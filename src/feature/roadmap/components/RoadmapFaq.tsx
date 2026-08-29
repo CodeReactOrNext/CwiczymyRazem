@@ -1,4 +1,5 @@
 import { Clock, Gift, HeartHandshake, RefreshCw } from "lucide-react";
+import Link from "next/link";
 
 const DISCORD_URL = "https://discord.gg/6yJmsZW2Ne";
 
@@ -32,7 +33,15 @@ const FAQ = [
     q: "What do I get in return?",
     a: (
       <>
-        A special role on our{" "}
+        Tokens, and the{" "}
+        <Link
+          href='/supporter'
+          className='text-cyan-400 transition-colors hover:text-cyan-300'>
+          supporter panel
+        </Link>{" "}
+        to spend them in: post and back roadmap ideas, propose the gear that
+        goes into the Arsenal, vote on the supporter case and next week&apos;s
+        challenge, or found a guild. On top of that a special role on our{" "}
         <a
           href={DISCORD_URL}
           target='_blank'
@@ -40,9 +49,9 @@ const FAQ = [
           className='text-cyan-400 transition-colors hover:text-cyan-300'>
           Discord
         </a>{" "}
-        and access to a channel just for supporters, where you can have a say in
-        what gets built next and see what I am working on behind the scenes.
-        After you buy a coffee, just{" "}
+        and a channel just for supporters, where you can see what I am working
+        on behind the scenes. The badge is handed out by matching the email on
+        the donation to your account — if you paid from another address, just{" "}
         <a
           href={DISCORD_URL}
           target='_blank'
@@ -50,7 +59,7 @@ const FAQ = [
           className='text-cyan-400 transition-colors hover:text-cyan-300'>
           message me on Discord
         </a>{" "}
-        so I can match it to you and hand you the role.
+        so I can attach it by hand.
       </>
     ),
   },
@@ -78,7 +87,9 @@ export const RoadmapFaq = () => {
             <Icon size={18} className='mt-0.5 shrink-0 text-zinc-500' />
             <div>
               <h3 className='text-sm font-semibold text-zinc-100'>{q}</h3>
-              <p className='mt-1.5 text-sm leading-relaxed text-zinc-400'>{a}</p>
+              <p className='mt-1.5 text-sm leading-relaxed text-zinc-400'>
+                {a}
+              </p>
             </div>
           </div>
         ))}

@@ -1,5 +1,8 @@
 import axios from "axios";
-import type { SupportTeamMember } from "feature/supportTeam/types/supportTeam.types";
+import type {
+  PendingSupporter,
+  SupportTeamMember,
+} from "feature/supportTeam/types/supportTeam.types";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -9,6 +12,7 @@ export interface SupportSearchResult extends SupportTeamMember {
 
 export const useAdminSupport = (password: string) => {
   const [members, setMembers] = useState<SupportTeamMember[]>([]);
+  const [pending, setPending] = useState<PendingSupporter[]>([]);
   const [results, setResults] = useState<SupportSearchResult[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -23,6 +27,7 @@ export const useAdminSupport = (password: string) => {
           headers: { "x-admin-password": pass },
         });
         setMembers(res.data.members ?? []);
+        setPending(res.data.pending ?? []);
       } catch {
         toast.error("Failed to load the supporters");
       } finally {
@@ -99,8 +104,23 @@ export const useAdminSupport = (password: string) => {
     }
   };
 
+  /** Drops a donation parked on an email nobody has signed up with. */
+  const removePending = async (email: string) => {
+    try {
+      const res = await axios.delete("/api/admin/support", {
+        data: { email },
+        headers: { "x-admin-password": password },
+      });
+      setPending(res.data.pending ?? []);
+      toast.success("Removed from the waiting donations");
+    } catch {
+      toast.error("Failed to remove the waiting donation");
+    }
+  };
+
   return {
     members,
+    pending,
     results,
     isLoading,
     isSearching,
@@ -108,5 +128,6 @@ export const useAdminSupport = (password: string) => {
     searchUsers,
     markAsSupport,
     removeSupport,
+    removePending,
   };
 };

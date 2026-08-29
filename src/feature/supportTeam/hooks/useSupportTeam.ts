@@ -19,7 +19,7 @@ const fetchSupportTeam = async (): Promise<SupportTeamMember[]> => {
  * Cached for a long while: the list changes maybe a few times a year.
  */
 export const useSupportTeam = () => {
-  const { data } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: SUPPORT_TEAM_QUERY_KEY,
     queryFn: fetchSupportTeam,
     staleTime: 30 * 60 * 1000,
@@ -32,10 +32,16 @@ export const useSupportTeam = () => {
   return useMemo(
     () => ({
       members,
+      /**
+       * True until the roster has arrived. Before that `isSupport` answers no
+       * for everyone, so anything that shows one thing to supporters and
+       * another to everybody else has to wait rather than flash the wrong one.
+       */
+      isLoading: isPending,
       getSupportMember: (uid?: string | null): SupportTeamMember | undefined =>
         uid ? index.get(uid) : undefined,
       isSupport: (uid?: string | null): boolean => !!uid && index.has(uid),
     }),
-    [members, index],
+    [members, index, isPending],
   );
 };

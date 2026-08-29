@@ -7,7 +7,7 @@ const sleep = (ms: number): Promise<void> =>
 export async function sendThrottled<T, R>(
   items: T[],
   task: (item: T, idx: number) => Promise<R>,
-  gapMs: number = RESEND_GAP_MS
+  gapMs: number = RESEND_GAP_MS,
 ): Promise<PromiseSettledResult<R>[]> {
   if (items.length === 0) return [];
 

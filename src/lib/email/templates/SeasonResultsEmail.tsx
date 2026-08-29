@@ -229,13 +229,13 @@ export default function SeasonResultsEmail({
     : `${seasonName} is over — see how you did`;
 
   return (
-    <Html lang="en">
+    <Html lang='en'>
       <Head />
       <Preview>{previewText}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={logoSection}>
-            <Img src={logoUrl} alt="Riff Quest" width="160" />
+            <Img src={logoUrl} alt='Riff Quest' width='160' />
           </Section>
 
           <Section style={card}>
@@ -275,15 +275,17 @@ export default function SeasonResultsEmail({
                 </Heading>
                 <Text style={paragraph}>
                   You finished with {userPoints.toLocaleString()} points
-                  {userPlace !== null ? `, placing ${ordinal(userPlace)}` : ""}
-                  . A new season starts tomorrow — come back and go further.
+                  {userPlace !== null ? `, placing ${ordinal(userPlace)}` : ""}.
+                  A new season starts tomorrow — come back and go further.
                 </Text>
 
                 <Section style={resultHero(heroBg)}>
                   <Text style={resultPlace(heroTextColor)}>
                     {userPoints.toLocaleString()}
                   </Text>
-                  <Text style={resultLabel(heroTextColor)}>points this season</Text>
+                  <Text style={resultLabel(heroTextColor)}>
+                    points this season
+                  </Text>
                 </Section>
               </>
             )}

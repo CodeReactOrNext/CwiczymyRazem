@@ -49,7 +49,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     probabilities: {
       Common: 0.38,
       Uncommon: 0.28,
-      Rare: 0.20,
+      Rare: 0.2,
       Epic: 0.11,
       Legendary: 0.025,
       Mythic: 0.005,
@@ -66,7 +66,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     country: "Korea",
     probabilities: {
       Common: 0,
-      Uncommon: 0.40,
+      Uncommon: 0.4,
       Rare: 0.33,
       Epic: 0.22,
       Legendary: 0.04,
@@ -84,7 +84,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     country: "Korea",
     probabilities: {
       Common: 0,
-      Uncommon: 0.40,
+      Uncommon: 0.4,
       Rare: 0.33,
       Epic: 0.22,
       Legendary: 0.04,
@@ -103,9 +103,56 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
       Common: 0.22,
       Uncommon: 0.25,
       Rare: 0.25,
-      Epic: 0.20,
+      Epic: 0.2,
       Legendary: 0.06,
       Mythic: 0.02,
+    },
+  },
+  /**
+   * The supporters' own case: six items, one per rarity, voted onto the slate
+   * for a fortnight at a time.
+   *
+   * Balanced as a *targeting* tool, not a better case. Curation is worth far
+   * more than it looks: rolling Mythic out of Elite spreads across the six
+   * Mythics in the game, so a 3% Mythic roll there is 0.5% on the one you
+   * wanted, while a slate has exactly one — at equal odds the supporter case
+   * would be six times the case Elite is. The odds are therefore set strictly
+   * below Elite at every rarity it shares, and strictly above the Featured
+   * case, which is the other curated one:
+   *
+   *   rarity      Featured (160)   Supporter (300)   Elite (350)
+   *   Rare            0.25              0.40            0.50
+   *   Epic            0.20              0.28            0.38
+   *   Legendary       0.06              0.07            0.09
+   *   Mythic          0.02             0.025            0.03
+   *
+   * So the ladder still reads top to bottom on raw value, and what the 300 Fame
+   * buys over the Featured case is knowing exactly which six items are in it.
+   *
+   * The Common seat is deliberately thin at 8% — a third of what the Featured
+   * case rolls and a fifth of the Standard's. Commons are the one tier the game
+   * hands out freely, so a fat Common slice on the most expensive curated case
+   * would just be a tax; 8% is enough that voting a Common in is a real way to
+   * finish that corner of the Dex, and small enough that nobody pays 300 Fame
+   * expecting one. Its share came out of Uncommon rather than the tiers above,
+   * so every relationship in the table stayed exactly where it was.
+   */
+  supporter: {
+    id: "supporter",
+    name: "Supporter Case",
+    description:
+      "Six items, chosen by the supporters. New slate every fortnight.",
+    fameCost: 300,
+    yearFrom: 2018,
+    yearTo: 2024,
+    country: "USA",
+    probabilities: {
+      Common: 0.08,
+      Uncommon: 0.145,
+      Rare: 0.4,
+      Epic: 0.28,
+      Legendary: 0.07,
+      Mythic: 0.025,
     },
   },
   "elite-guitar": {
@@ -120,7 +167,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     probabilities: {
       Common: 0,
       Uncommon: 0,
-      Rare: 0.50,
+      Rare: 0.5,
       Epic: 0.38,
       Legendary: 0.09,
       Mythic: 0.03,
@@ -138,7 +185,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     probabilities: {
       Common: 0,
       Uncommon: 0,
-      Rare: 0.50,
+      Rare: 0.5,
       Epic: 0.38,
       Legendary: 0.09,
       Mythic: 0.03,

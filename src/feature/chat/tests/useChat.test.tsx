@@ -83,11 +83,13 @@ describe("useChat Hook", () => {
       await result.current.toggleLike("msg1");
     });
 
+    // The room travels with every call now; omitted, the hook uses the global one.
     expect(toggleLikeChatMessage).toHaveBeenCalledWith(
       "msg1",
       "user123",
       "Test User",
-      false
+      false,
+      "chats"
     );
   });
 });

@@ -1,6 +1,7 @@
 import { CHAT_LIMIT_MESSAGE_LENGTH } from "feature/chat/chat.setting";
 import {
   fetchChatMessages,
+  GLOBAL_CHAT_PATH,
   sendChatMessage,
   toggleLikeChatMessage,
 } from "feature/chat/services/chatService";
@@ -16,7 +17,8 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
-export const useChat = () => {
+/** Same chat, any room: the global one by default, a guild's when given its path. */
+export const useChat = (chatPath: string = GLOBAL_CHAT_PATH) => {
   const { t } = useTranslation("chat");
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -28,9 +30,9 @@ export const useChat = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
 
   useEffect(() => {
-    const unsubscribe = fetchChatMessages(setMessages);
+    const unsubscribe = fetchChatMessages(setMessages, chatPath);
     return unsubscribe;
-  }, []);
+  }, [chatPath]);
 
   const sendMessage = useCallback(
     async (e: React.FormEvent) => {
@@ -51,7 +53,8 @@ export const useChat = () => {
           currentUserId,
           currentUserName,
           avatar,
-          userStats?.lvl || 0
+          userStats?.lvl || 0,
+          chatPath
         );
 
         setNewMessage("");
@@ -59,7 +62,7 @@ export const useChat = () => {
         toast.error(t("error"));
       }
     },
-    [newMessage, currentUserId, currentUserName, avatar, userStats]
+    [newMessage, currentUserId, currentUserName, avatar, userStats, chatPath]
   );
 
   const toggleLike = useCallback(
@@ -70,12 +73,12 @@ export const useChat = () => {
       const hasLiked = message?.likes?.some((l) => l.id === currentUserId) ?? false;
 
       try {
-        await toggleLikeChatMessage(messageId, currentUserId, currentUserName, hasLiked);
+        await toggleLikeChatMessage(messageId, currentUserId, currentUserName, hasLiked, chatPath);
       } catch {
         toast.error(t("error"));
       }
     },
-    [messages, currentUserId, currentUserName, t]
+    [messages, currentUserId, currentUserName, t, chatPath]
   );
 
   return {

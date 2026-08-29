@@ -32,7 +32,7 @@ export default async function getCroppedImg(
   imageSrc: string,
   pixelCrop: { x: number; y: number; width: number; height: number },
   rotation = 0,
-  flip = { horizontal: false, vertical: false }
+  flip = { horizontal: false, vertical: false },
 ): Promise<Blob | null> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
@@ -48,7 +48,7 @@ export default async function getCroppedImg(
   const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
     image.width,
     image.height,
-    rotation
+    rotation,
   );
 
   // set canvas size to match the bounding box
@@ -70,7 +70,7 @@ export default async function getCroppedImg(
     pixelCrop.x,
     pixelCrop.y,
     pixelCrop.width,
-    pixelCrop.height
+    pixelCrop.height,
   );
 
   // set canvas width to final desired crop size - this will clear existing context
@@ -89,4 +89,55 @@ export default async function getCroppedImg(
       resolve(file);
     }, "image/jpeg");
   });
+}
+
+const toBlob = (
+  canvas: HTMLCanvasElement,
+  type: string,
+): Promise<Blob | null> =>
+  new Promise((resolve) => canvas.toBlob((blob) => resolve(blob), type, 0.9));
+
+/**
+ * Centre-crops an image to a square and scales it down.
+ *
+ * Whatever comes out of a file picker — a 4000px photo, a wide banner — leaves
+ * here as one predictable square, so an upload is small and every card that
+ * shows it is the same shape. WebP where the browser can encode it, PNG where
+ * it cannot, because transparency is the point of a crest.
+ */
+export async function getSquareImg(
+  file: Blob,
+  size: number,
+): Promise<Blob | null> {
+  const url = URL.createObjectURL(file);
+
+  try {
+    const image = await createImage(url);
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    const side = Math.min(image.width, image.height);
+    ctx.drawImage(
+      image,
+      (image.width - side) / 2,
+      (image.height - side) / 2,
+      side,
+      side,
+      0,
+      0,
+      size,
+      size,
+    );
+
+    return (
+      (await toBlob(canvas, "image/webp")) ??
+      (await toBlob(canvas, "image/png"))
+    );
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }

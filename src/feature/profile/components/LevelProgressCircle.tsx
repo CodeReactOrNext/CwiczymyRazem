@@ -1,3 +1,4 @@
+import { cn } from "assets/lib/utils";
 import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface LevelProgressCircleProps {
@@ -34,7 +35,11 @@ export const LevelProgressCircle = ({
   return (
     <div className={`relative flex flex-col items-center gap-1 ${className}`}>
       <div className="relative">
-        <svg width={finalSize} height={finalSize} viewBox="0 0 100 100" className="relative shrink-0 md:w-[120px] md:h-[120px]">
+        <svg
+          width={finalSize}
+          height={finalSize}
+          viewBox="0 0 100 100"
+          className={cn("relative shrink-0", !size && "md:w-[120px] md:h-[120px]")}>
           <defs>
             <linearGradient id="lvlArcGradDash" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#a5f3fc" />

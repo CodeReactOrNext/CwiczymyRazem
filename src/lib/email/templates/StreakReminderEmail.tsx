@@ -29,7 +29,11 @@ interface StreakReminderEmailProps {
  * so a concrete hour count goes in whenever the timezone is known.
  */
 export function formatHoursLeft(hoursLeft?: number | null): string {
-  if (typeof hoursLeft !== "number" || !Number.isFinite(hoursLeft) || hoursLeft <= 0) {
+  if (
+    typeof hoursLeft !== "number" ||
+    !Number.isFinite(hoursLeft) ||
+    hoursLeft <= 0
+  ) {
     return "tonight";
   }
   return hoursLeft === 1 ? "in 1 hour" : `in ${hoursLeft} hours`;
@@ -109,7 +113,6 @@ const streakHero = (bgColor: string) => ({
   textAlign: "center" as const,
   margin: "0 0 24px",
 });
-
 
 const streakNumber = (color: string) => ({
   fontSize: "72px",
@@ -213,13 +216,13 @@ export default function StreakReminderEmail({
     : `Hey ${displayName}, it's been 3 days. Time to play something.`;
 
   return (
-    <Html lang="en">
+    <Html lang='en'>
       <Head />
       <Preview>{previewText}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={logoSection}>
-            <Img src={logoUrl} alt="Riff Quest" width="160" />
+            <Img src={logoUrl} alt='Riff Quest' width='160' />
           </Section>
 
           <Section style={card}>
@@ -230,8 +233,8 @@ export default function StreakReminderEmail({
                   {displayName}, your streak ends {deadline}
                 </Heading>
                 <Text style={paragraph}>
-                  You&apos;ve built something real. Don&apos;t let one missed day
-                  reset it — a single session today is all it takes.
+                  You&apos;ve built something real. Don&apos;t let one missed
+                  day reset it — a single session today is all it takes.
                 </Text>
 
                 <Section style={streakHero(accentBg)}>

@@ -61,13 +61,13 @@ const asNonNegativeInt = (value: unknown): number | null =>
  */
 const getDaysSincePractice = (
   statistics: StreakCandidateStats,
-  now: Date
+  now: Date,
 ): number | null => {
   const localDay = asString(statistics.lastPracticeLocalDay);
   if (localDay) {
     return daysBetweenDayKeys(
       localDay,
-      getLocalDayKey(now, statistics.timeZone)
+      getLocalDayKey(now, statistics.timeZone),
     );
   }
 
@@ -79,13 +79,13 @@ const getDaysSincePractice = (
 
   return daysBetweenDayKeys(
     parsed.toISOString().slice(0, 10),
-    now.toISOString().slice(0, 10)
+    now.toISOString().slice(0, 10),
   );
 };
 
 export const evaluateStreakReminder = (
   statistics: StreakCandidateStats | null | undefined,
-  now: Date = new Date()
+  now: Date = new Date(),
 ): StreakReminderTarget | null => {
   if (!statistics) return null;
 

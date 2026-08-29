@@ -17,8 +17,7 @@ export async function sendWelcomeEmail({ to, userName }: SendWelcomeArgs) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riff.quest";
 
   const logoUrl =
-    process.env.EMAIL_LOGO_URL ??
-    "https://riff.quest/images/longlightlogo.png";
+    process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
   const { data, error } = await getResend().emails.send({
     from: EMAIL_FROM,
@@ -61,8 +60,7 @@ export async function sendStreakReminderEmail({
 }: SendStreakReminderArgs) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riff.quest";
   const logoUrl =
-    process.env.EMAIL_LOGO_URL ??
-    "https://riff.quest/images/longlightlogo.png";
+    process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
   const deadline = formatHoursLeft(hoursLeft);
   const subjects: Record<StreakEmailVariant, string> = {
@@ -85,7 +83,11 @@ export async function sendStreakReminderEmail({
   });
 
   if (error) {
-    console.error("[email] streak reminder send failed", { to, variant, error });
+    console.error("[email] streak reminder send failed", {
+      to,
+      variant,
+      error,
+    });
     throw error;
   }
 

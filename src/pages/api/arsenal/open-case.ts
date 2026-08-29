@@ -17,6 +17,7 @@ import type {
 import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import type { DocumentReference,Transaction } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
+import { getSlatePool } from "lib/supporterCase/supporterCase";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -131,13 +132,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         (i) => i.effectId,
       );
 
-      // Daily case: the drop comes from today's deterministic featured pool —
-      // the exact 10 items the shop preview shows. Rarity is still rolled from
-      // the case's probability table; the item is then picked from the pool's
-      // entries of that rarity (guitar or effect, whatever the slot holds).
+      // Curated cases draw from a fixed list instead of the whole collection:
+      // the Featured case from today's deterministic pool, the Supporter case
+      // from the slate this fortnight's vote put together. Rarity is still
+      // rolled from the case's own table; the item is then picked from that
+      // pool's entries of the rolled rarity.
       let dailyPick: DailyPoolEntry | null = null;
-      if (caseType === "daily") {
-        const pool = getDailyPool();
+      if (caseType === "daily" || caseType === "supporter") {
+        const pool =
+          caseType === "supporter"
+            ? ((await getSlatePool()) as DailyPoolEntry[])
+            : getDailyPool();
         const rarity = drawRarity(caseDef.probabilities);
         const candidates = pool.filter((e) => e.def.rarity === rarity);
         // Slots guarantee every rarity is present; fall back to the whole pool just in case.

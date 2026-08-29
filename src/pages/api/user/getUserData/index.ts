@@ -1,6 +1,7 @@
 import { todayKey } from "lib/email/cooldown";
 import { markCooldown } from "lib/email/cooldownStore";
 import { sendWelcomeEmail } from "lib/email/send";
+import { claimPendingSupporter } from "lib/support/supporterGrant";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore } from "utils/firebase/api/firebase.config";
 
@@ -72,6 +73,19 @@ export default async function handler(
           backfill.displayName = user.displayName;
         if (Object.keys(backfill).length > 0) {
           await userDocRef.update(backfill);
+        }
+      }
+
+      // A Buy Me a Coffee donation made before this account existed (or while
+      // it was logged out) waits on the donor's email. Login is the one moment
+      // the two sides are both known, so the badge is handed out here. The
+      // grant itself re-checks the address against Firebase Auth — the email in
+      // the request body only decides whether there is anything to look up.
+      if (userData?.isSupport !== true) {
+        try {
+          await claimPendingSupporter(uid, userData?.email ?? user.email);
+        } catch (error) {
+          console.error("[supporter-claim] failed for", uid, error);
         }
       }
 

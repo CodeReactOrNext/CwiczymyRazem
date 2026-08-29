@@ -6,20 +6,25 @@ import {
   type EmailCooldownType,
 } from "./cooldown";
 
-export async function fetchCooldown(uid: string): Promise<EmailCooldownData | null> {
-  const snap = await firestore.collection(EMAIL_COOLDOWNS_COLLECTION).doc(uid).get();
+export async function fetchCooldown(
+  uid: string,
+): Promise<EmailCooldownData | null> {
+  const snap = await firestore
+    .collection(EMAIL_COOLDOWNS_COLLECTION)
+    .doc(uid)
+    .get();
   if (!snap.exists) return null;
   return (snap.data() as EmailCooldownData) ?? null;
 }
 
 export async function fetchCooldownsMap(
-  uids: string[]
+  uids: string[],
 ): Promise<Map<string, EmailCooldownData>> {
   const map = new Map<string, EmailCooldownData>();
   if (uids.length === 0) return map;
 
   const refs = uids.map((uid) =>
-    firestore.collection(EMAIL_COOLDOWNS_COLLECTION).doc(uid)
+    firestore.collection(EMAIL_COOLDOWNS_COLLECTION).doc(uid),
   );
   const snaps = await firestore.getAll(...refs);
   snaps.forEach((snap: any, idx: number) => {
@@ -33,7 +38,7 @@ export async function fetchCooldownsMap(
 export async function markCooldown(
   uid: string,
   type: EmailCooldownType,
-  dateKey: string
+  dateKey: string,
 ): Promise<void> {
   await firestore
     .collection(EMAIL_COOLDOWNS_COLLECTION)
@@ -43,7 +48,7 @@ export async function markCooldown(
 
 export async function batchMarkCooldown(
   entries: { uid: string; type: EmailCooldownType }[],
-  dateKey: string
+  dateKey: string,
 ): Promise<void> {
   if (entries.length === 0) return;
 
@@ -55,7 +60,7 @@ export async function batchMarkCooldown(
       batch.set(
         firestore.collection(EMAIL_COOLDOWNS_COLLECTION).doc(uid),
         { [type]: dateKey },
-        { merge: true }
+        { merge: true },
       );
     });
     await batch.commit();

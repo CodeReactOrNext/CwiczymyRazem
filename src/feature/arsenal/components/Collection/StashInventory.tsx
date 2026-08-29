@@ -14,10 +14,7 @@ import {
   GUITARS_BY_ID,
 } from "feature/arsenal/data/guitarDefinitions";
 import { getItemValue } from "feature/arsenal/data/itemStats";
-import {
-  getPartLabel,
-  PART_TIER_COLORS,
-} from "feature/arsenal/data/partDefinitions";
+import { getPartLabel } from "feature/arsenal/data/partDefinitions";
 import {
   getModResaleValue,
   getPartResaleValue,
@@ -51,6 +48,13 @@ import { useUpdatePedalboard } from "feature/arsenal/hooks/useUpdatePedalboard";
 import { useUpdateRig } from "feature/arsenal/hooks/useUpdateRig";
 import { useUpdateStashLayout } from "feature/arsenal/hooks/useUpdateStashLayout";
 import { useWorkshopMod } from "feature/arsenal/hooks/useWorkshopMod";
+import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
+import {
+  guitarPiece,
+  modPieces,
+  partPieces,
+  pedalPiece,
+} from "feature/arsenal/utils/boardPieces";
 import {
   getEffectEntries,
   getGuitarEntries,
@@ -72,7 +76,6 @@ import { getInUseGuitarIds } from "feature/arsenal/utils/inUse";
 import {
   getEffectScrapYield,
   getGuitarScrapYield,
-  groupWalletByPart,
 } from "feature/arsenal/utils/scrap";
 import type { StashLayout } from "feature/arsenal/utils/stashLayout";
 import {
@@ -99,27 +102,21 @@ import { useResponsiveStore } from "store/useResponsiveStore";
 
 import type {
   ArsenalUserData,
-  EffectInventoryItem,
-  InventoryItem,
   PartId,
   PartTier,
   RigSetup,
   SalvagedMod,
-  ScrapPart,
 } from "../../types/arsenal.types";
 import { DEFAULT_RIG } from "../../types/arsenal.types";
 import { BulkDuplicatesDialog } from "../GuitarInventory/BulkDuplicatesDialog";
 import { EffectCard } from "../GuitarInventory/EffectCard";
-import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
 import { EquipTargetDialog } from "../GuitarInventory/EquipTargetDialog";
 import type { EquipTarget } from "../GuitarInventory/GuitarCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
-import { GuitarStashTile } from "../GuitarInventory/GuitarStashTile";
 import { SellConfirmDialog } from "../GuitarInventory/SellConfirmDialog";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
-import { PartIcon } from "../Parts/PartIcon";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
-import { ModArt } from "../Workshop/ModArt";
+import { BoardPieceTile } from "./BoardPieceTile";
 import { CollectionEmptyResult } from "./CollectionEmptyResult";
 import { CollectionSectionHeader } from "./CollectionSectionHeader";
 import { FitSalvagedDialog } from "./FitSalvagedDialog";
@@ -130,7 +127,6 @@ import type { StashMenuItem } from "./StashContextMenu";
 import { StashContextMenu } from "./StashContextMenu";
 import { StashItemDialog } from "./StashItemDialog";
 import type { StashDropTarget, StashPlacement } from "./StashTile";
-import { StashTile } from "./StashTile";
 import { useStashDrag } from "./useStashDrag";
 
 /** Which half of the arsenal an id belongs to. */
@@ -148,37 +144,6 @@ type ResalePending =
   | { kind: "mod"; mod: SalvagedMod }
   | { kind: "part"; partId: PartId; tier: PartTier; qty: number }
   | null;
-
-/** One thing hanging on the board, with everything its socket needs to draw. */
-type BoardPiece =
-  | {
-      id: string;
-      tall: true;
-      kind: "guitar";
-      item: InventoryItem;
-      name: string;
-    }
-  | {
-      id: string;
-      tall: false;
-      kind: "effect";
-      item: EffectInventoryItem;
-      name: string;
-    }
-  | {
-      id: string;
-      tall: false;
-      kind: "part";
-      part: ScrapPart & { tier: PartTier };
-      name: string;
-    }
-  | {
-      id: string;
-      tall: false;
-      kind: "mod";
-      mod: SalvagedMod;
-      name: string;
-    };
 
 interface StashInventoryProps {
   data: ArsenalUserData;
@@ -207,12 +172,6 @@ const ARRANGE_ORDERS: { id: CollectionSort; label: string }[] = [
   { id: "level", label: "Highest level first" },
   { id: "newest", label: "Newest first" },
 ];
-
-/** Part stacks get a stable id of their own — they have no inventory row. */
-const partPieceId = (partId: string, tier: string) => `part:${partId}:${tier}`;
-
-/** Mods are purple everywhere in the arsenal — the bench, the picker, the socket. */
-const MOD_TILE_COLOR = "#c084fc";
 
 /**
  * One board for the whole arsenal, arranged by hand.
@@ -395,61 +354,18 @@ export const StashInventory = ({
       within: CollectionScope,
     ): BoardPiece[] => {
       const byHand = order === "manual";
-      const guitarPiece = (item: InventoryItem): BoardPiece => {
-        const guitar = GUITARS_BY_ID.get(item.guitarId);
-        return {
-          id: item.id,
-          tall: true,
-          kind: "guitar",
-          item,
-          name: guitar ? `${guitar.brand} ${guitar.name}` : "",
-        };
-      };
 
-      const pedalPiece = (item: EffectInventoryItem): BoardPiece => {
-        const effect = EFFECTS_BY_ID.get(item.effectId);
-        return {
-          id: item.id,
-          tall: false,
-          kind: "effect",
-          item,
-          name: effect ? `${effect.brand} ${effect.name}` : "",
-        };
-      };
-
-      const partStacks = groupWalletByPart(data.parts ?? []).flatMap((row) =>
-        row.tiers.map((tier) => ({ partId: row.partId, ...tier })),
+      const parts = partPieces(data.parts ?? []).filter(
+        (piece) =>
+          byHand || (within === "all" && matchesQuery(piece.name, search)),
       );
-
-      const parts: BoardPiece[] = partStacks
-        .filter(
-          (stack) =>
-            byHand ||
-            (within === "all" &&
-              matchesQuery(getPartLabel(stack.partId), search)),
-        )
-        .map((stack) => ({
-          id: partPieceId(stack.partId, stack.tier),
-          tall: false,
-          kind: "part",
-          part: stack,
-          name: `${stack.tier} ${getPartLabel(stack.partId)}`,
-        }));
 
       // Rescued mods hang with everything else — they are gear, not a counter,
       // and the whole point of the stash is that you can see what you hold.
-      const mods: BoardPiece[] = salvagedMods
-        .map((mod) => ({
-          id: mod.id,
-          tall: false as const,
-          kind: "mod" as const,
-          mod,
-          name: getModDef(mod.kind, mod.featureId)?.label ?? mod.featureId,
-        }))
-        .filter(
-          (piece) =>
-            byHand || (within === "all" && matchesQuery(piece.name, search)),
-        );
+      const mods = modPieces(salvagedMods).filter(
+        (piece) =>
+          byHand || (within === "all" && matchesQuery(piece.name, search)),
+      );
 
       // Hand-arranged: the saved layout decides where everything hangs, so the
       // order the pieces are listed in only settles what was never placed.
@@ -588,9 +504,16 @@ export const StashInventory = ({
   );
 
   const closeDetail = () => setDetail(null);
-  const openDetail = (kind: Kind, itemId: string) => {
+  /** A socket opened from the board — every kind has somewhere to open into. */
+  const openPiece = (piece: BoardPiece) => {
     if (consumeClick()) return;
-    setDetail({ kind, itemId });
+    if (piece.kind === "guitar" || piece.kind === "effect") {
+      setDetail({ kind: piece.kind, itemId: piece.id });
+    } else if (piece.kind === "mod") {
+      setModDetail(piece.mod);
+    } else {
+      setPartDetail(piece.part);
+    }
   };
   /** Opening a confirm dialog always closes the sheet it was triggered from. */
   const open = (
@@ -922,68 +845,15 @@ export const StashInventory = ({
           onContextMenu: openMenu(piece),
         };
 
-    if (piece.kind === "guitar")
-      return (
-        <GuitarStashTile
-          key={piece.id}
-          {...placement}
-          item={piece.item}
-          isEquipped={data.equippedItemId === piece.id}
-          rigSlot={rigSlotOf(piece.id)}
-          onClick={() => openDetail("guitar", piece.id)}
-        />
-      );
-
-    if (piece.kind === "effect")
-      return (
-        <EffectStashTile
-          key={piece.id}
-          {...placement}
-          item={piece.item}
-          isOnPedalboard={pedalboardItemIds.has(piece.id)}
-          onClick={() => openDetail("effect", piece.id)}
-        />
-      );
-
-    if (piece.kind === "mod")
-      return (
-        <StashTile
-          key={piece.id}
-          {...placement}
-          color={MOD_TILE_COLOR}
-          art={<ModArt modId={piece.mod.featureId} />}
-          label={`${piece.name} +${piece.mod.points}`}
-          level={piece.mod.points}
-          levelPrefix='+'
-          preview={<SalvagedModCard mod={piece.mod} />}
-          onClick={() => {
-            if (consumeClick()) return;
-            setModDetail(piece.mod);
-          }}
-        />
-      );
-
     return (
-      <StashTile
+      <BoardPieceTile
         key={piece.id}
         {...placement}
-        color={PART_TIER_COLORS[piece.part.tier]}
-        // Sized off the socket rather than in px: the board's cells grow with
-        // the viewport, and a fixed box left a part swimming in a wide one.
-        art={<PartIcon partId={piece.part.partId} className='p-[14%]' />}
-        label={`${piece.name} ×${piece.part.qty}`}
-        count={piece.part.qty}
-        preview={
-          <ScrapPartCard
-            partId={piece.part.partId}
-            tier={piece.part.tier}
-            qty={piece.part.qty}
-          />
-        }
-        onClick={() => {
-          if (consumeClick()) return;
-          setPartDetail(piece.part);
-        }}
+        piece={piece}
+        isEquipped={data.equippedItemId === piece.id}
+        rigSlot={rigSlotOf(piece.id)}
+        isOnPedalboard={pedalboardItemIds.has(piece.id)}
+        onClick={() => openPiece(piece)}
       />
     );
   };

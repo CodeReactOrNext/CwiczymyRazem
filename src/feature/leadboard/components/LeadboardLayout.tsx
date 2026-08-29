@@ -189,6 +189,7 @@ export const LeadboardLayout = ({
                     guitarsOwned={user.arsenal?.inventory?.length ?? 0}
                     effectsOwned={user.arsenal?.effectInventory?.length ?? 0}
                     arsenal={user.arsenal}
+                    guildBadge={user.guildBadge}
                   />
                 ))}
               </ul>

@@ -21,7 +21,7 @@ const FALLBACK: FundingResponse = {
 function startOfMonthSec(): number {
   const now = new Date();
   return Math.floor(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1) / 1000
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1) / 1000,
   );
 }
 
@@ -38,7 +38,7 @@ const num = (v: unknown): number => {
 function paymentsMade(
   startSec: number,
   endSec: number,
-  durationType: string
+  durationType: string,
 ): number {
   if (!startSec || endSec < startSec) return 0;
   let count = 1;
@@ -67,7 +67,7 @@ export async function getFundingSnapshot(): Promise<FundingResponse> {
 
     // Base: one-off coffees, maintained by /api/bmc-webhook.
     const fundingSnap = await firestore.collection("meta").doc("funding").get();
-    const base = fundingSnap.exists ? fundingSnap.data() ?? {} : {};
+    const base = fundingSnap.exists ? (fundingSnap.data() ?? {}) : {};
     let totalRaised = num(base.oneOffTotal);
     let supporters = num(base.oneOffSupporters);
     let raisedThisMonth = 0;
@@ -91,7 +91,7 @@ export async function getFundingSnapshot(): Promise<FundingResponse> {
       const paymentsBeforeMonth = paymentsMade(
         startSec,
         Math.min(cappedEnd, monthStartSec - 1),
-        durationType
+        durationType,
       );
       raisedThisMonth += amount * (payments - paymentsBeforeMonth);
     });
@@ -99,7 +99,7 @@ export async function getFundingSnapshot(): Promise<FundingResponse> {
     // One-off coffees logged this month, summed from the per-event ledger.
     try {
       const monthStartTs = admin.firestore.Timestamp.fromMillis(
-        monthStartSec * 1000
+        monthStartSec * 1000,
       );
       const eventsSnap = await firestore
         .collection("bmcFundingEvents")

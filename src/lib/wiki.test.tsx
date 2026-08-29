@@ -106,7 +106,9 @@ describe("wiki content", () => {
 
       for (const src of sources) {
         const file = path.join(process.cwd(), "public", src);
-        expect(fs.existsSync(file), `${page.slug} references ${src}`).toBe(true);
+        expect(fs.existsSync(file), `${page.slug} references ${src}`).toBe(
+          true,
+        );
       }
     }
   });

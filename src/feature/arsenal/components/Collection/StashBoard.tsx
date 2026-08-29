@@ -16,6 +16,11 @@ interface StashBoardProps {
   gridRef: RefObject<HTMLDivElement | null>;
   /** Cell being dropped on, and whether the piece is allowed to land there. */
   drop?: { index: number; tall: boolean; valid: boolean } | null;
+  /**
+   * The whole cabinet is the drop target right now — a piece is being carried
+   * over from another board, where the cell it lands on is nobody's decision.
+   */
+  receiving?: boolean;
   label?: string;
   children: ReactNode;
   className?: string;
@@ -33,17 +38,27 @@ export const StashBoard = ({
   rows,
   gridRef,
   drop,
+  receiving = false,
   label,
   children,
   className,
 }: StashBoardProps) => (
   <div
-    className={cn("overflow-x-auto rounded-lg p-2", className)}
+    className={cn(
+      "overflow-x-auto rounded-lg p-2 transition-shadow",
+      className,
+    )}
     style={{
-      background:
-        "linear-gradient(180deg, rgba(39,39,42,0.55) 0%, rgba(9,9,11,0.85) 22%, rgba(9,9,11,0.92) 100%)",
-      boxShadow:
-        "inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 0 1px rgba(0,0,0,0.6)",
+      background: receiving
+        ? "linear-gradient(180deg, rgba(34,211,238,0.16) 0%, rgba(9,9,11,0.85) 22%, rgba(9,9,11,0.92) 100%)"
+        : "linear-gradient(180deg, rgba(39,39,42,0.55) 0%, rgba(9,9,11,0.85) 22%, rgba(9,9,11,0.92) 100%)",
+      // A carried piece has to be told which cabinet will take it, and a lit
+      // socket cannot say it: where the piece lands on a shelf nobody arranges
+      // is the board's choice, not the player's. So the cabinet itself lights
+      // up, in the same cyan a socket uses when it is the target.
+      boxShadow: receiving
+        ? "inset 0 0 0 1px rgba(34,211,238,0.75), 0 0 22px rgba(34,211,238,0.22)"
+        : "inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 0 1px rgba(0,0,0,0.6)",
     }}>
     <div
       ref={gridRef}

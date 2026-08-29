@@ -51,8 +51,7 @@ export interface SentryEnvironmentInput {
 export const resolveSentryEnvironment = ({
   vercelEnv,
   nodeEnv,
-}: SentryEnvironmentInput): string =>
-  vercelEnv || nodeEnv || "development";
+}: SentryEnvironmentInput): string => vercelEnv || nodeEnv || "development";
 
 export const SENTRY_ENABLED = resolveSentryEnabled({
   dsn: SENTRY_DSN,

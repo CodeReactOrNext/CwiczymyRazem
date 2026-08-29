@@ -17,7 +17,7 @@ describe("evaluateStreakReminder", () => {
         lastPracticeLocalDay: "2026-08-15",
         timeZone: "Europe/Warsaw",
       },
-      NOW
+      NOW,
     );
 
     expect(target?.streakDays).toBe(79);
@@ -32,7 +32,7 @@ describe("evaluateStreakReminder", () => {
         lastPracticeLocalDay: "2026-08-15",
         timeZone: "Europe/Warsaw",
       },
-      NOW
+      NOW,
     );
 
     expect(target?.streakDays).toBe(8);
@@ -45,10 +45,10 @@ describe("evaluateStreakReminder", () => {
 
     expect(
       evaluateStreakReminder({ ...stats, timeZone: "Pacific/Auckland" }, NOW)
-        ?.daysSincePractice
+        ?.daysSincePractice,
     ).toBe(1);
     expect(
-      evaluateStreakReminder({ ...stats, timeZone: "Europe/Warsaw" }, NOW)
+      evaluateStreakReminder({ ...stats, timeZone: "Europe/Warsaw" }, NOW),
     ).toBeNull();
   });
 
@@ -59,7 +59,7 @@ describe("evaluateStreakReminder", () => {
         lastPracticeLocalDay: "2026-08-13",
         timeZone: "Europe/Warsaw",
       },
-      NOW
+      NOW,
     );
 
     expect(target?.daysSincePractice).toBe(3);
@@ -70,7 +70,7 @@ describe("evaluateStreakReminder", () => {
     const at = (day: string) =>
       evaluateStreakReminder(
         { streakDays: 5, lastPracticeLocalDay: day, timeZone: "Europe/Warsaw" },
-        NOW
+        NOW,
       );
 
     expect(at("2026-08-16")).toBeNull(); // practised today
@@ -88,15 +88,15 @@ describe("evaluateStreakReminder", () => {
           lastPracticeLocalDay: "2026-08-17",
           timeZone: "Europe/Warsaw",
         },
-        NOW
-      )
+        NOW,
+      ),
     ).toBeNull();
   });
 
   it("falls back to lastReportDate for accounts that never reported a zone", () => {
     const target = evaluateStreakReminder(
       { actualDayWithoutBreak: 6, lastReportDate: "2026-08-15T00:00:00.000Z" },
-      NOW
+      NOW,
     );
 
     expect(target?.daysSincePractice).toBe(1);
@@ -109,7 +109,7 @@ describe("evaluateStreakReminder", () => {
     expect(evaluateStreakReminder(null, NOW)).toBeNull();
     expect(evaluateStreakReminder({}, NOW)).toBeNull();
     expect(
-      evaluateStreakReminder({ lastReportDate: "not-a-date" }, NOW)
+      evaluateStreakReminder({ lastReportDate: "not-a-date" }, NOW),
     ).toBeNull();
   });
 });

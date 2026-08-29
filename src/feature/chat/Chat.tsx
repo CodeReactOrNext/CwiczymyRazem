@@ -18,7 +18,8 @@ import { useTranslation } from "hooks/useTranslation";
 import { Heart, SendHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-const Chat = () => {
+/** `chatPath` picks the room; omitted, it is the global one. */
+const Chat = ({ chatPath }: { chatPath?: string } = {}) => {
   const {
     error,
     messages,
@@ -27,7 +28,7 @@ const Chat = () => {
     setNewMessage,
     toggleLike,
     currentUserId,
-  } = useChat();
+  } = useChat(chatPath);
 
   const { t } = useTranslation("chat");
   // Na dotyku nie ma hovera, więc serduszko odsłania się tapnięciem w dymek.

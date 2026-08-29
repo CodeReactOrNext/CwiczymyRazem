@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { logger } from "feature/logger/Logger";
 import * as admin from "firebase-admin";
+import { grantSupporterByEmail } from "lib/support/supporterGrant";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Readable } from "stream";
 import { firestore } from "utils/firebase/api/firebase.config";
@@ -89,6 +90,37 @@ async function postDonationActivity(
   }
 }
 
+/** BMC labels the donor's address differently per event type; take whichever came. */
+function extractEmail(data: Record<string, any>): string | null {
+  return data.supporter_email ?? data.payer_email ?? data.email ?? null;
+}
+
+/** Turns the donation into the supporter badge. Anonymous donations carry no
+ * address and are skipped; an address with no account behind it yet is parked
+ * until that person logs in. Never throws — a badge is a thank-you, not a
+ * reason to make BMC retry a donation that was already recorded. */
+async function grantSupporterBadge(
+  data: Record<string, any>,
+  type: string
+): Promise<void> {
+  try {
+    const outcome = await grantSupporterByEmail({
+      email: extractEmail(data),
+      supporterName: data.supporter_name ?? null,
+      amount: extractAmount(data),
+    });
+    logger.info(`BMC supporter badge: ${outcome.status}`, {
+      context: "bmcWebhook",
+      extra: { type, status: outcome.status },
+    });
+  } catch (error) {
+    logger.warn("Failed to grant the supporter badge", {
+      context: "bmcWebhook",
+      extra: { error: error instanceof Error ? error.message : String(error) },
+    });
+  }
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -142,6 +174,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (isNewDonation) {
         await postDonationActivity(data.supporter_name ?? null, amount, "one_off");
+        await grantSupporterBadge(data, type);
       }
     } else if (
       type === "recurring_donation.started" ||
@@ -169,6 +202,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (isNewSubscription) {
         await postDonationActivity(data.supporter_name ?? null, extractAmount(data), "recurring");
+        await grantSupporterBadge(data, type);
       }
     } else if (
       type === "recurring_donation.updated" ||

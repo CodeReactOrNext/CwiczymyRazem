@@ -9,10 +9,13 @@ import { FeedbackModal } from "components/FeedbackBubble";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import Avatar from "components/UI/Avatar";
+import { DISCORD_INVITE_URL } from "constants/community";
 import { DESKTOP_APP_RELEASES_URL } from "constants/desktopApp";
 import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaimedMilestone";
+import { getLockedAtLvl } from "feature/levelGate/data/featureUnlocks";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 import { SupportModal } from "feature/support/components/SupportModal";
+import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import {
   selectCurrentUserStats,
   selectUserAuth,
@@ -37,11 +40,13 @@ import {
   Dumbbell,
   FilePlus2,
   Flame,
+  Heart,
   Home,
   LayoutDashboard,
   Library,
   ListChecks,
   ListMusic,
+  Lock,
   LogOut,
   Mic2,
   Milestone,
@@ -51,6 +56,7 @@ import {
   Route,
   Search,
   Settings,
+  Shield,
   SlidersHorizontal,
   Star,
   Swords,
@@ -68,7 +74,6 @@ import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 
-
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
   name: string;
@@ -76,8 +81,6 @@ export interface SidebarLinkInterface {
   icon: React.ReactNode;
   external?: boolean;
 }
-
-const DISCORD_INVITE_URL = "https://discord.com/invite/6yJmsZW2Ne";
 
 /** Fixed-size slot so icons of different sizes keep the labels on one line. */
 const NAV_ICON_SLOT = "flex h-5 w-5 shrink-0 items-center justify-center";
@@ -98,6 +101,7 @@ const SidebarNavLink = ({
   tooltip,
   muted = false,
   external = false,
+  lockedLvl,
 }: {
   href: string;
   name: string;
@@ -108,6 +112,8 @@ const SidebarNavLink = ({
   tooltip?: string;
   muted?: boolean;
   external?: boolean;
+  /** Level the page opens at — set only while the account is below it. */
+  lockedLvl?: number;
 }) => {
   const { createRipple, ripple } = useRipple();
   const link = (
@@ -123,37 +129,50 @@ const SidebarNavLink = ({
         isActive
           ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
           : muted
-          ? "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
-          : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+            ? "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+            : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
       }`}>
       {ripple}
-      <span className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
+      <span
+        className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
         {icon}
       </span>
-      <span className="flex-1">{name}</span>
-      {(showBadge || isActive) && (
+      <span className={`flex-1 ${lockedLvl ? "text-zinc-600" : ""}`}>
+        {name}
+      </span>
+      {lockedLvl && (
+        <span
+          aria-label={`Locked until level ${lockedLvl}`}
+          className='flex shrink-0 items-center gap-1 text-[11px] font-bold tabular-nums text-zinc-600'>
+          <Lock size={11} />
+          {lockedLvl}
+        </span>
+      )}
+      {!lockedLvl && (showBadge || isActive) && (
         <span className={NAV_INDICATOR_SLOT}>
           {showBadge ? (
             <span
-              aria-label="Unclaimed reward"
-              className="h-2 w-2 rounded-full bg-amber-500 animate-pulse"
+              aria-label='Unclaimed reward'
+              className='h-2 w-2 animate-pulse rounded-full bg-amber-500'
             />
           ) : (
-            <span className="h-2 w-2 rounded-full bg-cyan-400" />
+            <span className='h-2 w-2 rounded-full bg-cyan-400' />
           )}
         </span>
       )}
     </Link>
   );
 
-  if (!tooltip) return link;
+  const hint = lockedLvl ? `Opens at level ${lockedLvl}` : tooltip;
+
+  if (!hint) return link;
 
   return (
     <TooltipProvider>
       <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>{link}</TooltipTrigger>
-        <TooltipContent side="right" className="max-w-[200px]">
-          <p>{tooltip}</p>
+        <TooltipContent side='right' className='max-w-[200px]'>
+          <p>{hint}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -168,29 +187,114 @@ interface SidebarSubLink {
 }
 
 const PRACTICE_SUB_NAV: SidebarSubLink[] = [
-  { id: "practice-plans", name: "Practice Routines", href: "/timer/plans", icon: <ListChecks size={16} /> },
-  { id: "practice-auto", name: "Auto Plan", href: "/timer/auto", icon: <PiMagicWandDuotone size={16} /> },
-  { id: "practice-free-timer", name: "Free Timer", href: "/timer/practice", icon: <Clock size={16} /> },
-  { id: "practice-report", name: "Manual Log", href: "/report", icon: <NotebookPen size={16} /> },
-  { id: "practice-gp-tabs", name: "Guitar Pro Files", href: "/gp-tabs", icon: <SiGuitarpro size={16} /> },
-  { id: "practice-skills", name: "Skills", href: "/profile/skills?tab=skill-tree", icon: <Brain size={16} /> },
-  { id: "practice-exercises", name: "Exercises", href: "/profile/skills?tab=browse", icon: <Dumbbell size={16} /> },
-  { id: "practice-roadmaps", name: "Mastery Roadmaps", href: "/ai-coach", icon: <ClipboardList size={16} /> },
-  { id: "practice-journey", name: "Learning Path", href: "/journey", icon: <Route size={16} /> },
+  {
+    id: "practice-plans",
+    name: "Practice Routines",
+    href: "/timer/plans",
+    icon: <ListChecks size={16} />,
+  },
+  {
+    id: "practice-auto",
+    name: "Auto Plan",
+    href: "/timer/auto",
+    icon: <PiMagicWandDuotone size={16} />,
+  },
+  {
+    id: "practice-free-timer",
+    name: "Free Timer",
+    href: "/timer/practice",
+    icon: <Clock size={16} />,
+  },
+  {
+    id: "practice-report",
+    name: "Manual Log",
+    href: "/report",
+    icon: <NotebookPen size={16} />,
+  },
+  {
+    id: "practice-gp-tabs",
+    name: "Guitar Pro Files",
+    href: "/gp-tabs",
+    icon: <SiGuitarpro size={16} />,
+  },
+  {
+    id: "practice-skills",
+    name: "Skills",
+    href: "/profile/skills?tab=skill-tree",
+    icon: <Brain size={16} />,
+  },
+  {
+    id: "practice-exercises",
+    name: "Exercises",
+    href: "/profile/skills?tab=browse",
+    icon: <Dumbbell size={16} />,
+  },
+  {
+    id: "practice-roadmaps",
+    name: "Mastery Roadmaps",
+    href: "/ai-coach",
+    icon: <ClipboardList size={16} />,
+  },
+  {
+    id: "practice-journey",
+    name: "Learning Path",
+    href: "/journey",
+    icon: <Route size={16} />,
+  },
 ];
 
 const SONGS_SUB_NAV: SidebarSubLink[] = [
-  { id: "songs-board", name: "Board", href: "/songs?view=board", icon: <LayoutDashboard size={16} /> },
-  { id: "songs-explore", name: "Explore", href: "/songs?view=explore", icon: <Search size={16} /> },
-  { id: "songs-playlists", name: "Playlists", href: "/songs?view=playlists", icon: <ListMusic size={16} /> },
+  {
+    id: "songs-board",
+    name: "Board",
+    href: "/songs?view=board",
+    icon: <LayoutDashboard size={16} />,
+  },
+  {
+    id: "songs-explore",
+    name: "Explore",
+    href: "/songs?view=explore",
+    icon: <Search size={16} />,
+  },
+  {
+    id: "songs-playlists",
+    name: "Playlists",
+    href: "/songs?view=playlists",
+    icon: <ListMusic size={16} />,
+  },
 ];
 
 const LIBRARY_SUB_NAV: SidebarSubLink[] = [
-  { id: "library-favorites", name: "Favorites", href: "/favorites", icon: <Star size={16} /> },
-  { id: "library-plans", name: "My Plans", href: "/plans", icon: <ClipboardList size={16} /> },
-  { id: "library-exercises", name: "My Exercises", href: "/my-exercises", icon: <Music2 size={16} /> },
-  { id: "library-create-plan", name: "Create Plan", href: "/plans/create", icon: <PlusCircle size={16} /> },
-  { id: "library-create-exercise", name: "Create Exercise", href: "/tab-editor", icon: <FilePlus2 size={16} /> },
+  {
+    id: "library-favorites",
+    name: "Favorites",
+    href: "/favorites",
+    icon: <Star size={16} />,
+  },
+  {
+    id: "library-plans",
+    name: "My Plans",
+    href: "/plans",
+    icon: <ClipboardList size={16} />,
+  },
+  {
+    id: "library-exercises",
+    name: "My Exercises",
+    href: "/my-exercises",
+    icon: <Music2 size={16} />,
+  },
+  {
+    id: "library-create-plan",
+    name: "Create Plan",
+    href: "/plans/create",
+    icon: <PlusCircle size={16} />,
+  },
+  {
+    id: "library-create-exercise",
+    name: "Create Exercise",
+    href: "/tab-editor",
+    icon: <FilePlus2 size={16} />,
+  },
 ];
 
 /** Views a page falls back to when its query param is absent (bare /songs renders Board). */
@@ -236,22 +340,23 @@ const SidebarExpandableNavLink = ({
             createRipple(e);
             onLinkClick?.();
           }}
-          className="relative flex flex-1 items-center gap-3 overflow-hidden px-3 py-2.5 active:scale-[0.98]">
+          className='relative flex flex-1 items-center gap-3 overflow-hidden px-3 py-2.5 active:scale-[0.98]'>
           {ripple}
-          <span className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
+          <span
+            className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
             {icon}
           </span>
-          <span className="flex-1">{name}</span>
+          <span className='flex-1'>{name}</span>
         </Link>
         <button
-          type="button"
+          type='button'
           aria-label={isExpanded ? `Collapse ${name}` : `Expand ${name}`}
           aria-expanded={isExpanded}
           onClick={(e) => {
             e.preventDefault();
             onToggle();
           }}
-          className="flex items-center px-3 py-2.5 text-zinc-600 transition-colors duration-200 hover:text-zinc-300">
+          className='flex items-center px-3 py-2.5 text-zinc-600 transition-colors duration-200 hover:text-zinc-300'>
           <span className={NAV_INDICATOR_SLOT}>
             <ChevronDown
               size={16}
@@ -268,8 +373,8 @@ const SidebarExpandableNavLink = ({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden">
-            <div className="mt-1 space-y-0.5 rounded-lg bg-black/20 p-1">
+            className='overflow-hidden'>
+            <div className='mt-1 space-y-0.5 rounded-lg bg-black/20 p-1'>
               {subLinks.map((subLink) => (
                 <SidebarNavLink
                   key={subLink.id}
@@ -290,7 +395,11 @@ const SidebarExpandableNavLink = ({
 
 const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const { show: showFeedbackPrompt, markAsDismissed, markAsSent } = useFeedbackPrompt();
+  const {
+    show: showFeedbackPrompt,
+    markAsDismissed,
+    markAsSent,
+  } = useFeedbackPrompt();
   const {
     show: showSupportPrompt,
     markAsDismissed: markSupportAsDismissed,
@@ -310,6 +419,15 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const userInfo = useAppSelector(selectUserInfo);
   const userAuth = useAppSelector(selectUserAuth);
   const hasUnclaimedMilestone = useHasUnclaimedMilestone();
+
+  // Undefined until the stats land, so a low-level lock never flashes on a
+  // sidebar that is still loading somebody's real level.
+  const lockedAtLvl = (feature: "summary" | "guilds") =>
+    userStats ? getLockedAtLvl(feature, userStats.lvl) : undefined;
+
+  // The panel is a perk, so the entry only exists for people who funded it.
+  const { isSupport } = useSupportTeam();
+  const isSupporter = isSupport(userAuth);
 
   const getActiveProfileSection = () => {
     const { pathname } = router;
@@ -336,6 +454,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/recordings")) return "recordings";
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/roadmap")) return "roadmap";
+    if (pathname.startsWith("/supporter")) return "supporter";
+    if (pathname.startsWith("/guilds")) return "guilds";
     if (pathname.startsWith("/wiki")) return "wiki";
     return null;
   };
@@ -344,7 +464,9 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   // A section auto-expands while you are inside it; a manual toggle overrides that until
   // you navigate into the section again.
-  const [expandedOverride, setExpandedOverride] = useState<Record<string, boolean>>({});
+  const [expandedOverride, setExpandedOverride] = useState<
+    Record<string, boolean>
+  >({});
   const [lastActiveId, setLastActiveId] = useState(activeId);
 
   if (activeId !== lastActiveId) {
@@ -359,7 +481,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     }
   }
 
-  const isSectionExpanded = (id: string) => expandedOverride[id] ?? activeId === id;
+  const isSectionExpanded = (id: string) =>
+    expandedOverride[id] ?? activeId === id;
 
   const toggleSection = (id: string) =>
     setExpandedOverride((prev) => ({ ...prev, [id]: !isSectionExpanded(id) }));
@@ -370,7 +493,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (!query) return true;
     const params = new URLSearchParams(query);
     return Array.from(params.entries()).every(
-      ([key, value]) => (router.query[key] ?? DEFAULT_QUERY_BY_PATH[path]?.[key]) === value
+      ([key, value]) =>
+        (router.query[key] ?? DEFAULT_QUERY_BY_PATH[path]?.[key]) === value,
     );
   };
 
@@ -401,13 +525,19 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       icon: <PiCassetteTapeLight size={18} />,
       children: SONGS_SUB_NAV,
     },
-    { id: "progress", name: "Progress", href: "/profile/activity", icon: <FaArrowTrendUp size={18} /> },
+    {
+      id: "progress",
+      name: "Progress",
+      href: "/profile/activity",
+      icon: <FaArrowTrendUp size={18} />,
+    },
     {
       id: "summary",
       name: "Milestones",
       href: "/summary",
       icon: <Milestone size={18} />,
       tooltip: "Weekly rewards for hitting practice goals",
+      lockedLvl: lockedAtLvl("summary"),
     },
     {
       id: "challenges",
@@ -416,12 +546,49 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       icon: <Flame size={18} />,
       tooltip: "Five community-voted songs to record every month",
     },
-    { id: "leaderboard", name: "Rankings", href: "/seasons", icon: <Trophy size={18} /> },
-    { id: "arsenal", name: "Arsenal", href: "/arsenal", icon: <Swords size={18} /> },
+    {
+      id: "leaderboard",
+      name: "Rankings",
+      href: "/seasons",
+      icon: <Trophy size={18} />,
+    },
+    {
+      id: "guilds",
+      name: "Guilds",
+      href: "/guilds",
+      icon: <Shield size={18} />,
+      tooltip: "Practise alongside other people — chat and a weekly challenge",
+      lockedLvl: lockedAtLvl("guilds"),
+    },
+    {
+      id: "arsenal",
+      name: "Arsenal",
+      href: "/arsenal",
+      icon: <Swords size={18} />,
+    },
     // Electron-only (window.nativeAmp) — does nothing on the web build.
     ...(isElectron
-      ? [{ id: "tone-studio", name: "Tone Studio", href: "/tone-studio", icon: <SlidersHorizontal size={18} /> }]
+      ? [
+          {
+            id: "tone-studio",
+            name: "Tone Studio",
+            href: "/tone-studio",
+            icon: <SlidersHorizontal size={18} />,
+          },
+        ]
       : []),
+    // Shown to everyone: without the badge the page explains what supporting
+    // buys and how to get it, and hiding the entry left that page unreachable
+    // by the only people it was written for.
+    {
+      id: "supporter",
+      name: isSupporter ? "Supporter" : "Support",
+      href: "/supporter",
+      icon: <Heart size={18} />,
+      tooltip: isSupporter
+        ? "Post ideas and spend your votes on what gets built next"
+        : "What supporting the project gets you, and how to get it",
+    },
   ];
 
   const libraryNavigation = [
@@ -435,9 +602,28 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   ];
 
   const utilityNavigation = [
-    { id: "recordings", name: "Recordings", href: "/recordings", icon: <Mic2 size={18} />, muted: true },
-    { id: "wiki", name: "Knowledge Base", href: "/wiki", icon: <BookOpen size={18} />, muted: true, tooltip: "How every part of the app works, in plain language" },
-    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={18} />, muted: true },
+    {
+      id: "recordings",
+      name: "Recordings",
+      href: "/recordings",
+      icon: <Mic2 size={18} />,
+      muted: true,
+    },
+    {
+      id: "wiki",
+      name: "Knowledge Base",
+      href: "/wiki",
+      icon: <BookOpen size={18} />,
+      muted: true,
+      tooltip: "How every part of the app works, in plain language",
+    },
+    {
+      id: "settings",
+      name: "Settings",
+      href: "/settings",
+      icon: <Settings size={18} />,
+      muted: true,
+    },
     {
       id: "discord",
       name: "Discord",
@@ -458,43 +644,57 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       tooltip?: string;
       muted?: boolean;
       external?: boolean;
+      lockedLvl?: number;
       children?: SidebarSubLink[];
     }[],
-    onClick?: () => void
+    onClick?: () => void,
   ) =>
-    items.map(({ id, name, href, icon, tooltip, muted, external, children }) => {
-      if (children) {
+    items.map(
+      ({
+        id,
+        name,
+        href,
+        icon,
+        tooltip,
+        muted,
+        external,
+        lockedLvl,
+        children,
+      }) => {
+        if (children) {
+          return (
+            <SidebarExpandableNavLink
+              key={id}
+              href={href}
+              name={name}
+              icon={icon}
+              isActive={isLinkActive(id, href)}
+              isExpanded={isSectionExpanded(id)}
+              onToggle={() => toggleSection(id)}
+              onLinkClick={onClick}
+              subLinks={children}
+              isSubLinkActive={isSubLinkActive}
+            />
+          );
+        }
+
         return (
-          <SidebarExpandableNavLink
+          <SidebarNavLink
             key={id}
             href={href}
             name={name}
             icon={icon}
             isActive={isLinkActive(id, href)}
-            isExpanded={isSectionExpanded(id)}
-            onToggle={() => toggleSection(id)}
-            onLinkClick={onClick}
-            subLinks={children}
-            isSubLinkActive={isSubLinkActive}
+            onClick={onClick}
+            showBadge={id === "summary" && hasUnclaimedMilestone}
+            tooltip={tooltip}
+            muted={muted}
+            external={external}
+            lockedLvl={lockedLvl}
           />
         );
-      }
-
-      return (
-        <SidebarNavLink
-          key={id}
-          href={href}
-          name={name}
-          icon={icon}
-          isActive={isLinkActive(id, href)}
-          onClick={onClick}
-          showBadge={id === "summary" && hasUnclaimedMilestone}
-          tooltip={tooltip}
-          muted={muted}
-          external={external}
-        />
-      );
-    });
+      },
+    );
 
   const userProfileSection = (mobile?: boolean) => {
     if (!userStats || !userName) return null;
@@ -504,8 +704,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         <Link
           href={`/user/${userAuth}`}
           onClick={handleLinkClick}
-          className="block border-b border-white/10 p-4 transition-colors duration-200 hover:bg-white/5">
-          <div className="flex items-center gap-3">
+          className='block border-b border-white/10 p-4 transition-colors duration-200 hover:bg-white/5'>
+          <div className='flex items-center gap-3'>
             <Avatar
               avatarURL={userAvatar}
               name={userName}
@@ -514,8 +714,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               guitarYear={userInfo?.selectedGuitarYear}
               guitarCountry={userInfo?.selectedGuitarCountry}
             />
-            <div className="min-w-0 flex-1">
-              <span className="truncate text-[15px] font-bold text-white tracking-wide">
+            <div className='min-w-0 flex-1'>
+              <span className='truncate text-[15px] font-bold tracking-wide text-white'>
                 {userName}
               </span>
             </div>
@@ -527,8 +727,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     return (
       <Link
         href={`/user/${userAuth}`}
-        className="block rounded-lg p-4 transition-colors duration-200 hover:bg-white/5">
-        <div className="flex items-center gap-3">
+        className='block rounded-lg p-4 transition-colors duration-200 hover:bg-white/5'>
+        <div className='flex items-center gap-3'>
           <Avatar
             avatarURL={userAvatar}
             name={userName}
@@ -537,8 +737,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             guitarYear={userInfo?.selectedGuitarYear}
             guitarCountry={userInfo?.selectedGuitarCountry}
           />
-          <div className="min-w-0 flex-1 flex flex-col justify-center">
-            <span className="truncate text-[15px] font-bold text-white tracking-wide">
+          <div className='flex min-w-0 flex-1 flex-col justify-center'>
+            <span className='truncate text-[15px] font-bold tracking-wide text-white'>
               {userName}
             </span>
           </div>
@@ -549,37 +749,52 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const navContent = (mobile?: boolean) => (
     <nav
-      className={`flex flex-1 flex-col overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent ${
+      className={`flex min-h-0 flex-1 flex-col overflow-y-auto p-4 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 ${
         mobile ? "pb-20" : ""
       }`}>
-      <div className="space-y-8">
+      <div className='space-y-8'>
         <div>
-          <div className="space-y-1">{renderNavLinks(mainNavigation, mobile ? handleLinkClick : undefined)}</div>
+          <div className='space-y-1'>
+            {renderNavLinks(
+              mainNavigation,
+              mobile ? handleLinkClick : undefined,
+            )}
+          </div>
         </div>
 
         <div>
-          <div className="space-y-1">{renderNavLinks(libraryNavigation, mobile ? handleLinkClick : undefined)}</div>
+          <div className='space-y-1'>
+            {renderNavLinks(
+              libraryNavigation,
+              mobile ? handleLinkClick : undefined,
+            )}
+          </div>
         </div>
 
-        <div className="space-y-1">
-          {renderNavLinks(utilityNavigation, mobile ? handleLinkClick : undefined)}
+        <div className='space-y-1'>
+          {renderNavLinks(
+            utilityNavigation,
+            mobile ? handleLinkClick : undefined,
+          )}
         </div>
       </div>
 
-      <div className="hidden lg:block lg:flex-1" />
+      <div className='hidden lg:block lg:flex-1' />
 
       {!isElectron && !mobile && (
         <a
           href={DESKTOP_APP_RELEASES_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="relative -mx-4 -mb-4 mt-10 flex items-center gap-3 overflow-hidden bg-orange-500/10 px-7 py-4 transition-all duration-200 active:scale-[0.98] hover:bg-orange-500/15">
-          <GuitarPatternBackground opacity={0.14} scale={0.5} color="#fb923c" />
-          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500/20 text-orange-400">
+          target='_blank'
+          rel='noreferrer'
+          className='relative -mx-4 -mb-4 mt-10 flex items-center gap-3 overflow-hidden bg-orange-500/10 px-7 py-4 transition-all duration-200 hover:bg-orange-500/15 active:scale-[0.98]'>
+          <GuitarPatternBackground opacity={0.14} scale={0.5} color='#fb923c' />
+          <span className='relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500/20 text-orange-400'>
             <Download size={18} />
           </span>
-          <div className="relative min-w-0 flex-1">
-            <p className="text-sm font-semibold text-orange-300">Get the desktop app</p>
+          <div className='relative min-w-0 flex-1'>
+            <p className='text-sm font-semibold text-orange-300'>
+              Get the desktop app
+            </p>
           </div>
         </a>
       )}
@@ -591,7 +806,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               handleLinkClick();
               dispatch(logUserOff());
             }}
-            className="mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-500 hover:bg-red-500/10 hover:text-red-500 mb-12">
+            className='mb-12 mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-500 transition-all duration-200 hover:bg-red-500/10 hover:text-red-500'>
             <span className={`${NAV_ICON_SLOT} text-zinc-600`}>
               <LogOut size={16} />
             </span>
@@ -607,22 +822,28 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       <MobileBottomNav onMenuClick={() => setIsMobileOpen(true)} />
 
       {/* Desktop Sidebar */}
-      <aside className="hidden h-full bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col">
-        <div className="p-4">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center">
-                <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
+      <aside className='hidden h-full bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col'>
+        <div className='p-4'>
+          <div className='flex items-center gap-3'>
+            <Link href='/dashboard' className='flex items-center gap-3'>
+              <div className='flex h-9 w-9 items-center justify-center'>
+                <Image
+                  src='/images/logolight.svg'
+                  alt='Logo'
+                  width={32}
+                  height={32}
+                  className='h-8 w-8'
+                />
               </div>
-              <div className="flex flex-col">
-                <h2 className="text-sm font-semibold text-white">Riff Quest</h2>
-                <span className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-600">
-                  <span className="text-amber-500/80">beta</span>
+              <div className='flex flex-col'>
+                <h2 className='text-sm font-semibold text-white'>Riff Quest</h2>
+                <span className='flex items-center gap-1.5 text-[10px] font-medium text-zinc-600'>
+                  <span className='text-amber-500/80'>beta</span>
                   {appVersion && <span>v{appVersion}</span>}
                 </span>
               </div>
             </Link>
-            <div className="ml-auto">
+            <div className='ml-auto'>
               <NotificationsBell />
             </div>
           </div>
@@ -641,7 +862,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileOpen(false)}
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+              className='fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden'
             />
 
             <motion.aside
@@ -650,31 +871,41 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className={`fixed left-0 z-50 flex w-72 flex-col border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden ${
-                isElectron ? "top-10 h-[calc(100dvh-2.5rem)]" : "top-0 h-[100dvh]"
+                isElectron
+                  ? "top-10 h-[calc(100dvh-2.5rem)]"
+                  : "top-0 h-[100dvh]"
               }`}>
-              <div className="flex items-center justify-between border-b border-white/10 p-4">
+              <div className='flex items-center justify-between border-b border-white/10 p-4'>
                 <Link
-                  href="/dashboard"
+                  href='/dashboard'
                   onClick={() => setIsMobileOpen(false)}
-                  className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center">
-                    <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
+                  className='flex items-center gap-3'>
+                  <div className='flex h-9 w-9 items-center justify-center'>
+                    <Image
+                      src='/images/logolight.svg'
+                      alt='Logo'
+                      width={32}
+                      height={32}
+                      className='h-8 w-8'
+                    />
                   </div>
-                  <div className="flex flex-col">
-                    <h2 className="text-sm font-semibold text-white">Riff Quest</h2>
-                    <span className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-600">
-                      <span className="text-amber-500/80">beta</span>
+                  <div className='flex flex-col'>
+                    <h2 className='text-sm font-semibold text-white'>
+                      Riff Quest
+                    </h2>
+                    <span className='flex items-center gap-1.5 text-[10px] font-medium text-zinc-600'>
+                      <span className='text-amber-500/80'>beta</span>
                       {appVersion && <span>v{appVersion}</span>}
                     </span>
                   </div>
                 </Link>
-                <div className="flex items-center gap-2">
+                <div className='flex items-center gap-2'>
                   <NotificationsBell />
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant='ghost'
+                    size='icon'
                     onClick={() => setIsMobileOpen(false)}
-                    className="text-zinc-400 hover:bg-white/10 hover:text-white">
+                    className='text-zinc-400 hover:bg-white/10 hover:text-white'>
                     <X size={16} />
                   </Button>
                 </div>
@@ -688,7 +919,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       </AnimatePresence>
 
       <FeedbackModal
-        variant="prompt"
+        variant='prompt'
         isOpen={showFeedbackPrompt}
         onClose={markAsDismissed}
         onSent={markAsSent}

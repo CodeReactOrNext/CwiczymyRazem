@@ -15,7 +15,7 @@ export function isOnEmailCooldown(
   cooldown: EmailCooldownData | null | undefined,
   type: EmailCooldownType,
   now: Date = new Date(),
-  daysWindow: number = EMAIL_COOLDOWN_DAYS
+  daysWindow: number = EMAIL_COOLDOWN_DAYS,
 ): boolean {
   const lastStr = cooldown?.[type];
   if (typeof lastStr !== "string" || !lastStr) return false;

@@ -16,7 +16,7 @@ interface GuitarStashTileProps extends StashPlacement {
   isEquipped?: boolean;
   /** Rig slot index (0-2) this copy occupies, or null. */
   rigSlot?: number | null;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 /** A guitar in the stash: two sockets tall, art stood upright, like a big weapon. */

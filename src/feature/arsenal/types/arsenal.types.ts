@@ -155,7 +155,8 @@ export type CaseType =
   | "premium-effect"
   | "elite-guitar"
   | "elite-effect"
-  | "daily";
+  | "daily"
+  | "supporter";
 
 type ProductionCountry =
   | "USA"

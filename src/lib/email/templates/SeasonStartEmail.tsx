@@ -179,7 +179,7 @@ export default function SeasonStartEmail({
   const displayName = userName?.trim() || "Guitarist";
 
   return (
-    <Html lang="en">
+    <Html lang='en'>
       <Head />
       <Preview>
         {`${seasonName} has started — ${daysInSeason} days to climb the leaderboard`}
@@ -187,7 +187,7 @@ export default function SeasonStartEmail({
       <Body style={main}>
         <Container style={container}>
           <Section style={logoSection}>
-            <Img src={logoUrl} alt="Riff Quest" width="160" />
+            <Img src={logoUrl} alt='Riff Quest' width='160' />
           </Section>
 
           <Section style={card}>

@@ -1,4 +1,5 @@
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import type { UserSongLists } from "feature/songs/types/songs.type";
 import type { Timestamp } from "firebase/firestore";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -20,6 +21,12 @@ export interface FirebaseUserDataInterface {
   songLists: UserSongLists;
   /** Denormalized total level of the equipped rig (gear leaderboard sort key). */
   rigLevel?: number;
+  /**
+   * Denormalized copy of the guild tag and kit this player wears, so a row can
+   * draw the badge without reading /guilds — which clients may not. Written by
+   * the Admin SDK on the way into a guild; see `lib/guild/guildBadge.ts`.
+   */
+  guildBadge?: GuildBadge;
   arsenal?: Partial<ArsenalUserData>;
   fcmData?: {
     tokens: string[];
@@ -38,5 +45,3 @@ interface FirebaseDiscordEventsInteface {
   description: string;
   link: string;
 }
-
-

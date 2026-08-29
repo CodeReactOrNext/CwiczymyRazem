@@ -179,20 +179,13 @@ export default function WelcomeEmail({
   const displayName = userName?.trim() || "Guitarist";
 
   return (
-    <Html lang="en">
+    <Html lang='en'>
       <Head />
-      <Preview>
-        Welcome to Riff Quest, your guitar journey starts now
-      </Preview>
+      <Preview>Welcome to Riff Quest, your guitar journey starts now</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={logoSection}>
-            <Img
-              src={logoUrl}
-              alt="Riff Quest"
-              width="200"
-              style={logo}
-            />
+            <Img src={logoUrl} alt='Riff Quest' width='200' style={logo} />
           </Section>
 
           <Section style={card}>

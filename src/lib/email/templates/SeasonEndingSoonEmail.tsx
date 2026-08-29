@@ -148,7 +148,11 @@ interface Copy {
   heroNumberAsWord: boolean;
 }
 
-function buildCopy(daysLeft: number, displayName: string, seasonName: string): Copy {
+function buildCopy(
+  daysLeft: number,
+  displayName: string,
+  seasonName: string,
+): Copy {
   if (daysLeft <= 0) {
     return {
       preview: `${seasonName} ends today — last chance`,
@@ -193,13 +197,13 @@ export default function SeasonEndingSoonEmail({
   const copy = buildCopy(daysLeft, displayName, seasonName);
 
   return (
-    <Html lang="en">
+    <Html lang='en'>
       <Head />
       <Preview>{copy.preview}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={logoSection}>
-            <Img src={logoUrl} alt="Riff Quest" width="160" />
+            <Img src={logoUrl} alt='Riff Quest' width='160' />
           </Section>
 
           <Section style={card}>
@@ -208,7 +212,8 @@ export default function SeasonEndingSoonEmail({
             <Text style={paragraph}>{copy.paragraph}</Text>
 
             <Section style={daysHero}>
-              <Text style={copy.heroNumberAsWord ? daysNumberWord : daysNumberBig}>
+              <Text
+                style={copy.heroNumberAsWord ? daysNumberWord : daysNumberBig}>
                 {copy.heroNumber}
               </Text>
               <Text style={daysLabel}>{copy.heroLabel}</Text>

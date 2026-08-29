@@ -2,6 +2,8 @@ import { cn } from "assets/lib/utils";
 import { DaySinceMessage } from "components/DaySince/DaySince";
 import Avatar from "components/UI/Avatar";
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
+import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import { AchievementsCarousel } from "feature/leadboard/components/AchievementsCarousel";
 import { RigGuitarsPreview } from "feature/leadboard/components/RigGuitarsPreview";
 import { useTranslation } from "hooks/useTranslation";
@@ -25,6 +27,8 @@ interface LeadboardColumnProps {
   guitarsOwned?: number;
   effectsOwned?: number;
   arsenal?: Partial<ArsenalUserData>;
+  /** The guild kit this player wears, if they are in a guild. */
+  guildBadge?: GuildBadge;
 }
 
 export const LeadboardRow = ({
@@ -42,6 +46,7 @@ export const LeadboardRow = ({
   guitarsOwned = 0,
   effectsOwned = 0,
   arsenal,
+  guildBadge,
 }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
@@ -65,162 +70,199 @@ export const LeadboardRow = ({
     <li className='w-full'>
       <div
         className={cn(
-          "relative overflow-hidden rounded-2xl glass-card transition-background",
+          "relative overflow-hidden rounded-2xl transition-background glass-card",
           profileId === currentUserId
-            ? " bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20 "
-            : " hover:glass-card-hover"
+            ? "bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20"
+            : "hover:glass-card-hover",
         )}>
-      
-
         {/* --- Mobile Layout (<640px) --- */}
         <div className='relative z-10 flex flex-col gap-4 p-4 sm:hidden'>
-           {/* Card Header: Rank, Avatar, Name */}
-           <div className="flex items-center gap-3">
-              {/* Rank Badge */}
-              <div
-                translate="no"
-                className={cn(
-                  "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-lg font-black italic tracking-tighter",
-                   profileId === currentUserId
-                    ? "bg-cyan-500 text-black"
-                    : "bg-balck/40 text-zinc-400"
-                )}
-              >
-                 #{place}
+          {/* Card Header: Rank, Avatar, Name */}
+          <div className='flex items-center gap-3'>
+            {/* Rank Badge */}
+            <div
+              translate='no'
+              className={cn(
+                "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-lg font-black italic tracking-tighter",
+                profileId === currentUserId
+                  ? "bg-cyan-500 text-black"
+                  : "bg-balck/40 text-zinc-400",
+              )}>
+              #{place}
+            </div>
+
+            {/* Avatar & Identity */}
+            <div className='flex flex-1 items-center gap-3 overflow-hidden'>
+              <Link
+                href={`/user/${profileId}`}
+                className='relative flex-shrink-0'>
+                <Avatar
+                  avatarURL={userAvatar}
+                  name={nick}
+                  lvl={lvl}
+                  size='sm'
+                  selectedGuitar={selectedGuitar}
+                  guitarYear={selectedGuitarYear}
+                  guitarCountry={selectedGuitarCountry}
+                />
+              </Link>
+
+              <div className='flex min-w-0 flex-col gap-0.5'>
+                <Link href={`/user/${profileId}`} className='block truncate'>
+                  <span
+                    translate='no'
+                    className={cn(
+                      "flex items-center gap-2 truncate text-sm font-bold tracking-tight hover:underline",
+                      profileId === currentUserId
+                        ? "text-cyan-400"
+                        : "text-white",
+                    )}>
+                    {nick}
+                    <FaExternalLinkAlt className='h-3 w-3 opacity-50' />
+                  </span>
+                </Link>
+
+                <div className='flex items-center gap-2 text-[10px] font-medium text-zinc-500'>
+                  <div
+                    translate='no'
+                    className={cn(
+                      "flex items-center rounded-sm px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+                      profileId === currentUserId
+                        ? "bg-cyan-500/10 text-cyan-400"
+                        : "bg-zinc-800 text-zinc-400",
+                    )}>
+                    LVL {lvl}
+                  </div>
+                  {/* Sits outside the name's link — an anchor inside an
+                           anchor is markup the browser silently rearranges. */}
+                  <GuildTagBadge badge={guildBadge} />
+                  <div translate='no' className='truncate'>
+                    <DaySinceMessage
+                      date={new Date(statistics.lastReportDate)}
+                    />
+                  </div>
+                </div>
               </div>
+            </div>
+          </div>
 
-              {/* Avatar & Identity */}
-              <div className="flex flex-1 items-center gap-3 overflow-hidden">
-                  <Link href={`/user/${profileId}`} className="relative flex-shrink-0">
-                     <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} size="sm" selectedGuitar={selectedGuitar} guitarYear={selectedGuitarYear} guitarCountry={selectedGuitarCountry} />
-                  </Link>
-
-                 <div className="flex flex-col min-w-0 gap-0.5">
-                    <Link href={`/user/${profileId}`} className="block truncate">
-                       <span
-                         translate="no"
-                         className={cn(
-                           "flex items-center gap-2 truncate text-sm font-bold tracking-tight hover:underline",
-                            profileId === currentUserId ? "text-cyan-400" : "text-white"
-                         )}
-                       >
-                         {nick}
-                         <FaExternalLinkAlt className="h-3 w-3 opacity-50" />
-                       </span>
-                    </Link>
-                    
-                    <div className="flex items-center gap-2 text-[10px] font-medium text-zinc-500">
-                       <div
-                          translate="no"
-                          className={cn(
-                            "flex items-center rounded-sm px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider",
-                            profileId === currentUserId
-                             ? "bg-cyan-500/10 text-cyan-400"
-                             : "bg-zinc-800 text-zinc-400"
-                          )}
-                       >
-                         LVL {lvl}
-                       </div>
-                        <div translate="no" className="truncate">
-                          <DaySinceMessage date={new Date(statistics.lastReportDate)} />
-                        </div>
-                    </div>
-                 </div>
-              </div>
-           </div>
-
-           {/* Stats Grid - Card within a Card */}
-           {variant === "gear" ? (
-             <div className="grid grid-cols-3 divide-x divide-white/5 rounded-xl bg-black/20">
-                <div className="flex flex-col items-center justify-center py-3">
-                   <span className={cn(
-                      "text-lg font-black tracking-tight",
-                       profileId === currentUserId ? "text-cyan-400" : "text-zinc-100"
-                   )}>
-                      {rigLevel.toLocaleString()}
-                   </span>
-                   <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-600">
-                      {t("rig_level")}
-                   </span>
-                </div>
-
-                <div className="flex flex-col items-center justify-center py-3">
-                   <span className={cn(
-                      "text-lg font-bold",
-                       profileId === currentUserId ? "text-cyan-400" : "text-zinc-300"
-                   )}>
-                      {guitarsOwned}
-                   </span>
-                   <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-600">
-                      {t("guitars")}
-                   </span>
-                </div>
-
-                <div className="flex flex-col items-center justify-center py-3">
-                   <span className={cn(
-                      "text-lg font-bold",
-                       profileId === currentUserId ? "text-cyan-400" : "text-zinc-300"
-                   )}>
-                      {effectsOwned}
-                   </span>
-                   <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-600">
-                      {t("effects")}
-                   </span>
-                </div>
-             </div>
-           ) : (
-           <div className="grid grid-cols-2 divide-x divide-white/5 rounded-xl bg-black/20">
-              <div className="flex flex-col items-center justify-center py-3">
-                 <span className={cn(
+          {/* Stats Grid - Card within a Card */}
+          {variant === "gear" ? (
+            <div className='grid grid-cols-3 divide-x divide-white/5 rounded-xl bg-black/20'>
+              <div className='flex flex-col items-center justify-center py-3'>
+                <span
+                  className={cn(
                     "text-lg font-black tracking-tight",
-                     profileId === currentUserId ? "text-cyan-400" : "text-zinc-100"
-                 )}>
-                    {statistics.points.toLocaleString()}
-                 </span>
-                 <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-600">
-                    {t("points")}
-                 </span>
+                    profileId === currentUserId
+                      ? "text-cyan-400"
+                      : "text-zinc-100",
+                  )}>
+                  {rigLevel.toLocaleString()}
+                </span>
+                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                  {t("rig_level")}
+                </span>
               </div>
 
-              <div className="flex flex-col items-center justify-center py-3">
-                 <span className={cn(
+              <div className='flex flex-col items-center justify-center py-3'>
+                <span
+                  className={cn(
+                    "text-lg font-bold",
+                    profileId === currentUserId
+                      ? "text-cyan-400"
+                      : "text-zinc-300",
+                  )}>
+                  {guitarsOwned}
+                </span>
+                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                  {t("guitars")}
+                </span>
+              </div>
+
+              <div className='flex flex-col items-center justify-center py-3'>
+                <span
+                  className={cn(
+                    "text-lg font-bold",
+                    profileId === currentUserId
+                      ? "text-cyan-400"
+                      : "text-zinc-300",
+                  )}>
+                  {effectsOwned}
+                </span>
+                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                  {t("effects")}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className='grid grid-cols-2 divide-x divide-white/5 rounded-xl bg-black/20'>
+              <div className='flex flex-col items-center justify-center py-3'>
+                <span
+                  className={cn(
+                    "text-lg font-black tracking-tight",
+                    profileId === currentUserId
+                      ? "text-cyan-400"
+                      : "text-zinc-100",
+                  )}>
+                  {statistics.points.toLocaleString()}
+                </span>
+                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                  {t("points")}
+                </span>
+              </div>
+
+              <div className='flex flex-col items-center justify-center py-3'>
+                <span
+                  className={cn(
                     "font-mono text-lg font-bold",
-                     profileId === currentUserId ? "text-cyan-400" : "text-zinc-300"
-                 )}>
-                    {convertMsToHM(time.creativity + time.hearing + time.technique + time.theory)}
-                 </span>
-                 <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-600">
-                    {t("exercise_time")}
-                 </span>
+                    profileId === currentUserId
+                      ? "text-cyan-400"
+                      : "text-zinc-300",
+                  )}>
+                  {convertMsToHM(
+                    time.creativity +
+                      time.hearing +
+                      time.technique +
+                      time.theory,
+                  )}
+                </span>
+                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                  {t("exercise_time")}
+                </span>
               </div>
-           </div>
-           )}
+            </div>
+          )}
 
-           {/* Rig Guitars / Achievements Footer */}
-           {variant === "gear" ? (
-              <div className="flex items-center justify-center pt-3">
-                 <div className="scale-90 opacity-90">
-                    <RigGuitarsPreview arsenal={arsenal} />
-                 </div>
+          {/* Rig Guitars / Achievements Footer */}
+          {variant === "gear" ? (
+            <div className='flex items-center justify-center pt-3'>
+              <div className='scale-90 opacity-90'>
+                <RigGuitarsPreview arsenal={arsenal} />
               </div>
-           ) : statistics.achievements && statistics.achievements.length > 0 && (
-              <div className="flex items-center justify-center  pt-3">
-                 <div className="scale-90 opacity-80">
-                    <AchievementsCarousel achievements={statistics.achievements} />
-                 </div>
+            </div>
+          ) : (
+            statistics.achievements &&
+            statistics.achievements.length > 0 && (
+              <div className='flex items-center justify-center pt-3'>
+                <div className='scale-90 opacity-80'>
+                  <AchievementsCarousel
+                    achievements={statistics.achievements}
+                  />
+                </div>
               </div>
-           )}
+            )
+          )}
         </div>
 
         <div className='relative z-10 hidden items-center gap-3 p-4 sm:flex sm:gap-5 sm:p-5 lg:gap-8 lg:p-6'>
           <div
-            translate="no"
+            translate='no'
             className={`flex h-10 w-10 flex-shrink-0 items-center justify-center text-lg font-black italic tracking-tighter sm:h-12 sm:w-12 sm:text-xl lg:h-14 lg:w-14 lg:text-2xl ${
               profileId === currentUserId
                 ? "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]"
                 : place <= 3
-                ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                : "text-zinc-500 group-hover:text-zinc-400"
+                  ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+                  : "text-zinc-500 group-hover:text-zinc-400"
             }`}>
             #{place}
           </div>
@@ -228,17 +270,26 @@ export const LeadboardRow = ({
           {/* Avatar */}
           <Link href={`/user/${profileId}`} className='flex-shrink-0'>
             <div className='relative transition-transform duration-300 group-hover:scale-105'>
-              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} selectedGuitar={selectedGuitar} guitarYear={selectedGuitarYear} guitarCountry={selectedGuitarCountry} />
+              <Avatar
+                avatarURL={userAvatar}
+                name={nick}
+                lvl={lvl}
+                selectedGuitar={selectedGuitar}
+                guitarYear={selectedGuitarYear}
+                guitarCountry={selectedGuitarCountry}
+              />
             </div>
           </Link>
 
           {/* User Info */}
           <div className='min-w-0 flex-1'>
             <div className='mb-1.5 flex flex-wrap items-center gap-x-4 gap-y-1'>
-              <Link href={`/user/${profileId}`} className="flex min-w-0 items-center gap-2 group/link">
+              <Link
+                href={`/user/${profileId}`}
+                className='group/link flex min-w-0 items-center gap-2'>
                 <h3
-                  translate="no"
-                  className={`truncate text-lg font-bold tracking-tight transition-colors lg:text-xl group-hover/link:underline ${
+                  translate='no'
+                  className={`truncate text-lg font-bold tracking-tight transition-colors group-hover/link:underline lg:text-xl ${
                     profileId === currentUserId
                       ? "text-cyan-300"
                       : "text-zinc-200 group-hover:text-white"
@@ -249,7 +300,7 @@ export const LeadboardRow = ({
               </Link>
 
               <div
-                translate="no"
+                translate='no'
                 className={`flex w-fit flex-shrink-0 items-center gap-1.5 rounded-sm px-3 py-1 ${
                   profileId === currentUserId
                     ? "bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-500/30"
@@ -258,13 +309,13 @@ export const LeadboardRow = ({
                 <span className='text-[10px] font-bold uppercase tracking-wider opacity-70'>
                   LVL
                 </span>
-                <span className='text-base font-bold'>
-                  {statistics.lvl}
-                </span>
+                <span className='text-base font-bold'>{statistics.lvl}</span>
               </div>
+
+              <GuildTagBadge badge={guildBadge} size='md' />
             </div>
 
-            <div translate="no" className='font-medium'>
+            <div translate='no' className='font-medium'>
               <DaySinceMessage date={new Date(statistics.lastReportDate)} />
             </div>
           </div>
@@ -277,11 +328,11 @@ export const LeadboardRow = ({
                   className={`text-xl font-black tracking-tight lg:text-2xl ${
                     profileId === currentUserId
                       ? "text-cyan-300"
-                      : "text-white group-hover:scale-105 transition-transform duration-300"
+                      : "text-white transition-transform duration-300 group-hover:scale-105"
                   }`}>
                   {rigLevel.toLocaleString()}
                 </div>
-                <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                   {t("rig_level")}
                 </div>
               </div>
@@ -295,7 +346,7 @@ export const LeadboardRow = ({
                   }`}>
                   {guitarsOwned}
                 </div>
-                <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                   {t("guitars")}
                 </div>
               </div>
@@ -309,52 +360,55 @@ export const LeadboardRow = ({
                   }`}>
                   {effectsOwned}
                 </div>
-                <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                   {t("effects")}
                 </div>
               </div>
             </div>
           ) : (
-          <div className='flex items-center gap-8 lg:gap-12'>
-            <div className='text-center'>
-              <div
-                className={`text-xl font-black tracking-tight lg:text-2xl ${
-                  profileId === currentUserId
-                    ? "text-cyan-300"
-                    : "text-white group-hover:scale-105 transition-transform duration-300"
-                }`}>
-                {statistics.points.toLocaleString()}
+            <div className='flex items-center gap-8 lg:gap-12'>
+              <div className='text-center'>
+                <div
+                  className={`text-xl font-black tracking-tight lg:text-2xl ${
+                    profileId === currentUserId
+                      ? "text-cyan-300"
+                      : "text-white transition-transform duration-300 group-hover:scale-105"
+                  }`}>
+                  {statistics.points.toLocaleString()}
+                </div>
+                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+                  {t("points")}
+                </div>
               </div>
-              <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
-                {t("points")}
-              </div>
-            </div>
 
-            <div className='text-center'>
-              <div
-                className={`font-mono text-xl font-bold lg:text-2xl ${
-                  profileId === currentUserId
-                    ? "text-cyan-300"
-                    : "text-zinc-300 group-hover:text-white"
-                }`}>
-                {convertMsToHM(
-                  time.creativity + time.hearing + time.technique + time.theory
-                )}
-              </div>
-              <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
-                {t("exercise_time")}
+              <div className='text-center'>
+                <div
+                  className={`font-mono text-xl font-bold lg:text-2xl ${
+                    profileId === currentUserId
+                      ? "text-cyan-300"
+                      : "text-zinc-300 group-hover:text-white"
+                  }`}>
+                  {convertMsToHM(
+                    time.creativity +
+                      time.hearing +
+                      time.technique +
+                      time.theory,
+                  )}
+                </div>
+                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+                  {t("exercise_time")}
+                </div>
               </div>
             </div>
-          </div>
           )}
 
           {/* Rig Guitars / Achievements - Desktop */}
           {variant === "gear" ? (
-            <div className='flex-shrink-0 hidden xl:block opacity-90 transition-opacity duration-300 group-hover:opacity-100'>
+            <div className='hidden flex-shrink-0 opacity-90 transition-opacity duration-300 group-hover:opacity-100 xl:block'>
               <RigGuitarsPreview arsenal={arsenal} />
             </div>
           ) : (
-            <div className='flex-shrink-0 hidden xl:block opacity-80 transition-opacity duration-300 group-hover:opacity-100'>
+            <div className='hidden flex-shrink-0 opacity-80 transition-opacity duration-300 group-hover:opacity-100 xl:block'>
               <AchievementsCarousel achievements={statistics.achievements} />
             </div>
           )}

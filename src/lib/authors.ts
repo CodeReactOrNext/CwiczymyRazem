@@ -6,11 +6,11 @@ export interface AuthorProfile {
 }
 
 export const AUTHORS: Record<string, AuthorProfile> = {
-  'Michael Apfel': {
-    name: 'Michael Apfel',
-    image: '/images/authors/michael-apfel.webp',
-    role: 'Guitarist & Creator of Riff Quest',
-    bio: 'Has been playing guitar for 14 years, including time performing live in two bands. Built Riff Quest to solve his own practice-tracking problems, and writes about practice and learning guitar drawing on hands-on experience with the instrument.',
+  "Michael Apfel": {
+    name: "Michael Apfel",
+    image: "/images/authors/michael-apfel.webp",
+    role: "Guitarist & Creator of Riff Quest",
+    bio: "Has been playing guitar for 14 years, including time performing live in two bands. Built Riff Quest to solve his own practice-tracking problems, and writes about practice and learning guitar drawing on hands-on experience with the instrument.",
   },
 };
 

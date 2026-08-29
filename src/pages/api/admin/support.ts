@@ -1,10 +1,12 @@
-import {
-  SUPPORT_TEAM_COLLECTION,
-  SUPPORT_TEAM_DOC_ID,
-} from "feature/supportTeam/constants/supportTeam.constants";
 import type { SupportTeamMember } from "feature/supportTeam/types/supportTeam.types";
 import type { DocumentSnapshot } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
+import {
+  getFlaggedMembers,
+  listPendingSupporters,
+  rebuildSupportRoster,
+  removePendingSupporter,
+} from "lib/support/supporterGrant";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore } from "utils/firebase/api/firebase.config";
 
@@ -28,31 +30,6 @@ const toMember = (doc: DocumentSnapshot): SupportTeamMember => {
     title: data.supportTitle ?? null,
   };
 };
-
-const byDisplayName = (a: SupportTeamMember, b: SupportTeamMember): number =>
-  a.displayName.localeCompare(b.displayName);
-
-/** Every user currently carrying the flag, alphabetically. */
-async function getFlaggedMembers(): Promise<SupportTeamMember[]> {
-  const snap = await firestore
-    .collection("users")
-    .where("isSupport", "==", true)
-    .get();
-
-  return (snap.docs as DocumentSnapshot[]).map(toMember).sort(byDisplayName);
-}
-
-/** Reads every flagged user and rewrites the public roster document in one go. */
-async function rebuildRoster(): Promise<SupportTeamMember[]> {
-  const members = await getFlaggedMembers();
-
-  await firestore
-    .collection(SUPPORT_TEAM_COLLECTION)
-    .doc(SUPPORT_TEAM_DOC_ID)
-    .set({ members, updatedAt: FieldValue.serverTimestamp() });
-
-  return members;
-}
 
 /**
  * Prefix search over displayName. Firestore range queries are case sensitive,
@@ -115,7 +92,11 @@ export default async function handler(
         });
       }
 
-      return res.status(200).json({ members: await getFlaggedMembers() });
+      const [members, pending] = await Promise.all([
+        getFlaggedMembers(),
+        listPendingSupporters(),
+      ]);
+      return res.status(200).json({ members, pending });
     }
 
     // ── POST – mark a user as support (or update their title) ─────────────────
@@ -133,20 +114,28 @@ export default async function handler(
         supportTitle: title?.trim() ? title.trim() : FieldValue.delete(),
       });
 
-      return res.status(200).json({ members: await rebuildRoster() });
+      return res.status(200).json({ members: await rebuildSupportRoster() });
     }
 
     // ── DELETE – remove a user from the support team ──────────────────────────
     if (req.method === "DELETE") {
-      const { uid } = req.body as { uid?: string };
-      if (!uid) return res.status(400).json({ error: "uid required" });
+      const { uid, email } = req.body as { uid?: string; email?: string };
+
+      // A parked donation has no account behind it yet — it is dropped by
+      // address (typo'd email, or one already thanked by hand).
+      if (!uid && email) {
+        await removePendingSupporter(email);
+        return res.status(200).json({ pending: await listPendingSupporters() });
+      }
+
+      if (!uid) return res.status(400).json({ error: "uid or email required" });
 
       await firestore.collection("users").doc(uid).update({
         isSupport: FieldValue.delete(),
         supportTitle: FieldValue.delete(),
       });
 
-      return res.status(200).json({ members: await rebuildRoster() });
+      return res.status(200).json({ members: await rebuildSupportRoster() });
     }
 
     return res.status(405).json({ error: "Method not allowed" });

@@ -11,6 +11,9 @@ const CASE_ACCENT: Record<string, { color: string; image: string }> = {
   standard: { color: "#a1a1aa", image: "/images/case-2.webp" },
   premium: { color: "#818cf8", image: "/images/case-3.webp" },
   elite: { color: "#fbbf24", image: "/images/case-1.webp" },
+  // Aged brass rather than Elite's bright amber: supporters read amber right
+  // across the app, and one step deeper keeps the two apart on the same shelf.
+  supporter: { color: "#f59e0b", image: "/images/case-supporter.webp" },
 };
 
 /** Effect-pool cases get dedicated pedal-case art instead of the shared guitar case. */
@@ -44,7 +47,9 @@ export const CaseCard = ({
   const tier = caseDef.id.split("-")[0];
   const accent = CASE_ACCENT[tier] || CASE_ACCENT.standard;
   const image =
-    caseDef.dropKind === "effect" ? EFFECT_CASE_IMAGE[tier] || accent.image : accent.image;
+    caseDef.dropKind === "effect"
+      ? EFFECT_CASE_IMAGE[tier] || accent.image
+      : accent.image;
   const canAfford = currentFame >= caseDef.fameCost;
   const isWide = layout === "wide";
 
@@ -68,7 +73,11 @@ export const CaseCard = ({
 
       {/* Art and copy sit side by side at every size: a case is a thing on a
           shelf, and a thing on a shelf has its label beside it, not under it. */}
-      <div className={cn("relative flex items-center gap-4", isWide && "sm:flex-1 sm:gap-8")}>
+      <div
+        className={cn(
+          "relative flex items-center gap-4",
+          isWide && "sm:flex-1 sm:gap-8",
+        )}>
         <div
           className={cn(
             "relative flex flex-shrink-0 items-center justify-center",
@@ -97,13 +106,20 @@ export const CaseCard = ({
               "font-display font-bold text-zinc-100",
               isWide ? "text-xl" : "text-base",
             )}>
-            <span style={{ color: accent.color }}>{tierWord}</span> {restOfName.join(" ")}
+            <span style={{ color: accent.color }}>{tierWord}</span>{" "}
+            {restOfName.join(" ")}
           </h3>
-          <p className='mt-1 text-xs leading-relaxed text-zinc-500'>{caseDef.description}</p>
+          <p className='mt-1 text-xs leading-relaxed text-zinc-500'>
+            {caseDef.description}
+          </p>
         </div>
       </div>
 
-      <div className={cn("relative flex flex-col gap-3", isWide ? "w-full sm:w-56" : "mt-auto")}>
+      <div
+        className={cn(
+          "relative flex flex-col gap-3",
+          isWide ? "w-full sm:w-56" : "mt-auto",
+        )}>
         <DropRates probabilities={caseDef.probabilities} />
         <OpenCaseButton
           canAfford={canAfford}

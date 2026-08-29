@@ -15,6 +15,15 @@ service cloud.firestore {
         && !("role"                 in request.resource.data.diff(resource.data).affectedKeys())
         && !("isSupport"            in request.resource.data.diff(resource.data).affectedKeys())
         && !("supportTitle"         in request.resource.data.diff(resource.data).affectedKeys())
+        && !("supportTotal"         in request.resource.data.diff(resource.data).affectedKeys())
+        && !("supporterTokens"      in request.resource.data.diff(resource.data).affectedKeys())
+        && !("communityGoalClaims"  in request.resource.data.diff(resource.data).affectedKeys())
+        && !("guildId"              in request.resource.data.diff(resource.data).affectedKeys())
+        // Denormalised copy of the guild's tag and cosmetics, so the leaderboard
+        // can draw a member's badge without reading /guilds (which is closed to
+        // clients). Server-written for the same reason guildId is: a client able
+        // to set it could wear any guild's tag, or one it was never let into.
+        && !("guildBadge"           in request.resource.data.diff(resource.data).affectedKeys())
         && !("stripeCustomerId"     in request.resource.data.diff(resource.data).affectedKeys())
         && !("stripeSubscriptionId" in request.resource.data.diff(resource.data).affectedKeys())
         && !("premiumUntil"         in request.resource.data.diff(resource.data).affectedKeys());
@@ -244,6 +253,138 @@ service cloud.firestore {
       allow update: if request.auth != null
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voters', 'voteCount']);
       allow delete: if false; // Admin SDK only (auto-cleanup via ensure-current)
+    }
+
+    // ─── Pending Buy Me a Coffee supporters ───────────────────────────────────
+    // Donations whose email has no account yet, parked until that person logs
+    // in (/api/bmc-webhook writes, /api/user/getUserData claims — both Admin
+    // SDK). These documents hold donor email addresses, so no client may read
+    // them, not even the donor.
+    match /bmcPendingSupporters/{email} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    // ─── Supporter roadmap board ──────────────────────────────────────────────
+    // Ideas and the per-user vote allocation behind them. Votes and idea
+    // credits are bought with real donations, so every read and write goes
+    // through /api/supporter/* (Admin SDK), which re-derives the budget from
+    // the user document. A client that could write here would print its own
+    // votes.
+    match /roadmapIdeas/{ideaId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    match /roadmapVotes/{userId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    // ─── Weekly community goal ────────────────────────────────────────────────
+    // The goal itself, and the supporter ballot that picks next week's. Progress
+    // is never stored — it is aggregated from practice reports on read — so the
+    // only writes are the rollover, a paid ballot vote and the reward claim,
+    // all through /api/community-goal/* on the Admin SDK. A client that could
+    // write here could hand every player in the app free Fame.
+    match /communityGoals/{weekId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    match /communityGoalBallots/{weekId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    // ─── Work board ───────────────────────────────────────────────────────────
+    // Queue / in progress / done, maintained by the owner in /admin/work and
+    // read by supporters through /api/supporter/work (Admin SDK). Nothing here
+    // is client-writable: it is the project's public word on what is happening.
+    match /workItems/{itemId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    // ─── Gear proposals ───────────────────────────────────────────────────────
+    // Supporter-proposed guitars and pedals, and the token backing behind them.
+    // Written only by /api/supporter/gear/* (Admin SDK), which re-validates the
+    // rarity, the effect type, the teardown and — the one that matters for
+    // anyone else's browser — the image link's scheme.
+    match /gearProposals/{proposalId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    match /gearVotes/{userId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    // ─── Supporter case ───────────────────────────────────────────────────────
+    // The fortnightly slate and the ballot that picks the next one. Written
+    // only by /api/supporter/case/* (Admin SDK) and read back by the draw in
+    // /api/arsenal/open-case. A client able to write here could put any item it
+    // liked into a 300-Fame case, so nothing below is client-writable.
+    match /supporterCaseSlates/{cycleId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    match /supporterCaseBallots/{cycleId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    // ─── Guilds ───────────────────────────────────────────────────────────────
+    // A guild's document id is its name and `guildTags/{tag}` is its tag claim,
+    // so a client able to write here could take every name in the game, or free
+    // one somebody paid tokens for. Founding, joining and leaving all run
+    // server-side through /api/supporter/guild/* (Admin SDK).
+    match /guilds/{guildId} {
+      allow read, write: if false; // Admin SDK only
+
+      // The guild's own chat room. This one IS client-facing: messages arrive
+      // over a realtime listener, so members read and write it directly.
+      // Membership is checked against the caller's own `guildId`, which only
+      // the Admin SDK can set (see the users rule above) — reading the guild's
+      // member array here would mean matching objects inside it, which rules
+      // cannot do cleanly.
+      // Requests to join. Server-only: a client able to write here could seat
+      // itself, and one able to read another guild's queue would see who is
+      // trying to leave for somewhere else.
+      match /applications/{applicantUid} {
+        allow read, write: if false; // Admin SDK only
+      }
+
+      // The shared shelf and its ledger. Server-only: an entry holds a real
+      // gear instance, so a client able to write here could mint items, and one
+      // able to edit the log could take without the taking being visible —
+      // which is the only thing keeping a free-for-all shelf honest.
+      match /stash/{entryId} {
+        allow read, write: if false; // Admin SDK only
+      }
+
+      match /stashLog/{logId} {
+        allow read, write: if false; // Admin SDK only
+      }
+
+      match /chat/{messageId} {
+        allow read: if request.auth != null
+          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.guildId == guildId;
+
+        allow create: if request.auth != null
+          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.guildId == guildId
+          && request.resource.data.userId == request.auth.uid;
+
+        // Author edits their own message (author fields immutable); any member
+        // may touch only "likes" — same shape as the global chat.
+        allow update: if request.auth != null
+          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.guildId == guildId
+          && (
+            (
+              resource.data.userId == request.auth.uid
+              && !("userId" in request.resource.data.diff(resource.data).affectedKeys())
+            )
+            || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+          );
+
+        allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      }
+    }
+
+    match /guildTags/{tag} {
+      allow read, write: if false; // Admin SDK only
     }
 
     // ─── Default: deny everything else ────────────────────────────────────────

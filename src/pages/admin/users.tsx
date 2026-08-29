@@ -6,10 +6,13 @@ import { useAdminUsers } from "feature/admin/hooks/useAdminUsers";
 import AdminLayout from "feature/admin/layouts/AdminLayout";
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
 import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
-import type { SupportTeamMember } from "feature/supportTeam/types/supportTeam.types";
+import type {
+  PendingSupporter,
+  SupportTeamMember,
+} from "feature/supportTeam/types/supportTeam.types";
 import { DEFAULT_SUPPORT_TITLE } from "feature/supportTeam/utils/supportTeam.utils";
 import { doc, getDoc } from "firebase/firestore";
-import { Heart, Search, Trash2, User, Users } from "lucide-react";
+import { Clock, Heart, Search, Trash2, User, Users } from "lucide-react";
 import type { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
 import { useEffect, useState } from "react";
@@ -127,6 +130,42 @@ const TeamMemberRow = ({
   </div>
 );
 
+// ─── Waiting donation row ─────────────────────────────────────────────────────
+
+const PendingDonationRow = ({
+  donation,
+  onDismiss,
+}: {
+  donation: PendingSupporter;
+  onDismiss: () => void;
+}) => (
+  <div className='flex items-center gap-4 rounded-2xl bg-zinc-900/40 px-5 py-4'>
+    <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-400/70'>
+      <Clock size={16} />
+    </div>
+
+    <div className='min-w-0 flex-1'>
+      <p className='truncate text-sm font-bold text-white'>
+        {donation.supporterName || "Anonymous"}
+      </p>
+      <p className='truncate text-xs text-zinc-500'>{donation.email}</p>
+    </div>
+
+    {donation.amount ? (
+      <span className='shrink-0 text-sm font-bold tabular-nums text-amber-400/80'>
+        ${donation.amount}
+      </span>
+    ) : null}
+
+    <button
+      onClick={onDismiss}
+      title='Drop this waiting donation'
+      className='shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold text-zinc-600 transition-colors hover:text-red-400'>
+      <Trash2 size={13} />
+    </button>
+  </div>
+);
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const AdminUsersPage = () => {
@@ -136,12 +175,14 @@ const AdminUsersPage = () => {
   const { isLoading, userStats, fetchUsers } = useAdminUsers(password);
   const {
     members,
+    pending,
     results,
     isSearching,
     fetchSupportTeam,
     searchUsers,
     markAsSupport,
     removeSupport,
+    removePending,
   } = useAdminSupport(password);
 
   const [term, setTerm] = useState("");
@@ -296,6 +337,34 @@ const AdminUsersPage = () => {
             </div>
           )}
         </section>
+
+        {/* Donations whose email has no account yet */}
+        {pending.length > 0 && (
+          <section className='space-y-4'>
+            <div className='flex flex-col gap-1'>
+              <h3 className='flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-zinc-500'>
+                <Clock size={13} />
+                Waiting for an account
+              </h3>
+              <p className='text-xs text-zinc-600'>
+                Buy Me a Coffee donations whose email matches no player yet. The
+                badge is handed out on its own the moment they log in with it —
+                mark someone by hand above only if they donated from a different
+                address.
+              </p>
+            </div>
+
+            <div className='space-y-2'>
+              {pending.map((donation) => (
+                <PendingDonationRow
+                  key={donation.email}
+                  donation={donation}
+                  onDismiss={() => removePending(donation.email)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </AdminLayout>
   );

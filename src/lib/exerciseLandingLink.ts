@@ -84,7 +84,7 @@ export interface ExerciseLandingMeta {
  */
 export function classifyExerciseLanding(
   exerciseId: string,
-  meta?: ExerciseLandingMeta
+  meta?: ExerciseLandingMeta,
 ): SeoLandingPageKey {
   const idHas = (...fragments: string[]) =>
     fragments.some((fragment) => exerciseId.includes(fragment));
@@ -92,7 +92,17 @@ export function classifyExerciseLanding(
   // string_sweep_* / whole_neck_sweep are the String Hunt / Whole Neck Hunt
   // fretboard exams — their ids predate the rename and still say "sweep", so they
   // have to be claimed here before the picking-technique rule below grabs them.
-  if (idHas("pentatonic", "scale", "fretboard", "note_hunt", "interval_hunt", "string_sweep", "whole_neck")) {
+  if (
+    idHas(
+      "pentatonic",
+      "scale",
+      "fretboard",
+      "note_hunt",
+      "interval_hunt",
+      "string_sweep",
+      "whole_neck",
+    )
+  ) {
     return "scales";
   }
   if (
@@ -109,7 +119,7 @@ export function classifyExerciseLanding(
       "pinky",
       "stretch",
       "speed",
-      "trill"
+      "trill",
     )
   ) {
     return "speed";
@@ -132,7 +142,7 @@ export function classifyExerciseLanding(
 /** Which landing page an exercise belongs to, embedded or classified. */
 export function getExerciseLandingPageKey(
   exerciseId: string,
-  meta?: ExerciseLandingMeta
+  meta?: ExerciseLandingMeta,
 ): SeoLandingPageKey {
   return (
     EMBEDDED_EXERCISE_PAGE[exerciseId] ??
@@ -146,7 +156,7 @@ export function getExerciseLandingPageKey(
  */
 export function getExerciseLandingHref(
   exerciseId: string,
-  meta?: ExerciseLandingMeta
+  meta?: ExerciseLandingMeta,
 ): string {
   const embedded = EMBEDDED_EXERCISE_PAGE[exerciseId];
   if (embedded) {

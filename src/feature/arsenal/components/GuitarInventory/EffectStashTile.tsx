@@ -12,7 +12,7 @@ import { EffectCard } from "./EffectCard";
 interface EffectStashTileProps extends StashPlacement {
   item: EffectInventoryItem;
   isOnPedalboard?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 /** A pedal as one socket of the stash. Square, unlike the tall guitar sockets. */

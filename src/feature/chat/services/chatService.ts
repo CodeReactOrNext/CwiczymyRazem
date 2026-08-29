@@ -15,11 +15,21 @@ import {
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
+/**
+ * Where the messages live. The global room is a top-level collection; a guild
+ * keeps its own under the guild document, so a channel is just a different
+ * path and the whole chat feature works unchanged on either.
+ */
+export const GLOBAL_CHAT_PATH = "chats";
+
+export const guildChatPath = (guildId: string) => `guilds/${guildId}/chat`;
+
 export const fetchChatMessages = (
-  callback: (messages: ChatMessageType[]) => void
+  callback: (messages: ChatMessageType[]) => void,
+  chatPath: string = GLOBAL_CHAT_PATH
 ) => {
   const chatQuery = query(
-    collection(db, "chats"),
+    collection(db, chatPath),
     orderBy("timestamp", "desc"),
     limit(CHAT_LIMIT_MESSAGE)
   );
@@ -41,11 +51,12 @@ export const sendChatMessage = async (
   userId: string,
   username: string,
   avatar: string | undefined,
-  lvl: number
+  lvl: number,
+  chatPath: string = GLOBAL_CHAT_PATH
 ) => {
   if (!message.trim()) return undefined
 
-  return addDoc(collection(db, "chats"), {
+  return addDoc(collection(db, chatPath), {
     userId,
     username,
     message,
@@ -60,9 +71,10 @@ export const toggleLikeChatMessage = async (
   messageId: string,
   userId: string,
   username: string,
-  hasLiked: boolean
+  hasLiked: boolean,
+  chatPath: string = GLOBAL_CHAT_PATH
 ) => {
-  const messageRef = doc(db, "chats", messageId);
+  const messageRef = doc(db, chatPath, messageId);
 
   return updateDoc(messageRef, {
     likes: hasLiked
