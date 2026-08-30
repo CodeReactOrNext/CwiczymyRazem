@@ -178,7 +178,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const year = rollVintageYear(guitar.yearFrom, guitar.yearTo);
         const country = guitar.countries[Math.floor(Math.random() * guitar.countries.length)];
         const condition = rollCondition();
-        const rolled = rollItemFeatures(guitar.rarity);
+        const rolled = rollItemFeatures(guitar);
         const rolledTraits = rollItemTraits(guitar.rarity, "guitar");
 
         // Dex-new: first copy of this model ever pulled, as opposed to a duplicate.

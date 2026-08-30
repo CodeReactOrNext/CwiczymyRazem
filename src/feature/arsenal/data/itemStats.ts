@@ -1,9 +1,14 @@
 import type {
+  BodyConstruction,
+  BridgeType,
+  Electronics,
   GuitarDefinition,
   GuitarRarity,
+  GuitarSpec,
   InventoryItem,
   ItemFeature,
   ItemStats,
+  PickupConfig,
 } from "../types/arsenal.types";
 
 /** Base sell value per rarity — the floor before condition/vintage multipliers. */
@@ -122,6 +127,29 @@ export const STAT_LABELS: Record<StatCategory, string> = {
   playFeeling: "Play Feeling",
 };
 
+/**
+ * What a guitar has to be for a mod to go on it.
+ *
+ * Every field is optional and every one present has to hold — a mod with no
+ * requirement at all fits anything with frets, which covers the whole setup and
+ * fretwork half of the pool. Kept declarative rather than a predicate per mod so
+ * the UI can explain a blocked mod without running it.
+ */
+export interface ModRequirement {
+  /** Bridges this can be fitted to. */
+  bridge?: BridgeType[];
+  /** Needs a coil to split or tap — so at least one humbucker. */
+  humbucker?: boolean;
+  /** Needs at least this many pickups to wire together. */
+  minPickups?: number;
+  /** Bodies this can be cut into. */
+  construction?: BodyConstruction[];
+  /** The harness this is a part of. */
+  electronics?: Electronics[];
+  /** Needs tuners on a headstock. */
+  headstock?: boolean;
+}
+
 export interface GuitarFeatureDef {
   id: string;
   label: string;
@@ -129,7 +157,46 @@ export interface GuitarFeatureDef {
   /** Inclusive point range this feature can roll. */
   min: number;
   max: number;
+  /** What the instrument has to be. Omitted = fits every guitar. */
+  requires?: ModRequirement;
 }
+
+/**
+ * Every bridge in the game, derived from the union so the lists below cannot drift.
+ *
+ * `satisfies` is what makes this safe: adding a bridge type without adding it here
+ * fails to compile, and the "everything except" lists then pick it up on their own —
+ * a new bridge is assumed to take a mod unless someone says otherwise, which is the
+ * forgiving default. The alternative, hand-written allowlists, silently locks a new
+ * bridge out of half the pool.
+ */
+const BRIDGE_TYPES = Object.keys({
+  hardtail: 1,
+  "vintage-trem": 1,
+  "modern-trem": 1,
+  floyd: 1,
+  "tom-stopbar": 1,
+  wraparound: 1,
+  "floating-offset": 1,
+  biscuit: 1,
+} satisfies Record<BridgeType, 1>) as BridgeType[];
+
+/** Tremolos with a sustain block sunk into the body, brass or otherwise. */
+const TREM_WITH_BLOCK: BridgeType[] = ["vintage-trem", "modern-trem", "floyd"];
+
+/** A Floyd's nut is the locking clamp; there is no bone to fit in its place. */
+const NON_LOCKING_NUT = BRIDGE_TYPES.filter((b) => b !== "floyd");
+
+/**
+ * Bridges whose saddles come off on their own. A Floyd's are part of the locking
+ * system, and a resonator's biscuit carries one slotted saddle, not six.
+ */
+const SWAPPABLE_SADDLES = BRIDGE_TYPES.filter(
+  (b) => b !== "floyd" && b !== "biscuit",
+);
+
+/** A harness with pots to solder into. */
+const PASSIVE: Electronics[] = ["passive"];
 
 /** Pool of rollable, invisible-on-image guitar features. Each adds points to its category. */
 export const GUITAR_FEATURES: GuitarFeatureDef[] = [
@@ -140,6 +207,7 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "pickups",
     min: 1,
     max: 3,
+    requires: { humbucker: true, electronics: PASSIVE },
   },
   {
     id: "hand-wound",
@@ -147,6 +215,7 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "pickups",
     min: 3,
     max: 5,
+    requires: { minPickups: 1 },
   },
   {
     id: "push-pull",
@@ -154,6 +223,7 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "pickups",
     min: 1,
     max: 3,
+    requires: { electronics: PASSIVE },
   },
   {
     id: "phase-switch",
@@ -161,6 +231,7 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "pickups",
     min: 1,
     max: 2,
+    requires: { minPickups: 2, electronics: PASSIVE },
   },
   {
     id: "treble-bleed",
@@ -168,14 +239,23 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "pickups",
     min: 1,
     max: 2,
+    requires: { electronics: PASSIVE },
   },
-  { id: "cts-pots", label: "CTS pots", category: "pickups", min: 1, max: 2 },
+  {
+    id: "cts-pots",
+    label: "CTS pots",
+    category: "pickups",
+    min: 1,
+    max: 2,
+    requires: { electronics: PASSIVE },
+  },
   {
     id: "pio-caps",
     label: "Paper-in-oil caps",
     category: "pickups",
     min: 1,
     max: 3,
+    requires: { electronics: PASSIVE },
   },
   {
     id: "active-preamp",
@@ -183,6 +263,7 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "pickups",
     min: 2,
     max: 4,
+    requires: { minPickups: 1 },
   },
   {
     id: "copper-shielding",
@@ -190,15 +271,24 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "pickups",
     min: 1,
     max: 2,
+    requires: { electronics: PASSIVE },
   },
   // Sustain / hardware / resonance
-  { id: "bone-nut", label: "Bone nut", category: "sustain", min: 1, max: 2 },
+  {
+    id: "bone-nut",
+    label: "Bone nut",
+    category: "sustain",
+    min: 1,
+    max: 2,
+    requires: { bridge: NON_LOCKING_NUT },
+  },
   {
     id: "brass-trem-block",
     label: "Brass trem block",
     category: "sustain",
     min: 2,
     max: 4,
+    requires: { bridge: TREM_WITH_BLOCK },
   },
   {
     id: "steel-saddles",
@@ -206,6 +296,7 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "sustain",
     min: 1,
     max: 3,
+    requires: { bridge: SWAPPABLE_SADDLES },
   },
   {
     id: "locking-tuners",
@@ -213,6 +304,7 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "sustain",
     min: 1,
     max: 2,
+    requires: { headstock: true },
   },
   {
     id: "torrefied-wood",
@@ -227,6 +319,7 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
     category: "sustain",
     min: 1,
     max: 3,
+    requires: { construction: ["solid"] },
   },
   // Play feeling / setup / neck
   {
@@ -303,6 +396,60 @@ export const GUITAR_FEATURES: GuitarFeatureDef[] = [
 
 const FEATURES_BY_ID = new Map(GUITAR_FEATURES.map((f) => [f.id, f]));
 
+/** How many coils each layout carries, and how many of them are humbuckers. */
+const PICKUP_COUNT: Record<PickupConfig, number> = {
+  SSS: 3,
+  SS: 2,
+  HSS: 3,
+  HSH: 3,
+  HH: 2,
+  P90: 2,
+  none: 0,
+};
+
+const HUMBUCKER_COUNT: Record<PickupConfig, number> = {
+  SSS: 0,
+  SS: 0,
+  HSS: 1,
+  HSH: 2,
+  HH: 2,
+  P90: 0,
+  none: 0,
+};
+
+/** Every condition on the requirement has to hold; an absent one is satisfied. */
+export const modFitsSpec = (
+  def: Pick<GuitarFeatureDef, "requires">,
+  spec: GuitarSpec,
+): boolean => {
+  const req = def.requires;
+  if (!req) return true;
+  if (req.bridge && !req.bridge.includes(spec.bridge)) return false;
+  if (req.humbucker && HUMBUCKER_COUNT[spec.pickups] === 0) return false;
+  if (req.minPickups != null && PICKUP_COUNT[spec.pickups] < req.minPickups) {
+    return false;
+  }
+  if (req.construction && !req.construction.includes(spec.construction)) {
+    return false;
+  }
+  if (req.electronics && !req.electronics.includes(spec.electronics)) {
+    return false;
+  }
+  if (req.headstock && !spec.headstock) return false;
+  return true;
+};
+
+/**
+ * Every mod this guitar could physically take.
+ *
+ * The one gate in the game: both halves of the system read it, so "what a case can
+ * roll on this" and "what the bench will bolt to this" are the same list. They used
+ * to be two different answers — the roll had no gate at all and the bench filtered
+ * on the salvage BOM — which is how a Les Paul ended up wearing a tremolo block.
+ */
+export const getEligibleMods = (spec: GuitarSpec): GuitarFeatureDef[] =>
+  GUITAR_FEATURES.filter((def) => modFitsSpec(def, spec));
+
 /** Most features a guitar of this rarity *can* have (each slot is then rolled independently). */
 export const RARITY_MAX_FEATURES: Record<GuitarRarity, number> = {
   Common: 2,
@@ -335,14 +482,19 @@ export const sumFeatureStats = (features: ItemFeature[]): ItemStats => {
  * Roll a set of named features for a newly minted guitar. Up to RARITY_MAX_FEATURES
  * slots, each filled independently — so the count is random and may be 0 (plain guitar,
  * returns `undefined`). Returns both the feature list and the derived per-category sums.
+ *
+ * Takes the whole definition rather than the rarity, because the pool it draws from
+ * is the guitar's own: a Telecaster has no tremolo to block and a resonator has no
+ * harness to solder into. `guitarSpecs.test.ts` asserts that no guitar's pool is
+ * smaller than the slots its rarity can reach, so this can never run short.
  */
 export const rollItemFeatures = (
-  rarity: GuitarRarity,
+  guitar: Pick<GuitarDefinition, "rarity" | "spec">,
   rng: () => number = Math.random,
 ): { features: ItemFeature[]; stats: ItemStats } | undefined => {
-  const max = RARITY_MAX_FEATURES[rarity] ?? 2;
+  const max = RARITY_MAX_FEATURES[guitar.rarity] ?? 2;
   // Fisher–Yates shuffle so distinct features are picked.
-  const pool = [...GUITAR_FEATURES];
+  const pool = getEligibleMods(guitar.spec);
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];

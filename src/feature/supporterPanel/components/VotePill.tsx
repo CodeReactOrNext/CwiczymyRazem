@@ -25,13 +25,16 @@ interface VotePillProps {
   total: number;
   /** What the reader has put in. */
   mine: number;
-  /** The most one person may put on one item. */
-  max: number;
+  /** The most one person may put on one item. Absent where there is no cap. */
+  max?: number;
   /** What the reader has left to spend anywhere. */
   tokensLeft: number;
   busy: boolean;
   /** What is being backed, for the label: "idea", "piece of gear". */
   what: string;
+  /** The thing's own name, on a board where the row carries one — a ballot of
+   *  two dozen guitars gives every pill the same label without it. */
+  name?: string;
   /** Accent hex for a board that colours by rarity. Cyan when absent. */
   accent?: string;
   onBack: () => void;
@@ -44,21 +47,23 @@ export const VotePill = ({
   tokensLeft,
   busy,
   what,
+  name,
   accent,
   onBack,
 }: VotePillProps) => {
   const backed = mine > 0;
-  const maxed = mine >= max;
+  const maxed = max !== undefined && mine >= max;
   const broke = tokensLeft <= 0;
   const blocked = busy || maxed || broke;
 
+  const target = name ?? `this ${what}`;
   const label = maxed
     ? `You have put ${mine} in — the most one person can`
     : broke
       ? "Nothing left in your wallet to spend"
       : backed
-        ? `Spend another token on this ${what} — you have put ${mine} in`
-        : `Spend a token on this ${what}`;
+        ? `Spend another token on ${target} — you have put ${mine} in`
+        : `Spend a token on ${target}`;
 
   return (
     <button

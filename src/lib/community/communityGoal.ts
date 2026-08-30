@@ -134,12 +134,25 @@ async function supporterUids(): Promise<string[]> {
 export const supporterCount = async (): Promise<number> =>
   (await supporterUids()).length;
 
+/** A window's numbers, and whether every query behind them actually answered. */
+interface Measurement {
+  bundle: MetricBundle;
+  complete: boolean;
+}
+
 /**
  * One supporter's whole contribution to the window: a session count, plus the
  * raw milliseconds behind each time metric.
  *
- * Two queries rather than one because Firestore allows at most five
- * aggregations per query and there are six things to ask for. Milliseconds come
+ * Three queries rather than one, for two reasons. Firestore allows at most five
+ * aggregations per query and there are six things to ask for — and a `sum` over
+ * a range filter needs a composite index covering every field it touches, while
+ * a bare `count` needs none. The count therefore rides in a query of its own:
+ * an index that has not been created yet costs the hours it belongs to and
+ * leaves the session count standing, rather than zeroing the whole bundle.
+ *
+ * Each query is caught on its own for that same reason, and what could not be
+ * asked is reported rather than passed off as a real zero. Milliseconds come
  * back raw — they are floored to hours only once the roster has been added up,
  * otherwise every supporter's part-hour is thrown away before it counts.
  */
@@ -147,7 +160,7 @@ const measureOne = async (
   uid: string,
   from: Date,
   to: Date,
-): Promise<MetricBundle> => {
+): Promise<Measurement> => {
   const window = firestore
     .collection("users")
     .doc(uid)
@@ -155,27 +168,44 @@ const measureOne = async (
     .where("reportDate", ">=", from)
     .where("reportDate", "<", to);
 
-  const [head, tail] = await Promise.all([
-    window
-      .aggregate({
-        sessions: AggregateField.count(),
-        minutes: AggregateField.sum(GOAL_METRICS.minutes.field!),
-        technique: AggregateField.sum(GOAL_METRICS.technique.field!),
-        theory: AggregateField.sum(GOAL_METRICS.theory.field!),
-      })
-      .get(),
-    window
-      .aggregate({
-        hearing: AggregateField.sum(GOAL_METRICS.hearing.field!),
-        creativity: AggregateField.sum(GOAL_METRICS.creativity.field!),
-      })
-      .get(),
+  const run = async (
+    spec: Record<string, unknown>,
+  ): Promise<Partial<MetricBundle> | null> => {
+    try {
+      return (
+        await window.aggregate(spec as never).get()
+      ).data() as Partial<MetricBundle>;
+    } catch (error) {
+      // A missing composite index is the likely cause, and it names itself in
+      // the message along with the link that creates it.
+      console.error("[communityGoal] aggregate failed", error);
+      return null;
+    }
+  };
+
+  const parts = await Promise.all([
+    run({ sessions: AggregateField.count() }),
+    run({
+      minutes: AggregateField.sum(GOAL_METRICS.minutes.field!),
+      technique: AggregateField.sum(GOAL_METRICS.technique.field!),
+      theory: AggregateField.sum(GOAL_METRICS.theory.field!),
+    }),
+    run({
+      hearing: AggregateField.sum(GOAL_METRICS.hearing.field!),
+      creativity: AggregateField.sum(GOAL_METRICS.creativity.field!),
+    }),
   ]);
 
-  const raw = { ...head.data(), ...tail.data() } as Partial<MetricBundle>;
   const bundle = emptyBundle();
-  for (const metric of METRIC_KEYS) bundle[metric] = Number(raw[metric]) || 0;
-  return bundle;
+  for (const part of parts) {
+    if (!part) continue;
+    for (const metric of METRIC_KEYS) {
+      if (part[metric] !== undefined)
+        bundle[metric] = Number(part[metric]) || 0;
+    }
+  }
+
+  return { bundle, complete: parts.every(Boolean) };
 };
 
 /** How many supporters are queried at once, so a large roster can't fan out unbounded. */
@@ -199,6 +229,7 @@ export async function measureAll(from: Date, to: Date): Promise<MetricBundle> {
   if (hit && Date.now() - hit.at < ttl) return hit.value;
 
   const totals = emptyBundle();
+  let complete = true;
 
   try {
     const uids = await supporterUids();
@@ -208,7 +239,8 @@ export async function measureAll(from: Date, to: Date): Promise<MetricBundle> {
         uids.slice(i, i + ROSTER_BATCH).map((uid) => measureOne(uid, from, to)),
       );
       for (const part of batch) {
-        for (const metric of METRIC_KEYS) totals[metric] += part[metric];
+        if (!part.complete) complete = false;
+        for (const metric of METRIC_KEYS) totals[metric] += part.bundle[metric];
       }
     }
 
@@ -217,13 +249,17 @@ export async function measureAll(from: Date, to: Date): Promise<MetricBundle> {
       if (metric !== "sessions") totals[metric] = msToHours(totals[metric]);
     }
   } catch (error) {
-    // A missing composite index is the likely cause, and a goal that cannot be
+    // The roster read is all that is left to throw, and a goal that cannot be
     // measured must not read as "already done" — zeroes keep it honest.
     console.error("[communityGoal] measure failed", error);
-    for (const metric of METRIC_KEYS) totals[metric] = 0;
+    return emptyBundle();
   }
 
-  bundleCache.set(key, { at: Date.now(), value: totals });
+  // A window that could not be asked in full is short by whatever the failed
+  // query carried, and memoising that would hold the shortfall for the whole
+  // TTL — half an hour on a closed window. It is answered now and asked again
+  // next time, so the number repairs itself the moment the index lands.
+  if (complete) bundleCache.set(key, { at: Date.now(), value: totals });
   return totals;
 }
 

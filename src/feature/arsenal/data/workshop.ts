@@ -4,6 +4,7 @@ import type {
   EffectType,
   GuitarDefinition,
   GuitarRarity,
+  GuitarSpec,
   InventoryItem,
   ItemFeature,
   PartId,
@@ -22,6 +23,7 @@ import {
   getConditionGrade,
   getConditionPoints,
   getEffectiveRarity,
+  getEligibleMods,
   getItemCondition,
   getPromotionsAvailable,
   GUITAR_FEATURES,
@@ -442,11 +444,13 @@ export interface WorkshopSubject {
   features: ItemFeature[];
   /** Pedals only: gates the `appliesTo` half of the mod pool. */
   effectType?: EffectType;
+  /** Guitars only: gates the mod pool, the way `effectType` does for pedals. */
+  spec?: GuitarSpec;
 }
 
 export const getGuitarSubject = (
   item: Pick<InventoryItem, "id" | "condition" | "buildLevel" | "features">,
-  guitar: Pick<GuitarDefinition, "id" | "name" | "rarity">,
+  guitar: Pick<GuitarDefinition, "id" | "name" | "rarity" | "spec">,
 ): WorkshopSubject => ({
   id: item.id,
   kind: "guitar",
@@ -457,6 +461,7 @@ export const getGuitarSubject = (
   condition: getItemCondition(item),
   bom: getGuitarBom(guitar.id),
   features: item.features ?? [],
+  spec: guitar.spec,
 });
 
 export const getEffectSubject = (
@@ -903,8 +908,15 @@ const toModDef = (def: {
 /**
  * Every mod this instrument could physically take, fitted or not.
  *
- * For guitars the gate is the BOM — construction decides what there is to modify.
+ * For guitars the gate is the spec — the hardware decides what there is to modify.
  * For pedals it is the type, which is how `rollEffectFeatures` already gates them.
+ * Both sides therefore answer the same question the mint roll does, which is the
+ * whole point: `getEligibleMods` and `rollItemFeatures` read one list.
+ *
+ * This used to filter on the salvage BOM, and got it backwards in both directions.
+ * A BOM says what comes *off* an instrument, so a set-neck — which never gives up
+ * its neck — could take no fretwork at all, while a Telecaster, whose BOM does list
+ * a bridge, could be fitted with a tremolo block for the tremolo it does not have.
  */
 export const getFittableMods = (subject: WorkshopSubject): ModFeatureDef[] => {
   if (subject.kind === "effect") {
@@ -916,11 +928,12 @@ export const getFittableMods = (subject: WorkshopSubject): ModFeatureDef[] => {
     ).map(toModDef);
   }
 
-  const bomParts = new Set(getBomParts(subject.bom));
-  return GUITAR_FEATURES.filter((f) => {
-    const partId = FEATURE_PART_UPGRADES[f.id];
-    return !partId || bomParts.has(partId);
-  }).map(toModDef);
+  // A guitar subject always carries a spec — `GuitarDefinition` requires one. The
+  // fallback is for a hand-built subject in a test, and offers the whole pool
+  // rather than nothing, so a missing spec cannot silently strip an item's mods.
+  return (subject.spec ? getEligibleMods(subject.spec) : GUITAR_FEATURES).map(
+    toModDef,
+  );
 };
 
 export interface ModSlots {

@@ -330,7 +330,7 @@ const drawGuitarOffer = (
   if (!def) return null;
   used.add(def.id);
 
-  const rolled = rollItemFeatures(def.rarity, random);
+  const rolled = rollItemFeatures(def, random);
   // Driven by the same seeded `random` as every other roll on this offer, so the
   // instance the shop card advertises is the one the purchase mints server-side.
   const rolledTraits = rollItemTraits(def.rarity, "guitar", undefined, random);

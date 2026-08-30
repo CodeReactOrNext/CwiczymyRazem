@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ItemFeature, SalvagedMod } from "../types/arsenal.types";
 import { getGuitarBom } from "./guitarBom";
+import { HEADLESS, S_TYPE } from "./guitarSpecs";
 import { getEffectiveRarity } from "./itemStats";
 import {
   canFitSalvagedMod,
@@ -29,6 +30,8 @@ const subject = (over: Partial<WorkshopSubject> = {}): WorkshopSubject => {
     bom: over.bom ?? STRAT_BOM,
     features: over.features ?? [],
     effectType: over.effectType,
+    // A guitar subject always carries one, and the mod bench gates on it.
+    spec: over.spec ?? (over.kind === "effect" ? undefined : S_TYPE),
   };
 };
 
@@ -279,12 +282,11 @@ describe("getSalvagedModOptions", () => {
   });
 
   it("hides a mod the construction has nowhere to put", () => {
-    // A BOM without a `tuners` slot cannot take locking tuners, exactly as the
-    // fresh-mod menu already refuses to offer them.
-    const options = getSalvagedModOptions(
-      subject({ bom: [{ partId: "body", qty: 1 }] }),
-      [stashed({ id: "s3", featureId: "locking-tuners" })],
-    );
+    // A headless build has no headstock, so there are no tuners to lock, exactly
+    // as the list of what the instrument would take already refuses to offer them.
+    const options = getSalvagedModOptions(subject({ spec: HEADLESS }), [
+      stashed({ id: "s3", featureId: "locking-tuners" }),
+    ]);
     expect(options).toHaveLength(0);
   });
 });
@@ -333,7 +335,7 @@ describe("canFitSalvagedMod", () => {
   it("refuses a construction with nowhere to bolt it on", () => {
     expect(
       canFitSalvagedMod(
-        subject({ bom: [{ partId: "body", qty: 1 }] }),
+        subject({ spec: HEADLESS }),
         stashed({ featureId: "locking-tuners" }),
       ),
     ).toBe(false);

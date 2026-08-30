@@ -1,22 +1,23 @@
 import { cn } from "assets/lib/utils";
-import { SupportToken } from "components/UI/SupportToken/SupportToken";
+import { GoalIcon } from "feature/communityGoal/components/GoalIcon";
 import {
   getCandidate,
-  perSupporterLine,
+  perSupporterShare,
 } from "feature/communityGoal/data/goalCatalog";
 import {
   useCommunityGoal,
   useCommunityGoalMutations,
 } from "feature/communityGoal/hooks/useCommunityGoal";
-import { GOAL_VOTE_COST } from "feature/supporterPanel/constants/supporterPanel.constants";
+import { VotePill } from "feature/supporterPanel/components/VotePill";
 
 /**
- * Next week's ballot. One token, one push — supporters are buying which goal
- * the whole app plays for, never how much it pays out.
+ * Next week's ballot.
  *
- * Every number on a row says what it is in the same breath: the target is
- * divided down to what it asks of one supporter, and the tally is counted in
- * votes rather than left as a bare figure beside a coin.
+ * Sorted by what is backing each option, so the row at the top is the one that
+ * runs on Monday — the order carries the result, and nothing has to be labelled
+ * "leading the vote" for it to read that way. What a challenge is, where the
+ * targets come from and what a token buys are all spelled out on the Milestones
+ * page (`SupportChallengeExplainer`); this is the ballot, so it just votes.
  */
 export const GoalBallot = ({ tokensLeft }: { tokensLeft: number }) => {
   const { data, isLoading } = useCommunityGoal();
@@ -28,7 +29,7 @@ export const GoalBallot = ({ tokensLeft }: { tokensLeft: number }) => {
         {Array.from({ length: 5 }, (_, index) => (
           <div
             key={index}
-            className='h-20 animate-pulse rounded-lg bg-zinc-900/40'
+            className='h-[104px] animate-pulse rounded-lg bg-zinc-900/40'
           />
         ))}
       </div>
@@ -36,89 +37,55 @@ export const GoalBallot = ({ tokensLeft }: { tokensLeft: number }) => {
   }
 
   const supporters = data.ballot.supporters;
-  const leader = Math.max(
-    ...data.ballot.options.map((option) => option.tokens),
-    0,
-  );
+  const options = [...data.ballot.options].sort((a, b) => b.tokens - a.tokens);
 
   return (
     <div className='space-y-3'>
-      {data.ballot.options.map((option) => {
-        const isLeading = leader > 0 && option.tokens === leader;
-        const share = perSupporterLine(
+      {options.map((option, index) => {
+        const leading = index === 0 && option.tokens > 0;
+        const share = perSupporterShare(
           option.target,
           supporters,
           getCandidate(option.candidateId).metric,
         );
-        const footnote = [
-          isLeading ? "leading the vote" : null,
-          option.mine > 0 ? `${option.mine} from you` : null,
-        ]
-          .filter(Boolean)
-          .join(" · ");
 
         return (
-          <button
+          <div
             key={option.candidateId}
-            type='button'
-            disabled={vote.isPending || tokensLeft < GOAL_VOTE_COST}
-            onClick={() => vote.mutate(option.candidateId)}
             className={cn(
-              "flex w-full items-center gap-5 rounded-lg p-5 text-left transition-background",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-              "disabled:pointer-events-none disabled:opacity-50",
-              isLeading
-                ? "bg-cyan-500/10 hover:bg-cyan-500/15"
-                : "bg-zinc-900/40 hover:bg-zinc-900/60",
+              "flex items-center gap-4 rounded-lg p-5 transition-background",
+              leading ? "bg-cyan-500/10" : "bg-zinc-900/40",
             )}>
+            <span
+              className={cn(
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
+                leading
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "bg-zinc-800/60 text-zinc-400",
+              )}>
+              <GoalIcon icon={option.icon} />
+            </span>
+
             <div className='min-w-0 flex-1'>
               <p className='font-bold text-zinc-100'>{option.label}</p>
               <p className='mt-1 text-sm text-zinc-400'>{option.blurb}</p>
-              {share && (
-                <p className='mt-2 text-xs text-zinc-500'>
-                  {option.target} {option.unit} in one week — {share}
-                </p>
-              )}
+              {share && <p className='mt-2 text-xs text-zinc-500'>{share}</p>}
             </div>
 
-            <div className='flex shrink-0 flex-col items-end gap-1'>
-              <span
-                className={cn(
-                  "flex items-center gap-1.5 text-sm font-bold tabular-nums",
-                  isLeading ? "text-cyan-400" : "text-zinc-300",
-                )}>
-                <SupportToken size={20} />
-                {option.tokens} {option.tokens === 1 ? "vote" : "votes"}
-              </span>
-              {footnote && (
-                <span className='text-[11px] text-zinc-500'>{footnote}</span>
-              )}
-            </div>
-          </button>
+            <VotePill
+              total={option.tokens}
+              mine={option.mine}
+              // No `max`: nothing caps how much of a wallet may go behind one
+              // goal — the ballot buys which target runs, never what it pays.
+              tokensLeft={tokensLeft}
+              busy={vote.isPending}
+              what='goal'
+              name={option.label}
+              onBack={() => vote.mutate(option.candidateId)}
+            />
+          </div>
         );
       })}
-
-      <p className='pt-2 text-xs leading-relaxed text-zinc-500'>
-        Every target above is what that goal would ask for if next week opened
-        today — a stretch over the best week{" "}
-        {supporters === 1
-          ? "the one supporter has"
-          : `the ${supporters} supporters have`}{" "}
-        had recently, and only practice logged by a supporter counts towards it.
-        It settles for real on Monday.
-      </p>
-
-      <p className='text-xs text-zinc-500'>
-        {tokensLeft < GOAL_VOTE_COST ? (
-          "Out of tokens — the ballot stays open, and the next donation buys more."
-        ) : (
-          <>
-            <SupportToken size={18} className='inline-block align-middle' />{" "}
-            {GOAL_VOTE_COST} token = 1 vote. The option carrying the most votes
-            on Monday becomes next week&apos;s goal for the whole app.
-          </>
-        )}
-      </p>
     </div>
   );
 };

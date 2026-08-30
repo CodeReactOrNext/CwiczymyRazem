@@ -82,6 +82,8 @@ It comes off slightly worn: a point off what it was worth, never below that mod'
 
 Whichever way you fit it, the same three rules apply: it has to physically fit that instrument, the instrument needs a free mod slot, and it can't already carry that mod. On a phone there's no board to drag from, so fit it at the Workshop bench instead, which does exactly the same thing.
 
+**"Physically fits" means what it says.** A brass tremolo block needs a tremolo, so it goes on a Strat and never on a Les Paul or a Telecaster. A coil-split needs a humbucker to split, so three single coils rule it out. Locking tuners need a headstock, and a headless build hasn't got one. A body that's already hollow can't be chambered again, and an acoustic with no pickups takes no electrical work at all. Fretwork and setup are the exception — a fret level, stainless frets or a compound radius go on anything with a neck. The bench lists what each instrument would take, so you never have to guess before you go hunting.
+
 ## The Trader
 
 The Trader is the game's own shop, and the only place parts can be bought at all. It restocks once a day and everyone sees the same stock. Listings from other players are next door, in the Market tab.

@@ -1,3 +1,4 @@
+import { Chip } from "assets/components/ui/chip";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
@@ -15,6 +16,7 @@ import type {
 } from "feature/supporterCase/types/supporterCase.types";
 import { SLATE_RARITIES } from "feature/supporterCase/types/supporterCase.types";
 import { eligibleItems } from "feature/supporterCase/utils/slate";
+import { VotePill } from "feature/supporterPanel/components/VotePill";
 import { SLATE_VOTE_COST } from "feature/supporterPanel/constants/supporterPanel.constants";
 import type { SupporterWallet } from "feature/supporterPanel/types/supporterPanel.types";
 import {
@@ -26,8 +28,6 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-
-const tokenWord = (count: number) => (count === 1 ? "token" : "tokens");
 
 const ItemLine = ({ item }: { item: SlateItem }) => (
   <span className='block min-w-0'>
@@ -42,13 +42,12 @@ const ItemLine = ({ item }: { item: SlateItem }) => (
 );
 
 /**
- * One seat of the case: what is in it now, and where its vote stands.
+ * One seat of the case: what is in it now, and what is about to take it.
  *
  * The six of these are also the ballot's navigation — a seat is picked here
- * and voted on below. Showing all six ballots at once stacked six searchable
- * pools of two dozen items down the page, so the thing the page is actually
- * about — the case, and what is winning each seat — was never on screen at the
- * same time as the vote.
+ * and voted on below. Everything on the card is a picture or a name: the art
+ * of what is in the seat, an arrow to whatever is winning, and the reader's
+ * own tokens as the token glyph rather than a sentence about them.
  */
 const SeatCard = ({
   slot,
@@ -83,14 +82,19 @@ const SeatCard = ({
           ? { boxShadow: `inset 0 0 0 1px ${styles.baseColor}66` }
           : undefined
       }>
-      <span className='flex items-center justify-between gap-2'>
+      {/* Fixed height: the token count only shows on some seats, and a row
+          that grows with it left the six artworks sitting at two heights. */}
+      <span className='flex h-5 items-center justify-between gap-2'>
         <span
           className={cn("text-[10px] font-black tracking-widest", styles.text)}>
           {slot.rarity}
         </span>
         {mine > 0 && (
-          <span className='shrink-0 rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300'>
-            you {mine}
+          <span
+            title={`${mine} of your tokens are on this seat`}
+            className='flex shrink-0 items-center gap-1 text-[11px] font-bold tabular-nums text-cyan-300'>
+            <SupportToken size={13} />
+            {mine}
           </span>
         )}
       </span>
@@ -103,8 +107,8 @@ const SeatCard = ({
           width='full'
         />
       ) : (
-        <span className='flex h-[104px] w-full items-center justify-center rounded-md bg-zinc-950/40 text-xs text-zinc-500'>
-          nothing in this seat
+        <span className='flex h-[104px] w-full items-center justify-center rounded-lg bg-zinc-950/40 text-xs text-zinc-500'>
+          empty
         </span>
       )}
 
@@ -112,40 +116,53 @@ const SeatCard = ({
 
       {/* Pinned to the bottom so the six footers line up however long the
           names above them run. */}
-      <span className='mt-auto flex min-w-0 items-center gap-1.5 text-[11px] text-zinc-400'>
+      <span className='mt-auto flex min-w-0 items-center gap-1.5 text-[11px]'>
         {leader ? (
           <>
-            <ChevronUp size={12} style={{ color: styles.baseColor }} />
-            <span className='truncate'>
-              next:{" "}
-              <span className='font-bold text-zinc-200'>{leader.name}</span>
+            <ChevronUp
+              size={13}
+              className='shrink-0'
+              style={{ color: styles.baseColor }}
+            />
+            <span
+              title={`${leader.name} is winning this seat`}
+              className='truncate font-bold text-zinc-200'>
+              {leader.name}
             </span>
           </>
         ) : (
-          "no votes on this seat yet"
+          <span className='text-zinc-500'>no votes yet</span>
         )}
       </span>
     </button>
   );
 };
 
-/** A backed item, its tally, and the button that puts another token on it. */
+/**
+ * A backed item and everything riding on it.
+ *
+ * The rank is the whole explanation: whatever sits at 1 when the slate turns
+ * over is what the case draws. The count, the reader's own share of it and the
+ * button that adds to it are one control — the same `VotePill` the roadmap and
+ * the gear board spend tokens through.
+ */
 const CandidateRow = ({
   candidate,
+  rank,
   rarity,
-  leading,
-  canVote,
+  tokensLeft,
   busy,
   onVote,
 }: {
   candidate: SlateCandidate;
+  rank: number;
   rarity: SlateRarity;
-  leading: boolean;
-  canVote: boolean;
+  tokensLeft: number;
   busy: boolean;
   onVote: () => void;
 }) => {
   const styles = RARITY_STYLES[rarity];
+  const leading = rank === 1;
 
   return (
     <div
@@ -153,6 +170,19 @@ const CandidateRow = ({
         "flex items-center gap-3 rounded-lg p-2.5",
         leading ? "bg-white/[0.07]" : "bg-white/[0.03]",
       )}>
+      <span
+        className={cn(
+          "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-black tabular-nums",
+          !leading && "text-zinc-500",
+        )}
+        style={
+          leading
+            ? { backgroundColor: styles.baseColor, color: "#09090b" }
+            : undefined
+        }>
+        {rank}
+      </span>
+
       <SlateItemArt
         item={candidate}
         color={styles.baseColor}
@@ -162,74 +192,43 @@ const CandidateRow = ({
 
       <div className='min-w-0 flex-1'>
         <ItemLine item={candidate} />
-
-        <span className='mt-1 flex flex-wrap items-center gap-2'>
-          <span className='flex items-center gap-1 text-xs tabular-nums text-zinc-400'>
-            <SupportToken size={18} />
-            <span className='font-bold' style={{ color: styles.baseColor }}>
-              {candidate.tokens}
-            </span>
-          </span>
-
-          {candidate.mine > 0 && (
-            <span className='rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300'>
-              you {candidate.mine}
-            </span>
-          )}
-
-          {candidate.carried > 0 && (
-            <span
-              className='rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-bold text-zinc-400'
-              title='Tokens left on this item by an earlier slate it did not win'>
-              {candidate.carried} held over
-            </span>
-          )}
-
-          {leading && (
-            <span
-              className='rounded px-1.5 py-0.5 text-[10px] font-black tracking-wider'
-              style={{
-                backgroundColor: `${styles.baseColor}1a`,
-                color: styles.baseColor,
-              }}>
-              takes the seat
-            </span>
-          )}
-        </span>
       </div>
 
-      {/* Cyan, labelled and thumb-sized: the one thing on the row that does
-          anything, and the same colour every other action in the app uses. */}
-      <button
-        type='button'
-        disabled={!canVote || busy}
-        onClick={onVote}
-        title={`Spend ${SLATE_VOTE_COST} token on ${candidate.name}`}
-        className='flex h-10 shrink-0 items-center gap-1.5 rounded-lg bg-cyan-500/10 px-3 text-sm font-bold text-cyan-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 hover:bg-cyan-500/20 hover:text-cyan-200 sm:px-4'>
-        <ChevronUp size={16} />
-        Back
-      </button>
+      <VotePill
+        total={candidate.tokens}
+        mine={candidate.mine}
+        tokensLeft={tokensLeft}
+        busy={busy}
+        what='item'
+        name={candidate.name}
+        accent={styles.baseColor}
+        onBack={onVote}
+      />
     </div>
   );
 };
 
 /**
- * Everything of this rarity nobody has backed yet, behind one button.
+ * Everything of this rarity nobody has backed yet.
  *
- * Folded away by default: the pool runs to a couple of dozen items per seat,
- * and the ballot itself — what people have actually voted for — is the part
- * worth reading first.
+ * Folded away once the ballot has something on it — the pool runs to a couple
+ * of dozen items per seat, and what people have actually voted for is the part
+ * worth reading first. On an empty seat the pool *is* the ballot, so it opens
+ * straight away rather than hiding behind a button and an empty-state line.
  */
 const ItemPicker = ({
   slot,
   busy,
+  canVote,
   onVote,
 }: {
   slot: Slot;
   busy: boolean;
+  canVote: boolean;
   onVote: (key: string) => void;
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const empty = slot.candidates.length === 0;
+  const [isOpen, setIsOpen] = useState(empty);
   const [search, setSearch] = useState("");
 
   const styles = RARITY_STYLES[slot.rarity];
@@ -254,22 +253,22 @@ const ItemPicker = ({
 
   return (
     <div className='space-y-3'>
-      <button
-        type='button'
-        onClick={() => setIsOpen((open) => !open)}
-        className='flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-white/[0.06] text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/[0.12] hover:text-zinc-100'>
-        {isOpen ? <X size={14} /> : <Plus size={14} />}
-        {isOpen
-          ? "Close the list"
-          : `Back one of the other ${rest.length} ${slot.rarity} items`}
-      </button>
+      {!empty && (
+        <button
+          type='button'
+          onClick={() => setIsOpen((open) => !open)}
+          className='flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-white/[0.06] text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/[0.12] hover:text-zinc-100'>
+          {isOpen ? <X size={14} /> : <Plus size={14} />}
+          {isOpen ? "Close" : `${rest.length} more ${slot.rarity} items`}
+        </button>
+      )}
 
-      {isOpen && (
+      {(isOpen || empty) && (
         <>
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder={`Search ${rest.length} ${slot.rarity} items…`}
+            placeholder={`Search ${slot.rarity} items…`}
             startIcon={<Search size={14} className='ml-1.5 text-zinc-400' />}
             className='h-9 border-none bg-white/5 text-sm'
           />
@@ -286,10 +285,17 @@ const ItemPicker = ({
                 <button
                   key={item.key}
                   type='button'
-                  disabled={busy}
+                  disabled={busy || !canVote}
                   onClick={() => onVote(item.key)}
-                  title={`Spend ${SLATE_VOTE_COST} token on ${item.name}`}
-                  className='group flex items-center gap-2.5 rounded-lg bg-white/[0.03] p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 hover:bg-white/[0.08]'>
+                  title={
+                    canVote
+                      ? `Back ${item.name}`
+                      : "Nothing left in your wallet to spend"
+                  }
+                  // Dimmed rather than deaf: an empty wallet still gets to
+                  // read the pool, and the tooltip says why the tile will
+                  // not move — which `pointer-events-none` would swallow.
+                  className='group flex items-center gap-2.5 rounded-lg bg-white/[0.03] p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 hover:bg-white/[0.08] disabled:hover:bg-white/[0.03]'>
                   <SlateItemArt
                     item={item}
                     color={styles.baseColor}
@@ -322,13 +328,13 @@ const ItemPicker = ({
 /** The open ballot for whichever seat is picked above. */
 const SeatBallot = ({
   slot,
-  wallet,
+  tokensLeft,
   canVote,
   busy,
   onVote,
 }: {
   slot: Slot;
-  wallet: SupporterWallet | undefined;
+  tokensLeft: number;
   canVote: boolean;
   busy: boolean;
   onVote: (key: string) => void;
@@ -338,29 +344,25 @@ const SeatBallot = ({
   return (
     <section className='space-y-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
       <div className='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
-        <h3 className={cn("text-sm font-black tracking-wide", styles.text)}>
+        <h2 className={cn("text-sm font-black tracking-wide", styles.text)}>
           {slot.rarity} seat
-        </h3>
+        </h2>
         <p className='text-xs text-zinc-400'>
           {slot.current
-            ? `${slot.current.name} holds it until the next slate`
-            : "nothing holds it yet"}
+            ? `back what replaces ${slot.current.name}`
+            : "back what fills it"}
         </p>
       </div>
 
-      {slot.candidates.length === 0 ? (
-        <p className='rounded-lg bg-white/[0.03] px-4 py-6 text-center text-sm text-zinc-400'>
-          Nothing backed yet — the first token decides this seat.
-        </p>
-      ) : (
+      {slot.candidates.length > 0 && (
         <div className='space-y-2'>
           {slot.candidates.map((candidate, index) => (
             <CandidateRow
               key={candidate.key}
               candidate={candidate}
+              rank={index + 1}
               rarity={slot.rarity}
-              leading={index === 0}
-              canVote={canVote}
+              tokensLeft={canVote ? tokensLeft : 0}
               busy={busy}
               onVote={() => onVote(candidate.key)}
             />
@@ -368,17 +370,7 @@ const SeatBallot = ({
         </div>
       )}
 
-      {canVote ? (
-        <ItemPicker slot={slot} busy={busy} onVote={onVote} />
-      ) : (
-        // Only once the wallet is in: an empty one is worth saying, but a
-        // wallet that has not loaded yet is nothing worth saying.
-        wallet && (
-          <p className='rounded-lg bg-white/[0.03] px-4 py-3 text-xs text-zinc-400'>
-            No tokens left — another donation puts more in the wallet.
-          </p>
-        )
-      )}
+      <ItemPicker slot={slot} busy={busy} canVote={canVote} onVote={onVote} />
     </section>
   );
 };
@@ -401,7 +393,7 @@ export const SupporterCaseTab = ({
           {Array.from({ length: SLATE_RARITIES.length }, (_, index) => (
             <div
               key={index}
-              className='h-[132px] animate-pulse rounded-lg bg-zinc-900/40'
+              className='h-[240px] animate-pulse rounded-lg bg-zinc-900/40'
             />
           ))}
         </div>
@@ -425,22 +417,17 @@ export const SupporterCaseTab = ({
               In the case right now
             </h2>
             <p className='max-w-xl text-sm text-zinc-400'>
-              One seat per rarity, and the seats never move — what the vote
-              picks is which item sits in each, never how good the case is.
+              Six items, one per rarity. Pick a seat and back what you want in
+              it next.
             </p>
           </div>
 
-          <div className='flex shrink-0 items-center gap-2'>
-            <span className='rounded bg-amber-500/10 px-2 py-1 text-xs font-bold text-amber-400'>
-              {state.fameCost} Fame
-            </span>
-            <span className='inline-flex items-center gap-1.5 rounded bg-white/5 px-2 py-1 text-xs text-zinc-300'>
-              <CalendarClock size={13} className='text-zinc-400' />
-              {state.daysLeft === 1
-                ? "new slate tomorrow"
-                : `new slate in ${state.daysLeft} days`}
-            </span>
-          </div>
+          <Chip color='gray' className='shrink-0'>
+            <CalendarClock size={13} className='text-zinc-400' />
+            {state.daysLeft === 1
+              ? "changes tomorrow"
+              : `changes in ${state.daysLeft} days`}
+          </Chip>
         </div>
 
         <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'>
@@ -456,35 +443,14 @@ export const SupporterCaseTab = ({
       </div>
 
       {open && (
-        <div className='space-y-4'>
-          <div className='flex flex-col gap-1'>
-            <h2 className='text-sm font-bold text-zinc-200'>
-              Vote the next slate in
-            </h2>
-            <p className='text-sm text-zinc-400'>
-              <SupportToken size={18} className='inline-block align-middle' />{" "}
-              {SLATE_VOTE_COST} a push, on the seat picked above.
-              {state.myTokens > 0 &&
-                ` ${state.myTokens} ${tokenWord(state.myTokens)} of yours ${
-                  state.myTokens === 1 ? "is" : "are"
-                } already on this ballot.`}
-            </p>
-            <p className='text-sm text-zinc-500'>
-              When the slate turns over, only the winning item’s tokens are
-              spent — everything backing the rest stays on the board for the
-              next one. A vote that comes second is never a vote thrown away.
-            </p>
-          </div>
-
-          <SeatBallot
-            key={open.rarity}
-            slot={open}
-            wallet={wallet}
-            canVote={canVote}
-            busy={vote.isPending}
-            onVote={(key) => vote.mutate({ rarity: open.rarity, key })}
-          />
-        </div>
+        <SeatBallot
+          key={open.rarity}
+          slot={open}
+          tokensLeft={tokensLeft}
+          canVote={canVote}
+          busy={vote.isPending}
+          onVote={(key) => vote.mutate({ rarity: open.rarity, key })}
+        />
       )}
     </div>
   );

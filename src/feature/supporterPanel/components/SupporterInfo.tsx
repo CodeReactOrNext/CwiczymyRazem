@@ -62,7 +62,7 @@ const SURFACES: { icon: typeof Map; title: string; body: string }[] = [
   {
     icon: Package,
     title: "Supporter case",
-    body: "Six seats in the next case, and you pick what sits in each one before it ever opens.",
+    body: "Six seats in the next case, and you pick what sits in each one before it ever opens. Only the winner's tokens are spent. Everything backing the rest stays on the board for the next case.",
   },
   {
     icon: Target,

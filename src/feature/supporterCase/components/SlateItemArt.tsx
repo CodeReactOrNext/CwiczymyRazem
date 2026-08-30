@@ -89,8 +89,8 @@ export const SlateItemArt = ({
       aria-hidden
       className={
         width === "full"
-          ? "relative flex w-full items-center justify-center overflow-hidden rounded-md"
-          : "relative flex shrink-0 items-center justify-center overflow-hidden rounded-md"
+          ? "relative flex w-full items-center justify-center overflow-hidden rounded-lg"
+          : "relative flex shrink-0 items-center justify-center overflow-hidden rounded-lg"
       }
       style={{
         height: size,

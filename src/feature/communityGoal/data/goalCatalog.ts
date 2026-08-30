@@ -40,7 +40,7 @@ export const metricShortUnit = (metric: GoalMetric): string =>
  * do the division. This is the number a supporter is actually agreeing to, so
  * every screen that shows a target shows it underneath.
  */
-export const perSupporterLine = (
+export const perSupporterShare = (
   target: number,
   supporters: number,
   metric: GoalMetric,
@@ -49,10 +49,26 @@ export const perSupporterLine = (
   if (!Number.isFinite(supporters) || supporters <= 0) return null;
 
   const each = Math.round((target / supporters) * 10) / 10;
+  return `about ${each} ${metricShortUnit(metric)} each`;
+};
+
+/**
+ * The same number with the roster it is divided over named, for the one place
+ * that says it once. A ballot repeats the figure on every row, where naming the
+ * roster five times tells the reader nothing they did not have after the first.
+ */
+export const perSupporterLine = (
+  target: number,
+  supporters: number,
+  metric: GoalMetric,
+): string | null => {
+  const share = perSupporterShare(target, supporters, metric);
+  if (!share) return null;
+
   const roster =
     supporters === 1 ? "the one supporter" : `${supporters} supporters`;
 
-  return `about ${each} ${metricShortUnit(metric)} each across ${roster}`;
+  return `${share} across ${roster}`;
 };
 
 /**

@@ -166,8 +166,9 @@ export const SupporterPanelView = () => {
                       Next week is yours to pick
                     </h2>
                     <p className='text-sm text-zinc-400'>
-                      Spend a token on the goal you want the whole app playing
-                      for. Whatever is running now sits this one out.
+                      Whatever carries the most votes on Monday is what the
+                      whole app plays for. The one running now sits this ballot
+                      out.
                     </p>
                   </div>
 

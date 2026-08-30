@@ -185,6 +185,59 @@ const PRODUCTION_COUNTRIES: ProductionCountry[] = [
   "Sweden",
 ];
 
+/**
+ * The bridge the model was built with — the most restrictive fact about a guitar.
+ *
+ * It decides whether there is a tremolo block to swap out, saddles that come off
+ * on their own, and whether the instrument has a whammy bar at all. `biscuit` is
+ * the resonator's, and behaves like nothing else on the list.
+ */
+export type BridgeType =
+  | "hardtail"
+  | "vintage-trem"
+  | "modern-trem"
+  | "floyd"
+  | "tom-stopbar"
+  | "wraparound"
+  | "floating-offset"
+  | "biscuit";
+
+/** Pickup layout, in the usual shorthand. `P90` is a pair of soapbars. */
+export type PickupConfig = "SSS" | "SS" | "HSS" | "HSH" | "HH" | "P90" | "none";
+
+export type BodyConstruction =
+  | "solid"
+  | "chambered"
+  | "semi-hollow"
+  | "hollow"
+  | "resonator";
+
+export type Electronics = "passive" | "active" | "none";
+
+export type NeckJoint = "bolt-on" | "set-neck" | "neck-thru";
+
+/**
+ * What a guitar physically *is* — the hand-authored half of mod compatibility.
+ *
+ * Deliberately separate from `ScrapBom`, which says what comes *off* an instrument
+ * on a teardown. The two answer different questions and gating mods on the BOM got
+ * them backwards: a set-neck never gives up its neck, so every single-cut in the
+ * game was treated as having no neck to do fret work on, while a Telecaster — whose
+ * BOM lists a bridge — could be fitted with a tremolo block it has no tremolo for.
+ *
+ * Authored per model in `data/guitarSpecs.ts`. Required, so a guitar cannot ship
+ * unclassified: there is no default, and TypeScript is the thing that enforces it.
+ */
+export interface GuitarSpec {
+  bridge: BridgeType;
+  pickups: PickupConfig;
+  construction: BodyConstruction;
+  electronics: Electronics;
+  neckJoint: NeckJoint;
+  /** False only on headless builds, where the tuners sit at the bridge. */
+  headstock: boolean;
+}
+
 export interface GuitarDefinition {
   id: number | string;
   brand: string;
@@ -194,6 +247,8 @@ export interface GuitarDefinition {
   yearFrom: number;
   yearTo: number;
   countries: ProductionCountry[];
+  /** Gates which mods can roll on it and which the bench will fit. */
+  spec: GuitarSpec;
 }
 
 interface ProbabilityTable {

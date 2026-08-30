@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { perSupporterLine } from "./goalCatalog";
+import { perSupporterLine, perSupporterShare } from "./goalCatalog";
 
 describe("perSupporterLine", () => {
   it("divides the target down to what one supporter is agreeing to", () => {
@@ -30,5 +30,19 @@ describe("perSupporterLine", () => {
   it("says nothing when there is nothing to divide", () => {
     expect(perSupporterLine(48, 0, "minutes")).toBeNull();
     expect(perSupporterLine(0, 16, "minutes")).toBeNull();
+  });
+});
+
+describe("perSupporterShare", () => {
+  it("drops the roster clause a ballot would repeat on every row", () => {
+    expect(perSupporterShare(48, 16, "minutes")).toBe("about 3 h each");
+    expect(perSupporterShare(40, 16, "sessions")).toBe(
+      "about 2.5 sessions each",
+    );
+  });
+
+  it("says nothing when there is nothing to divide", () => {
+    expect(perSupporterShare(48, 0, "minutes")).toBeNull();
+    expect(perSupporterShare(0, 16, "minutes")).toBeNull();
   });
 });

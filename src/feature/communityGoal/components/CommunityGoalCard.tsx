@@ -1,43 +1,15 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { GoalIcon } from "feature/communityGoal/components/GoalIcon";
 import {
   metricUnit,
-  perSupporterLine,
+  perSupporterShare,
 } from "feature/communityGoal/data/goalCatalog";
 import {
   useCommunityGoal,
   useCommunityGoalMutations,
 } from "feature/communityGoal/hooks/useCommunityGoal";
-import type { GoalIcon } from "feature/communityGoal/types/communityGoal.types";
-import {
-  BookOpen,
-  CalendarClock,
-  Check,
-  Ear,
-  Flame,
-  Guitar,
-  Sparkles,
-  Timer,
-  Users,
-} from "lucide-react";
-
-const GOAL_ICONS: Record<GoalIcon, typeof Users> = {
-  sessions: Users,
-  hours: Timer,
-  technique: Guitar,
-  theory: BookOpen,
-  hearing: Ear,
-  creativity: Sparkles,
-  // Retired candidates, still carried by goal documents written before the
-  // practice categories existed.
-  marathon: Flame,
-  spread: CalendarClock,
-};
-
-const renderGoalIcon = (icon: GoalIcon) => {
-  const Icon = GOAL_ICONS[icon] ?? Users;
-  return <Icon size={18} />;
-};
+import { Check } from "lucide-react";
 
 const daysLeft = (endsAt: string): string => {
   const days = Math.ceil(
@@ -52,6 +24,10 @@ const daysLeft = (endsAt: string): string => {
  * how far it has got, and the reward once it lands. Shown to every player —
  * supporters pick it and run it, everybody watches it and everybody who
  * practised claims it.
+ *
+ * What a challenge *is* is spelled out once, on the Milestones page this card
+ * also sits on (`SupportChallengeExplainer`). Here the bar is the explanation,
+ * so the card says the numbers and stops.
  */
 export const CommunityGoalCard = ({ className }: { className?: string }) => {
   const { data, isLoading } = useCommunityGoal();
@@ -81,7 +57,7 @@ export const CommunityGoalCard = ({ className }: { className?: string }) => {
   // What is left, divided by the roster that is allowed to move the bar — the
   // difference between "40 sessions" and "two and a half each" is the whole
   // question of whether the week is winnable.
-  const leftEach = perSupporterLine(left, data.ballot.supporters, goal.metric);
+  const leftEach = perSupporterShare(left, data.ballot.supporters, goal.metric);
 
   return (
     <section
@@ -95,7 +71,11 @@ export const CommunityGoalCard = ({ className }: { className?: string }) => {
                 ? "bg-emerald-500/10 text-emerald-400"
                 : "bg-cyan-500/10 text-cyan-400",
             )}>
-            {goal.isComplete ? <Check size={18} /> : renderGoalIcon(goal.icon)}
+            {goal.isComplete ? (
+              <Check size={18} />
+            ) : (
+              <GoalIcon icon={goal.icon} />
+            )}
           </span>
           <div>
             <p className='text-xs text-zinc-400'>
@@ -120,40 +100,33 @@ export const CommunityGoalCard = ({ className }: { className?: string }) => {
             style={{ width: `${percent}%` }}
           />
         </div>
+        {/* The bar is already the percentage; the line under it is the count. */}
         <p className='text-xs tabular-nums text-zinc-400'>
-          {goal.progress} of {goal.target} {unit} logged by supporters ·{" "}
-          {percent}% there
+          {goal.progress} of {goal.target} {unit} logged by supporters
+          {!goal.isComplete && leftEach && (
+            <span className='text-zinc-500'>
+              {" "}
+              · {left} to go, {leftEach} before Monday
+            </span>
+          )}
         </p>
-        {!goal.isComplete && leftEach && (
-          <p className='text-xs text-zinc-500'>
-            {left} {unit} still to go — {leftEach}, before Monday
-          </p>
-        )}
       </div>
 
       {reward.claimed ? (
         <p className='text-sm font-medium text-emerald-400'>
-          Done — you took your {reward.fame} Fame this week.
+          {reward.fame} Fame claimed.
         </p>
       ) : reward.claimable ? (
-        <div className='flex flex-wrap items-center gap-4'>
-          <Button onClick={() => claim.mutate()} disabled={claim.isPending}>
-            Claim {reward.fame} Fame
-          </Button>
-          <p className='text-sm text-zinc-400'>
-            The supporters got there. Everyone who practised this week gets
-            paid.
-          </p>
-        </div>
+        <Button onClick={() => claim.mutate()} disabled={claim.isPending}>
+          Claim {reward.fame} Fame
+        </Button>
       ) : reward.missedTheWeek ? (
         <p className='text-sm text-zinc-400'>
-          The supporters landed it, but the reward is for players who practised
-          this week. Log a session before Monday and it is yours.
+          Landed. Log a session before Monday to take {reward.fame} Fame.
         </p>
       ) : (
         <p className='text-sm text-zinc-400'>
-          The supporters are running this one. When it lands, every player who
-          practised this week takes {reward.fame} Fame.
+          {reward.fame} Fame for every player who practised, once it lands.
         </p>
       )}
     </section>

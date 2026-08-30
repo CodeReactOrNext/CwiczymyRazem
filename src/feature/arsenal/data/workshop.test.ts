@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type {
   GuitarRarity,
+  GuitarSpec,
   PartId,
   PartTier,
   ScrapPart,
@@ -10,6 +11,13 @@ import { getEffectBom } from "./effectBom";
 import { EFFECT_DEFINITIONS } from "./effectDefinitions";
 import { getGuitarBom } from "./guitarBom";
 import { GUITAR_DEFINITIONS } from "./guitarDefinitions";
+import {
+  RESONATOR,
+  S_TYPE,
+  SET_NECK_TOM,
+  SET_NECK_TREM,
+  T_TYPE,
+} from "./guitarSpecs";
 import {
   getEffectiveRarity,
   getItemCondition,
@@ -57,6 +65,9 @@ const subject = (over: Partial<WorkshopSubject> = {}): WorkshopSubject => {
     bom: over.bom ?? STRAT_BOM,
     features: over.features ?? [],
     effectType: over.effectType,
+    // A guitar subject always carries one in production, so the default is a real
+    // archetype rather than `undefined` — the mod bench gates on it.
+    spec: over.spec ?? (over.kind === "effect" ? undefined : S_TYPE),
   };
 };
 
@@ -109,20 +120,50 @@ const modWallet = (): ScrapPart[] => [
 ];
 
 describe("mods — what fits", () => {
-  // Guitar #1 has no `neck`, `bridge` or `tuners` slot in its BOM, so the parts
-  // those mods physically are cannot be on the instrument.
+  // The default subject is an S-Type: three single coils on a vintage tremolo.
   const fittableIds = getFittableMods(subject()).map((m) => m.id);
 
-  it("offers only mods the instrument physically has the part for", () => {
-    expect(fittableIds).toContain("hand-wound"); // pickup — in the BOM
-    expect(fittableIds).not.toContain("graphite-neck"); // neck — not in the BOM
-    expect(fittableIds).not.toContain("locking-tuners"); // tuners — not in the BOM
-    expect(fittableIds).not.toContain("brass-trem-block"); // bridge — not in the BOM
+  it("gates guitar mods on the hardware, not on the salvage BOM", () => {
+    expect(fittableIds).toContain("brass-trem-block"); // it has the tremolo
+    expect(fittableIds).toContain("graphite-neck"); // and a neck, glued or not
+    expect(fittableIds).toContain("locking-tuners"); // and a headstock
+    expect(fittableIds).not.toContain("coil-split"); // but no humbucker to split
   });
 
-  it("always offers mods that are not a part at all", () => {
-    // Copper shielding and a fret level are work, not hardware — nothing has to
-    // be in the BOM for a bench to do them.
+  it("takes the tremolo block off everything without a tremolo", () => {
+    const ids = (spec: GuitarSpec) =>
+      getFittableMods(subject({ spec })).map((m) => m.id);
+
+    expect(ids(T_TYPE)).not.toContain("brass-trem-block"); // hardtail
+    expect(ids(SET_NECK_TOM)).not.toContain("brass-trem-block"); // stop bar
+    expect(ids(SET_NECK_TREM)).toContain("brass-trem-block"); // vibrato
+  });
+
+  it("gives a set-neck back the fretwork the BOM used to deny it", () => {
+    // A glued-in neck is never salvaged, which is what the old gate read as "this
+    // guitar has no neck" — every single-cut in the game lost its neck mods.
+    const ids = getFittableMods(subject({ spec: SET_NECK_TOM })).map(
+      (m) => m.id,
+    );
+
+    expect(ids).toContain("graphite-neck");
+    expect(ids).toContain("compound-radius");
+    expect(ids).toContain("locking-tuners");
+  });
+
+  it("strips the whole Pickups category off an instrument with no harness", () => {
+    const ids = getFittableMods(subject({ spec: RESONATOR })).map((m) => m.id);
+
+    expect(ids).not.toContain("hand-wound");
+    expect(ids).not.toContain("cts-pots");
+    expect(ids).not.toContain("active-preamp");
+    // The frets are still frets.
+    expect(ids).toContain("fret-level");
+  });
+
+  it("always offers mods that are not hardware at all", () => {
+    // Copper shielding and a fret level are work, not parts — nothing has to be on
+    // the instrument for a bench to do them, beyond a harness and frets.
     expect(fittableIds).toContain("copper-shielding");
     expect(fittableIds).toContain("fret-level");
   });
@@ -339,14 +380,15 @@ describe("mods — the roll", () => {
   });
 
   it("resolves a fitted mod even when the pool no longer offers it", () => {
-    // A neck mod on a guitar with no neck slot — legacy rolls and pool edits both
-    // produce this, and the bench still has to show and re-roll it.
+    // A coil-split on a guitar with nothing but single coils — every legendary Les
+    // Paul minted before the spec gate carries something like it, and the bench
+    // still has to show it, re-roll it and let it be taken off.
     const quote = getModQuote(
-      subject({ features: [{ id: "graphite-neck", points: 2 }] }),
+      subject({ features: [{ id: "coil-split", points: 2 }] }),
       modWallet(),
     );
 
-    expect(quote.fitted.map((f) => f.id)).toEqual(["graphite-neck"]);
+    expect(quote.fitted.map((f) => f.id)).toEqual(["coil-split"]);
     expect(quote.canReroll).toBe(true);
   });
 });
