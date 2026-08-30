@@ -1,6 +1,8 @@
 import type { Node, NodeProps } from "@xyflow/react";
 import { Handle, Position } from "@xyflow/react";
+import { addFame, updatePoints } from "feature/user/store/userSlice";
 import { useCallback, useEffect,useRef, useState } from "react";
+import { useAppDispatch } from "store/hooks";
 
 import { claimReward } from "../services/rewardService";
 import type { RewardNodeDef } from "../types/scaleTree.types";
@@ -8,6 +10,7 @@ import type { RewardNodeDef } from "../types/scaleTree.types";
 export type RewardNodeRFNode = Node<RewardNodeDef & { claimed?: boolean; userId?: string }, "rewardNode">;
 
 export function RewardNodeComponent({ data, selected }: NodeProps<RewardNodeRFNode>) {
+  const dispatch = useAppDispatch();
   const [showTooltip, setShowTooltip] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [localClaimed, setLocalClaimed] = useState(data.claimed ?? false);
@@ -40,13 +43,19 @@ export function RewardNodeComponent({ data, selected }: NodeProps<RewardNodeRFNo
       );
       if (result.success) {
         setLocalClaimed(true);
+        // The payout is an increment on the user document, which the store
+        // behind the header and profile counters never sees — without this the
+        // node goes claimed while both numbers sit at their old totals until
+        // the next reload.
+        if (data.points > 0) dispatch(updatePoints(data.points));
+        if (data.famePoints > 0) dispatch(addFame(data.famePoints));
       } else {
         console.error("Failed to claim reward:", result.error);
       }
     } finally {
       setIsClaiming(false);
     }
-  }, [isClaimed, isClaiming, data]);
+  }, [isClaimed, isClaiming, data, dispatch]);
 
   const size = 70;
   const containerSize = 100;

@@ -65,6 +65,7 @@ import type {
 import { calculateGroupFame } from "feature/logs/utils/activityFame";
 import {
   type AnyFirebaseLog,
+  dropIncompleteTailGroup,
   getLogActivityType,
   groupConsecutiveLogs,
   type LogActivityType,
@@ -412,6 +413,8 @@ interface LogsBoxLayoutProps {
   logs: AnyFirebaseLog[];
   marksLogsAsRead: () => void;
   currentUserId: string;
+  /** More logs exist below the window — separate from whether "Show more" is still on offer. */
+  hasOlderLogs?: boolean;
   hasMoreLogs?: boolean;
   onLoadMoreLogs?: () => void;
 }
@@ -1377,6 +1380,7 @@ const Logs = ({
   logs,
   marksLogsAsRead,
   currentUserId,
+  hasOlderLogs,
   hasMoreLogs,
   onLoadMoreLogs,
 }: LogsBoxLayoutProps) => {
@@ -1418,7 +1422,11 @@ const Logs = ({
     };
   }, []); // Empty dependency array since we handle cleanup manually
 
-  const groups = useMemo(() => groupConsecutiveLogs(logs), [logs]);
+  const groups = useMemo(
+    () =>
+      dropIncompleteTailGroup(groupConsecutiveLogs(logs), Boolean(hasOlderLogs)),
+    [logs, hasOlderLogs],
+  );
 
   const songIds = useMemo(
     () =>

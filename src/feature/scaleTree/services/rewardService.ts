@@ -2,7 +2,8 @@ import {
   arrayUnion,
   doc,
   getDoc,
-  updateDoc,
+  increment,
+  runTransaction,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -20,39 +21,43 @@ export async function claimReward(
   famePoints: number
 ): Promise<ClaimRewardResult> {
   try {
-    // Check if reward already claimed
     const userDocRef = doc(db, "users", userId);
-    const userDoc = await getDoc(userDocRef);
 
-    if (!userDoc.exists()) {
-      return { success: false, error: "User not found" };
-    }
+    // One transaction for the whole claim. Read-then-write across two round
+    // trips let a double click pass the "already claimed" check twice and pay
+    // the node out twice (`arrayUnion` dedupes the id, the points don't), and
+    // it wrote both currencies as absolute totals — anything incremented onto
+    // the same fields in between (a challenge recording, a song learned) was
+    // erased. The increments make the payout additive; the transaction makes
+    // the guard hold.
+    return await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userDocRef);
 
-    const userData = userDoc.data();
-    const claimedRewards = userData?.claimedRewards ?? [];
+      if (!userDoc.exists()) {
+        return { success: false, error: "User not found" };
+      }
 
-    if (claimedRewards.includes(rewardNodeId)) {
-      return { success: false, error: "Reward already claimed" };
-    }
+      const userData = userDoc.data();
+      const claimedRewards = userData?.claimedRewards ?? [];
 
-    // Update user stats
-    const statsRef = doc(db, "users", userId);
-    const currentStats = userData?.statistics ?? { points: 0, fame: 0 };
+      if (claimedRewards.includes(rewardNodeId)) {
+        return { success: false, error: "Reward already claimed" };
+      }
 
-    const newPoints = (currentStats.points ?? 0) + points;
-    const newFame = (currentStats.fame ?? 0) + famePoints;
+      const currentStats = userData?.statistics ?? {};
 
-    await updateDoc(statsRef, {
-      "statistics.points": newPoints,
-      "statistics.fame": newFame,
-      claimedRewards: arrayUnion(rewardNodeId),
+      transaction.update(userDocRef, {
+        "statistics.points": increment(points),
+        "statistics.fame": increment(famePoints),
+        claimedRewards: arrayUnion(rewardNodeId),
+      });
+
+      return {
+        success: true,
+        newPoints: (currentStats.points ?? 0) + points,
+        newFame: (currentStats.fame ?? 0) + famePoints,
+      };
     });
-
-    return {
-      success: true,
-      newPoints,
-      newFame,
-    };
   } catch (error) {
     console.error("Failed to claim reward:", error);
     return {

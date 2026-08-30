@@ -169,3 +169,20 @@ export const groupConsecutiveLogs = <T extends AnyFirebaseLog>(logs: T[]): LogGr
 
   return groups;
 };
+
+/**
+ * Drops the group the feed window cut in half.
+ *
+ * Grouping only sees the logs it was handed, so when older logs exist below the cutoff the last
+ * group can be missing members that sit just past it — and with them everything those members
+ * carry: the reaction written to the group's true oldest log, and the practice time that prices
+ * the row. `/api/logs/react` rebuilds the whole group from Firestore, so a half-group renders a
+ * state the server disagrees with: "Motivate" offered to someone who already motivated it, a
+ * short Fame total, and a click that silently withdraws the earlier reaction. Every other group
+ * is bounded on both sides by a real group break, so only the tail is at risk.
+ */
+export const dropIncompleteTailGroup = <T extends AnyFirebaseLog>(
+  groups: LogGroup<T>[],
+  hasOlderLogs: boolean
+): LogGroup<T>[] =>
+  hasOlderLogs && groups.length > 1 ? groups.slice(0, -1) : groups;

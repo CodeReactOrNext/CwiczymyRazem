@@ -12,7 +12,7 @@ import { ArrowRight, Brain, Ear, Flame, Hand, Music, RotateCcw, Sparkles, Timer,
 import Router from "next/router";
 import { useMemo } from "react";
 import {
-  Area, AreaChart, PolarAngleAxis, PolarGrid, Radar, RadarChart, ReferenceLine, ResponsiveContainer, XAxis,
+  Area, AreaChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ReferenceLine, ResponsiveContainer, XAxis,
 } from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getDailyStreakMultiplier, getReconciledStreak } from "utils/gameLogic";
@@ -221,14 +221,15 @@ const RatingPopUpLayout = ({
     const cur = sum(lastStart, dayStr(today));
     const prv = sum(prevStart, prevEnd);
 
-    const radarData = CATS.map((c) => {
-      const max = Math.max(cur[c.key], prv[c.key], 1);
-      return {
-        cat: c.label,
-        prev: Math.round((prv[c.key] / max) * 100),
-        current: Math.round((cur[c.key] / max) * 100),
-      };
-    });
+    // one shared scale for every axis and both periods — normalising per
+    // category would pin each vertex to 100 and draw a full diamond
+    const scaleMax = Math.max(1, ...CATS.flatMap((c) => [cur[c.key], prv[c.key]]));
+
+    const radarData = CATS.map((c) => ({
+      cat: c.label,
+      prev: Math.round((prv[c.key] / scaleMax) * 100),
+      current: Math.round((cur[c.key] / scaleMax) * 100),
+    }));
     const radarRows = CATS.map((c) => ({
       ...c,
       curMin: Math.round(cur[c.key] / MIN),
@@ -555,6 +556,7 @@ const RatingPopUpLayout = ({
                   <RadarChart data={radarData} outerRadius="70%">
                     <PolarGrid stroke="#3f3f46" />
                     <PolarAngleAxis dataKey="cat" tick={{ fontSize: 11, fill: "#a1a1aa" }} />
+                    <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
                     <Radar dataKey="prev" stroke="#52525b" fill="#52525b" fillOpacity={0.12} />
                     <Radar dataKey="current" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.25} />
                   </RadarChart>

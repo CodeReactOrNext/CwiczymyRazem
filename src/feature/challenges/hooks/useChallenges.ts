@@ -23,7 +23,9 @@ import {
   votingChallengeId,
 } from "feature/challenges/utils/challengeMonth";
 import type { Song } from "feature/songs/types/songs.type";
+import { addFame, updatePoints } from "feature/user/store/userSlice";
 import { toast } from "sonner";
+import { useAppDispatch } from "store/hooks";
 
 const STALE_TIME = 60 * 1000;
 
@@ -74,6 +76,7 @@ export const useNominations = () => {
 
 export const useChallengeMutations = () => {
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
   const ballotId = votingChallengeId();
 
   const refreshBoard = (challengeId: string) => {
@@ -99,6 +102,14 @@ export const useChallengeMutations = () => {
       submitChallengeRecording(params),
     onSuccess: (reward, params) => {
       refreshBoard(params.challenge.id);
+      // The reward lands on the user document as an increment, which the store
+      // holding the header and profile numbers never hears about — without this
+      // the toast promises points the app goes on showing the old total for
+      // until the next reload.
+      if (reward.isPaid) {
+        if (reward.points > 0) dispatch(updatePoints(reward.points));
+        if (reward.fame > 0) dispatch(addFame(reward.fame));
+      }
       if (!reward.isPaid) {
         toast.success(
           reward.isClear

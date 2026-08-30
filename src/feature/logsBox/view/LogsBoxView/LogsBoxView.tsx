@@ -70,9 +70,13 @@ const LogsBoxView = ({ className }: { className?: string }) => {
     return () => unsubscribe();
   }, [logsLimit]);
 
-  // Firestore doesn't return a total count — if we got a full page, assume there's more.
+  // Firestore doesn't return a total count — if we got a full page, assume there's more below
+  // the window. The feed needs this on its own, and not just as "is the button showing": the
+  // window keeps cutting its last group in half long after "Show more" has bowed out.
+  const hasOlderLogs = (logs?.length ?? 0) >= logsLimit;
+
   // Only offer "Show more" once — after that the button disappears even if more logs remain.
-  const hasMoreLogs = !hasLoadedMore && (logs?.length ?? 0) >= logsLimit;
+  const hasMoreLogs = !hasLoadedMore && hasOlderLogs;
 
   return logs && userAchievement && currentUserId ? (
     <LogsBoxLayout
@@ -80,6 +84,7 @@ const LogsBoxView = ({ className }: { className?: string }) => {
       userAchievements={userAchievement}
       currentUserId={currentUserId}
       className={className}
+      hasOlderLogs={hasOlderLogs}
       hasMoreLogs={hasMoreLogs}
       onLoadMoreLogs={() => {
         setHasLoadedMore(true);

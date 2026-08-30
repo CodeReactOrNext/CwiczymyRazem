@@ -1,17 +1,21 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
-import { doc, increment, runTransaction, updateDoc } from "firebase/firestore";
+import { doc, increment, runTransaction } from "firebase/firestore";
 import posthog from "posthog-js";
 import type { RootState } from "store/store";
 import type { DailyQuest, DailyQuestTaskType } from "types/api.types";
 import { getLocalDateKey } from "utils/converter";
 import { auth, db } from "utils/firebase/client/firebase.utils";
+import { getPointsToLvlUp, levelUpUser } from "utils/gameLogic";
 
 import { isSameQuest, mergeDailyQuests } from "./dailyQuest.merge";
 import { claimQuestReward, completeQuestTask, generateDailyQuest, setDailyQuest } from "./userSlice";
 
 /** Fame Points awarded for completing the full daily quest set. */
 export const DAILY_QUEST_FAME_REWARD = 40;
+
+/** Points awarded for completing the full daily quest set. */
+export const DAILY_QUEST_POINTS_REWARD = 10;
 
 /**
  * Quest syncs are serialized and coalesced. Finishing a session completes
@@ -174,12 +178,27 @@ export const claimQuestRewardAction = createAsyncThunk(
       if (userId && state.user.currentUserStats) {
         const userRef = doc(db, "users", userId);
 
-        await updateSeasonalPoints(userId, 10);
+        await updateSeasonalPoints(userId, DAILY_QUEST_POINTS_REWARD);
 
-        await updateDoc(userRef, {
-          "statistics.points": state.user.currentUserStats.points,
-          "statistics.lvl": state.user.currentUserStats.lvl,
-          "statistics.fame": increment(DAILY_QUEST_FAME_REWARD),
+        // Points are added to what is *stored*, never to the copy this tab has
+        // held since it loaded. Writing the in-memory number straight over the
+        // field wiped every point earned meanwhile by something that increments
+        // it behind the store's back — a challenge recording, a song marked
+        // learned — which is what made those rewards silently disappear while
+        // Fame (always an increment) survived. The level is derived from the
+        // fresh total for the same reason.
+        await runTransaction(db, async (transaction) => {
+          const snapshot = await transaction.get(userRef);
+          const stored = snapshot.data()?.statistics ?? {};
+          const points = (stored.points ?? 0) + DAILY_QUEST_POINTS_REWARD;
+          const lvl = levelUpUser(stored.lvl ?? 1, points);
+
+          transaction.update(userRef, {
+            "statistics.points": points,
+            "statistics.lvl": lvl,
+            "statistics.currentLevelMaxPoints": getPointsToLvlUp(lvl + 1),
+            "statistics.fame": increment(DAILY_QUEST_FAME_REWARD),
+          });
         });
 
         const { firebaseAddQuestLog } = await import("../../logs/services/addQuestLog.service");

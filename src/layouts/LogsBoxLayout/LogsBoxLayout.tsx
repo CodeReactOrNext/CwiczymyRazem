@@ -25,6 +25,7 @@ interface LogsBoxLayoutProps {
   userAchievements: AchievementList[];
   currentUserId: string;
   className?: string; // Allow custom styles
+  hasOlderLogs?: boolean;
   hasMoreLogs?: boolean;
   onLoadMoreLogs?: () => void;
 }
@@ -34,6 +35,7 @@ const LogsBoxLayout = ({
   userAchievements,
   currentUserId,
   className = "",
+  hasOlderLogs = false,
   hasMoreLogs = false,
   onLoadMoreLogs,
 }: LogsBoxLayoutProps) => {
@@ -157,6 +159,7 @@ const LogsBoxLayout = ({
                   logs={logs}
                   marksLogsAsRead={markLogsAsRead}
                   currentUserId={currentUserId}
+                  hasOlderLogs={hasOlderLogs}
                   hasMoreLogs={hasMoreLogs}
                   onLoadMoreLogs={onLoadMoreLogs}
                 />

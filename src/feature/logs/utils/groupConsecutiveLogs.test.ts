@@ -6,7 +6,11 @@ import type {
 } from "feature/logs/types/logs.type";
 import { describe, expect, it } from "vitest";
 
-import { getLogActivityType, groupConsecutiveLogs } from "./groupConsecutiveLogs";
+import {
+  dropIncompleteTailGroup,
+  getLogActivityType,
+  groupConsecutiveLogs,
+} from "./groupConsecutiveLogs";
 
 const caseOpenLog = (
   overrides: Partial<FirebaseLogsCaseOpenInterface> = {}
@@ -121,5 +125,31 @@ describe("groupConsecutiveLogs", () => {
     expect(groups[0].type).toBe("arsenal");
     expect(groups[1].type).toBe("song");
     expect(groups[2].type).toBe("arsenal");
+  });
+});
+
+describe("dropIncompleteTailGroup", () => {
+  const groups = () =>
+    groupConsecutiveLogs([
+      caseOpenLog(),
+      songLog({ uid: "user-2", userName: "Other" }),
+      caseOpenLog({ uid: "user-3", userName: "Third" }),
+    ]);
+
+  it("drops the last group when older logs sit below the window", () => {
+    const kept = dropIncompleteTailGroup(groups(), true);
+
+    expect(kept).toHaveLength(2);
+    expect(kept[1].uid).toBe("user-2");
+  });
+
+  it("keeps every group when the window already reaches the oldest log", () => {
+    expect(dropIncompleteTailGroup(groups(), false)).toHaveLength(3);
+  });
+
+  it("keeps a lone group rather than emptying the feed", () => {
+    const single = groupConsecutiveLogs([caseOpenLog(), marketplaceLog()]);
+
+    expect(dropIncompleteTailGroup(single, true)).toEqual(single);
   });
 });
