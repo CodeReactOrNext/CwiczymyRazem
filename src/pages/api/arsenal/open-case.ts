@@ -14,6 +14,7 @@ import type {
   GuitarRarity,
   InventoryItem,
 } from "feature/arsenal/types/arsenal.types";
+import { pickCuratedDrop } from "feature/arsenal/utils/curatedDraw";
 import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import type { DocumentReference,Transaction } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
@@ -51,6 +52,9 @@ function drawRarity(probabilities: Partial<Record<GuitarRarity, number>>): Guita
  * player was paying full price for a sell-for-scrap duplicate. Not 100%, because
  * duplicates are load-bearing elsewhere — they are the scrap and build economy's
  * raw material, and a stream that never repeats starves the workshop.
+ *
+ * Open cases only. The curated pools are too small for a soft bias to bite —
+ * see `pickCuratedDrop`, which handles them on a stricter rule.
  */
 const NEW_ITEM_BIAS = 0.7;
 
@@ -135,22 +139,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Curated cases draw from a fixed list instead of the whole collection:
       // the Featured case from today's deterministic pool, the Supporter case
       // from the slate this fortnight's vote put together. Rarity is still
-      // rolled from the case's own table; the item is then picked from that
-      // pool's entries of the rolled rarity.
+      // rolled from the case's own table; `pickCuratedDrop` then decides which
+      // item of the pool that roll turns into, skipping duplicates while the
+      // pool still holds something new at or below the rolled rarity.
       let dailyPick: DailyPoolEntry | null = null;
       if (caseType === "daily" || caseType === "supporter") {
         const pool =
           caseType === "supporter"
             ? ((await getSlatePool()) as DailyPoolEntry[])
             : getDailyPool();
-        const rarity = drawRarity(caseDef.probabilities);
-        const candidates = pool.filter((e) => e.def.rarity === rarity);
-        // Slots guarantee every rarity is present; fall back to the whole pool just in case.
-        const pickFrom = candidates.length > 0 ? candidates : pool;
-        dailyPick = pickBiased(pickFrom, (entry) =>
-          entry.kind === "guitar"
-            ? discoveredGuitarIds.has(entry.def.id)
-            : discoveredEffectIds.has(entry.def.id),
+        dailyPick = pickCuratedDrop(
+          pool,
+          drawRarity(caseDef.probabilities),
+          (entry) => entry.def.rarity,
+          (entry) =>
+            entry.kind === "guitar"
+              ? discoveredGuitarIds.has(entry.def.id)
+              : discoveredEffectIds.has(entry.def.id),
         );
       }
 

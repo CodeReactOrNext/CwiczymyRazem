@@ -26,8 +26,14 @@ export const DAILY_POOL_SLOTS: Record<GuitarRarity, number> = {
   Common: 2,
 };
 
-/** Fixed iteration order so the seeded draw is deterministic. Rarest first. */
-const POOL_RARITY_ORDER: GuitarRarity[] = [
+/**
+ * The drop-side rarity ladder, rarest first. Custom Shop is absent by design —
+ * it is workshop-only and never enters a drop pool.
+ *
+ * Fixes the iteration order of the seeded pool build below, and doubles as the
+ * ladder `pickCuratedDrop` walks down when a rolled rarity is fully collected.
+ */
+export const POOL_RARITY_ORDER: GuitarRarity[] = [
   "Mythic",
   "Legendary",
   "Epic",
