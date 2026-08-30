@@ -8,6 +8,7 @@ import type { TablatureStylePatch } from "./useTablatureWorkerBridge";
 
 export type PaletteKey =
   | "rainbow"
+  | "stringCode"
   | "ocean"
   | "sunset"
   | "forest"
@@ -47,6 +48,15 @@ export const STRING_PALETTES: Record<PaletteKey, StringPalette> = {
     label: "Rainbow",
     desc: "One hue per string",
     colors: ["#f87171", "#fb923c", "#facc15", "#4ade80", "#60a5fa", "#c084fc"],
+  },
+  stringCode: {
+    label: "String code",
+    desc: "Low E red, high e purple",
+    // The six-colour string code shared by colour-coded string sets and the
+    // note highways players arrive from: low E red, then yellow, blue, orange,
+    // green, purple up to the high e. Listed high e first like every other
+    // palette here, so it reads reversed against that.
+    colors: ["#a855f7", "#22c55e", "#f97316", "#3b82f6", "#facc15", "#ef4444"],
   },
   ocean: {
     label: "Ocean",
