@@ -1,10 +1,14 @@
 import MainContainer from "components/MainContainer";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import type { CategoryDifficultyFilter } from "feature/practice/utils/autoPlan";
+import {
+  filterExercises,
+  pickExercisesWithinTime,
+} from "feature/practice/utils/autoPlan";
 import { useState } from "react";
 
 import type {
   DifficultyLevel,
-  Exercise,
   ExerciseCategory,
   ExercisePlan,
   LocalizedContent,
@@ -24,46 +28,15 @@ export const AutoPlanGenerator = ({
   isStarting
 }: AutoPlanGeneratorProps) => {
   const [time, setTime] = useState(30);
-  const [selectedCategories, setSelectedCategories] = useState<ExerciseCategory[]>([]);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel | "all">("all");
+  const [filter, setFilter] = useState<CategoryDifficultyFilter>({});
   const [generatedPlan, setGeneratedPlan] = useState<ExercisePlan | null>(null);
 
   const generatePlan = () => {
-    let filteredExercises = exercisesAgregat.filter(ex => !!ex);
+    const filteredExercises = filterExercises(exercisesAgregat, filter);
 
-    if (selectedCategories.length > 0) {
-      filteredExercises = filteredExercises.filter((ex) =>
-        selectedCategories.includes(ex.category)
-      );
-    }
+    if (filteredExercises.length === 0) return;
 
-    if (selectedDifficulty !== "all") {
-      filteredExercises = filteredExercises.filter(
-        (ex) => ex.difficulty === selectedDifficulty
-      );
-    }
-
-    if (filteredExercises.length === 0) {
-      alert("No exercises found for the selected criteria.");
-      return;
-    }
-
-    const allExercises = filteredExercises.sort(() => Math.random() - 0.5);
-    const selectedExercises: Exercise[] = [];
-    let totalTime = 0;
-
-    for (const exercise of allExercises) {
-      if (totalTime + exercise.timeInMinutes <= time) {
-        selectedExercises.push(exercise);
-        totalTime += exercise.timeInMinutes;
-      }
-
-      if (totalTime >= time * 0.9) break;
-    }
-
-    if (selectedExercises.length === 0 && allExercises.length > 0) {
-       selectedExercises.push(allExercises[0]);
-    }
+    const selectedExercises = pickExercisesWithinTime(filteredExercises, time);
 
     const categoryCount: Record<string, number> = {};
     selectedExercises.forEach((exercise) => {
@@ -160,27 +133,14 @@ export const AutoPlanGenerator = ({
   const replaceExercise = (index: number) => {
     if (!generatedPlan) return;
 
-    let filteredAvailable = exercisesAgregat.filter(
+    const unusedExercises = exercisesAgregat.filter(
       (e) => e && !generatedPlan.exercises.some((ge) => ge.id === e.id)
     );
 
-    if (selectedCategories.length > 0) {
-      filteredAvailable = filteredAvailable.filter((ex) =>
-        selectedCategories.includes(ex.category)
-      );
-    }
-
-    if (selectedDifficulty !== "all") {
-       filteredAvailable = filteredAvailable.filter((ex) =>
-          ex.difficulty === selectedDifficulty
-       );
-    }
-
-    if (filteredAvailable.length === 0) {
-      filteredAvailable = exercisesAgregat.filter(
-        (e) => e && !generatedPlan.exercises.some((ge) => ge.id === e.id)
-      );
-    }
+    // Stay inside the picked categories/difficulties, but never leave a slot
+    // unreplaceable just because that pool ran dry.
+    const matching = filterExercises(unusedExercises, filter);
+    const filteredAvailable = matching.length > 0 ? matching : unusedExercises;
 
     if (filteredAvailable.length === 0) return;
 
@@ -222,10 +182,8 @@ export const AutoPlanGenerator = ({
     <PlanSetup
       time={time}
       setTime={setTime}
-      selectedCategories={selectedCategories}
-      setSelectedCategories={setSelectedCategories}
-      selectedDifficulty={selectedDifficulty}
-      setSelectedDifficulty={setSelectedDifficulty}
+      filter={filter}
+      setFilter={setFilter}
       onBack={onBack}
       onGenerate={generatePlan}
     />

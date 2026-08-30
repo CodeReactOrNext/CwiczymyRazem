@@ -17,6 +17,7 @@ import {
   FolderOpen,
   Link2Off,
   Loader2,
+  NotebookPen,
   Upload,
 } from "lucide-react";
 import Link from "next/link";
@@ -68,6 +69,21 @@ export function SongPracticePickerModal({
     } else {
       setPhase("attach");
     }
+  };
+
+  // Practice that already happened away from the app still belongs in the log —
+  // the report form takes the song prefilled, so only the time is left to fill in.
+  const handleManualLog = () => {
+    onClose();
+    router.push({
+      pathname: "/report",
+      query: {
+        songId: song.id,
+        songTitle: song.title,
+        songArtist: song.artist,
+        returnTo: router.asPath,
+      },
+    });
   };
 
   const handleDetach = async () => {
@@ -205,6 +221,21 @@ export function SongPracticePickerModal({
                 </button>
               </div>
             )}
+
+            {/* Manual log — for practice that happened outside the app */}
+            <button
+              onClick={handleManualLog}
+              className="group mt-2 flex w-full items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 text-left transition-all hover:border-white/10 hover:bg-white/[0.06] active:scale-[0.99]"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20 shadow-lg transition-all duration-300 group-hover:scale-105">
+                <NotebookPen className="h-5 w-5 text-emerald-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-white">Log Practice</p>
+                <p className="text-[11px] text-zinc-500">Already played it? Add the time by hand</p>
+              </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover:text-zinc-400" />
+            </button>
           </div>
         )}
 
