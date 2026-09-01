@@ -5,7 +5,10 @@ import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -25,7 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userRef = firestore.collection("users").doc(userId);
     const userDoc = await userRef.get();
 
-    if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+    if (!userDoc.exists)
+      return res.status(404).json({ error: "User not found" });
 
     const data = userDoc.data()!;
     const fame: number = data.statistics?.fame || 0;
@@ -46,14 +50,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const storedRig = data.arsenal.rig;
-    const inventory: ArsenalUserData["inventory"] = data.arsenal.inventory || [];
+    const inventory: ArsenalUserData["inventory"] =
+      data.arsenal.inventory || [];
     const equippedGuitarId = data.arsenal.equippedGuitarId ?? null;
     // Migrate older accounts that tracked the equipped guitar only by guitarId:
     // resolve to the first matching inventory item so exactly one copy is marked equipped.
     const equippedItemId =
       data.arsenal.equippedItemId ??
       (equippedGuitarId != null
-        ? inventory.find((item) => item.guitarId === equippedGuitarId)?.id ?? null
+        ? (inventory.find((item) => item.guitarId === equippedGuitarId)?.id ??
+          null)
         : null);
     const effectInventory: ArsenalUserData["effectInventory"] =
       data.arsenal.effectInventory || [];
@@ -64,12 +70,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const discoveredGuitars = buildDiscoveredSet(
       data.arsenal.dexGuitars,
       inventory,
-      (item) => item.guitarId
+      (item) => item.guitarId,
     );
     const discoveredEffects = buildDiscoveredSet(
       data.arsenal.dexEffects,
       effectInventory,
-      (item) => item.effectId
+      (item) => item.effectId,
     );
 
     const arsenal: ArsenalUserData = {
@@ -83,11 +89,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           : DEFAULT_RIG.pedalboardItems,
         ampHeadId: storedRig?.ampHeadId ?? null,
         ampId: storedRig?.ampId ?? null,
-        // The case the player has paid for. Dropping it here made the Rig read
-        // every account as a fresh one — bottom-rung case — while a public
-        // profile, which reads the document straight, drew the board its owner
-        // actually bought.
+        // The case and the brick the player has paid for. Dropping either here
+        // made the Rig read every account as a fresh one — bottom-rung case, a
+        // four-output supply — while a public profile, which reads the document
+        // straight, drew the board its owner actually bought.
         boardTier: storedRig?.boardTier ?? DEFAULT_RIG.boardTier,
+        supplyTier: storedRig?.supplyTier ?? DEFAULT_RIG.supplyTier,
+        // …and the loom, which travels with them. Absent — as opposed to empty
+        // — is what tells the board to patch itself from scratch, so dropping a
+        // stored loom here re-patched the board on every read and quietly threw
+        // away cables the player had moved by hand.
+        ...(Array.isArray(storedRig?.power) ? { power: storedRig.power } : {}),
       },
       effectInventory,
       dexGuitars: [...discoveredGuitars],
@@ -115,10 +127,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const computedRigLevel = getRigLevel(arsenal);
     const updates: Record<string, unknown> = {};
     if (data.rigLevel !== computedRigLevel) updates.rigLevel = computedRigLevel;
-    if (new Set(data.arsenal.dexGuitars || []).size !== discoveredGuitars.size) {
+    if (
+      new Set(data.arsenal.dexGuitars || []).size !== discoveredGuitars.size
+    ) {
       updates["arsenal.dexGuitars"] = [...discoveredGuitars];
     }
-    if (new Set(data.arsenal.dexEffects || []).size !== discoveredEffects.size) {
+    if (
+      new Set(data.arsenal.dexEffects || []).size !== discoveredEffects.size
+    ) {
       updates["arsenal.dexEffects"] = [...discoveredEffects];
     }
     if (Object.keys(updates).length > 0) {

@@ -2,13 +2,17 @@ import type {
   HardwareKind,
   UpgradeRigResult,
 } from "feature/arsenal/data/rigHardware";
-import { boardTierOf, nextTier } from "feature/arsenal/data/rigHardware";
+import {
+  boardTierOf,
+  nextTier,
+  supplyTierOf,
+} from "feature/arsenal/data/rigHardware";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 /**
- * Buys the next rung of a rig's hardware: a bigger case.
+ * Buys the next rung of a rig's hardware: a bigger case, or a bigger brick.
  *
  * The client sends only *which ladder* — never a tier and never a price. Both
  * are recomputed here from what the account already owns, the same way the
@@ -51,7 +55,7 @@ export default async function handler(
   const { idToken, kind } = req.body as { idToken: string; kind: HardwareKind };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
-  if (kind !== "board") {
+  if (kind !== "board" && kind !== "supply") {
     return res.status(400).json({ error: "Unknown hardware" });
   }
 
@@ -75,7 +79,10 @@ export default async function handler(
 
         const data = userDoc.data()!;
         const rig = data.arsenal?.rig;
-        const owned = boardTierOf(rig?.boardTier).id;
+        const owned =
+          kind === "board"
+            ? boardTierOf(rig?.boardTier).id
+            : supplyTierOf(rig?.supplyTier).id;
 
         const next = nextTier(kind, owned);
         if (!next) throw new Error("ALREADY_TOP_TIER");
@@ -87,13 +94,17 @@ export default async function handler(
 
         const newFame = currentFame - next.fame;
 
-        // The board is not re-laid out here. A bigger case only ever *adds*
-        // room, so nothing that fitted before can stop fitting; the client
-        // re-runs its own layout pass on the next read and puts the parked
-        // pedals back on the surface itself.
+        // Neither the layout nor the loom is rewritten here. Both ladders only
+        // ever *add* — room in the case, holes on the brick — so nothing that
+        // fitted before can stop fitting and no cable already in the brick is
+        // pulled out. The client re-runs its own layout and patching pass on the
+        // next read, putting parked pedals back on the surface and filling the
+        // new outputs itself.
         t.update(userRef, {
           "statistics.fame": newFame,
-          "arsenal.rig.boardTier": next.id,
+          [kind === "board"
+            ? "arsenal.rig.boardTier"
+            : "arsenal.rig.supplyTier"]: next.id,
         });
 
         return {

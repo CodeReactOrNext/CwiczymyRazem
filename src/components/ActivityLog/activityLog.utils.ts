@@ -39,6 +39,13 @@ export const processRawReports = (
     if (reportsMap[dateKey]) {
       const existingReport = reportsMap[dateKey];
 
+      if (
+        !existingReport.lastActivityDate ||
+        reportDate > existingReport.lastActivityDate
+      ) {
+        existingReport.lastActivityDate = reportDate;
+      }
+
       existingReport.points += exerciseLog.totalPoints;
       existingReport.totalTime += exerciseLog.bonusPoints.time;
 
@@ -83,6 +90,7 @@ export const processRawReports = (
       reportsMap[dateKey] = {
         points: exerciseLog.totalPoints,
         date: reportDate,
+        lastActivityDate: reportDate,
         totalTime: exerciseLog.bonusPoints.time,
         isDateBackReport: exerciseLog.isDateBackReport,
         exceriseTitle: exerciseLog.exceriseTitle,

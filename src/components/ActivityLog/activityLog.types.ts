@@ -8,6 +8,12 @@ export type ReportListInterfaceWithTimeSumary = PartiallyRequired<
   "timeSumary"
 > & {
   activities?: ActivityDetail[];
+  /**
+   * The most recent raw log of this day. `date` holds the day’s *first* report,
+   * which the calendar grid needs; anything asking when the user last practised
+   * wants this one.
+   */
+  lastActivityDate?: Date;
 };
 
 export interface ActivityDetail {

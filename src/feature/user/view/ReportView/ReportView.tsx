@@ -50,7 +50,10 @@ import { getClientReportContext, getDailyStreakMultiplier } from "utils/gameLogi
 import { resolveInternalPath } from "utils/resolveInternalPath";
 import { i18n } from "utils/translation";
 
-import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
+import {
+  getLastReportInstant,
+  isLastReportTimeExceeded,
+} from "./helpers/isLastReportTimeExceeded";
 import { RaportSchema } from "./helpers/RaportShcema";
 import {
   buildSongsSessionTitle,
@@ -319,10 +322,6 @@ const ReportView = () => {
 
   const reportOnSubmit = async (inputData: ReportFormikInterface) => {
     const sumTime = getSumTime(inputData);
-    const lastReportTimeExceded = isLastReportTimeExceeded(
-      currentUserStats!.lastReportDate,
-      sumTime
-    );
 
     if (!userAuth) {
       toast.error(t("toast.not_logged"), {
@@ -352,6 +351,12 @@ const ReportView = () => {
       setLongTimePopUpVisible(true);
       return;
     }
+
+    // A back-dated entry is time from an earlier day by definition, so the
+    // elapsed-window check does not apply to it.
+    const lastReportTimeExceded = inputData.countBackDays
+      ? false
+      : isLastReportTimeExceeded(getLastReportInstant(reportList), sumTime);
 
     if (lastReportTimeExceded && !acceptExceedingTime) {
       setAcceptPopUpVisible(true);

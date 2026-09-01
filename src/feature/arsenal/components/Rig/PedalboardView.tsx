@@ -309,13 +309,27 @@ export const PedalboardView = ({
        * lines everything up — same signal order, new rows.
        */
       recase = false,
+      /**
+       * …and the same for the brick: a supply that just grew under the board.
+       *
+       * The cables already in it are left exactly where they are — this only
+       * fills the holes that were bought a moment ago, in signal order. A hole
+       * the player has just paid for and that nothing is plugged into is the
+       * one thing the upgrade was supposed to buy, so it does not wait to be
+       * patched by hand.
+       */
+      rebrick = false,
     ) => {
       const layout = recase
         ? tidyBoard(geo, items, widthOf)
         : layoutBoard(geo, items, widthOf);
       applyLayout(layout, items);
       if (Array.isArray(links)) {
-        setLocalPower(links);
+        const toppedUp = rebrick
+          ? autoPatch(rail, layout.placed, links, widthOf)
+          : links;
+        if (toppedUp.length > links.length) savePower(toppedUp);
+        else setLocalPower(links);
         return;
       }
 
@@ -334,17 +348,24 @@ export const PedalboardView = ({
     [applyLayout, geo, rail, savePower, supply, widthOf],
   );
 
-  /** The case the board was last laid out on, so a change of one is noticed. */
+  /**
+   * The case and the brick the board was last read against, so a change of
+   * either is noticed — that is what tells an upgrade apart from a refetch.
+   */
   const lastCaseRef = useRef(geo.tier.id);
+  const lastSupplyRef = useRef(supply.id);
 
   useEffect(() => {
     if (dragging || pendingSaveRef.current) return;
     const recased = lastCaseRef.current !== geo.tier.id;
+    const rebricked = lastSupplyRef.current !== supply.id;
     lastCaseRef.current = geo.tier.id;
+    lastSupplyRef.current = supply.id;
     adoptSaved(
       Array.isArray(data.rig.pedalboardItems) ? data.rig.pedalboardItems : [],
       data.rig.power,
       recased,
+      rebricked,
     );
   }, [
     data.rig.pedalboardItems,
@@ -352,6 +373,7 @@ export const PedalboardView = ({
     dragging,
     adoptSaved,
     geo.tier.id,
+    supply.id,
   ]);
 
   useEffect(() => {
