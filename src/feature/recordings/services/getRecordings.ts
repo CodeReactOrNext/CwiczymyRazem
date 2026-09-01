@@ -2,6 +2,7 @@ import type { Recording } from "feature/recordings/types/types";
 import {
   collection,
   doc,
+  documentId,
   getCountFromServer,
   limit,
   orderBy,
@@ -11,6 +12,68 @@ import {
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDoc, trackedGetDocs } from "utils/firebase/client/firestoreTracking";
+
+/**
+ * Recordings denormalise the author's avatar at write time, but everything saved
+ * before that field was fixed has `userAvatarUrl: null` (it used to be read from
+ * a non-existent `photoURL`). Fill those in from the user docs so old recordings
+ * show an avatar too; recordings that already carry one cost no extra reads.
+ */
+const withAuthorAvatars = async (recordings: Recording[]) => {
+  const missingIds = [
+    ...new Set(
+      recordings.filter((r) => !r.userAvatarUrl && r.userId).map((r) => r.userId),
+    ),
+  ];
+
+  if (missingIds.length === 0) return recordings;
+
+  const chunks: string[][] = [];
+  for (let i = 0; i < missingIds.length; i += 10) {
+    chunks.push(missingIds.slice(i, i + 10));
+  }
+
+  type AuthorProfile = {
+    avatar: string | null;
+    lvl: number;
+    displayName: string | null;
+  };
+  const authors = new Map<string, AuthorProfile>();
+
+  try {
+    const snapshots = await Promise.all(
+      chunks.map((chunk) =>
+        trackedGetDocs(query(collection(db, "users"), where(documentId(), "in", chunk))),
+      ),
+    );
+
+    snapshots.forEach((snapshot) => {
+      snapshot.docs.forEach((userDoc) => {
+        const data = userDoc.data();
+        authors.set(userDoc.id, {
+          avatar: data.avatar || null,
+          lvl: data.statistics?.lvl ?? 0,
+          displayName: data.displayName || null,
+        });
+      });
+    });
+  } catch (error) {
+    console.error("Error hydrating recording authors:", error);
+    return recordings;
+  }
+
+  return recordings.map((recording) => {
+    const author = authors.get(recording.userId);
+    if (!author) return recording;
+
+    return {
+      ...recording,
+      userAvatarUrl: recording.userAvatarUrl || author.avatar,
+      userAvatarFrame: recording.userAvatarFrame ?? author.lvl,
+      userDisplayName: recording.userDisplayName || author.displayName,
+    };
+  });
+};
 
 export const getRecordings = async (
   page: number,
@@ -78,7 +141,7 @@ export const getRecordings = async (
   }
 
   return {
-    recordings,
+    recordings: await withAuthorAvatars(recordings),
     total,
     lastDoc,
   };
@@ -90,10 +153,13 @@ export const getRecordingById = async (recordingId: string): Promise<Recording |
     const docSnap = await trackedGetDoc(docRef);
 
     if (docSnap.exists()) {
-      return {
+      const recording = {
         id: docSnap.id,
         ...docSnap.data(),
       } as Recording;
+
+      const [hydrated] = await withAuthorAvatars([recording]);
+      return hydrated;
     }
     return null;
   } catch (error) {
