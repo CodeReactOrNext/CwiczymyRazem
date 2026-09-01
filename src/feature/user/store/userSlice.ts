@@ -143,6 +143,21 @@ const userSlice = createSlice({
         state.currentUserStats.fame = (state.currentUserStats.fame || 0) + payload;
       }
     },
+    /**
+     * The wallet, set to what the server says it is.
+     *
+     * Everything else here nudges the balance by a delta, which is right while
+     * the writes behind those deltas all land — and leaves the balance drifting
+     * for the rest of the session when one does not. A drifted wallet is not
+     * only a wrong number on screen: the shops price against it, so a balance
+     * reading high offers upgrades the server will refuse, over and over. This
+     * is how a refusal puts it back.
+     */
+    setFame: (state, { payload }: PayloadAction<number>) => {
+      if (state.currentUserStats) {
+        state.currentUserStats.fame = Math.max(0, payload);
+      }
+    },
     // Challenges removed
     generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
@@ -541,6 +556,7 @@ export const {
   setUserRole,
   deductFame,
   addFame,
+  setFame,
   setSelectedGuitar,
   setFavoritePlan,
   setFavoriteExercise,

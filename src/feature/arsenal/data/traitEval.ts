@@ -35,7 +35,7 @@ import type {
   ItemTrait,
   RigSetup,
 } from "../types/arsenal.types";
-import { inChainOrder } from "../utils/pedalboardLayout";
+import { geometryOf, inChainOrder } from "../utils/pedalboardLayout";
 import { EFFECTS_BY_ID } from "./effectDefinitions";
 import { GUITARS_BY_ID } from "./guitarDefinitions";
 import { getEffectiveRarity, RARITY_LADDER } from "./itemStats";
@@ -127,7 +127,11 @@ export interface RigTraitContext {
 }
 
 type ArsenalLike = Pick<
-  { rig: RigSetup; inventory: InventoryItem[]; effectInventory: EffectInventoryItem[] },
+  {
+    rig: RigSetup;
+    inventory: InventoryItem[];
+    effectInventory: EffectInventoryItem[];
+  },
   "rig" | "inventory" | "effectInventory"
 >;
 
@@ -161,17 +165,20 @@ export const buildRigTraitContext = (
     });
   }
 
-  // Chain position rather than raw x, because a two-row board is wired row by
+  // Chain position rather than raw x, because a multi-row board is wired row by
   // row: a pedal at the far right of the bottom row comes *after* one at the
   // far left of the top row, which comparing x alone gets backwards.
   const chainIndex = new Map(
-    inChainOrder(arsenal.rig?.pedalboardItems ?? []).map(
-      (placement, index) => [placement.itemId, index] as const,
-    ),
+    inChainOrder(
+      geometryOf(arsenal.rig?.boardTier),
+      arsenal.rig?.pedalboardItems ?? [],
+    ).map((placement, index) => [placement.itemId, index] as const),
   );
 
   for (const placement of arsenal.rig?.pedalboardItems ?? []) {
-    const item = arsenal.effectInventory?.find((e) => e.id === placement.itemId);
+    const item = arsenal.effectInventory?.find(
+      (e) => e.id === placement.itemId,
+    );
     const def: EffectDefinition | undefined = item
       ? EFFECTS_BY_ID.get(item.effectId)
       : undefined;
@@ -196,8 +203,7 @@ export const buildRigTraitContext = (
 // ─── Conditions ──────────────────────────────────────────────────────────────
 
 const isDrive = (pedal: RigItem): boolean =>
-  !!pedal.effectType &&
-  (DRIVE_TYPES as string[]).includes(pedal.effectType);
+  !!pedal.effectType && (DRIVE_TYPES as string[]).includes(pedal.effectType);
 
 /**
  * How far down the signal chain a pedal sits. Falls back to the board x read
@@ -239,9 +245,7 @@ export const evaluateCondition = (
       );
 
     case "category-min":
-      return (
-        toTraitBlocks(session.minutes[cond.category]) >= cond.minutes
-      );
+      return toTraitBlocks(session.minutes[cond.category]) >= cond.minutes;
 
     case "session-min":
       return toTraitBlocks(sessionMinutes(session)) >= cond.minutes;
@@ -377,9 +381,7 @@ const evaluateRigPart = (
 };
 
 const hasSessionPart = (cond: TraitCondition): boolean =>
-  cond.type === "all"
-    ? cond.of.some(hasSessionPart)
-    : isSessionCondition(cond);
+  cond.type === "all" ? cond.of.some(hasSessionPart) : isSessionCondition(cond);
 
 // ─── Counters ────────────────────────────────────────────────────────────────
 
@@ -438,7 +440,8 @@ export const getTraitUnits = (
         counter.cap,
         all.reduce(
           (sum, i) =>
-            sum + (i.itemId === self.itemId ? i.traits.length - 1 : i.traits.length),
+            sum +
+            (i.itemId === self.itemId ? i.traits.length - 1 : i.traits.length),
           0,
         ),
       );
@@ -599,8 +602,7 @@ export const evaluateRigTraits = (
     (e) => e.def.penalty?.type === "others-zero" && e.active,
   );
   if (zeroing.length > 0) {
-    for (const entry of entries)
-      if (!zeroing.includes(entry)) entry.rate = 0;
+    for (const entry of entries) if (!zeroing.includes(entry)) entry.rate = 0;
   }
 
   for (const item of all) {
@@ -631,7 +633,9 @@ export const getTraitClockMinutes = (
   session: TraitSessionContext,
 ): number =>
   toTraitBlocks(
-    def.clock === "session" ? sessionMinutes(session) : session.minutes[def.clock],
+    def.clock === "session"
+      ? sessionMinutes(session)
+      : session.minutes[def.clock],
   );
 
 export interface RigTraitPayout {

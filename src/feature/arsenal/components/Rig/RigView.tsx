@@ -11,10 +11,13 @@ import type { ArsenalUserData, RigSetup } from "../../types/arsenal.types";
 import { GuitarPickerModal } from "./GuitarPickerModal";
 import { GuitarSlot } from "./GuitarSlot";
 import { PedalboardView } from "./PedalboardView";
+import { SectionHeading } from "./RigSection";
 import { RigStatsPanel } from "./RigStatsPanel";
 
 interface RigViewProps {
   data: ArsenalUserData;
+  /** The wallet, for the hardware shop under the board. */
+  fame: number;
 }
 
 export interface RigHoverState {
@@ -23,7 +26,7 @@ export interface RigHoverState {
   content: React.ReactNode;
 }
 
-export const RigView = ({ data }: RigViewProps) => {
+export const RigView = ({ data, fame }: RigViewProps) => {
   const { mutate: saveRig } = useUpdateRig();
   const { mutate: savePedalboard } = useUpdatePedalboard();
   const isMobile = useResponsiveStore((state) => state.isMobile);
@@ -32,20 +35,27 @@ export const RigView = ({ data }: RigViewProps) => {
   // On touch devices there is no hover — tapping an item opens its card in a centered modal instead.
   const [pinnedCard, setPinnedCard] = useState<React.ReactNode | null>(null);
 
-  const handleHover = (e: React.MouseEvent | null, content: React.ReactNode | null) => {
+  const handleHover = (
+    e: React.MouseEvent | null,
+    content: React.ReactNode | null,
+  ) => {
     if (isMobile) return;
     if (!e || !content) return setHover(null);
     setHover({ x: e.clientX, y: e.clientY, content });
   };
 
-  const handleShowCard = isMobile ? (content: React.ReactNode) => setPinnedCard(content) : undefined;
+  const handleShowCard = isMobile
+    ? (content: React.ReactNode) => setPinnedCard(content)
+    : undefined;
 
   const rig = data.rig;
 
   const getSelectedGuitarMeta = (slots: RigSetup["guitarSlots"]) => {
     const slot0ItemId = slots[0];
     if (!slot0ItemId) return { imageId: null };
-    const inventoryItem = data.inventory.find((item) => item.id === slot0ItemId);
+    const inventoryItem = data.inventory.find(
+      (item) => item.id === slot0ItemId,
+    );
     if (!inventoryItem) return { imageId: null };
     const guitarDef = GUITARS_BY_ID.get(inventoryItem.guitarId);
     return {
@@ -58,31 +68,40 @@ export const RigView = ({ data }: RigViewProps) => {
   const handleGuitarSelect = (itemId: string | null) => {
     if (pickerSlot === null) return;
     // A guitar instance can occupy only one slot — clear it from any other slot first.
-    const newSlots = rig.guitarSlots.map((id) => (itemId && id === itemId ? null : id)) as RigSetup["guitarSlots"];
+    const newSlots = rig.guitarSlots.map((id) =>
+      itemId && id === itemId ? null : id,
+    ) as RigSetup["guitarSlots"];
     newSlots[pickerSlot] = itemId;
     const meta = getSelectedGuitarMeta(newSlots);
-    saveRig({ rig: { ...rig, guitarSlots: newSlots }, selectedGuitar: meta.imageId, selectedGuitarYear: meta.year, selectedGuitarCountry: meta.country });
+    saveRig({
+      rig: { ...rig, guitarSlots: newSlots },
+      selectedGuitar: meta.imageId,
+      selectedGuitarYear: meta.year,
+      selectedGuitarCountry: meta.country,
+    });
   };
 
   const handleGuitarRemove = (slotIndex: number) => {
     const newSlots = [...rig.guitarSlots] as RigSetup["guitarSlots"];
     newSlots[slotIndex] = null;
     const meta = getSelectedGuitarMeta(newSlots);
-    saveRig({ rig: { ...rig, guitarSlots: newSlots }, selectedGuitar: meta.imageId, selectedGuitarYear: meta.year, selectedGuitarCountry: meta.country });
+    saveRig({
+      rig: { ...rig, guitarSlots: newSlots },
+      selectedGuitar: meta.imageId,
+      selectedGuitarYear: meta.year,
+      selectedGuitarCountry: meta.country,
+    });
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className='flex flex-col gap-8'>
       {/* What the rig below is currently worth per hour of practice. */}
       <RigStatsPanel data={data} />
 
       {/* Guitars */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-0.5">
-          <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Instruments</p>
-          <p className="text-base font-black text-white capitalize tracking-wide">Guitars</p>
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className='flex flex-col gap-4'>
+        <SectionHeading title='Guitars' />
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
           {([0, 1, 2] as const).map((slotIndex) => (
             <GuitarSlot
               key={slotIndex}
@@ -98,13 +117,15 @@ export const RigView = ({ data }: RigViewProps) => {
         </div>
       </div>
 
-      {/* Pedalboard */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-0.5">
-          <p className="text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500">Effects</p>
-          <p className="text-base font-black text-white capitalize tracking-wide">Pedalboard</p>
-        </div>
-        <PedalboardView data={data} onUpdateItems={savePedalboard} onHover={handleHover} onShowCard={handleShowCard} />
+      {/* Pedalboard — its own heading, because the board actions ride on it. */}
+      <div className='flex flex-col gap-5'>
+        <PedalboardView
+          data={data}
+          fame={fame}
+          onUpdateItems={(items, power) => savePedalboard({ items, power })}
+          onHover={handleHover}
+          onShowCard={handleShowCard}
+        />
       </div>
 
       {pickerSlot !== null && (
@@ -124,27 +145,25 @@ export const RigView = ({ data }: RigViewProps) => {
         </CursorTooltip>
       )}
 
-      {pinnedCard && typeof document !== "undefined" &&
+      {pinnedCard &&
+        typeof document !== "undefined" &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
-            onClick={() => setPinnedCard(null)}
-          >
+            className='fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm'
+            onClick={() => setPinnedCard(null)}>
             <div
-              className="relative w-full max-w-[320px]"
-              onClick={(e) => e.stopPropagation()}
-            >
+              className='relative w-full max-w-[320px]'
+              onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => setPinnedCard(null)}
-                aria-label="Close"
-                className="absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white"
-              >
+                aria-label='Close'
+                className='absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white'>
                 <X size={15} />
               </button>
               {pinnedCard}
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );

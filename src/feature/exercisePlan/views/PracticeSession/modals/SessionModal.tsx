@@ -100,7 +100,7 @@ const SessionModal = ({
     !!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat";
   const countInDelayMs = () => (
     startsMetronome
-      ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, effectiveBpm ?? metronome.bpm)
+      ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, effectiveBpm ?? metronome.bpm, metronome.gridUnit)
       : 0
   );
 

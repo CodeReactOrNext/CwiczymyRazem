@@ -1,3 +1,4 @@
+import type { GridUnit } from "feature/exercisePlan/components/Metronome/utils/accentPattern";
 import { getCountInDurationMs } from "feature/exercisePlan/components/Metronome/utils/countInDuration";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -18,6 +19,8 @@ interface Metronome {
   handleSetRecommendedBpm: () => void;
   /** One entry per beat of the meter — its length is how many count-in beats play. */
   accentPattern?:         unknown[];
+  /** What one accentPattern entry is worth — 8 halves the count-in tick. */
+  gridUnit?:              GridUnit;
 }
 
 interface UseSessionControlsOptions {
@@ -75,7 +78,7 @@ export function useSessionControls({
   // timer for as long as the count-in will take.
   const countInDelayMs = useCallback(() => (
     startsMetronome
-      ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, metronome.bpm * (speedMultiplier || 1))
+      ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, metronome.bpm * (speedMultiplier || 1), metronome.gridUnit)
       : 0
   ), [startsMetronome, metronome, speedMultiplier]);
 

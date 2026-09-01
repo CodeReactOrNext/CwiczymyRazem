@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { EffectType } from "../types/arsenal.types";
-import { ROW_Y_PCT } from "../utils/pedalboardLayout";
+import { geometryFor } from "../utils/pedalboardLayout";
+import { BOARD_TIERS } from "./rigHardware";
+
+/** The two-row case these boards are laid out on. */
+const GEO = geometryFor(BOARD_TIERS[0]);
+const ROW_Y_PCT = GEO.rowYPct;
 import { EFFECT_DEFINITIONS } from "./effectDefinitions";
 import {
   CHAIN_FLAWLESS_FAME,
@@ -10,6 +15,7 @@ import {
   CHAIN_TIERS,
   evaluateChain,
   getChainFameRate,
+  getChainVerdict,
   PLAYABLE_SIGNAL_STAGES,
   readChainNodes,
   SIGNAL_STAGES,
@@ -62,7 +68,7 @@ const board = (types: EffectType[]) => {
 
 const verdictFor = (types: EffectType[]) => {
   const { items, effectInventory } = board(types);
-  return evaluateChain(readChainNodes(items, effectInventory));
+  return evaluateChain(readChainNodes(GEO, items, effectInventory));
 };
 
 describe("SIGNAL_STAGES", () => {
@@ -129,9 +135,24 @@ describe("SIGNAL_STAGES", () => {
 describe("readChainNodes", () => {
   it("reads the top row before the bottom one, each right to left", () => {
     const effectInventory = [
-      { id: "a", effectId: firstEffectOfType("Tuner").id, acquiredAt: 0, isNew: false },
-      { id: "b", effectId: firstEffectOfType("Delay").id, acquiredAt: 0, isNew: false },
-      { id: "c", effectId: firstEffectOfType("Reverb").id, acquiredAt: 0, isNew: false },
+      {
+        id: "a",
+        effectId: firstEffectOfType("Tuner").id,
+        acquiredAt: 0,
+        isNew: false,
+      },
+      {
+        id: "b",
+        effectId: firstEffectOfType("Delay").id,
+        acquiredAt: 0,
+        isNew: false,
+      },
+      {
+        id: "c",
+        effectId: firstEffectOfType("Reverb").id,
+        acquiredAt: 0,
+        isNew: false,
+      },
     ];
     // Stored in the wrong order on purpose: position decides the chain, not the array.
     const items = [
@@ -140,24 +161,30 @@ describe("readChainNodes", () => {
       { itemId: "a", xPct: 80, yPct: ROW_Y_PCT[0] },
     ];
 
-    expect(readChainNodes(items, effectInventory).map((n) => n.itemId)).toEqual([
-      "a",
-      "b",
-      "c",
-    ]);
+    expect(
+      readChainNodes(GEO, items, effectInventory).map((n) => n.itemId),
+    ).toEqual(["a", "b", "c"]);
   });
 
   it("skips a pedal whose definition no longer exists", () => {
     const nodes = readChainNodes(
+      GEO,
       [{ itemId: "ghost", xPct: 5, yPct: ROW_Y_PCT[0] }],
-      [{ id: "ghost", effectId: "retired-effect", acquiredAt: 0, isNew: false }],
+      [
+        {
+          id: "ghost",
+          effectId: "retired-effect",
+          acquiredAt: 0,
+          isNew: false,
+        },
+      ],
     );
     expect(nodes).toEqual([]);
   });
 
   it("survives a missing board and a missing inventory", () => {
-    expect(readChainNodes(undefined, undefined)).toEqual([]);
-    expect(readChainNodes(null, [])).toEqual([]);
+    expect(readChainNodes(GEO, undefined, undefined)).toEqual([]);
+    expect(readChainNodes(GEO, null, [])).toEqual([]);
   });
 });
 
@@ -246,10 +273,18 @@ describe("evaluateChain", () => {
   });
 
   it("climbs the tiers as the wiring gets worse", () => {
-    expect(verdictFor(["Tuner", "Overdrive", "Delay", "Reverb"]).tier).toBe("book");
-    expect(verdictFor(["Overdrive", "Tuner", "Delay", "Reverb"]).tier).toBe("one-off");
-    expect(verdictFor(["Overdrive", "Tuner", "Reverb", "Delay"]).tier).toBe("rough");
-    expect(verdictFor(["Reverb", "Delay", "Overdrive", "Tuner"]).tier).toBe("spaghetti");
+    expect(verdictFor(["Tuner", "Overdrive", "Delay", "Reverb"]).tier).toBe(
+      "book",
+    );
+    expect(verdictFor(["Overdrive", "Tuner", "Delay", "Reverb"]).tier).toBe(
+      "one-off",
+    );
+    expect(verdictFor(["Overdrive", "Tuner", "Reverb", "Delay"]).tier).toBe(
+      "rough",
+    );
+    expect(verdictFor(["Reverb", "Delay", "Overdrive", "Tuner"]).tier).toBe(
+      "spaghetti",
+    );
   });
 
   it("reports the stages the board covers, without repeats", () => {
@@ -261,11 +296,24 @@ describe("evaluateChain", () => {
   });
 });
 
+/** A rig with nothing in it but the pedalboard each case fills in. */
+const emptyRig = {
+  guitarSlots: [null, null, null] as [null, null, null],
+  ampHeadId: null,
+  ampId: null,
+  pedalboardItems: [],
+};
+
 describe("getChainFameRate", () => {
   it("scores a stored arsenal the way the board does", () => {
     const { items, effectInventory } = board(["Tuner", "Overdrive", "Delay"]);
     const arsenal = {
-      rig: { guitarSlots: [null, null, null] as [null, null, null], pedalboardItems: items, ampHeadId: null, ampId: null },
+      rig: {
+        guitarSlots: [null, null, null] as [null, null, null],
+        pedalboardItems: items,
+        ampHeadId: null,
+        ampId: null,
+      },
       effectInventory,
     };
 
@@ -277,6 +325,69 @@ describe("getChainFameRate", () => {
   it("pays nothing for a player with no arsenal at all", () => {
     expect(getChainFameRate(null)).toBe(0);
     expect(getChainFameRate({})).toBe(0);
+  });
+
+  it("counts every pedal on a board saved before the power brick existed", () => {
+    // `power` absent, rather than empty: nobody loses a bonus to a migration.
+    const { items, effectInventory } = board(["Tuner", "Overdrive", "Delay"]);
+    const arsenal = {
+      rig: { ...emptyRig, pedalboardItems: items },
+      effectInventory,
+    };
+
+    expect(getChainFameRate(arsenal)).toBe(
+      2 * CHAIN_LINK_FAME + CHAIN_FLAWLESS_FAME,
+    );
+  });
+
+  it("leaves an unpowered pedal out of the chain entirely", () => {
+    const { items, effectInventory } = board(["Tuner", "Overdrive", "Delay"]);
+    const arsenal = {
+      rig: {
+        ...emptyRig,
+        pedalboardItems: items,
+        // The overdrive in the middle has no cable to the brick, so the chain is
+        // a tuner into a delay: one cable, and too few pedals to be flawless.
+        power: [
+          { itemId: "item-0", out: 0 },
+          { itemId: "item-2", out: 1 },
+        ],
+      },
+      effectInventory,
+    };
+
+    const verdict = getChainVerdict(arsenal);
+    expect(verdict.nodes.map((node) => node.itemId)).toEqual([
+      "item-0",
+      "item-2",
+    ]);
+    expect(verdict.rate).toBe(CHAIN_LINK_FAME);
+  });
+
+  it("pays nothing at all for a board with nothing plugged in", () => {
+    const { items, effectInventory } = board(["Tuner", "Overdrive", "Delay"]);
+    const arsenal = {
+      rig: { ...emptyRig, pedalboardItems: items, power: [] },
+      effectInventory,
+    };
+
+    expect(getChainFameRate(arsenal)).toBe(0);
+  });
+
+  it("cannot be blamed for a cable it has no power to run", () => {
+    // Backwards on paper — a delay in front of an overdrive — but the delay has
+    // no power, so there is no cable running through it to be wrong.
+    const { items, effectInventory } = board(["Delay", "Overdrive"]);
+    const arsenal = {
+      rig: {
+        ...emptyRig,
+        pedalboardItems: items,
+        power: [{ itemId: "item-1", out: 0 }],
+      },
+      effectInventory,
+    };
+
+    expect(getChainVerdict(arsenal).wrongLinks).toBe(0);
   });
 });
 
@@ -291,7 +402,7 @@ describe("wiredOrder", () => {
       "Tuner",
     ]);
 
-    const wired = wiredOrder(items, effectInventory);
+    const wired = wiredOrder(GEO, items, effectInventory);
     // Re-laid right to left in the returned order, the chain is flawless.
     const relaid = wired.map((item, index) => ({
       ...item,
@@ -299,7 +410,7 @@ describe("wiredOrder", () => {
       yPct: ROW_Y_PCT[0],
     }));
 
-    const verdict = evaluateChain(readChainNodes(relaid, effectInventory));
+    const verdict = evaluateChain(readChainNodes(GEO, relaid, effectInventory));
     expect(verdict.wrongLinks).toBe(0);
     expect(verdict.flawless).toBe(true);
   });
@@ -312,7 +423,7 @@ describe("wiredOrder", () => {
       "Phaser",
     ]);
 
-    const wired = wiredOrder(items, effectInventory);
+    const wired = wiredOrder(GEO, items, effectInventory);
     expect(wired.map((i) => i.itemId)).toEqual([
       "item-0",
       "item-1",
@@ -323,7 +434,7 @@ describe("wiredOrder", () => {
 
   it("keeps every pedal it was given", () => {
     const { items, effectInventory } = board(["Reverb", "Tuner", "Delay"]);
-    const wired = wiredOrder(items, effectInventory);
+    const wired = wiredOrder(GEO, items, effectInventory);
     expect(wired.map((i) => i.itemId).sort()).toEqual(
       items.map((i) => i.itemId).sort(),
     );

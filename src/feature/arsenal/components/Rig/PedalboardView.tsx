@@ -1,9 +1,25 @@
+import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
-import { AlertTriangle, LayoutGrid, Plus, X } from "lucide-react";
+import {
+  AlertTriangle,
+  LayoutGrid,
+  Plug,
+  Plus,
+  Unplug,
+  X,
+  Zap,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import {
+  autoPatch,
+  pickOutput,
+  readPowerState,
+  refusalFor,
+} from "../../data/powerSupply";
+import { boardTierOf, supplyTierOf } from "../../data/rigHardware";
 import {
   type ChainTier,
   evaluateChain,
@@ -13,26 +29,43 @@ import {
 import type {
   ArsenalUserData,
   PedalboardPlacement,
+  PowerLink,
 } from "../../types/arsenal.types";
+import type { Point } from "../../utils/cableGeometry";
 import { getEffectImageSrc } from "../../utils/effectImage";
 import type { BoardBox, BoardLayout } from "../../utils/pedalboardLayout";
 import {
   collidesWithAny,
+  createDcResolver,
   createJackResolver,
   createWidthResolver,
   DEFAULT_ASPECT,
   EFFECT_IMAGE_ASPECT,
   findFreeSpot,
   findSwapTarget,
+  geometryFor,
+  inChainOrder,
   layoutBoard,
   packInOrder,
-  PEDAL_H_PCT,
   planSwap,
+  rowIndexOf,
   tidyBoard,
 } from "../../utils/pedalboardLayout";
+import type { RowSpan } from "../../utils/powerLayout";
+import {
+  dcJackAt,
+  RAIL_H,
+  railFor,
+  railPaddingPct,
+} from "../../utils/powerLayout";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
 import { EffectPickerModal } from "./EffectPickerModal";
+import type { PoweredPedal } from "./PowerLoom";
+import { PowerLoom, PowerRail } from "./PowerLoom";
+import { PowerPanel } from "./PowerPanel";
+import { RigHardwarePanel } from "./RigHardwarePanel";
+import { RIG_BUTTON, RIG_BUTTON_FIX, SectionHeading } from "./RigSection";
 import { BoardJack, SignalCable } from "./SignalCable";
 import { SignalPathPanel } from "./SignalPathPanel";
 
@@ -63,9 +96,24 @@ interface DragState {
   swapped: boolean;
 }
 
+/**
+ * A DC cable in the air: the pointer that is carrying it, and whether it has
+ * ever moved. A press that never moves is a tap, which arms the brick instead of
+ * dragging out of it — the only way to patch a board on a touch screen.
+ */
+interface PatchState {
+  /** Where the loose end is, in board units. */
+  to: Point;
+  moved: boolean;
+  /** Waiting for a second tap on a pedal rather than following a pointer. */
+  armed: boolean;
+}
+
 interface PedalboardViewProps {
   data: ArsenalUserData;
-  onUpdateItems: (items: PedalboardPlacement[]) => void;
+  /** The wallet, for the two hardware buttons on the heading. */
+  fame: number;
+  onUpdateItems: (items: PedalboardPlacement[], power: PowerLink[]) => void;
   onHover?: (
     e: React.MouseEvent | null,
     content: React.ReactNode | null,
@@ -76,6 +124,7 @@ interface PedalboardViewProps {
 
 export const PedalboardView = ({
   data,
+  fame,
   onUpdateItems,
   onHover,
   onShowCard,
@@ -109,14 +158,33 @@ export const PedalboardView = ({
   const pendingSaveRef = useRef(false);
   const onUpdateItemsRef = useRef(onUpdateItems);
 
-  const debouncedSave = useCallback((items: PedalboardPlacement[]) => {
-    pendingSaveRef.current = true;
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      pendingSaveRef.current = false;
-      onUpdateItemsRef.current(items);
-    }, 600);
-  }, []);
+  /**
+   * What is plugged into the brick. `null` is a board saved before the brick
+   * existed — read as fully powered until the migration below patches it, so
+   * opening the Rig never costs anybody a wiring bonus they had already earned.
+   */
+  const [localPower, setLocalPowerState] = useState<PowerLink[] | null>(() =>
+    Array.isArray(data.rig.power) ? data.rig.power : null,
+  );
+  const localPowerRef = useRef(localPower);
+
+  const setLocalPower = (next: PowerLink[]) => {
+    localPowerRef.current = next;
+    setLocalPowerState(next);
+  };
+
+  const debouncedSave = useCallback(
+    (items: PedalboardPlacement[], power?: PowerLink[]) => {
+      pendingSaveRef.current = true;
+      const links = power ?? localPowerRef.current ?? [];
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = setTimeout(() => {
+        pendingSaveRef.current = false;
+        onUpdateItemsRef.current(items, links);
+      }, 600);
+    },
+    [],
+  );
 
   const [localItems, setLocalItemsState] = useState<PedalboardPlacement[]>(
     () =>
@@ -131,11 +199,30 @@ export const PedalboardView = ({
     setLocalItemsState(next);
   };
 
+  /**
+   * The two pieces of hardware the board is made of: the case it stands in and
+   * the brick racked above it, both bought with Fame (`data/rigHardware`).
+   *
+   * Every measurement below is taken off them rather than off a constant, which
+   * is what makes an upgrade a different board instead of the same board with a
+   * bigger number on the panel. A rig that has bought nothing gets the bottom
+   * rung of each, and a layout too big for it comes back as overflow.
+   */
+  const geo = useMemo(
+    () => geometryFor(boardTierOf(data.rig.boardTier)),
+    [data.rig.boardTier],
+  );
+  const supply = useMemo(
+    () => supplyTierOf(data.rig.supplyTier),
+    [data.rig.supplyTier],
+  );
+  const rail = useMemo(() => railFor(geo, supply), [geo, supply]);
+
   // Width-in-board-% of every pedal, driven by its image's own proportions so
   // a wide (dual) pedal really is wider instead of being squished.
   const widthOf = useMemo(
-    () => createWidthResolver(data.effectInventory, aspectById),
-    [data.effectInventory, aspectById],
+    () => createWidthResolver(geo, data.effectInventory, aspectById),
+    [geo, data.effectInventory, aspectById],
   );
 
   // Where each pedal takes its cable, so a top-mounted enclosure gets the
@@ -144,6 +231,10 @@ export const PedalboardView = ({
     () => createJackResolver(data.effectInventory),
     [data.effectInventory],
   );
+
+  /** …and where its power goes in, which is a different socket entirely. */
+  const dcOf = useMemo(() => createDcResolver(jacksOf), [jacksOf]);
+
   const widthOfRef = useRef(widthOf);
   const overflowRef = useRef(overflowIds);
 
@@ -153,6 +244,15 @@ export const PedalboardView = ({
     widthOfRef.current = widthOf;
     overflowRef.current = overflowIds;
   }, [onUpdateItems, widthOf, overflowIds]);
+
+  /** Sets the loom and saves it. Every change to a DC cable goes through here. */
+  const savePower = useCallback(
+    (links: PowerLink[]) => {
+      setLocalPower(links);
+      debouncedSave(localItemsRef.current, links);
+    },
+    [debouncedSave],
+  );
 
   /** Everything currently occupying board space, minus one pedal. */
   const boardBoxes = useCallback((excludeId?: string): BoardBox[] => {
@@ -181,15 +281,78 @@ export const PedalboardView = ({
     [debouncedSave],
   );
 
-  // Straighten out whatever comes back from the server: pedals dropped on top
-  // of each other by older builds of this board get moved to free space.
+  /**
+   * Takes the server's copy of the board over the local one — positions, parked
+   * pedals and DC cables together, because they only make sense together.
+   * Pedals dropped on top of each other by older builds get moved to free space
+   * on the way in.
+   *
+   * A board with no `power` at all was saved before the brick existed, and it
+   * patches itself here: in signal order, keeping as much as the budget can pay
+   * for, so a player who had wired a board by the book keeps as much of that
+   * bonus as there is current for. Whatever is left over stays unpowered where
+   * it can be seen and moved, rather than being quietly dropped.
+   */
+  const adoptSaved = useCallback(
+    (
+      items: PedalboardPlacement[],
+      links: PowerLink[] | undefined,
+      /**
+       * The case just changed under the board — so repack it rather than
+       * repairing it.
+       *
+       * `layoutBoard` deliberately leaves a pedal wherever its owner put it, and
+       * after an upgrade that is the wrong instinct: the pedals are standing on
+       * the old case's rows, which straddle the new one's, and a parked pedal
+       * can find nowhere to land between them. The player has just paid for the
+       * room, so the board takes the one liberty it otherwise never takes and
+       * lines everything up — same signal order, new rows.
+       */
+      recase = false,
+    ) => {
+      const layout = recase
+        ? tidyBoard(geo, items, widthOf)
+        : layoutBoard(geo, items, widthOf);
+      applyLayout(layout, items);
+      if (Array.isArray(links)) {
+        setLocalPower(links);
+        return;
+      }
+
+      const patched = autoPatch(rail, layout.placed, [], widthOf);
+      savePower(patched);
+      const short = layout.placed.length - patched.length;
+      if (short > 0) {
+        announce(
+          `The ${supply.name} has no output for ${short} pedal${
+            short > 1 ? "s" : ""
+          } — unpowered, and out of the signal chain.`,
+          setNotice,
+        );
+      }
+    },
+    [applyLayout, geo, rail, savePower, supply, widthOf],
+  );
+
+  /** The case the board was last laid out on, so a change of one is noticed. */
+  const lastCaseRef = useRef(geo.tier.id);
+
   useEffect(() => {
     if (dragging || pendingSaveRef.current) return;
-    const items = Array.isArray(data.rig.pedalboardItems)
-      ? data.rig.pedalboardItems
-      : [];
-    applyLayout(layoutBoard(items, widthOf), items);
-  }, [data.rig.pedalboardItems, dragging, widthOf, applyLayout]);
+    const recased = lastCaseRef.current !== geo.tier.id;
+    lastCaseRef.current = geo.tier.id;
+    adoptSaved(
+      Array.isArray(data.rig.pedalboardItems) ? data.rig.pedalboardItems : [],
+      data.rig.power,
+      recased,
+    );
+  }, [
+    data.rig.pedalboardItems,
+    data.rig.power,
+    dragging,
+    adoptSaved,
+    geo.tier.id,
+  ]);
 
   useEffect(() => {
     const timer = notice ? setTimeout(() => setNotice(null), NOTICE_MS) : null;
@@ -197,6 +360,185 @@ export const PedalboardView = ({
       if (timer) clearTimeout(timer);
     };
   }, [notice]);
+
+  const boardItems = useMemo(
+    () => localItems.filter((i) => !overflowIds.includes(i.itemId)),
+    [localItems, overflowIds],
+  );
+
+  // What the brick is actually carrying, read against the board that is there
+  // rather than against whatever the last save happened to hold.
+  const powerState = useMemo(
+    () => readPowerState(supply, boardItems, localPower),
+    [supply, boardItems, localPower],
+  );
+
+  /** The pedal's own name, for the messages that have to say which one. */
+  const nameOf = useCallback(
+    (itemId: string) => {
+      const invItem = data.effectInventory.find((e) => e.id === itemId);
+      const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
+      return effect?.name ?? "pedal";
+    },
+    [data.effectInventory],
+  );
+
+  /** Puts a cable in the brick, or says why it cannot. */
+  const plugIn = useCallback(
+    (itemId: string) => {
+      if (powerState.poweredIds.has(itemId)) return;
+      const item = boardItems.find((i) => i.itemId === itemId);
+      if (!item) return;
+
+      const refusal = refusalFor(supply, powerState);
+      if (refusal) {
+        announce(refusal, setNotice);
+        return;
+      }
+
+      const out = pickOutput(
+        rail,
+        item,
+        widthOf(itemId),
+        new Set(powerState.links.map((link) => link.out)),
+      );
+      if (out === null) return;
+      setNotice(null);
+      savePower([...powerState.links, { itemId, out }]);
+    },
+    [boardItems, powerState, rail, savePower, supply, widthOf],
+  );
+
+  const unplug = useCallback(
+    (itemId: string) =>
+      savePower(powerState.links.filter((link) => link.itemId !== itemId)),
+    [powerState.links, savePower],
+  );
+
+  const [patch, setPatchState] = useState<PatchState | null>(null);
+  const patchRef = useRef<PatchState | null>(null);
+
+  const setPatch = (next: PatchState | null) => {
+    patchRef.current = next;
+    setPatchState(next);
+  };
+
+  /** Pointer position in the board's own units, which is what the loom draws in. */
+  const toBoard = useCallback(
+    (clientX: number, clientY: number): Point | null => {
+      const rect = boardRef.current?.getBoundingClientRect();
+      if (!rect) return null;
+      return {
+        x: ((clientX - rect.left) / rect.width) * geo.viewW,
+        y: ((clientY - rect.top) / rect.height) * geo.viewH,
+      };
+    },
+    [geo.viewH, geo.viewW],
+  );
+
+  const pedalUnder = useCallback(
+    (point: Point) =>
+      boardItems.find((item) => {
+        const left = (item.xPct / 100) * geo.viewW;
+        const top = (item.yPct / 100) * geo.viewH;
+        return (
+          point.x >= left &&
+          point.x <= left + (widthOf(item.itemId) / 100) * geo.viewW &&
+          point.y >= top &&
+          point.y <= top + (geo.pedalHPct / 100) * geo.viewH
+        );
+      }) ?? null,
+    [boardItems, geo, widthOf],
+  );
+
+  // The drop handler outlives the render it was written in — the pointer can
+  // come up two frames after the last move — so it reads the live versions.
+  const patchActionsRef = useRef({ plugIn, pedalUnder, toBoard });
+  useEffect(() => {
+    patchActionsRef.current = { plugIn, pedalUnder, toBoard };
+  }, [plugIn, pedalUnder, toBoard]);
+
+  const patching = patch !== null && !patch.armed;
+
+  useEffect(() => {
+    if (!patching) return;
+    const move = (e: PointerEvent) => {
+      const to = patchActionsRef.current.toBoard(e.clientX, e.clientY);
+      const current = patchRef.current;
+      if (!to || !current) return;
+      setPatch({ ...current, to, moved: true });
+    };
+    const up = (e: PointerEvent) => {
+      const current = patchRef.current;
+      if (!current) return;
+      const {
+        toBoard: at,
+        pedalUnder: under,
+        plugIn: plug,
+      } = patchActionsRef.current;
+      const to = at(e.clientX, e.clientY) ?? current.to;
+      const target = under(to);
+      if (target) {
+        setPatch(null);
+        plug(target.itemId);
+        return;
+      }
+      // A press that never moved is a tap, and a tap is how a board gets patched
+      // on a screen with no cursor: the brick stays armed for the pedal to come.
+      if (!current.moved) {
+        setPatch({ ...current, armed: true });
+        setNotice("Now tap the pedal this cable goes to.");
+        return;
+      }
+      setPatch(null);
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+  }, [patching]);
+
+  useEffect(() => {
+    if (!patch) return;
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPatch(null);
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [patch]);
+
+  const handleBrickPointerDown = (e: React.PointerEvent) => {
+    if (dragging) return;
+    e.preventDefault();
+    if (patch?.armed) {
+      setPatch(null);
+      return;
+    }
+    if (powerState.outputsFree === 0) {
+      announce(
+        `Every output on the ${supply.name} is taken — pull a cable out first.`,
+        setNotice,
+      );
+      return;
+    }
+    const to = toBoard(e.clientX, e.clientY);
+    if (to) setPatch({ to, moved: false, armed: false });
+  };
+
+  /** The armed brick waiting for its second tap: anywhere else puts it away. */
+  const handleArmedTap = (e: React.PointerEvent) => {
+    e.preventDefault();
+    setPatch(null);
+    setNotice(null);
+    const to = toBoard(e.clientX, e.clientY);
+    const target = to ? pedalUnder(to) : null;
+    if (target) plugIn(target.itemId);
+  };
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -217,7 +559,7 @@ export const PedalboardView = ({
       const yPct = Math.max(
         0,
         Math.min(
-          100 - PEDAL_H_PCT,
+          100 - geo.pedalHPct,
           ((e.clientY - rect.top) / rect.height) * 100 - drag.offYPct,
         ),
       );
@@ -232,9 +574,10 @@ export const PedalboardView = ({
       // one just vacated. That is the whole of reordering the board — no
       // shuffling anything out of the way first.
       const others = boardBoxes(itemId);
-      const target = findSwapTarget({ xPct, yPct, wPct }, others);
+      const target = findSwapTarget(geo, { xPct, yPct, wPct }, others);
       if (target && target.itemId !== drag.lockedId) {
         const plan = planSwap(
+          geo,
           { ...home, wPct },
           target,
           others.filter((box) => box.itemId !== target.itemId),
@@ -268,13 +611,13 @@ export const PedalboardView = ({
         wPct: widthOfRef.current(i.itemId),
       }));
       setIsColliding(
-        collidesWithAny({ xPct, yPct, wPct }, boxes) &&
-          collidesWithAny({ ...home, wPct }, boxes),
+        collidesWithAny(geo, { xPct, yPct, wPct }, boxes) &&
+          collidesWithAny(geo, { ...home, wPct }, boxes),
       );
 
       setLocalItems(next);
     },
-    [boardBoxes],
+    [boardBoxes, geo],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -298,12 +641,12 @@ export const PedalboardView = ({
     if (dropped) {
       const box = { xPct: dropped.xPct, yPct: dropped.yPct, wPct };
       const homeBox = { ...home, wPct };
-      const covered = collidesWithAny(box, others);
-      const homeFree = !collidesWithAny(homeBox, others);
+      const covered = collidesWithAny(geo, box, others);
+      const homeFree = !collidesWithAny(geo, homeBox, others);
 
       if (
         homeFree &&
-        (covered || (swapped && collidesWithAny(box, [homeBox])))
+        (covered || (swapped && collidesWithAny(geo, box, [homeBox])))
       ) {
         // An exchange finishes in the slot it traded for, so the two pedals
         // really do end up in each other's places instead of near enough.
@@ -311,7 +654,7 @@ export const PedalboardView = ({
       } else if (covered) {
         // Nowhere of its own to go back to — the pedal came off a stack, or
         // its slot was taken while it was in the air.
-        const spot = findFreeSpot(others, wPct);
+        const spot = findFreeSpot(geo, others, wPct);
         if (spot) {
           next = settleAt(spot);
         } else {
@@ -325,7 +668,7 @@ export const PedalboardView = ({
 
     setLocalItems(next);
     debouncedSave(next);
-  }, [debouncedSave, boardBoxes]);
+  }, [debouncedSave, boardBoxes, geo]);
 
   useEffect(() => {
     if (dragging) {
@@ -361,12 +704,47 @@ export const PedalboardView = ({
     });
   };
 
+  /**
+   * Re-seats every cable after the board has been rearranged.
+   *
+   * The brick's outputs alternate between its two faces, so an output that faced
+   * a pedal's row before a tidy may be facing away from it after one — and a
+   * loom full of cables going the long way round the brick is a loom nobody
+   * would have wired. Which pedals are powered never changes here; only which
+   * hole each one is in.
+   */
+  const repatch = useCallback(
+    (
+      items: PedalboardPlacement[],
+      overflow: string[],
+      links: PowerLink[],
+    ): PowerLink[] => {
+      const powered = new Set(links.map((link) => link.itemId));
+      const taken = new Set<number>();
+
+      return inChainOrder(
+        geo,
+        items.filter((item) => !overflow.includes(item.itemId)),
+      ).flatMap((item) => {
+        if (!powered.has(item.itemId)) return [];
+        const out = pickOutput(rail, item, widthOf(item.itemId), taken);
+        if (out === null) return [];
+        taken.add(out);
+        return [{ itemId: item.itemId, out }];
+      });
+    },
+    [geo, rail, widthOf],
+  );
+
   const handleRemove = (itemId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     const remaining = localItems.filter((i) => i.itemId !== itemId);
     // Taking a pedal off can free the room a parked one was waiting for.
-    debouncedSave(applyLayout(layoutBoard(remaining, widthOf), remaining));
+    const next = applyLayout(layoutBoard(geo, remaining, widthOf), remaining);
+    const links = powerState.links.filter((link) => link.itemId !== itemId);
+    setLocalPower(links);
+    debouncedSave(next, links);
   };
 
   const handlePickerSelect = (inventoryItemId: string | null) => {
@@ -375,14 +753,35 @@ export const PedalboardView = ({
       localItems.some((i) => i.itemId === inventoryItemId)
     )
       return;
-    const spot = findFreeSpot(boardBoxes(), widthOf(inventoryItemId));
+    const spot = findFreeSpot(geo, boardBoxes(), widthOf(inventoryItemId));
     if (!spot) {
       announce(BOARD_FULL, setNotice);
       return;
     }
-    const next = [...localItems, { itemId: inventoryItemId, ...spot }];
+    const placement = { itemId: inventoryItemId, ...spot };
+    const next = [...localItems, placement];
     setLocalItems(next);
-    debouncedSave(next);
+
+    // A pedal that lands on the board gets a cable if the brick has an output
+    // left, because that is what the player meant by adding it. When it has
+    // none, the pedal still goes down — dark, and with the reason said out loud.
+    const refusal = refusalFor(supply, powerState);
+    const out = refusal
+      ? null
+      : pickOutput(
+          rail,
+          placement,
+          widthOf(inventoryItemId),
+          new Set(powerState.links.map((link) => link.out)),
+        );
+    const links =
+      out === null
+        ? powerState.links
+        : [...powerState.links, { itemId: inventoryItemId, out }];
+
+    setLocalPower(links);
+    debouncedSave(next, links);
+    if (refusal) announce(refusal, setNotice);
   };
 
   /**
@@ -396,10 +795,18 @@ export const PedalboardView = ({
    */
   const handleWireUp = () => {
     const layout = packInOrder(
-      wiredOrder(localItems, data.effectInventory),
+      geo,
+      wiredOrder(geo, localItems, data.effectInventory),
       widthOf,
     );
-    applyLayout(layout, localItems);
+    const next = applyLayout(layout, localItems);
+    savePower(
+      repatch(
+        next,
+        layout.overflow.map((item) => item.itemId),
+        powerState.links,
+      ),
+    );
     setNotice(null);
     if (layout.overflow.length > 0) {
       announce(
@@ -410,8 +817,15 @@ export const PedalboardView = ({
   };
 
   const handleTidy = () => {
-    const layout = tidyBoard(localItems, widthOf);
-    applyLayout(layout, localItems);
+    const layout = tidyBoard(geo, localItems, widthOf);
+    const next = applyLayout(layout, localItems);
+    savePower(
+      repatch(
+        next,
+        layout.overflow.map((item) => item.itemId),
+        powerState.links,
+      ),
+    );
     if (layout.overflow.length > 0) {
       const count = layout.overflow.length;
       announce(
@@ -429,23 +843,94 @@ export const PedalboardView = ({
   };
 
   const occupiedIds = localItems.map((i) => i.itemId);
-  const boardItems = localItems.filter((i) => !overflowIds.includes(i.itemId));
   const overflowItems = localItems.filter((i) =>
     overflowIds.includes(i.itemId),
   );
 
+  /** Everything with a cable in the brick — and, on a legacy board, everything. */
+  const hasPower = useCallback(
+    (itemId: string) =>
+      localPower === null || powerState.poweredIds.has(itemId),
+    [localPower, powerState],
+  );
+
   // Scored off the *live* board rather than the saved one, so the panel and the
-  // cable move under the player's hand instead of 600ms after it. Parked pedals
-  // are included because the server counts them too — what the panel promises
-  // has to be what a session pays.
+  // cable move under the player's hand instead of 600ms after it. Only pedals
+  // with power are in it: a dead pedal is a box the signal walks through, so it
+  // neither earns a cable's Fame nor is blamed for one — which is what the
+  // report API pays on too.
   const verdict = useMemo(
-    () => evaluateChain(readChainNodes(localItems, data.effectInventory)),
-    [localItems, data.effectInventory],
+    () =>
+      evaluateChain(
+        readChainNodes(
+          geo,
+          localItems,
+          data.effectInventory,
+          localPower === null ? undefined : hasPower,
+        ),
+      ),
+    [geo, localItems, data.effectInventory, localPower, hasPower],
   );
   const isOnBoard = useCallback(
     (itemId: string) => !overflowIds.includes(itemId),
     [overflowIds],
   );
+
+  // Where every DC cable begins and ends, and the rest of each row, so a run
+  // climbing to the top row can pick a gap between two pedals to climb through.
+  const patched: PoweredPedal[] = powerState.links.flatMap((link) => {
+    const item = boardItems.find((i) => i.itemId === link.itemId);
+    if (!item) return [];
+    const wPct = widthOf(link.itemId);
+    return [
+      {
+        itemId: link.itemId,
+        out: link.out,
+        row: rowIndexOf(geo, item.yPct),
+        jack: dcJackAt(geo, item.xPct, item.yPct, wPct, dcOf(link.itemId)),
+        left: (item.xPct / 100) * geo.viewW,
+        right: ((item.xPct + wPct) / 100) * geo.viewW,
+      },
+    ];
+  });
+
+  const rowSpans = boardItems.reduce<Record<number, RowSpan[]>>((acc, item) => {
+    const row = rowIndexOf(geo, item.yPct);
+    const wPct = widthOf(item.itemId);
+    (acc[row] ??= []).push({
+      left: (item.xPct / 100) * geo.viewW,
+      right: ((item.xPct + wPct) / 100) * geo.viewW,
+    });
+    return acc;
+  }, {});
+
+  // The loose end of a cable being dragged out of the brick: which socket it is
+  // hanging from, what it is over, and whether the brick can carry it.
+  const patchTarget = patch && !patch.armed ? pedalUnder(patch.to) : null;
+  const patchFree = rail.sockets.filter(
+    (socket) => !powerState.links.some((link) => link.out === socket.index),
+  );
+  const patchSocket =
+    patch && patchFree.length > 0
+      ? patchTarget && !powerState.poweredIds.has(patchTarget.itemId)
+        ? rail.sockets[
+            pickOutput(
+              rail,
+              patchTarget,
+              widthOf(patchTarget.itemId),
+              new Set(powerState.links.map((link) => link.out)),
+            ) ?? patchFree[0].index
+          ]
+        : patchFree.reduce((best, socket) =>
+            Math.abs(socket.x - patch.to.x) < Math.abs(best.x - patch.to.x)
+              ? socket
+              : best,
+          )
+      : null;
+  const patchAllowed =
+    patchTarget !== null && !powerState.poweredIds.has(patchTarget.itemId);
+
+  const unpoweredNames = powerState.unpoweredIds.map(nameOf);
 
   // The one moment the whole system exists for: say it out loud, once, on the
   // transition — not every render the board happens to be right.
@@ -472,41 +957,79 @@ export const PedalboardView = ({
     wPct: widthOf(i.itemId),
   }));
   const canFit = (itemId: string) =>
-    findFreeSpot(occupancy, widthOf(itemId)) !== null;
+    findFreeSpot(geo, occupancy, widthOf(itemId)) !== null;
+
+  // Filling every output the brick still has saves a player eight drags — but
+  // only offer it when it would actually do something.
+  const canPatch =
+    powerState.outputsFree > 0 && powerState.unpoweredIds.length > 0;
 
   return (
     <>
-      {/* What the wiring below is worth, and how to fix it. */}
-      <div className='mb-5'>
-        <SignalPathPanel
-          verdict={verdict}
-          onWireUp={boardItems.length > 1 ? handleWireUp : undefined}
-        />
-      </div>
+      <SectionHeading title='Pedalboard' />
 
-      {/* Board controls live off the surface so they never sit under a pedal. */}
-      <div className='mb-3 flex flex-wrap items-center justify-end gap-x-3 gap-y-2'>
+      {/* What the wiring is worth, and whether the brick has a hole left. */}
+      {boardItems.length > 0 && (
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+          <SignalPathPanel verdict={verdict} />
+          <PowerPanel
+            supply={supply}
+            state={powerState}
+            unpowered={unpoweredNames}
+          />
+        </div>
+      )}
+
+      {/* Every button the board has, on the board's own doorstep: the four that
+          rearrange it, and the two that buy it more room. Directly above the
+          case, because each one is answering something the deck below is
+          already showing. */}
+      <div className='flex flex-wrap items-center justify-end gap-2'>
         {notice && (
           <p className='mr-auto flex items-center gap-1.5 text-[11px] font-semibold text-amber-400'>
             <AlertTriangle size={13} strokeWidth={2.5} className='shrink-0' />
             {notice}
           </p>
         )}
+
+        {verdict.tip !== null && boardItems.length > 1 && (
+          <button
+            onClick={handleWireUp}
+            className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
+            title='Lay the whole board out in the order the craft asks for'>
+            <Zap size={12} strokeWidth={2.5} />
+            Wire it up
+          </button>
+        )}
+        {canPatch && (
+          <button
+            onClick={() =>
+              savePower(autoPatch(rail, boardItems, powerState.links, widthOf))
+            }
+            className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
+            title='Plug in everything the brick still has a hole for'>
+            <Plug size={12} strokeWidth={2.5} />
+            Patch power
+          </button>
+        )}
         {boardItems.length > 1 && (
           <button
             onClick={handleTidy}
-            className='flex items-center gap-1.5 rounded bg-zinc-800/60 px-3 py-1.5 text-[9px] font-black capitalize tracking-[0.2em] text-zinc-400 transition-colors hover:bg-zinc-700/70 hover:text-white'
+            className={RIG_BUTTON}
             title='Line every pedal up in rows'>
-            <LayoutGrid size={10} strokeWidth={2.5} />
-            Tidy Up
+            <LayoutGrid size={12} strokeWidth={2.5} />
+            Tidy up
           </button>
         )}
-        <button
-          onClick={() => setShowPicker(true)}
-          className='flex items-center gap-1.5 rounded bg-zinc-800/60 px-3 py-1.5 text-[9px] font-black capitalize tracking-[0.2em] text-zinc-300 transition-colors hover:bg-zinc-700/70 hover:text-white'>
-          <Plus size={10} strokeWidth={2.5} />
-          Add Pedal
+        <button onClick={() => setShowPicker(true)} className={RIG_BUTTON}>
+          <Plus size={12} strokeWidth={2.5} />
+          Add pedal
         </button>
+
+        {/* Set a little apart from the rest, because these two spend Fame. */}
+        <div className='flex flex-wrap items-center gap-2 sm:ml-3'>
+          <RigHardwarePanel rig={data.rig} fame={fame} />
+        </div>
       </div>
 
       {/* Case outer shell */}
@@ -560,12 +1083,41 @@ export const PedalboardView = ({
           </div>
         </div>
 
+        {/* The supply, racked on the case above the deck. Its cables carry on
+            into the board below — see `PowerLoom` for the seam. */}
+        <div
+          className='relative w-full'
+          style={{ paddingTop: `${railPaddingPct(geo)}%` }}>
+          <PowerRail
+            rail={rail}
+            used={new Set(patched.map((pedal) => pedal.out))}
+            pending={
+              patch && !patch.armed ? (patchSocket?.index ?? null) : null
+            }
+          />
+          {/* The brick is the grab handle: a cable is dragged out of it and
+              dropped on the pedal it feeds. */}
+          <div
+            onPointerDown={handleBrickPointerDown}
+            title={`${supply.name} — drag a cable onto a pedal to power it`}
+            className='absolute'
+            style={{
+              left: `${(rail.brick.x / geo.viewW) * 100}%`,
+              width: `${(rail.brick.w / geo.viewW) * 100}%`,
+              top: `${(rail.brick.y / RAIL_H) * 100}%`,
+              height: `${(rail.brick.h / RAIL_H) * 100}%`,
+              cursor: patch ? "grabbing" : "grab",
+              touchAction: "none",
+            }}
+          />
+        </div>
+
         {/* Board surface — perforated */}
         <div
           ref={boardRef}
           className='relative w-full overflow-hidden'
           style={{
-            aspectRatio: "16 / 7",
+            aspectRatio: `${geo.w} / ${geo.h}`,
             borderRadius: 4,
             backgroundImage:
               "radial-gradient(circle, #272727 1.4px, transparent 1.4px)",
@@ -585,7 +1137,37 @@ export const PedalboardView = ({
           <BoardJack kind='in' />
           <BoardJack kind='out' />
 
+          {/* Power first, under everything, the way it is on a real board. The
+              cable in the air picks up where the rail's stub left off, at the
+              deck's own top edge. */}
+          <PowerLoom
+            rail={rail}
+            patched={patched}
+            rowSpans={rowSpans}
+            dragging={
+              patch && !patch.armed && patchSocket
+                ? {
+                    from: { x: patchSocket.x, y: 0 },
+                    to: patch.to,
+                    allowed: patchAllowed,
+                  }
+                : null
+            }
+          />
+
+          {/* An armed brick waits for one tap anywhere: on a pedal it patches
+              it, anywhere else it puts the cable away. Touch has no hover to
+              drag with, and this is what it gets instead. */}
+          {patch?.armed && (
+            <div
+              onPointerDown={handleArmedTap}
+              className='absolute inset-0 z-[60]'
+              style={{ touchAction: "none" }}
+            />
+          )}
+
           <SignalCable
+            geo={geo}
             verdict={verdict}
             widthOf={widthOf}
             jacksOf={jacksOf}
@@ -607,6 +1189,11 @@ export const PedalboardView = ({
             const isDragging = dragging?.itemId === placement.itemId;
             const showCollision = isDragging && isColliding;
             const wPct = widthOf(placement.itemId);
+            const powered = hasPower(placement.itemId);
+            // The pedal the loose end of a cable is currently over. Amber when
+            // the brick can carry it, red when the drop would be refused — so
+            // the answer arrives before the cable is let go, not after.
+            const aimedAt = patchTarget?.itemId === placement.itemId;
 
             return (
               <div
@@ -626,14 +1213,25 @@ export const PedalboardView = ({
                   left: `${placement.xPct}%`,
                   top: `${placement.yPct}%`,
                   width: `${wPct}%`,
-                  height: `${PEDAL_H_PCT}%`,
+                  height: `${geo.pedalHPct}%`,
                   zIndex: isDragging ? 50 : 2,
                   cursor: isDragging ? "grabbing" : "grab",
                   filter: showCollision
                     ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 16px rgba(220,38,38,0.9))`
                     : isDragging
                       ? `drop-shadow(0 18px 32px rgba(0,0,0,0.98)) drop-shadow(0 0 14px ${rs.baseColor}70)`
-                      : `drop-shadow(0 6px 12px rgba(0,0,0,0.9)) drop-shadow(0 2px 4px rgba(0,0,0,0.7))`,
+                      : aimedAt
+                        ? `drop-shadow(0 6px 12px rgba(0,0,0,0.9)) drop-shadow(0 0 14px ${
+                            patchAllowed
+                              ? "rgba(245,158,11,0.85)"
+                              : "rgba(248,113,113,0.85)"
+                          })`
+                        : // An unpowered pedal is off. Not dimmed to say "you
+                          // cannot have this" — dimmed because there is no
+                          // current in it, which is also why its LED is out.
+                          `drop-shadow(0 6px 12px rgba(0,0,0,0.9)) drop-shadow(0 2px 4px rgba(0,0,0,0.7))${
+                            powered ? "" : " grayscale(0.7) brightness(0.55)"
+                          }`,
                   transform: isDragging
                     ? "scale(1.07) translateY(-6px)"
                     : "scale(1)",
@@ -665,16 +1263,49 @@ export const PedalboardView = ({
                     );
                   }}
                 />
-                {/* LED indicator */}
+                {/* LED indicator — out when nothing is feeding it. */}
                 <div
-                  className='absolute bottom-[10%] left-1/2 -translate-x-1/2 rounded-full'
+                  className='absolute bottom-[10%] left-1/2 -translate-x-1/2 rounded-full transition-colors'
                   style={{
                     width: 5,
                     height: 5,
-                    backgroundColor: rs.baseColor,
-                    boxShadow: `0 0 6px 2px ${rs.baseColor}90`,
+                    backgroundColor: powered ? rs.baseColor : "#1c1c1f",
+                    boxShadow: powered
+                      ? `0 0 6px 2px ${rs.baseColor}90`
+                      : "inset 0 1px 1px rgba(0,0,0,0.9)",
                   }}
                 />
+                {/* Pull the DC cable out. It stands over the pedal's own
+                    inlet, so it reads as the plug it removes rather than as
+                    another button in the corner — and it is a whole control
+                    wide, which the drawn plug never could be. */}
+                {powered && (
+                  <button
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      unplug(placement.itemId);
+                    }}
+                    aria-label={`Unplug ${effect.name}`}
+                    title={`Unplug ${effect.name}`}
+                    className={`absolute z-10 flex h-[30px] w-[30px] -translate-x-1/2 items-center justify-center rounded-full bg-black/85 text-zinc-300 transition-opacity hover:text-amber-300 ${
+                      // No hover on a touch screen, so there it simply stays up.
+                      onShowCard
+                        ? "opacity-90"
+                        : "opacity-0 group-hover:opacity-100"
+                    }`}
+                    style={{
+                      left: `${dcOf(placement.itemId).x * 100}%`,
+                      // Straddling the edge rather than floating clear of it:
+                      // a narrow board leaves only a few pixels of margin above
+                      // the top row, and the deck clips whatever spills out.
+                      top: -11,
+                    }}>
+                    <Unplug size={15} strokeWidth={2.5} />
+                  </button>
+                )}
                 {/* Remove */}
                 <button
                   onMouseDown={(e) => e.stopPropagation()}

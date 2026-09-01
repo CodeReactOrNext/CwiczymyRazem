@@ -115,11 +115,11 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: AudioLines,
     label: "Sync Backing Track to Tablature",
     kind: "feature",
-    inProgress: true,
+    done: true,
     description:
       "Backing tracks for songs synced to the tab, so you can play along in time without hunting for the beat.",
   },
-  { id: "t69", goal: 69, icon: Target, label: "+4 New Exercises", kind: "content" },
+  { id: "t69", goal: 69, icon: Target, label: "+4 New Exercises", kind: "content", done: true },
   {
     id: "t79",
     goal: 79,
@@ -145,6 +145,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: Gauge,
     label: "Pedalboard Power Cap",
     kind: "feature",
+    done: true,
     description: "Your pedalboard has a power limit, so upgrade it if you want to run stronger effects.",
   },
   {

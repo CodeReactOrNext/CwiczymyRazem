@@ -41,7 +41,8 @@ import type {
   PedalboardPlacement,
   RigSetup,
 } from "../types/arsenal.types";
-import { inChainOrder } from "../utils/pedalboardLayout";
+import type { BoardGeometry } from "../utils/pedalboardLayout";
+import { geometryOf, inChainOrder } from "../utils/pedalboardLayout";
 import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "./effectDefinitions";
 
 /** Fame/h for every cable that runs into the pedal that belongs next. */
@@ -195,7 +196,13 @@ export interface ChainLink {
   ok: boolean;
 }
 
-export type ChainTier = "empty" | "single" | "book" | "one-off" | "rough" | "spaghetti";
+export type ChainTier =
+  | "empty"
+  | "single"
+  | "book"
+  | "one-off"
+  | "rough"
+  | "spaghetti";
 
 export interface ChainVerdict {
   /** Every boarded pedal, in signal order. */
@@ -260,12 +267,22 @@ const stageLabel = (stage: number) => SIGNAL_STAGES[stage]?.label ?? "";
  *
  * Pedals whose definition has gone missing are dropped rather than scored: a
  * retired effect id must not turn a good board into a broken one.
+ *
+ * So are pedals `powered` says have no cable to the brick. A pedal with no power
+ * is a box the signal walks straight through — it colours nothing, so it can
+ * neither earn a cable's Fame nor be blamed for one. That is what gives the
+ * brick's budget teeth: a board with more pedals than current is a board with
+ * pedals that are not in the chain at all. Omitting the predicate powers
+ * everything, which is what the read-only views and the older tests want.
  */
 export const readChainNodes = (
+  geo: BoardGeometry,
   items: PedalboardPlacement[] | null | undefined,
   effectInventory: EffectInventoryItem[] | null | undefined,
+  powered?: (itemId: string) => boolean,
 ): ChainNode[] =>
-  inChainOrder(Array.isArray(items) ? items : []).flatMap((placement) => {
+  inChainOrder(geo, Array.isArray(items) ? items : []).flatMap((placement) => {
+    if (powered && !powered(placement.itemId)) return [];
     const item = effectInventory?.find((e) => e.id === placement.itemId);
     const def = item ? EFFECTS_BY_ID.get(item.effectId) : undefined;
     if (!def) return [];
@@ -311,7 +328,8 @@ export const evaluateChain = (nodes: ChainNode[]): ChainVerdict => {
 
   const wrongLinks = links.filter((link) => !link.ok).length;
   const okLinks = links.length - wrongLinks;
-  const flawless = wrongLinks === 0 && nodes.length >= CHAIN_FLAWLESS_MIN_PEDALS;
+  const flawless =
+    wrongLinks === 0 && nodes.length >= CHAIN_FLAWLESS_MIN_PEDALS;
   const rate = round1(
     okLinks * CHAIN_LINK_FAME + (flawless ? CHAIN_FLAWLESS_FAME : 0),
   );
@@ -345,12 +363,36 @@ type ArsenalLike = Pick<
   "rig" | "effectInventory"
 >;
 
+/**
+ * Which of a stored rig's pedals have power.
+ *
+ * `undefined` — a board saved before the brick existed — powers everything, so
+ * a migration can never quietly cost somebody a wiring bonus they had already
+ * earned. An array, even an empty one, is taken at its word: that board has been
+ * patched, and whatever is not on it is off.
+ */
+const poweredIn = (
+  arsenal: Partial<ArsenalLike> | null | undefined,
+): ((itemId: string) => boolean) | undefined => {
+  const links = arsenal?.rig?.power;
+  if (!Array.isArray(links)) return undefined;
+  const powered = new Set(links.map((link) => link.itemId));
+  return (itemId: string) => powered.has(itemId);
+};
+
 /** The whole verdict for a stored arsenal — the shape both the API and UI read. */
 export const getChainVerdict = (
   arsenal: Partial<ArsenalLike> | null | undefined,
 ): ChainVerdict =>
   evaluateChain(
-    readChainNodes(arsenal?.rig?.pedalboardItems, arsenal?.effectInventory),
+    readChainNodes(
+      // The case the board is stored on decides which pedals count as one row,
+      // and therefore what order the chain is read in.
+      geometryOf(arsenal?.rig?.boardTier),
+      arsenal?.rig?.pedalboardItems,
+      arsenal?.effectInventory,
+      poweredIn(arsenal),
+    ),
   );
 
 /** Fame/h the stored board's wiring is worth. What the report API pays on. */
@@ -368,12 +410,13 @@ export const getChainFameRate = (
  * move.
  */
 export const wiredOrder = (
+  geo: BoardGeometry,
   items: PedalboardPlacement[] | null | undefined,
   effectInventory: EffectInventoryItem[] | null | undefined,
 ): PedalboardPlacement[] => {
   const source = Array.isArray(items) ? items : [];
   const stageOf = new Map(
-    readChainNodes(source, effectInventory).map((node) => [
+    readChainNodes(geo, source, effectInventory).map((node) => [
       node.itemId,
       // Unstaged pedals go to the back rather than to the front, where they
       // would push a Tuner out of the one position it has to hold.
@@ -381,7 +424,7 @@ export const wiredOrder = (
     ]),
   );
 
-  return inChainOrder(source).sort(
+  return inChainOrder(geo, source).sort(
     (a, b) =>
       (stageOf.get(a.itemId) ?? SIGNAL_STAGES.length) -
       (stageOf.get(b.itemId) ?? SIGNAL_STAGES.length),

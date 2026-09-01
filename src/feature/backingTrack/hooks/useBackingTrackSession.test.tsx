@@ -5,16 +5,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useBackingTrackSession } from "./useBackingTrackSession";
 
-// The mode ships behind a flag, so the suite has to say which side of it each
-// case is on. A getter rather than a fixed value: the flag is read on every
-// render, so a test can move it without re-importing the hook.
-const flags = vi.hoisted(() => ({ backingTrack: true }));
-vi.mock("constants/featureFlags", () => ({
-  get IS_BACKING_TRACK_ENABLED() {
-    return flags.backingTrack;
-  },
-}));
-
 // The Firestore side is exercised through its own service; here it only has to
 // exist so mounting the hook doesn't drag a real client in.
 vi.mock("utils/firebase/client/firebase.utils", () => ({ db: {} }));
@@ -35,7 +25,6 @@ const baseOptions = {
 };
 
 beforeEach(() => {
-  flags.backingTrack = true;
   localStorage.clear();
   delete (window as { backingTracks?: unknown }).backingTracks;
 });
@@ -71,21 +60,6 @@ describe("useBackingTrackSession", () => {
 
     expect(result.current.enabled).toBe(false);
     expect(result.current.source).toBe("off");
-  });
-
-  it("stays idle while the mode is flagged off, song or no song", () => {
-    flags.backingTrack = false;
-    stubDesktopBridge();
-    const bridge = (window as unknown as { backingTracks: { listTracks: () => void } })
-      .backingTracks;
-
-    const { result } = renderHook(() => useBackingTrackSession(baseOptions));
-
-    expect(result.current.enabled).toBe(false);
-    expect(result.current.source).toBe("off");
-    expect(result.current.stems).toEqual([]);
-    // Nothing is read on the way past either — not even the track library.
-    expect(bridge.listTracks).not.toHaveBeenCalled();
   });
 
   it("seeds the recording tempo from the score rather than a hardcoded default", () => {

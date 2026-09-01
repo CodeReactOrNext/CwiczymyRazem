@@ -29,6 +29,8 @@
     "postinstall": "node patch-aubio.js",
     "backfill-rig-level": "vitest run --mode backfill scripts/backfillRigLevel.test.ts",
     "grant-scrap-parts": "vitest run --mode grantparts scripts/grantScrapParts.test.ts",
+    "grant-fame": "vitest run --mode grantfame scripts/grantFame.test.ts",
+    "reset-pedalboard": "vitest run --mode reset-pedalboard scripts/resetPedalboard.test.ts",
     "grant-tokens": "vitest run --mode granttokens scripts/grantSupporterTokens.test.ts",
     "grant-all-tokens": "vitest run --mode grant-all-tokens scripts/grantAllSupportersTokens.test.ts",
     "clear-boards": "vitest run --mode clear-boards scripts/clearSupporterBoards.test.ts",

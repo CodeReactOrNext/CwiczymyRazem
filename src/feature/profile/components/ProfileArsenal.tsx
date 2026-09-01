@@ -2,6 +2,8 @@ import { CursorTooltip } from "components/UI/CursorTooltip/CursorTooltip";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
+import type { PoweredPedal } from "feature/arsenal/components/Rig/PowerLoom";
+import { PowerLoom, PowerRail } from "feature/arsenal/components/Rig/PowerLoom";
 import {
   BoardJack,
   SignalCable,
@@ -12,6 +14,8 @@ import {
   getEffectiveRarity,
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
+import { readPowerState } from "feature/arsenal/data/powerSupply";
+import { boardTierOf, supplyTierOf } from "feature/arsenal/data/rigHardware";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import {
   CHAIN_TIERS,
@@ -28,12 +32,21 @@ import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // Layout is shared with the editable board (PedalboardView) so a pedal sits in
 // exactly the same place here as it does in the owner's arsenal — including the
 // repair of boards saved before pedals were kept from overlapping.
+import type { BoardGeometry } from "feature/arsenal/utils/pedalboardLayout";
 import {
+  createDcResolver,
   createJackResolver,
   createWidthResolver,
+  geometryFor,
   layoutBoard,
-  PEDAL_H_PCT,
+  rowIndexOf,
 } from "feature/arsenal/utils/pedalboardLayout";
+import type { RowSpan } from "feature/arsenal/utils/powerLayout";
+import {
+  dcJackAt,
+  railFor,
+  railPaddingPct,
+} from "feature/arsenal/utils/powerLayout";
 import { doc, getDoc } from "firebase/firestore";
 import { Guitar, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -191,17 +204,23 @@ const GuitarSlotReadonly = ({
 };
 
 interface PedalReadonlyProps {
+  /** The case it is standing on, for the height a pedal takes on it. */
+  geo: BoardGeometry;
   placement: PedalboardPlacement;
   /** Width in board-%, from the shared layout so both views agree. */
   wPct: number;
+  /** False when nothing on the brick is feeding it, so it is drawn switched off. */
+  powered: boolean;
   effectInventory: ArsenalUserData["effectInventory"];
   onHover: (e: React.MouseEvent, data: TooltipData | null) => void;
   onSelect: (content: React.ReactNode) => void;
 }
 
 const PedalReadonly = ({
+  geo,
   placement,
   wPct,
+  powered,
   effectInventory,
   onHover,
   onSelect,
@@ -233,12 +252,14 @@ const PedalReadonly = ({
         left: `${placement.xPct}%`,
         top: `${placement.yPct}%`,
         width: `${wPct}%`,
-        height: `${PEDAL_H_PCT}%`,
+        height: `${geo.pedalHPct}%`,
         // Above the loom, the way the editor's pedals are. Without it the
         // cable's own `z-index: 1` wins and every plug is painted across the
         // enclosure it is supposed to disappear into.
         zIndex: 2,
-        filter: `drop-shadow(0 5px 10px rgba(0,0,0,0.85))`,
+        filter: `drop-shadow(0 5px 10px rgba(0,0,0,0.85))${
+          powered ? "" : " grayscale(0.7) brightness(0.55)"
+        }`,
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => onHover(null as any, null)}
@@ -254,8 +275,10 @@ const PedalReadonly = ({
         style={{
           width: 5,
           height: 5,
-          backgroundColor: rs.baseColor,
-          boxShadow: `0 0 6px 2px ${rs.baseColor}90`,
+          backgroundColor: powered ? rs.baseColor : "#1c1c1f",
+          boxShadow: powered
+            ? `0 0 6px 2px ${rs.baseColor}90`
+            : "inset 0 1px 1px rgba(0,0,0,0.9)",
         }}
       />
     </div>
@@ -289,17 +312,69 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
   const hasGuitars = rig?.guitarSlots?.some(Boolean) ?? false;
   if (!hasPedals && !hasGuitars) return null;
 
+  // The case and the brick this player has bought. A visitor sees the hardware
+  // its owner actually owns — a small board really is drawn small, which is
+  // half of what makes a big one worth having.
+  const geo = geometryFor(boardTierOf(rig?.boardTier));
+  const supply = supplyTierOf(rig?.supplyTier);
+  const rail = railFor(geo, supply);
+
   // The same layout pass the editor runs, so a board stored with pedals piled
   // on top of each other still reads cleanly here.
-  const widthOf = createWidthResolver(effectInventory ?? []);
+  const widthOf = createWidthResolver(geo, effectInventory ?? []);
   const jacksOf = createJackResolver(effectInventory ?? []);
-  const board = layoutBoard(rig?.pedalboardItems ?? [], widthOf);
+  const dcOf = createDcResolver(jacksOf);
+  const board = layoutBoard(geo, rig?.pedalboardItems ?? [], widthOf);
+
+  // What the owner's brick is carrying. A board saved before the brick existed
+  // has no links at all, and is read as fully powered — the same rule the owner's
+  // own board and the report API follow, so all three agree about one rig.
+  const legacyPower = !Array.isArray(rig?.power);
+  const power = readPowerState(supply, board.placed, rig?.power);
+  const isPowered = (itemId: string) =>
+    legacyPower || power.poweredIds.has(itemId);
 
   // The same verdict the owner sees on their own board, so a visitor can tell a
   // properly wired rig from a pile of pedals — and so can its owner, from the
   // outside, which is half of why anybody bothers to tidy one.
   const verdict = evaluateChain(
-    readChainNodes(board.placed, effectInventory ?? []),
+    readChainNodes(
+      geo,
+      board.placed,
+      effectInventory ?? [],
+      legacyPower ? undefined : isPowered,
+    ),
+  );
+
+  // Every DC cable, and the rest of each row for the runs that have to climb
+  // through a gap to reach the top one.
+  const patched: PoweredPedal[] = power.links.flatMap((link) => {
+    const item = board.placed.find((i) => i.itemId === link.itemId);
+    if (!item) return [];
+    const wPct = widthOf(link.itemId);
+    return [
+      {
+        itemId: link.itemId,
+        out: link.out,
+        row: rowIndexOf(geo, item.yPct),
+        jack: dcJackAt(geo, item.xPct, item.yPct, wPct, dcOf(link.itemId)),
+        left: (item.xPct / 100) * geo.viewW,
+        right: ((item.xPct + wPct) / 100) * geo.viewW,
+      },
+    ];
+  });
+
+  const rowSpans = board.placed.reduce<Record<number, RowSpan[]>>(
+    (acc, item) => {
+      const row = rowIndexOf(geo, item.yPct);
+      const wPct = widthOf(item.itemId);
+      (acc[row] ??= []).push({
+        left: (item.xPct / 100) * geo.viewW,
+        right: ((item.xPct + wPct) / 100) * geo.viewW,
+      });
+      return acc;
+    },
+    {},
   );
   const chainTier = CHAIN_TIERS[verdict.tier];
 
@@ -425,11 +500,23 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
               </div>
             </div>
 
+            {/* The owner's supply, racked above the deck the way it is on
+                their own board. Dead here: no LEDs, nothing to plug in. */}
+            <div
+              className='relative w-full'
+              style={{ paddingTop: `${railPaddingPct(geo)}%` }}>
+              <PowerRail
+                rail={rail}
+                used={new Set(patched.map((pedal) => pedal.out))}
+                live={false}
+              />
+            </div>
+
             {/* Board surface */}
             <div
               className='relative w-full overflow-hidden'
               style={{
-                aspectRatio: "16 / 7",
+                aspectRatio: `${geo.w} / ${geo.h}`,
                 borderRadius: 6,
                 backgroundImage:
                   "radial-gradient(circle, #272727 1.4px, transparent 1.4px)",
@@ -442,9 +529,19 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
               <BoardJack kind='in' />
               <BoardJack kind='out' />
 
+              {/* Power under everything, picking up where the rail's stubs
+                  left off at the deck's top edge. */}
+              <PowerLoom
+                rail={rail}
+                patched={patched}
+                rowSpans={rowSpans}
+                live={false}
+              />
+
               {/* Black loom here, colours only on the owner's own board in the
                   Arsenal: a visitor cannot rewire what they are looking at. */}
               <SignalCable
+                geo={geo}
                 verdict={verdict}
                 widthOf={widthOf}
                 jacksOf={jacksOf}
@@ -454,9 +551,11 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
               {/* Pedals */}
               {board.placed.map((placement) => (
                 <PedalReadonly
+                  geo={geo}
                   key={placement.itemId}
                   placement={placement}
                   wPct={widthOf(placement.itemId)}
+                  powered={isPowered(placement.itemId)}
                   effectInventory={effectInventory ?? []}
                   onHover={handleTooltip}
                   onSelect={setPinnedCard}

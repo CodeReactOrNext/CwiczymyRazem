@@ -557,9 +557,11 @@ export const StashInventory = ({
 
   const handleRemoveFromBoard = (itemId: string) => {
     closeDetail();
-    savePedalboard(
-      (rig.pedalboardItems ?? []).filter((p) => p.itemId !== itemId),
-    );
+    savePedalboard({
+      items: (rig.pedalboardItems ?? []).filter((p) => p.itemId !== itemId),
+      // The pedal is off the board, so its DC cable comes out with it.
+      power: (rig.power ?? []).filter((link) => link.itemId !== itemId),
+    });
   };
 
   const confirmSell = () => {

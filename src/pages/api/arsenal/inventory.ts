@@ -83,6 +83,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           : DEFAULT_RIG.pedalboardItems,
         ampHeadId: storedRig?.ampHeadId ?? null,
         ampId: storedRig?.ampId ?? null,
+        // The case the player has paid for. Dropping it here made the Rig read
+        // every account as a fresh one — bottom-rung case — while a public
+        // profile, which reads the document straight, drew the board its owner
+        // actually bought.
+        boardTier: storedRig?.boardTier ?? DEFAULT_RIG.boardTier,
       },
       effectInventory,
       dexGuitars: [...discoveredGuitars],

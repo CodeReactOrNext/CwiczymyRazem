@@ -1,4 +1,6 @@
 import { EFFECTS_BY_ID } from "../data/effectDefinitions";
+import type { BoardTier } from "../data/rigHardware";
+import { boardTierOf } from "../data/rigHardware";
 import type {
   EffectInventoryItem,
   EffectJackLayout,
@@ -10,21 +12,106 @@ import type {
  * read-only one on a public profile, so a pedal lands in the same spot in both.
  *
  * Everything is in board percentages: `xPct`/`yPct` are a pedal's top-left
- * corner on a surface that always renders at a 16/7 aspect ratio.
+ * corner on the surface, whatever size that surface is.
+ *
+ * Percentages, and not units, because that is what is stored: a board saved on
+ * one case and reopened on another keeps its proportions rather than its inches.
+ * What changes with the case is the *scale* — a pedal is a fixed number of board
+ * units tall (`PEDAL_H`) whatever it stands on, so a wider case turns that into
+ * a smaller percentage, and more pedals fit. Which is the whole mechanic: the
+ * pedals never shrink, the case grows around them.
+ *
+ * So nothing here is a constant any more. Every measurement is derived from the
+ * case the player owns, by `geometryFor`, and handed to the functions that need
+ * it. See `data/rigHardware` for the ladder itself.
  */
 
-/** The board surface aspect (`aspectRatio: "16 / 7"` in both views). */
-export const BOARD_W = 16;
-export const BOARD_H = 7;
+/**
+ * A pedal's own height, in board units. The one fixed dimension in the system —
+ * every other number here is measured against it.
+ *
+ * Its value is the one the original single board was drawn at (42% of a 16 × 7
+ * deck), so the bottom rung of the case ladder renders pixel for pixel the board
+ * everybody already had before the ladder existed.
+ */
+export const PEDAL_H = 2.94;
 
-/** Every pedal shares this on-board height; its width follows the image. */
-export const PEDAL_H_PCT = 42;
+/** Case edge to first pedal, and the strip left above and below each row. */
+const EDGE = 0.48;
+const MARGIN_Y = 0.385;
+
+/** The channel between two rows: where the cable to the row below runs. */
+const ROW_GAP = 0.35;
+
+/** Breathing room left between two pedals whenever the board places them. */
+const GAP = 0.24;
+
+export interface BoardGeometry {
+  tier: BoardTier;
+  /** The deck, in board units. */
+  w: number;
+  h: number;
+  rows: number;
+  /** …and in the units both looms draw in (`utils/cableGeometry`). */
+  viewW: number;
+  viewH: number;
+  /** A pedal's height as a share of this deck — its width follows the image. */
+  pedalHPct: number;
+  /** The top of each row, in board percent. */
+  rowYPct: number[];
+  edgePct: number;
+  gapPct: number;
+}
+
+/**
+ * The deck a case gives you, worked out from the one fixed dimension.
+ *
+ * Memoised on the tier, because this is read on every render of the board and
+ * every one of its cables, and because a stable object identity is what keeps
+ * the `useMemo`s downstream from re-running for a board that has not changed.
+ */
+const geometryCache = new Map<number, BoardGeometry>();
+
+export const geometryFor = (tier: BoardTier): BoardGeometry => {
+  const cached = geometryCache.get(tier.id);
+  if (cached) return cached;
+
+  const h = MARGIN_Y * 2 + tier.rows * PEDAL_H + (tier.rows - 1) * ROW_GAP;
+  const geometry: BoardGeometry = {
+    tier,
+    w: tier.w,
+    h,
+    rows: tier.rows,
+    viewW: tier.w * 10,
+    viewH: h * 10,
+    pedalHPct: (PEDAL_H / h) * 100,
+    rowYPct: Array.from(
+      { length: tier.rows },
+      (_, row) => ((MARGIN_Y + row * (PEDAL_H + ROW_GAP)) / h) * 100,
+    ),
+    edgePct: (EDGE / tier.w) * 100,
+    gapPct: (GAP / tier.w) * 100,
+  };
+  geometryCache.set(tier.id, geometry);
+  return geometry;
+};
+
+/** The deck a stored tier index means. The entry point for everything else. */
+export const geometryOf = (storedTier?: number | null): BoardGeometry =>
+  geometryFor(boardTierOf(storedTier));
 
 /** Aspect used for an image we have no size for (a typical single pedal). */
 export const DEFAULT_ASPECT = 480 / 515;
 
-export const widthPctForAspect = (aspect: number) =>
-  PEDAL_H_PCT * (BOARD_H / BOARD_W) * aspect;
+/**
+ * What a pedal of this aspect takes across the deck, in board percent.
+ *
+ * Its real width is `PEDAL_H * aspect` whatever it stands on, so the share of
+ * the board it eats is that over the deck's width — the same pedal on a wider
+ * case is the same pedal, drawn smaller.
+ */
+export const widthPctForAspect = (geo: BoardGeometry, aspect: number) =>
+  ((PEDAL_H * aspect) / geo.w) * 100;
 
 /**
  * Intrinsic width/height of every pedal image in
@@ -64,15 +151,6 @@ export const EFFECT_IMAGE_ASPECT: Record<number | string, number> = {
   27: 263 / 440,
 };
 
-/** Keeps pedals off the case edge and clear of the two corner jacks. */
-const EDGE_PCT = 3;
-
-/** Breathing room left between pedals whenever the board places them itself. */
-const GAP_PCT = 1.5;
-
-/** Row tops — two rows of `PEDAL_H_PCT` is all a 16/7 board fits. */
-export const ROW_Y_PCT = [5, 52];
-
 /** How finely `findFreeSpot` walks a row looking for a gap. */
 const SCAN_STEP_PCT = 0.5;
 
@@ -88,25 +166,34 @@ export interface LayoutBox {
 /** Resolves a pedalboard placement to the width its pedal takes on the board. */
 export type WidthResolver = (itemId: string) => number;
 
-const boxesOverlap = (a: LayoutBox, b: LayoutBox, gap: number) =>
+const boxesOverlap = (
+  geo: BoardGeometry,
+  a: LayoutBox,
+  b: LayoutBox,
+  gap: number,
+) =>
   a.xPct < b.xPct + b.wPct + gap &&
   a.xPct + a.wPct + gap > b.xPct &&
-  a.yPct < b.yPct + PEDAL_H_PCT &&
-  a.yPct + PEDAL_H_PCT > b.yPct;
+  a.yPct < b.yPct + geo.pedalHPct &&
+  a.yPct + geo.pedalHPct > b.yPct;
 
 /**
  * Does `box` hit anything in `others`? `gap` is the clearance demanded on top
  * of the pedals' own footprints — zero when the player drags a pedal snug
  * against its neighbour, wider when the board picks a spot on its own.
  */
-export const collidesWithAny = (box: LayoutBox, others: LayoutBox[], gap = 0) =>
-  others.some((other) => boxesOverlap(box, other, gap));
+export const collidesWithAny = (
+  geo: BoardGeometry,
+  box: LayoutBox,
+  others: LayoutBox[],
+  gap = 0,
+) => others.some((other) => boxesOverlap(geo, box, other, gap));
 
-const isOnBoard = (box: LayoutBox) =>
+const isOnBoard = (geo: BoardGeometry, box: LayoutBox) =>
   box.xPct >= -EPSILON &&
   box.yPct >= -EPSILON &&
   box.xPct + box.wPct <= 100 + EPSILON &&
-  box.yPct + PEDAL_H_PCT <= 100 + EPSILON;
+  box.yPct + geo.pedalHPct <= 100 + EPSILON;
 
 /**
  * First spot in signal order where a `wPct`-wide pedal fits without touching
@@ -115,22 +202,53 @@ const isOnBoard = (box: LayoutBox) =>
  * `null` means the board is full.
  */
 export const findFreeSpot = (
+  geo: BoardGeometry,
   occupied: LayoutBox[],
   wPct: number,
 ): { xPct: number; yPct: number } | null => {
-  const startX = 100 - EDGE_PCT - wPct;
-  if (startX < EDGE_PCT) return null;
+  const startX = 100 - geo.edgePct - wPct;
+  if (startX < geo.edgePct) return null;
 
-  for (const yPct of ROW_Y_PCT) {
+  for (const yPct of geo.rowYPct) {
     for (let step = 0; ; step++) {
-      const xPct = Math.max(startX - step * SCAN_STEP_PCT, EDGE_PCT);
-      if (!collidesWithAny({ xPct, yPct, wPct }, occupied, GAP_PCT)) {
+      const xPct = Math.max(startX - step * SCAN_STEP_PCT, geo.edgePct);
+      if (!collidesWithAny(geo, { xPct, yPct, wPct }, occupied, geo.gapPct)) {
         return { xPct, yPct };
       }
-      if (xPct <= EDGE_PCT) break;
+      if (xPct <= geo.edgePct) break;
     }
   }
   return null;
+};
+
+/**
+ * How many ordinary pedals a case holds, packed as tight as the board itself
+ * would pack them.
+ *
+ * Counted by actually filling the thing rather than by dividing one number by
+ * another, so the figure on the shop card is the figure the board will honour —
+ * including the half-pedal of edge it will not use. Ordinary meaning
+ * `DEFAULT_ASPECT`: a board of wide enclosures holds fewer, and the card says
+ * "about", because it is a guide and not a promise.
+ *
+ * Cached per tier: the fill is cheap but not free, and the shop asks for all
+ * every rung on every render.
+ */
+const slotCache = new Map<number, number>();
+
+export const slotEstimate = (geo: BoardGeometry): number => {
+  const cached = slotCache.get(geo.tier.id);
+  if (cached !== undefined) return cached;
+
+  const wPct = widthPctForAspect(geo, DEFAULT_ASPECT);
+  const occupied: LayoutBox[] = [];
+  for (;;) {
+    const spot = findFreeSpot(geo, occupied, wPct);
+    if (!spot) break;
+    occupied.push({ ...spot, wPct });
+  }
+  slotCache.set(geo.tier.id, occupied.length);
+  return occupied.length;
 };
 
 /** A box that knows whose it is — what trading two pedals over has to name. */
@@ -149,6 +267,7 @@ const SLOT_ALIGNMENTS = [0, 0.5, 1];
  * pedal simply cannot be squeezed into a narrower neighbour's place.
  */
 const fitInSlot = (
+  geo: BoardGeometry,
   slot: LayoutBox,
   wPct: number,
   others: LayoutBox[],
@@ -158,7 +277,7 @@ const fitInSlot = (
       0,
       Math.min(100 - wPct, slot.xPct + (slot.wPct - wPct) * align),
     );
-    if (!collidesWithAny({ xPct, yPct: slot.yPct, wPct }, others)) {
+    if (!collidesWithAny(geo, { xPct, yPct: slot.yPct, wPct }, others)) {
       return { xPct, yPct: slot.yPct };
     }
   }
@@ -173,18 +292,19 @@ const fitInSlot = (
  * pedal has really covered the other one.
  */
 export const findSwapTarget = (
+  geo: BoardGeometry,
   dragged: LayoutBox,
   others: BoardBox[],
 ): BoardBox | null => {
   const xPct = dragged.xPct + dragged.wPct / 2;
-  const yPct = dragged.yPct + PEDAL_H_PCT / 2;
+  const yPct = dragged.yPct + geo.pedalHPct / 2;
   return (
     others.find(
       (box) =>
         xPct >= box.xPct &&
         xPct <= box.xPct + box.wPct &&
         yPct >= box.yPct &&
-        yPct <= box.yPct + PEDAL_H_PCT,
+        yPct <= box.yPct + geo.pedalHPct,
     ) ?? null
   );
 };
@@ -206,14 +326,15 @@ export interface SwapPlan {
  * the drag carries on as an ordinary move.
  */
 export const planSwap = (
+  geo: BoardGeometry,
   home: LayoutBox,
   target: BoardBox,
   others: LayoutBox[],
 ): SwapPlan | null => {
-  const targetSpot = fitInSlot(home, target.wPct, others);
+  const targetSpot = fitInSlot(geo, home, target.wPct, others);
   if (!targetSpot) return null;
 
-  const homeSpot = fitInSlot(target, home.wPct, [
+  const homeSpot = fitInSlot(geo, target, home.wPct, [
     ...others,
     { ...targetSpot, wPct: target.wPct },
   ]);
@@ -221,10 +342,12 @@ export const planSwap = (
 };
 
 /** Which row a stored `yPct` belongs to — used to read the board in order. */
-export const rowIndexOf = (yPct: number) => {
+export const rowIndexOf = (geo: BoardGeometry, yPct: number) => {
   let closest = 0;
-  for (let i = 1; i < ROW_Y_PCT.length; i++) {
-    if (Math.abs(yPct - ROW_Y_PCT[i]) < Math.abs(yPct - ROW_Y_PCT[closest])) {
+  for (let i = 1; i < geo.rowYPct.length; i++) {
+    if (
+      Math.abs(yPct - geo.rowYPct[i]) < Math.abs(yPct - geo.rowYPct[closest])
+    ) {
       closest = i;
     }
   }
@@ -240,9 +363,13 @@ export const rowIndexOf = (yPct: number) => {
  * act. `data/signalChain` judges the chain in this order, which is why
  * `tidyBoard` can straighten a board without ever rewiring it.
  */
-export const inChainOrder = (items: PedalboardPlacement[]) =>
+export const inChainOrder = (
+  geo: BoardGeometry,
+  items: PedalboardPlacement[],
+) =>
   [...items].sort(
-    (a, b) => rowIndexOf(a.yPct) - rowIndexOf(b.yPct) || b.xPct - a.xPct,
+    (a, b) =>
+      rowIndexOf(geo, a.yPct) - rowIndexOf(geo, b.yPct) || b.xPct - a.xPct,
   );
 
 export interface BoardLayout {
@@ -280,6 +407,7 @@ const buildLayout = (
  * room for at all comes back as `overflow` rather than being thrown away.
  */
 export const layoutBoard = (
+  geo: BoardGeometry,
   items: PedalboardPlacement[],
   widthOf: WidthResolver,
 ): BoardLayout => {
@@ -293,7 +421,7 @@ export const layoutBoard = (
       yPct: item.yPct,
       wPct: widthOf(item.itemId),
     };
-    if (isOnBoard(box) && !collidesWithAny(box, kept)) {
+    if (isOnBoard(geo, box) && !collidesWithAny(geo, box, kept)) {
       kept.push(box);
       placed.push(item);
     } else {
@@ -304,7 +432,7 @@ export const layoutBoard = (
   const overflow: PedalboardPlacement[] = [];
   for (const item of loose) {
     const wPct = widthOf(item.itemId);
-    const spot = findFreeSpot(kept, wPct);
+    const spot = findFreeSpot(geo, kept, wPct);
     if (!spot) {
       overflow.push(item);
       continue;
@@ -323,6 +451,7 @@ export const layoutBoard = (
  * neat rows out. Pedals past the last row come back as `overflow`.
  */
 export const packInOrder = (
+  geo: BoardGeometry,
   ordered: PedalboardPlacement[],
   widthOf: WidthResolver,
 ): BoardLayout => {
@@ -332,20 +461,20 @@ export const packInOrder = (
   // The cursor is the right-hand edge of the next pedal, because the chain
   // starts at the input jack in the top right and each pedal is laid down to
   // the left of the one before it.
-  let cursor = 100 - EDGE_PCT;
+  let cursor = 100 - geo.edgePct;
 
   for (const item of ordered) {
     const wPct = widthOf(item.itemId);
-    if (cursor - wPct < EDGE_PCT) {
+    if (cursor - wPct < geo.edgePct) {
       row += 1;
-      cursor = 100 - EDGE_PCT;
+      cursor = 100 - geo.edgePct;
     }
-    if (row >= ROW_Y_PCT.length || cursor - wPct < EDGE_PCT) {
+    if (row >= geo.rowYPct.length || cursor - wPct < geo.edgePct) {
       overflow.push(item);
       continue;
     }
-    placed.push({ ...item, xPct: cursor - wPct, yPct: ROW_Y_PCT[row] });
-    cursor -= wPct + GAP_PCT;
+    placed.push({ ...item, xPct: cursor - wPct, yPct: geo.rowYPct[row] });
+    cursor -= wPct + geo.gapPct;
   }
 
   return buildLayout(ordered, placed, overflow);
@@ -353,9 +482,10 @@ export const packInOrder = (
 
 /** Repacks the whole board into rows without changing the signal order. */
 export const tidyBoard = (
+  geo: BoardGeometry,
   items: PedalboardPlacement[],
   widthOf: WidthResolver,
-): BoardLayout => packInOrder(inChainOrder(items), widthOf);
+): BoardLayout => packInOrder(geo, inChainOrder(geo, items), widthOf);
 
 /**
  * Width lookup for a board, in the units `layoutBoard` and friends work in.
@@ -363,6 +493,7 @@ export const tidyBoard = (
  * over the static table so a swapped-out image corrects itself.
  */
 export const createWidthResolver = (
+  geo: BoardGeometry,
   effectInventory: EffectInventoryItem[],
   measured: Record<number | string, number> = {},
 ): WidthResolver => {
@@ -379,7 +510,7 @@ export const createWidthResolver = (
         DEFAULT_ASPECT)
       : DEFAULT_ASPECT;
 
-    const width = widthPctForAspect(aspect);
+    const width = widthPctForAspect(geo, aspect);
     cache.set(itemId, width);
     return width;
   };
@@ -449,6 +580,32 @@ const sideJacksFor = (imageId?: number | string): EffectJackLayout => {
 
 /** Resolves a pedalboard placement to where its pedal's sockets are. */
 export type JackResolver = (itemId: string) => EffectJackLayout;
+
+/** …and to where its power goes in. */
+export type DcResolver = (itemId: string) => { x: number; y: number };
+
+/**
+ * Where a pedal's DC inlet sits on its own box, as a fraction of it: the middle
+ * of the top edge, which is where nearly every pedal ever built takes its power.
+ */
+export const DEFAULT_DC_JACK = { x: 0.5, y: 0 };
+
+/**
+ * DC inlet lookup for a board. The middle of the top edge unless the pedal's own
+ * jack layout says otherwise, because that is where a pedal takes its power —
+ * see `utils/powerLayout` for what the cable does with it.
+ */
+export const createDcResolver = (jacksOf: JackResolver): DcResolver => {
+  const cache = new Map<string, { x: number; y: number }>();
+  return (itemId: string) => {
+    const cached = cache.get(itemId);
+    if (cached !== undefined) return cached;
+
+    const dc = jacksOf(itemId).dc ?? DEFAULT_DC_JACK;
+    cache.set(itemId, dc);
+    return dc;
+  };
+};
 
 /**
  * Socket lookup for a board, the companion to `createWidthResolver`. A pedal

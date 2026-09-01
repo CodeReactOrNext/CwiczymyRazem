@@ -99,7 +99,13 @@ export const EffectCollection = ({
   // Sell stay locked until the user goes back to the rig.
   const handleRemoveFromBoard = (inventoryItemId: string) => {
     const placements = data.rig?.pedalboardItems || [];
-    savePedalboard(placements.filter((p) => p.itemId !== inventoryItemId));
+    savePedalboard({
+      items: placements.filter((p) => p.itemId !== inventoryItemId),
+      // Its output on the brick goes free along with its place on the board.
+      power: (data.rig?.power ?? []).filter(
+        (link) => link.itemId !== inventoryItemId,
+      ),
+    });
   };
 
   // Spare duplicates: for every pedal owned more than once, keep the

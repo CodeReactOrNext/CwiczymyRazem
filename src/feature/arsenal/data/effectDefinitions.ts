@@ -27,24 +27,33 @@ import type {
  */
 const TOP_JACK_SEAT = 0.012;
 
+/**
+ * The `dc` on each of these is read off the same silkscreen the signal pair is.
+ * Every one of them prints its power inlet at the end of the strip, after the
+ * ins, the outs and whatever expression and USB it carries, so the DC cable
+ * arrives well clear of the two instrument plugs standing beside it.
+ */
 const TOP_JACKS = {
   /** "L-IN · L-OUT · R-OUT · EXP · USB · 9V DC" — the wide Lab enclosures. */
   lab: {
     edge: "top",
     in: { x: 0.405, y: TOP_JACK_SEAT },
     out: { x: 0.496, y: TOP_JACK_SEAT },
+    dc: { x: 0.86, y: TOP_JACK_SEAT },
   },
   /** "SOURCE IN · ECHO OUT · CONTROL CV · LINK MIDI" — Astral Reverberator. */
   astral: {
     edge: "top",
     in: { x: 0.232, y: TOP_JACK_SEAT },
     out: { x: 0.379, y: TOP_JACK_SEAT },
+    dc: { x: 0.82, y: TOP_JACK_SEAT },
   },
   /** "L-IN · R-OUT · EXP · USB" — Cosmic Resonance. */
   cosmic: {
     edge: "top",
     in: { x: 0.239, y: TOP_JACK_SEAT },
     out: { x: 0.383, y: TOP_JACK_SEAT },
+    dc: { x: 0.82, y: TOP_JACK_SEAT },
   },
 } satisfies Record<string, EffectJackLayout>;
 
@@ -56,6 +65,9 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     type: "Delay",
     imageId: 1,
     rarity: "Uncommon",
+    // A compact echo in a single-width box, so it costs the brick far less than
+    // the rack-sized delays further down this list.
+    draw: 65,
   },
   {
     id: 2,
@@ -104,6 +116,8 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     type: "Overdrive",
     imageId: 7,
     rarity: "Common",
+    /** Half a board's worth of these still costs less than one digital box. */
+    draw: 6,
   },
   {
     id: 8,
@@ -129,6 +143,9 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     imageId: 10,
     rarity: "Epic",
     jacks: TOP_JACKS.cosmic,
+    // Stereo, with a converter and a screen. Nothing about it is a chorus
+    // pedal's usual twenty-five milliamps.
+    draw: 180,
   },
   {
     id: 11,
@@ -138,6 +155,8 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     imageId: 11,
     rarity: "Legendary",
     jacks: TOP_JACKS.lab,
+    /** A whole stereo rig in a box — it draws like one, fuzz or not. */
+    draw: 250,
   },
   {
     id: 12,
@@ -147,6 +166,8 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     imageId: 12,
     rarity: "Epic",
     jacks: TOP_JACKS.lab,
+    /** The most expensive thing a board can carry, and worth every mA. */
+    draw: 300,
   },
   {
     id: 13,
@@ -156,6 +177,8 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     imageId: 13,
     rarity: "Mythic",
     jacks: TOP_JACKS.lab,
+    /** Presets, a display and three footswitches. Not a passive dirt box. */
+    draw: 200,
   },
   {
     id: 14,
@@ -165,6 +188,8 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     imageId: 15,
     rarity: "Legendary",
     jacks: TOP_JACKS.astral,
+    /** Two of these do not fit on one brick, which is the whole point. */
+    draw: 300,
   },
   // New batch (15-19) — marki są placeholderami, do poprawki
   {
@@ -248,6 +273,7 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     imageId: 25,
     rarity: "Legendary",
     jacks: TOP_JACKS.astral,
+    draw: 300,
   },
   {
     id: 25,
@@ -257,6 +283,7 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     imageId: 26,
     rarity: "Legendary",
     jacks: TOP_JACKS.astral,
+    draw: 300,
   },
   {
     id: 26,

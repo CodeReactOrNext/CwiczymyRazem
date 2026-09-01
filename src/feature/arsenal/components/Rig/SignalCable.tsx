@@ -2,14 +2,10 @@ import type { ChainVerdict } from "feature/arsenal/data/signalChain";
 import { motion, useReducedMotion } from "framer-motion";
 import { useId } from "react";
 
-import type { JackResolver } from "../../utils/pedalboardLayout";
-import {
-  BOARD_H,
-  BOARD_W,
-  PEDAL_H_PCT,
-  rowIndexOf,
-  SIDE_JACKS,
-} from "../../utils/pedalboardLayout";
+import type { Point } from "../../utils/cableGeometry";
+import { at, routed as bent, toView } from "../../utils/cableGeometry";
+import type { BoardGeometry, JackResolver } from "../../utils/pedalboardLayout";
+import { rowIndexOf, SIDE_JACKS } from "../../utils/pedalboardLayout";
 
 /**
  * The patch cable, drawn.
@@ -29,8 +25,10 @@ import {
  * reward for getting it right, and the reason the panel above can stay quiet
  * about it.
  *
- * Drawn in board units (a 160 × 70 viewBox for the surface's 16/7) so stroke
- * widths stay even instead of stretching with the board, and behind the pedals
+ * Drawn in the board's own units — see `utils/cableGeometry`, and note that the
+ * svg's viewBox has to be the case's, or the whole loom lands in a corner of it
+ * at the wrong scale with every path still perfectly correct — so stroke widths
+ * stay even instead of stretching with the board, and behind the pedals
  * (`z-index: 1` against their 2) so the cable disappears under each enclosure
  * the way it would on a real board.
  */
@@ -184,9 +182,6 @@ export const BoardJack = ({ kind }: BoardJackProps) => {
   );
 };
 
-const VIEW_W = BOARD_W * 10;
-const VIEW_H = BOARD_H * 10;
-
 /** How close to the case edge a cable is routed when it runs down the side. */
 const EDGE_LANE = 2.2;
 
@@ -245,18 +240,6 @@ const COUPLER_MAX = MIN_PLUG_REACH * 2 + PLUG_BREATH;
 const reachInGap = (gap: number) =>
   Math.max(MIN_PLUG_REACH, Math.min(PLUG_REACH, (gap - PLUG_BREATH) / 2));
 
-const toView = (xPct: number, yPct: number) => ({
-  x: (xPct / 100) * VIEW_W,
-  y: (yPct / 100) * VIEW_H,
-});
-
-interface Point {
-  x: number;
-  y: number;
-}
-
-const at = (p: Point) => `${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
-
 /**
  * One socket on one pedal, with everything the routing needs to know about the
  * enclosure it belongs to: a cable off a top edge has to clear the pedal before
@@ -278,40 +261,8 @@ interface Anchor {
   row: number;
 }
 
-/**
- * Walks a route and rounds off every corner, so the cable bends where a real one
- * would instead of kinking. Corners tighter than the bend radius borrow half the
- * shorter leg, and a corner sitting on top of its neighbour is dropped rather
- * than drawn as a spike.
- */
-const routed = (points: Point[]): string => {
-  const parts = [`M ${at(points[0])}`];
-
-  for (let i = 1; i < points.length - 1; i++) {
-    const prev = points[i - 1];
-    const here = points[i];
-    const next = points[i + 1];
-    const inLen = Math.hypot(here.x - prev.x, here.y - prev.y);
-    const outLen = Math.hypot(next.x - here.x, next.y - here.y);
-    if (inLen < 0.05 || outLen < 0.05) continue;
-
-    const back = Math.min(BEND, inLen / 2) / inLen;
-    const on = Math.min(BEND, outLen / 2) / outLen;
-    parts.push(
-      `L ${at({
-        x: here.x + (prev.x - here.x) * back,
-        y: here.y + (prev.y - here.y) * back,
-      })}`,
-      `Q ${at(here)} ${at({
-        x: here.x + (next.x - here.x) * on,
-        y: here.y + (next.y - here.y) * on,
-      })}`,
-    );
-  }
-
-  parts.push(`L ${at(points[points.length - 1])}`);
-  return parts.join(" ");
-};
+/** Every run on this loom bends to the same radius: a fat instrument lead's. */
+const routed = (points: Point[]): string => bent(points, BEND);
 
 /** Where a cable off a top-mounted socket gets to before it turns sideways. */
 const clearOf = (anchor: Anchor): Point => ({ x: anchor.at.x, y: anchor.lane });
@@ -366,8 +317,11 @@ const laneTurn = (socket: Anchor, other: Anchor): number => {
  * it into the socket square rather than at whatever angle the board happens to
  * be laid out in.
  */
-const feedRun = (jack: Point, into: Anchor): string => {
-  const lane = Math.min(VIEW_W - EDGE_LANE, Math.max(jack.x, into.outer) + 2.4);
+const feedRun = (geo: BoardGeometry, jack: Point, into: Anchor): string => {
+  const lane = Math.min(
+    geo.viewW - EDGE_LANE,
+    Math.max(jack.x, into.outer) + 2.4,
+  );
   return into.fromTop
     ? routed([
         jack,
@@ -462,13 +416,13 @@ const overRun = (a: Anchor, b: Anchor): string => {
  * than off the row constants, so a row dragged out of line still gets a cable
  * that runs between the pedals instead of under them.
  */
-const returnRun = (a: Anchor, b: Anchor): string => {
+const returnRun = (geo: BoardGeometry, a: Anchor, b: Anchor): string => {
   const from = a.fromTop ? clearOf(a) : a.at;
   const to = b.fromTop ? clearOf(b) : b.at;
   const channel = (a.edgeBottom + b.edgeTop) / 2;
   /** The rail the row runs out to, and the one the next row is entered from. */
   const exitLane = Math.max(from.x - TURN, EDGE_LANE);
-  const entryLane = Math.min(to.x + TURN, VIEW_W - EDGE_LANE);
+  const entryLane = Math.min(to.x + TURN, geo.viewW - EDGE_LANE);
 
   return routed([
     a.at,
@@ -490,9 +444,9 @@ const returnRun = (a: Anchor, b: Anchor): string => {
  * back, or climbing a row. Bowed away from the board's middle so it stands off
  * the pedals and reads as the mess it is.
  */
-const looseRun = (a: Point, b: Point): string => {
+const looseRun = (geo: BoardGeometry, a: Point, b: Point): string => {
   const reach = Math.max(9, Math.min(Math.abs(b.x - a.x) * 0.45, 26));
-  const bow = a.y < VIEW_H / 2 ? -6 : 6;
+  const bow = a.y < geo.viewH / 2 ? -6 : 6;
   // Both ends reach *away* from the other, which is what throws the loop out
   // past the pedals instead of pulling it into a straight line between them.
   const away = Math.sign(a.x - b.x) || 1;
@@ -503,13 +457,20 @@ const looseRun = (a: Point, b: Point): string => {
 };
 
 /** Picks the routing a run's own geometry asks for. */
-const linkRun = (a: Anchor, b: Anchor, reach: number): string => {
+const linkRun = (
+  geo: BoardGeometry,
+  a: Anchor,
+  b: Anchor,
+  reach: number,
+): string => {
   if (a.row !== b.row) {
-    return b.row > a.row ? returnRun(a, b) : looseRun(a.at, b.at);
+    return b.row > a.row ? returnRun(geo, a, b) : looseRun(geo, a.at, b.at);
   }
   if (a.fromTop || b.fromTop) return overRun(a, b);
   // Leftwards is forwards. A run heading the other way is doubling back.
-  return b.at.x < a.at.x ? hopRun(a.at, b.at, reach) : looseRun(a.at, b.at);
+  return b.at.x < a.at.x
+    ? hopRun(a.at, b.at, reach)
+    : looseRun(geo, a.at, b.at);
 };
 
 const TONES = {
@@ -732,6 +693,8 @@ const Coupler = ({ from, to, tone, metal }: CouplerProps) => {
 };
 
 interface SignalCableProps {
+  /** The case the board stands in — every measurement below is taken off it. */
+  geo: BoardGeometry;
   verdict: ChainVerdict;
   /** A pedal's width on the board, in board percent. */
   widthOf: (itemId: string) => number;
@@ -754,6 +717,7 @@ interface SignalCableProps {
 }
 
 export const SignalCable = ({
+  geo,
   verdict,
   widthOf,
   jacksOf,
@@ -788,19 +752,21 @@ export const SignalCable = ({
     const width = widthOf(node.itemId);
     const jacks = jacksOf ? jacksOf(node.itemId) : SIDE_JACKS;
     const socket = jacks[which];
-    const edgeTop = (node.yPct / 100) * VIEW_H;
+    const edgeTop = (node.yPct / 100) * geo.viewH;
 
     return {
       at: toView(
+        geo,
         node.xPct + width * socket.x,
-        node.yPct + PEDAL_H_PCT * socket.y,
+        node.yPct + geo.pedalHPct * socket.y,
       ),
       fromTop: jacks.edge === "top",
       lane: Math.max(1.5, edgeTop - TOP_LANE),
       edgeTop,
-      edgeBottom: ((node.yPct + PEDAL_H_PCT) / 100) * VIEW_H,
-      outer: ((which === "in" ? node.xPct + width : node.xPct) / 100) * VIEW_W,
-      row: rowIndexOf(node.yPct),
+      edgeBottom: ((node.yPct + geo.pedalHPct) / 100) * geo.viewH,
+      outer:
+        ((which === "in" ? node.xPct + width : node.xPct) / 100) * geo.viewW,
+      row: rowIndexOf(geo, node.yPct),
     };
   };
 
@@ -828,19 +794,23 @@ export const SignalCable = ({
 
   const runs: CableRun[] = [
     {
-      d: feedRun(toView(INPUT_JACK.xPct, INPUT_JACK.yPct), anchorAt(0, "in")),
+      d: feedRun(
+        geo,
+        toView(geo, INPUT_JACK.xPct, INPUT_JACK.yPct),
+        anchorAt(0, "in"),
+      ),
       ok: true,
     },
     ...between.map((link) => ({
       d: link.coupled
         ? tautRun(link.a.at, link.b.at)
-        : linkRun(link.a, link.b, link.reach),
+        : linkRun(geo, link.a, link.b, link.reach),
       ok: link.ok,
     })),
     {
       d: exitRun(
         anchorAt(drawn.length - 1, "out"),
-        toView(OUTPUT_JACK.xPct, OUTPUT_JACK.yPct),
+        toView(geo, OUTPUT_JACK.xPct, OUTPUT_JACK.yPct),
       ),
       ok: true,
     },
@@ -891,7 +861,7 @@ export const SignalCable = ({
 
   return (
     <svg
-      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+      viewBox={`0 0 ${geo.viewW} ${geo.viewH}`}
       preserveAspectRatio='none'
       className='pointer-events-none absolute inset-0 h-full w-full'
       style={{ zIndex: 1 }}

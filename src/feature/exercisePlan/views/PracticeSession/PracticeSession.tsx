@@ -16,6 +16,7 @@ import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
+import { DEFAULT_ACCENT_PATTERN } from "../../components/Metronome/utils/accentPattern";
 import { getCountInDurationMs } from "../../components/Metronome/utils/countInDuration";
 import type { ExercisePlan } from "../../types/exercise.types";
 import { isClickAnsweredMode } from "../../utils/huntModes";
@@ -538,6 +539,29 @@ export const PracticeSession = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExercise.id]);
 
+  // Hand the metronome the click grid this exercise needs (Exercise.metronomeGrid).
+  //
+  // Only the odd-meter drills carry one: their bars can't be marked by whole
+  // quarter-note beats, so without this the click's "one" walks away from the bar
+  // lines within a couple of bars. The grid is applied on entry only — the +/- and
+  // click-to-accent controls stay the player's from then on.
+  //
+  // Leaving is what the ref is for: a 15-entry eighth grid must not follow the
+  // player into the next exercise, but an exercise that never asks for a grid also
+  // must not wipe a grid the player set up by hand, which is how it behaved before.
+  const appliedMetronomeGridRef = useRef<string | null>(null);
+  useEffect(() => {
+    const grid = currentExercise.metronomeGrid;
+    if (grid) {
+      metronome.setAccentGrid(grid.unit, grid.pattern);
+      appliedMetronomeGridRef.current = currentExercise.id;
+    } else if (appliedMetronomeGridRef.current !== null) {
+      metronome.setAccentGrid(4, DEFAULT_ACCENT_PATTERN);
+      appliedMetronomeGridRef.current = null;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentExercise.id]);
+
   // Persist Practice Session settings per exercise, so reopening the same
   // exercise restores its own metronome/playback/mic preferences.
   useEffect(() => {
@@ -827,7 +851,7 @@ export const PracticeSession = ({
             const usesMetronome = !!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat";
             resetSuccessView(); resetTimer(); metronome.restartMetronome();
             // Hold the timer for the count-in — it must not eat practice time.
-            startTimer(usesMetronome ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, effectiveBpm) : 0);
+            startTimer(usesMetronome ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, effectiveBpm, metronome.gridUnit) : 0);
             if (usesMetronome) metronome.startMetronome();
           }}
           isLoading={isFinishing || isSubmittingReport}

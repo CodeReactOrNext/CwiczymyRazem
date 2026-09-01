@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { render } from "@testing-library/react";
+import { BOARD_TIERS } from "feature/arsenal/data/rigHardware";
 import type {
   ChainLink,
   ChainNode,
@@ -8,8 +9,7 @@ import type {
 } from "feature/arsenal/data/signalChain";
 import type { EffectJackLayout } from "feature/arsenal/types/arsenal.types";
 import {
-  PEDAL_H_PCT,
-  ROW_Y_PCT,
+  geometryFor,
   SIDE_JACKS,
 } from "feature/arsenal/utils/pedalboardLayout";
 import { describe, expect, it } from "vitest";
@@ -24,6 +24,14 @@ import { SignalCable } from "./SignalCable";
  * its plugs for a coupler. All three are easy to lose in a refactor and none of
  * them shows up in a type error.
  */
+
+/**
+ * The case these boards stand on: the two-row `Touring Case`, which is the deck
+ * the cable was drawn against before a board had a size you could buy.
+ */
+const GEO = geometryFor(BOARD_TIERS[0]);
+const ROW_Y_PCT = GEO.rowYPct;
+const PEDAL_H_PCT = GEO.pedalHPct;
 
 /** Board percent a test pedal takes — near enough a standard single. */
 const W = 11;
@@ -81,6 +89,7 @@ interface DrawOptions {
 const draw = (nodes: ChainNode[], options: DrawOptions = {}) => {
   const { container } = render(
     <SignalCable
+      geo={GEO}
       verdict={verdictOf(nodes)}
       widthOf={() => W}
       jacksOf={(itemId) =>
@@ -125,6 +134,18 @@ const plugsOf = (container: Element) =>
     .sort((a, b) => a.x - b.x);
 
 describe("SignalCable", () => {
+  it("draws into the board's own coordinate space", () => {
+    // Every run below is measured in board units, and an svg whose viewBox
+    // disagrees with them renders the whole loom at the wrong scale in the
+    // corner of the deck — while every one of those assertions still passes,
+    // because the paths themselves are right. So the box is pinned here.
+    const { container } = draw(row(ROW_Y_PCT[0], 3));
+
+    expect(container.querySelector("svg")?.getAttribute("viewBox")).toBe(
+      `0 0 ${GEO.viewW} ${GEO.viewH}`,
+    );
+  });
+
   it("draws one run per pedal plus the two to the board's own jacks", () => {
     const { runs } = draw([...row(ROW_Y_PCT[0], 4), ...row(ROW_Y_PCT[1], 3)]);
 
@@ -238,7 +259,7 @@ describe("SignalCable", () => {
 
   it("draws nothing at all for an empty board", () => {
     const { container } = render(
-      <SignalCable verdict={verdictOf([])} widthOf={() => W} />,
+      <SignalCable geo={GEO} verdict={verdictOf([])} widthOf={() => W} />,
     );
 
     expect(container.querySelector("svg")).toBeNull();

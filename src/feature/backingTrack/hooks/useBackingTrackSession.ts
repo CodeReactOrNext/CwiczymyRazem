@@ -1,4 +1,3 @@
-import { IS_BACKING_TRACK_ENABLED } from "constants/featureFlags";
 import type { MutableRefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { BackingTrackImportResult, BackingTracksApi } from "types/backingTracks";
@@ -224,7 +223,7 @@ export interface BackingTrackController {
  * audio has to live above them).
  */
 export function useBackingTrackSession({
-  songId: requestedSongId,
+  songId,
   userId,
   gpTempo,
   isPlaying,
@@ -234,15 +233,6 @@ export function useBackingTrackSession({
   effectiveBpm,
   sessionBpm,
 }: UseBackingTrackSessionOptions): BackingTrackController {
-  /**
-   * The mode is still behind a flag while it is being finished.
-   *
-   * Gating the song id rather than each subsystem is what makes "off" mean
-   * off: everything below hangs off this one value, so with the flag down the
-   * controller takes exactly the path a plan that isn't a song already takes —
-   * no effects, no players, no stored config, nothing rendered.
-   */
-  const songId = IS_BACKING_TRACK_ENABLED ? requestedSongId : null;
   const enabled = !!songId;
 
   const desktopAvailable = useSyncExternalStore(

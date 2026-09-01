@@ -184,7 +184,7 @@ export const ArsenalView = () => {
             </TabsContent>
 
             <TabsContent value="rig" className="mt-4">
-              {data ? <RigView data={data} /> : null}
+              {data ? <RigView data={data} fame={fame} /> : null}
             </TabsContent>
 
             <TabsContent value="trader" className="mt-4">

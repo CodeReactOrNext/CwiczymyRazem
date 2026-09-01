@@ -25,6 +25,14 @@ import {
   musicianFitnessLvl1S7Exercise,
   musicianFitnessLvl1S8Exercise,
 } from "feature/exercisePlan/data/exerises/metalPlayalong/metalPlayalong";
+import { meterRegroup78Exercise } from "feature/exercisePlan/data/exerises/meterSwitching/meterRegroup78";
+import { meterRegroup88Exercise } from "feature/exercisePlan/data/exerises/meterSwitching/meterRegroup88";
+import { meterSwitch34To58Exercise } from "feature/exercisePlan/data/exerises/meterSwitching/meterSwitch34To58";
+import { meterSwitch44To68PulseExercise } from "feature/exercisePlan/data/exerises/meterSwitching/meterSwitch44To68Pulse";
+import { meterSwitch44To78Exercise } from "feature/exercisePlan/data/exerises/meterSwitching/meterSwitch44To78";
+import { meterSwitch54To74Exercise } from "feature/exercisePlan/data/exerises/meterSwitching/meterSwitch54To74";
+import { meterSwitch68To34Exercise } from "feature/exercisePlan/data/exerises/meterSwitching/meterSwitch68To34";
+import { meterSwitch128To44Exercise } from "feature/exercisePlan/data/exerises/meterSwitching/meterSwitch128To44";
 import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
 import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
 import { mutingDisciplineDrillExercise } from "feature/exercisePlan/data/exerises/mutingDisciplineDrill/mutingDisciplineDrill";
@@ -335,6 +343,15 @@ const rawExercises: Exercise[] = [
   fretboardMasteryExercise,
   smoothChordTransitionsExercise,
   metronomeGapTestExercise,
+  // Meter switching — one bar against another, easiest pair first
+  meterSwitch34To58Exercise,
+  meterSwitch44To78Exercise,
+  meterRegroup78Exercise,
+  meterRegroup88Exercise,
+  meterSwitch68To34Exercise,
+  meterSwitch54To74Exercise,
+  meterSwitch128To44Exercise,
+  meterSwitch44To68PulseExercise,
   singWhatYouPlayExercise,
   openGRepetitionExercise,
   stringRepetitionExercise,

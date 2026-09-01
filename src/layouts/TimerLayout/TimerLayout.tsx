@@ -477,9 +477,9 @@ const TimerLayout = ({
           )}
 
           <p className='text-center text-xs text-muted-foreground sm:text-sm'>
-            {t("info_about_repot ")}{" "}
+            {t("info_about_report")}{" "}
             <Link href='/report' className='text-primary hover:underline'>
-              {t("raport_link")}
+              {t("report_link")}
             </Link>
           </p>
         </div>

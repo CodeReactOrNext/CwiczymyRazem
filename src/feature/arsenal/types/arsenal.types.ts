@@ -31,6 +31,14 @@ export interface EffectJackLayout {
   edge: "side" | "top";
   in: { x: number; y: number };
   out: { x: number; y: number };
+  /**
+   * Where the `9V DC` inlet is, when it is not where it is on everything else.
+   *
+   * The default is the middle of the top edge, which is where a pedal takes its
+   * power. The enclosures carrying their whole socket strip up there put it at
+   * the end of that strip instead, so their DC cable has to be told.
+   */
+  dc?: { x: number; y: number };
 }
 
 export interface EffectDefinition {
@@ -42,6 +50,11 @@ export interface EffectDefinition {
   rarity: GuitarRarity;
   /** Where its sockets sit. Absent means the ordinary side-mounted pair. */
   jacks?: EffectJackLayout;
+  /**
+   * What it pulls off the power brick, in mA. Absent falls back to what its type
+   * is worth — see `data/powerSupply`.
+   */
+  draw?: number;
   /** Optional production-era range for the vintage roll; falls back to global defaults. */
   yearFrom?: number;
   yearTo?: number;
@@ -335,11 +348,37 @@ export interface PedalboardPlacement {
   yPct: number; // 0–100 from top edge of board
 }
 
+/** One DC cable: the pedal it feeds, and the brick output it is plugged into. */
+export interface PowerLink {
+  itemId: string; // EffectInventoryItem.id
+  /** Index of the brick output, `0` to `POWER_OUTPUTS - 1`. */
+  out: number;
+}
+
 export interface RigSetup {
   guitarSlots: [string | null, string | null, string | null];
   pedalboardItems: PedalboardPlacement[];
   ampHeadId: string | null;
   ampId: string | null;
+  /**
+   * What is plugged into the power brick. A pedal with no link here has no
+   * power, and a pedal with no power is not in the signal chain at all.
+   *
+   * Absent — as opposed to empty — means a board saved before the brick existed.
+   * Those are read as fully powered until the Rig is next opened and the board
+   * patches itself for real, so nobody loses a wiring bonus to a migration.
+   */
+  power?: PowerLink[];
+  /**
+   * Which case the board stands in and which brick feeds it — indices into the
+   * ladders in `data/rigHardware`, bought with Fame.
+   *
+   * Absent means the bottom rung, which is what a rig saved before the ladders
+   * existed gets. Both are written only by `/api/arsenal/upgrade-rig`, because
+   * both are things a player pays for.
+   */
+  boardTier?: number;
+  supplyTier?: number;
 }
 
 export const DEFAULT_RIG: RigSetup = {
@@ -347,6 +386,9 @@ export const DEFAULT_RIG: RigSetup = {
   pedalboardItems: [],
   ampHeadId: null,
   ampId: null,
+  power: [],
+  boardTier: 0,
+  supplyTier: 0,
 };
 
 /**

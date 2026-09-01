@@ -1,6 +1,8 @@
 import axios from "axios";
 import { auth } from "utils/firebase/client/firebase.utils";
 
+import type { HardwareKind, UpgradeRigResult } from "../data/rigHardware";
+
 import type {
   ArsenalUserData,
   BulkScrapResult,
@@ -11,6 +13,7 @@ import type {
   PartId,
   PartTier,
   PedalboardPlacement,
+  PowerLink,
   RigSetup,
   ScrapResult,
   WorkshopBuildResult,
@@ -97,9 +100,25 @@ export const updateStashLayout = async (
 
 export const updatePedalboard = async (
   items: PedalboardPlacement[],
+  power: PowerLink[],
 ): Promise<void> => {
   const idToken = await getIdToken();
-  await axios.post("/api/arsenal/update-pedalboard", { idToken, items });
+  await axios.post("/api/arsenal/update-pedalboard", { idToken, items, power });
+};
+
+/**
+ * Buys the next case or the next brick. The tier and the price are the
+ * server's to decide — see `/api/arsenal/upgrade-rig`.
+ */
+export const upgradeRig = async (
+  kind: HardwareKind,
+): Promise<UpgradeRigResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<UpgradeRigResult>(
+    "/api/arsenal/upgrade-rig",
+    { idToken, kind },
+  );
+  return data;
 };
 
 export const sellGuitar = async (

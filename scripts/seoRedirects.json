@@ -125,6 +125,46 @@
     "permanent": true
   },
   {
+    "source": "/exercises/meter-switch-3-4-to-5-8",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/meter-switch-4-4-to-7-8",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/meter-regroup-7-8",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/meter-regroup-8-8",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/meter-switch-6-8-to-3-4",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/meter-switch-5-4-to-7-4",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/meter-switch-12-8-to-4-4",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/meter-switch-4-4-to-6-8-pulse",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
     "source": "/exercises/sing-what-you-play",
     "destination": "/daily-guitar-practice-plan",
     "permanent": true
