@@ -11,11 +11,12 @@ import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
 import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMutations";
+import type { Recording } from "feature/recordings/types/types";
 import { getSongs } from "feature/songs/services/getSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import debounce from "lodash/debounce";
-import { ArrowRight, Loader2, Music, Search, Video, X } from "lucide-react";
+import { ArrowRight, Loader2, Music, Pencil, Search, Video, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
@@ -26,6 +27,8 @@ interface AddRecordingModalProps {
   onClose: () => void;
   /** Pre-selects the song this recording is for (e.g. opened from a song's detail page). */
   initialSong?: { id: string; title: string; artist: string } | null;
+  /** When given, the modal edits this recording's text instead of sharing a new one. */
+  recording?: Recording | null;
 }
 
 const isValidFaYoutubeUrl = (url: string) => {
@@ -54,7 +57,12 @@ const SongResultRow = ({ song, onSelect }: { song: Song; onSelect: () => void })
   </button>
 );
 
-export const AddRecordingModal = ({ isOpen, onClose, initialSong }: AddRecordingModalProps) => {
+export const AddRecordingModal = ({
+  isOpen,
+  onClose,
+  initialSong,
+  recording,
+}: AddRecordingModalProps) => {
   const [videoUrl, setVideoUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -68,13 +76,33 @@ export const AddRecordingModal = ({ isOpen, onClose, initialSong }: AddRecording
   const [wasOpen, setWasOpen] = useState(isOpen);
 
   const userId = useAppSelector(selectUserAuth);
-  const { addRecording, isAdding } = useRecordingMutations();
+  const { addRecording, isAdding, updateRecording, isUpdating } = useRecordingMutations();
+
+  const isEditing = !!recording;
+  const isSaving = isAdding || isUpdating;
 
   // Carries the song over when the modal is opened from that song's own page,
   // same derived-state-during-render pattern as AddSongModal's initialTitle/Artist.
   if (isOpen !== wasOpen) {
     setWasOpen(isOpen);
-    if (isOpen && initialSong) {
+    if (isOpen && recording) {
+      // Editing: start from what the author already published, so they only
+      // have to touch the words they want to change.
+      setVideoUrl(recording.videoUrl);
+      setTitle(recording.title);
+      setDescription(recording.description || "");
+      if (recording.songId) {
+        setSelectedSong({
+          id: recording.songId,
+          title: recording.songTitle,
+          artist: recording.songArtist,
+        } as Song);
+      } else {
+        // Song was typed by hand — it belongs in the search fields, not as a pick.
+        setSearchArtist(recording.songArtist || "");
+        setSearchTitle(recording.songTitle || "");
+      }
+    } else if (isOpen && initialSong) {
       setSelectedSong(initialSong as Song);
       setTitle(`${initialSong.artist} - ${initialSong.title} Cover`);
     }
@@ -160,19 +188,22 @@ export const AddRecordingModal = ({ isOpen, onClose, initialSong }: AddRecording
       return;
     }
 
+    const recordingData = {
+      videoUrl,
+      title,
+      description,
+      songId: selectedSong?.id || null,
+      // If a song is selected, use its details. If not, use the search inputs as manual entries.
+      songTitle: selectedSong ? selectedSong.title : (searchTitle || null),
+      songArtist: selectedSong ? selectedSong.artist : (searchArtist || null),
+    };
+
     try {
-      await addRecording({
-        userId,
-        recordingData: {
-          videoUrl,
-          title,
-          description,
-          songId: selectedSong?.id || null, 
-          // If a song is selected, use its details. If not, use the search inputs as manual entries.
-          songTitle: selectedSong ? selectedSong.title : (searchTitle || null),
-          songArtist: selectedSong ? selectedSong.artist : (searchArtist || null),
-        },
-      });
+      if (recording) {
+        await updateRecording({ recordingId: recording.id, userId, recordingData });
+      } else {
+        await addRecording({ userId, recordingData });
+      }
       handleClose();
     } catch (error) {
       console.error(error);
@@ -190,9 +221,13 @@ export const AddRecordingModal = ({ isOpen, onClose, initialSong }: AddRecording
           <DialogHeader className="mb-6">
             <DialogTitle className="flex items-center gap-3 text-xl font-bold">
               <div className="p-2 rounded-lg bg-cyan-500/10">
-                <Video className="h-5 w-5 text-cyan-400" />
+                {isEditing ? (
+                  <Pencil className="h-5 w-5 text-cyan-400" />
+                ) : (
+                  <Video className="h-5 w-5 text-cyan-400" />
+                )}
               </div>
-              Add New Recording
+              {isEditing ? "Edit Recording" : "Add New Recording"}
             </DialogTitle>
           </DialogHeader>
 
@@ -320,12 +355,12 @@ export const AddRecordingModal = ({ isOpen, onClose, initialSong }: AddRecording
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="ghost" onClick={handleClose} disabled={isAdding}>
+              <Button type="button" variant="ghost" onClick={handleClose} disabled={isSaving}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isAdding} className="bg-cyan-600 hover:bg-cyan-500 text-white">
-                {isAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Share Recording
+              <Button type="submit" disabled={isSaving} className="bg-cyan-600 hover:bg-cyan-500 text-white">
+                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isEditing ? "Save Changes" : "Share Recording"}
               </Button>
             </DialogFooter>
           </form>

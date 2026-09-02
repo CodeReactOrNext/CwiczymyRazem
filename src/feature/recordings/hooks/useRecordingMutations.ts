@@ -3,7 +3,11 @@ import { addRecording } from "feature/recordings/services/addRecording";
 import { addComment } from "feature/recordings/services/comments.service";
 import { deleteRecording as deleteRecordingService } from "feature/recordings/services/deleteRecording";
 import { toggleLikeRecording } from "feature/recordings/services/toggleLikeRecording";
-import type { RecordingCreateData } from "feature/recordings/types/types";
+import { updateRecording as updateRecordingService } from "feature/recordings/services/updateRecording";
+import type {
+  RecordingCreateData,
+  RecordingUpdateData,
+} from "feature/recordings/types/types";
 import { toast } from "sonner";
 
 export const useRecordingMutations = () => {
@@ -43,6 +47,23 @@ export const useRecordingMutations = () => {
     },
   });
 
+  const updateRecordingMutation = useMutation({
+    mutationFn: (data: {
+      recordingId: string;
+      userId: string;
+      recordingData: RecordingUpdateData;
+    }) => updateRecordingService(data.recordingId, data.userId, data.recordingData),
+    onSuccess: (_, variables) => {
+      toast.success("Recording updated!");
+      queryClient.invalidateQueries(["recordings"] as any);
+      queryClient.invalidateQueries(["recording", variables.recordingId] as any);
+    },
+    onError: (error: any) => {
+      console.error(error);
+      toast.error("Failed to update recording.");
+    },
+  });
+
   const deleteRecordingMutation = useMutation({
     mutationFn: (data: { recordingId: string; userId: string }) =>
       deleteRecordingService(data.recordingId, data.userId),
@@ -62,6 +83,8 @@ export const useRecordingMutations = () => {
     toggleLike: toggleLikeMutation.mutateAsync,
     addComment: addCommentMutation.mutateAsync,
     isAddingComment: addCommentMutation.isPending,
+    updateRecording: updateRecordingMutation.mutateAsync,
+    isUpdating: updateRecordingMutation.isPending,
     deleteRecording: deleteRecordingMutation.mutateAsync,
     isDeleting: deleteRecordingMutation.isPending
   };

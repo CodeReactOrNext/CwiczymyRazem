@@ -50,6 +50,34 @@ export interface SupplyTier {
 }
 
 /**
+ * ─── The prices ─────────────────────────────────────────────────────────────
+ *
+ * Recut from the launch numbers (board 400/1200, supply 300/900/1500/2200),
+ * which totalled 6500 Fame across both ladders — eighteen Elite cases, or 250
+ * days of everything a new player earns. Infrastructure was costing several
+ * times the collection it exists to hold, which is backwards: the cases are the
+ * loop and have to stay expensive, while a case and a brick are bought once and
+ * only make the rest of the game usable.
+ *
+ * The steps were also the wrong shape. Each rung roughly tripled the one below
+ * it, so the ladder read as a wall rather than a climb — and because a rung
+ * replaces the unit under it rather than adding to it, the player paid the full
+ * sticker again every time. The brick now steps by a flat 150 the whole way up
+ * (250 → 400 → 550 → 700) and the case by 250 (350 → 600), so every rung stays
+ * dearer than the last without any of them tripling. Both ladders together come
+ * to 2850.
+ *
+ * The floor under all of it is deliberate: no rung is under 250, so a case or a
+ * brick is never an afterthought bought out of loose change. That is the 100
+ * added to every purchasable rung on top of the recut. The bottom rung of each
+ * ladder stays at 0 — it is what every account already owns, not something the
+ * shop sells.
+ *
+ * Only the numbers moved. Nothing about how a rung is bought, migrated or drawn
+ * changed with them.
+ */
+
+/**
  * The cases.
  *
  * The bottom rung is the board everybody already has — the two-row 16-wide deck
@@ -82,7 +110,7 @@ export const BOARD_TIERS: readonly BoardTier[] = [
     name: "Stage Rack",
     w: 16,
     rows: 3,
-    fame: 400,
+    fame: 350,
     blurb: "A third row, and a second channel to run cable down.",
   },
   {
@@ -90,7 +118,7 @@ export const BOARD_TIERS: readonly BoardTier[] = [
     name: "Studio Riser",
     w: 20,
     rows: 3,
-    fame: 1200,
+    fame: 600,
     blurb: "The same three rows, widened out to six pedals each.",
   },
 ];
@@ -116,28 +144,28 @@ export const SUPPLY_TIERS: readonly SupplyTier[] = [
     id: 1,
     name: "Forge Supply 8",
     outputs: 8,
-    fame: 300,
+    fame: 250,
     blurb: "Eight outputs — room for a second half of the board.",
   },
   {
     id: 2,
     name: "Forge Supply 12",
     outputs: 12,
-    fame: 900,
+    fame: 400,
     blurb: "Twelve outputs, and a hole for most of a full case.",
   },
   {
     id: 3,
     name: "Forge Supply 18",
     outputs: 18,
-    fame: 1500,
+    fame: 550,
     blurb: "Eighteen outputs — a hole for every pedal a case can hold.",
   },
   {
     id: 4,
     name: "Forge Supply 24",
     outputs: 24,
-    fame: 2200,
+    fame: 700,
     blurb: "Twenty-four outputs. More holes than any case has pedals.",
   },
 ];

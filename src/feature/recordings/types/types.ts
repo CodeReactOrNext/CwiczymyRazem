@@ -23,6 +23,7 @@ export interface Recording {
   title: string;
   description: string;
   createdAt: Timestamp;
+  updatedAt?: Timestamp;
   likes: string[];
   commentCount: number;
 }
@@ -35,3 +36,7 @@ export interface RecordingCreateData {
   songTitle?: string | null;
   songArtist?: string | null;
 }
+
+/** Editable fields of an existing recording — everything else on the doc is
+ *  author metadata, likes or counters the owner must not overwrite. */
+export type RecordingUpdateData = RecordingCreateData;

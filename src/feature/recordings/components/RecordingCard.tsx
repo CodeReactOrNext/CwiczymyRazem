@@ -14,10 +14,12 @@ import { Card } from "assets/components/ui/card";
 import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { UserLink } from "components/UserLink";
+import { AddRecordingModal } from "feature/recordings/components/AddRecordingModal";
 import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMutations";
 import type { Recording } from "feature/recordings/types/types";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { Heart, MessageSquare, Play, Trash2 } from "lucide-react";
+import { Heart, MessageSquare, Pencil, Play, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 interface RecordingCardProps {
@@ -32,6 +34,7 @@ const getYoutubeId = (url: string) => {
 };
 
 export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const userId = useAppSelector(selectUserAuth);
   const { toggleLike, deleteRecording, isDeleting } = useRecordingMutations();
 
@@ -92,37 +95,49 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
             {recording.title}
           </h3>
           {isOwner && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  aria-label='Delete recording'
-                  className='-mr-2 -mt-1 h-8 w-8 shrink-0 text-zinc-500 opacity-100 transition-opacity focus-visible:opacity-100 hover:bg-red-500/10 hover:text-red-400 md:opacity-0 md:group-hover/card:opacity-100'>
-                  <Trash2 className='h-4 w-4' />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent className='bg-zinc-950 text-white'>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription className='text-zinc-400'>
-                    This action cannot be undone. This will permanently delete
-                    your recording.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className='bg-zinc-900 text-white hover:bg-zinc-800'>
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                    className='border-none bg-red-600 text-white hover:bg-red-700'>
-                    {isDeleting ? "Deleting..." : "Delete"}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            // Both owner actions share one hover-reveal wrapper, so the pencil and
+            // the bin fade in together instead of drifting apart.
+            <div className='-mr-2 -mt-1 flex shrink-0 items-center opacity-100 transition-opacity focus-within:opacity-100 md:opacity-0 md:group-hover/card:opacity-100'>
+              <Button
+                variant='ghost'
+                size='icon'
+                aria-label='Edit recording'
+                onClick={() => setIsEditOpen(true)}
+                className='h-8 w-8 text-zinc-500 hover:bg-cyan-500/10 hover:text-cyan-400'>
+                <Pencil className='h-4 w-4' />
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    aria-label='Delete recording'
+                    className='h-8 w-8 text-zinc-500 hover:bg-red-500/10 hover:text-red-400'>
+                    <Trash2 className='h-4 w-4' />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className='bg-zinc-950 text-white'>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription className='text-zinc-400'>
+                      This action cannot be undone. This will permanently delete
+                      your recording.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className='bg-zinc-900 text-white hover:bg-zinc-800'>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className='border-none bg-red-600 text-white hover:bg-red-700'>
+                      {isDeleting ? "Deleting..." : "Delete"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           )}
         </div>
 
@@ -180,6 +195,14 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
           <span className='text-xs font-bold'>{recording.commentCount}</span>
         </Button>
       </div>
+
+      {isOwner && (
+        <AddRecordingModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          recording={recording}
+        />
+      )}
     </Card>
   );
 };
