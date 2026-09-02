@@ -1,7 +1,6 @@
-import type { 
-  AchievementContext, 
+import type {
   AchievementsDataInterface,
-  AchievementsRarityType 
+  AchievementsRarityType
 } from "feature/achievements";
 import { 
   AchievementCard 
@@ -11,14 +10,12 @@ import { useTranslation } from "hooks/useTranslation";
 interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];
   maxLenght: number;
-  context?: AchievementContext | null;
 }
 
 export const AchievementBox = ({
   achievment,
   rarity,
   maxLenght,
-  context,
 }: AchievementBoxProps) => {
   const { t } = useTranslation("achievements");
 
@@ -37,7 +34,7 @@ export const AchievementBox = ({
                 <div
                   key={item.id}
                   className='mb-2 flex w-[4rem] flex-col items-center text-center'>
-                  <AchievementCard id={item.id} data={item} context={context} isUnlocked={true} />
+                  <AchievementCard id={item.id} data={item} isUnlocked={true} />
                 </div>
               );
             })}

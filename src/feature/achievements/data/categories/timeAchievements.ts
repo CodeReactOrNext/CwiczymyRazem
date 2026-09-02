@@ -5,6 +5,7 @@ import {
   FaClock,
   FaHeadphones,
   FaHourglass,
+  FaMagic,
   FaMicroscope,
   FaPalette,
   FaThumbsUp,
@@ -25,7 +26,7 @@ export const timeAchievements = [
   achivFactor("time_3", FaHourglass, "veryRare", AchievementRequirement.totalTimeThreshold(hoursToMilliseconds(100)), AchievementRequirement.getProgressFor.totalTimeThreshold(hoursToMilliseconds(100))),
   achivFactor("scientist", FaMicroscope, "veryRare", AchievementRequirement.statTimeThreshold("theory", hoursToMilliseconds(50)), AchievementRequirement.getProgressFor.statTimeThreshold("theory", hoursToMilliseconds(50))),
   achivFactor("bigear", FaHeadphones, "veryRare", AchievementRequirement.statTimeThreshold("hearing", hoursToMilliseconds(50)), AchievementRequirement.getProgressFor.statTimeThreshold("hearing", hoursToMilliseconds(50))),
-  achivFactor("wizard", FaUserNinja, "veryRare", AchievementRequirement.statTimeThreshold("technique", hoursToMilliseconds(50)), AchievementRequirement.getProgressFor.statTimeThreshold("technique", hoursToMilliseconds(50))),
+  achivFactor("wizard", FaMagic, "veryRare", AchievementRequirement.statTimeThreshold("creativity", hoursToMilliseconds(50)), AchievementRequirement.getProgressFor.statTimeThreshold("creativity", hoursToMilliseconds(50))),
   achivFactor("fireSession", GiCelebrationFire, "epic", (ctx) => {
     return inputTimeConverter(ctx.inputData).sumTime >= hoursToMilliseconds(10);
   }),

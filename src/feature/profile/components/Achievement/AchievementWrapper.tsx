@@ -1,12 +1,8 @@
 import { Card } from "assets/components/ui/card";
-import type { 
+import type {
   AchievementList,
   AchievementsDataInterface} from "feature/achievements";
-import { 
-  achievementsCounts, 
-  achievementsMap, 
-  useAchievementContext 
-} from "feature/achievements";
+import { achievementsCounts, achievementsMap } from "feature/achievements";
 import { AchievementBox } from "feature/profile/components/Achievement/AchievementBox";
 import { FaMapMarkedAlt } from "react-icons/fa";
 
@@ -15,7 +11,6 @@ export const AchievementWrapper = ({
 }: {
   userAchievements: AchievementList[];
 }) => {
-  const context = useAchievementContext();
   interface grupedAchievements {
     common: AchievementsDataInterface[];
     rare: AchievementsDataInterface[];
@@ -67,13 +62,12 @@ export const AchievementWrapper = ({
             achievment={common}
             maxLenght={achievementsCounts.common}
             rarity='common'
-            context={context}
           />
         </div>
       )}
       {rare.length > 0 && (
         <div className="p-4">
-           <AchievementBox achievment={rare} maxLenght={achievementsCounts.rare} rarity='rare' context={context} />
+           <AchievementBox achievment={rare} maxLenght={achievementsCounts.rare} rarity='rare' />
         </div>
       )}
       {veryRare.length > 0 && (
@@ -82,13 +76,12 @@ export const AchievementWrapper = ({
             achievment={veryRare}
             maxLenght={achievementsCounts.veryRare}
             rarity='veryRare'
-            context={context}
           />
         </div>
       )}
       {epic.length > 0 && (
         <div className="p-4">
-           <AchievementBox achievment={epic} maxLenght={achievementsCounts.epic} rarity='epic' context={context} />
+           <AchievementBox achievment={epic} maxLenght={achievementsCounts.epic} rarity='epic' />
         </div>
       )}
     </Card>

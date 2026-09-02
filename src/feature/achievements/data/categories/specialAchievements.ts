@@ -42,7 +42,9 @@ export const specialAchievements = [
   }),
   achivFactor("fire", FaHotjar, "veryRare", (ctx) => ctx.sessionResults.totalPoints >= 60),
   achivFactor("medal", FaMedal, "veryRare", AchievementRequirement.achievementCount(20), AchievementRequirement.getProgressFor.achievementCount(20)),
-  achivFactor("dumbbel", FaDumbbell, "veryRare", (ctx) => ctx.statistics.actualDayWithoutBreak >= 5 && ctx.inputData.countBackDays !== undefined),
+  // countBackDays is always a number (0 = "reported today"), so the old
+  // `!== undefined` guard was dead and this unlocked on the streak alone.
+  achivFactor("dumbbel", FaDumbbell, "veryRare", (ctx) => ctx.statistics.actualDayWithoutBreak >= 5 && ctx.inputData.countBackDays === 0),
   achivFactor("vip", FaWrench, "veryRare", () => false),
   achivFactor("short", FaShieldAlt, "veryRare", (ctx) => ctx.statistics.actualDayWithoutBreak >= 10 && ctx.sessionResults.totalPoints <= 15),
   achivFactor("event", FaTrophy, "veryRare", () => false),

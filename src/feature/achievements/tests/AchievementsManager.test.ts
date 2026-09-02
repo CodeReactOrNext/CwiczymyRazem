@@ -12,6 +12,10 @@ vi.mock('../data/achievementsData', () => ({
     {
       id: 'points_1',
       check: (ctx: AchievementContext) => ctx.statistics.points >= 100,
+    },
+    {
+      id: 'medal',
+      check: (ctx: AchievementContext) => ctx.statistics.achievements.length >= 3,
     }
   ] as Partial<AchievementsDataInterface>[]
 }));
@@ -77,5 +81,19 @@ describe('AchievementManager', () => {
 
     const newlyEarned = AchievementManager.getNewlyEarned(ctx);
     expect(newlyEarned).toEqual([]);
+  });
+
+  it('unlocks a meta achievement in the same pass that earns its last badge', () => {
+    const ctx = createMockContext({
+      statistics: {
+        achievements: ['points_1', 'vip'],
+        points: 150
+      }
+    });
+
+    const newlyEarned = AchievementManager.getNewlyEarned(ctx);
+
+    // `medal` counts owned badges, and `time_1` earned here is the third one.
+    expect(newlyEarned).toEqual(['time_1', 'medal']);
   });
 });

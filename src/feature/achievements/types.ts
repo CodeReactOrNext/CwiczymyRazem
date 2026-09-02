@@ -61,7 +61,6 @@ export type AchievementList =
   | "learning10"
   | "learning20"
   | "learning30"
-  | "learning50"
   | "learned1"
   | "learned3"
   | "learned5"
@@ -95,5 +94,3 @@ export interface AchievementsDataInterface extends AchievementsRarityType {
   check: AchievementCheck;
   getProgress?: (ctx: AchievementContext) => AchievementProgress;
 }
-
-type AchievementCheckerReturnType = AchievementList | undefined;
