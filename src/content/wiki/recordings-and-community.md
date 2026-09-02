@@ -22,7 +22,7 @@ Tying a recording to a song makes it show up on that song's page too, which is h
 
 ## Other ways the community pays
 
-<StatRow stats="+300 Fame:a challenge recording|+20 Fame:someone saves your playlist|+5 Fame:someone likes your playlist|+5 Fame:a thank-you for an exercise you shared" caption="Plus +1 Fame the first time another player completes an exercise you wrote, and +3 Fame the first time you rate a song's difficulty." />
+<StatRow stats="+500 Fame:a challenge recording|+20 Fame:someone saves your playlist|+5 Fame:someone likes your playlist|+5 Fame:a thank-you for an exercise you shared" caption="Plus +1 Fame the first time another player completes an exercise you wrote, and +3 Fame the first time you rate a song's difficulty." />
 
 <BlogAlert type="tip">
 If you want a steady Fame income without grinding, share what you already make: publish the practice exercises you write and the playlists you build. They keep paying long after you've forgotten about them.

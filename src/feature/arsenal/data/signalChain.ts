@@ -44,6 +44,7 @@ import type {
 import type { BoardGeometry } from "../utils/pedalboardLayout";
 import { geometryOf, inChainOrder } from "../utils/pedalboardLayout";
 import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "./effectDefinitions";
+import { poweredPredicateOf } from "./powerSupply";
 
 /** Fame/h for every cable that runs into the pedal that belongs next. */
 export const CHAIN_LINK_FAME = 2;
@@ -363,23 +364,6 @@ type ArsenalLike = Pick<
   "rig" | "effectInventory"
 >;
 
-/**
- * Which of a stored rig's pedals have power.
- *
- * `undefined` — a board saved before the brick existed — powers everything, so
- * a migration can never quietly cost somebody a wiring bonus they had already
- * earned. An array, even an empty one, is taken at its word: that board has been
- * patched, and whatever is not on it is off.
- */
-const poweredIn = (
-  arsenal: Partial<ArsenalLike> | null | undefined,
-): ((itemId: string) => boolean) | undefined => {
-  const links = arsenal?.rig?.power;
-  if (!Array.isArray(links)) return undefined;
-  const powered = new Set(links.map((link) => link.itemId));
-  return (itemId: string) => powered.has(itemId);
-};
-
 /** The whole verdict for a stored arsenal — the shape both the API and UI read. */
 export const getChainVerdict = (
   arsenal: Partial<ArsenalLike> | null | undefined,
@@ -391,7 +375,7 @@ export const getChainVerdict = (
       geometryOf(arsenal?.rig?.boardTier),
       arsenal?.rig?.pedalboardItems,
       arsenal?.effectInventory,
-      poweredIn(arsenal),
+      poweredPredicateOf(arsenal?.rig),
     ),
   );
 

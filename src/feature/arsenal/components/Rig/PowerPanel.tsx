@@ -70,6 +70,14 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
             </span>
           )}
         </p>
+
+        {/* Said out loud because the rig level moves when it happens: a dead
+            pedal is off the board as far as the game is concerned. */}
+        {unpowered.length > 0 && (
+          <p className='text-[11px] tracking-wide text-zinc-500'>
+            A pedal with no power adds no rig level and earns no Fame.
+          </p>
+        )}
       </div>
     </div>
   );

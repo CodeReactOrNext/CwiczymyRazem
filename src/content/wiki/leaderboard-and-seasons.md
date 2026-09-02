@@ -1,6 +1,6 @@
 ---
 title: "Rankings & Seasons"
-description: "The three boards you can appear on, how the monthly season resets, what finishing in the top 5 pays, and why your rank sometimes lags behind."
+description: "The three boards you can appear on, how the monthly season resets, what finishing in the top 10 pays, and why your rank sometimes lags behind."
 slug: "leaderboard-and-seasons"
 section: "Competition"
 order: 1
@@ -19,7 +19,7 @@ A season is one calendar month. Seasonal points are kept in their own pile, sepa
 A season counts your practice time, healthy habits, daily quests and challenge recordings. It leaves out the one-off rewards — learning a song and clearing a Scale Map box — because those can only be collected once each, and a month should rank what you practised that month.
 
 <BlogAlert type="tip">
-Finish in the **top 5** of a season and you get a one-off Fame payout when it ends: **500 / 300 / 200 / 100 / 50** Fame for 1st through 5th.
+Finish in the **top 10** of a season and you get a one-off Fame payout when it ends: **5000 / 3000 / 2000 / 1200 / 700** Fame for 1st through 5th, then **500 / 400 / 300 / 200 / 150** down to 10th.
 </BlogAlert>
 
 ## Your position

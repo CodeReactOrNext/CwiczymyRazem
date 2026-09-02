@@ -1,4 +1,4 @@
-import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
+import { SEASON_FAME_REWARDS, SEASON_REWARD_PLACES } from "constants/seasonRewards";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { logger } from "feature/logger/Logger";
 import {
@@ -47,10 +47,10 @@ export const assignSeasonalAchievements = async (
     const batchCommits = [];
     let assignedCount = 0;
 
-    const topFivePlayers = topPlayers.slice(0, 5);
+    const rankedPlayers = topPlayers.slice(0, SEASON_REWARD_PLACES);
 
-    for (let i = 0; i < topFivePlayers.length; i++) {
-      const player = topFivePlayers[i];
+    for (let i = 0; i < rankedPlayers.length; i++) {
+      const player = rankedPlayers[i];
       const place = i + 1;
 
       if (!player.uid) {
@@ -81,7 +81,7 @@ export const assignSeasonalAchievements = async (
       extra: {
         seasonId,
         assignedCount,
-        topPlayers: topFivePlayers.map(p => ({ uid: p.uid, points: p.points, place: topPlayers.indexOf(p) + 1 }))
+        topPlayers: rankedPlayers.map(p => ({ uid: p.uid, points: p.points, place: topPlayers.indexOf(p) + 1 }))
       }
     });
 
@@ -99,14 +99,17 @@ export const awardSeasonFame = async (
   topPlayers: TopPlayerData[],
   seasonId: string,
 ): Promise<void> => {
-  const topFive = topPlayers.slice(0, 5);
+  const ranked = topPlayers.slice(0, SEASON_REWARD_PLACES);
 
-  const updates = topFive
-    .filter((player) => player.uid && !player.uid.startsWith("player-"))
-    .map((player, i) => {
-      const fameAmount = SEASON_FAME_REWARDS[i];
+  // Place is read off the ranked list *before* the placeholder filter: filtering
+  // first and then using the map index would promote everyone below a dropped
+  // seed player by one place, and hand them someone else's Fame.
+  const updates = ranked
+    .map((player, i) => ({ player, fame: SEASON_FAME_REWARDS[i] }))
+    .filter(({ player }) => player.uid && !player.uid.startsWith("player-"))
+    .map(({ player, fame }) => {
       const userRef = doc(db, "users", player.uid!);
-      return updateDoc(userRef, { "statistics.fame": increment(fameAmount) });
+      return updateDoc(userRef, { "statistics.fame": increment(fame) });
     });
 
   await Promise.all(updates);

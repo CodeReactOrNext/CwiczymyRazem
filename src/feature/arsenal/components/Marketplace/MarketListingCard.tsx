@@ -9,11 +9,10 @@ import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getSalvageableMod } from "feature/arsenal/data/salvage";
 import {
-  countScrapParts,
   getEffectScrapYield,
   getGuitarScrapYield,
 } from "feature/arsenal/utils/scrap";
-import { ShoppingCart, Tag, Unplug, Wrench, X } from "lucide-react";
+import { ShoppingCart, Tag, Unplug, X } from "lucide-react";
 import Link from "next/link";
 
 import type {
@@ -26,8 +25,7 @@ import type { MarketplaceListing } from "../../types/marketplace.types";
 import { SalvagedModCard } from "../Collection/SalvagedModCard";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
-import { PartIcon } from "../Parts/PartIcon";
-import { ScrapYieldList } from "../Parts/ScrapYieldList";
+import { ScrapYieldStrip } from "../Parts/ScrapYieldStrip";
 import { ModArt } from "../Workshop/ModArt";
 
 interface MarketListingCardProps {
@@ -76,7 +74,6 @@ export const MarketListingCard = ({
   const showMissingBadge = notInCollection && !isOwn;
 
   const scrapParts = getListingScrapYield(listing);
-  const scrapTotal = countScrapParts(scrapParts);
   // The mod a teardown of this instance would hand over. Picked by hashing the
   // item's own id, so the buyer gets exactly the one advertised here — nothing
   // is rolled at purchase.
@@ -118,39 +115,7 @@ export const MarketListingCard = ({
         </span>
       </div>
 
-      {scrapParts.length > 0 && (
-        <TooltipProvider>
-          <Tooltip delayDuration={150}>
-            <TooltipTrigger asChild>
-              <div className='flex cursor-help items-center gap-2 text-zinc-500 transition-colors hover:text-orange-400'>
-                <Wrench size={13} strokeWidth={2.5} className='shrink-0' />
-                <span className='flex items-center gap-1'>
-                  {scrapParts.map((part) => (
-                    <PartIcon
-                      key={`${part.partId}:${part.tier}`}
-                      partId={part.partId}
-                      size={24}
-                    />
-                  ))}
-                </span>
-                <span className='text-[11px] font-semibold tabular-nums'>
-                  {scrapTotal} parts
-                </span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent
-              side='top'
-              className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
-              <div className='flex flex-col gap-1.5'>
-                <span className='text-[10px] font-bold capitalize tracking-wider text-zinc-400'>
-                  Scraps into {scrapTotal} parts
-                </span>
-                <ScrapYieldList parts={scrapParts} compact />
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
+      <ScrapYieldStrip parts={scrapParts} />
 
       {/* Sits under the scrap strip because it answers the same question one
           step further on: that strip says what the instance breaks into, this

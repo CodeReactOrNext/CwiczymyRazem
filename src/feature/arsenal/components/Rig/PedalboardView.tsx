@@ -340,7 +340,7 @@ export const PedalboardView = ({
         announce(
           `The ${supply.name} has no output for ${short} pedal${
             short > 1 ? "s" : ""
-          } — unpowered, and out of the signal chain.`,
+          } — unpowered, so out of the signal chain and out of the rig.`,
           setNotice,
         );
       }

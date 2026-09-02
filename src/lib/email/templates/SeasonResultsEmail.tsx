@@ -10,6 +10,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
 
 interface TopPlayer {
   displayName: string;
@@ -219,12 +220,12 @@ export default function SeasonResultsEmail({
   logoUrl,
 }: SeasonResultsEmailProps) {
   const displayName = userName?.trim() || "Guitarist";
-  const isTopFive = userPlace !== null && userPlace <= 5;
-  const accentColor = isTopFive ? colors.gold : colors.cyan;
-  const heroBg = isTopFive ? colors.goldBg : "#0c1920";
-  const heroTextColor = isTopFive ? colors.goldMuted : colors.cyan;
+  const isRanked = userPlace !== null && userPlace <= SEASON_REWARD_PLACES;
+  const accentColor = isRanked ? colors.gold : colors.cyan;
+  const heroBg = isRanked ? colors.goldBg : "#0c1920";
+  const heroTextColor = isRanked ? colors.goldMuted : colors.cyan;
 
-  const previewText = isTopFive
+  const previewText = isRanked
     ? `You finished ${ordinal(userPlace!)} in ${seasonName} — well done`
     : `${seasonName} is over — see how you did`;
 
@@ -241,15 +242,15 @@ export default function SeasonResultsEmail({
           <Section style={card}>
             <Text style={eyebrow(accentColor)}>Season over</Text>
 
-            {isTopFive ? (
+            {isRanked ? (
               <>
                 <Heading style={heading}>
-                  You finished in the top 5, {displayName}
+                  You finished in the top {SEASON_REWARD_PLACES}, {displayName}
                 </Heading>
                 <Text style={paragraph}>
                   {seasonName} is done. You placed {ordinal(userPlace!)} with{" "}
-                  {userPoints.toLocaleString()} points — that puts you in the
-                  top 5 and earns you fame rewards.
+                  {userPoints.toLocaleString()} points — that puts you in the top{" "}
+                  {SEASON_REWARD_PLACES} and earns you fame rewards.
                 </Text>
 
                 <Section style={resultHero(heroBg)}>
@@ -307,7 +308,7 @@ export default function SeasonResultsEmail({
 
             <Section style={buttonWrap}>
               <Button href={leaderboardUrl} style={ctaButton}>
-                {isTopFive ? "See final results" : "Start next season"}
+                {isRanked ? "See final results" : "Start next season"}
               </Button>
             </Section>
           </Section>

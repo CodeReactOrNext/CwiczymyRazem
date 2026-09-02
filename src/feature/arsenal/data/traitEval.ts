@@ -39,6 +39,7 @@ import { geometryOf, inChainOrder } from "../utils/pedalboardLayout";
 import { EFFECTS_BY_ID } from "./effectDefinitions";
 import { GUITARS_BY_ID } from "./guitarDefinitions";
 import { getEffectiveRarity, RARITY_LADDER } from "./itemStats";
+import { isPoweredIn } from "./powerSupply";
 import type {
   PracticeCategory,
   TraitCondition,
@@ -139,6 +140,12 @@ type ArsenalLike = Pick<
  * Flatten the gear in service. Only equipped guitars and boarded pedals appear —
  * a trait on something in the stash pays nothing, which is what makes the rig a
  * decision rather than an inventory total.
+ *
+ * "In service" means powered, too. A pedal with no cable to the brick is out of
+ * the signal chain and out of the rig level, so its traits pay nothing either:
+ * otherwise the cheapest way to buy a trait rate would be to stand every pedal
+ * owned on the board and never plug one in. A board saved before the brick
+ * existed stores no links and is read as fully powered.
  */
 export const buildRigTraitContext = (
   arsenal: Partial<ArsenalLike> | null | undefined,
@@ -165,17 +172,26 @@ export const buildRigTraitContext = (
     });
   }
 
+  const powered = isPoweredIn(arsenal.rig);
+
   // Chain position rather than raw x, because a multi-row board is wired row by
   // row: a pedal at the far right of the bottom row comes *after* one at the
   // far left of the top row, which comparing x alone gets backwards.
+  //
+  // Numbered over the powered pedals only, exactly as `readChainNodes` does, so
+  // a dead pedal does not sit between two live ones and break a trait that asks
+  // to be first in the chain — the signal does not stop at it either.
   const chainIndex = new Map(
     inChainOrder(
       geometryOf(arsenal.rig?.boardTier),
       arsenal.rig?.pedalboardItems ?? [],
-    ).map((placement, index) => [placement.itemId, index] as const),
+    )
+      .filter((placement) => powered(placement.itemId))
+      .map((placement, index) => [placement.itemId, index] as const),
   );
 
   for (const placement of arsenal.rig?.pedalboardItems ?? []) {
+    if (!powered(placement.itemId)) continue;
     const item = arsenal.effectInventory?.find(
       (e) => e.id === placement.itemId,
     );

@@ -1,44 +1,29 @@
-import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
+import { placeSuffix, SEASON_FAME_REWARDS } from "constants/seasonRewards";
+
+/** Places shown as their own row. The rest collapse into one summary line — ten
+ *  rows would outgrow the hero banner this card sits in, and the tail is flat
+ *  enough that a range says everything a row would. */
+const DETAILED_PLACES = 5;
 
 const RANKS = [
-  {
-    label: "1st",
-    medal: "👑",
-    gemColor: "#FFD700",
-    rowBg: "rgba(255,215,0,0.07)",
-    labelColor: "#FFD700",
-  },
-  {
-    label: "2nd",
-    medal: "🥈",
-    gemColor: "#C0C0C0",
-    rowBg: "rgba(192,192,192,0.05)",
-    labelColor: "#C8C8C8",
-  },
-  {
-    label: "3rd",
-    medal: "🥉",
-    gemColor: "#CD7F32",
-    rowBg: "rgba(205,127,50,0.06)",
-    labelColor: "#CD9B6A",
-  },
-  {
-    label: "4th",
-    medal: null,
-    gemColor: "#6B7280",
-    rowBg: "transparent",
-    labelColor: "#9CA3AF",
-  },
-  {
-    label: "5th",
-    medal: null,
-    gemColor: "#6B7280",
-    rowBg: "transparent",
-    labelColor: "#9CA3AF",
-  },
+  { medal: "👑", gemColor: "#FFD700", rowBg: "rgba(255,215,0,0.07)", labelColor: "#FFD700" },
+  { medal: "🥈", gemColor: "#C0C0C0", rowBg: "rgba(192,192,192,0.05)", labelColor: "#C8C8C8" },
+  { medal: "🥉", gemColor: "#CD7F32", rowBg: "rgba(205,127,50,0.06)", labelColor: "#CD9B6A" },
 ] as const;
 
+const PLAIN_RANK = {
+  medal: null,
+  gemColor: "#6B7280",
+  rowBg: "transparent",
+  labelColor: "#9CA3AF",
+} as const;
+
+const ordinal = (place: number): string => `${place}${placeSuffix(place)}`;
+
 export const SeasonRewards = () => {
+  const detailed = SEASON_FAME_REWARDS.slice(0, DETAILED_PLACES);
+  const tail = SEASON_FAME_REWARDS.slice(DETAILED_PLACES);
+
   return (
     <div
       style={{
@@ -81,8 +66,8 @@ export const SeasonRewards = () => {
           listStyle: "none",
         }}
       >
-        {SEASON_FAME_REWARDS.map((fame, i) => {
-          const rank = RANKS[i];
+        {detailed.map((fame, i) => {
+          const rank = RANKS[i] ?? PLAIN_RANK;
           return (
             <li
               key={i}
@@ -120,7 +105,7 @@ export const SeasonRewards = () => {
                   lineHeight: 1,
                 }}
               >
-                {rank.label}
+                {ordinal(i + 1)}
               </span>
 
               {/* Coin + amount */}
@@ -144,11 +129,38 @@ export const SeasonRewards = () => {
                     flexShrink: 0,
                   }}
                 />
-                {fame}
+                {fame.toLocaleString()}
               </span>
             </li>
           );
         })}
+
+        {tail.length > 0 && (
+          <li
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "9px 10px 2px",
+              fontSize: "12px",
+              color: "rgba(255,255,255,0.35)",
+              lineHeight: 1,
+            }}
+          >
+            <span style={{ width: "22px", flexShrink: 0 }} />
+            <span style={{ flex: 1 }}>
+              {ordinal(DETAILED_PLACES + 1)}–{ordinal(SEASON_FAME_REWARDS.length)}
+            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: "5px", fontWeight: 600 }}>
+              <img
+                src="/images/coin.png"
+                alt="coin"
+                style={{ width: 11, height: 11, flexShrink: 0, opacity: 0.6 }}
+              />
+              {tail[0].toLocaleString()}–{tail[tail.length - 1].toLocaleString()}
+            </span>
+          </li>
+        )}
       </ul>
     </div>
   );

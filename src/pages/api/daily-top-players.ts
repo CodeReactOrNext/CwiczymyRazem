@@ -1,4 +1,7 @@
-import {SEASON_FAME_REWARDS } from "constants/seasonRewards";
+import {
+  SEASON_FAME_REWARDS,
+  SEASON_REWARD_PLACES,
+} from "constants/seasonRewards";
 import { SeasonService } from "feature/discordBot/services/seasonService";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { logger } from "feature/logger/Logger";
@@ -110,10 +113,10 @@ const checkSeasonEndAndAssignAchievements = async (
     }
   });
 
-  const topFivePlayers = topPlayers.slice(0, 5);
+  const rankedPlayers = topPlayers.slice(0, SEASON_REWARD_PLACES);
   const playersWithoutAchievements = [];
 
-  for (const player of topFivePlayers) {
+  for (const player of rankedPlayers) {
     if (!player.uid || player.uid.startsWith('player-')) {
       continue;
     }
@@ -145,12 +148,13 @@ const checkSeasonEndAndAssignAchievements = async (
 
   await awardSeasonFame(topPlayers, seasonId);
 
-  // Send in-app notifications to top 5
-  const notifPromises = topFivePlayers
-    .filter((p) => p.uid && !p.uid.startsWith("player-"))
-    .map((player, i) => {
-      const place = i + 1;
-      const fameAmount = SEASON_FAME_REWARDS[i];
+  // In-app notification for everyone the ladder pays. Place comes off the ranked
+  // list before the placeholder filter — filtering first would tell everyone
+  // below a dropped seed player the wrong place.
+  const notifPromises = rankedPlayers
+    .map((player, i) => ({ player, place: i + 1, fameAmount: SEASON_FAME_REWARDS[i] }))
+    .filter(({ player }) => player.uid && !player.uid.startsWith("player-"))
+    .map(({ player, place, fameAmount }) => {
       return addDoc(collection(db, "notifications"), {
         userId: player.uid,
         type: "season_reward",

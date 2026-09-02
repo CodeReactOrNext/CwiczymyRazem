@@ -7,17 +7,25 @@
  * which is a limit a player can see on the brick itself rather than one they
  * have to work out.
  *
- * A pedal with no cable to the brick is dead: it drops out of the signal chain
- * in `data/signalChain`, which is what makes the choice cost something.
+ * A pedal with no cable to the brick is dead, everywhere the game reads a rig:
+ * it is out of the signal chain (`data/signalChain`), it adds nothing to the rig
+ * level (`data/rigLevel`) and its traits pay nothing (`data/traitEval`). All
+ * three ask the same question through `poweredPredicateOf` below, which is what
+ * makes the brick's budget a real choice rather than a drawing of one.
  *
  * Free of anything React, so the report API can score a stored rig with exactly
  * the rules the board draws.
  */
 
-import type { PedalboardPlacement, PowerLink } from "../types/arsenal.types";
+import type {
+  PedalboardPlacement,
+  PowerLink,
+  RigSetup,
+} from "../types/arsenal.types";
 import { inChainOrder } from "../utils/pedalboardLayout";
 import type { RailGeometry } from "../utils/powerLayout";
 import type { SupplyTier } from "./rigHardware";
+import { supplyTierOf } from "./rigHardware";
 
 export interface PowerState {
   /** The links that survived: on the board, on a real output, one each. */
@@ -132,3 +140,41 @@ export const refusalFor = (
   state.outputsFree === 0
     ? `Every output on the ${supply.name} is taken — unplug something first.`
     : null;
+
+/** Just enough of a stored rig to work out what has power. */
+export type PoweredRigLike = Partial<
+  Pick<RigSetup, "pedalboardItems" | "power" | "supplyTier">
+>;
+
+/**
+ * Which of a stored rig's pedals have power — the one answer every scorer asks.
+ *
+ * `undefined` — a board saved before the brick existed — means "everything", so
+ * a migration can never quietly cost somebody Fame they had already earned. An
+ * array, even an empty one, is taken at its word: that board has been patched,
+ * and whatever is not on it is off.
+ *
+ * The links are read through `readPowerState` rather than trusted, so a cable to
+ * a sold pedal, two cables claiming one output, or an output number off a bigger
+ * brick than the rig owns all come out as no power at all — exactly what the
+ * board itself draws.
+ */
+export const poweredPredicateOf = (
+  rig: PoweredRigLike | null | undefined,
+): ((itemId: string) => boolean) | undefined => {
+  const links = rig?.power;
+  if (!Array.isArray(links)) return undefined;
+
+  const { poweredIds } = readPowerState(
+    supplyTierOf(rig?.supplyTier),
+    rig?.pedalboardItems ?? [],
+    links,
+  );
+
+  return (itemId: string) => poweredIds.has(itemId);
+};
+
+/** The same test with the legacy case resolved: no links stored, all powered. */
+export const isPoweredIn = (
+  rig: PoweredRigLike | null | undefined,
+): ((itemId: string) => boolean) => poweredPredicateOf(rig) ?? (() => true);

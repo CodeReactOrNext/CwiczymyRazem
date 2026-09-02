@@ -10,6 +10,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { placeSuffix, SEASON_FAME_REWARDS } from "constants/seasonRewards";
 
 interface SeasonStartEmailProps {
   userName: string;
@@ -31,12 +32,28 @@ const colors = {
   goldBg: "#2a1d08",
 };
 
+/** Read off the live ladder rather than retyped, so the email can never quote
+ *  a payout the season no longer makes. Places past the fifth collapse into one
+ *  row — the tail is flat, and ten rows would swamp the card. */
+const DETAILED_PLACES = 5;
+
 const rewards = [
-  { place: "1st place", fame: "500 fame" },
-  { place: "2nd place", fame: "300 fame" },
-  { place: "3rd place", fame: "200 fame" },
-  { place: "4th place", fame: "100 fame" },
-  { place: "5th place", fame: "50 fame" },
+  ...SEASON_FAME_REWARDS.slice(0, DETAILED_PLACES).map((fame, i) => ({
+    place: `${i + 1}${placeSuffix(i + 1)} place`,
+    fame: `${fame.toLocaleString()} fame`,
+  })),
+  ...(SEASON_FAME_REWARDS.length > DETAILED_PLACES
+    ? [
+        {
+          place: `${DETAILED_PLACES + 1}${placeSuffix(DETAILED_PLACES + 1)}–${
+            SEASON_FAME_REWARDS.length
+          }${placeSuffix(SEASON_FAME_REWARDS.length)} place`,
+          fame: `${SEASON_FAME_REWARDS[DETAILED_PLACES].toLocaleString()}–${SEASON_FAME_REWARDS[
+            SEASON_FAME_REWARDS.length - 1
+          ].toLocaleString()} fame`,
+        },
+      ]
+    : []),
 ];
 
 const main = {
@@ -197,8 +214,9 @@ export default function SeasonStartEmail({
             </Heading>
             <Text style={paragraph}>
               The competition is open. You have {daysInSeason} days to practice,
-              earn points, and climb the leaderboard. The top 5 players at the
-              end of the season take home fame rewards.
+              earn points, and climb the leaderboard. The top{" "}
+              {SEASON_FAME_REWARDS.length} players at the end of the season take
+              home fame rewards.
             </Text>
 
             <Section style={daysHero}>

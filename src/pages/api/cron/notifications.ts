@@ -1,4 +1,7 @@
-import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
+import {
+  getSeasonFameReward,
+  SEASON_REWARD_PLACES,
+} from "constants/seasonRewards";
 import { DEFAULT_REMINDER_HOUR_UTC } from "constants/streakReminder";
 import { isOnEmailCooldown, todayKey } from "lib/email/cooldown";
 import {
@@ -136,7 +139,7 @@ export default async function handler(
             tokens: allEnabledTokens,
             notification: {
               title: "🎸 A new season has started!",
-              body: `Season ${currentSeasonId} is now live. Start practicing and fight for top 5!`,
+              body: `Season ${currentSeasonId} is now live. Start practicing and fight for the top ${SEASON_REWARD_PLACES}!`,
             },
             data: { url: "/seasons" },
           })
@@ -335,8 +338,7 @@ export default async function handler(
           seasonResultsCooldown += 1;
           return;
         }
-        const fameEarned =
-          p.place <= 5 ? SEASON_FAME_REWARDS[p.place - 1] : null;
+        const fameEarned = getSeasonFameReward(p.place);
         jobs.push({
           uid: p.uid,
           run: () =>

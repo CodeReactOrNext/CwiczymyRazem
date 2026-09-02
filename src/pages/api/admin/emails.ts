@@ -1,4 +1,4 @@
-import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
+import { getSeasonFameReward } from "constants/seasonRewards";
 import { isOnEmailCooldown, todayKey } from "lib/email/cooldown";
 import {
   fetchCooldown,
@@ -268,7 +268,7 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
         extras: {
           place: p.place,
           points: p.points,
-          fameEarned: p.place <= 5 ? SEASON_FAME_REWARDS[p.place - 1] : null,
+          fameEarned: getSeasonFameReward(p.place),
         },
       })),
       cooldownExcluded: excluded,

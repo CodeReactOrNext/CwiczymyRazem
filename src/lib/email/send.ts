@@ -1,3 +1,5 @@
+import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
+
 import { EMAIL_FROM, getResend } from "./client";
 import SeasonEndingSoonEmail from "./templates/SeasonEndingSoonEmail";
 import SeasonResultsEmail from "./templates/SeasonResultsEmail";
@@ -121,7 +123,7 @@ export async function sendSeasonStartEmail({
   const { data, error } = await getResend().emails.send({
     from: EMAIL_FROM,
     to,
-    subject: `${seasonName} has started — compete for the top 5`,
+    subject: `${seasonName} has started — compete for the top ${SEASON_REWARD_PLACES}`,
     react: SeasonStartEmail({
       userName: userName ?? "",
       seasonName,
@@ -207,8 +209,8 @@ export async function sendSeasonResultsEmail({
     process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
   const subject =
-    userPlace !== null && userPlace <= 5
-      ? `You finished top 5 in ${seasonName}`
+    userPlace !== null && userPlace <= SEASON_REWARD_PLACES
+      ? `You finished top ${SEASON_REWARD_PLACES} in ${seasonName}`
       : `${seasonName} is over — see your results`;
 
   const { data, error } = await getResend().emails.send({

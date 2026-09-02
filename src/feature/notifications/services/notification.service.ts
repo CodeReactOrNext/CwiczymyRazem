@@ -1,3 +1,4 @@
+import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
 import {
   addDoc,
   collection,
@@ -120,7 +121,7 @@ export const notificationText = (
     case "season_start":
       return {
         title: "New season!",
-        body: "A new season has started! Start practicing and fight for top 5.",
+        body: `A new season has started! Start practicing and fight for the top ${SEASON_REWARD_PLACES}.`,
       };
     case "marketplace_sold":
       return {

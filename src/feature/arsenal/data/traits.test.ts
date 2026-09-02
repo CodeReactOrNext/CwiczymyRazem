@@ -100,9 +100,10 @@ describe("trait satisfiability", () => {
       walkConditions(trait.condition, (cond) => {
         if (cond.type !== "board-has-types") return;
         for (const type of cond.types)
-          expect(types.has(type), `${trait.id} wants ${type} on the board`).toBe(
-            true,
-          );
+          expect(
+            types.has(type),
+            `${trait.id} wants ${type} on the board`,
+          ).toBe(true);
       });
     }
   });
@@ -176,7 +177,9 @@ describe("trait satisfiability", () => {
       const guitars = TRAIT_DEFINITIONS.filter((t) =>
         isTraitEligible(t, "guitar", rarity),
       );
-      expect(guitars.length, `no guitar traits for ${rarity}`).toBeGreaterThan(0);
+      expect(guitars.length, `no guitar traits for ${rarity}`).toBeGreaterThan(
+        0,
+      );
     }
   });
 
@@ -200,7 +203,9 @@ describe("rolling traits", () => {
   });
 
   it("drops nothing when every slot rolls over the chance", () => {
-    expect(rollItemTraits("Mythic", "guitar", undefined, fixed(0.9))).toBeUndefined();
+    expect(
+      rollItemTraits("Mythic", "guitar", undefined, fixed(0.9)),
+    ).toBeUndefined();
   });
 
   it("fills both Epic slots when every roll passes, with distinct traits", () => {
@@ -221,7 +226,8 @@ describe("rolling traits", () => {
     let withTrait = 0;
     const runs = 4000;
     for (let seed = 1; seed <= runs; seed++)
-      if (rollItemTraits("Rare", "guitar", undefined, seeded(seed))) withTrait++;
+      if (rollItemTraits("Rare", "guitar", undefined, seeded(seed)))
+        withTrait++;
     // One slot at TRAIT_CHANCE, so the rate is the chance itself.
     expect(withTrait / runs).toBeGreaterThan(TRAIT_CHANCE - 0.04);
     expect(withTrait / runs).toBeLessThan(TRAIT_CHANCE + 0.04);
@@ -243,7 +249,9 @@ describe("rolling traits", () => {
   });
 
   it("keeps the three empty-board tiers in their own rarity windows", () => {
-    expect(isTraitEligible(def("straight-to-amp"), "guitar", "Rare")).toBe(true);
+    expect(isTraitEligible(def("straight-to-amp"), "guitar", "Rare")).toBe(
+      true,
+    );
     expect(isTraitEligible(def("straight-to-amp"), "guitar", "Legendary")).toBe(
       false,
     );
@@ -251,12 +259,12 @@ describe("rolling traits", () => {
     expect(isTraitEligible(def("cable-and-amp"), "guitar", "Legendary")).toBe(
       true,
     );
-    expect(isTraitEligible(def("nothing-but-the-guitar"), "guitar", "Legendary")).toBe(
-      false,
-    );
-    expect(isTraitEligible(def("nothing-but-the-guitar"), "guitar", "Mythic")).toBe(
-      true,
-    );
+    expect(
+      isTraitEligible(def("nothing-but-the-guitar"), "guitar", "Legendary"),
+    ).toBe(false);
+    expect(
+      isTraitEligible(def("nothing-but-the-guitar"), "guitar", "Mythic"),
+    ).toBe(true);
   });
 
   it("only offers a pedal the traits its type can carry", () => {
@@ -396,15 +404,22 @@ describe("conditions", () => {
     };
     const withoutDirt = { guitars: [guitar({ traits })], pedals: [] };
 
-    expect(getRigTraitPayout(withDirt, session({ technique: 60 })).fame).toBe(8);
-    expect(getRigTraitPayout(withoutDirt, session({ technique: 60 })).fame).toBe(
-      0,
+    expect(getRigTraitPayout(withDirt, session({ technique: 60 })).fame).toBe(
+      8,
     );
+    expect(
+      getRigTraitPayout(withoutDirt, session({ technique: 60 })).fame,
+    ).toBe(0);
   });
 
   it("requires every skill a multi-skill trait names", () => {
     const rig = {
-      guitars: [guitar({ rarity: "Legendary", traits: [{ id: "virtuoso", value: 40 }] })],
+      guitars: [
+        guitar({
+          rarity: "Legendary",
+          traits: [{ id: "virtuoso", value: 40 }],
+        }),
+      ],
       pedals: [],
     };
     const all = session({ technique: 60 }, [
@@ -457,7 +472,10 @@ describe("conditions", () => {
     ).toBe(0);
     expect(
       getRigTraitPayout(
-        { guitars: [guitar()], pedals: [od, pedal({ itemId: "d2", effectType: "Distortion" })] },
+        {
+          guitars: [guitar()],
+          pedals: [od, pedal({ itemId: "d2", effectType: "Distortion" })],
+        },
         session({ technique: 60 }),
       ).fame,
     ).toBe(6);
@@ -467,7 +485,9 @@ describe("conditions", () => {
 describe("counters", () => {
   it("multiplies by the units in service and stops at the cap", () => {
     const carrier = guitar({
-      traits: [{ id: "brand-endorsement", value: 3, params: { brand: "Fairmont" } }],
+      traits: [
+        { id: "brand-endorsement", value: 3, params: { brand: "Fairmont" } },
+      ],
     });
     const two = {
       guitars: [carrier, guitar({ itemId: "g2", brand: "Fairmont" })],
@@ -530,7 +550,11 @@ describe("amplifiers and penalties", () => {
       traits: [{ id: "patchbay", value: 2 }],
     });
     const neighbour = (x: number) =>
-      pedal({ itemId: "neighbour", x, traits: [{ id: "workhorse", value: 3 }] });
+      pedal({
+        itemId: "neighbour",
+        x,
+        traits: [{ id: "workhorse", value: 3 }],
+      });
     const rateOf = (x: number) =>
       getRigTraitPayout(
         { guitars: [guitar()], pedals: [patchbay, neighbour(x)] },
@@ -546,7 +570,10 @@ describe("amplifiers and penalties", () => {
   it("lets Prima Donna silence every other trait in the rig", () => {
     const rig = {
       guitars: [
-        guitar({ rarity: "Mythic", traits: [{ id: "prima-donna", value: 100 }] }),
+        guitar({
+          rarity: "Mythic",
+          traits: [{ id: "prima-donna", value: 100 }],
+        }),
         guitar({ itemId: "g2", traits: [{ id: "workhorse", value: 3 }] }),
       ],
       pedals: [pedal({ traits: [{ id: "ear-trainer", value: 5 }] })],
@@ -650,11 +677,15 @@ describe("card state", () => {
     });
     const raw = { id: "boutique-row", value: 2 };
 
-    expect(getTraitCardState(def("boutique-row"), raw, self, rigWith([self], []))).toBe(
-      "unmet",
-    );
+    expect(
+      getTraitCardState(def("boutique-row"), raw, self, rigWith([self], [])),
+    ).toBe("unmet");
 
-    const boutique = pedal({ itemId: "p2", rarity: "Epic", effectType: "Delay" });
+    const boutique = pedal({
+      itemId: "p2",
+      rarity: "Epic",
+      effectType: "Delay",
+    });
     expect(
       getTraitCardState(
         def("boutique-row"),
@@ -672,7 +703,12 @@ describe("card state", () => {
       [self],
     );
     expect(
-      getTraitUnits(def("pedal-platform"), { id: "pedal-platform", value: 1.5 }, self, rig),
+      getTraitUnits(
+        def("pedal-platform"),
+        { id: "pedal-platform", value: 1.5 },
+        self,
+        rig,
+      ),
     ).toBe(2);
   });
 
@@ -728,6 +764,62 @@ describe("buildRigTraitContext", () => {
 
   it("survives an empty or missing arsenal", () => {
     expect(buildRigTraitContext(null)).toEqual({ guitars: [], pedals: [] });
+  });
+
+  it("drops a boarded pedal that has no cable to the brick", () => {
+    // Otherwise the cheapest trait rate in the game would be to stand every
+    // pedal owned on the case and never plug one in.
+    const effectInventory: EffectInventoryItem[] = ["p1", "p2", "p3"].map(
+      (id) => ({
+        id,
+        effectId: EFFECT_DEFINITIONS[0].id,
+        acquiredAt: 0,
+        isNew: false,
+      }),
+    );
+    const rig: RigSetup = {
+      guitarSlots: [null, null, null],
+      pedalboardItems: effectInventory.map((item, index) => ({
+        itemId: item.id,
+        xPct: 87 - index * 10,
+        yPct: 10,
+      })),
+      ampHeadId: null,
+      ampId: null,
+      // The middle pedal is dead, so the chain runs p1 → p3 with no gap in it.
+      power: [
+        { itemId: "p1", out: 0 },
+        { itemId: "p3", out: 1 },
+      ],
+    };
+
+    const ctx = buildRigTraitContext({ rig, inventory: [], effectInventory });
+
+    expect(ctx.pedals.map((p) => p.itemId)).toEqual(["p1", "p3"]);
+    expect(ctx.pedals.map((p) => p.chain)).toEqual([0, 1]);
+  });
+
+  it("keeps every pedal on a board saved before the brick existed", () => {
+    const effectInventory: EffectInventoryItem[] = ["p1", "p2"].map((id) => ({
+      id,
+      effectId: EFFECT_DEFINITIONS[0].id,
+      acquiredAt: 0,
+      isNew: false,
+    }));
+    const rig: RigSetup = {
+      guitarSlots: [null, null, null],
+      pedalboardItems: effectInventory.map((item, index) => ({
+        itemId: item.id,
+        xPct: 87 - index * 10,
+        yPct: 10,
+      })),
+      ampHeadId: null,
+      ampId: null,
+    };
+
+    const ctx = buildRigTraitContext({ rig, inventory: [], effectInventory });
+
+    expect(ctx.pedals.map((p) => p.itemId)).toEqual(["p1", "p2"]);
   });
 
   it("ignores traits on items whose definition has been retired", () => {

@@ -10,6 +10,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
 
 interface SeasonEndingSoonEmailProps {
   userName: string;
@@ -169,7 +170,7 @@ function buildCopy(
       preview: `${seasonName} ends tomorrow`,
       eyebrow: "1 day left",
       heading: `${displayName}, the season ends tomorrow`,
-      paragraph: `${seasonName} closes tomorrow. This is the last day to climb — top 5 take home fame rewards.`,
+      paragraph: `${seasonName} closes tomorrow. This is the last day to climb — the top ${SEASON_REWARD_PLACES} take home fame rewards.`,
       heroNumber: "1",
       heroLabel: "day remaining",
       heroNumberAsWord: false,
@@ -179,7 +180,7 @@ function buildCopy(
     preview: `${daysLeft} days left in ${seasonName}`,
     eyebrow: `${daysLeft} days left`,
     heading: `${displayName}, the season ends in ${daysLeft} days`,
-    paragraph: `${seasonName} closes in ${daysLeft} days. This is your final push — every session counts toward the leaderboard. The top 5 take home fame rewards at the end.`,
+    paragraph: `${seasonName} closes in ${daysLeft} days. This is your final push — every session counts toward the leaderboard. The top ${SEASON_REWARD_PLACES} take home fame rewards at the end.`,
     heroNumber: String(daysLeft),
     heroLabel: "days remaining",
     heroNumberAsWord: false,
