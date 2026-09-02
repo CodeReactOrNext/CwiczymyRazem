@@ -8,6 +8,7 @@ import {
 import { FeedbackModal } from "components/FeedbackBubble";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
+import { ResetClock } from "components/ResetClock/ResetClock";
 import Avatar from "components/UI/Avatar";
 import { DISCORD_INVITE_URL } from "constants/community";
 import { DESKTOP_APP_RELEASES_URL } from "constants/desktopApp";
@@ -780,6 +781,13 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       </div>
 
       <div className='hidden lg:block lg:flex-1' />
+
+      {/* Sits below the nav on both layouts: reference, not a destination. Kept
+          to one quiet line — the detail is a click away rather than a panel the
+          nav has to make room for. */}
+      <div className='mt-6'>
+        <ResetClock />
+      </div>
 
       {!isElectron && !mobile && (
         <a

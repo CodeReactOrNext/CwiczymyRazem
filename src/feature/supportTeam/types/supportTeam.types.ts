@@ -5,6 +5,13 @@ export interface SupportTeamMember {
   avatar: string | null;
   /** Custom badge label (e.g. "Patron"). Falls back to "Supporter" when empty. */
   title: string | null;
+  /**
+   * The player's level, so the supporter wall can honour them as players and
+   * not just as names. Absent on rosters written before the wall existed, and
+   * refreshed from the user documents whenever the wall asks for it — the
+   * roster itself is only rewritten when somebody joins or leaves it.
+   */
+  lvl?: number | null;
 }
 
 /**

@@ -4,6 +4,7 @@ import { addZeroToTime } from "./addZeroToTime";
 import { calculatePercent } from "./calculatePercent";
 import { getDateFromPast } from "./getDateFromPast";
 import { getLocalDateKey } from "./getLocalDateKey";
+import { getServerDateKey } from "./getServerDateKey";
 import { inputTimeConverter } from "./InputTimeConverter";
 import {
   convertMsToHM,
@@ -19,6 +20,7 @@ export {
   convertMsToHMS,
   getDateFromPast,
   getLocalDateKey,
+  getServerDateKey,
   getYearsOfPlaying,
   inputTimeConverter,
 };

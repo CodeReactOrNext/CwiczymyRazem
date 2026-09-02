@@ -49,9 +49,10 @@ export class SeasonService {
     return Math.ceil((endDate.getTime() - startDate.getTime()) / millisecondsPerDay);
   }
 
+  /** UTC, so the id always matches the one the report path writes points under. */
   private getCurrentSeasonId(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
     return `${year}-${month}`;
   }
 

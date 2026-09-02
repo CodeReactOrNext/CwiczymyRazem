@@ -32,3 +32,20 @@ export const sortSupportFirst = <T extends { uid: string }>(
   [...users].sort(
     (a, b) => Number(isSupport(b.uid)) - Number(isSupport(a.uid)),
   );
+
+/**
+ * Order of the supporter wall: the highest level first, and everyone whose
+ * level is missing — a roster written before levels were carried, or an account
+ * that has never reported a session — after those, alphabetically.
+ *
+ * The roster itself arrives sorted by name, which reads like a phone book; the
+ * wall is a thank-you, so the players who put the most into the app stand at
+ * the front of it.
+ */
+export const sortSupporterWall = (
+  members: SupportTeamMember[],
+): SupportTeamMember[] =>
+  [...members].sort(
+    (a, b) =>
+      (b.lvl ?? 0) - (a.lvl ?? 0) || a.displayName.localeCompare(b.displayName),
+  );

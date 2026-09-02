@@ -10,12 +10,14 @@ import { SupporterInfo } from "feature/supporterPanel/components/SupporterInfo";
 import { SupporterPitch } from "feature/supporterPanel/components/SupporterPitch";
 import { TokenWalletBar } from "feature/supporterPanel/components/TokenWalletBar";
 import { useSupporterRoadmap } from "feature/supporterPanel/hooks/useSupporterRoadmap";
+import { SupporterWall } from "feature/supportTeam/components/SupporterWall";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { WorkBoardTab } from "feature/workBoard/components/WorkBoardTab";
 import {
   Guitar,
   Hammer,
+  Heart,
   Info,
   Map,
   Package,
@@ -33,6 +35,7 @@ type SupporterTab =
   | "guild"
   | "work"
   | "goal"
+  | "wall"
   | "info";
 
 const TABS: { id: SupporterTab; label: string; icon: typeof Map }[] = [
@@ -42,6 +45,7 @@ const TABS: { id: SupporterTab; label: string; icon: typeof Map }[] = [
   { id: "guild", label: "Found a Guild", icon: Shield },
   { id: "work", label: "In the works", icon: Hammer },
   { id: "goal", label: "Support Challenge", icon: Target },
+  { id: "wall", label: "Supporters", icon: Heart },
   { id: "info", label: "Info", icon: Info },
 ];
 
@@ -110,7 +114,12 @@ export const SupporterPanelView = () => {
           // so waiting is what keeps a supporter off the sales pitch.
           <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />
         ) : !isSupporter ? (
-          <SupporterPitch />
+          // The wall rides along under the pitch: the door reads better next to
+          // the people already through it, and it is public anyway.
+          <div className='space-y-12'>
+            <SupporterPitch />
+            <SupporterWall />
+          </div>
         ) : (
           <>
             {/* Scrolls sideways on a phone rather than wrapping into three rows. */}
@@ -176,6 +185,8 @@ export const SupporterPanelView = () => {
                 </div>
               </div>
             )}
+
+            {tab === "wall" && <SupporterWall />}
 
             {tab === "info" && <SupporterInfo />}
           </>

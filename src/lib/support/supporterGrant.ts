@@ -58,6 +58,7 @@ const toMember = (doc: DocumentSnapshot): SupportTeamMember => {
     displayName: data.displayName ?? "Unknown",
     avatar: data.avatar ?? null,
     title: data.supportTitle ?? null,
+    lvl: typeof data.statistics?.lvl === "number" ? data.statistics.lvl : null,
   };
 };
 

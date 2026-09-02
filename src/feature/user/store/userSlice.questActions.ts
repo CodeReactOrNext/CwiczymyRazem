@@ -4,7 +4,7 @@ import { doc, increment, runTransaction } from "firebase/firestore";
 import posthog from "posthog-js";
 import type { RootState } from "store/store";
 import type { DailyQuest, DailyQuestTaskType } from "types/api.types";
-import { getLocalDateKey } from "utils/converter";
+import { getServerDateKey } from "utils/converter";
 import { auth, db } from "utils/firebase/client/firebase.utils";
 import { getPointsToLvlUp, levelUpUser } from "utils/gameLogic";
 
@@ -86,7 +86,7 @@ export const syncDailyQuestAction = createAsyncThunk(
 
       try {
         const userRef = doc(db, "users", userId);
-        const today = getLocalDateKey();
+        const today = getServerDateKey();
 
         const merged = await withTimeout(runTransaction(db, async (transaction) => {
           const snapshot = await transaction.get(userRef);

@@ -6,6 +6,7 @@ import {
   DEFAULT_SUPPORT_TITLE,
   getSupportLabel,
   getSupportTooltip,
+  sortSupporterWall,
   sortSupportFirst,
 } from "./supportTeam.utils";
 
@@ -71,5 +72,36 @@ describe("sortSupportFirst", () => {
     const users = [{ uid: "a" }, { uid: "b" }];
     sortSupportFirst(users, (uid) => uid === "b");
     expect(users.map((u) => u.uid)).toEqual(["a", "b"]);
+  });
+});
+
+describe("sortSupporterWall", () => {
+  const withLevel = (uid: string, lvl: number | null): SupportTeamMember => ({
+    ...member(uid),
+    lvl,
+  });
+
+  it("puts the highest level first", () => {
+    const sorted = sortSupporterWall([
+      withLevel("a", 3),
+      withLevel("b", 12),
+      withLevel("c", 7),
+    ]);
+    expect(sorted.map(({ uid }) => uid)).toEqual(["b", "c", "a"]);
+  });
+
+  it("breaks ties by name and keeps unknown levels at the back", () => {
+    const sorted = sortSupporterWall([
+      withLevel("zoe", null),
+      withLevel("bob", 5),
+      withLevel("amy", 5),
+    ]);
+    expect(sorted.map(({ uid }) => uid)).toEqual(["amy", "bob", "zoe"]);
+  });
+
+  it("leaves the input array alone", () => {
+    const members = [withLevel("a", 1), withLevel("b", 9)];
+    sortSupporterWall(members);
+    expect(members.map(({ uid }) => uid)).toEqual(["a", "b"]);
   });
 });

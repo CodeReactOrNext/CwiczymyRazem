@@ -22,6 +22,7 @@ import {
   AtSign,
   Guitar,
   Hammer,
+  Heart,
   Map,
   Package,
   Shield,
@@ -68,6 +69,11 @@ const SURFACES: { icon: typeof Map; title: string; body: string }[] = [
     icon: Target,
     title: "Support challenge",
     body: "Choose the target the whole app plays for next week — every player collects the Fame off the week you set.",
+  },
+  {
+    icon: Heart,
+    title: "Supporters",
+    body: "Everyone funding the app, listed with the level they play at. The badge puts you on that wall the day it lands.",
   },
   {
     icon: Shield,

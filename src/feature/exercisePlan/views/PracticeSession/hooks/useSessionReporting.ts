@@ -6,6 +6,7 @@ import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { getLocalDateKey } from 'utils/converter';
 import { getClientReportContext } from 'utils/gameLogic';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
@@ -196,7 +197,11 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
     if (!reportResult || !sessionTimeSnapshot) return existingList;
 
     const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+    // Local, not UTC. This list is the activity log the streak and the heatmap
+    // are derived from, and those follow the player's own calendar day — bucketing
+    // by the UTC day would fold an evening session in the Americas into the next
+    // day's row and make the just-finished session look like it never happened.
+    const todayStr = getLocalDateKey(today);
 
     const newEntry = {
       date: today.toISOString(),
@@ -206,11 +211,11 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
       creativityTime: sessionTimeSnapshot.creativity,
     };
 
-    const exists = existingList.some((item) => new Date(item.date).toISOString().split('T')[0] === todayStr);
+    const exists = existingList.some((item) => getLocalDateKey(new Date(item.date)) === todayStr);
 
     if (exists) {
       return existingList.map((item) => {
-        if (new Date(item.date).toISOString().split('T')[0] === todayStr) {
+        if (getLocalDateKey(new Date(item.date)) === todayStr) {
           return {
             ...item,
             techniqueTime: Number(item.techniqueTime || 0) + newEntry.techniqueTime,

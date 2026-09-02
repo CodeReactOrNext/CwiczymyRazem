@@ -32,8 +32,6 @@ export interface SongListInterface {
   learning: string[];
 }
 
-const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
-
 /** Matches `MAX_SESSION_SONGS` in the form — keeps one report doc a sane size. */
 const MAX_REPORT_SONGS = 20;
 const MAX_SONG_TEXT_LENGTH = 200;
@@ -73,21 +71,19 @@ const sanitizeReportSongs = (value: unknown) => {
 };
 
 /**
- * The user's local calendar day this report is being filed on — the bucket the
- * daily fame counter belongs to. Always the client's "today", even for a
- * back-dated report: that report's own day is long closed, and pointing the
- * counter at it would hand the user a fresh allowance for today.
+ * The server day this report is being filed on — the bucket the daily Fame
+ * counter belongs to. Always "now", even for a back-dated report: that report's
+ * own day is long closed, and pointing the counter at it would hand the user a
+ * fresh allowance for today.
+ *
+ * Read from the server clock rather than the client's `clientTodayISO`, because
+ * the daily Fame allowance is an economy limit, not a personal habit. Taking it
+ * from the browser meant the cap rolled over at a different instant for every
+ * player — and that a client claiming to be in Kiritimati got a second day's
+ * worth of Fame ten hours before anyone else. The streak still uses the client's
+ * local day (see `reportUpdateUserStats`), which is why that field stays.
  */
-const getReportDayKey = (clientTodayISO?: string): string => {
-  if (clientTodayISO && ISO_DAY.test(clientTodayISO)) return clientTodayISO;
-
-  // Legacy clients sent a full ISO timestamp; reportUpdateUserStats normalizes
-  // those to UTC midnight, so bucket them by their UTC day the same way.
-  const parsed = clientTodayISO ? new Date(clientTodayISO) : new Date();
-  const date = isNaN(parsed.getTime()) ? new Date() : parsed;
-
-  return date.toISOString().slice(0, 10);
-};
+const getReportDayKey = (): string => new Date().toISOString().slice(0, 10);
 
 export default async function handler(
   req: NextApiRequest,
@@ -188,7 +184,7 @@ export default async function handler(
     // the shop economy can't be inflated by one very long (self-reported) day.
     const fameResult = calculateSessionFame({
       sessionTimeMs: report.timeSummary.sumTime,
-      dayKey: getReportDayKey(inputData.clientTodayISO),
+      dayKey: getReportDayKey(),
       streak: report.currentUserStats.actualDayWithoutBreak,
       fameDay: currentUserStats.fameDay,
       accuracy: inputData.micPerformance?.accuracy,

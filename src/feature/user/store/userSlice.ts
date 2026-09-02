@@ -13,7 +13,7 @@ import type {
   userSliceInitialState,
 } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
-import { getLocalDateKey } from "utils/converter";
+import { getLocalDateKey, getServerDateKey } from "utils/converter";
 import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
 import { subtractReportedTime } from "./timerReporting";
@@ -161,7 +161,7 @@ const userSlice = createSlice({
     // Challenges removed
     generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
-      const today = getLocalDateKey();
+      const today = getServerDateKey();
 
       // Templates. `group` marks tasks that overlap in what they ask the
       // player to do (e.g. rating songs, completing practice plans) so we
@@ -190,8 +190,16 @@ const userSlice = createSlice({
         { type: 'practice_three_exercises', title: 'Practice 3 different exercises', target: 3, group: 'specific_exercise' },
       ];
 
-      // If quest exists for today, do nothing
-      if (state.currentUserStats.dailyQuest?.date === today && state.currentUserStats.dailyQuest?.tasks?.length > 0) return;
+      // If a quest exists for today, do nothing.
+      //
+      // `>=` rather than `===` because the key used to be the player's *local*
+      // date, so everyone ahead of UTC is holding a quest stamped with tomorrow's
+      // server day at the moment this ships. Treating that as stale would throw
+      // away a half-finished set — and an already-claimed one would come back
+      // unclaimed. Keeping it costs nothing: the next server midnight makes the
+      // key current and the one after that retires it normally.
+      const storedQuest = state.currentUserStats.dailyQuest;
+      if (storedQuest && storedQuest.date >= today && (storedQuest.tasks?.length ?? 0) > 0) return;
 
       // Shuffle and pick 3, skipping templates whose group is already
       // represented in the selection so the quest set never contains two
@@ -246,9 +254,12 @@ const userSlice = createSlice({
     completeQuestTask: (state, { payload }: PayloadAction<{ type: DailyQuestTaskType; amount?: number; exerciseId?: string }>) => {
       if (!state.currentUserStats?.dailyQuest) return;
 
-      // Check if today
-      const today = getLocalDateKey();
-      if (state.currentUserStats.dailyQuest.date !== today) return;
+      // Progress only counts against a quest that is still live. `>=` for the
+      // same reason as in `generateDailyQuest`: a quest carrying a pre-migration
+      // local date key can read as tomorrow, and refusing its progress would
+      // leave those players unable to complete the set they are looking at.
+      const today = getServerDateKey();
+      if (state.currentUserStats.dailyQuest.date < today) return;
 
       const quest = state.currentUserStats.dailyQuest;
 
@@ -386,18 +397,24 @@ const userSlice = createSlice({
 
           const currentDailyQuest = prevStats?.dailyQuest;
           const currentSkills = prevStats?.skills;
-          const today = getLocalDateKey();
+          // Two clocks, deliberately. The quest is a shared server day, while
+          // `lastReportDate` below is stored as UTC midnight of the reporter's
+          // *local* day — comparing it against a server key would call every
+          // evening session in the Americas a new day and hand out the skill
+          // point twice.
+          const serverToday = getServerDateKey();
+          const localToday = getLocalDateKey();
 
           state.currentUserStats = {
             ...payload.currentUserStats,
-            dailyQuest: (currentDailyQuest && currentDailyQuest.date === today) ? currentDailyQuest : payload.currentUserStats.dailyQuest,
+            dailyQuest: (currentDailyQuest && currentDailyQuest.date === serverToday) ? currentDailyQuest : payload.currentUserStats.dailyQuest,
             skills: payload.currentUserStats.skills?.unlockedSkills ? payload.currentUserStats.skills : currentSkills,
           };
 
           state.previousUserStats = prevStats;
 
           // SKILL REWARD LOGIC: Every category practiced today gives +1 level to its master skill
-          const isNewDayReport = prevStats?.lastReportDate?.split('T')[0] !== today;
+          const isNewDayReport = prevStats?.lastReportDate?.split('T')[0] !== localToday;
 
           if (isNewDayReport && state.currentUserStats.skills) {
             const skills = { ...state.currentUserStats.skills };
