@@ -28,9 +28,9 @@ On top of the curve there are two modifiers:
 
 These are the big, predictable payouts. Most of the Fame that ends up buying a Legendary comes from here.
 
-<StatRow stats="+5000:winning a season|+500:a monthly challenge recording|+750:bonus for clearing all five|+40:finishing your daily quests" caption="A full challenge board is 3250 Fame in a month and takes an afternoon; topping the season pays 5000 and takes the whole month." />
+<StatRow stats="+2000:winning a season|+200:a monthly challenge recording|+500:bonus for clearing all five|+40:finishing your daily quests" caption="A full challenge board is 1500 Fame in a month and takes an afternoon; topping the season pays 2000 on top of everything the month already paid you." />
 
-<Checklist items="Monthly challenges::500 Fame per accepted recording, plus 750 once every song on the board has one. Recordings on a closed month's board pay nothing|Weekly Milestones::Each level you've unlocked pays out every week you meet its goal, from 20 Fame a week at the bottom to 300 at the top, and every unlocked level you've met pays at once|Daily quests::40 Fame for finishing all three, once you press Claim|Scale Map::50 Fame each time you clear a full box, alongside the points|Season placings::Finishing a month in the top ten pays 5000 / 3000 / 2000 / 1200 / 700 Fame for the first five places and 500 / 400 / 300 / 200 / 150 for the rest, paid when the season closes. Winning a season is the single biggest payout in the app" />
+<Checklist items="Monthly challenges::200 Fame per accepted recording, plus 500 once every song on the board has one. Recordings on a closed month's board pay nothing|Weekly Milestones::Each level you've unlocked pays out every week you meet its goal, from 20 Fame a week at the bottom to 300 at the top, and every unlocked level you've met pays at once|Daily quests::40 Fame for finishing all three, once you press Claim|Scale Map::50 Fame each time you clear a full box, alongside the points|Season placings::Finishing a month in the top ten pays 2000 / 1200 / 800 / 500 / 350 Fame for the first five places and 250 / 220 / 200 / 175 / 150 for the rest, paid when the season closes" />
 
 ## The community pays you
 

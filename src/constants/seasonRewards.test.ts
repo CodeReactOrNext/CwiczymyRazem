@@ -28,10 +28,10 @@ describe("season fame ladder", () => {
   });
 
   /**
-   * The reason this ladder was rebalanced: 1st used to pay 500, exactly what a
-   * single challenge recording pays and a fifth of a full board — a month of
-   * leading the table worth less than an afternoon of recording. Winning the
-   * season is the longest grind in the game and has to pay like the longest.
+   * 1st used to pay 500, exactly what a single challenge recording paid then —
+   * a month of leading the table worth less than an afternoon of recording.
+   * Winning the season is the longest grind in the game, so it has to outpay
+   * both a single recording and a whole board cleared in an afternoon.
    */
   it("pays more for winning a season than for clearing a challenge board", () => {
     expect(SEASON_FAME_REWARDS[0]).toBeGreaterThan(FULL_BOARD_FAME);

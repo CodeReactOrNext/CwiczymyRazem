@@ -35,6 +35,7 @@
     "grant-all-tokens": "vitest run --mode grant-all-tokens scripts/grantAllSupportersTokens.test.ts",
     "clear-boards": "vitest run --mode clear-boards scripts/clearSupporterBoards.test.ts",
     "delete-guilds": "vitest run --mode delete-guilds scripts/deleteAllGuilds.test.ts",
+    "delete-recording": "vitest run --mode delete-recording scripts/deleteRecording.test.ts",
     "backfill-section-maps": "vitest run --mode backfill-section-maps scripts/backfillSongSectionMaps.test.ts",
     "update-hero-stats": "vitest run --mode hero-stats scripts/updateHeroStats.test.ts",
     "blog-stats": "vitest run --mode blog-stats scripts/blogStats.test.ts",
