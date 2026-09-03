@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { achievementCategoryKey } from "../../data/achievementCategories";
 import { useAchievementContext } from "../../hooks/useAchievementContext";
-import type { AchievementList } from "../../types";
+import type { AchievementContext, AchievementList } from "../../types";
 import type {
   AchievementPanelCategory,
   AchievementPanelEntry,
@@ -21,18 +21,32 @@ const RARITY_BAR: Record<AchievementRarityTally["rarity"], string> = {
   epic: "bg-purple-400",
 };
 
+// Tiles read left to right — badge, then name and progress — so the columns are
+// wider and fewer than a bare icon grid would want.
 const TILE_GRID =
-  "grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6";
+  "grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4";
 
-const Tiles = ({ entries }: { entries: AchievementPanelEntry[] }) => (
+const Tiles = ({
+  entries,
+  context,
+}: {
+  entries: AchievementPanelEntry[];
+  context: AchievementContext | null;
+}) => (
   <div className={TILE_GRID}>
     {entries.map((entry) => (
-      <AchievementTile key={entry.data.id} entry={entry} />
+      <AchievementTile key={entry.data.id} entry={entry} context={context} />
     ))}
   </div>
 );
 
-const CategoryBlock = ({ block }: { block: AchievementPanelCategory }) => {
+const CategoryBlock = ({
+  block,
+  context,
+}: {
+  block: AchievementPanelCategory;
+  context: AchievementContext | null;
+}) => {
   const { t } = useTranslation("achievements");
   const percent = block.total > 0 ? (block.owned / block.total) * 100 : 0;
 
@@ -49,7 +63,7 @@ const CategoryBlock = ({ block }: { block: AchievementPanelCategory }) => {
           <div className='h-full rounded-full bg-zinc-600' style={{ width: `${percent}%` }} />
         </div>
       </div>
-      <Tiles entries={block.entries} />
+      <Tiles entries={block.entries} context={context} />
     </section>
   );
 };
@@ -111,13 +125,13 @@ export const AchievementsPanel = ({
               {t("panel.readySubtitle", { count: state.ready.length })}
             </p>
           </div>
-          <Tiles entries={state.ready} />
+          <Tiles entries={state.ready} context={context} />
         </section>
       )}
 
       <div className='flex flex-col gap-8'>
         {state.categories.map((block) => (
-          <CategoryBlock key={block.category} block={block} />
+          <CategoryBlock key={block.category} block={block} context={context} />
         ))}
       </div>
     </div>

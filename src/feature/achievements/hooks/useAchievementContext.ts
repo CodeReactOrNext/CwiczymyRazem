@@ -7,6 +7,7 @@ import type {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
+import { useMemo } from "react";
 import type { SongListInterface } from "src/pages/api/user/report";
 import { useAppSelector } from "store/hooks";
 
@@ -61,15 +62,18 @@ export const useAchievementContext = (): AchievementContext | null => {
     staleTime: 10 * 60 * 1000,
   });
 
-  if (!currentUserStats || !userSongs) {
-    return null;
-  }
+  // Memoised because consumers key work off this object: the panel evaluates 77
+  // checks twice over from it, and a fresh literal every render would defeat
+  // that memo on every unrelated re-render.
+  return useMemo(() => {
+    if (!currentUserStats || !userSongs) return null;
 
-  return {
-    statistics: currentUserStats,
-    songLists: userSongs as unknown as SongListInterface,
-    arsenal: summarizeArsenal(arsenal),
-    sessionResults: EMPTY_SESSION_RESULTS,
-    inputData: EMPTY_INPUT_DATA,
-  };
+    return {
+      statistics: currentUserStats,
+      songLists: userSongs as unknown as SongListInterface,
+      arsenal: summarizeArsenal(arsenal),
+      sessionResults: EMPTY_SESSION_RESULTS,
+      inputData: EMPTY_INPUT_DATA,
+    };
+  }, [currentUserStats, userSongs, arsenal]);
 };

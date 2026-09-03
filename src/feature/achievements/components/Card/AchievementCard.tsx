@@ -12,13 +12,19 @@ export const AchievementCard = memo(({
   data,
   context,
   isUnlocked,
-  showProgress = false
+  showProgress = false,
+  variant = "holo",
+  muted = false
 }: { 
   id: AchievementList; 
   data?: AchievementsDataInterface;
   context?: AchievementContext | null;
   isUnlocked?: boolean;
   showProgress?: boolean;
+  /** `flat` for dense grids — see `AchievementPhysicalCard`. */
+  variant?: "holo" | "flat";
+  /** `flat` only: render the badge in neutral zinc, for a locked one. */
+  muted?: boolean;
 }) => {
   const isMobileView = useResponsiveStore((state) => state.isMobile);
 
@@ -37,6 +43,8 @@ export const AchievementCard = memo(({
     <AchievementPhysicalCard
       Icon={Icon}
       rarity={rarity}
+      variant={variant}
+      muted={muted}
       isMobileView={isMobileView}
       className={`rounded-lg ${isMobileView ? "h-10 w-10 md:h-11 md:w-11" : "h-9 w-9 md:h-11 md:w-11"}`}
     />
