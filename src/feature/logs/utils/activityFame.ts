@@ -1,12 +1,29 @@
 import type { FirebaseLogsInterface } from "feature/logs/types/logs.type";
 
-import type { AnyFirebaseLog } from "./groupConsecutiveLogs";
+import {
+  type AnyFirebaseLog,
+  isFirebaseLogsDonation,
+} from "./groupConsecutiveLogs";
 
 /**
  * Fame for one logged activity that carries no practice time — a case opened, a song rated, a
  * listing put up, a playlist created. Paid per activity, so a row of five is worth five of them.
  */
 export const ACTION_FAME = 3;
+
+/**
+ * Fame a single donation is worth — the same order as a solid practice session, because putting
+ * money into the project is the rarest thing anyone does here. Only donations matched to an
+ * account by email carry it; an anonymous coffee has nobody to pay.
+ */
+export const DONATION_FAME = 30;
+
+/**
+ * Donations from one day that a single feed row pays for. A fifth coffee on the same day still
+ * shows up in the feed, it just stops adding to the row — see `splitPinnedDonations`, which uses
+ * the same number to decide how many get pinned to the top.
+ */
+export const MAX_DAILY_DONATIONS = 4;
 
 /**
  * Fame per minute of logged practice. One minute, one Fame: the amount a practice row is worth is
@@ -41,11 +58,29 @@ const getLogSessionMs = (log: AnyFirebaseLog): number => {
 export const getGroupSessionMs = (logs: readonly AnyFirebaseLog[]): number =>
   logs.reduce((total, log) => total + getLogSessionMs(log), 0);
 
-/** Logs in the group that aren't practice — the ones paid per activity rather than per minute. */
+/**
+ * Logs in the group that aren't practice and aren't donations — the ones paid per activity rather
+ * than per minute. Donations are counted separately because they're priced differently.
+ */
 export const countActionLogs = (logs: readonly AnyFirebaseLog[]): number =>
   logs.reduce(
-    (count, log) => (getLogSessionMs(log) === 0 ? count + 1 : count),
+    (count, log) =>
+      getLogSessionMs(log) === 0 && !isFirebaseLogsDonation(log)
+        ? count + 1
+        : count,
     0,
+  );
+
+/** Donations the group pays for: everything past the day's fourth is on the house. */
+export const countPaidDonationLogs = (
+  logs: readonly AnyFirebaseLog[],
+): number =>
+  Math.min(
+    MAX_DAILY_DONATIONS,
+    logs.reduce(
+      (count, log) => (isFirebaseLogsDonation(log) ? count + 1 : count),
+      0,
+    ),
   );
 
 /**
@@ -73,5 +108,6 @@ export const calculateGroupFame = (group: {
   Math.min(
     MAX_ACTIVITY_FAME,
     calculateTimeFame(getGroupSessionMs(group.logs)) +
-      ACTION_FAME * countActionLogs(group.logs),
+      ACTION_FAME * countActionLogs(group.logs) +
+      DONATION_FAME * countPaidDonationLogs(group.logs),
   );

@@ -304,6 +304,15 @@ export interface FirebaseLogsDonationInterface {
   supporterName?: string | null;
   amount: number;
   kind: "one_off" | "recurring";
+  /**
+   * Account behind the donation, matched by the address Buy Me a Coffee sent. Absent when the
+   * donation was anonymous or nobody signed up with that address yet — such a card stays the
+   * plain announcement it always was: no player attached, no pin, nothing to motivate.
+   */
+  uid?: string;
+  userName?: string;
+  avatarUrl?: string | null;
+  userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
   reactionFame?: LogReactionFame;
