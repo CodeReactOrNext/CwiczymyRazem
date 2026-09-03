@@ -8,13 +8,11 @@ import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { PROGRESS_TABS } from "constants/navTabs";
-import { AchievementsPanel } from "feature/achievements";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
 import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
-import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { StatsSection } from "feature/profile/components/StatsSection";
+import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
 import { downloadProfileSummaryCsv } from "feature/profile/services/profileSummary.export";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { downloadSongProgressCsv } from "feature/songs/services/songs.export";
@@ -44,6 +42,7 @@ const ProfileActivityPage = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
   const [refreshKey] = useState(0);
+  const tabs = useProgressTabs();
   const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth as string, refreshKey);
 
   const { data: songs, refetch: refreshSongs } = useQuery({
@@ -112,7 +111,7 @@ const ProfileActivityPage = () => {
       <div className='p-4'>
         <div className='mb-6 flex flex-wrap items-center gap-2'>
           <PageTabs
-            tabs={PROGRESS_TABS}
+            tabs={tabs}
             activeHref='/profile/activity'
             ariaLabel='Progress sections'
           />
@@ -163,14 +162,6 @@ const ProfileActivityPage = () => {
           {/* 5. Activity Log calendar */}
           <ActivityLog key={refreshKey} userAuth={userAuth as string} />
 
-          {/* 6. Achievements */}
-          <div className='mt-4 flex flex-col gap-8'>
-            <SeasonalAchievements userId={userAuth as string} />
-            <div className='flex flex-col gap-4'>
-              <h3 className='text-xl font-semibold text-white'>Achievements</h3>
-              <AchievementsPanel userAchievements={userStats?.achievements ?? []} />
-            </div>
-          </div>
         </div>
       </div>
     </MainContainer>

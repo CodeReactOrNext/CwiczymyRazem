@@ -11,6 +11,8 @@ export interface PageTab {
   label: string;
   href: string;
   tooltip?: string;
+  /** Short trailing count, e.g. `51/77`. Rendered muted next to the label. */
+  badge?: string;
 }
 
 interface PageTabsProps {
@@ -32,7 +34,7 @@ export const PageTabs = ({
       "flex h-auto max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-zinc-900 p-1 no-scrollbar",
       className
     )}>
-    {tabs.map(({ label, href, tooltip }) => {
+    {tabs.map(({ label, href, tooltip, badge }) => {
       const isActive = href === activeHref;
       const link = (
         <Link
@@ -46,6 +48,15 @@ export const PageTabs = ({
               : "text-zinc-400 hover:text-zinc-300"
           )}>
           {label}
+          {badge && (
+            <span
+              className={cn(
+                "ml-2 text-xs font-semibold tabular-nums",
+                isActive ? "text-zinc-500" : "text-zinc-600"
+              )}>
+              {badge}
+            </span>
+          )}
         </Link>
       );
 

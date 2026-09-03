@@ -9,11 +9,10 @@ import { AchievementCard } from "../Card/AchievementCard";
 /**
  * One badge on the collection panel.
  *
- * The badge art is `AchievementCard`, the same component the post-session popup
- * and the public profile use, so a badge looks like itself everywhere and its
- * tooltip and mobile dialog come along for free. It is asked for the `flat`
- * variant: the holo treatment is a reward moment, and 77 of them at once is both
- * a wall of light chiclets and a few hundred blended layers.
+ * The badge art is `AchievementCard`, exactly as the post-session popup, the
+ * Achievements Map and the public profile render it — same holo face, same tilt,
+ * same hover — so a badge looks and behaves like itself everywhere, and its
+ * tooltip and mobile dialog come along for free.
  *
  * What the tile adds is what the bare grid could not say — the name, and how far
  * along the badge is — so finding what is close to unlocking does not mean
@@ -55,20 +54,22 @@ export const AchievementTile = memo(
           SURFACE[state]
         )}>
         {/*
-          A locked badge is drawn in neutral zinc rather than desaturated with a
-          filter: a rarity colour should never hint at a badge the player does
-          not hold, and a filter would cost a composited layer per tile. `ready`
+          Locked badges are greyed the way the Achievements Map greys them, so a
+          rarity colour never hints at a badge the player does not hold. `ready`
           keeps its colour — the requirement is met, only the report is missing.
+
+          The card itself is the full collectible, hover and all: this panel is
+          behind its own tab, so nothing here mounts until it is asked for.
         */}
-        <AchievementCard
-          id={data.id}
-          data={data}
-          context={context}
-          isUnlocked={isOwned}
-          showProgress={state === "progress"}
-          variant='flat'
-          muted={state === "progress" || state === "locked"}
-        />
+        <div className={cn(!isOwned && state !== "ready" && "opacity-50 grayscale")}>
+          <AchievementCard
+            id={data.id}
+            data={data}
+            context={context}
+            isUnlocked={isOwned}
+            showProgress={state === "progress"}
+          />
+        </div>
 
         <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
           <p className={cn("text-xs font-semibold leading-snug", NAME[state])}>
