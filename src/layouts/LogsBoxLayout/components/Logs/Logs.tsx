@@ -76,6 +76,7 @@ import {
   getGroupReactionAnchor,
   getGroupReactors,
 } from "feature/logs/utils/groupReactions";
+import { splitPinnedDonations } from "feature/logs/utils/pinnedDonations";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
@@ -704,19 +705,59 @@ const FirebaseLogsSupportAskItem = ({
   );
 };
 
-const FirebaseLogsDonationItem = ({
-  log,
-  isNew,
-}: {
-  log: FirebaseLogsDonationInterface;
-  isNew: boolean;
-}) => {
+/** What a single donation reads as — the sentence the card leads with. */
+const getDonationHeadline = (log: FirebaseLogsDonationInterface): string => {
+  const name = log.supporterName?.trim() || log.userName?.trim() || "Someone";
+
+  return log.kind === "recurring"
+    ? `${name} became a monthly supporter`
+    : `${name} bought Riff Quest a $${log.amount} coffee`;
+};
+
+/** One coffee inside a card that holds several — the day's donations, listed under the headline. */
+const DonationLine = ({ log }: { log: FirebaseLogsDonationInterface }) => {
   const date = new Date(log.data);
-  const name = log.supporterName?.trim() || "Someone";
-  const headline =
-    log.kind === "recurring"
-      ? `${name} became a monthly supporter`
-      : `${name} bought Riff Quest a $${log.amount} coffee`;
+
+  return (
+    <div className='flex items-center gap-2 text-sm text-secondText'>
+      <Coffee size={14} className='shrink-0 text-orange-400/80' />
+      <span className='text-white'>
+        {log.kind === "recurring" ? "Monthly support" : `$${log.amount} coffee`}
+      </span>
+      <span className='text-[11px] opacity-60'>
+        {addZeroToTime(date.getHours())}:{addZeroToTime(date.getMinutes())}
+      </span>
+    </div>
+  );
+};
+
+/**
+ * A donation card. When the address Buy Me a Coffee sent matches an account, the card names that
+ * player and can be motivated like any other activity — the donor keeps the Fame the feed hands
+ * out, and a second coffee the same day stacks onto the same amount instead of opening a second
+ * card. With no account behind the donation there is nobody to pay, so the card stays the plain
+ * announcement it has always been.
+ */
+const FirebaseLogsDonationItem = ({
+  logs,
+  isNew,
+  currentUserId,
+  showMotivateHint,
+}: {
+  logs: FirebaseLogsDonationInterface[];
+  isNew: boolean;
+  currentUserId: string;
+  showMotivateHint: boolean;
+}) => {
+  const newest = logs[0];
+  const date = new Date(newest.data);
+  const { uid, userName, avatarUrl, userAvatarFrame } = newest;
+
+  const fameAmount = calculateGroupFame({ logs });
+  const reactionLogId = getGroupReactionAnchor({ logs })?.id;
+  const reactors = getGroupReactors({ logs });
+  const awardedFame = getGroupAwardedFame({ logs }, fameAmount);
+  const canMotivate = Boolean(uid && reactionLogId);
 
   return (
     <div
@@ -737,7 +778,7 @@ const FirebaseLogsDonationItem = ({
             New supporter
           </p>
           <h3 className='text-sm font-bold text-white sm:text-base'>
-            {headline}
+            {getDonationHeadline(newest)}
           </h3>
         </div>
         <span className='ml-auto shrink-0 text-[11px] text-secondText opacity-60'>
@@ -745,6 +786,42 @@ const FirebaseLogsDonationItem = ({
           {addZeroToTime(date.getMinutes())}
         </span>
       </div>
+
+      {logs.length > 1 && (
+        <div className='relative z-10 flex flex-col gap-2 px-3 pb-4 sm:px-5'>
+          {logs.map((log, index) => (
+            <DonationLine key={log.id ?? `${log.data}-${index}`} log={log} />
+          ))}
+        </div>
+      )}
+
+      {uid && (
+        <div className='relative z-10 flex items-center gap-2 px-3 pb-4 sm:gap-2.5 sm:px-5'>
+          <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-tertiary'>
+            <UserLink
+              uid={uid}
+              userName={userName ?? newest.supporterName ?? "Supporter"}
+              avatarUrl={avatarUrl ?? undefined}
+              lvl={userAvatarFrame}
+              avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
+            />
+          </span>
+          {canMotivate && (
+            <div className='ml-auto shrink-0'>
+              <LogReaction
+                logId={reactionLogId as string}
+                reactions={reactors}
+                currentUserId={currentUserId}
+                disabled={uid === currentUserId}
+                fameAmount={fameAmount}
+                awardedFame={awardedFame}
+                recipientName={userName ?? newest.supporterName ?? undefined}
+                showHint={showMotivateHint}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -1422,11 +1499,16 @@ const Logs = ({
     };
   }, []); // Empty dependency array since we handle cleanup manually
 
-  const groups = useMemo(
-    () =>
-      dropIncompleteTailGroup(groupConsecutiveLogs(logs), Boolean(hasOlderLogs)),
-    [logs, hasOlderLogs],
-  );
+  // Today's donations are lifted to the front before grouping, so they open the feed instead of
+  // sinking under the evening's practice reports. Everything else keeps the order it streamed in.
+  const groups = useMemo(() => {
+    const { pinned, rest } = splitPinnedDonations(logs);
+
+    return [
+      ...groupConsecutiveLogs(pinned),
+      ...dropIncompleteTailGroup(groupConsecutiveLogs(rest), Boolean(hasOlderLogs)),
+    ];
+  }, [logs, hasOlderLogs]);
 
   const songIds = useMemo(
     () =>
@@ -1453,9 +1535,7 @@ const Logs = ({
 
     return groups.findIndex(
       (group) =>
-        group.type !== "topPlayers" &&
-        group.type !== "supportAsk" &&
-        group.type !== "donationReceived" &&
+        Boolean(group.uid) &&
         group.uid !== currentUserId &&
         Boolean(getGroupReactionAnchor(group)?.id),
     );
@@ -1493,8 +1573,10 @@ const Logs = ({
               />
             ) : group.type === "donationReceived" ? (
               <FirebaseLogsDonationItem
-                log={representative as FirebaseLogsDonationInterface}
+                logs={group.logs as FirebaseLogsDonationInterface[]}
                 isNew={isNew}
+                currentUserId={currentUserId}
+                showMotivateHint={groupIndex === hintGroupIndex}
               />
             ) : (
               <GroupedLogItem

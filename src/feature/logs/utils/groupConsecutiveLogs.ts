@@ -141,6 +141,29 @@ export const getLogGroupType = (log: AnyFirebaseLog): LogGroupType => {
 
 const getLogUid = (log: AnyFirebaseLog): string | undefined => (log as { uid?: string }).uid;
 
+/**
+ * The calendar day a log belongs to, in UTC. Deliberately not the viewer's timezone: the feed and
+ * `/api/logs/react` both group by this key, and a browser in UTC+2 disagreeing with the server
+ * about where the day ends would price the same row two different ways.
+ */
+export const getLogDayKey = (log: AnyFirebaseLog): string => {
+  const raw = (log as { timestamp?: string | number | Date; data?: string }).timestamp ??
+    (log as { data?: string }).data;
+  const date = new Date(raw as string | number | Date);
+
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+};
+
+/**
+ * Key donations gather under: the donor and the day. Anonymous donations — the ones no account was
+ * matched to by email — have no donor to gather under and stay one card each, exactly as before.
+ */
+const getDonationGroupKey = (log: AnyFirebaseLog): string | null => {
+  if (!isFirebaseLogsDonation(log) || !log.uid) return null;
+
+  return `${log.uid}:${getLogDayKey(log)}`;
+};
+
 export interface LogGroup<T extends AnyFirebaseLog = AnyFirebaseLog> {
   type: LogGroupType;
   uid?: string;
@@ -151,13 +174,33 @@ export interface LogGroup<T extends AnyFirebaseLog = AnyFirebaseLog> {
  * Groups consecutive logs of the same activity category performed by the same user into a single
  * visual group. A different category or a different user's log breaks the group — logs that have
  * no owning user (e.g. season top-players digests) are never grouped together.
+ *
+ * Donations are the one exception to "consecutive": a donor's coffees from the same day gather
+ * into one card wherever they land in the feed, because two donations hours apart are still the
+ * same day's support and their Fame is meant to stack into a single amount.
  */
 export const groupConsecutiveLogs = <T extends AnyFirebaseLog>(logs: T[]): LogGroup<T>[] => {
   const groups: LogGroup<T>[] = [];
+  const donationGroups = new Map<string, LogGroup<T>>();
 
   for (const log of logs) {
     const type = getLogGroupType(log);
     const uid = getLogUid(log);
+    const donationKey = getDonationGroupKey(log);
+
+    if (donationKey) {
+      const donationGroup = donationGroups.get(donationKey);
+
+      if (donationGroup) {
+        donationGroup.logs.push(log);
+      } else {
+        const group: LogGroup<T> = { type, uid, logs: [log] };
+        donationGroups.set(donationKey, group);
+        groups.push(group);
+      }
+      continue;
+    }
+
     const previousGroup = groups[groups.length - 1];
 
     if (previousGroup && uid && previousGroup.type === type && previousGroup.uid === uid) {
