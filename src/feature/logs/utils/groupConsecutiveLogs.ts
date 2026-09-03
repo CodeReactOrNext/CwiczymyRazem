@@ -147,7 +147,8 @@ const getLogUid = (log: AnyFirebaseLog): string | undefined => (log as { uid?: s
  * about where the day ends would price the same row two different ways.
  */
 export const getLogDayKey = (log: AnyFirebaseLog): string => {
-  const raw = (log as { timestamp?: string | number | Date; data?: string }).timestamp ??
+  const raw =
+    (log as { timestamp?: string | number | Date; data?: string }).timestamp ??
     (log as { data?: string }).data;
   const date = new Date(raw as string | number | Date);
 

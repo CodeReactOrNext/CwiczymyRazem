@@ -705,13 +705,20 @@ const FirebaseLogsSupportAskItem = ({
   );
 };
 
-/** What a single donation reads as — the sentence the card leads with. */
-const getDonationHeadline = (log: FirebaseLogsDonationInterface): string => {
-  const name = log.supporterName?.trim() || log.userName?.trim() || "Someone";
+/** Who the card thanks: the name Buy Me a Coffee sent, or the account it was matched to. */
+const getDonationName = (log: FirebaseLogsDonationInterface): string =>
+  log.supporterName?.trim() || log.userName?.trim() || "Someone";
 
-  return log.kind === "recurring"
+/** The sentence the card leads with — the day's whole support when there was more than one. */
+const getDonationHeadline = (logs: FirebaseLogsDonationInterface[]): string => {
+  const [newest] = logs;
+  const name = getDonationName(newest);
+
+  if (logs.length > 1) return `${name} backed Riff Quest ${logs.length} times`;
+
+  return newest.kind === "recurring"
     ? `${name} became a monthly supporter`
-    : `${name} bought Riff Quest a $${log.amount} coffee`;
+    : `${name} bought Riff Quest a $${newest.amount} coffee`;
 };
 
 /** One coffee inside a card that holds several — the day's donations, listed under the headline. */
@@ -757,7 +764,6 @@ const FirebaseLogsDonationItem = ({
   const reactionLogId = getGroupReactionAnchor({ logs })?.id;
   const reactors = getGroupReactors({ logs });
   const awardedFame = getGroupAwardedFame({ logs }, fameAmount);
-  const canMotivate = Boolean(uid && reactionLogId);
 
   return (
     <div
@@ -778,7 +784,7 @@ const FirebaseLogsDonationItem = ({
             New supporter
           </p>
           <h3 className='text-sm font-bold text-white sm:text-base'>
-            {getDonationHeadline(newest)}
+            {getDonationHeadline(logs)}
           </h3>
         </div>
         <span className='ml-auto shrink-0 text-[11px] text-secondText opacity-60'>
@@ -800,22 +806,22 @@ const FirebaseLogsDonationItem = ({
           <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-tertiary'>
             <UserLink
               uid={uid}
-              userName={userName ?? newest.supporterName ?? "Supporter"}
+              userName={userName ?? getDonationName(newest)}
               avatarUrl={avatarUrl ?? undefined}
               lvl={userAvatarFrame}
               avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
             />
           </span>
-          {canMotivate && (
+          {reactionLogId && (
             <div className='ml-auto shrink-0'>
               <LogReaction
-                logId={reactionLogId as string}
+                logId={reactionLogId}
                 reactions={reactors}
                 currentUserId={currentUserId}
                 disabled={uid === currentUserId}
                 fameAmount={fameAmount}
                 awardedFame={awardedFame}
-                recipientName={userName ?? newest.supporterName ?? undefined}
+                recipientName={userName ?? getDonationName(newest)}
                 showHint={showMotivateHint}
               />
             </div>
@@ -1506,7 +1512,10 @@ const Logs = ({
 
     return [
       ...groupConsecutiveLogs(pinned),
-      ...dropIncompleteTailGroup(groupConsecutiveLogs(rest), Boolean(hasOlderLogs)),
+      ...dropIncompleteTailGroup(
+        groupConsecutiveLogs(rest),
+        Boolean(hasOlderLogs),
+      ),
     ];
   }, [logs, hasOlderLogs]);
 

@@ -1,7 +1,10 @@
 import crypto from "crypto";
 import { logger } from "feature/logger/Logger";
 import * as admin from "firebase-admin";
-import { findDonorAccountByEmail, grantSupporterByEmail } from "lib/support/supporterGrant";
+import {
+  findDonorAccountByEmail,
+  grantSupporterByEmail,
+} from "lib/support/supporterGrant";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Readable } from "stream";
 import { firestore } from "utils/firebase/api/firebase.config";
@@ -60,6 +63,11 @@ function extractAmount(data: Record<string, any>): number {
 
 const TS = () => admin.firestore.FieldValue.serverTimestamp();
 
+/** BMC labels the donor's address differently per event type; take whichever came. */
+function extractEmail(data: Record<string, any>): string | null {
+  return data.supporter_email ?? data.payer_email ?? data.email ?? null;
+}
+
 /** Posts a celebratory card into the shared Activity feed — same broadcast pattern as
  * the support-ask cron (everyone sees it). When the donor's address belongs to an account,
  * that account is stamped onto the log: the feed then pins the card to the top of the day
@@ -95,11 +103,6 @@ async function postDonationActivity(
       extra: { error: error instanceof Error ? error.message : String(error) },
     });
   }
-}
-
-/** BMC labels the donor's address differently per event type; take whichever came. */
-function extractEmail(data: Record<string, any>): string | null {
-  return data.supporter_email ?? data.payer_email ?? data.email ?? null;
 }
 
 /** Turns the donation into the supporter badge. Anonymous donations carry no

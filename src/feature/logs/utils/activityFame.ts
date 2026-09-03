@@ -1,6 +1,9 @@
 import type { FirebaseLogsInterface } from "feature/logs/types/logs.type";
 
-import { type AnyFirebaseLog, isFirebaseLogsDonation } from "./groupConsecutiveLogs";
+import {
+  type AnyFirebaseLog,
+  isFirebaseLogsDonation,
+} from "./groupConsecutiveLogs";
 
 /**
  * Fame for one logged activity that carries no practice time — a case opened, a song rated, a
@@ -74,7 +77,10 @@ export const countPaidDonationLogs = (
 ): number =>
   Math.min(
     MAX_DAILY_DONATIONS,
-    logs.reduce((count, log) => (isFirebaseLogsDonation(log) ? count + 1 : count), 0),
+    logs.reduce(
+      (count, log) => (isFirebaseLogsDonation(log) ? count + 1 : count),
+      0,
+    ),
   );
 
 /**
