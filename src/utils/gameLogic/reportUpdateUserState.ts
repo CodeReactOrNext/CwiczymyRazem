@@ -1,4 +1,6 @@
 import { STREAK_REMINDER_LOCAL_HOUR } from "constants/streakReminder";
+import type { ArsenalSummary } from "feature/arsenal/data/arsenalSummary";
+import { EMPTY_ARSENAL_SUMMARY } from "feature/arsenal/data/arsenalSummary";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -18,11 +20,18 @@ interface updateUserStatsProps {
   currentUserStats: StatisticsDataInterface;
   inputData: ReportFormikInterface;
   currentUserSongLists: SongListInterface;
+  /**
+   * Flat gear facts the gear achievements read. Absent means "no arsenal to
+   * speak of" rather than an error, so a caller that predates the Arsenal
+   * simply earns none of them.
+   */
+  arsenalSummary?: ArsenalSummary;
 }
 export const reportUpdateUserStats = ({
   currentUserStats,
   inputData,
-  currentUserSongLists
+  currentUserSongLists,
+  arsenalSummary = EMPTY_ARSENAL_SUMMARY
 }: updateUserStatsProps) => {
   // Parse client's local date as UTC midnight to avoid timezone drift.
   // New format: "YYYY-MM-DD" (local date string from client).
@@ -196,7 +205,8 @@ export const reportUpdateUserStats = ({
     statistics: updatedUserData,
     sessionResults: raiting,
     inputData,
-    songLists: currentUserSongLists
+    songLists: currentUserSongLists,
+    arsenal: arsenalSummary
   });
   const updatedUserDataWithAchievements: StatisticsDataInterface = {
     ...updatedUserData,

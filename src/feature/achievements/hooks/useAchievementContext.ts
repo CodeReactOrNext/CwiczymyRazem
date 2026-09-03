@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { summarizeArsenal } from "feature/arsenal/data/arsenalSummary";
+import { useArsenalData } from "feature/arsenal/hooks/useArsenalData";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import type {
@@ -48,6 +50,10 @@ export const useAchievementContext = (): AchievementContext | null => {
   const currentUserId = useAppSelector(selectUserAuth);
   const currentUserStats = useAppSelector(selectCurrentUserStats);
 
+  // Gear progress bars need the stash. It is the same cached query the Arsenal
+  // itself runs, so opening a profile after the Arsenal costs no extra request.
+  const { data: arsenal } = useArsenalData();
+
   const { data: userSongs } = useQuery({
     queryKey: ["user-songs", currentUserId],
     queryFn: () => getUserSongs(currentUserId!),
@@ -62,6 +68,7 @@ export const useAchievementContext = (): AchievementContext | null => {
   return {
     statistics: currentUserStats,
     songLists: userSongs as unknown as SongListInterface,
+    arsenal: summarizeArsenal(arsenal),
     sessionResults: EMPTY_SESSION_RESULTS,
     inputData: EMPTY_INPUT_DATA,
   };

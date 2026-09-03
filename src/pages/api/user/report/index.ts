@@ -1,3 +1,4 @@
+import { summarizeArsenal } from "feature/arsenal/data/arsenalSummary";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import { getChainFameRate } from "feature/arsenal/data/signalChain";
 import {
@@ -135,7 +136,11 @@ export default async function handler(
       report = reportUpdateUserStats({
         currentUserStats,
         inputData,
-        currentUserSongLists
+        currentUserSongLists,
+        // The gear half of the achievement context. Same stored arsenal the Fame
+        // bonuses above are priced from, so a badge can never disagree with the
+        // rate the session paid.
+        arsenalSummary: summarizeArsenal(userData?.arsenal)
       });
     } catch (error) {
       console.error("reportUpdateUserStats failed:", error);

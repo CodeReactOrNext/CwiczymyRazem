@@ -1,5 +1,6 @@
 import type { AchievementList,AchievementsDataInterface} from "../types";
 import { habitAchievements } from "./categories/habitAchievements";
+import { rigAchievements } from "./categories/rigAchievements";
 import { songAchievements } from "./categories/songAchievements";
 import { specialAchievements } from "./categories/specialAchievements";
 import { statAchievements } from "./categories/statAchievements";
@@ -11,6 +12,7 @@ export const achievementsData: AchievementsDataInterface[] = [
   ...songAchievements,
   ...specialAchievements,
   ...habitAchievements,
+  ...rigAchievements,
 ];
 
 export const achievementsMap = new Map<AchievementList, AchievementsDataInterface>(

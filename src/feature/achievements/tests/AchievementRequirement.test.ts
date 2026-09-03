@@ -1,3 +1,4 @@
+import { EMPTY_ARSENAL_SUMMARY } from 'feature/arsenal/data/arsenalSummary';
 import { describe, expect,it } from 'vitest';
 
 import type { AchievementContext } from '../types';
@@ -31,6 +32,7 @@ const createMockContext = (overrides: Partial<AchievementContext> = {}): Achieve
     },
     ...overrides?.statistics,
   },
+  arsenal: overrides?.arsenal ?? EMPTY_ARSENAL_SUMMARY,
   sessionResults: {
     reportDate: new Date(),
     totalPoints: 0,
