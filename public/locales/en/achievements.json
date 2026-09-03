@@ -5,6 +5,21 @@
   "empty": "Empty",
   "epic": "Epic",
 
+  "panel": {
+    "totalCaption": "achievements earned",
+    "readyTitle": "Ready to unlock",
+    "readySubtitle": "{{count}} already meet their requirement and land on your next report",
+    "conditionMet": "requirement met",
+    "stillLocked": "still locked"
+  },
+  "categories": {
+    "stat": "Progress",
+    "time": "Practice time",
+    "song": "Songs",
+    "habit": "Habits",
+    "special": "Special",
+    "rig": "Gear & rig"
+  },
   "time_1": {
     "title": "Hard Work Pays Off",
     "description": "Exceed the 10 hour exercise threshold."
