@@ -4,7 +4,12 @@ import type {
 } from "feature/logs/types/logs.type";
 import { describe, expect, it } from "vitest";
 
-import { splitPinnedDonations } from "./pinnedDonations";
+import type { AnyFirebaseLog } from "./groupConsecutiveLogs";
+import {
+  mergeTodayDonations,
+  pinnedDonationsSince,
+  splitPinnedDonations,
+} from "./pinnedDonations";
 
 const TODAY = new Date("2026-07-09T18:00:00.000Z");
 
@@ -94,5 +99,74 @@ describe("splitPinnedDonations", () => {
     );
 
     expect(rest).toEqual([first, second]);
+  });
+});
+
+describe("mergeTodayDonations", () => {
+  it("puts back a donation the page has scrolled past", () => {
+    const donation = donationLog({ id: "donation-1" });
+    const page: AnyFirebaseLog[] = [songLog({ id: "song-1" })];
+
+    const merged = mergeTodayDonations(page, [donation], TODAY);
+
+    expect(merged).toEqual([donation, ...page]);
+    expect(splitPinnedDonations(merged, TODAY).pinned).toEqual([donation]);
+  });
+
+  it("does not render a donation the page still carries twice", () => {
+    const donation = donationLog({ id: "donation-1" });
+    const page: AnyFirebaseLog[] = [donation, songLog({ id: "song-1" })];
+
+    expect(mergeTodayDonations(page, [donation], TODAY)).toEqual(page);
+  });
+
+  it("leaves the page untouched when there is nothing to splice in", () => {
+    const page: AnyFirebaseLog[] = [songLog({ id: "song-1" })];
+
+    expect(mergeTodayDonations(page, [], TODAY)).toBe(page);
+  });
+
+  it("ignores a donation that would not be pinned anyway", () => {
+    const page: AnyFirebaseLog[] = [songLog({ id: "song-1" })];
+    const anonymous = donationLog({ id: "donation-1", uid: undefined });
+    const yesterday = donationLog({
+      id: "donation-2",
+      timestamp: "2026-07-08T22:00:00.000Z",
+      data: "2026-07-08T22:00:00.000Z",
+    });
+
+    expect(mergeTodayDonations(page, [anonymous, yesterday], TODAY)).toBe(page);
+  });
+
+  it("keeps the donations newest first, ahead of the page", () => {
+    const newer = donationLog({
+      id: "donation-newer",
+      timestamp: "2026-07-09T15:00:00.000Z",
+    });
+    const older = donationLog({
+      id: "donation-older",
+      timestamp: "2026-07-09T09:00:00.000Z",
+    });
+
+    const merged = mergeTodayDonations<AnyFirebaseLog>(
+      [songLog()],
+      [newer, older],
+      TODAY,
+    );
+
+    expect(merged.slice(0, 2)).toEqual([newer, older]);
+  });
+});
+
+describe("pinnedDonationsSince", () => {
+  it("bounds the query at the start of the pinned day", () => {
+    expect(pinnedDonationsSince(TODAY)).toBe("2026-07-09T00:00:00.000Z");
+  });
+
+  it("sorts before every timestamp that day and after the one before it", () => {
+    const since = pinnedDonationsSince(TODAY);
+
+    expect("2026-07-09T00:00:00.001Z" >= since).toBe(true);
+    expect("2026-07-08T23:59:59.999Z" >= since).toBe(false);
   });
 });

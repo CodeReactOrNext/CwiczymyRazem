@@ -1,9 +1,14 @@
 import { Card } from "assets/components/ui/card";
 import { firebaseGetLogsStream } from "feature/logs/services/getLogsStream.service";
+import { firebaseGetTodayDonationsStream } from "feature/logs/services/getTodayDonationsStream.service";
 import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
-import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { mergeTodayDonations } from "feature/logs/utils/pinnedDonations";
+import {
+  selectCurrentUserStats,
+  selectUserAuth,
+} from "feature/user/store/userSlice";
 import LogsBoxLayout from "layouts/LogsBoxLayout";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 const SkeletonLogRow = () => (
@@ -55,6 +60,7 @@ const LOGS_PAGE_SIZE = 20;
 
 const LogsBoxView = ({ className }: { className?: string }) => {
   const [logs, setLogs] = useState<AnyFirebaseLog[] | null>(null);
+  const [todayDonations, setTodayDonations] = useState<AnyFirebaseLog[]>([]);
   const [logsLimit, setLogsLimit] = useState(LOGS_PAGE_SIZE);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
 
@@ -70,17 +76,31 @@ const LogsBoxView = ({ className }: { className?: string }) => {
     return () => unsubscribe();
   }, [logsLimit]);
 
+  // Streamed apart from the page above: a donation is meant to hold the top of the feed until
+  // midnight, which it can't do once the newest-20 window has scrolled past it.
+  useEffect(() => {
+    const unsubscribe = firebaseGetTodayDonationsStream(setTodayDonations);
+
+    return () => unsubscribe();
+  }, []);
+
   // Firestore doesn't return a total count — if we got a full page, assume there's more below
   // the window. The feed needs this on its own, and not just as "is the button showing": the
-  // window keeps cutting its last group in half long after "Show more" has bowed out.
+  // window keeps cutting its last group in half long after "Show more" has bowed out. Read off
+  // the page alone, so the donations spliced in below can't be mistaken for a fuller window.
   const hasOlderLogs = (logs?.length ?? 0) >= logsLimit;
 
   // Only offer "Show more" once — after that the button disappears even if more logs remain.
   const hasMoreLogs = !hasLoadedMore && hasOlderLogs;
 
-  return logs && userAchievement && currentUserId ? (
+  const feedLogs = useMemo(
+    () => (logs ? mergeTodayDonations(logs, todayDonations) : null),
+    [logs, todayDonations],
+  );
+
+  return feedLogs && userAchievement && currentUserId ? (
     <LogsBoxLayout
-      logs={logs}
+      logs={feedLogs}
       userAchievements={userAchievement}
       currentUserId={currentUserId}
       className={className}

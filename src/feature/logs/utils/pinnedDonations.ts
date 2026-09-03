@@ -24,11 +24,59 @@ export interface PinnedDonationsSplit<T extends AnyFirebaseLog> {
   rest: T[];
 }
 
+/**
+ * The day the feed pins by, in the `YYYY-MM-DD` form `getLogDayKey` reads off a log. UTC, because
+ * that's what the log timestamps are written in — so the pinned set turns over at 02:00 in Poland
+ * rather than at midnight.
+ */
+export const getPinnedDonationsDayKey = (now: Date = new Date()): string =>
+  now.toISOString().slice(0, 10);
+
+/**
+ * Oldest `logs.timestamp` still belonging to the pinned day — the lower bound the donation query
+ * needs. Timestamps are stored as ISO strings, so this compares correctly as a plain string.
+ */
+export const pinnedDonationsSince = (now: Date = new Date()): string =>
+  `${getPinnedDonationsDayKey(now)}T00:00:00.000Z`;
+
 /** Whether this log is a donation the feed should pin: matched to an account, and from `dayKey`. */
 const isPinnableDonation = (log: AnyFirebaseLog, dayKey: string): boolean =>
   isFirebaseLogsDonation(log) &&
   Boolean(log.uid) &&
   getLogDayKey(log) === dayKey;
+
+const logId = (log: AnyFirebaseLog): string | undefined =>
+  (log as { id?: string }).id;
+
+/**
+ * Folds separately-streamed donations back into the feed page.
+ *
+ * The page is only the newest handful of logs, so a morning coffee scrolls out of it within the
+ * hour — and pinning can't lift what was never fetched, which is why the card kept vanishing
+ * mid-day instead of holding the top until midnight. The donations therefore come from their own
+ * query, and are spliced in here so `splitPinnedDonations` gets to see them.
+ *
+ * Only donations that would actually be pinned are injected: anything else has a timestamp the
+ * page no longer covers, and dropping it into `rest` would park a stale card in the middle of the
+ * chronological order. Donations the page still carries are deduplicated by id rather than
+ * rendered twice.
+ */
+export const mergeTodayDonations = <T extends AnyFirebaseLog>(
+  logs: T[],
+  donations: T[],
+  now: Date = new Date(),
+): T[] => {
+  const dayKey = getPinnedDonationsDayKey(now);
+  const alreadyOnPage = new Set(logs.map(logId).filter(Boolean));
+
+  const missing = donations.filter(
+    (donation) =>
+      isPinnableDonation(donation, dayKey) &&
+      !alreadyOnPage.has(logId(donation)),
+  );
+
+  return missing.length ? [...missing, ...logs] : logs;
+};
 
 /**
  * Splits the feed into the donations pinned to the top and the rest of it. `logs` arrives newest
@@ -38,7 +86,7 @@ export const splitPinnedDonations = <T extends AnyFirebaseLog>(
   logs: T[],
   now: Date = new Date(),
 ): PinnedDonationsSplit<T> => {
-  const dayKey = now.toISOString().slice(0, 10);
+  const dayKey = getPinnedDonationsDayKey(now);
   const pinned: T[] = [];
   const rest: T[] = [];
 
