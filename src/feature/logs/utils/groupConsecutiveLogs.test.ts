@@ -1,5 +1,6 @@
 import type {
   FirebaseLogsCaseOpenInterface,
+  FirebaseLogsDonationInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsMarketplacePurchaseInterface,
   FirebaseLogsSongsInterface,
@@ -83,6 +84,20 @@ const songLog = (
   ...overrides,
 });
 
+const donationLog = (
+  overrides: Partial<FirebaseLogsDonationInterface> = {}
+): FirebaseLogsDonationInterface => ({
+  type: "donation_received",
+  data: "2026-07-09T21:20:00.000Z",
+  timestamp: "2026-07-09T21:20:00.000Z",
+  supporterName: "Cookie",
+  amount: 5,
+  kind: "one_off",
+  uid: "user-1",
+  userName: "Cookie",
+  ...overrides,
+});
+
 describe("groupConsecutiveLogs", () => {
   it("groups consecutive case-open and marketplace logs from the same user as one arsenal group", () => {
     const logs = [marketplaceLog(), caseOpenLog(), marketplaceLog(), marketplaceLog()];
@@ -125,6 +140,49 @@ describe("groupConsecutiveLogs", () => {
     expect(groups[0].type).toBe("arsenal");
     expect(groups[1].type).toBe("song");
     expect(groups[2].type).toBe("arsenal");
+  });
+
+  it("gathers one donor's coffees from the same day even with other activity in between", () => {
+    const logs = [
+      donationLog({ timestamp: "2026-07-09T21:20:00.000Z" }),
+      songLog(),
+      donationLog({ timestamp: "2026-07-09T09:05:00.000Z" }),
+    ];
+
+    const groups = groupConsecutiveLogs(logs);
+
+    expect(groups).toHaveLength(2);
+    expect(groups[0].type).toBe("donationReceived");
+    expect(groups[0].logs).toHaveLength(2);
+    expect(groups[1].type).toBe("song");
+  });
+
+  it("keeps a donor's coffees from different days apart", () => {
+    const groups = groupConsecutiveLogs([
+      donationLog({ timestamp: "2026-07-09T21:20:00.000Z" }),
+      donationLog({ timestamp: "2026-07-08T21:20:00.000Z" }),
+    ]);
+
+    expect(groups).toHaveLength(2);
+  });
+
+  it("keeps donations from different donors apart", () => {
+    const groups = groupConsecutiveLogs([
+      donationLog(),
+      donationLog({ uid: "user-2", userName: "Other" }),
+    ]);
+
+    expect(groups).toHaveLength(2);
+  });
+
+  it("never gathers donations that were not matched to an account", () => {
+    const groups = groupConsecutiveLogs([
+      donationLog({ uid: undefined }),
+      donationLog({ uid: undefined }),
+    ]);
+
+    expect(groups).toHaveLength(2);
+    expect(groups[0].uid).toBeUndefined();
   });
 });
 

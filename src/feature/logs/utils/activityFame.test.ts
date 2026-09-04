@@ -1,4 +1,5 @@
 import type {
+  FirebaseLogsDonationInterface,
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
 } from "feature/logs/types/logs.type";
@@ -9,8 +10,10 @@ import {
   calculateGroupFame,
   calculateTimeFame,
   countActionLogs,
+  DONATION_FAME,
   getGroupSessionMs,
   MAX_ACTIVITY_FAME,
+  MAX_DAILY_DONATIONS,
 } from "./activityFame";
 
 const minutes = (value: number) => value * 60 * 1000;
@@ -47,6 +50,20 @@ const songLog = (): FirebaseLogsSongsInterface =>
     avatarUrl: undefined,
   }) as FirebaseLogsSongsInterface;
 
+const donationLog = (
+  overrides: Partial<FirebaseLogsDonationInterface> = {},
+): FirebaseLogsDonationInterface => ({
+  type: "donation_received",
+  data: "2026-08-07T10:00:00.000Z",
+  timestamp: "2026-08-07T10:00:00.000Z",
+  supporterName: "Cookie",
+  amount: 5,
+  kind: "one_off",
+  uid: "user-1",
+  userName: "Cookie",
+  ...overrides,
+});
+
 describe("getGroupSessionMs", () => {
   it("sums the practice time across the group", () => {
     expect(
@@ -78,6 +95,10 @@ describe("countActionLogs", () => {
 
   it("counts a malformed practice log as an action rather than dropping it", () => {
     expect(countActionLogs([practiceLog(Number.NaN)])).toBe(1);
+  });
+
+  it("leaves donations out — they are priced on their own", () => {
+    expect(countActionLogs([donationLog(), songLog()])).toBe(1);
   });
 });
 
@@ -121,6 +142,23 @@ describe("calculateGroupFame", () => {
     expect(
       calculateGroupFame({ logs: [practiceLog(minutes(30)), songLog()] }),
     ).toBe(30 + ACTION_FAME);
+  });
+
+  it("pays a donation far more than a plain action", () => {
+    expect(calculateGroupFame({ logs: [donationLog()] })).toBe(DONATION_FAME);
+  });
+
+  it("stacks the coffees of one day", () => {
+    expect(calculateGroupFame({ logs: [donationLog(), donationLog()] })).toBe(
+      2 * DONATION_FAME,
+    );
+  });
+
+  it("stops paying past the day's fourth coffee", () => {
+    const logs = Array.from({ length: 7 }, () => donationLog());
+    expect(calculateGroupFame({ logs })).toBe(
+      MAX_DAILY_DONATIONS * DONATION_FAME,
+    );
   });
 
   it("caps a single row", () => {

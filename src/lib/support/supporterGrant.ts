@@ -108,6 +108,37 @@ async function findUserByEmail(
   return null;
 }
 
+/**
+ * The account behind a donation, in the shape the Activity feed stores on a log: enough to name
+ * the donor, link to their profile and hand them Fame. `null` when the donation was anonymous or
+ * nobody has signed up with that address yet — the feed then shows the plain announcement card.
+ */
+export interface DonorAccount {
+  uid: string;
+  userName: string;
+  avatarUrl: string | null;
+  userAvatarFrame: number;
+}
+
+export async function findDonorAccountByEmail(
+  email?: string | null,
+): Promise<DonorAccount | null> {
+  if (!normalizeEmail(email)) return null;
+
+  const user = await findUserByEmail(email);
+  if (!user) return null;
+
+  const data = user.data() ?? {};
+
+  return {
+    uid: user.id,
+    userName: data.displayName ?? "Supporter",
+    avatarUrl: data.avatar ?? data.photoURL ?? null,
+    userAvatarFrame:
+      typeof data.statistics?.lvl === "number" ? data.statistics.lvl : 0,
+  };
+}
+
 const pendingRef = (normalizedEmail: string) =>
   firestore
     .collection(PENDING_SUPPORTER_COLLECTION)
