@@ -8,9 +8,8 @@
   "panel": {
     "earnedHeadline": "{{owned}} of {{total}} achievements earned",
     "globalColumn": "% of all players",
-    "readyTitle": "Ready to unlock",
-    "readySubtitle": "{{count}} already meet their requirement and land on your next report",
-    "conditionMet": "requirement met"
+    "readyHint": "Log practice to get achievement",
+    "earned": "Earned"
   },
   "time_1": {
     "title": "Hard Work Pays Off",

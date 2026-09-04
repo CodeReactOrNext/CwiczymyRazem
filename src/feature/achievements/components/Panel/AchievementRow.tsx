@@ -11,28 +11,56 @@ import { AchievementCard } from "../Card/AchievementCard";
  * One badge, as a row.
  *
  * The row is its own bar chart: the fill behind it runs to the share of players
- * who hold the badge, so the commonest sit as long bars at the top of a category
- * and the rarest as slivers at the bottom — the list is readable as a shape
- * before a single number is.
+ * who hold the badge, so the list is readable as a shape before a single number
+ * is — long bars at the top, slivers at the bottom.
  *
  * The badge art is `AchievementCard`, exactly as the post-session popup, the
  * Achievements Map and the public profile render it, so a badge looks and
  * behaves the same everywhere and its tooltip and mobile dialog come for free.
  */
 
+/**
+ * Earned or not is the first thing to read off a row, so it is said four times
+ * over: a green tick, a green bar, full-colour art and the brightest text on the
+ * row. Everything unearned is grey and desaturated, and its bar sits close to
+ * the surface behind it.
+ *
+ * Green rather than the brand accent: the styleguide gives emerald to "done",
+ * and cyan is already spoken for by the badges a player can go and finish now.
+ */
+const SURFACE: Record<AchievementEntryState, string> = {
+  owned: "bg-zinc-800/40",
+  ready: "bg-zinc-900/40",
+  progress: "bg-zinc-900/40",
+  locked: "bg-zinc-900/30",
+};
+
+const FILL: Record<AchievementEntryState, string> = {
+  owned: "bg-emerald-500/[0.09]",
+  ready: "bg-cyan-500/10",
+  progress: "bg-zinc-700/30",
+  locked: "bg-zinc-800/40",
+};
+
 const NAME: Record<AchievementEntryState, string> = {
-  owned: "text-zinc-100",
+  owned: "text-zinc-50",
   ready: "text-cyan-300",
-  progress: "text-zinc-200",
+  progress: "text-zinc-300",
   locked: "text-zinc-400",
 };
 
-/** The fill is a backdrop, so it stays well under the text it sits behind. */
-const FILL: Record<AchievementEntryState, string> = {
-  owned: "bg-zinc-700/40",
-  ready: "bg-cyan-500/10",
-  progress: "bg-zinc-800/50",
-  locked: "bg-zinc-800/40",
+const DESCRIPTION: Record<AchievementEntryState, string> = {
+  owned: "text-zinc-400",
+  ready: "text-zinc-400",
+  progress: "text-zinc-500",
+  locked: "text-zinc-500",
+};
+
+const PERCENT: Record<AchievementEntryState, string> = {
+  owned: "text-zinc-200",
+  ready: "text-zinc-300",
+  progress: "text-zinc-400",
+  locked: "text-zinc-500",
 };
 
 export const AchievementRow = memo(
@@ -50,7 +78,7 @@ export const AchievementRow = memo(
     const percent = progress && progress.max > 0 ? (progress.current / progress.max) * 100 : 0;
 
     return (
-      <div className='relative overflow-hidden rounded-lg bg-zinc-900/40'>
+      <div className={cn("relative overflow-hidden rounded-lg", SURFACE[state])}>
         <div
           aria-hidden
           className={cn("absolute inset-y-0 left-0", FILL[state])}
@@ -60,7 +88,9 @@ export const AchievementRow = memo(
         <div className='relative flex items-center gap-3 p-2.5 pr-3 sm:gap-4 sm:p-3'>
           {/* The tick column keeps its width either way, so names stay aligned. */}
           <span className='flex w-4 shrink-0 justify-center'>
-            {isOwned && <Check className='h-4 w-4 text-zinc-400' aria-label='Earned' />}
+            {isOwned && (
+              <Check className='h-4 w-4 text-emerald-400' aria-label={t("panel.earned")} />
+            )}
           </span>
 
           {/*
@@ -82,11 +112,13 @@ export const AchievementRow = memo(
             <p className={cn("text-sm font-bold leading-tight", NAME[state])}>
               {t(`${data.id}.title`)}
             </p>
-            <p className='text-xs leading-snug text-zinc-500'>{t(`${data.id}.description`)}</p>
+            <p className={cn("text-xs leading-snug", DESCRIPTION[state])}>
+              {t(`${data.id}.description`)}
+            </p>
 
             {state === "ready" && (
-              <span className='mt-1 text-[0.6875rem] leading-none text-cyan-400/80'>
-                {t("panel.conditionMet")}
+              <span className='mt-1 text-[0.6875rem] font-semibold leading-none text-cyan-400'>
+                {t("panel.readyHint")}
               </span>
             )}
 
@@ -105,7 +137,7 @@ export const AchievementRow = memo(
             )}
           </div>
 
-          <span className='shrink-0 text-sm font-bold tabular-nums text-zinc-300'>
+          <span className={cn("shrink-0 text-sm font-bold tabular-nums", PERCENT[state])}>
             {globalRate.toFixed(1)}%
           </span>
         </div>
