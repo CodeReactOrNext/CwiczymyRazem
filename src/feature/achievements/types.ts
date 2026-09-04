@@ -1,3 +1,4 @@
+import type { ArsenalSummary } from "feature/arsenal/data/arsenalSummary";
 import type {
   ReportDataInterface,
   ReportFormikInterface
@@ -61,7 +62,6 @@ export type AchievementList =
   | "learning10"
   | "learning20"
   | "learning30"
-  | "learning50"
   | "learned1"
   | "learned3"
   | "learned5"
@@ -70,10 +70,38 @@ export type AchievementList =
   | "learned30"
   | "learned50"
   | "learned100"
-  | "performance";
+  | "performance"
+  | "rig_50"
+  | "rig_150"
+  | "rig_300"
+  | "rig_500"
+  | "rig_800"
+  | "rig_1000"
+  | "first_rare"
+  | "first_epic"
+  | "first_legendary"
+  | "first_mythic"
+  | "rarity_full_set"
+  | "museum_1"
+  | "museum_5"
+  | "serial_one"
+  | "globetrotter"
+  | "vintage_1970";
+
+/**
+ * How one badge reads on the panel. `ready` is the state the old grid could not
+ * express: the requirement is already met and the badge lands on the next report.
+ */
+export type AchievementEntryState = "owned" | "ready" | "progress" | "locked";
 
 export interface AchievementContext {
   statistics: StatisticsDataInterface;
+  /**
+   * Flat gear facts — see `summarizeArsenal`. Never the raw `ArsenalUserData`:
+   * a check that had to resolve a model id would drag every guitar and effect
+   * definition into the report bundle.
+   */
+  arsenal: ArsenalSummary;
   sessionResults: ReportDataInterface;
   inputData: ReportFormikInterface;
   songLists: SongListInterface;
@@ -84,7 +112,7 @@ export type AchievementCheck = (ctx: AchievementContext) => boolean;
 export interface AchievementProgress {
   current: number;
   max: number;
-  unit?: "h" | "pts" | "days" | "sessions" | "songs" | "habits";
+  unit?: "h" | "pts" | "days" | "sessions" | "songs" | "habits" | "lvl" | "items" | "countries";
 }
 
 export interface AchievementsDataInterface extends AchievementsRarityType {
@@ -95,5 +123,3 @@ export interface AchievementsDataInterface extends AchievementsRarityType {
   check: AchievementCheck;
   getProgress?: (ctx: AchievementContext) => AchievementProgress;
 }
-
-type AchievementCheckerReturnType = AchievementList | undefined;

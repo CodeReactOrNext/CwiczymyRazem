@@ -37,6 +37,7 @@
     "delete-guilds": "vitest run --mode delete-guilds scripts/deleteAllGuilds.test.ts",
     "delete-recording": "vitest run --mode delete-recording scripts/deleteRecording.test.ts",
     "backfill-section-maps": "vitest run --mode backfill-section-maps scripts/backfillSongSectionMaps.test.ts",
+    "backfill-achievement-stats": "vitest run --mode achievement-stats scripts/backfillAchievementStats.test.ts",
     "update-hero-stats": "vitest run --mode hero-stats scripts/updateHeroStats.test.ts",
     "blog-stats": "vitest run --mode blog-stats scripts/blogStats.test.ts",
     "knip": "knip",

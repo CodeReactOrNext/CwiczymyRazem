@@ -64,9 +64,7 @@ const LogsBoxView = ({ className }: { className?: string }) => {
   const [logsLimit, setLogsLimit] = useState(LOGS_PAGE_SIZE);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
 
-  const userStats = useAppSelector(selectCurrentUserStats);
   const currentUserId = useAppSelector(selectUserAuth);
-  const userAchievement = userStats?.achievements;
 
   useEffect(() => {
     const unsubscribe = firebaseGetLogsStream((logsData) => {
@@ -93,15 +91,9 @@ const LogsBoxView = ({ className }: { className?: string }) => {
   // Only offer "Show more" once — after that the button disappears even if more logs remain.
   const hasMoreLogs = !hasLoadedMore && hasOlderLogs;
 
-  const feedLogs = useMemo(
-    () => (logs ? mergeTodayDonations(logs, todayDonations) : null),
-    [logs, todayDonations],
-  );
-
-  return feedLogs && userAchievement && currentUserId ? (
+  return logs && currentUserId ? (
     <LogsBoxLayout
-      logs={feedLogs}
-      userAchievements={userAchievement}
+      logs={logs}
       currentUserId={currentUserId}
       className={className}
       hasOlderLogs={hasOlderLogs}

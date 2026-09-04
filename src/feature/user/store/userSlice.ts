@@ -13,9 +13,10 @@ import type {
   userSliceInitialState,
 } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
-import { getLocalDateKey, getServerDateKey } from "utils/converter";
+import { getLocalDateKey } from "utils/converter";
 import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
+import { getQuestDayKey, isPreMigrationQuestDay } from "./questDay";
 import { subtractReportedTime } from "./timerReporting";
 import {
   autoLogIn,
@@ -161,7 +162,7 @@ const userSlice = createSlice({
     // Challenges removed
     generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
-      const today = getServerDateKey();
+      const today = getQuestDayKey(state.currentUserStats.timeZone);
 
       // Templates. `group` marks tasks that overlap in what they ask the
       // player to do (e.g. rating songs, completing practice plans) so we
@@ -192,14 +193,23 @@ const userSlice = createSlice({
 
       // If a quest exists for today, do nothing.
       //
-      // `>=` rather than `===` because the key used to be the player's *local*
-      // date, so everyone ahead of UTC is holding a quest stamped with tomorrow's
-      // server day at the moment this ships. Treating that as stale would throw
-      // away a half-finished set — and an already-claimed one would come back
-      // unclaimed. Keeping it costs nothing: the next server midnight makes the
-      // key current and the one after that retires it normally.
+      // `>=` rather than `===` because a stored key can read as tomorrow's: the
+      // key has changed meaning twice now (player-local → UTC → player-local
+      // again), and a quest carrying the older sense of it must not be thrown
+      // away — a half-finished set would come back empty and an already-claimed
+      // one would come back unclaimed.
       const storedQuest = state.currentUserStats.dailyQuest;
-      if (storedQuest && storedQuest.date >= today && (storedQuest.tasks?.length ?? 0) > 0) return;
+      const hasTasks = (storedQuest?.tasks?.length ?? 0) > 0;
+
+      // The quest the player is holding right now, stamped with the UTC day
+      // this key used to mean. Re-stamp it with their own day instead of
+      // drawing a new set on top of a set they are halfway through.
+      if (storedQuest && hasTasks && isPreMigrationQuestDay(storedQuest.date, today)) {
+        storedQuest.date = today;
+        return;
+      }
+
+      if (storedQuest && hasTasks && storedQuest.date >= today) return;
 
       // Shuffle and pick 3, skipping templates whose group is already
       // represented in the selection so the quest set never contains two
@@ -254,11 +264,12 @@ const userSlice = createSlice({
     completeQuestTask: (state, { payload }: PayloadAction<{ type: DailyQuestTaskType; amount?: number; exerciseId?: string }>) => {
       if (!state.currentUserStats?.dailyQuest) return;
 
-      // Progress only counts against a quest that is still live. `>=` for the
-      // same reason as in `generateDailyQuest`: a quest carrying a pre-migration
-      // local date key can read as tomorrow, and refusing its progress would
-      // leave those players unable to complete the set they are looking at.
-      const today = getServerDateKey();
+      // Progress only counts against a quest that is still live. Anything
+      // stamped later than today is honoured for the same reason as in
+      // `generateDailyQuest`: a quest carrying an older sense of the day key can
+      // read as tomorrow, and refusing its progress would leave those players
+      // unable to complete the set they are looking at.
+      const today = getQuestDayKey(state.currentUserStats.timeZone);
       if (state.currentUserStats.dailyQuest.date < today) return;
 
       const quest = state.currentUserStats.dailyQuest;
@@ -397,17 +408,19 @@ const userSlice = createSlice({
 
           const currentDailyQuest = prevStats?.dailyQuest;
           const currentSkills = prevStats?.skills;
-          // Two clocks, deliberately. The quest is a shared server day, while
-          // `lastReportDate` below is stored as UTC midnight of the reporter's
-          // *local* day — comparing it against a server key would call every
-          // evening session in the Americas a new day and hand out the skill
-          // point twice.
-          const serverToday = getServerDateKey();
+          // Two clocks, deliberately. The quest day is resolved in the zone the
+          // profile carries, while `lastReportDate` below is stored as UTC
+          // midnight of the reporter's *device* day — the two agree for anyone
+          // whose device sits in the zone they filed their last report from,
+          // and the quest one is the one that must survive a second device.
+          const questToday = getQuestDayKey(
+            payload.currentUserStats.timeZone ?? prevStats?.timeZone
+          );
           const localToday = getLocalDateKey();
 
           state.currentUserStats = {
             ...payload.currentUserStats,
-            dailyQuest: (currentDailyQuest && currentDailyQuest.date === serverToday) ? currentDailyQuest : payload.currentUserStats.dailyQuest,
+            dailyQuest: (currentDailyQuest && currentDailyQuest.date >= questToday) ? currentDailyQuest : payload.currentUserStats.dailyQuest,
             skills: payload.currentUserStats.skills?.unlockedSkills ? payload.currentUserStats.skills : currentSkills,
           };
 
