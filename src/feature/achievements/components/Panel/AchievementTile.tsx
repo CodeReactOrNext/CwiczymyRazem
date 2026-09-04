@@ -54,14 +54,15 @@ export const AchievementTile = memo(
           SURFACE[state]
         )}>
         {/*
-          Locked badges are greyed the way the Achievements Map greys them, so a
-          rarity colour never hints at a badge the player does not hold. `ready`
-          keeps its colour — the requirement is met, only the report is missing.
+          Locked badges are desaturated so a rarity colour never hints at a badge
+          the player does not hold — but at full opacity, so the art still reads.
+          `ready` keeps its colour: the requirement is met, only the report is
+          missing.
 
           The card itself is the full collectible, hover and all: this panel is
           behind its own tab, so nothing here mounts until it is asked for.
         */}
-        <div className={cn(!isOwned && state !== "ready" && "opacity-50 grayscale")}>
+        <div className={cn(!isOwned && state !== "ready" && "grayscale")}>
           <AchievementCard
             id={data.id}
             data={data}
