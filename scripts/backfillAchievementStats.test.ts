@@ -25,7 +25,7 @@ import {
   tallyAchievementStats,
 } from "lib/achievements/achievementStats";
 import path from "path";
-import { describe, it } from "vitest";
+import { afterAll, describe, it } from "vitest";
 
 const readServiceAccountJson = (): string | undefined => {
   if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
@@ -51,6 +51,12 @@ const readServiceAccountJson = (): string | undefined => {
 
 /** Paged, so the scan holds one page rather than every account at once. */
 const PAGE_SIZE = 500;
+
+const report: string[] = [];
+const say = (line: string) => {
+  report.push(line);
+  console.log(line);
+};
 
 const isBackfillMode = (import.meta as any).env?.MODE === "achievement-stats";
 
@@ -104,7 +110,7 @@ const isBackfillMode = (import.meta as any).env?.MODE === "achievement-stats";
 
       const stats = tallyAchievementStats(accounts);
 
-      console.log(
+      say(
         `[achievement-stats] scanned ${scanned} accounts, ${stats.totalPlayers} of them have practised`
       );
 
@@ -118,27 +124,50 @@ const isBackfillMode = (import.meta as any).env?.MODE === "achievement-stats";
         .sort((a, b) => b.rate - a.rate);
 
       for (const row of rows) {
-        console.log(
+        say(
           `  ${String(row.rate).padStart(5)}%  ${String(row.held).padStart(5)}  ${row.id} (${row.rarity})`
         );
       }
 
       const unheld = rows.filter((r) => r.held === 0);
       if (unheld.length > 0) {
-        console.log(
+        say(
           `[achievement-stats] nobody holds ${unheld.length}: ${unheld.map((r) => r.id).join(", ")}`
         );
       }
 
       if (process.env.ACHIEVEMENT_STATS_DRY_RUN) {
-        console.log("[achievement-stats] dry run — nothing written");
+        say("[achievement-stats] dry run — nothing written");
         return;
       }
 
       const [collection, docId] = ACHIEVEMENT_STATS_PATH.split("/");
-      await firestore.collection(collection).doc(docId).set(stats);
-      console.log(`[achievement-stats] wrote ${ACHIEVEMENT_STATS_PATH}`);
+      const ref = firestore.collection(collection).doc(docId);
+      await ref.set(stats);
+
+      // Read back rather than trust the write: this is the one document the
+      // whole screen divides by, and a silent failure would show every badge
+      // at its estimate with nothing to say why.
+      const written = (await ref.get()).data();
+      if (!written || written.totalPlayers !== stats.totalPlayers) {
+        throw new Error(
+          `[achievement-stats] write did not land: expected ${stats.totalPlayers} players, read back ${written?.totalPlayers}`
+        );
+      }
+
+      say(
+        `[achievement-stats] wrote ${ACHIEVEMENT_STATS_PATH} — ${Object.keys(written.counts ?? {}).length} badges held, ${written.totalPlayers} players`
+      );
     },
     10 * 60 * 1000
   );
+
+  // Vitest intercepts stdout, and a run whose report you cannot read is a run
+  // you cannot check. `ACHIEVEMENT_STATS_OUT` puts the same lines in a file,
+  // dry run or not.
+  afterAll(() => {
+    if (process.env.ACHIEVEMENT_STATS_OUT) {
+      fs.writeFileSync(process.env.ACHIEVEMENT_STATS_OUT, report.join("\n"));
+    }
+  });
 });
