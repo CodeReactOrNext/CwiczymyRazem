@@ -2,12 +2,10 @@ import type { HabbitsType } from "feature/user/view/ReportView/ReportView.types"
 import type { AchievementStatsDoc } from "lib/achievements/achievementStats";
 import { rateFromStats } from "lib/achievements/achievementStats";
 
-import { ACHIEVEMENT_CATEGORIES } from "../data/achievementCategories";
 import { achievementsData } from "../data/achievementsData";
 import type { AchievementsRarityType } from "../data/achievementsRarity";
 import { getGlobalUnlockRate } from "../data/globalUnlockRate";
 import type {
-  AchievementCategory,
   AchievementContext,
   AchievementEntryState,
   AchievementList,
@@ -44,12 +42,6 @@ export interface AchievementPanelEntry {
   globalRate: number;
 }
 
-export interface AchievementPanelCategory {
-  category: AchievementCategory;
-  owned: number;
-  total: number;
-  entries: AchievementPanelEntry[];
-}
 
 export interface AchievementRarityTally {
   rarity: Rarity;
@@ -61,9 +53,8 @@ export interface AchievementPanelState {
   owned: number;
   total: number;
   rarities: AchievementRarityTally[];
-  /** Conditions already met — these land on the next report. */
-  ready: AchievementPanelEntry[];
-  categories: AchievementPanelCategory[];
+  /** Every badge, commonest first. */
+  entries: AchievementPanelEntry[];
 }
 
 /**
@@ -106,9 +97,9 @@ const clampProgress = (progress: AchievementProgress): AchievementProgress => ({
 });
 
 /**
- * Commonest first, the way a global achievement list is read: the top of a
- * category is what nearly everyone has, the bottom is what almost nobody does.
- * Ties break on the id so the order is total and cannot wobble between renders.
+ * Commonest first, the way a global achievement list is read: the top is what
+ * nearly everyone has, the bottom what almost nobody does. Ties break on the id
+ * so the order is total and cannot wobble between renders.
  */
 const byGlobalRate = (a: AchievementPanelEntry, b: AchievementPanelEntry) =>
   b.globalRate - a.globalRate || a.data.id.localeCompare(b.data.id);
@@ -157,19 +148,6 @@ export const buildAchievementPanelState = (
     return { data, globalRate, state: "locked" };
   });
 
-  const categories = ACHIEVEMENT_CATEGORIES.map((category) => {
-    const inCategory = entries.filter((e) => e.data.category === category);
-    return {
-      category,
-      owned: inCategory.filter((e) => e.state === "owned").length,
-      total: inCategory.length,
-      entries: inCategory.slice().sort(byGlobalRate),
-    };
-  })
-    .filter((c) => c.total > 0)
-    // Least complete first: the category that still owes the player something
-    // belongs at the top, which is information rather than decoration.
-    .sort((a, b) => a.owned / a.total - b.owned / b.total);
 
   const rarities = RARITY_ORDER.map((rarity) => {
     const inRarity = entries.filter((e) => e.data.rarity === rarity);
@@ -184,7 +162,6 @@ export const buildAchievementPanelState = (
     owned: entries.filter((e) => e.state === "owned").length,
     total: entries.length,
     rarities,
-    ready: entries.filter((e) => e.state === "ready").sort(byGlobalRate),
-    categories,
+    entries: entries.slice().sort(byGlobalRate),
   };
 };

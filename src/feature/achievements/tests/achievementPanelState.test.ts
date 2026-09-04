@@ -5,11 +5,11 @@ import { describe, expect, it } from "vitest";
 import { achievementsData } from "../data/achievementsData";
 import { getGlobalUnlockRate } from "../data/globalUnlockRate";
 import type {
-  AchievementCategory,
   AchievementContext,
   AchievementList,
   AchievementsDataInterface,
 } from "../types";
+import type { AchievementPanelState } from "../utils/achievementPanelState";
 import { buildAchievementPanelState } from "../utils/achievementPanelState";
 
 const ctx = (over: Partial<AchievementContext["statistics"]> = {}): AchievementContext =>
@@ -45,12 +45,10 @@ const ctx = (over: Partial<AchievementContext["statistics"]> = {}): AchievementC
 
 const def = (
   id: string,
-  category: AchievementCategory,
   check: AchievementsDataInterface["check"],
   getProgress?: AchievementsDataInterface["getProgress"]
 ): AchievementsDataInterface => ({
   id: id as AchievementList,
-  category,
   rarity: "common",
   Icon: FaMedal,
   name: `${id}.title`,
@@ -60,7 +58,7 @@ const def = (
 });
 
 /** Threshold-style: met now, and a bigger session cannot un-meet it. */
-const pointsDef = def("points_1", "stat", (c) => c.statistics.points >= 100, (c) => ({
+const pointsDef = def("points_1", (c) => c.statistics.points >= 100, (c) => ({
   current: c.statistics.points,
   max: 100,
   unit: "pts",
@@ -73,13 +71,15 @@ const pointsDef = def("points_1", "stat", (c) => c.statistics.points >= 100, (c)
  */
 const ceilingDef = def(
   "short",
-  "special",
   (c) => c.statistics.actualDayWithoutBreak >= 10 && c.sessionResults.totalPoints <= 15
 );
 
 /** Needs a real session, so it can never be "ready" from stored state alone. */
-const sessionDef = def("fire", "special", (c) => c.sessionResults.totalPoints >= 60);
+const sessionDef = def("fire", (c) => c.sessionResults.totalPoints >= 60);
 
+/** The list is flat now, so a fixture is found by id rather than by section. */
+const entryFor = (state: AchievementPanelState, id: string) =>
+  state.entries.find((e) => e.data.id === id)!;
 describe("buildAchievementPanelState", () => {
   it("tallies what is owned against the whole registry", () => {
     const state = buildAchievementPanelState(["points_1" as AchievementList], ctx(), null, [
@@ -96,7 +96,7 @@ describe("buildAchievementPanelState", () => {
   it("marks a met threshold as ready", () => {
     const state = buildAchievementPanelState([], ctx({ points: 150 }), null, [pointsDef]);
 
-    expect(state.ready.map((e) => e.data.id)).toEqual(["points_1"]);
+    expect(entryFor(state, "points_1").state).toBe("ready");
   });
 
   it("does not promise a badge a real session would fail", () => {
@@ -105,32 +105,34 @@ describe("buildAchievementPanelState", () => {
       ceilingDef,
     ]);
 
-    expect(state.ready).toEqual([]);
-    expect(state.categories[0].entries[0].state).toBe("locked");
+    expect(entryFor(state, "short").state).toBe("locked");
   });
 
   it("leaves a session-only badge locked rather than showing a dead bar", () => {
     const state = buildAchievementPanelState([], ctx(), null, [sessionDef]);
 
-    expect(state.categories[0].entries[0].state).toBe("locked");
+    expect(entryFor(state, "fire").state).toBe("locked");
   });
 
   it("clamps progress so a bar can never overrun its track", () => {
-    const overshoot = def("points_1", "stat", () => false, () => ({ current: 400, max: 100 }));
+    const overshoot = def("points_1", () => false, () => ({ current: 400, max: 100 }));
     const state = buildAchievementPanelState([], ctx(), null, [overshoot]);
 
-    expect(state.categories[0].entries[0].progress).toMatchObject({ current: 100, max: 100 });
+    expect(entryFor(state, "points_1").progress).toMatchObject({ current: 100, max: 100 });
   });
 
-  it("puts the least complete category first", () => {
-    const done = def("time_1", "time", () => false);
+  it("lists every badge commonest first, ungrouped", () => {
+    const done = def("time_1", () => false);
     const state = buildAchievementPanelState(["time_1" as AchievementList], ctx(), null, [
       done,
       pointsDef,
       ceilingDef,
     ]);
 
-    expect(state.categories.map((c) => c.category)).toEqual(["stat", "special", "time"]);
+    const rates = state.entries.map((e) => e.globalRate);
+    expect(rates).toEqual([...rates].sort((a, b) => b - a));
+    // Nothing is dropped or duplicated by the sort.
+    expect(state.entries.map((e) => e.data.id).sort()).toEqual(["points_1", "short", "time_1"]);
   });
 
   it("reads everything as locked until the context has loaded", () => {
@@ -140,20 +142,15 @@ describe("buildAchievementPanelState", () => {
     ]);
 
     expect(state.owned).toBe(1);
-    expect(state.ready).toEqual([]);
-    expect(state.categories.flatMap((c) => c.entries).map((e) => e.state)).toContain("locked");
+    expect(state.entries.every((e) => e.state !== "ready")).toBe(true);
+    expect(entryFor(state, "fire").state).toBe("locked");
   });
-  it("orders a category by how many players hold each badge", () => {
+  it("gives every badge a share between 0 and 100", () => {
     const state = buildAchievementPanelState([], ctx(), null, [pointsDef, ceilingDef, sessionDef]);
-    const rates = state.categories.flatMap((c) => c.entries).map((e) => e.globalRate);
+    const rates = state.entries.map((e) => e.globalRate);
 
     expect(rates.length).toBe(3);
     expect(rates.every((rate) => rate > 0 && rate <= 100)).toBe(true);
-
-    for (const category of state.categories) {
-      const inOrder = category.entries.map((e) => e.globalRate);
-      expect(inOrder).toEqual([...inOrder].sort((a, b) => b - a));
-    }
   });
 });
 

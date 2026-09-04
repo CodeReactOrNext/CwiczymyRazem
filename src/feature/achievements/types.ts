@@ -89,19 +89,6 @@ export type AchievementList =
   | "vintage_1970";
 
 /**
- * The family a badge belongs to — the file it lives in under `data/categories/`.
- * Stamped onto every definition where the registry is assembled, so a category
- * file cannot ship without one.
- */
-export type AchievementCategory =
-  | "stat"
-  | "time"
-  | "song"
-  | "habit"
-  | "special"
-  | "rig";
-
-/**
  * How one badge reads on the panel. `ready` is the state the old grid could not
  * express: the requirement is already met and the badge lands on the next report.
  */
@@ -130,7 +117,6 @@ export interface AchievementProgress {
 
 export interface AchievementsDataInterface extends AchievementsRarityType {
   id: AchievementList;
-  category: AchievementCategory;
   name: string;
   Icon: IconType;
   description: string;
