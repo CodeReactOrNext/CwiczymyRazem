@@ -105,7 +105,7 @@ export type AchievementCategory =
  * How one badge reads on the panel. `ready` is the state the old grid could not
  * express: the requirement is already met and the badge lands on the next report.
  */
-export type AchievementTileState = "owned" | "ready" | "progress" | "locked";
+export type AchievementEntryState = "owned" | "ready" | "progress" | "locked";
 
 export interface AchievementContext {
   statistics: StatisticsDataInterface;

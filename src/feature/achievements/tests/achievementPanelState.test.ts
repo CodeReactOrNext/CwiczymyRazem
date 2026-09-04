@@ -2,6 +2,8 @@ import { EMPTY_ARSENAL_SUMMARY } from "feature/arsenal/data/arsenalSummary";
 import { FaMedal } from "react-icons/fa";
 import { describe, expect, it } from "vitest";
 
+import { achievementsData } from "../data/achievementsData";
+import { getGlobalUnlockRate } from "../data/globalUnlockRate";
 import type {
   AchievementCategory,
   AchievementContext,
@@ -140,5 +142,40 @@ describe("buildAchievementPanelState", () => {
     expect(state.owned).toBe(1);
     expect(state.ready).toEqual([]);
     expect(state.categories.flatMap((c) => c.entries).map((e) => e.state)).toContain("locked");
+  });
+  it("orders a category by how many players hold each badge", () => {
+    const state = buildAchievementPanelState([], ctx(), [pointsDef, ceilingDef, sessionDef]);
+    const rates = state.categories.flatMap((c) => c.entries).map((e) => e.globalRate);
+
+    expect(rates.length).toBe(3);
+    expect(rates.every((rate) => rate > 0 && rate <= 100)).toBe(true);
+
+    for (const category of state.categories) {
+      const inOrder = category.entries.map((e) => e.globalRate);
+      expect(inOrder).toEqual([...inOrder].sort((a, b) => b - a));
+    }
+  });
+});
+
+describe("getGlobalUnlockRate", () => {
+  it("returns the same figure every time it is asked", () => {
+    // Rows sort on this, so a value that moved would reorder the list on paint.
+    for (const badge of achievementsData) {
+      const first = getGlobalUnlockRate(badge.id, badge.rarity);
+      expect(getGlobalUnlockRate(badge.id, badge.rarity)).toBe(first);
+    }
+  });
+
+  it("puts rarer badges lower, the way real numbers will", () => {
+    const highest = (rarity: (typeof achievementsData)[number]["rarity"]) =>
+      Math.max(
+        ...achievementsData
+          .filter((d) => d.rarity === rarity)
+          .map((d) => getGlobalUnlockRate(d.id, d.rarity))
+      );
+
+    expect(highest("epic")).toBeLessThan(highest("veryRare"));
+    expect(highest("veryRare")).toBeLessThan(highest("rare"));
+    expect(highest("rare")).toBeLessThan(highest("common"));
   });
 });

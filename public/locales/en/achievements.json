@@ -6,11 +6,11 @@
   "epic": "Epic",
 
   "panel": {
-    "totalCaption": "achievements earned",
+    "earnedHeadline": "{{owned}} of {{total}} achievements earned",
+    "globalColumn": "% of all players",
     "readyTitle": "Ready to unlock",
     "readySubtitle": "{{count}} already meet their requirement and land on your next report",
-    "conditionMet": "requirement met",
-    "stillLocked": "still locked"
+    "conditionMet": "requirement met"
   },
   "categories": {
     "stat": "Progress",

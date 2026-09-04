@@ -3,13 +3,14 @@ import type { HabbitsType } from "feature/user/view/ReportView/ReportView.types"
 import { ACHIEVEMENT_CATEGORIES } from "../data/achievementCategories";
 import { achievementsData } from "../data/achievementsData";
 import type { AchievementsRarityType } from "../data/achievementsRarity";
+import { getGlobalUnlockRate } from "../data/globalUnlockRate";
 import type {
   AchievementCategory,
   AchievementContext,
+  AchievementEntryState,
   AchievementList,
   AchievementProgress,
   AchievementsDataInterface,
-  AchievementTileState,
 } from "../types";
 
 type Rarity = AchievementsRarityType["rarity"];
@@ -34,9 +35,11 @@ const ALL_HABITS = Object.keys(ALL_HABITS_MAP) as HabbitsType[];
 
 export interface AchievementPanelEntry {
   data: AchievementsDataInterface;
-  state: AchievementTileState;
+  state: AchievementEntryState;
   /** Only on `progress` entries, already clamped so a bar can never overrun. */
   progress?: AchievementProgress;
+  /** Share of players holding this badge — a placeholder for now. */
+  globalRate: number;
 }
 
 export interface AchievementPanelCategory {
@@ -101,19 +104,12 @@ const clampProgress = (progress: AchievementProgress): AchievementProgress => ({
 });
 
 /**
- * Sorts a category's tiles so the actionable ones come first: what is ready,
- * then what is under way, then what has not started, then the shelf of things
- * already won.
+ * Commonest first, the way a global achievement list is read: the top of a
+ * category is what nearly everyone has, the bottom is what almost nobody does.
+ * Ties break on the id so the order is total and cannot wobble between renders.
  */
-const STATE_ORDER: Record<AchievementTileState, number> = {
-  ready: 0,
-  progress: 1,
-  locked: 2,
-  owned: 3,
-};
-
-const byState = (a: AchievementPanelEntry, b: AchievementPanelEntry) =>
-  STATE_ORDER[a.state] - STATE_ORDER[b.state];
+const byGlobalRate = (a: AchievementPanelEntry, b: AchievementPanelEntry) =>
+  b.globalRate - a.globalRate || a.data.id.localeCompare(b.data.id);
 
 /**
  * Turns the registry plus one account's state into everything the panel draws.
@@ -131,22 +127,25 @@ export const buildAchievementPanelState = (
   const generous = context ? withGenerousSession(context) : null;
 
   const entries: AchievementPanelEntry[] = definitions.map((data) => {
-    if (owned.has(data.id)) return { data, state: "owned" };
-    if (!context) return { data, state: "locked" };
+    const globalRate = getGlobalUnlockRate(data.id, data.rarity);
+
+    if (owned.has(data.id)) return { data, globalRate, state: "owned" };
+    if (!context) return { data, globalRate, state: "locked" };
 
     if (data.check(context) && generous && data.check(generous)) {
-      return { data, state: "ready" };
+      return { data, globalRate, state: "ready" };
     }
 
     if (data.getProgress) {
       return {
         data,
+        globalRate,
         state: "progress",
         progress: clampProgress(data.getProgress(context)),
       };
     }
 
-    return { data, state: "locked" };
+    return { data, globalRate, state: "locked" };
   });
 
   const categories = ACHIEVEMENT_CATEGORIES.map((category) => {
@@ -155,7 +154,7 @@ export const buildAchievementPanelState = (
       category,
       owned: inCategory.filter((e) => e.state === "owned").length,
       total: inCategory.length,
-      entries: inCategory.slice().sort(byState),
+      entries: inCategory.slice().sort(byGlobalRate),
     };
   })
     .filter((c) => c.total > 0)
@@ -176,7 +175,7 @@ export const buildAchievementPanelState = (
     owned: entries.filter((e) => e.state === "owned").length,
     total: entries.length,
     rarities,
-    ready: entries.filter((e) => e.state === "ready"),
+    ready: entries.filter((e) => e.state === "ready").sort(byGlobalRate),
     categories,
   };
 };
