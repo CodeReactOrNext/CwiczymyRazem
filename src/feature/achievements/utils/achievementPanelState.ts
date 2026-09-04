@@ -1,4 +1,6 @@
 import type { HabbitsType } from "feature/user/view/ReportView/ReportView.types";
+import type { AchievementStatsDoc } from "lib/achievements/achievementStats";
+import { rateFromStats } from "lib/achievements/achievementStats";
 
 import { ACHIEVEMENT_CATEGORIES } from "../data/achievementCategories";
 import { achievementsData } from "../data/achievementsData";
@@ -38,7 +40,7 @@ export interface AchievementPanelEntry {
   state: AchievementEntryState;
   /** Only on `progress` entries, already clamped so a bar can never overrun. */
   progress?: AchievementProgress;
-  /** Share of players holding this badge — a placeholder for now. */
+  /** Share of players holding this badge. Counted where known, estimated otherwise. */
   globalRate: number;
 }
 
@@ -121,13 +123,20 @@ const byGlobalRate = (a: AchievementPanelEntry, b: AchievementPanelEntry) =>
 export const buildAchievementPanelState = (
   ownedIds: AchievementList[],
   context: AchievementContext | null,
+  /**
+   * Counted holders, once `/api/achievements/stats` has answered. Null while it
+   * is in flight, or before the first recount has ever run — the estimate stands
+   * in until then, so the list never renders a column of `0.0%`.
+   */
+  stats: AchievementStatsDoc | null = null,
   definitions: AchievementsDataInterface[] = achievementsData,
 ): AchievementPanelState => {
   const owned = new Set(ownedIds);
   const generous = context ? withGenerousSession(context) : null;
 
   const entries: AchievementPanelEntry[] = definitions.map((data) => {
-    const globalRate = getGlobalUnlockRate(data.id, data.rarity);
+    const globalRate =
+      rateFromStats(data.id, stats) ?? getGlobalUnlockRate(data.id, data.rarity);
 
     if (owned.has(data.id)) return { data, globalRate, state: "owned" };
     if (!context) return { data, globalRate, state: "locked" };

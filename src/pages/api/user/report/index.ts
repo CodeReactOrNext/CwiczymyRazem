@@ -14,9 +14,11 @@ import {
 } from "feature/report/services/setUserExerciseRaport";
 import { firebaseUpdateUserStats } from "feature/report/services/updateUserStats";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
+import { FieldValue } from "firebase-admin/firestore";
+import { ACHIEVEMENT_STATS_PATH, countsAsPlayer } from "lib/achievements/achievementStats";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { StatisticsDataInterface } from "types/api.types";
-import { auth } from "utils/firebase/api/firebase.config";
+import { auth, firestore } from "utils/firebase/api/firebase.config";
 import { calculateSessionFame } from "utils/gameLogic/calculateSessionFame";
 import { reportUpdateUserStats } from "utils/gameLogic/reportUpdateUserState";
 
@@ -217,6 +219,45 @@ export default async function handler(
         : undefined;
 
     const writePromises = [];
+
+    // Keep `config/achievementStats` live, so the collection screen can show
+    // how many players hold each badge without counting accounts per request.
+    //
+    // Written with the Admin SDK rather than through `firebaseUpdateUserStats`,
+    // which still goes out over the client SDK: a counter every visitor could
+    // write is a counter nobody can trust. Increments rather than absolute
+    // writes, so two players finishing at once cannot clobber each other.
+    //
+    // Drifts over time — a failed write here, a badge granted by hand — which
+    // is what `npm run backfill-achievement-stats` exists to repair.
+    const isFirstEverSession =
+      (report.previousUserStats?.sessionCount ?? 0) === 0 &&
+      countsAsPlayer(report.currentUserStats);
+
+    if (report.newAchievements.length > 0 || isFirstEverSession) {
+      const [statsCollection, statsDoc] = ACHIEVEMENT_STATS_PATH.split("/");
+      const statsUpdate: Record<string, FirebaseFirestore.FieldValue> = {};
+
+      for (const achievementId of report.newAchievements) {
+        statsUpdate[`counts.${achievementId}`] = FieldValue.increment(1);
+      }
+      if (isFirstEverSession) {
+        statsUpdate.totalPlayers = FieldValue.increment(1);
+      }
+
+      writePromises.push(
+        firestore
+          .collection(statsCollection)
+          .doc(statsDoc)
+          // `set(..., { merge: true })` so the very first report of a fresh
+          // deployment creates the document instead of failing on a missing one.
+          .set(statsUpdate, { merge: true })
+          .catch((error: unknown) => {
+            // A lost count must never cost a player their session.
+            console.error("achievement stats increment failed:", error);
+          })
+      );
+    }
 
     writePromises.push(firebaseUpdateUserStats(
       userUid,

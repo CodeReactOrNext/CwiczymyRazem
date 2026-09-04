@@ -4,6 +4,7 @@ import { useMemo } from "react";
 
 import { achievementCategoryKey } from "../../data/achievementCategories";
 import { useAchievementContext } from "../../hooks/useAchievementContext";
+import { useAchievementStats } from "../../hooks/useAchievementStats";
 import type { AchievementContext, AchievementList } from "../../types";
 import type {
   AchievementPanelCategory,
@@ -76,10 +77,11 @@ export const AchievementsPanel = ({
 }) => {
   const { t } = useTranslation("achievements");
   const context = useAchievementContext();
+  const { data: stats } = useAchievementStats();
 
   const state = useMemo(
-    () => buildAchievementPanelState(userAchievements, context),
-    [userAchievements, context]
+    () => buildAchievementPanelState(userAchievements, context, stats ?? null),
+    [userAchievements, context, stats]
   );
 
   const earnedPercent = state.total > 0 ? Math.round((state.owned / state.total) * 100) : 0;
