@@ -230,18 +230,20 @@ export default async function handler(
     //
     // Drifts over time — a failed write here, a badge granted by hand — which
     // is what `npm run backfill-achievement-stats` exists to repair.
-    const isFirstEverSession =
-      (report.previousUserStats?.sessionCount ?? 0) === 0 &&
-      countsAsPlayer(report.currentUserStats);
+    // Crossing the line, not the first session ever: `countsAsPlayer` decides
+    // where the line is, and comparing both sides of the report keeps this
+    // correct if that threshold ever moves.
+    const becameAPlayer =
+      !countsAsPlayer(report.previousUserStats) && countsAsPlayer(report.currentUserStats);
 
-    if (report.newAchievements.length > 0 || isFirstEverSession) {
+    if (report.newAchievements.length > 0 || becameAPlayer) {
       const [statsCollection, statsDoc] = ACHIEVEMENT_STATS_PATH.split("/");
       const statsUpdate: Record<string, FirebaseFirestore.FieldValue> = {};
 
       for (const achievementId of report.newAchievements) {
         statsUpdate[`counts.${achievementId}`] = FieldValue.increment(1);
       }
-      if (isFirstEverSession) {
+      if (becameAPlayer) {
         statsUpdate.totalPlayers = FieldValue.increment(1);
       }
 

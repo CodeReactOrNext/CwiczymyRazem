@@ -2,7 +2,12 @@ import type { AchievementList } from "feature/achievements/types";
 import { describe, expect, it } from "vitest";
 
 import type { AchievementStatsDoc } from "./achievementStats";
-import { countsAsPlayer, rateFromStats, tallyAchievementStats } from "./achievementStats";
+import {
+  countsAsPlayer,
+  MIN_SESSIONS_FOR_PLAYER,
+  rateFromStats,
+  tallyAchievementStats,
+} from "./achievementStats";
 
 const ids = (...list: string[]) => list as AchievementList[];
 
@@ -11,7 +16,7 @@ describe("tallyAchievementStats", () => {
     const stats = tallyAchievementStats(
       [
         { sessionCount: 4, achievements: ids("time_1", "points_1") },
-        { sessionCount: 1, achievements: ids("time_1") },
+        { sessionCount: 3, achievements: ids("time_1") },
         { sessionCount: 9, achievements: ids() },
       ],
       1000
@@ -24,11 +29,12 @@ describe("tallyAchievementStats", () => {
     });
   });
 
-  it("leaves accounts that never played out of the denominator", () => {
-    // Signed up and never practised: counting them would drag every share down
-    // while saying nothing about how hard a badge is.
+  it("leaves accounts that barely played out of the denominator", () => {
+    // Signed up and left: on real data these were most of the pool and put the
+    // commonest badge in the game at 29.8%. See `MIN_SESSIONS_FOR_PLAYER`.
     const stats = tallyAchievementStats([
-      { sessionCount: 2, achievements: ids("time_1") },
+      { sessionCount: 8, achievements: ids("time_1") },
+      { sessionCount: 1, achievements: ids() },
       { sessionCount: 0, achievements: ids() },
       { achievements: ids() },
     ]);
@@ -38,7 +44,7 @@ describe("tallyAchievementStats", () => {
 
   it("does not let a duplicated id count one account twice", () => {
     const stats = tallyAchievementStats([
-      { sessionCount: 1, achievements: ids("time_1", "time_1") },
+      { sessionCount: 5, achievements: ids("time_1", "time_1") },
     ]);
 
     expect(stats.counts.time_1).toBe(1);
@@ -47,7 +53,9 @@ describe("tallyAchievementStats", () => {
 
 describe("countsAsPlayer", () => {
   it.each([
-    [{ sessionCount: 1 }, true],
+    [{ sessionCount: MIN_SESSIONS_FOR_PLAYER }, true],
+    [{ sessionCount: MIN_SESSIONS_FOR_PLAYER + 10 }, true],
+    [{ sessionCount: MIN_SESSIONS_FOR_PLAYER - 1 }, false],
     [{ sessionCount: 0 }, false],
     [{}, false],
     [undefined, false],
