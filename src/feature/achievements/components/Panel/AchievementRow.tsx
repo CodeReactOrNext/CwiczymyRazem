@@ -77,13 +77,23 @@ export const AchievementRow = memo(
     const isOwned = state === "owned";
     const percent = progress && progress.max > 0 ? (progress.current / progress.max) * 100 : 0;
 
+    // `hover:z-10` so the badge, which grows to 2.2x under the pointer, comes up
+    // over the rows below it rather than under them.
     return (
-      <div className={cn("relative overflow-hidden rounded-lg", SURFACE[state])}>
+      <div className={cn("relative rounded-lg transition-colors hover:z-10", SURFACE[state])}>
+        {/*
+          The clip lives on the bar rather than on the row. It is only here to
+          keep the fill inside the rounded corners, and on the row it also cut
+          the badge off the moment it grew past the row's edge.
+        */}
         <div
           aria-hidden
-          className={cn("absolute inset-y-0 left-0", FILL[state])}
-          style={{ width: `${globalRate}%` }}
-        />
+          className='pointer-events-none absolute inset-0 overflow-hidden rounded-lg'>
+          <div
+            className={cn("absolute inset-y-0 left-0", FILL[state])}
+            style={{ width: `${globalRate}%` }}
+          />
+        </div>
 
         <div className='relative flex items-center gap-3 p-2.5 pr-3 sm:gap-4 sm:p-3'>
           {/* The tick column keeps its width either way, so names stay aligned. */}
