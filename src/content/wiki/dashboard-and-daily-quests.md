@@ -19,7 +19,7 @@ Every day you get three small tasks, drawn at random from a big pool, with no tw
 The tasks are things you were probably going to do anyway. They tick off automatically as you practise and log, so there's nothing to mark by hand.
 
 <BlogAlert type="warning">
-The reward isn't given automatically. You have to press Claim before the day rolls over. The quests reset with a fresh set of three the next day.
+The reward isn't given automatically. You have to press Claim before the day rolls over. Your quest day ends at midnight where you live, so a late-evening session still counts towards the set you have been looking at all day, and a fresh set of three is waiting the next morning.
 </BlogAlert>
 
 ## Every quest that can come up

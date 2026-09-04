@@ -7,8 +7,9 @@ import { cycleEnd } from "feature/supporterCase/utils/caseCycle";
  * Which clock a rollover runs on.
  *
  * `server` is UTC and identical for everyone — the only thing a shared deadline
- * can be stated in. `local` is the viewer's own midnight, and the streak is the
- * single mechanic that uses it (see `getServerDateKey` for why).
+ * can be stated in. `local` is the viewer's own midnight, used by the mechanics
+ * that are about one player's own habit rather than a shared race: the streak
+ * and the daily quest (see `getServerDateKey` for why).
  */
 export type ResetScope = "server" | "local";
 
@@ -62,7 +63,7 @@ export const getResetSchedule = (now: Date = new Date()): ResetEntry[] => {
     {
       id: "daily",
       label: "Daily reset",
-      detail: "New Daily Quests and a fresh daily Fame bonus.",
+      detail: "A fresh daily Fame bonus.",
       scope: "server",
       nextResetAt: getServerDayEnd(now),
     },
@@ -103,9 +104,9 @@ export const getResetSchedule = (now: Date = new Date()): ResetEntry[] => {
     },
     {
       id: "streak",
-      label: "Your streak day",
+      label: "Your practice day",
       detail:
-        "Practice before your own midnight to keep the streak — this one follows your timezone, not the server.",
+        "Daily Quests draw a new set and the streak wants a session before then — this one follows your timezone, not the server.",
       scope: "local",
       nextResetAt: getLocalDayEnd(now),
     },

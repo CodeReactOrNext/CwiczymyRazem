@@ -792,6 +792,7 @@ const ReportView = () => {
                               { label: "Techniques", icon: "🧩", tags: [
                                 { label: "Legato", icon: "🌊" },
                                 { label: "Alt Picking", icon: "🔄" },
+                                { label: "Hybrid Picking", icon: "🤟" },
                                 { label: "Sweep Picking", icon: "🌪️" },
                                 { label: "Tapping", icon: "👆" },
                                 { label: "Picking Control", icon: "🤏" },

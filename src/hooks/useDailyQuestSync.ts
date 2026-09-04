@@ -1,5 +1,5 @@
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { syncDailyQuestAction } from "feature/user/store/userSlice.questActions";
+import { ensureQuestForToday, syncDailyQuestAction } from "feature/user/store/userSlice.questActions";
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
@@ -33,6 +33,10 @@ const useDailyQuestSync = () => {
       lastSyncedAt.current = now;
 
       dispatch(syncDailyQuestAction());
+      // A tab that has been open across the server-day boundary is still
+      // showing yesterday's set — until now only mounting the dashboard widget
+      // drew the new one. This is a no-op on a quest that is already current.
+      dispatch(ensureQuestForToday());
     };
 
     document.addEventListener("visibilitychange", sync);
