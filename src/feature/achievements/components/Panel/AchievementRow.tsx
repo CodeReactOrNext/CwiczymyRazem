@@ -27,19 +27,24 @@ import { AchievementCard } from "../Card/AchievementCard";
  *
  * Green rather than the brand accent: the styleguide gives emerald to "done",
  * and cyan is already spoken for by the badges a player can go and finish now.
+ *
+ * Unearned rows sit closer to the page behind them than to an earned one. Only
+ * their surfaces and bars are dimmed, never the text on them: darkening the
+ * ground raises the contrast of what is written on it, so the row recedes while
+ * staying as readable as it was.
  */
 const SURFACE: Record<AchievementEntryState, string> = {
   owned: "bg-zinc-800/40",
   ready: "bg-zinc-900/40",
-  progress: "bg-zinc-900/40",
-  locked: "bg-zinc-900/30",
+  progress: "bg-zinc-900/25",
+  locked: "bg-zinc-900/15",
 };
 
 const FILL: Record<AchievementEntryState, string> = {
   owned: "bg-emerald-500/[0.09]",
   ready: "bg-cyan-500/10",
-  progress: "bg-zinc-700/30",
-  locked: "bg-zinc-800/40",
+  progress: "bg-zinc-700/20",
+  locked: "bg-zinc-800/25",
 };
 
 const NAME: Record<AchievementEntryState, string> = {
