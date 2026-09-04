@@ -3,7 +3,6 @@ import type { AchievementStatsDoc } from "lib/achievements/achievementStats";
 import { rateFromStats } from "lib/achievements/achievementStats";
 
 import { achievementsData } from "../data/achievementsData";
-import type { AchievementsRarityType } from "../data/achievementsRarity";
 import { getGlobalUnlockRate } from "../data/globalUnlockRate";
 import type {
   AchievementContext,
@@ -12,10 +11,6 @@ import type {
   AchievementProgress,
   AchievementsDataInterface,
 } from "../types";
-
-type Rarity = AchievementsRarityType["rarity"];
-
-const RARITY_ORDER: Rarity[] = ["common", "rare", "veryRare", "epic"];
 
 /**
  * Every habit the report form offers.
@@ -42,17 +37,9 @@ export interface AchievementPanelEntry {
   globalRate: number;
 }
 
-
-export interface AchievementRarityTally {
-  rarity: Rarity;
-  owned: number;
-  total: number;
-}
-
 export interface AchievementPanelState {
   owned: number;
   total: number;
-  rarities: AchievementRarityTally[];
   /** Every badge, commonest first. */
   entries: AchievementPanelEntry[];
 }
@@ -148,20 +135,9 @@ export const buildAchievementPanelState = (
     return { data, globalRate, state: "locked" };
   });
 
-
-  const rarities = RARITY_ORDER.map((rarity) => {
-    const inRarity = entries.filter((e) => e.data.rarity === rarity);
-    return {
-      rarity,
-      owned: inRarity.filter((e) => e.state === "owned").length,
-      total: inRarity.length,
-    };
-  }).filter((r) => r.total > 0);
-
   return {
     owned: entries.filter((e) => e.state === "owned").length,
     total: entries.length,
-    rarities,
     entries: entries.slice().sort(byGlobalRate),
   };
 };

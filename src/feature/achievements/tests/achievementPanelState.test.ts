@@ -90,7 +90,6 @@ describe("buildAchievementPanelState", () => {
 
     expect(state.owned).toBe(1);
     expect(state.total).toBe(3);
-    expect(state.rarities).toEqual([{ rarity: "common", owned: 1, total: 3 }]);
   });
 
   it("marks a met threshold as ready", () => {
