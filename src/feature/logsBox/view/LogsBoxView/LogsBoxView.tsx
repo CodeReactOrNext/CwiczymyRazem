@@ -1,7 +1,7 @@
 import { Card } from "assets/components/ui/card";
 import { firebaseGetLogsStream } from "feature/logs/services/getLogsStream.service";
 import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
-import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import LogsBoxLayout from "layouts/LogsBoxLayout";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -58,9 +58,7 @@ const LogsBoxView = ({ className }: { className?: string }) => {
   const [logsLimit, setLogsLimit] = useState(LOGS_PAGE_SIZE);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
 
-  const userStats = useAppSelector(selectCurrentUserStats);
   const currentUserId = useAppSelector(selectUserAuth);
-  const userAchievement = userStats?.achievements;
 
   useEffect(() => {
     const unsubscribe = firebaseGetLogsStream((logsData) => {
@@ -78,10 +76,9 @@ const LogsBoxView = ({ className }: { className?: string }) => {
   // Only offer "Show more" once — after that the button disappears even if more logs remain.
   const hasMoreLogs = !hasLoadedMore && hasOlderLogs;
 
-  return logs && userAchievement && currentUserId ? (
+  return logs && currentUserId ? (
     <LogsBoxLayout
       logs={logs}
-      userAchievements={userAchievement}
       currentUserId={currentUserId}
       className={className}
       hasOlderLogs={hasOlderLogs}

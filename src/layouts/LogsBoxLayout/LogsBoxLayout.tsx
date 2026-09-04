@@ -3,17 +3,13 @@ import Changelog, {
   hasRecentChanges,
   useChangelogData,
 } from "components/Changelog/Changelog";
-import type { AchievementList } from "feature/achievements/types";
 import Chat from "feature/chat/Chat";
 import { useUnreadMessages as useUnreadChatMessages } from "feature/chat/hooks/useUnreadMessages";
 import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
 import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
 import { AnimatePresence, m } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
-import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import { useState } from "react";
-import { FaMedal } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { IoChatboxEllipses } from "react-icons/io5";
 import { LuLogs } from "react-icons/lu";
@@ -22,7 +18,6 @@ import Logs from "./components/Logs";
 
 interface LogsBoxLayoutProps {
   logs: AnyFirebaseLog[];
-  userAchievements: AchievementList[];
   currentUserId: string;
   className?: string; // Allow custom styles
   hasOlderLogs?: boolean;
@@ -32,7 +27,6 @@ interface LogsBoxLayoutProps {
 
 const LogsBoxLayout = ({
   logs,
-  userAchievements,
   currentUserId,
   className = "",
   hasOlderLogs = false,
@@ -40,7 +34,7 @@ const LogsBoxLayout = ({
   onLoadMoreLogs,
 }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
-    "logs" | "achievements" | "chat" | "excerise" | "changelog"
+    "logs" | "chat" | "excerise" | "changelog"
   >("logs");
   const [changelogDotHidden, setChangelogDotHidden] = useState(false);
 
@@ -66,8 +60,6 @@ const LogsBoxLayout = ({
     !!changelog?.entries &&
     hasRecentChanges(changelog.entries);
 
-  const { t } = useTranslation("common");
-
   const handleCategoryChange = (category: typeof showedCategory) => {
     if (category === "chat" || showedCategory === "chat") {
       markChatsAsRead();
@@ -84,7 +76,7 @@ const LogsBoxLayout = ({
   return (
     <Card
       className={`relative m-auto flex ${
-        showedCategory !== "achievements" && showedCategory !== "logs" && !className.includes("h-")
+        showedCategory !== "logs" && !className.includes("h-")
           ? "sm:h-[650px] lg:h-[800px]"
           : ""
       } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
@@ -106,34 +98,16 @@ const LogsBoxLayout = ({
           hasNewMessages={hasNewChats}
         />
         {!className.includes("border-none") && (
-          <>
-            <LogsBoxButton
-              title={t("logsBox.achievements_map")}
-              active={showedCategory === "achievements"}
-              onClick={() => handleCategoryChange("achievements")}
-              Icon={FaMedal}
-            />
-            <LogsBoxButton
-              title='Changelog'
-              active={showedCategory === "changelog"}
-              onClick={() => handleCategoryChange("changelog")}
-              Icon={FiBook}
-              hasNewDot={hasNewChangelog}
-            />
-          </>
+          <LogsBoxButton
+            title='Changelog'
+            active={showedCategory === "changelog"}
+            onClick={() => handleCategoryChange("changelog")}
+            Icon={FiBook}
+            hasNewDot={hasNewChangelog}
+          />
         )}
       </div>
       <AnimatePresence mode='wait' initial={false}>
-        {showedCategory === "achievements" && (
-          <m.div
-            key='achievements'
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}>
-            <AchievementsMap userAchievements={userAchievements} />
-          </m.div>
-        )}
         {showedCategory === "changelog" && (
           <m.div
             key='changelog'
