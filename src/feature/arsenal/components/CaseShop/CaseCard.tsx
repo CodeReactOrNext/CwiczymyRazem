@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 
 import type { CaseDefinition } from "../../types/arsenal.types";
 import { DropRates } from "./DropRates";
+import { FreeCaseButton } from "./FreeCaseButton";
 import { OpenCaseButton } from "./OpenCaseButton";
 
 /** Per-tier identity is carried by one tinted glow behind the art and by the
@@ -25,8 +26,10 @@ const EFFECT_CASE_IMAGE: Record<string, string> = {
 interface CaseCardProps {
   caseDef: CaseDefinition;
   currentFame: number;
-  onOpen: (caseType: string) => void;
+  onOpen: (caseType: string, useToken?: boolean) => void;
   isOpening: boolean;
+  /** Free cases the player is holding. Zero hides the second button entirely. */
+  freeTokens?: number;
   /**
    * Both layouts read art-left / copy-right. `wide` additionally pulls the
    * actions out into a third column — used for Standard alone, so the everyday
@@ -41,6 +44,7 @@ export const CaseCard = ({
   currentFame,
   onOpen,
   isOpening,
+  freeTokens = 0,
   layout = "tile",
   className,
 }: CaseCardProps) => {
@@ -129,6 +133,14 @@ export const CaseCard = ({
           variant='soft'
           className='w-full'
         />
+        {freeTokens > 0 && (
+          <FreeCaseButton
+            isOpening={isOpening}
+            tokens={freeTokens}
+            onClick={() => onOpen(caseDef.id, true)}
+            className='w-full'
+          />
+        )}
       </div>
     </article>
   );

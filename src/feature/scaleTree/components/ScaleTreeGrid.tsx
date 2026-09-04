@@ -5,6 +5,7 @@ import { SCALE_TREE_POSITIONS, usesBoxNames } from 'feature/scaleTree/data/scale
 import { motion } from 'framer-motion';
 import { useEffect, useMemo,useRef, useState } from 'react';
 
+import { BoxRewardBlock } from './BoxRewardBlock';
 import { ScaleTreeGridNode } from './ScaleTreeGridNode';
 
 interface ScaleTreeGridProps {
@@ -101,10 +102,9 @@ export function ScaleTreeGrid({
       if (found) list.push(found);
     });
 
-    const rewardId = `${prefix}_pos${pos}_reward`;
-    const rewardNode = scaleNodes.find((n) => n.id === rewardId);
-    if (rewardNode) list.push(rewardNode);
-
+    // The row's reward is `BoxRewardBlock`, not a node: the retired React Flow
+    // tree carried one as an eighth polygon on the end of the row, and it read
+    // as an eighth exercise.
     return list;
   };
 
@@ -286,6 +286,9 @@ export function ScaleTreeGrid({
               const posNodes = getPositionNodes(pos);
               // Node IDs stay keyed to the C fret; only the label follows the key.
               const fret = transposeFret(pos, rootNote);
+              const rowDone = posNodes.filter(
+                (n) => n.data?.status === 'completed'
+              ).length;
 
               return (
                 <div key={pos} className="flex items-center w-full gap-2 sm:gap-6">
@@ -318,6 +321,16 @@ export function ScaleTreeGrid({
                       </div>
                     ))}
                   </div>
+
+                  {/* Outside the shapes' panel, not inside it: what closes the
+                      row should not look like one more thing in it. */}
+                  <BoxRewardBlock
+                    scaleType={scaleType}
+                    position={pos}
+                    done={rowDone}
+                    total={posNodes.length}
+                    accentColor={accentColor}
+                  />
                 </div>
               );
             })}

@@ -1,9 +1,15 @@
 import { Card } from "assets/components/ui/card";
+import { RewardSummary } from "components/Rewards/RewardSummary";
 import type { AchievementList} from "feature/achievements";
-import { AchievementCard, useAchievementContext } from "feature/achievements";
+import {
+  AchievementCard,
+  previewClaim,
+  useAchievementContext,
+} from "feature/achievements";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { Trophy } from "lucide-react";
+import Link from "next/link";
 
 interface AchievementsDisplayProps {
   achievements: AchievementList[];
@@ -12,6 +18,10 @@ interface AchievementsDisplayProps {
 export const AchievementsDisplay = ({ achievements }: AchievementsDisplayProps) => {
   const { t } = useTranslation(["report"]);
   const context = useAchievementContext();
+  // What the badges that just landed are worth. Shown here rather than only on
+  // the profile because this popup is the one moment a player is looking at
+  // them — a reward nobody knows about is a reward nobody collects.
+  const reward = previewClaim(achievements);
 
   if (achievements.length === 0) return null;
 
@@ -42,6 +52,18 @@ export const AchievementsDisplay = ({ achievements }: AchievementsDisplayProps) 
                 <AchievementCard id={id} context={context} isUnlocked={true} />
               </motion.div>
             ))}
+          </div>
+
+          <div className='mt-8 flex flex-col gap-2'>
+            <p className='text-xs font-semibold text-zinc-400'>
+              {t("report:rating_popup.achievement_reward")}
+            </p>
+            <RewardSummary reward={reward} size='lg' />
+            <Link
+              href='/profile/achievements'
+              className='mt-1 text-xs font-semibold text-amber-500 transition-colors hover:text-amber-400'>
+              {t("report:rating_popup.collect_reward")}
+            </Link>
           </div>
         </div>
       </Card>

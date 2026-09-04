@@ -11,7 +11,9 @@ import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
 import { firebaseGetLessonsByIds } from "../../services/youtubeLesson.service";
 import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
 import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
+import { isRewardableRoadmap } from "../../data/roadmapRewards";
 import LessonPracticeModal from "./components/LessonPracticeModal";
+import { RoadmapFinishCard } from "./components/RoadmapFinishCard";
 import YouTubeLessonCard from "./components/YouTubeLessonCard";
 
 // ─── AI Generating Loader ───────────────────────────────────────────────────
@@ -1591,15 +1593,25 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
               })}
             </div>
 
-            {/* Finish node */}
+            {/* Finish node — the reward card on the authored roadmaps, whose
+                steps ship in the repo and can therefore be paid for; the plain
+                plate on a roadmap the player generated for themselves. */}
             {phases.length > 0 && (
-              <div className={`rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-700 ${
-                progress === 100
-                  ? "bg-green-950/20 text-green-400"
-                  : "bg-zinc-900/30 text-zinc-500 opacity-40"
-              }`}>
-                {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
-              </div>
+              isRewardableRoadmap(roadmap.id) ? (
+                <RoadmapFinishCard
+                  roadmapId={roadmap.id}
+                  done={doneCount}
+                  total={allSteps.length}
+                />
+              ) : (
+                <div className={`rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-700 ${
+                  progress === 100
+                    ? "bg-green-950/20 text-green-400"
+                    : "bg-zinc-900/30 text-zinc-500 opacity-40"
+                }`}>
+                  {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
+                </div>
+              )
             )}
           </div>
         </div>{/* end containerRef */}

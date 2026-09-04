@@ -1,9 +1,15 @@
 import { cn } from "assets/lib/utils";
+import { RewardBadge } from "components/Rewards/RewardBadge";
 import { useTranslation } from "hooks/useTranslation";
 import { Check } from "lucide-react";
 import { memo } from "react";
 
-import type { AchievementContext, AchievementEntryState } from "../../types";
+import type { AchievementReward } from "../../data/achievementRewards";
+import type {
+  AchievementContext,
+  AchievementEntryState,
+  AchievementList,
+} from "../../types";
 import type { AchievementPanelEntry } from "../../utils/achievementPanelState";
 import { AchievementCard } from "../Card/AchievementCard";
 
@@ -72,14 +78,24 @@ export const AchievementRow = memo(
   ({
     entry,
     context,
+    reward,
+    isClaimed = false,
+    isClaiming = false,
+    onClaim,
   }: {
     entry: AchievementPanelEntry;
     context: AchievementContext | null;
+    /** What this badge pays. Absent while the ledger is still loading. */
+    reward?: AchievementReward | null;
+    isClaimed?: boolean;
+    isClaiming?: boolean;
+    onClaim?: (id: AchievementList) => void;
   }) => {
     const { t } = useTranslation("achievements");
     const { data, state, progress, globalRate } = entry;
 
     const isOwned = state === "owned";
+    const canClaim = isOwned && !isClaimed && Boolean(reward);
     const percent = progress && progress.max > 0 ? (progress.current / progress.max) * 100 : 0;
 
     // `hover:z-10` so the badge, which grows to 2.2x under the pointer, comes up
@@ -151,6 +167,27 @@ export const AchievementRow = memo(
               </div>
             )}
           </div>
+
+          {/*
+            The payout itself stays behind this glyph. Spelled out on the row it
+            was three coloured chips apiece across the whole list, which buried
+            the two things the list is actually read for.
+          */}
+          {reward && (
+            <RewardBadge reward={reward} earned={isOwned} claimed={isClaimed} />
+          )}
+
+          {canClaim && (
+            <button
+              onClick={() => onClaim?.(data.id)}
+              disabled={isClaiming}
+              className={cn(
+                "shrink-0 rounded-lg bg-zinc-100 px-3 py-1.5 text-[0.6875rem] font-bold capitalize tracking-wide text-zinc-900 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                isClaiming && "cursor-wait opacity-70",
+              )}>
+              {t("panel.rewards.claim")}
+            </button>
+          )}
 
           <span className={cn("shrink-0 text-sm font-bold tabular-nums", PERCENT[state])}>
             {globalRate.toFixed(1)}%

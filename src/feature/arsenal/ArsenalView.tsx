@@ -1,10 +1,12 @@
 import { Skeleton } from "assets/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import type { LucideIcon } from "lucide-react";
-import { BookMarked, Guitar, Hammer, PackageOpen, Store, Swords, Users } from "lucide-react";
+import { BookMarked, Guitar, Hammer, PackageOpen, Store, Swords, Ticket, Users } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -63,6 +65,9 @@ export const ArsenalView = () => {
   const { data, isLoading } = useArsenalData();
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
+  // Free cases earned from achievements. Spendable on any case on the shelf,
+  // which is why they sit in the banner beside Fame rather than on one card.
+  const freeCases = data?.caseTokens ?? 0;
 
   // Tab is URL-driven (?tab=market) so notifications/links can deep-link to it.
   const router = useRouter();
@@ -82,13 +87,16 @@ export const ArsenalView = () => {
   const [openedCaseType, setOpenedCaseType] = useState<CaseType | null>(null);
   const { mutate: openCase, isPending: isOpening } = useOpenCase();
 
-  const handleOpenCase = (caseType: CaseType) => {
+  const handleOpenCase = (caseType: CaseType, useToken?: boolean) => {
     setOpenedCaseType(caseType);
-    openCase(caseType, {
-      onSuccess: (result) => {
-        setOpenResult(result);
+    openCase(
+      { caseType, useToken },
+      {
+        onSuccess: (result) => {
+          setOpenResult(result);
+        },
       },
-    });
+    );
   };
 
   return (
@@ -106,10 +114,48 @@ export const ArsenalView = () => {
           // what every tab spends. Rig Level and the trait rate moved into the
           // Rig tab itself (`RigStatsPanel`): they are changed by moving gear,
           // so they read as stats of that screen rather than of the banner.
-          <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
-            <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
-            <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
-            <span className="text-xs text-zinc-400">Fame Points</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
+              <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
+              <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
+              <span className="text-xs text-zinc-400">Fame Points</span>
+            </div>
+            {/*
+              Shown even at zero, unlike most counters. A currency nobody knows
+              exists is a currency nobody goes and earns: hiding the empty state
+              meant the only players ever told about free cases were the ones who
+              already had one. Greyed out rather than absent, with where they
+              come from on the tooltip.
+            */}
+            <Tooltip delayDuration={50}>
+              <TooltipTrigger asChild>
+                <div
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-4 py-2.5",
+                    freeCases > 0 ? "bg-cyan-500/10" : "bg-zinc-800/40",
+                  )}>
+                  <Ticket
+                    size={20}
+                    strokeWidth={2.5}
+                    className={freeCases > 0 ? "text-cyan-300" : "text-zinc-500"}
+                  />
+                  <span
+                    className={cn(
+                      "text-xl font-black tabular-nums",
+                      freeCases > 0 ? "text-cyan-300" : "text-zinc-500",
+                    )}>
+                    {freeCases}
+                  </span>
+                  <span className="text-xs text-zinc-400">
+                    Free {freeCases === 1 ? "case" : "cases"}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-[15rem] font-normal">
+                Earned from epic achievements. One opens any case on the shelf —
+                Elite included — without spending Fame.
+              </TooltipContent>
+            </Tooltip>
           </div>
         }
       />
@@ -148,6 +194,7 @@ export const ArsenalView = () => {
                 onOpenCase={handleOpenCase}
                 isOpening={isOpening}
                 lastResult={openResult}
+                freeTokens={freeCases}
               />
             </TabsContent>
 

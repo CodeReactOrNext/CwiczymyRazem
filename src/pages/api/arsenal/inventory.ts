@@ -2,6 +2,7 @@ import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
+import { readRewardLedger } from "lib/rewards/rewardLedger";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -33,6 +34,10 @@ export default async function handler(
 
     const data = userDoc.data()!;
     const fame: number = data.statistics?.fame || 0;
+    // Free cases ride along with Fame because the shelf spends both, and the
+    // case shop would otherwise need a second round trip to know what a player
+    // can afford.
+    const caseTokens = readRewardLedger(data).caseTokens;
 
     if (!data.arsenal) {
       // Starter migration: initialize arsenal
@@ -46,7 +51,7 @@ export default async function handler(
         parts: [],
       };
       await userRef.update({ arsenal, rigLevel: 0 });
-      return res.status(200).json({ ...arsenal, fame });
+      return res.status(200).json({ ...arsenal, fame, caseTokens });
     }
 
     const storedRig = data.arsenal.rig;
@@ -141,7 +146,7 @@ export default async function handler(
       await userRef.update(updates);
     }
 
-    return res.status(200).json({ ...arsenal, fame });
+    return res.status(200).json({ ...arsenal, fame, caseTokens });
   } catch (error) {
     console.error("[inventory]", error);
     return res.status(500).json({ error: "Internal server error" });

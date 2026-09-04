@@ -9,7 +9,19 @@
     "earnedHeadline": "{{owned}} of {{total}} achievements earned",
     "globalColumn": "% of all players",
     "readyHint": "Log practice to get achievement",
-    "earned": "Earned"
+    "earned": "Earned",
+    "rewards": {
+      "claim": "Claim",
+      "claimAll": "Collect all",
+      "claiming": "Collecting...",
+      "waiting": "{{count}} rewards waiting to be collected",
+      "waitingOne": "1 reward waiting to be collected",
+      "tokensHeld": "{{count}} free cases in hand - spend them on any case in the Arsenal.",
+      "tokensHeldOne": "1 free case in hand - spend it on any case in the Arsenal.",
+      "readyToCollect": "Reward ready to collect",
+      "onCompletion": "Reward for earning this",
+      "collected": "Reward already collected"
+    }
   },
   "time_1": {
     "title": "Hard Work Pays Off",

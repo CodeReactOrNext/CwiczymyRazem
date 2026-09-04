@@ -18,6 +18,12 @@ service cloud.firestore {
         && !("supportTotal"         in request.resource.data.diff(resource.data).affectedKeys())
         && !("supporterTokens"      in request.resource.data.diff(resource.data).affectedKeys())
         && !("communityGoalClaims"  in request.resource.data.diff(resource.data).affectedKeys())
+        // Which rewards have been collected — badges and finished scale trees
+        // alike — and how many free cases are unspent. Paid out by
+        // /api/rewards/* and spent by /api/arsenal/open-case (Admin SDK). A
+        // client able to write here could re-collect something it has already
+        // been paid for, or mint itself free Elite cases outright.
+        && !("rewards"              in request.resource.data.diff(resource.data).affectedKeys())
         && !("guildId"              in request.resource.data.diff(resource.data).affectedKeys())
         // Denormalised copy of the guild's tag and cosmetics, so the leaderboard
         // can draw a member's badge without reading /guilds (which is closed to

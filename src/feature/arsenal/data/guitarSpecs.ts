@@ -89,6 +89,18 @@ export const SET_NECK_WRAP: GuitarSpec = {
   bridge: "wraparound",
 };
 
+/**
+ * The student build: one soapbar straight into a wraparound.
+ *
+ * A single pickup and no tone circuit worth the name, which is exactly what
+ * makes it the cheapest real guitar in the catalogue — and the only P90 below
+ * Legendary, where that pickup used to live alone.
+ */
+export const SET_NECK_WRAP_P90: GuitarSpec = {
+  ...SET_NECK_WRAP,
+  pickups: "P90",
+};
+
 /** Thinline archtop with f-holes — there is no solid wood left to chamber. */
 export const SEMI_HOLLOW: GuitarSpec = {
   ...SET_NECK_TOM,

@@ -293,6 +293,73 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     imageId: 27,
     rarity: "Rare",
   },
+
+  // ─── Filling the empty stages (27-32) ──────────────────────────────────────
+  // Four of these are the first pedal of their type in the game. Every one of
+  // those types already had a stage in `signalChain`, a BOM in `effectBom` and a
+  // mod pool in `effectStats` — the plumbing was written and simply had nothing
+  // to run through it, so a by-the-book chain could never use those slots.
+  {
+    id: 27,
+    name: "Level Keeper CM-8",
+    brand: "Ronin",
+    type: "Compressor",
+    imageId: 28,
+    rarity: "Common",
+    // An optical compressor in a compact box: two transistors and a lamp.
+    draw: 30,
+  },
+  {
+    id: 28,
+    name: "Shimmer Path",
+    brand: "Astra-Path",
+    type: "Chorus",
+    imageId: 29,
+    rarity: "Common",
+    // A single bucket-brigade chip, which is all a chorus has ever needed.
+    draw: 25,
+  },
+  {
+    id: 29,
+    name: "Rust Forge",
+    brand: "Forge",
+    type: "Fuzz",
+    imageId: 30,
+    rarity: "Rare",
+    // Two germanium transistors and a battery clip. Nothing on a board asks the
+    // brick for less, which is half of why a fuzz wants to go first.
+    draw: 8,
+  },
+  {
+    id: 30,
+    name: "Tidal Flange",
+    brand: "Aqua-Fab",
+    type: "Flanger",
+    imageId: 31,
+    rarity: "Rare",
+    // A longer delay line than a chorus runs, and it costs accordingly.
+    draw: 45,
+  },
+  {
+    id: 31,
+    name: "Chronos Infinity",
+    brand: "ChronosEcho",
+    type: "Delay",
+    imageId: 32,
+    rarity: "Legendary",
+    // Digital, with tails that outlive the switch. The converter is the drain.
+    draw: 150,
+  },
+  {
+    id: 32,
+    name: "Ruin Machine",
+    brand: "VelcroLab",
+    type: "Distortion",
+    imageId: 33,
+    rarity: "Mythic",
+    // Three clipping stages stacked, each with its own supply rail.
+    draw: 60,
+  },
 ];
 
 export const EFFECTS_BY_ID = new Map<number | string, EffectDefinition>(

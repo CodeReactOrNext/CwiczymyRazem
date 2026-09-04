@@ -156,6 +156,18 @@ export const GUITAR_BOMS: Record<number, ScrapBom> = {
   64: SINGLECUT,
   65: SINGLECUT,
   66: SINGLECUT,
+  // Roadmap trophies — two Strats, a set-neck single-cut and two superstrats.
+  67: STRAT,
+  68: STRAT,
+  69: SINGLECUT,
+  70: SUPER_HSS,
+  71: SUPER_HSS,
+  // Grayson double-cuts — both set-neck, so neither gives up a neck.
+  72: SINGLECUT,
+  73: SINGLECUT,
+  // Jaguar — bolt-on offset. Two pickups on a switch-plate harness, so it pays
+  // the pot rather than a third pickup.
+  74: TWIN,
 };
 
 /** Fallback for any guitar id added before its BOM is authored. */

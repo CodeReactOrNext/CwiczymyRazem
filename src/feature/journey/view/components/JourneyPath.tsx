@@ -1,12 +1,12 @@
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
-import { motion } from "framer-motion";
 import { Check, ChevronLeft, Guitar } from "lucide-react";
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { FaStar } from "react-icons/fa";
 
 import type { JourneyModuleWithStatus, JourneyStepWithStatus } from "../../types/journey.types";
 import { getStepIcon } from "../../utils/stepIcons";
+import { JourneyFinishCard } from "./JourneyFinishCard";
 
 const WAVE_AMPLITUDE = 56;
 
@@ -192,7 +192,6 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
     segments.push({ d, stroke, dashed: destStatus === "locked" });
   }
 
-  const allComplete = module.completedCount === module.totalCount && module.totalCount > 0;
   const waveX = new Map(
     stepEntries.map((entry, i) => [entry.id, WAVE_AMPLITUDE * Math.sin((i * Math.PI) / 2)] as const)
   );
@@ -295,30 +294,13 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
             );
           })}
 
-          {/* Completion */}
-          {allComplete && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 240, damping: 22 }}
-              className="relative z-10 flex w-full max-w-xs flex-col items-center gap-3 overflow-hidden rounded-lg bg-emerald-500/10 px-8 py-8 text-center"
-            >
-              <div
-                className="pointer-events-none absolute inset-0 animate-glow-float-1 opacity-40"
-                style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.35), transparent 70%)" }}
-                aria-hidden
-              />
-              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20">
-                <Check size={28} className="text-emerald-400" strokeWidth={3} />
-              </div>
-              <div className="relative">
-                <p className="text-lg font-black text-emerald-400">Module Complete!</p>
-                <p className="mt-1 text-xs text-zinc-400">
-                  Congratulations — you&apos;ve mastered all guitar fundamentals.
-                </p>
-              </div>
-            </motion.div>
-          )}
+          {/* The finish line, on the path whether or not it has been reached:
+              the guitar waiting at the end is the reason to keep walking it. */}
+          <JourneyFinishCard
+            moduleId={module.id}
+            done={module.completedCount}
+            total={module.totalCount}
+          />
         </div>
       </div>
     </div>
