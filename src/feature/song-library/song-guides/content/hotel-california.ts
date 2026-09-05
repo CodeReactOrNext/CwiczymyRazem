@@ -205,6 +205,14 @@ export const hotelCalifornia: SongGuide = {
         songId: "YPmaQIKfQBpsI5IzdLEg",
       },
       {
+        title: "Wish You Were Here",
+        artist: "Pink Floyd",
+        difficulty: 4.2,
+        why: "The same acoustic-classic shape one tier down: a riff over open chords, then a lead outro to grow into.",
+        guideSlug: "wish-you-were-here",
+        songId: "OZPnA7SLVbL4J5ghIQs2",
+      },
+      {
         title: "Nothing Else Matters",
         artist: "Metallica",
         difficulty: 4.6,

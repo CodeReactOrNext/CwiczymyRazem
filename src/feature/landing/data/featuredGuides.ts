@@ -9,6 +9,7 @@ import type { SongGuide } from "feature/song-library/song-guides/types";
  */
 export const FEATURED_GUIDE_SLUGS = [
   "smoke-on-the-water",
+  "wish-you-were-here",
   "seven-nation-army",
   "nothing-else-matters",
   "thunderstruck",

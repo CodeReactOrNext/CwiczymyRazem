@@ -206,8 +206,9 @@ export const nothingElseMatters: SongGuide = {
       {
         title: "Wish You Were Here",
         artist: "Pink Floyd",
-        difficulty: 3.8,
+        difficulty: 4.2,
         why: "Open-position riffing mixed with strumming: the ideal warm-up act for NEM's chord-plus-melody world.",
+        guideSlug: "wish-you-were-here",
         songId: "OZPnA7SLVbL4J5ghIQs2",
       },
     ],

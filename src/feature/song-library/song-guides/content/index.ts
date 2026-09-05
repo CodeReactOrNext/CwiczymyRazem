@@ -12,6 +12,7 @@ import { sweetChildOMine } from "./sweet-child-o-mine";
 import { theTrooper } from "./the-trooper";
 import { thunderstruck } from "./thunderstruck";
 import { tornadoOfSouls } from "./tornado-of-souls";
+import { wishYouWereHere } from "./wish-you-were-here";
 
 export const songGuides: SongGuide[] = [
   nothingElseMatters,
@@ -19,6 +20,7 @@ export const songGuides: SongGuide[] = [
   stairwayToHeaven,
   hotelCalifornia,
   sweetChildOMine,
+  wishYouWereHere,
   sevenNationArmy,
   thunderstruck,
   crazyTrain,
