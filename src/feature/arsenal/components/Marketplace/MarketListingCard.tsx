@@ -1,3 +1,4 @@
+import { Chip } from "assets/components/ui/chip";
 import {
   Tooltip,
   TooltipContent,
@@ -12,7 +13,7 @@ import {
   getEffectScrapYield,
   getGuitarScrapYield,
 } from "feature/arsenal/utils/scrap";
-import { ShoppingCart, Tag, Unplug, X } from "lucide-react";
+import { Tag, Unplug, X } from "lucide-react";
 import Link from "next/link";
 
 import type {
@@ -22,6 +23,7 @@ import type {
   ScrapPart,
 } from "../../types/arsenal.types";
 import type { MarketplaceListing } from "../../types/marketplace.types";
+import { BuyButton } from "../BuyButton";
 import { SalvagedModCard } from "../Collection/SalvagedModCard";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
@@ -105,14 +107,18 @@ export const MarketListingCard = ({
             {listing.sellerName}
           </span>
         </Link>
-        <span className='flex shrink-0 items-center gap-1 font-black text-amber-400'>
-          <img
-            src='/images/coin.png'
-            alt='coin'
-            className='h-4 w-4 object-contain'
-          />
-          {listing.price.toLocaleString()}
-        </span>
+        {/* A buyer reads the price off the button; the seller has no button to
+            read it off, so their own listing keeps it up here. */}
+        {isOwn && (
+          <span className='flex shrink-0 items-center gap-1 font-black text-amber-400'>
+            <img
+              src='/images/coin.png'
+              alt='coin'
+              className='h-4 w-4 object-contain'
+            />
+            {listing.price.toLocaleString()}
+          </span>
+        )}
       </div>
 
       <ScrapYieldStrip parts={scrapParts} />
@@ -151,29 +157,28 @@ export const MarketListingCard = ({
       )}
 
       {showMissingBadge && (
-        <div className='flex items-center gap-1.5 rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-300'>
+        <Chip color='amber' className='self-start px-2 py-1 text-[11px]'>
           <Tag size={11} strokeWidth={2.5} className='shrink-0' />
-          <span>New for your collection</span>
-        </div>
+          New for your collection
+        </Chip>
       )}
 
       {isOwn ? (
         <button
           onClick={onCancel}
           disabled={isCancelling}
-          className='flex items-center justify-center gap-1.5 rounded bg-zinc-800 py-2 text-xs font-semibold text-zinc-300 transition-colors disabled:opacity-50 hover:bg-zinc-700'>
+          className='flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-800 text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 hover:bg-zinc-700 hover:text-white'>
           <X size={13} strokeWidth={2.5} />
           {isCancelling ? "Cancelling..." : "Cancel listing"}
         </button>
       ) : (
-        <button
+        <BuyButton
+          size='sm'
+          price={listing.price}
+          canAfford={canAfford}
+          isBuying={isBuying}
           onClick={onBuy}
-          disabled={isBuying || !canAfford}
-          className='flex items-center justify-center gap-1.5 rounded bg-amber-600 py-2 text-xs font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-amber-700'
-          title={!canAfford ? "Not enough Fame Points" : undefined}>
-          <ShoppingCart size={13} strokeWidth={2.5} />
-          {isBuying ? "Buying..." : canAfford ? "Buy" : "Not enough Fame"}
-        </button>
+        />
       )}
     </div>
   );

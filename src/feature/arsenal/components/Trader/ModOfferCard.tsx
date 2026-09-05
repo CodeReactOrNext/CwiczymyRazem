@@ -1,8 +1,10 @@
+import { Chip } from "assets/components/ui/chip";
 import type { TraderModOffer } from "feature/arsenal/types/trader.types";
-import { ShoppingCart } from "lucide-react";
 
+import { BuyButton } from "../BuyButton";
 import { MOD_ACCENT, TierPlate } from "../TierPlate";
 import { ModArt } from "../Workshop/ModArt";
+import { OfferPrice, TakenToday } from "./offerBits";
 
 interface ModOfferCardProps {
   offer: TraderModOffer;
@@ -39,67 +41,58 @@ export const ModOfferCard = ({
   const isTopRoll = offer.points >= offer.maxPoints;
 
   return (
-    <div className='flex flex-col gap-5 rounded-lg bg-zinc-800/40 p-5'>
+    <div className='flex h-full flex-col gap-5 rounded-lg bg-zinc-800/40 p-5'>
       <div className='flex items-start justify-between gap-3'>
         {/* Socketed the way the stash board shows a rescued mod: the blueprint
             tile sitting in a hollow lit by the mods' own purple. */}
-        <TierPlate color={MOD_ACCENT} size={56}>
-          <ModArt modId={offer.featureId} size={46} />
+        <TierPlate color={MOD_ACCENT} size={64}>
+          <ModArt modId={offer.featureId} size={52} />
         </TierPlate>
 
-        <div className='flex flex-col items-end gap-1'>
+        <div className='flex flex-col items-end gap-1.5 text-right'>
           {isTopRoll && (
-            <span className='rounded bg-purple-500/15 px-2 py-0.5 text-[10px] font-bold text-purple-300'>
+            <Chip color='purple' className='px-2 py-0.5'>
               Top roll
-            </span>
+            </Chip>
           )}
-          <span className='text-[10px] font-semibold text-purple-300'>
+          <span className='text-xs font-semibold text-purple-300'>
             {offer.modKind === "guitar" ? "Guitar mod" : "Pedal mod"}
           </span>
-          <span className='text-[11px] font-medium tabular-nums text-zinc-500'>
-            {available ? "1 left" : "0 left"} / 1
+          <span className='text-xs tabular-nums text-zinc-400'>
+            {available ? "1 left" : "Taken today"}
           </span>
         </div>
       </div>
 
-      <div className='flex flex-col gap-1'>
-        <span className='flex items-baseline gap-2'>
-          <span className='text-xl font-black tabular-nums text-purple-300'>
+      <div className='flex flex-col gap-1.5'>
+        <span className='truncate text-base font-bold text-zinc-100'>
+          {offer.label}
+        </span>
+        {/* The ceiling belongs to the roll, not to the price — a `+3` means
+            nothing without knowing whether 4 or 8 was the best it could be. */}
+        <span className='flex items-baseline gap-1.5'>
+          <span className='text-lg font-black tabular-nums text-purple-300'>
             +{offer.points}
           </span>
-          {/* The ceiling belongs to the roll, not to the price — a `+3` means
-              nothing without knowing whether 4 or 8 was the best it could be. */}
-          <span className='text-[11px] tabular-nums text-zinc-500'>
-            of {offer.maxPoints}
-          </span>
-          <span className='min-w-0 truncate text-sm font-bold text-zinc-100'>
-            {offer.label}
+          <span className='text-xs tabular-nums text-zinc-400'>
+            of {offer.maxPoints} max
           </span>
         </span>
-        <span className='flex items-center gap-1.5 font-black text-amber-400'>
-          <img
-            src='/images/coin.png'
-            alt='coin'
-            className='h-4 w-4 object-contain'
-          />
-          {offer.unitPrice.toLocaleString()}
-        </span>
+        <OfferPrice unitPrice={offer.unitPrice} />
       </div>
 
-      {available ? (
-        <button
-          onClick={onBuy}
-          disabled={isBuying || !canAfford}
-          title={!canAfford ? "Not enough Fame Points" : undefined}
-          className='flex items-center justify-center gap-1.5 rounded bg-amber-600 py-2 text-xs font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-amber-700'>
-          <ShoppingCart size={13} strokeWidth={2.5} />
-          {isBuying ? "Buying..." : canAfford ? "Buy" : "Not enough Fame"}
-        </button>
-      ) : (
-        <p className='py-2 text-center text-xs font-semibold text-zinc-500'>
-          Taken for today
-        </p>
-      )}
+      <div className='mt-auto flex flex-col gap-3'>
+        {available ? (
+          <BuyButton
+            price={offer.unitPrice}
+            canAfford={canAfford}
+            isBuying={isBuying}
+            onClick={onBuy}
+          />
+        ) : (
+          <TakenToday />
+        )}
+      </div>
     </div>
   );
 };

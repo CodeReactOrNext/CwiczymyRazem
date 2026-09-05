@@ -1,9 +1,8 @@
 import { FundingProgressBar } from "./components/FundingProgressBar";
 import { FundingProgressBarSkeleton } from "./components/FundingProgressBarSkeleton";
 import { RoadmapFaq } from "./components/RoadmapFaq";
-import { RoadmapHowItWorks } from "./components/RoadmapHowItWorks";
+import { RoadmapHero } from "./components/RoadmapHero";
 import { RoadmapPerks } from "./components/RoadmapPerks";
-import { RoadmapPitch } from "./components/RoadmapPitch";
 import { RoadmapThanks } from "./components/RoadmapThanks";
 import { ROADMAP_RAISED_OFFSET } from "./data/roadmap.data";
 import { useBuyMeACoffeeFunding } from "./hooks/useBuyMeACoffeeFunding";
@@ -19,30 +18,26 @@ export const RoadmapView = () => {
   const totalRaised = Math.max(0, rawTotalRaised - ROADMAP_RAISED_OFFSET);
 
   return (
-    <div className='w-full space-y-8 p-4 sm:p-6'>
-      {/* Why support — one block per accent: cost (orange), how it works
-          (cyan), what a supporter gets back (amber), no-strings thanks
-          (purple). First thing on the page. */}
-      <div className='w-full space-y-4'>
-        <RoadmapPitch
-          totalRaised={totalRaised}
-          raisedThisMonth={raisedThisMonth}
-        />
-        <RoadmapHowItWorks />
+    <>
+      {/* Pitch, status and the button live in the hero, so the page opens on
+          the ask instead of on a stack of explanatory banners. */}
+      <RoadmapHero
+        totalRaised={totalRaised}
+        raisedThisMonth={raisedThisMonth}
+        isLoading={isLoading}
+      />
+
+      <div className='w-full space-y-6 p-4 sm:p-6'>
+        {/* What the money builds comes first — it is the argument. */}
+        {isLoading ? (
+          <FundingProgressBarSkeleton />
+        ) : (
+          <FundingProgressBar totalRaised={totalRaised} />
+        )}
         <RoadmapPerks />
+        <RoadmapFaq />
         <RoadmapThanks />
       </div>
-
-      {/* Funding bar — full width, tiers described inline in tooltip boxes */}
-      {isLoading ? (
-        <FundingProgressBarSkeleton />
-      ) : (
-        <FundingProgressBar totalRaised={totalRaised} />
-      )}
-
-      <div className='mx-auto w-full max-w-4xl'>
-        <RoadmapFaq />
-      </div>
-    </div>
+    </>
   );
 };

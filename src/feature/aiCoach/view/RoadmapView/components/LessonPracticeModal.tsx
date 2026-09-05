@@ -1,3 +1,11 @@
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "assets/components/ui/dialog";
+import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
@@ -7,7 +15,6 @@ import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportV
 import useTimer from "hooks/useTimer";
 import { Check, Loader2, Pause, Play, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import { FaBrain, FaMusic } from "react-icons/fa";
 import { IoMdHand } from "react-icons/io";
 import { MdSchool } from "react-icons/md";
@@ -17,7 +24,11 @@ import type { DailyQuestTaskType } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
 import { getClientReportContext } from "utils/gameLogic";
 
-const SKILL_OPTIONS: { id: SkillsType; label: string; Icon: typeof MdSchool }[] = [
+const SKILL_OPTIONS: {
+  id: SkillsType;
+  label: string;
+  Icon: typeof MdSchool;
+}[] = [
   { id: "technique", label: "Technique", Icon: IoMdHand },
   { id: "theory", label: "Theory", Icon: MdSchool },
   { id: "hearing", label: "Hearing", Icon: FaMusic },
@@ -53,8 +64,16 @@ interface LessonPracticeModalProps {
  * embedded while a stopwatch tracks how long the user practiced. Finishing
  * logs the elapsed time straight away (same accounting as the report page,
  * skipping the form) instead of navigating anywhere.
+ *
+ * A Radix dialog rather than a hand-rolled portal so it layers correctly over
+ * the step drawer (also Radix): pointer events, focus and Escape all go to the
+ * window on top.
  */
-const LessonPracticeModal = ({ lesson, onFinish, onClose }: LessonPracticeModalProps) => {
+const LessonPracticeModal = ({
+  lesson,
+  onFinish,
+  onClose,
+}: LessonPracticeModalProps) => {
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
   const userAvatar = useAppSelector(selectUserAvatar);
@@ -75,13 +94,6 @@ const LessonPracticeModal = ({ lesson, onFinish, onClose }: LessonPracticeModalP
       timer.stopTimer();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Lock background scroll while the window is open.
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
   }, []);
 
   const handleToggle = () => {
@@ -107,27 +119,33 @@ const LessonPracticeModal = ({ lesson, onFinish, onClose }: LessonPracticeModalP
 
     const inputData: ReportFormikInterface = {
       techniqueHours: skill === "technique" ? skillTime.hours : zero.hours,
-      techniqueMinutes: skill === "technique" ? skillTime.minutes : zero.minutes,
+      techniqueMinutes:
+        skill === "technique" ? skillTime.minutes : zero.minutes,
       theoryHours: skill === "theory" ? skillTime.hours : zero.hours,
       theoryMinutes: skill === "theory" ? skillTime.minutes : zero.minutes,
       hearingHours: skill === "hearing" ? skillTime.hours : zero.hours,
       hearingMinutes: skill === "hearing" ? skillTime.minutes : zero.minutes,
       creativityHours: skill === "creativity" ? skillTime.hours : zero.hours,
-      creativityMinutes: skill === "creativity" ? skillTime.minutes : zero.minutes,
+      creativityMinutes:
+        skill === "creativity" ? skillTime.minutes : zero.minutes,
       habbits: [],
       countBackDays: 0,
       reportTitle: `Lesson: ${lesson.title}`,
       avatarUrl: userAvatar ?? null,
       ...getClientReportContext(
-        ((reportList as any[]) ?? []).map((report) => report.date)
+        ((reportList as any[]) ?? []).map((report) => report.date),
       ),
     };
 
     try {
       await dispatch(updateUserStats({ inputData })).unwrap();
-      dispatch(updateQuestProgress({ type: "practice_total_time", amount: minutes }));
+      dispatch(
+        updateQuestProgress({ type: "practice_total_time", amount: minutes }),
+      );
       dispatch(updateQuestProgress({ type: "long_session", amount: minutes }));
-      dispatch(updateQuestProgress({ type: SKILL_TIME_QUEST[skill], amount: minutes }));
+      dispatch(
+        updateQuestProgress({ type: SKILL_TIME_QUEST[skill], amount: minutes }),
+      );
       toast.success(`Logged ${minutes} min of practice.`);
       onFinish();
     } catch {
@@ -137,73 +155,101 @@ const LessonPracticeModal = ({ lesson, onFinish, onClose }: LessonPracticeModalP
     }
   };
 
-  return createPortal(
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm">
-      <div className="flex w-full max-w-3xl flex-col overflow-hidden rounded-xl bg-zinc-950 ring-1 ring-zinc-800 shadow-2xl">
+  return (
+    <Dialog
+      open
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}>
+      <DialogContent
+        hideCloseButton
+        overlayClassName='z-[1000] bg-black/85 backdrop-blur-sm'
+        className='z-[1000] flex h-[100dvh] w-full max-w-3xl flex-col gap-0 overflow-y-auto border-0 bg-zinc-950 p-0 shadow-none sm:h-auto sm:max-h-[92dvh] sm:rounded-lg'>
         {/* ── Header ── */}
-        <div className="flex items-start justify-between gap-4 border-b border-zinc-800/60 px-5 py-4">
-          <div className="min-w-0">
-            <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-widest text-cyan-500/70">
+        <div className='flex items-start justify-between gap-4 px-5 pb-4 pt-5'>
+          <div className='min-w-0'>
+            <p className='mb-1 text-[11px] font-semibold tracking-wide text-cyan-400'>
               Practice session
             </p>
-            <h2 className="truncate text-sm font-bold text-zinc-100">{lesson.title}</h2>
+            <DialogTitle className='truncate text-sm font-bold leading-snug tracking-normal text-zinc-100'>
+              {lesson.title}
+            </DialogTitle>
+            <DialogDescription className='sr-only'>
+              The lesson plays here while a stopwatch tracks your practice.
+              Finishing logs the time.
+            </DialogDescription>
           </div>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <DialogClose asChild>
+            <button
+              type='button'
+              aria-label='Close'
+              className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+              <X className='h-4 w-4' />
+            </button>
+          </DialogClose>
         </div>
 
         {/* ── Video ── */}
-        <div className="relative aspect-video w-full bg-black">
+        <div className='relative aspect-video w-full shrink-0 bg-black'>
           <iframe
-            className="absolute inset-0 h-full w-full"
+            className='absolute inset-0 h-full w-full'
             src={`https://www.youtube.com/embed/${lesson.videoId}?autoplay=1&rel=0`}
             title={lesson.title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
             allowFullScreen
           />
         </div>
 
         {/* ── Timer + controls ── */}
-        <div className="flex flex-col gap-4 px-5 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <span className={`h-2 w-2 shrink-0 rounded-full ${isRunning ? "animate-pulse bg-green-500" : "bg-zinc-600"}`} />
-              <span className="font-mono text-3xl font-bold tabular-nums text-zinc-100">
+        <div className='flex flex-col gap-5 px-5 py-5'>
+          <div className='flex items-center justify-between gap-4'>
+            <div className='flex items-center gap-3'>
+              <span
+                className={cn(
+                  "h-2 w-2 shrink-0 rounded-full",
+                  isRunning ? "animate-pulse bg-emerald-500" : "bg-zinc-600",
+                )}
+              />
+              <span className='font-mono text-3xl font-bold tabular-nums text-zinc-100'>
                 {formatElapsed(elapsed)}
               </span>
             </div>
             <button
+              type='button'
               onClick={handleToggle}
-              className="flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-xs font-semibold text-zinc-200 transition hover:bg-zinc-700"
-            >
-              {isRunning ? <><Pause className="h-3.5 w-3.5" /> Pause</> : <><Play className="h-3.5 w-3.5" /> Resume</>}
+              className='flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-xs font-semibold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700'>
+              {isRunning ? (
+                <>
+                  <Pause className='h-3.5 w-3.5' /> Pause
+                </>
+              ) : (
+                <>
+                  <Play className='h-3.5 w-3.5' /> Resume
+                </>
+              )}
             </button>
           </div>
 
           {/* Skill category — where this time is logged */}
-          <div className="flex flex-col gap-2">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-              Log time as
-            </p>
-            <div className="grid grid-cols-4 gap-2">
+          <div className='flex flex-col gap-2'>
+            <p className='text-xs font-semibold text-zinc-400'>Log time as</p>
+            <div role='radiogroup' className='grid grid-cols-4 gap-2'>
               {SKILL_OPTIONS.map(({ id, label, Icon }) => {
                 const active = skill === id;
                 return (
                   <button
                     key={id}
+                    type='button'
+                    role='radio'
+                    aria-checked={active}
                     onClick={() => setSkill(id)}
-                    className={`flex flex-col items-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] font-semibold transition-all ${
+                    className={cn(
+                      "flex flex-col items-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                       active
-                        ? "bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-500/40"
-                        : "bg-zinc-900/60 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
+                        ? "bg-cyan-500/10 text-cyan-400"
+                        : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
+                    )}>
+                    <Icon className='h-4 w-4' />
                     {label}
                   </button>
                 );
@@ -212,17 +258,20 @@ const LessonPracticeModal = ({ lesson, onFinish, onClose }: LessonPracticeModalP
           </div>
 
           <button
+            type='button'
             onClick={handleFinish}
             disabled={isSubmitting}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-500 disabled:opacity-60"
-          >
-            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+            className='flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-60 hover:bg-emerald-400'>
+            {isSubmitting ? (
+              <Loader2 className='h-4 w-4 animate-spin' />
+            ) : (
+              <Check className='h-4 w-4' />
+            )}
             {isSubmitting ? "Logging time…" : "Finish & log time"}
           </button>
         </div>
-      </div>
-    </div>,
-    document.body
+      </DialogContent>
+    </Dialog>
   );
 };
 

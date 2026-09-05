@@ -33,7 +33,9 @@ const TOP_JACK_SEAT = 0.012;
  * somewhere along the strip. The Lab and Astral boxes print theirs last, after
  * the ins, the outs and whatever expression and USB they carry; the Cosmic
  * Resonance sinks a flat barrel inlet into the strip between its `R-OUT` and
- * `EXP`. Either way the DC plug stands clear of the two instrument plugs.
+ * `EXP`, so its `y` is a real depth (see `EFFECT_DC_JACK`) rather than the
+ * seating sliver. Either way the DC plug stands clear of the two instrument
+ * plugs.
  */
 const TOP_JACKS = {
   /** "L-IN · L-OUT · R-OUT · EXP · USB · 9V DC" — the wide Lab enclosures. */
@@ -57,8 +59,9 @@ const TOP_JACKS = {
     edge: "top",
     in: { x: 0.239, y: TOP_JACK_SEAT },
     out: { x: 0.383, y: TOP_JACK_SEAT },
-    // The unlabelled barrel inlet set flush into the strip, not the USB nut.
-    dc: { x: 0.505, y: TOP_JACK_SEAT },
+    // The unlabelled barrel inlet set flush into the strip, not the USB nut —
+    // so the plug's tip goes to the far lip of that hole, not to the edge.
+    dc: { x: 0.51, y: 0.052 },
   },
 } satisfies Record<string, EffectJackLayout>;
 
