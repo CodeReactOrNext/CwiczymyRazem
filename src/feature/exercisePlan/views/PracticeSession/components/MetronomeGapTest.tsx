@@ -26,10 +26,10 @@ const VERDICT: Record<GapVerdict, { num: string; dot: string; fill: string; chip
 /** A mouse cursor with click ripples — the "click" half of the tap affordance. */
 function CursorClick({ active }: { active: boolean }) {
   const reduce = useReducedMotion();
-  const loop = active && !reduce;
+  const cue = active && !reduce;
   return (
     <div className="relative grid h-10 w-10 place-items-center">
-      {loop &&
+      {cue &&
         [0, 0.55].map((delay) => (
           <motion.span
             key={delay}
@@ -37,7 +37,7 @@ function CursorClick({ active }: { active: boolean }) {
             className="absolute h-7 w-7 rounded-full border border-cyan-400/60"
             initial={{ scale: 0.5, opacity: 0.7 }}
             animate={{ scale: 1.9, opacity: 0 }}
-            transition={{ duration: 1.1, repeat: Infinity, ease: "easeOut", delay }}
+            transition={{ duration: 1.1, ease: "easeOut", delay }}
           />
         ))}
       <motion.svg
@@ -46,8 +46,8 @@ function CursorClick({ active }: { active: boolean }) {
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden
-        animate={loop ? { scale: [1, 0.86, 1] } : { scale: 1 }}
-        transition={loop ? { duration: 1.1, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
+        animate={cue ? { scale: [1, 0.86, 1] } : { scale: 1 }}
+        transition={{ duration: cue ? 1.1 : 0.2, ease: "easeInOut" }}
         className="relative">
         <path
           d="M5 2.5 L5 18.5 L9 14.8 L11.8 20.6 L14 19.6 L11.2 13.9 L16 13.9 Z"
@@ -63,10 +63,10 @@ function CursorClick({ active }: { active: boolean }) {
 /** Touch "tap here" indicator for mobile — ripples around a fingertip dot. */
 function TouchTap({ active }: { active: boolean }) {
   const reduce = useReducedMotion();
-  const loop = active && !reduce;
+  const cue = active && !reduce;
   return (
     <div className="relative grid h-12 w-12 place-items-center">
-      {loop &&
+      {cue &&
         [0, 0.55].map((delay) => (
           <motion.span
             key={delay}
@@ -74,7 +74,7 @@ function TouchTap({ active }: { active: boolean }) {
             className="absolute h-9 w-9 rounded-full border-2 border-cyan-400/60"
             initial={{ scale: 0.5, opacity: 0.7 }}
             animate={{ scale: 2, opacity: 0 }}
-            transition={{ duration: 1.1, repeat: Infinity, ease: "easeOut", delay }}
+            transition={{ duration: 1.1, ease: "easeOut", delay }}
           />
         ))}
       <motion.span
@@ -83,8 +83,8 @@ function TouchTap({ active }: { active: boolean }) {
           "h-6 w-6 rounded-full",
           active ? "bg-cyan-400 shadow-[0_0_18px_rgba(34,211,238,0.8)]" : "bg-zinc-600",
         )}
-        animate={loop ? { scale: [1, 0.8, 1] } : { scale: 1 }}
-        transition={loop ? { duration: 1.1, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
+        animate={cue ? { scale: [1, 0.8, 1] } : { scale: 1 }}
+        transition={{ duration: cue ? 1.1 : 0.2, ease: "easeInOut" }}
       />
     </div>
   );
@@ -92,14 +92,19 @@ function TouchTap({ active }: { active: boolean }) {
 
 /**
  * Illustrative "press now" affordance. On desktop: a spacebar keycap that
- * depresses on a loop next to a mouse cursor with click ripples. On mobile
+ * depresses once next to a mouse cursor with click ripples. On mobile
  * (compact) there's no keyboard, so it collapses to a single touch-tap ripple.
  * Everything comes alive only when `active` (the silent phase) so the cue
  * doesn't say "tap yet" during the audible lead-in.
+ *
+ * The animations play once and stop. They used to loop forever, which put a
+ * steady 1.1 s visual pulse on screen during the one bar where the player is
+ * counting their own — an external tempo to be dragged towards, in a test about
+ * holding an internal one.
  */
 function TapAffordance({ active, compact }: { active: boolean; compact?: boolean }) {
   const reduce = useReducedMotion();
-  const loop = active && !reduce;
+  const cue = active && !reduce;
   if (compact) return <TouchTap active={active} />;
   return (
     <div className="flex items-center gap-4">
@@ -107,7 +112,7 @@ function TapAffordance({ active, compact }: { active: boolean; compact?: boolean
       <motion.div
         aria-hidden
         animate={
-          loop
+          cue
             ? {
                 y: [0, 3, 0],
                 boxShadow: [
@@ -118,7 +123,7 @@ function TapAffordance({ active, compact }: { active: boolean; compact?: boolean
               }
             : { y: 0, boxShadow: `0 4px 0 0 rgba(34,211,238,${active ? 0.4 : 0.18})` }
         }
-        transition={loop ? { duration: 1.1, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
+        transition={{ duration: cue ? 1.1 : 0.2, ease: "easeInOut" }}
         className={cn(
           "select-none rounded-md border px-9 py-2.5 text-[10px] font-bold uppercase tracking-[0.3em]",
           active ? "border-cyan-400/70 bg-cyan-400/15 text-cyan-100" : "border-white/15 bg-white/5 text-zinc-500",
@@ -159,9 +164,13 @@ function Step({ icon, title, sub, active }: { icon: ReactNode; title: string; su
 interface MetronomeGapTestProps {
   /** Tighter spacing for the mobile content column. */
   compact?: boolean;
+  /** Whether the session's practice clock is running. */
+  isSessionRunning?: boolean;
+  /** Starts that clock — a round is practice time and has to be counted as such. */
+  onStartSession?: () => void;
 }
 
-export function MetronomeGapTest({ compact }: MetronomeGapTestProps) {
+export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: MetronomeGapTestProps) {
   const s = useSyncExternalStore(gapTestEngine.subscribe, gapTestEngine.getSnapshot, gapTestEngine.getSnapshot);
 
   useEffect(() => {
@@ -170,6 +179,20 @@ export function MetronomeGapTest({ compact }: MetronomeGapTestProps) {
   }, []);
 
   const { running, result: res } = s;
+
+  // Starting a round starts the practice clock, so the test can never be taken
+  // against a stopped timer. startTimer no-ops when it is already running, which
+  // is what makes the double-mounted desktop + mobile panels harmless here.
+  useEffect(() => {
+    if (running) onStartSession?.();
+  }, [running, onStartSession]);
+
+  // The mirror of that: pausing the session drops the live round instead of
+  // letting it time out into the history as a miss nobody was there to answer.
+  useEffect(() => {
+    if (isSessionRunning === false) gapTestEngine.stop();
+  }, [isSessionRunning]);
+
   // The "Tap" stage begins in the final silent bar (get-ready) and stays through the result.
   const tapActive = (s.phase === "gap" && s.getReady) || s.phase === "result";
 
@@ -300,12 +323,15 @@ export function MetronomeGapTest({ compact }: MetronomeGapTestProps) {
               </span>
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => gapTestEngine.start()}
-              className="rounded-xl bg-cyan-500 px-8 py-3 text-base font-bold text-zinc-950 transition hover:bg-cyan-400 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400">
-              {res ? (res.verdict === "super" ? `Level up → ${s.gapBars} silent bars` : "Try again") : "Start"}
-            </button>
+            <div className="flex flex-col items-center gap-2">
+              <button
+                type="button"
+                onClick={() => gapTestEngine.start()}
+                className="rounded-xl bg-cyan-500 px-8 py-3 text-base font-bold text-zinc-950 transition hover:bg-cyan-400 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400">
+                {res ? (res.verdict === "super" ? `Level up → ${s.gapBars} silent bars` : "Try again") : "Start"}
+              </button>
+              {!compact && <span className="text-[11px] text-zinc-500">or press Space</span>}
+            </div>
           )}
         </div>
 

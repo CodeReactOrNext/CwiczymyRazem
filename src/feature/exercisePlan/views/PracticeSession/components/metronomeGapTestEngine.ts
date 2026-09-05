@@ -59,6 +59,32 @@ export const RULER_RANGE = 200;
 export const TEMPO_MIN = 40;
 export const TEMPO_MAX = 160;
 
+/**
+ * Cues shown while the click is silent (the bar counter, the "get ready"
+ * arming) are pushed off the grid on purpose. A counter that ticked exactly on
+ * the downbeat was a silent metronome — it handed back the very pulse the test
+ * asks the player to hold. Every cue now sits at least CUE_MIN_OFF_BEAT beats
+ * away from any beat line.
+ */
+const CUE_MIN_OFF_BEAT = 0.3;
+/** A cue may also slip a whole beat late, so the gaps between cues vary. */
+const CUE_MAX_BEAT_SLIP = 1;
+
+/**
+ * How late (in beats past its own downbeat) the UI may admit it has reached
+ * each silent bar. Bar 0 is free: the click has only just stopped, so that
+ * downbeat is already common knowledge. The rest are drawn independently, so
+ * the cues never line up into a merely phase-shifted grid either.
+ */
+export function makeCueOffsets(gapBars: number, rand: () => number = Math.random): number[] {
+  const offsets = [0];
+  for (let bar = 1; bar < gapBars; bar++) {
+    const slip = Math.min(CUE_MAX_BEAT_SLIP, Math.floor(rand() * (CUE_MAX_BEAT_SLIP + 1)));
+    offsets.push(slip + CUE_MIN_OFF_BEAT + rand() * (1 - 2 * CUE_MIN_OFF_BEAT));
+  }
+  return offsets;
+}
+
 const INITIAL_STATE: GapTestState = {
   phase: "idle",
   running: false,
@@ -85,7 +111,14 @@ class GapTestEngine {
   private raf = 0;
   private missTimer: ReturnType<typeof setTimeout> | null = null;
   private awaiting = false;
-  private round: { beatMs: number; startPerf: number; gapPerf: number; targetPerf: number } | null = null;
+  private round: {
+    beatMs: number;
+    startPerf: number;
+    gapPerf: number;
+    targetPerf: number;
+    /** Per silent bar: how many beats past its downbeat the UI may reveal it. */
+    cueOffsets: number[];
+  } | null = null;
 
   // --- external store API (useSyncExternalStore) ---
   subscribe = (cb: () => void): (() => void) => {
@@ -106,26 +139,36 @@ class GapTestEngine {
    */
   retain() {
     this.refCount += 1;
-    if (this.refCount === 1) window.addEventListener("keydown", this.keyHandler);
+    if (this.refCount === 1) window.addEventListener("keydown", this.keyHandler, true);
   }
   release() {
     this.refCount = Math.max(0, this.refCount - 1);
     if (this.refCount === 0) {
-      window.removeEventListener("keydown", this.keyHandler);
+      window.removeEventListener("keydown", this.keyHandler, true);
       this.abort();
       // Keep the earned level, calibration and history; just stop any live round.
       this.emit({ phase: "idle", running: false, ledIndex: -1, ledAccent: false });
     }
   }
 
+  /**
+   * While a panel is mounted the spacebar belongs to this exercise — it starts a
+   * round and it taps the answer. The listener runs in the capture phase and
+   * stops the event dead so the session's own Space shortcut never sees it:
+   * before, every tap also toggled the practice clock, which paused the timer
+   * while the round carried on.
+   */
   private keyHandler = (e: KeyboardEvent) => {
     if (e.code !== "Space") return;
-    if (this.awaiting) {
-      e.preventDefault();
-      this.tap(e.timeStamp);
-    } else if (this.state.running) {
-      e.preventDefault(); // swallow scroll while a round is live
-    }
+    // Typing wins, and so does an open dialog — its buttons still answer to Space.
+    const el = e.target;
+    const notOurs = "input, textarea, select, [contenteditable='true'], [role='dialog']";
+    if (el instanceof Element && el.closest(notOurs)) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (e.repeat) return; // a held key is one tap, not a stream of them
+    if (this.awaiting) this.tap(e.timeStamp);
+    else if (!this.state.running) this.start();
   };
 
   setBpm(bpm: number) {
@@ -135,6 +178,17 @@ class GapTestEngine {
   reset() {
     if (this.state.running) return;
     this.emit({ gapBars: 2, history: [], result: null, phase: "idle" });
+  }
+
+  /**
+   * Drop a live round without banking an attempt. The session clock stopping is
+   * the player stepping away; letting the round run on would time out and file a
+   * "miss" they never had a chance to answer.
+   */
+  stop() {
+    if (!this.state.running) return;
+    this.abort();
+    this.emit({ running: false, phase: "idle", ledIndex: -1, ledAccent: false, silentBar: -1, getReady: false });
   }
 
   /** Begin a round at the current tempo using the current level + calibration. */
@@ -165,6 +219,7 @@ class GapTestEngine {
       startPerf: ctxToPerf(startCtx),
       gapPerf: ctxToPerf(startCtx + leadBeats * beatS),
       targetPerf: ctxToPerf(startCtx + targetBeat * beatS),
+      cueOffsets: makeCueOffsets(this.state.gapBars),
     };
 
     this.awaiting = true;
@@ -207,12 +262,16 @@ class GapTestEngine {
         ledAccent = inBar === 0;
       }
     } else {
-      // Silence — no per-beat cue (that's the test), but we track which silent
-      // bar we're in so the UI can count down and flag the final "get ready" bar.
+      // Silence — no per-beat cue, that's the test. The bar counter still runs,
+      // but each step is held back to its own off-grid cue time so neither it nor
+      // the "get ready" arming that rides on it can be read as a beat.
       phase = "gap";
-      const barsIntoGap = Math.floor((now - r.gapPerf) / r.beatMs / BEATS_PER_BAR);
-      silentBar = Math.max(0, Math.min(this.state.gapBars - 1, barsIntoGap));
-      getReady = barsIntoGap >= this.state.gapBars - 1;
+      const beatsIntoGap = (now - r.gapPerf) / r.beatMs;
+      const bars = r.cueOffsets.length;
+      let bar = 0;
+      while (bar + 1 < bars && beatsIntoGap >= (bar + 1) * BEATS_PER_BAR + r.cueOffsets[bar + 1]) bar++;
+      silentBar = bar;
+      getReady = bar >= bars - 1;
     }
 
     if (

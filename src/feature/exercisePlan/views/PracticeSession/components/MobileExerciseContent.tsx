@@ -155,7 +155,7 @@ export function MobileExerciseContent({
         <ImprovPromptView config={currentExercise.riddleConfig} isRunning={isPlaying} />
       )}
       {currentExercise.id === "metronome_gap_test" ? (
-        <MetronomeGapTest compact />
+        <MetronomeGapTest compact isSessionRunning={isPlaying} onStartSession={startTimer} />
       ) : activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
         <MobileTablaturePanel
           measures={activeTablature}

@@ -213,7 +213,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         </div>
       ) : currentExercise.id === "metronome_gap_test" ? (
         <div className="p-4">
-          <MetronomeGapTest />
+          <MetronomeGapTest isSessionRunning={isPlaying} onStartSession={startTimer} />
         </div>
       ) : currentExercise.customGoal ? (
         <div className="flex w-full justify-center px-3 py-6 sm:px-5 sm:py-8">
