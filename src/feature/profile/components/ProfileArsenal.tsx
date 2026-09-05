@@ -4,10 +4,7 @@ import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCar
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import type { PoweredPedal } from "feature/arsenal/components/Rig/PowerLoom";
 import { PowerLoom, PowerRail } from "feature/arsenal/components/Rig/PowerLoom";
-import {
-  BoardJack,
-  SignalCable,
-} from "feature/arsenal/components/Rig/SignalCable";
+import { SignalCable } from "feature/arsenal/components/Rig/SignalCable";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import {
@@ -526,9 +523,6 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                   ? "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(52,211,153,0.10), inset 0 0 44px rgba(16,185,129,0.11)"
                   : "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.02)",
               }}>
-              <BoardJack kind='in' />
-              <BoardJack kind='out' />
-
               {/* Power under everything, picking up where the rail's stubs
                   left off at the deck's top edge. */}
               <PowerLoom

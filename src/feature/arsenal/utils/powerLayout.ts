@@ -39,11 +39,30 @@ import type { BoardGeometry } from "./pedalboardLayout";
  * case it occupies keeps its proportions at every board size, exactly as the
  * deck below it does.
  */
-export const RAIL_H = 8;
+export const RAIL_H = 9.4;
 
-/** The brick's own body: how far down the rail it hangs, and how deep it is. */
-const BRICK_Y = 0.8;
-const BRICK_H = 4.9;
+/**
+ * The brick's own body: how far down the rail it hangs, and how deep it is.
+ *
+ * Deep enough to be a box rather than a bar. A supply that spans most of the
+ * case is already a long object, and a long object drawn thin reads as a strip
+ * of trim — there is nowhere to put a face, a bay and a row of lamps, so none of
+ * them get room to look like anything. The body carries all three, stacked:
+ * silkscreen at the top, pilot lamps under it, and the output bay milled along
+ * the bottom edge (`BAY_TOP` of the way down).
+ */
+const BRICK_Y = 0.85;
+const BRICK_H = 6.1;
+
+/**
+ * Where the outputs' bay starts, as a share of the body — the rest of the face
+ * is what is left above it. Shared with the drawing, so the sockets sit in the
+ * middle of the hole they are recessed into rather than near one of its lips.
+ */
+export const BAY_TOP = 0.557;
+
+/** How far the outputs sit up off the brick's bottom edge. */
+const SOCKET_INSET = 1.47;
 
 /**
  * Distance between two outputs on the brick's underside, in view units.
@@ -60,7 +79,7 @@ const SOCKET_PITCH = 10.5;
 const BRICK_MAX_SHARE = 0.92;
 
 /** Radius of one DC output, sized to the bay it is recessed into. */
-export const SOCKET_R = 0.72;
+export const SOCKET_R = 0.78;
 
 export interface PowerSocket {
   index: number;
@@ -124,7 +143,7 @@ export const railFor = (
     sockets: Array.from({ length: supply.outputs }, (_, index) => ({
       index,
       x: brick.x + (brick.w * (index + 0.5)) / supply.outputs,
-      y: brick.y + brick.h - 1.15,
+      y: brick.y + brick.h - SOCKET_INSET,
     })),
   };
   railCache.set(key, rail);
@@ -164,7 +183,7 @@ export const DC_PLUG_HALF_W = 0.82;
  * sunk in a bay: a plug the pedal's length would spend most of itself inside the
  * overhang and read as a shadow. This one clears the underside.
  */
-export const DC_BRICK_PLUG_REACH = 1.9;
+export const DC_BRICK_PLUG_REACH = 2;
 
 /** The collar that seats against whatever the plug is pushed into. */
 export const DC_COLLAR_H = 0.46;
@@ -349,8 +368,7 @@ export const dcJackAt = (
   yPct: number,
   wPct: number,
   jack: { x: number; y: number },
-): Point =>
-  toView(geo, xPct + wPct * jack.x, yPct + geo.pedalHPct * jack.y);
+): Point => toView(geo, xPct + wPct * jack.x, yPct + geo.pedalHPct * jack.y);
 
 /**
  * The height of the strip the rail occupies, as a share of the deck's width —
@@ -362,4 +380,3 @@ export const dcJackAt = (
  */
 export const railPaddingPct = (geo: BoardGeometry) =>
   (RAIL_H / geo.viewW) * 100;
-

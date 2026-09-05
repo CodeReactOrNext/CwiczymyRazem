@@ -28,10 +28,12 @@ import type {
 const TOP_JACK_SEAT = 0.012;
 
 /**
- * The `dc` on each of these is read off the same silkscreen the signal pair is.
- * Every one of them prints its power inlet at the end of the strip, after the
- * ins, the outs and whatever expression and USB it carries, so the DC cable
- * arrives well clear of the two instrument plugs standing beside it.
+ * The `dc` on each of these is read off the same silkscreen the signal pair is,
+ * and lands on the socket the artwork actually draws for power — not merely
+ * somewhere along the strip. The Lab and Astral boxes print theirs last, after
+ * the ins, the outs and whatever expression and USB they carry; the Cosmic
+ * Resonance sinks a flat barrel inlet into the strip between its `R-OUT` and
+ * `EXP`. Either way the DC plug stands clear of the two instrument plugs.
  */
 const TOP_JACKS = {
   /** "L-IN · L-OUT · R-OUT · EXP · USB · 9V DC" — the wide Lab enclosures. */
@@ -39,21 +41,24 @@ const TOP_JACKS = {
     edge: "top",
     in: { x: 0.405, y: TOP_JACK_SEAT },
     out: { x: 0.496, y: TOP_JACK_SEAT },
-    dc: { x: 0.86, y: TOP_JACK_SEAT },
+    // The last port on the strip. The one before it, at `0.85`, is the USB.
+    dc: { x: 0.92, y: TOP_JACK_SEAT },
   },
   /** "SOURCE IN · ECHO OUT · CONTROL CV · LINK MIDI" — Astral Reverberator. */
   astral: {
     edge: "top",
     in: { x: 0.232, y: TOP_JACK_SEAT },
     out: { x: 0.379, y: TOP_JACK_SEAT },
-    dc: { x: 0.82, y: TOP_JACK_SEAT },
+    // The fourth nut, the one the silhouette measures at `0.846`.
+    dc: { x: 0.846, y: TOP_JACK_SEAT },
   },
   /** "L-IN · R-OUT · EXP · USB" — Cosmic Resonance. */
   cosmic: {
     edge: "top",
     in: { x: 0.239, y: TOP_JACK_SEAT },
     out: { x: 0.383, y: TOP_JACK_SEAT },
-    dc: { x: 0.82, y: TOP_JACK_SEAT },
+    // The unlabelled barrel inlet set flush into the strip, not the USB nut.
+    dc: { x: 0.505, y: TOP_JACK_SEAT },
   },
 } satisfies Record<string, EffectJackLayout>;
 
