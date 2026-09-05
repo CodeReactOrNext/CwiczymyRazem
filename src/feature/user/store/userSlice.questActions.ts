@@ -4,11 +4,11 @@ import { doc, increment, runTransaction } from "firebase/firestore";
 import posthog from "posthog-js";
 import type { RootState } from "store/store";
 import type { DailyQuest, DailyQuestTaskType } from "types/api.types";
-import { getServerDateKey } from "utils/converter";
 import { auth, db } from "utils/firebase/client/firebase.utils";
 import { getPointsToLvlUp, levelUpUser } from "utils/gameLogic";
 
 import { isSameQuest, mergeDailyQuests } from "./dailyQuest.merge";
+import { getQuestDayKey } from "./questDay";
 import { claimQuestReward, completeQuestTask, generateDailyQuest, setDailyQuest } from "./userSlice";
 
 /** Fame Points awarded for completing the full daily quest set. */
@@ -86,7 +86,7 @@ export const syncDailyQuestAction = createAsyncThunk(
 
       try {
         const userRef = doc(db, "users", userId);
-        const today = getServerDateKey();
+        const today = getQuestDayKey(state.user.currentUserStats.timeZone);
 
         const merged = await withTimeout(runTransaction(db, async (transaction) => {
           const snapshot = await transaction.get(userRef);
@@ -116,22 +116,6 @@ export const syncDailyQuestAction = createAsyncThunk(
     })
 );
 
-export const updateQuestProgress = createAsyncThunk(
-  "user/updateQuestProgress",
-  async (payload: { type: DailyQuestTaskType; amount?: number; exerciseId?: string }, { dispatch, getState }) => {
-    const questBefore = (getState() as RootState).user.currentUserStats?.dailyQuest;
-    dispatch(completeQuestTask(payload));
-    const questAfter = (getState() as RootState).user.currentUserStats?.dailyQuest;
-
-    // Finishing a session fires this for every task type the session could
-    // possibly satisfy, and today's set holds three of them. Only the ones that
-    // moved something are worth a round trip.
-    if (questBefore !== questAfter) {
-      dispatch(syncDailyQuestAction());
-    }
-  }
-);
-
 export const initializeDailyQuestAction = createAsyncThunk(
   "user/initializeDailyQuest",
   async (_, { dispatch, getState }) => {
@@ -156,6 +140,64 @@ export const initializeDailyQuestAction = createAsyncThunk(
     // and the sync writes nothing when the merge changes nothing — so mounting
     // the widget costs a read, not an overwrite of whatever is stored.
     dispatch(syncDailyQuestAction());
+  }
+);
+
+/**
+ * Brings the store up to the current quest day before anything is scored
+ * against it.
+ *
+ * Nothing rolls the quest over while the app stays open: the set is drawn when
+ * the dashboard widget mounts, or once per login, and never again. A client
+ * loaded before the day key flipped therefore keeps holding yesterday's quest —
+ * and `completeQuestTask` drops every completion aimed at it (its date guard),
+ * silently. That is how a 45-minute session ended with "Practice for 15
+ * minutes" still reading 0/15. Moving the key into the player's own timezone
+ * puts the flip at their midnight rather than mid-evening, but it does not stop
+ * a session from running across it — a player practicing at midnight hits
+ * exactly the same wall.
+ *
+ * The stored quest is pulled first: another client may already have drawn
+ * today's set, and adopting it is better than drawing a second one whose tasks
+ * the merge would only throw away.
+ */
+export const ensureQuestForToday = createAsyncThunk(
+  "user/ensureQuestForToday",
+  async (_, { dispatch, getState }) => {
+    const isStale = () => {
+      const stats = (getState() as RootState).user.currentUserStats;
+      const quest = stats?.dailyQuest;
+      return !quest || quest.date < getQuestDayKey(stats?.timeZone);
+    };
+
+    if (!(getState() as RootState).user.currentUserStats) return;
+    if (!isStale()) return;
+
+    await dispatch(syncDailyQuestAction());
+    if (!isStale()) return;
+
+    await dispatch(initializeDailyQuestAction());
+  }
+);
+
+export const updateQuestProgress = createAsyncThunk(
+  "user/updateQuestProgress",
+  async (payload: { type: DailyQuestTaskType; amount?: number; exerciseId?: string }, { dispatch, getState }) => {
+    // A session that started before the server day rolled over reports after
+    // it, against a quest the store has not refreshed since. Roll it over here
+    // rather than letting the reducer's date guard eat the progress.
+    await dispatch(ensureQuestForToday());
+
+    const questBefore = (getState() as RootState).user.currentUserStats?.dailyQuest;
+    dispatch(completeQuestTask(payload));
+    const questAfter = (getState() as RootState).user.currentUserStats?.dailyQuest;
+
+    // Finishing a session fires this for every task type the session could
+    // possibly satisfy, and today's set holds three of them. Only the ones that
+    // moved something are worth a round trip.
+    if (questBefore !== questAfter) {
+      dispatch(syncDailyQuestAction());
+    }
   }
 );
 

@@ -28,10 +28,14 @@ import type {
 const TOP_JACK_SEAT = 0.012;
 
 /**
- * The `dc` on each of these is read off the same silkscreen the signal pair is.
- * Every one of them prints its power inlet at the end of the strip, after the
- * ins, the outs and whatever expression and USB it carries, so the DC cable
- * arrives well clear of the two instrument plugs standing beside it.
+ * The `dc` on each of these is read off the same silkscreen the signal pair is,
+ * and lands on the socket the artwork actually draws for power — not merely
+ * somewhere along the strip. The Lab and Astral boxes print theirs last, after
+ * the ins, the outs and whatever expression and USB they carry; the Cosmic
+ * Resonance sinks a flat barrel inlet into the strip between its `R-OUT` and
+ * `EXP`, so its `y` is a real depth (see `EFFECT_DC_JACK`) rather than the
+ * seating sliver. Either way the DC plug stands clear of the two instrument
+ * plugs.
  */
 const TOP_JACKS = {
   /** "L-IN · L-OUT · R-OUT · EXP · USB · 9V DC" — the wide Lab enclosures. */
@@ -39,21 +43,25 @@ const TOP_JACKS = {
     edge: "top",
     in: { x: 0.405, y: TOP_JACK_SEAT },
     out: { x: 0.496, y: TOP_JACK_SEAT },
-    dc: { x: 0.86, y: TOP_JACK_SEAT },
+    // The last port on the strip. The one before it, at `0.85`, is the USB.
+    dc: { x: 0.92, y: TOP_JACK_SEAT },
   },
   /** "SOURCE IN · ECHO OUT · CONTROL CV · LINK MIDI" — Astral Reverberator. */
   astral: {
     edge: "top",
     in: { x: 0.232, y: TOP_JACK_SEAT },
     out: { x: 0.379, y: TOP_JACK_SEAT },
-    dc: { x: 0.82, y: TOP_JACK_SEAT },
+    // The fourth nut, the one the silhouette measures at `0.846`.
+    dc: { x: 0.846, y: TOP_JACK_SEAT },
   },
   /** "L-IN · R-OUT · EXP · USB" — Cosmic Resonance. */
   cosmic: {
     edge: "top",
     in: { x: 0.239, y: TOP_JACK_SEAT },
     out: { x: 0.383, y: TOP_JACK_SEAT },
-    dc: { x: 0.82, y: TOP_JACK_SEAT },
+    // The unlabelled barrel inlet set flush into the strip, not the USB nut —
+    // so the plug's tip goes to the far lip of that hole, not to the edge.
+    dc: { x: 0.51, y: 0.052 },
   },
 } satisfies Record<string, EffectJackLayout>;
 
@@ -292,6 +300,73 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     type: "Overdrive",
     imageId: 27,
     rarity: "Rare",
+  },
+
+  // ─── Filling the empty stages (27-32) ──────────────────────────────────────
+  // Four of these are the first pedal of their type in the game. Every one of
+  // those types already had a stage in `signalChain`, a BOM in `effectBom` and a
+  // mod pool in `effectStats` — the plumbing was written and simply had nothing
+  // to run through it, so a by-the-book chain could never use those slots.
+  {
+    id: 27,
+    name: "Level Keeper CM-8",
+    brand: "Ronin",
+    type: "Compressor",
+    imageId: 28,
+    rarity: "Common",
+    // An optical compressor in a compact box: two transistors and a lamp.
+    draw: 30,
+  },
+  {
+    id: 28,
+    name: "Shimmer Path",
+    brand: "Astra-Path",
+    type: "Chorus",
+    imageId: 29,
+    rarity: "Common",
+    // A single bucket-brigade chip, which is all a chorus has ever needed.
+    draw: 25,
+  },
+  {
+    id: 29,
+    name: "Rust Forge",
+    brand: "Forge",
+    type: "Fuzz",
+    imageId: 30,
+    rarity: "Rare",
+    // Two germanium transistors and a battery clip. Nothing on a board asks the
+    // brick for less, which is half of why a fuzz wants to go first.
+    draw: 8,
+  },
+  {
+    id: 30,
+    name: "Tidal Flange",
+    brand: "Aqua-Fab",
+    type: "Flanger",
+    imageId: 31,
+    rarity: "Rare",
+    // A longer delay line than a chorus runs, and it costs accordingly.
+    draw: 45,
+  },
+  {
+    id: 31,
+    name: "Chronos Infinity",
+    brand: "ChronosEcho",
+    type: "Delay",
+    imageId: 32,
+    rarity: "Legendary",
+    // Digital, with tails that outlive the switch. The converter is the drain.
+    draw: 150,
+  },
+  {
+    id: 32,
+    name: "Ruin Machine",
+    brand: "VelcroLab",
+    type: "Distortion",
+    imageId: 33,
+    rarity: "Mythic",
+    // Three clipping stages stacked, each with its own supply rail.
+    draw: 60,
   },
 ];
 

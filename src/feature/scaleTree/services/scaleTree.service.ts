@@ -2,39 +2,21 @@ import { collection } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 
+import { collectBpms, isExerciseCleared } from "../data/exerciseClearance";
 import { SCALE_TREE_NODES } from "../data/scaleTreeNodes";
 import type {
   BpmProgressMap,
   NodeStatus,
-  RequiredExercise,
   ScaleRecordMap,
   ScaleTreeProgress,
 } from "../types/scaleTree.types";
 
+// Re-exported so the callers that have always read them from here keep working;
+// they live in `data/exerciseClearance` because the claim routes need them
+// without dragging the client SDK below into a server bundle.
+export { collectBpms, isExerciseCleared };
+
 const BPM_PROGRESS_SUBCOLLECTION = "exerciseBpmProgress";
-
-/**
- * Whether a required exercise counts as passed. The bar is the exercise's
- * current target BPM, or the lower one it had before the tempo bump — players
- * who already cleared a node under the old rules keep it cleared.
- */
-/**
- * Every tempo on record for this exercise, gathered across the ids it has been
- * filed under. A shape that was renamed keeps the runs a player already logged.
- */
-export function collectBpms(req: RequiredExercise, progress: BpmProgressMap): number[] {
-  return [req.exerciseId, ...(req.legacyExerciseIds ?? [])].flatMap(
-    (id) => progress.get(id) ?? [],
-  );
-}
-
-export function isExerciseCleared(req: RequiredExercise, bpms: number[]): boolean {
-  const threshold =
-    req.legacyRequiredBpm != null
-      ? Math.min(req.requiredBpm, req.legacyRequiredBpm)
-      : req.requiredBpm;
-  return bpms.some((b) => b >= threshold);
-}
 
 /**
  * Reads the whole `exerciseBpmProgress` subcollection once: cleared tempos (what

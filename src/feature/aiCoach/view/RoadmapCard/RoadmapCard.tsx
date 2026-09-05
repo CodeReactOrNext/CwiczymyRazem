@@ -6,7 +6,6 @@ import type { Roadmap } from "../../types/roadmap.types";
 interface RoadmapCardProps {
   roadmap: Roadmap;
   onOpen: () => void;
-  onDelete: () => void;
 }
 
 function getRoadmapStats(roadmap: Roadmap) {

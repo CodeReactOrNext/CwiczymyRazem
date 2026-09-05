@@ -113,6 +113,18 @@ describe("SEO landing content configs", () => {
     }
   });
 
+  it("points every hero quick pick at a section that exists", () => {
+    for (const config of seoLandingConfigs) {
+      const headings = new Set(config.sections.map((section) => section.heading));
+      for (const pick of config.quickPicks ?? []) {
+        expect(
+          headings.has(pick.heading),
+          `quick pick "${pick.label}" on ${config.slug} names no section`
+        ).toBe(true);
+      }
+    }
+  });
+
   it("keeps lib/exerciseLandingLink embedded map in sync with the configs", () => {
     for (const config of seoLandingConfigs) {
       for (const id of collectExerciseIds(config)) {

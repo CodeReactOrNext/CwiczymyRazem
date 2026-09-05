@@ -27,13 +27,13 @@ export const RestockTimer = ({ restockAt }: RestockTimerProps) => {
 
   return (
     <div className='flex items-center gap-2.5 rounded-lg bg-zinc-800/40 px-4 py-2.5'>
-      <Timer size={15} className='text-cyan-400' />
-      <span className='text-[11px] font-semibold text-zinc-400'>Restocks in</span>
+      <Timer size={16} className='text-cyan-400' />
+      <span className='text-xs font-semibold text-zinc-400'>Restocks in</span>
       {/* Server and client read their own clocks a moment apart — the first
           paint is allowed to disagree, the interval settles it a second later. */}
       <span
         suppressHydrationWarning
-        className='text-base font-black tabular-nums text-white'>
+        className='text-lg font-black tabular-nums text-white'>
         {format(left)}
       </span>
     </div>

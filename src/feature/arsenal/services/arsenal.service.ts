@@ -28,23 +28,26 @@ async function getIdToken(): Promise<string> {
   return token;
 }
 
-export const openCase = async (caseType: CaseType): Promise<OpenCaseResult> => {
+export const openCase = async (
+  caseType: CaseType,
+  useToken = false,
+): Promise<OpenCaseResult> => {
   const idToken = await getIdToken();
   const { data } = await axios.post<OpenCaseResult>("/api/arsenal/open-case", {
     idToken,
     caseType,
+    useToken,
   });
   return data;
 };
 
 export const fetchInventory = async (): Promise<
-  ArsenalUserData & { fame: number }
+  ArsenalUserData & { fame: number; caseTokens: number }
 > => {
   const idToken = await getIdToken();
-  const { data } = await axios.post<ArsenalUserData & { fame: number }>(
-    "/api/arsenal/inventory",
-    { idToken },
-  );
+  const { data } = await axios.post<
+    ArsenalUserData & { fame: number; caseTokens: number }
+  >("/api/arsenal/inventory", { idToken });
   return data;
 };
 

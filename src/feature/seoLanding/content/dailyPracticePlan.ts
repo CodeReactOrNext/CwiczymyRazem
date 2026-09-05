@@ -7,10 +7,17 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
   metaDescription:
     "Ready-made daily guitar practice routines for 15, 30 and 60 minutes — with example exercises, a beginner practice schedule, and a system for staying consistent.",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-07-20",
+  updatedAt: "2026-09-05",
   intro: [
     "A daily guitar practice plan needs to answer exactly two questions before you pick up the instrument: *what am I working on today* and *for how long*. Answer them in advance and practice happens; leave them for the moment you sit down and the session dissolves into noodling and YouTube.",
     "Below are three complete daily guitar practice routines — 15, 30 and 60 minutes — each with time blocks, example exercises with interactive tabs, and a clear rule for what to do when life shrinks your day. Pick the plan that matches your *worst* day, not your best one: the schedule you can keep on a bad Tuesday is the one that compounds.",
+  ],
+  // The whole page is a choice between three lengths, so make the choice the
+  // first thing on it instead of a scroll past the session-length essay.
+  quickPicks: [
+    { label: "15 minutes", heading: "The 15-Minute Daily Guitar Practice Routine" },
+    { label: "30 minutes", heading: "The 30-Minute Plan" },
+    { label: "60 minutes", heading: "The 60-Minute Plan" },
   ],
   sections: [
     {

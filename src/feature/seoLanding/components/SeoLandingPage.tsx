@@ -2,12 +2,10 @@ import { BlogCard } from "components/Blog/BlogCard";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import type { SerializedExercise } from "feature/exercises/lib/serializeExercise";
 import { idToSlug } from "feature/exercises/lib/slugUtils";
-import { CookieBanner } from "feature/landing/components/CookieBanner";
-import { FinalCTASection } from "feature/landing/components/FinalCTASection";
-import { Footer } from "feature/landing/components/Footer";
 import { jakartaLanding } from "feature/landing/lib/fonts";
 import { motion, useScroll, useSpring } from "framer-motion";
 import type { BlogFrontmatter } from "lib/blog";
+import { trackSignupCtaClicked } from "lib/signupFunnel";
 import {
   ArrowDown,
   ArrowRight,
@@ -16,6 +14,7 @@ import {
   List,
   Sparkles,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,6 +39,25 @@ export interface SeoLandingPageProps {
   relatedBlogs: BlogFrontmatter[];
   relatedSongGuides: SeoLandingSongGuideLink[];
 }
+
+// Everything below the article is off-screen at first paint, so it loads on
+// its own chunk rather than competing with the content for the main thread —
+// the same treatment the home page already gives its lower sections.
+const FinalCTASection = dynamic(() =>
+  import("feature/landing/components/FinalCTASection").then(
+    (m) => m.FinalCTASection
+  )
+);
+const Footer = dynamic(() =>
+  import("feature/landing/components/Footer").then((m) => m.Footer)
+);
+const CookieBanner = dynamic(
+  () =>
+    import("feature/landing/components/CookieBanner").then(
+      (m) => m.CookieBanner
+    ),
+  { ssr: false }
+);
 
 const FAQ_HEADING = "FAQ";
 
@@ -106,6 +124,7 @@ const Block = ({
             <div className='flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
               <Link
                 href='/signup'
+                onClick={() => trackSignupCtaClicked("guide_cta")}
                 className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
                 Start free
                 <ArrowRight className='h-4 w-4' aria-hidden='true' />
@@ -183,8 +202,16 @@ export const SeoLandingPage = ({
   const exercisePosition = Object.fromEntries(
     exerciseIds.map((id, index) => [id, index + 1])
   );
-  const firstSectionId =
-    config.sections.length > 0 ? headingId(config.sections[0].heading) : "";
+  // "Jump to the drills" used to land on whatever came first, which on the daily
+  // plan is an essay about session length (SEO audit 2026-09-05). Aim it at the
+  // first section that actually embeds an exercise.
+  const firstDrillSection =
+    config.sections.find((section) =>
+      section.blocks.some((block) => block.kind === "exercise")
+    ) ?? config.sections[0];
+  const firstSectionId = firstDrillSection
+    ? headingId(firstDrillSection.heading)
+    : "";
   const pageTitle =
     config.metaTitle.length <= 47
       ? `${config.metaTitle} | Riff Quest`
@@ -343,6 +370,24 @@ export const SeoLandingPage = ({
                 ))}
               </div>
 
+              {config.quickPicks && config.quickPicks.length > 0 && (
+                <div className='mt-8'>
+                  <p className='mb-3 text-sm font-semibold text-zinc-300'>
+                    How long have you got today?
+                  </p>
+                  <div className='flex flex-wrap gap-3'>
+                    {config.quickPicks.map((pick) => (
+                      <a
+                        key={pick.heading}
+                        href={`#${headingId(pick.heading)}`}
+                        className='rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
+                        {pick.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className='mt-8 flex flex-wrap items-center gap-3 text-sm'>
                 {exerciseIds.length > 0 && (
                   <span className='rounded bg-cyan-500/10 px-3 py-1.5 font-semibold text-cyan-400'>
@@ -360,6 +405,7 @@ export const SeoLandingPage = ({
               <div className='mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
                 <Link
                   href='/signup'
+                  onClick={() => trackSignupCtaClicked("guide_hero")}
                   className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
                   Start practicing free
                   <ArrowRight className='h-4 w-4' aria-hidden='true' />

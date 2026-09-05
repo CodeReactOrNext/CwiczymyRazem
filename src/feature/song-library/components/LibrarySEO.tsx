@@ -65,14 +65,17 @@ export const LibrarySEO = ({ songs, totalSongs, faqQuestions }: LibrarySEOProps)
                 name: song.title,
                 byArtist: { "@type": "MusicGroup", name: song.artist },
                 url: pageUrl,
+                // Difficulty is a property of playing the song, not a review of
+                // the recording — see SongGuideSEO for the same correction.
                 ...(song.ratingsCount > 0
                   ? {
-                      aggregateRating: {
-                        "@type": "AggregateRating",
-                        ratingValue: song.avgDifficulty,
-                        ratingCount: song.ratingsCount,
-                        bestRating: 10,
-                        worstRating: 1,
+                      additionalProperty: {
+                        "@type": "PropertyValue",
+                        name: "Guitar difficulty",
+                        value: song.avgDifficulty,
+                        minValue: 1,
+                        maxValue: 10,
+                        description: `Average difficulty rating from ${song.ratingsCount} Riff Quest guitarists who have played it, on a 1-10 scale.`,
                       },
                     }
                   : {}),

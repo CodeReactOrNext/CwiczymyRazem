@@ -5,11 +5,13 @@ import { mergeDailyQuests } from "./dailyQuest.merge";
 import userReducer, { completeQuestTask, generateDailyQuest } from "./userSlice";
 
 /**
- * The daily quest key moved from the player's local date to the shared server
- * (UTC) date. On the day that ships, every player ahead of UTC is holding a
- * quest stamped with what is now *tomorrow's* server day, and every player
- * behind it one stamped with yesterday's. Neither may lose a set they are part
- * way through, or have a claimed reward come back unclaimed.
+ * The daily quest key has changed meaning twice: player-local date → shared
+ * server (UTC) date → the player's own day resolved from the zone on their
+ * profile. On each of those days, some players are holding a quest stamped with
+ * what now reads as *tomorrow* and others one stamped with yesterday. Neither
+ * may lose a set they are part way through, or have a claimed reward come back
+ * unclaimed. The state below pins the zone to UTC so these assertions test that
+ * tolerance rather than the zone the suite happens to run in.
  */
 const questFor = (date: string, overrides = {}) => ({
   date,
@@ -31,7 +33,7 @@ const stateWithQuest = (quest: ReturnType<typeof questFor>) =>
   ({
     userInfo: null,
     userAuth: null,
-    currentUserStats: { ...statisticsInitial, dailyQuest: quest },
+    currentUserStats: { ...statisticsInitial, timeZone: "UTC", dailyQuest: quest },
     previousUserStats: null,
     raitingData: null,
     isFetching: null,

@@ -1,24 +1,6 @@
-import { evaluate } from '@mdx-js/mdx';
-import { ActionCard } from 'components/Blog/ActionCard';
-import { AppCard } from 'components/Blog/AppCard';
 import { AuthorBio } from 'components/Blog/AuthorBio';
-import { BlogAlert } from 'components/Blog/BlogAlert';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
-import { Checklist } from 'components/Blog/Checklist';
-import { ExercisePromo } from 'components/Blog/ExercisePromo';
-import { MajorScaleDiagram } from 'components/Blog/MajorScaleDiagram';
-import { PatternBackground } from 'components/Blog/PatternBackground';
-import { PhotoBlock } from 'components/Blog/PhotoBlock';
-import { PracticePlanCard } from 'components/Blog/PracticePlanCard';
-import { PracticeTable } from 'components/Blog/PracticeTable';
-import { SessionLengthChart } from 'components/Blog/SessionLengthChart';
-import { SessionTimeline } from 'components/Blog/SessionTimeline';
-import { SongTierTable } from 'components/Blog/SongTierTable';
-import { StatRow } from 'components/Blog/StatRow';
-import { StepList } from 'components/Blog/StepList';
-import { TierCards } from 'components/Blog/TierCards';
-import { YouTube } from 'components/Blog/YouTube';
 import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
 import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
 import { serializeExercises } from 'feature/exercises/lib/serializeExercise';
@@ -27,18 +9,17 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 import { getAuthorProfile } from 'lib/authors';
 import type { BlogFrontmatter} from 'lib/blog';
 import {getAllBlogs, getBlogBySlug } from 'lib/blog';
+import type { BlogHeading } from 'lib/blogContent';
+import { extractFaqs, renderBlogContent } from 'lib/blogContent';
 import { getExerciseLandingHref } from 'lib/exerciseLandingLink';
 import type { PracticeLink } from 'lib/internalLinks';
 import { CLUSTER_PRACTICE_LINK } from 'lib/internalLinks';
-import { CheckCircle2, ChevronRight, Clock, Flame, HelpCircle, List, Sprout, Target, Trophy } from 'lucide-react';
+import { ChevronRight, List } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import * as jsxRuntime from 'react/jsx-runtime';
-import { renderToStaticMarkup } from 'react-dom/server';
-import remarkGfm from 'remark-gfm';
 
 
 
@@ -56,117 +37,15 @@ interface BlogPostProps {
   frontmatter: BlogFrontmatter;
   contentHtml: string;
   relatedBlogs: BlogFrontmatter[];
-  headings: { text: string; id: string }[];
+  headings: BlogHeading[];
+  readingMinutes: number;
   faqs: { question: string; answer: string }[];
   practiceLink: PracticeLink | null;
   practiceExercises: PracticeExercise[];
 }
 
-// Keyword -> icon for H2 section markers. Falls back to a plain dot when no
-// keyword matches, so existing posts without these headings render unchanged.
-const H2_ICONS: [RegExp, React.ElementType][] = [
-  [/beginner/i, Sprout],
-  [/intermediate/i, Flame],
-  [/advanced/i, Trophy],
-  [/efficien/i, Target],
-  [/faq/i, HelpCircle],
-  [/conclusion/i, CheckCircle2],
-  [/^how long/i, Clock],
-];
 
-const getH2Icon = (text: string): React.ElementType | null => {
-  const match = H2_ICONS.find(([pattern]) => pattern.test(text));
-  return match ? match[1] : null;
-};
-
-const components = {
-  YouTube,
-  BlogAlert,
-  ActionCard,
-  AppCard,
-  Checklist,
-  ExercisePromo,
-  MajorScaleDiagram,
-  PhotoBlock,
-  PracticePlanCard,
-  PracticeTable,
-  SessionLengthChart,
-  SessionTimeline,
-  StatRow,
-  StepList,
-  SongTierTable,
-  TierCards,
-  // Mapping h2 to include IDs for ToC, plus an accent marker for section scanning
-  h2: ({ children, ...rest }: any) => {
-    const text = children?.toString() ?? '';
-    const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-    const Icon = getH2Icon(text);
-    return (
-      <h2 {...rest} id={id} className="flex items-center gap-3.5">
-        {Icon ? (
-          <Icon className="h-6 w-6 shrink-0 text-cyan-400" aria-hidden="true" />
-        ) : (
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true" />
-        )}
-        <span>{children}</span>
-      </h2>
-    );
-  },
-  // h3 gets a small marker to echo h2's language at a subtler scale, so
-  // sub-sections read as part of the same heading system, not plain bold text.
-  h3: ({ children, ...rest }: any) => (
-    <h3 {...rest} className="flex items-center gap-3">
-      <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-500/60" aria-hidden="true" />
-      <span>{children}</span>
-    </h3>
-  ),
-  // Content images live below the fold; lazy-load them to cut initial page weight
-  img: (props: any) => <img loading='lazy' decoding='async' {...props} />,
-  // Expert-quote blockquotes get the same repeating-icon treatment as BlogAlert,
-  // just smaller/tighter so the box doesn't dominate the page
-  blockquote: ({ children, ...rest }: any) => (
-    <div className='relative my-10 overflow-hidden rounded-lg bg-zinc-800/40 px-6 py-8 sm:px-10'>
-      <PatternBackground
-        icon={
-          <g>
-            <path d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z' />
-            <path d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z' />
-          </g>
-        }
-        strokeClass='stroke-cyan-400'
-      />
-      <blockquote
-        {...rest}
-        className='relative m-0 border-0 text-center text-base italic leading-relaxed text-zinc-200 [&>p]:m-0 [&>p]:before:content-none [&>p]:after:content-none'
-      >
-        {children}
-      </blockquote>
-    </div>
-  ),
-  // Source citations are written as `[\[5\]](url)`; render them as small,
-  // superscript-style markers so they read as footnotes, not body links
-  a: ({ children, ...rest }: any) => {
-    const text = Array.isArray(children) ? children.join('') : (children?.toString() ?? '');
-    const isCitation = /^\[\d+\]$/.test(text.trim());
-    return (
-      <a
-        {...rest}
-        className={isCitation ? 'align-super text-[0.65em] text-zinc-500 no-underline hover:text-zinc-300' : undefined}
-      >
-        {children}
-      </a>
-    );
-  },
-  // GFM task-list checkboxes render as bare inputs; give them an accessible name
-  input: (props: any) =>
-    props.type === 'checkbox' ? (
-      <input aria-label='Checklist item' {...props} />
-    ) : (
-      <input {...props} />
-    ),
-};
-
-const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], faqs = [], practiceLink = null, practiceExercises = [] }: BlogPostProps) => {
+const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], faqs = [], practiceLink = null, practiceExercises = [], readingMinutes = 1 }: BlogPostProps) => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -342,6 +221,8 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
           title={frontmatter.title}
           description={frontmatter.heroSubtitle || frontmatter.description}
           date={frontmatter.date}
+          updatedAt={frontmatter.updatedAt}
+          readTime={`${readingMinutes} min`}
           image={frontmatter.image}
           author={frontmatter.author}
           authorImage={authorProfile?.image}
@@ -360,7 +241,9 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
                   <a
                     key={heading.id}
                     href={`#${heading.id}`}
-                    className={`rounded px-4 py-1.5 text-sm transition-background hover:text-cyan-400 ${
+                    className={`rounded py-1.5 text-sm transition-background hover:text-cyan-400 ${
+                      heading.level === 3 ? 'pl-8 pr-4 text-[13px]' : 'px-4'
+                    } ${
                       activeId === heading.id
                         ? 'bg-cyan-500/10 text-cyan-400 font-medium'
                         : 'text-zinc-500'
@@ -373,6 +256,29 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
             </aside>
 
             <div className="flex-1 min-w-0 max-w-full lg:max-w-3xl mx-auto lg:mx-0 overflow-hidden">
+              {/* Phone-sized screens have no sidebar. Collapsed by default so the
+                  article itself, not a 25-item list, is what follows the hero. */}
+              {headings.length > 0 && (
+                <details className="mb-10 rounded-lg bg-zinc-900/40 p-5 lg:hidden">
+                  <summary className="cursor-pointer text-sm font-bold text-white">
+                    On this page
+                  </summary>
+                  <nav className="mt-4 flex flex-col gap-3">
+                    {headings.map((heading) => (
+                      <a
+                        key={heading.id}
+                        href={`#${heading.id}`}
+                        className={`text-sm text-zinc-400 transition-colors hover:text-cyan-400 ${
+                          heading.level === 3 ? 'pl-4 text-[13px] text-zinc-500' : ''
+                        }`}
+                      >
+                        {heading.text}
+                      </a>
+                    ))}
+                  </nav>
+                </details>
+              )}
+
               <div
                 className="prose prose-invert prose-lg max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-5 prose-h2:text-white prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-li:my-3 prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-table:my-8 prose-th:text-white prose-th:py-3 prose-td:py-3"
                 dangerouslySetInnerHTML={{ __html: contentHtml }}
@@ -458,39 +364,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const slug = params?.slug as string;
   const { frontmatter, content } = await getBlogBySlug(slug);
 
-  // Compiled and rendered to static HTML here at build time (Node has no CSP),
-  // instead of shipping compiled MDX for the client to `new Function()`-eval on
-  // hydration — the browser's script-src CSP has no 'unsafe-eval' and blocks that.
-  // None of the MDX components below are interactive, so static markup is lossless.
-  const { default: MDXContent } = await evaluate(content, {
-    ...jsxRuntime,
-    remarkPlugins: [remarkGfm],
-  });
-  const contentHtml = renderToStaticMarkup(<MDXContent components={components} />);
+  const { contentHtml, headings, readingMinutes } = await renderBlogContent(content);
 
-  const headings = content.split('\n')
-    .filter(line => line.startsWith('## '))
-    .map(line => {
-      const text = line.replace('## ', '').trim();
-      const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-      return { text, id };
-    });
-
-  // Extract FAQs
-  const faqs: { question: string; answer: string }[] = [];
-  const faqStartIndex = content.indexOf('## FAQs');
-  if (faqStartIndex !== -1) {
-    const faqSection = content.slice(faqStartIndex);
-    const faqBlocks = faqSection.split('### ').slice(1);
-    faqBlocks.forEach(block => {
-      const lines = block.split('\n');
-      const question = lines[0].trim();
-      const answer = lines.slice(1).join(' ').replace(/\s+/g, ' ').trim();
-      if (question && answer) {
-        faqs.push({ question, answer });
-      }
-    });
-  }
+  const faqs = extractFaqs(content);
 
   // Hub-and-spoke related posts: surface same-cluster posts first (pillar leading),
   // then top up with the most recent posts so every article still shows three.
@@ -544,6 +420,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       contentHtml,
       relatedBlogs,
       headings,
+      readingMinutes,
       faqs,
       practiceLink,
       practiceExercises,

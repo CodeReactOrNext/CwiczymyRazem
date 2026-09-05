@@ -7,7 +7,7 @@ export const guitarScaleRoutineConfig: SeoLandingConfig = {
   metaDescription:
     "How to practice guitar scales effectively: which scales to practice daily, pentatonic drills with tabs, and a 15-minute CAGED fretboard-mapping routine.",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-07-20",
+  updatedAt: "2026-09-05",
   intro: [
     "Practicing guitar scales means three things done daily: drilling a position until it is automatic, connecting it to the notes it contains, and immediately using it to make music. Run scales up and down for a year and you will be excellent at running scales up and down — and still lost in a solo.",
     "This routine fixes that. It combines pentatonic drills with interactive tabs, hammer-on and pull-off phrasing work, and a 15-minute daily fretboard-mapping plan built around the CAGED system. Everything here is free to practice with real-time feedback in [Riff Quest](/how-it-works).",

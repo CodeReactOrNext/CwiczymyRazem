@@ -8,13 +8,11 @@ import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { PROGRESS_TABS } from "constants/navTabs";
-import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
 import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
-import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { StatsSection } from "feature/profile/components/StatsSection";
+import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
 import { downloadProfileSummaryCsv } from "feature/profile/services/profileSummary.export";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { downloadSongProgressCsv } from "feature/songs/services/songs.export";
@@ -44,10 +42,13 @@ const ProfileActivityPage = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
   const [refreshKey] = useState(0);
+  const tabs = useProgressTabs();
   const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth as string, refreshKey);
 
   const { data: songs, refetch: refreshSongs } = useQuery({
-    queryKey: ['userSongs', userAuth],
+    // Same key the rest of the app uses, so the panel below shares this fetch
+    // instead of pulling the stash a second time.
+    queryKey: ['user-songs', userAuth],
     queryFn: () => getUserSongs(userAuth as string),
     enabled: !!userAuth,
   });
@@ -110,7 +111,7 @@ const ProfileActivityPage = () => {
       <div className='p-4'>
         <div className='mb-6 flex flex-wrap items-center gap-2'>
           <PageTabs
-            tabs={PROGRESS_TABS}
+            tabs={tabs}
             activeHref='/profile/activity'
             ariaLabel='Progress sections'
           />
@@ -161,18 +162,6 @@ const ProfileActivityPage = () => {
           {/* 5. Activity Log calendar */}
           <ActivityLog key={refreshKey} userAuth={userAuth as string} />
 
-          {/* 6. Achievement Sections */}
-          <div className='space-y-8 mt-4'>
-                <SeasonalAchievements userId={userAuth as string} />
-
-              <div className='flex items-center gap-2 mb-1'>
-               <h3 className='text-xl font-semibold text-white mr-2'>Achievements</h3>
-                <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
-                  {userStats?.achievements?.length || 0}
-                </span>
-              </div>
-              <AchievementWrapper userAchievements={userStats?.achievements ?? []} />
-          </div>
         </div>
       </div>
     </MainContainer>

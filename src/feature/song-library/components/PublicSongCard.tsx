@@ -3,14 +3,17 @@
 import { cn } from "assets/lib/utils";
 import type { LibrarySong } from "feature/song-library/services/getSongsForStaticProps";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { trackSignupCtaClicked } from "lib/signupFunnel";
 import { ChevronRight, Music, Users } from "lucide-react";
 import Link from "next/link";
 
 interface PublicSongCardProps {
   song: LibrarySong;
+  /** Slug of this song's difficulty guide, when one has been written. */
+  guideSlug?: string;
 }
 
-export const PublicSongCard = ({ song }: PublicSongCardProps) => {
+export const PublicSongCard = ({ song, guideSlug }: PublicSongCardProps) => {
   const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty === 0 ? "?" : (song.tier || avgDifficulty));
 
@@ -118,11 +121,25 @@ export const PublicSongCard = ({ song }: PublicSongCardProps) => {
         </div>
       </div>
 
-      {/* CTA footer */}
-      <div className="relative z-10 mt-auto">
+      {/* CTA footer. Songs with a written guide lead there first: it is the
+          page that answers "how hard is this" without a sign-up wall. The
+          sign-up link carries the song so the choice survives the form. */}
+      <div className="relative z-10 mt-auto flex flex-col gap-2">
+        {guideSlug && (
+          <Link
+            href={`/song-library/${guideSlug}`}
+            className="flex h-8 w-full items-center justify-between rounded-xl bg-cyan-500/10 px-4 text-[10px] font-bold text-cyan-300 transition-all hover:bg-cyan-500/20 hover:text-cyan-200 gap-2"
+          >
+            <span>Read the difficulty guide</span>
+            <ChevronRight className="h-4 w-4 opacity-60 transition-transform group-hover:translate-x-1 ml-2" />
+          </Link>
+        )}
         <Link
-          href="/signup"
-          className="flex h-8 w-full items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-all hover:bg-white/10 hover:text-white gap-2"
+          href={`/signup?next=${encodeURIComponent(`/songs/practice/${song.id}`)}`}
+          onClick={() =>
+            trackSignupCtaClicked("song_card", { song_id: song.id })
+          }
+          className="flex h-8 w-full items-center justify-between rounded-xl bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-all hover:bg-white/10 hover:text-white gap-2"
         >
           <span>Start Learning</span>
           <ChevronRight className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-transform group-hover:translate-x-1 ml-2" />

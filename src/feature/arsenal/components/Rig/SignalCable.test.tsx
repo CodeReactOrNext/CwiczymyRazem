@@ -80,9 +80,18 @@ const verdictOf = (nodes: ChainNode[]): ChainVerdict => {
   };
 };
 
+/** A compact enclosure's pair: side-mounted, but well above centre. */
+const HIGH_JACKS: EffectJackLayout = {
+  edge: "side",
+  in: { x: 1, y: 0.44 },
+  out: { x: 0, y: 0.44 },
+};
+
 interface DrawOptions {
   /** Item ids whose pedal takes its cable off the top edge. */
   topJacked?: string[];
+  /** Item ids whose pedal wears its side sockets high, like `HIGH_JACKS`. */
+  highJacked?: string[];
   plain?: boolean;
 }
 
@@ -93,7 +102,11 @@ const draw = (nodes: ChainNode[], options: DrawOptions = {}) => {
       verdict={verdictOf(nodes)}
       widthOf={() => W}
       jacksOf={(itemId) =>
-        options.topJacked?.includes(itemId) ? TOP_JACKS : SIDE_JACKS
+        options.topJacked?.includes(itemId)
+          ? TOP_JACKS
+          : options.highJacked?.includes(itemId)
+            ? HIGH_JACKS
+            : SIDE_JACKS
       }
       plain={options.plain}
     />,
@@ -146,7 +159,7 @@ describe("SignalCable", () => {
     );
   });
 
-  it("draws one run per pedal plus the two to the board's own jacks", () => {
+  it("draws one run per pedal plus the two running on and off the deck", () => {
     const { runs } = draw([...row(ROW_Y_PCT[0], 4), ...row(ROW_Y_PCT[1], 3)]);
 
     expect(runs).toHaveLength(8);
@@ -195,12 +208,34 @@ describe("SignalCable", () => {
     expect(draw(tight).parts).toHaveLength(3);
   });
 
+  it("lays a coupler socket to socket when the pair's jacks sit at different heights", () => {
+    // Tight enough to couple, with the second pedal wearing its sockets high.
+    const nodes = row(ROW_Y_PCT[0], 2, 1.5);
+    const { container } = draw(nodes, { highJacked: [nodes[1].itemId] });
+
+    // A coupler is the one part without a strain-relief boot.
+    const coupler = Array.from(container.querySelectorAll("g[transform]")).find(
+      (group) => !group.querySelector('path[d^="M -0.95"]'),
+    );
+    expect(coupler).toBeDefined();
+
+    // The leftmost socket is the high one, so the bar runs down to the right:
+    // a rise of 6% of a pedal's height over the gap between the two enclosures.
+    const gap = (1.5 / 100) * GEO.viewW;
+    const drop = ((0.5 - 0.44) * PEDAL_H_PCT * GEO.viewH) / 100;
+    const expected = (Math.atan2(drop, gap) * 180) / Math.PI;
+    const tilt = Number(
+      coupler?.getAttribute("transform")?.match(/rotate\((-?[\d.]+)\)/)?.[1],
+    );
+    expect(tilt).toBeCloseTo(expected, 1);
+  });
+
   it("plugs both sides of every pedal, and nothing else", () => {
     const nodes = row(ROW_Y_PCT[0], 3, 6);
     const { parts } = draw(nodes);
 
-    // The board's own sockets are drawn at life size by `BoardJack` and show
-    // only the cable going in, so nothing is plugged into them here.
+    // The two ends of the board have nothing to plug into — the cable runs
+    // off the deck — so no plug is drawn anywhere but on a pedal.
     expect(parts).toHaveLength(nodes.length * 2);
     // The input is on the right face, so its plug is the mirrored one; the
     // output on the left face takes the plug as it is drawn.
@@ -250,11 +285,27 @@ describe("SignalCable", () => {
     expect(cast({ plain: true })).toHaveLength(0);
   });
 
-  it("still reaches both jacks with a single pedal on the board", () => {
+  it("still runs on and off the deck with a single pedal on the board", () => {
     const { runs } = draw(row(ROW_Y_PCT[0], 1));
 
     expect(runs).toHaveLength(2);
     runs.forEach((d) => expect(d).not.toContain("NaN"));
+  });
+
+  it("runs off the deck at both ends, fading out towards the edge", () => {
+    const { container, runs } = draw(row(ROW_Y_PCT[0], 3, 6));
+    const feed = pointsOf(runs[0]);
+    const exit = pointsOf(runs[runs.length - 1]);
+
+    // In over the top edge from the guitar, out over the bottom edge to the
+    // amp — past the deck's own clip, so neither end shows a cap.
+    expect(feed[0].y).toBeLessThan(0);
+    expect(exit[exit.length - 1].y).toBeGreaterThan(GEO.viewH);
+
+    // …and each of the two, shadow included, is masked so it thins out to
+    // nothing at the edge instead of stopping dead against it.
+    expect(container.querySelectorAll("[mask]")).toHaveLength(4);
+    expect(container.querySelectorAll("mask")).toHaveLength(2);
   });
 
   it("draws nothing at all for an empty board", () => {

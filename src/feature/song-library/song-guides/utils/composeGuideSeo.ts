@@ -39,8 +39,15 @@ const resolveRating = (
 };
 
 /**
- * First variant that has all its data *and* fits the budget wins. Variant 4
- * needs nothing beyond the song name, so the chain always terminates.
+ * First variant that has all its data *and* fits the budget wins. The last
+ * variant needs nothing beyond the song name, so the chain always terminates.
+ *
+ * The title used to lead with the raw lookup values — "212 BPM, E standard,
+ * 8.5/10". Those pages collected impressions and almost no clicks (master of
+ * puppets bpm: 472 impressions, 0 clicks in the 2026-09-05 audit), because a
+ * number is exactly what Google can answer without the visit. The tempo and
+ * tuning still carry the query in the description; the title now leads with
+ * what only opening the page gives you — the section-by-section breakdown.
  */
 export const composeGuideTitle = (
   guide: SongGuide,
@@ -51,11 +58,13 @@ export const composeGuideTitle = (
   const rating = resolveRating(guide, liveData);
 
   const variants = [
+    `${song} Guitar Difficulty: Section Map & Practice Plan`,
+    `${song} Guitar Difficulty: Section Map & Practice`,
+    rating ? `${song} Guitar Difficulty: ${rating}/10, Section Map` : null,
+    rating ? `${song} Guitar Difficulty: ${rating}/10` : null,
     bpm && tuning && rating
       ? `${song}: ${bpm} BPM, ${tuning}, ${rating}/10 Difficulty`
       : null,
-    bpm && rating ? `${song}: ${bpm} BPM, ${rating}/10 Difficulty` : null,
-    rating ? `${song} Guitar Difficulty: ${rating}/10` : null,
     `${song} on Guitar: Difficulty, BPM & Tuning`,
   ];
 

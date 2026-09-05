@@ -11,6 +11,7 @@ import {
   useReducedMotion,
   useTransform,
 } from "framer-motion";
+import { trackSignupCtaClicked } from "lib/signupFunnel";
 import { ArrowRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -19,7 +20,7 @@ import { useEffect, useRef } from "react";
 
 const StaticCTA = () => (
   <div className='flex flex-col items-center gap-2'>
-    <Link href='/signup'>
+    <Link href='/signup' onClick={() => trackSignupCtaClicked('landing_hero')}>
       <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
         <span className='flex items-center gap-3 whitespace-nowrap'>
           Start tracking free

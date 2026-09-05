@@ -20,11 +20,12 @@ export const AchievementCard = memo(({
   isUnlocked?: boolean;
   showProgress?: boolean;
 }) => {
+  const isMobileView = useResponsiveStore((state) => state.isMobile);
+
   const achievementData = data || achievementsMap.get(id);
   if (!achievementData) return null;
-  
+
   const { Icon, rarity, description, name, getProgress } = achievementData;
-  const isMobileView = useResponsiveStore((state) => state.isMobile);
 
   const rawProgress = context && getProgress ? getProgress(context) : undefined;
   const progress = (rawProgress && showProgress && !isUnlocked) ? {

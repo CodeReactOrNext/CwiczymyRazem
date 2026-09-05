@@ -9,6 +9,7 @@ export const LIBRARY_TABS: PageTab[] = [
 export const PROGRESS_TABS: PageTab[] = [
   { label: "Activity", href: "/profile/activity" },
   { label: "Practice Log", href: "/practice-log" },
+  { label: "Achievements", href: "/profile/achievements" },
 ];
 
 export const LEADERBOARD_TABS: PageTab[] = [

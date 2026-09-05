@@ -7,7 +7,7 @@ import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
+import { EarnedAchievementsList } from "feature/achievements";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
@@ -303,7 +303,7 @@ const ProfileLayout = ({
                   {achievements?.length || 0}
                 </span>
               </div>
-              <AchievementWrapper userAchievements={achievements ?? []} />
+              <EarnedAchievementsList userAchievements={achievements ?? []} />
             </div>
           )}
         </div>

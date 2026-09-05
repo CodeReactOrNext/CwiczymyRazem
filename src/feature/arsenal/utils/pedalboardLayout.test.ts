@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { EFFECT_DEFINITIONS } from "../data/effectDefinitions";
 import { BOARD_TIERS } from "../data/rigHardware";
 import type {
   EffectInventoryItem,
@@ -7,7 +8,11 @@ import type {
 } from "../types/arsenal.types";
 import {
   collidesWithAny,
+  createDcResolver,
   createJackResolver,
+  DEFAULT_DC_JACK,
+  EFFECT_DC_JACK,
+  EFFECT_IMAGE_ASPECT,
   EFFECT_JACK_Y,
   findFreeSpot,
   findSwapTarget,
@@ -381,6 +386,56 @@ describe("createJackResolver", () => {
     const resolve = createJackResolver([]);
     expect(resolve("nobody")).toEqual(SIDE_JACKS);
   });
+
+  it("takes power where its own artwork prints the inlet, not mid-edge", () => {
+    // Effect 3 is a Friedman-style box: `9V DC IN` is the last nut on the top
+    // strip, well right of centre, while its signal pair stays on the sides.
+    const resolve = createJackResolver([owned("forge", 3)]);
+    const jacks = resolve("forge");
+
+    expect(jacks.edge).toBe("side");
+    expect(jacks.dc).toEqual(EFFECT_DC_JACK[3]);
+    // A nut standing on the edge: the plug's tip goes to the edge itself.
+    expect(jacks.dc?.y).toBe(0);
+    expect(createDcResolver(resolve)("forge").x).toBeGreaterThan(0.75);
+  });
+
+  it("seats the plug down in a socket drawn flush on the top face", () => {
+    // Effect 2, the TS-808, draws its square DC jack on the enclosure's top
+    // face, a unit or so in from the edge — so the tip has to go in that far.
+    const dc = createDcResolver(createJackResolver([owned("ts", 2)]))("ts");
+    expect(dc.x).toBeCloseTo(0.5, 1);
+    expect(dc.y).toBeGreaterThan(0.03);
+  });
+
+  it("keeps the inlet on the middle of the edge for an enclosure with a nut there", () => {
+    // Effect 7, the Red Forge Mini, has a black barrel jack dead centre, proud
+    // of the top edge — exactly what the default assumes.
+    const resolve = createJackResolver([owned("mini", 7)]);
+    expect(resolve("mini").dc).toBeUndefined();
+    expect(createDcResolver(resolve)("mini")).toEqual(DEFAULT_DC_JACK);
+  });
+});
+
+describe("EFFECT_DC_JACK", () => {
+  it("only lists side-mounted pedals that exist, at a sane spot on the box", () => {
+    for (const [imageId, dc] of Object.entries(EFFECT_DC_JACK)) {
+      const owners = EFFECT_DEFINITIONS.filter(
+        (effect) => String(effect.imageId) === imageId,
+      );
+      expect(owners.length, imageId).toBeGreaterThan(0);
+      // A top-mounted pedal carries its `dc` on the definition instead.
+      expect(
+        owners.every((effect) => !effect.jacks),
+        imageId,
+      ).toBe(true);
+      expect(dc.x, imageId).toBeGreaterThan(0.05);
+      expect(dc.x, imageId).toBeLessThan(0.95);
+      // On the edge, or a little way down the top face — never mid-pedal.
+      expect(dc.y, imageId).toBeGreaterThanOrEqual(0);
+      expect(dc.y, imageId).toBeLessThan(0.08);
+    }
+  });
 });
 
 /**
@@ -507,6 +562,28 @@ describe("a board that changes case", () => {
     const counts = BOARD_TIERS.map((tier) => slotEstimate(geometryFor(tier)));
     for (let i = 1; i < counts.length; i++) {
       expect(counts[i]).toBeGreaterThan(counts[i - 1]);
+    }
+  });
+});
+
+describe("EFFECT_IMAGE_ASPECT", () => {
+  /**
+   * A pedal missing from this table falls back to `DEFAULT_ASPECT`, which is a
+   * wide enclosure — so a tall compact one renders about half as wide again as
+   * it should. The interactive board hides it by measuring the loaded image;
+   * the read-only board on a profile does not, which is where it shows up.
+   */
+  it("knows the proportions of every pedal in the game", () => {
+    const missing = EFFECT_DEFINITIONS.filter(
+      (effect) => EFFECT_IMAGE_ASPECT[effect.imageId] === undefined,
+    );
+    expect(missing.map((effect) => `${effect.id}:${effect.name}`)).toEqual([]);
+  });
+
+  it("keeps every entry a sane, portrait-or-wider ratio", () => {
+    for (const [imageId, aspect] of Object.entries(EFFECT_IMAGE_ASPECT)) {
+      expect(aspect, imageId).toBeGreaterThan(0.4);
+      expect(aspect, imageId).toBeLessThan(2);
     }
   });
 });

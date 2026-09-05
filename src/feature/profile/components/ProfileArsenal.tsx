@@ -3,11 +3,12 @@ import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCar
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import type { PoweredPedal } from "feature/arsenal/components/Rig/PowerLoom";
-import { PowerLoom, PowerRail } from "feature/arsenal/components/Rig/PowerLoom";
 import {
-  BoardJack,
-  SignalCable,
-} from "feature/arsenal/components/Rig/SignalCable";
+  PedalDcPlug,
+  PowerLoom,
+  PowerRail,
+} from "feature/arsenal/components/Rig/PowerLoom";
+import { SignalCable } from "feature/arsenal/components/Rig/SignalCable";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import {
@@ -211,6 +212,12 @@ interface PedalReadonlyProps {
   wPct: number;
   /** False when nothing on the brick is feeding it, so it is drawn switched off. */
   powered: boolean;
+  /**
+   * Where the DC plug sits on it, in fractions of its own box — `null` when no
+   * cable is in it. Separate from `powered` because a board saved before the
+   * brick existed is lit without a single cable on it.
+   */
+  plug: { x: number; y: number } | null;
   effectInventory: ArsenalUserData["effectInventory"];
   onHover: (e: React.MouseEvent, data: TooltipData | null) => void;
   onSelect: (content: React.ReactNode) => void;
@@ -221,6 +228,7 @@ const PedalReadonly = ({
   placement,
   wPct,
   powered,
+  plug,
   effectInventory,
   onHover,
   onSelect,
@@ -270,6 +278,10 @@ const PedalReadonly = ({
         className='h-full w-full object-contain'
         draggable={false}
       />
+      {/* The plug in its inlet, over the artwork — the same one the owner's
+          board draws, so a socket set into the top face reads as filled here
+          too. */}
+      {plug && <PedalDcPlug dc={plug} widthUnits={(wPct / 100) * geo.viewW} />}
       <div
         className='absolute bottom-[10%] left-1/2 -translate-x-1/2 rounded-full'
         style={{
@@ -526,9 +538,6 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                   ? "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(52,211,153,0.10), inset 0 0 44px rgba(16,185,129,0.11)"
                   : "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.02)",
               }}>
-              <BoardJack kind='in' />
-              <BoardJack kind='out' />
-
               {/* Power under everything, picking up where the rail's stubs
                   left off at the deck's top edge. */}
               <PowerLoom
@@ -556,6 +565,11 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
                   placement={placement}
                   wPct={widthOf(placement.itemId)}
                   powered={isPowered(placement.itemId)}
+                  plug={
+                    power.poweredIds.has(placement.itemId)
+                      ? dcOf(placement.itemId)
+                      : null
+                  }
                   effectInventory={effectInventory ?? []}
                   onHover={handleTooltip}
                   onSelect={setPinnedCard}

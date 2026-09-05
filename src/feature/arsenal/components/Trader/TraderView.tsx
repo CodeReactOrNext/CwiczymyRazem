@@ -10,6 +10,7 @@ import type {
   TraderModOffer,
   TraderPartOffer,
 } from "../../types/trader.types";
+import { SectionLabel } from "../SectionLabel";
 import { ItemOfferCard } from "./ItemOfferCard";
 import { ModOfferCard } from "./ModOfferCard";
 import { PartOfferCard } from "./PartOfferCard";
@@ -21,6 +22,10 @@ import { RestockTimer } from "./RestockTimer";
  * Everything on it is derived from the current window, so this renders with no
  * request of its own — the only thing it needs from the server is what the player
  * has already taken today, which rides along with the arsenal data.
+ *
+ * Two shelves, built the same way: a caption, a heading, and a grid of cards on
+ * one shared surface. The parts shelf used to be the only one on a panel, with
+ * the featured gear floating loose underneath it.
  */
 export const TraderView = () => {
   const shop = useTraderShop();
@@ -59,16 +64,12 @@ export const TraderView = () => {
   };
 
   return (
-    <div className='flex flex-col gap-12'>
-      <section className='flex flex-col gap-6 rounded-xl bg-zinc-900/40 p-6'>
+    <div className='flex flex-col gap-8'>
+      <section className='flex flex-col gap-6 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
         <div className='flex flex-wrap items-end justify-between gap-x-8 gap-y-4'>
-          <div className='flex flex-col gap-0.5'>
-            <p className='text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500'>
-              Today at the counter
-            </p>
-            <p className='text-base font-black capitalize tracking-wide text-white'>
-              Parts &amp; mods
-            </p>
+          <div className='flex flex-col gap-1.5'>
+            <SectionLabel>Today at the counter</SectionLabel>
+            <h2 className='text-xl font-black text-white'>Parts &amp; mods</h2>
           </div>
           <RestockTimer restockAt={shop.restockAt} />
         </div>
@@ -102,14 +103,10 @@ export const TraderView = () => {
       </section>
 
       {items.length > 0 && (
-        <section className='flex flex-col gap-6'>
-          <div className='flex flex-col gap-0.5'>
-            <p className='text-[9px] font-bold capitalize tracking-[0.2em] text-zinc-500'>
-              Four picks, rolled fresh every day
-            </p>
-            <p className='text-base font-black capitalize tracking-wide text-white'>
-              Featured gear
-            </p>
+        <section className='flex flex-col gap-6 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+          <div className='flex flex-col gap-1.5'>
+            <SectionLabel>Rolled fresh every day</SectionLabel>
+            <h2 className='text-xl font-black text-white'>Featured gear</h2>
           </div>
 
           <div className='grid grid-cols-1 gap-4 xsm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>

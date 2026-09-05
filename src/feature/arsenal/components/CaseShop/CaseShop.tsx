@@ -6,9 +6,11 @@ import { DailyCaseCard } from "./DailyCaseCard";
 
 interface CaseShopProps {
   currentFame: number;
-  onOpenCase: (caseType: CaseType) => void;
+  onOpenCase: (caseType: CaseType, useToken?: boolean) => void;
   isOpening: boolean;
   lastResult: OpenCaseResult | null;
+  /** Free cases from achievement rewards — spendable on any card on the shelf. */
+  freeTokens?: number;
 }
 
 /** Ordered as the price ladder reads: Premium pair first, then the Elite pair,
@@ -28,8 +30,10 @@ export const CaseShop = ({
   currentFame,
   onOpenCase,
   isOpening,
+  freeTokens = 0,
 }: CaseShopProps) => {
-  const openCard = (id: string) => onOpenCase(id as CaseType);
+  const openCard = (id: string, useToken?: boolean) =>
+    onOpenCase(id as CaseType, useToken);
 
   return (
     <div className='flex w-full flex-col gap-8'>
@@ -37,6 +41,7 @@ export const CaseShop = ({
         currentFame={currentFame}
         onOpen={openCard}
         isOpening={isOpening}
+        freeTokens={freeTokens}
       />
 
       {/* The permanent shelf. Standard and Supporter take the top row two-up —
@@ -51,6 +56,7 @@ export const CaseShop = ({
               currentFame={currentFame}
               onOpen={openCard}
               isOpening={isOpening}
+              freeTokens={freeTokens}
             />
           ))}
         </div>
@@ -62,6 +68,7 @@ export const CaseShop = ({
               currentFame={currentFame}
               onOpen={openCard}
               isOpening={isOpening}
+              freeTokens={freeTokens}
             />
           ))}
         </div>

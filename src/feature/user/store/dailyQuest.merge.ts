@@ -42,12 +42,14 @@ export const isSameQuest = (
  * over newer progress, and completed tasks "reset" hours later. Merging instead
  * means progress only ever moves forward.
  *
- * `today` is the server date key (UTC): on a day boundary the copy that belongs
- * to the current server day wins, so a stale client can never resurrect
- * yesterday's quest and a client that just rolled over can publish the new set.
- * Because every client derives that key from the same clock, two devices in
- * different timezones no longer disagree about which quest is current — the
- * tie-break below is now only reachable via a genuinely wrong device clock.
+ * `today` is the quest day key, resolved in the timezone the player's profile
+ * carries: on a day boundary the copy that belongs to the current day wins, so
+ * a stale client can never resurrect yesterday's quest and a client that just
+ * rolled over can publish the new set. Because every client derives that key
+ * from the same stored zone rather than from its own clock, a phone and a
+ * laptop in different places still agree on which quest is current — the
+ * tie-break below is only reachable while a client is holding a key from an
+ * older sense of the day (see `questDay`).
  */
 export const mergeDailyQuests = (
   local: DailyQuest | null | undefined,

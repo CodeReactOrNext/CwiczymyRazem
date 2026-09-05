@@ -1,7 +1,7 @@
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { PROGRESS_TABS } from "constants/navTabs";
 import { PracticeLogView } from "feature/practiceLog/view/PracticeLogView";
+import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
 import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
@@ -9,6 +9,7 @@ import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 
 const PracticeLogPage: NextPageWithLayout = () => {
+  const tabs = useProgressTabs();
   const router = useRouter();
 
   return (
@@ -24,7 +25,7 @@ const PracticeLogPage: NextPageWithLayout = () => {
       />
       <div className="mb-6 px-4 md:px-6">
         <PageTabs
-          tabs={PROGRESS_TABS}
+          tabs={tabs}
           activeHref="/practice-log"
           ariaLabel="Progress sections"
         />

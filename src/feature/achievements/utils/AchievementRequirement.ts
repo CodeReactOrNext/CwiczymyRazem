@@ -1,4 +1,5 @@
 import type { AchievementCheck, AchievementProgress } from "feature/achievements/types";
+import type { GuitarRarity } from "feature/arsenal/types/arsenal.types";
 import type { HabbitsType } from "feature/user/view/ReportView/ReportView.types";
 import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface, StatisticsTime } from "types/api.types";
@@ -32,6 +33,13 @@ export class AchievementRequirement {
   static habitPresent = (habit: HabbitsType): AchievementCheck =>
     (ctx) => ctx.inputData.habbits.includes(habit);
 
+  static rigLevel = (min: number): AchievementCheck =>
+    (ctx) => ctx.arsenal.rigLevel >= min;
+
+  /** Owns at least one item minted at this rarity, guitar or pedal. */
+  static ownsRarity = (rarity: GuitarRarity): AchievementCheck =>
+    (ctx) => ctx.arsenal.ownedByRarity[rarity] > 0;
+
   static getProgressFor = {
     songCount: (listName: keyof SongListInterface, min: number) => (ctx: any): AchievementProgress => ({
       current: ctx.songLists[listName].length,
@@ -42,6 +50,12 @@ export class AchievementRequirement {
     achievementCount: (min: number) => (ctx: any): AchievementProgress => ({
       current: ctx.statistics.achievements.length,
       max: min,
+    }),
+
+    rigLevel: (min: number) => (ctx: any): AchievementProgress => ({
+      current: ctx.arsenal.rigLevel,
+      max: min,
+      unit: "lvl",
     }),
 
     statThreshold: (path: keyof StatisticsDataInterface, min: number, unit?: AchievementProgress["unit"]) => (ctx: any): AchievementProgress => {

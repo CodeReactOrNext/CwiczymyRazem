@@ -18,6 +18,7 @@ import { pickCuratedDrop } from "feature/arsenal/utils/curatedDraw";
 import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import type { DocumentReference,Transaction } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
+import { readRewardLedger } from "lib/rewards/rewardLedger";
 import { getSlatePool } from "lib/supporterCase/supporterCase";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
@@ -86,7 +87,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken, caseType } = req.body as { idToken: string; caseType: CaseType };
+  const { idToken, caseType, useToken } = req.body as {
+    idToken: string;
+    caseType: CaseType;
+    /** Spend a free case instead of Fame. Any case on the shelf takes one. */
+    useToken?: boolean;
+  };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
 
@@ -113,10 +119,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       capturedUserData = data;
       const currentFame: number = data.statistics?.fame || 0;
 
-      if (currentFame < caseDef.fameCost) throw new Error("INSUFFICIENT_FAME");
+      // A free case is worth more than the Fame the badge behind it also paid,
+      // because it is spendable on the Elite pair as readily as on Standard —
+      // the shelf's price ladder is exactly what a token ignores.
+      const freeCases = readRewardLedger(data).caseTokens;
+      const payWithToken = useToken === true;
+
+      if (payWithToken && freeCases < 1) throw new Error("NO_FREE_CASE");
+      if (!payWithToken && currentFame < caseDef.fameCost) {
+        throw new Error("INSUFFICIENT_FAME");
+      }
 
       const existingEquipped = data.arsenal?.equippedGuitarId ?? data.selectedGuitar ?? null;
-      const newFame = currentFame - caseDef.fameCost;
+      const newFame = payWithToken ? currentFame : currentFame - caseDef.fameCost;
+      const caseTokens = payWithToken ? freeCases - 1 : freeCases;
+      // Decremented rather than set, so a token granted by a claim that landed
+      // mid-transaction is not quietly spent along with this one.
+      const tokenSpend = payWithToken
+        ? { "rewards.caseTokens": FieldValue.increment(-1) }
+        : {};
 
       // What the Dex already has, for the new-item bias below. Built once here
       // rather than per draw site, and read from the stored document — the
@@ -208,6 +229,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const newInventory = [...(data.arsenal?.inventory || []), newItem];
 
         t.update(userRef, {
+          ...tokenSpend,
           "statistics.fame": newFame,
           "arsenal.inventory": newInventory,
           "arsenal.equippedGuitarId": existingEquipped,
@@ -216,7 +238,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
         t.set(serialRef, { count: serial }, { merge: true });
 
-        return { type: "guitar", guitar, newItem, newInventory, newFame, isNewToDex };
+        return { type: "guitar", guitar, newItem, newInventory, newFame, isNewToDex, caseTokens, usedToken: payWithToken };
       } else {
         // Draw effect
         let effect: EffectDefinition;
@@ -258,6 +280,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const newEffectInventory = [...(data.arsenal?.effectInventory || []), effectItem];
 
         t.update(userRef, {
+          ...tokenSpend,
           "statistics.fame": newFame,
           "arsenal.effectInventory": newEffectInventory,
           // Discovery is permanent — recorded on the pull, never removed on a sale.
@@ -265,7 +288,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
         t.set(effectSerialRef, { count: effectSerial }, { merge: true });
 
-        return { type: "effect", effect, effectItem, newFame, isNewToDex };
+        return { type: "effect", effect, effectItem, newFame, isNewToDex, caseTokens, usedToken: payWithToken };
       }
     });
 
@@ -298,6 +321,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error: any) {
     if (error.message === "INSUFFICIENT_FAME") {
       return res.status(400).json({ error: "Not enough Fame Points" });
+    }
+    if (error.message === "NO_FREE_CASE") {
+      return res.status(400).json({ error: "No free cases left" });
     }
     if (error.message === "USER_NOT_FOUND") {
       return res.status(404).json({ error: "User not found" });

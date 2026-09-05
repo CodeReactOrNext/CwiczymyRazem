@@ -1,8 +1,10 @@
 import { useId } from "react";
 
 import type { Point } from "../../utils/cableGeometry";
+import { PEDAL_H } from "../../utils/pedalboardLayout";
 import type { DcTarget, RailGeometry, RowSpan } from "../../utils/powerLayout";
 import {
+  BAY_TOP,
   DC_BRICK_PLUG_REACH,
   DC_COLLAR_H,
   DC_JACKET_W,
@@ -39,7 +41,8 @@ import {
  * (`z-index: 0` against their 1 and 2), which is the order they stack in on a
  * real board — power runs beneath everything, disappears under the enclosures
  * and shows in the gaps between them. Most of a tidy loom is hidden, and that is
- * correct.
+ * correct. The one part of it that must not be hidden is the plug in the pedal,
+ * which is why that is drawn by the pedal itself — see `PedalDcPlug`.
  */
 
 /** Jacket, and the amber thread of current down the middle of it. */
@@ -51,6 +54,8 @@ const DC_CORE_LIVE = "#f59e0b";
 const BRICK_FACE = "#17181c";
 const BRICK_EDGE = "#0a0a0c";
 const COPPER = "#b45309";
+/** The machined edges that catch the light: chamfers, screw heads, grooves. */
+const BRICK_BRIGHT = "#5c626d";
 
 interface DcPlugProps {
   at: Point;
@@ -75,7 +80,8 @@ interface DcPlugProps {
  * Both ends of a cable get one, because a cable that is moulded into a pedal at
  * one end and welded to the brick at the other is not a cable a player believes
  * they can pull. The plug is the affordance — the unplug button sits right on
- * top of the pedal's, and this is what it looks like it is for.
+ * top of the pedal's, and this is what it looks like it is for. The brick end
+ * is drawn here on the rail; the pedal end by `PedalDcPlug`, on the pedal.
  */
 const DcPlug = ({
   at: point,
@@ -87,59 +93,150 @@ const DcPlug = ({
   /** The body, top-down, whichever way it is facing. */
   const top = Math.min(point.y, back);
   /** …and the two bands on it: the collar at the socket, the boot at the cable. */
-  const collarY = dir < 0 ? point.y - DC_COLLAR_H : point.y;
-  const bootY = dir < 0 ? top : back - DC_COLLAR_H * 0.7;
+  const collarY = dir < 0 ? point.y - DC_COLLAR_H : point.y - 0.06;
+  const bootY = dir < 0 ? top : back - DC_COLLAR_H * 0.9;
 
   return (
     <g>
-      {/* The shadow it drops on whatever it is standing on. */}
-      <ellipse
-        cx={point.x + 0.25}
-        cy={(point.y + back) / 2 + 0.2}
-        rx={half + 0.42}
-        ry={reach / 2 + 0.3}
+      {/* The shadow it drops on whatever it is standing on. Cast off to one
+          side rather than ringed around it, so the plug seats on the metal
+          instead of glowing against it. */}
+      <rect
+        x={point.x - half + 0.3}
+        y={top + 0.22}
+        width={half * 2}
+        height={reach}
+        rx={half * 0.55}
         fill='#000000'
-        opacity={0.4}
+        opacity={0.45}
       />
-      {/* The moulded body, lit down one side so it reads as round. */}
+      {/* The moulded barrel, lit down one side and turning away on the other,
+          which is the whole of what makes it round at this size. */}
       <rect
         x={point.x - half}
         y={top}
         width={half * 2}
         height={reach}
-        rx={0.32}
-        fill='#1c1d22'
+        rx={half * 0.5}
+        fill='#15161a'
       />
       <rect
         x={point.x - half}
         y={top}
-        width={half * 0.75}
+        width={half * 0.6}
         height={reach}
-        rx={0.32}
+        rx={half * 0.42}
         fill='#ffffff'
-        opacity={0.08}
+        opacity={0.11}
       />
-      {/* The strain-relief boot the cable leaves through. */}
       <rect
-        x={point.x - half - 0.06}
-        y={bootY}
-        width={half * 2 + 0.12}
-        height={DC_COLLAR_H * 0.7}
-        rx={0.16}
+        x={point.x + half * 0.44}
+        y={top}
+        width={half * 0.56}
+        height={reach}
+        rx={half * 0.42}
         fill='#000000'
-        opacity={0.5}
+        opacity={0.38}
       />
-      {/* …and the collar seated against the socket. */}
+      {/* The strain-relief boot the cable leaves through — narrower than the
+          barrel, because that is the step a moulded plug has. */}
       <rect
-        x={point.x - half - 0.12}
-        y={collarY}
-        width={half * 2 + 0.24}
-        height={DC_COLLAR_H}
+        x={point.x - half * 0.64}
+        y={bootY}
+        width={half * 1.28}
+        height={DC_COLLAR_H * 0.9}
         rx={0.15}
+        fill='#0c0d10'
+      />
+      {/* …and the collar seated against the socket, which is what covers the
+          hole: a plugged jack is a jack nobody can see any more. A band round
+          the barrel, not a plate on the end of it — the same copper as the
+          outputs, and no wider than the body it belongs to. */}
+      <rect
+        x={point.x - half - 0.04}
+        y={collarY}
+        width={half * 2 + 0.08}
+        height={DC_COLLAR_H * 0.78}
+        rx={0.13}
         fill={COPPER}
-        opacity={0.75}
+        opacity={0.62}
+      />
+      <rect
+        x={point.x - half - 0.04}
+        y={collarY}
+        width={half * 2 + 0.08}
+        height={DC_COLLAR_H * 0.3}
+        rx={0.1}
+        fill='#ffffff'
+        opacity={0.15}
+      />
+      <rect
+        x={point.x - half - 0.04}
+        y={collarY + DC_COLLAR_H * 0.78}
+        width={half * 2 + 0.08}
+        height={0.11}
+        fill='#000000'
+        opacity={0.45}
       />
     </g>
+  );
+};
+
+/**
+ * How far the back of a plug seated in a socket on the enclosure's top face
+ * stands above the edge of it — so the cable coming down the margin is seen
+ * going into the boot rather than vanishing under the artwork a hair short of
+ * it.
+ */
+const DC_PLUG_CLEAR = 0.45;
+
+interface PedalDcPlugProps {
+  /** The inlet, as a fraction of the pedal's own box — what a `DcResolver` gives. */
+  dc: { x: number; y: number };
+  /** The pedal's width in board units. Its height is always `PEDAL_H` tall. */
+  widthUnits: number;
+}
+
+/**
+ * The pedal end of a DC cable, drawn on the pedal rather than on the loom.
+ *
+ * The loom runs under the enclosures, which is right for cable and wrong for
+ * the plug: a plug is the one part that has to be seen *in* its socket, and a
+ * good few enclosures draw that socket flush on the top face, a unit or so in
+ * from the edge — the EchoPath, the TS-808, the Stellar OD, the Amber Forge
+ * Wood. A plug painted under the artwork stops dead at the edge and leaves the
+ * hole showing beside it. So it lives inside the pedal's own element, over the
+ * image and under the unplug control, in a box sized in board units and placed
+ * in fractions of the pedal — which is also what lets it move with a drag and
+ * dim with the rest of the enclosure without anything having to follow it.
+ *
+ * The body is at least as long as the brick end's, and longer when the socket
+ * is set into the face: however deep the seat, the back of the plug clears the
+ * edge by `DC_PLUG_CLEAR`, so the cable coming down the margin visibly goes in.
+ */
+export const PedalDcPlug = ({ dc, widthUnits }: PedalDcPlugProps) => {
+  // Ten view units to the board unit — the scale both looms draw in.
+  const heightUnits = PEDAL_H * 10;
+  const tip = dc.y * heightUnits;
+  const reach = Math.max(DC_PLUG_REACH, tip + DC_PLUG_CLEAR);
+  /** Room either side for the body and the shadow it casts off to the right. */
+  const half = DC_PLUG_HALF_W + 0.7;
+  const top = tip - reach - 0.3;
+  const bottom = tip + 0.4;
+
+  return (
+    <svg
+      viewBox={`${-half} ${top.toFixed(3)} ${half * 2} ${(bottom - top).toFixed(3)}`}
+      className='pointer-events-none absolute -translate-x-1/2'
+      style={{
+        left: `${dc.x * 100}%`,
+        top: `${(top / heightUnits) * 100}%`,
+        width: `${((half * 2) / widthUnits) * 100}%`,
+        height: `${((bottom - top) / heightUnits) * 100}%`,
+      }}
+      aria-hidden>
+      <DcPlug at={{ x: 0, y: tip }} reach={reach} />
+    </svg>
   );
 };
 
@@ -189,6 +286,8 @@ export const PowerRail = ({
   const face = `${uid}-face`;
   const cap = `${uid}-cap`;
   const bay = `${uid}-bay`;
+  const sheen = `${uid}-sheen`;
+  const halo = `${uid}-halo`;
 
   const { brick, supply } = rail;
   /** What is silkscreened on it: whose it is, and how many pedals it feeds. */
@@ -200,14 +299,26 @@ export const PowerRail = ({
     (socket) => used.has(socket.index) || socket.index === pending,
   );
 
-  /** The cast end blocks, and the stretch of extrusion left between them. */
-  const CAP_W = 3.4;
-  const inner = { x: brick.x + CAP_W, w: brick.w - CAP_W * 2 };
+  /**
+   * The cast end blocks, and the stretch of extrusion left between them.
+   *
+   * Capped as a share of the body as well as in units, because the smallest
+   * brick in the shop is a quarter the length of the biggest and a fixed block
+   * would eat most of its face.
+   */
+  const capW = Math.min(3.6, brick.w * 0.13);
+  const inner = { x: brick.x + capW, w: brick.w - capW * 2 };
+  const bottom = brick.y + brick.h;
   /** The bay the outputs are recessed into, milled along the underside. */
-  const bayTop = brick.y + 2.86;
-  const bayBottom = brick.y + brick.h - 0.22;
+  const bayTop = brick.y + brick.h * BAY_TOP;
+  const bayBottom = bottom - 0.24;
   /** The row of pilot LEDs, on the face just above it. */
-  const ledY = brick.y + 2.3;
+  const ledY = brick.y + brick.h * 0.446;
+  /** …and the silkscreen, on the clear stretch of face above them. */
+  const nameY = brick.y + brick.h * 0.29;
+  /** Where the mains lead leaves the left cap, and how far it has to travel. */
+  const leadY = brick.y + brick.h * 0.44;
+  const leadRun = brick.x + 3;
 
   /**
    * The name, split where a brand splits: the make in ink, the model number in
@@ -229,24 +340,47 @@ export const PowerRail = ({
         {/* Brushed aluminium: lit in bands rather than in one smooth ramp. The
             little reversals are what read as grain instead of as a gradient. */}
         <linearGradient id={face} x1='0' y1='0' x2='0' y2='1'>
-          <stop offset='0%' stopColor='#3a3d45' />
-          <stop offset='14%' stopColor='#2a2c33' />
-          <stop offset='31%' stopColor='#34373e' />
-          <stop offset='53%' stopColor={BRICK_FACE} />
-          <stop offset='75%' stopColor='#24262c' />
-          <stop offset='100%' stopColor='#111216' />
+          <stop offset='0%' stopColor='#43464f' />
+          <stop offset='7%' stopColor='#2e3138' />
+          <stop offset='19%' stopColor='#383b43' />
+          <stop offset='34%' stopColor='#2a2c33' />
+          <stop offset='52%' stopColor={BRICK_FACE} />
+          <stop offset='72%' stopColor='#212329' />
+          <stop offset='90%' stopColor='#15161a' />
+          <stop offset='100%' stopColor='#0e0f12' />
         </linearGradient>
+        {/* A cast end block is grittier than the extrusion and turns over
+            harder at the top, because it is a thicker piece of metal. */}
         <linearGradient id={cap} x1='0' y1='0' x2='0' y2='1'>
-          <stop offset='0%' stopColor='#31343c' />
-          <stop offset='45%' stopColor='#1a1c21' />
-          <stop offset='100%' stopColor='#0b0c0f' />
+          <stop offset='0%' stopColor='#3c3f47' />
+          <stop offset='22%' stopColor='#23252b' />
+          <stop offset='60%' stopColor='#16171b' />
+          <stop offset='100%' stopColor='#08090b' />
         </linearGradient>
         {/* The bay is a hole, so it is darkest at the top, under the lip. */}
         <linearGradient id={bay} x1='0' y1='0' x2='0' y2='1'>
           <stop offset='0%' stopColor='#000000' />
           <stop offset='45%' stopColor='#0a0b0d' />
-          <stop offset='100%' stopColor='#191a1f' />
+          <stop offset='100%' stopColor='#1c1d23' />
         </linearGradient>
+        {/* One soft sweep of light down the length of it. A metre of extrusion
+            is never lit evenly end to end, and the unevenness is most of what
+            separates a machined body from a rounded rectangle. */}
+        <linearGradient id={sheen} x1='0' y1='0' x2='1' y2='0'>
+          <stop offset='0%' stopColor='#ffffff' stopOpacity={0} />
+          <stop offset='16%' stopColor='#ffffff' stopOpacity={0.05} />
+          <stop offset='30%' stopColor='#ffffff' stopOpacity={0} />
+          <stop offset='58%' stopColor='#ffffff' stopOpacity={0.065} />
+          <stop offset='76%' stopColor='#ffffff' stopOpacity={0} />
+          <stop offset='93%' stopColor='#ffffff' stopOpacity={0.035} />
+          <stop offset='100%' stopColor='#ffffff' stopOpacity={0} />
+        </linearGradient>
+        {/* What a lit pilot lamp throws on the metal around it. */}
+        <radialGradient id={halo}>
+          <stop offset='0%' stopColor={DC_CORE_LIVE} stopOpacity={0.5} />
+          <stop offset='45%' stopColor={DC_CORE_LIVE} stopOpacity={0.16} />
+          <stop offset='100%' stopColor={DC_CORE_LIVE} stopOpacity={0} />
+        </radialGradient>
       </defs>
 
       {/* The stubs go down first, so each one disappears behind the enclosure
@@ -276,11 +410,13 @@ export const PowerRail = ({
         ))}
       </g>
 
-      {/* The mains lead, out of the left cap and away into the case. */}
+      {/* The mains lead, out of the left cap and away into the case. It always
+          leaves the frame, whatever the brick's length: a lead that stops in
+          mid-air on a short brick is a lead plugged into nothing. */}
       <path
-        d={`M ${brick.x + 0.4} ${brick.y + brick.h * 0.55} C ${brick.x - 10} ${
-          brick.y + brick.h * 0.52
-        } ${brick.x - 17} ${RAIL_H - 0.7} ${brick.x - 27} ${RAIL_H - 0.25}`}
+        d={`M ${brick.x + 0.4} ${leadY} C ${brick.x - leadRun * 0.34} ${
+          leadY + 0.25
+        } ${brick.x - leadRun * 0.66} ${RAIL_H - 0.75} ${-3} ${RAIL_H - 0.2}`}
         fill='none'
         stroke={DC_JACKET}
         strokeWidth={DC_JACKET_W + 0.25}
@@ -288,26 +424,46 @@ export const PowerRail = ({
       />
       {/* …and the strain-relief boot it leaves through. */}
       <rect
-        x={brick.x - 2.4}
-        y={brick.y + brick.h * 0.55 - 0.62}
-        width={2.8}
-        height={1.24}
-        rx={0.5}
+        x={brick.x - 2.5}
+        y={leadY - 0.68}
+        width={2.9}
+        height={1.36}
+        rx={0.55}
         fill='#1b1c21'
       />
+      <rect
+        x={brick.x - 2.5}
+        y={leadY - 0.68}
+        width={2.9}
+        height={0.4}
+        rx={0.2}
+        fill='#ffffff'
+        opacity={0.07}
+      />
 
-      {/* The shadow the whole thing sits in. */}
+      {/* The shadow the whole thing sits in — two passes, so it falls off
+          instead of stopping dead, and the brick reads as standing on the case
+          rather than as printed on it. */}
+      <rect
+        x={brick.x - 0.5}
+        y={brick.y + 1.1}
+        width={brick.w + 1}
+        height={brick.h}
+        rx={1}
+        fill='#000000'
+        opacity={0.3}
+      />
       <rect
         x={brick.x}
-        y={brick.y + 0.45}
+        y={brick.y + 0.4}
         width={brick.w}
         height={brick.h}
         rx={0.7}
         fill='#000000'
-        opacity={0.55}
+        opacity={0.6}
       />
 
-      {/* The extrusion, and the chamfer running along its top edge. */}
+      {/* The extrusion itself, and the sweep of light down the length of it. */}
       <rect
         x={brick.x}
         y={brick.y}
@@ -319,16 +475,61 @@ export const PowerRail = ({
         strokeWidth={0.2}
       />
       <rect
-        x={brick.x + 0.5}
-        y={brick.y + 0.16}
-        width={brick.w - 1}
-        height={0.16}
-        rx={0.08}
-        fill='#ffffff'
-        opacity={0.18}
+        x={brick.x}
+        y={brick.y}
+        width={brick.w}
+        height={brick.h}
+        rx={0.7}
+        fill={`url(#${sheen})`}
       />
 
-      {/* The bay the outputs are recessed into, and the lip overhanging it. */}
+      {/* The chamfer along the top edge: the hard line the light catches, and
+          the softer band falling away under it. */}
+      <rect
+        x={brick.x + 0.55}
+        y={brick.y + 0.1}
+        width={brick.w - 1.1}
+        height={0.13}
+        rx={0.07}
+        fill='#ffffff'
+        opacity={0.3}
+      />
+      <rect
+        x={brick.x + 0.55}
+        y={brick.y + 0.23}
+        width={brick.w - 1.1}
+        height={0.34}
+        fill='#ffffff'
+        opacity={0.06}
+      />
+
+      {/* Two grooves pulled the length of the extrusion, the way a die leaves
+          them. They are what says this body was drawn through something. */}
+      {[0.86, 1.06].map((at, index) => (
+        <rect
+          key={at}
+          x={inner.x - 1.4}
+          y={brick.y + at}
+          width={inner.w + 2.8}
+          height={index === 0 ? 0.14 : 0.08}
+          fill={index === 0 ? "#000000" : "#ffffff"}
+          opacity={index === 0 ? 0.45 : 0.11}
+        />
+      ))}
+
+      {/* …and the dark turn of the bottom edge, under everything else. */}
+      <rect
+        x={brick.x + 0.4}
+        y={bottom - 0.28}
+        width={brick.w - 0.8}
+        height={0.28}
+        fill='#000000'
+        opacity={0.45}
+      />
+
+      {/* The bay the outputs are recessed into: a hole, with the lip of the
+          face overhanging it and a thread of light off the bottom edge that
+          stands proud of it. */}
       <rect
         x={inner.x - 0.6}
         y={bayTop}
@@ -341,40 +542,88 @@ export const PowerRail = ({
         x={inner.x - 0.6}
         y={bayTop}
         width={inner.w + 1.2}
-        height={0.22}
-        rx={0.11}
+        height={0.55}
+        rx={0.2}
         fill='#000000'
-        opacity={0.7}
+        opacity={0.8}
+      />
+      <rect
+        x={inner.x - 0.4}
+        y={bayTop - 0.14}
+        width={inner.w + 0.8}
+        height={0.14}
+        fill='#ffffff'
+        opacity={0.16}
+      />
+      <rect
+        x={inner.x - 0.4}
+        y={bayBottom - 0.06}
+        width={inner.w + 0.8}
+        height={0.13}
+        fill='#ffffff'
+        opacity={0.12}
       />
 
-      {/* A cast end cap at each end, bolted through. */}
-      {[brick.x, brick.x + brick.w - CAP_W].map((x) => (
+      {/* A cast end cap at each end, bolted through top and bottom. Drawn over
+          the bay, because the block is solid where the extrusion is hollow. */}
+      {[brick.x, brick.x + brick.w - capW].map((x, side) => (
         <g key={x}>
           <rect
             x={x}
             y={brick.y}
-            width={CAP_W}
+            width={capW}
             height={brick.h}
             rx={0.7}
             fill={`url(#${cap})`}
           />
-          <circle
-            cx={x + CAP_W / 2}
-            cy={brick.y + brick.h / 2}
-            r={0.5}
-            fill='#0a0b0e'
-            stroke='#565c66'
-            strokeWidth={0.16}
+          {/* The seam where the block meets the extrusion: a shadowed joint,
+              and the lit edge of the block beside it. */}
+          <rect
+            x={side === 0 ? x + capW - 0.16 : x}
+            y={brick.y + 0.12}
+            width={0.16}
+            height={brick.h - 0.24}
+            fill='#000000'
+            opacity={0.55}
           />
-          {/* The slot, so it reads as a fastener rather than as a hole. */}
-          <line
-            x1={x + CAP_W / 2 - 0.28}
-            y1={brick.y + brick.h / 2 - 0.28}
-            x2={x + CAP_W / 2 + 0.28}
-            y2={brick.y + brick.h / 2 + 0.28}
-            stroke='#565c66'
-            strokeWidth={0.16}
+          <rect
+            x={side === 0 ? x + capW - 0.24 : x + 0.16}
+            y={brick.y + 0.12}
+            width={0.08}
+            height={brick.h - 0.24}
+            fill='#ffffff'
+            opacity={0.07}
           />
+          <rect
+            x={x + 0.5}
+            y={brick.y + 0.1}
+            width={capW - 1}
+            height={0.13}
+            rx={0.07}
+            fill='#ffffff'
+            opacity={0.26}
+          />
+          {[0.3, 0.72].map((at) => (
+            <g key={at}>
+              <circle
+                cx={x + capW / 2}
+                cy={brick.y + brick.h * at}
+                r={0.46}
+                fill='#0a0b0e'
+                stroke={BRICK_BRIGHT}
+                strokeWidth={0.15}
+              />
+              {/* The slot, so it reads as a fastener rather than as a hole. */}
+              <line
+                x1={x + capW / 2 - 0.25}
+                y1={brick.y + brick.h * at - 0.25}
+                x2={x + capW / 2 + 0.25}
+                y2={brick.y + brick.h * at + 0.25}
+                stroke={BRICK_BRIGHT}
+                strokeWidth={0.15}
+              />
+            </g>
+          ))}
         </g>
       ))}
 
@@ -388,85 +637,170 @@ export const PowerRail = ({
       ].map((pass) => (
         <text
           key={pass.ink}
-          x={inner.x + 0.8}
-          y={brick.y + 1.72 + pass.dy}
+          x={inner.x + 0.9}
+          y={nameY + pass.dy}
           fill={pass.ink}
           opacity={pass.opacity}
-          fontSize={1.3}
-          letterSpacing={0.38}
+          fontSize={1.5}
+          letterSpacing={0.44}
           fontFamily='ui-sans-serif, system-ui, sans-serif'
           fontWeight={800}>
           {brand.toUpperCase()}
           {model && (
             <tspan
-              dx={0.62}
+              dx={0.72}
               fill={pass.mark}
               fontWeight={700}
-              letterSpacing={0.14}>
+              letterSpacing={0.16}>
               {model}
             </tspan>
           )}
         </text>
       ))}
+      {/* The rating, on its own etched plate at the other end — where a spec is
+          stamped, and far enough from the name that neither is reading as part
+          of the other. */}
+      <rect
+        x={inner.x + inner.w - 0.4 - legend.length * 0.78}
+        y={nameY - 1.18}
+        width={legend.length * 0.78 + 0.4}
+        height={1.66}
+        rx={0.28}
+        fill='#000000'
+        opacity={0.42}
+      />
+      <rect
+        x={inner.x + inner.w - 0.4 - legend.length * 0.78}
+        y={nameY + 0.41}
+        width={legend.length * 0.78 + 0.4}
+        height={0.07}
+        rx={0.03}
+        fill='#ffffff'
+        opacity={0.12}
+      />
       <text
-        x={inner.x + inner.w - 0.7}
-        y={brick.y + 1.66}
+        x={inner.x + inner.w - 0.8}
+        y={nameY}
         textAnchor='end'
         fill={DC_CORE_LIVE}
-        opacity={live ? 0.5 : 0.28}
-        fontSize={1.14}
-        letterSpacing={0.14}
+        opacity={live ? 0.72 : 0.34}
+        fontSize={1.16}
+        letterSpacing={0.16}
         fontFamily='ui-sans-serif, system-ui, sans-serif'
         fontWeight={700}>
         {legend}
       </text>
 
-      {rail.sockets.map((socket) => (
-        <g key={socket.index}>
-          {/* The pilot LED, on the face directly above its own output. */}
-          {lit(socket.index) && (
+      {rail.sockets.map((socket) => {
+        const on = lit(socket.index);
+        /** A hole with a plug in it is a hole nobody can see. */
+        const open = !stubs.some((taken) => taken.index === socket.index);
+        return (
+          <g key={socket.index}>
+            {/* The pilot LED, on the face directly above its own output. It is
+                a lamp sunk in a bezel whether or not it is on, so an unused
+                output reads as dark rather than as missing. */}
+            {on && (
+              <circle cx={socket.x} cy={ledY} r={1.4} fill={`url(#${halo})`} />
+            )}
             <circle
               cx={socket.x}
               cy={ledY}
-              r={0.95}
-              fill={DC_CORE_LIVE}
-              opacity={0.22}
+              r={0.4}
+              fill='#08090b'
+              stroke='#33363d'
+              strokeWidth={0.09}
             />
-          )}
-          <circle
-            cx={socket.x}
-            cy={ledY}
-            r={0.3}
-            fill={lit(socket.index) ? "#fcd34d" : "#191a1e"}
-          />
+            <circle
+              cx={socket.x}
+              cy={ledY}
+              r={0.25}
+              fill={on ? "#f0a51c" : "#1a1b20"}
+            />
+            {on && (
+              <circle
+                cx={socket.x}
+                cy={ledY - 0.06}
+                r={0.12}
+                fill='#fef3c7'
+                opacity={0.9}
+              />
+            )}
 
-          {/* The output: a copper-ringed barrel jack sunk into the bay. */}
-          <circle
-            cx={socket.x}
-            cy={socket.y}
-            r={SOCKET_R + 0.22}
-            fill={COPPER}
-            opacity={lit(socket.index) ? 0.8 : 0.42}
-          />
-          <circle cx={socket.x} cy={socket.y} r={SOCKET_R} fill='#050506' />
-          {/* The centre pin every barrel jack has standing in it. */}
-          <circle
-            cx={socket.x}
-            cy={socket.y}
-            r={SOCKET_R * 0.28}
-            fill='#3d4149'
-          />
-          {/* One highlight off the rim, so it reads as metal, not as a dot. */}
-          <path
-            d={`M ${socket.x - SOCKET_R * 0.8} ${socket.y - SOCKET_R * 0.48} A ${SOCKET_R} ${SOCKET_R} 0 0 1 ${socket.x + SOCKET_R * 0.34} ${socket.y - SOCKET_R * 0.92}`}
-            fill='none'
-            stroke='#ffffff'
-            strokeWidth={0.16}
-            strokeLinecap='round'
-            opacity={0.28}
-          />
-        </g>
-      ))}
+            {/* The counterbore the jack is sunk into. Drawn whether or not the
+                hole is filled, because it is machined into the metal and a
+                plug sits down in it rather than on top of it. */}
+            <circle
+              cx={socket.x}
+              cy={socket.y}
+              r={SOCKET_R + 0.36}
+              fill='#000000'
+              opacity={0.55}
+            />
+
+            {/* The output itself: a copper-ringed barrel jack. Only while it is
+                empty — a plug's collar seats on the panel and covers the whole
+                of it, and drawing both is what turns a plugged output into a
+                pail with a handle. */}
+            {open && (
+              <>
+                <circle
+                  cx={socket.x}
+                  cy={socket.y}
+                  r={SOCKET_R + 0.2}
+                  fill={COPPER}
+                  opacity={0.45}
+                />
+                <circle
+                  cx={socket.x}
+                  cy={socket.y}
+                  r={SOCKET_R + 0.2}
+                  fill='none'
+                  stroke='#000000'
+                  strokeWidth={0.1}
+                  opacity={0.45}
+                />
+                <circle
+                  cx={socket.x}
+                  cy={socket.y}
+                  r={SOCKET_R}
+                  fill='#050506'
+                />
+                {/* The shadow the near lip of the hole casts down inside it. */}
+                <path
+                  d={`M ${socket.x - SOCKET_R} ${socket.y} A ${SOCKET_R} ${SOCKET_R} 0 0 1 ${socket.x + SOCKET_R} ${socket.y}`}
+                  fill='none'
+                  stroke='#000000'
+                  strokeWidth={0.3}
+                  opacity={0.75}
+                />
+                {/* The centre pin every barrel jack has standing in it. */}
+                <circle
+                  cx={socket.x}
+                  cy={socket.y}
+                  r={SOCKET_R * 0.3}
+                  fill='#41454e'
+                />
+                <circle
+                  cx={socket.x}
+                  cy={socket.y - SOCKET_R * 0.08}
+                  r={SOCKET_R * 0.14}
+                  fill='#767c88'
+                />
+                {/* One highlight off the rim, so it reads as metal, not a dot. */}
+                <path
+                  d={`M ${socket.x - SOCKET_R * 0.82} ${socket.y - SOCKET_R * 0.62} A ${SOCKET_R + 0.2} ${SOCKET_R + 0.2} 0 0 1 ${socket.x + SOCKET_R * 0.4} ${socket.y - SOCKET_R * 1.02}`}
+                  fill='none'
+                  stroke='#ffffff'
+                  strokeWidth={0.16}
+                  strokeLinecap='round'
+                  opacity={0.32}
+                />
+              </>
+            )}
+          </g>
+        );
+      })}
 
       {/* …and a plug in every output that has a cable in it, hanging out of the
           bay the way the pedal end stands on the enclosure. Drawn over the
@@ -519,7 +853,6 @@ export const PowerLoom = ({
     return {
       itemId: pedal.itemId,
       d: powerRun(rail, socket, pedal, risers),
-      jack: pedal.jack,
     };
   });
 
@@ -586,9 +919,8 @@ export const PowerLoom = ({
         )}
       </g>
 
-      {runs.map((run) => (
-        <DcPlug key={`plug-${run.itemId}`} at={run.jack} />
-      ))}
+      {/* Only the loose end gets its plug here: one seated in a pedal is drawn
+          by the pedal, over its own artwork — see `PedalDcPlug`. */}
       {dragging && <DcPlug at={dragging.to} />}
     </svg>
   );

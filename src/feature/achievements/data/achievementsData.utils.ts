@@ -2,6 +2,7 @@ import type { IconType } from "react-icons/lib";
 
 import type { AchievementCheck, AchievementList, AchievementsDataInterface } from "../types";
 
+
 export const achivFactor = (
   id: AchievementList,
   Icon: IconType,

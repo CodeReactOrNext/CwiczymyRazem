@@ -2,6 +2,7 @@
 
 import { Button } from "assets/components/ui/button";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { trackSignupCtaClicked } from "lib/signupFunnel";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -26,7 +27,9 @@ export const FinalCTASection = () => {
             </p>
 
             <div className='flex flex-col items-center'>
-              <Link href='/signup'>
+              <Link
+                href='/signup'
+                onClick={() => trackSignupCtaClicked('landing_final')}>
                 <Button className='group/btn h-14 w-full rounded-lg border-none bg-white px-10 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98] sm:w-auto'>
                   <span className='flex items-center gap-3'>
                     Start tracking free

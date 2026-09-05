@@ -5,6 +5,24 @@
   "empty": "Empty",
   "epic": "Epic",
 
+  "panel": {
+    "earnedHeadline": "{{owned}} of {{total}} achievements earned",
+    "globalColumn": "% of all players",
+    "readyHint": "Log practice to get achievement",
+    "earned": "Earned",
+    "rewards": {
+      "claim": "Claim",
+      "claimAll": "Collect all",
+      "claiming": "Collecting...",
+      "waiting": "{{count}} rewards waiting to be collected",
+      "waitingOne": "1 reward waiting to be collected",
+      "tokensHeld": "{{count}} free cases in hand - spend them on any case in the Arsenal.",
+      "tokensHeldOne": "1 free case in hand - spend it on any case in the Arsenal.",
+      "readyToCollect": "Reward ready to collect",
+      "onCompletion": "Reward for earning this",
+      "collected": "Reward already collected"
+    }
+  },
   "time_1": {
     "title": "Hard Work Pays Off",
     "description": "Exceed the 10 hour exercise threshold."
@@ -165,10 +183,6 @@
     "title": "100 days",
     "description": "This player has practiced for 100 days"
   },
-  "drowning": {
-    "title": "Dużo na głowie",
-    "description": "This player wanted to learn a lot of songs"
-  },
   "bomb": {
     "title": "Critical Situation",
     "description": "This player saved their streak"
@@ -250,6 +264,71 @@
     "title": "Ace of Diamonds",
     "description": "You have learned one hundred songs - you are a true ace!"
   },
+  "rig_50": {
+    "title": "Signal Path",
+    "description": "Build a rig worth 50 Rig Level."
+  },
+  "rig_150": {
+    "title": "Stage Ready",
+    "description": "Build a rig worth 150 Rig Level."
+  },
+  "rig_300": {
+    "title": "Studio Wall",
+    "description": "Build a rig worth 300 Rig Level."
+  },
+  "rig_500": {
+    "title": "Headliner Rig",
+    "description": "Build a rig worth 500 Rig Level."
+  },
+  "rig_800": {
+    "title": "Wall of Sound",
+    "description": "Build a rig worth 800 Rig Level."
+  },
+  "rig_1000": {
+    "title": "Four Figures",
+    "description": "Build a rig worth 1000 Rig Level."
+  },
+  "first_rare": {
+    "title": "Something Special",
+    "description": "Own your first Rare piece of gear."
+  },
+  "first_epic": {
+    "title": "Collector Grade",
+    "description": "Own your first Epic piece of gear."
+  },
+  "first_legendary": {
+    "title": "One of the Greats",
+    "description": "Own your first Legendary piece of gear."
+  },
+  "first_mythic": {
+    "title": "Holy Grail",
+    "description": "Own your first Mythic piece of gear."
+  },
+  "rarity_full_set": {
+    "title": "Full Spread",
+    "description": "Own gear of every rarity a case can drop."
+  },
+  "museum_1": {
+    "title": "Behind Glass",
+    "description": "Own a Museum Grade piece of gear."
+  },
+  "museum_5": {
+    "title": "Private Collection",
+    "description": "Own five Museum Grade pieces of gear."
+  },
+  "serial_one": {
+    "title": "Number One",
+    "description": "Own the very first unit ever minted of any model."
+  },
+  "globetrotter": {
+    "title": "Well Travelled",
+    "description": "Own gear built in eight different countries."
+  },
+  "vintage_1970": {
+    "title": "Older Than the Amp",
+    "description": "Own a guitar built before 1970."
+  },
+
   "performance": {
     "title": "Stage Debut",
     "description": "Log a full performance session — practice a song, put in 1h of technique, and hit record."

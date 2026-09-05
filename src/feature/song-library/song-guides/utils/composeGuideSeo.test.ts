@@ -26,32 +26,32 @@ const live = (
 const noLive: GuideLiveData = { song: null };
 
 describe("composeGuideTitle", () => {
-  it("uses the full variant when bpm, tuning and a rating are all present", () => {
+  it("leads with the section map, which is what the visit is for", () => {
     expect(composeGuideTitle(guideBySlug("master-of-puppets"), live(7.3, 14))).toBe(
-      "Master of Puppets: 212 BPM, E standard, 7.3/10 Difficulty",
+      "Master of Puppets Guitar Difficulty: Section Map & Practice",
     );
   });
 
-  it("keeps a non-ASCII tuning intact when it still fits", () => {
-    expect(composeGuideTitle(guideBySlug("sweet-child-o-mine"), live(7.5, 9))).toBe(
-      "Sweet Child O' Mine: 125 BPM, E♭ standard, 7.5/10 Difficulty",
+  it("keeps the longer plan wording when the song name leaves room", () => {
+    expect(composeGuideTitle(guideBySlug("eruption"), live(9.4, 6))).toBe(
+      "Eruption Guitar Difficulty: Section Map & Practice Plan",
     );
   });
 
-  it("drops tuning when a long song name pushes variant 1 over the budget", () => {
+  it("trades the section map for the rating when the name is long", () => {
     const long = {
       ...guideBySlug("master-of-puppets"),
       title: "Everything In Its Right Place",
     };
     expect(composeGuideTitle(long, live(7.3, 14))).toBe(
-      "Everything In Its Right Place: 212 BPM, 7.3/10 Difficulty",
+      "Everything In Its Right Place Guitar Difficulty: 7.3/10",
     );
   });
 
   it("falls all the way to the terminal variant when nothing else fits", () => {
-    // Every data-bearing variant overruns, so the chain runs out. The last
-    // one is returned over budget rather than emitting nothing — Google trims
-    // a long title, but an empty one is a bug.
+    // Every shorter variant overruns, so the chain runs out. The last one is
+    // returned over budget rather than emitting nothing — Google trims a long
+    // title, but an empty one is a bug.
     const veryLong = {
       ...guideBySlug("master-of-puppets"),
       title: "Lift Your Skinny Fists Like Antennas To Heaven",
@@ -61,16 +61,20 @@ describe("composeGuideTitle", () => {
     );
   });
 
-  it("falls through to the rating-only variant when bpm is absent", () => {
+  it("works for a song with no bpm at all", () => {
     // Nothing Else Matters is a 6/8 ballad with no single tempo in its facts.
+    // The tempo variants are unavailable, so the chain lands on a rating one.
     expect(guideBySlug("nothing-else-matters").lookup?.bpm).toBeUndefined();
     expect(
       composeGuideTitle(guideBySlug("nothing-else-matters"), live(4.6, 5)),
-    ).toBe("Nothing Else Matters Guitar Difficulty: 4.6/10");
+    ).toBe("Nothing Else Matters Guitar Difficulty: 4.6/10, Section Map");
   });
 
-  it("falls back to editorial difficulty when nobody has rated the song", () => {
-    const guide = guideBySlug("master-of-puppets");
+  it("uses the editorial difficulty when a rating is needed and nobody has rated", () => {
+    const guide = {
+      ...guideBySlug("master-of-puppets"),
+      title: "Everything In Its Right Place",
+    };
     expect(composeGuideTitle(guide, noLive)).toContain(
       `${guide.editorial.difficulty.toFixed(1)}/10`,
     );
