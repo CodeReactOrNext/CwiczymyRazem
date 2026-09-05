@@ -1,7 +1,10 @@
 import crypto from "crypto";
 import { logger } from "feature/logger/Logger";
 import * as admin from "firebase-admin";
-import { grantSupporterByEmail } from "lib/support/supporterGrant";
+import {
+  findDonorAccountByEmail,
+  grantSupporterByEmail,
+} from "lib/support/supporterGrant";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Readable } from "stream";
 import { firestore } from "utils/firebase/api/firebase.config";
@@ -60,21 +63,33 @@ function extractAmount(data: Record<string, any>): number {
 
 const TS = () => admin.firestore.FieldValue.serverTimestamp();
 
+/** BMC labels the donor's address differently per event type; take whichever came. */
+function extractEmail(data: Record<string, any>): string | null {
+  return data.supporter_email ?? data.payer_email ?? data.email ?? null;
+}
+
 /** Posts a celebratory card into the shared Activity feed — same broadcast pattern as
- * the support-ask cron (no `uid`, everyone sees it). Never throws: a failure here
- * shouldn't turn a successfully-recorded donation into a 500 for BMC's retry logic. */
+ * the support-ask cron (everyone sees it). When the donor's address belongs to an account,
+ * that account is stamped onto the log: the feed then pins the card to the top of the day
+ * and lets other players motivate it, which is what turns the donation into Fame. Never
+ * throws: a failure here shouldn't turn a successfully-recorded donation into a 500 for
+ * BMC's retry logic. */
 async function postDonationActivity(
-  supporterName: string | null,
+  data: Record<string, any>,
   amount: number,
   kind: "one_off" | "recurring"
 ): Promise<void> {
   try {
+    // The email never reaches the feed — only the account it resolved to does.
+    const donor = await findDonorAccountByEmail(extractEmail(data));
+
     await firestore.collection("logs").add({
       type: "donation_received",
       data: new Date().toISOString(),
-      supporterName,
+      supporterName: data.supporter_name ?? null,
       amount,
       kind,
+      ...(donor ?? {}),
       // The `logs` collection's `timestamp` field is a plain ISO string
       // everywhere else it's written (see addQuestLog/addSongsLog/etc. and
       // daily-top-players.ts) — a real Firestore Timestamp here would sort
@@ -88,11 +103,6 @@ async function postDonationActivity(
       extra: { error: error instanceof Error ? error.message : String(error) },
     });
   }
-}
-
-/** BMC labels the donor's address differently per event type; take whichever came. */
-function extractEmail(data: Record<string, any>): string | null {
-  return data.supporter_email ?? data.payer_email ?? data.email ?? null;
 }
 
 /** Turns the donation into the supporter badge. Anonymous donations carry no
@@ -173,7 +183,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       if (isNewDonation) {
-        await postDonationActivity(data.supporter_name ?? null, amount, "one_off");
+        await postDonationActivity(data, amount, "one_off");
         await grantSupporterBadge(data, type);
       }
     } else if (
@@ -201,7 +211,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
 
       if (isNewSubscription) {
-        await postDonationActivity(data.supporter_name ?? null, extractAmount(data), "recurring");
+        await postDonationActivity(data, extractAmount(data), "recurring");
         await grantSupporterBadge(data, type);
       }
     } else if (

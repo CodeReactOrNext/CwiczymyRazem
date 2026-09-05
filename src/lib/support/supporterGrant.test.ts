@@ -92,6 +92,7 @@ vi.mock("firebase-admin/firestore", () => ({
 
 const {
   claimPendingSupporter,
+  findDonorAccountByEmail,
   grantSupporterByEmail,
   listPendingSupporters,
   removePendingSupporter,
@@ -105,6 +106,32 @@ beforeEach(() => {
   authUsers.clear();
 });
 
+describe("findDonorAccountByEmail", () => {
+  it("returns what the Activity feed needs to name and pay the donor", async () => {
+    store.set("users/u1", {
+      displayName: "Ola",
+      email: "ola@gmail.com",
+      avatar: "ola.png",
+      statistics: { lvl: 7 },
+    });
+
+    expect(await findDonorAccountByEmail("Ola@Gmail.com")).toEqual({
+      uid: "u1",
+      userName: "Ola",
+      avatarUrl: "ola.png",
+      userAvatarFrame: 7,
+    });
+  });
+
+  it("finds nobody for an address without an account", async () => {
+    expect(await findDonorAccountByEmail("nobody@gmail.com")).toBeNull();
+  });
+
+  it("finds nobody for an anonymous donation", async () => {
+    expect(await findDonorAccountByEmail(null)).toBeNull();
+  });
+});
+
 describe("grantSupporterByEmail", () => {
   it("flags the account behind the donation and republishes the roster", async () => {
     store.set("users/u1", { displayName: "Ola", email: "ola@gmail.com" });
@@ -114,7 +141,7 @@ describe("grantSupporterByEmail", () => {
     expect(outcome).toEqual({ status: "granted", uid: "u1" });
     expect(store.get("users/u1")?.isSupport).toBe(true);
     expect(store.get("config/supportTeam")?.members).toEqual([
-      { uid: "u1", displayName: "Ola", avatar: null, title: null },
+      { uid: "u1", displayName: "Ola", avatar: null, title: null, lvl: null },
     ]);
   });
 
