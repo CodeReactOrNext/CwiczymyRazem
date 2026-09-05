@@ -111,9 +111,12 @@ const nextConfig = {
         destination: '/practice-log',
         permanent: true,
       },
+      // The removed page (ac04b504) was "Guitar Practice Tracker: 5 Metrics That
+      // Predict Progress" — what to log, not which app to buy. Pointed at the app
+      // ranking it was an intent mismatch (SEO audit 2026-09-05).
       {
         source: '/guitar-practice-tracker',
-        destination: '/blog/best-app-for-guitar-practice',
+        destination: '/blog/how-to-track-guitar-practice-progress-effectively',
         permanent: true,
       },
       {
@@ -195,30 +198,35 @@ const nextConfig = {
         destination: '/blog/best-app-for-guitar-practice',
         permanent: true,
       },
-      // Cluster: "get better at guitar fast"
+      // Cluster: "get better at guitar fast". The original target
+      // /blog/get-better-at-guitar-fast-app was deleted in 70ae70ed but the 301s
+      // were left behind, so each of these ended on a 404 (audit 2026-09-05).
+      // Retargeted at the closest surviving post: the song-learning pillar for the
+      // two 'learn songs faster' URLs, the app-stack pillar for the rest, which is
+      // what the deleted post was mostly about.
       {
         source: '/blog/learn-guitar-songs-faster-proven-methods',
-        destination: '/blog/get-better-at-guitar-fast-app',
+        destination: '/blog/find-guitar-songs-difficulty',
         permanent: true,
       },
       {
         source: '/blog/effective-strategies-for-learning-new-guitar-songs-quickly',
-        destination: '/blog/get-better-at-guitar-fast-app',
+        destination: '/blog/find-guitar-songs-difficulty',
         permanent: true,
       },
       {
         source: '/blog/how-to-learn-guitar-faster',
-        destination: '/blog/get-better-at-guitar-fast-app',
+        destination: '/blog/best-app-for-guitar-practice',
         permanent: true,
       },
       {
         source: '/blog/how-to-master-guitar-faster',
-        destination: '/blog/get-better-at-guitar-fast-app',
+        destination: '/blog/best-app-for-guitar-practice',
         permanent: true,
       },
       {
         source: '/blog/improve-guitar-skills-faster',
-        destination: '/blog/get-better-at-guitar-fast-app',
+        destination: '/blog/best-app-for-guitar-practice',
         permanent: true,
       },
       // Cluster: "guitar practice routine / builder"
@@ -237,9 +245,11 @@ const nextConfig = {
         destination: '/blog/guitar-practice-routine-builder',
         permanent: true,
       },
+      // An intermediate 7-day framework: the beginner builder was the wrong level,
+      // the intermediate landing page is the real equivalent (SEO audit 2026-09-05).
       {
         source: '/blog/guitar-practice-plan-intermediate-players',
-        destination: '/blog/guitar-practice-routine-builder',
+        destination: '/intermediate-guitar-practice-routine',
         permanent: true,
       },
       {
@@ -264,6 +274,23 @@ const nextConfig = {
       },
       {
         source: '/blog/structured-practice-technical-vs-musical-focus',
+        destination: '/blog/guitar-practice-routine-builder',
+        permanent: true,
+      },
+      // Posts removed in 70ae70ed that were left returning a bare 404 while still
+      // holding impressions. Each goes to the pillar of its old cluster.
+      {
+        source: '/blog/guitar-practice-motivation-techniques',
+        destination: '/blog/how-to-track-guitar-practice-progress-effectively',
+        permanent: true,
+      },
+      {
+        source: '/blog/guitar-learning-without-a-teacher',
+        destination: '/blog/best-app-for-guitar-practice',
+        permanent: true,
+      },
+      {
+        source: '/blog/how-to-organize-guitar-lessons',
         destination: '/blog/guitar-practice-routine-builder',
         permanent: true,
       },

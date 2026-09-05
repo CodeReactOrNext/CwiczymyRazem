@@ -57,8 +57,23 @@ async function generateSongGuidesSitemap() {
       )
       .join('\n');
 
+    // The library hub itself was in no sitemap at all even though it is the
+    // second-best performing page on the site (SEO audit 2026-09-05). It belongs
+    // here, alongside the guides it links to, the way /blog sits with its posts.
+    const newest = guides.reduce(
+      (latest, guide) => (guide.lastmod > latest ? guide.lastmod : latest),
+      guides[0].lastmod
+    );
+    const libraryIndex = `  <url>
+    <loc>${BASE_URL}/song-library</loc>
+    <lastmod>${newest}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>`;
+
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${libraryIndex}
 ${urls}
 </urlset>
 `;

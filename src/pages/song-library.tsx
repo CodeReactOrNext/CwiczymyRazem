@@ -12,18 +12,21 @@ interface LibraryPageProps {
   songs: LibrarySong[];
   totalSongs: number;
   guideLiveData: PathSongLiveDataMap;
+  guideSlugBySongId: Record<string, string>;
 }
 
 const LibraryPage: NextPage<LibraryPageProps> = ({
   songs,
   totalSongs,
   guideLiveData,
+  guideSlugBySongId,
 }) => {
   return (
     <LibraryLandingPage
       songs={songs}
       totalSongs={totalSongs}
       guideLiveData={guideLiveData}
+      guideSlugBySongId={guideSlugBySongId}
     />
   );
 };
@@ -38,8 +41,16 @@ export const getStaticProps: GetStaticProps<LibraryPageProps> = async () => {
     getPathSongLiveData(guideSongIds),
   ]);
 
+  // Cards for songs we have written a guide for link straight to it, instead of
+  // sending every visitor to the sign-up form (SEO audit 2026-09-05).
+  const guideSlugBySongId = Object.fromEntries(
+    songGuides
+      .filter((guide) => guide.songId)
+      .map((guide) => [guide.songId as string, guide.slug])
+  );
+
   return {
-    props: { songs, totalSongs: total, guideLiveData },
+    props: { songs, totalSongs: total, guideLiveData, guideSlugBySongId },
     revalidate: 172800, // 2 days
   };
 };

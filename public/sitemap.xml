@@ -2,18 +2,18 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>https://riff.quest/sitemap-static.xml</loc>
-    <lastmod>2026-07-03</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://riff.quest/sitemap-blog.xml</loc>
-    <lastmod>2026-07-24</lastmod>
+    <lastmod>2026-09-05</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://riff.quest/sitemap-song-guides.xml</loc>
-    <lastmod>2026-07-20</lastmod>
+    <lastmod>2026-08-25</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://riff.quest/sitemap-wiki.xml</loc>
-    <lastmod>2026-08-14</lastmod>
+    <lastmod>2026-09-04</lastmod>
   </sitemap>
 </sitemapindex>

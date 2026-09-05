@@ -90,15 +90,27 @@ export const SongGuideSEO = ({
           name: guide.title,
           byArtist: { "@type": "MusicGroup", name: guide.artist },
           recordingOf: { "@id": `${pageUrl}#composition` },
+          // The community score is how hard the song is to play, not how good the
+          // recording is. Expressed as aggregateRating it read as a review score
+          // to Google — a structured-data policy problem, not a rich-result
+          // opportunity (SEO audit 2026-09-05). It is a measured property now.
           ...(liveData.song && liveData.song.ratingsCount > 0
             ? {
-                aggregateRating: {
-                  "@type": "AggregateRating",
-                  ratingValue: liveData.song.avgDifficulty,
-                  ratingCount: liveData.song.ratingsCount,
-                  bestRating: 10,
-                  worstRating: 1,
-                },
+                additionalProperty: [
+                  {
+                    "@type": "PropertyValue",
+                    name: "Guitar difficulty",
+                    value: liveData.song.avgDifficulty,
+                    minValue: 1,
+                    maxValue: 10,
+                    description: `Average difficulty rating from ${liveData.song.ratingsCount} Riff Quest guitarists who have played it, on a 1-10 scale.`,
+                  },
+                  {
+                    "@type": "PropertyValue",
+                    name: "Difficulty ratings submitted",
+                    value: liveData.song.ratingsCount,
+                  },
+                ],
               }
             : {}),
         },
