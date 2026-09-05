@@ -70,7 +70,9 @@
     "time": "for the amount of time",
     "time_amount": "you practiced for",
     "new_level": "Level Up!",
-    "new_achievements": "New achievements:"
+    "new_achievements": "New achievements:",
+    "achievement_reward": "Reward waiting:",
+    "collect_reward": "Collect it in your profile"
   },
 
   "skills": {

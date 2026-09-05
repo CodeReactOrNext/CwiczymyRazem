@@ -12,6 +12,7 @@ import {
   SET_NECK_TOM,
   SET_NECK_TREM,
   SET_NECK_WRAP,
+  SET_NECK_WRAP_P90,
   SUPERSTRAT,
   SUPERSTRAT_HH,
   T_TYPE,
@@ -742,6 +743,106 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
     yearTo: 2020,
     countries: ["China", "Korea", "USA"],
     spec: SET_NECK_TOM,
+  },
+
+  // ─── Roadmap trophies (67-71) ──────────────────────────────────────────────
+  // The five instruments at the end of the artist roadmaps. They drop from the
+  // cases like any other Mythic as well: finishing a roadmap is the way to be
+  // *given* one, not the only way to own one.
+  {
+    id: 67,
+    imageId: "special/68",
+    name: "Stratocaster Olympic White",
+    brand: "Fairmont",
+    rarity: "Mythic",
+    yearFrom: 1968,
+    yearTo: 2024,
+    countries: ["USA"],
+    spec: S_TYPE,
+  },
+  {
+    id: 68,
+    imageId: "special/69",
+    name: "Stratocaster Tungsten",
+    brand: "Fairmont",
+    rarity: "Mythic",
+    yearFrom: 1988,
+    yearTo: 2026,
+    countries: ["USA"],
+    spec: S_TYPE,
+  },
+  {
+    id: 69,
+    imageId: "special/70",
+    name: "Eclipse Silverburst",
+    brand: "Louis Carver",
+    rarity: "Mythic",
+    yearFrom: 1979,
+    yearTo: 2024,
+    countries: ["USA", "Japan"],
+    spec: SET_NECK_TOM,
+  },
+  {
+    id: 70,
+    imageId: "special/71",
+    name: "Warhead Crimson",
+    brand: "Grayson",
+    rarity: "Mythic",
+    yearFrom: 1984,
+    yearTo: 2022,
+    countries: ["USA", "Japan"],
+    spec: SUPERSTRAT_HH,
+  },
+  {
+    id: 71,
+    imageId: "special/72",
+    name: "JTY Kaleido",
+    brand: "Izanor",
+    rarity: "Mythic",
+    yearFrom: 1990,
+    yearTo: 2023,
+    countries: ["Japan"],
+    spec: S_TYPE_MODERN_HSH,
+  },
+
+  // ─── Grayson's double-cuts (72-73) ─────────────────────────────────────────
+  {
+    id: 72,
+    imageId: "special/73",
+    name: "Sabre",
+    brand: "Grayson",
+    rarity: "Uncommon",
+    yearFrom: 1961,
+    yearTo: 2024,
+    countries: ["Indonesia", "China", "Korea"],
+    spec: SET_NECK_TOM,
+  },
+  {
+    id: 73,
+    imageId: "special/74",
+    name: "Lewis Palmer Junior",
+    brand: "Grayson",
+    rarity: "Common",
+    yearFrom: 1958,
+    yearTo: 2024,
+    countries: ["Indonesia", "China", "Korea"],
+    spec: SET_NECK_WRAP_P90,
+  },
+
+  // ─── Offsets (74) ──────────────────────────────────────────────────────────
+  // The second offset in the game, and the first above Epic. Its window closes
+  // in 1975: the run that is worth Legendary money is the pre-CBS one, and a
+  // model still in production would have made the vintage roll meaningless.
+  {
+    id: 74,
+    imageId: "special/75",
+    name: "Jaguar Black",
+    brand: "Fairmont",
+    rarity: "Legendary",
+    yearFrom: 1962,
+    yearTo: 1975,
+    countries: ["USA"],
+    spec: OFFSET_FLOATING,
   },
 ];
 

@@ -135,10 +135,11 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: Trophy,
     label: "Achievements Rework",
     kind: "feature",
+    done: true,
     description:
       "A full redo of achievements, plus new ones. Each one actually gives you something, not just a badge.",
   },
-  { id: "t97", goal: 97, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
+  { id: "t97", goal: 97, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content", done: true },
   {
     id: "t107",
     goal: 107,
@@ -154,11 +155,12 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: Gift,
     label: "Gamification: Path/Skill Completion Rewards",
     kind: "feature",
+    done: true,
     description:
       "Finish a Journey, Roadmap, or Skill track and get a guitar or effect dropped as a reward.",
   },
   { id: "t125", goal: 125, icon: Target, label: "+4 New Exercises", kind: "content" },
-  { id: "t133", goal: 133, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
+  { id: "t133", goal: 133, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content", done: true },
   {
     id: "t153",
     goal: 153,

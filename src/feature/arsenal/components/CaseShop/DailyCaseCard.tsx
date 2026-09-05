@@ -15,12 +15,15 @@ import { useEffect, useState } from "react";
 
 import { RARITY_STYLES } from "../RarityBadge";
 import { oddsTooltipClass, rollChance } from "./DropRates";
+import { FreeCaseButton } from "./FreeCaseButton";
 import { OpenCaseButton } from "./OpenCaseButton";
 
 interface DailyCaseCardProps {
   currentFame: number;
-  onOpen: (caseType: string) => void;
+  onOpen: (caseType: string, useToken?: boolean) => void;
   isOpening: boolean;
+  /** Free cases the player is holding. Zero hides the second button entirely. */
+  freeTokens?: number;
 }
 
 const formatCountdown = (msLeft: number) => {
@@ -33,7 +36,12 @@ const formatCountdown = (msLeft: number) => {
   return `${h}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`;
 };
 
-export const DailyCaseCard = ({ currentFame, onOpen, isOpening }: DailyCaseCardProps) => {
+export const DailyCaseCard = ({
+  currentFame,
+  onOpen,
+  isOpening,
+  freeTokens = 0,
+}: DailyCaseCardProps) => {
   const caseDef = CASE_DEFINITIONS.daily;
   const canAfford = currentFame >= caseDef.fameCost;
 
@@ -162,13 +170,26 @@ export const DailyCaseCard = ({ currentFame, onOpen, isOpening }: DailyCaseCardP
         </div>
       </TooltipProvider>
 
-      <OpenCaseButton
-        canAfford={canAfford}
-        isOpening={isOpening}
-        onClick={() => onOpen(caseDef.id)}
-        fameCost={caseDef.fameCost}
-        className='relative w-full py-3.5 sm:ml-auto sm:w-80'
-      />
+      {/* The two ways to pay stack rather than sit side by side: the Fame
+          button is the loud CTA of the whole screen, and a second bar of the
+          same width beside it would have split that emphasis in half. */}
+      <div className='relative flex w-full flex-col gap-2 sm:ml-auto sm:w-80'>
+        <OpenCaseButton
+          canAfford={canAfford}
+          isOpening={isOpening}
+          onClick={() => onOpen(caseDef.id)}
+          fameCost={caseDef.fameCost}
+          className='w-full py-3.5'
+        />
+        {freeTokens > 0 && (
+          <FreeCaseButton
+            isOpening={isOpening}
+            tokens={freeTokens}
+            onClick={() => onOpen(caseDef.id, true)}
+            className='w-full'
+          />
+        )}
+      </div>
     </section>
   );
 };

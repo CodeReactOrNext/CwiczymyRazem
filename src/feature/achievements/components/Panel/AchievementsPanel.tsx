@@ -1,11 +1,17 @@
+import {
+  useClaimAchievementRewards,
+  useRewardLedger,
+} from "hooks/useRewardLedger";
 import { useTranslation } from "hooks/useTranslation";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
+import { resolveAchievementReward } from "../../data/achievementRewards";
 import { useAchievementContext } from "../../hooks/useAchievementContext";
 import { useAchievementStats } from "../../hooks/useAchievementStats";
 import type { AchievementList } from "../../types";
 import { buildAchievementPanelState } from "../../utils/achievementPanelState";
 import { AchievementRow } from "./AchievementRow";
+import { ClaimRewardsBanner } from "./ClaimRewardsBanner";
 
 /**
  * The whole collection: one count, then one list, commonest badge first.
@@ -26,6 +32,23 @@ export const AchievementsPanel = ({
   const { t } = useTranslation("achievements");
   const context = useAchievementContext();
   const { data: stats } = useAchievementStats();
+  const { data: ledger } = useRewardLedger();
+  const rewards = ledger?.achievements;
+  const { mutate: claim, isPending: isClaiming } = useClaimAchievementRewards();
+
+  // Which badges have already been paid for. Empty while the ledger loads,
+  // which reads as "nothing collected yet" — the claim button it briefly shows
+  // is harmless, because the server decides what is actually owed.
+  const claimedIds = useMemo(
+    () => new Set(rewards?.claimed ?? []),
+    [rewards?.claimed]
+  );
+
+  const claimOne = useCallback(
+    (id: AchievementList) => claim([id]),
+    [claim]
+  );
+  const claimAll = useCallback(() => claim(undefined), [claim]);
 
   const state = useMemo(
     () => buildAchievementPanelState(userAchievements, context, stats ?? null),
@@ -36,6 +59,16 @@ export const AchievementsPanel = ({
 
   return (
     <div className='flex flex-col gap-6'>
+      {rewards && (
+        <ClaimRewardsBanner
+          waiting={rewards.claimable.length}
+          pending={rewards.pending}
+          caseTokens={ledger?.caseTokens ?? 0}
+          isClaiming={isClaiming}
+          onClaimAll={claimAll}
+        />
+      )}
+
       <div className='flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-5'>
         <div className='flex items-baseline justify-between gap-4'>
           <p className='text-sm font-bold text-zinc-200'>
@@ -60,7 +93,15 @@ export const AchievementsPanel = ({
 
         <div className='flex flex-col gap-1.5'>
           {state.entries.map((entry) => (
-            <AchievementRow key={entry.data.id} entry={entry} context={context} />
+            <AchievementRow
+              key={entry.data.id}
+              entry={entry}
+              context={context}
+              reward={resolveAchievementReward(entry.data.id)}
+              isClaimed={claimedIds.has(entry.data.id)}
+              isClaiming={isClaiming}
+              onClaim={claimOne}
+            />
           ))}
         </div>
       </div>

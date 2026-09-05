@@ -66,7 +66,7 @@ import { PowerLoom, PowerRail } from "./PowerLoom";
 import { PowerPanel } from "./PowerPanel";
 import { RigHardwarePanel } from "./RigHardwarePanel";
 import { RIG_BUTTON, RIG_BUTTON_FIX, SectionHeading } from "./RigSection";
-import { BoardJack, SignalCable } from "./SignalCable";
+import { SignalCable } from "./SignalCable";
 import { SignalPathPanel } from "./SignalPathPanel";
 
 /** How long a "no room left" message stays up next to the board controls. */
@@ -1084,9 +1084,6 @@ export const PedalboardView = ({
               />
             ))}
           </div>
-          <span className='text-[8px] font-black capitalize tracking-[0.35em] text-zinc-600'>
-            Pedalboard
-          </span>
           <div className='flex gap-2'>
             {[0, 1].map((i) => (
               <div
@@ -1153,12 +1150,6 @@ export const PedalboardView = ({
             transition: "box-shadow 0.4s ease",
             cursor: dragging ? "grabbing" : "default",
           }}>
-          {/* The signal runs the way a pedal is built — input on the right
-              face, output on the left — so it comes in at the top right and
-              leaves for the amp at the bottom left. */}
-          <BoardJack kind='in' />
-          <BoardJack kind='out' />
-
           {/* Power first, under everything, the way it is on a real board. The
               cable in the air picks up where the rail's stub left off, at the
               deck's own top edge. */}
@@ -1243,17 +1234,17 @@ export const PedalboardView = ({
                     : isDragging
                       ? `drop-shadow(0 18px 32px rgba(0,0,0,0.98)) drop-shadow(0 0 14px ${rs.baseColor}70)`
                       : aimedAt
-                        ? `drop-shadow(0 6px 12px rgba(0,0,0,0.9)) drop-shadow(0 0 14px ${
+                        ? `drop-shadow(0 0 14px ${
                             patchAllowed
                               ? "rgba(245,158,11,0.85)"
                               : "rgba(248,113,113,0.85)"
                           })`
                         : // An unpowered pedal is off. Not dimmed to say "you
                           // cannot have this" — dimmed because there is no
-                          // current in it, which is also why its LED is out.
-                          `drop-shadow(0 6px 12px rgba(0,0,0,0.9)) drop-shadow(0 2px 4px rgba(0,0,0,0.7))${
-                            powered ? "" : " grayscale(0.7) brightness(0.55)"
-                          }`,
+                          // current in it.
+                          powered
+                          ? "none"
+                          : "grayscale(0.7) brightness(0.55)",
                   transform: isDragging
                     ? "scale(1.07) translateY(-6px)"
                     : "scale(1)",
@@ -1283,18 +1274,6 @@ export const PedalboardView = ({
                         ? prev
                         : { ...prev, [effect.imageId]: ar },
                     );
-                  }}
-                />
-                {/* LED indicator — out when nothing is feeding it. */}
-                <div
-                  className='absolute bottom-[10%] left-1/2 -translate-x-1/2 rounded-full transition-colors'
-                  style={{
-                    width: 5,
-                    height: 5,
-                    backgroundColor: powered ? rs.baseColor : "#1c1c1f",
-                    boxShadow: powered
-                      ? `0 0 6px 2px ${rs.baseColor}90`
-                      : "inset 0 1px 1px rgba(0,0,0,0.9)",
                   }}
                 />
                 {/* Pull the DC cable out. It stands over the pedal's own

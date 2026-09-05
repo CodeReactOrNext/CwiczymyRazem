@@ -484,6 +484,10 @@ export interface OpenCaseResult {
   newFame: number;
   /** True if this is the first copy of this guitarId/effectId the user has ever pulled (dex-new), as opposed to a duplicate. */
   isNewToDex: boolean;
+  /** Free cases left after this pull. */
+  caseTokens: number;
+  /** True when a free case paid for this pull instead of Fame. */
+  usedToken: boolean;
 }
 
 /** Which half of the wallet a workshop job draws on. */

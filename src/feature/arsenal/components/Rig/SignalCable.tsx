@@ -12,11 +12,11 @@ import { rowIndexOf, SIDE_JACKS } from "../../utils/pedalboardLayout";
  *
  * The whole point of the signal-path system is that a player should not have to
  * read a number to know whether the board is wired properly — they should see
- * it. So the cable is a real object on the surface: it leaves the input jack,
- * runs into the right side of the first pedal, out of its left side, and on to
- * the amp, sagging between pedals and taking the long way round when it has to
- * change row. Right to left, because that is the side of the enclosure each
- * socket is actually printed on.
+ * it. So the cable is a real object on the surface: it comes onto the deck from
+ * the guitar, runs into the right side of the first pedal, out of its left side,
+ * and on off the deck to the amp, sagging between pedals and taking the long way
+ * round when it has to change row. Right to left, because that is the side of
+ * the enclosure each socket is actually printed on.
  *
  * Every run is coloured on its own. A cable into the pedal that belongs next
  * glows emerald; one running backwards through the chain is red, which is what
@@ -33,154 +33,22 @@ import { rowIndexOf, SIDE_JACKS } from "../../utils/pedalboardLayout";
  * the way it would on a real board.
  */
 
-/** Where the cable comes in from the guitar, in board percent. */
-export const INPUT_JACK = { xPct: 97.8, yPct: 7 };
-
-/** …and where it leaves for the amp. */
-export const OUTPUT_JACK = { xPct: 2.2, yPct: 93 };
-
-/** Copper, the same on both jacks — the board's own accent. */
-const JACK_COPPER = "#b45309";
-
 /**
- * Outer diameter of the mounting nut, in pixels.
+ * There is nothing at either end of the board to plug into. The guitar's own
+ * lead runs onto the deck over the top edge, straight into the first pedal, and
+ * the last pedal's lead runs off it over the bottom edge to the amp — which is
+ * what the ends of a real board look like from above, and why neither end is
+ * drawn as a socket: a jack seen from the top with a cable going into it
+ * sideways is a hole, not a connection.
  *
- * A quarter-inch jack's nut is about a fifth of a pedal's width across, and a
- * pedal lands near 130px on a full-size board — so this is roughly life-size
- * rather than a number that merely looked tidy. Anything much smaller stops
- * reading as the big jack a guitar goes into and starts reading as a 3.5mm one.
+ * So each end is a run that leaves the picture. `OFF_BOARD` is how far past
+ * the deck's edge it is drawn — beyond the clip, so the round cap never shows —
+ * and `FADE` is the stretch of run, measured back in from that edge, over
+ * which the whole of it (shadow, glow, jacket and pulse) thins out to nothing.
+ * Long enough to read as a cable going somewhere rather than a cable cut off.
  */
-const SOCKET_PX = 30;
-
-/** Ticks round the nut, so it reads as knurled rather than turned smooth. */
-const KNURL = Array.from({ length: 30 }, (_, i) => {
-  const turn = (i / 30) * Math.PI * 2;
-  return {
-    x1: 16 + Math.cos(turn) * 12.4,
-    y1: 16 + Math.sin(turn) * 12.4,
-    x2: 16 + Math.cos(turn) * 14.6,
-    y2: 16 + Math.sin(turn) * 14.6,
-  };
-});
-
-interface BoardJackProps {
-  /** `in` takes the guitar, `out` leaves for the amp. */
-  kind: "in" | "out";
-}
-
-/**
- * One end of the cable: a panel-mount quarter-inch socket, not a dot.
- *
- * Built the way the real part is, and at the size the real part would be — a
- * knurled nickel nut, the shoulder it tightens onto, a copper washer, and a
- * bore deep enough that the cable running under it looks like it goes
- * somewhere. Nothing is drawn coming out of it: the cable simply disappears
- * into the hole, which is all that is ever visible of a plugged-in jack from
- * this far away.
- *
- * Anchored to the very constants the cable draws from, and in board percent
- * rather than pixels, so the cable meets the socket at every board size instead
- * of near it. The input sits at the top right and the output at the bottom left
- * because that is how a pedal is built — input on the right face, output on the
- * left — so a chain of them travels leftwards. Which is also why neither is
- * labelled: a socket in the corner the cable leaves from needs no word next to
- * it.
- */
-export const BoardJack = ({ kind }: BoardJackProps) => {
-  const anchor = kind === "in" ? INPUT_JACK : OUTPUT_JACK;
-  const uid = useId();
-  const nut = `${uid}-nut`;
-  const washer = `${uid}-washer`;
-  const bore = `${uid}-bore`;
-
-  return (
-    <div
-      className='pointer-events-none absolute z-10'
-      style={{
-        left: `${anchor.xPct}%`,
-        top: `${anchor.yPct}%`,
-        transform: "translate(-50%, -50%)",
-      }}>
-      <svg
-        width={SOCKET_PX}
-        height={SOCKET_PX}
-        viewBox='0 0 32 32'
-        className='block'>
-        <defs>
-          <linearGradient id={nut} x1='0.15' y1='0' x2='0.7' y2='1'>
-            <stop offset='0%' stopColor='#d5dbe1' />
-            <stop offset='28%' stopColor='#798087' />
-            <stop offset='56%' stopColor='#2f3338' />
-            <stop offset='78%' stopColor='#4d535a' />
-            <stop offset='100%' stopColor='#a2a9b0' />
-          </linearGradient>
-          <radialGradient id={washer} cx='0.36' cy='0.3' r='0.78'>
-            <stop offset='0%' stopColor={JACK_COPPER} />
-            <stop offset='55%' stopColor='#7c2d12' />
-            <stop offset='100%' stopColor='#3f1206' />
-          </radialGradient>
-          <radialGradient id={bore} cx='0.42' cy='0.28' r='0.82'>
-            <stop offset='0%' stopColor='#3a3531' />
-            <stop offset='52%' stopColor='#0d0c0b' />
-            <stop offset='100%' stopColor='#000000' />
-          </radialGradient>
-        </defs>
-
-        {/* The shadow the hardware sits in. */}
-        <circle cx={16} cy={16.8} r={15} fill='#000000' opacity={0.55} />
-        {/* Mounting nut, knurled the way a jack's is. */}
-        <circle cx={16} cy={16} r={15} fill={`url(#${nut})`} />
-        <g stroke='#14171a' strokeWidth={0.85} opacity={0.4}>
-          {KNURL.map((tick, index) => (
-            <line key={index} {...tick} />
-          ))}
-        </g>
-        <circle
-          cx={16}
-          cy={16}
-          r={14.7}
-          fill='none'
-          stroke='#e6ecf1'
-          strokeWidth={0.7}
-          opacity={0.2}
-        />
-        {/* The shoulder the nut is tightened down onto. */}
-        <circle cx={16} cy={16} r={11.4} fill='#1b1e21' />
-        <circle
-          cx={16}
-          cy={16}
-          r={11.4}
-          fill='none'
-          stroke='#000000'
-          strokeWidth={1.1}
-          opacity={0.7}
-        />
-        {/* Copper washer — the one thing keeping the hardware on-palette. */}
-        <circle cx={16} cy={16} r={9.2} fill={`url(#${washer})`} />
-        {/* …and the bore the cable disappears into. */}
-        <circle cx={16} cy={16} r={5.8} fill={`url(#${bore})`} />
-        <circle
-          cx={16}
-          cy={16}
-          r={5.8}
-          fill='none'
-          stroke='#000000'
-          strokeWidth={1.4}
-          opacity={0.85}
-        />
-        {/* One highlight, so the nut reads as metal and not a grey disc. */}
-        <path
-          d='M 6.2 10.4 A 12.4 12.4 0 0 1 17.6 3.7'
-          fill='none'
-          stroke='#ffffff'
-          strokeWidth={1.5}
-          strokeLinecap='round'
-          opacity={0.28}
-        />
-      </svg>
-    </div>
-  );
-};
+const OFF_BOARD = 6;
+const FADE = 11;
 
 /** How close to the case edge a cable is routed when it runs down the side. */
 const EDGE_LANE = 2.2;
@@ -312,38 +180,31 @@ const laneTurn = (socket: Anchor, other: Anchor): number => {
 };
 
 /**
- * Guitar to first pedal: down the side lane, then in at the socket's own height.
- * Hugging the rail keeps the run off the surface the pedals stand on, and drops
- * it into the socket square rather than at whatever angle the board happens to
- * be laid out in.
+ * Guitar to first pedal: in over the top edge, down the lane just past the
+ * pedal, then in at the socket's own height. Hugging the rail keeps the run off
+ * the surface the pedals stand on, and drops it into the socket square rather
+ * than at whatever angle the board happens to be laid out in.
  */
-const feedRun = (geo: BoardGeometry, jack: Point, into: Anchor): string => {
-  const lane = Math.min(
-    geo.viewW - EDGE_LANE,
-    Math.max(jack.x, into.outer) + 2.4,
-  );
+const feedRun = (geo: BoardGeometry, into: Anchor): string => {
+  const lane = Math.min(geo.viewW - EDGE_LANE, into.outer + 2.4);
+  const off = { x: lane, y: -OFF_BOARD };
   return into.fromTop
     ? routed([
-        jack,
+        off,
         { x: lane, y: into.lane },
         { x: into.at.x, y: into.lane },
         into.at,
       ])
-    : routed([jack, { x: lane, y: into.at.y }, into.at]);
+    : routed([off, { x: lane, y: into.at.y }, into.at]);
 };
 
-/** Last pedal to the amp: out to the far lane at socket height, then down. */
-const exitRun = (from: Anchor, jack: Point): string => {
-  const lane = Math.max(EDGE_LANE, Math.min(from.outer, jack.x) - 2.4);
+/** Last pedal to the amp: out to the lane at socket height, then off the bottom. */
+const exitRun = (geo: BoardGeometry, from: Anchor): string => {
+  const lane = Math.max(EDGE_LANE, from.outer - 2.4);
+  const off = { x: lane, y: geo.viewH + OFF_BOARD };
   return from.fromTop
-    ? routed([
-        from.at,
-        ...riseOf(from),
-        { x: lane, y: from.lane },
-        { x: lane, y: jack.y - 4 },
-        jack,
-      ])
-    : routed([from.at, { x: lane, y: from.at.y }, jack]);
+    ? routed([from.at, ...riseOf(from), { x: lane, y: from.lane }, off])
+    : routed([from.at, { x: lane, y: from.at.y }, off]);
 };
 
 /**
@@ -490,6 +351,8 @@ type Tone = (typeof TONES)[keyof typeof TONES];
 interface CableRun {
   d: string;
   ok: boolean;
+  /** The mask that fades a run leaving the deck — the two ends carry one. */
+  mask?: string;
 }
 
 interface PlugProps {
@@ -611,12 +474,22 @@ interface CouplerProps {
  * covers is left in place underneath. So the verdict still shows — emerald or
  * red, travelling pulse and all — through the gap in the metal, and a coupled
  * link says exactly what every other link says.
+ *
+ * It is laid socket to socket, not level. Two enclosures rarely wear their
+ * jacks at the same height — a compact box carries its pair a good way above
+ * where a Friedman-style one does — and a rigid coupler between them stands at
+ * whatever angle joins the two holes. Drawn level from one of them it left the
+ * other ring hanging in the air a plug's width above the nut it was meant to be
+ * seated in.
  */
 const Coupler = ({ from, to, tone, metal }: CouplerProps) => {
   // The pair arrives in signal order, which runs right to left, so the barrel
   // is laid from whichever of the two sockets is the leftmost.
   const start = from.x <= to.x ? from : to;
-  const span = Math.abs(to.x - from.x);
+  const end = start === from ? to : from;
+  const span = Math.hypot(end.x - start.x, end.y - start.y);
+  /** The angle the bar has to stand at to reach the far socket. */
+  const tilt = (Math.atan2(end.y - start.y, end.x - start.x) * 180) / Math.PI;
   /** Barrel and rings, at the gauge the plugs it stands in for are drawn to. */
   const ring = HANDLE_H / 2;
   const barrel = BOOT_H / 2;
@@ -625,7 +498,7 @@ const Coupler = ({ from, to, tone, metal }: CouplerProps) => {
   const slot = JACKET_W / 4;
 
   return (
-    <g transform={`translate(${at(start)})`}>
+    <g transform={`translate(${at(start)}) rotate(${tilt.toFixed(2)})`}>
       <ellipse
         cx={span / 2}
         cy={ring + 0.55}
@@ -728,6 +601,8 @@ export const SignalCable = ({
   const uid = useId();
   const metalDown = `${uid}-metal-down`;
   const metalAcross = `${uid}-metal-across`;
+  const feedFade = `${uid}-feed-fade`;
+  const exitFade = `${uid}-exit-fade`;
   const { nodes, links } = verdict;
 
   // Fold the chain down to the pedals that can actually be drawn, carrying the
@@ -794,12 +669,9 @@ export const SignalCable = ({
 
   const runs: CableRun[] = [
     {
-      d: feedRun(
-        geo,
-        toView(geo, INPUT_JACK.xPct, INPUT_JACK.yPct),
-        anchorAt(0, "in"),
-      ),
+      d: feedRun(geo, anchorAt(0, "in")),
       ok: true,
+      mask: `url(#${feedFade})`,
     },
     ...between.map((link) => ({
       d: link.coupled
@@ -808,17 +680,15 @@ export const SignalCable = ({
       ok: link.ok,
     })),
     {
-      d: exitRun(
-        anchorAt(drawn.length - 1, "out"),
-        toView(geo, OUTPUT_JACK.xPct, OUTPUT_JACK.yPct),
-      ),
+      d: exitRun(geo, anchorAt(drawn.length - 1, "out")),
       ok: true,
+      mask: `url(#${exitFade})`,
     },
   ];
 
   // A plug per pedal socket, facing into the enclosure it is pushed into —
-  // except where a coupler has taken the pair over. The board's own sockets
-  // show nothing but the cable going in; see `Plug`.
+  // except where a coupler has taken the pair over. The two ends of the board
+  // have nothing to plug into: the cable simply runs off the deck; see `Plug`.
   const plugs = drawn.flatMap((_, index) => {
     const inAnchor = anchorAt(index, "in");
     const outAnchor = anchorAt(index, "out");
@@ -885,6 +755,54 @@ export const SignalCable = ({
           <stop offset='72%' stopColor='#2a2e33' />
           <stop offset='100%' stopColor='#767d84' />
         </linearGradient>
+
+        {/* The two ends fade out towards the edge they leave by. A luminance
+            mask rather than a gradient stroke, so every layer of the run —
+            cast shadow, glow, jacket, sheen, core and pulse — thins out
+            together instead of each needing its own copy of the ramp. Drawn in
+            board units and padded past the deck, so the region never clips the
+            glow off a run that hugs the rail. */}
+        <linearGradient
+          id={`${feedFade}-ramp`}
+          gradientUnits='userSpaceOnUse'
+          x1='0'
+          y1='0'
+          x2='0'
+          y2={FADE}>
+          <stop offset='0%' stopColor='#000000' />
+          <stop offset='100%' stopColor='#ffffff' />
+        </linearGradient>
+        <linearGradient
+          id={`${exitFade}-ramp`}
+          gradientUnits='userSpaceOnUse'
+          x1='0'
+          y1={geo.viewH - FADE}
+          x2='0'
+          y2={geo.viewH}>
+          <stop offset='0%' stopColor='#ffffff' />
+          <stop offset='100%' stopColor='#000000' />
+        </linearGradient>
+        {[
+          { id: feedFade, ramp: `${feedFade}-ramp` },
+          { id: exitFade, ramp: `${exitFade}-ramp` },
+        ].map((fade) => (
+          <mask
+            key={fade.id}
+            id={fade.id}
+            maskUnits='userSpaceOnUse'
+            x={-OFF_BOARD}
+            y={-OFF_BOARD}
+            width={geo.viewW + OFF_BOARD * 2}
+            height={geo.viewH + OFF_BOARD * 2}>
+            <rect
+              x={-OFF_BOARD}
+              y={-OFF_BOARD}
+              width={geo.viewW + OFF_BOARD * 2}
+              height={geo.viewH + OFF_BOARD * 2}
+              fill={`url(#${fade.ramp})`}
+            />
+          </mask>
+        ))}
       </defs>
 
       {/* Every shadow first, so one run's cast never darkens the next one's
@@ -901,6 +819,7 @@ export const SignalCable = ({
               strokeWidth={2.8}
               opacity={0.5}
               transform='translate(0 0.75)'
+              mask={run.mask}
             />
           ))}
         </g>
@@ -914,7 +833,8 @@ export const SignalCable = ({
             key={index}
             fill='none'
             strokeLinecap='round'
-            strokeLinejoin='round'>
+            strokeLinejoin='round'
+            mask={run.mask}>
             {/* The glow a good run carries, and the alarm a bad one does. */}
             {!plain && (
               <path
