@@ -33,12 +33,20 @@ const DrawerOverlay = React.forwardRef<
 ))
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 
+interface DrawerContentProps
+  extends React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> {
+  /** Skip the grab handle — a side drawer has nothing to pull down. */
+  hideHandle?: boolean
+  /** Extra classes for the backdrop, e.g. a lighter dim when what is behind should stay readable. */
+  overlayClassName?: string
+}
+
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DrawerContentProps
+>(({ className, children, hideHandle = false, overlayClassName, ...props }, ref) => (
   <DrawerPortal>
-    <DrawerOverlay />
+    <DrawerOverlay className={overlayClassName} />
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
@@ -47,7 +55,9 @@ const DrawerContent = React.forwardRef<
       )}
       {...props}
     >
-      <div className="mx-auto h-2 w-[100px] rounded-full bg-zinc-800" />
+      {!hideHandle && (
+        <div className="mx-auto h-2 w-[100px] rounded-full bg-zinc-800" />
+      )}
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>
@@ -105,5 +115,13 @@ DrawerDescription.displayName = DrawerPrimitive.Description.displayName
 
 export {
   Drawer,
+  DrawerClose,
   DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
+  DrawerTitle,
+  DrawerTrigger,
 }

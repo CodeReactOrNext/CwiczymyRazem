@@ -11,7 +11,7 @@ import {
   createDcResolver,
   createJackResolver,
   DEFAULT_DC_JACK,
-  EFFECT_DC_X,
+  EFFECT_DC_JACK,
   EFFECT_IMAGE_ASPECT,
   EFFECT_JACK_Y,
   findFreeSpot,
@@ -394,21 +394,32 @@ describe("createJackResolver", () => {
     const jacks = resolve("forge");
 
     expect(jacks.edge).toBe("side");
-    expect(jacks.dc).toEqual({ x: EFFECT_DC_X[3], y: DEFAULT_DC_JACK.y });
+    expect(jacks.dc).toEqual(EFFECT_DC_JACK[3]);
+    // A nut standing on the edge: the plug's tip goes to the edge itself.
+    expect(jacks.dc?.y).toBe(0);
     expect(createDcResolver(resolve)("forge").x).toBeGreaterThan(0.75);
   });
 
-  it("keeps the inlet in the middle for an enclosure that draws it there", () => {
-    // Effect 2, the TS-808, has its square DC jack dead centre on the top face.
-    const resolve = createJackResolver([owned("ts", 2)]);
-    expect(resolve("ts").dc).toBeUndefined();
-    expect(createDcResolver(resolve)("ts")).toEqual(DEFAULT_DC_JACK);
+  it("seats the plug down in a socket drawn flush on the top face", () => {
+    // Effect 2, the TS-808, draws its square DC jack on the enclosure's top
+    // face, a unit or so in from the edge — so the tip has to go in that far.
+    const dc = createDcResolver(createJackResolver([owned("ts", 2)]))("ts");
+    expect(dc.x).toBeCloseTo(0.5, 1);
+    expect(dc.y).toBeGreaterThan(0.03);
+  });
+
+  it("keeps the inlet on the middle of the edge for an enclosure with a nut there", () => {
+    // Effect 7, the Red Forge Mini, has a black barrel jack dead centre, proud
+    // of the top edge — exactly what the default assumes.
+    const resolve = createJackResolver([owned("mini", 7)]);
+    expect(resolve("mini").dc).toBeUndefined();
+    expect(createDcResolver(resolve)("mini")).toEqual(DEFAULT_DC_JACK);
   });
 });
 
-describe("EFFECT_DC_X", () => {
-  it("only lists side-mounted pedals that exist, at a sane offset", () => {
-    for (const [imageId, x] of Object.entries(EFFECT_DC_X)) {
+describe("EFFECT_DC_JACK", () => {
+  it("only lists side-mounted pedals that exist, at a sane spot on the box", () => {
+    for (const [imageId, dc] of Object.entries(EFFECT_DC_JACK)) {
       const owners = EFFECT_DEFINITIONS.filter(
         (effect) => String(effect.imageId) === imageId,
       );
@@ -418,8 +429,11 @@ describe("EFFECT_DC_X", () => {
         owners.every((effect) => !effect.jacks),
         imageId,
       ).toBe(true);
-      expect(x, imageId).toBeGreaterThan(0.05);
-      expect(x, imageId).toBeLessThan(0.95);
+      expect(dc.x, imageId).toBeGreaterThan(0.05);
+      expect(dc.x, imageId).toBeLessThan(0.95);
+      // On the edge, or a little way down the top face — never mid-pedal.
+      expect(dc.y, imageId).toBeGreaterThanOrEqual(0);
+      expect(dc.y, imageId).toBeLessThan(0.08);
     }
   });
 });

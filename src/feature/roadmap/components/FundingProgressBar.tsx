@@ -1,12 +1,5 @@
 import { cn } from "assets/lib/utils";
-import {
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Hammer,
-  Lock,
-  Sparkles,
-} from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Hammer, Lock } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ROADMAP_TIERS } from "../data/roadmap.data";
@@ -21,6 +14,14 @@ const TRACK_H = 18;
 const BOX_TOP = TRACK_TOP + TRACK_H + 22;
 const CONTAINER_H = 400;
 
+const SCROLL_BUTTON_CLASS =
+  "absolute top-[78px] z-30 flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700";
+
+/**
+ * One accent only: cyan marks where the running total is and what it unlocks
+ * next, emerald ticks what has shipped, everything else stays zinc. Feature
+ * tiers stand out by weight and a solid box, not by their own colour.
+ */
 export const FundingProgressBar = ({
   totalRaised,
 }: {
@@ -63,7 +64,7 @@ export const FundingProgressBar = ({
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el) return;
+    if (!el) return undefined;
     const measure = () => {
       const avail = el.clientWidth - PAD_X * 2;
       const seg = Math.max(MIN_SEGMENT, avail / gaps);
@@ -104,10 +105,12 @@ export const FundingProgressBar = ({
       <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
         <header className='mb-2 flex items-start justify-between gap-4'>
           <div>
-            <h2 className='text-sm font-semibold text-zinc-200'>The roadmap</h2>
-            <p className='mt-0.5 text-xs text-zinc-500'>
-              Every goal the running total reaches gets built and unlocked for
-              everyone.
+            <h2 className='text-base font-semibold text-zinc-100'>
+              The roadmap
+            </h2>
+            <p className='mt-1 text-sm text-zinc-400'>
+              A running total, not a subscription. Every goal it reaches gets
+              built and stays unlocked for everyone, for good.
             </p>
           </div>
           <div className='shrink-0 text-right'>
@@ -129,13 +132,13 @@ export const FundingProgressBar = ({
                 type='button'
                 aria-label='Scroll left'
                 onClick={() => scrollBy(-1)}
-                className='absolute left-2 top-[78px] z-30 flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700'>
+                className={cn(SCROLL_BUTTON_CLASS, "left-2")}>
                 <ChevronLeft size={18} />
               </button>
             </>
           )}
 
-          {/* Right fade + chevron — the "scroll right" hint */}
+          {/* Right fade + chevron */}
           {canRight && (
             <>
               <div className='pointer-events-none absolute inset-y-0 right-0 z-30 w-20 bg-gradient-to-l from-zinc-900 to-transparent' />
@@ -143,7 +146,7 @@ export const FundingProgressBar = ({
                 type='button'
                 aria-label='Scroll right'
                 onClick={() => scrollBy(1)}
-                className='absolute right-2 top-[78px] z-30 flex h-9 w-9 animate-pulse items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50 hover:bg-cyan-500/30'>
+                className={cn(SCROLL_BUTTON_CLASS, "right-2")}>
                 <ChevronRight size={18} />
               </button>
             </>
@@ -200,14 +203,12 @@ export const FundingProgressBar = ({
                         done
                           ? "bg-emerald-500 text-zinc-950"
                           : inProgress
-                            ? "bg-orange-500 text-zinc-950"
+                            ? "bg-cyan-500 text-zinc-950"
                             : reached
-                              ? "bg-cyan-500 text-zinc-950"
+                              ? "bg-zinc-300 text-zinc-950"
                               : isNext
                                 ? "bg-zinc-900 ring-cyan-500/50"
-                                : isFeature
-                                  ? "bg-amber-500/20 ring-amber-500/50"
-                                  : "bg-zinc-700",
+                                : "bg-zinc-800",
                       )}
                       style={{
                         left,
@@ -217,9 +218,7 @@ export const FundingProgressBar = ({
                         <Hammer size={15} strokeWidth={2.5} />
                       ) : reached ? (
                         <Check size={16} strokeWidth={3} />
-                      ) : isNext ? null : isFeature ? (
-                        <Sparkles size={15} className='text-amber-400' />
-                      ) : (
+                      ) : isNext ? null : (
                         <Lock size={13} className='text-zinc-500' />
                       )}
                     </span>
@@ -227,13 +226,9 @@ export const FundingProgressBar = ({
                     {/* Tooltip-styled unlock box */}
                     <div
                       className={cn(
-                        "absolute -translate-x-1/2 rounded-lg p-3.5 text-left transition-background",
-                        isFeature
-                          ? "bg-zinc-800 ring-1 ring-amber-500/30"
-                          : "bg-zinc-800/60",
-                        done && "ring-1 ring-emerald-500/50",
-                        inProgress && "ring-1 ring-orange-500/50",
-                        isNext && !inProgress && "ring-1 ring-cyan-500/50",
+                        "absolute -translate-x-1/2 rounded-lg p-3.5 text-left",
+                        isFeature ? "bg-zinc-800" : "bg-zinc-800/60",
+                        isNext && "ring-1 ring-cyan-500/50",
                         !reached &&
                           !isNext &&
                           !isFeature &&
@@ -249,22 +244,11 @@ export const FundingProgressBar = ({
                         )}
                       />
 
-                      {isFeature && (
-                        <span className='mb-2 inline-flex items-center gap-1 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300'>
-                          <Sparkles size={11} />
-                          Feature
-                        </span>
-                      )}
-
                       <div className='flex items-baseline justify-between gap-2'>
                         <span
                           className={cn(
                             "text-base font-bold",
-                            reached
-                              ? "text-zinc-200"
-                              : isNext
-                                ? "text-cyan-300"
-                                : "text-zinc-300",
+                            isNext ? "text-cyan-300" : "text-zinc-200",
                           )}>
                           ${tier.goal}
                         </span>
@@ -273,13 +257,9 @@ export const FundingProgressBar = ({
                             "text-[11px] font-medium",
                             done
                               ? "text-emerald-400"
-                              : inProgress
-                                ? "text-orange-400"
-                                : reached
-                                  ? "text-zinc-500"
-                                  : isNext
-                                    ? "text-cyan-400"
-                                    : "text-zinc-600",
+                              : inProgress || isNext
+                                ? "text-cyan-400"
+                                : "text-zinc-500",
                           )}>
                           {done
                             ? "Done"
@@ -288,7 +268,7 @@ export const FundingProgressBar = ({
                               : reached
                                 ? "Funded"
                                 : isNext
-                                  ? `+${tier.goal - totalRaised}`
+                                  ? `+$${tier.goal - totalRaised}`
                                   : "Locked"}
                         </span>
                       </div>
@@ -296,10 +276,7 @@ export const FundingProgressBar = ({
                       <div className='mt-2 flex items-start gap-2'>
                         <TierIcon
                           size={18}
-                          className={cn(
-                            "mt-0.5 shrink-0",
-                            isFeature ? "text-amber-400" : "text-zinc-400",
-                          )}
+                          className='mt-0.5 shrink-0 text-zinc-400'
                         />
                         <p
                           className={cn(

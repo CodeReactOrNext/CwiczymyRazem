@@ -62,7 +62,7 @@ import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
 import { EffectPickerModal } from "./EffectPickerModal";
 import type { PoweredPedal } from "./PowerLoom";
-import { PowerLoom, PowerRail } from "./PowerLoom";
+import { PedalDcPlug, PowerLoom, PowerRail } from "./PowerLoom";
 import { PowerPanel } from "./PowerPanel";
 import { RigHardwarePanel } from "./RigHardwarePanel";
 import { RIG_BUTTON, RIG_BUTTON_FIX, SectionHeading } from "./RigSection";
@@ -916,6 +916,9 @@ export const PedalboardView = ({
     ];
   });
 
+  /** The pedals with a cable actually in them — the ones that get a plug. */
+  const patchedIds = new Set(patched.map((pedal) => pedal.itemId));
+
   const rowSpans = boardItems.reduce<Record<number, RowSpan[]>>((acc, item) => {
     const row = rowIndexOf(geo, item.yPct);
     const wPct = widthOf(item.itemId);
@@ -1276,6 +1279,14 @@ export const PedalboardView = ({
                     );
                   }}
                 />
+                {/* The plug in its inlet, over the artwork rather than under
+                    it, so it can sit down in a socket drawn on the top face. */}
+                {patchedIds.has(placement.itemId) && (
+                  <PedalDcPlug
+                    dc={dcOf(placement.itemId)}
+                    widthUnits={(wPct / 100) * geo.viewW}
+                  />
+                )}
                 {/* Pull the DC cable out. It stands over the pedal's own
                     inlet, so it reads as the plug it removes rather than as
                     another button in the corner — and it is a whole control

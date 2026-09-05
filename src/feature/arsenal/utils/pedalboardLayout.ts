@@ -575,32 +575,49 @@ export const EFFECT_JACK_Y: Record<number | string, number> = {
 export const DEFAULT_DC_JACK = { x: 0.5, y: 0 };
 
 /**
- * How far along the top edge each enclosure's `9V DC` inlet is, as a fraction
- * of the pedal's width — for the side-mounted pedals whose artwork does not put
- * it in the middle.
+ * Where each enclosure's `9V DC` inlet actually is, as a fraction of the pedal's
+ * box — for the side-mounted pedals whose artwork does not put it where
+ * `DEFAULT_DC_JACK` assumes.
  *
- * Measured off the artwork the same way `EFFECT_JACK_Y` is: the inlet is a nut
- * standing on the top strip, and on these enclosures it is the last one in the
- * row, printed after the stereo and expression sockets and labelled `9V DC IN`.
+ * Measured off the artwork the same way `EFFECT_JACK_Y` is. Two kinds of
+ * enclosure need it:
+ *
+ * - **A nut on the edge, off centre.** The Friedman-style boxes and the compact
+ *   `AT-10`/`GE-10`/`Aethernaut` family print the inlet last in their top strip,
+ *   after the stereo and expression sockets, labelled `9V DC IN` — around
+ *   `0.80` and `0.76` of the width respectively. `y` is `0`: the nut reaches the
+ *   top of the image, and the plug stands on it.
+ * - **A socket set into the top face.** The EchoPath, the TS-808, the Stellar OD
+ *   and the Amber Forge Wood draw a square barrel jack flush on the enclosure,
+ *   a unit or so in from the edge; the Forest Drive and Nova Drive a raised one
+ *   between their two brass nuts. `y` is where the plug's tip has to go to sit
+ *   in that hole — the far lip of it, so the body covers the whole hole rather
+ *   than leaving its bottom half showing under the tip. The plug is drawn on
+ *   the pedal, over the artwork, for exactly this case — see `PedalDcPlug`.
+ *
  * A cable dropped onto the middle of the edge instead lands on bare enclosure,
  * a good plug's width from the hole — which is what the board did before this
- * table existed. The Friedman-style boxes carry theirs around `0.80`, the
- * compact `AT-10`/`GE-10`/`Aethernaut` family around `0.76`.
- *
- * Only pedals whose inlet is off-centre are listed; an image missing from here
- * takes `DEFAULT_DC_JACK`. Top-mounted pedals carry their own `dc` on the
- * definition instead, beside the signal pair it has to stay clear of.
+ * table existed. An image missing from here takes `DEFAULT_DC_JACK`; the
+ * top-mounted pedals carry their own `dc` on the definition, beside the signal
+ * pair it has to stay clear of.
  */
-export const EFFECT_DC_X: Record<number | string, number> = {
-  3: 0.797,
-  4: 0.81,
-  19: 0.752,
-  20: 0.759,
-  21: 0.773,
-  22: 0.806,
-  23: 0.802,
-  24: 0.803,
-};
+export const EFFECT_DC_JACK: Record<number | string, { x: number; y: number }> =
+  {
+    1: { x: 0.49, y: 0.055 },
+    2: { x: 0.5, y: 0.055 },
+    3: { x: 0.797, y: 0 },
+    4: { x: 0.81, y: 0 },
+    5: { x: 0.5, y: 0.05 },
+    6: { x: 0.5, y: 0.047 },
+    8: { x: 0.5, y: 0.055 },
+    19: { x: 0.752, y: 0 },
+    20: { x: 0.759, y: 0 },
+    21: { x: 0.773, y: 0 },
+    22: { x: 0.806, y: 0 },
+    23: { x: 0.802, y: 0 },
+    24: { x: 0.803, y: 0 },
+    27: { x: 0.5, y: 0.055 },
+  };
 
 /**
  * The ordinary enclosure: in on the right face, out on the left, half way up.
@@ -618,18 +635,19 @@ export const SIDE_JACKS: EffectJackLayout = {
 
 /**
  * The side-mounted pair at the height this particular enclosure wears them —
- * and its power inlet, when the artwork puts that anywhere but the middle.
+ * and its power inlet, when the artwork puts that anywhere but on the middle of
+ * the top edge.
  */
 const sideJacksFor = (imageId?: number | string): EffectJackLayout => {
   const y = (imageId !== undefined && EFFECT_JACK_Y[imageId]) || DEFAULT_JACK_Y;
-  const dcX = imageId !== undefined ? EFFECT_DC_X[imageId] : undefined;
-  if (y === DEFAULT_JACK_Y && dcX === undefined) return SIDE_JACKS;
+  const dc = imageId !== undefined ? EFFECT_DC_JACK[imageId] : undefined;
+  if (y === DEFAULT_JACK_Y && dc === undefined) return SIDE_JACKS;
 
   return {
     edge: "side",
     in: { x: 1, y },
     out: { x: 0, y },
-    ...(dcX !== undefined ? { dc: { x: dcX, y: DEFAULT_DC_JACK.y } } : {}),
+    ...(dc ? { dc } : {}),
   };
 };
 
@@ -641,10 +659,10 @@ export type DcResolver = (itemId: string) => { x: number; y: number };
 
 /**
  * DC inlet lookup for a board. The middle of the top edge unless the pedal's own
- * jack layout says otherwise — a top-mounted definition's `dc`, or the column
- * `EFFECT_DC_X` measured off a side-mounted enclosure's artwork — because that
- * is where a pedal takes its power. See `utils/powerLayout` for what the cable
- * does with it.
+ * jack layout says otherwise — a top-mounted definition's `dc`, or the socket
+ * `EFFECT_DC_JACK` measured off a side-mounted enclosure's artwork — because
+ * that is where a pedal takes its power. See `utils/powerLayout` for what the
+ * cable does with it, and `PedalDcPlug` for the plug that sits in it.
  */
 export const createDcResolver = (jacksOf: JackResolver): DcResolver => {
   const cache = new Map<string, { x: number; y: number }>();

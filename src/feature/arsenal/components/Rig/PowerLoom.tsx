@@ -1,6 +1,7 @@
 import { useId } from "react";
 
 import type { Point } from "../../utils/cableGeometry";
+import { PEDAL_H } from "../../utils/pedalboardLayout";
 import type { DcTarget, RailGeometry, RowSpan } from "../../utils/powerLayout";
 import {
   BAY_TOP,
@@ -40,7 +41,8 @@ import {
  * (`z-index: 0` against their 1 and 2), which is the order they stack in on a
  * real board — power runs beneath everything, disappears under the enclosures
  * and shows in the gaps between them. Most of a tidy loom is hidden, and that is
- * correct.
+ * correct. The one part of it that must not be hidden is the plug in the pedal,
+ * which is why that is drawn by the pedal itself — see `PedalDcPlug`.
  */
 
 /** Jacket, and the amber thread of current down the middle of it. */
@@ -78,7 +80,8 @@ interface DcPlugProps {
  * Both ends of a cable get one, because a cable that is moulded into a pedal at
  * one end and welded to the brick at the other is not a cable a player believes
  * they can pull. The plug is the affordance — the unplug button sits right on
- * top of the pedal's, and this is what it looks like it is for.
+ * top of the pedal's, and this is what it looks like it is for. The brick end
+ * is drawn here on the rail; the pedal end by `PedalDcPlug`, on the pedal.
  */
 const DcPlug = ({
   at: point,
@@ -176,6 +179,64 @@ const DcPlug = ({
         opacity={0.45}
       />
     </g>
+  );
+};
+
+/**
+ * How far the back of a plug seated in a socket on the enclosure's top face
+ * stands above the edge of it — so the cable coming down the margin is seen
+ * going into the boot rather than vanishing under the artwork a hair short of
+ * it.
+ */
+const DC_PLUG_CLEAR = 0.45;
+
+interface PedalDcPlugProps {
+  /** The inlet, as a fraction of the pedal's own box — what a `DcResolver` gives. */
+  dc: { x: number; y: number };
+  /** The pedal's width in board units. Its height is always `PEDAL_H` tall. */
+  widthUnits: number;
+}
+
+/**
+ * The pedal end of a DC cable, drawn on the pedal rather than on the loom.
+ *
+ * The loom runs under the enclosures, which is right for cable and wrong for
+ * the plug: a plug is the one part that has to be seen *in* its socket, and a
+ * good few enclosures draw that socket flush on the top face, a unit or so in
+ * from the edge — the EchoPath, the TS-808, the Stellar OD, the Amber Forge
+ * Wood. A plug painted under the artwork stops dead at the edge and leaves the
+ * hole showing beside it. So it lives inside the pedal's own element, over the
+ * image and under the unplug control, in a box sized in board units and placed
+ * in fractions of the pedal — which is also what lets it move with a drag and
+ * dim with the rest of the enclosure without anything having to follow it.
+ *
+ * The body is at least as long as the brick end's, and longer when the socket
+ * is set into the face: however deep the seat, the back of the plug clears the
+ * edge by `DC_PLUG_CLEAR`, so the cable coming down the margin visibly goes in.
+ */
+export const PedalDcPlug = ({ dc, widthUnits }: PedalDcPlugProps) => {
+  // Ten view units to the board unit — the scale both looms draw in.
+  const heightUnits = PEDAL_H * 10;
+  const tip = dc.y * heightUnits;
+  const reach = Math.max(DC_PLUG_REACH, tip + DC_PLUG_CLEAR);
+  /** Room either side for the body and the shadow it casts off to the right. */
+  const half = DC_PLUG_HALF_W + 0.7;
+  const top = tip - reach - 0.3;
+  const bottom = tip + 0.4;
+
+  return (
+    <svg
+      viewBox={`${-half} ${top.toFixed(3)} ${half * 2} ${(bottom - top).toFixed(3)}`}
+      className='pointer-events-none absolute -translate-x-1/2'
+      style={{
+        left: `${dc.x * 100}%`,
+        top: `${(top / heightUnits) * 100}%`,
+        width: `${((half * 2) / widthUnits) * 100}%`,
+        height: `${((bottom - top) / heightUnits) * 100}%`,
+      }}
+      aria-hidden>
+      <DcPlug at={{ x: 0, y: tip }} reach={reach} />
+    </svg>
   );
 };
 
@@ -792,7 +853,6 @@ export const PowerLoom = ({
     return {
       itemId: pedal.itemId,
       d: powerRun(rail, socket, pedal, risers),
-      jack: pedal.jack,
     };
   });
 
@@ -859,9 +919,8 @@ export const PowerLoom = ({
         )}
       </g>
 
-      {runs.map((run) => (
-        <DcPlug key={`plug-${run.itemId}`} at={run.jack} />
-      ))}
+      {/* Only the loose end gets its plug here: one seated in a pedal is drawn
+          by the pedal, over its own artwork — see `PedalDcPlug`. */}
       {dragging && <DcPlug at={dragging.to} />}
     </svg>
   );

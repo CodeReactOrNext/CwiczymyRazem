@@ -1,248 +1,284 @@
 import { cn } from "assets/lib/utils";
-import { BackLink } from "components/BackLink/BackLink";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { Check, CheckCircle2, ChevronRight, CircleDashed, Dumbbell, Info, Lightbulb, ListChecks, Loader2, Map as MapIcon, RefreshCw, Sparkles, Target, X, Zap } from "lucide-react";
+import {
+  Check,
+  CheckCircle2,
+  ChevronRight,
+  Dumbbell,
+  Loader2,
+  Play,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
 
+import { isRewardableRoadmap } from "../../data/roadmapRewards";
 import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
 import { firebaseGetLessonsByIds } from "../../services/youtubeLesson.service";
-import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
+import type {
+  Roadmap,
+  RoadmapPhase,
+  RoadmapStep,
+} from "../../types/roadmap.types";
 import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
-import { isRewardableRoadmap } from "../../data/roadmapRewards";
+import type { RoadmapStepRef } from "../../utils/roadmapSteps";
+import {
+  findRoadmapStep,
+  flattenRoadmapSteps,
+  getNextUnfinishedStep,
+} from "../../utils/roadmapSteps";
+import type { StepStatus } from "../../utils/stepStatus";
+import {
+  getStepStatus,
+  sessionsForStatus,
+  withResourceStatus,
+} from "../../utils/stepStatus";
 import LessonPracticeModal from "./components/LessonPracticeModal";
 import { RoadmapFinishCard } from "./components/RoadmapFinishCard";
-import YouTubeLessonCard from "./components/YouTubeLessonCard";
+import type {
+  StepDrawerAdminProps,
+  StepDrawerView,
+} from "./components/StepDrawer";
+import { StepDrawer } from "./components/StepDrawer";
 
-// ─── AI Generating Loader ───────────────────────────────────────────────────
-
-const AI_MESSAGES = [
-  "Analyzing your learning goal...",
-  "Identifying key techniques...",
-  "Writing practice exercises...",
-  "Calibrating difficulty to your level...",
-  "Setting success criteria...",
-  "Almost there...",
-];
-
-const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
-  const [msgIdx, setMsgIdx] = useState(0);
-  const [fade, setFade] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setMsgIdx((i) => (i + 1) % AI_MESSAGES.length);
-        setFade(true);
-      }, 300);
-    }, 2200);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="flex flex-col gap-6 pt-2">
-      <div className="flex flex-col items-center gap-4 py-4">
-        <div className="relative flex items-center justify-center">
-          <span className="absolute h-16 w-16 animate-ping rounded-full bg-cyan-500/10" />
-          <span className="absolute h-12 w-12 animate-pulse rounded-full bg-cyan-500/15" />
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/20">
-            <MapIcon className="h-5 w-5 text-cyan-400" />
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center gap-1.5">
-          <p className="text-[11px] font-semibold capitalize tracking-widest text-cyan-500/70">
-            Coach is thinking
-          </p>
-          <p
-            className="text-sm text-zinc-400 transition-opacity duration-300"
-            style={{ opacity: fade ? 1 : 0 }}
-          >
-            {AI_MESSAGES[msgIdx]}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-1.5">
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className="h-1.5 w-1.5 rounded-full bg-cyan-500/60"
-              style={{ animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite` }}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="rounded-lg bg-zinc-900/50 px-4 py-3">
-        <p className="mb-1 text-[10px] font-semibold capitalize tracking-widest text-zinc-600">
-          Generating details for
-        </p>
-        <p className="text-sm font-medium text-zinc-300">{stepTitle}</p>
-      </div>
-
-      <div className="flex flex-col gap-4">
-        {[92, 100, 78, 95, 65, 88].map((w, i) => (
-          <div key={i} className="h-3 overflow-hidden rounded-full bg-zinc-800/60" style={{ width: `${w}%` }}>
-            <div
-              className="h-full w-full rounded-full"
-              style={{
-                background: "linear-gradient(90deg, transparent 0%, rgba(6,182,212,0.12) 50%, transparent 100%)",
-                backgroundSize: "200% 100%",
-                animation: `shimmer 1.8s ease-in-out ${i * 0.15}s infinite`,
-              }}
-            />
-          </div>
-        ))}
-      </div>
-
-      <style jsx>{`
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-        @keyframes bounce {
-          0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-          40% { transform: translateY(-5px); opacity: 1; }
-        }
-      `}</style>
-    </div>
-  );
-};
-
-// ─── Step description (parsed [Section] blocks) ─────────────────────────────
-
-interface DescSection {
-  heading: string | null;
-  lines: string[];
-}
-
-function parseDescriptionSections(desc: string): DescSection[] {
-  const out: DescSection[] = [];
-  let current: DescSection | null = null;
-  desc.split("\n").forEach((raw) => {
-    const line = raw.trim();
-    const headingMatch = line.match(/^\[(.+)\]$/);
-    if (headingMatch) {
-      current = { heading: headingMatch[1], lines: [] };
-      out.push(current);
-      return;
-    }
-    if (line === "") return;
-    if (!current) {
-      current = { heading: null, lines: [] };
-      out.push(current);
-    }
-    current.lines.push(line);
-  });
-  return out.filter((s) => s.heading || s.lines.length);
-}
-
-const SECTION_ICONS: { match: RegExp; Icon: typeof Info; color: string }[] = [
-  { match: /what it is/i, Icon: Info, color: "text-sky-400" },
-  { match: /why it matters/i, Icon: Lightbulb, color: "text-amber-400" },
-  { match: /how to (practice|develop|do it)/i, Icon: ListChecks, color: "text-cyan-400" },
-];
-
-const StepDescription: React.FC<{ description: string }> = ({ description }) => {
-  const sections = useMemo(() => parseDescriptionSections(description), [description]);
-  return (
-    <div className="space-y-5">
-      {sections.map((sec, i) => {
-        const meta = sec.heading ? SECTION_ICONS.find((m) => m.match.test(sec.heading as string)) : undefined;
-        const Icon = meta?.Icon ?? Sparkles;
-        return (
-          <div key={i} className="space-y-2">
-            {sec.heading && (
-              <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                <Icon className={`h-3.5 w-3.5 ${meta?.color ?? "text-zinc-500"}`} />
-                {sec.heading}
-              </p>
-            )}
-            <div className="space-y-2 text-sm leading-relaxed text-zinc-300">
-              {sec.lines.map((line, j) =>
-                line.startsWith("- ") ? (
-                  <div key={j} className="flex items-start gap-2.5">
-                    <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-700" />
-                    <span>{line.slice(2)}</span>
-                  </div>
-                ) : (
-                  <p key={j}>{line}</p>
-                )
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-// ───────────────────────────────────────────────────────────────────────────
-
-type StepStatus = "not-started" | "in-progress" | "done";
-
-function getStatus(step: RoadmapStep): StepStatus {
-  if (step.sessionsCompleted >= step.sessionsRequired) return "done";
-  if (step.sessionsCompleted > 0) return "in-progress";
-  return "not-started";
-}
-
-/**
- * Status derived from the checkable resources (exercise + lessons), so marking
- * things as practiced/watched is what moves a step through its lifecycle.
- * Returns null when the step has no trackable resource yet.
- */
-function getResourceStatus(step: RoadmapStep, lessons: YouTubeLessonResult[]): StepStatus | null {
-  const hasExercise = !!step.suggestedExerciseId && !step.noExercise;
-  const total = (hasExercise ? 1 : 0) + lessons.length;
-  if (total === 0) return null;
-  const completed = (hasExercise && step.exerciseCompleted ? 1 : 0) + (step.completedLessonIds?.length ?? 0);
-  if (completed === 0) return "not-started";
-  if (completed >= total) return "done";
-  return "in-progress";
-}
+// ─── Map styling ─────────────────────────────────────────────────────────────
 
 const STEP_CLS: Record<StepStatus, string> = {
   "not-started": "bg-zinc-900 text-zinc-300 hover:bg-zinc-800/80",
-  "in-progress": "bg-amber-500/10 text-amber-200",
-  done: "bg-green-950/30 text-green-600/70",
+  "in-progress": "bg-amber-500/10 text-amber-200 hover:bg-amber-500/15",
+  done: "bg-emerald-950/30 text-emerald-400/80 hover:bg-emerald-950/50",
 };
 
 const STATUS_DOT: Record<StepStatus, string> = {
   "not-started": "bg-zinc-600",
   "in-progress": "bg-amber-400",
-  done: "bg-green-500",
+  done: "bg-emerald-500",
 };
-
-const STATUS_LABEL: Record<StepStatus, string> = {
-  "not-started": "To do",
-  "in-progress": "In progress",
-  done: "Done",
-};
-
-const STATUS_BTNS = [
-  { status: "not-started" as StepStatus, label: "Not yet", Icon: CircleDashed },
-  { status: "in-progress" as StepStatus, label: "Practicing", Icon: Zap },
-  { status: "done" as StepStatus, label: "Got it!", Icon: CheckCircle2 },
-];
 
 const PATH_COLOR: Record<StepStatus, string> = {
   "not-started": "#3f3f46",
   "in-progress": "#78350f",
-  done: "#14532d",
+  done: "#065f46",
 };
 
-const PHASE_COLORS = [
-  { badge: "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/30" },
-  { badge: "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/30" },
-  { badge: "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30" },
-  { badge: "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/30" },
-  { badge: "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/30" },
-  { badge: "bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30" },
+const PHASE_BADGE = [
+  "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/30",
+  "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/30",
+  "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30",
+  "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/30",
+  "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/30",
+  "bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30",
 ];
+
+const LEGEND: { status: StepStatus; label: string }[] = [
+  { status: "not-started", label: "To do" },
+  { status: "in-progress", label: "In progress" },
+  { status: "done", label: "Done" },
+];
+
+// ─── Small pieces of the map ─────────────────────────────────────────────────
+
+interface StepMapButtonProps {
+  step: RoadmapStep;
+  isActive: boolean;
+  isLoading: boolean;
+  textAlign: "left" | "right";
+  fullWidth?: boolean;
+  /** Marks the node the connector lines attach to (the desktop copy of the step). */
+  connector?: boolean;
+  onClick: () => void;
+}
+
+const StepMapButton = ({
+  step,
+  isActive,
+  isLoading,
+  textAlign,
+  fullWidth = false,
+  connector = false,
+  onClick,
+}: StepMapButtonProps) => {
+  const status = getStepStatus(step);
+  return (
+    <button
+      type='button'
+      data-step-id={connector ? step.id : undefined}
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-2.5 rounded px-3 py-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        STEP_CLS[status],
+        fullWidth ? "w-full" : "max-w-[260px]",
+        textAlign === "right" ? "text-right" : "text-left",
+        isActive &&
+          "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950",
+      )}>
+      <span
+        className={cn(
+          "h-2 w-2 shrink-0 rounded-full",
+          isLoading ? "animate-pulse bg-zinc-500" : STATUS_DOT[status],
+        )}
+      />
+      <span>{step.title}</span>
+    </button>
+  );
+};
+
+const PhaseBadge = ({
+  phaseIdx,
+  allDone,
+}: {
+  phaseIdx: number;
+  allDone: boolean;
+}) => (
+  <span
+    className={cn(
+      "flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-colors",
+      allDone
+        ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40"
+        : PHASE_BADGE[phaseIdx % PHASE_BADGE.length],
+    )}>
+    {allDone ? <Check className='h-4 w-4' /> : phaseIdx + 1}
+  </span>
+);
+
+// ─── Data helpers ────────────────────────────────────────────────────────────
+
+const withId = (set: Set<string>, id: string) => new Set(set).add(id);
+const withoutId = (set: Set<string>, id: string) => {
+  const next = new Set(set);
+  next.delete(id);
+  return next;
+};
+
+interface StepDetailResponse {
+  description?: string;
+  successCriteria?: string;
+  sessionsRequired?: number | string;
+}
+
+const fetchStepDetail = async (
+  roadmap: Roadmap,
+  ref: RoadmapStepRef,
+  phases: RoadmapPhase[],
+): Promise<StepDetailResponse> => {
+  const { step, phase, stepIdx, phaseIdx } = ref;
+  const res = await fetch("/api/generate-step-detail", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      goal: roadmap.goal,
+      level: roadmap.level,
+      phaseIndex: phaseIdx,
+      phaseName: phase.title,
+      totalPhases: phases.length,
+      stepTitle: step.title,
+      prevSteps: phase.steps.slice(0, stepIdx).map((s) => s.title),
+      nextSteps: phase.steps.slice(stepIdx + 1).map((s) => s.title),
+      allPhases: phases.map((p) => ({
+        title: p.title,
+        steps: p.steps.map((s) => s.title),
+      })),
+    }),
+  });
+  return res.json();
+};
+
+const enrichStep = (
+  step: RoadmapStep,
+  data: StepDetailResponse,
+): RoadmapStep => ({
+  ...step,
+  description: data.description || "",
+  successCriteria: data.successCriteria || "",
+  sessionsRequired: Number(data.sessionsRequired) || 8,
+});
+
+const searchExercise = async (
+  roadmap: Roadmap,
+  step: RoadmapStep,
+): Promise<string[]> => {
+  const res = await fetch("/api/search-exercise", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      stepTitle: step.title,
+      description: step.description || "",
+      goal: roadmap.goal,
+      level: roadmap.level,
+    }),
+  });
+  const data = await res.json();
+  return (data.exercise_ids ?? []) as string[];
+};
+
+const searchLessons = async (
+  roadmap: Roadmap,
+  step: RoadmapStep,
+): Promise<YouTubeLessonResult[]> => {
+  const res = await fetch("/api/search-youtube-lessons", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      stepTitle: step.title,
+      stepDescription: step.description || "",
+      roadmapGoal: roadmap.goal,
+      roadmapLevel: roadmap.level,
+    }),
+  });
+  const data = await res.json();
+  return (data.lessons ?? []) as YouTubeLessonResult[];
+};
+
+/** Inline lessons (authored in the roadmap JSON) first, then the indexed ones, deduped by video. */
+const loadStepLessons = async (
+  step: RoadmapStep,
+): Promise<YouTubeLessonResult[]> => {
+  const inline = step.lessons ?? [];
+  let fromIds: YouTubeLessonResult[] = [];
+  if (step.suggestedLessonIds?.length) {
+    const stored = await firebaseGetLessonsByIds(step.suggestedLessonIds);
+    fromIds = stored.map((l) => ({
+      videoId: l.videoId,
+      title: l.title,
+      channelName: l.channelName,
+      thumbnailUrl: l.thumbnailUrl,
+      duration: l.duration,
+      level: l.level,
+      topics: l.topics,
+      score: l.qualityScore ?? 0,
+    }));
+  }
+  const seen = new Set(inline.map((l) => l.videoId));
+  return [...inline, ...fromIds.filter((l) => !seen.has(l.videoId))];
+};
+
+const parseYouTubeId = (url: string): string | null => {
+  const m = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+  );
+  return m?.[1] ?? null;
+};
+
+/** The DOM nodes the connector lines run between, keyed by id. */
+const collectNodes = (
+  container: HTMLElement,
+  attribute: "data-phase-id" | "data-step-id",
+) => {
+  const nodes = new Map<string, HTMLElement>();
+  container.querySelectorAll<HTMLElement>(`[${attribute}]`).forEach((el) => {
+    const id = el.getAttribute(attribute);
+    if (id) nodes.set(id, el);
+  });
+  return nodes;
+};
 
 interface SvgPath {
   d: string;
@@ -250,546 +286,136 @@ interface SvgPath {
   status: StepStatus;
 }
 
+interface BatchState {
+  label: string;
+  color: string;
+  done: number;
+  total: number;
+}
+
 interface RoadmapViewProps {
   roadmap: Roadmap;
-  onDelete: () => void;
+  /** The step to open straight away — the `?step=` of a deep link or a return trip. */
+  initialStepId?: string;
   onUpdate?: (roadmap: Roadmap) => void;
   onPersist?: (phases: RoadmapPhase[]) => Promise<void>;
   adminMode?: boolean;
 }
 
-// ─── Step page (replaces the old drawer — full-width, readable, no overlay) ─
-
-interface StepPageContentProps {
-  activeStepInfo: { step: RoadmapStep; phase: RoadmapPhase; stepIdx: number; phaseIdx: number };
-  adminMode?: boolean;
-  roadmap: Roadmap;
-  router: ReturnType<typeof useRouter>;
-  lessonsCache: Record<string, YouTubeLessonResult[]>;
-  loadingDetailIds: Set<string>;
-  loadingExerciseIds: Set<string>;
-  loadingLessonsId: string | null;
-  exerciseOptions: Record<string, string[]>;
-  customLessonInput: Record<string, string>;
-  addingCustomLesson: Set<string>;
-  onBack: () => void;
-  onRegenerateStep: (step: RoadmapStep, phase: RoadmapPhase, stepIdx: number, phaseIdx: number) => void;
-  onSetStepStatus: (phaseId: string, stepId: string, status: StepStatus) => void;
-  onEditStep: (stepId: string, phaseId: string, updates: Partial<RoadmapStep>) => void;
-  onFindExercises: (step: RoadmapStep) => void;
-  onSelectExercise: (stepId: string, phaseId: string, exerciseId: string) => void;
-  onToggleExercise: () => void;
-  onToggleLesson: (videoId: string) => void;
-  onFindLessons: (step: RoadmapStep, phase: RoadmapPhase) => void;
-  onRemoveLesson: (stepId: string, phaseId: string, videoId: string) => void;
-  onCustomLessonInputChange: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-  onAddCustomLesson: (stepId: string, phaseId: string, url: string) => void;
-  onPracticeLesson: (lesson: YouTubeLessonResult) => void;
-}
-
-const StepPageContent: React.FC<StepPageContentProps> = ({
-  activeStepInfo: info,
-  adminMode,
+/**
+ * The roadmap as a map: phases down the spine, steps branching off, the
+ * reward at the bottom. A step opens in a side drawer, so the map stays in
+ * view and the drawer's prev/next walk the whole path. The open step also
+ * lives in the URL (`?step=`), so a refresh, or coming back from the exercise
+ * page, lands in the same place.
+ */
+const RoadmapView: React.FC<RoadmapViewProps> = ({
   roadmap,
-  router,
-  lessonsCache,
-  loadingDetailIds,
-  loadingExerciseIds,
-  loadingLessonsId,
-  exerciseOptions,
-  customLessonInput,
-  addingCustomLesson,
-  onBack,
-  onRegenerateStep,
-  onSetStepStatus,
-  onEditStep,
-  onFindExercises,
-  onSelectExercise,
-  onToggleExercise,
-  onToggleLesson,
-  onFindLessons,
-  onRemoveLesson,
-  onCustomLessonInputChange,
-  onAddCustomLesson,
-  onPracticeLesson,
+  initialStepId,
+  onUpdate,
+  onPersist,
+  adminMode = false,
 }) => {
-  const { step, phase, stepIdx, phaseIdx } = info;
-  const lessons = lessonsCache[step.id] ?? [];
-  const resourceStatus = getResourceStatus(step, lessons);
+  const router = useRouter();
 
-  return (
-    <div className="flex flex-col gap-8 px-5 py-6 md:px-8 md:py-8">
-      {/* ── Top bar ── */}
-      <div className="flex flex-col gap-4">
-        <BackLink label="Back to roadmap" onClick={onBack} />
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-2">
-            <span className="w-fit rounded bg-zinc-800/80 px-2 py-0.5 text-[10px] font-semibold tracking-widest text-zinc-500">
-              Phase {phaseIdx + 1} · Step {stepIdx + 1} of {phase.steps.length}
-            </span>
-            <h1 className="font-display text-xl font-bold leading-snug text-zinc-100 md:text-2xl">{step.title}</h1>
-          </div>
-          {adminMode && step.description && !loadingDetailIds.has(step.id) && (
-            <button
-              onClick={() => onRegenerateStep(step, phase, stepIdx, phaseIdx)}
-              className="flex shrink-0 items-center gap-1 rounded bg-zinc-800 px-2.5 py-1.5 text-[11px] text-zinc-400 transition hover:bg-zinc-700 hover:text-zinc-200"
-            >
-              <RefreshCw className="h-3 w-3" /> Regen
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* ── Status ── */}
-      {resourceStatus ? (
-        <div
-          className={cn(
-            "flex flex-wrap items-center gap-2.5 rounded-lg px-4 py-3.5",
-            resourceStatus === "done"
-              ? "bg-green-900/30 text-green-400"
-              : resourceStatus === "in-progress"
-              ? "bg-amber-500/10 text-amber-300"
-              : "bg-zinc-900/40 text-zinc-500"
-          )}
-        >
-          <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[resourceStatus]}`} />
-          <span className="text-sm font-semibold">{STATUS_LABEL[resourceStatus]}</span>
-          <span className="text-xs opacity-80">
-            {resourceStatus === "done"
-              ? "Nice — you've got this one!"
-              : resourceStatus === "in-progress"
-              ? "Mark everything below to complete this skill."
-              : "Mark a resource below as you practice it."}
-          </span>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2.5">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Your progress on this skill</p>
-          <div className="grid grid-cols-3 gap-2">
-            {STATUS_BTNS.map(({ status: s, label, Icon }) => {
-              const isActive = getStatus(step) === s;
-              return (
-                <button
-                  key={s}
-                  onClick={() => onSetStepStatus(phase.id, step.id, s)}
-                  className={`flex flex-col items-center gap-1.5 rounded-lg px-2 py-3.5 text-xs font-semibold transition-all ${
-                    isActive
-                      ? s === "not-started"
-                        ? "bg-zinc-700 text-zinc-100 ring-1 ring-zinc-500"
-                        : s === "in-progress"
-                        ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40"
-                        : "bg-green-900/50 text-green-400 ring-1 ring-green-500/40"
-                      : "bg-zinc-900/60 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-400"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ── Content ── */}
-      {loadingDetailIds.has(step.id) ? (
-        <AiGeneratingLoader stepTitle={step.title} />
-      ) : step.description ? (
-        <div className="flex flex-col gap-8">
-          {/* Exercise (admin only) */}
-          {adminMode && (
-            <div className="rounded-lg bg-zinc-900/40 p-5 md:p-6">
-              <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
-                <Dumbbell className="h-3 w-3 text-cyan-500" /> Exercise
-              </p>
-              {loadingExerciseIds.has(step.id) ? (
-                <div className="flex items-center gap-2 text-xs text-zinc-500">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Searching exercises…
-                </div>
-              ) : exerciseOptions[step.id] ? (
-                <div className="space-y-2">
-                  <p className="text-[11px] text-zinc-600">Pick one:</p>
-                  {exerciseOptions[step.id].map((id) => {
-                    const ex = exercisesAgregat.find((e) => e.id === id);
-                    if (!ex) return null;
-                    return (
-                      <button
-                        key={id}
-                        onClick={() => onSelectExercise(step.id, phase.id, id)}
-                        className="flex w-full items-center gap-3 rounded bg-zinc-900 px-3 py-2.5 text-left text-xs transition hover:bg-zinc-800"
-                      >
-                        <Dumbbell className="h-4 w-4 shrink-0 text-cyan-500" />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-semibold text-zinc-100">{ex.title}</p>
-                          {ex.difficulty && <p className="capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
-                        </div>
-                        <ChevronRight className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
-                      </button>
-                    );
-                  })}
-                  <button onClick={() => onFindExercises(step)} className="text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
-                    Search again
-                  </button>
-                </div>
-              ) : step.noExercise ? (
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1.5 rounded bg-zinc-800/60 px-2.5 py-1.5 text-[11px] text-zinc-500">
-                    <X className="h-3 w-3" /> No exercise
-                  </span>
-                  <button onClick={() => onEditStep(step.id, phase.id, { noExercise: false })} className="text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
-                    Undo
-                  </button>
-                </div>
-              ) : step.suggestedExerciseId ? (
-                (() => {
-                  const ex = exercisesAgregat.find((e) => e.id === step.suggestedExerciseId);
-                  if (!ex) return null;
-                  return (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3 rounded-lg bg-cyan-950/25 px-3 py-2.5">
-                        <Dumbbell className="h-4 w-4 shrink-0 text-cyan-400" />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
-                          {ex.difficulty && <p className="text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <button onClick={() => onFindExercises(step)} className="flex items-center gap-1 text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
-                          <RefreshCw className="h-2.5 w-2.5" /> Change exercise
-                        </button>
-                        <button onClick={() => onEditStep(step.id, phase.id, { suggestedExerciseId: undefined, noExercise: true })} className="text-[11px] text-zinc-700 underline underline-offset-2 hover:text-red-400">
-                          No exercise
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })()
-              ) : (
-                <div className="flex items-center gap-2">
-                  <button onClick={() => onFindExercises(step)} className="flex items-center gap-2 rounded bg-zinc-800 px-3 py-2 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-cyan-300">
-                    <Sparkles className="h-3.5 w-3.5" /> Find exercise
-                  </button>
-                  <button onClick={() => onEditStep(step.id, phase.id, { noExercise: true })} className="flex items-center gap-2 rounded bg-zinc-800 px-3 py-2 text-xs text-zinc-500 transition hover:bg-zinc-700 hover:text-zinc-300">
-                    <X className="h-3.5 w-3.5" /> No exercise
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Description */}
-          <div className="rounded-lg bg-zinc-900/40 p-5 md:p-6">
-            {adminMode ? (
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold tracking-widest text-zinc-500">Description</label>
-                <textarea
-                  rows={8}
-                  className="w-full resize-y rounded-lg bg-zinc-800/60 px-3 py-2 text-sm leading-relaxed text-zinc-200 outline-none transition focus:ring-1 focus:ring-cyan-500"
-                  value={step.description}
-                  onChange={(e) => onEditStep(step.id, phase.id, { description: e.target.value })}
-                />
-              </div>
-            ) : (
-              <StepDescription description={step.description} />
-            )}
-          </div>
-
-          {/* Success criteria */}
-          {(step.successCriteria || adminMode) && (
-            <div className="rounded-lg bg-cyan-950/20 p-5 md:p-6">
-              <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-cyan-500/80">
-                <Target className="h-3.5 w-3.5" /> Success criteria
-              </p>
-              {adminMode ? (
-                <textarea
-                  rows={3}
-                  className="w-full resize-y rounded-lg bg-zinc-800/60 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:ring-1 focus:ring-cyan-500"
-                  value={step.successCriteria}
-                  onChange={(e) => onEditStep(step.id, phase.id, { successCriteria: e.target.value })}
-                />
-              ) : (
-                <p className="text-sm leading-relaxed text-zinc-200">{step.successCriteria}</p>
-              )}
-            </div>
-          )}
-
-          {/* Suggested resources (user) */}
-          {!adminMode && (() => {
-            const hasExercise = loadingExerciseIds.has(step.id) || !!step.suggestedExerciseId;
-            const hasLessons = loadingLessonsId === step.id || lessons.length > 0;
-            if (!hasExercise && !hasLessons) return null;
-            return (
-              <div className="flex flex-col gap-5">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Suggested resources</p>
-                    <span className="rounded-full bg-zinc-800/80 px-2 py-0.5 text-[10px] text-zinc-600">optional</span>
-                  </div>
-                  <p className="mt-1 text-[11px] text-zinc-600">
-                    Mark them off as you use them — that&apos;s what moves this skill along.
-                  </p>
-                </div>
-
-                {/* Exercise */}
-                {hasExercise && (
-                  loadingExerciseIds.has(step.id) ? (
-                    <div className="flex items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-3">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
-                      <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
-                    </div>
-                  ) : (() => {
-                    const ex = exercisesAgregat.find((e) => e.id === step.suggestedExerciseId);
-                    if (!ex) return null;
-                    const isCompleted = !!step.exerciseCompleted;
-                    return (
-                      <div className="flex flex-col gap-2">
-                        <p className="flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
-                          <Dumbbell className="h-3 w-3 text-cyan-500" /> Recommended exercise
-                        </p>
-                        <button
-                          onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}&returnTo=${encodeURIComponent(`/ai-coach?roadmapId=${roadmap.id}`)}`)}
-                          className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-lg px-4 py-4 text-left transition-all ${
-                            isCompleted ? "bg-green-950/20 hover:bg-green-950/30" : "bg-cyan-950/30 hover:bg-cyan-950/50"
-                          }`}
-                        >
-                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition group-hover:bg-cyan-500/25 ${
-                            isCompleted ? "bg-green-500/15" : "bg-cyan-500/15"
-                          }`}>
-                            {isCompleted
-                              ? <CheckCircle2 className="h-5 w-5 text-green-400" />
-                              : <Dumbbell className="h-5 w-5 text-cyan-400" />}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
-                            {ex.difficulty && <p className="mt-0.5 text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>}
-                          </div>
-                          <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-400" />
-                        </button>
-                        <button
-                          onClick={onToggleExercise}
-                          className={`flex w-full items-center gap-3 rounded-lg px-4 py-3.5 text-sm font-semibold transition-colors ${
-                            isCompleted
-                              ? "bg-green-950/30 text-green-400"
-                              : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200"
-                          }`}
-                        >
-                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
-                            isCompleted ? "border-green-500 bg-green-500/20" : "border-zinc-600"
-                          }`}>
-                            {isCompleted && <Check className="h-3 w-3 text-green-400" />}
-                          </span>
-                          {isCompleted ? "Practiced ✓" : "Mark as practiced"}
-                        </button>
-                      </div>
-                    );
-                  })()
-                )}
-
-                {/* YouTube lessons */}
-                {hasLessons && (
-                  <div className="flex flex-col gap-3">
-                    <p className="flex items-center gap-1.5 text-[10px] font-semibold capitalize tracking-widest text-zinc-500">
-                      <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
-                    </p>
-                    {loadingLessonsId === step.id ? (
-                      <div className="space-y-2">
-                        {[0, 1, 2].map((i) => (
-                          <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
-                            <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
-                            <div className="flex-1 space-y-2">
-                              <div className="h-3 w-3/4 rounded bg-zinc-800" />
-                              <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col gap-4">
-                        {lessons.map((lesson) => {
-                          const isWatched = step.completedLessonIds?.includes(lesson.videoId) ?? false;
-                          return (
-                            <div key={lesson.videoId} className="flex flex-col gap-2">
-                              <YouTubeLessonCard lesson={lesson} onClick={() => onPracticeLesson(lesson)} />
-                              <button
-                                onClick={() => onToggleLesson(lesson.videoId)}
-                                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3.5 text-sm font-semibold transition-colors ${
-                                  isWatched
-                                    ? "bg-green-950/20 text-green-400"
-                                    : "bg-zinc-900/40 text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200"
-                                }`}
-                              >
-                                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all ${
-                                  isWatched ? "border-green-500 bg-green-500/20" : "border-zinc-600"
-                                }`}>
-                                  {isWatched && <Check className="h-3 w-3 text-green-400" />}
-                                </span>
-                                {isWatched ? "Watched ✓" : "Mark as watched"}
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-
-          {/* YouTube lessons (admin only) */}
-          {adminMode && (
-            <div className="rounded-lg bg-zinc-900/40 p-5 md:p-6">
-              <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold capitalize tracking-widest text-zinc-500">
-                <FaYoutube className="h-3.5 w-3.5 text-red-500" /> YouTube Lessons
-              </p>
-              {loadingLessonsId === step.id ? (
-                <div className="space-y-2">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="flex h-[61px] animate-pulse items-center gap-3 rounded bg-zinc-900/60 px-3">
-                      <div className="h-[45px] w-[80px] shrink-0 rounded bg-zinc-800" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-3 w-3/4 rounded bg-zinc-800" />
-                        <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : lessons.length ? (
-                <div className="space-y-2">
-                  {lessons.map((lesson) => (
-                    <div key={lesson.videoId} className="group relative">
-                      <YouTubeLessonCard lesson={lesson} />
-                      <button
-                        onClick={() => onRemoveLesson(step.id, phase.id, lesson.videoId)}
-                        className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded bg-zinc-800/80 text-zinc-500 opacity-0 transition hover:bg-red-900/60 hover:text-red-400 group-hover:opacity-100"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                  <button onClick={() => onFindLessons(step, phase)} className="flex items-center gap-1 text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-300">
-                    <RefreshCw className="h-2.5 w-2.5" /> Search again
-                  </button>
-                  <div className="flex gap-2 pt-1">
-                    <input
-                      type="text" placeholder="Paste YouTube URL…"
-                      value={customLessonInput[step.id] ?? ""}
-                      onChange={(e) => onCustomLessonInputChange((prev) => ({ ...prev, [step.id]: e.target.value }))}
-                      onKeyDown={(e) => { if (e.key === "Enter") onAddCustomLesson(step.id, phase.id, customLessonInput[step.id] ?? ""); }}
-                      className="flex-1 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-red-600"
-                    />
-                    <button
-                      onClick={() => onAddCustomLesson(step.id, phase.id, customLessonInput[step.id] ?? "")}
-                      disabled={addingCustomLesson.has(step.id)}
-                      className="flex items-center gap-1.5 rounded bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300 disabled:opacity-50"
-                    >
-                      {addingCustomLesson.has(step.id) ? <Loader2 className="h-3 w-3 animate-spin" /> : <FaYoutube className="h-3 w-3 text-red-500" />}
-                      Add
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <button onClick={() => onFindLessons(step, phase)} className="flex items-center gap-2 rounded bg-zinc-800 px-3 py-2 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300">
-                    <FaYoutube className="h-3.5 w-3.5 text-red-500" /> Find lessons
-                  </button>
-                  <div className="flex gap-2">
-                    <input
-                      type="text" placeholder="Or paste YouTube URL…"
-                      value={customLessonInput[step.id] ?? ""}
-                      onChange={(e) => onCustomLessonInputChange((prev) => ({ ...prev, [step.id]: e.target.value }))}
-                      onKeyDown={(e) => { if (e.key === "Enter") onAddCustomLesson(step.id, phase.id, customLessonInput[step.id] ?? ""); }}
-                      className="flex-1 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-red-600"
-                    />
-                    <button
-                      onClick={() => onAddCustomLesson(step.id, phase.id, customLessonInput[step.id] ?? "")}
-                      disabled={addingCustomLesson.has(step.id)}
-                      className="flex items-center gap-1.5 rounded bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300 disabled:opacity-50"
-                    >
-                      {addingCustomLesson.has(step.id) ? <Loader2 className="h-3 w-3 animate-spin" /> : <FaYoutube className="h-3 w-3 text-red-500" />}
-                      Add
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 py-12 text-center">
-          <p className="text-sm text-zinc-500">Detailed description will be generated.</p>
-          <p className="text-xs text-zinc-700">Close and reopen this step to load the description.</p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist, adminMode }) => {
   const persist = useCallback(
     async (phases: RoadmapPhase[]) => {
-      if (onPersist) {
-        await onPersist(phases);
-      } else {
-        await firebaseUpdateRoadmap(roadmap.id, { phases });
-      }
+      if (onPersist) await onPersist(phases);
+      else await firebaseUpdateRoadmap(roadmap.id, { phases });
     },
-    [onPersist, roadmap.id]
+    [onPersist, roadmap.id],
   );
-  const router = useRouter();
-  const [phases, setPhases] = useState<RoadmapPhase[]>(roadmap.phases ?? []);
-  const phasesRef = useRef(phases);
-  useEffect(() => { phasesRef.current = phases; }, [phases]);
 
-  const [activeStepId, setActiveStepId] = useState<string | null>(null);
+  const [phases, setPhases] = useState<RoadmapPhase[]>(roadmap.phases ?? []);
+  // Mirror for async work (batches, fetches) that outlives the render it started in.
+  const phasesRef = useRef(phases);
+  useEffect(() => {
+    phasesRef.current = phases;
+  }, [phases]);
+
+  // The active step outlives the drawer being open: closing keeps it so the
+  // panel has content while it slides out, and so the map remembers the spot.
+  const [activeStepId, setActiveStepId] = useState<string | null>(() =>
+    initialStepId &&
+    roadmap.phases.some((p) => p.steps.some((s) => s.id === initialStepId))
+      ? initialStepId
+      : null,
+  );
+  const [isDrawerOpen, setIsDrawerOpen] = useState(() => activeStepId !== null);
+
   const [practiceLesson, setPracticeLesson] = useState<{
     lesson: YouTubeLessonResult;
     stepId: string;
     phaseId: string;
   } | null>(null);
-  const [loadingDetailIds, setLoadingDetailIds] = useState<Set<string>>(new Set());
-  const [loadingExerciseIds, setLoadingExerciseIds] = useState<Set<string>>(new Set());
 
-  const [batchGenerating, setBatchGenerating] = useState(false);
-  const [batchProgress, setBatchProgress] = useState({ done: 0, total: 0 });
-  const [batchExercising, setBatchExercising] = useState(false);
-  const [batchExerciseProgress, setBatchExerciseProgress] = useState({ done: 0, total: 0 });
-  const [batchLessoning, setBatchLessoning] = useState(false);
-  const [batchLessonProgress, setBatchLessonProgress] = useState({ done: 0, total: 0 });
+  // Lessons per step. Missing = not loaded yet (the effect below fetches for the open step).
+  const [lessonsCache, setLessonsCache] = useState<
+    Record<string, YouTubeLessonResult[]>
+  >({});
+  const lessonsInFlight = useRef<Set<string>>(new Set());
+  // A step without a description is generated while open; a failure is remembered so it can be retried.
+  const [detailFailedIds, setDetailFailedIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const detailInFlight = useRef<Set<string>>(new Set());
 
-  const [exerciseOptions, setExerciseOptions] = useState<Record<string, string[]>>({});
-  const [lessonsCache, setLessonsCache] = useState<Record<string, YouTubeLessonResult[]>>({});
-  const [loadingLessonsId, setLoadingLessonsId] = useState<string | null>(null);
-  const [customLessonInput, setCustomLessonInput] = useState<Record<string, string>>({});
-  const [addingCustomLesson, setAddingCustomLesson] = useState<Set<string>>(new Set());
+  // Admin only
+  const [loadingDetailIds, setLoadingDetailIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [loadingExerciseIds, setLoadingExerciseIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [loadingLessonIds, setLoadingLessonIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [exerciseOptions, setExerciseOptions] = useState<
+    Record<string, string[]>
+  >({});
+  const [customLessonInput, setCustomLessonInput] = useState<
+    Record<string, string>
+  >({});
+  const [addingCustomLesson, setAddingCustomLesson] = useState<Set<string>>(
+    new Set(),
+  );
+  const [batch, setBatch] = useState<BatchState | null>(null);
 
-  const containerCardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const phaseNodeRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const stepBtnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const [svgPaths, setSvgPaths] = useState<SvgPath[]>([]);
   const [svgDims, setSvgDims] = useState({ w: 0, h: 0 });
 
-  // Opening/closing a step swaps the whole card content (graph <-> step page),
-  // so scroll back to the top of that content each time.
-  useEffect(() => {
-    containerCardRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
-  }, [activeStepId]);
+  // ─── Derived ───────────────────────────────────────────────────────────────
 
-  const activeStepInfo = useMemo((): {
-    step: RoadmapStep;
-    phase: RoadmapPhase;
-    stepIdx: number;
-    phaseIdx: number;
-  } | null => {
-    if (!activeStepId) return null;
-    for (let pi = 0; pi < phases.length; pi++) {
-      const stepIdx = phases[pi].steps.findIndex((s) => s.id === activeStepId);
-      if (stepIdx !== -1)
-        return { step: phases[pi].steps[stepIdx], phase: phases[pi], stepIdx, phaseIdx: pi };
-    }
-    return null;
-  }, [activeStepId, phases]);
+  const steps = useMemo(() => flattenRoadmapSteps(phases), [phases]);
+  const activeStep = useMemo(
+    () => findRoadmapStep(steps, activeStepId),
+    [steps, activeStepId],
+  );
+  const upNext = useMemo(() => getNextUnfinishedStep(steps), [steps]);
+  const doneCount = useMemo(
+    () => steps.filter((r) => getStepStatus(r.step) === "done").length,
+    [steps],
+  );
+  const inProgressCount = useMemo(
+    () => steps.filter((r) => getStepStatus(r.step) === "in-progress").length,
+    [steps],
+  );
+  // Progress is session-based so partially-practiced steps still move the bar.
+  const progress = useMemo(() => {
+    const { completed, total } = steps.reduce(
+      (acc, { step }) => {
+        const required = step.sessionsRequired || 0;
+        acc.total += required;
+        acc.completed += Math.min(step.sessionsCompleted || 0, required);
+        return acc;
+      },
+      { completed: 0, total: 0 },
+    );
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
+  }, [steps]);
+
+  // ─── Connector lines ───────────────────────────────────────────────────────
 
   const recalcPaths = useCallback(() => {
     const container = containerRef.current;
@@ -797,9 +423,12 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
     const cRect = container.getBoundingClientRect();
     if (cRect.width === 0) return;
 
+    const phaseNodes = collectNodes(container, "data-phase-id");
+    const stepNodes = collectNodes(container, "data-step-id");
+
     const newPaths: SvgPath[] = [];
     phases.forEach((phase, phaseIdx) => {
-      const phaseEl = phaseNodeRefs.current.get(phase.id);
+      const phaseEl = phaseNodes.get(phase.id);
       if (!phaseEl) return;
       const pRect = phaseEl.getBoundingClientRect();
       const pCY = pRect.top + pRect.height / 2 - cRect.top;
@@ -808,11 +437,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
       const stepsRight = phaseIdx % 2 === 0;
 
       phase.steps.forEach((step) => {
-        const stepEl = stepBtnRefs.current.get(step.id);
+        const stepEl = stepNodes.get(step.id);
         if (!stepEl) return;
         const sRect = stepEl.getBoundingClientRect();
         const sCY = sRect.top + sRect.height / 2 - cRect.top;
-        const status = getStatus(step);
 
         let d: string;
         if (stepsRight) {
@@ -826,7 +454,11 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
           const span = x0 - x3;
           d = `M ${x0} ${pCY} C ${x0 - span * 0.75} ${pCY} ${x0 - span * 0.25} ${sCY} ${x3} ${sCY}`;
         }
-        newPaths.push({ d, key: `${phase.id}-${step.id}`, status });
+        newPaths.push({
+          d,
+          key: `${phase.id}-${step.id}`,
+          status: getStepStatus(step),
+        });
       });
     });
 
@@ -844,788 +476,912 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate, onPersist,
     return () => window.removeEventListener("resize", recalcPaths);
   }, [recalcPaths]);
 
-  const allSteps = useMemo(() => phases.flatMap((p) => p.steps), [phases]);
-  const doneCount = useMemo(() => allSteps.filter((s) => getStatus(s) === "done").length, [allSteps]);
-  const inProgressCount = useMemo(() => allSteps.filter((s) => getStatus(s) === "in-progress").length, [allSteps]);
-  // Progress is session-based so partially-practiced steps still move the bar.
-  const { completedSessions, totalSessions } = useMemo(
-    () =>
-      allSteps.reduce(
-        (acc, s) => {
-          const req = s.sessionsRequired || 0;
-          acc.totalSessions += req;
-          acc.completedSessions += Math.min(s.sessionsCompleted || 0, req);
-          return acc;
-        },
-        { completedSessions: 0, totalSessions: 0 }
-      ),
-    [allSteps]
+  // ─── State plumbing ────────────────────────────────────────────────────────
+
+  /** Replaces one step, keeps the ref in sync for async callers, tells the parent. */
+  const patchStep = useCallback(
+    (
+      phaseId: string,
+      stepId: string,
+      patch: (step: RoadmapStep) => RoadmapStep,
+    ): RoadmapPhase[] => {
+      const next = phasesRef.current.map((p) =>
+        p.id !== phaseId
+          ? p
+          : {
+              ...p,
+              steps: p.steps.map((s) => (s.id !== stepId ? s : patch(s))),
+            },
+      );
+      phasesRef.current = next;
+      setPhases(next);
+      onUpdate?.({
+        ...roadmap,
+        phases: next,
+        updatedAt: new Date().toISOString(),
+      });
+      return next;
+    },
+    [roadmap, onUpdate],
   );
-  const progress = totalSessions > 0 ? Math.round((completedSessions / totalSessions) * 100) : 0;
 
-  const openStepPage = async (step: RoadmapStep, phase: RoadmapPhase, stepIdx: number, phaseIdx: number) => {
-    setActiveStepId(step.id);
+  /** A patch the player made — persisted straight away. */
+  const saveStep = useCallback(
+    (
+      phaseId: string,
+      stepId: string,
+      patch: (step: RoadmapStep) => RoadmapStep,
+    ) => {
+      persist(patchStep(phaseId, stepId, patch)).catch(() =>
+        toast.error("Failed to save."),
+      );
+    },
+    [patchStep, persist],
+  );
 
-    let enrichedStep = step;
-    if (!step.description && !loadingDetailIds.has(step.id)) {
-      setLoadingDetailIds((prev) => new Set(prev).add(step.id));
-      try {
-        const res = await fetch("/api/generate-step-detail", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            goal: roadmap.goal,
-            level: roadmap.level,
-            phaseIndex: phaseIdx,
-            phaseName: phase.title,
-            totalPhases: phases.length,
-            stepTitle: step.title,
-            prevSteps: phase.steps.slice(0, stepIdx).map((s) => s.title),
-            nextSteps: phase.steps.slice(stepIdx + 1).map((s) => s.title),
-            allPhases: phases.map((p) => ({ title: p.title, steps: p.steps.map((s) => s.title) })),
-          }),
-        });
-        const data = await res.json();
-        enrichedStep = {
-          ...step,
-          description: data.description || "",
-          successCriteria: data.successCriteria || "",
-          sessionsRequired: Number(data.sessionsRequired) || 8,
-        };
-        const finalEnriched = enrichedStep;
-        let savedPhases: RoadmapPhase[] = [];
-        setPhases((prev) => {
-          savedPhases = prev.map((p) =>
-            p.id !== phase.id ? p : { ...p, steps: p.steps.map((s) => (s.id !== step.id ? s : finalEnriched)) }
-          );
-          return savedPhases;
-        });
-        onUpdate?.({ ...roadmap, phases: savedPhases, updatedAt: new Date().toISOString() });
-        await persist(savedPhases);
-      } catch (err) {
+  /** Mirrors the open step into the URL so a refresh or a return trip lands on it again. */
+  const syncStepQuery = useCallback(
+    (stepId: string | null) => {
+      const query: Record<string, string | string[]> = {};
+      Object.entries(router.query).forEach(([key, value]) => {
+        if (value !== undefined && key !== "step") query[key] = value;
+      });
+      query.roadmapId = roadmap.id;
+      if (stepId) query.step = stepId;
+      void router.replace({ pathname: router.pathname, query }, undefined, {
+        shallow: true,
+        scroll: false,
+      });
+    },
+    [router, roadmap.id],
+  );
+
+  const openStep = useCallback(
+    (ref: RoadmapStepRef) => {
+      setActiveStepId(ref.step.id);
+      setIsDrawerOpen(true);
+      syncStepQuery(ref.step.id);
+    },
+    [syncStepQuery],
+  );
+
+  const closeStep = useCallback(() => {
+    setIsDrawerOpen(false);
+    syncStepQuery(null);
+  }, [syncStepQuery]);
+
+  const navigateStep = useCallback(
+    (stepId: string) => {
+      const ref = findRoadmapStep(steps, stepId);
+      if (ref) openStep(ref);
+    },
+    [steps, openStep],
+  );
+
+  // The open step's lessons, fetched once and kept.
+  useEffect(() => {
+    if (adminMode || !activeStep) return;
+    const { step } = activeStep;
+    if (
+      lessonsCache[step.id] !== undefined ||
+      lessonsInFlight.current.has(step.id)
+    )
+      return;
+    lessonsInFlight.current.add(step.id);
+    loadStepLessons(step)
+      .then((lessons) =>
+        setLessonsCache((prev) => ({ ...prev, [step.id]: lessons })),
+      )
+      .catch(() => setLessonsCache((prev) => ({ ...prev, [step.id]: [] })))
+      .finally(() => lessonsInFlight.current.delete(step.id));
+  }, [activeStep, adminMode, lessonsCache]);
+
+  // The open step's details, written by the coach the first time anyone opens it.
+  useEffect(() => {
+    if (!activeStep || activeStep.step.description) return;
+    const { step, phase } = activeStep;
+    if (detailFailedIds.has(step.id) || detailInFlight.current.has(step.id))
+      return;
+    detailInFlight.current.add(step.id);
+    fetchStepDetail(roadmap, activeStep, phasesRef.current)
+      .then((data) => {
+        const saved = patchStep(phase.id, step.id, (s) => enrichStep(s, data));
+        return persist(saved).catch(() => toast.error("Failed to save."));
+      })
+      .catch((err) => {
         console.warn("Failed to fetch step detail:", err);
-      } finally {
-        setLoadingDetailIds((prev) => { const s = new Set(prev); s.delete(step.id); return s; });
-      }
-    }
+        setDetailFailedIds((prev) => withId(prev, step.id));
+      })
+      .finally(() => detailInFlight.current.delete(step.id));
+  }, [activeStep, detailFailedIds, patchStep, persist, roadmap]);
 
-    if (!adminMode && !lessonsCache[step.id] && !loadingLessonsId) {
-      setLoadingLessonsId(step.id);
-      const fetchLessons = async () => {
-        const inline = enrichedStep.lessons ?? [];
-        let fromIds: YouTubeLessonResult[] = [];
-        if (enrichedStep.suggestedLessonIds?.length) {
-          const firestoreLessons = await firebaseGetLessonsByIds(enrichedStep.suggestedLessonIds);
-          fromIds = firestoreLessons.map((l) => ({
-            videoId: l.videoId, title: l.title, channelName: l.channelName,
-            thumbnailUrl: l.thumbnailUrl, duration: l.duration, level: l.level,
-            topics: l.topics, score: l.qualityScore ?? 0,
-          }));
-        }
-        // Inline lessons (authored in the roadmap JSON) take priority; dedupe by videoId.
-        const seen = new Set(inline.map((l) => l.videoId));
-        return [...inline, ...fromIds.filter((l) => !seen.has(l.videoId))];
-      };
-      fetchLessons()
-        .then((lessons) => setLessonsCache((prev) => ({ ...prev, [step.id]: lessons })))
-        .catch(() => setLessonsCache((prev) => ({ ...prev, [step.id]: [] })))
-        .finally(() => setLoadingLessonsId(null));
-    }
+  // ─── Player actions ────────────────────────────────────────────────────────
 
+  const handleToggleExercise = () => {
+    if (!activeStep) return;
+    const { step, phase } = activeStep;
+    const lessons = lessonsCache[step.id] ?? [];
+    saveStep(phase.id, step.id, (s) =>
+      withResourceStatus(
+        { ...s, exerciseCompleted: !s.exerciseCompleted },
+        lessons,
+      ),
+    );
   };
 
-  // ─── Admin helpers ───────────────────────────────────────────────────────
-
-  const callStepDetailApi = useCallback(
-    async (step: RoadmapStep, phase: RoadmapPhase, stepIdx: number, phaseIdx: number, currentPhases: RoadmapPhase[]) => {
-      const res = await fetch("/api/generate-step-detail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          goal: roadmap.goal, level: roadmap.level, phaseIndex: phaseIdx,
-          phaseName: phase.title, totalPhases: currentPhases.length, stepTitle: step.title,
-          prevSteps: phase.steps.slice(0, stepIdx).map((s) => s.title),
-          nextSteps: phase.steps.slice(stepIdx + 1).map((s) => s.title),
-          allPhases: currentPhases.map((p) => ({ title: p.title, steps: p.steps.map((s) => s.title) })),
-        }),
-      });
-      return res.json() as Promise<{ description: string; successCriteria: string; sessionsRequired: number }>;
-    },
-    [roadmap.goal, roadmap.level]
-  );
-
-  const applyEnrichedStep = useCallback(
-    (phaseId: string, enriched: RoadmapStep) => {
-      let saved: RoadmapPhase[] = [];
-      setPhases((prev) => {
-        saved = prev.map((p) =>
-          p.id !== phaseId ? p : { ...p, steps: p.steps.map((s) => (s.id !== enriched.id ? s : enriched)) }
-        );
-        onUpdate?.({ ...roadmap, phases: saved, updatedAt: new Date().toISOString() });
-        return saved;
-      });
-      return saved;
-    },
-    [roadmap, onUpdate]
-  );
-
-  const handleGenerateAll = async () => {
-    const toGenerate: { step: RoadmapStep; phase: RoadmapPhase; stepIdx: number; phaseIdx: number }[] = [];
-    phasesRef.current.forEach((phase, phaseIdx) => {
-      phase.steps.forEach((step, stepIdx) => {
-        if (!step.description) toGenerate.push({ step, phase, stepIdx, phaseIdx });
-      });
+  const handleToggleLesson = (videoId: string) => {
+    if (!activeStep) return;
+    const { step, phase } = activeStep;
+    const lessons = lessonsCache[step.id] ?? [];
+    saveStep(phase.id, step.id, (s) => {
+      const current = s.completedLessonIds ?? [];
+      const next = current.includes(videoId)
+        ? current.filter((id) => id !== videoId)
+        : [...current, videoId];
+      return withResourceStatus({ ...s, completedLessonIds: next }, lessons);
     });
-    if (!toGenerate.length) { toast.info("All steps already have descriptions."); return; }
-    setBatchGenerating(true);
-    setBatchProgress({ done: 0, total: toGenerate.length });
-    for (let i = 0; i < toGenerate.length; i += 3) {
-      const batch = toGenerate.slice(i, i + 3);
-      await Promise.all(
-        batch.map(async ({ step, phase, stepIdx, phaseIdx }) => {
-          setLoadingDetailIds((prev) => new Set(prev).add(step.id));
-          try {
-            const data = await callStepDetailApi(step, phase, stepIdx, phaseIdx, phasesRef.current);
-            applyEnrichedStep(phase.id, {
-              ...step, description: data.description || "",
-              successCriteria: data.successCriteria || "",
-              sessionsRequired: Number(data.sessionsRequired) || 8,
-            });
-          } catch (err) {
-            console.warn("Batch step detail error:", err);
-          } finally {
-            setLoadingDetailIds((prev) => { const s = new Set(prev); s.delete(step.id); return s; });
-            setBatchProgress((prev) => ({ ...prev, done: prev.done + 1 }));
-          }
-        })
-      );
-    }
-    setBatchGenerating(false);
-    toast.success("All descriptions generated.");
   };
 
-  const handleFindAllExercises = async () => {
-    const toFind = phasesRef.current.flatMap((phase) =>
-      phase.steps.filter((s) => !s.suggestedExerciseId && !s.noExercise).map((s) => ({ step: s, phase }))
+  // The practice window forces a lesson to "watched" on finish (never toggles it back off).
+  const markLessonWatched = (
+    phaseId: string,
+    stepId: string,
+    videoId: string,
+  ) => {
+    const step = phasesRef.current
+      .find((p) => p.id === phaseId)
+      ?.steps.find((s) => s.id === stepId);
+    if (!step || step.completedLessonIds?.includes(videoId)) return;
+    const lessons = lessonsCache[stepId] ?? [];
+    saveStep(phaseId, stepId, (s) =>
+      withResourceStatus(
+        {
+          ...s,
+          completedLessonIds: [...(s.completedLessonIds ?? []), videoId],
+        },
+        lessons,
+      ),
     );
-    if (!toFind.length) { toast.info("All steps already have exercises or are marked as no-exercise."); return; }
-    setBatchExercising(true);
-    setBatchExerciseProgress({ done: 0, total: toFind.length });
-    for (let i = 0; i < toFind.length; i += 3) {
-      const batch = toFind.slice(i, i + 3);
-      await Promise.all(
-        batch.map(async ({ step, phase }) => {
-          setLoadingExerciseIds((prev) => new Set(prev).add(step.id));
-          try {
-            const res = await fetch("/api/search-exercise", {
-              method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ stepTitle: step.title, description: step.description || "", goal: roadmap.goal, level: roadmap.level }),
-            });
-            const data = await res.json();
-            const firstId: string | undefined = data.exercise_ids?.[0];
-            if (firstId) {
-              setPhases((prev) => {
-                const next = prev.map((p) =>
-                  p.id !== phase.id ? p : { ...p, steps: p.steps.map((s) => s.id !== step.id ? s : { ...s, suggestedExerciseId: firstId }) }
-                );
-                onUpdate?.({ ...roadmap, phases: next, updatedAt: new Date().toISOString() });
-                return next;
-              });
-            }
-          } catch { /* skip */ } finally {
-            setLoadingExerciseIds((prev) => { const s = new Set(prev); s.delete(step.id); return s; });
-            setBatchExerciseProgress((prev) => ({ ...prev, done: prev.done + 1 }));
-          }
-        })
-      );
-    }
-    setBatchExercising(false);
-    toast.success("Exercise search complete.");
   };
 
-  const handleFindAllLessons = async () => {
-    const toFind = phasesRef.current.flatMap((phase) =>
-      phase.steps.filter((s) => s.description && !s.suggestedLessonIds?.length).map((s) => ({ step: s, phase }))
-    );
-    if (!toFind.length) { toast.info("All described steps already have lessons."); return; }
-    setBatchLessoning(true);
-    setBatchLessonProgress({ done: 0, total: toFind.length });
-    for (let i = 0; i < toFind.length; i += 3) {
-      const batch = toFind.slice(i, i + 3);
-      await Promise.all(
-        batch.map(async ({ step, phase }) => {
-          try {
-            const res = await fetch("/api/search-youtube-lessons", {
-              method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ stepTitle: step.title, stepDescription: step.description || "", roadmapGoal: roadmap.goal, roadmapLevel: roadmap.level }),
-            });
-            const data = await res.json();
-            const lessons: YouTubeLessonResult[] = data.lessons ?? [];
-            if (lessons.length > 0) {
-              setLessonsCache((prev) => ({ ...prev, [step.id]: lessons }));
-              const lessonIds = lessons.map((l) => l.videoId);
-              setPhases((prev) => {
-                const next = prev.map((p) =>
-                  p.id !== phase.id ? p : { ...p, steps: p.steps.map((s) => s.id !== step.id ? s : { ...s, suggestedLessonIds: lessonIds }) }
-                );
-                onUpdate?.({ ...roadmap, phases: next, updatedAt: new Date().toISOString() });
-                return next;
-              });
-            }
-          } catch { /* skip */ } finally {
-            setBatchLessonProgress((prev) => ({ ...prev, done: prev.done + 1 }));
-          }
-        })
-      );
-    }
-    setBatchLessoning(false);
-    toast.success("Lesson search complete.");
+  const handleSetStatus = (status: StepStatus) => {
+    if (!activeStep) return;
+    saveStep(activeStep.phase.id, activeStep.step.id, (s) => ({
+      ...s,
+      sessionsCompleted: sessionsForStatus(s, status),
+    }));
   };
+
+  const handleOpenExercise = (exerciseId: string) => {
+    const returnTo = `/ai-coach?roadmapId=${roadmap.id}${activeStep ? `&step=${activeStep.step.id}` : ""}`;
+    void router.push(
+      `/profile/skills?exerciseId=${exerciseId}&returnTo=${encodeURIComponent(returnTo)}`,
+    );
+  };
+
+  const handleRetryDetail = () => {
+    if (activeStep)
+      setDetailFailedIds((prev) => withoutId(prev, activeStep.step.id));
+  };
+
+  // ─── Admin actions ─────────────────────────────────────────────────────────
 
   const handleEditStep = useCallback(
     (stepId: string, phaseId: string, updates: Partial<RoadmapStep>) => {
-      setPhases((prev) => {
-        const newPhases = prev.map((p) =>
-          p.id !== phaseId ? p : { ...p, steps: p.steps.map((s) => (s.id !== stepId ? s : { ...s, ...updates })) }
-        );
-        onUpdate?.({ ...roadmap, phases: newPhases, updatedAt: new Date().toISOString() });
-        return newPhases;
-      });
+      patchStep(phaseId, stepId, (s) => ({ ...s, ...updates }));
     },
-    [roadmap, onUpdate]
+    [patchStep],
   );
 
-  const handleRegenerateStep = async (step: RoadmapStep, phase: RoadmapPhase, stepIdx: number, phaseIdx: number) => {
-    applyEnrichedStep(phase.id, { ...step, description: "", successCriteria: "" });
-    setLoadingDetailIds((prev) => new Set(prev).add(step.id));
-    try {
-      const data = await callStepDetailApi({ ...step, description: "", successCriteria: "" }, phase, stepIdx, phaseIdx, phasesRef.current);
-      applyEnrichedStep(phase.id, {
-        ...step, description: data.description || "",
-        successCriteria: data.successCriteria || "",
-        sessionsRequired: Number(data.sessionsRequired) || 8,
-      });
-    } catch (err) {
-      console.warn("Regenerate step error:", err);
-      toast.error("Failed to regenerate. Try again.");
-    } finally {
-      setLoadingDetailIds((prev) => { const s = new Set(prev); s.delete(step.id); return s; });
-    }
+  /** Clears the copy; the detail effect above then writes it again. */
+  const handleRegenerateStep = (ref: RoadmapStepRef) => {
+    setDetailFailedIds((prev) => withoutId(prev, ref.step.id));
+    patchStep(ref.phase.id, ref.step.id, (s) => ({
+      ...s,
+      description: "",
+      successCriteria: "",
+    }));
   };
 
   const handleFindExercises = async (step: RoadmapStep) => {
-    setLoadingExerciseIds((prev) => new Set(prev).add(step.id));
+    setLoadingExerciseIds((prev) => withId(prev, step.id));
     try {
-      const res = await fetch("/api/search-exercise", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stepTitle: step.title, description: step.description || "", goal: roadmap.goal, level: roadmap.level }),
-      });
-      const data = await res.json();
-      setExerciseOptions((prev) => ({ ...prev, [step.id]: (data.exercise_ids ?? []).slice(0, 3) }));
+      const ids = await searchExercise(roadmap, step);
+      setExerciseOptions((prev) => ({ ...prev, [step.id]: ids.slice(0, 3) }));
     } catch {
       toast.error("Exercise search failed.");
     } finally {
-      setLoadingExerciseIds((prev) => { const s = new Set(prev); s.delete(step.id); return s; });
+      setLoadingExerciseIds((prev) => withoutId(prev, step.id));
     }
   };
 
-  const handleSelectExercise = (stepId: string, phaseId: string, exerciseId: string) => {
+  const handleSelectExercise = (
+    stepId: string,
+    phaseId: string,
+    exerciseId: string,
+  ) => {
     handleEditStep(stepId, phaseId, { suggestedExerciseId: exerciseId });
-    setExerciseOptions((prev) => { const n = { ...prev }; delete n[stepId]; return n; });
+    setExerciseOptions((prev) => {
+      const next = { ...prev };
+      delete next[stepId];
+      return next;
+    });
   };
 
   const handleFindLessons = async (step: RoadmapStep, phase: RoadmapPhase) => {
-    if (loadingLessonsId) return;
-    setLessonsCache((prev) => { const n = { ...prev }; delete n[step.id]; return n; });
-    setLoadingLessonsId(step.id);
+    if (loadingLessonIds.has(step.id)) return;
+    setLessonsCache((prev) => {
+      const next = { ...prev };
+      delete next[step.id];
+      return next;
+    });
+    setLoadingLessonIds((prev) => withId(prev, step.id));
     try {
-      const res = await fetch("/api/search-youtube-lessons", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stepTitle: step.title, stepDescription: step.description || "", roadmapGoal: roadmap.goal, roadmapLevel: roadmap.level }),
-      });
-      const data = await res.json();
-      const lessons: YouTubeLessonResult[] = data.lessons ?? [];
+      const lessons = await searchLessons(roadmap, step);
       setLessonsCache((prev) => ({ ...prev, [step.id]: lessons }));
-      if (lessons.length > 0) {
-        handleEditStep(step.id, phase.id, { suggestedLessonIds: lessons.map((l) => l.videoId) });
+      if (lessons.length) {
+        handleEditStep(step.id, phase.id, {
+          suggestedLessonIds: lessons.map((l) => l.videoId),
+        });
       }
     } catch {
       toast.error("Lesson search failed.");
     } finally {
-      setLoadingLessonsId(null);
+      setLoadingLessonIds((prev) => withoutId(prev, step.id));
     }
   };
 
-  const handleRemoveLesson = (stepId: string, phaseId: string, videoId: string) => {
-    setLessonsCache((prev) => ({ ...prev, [stepId]: (prev[stepId] ?? []).filter((l) => l.videoId !== videoId) }));
-    handleEditStep(stepId, phaseId, {
-      suggestedLessonIds: (phases.flatMap((p) => p.steps).find((s) => s.id === stepId)?.suggestedLessonIds ?? []).filter((id) => id !== videoId),
-    });
+  const handleRemoveLesson = (
+    stepId: string,
+    phaseId: string,
+    videoId: string,
+  ) => {
+    setLessonsCache((prev) => ({
+      ...prev,
+      [stepId]: (prev[stepId] ?? []).filter((l) => l.videoId !== videoId),
+    }));
+    patchStep(phaseId, stepId, (s) => ({
+      ...s,
+      suggestedLessonIds: (s.suggestedLessonIds ?? []).filter(
+        (id) => id !== videoId,
+      ),
+    }));
   };
 
-  const parseYouTubeId = (url: string): string | null => {
-    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    return m?.[1] ?? null;
-  };
-
-  const handleAddCustomLesson = async (stepId: string, phaseId: string, url: string) => {
+  const handleAddCustomLesson = async (
+    stepId: string,
+    phaseId: string,
+    url: string,
+  ) => {
     const videoId = parseYouTubeId(url.trim());
-    if (!videoId) { toast.error("Invalid YouTube URL."); return; }
-    if (lessonsCache[stepId]?.some((l) => l.videoId === videoId)) { toast.info("This video is already in the list."); return; }
-    setAddingCustomLesson((prev) => new Set(prev).add(stepId));
+    if (!videoId) {
+      toast.error("Invalid YouTube URL.");
+      return;
+    }
+    if (lessonsCache[stepId]?.some((l) => l.videoId === videoId)) {
+      toast.info("This video is already in the list.");
+      return;
+    }
+    setAddingCustomLesson((prev) => withId(prev, stepId));
     try {
-      const oEmbed = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`).then((r) => r.json());
+      const oEmbed = await fetch(
+        `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
+      ).then((r) => r.json());
       const lesson: YouTubeLessonResult = {
-        videoId, title: oEmbed.title ?? videoId, channelName: oEmbed.author_name ?? "",
-        thumbnailUrl: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`, duration: 0, score: 0,
+        videoId,
+        title: oEmbed.title ?? videoId,
+        channelName: oEmbed.author_name ?? "",
+        thumbnailUrl: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+        duration: 0,
+        score: 0,
       };
-      setLessonsCache((prev) => ({ ...prev, [stepId]: [...(prev[stepId] ?? []), lesson] }));
-      handleEditStep(stepId, phaseId, {
-        suggestedLessonIds: [
-          ...(phases.flatMap((p) => p.steps).find((s) => s.id === stepId)?.suggestedLessonIds ?? []),
-          videoId,
-        ],
-      });
+      setLessonsCache((prev) => ({
+        ...prev,
+        [stepId]: [...(prev[stepId] ?? []), lesson],
+      }));
+      patchStep(phaseId, stepId, (s) => ({
+        ...s,
+        suggestedLessonIds: [...(s.suggestedLessonIds ?? []), videoId],
+      }));
       setCustomLessonInput((prev) => ({ ...prev, [stepId]: "" }));
     } catch {
       toast.error("Could not fetch video info. Check the URL and try again.");
     } finally {
-      setAddingCustomLesson((prev) => { const s = new Set(prev); s.delete(stepId); return s; });
+      setAddingCustomLesson((prev) => withoutId(prev, stepId));
     }
   };
 
-  // Whenever a resource's completion changes, the step's own status (sessionsCompleted)
-  // is recomputed from it — checking anything moves the step to "in-progress", checking
-  // everything moves it to "done".
-  const applyAutoStatus = useCallback(
-    (step: RoadmapStep): RoadmapStep => {
-      const status = getResourceStatus(step, lessonsCache[step.id] ?? []);
-      if (status === null) return step;
-      const sessionsCompleted = status === "done" ? step.sessionsRequired : status === "in-progress" ? 1 : 0;
-      return { ...step, sessionsCompleted };
-    },
-    [lessonsCache]
-  );
-
-  const handleToggleExercise = () => {
-    if (!activeStepInfo) return;
-    const newPhases = phases.map((p) =>
-      p.id !== activeStepInfo.phase.id ? p : {
-        ...p,
-        steps: p.steps.map((s) =>
-          s.id !== activeStepInfo.step.id ? s : applyAutoStatus({ ...s, exerciseCompleted: !s.exerciseCompleted })
-        ),
-      }
-    );
-    setPhases(newPhases);
-    persist(newPhases).catch(() => toast.error("Failed to save."));
-  };
-
-  const handleToggleLesson = (videoId: string) => {
-    if (!activeStepInfo) return;
-    const current = activeStepInfo.step.completedLessonIds ?? [];
-    const next = current.includes(videoId)
-      ? current.filter((id) => id !== videoId)
-      : [...current, videoId];
-    const newPhases = phases.map((p) =>
-      p.id !== activeStepInfo.phase.id ? p : {
-        ...p,
-        steps: p.steps.map((s) =>
-          s.id !== activeStepInfo.step.id ? s : applyAutoStatus({ ...s, completedLessonIds: next })
-        ),
-      }
-    );
-    setPhases(newPhases);
-    persist(newPhases).catch(() => toast.error("Failed to save."));
-  };
-
-  // Used by the practice-session modal to force a lesson to "watched" on finish
-  // (never toggles it back off).
-  const markLessonWatched = useCallback(
-    (phaseId: string, stepId: string, videoId: string) => {
-      let changed = false;
-      const newPhases = phases.map((p) =>
-        p.id !== phaseId ? p : {
-          ...p,
-          steps: p.steps.map((s) => {
-            if (s.id !== stepId) return s;
-            const current = s.completedLessonIds ?? [];
-            if (current.includes(videoId)) return s;
-            changed = true;
-            return applyAutoStatus({ ...s, completedLessonIds: [...current, videoId] });
-          }),
-        }
-      );
-      if (!changed) return;
-      setPhases(newPhases);
-      persist(newPhases).catch(() => toast.error("Failed to save."));
-    },
-    [phases, applyAutoStatus, persist]
-  );
-
-  const setStepStatus = async (phaseId: string, stepId: string, status: StepStatus) => {
-    const newPhases = phases.map((phase) =>
-      phase.id !== phaseId ? phase : {
-        ...phase,
-        steps: phase.steps.map((step) => {
-          if (step.id !== stepId) return step;
-          const sessionsCompleted = status === "done" ? step.sessionsRequired : status === "in-progress" ? 1 : 0;
-          return { ...step, sessionsCompleted };
+  /** Runs `work` over `items` three at a time, with a progress bar on the map. */
+  const runBatch = async <T,>(
+    label: string,
+    color: string,
+    items: T[],
+    work: (item: T) => Promise<void>,
+  ) => {
+    setBatch({ label, color, done: 0, total: items.length });
+    for (let i = 0; i < items.length; i += 3) {
+      await Promise.all(
+        items.slice(i, i + 3).map(async (item) => {
+          try {
+            await work(item);
+          } catch (err) {
+            console.warn(`${label} error:`, err);
+          } finally {
+            setBatch((prev) =>
+              prev ? { ...prev, done: prev.done + 1 } : prev,
+            );
+          }
         }),
-      }
-    );
-    setPhases(newPhases);
-    try {
-      await persist(newPhases);
-    } catch {
-      toast.error("Failed to save.");
+      );
     }
+    setBatch(null);
   };
+
+  const handleGenerateAll = async () => {
+    const toGenerate = flattenRoadmapSteps(phasesRef.current).filter(
+      (r) => !r.step.description && !detailInFlight.current.has(r.step.id),
+    );
+    if (!toGenerate.length) {
+      toast.info("All steps already have descriptions.");
+      return;
+    }
+    await runBatch(
+      "Generating descriptions",
+      "bg-cyan-500",
+      toGenerate,
+      async (ref) => {
+        detailInFlight.current.add(ref.step.id);
+        setLoadingDetailIds((prev) => withId(prev, ref.step.id));
+        try {
+          const data = await fetchStepDetail(roadmap, ref, phasesRef.current);
+          patchStep(ref.phase.id, ref.step.id, (s) => enrichStep(s, data));
+        } finally {
+          detailInFlight.current.delete(ref.step.id);
+          setLoadingDetailIds((prev) => withoutId(prev, ref.step.id));
+        }
+      },
+    );
+    toast.success("All descriptions generated.");
+  };
+
+  const handleFindAllExercises = async () => {
+    const toFind = flattenRoadmapSteps(phasesRef.current).filter(
+      (r) => !r.step.suggestedExerciseId && !r.step.noExercise,
+    );
+    if (!toFind.length) {
+      toast.info(
+        "All steps already have exercises or are marked as no-exercise.",
+      );
+      return;
+    }
+    await runBatch(
+      "Finding exercises",
+      "bg-violet-500",
+      toFind,
+      async ({ step, phase }) => {
+        setLoadingExerciseIds((prev) => withId(prev, step.id));
+        try {
+          const [firstId] = await searchExercise(roadmap, step);
+          if (firstId)
+            patchStep(phase.id, step.id, (s) => ({
+              ...s,
+              suggestedExerciseId: firstId,
+            }));
+        } finally {
+          setLoadingExerciseIds((prev) => withoutId(prev, step.id));
+        }
+      },
+    );
+    toast.success("Exercise search complete.");
+  };
+
+  const handleFindAllLessons = async () => {
+    const toFind = flattenRoadmapSteps(phasesRef.current).filter(
+      (r) => r.step.description && !r.step.suggestedLessonIds?.length,
+    );
+    if (!toFind.length) {
+      toast.info("All described steps already have lessons.");
+      return;
+    }
+    await runBatch(
+      "Finding lessons",
+      "bg-red-500",
+      toFind,
+      async ({ step, phase }) => {
+        const lessons = await searchLessons(roadmap, step);
+        if (lessons.length) {
+          setLessonsCache((prev) => ({ ...prev, [step.id]: lessons }));
+          patchStep(phase.id, step.id, (s) => ({
+            ...s,
+            suggestedLessonIds: lessons.map((l) => l.videoId),
+          }));
+        }
+      },
+    );
+    toast.success("Lesson search complete.");
+  };
+
+  // ─── Drawer wiring ─────────────────────────────────────────────────────────
+
+  const drawerView = useMemo<StepDrawerView | null>(() => {
+    if (!activeStep) return null;
+    const id = activeStep.step.id;
+    const detailFailed = detailFailedIds.has(id);
+    return {
+      current: activeStep,
+      prev: activeStep.index > 0 ? steps[activeStep.index - 1] : null,
+      next:
+        activeStep.index < steps.length - 1
+          ? steps[activeStep.index + 1]
+          : null,
+      lessons: lessonsCache[id] ?? [],
+      isGenerating: !activeStep.step.description && !detailFailed,
+      detailFailed,
+      loadingLessons: adminMode
+        ? loadingLessonIds.has(id)
+        : lessonsCache[id] === undefined,
+      loadingExercise: loadingExerciseIds.has(id),
+    };
+  }, [
+    activeStep,
+    steps,
+    lessonsCache,
+    detailFailedIds,
+    adminMode,
+    loadingLessonIds,
+    loadingExerciseIds,
+  ]);
+
+  const adminProps: StepDrawerAdminProps | undefined =
+    adminMode && activeStep
+      ? {
+          exerciseOptions: exerciseOptions[activeStep.step.id],
+          addingCustomLesson: addingCustomLesson.has(activeStep.step.id),
+          customLessonInput: customLessonInput[activeStep.step.id] ?? "",
+          onCustomLessonInputChange: (value) =>
+            setCustomLessonInput((prev) => ({
+              ...prev,
+              [activeStep.step.id]: value,
+            })),
+          onEditStep: handleEditStep,
+          onFindExercises: handleFindExercises,
+          onSelectExercise: handleSelectExercise,
+          onFindLessons: handleFindLessons,
+          onRemoveLesson: handleRemoveLesson,
+          onAddCustomLesson: handleAddCustomLesson,
+          onRegenerate: handleRegenerateStep,
+        }
+      : undefined;
 
   const markerId = `arr-${roadmap.id.slice(0, 8)}`;
+  const totalSteps = steps.length;
+  const hasStarted = doneCount > 0 || inProgressCount > 0;
+  const isStepLoading = (step: RoadmapStep) =>
+    loadingDetailIds.has(step.id) ||
+    (step.id === activeStepId && !!drawerView?.isGenerating);
+
+  // ─── Render ────────────────────────────────────────────────────────────────
 
   return (
     <>
-      <div ref={containerCardRef} className="rounded-lg bg-zinc-950 overflow-hidden">
-      {activeStepInfo && (
-        <StepPageContent
-          activeStepInfo={activeStepInfo}
-          adminMode={adminMode}
-          roadmap={roadmap}
-          router={router}
-          lessonsCache={lessonsCache}
-          loadingDetailIds={loadingDetailIds}
-          loadingExerciseIds={loadingExerciseIds}
-          loadingLessonsId={loadingLessonsId}
-          exerciseOptions={exerciseOptions}
-          customLessonInput={customLessonInput}
-          addingCustomLesson={addingCustomLesson}
-          onBack={() => setActiveStepId(null)}
-          onRegenerateStep={handleRegenerateStep}
-          onSetStepStatus={setStepStatus}
-          onEditStep={handleEditStep}
-          onFindExercises={handleFindExercises}
-          onSelectExercise={handleSelectExercise}
-          onToggleExercise={handleToggleExercise}
-          onToggleLesson={handleToggleLesson}
-          onFindLessons={handleFindLessons}
-          onRemoveLesson={handleRemoveLesson}
-          onCustomLessonInputChange={setCustomLessonInput}
-          onAddCustomLesson={handleAddCustomLesson}
-          onPracticeLesson={(lesson) =>
-            setPracticeLesson({ lesson, stepId: activeStepInfo.step.id, phaseId: activeStepInfo.phase.id })
-          }
-        />
-      )}
-      {!activeStepInfo && (
-      <>
+      <div className='overflow-hidden rounded-lg bg-zinc-950'>
         {/* ─── Hero header ─── */}
         {roadmap.image ? (
-          <div className="relative h-48 w-full overflow-hidden md:h-56">
+          <div className='relative h-48 w-full overflow-hidden md:h-56'>
             <img
               src={roadmap.image}
               alt={roadmap.title}
-              className="absolute inset-0 h-full w-full object-cover"
+              className='absolute inset-0 h-full w-full object-cover'
               style={{ filter: "grayscale(50%) saturate(0.7)" }}
             />
-            {/* heavy dark overlay so text is readable */}
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/30" />
-            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/60 to-transparent" />
+            <div className='absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/30' />
+            <div className='absolute inset-0 bg-gradient-to-r from-zinc-950/60 to-transparent' />
 
-            {/* content on top of image */}
-            <div className="absolute inset-0 flex flex-col justify-end px-6 pb-5 md:px-8">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400 mb-1.5">
-                {roadmap.level && <span className="rounded bg-zinc-800/80 px-2 py-0.5 backdrop-blur-sm">{roadmap.level}</span>}
-                <span className="text-zinc-600">·</span>
-                <span>{allSteps.length} steps</span>
-                <span className="text-zinc-600">·</span>
-                <span>{roadmap.phases.length} phases</span>
+            <div className='absolute inset-0 flex flex-col justify-end px-6 pb-5 md:px-8'>
+              <div className='mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400'>
+                {roadmap.level && (
+                  <span className='rounded bg-zinc-800/80 px-2 py-0.5 backdrop-blur-sm'>
+                    {roadmap.level}
+                  </span>
+                )}
+                <span className='text-zinc-600'>·</span>
+                <span>{totalSteps} steps</span>
+                <span className='text-zinc-600'>·</span>
+                <span>{phases.length} phases</span>
               </div>
-              <h2 className="font-display text-xl font-bold text-zinc-100 md:text-2xl">{roadmap.title}</h2>
-              {/* progress bar inside header */}
-              <div className="mt-3 flex items-center gap-3">
-                <div className="flex-1 h-1 overflow-hidden rounded-full bg-zinc-800/80">
-                  <div className="h-full rounded-full bg-green-500 transition-all duration-700" style={{ width: `${progress}%` }} />
+              <h2 className='font-display text-xl font-bold text-zinc-100 md:text-2xl'>
+                {roadmap.title}
+              </h2>
+              <div className='mt-3 flex items-center gap-3'>
+                <div className='h-1 flex-1 overflow-hidden rounded-full bg-zinc-800/80'>
+                  <div
+                    className='h-full rounded-full bg-emerald-500 transition-all duration-700'
+                    style={{ width: `${progress}%` }}
+                  />
                 </div>
-                <span className="text-xs font-semibold text-green-400 tabular-nums shrink-0">
-                  {doneCount}/{allSteps.length}
-                  {inProgressCount > 0 && <span className="ml-1.5 text-amber-400">· {inProgressCount} in progress</span>}
+                <span className='shrink-0 text-xs font-semibold tabular-nums text-emerald-400'>
+                  {doneCount}/{totalSteps}
+                  {inProgressCount > 0 && (
+                    <span className='ml-1.5 text-amber-400'>
+                      · {inProgressCount} in progress
+                    </span>
+                  )}
                 </span>
               </div>
             </div>
           </div>
         ) : (
-          <div className="px-5 pb-0 pt-5 md:px-8 md:pt-8">
-            <div className="mb-5 flex flex-col gap-1">
-              <h2 className="text-xl font-bold text-zinc-100">{roadmap.title}</h2>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
-                <span className="flex items-center gap-1.5">
-                  <Zap className="h-4 w-4 text-green-500" />
-                  <span className="font-semibold text-green-500">{progress}%</span>
+          <div className='px-5 pt-5 md:px-8 md:pt-8'>
+            <div className='mb-5 flex flex-col gap-1'>
+              <h2 className='font-display text-xl font-bold text-zinc-100'>
+                {roadmap.title}
+              </h2>
+              <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-400'>
+                <span className='flex items-center gap-1.5'>
+                  <Zap className='h-4 w-4 text-emerald-500' />
+                  <span className='font-semibold text-emerald-500'>
+                    {progress}%
+                  </span>
                 </span>
-                <span className="text-zinc-700">·</span>
-                <span>{doneCount}/{allSteps.length} steps</span>
-                {inProgressCount > 0 && <><span className="text-zinc-700">·</span><span className="text-amber-400">{inProgressCount} in progress</span></>}
-                {roadmap.level && <><span className="text-zinc-700">·</span><span className="rounded bg-zinc-800 px-2 py-0.5 text-xs">{roadmap.level}</span></>}
+                <span className='text-zinc-700'>·</span>
+                <span>
+                  {doneCount}/{totalSteps} steps
+                </span>
+                {inProgressCount > 0 && (
+                  <>
+                    <span className='text-zinc-700'>·</span>
+                    <span className='text-amber-400'>
+                      {inProgressCount} in progress
+                    </span>
+                  </>
+                )}
+                {roadmap.level && (
+                  <>
+                    <span className='text-zinc-700'>·</span>
+                    <span className='rounded bg-zinc-800 px-2 py-0.5 text-xs'>
+                      {roadmap.level}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
-            <div className="mb-6 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div className="h-full rounded-full bg-green-500 transition-all duration-700" style={{ width: `${progress}%` }} />
+            <div className='h-1 w-full overflow-hidden rounded-full bg-zinc-800'>
+              <div
+                className='h-full rounded-full bg-emerald-500 transition-all duration-700'
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </div>
         )}
 
-        <div className="p-5 md:p-8">
-        <div className="relative z-[1]">
+        <div className='p-5 md:p-8'>
+          <div className='relative z-[1]'>
+            {/* ─── Admin: batch action bar ─── */}
+            {adminMode && (
+              <div className='mb-5 rounded-lg bg-zinc-900/40 px-4 py-3'>
+                {batch ? (
+                  <div className='flex items-center gap-3'>
+                    <Loader2 className='h-4 w-4 shrink-0 animate-spin text-zinc-400' />
+                    <span className='text-xs text-zinc-400'>
+                      {batch.label} {batch.done}/{batch.total}…
+                    </span>
+                    <div className='ml-auto h-1 w-32 overflow-hidden rounded-full bg-zinc-800'>
+                      <div
+                        className={cn(
+                          "h-full rounded-full transition-all duration-300",
+                          batch.color,
+                        )}
+                        style={{
+                          width: `${batch.total ? (batch.done / batch.total) * 100 : 0}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className='flex flex-col gap-2.5'>
+                    <div className='flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-zinc-500'>
+                      <span>
+                        <span className='text-zinc-300'>
+                          {steps.filter((r) => r.step.description).length}
+                        </span>
+                        /{totalSteps} described
+                      </span>
+                      <span>
+                        <span className='text-zinc-300'>
+                          {
+                            steps.filter(
+                              (r) =>
+                                r.step.suggestedExerciseId || r.step.noExercise,
+                            ).length
+                          }
+                        </span>
+                        /{totalSteps} exercises
+                      </span>
+                      <span>
+                        <span className='text-zinc-300'>
+                          {
+                            steps.filter(
+                              (r) => r.step.suggestedLessonIds?.length,
+                            ).length
+                          }
+                        </span>
+                        /{totalSteps} lessons
+                      </span>
+                    </div>
+                    <div className='flex flex-wrap gap-2'>
+                      <button
+                        type='button'
+                        onClick={handleGenerateAll}
+                        className='flex items-center gap-1.5 rounded bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-cyan-300'>
+                        <Sparkles className='h-3.5 w-3.5' /> All descriptions
+                      </button>
+                      <button
+                        type='button'
+                        onClick={handleFindAllExercises}
+                        className='flex items-center gap-1.5 rounded bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-violet-300'>
+                        <Dumbbell className='h-3.5 w-3.5' /> All exercises
+                      </button>
+                      <button
+                        type='button'
+                        onClick={handleFindAllLessons}
+                        className='flex items-center gap-1.5 rounded bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-red-300'>
+                        <FaYoutube className='h-3.5 w-3.5' /> All lessons
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
-        {/* ─── Admin: batch action bar ─── */}
-        {adminMode && (() => {
-          const activeBatch = batchGenerating
-            ? { label: "Generating descriptions", progress: batchProgress, color: "bg-cyan-500" }
-            : batchExercising
-            ? { label: "Finding exercises", progress: batchExerciseProgress, color: "bg-violet-500" }
-            : batchLessoning
-            ? { label: "Finding lessons", progress: batchLessonProgress, color: "bg-red-500" }
-            : null;
-
-          const stepsWithDesc = allSteps.filter((s) => s.description).length;
-          const stepsWithEx = allSteps.filter((s) => s.suggestedExerciseId || s.noExercise).length;
-          const stepsWithLessons = allSteps.filter((s) => s.suggestedLessonIds?.length).length;
-
-          return (
-            <div className="mb-5 rounded-lg bg-zinc-900/40 px-4 py-3">
-              {activeBatch ? (
-                <div className="flex items-center gap-3">
-                  <Loader2 className="h-4 w-4 shrink-0 animate-spin text-zinc-400" />
-                  <span className="text-xs text-zinc-400">
-                    {activeBatch.label} {activeBatch.progress.done}/{activeBatch.progress.total}…
+            {/* ─── Up next + legend ─── */}
+            <div className='mb-8 flex flex-col gap-3 md:flex-row md:items-stretch'>
+              {upNext ? (
+                <button
+                  type='button'
+                  onClick={() => openStep(upNext)}
+                  className='group flex min-w-0 flex-1 items-center gap-4 rounded-lg bg-cyan-500/10 px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-cyan-500/15'>
+                  <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
+                    <Play className='h-4 w-4' fill='currentColor' />
                   </span>
-                  <div className="ml-auto h-1 w-32 overflow-hidden rounded-full bg-zinc-800">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${activeBatch.color}`}
-                      style={{ width: `${activeBatch.progress.total ? (activeBatch.progress.done / activeBatch.progress.total) * 100 : 0}%` }}
-                    />
-                  </div>
-                </div>
+                  <span className='min-w-0 flex-1'>
+                    <span className='block text-[11px] font-semibold text-cyan-400'>
+                      {hasStarted ? "Continue" : "Start here"}
+                    </span>
+                    <span className='block truncate text-sm font-semibold text-zinc-100'>
+                      {upNext.step.title}
+                    </span>
+                    <span className='block truncate text-xs text-zinc-400'>
+                      Phase {upNext.phaseIdx + 1} · {upNext.phase.title}
+                    </span>
+                  </span>
+                  <ChevronRight className='h-4 w-4 shrink-0 text-cyan-500 transition-colors group-hover:text-cyan-300' />
+                </button>
               ) : (
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-zinc-600">
-                    <span><span className="text-zinc-400">{stepsWithDesc}</span>/{allSteps.length} described</span>
-                    <span><span className="text-zinc-400">{stepsWithEx}</span>/{allSteps.length} exercises</span>
-                    <span><span className="text-zinc-400">{stepsWithLessons}</span>/{allSteps.length} lessons</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button onClick={handleGenerateAll} className="flex items-center gap-1.5 rounded bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:bg-zinc-700 hover:text-cyan-300">
-                      <Sparkles className="h-3.5 w-3.5" /> All descriptions
-                    </button>
-                    <button onClick={handleFindAllExercises} className="flex items-center gap-1.5 rounded bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:bg-zinc-700 hover:text-violet-300">
-                      <Dumbbell className="h-3.5 w-3.5" /> All exercises
-                    </button>
-                    <button onClick={handleFindAllLessons} className="flex items-center gap-1.5 rounded bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:bg-zinc-700 hover:text-red-300">
-                      <FaYoutube className="h-3.5 w-3.5" /> All lessons
-                    </button>
-                  </div>
+                <div className='flex flex-1 items-center gap-3 rounded-lg bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-400'>
+                  <CheckCircle2 className='h-4 w-4 shrink-0' />
+                  Every step done. Your reward is waiting at the finish line.
                 </div>
               )}
-            </div>
-          );
-        })()}
 
-        {/* ─── Legend ─── */}
-        <div className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg bg-zinc-900/40 px-4 py-2.5">
-          <span className="text-xs font-medium text-zinc-500">Status:</span>
-          {([
-            { dot: "bg-zinc-600", label: "To do" },
-            { dot: "bg-amber-400", label: "In progress" },
-            { dot: "bg-green-500", label: "Done" },
-          ] as { dot: string; label: string }[]).map(({ dot, label }) => (
-            <span key={label} className="flex items-center gap-1.5 text-xs text-zinc-400">
-              <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
-              {label}
-            </span>
-          ))}
-          <span className="ml-auto text-xs text-zinc-600">Click step → details</span>
-        </div>
-
-        {/* ─── Graph ─── */}
-        <div ref={containerRef} className="relative">
-          {svgDims.w > 0 && (
-            <svg
-              className="pointer-events-none absolute left-0 top-0 hidden overflow-visible sm:block"
-              width={svgDims.w} height={svgDims.h} style={{ zIndex: 0 }}
-            >
-              <defs>
-                {(["not-started", "in-progress", "done"] as StepStatus[]).map((s) => (
-                  <marker key={s} id={`${markerId}-${s}`} markerWidth="5" markerHeight="4" refX="5" refY="2" orient="auto">
-                    <polygon points="0 0, 5 2, 0 4" fill={PATH_COLOR[s]} />
-                  </marker>
+              <div className='flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-lg bg-zinc-900/40 px-4 py-3 text-xs text-zinc-400 md:shrink-0'>
+                {LEGEND.map(({ status, label }) => (
+                  <span key={status} className='flex items-center gap-1.5'>
+                    <span
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full",
+                        STATUS_DOT[status],
+                      )}
+                    />
+                    {label}
+                  </span>
                 ))}
-              </defs>
-              {svgPaths.map((path) => (
-                <path
-                  key={path.key} d={path.d} stroke={PATH_COLOR[path.status]}
-                  strokeWidth="2" fill="none" strokeDasharray="5 3"
-                  markerEnd={`url(#${markerId}-${path.status})`} opacity="0.8"
-                />
-              ))}
-            </svg>
-          )}
-
-          <div className="relative flex flex-col items-center" style={{ zIndex: 1 }}>
-            {/* Root node */}
-            <div className="max-w-sm rounded-lg bg-zinc-800/90 px-8 py-4 text-center text-sm font-bold text-zinc-100">
-              {roadmap.goal}
+              </div>
             </div>
 
-            <div className="relative w-full">
-              <div className="absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-zinc-800 sm:block" />
+            {/* ─── Graph ─── */}
+            <div ref={containerRef} className='relative'>
+              {svgDims.w > 0 && (
+                <svg
+                  className='pointer-events-none absolute left-0 top-0 hidden overflow-visible sm:block'
+                  width={svgDims.w}
+                  height={svgDims.h}
+                  style={{ zIndex: 0 }}>
+                  <defs>
+                    {LEGEND.map(({ status }) => (
+                      <marker
+                        key={status}
+                        id={`${markerId}-${status}`}
+                        markerWidth='5'
+                        markerHeight='4'
+                        refX='5'
+                        refY='2'
+                        orient='auto'>
+                        <polygon
+                          points='0 0, 5 2, 0 4'
+                          fill={PATH_COLOR[status]}
+                        />
+                      </marker>
+                    ))}
+                  </defs>
+                  {svgPaths.map((path) => (
+                    <path
+                      key={path.key}
+                      d={path.d}
+                      stroke={PATH_COLOR[path.status]}
+                      strokeWidth='2'
+                      fill='none'
+                      strokeDasharray='5 3'
+                      markerEnd={`url(#${markerId}-${path.status})`}
+                      opacity='0.8'
+                    />
+                  ))}
+                </svg>
+              )}
+
               <div
-                className="absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-green-600/50 transition-all duration-700 sm:block"
-                style={{ height: `${progress}%` }}
-              />
-
-              {phases.map((phase, phaseIdx) => {
-                const stepsRight = phaseIdx % 2 === 0;
-                const phaseColor = PHASE_COLORS[phaseIdx % PHASE_COLORS.length];
-                const phaseAllDone = phase.steps.every((s) => getStatus(s) === "done");
-                const phaseDone = phase.steps.filter((s) => getStatus(s) === "done").length;
-
-                return (
-                  <div key={phase.id} className="flex w-full flex-col py-6 sm:items-center sm:py-10">
-
-                    {/* ── MOBILE layout ── */}
-                    <div className="flex w-full flex-col gap-3 sm:hidden">
-                      <div className="flex items-center gap-2.5">
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-green-500/20 text-green-300 ring-1 ring-green-500/40" : phaseColor.badge}`}>
-                          {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
-                        </span>
-                        <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
-                        {!phaseAllDone && (
-                          <span className="ml-auto shrink-0 text-[11px] font-medium tabular-nums text-zinc-500">{phaseDone}/{phase.steps.length}</span>
-                        )}
-                      </div>
-                      <div className="ml-4 flex flex-col gap-3 pl-4">
-                        {phase.steps.map((step, stepIdx) => {
-                          const status = getStatus(step);
-                          const isActive = activeStepId === step.id;
-                          const isLoading = loadingDetailIds.has(step.id);
-                          return (
-                            <button
-                              key={step.id}
-                              onClick={() => openStepPage(step, phase, stepIdx, phaseIdx)}
-                              className={`flex w-full items-center gap-2.5 rounded px-3 py-2.5 text-xs font-medium transition-all duration-150 text-left ${STEP_CLS[status]} ${isActive ? "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950" : ""}`}
-                            >
-                              {isLoading
-                                ? <span className="h-2 w-2 shrink-0 animate-pulse rounded bg-zinc-500" />
-                                : <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
-                              }
-                              <span>{step.title}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* ── DESKTOP layout ── */}
-                    <div className="hidden w-full sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-x-24 md:gap-x-40">
-                      {/* LEFT column */}
-                      <div className="flex flex-col items-end gap-5">
-                        {!stepsRight && phase.steps.map((step, stepIdx) => {
-                          const status = getStatus(step);
-                          const isActive = activeStepId === step.id;
-                          const isLoading = loadingDetailIds.has(step.id);
-                          return (
-                            <button
-                              key={step.id}
-                              ref={(el) => { if (el) stepBtnRefs.current.set(step.id, el); else stepBtnRefs.current.delete(step.id); }}
-                              onClick={() => openStepPage(step, phase, stepIdx, phaseIdx)}
-                              className={`flex max-w-[260px] items-center gap-2.5 rounded px-3 py-2.5 text-xs font-medium transition-all duration-150 text-right ${STEP_CLS[status]} ${isActive ? "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950" : ""}`}
-                            >
-                              {isLoading
-                                ? <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-zinc-500" />
-                                : <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
-                              }
-                              <span>{step.title}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* CENTER — phase milestone */}
-                      <div
-                        ref={(el) => { if (el) phaseNodeRefs.current.set(phase.id, el); else phaseNodeRefs.current.delete(phase.id); }}
-                        className="relative z-10 flex shrink-0 items-center gap-2.5 whitespace-nowrap bg-zinc-950 py-1 pl-1 pr-3"
-                      >
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-green-500/20 text-green-300 ring-1 ring-green-500/40" : phaseColor.badge}`}>
-                          {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
-                        </span>
-                        <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
-                        {!phaseAllDone && (
-                          <span className="text-[11px] font-medium tabular-nums text-zinc-500">{phaseDone}/{phase.steps.length}</span>
-                        )}
-                      </div>
-
-                      {/* RIGHT column */}
-                      <div className="flex flex-col items-start gap-5">
-                        {stepsRight && phase.steps.map((step, stepIdx) => {
-                          const status = getStatus(step);
-                          const isActive = activeStepId === step.id;
-                          const isLoading = loadingDetailIds.has(step.id);
-                          return (
-                            <button
-                              key={step.id}
-                              ref={(el) => { if (el) stepBtnRefs.current.set(step.id, el); else stepBtnRefs.current.delete(step.id); }}
-                              onClick={() => openStepPage(step, phase, stepIdx, phaseIdx)}
-                              className={`flex max-w-[260px] items-center gap-2.5 rounded px-3 py-2.5 text-xs font-medium transition-all duration-150 text-left ${STEP_CLS[status]} ${isActive ? "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950" : ""}`}
-                            >
-                              {isLoading
-                                ? <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-zinc-500" />
-                                : <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
-                              }
-                              <span>{step.title}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Finish node — the reward card on the authored roadmaps, whose
-                steps ship in the repo and can therefore be paid for; the plain
-                plate on a roadmap the player generated for themselves. */}
-            {phases.length > 0 && (
-              isRewardableRoadmap(roadmap.id) ? (
-                <RoadmapFinishCard
-                  roadmapId={roadmap.id}
-                  done={doneCount}
-                  total={allSteps.length}
-                />
-              ) : (
-                <div className={`rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-700 ${
-                  progress === 100
-                    ? "bg-green-950/20 text-green-400"
-                    : "bg-zinc-900/30 text-zinc-500 opacity-40"
-                }`}>
-                  {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
+                className='relative flex flex-col items-center'
+                style={{ zIndex: 1 }}>
+                {/* Root node */}
+                <div className='max-w-sm rounded-lg bg-zinc-800/90 px-8 py-4 text-center text-sm font-bold text-zinc-100'>
+                  {roadmap.goal}
                 </div>
-              )
-            )}
+
+                <div className='relative w-full'>
+                  <div className='absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-zinc-800 sm:block' />
+                  <div
+                    className='absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-emerald-600/50 transition-all duration-700 sm:block'
+                    style={{ height: `${progress}%` }}
+                  />
+
+                  {phases.map((phase, phaseIdx) => {
+                    const stepsRight = phaseIdx % 2 === 0;
+                    const phaseAllDone = phase.steps.every(
+                      (s) => getStepStatus(s) === "done",
+                    );
+                    const phaseDone = phase.steps.filter(
+                      (s) => getStepStatus(s) === "done",
+                    ).length;
+                    const columnSteps = (textAlign: "left" | "right") =>
+                      phase.steps.map((step) => (
+                        <StepMapButton
+                          key={step.id}
+                          step={step}
+                          isActive={isDrawerOpen && activeStepId === step.id}
+                          isLoading={isStepLoading(step)}
+                          textAlign={textAlign}
+                          connector
+                          onClick={() => navigateStep(step.id)}
+                        />
+                      ));
+
+                    return (
+                      <div
+                        key={phase.id}
+                        className='flex w-full flex-col py-6 sm:items-center sm:py-10'>
+                        {/* ── Mobile ── */}
+                        <div className='flex w-full flex-col gap-3 sm:hidden'>
+                          <div className='flex items-center gap-2.5'>
+                            <PhaseBadge
+                              phaseIdx={phaseIdx}
+                              allDone={phaseAllDone}
+                            />
+                            <span className='text-sm font-semibold text-zinc-200'>
+                              {phase.title}
+                            </span>
+                            {!phaseAllDone && (
+                              <span className='ml-auto shrink-0 text-[11px] font-medium tabular-nums text-zinc-400'>
+                                {phaseDone}/{phase.steps.length}
+                              </span>
+                            )}
+                          </div>
+                          <div className='ml-4 flex flex-col gap-3 pl-4'>
+                            {phase.steps.map((step) => (
+                              <StepMapButton
+                                key={step.id}
+                                step={step}
+                                isActive={
+                                  isDrawerOpen && activeStepId === step.id
+                                }
+                                isLoading={isStepLoading(step)}
+                                textAlign='left'
+                                fullWidth
+                                onClick={() => navigateStep(step.id)}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* ── Desktop ── */}
+                        <div className='hidden w-full sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-x-24 md:gap-x-40'>
+                          <div className='flex flex-col items-end gap-5'>
+                            {!stepsRight && columnSteps("right")}
+                          </div>
+
+                          <div
+                            data-phase-id={phase.id}
+                            className='relative z-10 flex shrink-0 items-center gap-2.5 whitespace-nowrap bg-zinc-950 py-1 pl-1 pr-3'>
+                            <PhaseBadge
+                              phaseIdx={phaseIdx}
+                              allDone={phaseAllDone}
+                            />
+                            <span className='text-sm font-semibold text-zinc-200'>
+                              {phase.title}
+                            </span>
+                            {!phaseAllDone && (
+                              <span className='text-[11px] font-medium tabular-nums text-zinc-400'>
+                                {phaseDone}/{phase.steps.length}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className='flex flex-col items-start gap-5'>
+                            {stepsRight && columnSteps("left")}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Finish node — the reward card on the authored roadmaps, whose
+                    steps ship in the repo and can therefore be paid for; the plain
+                    plate on a roadmap the player generated for themselves. */}
+                {phases.length > 0 &&
+                  (isRewardableRoadmap(roadmap.id) ? (
+                    <RoadmapFinishCard
+                      roadmapId={roadmap.id}
+                      done={doneCount}
+                      total={totalSteps}
+                    />
+                  ) : (
+                    <div
+                      className={cn(
+                        "rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-700",
+                        progress === 100
+                          ? "bg-emerald-500/10 text-emerald-400"
+                          : "bg-zinc-900/30 text-zinc-500 opacity-40",
+                      )}>
+                      {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
+                    </div>
+                  ))}
+              </div>
+            </div>
           </div>
-        </div>{/* end containerRef */}
-        </div>{/* end relative z-[1] */}
-        </div>{/* end p-5 md:p-8 */}
-      </>
-      )}
-      </div>{/* end outer wrapper */}
+        </div>
+      </div>
+
+      <StepDrawer
+        open={isDrawerOpen}
+        view={drawerView}
+        navigationLocked={!!practiceLesson}
+        onClose={closeStep}
+        onNavigate={navigateStep}
+        onSetStatus={handleSetStatus}
+        onRetryDetail={handleRetryDetail}
+        onOpenExercise={handleOpenExercise}
+        onToggleExercise={handleToggleExercise}
+        onToggleLesson={handleToggleLesson}
+        onPracticeLesson={(lesson) => {
+          if (activeStep) {
+            setPracticeLesson({
+              lesson,
+              stepId: activeStep.step.id,
+              phaseId: activeStep.phase.id,
+            });
+          }
+        }}
+        admin={adminProps}
+      />
 
       {practiceLesson && (
         <LessonPracticeModal
           lesson={practiceLesson.lesson}
           onFinish={() => {
-            markLessonWatched(practiceLesson.phaseId, practiceLesson.stepId, practiceLesson.lesson.videoId);
+            markLessonWatched(
+              practiceLesson.phaseId,
+              practiceLesson.stepId,
+              practiceLesson.lesson.videoId,
+            );
             setPracticeLesson(null);
           }}
           onClose={() => setPracticeLesson(null)}

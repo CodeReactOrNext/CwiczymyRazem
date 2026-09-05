@@ -1,45 +1,28 @@
-import { HeroPattern } from "components/UI/HeroBanner";
-import { BMC_URL } from "feature/roadmap/data/roadmap.data";
-import { Coffee, PartyPopper } from "lucide-react";
+import { SupportCta } from "./SupportCta";
 
 /**
- * The "no strings attached" block — for people who don't care about the
- * roadmap tiers and just want to say thanks. Purple, since it's the one
- * accent not already claimed by cost (orange) or goals (cyan/emerald) above.
+ * The closing ask, for people who read to the bottom before deciding, and
+ * for the ones who never cared about tiers and just want to say thanks.
  */
 export const RoadmapThanks = () => {
   return (
-    <section className='relative overflow-hidden rounded-lg bg-zinc-900/40 p-5 sm:p-7'>
-      <HeroPattern
-        className='opacity-[0.06]'
-        maskImage='linear-gradient(to right, black 0%, transparent 55%)'
-      />
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-transparent' />
-      <div className='relative flex flex-wrap items-center gap-x-12 gap-y-6'>
-        {/* Full width until lg, same as RoadmapPitch — the shrink-0 CTA would
-            otherwise squeeze the copy down to a word per line on a phone. */}
-        <div className='flex w-full min-w-0 items-start gap-3.5 lg:w-auto lg:flex-1'>
-          <PartyPopper size={18} className='mt-0.5 shrink-0 text-purple-400' />
-          <div className='min-w-0'>
-            <p className='text-sm font-semibold text-zinc-100 sm:text-base'>
-              Just want to say thanks?
-            </p>
-            <p className='mt-1 text-xs leading-relaxed text-zinc-400 sm:text-sm'>
-              Some support isn&apos;t about unlocking anything. Knowing Riff
-              Quest is useful to you is already the good part. A coffee on top
-              of that genuinely makes my day.
-            </p>
-          </div>
+    <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-7'>
+      <div className='flex flex-wrap items-center gap-x-12 gap-y-6'>
+        {/* Full width until lg: the shrink-0 CTA would otherwise squeeze the
+            copy down to a word per line on a phone. */}
+        <div className='w-full min-w-0 lg:w-auto lg:flex-1'>
+          <p className='text-base font-semibold text-zinc-100'>
+            Just want to say thanks?
+          </p>
+          <p className='mt-1.5 max-w-2xl text-sm leading-relaxed text-zinc-400'>
+            Knowing Riff Quest is useful to you is already the good part. A
+            coffee on top of that genuinely makes my day.
+          </p>
         </div>
 
-        <a
-          href={BMC_URL}
-          target='_blank'
-          rel='noopener noreferrer'
-          className='flex shrink-0 items-center gap-1.5 rounded-lg bg-purple-500/15 px-4 py-2.5 text-xs font-semibold text-purple-300 transition-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/50 hover:bg-purple-500/25 sm:text-sm'>
-          <Coffee size={16} />
+        <SupportCta className='w-full sm:w-auto'>
           Say thanks with a coffee
-        </a>
+        </SupportCta>
       </div>
     </section>
   );
