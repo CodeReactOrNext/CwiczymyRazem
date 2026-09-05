@@ -19,7 +19,7 @@
     "electron:release:linux": "electron-builder --linux --publish always",
     "electron:release:mac": "electron-builder --mac --publish always",
     "build": "next build",
-    "prebuild": "node scripts/generateBlogSitemap.mjs && node scripts/generateSongGuidesSitemap.mjs && node scripts/generateWikiSitemap.mjs",
+    "prebuild": "node scripts/generateStaticSitemap.mjs && node scripts/generateBlogSitemap.mjs && node scripts/generateSongGuidesSitemap.mjs && node scripts/generateWikiSitemap.mjs && node scripts/generateSitemapIndex.mjs",
     "start": "next start",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",

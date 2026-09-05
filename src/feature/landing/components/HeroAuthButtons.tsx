@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
 import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
 import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
+import { trackSignupCtaClicked } from "lib/signupFunnel";
 import { ArrowRight, LayoutDashboard, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -57,7 +58,9 @@ export const HeroAuthButtons = () => {
         ) : (
           <div className='flex flex-col items-center gap-2'>
             <div className='flex flex-col items-center gap-4 sm:flex-row'>
-              <Link href='/signup'>
+              <Link
+                href='/signup'
+                onClick={() => trackSignupCtaClicked('landing_hero')}>
                 <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
                   <span className='flex items-center gap-3 whitespace-nowrap'>
                     Start tracking free

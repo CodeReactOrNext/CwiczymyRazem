@@ -28,7 +28,7 @@ const faqQuestions = [
   {
     title: "Can I filter songs by genre?",
     message:
-      "Yes — you can filter by genre and tier directly on this page. Inside the full app you can also filter by difficulty range and sort by popularity or rating count.",
+      "Yes — you can filter by genre and tier directly on this page, or search by song and artist name. Inside the full app you can also filter by difficulty range and sort by popularity or rating count.",
   },
   {
     title: "Is the guitar song library free to use?",
@@ -46,12 +46,15 @@ interface LibraryLandingPageProps {
   songs: LibrarySong[];
   totalSongs: number;
   guideLiveData: PathSongLiveDataMap;
+  /** Firestore song id -> slug of the difficulty guide written for it. */
+  guideSlugBySongId: Record<string, string>;
 }
 
 const LibraryLandingPage = ({
   songs,
   totalSongs,
   guideLiveData,
+  guideSlugBySongId,
 }: LibraryLandingPageProps) => {
   return (
     <>
@@ -61,7 +64,11 @@ const LibraryLandingPage = ({
 
         <LibraryHeroSection totalSongs={totalSongs} />
         <LibraryStatsBar totalSongs={totalSongs} />
-        <LibrarySongGrid songs={songs} totalSongs={totalSongs} />
+        <LibrarySongGrid
+          songs={songs}
+          totalSongs={totalSongs}
+          guideSlugBySongId={guideSlugBySongId}
+        />
         <LibraryGuidesSection guideLiveData={guideLiveData} />
         <LibraryTierGuide />
         <LibraryCTASection />

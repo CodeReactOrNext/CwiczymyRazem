@@ -11,6 +11,10 @@ import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
 import { Form, Formik } from "formik";
 import { useTranslation } from "hooks/useTranslation";
 import {
+  trackSignupCompleted,
+  trackSignupFormViewed,
+} from "lib/signupFunnel";
+import {
   CheckCircle,
   ChevronRight,
   Eye,
@@ -33,6 +37,7 @@ import { FcGoogle } from "react-icons/fc";
 import { TbGuitarPick } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { useResponsiveStore } from "store/useResponsiveStore";
+import { safeNextPath } from "utils/auth/safeNextPath";
 
 // Mobile gets the desktop-app notice on the success screen, which 3s is not
 // enough to read.
@@ -65,9 +70,14 @@ const SingupView = () => {
     repeat_password: "",
   };
 
+  // Set by links that carried a destination — a song card in the public
+  // library, say — so what the visitor picked survives the sign-up form.
+  const destination = safeNextPath(router.query.next);
+
   const onSubmit = async (credentials: SignUpCredentials) => {
     try {
       await dispatch(createAccount(credentials)).unwrap();
+      trackSignupCompleted(destination);
       setIsSuccess(true);
     } catch  {
       // Error is handled by global toast in thunk
@@ -88,17 +98,25 @@ const SingupView = () => {
     return strength;
   };
 
+  // The funnel needs "the form was actually on screen" as its own step —
+  // /signup also serves redirects, so a pageview is not the same thing.
+  useEffect(() => {
+    trackSignupFormViewed(destination);
+    // Once per mount: re-firing on every destination change would inflate the step.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (isSuccess) {
       const timer = setTimeout(
         () => {
-          router.push("/dashboard");
+          router.push(destination);
         },
         isMobile ? SUCCESS_REDIRECT_DELAY_MOBILE : SUCCESS_REDIRECT_DELAY
       );
       return () => clearTimeout(timer);
     }
-  }, [isSuccess, isMobile, router]);
+  }, [isSuccess, isMobile, router, destination]);
 
   if (isSuccess) {
     return (
@@ -138,10 +156,10 @@ const SingupView = () => {
           )}
 
           <Button
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push(destination)}
             className="w-full h-12 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-base transition-all group"
           >
-            Go to Dashboard
+            {destination === "/dashboard" ? "Go to Dashboard" : "Continue"}
             <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Button>
         </div>

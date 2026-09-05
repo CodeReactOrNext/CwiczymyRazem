@@ -8,13 +8,16 @@ interface BlogHeaderProps {
   title: string;
   description: string;
   date: string;
+  /** Shown next to the publish date when the post has actually been revised. */
+  updatedAt?: string;
   image: string;
   author?: string;
   authorImage?: string;
   readTime?: string;
 }
 
-export const BlogHeader = ({ title, description, date, image, author, authorImage, readTime = "5 min" }: BlogHeaderProps) => {
+export const BlogHeader = ({ title, description, date, updatedAt, image, author, authorImage, readTime = "5 min" }: BlogHeaderProps) => {
+  const showUpdated = Boolean(updatedAt) && updatedAt !== date;
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -89,7 +92,11 @@ export const BlogHeader = ({ title, description, date, image, author, authorImag
 
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-zinc-500" />
-                <span>{format(new Date(date), 'MMM dd, yyyy')}</span>
+                <span>
+                  {showUpdated
+                    ? `Updated ${format(new Date(updatedAt as string), 'MMM dd, yyyy')}`
+                    : format(new Date(date), 'MMM dd, yyyy')}
+                </span>
               </div>
 
               <div className="h-4 w-px bg-white/10" />

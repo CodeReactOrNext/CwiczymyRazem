@@ -7,7 +7,7 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
   metaDescription:
     "A structured intermediate guitar practice routine: 45 minutes in four blocks, advanced techniques to rotate weekly, and how to measure real progress.",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-07-20",
+  updatedAt: "2026-09-05",
   intro: [
     "An effective intermediate guitar practice routine has three properties: fixed structure, rotating content, and measurement. Structure decides *when* you work on what, rotation keeps techniques from going stale, and measurement tells you whether any of it is working. Miss one of the three and you get the classic intermediate plateau — busy hands, flat progress.",
     "This page gives you the complete system: a 45-minute session template, eight advanced technique exercises with interactive tabs to rotate through it, and a measurement habit that takes five minutes a week. If you are still building first fundamentals, start with the [beginner exercises](/beginner-guitar-exercises) instead — this routine assumes clean chords, basic scale fluency and metronome comfort. For how this 45 minutes fits into your week, see our guide on [how long to practice guitar daily](/blog/how-long-practice-guitar-daily) by skill level.",

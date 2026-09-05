@@ -7,7 +7,7 @@ export const guitarSpeedHandSyncConfig: SeoLandingConfig = {
   metaDescription:
     "15 guitar speed and hand synchronization exercises with interactive tabs: spider drills, chromatic patterns, legato runs, string skipping and burst training.",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-07-20",
+  updatedAt: "2026-09-05",
   intro: [
     "Guitar speed is not a picking-hand skill — it is a synchronization skill. Every fast player you admire has hands that agree, within a few milliseconds, on when a note starts. When the pick arrives before the finger (or after it), you get the clicks, ghost notes and mud that make fast playing sound bad at any tempo.",
     "This page is a complete synchronization workout: 15 exercises with interactive tabs, ordered from foundation to advanced. Spider exercises establish the four-finger baseline, chromatic pattern drills add speed bursts, legato exercises train the fretting hand to carry rhythm alone, and string-skipping drills stress-test the whole system. Work through them in order, or jump to the [metronome method](#the-metronome-method-how-to-actually-get-faster) to learn how to structure the tempo climb.",

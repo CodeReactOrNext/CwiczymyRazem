@@ -3,6 +3,7 @@
 import { Button } from "assets/components/ui/button";
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { Reveal } from "feature/landing/components/Reveal";
+import { trackSignupCtaClicked } from "lib/signupFunnel";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -31,7 +32,9 @@ export const MidCTASection = () => {
                   </p>
                 </div>
                 <div className='flex shrink-0 flex-col items-start gap-2 sm:items-center'>
-                  <Link href='/signup'>
+                  <Link
+                    href='/signup'
+                    onClick={() => trackSignupCtaClicked('landing_mid')}>
                     <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
                       <span className='flex items-center gap-3 whitespace-nowrap'>
                         Start tracking free

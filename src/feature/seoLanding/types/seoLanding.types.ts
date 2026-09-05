@@ -35,6 +35,12 @@ export interface SeoLandingConfig {
   updatedAt: string;
   /** Hero paragraphs — answer the search intent in the first two sentences. */
   intro: string[];
+  /**
+   * Optional chips in the hero that jump straight to a section, for pages whose
+   * whole point is choosing between variants — "15 / 30 / 60 minutes" on the
+   * daily plan. `heading` must match a section heading exactly.
+   */
+  quickPicks?: { label: string; heading: string }[];
   sections: SeoLandingSection[];
   faqs: SeoLandingFaq[];
   /** Slugs of the other SEO landing pages to cross-link. */

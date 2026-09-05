@@ -1,5 +1,6 @@
 "use client";
 
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { LandingExerciseCard } from "feature/landing/components/LandingExerciseCard";
 import { Reveal } from "feature/landing/components/Reveal";
 import {
@@ -9,6 +10,12 @@ import {
 } from "lib/exerciseLandingLink";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+
+/** Counted from the catalogue rather than hard-coded: the headline said 144
+ *  long after the library had grown past 200 (SEO audit 2026-09-05). */
+const CATALOG_SIZE = exercisesAgregat.filter(
+  (exercise) => !exercise.isHiddenFromLibrary
+).length;
 
 interface ExerciseCatalogPreviewProps {
   exercises: Array<{
@@ -35,7 +42,7 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <Reveal className='mx-auto mb-12 max-w-2xl text-center'>
           <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
-            144 exercises ready to learn
+            {CATALOG_SIZE} exercises ready to learn
           </h2>
 
           <p className='mb-4 text-lg leading-relaxed text-zinc-400'>

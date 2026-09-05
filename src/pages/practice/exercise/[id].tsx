@@ -6,6 +6,7 @@ import { journeyModules } from "feature/journey/data/journeyModules";
 import { accuracyToStars, firebaseCompleteJourneyStepWithStars } from "feature/journey/services/journey.service";
 import { firebaseAddExamPassedLog } from "feature/logs/services/addExamPassedLog.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -77,33 +78,50 @@ export default function PracticeExercisePage() {
     router.push({ pathname: "/journey", query: { module: moduleId, step: stepId, examResult: stars ?? "fail", accuracy: Math.round(accuracy) } });
   };
 
+  // Anonymous visitors get a 200 with a generic title before the client-side
+  // redirect to /login runs, so this route is crawlable index bloat — it is the
+  // in-app player, not a landing page (SEO audit 2026-09-05).
+  const noIndex = (
+    <Head>
+      <meta name='robots' content='noindex, nofollow' />
+    </Head>
+  );
+
   const isDataReady = router.isReady && !!plan;
 
   if (!isDataReady) {
-    return <PracticeLoadingScreen isReady={false} />;
+    return (
+      <>
+        {noIndex}
+        <PracticeLoadingScreen isReady={false} />
+      </>
+    );
   }
 
   return (
-    <PracticeSession
-      plan={plan!}
-      onClose={() => {
-        if (moduleId) {
-          router.push({ pathname: "/journey", query: { module: moduleId, ...(stepId ? { step: stepId } : {}) } });
-        } else if (typeof window !== "undefined" && window.history.length > 1) {
-          router.back();
-        } else {
-          router.push("/timer/plans");
-        }
-      }}
-      onFinish={() => {
-        setIsFinishing(true);
-        router.push("/report");
-      }}
-      isFinishing={isFinishing}
-      examMode={isExamMode}
-      examBpm={examBpm}
-      onExamComplete={isExamMode ? handleExamComplete : undefined}
-      skipExitDialog={!!moduleId}
-    />
+    <>
+      {noIndex}
+      <PracticeSession
+        plan={plan!}
+        onClose={() => {
+          if (moduleId) {
+            router.push({ pathname: "/journey", query: { module: moduleId, ...(stepId ? { step: stepId } : {}) } });
+          } else if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+          } else {
+            router.push("/timer/plans");
+          }
+        }}
+        onFinish={() => {
+          setIsFinishing(true);
+          router.push("/report");
+        }}
+        isFinishing={isFinishing}
+        examMode={isExamMode}
+        examBpm={examBpm}
+        onExamComplete={isExamMode ? handleExamComplete : undefined}
+        skipExitDialog={!!moduleId}
+      />
+    </>
   );
 }
