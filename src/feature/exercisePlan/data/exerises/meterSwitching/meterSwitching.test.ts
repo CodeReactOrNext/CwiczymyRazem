@@ -1,6 +1,7 @@
+import { deriveMetronomeGrid } from "feature/exercisePlan/components/Metronome/utils/meterGrid";
 import { describe, expect, it } from "vitest";
 
-import { accentIndexes, buildMeterBar, buildMeterTablature, meterGridFor } from "./createMeterSwitchExercise";
+import { accentIndexes, buildMeterBar, buildMeterTablature } from "./createMeterSwitchExercise";
 import { meterRegroup78Exercise } from "./meterRegroup78";
 import { meterRegroup88Exercise } from "./meterRegroup88";
 import { meterSwitch34To58Exercise } from "./meterSwitch34To58";
@@ -120,47 +121,82 @@ describe("meter switching exercises", () => {
   });
 });
 
-describe("metronome grids", () => {
+describe("the click grid the tab gives these drills", () => {
+  // The drills carry no metronomeGrid of their own: the session reads the meter
+  // off the tablature (see deriveMetronomeGrid), which is what keeps one rule for
+  // the click across every exercise in the app rather than a hand-made grid here
+  // and a derived one everywhere else.
   it.each(allExercises.map((exercise) => [exercise.id, exercise] as const))(
-    "%s — the grid measures exactly one full pair of bars",
+    "%s — declares no grid of its own",
     (_id, exercise) => {
-      const grid = exercise.metronomeGrid!;
-      const entryQuarters = grid.unit === 8 ? 0.5 : 1;
+      expect(exercise.metronomeGrid).toBeUndefined();
+    },
+  );
+
+  it.each(allExercises.map((exercise) => [exercise.id, exercise] as const))(
+    "%s — the derived grid divides the drill's pair of bars evenly",
+    (_id, exercise) => {
+      const grid = deriveMetronomeGrid(exercise.tablature)!;
+      const gridQuarters = grid.pattern.length * (grid.unit === 8 ? 0.5 : 1);
       const pairQuarters = exercise
         .tablature!.slice(0, 2)
         .reduce((sum, m) => sum + m.beats.reduce((bar, beat) => bar + beat.duration, 0), 0);
 
-      // A grid shorter or longer than the pair is exactly the drift being fixed:
-      // the click would restart its accents somewhere other than the bar line.
-      expect(grid.pattern.length * entryQuarters).toBeCloseTo(pairQuarters, 5);
-      expect(grid.pattern.length).toBeLessThanOrEqual(16);
+      // Usually the grid IS the pair. The two regroup drills are the exception:
+      // both their bars are the same time signature (7/8 against 7/8), so the
+      // cycle is one bar and the pair is two of it. Either way the click has to
+      // come back around on a bar line, or it restarts its accents mid-bar and
+      // walks away from the tab from there.
+      expect(pairQuarters % gridQuarters).toBeCloseTo(0, 5);
     },
   );
 
-  it("accents the tab's group openings and nothing else", () => {
-    // 4/4 as 2+2+2+2, then 7/8 as 2+2+3. The tab also accents the last two notes of
-    // each bar; the click stays out of that, or 3/4 would sound like it had four
-    // accents in six eighths.
-    expect(meterSwitch44To78Exercise.metronomeGrid).toEqual({
+  it("clicks a steady bar for the regroup drills, whose two bars share a meter", () => {
+    // 2+2+3 against 3+2+2 is one time signature written twice, and a time
+    // signature is all the click can read — so the regrouping is the player's to
+    // play against a level 7/8, not something the metronome spells out.
+    expect(deriveMetronomeGrid(meterRegroup78Exercise.tablature)).toEqual({
       unit: 8,
-      pattern: [2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1],
-    });
-    // The hemiola itself: 3+3 answered by 2+2+2 over the same six eighths.
-    expect(meterSwitch68To34Exercise.metronomeGrid).toEqual({
-      unit: 8,
-      pattern: [2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1],
+      pattern: [2, 1, 1, 1, 1, 1, 1],
+      barLengths: [7],
+      label: "7/8",
     });
   });
 
-  it("declines a shared grid when the two bars have no shared note length", () => {
-    // 12/8 in eighths against 4/4 in triplet eighths: no one grid sits on both, so
-    // that exercise carries a hand-written quarter grid that claims the bar lines only.
-    expect(
-      meterGridFor([
-        { timeSignature: [12, 8], groups: [3, 3, 3, 3], noteDuration: 0.5 },
-        { timeSignature: [4, 4], groups: [4, 4, 4], noteDuration: 1 / 3, tuplet: 3 },
-      ]),
-    ).toBeNull();
-    expect(meterSwitch128To44Exercise.metronomeGrid?.unit).toBe(4);
+  it.each(allExercises.map((exercise) => [exercise.id, exercise] as const))(
+    "%s — accents nothing but the first beat of each bar",
+    (_id, exercise) => {
+      const grid = deriveMetronomeGrid(exercise.tablature)!;
+      const accentAt = grid.pattern.flatMap((level, index) => (level === 2 ? [index] : []));
+
+      // One accent per bar, on its opening entry — the bar lines and nothing else.
+      const barStarts: number[] = [];
+      let offset = 0;
+      for (const length of grid.barLengths) {
+        barStarts.push(offset);
+        offset += length;
+      }
+      expect(accentAt).toEqual(barStarts);
+    },
+  );
+
+  it("clicks 4/4 in quarters and 6/8 in eighths, in the same pattern", () => {
+    // The pair the player sees as "4/4 ↔ 6/8": four clicks then six, one accent
+    // each, with the 4/4 bar's off-eighths resting so it still sounds in quarters.
+    expect(deriveMetronomeGrid(meterSwitch44To68PulseExercise.tablature)).toEqual({
+      unit: 8,
+      pattern: [2, 0, 1, 0, 1, 0, 1, 0, 2, 1, 1, 1, 1, 1],
+      barLengths: [8, 6],
+      label: "4/4 ↔ 6/8",
+    });
+  });
+
+  it("spells out the 12/8 pair the old hand-made grid had no room for", () => {
+    // Twenty entries: past what the +/- control can build, which is why that limit
+    // is not the one the grid is measured against.
+    const grid = deriveMetronomeGrid(meterSwitch128To44Exercise.tablature);
+
+    expect(grid?.barLengths).toEqual([12, 8]);
+    expect(grid?.label).toBe("12/8 ↔ 4/4");
   });
 });

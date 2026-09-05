@@ -5,6 +5,7 @@ import { cn } from "assets/lib/utils";
 import { Gauge, Lock, Minus, Plus, Volume2, VolumeX } from "lucide-react";
 import { useRef, useState } from "react";
 
+import { AccentGrid } from "./AccentGrid";
 import { SubdivisionIcon, SUBDIVISIONS } from "./SubdivisionIcon";
 import { MAX_BEATS_PER_BAR, MIN_BEATS_PER_BAR } from "./utils/accentPattern";
 
@@ -42,6 +43,9 @@ export const Metronome = ({
   const setBpm = metronome.setBpm;
   const minBpm = metronome.minBpm;
   const maxBpm = metronome.maxBpm;
+  // Separate from `locked` (exam mode, which freezes the tempo): the meter drills
+  // own their click grid, but the player still picks the tempo they drill it at.
+  const accentLocked = !!metronome.accentLocked;
 
   const [isEditingBpm, setIsEditingBpm] = useState(false);
   const [bpmInput, setBpmInput] = useState("");
@@ -217,62 +221,55 @@ export const Metronome = ({
           <div className='flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-2'>
             <div className='flex items-center justify-between px-1'>
               <span className='select-none text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500'>
-                Beats per bar
+                {accentLocked && metronome.gridLabel ? metronome.gridLabel : "Beats per bar"}
               </span>
-              <div className='flex items-center gap-1'>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='h-6 w-6 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
-                  onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length - 1)}
-                  disabled={locked || metronome.accentPattern.length <= MIN_BEATS_PER_BAR}
-                  aria-label='Remove beat'>
-                  <Minus className='h-3 w-3' strokeWidth={2.5} />
-                </Button>
-                <span translate='no' className='w-4 select-none text-center text-xs font-bold tabular-nums text-zinc-300'>
+              {accentLocked ? (
+                <span className='flex select-none items-center gap-1 text-[10px] font-bold text-amber-400'>
+                  <Lock size={11} />
                   {metronome.accentPattern.length}
                 </span>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='h-6 w-6 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
-                  onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length + 1)}
-                  disabled={locked || metronome.accentPattern.length >= MAX_BEATS_PER_BAR}
-                  aria-label='Add beat'>
-                  <Plus className='h-3 w-3' strokeWidth={2.5} />
-                </Button>
-              </div>
+              ) : (
+                <div className='flex items-center gap-1'>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='h-6 w-6 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
+                    onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length - 1)}
+                    disabled={locked || metronome.accentPattern.length <= MIN_BEATS_PER_BAR}
+                    aria-label='Remove beat'>
+                    <Minus className='h-3 w-3' strokeWidth={2.5} />
+                  </Button>
+                  <span translate='no' className='w-4 select-none text-center text-xs font-bold tabular-nums text-zinc-300'>
+                    {metronome.accentPattern.length}
+                  </span>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='h-6 w-6 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
+                    onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length + 1)}
+                    disabled={locked || metronome.accentPattern.length >= MAX_BEATS_PER_BAR}
+                    aria-label='Add beat'>
+                    <Plus className='h-3 w-3' strokeWidth={2.5} />
+                  </Button>
+                </div>
+              )}
             </div>
 
-            <div className='flex flex-wrap gap-1.5'>
-              {metronome.accentPattern.map((level: number, i: number) => (
-                <button
-                  key={i}
-                  type='button'
-                  onClick={() => metronome.cycleBeatAccent(i)}
-                  disabled={locked}
-                  title={
-                    level === 2
-                      ? "Accent — click to mute"
-                      : level === 1
-                        ? "Click — click to accent"
-                        : "Muted — click to reset"
-                  }
-                  className={cn(
-                    "flex h-8 min-w-8 flex-1 select-none items-center justify-center rounded-full text-[11px] font-bold tabular-nums transition-colors",
-                    level === 2 && "bg-cyan-500/20 text-cyan-300",
-                    level === 1 && "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700/70",
-                    level === 0 && "bg-zinc-900/60 text-zinc-700 hover:bg-zinc-800/60",
-                    !locked && metronome.isPlaying && metronome.currentBeat === i && "ring-2 ring-cyan-400",
-                    locked && "cursor-not-allowed opacity-50",
-                  )}>
-                  {i + 1}
-                </button>
-              ))}
-            </div>
+            <AccentGrid
+              pattern={metronome.accentPattern}
+              barLengths={metronome.gridBarLengths}
+              currentBeat={metronome.currentBeat}
+              isPlaying={!locked && metronome.isPlaying}
+              locked={locked || accentLocked}
+              onCycle={metronome.cycleBeatAccent}
+            />
 
             <span className='select-none px-1 text-[10px] text-zinc-600'>
-              Click a beat to accent, click again to mute
+              {accentLocked
+                ? metronome.gridLabel?.includes("↔")
+                  ? "The click changes meter with the tab"
+                  : "Accents come from this exercise's meter"
+                : "Click a beat to accent, click again to mute"}
             </span>
           </div>
         )}

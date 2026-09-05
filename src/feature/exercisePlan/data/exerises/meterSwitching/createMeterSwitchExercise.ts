@@ -1,5 +1,3 @@
-import type { AccentLevel, GridUnit } from "feature/exercisePlan/components/Metronome/utils/accentPattern";
-import { MAX_BEATS_PER_BAR } from "feature/exercisePlan/components/Metronome/utils/accentPattern";
 import type {
   Exercise,
   TablatureBeat,
@@ -52,12 +50,6 @@ export interface MeterSwitchConfig {
   tips: string[];
   /** The two bars the drill alternates between. */
   bars: [MeterBar, MeterBar];
-  /**
-   * Click grid to use instead of the one derived from `bars` — for a pair the
-   * derivation gives up on (see meterGridFor) but that can still be clicked
-   * usefully, if not completely. `null` asks for no grid at all.
-   */
-  grid?: { unit: GridUnit; pattern: AccentLevel[] } | null;
   seam?: SeamStyle;
   /** How many times the pair repeats. 4 pairs = 8 bars. */
   pairs?: number;
@@ -139,47 +131,6 @@ export const buildMeterTablature = (
 };
 
 /**
- * The click grid for a pair of bars, or null when no single repeating pattern can
- * describe them — which the metronome would need, since it only ever loops one.
- *
- * Both bars go into ONE pattern end to end (4/4 + 7/8 = 15 entries), because the
- * pair is what actually repeats. An entry per note is what makes the accents land:
- * a 7/8 bar is 3.5 quarters, so a quarter grid can't even mark its bar line.
- *
- * Returns null when the two bars don't share a note length — the 12/8 pair answers
- * eighths with triplet eighths, and no single grid sits on both — or when the pair
- * needs more entries than the metronome can hold.
- */
-export const meterGridFor = (
-  bars: [MeterBar, MeterBar],
-): { unit: GridUnit; pattern: AccentLevel[] } | null => {
-  const [first, second] = bars;
-  if (first.noteDuration !== second.noteDuration) return null;
-  if (first.tuplet || second.tuplet) return null;
-
-  // The grid steps at the drill's own note length: eighths for the x/8 pairs,
-  // quarters for the ones already written in quarters.
-  const unit: GridUnit | null =
-    first.noteDuration === 0.5 ? 8 : first.noteDuration === 1 ? 4 : null;
-  if (unit === null) return null;
-
-  const pattern: AccentLevel[] = [];
-  for (const bar of bars) {
-    const accents = accentIndexes(bar.groups);
-    const noteCount = bar.groups.reduce((sum, group) => sum + group, 0);
-    for (let index = 0; index < noteCount; index += 1) {
-      // Group openings only. The seam notes are accented in the tab too, but the
-      // click deliberately stays out of it: its one job is to state the meter, and
-      // a bar of 3/4 whose last two eighths also click hard stops sounding like
-      // three. The change signal is the player's to play, not the metronome's.
-      pattern.push(accents.has(index) ? 2 : 1);
-    }
-  }
-
-  return pattern.length <= MAX_BEATS_PER_BAR ? { unit, pattern } : null;
-};
-
-/**
  * Builds one meter-switching drill: two bars in different meters (or in the same
  * meter grouped two different ways) played back to back, over and over.
  *
@@ -188,10 +139,13 @@ export const meterGridFor = (
  */
 export function createMeterSwitchExercise(config: MeterSwitchConfig): Exercise {
   const seam = config.seam ?? "lift";
-  const grid = config.grid !== undefined ? config.grid : meterGridFor(config.bars);
 
+  // No metronomeGrid: the session reads the meter off the tablature below, which
+  // states both bars of the pair, so the click alternates with them on its own
+  // (see deriveMetronomeGrid). A hand-written grid here used to accent every
+  // group opening instead — four accents in a bar of 4/4 — which read as noise
+  // rather than as a meter.
   return {
-    ...(grid ? { metronomeGrid: grid } : {}),
     id: config.id,
     addedAt: config.addedAt,
     title: config.title,

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { MAX_BEATS_PER_BAR, stepsPerBeat, subdivisionCountFor } from "./accentPattern";
 import { getCountInDurationMs } from "./countInDuration";
+import { MAX_GRID_ENTRIES } from "./meterGrid";
 
 describe("stepsPerBeat", () => {
   it("is one entry per beat on a quarter grid and two on an eighth grid", () => {
@@ -39,21 +40,20 @@ describe("subdivisionCountFor", () => {
 });
 
 describe("bar length ceiling", () => {
-  it("holds the longest pair the odd-meter drills need — 8/8 answered by 8/8", () => {
+  it("caps the +/- control well below what a derived grid may hold", () => {
+    // MAX_BEATS_PER_BAR is only what a player can build by hand. A grid read off a
+    // tab that alternates meters is longer — 12/8 answered by 4/4 is twenty entries
+    // — and is measured against MAX_GRID_ENTRIES instead.
     expect(MAX_BEATS_PER_BAR).toBeGreaterThanOrEqual(16);
+    expect(MAX_GRID_ENTRIES).toBeGreaterThan(MAX_BEATS_PER_BAR);
   });
 });
 
 describe("getCountInDurationMs", () => {
-  it("is unchanged for the quarter grid every existing exercise uses", () => {
-    expect(getCountInDurationMs(4, 60)).toBe(4000);
-    expect(getCountInDurationMs(4, 60, 4)).toBe(4000);
-  });
-
-  it("counts an eighth grid in eighths, so one bar still lasts one bar", () => {
-    // 8 eighths at quarter=60 is four beats — the same 4s as a 4-entry quarter grid.
-    expect(getCountInDurationMs(8, 60, 8)).toBe(4000);
-    // A 7/8 bar is three and a half beats, and counts in for exactly that long.
-    expect(getCountInDurationMs(7, 60, 8)).toBe(3500);
+  it("is four quarter notes whatever grid the exercise is clicked on", () => {
+    // The count-in used to walk the exercise's own grid, which made an eighth-grid
+    // drill count itself in in eighths and a two-bar cycle count in for both bars.
+    expect(getCountInDurationMs(60)).toBe(4000);
+    expect(getCountInDurationMs(120)).toBe(4000);
   });
 });

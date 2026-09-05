@@ -15,8 +15,9 @@ import {
   subdivisionCountFor,
 } from "../utils/accentPattern";
 import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
-import { getCountInSteps } from "../utils/countInDuration";
+import { getCountInBeats } from "../utils/countInDuration";
 import { isIOSDevice } from "../utils/deviceDetection";
+import type { MetronomeGrid } from "../utils/meterGrid";
 
 interface UseMobileMetronomeProps {
   initialBpm?: number;
@@ -67,6 +68,13 @@ export const useMobileMetronome = ({
   // What one accentPattern entry is worth — a quarter (4, the default) or an eighth (8).
   // See GridUnit; mirrors useMetronome so both devices click a meter the same way.
   const [gridUnit, setGridUnit] = useState<GridUnit>(4);
+  // Read-only click grid — set by an exercise the grid itself belongs to (the
+  // meter drills). See accentLocked in useMetronome.
+  const [accentLocked, setAccentLocked] = useState(false);
+  // How the current grid reads — see gridLabel in useMetronome.
+  const [gridLabel, setGridLabel] = useState<string | null>(null);
+  // Entries per bar — see gridBarLengths in useMetronome.
+  const [gridBarLengths, setGridBarLengths] = useState<number[] | null>(null);
   // Which beat in the pattern is currently sounding — drives the UI's playhead highlight.
   const [currentBeat, setCurrentBeat] = useState(0);
   // Playback anchor mirrored into React state. The refs are set by the scheduler
@@ -84,9 +92,8 @@ export const useMobileMetronome = ({
   const startTimeRef = useRef<number | null>(null);
   const audioStartTimeRef = useRef<number | null>(null);
   const countInTargetRef = useRef<number>(0);
-  // Count-in length in beats — derived from accentPattern.length at start time, so
-  // e.g. a 5-beat meter counts in "1..5" instead of a hardcoded "1..4" (and two bars
-  // at fast tempos, see getCountInBeats).
+  // Count-in length in quarter notes — one 4/4 bar, or two at fast tempos. See
+  // getCountInBeats.
   const countInStartRef  = useRef<number>(4);
   const beatCounterRef = useRef<number>(0);
   // Accent-grid entries sounded so far — the index into accentPattern. Separate
@@ -98,6 +105,8 @@ export const useMobileMetronome = ({
   const subdivisionIndexRef = useRef<number>(0);
   const isIOS = isIOSDevice();
   const isMutedRef = useRef(isMuted);
+  // Mirrors accentLocked for the edit callbacks — see useMetronome.
+  const accentLockedRef = useRef(false);
   const volumeRef = useRef(volume);
   useEffect(() => { volumeRef.current = volume; }, [volume]);
   const onPlayStartRef = useRef(onPlayStart);
@@ -238,19 +247,16 @@ export const useMobileMetronome = ({
     // Schedule notes ahead of time for precise timing
     while (nextNoteTimeRef.current < currentTime + 0.1) {
       if (countInTargetRef.current > 0) {
-        // The count-in is always plain quarter notes — subdivision only kicks in
-        // once real playback starts below. It previews the same accent pattern
-        // that will play once the bar starts, so a muted beat stays silent here too.
+        // Always a plain 4/4 bar of quarter notes, whatever grid the exercise plays
+        // in — see COUNT_IN_BEATS. Subdivision only kicks in once real playback starts.
         const countInBeatIndex = countInStartRef.current - countInTargetRef.current;
-        const countInLevel     = getAccentLevel(accentPattern, countInBeatIndex);
-        if (countInLevel !== 0) {
-          scheduleNote(nextNoteTimeRef.current, countInLevel === 2 ? 'accent' : 'beat');
-        }
+        const countInLevel     = getAccentLevel(DEFAULT_ACCENT_PATTERN, countInBeatIndex);
+        scheduleNote(nextNoteTimeRef.current, countInLevel === 2 ? 'accent' : 'beat');
         setCountInRemaining(countInTargetRef.current);
         countInTargetRef.current -= 1;
-        // The count-in leads into bar 1, so it ticks at bar 1's tempo — one grid
-        // entry at a time, which under an eighth grid is half a beat.
-        nextNoteTimeRef.current  += stepSeconds(0, 1 / stepsPerBeat);
+        // The count-in leads into bar 1, so it ticks at bar 1's tempo — one whole
+        // quarter note at a time, independent of what a grid entry is worth.
+        nextNoteTimeRef.current  += stepSeconds(0, 1);
       } else {
         // Only a true beat (subdivision index 0) drives the playback anchor and the
         // 4-beat accent grid — subdivision ticks in between are just extra clicks.
@@ -322,12 +328,7 @@ export const useMobileMetronome = ({
 
     if (audioContextRef.current) {
       const useCountIn   = !options?.skipCountIn;
-      // Counted in grid entries, so an eighth grid counts in eighths — see useMetronome.
-      const countInBeats = getCountInSteps(
-        accentPattern.length,
-        bpm * (speedMultiplier || 1),
-        gridUnit,
-      );
+      const countInBeats = getCountInBeats(bpm * (speedMultiplier || 1));
       nextNoteTimeRef.current   = audioContextRef.current.currentTime;
       countInTargetRef.current  = useCountIn ? countInBeats : 0;
       countInStartRef.current   = countInBeats;
@@ -342,7 +343,7 @@ export const useMobileMetronome = ({
     }
 
     setIsPlaying(true);
-  }, [initializeAudio, resumeAudioContext, scheduler, accentPattern.length, gridUnit, bpm, speedMultiplier]);
+  }, [initializeAudio, resumeAudioContext, scheduler, bpm, speedMultiplier]);
 
   const stopMetronome = useCallback(() => {
     if (timeoutRef.current) {
@@ -434,18 +435,24 @@ export const useMobileMetronome = ({
   // Change the meter's beat count (its numerator, e.g. 4/4 → 5/4). New beats
   // start as plain clicks; existing accents are kept.
   const setBeatsPerBar = useCallback((count: number) => {
+    if (accentLockedRef.current) return;
     setAccentPattern((prev) => resizeAccentPattern(prev, count));
   }, []);
 
   // Click-to-cycle a single beat's accent: plain → accent → muted → plain.
   const cycleBeatAccent = useCallback((index: number) => {
+    if (accentLockedRef.current) return;
     setAccentPattern((prev) => prev.map((level, i) => (i === index ? cycleAccentLevel(level) : level)));
   }, []);
 
   /** Replace the whole click grid at once — see setAccentGrid in useMetronome. */
-  const setAccentGrid = useCallback((unit: GridUnit, pattern: AccentLevel[]) => {
-    setGridUnit(unit);
-    setAccentPattern(resizeAccentPattern(pattern, pattern.length));
+  const setAccentGrid = useCallback((grid: MetronomeGrid, locked = false) => {
+    setGridUnit(grid.unit);
+    setAccentPattern([...grid.pattern]);
+    setGridLabel(grid.label ?? null);
+    setGridBarLengths(grid.barLengths.length > 1 ? grid.barLengths : null);
+    accentLockedRef.current = locked;
+    setAccentLocked(locked);
   }, []);
 
   /**
@@ -501,6 +508,9 @@ export const useMobileMetronome = ({
     setSubdivision,
     accentPattern,
     gridUnit,
+    accentLocked,
+    gridLabel,
+    gridBarLengths,
     setBeatsPerBar,
     cycleBeatAccent,
     setAccentGrid,
@@ -521,7 +531,7 @@ export const useMobileMetronome = ({
     audioStartTime: playbackAnchor.audio,
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, volume, setVolume,
-    subdivision, setSubdivision, accentPattern, gridUnit, setBeatsPerBar, cycleBeatAccent, setAccentGrid, currentBeat,
+    subdivision, setSubdivision, accentPattern, gridUnit, accentLocked, gridLabel, gridBarLengths, setBeatsPerBar, cycleBeatAccent, setAccentGrid, currentBeat,
     toggleMetronome, startMetronome, stopMetronome, restartMetronome, seekToBeats,
     getResumeBeat, handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized,
     playbackAnchor,

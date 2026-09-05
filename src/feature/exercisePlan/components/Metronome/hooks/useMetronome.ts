@@ -15,7 +15,8 @@ import {
   subdivisionCountFor,
 } from "../utils/accentPattern";
 import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
-import { getCountInSteps } from "../utils/countInDuration";
+import { getCountInBeats } from "../utils/countInDuration";
+import type { MetronomeGrid } from "../utils/meterGrid";
 
 // AudioWorklet processor — runs on the audio thread, fires ticks every ~25ms.
 // Using an inline Blob URL avoids the need to serve a separate .js file.
@@ -112,6 +113,17 @@ export const useMetronome = ({
   // What one accentPattern entry is worth — a quarter (4, the default) or an eighth (8).
   // See GridUnit: 8 is what lets 7/8 and compound groupings be clicked at all.
   const [gridUnit, setGridUnit] = useState<GridUnit>(4);
+  // Set by an exercise whose whole point IS the click grid (the meter drills):
+  // editing the beats or the accents there would take the drill apart, so the
+  // controls go read-only until another exercise hands over a grid of its own.
+  const [accentLocked, setAccentLocked] = useState(false);
+  // How the current grid reads ("3/4", "3/4 ↔ 5/8") — shown next to the click
+  // grid so the player can see which meter is being clicked. Null when the grid
+  // is the plain default or something the player built by hand.
+  const [gridLabel, setGridLabel] = useState<string | null>(null);
+  // Entries each bar of the grid takes, so the UI can break its rows on the bar
+  // lines instead of wherever the row happens to run out.
+  const [gridBarLengths, setGridBarLengths] = useState<number[] | null>(null);
   // Which beat in the pattern is currently sounding — drives the UI's playhead highlight.
   const [currentBeat, setCurrentBeat] = useState(0);
   // Playback anchor mirrored into React state. The refs are set on the audio
@@ -125,9 +137,8 @@ export const useMetronome = ({
   const workletNodeRef       = useRef<AudioWorkletNode | null>(null);
   const workletReadyRef      = useRef(false);
   const countInTargetRef     = useRef<number>(0);
-  // Count-in length in beats — derived from accentPattern.length at start time, so
-  // e.g. a 5-beat meter counts in "1..5" instead of a hardcoded "1..4" (and two bars
-  // at fast tempos, see getCountInBeats).
+  // Count-in length in quarter notes — one 4/4 bar, or two at fast tempos (see
+  // getCountInBeats). Held so the scheduler can tell which beat of it is sounding.
   const countInStartRef      = useRef<number>(4);
   const startTimeRef         = useRef<number | null>(null);
   const audioStartTimeRef    = useRef<number | null>(null);
@@ -143,6 +154,9 @@ export const useMetronome = ({
   // itself, anything else is a subdivision tick between beats.
   const subdivisionIndexRef  = useRef<number>(0);
   const isMutedRef           = useRef(isMuted);
+  // Mirrors accentLocked so the edit callbacks can reject a change without
+  // taking the state as a dependency (they are handed to memoized toolbars).
+  const accentLockedRef      = useRef(false);
   const mutePlaybackClickRef = useRef(mutePlaybackClick);
   const volumeRef            = useRef(volume);
   const pausedElapsedTimeRef = useRef<number>(0);
@@ -282,22 +296,19 @@ export const useMetronome = ({
         // Count-in beeps stay audible even when `mutePlaybackClick` is set (e.g. AlphaTab
         // notation is shown): AlphaTab itself hasn't started playing yet at this point
         // (see PracticeSession's isAudioPlaying gate), so nothing else would click here.
-        // The count-in is always plain quarter notes — subdivision only kicks in once
-        // real playback starts below. It previews the same accent pattern that will
-        // play once the bar starts, so a muted beat stays silent during count-in too.
+        // Always a plain 4/4 bar of quarter notes, whatever grid the exercise plays in
+        // — see COUNT_IN_BEATS. Subdivision only kicks in once real playback starts.
         const countInBeatIndex = countInStartRef.current - countInTargetRef.current;
-        const countInLevel     = getAccentLevel(accentPattern, countInBeatIndex);
-        if (countInLevel !== 0) {
-          playSound(nextNoteTimeRef.current, countInLevel === 2 ? 'accent' : 'beat', isMutedRef.current);
-        }
+        const countInLevel     = getAccentLevel(DEFAULT_ACCENT_PATTERN, countInBeatIndex);
+        playSound(nextNoteTimeRef.current, countInLevel === 2 ? 'accent' : 'beat', isMutedRef.current);
 
         const currentCount = countInTargetRef.current;
         setTimeout(() => setCountInRemaining(currentCount), 0);
 
         countInTargetRef.current -= 1;
-        // The count-in leads into bar 1, so it ticks at bar 1's tempo — one grid
-        // entry at a time, which under an eighth grid is half a beat.
-        nextNoteTimeRef.current  += stepSeconds(0, 1 / stepsPerBeat);
+        // The count-in leads into bar 1, so it ticks at bar 1's tempo — one whole
+        // quarter note at a time, independent of what a grid entry is worth.
+        nextNoteTimeRef.current  += stepSeconds(0, 1);
       } else {
         // Only a true beat (subdivision index 0) drives the playback anchor and the
         // 4-beat accent grid — subdivision ticks in between are just extra clicks.
@@ -397,13 +408,7 @@ export const useMetronome = ({
     if (ctx.state === 'suspended') ctx.resume();
 
     const useCountIn  = !options?.skipCountIn;
-    // Counted in grid entries, so an eighth grid counts in eighths — one bar of 7/8
-    // is "1-2 1-2 1-2-3", not seven quarters.
-    const countInBeats = getCountInSteps(
-      accentPattern.length,
-      bpm * (speedMultiplier || 1),
-      gridUnit,
-    );
+    const countInBeats = getCountInBeats(bpm * (speedMultiplier || 1));
     nextNoteTimeRef.current   = ctx.currentTime;
     countInTargetRef.current  = useCountIn ? countInBeats : 0;
     countInStartRef.current   = countInBeats;
@@ -424,7 +429,7 @@ export const useMetronome = ({
     }
 
     setIsPlaying(true);
-  }, [scheduler, ensureWorkletNode, accentPattern.length, gridUnit, bpm, speedMultiplier]);
+  }, [scheduler, ensureWorkletNode, bpm, speedMultiplier]);
 
   const stopMetronome = useCallback(() => {
     workletNodeRef.current?.port.postMessage({ type: 'stop' });
@@ -475,11 +480,13 @@ export const useMetronome = ({
   // Change the meter's beat count (its numerator, e.g. 4/4 → 5/4). New beats
   // start as plain clicks; existing accents are kept.
   const setBeatsPerBar = useCallback((count: number) => {
+    if (accentLockedRef.current) return;
     setAccentPattern((prev) => resizeAccentPattern(prev, count));
   }, []);
 
   // Click-to-cycle a single beat's accent: plain → accent → muted → plain.
   const cycleBeatAccent = useCallback((index: number) => {
+    if (accentLockedRef.current) return;
     setAccentPattern((prev) => prev.map((level, i) => (i === index ? cycleAccentLevel(level) : level)));
   }, []);
 
@@ -488,13 +495,25 @@ export const useMetronome = ({
    * accents themselves. Set together because they are meaningless apart: seven
    * entries mean a bar of 7/8 under an eighth grid and 7/4 under a quarter one.
    *
-   * This is how an exercise hands the metronome its own meter (see
-   * Exercise.metronomeGrid); the +/- and click-to-accent controls stay in charge
-   * of whatever the player does to it afterwards.
+   * This is how an exercise hands the metronome its own meter — either the one
+   * it declares (Exercise.metronomeGrid) or the one derived from its tab. A grid
+   * spanning several bars is how the click follows a meter that changes: the
+   * pattern covers the whole 3/4 + 5/8 cycle, so the accents move with it.
+   *
+   * `locked` is for the grids that are the exercise itself rather than a
+   * starting point. Everywhere else the +/- and click-to-accent controls stay in
+   * charge of whatever the player does to the grid afterwards.
    */
-  const setAccentGrid = useCallback((unit: GridUnit, pattern: AccentLevel[]) => {
-    setGridUnit(unit);
-    setAccentPattern(resizeAccentPattern(pattern, pattern.length));
+  const setAccentGrid = useCallback((grid: MetronomeGrid, locked = false) => {
+    setGridUnit(grid.unit);
+    // Taken as given, not resized: a grid spelling out a whole 12/8 + 4/4 pair is
+    // longer than the +/- control's own limit, and clamping it there would drop
+    // the second bar of the pair on the floor.
+    setAccentPattern([...grid.pattern]);
+    setGridLabel(grid.label ?? null);
+    setGridBarLengths(grid.barLengths.length > 1 ? grid.barLengths : null);
+    accentLockedRef.current = locked;
+    setAccentLocked(locked);
   }, []);
 
   /**
@@ -550,6 +569,9 @@ export const useMetronome = ({
     setSubdivision,
     accentPattern,
     gridUnit,
+    accentLocked,
+    gridLabel,
+    gridBarLengths,
     setBeatsPerBar,
     cycleBeatAccent,
     setAccentGrid,
@@ -569,7 +591,7 @@ export const useMetronome = ({
   }), [
     bpm, isPlaying, countInRemaining, minBpm, maxBpm,
     setBpm, volume, setVolume, subdivision, setSubdivision,
-    accentPattern, gridUnit, setBeatsPerBar, cycleBeatAccent, setAccentGrid, currentBeat,
+    accentPattern, gridUnit, accentLocked, gridLabel, gridBarLengths, setBeatsPerBar, cycleBeatAccent, setAccentGrid, currentBeat,
     toggleMetronome, startMetronome, stopMetronome,
     restartMetronome, seekToBeats, getResumeBeat, handleSetRecommendedBpm, recommendedBpm,
     playbackAnchor,

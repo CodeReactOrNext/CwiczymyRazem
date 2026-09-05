@@ -18,6 +18,7 @@ import { useAppSelector } from "store/hooks";
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import { DEFAULT_ACCENT_PATTERN } from "../../components/Metronome/utils/accentPattern";
 import { getCountInDurationMs } from "../../components/Metronome/utils/countInDuration";
+import { deriveMetronomeGrid } from "../../components/Metronome/utils/meterGrid";
 import type { ExercisePlan } from "../../types/exercise.types";
 import { isClickAnsweredMode } from "../../utils/huntModes";
 import { DesktopSessionView } from "./components/DesktopSessionView";
@@ -539,28 +540,53 @@ export const PracticeSession = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExercise.id]);
 
-  // Hand the metronome the click grid this exercise needs (Exercise.metronomeGrid).
-  //
-  // Only the odd-meter drills carry one: their bars can't be marked by whole
-  // quarter-note beats, so without this the click's "one" walks away from the bar
-  // lines within a couple of bars. The grid is applied on entry only — the +/- and
-  // click-to-accent controls stay the player's from then on.
-  //
-  // Leaving is what the ref is for: a 15-entry eighth grid must not follow the
-  // player into the next exercise, but an exercise that never asks for a grid also
-  // must not wipe a grid the player set up by hand, which is how it behaved before.
+  /**
+   * The click grid this exercise plays in.
+   *
+   * The meter comes from the tab about to be played: a 4/4 exercise clicks four
+   * quarters with the accent on one, a 6/8 one clicks six eighths the same way,
+   * and a tab that *changes* meter gets a pattern spanning its whole repeating
+   * cycle, so the click changes with it instead of holding one bar's shape over
+   * all of them. Exercise.metronomeGrid overrides that, for a drill whose click
+   * cannot be read off a time signature; nothing needs it today.
+   *
+   * Locked whenever the pattern covers more than a single bar: the +/- control
+   * means "beats in the bar", which a two-bar cycle has no answer for, and adding
+   * a beat to it only breaks the alternation. A plain one-bar grid is just a
+   * starting point and stays the player's to edit.
+   *
+   * Read from rawTablature rather than the exercise, so a GP file's own time
+   * signatures count too — and so switching GP track re-derives it.
+   */
+  const exerciseMetronomeGrid = currentExercise.metronomeGrid ?? deriveMetronomeGrid(rawTablature);
+  const metronomeGridLocked = (exerciseMetronomeGrid?.barLengths.length ?? 1) > 1;
+  // Identity of the grid rather than the object, so a re-derivation that lands on
+  // the same meter doesn't wipe accents the player set by hand mid-exercise. The
+  // exercise id is part of it because moving to the next exercise *should* reset
+  // to that exercise's meter, even when the two happen to share one.
+  const metronomeGridKey = exerciseMetronomeGrid
+    ? `${currentExercise.id}|${metronomeGridLocked ? "L" : "u"}${exerciseMetronomeGrid.unit}:${exerciseMetronomeGrid.pattern.join("")}`
+    : null;
+  // An exercise with no tab at all (ear training, improv prompts) asks for no
+  // grid — but a two-bar eighth grid must not follow the player out of the drill
+  // that set it, hence the reset. The ref keeps that reset from firing on a
+  // session that never applied a grid in the first place, where it would wipe a
+  // grid the player built by hand.
   const appliedMetronomeGridRef = useRef<string | null>(null);
   useEffect(() => {
-    const grid = currentExercise.metronomeGrid;
-    if (grid) {
-      metronome.setAccentGrid(grid.unit, grid.pattern);
-      appliedMetronomeGridRef.current = currentExercise.id;
+    if (exerciseMetronomeGrid) {
+      metronome.setAccentGrid(exerciseMetronomeGrid, metronomeGridLocked);
+      appliedMetronomeGridRef.current = metronomeGridKey;
     } else if (appliedMetronomeGridRef.current !== null) {
-      metronome.setAccentGrid(4, DEFAULT_ACCENT_PATTERN);
+      metronome.setAccentGrid({
+        unit: 4,
+        pattern: DEFAULT_ACCENT_PATTERN,
+        barLengths: [DEFAULT_ACCENT_PATTERN.length],
+      });
       appliedMetronomeGridRef.current = null;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentExercise.id]);
+  }, [metronomeGridKey]);
 
   // Persist Practice Session settings per exercise, so reopening the same
   // exercise restores its own metronome/playback/mic preferences.
@@ -851,7 +877,7 @@ export const PracticeSession = ({
             const usesMetronome = !!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat";
             resetSuccessView(); resetTimer(); metronome.restartMetronome();
             // Hold the timer for the count-in — it must not eat practice time.
-            startTimer(usesMetronome ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, effectiveBpm, metronome.gridUnit) : 0);
+            startTimer(usesMetronome ? getCountInDurationMs(effectiveBpm) : 0);
             if (usesMetronome) metronome.startMetronome();
           }}
           isLoading={isFinishing || isSubmittingReport}

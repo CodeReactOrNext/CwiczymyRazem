@@ -1,5 +1,3 @@
-import { type GridUnit, stepsPerBeat } from "./accentPattern";
-
 /**
  * Above this (already speed-multiplied) tempo one bar of count-in gets too short to
  * be useful — at 160 bpm a 4/4 count-in lasts 1.5s, which is barely enough to hear
@@ -8,50 +6,34 @@ import { type GridUnit, stepsPerBeat } from "./accentPattern";
 export const DOUBLE_COUNT_IN_BPM = 120;
 
 /**
- * How many beats the count-in runs for.
+ * The count-in is always one plain bar of four quarter notes, whatever meter the
+ * exercise itself is in.
  *
- * One plain quarter-note per beat of the current meter (`Math.max(1, accentPattern.length)`,
- * see `startMetronome`) — doubled to two full bars once the effective tempo reaches
- * `DOUBLE_COUNT_IN_BPM`, so a fast count-in never gets uncomfortably short. Doubling by
- * whole bars (rather than adding a fixed number of beats) keeps the accent pattern intact,
- * so the count-in still previews the meter the exercise will play in.
+ * It used to be the exercise's own meter, so that it "previewed" what was coming.
+ * That reads well for 3/4 and turns absurd everywhere else: a drill alternating
+ * 12/8 and 4/4 counted itself in for twenty clicks, and any grid with rests in it
+ * counted in with gaps. Four beats is what a player expects before a take, and it
+ * says the one thing a count-in is for — where the tempo is.
  */
-export const getCountInBeats = (beatsPerBar: number, effectiveBpm: number): number => {
-  const beats = Math.max(1, beatsPerBar);
-  if (!Number.isFinite(effectiveBpm) || effectiveBpm <= 0) return beats;
-  return effectiveBpm >= DOUBLE_COUNT_IN_BPM ? beats * 2 : beats;
+export const COUNT_IN_BEATS = 4;
+
+/**
+ * How many quarter-note beats the count-in runs for: one bar, doubled to two once
+ * the effective tempo reaches `DOUBLE_COUNT_IN_BPM` so a fast count-in never gets
+ * uncomfortably short.
+ */
+export const getCountInBeats = (effectiveBpm: number): number => {
+  if (!Number.isFinite(effectiveBpm) || effectiveBpm <= 0) return COUNT_IN_BEATS;
+  return effectiveBpm >= DOUBLE_COUNT_IN_BPM ? COUNT_IN_BEATS * 2 : COUNT_IN_BEATS;
 };
 
 /**
- * How many grid entries the count-in ticks for.
- *
- * The doubling rule has to be judged on how long the bar actually *lasts*, which is
- * its length in beats — not on how fast the entries tick. An eighth grid ticks at
- * twice the beat rate, so feeding the entry rate to `getCountInBeats` would push a
- * perfectly slow 7/8 at quarter=60 over DOUBLE_COUNT_IN_BPM and count it in for two
- * bars, eight seconds, for no reason.
- */
-export const getCountInSteps = (
-  entriesPerBar: number,
-  effectiveBpm: number,
-  gridUnit: GridUnit = 4,
-): number => {
-  const perBeat = stepsPerBeat(gridUnit);
-  return getCountInBeats(entriesPerBar / perBeat, effectiveBpm) * perBeat;
-};
-
-/**
- * How long the metronome's count-in will run, in milliseconds.
+ * How long the count-in will run, in milliseconds.
  *
  * Used to hold the exercise timer frozen for exactly that long, so the count-in
  * doesn't eat practice time.
  */
-export const getCountInDurationMs = (
-  entriesPerBar: number,
-  effectiveBpm: number,
-  gridUnit: GridUnit = 4,
-): number => {
+export const getCountInDurationMs = (effectiveBpm: number): number => {
   if (!Number.isFinite(effectiveBpm) || effectiveBpm <= 0) return 0;
-  const steps = getCountInSteps(entriesPerBar, effectiveBpm, gridUnit);
-  return (steps * 60_000) / (effectiveBpm * stepsPerBeat(gridUnit));
+  return (getCountInBeats(effectiveBpm) * 60_000) / effectiveBpm;
 };

@@ -1,4 +1,4 @@
-import type { AccentLevel, GridUnit } from "feature/exercisePlan/components/Metronome/utils/accentPattern";
+import type { MetronomeGrid } from "feature/exercisePlan/components/Metronome/utils/meterGrid";
 import type { EarQuizConfig } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import type { StaticImageData } from "next/image";
@@ -224,19 +224,17 @@ export interface Exercise {
    *  See EarQuizPanel / feature/exercisePlan/logic/earQuiz. */
   earQuizConfig?: EarQuizConfig;
   /**
-   * Click grid the session hands the metronome when this exercise is entered.
+   * Click grid the session hands the metronome when this exercise is entered,
+   * instead of the one it would read off the tab.
    *
-   * Needed wherever the default "one accent per quarter, four to a bar" grid can't
-   * describe the music: a 7/8 bar is 3.5 quarters long, and 6/8 grouped 3+3 wants
-   * its second accent on quarter 1.5 — under `unit: 8` both are exact, because an
-   * entry is then worth an eighth. `pattern` covers ONE full cycle of the click, so
-   * a drill that alternates two bars spells out both (4/4 + 7/8 = 15 entries): the
-   * metronome only ever loops a single pattern.
-   *
-   * Leave it off for anything in plain quarters — the player's own grid then stays
-   * untouched, exactly as before.
+   * Escape hatch, with no users today: the derivation covers every meter a time
+   * signature can state, including a tab that alternates two of them (see
+   * deriveMetronomeGrid). Reach for this only when a drill needs a click that a
+   * time signature cannot express — an inner grouping, say — and accept that the
+   * grid then goes read-only, since a hand-made pattern has no sensible answer to
+   * "add a beat".
    */
-  metronomeGrid?: { unit: GridUnit; pattern: AccentLevel[] };
+  metronomeGrid?: MetronomeGrid;
   strummingPatterns?: StrumPattern[];
   _generatorConfig?: any;
   /** Audio file played as backing in exam mode. sourceBpm must match the file's recorded tempo. */

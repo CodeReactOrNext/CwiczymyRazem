@@ -37,5 +37,4 @@ export const meterSwitch128To44Exercise = createMeterSwitchExercise({
   // instead of walking away from it. Accents mark each bar start plus quarter 3 of
   // the 12/8 bar, which is its third group — the only other grouping that lands on a
   // quarter. Everything else in the grouping the player supplies.
-  grid: { unit: 4, pattern: [2, 1, 1, 2, 1, 1, 2, 1, 1, 1] },
 });

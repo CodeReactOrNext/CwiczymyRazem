@@ -78,7 +78,7 @@ export function useSessionControls({
   // timer for as long as the count-in will take.
   const countInDelayMs = useCallback(() => (
     startsMetronome
-      ? getCountInDurationMs(metronome.accentPattern?.length ?? 4, metronome.bpm * (speedMultiplier || 1), metronome.gridUnit)
+      ? getCountInDurationMs(metronome.bpm * (speedMultiplier || 1))
       : 0
   ), [startsMetronome, metronome, speedMultiplier]);
 
