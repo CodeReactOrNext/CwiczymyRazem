@@ -1,7 +1,9 @@
 import { Button } from "assets/components/ui/button";
+import { HeroPattern } from "components/UI/HeroBanner";
 import { DISCORD_INVITE_URL } from "constants/community";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { useAccountEmail } from "feature/supporterPanel/hooks/useAccountEmail";
+import { SupporterStrip } from "feature/supportTeam/components/SupporterStrip";
 import { Heart } from "lucide-react";
 
 /**
@@ -22,12 +24,23 @@ export const SupporterPitch = () => {
   const email = useAccountEmail();
 
   return (
-    <section className='flex flex-col items-start gap-6 rounded-lg bg-zinc-900/40 p-6 sm:p-8 md:p-10'>
-      <span className='flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-400'>
+    <section className='relative flex flex-col items-start gap-6 overflow-hidden rounded-lg bg-zinc-900/40 p-6 sm:p-8 md:p-10'>
+      {/* Amber, the colour the badge and the avatar ring are already in, so the
+          door is painted like the thing behind it. Pattern and glow fade out to
+          the right, leaving the copy on clean background. */}
+      <HeroPattern
+        variant='heart'
+        className='opacity-[0.09]'
+        maskImage='linear-gradient(to right, black 0%, transparent 55%)'
+        gradient={["#fbbf24", "#f97316"]}
+      />
+      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
+
+      <span className='relative flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-400'>
         <Heart size={24} fill='currentColor' />
       </span>
 
-      <div className='space-y-3'>
+      <div className='relative space-y-3'>
         <h2 className='text-xl font-bold text-zinc-100'>
           A donation opens the supporter panel
         </h2>
@@ -39,7 +52,7 @@ export const SupporterPitch = () => {
         </p>
       </div>
 
-      <Button asChild size='lg'>
+      <Button asChild size='lg' className='relative'>
         <a href={BMC_URL} target='_blank' rel='noreferrer'>
           <span className='flex items-center gap-2'>
             <Heart size={16} fill='currentColor' />
@@ -48,7 +61,15 @@ export const SupporterPitch = () => {
         </a>
       </Button>
 
-      <p className='max-w-2xl text-sm leading-relaxed text-zinc-500'>
+      {/* Faces right under the button, because this is the one spot on the page
+          where they are an argument rather than a thank-you: whoever is reading
+          the ask sees who already said yes. No link on the caption — the full
+          wall, with names and levels, is the next thing down the page. */}
+      {/* w-full, not the column's default max-content: the row has to know how
+          wide the box is to wrap inside it instead of running past the edge. */}
+      <SupporterStrip className='relative w-full' />
+
+      <p className='relative max-w-2xl text-sm leading-relaxed text-zinc-500'>
         Pay with the email this account is on
         {email ? (
           <>

@@ -17,6 +17,8 @@ interface HeroBannerProps {
   onClick?: () => void;
   className?: string;
   leftContent?: ReactNode;
+  /** Spans the full banner width, below both columns. */
+  footerContent?: ReactNode;
   children?: ReactNode;
   compact?: boolean;
 }
@@ -36,6 +38,7 @@ export const HeroBanner = ({
   onClick,
   className = "",
   leftContent,
+  footerContent,
   children,
   compact = false,
 }: HeroBannerProps) => {
@@ -96,9 +99,11 @@ export const HeroBanner = ({
         />
       )}
 
-      {/* Content */}
+      {/* Content. flex-wrap is what lets footerContent claim a full-width row of
+          its own: the two columns never wrap on their own (the left one is
+          flex-1 min-w-0, so it shrinks instead), only a w-full child does. */}
       <div
-        className={`relative z-10 flex flex-col md:flex-row w-full items-start md:items-start justify-between gap-6 md:gap-8 ${
+        className={`relative z-10 flex flex-col md:flex-row flex-wrap w-full items-start md:items-start justify-between gap-6 md:gap-8 ${
           compact ? 'p-4 md:p-5 lg:px-6 lg:py-4' : 'p-6 md:p-8 lg:px-10 lg:py-8'
         } ${
           characterImage ? "pr-[120px] xs:pr-[160px] md:pr-8 lg:pr-10" : ""
@@ -149,6 +154,10 @@ export const HeroBanner = ({
             {children && <div className="w-full md:w-auto md:mb-1">{children}</div>}
           </div>
         )}
+
+        {/* Full-width band under both columns, for content the left column's
+            max-w-xl would squeeze — e.g. a long row of supporter avatars. */}
+        {footerContent && <div className="w-full">{footerContent}</div>}
       </div>
     </div>
   );

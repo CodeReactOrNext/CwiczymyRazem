@@ -1,3 +1,4 @@
+import { HeroPattern } from "components/UI/HeroBanner";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { DISCORD_INVITE_URL } from "constants/community";
 import {
@@ -57,7 +58,7 @@ const PERKS: Perk[] = [
           href={DISCORD_INVITE_URL}
           target='_blank'
           rel='noopener noreferrer'
-          className='text-zinc-200 underline decoration-zinc-600 underline-offset-2 transition-colors hover:text-white hover:decoration-zinc-300'>
+          className='text-amber-300 underline decoration-amber-500/40 underline-offset-2 transition-colors hover:text-amber-200 hover:decoration-amber-400'>
           Discord
         </a>{" "}
         and a channel where I show what I am building before it ships.
@@ -68,8 +69,20 @@ const PERKS: Perk[] = [
 
 export const RoadmapPerks = () => {
   return (
-    <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-7'>
-      <div className='flex flex-wrap items-start justify-between gap-x-12 gap-y-5'>
+    <section className='relative overflow-hidden rounded-lg bg-zinc-900/40 p-5 sm:p-7'>
+      {/* Amber, the colour the app already spends on supporters (the badge, the
+          avatar ring): this section lists what the badge buys, so the surface
+          it sits on should read as the same thing. Pattern and glow both fade
+          out to the right, leaving the copy on clean background. */}
+      <HeroPattern
+        variant='shuffle'
+        className='opacity-[0.09]'
+        maskImage='linear-gradient(to right, black 0%, transparent 55%)'
+        gradient={["#fbbf24", "#f97316"]}
+      />
+      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
+
+      <div className='relative flex flex-wrap items-start justify-between gap-x-12 gap-y-5'>
         <div className='min-w-0 max-w-2xl'>
           <h2 className='flex items-center gap-2.5 text-base font-semibold text-zinc-100'>
             <SupportToken size={18} />
@@ -84,7 +97,7 @@ export const RoadmapPerks = () => {
 
         <Link
           href='/supporter'
-          className='group flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-800/60 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800'>
+          className='group flex shrink-0 items-center gap-1.5 rounded-lg bg-amber-500/15 px-4 py-2.5 text-sm font-semibold text-amber-300 transition-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50 hover:bg-amber-500/25'>
           Open the supporter panel
           <ArrowRight
             size={16}
@@ -95,10 +108,10 @@ export const RoadmapPerks = () => {
 
       {/* Plain rows, not tiles: six tinted boxes were the loudest thing on the
           page, and on a phone they nested a card inside a card. */}
-      <ul className='mt-8 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3'>
+      <ul className='relative mt-8 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3'>
         {PERKS.map(({ icon: Icon, title, body }) => (
           <li key={title} className='flex gap-3.5'>
-            <Icon size={18} className='mt-0.5 shrink-0 text-zinc-400' />
+            <Icon size={18} className='mt-0.5 shrink-0 text-amber-400' />
             <div className='min-w-0'>
               <p className='text-sm font-semibold text-zinc-100'>{title}</p>
               <p className='mt-1 text-sm leading-relaxed text-zinc-400'>

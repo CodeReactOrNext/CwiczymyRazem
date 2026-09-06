@@ -114,12 +114,9 @@ export const SupporterPanelView = () => {
           // so waiting is what keeps a supporter off the sales pitch.
           <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />
         ) : !isSupporter ? (
-          // The wall rides along under the pitch: the door reads better next to
-          // the people already through it, and it is public anyway.
-          <div className='space-y-12'>
-            <SupporterPitch />
-            <SupporterWall />
-          </div>
+          // The faces that used to sit under the pitch on their own wall are in
+          // the pitch itself now, where they read as part of the ask.
+          <SupporterPitch />
         ) : (
           <>
             {/* Scrolls sideways on a phone rather than wrapping into three rows. */}

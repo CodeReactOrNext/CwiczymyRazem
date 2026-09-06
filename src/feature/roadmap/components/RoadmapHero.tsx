@@ -1,4 +1,5 @@
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { SupporterStrip } from "feature/supportTeam/components/SupporterStrip";
 
 import { FundingStatusBlock } from "./FundingStatusBlock";
 import { SupportCta } from "./SupportCta";
@@ -12,8 +13,8 @@ interface RoadmapHeroProps {
 
 /**
  * The whole pitch in one place: what the money does, where the running total
- * stands, and the button. Everything a first-time visitor needs to decide is
- * above the fold; the sections below only add detail.
+ * stands, who is already paying it, and the button. Everything a first-time
+ * visitor needs to decide is above the fold; the sections below add detail.
  */
 export const RoadmapHero = ({
   totalRaised,
@@ -39,6 +40,12 @@ export const RoadmapHero = ({
           className='max-w-sm'
         />
       )
+    }
+    footerContent={
+      // Its own band rather than the left column: that one is capped at
+      // max-w-xl for readable copy, which folded eighteen supporters onto two
+      // short rows.
+      <SupporterStrip />
     }
     rightContent={
       <div className='flex flex-col items-start gap-2.5 md:items-end'>
