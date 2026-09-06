@@ -8,7 +8,7 @@ export const meterSwitch44To78Exercise = createMeterSwitchExercise({
     "Alternate a bar of 4/4 with a bar of 7/8 over one unbroken stream of eighth notes — the 7/8 bar is simply one eighth shorter.",
   whyItMatters:
     "This is the gentlest possible way into odd meters: the eighth note never changes speed, so nothing about your picking hand has to change. Only one eighth goes missing, and the ear picks that up immediately — which is why almost every prog and post-rock riff you'll meet starts from exactly this relationship.",
-  difficulty: "easy",
+  difficulty: "medium",
   timeInMinutes: 3,
   metronomeSpeed: { min: 40, max: 120, recommended: 60 },
   instructions: [

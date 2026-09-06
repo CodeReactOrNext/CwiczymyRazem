@@ -8,7 +8,7 @@ export const meterSwitch34To58Exercise = createMeterSwitchExercise({
     "The same one-eighth-shorter switch as 4/4 ↔ 7/8, in half the size — six eighths against five. The best place to start.",
   whyItMatters:
     "Short bars come back around fast, so a mistake shows up within a second instead of after four beats of drifting. That tight feedback loop is what makes this pair the fastest warm-up for odd-meter work, and it's the same skill 4/4 ↔ 7/8 asks for, just easier to hold in your head.",
-  difficulty: "beginner",
+  difficulty: "medium",
   timeInMinutes: 2.5,
   metronomeSpeed: { min: 40, max: 120, recommended: 60 },
   instructions: [
