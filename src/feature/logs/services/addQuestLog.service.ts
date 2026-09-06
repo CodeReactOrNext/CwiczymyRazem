@@ -27,6 +27,7 @@ export const firebaseAddQuestLog = async (uid: string) => {
       uid,
       userName,
       userAvatarFrame,
+      guildBadge: userData.guildBadge ?? null,
       avatarUrl,
       timestamp: new Date().toISOString(),
       points: 10, // Reward points

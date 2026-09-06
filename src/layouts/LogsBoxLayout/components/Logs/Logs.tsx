@@ -758,7 +758,7 @@ const FirebaseLogsDonationItem = ({
 }) => {
   const newest = logs[0];
   const date = new Date(newest.data);
-  const { uid, userName, avatarUrl, userAvatarFrame } = newest;
+  const { uid, userName, avatarUrl, userAvatarFrame, guildBadge } = newest;
 
   const fameAmount = calculateGroupFame({ logs });
   const reactionLogId = getGroupReactionAnchor({ logs })?.id;
@@ -809,6 +809,7 @@ const FirebaseLogsDonationItem = ({
               userName={userName ?? getDonationName(newest)}
               avatarUrl={avatarUrl ?? undefined}
               lvl={userAvatarFrame}
+              guildBadge={guildBadge}
               avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
             />
           </span>
@@ -1396,7 +1397,7 @@ const GroupedLogItem = ({
   const representative = group.logs[0] as FirebaseLogsInterface;
   const date = new Date(getLogTimestampMs(group.logs[0]));
   const fameAmount = calculateGroupFame(group);
-  const { uid, userName, avatarUrl, userAvatarFrame } = representative;
+  const { uid, userName, avatarUrl, userAvatarFrame, guildBadge } = representative;
 
   // The reaction lives on the oldest log in the group, not the newest one shown at the top: the
   // head keeps changing as the user logs more of the same activity, the tail does not.
@@ -1414,6 +1415,7 @@ const GroupedLogItem = ({
               userName={userName}
               avatarUrl={avatarUrl ?? undefined}
               lvl={userAvatarFrame}
+              guildBadge={guildBadge}
               avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
             />
           </span>

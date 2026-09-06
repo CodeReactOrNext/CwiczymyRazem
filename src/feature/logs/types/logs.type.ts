@@ -1,6 +1,7 @@
 import type { AchievementList } from "feature/achievements/types";
 import type { EffectInventoryItem, InventoryItem } from "feature/arsenal/types/arsenal.types";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import type { SupportVariantId } from "feature/support/content/supportVariants";
 import type { ReportSongEntry } from "feature/user/view/ReportView/ReportView.types";
 
@@ -29,6 +30,7 @@ export interface FirebaseLogsSongsInterface {
   status: FirebaseLogsSongsStatuses;
   avatarUrl: string | undefined;
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   id?: string;
   reactions?: string[];
   reactionFame?: LogReactionFame;
@@ -91,6 +93,7 @@ export interface FirebaseLogsInterface {
   };
   avatarUrl: string | null;
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   id?: string;
   reactions?: string[];
   reactionFame?: LogReactionFame;
@@ -179,6 +182,7 @@ export interface FirebaseLogsRecordingsInterface {
   data: string; // Generic data field if needed, or url
   avatarUrl: string | undefined | null; // For consistency with other logs
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   id?: string;
   reactions?: string[];
   reactionFame?: LogReactionFame;
@@ -190,6 +194,7 @@ export interface FirebaseLogsPlaylistInterface {
   userName: string;
   avatarUrl: string | null;
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   timestamp: string | number | Date;
   data: string;
   playlistId: string;
@@ -210,6 +215,7 @@ export interface FirebaseLogsDailyQuestInterface {
   points: number;
   avatarUrl: string | null;
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   id?: string;
   reactions?: string[];
   reactionFame?: LogReactionFame;
@@ -229,6 +235,7 @@ export interface FirebaseLogsExamPassedInterface {
   accuracy: number;
   avatarUrl: string | null;
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   id?: string;
   reactions?: string[];
   reactionFame?: LogReactionFame;
@@ -240,6 +247,7 @@ export interface FirebaseLogsMarketplaceInterface {
   userName: string;
   avatarUrl: string | null;
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   timestamp: string | number | Date;
   data: string;
   itemType: "guitar" | "effect";
@@ -262,6 +270,7 @@ export interface FirebaseLogsMarketplacePurchaseInterface {
   userName: string;
   avatarUrl: string | null;
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   timestamp: string | number | Date;
   data: string;
   sellerId: string;
@@ -313,6 +322,7 @@ export interface FirebaseLogsDonationInterface {
   userName?: string;
   avatarUrl?: string | null;
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   id?: string;
   reactions?: string[];
   reactionFame?: LogReactionFame;
@@ -325,6 +335,7 @@ export interface FirebaseLogsCaseOpenInterface {
   userName: string;
   avatarUrl: string | null;
   userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
   timestamp: string | number | Date;
   data: string;
   caseType: string;

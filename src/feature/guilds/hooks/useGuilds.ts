@@ -30,7 +30,7 @@ const post = async <T = GuildsState>(
 type Funded = GuildsState & { paid: number; unlocked: boolean };
 
 /** What the claim route adds: the Fame that just landed, over how many quests. */
-type Claimed = GuildsState & { fame: number; quests: number };
+type Claimed = GuildsState & { claimedFame: number; claimedQuests: number };
 
 /** What the deposit route adds: the Fame that just left your own pocket. */
 type Deposited = GuildsState & { paid: number };
@@ -182,9 +182,9 @@ export const useGuildMutations = () => {
     onSuccess: (state) => {
       apply(state);
       toast.success(
-        state.quests === 1
-          ? `+${state.fame} Fame — one quest, yours`
-          : `+${state.fame} Fame over ${state.quests} quests`,
+        state.claimedQuests === 1
+          ? `+${state.claimedFame} Fame — one quest, yours`
+          : `+${state.claimedFame} Fame over ${state.claimedQuests} quests`,
       );
     },
     onError: (error) =>

@@ -1,3 +1,4 @@
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import {
   SUPPORT_TEAM_COLLECTION,
   SUPPORT_TEAM_DOC_ID,
@@ -118,6 +119,7 @@ export interface DonorAccount {
   userName: string;
   avatarUrl: string | null;
   userAvatarFrame: number;
+  guildBadge: GuildBadge | null;
 }
 
 export async function findDonorAccountByEmail(
@@ -136,6 +138,7 @@ export async function findDonorAccountByEmail(
     avatarUrl: data.avatar ?? data.photoURL ?? null,
     userAvatarFrame:
       typeof data.statistics?.lvl === "number" ? data.statistics.lvl : 0,
+    guildBadge: data.guildBadge ?? null,
   };
 }
 

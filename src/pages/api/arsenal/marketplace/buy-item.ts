@@ -131,6 +131,7 @@ export default async function handler(
         buyerName: buyerData.displayName || "Someone",
         buyerAvatarUrl: buyerData.avatar || buyerData.photoURL || null,
         buyerFrame: buyerData.statistics?.lvl ?? 0,
+        buyerGuildBadge: buyerData.guildBadge ?? null,
       };
     });
 
@@ -165,6 +166,7 @@ export default async function handler(
         userName: result.buyerName,
         avatarUrl: result.buyerAvatarUrl,
         userAvatarFrame: result.buyerFrame,
+        guildBadge: result.buyerGuildBadge,
         timestamp: new Date().toISOString(),
         data: new Date().toISOString(),
         sellerId: result.sellerId,

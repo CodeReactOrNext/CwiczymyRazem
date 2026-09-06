@@ -1,3 +1,4 @@
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import { logger } from "feature/logger/Logger";
 import {
   FAME_ON_LIKE,
@@ -120,6 +121,7 @@ const logPlaylistCreated = async (params: {
   userId: string;
   userName: string | null | undefined;
   userAvatar: string | null | undefined;
+  guildBadge: GuildBadge | null | undefined;
   name: string;
   kind: Playlist["kind"];
   songCount: number;
@@ -130,6 +132,7 @@ const logPlaylistCreated = async (params: {
     uid: params.userId,
     userName: params.userName ?? "Someone",
     avatarUrl: params.userAvatar ?? null,
+    guildBadge: params.guildBadge ?? null,
     playlistId: params.playlistId,
     playlistName: params.name,
     playlistKind: params.kind,
@@ -143,7 +146,8 @@ export const createPlaylist = async (
   userId: string,
   ownerName: string | null | undefined,
   ownerAvatar: string | null | undefined,
-  draft: PlaylistDraft
+  draft: PlaylistDraft,
+  ownerGuildBadge?: GuildBadge | null
 ): Promise<string> => {
   const now = Timestamp.now();
   const docRef = await addDoc(collection(db, PLAYLISTS_COLLECTION), {
@@ -171,6 +175,7 @@ export const createPlaylist = async (
       userId,
       userName: ownerName,
       userAvatar: ownerAvatar,
+      guildBadge: ownerGuildBadge,
       name: draft.name,
       kind: draft.kind,
       songCount: draft.songs.length,

@@ -35,6 +35,7 @@ export const firebaseAddExamPassedLog = async (
       uid,
       userName,
       userAvatarFrame,
+      guildBadge: userData.guildBadge ?? null,
       avatarUrl,
       timestamp: new Date().toISOString(),
       moduleId,

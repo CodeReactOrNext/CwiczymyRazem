@@ -41,11 +41,13 @@ export default async function handler(
     }
 
     // The whole state comes back with the Fame already spend-able, plus what
-    // was actually paid, which is the only thing the toast needs.
+    // was actually paid, which is the only thing the toast needs. Named apart
+    // from the state's own `fame`/`quests` — those already mean the balance
+    // and the board, not the delta this claim just paid out.
     return res.status(200).json({
       ...(await readGuilds(authResult.session)),
-      fame: result.fame,
-      quests: result.quests,
+      claimedFame: result.fame,
+      claimedQuests: result.quests,
     });
   } catch (error: any) {
     console.error("[supporter/guild/quests]", error);

@@ -22,6 +22,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import {
   selectUserAuth,
   selectUserAvatar,
+  selectUserGuildBadge,
   selectUserName,
 } from "feature/user/store/userSlice";
 import { ArrowLeft, ArrowRight, Globe, Lock, Music, X } from "lucide-react";
@@ -51,6 +52,7 @@ export const PlaylistCreator = ({
   const userAuth = useAppSelector(selectUserAuth);
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
+  const userGuildBadge = useAppSelector(selectUserGuildBadge);
 
   const [step, setStep] = useState<CreatorStep>("kind");
   const [kind, setKind] = useState<PlaylistKind>("playlist");
@@ -92,13 +94,19 @@ export const PlaylistCreator = ({
     if (!userAuth || !name.trim()) return;
     setIsSaving(true);
     try {
-      const playlistId = await createPlaylist(userAuth, userName, userAvatar, {
-        name: name.trim(),
-        description: description.trim(),
-        kind,
-        isPublic,
-        songs: entries,
-      });
+      const playlistId = await createPlaylist(
+        userAuth,
+        userName,
+        userAvatar,
+        {
+          name: name.trim(),
+          description: description.trim(),
+          kind,
+          isPublic,
+          songs: entries,
+        },
+        userGuildBadge
+      );
       posthog.capture("playlist_action", {
         action: "create",
         kind,

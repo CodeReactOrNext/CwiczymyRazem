@@ -301,6 +301,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         userName: capturedUserData?.displayName || "Unknown",
         avatarUrl: capturedUserData?.avatar || null,
         userAvatarFrame: capturedUserData?.statistics?.lvl ?? 0,
+        guildBadge: capturedUserData?.guildBadge ?? null,
         timestamp: new Date().toISOString(),
         data: new Date().toISOString(),
         caseType,

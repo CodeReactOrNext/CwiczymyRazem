@@ -120,6 +120,25 @@ describe("findDonorAccountByEmail", () => {
       userName: "Ola",
       avatarUrl: "ola.png",
       userAvatarFrame: 7,
+      guildBadge: null,
+    });
+  });
+
+  it("carries the donor's guild badge along, so the feed can tag their name", async () => {
+    store.set("users/u2", {
+      displayName: "Bea",
+      email: "bea@gmail.com",
+      avatar: "bea.png",
+      statistics: { lvl: 3 },
+      guildBadge: { guildId: "g1", tag: "RIF", accent: "gold", frame: "plain" },
+    });
+
+    const donor = await findDonorAccountByEmail("bea@gmail.com");
+    expect(donor?.guildBadge).toEqual({
+      guildId: "g1",
+      tag: "RIF",
+      accent: "gold",
+      frame: "plain",
     });
   });
 

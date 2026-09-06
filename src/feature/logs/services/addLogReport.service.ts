@@ -61,6 +61,7 @@ export const firebaseAddLogReport = async (
     uid,
     userName,
     userAvatarFrame,
+    guildBadge: userData.guildBadge ?? null,
     points,
     newAchievements,
     newLevel,
