@@ -1,4 +1,4 @@
-import type { GuildMetric } from "feature/guilds/data/guildMetrics";
+import type { QuestUnit } from "feature/guilds/data/guildQuests";
 import type { GuildUpgrade } from "feature/guilds/utils/guildUpgrades.utils";
 
 /**
@@ -13,6 +13,8 @@ export interface GuildCosmetics {
   /** Worn, one per slot. Ids the catalog does not know fall back to the default. */
   accent: string;
   banner: string;
+  /** The four icons across the banner, as one id — see `motifId`. */
+  motif: string;
   frame: string;
 }
 
@@ -23,8 +25,9 @@ export interface GuildCosmetics {
  * Copied onto every member's own user document, because the leaderboard, the
  * chat and the profile all read users and none of them may read `guilds` (see
  * `firestore.rules`). Re-synced across the roster whenever the guild changes
- * what it wears — a roster is capped at a few dozen, so that is one small batch
- * on a rare action, against an extra read on every page that names a player.
+ * what it wears or clears a quest — a roster is capped at a few dozen, so that
+ * is one small batch on a rare action, against an extra read on every page
+ * that names a player.
  */
 export interface GuildBadge {
   guildId: string;
@@ -33,6 +36,8 @@ export interface GuildBadge {
   accent: string;
   /** Equipped frame id. */
   frame: string;
+  /** Quests cleared — the guild's level. Missing on badges stamped before it existed. */
+  level?: number;
 }
 
 /**
@@ -54,20 +59,18 @@ export interface GuildFund {
 }
 
 /**
- * The guild's own Fame: a balance it holds, rather than a pot earmarked for one
- * purchase.
+ * The guild's own Fame: a balance it holds.
  *
- * Members top it up out of their own Fame and the guild spends it as a
- * deliberate act — today on the challenge ladder, and on whatever else a guild
- * comes to buy. See `guildTreasury.utils.ts` for why a balance is the right
- * shape here where a self-buying pot was the right shape for seats.
+ * Members top it up out of their own Fame. Nothing spends it any more — the
+ * treasury is one of the things the guild's quests count, and the record of who
+ * filled it is the point. See `guildTreasury.utils.ts`.
  */
 export interface GuildTreasury {
   /** Fame in the guild's hands right now. */
   fame: number;
   /** Fame put in per member uid, all-time. Never reset — the credit for it. */
   deposits: Record<string, number>;
-  /** Fame the guild has spent, all-time. */
+  /** Fame the guild spent back when it could, all-time. Kept for the record. */
   spent: number;
 }
 
@@ -77,14 +80,21 @@ export interface GuildMember {
   avatar: string | null;
 }
 
+/**
+ * One member's honor: the guild's own currency, earned by putting Fame, tokens
+ * or gear into the guild and spent taking gear off its shelf. `earned` is the
+ * standing the roster shows; `balance` is what the shelf charges against.
+ * See `guildHonor.utils.ts`.
+ */
+export interface GuildHonor {
+  earned: number;
+  spent: number;
+  balance: number;
+}
+
 export interface Guild {
-  /** Consecutive weeks this guild has cleared its challenge. */
-  challengeStreak: number;
-  /**
-   * Steps up the challenge ladder the guild has bought — the index into
-   * `GUILD_CHALLENGE_TIERS`. Zero is the week every guild starts on.
-   */
-  challengeTier: number;
+  /** Quests cleared, across every lap of the ladder. No ceiling. */
+  level: number;
   /** The guild's own Fame, and who put it there. */
   treasury: GuildTreasury;
   /** Slug of the name, and the document id — see `guildSlug`. */
@@ -111,6 +121,8 @@ export interface Guild {
   /** What it wears. */
   cosmetics: GuildCosmetics;
   members: GuildMember[];
+  /** Honor per member uid — who has put in, and what they have left to spend. */
+  honor: Record<string, GuildHonor>;
   createdAt: string;
 }
 
@@ -131,66 +143,85 @@ export interface GuildApplication {
 }
 
 /**
- * One goal inside the week: what each member is asked for, what that adds up to
- * across the roster, and how both the guild and the caller stand against it.
+ * One quest of the chapter the guild is on, measured.
+ *
+ * `progress` and `target` are in `unit`. On a quest that asks something of
+ * every member they count members, and `each` says what each one is asked for
+ * and where the caller stands against it; on a quest that counts the guild,
+ * `mine` is the caller's own share of the total.
  */
-export interface GuildObjectiveProgress {
-  metric: GuildMetric;
-  /** Asked of every member: sessions for `sessions`, hours for the rest. */
-  perMember: number;
-  /** Asked of the whole guild — the share above, times the roster. */
+export interface GuildQuestProgress {
+  /** The ledger key: the catalog id, with `@lap` after the first lap. */
+  id: string;
+  /** The catalog quest behind it. */
+  questId: string;
+  lap: number;
+  chapter: number;
+  /** The lap's name for it, e.g. "First Hundred II". */
+  name: string;
+  blurb: string;
+  unit: QuestUnit;
   target: number;
-  /** What the guild has put in this week. */
   progress: number;
   isComplete: boolean;
-  /**
-   * The caller's own tally against `perMember`. Answered rather than left to be
-   * worked out: the client is never told which uid is its own (see
-   * `isFounder`), so it cannot find itself in `perMember`.
-   */
-  mine: number;
-  mineComplete: boolean;
-}
-
-/** What one member put into the week, as the roster reads it. */
-export interface GuildMemberTally {
-  /** Sessions logged this week. */
-  sessions: number;
-  /** Hours per practice category, to the tenth — only what the rank asks for. */
-  hours: Partial<Record<GuildMetric, number>>;
-  /** Goals this member cleared on their own, of the `total` asked of them. */
-  done: number;
-  total: number;
-}
-
-/** The guild's week: clear every goal together, or the streak resets. */
-export interface GuildChallenge {
-  weekId: string;
-  /** Everything the week asks for. All of it has to be cleared. */
-  objectives: GuildObjectiveProgress[];
-  /** Goals the guild has cleared together, of how many it was asked for. */
-  cleared: number;
-  isComplete: boolean;
-  /**
-   * What each member put in, per uid. The bars above are these added up, so the
-   * roster is shown out of counting that had to happen anyway rather than out
-   * of a second pass over the same reports.
-   */
-  perMember: Record<string, GuildMemberTally>;
-  /** Consecutive weeks cleared, and the thing every rank pays. */
-  streak: number;
-  endsAt: string;
-  /** Which rank of the ladder the guild has funded its way onto. */
-  tier: number;
-  tierName: string;
-  /** Fame a member claims for a cleared week on this rank. Zero on the first. */
+  /** Fame each eligible member claims once it is cleared. */
   reward: number;
-  /** Whether the caller has personally done their share of every goal. */
-  myShareDone: boolean;
-  /** Whether the caller has already taken this week's Fame. */
+  /** The caller's own contribution to a guild total, or null when it is not one. */
+  mine: number | null;
+  /** The per-member ask, in words, and the caller's own number against it. */
+  each: { ask: string; mine: number; target: number; done: boolean } | null;
+  /** When the guild cleared it, or null while it is still open. */
+  doneAt: string | null;
+}
+
+/** A quest the guild has behind it, as the ledger has it. */
+export interface GuildQuestDone {
+  /** The ledger key. */
+  id: string;
+  questId: string;
+  lap: number;
+  chapter: number;
+  name: string;
+  /** What it paid, on its lap. */
+  reward: number;
+  doneAt: string;
+  /** Whether the caller was on the roster when it was cleared. */
+  eligible: boolean;
   claimed: boolean;
-  /** Cleared week, own share done, nothing taken yet. */
-  canClaim: boolean;
+}
+
+/** What one member has put in since the guild was founded, for the roster. */
+export interface GuildMemberEffort {
+  sessions: number;
+  hours: number;
+}
+
+/**
+ * The guild's quest board: its level, the lap and chapter it is on, and what
+ * the caller has waiting to take.
+ */
+export interface GuildQuestBoard {
+  /** Quests cleared, across every lap. */
+  level: number;
+  /** The lap of the ladder the guild is on, counting from one. */
+  lap: number;
+  /** Quests in one lap. */
+  lapSize: number;
+  /** Quests cleared on the current lap. */
+  lapCleared: number;
+  /** The chapter being worked on, with the lap's reward. There is always one. */
+  chapter: { index: number; name: string; blurb: string; reward: number };
+  chaptersTotal: number;
+  /** The open chapter's quests, cleared ones included. */
+  active: GuildQuestProgress[];
+  /** Everything cleared so far, oldest first. */
+  done: GuildQuestDone[];
+  /** Fame the caller can take right now, and over how many quests. */
+  claimable: { fame: number; quests: number };
+  /** Sessions and hours per member uid, since the guild was founded. */
+  perMember: Record<string, GuildMemberEffort>;
+  /** When counting started — the day the guild was founded. */
+  since: string;
 }
 
 export interface GuildsState {
@@ -201,8 +232,8 @@ export interface GuildsState {
   foundingCost: number;
   /** What the caller has left to spend, so the panel can price the button. */
   tokensLeft: number;
-  /** Only for the guild the caller is in — nobody else's week is their business. */
-  challenge: GuildChallenge | null;
+  /** Only for the guild the caller is in — nobody else's board is their business. */
+  quests: GuildQuestBoard | null;
   /** Where the caller's own request stands, if they have one out. */
   myApplication: { guildId: string; status: "pending" | "rejected" } | null;
   /** Everyone knocking — only ever filled for a founder, on their own guild. */

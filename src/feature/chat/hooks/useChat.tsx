@@ -10,6 +10,7 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
   selectUserAvatar,
+  selectUserGuildBadge,
   selectUserName,
 } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
@@ -28,6 +29,9 @@ export const useChat = (chatPath: string = GLOBAL_CHAT_PATH) => {
   const currentUserName = useAppSelector(selectUserName) || "Anonymous";
   const avatar = useAppSelector(selectUserAvatar);
   const userStats = useAppSelector(selectCurrentUserStats);
+  // Read once at login like the avatar is: a tag changes when somebody joins,
+  // leaves or re-kits a guild, which is rare enough to catch on the next load.
+  const guildBadge = useAppSelector(selectUserGuildBadge);
 
   useEffect(() => {
     const unsubscribe = fetchChatMessages(setMessages, chatPath);
@@ -54,6 +58,7 @@ export const useChat = (chatPath: string = GLOBAL_CHAT_PATH) => {
           currentUserName,
           avatar,
           userStats?.lvl || 0,
+          guildBadge,
           chatPath
         );
 
@@ -62,7 +67,15 @@ export const useChat = (chatPath: string = GLOBAL_CHAT_PATH) => {
         toast.error(t("error"));
       }
     },
-    [newMessage, currentUserId, currentUserName, avatar, userStats, chatPath]
+    [
+      newMessage,
+      currentUserId,
+      currentUserName,
+      avatar,
+      userStats,
+      guildBadge,
+      chatPath,
+    ]
   );
 
   const toggleLike = useCallback(

@@ -1,7 +1,10 @@
 import {
   DEFAULT_COSMETIC,
+  DEFAULT_MOTIF_KEYS,
   findCosmetic,
   GUILD_COSMETICS,
+  motifId,
+  motifKeys,
   slotOf,
 } from "feature/guilds/data/guildCosmetics";
 import type { GuildCosmetics } from "feature/guilds/types/guild.types";
@@ -10,6 +13,7 @@ import {
   canEquip,
   EMPTY_COSMETICS,
   equippedItem,
+  motifIcons,
   readCosmetics,
 } from "feature/guilds/utils/guildCosmetics.utils";
 import { describe, expect, it } from "vitest";
@@ -30,7 +34,7 @@ describe("the catalog", () => {
   });
 
   it("has an item in every slot to fall back to", () => {
-    for (const slot of ["accent", "banner", "frame"] as const) {
+    for (const slot of ["accent", "banner", "motif", "frame"] as const) {
       const fallback = DEFAULT_COSMETIC[slot];
       expect(fallback.slot).toBe(slot);
       expect(GUILD_COSMETICS).toContain(fallback);
@@ -59,6 +63,7 @@ describe("readCosmetics", () => {
     expect(readCosmetics(undefined)).toEqual({
       accent: DEFAULT_COSMETIC.accent.id,
       banner: DEFAULT_COSMETIC.banner.id,
+      motif: DEFAULT_COSMETIC.motif.id,
       frame: DEFAULT_COSMETIC.frame.id,
     });
   });
@@ -82,8 +87,52 @@ describe("readCosmetics", () => {
     ).toEqual({
       accent: "accent:ember",
       banner: DEFAULT_COSMETIC.banner.id,
+      motif: DEFAULT_COSMETIC.motif.id,
       frame: DEFAULT_COSMETIC.frame.id,
     });
+  });
+});
+
+describe("motifs", () => {
+  it("reads four known keys out of an id, and nothing else", () => {
+    expect(motifKeys("motif:guitar.skull.crown.flame")).toEqual([
+      "guitar",
+      "skull",
+      "crown",
+      "flame",
+    ]);
+    expect(motifKeys("motif:guitar.skull.crown")).toBeNull();
+    expect(motifKeys("motif:guitar.skull.crown.flame.star")).toBeNull();
+    expect(motifKeys("motif:guitar.skull.crown.banjo")).toBeNull();
+    expect(motifKeys("motif:guitar..crown.flame")).toBeNull();
+    expect(motifKeys("banner:halo")).toBeNull();
+    expect(motifKeys(4)).toBeNull();
+  });
+
+  it("makes any valid four wearable, not only the one in the catalog", () => {
+    const id = motifId(["skull", "skull", "flame", "crown"]);
+    expect(findCosmetic(id)).toMatchObject({
+      id,
+      slot: "motif",
+      icons: ["skull", "skull", "flame", "crown"],
+    });
+    expect(canEquip(cosmetics(), id, 99)).toBeNull();
+    expect(canEquip(cosmetics({ motif: id }), id, 99)).toBe("already-worn");
+    expect(motifIcons(cosmetics({ motif: id }))).toEqual([
+      "skull",
+      "skull",
+      "flame",
+      "crown",
+    ]);
+  });
+
+  it("refuses a motif that is not four known keys", () => {
+    expect(canEquip(cosmetics(), "motif:guitar.banjo.crown.flame", 99)).toBe(
+      "unknown",
+    );
+    expect(motifIcons(cosmetics({ motif: "motif:nope" }))).toEqual(
+      DEFAULT_MOTIF_KEYS,
+    );
   });
 });
 
@@ -112,16 +161,16 @@ describe("equippedItem", () => {
 
 describe("canEquip", () => {
   it("allows anything in the catalog that is not already on", () => {
-    expect(canEquip(cosmetics(), "frame:ring")).toBeNull();
-    expect(canEquip(cosmetics(), "banner:halo")).toBeNull();
+    expect(canEquip(cosmetics(), "frame:ring", 99)).toBeNull();
+    expect(canEquip(cosmetics(), "banner:halo", 99)).toBeNull();
   });
 
   it("refuses something that is not in the catalog", () => {
-    expect(canEquip(cosmetics(), "banner:lasers")).toBe("unknown");
+    expect(canEquip(cosmetics(), "banner:lasers", 99)).toBe("unknown");
   });
 
   it("refuses one already being worn, so a no-op is not a write", () => {
-    expect(canEquip(cosmetics({ frame: "frame:ring" }), "frame:ring")).toBe(
+    expect(canEquip(cosmetics({ frame: "frame:ring" }), "frame:ring", 99)).toBe(
       "already-worn",
     );
   });

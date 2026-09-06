@@ -29,14 +29,11 @@ const post = async <T = GuildsState>(
 /** What the fund route adds to the state it hands back. */
 type Funded = GuildsState & { paid: number; unlocked: boolean };
 
-/** What the claim route adds: the Fame that just landed. */
-type Claimed = GuildsState & { fame: number };
+/** What the claim route adds: the Fame that just landed, over how many quests. */
+type Claimed = GuildsState & { fame: number; quests: number };
 
 /** What the deposit route adds: the Fame that just left your own pocket. */
 type Deposited = GuildsState & { paid: number };
-
-/** What the tier purchase adds: which week the guild has just signed up for. */
-type Upgraded = GuildsState & { tierName: string; spent: number };
 
 /** Said once a pot fills, per track. */
 const BOUGHT: Record<GuildUpgrade, string> = {
@@ -176,15 +173,19 @@ export const useGuildMutations = () => {
   });
 
   /**
-   * This week's Fame, for a member who did their own share of a week the guild
-   * cleared. The server decides all of that; the button only asks.
+   * Every quest reward waiting for this member, in one go. Which quests those
+   * are is the server's to decide from the guild's ledger; the button only asks.
    */
-  const claimChallenge = useMutation({
+  const claimQuests = useMutation({
     mutationFn: () =>
-      post<Claimed>("/api/supporter/guild/challenge", { action: "claim" }),
+      post<Claimed>("/api/supporter/guild/quests", { action: "claim" }),
     onSuccess: (state) => {
       apply(state);
-      toast.success(`+${state.fame} Fame — the week is yours`);
+      toast.success(
+        state.quests === 1
+          ? `+${state.fame} Fame — one quest, yours`
+          : `+${state.fame} Fame over ${state.quests} quests`,
+      );
     },
     onError: (error) =>
       toast.error(errorMessage(error, "Could not claim that")),
@@ -205,18 +206,6 @@ export const useGuildMutations = () => {
       toast.error(errorMessage(error, "Could not put that in")),
   });
 
-  /** The founder commits the roster to a harder week, out of the treasury. */
-  const buyChallengeTier = useMutation({
-    mutationFn: () =>
-      post<Upgraded>("/api/supporter/guild/challenge", { action: "buyTier" }),
-    onSuccess: (state) => {
-      apply(state);
-      toast.success(`${state.tierName} — the guild is on a harder week`);
-    },
-    onError: (error) =>
-      toast.error(errorMessage(error, "Could not take that on")),
-  });
-
   return {
     found,
     applyTo,
@@ -225,8 +214,7 @@ export const useGuildMutations = () => {
     leave,
     fund,
     equipCosmetic,
-    claimChallenge,
+    claimQuests,
     depositFame,
-    buyChallengeTier,
   };
 };

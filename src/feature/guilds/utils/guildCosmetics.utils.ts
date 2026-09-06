@@ -1,9 +1,11 @@
 import type {
   CosmeticSlot,
   GuildCosmeticItem,
+  MotifIconKey,
 } from "feature/guilds/data/guildCosmetics";
 import {
   DEFAULT_COSMETIC,
+  DEFAULT_MOTIF_KEYS,
   findCosmetic,
 } from "feature/guilds/data/guildCosmetics";
 import type { GuildCosmetics } from "feature/guilds/types/guild.types";
@@ -36,6 +38,8 @@ export const readCosmetics = (raw: unknown): GuildCosmetics => {
       typeof data.banner === "string"
         ? data.banner
         : DEFAULT_COSMETIC.banner.id,
+    motif:
+      typeof data.motif === "string" ? data.motif : DEFAULT_COSMETIC.motif.id,
     frame:
       typeof data.frame === "string" ? data.frame : DEFAULT_COSMETIC.frame.id,
   };
@@ -60,19 +64,55 @@ export const equippedItem = (
 export const accentHex = (cosmetics: GuildCosmetics): string =>
   equippedItem(cosmetics, "accent").hex ?? DEFAULT_COSMETIC.accent.hex!;
 
-export type CosmeticProblem = "unknown" | "already-worn";
+/** The four icons tiled across the banner. */
+export const motifIcons = (cosmetics: GuildCosmetics): MotifIconKey[] =>
+  equippedItem(cosmetics, "motif").icons ?? DEFAULT_MOTIF_KEYS;
 
-/** Whether this is a thing the guild can put on right now, and why not. */
+/** The guild level an item needs. The plain ones need none. */
+export const unlockLevel = (item: GuildCosmeticItem): number =>
+  Math.max(0, Math.floor(item.level ?? 0));
+
+export const isUnlocked = (
+  item: GuildCosmeticItem,
+  guildLevel: number,
+): boolean => (Number(guildLevel) || 0) >= unlockLevel(item);
+
+/**
+ * The wardrobe's order: what can be worn first, in the catalog's own order,
+ * then what cannot yet, nearest level first — so the next thing to unlock is
+ * the first locked tile a founder sees.
+ */
+export const sortByUnlock = (
+  items: GuildCosmeticItem[],
+  guildLevel: number,
+): GuildCosmeticItem[] =>
+  [...items].sort((a, b) => {
+    const aOpen = isUnlocked(a, guildLevel);
+    const bOpen = isUnlocked(b, guildLevel);
+    if (aOpen !== bOpen) return aOpen ? -1 : 1;
+    return aOpen ? 0 : unlockLevel(a) - unlockLevel(b);
+  });
+
+export type CosmeticProblem = "unknown" | "already-worn" | "locked";
+
+/**
+ * Whether this is a thing the guild can put on right now, and why not. The
+ * level is the guild's — quests cleared — and the one thing besides the
+ * catalog that decides.
+ */
 export const canEquip = (
   cosmetics: GuildCosmetics,
   id: string,
+  guildLevel: number,
 ): CosmeticProblem | null => {
   const item = findCosmetic(id);
   if (!item) return "unknown";
+  if (!isUnlocked(item, guildLevel)) return "locked";
   return cosmetics[item.slot] === id ? "already-worn" : null;
 };
 
 export const COSMETIC_PROBLEM_MESSAGES: Record<CosmeticProblem, string> = {
   unknown: "No such thing in the catalogue",
   "already-worn": "Already worn",
+  locked: "The guild has not reached the level that unlocks it",
 };

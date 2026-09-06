@@ -1,3 +1,4 @@
+import { doneQuestKeys, guildLevelOf } from "feature/guilds/data/guildQuests";
 import type { GuildBadge, GuildMember } from "feature/guilds/types/guild.types";
 import {
   equippedItem,
@@ -34,6 +35,7 @@ export const badgeFor = (
     tag: typeof data?.tag === "string" ? data.tag : "",
     accent: equippedItem(cosmetics, "accent").id,
     frame: equippedItem(cosmetics, "frame").id,
+    level: guildLevelOf(doneQuestKeys(data)),
   };
 };
 
@@ -48,7 +50,8 @@ export const badgeFor = (
 export const clearBadge = () => FieldValue.delete();
 
 /**
- * Re-stamps the badge on every member after the guild changes what it wears.
+ * Re-stamps the badge on every member after the guild changes what it wears,
+ * or clears a quest and moves up a level.
  *
  * Runs after the transaction rather than inside it: a roster is capped at a few
  * dozen, and a transaction that touched all of them would take a lock on every

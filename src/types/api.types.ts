@@ -1,4 +1,5 @@
 import type { AchievementList } from "feature/achievements/types";
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import type {
   ReportDataInterface,
   ReportFormikInterface,
@@ -190,6 +191,8 @@ export interface userSliceInitialState {
     selectedGuitar?: number | string;
     selectedGuitarYear?: number;
     selectedGuitarCountry?: string;
+    /** Denormalised guild kit, so the chat can stamp it onto a message. */
+    guildBadge?: GuildBadge;
     role?: "admin" | "pro" | "master" | "user";
     premiumUntil?: string | null; // ISO date string, null = no expiry (forever)
     feedbackAskedAt?: Timestamp | null;

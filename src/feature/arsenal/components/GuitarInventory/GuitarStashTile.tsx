@@ -4,6 +4,7 @@ import {
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import type { ReactNode } from "react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
 import type { StashPlacement } from "../Collection/StashTile";
@@ -16,6 +17,8 @@ interface GuitarStashTileProps extends StashPlacement {
   isEquipped?: boolean;
   /** Rig slot index (0-2) this copy occupies, or null. */
   rigSlot?: number | null;
+  /** Under the hover card — see `StashTile`. */
+  previewFooter?: ReactNode;
   onClick?: () => void;
 }
 
@@ -24,6 +27,7 @@ export const GuitarStashTile = ({
   item,
   isEquipped = false,
   rigSlot = null,
+  previewFooter,
   onClick,
   ...placement
 }: GuitarStashTileProps) => {
@@ -45,6 +49,7 @@ export const GuitarStashTile = ({
       inUse={isEquipped || rigSlot != null}
       onClick={onClick}
       preview={<GuitarCard item={item} isEquipped={isEquipped} readOnly />}
+      previewFooter={previewFooter}
     />
   );
 };

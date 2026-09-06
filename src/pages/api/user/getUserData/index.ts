@@ -100,6 +100,9 @@ export default async function handler(
           selectedGuitar: userData?.selectedGuitar ?? null,
           selectedGuitarYear: userData?.selectedGuitarYear ?? null,
           selectedGuitarCountry: userData?.selectedGuitarCountry ?? null,
+          // Handed over so the chat can stamp the tag onto a message without
+          // re-reading the sender's document on every send.
+          guildBadge: userData?.guildBadge ?? null,
           role: userData?.role ?? null,
           createdAt: userData?.createdAt ?? null,
           feedbackAskedAt: userData?.feedbackAskedAt ?? null,

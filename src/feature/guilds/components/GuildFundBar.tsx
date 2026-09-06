@@ -1,13 +1,14 @@
-import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
-import { SupportToken } from "components/UI/SupportToken/SupportToken";
+import {
+  GuildSpendPanel,
+  PledgeButton,
+} from "feature/guilds/components/GuildSpendPanel";
 import type { GuildFund, GuildMember } from "feature/guilds/types/guild.types";
 import type { ReactNode } from "react";
 
 /**
  * The pot for something the guild is outgrowing, and the way to put into it.
  *
- * One bar for both tracks — seats and shelf rows — because they are the same
+ * One panel for both tracks — seats and shelf rows — because they are the same
  * bargain: a price that climbs with every step, paid by whoever in the room has
  * tokens spare this month. The bar is the point of the whole mechanic. A button
  * that says "buy" asks one member to carry a purchase alone; a bar that says
@@ -16,10 +17,15 @@ import type { ReactNode } from "react";
  * Amounts are offered rather than typed, and the largest one is always exactly
  * what is left owing: the server clamps a contribution to the remainder anyway,
  * so an input box could only ever be a way of getting that wrong.
+ *
+ * Drawn as a `GuildSpendPanel`, the same box every other place a guild pays
+ * into wears, so an upgrade is recognised as an upgrade wherever it sits.
  */
 
 interface GuildFundBarProps {
   fund: GuildFund;
+  /** What the track is, as the panel's title: "More seats", "Another shelf row". */
+  title: ReactNode;
   /** Where the guild stands now, e.g. "Room for 2 more". */
   standing: ReactNode;
   /** What the next step adds, e.g. "3 more seats". */
@@ -74,6 +80,7 @@ const Patrons = ({
 
 export const GuildFundBar = ({
   fund,
+  title,
   standing,
   buys,
   maxed,
@@ -85,13 +92,19 @@ export const GuildFundBar = ({
 }: GuildFundBarProps) => {
   if (fund.cost === null) {
     return (
-      <div className={cn("rounded-lg bg-white/[0.03] px-4 py-3", className)}>
-        <p className='text-xs text-zinc-500'>
-          <span className='font-semibold text-zinc-300'>{standing}</span> ·{" "}
-          {maxed}
-        </p>
+      <GuildSpendPanel
+        currency='tokens'
+        title={title}
+        blurb={
+          <>
+            {standing} · {maxed}.
+          </>
+        }
+        have={fund.pot}
+        need={null}
+        className={className}>
         <Patrons pledges={fund.pledges} members={members} />
-      </div>
+      </GuildSpendPanel>
     );
   }
 
@@ -99,65 +112,40 @@ export const GuildFundBar = ({
   const amounts = offers(owed, tokensLeft);
 
   return (
-    <div
-      className={cn(
-        "space-y-3 rounded-lg bg-white/[0.03] px-4 py-4",
-        className,
-      )}>
-      <div className='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
-        <p className='text-xs text-zinc-500'>
-          <span className='font-semibold text-zinc-300'>{standing}</span> ·{" "}
-          {buys} next
-        </p>
-        <p className='flex items-center gap-1.5 text-xs tabular-nums text-zinc-500'>
-          <SupportToken size={16} />
-          <span className='font-semibold text-cyan-300'>{fund.pot}</span>
-          of {fund.cost} together
-        </p>
-      </div>
+    <GuildSpendPanel
+      currency='tokens'
+      title={title}
+      blurb={`Next step: ${buys}.`}
+      have={fund.pot}
+      need={fund.cost}
+      className={className}>
+      {/* One row: who has already put in on the left, the ways to put in on
+          the right — `ml-auto` rather than `justify-between` so the buttons
+          still land on the right with nothing on the left at all. */}
+      <div className='flex flex-wrap items-center gap-3'>
+        <Patrons pledges={fund.pledges} members={members} />
 
-      <div
-        role='progressbar'
-        aria-valuenow={fund.pot}
-        aria-valuemin={0}
-        aria-valuemax={fund.cost}
-        aria-label={`${buys} — ${fund.pot} of ${fund.cost} tokens in`}
-        className='h-2 overflow-hidden rounded-full bg-zinc-800/70'>
-        <div
-          className='h-full rounded-full bg-cyan-500/80 transition-[width] duration-500'
-          style={{ width: `${Math.round((fund.pot / fund.cost) * 100)}%` }}
-        />
-      </div>
-
-      <div className='flex flex-wrap items-center gap-2'>
         {amounts.length === 0 ? (
-          <p className='text-xs text-zinc-500'>
-            {owed} to go — nothing left in your wallet for it this time.
+          <p className='ml-auto text-xs text-zinc-500'>
+            Nothing left in your wallet this time.
           </p>
         ) : (
-          <>
+          <div
+            title={`You have ${tokensLeft.toLocaleString()} tokens`}
+            className='ml-auto flex flex-wrap items-center justify-end gap-2'>
             {amounts.map((amount) => (
-              <Button
+              <PledgeButton
                 key={amount}
-                size='sm'
-                variant='ghost'
+                currency='tokens'
+                amount={amount}
+                finishes={amount === owed && owed > 1}
                 disabled={busy}
                 onClick={() => onPledge(amount)}
-                className='text-cyan-300 hover:text-cyan-200'>
-                <span className='flex items-center gap-1.5'>
-                  <SupportToken size={18} />
-                  {amount === owed && owed > 1
-                    ? `${amount} · finish it`
-                    : amount}
-                </span>
-              </Button>
+              />
             ))}
-            <span className='text-xs text-zinc-500'>{owed} to go</span>
-          </>
+          </div>
         )}
       </div>
-
-      <Patrons pledges={fund.pledges} members={members} />
-    </div>
+    </GuildSpendPanel>
   );
 };

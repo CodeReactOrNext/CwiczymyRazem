@@ -6,6 +6,7 @@ import type {
   SalvagedMod,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
+import type { GuildHonor } from "feature/guilds/types/guild.types";
 
 export type StashItemKind = "guitar" | "effect" | "part" | "mod";
 
@@ -73,4 +74,10 @@ export interface GuildStash {
   entries: StashEntry[];
   log: StashLogEntry[];
   tallies: StashTally[];
+  /**
+   * Honor per member uid, fresh from the same read — the shelf is taken in
+   * honor, so the balance has to move the moment a take or a deposit lands,
+   * without waiting on the guild page to refetch.
+   */
+  honor: Record<string, GuildHonor>;
 }

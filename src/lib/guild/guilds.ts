@@ -1,4 +1,4 @@
-import { challengeTierOf } from "feature/guilds/data/guildChallengeTiers";
+import { doneQuestKeys, guildLevelOf } from "feature/guilds/data/guildQuests";
 import type { Guild, GuildMember } from "feature/guilds/types/guild.types";
 import {
   checkGuildName,
@@ -10,6 +10,7 @@ import {
   normaliseTag,
 } from "feature/guilds/utils/guild.utils";
 import { readCosmetics } from "feature/guilds/utils/guildCosmetics.utils";
+import { readHonor } from "feature/guilds/utils/guildHonor.utils";
 import { isGuildLogoUrl } from "feature/guilds/utils/guildLogo";
 import { readTreasury } from "feature/guilds/utils/guildTreasury.utils";
 import {
@@ -29,7 +30,7 @@ import {
   readApplications,
 } from "lib/guild/guildApplications";
 import { badgeFor, clearBadge } from "lib/guild/guildBadge";
-import { readChallenge } from "lib/guild/guildChallenge";
+import { readQuestBoard } from "lib/guild/guildQuests";
 import { readFame } from "lib/support/fameWallet";
 import type {
   PlayerSession,
@@ -92,8 +93,10 @@ const toGuild = (doc: DocumentSnapshot): Guild => {
     },
     cosmetics: readCosmetics(data.cosmetics),
     members,
-    challengeStreak: num(data.challengeStreak),
-    challengeTier: challengeTierOf(data.challengeTier).id,
+    honor: readHonor(data),
+    // Quests cleared, straight off the ledger — the same count the badge on
+    // every member carries, so the card and the tag can never disagree.
+    level: guildLevelOf(doneQuestKeys(data)),
     treasury: readTreasury(data),
     createdAt: createdAt ? createdAt.toISOString() : new Date(0).toISOString(),
   };
@@ -116,11 +119,11 @@ export async function readGuilds(session: PlayerSession) {
   const myGuildId = (user.data()?.guildId as string | undefined) ?? null;
   const mine = myGuildId ? docs.find((doc) => doc.id === myGuildId) : undefined;
 
-  // Only the caller's own guild gets its week counted: the challenge costs an
-  // aggregate per member, and nobody needs a live bar for a guild they are not
-  // in.
-  const challenge = mine
-    ? await readChallenge(mine.id, mine.data() ?? {}, session.uid)
+  // Only the caller's own guild gets its quests measured: the board costs a
+  // handful of aggregates per member, and nobody needs a live bar for a guild
+  // they are not in.
+  const quests = mine
+    ? await readQuestBoard(mine.id, mine.data() ?? {}, session.uid)
     : null;
 
   // The queue is the founder's business alone; everyone else gets an empty
@@ -138,7 +141,7 @@ export async function readGuilds(session: PlayerSession) {
     foundingCost: GUILD_FOUNDING_COST,
     tokensLeft: describeWallet(user.data()).left,
     fame: readFame(user.data()),
-    challenge,
+    quests,
     myApplication,
     applications,
     isFounder,

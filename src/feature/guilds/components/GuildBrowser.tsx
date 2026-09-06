@@ -3,20 +3,10 @@ import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
-import { GuildCrest } from "feature/guilds/components/GuildCrest";
-import { GuildFundBar } from "feature/guilds/components/GuildFundBar";
-import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
+import { GuildCover } from "feature/guilds/components/GuildCover";
 import { NewGuildDialog } from "feature/guilds/components/NewGuildDialog";
 import { useGuildMutations } from "feature/guilds/hooks/useGuilds";
 import type { Guild, GuildsState } from "feature/guilds/types/guild.types";
-import { bannerStyle } from "feature/guilds/utils/guildCosmetics.style";
-import {
-  accentHex,
-  equippedItem,
-} from "feature/guilds/utils/guildCosmetics.utils";
-import { GUILD_MAX_SEATS } from "feature/guilds/utils/guildUpgrades.utils";
-import { GUILD_SEATS_PER_UPGRADE } from "feature/supporterPanel/constants/supporterPanel.constants";
-import { Flame } from "lucide-react";
 import { Check, Clock, Plus, Search, Shield, Users, X } from "lucide-react";
 import { useState } from "react";
 
@@ -29,58 +19,34 @@ import { useState } from "react";
  * The roster tab is where the names are read properly.
  */
 const MemberStack = ({ guild }: { guild: Guild }) => (
-  <div className='flex flex-wrap items-center gap-1.5'>
-    {guild.members.slice(0, 14).map((member) => (
+  <div className='flex flex-wrap items-center gap-2'>
+    {guild.members.slice(0, 12).map((member) => (
       <span key={member.uid} title={member.displayName} className='shrink-0'>
         <Avatar
           name={member.displayName}
           avatarURL={member.avatar ?? undefined}
-          size='xs'
+          size='sm'
         />
       </span>
     ))}
-    {guild.members.length > 14 && (
-      <span className='inline-flex h-8 items-center px-1 text-xs font-semibold tabular-nums text-zinc-500'>
-        +{guild.members.length - 14}
+    {guild.members.length > 12 && (
+      <span className='inline-flex h-10 items-center px-1 text-xs font-semibold tabular-nums text-zinc-500'>
+        +{guild.members.length - 12}
       </span>
     )}
   </div>
 );
 
-/**
- * What the guild's own members see under the roster: how much room is left, and
- * the pot for three more seats. Anyone inside may put into it — an allowance
- * goes further split across a guild than saved up by its founder.
- */
-const SeatBar = ({
-  guild,
-  tokensLeft,
-  busy,
-  onFund,
-}: {
-  guild: Guild;
-  tokensLeft: number;
-  busy: boolean;
-  onFund: (tokens: number) => void;
-}) => {
-  const free = Math.max(0, guild.memberLimit - guild.memberCount);
-
-  return (
-    <GuildFundBar
-      fund={guild.funds.seats}
-      standing={free === 0 ? "Every seat is taken" : `Room for ${free} more`}
-      buys={`${GUILD_SEATS_PER_UPGRADE} more seats`}
-      maxed={`a guild tops out at ${GUILD_MAX_SEATS} seats`}
-      members={guild.members}
-      tokensLeft={tokensLeft}
-      busy={busy}
-      onPledge={onFund}
-      // Already inside the guild's own card: a second panel here would be a
-      // card inside a card, so the pot is separated by the gap instead.
-      className='bg-transparent px-0 pb-0 pt-2'
-    />
-  );
-};
+/** The three numbers a card is scanned for, under the name. */
+const CardMeta = ({ guild }: { guild: Guild }) => (
+  <span className='inline-flex flex-wrap items-center gap-x-3 gap-y-1'>
+    <span className='inline-flex items-center gap-1.5 tabular-nums'>
+      <Users size={13} />
+      {guild.memberCount} of {guild.memberLimit} seats
+    </span>
+    <span>founded by {guild.founderName}</span>
+  </span>
+);
 
 const GuildCard = ({
   guild,
@@ -88,11 +54,9 @@ const GuildCard = ({
   blocked,
   application,
   busy,
-  tokensLeft,
   onApply,
   onWithdraw,
   onLeave,
-  onFundSeats,
 }: {
   guild: Guild;
   isMine: boolean;
@@ -100,117 +64,66 @@ const GuildCard = ({
   blocked: boolean;
   application: "pending" | "rejected" | null;
   busy: boolean;
-  tokensLeft: number;
   onApply: () => void;
   onWithdraw: () => void;
   onLeave: () => void;
-  onFundSeats: (tokens: number) => void;
 }) => (
   <article
-    // The banner sits on top of the card colour rather than replacing it, so a
-    // guild that has bought nothing looks exactly as it did before.
-    style={bannerStyle(
-      equippedItem(guild.cosmetics, "banner").id,
-      accentHex(guild.cosmetics),
-    )}
     className={cn(
-      "space-y-4 overflow-hidden rounded-lg p-5 transition-background",
+      "overflow-hidden rounded-lg transition-background",
       isMine ? "bg-cyan-500/[0.07]" : "bg-zinc-900/40 hover:bg-zinc-900/60",
     )}>
-    <div className='flex flex-wrap items-start justify-between gap-3'>
-      <div className='flex items-start gap-3'>
-        <GuildCrest
-          logo={guild.logo}
-          tag={guild.tag}
-          accentHex={accentHex(guild.cosmetics)}
-          isMine={isMine}
-        />
-        <div className='min-w-0'>
-          <h3 className='flex items-center gap-2 text-base font-bold text-zinc-100'>
-            {guild.name}
-            {/* The crest has taken the tag's square, so it says itself here —
-                drawn by the same badge the leaderboard uses, so a guild sees
-                exactly what everyone else sees next to its members' names. */}
-            {guild.logo && (
-              <GuildTagBadge
-                badge={{
-                  guildId: guild.id,
-                  tag: guild.tag,
-                  accent: guild.cosmetics.accent,
-                  frame: guild.cosmetics.frame,
-                }}
-                linked={false}
-              />
-            )}
-          </h3>
-          <p className='mt-0.5 inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500'>
-            <span className='inline-flex items-center gap-1.5'>
-              <Users size={12} />
-              {guild.memberCount} of {guild.memberLimit} seats
-            </span>
-            {guild.challengeStreak > 0 && (
-              <span className='inline-flex items-center gap-1 text-orange-400'>
-                <Flame size={12} />
-                {guild.challengeStreak}
-                {guild.challengeStreak === 1 ? " week" : " weeks"}
-              </span>
-            )}
-            <span>· founded by {guild.founderName}</span>
-          </p>
-        </div>
-      </div>
-
-      {isMine ? (
-        <Button
-          variant='ghost'
-          disabled={busy}
-          onClick={onLeave}
-          className='h-9 text-zinc-400 hover:text-red-400'>
-          Leave
-        </Button>
-      ) : application ? (
-        <div className='flex items-center gap-2'>
-          <span
-            className={cn(
-              "inline-flex items-center gap-1.5 text-xs font-semibold",
-              application === "pending" ? "text-cyan-400" : "text-zinc-500",
-            )}>
-            <Clock size={13} />
-            {application === "pending" ? "Waiting on them" : "Turned down"}
-          </span>
+    <GuildCover
+      guild={guild}
+      meta={<CardMeta guild={guild} />}
+      actions={
+        isMine ? (
           <Button
             variant='ghost'
             disabled={busy}
-            onClick={onWithdraw}
-            className='h-9 text-zinc-500 hover:text-zinc-200'>
-            {application === "pending" ? "Withdraw" : "Clear"}
+            onClick={onLeave}
+            className='h-9 text-zinc-400 hover:text-red-400'>
+            Leave
           </Button>
-        </div>
-      ) : (
-        <Button
-          disabled={busy || blocked || guild.memberCount >= guild.memberLimit}
-          onClick={onApply}
-          className='h-9'>
-          {guild.memberCount >= guild.memberLimit ? "Full" : "Ask to join"}
-        </Button>
-      )}
-    </div>
+        ) : application ? (
+          <>
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 text-xs font-semibold",
+                application === "pending" ? "text-cyan-400" : "text-zinc-500",
+              )}>
+              <Clock size={13} />
+              {application === "pending" ? "Waiting on them" : "Turned down"}
+            </span>
+            <Button
+              variant='ghost'
+              disabled={busy}
+              onClick={onWithdraw}
+              className='h-9 text-zinc-500 hover:text-zinc-200'>
+              {application === "pending" ? "Withdraw" : "Clear"}
+            </Button>
+          </>
+        ) : (
+          <Button
+            disabled={busy || blocked || guild.memberCount >= guild.memberLimit}
+            onClick={onApply}
+            className='h-9'>
+            {guild.memberCount >= guild.memberLimit ? "Full" : "Ask to join"}
+          </Button>
+        )
+      }
+    />
 
-    {guild.description && (
-      <p className='text-sm leading-relaxed text-zinc-400'>
-        {guild.description}
-      </p>
-    )}
+    {(guild.description || guild.members.length > 0) && (
+      <div className='space-y-5 px-5 pb-5 pt-5'>
+        {guild.description && (
+          <p className='max-w-3xl text-sm leading-relaxed text-zinc-400'>
+            {guild.description}
+          </p>
+        )}
 
-    {guild.members.length > 0 && <MemberStack guild={guild} />}
-
-    {isMine && (
-      <SeatBar
-        guild={guild}
-        tokensLeft={tokensLeft}
-        busy={busy}
-        onFund={onFundSeats}
-      />
+        {guild.members.length > 0 && <MemberStack guild={guild} />}
+      </div>
     )}
   </article>
 );
@@ -298,15 +211,15 @@ export const GuildBrowser = ({
 }) => {
   const [isFounding, setIsFounding] = useState(false);
   const [search, setSearch] = useState("");
-  const { found, applyTo, withdraw, decide, leave, fund } = useGuildMutations();
+  const { found, applyTo, withdraw, decide, leave } = useGuildMutations();
 
   if (isLoading || !data) {
     return (
-      <div className='space-y-3'>
+      <div className='space-y-4'>
         {Array.from({ length: 3 }, (_, index) => (
           <div
             key={index}
-            className='h-32 animate-pulse rounded-lg bg-zinc-900/40'
+            className='h-52 animate-pulse rounded-lg bg-zinc-900/40'
           />
         ))}
       </div>
@@ -318,8 +231,7 @@ export const GuildBrowser = ({
     applyTo.isPending ||
     withdraw.isPending ||
     decide.isPending ||
-    leave.isPending ||
-    fund.isPending;
+    leave.isPending;
   const tokensLeft = data.tokensLeft;
 
   // Name, tag and the blurb all read as "which guild is this", so one box
@@ -336,10 +248,13 @@ export const GuildBrowser = ({
 
   return (
     <div className='space-y-8'>
-      <section className='flex flex-wrap items-center justify-between gap-4 rounded-lg bg-zinc-900/40 p-5'>
-        <div className='min-w-0 flex-1 space-y-1'>
-          <p className='text-sm text-zinc-400'>
-            Your own corner of the community. Founding one costs{" "}
+      <section className='flex flex-wrap items-center justify-between gap-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+        <div className='min-w-0 flex-1 space-y-1.5'>
+          <h2 className='text-base font-bold text-zinc-100'>
+            Your own corner of the community
+          </h2>
+          <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
+            Founding one costs{" "}
             <SupportToken size={18} className='inline-block align-middle' />{" "}
             {data.foundingCost} and takes the name for good — getting into
             somebody else&apos;s is free, and theirs to say yes to.
@@ -407,7 +322,7 @@ export const GuildBrowser = ({
           No guild matches “{search}”
         </p>
       ) : (
-        <div className='space-y-3'>
+        <div className='space-y-4'>
           {matches.map((guild) => (
             <GuildCard
               key={guild.id}
@@ -420,11 +335,9 @@ export const GuildBrowser = ({
                   : null
               }
               busy={busy}
-              tokensLeft={tokensLeft}
               onApply={() => applyTo.mutate({ guildId: guild.id, message: "" })}
               onWithdraw={() => withdraw.mutate(guild.id)}
               onLeave={() => leave.mutate()}
-              onFundSeats={(tokens) => fund.mutate({ track: "seats", tokens })}
             />
           ))}
         </div>

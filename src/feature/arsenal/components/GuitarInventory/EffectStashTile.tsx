@@ -2,6 +2,7 @@ import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectLevel } from "feature/arsenal/data/effectStats";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
+import type { ReactNode } from "react";
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
 import type { StashPlacement } from "../Collection/StashTile";
@@ -12,6 +13,8 @@ import { EffectCard } from "./EffectCard";
 interface EffectStashTileProps extends StashPlacement {
   item: EffectInventoryItem;
   isOnPedalboard?: boolean;
+  /** Under the hover card — see `StashTile`. */
+  previewFooter?: ReactNode;
   onClick?: () => void;
 }
 
@@ -19,6 +22,7 @@ interface EffectStashTileProps extends StashPlacement {
 export const EffectStashTile = ({
   item,
   isOnPedalboard = false,
+  previewFooter,
   onClick,
   ...placement
 }: EffectStashTileProps) => {
@@ -40,6 +44,7 @@ export const EffectStashTile = ({
       preview={
         <EffectCard item={item} isOnPedalboard={isOnPedalboard} readOnly />
       }
+      previewFooter={previewFooter}
     />
   );
 };

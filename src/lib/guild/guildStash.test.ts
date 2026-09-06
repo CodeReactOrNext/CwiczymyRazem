@@ -1,6 +1,11 @@
 import type { StashDeposit } from "feature/guilds/types/stash.types";
+import {
+  stashHonorValue,
+  TAKE_DAILY_LIMIT,
+  TAKE_HONOR_COST,
+} from "feature/guilds/utils/guildHonor.utils";
 import type { PlayerSession } from "lib/support/supporterAuth";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 /** Fake Firestore with subcollections, ordered log reads and transactions. */
 const store = new Map<string, Record<string, any>>();
@@ -37,7 +42,11 @@ const applyPatch = (
       target[segment] = { ...(target[segment] ?? {}) };
       target = target[segment];
     }
-    target[segments[0]] = value;
+    const leaf = segments[0];
+    target[leaf] =
+      value && typeof value === "object" && "__increment" in value
+        ? (target[leaf] ?? 0) + value.__increment
+        : value;
   }
   return next;
 };
@@ -87,7 +96,10 @@ vi.mock("utils/firebase/api/firebase.config", () => ({
 }));
 
 vi.mock("firebase-admin/firestore", () => ({
-  FieldValue: { serverTimestamp: () => new Date("2026-08-29T00:00:00.000Z") },
+  FieldValue: {
+    serverTimestamp: () => new Date("2026-08-29T00:00:00.000Z"),
+    increment: (by: number) => ({ __increment: by }),
+  },
 }));
 
 const { depositItem, readStash, takeItem } = await import("./guildStash");
@@ -123,6 +135,12 @@ const shelf = () =>
 const inventoryOf = (uid: string): any[] =>
   store.get(`users/${uid}`)?.arsenal?.inventory ?? [];
 
+/** The stored honor counters for a member, as the guild document has them. */
+const honorOf = (uid: string): { earned: number; spent: number } => {
+  const entry = store.get("guilds/riff-raiders")?.honor?.[uid] ?? {};
+  return { earned: entry.earned ?? 0, spent: entry.spent ?? 0 };
+};
+
 beforeEach(() => {
   store.clear();
   autoId = 0;
@@ -137,6 +155,9 @@ beforeEach(() => {
       { uid: "giver", displayName: "giver", avatar: null },
       { uid: "taker", displayName: "taker", avatar: null },
     ],
+    // The taker has put plenty into the guild already, so the shelf is
+    // theirs to take from; what taking costs is tested on its own below.
+    honor: { taker: { earned: 10_000, spent: 0 } },
   });
 });
 
@@ -254,6 +275,141 @@ describe("takeItem", () => {
       await takeItem(session("outsider"), "riff-raiders", entryId),
     ).toMatchObject({ ok: false, status: 403 });
     expect(shelf()).toHaveLength(1);
+  });
+
+  it("earns the giver the piece's rarity value, but charges the taker the flat toll", async () => {
+    const entryId = ref(shelf()[0]).id;
+    const entry = store.get(shelf()[0])!;
+    const depositValue = stashHonorValue(entry.kind, entry.rarity);
+    expect(depositValue).toBeGreaterThan(0);
+
+    // Leaving it earned the giver its rarity value.
+    expect(honorOf("giver")).toEqual({ earned: depositValue, spent: 0 });
+
+    await takeItem(session("taker"), "riff-raiders", entryId);
+
+    // Taking it costs the flat toll, not the piece's own value.
+    expect(honorOf("taker")).toEqual({ earned: 10_000, spent: TAKE_HONOR_COST });
+  });
+
+  it("refuses a taker who cannot pay, and moves nothing", async () => {
+    const entryId = ref(shelf()[0]).id;
+    store.set("guilds/riff-raiders", {
+      ...store.get("guilds/riff-raiders"),
+      honor: { taker: { earned: 1, spent: 0 } },
+    });
+
+    const result = await takeItem(session("taker"), "riff-raiders", entryId);
+
+    expect(result).toMatchObject({ ok: false, status: 402 });
+    expect((result as { error: string }).error).toContain("honor");
+    expect(shelf()).toHaveLength(1);
+    expect(inventoryOf("taker")).toHaveLength(0);
+    expect(honorOf("taker")).toEqual({ earned: 1, spent: 0 });
+  });
+
+  it("charges the same flat toll for a stack of parts, whatever the amount taken", async () => {
+    seedOwner("giver", {
+      parts: [{ partId: "screws", tier: "Standard", qty: 10 }],
+    });
+    await depositItem(session("giver"), "riff-raiders", {
+      kind: "part",
+      partId: "screws",
+      tier: "Standard",
+      qty: 10,
+    });
+    const spentBefore = honorOf("taker").spent;
+
+    await takeItem(session("taker"), "riff-raiders", "part-screws-Standard", 4);
+
+    expect(honorOf("taker").spent - spentBefore).toBe(TAKE_HONOR_COST);
+  });
+});
+
+describe("the daily take limit", () => {
+  beforeEach(async () => {
+    await depositItem(session("giver"), "riff-raiders", GIVE_GUITAR);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /** Ten spare guitars on the shelf: plenty to hit the limit against before running out. */
+  const stockShelf = async () => {
+    for (let index = 0; index < TAKE_DAILY_LIMIT; index++) {
+      store.set(`guilds/riff-raiders/stash/spare-${index}`, {
+        kind: "guitar",
+        name: "Spare",
+        rarity: "Common",
+        item: { id: `spare-${index}`, guitarId: 1, condition: 90 },
+      });
+    }
+  };
+
+  it("refuses a take past the daily limit, leaving the piece on the shelf", async () => {
+    await stockShelf();
+    const ids = shelf().map((path) => ref(path).id);
+
+    for (let index = 0; index < TAKE_DAILY_LIMIT; index++) {
+      expect(
+        await takeItem(session("taker"), "riff-raiders", ids[index]),
+      ).toEqual({ ok: true });
+    }
+
+    const result = await takeItem(session("taker"), "riff-raiders", ids[TAKE_DAILY_LIMIT]);
+
+    expect(result).toMatchObject({ ok: false, status: 429 });
+    expect(shelf()).toContain(`guilds/riff-raiders/stash/${ids[TAKE_DAILY_LIMIT]}`);
+  });
+
+  it("does not count against a different member's limit", async () => {
+    await stockShelf();
+    const ids = shelf().map((path) => ref(path).id);
+    store.set("users/second-taker", {
+      displayName: "second-taker",
+      guildId: "riff-raiders",
+      arsenal: { inventory: [], effectInventory: [] },
+    });
+    store.set("guilds/riff-raiders", {
+      ...store.get("guilds/riff-raiders"),
+      honor: {
+        ...store.get("guilds/riff-raiders")?.honor,
+        "second-taker": { earned: 10_000, spent: 0 },
+      },
+    });
+
+    for (let index = 0; index < TAKE_DAILY_LIMIT; index++) {
+      await takeItem(session("taker"), "riff-raiders", ids[index]);
+    }
+
+    expect(
+      await takeItem(
+        session("second-taker"),
+        "riff-raiders",
+        ids[TAKE_DAILY_LIMIT],
+      ),
+    ).toEqual({ ok: true });
+  });
+
+  it("resets once the server day turns over", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-29T23:00:00.000Z"));
+    await stockShelf();
+    const ids = shelf().map((path) => ref(path).id);
+
+    for (let index = 0; index < TAKE_DAILY_LIMIT; index++) {
+      await takeItem(session("taker"), "riff-raiders", ids[index]);
+    }
+    expect(
+      await takeItem(session("taker"), "riff-raiders", ids[TAKE_DAILY_LIMIT]),
+    ).toMatchObject({ ok: false, status: 429 });
+
+    vi.setSystemTime(new Date("2026-08-30T01:00:00.000Z"));
+
+    expect(
+      await takeItem(session("taker"), "riff-raiders", ids[TAKE_DAILY_LIMIT]),
+    ).toEqual({ ok: true });
   });
 });
 

@@ -1,5 +1,6 @@
 import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
+import type { ReactNode } from "react";
 
 import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
 import { GuitarStashTile } from "../GuitarInventory/GuitarStashTile";
@@ -21,6 +22,8 @@ interface BoardPieceTileProps extends StashPlacement {
   rigSlot?: number | null;
   /** Pedal sockets: wired into the pedalboard. */
   isOnPedalboard?: boolean;
+  /** Under the hover card, whatever the piece — see `StashTile`. */
+  previewFooter?: ReactNode;
   onClick?: () => void;
 }
 
@@ -37,6 +40,7 @@ export const BoardPieceTile = ({
   isEquipped = false,
   rigSlot = null,
   isOnPedalboard = false,
+  previewFooter,
   onClick,
   ...placement
 }: BoardPieceTileProps) => {
@@ -47,6 +51,7 @@ export const BoardPieceTile = ({
         item={piece.item}
         isEquipped={isEquipped}
         rigSlot={rigSlot}
+        previewFooter={previewFooter}
         onClick={onClick}
       />
     );
@@ -57,6 +62,7 @@ export const BoardPieceTile = ({
         {...placement}
         item={piece.item}
         isOnPedalboard={isOnPedalboard}
+        previewFooter={previewFooter}
         onClick={onClick}
       />
     );
@@ -71,6 +77,7 @@ export const BoardPieceTile = ({
         level={piece.mod.points}
         levelPrefix='+'
         preview={<SalvagedModCard mod={piece.mod} />}
+        previewFooter={previewFooter}
         onClick={onClick}
       />
     );
@@ -91,6 +98,7 @@ export const BoardPieceTile = ({
           qty={piece.part.qty}
         />
       }
+      previewFooter={previewFooter}
       onClick={onClick}
     />
   );

@@ -40,7 +40,11 @@ export const GuildTagBadge = ({
   const body = (
     <span
       translate='no'
-      title={`Guild: ${badge.tag}`}
+      title={
+        typeof badge.level === "number"
+          ? `Guild: ${badge.tag} · level ${badge.level}`
+          : `Guild: ${badge.tag}`
+      }
       style={frameStyle(badge.frame, hex)}
       className={cn(
         "inline-flex shrink-0 items-center rounded font-black tracking-wider",

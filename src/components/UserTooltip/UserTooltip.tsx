@@ -8,6 +8,7 @@ import { IconBox } from "components/IconBox/IconBox";
 import Avatar from "components/UI/Avatar";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
@@ -155,8 +156,11 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   </div>
                 )}
                 <div className='flex flex-col items-start gap-1.5'>
-                  <h3 className='text-base font-bold text-gray-900'>
+                  <h3 className='flex items-center gap-2 text-base font-bold text-gray-900'>
                     {userData.displayName}
+                    {/* The card is portalled out of whatever row opened it, so
+                        the tag may carry its own link here. */}
+                    <GuildTagBadge badge={userData.guildBadge} />
                   </h3>
                   {supportMember && (
                     <SupportBadge member={supportMember} tone='light' />

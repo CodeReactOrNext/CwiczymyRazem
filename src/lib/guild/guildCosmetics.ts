@@ -1,4 +1,5 @@
 import { findCosmetic } from "feature/guilds/data/guildCosmetics";
+import { doneQuestKeys, guildLevelOf } from "feature/guilds/data/guildQuests";
 import {
   canEquip,
   COSMETIC_PROBLEM_MESSAGES,
@@ -13,11 +14,14 @@ import { firestore } from "utils/firebase/api/firebase.config";
 /**
  * Wearing a guild's kit.
  *
- * One rule decides everything: the founder changes what the guild wears, and it
- * costs nothing. Free, because a look pays nothing back and charging for one
- * only kept guilds in the default; founder-only, because with a free change and
- * no owner, two members with different taste could flip the guild's colour back
- * and forth all afternoon at no cost to either.
+ * One rule decides almost everything: the founder changes what the guild wears,
+ * and it costs nothing. Free, because a look pays nothing back and charging for
+ * one only kept guilds in the default; founder-only, because with a free change
+ * and no owner, two members with different taste could flip the guild's colour
+ * back and forth all afternoon at no cost to either. The one thing besides is
+ * the guild's level: the fancier items unlock as quests are cleared, and the
+ * level is read off the stored ledger inside the same transaction, never off
+ * anything the client sent.
  *
  * Which guild is changed comes from the caller's own `guildId`, an
  * Admin-SDK-only field, never from the request body — the same rule the seat
@@ -39,6 +43,7 @@ type Outcome =
   | "missing"
   | "unknown"
   | "already-worn"
+  | "locked"
   | "not-founder";
 
 const REFUSALS: Record<
@@ -52,6 +57,7 @@ const REFUSALS: Record<
     status: 409,
     error: COSMETIC_PROBLEM_MESSAGES["already-worn"],
   },
+  locked: { status: 403, error: COSMETIC_PROBLEM_MESSAGES.locked },
   "not-founder": {
     status: 403,
     error: "Only the founder changes what the guild wears",
@@ -89,7 +95,11 @@ export async function equipCosmetic(
       if (data.founderUid !== session.uid) return { outcome: "not-founder" };
 
       const cosmetics = readCosmetics(data.cosmetics);
-      const problem = canEquip(cosmetics, item.id);
+      const problem = canEquip(
+        cosmetics,
+        item.id,
+        guildLevelOf(doneQuestKeys(data)),
+      );
       if (problem) return { outcome: problem };
 
       // The whole object rather than a `cosmetics.accent` field path: the

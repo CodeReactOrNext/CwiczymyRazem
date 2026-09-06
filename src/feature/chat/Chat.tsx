@@ -11,6 +11,7 @@ import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChat } from "feature/chat/hooks/useChat";
+import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
 import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
@@ -113,6 +114,10 @@ const Chat = ({ chatPath }: { chatPath?: string } = {}) => {
                             {msg.username}
                           </span>
                         </UserTooltip>
+                        {/* Outside the tooltip on purpose — its trigger takes a
+                            single child, and the tag belongs beside the name
+                            rather than inside what opens the card. */}
+                        <GuildTagBadge badge={msg.guildBadge} />
                         {supportMember && <SupportBadge member={supportMember} />}
                       </div>
                     )}

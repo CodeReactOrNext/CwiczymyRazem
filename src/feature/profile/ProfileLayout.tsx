@@ -8,6 +8,7 @@ import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { EarnedAchievementsList } from "feature/achievements";
+import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
@@ -50,6 +51,7 @@ const ProfileLayout = ({
     statistics,
     displayName,
     avatar,
+    guildBadge,
     createdAt,
     band,
     soundCloudLink,
@@ -110,6 +112,19 @@ const ProfileLayout = ({
     <div className='bg-second-600 rounded-xl flex flex-col shadow-sm border-none overflow-hidden md:overflow-visible'>
       <HeroBanner
         eyebrow='Player Profile'
+        // The banner takes its title as a string, so the tag rides in the
+        // eyebrow instead — directly above the name, which is where a profile
+        // says who this player plays with.
+        eyebrowContent={
+          guildBadge ? (
+            <div className='flex items-center gap-2'>
+              <p className='text-xs font-semibold uppercase tracking-[0.2em] text-orange-400/80'>
+                Player Profile
+              </p>
+              <GuildTagBadge badge={guildBadge} size='md' />
+            </div>
+          ) : undefined
+        }
         title={displayName}
         subtitle={`${statistics.points.toLocaleString()} ${t("points")}${band ? ` · ${band}` : ""}`}
         className='w-full !rounded-none !shadow-none'

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import { fetchInventory } from "feature/arsenal/services/arsenal.service";
+import { GUILDS_KEY } from "feature/guilds/hooks/useGuilds";
 import type {
   GuildStash,
   StashDeposit,
@@ -59,6 +60,8 @@ export const useStashMutations = () => {
     queryClient.setQueryData(GUILD_STASH_KEY, stash);
     // The arsenal moved on both sides of every one of these.
     queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
+    // And so did somebody's honor, which the roster shows.
+    queryClient.invalidateQueries({ queryKey: GUILDS_KEY });
   };
 
   const deposit = useMutation({

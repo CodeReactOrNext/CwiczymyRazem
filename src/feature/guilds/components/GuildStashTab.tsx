@@ -19,14 +19,15 @@ import {
   resolveLayout,
   rowOf,
 } from "feature/arsenal/utils/stashLayout";
-import { GuildFundBar } from "feature/guilds/components/GuildFundBar";
+import { HonorMark } from "feature/guilds/components/HonorMark";
+import { HonorPriceTag } from "feature/guilds/components/HonorPriceTag";
+import { HonorTakeCard } from "feature/guilds/components/HonorTakeCard";
 import { PartAmountCard } from "feature/guilds/components/PartAmountCard";
 import type {
   ShelfBoard,
   ShelfBoardId,
 } from "feature/guilds/components/useShelfDrag";
 import { useShelfDrag } from "feature/guilds/components/useShelfDrag";
-import { useGuildMutations } from "feature/guilds/hooks/useGuilds";
 import {
   useGuildStash,
   useMyGear,
@@ -34,12 +35,17 @@ import {
 } from "feature/guilds/hooks/useGuildStash";
 import type { Guild } from "feature/guilds/types/guild.types";
 import type { StashEntry, StashTally } from "feature/guilds/types/stash.types";
+import {
+  stashHonorValue,
+  TAKE_DAILY_LIMIT,
+  TAKE_HONOR_COST,
+} from "feature/guilds/utils/guildHonor.utils";
 import { shelfRowsUsed } from "feature/guilds/utils/guildShelf.utils";
-import { GUILD_MAX_STASH_ROWS } from "feature/guilds/utils/guildUpgrades.utils";
 import { ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useResponsiveStore } from "store/useResponsiveStore";
+import { auth } from "utils/firebase/client/firebase.utils";
 
 /**
  * One entry on the shelf as a socket, keyed by the entry rather than the item.
@@ -62,10 +68,14 @@ const entryPiece = (entry: StashEntry): BoardPiece => {
   };
 };
 
-/** A stack of parts stopped on its way across, waiting on an amount. */
+/**
+ * A piece stopped on its way across: a stack of parts waiting on an amount,
+ * or anything on the shelf waiting on the taker to see its price.
+ */
 type AmountPrompt =
   | { mode: "deposit"; part: ScrapPart }
-  | { mode: "take"; entryId: string; part: ScrapPart };
+  | { mode: "take"; entryId: string; part: ScrapPart }
+  | { mode: "confirm"; entry: StashEntry };
 
 const Ledger = ({ tallies }: { tallies: StashTally[] }) => (
   <div className='space-y-2'>
@@ -117,16 +127,13 @@ const Ledger = ({ tallies }: { tallies: StashTally[] }) => (
 export const GuildStashTab = ({
   enabled,
   guild,
-  tokensLeft,
 }: {
   enabled: boolean;
   guild: Guild;
-  tokensLeft: number;
 }) => {
   const { data: stash, isLoading } = useGuildStash(enabled);
   const { data: gear } = useMyGear(enabled);
   const { deposit, take } = useStashMutations();
-  const { fund } = useGuildMutations();
   const { mutate: saveLayout } = useUpdateStashLayout();
   const isMobile = useResponsiveStore((state) => state.isMobile);
 
@@ -136,7 +143,16 @@ export const GuildStashTab = ({
   const [draft, setDraft] = useState<StashLayout | null>(null);
   const [amount, setAmount] = useState<AmountPrompt | null>(null);
 
-  const busy = deposit.isPending || take.isPending || fund.isPending;
+  const busy = deposit.isPending || take.isPending;
+
+  // The caller's own uid never comes back from the API, so the honor that is
+  // theirs is found the way the rest of the client finds itself.
+  const myUid = auth.currentUser?.uid ?? null;
+  const myHonor = (myUid && stash?.honor?.[myUid]) || {
+    earned: 0,
+    spent: 0,
+    balance: 0,
+  };
 
   const entries = useMemo(() => stash?.entries ?? [], [stash]);
   const shelfPieces = useMemo(() => entries.map(entryPiece), [entries]);
@@ -216,7 +232,9 @@ export const GuildStashTab = ({
       setAmount({ mode: "take", entryId: entry.id, part: entry.item });
       return;
     }
-    take.mutate({ entryId: pieceId });
+    // Taking costs honor, so nothing leaves the shelf on a single click: the
+    // price is shown first and the take is the button under it.
+    setAmount({ mode: "confirm", entry });
   };
 
   const applyMove = (next: StashLayout) => {
@@ -269,6 +287,11 @@ export const GuildStashTab = ({
           dragHandlers: dragHandlers(board, piece),
         };
 
+    // A shelf piece says its price under its hover card, so a member knows
+    // what a take costs before they click and not from the error after.
+    const entry =
+      board === "shelf" ? entries.find((e) => e.id === piece.id) : undefined;
+
     return (
       <BoardPieceTile
         key={piece.id}
@@ -277,6 +300,7 @@ export const GuildStashTab = ({
         isEquipped={board === "gear" && equippedItemId === piece.id}
         rigSlot={board === "gear" ? rigSlotOf(piece.id) : null}
         isOnPedalboard={board === "gear" && pedalboardItemIds.has(piece.id)}
+        previewFooter={entry ? <HonorPriceTag /> : undefined}
         onClick={() => {
           if (consumeClick()) return;
           transfer(board, piece.id);
@@ -313,8 +337,16 @@ export const GuildStashTab = ({
           <span className='font-medium text-zinc-500'>
             {shelfPieces.length}
           </span>
-          <span className='ml-auto text-xs font-medium tabular-nums text-zinc-500'>
-            {rowsUsed} of {guild.stashRowLimit} rows
+          <span className='ml-auto flex items-center gap-3 text-xs font-medium tabular-nums text-zinc-500'>
+            <span>
+              {rowsUsed} of {guild.stashRowLimit} rows
+            </span>
+            <span
+              title={`${myHonor.earned.toLocaleString()} honor earned, ${myHonor.spent.toLocaleString()} spent`}
+              className='flex items-center gap-1.5 font-bold text-purple-300'>
+              <HonorMark size={18} />
+              {myHonor.balance.toLocaleString()} honor
+            </span>
           </span>
         </h2>
 
@@ -331,24 +363,9 @@ export const GuildStashTab = ({
           {shelfPieces.length === 0
             ? "Nothing here yet. Drag something down from your gear and somebody will use it."
             : rowsFree === 0
-              ? "The shelf is full — take something off it, or put a few tokens towards another row."
-              : "Drag a socket into your own cabinet to take it, or click it. Who left what is in the ledger below."}
+              ? "The shelf is full — take something off it, or put a few tokens towards another row in the Upgrades tab."
+              : `Drag a socket into your own cabinet to take it, or click it. Leaving something earns honor by its rarity; taking anything off the shelf costs a flat ${TAKE_HONOR_COST}, up to ${TAKE_DAILY_LIMIT} times a day. Who left what is in the ledger below.`}
         </p>
-
-        <GuildFundBar
-          fund={guild.funds.stashRows}
-          standing={
-            rowsFree === 0
-              ? "The shelf is full"
-              : `${rowsFree} ${rowsFree === 1 ? "row" : "rows"} free`
-          }
-          buys='another row'
-          maxed={`a shelf tops out at ${GUILD_MAX_STASH_ROWS} rows`}
-          members={guild.members}
-          tokensLeft={tokensLeft}
-          busy={busy}
-          onPledge={(tokens) => fund.mutate({ track: "stashRows", tokens })}
-        />
       </section>
 
       <section className='space-y-4'>
@@ -435,11 +452,30 @@ export const GuildStashTab = ({
       <StashItemDialog
         isOpen={amount != null}
         onClose={() => setAmount(null)}
-        title='How many'>
-        {amount && (
+        title={amount?.mode === "confirm" ? "Take it" : "How many"}>
+        {amount?.mode === "confirm" && (
+          <HonorTakeCard
+            entry={amount.entry}
+            balance={myHonor.balance}
+            busy={busy}
+            onConfirm={() => {
+              const { entry } = amount;
+              setAmount(null);
+              take.mutate({ entryId: entry.id });
+            }}
+          />
+        )}
+        {amount && amount.mode !== "confirm" && (
           <PartAmountCard
             part={amount.part}
             mode={amount.mode}
+            honorPerPiece={
+              amount.mode === "deposit"
+                ? stashHonorValue("part", amount.part.tier, 1)
+                : undefined
+            }
+            honorCost={amount.mode === "take" ? TAKE_HONOR_COST : undefined}
+            honorBalance={amount.mode === "take" ? myHonor.balance : undefined}
             busy={busy}
             onConfirm={(qty) => {
               setAmount(null);

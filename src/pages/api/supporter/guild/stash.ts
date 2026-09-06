@@ -93,7 +93,9 @@ export default async function handler(
     const guild = await firestore.collection("guilds").doc(guildId).get();
     return res
       .status(200)
-      .json(await readStash(guildId, guild.data()?.members ?? []));
+      .json(
+        await readStash(guildId, guild.data()?.members ?? [], guild.data()),
+      );
   } catch (error: any) {
     console.error("[supporter/guild/stash]", error);
     return res.status(500).json({ error: "Failed to reach the stash" });

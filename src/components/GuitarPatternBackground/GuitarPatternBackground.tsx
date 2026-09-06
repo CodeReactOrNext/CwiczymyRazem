@@ -1,6 +1,10 @@
 import { Guitar, Headphones, type LucideIcon, Music } from "lucide-react";
 import { useId } from "react";
+import type { IconType } from "react-icons";
 import { TbGuitarPick } from "react-icons/tb";
+
+/** Anything that draws an icon from `size`, `color` and `className` — lucide or react-icons. */
+export type PatternIcon = LucideIcon | IconType;
 
 // Fixed offsets for the 4 icon slots inside one tile — scattered, not grid-aligned,
 // so neighbouring tiles read as an overlapping cluster rather than a repeating stamp.
@@ -11,7 +15,7 @@ const SLOTS = [
   { x: 110, y: 110 },
 ] as const;
 
-const DEFAULT_ICONS: LucideIcon[] = [Guitar, Music, TbGuitarPick as unknown as LucideIcon, Headphones];
+const DEFAULT_ICONS: PatternIcon[] = [Guitar, Music, TbGuitarPick, Headphones];
 
 interface GuitarPatternBackgroundProps {
   /** Pattern opacity. Keep this low — it's a texture, not a graphic. */
@@ -27,7 +31,7 @@ interface GuitarPatternBackgroundProps {
   /** Raw color (hex/rgb) for the icons — overrides `variant`, for tinting to a specific surface. */
   color?: string;
   /** Up to 4 icons filling the tile's 4 slots. Defaults to the guitar/music set used on /login. */
-  icons?: LucideIcon[];
+  icons?: PatternIcon[];
   className?: string;
 }
 

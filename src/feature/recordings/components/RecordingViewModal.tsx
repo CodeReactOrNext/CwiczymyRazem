@@ -156,6 +156,7 @@ export const RecordingViewModal = ({
                         userName={recording.userDisplayName || "?"}
                         avatarUrl={recording.userAvatarUrl}
                         lvl={recording.userAvatarFrame}
+                        guildBadge={recording.userGuildBadge}
                         size='xs'
                         nameClassName='text-zinc-300'
                       />

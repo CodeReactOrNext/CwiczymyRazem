@@ -1,8 +1,4 @@
-import {
-  GUILD_CHALLENGE_TIER_COST,
-  GUILD_CHALLENGE_TIER_COST_STEP,
-  GUILD_MAX_CHALLENGE_TIERS,
-} from "feature/supporterPanel/constants/supporterPanel.constants";
+import { honorForFame } from "feature/guilds/utils/guildHonor.utils";
 import type { PlayerSession } from "lib/support/supporterAuth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -70,7 +66,7 @@ vi.mock("firebase-admin/firestore", () => ({
   FieldValue: { increment: (by: number) => ({ __increment: by }) },
 }));
 
-const { buyChallengeTier, depositFame } = await import("./guildTreasury");
+const { depositFame } = await import("./guildTreasury");
 
 const session = (uid: string): PlayerSession => ({
   uid,
@@ -156,67 +152,13 @@ describe("depositFame", () => {
       status: 400,
     });
   });
-});
 
-describe("buyChallengeTier", () => {
-  it("spends the guild's Fame, not the founder's", async () => {
-    seedGuild({ treasury: { fame: GUILD_CHALLENGE_TIER_COST + 40 } });
+  it("credits honor for every Fame put in, at the rate", async () => {
+    await depositFame(session("ann"), 250);
 
-    const result = await buyChallengeTier(session("ann"));
-
-    expect(result).toMatchObject({ ok: true, tier: 1 });
-    expect(guild().challengeTier).toBe(1);
-    expect(guild().treasury.fame).toBe(40);
-    expect(guild().treasury.spent).toBe(GUILD_CHALLENGE_TIER_COST);
-    // The founder pressed the button; the room paid for it.
-    expect(fameOf("ann")).toBe(1000);
-  });
-
-  it("charges more for every step up the ladder", async () => {
-    seedGuild({
-      challengeTier: 1,
-      treasury: { fame: 10_000 },
-    });
-
-    await buyChallengeTier(session("ann"));
-
-    expect(guild().challengeTier).toBe(2);
-    expect(guild().treasury.spent).toBe(
-      GUILD_CHALLENGE_TIER_COST + GUILD_CHALLENGE_TIER_COST_STEP,
-    );
-  });
-
-  it("says how far short the guild is, and buys nothing", async () => {
-    seedGuild({ treasury: { fame: GUILD_CHALLENGE_TIER_COST - 120 } });
-
-    const result = await buyChallengeTier(session("ann"));
-
-    expect(result).toMatchObject({ ok: false, status: 402 });
-    expect((result as { error: string }).error).toContain("120");
-    expect(guild().challengeTier).toBeUndefined();
-    expect(guild().treasury.fame).toBe(GUILD_CHALLENGE_TIER_COST - 120);
-  });
-
-  it("will not let a member commit the roster to a harder week", async () => {
-    seedGuild({ treasury: { fame: 10_000 } });
-
-    expect(await buyChallengeTier(session("bob"))).toMatchObject({
-      ok: false,
-      status: 403,
-    });
-    expect(guild().challengeTier).toBeUndefined();
-  });
-
-  it("stops at the top of the ladder", async () => {
-    seedGuild({
-      challengeTier: GUILD_MAX_CHALLENGE_TIERS,
-      treasury: { fame: 10_000 },
-    });
-
-    expect(await buyChallengeTier(session("ann"))).toMatchObject({
-      ok: false,
-      status: 409,
-    });
-    expect(guild().treasury.fame).toBe(10_000);
+    expect(guild().honor.ann).toEqual({ earned: honorForFame(250) });
+    // Nothing is written when the deposit is refused.
+    await depositFame(session("bob"), 5_000);
+    expect(guild().honor.bob).toBeUndefined();
   });
 });

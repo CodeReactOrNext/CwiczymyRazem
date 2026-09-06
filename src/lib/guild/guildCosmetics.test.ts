@@ -1,4 +1,5 @@
 import { findCosmetic } from "feature/guilds/data/guildCosmetics";
+import { GUILD_QUESTS } from "feature/guilds/data/guildQuests";
 import type { PlayerSession } from "lib/support/supporterAuth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -122,6 +123,14 @@ const seedPlayer = (uid: string, fame: number, guildId?: string) =>
     ...(guildId ? { guildId } : {}),
   });
 
+/** Twenty quests cleared: a guild level high enough to wear anything below. */
+const LEVEL_20 = Object.fromEntries(
+  GUILD_QUESTS.slice(0, 20).map((quest) => [
+    quest.id,
+    { at: "2026-01-01T00:00:00.000Z", roster: ["founder", "member"] },
+  ]),
+);
+
 const seedGuild = (extra: Record<string, any> = {}) =>
   store.set("guilds/riff-raiders", {
     name: "Riff Raiders",
@@ -131,6 +140,7 @@ const seedGuild = (extra: Record<string, any> = {}) =>
       { uid: "founder", displayName: "founder", avatar: null },
       { uid: "member", displayName: "member", avatar: null },
     ],
+    quests: LEVEL_20,
     ...extra,
   });
 
@@ -164,6 +174,7 @@ describe("equipCosmetic", () => {
     expect(guild().cosmetics).toEqual({
       accent: EMBER.id,
       banner: HALO.id,
+      motif: "motif:guitar.notes.metalhand.headphones",
       frame: "frame:plain",
     });
   });
@@ -175,6 +186,7 @@ describe("equipCosmetic", () => {
       expect(badgeOf(uid)).toEqual({
         guildId: "riff-raiders",
         tag: "RIF",
+        level: 20,
         accent: EMBER.id,
         frame: "frame:plain",
       });
@@ -207,8 +219,26 @@ describe("equipCosmetic", () => {
     expect(guild().cosmetics).toEqual({
       accent: EMBER.id,
       banner: "banner:none",
+      motif: "motif:guitar.notes.metalhand.headphones",
       frame: "frame:plain",
     });
+  });
+
+  it("puts on any four icons, listed in the catalog or not", async () => {
+    const own = "motif:skull.flame.crown.skull";
+    expect(await equipCosmetic(session("founder"), own)).toEqual({
+      ok: true,
+    });
+    expect(guild().cosmetics.motif).toBe(own);
+
+    // Four is the size of the tile; a fifth icon is not a motif at all.
+    expect(
+      await equipCosmetic(
+        session("founder"),
+        "motif:skull.flame.crown.skull.star",
+      ),
+    ).toMatchObject({ ok: false, status: 400 });
+    expect(guild().cosmetics.motif).toBe(own);
   });
 
   it("refuses an id the catalog has never heard of", async () => {
@@ -241,5 +271,21 @@ describe("equipCosmetic", () => {
       ok: true,
     });
     expect(guild().cosmetics.accent).toBe("accent:steel");
+  });
+
+  it("refuses an item the guild's level has not unlocked yet", async () => {
+    // No quests cleared: level zero, and Ember unlocks well above it.
+    seedGuild({ quests: {} });
+
+    expect(await equipCosmetic(session("founder"), EMBER.id)).toMatchObject({
+      ok: false,
+      status: 403,
+    });
+    expect(guild().cosmetics).toBeUndefined();
+
+    // The plain one is there from the start.
+    expect(await equipCosmetic(session("founder"), "accent:ivory")).toEqual({
+      ok: true,
+    });
   });
 });

@@ -1,3 +1,4 @@
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import type { Timestamp } from "firebase/firestore";
 
 export interface Comment {
@@ -16,6 +17,8 @@ export interface Recording {
   userDisplayName?: string | null;
   userAvatarUrl?: string | null;
   userAvatarFrame?: number;
+  /** Filled in from the author document when a page of recordings is read. */
+  userGuildBadge?: GuildBadge | null;
   songId?: string | null;
   songTitle?: string | null;
   songArtist?: string | null;

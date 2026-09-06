@@ -9,6 +9,13 @@ import type {
   StashTally,
 } from "feature/guilds/types/stash.types";
 import {
+  honorFor,
+  readHonor,
+  stashHonorValue,
+  TAKE_DAILY_LIMIT,
+  TAKE_HONOR_COST,
+} from "feature/guilds/utils/guildHonor.utils";
+import {
   shelfHasRoom,
   shelfPiece,
 } from "feature/guilds/utils/guildShelf.utils";
@@ -30,6 +37,7 @@ import {
 } from "lib/guild/stashTransfer";
 import type { PlayerSession } from "lib/support/supporterAuth";
 import { userRef } from "lib/support/tokenWallet";
+import { getServerDateKey } from "utils/converter";
 import { firestore } from "utils/firebase/api/firebase.config";
 
 /**
@@ -52,6 +60,17 @@ import { firestore } from "utils/firebase/api/firebase.config";
  * guild has chipped in for (see `lib/guild/guildFunding`), so a stash big
  * enough to kit out a dozen people is something the guild decided to build
  * rather than the default state of an empty room.
+ *
+ * And taking is no longer free. Leaving a piece earns honor by its rarity
+ * (see `guildHonor.utils.ts`), and Fame or tokens put into the guild earn it
+ * too — but taking one off the shelf costs a flat `TAKE_HONOR_COST`, the same
+ * for a stack of screws as for a Custom Shop guitar. A price that scaled with
+ * the item's own value made the best gear unreachable right after the one
+ * deposit that would have paid for it; a flat toll does not. A member who
+ * only ever takes runs out of honor to take with, which is the alt-account
+ * funnel above closed without a rule about who may take — and `TAKE_DAILY_LIMIT`
+ * is the other half of it: honor alone cannot walk out with the whole shelf
+ * in one visit, however big the balance behind it.
  */
 
 const GUILDS = "guilds";
@@ -145,6 +164,8 @@ const buildTallies = (
 export async function readStash(
   guildId: string,
   members: GuildMember[],
+  /** The guild document, for the honor each member has to take with. */
+  guildData?: Record<string, any>,
 ): Promise<GuildStash> {
   const [entries, logSnap] = await Promise.all([
     stashRef(guildId).limit(STASH_LIMIT).get(),
@@ -159,12 +180,13 @@ export async function readStash(
       .sort((a, b) => b.depositedAt.localeCompare(a.depositedAt)),
     log,
     tallies: buildTallies(members, log),
+    honor: readHonor(guildData),
   };
 }
 
 export type StashResult =
   | { ok: true }
-  | { ok: false; status: 400 | 403 | 404 | 409; error: string };
+  | { ok: false; status: 400 | 402 | 403 | 404 | 409 | 429; error: string };
 
 const DETACH_MESSAGES: Record<string, string> = {
   "not-found": "You do not own that item",
@@ -219,6 +241,25 @@ const amountOf = (request: StashDeposit) =>
 /** "12× Epic Pickup" reads better in the log than a bare part name does. */
 const logName = (name: string, qty: number) =>
   qty > 1 ? `${qty}× ${name}` : name;
+
+/**
+ * How many takes this member has already spent today, off the guild document.
+ *
+ * Stored as a day key and a count rather than reset by a scheduled job: a
+ * count left over from yesterday reads as zero the moment `today` no longer
+ * matches it, so nothing has to run at midnight to clear it.
+ */
+const takesToday = (
+  guildData: Record<string, any>,
+  uid: string,
+  today: string,
+): number => {
+  const stored = (guildData.stashTakes ?? {})[uid] as
+    | { day?: string; count?: number }
+    | undefined;
+  if (!stored || stored.day !== today) return 0;
+  return Math.max(0, Math.floor(Number(stored.count) || 0));
+};
 
 /** Puts one of the member's items — gear, a rescued mod, or parts — on the shelf. */
 export async function depositItem(
@@ -311,6 +352,13 @@ export async function depositItem(
       rarity: detached.rarity,
       at: FieldValue.serverTimestamp(),
     });
+    // The receipt: what the piece is worth on the shelf, in honor, credited to
+    // whoever left it — the same number it will cost whoever takes it.
+    tx.update(guildRef(guildId), {
+      [`honor.${session.uid}.earned`]: FieldValue.increment(
+        stashHonorValue(request.kind, detached.rarity, moved),
+      ),
+    });
 
     return "ok" as const;
   });
@@ -337,12 +385,19 @@ export async function depositItem(
 }
 
 /**
- * Takes an entry off the shelf and into the member's arsenal.
+ * Takes an entry off the shelf and into the member's arsenal, for honor.
  *
  * `qty` only means anything to a stack of parts, and it is clamped to what is
  * actually there: a shared pool of parts is only usable if a member can take
  * the eight screws their build wants without emptying the shelf, and only
  * honest if asking for more than exists hands over no more than exists.
+ *
+ * The price is `TAKE_HONOR_COST` flat — never the item's own value, see
+ * `guildHonor.utils.ts` for why — checked against the balance on the stored
+ * guild document inside the same transaction that moves the piece, so two
+ * takes racing for one balance are settled by Firestore rather than by
+ * whoever's request arrived first. `TAKE_DAILY_LIMIT` is checked the same way,
+ * off a per-member count also stored on the guild document.
  */
 export async function takeItem(
   session: PlayerSession,
@@ -354,17 +409,23 @@ export async function takeItem(
 
   const entryRef = stashRef(guildId).doc(entryId);
   const historyRef = logRef(guildId).doc();
+  const today = getServerDateKey();
 
   const outcome = await firestore.runTransaction(async (tx: Transaction) => {
-    const [user, entry] = await Promise.all([
+    const [user, entry, guild] = await Promise.all([
       tx.get(userRef(session.uid)),
       tx.get(entryRef),
+      tx.get(guildRef(guildId)),
     ]);
 
     if (user.data()?.guildId !== guildId) return "not-a-member" as const;
     // Two members reaching for the same thing: whoever's transaction lands
     // first gets it, and the second finds an empty shelf rather than a copy.
     if (!entry.exists) return "gone" as const;
+
+    const guildData = guild.data() ?? {};
+    const takenToday = takesToday(guildData, session.uid, today);
+    if (takenToday >= TAKE_DAILY_LIMIT) return { limited: true as const };
 
     const data = entry.data() ?? {};
     const kind = (data.kind ?? "guitar") as StashItemKind;
@@ -379,8 +440,18 @@ export async function takeItem(
           ? Math.min(asked, stack.qty)
           : stack.qty;
       if (want <= 0) return "gone" as const;
-
       moved = want;
+    }
+
+    // Flat, whatever is moving, and checked against the stored balance before
+    // anything does.
+    const cost = TAKE_HONOR_COST;
+    const { balance } = honorFor(guildData, session.uid);
+    if (balance < cost) return { poor: true as const, cost, balance };
+
+    if (kind === "part") {
+      const stack = (data.item ?? {}) as ScrapPart;
+      const want = moved;
       tx.update(
         userRef(session.uid),
         attachPart(owner, { ...stack, qty: want }),
@@ -406,6 +477,10 @@ export async function takeItem(
       rarity: data.rarity ?? "",
       at: FieldValue.serverTimestamp(),
     });
+    tx.update(guildRef(guildId), {
+      [`honor.${session.uid}.spent`]: FieldValue.increment(cost),
+      [`stashTakes.${session.uid}`]: { day: today, count: takenToday + 1 },
+    });
 
     return "ok" as const;
   });
@@ -415,6 +490,20 @@ export async function takeItem(
   }
   if (outcome === "gone") {
     return { ok: false, status: 404, error: "Somebody got there first" };
+  }
+  if (typeof outcome === "object" && "limited" in outcome) {
+    return {
+      ok: false,
+      status: 429,
+      error: `You have already taken ${TAKE_DAILY_LIMIT} things off the shelf today — come back tomorrow`,
+    };
+  }
+  if (typeof outcome === "object") {
+    return {
+      ok: false,
+      status: 402,
+      error: `That takes ${outcome.cost} honor and you have ${outcome.balance} — put something into the guild first`,
+    };
   }
 
   return { ok: true };

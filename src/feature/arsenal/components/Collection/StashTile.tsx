@@ -108,6 +108,11 @@ interface StashTileProps {
   inUse?: boolean;
   /** Full card shown on hover. Desktop only; touch opens the sheet instead. */
   preview?: ReactNode;
+  /**
+   * A line under the hover card, from whoever owns the board — the guild's
+   * shelf puts the piece's price there. Nothing without a `preview`.
+   */
+  previewFooter?: ReactNode;
   onClick?: () => void;
 }
 
@@ -143,6 +148,7 @@ export const StashTile = ({
   isNew = false,
   inUse = false,
   preview,
+  previewFooter,
   onClick,
 }: StashTileProps) => {
   const isMobile = useResponsiveStore((state) => state.isMobile);
@@ -342,6 +348,7 @@ export const StashTile = ({
           sideOffset={8}
           className='w-[260px] border-0 bg-transparent p-0 shadow-none'>
           {preview}
+          {previewFooter}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -1,3 +1,4 @@
+import { honorForTokens } from "feature/guilds/utils/guildHonor.utils";
 import type { GuildUpgrade } from "feature/guilds/utils/guildUpgrades.utils";
 import {
   GUILD_MAX_SEATS,
@@ -96,6 +97,11 @@ export async function fundUpgrade(
       // Pledges are the credit for the room and outlive every step; the pot is
       // only what is owed on this one, so buying empties it.
       [`funds.${track}.pledges.${session.uid}`]: FieldValue.increment(paid),
+      // Tokens put in earn honor, the guild's own currency — see
+      // `guildHonor.utils.ts` for the rate and the reasoning.
+      [`honor.${session.uid}.earned`]: FieldValue.increment(
+        honorForTokens(paid),
+      ),
       ...(unlocked
         ? { [countField]: upgrades + 1, [`funds.${track}.pot`]: 0 }
         : { [`funds.${track}.pot`]: FieldValue.increment(paid) }),

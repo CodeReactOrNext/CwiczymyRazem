@@ -1,6 +1,11 @@
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
-import type { Guild, GuildChallenge } from "feature/guilds/types/guild.types";
+import { HonorMark } from "feature/guilds/components/HonorMark";
+import type {
+  Guild,
+  GuildHonor,
+  GuildQuestBoard,
+} from "feature/guilds/types/guild.types";
 import type { RosterRow } from "feature/guilds/utils/guildRoster.utils";
 import { rankRoster } from "feature/guilds/utils/guildRoster.utils";
 import { Crown } from "lucide-react";
@@ -9,48 +14,82 @@ import { useMemo } from "react";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 /**
- * Who is in the guild, and what each of them has put into the week.
+ * Who is in the guild, and what each of them has put in since it was founded.
  *
  * The browse tab shows everybody as a row of faces, which answers "is my friend
  * in this one" and nothing else. This is the view from inside: the roster
- * ordered by the goals the challenge is counting anyway, so the tab says who is
- * carrying the week rather than only who signed up for it.
+ * ordered by the sessions and hours the quests are counted out of anyway, so
+ * the tab says who is carrying the guild rather than only who signed up for it.
  */
 
+const tenth = (value: number): string =>
+  (Math.round((Number.isFinite(value) ? value : 0) * 10) / 10).toString();
+
+const sinceLine = (since: string): string => {
+  const date = new Date(since);
+  if (Number.isNaN(date.getTime()) || date.getTime() === 0) return "";
+  return date.toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+/** What one member has put in: sessions first, hours under them. Nothing yet is said as nothing. */
+const Effort = ({ row }: { row: RosterRow }) => {
+  if (row.sessions === 0) return null;
+
+  return (
+    <div className='shrink-0 text-right'>
+      <p className='text-xs font-semibold tabular-nums text-zinc-300'>
+        {row.sessions} {row.sessions === 1 ? "session" : "sessions"}
+      </p>
+      {row.hours > 0 && (
+        <p className='mt-0.5 text-[11px] tabular-nums text-zinc-500'>
+          {tenth(row.hours)}h of practice
+        </p>
+      )}
+    </div>
+  );
+};
+
 /**
- * What one member has done of their own share.
- *
- * The goals come first because they are what the week is decided on, and the
- * session count sits under them because it is the number people actually
- * recognise themselves by.
+ * The member's honor: what they have earned by putting into the guild. The
+ * earned total, not the balance — that is a shelf question, and this row is
+ * the standing. A member who gave a lot and spent a lot has still given a
+ * lot, which the balance alone would not say.
  */
-const Share = ({ row }: { row: RosterRow }) => (
-  <div className='shrink-0 text-right'>
-    <p
-      title={`${row.done} of the ${row.total} goals this week's rank asks of every member`}
-      className={cn(
-        "text-xs font-semibold tabular-nums",
-        row.isShareDone ? "text-emerald-400" : "text-zinc-400",
-      )}>
-      {row.done} of {row.total} {row.total === 1 ? "goal" : "goals"}
-    </p>
-    <p className='mt-0.5 text-[11px] tabular-nums text-zinc-500'>
-      {row.sessions === 0
-        ? "nothing yet"
-        : `${row.sessions} ${row.sessions === 1 ? "session" : "sessions"}`}
-    </p>
-  </div>
-);
+const Honor = ({ honor }: { honor: GuildHonor | undefined }) => {
+  const earned = honor?.earned ?? 0;
+  const balance = honor?.balance ?? 0;
+
+  return (
+    <div
+      title={`${earned.toLocaleString()} honor earned · ${balance.toLocaleString()} left to spend on the shelf`}
+      className='shrink-0 text-right'>
+      <p
+        className={cn(
+          "flex items-center justify-end gap-1 text-sm font-bold tabular-nums",
+          earned > 0 ? "text-purple-300" : "text-zinc-600",
+        )}>
+        <HonorMark size={18} className={earned > 0 ? "" : "opacity-40"} />
+        {earned.toLocaleString()}
+      </p>
+    </div>
+  );
+};
 
 const MemberRow = ({
   row,
+  honor,
   isMe,
-  showShare,
+  showEffort,
 }: {
   row: RosterRow;
+  honor: GuildHonor | undefined;
   isMe: boolean;
-  /** False when there is no week to measure anybody against. */
-  showShare: boolean;
+  /** False when there is no board to measure anybody against. */
+  showEffort: boolean;
 }) => (
   <div
     className={cn(
@@ -82,40 +121,38 @@ const MemberRow = ({
       {isMe && <p className='mt-0.5 text-xs text-zinc-500'>That is you</p>}
     </div>
 
-    {showShare && <Share row={row} />}
+    {showEffort && <Effort row={row} />}
+    <Honor honor={honor} />
   </div>
 );
 
 export const GuildMembersTab = ({
   guild,
-  challenge,
+  board,
 }: {
   guild: Guild;
-  challenge: GuildChallenge | null;
+  board: GuildQuestBoard | null;
 }) => {
   // The caller's own uid never comes back from the API — see `GuildsState` —
   // so the row that is theirs is found the way the rest of the client finds
   // itself, off the signed-in user.
   const myUid = auth.currentUser?.uid ?? null;
 
-  // What counts as "their share" moves with the rank the guild funded, so the
-  // roster is measured against the same goals the challenge card shows.
-  const goals = challenge?.objectives.length ?? 1;
-
   const rows = useMemo(
-    () =>
-      rankRoster(guild.members, challenge?.perMember, guild.founderUid, goals),
-    [guild.members, guild.founderUid, challenge?.perMember, goals],
+    () => rankRoster(guild.members, board?.perMember, guild.founderUid),
+    [guild.members, guild.founderUid, board?.perMember],
   );
 
   const free = Math.max(0, guild.memberLimit - guild.memberCount);
-  const doneTheirShare = rows.filter((row) => row.isShareDone).length;
+  const sessions = rows.reduce((sum, row) => sum + row.sessions, 0);
+  const hours = rows.reduce((sum, row) => sum + row.hours, 0);
+  const since = board ? sinceLine(board.since) : "";
 
   return (
     <div className='space-y-6'>
       {/* The guild's name, tag and crest are already at the top of the page —
-          this says the one thing the page header does not: how the week is
-          going, and how much room is left. */}
+          this says the one thing the page header does not: how much the guild
+          has put in together, and how much room is left. */}
       <div className='flex flex-wrap items-center justify-between gap-4 rounded-lg bg-zinc-900/40 p-5'>
         <div className='space-y-1'>
           <h2 className='text-sm font-bold text-zinc-200'>The roster</h2>
@@ -123,33 +160,38 @@ export const GuildMembersTab = ({
             {guild.memberCount} of {guild.memberLimit} seats taken
             {free > 0
               ? ` · room for ${free} more`
-              : " · the room is full, and more seats are bought from the Guilds tab"}
+              : " · the room is full, and more seats are bought from the Upgrades tab"}
           </p>
         </div>
 
-        {challenge && rows.length > 0 && (
+        {board && rows.length > 0 && (
           <p className='text-sm text-zinc-400'>
-            <span
-              className={cn(
-                "font-bold tabular-nums",
-                doneTheirShare === rows.length
-                  ? "text-emerald-400"
-                  : "text-zinc-200",
-              )}>
-              {doneTheirShare} of {rows.length}
+            <span className='font-bold tabular-nums text-zinc-200'>
+              {sessions.toLocaleString()}
             </span>{" "}
-            have cleared every goal this week
+            {sessions === 1 ? "session" : "sessions"} and{" "}
+            <span className='font-bold tabular-nums text-zinc-200'>
+              {tenth(hours)}h
+            </span>{" "}
+            together{since ? ` since ${since}` : ""}
           </p>
         )}
       </div>
+
+      <p className='flex items-center gap-2 text-xs text-zinc-500'>
+        <HonorMark size={18} />
+        Honor is the guild&apos;s own currency: earned by putting Fame, tokens
+        or gear into the guild, spent taking gear off the shelf.
+      </p>
 
       <div className='space-y-2'>
         {rows.map((row) => (
           <MemberRow
             key={row.member.uid}
             row={row}
+            honor={guild.honor[row.member.uid]}
             isMe={row.member.uid === myUid}
-            showShare={challenge !== null}
+            showEffort={board !== null}
           />
         ))}
       </div>

@@ -8,12 +8,19 @@ import {
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
+import { HonorMark } from "feature/guilds/components/HonorMark";
 import { useState } from "react";
 
 interface PartAmountCardProps {
   part: ScrapPart;
   /** Which side of the shelf the pieces are crossing. */
   mode: "deposit" | "take";
+  /** Deposit only: honor earned per piece left — leaving more earns more. */
+  honorPerPiece?: number;
+  /** Take only: the flat honor a take costs, however many pieces come with it. */
+  honorCost?: number;
+  /** Take only: the honor the member has to pay with. */
+  honorBalance?: number;
   busy?: boolean;
   onConfirm: (qty: number) => void;
 }
@@ -36,12 +43,36 @@ const minorButtonClass =
 export const PartAmountCard = ({
   part,
   mode,
+  honorPerPiece,
+  honorCost,
+  honorBalance,
   busy = false,
   onConfirm,
 }: PartAmountCardProps) => {
   const [qty, setQty] = useState(part.qty);
   const color = PART_TIER_COLORS[part.tier];
   const verb = mode === "deposit" ? "Leave" : "Take";
+
+  // A deposit earns per piece; a take costs the same flat price whatever the
+  // slider says, because how much of the stack moves is not what is priced.
+  const honor =
+    mode === "take"
+      ? (honorCost ?? null)
+      : honorPerPiece === undefined
+        ? null
+        : honorPerPiece * qty;
+  const honorAll =
+    mode === "take"
+      ? (honorCost ?? null)
+      : honorPerPiece === undefined
+        ? null
+        : honorPerPiece * part.qty;
+  // Only a take is limited by the balance; a deposit only ever adds to it.
+  const cannotPay = (amount: number | null) =>
+    mode === "take" &&
+    amount !== null &&
+    honorBalance !== undefined &&
+    amount > honorBalance;
 
   return (
     <div className='flex flex-col gap-7 rounded-lg bg-zinc-900 p-6'>
@@ -89,10 +120,26 @@ export const PartAmountCard = ({
         />
       </div>
 
+      {honor !== null && (
+        <p className='flex items-center justify-center gap-2 text-xs tabular-nums text-zinc-400'>
+          <HonorMark size={18} />
+          {mode === "deposit" ? "earns" : "costs"}{" "}
+          <span className='font-bold text-purple-300'>{honor}</span> honor
+          {mode === "take" && honorBalance !== undefined && (
+            <span
+              className={cn(
+                cannotPay(honor) ? "text-orange-400" : "text-zinc-500",
+              )}>
+              · you have {honorBalance.toLocaleString()}
+            </span>
+          )}
+        </p>
+      )}
+
       <div className='flex flex-col gap-2'>
         <button
           onClick={() => onConfirm(qty)}
-          disabled={busy}
+          disabled={busy || cannotPay(honor)}
           className={cn(
             confirmButtonClass,
             "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25",
@@ -103,7 +150,7 @@ export const PartAmountCard = ({
         {qty !== part.qty && (
           <button
             onClick={() => onConfirm(part.qty)}
-            disabled={busy}
+            disabled={busy || cannotPay(honorAll)}
             className={minorButtonClass}>
             {verb} all {part.qty}
           </button>

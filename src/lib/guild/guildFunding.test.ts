@@ -1,3 +1,4 @@
+import { honorForTokens } from "feature/guilds/utils/guildHonor.utils";
 import {
   GUILD_MAX_SEAT_UPGRADES,
   GUILD_SEAT_COST_STEP,
@@ -215,5 +216,11 @@ describe("fundUpgrade", () => {
       status: 409,
     });
     expect(spentBy("ann")).toBe(0);
+  });
+
+  it("credits honor for the tokens put in, at the rate", async () => {
+    await fundUpgrade(session("ann"), "seats", 2);
+
+    expect(guild().honor.ann).toEqual({ earned: honorForTokens(2) });
   });
 });

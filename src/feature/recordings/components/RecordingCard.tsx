@@ -162,6 +162,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
             userName={recording.userDisplayName || "?"}
             avatarUrl={recording.userAvatarUrl}
             lvl={recording.userAvatarFrame}
+            guildBadge={recording.userGuildBadge}
             size='xs'
             nameClassName='text-xs font-medium text-zinc-300'
           />

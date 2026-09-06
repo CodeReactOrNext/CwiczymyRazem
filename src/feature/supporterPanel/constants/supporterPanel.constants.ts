@@ -124,28 +124,5 @@ export const GUILD_STASH_ROW_COST_STEP = 2;
  */
 export const GUILD_MAX_STASH_UPGRADES = 8;
 
-/**
- * Taking on a harder week, and what the first step up costs the guild.
- *
- * Paid out of the guild's own Fame (see `guildTreasury.utils.ts`), not out of
- * tokens — a harder practice week is bought with the currency practice earns,
- * so a roster of players who have never donated can still reach the top of the
- * ladder. The price rises with every step for the same reason seats do: a tier
- * the whole guild saved for is a different thing from one the richest member
- * bought on a whim.
- *
- * The first tier is about a case pull each in a six-strong guild, and pays
- * itself back in about three weeks of the guild actually clearing it.
- */
-export const GUILD_CHALLENGE_TIER_COST = 500;
-export const GUILD_CHALLENGE_TIER_COST_STEP = 800;
-
-/**
- * How far the ladder goes. Four tiers in total counting the free one, and the
- * last asks six sessions a week of every member — past that the target stops
- * being a challenge and starts being a reason to leave the guild.
- */
-export const GUILD_MAX_CHALLENGE_TIERS = 3;
-
 export const IDEA_TITLE_MAX = 90;
 export const IDEA_DESCRIPTION_MAX = 600;

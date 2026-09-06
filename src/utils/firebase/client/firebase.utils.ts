@@ -1,3 +1,4 @@
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
 import {
   createUserWithEmailAndPassword,
@@ -213,6 +214,8 @@ export interface UserTooltipData {
   selectedGuitar?: number | string;
   selectedGuitarYear?: number;
   selectedGuitarCountry?: string;
+  /** The guild kit this player wears, if they are in a guild. */
+  guildBadge?: GuildBadge;
   statistics: {
     totalPracticeTime: number;
     totalPoints: number;
@@ -254,6 +257,7 @@ export const firebaseGetUserTooltipData = async (
       selectedGuitar: userData.selectedGuitar,
       selectedGuitarYear: userData.selectedGuitarYear,
       selectedGuitarCountry: userData.selectedGuitarCountry,
+      guildBadge: userData.guildBadge,
       statistics: {
         totalPracticeTime:
           userData.statistics.time.creativity +

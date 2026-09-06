@@ -1,5 +1,7 @@
-import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
+import {
+  GuildSpendPanel,
+  PledgeButton,
+} from "feature/guilds/components/GuildSpendPanel";
 import type {
   GuildMember,
   GuildTreasury,
@@ -11,11 +13,12 @@ import type { ReactNode } from "react";
  * The guild's own Fame: what it holds, who put it there, and the way to add to
  * it.
  *
- * Deliberately not the fund bar. That bar is a pot with one destination and it
- * buys itself the moment it fills; this is a balance the guild is sitting on,
- * so the bar here is a *goal* — what the next thing costs — rather than a
- * purchase in progress, and crossing it changes nothing until somebody decides
- * to spend.
+ * Deliberately not an upgrade pot. That pot has one destination and buys
+ * itself the moment it fills; this is a balance the guild is sitting on, and
+ * the bar here — when there is one — is a *quest* the balance counts towards,
+ * not a purchase in progress. Drawn as the same `GuildSpendPanel` as the pots,
+ * in Fame's own amber, so it reads as "money goes in here" at a glance and as
+ * "not a token upgrade" a moment later.
  *
  * Amounts are offered rather than typed, because the useful ones are the round
  * handful, everything you have, and exactly what the guild is still short —
@@ -72,6 +75,7 @@ export const GuildTreasuryPanel = ({
   members,
   fame,
   goal,
+  saved,
   busy,
   onDeposit,
   action,
@@ -82,116 +86,78 @@ export const GuildTreasuryPanel = ({
   members: GuildMember[];
   /** The caller's own Fame — a deposit comes out of it. */
   fame: number;
-  /** What the guild is saving towards, if there is anything left to buy. */
+  /** What the guild is saving towards, if there is anything to save for. */
   goal: { label: string; cost: number } | null;
+  /**
+   * What counts towards the goal, when it is not the balance — a quest counts
+   * everything ever put in, which outlives whatever an older guild once spent.
+   */
+  saved?: number;
   busy: boolean;
   onDeposit: (fame: number) => void;
-  /** The control that spends the balance, for whoever is allowed to. */
+  /** Whatever acts on the balance, for whoever is allowed to. */
   action?: ReactNode;
   className?: string;
 }) => {
-  const short = goal ? Math.max(0, goal.cost - treasury.fame) : 0;
+  const towards = saved ?? treasury.fame;
+  const short = goal ? Math.max(0, goal.cost - towards) : 0;
   const amounts = offers(fame, short);
-  const percent = goal
-    ? Math.min(100, Math.round((treasury.fame / goal.cost) * 100))
-    : 100;
 
   return (
-    <section
-      className={cn("space-y-4 rounded-lg bg-zinc-900/40 p-6", className)}>
-      <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2'>
-        <div>
-          <h2 className='text-sm font-bold text-zinc-200'>
-            The guild&apos;s Fame
-          </h2>
-          <p className='mt-1 flex items-baseline gap-2'>
-            <span className='text-2xl font-bold tabular-nums text-amber-400'>
-              {treasury.fame.toLocaleString()}
-            </span>
-            {treasury.spent > 0 && (
-              <span className='text-xs text-zinc-500'>
-                {treasury.spent.toLocaleString()} spent so far
-              </span>
-            )}
-          </p>
-        </div>
+    <GuildSpendPanel
+      currency='fame'
+      title="The guild's Fame"
+      blurb={
+        goal ? (
+          <>
+            Counting towards{" "}
+            <span className='font-semibold text-zinc-200'>{goal.label}</span>.
+          </>
+        ) : (
+          "Counts towards the guild's quests, never spent."
+        )
+      }
+      have={goal ? towards : treasury.fame}
+      need={goal ? goal.cost : null}
+      className={className}>
+      {/* One row: who has already filled it on the left, the ways to put in
+          on the right — `ml-auto` rather than `justify-between` so the
+          buttons still land on the right with nobody having paid in yet. */}
+      <div className='flex flex-wrap items-center gap-3'>
+        <Depositors treasury={treasury} members={members} />
 
-        <p className='text-right text-xs text-zinc-500'>
-          {goal ? (
-            <>
-              <span className='font-semibold text-zinc-300'>{goal.label}</span>{" "}
-              costs{" "}
-              <span className='tabular-nums'>{goal.cost.toLocaleString()}</span>
-              {short > 0 && (
-                <>
-                  {" · "}
-                  <span className='tabular-nums text-zinc-400'>
-                    {short.toLocaleString()} to go
-                  </span>
-                </>
-              )}
-            </>
-          ) : (
-            "Nothing left to save for"
-          )}
-        </p>
-      </div>
-
-      {goal && (
-        <div
-          role='progressbar'
-          aria-valuenow={Math.min(treasury.fame, goal.cost)}
-          aria-valuemin={0}
-          aria-valuemax={goal.cost}
-          aria-label={`${goal.label} — ${treasury.fame} of ${goal.cost} Fame saved`}
-          className='h-2 overflow-hidden rounded-full bg-zinc-800/70'>
-          <div
-            className={cn(
-              "h-full rounded-full transition-[width] duration-500",
-              short === 0 ? "bg-emerald-400" : "bg-amber-400/80",
-            )}
-            style={{ width: `${percent}%` }}
-          />
-        </div>
-      )}
-
-      <div className='flex flex-wrap items-center gap-2'>
         {amounts.length === 0 ? (
-          <p className='text-xs text-zinc-500'>
-            Nothing in your own Fame to put in this time.
+          <p className='ml-auto text-xs text-zinc-500'>
+            Nothing in your own Fame this time.
           </p>
         ) : (
-          <>
-            <span className='text-xs text-zinc-500'>Put in</span>
+          <div
+            title={`You have ${fame.toLocaleString()} Fame`}
+            className='ml-auto flex flex-wrap items-center justify-end gap-2'>
             {amounts.map((amount) => (
-              <Button
+              <PledgeButton
                 key={amount}
-                size='sm'
-                variant='ghost'
+                currency='fame'
+                amount={amount}
+                finishes={amount === short && short > 0}
                 disabled={busy}
                 onClick={() => onDeposit(amount)}
-                className='text-amber-300 hover:text-amber-200'>
-                <span className='flex items-center gap-1.5'>
-                  <img
-                    src='/images/coin.png'
-                    alt=''
-                    className='h-4 w-4 object-contain'
-                  />
-                  {amount.toLocaleString()}
-                  {amount === short && short > 0 && " · finish it"}
-                </span>
-              </Button>
+              />
             ))}
-            <span className='text-xs text-zinc-600'>
-              of your {fame.toLocaleString()}
-            </span>
-          </>
+          </div>
         )}
       </div>
 
       {action}
 
-      <Depositors treasury={treasury} members={members} />
-    </section>
+      {goal && treasury.fame !== towards && (
+        <p className='text-xs text-zinc-500'>
+          {treasury.fame.toLocaleString()} Fame in the bank right now
+          {treasury.spent > 0 &&
+            `, ${treasury.spent.toLocaleString()} spent back when it could be`}
+          .
+        </p>
+      )}
+    </GuildSpendPanel>
   );
 };

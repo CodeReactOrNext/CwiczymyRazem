@@ -8,8 +8,8 @@ interface GuildCrestProps {
   /** Worn in its place when it has not — a guild always has a tag. */
   tag: string;
   /**
-   * The guild's bought colour. Takes over from `isMine` when there is one: a
-   * guild that has paid for a colour should be that colour on everybody's
+   * The guild's chosen colour. Takes over from `isMine` when there is one: a
+   * guild that has picked a colour should be that colour on everybody's
    * screen, not cyan on its own members' and grey on everyone else's.
    */
   accentHex?: string | null;
@@ -22,6 +22,9 @@ interface GuildCrestProps {
  * The square a guild is recognised by: its picture, or its tag when there is
  * none. One component so the card, the panel and anything after them cannot
  * disagree about what a guild looks like.
+ *
+ * The square is solid. It hangs half over the guild's banner, and a see-through
+ * one there would print the pattern straight through the initials.
  */
 export const GuildCrest = ({
   logo,
@@ -33,14 +36,13 @@ export const GuildCrest = ({
   <span
     // The colour is skipped entirely behind a picture — a tint under an opaque
     // image is paint nobody sees.
-    style={accentHex && !logo ? crestStyle(accentHex) : undefined}
+    style={
+      logo
+        ? undefined
+        : crestStyle(accentHex ?? (isMine ? "#22d3ee" : "#a1a1aa"))
+    }
     className={cn(
-      "flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg text-[11px] font-black tracking-wider",
-      !accentHex &&
-        (isMine
-          ? "bg-cyan-500/15 text-cyan-300"
-          : "bg-zinc-800/60 text-zinc-400"),
-      accentHex && "bg-zinc-800/60",
+      "flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-zinc-900 text-[11px] font-black tracking-wider",
       className,
     )}>
     {logo ? (

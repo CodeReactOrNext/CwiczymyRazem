@@ -606,6 +606,8 @@ export const selectUserName = (state: RootState) =>
 export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectUserAvatar = (state: RootState) =>
   state.user.userInfo?.avatar;
+export const selectUserGuildBadge = (state: RootState) =>
+  state.user.userInfo?.guildBadge;
 export const selectCurrentActivity = (state: RootState) => state.user.currentActivity;
 export const selectDailyQuest = (state: RootState) =>
   state.user.currentUserStats?.dailyQuest;

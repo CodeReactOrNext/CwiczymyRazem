@@ -1,5 +1,6 @@
 import { CHAT_LIMIT_MESSAGE } from "feature/chat/chat.setting";
 import type { ChatMessageType } from "feature/chat/types/chat.types";
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import {
   addDoc,
   arrayRemove,
@@ -52,6 +53,7 @@ export const sendChatMessage = async (
   username: string,
   avatar: string | undefined,
   lvl: number,
+  guildBadge: GuildBadge | null | undefined,
   chatPath: string = GLOBAL_CHAT_PATH
 ) => {
   if (!message.trim()) return undefined
@@ -63,6 +65,7 @@ export const sendChatMessage = async (
     timestamp: serverTimestamp(),
     userPhotoURL: avatar,
     lvl,
+    guildBadge: guildBadge ?? null,
     likes: [],
   });
 };

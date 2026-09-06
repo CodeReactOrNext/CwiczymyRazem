@@ -1,3 +1,4 @@
+import type { GuildBadge } from "feature/guilds/types/guild.types";
 import type { Recording } from "feature/recordings/types/types";
 import {
   collection,
@@ -37,6 +38,7 @@ const withAuthorAvatars = async (recordings: Recording[]) => {
     avatar: string | null;
     lvl: number;
     displayName: string | null;
+    guildBadge: GuildBadge | null;
   };
   const authors = new Map<string, AuthorProfile>();
 
@@ -54,6 +56,7 @@ const withAuthorAvatars = async (recordings: Recording[]) => {
           avatar: data.avatar || null,
           lvl: data.statistics?.lvl ?? 0,
           displayName: data.displayName || null,
+          guildBadge: data.guildBadge ?? null,
         });
       });
     });
@@ -71,6 +74,10 @@ const withAuthorAvatars = async (recordings: Recording[]) => {
       userAvatarUrl: recording.userAvatarUrl || author.avatar,
       userAvatarFrame: recording.userAvatarFrame ?? author.lvl,
       userDisplayName: recording.userDisplayName || author.displayName,
+      // Taken from the author document rather than frozen onto the recording:
+      // this batch is already being read, and a tag that went stale the moment
+      // somebody changed guilds is worse than no tag at all.
+      userGuildBadge: author.guildBadge,
     };
   });
 };

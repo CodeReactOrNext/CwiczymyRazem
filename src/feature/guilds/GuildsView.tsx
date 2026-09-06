@@ -7,20 +7,20 @@ import {
 import { cn } from "assets/lib/utils";
 import Chat from "feature/chat/Chat";
 import { guildChatPath } from "feature/chat/services/chatService";
+import { GuildBanner } from "feature/guilds/components/GuildBanner";
 import { GuildBrowser } from "feature/guilds/components/GuildBrowser";
-import { GuildChallengeTab } from "feature/guilds/components/GuildChallengeTab";
 import { GuildCosmeticsTab } from "feature/guilds/components/GuildCosmeticsTab";
-import { GuildCrest } from "feature/guilds/components/GuildCrest";
+import { GuildCover } from "feature/guilds/components/GuildCover";
 import { GuildMembersTab } from "feature/guilds/components/GuildMembersTab";
+import { GuildQuestsTab } from "feature/guilds/components/GuildQuestsTab";
 import { GuildStashTab } from "feature/guilds/components/GuildStashTab";
-import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
+import { GuildUpgradesTab } from "feature/guilds/components/GuildUpgradesTab";
 import { useGuilds } from "feature/guilds/hooks/useGuilds";
 import type { Guild } from "feature/guilds/types/guild.types";
-import { accentHex } from "feature/guilds/utils/guildCosmetics.utils";
 import type { LucideIcon } from "lucide-react";
 import {
   Boxes,
-  Flame,
+  Coins,
   Lock,
   MessageSquare,
   Palette,
@@ -30,7 +30,14 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-type GuildTab = "browse" | "members" | "chat" | "stash" | "challenge" | "kit";
+type GuildTab =
+  | "browse"
+  | "members"
+  | "chat"
+  | "stash"
+  | "quests"
+  | "upgrades"
+  | "kit";
 
 const TABS: {
   id: GuildTab;
@@ -49,7 +56,8 @@ const TABS: {
   { id: "members", label: "Members", icon: Users, needsGuild: true },
   { id: "chat", label: "Chat", icon: MessageSquare, needsGuild: true },
   { id: "stash", label: "Stash", icon: Boxes, needsGuild: true },
-  { id: "challenge", label: "Challenge", icon: Target, needsGuild: true },
+  { id: "quests", label: "Quests", icon: Target, needsGuild: true },
+  { id: "upgrades", label: "Upgrades", icon: Coins, needsGuild: true },
   {
     id: "kit",
     label: "Kit",
@@ -91,54 +99,62 @@ const NeedsAGuild = ({
 );
 
 /**
- * The one line that says which guild this is: crest, name, tag, and the two
- * numbers a member checks on the way in — seats taken and the weekly streak.
+ * The top of the page for a member: the guild's own card, at full size — its
+ * banner across the top with the level ring in its corner, the crest hanging
+ * off it, and the seats taken beside the name.
  */
 const GuildHeader = ({ guild }: { guild: Guild }) => (
-  <>
-    <GuildCrest
-      logo={guild.logo}
-      tag={guild.tag}
-      accentHex={accentHex(guild.cosmetics)}
-      isMine
-      className='h-12 w-12 text-sm'
-    />
-
-    <div className='min-w-0 flex-1'>
-      <h1 className='flex flex-wrap items-center gap-2 text-2xl font-bold text-zinc-100'>
-        {guild.name}
-        <GuildTagBadge
-          badge={{
-            guildId: guild.id,
-            tag: guild.tag,
-            accent: guild.cosmetics.accent,
-            frame: guild.cosmetics.frame,
-          }}
-          size='md'
-          linked={false}
-        />
-      </h1>
-      <p className='mt-1 text-sm text-zinc-400'>
+  <GuildCover
+    guild={guild}
+    size='lg'
+    className='pb-6 sm:px-6'
+    meta={
+      <p className='text-sm text-zinc-400'>
         {guild.description || `Founded by ${guild.founderName}.`}
       </p>
-    </div>
-
-    <div className='flex items-center gap-4 text-sm'>
-      <span
-        title={`${guild.memberCount} of ${guild.memberLimit} seats taken`}
-        className='inline-flex items-center gap-1.5 tabular-nums text-zinc-400'>
-        <Users size={15} className='text-zinc-500' />
-        {guild.memberCount}
-        <span className='text-zinc-500'>/ {guild.memberLimit}</span>
-      </span>
-      {guild.challengeStreak > 0 && (
+    }
+    actions={
+      <span className='flex items-center gap-4 text-sm'>
         <span
-          title={`${guild.challengeStreak} weeks cleared in a row`}
-          className='inline-flex items-center gap-1.5 font-bold tabular-nums text-orange-400'>
-          <Flame size={15} />
-          {guild.challengeStreak}
+          title={`${guild.memberCount} of ${guild.memberLimit} seats taken`}
+          className='inline-flex items-center gap-1.5 tabular-nums text-zinc-400'>
+          <Users size={15} className='text-zinc-500' />
+          {guild.memberCount}
+          <span className='text-zinc-500'>/ {guild.memberLimit}</span>
         </span>
-      )}
+      </span>
+    }
+  />
+);
+
+/**
+ * The same shape for somebody not in a guild yet, so the page does not change
+ * height the moment they join one: a strip in the app's own cyan, and a shield
+ * where the crest will go.
+ */
+const NoGuildHeader = ({ isLoading }: { isLoading: boolean }) => (
+  <>
+    <GuildBanner
+      bannerId='banner:wash'
+      hex='#22d3ee'
+      className='h-28 sm:h-40'
+    />
+    <div className='px-5 pb-6 sm:px-6'>
+      <div className='-mt-12 flex items-start gap-5 sm:-mt-14'>
+        <span className='flex h-24 w-24 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-cyan-400 sm:h-32 sm:w-32'>
+          <Shield size={40} />
+        </span>
+        <div className='min-w-0 flex-1 pt-14 sm:pt-16'>
+          <h1 className='text-2xl font-bold text-zinc-100'>Guilds</h1>
+          {isLoading ? (
+            <span className='mt-2 block h-4 w-64 max-w-full animate-pulse rounded bg-zinc-800/60' />
+          ) : (
+            <p className='mt-1 text-sm text-zinc-400'>
+              Find people to practise alongside. Joining is free.
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   </>
 );
@@ -159,25 +175,11 @@ export const GuildsView = () => {
 
   return (
     <div className='space-y-8 p-4 sm:p-6 md:p-10'>
-      <header className='flex flex-wrap items-center gap-x-5 gap-y-4 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+      <header className='overflow-hidden rounded-lg bg-zinc-900/40'>
         {myGuild ? (
           <GuildHeader guild={myGuild} />
         ) : (
-          <>
-            <span className='flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
-              <Shield size={22} />
-            </span>
-            <div className='min-w-0 flex-1'>
-              <h1 className='text-2xl font-bold text-zinc-100'>Guilds</h1>
-              {isLoading ? (
-                <span className='mt-2 block h-4 w-64 max-w-full animate-pulse rounded bg-zinc-800/60' />
-              ) : (
-                <p className='mt-1 text-sm text-zinc-400'>
-                  Find people to practise alongside. Joining is free.
-                </p>
-              )}
-            </div>
-          </>
+          <NoGuildHeader isLoading={isLoading} />
         )}
       </header>
 
@@ -212,10 +214,7 @@ export const GuildsView = () => {
 
         <TabsContent value='members' className='mt-0'>
           {myGuild ? (
-            <GuildMembersTab
-              guild={myGuild}
-              challenge={data?.challenge ?? null}
-            />
+            <GuildMembersTab guild={myGuild} board={data?.quests ?? null} />
           ) : (
             <NeedsAGuild
               what='A roster is the people you are in it with, and you are not in one yet.'
@@ -239,11 +238,7 @@ export const GuildsView = () => {
 
         <TabsContent value='stash' className='mt-0'>
           {myGuild && data ? (
-            <GuildStashTab
-              enabled
-              guild={myGuild}
-              tokensLeft={data.tokensLeft}
-            />
+            <GuildStashTab enabled guild={myGuild} />
           ) : (
             <NeedsAGuild
               what='The shelf belongs to a guild, and you are not in one.'
@@ -252,17 +247,28 @@ export const GuildsView = () => {
           )}
         </TabsContent>
 
-        <TabsContent value='challenge' className='mt-0'>
-          {myGuild && data?.challenge ? (
-            <GuildChallengeTab
+        <TabsContent value='quests' className='mt-0'>
+          {myGuild && data?.quests ? (
+            <GuildQuestsTab board={data.quests} />
+          ) : (
+            <NeedsAGuild
+              what='Quests are cleared by a guild, and you are not in one yet.'
+              onBrowse={() => setTab("browse")}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value='upgrades' className='mt-0'>
+          {myGuild && data ? (
+            <GuildUpgradesTab
               guild={myGuild}
-              challenge={data.challenge}
+              board={data.quests}
               fame={data.fame}
-              isFounder={data.isFounder}
+              tokensLeft={data.tokensLeft}
             />
           ) : (
             <NeedsAGuild
-              what='A challenge needs a guild to run it with.'
+              what='Upgrades are paid for by a guild, and you are not in one yet.'
               onBrowse={() => setTab("browse")}
             />
           )}
