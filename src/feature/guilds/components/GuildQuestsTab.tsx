@@ -84,11 +84,11 @@ const Payout = ({
           </p>
         </>
       ) : (
-        <p className='max-w-xs text-xs text-zinc-500'>
-          {taken > 0
-            ? "Every quest you were here for is taken. The next one lands here."
-            : "When the guild clears a quest, your share lands here to take."}
-        </p>
+        taken > 0 && (
+          <p className='max-w-xs text-xs text-zinc-500'>
+            Every quest you were here for is taken. The next one lands here.
+          </p>
+        )
       )}
     </div>
   );
@@ -135,8 +135,8 @@ const LevelCard = ({
               Every quest cleared is one level up, and{" "}
               <span className='font-bold text-amber-400'>
                 +{board.chapter.reward} Fame
-              </span>{" "}
-              for every member on the roster.
+              </span>
+              .
             </p>
           </div>
         </div>

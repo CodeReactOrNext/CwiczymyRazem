@@ -104,7 +104,7 @@ export const GuildCover = ({
           96px on a card, 128px at the top of the page, half of it hanging
           over the banner. The paddings under it keep the name just below the
           banner's edge at either size. */}
-      <div className={cn("px-5", className)}>
+      <div className={cn("relative z-10 px-5", className)}>
         <div
           className={cn(
             "flex flex-col gap-x-5 gap-y-3 sm:flex-row sm:items-start sm:justify-between",

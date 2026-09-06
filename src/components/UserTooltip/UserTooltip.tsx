@@ -160,7 +160,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                     {userData.displayName}
                     {/* The card is portalled out of whatever row opened it, so
                         the tag may carry its own link here. */}
-                    <GuildTagBadge badge={userData.guildBadge} />
+                    <GuildTagBadge badge={userData.guildBadge} tone='light' />
                   </h3>
                   {supportMember && (
                     <SupportBadge member={supportMember} tone='light' />

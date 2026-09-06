@@ -5,6 +5,7 @@ import {
 import {
   bannerLook,
   crestStyle,
+  darken,
   frameStyle,
   lighten,
   mute,
@@ -43,6 +44,18 @@ describe("lighten", () => {
 
   it("falls back to grey for a bad colour", () => {
     expect(lighten("orange", 0)).toBe("#a1a1aa");
+  });
+});
+
+describe("darken", () => {
+  it("pulls the colour towards black by the amount asked", () => {
+    expect(darken("#ffffff", 1)).toBe("#000000");
+    expect(darken("#ffffff", 0.5)).toBe("#808080");
+    expect(darken("#fb923c", 0)).toBe("#fb923c");
+  });
+
+  it("falls back to grey for a bad colour", () => {
+    expect(darken("orange", 0)).toBe("#a1a1aa");
   });
 });
 
@@ -158,5 +171,30 @@ describe("frameStyle and crestStyle", () => {
   it("fall back to grey rather than to an unset colour", () => {
     expect(frameStyle("frame:ring", "").color).toBe("#a1a1aa");
     expect(crestStyle("").color).toBe("#a1a1aa");
+  });
+
+  it("darkens every mark for the light tone, so pale accents stay readable on white", () => {
+    for (const frame of GUILD_FRAMES) {
+      const style = frameStyle(frame.id, "#e4e4e7", "light");
+      const expectedMark =
+        frame.id === "frame:solid" ? "#09090b" : darken("#e4e4e7", 0.35);
+      expect(style.color).toBe(expectedMark);
+    }
+  });
+
+  it("paints frame:double's gap in white on the light tone instead of the page's black", () => {
+    const dark = frameStyle("frame:double", "#a78bfa", "dark");
+    const light = frameStyle("frame:double", "#a78bfa", "light");
+    expect(String(dark.boxShadow)).toContain("#09090b");
+    expect(String(light.boxShadow)).toContain("#ffffff");
+    expect(String(light.boxShadow)).not.toContain("#09090b");
+  });
+
+  it("defaults to the dark tone, leaving every existing call site unchanged", () => {
+    for (const frame of GUILD_FRAMES) {
+      expect(frameStyle(frame.id, "#a78bfa")).toEqual(
+        frameStyle(frame.id, "#a78bfa", "dark"),
+      );
+    }
   });
 });

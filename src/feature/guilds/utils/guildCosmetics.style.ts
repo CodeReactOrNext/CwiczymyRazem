@@ -64,6 +64,20 @@ export const lighten = (hex: string, amount: number): string => {
 };
 
 /**
+ * The colour pulled towards black — what an accent becomes as text.
+ *
+ * Accents are picked to glow on the app's near-black surfaces, which puts most
+ * of them in the pale end of the wheel (zinc-200, yellow-400 and lighter). The
+ * same hex as text on a white card is barely there, so `frameStyle`'s `light`
+ * tone reaches for this instead of the raw accent.
+ */
+export const darken = (hex: string, amount: number): string => {
+  const t = clamp(amount);
+  const [r, g, b] = channels(hex);
+  return toHex(r * (1 - t), g * (1 - t), b * (1 - t));
+};
+
+/**
  * The colour taken down towards its own grey: what a large area of it should
  * be, so that it sits on the card instead of shouting from it.
  */
@@ -220,24 +234,36 @@ export const bannerLook = (bannerId: string, hex: string): BannerLook => {
  * exactly the size it was — a real border would nudge every name on the
  * leaderboard sideways by two pixels the moment a guild bought one.
  */
-export const frameStyle = (frameId: string, hex: string): CSSProperties => {
+export const frameStyle = (
+  frameId: string,
+  hex: string,
+  /** "light" is for the one white surface a tag lands on (the profile hover card). */
+  tone: "dark" | "light" = "dark",
+): CSSProperties => {
   const colour = safe(hex);
+  // Every mark below except frame:solid's cutout letters is drawn straight in
+  // the accent — fine on the app's dark cards, unreadable on a white one.
+  const mark = tone === "light" ? darken(colour, 0.35) : colour;
+  // frame:double's gap is painted in the surface it sits on, so it reads as a
+  // gap whatever the badge lands on: near-black on the app's dark pages,
+  // white on the light tooltip card.
+  const gap = tone === "light" ? "#ffffff" : "#09090b";
 
   switch (frameId) {
     case "frame:ring":
-      return { color: colour, boxShadow: `inset 0 0 0 1px ${tint(hex, 0.45)}` };
+      return { color: mark, boxShadow: `inset 0 0 0 1px ${tint(hex, 0.45)}` };
     case "frame:double":
       // Two rings a pixel apart, the gap painted in the page's own black so
       // it reads as a gap whatever the badge is sitting on.
       return {
-        color: colour,
-        boxShadow: `inset 0 0 0 1px ${tint(hex, 0.6)}, inset 0 0 0 2px #09090b, inset 0 0 0 3px ${tint(hex, 0.4)}`,
+        color: mark,
+        boxShadow: `inset 0 0 0 1px ${tint(hex, 0.6)}, inset 0 0 0 2px ${gap}, inset 0 0 0 3px ${tint(hex, 0.4)}`,
       };
     case "frame:plate":
-      return { color: colour, backgroundColor: tint(hex, 0.16) };
+      return { color: mark, backgroundColor: tint(hex, 0.16) };
     case "frame:heavy":
       return {
-        color: colour,
+        color: mark,
         backgroundColor: tint(hex, 0.18),
         boxShadow: `inset 0 0 0 1px ${tint(hex, 0.55)}`,
       };
@@ -248,30 +274,30 @@ export const frameStyle = (frameId: string, hex: string): CSSProperties => {
       return { color: "#09090b", backgroundColor: colour };
     case "frame:pill":
       return {
-        color: colour,
+        color: mark,
         backgroundColor: tint(hex, 0.16),
         borderRadius: 9999,
       };
     case "frame:sunken":
       // Darker than any row it sits on, so it reads as a slot cut into the
       // row rather than a chip laid on it.
-      return { color: colour, backgroundColor: "rgba(0, 0, 0, 0.45)" };
+      return { color: mark, backgroundColor: "rgba(0, 0, 0, 0.45)" };
     case "frame:brackets":
       return {
-        color: colour,
+        color: mark,
         backgroundColor: tint(hex, 0.08),
-        boxShadow: `inset 2px 0 0 0 ${colour}, inset -2px 0 0 0 ${colour}`,
+        boxShadow: `inset 2px 0 0 0 ${mark}, inset -2px 0 0 0 ${mark}`,
       };
     case "frame:dot":
       // The dot is painted into the background and the text pushed past it,
       // so the badge stays one span and one line of markup wherever it lands.
       return {
-        color: colour,
-        backgroundImage: `radial-gradient(circle at 7px 50%, ${colour} 0 2px, transparent 2.75px)`,
+        color: mark,
+        backgroundImage: `radial-gradient(circle at 7px 50%, ${mark} 0 2px, transparent 2.75px)`,
         paddingLeft: 14,
       };
     default:
-      return { color: colour };
+      return { color: mark };
   }
 };
 

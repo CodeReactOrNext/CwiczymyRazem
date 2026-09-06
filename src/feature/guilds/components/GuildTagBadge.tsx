@@ -23,6 +23,8 @@ interface GuildTagBadgeProps {
   size?: "sm" | "md";
   /** Links to the guilds page unless this is switched off (inside another link). */
   linked?: boolean;
+  /** "light" is for the one white surface a tag lands on (the profile hover card). */
+  tone?: "dark" | "light";
   className?: string;
 }
 
@@ -30,6 +32,7 @@ export const GuildTagBadge = ({
   badge,
   size = "sm",
   linked = true,
+  tone = "dark",
   className,
 }: GuildTagBadgeProps) => {
   if (!badge?.tag) return null;
@@ -45,7 +48,7 @@ export const GuildTagBadge = ({
           ? `Guild: ${badge.tag} · level ${badge.level}`
           : `Guild: ${badge.tag}`
       }
-      style={frameStyle(badge.frame, hex)}
+      style={frameStyle(badge.frame, hex, tone)}
       className={cn(
         "inline-flex shrink-0 items-center rounded font-black tracking-wider",
         size === "sm" ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-[11px]",

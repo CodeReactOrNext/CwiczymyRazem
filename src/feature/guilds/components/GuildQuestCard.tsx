@@ -177,7 +177,6 @@ export const GuildQuestCard = ({ quest }: { quest: GuildQuestProgress }) => {
                 )}>
                 <FameCoin size={14} />+{quest.reward} Fame
               </p>
-              <p className='mt-1 text-[11px] text-zinc-500'>for every member</p>
             </div>
           </div>
 
