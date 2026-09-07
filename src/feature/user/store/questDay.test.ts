@@ -43,6 +43,16 @@ describe("isPreMigrationQuestDay", () => {
     expect(isPreMigrationQuestDay("2026-09-02", "2026-09-03", LA_EVENING)).toBe(false);
   });
 
+  it("does not mistake last night's set for one held under the old key", () => {
+    // 00:30 on 7 September in Warsaw, still 6 September in UTC: the quest the
+    // player finished last night carries a key that reads as today's UTC day.
+    const pastWarsawMidnight = new Date("2026-09-06T22:30:00.000Z");
+
+    expect(isPreMigrationQuestDay("2026-09-06", "2026-09-07", pastWarsawMidnight)).toBe(
+      false,
+    );
+  });
+
   it("says nothing about a quest that already carries today's key", () => {
     expect(isPreMigrationQuestDay("2026-09-03", "2026-09-03", LA_EVENING)).toBe(false);
   });

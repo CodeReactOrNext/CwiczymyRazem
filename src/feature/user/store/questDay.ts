@@ -33,15 +33,21 @@ export const getQuestDayKey = (
  * anyone not on UTC names a different day than `getQuestDayKey` does. Read
  * literally, every one of them is "from another day" — so a player mid-set
  * would have it torn down and redrawn, losing whatever progress was already in
- * it. A stored key that is today's *UTC* day is by definition the set the
- * player is holding, so it gets re-stamped with their own day instead.
+ * it. A stored key that is today's *UTC* day is the set the player is holding,
+ * so it gets re-stamped with their own day instead.
  *
- * Only reachable while pre-migration quests exist: once a quest carries a
- * local-day key, it equals today's UTC key only in zones where the two days
- * coincide anyway, and the second condition then rules it out.
+ * Only ever true where the UTC day runs *ahead* of the player's own — the
+ * Americas, the zones the UTC key actually broke, where a set drawn this
+ * evening is stamped with tomorrow. East of Greenwich the UTC key runs behind
+ * instead: between the player's midnight and UTC midnight it names the day they
+ * have just finished, and a quest carrying that key is not the set they are
+ * holding but the one they completed last night. Re-stamping it handed those
+ * players their own finished set back as today's quest, reward already
+ * claimed (#814) — so a key that reads as earlier than their day is never a
+ * migration, only a quest whose day is over.
  */
 export const isPreMigrationQuestDay = (
   storedDate: string,
   questToday: string,
   date: Date = new Date()
-): boolean => storedDate !== questToday && storedDate === getServerDateKey(date);
+): boolean => storedDate > questToday && storedDate === getServerDateKey(date);
