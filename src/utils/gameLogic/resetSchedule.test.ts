@@ -64,12 +64,14 @@ describe("getResetSchedule", () => {
   });
 
   it("marks the streak as the one following the viewer's own clock", () => {
-    const local = getResetSchedule(now).filter(
-      (entry) => entry.scope === "local",
+    const practiceDay = getResetSchedule(now).find((entry) =>
+      entry.label.includes("Your practice day"),
     );
 
-    expect(local).toHaveLength(1);
-    expect(local[0].id).toBe("streak");
+    // Asserted as an instant rather than a `local` row: run from a zone whose
+    // midnight is the server's, the row merges into the daily one and the
+    // scope disappears, which says nothing about the clock it followed.
+    expect(practiceDay?.nextResetAt).toBe(getLocalDayEnd(now));
   });
 
   it("reads each boundary from the module that owns it", () => {
