@@ -203,7 +203,9 @@ const userSlice = createSlice({
 
       // The quest the player is holding right now, stamped with the UTC day
       // this key used to mean. Re-stamp it with their own day instead of
-      // drawing a new set on top of a set they are halfway through.
+      // drawing a new set on top of a set they are halfway through — never a
+      // key that reads as earlier than their day, which is last night's
+      // finished set rather than the one in front of them (see `questDay`).
       if (storedQuest && hasTasks && isPreMigrationQuestDay(storedQuest.date, today)) {
         storedQuest.date = today;
         return;
