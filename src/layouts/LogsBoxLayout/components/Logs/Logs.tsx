@@ -1507,8 +1507,9 @@ const Logs = ({
     };
   }, []); // Empty dependency array since we handle cleanup manually
 
-  // Today's donations are lifted to the front before grouping, so they open the feed instead of
-  // sinking under the evening's practice reports. Everything else keeps the order it streamed in.
+  // Donations from the last 24 hours are lifted to the front before grouping, so they open the
+  // feed instead of sinking under the evening's practice reports. Everything else keeps the order
+  // it streamed in.
   const groups = useMemo(() => {
     const { pinned, rest } = splitPinnedDonations(logs);
 

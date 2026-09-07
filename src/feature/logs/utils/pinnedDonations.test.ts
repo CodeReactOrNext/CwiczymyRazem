@@ -6,12 +6,17 @@ import { describe, expect, it } from "vitest";
 
 import type { AnyFirebaseLog } from "./groupConsecutiveLogs";
 import {
-  mergeTodayDonations,
+  mergePinnedDonations,
   pinnedDonationsSince,
   splitPinnedDonations,
 } from "./pinnedDonations";
 
-const TODAY = new Date("2026-07-09T18:00:00.000Z");
+const NOW = new Date("2026-07-09T18:00:00.000Z");
+
+/** Just inside the 24h window — last night's coffee, still owed its place at the top. */
+const LAST_NIGHT = "2026-07-08T22:00:00.000Z";
+/** Just past it. */
+const TOO_OLD = "2026-07-08T17:59:59.000Z";
 
 const donationLog = (
   overrides: Partial<FirebaseLogsDonationInterface> = {},
@@ -42,11 +47,11 @@ const songLog = (
 });
 
 describe("splitPinnedDonations", () => {
-  it("lifts today's matched donation out of the feed", () => {
+  it("lifts a recent matched donation out of the feed", () => {
     const donation = donationLog();
     const song = songLog();
 
-    const { pinned, rest } = splitPinnedDonations([song, donation], TODAY);
+    const { pinned, rest } = splitPinnedDonations([song, donation], NOW);
 
     expect(pinned).toEqual([donation]);
     expect(rest).toEqual([song]);
@@ -55,30 +60,36 @@ describe("splitPinnedDonations", () => {
   it("leaves a donation nobody was matched to where it is", () => {
     const donation = donationLog({ uid: undefined });
 
-    const { pinned, rest } = splitPinnedDonations([donation], TODAY);
+    const { pinned, rest } = splitPinnedDonations([donation], NOW);
 
     expect(pinned).toEqual([]);
     expect(rest).toEqual([donation]);
   });
 
-  it("leaves yesterday's donation where it is", () => {
-    const donation = donationLog({
-      timestamp: "2026-07-08T22:00:00.000Z",
-      data: "2026-07-08T22:00:00.000Z",
-    });
+  it("still pins last night's donation the next afternoon", () => {
+    const donation = donationLog({ timestamp: LAST_NIGHT, data: LAST_NIGHT });
 
-    const { pinned, rest } = splitPinnedDonations([donation], TODAY);
+    const { pinned, rest } = splitPinnedDonations([donation], NOW);
+
+    expect(pinned).toEqual([donation]);
+    expect(rest).toEqual([]);
+  });
+
+  it("leaves a donation older than 24h where it is", () => {
+    const donation = donationLog({ timestamp: TOO_OLD, data: TOO_OLD });
+
+    const { pinned, rest } = splitPinnedDonations([donation], NOW);
 
     expect(pinned).toEqual([]);
     expect(rest).toEqual([donation]);
   });
 
-  it("pins the four newest and drops the rest of the day's donations", () => {
+  it("pins the four newest and drops the rest", () => {
     const donations = Array.from({ length: 6 }, (_, index) =>
       donationLog({ id: `donation-${index}` }),
     );
 
-    const { pinned, rest } = splitPinnedDonations(donations, TODAY);
+    const { pinned, rest } = splitPinnedDonations(donations, NOW);
 
     expect(pinned.map((log) => log.id)).toEqual([
       "donation-0",
@@ -93,49 +104,46 @@ describe("splitPinnedDonations", () => {
     const first = songLog({ id: "song-1" });
     const second = songLog({ id: "song-2" });
 
-    const { rest } = splitPinnedDonations(
-      [first, donationLog(), second],
-      TODAY,
-    );
+    const { rest } = splitPinnedDonations([first, donationLog(), second], NOW);
 
     expect(rest).toEqual([first, second]);
   });
 });
 
-describe("mergeTodayDonations", () => {
+describe("mergePinnedDonations", () => {
   it("puts back a donation the page has scrolled past", () => {
     const donation = donationLog({ id: "donation-1" });
     const page: AnyFirebaseLog[] = [songLog({ id: "song-1" })];
 
-    const merged = mergeTodayDonations(page, [donation], TODAY);
+    const merged = mergePinnedDonations(page, [donation], NOW);
 
     expect(merged).toEqual([donation, ...page]);
-    expect(splitPinnedDonations(merged, TODAY).pinned).toEqual([donation]);
+    expect(splitPinnedDonations(merged, NOW).pinned).toEqual([donation]);
   });
 
   it("does not render a donation the page still carries twice", () => {
     const donation = donationLog({ id: "donation-1" });
     const page: AnyFirebaseLog[] = [donation, songLog({ id: "song-1" })];
 
-    expect(mergeTodayDonations(page, [donation], TODAY)).toEqual(page);
+    expect(mergePinnedDonations(page, [donation], NOW)).toEqual(page);
   });
 
   it("leaves the page untouched when there is nothing to splice in", () => {
     const page: AnyFirebaseLog[] = [songLog({ id: "song-1" })];
 
-    expect(mergeTodayDonations(page, [], TODAY)).toBe(page);
+    expect(mergePinnedDonations(page, [], NOW)).toBe(page);
   });
 
   it("ignores a donation that would not be pinned anyway", () => {
     const page: AnyFirebaseLog[] = [songLog({ id: "song-1" })];
     const anonymous = donationLog({ id: "donation-1", uid: undefined });
-    const yesterday = donationLog({
+    const expired = donationLog({
       id: "donation-2",
-      timestamp: "2026-07-08T22:00:00.000Z",
-      data: "2026-07-08T22:00:00.000Z",
+      timestamp: TOO_OLD,
+      data: TOO_OLD,
     });
 
-    expect(mergeTodayDonations(page, [anonymous, yesterday], TODAY)).toBe(page);
+    expect(mergePinnedDonations(page, [anonymous, expired], NOW)).toBe(page);
   });
 
   it("keeps the donations newest first, ahead of the page", () => {
@@ -148,10 +156,10 @@ describe("mergeTodayDonations", () => {
       timestamp: "2026-07-09T09:00:00.000Z",
     });
 
-    const merged = mergeTodayDonations<AnyFirebaseLog>(
+    const merged = mergePinnedDonations<AnyFirebaseLog>(
       [songLog()],
       [newer, older],
-      TODAY,
+      NOW,
     );
 
     expect(merged.slice(0, 2)).toEqual([newer, older]);
@@ -159,14 +167,14 @@ describe("mergeTodayDonations", () => {
 });
 
 describe("pinnedDonationsSince", () => {
-  it("bounds the query at the start of the pinned day", () => {
-    expect(pinnedDonationsSince(TODAY)).toBe("2026-07-09T00:00:00.000Z");
+  it("bounds the query 24h back, not at midnight", () => {
+    expect(pinnedDonationsSince(NOW)).toBe("2026-07-08T18:00:00.000Z");
   });
 
-  it("sorts before every timestamp that day and after the one before it", () => {
-    const since = pinnedDonationsSince(TODAY);
+  it("sorts before every timestamp inside the window and after every one outside it", () => {
+    const since = pinnedDonationsSince(NOW);
 
-    expect("2026-07-09T00:00:00.001Z" >= since).toBe(true);
-    expect("2026-07-08T23:59:59.999Z" >= since).toBe(false);
+    expect(LAST_NIGHT >= since).toBe(true);
+    expect(TOO_OLD >= since).toBe(false);
   });
 });
