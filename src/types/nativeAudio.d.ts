@@ -147,12 +147,43 @@ export interface AmpStartOpts {
 }
 
 /** Fired when the DSP chain (usually a NAM model too heavy for the current
- *  buffer size) fell far enough behind real time that the engine had to clear
- *  the output queue to recover — a real, audible click just happened. */
+ *  buffer size) or a stall left the output queue far enough behind real time
+ *  that the engine had to drop the backlog to recover — a real, audible click
+ *  just happened. */
 export interface AmpOverloadInfo {
   /** How much accumulated drift (ms) triggered the recovery. */
   driftMs: number;
   namEnabled: boolean;
+}
+
+/** Live health counters of the open stream since it was (re)opened — see
+ *  electron/nativeAudioEngine.js getDiagnostics. */
+export interface AmpDiagnostics {
+  frameSize: number;
+  sampleRate: number;
+  /** Hardware blocks processed. */
+  blocks: number;
+  /** Blocks whose delivery to the DSP was more than 1.5× a block period late. */
+  lateBlocks: number;
+  /** Longest gap (ms) between two consecutive blocks reaching the DSP. */
+  maxGapMs: number;
+  /** Blocks whose DSP took longer than the block's own real-time budget. */
+  overruns: number;
+  dspAvgMs: number;
+  dspMaxMs: number;
+  /** Hardware callbacks that found nothing queued to play — each one was an
+   *  audible gap. This is the number the user hears. */
+  underruns: number;
+  /** Blocks deliberately dropped to shed accumulated latency (each a small click). */
+  drops: number;
+  hardEvents: number;
+  softEvents: number;
+  /** Worst backlog seen (blocks beyond the one normally in flight). */
+  maxExcess: number;
+  queueDepth: number;
+  /** Extra blocks the engine now deliberately keeps in flight (each one block
+   *  period of latency) after repeated underruns — its automatic safety margin. */
+  safetyBlocks: number;
 }
 
 export interface NativeAmpApi {
@@ -162,6 +193,9 @@ export interface NativeAmpApi {
   setParams: (params: Partial<AmpParams>) => Promise<AmpStreamInfo | null>;
   stop: () => Promise<boolean>;
   getStatus: () => Promise<{ isOpen: boolean; info: AmpStreamInfo | null }>;
+  /** Live stream health since the stream was (re)opened; null when nothing is
+   *  open. Optional: older desktop shells don't expose it. */
+  getDiagnostics?: () => Promise<AmpDiagnostics | null>;
   /** Subscribe to overload-recovery events. Returns an unsubscribe fn. */
   onOverload: (cb: (info: AmpOverloadInfo) => void) => () => void;
   /** Subscribe to stream-loss/recovery events (the amp shares the one underlying

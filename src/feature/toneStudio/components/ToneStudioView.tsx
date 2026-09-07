@@ -374,6 +374,31 @@ export const ToneStudioView = () => {
             {" · "}
             {amp.info.sampleRate / 1000}kHz · ~{amp.info.roundTripMs.toFixed(0)}
             ms latency
+            {amp.diagnostics && (
+              <>
+                {" · "}
+                <span
+                  className={cn(
+                    amp.diagnostics.underruns > 0 && "text-amber-400",
+                  )}
+                  title='Hardware callbacks that found nothing to play since the stream opened — each one was an audible gap. Dropped blocks are the engine shedding backlog to keep latency from creeping up.'>
+                  {amp.diagnostics.underruns} dropout
+                  {amp.diagnostics.underruns === 1 ? "" : "s"}
+                  {amp.diagnostics.drops > 0 &&
+                    ` (${amp.diagnostics.drops} dropped)`}
+                </span>
+                {amp.diagnostics.safetyBlocks > 0 &&
+                  ` · +${amp.diagnostics.safetyBlocks} block safety margin`}
+                {" · DSP "}
+                {Math.round(
+                  (amp.diagnostics.dspAvgMs /
+                    ((amp.diagnostics.frameSize / amp.diagnostics.sampleRate) *
+                      1000)) *
+                    100,
+                )}
+                %
+              </>
+            )}
           </p>
         )}
       </div>

@@ -5,7 +5,7 @@ const audioBridge = require("./audioBridge");
 const ampSim = require("./ampSim");
 
 app.whenReady().then(async () => {
-  const { devices } = audioBridge.listDevices();
+  const { devices } = await audioBridge.listDevices();
   // Prefer a real interface that has both inputs and outputs.
   const candidates = devices.filter((d) => d.inputChannels > 0 && d.outputChannels > 0);
   if (candidates.length === 0) { console.log("NO_DUPLEX_DEVICE"); return app.quit(); }
@@ -23,15 +23,16 @@ app.whenReady().then(async () => {
   }
   if (!started) { console.log("AMP_OPEN_FAIL " + lastErr); return app.quit(); }
 
-  setTimeout(() => {
+  setTimeout(async () => {
     // live param change must not crash
-    try { ampSim.setParams({ drive: 0.3 }); console.log("AMP_SETPARAMS_OK"); } catch (e) { console.log("AMP_SETPARAMS_FAIL " + e.message); }
+    try { await ampSim.setParams({ drive: 0.3 }); console.log("AMP_SETPARAMS_OK"); } catch (e) { console.log("AMP_SETPARAMS_FAIL " + e.message); }
   }, 500);
 
-  setTimeout(() => {
-    const st = ampSim.getStatus();
-    ampSim.stop();
-    console.log("AMP_RESULT isOpenDuringRun=" + st.isOpen);
+  setTimeout(async () => {
+    const st = await ampSim.getStatus();
+    const diag = await ampSim.getDiagnostics();
+    await ampSim.stop();
+    console.log("AMP_RESULT isOpenDuringRun=" + st.isOpen + " diagnostics=" + JSON.stringify(diag));
     console.log(st.isOpen ? "AMP_OK" : "AMP_FAIL");
     app.quit();
   }, 1500);

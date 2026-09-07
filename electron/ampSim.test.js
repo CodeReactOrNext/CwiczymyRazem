@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { AmpChain } from "./ampSim";
+import { NamEngine } from "./dsp/nam";
 
 // Real trained weights (Steve's "Darkglass Microtubes 900 v2" test fixture from
 // sdatkinson/NeuralAmpModelerCore's example_models/wavenet.nam) — same fixture
@@ -128,6 +129,63 @@ describe("AmpChain drive stage", () => {
       const x = 0.3 * Math.sin((2 * Math.PI * 220 * i) / sr);
       expect(namEnabledButUnloaded.process(x)).toBeCloseTo(withoutNam.process(x), 10);
     }
+  });
+
+  it("processBlock() is bit-identical to the per-sample chain on the classic (non-NAM) path", () => {
+    const overrides = {
+      drive: 0.6, preampGain: 0.4, cab: true, gate: true, level: 0.8,
+      overdriveEnabled: true, overdriveDrive: 0.5, delayEnabled: true, delayMs: 20, delayMix: 0.3,
+      bass: 0.7, mid: 0.3, treble: 0.6,
+    };
+    const perSample = freshChain(overrides);
+    const block = freshChain(overrides);
+    const N = 1000;
+    const inF = new Float32Array(N);
+    for (let i = 0; i < N; i++) inF[i] = 0.3 * Math.sin((2 * Math.PI * 220 * i) / sr) + (i === 100 ? 0.5 : 0);
+    const ref = new Float32Array(N);
+    for (let i = 0; i < N; i++) ref[i] = perSample.process(inF[i]);
+    const out = new Float32Array(N);
+    block.processBlock(inF, out, N);
+    for (let i = 0; i < N; i++) expect(out[i]).toBe(ref[i]);
+  });
+
+  it("processBlock() runs NAM on the whole block in place of the classic amp, with no added latency", async () => {
+    // Everything but NAM neutral (gate/overdrive/cab/delay off, level 1): the
+    // chain's output should be exactly 0.7 × the model's own block output.
+    const amp = freshChain({ namEnabled: true, level: 1 });
+    await amp.nam.loadModel(SMALL_NAM_MODEL_JSON);
+    const reference = new NamEngine(sr);
+    await reference.loadModel(SMALL_NAM_MODEL_JSON);
+
+    const N = 256;
+    const inF = new Float32Array(N);
+    for (let i = 0; i < N; i++) inF[i] = 0.3 * Math.sin((2 * Math.PI * 220 * i) / sr);
+    const expected = Float32Array.from(inF);
+    reference.processBlock(expected, N);
+
+    const out = new Float32Array(N);
+    amp.processBlock(inF, out, N);
+    let sawNonPassthrough = false;
+    for (let i = 0; i < N; i++) {
+      expect(out[i]).toBeCloseTo(expected[i] * 0.7, 5);
+      if (Math.abs(out[i] - inF[i]) > 1e-6) sawNonPassthrough = true;
+    }
+    expect(sawNonPassthrough).toBe(true);
+  });
+
+  it("keeps IR samples and NAM model text out of params (they'd otherwise cross IPC on every knob move)", async () => {
+    const amp = freshChain();
+    amp.setParams({ irId: "ir_x", irSamples: new Float32Array([1, 0, 0]), namModelId: "nam_y", namModelJson: SMALL_NAM_MODEL_JSON });
+    expect(amp.params).not.toHaveProperty("irSamples");
+    expect(amp.params).not.toHaveProperty("namModelJson");
+    expect(amp.params.irId).toBe("ir_x");
+    expect(amp.params.namModelId).toBe("nam_y");
+    // ...but the payloads still reached the stages they were meant for.
+    expect(amp.convolver.ir).not.toBeNull();
+    expect(amp.convolver.ir.length).toBe(3);
+    await amp.nam.initPromise;
+    await new Promise((r) => setTimeout(r, 0));
+    expect(amp.nam.isLoaded()).toBe(true);
   });
 
   it("cabinet resonance boosts ~120Hz output level relative to cab bypassed", () => {

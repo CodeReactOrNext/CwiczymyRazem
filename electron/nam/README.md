@@ -115,3 +115,19 @@ JS↔WASM boundary crossing cost dominates at 48000+ calls/sec. Batching into
 64-sample blocks recovers ~2.2x real-time at the cost of ~1.3ms of added
 latency. `electron/dsp/nam.js` does this batching internally so callers still
 see a plain `process(x)` per-sample interface.
+
+The live stream doesn't use that path anymore: `nativeAudioEngine.js` hands
+`AmpChain.processBlock()` the whole hardware block, which runs
+`NamEngine.processBlock()` — one `nam_process(n)` call per hardware block (the
+scratch buffer is 512 samples; bigger blocks are chunked), with **zero** added
+latency, since the whole block is already in hand. The per-sample path stays
+for tests and callers that only have a sample at a time.
+
+## Where it runs
+
+Since 2026-09 the whole engine (audify stream + AmpChain + this WASM) runs in a
+dedicated Electron `utilityProcess` (`electron/audioProcess.js`, spawned by
+`electron/audioEngineHost.js`), not the main process. A `.nam` load is tens of
+ms of synchronous work, so `nativeAudioEngine` awaits it *before* starting the
+stream (`AmpChain.whenReady()`), and the audio process compiles the WASM once
+at startup (`engine.warmUp()`) so the first "turn on" doesn't pay for it.

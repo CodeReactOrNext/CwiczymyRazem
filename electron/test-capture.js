@@ -8,7 +8,7 @@ app.whenReady().then(async () => {
   let samples = 0;
   let peak = 0;
   try {
-    const { devices } = audioBridge.listDevices();
+    const { devices } = await audioBridge.listDevices();
     const dev = devices.find((d) => d.inputChannels > 0);
     if (!dev) { console.log("NO_INPUT_DEVICE"); return app.quit(); }
 

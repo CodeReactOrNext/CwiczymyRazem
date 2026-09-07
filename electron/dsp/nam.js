@@ -6,11 +6,14 @@
 // Two things the real DSP forces on this wrapper that the others don't have:
 // - Loading is async (WASM instantiation) — process() is a silent passthrough
 //   until init() resolves and a model is loaded.
-// - Processing is internally batched (BLOCK_SIZE samples per WASM call, not 1)
-//   — calling nam_process(1) once per sample measured at ~0.7x real-time (the
-//   JS<->WASM boundary crossing cost dominates at 48000+ calls/sec); batching
-//   into small blocks recovers ~2.2x at the cost of a few ms of latency. See
-//   electron/nam/README.md for the actual numbers.
+// - Processing must be batched (many samples per WASM call, not 1) — calling
+//   nam_process(1) once per sample measured at ~0.7x real-time (the JS<->WASM
+//   boundary crossing cost dominates at 48000+ calls/sec). The live audio path
+//   (nativeAudioEngine → AmpChain.processBlock) therefore uses processBlock(),
+//   one call per hardware block with zero added latency. The per-sample
+//   process(x) below keeps its own internal BLOCK_SIZE batching (at the cost of
+//   BLOCK_SIZE samples of latency) for callers that only have a sample at a
+//   time. See electron/nam/README.md for the actual numbers.
 const path = require("path");
 
 const BLOCK_SIZE = 64; // ~1.3ms at 48kHz — the latency/throughput balance point measured for this module
@@ -49,9 +52,13 @@ class NamEngine {
         reset: Module.cwrap("nam_reset", null, []),
         process: Module.cwrap("nam_process", null, ["number"]),
         getBuffer: Module.cwrap("nam_get_buffer", "number", []),
+        bufferCapacity: Module.cwrap("nam_buffer_capacity", "number", []),
       };
       this.fns.setSampleRate(this.sr);
       this.bufPtr = this.fns.getBuffer();
+      // Scratch size the wrapper (nam/wrapper.cpp) actually allocated — the
+      // upper bound on samples per WASM call for processBlock() below.
+      this.capacity = this.fns.bufferCapacity();
       this.ready = true;
     } catch (err) {
       // Feature stays silently unavailable (process() passes through) — a
@@ -116,6 +123,29 @@ class NamEngine {
     if (this.inPos === BLOCK_SIZE) this._runBlock();
 
     return y;
+  }
+
+  /** Processes the first `n` samples of `buf` in place, in as few WASM calls as
+   *  the wrapper's scratch buffer allows (one call for any n ≤ 512, which covers
+   *  every real ASIO/WASAPI block size). This is what the live audio path uses:
+   *  unlike process(x) it adds NO latency — the whole hardware block is already
+   *  in hand, so there's nothing to accumulate — and it costs one JS↔WASM
+   *  boundary crossing per hardware block instead of one per 64 samples.
+   *  Passthrough (buf untouched) until a model is loaded. Don't interleave with
+   *  process(x) on the same instance: the two paths keep separate buffering
+   *  state (the model itself is shared and stays continuous either way). */
+  processBlock(buf, n = buf.length) {
+    if (!this.isLoaded()) return;
+    const cap = this.capacity || BLOCK_SIZE;
+    for (let off = 0; off < n; off += cap) {
+      const len = Math.min(cap, n - off);
+      // Re-derive the view every call: with ALLOW_MEMORY_GROWTH the WASM heap
+      // can be reallocated (e.g. by a model load), detaching any cached view.
+      const heap = new Float32Array(this.module.HEAPF32.buffer, this.bufPtr, len);
+      heap.set(buf.subarray(off, off + len));
+      this.fns.process(len);
+      buf.set(heap, off);
+    }
   }
 
   reset() {

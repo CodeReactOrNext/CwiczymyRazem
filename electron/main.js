@@ -18,7 +18,7 @@ const {
 const path = require("path");
 const audioBridge = require("./audioBridge");
 const ampSim = require("./ampSim");
-const nativeAudioEngine = require("./nativeAudioEngine");
+const audioEngine = require("./audioEngineHost");
 const buildMenu = require("./menu");
 const windowState = require("./windowState");
 const toneStore = require("./toneStore");
@@ -39,12 +39,13 @@ const APP_ICON = path.join(
 );
 const RELOAD_RETRY_MS = 2500; // auto-reconnect interval while offline / server starting
 
-// nativeAudioEngine.js dispatches its real-time ASIO/WASAPI callback into THIS
-// (main) process. Chromium normally throttles timers/backgrounding for windows
-// that lose focus or are occluded to save power — with the amp on, that shows
-// up as monitoring latency ballooning by hundreds of ms the moment the user
-// alt-tabs away (e.g. to compare against another app). Must be set before the
-// app is ready.
+// The real-time ASIO/WASAPI callback runs in a dedicated audio process now
+// (electron/audioEngineHost.js → audioProcess.js), so it no longer competes
+// with this process's event loop at all. These switches still matter for the
+// renderer side: Chromium throttles timers/backgrounding for windows that lose
+// focus or are occluded, which starves note-detection/UI work (and, before the
+// engine moved out, was one of the ways monitoring latency ballooned the moment
+// the user alt-tabbed away). Must be set before the app is ready.
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
 app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
 app.commandLine.appendSwitch("disable-background-timer-throttling");
@@ -412,28 +413,34 @@ ipcMain.handle("amp:stop", async () => {
   return true;
 });
 ipcMain.handle("amp:status", () => ampSim.getStatus());
+// Live stream health (underruns, dropped blocks, DSP load) — see
+// nativeAudioEngine.getDiagnostics. Lets the Tone Studio show real numbers
+// next to the latency estimate, so a "it crackles at 128" report can come
+// with counts instead of impressions.
+ipcMain.handle("amp:diagnostics", () => ampSim.getDiagnostics());
 
 // A heavy DSP chain (typically a NAM model too big for the current buffer
-// size) can fall behind real time — nativeAudioEngine.js self-recovers by
-// clearing the output queue, but that's a console.warn nobody but a dev sees.
-// Forward it to the renderer so a real client gets an actual explanation
-// instead of just an unexplained click and a moment of "why did that glitch".
-nativeAudioEngine.onOverload((info) => {
+// size) or a stall can leave the output queue behind real time —
+// nativeAudioEngine.js self-recovers by dropping the backlog, but that's a
+// console.warn nobody but a dev sees. Forward it to the renderer so a real
+// client gets an actual explanation instead of just an unexplained click and
+// a moment of "why did that glitch".
+audioEngine.onOverload((info) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send("amp:overload", info);
   }
 });
 
 // Surfaces stream-loss/recovery (device disconnected, driver reset from its own
-// control panel, hot-plug) and device-list changes — see nativeAudioEngine.js's
-// scheduleRecovery/health poll for why the renderer can't just infer this from a
-// silently-stopped frame flow.
-nativeAudioEngine.onConnectionIssue((info) => {
+// control panel, hot-plug, the audio process dying) and device-list changes — see
+// nativeAudioEngine.js's scheduleRecovery/health poll for why the renderer can't
+// just infer this from a silently-stopped frame flow.
+audioEngine.onConnectionIssue((info) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send("native-audio:connection-issue", info);
   }
 });
-nativeAudioEngine.onDevicesChanged(() => {
+audioEngine.onDevicesChanged(() => {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send("native-audio:devices-changed");
   }
@@ -443,7 +450,7 @@ nativeAudioEngine.onDevicesChanged(() => {
 // doesn't notice on its own — force a clean reconnect rather than leaving a
 // practice session silently dead until the user restarts it themselves.
 powerMonitor.on("resume", () => {
-  nativeAudioEngine.recoverAfterResume();
+  audioEngine.recoverAfterResume();
 });
 
 // ── Tone Studio IPC (local preset + cabinet-IR persistence) ──────────────────
@@ -654,6 +661,11 @@ if (!isPrimaryInstance) {
     Menu.setApplicationMenu(
       buildMenu({ isDev, shell, dialog, getMainWindow: () => mainWindow }),
     );
+    // Spawn the audio process now so the first "turn on" only pays the ASIO
+    // open, not process start + audify/NAM WASM load on top of it.
+    audioEngine.warmUp().catch((err) => {
+      console.error("[audio] engine warm-up failed (the next attach retries):", err && err.message);
+    });
     createSplashWindow();
     createWindow();
     createTray();
@@ -677,6 +689,18 @@ if (!isPrimaryInstance) {
     });
   });
 }
+
+// The stream lives in a separate process now, so "stop" is a message, not a
+// synchronous close — give the audio process a moment to release the ASIO
+// driver cleanly (a driver left open by a killed process is the classic cause
+// of "device busy" on the next launch) before the app actually exits.
+let shuttingDown = false;
+app.on("before-quit", (event) => {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  event.preventDefault();
+  audioEngine.shutdown().finally(() => app.quit());
+});
 
 app.on("window-all-closed", () => {
   audioBridge.stop();

@@ -86,6 +86,64 @@ describe("NamEngine", () => {
     expect(engine.outLen).toBe(0);
   });
 
+  it("processBlock() matches the per-sample path sample for sample, minus its BLOCK_SIZE latency", async () => {
+    const perSample = new NamEngine(48000);
+    await perSample.loadModel(SMALL_MODEL_JSON);
+    const block = new NamEngine(48000);
+    await block.loadModel(SMALL_MODEL_JSON);
+
+    const N = 1024;
+    const input = new Float32Array(N);
+    for (let i = 0; i < N; i++) input[i] = 0.3 * Math.sin((2 * Math.PI * 220 * i) / 48000);
+
+    // Reference: process(x) returns passthrough for the first BLOCK_SIZE calls,
+    // then the model's output for sample i - BLOCK_SIZE.
+    const ref = new Float32Array(N);
+    for (let i = 0; i < N; i++) ref[i] = perSample.process(input[i]);
+
+    // Block path, fed in 128-sample hardware blocks: output i is the model's
+    // output for input i — no ramp-up, no delay.
+    const out = Float32Array.from(input);
+    for (let off = 0; off < N; off += 128) block.processBlock(out.subarray(off, off + 128), 128);
+
+    let sawNonPassthrough = false;
+    for (let i = 0; i < N - BLOCK_SIZE; i++) {
+      expect(out[i]).toBeCloseTo(ref[i + BLOCK_SIZE], 4);
+      if (Math.abs(out[i] - input[i]) > 1e-6) sawNonPassthrough = true;
+    }
+    expect(sawNonPassthrough).toBe(true);
+  });
+
+  it("processBlock() handles a block larger than the WASM scratch buffer by chunking", async () => {
+    const chunked = new NamEngine(48000);
+    await chunked.loadModel(SMALL_MODEL_JSON);
+    const whole = new NamEngine(48000);
+    await whole.loadModel(SMALL_MODEL_JSON);
+    expect(whole.capacity).toBeGreaterThan(0);
+
+    const N = whole.capacity * 2 + 37; // deliberately not a multiple of the capacity
+    const input = new Float32Array(N);
+    for (let i = 0; i < N; i++) input[i] = 0.25 * Math.sin((2 * Math.PI * 330 * i) / 48000);
+
+    const a = Float32Array.from(input);
+    for (let off = 0; off < N; off += 64) chunked.processBlock(a.subarray(off, Math.min(N, off + 64)), Math.min(64, N - off));
+    const b = Float32Array.from(input);
+    whole.processBlock(b, N);
+
+    for (let i = 0; i < N; i++) {
+      expect(Number.isFinite(b[i])).toBe(true);
+      expect(b[i]).toBeCloseTo(a[i], 4);
+    }
+  });
+
+  it("processBlock() is a passthrough before a model is loaded", async () => {
+    const engine = new NamEngine(48000);
+    await engine.initPromise;
+    const buf = Float32Array.from([0.1, -0.2, 0.3, 0.4]);
+    engine.processBlock(buf, 4);
+    expect(Array.from(buf)).toEqual([0.1, -0.2, 0.3, 0.4].map((v) => Math.fround(v)));
+  });
+
   it("loadModel(null) unloads the model and reverts to passthrough", async () => {
     const engine = new NamEngine(48000);
     await engine.loadModel(SMALL_MODEL_JSON);

@@ -31,9 +31,10 @@
 // with the built-in cab sim or a loaded IR same as with the classic amp path.
 // Gate/overdrive stay before NAM and delay stays after, same as
 // pedals-into-amp-into-rack in a real rig.
-// See dsp/nam.js and electron/nam/README.md for why this needs its own
-// internal block-buffering (the WASM call overhead per sample is too high to
-// call it the way every other stage here is called, one sample at a time).
+// See dsp/nam.js and electron/nam/README.md for why NAM has to be fed whole
+// blocks (the WASM call overhead per sample is too high to call it the way
+// every other stage here is called, one sample at a time) — which is why the
+// live stream runs AmpChain.processBlock(), not process(x) in a loop.
 
 const { Delay } = require("./dsp/delay");
 const { Convolver } = require("./dsp/convolver");
@@ -193,7 +194,14 @@ class AmpChain {
     this.dcBlockPower.highpass(this.sr, 20, 0.707);
   }
   setParams(p) {
-    this.params = { ...this.params, ...p };
+    // irSamples/namModelJson are payloads (a Float32Array, a multi-MB JSON
+    // string), not params: they're consumed by the convolver/NAM below and must
+    // NOT be kept on this.params — that object is what nativeAudioEngine reports
+    // back as `info.params` after every attach/setParams, i.e. it crosses the
+    // process boundary and the renderer IPC on every knob tweak. Storing the
+    // model text there meant every slider move serialised the whole .nam file.
+    const { irSamples, namModelJson, ...rest } = p;
+    this.params = { ...this.params, ...rest };
     const { bass, mid, treble, delayEnabled, delayMs, delayFeedback, delayMix,
       overdriveEnabled, overdriveDrive, overdriveTone, overdriveLevel } = this.params;
     // 0..1 → ±12dB around the center detent (0.5 = flat), like a real tone stack.
@@ -214,37 +222,55 @@ class AmpChain {
     // of its own. NamEngine.loadModel() is async (WASM); fire-and-forget here —
     // process() checks this.nam.isLoaded() each call and falls back to the
     // traditional amp chain until it resolves.
-    if ("irSamples" in p) this.convolver.setIR(p.irSamples);
-    if ("namModelJson" in p) this.nam.loadModel(p.namModelJson);
+    if ("irSamples" in p) this.convolver.setIR(irSamples);
+    if ("namModelJson" in p) this.pendingModelLoad = this.nam.loadModel(namModelJson);
   }
-  process(x) {
-    const { preampGain, drive, level, cab, gate, namEnabled } = this.params;
-    let s = gate ? this.gate.process(x) : x;
-    s = this.overdrive.process(s);
 
-    const useNam = namEnabled && this.nam.isLoaded();
-    if (useNam) {
-      s = this.nam.process(s);
-    } else {
-      s = this.hpf.process(s);
+  /** Resolves once the NAM WASM is up and any model load requested so far has
+   *  finished (never rejects). nativeAudioEngine awaits this BEFORE starting the
+   *  stream: parsing a .nam file and building the network is tens of ms of
+   *  synchronous work, which on an already-running stream is a guaranteed
+   *  dropout plus a burst of backlogged blocks on its very first "turn on". */
+  async whenReady() {
+    try { await this.nam.initPromise; } catch { /* WASM unavailable — chain runs without NAM */ }
+    try { await this.pendingModelLoad; } catch { /* bad model — chain falls back to the classic path */ }
+  }
 
-      // ── Preamp stage: the first gain stage, gentler ceiling than the power
-      // stage below (pre-gain ×9 vs ×31) — it's meant to add the warmth of a
-      // second cascaded tube stage, not do the amp's clipping by itself.
-      s = this.preampOversampler.process(s, 1 + preampGain * 8);
-      s = this.dcBlockPreamp.process(s);
+  // The chain is split into three per-sample helpers so process(x) and
+  // processBlock() below are the same DSP by construction (one source of truth)
+  // and only differ in how the NAM stage in the middle is fed.
 
-      s = this.bassEq.process(s);
-      s = this.midEq.process(s);
-      s = this.trebleEq.process(s);
+  /** Front of the chain: noise gate → overdrive pedal. */
+  _pre(x) {
+    const s = this.params.gate ? this.gate.process(x) : x;
+    return this.overdrive.process(s);
+  }
 
-      // ── Power amp stage: final saturation before the cabinet, cascaded after
-      // the tone stack like a real amp's output section — this is the original
-      // `drive` knob, now the second of two gain stages instead of the only one.
-      s = this.powerOversampler.process(s, 1 + drive * 30);
-      s = this.dcBlockPower.process(s);
-    }
+  /** The classic amp block NAM replaces when active: hpf → preamp → tone stack → power amp. */
+  _classicAmp(s) {
+    const { preampGain, drive } = this.params;
+    s = this.hpf.process(s);
 
+    // ── Preamp stage: the first gain stage, gentler ceiling than the power
+    // stage below (pre-gain ×9 vs ×31) — it's meant to add the warmth of a
+    // second cascaded tube stage, not do the amp's clipping by itself.
+    s = this.preampOversampler.process(s, 1 + preampGain * 8);
+    s = this.dcBlockPreamp.process(s);
+
+    s = this.bassEq.process(s);
+    s = this.midEq.process(s);
+    s = this.trebleEq.process(s);
+
+    // ── Power amp stage: final saturation before the cabinet, cascaded after
+    // the tone stack like a real amp's output section — this is the original
+    // `drive` knob, now the second of two gain stages instead of the only one.
+    s = this.powerOversampler.process(s, 1 + drive * 30);
+    return this.dcBlockPower.process(s);
+  }
+
+  /** Back of the chain: cabinet → delay → level + soft limiter. */
+  _post(s) {
+    const { level, cab } = this.params;
     if (cab) {
       if (this.convolver.ir) s = this.convolver.process(s);
       else { s = this.cabRes.process(s); s = this.cabLpf.process(s); s = this.cabPeak.process(s); }
@@ -255,6 +281,40 @@ class AmpChain {
     // soft safety limiter
     if (s > 1) s = 1; else if (s < -1) s = -1;
     return s;
+  }
+
+  /** One sample at a time. With NAM active this goes through NamEngine's
+   *  per-sample batching (adds BLOCK_SIZE samples of latency) — the live
+   *  stream uses processBlock() instead; this stays for callers/tests that
+   *  only have a sample in hand. */
+  process(x) {
+    let s = this._pre(x);
+    s = this.params.namEnabled && this.nam.isLoaded() ? this.nam.process(s) : this._classicAmp(s);
+    return this._post(s);
+  }
+
+  /** Whole hardware block at once: `out[i] = chain(inF[i])` for i < n. Same DSP
+   *  as process(x), but the NAM stage runs on the entire block in one WASM call
+   *  with zero added latency (see dsp/nam.js processBlock). `out` may alias
+   *  `inF`. Returns `out`. */
+  processBlock(inF, out, n = inF.length) {
+    const useNam = this.params.namEnabled && this.nam.isLoaded();
+    if (!useNam) {
+      for (let i = 0; i < n; i++) out[i] = this._post(this._classicAmp(this._pre(inF[i])));
+      return out;
+    }
+    const buf = this._blockBuffer(n);
+    for (let i = 0; i < n; i++) buf[i] = this._pre(inF[i]);
+    this.nam.processBlock(buf, n);
+    for (let i = 0; i < n; i++) out[i] = this._post(buf[i]);
+    return out;
+  }
+
+  // Reused scratch for processBlock's NAM path — sized once per distinct block
+  // length, never per call (no per-block allocation on the audio path).
+  _blockBuffer(n) {
+    if (!this._blockBuf || this._blockBuf.length < n) this._blockBuf = new Float32Array(n);
+    return this._blockBuf;
   }
   reset() {
     this.gate.reset(); this.hpf.reset();
@@ -268,22 +328,29 @@ class AmpChain {
 }
 
 // ── Stream management ────────────────────────────────────────────────────────
-// Lazily required (not at module load) to avoid a circular-require: the engine
-// needs AmpChain from this file, so this file cannot require the engine at the top.
+// The stream (and the AmpChain instance driving it) lives in the dedicated audio
+// process; these go through ./audioEngineHost and are all async. Lazily required
+// (not at module load): the engine — inside the audio process — needs AmpChain
+// from this file, so this file must not pull the host (and with it `electron`)
+// in at the top.
 function start(opts = {}) {
-  return require("./nativeAudioEngine").attachAmp(opts);
+  return require("./audioEngineHost").attachAmp(opts);
 }
 
 function setParams(p) {
-  return require("./nativeAudioEngine").updateAmpParams(p);
+  return require("./audioEngineHost").updateAmpParams(p);
 }
 
 function stop() {
-  require("./nativeAudioEngine").detachAmp();
+  return require("./audioEngineHost").detachAmp();
 }
 
 function getStatus() {
-  return require("./nativeAudioEngine").getAmpStatus();
+  return require("./audioEngineHost").getAmpStatus();
 }
 
-module.exports = { AmpChain, start, stop, setParams, getStatus };
+function getDiagnostics() {
+  return require("./audioEngineHost").getDiagnostics();
+}
+
+module.exports = { AmpChain, start, stop, setParams, getStatus, getDiagnostics };

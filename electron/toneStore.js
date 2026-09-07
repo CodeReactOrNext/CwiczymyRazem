@@ -16,15 +16,24 @@ const PRESETS_FILE_NAME = "tone-presets.json";
 const IR_DIR_NAME = "tone-irs";
 const NAM_DIR_NAME = "tone-nam";
 
-// Test-only seam: electron's `app` module only exists inside the real Electron
-// runtime (a plain `require("electron")` under Node/Vitest returns a path string,
-// not the API object), so tests inject a temp directory here instead.
+// electron's `app` only exists in the main process: a plain `require("electron")`
+// under Node/Vitest returns a path string, and inside the dedicated audio process
+// (electron/audioProcess.js — a utilityProcess, which gets only a subset of the
+// Electron API) `app` is undefined. Both inject the directory explicitly instead;
+// the main process keeps resolving it from `app` as before.
 let userDataDirOverride = null;
-function _setUserDataDirForTests(dir) {
+function setUserDataDir(dir) {
   userDataDirOverride = dir;
 }
+function _setUserDataDirForTests(dir) {
+  setUserDataDir(dir);
+}
 function userDataDir() {
-  return userDataDirOverride ?? app.getPath("userData");
+  if (userDataDirOverride) return userDataDirOverride;
+  if (!app || typeof app.getPath !== "function") {
+    throw new Error("toneStore: userData directory not configured (call setUserDataDir outside the main process)");
+  }
+  return app.getPath("userData");
 }
 
 function presetsFilePath() {
@@ -214,5 +223,6 @@ module.exports = {
   listPresets, savePreset, deletePreset,
   listIRs, deleteIR, importIR, getIRSamples,
   listNamModels, deleteNamModel, importNamModel, getNamModelJson,
+  setUserDataDir,
   _setUserDataDirForTests,
 };

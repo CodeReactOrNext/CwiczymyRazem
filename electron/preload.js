@@ -60,10 +60,13 @@ contextBridge.exposeInMainWorld("nativeAmp", {
   setParams: (params) => ipcRenderer.invoke("amp:set-params", params),
   stop: () => ipcRenderer.invoke("amp:stop"),
   getStatus: () => ipcRenderer.invoke("amp:status"),
-  /** Fires when the DSP chain (usually a NAM model) fell far enough behind
-   *  real time that the engine had to clear the output queue to recover —
-   *  a real, audible click just happened, not a hypothetical one. Payload:
-   *  { driftMs, namEnabled }. Returns an unsubscribe fn. */
+  /** Live stream health counters (underruns, dropped blocks, DSP load) since the
+   *  stream was (re)opened, or null when nothing is open. */
+  getDiagnostics: () => ipcRenderer.invoke("amp:diagnostics"),
+  /** Fires when the DSP chain (usually a NAM model) or a stall left the output
+   *  queue far enough behind real time that the engine had to drop the backlog
+   *  to recover — a real, audible click just happened, not a hypothetical one.
+   *  Payload: { driftMs, namEnabled }. Returns an unsubscribe fn. */
   onOverload: (cb) => {
     const listener = (_event, info) => cb(info);
     ipcRenderer.on("amp:overload", listener);

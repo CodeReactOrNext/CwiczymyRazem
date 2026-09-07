@@ -2,9 +2,9 @@
 const { app } = require("electron");
 const audioBridge = require("./audioBridge");
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   try {
-    const result = audioBridge.listDevices();
+    const result = await audioBridge.listDevices();
     console.log("ELECTRON_AUDIO_OK api=" + result.api + " devices=" + result.devices.length);
     result.devices.forEach((d) =>
       console.log(`  #${d.id} ${d.name} | in:${d.inputChannels} out:${d.outputChannels}${d.isDefaultInput ? " [DEFAULT IN]" : ""}`)

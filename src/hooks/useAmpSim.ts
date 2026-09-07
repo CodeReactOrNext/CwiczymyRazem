@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { AmpOverloadInfo, AmpParams, AmpStreamInfo, ConnectionIssueInfo } from "types/nativeAudio";
+import type {
+  AmpDiagnostics,
+  AmpOverloadInfo,
+  AmpParams,
+  AmpStreamInfo,
+  ConnectionIssueInfo,
+} from "types/nativeAudio";
 
 import {
   readPersistedChannel,
@@ -90,6 +96,24 @@ export const useAmpSim = () => {
     return () => clearTimeout(timer);
   }, [overload]);
 
+  // Live stream health (underruns = audible gaps, dropped blocks, DSP load),
+  // polled while monitoring is on. Shown next to the latency estimate so "it
+  // crackles at 128" can be reported — and triaged — with actual counts.
+  const [diagnostics, setDiagnostics] = useState<AmpDiagnostics | null>(null);
+  useEffect(() => {
+    if (!isOn) return undefined;
+    // Same version-skew guard as the listeners above: older desktop shells don't
+    // expose getDiagnostics yet.
+    const getDiagnostics = window.nativeAmp?.getDiagnostics;
+    if (typeof getDiagnostics !== "function") return undefined;
+    const poll = () => {
+      getDiagnostics().then((d) => setDiagnostics(d)).catch(() => { /* ignore */ });
+    };
+    poll();
+    const timer = setInterval(poll, 1000);
+    return () => clearInterval(timer);
+  }, [isOn]);
+
   // Surfaces nativeAudioEngine's stream-loss/recovery (device disconnected, driver
   // reset from its own control panel, system resume) — the amp shares the one
   // underlying stream with capture, so it can be knocked out the same way. "failed"
@@ -152,6 +176,7 @@ export const useAmpSim = () => {
     try { await window.nativeAmp.stop(); } catch { /* ignore */ }
     setIsOn(false);
     setInfo(null);
+    setDiagnostics(null);
   }, []);
 
   const toggle = useCallback(() => { (isOn ? stop() : start()); }, [isOn, start, stop]);
@@ -191,7 +216,7 @@ export const useAmpSim = () => {
   }, []);
 
   return {
-    available, isOn, isBusy, error, info, params, bufferSize, overload, connectionIssue,
+    available, isOn, isBusy, error, info, params, bufferSize, overload, connectionIssue, diagnostics,
     toggle, start, stop, restart, setParams, setBufferSize,
   };
 };

@@ -1,15 +1,13 @@
-// Diagnostic (not a pass/fail regression test): measures how evenly-spaced the
-// JS-side capture callback actually fires. nativeAudioEngine's onInputBlock runs
-// on whatever thread audify's native binding delivers it on and hands off to
-// audioBridge's onFrame in the Electron MAIN process — the same process that
-// also services all other IPC/window/timer work. If that hand-off is queued
-// through Node's normal event loop (rather than serviced with hard real-time
-// priority), any main-process business (GC, IPC, window events, ...) would
-// show up here as occasional gaps much larger than the nominal block period —
-// which would explain added/inconsistent latency independent of the ASIO
-// buffer size the driver actually granted.
+// Diagnostic (not a pass/fail regression test): measures how evenly-spaced
+// captured blocks arrive at audioBridge's onFrame in the Electron MAIN process.
+// Since the engine moved to its own process (see audioEngineHost.js) this is the
+// capture → main hand-off as the renderer relay sees it (RPC hop included), not
+// the audio path itself — the engine's own timing is in the diagnostics it
+// reports at the end (lateBlocks/maxGapMs are measured inside the audio
+// process). For the main-vs-audio-process comparison that motivated the move,
+// see test-audio-process-vs-main.js.
 //
-// Run: node_modules\.bin\electron.cmd electron\test-latency-jitter.js [frameSize] [seconds]
+// Run: node_modules\.bin\electron.cmd electron\test-latency-jitter.js [frameSize] [seconds] [deviceNameFilter]
 const { app } = require("electron");
 const audioBridge = require("./audioBridge");
 
@@ -18,7 +16,7 @@ const DURATION_S = parseFloat(process.argv[3]) || 8;
 const NAME_FILTER = process.argv[4] || null;
 
 app.whenReady().then(async () => {
-  const { devices } = audioBridge.listDevices();
+  const { devices } = await audioBridge.listDevices();
   devices.forEach((d) => console.log("  device id=" + d.id + " in=" + d.inputChannels + " out=" + d.outputChannels + " name=" + JSON.stringify(d.name)));
   const dev = NAME_FILTER
     ? devices.find((d) => d.inputChannels > 0 && d.name.toLowerCase().includes(NAME_FILTER.toLowerCase()))
