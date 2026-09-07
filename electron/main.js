@@ -14,6 +14,7 @@ const {
   powerMonitor,
   shell,
   dialog,
+  Notification,
 } = require("electron");
 const path = require("path");
 const audioBridge = require("./audioBridge");
@@ -563,6 +564,27 @@ function createTray() {
 // never happened in this run.
 let pendingUpdate = null; // { version, readyAt } | null
 
+// The OS-level half of the update prompt. The in-app toast (see
+// components/ElectronIntegrations) is the nicer path, but it only exists while
+// a renderer is mounted and showing a <Toaster/> — this one survives the app
+// being minimised to the tray, which is where it spends most of its life.
+// Body text spells out that clicking restarts, because the click DOES restart.
+function notifyUpdateReady(autoUpdater, version) {
+  if (!Notification.isSupported()) return;
+  const notification = new Notification({
+    title: "Update ready",
+    body: `Click to restart riff.quest and install version ${version}.`,
+  });
+  notification.on("click", () => {
+    try {
+      autoUpdater.quitAndInstall();
+    } catch (err) {
+      console.error("quitAndInstall failed:", err);
+    }
+  });
+  notification.show();
+}
+
 function setupAutoUpdater() {
   if (isDev) return; // dev runs from source — nothing to update
   let autoUpdater;
@@ -586,8 +608,15 @@ function setupAutoUpdater() {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send("app:update-ready", { version: info.version });
     }
+    notifyUpdateReady(autoUpdater, info.version);
   });
-  const check = () => autoUpdater.checkForUpdatesAndNotify().catch(() => {});
+  // NOT checkForUpdatesAndNotify(): that helper shows its own OS notification
+  // built with `new Notification(content).show()` and no click handler at all,
+  // so users got a toast they could click forever with nothing happening. It
+  // also claims the update "will be automatically installed on exit", which is
+  // a lie for an app that lives in the tray for weeks. We show our own
+  // clickable one from the update-downloaded handler above instead.
+  const check = () => autoUpdater.checkForUpdates().catch(() => {});
   check();
   setInterval(check, 4 * 60 * 60 * 1000);
 

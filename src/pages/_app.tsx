@@ -117,6 +117,9 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                     <ElectronIntegrations />
                     <DesktopNotifications />
                     <DesktopUpdateRequired />
+                    <Toaster position='top-right' toastOptions={{
+                        className: "bg-zinc-200 text-zinc-950 border border-zinc-300 shadow-xl font-medium"
+                    }} />
                     <NextTopLoader color='#06b6d4' />
                     <div id='overlays'></div>
                     {page}

@@ -117,7 +117,8 @@ export const ElectronIntegrations = () => {
   useEffect(() => {
     const api = window.electronApp;
     if (!api || typeof api.onUpdateReady !== "function") return undefined;
-    return api.onUpdateReady(() => {
+    let cancelled = false;
+    const showUpdateToast = () => {
       toast.info(t("info.update_ready"), {
         id: "desktop-update-ready",
         duration: Infinity,
@@ -126,7 +127,24 @@ export const ElectronIntegrations = () => {
           onClick: () => api.installUpdate(),
         },
       });
-    });
+    };
+    const unsubscribe = api.onUpdateReady(showUpdateToast);
+    // onUpdateReady fires exactly once, when the download finishes. This shell
+    // loads a remote bundle, so any reload or navigation remounts us long after
+    // that — with the toast gone and the event never coming again. The main
+    // process keeps the pending update around precisely so we can re-ask.
+    if (typeof api.getUpdateStatus === "function") {
+      api
+        .getUpdateStatus()
+        .then((status) => {
+          if (!cancelled && status) showUpdateToast();
+        })
+        .catch(() => {});
+    }
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, [t]);
 
   useEffect(() => {
