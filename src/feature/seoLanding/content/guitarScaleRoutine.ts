@@ -166,7 +166,7 @@ export const guitarScaleRoutineConfig: SeoLandingConfig = {
         {
           kind: "cta",
           title: "Run the whole routine inside Riff Quest",
-          text: "Interactive tabs for every drill, a metronome, note detection that hears whether you hit the right fret, and a heatmap that shows your daily scale streak. Free, no paywalls.",
+          text: "Interactive tabs for every drill, a metronome, note detection that hears whether you hit the right fret, and a heatmap that shows your daily scale streak.",
         },
       ],
     },
@@ -179,7 +179,7 @@ export const guitarScaleRoutineConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
-          text: "And when scale runs start demanding more speed than your hands deliver, that is a synchronization problem, not a scale problem — the [speed and hand-sync exercises](/guitar-speed-hand-synchronization-exercises) are the fix. For fitting scales into a complete practice day, see the [daily guitar practice plan](/daily-guitar-practice-plan).",
+          text: "And when scale runs start demanding more speed than your hands deliver, that is a synchronization problem, not a scale problem — the [speed and hand-sync exercises](/guitar-speed-hand-synchronization-exercises) are the fix. For fitting scales into a complete practice day, see the [daily guitar practice plan](/daily-guitar-practice-plan), or the [intermediate guitar practice routine](/intermediate-guitar-practice-routine) if you want scales slotted into a 45-minute session alongside rhythm, ear training and repertoire.",
         },
       ],
     },

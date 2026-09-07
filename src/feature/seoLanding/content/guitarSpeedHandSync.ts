@@ -223,7 +223,7 @@ export const guitarSpeedHandSyncConfig: SeoLandingConfig = {
         {
           kind: "cta",
           title: "Let the app run the tempo climb for you",
-          text: "Riff Quest plays every one of these tabs at any tempo, listens to what you play, and logs your clean BPM per exercise — so 'am I actually getting faster?' becomes a chart instead of a feeling. Free, no paywalls.",
+          text: "Riff Quest plays every one of these tabs at any tempo, listens to what you play, and logs your clean BPM per exercise — so 'am I actually getting faster?' becomes a chart instead of a feeling.",
         },
         {
           kind: "paragraph",

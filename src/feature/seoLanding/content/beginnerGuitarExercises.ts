@@ -183,7 +183,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
         {
           kind: "cta",
           title: "Run this routine with real-time feedback",
-          text: "Every exercise on this page is built into Riff Quest with interactive tabs, a metronome, and note detection that hears what you play. Track your streak and watch the practice heatmap fill up. Free, no paywalls.",
+          text: "Every exercise on this page is built into Riff Quest with interactive tabs, a metronome, and note detection that hears what you play. Track your streak and watch the practice heatmap fill up.",
         },
       ],
     },
@@ -196,7 +196,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
-          text: "After three to four weeks, this page stops being enough — that is the plan working. Your next steps are the [guitar speed and hand synchronization exercises](/guitar-speed-hand-synchronization-exercises) for technique, and the [scale practice routine](/guitar-scale-practice-routine) when you are ready to start playing lead. If motivation is the bottleneck rather than technique, read our guide on [practicing every day in simple steps](/blog/practice-guitar-every-day-simple-steps).",
+          text: "After three to four weeks, this page stops being enough — that is the plan working. Your next steps are the [guitar speed and hand synchronization exercises](/guitar-speed-hand-synchronization-exercises) for technique, and the [scale practice routine](/guitar-scale-practice-routine) when you are ready to start playing lead. Once chords, timing and a first song are solid, the [intermediate guitar practice routine](/intermediate-guitar-practice-routine) is the 45-minute structure that replaces this one. If motivation is the bottleneck rather than technique, read our guide on [practicing every day in simple steps](/blog/practice-guitar-every-day-simple-steps).",
         },
       ],
     },
@@ -225,13 +225,14 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
     {
       question: "Are these beginner guitar drills enough on their own?",
       answer:
-        "For technique, yes — for motivation, no. Pair them with one song you genuinely want to play. The drills make the song achievable; the song makes the drills worth doing. When these feel easy, move on to a structured daily practice plan or speed-focused exercises.",
+        "For technique, yes — for motivation, no. Pair them with one song you genuinely want to play. The drills make the song achievable; the song makes the drills worth doing. When these feel easy, move on to the [intermediate practice routine](/intermediate-guitar-practice-routine), which keeps the same block structure and fills it with rhythm, fretboard, ear and technique work.",
     },
   ],
   relatedGuideSlugs: [
     "daily-guitar-practice-plan",
     "guitar-speed-hand-synchronization-exercises",
     "guitar-scale-practice-routine",
+    "intermediate-guitar-practice-routine",
   ],
   relatedBlogSlugs: [
     "beginner-guitar-practice-checklist-daily-essentials",

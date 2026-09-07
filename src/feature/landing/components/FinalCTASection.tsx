@@ -37,9 +37,6 @@ export const FinalCTASection = () => {
                   </span>
                 </Button>
               </Link>
-              <span className='mt-3 whitespace-nowrap text-xs font-medium text-zinc-400'>
-                Free forever, no paywalls
-              </span>
             </div>
           </div>
         </div>
