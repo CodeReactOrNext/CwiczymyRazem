@@ -142,16 +142,13 @@ export const ExerciseShowcase = ({
         </div>
       )}
 
-      <div className='mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
+      <div className='mt-8'>
         <Link
           href={`/practice/exercise/${slug}`}
           className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
           Practice this with real-time feedback
           <ArrowRight className='h-4 w-4' aria-hidden='true' />
         </Link>
-        <span className='text-xs font-medium text-zinc-400'>
-          Free, right in your browser
-        </span>
       </div>
     </div>
   );

@@ -106,17 +106,17 @@
   },
   {
     "source": "/exercises/minimal-motion-voice-leading",
-    "destination": "/daily-guitar-practice-plan",
+    "destination": "/intermediate-guitar-practice-routine#minimal-motion-voice-leading",
     "permanent": true
   },
   {
     "source": "/exercises/fretboard-mastery",
-    "destination": "/guitar-scale-practice-routine",
+    "destination": "/intermediate-guitar-practice-routine#fretboard-mastery",
     "permanent": true
   },
   {
     "source": "/exercises/smooth-chord-transitions",
-    "destination": "/daily-guitar-practice-plan",
+    "destination": "/intermediate-guitar-practice-routine#smooth-chord-transitions",
     "permanent": true
   },
   {
@@ -166,7 +166,7 @@
   },
   {
     "source": "/exercises/sing-what-you-play",
-    "destination": "/daily-guitar-practice-plan",
+    "destination": "/intermediate-guitar-practice-routine#sing-what-you-play",
     "permanent": true
   },
   {
@@ -606,7 +606,7 @@
   },
   {
     "source": "/exercises/muting-discipline-drill",
-    "destination": "/intermediate-guitar-practice-routine",
+    "destination": "/intermediate-guitar-practice-routine#muting-discipline-drill",
     "permanent": true
   },
   {
@@ -1011,7 +1011,7 @@
   },
   {
     "source": "/exercises/strumming-funk",
-    "destination": "/beginner-guitar-exercises",
+    "destination": "/intermediate-guitar-practice-routine#strumming-funk",
     "permanent": true
   },
   {

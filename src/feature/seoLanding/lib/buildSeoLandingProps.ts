@@ -2,6 +2,7 @@ import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { SerializedExercise } from "feature/exercises/lib/serializeExercise";
 import { serializeExercise } from "feature/exercises/lib/serializeExercise";
 import { songGuides } from "feature/song-library/song-guides/content";
+import { getAuthorProfile } from "lib/authors";
 import { getAllBlogs } from "lib/blog";
 
 import type { SeoLandingPageProps } from "../components/SeoLandingPage";
@@ -16,14 +17,14 @@ import { collectExerciseIds } from "./collectExerciseIds";
  * silently dropping an embed.
  */
 export function buildSeoLandingProps(
-  config: SeoLandingConfig
+  config: SeoLandingConfig,
 ): SeoLandingPageProps {
   const exercisesById: Record<string, SerializedExercise> = {};
   for (const id of collectExerciseIds(config)) {
     const raw = exercisesAgregat.find((exercise) => exercise.id === id);
     if (!raw) {
       throw new Error(
-        `SEO landing "${config.slug}" references unknown exercise id "${id}"`
+        `SEO landing "${config.slug}" references unknown exercise id "${id}"`,
       );
     }
     exercisesById[id] = serializeExercise(raw);
@@ -33,7 +34,7 @@ export function buildSeoLandingProps(
     const guide = seoLandingConfigs.find((c) => c.slug === slug);
     if (!guide) {
       throw new Error(
-        `SEO landing "${config.slug}" references unknown guide slug "${slug}"`
+        `SEO landing "${config.slug}" references unknown guide slug "${slug}"`,
       );
     }
     return {
@@ -45,14 +46,14 @@ export function buildSeoLandingProps(
 
   const allBlogs = getAllBlogs();
   const relatedBlogs = config.relatedBlogSlugs.flatMap((slug) =>
-    allBlogs.filter((blog) => blog.slug === slug)
+    allBlogs.filter((blog) => blog.slug === slug),
   );
 
   const relatedSongGuides = config.relatedSongGuideSlugs.map((slug) => {
     const guide = songGuides.find((g) => g.slug === slug);
     if (!guide) {
       throw new Error(
-        `SEO landing "${config.slug}" references unknown song guide "${slug}"`
+        `SEO landing "${config.slug}" references unknown song guide "${slug}"`,
       );
     }
     return {
@@ -63,5 +64,12 @@ export function buildSeoLandingProps(
     };
   });
 
-  return { config, exercisesById, relatedGuides, relatedBlogs, relatedSongGuides };
+  return {
+    config,
+    exercisesById,
+    relatedGuides,
+    relatedBlogs,
+    relatedSongGuides,
+    authorProfile: getAuthorProfile(config.author),
+  };
 }

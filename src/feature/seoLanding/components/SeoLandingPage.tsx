@@ -1,9 +1,12 @@
+import { cn } from "assets/lib/utils";
+import { AuthorBio } from "components/Blog/AuthorBio";
 import { BlogCard } from "components/Blog/BlogCard";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import type { SerializedExercise } from "feature/exercises/lib/serializeExercise";
 import { idToSlug } from "feature/exercises/lib/slugUtils";
 import { jakartaLanding } from "feature/landing/lib/fonts";
 import { motion, useScroll, useSpring } from "framer-motion";
+import type { AuthorProfile } from "lib/authors";
 import type { BlogFrontmatter } from "lib/blog";
 import { trackSignupCtaClicked } from "lib/signupFunnel";
 import {
@@ -12,7 +15,6 @@ import {
   ChevronRight,
   Lightbulb,
   List,
-  Sparkles,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Head from "next/head";
@@ -38,6 +40,7 @@ export interface SeoLandingPageProps {
   relatedGuides: SeoLandingGuideLink[];
   relatedBlogs: BlogFrontmatter[];
   relatedSongGuides: SeoLandingSongGuideLink[];
+  authorProfile: AuthorProfile | null;
 }
 
 // Everything below the article is off-screen at first paint, so it loads on
@@ -45,21 +48,30 @@ export interface SeoLandingPageProps {
 // the same treatment the home page already gives its lower sections.
 const FinalCTASection = dynamic(() =>
   import("feature/landing/components/FinalCTASection").then(
-    (m) => m.FinalCTASection
-  )
+    (m) => m.FinalCTASection,
+  ),
 );
 const Footer = dynamic(() =>
-  import("feature/landing/components/Footer").then((m) => m.Footer)
+  import("feature/landing/components/Footer").then((m) => m.Footer),
 );
 const CookieBanner = dynamic(
   () =>
     import("feature/landing/components/CookieBanner").then(
-      (m) => m.CookieBanner
+      (m) => m.CookieBanner,
     ),
-  { ssr: false }
+  { ssr: false },
 );
 
 const FAQ_HEADING = "FAQ";
+
+/** One colour per block in the CTA's session preview; cycles past five. */
+const PLAN_BLOCK_COLORS = [
+  "bg-cyan-400",
+  "bg-amber-400",
+  "bg-emerald-400",
+  "bg-purple-400",
+  "bg-orange-400",
+];
 
 const Block = ({
   block,
@@ -110,32 +122,87 @@ const Block = ({
           </div>
         </div>
       );
-    case "cta":
+    case "cta": {
+      const plan = block.plan ?? [];
+      const totalMinutes = plan.reduce((sum, item) => sum + item.minutes, 0);
       return (
         <div className='relative overflow-hidden rounded-lg bg-zinc-900/60 p-6 sm:p-10'>
           <div className='pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-cyan-500/15 blur-[100px]' />
-          <div className='relative'>
-            <p className='mb-3 text-2xl font-bold tracking-tight text-white sm:text-3xl'>
-              {block.title}
-            </p>
-            <p className='mb-6 max-w-xl leading-relaxed text-zinc-400'>
-              <InlineText text={block.text} />
-            </p>
-            <div className='flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
-              <Link
-                href='/signup'
-                onClick={() => trackSignupCtaClicked("guide_cta")}
-                className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
-                Start free
-                <ArrowRight className='h-4 w-4' aria-hidden='true' />
-              </Link>
-              <span className='text-xs font-medium text-zinc-400'>
-                Free forever — no credit card
-              </span>
+          <div
+            className={cn(
+              "relative",
+              plan.length > 0 &&
+                "grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:items-center",
+            )}>
+            <div>
+              <p className='mb-3 text-2xl font-bold tracking-tight text-white sm:text-3xl'>
+                {block.title}
+              </p>
+              <p className='mb-6 max-w-xl leading-relaxed text-zinc-400'>
+                <InlineText text={block.text} />
+              </p>
+              <div className='flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
+                <Link
+                  href='/signup'
+                  onClick={() => trackSignupCtaClicked("guide_cta")}
+                  className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
+                  {block.ctaLabel ?? "Start free"}
+                  <ArrowRight className='h-4 w-4' aria-hidden='true' />
+                </Link>
+                <span className='text-xs font-medium text-zinc-400'>
+                  Free forever, no credit card
+                </span>
+              </div>
             </div>
+
+            {plan.length > 0 && (
+              // A mock of the plan card the app builds from these blocks, so
+              // "build your own" is a picture, not a promise.
+              <div className='rounded-lg bg-zinc-950/60 p-5'>
+                <div className='mb-4 flex items-baseline justify-between'>
+                  <p className='text-sm font-semibold text-zinc-200'>
+                    {block.planTitle ?? "Your session"}
+                  </p>
+                  <p className='text-sm font-bold text-white'>
+                    {totalMinutes} min
+                  </p>
+                </div>
+                <div className='flex h-2 gap-1'>
+                  {plan.map((item, idx) => (
+                    <div
+                      key={item.label}
+                      style={{ flexGrow: item.minutes }}
+                      className={cn(
+                        "rounded-full",
+                        PLAN_BLOCK_COLORS[idx % PLAN_BLOCK_COLORS.length],
+                      )}
+                    />
+                  ))}
+                </div>
+                <ul className='mt-5 space-y-2.5'>
+                  {plan.map((item, idx) => (
+                    <li
+                      key={item.label}
+                      className='flex items-center gap-3 text-sm'>
+                      <span
+                        className={cn(
+                          "h-2 w-2 shrink-0 rounded-full",
+                          PLAN_BLOCK_COLORS[idx % PLAN_BLOCK_COLORS.length],
+                        )}
+                      />
+                      <span className='flex-1 text-zinc-300'>{item.label}</span>
+                      <span className='font-semibold text-zinc-500'>
+                        {item.minutes} min
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       );
+    }
     case "exercise": {
       const exercise = exercisesById[block.exerciseId];
       if (!exercise) return null;
@@ -161,6 +228,7 @@ export const SeoLandingPage = ({
   relatedGuides,
   relatedBlogs,
   relatedSongGuides,
+  authorProfile,
 }: SeoLandingPageProps) => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -187,7 +255,7 @@ export const SeoLandingPage = ({
           if (entry.isIntersecting) setActiveId(entry.target.id);
         });
       },
-      { rootMargin: "-20% 0% -35% 0%" }
+      { rootMargin: "-20% 0% -35% 0%" },
     );
     headings.forEach((heading) => {
       const el = document.getElementById(heading.id);
@@ -200,18 +268,21 @@ export const SeoLandingPage = ({
   const canonical = `https://riff.quest/${config.slug}`;
   const exerciseIds = collectExerciseIds(config);
   const exercisePosition = Object.fromEntries(
-    exerciseIds.map((id, index) => [id, index + 1])
+    exerciseIds.map((id, index) => [id, index + 1]),
   );
   // "Jump to the drills" used to land on whatever came first, which on the daily
   // plan is an essay about session length (SEO audit 2026-09-05). Aim it at the
   // first section that actually embeds an exercise.
   const firstDrillSection =
     config.sections.find((section) =>
-      section.blocks.some((block) => block.kind === "exercise")
+      section.blocks.some((block) => block.kind === "exercise"),
     ) ?? config.sections[0];
   const firstSectionId = firstDrillSection
     ? headingId(firstDrillSection.heading)
     : "";
+  const ogImage = config.heroImage
+    ? `https://riff.quest${config.heroImage.src}`
+    : "https://riff.quest/images/og-image.png";
   const pageTitle =
     config.metaTitle.length <= 47
       ? `${config.metaTitle} | Riff Quest`
@@ -224,12 +295,19 @@ export const SeoLandingPage = ({
         "@type": "Article",
         headline: config.title,
         description: config.metaDescription,
-        image: "https://riff.quest/images/og-image.png",
-        author: {
-          "@type": "Organization",
-          name: "Riff Quest",
-          url: "https://riff.quest",
-        },
+        image: ogImage,
+        author: authorProfile
+          ? {
+              "@type": "Person",
+              name: authorProfile.name,
+              description: authorProfile.bio,
+              image: `https://riff.quest${authorProfile.image}`,
+            }
+          : {
+              "@type": "Organization",
+              name: "Riff Quest",
+              url: "https://riff.quest",
+            },
         publisher: {
           "@type": "Organization",
           name: "Riff Quest",
@@ -291,10 +369,7 @@ export const SeoLandingPage = ({
         <meta name='description' content={config.metaDescription} />
         <meta property='og:title' content={config.title} />
         <meta property='og:description' content={config.metaDescription} />
-        <meta
-          property='og:image'
-          content='https://riff.quest/images/og-image.png'
-        />
+        <meta property='og:image' content={ogImage} />
         <meta property='og:type' content='article' />
         <meta property='og:url' content={canonical} />
         <meta property='article:published_time' content={config.publishedAt} />
@@ -332,7 +407,7 @@ export const SeoLandingPage = ({
               </Link>
               <Link
                 href='/signup'
-                className='rounded-lg bg-cyan-500 px-4 py-2 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
+                className='rounded-lg bg-cyan-500 px-4 py-2 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
                 Start free
               </Link>
             </div>
@@ -340,6 +415,24 @@ export const SeoLandingPage = ({
         </nav>
 
         <div className='relative overflow-hidden'>
+          {config.heroImage && (
+            // Full-bleed backdrop. The copy sits on the left, so the photo is
+            // anchored right and darkened from the left; on phones the copy
+            // spans the whole width, so the whole photo dims instead. The
+            // bottom fade lands the article on solid zinc-950.
+            <div className='pointer-events-none absolute inset-0'>
+              <Image
+                src={config.heroImage.src}
+                alt={config.heroImage.alt}
+                fill
+                priority
+                sizes='100vw'
+                className='object-cover object-[70%_center]'
+              />
+              <div className='absolute inset-0 bg-zinc-950/80 lg:bg-transparent lg:bg-gradient-to-r lg:from-zinc-950 lg:via-zinc-950/85 lg:via-45% lg:to-zinc-950/30' />
+              <div className='absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/10 via-35% to-zinc-950/70' />
+            </div>
+          )}
           <div className='pointer-events-none absolute -top-48 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]' />
           <GuitarPatternBackground opacity={0.02} />
 
@@ -354,72 +447,74 @@ export const SeoLandingPage = ({
               </span>
             </div>
 
-            <header className='max-w-4xl pb-16'>
-              <p className='mb-4 inline-flex items-center gap-2 rounded bg-cyan-500/10 px-3 py-1.5 text-sm font-semibold text-cyan-400'>
-                <Sparkles className='h-4 w-4' aria-hidden='true' />
-                Free practice guide
-              </p>
-              <h1 className='mb-6 text-balance font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
-                {config.title}
-              </h1>
-              <div className='space-y-4'>
-                {config.intro.map((paragraph, idx) => (
-                  <p key={idx} className='text-lg leading-relaxed text-zinc-400'>
-                    <InlineText text={paragraph} />
-                  </p>
-                ))}
-              </div>
-
-              {config.quickPicks && config.quickPicks.length > 0 && (
-                <div className='mt-8'>
-                  <p className='mb-3 text-sm font-semibold text-zinc-300'>
-                    How long have you got today?
-                  </p>
-                  <div className='flex flex-wrap gap-3'>
-                    {config.quickPicks.map((pick) => (
-                      <a
-                        key={pick.heading}
-                        href={`#${headingId(pick.heading)}`}
-                        className='rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
-                        {pick.label}
-                      </a>
-                    ))}
-                  </div>
+            <div className='max-w-4xl pb-20 lg:min-h-[560px]'>
+              <header>
+                <h1 className='mb-6 text-balance font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
+                  {config.title}
+                </h1>
+                <div className='space-y-4'>
+                  {config.intro.map((paragraph, idx) => (
+                    <p
+                      key={idx}
+                      className='text-lg leading-relaxed text-zinc-400'>
+                      <InlineText text={paragraph} />
+                    </p>
+                  ))}
                 </div>
-              )}
 
-              <div className='mt-8 flex flex-wrap items-center gap-3 text-sm'>
-                {exerciseIds.length > 0 && (
-                  <span className='rounded bg-cyan-500/10 px-3 py-1.5 font-semibold text-cyan-400'>
-                    {exerciseIds.length} interactive exercises
+                {config.quickPicks && config.quickPicks.length > 0 && (
+                  <div className='mt-8'>
+                    <p className='mb-3 text-sm font-semibold text-zinc-300'>
+                      {config.quickPicksTitle ?? "How long have you got today?"}
+                    </p>
+                    <div className='flex flex-wrap gap-3'>
+                      {config.quickPicks.map((pick) => (
+                        <a
+                          key={pick.heading}
+                          href={`#${headingId(pick.heading)}`}
+                          className='rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-zinc-800'>
+                          {pick.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className='mt-8 flex flex-wrap items-center gap-3 text-sm'>
+                  {exerciseIds.length > 0 && (
+                    <span className='rounded bg-cyan-500/10 px-3 py-1.5 font-semibold text-cyan-400'>
+                      {exerciseIds.length} interactive exercises
+                    </span>
+                  )}
+                  {authorProfile && (
+                    <span className='rounded bg-zinc-800/60 px-3 py-1.5 font-semibold text-zinc-300'>
+                      By {authorProfile.name}, {authorProfile.role}
+                    </span>
+                  )}
+                  <span className='rounded bg-zinc-800/60 px-3 py-1.5 font-semibold text-zinc-300'>
+                    Updated {config.updatedAt}
                   </span>
-                )}
-                <span className='rounded bg-zinc-800/60 px-3 py-1.5 font-semibold text-zinc-300'>
-                  100% free — no paywalls
-                </span>
-                <span className='rounded bg-zinc-800/60 px-3 py-1.5 font-semibold text-zinc-300'>
-                  Updated {config.updatedAt}
-                </span>
-              </div>
+                </div>
 
-              <div className='mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
-                <Link
-                  href='/signup'
-                  onClick={() => trackSignupCtaClicked("guide_hero")}
-                  className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
-                  Start practicing free
-                  <ArrowRight className='h-4 w-4' aria-hidden='true' />
-                </Link>
-                {firstSectionId && (
-                  <a
-                    href={`#${firstSectionId}`}
-                    className='inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-6 py-3 text-sm font-semibold text-zinc-200 transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500'>
-                    Jump to the drills
-                    <ArrowDown className='h-4 w-4' aria-hidden='true' />
-                  </a>
-                )}
-              </div>
-            </header>
+                <div className='mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center'>
+                  <Link
+                    href='/signup'
+                    onClick={() => trackSignupCtaClicked("guide_hero")}
+                    className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
+                    Start practicing free
+                    <ArrowRight className='h-4 w-4' aria-hidden='true' />
+                  </Link>
+                  {firstSectionId && (
+                    <a
+                      href={`#${firstSectionId}`}
+                      className='inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-6 py-3 text-sm font-semibold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 hover:bg-zinc-800'>
+                      Jump to the drills
+                      <ArrowDown className='h-4 w-4' aria-hidden='true' />
+                    </a>
+                  )}
+                </div>
+              </header>
+            </div>
           </div>
         </div>
 
@@ -511,6 +606,15 @@ export const SeoLandingPage = ({
                     </div>
                   </section>
                 )}
+
+                {authorProfile && (
+                  <AuthorBio
+                    name={authorProfile.name}
+                    image={authorProfile.image}
+                    role={authorProfile.role}
+                    bio={authorProfile.bio}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -575,7 +679,9 @@ export const SeoLandingPage = ({
 
         {relatedBlogs.length > 0 && (
           <section className='mx-auto max-w-7xl px-6 py-16'>
-            <h2 className='mb-8 text-2xl font-bold text-white'>From the blog</h2>
+            <h2 className='mb-8 text-2xl font-bold text-white'>
+              From the blog
+            </h2>
             <div className='grid gap-8 sm:grid-cols-2 lg:grid-cols-3'>
               {relatedBlogs.map((blog) => (
                 <BlogCard key={blog.slug} blog={blog} />

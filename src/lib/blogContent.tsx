@@ -11,6 +11,7 @@ import { PracticePlanCard } from 'components/Blog/PracticePlanCard';
 import { PracticeTable } from 'components/Blog/PracticeTable';
 import { SessionLengthChart } from 'components/Blog/SessionLengthChart';
 import { SessionTimeline } from 'components/Blog/SessionTimeline';
+import { SongRanking } from 'components/Blog/SongRanking';
 import { SongTierTable } from 'components/Blog/SongTierTable';
 import { StatRow } from 'components/Blog/StatRow';
 import { StepList } from 'components/Blog/StepList';
@@ -78,6 +79,7 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
   SessionTimeline,
   StatRow,
   StepList,
+  SongRanking,
   SongTierTable,
   TierCards,
   // Mapping h2 to include IDs for ToC, plus an accent marker for section scanning

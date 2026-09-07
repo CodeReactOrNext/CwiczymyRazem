@@ -48,16 +48,9 @@ export const NotationPreview = ({
         },
         display: {
           staveProfile: "ScoreTab",
-          // Dark-board ink, same values as AlphaTabScoreViewer's dark mode —
-          // the board itself is the container's near-black background.
-          resources: {
-            staffLineColor: "#52525b",
-            barSeparatorColor: "#52525b",
-            barNumberColor: "#a1a1aa",
-            mainGlyphColor: "#f4f4f5",
-            secondaryGlyphColor: "#a1a1aa",
-            scoreInfoColor: "#e4e4e7",
-          },
+          // Paper board: AlphaTab's default black ink on the container's white
+          // background, same as the practice viewer's light mode. Reads far
+          // better than light-on-dark for notation and matches the guide photo.
         },
         player: { enablePlayer: false },
       });
@@ -86,12 +79,12 @@ export const NotationPreview = ({
   return (
     <div
       className={cn(
-        "relative overflow-auto rounded-lg bg-zinc-950/70 p-3",
+        "relative overflow-auto rounded-lg bg-white p-3",
         className,
       )}
       style={{ height: heightPx }}>
       {!ready && (
-        <div className='absolute inset-0 animate-pulse rounded-lg bg-zinc-900/60' />
+        <div className='absolute inset-0 animate-pulse rounded-lg bg-zinc-100' />
       )}
       <div
         ref={containerRef}

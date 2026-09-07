@@ -15,7 +15,10 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
   // The whole page is a choice between three lengths, so make the choice the
   // first thing on it instead of a scroll past the session-length essay.
   quickPicks: [
-    { label: "15 minutes", heading: "The 15-Minute Daily Guitar Practice Routine" },
+    {
+      label: "15 minutes",
+      heading: "The 15-Minute Daily Guitar Practice Routine",
+    },
     { label: "30 minutes", heading: "The 30-Minute Plan" },
     { label: "60 minutes", heading: "The 60-Minute Plan" },
   ],
@@ -218,7 +221,7 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
         {
           kind: "cta",
           title: "Riff Quest is the infrastructure",
-          text: "Streaks, a GitHub-style practice heatmap, session logging, XP and a community leaderboard — plus every exercise above with interactive tabs and real-time feedback. The plan lives in the app so your willpower doesn't have to carry it. Free, no paywalls.",
+          text: "Streaks, a GitHub-style practice heatmap, session logging, XP and a community leaderboard — plus every exercise above with interactive tabs and real-time feedback. The plan lives in the app so your willpower doesn't have to carry it.",
         },
         {
           kind: "paragraph",
@@ -259,6 +262,9 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
     "intermediate-guitar-practice-routine",
     "guitar-scale-practice-routine",
   ],
-  relatedBlogSlugs: ["how-long-practice-guitar-daily", "practice-guitar-every-day-simple-steps"],
+  relatedBlogSlugs: [
+    "how-long-practice-guitar-daily",
+    "practice-guitar-every-day-simple-steps",
+  ],
   relatedSongGuideSlugs: ["nothing-else-matters"],
 };
