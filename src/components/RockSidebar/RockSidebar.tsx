@@ -712,8 +712,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               name={userName}
               lvl={userStats.lvl}
               selectedGuitar={userInfo?.selectedGuitar}
-              guitarYear={userInfo?.selectedGuitarYear}
-              guitarCountry={userInfo?.selectedGuitarCountry}
+              userId={userAuth}
             />
             <div className='min-w-0 flex-1'>
               <span className='truncate text-[15px] font-bold tracking-wide text-white'>
@@ -735,8 +734,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             name={userName}
             lvl={userStats.lvl}
             selectedGuitar={userInfo?.selectedGuitar as number}
-            guitarYear={userInfo?.selectedGuitarYear}
-            guitarCountry={userInfo?.selectedGuitarCountry}
+            userId={userAuth}
           />
           <div className='flex min-w-0 flex-1 flex-col justify-center'>
             <span className='truncate text-[15px] font-bold tracking-wide text-white'>

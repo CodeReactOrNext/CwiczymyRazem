@@ -85,9 +85,49 @@ describe("reportHandler", () => {
       );
 
       expect(result.currentUserStats.streakDays).toBe(79);
-      // The legacy counter keeps its own (wrong) value — achievements read it,
-      // so healing it is a separate decision.
+      // The legacy counter keeps its own (wrong) value — the points multiplier
+      // is priced off it, so healing that number is a separate decision.
       expect(result.currentUserStats.actualDayWithoutBreak).toBe(1);
+    });
+
+    it("heals the max-streak record and grades badges on the shown streak", () => {
+      // Same drift, seen from the achievement panel: the counter says 1, the app
+      // has been showing 79, and the streak badges were measured against the 1.
+      const result = run(withClientContext({ clientDisplayStreak: 79 }));
+
+      expect(result.currentUserStats.dayWithoutBreak).toBe(79);
+      expect(result.newAchievements).toContain("day_3");
+      expect(result.newRecords.maxStreak).toBe(true);
+    });
+
+    it("heals the record from the log when the best run is not the current one", () => {
+      // Practised 120 days straight last winter, 2 days into a new run now: the
+      // 100-day badge is owed, and only the client's log knows it.
+      const result = run(
+        withClientContext({ clientDisplayStreak: 2, clientLongestStreak: 120 })
+      );
+
+      expect(result.currentUserStats.dayWithoutBreak).toBe(120);
+      expect(result.newAchievements).toContain("100days");
+    });
+
+    it("ignores a nonsensical longest streak from the client", () => {
+      const result = run(
+        withClientContext({ clientDisplayStreak: 2, clientLongestStreak: -5 })
+      );
+
+      expect(result.currentUserStats.dayWithoutBreak).toBe(2);
+    });
+
+    it("never lowers a record the stored counter already earned", () => {
+      const result = reportUpdateUserStats({
+        currentUserStats: { ...currentUserStats, dayWithoutBreak: 120 },
+        inputData: withClientContext({ clientDisplayStreak: 79 }),
+        currentUserSongLists: { wantToLearn: [], learned: [], learning: [] },
+      });
+
+      expect(result.currentUserStats.dayWithoutBreak).toBe(120);
+      expect(result.newRecords.maxStreak).toBe(false);
     });
 
     it("falls back to the computed streak when the client sends nothing usable", () => {

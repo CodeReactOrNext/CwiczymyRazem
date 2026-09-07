@@ -63,3 +63,59 @@ export const getStreakFromActivityLog = (
 
   return streak;
 };
+
+/**
+ * The longest run of consecutive practice days anywhere in the log, in the
+ * user's local calendar.
+ *
+ * The stored `dayWithoutBreak` record is a high-water mark of the drift-prone
+ * counter, so the timezone slip that reset the counter to 1 also froze the
+ * record at whatever it had reached — which is why the "100 days" badge can read
+ * 41/100 for a player the app itself shows a 100+ day streak for. Walking the
+ * log heals the record the same way `getStreakFromActivityLog` heals the current
+ * streak, and for the same reason: the log keeps the real practice instants and
+ * renders them in the viewer's local time.
+ */
+export const getLongestStreakFromActivityLog = (
+  reportDates: Array<Date | string | null | undefined>
+): number => {
+  // Keyed by local day so multiple reports on one day count once, and holding
+  // the day at local midnight so the walk below does calendar arithmetic (DST
+  // and month/year boundaries handled by Date itself).
+  const practicedDays = new Map<string, Date>();
+
+  for (const raw of reportDates) {
+    if (!raw) continue;
+    const date = raw instanceof Date ? raw : new Date(raw);
+    if (isNaN(date.getTime())) continue;
+    const midnight = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+    practicedDays.set(localDayKey(midnight), midnight);
+  }
+
+  const days = [...practicedDays.values()].sort(
+    (a, b) => a.getTime() - b.getTime()
+  );
+
+  let longest = 0;
+  let run = 0;
+  let previous: Date | null = null;
+
+  for (const day of days) {
+    if (previous) {
+      const expected = new Date(previous);
+      expected.setDate(expected.getDate() + 1);
+      run = localDayKey(expected) === localDayKey(day) ? run + 1 : 1;
+    } else {
+      run = 1;
+    }
+
+    if (run > longest) longest = run;
+    previous = day;
+  }
+
+  return longest;
+};

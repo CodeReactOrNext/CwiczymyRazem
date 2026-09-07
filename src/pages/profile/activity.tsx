@@ -26,7 +26,7 @@ import type { ReactElement } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import type { StatisticsDataInterface } from "types/api.types";
+import { getLongestStreakFromActivityLog } from "utils/gameLogic";
 
 const ExportButton = ({ label, onClick }: { label: string; onClick: () => void }) => (
   <button
@@ -53,7 +53,25 @@ const ProfileActivityPage = () => {
     enabled: !!userAuth,
   });
 
-  const statsField = userStats ? getUserStatsField(userStats) as StatsFieldProps[] : [];
+  // "Consecutive days" is the all-time record, and the stored counter behind it
+  // stopped where a past timezone slip left it. The log is the local-time source
+  // of truth the streak in the header and the badges already read, so heal the
+  // record from it too rather than showing two different bests on one profile.
+  const stats = userStats
+    ? {
+        ...userStats,
+        dayWithoutBreak: Math.max(
+          userStats.dayWithoutBreak ?? 0,
+          getLongestStreakFromActivityLog(
+            (reportList ?? []).map(
+              (report: { date: Date | string }) => report.date
+            )
+          )
+        ),
+      }
+    : userStats;
+
+  const statsField = stats ? (getUserStatsField(stats) as StatsFieldProps[]) : [];
 
   const handleExportSessions = () => {
     if (!reportList || reportList.length === 0) {
@@ -126,16 +144,16 @@ const ProfileActivityPage = () => {
         <div className='font-openSans flex flex-col gap-6'>
 
           {/* 1. Overview stats with trends + radar + achievements */}
-          {userStats && (
+          {stats && (
             <DashboardSection compact>
               <StatsSection
                 statsField={statsField}
-                statistics={userStats}
+                statistics={stats}
                 datasWithReports={datasWithReports}
                 userSongs={songs}
                 onSongsChange={refreshSongs}
                 userAuth={userAuth as string}
-                achievements={userStats.achievements}
+                achievements={stats.achievements}
                 year={year}
                 setYear={setYear}
                 isLoadingActivity={isLoading}
@@ -150,8 +168,8 @@ const ProfileActivityPage = () => {
               <ActivityChart data={reportList as any} />
             </div>
             <div className='lg:col-span-1'>
-              {userStats && (
-                <RecordsList statistics={userStats as StatisticsDataInterface} />
+              {stats && (
+                <RecordsList statistics={stats} />
               )}
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useActivityLogReports } from "components/ActivityLog/hooks/useActivityLogReports";
 import { summarizeArsenal } from "feature/arsenal/data/arsenalSummary";
 import { useArsenalData } from "feature/arsenal/hooks/useArsenalData";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
@@ -10,6 +11,10 @@ import type {
 import { useMemo } from "react";
 import type { SongListInterface } from "src/pages/api/user/report";
 import { useAppSelector } from "store/hooks";
+import {
+  getLongestStreakFromActivityLog,
+  getReconciledStreak,
+} from "utils/gameLogic";
 
 import type { AchievementContext } from "../types";
 
@@ -62,18 +67,48 @@ export const useAchievementContext = (): AchievementContext | null => {
     staleTime: 10 * 60 * 1000,
   });
 
+  // The streak badges read the stored counters, which a past timezone slip pins
+  // to the wrong calendar day for good — that is the "streak is 100+ but the
+  // badge says 41/100" report. The activity log holds the real practice instants
+  // and is read back in the viewer's local time, so it is what every other
+  // streak in the UI is already reconciled against (see getReconciledStreak).
+  // Same all-time query the header streak runs, so it is served from cache.
+  const { reportList } = useActivityLogReports(currentUserId ?? "", "all");
+
+  const reportDates = useMemo(
+    () => (reportList ?? []).map((report) => report.date),
+    [reportList]
+  );
+
   // Memoised because consumers key work off this object: the panel evaluates 77
   // checks twice over from it, and a fresh literal every render would defeat
   // that memo on every unrelated re-render.
   return useMemo(() => {
     if (!currentUserStats || !userSongs) return null;
 
+    const { dayWithoutBreak: currentStreak } = getReconciledStreak({
+      actualDayWithoutBreak: currentUserStats.actualDayWithoutBreak ?? 0,
+      lastReportDate: currentUserStats.lastReportDate,
+      reportDates,
+    });
+
+    // The record only ever climbs: a log that has been trimmed (or has not
+    // loaded yet) must not talk a player out of a badge they already hold.
+    const longestStreak = Math.max(
+      currentUserStats.dayWithoutBreak ?? 0,
+      getLongestStreakFromActivityLog(reportDates)
+    );
+
     return {
-      statistics: currentUserStats,
+      statistics: {
+        ...currentUserStats,
+        actualDayWithoutBreak: currentStreak,
+        dayWithoutBreak: longestStreak,
+      },
       songLists: userSongs as unknown as SongListInterface,
       arsenal: summarizeArsenal(arsenal),
       sessionResults: EMPTY_SESSION_RESULTS,
       inputData: EMPTY_INPUT_DATA,
     };
-  }, [currentUserStats, userSongs, arsenal]);
+  }, [currentUserStats, userSongs, arsenal, reportDates]);
 };

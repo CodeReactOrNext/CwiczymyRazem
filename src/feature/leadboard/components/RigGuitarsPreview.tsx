@@ -4,6 +4,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { CardModal } from "feature/arsenal/components/CardModal";
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
@@ -14,39 +15,13 @@ import type {
   InventoryItem,
 } from "feature/arsenal/types/arsenal.types";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { Guitar, X } from "lucide-react";
+import { Guitar } from "lucide-react";
 import { useState } from "react";
-import { createPortal } from "react-dom";
 import { useResponsiveStore } from "store/useResponsiveStore";
 
 interface RigGuitarsPreviewProps {
   arsenal?: Partial<ArsenalUserData>;
 }
-
-/** Centered, tap-to-dismiss modal used on touch devices where hover tooltips don't fire. */
-const CardModal = ({ onClose, children }: { onClose: () => void; children: React.ReactNode }) => {
-  if (typeof document === "undefined") return null;
-  return createPortal(
-    <div
-      className='fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm'
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onClose();
-      }}>
-      <div className='relative w-full max-w-[320px]' onClick={(e) => e.stopPropagation()}>
-        <button
-          onClick={onClose}
-          aria-label='Close'
-          className='absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white'>
-          <X size={15} />
-        </button>
-        {children}
-      </div>
-    </div>,
-    document.body
-  );
-};
 
 const RigGuitarTile = ({
   item,

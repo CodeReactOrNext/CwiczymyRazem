@@ -1,4 +1,7 @@
-import { getStreakFromActivityLog } from "./getStreakFromActivityLog";
+import {
+  getLongestStreakFromActivityLog,
+  getStreakFromActivityLog,
+} from "./getStreakFromActivityLog";
 import { getLocalDayKey } from "./localDay";
 
 /**
@@ -17,6 +20,13 @@ export interface ClientReportContext {
    * cannot self-heal (see getReconciledStreak), so this is the trustworthy one.
    */
   clientDisplayStreak: number;
+  /**
+   * Longest run of practice days in the whole log, again in local time. The
+   * stored `dayWithoutBreak` record froze wherever the drifting counter left it,
+   * so without this the server cannot tell that the "100 days" badge is owed to
+   * someone whose current streak is shorter than their best one.
+   */
+  clientLongestStreak: number;
   /** IANA zone, e.g. "Europe/Warsaw". Empty when the browser won't say. */
   clientTimeZone: string;
 }
@@ -40,5 +50,6 @@ export const getClientReportContext = (
     { includeToday: true },
     now
   ),
+  clientLongestStreak: getLongestStreakFromActivityLog(reportDates),
   clientTimeZone: resolveTimeZone(),
 });

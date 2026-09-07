@@ -1,4 +1,3 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DashboardSection } from "components/Layout";
@@ -6,7 +5,9 @@ import { DashboardSection } from "components/Layout";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
+import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { useEquippedGuitar } from "feature/arsenal/hooks/useUserArsenal";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 import { SupportBanner } from "feature/dashboard/components/SupportBanner";
@@ -15,11 +16,9 @@ import type { LastSessionInfo } from "feature/practice/utils/lastSession";
 import { loadLastSession } from "feature/practice/utils/lastSession";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
 import { PracticeStatsWidget } from "feature/profile/components/PracticeStatsWidget";
+import { SongTierBadge } from "feature/profile/components/SongTierBadge";
 import { getTrendData } from "feature/profile/utils/getTrendData";
-import { getUserSongs } from "feature/songs/services/getUserSongs";
-import type { Song } from "feature/songs/types/songs.type";
-import { getGatedSkillPower, MIN_LEARNED_SONGS_FOR_TIER } from "feature/songs/utils/difficulty.utils";
-import { getSongTier } from "feature/songs/utils/getSongTier";
+import { useUserSongs } from "feature/songs/hooks/useUserSongs";
 import { ArrowRight, History } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -42,46 +41,13 @@ const ProfileLandingLayout = ({
 }: LandingLayoutProps) => {
   const router = useRouter();
   const { datasWithReports, year, setYear, isLoading, reportList } = useActivityLog(userAuth);
-  const [songs, setSongs] = useState<{ wantToLearn: Song[]; learning: Song[]; learned: Song[] }>();
+  const {
+    songs,
+    isLoading: isSongsLoading,
+    isError: isSongsError,
+  } = useUserSongs(userAuth);
   const [lastSession, setLastSession] = useState<LastSessionInfo | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    // getUserSongs reads directly from the client Firestore SDK (WebChannel).
-    // On networks where that transport stalls (some proxies / ISPs) the fetch
-    // never settles, which would leave the song-tier data stuck forever. Bound
-    // each attempt with a timeout, retry once, then fall back to empty lists so
-    // the dashboard renders (tier shows "?") instead of hanging — mirroring the
-    // activity-log fetch guard.
-    const FETCH_TIMEOUT = 10000;
-    const MAX_ATTEMPTS = 2;
-
-    const loadSongs = async () => {
-      if (!userAuth) return;
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS && !cancelled; attempt++) {
-        try {
-          const timeout = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("getUserSongs timeout")), FETCH_TIMEOUT)
-          );
-          const result = await Promise.race([getUserSongs(userAuth), timeout]);
-          if (!cancelled) setSongs(result);
-          return;
-        } catch (error) {
-          if (attempt === MAX_ATTEMPTS && !cancelled) {
-            console.error("Failed to load user songs:", error);
-            setSongs({ wantToLearn: [], learning: [], learned: [] });
-          }
-        }
-      }
-    };
-
-    loadSongs();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [userAuth]);
+  const { item: equippedGuitar } = useEquippedGuitar(userAuth);
 
   useEffect(() => {
     setLastSession(loadLastSession());
@@ -96,18 +62,14 @@ const ProfileLandingLayout = ({
   ) : "0:00";
   const timeTrendData = getTrendData(datasWithReports, "time");
 
-
-
-  const learnedSongsCount = songs?.learned?.length ?? 0;
-  const skillPower = songs?.learned ? getGatedSkillPower(songs.learned) : 0;
-  const songTier = getSongTier(skillPower > 0 ? skillPower : '?');
-  const songsUntilTierUnlocks = Math.max(0, MIN_LEARNED_SONGS_FOR_TIER - learnedSongsCount);
-
   const imgPath = userInfo?.selectedGuitar ?? (userStats?.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : userStats?.lvl);
   const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
   const specialGuitarDef = isSpecialGuitar ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath) : null;
+  // Lit by what the guitar is now: the workshop can promote it past its mint
+  // rarity, and that promotion only exists on the owner's inventory item.
+  const equippedRarity = getEquippedRarity(equippedGuitar, specialGuitarDef);
   // No special guitar equipped falls back to the brand cyan, not to a rarity.
-  const glowColor = specialGuitarDef ? getRarityColor(specialGuitarDef.rarity) : "#0891b2";
+  const glowColor = equippedRarity ? getRarityColor(equippedRarity) : "#0891b2";
 
   return (
     <div className="bg-second-600 rounded-xl flex flex-col shadow-sm border-none">
@@ -141,36 +103,13 @@ const ProfileLandingLayout = ({
             <div className="absolute inset-0 rounded-full bg-cyan-400/10 blur-3xl" />
 
             {/* Song tier badge */}
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => router.push("/songs?view=board")}
-                    className="relative flex flex-col items-center gap-1.5 rounded-lg p-1 transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  >
-                    <span className="text-[10px] font-semibold tracking-widest text-zinc-400">Song tier</span>
-                    <div
-                      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg"
-                      style={{ color: songTier.color, backgroundColor: 'rgba(10,10,10,0.9)', borderColor: `${songTier.color}40` }}
-                    >
-                      {songTier.tier}
-                    </div>
-                    <span className="text-[11px] font-medium" style={{ color: songTier.color }}>{songTier.label}</span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-[240px] text-center text-zinc-800 leading-relaxed">
-                  {songsUntilTierUnlocks > 0 ? (
-                    <>
-                      Learn {songsUntilTierUnlocks} more song{songsUntilTierUnlocks > 1 ? "s" : ""} to unlock your tier.
-                      It&apos;s a weighted average of your hardest mastered songs, capped by the difficulty of your hardest one — so one hard song alone won&apos;t jump you to a high tier.
-                    </>
-                  ) : (
-                    "Your tier is a weighted average of your hardest mastered songs, capped by the difficulty of your hardest one — so one hard song alone won't jump you to a high tier. Click to see your song board."
-                  )}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <SongTierBadge
+              learnedSongs={songs?.learned}
+              isLoading={isSongsLoading}
+              isError={isSongsError}
+              isOwnProfile
+              onClick={() => router.push("/songs?view=board")}
+            />
 
             {/* Level ring */}
             <LevelProgressCircle 

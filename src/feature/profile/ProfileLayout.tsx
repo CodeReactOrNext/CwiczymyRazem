@@ -4,20 +4,19 @@ import { DaySinceMessage } from "components/DaySince/DaySince";
 import Avatar from "components/UI/Avatar";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
-import { getRarityColor } from "feature/arsenal/components/RarityBadge";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
-import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { EarnedAchievementsList } from "feature/achievements";
+import { getRarityColor } from "feature/arsenal/components/RarityBadge";
+import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
+import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { useEquippedGuitar } from "feature/arsenal/hooks/useUserArsenal";
+import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
-import { getUserSongs } from "feature/songs/services/getUserSongs";
-import type { Song } from "feature/songs/types/songs.type";
-import { getGatedSkillPower } from "feature/songs/utils/difficulty.utils";
-import { getSongTier } from "feature/songs/utils/getSongTier";
+import { useUserSongs } from "feature/songs/hooks/useUserSongs";
 import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
 import { FaFire, FaSoundcloud, FaYoutube } from "react-icons/fa";
@@ -28,6 +27,7 @@ import { getPointsToLvlUp, getReconciledStreak } from "utils/gameLogic";
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
 import { ProfileArsenal } from "./components/ProfileArsenal";
 import { SongSkillShowcase } from "./components/SongSkillShowcase";
+import { SongTierBadge } from "./components/SongTierBadge";
 import { StatsSection } from "./components/StatsSection";
 
 interface LandingLayoutProps {
@@ -42,11 +42,6 @@ const ProfileLayout = ({
   userAuth,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
-  const [songs, setSongs] = useState<{
-    wantToLearn: Song[];
-    learning: Song[];
-    learned: Song[];
-  }>();
   const {
     statistics,
     displayName,
@@ -58,8 +53,6 @@ const ProfileLayout = ({
     youTubeLink,
     guitarStartDate,
     selectedGuitar,
-    selectedGuitarYear,
-    selectedGuitarCountry,
   } = userData;
   const { lastReportDate, achievements } = statistics;
   const [userSkills, setUserSkills] = useState<UserSkills>();
@@ -91,22 +84,27 @@ const ProfileLayout = ({
   const arcC = 2 * Math.PI * arcR;
   const arcOffset = arcC * (1 - xpPercent / 100);
 
-  const skillPower = songs?.learned ? getGatedSkillPower(songs.learned) : 0;
-  const songTier = getSongTier(skillPower);
-
-  useEffect(() => {
-    getUserSongs(userAuth).then((songs) => setSongs(songs));
-  }, []);
+  const {
+    songs,
+    isLoading: isSongsLoading,
+    isError: isSongsError,
+  } = useUserSongs(userAuth);
 
   useEffect(() => {
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
-  }, []);
+  }, [userAuth]);
+
+  const { item: equippedGuitar } = useEquippedGuitar(userAuth);
 
   const imgPath = selectedGuitar ?? (statistics.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : statistics.lvl);
   const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
   const specialGuitarDef = isSpecialGuitar ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath) : null;
+  // The banner is lit by what the guitar is now, not by what it was at mint —
+  // the workshop can promote it, and the promotion only exists on the item.
+  // (The same read feeds the rig below, so the profile pays for it once.)
+  const equippedRarity = getEquippedRarity(equippedGuitar, specialGuitarDef);
   // No special guitar equipped falls back to the brand cyan, not to a rarity.
-  const glowColor = specialGuitarDef ? getRarityColor(specialGuitarDef.rarity) : "#0891b2";
+  const glowColor = equippedRarity ? getRarityColor(equippedRarity) : "#0891b2";
 
   return (
     <div className='bg-second-600 rounded-xl flex flex-col shadow-sm border-none overflow-hidden md:overflow-visible'>
@@ -152,16 +150,11 @@ const ProfileLayout = ({
           <div className='relative flex select-none items-center gap-4 pr-2'>
 
             {/* Song tier badge */}
-            <div className='relative flex flex-col items-center gap-1.5'>
-              <span className='text-[10px] font-semibold tracking-widest text-zinc-400'>Song tier</span>
-              <div
-                className='flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg text-white'
-                style={{ color: songTier.color, backgroundColor: 'rgba(10,10,10,0.9)', borderColor: `${songTier.color}40` }}
-              >
-                {songTier.tier}
-              </div>
-              <span className='text-[11px] font-medium' style={{ color: songTier.color }}>{songTier.label}</span>
-            </div>
+            <SongTierBadge
+              learnedSongs={songs?.learned}
+              isLoading={isSongsLoading}
+              isError={isSongsError}
+            />
 
             {/* Level ring */}
             <div className='relative flex flex-col items-center gap-1'>
@@ -210,8 +203,7 @@ const ProfileLayout = ({
                 avatarURL={avatar}
                 lvl={statistics.lvl}
                 selectedGuitar={selectedGuitar}
-                guitarYear={selectedGuitarYear}
-                guitarCountry={selectedGuitarCountry}
+                userId={userAuth}
               />
             </div>
 
@@ -292,7 +284,7 @@ const ProfileLayout = ({
           />
         </div>
 
-        {/* Song Skill Showcase — visible to guests only */}
+        {/* Song Skill Showcase — the profile owner sees it too */}
         <SongSkillShowcase userSongs={songs} profileUserId={userAuth} />
 
         {/* Skills Section */}
