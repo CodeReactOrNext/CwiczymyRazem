@@ -1,4 +1,5 @@
 import { CursorTooltip } from "components/UI/CursorTooltip/CursorTooltip";
+import { CardModal } from "feature/arsenal/components/CardModal";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
@@ -23,6 +24,7 @@ import {
   evaluateChain,
   readChainNodes,
 } from "feature/arsenal/data/signalChain";
+import { useUserArsenal } from "feature/arsenal/hooks/useUserArsenal";
 import type {
   ArsenalUserData,
   InventoryItem,
@@ -48,11 +50,8 @@ import {
   railFor,
   railPaddingPct,
 } from "feature/arsenal/utils/powerLayout";
-import { doc, getDoc } from "firebase/firestore";
-import { Guitar, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import { db } from "utils/firebase/client/firebase.utils";
+import { Guitar } from "lucide-react";
+import { useState } from "react";
 
 /** How a visitor's eye is told what they are looking at. Chip pattern, no border. */
 const CHAIN_TONES = {
@@ -302,20 +301,13 @@ interface ProfileArsenalProps {
 }
 
 export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
-  const [arsenal, setArsenal] = useState<ArsenalUserData | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   // Clicking/tapping an item opens its card in a centered modal, matching the
   // arsenal editor and the activity view.
   const [pinnedCard, setPinnedCard] = useState<React.ReactNode | null>(null);
-
-  useEffect(() => {
-    getDoc(doc(db, "users", userAuth)).then((snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        if (data?.arsenal) setArsenal(data.arsenal as ArsenalUserData);
-      }
-    });
-  }, [userAuth]);
+  // Shared with the profile's hero — one read of this player's document feeds
+  // the rig here and the guitar card hanging off their avatar.
+  const { data: arsenal } = useUserArsenal(userAuth);
 
   if (!arsenal) return null;
 
@@ -663,26 +655,9 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
 
       {tooltip && !pinnedCard && <RpgTooltip tooltip={tooltip} />}
 
-      {pinnedCard &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <div
-            className='fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm'
-            onClick={() => setPinnedCard(null)}>
-            <div
-              className='relative w-full max-w-[320px]'
-              onClick={(e) => e.stopPropagation()}>
-              <button
-                onClick={() => setPinnedCard(null)}
-                aria-label='Close'
-                className='absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white'>
-                <X size={15} />
-              </button>
-              {pinnedCard}
-            </div>
-          </div>,
-          document.body,
-        )}
+      {pinnedCard && (
+        <CardModal onClose={() => setPinnedCard(null)}>{pinnedCard}</CardModal>
+      )}
     </div>
   );
 };

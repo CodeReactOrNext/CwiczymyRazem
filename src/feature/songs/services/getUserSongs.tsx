@@ -33,7 +33,10 @@ export const getUserSongs = async (userId: string) => {
       const masteryProgress = sections.length > 0 ? Math.round((totalWeighted / sections.length) * 100) : 0;
 
       return {
-        id: data.songId,
+        // The doc id is the song id — a doc written by a side path (backing
+        // track sync, section maps) may not carry the field, and dropping it
+        // would silently shrink the repertoire.
+        id: data.songId ?? docSnap.id,
         status: data.status as SongStatus,
         order: data.order ?? 0,
         masteryProgress,

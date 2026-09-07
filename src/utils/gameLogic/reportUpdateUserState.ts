@@ -142,6 +142,29 @@ export const reportUpdateUserStats = ({
       ? clientStreak
       : finalStreak;
 
+  // The streak the player is actually shown. `finalStreak` is the counter, which
+  // a past timezone slip can pin below the truth for good; `streakDays` is the
+  // local-time activity log walked on the client. Everything that grades a
+  // streak — the record, the badges — reads this, so a badge is never withheld
+  // from a run the app itself has been displaying for weeks.
+  const effectiveStreak = Math.max(finalStreak, streakDays);
+
+  // The all-time record. Also healed from the log, because the best run can sit
+  // far behind the current one — a player whose longest streak was cut in half
+  // by a timezone slip would otherwise be shown "ready" for the 100-day badge on
+  // the panel and never be granted it here. A record only ever climbs, so taking
+  // the highest of the three can neither lose a real record nor revoke a badge.
+  const longestStreak = inputData.clientLongestStreak;
+  const recordStreak = Math.max(
+    dayWithoutBreak,
+    effectiveStreak,
+    typeof longestStreak === "number" &&
+      Number.isInteger(longestStreak) &&
+      longestStreak >= 0
+      ? longestStreak
+      : 0
+  );
+
   const timeZone = isValidTimeZone(inputData.clientTimeZone)
     ? inputData.clientTimeZone
     : null;
@@ -179,9 +202,7 @@ export const reportUpdateUserStats = ({
     currentLevelMaxPoints: getPointsToLvlUp(updatedLevel + 1),
     sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
     habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
-    dayWithoutBreak: dayWithoutBreak < finalStreak
-      ? finalStreak
-      : dayWithoutBreak,
+    dayWithoutBreak: recordStreak,
     maxPoints: maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
     actualDayWithoutBreak: finalStreak,
     achievements: achievements,
@@ -202,7 +223,13 @@ export const reportUpdateUserStats = ({
   };
 
   const newAchievements = AchievementManager.getNewlyEarned({
-    statistics: updatedUserData,
+    statistics: {
+      ...updatedUserData,
+      // Graded against the streak the player is shown, not the raw counter —
+      // otherwise a 100-day run reads as "41/100" on the panel and the badge
+      // never lands, because the counter it is measured against is stuck.
+      actualDayWithoutBreak: effectiveStreak,
+    },
     sessionResults: raiting,
     inputData,
     songLists: currentUserSongLists,
@@ -219,7 +246,7 @@ export const reportUpdateUserStats = ({
   const newRecords = {
     maxPoints: raiting.totalPoints > maxPoints,
     longestSession: sumTime > time.longestSession,
-    maxStreak: finalStreak > dayWithoutBreak,
+    maxStreak: effectiveStreak > dayWithoutBreak,
     newLevel: isNewLevel,
   };
 

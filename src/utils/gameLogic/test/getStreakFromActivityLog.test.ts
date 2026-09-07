@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getStreakFromActivityLog } from "../getStreakFromActivityLog";
+import {
+  getLongestStreakFromActivityLog,
+  getStreakFromActivityLog,
+} from "../getStreakFromActivityLog";
 
 // Server stores the log date as UTC-midnight of the user's local day; the
 // activity log then reads it back and renders it in local time. Build dates the
@@ -106,5 +109,79 @@ describe("getStreakFromActivityLog", () => {
     // Parsed in local time; for any positive UTC offset these land on June 4/3.
     const result = getStreakFromActivityLog(reports, {}, now);
     expect(result).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("getLongestStreakFromActivityLog", () => {
+  it("finds the longest run, not the most recent one", () => {
+    const reports = [
+      // A 4-day run in May...
+      localDate(2026, 4, 10),
+      localDate(2026, 4, 11),
+      localDate(2026, 4, 12),
+      localDate(2026, 4, 13),
+      // ...and a 2-day one in June.
+      localDate(2026, 5, 1),
+      localDate(2026, 5, 2),
+    ];
+
+    expect(getLongestStreakFromActivityLog(reports)).toBe(4);
+  });
+
+  it("does not care what order the log arrives in", () => {
+    const reports = [
+      localDate(2026, 5, 3),
+      localDate(2026, 5, 1),
+      localDate(2026, 5, 2),
+    ];
+
+    expect(getLongestStreakFromActivityLog(reports)).toBe(3);
+  });
+
+  it("counts several reports on one day once", () => {
+    const reports = [
+      localDate(2026, 5, 1),
+      new Date(2026, 5, 1, 22, 30),
+      localDate(2026, 5, 2),
+    ];
+
+    expect(getLongestStreakFromActivityLog(reports)).toBe(2);
+  });
+
+  it("crosses month and year boundaries", () => {
+    const reports = [
+      localDate(2025, 11, 30),
+      localDate(2025, 11, 31),
+      localDate(2026, 0, 1),
+      localDate(2026, 0, 2),
+    ];
+
+    expect(getLongestStreakFromActivityLog(reports)).toBe(4);
+  });
+
+  it("ignores invalid / empty entries", () => {
+    const reports = [
+      localDate(2026, 5, 1),
+      null,
+      undefined,
+      "not-a-date",
+      localDate(2026, 5, 2),
+    ];
+
+    expect(getLongestStreakFromActivityLog(reports)).toBe(2);
+  });
+
+  it("returns 0 for an empty log", () => {
+    expect(getLongestStreakFromActivityLog([])).toBe(0);
+  });
+
+  it("heals a record the stored counter lost to a timezone slip", () => {
+    // A 120-day run: the counter that was reset to 1 partway through cannot
+    // show this any more, the log still can.
+    const reports = Array.from({ length: 120 }, (_, index) =>
+      localDate(2026, 1, 1 + index)
+    );
+
+    expect(getLongestStreakFromActivityLog(reports)).toBe(120);
   });
 });

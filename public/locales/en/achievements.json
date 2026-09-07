@@ -8,7 +8,7 @@
   "panel": {
     "earnedHeadline": "{{owned}} of {{total}} achievements earned",
     "globalColumn": "% of all players",
-    "readyHint": "Log practice to get achievement",
+    "readyHint": "Requirement met unlocks with your next logged session",
     "earned": "Earned",
     "rewards": {
       "claim": "Claim",

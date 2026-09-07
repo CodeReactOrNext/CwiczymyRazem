@@ -1,7 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { Song } from "feature/songs/types/songs.type";
-import { getGatedSkillPower } from "feature/songs/utils/difficulty.utils";
 import { getAllTiers, getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { Music } from "lucide-react";
@@ -26,20 +25,14 @@ export const SongSkillShowcase = ({
   const currentUserId = useAppSelector(selectUserAuth);
   const isOwnProfile = currentUserId === profileUserId;
 
-  const { skillPower, playerTier, tierGroups } = useMemo(() => {
-    if (!userSongs || userSongs.learned.length === 0) {
-      return { skillPower: 0, playerTier: null, tierGroups: [] };
-    }
-
-    const skillPower = getGatedSkillPower(userSongs.learned);
-    const playerTier = skillPower > 0 ? getSongTier(skillPower) : null;
+  const tierGroups = useMemo(() => {
+    if (!userSongs || userSongs.learned.length === 0) return [];
 
     const sortedLearned = [...userSongs.learned]
       .sort((a, b) => (b.avgDifficulty ?? 0) - (a.avgDifficulty ?? 0))
       .slice(0, 12);
 
-    const allTiers = getAllTiers();
-    const tierGroups = allTiers
+    return getAllTiers()
       .map((t) => ({
         tier: t,
         songs: sortedLearned.filter((s) => {
@@ -48,11 +41,30 @@ export const SongSkillShowcase = ({
         }),
       }))
       .filter((g) => g.songs.length > 0);
-
-    return { skillPower, playerTier, tierGroups };
   }, [userSongs]);
 
-  if (isOwnProfile || !userSongs || userSongs.learned.length === 0) return null;
+  // Nothing has loaded yet — the profile's own skeletons cover that moment.
+  if (!userSongs) return null;
+
+  // An empty repertoire used to render nothing at all, which reads as "this
+  // section is broken" rather than "there is nothing here yet".
+  if (userSongs.learned.length === 0) {
+    const learningCount = userSongs.learning.length;
+    return (
+      <div className='rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
+        <h2 className='text-2xl font-bold text-white'>Song Repertoire</h2>
+        <p className='mt-2 text-sm text-zinc-400'>
+          {isOwnProfile
+            ? `Songs land here once you mark them as learned on your song board${
+                learningCount > 0 ? `, and ${learningCount} are still in progress` : ""
+              }.`
+            : `No songs marked as learned yet${
+                learningCount > 0 ? `, ${learningCount} in progress` : ""
+              }.`}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className='rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
@@ -69,28 +81,6 @@ export const SongSkillShowcase = ({
             )}
           </p>
         </div>
-
-        {playerTier && (
-          <div className='flex shrink-0 flex-col items-center gap-1.5'>
-            <span className='text-[10px] font-semibold uppercase tracking-widest text-zinc-400'>
-              Song tier
-            </span>
-            <div
-              className='flex h-14 w-14 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg'
-              style={{
-                color: playerTier.color,
-                backgroundColor: "rgba(10,10,10,0.9)",
-                borderColor: `${playerTier.color}40`,
-              }}>
-              {playerTier.tier}
-            </div>
-            <span
-              className='text-[11px] font-medium'
-              style={{ color: playerTier.color }}>
-              {playerTier.label}
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Tier Groups */}

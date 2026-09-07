@@ -7,7 +7,10 @@ import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
 import { getDisplayStreak } from "./getDisplayStreak";
 import { getPointsToLvlUp } from "./getPointsToLvlUp";
 import { getReconciledStreak } from "./getReconciledStreak";
-import { getStreakFromActivityLog } from "./getStreakFromActivityLog";
+import {
+  getLongestStreakFromActivityLog,
+  getStreakFromActivityLog,
+} from "./getStreakFromActivityLog";
 import { getUpdatedActualDayWithoutBreak } from "./getUpdatedActualDayWithoutBreak";
 import { levelUpUser } from "./levelUpUser";
 import {
@@ -29,6 +32,7 @@ export {
   getDisplayStreak,
   getHoursUntilLocalMidnight,
   getLocalDayKey,
+  getLongestStreakFromActivityLog,
   getPointsToLvlUp,
   getReconciledStreak,
   getReminderHourUtc,
