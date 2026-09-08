@@ -14,16 +14,16 @@ const TermsOfServicePage: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Terms of Service - Riff Quest</title>
+        <title>Terms of Service — Using the Riff Quest Guitar App</title>
         <meta name="description" content="Terms of Service for Riff Quest. Read our terms and conditions for using the guitar practice tracking platform." />
         <link rel="canonical" href="https://riff.quest/terms-of-service" />
-        <meta property="og:title" content="Terms of Service - Riff Quest" />
+        <meta property="og:title" content="Terms of Service — Using the Riff Quest Guitar App" />
         <meta property="og:description" content="Terms of Service for Riff Quest. Read our terms and conditions for using the guitar practice tracking platform." />
         <meta property="og:url" content="https://riff.quest/terms-of-service" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://riff.quest/images/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Terms of Service - Riff Quest" />
+        <meta name="twitter:title" content="Terms of Service — Using the Riff Quest Guitar App" />
         <meta name="twitter:description" content="Terms of Service for Riff Quest." />
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
       </Head>

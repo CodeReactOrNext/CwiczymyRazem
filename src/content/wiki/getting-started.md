@@ -64,4 +64,6 @@ This trips up almost everyone in week one. **Points** are your record: they set 
 
 <FaqList items="Does it matter what I practise?::For points, no. 15 minutes is 15 minutes in any category. For your skills and your daily quests, yes: the category you tag decides which skills grow|I practise away from the computer::Use Practice → Manual Log and type the time in. You can log a session up to 7 days after it happened|What if I miss a day?::You lose the streak bonus and start counting again. Nothing else is touched: points, level, songs and gear all stay|Do I have to do the quests and the gear stuff?::No. The tracker works on its own. The quests, Arsenal and rankings are there for the days when motivation needs help|How much of this is free?::Practising, logging, songs, streaks, quests and the rankings all work without paying for anything" />
 
+More of these, including what the app costs, what you need to plug in and how the streak behaves when life gets in the way, are answered on the [frequently asked questions page](/faq).
+
 <ReadNext links="Your Home screen & daily quests::/wiki/dashboard-and-daily-quests|How points and streaks work::/wiki/how-scoring-works|Where Fame comes from::/wiki/fame|Logging a practice session::/wiki/practice-sessions-and-logging|Ways to practise::/wiki/practice-modes-overview" />

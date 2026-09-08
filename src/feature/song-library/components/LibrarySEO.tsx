@@ -17,7 +17,7 @@ export const LibrarySEO = ({ songs, totalSongs, faqQuestions }: LibrarySEOProps)
   const pageUrl = `${siteUrl}/song-library`;
   const ogImageUrl = `${siteUrl}/promo.png`;
 
-  const title = `Guitar Song Library — ${totalSongs}+ Songs Ranked by Difficulty | Riff Quest`;
+  const title = `${totalSongs}+ Guitar Songs Ranked by Difficulty | Riff Quest`;
   const description = `Browse ${totalSongs}+ guitar songs ranked by real community difficulty ratings. Filter by tier (S through D), genre, and skill level. Find your next song to learn — free to explore.`;
   const keywords =
     "guitar song library, learn guitar songs, song difficulty guitar, guitar tier list, guitar practice songs, community rated guitar songs, guitar repertoire, song difficulty ratings";
