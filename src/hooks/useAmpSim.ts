@@ -191,10 +191,10 @@ export const useAmpSim = () => {
 
   /** Change the requested ASIO/WASAPI buffer size (in frames). Persists and, if
    *  currently running, reopens the stream so it takes effect immediately — the
-   *  driver may still hand back something else (see nativeAudioEngine's retry),
-   *  and if note-detection capture is attached at the same time it wins the
-   *  shared stream's frame size regardless (it's the timing-critical side), so
-   *  this only reliably applies when the amp runs standalone. */
+   *  driver may still hand back something else (see nativeAudioEngine's retry).
+   *  The amp's size also wins when note-detection capture shares the stream
+   *  (capture works at any block size — see electron/streamShape.js), so
+   *  toggling Pitch Detect during a session never changes the amp's latency. */
   const setBufferSize = useCallback(async (size: number) => {
     setBufferSizeState(size);
     try { localStorage.setItem(BUFFER_SIZE_STORAGE_KEY, String(size)); } catch { /* ignore */ }

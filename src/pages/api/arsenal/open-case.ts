@@ -16,6 +16,7 @@ import type {
 } from "feature/arsenal/types/arsenal.types";
 import { pickCuratedDrop } from "feature/arsenal/utils/curatedDraw";
 import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
+import { drawOpenRarity, drawRarity, pickBiased } from "feature/arsenal/utils/openDraw";
 import type { DocumentReference,Transaction } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
 import { readRewardLedger } from "lib/rewards/rewardLedger";
@@ -29,53 +30,20 @@ const GUITAR_CHANCE = 0.6;
 // Flip to false to silence the public activity feed (e.g. while testing).
 const LOG_CASE_OPENS = true;
 
-// Partial: `Custom Shop` has no drop chance to state — it is workshop-only.
-function drawRarity(probabilities: Partial<Record<GuitarRarity, number>>): GuitarRarity {
-  const roll = Math.random();
-  let cumulative = 0;
-  for (const [rarity, prob] of Object.entries(probabilities) as [GuitarRarity, number][]) {
-    cumulative += prob ?? 0;
-    if (roll < cumulative) return rarity;
-  }
-  return "Common";
-}
-
 /**
- * How often a pull prefers a model the player does not own yet, given the rarity
- * already rolled.
+ * Does this rarity still hold a model the player has never pulled?
  *
- * Rarity is drawn first and is never touched by this — the odds printed on the
- * case card stay exactly true. All this decides is *which* item of that rarity
- * comes out, and only while the player is still missing some.
- *
- * Without it the collection ran into the coupon-collector wall: past about fifty
- * cases roughly two pulls in three were a model already in the Dex, and the
- * player was paying full price for a sell-for-scrap duplicate. Not 100%, because
- * duplicates are load-bearing elsewhere — they are the scrap and build economy's
- * raw material, and a stream that never repeats starves the workshop.
- *
- * Open cases only. The curated pools are too small for a soft bias to bite —
- * see `pickCuratedDrop`, which handles them on a stricter rule.
+ * The question `drawOpenRarity` re-rolls on, and it has to be asked per drop
+ * kind: a player can be through every Common effect — there are five — while
+ * half the Common guitars are still missing, and a Standard case that has
+ * already flipped to an effect must not be told otherwise.
  */
-const NEW_ITEM_BIAS = 0.7;
-
-/**
- * One item of `rarity`, biased toward models the player is missing.
- *
- * Falls back to the full pool whenever the bias does not fire or the player
- * already owns everything at that rarity, so this can never fail to return.
- */
-function pickBiased<T>(
-  pool: readonly T[],
-  isOwned: (item: T) => boolean,
-): T {
-  if (Math.random() < NEW_ITEM_BIAS) {
-    const missing = pool.filter((item) => !isOwned(item));
-    if (missing.length > 0) {
-      return missing[Math.floor(Math.random() * missing.length)];
-    }
-  }
-  return pool[Math.floor(Math.random() * pool.length)];
+function hasUndiscovered(
+  poolsByRarity: Record<string, readonly { id: number | string }[]>,
+  discovered: Set<number | string>,
+) {
+  return (rarity: GuitarRarity): boolean =>
+    (poolsByRarity[rarity] ?? []).some((item) => !discovered.has(item.id));
 }
 
 function generateId(): string {
@@ -192,7 +160,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (dailyPick?.kind === "guitar") {
           guitar = dailyPick.def;
         } else {
-          const rarity = drawRarity(caseDef.probabilities);
+          const rarity = drawOpenRarity(
+            caseDef.probabilities,
+            hasUndiscovered(GUITARS_BY_RARITY, discoveredGuitarIds),
+          );
           const pool = GUITARS_BY_RARITY[rarity] || GUITARS_BY_RARITY["Common"];
           guitar = pickBiased(pool, (g) => discoveredGuitarIds.has(g.id));
         }
@@ -245,7 +216,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (dailyPick?.kind === "effect") {
           effect = dailyPick.def;
         } else {
-          const rarity = drawRarity(caseDef.probabilities);
+          const rarity = drawOpenRarity(
+            caseDef.probabilities,
+            hasUndiscovered(EFFECTS_BY_RARITY, discoveredEffectIds),
+          );
           const pool = EFFECTS_BY_RARITY[rarity] || EFFECTS_BY_RARITY["Common"] || [];
           effect = pickBiased(pool, (e) => discoveredEffectIds.has(e.id));
         }

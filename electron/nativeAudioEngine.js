@@ -13,6 +13,7 @@ const { RtAudioFormat, RtAudioApi, RtAudioErrorType, RtAudioStreamFlags } = requ
 const { AmpChain } = require("./ampSim");
 const { OutputQueueMonitor } = require("./outputQueueMonitor");
 const shared = require("./rtaudio");
+const { pickRequestedFrameSize } = require("./streamShape");
 const toneStore = require("./toneStore");
 
 // Where this module runs: inside the dedicated audio process (electron/
@@ -150,18 +151,19 @@ function buildSampleRateCandidates(desiredRate, supportedRates) {
 }
 
 /** Opens the stream, first across sample-rate candidates (falling through to the
- *  next one if the driver throws opening at the previous one — see
- *  buildSampleRateCandidates), then within the winning rate retrying (close +
- *  short pause + reopen) while the driver keeps handing back a way-oversized
- *  buffer. Leaves the stream open but NOT started — the caller starts it once
+ *  next one once the driver has thrown at the previous one on every paused
+ *  retry — see buildSampleRateCandidates), then within the winning rate retrying
+ *  (close + short pause + reopen) while the driver keeps handing back a
+ *  way-oversized buffer. Leaves the stream open but NOT started — the caller starts it once
  *  the DSP chain is ready — so a discarded oversized attempt never audibly
  *  starts and the first callbacks never race a model load. */
 async function openStreamWithRetry(rt, outParams, inParams, sampleRateCandidates, requestedFrameSize) {
   let lastErr;
   for (const sampleRate of sampleRateCandidates) {
     let actualFrame;
-    try {
-      for (let attempt = 1; attempt <= MAX_OPEN_ATTEMPTS; attempt++) {
+    let opened = false;
+    for (let attempt = 1; attempt <= MAX_OPEN_ATTEMPTS; attempt++) {
+      try {
         actualFrame = rt.openStream(
           outParams,
           inParams,
@@ -174,15 +176,25 @@ async function openStreamWithRetry(rt, outParams, inParams, sampleRateCandidates
           STREAM_FLAGS,
           onStreamError
         );
-        if (!isOversized(actualFrame, requestedFrameSize) || attempt === MAX_OPEN_ATTEMPTS) break;
-        shared.closeStream();
-        await sleep(REOPEN_DELAY_MS);
+      } catch (err) {
+        lastErr = err;
+        shared.closeStream(); // defensive: make sure a failed open never blocks the next attempt
+        // Same driver quirk as the oversized-buffer retry below, just the ruder
+        // form of it: right after a teardown some ASIO drivers don't hand back a
+        // "safe" buffer, they refuse the open outright for a moment. That's the
+        // path a quick Pitch Detect off→on (or the mount-time init→close→init)
+        // used to die on. Give the driver the same short pause and try the same
+        // rate again before concluding this rate is genuinely unsupported.
+        if (attempt < MAX_OPEN_ATTEMPTS) { await sleep(REOPEN_DELAY_MS); continue; }
+        break;
       }
-    } catch (err) {
-      lastErr = err;
-      shared.closeStream(); // defensive: make sure a failed open never blocks the next candidate's attempt
-      continue;
+      opened = true;
+      if (!isOversized(actualFrame, requestedFrameSize) || attempt === MAX_OPEN_ATTEMPTS) break;
+      opened = false;
+      shared.closeStream();
+      await sleep(REOPEN_DELAY_MS);
     }
+    if (!opened) continue; // every attempt at this rate threw — next candidate
     if (isOversized(actualFrame, requestedFrameSize)) {
       // All MAX_OPEN_ATTEMPTS retries came back oversized — the driver is stuck
       // in its "safe" mode for this open and we're giving up rather than retry
@@ -364,8 +376,9 @@ function computeDesiredShape() {
   const rt = shared.getRt();
   const devices = rt.getDevices();
 
-  // Capture wins the shared input config when both are attached — it's the
-  // timing-sensitive side. In practice both already agree (same persisted device).
+  // Capture wins the shared input device/channel when both are attached — it's
+  // the timing-sensitive side. In practice both already agree (same persisted
+  // device). Frame size is decided separately below (the amp wins that one).
   let inDev;
   let primary;
   if (captureConsumer) {
@@ -384,7 +397,20 @@ function computeDesiredShape() {
 
   const sampleRate =
     primary.sampleRate || negotiatedSampleRateByDevice.get(inDev.id) || inDev.preferredSampleRate || 48000;
-  const requestedFrameSize = primary.frameSize || 256;
+  // Frame size is the one thing capture must NOT win: the buffer size is the
+  // amp's monitoring latency (the user picks 64/128/256 in Tone Studio), while
+  // capture just accumulates blocks into 2048-sample analysis windows and works
+  // identically at any block size. Letting capture's hardcoded 256 override the
+  // amp's 128 meant every "Pitch Detect" toggle during a live amp session forced
+  // a close + reopen of the ASIO stream (an audible gap, a NAM rebuild, doubled
+  // amp latency) — and ASIO drivers routinely refuse an immediate reopen, which
+  // is what made pitch detection fail to start until the user clicked it a few
+  // more times. With the amp's size adopted here, attaching/detaching capture
+  // onto a running amp stream is a no-reopen no-op, as the header promises.
+  const requestedFrameSize = pickRequestedFrameSize(
+    captureConsumer && captureConsumer.requested,
+    ampConsumer && ampConsumer.requested
+  );
   const channel = Math.max(0, Math.min(primary.channel || 0, Math.max(0, inDev.inputChannels - 1)));
 
   const duplex = !!ampConsumer;
@@ -796,9 +822,25 @@ async function attachCapture(opts, onFrame) {
     await ensureOpen();
   } catch (err) {
     captureConsumer = null;
+    await restoreAfterFailedAttach();
     throw decorateOpenError(err);
   }
   return captureInfo;
+}
+
+/** A failed attach that needed a reshape has already closed the stream the OTHER
+ *  consumer was happily using (ensureOpenInner closes before it reopens). Put that
+ *  consumer's stream back right away instead of leaving it dead until the health
+ *  poll's next tick notices (up to HEALTH_POLL_MS plus the first recovery delay) —
+ *  the amp going silent for seconds every time pitch detection fails to start
+ *  reads as a second bug on top of the first. Best-effort: if the driver is
+ *  genuinely stuck, the poll-driven recovery still takes over exactly as before.
+ *  No-op when nothing was disturbed (a request rejected by computeDesiredShape
+ *  before it touched the stream, or no other consumer attached). */
+async function restoreAfterFailedAttach() {
+  if (!captureConsumer && !ampConsumer) return;
+  if (shared.isStreamOpen()) return;
+  try { await ensureOpen(); } catch { /* recovery poll takes it from here */ }
 }
 
 async function detachCapture() {
@@ -827,6 +869,7 @@ async function attachAmp(opts = {}) {
     await ensureOpen();
   } catch (err) {
     ampConsumer = null;
+    await restoreAfterFailedAttach();
     throw decorateOpenError(err);
   }
   return ampInfo;

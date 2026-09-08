@@ -108,8 +108,9 @@ export const useNativeAudioAnalyzer = () => {
   // window and corrupting pitch detection for the whole session.
   const generationRef = useRef(0);
 
-  const init = useCallback(async () => {
-    const myGeneration = ++generationRef.current;
+  // The body of init(); only ever entered through the serialized wrapper below.
+  const runInit = useCallback(async (myGeneration: number) => {
+    if (myGeneration !== generationRef.current) return; // superseded while waiting its turn
     const native = window.nativeAudio;
     if (!native) {
       setState(prev => ({ ...prev, error: "Native audio bridge unavailable" }));
@@ -222,6 +223,11 @@ export const useNativeAudioAnalyzer = () => {
       });
 
       // Open the low-latency stream. Small frameSize → minimal capture latency.
+      // frameSize is only a request for when capture opens the stream on its
+      // own: if the amp simulator is already running, the engine keeps the
+      // amp's buffer size (its monitoring latency) and just attaches capture
+      // to the live stream — no reopen. The windowing above works at any
+      // block size, so nothing here depends on actually getting 256.
       // No sampleRate hint: some ASIO drivers report a preferred rate they then
       // refuse to open at, so the engine negotiates and reports back what it
       // actually got — detectors below are built for that, not a guess.
@@ -274,10 +280,38 @@ export const useNativeAudioAnalyzer = () => {
         streamInfo: info,
       }));
     } catch (err: any) {
+      if (myGeneration !== generationRef.current) return; // superseded — a newer call owns the outcome now
       console.error("Error initializing native audio analyzer:", err);
-      setState(prev => ({ ...prev, error: err?.message || "Native audio init failed" }));
+      const message = err?.message || "Native audio init failed";
+      setState(prev => ({ ...prev, error: message }));
+      // PracticeSession lights the "Pitch Detect" button from the user's
+      // preference, not from isListening — so without this, a failed native
+      // open (ASIO held by another app, driver refusing a reopen, ...) looked
+      // exactly like a working one, just with nothing ever being detected.
+      toast.error(`Couldn't start pitch detection: ${message}`);
     }
   }, []);
+
+  // init() calls are serialized: a new init() never sends its native.start()
+  // while a superseded init()'s start() is still in flight. Without this, the
+  // mount-time dance PracticeSession does (init → close → init, e.g. when an
+  // exercise's persisted mic preference differs from the global one, or React
+  // StrictMode's double-invoke) raced on the Electron path: init #1's start()
+  // takes hundreds of ms when it has to (re)open ASIO, so init #2's start()
+  // was already sent — and possibly already attached in the engine — by the
+  // time #1 resolved, saw it was superseded and called native.stop(), which
+  // detached #2's capture. #2 then completed normally (its start() had
+  // returned stream info), flipped isListening to true, and never received a
+  // single frame: "Pitch Detect on", nothing detected, until the user toggled
+  // it off and on again. Queued behind #1, #2's start() now always goes out
+  // after #1's stop() — IPC is FIFO, so the engine ends up with #2 attached.
+  const initChainRef = useRef<Promise<void>>(Promise.resolve());
+  const init = useCallback(() => {
+    const myGeneration = ++generationRef.current;
+    const run = initChainRef.current.then(() => runInit(myGeneration));
+    initChainRef.current = run.catch(() => { /* runInit handles its own errors; never break the chain */ });
+    return run;
+  }, [runInit]);
 
   const close = useCallback(() => {
     generationRef.current++; // invalidate any in-flight init() (see generationRef above)
