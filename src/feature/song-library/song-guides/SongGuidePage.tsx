@@ -142,7 +142,15 @@ const SongGuidePage = ({
         </div>
         {guide.sectionOrder.map(renderSection)}
         <div id='faq' className='scroll-mt-24'>
-          <FaqSection questions={resolvedFaq} />
+          <FaqSection
+            questions={resolvedFaq}
+            moreLink={{
+              intro:
+                "Questions about Riff Quest itself — how practice is scored, what it costs, what you need to plug in — are answered on",
+              href: "/faq",
+              label: "the frequently asked questions page",
+            }}
+          />
         </div>
         {authorProfile && (
           <div className='mx-auto max-w-5xl px-6'>

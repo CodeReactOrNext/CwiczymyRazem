@@ -1,9 +1,11 @@
+import { cn } from "assets/lib/utils";
 import { Footer } from "feature/landing/components/Footer";
-import { AudioLines, ExternalLink, Grid3x3, ListMusic, Rewind, Sparkles, Target, Timer } from "lucide-react";
+import { AudioLines, Ear, ExternalLink, Gauge, Grid3x3, ListMusic, Rewind, Sparkles, Target, Timer } from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType } from "react";
+import { useMemo, useState } from "react";
 
 type PriceTier = "free" | "freemium" | "paid";
 
@@ -11,7 +13,7 @@ interface Tool {
   name: string;
   url: string;
   description: string;
-  logo: string;
+  logo?: string;
   price: PriceTier;
   ai?: boolean;
   isOwnApp?: boolean;
@@ -72,6 +74,33 @@ const CATEGORIES: ToolCategory[] = [
         logo: "/images/tools/strumforge.png",
         price: "free",
       },
+      {
+        name: "Chordify",
+        url: "https://chordify.net/",
+        description: "Turns a track from YouTube, Spotify or your own upload into a chord chart that scrolls in time with the music.",
+        price: "freemium",
+        ai: true,
+      },
+      {
+        name: "Soundslice",
+        url: "https://www.soundslice.com/",
+        description: "Interactive tab and notation synced to video, and the tool a lot of teachers use to publish their lessons.",
+        logo: "/images/tools/soundslice.png",
+        price: "freemium",
+      },
+    ],
+  },
+  {
+    id: "tuners",
+    name: "Tuners",
+    icon: Gauge,
+    tools: [
+      {
+        name: "Fender Tune",
+        url: "https://www.fender.com/online-guitar-tuner/",
+        description: "Online guitar tuner in the browser, with tunings for electric, acoustic, bass and ukulele.",
+        price: "free",
+      },
     ],
   },
   {
@@ -98,6 +127,41 @@ const CATEGORIES: ToolCategory[] = [
         url: "https://quinnfetrowsguitarmachines.com/",
         description: "A toolkit for learning notes, scales, arpeggios, and improvisation.",
         logo: "/images/tools/qfgm.png",
+        price: "free",
+      },
+      {
+        name: "musictheory.net",
+        url: "https://www.musictheory.net/",
+        description: "Lessons and drills on notes, intervals, chords and key signatures, plus tools for building and hearing them.",
+        logo: "/images/tools/musictheory-net.png",
+        price: "free",
+      },
+      {
+        name: "Musicca",
+        url: "https://www.musicca.com/",
+        description: "Free exercises for notes, scales, chords and intervals, alongside a browser metronome, tuner and keyboard.",
+        logo: "/images/tools/musicca.png",
+        price: "free",
+      },
+    ],
+  },
+  {
+    id: "ear",
+    name: "Ear Training",
+    icon: Ear,
+    tools: [
+      {
+        name: "Functional Ear Trainer",
+        url: "https://getfet.app/",
+        description: "Ear training built on hearing a note by its function inside a key, rather than as an isolated interval.",
+        logo: "/images/tools/functional-ear-trainer.ico",
+        price: "freemium",
+      },
+      {
+        name: "Teoria",
+        url: "https://www.teoria.com/",
+        description: "Ear, rhythm and theory exercises, with tutorials covering harmony and analysis.",
+        logo: "/images/tools/teoria.ico",
         price: "free",
       },
     ],
@@ -142,11 +206,25 @@ const CATEGORIES: ToolCategory[] = [
         logo: "/images/tools/metricflow.png",
         price: "paid",
       },
+      {
+        name: "Metronome Online",
+        url: "https://www.metronomeonline.com/",
+        description: "A plain browser metronome with tap tempo and nothing to set up.",
+        logo: "/images/tools/metronome-online.png",
+        price: "free",
+      },
+      {
+        name: "Groove Scribe",
+        url: "https://www.mikeslessons.com/groove/",
+        description: "Write a drum groove in the browser and play it back, so you have a real beat to practise over instead of a click.",
+        logo: "/images/tools/groove-scribe.ico",
+        price: "free",
+      },
     ],
   },
   {
     id: "backing",
-    name: "Backing Tracks & Stem Separation",
+    name: "Backing Tracks, Stems & Recording",
     icon: AudioLines,
     tools: [
       {
@@ -171,6 +249,20 @@ const CATEGORIES: ToolCategory[] = [
         logo: "/images/tools/mvsep.ico",
         price: "free",
         ai: true,
+      },
+      {
+        name: "iReal Pro",
+        url: "https://www.irealpro.com/",
+        description: "Chord charts that play back as a backing band, with thousands of user-made progressions to improvise over.",
+        logo: "/images/tools/irealpro.png",
+        price: "paid",
+      },
+      {
+        name: "BandLab",
+        url: "https://www.bandlab.com/",
+        description: "Free browser DAW for recording yourself, layering takes and practising against your own backing tracks.",
+        logo: "/images/tools/bandlab.png",
+        price: "free",
       },
     ],
   },
@@ -204,7 +296,7 @@ const CATEGORIES: ToolCategory[] = [
   },
   {
     id: "guided",
-    name: "Guided Practice",
+    name: "Lessons & Guided Practice",
     icon: Target,
     tools: [
       {
@@ -212,8 +304,22 @@ const CATEGORIES: ToolCategory[] = [
         url: "/",
         description: "Session tracking, exercise and practice plans, scoring, leaderboards, songs, and playlists: the app this list lives on.",
         logo: "/images/logolight.svg",
-        price: "freemium",
+        price: "free",
         isOwnApp: true,
+      },
+      {
+        name: "JustinGuitar",
+        url: "https://www.justinguitar.com/",
+        description: "Free structured lesson courses from absolute beginner upwards, with songs, technique modules and practice routines.",
+        logo: "/images/tools/justinguitar.ico",
+        price: "freemium",
+      },
+      {
+        name: "String Theory",
+        url: "https://store.steampowered.com/app/4699410/String_Theory/",
+        description: "Free-to-play Steam game in early access: it listens to a real guitar or bass, scores your playing on songs you import, and has loop and speed controls.",
+        logo: "/images/tools/string-theory.png",
+        price: "free",
       },
       {
         name: "Solotrainer",
@@ -238,24 +344,62 @@ const PRICE_CLASSES: Record<PriceTier, string> = {
   paid: "bg-zinc-800 text-zinc-400",
 };
 
-const totalTools = CATEGORIES.reduce((sum, category) => sum + category.tools.length, 0);
+const AI_CLASSES = "bg-purple-500/10 text-purple-400";
+
+type FilterKey = PriceTier | "ai";
+
+const FILTERS: { key: FilterKey; label: string; hint: string; classes: string }[] = [
+  { key: "free", label: "Free", hint: "nothing to pay", classes: PRICE_CLASSES.free },
+  { key: "freemium", label: "Freemium", hint: "free tier, paid upgrade", classes: PRICE_CLASSES.freemium },
+  { key: "paid", label: "Paid", hint: "no free version", classes: PRICE_CLASSES.paid },
+  { key: "ai", label: "AI", hint: "a model does the work", classes: AI_CLASSES },
+];
+
+const ALL_TOOLS = CATEGORIES.flatMap((category) => category.tools);
+const totalTools = ALL_TOOLS.length;
+const countFor = (key: FilterKey) =>
+  key === "ai"
+    ? ALL_TOOLS.filter((tool) => tool.ai).length
+    : ALL_TOOLS.filter((tool) => tool.price === key).length;
 const siteUrl = "https://riff.quest/tools";
 
 const ToolsPage = () => {
+  const [activeFilters, setActiveFilters] = useState<FilterKey[]>([]);
+
+  const toggleFilter = (key: FilterKey) =>
+    setActiveFilters((current) =>
+      current.includes(key) ? current.filter((item) => item !== key) : [...current, key],
+    );
+
+  const visibleCategories = useMemo(() => {
+    const prices = activeFilters.filter((key): key is PriceTier => key !== "ai");
+    const aiOnly = activeFilters.includes("ai");
+
+    return CATEGORIES.map((category) => ({
+      ...category,
+      tools: category.tools.filter(
+        (tool) =>
+          (prices.length === 0 || prices.includes(tool.price)) && (!aiOnly || tool.ai),
+      ),
+    })).filter((category) => category.tools.length > 0);
+  }, [activeFilters]);
+
+  const visibleCount = visibleCategories.reduce((sum, category) => sum + category.tools.length, 0);
+
   return (
     <>
       <Head>
-        <title>22 Guitar Tools Worth Using Alongside Riff Quest</title>
-        <meta name="description" content="22 tools for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription, the things Riff Quest doesn't cover, marked free, freemium, or paid." />
+        <title>{`${totalTools} Guitar Practice Tools: Tabs, Tuners, Metronomes & Ear Training`}</title>
+        <meta name="description" content={`A catalogue of ${totalTools} guitar tools: tabs and notation, online tuners, fretboard and theory drills, ear training, metronomes, backing tracks and slow-downers. Each one marked free, freemium or paid.`} />
         <link rel='canonical' href={siteUrl} />
-        <meta property="og:title" content="22 Guitar Tools Worth Using Alongside Riff Quest" />
-        <meta property="og:description" content="What I use for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription: the things Riff Quest doesn't cover." />
+        <meta property="og:title" content={`${totalTools} Guitar Practice Tools: Tabs, Tuners, Metronomes & Ear Training`} />
+        <meta property="og:description" content={`A catalogue of ${totalTools} guitar tools for tabs, tuning, theory, ear training, rhythm, backing tracks and transcription.`} />
         <meta property="og:url" content={siteUrl} />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://riff.quest/images/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="22 Guitar Tools Worth Using Alongside Riff Quest" />
-        <meta name="twitter:description" content="What I use for tabs, fretboard drilling, metronomes, backing tracks, and ear transcription: the things Riff Quest doesn't cover." />
+        <meta name="twitter:title" content={`${totalTools} Guitar Practice Tools: Tabs, Tuners, Metronomes & Ear Training`} />
+        <meta name="twitter:description" content={`A catalogue of ${totalTools} guitar tools for tabs, tuning, theory, ear training, rhythm, backing tracks and transcription.`} />
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
         <script
           type="application/ld+json"
@@ -289,22 +433,72 @@ const ToolsPage = () => {
         </nav>
 
         <div className="mx-auto max-w-5xl px-6 pb-24 pt-32">
-          <div className="mb-16 max-w-2xl">
-            <p className="mb-4 text-xs text-zinc-500">
-              Michael Apfel, riff.quest founder. Last checked August 2026.
-            </p>
-            <h1 className="text-4xl font-black text-white mb-6">Tools worth using alongside Riff Quest</h1>
+          <div className="mb-10 max-w-2xl">
+            <h1 className="text-4xl font-black text-white mb-6">Guitar practice tools</h1>
             <p className="text-lg text-zinc-400 leading-relaxed">
-              Riff Quest handles session tracking, practice plans, and scoring, but it won&apos;t give you a tab, slow a recording down for ear training, or generate a backing track. These are the {totalTools} tools I use for that instead, grouped by what you&apos;d reach for them to do. Every entry is marked free, freemium, or paid, and anything leaning on a model to do the work carries an AI badge.
+              A catalogue of {totalTools} tools, grouped by what you would reach for them to do.
             </p>
           </div>
 
+          <div className="mb-16">
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveFilters([])}
+                aria-pressed={activeFilters.length === 0}
+                className={cn(
+                  "rounded px-2.5 py-1 text-xs font-bold text-zinc-300 transition-background hover:bg-zinc-800",
+                  activeFilters.length === 0 ? "bg-zinc-800" : "bg-zinc-900/40",
+                )}>
+                All {totalTools}
+              </button>
+
+              {FILTERS.map((filter) => {
+                const isActive = activeFilters.includes(filter.key);
+                return (
+                  <button
+                    key={filter.key}
+                    type="button"
+                    onClick={() => toggleFilter(filter.key)}
+                    aria-pressed={isActive}
+                    className={cn(
+                      "flex items-center gap-1 rounded px-2.5 py-1 text-xs font-bold transition-opacity",
+                      filter.classes,
+                      isActive ? "opacity-100 ring-1 ring-white/25" : "opacity-50 hover:opacity-100",
+                    )}>
+                    {filter.key === "ai" && <Sparkles className="h-2.5 w-2.5" />}
+                    {filter.label} {countFor(filter.key)}
+                  </button>
+                );
+              })}
+
+              {activeFilters.length > 0 && (
+                <span className="text-xs text-zinc-500">
+                  {visibleCount} of {totalTools}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs text-zinc-500">
+              {FILTERS.map((filter) => (
+                <span key={filter.key}>
+                  <span className="font-bold text-zinc-400">{filter.label}</span> {filter.hint}
+                </span>
+              ))}
+            </div>
+          </div>
+
           <div className="space-y-16">
-            {CATEGORIES.map((category) => {
+            {visibleCategories.length === 0 && (
+              <p className="rounded-lg bg-zinc-900/40 p-6 text-sm text-zinc-400">
+                Nothing matches those filters.
+              </p>
+            )}
+            {visibleCategories.map((category) => {
               const Icon = category.icon;
               return (
                 <section key={category.id} id={category.id}>
-                  <div className="mb-5 flex items-center gap-3">
+                  <div className="mb-3 flex items-center gap-3">
                     <Icon className="h-4 w-4 shrink-0 text-cyan-400" />
                     <h2 className="text-lg font-bold text-white">{category.name}</h2>
                   </div>
@@ -328,7 +522,11 @@ const ToolsPage = () => {
                                 ? "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-900/60 p-2.5"
                                 : "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-100 p-2"
                             }>
-                            <Image src={tool.logo} alt="" width={28} height={28} className="h-full w-full object-contain" unoptimized />
+                            {tool.logo ? (
+                              <Image src={tool.logo} alt="" width={28} height={28} className="h-full w-full object-contain" unoptimized />
+                            ) : (
+                              <span className="text-base font-black text-zinc-500">{tool.name.charAt(0)}</span>
+                            )}
                           </span>
                           <span className="text-sm font-bold text-white">{tool.name}</span>
                         </div>

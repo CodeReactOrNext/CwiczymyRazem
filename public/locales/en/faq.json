@@ -11,5 +11,55 @@
   "get_achievement_title": "How to earn a badge?",
   "get_achievement_description": "Badges are awarded for meeting specific conditions, such as: exceeding a specific number of points for one report or exceeding the total time spent practicing the guitar. Badges and requirements for earning them are hidden, but you can view them in the rankings and profiles of other players.",
   "about_excerise_title": "How do I distinguish what I am currently practicing?",
-  "about_excerise_description": "We propose dividing it into technique, theory, listening, and creative work. In the report prompts, you can see exercise suggestions for each of these pillars. The final choice of exercises is up to you and depends on your individual goals and needs. It is important to find a balance between these different areas and not neglect any of them."
+  "about_excerise_description": "We propose dividing it into technique, theory, listening, and creative work. In the report prompts, you can see exercise suggestions for each of these pillars. The final choice of exercises is up to you and depends on your individual goals and needs. It is important to find a balance between these different areas and not neglect any of them.",
+
+  "group_start": "Getting started",
+  "group_practice": "Practising and logging",
+  "group_progress": "Points, streaks and Fame",
+  "group_community": "Songs, rankings and community",
+
+  "intro_lead": "Everything below is a question people actually ask before or during their first weeks with Riff Quest: what the app does, what it costs, what you need to plug in, and how the scoring behaves once you start logging sessions.",
+  "intro_body": "Short answers live on this page. Every topic also has a longer article in the knowledge base, written for players rather than for developers, with screenshots of the screens being described. If your question is not here, Discord is the fastest place to ask it and the answer usually ends up on this page afterwards.",
+
+  "price_title": "Is Riff Quest free?",
+  "price_description": "Yes, and it is free forever, with no paywalls. Practising, logging sessions, the exercise library, songs, streaks, daily quests, the Arsenal and the rankings all work without paying for anything. There is a supporter option for people who want to help cover the running costs, but it does not unlock features or content that anyone else is missing.",
+
+  "account_title": "Do I need an account?",
+  "account_description": "Yes, because everything the app does is built on your own practice history: points, streak, level, skills, songs and gear all hang off one account. Signing up takes a few seconds with an email address or a Google account, and your data follows you between the browser and the desktop app the moment it is saved.",
+
+  "beginner_title": "Is it for beginners, or do I need to already play well?",
+  "beginner_description": "It works from the first week of playing. Nothing in the app judges how good you are, it measures how consistently you practise, so a beginner logging ten minutes a day makes visibly more progress on screen than an advanced player who practises once a fortnight. If you do not know what to practise yet, the Learning Path hands you one step at a time instead of asking you to choose.",
+
+  "equipment_title": "Do I need a microphone or an audio interface?",
+  "equipment_description": "No. Every core part of the app works if you simply type in the minutes you played. Note detection, which listens to your guitar and checks the notes you play against the screen, is an optional extra that needs a microphone or an interface, but no exercise, routine or point is locked behind it.",
+
+  "late_log_title": "Can I log a session I played away from the computer?",
+  "late_log_description": "Yes. Manual Log takes a session that already happened, and you can backdate it up to seven days. That covers the practice you did on the sofa, at a rehearsal or on holiday, so a week away from the desk does not turn into a hole in your history.",
+
+  "content_title": "How much is there to practise?",
+  "content_description": "The library holds more than 200 exercises and over 50 ready-made routines, the Learning Path runs 36 steps across two modules, and the Scale Map covers nine scale families. If none of that fits, the app can write a Mastery Roadmap for you: a personal curriculum of roughly 35 to 55 steps between where you are now and where you said you want to be.",
+
+  "desktop_title": "Is there a desktop app?",
+  "desktop_description": "Yes, for Windows, macOS and Linux. It is the same account and the same data as the website, so a session logged on the desktop appears in the browser on your phone a second later. The reason it exists is audio: the desktop app talks to your audio interface directly, which means far lower latency than a browser tab can manage.",
+
+  "streak_break_title": "What happens if I miss a day?",
+  "streak_break_description": "The streak resets to zero and you start counting again. Nothing else is touched: your points, level, skills, songs, achievements and gear all stay exactly where they were. Ten minutes is enough to keep a streak alive, which is why a short session on a busy day is worth more to you than a long one at the weekend.",
+
+  "points_rate_title": "How many points is an hour of practice worth?",
+  "points_rate_description": "Practice pays 22 points an hour before multipliers, plus a point for each good habit you tick when you save the session. The streak then multiplies the whole thing: day one pays the plain rate, and the multiplier climbs from day two up to a ceiling of one and a half times on day five. Consistency is worth more than volume, by design.",
+
+  "fame_title": "What is the difference between points and Fame?",
+  "fame_description": "Points are your record. They set your level and your place in the rankings, and you can never spend them. Fame is spending money: it buys cases, gear, parts and mods in the Arsenal and has no effect on your level or rank. A logged session pays both, and after that they part ways, because Fame also arrives from quests, milestones, monthly challenges and other players.",
+
+  "songs_title": "Can I keep track of the songs I am learning?",
+  "songs_description": "Yes. The song board is a list of what you are working on, and you drag each song along as it gets closer to being playable. Every song carries a difficulty tier, so the board doubles as an honest read on the level you are playing at, and finishing one pays points and Fame. Playlists let you group songs and share the collection with other players.",
+
+  "leaderboard_title": "How do the rankings work?",
+  "leaderboard_description": "There are three separate boards rather than one, and they rank different things, which matters if you have only been here a week. The season board resets every month, so a new player is never permanently behind the people who started two years ago, and finishing a season near the top pays a reward.",
+
+  "challenges_title": "What are the monthly challenges?",
+  "challenges_description": "Every month the community votes on five songs, and anyone who wants to takes a run at recording themselves playing one. It is the part of the app where other people actually hear you play, and it pays better Fame than anything else. Nominating and voting for next month's songs is open to everyone.",
+
+  "outro_title": "Still stuck?",
+  "outro_body": "The knowledge base covers every screen in the app in far more detail than a FAQ answer allows, including scoring, note detection, routines, the Arsenal and the desktop app. For anything it does not answer, a bug you have hit or a feature you would like to see, the Discord server is read every day."
 }

@@ -145,7 +145,15 @@ const LandingPage = ({
         <PracticePlansSection />
         <TestimonialsSection />
         <MidCTASection />
-        <FaqSection questions={faqQuestions} />
+        <FaqSection
+          questions={faqQuestions}
+          moreLink={{
+            intro:
+              "Still wondering about something? Scoring, note detection, the desktop app and the rest of it are covered on",
+            href: "/faq",
+            label: "the frequently asked questions page",
+          }}
+        />
         <BlogSection blogs={blogs} />
         <Footer />
         <CookieBanner />

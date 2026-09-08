@@ -604,6 +604,17 @@ export const SeoLandingPage = ({
                         </div>
                       ))}
                     </div>
+                    <p className='mt-6 leading-relaxed text-zinc-400'>
+                      Questions about the app rather than the practice — how
+                      sessions are scored, what it costs, what you need to plug
+                      in — are answered on{" "}
+                      <Link
+                        href='/faq'
+                        className='font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
+                        the frequently asked questions page
+                      </Link>
+                      .
+                    </p>
                   </section>
                 )}
 

@@ -194,6 +194,14 @@ export const Footer = () => {
               <ul className='space-y-4'>
                 <li>
                   <Link
+                    href='/faq'
+                    className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
+                    FAQ{" "}
+                    <ChevronRight className='ml-1 h-3 w-3 opacity-0 transition-all group-hover:opacity-100' />
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href='/contact'
                     className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
                     Contact{" "}

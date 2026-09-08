@@ -3,6 +3,14 @@
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { Reveal } from "feature/landing/components/Reveal";
 import { ChevronDown } from "lucide-react";
+import Link from "next/link";
+
+export interface FaqMoreLink {
+  /** Sentence before the link, so the link reads as part of a thought. */
+  intro: string;
+  href: string;
+  label: string;
+}
 
 /**
  * Native <details> instead of the shared Radix accordion on purpose:
@@ -11,8 +19,10 @@ import { ChevronDown } from "lucide-react";
  */
 export const FaqSection = ({
   questions,
+  moreLink,
 }: {
   questions: faqQuestionInterface[];
+  moreLink?: FaqMoreLink;
 }) => {
   return (
     <section className='bg-zinc-900 py-20'>
@@ -36,6 +46,17 @@ export const FaqSection = ({
             </details>
           ))}
         </div>
+
+        {moreLink && (
+          <p className='mt-8 text-sm leading-relaxed text-zinc-400'>
+            {moreLink.intro}{" "}
+            <Link
+              href={moreLink.href}
+              className='font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
+              {moreLink.label}
+            </Link>
+          </p>
+        )}
       </Reveal>
     </section>
   );

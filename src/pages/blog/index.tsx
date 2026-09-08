@@ -53,6 +53,10 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
             <p className="mx-auto max-w-2xl text-lg text-zinc-400">
               Discover articles that will help you become a better guitarist. From technique to practice psychology.
             </p>
+
+            <p className="mx-auto mt-6 max-w-2xl text-left text-base leading-relaxed text-zinc-400">
+              Every guide here answers a question guitarists actually ask once they get past the first chords: how long a daily session should be, what belongs in a beginner routine, how to practise scales so they end up in your playing instead of your warm-up, which songs are genuinely playable at your level, and how to tell whether six months of practice moved anything. The answers lean on how thousands of logged practice sessions on Riff Quest actually look, rather than on the usual advice to just practise more.
+            </p>
           </div>
 
           {blogs.length > 0 ? (
@@ -66,6 +70,44 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
               <p className="text-xl text-zinc-500">No articles yet. Check back soon!</p>
             </div>
           )}
+
+          <div className="mx-auto mt-20 grid max-w-6xl gap-6 md:grid-cols-2">
+            <section className="rounded-lg bg-zinc-900/40 p-6 sm:p-8">
+              <h2 className="text-lg font-bold text-white">What these guides cover</h2>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                Roughly half of the articles are about structure: what a practice routine should contain, how to split an hour between technique, theory, ear training and playing music, and what a realistic daily minimum looks like when the week gets busy. The rest are about material and measurement, from picking songs that match your current level to keeping an honest record of what you played.
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                They are written to be used at the guitar rather than read once. Where a guide gives a routine, it gives the timings too, and where it makes a claim about how quickly something improves, it says what that is based on.
+              </p>
+            </section>
+
+            <section className="rounded-lg bg-zinc-900/40 p-6 sm:p-8">
+              <h2 className="text-lg font-bold text-white">Where to go next</h2>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                Advice only becomes practice once something keeps score. Riff Quest turns a logged session into points, a streak and a growing picture of which of your skills are being neglected, and it is free to use.
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                If you would rather read about the app than sign up for it, the{" "}
+                <Link href="/wiki" className="text-cyan-400 hover:text-cyan-300">knowledge base</Link>{" "}
+                explains every screen in plain language, the{" "}
+                <Link href="/faq" className="text-cyan-400 hover:text-cyan-300">FAQ</Link>{" "}
+                answers the short questions about scoring and setup, and the{" "}
+                <Link href="/tools" className="text-cyan-400 hover:text-cyan-300">tools list</Link>{" "}
+                covers the tabs, metronomes and backing-track apps worth using alongside it.
+              </p>
+            </section>
+
+            <section className="rounded-lg bg-zinc-900/40 p-6 sm:p-8 md:col-span-2">
+              <h2 className="text-lg font-bold text-white">Getting something out of a practice guide</h2>
+              <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400">
+                The failure mode with practice advice is collecting it. Reading five routines in an evening feels productive and changes nothing, because the thing that improves your playing is the same twenty minutes repeated on days when you do not feel like it. One guide, applied for a fortnight, beats a reading list every time.
+              </p>
+              <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400">
+                So take one change from whichever article matches your current problem, and give it two weeks before judging it. If your sessions drift into whatever feels comfortable, fix the structure first. If you practise consistently but nothing seems to move, start writing sessions down, because progress on the guitar is slow enough to be invisible without a record of it. And if you are simply bored, learning a song you actually want to play is a legitimate practice plan.
+              </p>
+            </section>
+          </div>
         </div>
 
         <Footer />
