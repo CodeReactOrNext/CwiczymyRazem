@@ -16,7 +16,7 @@ import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
-import { DEFAULT_ACCENT_PATTERN } from "../../components/Metronome/utils/accentPattern";
+import { DEFAULT_ACCENT_PATTERN, stepsPerBeat } from "../../components/Metronome/utils/accentPattern";
 import { getCountInDurationMs } from "../../components/Metronome/utils/countInDuration";
 import { deriveMetronomeGrid } from "../../components/Metronome/utils/meterGrid";
 import type { ExercisePlan } from "../../types/exercise.types";
@@ -626,7 +626,20 @@ export const PracticeSession = ({
   // Rotating hunts: the provider flips this to true once the whole goal is solved,
   // so the rotation hook can fast-forward to the next target.
   const huntSolvedRef = useRef(false);
-  const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef, isExamMode);
+  // Bar clock for hunts that change on the bar line instead of on a stopwatch.
+  // Read off the click itself — the same anchor and the same effective tempo it
+  // schedules from — so the changes and the clicks can't drift apart. `startTime`
+  // is null until the count-in ends, which is exactly when the drill should start
+  // counting bars.
+  //
+  // Built fresh each render rather than memoized: the rotation hook reads it down
+  // to primitives before using it, so a new object identity costs nothing.
+  const huntBarSteps = metronome.gridBarLengths?.[0] ?? metronome.accentPattern?.length ?? DEFAULT_ACCENT_PATTERN.length;
+  const huntBarClock = {
+    startTime: metronome.startTime,
+    msPerBar: (60000 / effectiveBpm) * (huntBarSteps / stepsPerBeat(metronome.gridUnit)),
+  };
+  const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef, isExamMode, huntBarClock);
   const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
   const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
   useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);

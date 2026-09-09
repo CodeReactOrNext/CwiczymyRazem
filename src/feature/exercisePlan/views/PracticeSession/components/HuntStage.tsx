@@ -146,6 +146,34 @@ export function HuntChip({
   );
 }
 
+/**
+ * The loop a sequence drill walks — the chord changes, with the one being played
+ * lit and the one after it half-lit. Seeing the next change coming is most of the
+ * skill the changes drills are after, so it gets its own affordance rather than
+ * leaving the player to remember the progression.
+ */
+export function HuntSteps({ labels, activeIndex }: { labels: string[]; activeIndex: number }) {
+  const nextIndex = labels.length > 1 ? (activeIndex + 1) % labels.length : -1;
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-1.5">
+      {labels.map((label, index) => (
+        <span
+          key={`${label}-${index}`}
+          className={cn(
+            "rounded px-2 py-0.5 text-xs font-bold transition-colors duration-300",
+            index === activeIndex
+              ? "bg-cyan-500/15 text-cyan-300"
+              : index === nextIndex
+                ? "bg-zinc-800/40 text-zinc-300"
+                : "bg-zinc-800/40 text-zinc-500",
+          )}>
+          {label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 interface HuntTargetCardProps {
   /** The note (or prompt title) the drill is asking for. */
   value: ReactNode;
@@ -154,6 +182,20 @@ interface HuntTargetCardProps {
   foundCount: number;
   /** Re-runs the swap animation — pass the target note so a new one animates in. */
   animationKey?: string;
+}
+
+/**
+ * Type scale for the tile's value. The square is sized for a note name, but the
+ * chord drills put a whole symbol in it ("Cmaj7", "Bm7b5") — three times as wide,
+ * and at the note size it ran straight off the edge. Stepping the type down with
+ * the length keeps every hunt on the same square instead of giving the chord
+ * prompts a tile of their own; one- and two-character values are untouched.
+ */
+function valueTypeScale(value: ReactNode): string {
+  const length = typeof value === "string" ? value.length : 1;
+  if (length <= 2) return "text-4xl sm:text-5xl";
+  if (length <= 4) return "text-2xl sm:text-3xl";
+  return "text-xl sm:text-2xl";
 }
 
 /** The big note tile every hunt leads with. */
@@ -171,7 +213,7 @@ export function HuntTargetCard({ value, complete, foundCount, animationKey }: Hu
         animate={complete ? { scale: [1, 1.15, 1] } : { scale: 1 }}
         transition={{ duration: 0.4 }}
         className={cn(
-          "relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg transition-colors duration-500 sm:h-24 sm:w-24",
+          "relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg px-1.5 transition-colors duration-500 sm:h-24 sm:w-24",
           complete ? "bg-emerald-900/80" : "bg-zinc-900/90",
         )}>
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
@@ -182,7 +224,10 @@ export function HuntTargetCard({ value, complete, foundCount, animationKey }: Hu
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.85 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="font-display text-4xl font-black tracking-tighter text-white sm:text-5xl">
+            className={cn(
+              "whitespace-nowrap font-display font-black tracking-tighter text-white",
+              valueTypeScale(value),
+            )}>
             {value}
           </motion.span>
         </AnimatePresence>

@@ -355,6 +355,26 @@
     "permanent": true
   },
   {
+    "source": "/exercises/chord-degree-hunt-triads",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chord-degree-hunt-sevenths",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chord-degree-hunt-tensions",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/chord-degree-hunt-changes",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
     "source": "/exercises/fingerstyle-descending-arpeggios",
     "destination": "/beginner-guitar-exercises",
     "permanent": true

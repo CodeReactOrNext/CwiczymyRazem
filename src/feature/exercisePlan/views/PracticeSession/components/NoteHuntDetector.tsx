@@ -6,7 +6,7 @@ import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { huntPositions } from "../hooks/useNoteHunt";
 import { ClickableFretboard, FullNeckToggle, LeftyToggle, useShowFullNeck } from "./ClickableFretboard";
 import { DetectionWave } from "./DetectionWave";
-import { HuntChip, HuntStage, HuntStats, HuntTargetCard } from "./HuntStage";
+import { HuntChip, HuntStage, HuntStats, HuntSteps, HuntTargetCard } from "./HuntStage";
 
 interface NoteHuntDetectorProps {
   targetNote: string;
@@ -114,10 +114,15 @@ export function NoteHuntDetector({
       {isPrompt ? (
         <div className="flex flex-col items-center gap-1.5">
           {customGoalPrompt!.subtitle && <HuntChip tone='cyan'>{customGoalPrompt!.subtitle}</HuntChip>}
+          {customGoalPrompt!.steps && <HuntSteps {...customGoalPrompt!.steps} />}
           {solved ? (
             <span className="text-sm font-bold text-emerald-400">✓ it was {targetNote}</span>
           ) : (
-            <p className="text-center text-sm font-bold text-zinc-200">Play the note the interval lands on</p>
+            // The chord drills ask for a degree of the chord on the card, not an
+            // interval above a note, so they set their own line here.
+            <p className="text-center text-sm font-bold text-zinc-200">
+              {description ?? "Play the note the interval lands on"}
+            </p>
           )}
         </div>
       ) : (

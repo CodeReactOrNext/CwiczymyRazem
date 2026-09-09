@@ -1,7 +1,8 @@
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { ensureQuestForToday, syncDailyQuestAction } from "feature/user/store/userSlice.questActions";
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
+import { getMsUntilNextLocalDay } from "utils/gameLogic/localDay";
 
 /** A tab switch is not worth a document read every time. */
 const MIN_SYNC_INTERVAL = 30_000;
@@ -16,10 +17,21 @@ const MIN_SYNC_INTERVAL = 30_000;
  * back — completing a task, mounting the widget — is publish that stale copy,
  * which is how tasks completed elsewhere ended up "reset". The sync merges both
  * directions, so the store catches up before anything is written.
+ *
+ * It also arms the clock the rollover was missing. Every trigger the quest had
+ * was an event the player caused — logging in, mounting the dashboard widget,
+ * refocusing the tab, reporting a session — so a window left open *and focused*
+ * across the player's midnight fired none of them and went on showing
+ * yesterday's set, completed and claimed, until something happened to it. That
+ * is the "it doesn't reset at local time" report: the day key itself was right,
+ * nothing ever re-read it.
  */
 const useDailyQuestSync = () => {
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
+  // The quest day is resolved in the zone stored on the profile, so the
+  // midnight to wake up at is that zone's, not the device's (see `questDay`).
+  const timeZone = useAppSelector(selectCurrentUserStats)?.timeZone;
   const lastSyncedAt = useRef(0);
 
   useEffect(() => {
@@ -33,7 +45,7 @@ const useDailyQuestSync = () => {
       lastSyncedAt.current = now;
 
       dispatch(syncDailyQuestAction());
-      // A tab that has been open across the server-day boundary is still
+      // A tab that has been open across the quest-day boundary is still
       // showing yesterday's set — until now only mounting the dashboard widget
       // drew the new one. This is a no-op on a quest that is already current.
       dispatch(ensureQuestForToday());
@@ -49,6 +61,30 @@ const useDailyQuestSync = () => {
       window.removeEventListener("online", sync);
     };
   }, [userAuth, dispatch]);
+
+  useEffect(() => {
+    if (!userAuth) return;
+
+    let timer: ReturnType<typeof setTimeout>;
+
+    // Re-armed on every fire rather than left on an interval: the gap to the
+    // next boundary has to be recomputed anyway (DST, a zone arriving with the
+    // profile, a machine that slept through the deadline and wakes up past it),
+    // and `ensureQuestForToday` writes nothing when the quest is already
+    // current, so an early wake-up costs one read at most.
+    const arm = () => {
+      timer = setTimeout(() => {
+        // A second past midnight, not on it — a timer that fires a hair early
+        // would read the old day key and roll over a day late.
+        dispatch(ensureQuestForToday());
+        arm();
+      }, getMsUntilNextLocalDay(new Date(), timeZone) + 1000);
+    };
+
+    arm();
+
+    return () => clearTimeout(timer);
+  }, [userAuth, timeZone, dispatch]);
 };
 
 export default useDailyQuestSync;

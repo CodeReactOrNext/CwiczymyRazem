@@ -9,6 +9,21 @@ export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing"
 
 export type LocalizedContent = string;
 
+/**
+ * What a hunt's goal card shows while the answer itself stays hidden — the
+ * question, not the solution. Interval Hunt puts a root and an interval here;
+ * the chord drills put a chord symbol and a degree.
+ */
+export interface HuntPrompt {
+  title: string;
+  subtitle?: string;
+  /** Drills that walk a fixed sequence rather than rolling at random: the whole
+   *  loop and the step the prompt is currently on. Rendered as a strip under the
+   *  card, so the player can see the change that's coming and prepare for it —
+   *  which is most of the skill in playing over chord changes. */
+  steps?: { labels: string[]; activeIndex: number };
+}
+
 export interface BendPoint {
   /** Relative position in the note: 0.0 = note start, 1.0 = note end */
   position: number;
@@ -194,7 +209,25 @@ export interface Exercise {
    *     completed so far) / 12, for "hit every chromatic note before the clock
    *     runs out" exams. See the String Hunt / Whole Neck Hunt exercises.
    *  See randomNoteHunt / fretboardRegionHunt / intervalHunt / buildTheChord. */
-  noteHuntConfig?: { rotateSeconds: number; mode?: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" | "intervalClick" };
+  noteHuntConfig?: {
+    rotateSeconds: number;
+    mode?: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" | "intervalClick";
+    /** When the drill moves to the next target. Defaults to "timer".
+     *   - "timer": the countdown owns the pace — miss it and the target rotates
+     *     anyway. The pressure is the point for the drills that are races.
+     *   - "solved": the target holds until it is answered, then advances after a
+     *     short beat, and no countdown is shown. `rotateSeconds` is ignored (set
+     *     it to 0), so a player working something out is never cut off
+     *     mid-thought.
+     *   - "bar": the metronome owns the pace — targets change on the bar line,
+     *     every `advanceEveryBars` bars, so the changes land in time with the
+     *     click instead of on a stopwatch of their own. Needs the metronome to be
+     *     running; when it isn't, `rotateSeconds` takes over as the fallback, so
+     *     the drill still moves for a player with the click off. */
+    advanceOn?: "timer" | "solved" | "bar";
+    /** Bars per target under `advanceOn: "bar"`. Defaults to 1. */
+    advanceEveryBars?: number;
+  };
   /** Restricts which strings (1-6, 1 = high e) are in play. Omitted = all 6.
    *  Combined with customGoalRegion's fret window to compute the exact set of
    *  valid (string, fret) positions — the clickable targets in "click" mode, and
@@ -207,7 +240,7 @@ export interface Exercise {
    *  result in React state. See randomNoteHunt / intervalHunt / buildTheChord. */
   rollHuntTarget?: () => {
     goal: string;
-    prompt?: { title: string; subtitle?: string };
+    prompt?: HuntPrompt;
     region?: { startFret: number; endFret: number };
   };
   /** For region-mode note hunts: the fret window the target must be found in.
@@ -216,7 +249,7 @@ export interface Exercise {
   /** Prompt to show on the goal card when the answer must stay hidden (interval
    *  mode): e.g. { title: "A", subtitle: "Perfect 5th ↑" }. The real target stays
    *  in customGoal for detection. Re-rolled alongside customGoal. */
-  customGoalPrompt?: { title: string; subtitle?: string };
+  customGoalPrompt?: HuntPrompt;
   riddleConfig?: ExerciseRiddleConfig;
   /** Turns the exercise into one of the click-to-answer listening quizzes
    *  (chord quality, progression, tuning by ear, scale/mode). The panel plays

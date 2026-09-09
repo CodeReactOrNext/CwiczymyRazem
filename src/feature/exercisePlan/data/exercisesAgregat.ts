@@ -158,6 +158,8 @@ const FREE_EXERCISE_IDS = new Set([
   "ear_progression_basics",
   "ear_tuning_trainer",
   "ear_mode_basics",
+  // Chord degree hunts — the entry level is free
+  "chord_degree_hunt_triads",
   // Playalong exercises — free
   "pentatonic_playalong_best_of",
   "metal_playalong_basic",
@@ -201,6 +203,10 @@ import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePl
 import { bendAndReleaseExercise } from "feature/exercisePlan/data/exerises/bendAndRelease/bendAndRelease";
 import { buildTheChordExercise } from "feature/exercisePlan/data/exerises/buildTheChord/buildTheChord";
 import { chickenPickinExercise } from "feature/exercisePlan/data/exerises/chickenPickin/chickenPickin";
+import { chordDegreeHuntChangesExercise } from "feature/exercisePlan/data/exerises/chordDegreeHunt/chordDegreeHuntChanges";
+import { chordDegreeHuntSeventhsExercise } from "feature/exercisePlan/data/exerises/chordDegreeHunt/chordDegreeHuntSevenths";
+import { chordDegreeHuntTensionsExercise } from "feature/exercisePlan/data/exerises/chordDegreeHunt/chordDegreeHuntTensions";
+import { chordDegreeHuntTriadsExercise } from "feature/exercisePlan/data/exerises/chordDegreeHunt/chordDegreeHuntTriads";
 import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordPractice/chordPractice";
 import { chordSpotlightDrillExercise } from "feature/exercisePlan/data/exerises/chordSpotlightDrill/chordSpotlightDrill";
 import { chromaticNoteHuntExercise } from "feature/exercisePlan/data/exerises/chromaticNoteHunt/chromaticNoteHunt";
@@ -390,6 +396,10 @@ const rawExercises: Exercise[] = [
   wholeNeckHuntExercise,
   intervalHuntExercise,
   buildTheChordExercise,
+  chordDegreeHuntTriadsExercise,
+  chordDegreeHuntSeventhsExercise,
+  chordDegreeHuntTensionsExercise,
+  chordDegreeHuntChangesExercise,
   fingerstyleArpeggiosExercise,
 
   spiderPermutation1234Exercise,

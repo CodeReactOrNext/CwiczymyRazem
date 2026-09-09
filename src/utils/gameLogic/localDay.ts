@@ -140,6 +140,40 @@ export const getReminderHourUtc = (
 };
 
 /**
+ * Milliseconds until the user's local day rolls over — the instant a daily
+ * counter keyed to that day (the quest above all) starts naming a different day.
+ *
+ * Every consumer of `getLocalDayKey` so far only ever asked "which day is it
+ * now", and re-asked when something happened to make it ask: a tab regaining
+ * focus, a session being reported. Nothing asked on a clock, so a window left
+ * open and focused across midnight went on showing the previous day's set
+ * indefinitely. This is what a caller schedules against.
+ *
+ * A DST transition inside the coming day can put the result an hour out, since
+ * the offset is read at `now` rather than at the boundary. Callers re-arm from
+ * the returned deadline, so the worst case is one extra no-op wake-up (early) or
+ * one late rollover on the single night a year the clocks move (late), and the
+ * focus/visibility path covers that anyway. Clamped to a second so a caller
+ * that re-arms on fire can never spin.
+ */
+export const getMsUntilNextLocalDay = (
+  now: Date,
+  timeZone: string | null | undefined
+): number => {
+  if (isValidTimeZone(timeZone)) {
+    const localNowMs = now.getTime() + getTimeZoneOffsetMinutes(now, timeZone) * 60000;
+    const msIntoDay = ((localNowMs % DAY_MS) + DAY_MS) % DAY_MS;
+    return Math.max(1000, DAY_MS - msIntoDay);
+  }
+
+  // No stored zone: the device's own calendar, which is what `getLocalDayKey`
+  // falls back to. `setHours` on a local Date handles that zone's DST for us.
+  const nextMidnight = new Date(now);
+  nextMidnight.setHours(24, 0, 0, 0);
+  return Math.max(1000, nextMidnight.getTime() - now.getTime());
+};
+
+/**
  * Whole hours left before the user's local day rolls over — the deadline a
  * streak actually dies at. Null when the zone is unknown, so callers can fall
  * back to vaguer copy instead of quoting a number computed from the wrong clock.

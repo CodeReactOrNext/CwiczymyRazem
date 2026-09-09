@@ -4,7 +4,7 @@ import { NOTES } from "utils/audio/noteUtils";
 import { getUniformTuningShift } from "utils/audio/tunings";
 
 import { getChordTones } from "../../../chords/chordTones";
-import type { StrumPattern, TablatureMeasure } from "../../../types/exercise.types";
+import type { HuntPrompt, StrumPattern, TablatureMeasure } from "../../../types/exercise.types";
 import type { GameState } from "../hooks/noteMatchingFeedback";
 import type { ChordHuntState } from "../hooks/useChordHunt";
 import { useChordHunt } from "../hooks/useChordHunt";
@@ -47,7 +47,7 @@ interface NoteMatchingContextValue {
    *  whole neck. Scopes both detection (which octaves count) and the neck diagram. */
   noteHuntStrings: number[] | null;
   /** Prompt shown instead of the answer (interval mode), or null. */
-  customGoalPrompt: { title: string; subtitle?: string } | null;
+  customGoalPrompt: HuntPrompt | null;
   /** The live hunt target (note name / chord name). Read this — not a prop —
    *  so it updates through memoized content wrappers when the target rotates. */
   huntTarget: string | null;
@@ -155,7 +155,7 @@ interface NoteMatchingProviderProps {
   // fret window for region-mode note hunts (undefined when not in region mode)
   customGoalRegion: { startFret: number; endFret: number } | undefined;
   // prompt shown instead of the answer (interval mode)
-  customGoalPrompt: { title: string; subtitle?: string } | undefined;
+  customGoalPrompt: HuntPrompt | undefined;
   // strings in play for click- and mic-mode hunts (undefined = all 6)
   customGoalStrings: number[] | undefined;
   // which hunt variant the current exercise is (selects the detection hook)
