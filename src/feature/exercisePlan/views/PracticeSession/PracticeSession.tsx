@@ -327,6 +327,10 @@ export const PracticeSession = ({
     // once per exercise and the resetForExercise() below re-renders to show it.
     currentExercise.rerollCustomGoal?.();
 
+    // A strumming exercise's guitar is the pattern synth, not the sampler — it has no
+    // tablature to play, so it counts as its own playback when picking the default.
+    const hasStrumSynth = !!currentExercise.strummingPatterns?.length;
+
     let nextAudioMuted = true;
     if (isExamMode) {
       nextAudioMuted = true;
@@ -334,7 +338,9 @@ export const PracticeSession = ({
       nextAudioMuted = false;
     } else {
       const pref = loadGuitarPlaybackPreference();
-      nextAudioMuted = pref !== null ? !pref : !(currentExercise.tablature && currentExercise.tablature.length > 0);
+      nextAudioMuted = pref !== null
+        ? !pref
+        : !(hasStrumSynth || (currentExercise.tablature && currentExercise.tablature.length > 0));
     }
 
     // In exam mode with a backing track, the backing guides the tempo, so the
@@ -346,7 +352,11 @@ export const PracticeSession = ({
     // persisted settings only apply to regular practice.
     if (!isExamMode) {
       const persisted = loadPracticeSessionSettings(currentExercise.id);
-      if (persisted?.isAudioMuted !== undefined) nextAudioMuted = persisted.isAudioMuted;
+      // Strumming exercises skip the persisted flag on purpose: until the synth
+      // started answering to it, every stored value was the meaningless `true` this
+      // screen wrote by default, and honouring it now would mute the pattern for
+      // everyone. The global guitar-playback preference (same toggle) still applies.
+      if (persisted?.isAudioMuted !== undefined && !hasStrumSynth) nextAudioMuted = persisted.isAudioMuted;
       if (persisted?.isMetronomeMuted !== undefined) nextMetronomeMuted = persisted.isMetronomeMuted;
       if (persisted?.speedMultiplier !== undefined) nextSpeedMultiplier = persisted.speedMultiplier;
       if (persisted?.metronomeBpm !== undefined) metronome.setBpm(persisted.metronomeBpm);

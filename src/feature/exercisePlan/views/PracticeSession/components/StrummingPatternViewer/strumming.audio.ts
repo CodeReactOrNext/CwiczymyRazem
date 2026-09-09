@@ -42,9 +42,13 @@ function ksString(ctx: AudioContext, freq: number, t: number, decay: number, vol
   src.start(t); src.stop(t + decay + 0.05);
 }
 
-export function playStrumSound(ctx: AudioContext, direction: "down" | "up", muted: boolean, accented: boolean, chord?: string) {
+/** @param volume Session guitar level, 0 = muted. Scales the whole strum, so the
+ *  session's playback toggle and its track slider silence this synth too. */
+export function playStrumSound(ctx: AudioContext, direction: "down" | "up", muted: boolean, accented: boolean, chord?: string, volume = 1) {
+  if (volume <= 0) return;
+
   const now   = ctx.currentTime;
-  const vol   = accented ? 0.55 : muted ? 0.3 : 0.42;
+  const vol   = (accented ? 0.55 : muted ? 0.3 : 0.42) * volume;
   const decay = muted ? 0.06 : direction === "up" ? 0.55 : 0.75;
 
   const rawFreqs: number[] = (chord ? CHORD_FREQS[chord] : undefined) ?? CHORD_FREQS.default ?? [];

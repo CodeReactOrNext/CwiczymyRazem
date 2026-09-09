@@ -22,19 +22,22 @@ interface StrummingPatternViewerProps {
   maxReps?:             number;
   /** Shared AudioContext from the session — reused instead of creating a new one */
   audioContext?:        AudioContext | null;
+  /** Session guitar level (playback toggle + track slider), 0 = muted. Defaults to
+   *  full so a standalone viewer still sounds. */
+  volume?:              number;
 }
 
 function StrummingPatternViewerInner({
   patterns, bpm, isPlaying, startTime, countInRemaining = 0,
   className, slotFeedback, isMicEnabled, maxReps = 10,
-  audioContext: externalAudioContext,
+  audioContext: externalAudioContext, volume = 1,
 }: StrummingPatternViewerProps) {
   const pattern = patterns[0];
   const canvasH = PAD + HEADER_H + ARROW_AREA_H + LABEL_H + DOTS_H + PAD;
 
   const { canvasRef, containerRef } = useStrummingAnimation({
     pattern, bpm, isPlaying, startTime, countInRemaining,
-    slotFeedback, isMicEnabled, maxReps, canvasH, externalAudioContext,
+    slotFeedback, isMicEnabled, maxReps, canvasH, externalAudioContext, volume,
   });
 
   if (!pattern) return null;
@@ -92,5 +95,8 @@ export const StrummingPatternViewer = memo(StrummingPatternViewerInner, (prev, n
   prev.className        === next.className           &&
   prev.isMicEnabled     === next.isMicEnabled        &&
   prev.maxReps          === next.maxReps             &&
+  // Volume reaches the RAF tick through a ref written during render, so a memoized
+  // re-render is the only thing that can deliver a mute mid-loop.
+  prev.volume           === next.volume              &&
   Object.is(prev.slotFeedback, next.slotFeedback)
 );

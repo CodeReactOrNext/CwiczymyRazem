@@ -156,6 +156,13 @@ export interface AmpOverloadInfo {
   namEnabled: boolean;
 }
 
+/** Peak sample levels of the running amp stream over the last ~50 ms window,
+ *  linear (1.0 = full scale; above it the converter clipped). */
+export interface AmpMeterLevels {
+  inPeak: number;
+  outPeak: number;
+}
+
 /** Live health counters of the open stream since it was (re)opened — see
  *  electron/nativeAudioEngine.js getDiagnostics. */
 export interface AmpDiagnostics {
@@ -198,6 +205,9 @@ export interface NativeAmpApi {
   getDiagnostics?: () => Promise<AmpDiagnostics | null>;
   /** Subscribe to overload-recovery events. Returns an unsubscribe fn. */
   onOverload: (cb: (info: AmpOverloadInfo) => void) => () => void;
+  /** Subscribe to input/output peak levels (~20/s while monitoring). Optional:
+   *  older desktop shells don't expose it. Returns an unsubscribe fn. */
+  onMeter?: (cb: (levels: AmpMeterLevels) => void) => () => void;
   /** Subscribe to stream-loss/recovery events (the amp shares the one underlying
    *  stream with capture, so it can be affected too). Returns an unsubscribe fn. */
   onConnectionIssue: (cb: (info: ConnectionIssueInfo) => void) => () => void;

@@ -10,6 +10,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { ArcTuner } from "feature/tuner/components/ArcTuner";
 import { RippleButton } from "hooks/useRipple";
 import { Bug, Check, ChevronDown, Lock, Snail, X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
@@ -23,7 +24,6 @@ import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { TUNER_IN_TUNE_CENTS, useLiveTuner } from "../hooks/useLiveTuner";
 import { AmpSimButton } from "./AmpSimButton";
-import { ArcTuner } from "./CalibrationWizard/components/ArcTuner";
 import {
   MicTroubleshooting,
   MicTroubleshootingDialog,

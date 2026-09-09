@@ -50,6 +50,15 @@ export const useTonePresets = () => {
     return saved;
   }, [refresh]);
 
+  /** Overwrite a user preset's params in place (built-ins are immutable —
+   *  returns null for those, same as when the bridge is missing). */
+  const updatePreset = useCallback(async (preset: TonePreset, params: AmpParams) => {
+    if (!window.toneStudio || preset.builtIn) return null;
+    const saved = await window.toneStudio.savePreset({ ...preset, params });
+    await refresh();
+    return saved;
+  }, [refresh]);
+
   const deletePreset = useCallback(async (id: string) => {
     if (!window.toneStudio) return;
     await window.toneStudio.deletePreset(id);
@@ -102,6 +111,6 @@ export const useTonePresets = () => {
 
   return {
     presets, irs, namModels, loading, importing, importingNamModel, irError, namError,
-    savePreset, deletePreset, importIR, deleteIR, importNamModel, deleteNamModel, refresh,
+    savePreset, updatePreset, deletePreset, importIR, deleteIR, importNamModel, deleteNamModel, refresh,
   };
 };

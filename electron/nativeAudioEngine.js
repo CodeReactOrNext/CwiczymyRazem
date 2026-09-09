@@ -555,6 +555,41 @@ function onOverload(fn) {
   overloadListener = fn;
 }
 
+// ── Level meter ──────────────────────────────────────────────────────────────
+// Peak of the raw input and of the processed output, pushed to the UI a few
+// times per second — not per block: ~375 IPC hops/s at 128 smp would be pure
+// event-loop noise for a bar that only needs ~20 readings/s (the UI adds its own
+// decay). Only measured while the amp is attached; a max() over the block costs
+// nothing next to the DSP that just ran on the same samples. Answers the most
+// common "amp is on but I hear nothing" support question (wrong channel / no
+// signal) without leaving the practice session.
+const METER_INTERVAL_MS = 50;
+let meterListener = null;
+const meterAcc = { inPeak: 0, outPeak: 0, sentAt: 0 };
+function onMeter(fn) {
+  meterListener = fn;
+}
+function accumulateMeter(inF, mono, n) {
+  let inPeak = meterAcc.inPeak;
+  let outPeak = meterAcc.outPeak;
+  for (let i = 0; i < n; i++) {
+    const a = Math.abs(inF[i]);
+    if (a > inPeak) inPeak = a;
+    const b = Math.abs(mono[i]);
+    if (b > outPeak) outPeak = b;
+  }
+  const now = Date.now();
+  if (now - meterAcc.sentAt < METER_INTERVAL_MS) {
+    meterAcc.inPeak = inPeak;
+    meterAcc.outPeak = outPeak;
+    return;
+  }
+  meterAcc.sentAt = now;
+  meterAcc.inPeak = 0;
+  meterAcc.outPeak = 0;
+  try { meterListener({ inPeak, outPeak }); } catch { /* ignore */ }
+}
+
 // Runs from a setImmediate queued right after each rt.write(). By then, whatever
 // the hardware callback that delivered THIS block sent before the block itself
 // (its frame-output notification for the block it just popped — audify sends
@@ -634,6 +669,7 @@ function onInputBlock(inputBuffer) {
   if (ampConsumer && activeChain) {
     const mono = getMonoBuffer(n);
     activeChain.processBlock(inF, mono, n);
+    if (meterListener) accumulateMeter(inF, mono, n);
     if (outChannels === 1) {
       out.set(mono.subarray(0, n));
     } else {
@@ -899,6 +935,6 @@ module.exports = {
   listDevices,
   attachCapture, detachCapture, getCaptureStatus,
   attachAmp, updateAmpParams, detachAmp, getAmpStatus, getDiagnostics, warmUp,
-  onOverload,
+  onOverload, onMeter,
   onConnectionIssue, onDevicesChanged, recoverAfterResume,
 };

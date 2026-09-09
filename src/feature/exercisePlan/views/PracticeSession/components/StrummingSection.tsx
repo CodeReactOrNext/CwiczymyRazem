@@ -12,6 +12,8 @@ interface StrummingSectionProps {
   countInRemaining: number;
   isMicEnabled?: boolean;
   audioContext?: AudioContext | null;
+  /** Session guitar level (playback toggle + track slider), 0 = muted. */
+  volume?: number;
 }
 
 export const StrummingSection = memo(function StrummingSection(props: StrummingSectionProps) {

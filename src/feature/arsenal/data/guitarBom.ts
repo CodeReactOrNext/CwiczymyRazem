@@ -33,11 +33,16 @@ const STRAT: ScrapBom = [
  * Single-cut layout. No `neck` slot: these are set-neck builds, the neck is glued
  * into the body and cannot be salvaged.
  *
- * Four pots on the harness, and they sit in a routed control cavity behind a plate
- * — the electronics come out before anything soldered into the body does, so the
- * pots outrank the pickups here. They used to sit last, which put them a slot past
- * anything but a Mythic; the roster held no Mythic single-cut at the time, so twenty
- * guitars listed `pot ×2` and paid out exactly none.
+ * The pickups sit in top-routed cavities and lift straight out from under their
+ * rings; the pot harness has to be fished out through the control cavity with the
+ * soldered leads still on it. So the pickups outrank the pots here — which they
+ * did not until it turned out that put them last, a slot past anything but a
+ * Mythic. This is the single biggest archetype in the game (29 models) and it was
+ * paying out pickups on four of them.
+ *
+ * `bridge` keeps slot one whatever else moves: it is the game's only source of
+ * Legendary bridges, because a part reaches Legendary from the first two slots of
+ * a Legendary donor and no other archetype lists one that high.
  *
  * One pot, not the four the harness holds: a teardown recovers the one that comes
  * off the board clean. Paying the full count made pots three times more abundant
@@ -46,8 +51,8 @@ const STRAT: ScrapBom = [
 const SINGLECUT: ScrapBom = [
   { partId: "body", qty: 1 },
   { partId: "bridge", qty: 1 },
-  { partId: "pot", qty: 1 },
   { partId: "pickup", qty: 2 },
+  { partId: "pot", qty: 1 },
 ];
 
 /**
@@ -65,11 +70,20 @@ const TWIN: ScrapBom = [
   { partId: "bridge", qty: 1 },
 ];
 
-/** Three pickups but a stripped-down harness — modern superstrat. */
+/**
+ * Three pickups but a stripped-down harness — modern superstrat. One volume knob
+ * is the whole point of the control layout, so the pickups come off well before
+ * it does.
+ *
+ * Slot one is doing real work here: it is the only place outside the four
+ * Legendary Stratocasters that a Legendary pickup exists at all, since the tier
+ * is reachable only from the first two slots of a Legendary donor. Move the
+ * pickups back down and the entire Legendary supply is one guitar model again.
+ */
 const SUPER_HSS: ScrapBom = [
   { partId: "neck", qty: 1 },
-  { partId: "pot", qty: 1 },
   { partId: "pickup", qty: 3 },
+  { partId: "pot", qty: 1 },
   { partId: "tuners", qty: 1 },
 ];
 

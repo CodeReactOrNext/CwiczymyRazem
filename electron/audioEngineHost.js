@@ -32,6 +32,7 @@ let userDataDirOverride = null;
 
 let frameListener = null;
 let overloadListener = null;
+let meterListener = null;
 let connectionListener = null;
 let devicesChangedListener = null;
 // Whether a consumer is (as far as the host knows) attached — used to decide
@@ -52,6 +53,7 @@ function handleEvent(name, payload) {
   switch (name) {
     case "frame": safeCall(frameListener, payload); break;
     case "overload": safeCall(overloadListener, payload); break;
+    case "meter": safeCall(meterListener, payload); break;
     case "connection-issue": safeCall(connectionListener, payload); break;
     case "devices-changed": safeCall(devicesChangedListener); break;
     case "error": console.error("[audio] engine process error:", payload && payload.message); break;
@@ -179,6 +181,7 @@ function recoverAfterResume() {
 }
 
 function onOverload(fn) { overloadListener = fn; }
+function onMeter(fn) { meterListener = fn; }
 function onConnectionIssue(fn) { connectionListener = fn; }
 function onDevicesChanged(fn) { devicesChangedListener = fn; }
 
@@ -210,5 +213,5 @@ module.exports = {
   listDevices,
   attachCapture, detachCapture, getCaptureStatus,
   attachAmp, updateAmpParams, detachAmp, getAmpStatus, getDiagnostics,
-  onOverload, onConnectionIssue, onDevicesChanged, recoverAfterResume,
+  onOverload, onMeter, onConnectionIssue, onDevicesChanged, recoverAfterResume,
 };

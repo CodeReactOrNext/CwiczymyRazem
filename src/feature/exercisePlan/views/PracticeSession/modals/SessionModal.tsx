@@ -13,6 +13,7 @@ import { MobileToolsIsland } from "../components/MobileToolsIsland";
 import { RotateDeviceHint } from "../components/RotateDeviceHint";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
+import { strumSynthVolume } from "../helpers/strumSynthVolume";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { LandscapeSessionModal } from "./LandscapeSessionModal";
 
@@ -132,8 +133,11 @@ const SessionModal = ({
   // activeTablature (not currentExercise.tablature) so generated exercises
   // (configurable chord/scale practice) get mic + backing controls too.
   const hasMicControls = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableMic;
-  const hasAudioTrack  = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack;
+  // Strumming exercises carry their own guitar (the pattern synth), so they get the
+  // playback toggle too — without it there is no way to silence the strum.
+  const hasAudioTrack  = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableBackingTrack;
   const isRiddleMode   = currentExercise.riddleConfig?.mode === "sequenceRepeat";
+  const strumVolume    = strumSynthVolume(isAudioMuted, audioTracks?.find(t => t.id === "main"));
 
   if (isLandscape) {
     return (
@@ -212,6 +216,7 @@ const SessionModal = ({
             riddleProgress={riddleProgress}
             onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
             isExamMode={examMode}
+            strumVolume={strumVolume}
           />
 
           {activeTablature && activeTablature.length > 0 && <RotateDeviceHint />}

@@ -1,5 +1,7 @@
 import { cn } from "assets/lib/utils";
+import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
 import { Knob } from "feature/toneStudio/components/Knob";
+import { CHAIN_BLOCKS, type ToneAccent } from "feature/toneStudio/utils/chain";
 import { useAmpSim } from "hooks/useAmpSim";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
 import { useTonePresets } from "hooks/useTonePresets";
@@ -24,8 +26,10 @@ import { Fragment, type ReactNode, useState } from "react";
 import type { AmpParams } from "types/nativeAudio";
 
 const BUFFER_SIZES = [64, 128, 256, 512, 1024, 2048];
+/** Sentinel for "no explicit output device" — Radix selects cannot hold "". */
+const ENGINE_PICKED_OUTPUT = "engine-picked";
 
-type Accent = "cyan" | "amber" | "emerald" | "purple" | "orange";
+type Accent = ToneAccent;
 
 const ACCENT_TEXT: Record<Accent, string> = {
   cyan: "text-cyan-400",
@@ -197,7 +201,6 @@ export const ToneStudioView = () => {
     importNamModel,
     deleteNamModel,
   } = useTonePresets();
-  const [activePresetId, setActivePresetId] = useState<string | null>(null);
   const [presetName, setPresetName] = useState("");
   const [isCreatingPreset, setIsCreatingPreset] = useState(false);
 
@@ -232,15 +235,17 @@ export const ToneStudioView = () => {
   // channel picker too — outputDevices/selectedOutputId only apply on WASAPI.
   const outputChannelCount = isAsio
     ? selectedInputDevice?.outputChannels || 0
-    : (outputDevices.find((d) => d.id === selectedOutputId) ?? outputDevices[0])?.outputChannels || 0;
+    : (outputDevices.find((d) => d.id === selectedOutputId) ?? outputDevices[0])
+        ?.outputChannels || 0;
 
   const set = (patch: Partial<AmpParams>) => {
     amp.setParams(patch);
   };
 
+  const { activePresetId, setActivePresetId } = amp;
+
   const handleLoadPreset = (id: string, params: AmpParams) => {
-    amp.setParams(params);
-    setActivePresetId(id);
+    amp.loadPreset(id, params);
   };
 
   const handleSavePreset = async () => {
@@ -268,47 +273,15 @@ export const ToneStudioView = () => {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // Mirrors the real DSP order in electron/ampSim.js `process()`: gate → overdrive
-  // → (NAM model | classic preamp/tone-stack/drive) → cabinet → delay. Drives the
-  // breadcrumb strip below so order + enabled state are visible at a glance —
-  // clicking a chip scrolls to the section that controls it.
-  const chainSteps: {
-    label: string;
-    active: boolean;
-    accent: Accent;
-    sectionId: string;
-  }[] = [
-    {
-      label: "Gate",
-      active: amp.params.gate,
-      accent: "cyan",
-      sectionId: "chain-amp",
-    },
-    {
-      label: "Overdrive",
-      active: amp.params.overdriveEnabled,
-      accent: "orange",
-      sectionId: "chain-overdrive",
-    },
-    {
-      label: amp.params.namEnabled ? "Amp · NAM" : "Amp · Classic",
-      active: true,
-      accent: "cyan",
-      sectionId: "chain-amp",
-    },
-    {
-      label: "Cabinet",
-      active: amp.params.cab,
-      accent: "emerald",
-      sectionId: "chain-cabinet",
-    },
-    {
-      label: "Delay",
-      active: amp.params.delayEnabled,
-      accent: "amber",
-      sectionId: "chain-delay",
-    },
-  ];
+  // Order + enabled state of the chain (see CHAIN_BLOCKS) — drives the
+  // breadcrumb strip below so both are visible at a glance; clicking a chip
+  // scrolls to the section that controls it.
+  const chainSteps = CHAIN_BLOCKS.map((block) => ({
+    label: block.label(amp.params),
+    active: block.isActive(amp.params),
+    accent: block.accent,
+    sectionId: block.sectionId,
+  }));
 
   return (
     <div className='mx-auto flex max-w-4xl flex-col gap-6 p-6'>
@@ -407,113 +380,109 @@ export const ToneStudioView = () => {
       <SectionPanel
         title='Audio Interface'
         icon={<Cable size={14} />}
-        contentClassName='flex flex-col gap-3'>
-        <div className='flex items-center gap-2'>
-          <div className='flex-1'>
-            <span className='mb-1 block text-xs text-zinc-400'>
-              Input {api ? `(${api})` : ""}
-            </span>
-            <select
-              value={selectedId ?? ""}
-              onChange={(e) => handleSelectDevice(Number(e.target.value))}
-              className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
-              {devices.length === 0 && (
-                <option value=''>No input devices found</option>
-              )}
-              {devices.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name} ({d.inputChannels} in)
-                  {d.isDefaultInput ? " · default" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
-          {(selectedInputDevice?.inputChannels || 0) > 1 && (
-            <div className='w-28 shrink-0'>
-              <span className='mb-1 block text-xs text-zinc-400'>Channel</span>
-              <select
-                value={selectedChannel}
-                onChange={(e) => handleSelectChannel(Number(e.target.value))}
-                title='Which input channel to capture from — e.g. the guitar jack on a multi-channel interface'
-                className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
-                {Array.from({ length: selectedInputDevice?.inputChannels || 0 }, (_, i) => (
-                  <option key={i} value={i}>
-                    {i + 1}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+        headerRight={
           <button
             type='button'
             onClick={() => refresh()}
             title='Refresh device list'
-            className='mt-5 shrink-0 rounded-lg bg-zinc-800 p-2 text-zinc-400 hover:text-white'>
-            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+            className='flex items-center gap-1.5 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white'>
+            <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+            Refresh
           </button>
-          <div className='w-36 shrink-0'>
-            <span className='mb-1 block text-xs text-zinc-400'>Buffer</span>
-            <select
-              value={amp.bufferSize}
-              onChange={(e) => amp.setBufferSize(Number(e.target.value))}
-              title='ASIO/WASAPI buffer size — smaller = lower latency but more prone to crackling'
-              className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
-              {BUFFER_SIZES.map((size) => (
-                <option key={size} value={size}>
-                  {size} smp (~
-                  {((size / (amp.info?.sampleRate || 48000)) * 1000).toFixed(1)}
-                  ms)
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className='flex items-center gap-2'>
-          <div className='flex-1'>
-            <span className='mb-1 block text-xs text-zinc-400'>Output</span>
-            <select
-              value={selectedOutputId ?? ""}
-              onChange={(e) =>
-                handleSelectOutputDevice(
-                  e.target.value === "" ? null : Number(e.target.value),
-                )
-              }
-              disabled={isAsio}
-              title={
-                isAsio
-                  ? "ASIO uses the same device for input and output"
-                  : "Output device for amp monitoring"
-              }
-              className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50 disabled:cursor-not-allowed disabled:opacity-50'>
-              <option value=''>
-                {isAsio ? "Same as input (ASIO)" : "System default output"}
-              </option>
-              {outputDevices.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name} ({d.outputChannels} out)
-                  {d.isDefaultOutput ? " · default" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
-          {outputChannelCount > 1 && (
-            <div className='w-28 shrink-0'>
-              <span className='mb-1 block text-xs text-zinc-400'>Channel</span>
-              <select
-                value={selectedOutputChannel}
-                onChange={(e) => handleSelectOutputChannel(Number(e.target.value))}
-                title='First output channel to monitor through — e.g. outputs 3/4 instead of 1/2 on a multi-channel interface'
-                className='w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50'>
-                {Array.from({ length: outputChannelCount }, (_, i) => (
-                  <option key={i} value={i}>
-                    {i + 1}
-                  </option>
-                ))}
-              </select>
-            </div>
+        }
+        contentClassName='flex flex-col gap-4'>
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-start'>
+          <AudioSelect
+            className='flex-1'
+            label={`Input${api ? ` (${api})` : ""}`}
+            value={selectedId !== null ? String(selectedId) : ""}
+            onValueChange={(v) => handleSelectDevice(Number(v))}
+            placeholder={
+              devices.length ? "Select an input" : "No input devices found"
+            }
+            options={devices.map((d) => ({
+              value: String(d.id),
+              label: d.name,
+              hint: `${d.inputChannels} in${d.isDefaultInput ? " · default" : ""}`,
+            }))}
+          />
+          {(selectedInputDevice?.inputChannels || 0) > 1 && (
+            <AudioSelect
+              className='sm:w-28'
+              label='Channel'
+              title='Which input channel to capture from — e.g. the guitar jack on a multi-channel interface'
+              value={String(selectedChannel)}
+              onValueChange={(v) => handleSelectChannel(Number(v))}
+              options={Array.from(
+                { length: selectedInputDevice?.inputChannels || 0 },
+                (_, i) => ({ value: String(i), label: String(i + 1) }),
+              )}
+            />
           )}
         </div>
+
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-start'>
+          <AudioSelect
+            className='flex-1'
+            label='Output'
+            disabled={isAsio}
+            title={
+              isAsio
+                ? "ASIO uses the same device for input and output"
+                : "Output device for amp monitoring"
+            }
+            value={
+              selectedOutputId !== null
+                ? String(selectedOutputId)
+                : ENGINE_PICKED_OUTPUT
+            }
+            onValueChange={(v) =>
+              handleSelectOutputDevice(
+                v === ENGINE_PICKED_OUTPUT ? null : Number(v),
+              )
+            }
+            options={[
+              {
+                value: ENGINE_PICKED_OUTPUT,
+                label: isAsio
+                  ? "Same as input (ASIO)"
+                  : "System default output",
+              },
+              ...outputDevices.map((d) => ({
+                value: String(d.id),
+                label: d.name,
+                hint: `${d.outputChannels} out${d.isDefaultOutput ? " · default" : ""}`,
+              })),
+            ]}
+          />
+          {outputChannelCount > 1 && (
+            <AudioSelect
+              className='sm:w-28'
+              label='Channel'
+              title='First output channel to monitor through — e.g. outputs 3/4 instead of 1/2 on a multi-channel interface'
+              value={String(selectedOutputChannel)}
+              onValueChange={(v) => handleSelectOutputChannel(Number(v))}
+              options={Array.from({ length: outputChannelCount }, (_, i) => ({
+                value: String(i),
+                label: String(i + 1),
+              }))}
+            />
+          )}
+        </div>
+
+        <AudioSelect
+          className='sm:w-64'
+          label='Buffer'
+          title='ASIO/WASAPI buffer size — smaller = lower latency but more prone to crackling'
+          hint='Smaller buffers cut latency; too small and the audio starts crackling.'
+          value={String(amp.bufferSize)}
+          onValueChange={(v) => amp.setBufferSize(Number(v))}
+          options={BUFFER_SIZES.map((size) => ({
+            value: String(size),
+            label: `${size} smp`,
+            hint: `~${((size / (amp.info?.sampleRate || 48000)) * 1000).toFixed(1)} ms`,
+          }))}
+        />
       </SectionPanel>
 
       {/* ── Presets: browsing/loading is the default view; creating a new one is an

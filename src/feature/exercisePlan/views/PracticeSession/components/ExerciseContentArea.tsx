@@ -4,6 +4,7 @@ import React, { memo, useEffect } from "react";
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 import { isOpenExercise } from "../../../utils/isOpenExercise";
 import { useSessionUI } from "../contexts/SessionUIContext";
+import { strumSynthVolume } from "../helpers/strumSynthVolume";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
 import { ChordHuntPanel } from "./ChordHuntPanel";
@@ -317,6 +318,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           countInRemaining={countInRemaining}
           isMicEnabled={isMicEnabled}
           audioContext={audioContext}
+          volume={strumSynthVolume(isAudioMuted, trackConfigs?.main)}
         />
       ) : isOpenExercise(currentExercise) ? (
         <div className="p-4">

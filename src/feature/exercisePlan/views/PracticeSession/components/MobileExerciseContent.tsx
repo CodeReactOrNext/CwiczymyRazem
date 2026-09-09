@@ -44,6 +44,8 @@ interface MobileExerciseContentProps {
   onPlayRiddle: () => void;
   /** Shows the click hunt's mistake counter under the exam's strike limit. */
   isExamMode?: boolean;
+  /** Session guitar level for the strumming synth, 0 = muted. */
+  strumVolume?: number;
 }
 
 export function MobileExerciseContent({
@@ -72,6 +74,7 @@ export function MobileExerciseContent({
   riddleProgress,
   onPlayRiddle,
   isExamMode,
+  strumVolume = 1,
 }: MobileExerciseContentProps) {
   const { openLeaderboard } = useSessionUI();
 
@@ -213,6 +216,7 @@ export function MobileExerciseContent({
             countInRemaining={(metronome as any).countInRemaining}
             isMicEnabled={isMicEnabled}
             audioContext={metronome.audioContext}
+            volume={strumVolume}
           />
         </div>
       ) : (currentExercise.imageUrl || currentExercise.image) ? (

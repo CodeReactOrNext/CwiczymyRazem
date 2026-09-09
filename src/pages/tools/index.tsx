@@ -355,6 +355,26 @@ const FILTERS: { key: FilterKey; label: string; hint: string; classes: string }[
   { key: "ai", label: "AI", hint: "a model does the work", classes: AI_CLASSES },
 ];
 
+/**
+ * Tools that live on riff.quest itself, kept out of CATEGORIES and pinned above
+ * the catalogue: they are the ones a visitor can use without leaving the page,
+ * and they are the ones this site is responsible for.
+ */
+const INTERNAL_TOOLS: {
+  name: string;
+  href: string;
+  description: string;
+  icon: ComponentType<{ className?: string }>;
+}[] = [
+  {
+    name: "Guitar tuner",
+    href: "/tools/tuner",
+    description:
+      "Microphone tuner reading in cents, for guitar, bass, ukulele, mandolin and banjo. Standard, Drop D, Open G, DADGAD and a dozen more tunings, plus reference tones for tuning by ear.",
+    icon: Gauge,
+  },
+];
+
 const ALL_TOOLS = CATEGORIES.flatMap((category) => category.tools);
 const totalTools = ALL_TOOLS.length;
 const countFor = (key: FilterKey) =>
@@ -408,11 +428,17 @@ const ToolsPage = () => {
               "@context": "https://schema.org",
               "@type": "ItemList",
               "name": "Guitar Practice Tools",
-              "itemListElement": CATEGORIES.flatMap((category) => category.tools).map((tool, index) => ({
+              "itemListElement": [
+                ...INTERNAL_TOOLS.map((tool) => ({ name: tool.name, url: `https://riff.quest${tool.href}` })),
+                ...ALL_TOOLS.map((tool) => ({
+                  name: tool.name,
+                  url: tool.url.startsWith("http") ? tool.url : siteUrl,
+                })),
+              ].map((item, index) => ({
                 "@type": "ListItem",
                 "position": index + 1,
-                "name": tool.name,
-                "url": tool.url.startsWith("http") ? tool.url : siteUrl,
+                "name": item.name,
+                "url": item.url,
               })),
             }),
           }}
@@ -436,9 +462,50 @@ const ToolsPage = () => {
           <div className="mb-10 max-w-2xl">
             <h1 className="text-4xl font-black text-white mb-6">Guitar practice tools</h1>
             <p className="text-lg text-zinc-400 leading-relaxed">
-              A catalogue of {totalTools} tools, grouped by what you would reach for them to do.
+              A catalogue of {totalTools} tools, grouped by what you would reach for them to do —
+              starting with the{" "}
+              <Link href="/tools/tuner" className="font-bold text-cyan-400 transition-colors hover:text-cyan-300">
+                tuner
+              </Link>{" "}
+              that runs right here.
             </p>
           </div>
+
+          <section className="mb-16" id="internal">
+            <h2 className="mb-3 text-lg font-bold text-white">Internal tools</h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {INTERNAL_TOOLS.map((tool) => {
+                const Icon = tool.icon;
+                return (
+                  <Link
+                    key={tool.name}
+                    href={tool.href}
+                    className="group flex flex-col gap-3 rounded-lg bg-cyan-500/10 p-5 transition-background hover:bg-cyan-500/[0.16]">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-900/60">
+                        <Icon className="h-5 w-5 text-cyan-400" />
+                      </span>
+                      <span className="text-sm font-bold text-white">{tool.name}</span>
+                    </div>
+                    <p className="flex-grow text-sm leading-relaxed text-zinc-400">{tool.description}</p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wide ${PRICE_CLASSES.free}`}>
+                          Free
+                        </span>
+                        <span className="rounded bg-cyan-500/15 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-cyan-400">
+                          On this site
+                        </span>
+                      </div>
+                      <span className="text-xs font-bold text-cyan-400 opacity-0 transition-opacity group-hover:opacity-100">
+                        Open →
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
 
           <div className="mb-16">
             <div className="flex flex-wrap items-center gap-2">

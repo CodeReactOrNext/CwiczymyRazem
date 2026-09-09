@@ -117,7 +117,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                     <ElectronIntegrations />
                     <DesktopNotifications />
                     <DesktopUpdateRequired />
-                    <Toaster position='top-right' toastOptions={{
+                    <Toaster position='top-right' offset={isElectron ? { top: 52, right: 16 } : undefined} toastOptions={{
                         className: "bg-zinc-200 text-zinc-950 border border-zinc-300 shadow-xl font-medium"
                     }} />
                     <NextTopLoader color='#06b6d4' />
@@ -150,7 +150,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                     <ElectronIntegrations />
                     <DesktopNotifications />
                     <DesktopUpdateRequired />
-                    <Toaster position='top-right' toastOptions={{
+                    <Toaster position='top-right' offset={isElectron ? { top: 52, right: 16 } : undefined} toastOptions={{
                         className: "bg-zinc-200 text-zinc-950 border border-zinc-300 shadow-xl font-medium"
                     }} />
                     <NextTopLoader color='#06b6d4' />

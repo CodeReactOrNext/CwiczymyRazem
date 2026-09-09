@@ -72,6 +72,14 @@ contextBridge.exposeInMainWorld("nativeAmp", {
     ipcRenderer.on("amp:overload", listener);
     return () => ipcRenderer.removeListener("amp:overload", listener);
   },
+  /** Peak input/output level of the running amp stream, ~20 readings/s while
+   *  monitoring is on. Payload: { inPeak, outPeak } as linear 0..1+ sample peaks
+   *  (>= 1 means the converter clipped). Returns an unsubscribe fn. */
+  onMeter: (cb) => {
+    const listener = (_event, levels) => cb(levels);
+    ipcRenderer.on("amp:meter", listener);
+    return () => ipcRenderer.removeListener("amp:meter", listener);
+  },
   /** Same connection-loss/recovery event as nativeAudio.onConnectionIssue above —
    *  the amp shares the one underlying stream, so it can be affected too. Returns
    *  an unsubscribe fn. */

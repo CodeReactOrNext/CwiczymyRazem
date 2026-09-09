@@ -1,7 +1,18 @@
 import React from "react";
 
-import { arcPt,CX, CY, MAX_ANGLE_DEG, NEEDLE_LEN, R } from "../calibration.constants";
+// Arc SVG geometry: center (CX, CY), radius R — arc spans (CX−R, CY) to (CX+R, CY) upward
+export const CX = 140, CY = 155, R = 110;
+export const NEEDLE_LEN = 100;
+export const MAX_ANGLE_DEG = 80; // ±80° = ±50¢
 
+/** Returns [x, y] for a point on the arc at angleDeg from vertical (0=top, +right) */
+export function arcPt(angleDeg: number, radius = R): [number, number] {
+  const rad = (angleDeg * Math.PI) / 180;
+  return [CX + radius * Math.sin(rad), CY - radius * Math.cos(rad)];
+}
+
+/** The needle every tuner in the app shares: the practice session's calibration
+ *  wizard, the in-session tuner dialog, and the standalone tuner at /tools/tuner. */
 export const ArcTuner = React.memo(function ArcTuner({
   cents,
   hasNote,

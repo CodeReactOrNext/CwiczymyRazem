@@ -20,11 +20,13 @@ interface UseStrummingAnimationOptions {
   maxReps:               number;
   canvasH:               number;
   externalAudioContext:  AudioContext | null | undefined;
+  /** Session guitar level, 0 = muted. */
+  volume:                number;
 }
 
 export function useStrummingAnimation({
   pattern, bpm, isPlaying, startTime, countInRemaining,
-  slotFeedback, isMicEnabled, maxReps, canvasH, externalAudioContext,
+  slotFeedback, isMicEnabled, maxReps, canvasH, externalAudioContext, volume,
 }: UseStrummingAnimationOptions) {
   const canvasRef          = useRef<HTMLCanvasElement>(null);
   const containerRef       = useRef<HTMLDivElement>(null);
@@ -40,6 +42,11 @@ export function useStrummingAnimation({
   // Keep a ref to externalAudioContext so the RAF tick always reads the latest value
   const externalAudioContextRef = useRef(externalAudioContext);
   externalAudioContextRef.current = externalAudioContext;
+
+  // Same for the volume: muting mid-loop must take effect on the very next slot
+  // without rebuilding the tick (which would restart the animation frame chain).
+  const volumeRef = useRef(volume);
+  useEffect(() => { volumeRef.current = volume; }, [volume]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -123,7 +130,9 @@ export function useStrummingAnimation({
         lastSlotRef.current = totalSlotsElapsed;
         const slotInBar = totalSlotsElapsed % totalSlots;
         const beat      = pattern.strums[slotInBar];
-        if (beat && beat.direction !== "miss") {
+        // Muted (volume 0) leaves the cursor and the matcher running but never
+        // opens or resumes an AudioContext — the pattern plays silently.
+        if (beat && beat.direction !== "miss" && volumeRef.current > 0) {
           function getAudioCtx() {
             const ext = externalAudioContextRef.current;
             if (ext) { if (ext.state === "suspended") ext.resume(); return ext; }
@@ -134,7 +143,7 @@ export function useStrummingAnimation({
             if (audioCtxRef.current.state === "suspended") audioCtxRef.current.resume();
             return audioCtxRef.current;
           }
-          try { playStrumSound(getAudioCtx(), beat.direction, !!beat.muted, !!beat.accented, currentChord); }
+          try { playStrumSound(getAudioCtx(), beat.direction, !!beat.muted, !!beat.accented, currentChord, volumeRef.current); }
           catch (_) { /* ignore AudioContext errors */ }
         }
       }

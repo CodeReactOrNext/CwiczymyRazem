@@ -21,19 +21,9 @@ export const MIN_SAMPLES   = 8;
 export const ACCEPT_CENTS  = 250;
 export const STALE_MS      = 2000;
 
-// Arc SVG geometry: center (CX, CY), radius R — arc spans (CX−R, CY) to (CX+R, CY) upward
-export const CX = 140, CY = 155, R = 110;
-export const NEEDLE_LEN    = 100;
-export const MAX_ANGLE_DEG = 80; // ±80° = ±50¢
-
 export function median(arr: number[]): number {
   const s = [...arr].sort((a, b) => a - b);
   const m = Math.floor(s.length / 2);
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 }
 
-/** Returns [x, y] for a point on the arc at angleDeg from vertical (0=top, +right) */
-export function arcPt(angleDeg: number, radius = R): [number, number] {
-  const rad = (angleDeg * Math.PI) / 180;
-  return [CX + radius * Math.sin(rad), CY - radius * Math.cos(rad)];
-}

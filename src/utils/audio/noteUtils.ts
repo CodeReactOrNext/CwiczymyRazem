@@ -135,6 +135,13 @@ export function computeChromagram(analyser: AnalyserNode): Float32Array | null {
 export const midiToFrequency = (midi: number): number =>
   A4 * Math.pow(2, (midi - 69) / 12);
 
+/** Scientific pitch name for a MIDI note — 40 → "E2", 69 → "A4". Sharps only. */
+export const midiToNoteName = (midi: number): string => {
+  const name = NOTES[((midi % 12) + 12) % 12];
+  const octave = Math.floor(midi / 12) - 1;
+  return `${name}${octave}`;
+};
+
 /**
  * Calculates the frequency of a specific note on a guitar string and fret.
  * @param string - String number (1-6, 1 is High E).

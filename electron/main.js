@@ -432,6 +432,14 @@ audioEngine.onOverload((info) => {
   }
 });
 
+// Input/output peak levels while the amp runs (~20/s) — drives the level meter
+// in the in-session amp popover. See nativeAudioEngine.js accumulateMeter.
+audioEngine.onMeter((levels) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("amp:meter", levels);
+  }
+});
+
 // Surfaces stream-loss/recovery (device disconnected, driver reset from its own
 // control panel, hot-plug, the audio process dying) and device-list changes — see
 // nativeAudioEngine.js's scheduleRecovery/health poll for why the renderer can't

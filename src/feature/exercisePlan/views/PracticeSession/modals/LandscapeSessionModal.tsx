@@ -16,6 +16,7 @@ import { MobileExerciseContent } from "../components/MobileExerciseContent";
 import { MobileInstructionsCard } from "../components/MobileInstructionsCard";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useTimerContext } from "../contexts/TimerContext";
+import { strumSynthVolume } from "../helpers/strumSynthVolume";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 
 interface LandscapeSessionModalProps {
@@ -127,6 +128,7 @@ export function LandscapeSessionModal({
   const [isPanelExpanded, setIsPanelExpanded] = useState(true);
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
   const { formattedTimeLeft } = useTimerContext();
+  const strumVolume = strumSynthVolume(isAudioMuted, audioTracks?.find(t => t.id === "main"));
 
   // If landscape was forced via RotateDeviceHint (fullscreen + orientation
   // lock), release both when the session closes so the app isn't stuck sideways.
@@ -179,6 +181,7 @@ export function LandscapeSessionModal({
                     riddleProgress={riddleProgress}
                     onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
                     isExamMode={examMode}
+                    strumVolume={strumVolume}
                   />
                 </div>
               </div>
@@ -236,7 +239,7 @@ export function LandscapeSessionModal({
                     <div className="px-3 py-3 space-y-2">
                       <MediaControlsToolbar
                         hasMetronome={!!currentExercise.metronomeSpeed}
-                        hasAudioTrack={!!(activeTablature?.length > 0 || currentExercise.gpFileUrl) && !currentExercise.disableBackingTrack}
+                        hasAudioTrack={!!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableBackingTrack}
                         hasMicControls={!!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableMic}
                         speedMultiplier={speedMultiplier ?? 1}
                         onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}

@@ -250,6 +250,45 @@ describe("tier coverage across the whole pool", () => {
     expect(missing).toEqual([]);
   });
 
+  /**
+   * Pickups were the loudest shortage players reported, and it was never the
+   * odds table — it was BOM order. `pickup` sat last on the single-cuts and was
+   * absent from the twin-humbucker list, so two thirds of the roster could not
+   * pay one out at any rarity below Mythic. Both numbers below are the floor
+   * that fixed it; a reorder that quietly drops under them is the regression.
+   */
+  it("pays pickups out of most of the roster, not just the top of it", () => {
+    const yielders = GUITAR_DEFINITIONS.filter((g) =>
+      has(
+        getScrapYield({ bom: getGuitarBom(g.id), rarity: g.rarity }),
+        "pickup",
+      ),
+    );
+    expect(yielders.length).toBeGreaterThanOrEqual(
+      Math.ceil(GUITAR_DEFINITIONS.length / 2),
+    );
+  });
+
+  it("sources Legendary pickups from more than one guitar family", () => {
+    const sources = GUITAR_DEFINITIONS.filter((g) =>
+      getScrapYield({ bom: getGuitarBom(g.id), rarity: g.rarity }).some(
+        (p) => p.partId === "pickup" && p.tier === "Legendary",
+      ),
+    );
+    // A part only reaches Legendary from the first two slots of a Legendary
+    // donor, so the supply collapses onto one archetype the moment pickups slip
+    // down a list. Two archetypes is the margin that keeps a single reorder from
+    // emptying the tier.
+    const archetypes = new Set(
+      sources.map((g) =>
+        getGuitarBom(g.id)
+          .map((slot) => slot.partId)
+          .join(">"),
+      ),
+    );
+    expect(archetypes.size).toBeGreaterThanOrEqual(2);
+  });
+
   it("never produces a tier a part is not allowed to reach", () => {
     for (const pair of reachablePairs()) {
       const [partId, tier] = pair.split(":");

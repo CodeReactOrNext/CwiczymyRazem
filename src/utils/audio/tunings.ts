@@ -1,4 +1,4 @@
-import { correctOctaveForLowStrings, getCentsDistance, midiToFrequency, NOTES, STANDARD_OPEN_STRING_MIDI } from "./noteUtils";
+import { correctOctaveForLowStrings, getCentsDistance, midiToFrequency, midiToNoteName, STANDARD_OPEN_STRING_MIDI } from "./noteUtils";
 
 /** Semitone offset from standard tuning, per string. Index 0 = string 1 (high E) … index 5 = string 6 (low E). */
 export type TuningOffsets = readonly [number, number, number, number, number, number];
@@ -52,12 +52,6 @@ export interface TuningStringRef {
   string: number; // 1-6
   name: string;   // e.g. "D2"
   hz: number;
-}
-
-function midiToNoteName(midi: number): string {
-  const name = NOTES[((midi % 12) + 12) % 12];
-  const octave = Math.floor(midi / 12) - 1;
-  return `${name}${octave}`;
 }
 
 /** Reference pitch for each open string under the given tuning, low string (6) first — the order the tuner/calibration wizard walks through. */

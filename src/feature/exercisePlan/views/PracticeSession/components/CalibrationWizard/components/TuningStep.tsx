@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { ArcTuner } from "feature/tuner/components/ArcTuner";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import React from "react";
@@ -8,7 +9,6 @@ import { FaTimes } from "react-icons/fa";
 import type { CalibrationOffsets } from "../../../hooks/useCalibration";
 import type { GuitarString } from "../calibration.constants";
 import { useTuningFrequency } from "../hooks/useTuningFrequency";
-import { ArcTuner } from "./ArcTuner";
 import { StringProgress } from "./StringProgress";
 
 interface TuningStepProps {

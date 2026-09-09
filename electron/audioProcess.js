@@ -43,6 +43,7 @@ const handlers = {
     raisePriority();
     engine = require("./nativeAudioEngine");
     engine.onOverload((info) => rpc.emit("overload", info));
+    engine.onMeter((levels) => rpc.emit("meter", levels));
     engine.onConnectionIssue((info) => rpc.emit("connection-issue", info));
     engine.onDevicesChanged(() => rpc.emit("devices-changed"));
     // Compile the NAM WASM now, while nothing is streaming, not on first "turn on".
