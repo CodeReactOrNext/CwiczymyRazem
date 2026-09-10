@@ -3,8 +3,10 @@ import type { AchievementList } from "feature/achievements/types";
 import type {
   GuitarDefinition,
   InventoryItem,
+  SalvagedMod,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
+import type { LevelReward } from "feature/progression/utils/levelRewards";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 import type { RewardPayout } from "./rewardPayout";
@@ -29,6 +31,10 @@ export interface RewardLedgerState {
   };
   roadmaps: {
     /** Reward ids of the AI-coach roadmaps collected — see `roadmapRewardId`. */
+    claimed: string[];
+  };
+  levels: {
+    /** Reward ids of the level milestones collected — see `levelRewardId`. */
     claimed: string[];
   };
 }
@@ -58,6 +64,22 @@ export interface ClaimRoadmapResult extends ClaimResult {
   guitar: GuitarDefinition;
   /** The copy of it that was just minted for this player. */
   trophy: InventoryItem;
+}
+
+/**
+ * What a collected level rung paid.
+ *
+ * Not a `ClaimResult`: the ladder pays in things rather than money, so there is
+ * no Fame line to report back — see `LevelPayout`.
+ */
+export interface ClaimLevelResult {
+  rewardId: string;
+  lvl: number;
+  reward: LevelReward;
+  /** The mods as they now hang in the stash. */
+  mods: SalvagedMod[];
+  newParts: ScrapPart[];
+  caseTokens: number;
 }
 
 export interface ClaimJourneyResult extends ClaimResult {
@@ -116,6 +138,23 @@ export const claimJourneyReward = async (
   const { data } = await axios.post<ClaimJourneyResult>(
     "/api/rewards/claim-journey",
     { idToken, moduleId },
+  );
+  return data;
+};
+
+/**
+ * Collects what one level pays.
+ *
+ * The rung is all the server is told; it re-derives the payout itself. See
+ * `api/rewards/claim-level`.
+ */
+export const claimLevelReward = async (
+  lvl: number,
+): Promise<ClaimLevelResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<ClaimLevelResult>(
+    "/api/rewards/claim-level",
+    { idToken, lvl },
   );
   return data;
 };

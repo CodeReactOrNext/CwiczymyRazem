@@ -5,6 +5,10 @@ import type {
   PowerLink,
 } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
+import {
+  blockedEquipMessage,
+  findBlockedRigChange,
+} from "feature/progression/utils/equipGuard";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -40,7 +44,32 @@ export default async function handler(
     if (!userDoc.exists)
       return res.status(404).json({ error: "User not found" });
 
-    const arsenal = userDoc.data()!.arsenal;
+    const data = userDoc.data()!;
+    const arsenal = data.arsenal;
+
+    // Pedals go through the rarity ladder exactly as guitars do: a cap that
+    // only watched the guitar half would be a cap in name only.
+    const blocked =
+      data.role === "admin"
+        ? null
+        : findBlockedRigChange(
+            {
+              inventory: arsenal?.inventory ?? [],
+              effectInventory: arsenal?.effectInventory ?? [],
+              rig: arsenal?.rig,
+            },
+            {
+              pedalboardItemIds: items
+                .map((item) => item?.itemId)
+                .filter((id): id is string => typeof id === "string"),
+            },
+            data.statistics?.lvl ?? 1,
+          );
+    if (blocked) {
+      return res
+        .status(403)
+        .json({ error: blockedEquipMessage(blocked), blocked });
+    }
 
     // The DC cables decide which pedals count towards the wiring bonus, so they
     // are checked here rather than trusted: a link has to name a pedal that is

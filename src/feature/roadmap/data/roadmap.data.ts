@@ -159,7 +159,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     description:
       "Finish a Journey, Roadmap, or Skill track and get a guitar or effect dropped as a reward.",
   },
-  { id: "t125", goal: 125, icon: Target, label: "+4 New Exercises", kind: "content" },
+  { id: "t125", goal: 125, icon: Target, label: "+4 New Exercises", kind: "content", done: true },
   { id: "t133", goal: 133, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content", done: true },
   {
     id: "t153",

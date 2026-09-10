@@ -1,4 +1,8 @@
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import {
+  blockedEquipMessage,
+  checkGuitarEquip,
+} from "feature/progression/utils/equipGuard";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -33,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
 
     const data = userDoc.data()!;
-    const inventory: { id: string; guitarId: number | string; year?: number; country?: string }[] = data.arsenal?.inventory || [];
+    const inventory: { id: string; guitarId: number | string; year?: number; country?: string; buildLevel?: number }[] = data.arsenal?.inventory || [];
 
     // Prefer matching the unique inventory item so duplicates of the same guitarId
     // can be equipped independently. Fall back to guitarId for backward compatibility.
@@ -42,6 +46,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       : inventory.find((item) => item.guitarId === guitarId);
     if (!ownedItem) {
       return res.status(403).json({ error: "Guitar not in inventory" });
+    }
+
+    // Owning it was never the question — see `feature/progression`. Admins keep
+    // every rarity reachable from a low-level test account, the same exemption
+    // the page-level gates make.
+    const blocked =
+      data.role === "admin"
+        ? null
+        : checkGuitarEquip(ownedItem, data.statistics?.lvl ?? 1);
+    if (blocked) {
+      return res.status(403).json({ error: blockedEquipMessage(blocked), blocked });
     }
 
     const guitarDef = GUITARS_BY_ID.get(ownedItem.guitarId);

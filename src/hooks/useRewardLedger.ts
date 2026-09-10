@@ -6,6 +6,7 @@ import type { RewardPayout } from "lib/rewards/rewardPayout";
 import {
   claimAchievementRewards,
   claimJourneyReward,
+  claimLevelReward,
   claimRoadmapReward,
   claimScaleReward,
   fetchRewardLedger,
@@ -133,6 +134,43 @@ export const useClaimRoadmapReward = () => {
         result.newFame,
         `${result.guitar.brand} ${result.guitar.name} is yours`,
       );
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.error || "Could not collect the reward",
+      );
+    },
+  });
+};
+
+/**
+ * Collects one rung of the level ladder.
+ *
+ * Its own mutation rather than a fourth caller of `useClaimSideEffects`: levels
+ * pay no Fame, so there is no wallet to put right, and the one thing this
+ * payout has that the others do not — a mod, which is an object rather than a
+ * number — has to be named in the toast or it lands silently in the stash.
+ */
+export const useClaimLevelReward = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (lvl: number) => claimLevelReward(lvl),
+    onSuccess: (result) => {
+      const parts = result.reward.parts.reduce((sum, p) => sum + p.qty, 0);
+      const line = [
+        result.reward.caseTokens > 0
+          ? `${result.reward.caseTokens} free ${result.reward.caseTokens === 1 ? "case" : "cases"}`
+          : null,
+        parts > 0 ? `${parts} ${parts === 1 ? "part" : "parts"}` : null,
+        ...result.reward.mods.map((mod) => mod.label),
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+      toast.success(`Level ${result.lvl} collected: ${line}`);
+      queryClient.invalidateQueries({ queryKey: REWARD_LEDGER_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
     },
     onError: (error: any) => {
       toast.error(

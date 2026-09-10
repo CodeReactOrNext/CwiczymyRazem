@@ -23,6 +23,14 @@ export interface RewardLedger {
   claimedJourneys: string[];
   /** Curated AI-coach roadmaps already collected, by reward id. Same rule. */
   claimedRoadmaps: string[];
+  /**
+   * Level milestones already collected, by reward id. Same rule.
+   *
+   * Nothing on this ladder expires, so an account that climbed past a rung
+   * before the ladder shipped is still owed it — the list is what has been
+   * paid, never what was reached.
+   */
+  claimedLevels: string[];
   /** Unspent free cases. One opens any case on the shelf without paying Fame. */
   caseTokens: number;
 }
@@ -32,6 +40,7 @@ export const EMPTY_REWARD_LEDGER: RewardLedger = {
   claimedScales: [],
   claimedJourneys: [],
   claimedRoadmaps: [],
+  claimedLevels: [],
   caseTokens: 0,
 };
 
@@ -60,6 +69,7 @@ export const readRewardLedger = (
     claimedScales: readIds(stored.claimedScales),
     claimedJourneys: readIds(stored.claimedJourneys),
     claimedRoadmaps: readIds(stored.claimedRoadmaps),
+    claimedLevels: readIds(stored.claimedLevels),
     caseTokens: Number.isFinite(tokens) && tokens > 0 ? Math.floor(tokens) : 0,
   };
 };

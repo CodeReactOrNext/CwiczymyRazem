@@ -14,6 +14,7 @@ import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { StatsSection } from "feature/profile/components/StatsSection";
 import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
 import { downloadProfileSummaryCsv } from "feature/profile/services/profileSummary.export";
+import { MilestoneLadder } from "feature/progression/components/MilestoneLadder";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { downloadSongProgressCsv } from "feature/songs/services/songs.export";
 import {
@@ -176,6 +177,11 @@ const ProfileActivityPage = () => {
 
           {/* 3. Song Learning Stats */}
           <SongLearningSection userSongs={songs} />
+
+          {/* 4. The level ladder: what each level opened, and what it paid */}
+          <DashboardSection compact>
+            <MilestoneLadder />
+          </DashboardSection>
 
           {/* 5. Activity Log calendar */}
           <ActivityLog key={refreshKey} userAuth={userAuth as string} />

@@ -45,6 +45,14 @@ class MetronomeProcessor extends AudioWorkletProcessor {
 registerProcessor('metronome-processor', MetronomeProcessor);
 `;
 
+// Cadence of the worklet's tick, mirrored by the main-thread fallback ticker so
+// both drive the scheduler the same way.
+const TICK_INTERVAL_MS = 25;
+
+// How long a started transport may go with a motionless audio clock before the
+// output device is written off as dead — see armClockWatchdog.
+const DEAD_CLOCK_TIMEOUT_MS = 600;
+
 interface UseMetronomeProps {
   initialBpm?: number;
   minBpm?: number;
@@ -167,6 +175,20 @@ export const useMetronome = ({
   // ignores bar-click seeks (visual cursor jumps, audio does not).
   const pendingSeekBeatRef   = useRef<number | null>(null);
   const ownsContextRef       = useRef(true);
+  // Mirrors isPlaying for the callbacks that cannot wait for a re-render: the
+  // worklet-ready and context-swap paths both fire from promise callbacks.
+  const isPlayingRef         = useRef(false);
+  // Main-thread stand-in for the worklet tick, used while the worklet module is
+  // still loading — or for good, if it failed to load at all.
+  const fallbackTickerRef    = useRef<ReturnType<typeof setInterval> | null>(null);
+  const clockWatchdogRef     = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const deadClockHandledRef  = useRef(false);
+  // Bumped on every context (re)initialisation so a module load that resolves
+  // after its context was replaced cannot mark the *new* context as ready.
+  const workletGenerationRef = useRef(0);
+  // armScheduler by ref: the context effect must be able to call it without
+  // taking it as a dependency (that would rebuild the context on every render).
+  const armSchedulerRef      = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     volumeRef.current = volume;
@@ -191,6 +213,36 @@ export const useMetronome = ({
     setBpm(initialBpm);
   }, [initialBpm]);
 
+  const stopFallbackTicker = useCallback(() => {
+    if (fallbackTickerRef.current === null) return;
+    clearInterval(fallbackTickerRef.current);
+    fallbackTickerRef.current = null;
+  }, []);
+
+  /**
+   * Drives the scheduler from a plain interval whenever the AudioWorklet isn't
+   * there to do it — the module is still loading, or it failed outright.
+   *
+   * Same 25ms cadence and the same 100ms lookahead as the worklet, so the clicks
+   * themselves stay sample-accurate; only the tick jitter is worse, and the
+   * lookahead is what absorbs that. Without it, a Play pressed before the module
+   * lands left nothing at all driving the scheduler: one count-in beep was
+   * queued and the count-in then sat frozen on its first number forever.
+   */
+  const startFallbackTicker = useCallback(() => {
+    if (fallbackTickerRef.current !== null) return;
+    fallbackTickerRef.current = setInterval(() => {
+      schedulerRef.current?.();
+      onTickRef.current?.();
+    }, TICK_INTERVAL_MS);
+  }, []);
+
+  const clearClockWatchdog = useCallback(() => {
+    if (clockWatchdogRef.current === null) return;
+    clearTimeout(clockWatchdogRef.current);
+    clockWatchdogRef.current = null;
+  }, []);
+
   // ── AudioContext + AudioWorklet setup ───────────────────────────────────────
   // When externalAudioContext is provided (e.g. AlphaTab's context for GP files),
   // we skip creating our own and add the worklet module to the shared context instead.
@@ -208,19 +260,36 @@ export const useMetronome = ({
     workletNodeRef.current?.disconnect();
     workletNodeRef.current  = null;
     workletReadyRef.current = false;
+    deadClockHandledRef.current = false;
+    workletGenerationRef.current += 1;
+    const generation = workletGenerationRef.current;
 
     const blob    = new Blob([WORKLET_CODE], { type: 'application/javascript' });
     const blobUrl = URL.createObjectURL(blob);
 
     ctx.audioWorklet.addModule(blobUrl).then(() => {
       URL.revokeObjectURL(blobUrl);
+      // A load that resolves after its context was replaced says nothing about
+      // the context in place now — marking that one ready would make the next
+      // AudioWorkletNode() throw on a processor it never registered.
+      if (generation !== workletGenerationRef.current) return;
       workletReadyRef.current = true;
+      // Hand a transport that is already running over to the worklet.
+      armSchedulerRef.current?.();
     }).catch((err) => {
       console.error('[useMetronome] AudioWorklet failed to load:', err);
       URL.revokeObjectURL(blobUrl);
     });
 
+    // Adopting AlphaTab's context (it only becomes ready once its soundfont has
+    // loaded, which on a cold cache can land *after* Play was pressed) replaces
+    // the clock under a running count-in. Re-anchor it on the new context right
+    // away rather than leaving it frozen on whatever number it had reached.
+    armSchedulerRef.current?.();
+
     return () => {
+      stopFallbackTicker();
+      clearClockWatchdog();
       workletNodeRef.current?.port.postMessage({ type: 'stop' });
       workletNodeRef.current?.disconnect();
       workletNodeRef.current  = null;
@@ -231,7 +300,7 @@ export const useMetronome = ({
   // externalAudioContext intentionally included: when AlphaTab's context becomes
   // available we reinitialise the worklet on that context (happens before first play).
 
-  }, [enabled, externalAudioContext]);
+  }, [enabled, externalAudioContext, stopFallbackTicker, clearClockWatchdog]);
 
   // Move an already-open, app-owned context to a newly picked output device live
   // (e.g. user changes the interface mid-session in the Setup step). Never touches
@@ -386,7 +455,16 @@ export const useMetronome = ({
     if (!ctx || !workletReadyRef.current) return null;
 
     if (!workletNodeRef.current) {
-      const node = new AudioWorkletNode(ctx, 'metronome-processor');
+      let node: AudioWorkletNode;
+      try {
+        node = new AudioWorkletNode(ctx, 'metronome-processor');
+      } catch (err) {
+        // The processor isn't registered on this context after all — caller
+        // falls back to the main-thread ticker rather than losing the clock.
+        console.error('[useMetronome] AudioWorkletNode creation failed:', err);
+        workletReadyRef.current = false;
+        return null;
+      }
       node.port.onmessage = ({ data }) => {
         if (data.type === 'tick') {
           schedulerRef.current?.();
@@ -400,6 +478,84 @@ export const useMetronome = ({
 
     return workletNodeRef.current;
   }, []);
+
+  /**
+   * Web Audio can hand back a context that reports `running` while its clock
+   * never moves. The desktop build is where this bites: it redirects output with
+   * setSinkId onto the same interface the native engine drives, and an output
+   * that cannot be opened leaves the graph rendering nothing. A motionless clock
+   * means no worklet ticks and no clicks — the count-in freezes on its first
+   * number, which is exactly what desktop players reported. Give the device a
+   * moment to come up, then fall back to the system default output.
+   */
+  const armClockWatchdog = useCallback(() => {
+    clearClockWatchdog();
+    const ctx = audioContextRef.current;
+    if (!ctx) return;
+
+    const clockAtStart = ctx.currentTime;
+    clockWatchdogRef.current = setTimeout(() => {
+      clockWatchdogRef.current = null;
+      if (!isPlayingRef.current || audioContextRef.current !== ctx) return;
+      if (ctx.currentTime - clockAtStart > 0.05) return; // clock is alive
+
+      if (ctx.state !== 'running') {
+        // Not the device's fault: a suspended context has a clock that is meant
+        // to stand still. Resuming is the whole fix — whatever is driving the
+        // scheduler picks the count-in back up as soon as the clock moves.
+        ctx.resume();
+        return;
+      }
+      const canRetarget =
+        !deadClockHandledRef.current && ownsContextRef.current
+        && !!ctx.sinkId && typeof ctx.setSinkId === 'function';
+      if (!canRetarget) {
+        console.warn('[useMetronome] audio clock is not advancing (state:', ctx.state, ') — playback cannot start');
+        return;
+      }
+      deadClockHandledRef.current = true;
+      console.warn('[useMetronome] output device', ctx.sinkId, 'renders nothing — falling back to the system default');
+      // "" is the default device. Re-arm afterwards: the scheduler has to be
+      // re-anchored to a clock that only starts moving now.
+      Promise.resolve(ctx.setSinkId?.('')).then(() => armSchedulerRef.current?.()).catch(() => { /* nothing left to try */ });
+    }, DEAD_CLOCK_TIMEOUT_MS);
+  }, [clearClockWatchdog]);
+
+  /**
+   * Point whatever clock is in place now at a transport that is already running.
+   *
+   * Two things leave a started metronome with nothing driving its scheduler, and
+   * both land here: the worklet module was still loading when Play was pressed,
+   * and the context being swapped mid-count-in (AlphaTab's, once its player is
+   * ready). Either way the count-in used to stop dead on the number it was on.
+   */
+  const armScheduler = useCallback(() => {
+    const ctx = audioContextRef.current;
+    if (!ctx || !isPlayingRef.current) return;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    // A different context's clock has nothing to do with the old one's, so
+    // everything anchored to it is re-based here; a nextNoteTime left in the
+    // past would otherwise burst through the whole count-in in a single tick.
+    nextNoteTimeRef.current = ctx.currentTime;
+    if (startTimeRef.current !== null) {
+      const wall  = startTimeRef.current;
+      const audio = ctx.currentTime - (Date.now() - wall) / 1000;
+      audioStartTimeRef.current = audio;
+      setPlaybackAnchor({ wall, audio });
+    }
+
+    const node = ensureWorkletNode();
+    if (node) {
+      stopFallbackTicker();
+      node.port.postMessage({ type: 'start' });
+    } else {
+      startFallbackTicker();
+    }
+    armClockWatchdog();
+  }, [ensureWorkletNode, startFallbackTicker, stopFallbackTicker, armClockWatchdog]);
+
+  useEffect(() => { armSchedulerRef.current = armScheduler; }, [armScheduler]);
 
   const startMetronome = useCallback((options?: { skipCountIn?: boolean }) => {
     const ctx = audioContextRef.current;
@@ -421,17 +577,25 @@ export const useMetronome = ({
     setPlaybackAnchor({ wall: null, audio: null });
     setCurrentBeat(0);
 
+    isPlayingRef.current = true;
     const node = ensureWorkletNode();
     if (node) {
+      stopFallbackTicker();
       node.port.postMessage({ type: 'start' });
     } else {
-      scheduler();
+      // Module still loading — the main-thread ticker carries the count-in until
+      // it lands, at which point armScheduler hands over to the worklet.
+      startFallbackTicker();
     }
+    armClockWatchdog();
 
     setIsPlaying(true);
-  }, [scheduler, ensureWorkletNode, bpm, speedMultiplier]);
+  }, [ensureWorkletNode, startFallbackTicker, stopFallbackTicker, armClockWatchdog, bpm, speedMultiplier]);
 
   const stopMetronome = useCallback(() => {
+    isPlayingRef.current = false;
+    stopFallbackTicker();
+    clearClockWatchdog();
     workletNodeRef.current?.port.postMessage({ type: 'stop' });
 
     if (startTimeRef.current !== null) {
@@ -447,7 +611,7 @@ export const useMetronome = ({
     setCountInRemaining(0);
     setPlaybackAnchor({ wall: null, audio: null });
     setIsPlaying(false);
-  }, []);
+  }, [stopFallbackTicker, clearClockWatchdog]);
 
   const restartMetronome = useCallback(() => {
     stopMetronome();
