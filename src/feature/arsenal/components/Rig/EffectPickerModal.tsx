@@ -3,7 +3,12 @@ import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
 import { getEffectEntries } from "feature/arsenal/utils/collectionEntries";
 import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
-import { X } from "lucide-react";
+import { rarityLockLabel } from "feature/progression/components/RarityLock";
+import {
+  rarityLockLvl,
+  usePlayerLvl,
+} from "feature/progression/hooks/usePlayerLvl";
+import { Lock, X } from "lucide-react";
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
 import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
@@ -38,6 +43,7 @@ export const EffectPickerModal = ({
     "",
     "rarity",
   );
+  const playerLvl = usePlayerLvl();
 
   const boardFull =
     !!canFit &&
@@ -106,6 +112,11 @@ export const EffectPickerModal = ({
             const isOccupied = occupiedItemIds.includes(item.id) && !isSelected;
             const noRoom =
               !isSelected && !isOccupied && !!canFit && !canFit(item.id);
+            // The pedal already on this slot is grandfathered in — the cap only
+            // refuses what a change would newly bring in.
+            const lockedLvl = rarityLockLvl(rarity, playerLvl, isSelected);
+            // Locked is not dimmed — see `GuitarPickerModal`. It blocks the
+            // pick, but the pedal keeps its light.
             const unavailable = isOccupied || noRoom;
 
             return (
@@ -115,7 +126,7 @@ export const EffectPickerModal = ({
                     item={item}
                     isOnPedalboard={isSelected}
                     dimmed={unavailable}
-                    disabled={unavailable}
+                    disabled={unavailable || lockedLvl != null}
                     onClick={() => {
                       onSelect(item.id);
                       onClose();
@@ -144,6 +155,12 @@ export const EffectPickerModal = ({
                   {noRoom && (
                     <span className='text-[10px] font-semibold text-amber-500/90'>
                       No room on the board
+                    </span>
+                  )}
+                  {lockedLvl != null && !isOccupied && !noRoom && (
+                    <span className='flex items-center gap-1 text-[10px] font-semibold text-zinc-400'>
+                      <Lock size={9} aria-hidden />
+                      {rarityLockLabel(lockedLvl)}
                     </span>
                   )}
                 </div>

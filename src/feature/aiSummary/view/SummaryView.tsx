@@ -7,10 +7,11 @@ import {
 } from "feature/aiSummary/services/practiceLevels.service";
 import {
   computeProgressData, currentWeekDates, isoWeekKey, isSameDay,
-  LEVEL_COLORS, LEVELS, localDateStr, MS_15,
+  LEVEL_COLORS, LEVELS, localDateStr, milestoneLockedAtLvl, MS_15,
 } from "feature/aiSummary/utils/milestoneLogic";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
+import { unlocksAtLevelLabel } from "feature/progression/data/levelLock";
 import {
   addFame,
   deductFame,
@@ -65,7 +66,7 @@ const CATEGORIES: {
 // levels are reached. Tapping a node loads its goal into the card below.
 
 function PracticeProgressTracker({
-  logs, today, previewIdx, onPreviewChange, ownedSet, claimedSet,
+  logs, today, previewIdx, onPreviewChange, ownedSet, claimedSet, playerLvl,
 }: {
   logs: FirebaseUserExceriseLog[];
   today: Date;
@@ -73,6 +74,7 @@ function PracticeProgressTracker({
   onPreviewChange: (idx: number) => void;
   ownedSet: Set<number>;
   claimedSet: Set<number>;
+  playerLvl: number;
 }) {
   const data = useMemo(() => computeProgressData(logs, today), [logs, today]);
 
@@ -126,7 +128,11 @@ function PracticeProgressTracker({
           const isClaimed   = claimedSet.has(level.id);
           const isClaimable = level.met && isOwned && !isClaimed;   // reward waiting to collect
           const isCurrent   = idx === activeIdx;
-          const showLock    = !isOwned && level.cost > 0;
+          // Two reasons a tier can be shut: it has not been bought, or the
+          // account is not high enough to buy it. The strip has room for one
+          // padlock, not two stories — the card below tells them apart.
+          const lockedLvl   = milestoneLockedAtLvl(level, playerLvl, isOwned);
+          const showLock    = !isOwned && (level.cost > 0 || lockedLvl != null);
           const baseColor   = LEVEL_COLORS[level.id - 1];
           const ringColor   = level.met ? GREEN : baseColor;   // reached rings turn green
           const prevMet     = idx > 0 && levelStatuses[idx - 1].met;
@@ -292,7 +298,7 @@ function buildByDate(logs: FirebaseUserExceriseLog[]) {
 
 function LevelGoalCard({
   logs, today, displayDate, onSelectDay, onPeekDay, previewIdx,
-  isOwned, isClaimedThisWeek, fame, busy, onPurchase, onClaim,
+  isOwned, isClaimedThisWeek, fame, busy, onPurchase, onClaim, playerLvl,
 }: {
   logs: FirebaseUserExceriseLog[];
   today: Date;
@@ -306,6 +312,7 @@ function LevelGoalCard({
   busy: boolean;
   onPurchase: (levelId: number) => void;
   onClaim: (levelId: number) => void;
+  playerLvl: number;
 }) {
   const progressData  = useMemo(() => computeProgressData(logs, today), [logs, today]);
   const levelStatuses = useMemo(
@@ -380,7 +387,10 @@ function LevelGoalCard({
   });
 
   const isMet         = nextLevel.met;
-  const isLocked      = !isOwned && nextLevel.cost > 0;
+  // The account level comes first and the price second, so a tier out of reach
+  // never shows a price the player could pay but a button that would refuse.
+  const lockedLvl     = milestoneLockedAtLvl(nextLevel, playerLvl, isOwned);
+  const isLocked      = !isOwned && (nextLevel.cost > 0 || lockedLvl != null);
   const canAfford     = fame >= nextLevel.cost;
   const canClaim      = isOwned && isMet && !isClaimedThisWeek;
 
@@ -388,7 +398,26 @@ function LevelGoalCard({
   const btnBase = "flex w-full items-center justify-center gap-2.5 rounded-[8px] px-6 py-3.5 text-base font-bold transition-all sm:w-auto";
 
   let actionButton: React.ReactNode = null;
-  if (isLocked) {
+  if (lockedLvl != null) {
+    // Not a disabled button. There is nothing here to press yet — the way past
+    // this is to go and practise — so it is stated rather than offered, and the
+    // price waits its turn underneath.
+    actionButton = (
+      <div className="flex flex-col items-center gap-2">
+        <div
+          className={`${btnBase} cursor-default`}
+          style={{ backgroundColor: "#27272a", color: "#a1a1aa", border: "2px solid #3f3f46" }}
+        >
+          <Lock size={18} />
+          <span>{unlocksAtLevelLabel(lockedLvl)}</span>
+        </div>
+        <p className="text-center text-[12px] leading-snug text-zinc-500">
+          You&apos;re level {playerLvl}. Practice raises it
+          {nextLevel.cost > 0 && <> — then it&apos;s {nextLevel.cost} Fame to unlock</>}.
+        </p>
+      </div>
+    );
+  } else if (isLocked) {
     actionButton = (
       <button
         onClick={() => onPurchase(nextLevel.id)}
@@ -480,7 +509,7 @@ function LevelGoalCard({
           style={{ backgroundColor: `${color}18`, color }}
         >
           <nextLevel.Icon size={20} />
-          {!isOwned && nextLevel.cost > 0 && (
+          {isLocked && (
             <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-zinc-900 flex items-center justify-center">
               <Lock size={9} className="text-zinc-500" />
             </div>
@@ -861,7 +890,10 @@ function LevelGoalCard({
         /* Locked level: no charts — just the goal, the investment explainer and a centered unlock button */
         <div className="flex flex-col items-center gap-6 py-6">
           {goalBox}
-          {(() => {
+          {/* The "it pays for itself" pitch is for a tier the player could buy
+              today. Under a level lock it is an answer to a question they have
+              not reached yet, so it waits. */}
+          {lockedLvl == null && (() => {
             const weeks = Math.max(1, Math.ceil(nextLevel.cost / nextLevel.reward));
             return (
               <div className="flex w-full max-w-md items-start gap-2.5">
@@ -902,7 +934,7 @@ function RulesAlert() {
   };
 
   const steps: { title: string; desc: React.ReactNode }[] = [
-    { title: "Unlock a level once", desc: <>pay Fame once and it&apos;s yours for good. The first one is free.</> },
+    { title: "Reach it, then unlock it once", desc: <>each level opens at a practice level of your own, and then costs Fame once — after that it&apos;s yours for good. The first one is free.</> },
     { title: "Practice",            desc: <>hit that level&apos;s weekly goal.</> },
     { title: "Claim",               desc: <>collect the Fame reward — again every week you hit the goal.</> },
   ];
@@ -949,6 +981,7 @@ export const SummaryView = ({ tabs }: { tabs?: ReactNode }) => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const dispatch  = useAppDispatch();
   const fame      = userStats?.fame ?? 0;
+  const playerLvl = userStats?.lvl ?? 1;
 
   const [logs, setLogs] = useState<FirebaseUserExceriseLog[]>([]);
 
@@ -998,6 +1031,13 @@ export const SummaryView = ({ tabs }: { tabs?: ReactNode }) => {
     if (!userAuth) return;
     const lvl = LEVELS.find(l => l.id === levelId);
     if (!lvl) return;
+    // Checked here as well as in the card, next to the Fame check and for the
+    // same reason: this is the one door every purchase goes through.
+    const lockedLvl = milestoneLockedAtLvl(lvl, playerLvl, ownedSet.has(levelId));
+    if (lockedLvl != null) {
+      toast.error(`${lvl.name} ${unlocksAtLevelLabel(lockedLvl).toLowerCase()} — you're level ${playerLvl}`);
+      return;
+    }
     if (fame < lvl.cost) {
       toast.error(`Not enough Fame (need ${lvl.cost}, have ${fame})`);
       return;
@@ -1071,6 +1111,7 @@ export const SummaryView = ({ tabs }: { tabs?: ReactNode }) => {
           onPreviewChange={setPreviewIdx}
           ownedSet={ownedSet}
           claimedSet={claimedSet}
+          playerLvl={playerLvl}
         />
 
         {/* Current goal detail */}
@@ -1087,6 +1128,7 @@ export const SummaryView = ({ tabs }: { tabs?: ReactNode }) => {
           busy={busyLevelId !== null}
           onPurchase={handlePurchase}
           onClaim={handleClaim}
+          playerLvl={playerLvl}
         />
 
       </div>

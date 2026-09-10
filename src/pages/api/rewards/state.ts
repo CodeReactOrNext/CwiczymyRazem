@@ -61,6 +61,10 @@ export default async function handler(
       scales: { claimed: ledger.claimedScales },
       journeys: { claimed: ledger.claimedJourneys },
       roadmaps: { claimed: ledger.claimedRoadmaps },
+      // Same idea for the level ladder: which rung the account is on is already
+      // in `statistics`, so the only thing missing on the client is which rungs
+      // have been paid out.
+      levels: { claimed: ledger.claimedLevels },
     });
   } catch (error) {
     console.error("[rewards/state]", error);

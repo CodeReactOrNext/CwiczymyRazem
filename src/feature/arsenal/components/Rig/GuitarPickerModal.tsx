@@ -3,7 +3,12 @@ import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
 import { getGuitarEntries } from "feature/arsenal/utils/collectionEntries";
 import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
-import { X } from "lucide-react";
+import { rarityLockLabel } from "feature/progression/components/RarityLock";
+import {
+  rarityLockLvl,
+  usePlayerLvl,
+} from "feature/progression/hooks/usePlayerLvl";
+import { Lock, X } from "lucide-react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
 import { GuitarStashTile } from "../GuitarInventory/GuitarStashTile";
@@ -30,6 +35,7 @@ export const GuitarPickerModal = ({
   // level 17, and a picker that shows only one of them cannot say which. Ordered
   // the way the stash orders itself — rarest first, copies together, best first.
   const items = filterAndSortEntries(getGuitarEntries(inventory), "", "rarity");
+  const playerLvl = usePlayerLvl();
 
   return (
     <div
@@ -79,6 +85,9 @@ export const GuitarPickerModal = ({
             const rarity = getEffectiveRarity(guitar.rarity, item.buildLevel);
             const isSelected = item.id === currentItemId;
             const isOccupied = occupiedItemIds.includes(item.id) && !isSelected;
+            // The copy already in this slot is grandfathered in — the cap only
+            // refuses what a change would newly bring in.
+            const lockedLvl = rarityLockLvl(rarity, playerLvl, isSelected);
 
             return (
               <div key={item.id} className='flex flex-col gap-2'>
@@ -88,8 +97,12 @@ export const GuitarPickerModal = ({
                   <GuitarStashTile
                     item={item}
                     isEquipped={isSelected}
+                    // Locked is not dimmed. A guitar the player is a few levels
+                    // away from should still catch their eye — it is the reason
+                    // to go and practise — so it keeps its light and says why
+                    // underneath instead of being greyed into the background.
                     dimmed={isOccupied}
-                    disabled={isOccupied}
+                    disabled={isOccupied || lockedLvl != null}
                     onClick={() => {
                       onSelect(item.id);
                       onClose();
@@ -113,6 +126,12 @@ export const GuitarPickerModal = ({
                   {isOccupied && (
                     <span className='text-[10px] font-semibold text-zinc-500'>
                       In another slot
+                    </span>
+                  )}
+                  {lockedLvl != null && !isOccupied && (
+                    <span className='flex items-center gap-1 text-[10px] font-semibold text-zinc-400'>
+                      <Lock size={9} aria-hidden />
+                      {rarityLockLabel(lockedLvl)}
                     </span>
                   )}
                 </div>

@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/to
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { PlayerLvlProvider } from "feature/progression/hooks/usePlayerLvl";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import type { LucideIcon } from "lucide-react";
 import { BookMarked, Guitar, Hammer, PackageOpen, Store, Swords, Ticket, Users } from "lucide-react";
@@ -61,7 +62,7 @@ import { useArsenalData } from "./hooks/useArsenalData";
 import { useOpenCase } from "./hooks/useOpenCase";
 import type { CaseType, OpenCaseResult } from "./types/arsenal.types";
 
-export const ArsenalView = () => {
+const ArsenalTabs = () => {
   const { data, isLoading } = useArsenalData();
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
@@ -251,5 +252,26 @@ export const ArsenalView = () => {
         onClose={() => { setOpenResult(null); setOpenedCaseType(null); }}
       />
     </MainContainer>
+  );
+};
+
+/**
+ * Every piece of gear under this banner belongs to the player looking at it,
+ * which is what lets the cards say "level 15" on a Mythic instead of staying
+ * silent about the cap until the server refuses it. Screens that show somebody
+ * else's rig — a profile, the leaderboard's preview, a log entry — deliberately
+ * provide nothing, because "you need level 15" written across a stranger's
+ * guitar is not a fact about anything.
+ *
+ * A wrapper rather than one more level of indentation around the tabs: the two
+ * jobs are unrelated, and the component below is long enough already.
+ */
+export const ArsenalView = () => {
+  const lvl = useAppSelector(selectCurrentUserStats)?.lvl ?? 1;
+
+  return (
+    <PlayerLvlProvider value={lvl}>
+      <ArsenalTabs />
+    </PlayerLvlProvider>
   );
 };

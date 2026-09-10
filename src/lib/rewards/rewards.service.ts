@@ -3,6 +3,7 @@ import type { AchievementList } from "feature/achievements/types";
 import type {
   GuitarDefinition,
   InventoryItem,
+  SalvagedMod,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
 import { auth } from "utils/firebase/client/firebase.utils";
@@ -29,6 +30,10 @@ export interface RewardLedgerState {
   };
   roadmaps: {
     /** Reward ids of the AI-coach roadmaps collected — see `roadmapRewardId`. */
+    claimed: string[];
+  };
+  levels: {
+    /** Reward ids of the level milestones collected — see `levelRewardId`. */
     claimed: string[];
   };
 }
@@ -58,6 +63,22 @@ export interface ClaimRoadmapResult extends ClaimResult {
   guitar: GuitarDefinition;
   /** The copy of it that was just minted for this player. */
   trophy: InventoryItem;
+}
+
+/**
+ * What a collected level rung paid.
+ *
+ * Not a `ClaimResult`: the ladder pays in things rather than money, so there is
+ * no Fame line to report back — see `LevelPayout`.
+ */
+export interface ClaimLevelsResult {
+  /** The rungs that were just paid. Empty when there was nothing owed. */
+  levels: number[];
+  /** Everything the batch paid, merged into one stack per part. */
+  parts: ScrapPart[];
+  /** The mods as they now hang in the stash. */
+  mods: SalvagedMod[];
+  caseTokens: number;
 }
 
 export interface ClaimJourneyResult extends ClaimResult {
@@ -116,6 +137,23 @@ export const claimJourneyReward = async (
   const { data } = await axios.post<ClaimJourneyResult>(
     "/api/rewards/claim-journey",
     { idToken, moduleId },
+  );
+  return data;
+};
+
+/**
+ * Collects every rung the account has climbed and not been paid for.
+ *
+ * Takes no arguments on purpose — the ladder pays itself, so there is no rung
+ * for a caller to name and no way for one to ask for a level it has not
+ * reached. Returns an empty list when there was nothing owed, which is the
+ * ordinary outcome. See `api/rewards/claim-levels`.
+ */
+export const claimLevelRewards = async (): Promise<ClaimLevelsResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<ClaimLevelsResult>(
+    "/api/rewards/claim-levels",
+    { idToken },
   );
   return data;
 };

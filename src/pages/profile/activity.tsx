@@ -177,7 +177,7 @@ const ProfileActivityPage = () => {
           {/* 3. Song Learning Stats */}
           <SongLearningSection userSongs={songs} />
 
-          {/* 5. Activity Log calendar */}
+          {/* 4. Activity Log calendar */}
           <ActivityLog key={refreshKey} userAuth={userAuth as string} />
 
         </div>
