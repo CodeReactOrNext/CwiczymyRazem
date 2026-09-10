@@ -4,6 +4,10 @@ import {
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import {
+  rarityLockLvl,
+  usePlayerLvl,
+} from "feature/progression/hooks/usePlayerLvl";
 import type { ReactNode } from "react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
@@ -31,10 +35,14 @@ export const GuitarStashTile = ({
   onClick,
   ...placement
 }: GuitarStashTileProps) => {
+  const playerLvl = usePlayerLvl();
+
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
 
   const rarity = getEffectiveRarity(guitar.rarity, item.buildLevel);
+  const inUse = isEquipped || rigSlot != null;
+  const lockedLvl = rarityLockLvl(rarity, playerLvl, inUse);
 
   return (
     <StashTile
@@ -43,12 +51,24 @@ export const GuitarStashTile = ({
       imageSrc={getRankBadgeSrc(guitar.imageId, "medium")}
       imageRotated
       tall
-      label={`${guitar.brand} ${guitar.name} — ${rarity}`}
+      // The cap goes in the label as well as the corner: the padlock is the
+      // only part of a socket a screen reader cannot see.
+      label={`${guitar.brand} ${guitar.name} — ${rarity}${
+        lockedLvl != null ? ` — needs level ${lockedLvl}` : ""
+      }`}
       level={getItemLevel(item, guitar)}
       isNew={item.isNew}
-      inUse={isEquipped || rigSlot != null}
+      locked={lockedLvl != null}
+      inUse={inUse}
       onClick={onClick}
-      preview={<GuitarCard item={item} isEquipped={isEquipped} readOnly />}
+      preview={
+        <GuitarCard
+          item={item}
+          isEquipped={isEquipped}
+          rigSlot={rigSlot}
+          readOnly
+        />
+      }
       previewFooter={previewFooter}
     />
   );

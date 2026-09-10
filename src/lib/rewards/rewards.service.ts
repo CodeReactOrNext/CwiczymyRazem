@@ -6,7 +6,6 @@ import type {
   SalvagedMod,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
-import type { LevelReward } from "feature/progression/utils/levelRewards";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 import type { RewardPayout } from "./rewardPayout";
@@ -72,13 +71,13 @@ export interface ClaimRoadmapResult extends ClaimResult {
  * Not a `ClaimResult`: the ladder pays in things rather than money, so there is
  * no Fame line to report back — see `LevelPayout`.
  */
-export interface ClaimLevelResult {
-  rewardId: string;
-  lvl: number;
-  reward: LevelReward;
+export interface ClaimLevelsResult {
+  /** The rungs that were just paid. Empty when there was nothing owed. */
+  levels: number[];
+  /** Everything the batch paid, merged into one stack per part. */
+  parts: ScrapPart[];
   /** The mods as they now hang in the stash. */
   mods: SalvagedMod[];
-  newParts: ScrapPart[];
   caseTokens: number;
 }
 
@@ -143,18 +142,18 @@ export const claimJourneyReward = async (
 };
 
 /**
- * Collects what one level pays.
+ * Collects every rung the account has climbed and not been paid for.
  *
- * The rung is all the server is told; it re-derives the payout itself. See
- * `api/rewards/claim-level`.
+ * Takes no arguments on purpose — the ladder pays itself, so there is no rung
+ * for a caller to name and no way for one to ask for a level it has not
+ * reached. Returns an empty list when there was nothing owed, which is the
+ * ordinary outcome. See `api/rewards/claim-levels`.
  */
-export const claimLevelReward = async (
-  lvl: number,
-): Promise<ClaimLevelResult> => {
+export const claimLevelRewards = async (): Promise<ClaimLevelsResult> => {
   const idToken = await getIdToken();
-  const { data } = await axios.post<ClaimLevelResult>(
-    "/api/rewards/claim-level",
-    { idToken, lvl },
+  const { data } = await axios.post<ClaimLevelsResult>(
+    "/api/rewards/claim-levels",
+    { idToken },
   );
   return data;
 };

@@ -4,6 +4,7 @@
 // counts as "met" / "claimable" — no drifting duplicate rules.
 
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
+import { lockedAtLvl } from "feature/progression/data/levelLock";
 import type { LucideIcon } from "lucide-react";
 import {
   CalendarCheck, Flame, Guitar, Layers, Shield, Sprout, TrendingUp, Trophy, Zap,
@@ -71,6 +72,34 @@ export const LEVEL_COLORS = [
   "#eab308", // 9  gold (master)
 ];
 
+/**
+ * The account level a tier opens at, on top of its Fame price.
+ *
+ * Two conditions, in that order: reach the level, then pay. The price alone was
+ * doing a job it is bad at — Fame is earned all over the game, so a week in the
+ * Arsenal could buy Shredder for somebody who has never held a 5-day streak,
+ * and the tier they bought then sat there unmet and unclaimable, having taken
+ * 300 Fame with it. The level makes the ladder follow the practice it is
+ * supposed to be measuring.
+ *
+ * The numbers are deliberately gentle. This page itself opens at level 3, so
+ * nothing can sit below that; from there the ladder stays behind the goals
+ * rather than in front of them — anyone who can actually hold a 7-day
+ * all-category streak is well past level 17 by the time they can. The gate is a
+ * floor under the ladder, not the thing that decides when you climb it.
+ */
+export const MILESTONE_REQ_LVL: Record<number, number> = {
+  1: 3, // Spark — free, and level 3 is when this page opens at all
+  2: 3, // Groove
+  3: 4, // Hot Streak
+  4: 5, // Momentum
+  5: 7, // Unstoppable
+  6: 9, // All-Rounder
+  7: 11, // In the Zone
+  8: 14, // Shredder
+  9: 17, // Virtuoso
+};
+
 export interface LevelDef {
   id: number;
   name: string;
@@ -78,13 +107,14 @@ export interface LevelDef {
   req: string;
   Icon: LucideIcon;
   cost: number;      // 0 = free
+  reqLvl: number;    // account level that opens it — see MILESTONE_REQ_LVL
   reward: number;    // fame per week claim
   isMet: (d: ProgressData) => boolean;
   getProgress: (d: ProgressData) => { value: number; max: number };
   dayGoalMin?: number;   // per-day minutes goal for week-bars/streak charts (default 15)
 }
 
-export const LEVELS: LevelDef[] = [
+const TIERS: Omit<LevelDef, "reqLvl">[] = [
   {
     id: 1, name: "Spark",            Icon: Sprout,
     req: "1 day with 15+ min practice this week",
@@ -150,6 +180,31 @@ export const LEVELS: LevelDef[] = [
     getProgress: d => ({ value: Math.min(d.streakAllCats, 7), max: 7 }),
   },
 ];
+
+/**
+ * The tiers, each carrying the level it opens at.
+ *
+ * Folded in here rather than typed on all nine definitions so a tier cannot be
+ * added without a level: a missing entry in `MILESTONE_REQ_LVL` would leave a
+ * tier silently ungated, which is the one failure mode this table has.
+ */
+export const LEVELS: LevelDef[] = TIERS.map(tier => ({
+  ...tier,
+  reqLvl: MILESTONE_REQ_LVL[tier.id] ?? 1,
+}));
+
+/**
+ * The level a tier is still waiting for, or null when it can be bought now.
+ *
+ * A tier already bought is never locked, whatever the account's level — see
+ * `lockedAtLvl`. Somebody who unlocked Shredder before this rule existed keeps
+ * it and keeps claiming it.
+ */
+export const milestoneLockedAtLvl = (
+  level: Pick<LevelDef, "reqLvl">,
+  playerLvl: number | null,
+  owned = false,
+): number | null => lockedAtLvl(level.reqLvl, playerLvl, owned);
 
 export function computeProgressData(logs: FirebaseUserExceriseLog[], today: Date): ProgressData {
   const byDate = new Map<string, DayStats>();

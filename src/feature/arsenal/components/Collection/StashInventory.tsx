@@ -83,6 +83,12 @@ import {
   resolveLayout,
   rowOf,
 } from "feature/arsenal/utils/stashLayout";
+import { rarityLockLabel } from "feature/progression/components/RarityLock";
+import {
+  rarityLockLvl,
+  usePlayerLvl,
+} from "feature/progression/hooks/usePlayerLvl";
+import { guitarEquipRarity } from "feature/progression/utils/equipGuard";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import {
   ArrowDownWideNarrow,
@@ -215,6 +221,7 @@ export const StashInventory = ({
   const { mutate: fusePartsStack, isPending: isFusingPart } = useFuseParts();
   const { mutate: fitMod, isPending: isFitting } = useWorkshopMod();
   const currentFame = useAppSelector(selectCurrentUserStats)?.fame || 0;
+  const playerLvl = usePlayerLvl();
   const isMobile = useResponsiveStore((state) => state.isMobile);
 
   const rig: RigSetup = data.rig ?? DEFAULT_RIG;
@@ -661,6 +668,13 @@ export const StashInventory = ({
         : slot != null
           ? `Remove from rig slot ${slot + 1} first`
           : undefined;
+      // The equip cap, said in the row that would trip it rather than in a
+      // toast after the click. A copy already in use is grandfathered in.
+      const lockedLvl = rarityLockLvl(
+        guitarEquipRarity(piece.item),
+        playerLvl,
+        inUse,
+      );
 
       return [
         {
@@ -673,7 +687,8 @@ export const StashInventory = ({
           id: "equip",
           label: "Equip…",
           icon: Guitar,
-          disabled: isEquipping,
+          disabled: isEquipping || lockedLvl != null,
+          reason: lockedLvl != null ? rarityLockLabel(lockedLvl) : undefined,
           onSelect: () => setEquipItemId(piece.id),
         },
         ...(equipped

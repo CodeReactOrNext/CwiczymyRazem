@@ -6,6 +6,7 @@ import { TIME_POINTS_VALUE } from "constants/ratingValue";
 import type { AchievementList } from "feature/achievements";
 import { AchievementCard, useAchievementContext } from "feature/achievements";
 import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
+import { NextUpCard } from "feature/progression/components/NextUpCard";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Brain, Ear, Flame, Hand, Music, RotateCcw, Sparkles, Timer, Trophy } from "lucide-react";
@@ -443,6 +444,9 @@ const RatingPopUpLayout = ({
 
           {/* ── Exercise leaderboards ── */}
           {scoredRuns.length > 0 && <SessionLeaderboardCard runs={scoredRuns} />}
+
+          {/* ── The climb ahead, and anything already owed ── */}
+          <NextUpCard />
 
           {/* ── Session time + Streak ── */}
           <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2">

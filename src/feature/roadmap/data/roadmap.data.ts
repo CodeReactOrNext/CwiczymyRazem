@@ -167,6 +167,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: TrendingUp,
     label: "Player Progression System",
     kind: "feature",
+    done: true,
     description:
       "Level up from playing. Unlocks milestones, profile layouts, and which gear rarity you can equip.",
   },

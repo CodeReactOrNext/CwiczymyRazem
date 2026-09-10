@@ -5,7 +5,8 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { Star } from "lucide-react";
+import { lockedArtFilter } from "feature/progression/components/RarityLock";
+import { Lock, Star } from "lucide-react";
 import type {
   CSSProperties,
   MouseEvent as ReactMouseEvent,
@@ -104,6 +105,12 @@ interface StashTileProps {
   levelPrefix?: string;
   /** Unseen drop: the corner star, same flag the cards use. */
   isNew?: boolean;
+  /**
+   * Waiting on a level before it can go in the rig. A socket has no room to say
+   * which level — it says "not yet" by going unlit, the way an unpowered pedal
+   * does, and the hover card behind it names the number.
+   */
+  locked?: boolean;
   /** In use somewhere (profile, rig, pedalboard) — a lit frame and a corner dot. */
   inUse?: boolean;
   /** Full card shown on hover. Desktop only; touch opens the sheet instead. */
@@ -146,12 +153,22 @@ export const StashTile = ({
   level,
   levelPrefix,
   isNew = false,
+  locked = false,
   inUse = false,
   preview,
   previewFooter,
   onClick,
 }: StashTileProps) => {
   const isMobile = useResponsiveStore((state) => state.isMobile);
+
+  // Locked gear goes unlit rather than faint: `dimmed` (0.28) is for a piece the
+  // filters have pushed out of the way, and a Mythic the player is working
+  // towards is the opposite of that — it should still be the thing their eye
+  // lands on, just visibly not running yet.
+  const artFilter = lockedArtFilter(
+    "drop-shadow(0 3px 7px rgba(0,0,0,0.7))",
+    locked,
+  );
 
   // Parts have nothing to open, so their sockets stay plain elements — a button
   // that does nothing is a promise the stash cannot keep.
@@ -251,7 +268,7 @@ export const StashTile = ({
           style={
             {
               transform: "translate(-50%, -50%) rotate(-90deg)",
-              filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.7))",
+              filter: artFilter,
               WebkitUserDrag: "none",
             } as CSSProperties
           }
@@ -267,7 +284,7 @@ export const StashTile = ({
           className='pointer-events-none relative max-h-[84%] max-w-[84%] object-contain transition-transform duration-200 group-hover:scale-105'
           style={
             {
-              filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.7))",
+              filter: artFilter,
               WebkitUserDrag: "none",
             } as CSSProperties
           }
@@ -314,6 +331,19 @@ export const StashTile = ({
           aria-hidden
           className='absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber-400'
           style={{ boxShadow: "0 0 6px rgba(251,191,36,0.9)" }}
+        />
+      )}
+
+      {/* Opposite the New star and drawn the same way — a bare glyph in the
+          corner, no plate behind it. A socket is 80px: a fourth boxed chip on
+          it would cost more than the fact is worth, and the unlit art has
+          already said most of this. */}
+      {locked && (
+        <Lock
+          size={11}
+          aria-hidden
+          className='absolute bottom-0.5 right-0.5'
+          style={{ color, filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.95))" }}
         />
       )}
 

@@ -67,11 +67,72 @@ const LEVEL_PAYOUTS: Record<number, LevelPayout> = {
 /** The ledger id a claimed level is recorded under. One per level, forever. */
 export const levelRewardId = (lvl: number): string => `level_${lvl}`;
 
+/**
+ * The last level the ladder is defined for.
+ *
+ * Far past anywhere anybody will stand. A level costs `2×lvl + 34` points and
+ * practice pays 22 an hour, so level 1000 is somewhere north of forty thousand
+ * hours; the number is here to make the ladder finite, not to be reached. What
+ * it buys is that no account can ever climb off the end of it and find the
+ * screen empty, which is what used to happen at 28.
+ */
+export const MAX_LEVEL = 1000;
+
+/** Where the hand-written table stops and the curve takes over. */
+const AUTHORED_TOP = Math.max(...Object.keys(LEVEL_PAYOUTS).map(Number));
+
+/**
+ * What a level past the authored table pays.
+ *
+ * Every one of them pays something, which the early ladder deliberately does
+ * not: level 4 is minutes after level 3, and a reward every few minutes is
+ * confetti. Out here a single level is `2×lvl + 34` points — four hours of
+ * practice at level 30, ten at level 100 — so a level *is* the occasion, and
+ * one that passed unmarked would read as the ladder having quietly ended.
+ *
+ * Parts stop at Legendary because that is the highest tier a part can actually
+ * roll: `PartSlot` excludes Unique, and `partsAtTier("Unique")` would draw from
+ * an empty pool. So the climb past here is paid in quantity and in the cadence
+ * of cases and mods, not in a tier that does not exist.
+ *
+ * The rates are deliberately behind the cost curve. Parts grow every forty
+ * levels while the price of a level grows every level, so an hour of practice
+ * at level 300 buys strictly less than an hour at level 30 — the ladder keeps
+ * marking the climb without ever becoming the reason to make it.
+ */
+const generatedPayout = (lvl: number): LevelPayout => ({
+  // Every fifth level, doubling on the twenty-fifths — the round numbers a
+  // player already counts towards.
+  caseTokens: lvl % 25 === 0 ? 2 : lvl % 5 === 0 ? 1 : 0,
+  parts: [{ tier: "Legendary", qty: Math.min(10, 2 + Math.floor(lvl / 40)) }],
+  mods: lvl % 20 === 0 ? 2 : lvl % 4 === 0 ? 1 : 0,
+});
+
+/**
+ * What a level pays, anywhere on the ladder — the one place that answers it.
+ *
+ * The authored table wins wherever it has an entry, so the tuned early curve is
+ * untouched; its *gaps* win too, which is why the generated curve only starts
+ * once the table is finished rather than filling in behind it.
+ */
+export const levelPayout = (lvl: number): LevelPayout | null => {
+  if (!Number.isInteger(lvl) || lvl < 2 || lvl > MAX_LEVEL) return null;
+  if (LEVEL_PAYOUTS[lvl]) return LEVEL_PAYOUTS[lvl];
+  if (lvl <= AUTHORED_TOP) return null;
+  return generatedPayout(lvl);
+};
+
 const buildLadder = (): LevelMilestone[] => {
   const levels = new Set<number>([
     ...Object.keys(LEVEL_PAYOUTS).map(Number),
     ...Object.values(RARITY_UNLOCK_LVL),
     ...FEATURE_UNLOCK_LIST.map((feature) => feature.requiredLvl),
+    // Every level past the authored table gets a rung of its own, so the climb
+    // ahead is never empty however far somebody has come.
+    ...Array.from(
+      { length: MAX_LEVEL - AUTHORED_TOP },
+      (_, i) => AUTHORED_TOP + 1 + i,
+    ),
   ]);
 
   return [...levels]
@@ -92,16 +153,21 @@ const buildLadder = (): LevelMilestone[] => {
           }),
         ),
       ],
-      payout: LEVEL_PAYOUTS[lvl] ?? null,
+      payout: levelPayout(lvl),
     }));
 };
 
 /**
  * The whole ladder, ascending.
  *
- * Built once from the three sources rather than typed out, so adding a rarity
+ * Built once from its sources rather than typed out, so adding a rarity
  * threshold or gating a new page puts a rung on the ladder automatically
  * instead of leaving the screen a level behind the rules.
+ *
+ * A thousand rungs sounds like a lot to hold; it is a thousand small objects
+ * built once at import, which is less than this app spends on its guitar
+ * catalogue. The alternative — deriving each rung on demand — buys nothing back
+ * and costs every caller a different shape.
  */
 export const LEVEL_MILESTONES: LevelMilestone[] = buildLadder();
 

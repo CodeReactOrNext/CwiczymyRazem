@@ -1,12 +1,15 @@
 import { FEATURE_UNLOCK_LIST } from "feature/levelGate/data/featureUnlocks";
 import { describe, expect, it } from "vitest";
 
+import { rollLevelReward } from "../utils/levelRewards";
 import {
   getClaimableLevels,
   getLevelMilestone,
   getNextMilestone,
   LEVEL_MILESTONES,
+  levelPayout,
   levelRewardId,
+  MAX_LEVEL,
 } from "./levelMilestones";
 import { RARITY_UNLOCK_LEVELS } from "./rarityCap";
 
@@ -95,6 +98,70 @@ describe("getClaimableLevels", () => {
     // Level 15 pays; a rung with no payout must never appear as owed.
     for (const milestone of getClaimableLevels(100, [])) {
       expect(milestone.payout).not.toBeNull();
+    }
+  });
+});
+
+describe("the ladder past the authored table", () => {
+  it("reaches the top and stops there", () => {
+    expect(getLevelMilestone(MAX_LEVEL)).toBeDefined();
+    expect(getLevelMilestone(MAX_LEVEL + 1)).toBeUndefined();
+    expect(levelPayout(MAX_LEVEL + 1)).toBeNull();
+  });
+
+  it("leaves no level without a rung once the table runs out", () => {
+    // The bug this replaces: the ladder ended at 28 and anybody past it saw an
+    // empty screen where the climb ahead should be.
+    for (let lvl = 29; lvl <= MAX_LEVEL; lvl++) {
+      expect(getLevelMilestone(lvl), `level ${lvl}`).toBeDefined();
+      expect(levelPayout(lvl), `level ${lvl}`).not.toBeNull();
+    }
+  });
+
+  it("does not fill in the gaps the early ladder means to have", () => {
+    // 4, 7, 9 are silent on purpose — levels come minutes apart down there.
+    for (const lvl of [2, 4, 7, 9, 11, 27]) {
+      expect(levelPayout(lvl), `level ${lvl}`).toBeNull();
+    }
+  });
+
+  it("leaves the hand-tuned rungs exactly as they were", () => {
+    expect(levelPayout(3)).toStrictEqual({
+      caseTokens: 0,
+      parts: [{ tier: "Standard", qty: 2 }],
+      mods: 0,
+    });
+    expect(levelPayout(28)).toStrictEqual({
+      caseTokens: 1,
+      parts: [{ tier: "Legendary", qty: 4 }],
+      mods: 1,
+    });
+  });
+
+  it("keeps growing without running away", () => {
+    const partsAt = (lvl: number) =>
+      levelPayout(lvl)!.parts.reduce((sum, slot) => sum + slot.qty, 0);
+
+    expect(partsAt(200)).toBeGreaterThan(partsAt(40));
+    // Bounded: the top of the ladder is generous, not absurd.
+    expect(partsAt(MAX_LEVEL)).toBeLessThanOrEqual(10);
+    expect(levelPayout(MAX_LEVEL)!.caseTokens).toBeLessThanOrEqual(2);
+    expect(levelPayout(MAX_LEVEL)!.mods).toBeLessThanOrEqual(2);
+  });
+
+  it("only ever asks for a part tier that something can actually roll", () => {
+    // `partsAtTier("Unique")` draws from an empty pool — no part definition has
+    // that as its `maxTier` — so a slot asking for one would pay a part with no
+    // id at all. Every rung is rolled here rather than trusted.
+    for (let lvl = 2; lvl <= MAX_LEVEL; lvl++) {
+      const milestone = getLevelMilestone(lvl);
+      if (!milestone?.payout) continue;
+
+      const reward = rollLevelReward(milestone);
+      for (const part of reward!.parts) {
+        expect(part.partId, `level ${lvl}`).toBeTruthy();
+        expect(part.qty, `level ${lvl}`).toBeGreaterThan(0);
+      }
     }
   });
 });
