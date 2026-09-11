@@ -16,7 +16,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 /**
- * Pays out every rung the account has climbed and not been paid for.
+ * Pays out every rung the account has climbed since the ladder started watching
+ * and not been paid for.
  *
  * The client sends nothing but its token. It does not name the levels, it does
  * not say what they are worth, and it cannot ask for one it has not reached:
@@ -24,10 +25,14 @@ import { auth, firestore } from "utils/firebase/api/firebase.config";
  * the whole owed list is derived from it, then re-derived into rewards by the
  * same pure function the screen prints them with.
  *
- * One transaction for the lot. A player arriving at level 60 with the ladder
- * newly extended is owed thirty-odd rungs, and thirty round trips — each one
- * able to fail on its own and leave the ledger half paid — is not a way to
- * hand somebody their back pay.
+ * Nothing is ever back-paid. `rewards.levelBaseline` marks the rung the account
+ * already stood on the first time a reward route saw it, and rungs at or below
+ * it are not owed — see `RewardLedger.levelBaseline`. A player who was already
+ * level 30 when the ladder shipped starts square and is paid from level 31.
+ *
+ * One transaction for the lot even so: a session can carry an account across
+ * more than one rung, and two round trips — each able to fail on its own and
+ * leave the ledger half paid — is not a way to hand somebody a level-up.
  *
  * Idempotent by construction: `rewards.claimedLevels` is Admin-only in
  * `firestore.rules`, and a rung already on it drops out of the owed list. Two
@@ -67,10 +72,24 @@ export default async function handler(
       const ledger = readRewardLedger(data);
       const lvl: number = data.statistics?.lvl ?? 1;
 
-      const owed = getClaimableLevels(lvl, ledger.claimedLevels);
+      // An account the ladder has never seen has its history sealed here and
+      // now, at the level it is standing on: whatever it climbed before this
+      // moment was climbed without the rewards existing, so it is owed none of
+      // it. Ordinarily the report route got there first and sealed it a level
+      // lower, so the session that just ended still pays.
+      const baseline = ledger.levelBaseline ?? lvl;
+      const sealBaseline =
+        ledger.levelBaseline === null
+          ? { "rewards.levelBaseline": baseline }
+          : {};
+
+      const owed = getClaimableLevels(lvl, ledger.claimedLevels, baseline);
       // Nothing owed is the ordinary case, not a failure: this runs on its own
       // after every session, so most calls have nothing to do.
       if (owed.length === 0) {
+        // The baseline still has to land, or the next call would seal it at a
+        // level the player has since climbed past.
+        if (ledger.levelBaseline === null) t.update(userRef, sealBaseline);
         return { levels: [], parts: [], mods: [], caseTokens: 0 };
       }
 
@@ -99,6 +118,7 @@ export default async function handler(
       );
 
       t.update(userRef, {
+        ...sealBaseline,
         "arsenal.parts": newParts,
         ...(granted.length
           ? { "arsenal.salvagedMods": [...stash, ...granted] }

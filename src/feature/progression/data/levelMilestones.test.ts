@@ -77,26 +77,51 @@ describe("getNextMilestone", () => {
 });
 
 describe("getClaimableLevels", () => {
-  it("owes every paying rung the account has climbed past", () => {
-    const owed = getClaimableLevels(10, []).map((milestone) => milestone.lvl);
+  it("owes every paying rung climbed since the baseline", () => {
+    const owed = getClaimableLevels(10, [], 1).map(
+      (milestone) => milestone.lvl,
+    );
     expect(owed).toStrictEqual([3, 5, 6, 8, 10]);
   });
 
   it("drops a rung once it has been collected", () => {
-    const owed = getClaimableLevels(10, [
-      levelRewardId(3),
-      levelRewardId(6),
-    ]).map((milestone) => milestone.lvl);
+    const owed = getClaimableLevels(
+      10,
+      [levelRewardId(3), levelRewardId(6)],
+      1,
+    ).map((milestone) => milestone.lvl);
     expect(owed).toStrictEqual([5, 8, 10]);
   });
 
   it("never owes a rung the account has not reached", () => {
-    expect(getClaimableLevels(2, [])).toStrictEqual([]);
+    expect(getClaimableLevels(2, [], 1)).toStrictEqual([]);
+  });
+
+  it("never owes a rung climbed before the baseline", () => {
+    // The account arrived at level 20 with the ladder already shipped: its
+    // history stops there and the back pay is nobody's.
+    expect(getClaimableLevels(20, [], 20)).toStrictEqual([]);
+  });
+
+  it("pays the rungs climbed after the baseline, and only those", () => {
+    const owed = getClaimableLevels(12, [], 6).map(
+      (milestone) => milestone.lvl,
+    );
+    expect(owed).toStrictEqual([8, 10, 12]);
+  });
+
+  it("pays the rung the account has just landed on", () => {
+    // The baseline is sealed at the level the player stood on before the
+    // session, so the level that session earned is owed straight away.
+    const owed = getClaimableLevels(10, [], 9).map(
+      (milestone) => milestone.lvl,
+    );
+    expect(owed).toStrictEqual([10]);
   });
 
   it("skips rungs that only open something", () => {
     // Level 15 pays; a rung with no payout must never appear as owed.
-    for (const milestone of getClaimableLevels(100, [])) {
+    for (const milestone of getClaimableLevels(100, [], 1)) {
       expect(milestone.payout).not.toBeNull();
     }
   });

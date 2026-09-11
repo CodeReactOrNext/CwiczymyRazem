@@ -63,8 +63,13 @@ export default async function handler(
       roadmaps: { claimed: ledger.claimedRoadmaps },
       // Same idea for the level ladder: which rung the account is on is already
       // in `statistics`, so the only thing missing on the client is which rungs
-      // have been paid out.
-      levels: { claimed: ledger.claimedLevels },
+      // have been paid out — and where its history ends, since everything at or
+      // below the baseline was climbed before the ladder existed and is never
+      // owed.
+      levels: {
+        claimed: ledger.claimedLevels,
+        baseline: ledger.levelBaseline,
+      },
     });
   } catch (error) {
     console.error("[rewards/state]", error);

@@ -180,20 +180,28 @@ export const getNextMilestone = (lvl: number): LevelMilestone | null =>
   LEVEL_MILESTONES.find((milestone) => milestone.lvl > lvl) ?? null;
 
 /**
- * Rungs already reached whose payout has not been collected.
+ * Rungs reached since the ladder started watching, whose payout has not been
+ * collected.
  *
  * Reached, not passed: a level that pays nothing never appears here, and a
- * level claimed long ago never comes back. The account keeps every rung it
- * climbed past while the feature did not exist yet, which is the point — the
- * ladder ships owing people their back pay.
+ * level claimed long ago never comes back.
+ *
+ * `baseline` is where the account's history ends — the rung it already stood on
+ * when the ladder first saw it, from `RewardLedger.levelBaseline`. Everything at
+ * or below it was climbed before the rewards existed and is never paid out; the
+ * ladder pays forwards only, so a player who arrives at level 30 is owed level
+ * 31 and nothing behind it. Callers with no baseline recorded yet pass the
+ * account's current level, which owes exactly nothing.
  */
 export const getClaimableLevels = (
   lvl: number,
   claimed: readonly string[],
+  baseline: number,
 ): LevelMilestone[] =>
   LEVEL_MILESTONES.filter(
     (milestone) =>
       milestone.payout !== null &&
       milestone.lvl <= lvl &&
+      milestone.lvl > baseline &&
       !claimed.includes(levelRewardId(milestone.lvl)),
   );
