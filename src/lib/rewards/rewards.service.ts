@@ -35,6 +35,12 @@ export interface RewardLedgerState {
   levels: {
     /** Reward ids of the level milestones collected — see `levelRewardId`. */
     claimed: string[];
+    /**
+     * The rung the account already stood on when the ladder first saw it, or
+     * null while it has not been sealed yet. Nothing at or below it is owed —
+     * see `RewardLedger.levelBaseline`.
+     */
+    baseline: number | null;
   };
 }
 

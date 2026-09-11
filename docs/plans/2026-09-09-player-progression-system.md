@@ -27,6 +27,17 @@
 
 `firestore.rules` **nie wymagały zmiany** — cała mapa `rewards` jest już zablokowana przed zapisem z klienta (linia 26), więc `claimedLevels` jest pokryty tą samą regułą.
 
+### Decyzja właściciela (2026-09-11, [#820](https://github.com/CodeReactOrNext/CwiczymyRazem/issues/820)) — nagrody tylko na bieżąco
+
+Pierwotnie drabina wypłacała **wstecz**: konto na poziomie 30 w dniu wdrożenia dostawało wszystkie minięte progi naraz. To odpada. Poziomy zdobyte, zanim system nagród istniał, nie są płatne — liczy się tylko to, co gracz wejdzie od teraz.
+
+Realizacja: `rewards.levelBaseline` (numer, pole serwerowe w tym samym ledgerze, więc `firestore.rules` znów bez zmian). Pieczętowane **raz**, przy pierwszym zetknięciu konta z systemem nagród:
+
+- `POST /api/user/report` — na poziomie **sprzed** raportowanej sesji, więc poziom zdobyty tą sesją jeszcze się liczy,
+- `POST /api/rewards/claim-levels` — awaryjnie, na aktualnym poziomie, dla kont, które nie raportują.
+
+`getClaimableLevels(lvl, claimed, baseline)` pomija wszystko `<= baseline`. Konta, które zdążyły odebrać wypłatę wstecz przed tą zmianą, zatrzymują ją — `claimedLevels` i tak nie pozwoli zapłacić drugi raz.
+
 ---
 
 ## 1. Co już mamy w kodzie
