@@ -67,6 +67,12 @@ interface PartRowProps {
   dense?: boolean;
   /** Staggers the entry animation when a list renders. */
   index?: number;
+  /**
+   * A bill read as a ledger — "9 required / 29 owned", and what is left once
+   * the job is paid — named for the job, e.g. `"restoration"`. Without it the
+   * cost is the headline and the stock a whisper under it.
+   */
+  ledger?: string;
 }
 
 /**
@@ -93,6 +99,7 @@ export const PartRow = ({
   variant = "full",
   dense = false,
   index = 0,
+  ledger,
 }: PartRowProps) => {
   const isBill = need != null && have != null;
   const ok = isBill ? have >= need : true;
@@ -115,10 +122,7 @@ export const PartRow = ({
           is legible before the word under the name is read. A cost that is not
           a part — Fame — brings its own emblem and needs no socket. */}
       {tierColor && !icon ? (
-        <TierPlate
-          color={tierColor}
-          size={dense ? 32 : size.plate}
-          muted={!ok}>
+        <TierPlate color={tierColor} size={dense ? 32 : size.plate} muted={!ok}>
           <PartIcon partId={partId!} size={dense ? 26 : size.icon} />
         </TierPlate>
       ) : (
@@ -134,7 +138,7 @@ export const PartRow = ({
 
       {variant === "compact" ? (
         // No room for the name: the icon carries it and the tooltip spells it out.
-        <span className='flex shrink-0 flex-1 items-center justify-end gap-2'>
+        <span className='flex flex-1 shrink-0 items-center justify-end gap-2'>
           <span
             className={cn(
               "text-sm font-black tabular-nums",
@@ -145,7 +149,9 @@ export const PartRow = ({
             {need}
           </span>
           {tier && (
-            <span className='text-xs font-semibold' style={{ color: tierColor }}>
+            <span
+              className='text-xs font-semibold'
+              style={{ color: tierColor }}>
               {tier}
             </span>
           )}
@@ -174,24 +180,49 @@ export const PartRow = ({
 
           {isBill ? (
             <span className='flex shrink-0 items-center gap-3'>
-              <span className='flex flex-col items-end gap-0.5'>
-                <span
-                  className={cn(
-                    "text-2xl font-black leading-none tabular-nums",
-                    ok ? "text-zinc-100" : "text-amber-400",
-                  )}>
-                  {need}
+              {ledger ? (
+                <span className='flex flex-col items-end gap-1'>
+                  <span className='text-sm tabular-nums text-zinc-400'>
+                    <span
+                      className={cn(
+                        "text-lg font-black",
+                        ok ? "text-zinc-100" : "text-amber-400",
+                      )}>
+                      {need}
+                    </span>{" "}
+                    required <span className='text-zinc-600'>/</span> {have}{" "}
+                    owned
+                  </span>
+                  <span
+                    className={cn(
+                      "text-xs tabular-nums",
+                      ok ? "text-zinc-500" : "text-amber-400/80",
+                    )}>
+                    {ok
+                      ? `After ${ledger}: ${have! - need!} left`
+                      : `${need! - have!} short`}
+                  </span>
                 </span>
-                <span
-                  className={cn(
-                    "text-xs tabular-nums",
-                    ok ? "text-zinc-500" : "text-amber-400/80",
-                  )}>
-                  {ok
-                    ? `you have ${have}`
-                    : `you have ${have} — ${need! - have!} short`}
+              ) : (
+                <span className='flex flex-col items-end gap-0.5'>
+                  <span
+                    className={cn(
+                      "text-2xl font-black tabular-nums leading-none",
+                      ok ? "text-zinc-100" : "text-amber-400",
+                    )}>
+                    {need}
+                  </span>
+                  <span
+                    className={cn(
+                      "text-xs tabular-nums",
+                      ok ? "text-zinc-500" : "text-amber-400/80",
+                    )}>
+                    {ok
+                      ? `you have ${have}`
+                      : `you have ${have} — ${need! - have!} short`}
+                  </span>
                 </span>
-              </span>
+              )}
 
               <span
                 className={cn(
@@ -199,7 +230,11 @@ export const PartRow = ({
                   ok ? "bg-emerald-500/15" : "bg-zinc-800",
                 )}>
                 {ok ? (
-                  <Check size={13} strokeWidth={3} className='text-emerald-400' />
+                  <Check
+                    size={13}
+                    strokeWidth={3}
+                    className='text-emerald-400'
+                  />
                 ) : (
                   <span className='h-1.5 w-1.5 rounded-full bg-zinc-600' />
                 )}

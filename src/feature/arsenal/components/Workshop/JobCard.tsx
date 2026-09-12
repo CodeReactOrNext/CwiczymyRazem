@@ -76,43 +76,49 @@ export const JobCard = ({
   // where there is no room for a right-hand column — it moves under the summary
   // rather than disappearing.
   const note = ready ? (showsGain ? undefined : readyNote) : blockedNote;
-  const noteClass = ready ? ACCENTS[accent].fg : "text-amber-400/80";
+  // Orange, not amber — amber/gold is reserved for Fame everywhere else in the
+  // system, so a "why can't I do this" note needs its own colour.
+  const noteClass = ready ? ACCENTS[accent].fg : "text-orange-400/80";
 
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "group relative flex items-center gap-5 overflow-hidden rounded-lg bg-zinc-900/40 p-6 text-left transition-colors click-behavior",
-        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
+        "group relative flex items-center gap-5 overflow-hidden rounded-lg border border-arsenal-border bg-arsenal-section p-6 text-left transition-colors duration-150 click-behavior",
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         "disabled:pointer-events-none disabled:opacity-50",
-        "hover:bg-zinc-900/70",
+        "hover:border-arsenal-accent/30 hover:bg-arsenal-card",
       )}>
       {/*
         The plate is a layer rather than the button's own background: the card
-        still wants its zinc hover underneath, and a grid drawn in `style` cannot
+        still wants its own hover underneath, and a grid drawn in `style` cannot
         be brightened on hover the way a class can.
       */}
       <span
         aria-hidden
-        className='pointer-events-none absolute inset-0 opacity-70 transition-opacity group-hover:opacity-95'
+        className='pointer-events-none absolute inset-0 opacity-40 transition-opacity group-hover:opacity-60'
         style={PLATES[accent]}
       />
       {ready && !disabled && <ReadyShine />}
       <span
         className={cn(
           "relative flex h-14 w-14 shrink-0 items-center justify-center rounded-lg",
-          ready ? ACCENTS[accent].bg : "bg-zinc-800/60",
+          ready ? ACCENTS[accent].bg : "bg-arsenal-card",
         )}>
         <Icon
           size={24}
-          className={cn(ready ? ACCENTS[accent].fg : "text-zinc-500")}
+          className={cn(
+            ready ? ACCENTS[accent].fg : "text-arsenal-text-tertiary",
+          )}
         />
       </span>
 
       <span className='relative flex min-w-0 flex-1 flex-col gap-1.5'>
-        <span className='text-lg font-black text-white'>{title}</span>
-        <span className='flex flex-wrap items-center gap-x-3 gap-y-2 text-base text-zinc-400'>
+        <span className='text-lg font-semibold text-arsenal-text-primary'>
+          {title}
+        </span>
+        <span className='flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-arsenal-text-secondary'>
           {summary}
         </span>
         {note && (
@@ -131,7 +137,9 @@ export const JobCard = ({
                 ACCENTS[accent].fg,
               )}
             />
-            <span className='text-sm text-zinc-500'>level</span>
+            <span className='text-sm text-arsenal-text-tertiary'>
+              level{gain === 1 ? "" : "s"}
+            </span>
           </span>
         ) : (
           note && (
@@ -145,7 +153,7 @@ export const JobCard = ({
           )
         )}
 
-        <ChevronRight size={18} className='text-zinc-600' />
+        <ChevronRight size={18} className='text-arsenal-text-tertiary' />
       </span>
     </button>
   );

@@ -2,7 +2,6 @@ import { Accordion } from "assets/components/ui/accordion";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
-import { AmpSimButton } from "feature/exercisePlan/views/PracticeSession/components/AmpSimButton";
 import { CommunityMapImportModal } from "feature/songs/components/SongSections/CommunityMapImportModal";
 import {
   nextSectionColor,
@@ -25,6 +24,7 @@ import type {
 import { SECTION_COLORS } from "feature/songs/types/songSection.type";
 import { MIN_SECTIONS } from "feature/songs/utils/sectionMapValidation.utils";
 import { extractVideoId } from "feature/songs/utils/youtube.utils";
+import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import {

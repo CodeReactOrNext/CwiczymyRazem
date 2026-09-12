@@ -7,6 +7,11 @@
  * top-level tabs of their own since.
  */
 
-/** The module's tabs (Cases, Collection, Rig…). */
+/**
+ * The module's tabs (Cases, Collection, Rig…) — text, not filled pills, so
+ * they read as navigation rather than another row of buttons. The active tab
+ * gets the one interaction colour, as a 2px underline, and nothing else in
+ * this row is coloured.
+ */
 export const arsenalTabTriggerClass =
-  "shrink-0 gap-2 rounded-lg px-4 py-2 text-sm font-bold text-zinc-400 transition-colors hover:text-zinc-200 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200";
+  "shrink-0 gap-2 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 text-sm font-semibold text-arsenal-text-tertiary shadow-none transition-colors duration-150 hover:text-arsenal-text-primary data-[state=active]:border-arsenal-accent data-[state=active]:bg-transparent data-[state=active]:text-arsenal-text-primary data-[state=active]:shadow-none";

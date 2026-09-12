@@ -1,4 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import type { TraitCardState } from "feature/arsenal/data/traitEval";
 import {
@@ -72,6 +78,14 @@ interface CardTraitsProps {
    * never be coloured by somebody else's rig.
    */
   states?: TraitCardInfo[] | null;
+  /**
+   * Caps the rows shown, highest Fame/h first, collapsing the rest behind a
+   * "+N more" that reveals them on hover — used by the marketplace grid,
+   * where an eleven-trait item would otherwise push the price off-screen.
+   * Omitted everywhere else: a card the player owns is for reading what it
+   * carries, not a summary of it.
+   */
+  maxVisible?: number;
 }
 
 /**
@@ -87,14 +101,25 @@ interface CardTraitsProps {
  * colour. `session` means the rig is already right and the rest depends on how
  * they practise — a promise, not a failure, and it must not look like one.
  */
-export const CardTraits = ({ traits, states }: CardTraitsProps) => {
+export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
   if (traits.length === 0) return null;
+
+  const indexed = traits.map((trait, i) => ({ trait, i }));
+  // Only reordered when capped — the "most important" two are the highest
+  // Fame/h, but a card showing everything reads better in the order the
+  // traits were actually rolled onto the item.
+  const ordered =
+    maxVisible != null
+      ? [...indexed].sort((a, b) => b.trait.value - a.trait.value)
+      : indexed;
+  const visible = maxVisible != null ? ordered.slice(0, maxVisible) : ordered;
+  const hidden = maxVisible != null ? ordered.slice(maxVisible) : [];
 
   return (
     <div
       className='relative z-10 flex flex-shrink-0 flex-col gap-2.5 px-3 py-3'
       style={{ background: "rgba(16,185,129,0.07)" }}>
-      {traits.map((trait, i) => {
+      {visible.map(({ trait, i }) => {
         const info = states?.[i] ?? null;
         const state = info?.state ?? null;
         const unmet = state === "unmet";
@@ -142,6 +167,35 @@ export const CardTraits = ({ traits, states }: CardTraitsProps) => {
           </div>
         );
       })}
+      {hidden.length > 0 && (
+        <TooltipProvider>
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              <div className='flex cursor-help items-center gap-1.5 pl-[19px] text-[11px] font-bold text-emerald-300/60 transition-colors hover:text-emerald-300'>
+                +{hidden.length} more
+              </div>
+            </TooltipTrigger>
+            <TooltipContent
+              side='top'
+              className='max-w-[240px] border border-zinc-700 bg-zinc-950 text-white'>
+              <div className='flex flex-col gap-1.5'>
+                {hidden.map(({ trait }) => (
+                  <div
+                    key={trait.def.id}
+                    className='flex items-baseline justify-between gap-3 text-[11px]'>
+                    <span className='truncate font-semibold text-emerald-300'>
+                      {trait.label}
+                    </span>
+                    <span className='font-mono shrink-0 text-emerald-200'>
+                      {formatTraitValue(trait.value)} Fame/h
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
     </div>
   );
 };

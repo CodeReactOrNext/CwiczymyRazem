@@ -30,7 +30,7 @@ const TONES = {
   // red for a pedal that cannot go where it is being dropped, so a cable running
   // backwards had better be the same red.
   bad: { text: "text-red-400", bar: "bg-red-500/80" },
-  idle: { text: "text-zinc-300", bar: "bg-zinc-700" },
+  idle: { text: "text-arsenal-text-secondary", bar: "bg-arsenal-border" },
 } as const;
 
 interface StageChipProps {
@@ -45,7 +45,9 @@ const StageChip = ({ label, why, filled }: StageChipProps) => (
     title={why}
     className={cn(
       "cursor-default rounded px-2 py-1 text-[11px] tracking-wide transition-colors",
-      filled ? "bg-zinc-800 text-zinc-200" : "text-zinc-500",
+      filled
+        ? "bg-arsenal-card text-arsenal-text-secondary"
+        : "text-arsenal-text-tertiary",
     )}>
     {label}
   </span>
@@ -61,9 +63,11 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
   const filled = new Set(verdict.filledStages);
 
   return (
-    <div className='flex flex-col gap-3 rounded-lg bg-zinc-900/40 p-5'>
+    <div className='flex flex-col gap-3 rounded-lg bg-arsenal-section p-5'>
       <div className='flex items-center justify-between gap-4'>
-        <p className='text-[11px] tracking-wide text-zinc-500'>Signal path</p>
+        <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
+          Signal path
+        </p>
         <div className='flex items-baseline gap-1'>
           <CurrencyIcon currency='fame' className='mr-0 h-5 w-5 self-center' />
           <CountUp
@@ -101,7 +105,7 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
               />
             ))}
           </div>
-          <p className='text-[11px] tracking-wide text-zinc-500'>
+          <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
             {verdict.okLinks} of {verdict.links.length}{" "}
             {verdict.links.length === 1 ? "cable" : "cables"} in order
           </p>
@@ -111,7 +115,9 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
       <div className='flex flex-wrap items-center gap-x-0.5 gap-y-1'>
         {PLAYABLE_SIGNAL_STAGES.map((stage, index) => (
           <div key={stage.id} className='flex items-center gap-0.5'>
-            {index > 0 && <span className='text-[11px] text-zinc-700'>→</span>}
+            {index > 0 && (
+              <span className='text-[11px] text-arsenal-text-tertiary'>→</span>
+            )}
             <StageChip
               label={stage.label}
               why={stage.why}

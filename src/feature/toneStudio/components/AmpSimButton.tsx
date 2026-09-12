@@ -3,6 +3,7 @@ import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
 import { InputMeter } from "feature/toneStudio/components/InputMeter";
 import { Knob } from "feature/toneStudio/components/Knob";
 import { CHAIN_BLOCKS, type ToneAccent } from "feature/toneStudio/utils/chain";
+import { AMP_HEAD_SRC } from "feature/toneStudio/utils/gearArt";
 import { isPresetModified } from "feature/toneStudio/utils/presetDiff";
 import { useAmpSim } from "hooks/useAmpSim";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
@@ -26,6 +27,10 @@ interface AmpSimButtonProps {
   compact?: boolean;
   /** Height class to align with sibling toolbar buttons (e.g. "h-12" / "h-8"). */
   h?: string;
+  /** "titlebar" is the desktop strip's pill — the same shape and ink as its
+   *  nav buttons, state shown by a dot and a tint rather than a filled block.
+   *  "toolbar" (default) is the session/timer toolbar's square button. */
+  variant?: "toolbar" | "titlebar";
 }
 
 /** The three buffer sizes a player actually chooses between — the full smp
@@ -58,10 +63,15 @@ const secondaryButton =
  * (window.nativeAmp is absent). Toggles real-time monitoring, lets the user pick
  * which audio interface + saved tone preset to use, plus a basic level control.
  * Deep tone-shaping (drive/EQ/delay/IR) lives on the /tone-studio page.
+ *
+ * Mounted both in the app header and in the practice-session toolbar. Both read
+ * the same store (feature/toneStudio/services/ampSimStore), so they always agree
+ * on whether the amp is on, and neither one unmounting stops it.
  */
 export const AmpSimButton = ({
   compact = false,
   h = "h-12",
+  variant = "toolbar",
 }: AmpSimButtonProps) => {
   const amp = useAmpSim();
   const { devices, api, selectedId, loading, refresh, select } =
@@ -198,8 +208,38 @@ export const AmpSimButton = ({
       ? "bg-cyan-950 text-cyan-400 hover:bg-cyan-900"
       : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700";
 
-  return (
-    <div className='relative' ref={rootRef}>
+  // The title bar's pill: the nav buttons' ink (zinc-900 on zinc-950) at rest,
+  // a wash of the state colour when live, and a small lamp instead of a
+  // pulsing icon — a thin strip wants a quieter signal than a toolbar does.
+  const pillColor = needsAttention
+    ? "bg-amber-500/10 text-amber-300 hover:bg-amber-500/15"
+    : amp.isOn
+      ? "bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/15"
+      : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100";
+
+  const trigger =
+    variant === "titlebar" ? (
+      <RippleButton
+        onClick={() => setOpen((o) => !o)}
+        title={needsAttention ? statusLine : "Amp simulator (ASIO, live)"}
+        className={cn(
+          "flex items-center gap-1.5 rounded-full pl-2.5 pr-3 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
+          h,
+          pillColor,
+        )}>
+        <Speaker className='h-3.5 w-3.5 shrink-0' />
+        <span>{amp.isOn ? "Amp on" : "Amp"}</span>
+        {(amp.isOn || needsAttention) && (
+          <span
+            aria-hidden
+            className={cn(
+              "h-1.5 w-1.5 shrink-0 animate-pulse rounded-full",
+              needsAttention ? "bg-amber-400" : "bg-cyan-400",
+            )}
+          />
+        )}
+      </RippleButton>
+    ) : (
       <RippleButton
         onClick={() => setOpen((o) => !o)}
         title={needsAttention ? statusLine : "Amp simulator (ASIO, live)"}
@@ -222,20 +262,28 @@ export const AmpSimButton = ({
           </span>
         )}
       </RippleButton>
+    );
+
+  return (
+    <div className='relative' ref={rootRef}>
+      {trigger}
 
       {open && (
         <div className='absolute right-0 z-[99999999] mt-2 flex w-80 flex-col gap-4 rounded-lg bg-zinc-900/95 p-5 text-left text-white backdrop-blur-md'>
           {/* ── Header: what it is + is it live ─────────────────────────────── */}
           <div className='flex items-center gap-3'>
-            <span
+            {/* The rig itself rather than a speaker glyph — this popover is the
+                amp's face on every page outside Tone Studio, and it dims with
+                the engine so a glance says whether anything is running. */}
+            <img
+              src={AMP_HEAD_SRC}
+              alt=''
+              draggable={false}
               className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors",
-                amp.isOn
-                  ? "bg-cyan-500/15 text-cyan-400"
-                  : "bg-zinc-800 text-zinc-500",
-              )}>
-              <Speaker size={18} />
-            </span>
+                "h-auto w-[72px] shrink-0 select-none rounded transition-opacity",
+                amp.isOn ? "opacity-100" : "opacity-45",
+              )}
+            />
             <div className='min-w-0 flex-1'>
               <div className='text-sm font-semibold leading-tight'>Amp</div>
               <div className='mt-1 flex items-center gap-1.5 text-[11px] text-zinc-400'>
@@ -288,7 +336,9 @@ export const AmpSimButton = ({
               label='Level'
               value={amp.params.level}
               size={44}
+              ring={false}
               accent='cyan'
+              defaultValue={0.5}
               onChange={(v) => amp.setParams({ level: v })}
             />
           </div>

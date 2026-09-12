@@ -60,14 +60,14 @@ import {
 } from "../../utils/powerLayout";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
+import { BoardStatusStrip } from "./BoardStatusStrip";
 import { EffectPickerModal } from "./EffectPickerModal";
 import type { PoweredPedal } from "./PowerLoom";
 import { PedalDcPlug, PowerLoom, PowerRail } from "./PowerLoom";
-import { PowerPanel } from "./PowerPanel";
 import { RigHardwarePanel } from "./RigHardwarePanel";
-import { RIG_BUTTON, RIG_BUTTON_FIX, SectionHeading } from "./RigSection";
+import { RIG_BUTTON, RIG_BUTTON_FIX, RIG_BUTTON_PRIMARY } from "./RigSection";
 import { SignalCable } from "./SignalCable";
-import { SignalPathPanel } from "./SignalPathPanel";
+import { SignalOrderStrip } from "./SignalOrderStrip";
 
 /** How long a "no room left" message stays up next to the board controls. */
 const NOTICE_MS = 8000;
@@ -991,71 +991,80 @@ export const PedalboardView = ({
 
   return (
     <>
-      <SectionHeading title='Pedalboard' />
-
-      {/* What the wiring is worth, and whether the brick has a hole left. */}
-      {boardItems.length > 0 && (
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-          <SignalPathPanel verdict={verdict} />
-          <PowerPanel
-            supply={supply}
-            state={powerState}
-            unpowered={unpoweredNames}
-          />
-        </div>
-      )}
-
-      {/* Every button the board has, on the board's own doorstep: the four that
-          rearrange it, and the two that buy it more room. Directly above the
-          case, because each one is answering something the deck below is
-          already showing. */}
-      <div className='flex flex-wrap items-center justify-end gap-2'>
-        {notice && (
-          <p className='mr-auto flex items-center gap-1.5 text-[11px] font-semibold text-amber-400'>
-            <AlertTriangle size={13} strokeWidth={2.5} className='shrink-0' />
-            {notice}
-          </p>
-        )}
-
-        {verdict.tip !== null && boardItems.length > 1 && (
+      {/* The board's own heading, with every button it has on the same line:
+          the ones that rearrange it, the one that adds to it, and the two that
+          buy it more room. Directly above the readouts, because each button is
+          answering something they are about to show. */}
+      <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-3'>
+        <p className='font-display text-2xl font-black text-arsenal-text-primary'>
+          Pedalboard
+        </p>
+        <div className='flex flex-wrap items-center gap-2'>
+          {verdict.tip !== null && boardItems.length > 1 && (
+            <button
+              onClick={handleWireUp}
+              className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
+              title='Lay the whole board out in the order the craft asks for'>
+              <Zap size={12} strokeWidth={2.5} />
+              Wire it up
+            </button>
+          )}
+          {canPatch && (
+            <button
+              onClick={() =>
+                savePower(
+                  autoPatch(rail, boardItems, powerState.links, widthOf),
+                )
+              }
+              className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
+              title='Plug in everything the brick still has a hole for'>
+              <Plug size={12} strokeWidth={2.5} />
+              Patch power
+            </button>
+          )}
+          {boardItems.length > 1 && (
+            <button
+              onClick={handleTidy}
+              className={RIG_BUTTON}
+              title='Line every pedal up in rows'>
+              <LayoutGrid size={12} strokeWidth={2.5} />
+              Tidy up
+            </button>
+          )}
           <button
-            onClick={handleWireUp}
-            className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
-            title='Lay the whole board out in the order the craft asks for'>
-            <Zap size={12} strokeWidth={2.5} />
-            Wire it up
+            onClick={() => setShowPicker(true)}
+            className={RIG_BUTTON_PRIMARY}>
+            <Plus size={12} strokeWidth={2.5} />
+            Add pedal
           </button>
-        )}
-        {canPatch && (
-          <button
-            onClick={() =>
-              savePower(autoPatch(rail, boardItems, powerState.links, widthOf))
-            }
-            className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
-            title='Plug in everything the brick still has a hole for'>
-            <Plug size={12} strokeWidth={2.5} />
-            Patch power
-          </button>
-        )}
-        {boardItems.length > 1 && (
-          <button
-            onClick={handleTidy}
-            className={RIG_BUTTON}
-            title='Line every pedal up in rows'>
-            <LayoutGrid size={12} strokeWidth={2.5} />
-            Tidy up
-          </button>
-        )}
-        <button onClick={() => setShowPicker(true)} className={RIG_BUTTON}>
-          <Plus size={12} strokeWidth={2.5} />
-          Add pedal
-        </button>
 
-        {/* Set a little apart from the rest, because these two spend Fame. */}
-        <div className='flex flex-wrap items-center gap-2 sm:ml-3'>
-          <RigHardwarePanel rig={data.rig} fame={fame} />
+          {/* Set a little apart from the rest, because these two spend Fame. */}
+          <div className='flex flex-wrap items-center gap-2 sm:ml-2'>
+            <RigHardwarePanel rig={data.rig} fame={fame} />
+          </div>
         </div>
       </div>
+
+      {notice && (
+        <p className='flex items-center gap-1.5 text-[11px] font-semibold text-orange-400'>
+          <AlertTriangle size={13} strokeWidth={2.5} className='shrink-0' />
+          {notice}
+        </p>
+      )}
+
+      {/* What the wiring is worth and whether the brick has a hole left, then
+          the chain itself as a line of names. */}
+      {boardItems.length > 0 && (
+        <>
+          <BoardStatusStrip
+            verdict={verdict}
+            supply={supply}
+            power={powerState}
+            unpowered={unpoweredNames}
+          />
+          <SignalOrderStrip verdict={verdict} />
+        </>
+      )}
 
       {/* Case outer shell */}
       <div

@@ -1,4 +1,5 @@
 import { Chip } from "assets/components/ui/chip";
+import { cn } from "assets/lib/utils";
 import {
   getPartLabel,
   PART_TIER_COLORS,
@@ -11,7 +12,7 @@ import { useState } from "react";
 import { BuyButton } from "../BuyButton";
 import { PartIcon } from "../Parts/PartIcon";
 import { TierPlate } from "../TierPlate";
-import { OfferPrice, TakenToday } from "./offerBits";
+import { OfferPrice, StockMeter } from "./offerBits";
 
 interface PartOfferCardProps {
   offer: TraderPartOffer;
@@ -37,8 +38,8 @@ const PickerButton = ({
     onClick={onClick}
     disabled={disabled}
     aria-label={label}
-    className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-900/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-900 hover:text-white'>
-    <Icon size={14} strokeWidth={3} />
+    className='flex h-8 w-9 shrink-0 items-center justify-center rounded-md text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white'>
+    <Icon size={13} strokeWidth={3} />
   </button>
 );
 
@@ -47,9 +48,10 @@ const PickerButton = ({
  * picker rather than a take-it-or-leave-it bundle: a player with thirty Fame to
  * their name can still walk out with something.
  *
- * Same anatomy as the mod card beside it — plate, tier and stock top right, name
- * and price, then the footer pinned to the bottom so a row of cards lines up
- * whether or not a card has a picker.
+ * Read top to bottom the way a shelf label is: the thing, its name and tier,
+ * what it costs, how many are left, and the two controls at the foot. The
+ * picker and the button sit on one line, because "how many" and "buy" are one
+ * decision, and a card that stacked them read as a form.
  */
 export const PartOfferCard = ({
   offer,
@@ -71,56 +73,59 @@ export const PartOfferCard = ({
   const tierColor = PART_TIER_COLORS[offer.tier];
 
   return (
-    <div className='flex h-full flex-col gap-5 rounded-lg bg-zinc-800/40 p-5'>
-      <div className='flex items-start justify-between gap-3'>
+    <div
+      className={cn(
+        "flex h-full flex-col gap-4 rounded-lg bg-zinc-800/40 p-4 transition-colors",
+        soldOut ? "opacity-60" : "hover:bg-zinc-800/60",
+      )}>
+      <div className='flex items-center gap-3.5'>
         {/* The same lit hollow the stash sockets and the bench bills use, so a
             part on the counter reads as the very object it will become in the
             pile — a bare glyph on flat zinc read as an icon, not as loot. */}
-        <TierPlate color={tierColor} size={64}>
-          <PartIcon partId={offer.partId} size={40} />
+        <TierPlate color={tierColor} size={56}>
+          <PartIcon partId={offer.partId} size={36} />
         </TierPlate>
-        <div className='flex flex-col items-end gap-1.5 text-right'>
-          {offer.discountPct > 0 && (
-            <Chip color='emerald' className='px-2 py-0.5'>
-              −{offer.discountPct}% today
-            </Chip>
-          )}
-          <span className='text-xs font-semibold' style={{ color: tierColor }}>
-            {offer.tier}
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
+          <span className='truncate text-[15px] font-bold leading-tight text-zinc-100'>
+            {getPartLabel(offer.partId)}
           </span>
-          <span className='text-xs tabular-nums text-zinc-400'>
-            {remaining} / {offer.stock} left
+          <span className='flex flex-wrap items-center gap-1.5'>
+            <span
+              className='text-[11px] font-semibold'
+              style={{ color: tierColor }}>
+              {offer.tier}
+            </span>
+            {offer.discountPct > 0 && (
+              <Chip color='emerald' className='px-1.5 py-0 text-[10px]'>
+                −{offer.discountPct}% today
+              </Chip>
+            )}
           </span>
         </div>
       </div>
 
-      <div className='flex flex-col gap-1.5'>
-        <span className='truncate text-base font-bold text-zinc-100'>
-          {getPartLabel(offer.partId)}
-        </span>
-        <OfferPrice
-          unitPrice={offer.unitPrice}
-          basePrice={offer.discountPct > 0 ? offer.basePrice : undefined}
-          suffix='each'
-        />
-      </div>
+      <OfferPrice
+        unitPrice={offer.unitPrice}
+        basePrice={offer.discountPct > 0 ? offer.basePrice : undefined}
+        suffix='each'
+      />
 
-      <div className='mt-auto flex flex-col gap-3'>
-        {soldOut ? (
-          <TakenToday />
-        ) : (
-          <>
+      <StockMeter remaining={remaining} stock={offer.stock} color={tierColor} />
+
+      {!soldOut && (
+        <div className='mt-auto flex flex-col gap-2'>
+          <div className='flex items-center gap-2'>
             {/* A picker with nothing to pick is just two dead buttons — a slot
                 that only ever hands over one piece says so by having no picker. */}
             {remaining > 1 && (
-              <div className='flex items-center gap-2'>
+              <span className='flex shrink-0 items-center rounded-lg bg-zinc-900/60 p-0.5'>
                 <PickerButton
                   icon={Minus}
                   label='One fewer'
                   disabled={qty <= 1}
                   onClick={() => setQty(Math.max(1, qty - 1))}
                 />
-                <span className='flex-1 text-center text-lg font-black tabular-nums text-white'>
+                <span className='w-8 text-center text-sm font-black tabular-nums text-white'>
                   {qty}
                 </span>
                 <PickerButton
@@ -129,28 +134,28 @@ export const PartOfferCard = ({
                   disabled={qty >= remaining}
                   onClick={() => setQty(Math.min(remaining, qty + 1))}
                 />
-              </div>
+              </span>
             )}
-
             <BuyButton
               price={total}
               canAfford={canAfford}
               isBuying={isBuying}
               onClick={() => onBuy(qty)}
+              className='min-w-0 flex-1'
             />
+          </div>
 
-            {/* Only worth saying while it is the binding limit — not once the
-                player could clear the whole slot anyway. */}
-            {!canAfford && affordable > 0 && (
-              <button
-                onClick={() => setQty(Math.min(affordable, remaining))}
-                className='rounded text-xs font-medium text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-zinc-200'>
-                You can afford {Math.min(affordable, remaining)}
-              </button>
-            )}
-          </>
-        )}
-      </div>
+          {/* Only worth saying while it is the binding limit — not once the
+              player could clear the whole slot anyway. */}
+          {!canAfford && affordable > 0 && (
+            <button
+              onClick={() => setQty(Math.min(affordable, remaining))}
+              className='self-start rounded text-xs font-medium text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-zinc-200'>
+              You can afford {Math.min(affordable, remaining)}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };

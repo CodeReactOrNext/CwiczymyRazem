@@ -1,10 +1,12 @@
 import { Chip } from "assets/components/ui/chip";
+import { cn } from "assets/lib/utils";
 import type { TraderModOffer } from "feature/arsenal/types/trader.types";
+import { Sparkles } from "lucide-react";
 
 import { BuyButton } from "../BuyButton";
 import { MOD_ACCENT, TierPlate } from "../TierPlate";
 import { ModArt } from "../Workshop/ModArt";
-import { OfferPrice, TakenToday } from "./offerBits";
+import { OfferPrice, RollMeter, TakenToday } from "./offerBits";
 
 interface ModOfferCardProps {
   offer: TraderModOffer;
@@ -13,22 +15,21 @@ interface ModOfferCardProps {
   currentFame: number;
   onBuy: () => void;
   isBuying: boolean;
+  className?: string;
 }
 
 /**
- * The day's mod, on the shelf with the parts.
+ * The day's mod, first on the shelf and twice as wide as a part.
  *
- * Built to the same card as `PartOfferCard`, in the same grid: a mod is another
- * loose component the counter sells by the piece, and giving it a wide feature
- * panel of its own said it was a different *kind* of purchase than it is. Same
- * plate, same headline row, same footer — the only thing missing is the quantity
- * picker, because there is exactly one of it.
+ * There is one a day and it is gone once taken, and it is the only thing on the
+ * counter a player cannot make at the bench without owning the parts first —
+ * so it earns the double card, with the blueprint big and the roll drawn on the
+ * range it came out of. It still pays through the same button as everything
+ * else: it is a loose component, not a different kind of purchase.
  *
  * It does not show the bench bill the price is derived from. The bill is what
- * prices the mod, not what the buyer is choosing between: nobody standing at the
- * counter is deciding whether to go and gather three Epic diodes instead, and a
- * card is the wrong place to justify a number. The mod, its roll and its price
- * are the offer.
+ * prices the mod, not what the buyer is choosing between; the mod, its roll and
+ * its price are the offer.
  */
 export const ModOfferCard = ({
   offer,
@@ -36,52 +37,69 @@ export const ModOfferCard = ({
   currentFame,
   onBuy,
   isBuying,
+  className,
 }: ModOfferCardProps) => {
   const canAfford = currentFame >= offer.unitPrice;
   const isTopRoll = offer.points >= offer.maxPoints;
 
   return (
-    <div className='flex h-full flex-col gap-5 rounded-lg bg-zinc-800/40 p-5'>
-      <div className='flex items-start justify-between gap-3'>
-        {/* Socketed the way the stash board shows a rescued mod: the blueprint
-            tile sitting in a hollow lit by the mods' own purple. */}
-        <TierPlate color={MOD_ACCENT} size={64}>
-          <ModArt modId={offer.featureId} size={52} />
-        </TierPlate>
+    <div
+      className={cn(
+        "relative flex h-full flex-col gap-4 overflow-hidden rounded-lg bg-zinc-800/40 p-4 transition-colors sm:flex-row sm:items-stretch sm:gap-6 sm:p-5",
+        available ? "hover:bg-zinc-800/60" : "opacity-60",
+        className,
+      )}>
+      {/* The mods' own purple, as light off the plate rather than a frame. */}
+      <div
+        className='pointer-events-none absolute inset-0'
+        style={{
+          background: `radial-gradient(70% 90% at 0% 50%, ${MOD_ACCENT}1f 0%, transparent 60%)`,
+        }}
+      />
 
-        <div className='flex flex-col items-end gap-1.5 text-right'>
+      {/* Socketed the way the stash board shows a rescued mod: the blueprint
+          tile sitting in a hollow lit by the mods' own purple. */}
+      <TierPlate
+        color={MOD_ACCENT}
+        size={112}
+        className='relative shrink-0 self-start'>
+        <ModArt modId={offer.featureId} size={96} />
+      </TierPlate>
+
+      <div className='relative flex min-w-0 flex-1 flex-col gap-3'>
+        <div className='flex flex-wrap items-center gap-2'>
+          <Chip color='purple' className='px-2 py-0.5 text-[10px]'>
+            <Sparkles size={10} strokeWidth={2.5} />
+            Mod of the day
+          </Chip>
+          <span className='text-[11px] font-semibold text-purple-300'>
+            {offer.modKind === "guitar" ? "Guitar mod" : "Pedal mod"}
+          </span>
           {isTopRoll && (
-            <Chip color='purple' className='px-2 py-0.5'>
+            <Chip color='amber' className='px-2 py-0.5 text-[10px]'>
               Top roll
             </Chip>
           )}
-          <span className='text-xs font-semibold text-purple-300'>
-            {offer.modKind === "guitar" ? "Guitar mod" : "Pedal mod"}
-          </span>
-          <span className='text-xs tabular-nums text-zinc-400'>
-            {available ? "1 left" : "Taken today"}
-          </span>
         </div>
-      </div>
 
-      <div className='flex flex-col gap-1.5'>
-        <span className='truncate text-base font-bold text-zinc-100'>
+        <span className='truncate text-xl font-bold leading-tight text-zinc-100'>
           {offer.label}
         </span>
-        {/* The ceiling belongs to the roll, not to the price — a `+3` means
-            nothing without knowing whether 4 or 8 was the best it could be. */}
-        <span className='flex items-baseline gap-1.5'>
-          <span className='text-lg font-black tabular-nums text-purple-300'>
-            +{offer.points}
-          </span>
-          <span className='text-xs tabular-nums text-zinc-400'>
-            of {offer.maxPoints} max
-          </span>
-        </span>
-        <OfferPrice unitPrice={offer.unitPrice} />
-      </div>
 
-      <div className='mt-auto flex flex-col gap-3'>
+        <RollMeter
+          points={offer.points}
+          minPoints={offer.minPoints}
+          maxPoints={offer.maxPoints}
+          color={MOD_ACCENT}
+        />
+
+        <div className='mt-auto flex flex-wrap items-center justify-between gap-3 pt-1'>
+          <OfferPrice unitPrice={offer.unitPrice} />
+          <span className='text-[11px] text-zinc-500'>
+            {available ? "1 left · lands in your stash" : "Taken for today"}
+          </span>
+        </div>
+
         {available ? (
           <BuyButton
             price={offer.unitPrice}

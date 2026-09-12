@@ -193,6 +193,8 @@ export const StashTile = ({
     boxShadow: glow,
   };
 
+  const artFilter = "drop-shadow(0 3px 7px rgba(0,0,0,0.7))";
+
   const tile = (
     <Socket
       {...(onClick ? { type: "button" as const, onClick, disabled } : {})}
@@ -233,7 +235,9 @@ export const StashTile = ({
       {art ? (
         // Stretched rather than shrink-wrapped: art that wants the whole socket
         // takes it, and art with a size of its own still lands in the middle.
-        <span className='pointer-events-none absolute inset-0 flex items-center justify-center transition-transform duration-200 group-hover:scale-110'>
+        <span
+          className='pointer-events-none absolute inset-0 flex items-center justify-center'
+          style={{ filter: artFilter }}>
           {art}
         </span>
       ) : imageRotated ? (
@@ -251,7 +255,7 @@ export const StashTile = ({
           style={
             {
               transform: "translate(-50%, -50%) rotate(-90deg)",
-              filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.7))",
+              filter: artFilter,
               WebkitUserDrag: "none",
             } as CSSProperties
           }
@@ -264,10 +268,10 @@ export const StashTile = ({
           loading='lazy'
           decoding='async'
           draggable={false}
-          className='pointer-events-none relative max-h-[84%] max-w-[84%] object-contain transition-transform duration-200 group-hover:scale-105'
+          className='pointer-events-none relative max-h-[84%] max-w-[84%] object-contain'
           style={
             {
-              filter: "drop-shadow(0 3px 7px rgba(0,0,0,0.7))",
+              filter: artFilter,
               WebkitUserDrag: "none",
             } as CSSProperties
           }

@@ -62,7 +62,7 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
             started with scrolling past the whole collection. */}
         <button
           onClick={() => setRackOpen(true)}
-          className='flex items-center gap-3 rounded-lg bg-zinc-900/40 p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50 hover:bg-zinc-900/70 lg:hidden'>
+          className='flex items-center gap-3 rounded-lg bg-zinc-900/40 p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 hover:bg-zinc-900/70 lg:hidden'>
           <Guitar size={18} className='shrink-0 text-zinc-500' />
           <span className='flex min-w-0 flex-1 flex-col gap-1'>
             <span className='truncate text-sm font-bold text-zinc-100'>

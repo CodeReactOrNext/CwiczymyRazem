@@ -1,4 +1,11 @@
 import { Input } from "assets/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "assets/components/ui/select";
 import { cn } from "assets/lib/utils";
 import type {
   CollectionScope,
@@ -69,14 +76,15 @@ const VIEWS: { id: CollectionView; label: string; Icon: typeof LayoutGrid }[] =
     { id: "cards", label: "Cards", Icon: Rows3 },
   ];
 
-/** Same chip language as the workshop rack, so the two lists are operated alike. */
+/** Same chip language as the workshop rack, so the two lists are operated alike.
+    `h-full` so every chip fills the shared 36px control height set on its group. */
 const segmentClass = (isActive: boolean) =>
   cn(
-    "flex items-center justify-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold transition-colors",
-    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
+    "flex h-full items-center justify-center gap-1.5 rounded px-3 text-xs font-semibold transition-colors",
+    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
     isActive
-      ? "bg-zinc-100 text-zinc-900"
-      : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200",
+      ? "bg-arsenal-accent/15 text-arsenal-accent"
+      : "text-arsenal-text-tertiary hover:bg-white/[0.06] hover:text-arsenal-text-primary",
   );
 
 /**
@@ -106,9 +114,14 @@ export const CollectionToolbar = ({
     pedals: pedalCount,
   };
 
+  // Only the stash view can honour manual/type ordering — see `isStashOnlySort`.
+  const visibleSorts = SORTS.filter(
+    (s) => view === "stash" || !isStashOnlySort(s.id),
+  );
+
   return (
-    <div className='flex flex-col gap-3 rounded-lg bg-zinc-900/40 p-3 sm:flex-row sm:flex-wrap sm:items-center'>
-      <div className='flex gap-1 rounded-lg bg-zinc-950/50 p-1'>
+    <div className='flex flex-col gap-2.5 rounded-lg bg-arsenal-section p-3 sm:flex-row sm:items-center'>
+      <div className='flex h-9 shrink-0 gap-1 rounded-lg bg-arsenal-bg p-1'>
         {SCOPES.map((s) => (
           <button
             key={s.id}
@@ -121,49 +134,54 @@ export const CollectionToolbar = ({
         ))}
       </div>
 
-      <div className='relative min-w-0 flex-1 sm:min-w-[11rem]'>
+      {/* The one item that absorbs the row's slack — everything else is
+          content-sized, so the placeholder never gets squeezed. */}
+      <div className='relative min-w-0 flex-1'>
         <Search
           size={14}
-          className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500'
+          className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-arsenal-text-tertiary'
         />
         <Input
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           placeholder='Search your collection'
           aria-label='Search your collection'
-          className='h-9 border-0 bg-zinc-950/50 pl-9 text-sm text-zinc-200 placeholder:text-zinc-500'
+          className='h-9 border-0 bg-arsenal-bg pl-9 text-sm text-arsenal-text-primary placeholder:text-arsenal-text-tertiary'
         />
       </div>
 
-      {/* Six orders is more than one row can hold on a narrow screen, so the
-          chips wrap rather than shrinking into unreadable stubs — and the group
-          says what it is, since "Equipped" next to the scope chips could as
-          easily be read as another filter. */}
-      <div className='flex flex-wrap items-center gap-1 rounded-lg bg-zinc-950/50 p-1'>
-        <ArrowUpDown
-          size={13}
-          aria-hidden
-          className='mx-1.5 shrink-0 text-zinc-500'
-        />
-        {SORTS.filter((s) => view === "stash" || !isStashOnlySort(s.id)).map(
-          (s) => (
-            <button
-              key={s.id}
-              onClick={() => onSortChange(s.id)}
-              aria-pressed={sort === s.id}
-              title={s.hint}
-              className={cn(
-                segmentClass(sort === s.id),
-                "flex-1 sm:flex-none",
-              )}>
+      {/* A dropdown rather than six chips: at three controls wide it no longer
+          needs its own row's worth of space, and the current order still reads
+          straight off the trigger. */}
+      <Select
+        value={sort}
+        onValueChange={(value) => onSortChange(value as CollectionSort)}>
+        <SelectTrigger
+          aria-label='Sort by'
+          className='h-9 w-full shrink-0 gap-2 border-0 bg-arsenal-bg px-3 text-xs font-semibold text-arsenal-text-primary sm:w-[9.5rem]'>
+          <span className='flex items-center gap-1.5 text-arsenal-text-tertiary'>
+            <ArrowUpDown size={13} aria-hidden />
+            Sort:
+          </span>
+          {/* Explicit children rather than the auto-detected label — Radix only
+              knows an item's label once it has mounted inside the (closed by
+              default) content portal, so the trigger would show blank until
+              the menu had been opened once. */}
+          <SelectValue>
+            {visibleSorts.find((s) => s.id === sort)?.label}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {visibleSorts.map((s) => (
+            <SelectItem key={s.id} value={s.id} title={s.hint}>
               {s.label}
-            </button>
-          ),
-        )}
-      </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       {showViewSwitch && (
-        <div className='flex gap-1 rounded-lg bg-zinc-950/50 p-1'>
+        <div className='flex h-9 shrink-0 gap-1 rounded-lg bg-arsenal-bg p-1'>
           {VIEWS.map(({ id, label, Icon }) => (
             <button
               key={id}

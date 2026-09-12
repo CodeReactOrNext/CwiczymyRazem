@@ -10,20 +10,19 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { ArcTuner } from "feature/tuner/components/ArcTuner";
+import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
+import { TunerDialog } from "feature/tuner/components/TunerDialog";
+import { TuningForkIcon } from "feature/tuner/components/TuningForkIcon";
 import { RippleButton } from "hooks/useRipple";
-import { Bug, Check, ChevronDown, Lock, Snail, X } from "lucide-react";
+import { Bug, Check, ChevronDown, Lock, Snail } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaMicrophone, FaSync } from "react-icons/fa";
 import { GiGuitar, GiGuitarHead } from "react-icons/gi";
-import type { GuitarTuningPreset } from "utils/audio/tunings";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
-import { TUNER_IN_TUNE_CENTS, useLiveTuner } from "../hooks/useLiveTuner";
-import { AmpSimButton } from "./AmpSimButton";
 import {
   MicTroubleshooting,
   MicTroubleshootingDialog,
@@ -155,167 +154,6 @@ export function SpeedDropdown({
         })}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-function TuningForkIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox='0 0 16 16'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='1.5'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      aria-hidden>
-      {/* two prongs */}
-      <path d='M5 2 C5 2 5 7 5 8 C5 9.5 6.5 10.5 8 10.5 C9.5 10.5 11 9.5 11 8 C11 7 11 2 11 2' />
-      {/* stem */}
-      <line x1='8' y1='10.5' x2='8' y2='15' />
-    </svg>
-  );
-}
-
-/** Splits a reference name like "F#2" into the note letter and its octave. */
-function splitNoteName(name: string): [string, string] {
-  const match = /^([A-G]#?)(-?\d+)$/.exec(name);
-  return match ? [match[1], match[2]] : [name, ""];
-}
-
-function TunerDialog({
-  frequencyRef,
-  volumeRef,
-  isMicEnabled,
-  tuning,
-  isTuningLocked,
-  onClose,
-}: {
-  frequencyRef: React.RefObject<number>;
-  volumeRef: React.RefObject<number>;
-  isMicEnabled: boolean;
-  /** The tuning actually driving detection right now — the tuner has to target
-   *  the same open strings the exercise is graded against. */
-  tuning: GuitarTuningPreset;
-  isTuningLocked: boolean;
-  onClose: () => void;
-}) {
-  const { cents, hasNote, activeIndex, strings, tuned } = useLiveTuner(
-    frequencyRef,
-    volumeRef,
-    tuning,
-  );
-  const abs = Math.abs(cents);
-  const isInTune = hasNote && abs <= TUNER_IN_TUNE_CENTS;
-  const isClose = hasNote && abs < 25;
-  const noteColor = !hasNote
-    ? "text-zinc-600"
-    : isInTune
-      ? "text-emerald-400"
-      : isClose
-        ? "text-amber-400"
-        : "text-red-400";
-
-  const target = strings[activeIndex];
-  const [targetNote, targetOctave] = splitNoteName(target.name);
-  const allTuned = tuned.every(Boolean);
-
-  const statusText = !hasNote
-    ? "Play an open string"
-    : isInTune
-      ? "In tune — hold it"
-      : cents > 0
-        ? `${Math.round(abs)}¢ sharp — tune down`
-        : `${Math.round(abs)}¢ flat — tune up`;
-
-  return (
-    <div
-      className='fixed inset-0 z-[9999999] flex items-center justify-center bg-black/60 backdrop-blur-sm'
-      onClick={onClose}>
-      <div
-        className='relative w-80 rounded-lg bg-zinc-900 p-6 shadow-2xl'
-        onClick={(e) => e.stopPropagation()}>
-        <RippleButton
-          onClick={onClose}
-          className='absolute right-4 top-4 text-zinc-500 transition-colors hover:text-white'>
-          <X size={16} />
-        </RippleButton>
-
-        <p className='text-center text-[10px] font-semibold tracking-wide text-zinc-500'>
-          Tuner
-        </p>
-        <p className='mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-zinc-300'>
-          {isTuningLocked && <Lock className='h-3 w-3 shrink-0 text-zinc-500' />}
-          {tuning.name}
-        </p>
-
-        {!isMicEnabled && (
-          <p className='mt-4 text-center text-xs text-zinc-500'>
-            Enable Pitch Detect to use the tuner
-          </p>
-        )}
-
-        {/* Every open string of the active tuning — the ones still to tune stay
-            quiet, the string being played lifts, tuned ones go green. */}
-        <div className='mt-5 flex justify-center gap-1.5'>
-          {strings.map((str, index) => {
-            const isDone = tuned[index];
-            const isActive = hasNote && index === activeIndex;
-            return (
-              <span
-                key={str.string}
-                title={`String ${str.string} — ${str.name} (${str.hz.toFixed(1)} Hz)`}
-                className={cn(
-                  "font-mono rounded-md px-2 py-1.5 text-[11px] font-bold tabular-nums transition-colors duration-200",
-                  isDone
-                    ? "bg-emerald-500/15 text-emerald-400"
-                    : isActive
-                      ? "bg-white/15 text-white"
-                      : "bg-zinc-800/60 text-zinc-500",
-                )}>
-                {str.name}
-              </span>
-            );
-          })}
-        </div>
-
-        <div className='mt-5'>
-          <ArcTuner cents={cents} hasNote={hasNote} />
-        </div>
-
-        <div className='mt-2 flex flex-col items-center gap-0.5'>
-          <span
-            className={cn(
-              "font-mono text-5xl font-bold tracking-tight transition-colors duration-200",
-              noteColor,
-            )}>
-            {targetNote}
-          </span>
-          <span className='font-mono text-sm text-zinc-600'>
-            {targetOctave}
-          </span>
-          <span
-            className={cn(
-              "font-mono mt-1 text-sm transition-colors duration-200",
-              noteColor,
-            )}>
-            {hasNote
-              ? cents > 0
-                ? `+${Math.round(cents)}¢`
-                : `${Math.round(cents)}¢`
-              : "—"}
-          </span>
-        </div>
-
-        <p
-          className={cn(
-            "mt-4 text-center text-xs font-medium transition-colors duration-200",
-            allTuned ? "text-emerald-400" : "text-zinc-500",
-          )}>
-          {allTuned ? "All strings in tune" : statusText}
-        </p>
-      </div>
-    </div>
   );
 }
 

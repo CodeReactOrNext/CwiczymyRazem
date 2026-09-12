@@ -33,7 +33,7 @@ export const BuildLog = ({ entries }: BuildLogProps) => {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className='flex items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50'>
+        className='flex items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60'>
         <span className='flex flex-col gap-1'>
           <SectionLabel>Build log</SectionLabel>
           <span className='text-xs text-zinc-500'>

@@ -50,7 +50,7 @@ interface SalvageShelfProps {
 }
 
 const rowClass =
-  "flex items-center gap-3 rounded-lg bg-zinc-800/40 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50 hover:bg-zinc-800/70";
+  "flex items-center gap-3 rounded-lg bg-zinc-800/40 p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 hover:bg-zinc-800/70";
 
 /**
  * Loose parts and rescued mods, as a list you can act on.

@@ -6,7 +6,7 @@ import {
 } from "feature/arsenal/utils/stashLayout";
 import type { CSSProperties, ReactNode, RefObject } from "react";
 
-export const STASH_GAP = 4;
+export const STASH_GAP = 6;
 /** Below this the board stops shrinking and starts scrolling sideways. */
 export const STASH_MIN_CELL = 46;
 
@@ -45,7 +45,7 @@ export const StashBoard = ({
 }: StashBoardProps) => (
   <div
     className={cn(
-      "overflow-x-auto rounded-lg p-2 transition-shadow",
+      "overflow-x-auto rounded-lg p-3 transition-shadow",
       className,
     )}
     style={{

@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
+import { TunerButton } from "feature/tuner/components/TunerButton";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { ChevronLeft, ChevronRight, House } from "lucide-react";
 import { useRouter } from "next/router";
@@ -26,10 +28,10 @@ const NavButton = ({
 
 /**
  * Persistent, app-wide title bar for the Electron desktop shell — back /
- * forward / home navigation on the left, minimize/maximize/close on the
- * right (Spotify-desktop-style single strip). Mounted once, globally, in
- * _app.tsx; the app's own content reserves `pt-10` for it there so nothing
- * renders underneath.
+ * forward / home navigation on the left, the tuner, the amp switch and
+ * minimize/maximize/close on the right (Spotify-desktop-style single strip).
+ * Mounted once, globally, in _app.tsx; the app's own content reserves `pt-10`
+ * for it there so nothing renders underneath.
  *
  * Portalled straight into `document.body` rather than rendered in place:
  * `position: fixed` only anchors to the viewport as long as no ancestor sets
@@ -66,21 +68,40 @@ export const ElectronTitleBar = () => {
         <NavButton label='Dalej' onClick={() => window.history.forward()}>
           <ChevronRight size={16} strokeWidth={2} />
         </NavButton>
-        <NavButton label='Panel główny' onClick={() => router.push("/dashboard")}>
+        <NavButton
+          label='Panel główny'
+          onClick={() => router.push("/dashboard")}>
           <House size={14} strokeWidth={2} />
         </NavButton>
       </div>
 
-      {!isMac && (
-        <WindowControls
-          isMaximized={isMaximized}
-          onMinimize={minimize}
-          onToggleMaximize={toggleMaximize}
-          onClose={close}
-          className='h-10'
-        />
-      )}
+      <div className='flex items-center'>
+        {/* The amp runs in the main process and outlives every page, so its
+            switch belongs on the one strip that outlives them too — reachable
+            from a practice session, Tone Studio or the dashboard alike. Drag
+            has to be switched off around it (the bar itself is a drag region)
+            and the bar's double-click-to-maximize suppressed, or opening the
+            panel would throw the window around. Renders nothing on web. */}
+        <div
+          className='flex items-center gap-1.5 px-2 [-webkit-app-region:no-drag]'
+          onDoubleClick={(e) => e.stopPropagation()}>
+          {/* The tuner sits with the amp for the same reason: you tune before
+              you open a session, and it uses the same interface. */}
+          <TunerButton h='h-7' />
+          <AmpSimButton h='h-7' variant='titlebar' />
+        </div>
+
+        {!isMac && (
+          <WindowControls
+            isMaximized={isMaximized}
+            onMinimize={minimize}
+            onToggleMaximize={toggleMaximize}
+            onClose={close}
+            className='h-10'
+          />
+        )}
+      </div>
     </div>,
-    document.body
+    document.body,
   );
 };

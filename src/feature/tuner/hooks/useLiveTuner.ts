@@ -1,10 +1,11 @@
-import type { StringTunerResult } from "feature/tuner/hooks/useStringTuner";
-import { useStringTuner } from "feature/tuner/hooks/useStringTuner";
 import { useMemo } from "react";
 import type { GuitarTuningPreset, TuningStringRef } from "utils/audio/tunings";
 import { getTuningStrings } from "utils/audio/tunings";
 
-export { TUNER_IN_TUNE_CENTS } from "feature/tuner/hooks/useStringTuner";
+import type { StringTunerResult } from "./useStringTuner";
+import { useStringTuner } from "./useStringTuner";
+
+export { TUNER_IN_TUNE_CENTS } from "./useStringTuner";
 
 export interface LiveTunerResult extends StringTunerResult {
   /** Open-string reference pitches for the active tuning, low string (6) first. */

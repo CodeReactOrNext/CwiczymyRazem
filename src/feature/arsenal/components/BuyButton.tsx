@@ -43,14 +43,14 @@ export const BuyButton = ({
       disabled={isBuying || !canAfford}
       title={!canAfford ? "Not enough Fame Points" : undefined}
       className={cn(
-        "flex items-center justify-between gap-3 rounded-lg font-bold transition-colors click-behavior",
-        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        "flex items-center justify-between gap-3 rounded-lg font-bold transition-colors duration-150 click-behavior",
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         size === "sm" ? "h-9 px-3 text-xs" : "h-10 px-4 text-sm",
         canAfford
           ? solid
-            ? "bg-zinc-100 text-zinc-900 hover:bg-white"
-            : "bg-zinc-100/10 text-zinc-100 hover:bg-zinc-100/20"
-          : "cursor-not-allowed bg-zinc-800/60 text-zinc-500",
+            ? "bg-arsenal-accent text-arsenal-bg hover:bg-arsenal-accent/90"
+            : "bg-arsenal-accent/15 text-arsenal-accent hover:bg-arsenal-accent/25"
+          : "cursor-not-allowed bg-arsenal-card text-arsenal-text-tertiary",
         isBuying && "cursor-wait opacity-70",
         className,
       )}>
@@ -58,16 +58,17 @@ export const BuyButton = ({
         <ShoppingCart size={size === "sm" ? 13 : 15} strokeWidth={2.5} />
         {isBuying ? "Buying…" : canAfford ? "Buy" : "Not enough Fame"}
       </span>
-      {/* Fame keeps its amber on the dark button — the coin art alone is a dark
-          bronze and reads as a smudge against a near-black surface. */}
+      {/* Fame keeps its gold on the soft (card-grid) button — on the solid
+          turquoise CTA, amber-on-turquoise is nearly unreadable, so the price
+          takes the same dark text as the rest of that button instead. */}
       <span
         className={cn(
           "flex items-center gap-1.5 tabular-nums",
           canAfford
             ? solid
-              ? "text-zinc-900"
+              ? "text-arsenal-bg"
               : "text-amber-400"
-            : "text-zinc-500",
+            : "text-arsenal-text-tertiary",
         )}>
         <img
           src='/images/coin.png'

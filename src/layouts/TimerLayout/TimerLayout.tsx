@@ -15,7 +15,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
-import { AmpSimButton } from "feature/exercisePlan/views/PracticeSession/components/AmpSimButton";
+import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Loader2, RotateCcw } from "lucide-react";

@@ -22,16 +22,18 @@ import { useWorkshopRepair } from "feature/arsenal/hooks/useWorkshopRepair";
 import type { WorkshopModAction } from "feature/arsenal/types/arsenal.types";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
-import { X } from "lucide-react";
+import { Lock, Wrench, X } from "lucide-react";
 import { useState } from "react";
 
 import { SectionLabel, sectionLabelClass } from "../SectionLabel";
-import { ConditionDelta, LevelDelta, RarityDelta } from "./BeforeAfter";
 import { BuildLadder } from "./BuildLadder";
-import { CostList } from "./CostList";
+import { BuildPanel } from "./BuildPanel";
+import { CostTable } from "./CostTable";
+import { MaterialsBill } from "./MaterialsBill";
 import { ModPicker } from "./ModPicker";
 import { ModRemoveDialog } from "./ModRemoveDialog";
-import { GateRow, RewardPanel } from "./RewardPanel";
+import { RestorePanel } from "./RestorePanel";
+import { GateRow } from "./RewardPanel";
 import type { WorkshopResult } from "./WorkshopResultView";
 import { WorkshopResultView } from "./WorkshopResultView";
 
@@ -183,16 +185,21 @@ export const WorkshopJobModal = ({
   const title = result
     ? "Done"
     : job === "repair"
-      ? `Restore to ${repairQuote.target}`
+      ? `Restore ${entry.name}`
       : job === "mod"
         ? "Install mod"
-        : buildLabel(buildQuote);
+        : `Upgrade ${entry.name}`;
 
+  // The restoration and the upgrade read as a line about the job — what it
+  // does, or where it goes — because the item is already in their titles.
   const caption = result
     ? entry.name
-    : job === "repair" || job === "mod"
-      ? entry.name
-      : `${entry.name} · build ${entry.buildLevel} → ${buildQuote.requirement.level}`;
+    : job === "repair"
+      ? `Improve condition and gain ${repairQuote.gain} ${repairQuote.gain === 1 ? "level" : "levels"}.`
+      : job === "mod"
+        ? entry.name
+        : `Build ${entry.buildLevel} → Build ${buildQuote.requirement.level}`;
+  const captionIsSentence = !result && job !== "mod";
 
   // The quotes behind these were already recomputed by the refetch the job
   // triggered, so what is offered here is what the player can actually afford now.
@@ -244,20 +251,36 @@ export const WorkshopJobModal = ({
           job === "mod" ? "sm:max-w-5xl" : "sm:max-w-3xl",
         )}>
         <div className='flex items-start justify-between gap-4'>
-          <div className='flex flex-col gap-1'>
-            <DialogDescription className={sectionLabelClass}>
-              {caption}
-            </DialogDescription>
-            <DialogTitle className='text-2xl font-black text-white'>
-              {title}
-            </DialogTitle>
+          <div className='flex min-w-0 items-center gap-4'>
+            {/* The item on the bench, so the dialog is unmistakably about it. */}
+            <span className='flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-zinc-950/60'>
+              <img
+                src={entry.imageSrc}
+                alt=''
+                draggable={false}
+                className='h-14 w-14 object-contain'
+              />
+            </span>
+            <div className='flex min-w-0 flex-col gap-1'>
+              <DialogTitle className='text-2xl font-black text-white'>
+                {title}
+              </DialogTitle>
+              <DialogDescription
+                className={
+                  captionIsSentence
+                    ? "text-sm text-zinc-400"
+                    : sectionLabelClass
+                }>
+                {caption}
+              </DialogDescription>
+            </div>
           </div>
 
           <button
             onClick={close}
             disabled={isPending}
             aria-label='Close'
-            className='rounded-lg p-2 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50 disabled:opacity-40 hover:bg-zinc-800 hover:text-zinc-200'>
+            className='rounded-lg p-2 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 disabled:opacity-40 hover:bg-zinc-800 hover:text-zinc-200'>
             <X size={16} />
           </button>
         </div>
@@ -283,35 +306,43 @@ export const WorkshopJobModal = ({
           </>
         ) : job === "repair" ? (
           <>
-            <RewardPanel accent='emerald'>
-              <ConditionDelta
-                from={repairQuote.fromCondition}
-                to={repairQuote.toCondition}
-              />
-              <LevelDelta
-                from={entry.level}
-                to={entry.level + repairQuote.gain}
-                rarity={entry.rarity}
-              />
-            </RewardPanel>
+            <RestorePanel
+              fromCondition={repairQuote.fromCondition}
+              toCondition={repairQuote.toCondition}
+              fromLevel={entry.level}
+              toLevel={entry.level + repairQuote.gain}
+            />
 
-            <CostList recipe={repairQuote.recipe} />
+            <MaterialsBill
+              recipe={repairQuote.recipe}
+              job='restoration'
+              readyLabel='Ready to restore'
+            />
 
-            <button
-              onClick={runRepair}
-              disabled={!repairQuote.canRepair || isPending}
-              className={cn(
-                "rounded-lg px-5 py-3.5 text-sm font-bold transition-colors",
-                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400",
-                "disabled:pointer-events-none disabled:opacity-40",
-                repairQuote.canRepair
-                  ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
-                  : "bg-zinc-800/60 text-zinc-500",
-              )}>
-              {repair.isPending
-                ? "Restoring…"
-                : `Restore to ${repairQuote.target}`}
-            </button>
+            <div className='flex flex-col gap-3 sm:flex-row'>
+              <button
+                onClick={close}
+                disabled={isPending}
+                className='rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44'>
+                Cancel
+              </button>
+              <button
+                onClick={runRepair}
+                disabled={!repairQuote.canRepair || isPending}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2.5 rounded-lg px-5 py-3.5 text-sm font-bold transition-colors",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400",
+                  "disabled:pointer-events-none disabled:opacity-40",
+                  repairQuote.canRepair
+                    ? "bg-emerald-400 text-zinc-950 hover:bg-emerald-300"
+                    : "bg-zinc-800/60 text-zinc-500",
+                )}>
+                <Wrench size={16} />
+                {repair.isPending
+                  ? "Restoring…"
+                  : `Restore to ${repairQuote.target}`}
+              </button>
+            </div>
           </>
         ) : job === "mod" ? (
           <>
@@ -353,27 +384,25 @@ export const WorkshopJobModal = ({
           </>
         ) : (
           <>
-            <RewardPanel accent='cyan'>
-              {buildQuote.requirement.promotesTo && (
-                <RarityDelta
-                  from={entry.rarity}
-                  to={buildQuote.requirement.promotesTo}
-                />
-              )}
-              <LevelDelta
-                from={entry.level}
-                to={entry.level + buildQuote.gain}
-                rarity={buildQuote.requirement.promotesTo ?? entry.rarity}
-              />
-            </RewardPanel>
+            <BuildPanel
+              fromBuild={entry.buildLevel}
+              toBuild={buildQuote.requirement.level}
+              fromLevel={entry.level}
+              toLevel={entry.level + buildQuote.gain}
+              promotesTo={buildQuote.requirement.promotesTo}
+            />
 
             <GateRow
               ok={conditionCheck.ok}
               condition={entry.condition}
               required={getGradeByRank(conditionCheck.required)}
+              onRestore={
+                repairQuote.canRepair ? () => goTo("repair") : undefined
+              }
             />
 
-            <CostList
+            <CostTable
+              title='Upgrade cost'
               recipe={buildQuote.recipe}
               fame={{
                 need: fameCheck.required,
@@ -383,19 +412,32 @@ export const WorkshopJobModal = ({
 
             <BuildLadder subject={entry.subject} wallet={wallet} />
 
-            <button
-              onClick={runBuild}
-              disabled={!buildQuote.canBuild || isPending}
-              className={cn(
-                "rounded-lg px-5 py-3.5 text-sm font-bold transition-colors",
-                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
-                "disabled:pointer-events-none disabled:opacity-40",
-                buildQuote.canBuild
-                  ? "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25"
-                  : "bg-zinc-800/60 text-zinc-500",
-              )}>
-              {build.isPending ? "Building…" : buildLabel(buildQuote)}
-            </button>
+            <div className='flex flex-col gap-3 sm:flex-row'>
+              <button
+                onClick={close}
+                disabled={isPending}
+                className='rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44'>
+                Cancel
+              </button>
+              <button
+                onClick={runBuild}
+                disabled={!buildQuote.canBuild || isPending}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2.5 rounded-lg px-5 py-3.5 text-sm font-bold transition-colors",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
+                  "disabled:pointer-events-none disabled:opacity-40",
+                  buildQuote.canBuild
+                    ? "bg-cyan-400 text-zinc-950 hover:bg-cyan-300"
+                    : "bg-zinc-800/60 text-zinc-500",
+                )}>
+                {!conditionCheck.ok && <Lock size={16} />}
+                {build.isPending
+                  ? "Building…"
+                  : buildQuote.requirement.promotesTo
+                    ? buildLabel(buildQuote)
+                    : `Upgrade to Build ${buildQuote.requirement.level}`}
+              </button>
+            </div>
           </>
         )}
       </DialogContent>

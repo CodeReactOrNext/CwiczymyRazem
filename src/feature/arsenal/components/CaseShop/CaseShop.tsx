@@ -13,18 +13,17 @@ interface CaseShopProps {
   freeTokens?: number;
 }
 
-/** Ordered as the price ladder reads: Premium pair first, then the Elite pair,
-    so cost climbs left to right and the pairs stack by tier when it wraps. */
-const POOL_CASES = [
+/** Two rows of three, read as a ladder: the guitar cases climb Standard →
+    Premium → Elite across the top, and the bottom row mirrors it with the
+    two pedal cases sitting under their guitar siblings. */
+const SHELF = [
+  "standard",
   "premium-guitar",
-  "premium-effect",
   "elite-guitar",
+  "supporter",
+  "premium-effect",
   "elite-effect",
 ] as const;
-
-/** The two that stand alone: everything else on the shelf comes as a
-    guitar/effect pair, and these two draw from a pool of their own. */
-const SOLO_CASES = ["standard", "supporter"] as const;
 
 export const CaseShop = ({
   currentFame,
@@ -36,7 +35,7 @@ export const CaseShop = ({
     onOpenCase(id as CaseType, useToken);
 
   return (
-    <div className='flex w-full flex-col gap-8'>
+    <div className='flex w-full flex-col gap-10'>
       <DailyCaseCard
         currentFame={currentFame}
         onOpen={openCard}
@@ -44,12 +43,17 @@ export const CaseShop = ({
         freeTokens={freeTokens}
       />
 
-      {/* The permanent shelf. Standard and Supporter take the top row two-up —
-          wider tiles than the row below, which keeps the pair from reading as
-          the first two of a six-case grid — with the four pool cases under it. */}
-      <div className='flex flex-col gap-4'>
-        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
-          {SOLO_CASES.map((id) => (
+      <section className='flex flex-col gap-5'>
+        <div>
+          <h2 className='font-display text-2xl font-black text-zinc-100'>
+            Choose your case
+          </h2>
+          <p className='mt-1 text-sm text-zinc-500'>
+            Find the next piece of your sound.
+          </p>
+        </div>
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+          {SHELF.map((id) => (
             <CaseCard
               key={id}
               caseDef={CASE_DEFINITIONS[id]}
@@ -60,19 +64,7 @@ export const CaseShop = ({
             />
           ))}
         </div>
-        <div className='grid grid-cols-1 gap-4 xsm:grid-cols-2 lg:grid-cols-4'>
-          {POOL_CASES.map((id) => (
-            <CaseCard
-              key={id}
-              caseDef={CASE_DEFINITIONS[id]}
-              currentFame={currentFame}
-              onOpen={openCard}
-              isOpening={isOpening}
-              freeTokens={freeTokens}
-            />
-          ))}
-        </div>
-      </div>
+      </section>
     </div>
   );
 };

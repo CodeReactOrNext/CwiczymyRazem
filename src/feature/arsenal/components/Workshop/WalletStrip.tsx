@@ -35,7 +35,7 @@ export const WalletStrip = ({ parts }: WalletStripProps) => {
         aria-expanded={open}
         className={cn(
           "flex flex-wrap items-center gap-x-6 gap-y-2 text-left",
-          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         )}>
         <span className='flex items-center gap-2.5'>
           <Wrench size={16} className='text-zinc-500' />

@@ -252,6 +252,26 @@ module.exports = {
           600: "#059669",
         },
 
+        // Arsenal design system — scoped to this one feature (not a global
+        // palette swap): three flat surface levels instead of the various
+        // near-black zinc/gradient combinations the feature had accumulated,
+        // one interaction color, and a three-step text hierarchy. See
+        // src/feature/arsenal for usage; gold stays reserved for Fame and
+        // rarity keeps its own colors (RARITY_STYLES) — this token set is
+        // deliberately just surfaces, interaction and text.
+        arsenal: {
+          bg: "#101113",
+          section: "#17191D",
+          card: "#1E2126",
+          border: "#30343B",
+          accent: "#FFFFFF",
+          text: {
+            primary: "#F2F4F7",
+            secondary: "#B4BAC4",
+            tertiary: "#8C95A3",
+          },
+        },
+
         // Ivory — the single light-background section on the landing page
         // (see docs/STYLEGUIDE.md §3: app is otherwise dark-only). Values are
         // WCAG-AA-checked against `ivory` / `ivory-surface` — see the PR

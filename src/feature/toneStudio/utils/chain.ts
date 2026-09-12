@@ -6,8 +6,6 @@ export interface ChainBlock {
   key: "gate" | "overdrive" | "amp" | "cab" | "delay";
   label: (params: AmpParams) => string;
   accent: ToneAccent;
-  /** Tone Studio section the block is edited in (scroll target). */
-  sectionId: string;
   isActive: (params: AmpParams) => boolean;
   /** Patch that flips the block on/off. Absent for blocks that cannot be
    *  bypassed — the amp itself is always in the path. */
@@ -17,7 +15,7 @@ export interface ChainBlock {
 /**
  * Signal chain in the real DSP order of electron/ampSim.js `process()`:
  * gate → overdrive → (NAM model | classic preamp/tone-stack/drive) → cabinet →
- * delay. Single source for both the Tone Studio breadcrumb strip and the
+ * delay. Single source for both Tone Studio's rack of units and the
  * in-session quick toggles, so the two never disagree on order or state.
  */
 export const CHAIN_BLOCKS: ChainBlock[] = [
@@ -25,7 +23,6 @@ export const CHAIN_BLOCKS: ChainBlock[] = [
     key: "gate",
     label: () => "Gate",
     accent: "cyan",
-    sectionId: "chain-amp",
     isActive: (p) => p.gate,
     toggle: (p) => ({ gate: !p.gate }),
   },
@@ -33,7 +30,6 @@ export const CHAIN_BLOCKS: ChainBlock[] = [
     key: "overdrive",
     label: () => "Overdrive",
     accent: "orange",
-    sectionId: "chain-overdrive",
     isActive: (p) => p.overdriveEnabled,
     toggle: (p) => ({ overdriveEnabled: !p.overdriveEnabled }),
   },
@@ -41,14 +37,12 @@ export const CHAIN_BLOCKS: ChainBlock[] = [
     key: "amp",
     label: (p) => (p.namEnabled ? "Amp · NAM" : "Amp · Classic"),
     accent: "cyan",
-    sectionId: "chain-amp",
     isActive: () => true,
   },
   {
     key: "cab",
     label: () => "Cabinet",
     accent: "emerald",
-    sectionId: "chain-cabinet",
     isActive: (p) => p.cab,
     toggle: (p) => ({ cab: !p.cab }),
   },
@@ -56,7 +50,6 @@ export const CHAIN_BLOCKS: ChainBlock[] = [
     key: "delay",
     label: () => "Delay",
     accent: "amber",
-    sectionId: "chain-delay",
     isActive: (p) => p.delayEnabled,
     toggle: (p) => ({ delayEnabled: !p.delayEnabled }),
   },

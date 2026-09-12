@@ -21,6 +21,11 @@ const CLIP_HOLD_MS = 1200;
 
 interface InputMeterProps {
   className?: string;
+  /** "lg" is the gate panel's headline meter — same readings, room to see the
+   *  noise floor you're setting the gate against. */
+  size?: "sm" | "lg";
+  /** Hidden on the top rail, where the bar sits next to its own icon. */
+  showLabel?: boolean;
 }
 
 /**
@@ -30,7 +35,11 @@ interface InputMeterProps {
  * that only needs a width and a colour. Renders an empty bar (never crashes)
  * on desktop shells too old to send meter events.
  */
-export const InputMeter = ({ className }: InputMeterProps) => {
+export const InputMeter = ({
+  className,
+  size = "sm",
+  showLabel = true,
+}: InputMeterProps) => {
   const fillRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
 
@@ -78,8 +87,19 @@ export const InputMeter = ({ className }: InputMeterProps) => {
 
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <span className='w-10 shrink-0 text-[11px] text-zinc-400'>Input</span>
-      <div className='h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800'>
+      {showLabel && (
+        <span className='w-10 shrink-0 text-[11px] text-zinc-400'>Input</span>
+      )}
+      <div
+        className={cn(
+          "flex-1 overflow-hidden rounded-full bg-zinc-800",
+          size === "lg" ? "h-3" : "h-1.5",
+        )}
+        style={
+          size === "lg"
+            ? { boxShadow: "inset 0 1px 3px rgba(0,0,0,0.8)" }
+            : undefined
+        }>
         <div
           ref={fillRef}
           className='h-full w-0 rounded-full transition-[background-color] duration-150'
@@ -87,7 +107,10 @@ export const InputMeter = ({ className }: InputMeterProps) => {
       </div>
       <span
         ref={labelRef}
-        className='font-mono w-12 shrink-0 text-right text-[11px] tabular-nums text-zinc-400'>
+        className={cn(
+          "font-mono shrink-0 text-right tabular-nums text-zinc-400",
+          size === "lg" ? "w-16 text-sm" : "w-12 text-[11px]",
+        )}>
         —
       </span>
     </div>

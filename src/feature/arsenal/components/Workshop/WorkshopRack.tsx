@@ -60,21 +60,21 @@ export const WorkshopRack = ({
     <div
       className={cn(
         "flex flex-col gap-5",
-        !bare && "rounded-lg bg-zinc-900/40 p-5",
+        !bare && "rounded-lg bg-arsenal-section p-5",
       )}>
       <SectionLabel>Your gear</SectionLabel>
 
-      <div className='flex gap-1 rounded-lg bg-zinc-950/50 p-1'>
+      <div className='flex gap-1 rounded-lg bg-arsenal-bg p-1'>
         {FILTERS.map((f) => (
           <button
             key={f.id}
             onClick={() => setFilter(f.id)}
             className={cn(
               "flex flex-1 items-center justify-center gap-1.5 rounded px-2 py-1.5 text-xs font-semibold transition-colors",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
               filter === f.id
-                ? "bg-zinc-100 text-zinc-900"
-                : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200",
+                ? "bg-arsenal-accent/15 text-arsenal-accent"
+                : "text-arsenal-text-tertiary hover:bg-white/[0.06] hover:text-arsenal-text-primary",
             )}>
             {f.label}
             <span className='tabular-nums opacity-60'>{counts[f.id]}</span>
@@ -85,13 +85,13 @@ export const WorkshopRack = ({
       <div className='relative'>
         <Search
           size={14}
-          className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500'
+          className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-arsenal-text-tertiary'
         />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder='Search the rack'
-          className='h-9 border-0 bg-zinc-950/50 pl-9 text-sm text-zinc-200 placeholder:text-zinc-600'
+          className='h-9 border-0 bg-arsenal-bg pl-9 text-sm text-arsenal-text-primary placeholder:text-arsenal-text-tertiary'
         />
       </div>
 
@@ -101,7 +101,7 @@ export const WorkshopRack = ({
           !bare && "max-h-[600px] overflow-y-auto",
         )}>
         {visible.length === 0 ? (
-          <p className='py-10 text-center text-xs text-zinc-500'>
+          <p className='py-10 text-center text-xs text-arsenal-text-tertiary'>
             Nothing matches that.
           </p>
         ) : (
@@ -114,11 +114,11 @@ export const WorkshopRack = ({
                 key={entry.id}
                 onClick={() => onSelect(entry)}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
-                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
+                  "flex items-center gap-3 rounded-lg border p-3 text-left transition-colors duration-150",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
                   isSelected
-                    ? "bg-zinc-800/70 ring-1 ring-cyan-500/40"
-                    : "bg-zinc-800/30 hover:bg-zinc-800/60",
+                    ? "border-arsenal-accent/40 bg-arsenal-card"
+                    : "border-transparent bg-arsenal-card/60 hover:border-arsenal-border hover:bg-arsenal-card",
                 )}>
                 {/* Rarity as a single mark rather than a wash across the whole row —
                     the wash sat under the name and made both hard to read. */}
@@ -142,7 +142,7 @@ export const WorkshopRack = ({
                 </span>
 
                 <span className='flex min-w-0 flex-1 flex-col gap-2'>
-                  <span className='truncate text-sm font-bold leading-tight text-zinc-100'>
+                  <span className='truncate text-sm font-semibold leading-tight text-arsenal-text-primary'>
                     {entry.name}
                   </span>
                   {/* Sits above the condition meter rather than off to the side:
@@ -156,11 +156,11 @@ export const WorkshopRack = ({
                 </span>
 
                 <span className='flex shrink-0 flex-col items-end gap-1'>
-                  <span className='text-sm font-black tabular-nums leading-none text-white'>
+                  <span className='text-sm font-semibold tabular-nums leading-none text-arsenal-text-primary'>
                     {entry.level}
                   </span>
                   {entry.buildLevel > 0 && (
-                    <span className='rounded bg-cyan-950/50 px-1.5 py-0.5 text-[10px] font-bold tabular-nums leading-none text-cyan-400'>
+                    <span className='rounded bg-arsenal-accent/15 px-1.5 py-0.5 text-[10px] font-bold tabular-nums leading-none text-arsenal-accent'>
                       +{entry.buildLevel}
                     </span>
                   )}

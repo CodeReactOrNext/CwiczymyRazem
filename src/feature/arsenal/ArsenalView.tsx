@@ -107,7 +107,8 @@ export const ArsenalView = () => {
         title="Guitar Arsenal"
         subtitle="Open cases, build your rig, keep your gear in shape"
         eyebrow="Collect & equip"
-        className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
+        compact
+        className="w-full !rounded-none !shadow-none !p-6 min-h-[120px] md:min-h-[132px] lg:min-h-[144px]"
         backgroundContent={<HeroPattern />}
         rightContent={
           // Fame is the only number that belongs to the whole module — it is
@@ -115,10 +116,10 @@ export const ArsenalView = () => {
           // Rig tab itself (`RigStatsPanel`): they are changed by moving gear,
           // so they read as stats of that screen rather than of the banner.
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
-              <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
-              <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
-              <span className="text-xs text-zinc-400">Fame Points</span>
+            <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-1.5">
+              <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
+              <span className="text-sm font-black text-amber-400">{fame.toLocaleString()}</span>
+              <span className="text-[11px] text-zinc-400">Fame</span>
             </div>
             {/*
               Shown even at zero, unlike most counters. A currency nobody knows
@@ -131,22 +132,28 @@ export const ArsenalView = () => {
               <TooltipTrigger asChild>
                 <div
                   className={cn(
-                    "flex items-center gap-2 rounded-lg px-4 py-2.5",
-                    freeCases > 0 ? "bg-cyan-500/10" : "bg-zinc-800/40",
+                    "flex items-center gap-1.5 rounded-lg px-3 py-1.5",
+                    freeCases > 0 ? "bg-arsenal-accent/10" : "bg-arsenal-card",
                   )}>
                   <Ticket
-                    size={20}
+                    size={14}
                     strokeWidth={2.5}
-                    className={freeCases > 0 ? "text-cyan-300" : "text-zinc-500"}
+                    className={
+                      freeCases > 0
+                        ? "text-arsenal-accent"
+                        : "text-arsenal-text-tertiary"
+                    }
                   />
                   <span
                     className={cn(
-                      "text-xl font-black tabular-nums",
-                      freeCases > 0 ? "text-cyan-300" : "text-zinc-500",
+                      "text-sm font-black tabular-nums",
+                      freeCases > 0
+                        ? "text-arsenal-accent"
+                        : "text-arsenal-text-tertiary",
                     )}>
                     {freeCases}
                   </span>
-                  <span className="text-xs text-zinc-400">
+                  <span className="text-[11px] text-arsenal-text-secondary">
                     Free {freeCases === 1 ? "case" : "cases"}
                   </span>
                 </div>
@@ -163,7 +170,7 @@ export const ArsenalView = () => {
       <div className="p-4">
         <div className="flex flex-col gap-6">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="bg-zinc-900 p-1 rounded-lg h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
+            <TabsList className="h-auto max-w-full justify-start gap-1 rounded-none border-b border-arsenal-border bg-transparent p-0 overflow-x-auto no-scrollbar">
               {ARSENAL_TABS.filter(isTabVisible).map((tab) => {
                 const { label, icon: Icon } = TAB_META[tab];
                 const hasNewDrop =
@@ -181,7 +188,7 @@ export const ArsenalView = () => {
                       {label}
                     </span>
                     {hasNewDrop && (
-                      <span className="ml-1 h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                      <span className="ml-1 h-2 w-2 rounded-full bg-arsenal-accent shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
                     )}
                   </TabsTrigger>
                 );

@@ -8,10 +8,11 @@ import type { SupplyTier } from "../../data/rigHardware";
  *
  * A fuel gauge, not a lesson. One pedal takes one output, so there is exactly
  * one number to read and one bar to read it off: holes used against holes
- * owned. It turns amber on the last output and red when a pedal on the board
- * has nothing feeding it, which is the only moment it has anything to say. The
- * button that fixes that sits in the section heading with the rest of the board
- * actions.
+ * owned. It turns amber on the last output — capacity is the only thing this
+ * stat itself measures. A pedal on the board with nothing feeding it is a
+ * different, more specific problem, so it gets its own red line below rather
+ * than recolouring the capacity count. The button that fixes that sits in the
+ * section heading with the rest of the board actions.
  */
 
 interface PowerPanelProps {
@@ -24,18 +25,22 @@ interface PowerPanelProps {
 
 export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
   const share = Math.min(1, state.outputsUsed / supply.outputs);
+  // Capacity only — amber at the last output. Whether a boarded pedal is
+  // actually fed is a separate question, answered by the note below.
   const tone =
-    unpowered.length > 0
-      ? { text: "text-red-400", bar: "bg-red-500/80" }
-      : state.outputsFree === 0
-        ? { text: "text-amber-400", bar: "bg-amber-500/80" }
-        : { text: "text-zinc-100", bar: "bg-amber-500/60" };
+    state.outputsFree === 0
+      ? { text: "text-amber-400", bar: "bg-amber-500/80" }
+      : { text: "text-arsenal-text-primary", bar: "bg-arsenal-accent/60" };
 
   return (
-    <div className='flex flex-col gap-3 rounded-lg bg-zinc-900/40 p-5'>
+    <div className='flex flex-col gap-3 rounded-lg bg-arsenal-section p-5'>
       <div className='flex items-center justify-between gap-4'>
-        <p className='text-[11px] tracking-wide text-zinc-500'>Power</p>
-        <p className='text-[11px] tracking-wide text-zinc-400'>{supply.name}</p>
+        <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
+          Power
+        </p>
+        <p className='text-[11px] tracking-wide text-arsenal-text-secondary'>
+          {supply.name}
+        </p>
       </div>
 
       <p className='flex items-baseline gap-1.5'>
@@ -46,13 +51,13 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
           )}>
           {state.outputsUsed}
         </span>
-        <span className='font-teko text-base leading-none text-zinc-500'>
+        <span className='font-teko text-base leading-none text-arsenal-text-tertiary'>
           / {supply.outputs} outputs
         </span>
       </p>
 
       <div className='flex flex-col gap-2'>
-        <div className='h-1.5 w-full overflow-hidden rounded bg-zinc-800/70'>
+        <div className='h-1.5 w-full overflow-hidden rounded bg-arsenal-bg'>
           <div
             className={cn(
               "h-full rounded transition-all duration-300",
@@ -61,7 +66,7 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
             style={{ width: `${share * 100}%` }}
           />
         </div>
-        <p className='text-[11px] tracking-wide text-zinc-500'>
+        <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
           {unpowered.length === 0 ? (
             <>Every pedal is running</>
           ) : (
@@ -74,7 +79,7 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
         {/* Said out loud because the rig level moves when it happens: a dead
             pedal is off the board as far as the game is concerned. */}
         {unpowered.length > 0 && (
-          <p className='text-[11px] tracking-wide text-zinc-500'>
+          <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
             A pedal with no power adds no rig level and earns no Fame.
           </p>
         )}

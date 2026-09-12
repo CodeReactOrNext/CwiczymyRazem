@@ -7,7 +7,7 @@ import {
   priceRecipe,
 } from "feature/arsenal/data/workshop";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
-import { Check, ChevronDown } from "lucide-react";
+import { BarChart3, Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 import { PartRow } from "../Parts/PartRow";
@@ -58,13 +58,16 @@ export const BuildLadder = ({ subject, wallet }: BuildLadderProps) => {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className='flex items-center justify-between gap-4 rounded text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50 hover:text-zinc-200'>
-        <span className='flex flex-col gap-0.5'>
-          <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
-            Build path
-          </span>
-          <span className='text-base font-bold text-zinc-200'>
-            All {LADDER_LENGTH} builds and where they promote
+        className='flex items-center justify-between gap-4 rounded text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 hover:text-zinc-200'>
+        <span className='flex items-center gap-4'>
+          <BarChart3 size={20} className='shrink-0 text-zinc-500' />
+          <span className='flex flex-col gap-0.5'>
+            <span className='text-base font-semibold text-zinc-100'>
+              Build progression
+            </span>
+            <span className='text-sm text-zinc-400'>
+              View all {LADDER_LENGTH} builds and where they promote
+            </span>
           </span>
         </span>
         <ChevronDown

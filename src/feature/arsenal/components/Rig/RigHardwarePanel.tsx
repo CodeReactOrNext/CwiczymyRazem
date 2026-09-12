@@ -59,7 +59,10 @@ const HardwareButton = ({
             ? `${owned} → ${next.name}`
             : `${next.name} costs ${next.fame} Fame — ${next.fame - fame} more needed`
       }
-      className={cn(RIG_BUTTON, affordable && !pending && "text-cyan-300")}>
+      className={cn(
+        RIG_BUTTON,
+        affordable && !pending && "text-arsenal-accent",
+      )}>
       {icon}
       {next === null
         ? `${label} maxed`

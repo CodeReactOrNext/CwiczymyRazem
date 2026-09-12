@@ -33,7 +33,7 @@ describe("CollectionToolbar", () => {
     expect(screen.getByText("19")).toBeTruthy();
   });
 
-  it("marks the active scope and sort as pressed", () => {
+  it("marks the active scope as pressed and shows the active sort", () => {
     renderToolbar({ scope: "pedals", sort: "newest" });
     expect(screen.getByText("Pedals").closest("button")?.ariaPressed).toBe(
       "true",
@@ -41,8 +41,8 @@ describe("CollectionToolbar", () => {
     expect(screen.getByText("Guitars").closest("button")?.ariaPressed).toBe(
       "false",
     );
-    expect(screen.getByText("Newest").closest("button")?.ariaPressed).toBe(
-      "true",
+    expect(screen.getByRole("combobox", { name: "Sort by" }).textContent).toContain(
+      "Newest",
     );
   });
 
@@ -60,18 +60,15 @@ describe("CollectionToolbar", () => {
     expect(screen.queryByLabelText("Stash view")).toBeNull();
     expect(screen.queryByLabelText("Cards view")).toBeNull();
     // The rest of the bar is untouched: a phone still filters and searches.
-    expect(screen.getByText("Rarity")).toBeTruthy();
+    expect(screen.getByRole("combobox", { name: "Sort by" })).toBeTruthy();
     expect(screen.getByLabelText("Search your collection")).toBeTruthy();
   });
 
-  it("reports scope, sort and query changes", () => {
+  it("reports scope and query changes", () => {
     const props = renderToolbar();
 
     fireEvent.click(screen.getByText("Guitars"));
     expect(props.onScopeChange).toHaveBeenCalledWith("guitars");
-
-    fireEvent.click(screen.getByText("Level"));
-    expect(props.onSortChange).toHaveBeenCalledWith("level");
 
     fireEvent.change(screen.getByLabelText("Search your collection"), {
       target: { value: "strat" },

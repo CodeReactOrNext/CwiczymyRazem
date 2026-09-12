@@ -20,7 +20,8 @@ import { RARITY_STYLES } from "../RarityBadge";
 export const rollChance = (
   probabilities: CaseDefinition["probabilities"],
   rarity: GuitarRarity,
-): number | undefined => (rarity === "Custom Shop" ? undefined : probabilities[rarity]);
+): number | undefined =>
+  rarity === "Custom Shop" ? undefined : probabilities[rarity];
 
 /** The odds table itself, without a trigger around it. */
 export const RarityOddsTable = ({
@@ -28,9 +29,9 @@ export const RarityOddsTable = ({
 }: {
   probabilities: CaseDefinition["probabilities"];
 }) => {
-  const probs = (Object.entries(probabilities) as [GuitarRarity, number][]).filter(
-    ([, prob]) => prob > 0,
-  );
+  const probs = (
+    Object.entries(probabilities) as [GuitarRarity, number][]
+  ).filter(([, prob]) => prob > 0);
   return (
     <div className='space-y-1.5'>
       {probs.map(([rarity, prob]) => {
@@ -69,12 +70,18 @@ export const RarityOddsTable = ({
     table in rarity colours needs the dark one it was coloured for. */
 export const oddsTooltipClass = "w-60 border border-zinc-700 bg-zinc-950 p-3";
 
-/** "Drop Rates" link with the per-rarity odds tooltip — used by every case card. */
+/**
+ * Per-rarity odds behind a trigger. The default is the quiet "Drop Rates"
+ * link every shelf card carries in its corner; `inline` is the same thing a
+ * size up, sitting next to the featured CTA as "View drop rates".
+ */
 export const DropRates = ({
   probabilities,
+  variant = "link",
   className,
 }: {
   probabilities: CaseDefinition["probabilities"];
+  variant?: "link" | "inline";
   className?: string;
 }) => (
   <TooltipProvider>
@@ -83,11 +90,14 @@ export const DropRates = ({
         <button
           type='button'
           className={cn(
-            "flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-zinc-200",
+            "flex items-center gap-1.5 font-semibold tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            variant === "inline"
+              ? "px-1 text-sm text-zinc-300 hover:text-zinc-100"
+              : "text-[11px] text-zinc-400 hover:text-zinc-200",
             className,
           )}>
-          <Info size={12} />
-          Drop Rates
+          <Info size={variant === "inline" ? 14 : 12} />
+          {variant === "inline" ? "View drop rates" : "Drop Rates"}
         </button>
       </TooltipTrigger>
       <TooltipContent side='top' className={oddsTooltipClass}>

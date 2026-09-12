@@ -4,6 +4,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import {
   getEffectFeatures,
@@ -27,9 +28,6 @@ import { Store, Trash2, Unplug, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 
-import { ScrapYieldList } from "../Parts/ScrapYieldList";
-import { ModArt } from "../Workshop/ModArt";
-
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
@@ -39,8 +37,10 @@ import { CardTraits, useItemTraitStates } from "../CardTraits";
 import { ConditionMeter } from "../ConditionMeter";
 import { HoloFoil, HoloStripe } from "../HoloFoil";
 import { LevelEmblem } from "../LevelEmblem";
+import { ScrapYieldList } from "../Parts/ScrapYieldList";
 import { RARITY_STYLES } from "../RarityBadge";
 import { SpecTags } from "../SpecTags";
+import { ModArt } from "../Workshop/ModArt";
 
 interface EffectCardProps {
   item: EffectInventoryItem;
@@ -59,6 +59,13 @@ interface EffectCardProps {
   /** Custom footer rendered inside the card frame in place of the Sell row
       (e.g. the marketplace seller/price/buy panel). Takes precedence over readOnly. */
   footer?: ReactNode;
+  /** Fixes the image band to this height instead of it growing to fill the
+      card (flex-1) — the marketplace grid uses this so every card's art sits
+      at the same height regardless of how many mods/traits sit below it. */
+  imageHeight?: number;
+  /** Caps the trait rows before collapsing the rest into "+N more" — see
+      `CardTraits`. */
+  maxVisibleTraits?: number;
 }
 
 export const EffectCard = ({
@@ -74,6 +81,8 @@ export const EffectCard = ({
   isRemovingFromBoard,
   readOnly = false,
   footer,
+  imageHeight,
+  maxVisibleTraits,
 }: EffectCardProps) => {
   // Resolved before the guard below because the state hook must run on every
   // render — a pedal whose definition has been retired still has to obey the
@@ -182,8 +191,11 @@ export const EffectCard = ({
 
       {/* Effect image */}
       <div
-        className='relative flex flex-1 items-center justify-center overflow-hidden py-4'
-        style={{ minHeight: 200 }}>
+        className={cn(
+          "relative flex items-center justify-center overflow-hidden py-4",
+          imageHeight != null ? "flex-none" : "flex-1",
+        )}
+        style={imageHeight != null ? { height: imageHeight } : { minHeight: 200 }}>
         {/* Neutral spotlight so dark effects separate from the background */}
         <div
           className='pointer-events-none absolute inset-0 z-0'
@@ -263,7 +275,7 @@ export const EffectCard = ({
       </div>
 
       <CardAffixes features={features} />
-      <CardTraits traits={traits} states={traitStates} />
+      <CardTraits traits={traits} states={traitStates} maxVisible={maxVisibleTraits} />
 
       {/* Custom footer (e.g. marketplace panel) — part of the card frame */}
       {footer ? (

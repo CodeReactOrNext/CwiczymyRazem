@@ -45,7 +45,7 @@ export interface RoadmapTier {
  * Monthly running cost. Buy Me a Coffee support covers this first; everything
  * above funds the roadmap.
  */
-export const MONTHLY_RUNNING_COST = 20;
+export const MONTHLY_RUNNING_COST = 40;
 
 /** Buy Me a Coffee page — the single donate destination used everywhere. */
 export const BMC_URL = "https://buymeacoffee.com/riffquest";

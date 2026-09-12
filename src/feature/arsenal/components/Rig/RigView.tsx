@@ -9,9 +9,8 @@ import { useUpdatePedalboard } from "../../hooks/useUpdatePedalboard";
 import { useUpdateRig } from "../../hooks/useUpdateRig";
 import type { ArsenalUserData, RigSetup } from "../../types/arsenal.types";
 import { GuitarPickerModal } from "./GuitarPickerModal";
-import { GuitarSlot } from "./GuitarSlot";
+import { GuitarRack } from "./GuitarRack";
 import { PedalboardView } from "./PedalboardView";
-import { SectionHeading } from "./RigSection";
 import { RigStatsPanel } from "./RigStatsPanel";
 
 interface RigViewProps {
@@ -98,24 +97,15 @@ export const RigView = ({ data, fame }: RigViewProps) => {
       {/* What the rig below is currently worth per hour of practice. */}
       <RigStatsPanel data={data} />
 
-      {/* Guitars */}
-      <div className='flex flex-col gap-4'>
-        <SectionHeading title='Guitars' />
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
-          {([0, 1, 2] as const).map((slotIndex) => (
-            <GuitarSlot
-              key={slotIndex}
-              slotIndex={slotIndex}
-              itemId={rig.guitarSlots[slotIndex]}
-              inventory={data.inventory}
-              onOpenPicker={setPickerSlot}
-              onRemove={handleGuitarRemove}
-              onHover={handleHover}
-              onShowCard={handleShowCard}
-            />
-          ))}
-        </div>
-      </div>
+      {/* The rack: three hooks on one wall, and what hangs on them. */}
+      <GuitarRack
+        slots={rig.guitarSlots}
+        inventory={data.inventory}
+        onOpenPicker={setPickerSlot}
+        onRemove={handleGuitarRemove}
+        onHover={handleHover}
+        onShowCard={handleShowCard}
+      />
 
       {/* Pedalboard — its own heading, because the board actions ride on it. */}
       <div className='flex flex-col gap-5'>

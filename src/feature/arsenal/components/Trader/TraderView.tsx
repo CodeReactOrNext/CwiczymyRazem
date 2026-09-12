@@ -10,7 +10,6 @@ import type {
   TraderModOffer,
   TraderPartOffer,
 } from "../../types/trader.types";
-import { SectionLabel } from "../SectionLabel";
 import { ItemOfferCard } from "./ItemOfferCard";
 import { ModOfferCard } from "./ModOfferCard";
 import { PartOfferCard } from "./PartOfferCard";
@@ -23,9 +22,10 @@ import { RestockTimer } from "./RestockTimer";
  * request of its own — the only thing it needs from the server is what the player
  * has already taken today, which rides along with the arsenal data.
  *
- * Two shelves, built the same way: a caption, a heading, and a grid of cards on
- * one shared surface. The parts shelf used to be the only one on a panel, with
- * the featured gear floating loose underneath it.
+ * One heading for the counter with the restock clock beside it, then two
+ * shelves built the same way: a heading, a line on what the shelf is for, and
+ * a grid of cards on one shared surface. The day's mod leads the first shelf
+ * on a double card; the parts follow it in the same grid.
  */
 export const TraderView = () => {
   const shop = useTraderShop();
@@ -63,29 +63,47 @@ export const TraderView = () => {
     return getRemainingStock(offer, shop.window, arsenal?.trader);
   };
 
+  const partsTaken = parts.filter((p) => remainingOf(p.id) === 0).length;
+  const modTaken = mod ? remainingOf(mod.id) === 0 : false;
+
   return (
     <div className='flex flex-col gap-8'>
-      <section className='flex flex-col gap-6 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-        <div className='flex flex-wrap items-end justify-between gap-x-8 gap-y-4'>
-          <div className='flex flex-col gap-1.5'>
-            <SectionLabel>Today at the counter</SectionLabel>
-            <h2 className='text-xl font-black text-white'>Parts &amp; mods</h2>
-          </div>
-          <RestockTimer restockAt={shop.restockAt} />
+      <div className='flex flex-wrap items-end justify-between gap-x-8 gap-y-4'>
+        <div>
+          <h2 className='font-display text-2xl font-black text-zinc-100'>
+            Trader
+          </h2>
+          <p className='mt-1 text-sm text-zinc-500'>
+            Parts by the piece, one mod, and a few instruments — a fresh stock
+            every day.
+          </p>
+        </div>
+        <RestockTimer restockAt={shop.restockAt} />
+      </div>
+
+      <section className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+        <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1'>
+          <h3 className='text-lg font-bold text-zinc-100'>Parts &amp; mods</h3>
+          <p className='text-xs text-zinc-500'>
+            {partsTaken + (modTaken ? 1 : 0) === 0
+              ? "Nothing taken yet today."
+              : `${partsTaken + (modTaken ? 1 : 0)} of ${parts.length + (mod ? 1 : 0)} slots cleared today.`}
+          </p>
         </div>
 
         <div className='grid grid-cols-1 gap-4 xsm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4'>
           {/* The day's mod is another loose component sold by the piece, so it
               sits on the same shelf as the parts rather than in a feature panel
-              of its own. First, because there is one a day and it is gone once
-              taken. */}
+              of its own — first, and on a double card, because there is one a
+              day and it is gone once taken. */}
           {mod && (
             <ModOfferCard
               offer={mod}
-              available={remainingOf(mod.id) > 0}
+              available={!modTaken}
               currentFame={fame}
               onBuy={() => handleBuy(mod.id, 1)}
               isBuying={isPending && pendingOfferId === mod.id}
+              className='xsm:col-span-2'
             />
           )}
 
@@ -103,10 +121,13 @@ export const TraderView = () => {
       </section>
 
       {items.length > 0 && (
-        <section className='flex flex-col gap-6 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-          <div className='flex flex-col gap-1.5'>
-            <SectionLabel>Rolled fresh every day</SectionLabel>
-            <h2 className='text-xl font-black text-white'>Featured gear</h2>
+        <section className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+          <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1'>
+            <h3 className='text-lg font-bold text-zinc-100'>Featured gear</h3>
+            <p className='text-xs text-zinc-500'>
+              Rolled from today&apos;s seed — the card is the exact instrument
+              you get.
+            </p>
           </div>
 
           <div className='grid grid-cols-1 gap-4 xsm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>

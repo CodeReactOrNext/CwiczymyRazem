@@ -28,6 +28,8 @@ export interface WorkshopEntry {
   brand: string;
   rarity: GuitarRarity;
   imageSrc: string;
+  /** The full-size render for the bench itself, where the item is the hero. */
+  heroImageSrc: string;
   /** Guitar art is drawn head-up, so a horizontal thumbnail has to rotate it. */
   rotate: boolean;
   buildLevel: number;
@@ -75,6 +77,7 @@ export const getWorkshopEntries = (
       brand: def.brand,
       rarity: getEffectiveRarity(def.rarity, item.buildLevel),
       imageSrc: getRankBadgeSrc(def.imageId, "small"),
+      heroImageSrc: getRankBadgeSrc(def.imageId, "large"),
       rotate: true,
       buildLevel: item.buildLevel ?? 0,
       condition: getItemCondition(item),
@@ -97,6 +100,7 @@ export const getWorkshopEntries = (
       brand: def.brand,
       rarity: getEffectiveRarity(def.rarity, item.buildLevel),
       imageSrc: getEffectImageSrc(def.imageId, "medium"),
+      heroImageSrc: getEffectImageSrc(def.imageId, "full"),
       rotate: false,
       buildLevel: item.buildLevel ?? 0,
       condition: getItemCondition(item),

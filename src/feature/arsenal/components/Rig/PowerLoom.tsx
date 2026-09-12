@@ -292,7 +292,7 @@ export const PowerRail = ({
   const { brick, supply } = rail;
   /** What is silkscreened on it: whose it is, and how many pedals it feeds. */
   const name = supply.name;
-  const legend = `9V ⎓ ${supply.outputs} out`;
+  const legend = `${supply.outputs} OUTPUTS`;
 
   const lit = (index: number) => live && used.has(index);
   const stubs = rail.sockets.filter(
@@ -661,35 +661,59 @@ export const PowerRail = ({
           stamped, and far enough from the name that neither is reading as part
           of the other. */}
       <rect
-        x={inner.x + inner.w - 0.4 - legend.length * 0.78}
+        x={inner.x + inner.w - 0.4 - legend.length * 0.78 - 1.6}
         y={nameY - 1.18}
-        width={legend.length * 0.78 + 0.4}
+        width={legend.length * 0.78 + 0.4 + 1.6}
         height={1.66}
         rx={0.28}
         fill='#000000'
         opacity={0.42}
       />
       <rect
-        x={inner.x + inner.w - 0.4 - legend.length * 0.78}
+        x={inner.x + inner.w - 0.4 - legend.length * 0.78 - 1.6}
         y={nameY + 0.41}
-        width={legend.length * 0.78 + 0.4}
+        width={legend.length * 0.78 + 0.4 + 1.6}
         height={0.07}
         rx={0.03}
         fill='#ffffff'
         opacity={0.12}
       />
       <text
-        x={inner.x + inner.w - 0.8}
+        x={inner.x + inner.w - 2.1}
         y={nameY}
         textAnchor='end'
-        fill={DC_CORE_LIVE}
-        opacity={live ? 0.72 : 0.34}
+        fill='#d7dce4'
+        opacity={live ? 0.8 : 0.4}
         fontSize={1.16}
         letterSpacing={0.16}
         fontFamily='ui-sans-serif, system-ui, sans-serif'
         fontWeight={700}>
         {legend}
       </text>
+      {/* The mains lamp beside the rating: green while the brick is fed. */}
+      <circle
+        cx={inner.x + inner.w - 1.25}
+        cy={nameY - 0.4}
+        r={0.42}
+        fill='#08090b'
+        stroke='#33363d'
+        strokeWidth={0.09}
+      />
+      <circle
+        cx={inner.x + inner.w - 1.25}
+        cy={nameY - 0.4}
+        r={0.26}
+        fill={live ? "#34d399" : "#1a1b20"}
+      />
+      {live && (
+        <circle
+          cx={inner.x + inner.w - 1.25}
+          cy={nameY - 0.4}
+          r={0.9}
+          fill='#34d399'
+          opacity={0.18}
+        />
+      )}
 
       {rail.sockets.map((socket) => {
         const on = lit(socket.index);
