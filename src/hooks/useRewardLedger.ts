@@ -6,10 +6,12 @@ import type { RewardPayout } from "lib/rewards/rewardPayout";
 import {
   claimAchievementRewards,
   claimJourneyReward,
+  claimLevelRewards,
   claimRoadmapReward,
   claimScaleReward,
   fetchRewardLedger,
 } from "lib/rewards/rewards.service";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
@@ -140,6 +142,73 @@ export const useClaimRoadmapReward = () => {
       );
     },
   });
+};
+
+/**
+ * Pays out the level ladder, by itself.
+ *
+ * Fired rather than pressed: reaching a level *is* the act that earns the rung,
+ * so asking the player to come back and press Collect afterwards only invents a
+ * way to forget. It runs once per mount of whatever screen calls it, takes no
+ * arguments, and the server decides whether anything is owed — so the common
+ * case is a call that quietly pays nothing.
+ *
+ * Its own mutation rather than another caller of `useClaimSideEffects`: levels
+ * pay no Fame, so there is no wallet to put right, and the one thing this
+ * payout has that the others do not — a mod, which is an object rather than a
+ * number — has to be named or it lands silently in the stash.
+ */
+export const useAutoClaimLevels = () => {
+  const queryClient = useQueryClient();
+  const userAuth = useAppSelector(selectUserAuth);
+
+  const claim = useMutation({
+    mutationFn: () => claimLevelRewards(),
+    onSuccess: (result) => {
+      if (result.levels.length === 0) return;
+
+      const parts = result.parts.reduce((sum, part) => sum + part.qty, 0);
+      const line = [
+        result.caseTokens > 0
+          ? `${result.caseTokens} free ${result.caseTokens === 1 ? "case" : "cases"}`
+          : null,
+        parts > 0 ? `${parts} ${parts === 1 ? "part" : "parts"}` : null,
+        result.mods.length > 0
+          ? `${result.mods.length} ${result.mods.length === 1 ? "upgrade" : "upgrades"}`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+      toast.success(
+        result.levels.length === 1
+          ? `Level ${result.levels[0]} paid out: ${line}`
+          : `${result.levels.length} levels paid out: ${line}`,
+      );
+      queryClient.invalidateQueries({ queryKey: REWARD_LEDGER_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
+    },
+    // Deliberately quiet. Nobody asked for this to happen, so a red toast would
+    // be reporting the failure of something the player never started; the rungs
+    // stay owed and the next session picks them up.
+    onError: (error: any) => {
+      console.error("[auto-claim levels]", error);
+    },
+  });
+
+  // A ref rather than the mutation's own state: `isPending` is false for the
+  // tick between mount and the request leaving, which is exactly long enough
+  // for a re-render to fire a second one.
+  const fired = useRef(false);
+  const { mutate } = claim;
+
+  useEffect(() => {
+    if (!userAuth || fired.current) return;
+    fired.current = true;
+    mutate();
+  }, [userAuth, mutate]);
+
+  return claim.data ?? null;
 };
 
 export const useClaimScaleReward = () => {

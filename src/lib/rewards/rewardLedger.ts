@@ -23,6 +23,30 @@ export interface RewardLedger {
   claimedJourneys: string[];
   /** Curated AI-coach roadmaps already collected, by reward id. Same rule. */
   claimedRoadmaps: string[];
+  /**
+   * Level milestones already collected, by reward id. Same rule.
+   *
+   * Only ever rungs climbed since `levelBaseline` — the list is what has been
+   * paid, never what was reached.
+   */
+  claimedLevels: string[];
+  /**
+   * The rung the account already stood on when the ladder first saw it.
+   *
+   * Nothing at or below it is ever owed. An account sitting at level 30 when
+   * the ladder shipped climbed those thirty levels while the rewards did not
+   * exist, and back-paying them would drop a season's worth of cases, parts and
+   * mods into one stash for practice that was already done and already paid for
+   * in points. The ladder pays forwards: from here on, reaching a level is what
+   * earns the rung.
+   *
+   * Null until a reward route first sees the account, at which point it is
+   * sealed — at the level the player stood on before the session being filed
+   * (`api/user/report`), or at the current level if a claim gets there first.
+   * Written once and never moved again; a baseline that drifted upwards would
+   * quietly swallow rungs that were genuinely earned.
+   */
+  levelBaseline: number | null;
   /** Unspent free cases. One opens any case on the shelf without paying Fame. */
   caseTokens: number;
 }
@@ -32,6 +56,8 @@ export const EMPTY_REWARD_LEDGER: RewardLedger = {
   claimedScales: [],
   claimedJourneys: [],
   claimedRoadmaps: [],
+  claimedLevels: [],
+  levelBaseline: null,
   caseTokens: 0,
 };
 
@@ -52,6 +78,7 @@ export const readRewardLedger = (
 ): RewardLedger => {
   const stored = (data?.rewards ?? {}) as Partial<RewardLedger>;
   const tokens = Number(stored.caseTokens);
+  const baseline = stored.levelBaseline;
 
   return {
     claimedAchievements: readIds(
@@ -60,6 +87,14 @@ export const readRewardLedger = (
     claimedScales: readIds(stored.claimedScales),
     claimedJourneys: readIds(stored.claimedJourneys),
     claimedRoadmaps: readIds(stored.claimedRoadmaps),
+    claimedLevels: readIds(stored.claimedLevels),
+    // Read as "unset" rather than coerced, because the two are not the same
+    // thing here: a missing baseline means the ladder has not seen this account
+    // yet, while a zero would mean it is owed the whole climb.
+    levelBaseline:
+      typeof baseline === "number" && Number.isFinite(baseline) && baseline >= 1
+        ? Math.floor(baseline)
+        : null,
     caseTokens: Number.isFinite(tokens) && tokens > 0 ? Math.floor(tokens) : 0,
   };
 };

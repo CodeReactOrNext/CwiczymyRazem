@@ -1,5 +1,9 @@
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type { RigSetup } from "feature/arsenal/types/arsenal.types";
+import {
+  blockedEquipMessage,
+  findBlockedRigChange,
+} from "feature/progression/utils/equipGuard";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -26,7 +30,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userDoc = await userRef.get();
     if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
 
-    const arsenal = userDoc.data()!.arsenal;
+    const data = userDoc.data()!;
+    const arsenal = data.arsenal;
+
+    // The rarity ladder, checked against what this write would newly bring in
+    // rather than against the whole rig — see `findBlockedRigChange`.
+    const blocked =
+      data.role === "admin"
+        ? null
+        : findBlockedRigChange(
+            {
+              inventory: arsenal?.inventory ?? [],
+              effectInventory: arsenal?.effectInventory ?? [],
+              rig: arsenal?.rig,
+            },
+            {
+              guitarSlots: rig.guitarSlots,
+              pedalboardItemIds: (rig.pedalboardItems ?? []).map(
+                (placement) => placement.itemId,
+              ),
+            },
+            data.statistics?.lvl ?? 1,
+          );
+    if (blocked) {
+      return res
+        .status(403)
+        .json({ error: blockedEquipMessage(blocked), blocked });
+    }
+
     const updates: Record<string, unknown> = {
       "arsenal.rig": rig,
       rigLevel: getRigLevel({

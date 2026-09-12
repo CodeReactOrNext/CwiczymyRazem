@@ -22,7 +22,16 @@ import {
   countScrapParts,
   getGuitarScrapYield,
 } from "feature/arsenal/utils/scrap";
-import { Check, Store, Trash2, Wrench } from "lucide-react";
+import {
+  lockedArtFilter,
+  RarityLockNote,
+  rarityLockReason,
+} from "feature/progression/components/RarityLock";
+import {
+  rarityLockLvl,
+  usePlayerLvl,
+} from "feature/progression/hooks/usePlayerLvl";
+import { Check, Lock, Store, Trash2, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 
@@ -93,6 +102,8 @@ export const GuitarCard = ({
   // rules of hooks on its way to rendering nothing.
   const traits = useMemo(() => getItemTraits(item), [item]);
   const traitStates = useItemTraitStates(item.id, traits);
+  // Read here, above the guard, for the same reason the trait hooks are.
+  const playerLvl = usePlayerLvl();
 
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
@@ -107,6 +118,15 @@ export const GuitarCard = ({
   const condition = getItemCondition(item);
   const level = getItemLevel(item, guitar);
   const features = getItemFeatures(item);
+
+  // The equip cap, if it has anything to say about this copy. A guitar already
+  // in a slot or on the profile is grandfathered in and never badged — see
+  // `rarityLockLvl`.
+  const lockedLvl = rarityLockLvl(
+    rarity,
+    playerLvl,
+    isEquipped || rigSlot != null,
+  );
 
   // Reasons the Market / Sell actions are blocked — surfaced in a tooltip.
   const marketTooltip = isEquipped
@@ -221,8 +241,13 @@ export const GuitarCard = ({
           }}
         />
 
-        {/* Rarity glow backdrop */}
-        <div className='pointer-events-none absolute inset-0 z-0 flex translate-y-[60px] items-center justify-center opacity-50'>
+        {/* Rarity glow backdrop. Turned down on a locked guitar: the glow is
+            the tier's light, and the whole point is that it is not on yet. */}
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-0 z-0 flex translate-y-[60px] items-center justify-center",
+            lockedLvl != null ? "opacity-20" : "opacity-50",
+          )}>
           <div
             className='absolute h-[170px] w-[170px] rounded-full blur-[34px]'
             style={{
@@ -258,9 +283,20 @@ export const GuitarCard = ({
           style={{
             height: 260,
             width: 260,
-            filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.2))",
+            filter: lockedArtFilter(
+              "drop-shadow(0 4px 10px rgba(0,0,0,0.2))",
+              lockedLvl != null,
+            ),
           }}
         />
+
+        {lockedLvl != null && (
+          <RarityLockNote
+            rarity={rarity}
+            lvl={lockedLvl}
+            color={rs.baseColor}
+          />
+        )}
 
         {(isEquipped || rigSlot != null) && (
           <div className='absolute bottom-2 left-3 z-20 flex items-center gap-3'>
@@ -308,15 +344,41 @@ export const GuitarCard = ({
       {/* Equip / Sell */}
       {!readOnly && !footer && (
         <CardActionRow>
-          <CardAction
-            tone={isEquipped ? "active" : "neutral"}
-            icon={isEquipped ? Check : undefined}
-            onClick={() => onEquipClick?.()}
-            disabled={isEquipping}>
-            Equip
-          </CardAction>
-
           <TooltipProvider>
+            {/* Locked, the key says so rather than offering an Equip that will
+                bounce. It keeps its full opacity — the row's disabled style
+                drops to 30%, which on an 11px label is a key the player cannot
+                read at all, and "unreadable" is not the same message as "off". */}
+            {lockedLvl != null ? (
+              <Tooltip delayDuration={150}>
+                <TooltipTrigger asChild>
+                  {/* Wrapper span keeps the tooltip working while the button is disabled. */}
+                  <span className='flex flex-1'>
+                    <CardAction
+                      tone='neutral'
+                      icon={Lock}
+                      disabled
+                      className='text-zinc-500 disabled:opacity-100'>
+                      Locked
+                    </CardAction>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent
+                  side='top'
+                  className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-xs text-white'>
+                  {rarityLockReason(rarity, lockedLvl)}
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <CardAction
+                tone={isEquipped ? "active" : "neutral"}
+                icon={isEquipped ? Check : undefined}
+                onClick={() => onEquipClick?.()}
+                disabled={isEquipping}>
+                Equip
+              </CardAction>
+            )}
+
             {onListClick && (
               <Tooltip delayDuration={150}>
                 <TooltipTrigger asChild>

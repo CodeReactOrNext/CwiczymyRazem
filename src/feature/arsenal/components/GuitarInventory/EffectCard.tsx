@@ -24,6 +24,14 @@ import {
   countScrapParts,
   getEffectScrapYield,
 } from "feature/arsenal/utils/scrap";
+import {
+  lockedArtFilter,
+  RarityLockNote,
+} from "feature/progression/components/RarityLock";
+import {
+  rarityLockLvl,
+  usePlayerLvl,
+} from "feature/progression/hooks/usePlayerLvl";
 import { Store, Trash2, Unplug, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
@@ -89,6 +97,8 @@ export const EffectCard = ({
   // rules of hooks on its way to rendering nothing.
   const traits = useMemo(() => getItemTraits(item), [item]);
   const traitStates = useItemTraitStates(item.id, traits);
+  // Read here, above the guard, for the same reason the trait hooks are.
+  const playerLvl = usePlayerLvl();
 
   const effect = EFFECTS_BY_ID.get(item.effectId);
   if (!effect) return null;
@@ -103,6 +113,10 @@ export const EffectCard = ({
   const condition = getItemCondition(item);
   const level = getEffectLevel(item, effect);
   const features = getEffectFeatures(item);
+
+  // The equip cap. A pedal already on the board is grandfathered in and never
+  // badged — see `rarityLockLvl`.
+  const lockedLvl = rarityLockLvl(rarity, playerLvl, isOnPedalboard);
 
   // Scrap potential is deterministic, so the exact payout can be shown up front.
   const scrapParts = getEffectScrapYield(item, effect);
@@ -204,8 +218,11 @@ export const EffectCard = ({
           }}
         />
 
-        {/* Rarity glow backdrop */}
-        <div className='pointer-events-none absolute inset-0 z-0 flex translate-y-[60px] items-center justify-center opacity-50'>
+        {/* Rarity glow backdrop. Turned down on a locked pedal: the glow is the
+            tier's light, and the whole point is that it is not on yet. */}
+        <div
+          className='pointer-events-none absolute inset-0 z-0 flex translate-y-[60px] items-center justify-center'
+          style={{ opacity: lockedLvl != null ? 0.2 : 0.5 }}>
           <div
             className='absolute h-[170px] w-[170px] rounded-full blur-[34px]'
             style={{
@@ -241,20 +258,36 @@ export const EffectCard = ({
           style={{
             height: 160,
             width: 160,
-            filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.2))",
+            filter: lockedArtFilter(
+              "drop-shadow(0 4px 10px rgba(0,0,0,0.2))",
+              lockedLvl != null,
+            ),
           }}
         />
 
-        {/* LED */}
+        {/* LED. Out on a locked pedal — a stompbox that is not in the chain has
+            no light on it, and this card already taught the player that. */}
         <div
           className='absolute bottom-3 left-1/2 z-20 -translate-x-1/2 rounded-full'
           style={{
             width: 6,
             height: 6,
-            backgroundColor: rs.baseColor,
-            boxShadow: `0 0 8px 2px ${rs.baseColor}80`,
+            backgroundColor: lockedLvl != null ? "#27272a" : rs.baseColor,
+            boxShadow:
+              lockedLvl != null
+                ? "inset 0 0 2px rgba(0,0,0,0.9)"
+                : `0 0 8px 2px ${rs.baseColor}80`,
           }}
         />
+
+        {lockedLvl != null && (
+          <RarityLockNote
+            rarity={rarity}
+            lvl={lockedLvl}
+            color={rs.baseColor}
+            className='bottom-7'
+          />
+        )}
 
         {isOnPedalboard && (
           <div className='absolute bottom-2 left-3 z-20 flex items-center gap-1.5'>

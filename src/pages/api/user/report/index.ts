@@ -16,6 +16,7 @@ import { firebaseUpdateUserStats } from "feature/report/services/updateUserStats
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { FieldValue } from "firebase-admin/firestore";
 import { ACHIEVEMENT_STATS_PATH, countsAsPlayer } from "lib/achievements/achievementStats";
+import { readRewardLedger } from "lib/rewards/rewardLedger";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
@@ -257,6 +258,32 @@ export default async function handler(
           .catch((error: unknown) => {
             // A lost count must never cost a player their session.
             console.error("achievement stats increment failed:", error);
+          })
+      );
+    }
+
+    // The level ladder pays forwards only, so the first report an account files
+    // fixes where its history ends: the level it stood on *before* this session.
+    // Everything below that was climbed while the rewards did not exist and is
+    // never paid out; everything this session earns is. Sealed here rather than
+    // left to `/api/rewards/claim-levels` — that route runs after the stats are
+    // in, so on its own it would seal the baseline at the level the session just
+    // reached and swallow the very rung it was meant to pay.
+    if (readRewardLedger(userData).levelBaseline === null) {
+      writePromises.push(
+        firestore
+          .collection("users")
+          .doc(userUid)
+          // `merge` so nothing else under `rewards` is touched — the ledger this
+          // sits in is written by the reward routes, not by this one.
+          .set(
+            { rewards: { levelBaseline: report.previousUserStats.lvl } },
+            { merge: true }
+          )
+          .catch((error: unknown) => {
+            // A missed seal costs nothing a session: the claim route seals it
+            // itself, one rung higher at worst.
+            console.error("level baseline seed failed:", error);
           })
       );
     }
