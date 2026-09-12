@@ -210,8 +210,6 @@ export const StashTile = ({
     boxShadow: glow,
   };
 
-  const artFilter = "drop-shadow(0 3px 7px rgba(0,0,0,0.7))";
-
   const tile = (
     <Socket
       {...(onClick ? { type: "button" as const, onClick, disabled } : {})}
