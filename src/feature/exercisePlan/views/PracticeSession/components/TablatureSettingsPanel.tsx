@@ -1,7 +1,23 @@
 import { cn } from "assets/lib/utils";
+import {
+  METRONOME_SOUND_ORDER,
+  METRONOME_SOUNDS,
+  type MetronomeSoundKey,
+} from "feature/exercisePlan/components/Metronome/utils/clickTones";
+import { previewMetronomeSound } from "feature/exercisePlan/components/Metronome/utils/previewMetronomeSound";
 import { useHandednessStore, useIsLeftHanded } from "hooks/useHandedness";
 import type { LucideIcon } from "lucide-react";
-import { AlignJustify, Music, RotateCcw } from "lucide-react";
+import {
+  AlignJustify,
+  Bell,
+  Cpu,
+  Disc,
+  Drumstick,
+  Music,
+  RotateCcw,
+  TreePine,
+  Waves,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 import type { PillPresetKey } from "./tablaturePillPresets";
@@ -183,6 +199,16 @@ const DEFAULT_VIEW_OPTIONS: {
   },
 ];
 
+/** A glyph per click sound — the picker has nothing visual to swatch. */
+const METRONOME_SOUND_ICONS: Record<MetronomeSoundKey, LucideIcon> = {
+  classic: Waves,
+  wood: TreePine,
+  digital: Cpu,
+  sticks: Drumstick,
+  hihat: Disc,
+  cowbell: Bell,
+};
+
 function ResetButton({
   onClick,
   label,
@@ -330,6 +356,35 @@ export function TablatureSettingsPanel() {
               </span>
             </OptionCard>
           ))}
+        </div>
+      </Section>
+
+      <Section
+        title='Metronome sound'
+        hint='Tap one to hear it. Used for the count-in and the tab view; the notation view keeps AlphaTab’s own click.'>
+        <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
+          {METRONOME_SOUND_ORDER.map((key) => {
+            const Icon = METRONOME_SOUND_ICONS[key];
+            return (
+              <OptionCard
+                key={key}
+                active={settings.metronomeSound === key}
+                onClick={() => {
+                  set("metronomeSound", key);
+                  previewMetronomeSound(key);
+                }}>
+                <span className='flex h-8 items-center'>
+                  <Icon className='h-5 w-5 text-zinc-200' />
+                </span>
+                <span className='text-xs font-semibold text-zinc-100'>
+                  {METRONOME_SOUNDS[key].label}
+                </span>
+                <span className='text-[10px] leading-tight text-zinc-500'>
+                  {METRONOME_SOUNDS[key].desc}
+                </span>
+              </OptionCard>
+            );
+          })}
         </div>
       </Section>
 

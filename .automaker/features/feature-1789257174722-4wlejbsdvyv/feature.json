@@ -1,0 +1,27 @@
+{
+  "category": "Uncategorized",
+  "description": "Cel biznesowy: Umożliwić użytkownikowi Riff Quest zaplanowanie całej sesji w jednym miejscu, łącząc ćwiczenia techniczne z praktyczną pracą nad utworami.\n\nZakres:\n- Dodawanie utworu jako elementu rutyny/planu, ustawienie kolejności i planowanego czasu ćwiczenia.\n- Dodany utwór musi poprawnie uruchamiać się z poziomu planu oraz podczas Practice Session.\n- Gdy sesja dochodzi do pozycji z utworem, otwiera właściwy utwór do ćwiczenia; po zakończeniu użytkownik może kontynuować plan.\n- Spójny zapis wykonania i czasu bez podwójnego naliczania postępu.\n\nKryteria akceptacji:\n- Można dodać i usunąć utwór oraz zmienić jego miejsce w planie.\n- Uruchomienie pozycji z planu otwiera właściwy utwór.\n- Practice Session obsługuje przechodzenie między ćwiczeniami a utworami w zaplanowanej kolejności.\n- Czas i wykonanie są poprawnie zapisane, bez podwójnego naliczania.",
+  "title": "Adding songs to practice routines",
+  "images": [],
+  "imagePaths": [],
+  "textFilePaths": [],
+  "skipTests": true,
+  "model": "claude-opus",
+  "thinkingLevel": "adaptive",
+  "reasoningEffort": "none",
+  "branchName": "master",
+  "priority": 2,
+  "planningMode": "skip",
+  "requirePlanApproval": false,
+  "dependencies": [],
+  "status": "backlog",
+  "createdAt": "2026-09-12T23:52:54.722Z",
+  "id": "feature-1789257174722-4wlejbsdvyv",
+  "descriptionHistory": [
+    {
+      "description": "Cel biznesowy: Umożliwić użytkownikowi Riff Quest zaplanowanie całej sesji w jednym miejscu, łącząc ćwiczenia techniczne z praktyczną pracą nad utworami.\n\nZakres:\n- Dodawanie utworu jako elementu rutyny/planu, ustawienie kolejności i planowanego czasu ćwiczenia.\n- Dodany utwór musi poprawnie uruchamiać się z poziomu planu oraz podczas Practice Session.\n- Gdy sesja dochodzi do pozycji z utworem, otwiera właściwy utwór do ćwiczenia; po zakończeniu użytkownik może kontynuować plan.\n- Spójny zapis wykonania i czasu bez podwójnego naliczania postępu.\n\nKryteria akceptacji:\n- Można dodać i usunąć utwór oraz zmienić jego miejsce w planie.\n- Uruchomienie pozycji z planu otwiera właściwy utwór.\n- Practice Session obsługuje przechodzenie między ćwiczeniami a utworami w zaplanowanej kolejności.\n- Czas i wykonanie są poprawnie zapisane, bez podwójnego naliczania.",
+      "timestamp": "2026-09-12T23:52:54.952Z",
+      "source": "initial"
+    }
+  ]
+}

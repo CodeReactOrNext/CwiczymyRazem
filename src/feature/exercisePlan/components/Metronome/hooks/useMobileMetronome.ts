@@ -3,6 +3,7 @@ import type { MutableRefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applySinkId } from "utils/applyAudioSinkId";
 
+import { useTablatureSettings } from "../../../views/PracticeSession/components/tablatureSettings";
 import type { TempoRuler } from "../../../views/PracticeSession/hooks/tempoBeatClock";
 import {
   type AccentLevel,
@@ -14,7 +15,7 @@ import {
   stepsPerBeat as stepsPerBeatOf,
   subdivisionCountFor,
 } from "../utils/accentPattern";
-import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
+import { type ClickKind, scheduleClick } from "../utils/clickTones";
 import { getCountInBeats } from "../utils/countInDuration";
 import { isIOSDevice } from "../utils/deviceDetection";
 import type { MetronomeGrid } from "../utils/meterGrid";
@@ -201,26 +202,18 @@ export const useMobileMetronome = ({
   const scheduleNote = useCallback((time: number, kind: ClickKind = 'beat') => {
     if (!audioContextRef.current || isMutedRef.current) return;
 
-    const { frequency, gainScale } = CLICK_TONES[kind];
-    const peak = 0.85 * volumeRef.current * gainScale;
-    if (peak <= 0.0001) return;
-
-    const oscillator = audioContextRef.current.createOscillator();
-    const noteGain = audioContextRef.current.createGain();
-
-    oscillator.type = 'sine';
-    oscillator.frequency.value = frequency;
-
-    // Use a per-note gain node to avoid interfering with global gain or concurrent notes
-    noteGain.gain.setValueAtTime(0, time);
-    noteGain.gain.linearRampToValueAtTime(peak, time + 0.001);
-    noteGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.1);
-
-    oscillator.connect(noteGain);
-    noteGain.connect(gainNodeRef.current || audioContextRef.current.destination);
-
-    oscillator.start(time);
-    oscillator.stop(time + 0.1);
+    const context = audioContextRef.current;
+    // Every click builds its own per-note nodes, so it never interferes with the
+    // global gain or with concurrent notes. The sound is read from the settings
+    // store at click time so a mid-session switch is heard on the next click.
+    scheduleClick(
+      context,
+      gainNodeRef.current || context.destination,
+      time,
+      kind,
+      volumeRef.current,
+      useTablatureSettings.getState().metronomeSound,
+    );
   }, []);
 
   // Advanced timing mechanism using AudioContext's currentTime

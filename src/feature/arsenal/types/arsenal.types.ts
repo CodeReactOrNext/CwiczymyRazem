@@ -59,6 +59,8 @@ export interface EffectDefinition {
   yearFrom?: number;
   yearTo?: number;
   countries?: string[];
+  /** Flat Item Level bonus for outsized units (e.g. wide multi-effect enclosures). */
+  levelBonus?: number;
 }
 
 /**

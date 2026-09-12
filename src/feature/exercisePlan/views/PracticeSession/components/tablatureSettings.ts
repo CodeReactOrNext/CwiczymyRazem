@@ -1,3 +1,8 @@
+import {
+  DEFAULT_METRONOME_SOUND,
+  type MetronomeSoundKey,
+  normalizeMetronomeSound,
+} from "feature/exercisePlan/components/Metronome/utils/clickTones";
 import { useMemo } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -247,6 +252,8 @@ export interface TablatureSettings {
   // ── Session ──
   /** View shown when a practice session opens an exercise with tablature. */
   defaultViewMode: DefaultViewMode;
+  /** Which synthesised click the metronome plays (tab view and count-in). */
+  metronomeSound: MetronomeSoundKey;
   // ── Shape ──
   pillPreset: PillPresetKey;
   /** Multiplier on the fret-number type size (1 = the worker's 13px base). */
@@ -294,6 +301,7 @@ export interface TablatureSettings {
 
 export const DEFAULT_SETTINGS: TablatureSettings = {
   defaultViewMode: "tab",
+  metronomeSound: DEFAULT_METRONOME_SOUND,
   pillPreset: DEFAULT_PILL_PRESET,
   fretFontScale: 1,
   fretTextColor: "black",
@@ -315,6 +323,33 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   notationZoom: 1,
   notationSpacing: 1,
 };
+
+/**
+ * Heals whatever an older build left in localStorage into a complete, valid
+ * settings object — see the persist `version` note in the store below.
+ * Exported so the healing of each option can be tested without going
+ * through the persist middleware.
+ */
+export function migrateTablatureSettings(
+  persisted: unknown,
+): TablatureSettings {
+  const s = {
+    ...DEFAULT_SETTINGS,
+    ...(persisted as Partial<TablatureSettings>),
+  };
+  s.defaultViewMode = normalizeDefaultViewMode(s.defaultViewMode);
+  s.metronomeSound = normalizeMetronomeSound(s.metronomeSound);
+  if (!(s.pillPreset in PILL_PRESETS))
+    s.pillPreset = DEFAULT_SETTINGS.pillPreset;
+  if (!(s.palette in STRING_PALETTES)) s.palette = DEFAULT_SETTINGS.palette;
+  if (!(s.hitColor in HIT_COLORS)) s.hitColor = DEFAULT_SETTINGS.hitColor;
+  if (!(s.background in BACKGROUNDS))
+    s.background = DEFAULT_SETTINGS.background;
+  if (!(s.fretTextColor in FRET_TEXT_COLORS)) {
+    s.fretTextColor = DEFAULT_SETTINGS.fretTextColor;
+  }
+  return s;
+}
 
 interface TablatureSettingsStore extends TablatureSettings {
   set: <K extends keyof TablatureSettings>(
@@ -341,32 +376,16 @@ export const useTablatureSettings = create<TablatureSettingsStore>()(
       name: "practice-tab-settings",
       // v3 dropped the 3D highway; anyone who had it as their default view is
       // migrated back to the flat tab below. v4 added the flipped-string staff,
-      // which the defaults spread in the migration fills in as "off".
-      version: 4,
+      // which the defaults spread in the migration fills in as "off". v5 added
+      // the metronome sound picker, filled in as the classic beep the same way.
+      version: 5,
       /**
        * Drops stored choices that no longer exist (an option removed between
        * builds) back to their default, so the pickers show a real selection
        * instead of nothing. The lookups in `useTablatureStyle` guard the same
        * case at read time; this just heals the stored value once.
        */
-      migrate: (persisted) => {
-        const s = {
-          ...DEFAULT_SETTINGS,
-          ...(persisted as Partial<TablatureSettings>),
-        };
-        s.defaultViewMode = normalizeDefaultViewMode(s.defaultViewMode);
-        if (!(s.pillPreset in PILL_PRESETS))
-          s.pillPreset = DEFAULT_SETTINGS.pillPreset;
-        if (!(s.palette in STRING_PALETTES))
-          s.palette = DEFAULT_SETTINGS.palette;
-        if (!(s.hitColor in HIT_COLORS)) s.hitColor = DEFAULT_SETTINGS.hitColor;
-        if (!(s.background in BACKGROUNDS))
-          s.background = DEFAULT_SETTINGS.background;
-        if (!(s.fretTextColor in FRET_TEXT_COLORS)) {
-          s.fretTextColor = DEFAULT_SETTINGS.fretTextColor;
-        }
-        return s;
-      },
+      migrate: migrateTablatureSettings,
     },
   ),
 );

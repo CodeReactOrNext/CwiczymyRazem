@@ -3,6 +3,7 @@ import type { MutableRefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applySinkId } from "utils/applyAudioSinkId";
 
+import { useTablatureSettings } from "../../../views/PracticeSession/components/tablatureSettings";
 import type { TempoRuler } from "../../../views/PracticeSession/hooks/tempoBeatClock";
 import {
   type AccentLevel,
@@ -14,7 +15,7 @@ import {
   stepsPerBeat as stepsPerBeatOf,
   subdivisionCountFor,
 } from "../utils/accentPattern";
-import { CLICK_TONES, type ClickKind } from "../utils/clickTones";
+import { type ClickKind, scheduleClick } from "../utils/clickTones";
 import { getCountInBeats } from "../utils/countInDuration";
 import type { MetronomeGrid } from "../utils/meterGrid";
 
@@ -312,26 +313,18 @@ export const useMetronome = ({
   const playSound = useCallback((time: number, kind: ClickKind = 'beat', muted: boolean = false) => {
     if (!audioContextRef.current || muted) return;
 
-    const { frequency, gainScale } = CLICK_TONES[kind];
-    const peak = 0.85 * volumeRef.current * gainScale;
-    if (peak <= 0.0001) return;
-
-    const context    = audioContextRef.current;
-    const oscillator = context.createOscillator();
-    const gainNode   = context.createGain();
-
-    oscillator.type            = 'sine';
-    oscillator.frequency.value = frequency;
-
-    gainNode.gain.setValueAtTime(0, time);
-    gainNode.gain.linearRampToValueAtTime(peak, time + 0.001);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, time + 0.1);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
-
-    oscillator.start(time);
-    oscillator.stop(time + 0.1);
+    const context = audioContextRef.current;
+    // The sound is read straight from the settings store at click time rather
+    // than captured in a dep: the user can switch it mid-session and the very
+    // next click should already be the new one.
+    scheduleClick(
+      context,
+      context.destination,
+      time,
+      kind,
+      volumeRef.current,
+      useTablatureSettings.getState().metronomeSound,
+    );
   }, []);
 
   // ── Scheduler — called on every worklet tick (~25ms, audio thread) ─────────

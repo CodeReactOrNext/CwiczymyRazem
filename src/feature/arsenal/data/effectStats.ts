@@ -361,7 +361,10 @@ export const getEffectLevel = (
     EffectInventoryItem,
     "id" | "condition" | "year" | "country" | "stats" | "buildLevel"
   >,
-  effect: Pick<EffectDefinition, "rarity" | "yearFrom" | "yearTo">,
+  effect: Pick<
+    EffectDefinition,
+    "rarity" | "yearFrom" | "yearTo" | "levelBonus"
+  >,
 ): number => {
   const s = item.stats;
   // Same promotion rule as guitars — see `getEffectiveRarity`.
@@ -384,6 +387,7 @@ export const getEffectLevel = (
     conditionPoints +
     vintagePoints +
     originPoints +
-    buildPoints
+    buildPoints +
+    (effect.levelBonus ?? 0)
   );
 };

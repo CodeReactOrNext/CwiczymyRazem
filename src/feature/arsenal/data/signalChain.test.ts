@@ -9,6 +9,7 @@ const GEO = geometryFor(BOARD_TIERS[0]);
 const ROW_Y_PCT = GEO.rowYPct;
 import { EFFECT_DEFINITIONS } from "./effectDefinitions";
 import {
+  CHAIN_COMPLETE_FAME,
   CHAIN_FLAWLESS_FAME,
   CHAIN_FLAWLESS_MIN_PEDALS,
   CHAIN_LINK_FAME,
@@ -293,6 +294,47 @@ describe("evaluateChain", () => {
       stageIndexOf("Overdrive"),
       stageIndexOf("Delay"),
     ]);
+  });
+
+  it("pays the complete bonus once every playable stage is covered", () => {
+    const verdict = verdictFor([
+      "Tuner",
+      "Compressor",
+      "Fuzz",
+      "Overdrive",
+      "Distortion",
+      "Boost",
+      "EQ",
+      "Chorus",
+      "Delay",
+      "Reverb",
+    ]);
+
+    expect(verdict.filledStages.length).toBe(PLAYABLE_SIGNAL_STAGES.length);
+    expect(verdict.complete).toBe(true);
+    expect(verdict.flawless).toBe(true);
+    expect(verdict.rate).toBe(
+      9 * CHAIN_LINK_FAME + CHAIN_FLAWLESS_FAME + CHAIN_COMPLETE_FAME,
+    );
+  });
+
+  it("withholds the complete bonus while a stage is still empty", () => {
+    const verdict = verdictFor([
+      "Tuner",
+      "Fuzz",
+      "Overdrive",
+      "Distortion",
+      "Boost",
+      "EQ",
+      "Chorus",
+      "Delay",
+      "Reverb",
+    ]);
+
+    expect(verdict.filledStages.length).toBeLessThan(
+      PLAYABLE_SIGNAL_STAGES.length,
+    );
+    expect(verdict.complete).toBe(false);
   });
 });
 

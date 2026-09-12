@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "steps": [
+    {
+      "id": "triage",
+      "name": "Product Triage",
+      "order": 0,
+      "instructions": "Assess whether this report is a real, clear, non-duplicate problem worth solving.",
+      "colorClass": "bg-blue-500/20",
+      "createdAt": "2026-09-12T16:19:22.374Z",
+      "updatedAt": "2026-09-12T16:19:22.374Z"
+    },
+    {
+      "id": "research",
+      "name": "Research",
+      "order": 1,
+      "instructions": "Investigate the existing code, architecture, and UX context before proposing a solution.",
+      "colorClass": "bg-purple-500/20",
+      "createdAt": "2026-09-12T16:19:22.374Z",
+      "updatedAt": "2026-09-12T16:19:22.374Z"
+    },
+    {
+      "id": "prd",
+      "name": "PRD",
+      "order": 2,
+      "instructions": "Draft problem/solution/scope/acceptance-criteria doc from the research.",
+      "colorClass": "bg-green-500/20",
+      "createdAt": "2026-09-12T16:19:22.374Z",
+      "updatedAt": "2026-09-12T16:19:22.374Z"
+    },
+    {
+      "id": "plan-review",
+      "name": "Plan Review",
+      "order": 3,
+      "instructions": "Independent review of the PRD: sound, right-sized, sufficient acceptance criteria?",
+      "colorClass": "bg-orange-500/20",
+      "createdAt": "2026-09-12T16:19:22.374Z",
+      "updatedAt": "2026-09-12T16:19:22.374Z"
+    },
+    {
+      "id": "implement",
+      "name": "Implement",
+      "order": 4,
+      "instructions": "Write the code in an isolated worktree, minimal diff, with tests.",
+      "colorClass": "bg-red-500/20",
+      "createdAt": "2026-09-12T16:19:22.374Z",
+      "updatedAt": "2026-09-12T16:19:22.374Z"
+    },
+    {
+      "id": "verify",
+      "name": "Verify (lint/test/build)",
+      "order": 5,
+      "instructions": "Automated lint, unit tests, typecheck, and build must all pass.",
+      "colorClass": "bg-pink-500/20",
+      "createdAt": "2026-09-12T16:19:22.374Z",
+      "updatedAt": "2026-09-12T16:19:22.374Z"
+    },
+    {
+      "id": "browser-qa",
+      "name": "Browser QA",
+      "order": 6,
+      "instructions": "Drive a real browser against the running app and check the acceptance criteria.",
+      "colorClass": "bg-cyan-500/20",
+      "createdAt": "2026-09-12T16:19:22.374Z",
+      "updatedAt": "2026-09-12T16:19:22.374Z"
+    },
+    {
+      "id": "design-review",
+      "name": "Design Review",
+      "order": 7,
+      "instructions": "Judge UI screenshots against docs/STYLEGUIDE.md.",
+      "colorClass": "bg-amber-500/20",
+      "createdAt": "2026-09-12T16:19:22.374Z",
+      "updatedAt": "2026-09-12T16:19:22.374Z"
+    },
+    {
+      "id": "code-review",
+      "name": "Code Review",
+      "order": 8,
+      "instructions": "Independent, adversarial review for correctness, security, and regressions.",
+      "colorClass": "bg-indigo-500/20",
+      "createdAt": "2026-09-12T16:19:22.374Z",
+      "updatedAt": "2026-09-12T16:19:22.374Z"
+    }
+  ]
+}

@@ -165,6 +165,8 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     jacks: TOP_JACKS.lab,
     /** A whole stereo rig in a box — it draws like one, fuzz or not. */
     draw: 250,
+    /** Eats ~1.5x the board width of an ordinary pedal — Item Level pays for it. */
+    levelBonus: 3,
   },
   {
     id: 12,
@@ -176,6 +178,8 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     jacks: TOP_JACKS.lab,
     /** The most expensive thing a board can carry, and worth every mA. */
     draw: 300,
+    /** Eats ~1.5x the board width of an ordinary pedal — Item Level pays for it. */
+    levelBonus: 3,
   },
   {
     id: 13,
@@ -187,6 +191,8 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     jacks: TOP_JACKS.lab,
     /** Presets, a display and three footswitches. Not a passive dirt box. */
     draw: 200,
+    /** Eats ~1.5x the board width of an ordinary pedal — Item Level pays for it. */
+    levelBonus: 3,
   },
   {
     id: 14,

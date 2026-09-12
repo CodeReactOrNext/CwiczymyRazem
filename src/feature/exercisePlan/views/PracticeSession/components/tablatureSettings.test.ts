@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEFAULT_SETTINGS,
+  migrateTablatureSettings,
   normalizeDefaultViewMode,
 } from "./tablatureSettings";
 
@@ -29,5 +30,33 @@ describe("normalizeDefaultViewMode", () => {
     expect(normalizeDefaultViewMode(DEFAULT_SETTINGS.defaultViewMode)).toBe(
       DEFAULT_SETTINGS.defaultViewMode,
     );
+  });
+});
+
+describe("metronomeSound", () => {
+  it("defaults to the classic click", () => {
+    expect(DEFAULT_SETTINGS.metronomeSound).toBe("classic");
+  });
+
+  // The sound picker landed in store v5; a v4 install has no such key at all,
+  // and a later build could drop a sound. Either way the metronome must still
+  // find a real sound to play, so the migration heals the value.
+  it("heals a missing or unknown stored sound back to the classic click", () => {
+    const migrate = migrateTablatureSettings;
+    expect(
+      migrate({ ...DEFAULT_SETTINGS, metronomeSound: undefined }),
+    ).toMatchObject({
+      metronomeSound: "classic",
+    });
+    expect(
+      migrate({ ...DEFAULT_SETTINGS, metronomeSound: "laser" }),
+    ).toMatchObject({
+      metronomeSound: "classic",
+    });
+    expect(
+      migrate({ ...DEFAULT_SETTINGS, metronomeSound: "wood" }),
+    ).toMatchObject({
+      metronomeSound: "wood",
+    });
   });
 });

@@ -40,6 +40,12 @@ export const SignalOrderStrip = ({ verdict }: SignalOrderStripProps) => {
         Signal order
       </span>
 
+      {verdict.complete && (
+        <span className='rounded-md bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-300'>
+          Full chain
+        </span>
+      )}
+
       <div className='no-scrollbar flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto'>
         {PLAYABLE_SIGNAL_STAGES.map((stage, index) => {
           const stageIndex = SIGNAL_STAGES.indexOf(stage);

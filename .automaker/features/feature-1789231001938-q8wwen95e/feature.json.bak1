@@ -1,0 +1,21 @@
+{
+  "category": "pipeline-run",
+  "description": "docs/STYLEGUIDE.md rule #11 says never use the \"uppercase\" utility class - text should stay in its natural case. In src/feature/arsenal/components/GuitarInventory/GuitarCard.tsx, both the guitar brand label and the small \"New\" badge use \"uppercase\" classes. I'm not sure if this is an intentional exception for game-card badge styling or a genuine style-guide violation left over from before that rule was written. Please check whether STYLEGUIDE.md documents an exception for badges/labels like this; if not, bring it in line with the rule (or, if it turns out to be an intentional accepted style for card badges, say so instead of guessing).",
+  "title": "GuitarCard uses uppercase text, which STYLEGUIDE.md forbids",
+  "status": "verified",
+  "imagePaths": [],
+  "source": "manual",
+  "authorName": "michal.j@automa.net",
+  "pipelineRunId": "e26e0265-58a9-4de2-b732-dd3aa3c13568",
+  "id": "feature-1789231001938-q8wwen95e",
+  "createdAt": "2026-09-12T16:36:41.939Z",
+  "descriptionHistory": [
+    {
+      "description": "docs/STYLEGUIDE.md rule #11 says never use the \"uppercase\" utility class - text should stay in its natural case. In src/feature/arsenal/components/GuitarInventory/GuitarCard.tsx, both the guitar brand label and the small \"New\" badge use \"uppercase\" classes. I'm not sure if this is an intentional exception for game-card badge styling or a genuine style-guide violation left over from before that rule was written. Please check whether STYLEGUIDE.md documents an exception for badges/labels like this; if not, bring it in line with the rule (or, if it turns out to be an intentional accepted style for card badges, say so instead of guessing).",
+      "timestamp": "2026-09-12T16:36:41.939Z",
+      "source": "initial"
+    }
+  ],
+  "updatedAt": "2026-09-12T17:20:51.441Z",
+  "summary": "## Summary: Browser QA\n\n### Changes Implemented\n- Created a temporary Playwright browser test (`e2e-verify-uppercase.spec.ts`) with 7 test cases covering source code verification and live browser CSS validation\n- Ran all tests against the running dev server (localhost:3000)\n- Deleted the temporary test file after successful verification\n\n### Files Modified\n- No permanent file changes in this step (temporary test file created and deleted)\n\n### Outcome\n- **All 9 assertions passed, 0 failed** across 7 test cases:\n  - **Test 1**: Source code contains zero instances of `uppercase` class in GuitarCard.tsx\n  - **Test 2**: Badge text is \"New\" (natural case), not \"NEW\" (2 assertions)\n  - **Test 3**: Homepage loads successfully with HTTP 200 (2 assertions)\n  - **Test 4**: Brand label classes (`text-[10px] font-semibold leading-none tracking-wider`) produce `text-transform: none` in the browser — not uppercase\n  - **Test 5**: Badge classes (`px-1.5 py-0.5 text-[8px] font-black tracking-widest text-black`) produce `text-transform: none` in the browser — not uppercase\n  - **Test 6**: Badge would visually render as \"New\" (not \"NEW\") in the browser\n  - **Test 7 (control)**: The `uppercase` Tailwind class *does* produce `text-transform: uppercase` when applied, proving the test is meaningful — if the class were still present, it would force uppercase rendering\n- The arsenal page itself requires Firebase authentication so it cannot be accessed without credentials, but the CSS verification via computed styles on the homepage confirms the fix is effective"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "evt-1789233651500-8ba2c368",
+  "trigger": "feature_error",
+  "timestamp": "2026-09-12T17:20:51.505Z",
+  "projectPath": "G:\\cw\\sss\\CwiczymyRazem",
+  "projectName": "CwiczymyRazem",
+  "featureId": "feature-1789231001938-q8wwen95e",
+  "featureName": "GuitarCard uses uppercase text, which STYLEGUIDE.md forbids",
+  "error": "Operation was cancelled",
+  "errorType": "cancellation"
+}

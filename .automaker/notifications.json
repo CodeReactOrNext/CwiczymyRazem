@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "notifications": [
+    {
+      "id": "0ed5ab67-e72a-4e4a-ba9e-5480ba01ef87",
+      "type": "auto_mode_error",
+      "title": "GuitarCard uses uppercase text, which STYLEGUIDE.md forbids",
+      "message": "Auto Mode Error: Operation was cancelled",
+      "createdAt": "2026-09-12T17:20:51.506Z",
+      "read": false,
+      "dismissed": false,
+      "featureId": "feature-1789231001938-q8wwen95e",
+      "projectPath": "G:\\cw\\sss\\CwiczymyRazem"
+    },
+    {
+      "id": "4f342709-a21a-48a5-a9be-2b770366a6f1",
+      "type": "auto_mode_error",
+      "title": "GuitarCard uses uppercase text, which STYLEGUIDE.md forbids",
+      "message": "Auto Mode Error: Operation was cancelled",
+      "createdAt": "2026-09-12T17:20:51.507Z",
+      "read": false,
+      "dismissed": false,
+      "featureId": "feature-1789231001938-q8wwen95e",
+      "projectPath": "G:\\cw\\sss\\CwiczymyRazem"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Sparkles } from "lucide-react";
 
 import type { PowerState } from "../../data/powerSupply";
 import type { SupplyTier } from "../../data/rigHardware";
@@ -97,6 +97,12 @@ export const BoardStatusStrip = ({
                 <span className='flex items-center gap-1.5 font-semibold text-amber-400'>
                   <AlertTriangle size={13} strokeWidth={2.5} />
                   {verdict.wrongLinks} backwards
+                </span>
+              )}
+              {verdict.complete && (
+                <span className='flex items-center gap-1.5 font-semibold text-emerald-400'>
+                  <Sparkles size={13} strokeWidth={2.5} />
+                  Full chain
                 </span>
               )}
             </>

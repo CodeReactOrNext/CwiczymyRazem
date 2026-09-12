@@ -30,6 +30,12 @@
  *    player is never told "wrong" without also being shown progress. It also
  *    means the reward grows with the collection: more pedals, more cables.
  *
+ *  • **One kind of everything pays on top of that.** `CHAIN_COMPLETE_FAME`
+ *    lands once the board covers every stage the craft currently has pedals
+ *    for — not "a big board", a *complete* one. It stacks with flawless
+ *    rather than replacing it, because the two ask for different things: a
+ *    three-pedal board can be flawless, but only a full rack can be complete.
+ *
  * Deliberately free of anything React — the report API scores the stored board
  * with the same function the board itself draws from, so what the panel promises
  * is what a session pays.
@@ -57,6 +63,14 @@ export const CHAIN_FLAWLESS_FAME = 6;
  * order is one cable and a coin flip; three is a decision.
  */
 export const CHAIN_FLAWLESS_MIN_PEDALS = 3;
+
+/**
+ * Fame/h on top when the board covers every playable stage at once — dirt,
+ * modulation, time and everything between, all in service together. Set
+ * above the flawless bonus: getting the order right is a rule, owning one of
+ * every kind is a collection.
+ */
+export const CHAIN_COMPLETE_FAME = 10;
 
 export interface SignalStage {
   id: string;
@@ -213,6 +227,8 @@ export interface ChainVerdict {
   wrongLinks: number;
   /** Nothing backwards, and enough pedals for that to mean something. */
   flawless: boolean;
+  /** Every playable stage is filled — one of every kind of pedal, in service. */
+  complete: boolean;
   /** Fame/h this layout is worth. */
   rate: number;
   tier: ChainTier;
@@ -331,8 +347,14 @@ export const evaluateChain = (nodes: ChainNode[]): ChainVerdict => {
   const okLinks = links.length - wrongLinks;
   const flawless =
     wrongLinks === 0 && nodes.length >= CHAIN_FLAWLESS_MIN_PEDALS;
+  const filledStages = [
+    ...new Set(nodes.map((node) => node.stage).filter((stage) => stage >= 0)),
+  ];
+  const complete = filledStages.length === PLAYABLE_SIGNAL_STAGES.length;
   const rate = round1(
-    okLinks * CHAIN_LINK_FAME + (flawless ? CHAIN_FLAWLESS_FAME : 0),
+    okLinks * CHAIN_LINK_FAME +
+      (flawless ? CHAIN_FLAWLESS_FAME : 0) +
+      (complete ? CHAIN_COMPLETE_FAME : 0),
   );
 
   const firstWrong = links.find((link) => !link.ok);
@@ -350,12 +372,11 @@ export const evaluateChain = (nodes: ChainNode[]): ChainVerdict => {
     okLinks,
     wrongLinks,
     flawless,
+    complete,
     rate,
     tier: tierOf(nodes.length, wrongLinks),
     tip,
-    filledStages: [
-      ...new Set(nodes.map((node) => node.stage).filter((stage) => stage >= 0)),
-    ],
+    filledStages,
   };
 };
 
