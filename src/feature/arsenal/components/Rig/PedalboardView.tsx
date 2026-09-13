@@ -14,6 +14,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import {
+  describeDuplicateCopy,
+  formatDuplicateShare,
+  readBoardLevel,
+} from "../../data/boardDuplicates";
+import {
   autoPatch,
   pickOutput,
   readPowerState,
@@ -61,6 +66,7 @@ import {
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
 import { BoardStatusStrip } from "./BoardStatusStrip";
+import { DuplicateStrip } from "./DuplicateStrip";
 import { EffectPickerModal } from "./EffectPickerModal";
 import type { PoweredPedal } from "./PowerLoom";
 import { PedalDcPlug, PowerLoom, PowerRail } from "./PowerLoom";
@@ -893,6 +899,21 @@ export const PedalboardView = ({
       ),
     [geo, localItems, data.effectInventory, localPower, hasPower],
   );
+
+  // The same pedals, priced: what the powered board adds to Rig Level once a
+  // second copy of a model counts half and a third nothing. Live for the same
+  // reason the verdict is — a duplicate should cost something the moment it
+  // lands, not 600ms later — and off the same inputs, so the number this shows
+  // is the number the save writes.
+  const boardLevel = useMemo(
+    () =>
+      readBoardLevel(
+        localItems,
+        data.effectInventory,
+        localPower === null ? undefined : hasPower,
+      ),
+    [localItems, data.effectInventory, localPower, hasPower],
+  );
   const isOnBoard = useCallback(
     (itemId: string) => !overflowIds.includes(itemId),
     [overflowIds],
@@ -1062,6 +1083,7 @@ export const PedalboardView = ({
             power={powerState}
             unpowered={unpoweredNames}
           />
+          <DuplicateStrip board={boardLevel} />
           <SignalOrderStrip verdict={verdict} />
         </>
       )}
@@ -1215,6 +1237,10 @@ export const PedalboardView = ({
             const showCollision = isDragging && isColliding;
             const wPct = widthOf(placement.itemId);
             const powered = hasPower(placement.itemId);
+            // A second copy of a model wears what it is counted at, so the
+            // player can see which copy to swap out without opening a card.
+            const copy = boardLevel.copies.get(placement.itemId);
+            const shareMark = copy ? formatDuplicateShare(copy.share) : null;
             // The pedal the loose end of a cable is currently over. Amber when
             // the brick can carry it, red when the drop would be refused — so
             // the answer arrives before the cable is let go, not after.
@@ -1288,6 +1314,18 @@ export const PedalboardView = ({
                     );
                   }}
                 />
+                {shareMark && copy && (
+                  <span
+                    title={describeDuplicateCopy(
+                      copy,
+                      boardLevel.duplicates.find((group) =>
+                        group.copies.some((c) => c.itemId === copy.itemId),
+                      )?.name ?? effect.name,
+                    )}
+                    className='absolute bottom-1 right-1 z-10 rounded bg-black/85 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-300'>
+                    {shareMark}
+                  </span>
+                )}
                 {/* The plug in its inlet, over the artwork rather than under
                     it, so it can sit down in a socket drawn on the top face. */}
                 {patchedIds.has(placement.itemId) && (

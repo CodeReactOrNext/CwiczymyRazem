@@ -25,10 +25,12 @@ export interface YouTubeLessonResult {
   title: string;
   channelName: string;
   thumbnailUrl: string;
-  duration: number;
+  /** Seconds. Absent for lessons authored by hand in a roadmap JSON. */
+  duration?: number;
   level?: GuitarLevel;
   topics?: string[];
-  score: number;
+  /** Scraper quality score. Absent for lessons authored by hand. */
+  score?: number;
 }
 
 export interface ScraperConfig {

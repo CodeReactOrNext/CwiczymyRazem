@@ -157,13 +157,19 @@ export const usePracticeSessionState = ({
       exerciseRecords?: any,
       micPerformance?: any,
       earTrainingPerformance?: any
-    ) => handleFinishSession(
-      useSessionTimeStore.getState().time,
-      timer.stopTimer,
-      exerciseRecords,
-      micPerformance,
-      earTrainingPerformance
-    ),
+    ) => {
+      // Both read in the same breath: the song shares are a slice of the
+      // category totals and must come from the same snapshot.
+      const { time, songTime } = useSessionTimeStore.getState();
+      return handleFinishSession(
+        time,
+        timer.stopTimer,
+        exerciseRecords,
+        micPerformance,
+        earTrainingPerformance,
+        songTime
+      );
+    },
     canFinishSession,
     isSkillExercise,
     isSubmittingReport,

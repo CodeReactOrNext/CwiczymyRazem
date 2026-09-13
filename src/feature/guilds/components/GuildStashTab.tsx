@@ -3,6 +3,7 @@ import { BoardPieceTile } from "feature/arsenal/components/Collection/BoardPiece
 import { StashBoard } from "feature/arsenal/components/Collection/StashBoard";
 import { StashItemDialog } from "feature/arsenal/components/Collection/StashItemDialog";
 import type { StashPlacement } from "feature/arsenal/components/Collection/StashTile";
+import { DexMarks } from "feature/arsenal/components/DexMarks";
 import { useUpdateStashLayout } from "feature/arsenal/hooks/useUpdateStashLayout";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
@@ -13,6 +14,8 @@ import {
   partPieces,
   pedalPiece,
 } from "feature/arsenal/utils/boardPieces";
+import type { DexLookup, DexStatus } from "feature/arsenal/utils/dex";
+import { buildDexLookup } from "feature/arsenal/utils/dex";
 import type { StashLayout } from "feature/arsenal/utils/stashLayout";
 import {
   columnOf,
@@ -66,6 +69,19 @@ const entryPiece = (entry: StashEntry): BoardPiece => {
     mod: entry.item,
     name: entry.name,
   };
+};
+
+/**
+ * Owned / Dex for gear on the shelf, the way the case preview and the market
+ * mark it. Parts and mods are not collected, so they have no status to show.
+ */
+const dexStatusOfGear = (
+  lookup: DexLookup,
+  gear: BoardPiece | StashEntry,
+): DexStatus | undefined => {
+  if (gear.kind === "guitar") return lookup("guitar", gear.item.guitarId);
+  if (gear.kind === "effect") return lookup("effect", gear.item.effectId);
+  return undefined;
 };
 
 /**
@@ -181,6 +197,9 @@ export const GuildStashTab = ({
     () => resolveLayout(gearPieces, draft ?? gear?.stashLayout ?? {}),
     [gearPieces, draft, gear?.stashLayout],
   );
+  // What the shelf holds that the member already has, or has had — read off
+  // the same arsenal query the gear board is drawn from.
+  const dexStatusOf = useMemo(() => buildDexLookup(gear), [gear]);
 
   const equippedItemId = gear?.equippedItemId ?? null;
   const guitarSlots = useMemo<(string | null)[]>(
@@ -291,6 +310,11 @@ export const GuildStashTab = ({
     // what a take costs before they click and not from the error after.
     const entry =
       board === "shelf" ? entries.find((e) => e.id === piece.id) : undefined;
+    // And whether they already have one: a glyph on the socket, the two marks
+    // under the hover card. The member's own board says nothing — everything
+    // on it is theirs.
+    const dexStatus =
+      board === "shelf" ? dexStatusOfGear(dexStatusOf, piece) : undefined;
 
     return (
       <BoardPieceTile
@@ -300,7 +324,20 @@ export const GuildStashTab = ({
         isEquipped={board === "gear" && equippedItemId === piece.id}
         rigSlot={board === "gear" ? rigSlotOf(piece.id) : null}
         isOnPedalboard={board === "gear" && pedalboardItemIds.has(piece.id)}
-        previewFooter={entry ? <HonorPriceTag /> : undefined}
+        dexStatus={dexStatus}
+        previewFooter={
+          entry ? (
+            <>
+              {dexStatus && (
+                <DexMarks
+                  status={dexStatus}
+                  className='mt-2 rounded-lg bg-zinc-900/95 px-3 py-2'
+                />
+              )}
+              <HonorPriceTag />
+            </>
+          ) : undefined
+        }
         onClick={() => {
           if (consumeClick()) return;
           transfer(board, piece.id);
@@ -456,6 +493,7 @@ export const GuildStashTab = ({
         {amount?.mode === "confirm" && (
           <HonorTakeCard
             entry={amount.entry}
+            dexStatus={dexStatusOfGear(dexStatusOf, amount.entry)}
             balance={myHonor.balance}
             busy={busy}
             onConfirm={() => {

@@ -12,7 +12,14 @@ const EMPTY: SessionTime = {
 
 interface SessionTimeStore {
   time: SessionTime;
-  add: (skill: SkillsType, ms: number) => void;
+  /**
+   * The slice of `time` spent on the plan's song items, keyed by song id. A
+   * song that sits in the plan twice ticks into the same bucket, so this is
+   * "time with the song", not "time per slot" — which is what the song's own
+   * progress wants to know.
+   */
+  songTime: Record<string, number>;
+  add: (skill: SkillsType, ms: number, songId?: string) => void;
   reset: () => void;
 }
 
@@ -30,9 +37,18 @@ interface SessionTimeStore {
  */
 export const useSessionTimeStore = create<SessionTimeStore>()((set) => ({
   time: EMPTY,
-  add: (skill, ms) =>
-    set((state) => ({ time: { ...state.time, [skill]: state.time[skill] + ms } })),
-  reset: () => set({ time: EMPTY }),
+  songTime: {},
+  add: (skill, ms, songId) =>
+    set((state) => ({
+      time: { ...state.time, [skill]: state.time[skill] + ms },
+      // One tick, two ledgers: the song's share is a view over the category
+      // total, never an addition to it — the report reads both from here, so
+      // they cannot disagree about how long the song was played.
+      ...(songId
+        ? { songTime: { ...state.songTime, [songId]: (state.songTime[songId] ?? 0) + ms } }
+        : {}),
+    })),
+  reset: () => set({ time: EMPTY, songTime: {} }),
 }));
 
 /** Total ms tracked in the running session, across every category. */

@@ -185,6 +185,9 @@ interface SidebarSubLink {
   name: string;
   href: string;
   icon: React.ReactNode;
+  tooltip?: string;
+  lockedLvl?: number;
+  showBadge?: boolean;
 }
 
 const PRACTICE_SUB_NAV: SidebarSubLink[] = [
@@ -314,6 +317,7 @@ const SidebarExpandableNavLink = ({
   onLinkClick,
   subLinks,
   isSubLinkActive,
+  showBadge = false,
 }: {
   href: string;
   name: string;
@@ -324,6 +328,7 @@ const SidebarExpandableNavLink = ({
   onLinkClick?: () => void;
   subLinks: SidebarSubLink[];
   isSubLinkActive: (href: string) => boolean;
+  showBadge?: boolean;
 }) => {
   const { createRipple, ripple } = useRipple();
 
@@ -348,6 +353,14 @@ const SidebarExpandableNavLink = ({
             {icon}
           </span>
           <span className='flex-1'>{name}</span>
+          {showBadge && !isExpanded && (
+            <span className={NAV_INDICATOR_SLOT}>
+              <span
+                aria-label='Unclaimed reward'
+                className='h-2 w-2 animate-pulse rounded-full bg-amber-500'
+              />
+            </span>
+          )}
         </Link>
         <button
           type='button'
@@ -384,6 +397,9 @@ const SidebarExpandableNavLink = ({
                   icon={subLink.icon}
                   isActive={isSubLinkActive(subLink.href)}
                   onClick={onLinkClick}
+                  tooltip={subLink.tooltip}
+                  lockedLvl={subLink.lockedLvl}
+                  showBadge={subLink.showBadge}
                 />
               ))}
             </div>
@@ -442,10 +458,11 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
-    if (pathname === "/summary") return "summary";
-    if (pathname.startsWith("/leaderboard")) return "leaderboard";
-    if (pathname.startsWith("/seasons")) return "leaderboard";
-    if (pathname.startsWith("/challenges")) return "challenges";
+    if (pathname === "/summary") return "progress";
+    if (pathname.startsWith("/challenges")) return "progress";
+    if (pathname.startsWith("/leaderboard")) return "community";
+    if (pathname.startsWith("/seasons")) return "community";
+    if (pathname.startsWith("/guilds")) return "community";
     if (pathname.startsWith("/arsenal")) return "arsenal";
     if (pathname.startsWith("/tone-studio")) return "tone-studio";
     if (pathname.startsWith("/plans")) return "library";
@@ -456,7 +473,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/roadmap")) return "roadmap";
     if (pathname.startsWith("/supporter")) return "supporter";
-    if (pathname.startsWith("/guilds")) return "guilds";
     if (pathname.startsWith("/wiki")) return "wiki";
     return null;
   };
@@ -527,39 +543,65 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       children: SONGS_SUB_NAV,
     },
     {
+      id: "library",
+      name: "My Stuff",
+      href: "/favorites",
+      icon: <Library size={18} />,
+      children: LIBRARY_SUB_NAV,
+    },
+    {
       id: "progress",
       name: "Progress",
       href: "/profile/activity",
       icon: <FaArrowTrendUp size={18} />,
+      showBadge: hasUnclaimedMilestone,
+      children: [
+        {
+          id: "progress-activity",
+          name: "Activity",
+          href: "/profile/activity",
+          icon: <FaArrowTrendUp size={16} />,
+        },
+        {
+          id: "progress-milestones",
+          name: "Milestones",
+          href: "/summary",
+          icon: <Milestone size={16} />,
+          tooltip: "Weekly rewards for hitting practice goals",
+          lockedLvl: lockedAtLvl("summary"),
+          showBadge: hasUnclaimedMilestone,
+        },
+        {
+          id: "progress-challenges",
+          name: "Challenges",
+          href: "/challenges",
+          icon: <Flame size={16} />,
+          tooltip: "Five community-voted songs to record every month",
+        },
+      ] as SidebarSubLink[],
     },
     {
-      id: "summary",
-      name: "Milestones",
-      href: "/summary",
-      icon: <Milestone size={18} />,
-      tooltip: "Weekly rewards for hitting practice goals",
-      lockedLvl: lockedAtLvl("summary"),
-    },
-    {
-      id: "challenges",
-      name: "Challenges",
-      href: "/challenges",
-      icon: <Flame size={18} />,
-      tooltip: "Five community-voted songs to record every month",
-    },
-    {
-      id: "leaderboard",
-      name: "Rankings",
+      id: "community",
+      name: "Community",
       href: "/seasons",
       icon: <Trophy size={18} />,
-    },
-    {
-      id: "guilds",
-      name: "Guilds",
-      href: "/guilds",
-      icon: <Shield size={18} />,
-      tooltip: "Practise alongside other people — chat and a weekly challenge",
-      lockedLvl: lockedAtLvl("guilds"),
+      children: [
+        {
+          id: "community-rankings",
+          name: "Rankings",
+          href: "/seasons",
+          icon: <Trophy size={16} />,
+        },
+        {
+          id: "community-guilds",
+          name: "Guilds",
+          href: "/guilds",
+          icon: <Shield size={16} />,
+          tooltip:
+            "Practise alongside other people — chat and a weekly challenge",
+          lockedLvl: lockedAtLvl("guilds"),
+        },
+      ] as SidebarSubLink[],
     },
     {
       id: "arsenal",
@@ -589,16 +631,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       tooltip: isSupporter
         ? "Post ideas and spend your votes on what gets built next"
         : "What supporting the project gets you, and how to get it",
-    },
-  ];
-
-  const libraryNavigation = [
-    {
-      id: "library",
-      name: "My Stuff",
-      href: "/favorites",
-      icon: <Library size={18} />,
-      children: LIBRARY_SUB_NAV,
     },
   ];
 
@@ -646,6 +678,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       muted?: boolean;
       external?: boolean;
       lockedLvl?: number;
+      showBadge?: boolean;
       children?: SidebarSubLink[];
     }[],
     onClick?: () => void,
@@ -660,6 +693,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         muted,
         external,
         lockedLvl,
+        showBadge,
         children,
       }) => {
         if (children) {
@@ -675,6 +709,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               onLinkClick={onClick}
               subLinks={children}
               isSubLinkActive={isSubLinkActive}
+              showBadge={showBadge}
             />
           );
         }
@@ -752,22 +787,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         mobile ? "pb-20" : ""
       }`}>
       <div className='space-y-8'>
-        <div>
-          <div className='space-y-1'>
-            {renderNavLinks(
-              mainNavigation,
-              mobile ? handleLinkClick : undefined,
-            )}
-          </div>
-        </div>
-
-        <div>
-          <div className='space-y-1'>
-            {renderNavLinks(
-              libraryNavigation,
-              mobile ? handleLinkClick : undefined,
-            )}
-          </div>
+        <div className='space-y-1'>
+          {renderNavLinks(mainNavigation, mobile ? handleLinkClick : undefined)}
         </div>
 
         <div className='space-y-1'>

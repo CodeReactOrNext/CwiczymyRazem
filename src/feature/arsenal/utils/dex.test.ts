@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { buildDiscoveredSet, buildOwnershipMap, getDexProgress } from "./dex";
+import type {
+  EffectInventoryItem,
+  InventoryItem,
+} from "../types/arsenal.types";
+import {
+  buildDexLookup,
+  buildDiscoveredSet,
+  buildOwnershipMap,
+  getDexProgress,
+} from "./dex";
 
 interface FakeItem {
   id: string;
@@ -97,5 +106,48 @@ describe("getDexProgress", () => {
     const progress = getDexProgress(defs, new Set());
     expect(progress.owned).toBe(0);
     expect(progress.byRarity.Common).toEqual({ owned: 0, total: 2 });
+  });
+});
+
+describe("buildDexLookup", () => {
+  const guitar = (id: string, guitarId: number) =>
+    ({ id, guitarId }) as unknown as InventoryItem;
+  const effect = (id: string, effectId: string) =>
+    ({ id, effectId }) as unknown as EffectInventoryItem;
+
+  it("answers false/false with no data at all", () => {
+    const lookup = buildDexLookup(undefined);
+    expect(lookup("guitar", 1)).toEqual({ isOwned: false, inDex: false });
+    expect(lookup("effect", "od-1")).toEqual({ isOwned: false, inDex: false });
+  });
+
+  it("marks what is in the stash as owned and discovered", () => {
+    const lookup = buildDexLookup({
+      inventory: [guitar("a", 1)],
+      effectInventory: [effect("b", "od-1")],
+    });
+    expect(lookup("guitar", 1)).toEqual({ isOwned: true, inDex: true });
+    expect(lookup("effect", "od-1")).toEqual({ isOwned: true, inDex: true });
+  });
+
+  it("marks a recorded model no longer held as Dex only", () => {
+    const lookup = buildDexLookup({
+      inventory: [],
+      effectInventory: [],
+      dexGuitars: [2],
+      dexEffects: ["dl-3"],
+    });
+    expect(lookup("guitar", 2)).toEqual({ isOwned: false, inDex: true });
+    expect(lookup("effect", "dl-3")).toEqual({ isOwned: false, inDex: true });
+  });
+
+  it("keeps guitars and pedals apart", () => {
+    const lookup = buildDexLookup({
+      inventory: [guitar("a", 7)],
+      effectInventory: [],
+      dexEffects: [7],
+    });
+    expect(lookup("guitar", 7)).toEqual({ isOwned: true, inDex: true });
+    expect(lookup("effect", 7)).toEqual({ isOwned: false, inDex: true });
   });
 });

@@ -3,6 +3,7 @@ import {
   getEffectiveRarity,
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
+import type { DexStatus } from "feature/arsenal/utils/dex";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import {
   rarityLockLvl,
@@ -21,6 +22,8 @@ interface GuitarStashTileProps extends StashPlacement {
   isEquipped?: boolean;
   /** Rig slot index (0-2) this copy occupies, or null. */
   rigSlot?: number | null;
+  /** Owned / Dex corner glyph, on a board that is not the viewer's — see `StashTile`. */
+  dexStatus?: DexStatus;
   /** Under the hover card — see `StashTile`. */
   previewFooter?: ReactNode;
   onClick?: () => void;
@@ -31,6 +34,7 @@ export const GuitarStashTile = ({
   item,
   isEquipped = false,
   rigSlot = null,
+  dexStatus,
   previewFooter,
   onClick,
   ...placement
@@ -60,6 +64,7 @@ export const GuitarStashTile = ({
       isNew={item.isNew}
       locked={lockedLvl != null}
       inUse={inUse}
+      dexStatus={dexStatus}
       onClick={onClick}
       preview={
         <GuitarCard

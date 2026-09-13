@@ -14,7 +14,12 @@ import { SUPPLY_TIERS } from "./rigHardware";
 import { getRigLevel } from "./rigLevel";
 
 const GUITAR = GUITAR_DEFINITIONS[0];
-const EFFECT = EFFECT_DEFINITIONS[0];
+
+/**
+ * Five different models — a second copy of one model is scored by the duplicate
+ * rule (`boardDuplicates.test`), and these tests are about the brick, not that.
+ */
+const EFFECTS = EFFECT_DEFINITIONS.filter((def) => !def.variantOf).slice(0, 5);
 
 const guitar: InventoryItem = {
   id: "g1",
@@ -26,9 +31,9 @@ const guitar: InventoryItem = {
 };
 
 /** Five pedals, one more than the bottom brick has outputs. */
-const pedals: EffectInventoryItem[] = Array.from({ length: 5 }, (_, i) => ({
+const pedals: EffectInventoryItem[] = EFFECTS.map((def, i) => ({
   id: `p${i}`,
-  effectId: EFFECT.id,
+  effectId: def.id,
   acquiredAt: 0,
   isNew: false,
 }));
@@ -37,11 +42,10 @@ const GUITAR_LEVEL = getItemLevel(guitar, GUITAR);
 
 /** Condition is derived from the item id, so every pedal is worth its own. */
 const expected = (...poweredIds: string[]) =>
-  poweredIds.reduce(
-    (total, id) =>
-      total + getEffectLevel(pedals.find((p) => p.id === id)!, EFFECT),
-    GUITAR_LEVEL,
-  );
+  poweredIds.reduce((total, id) => {
+    const index = pedals.findIndex((p) => p.id === id);
+    return total + getEffectLevel(pedals[index], EFFECTS[index]);
+  }, GUITAR_LEVEL);
 
 const rigWith = (
   boarded: string[],
@@ -119,6 +123,22 @@ describe("getRigLevel", () => {
         ),
       ),
     ).toBe(expected("p0"));
+  });
+
+  it("counts a second copy of one model at half its level", () => {
+    // The duplicate rule itself is covered in `boardDuplicates.test`; this
+    // checks it reaches the number every API saves and every panel shows.
+    const twin: EffectInventoryItem = { ...pedals[0], id: "p0-twin" };
+    const level = getRigLevel({
+      rig: rigWith(["p0", "p0-twin"], allOn(["p0", "p0-twin"])),
+      inventory: [guitar],
+      effectInventory: [...pedals, twin],
+    });
+    const own = getEffectLevel(pedals[0], EFFECTS[0]);
+    const twinLevel = getEffectLevel(twin, EFFECTS[0]);
+    const [best, second] =
+      own >= twinLevel ? [own, twinLevel] : [twinLevel, own];
+    expect(level).toBe(GUITAR_LEVEL + best + Math.round(second / 2));
   });
 
   it("pays nothing for a player with no arsenal at all", () => {

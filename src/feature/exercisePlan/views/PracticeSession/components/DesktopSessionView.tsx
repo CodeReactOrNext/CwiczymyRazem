@@ -17,7 +17,7 @@ import { ExerciseHeroHeader } from "./ExerciseHeroHeader";
 import { ExerciseProgress } from "./ExerciseProgress";
 import { ExerciseQuickActionsBar } from "./ExerciseQuickActionsBar";
 import { GpTrackSelector } from "./GpTrackSelector";
-import { MediaControlsToolbar, SpeedDropdown } from "./MediaControlsToolbar";
+import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { SessionBottomBar } from "./SessionBottomBar";
 import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
 import { TablatureViewMenu } from "./TablatureViewMenu";
@@ -113,6 +113,7 @@ interface DesktopSessionViewProps {
   /** Backing-track bar — only a song practice session passes one. Rendered above
    *  the tablature, but owned by PracticeSession, since it drives real audio. */
   backingTrackSlot?:        React.ReactNode;
+  songSectionMapSlot?:      React.ReactNode;
   /** Cinema mode — the backing video fills the session behind the notation. */
   backingCinema?:           boolean;
   /** The backing-track alignment screen is open over the whole session. It plays
@@ -206,21 +207,17 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
           </>
         }
       />
-      {/* TEMPO island: playback speed lives next to the BPM slider — one axis, one place. */}
+      {/* TEMPO island: the BPM slider and the playback-speed picker are one bar —
+          the picker sits inside ExerciseQuickActionsBar, right after the BPM it scales. */}
       {hasMetronome && !p.isExamMode && (
-        <div className="flex items-center gap-1.5 rounded-lg bg-zinc-900/40 p-1.5">
-          <SpeedDropdown
-            speedMultiplier={p.speedMultiplier}
-            onSpeedMultiplierChange={p.handleSpeedMultiplierChange}
-            baseBpm={p.metronome?.bpm}
-            isSlowed={p.speedMultiplier < 1}
-            h="h-12"
-          />
-          <div className="w-[360px] max-w-full [&>*]:!mb-0">
+        <div className="flex items-center rounded-lg bg-zinc-900/40 p-1.5">
+          <div className="w-[640px] max-w-full [&>*]:!mb-0">
             <ExerciseQuickActionsBar
               exercise={p.currentExercise}
               metronome={p.metronome}
               examMode={p.isExamMode}
+              speedMultiplier={p.speedMultiplier}
+              onSpeedMultiplierChange={p.handleSpeedMultiplierChange}
             />
           </div>
         </div>
@@ -310,6 +307,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     rewardAmount={p.skillRewardAmount}
                     controlsSlot={playbackControls}
                     backingTrackSlot={p.backingTrackSlot}
+                    songSectionMapSlot={p.songSectionMapSlot}
                     cinema={p.backingCinema}
                     obscured={p.backingAligning}
                   />

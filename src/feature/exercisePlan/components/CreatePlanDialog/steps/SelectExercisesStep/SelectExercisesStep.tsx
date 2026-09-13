@@ -1,26 +1,34 @@
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
 import {
   getCommunityExercises,
   getUserCommunityExercises,
 } from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import type { Exercise, SongPracticeMode } from "feature/exercisePlan/types/exercise.types";
+import { songToExercise } from "feature/exercisePlan/utils/songToExercise";
 import { ChordSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ChordSelectionDialog";
 import { ScaleSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ScaleSelectionDialog";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
+import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
+import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
-import { ArrowRight, BookOpen, Globe, User } from "lucide-react";
+import { ArrowRight, BookOpen, Globe, Music, User } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
 import { AddExerciseTimeDialog } from "./components/AddExerciseTimeDialog";
+import type { PendingPlanSong } from "./components/AddSongToPlanDialog";
+import { AddSongToPlanDialog } from "./components/AddSongToPlanDialog";
 import { ExerciseFilters } from "./components/ExerciseFilters";
 import { ExerciseGrid } from "./components/ExerciseGrid";
 import { ExercisePreviewDialog } from "./components/ExercisePreviewDialog";
 import { SelectedExercisesList } from "./components/SelectedExercisesList";
+import { SongPickerList } from "./components/SongPickerList";
 import { CreateCustomExerciseDialog } from "./CreateCustomExerciseDialog";
 import { useExerciseSelection } from "./hooks/useExerciseSelection";
 
@@ -30,12 +38,13 @@ interface SelectExercisesStepProps {
   onNext: () => void;
 }
 
-type SourceTab = "library" | "community" | "mine";
+type SourceTab = "library" | "community" | "mine" | "songs";
 
 const SOURCE_TABS: { id: SourceTab; label: string; icon: LucideIcon }[] = [
   { id: "library", label: "Library", icon: BookOpen },
   { id: "community", label: "Community", icon: Globe },
   { id: "mine", label: "My Exercises", icon: User },
+  { id: "songs", label: "Songs", icon: Music },
 ];
 
 /** Prefix keeps ids from the community collection apart from the built-in
@@ -90,6 +99,43 @@ export const SelectExercisesStep = ({
   const [mySearch, setMySearch] = useState("");
   const [myLoading, setMyLoading] = useState(false);
   const myFetched = useRef(false);
+  const [pendingSong, setPendingSong] = useState<PendingPlanSong | null>(null);
+
+  // What each song can be practised with — the attached Guitar Pro file and
+  // the sections marked on its video. Fetched only once songs come into play
+  // (the Songs tab, or a plan that already holds one); the keys are shared
+  // with the songs page, so this is usually a cache hit.
+  const hasSongItems = selectedExercises.some((exercise) => !!exercise.songData);
+  const songDataEnabled = !!userAuth && (sourceTab === "songs" || hasSongItems);
+  const { data: songProgressList } = useQuery({
+    queryKey: ["user-song-progress", userAuth],
+    queryFn: () => getAllUserSongProgress(userAuth as string),
+    enabled: songDataEnabled,
+    staleTime: 5 * 60 * 1000,
+  });
+  const { data: userSongs } = useQuery({
+    queryKey: ["user-songs", userAuth],
+    queryFn: () => getUserSongs(userAuth as string),
+    enabled: songDataEnabled,
+    staleTime: 10 * 60 * 1000,
+  });
+  const gpSongIds = useMemo(
+    () =>
+      new Set(
+        (songProgressList ?? [])
+          .filter((progress) => !!progress.gpFileId)
+          .map((progress) => progress.songId)
+      ),
+    [songProgressList]
+  );
+  const sectionCountBySongId = useMemo(() => {
+    if (!userSongs) return null;
+    const map = new Map<string, number>();
+    [...userSongs.learning, ...userSongs.wantToLearn, ...userSongs.learned].forEach((song) =>
+      map.set(song.id, song.totalSections ?? 0)
+    );
+    return map;
+  }, [userSongs]);
 
   useEffect(() => {
     if (sourceTab !== "community" || communityFetched.current) return;
@@ -235,7 +281,47 @@ export const SelectExercisesStep = ({
   };
 
   const handleEditTimeRequest = (exercise: Exercise) => {
+    // A song item's dialog also carries its practice mode, so the time button
+    // reopens that one instead of the plain exercise time dialog.
+    if (exercise.songData) {
+      const { songId, title, artist, coverUrl, mode } = exercise.songData;
+      setPendingSong({
+        id: songId,
+        title,
+        artist,
+        coverUrl,
+        hasGpFile: gpSongIds.has(songId),
+        sectionCount: sectionCountBySongId?.get(songId) ?? null,
+        current: { timeInMinutes: exercise.timeInMinutes, mode },
+      });
+      return;
+    }
     setPendingExercise(exercise);
+  };
+
+  // A song is settled in its own dialog before it lands in the plan: how it
+  // will be practised (attached tab or section map) and how long its slot is.
+  const handlePickSong = (song: Song) => {
+    setPendingSong({
+      id: song.id,
+      title: song.title,
+      artist: song.artist,
+      coverUrl: song.coverUrl,
+      hasGpFile: gpSongIds.has(song.id),
+      sectionCount: song.totalSections ?? 0,
+    });
+  };
+
+  const handleSongConfirm = (timeInMinutes: number, mode: SongPracticeMode) => {
+    if (!pendingSong) return;
+    const item = songToExercise(pendingSong, timeInMinutes, mode);
+    const isAlreadySelected = selectedExercises.some((e) => e.id === item.id);
+    onExercisesSelect(
+      isAlreadySelected
+        ? selectedExercises.map((e) => (e.id === item.id ? item : e))
+        : [...selectedExercises, item]
+    );
+    setPendingSong(null);
   };
 
   const handleReorder = (reordered: Exercise[]) => {
@@ -379,6 +465,14 @@ export const SelectExercisesStep = ({
                 onPreviewExercise={setPreviewingExercise}
               />
             </>
+          ) : sourceTab === "songs" ? (
+            <SongPickerList
+              userId={userAuth}
+              selectedExercises={selectedExercises}
+              gpSongIds={gpSongIds}
+              onPickSong={handlePickSong}
+              onRemoveSong={handleExerciseToggle}
+            />
           ) : (
             <>
               <input
@@ -425,6 +519,12 @@ export const SelectExercisesStep = ({
         exercise={pendingExercise ?? null}
         onConfirm={handleTimeConfirm}
         onCancel={() => setPendingExercise(undefined)}
+      />
+
+      <AddSongToPlanDialog
+        song={pendingSong}
+        onConfirm={handleSongConfirm}
+        onCancel={() => setPendingSong(null)}
       />
 
       <ExercisePreviewDialog

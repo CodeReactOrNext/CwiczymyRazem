@@ -9,6 +9,7 @@ import Avatar from "components/UI/Avatar";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getSalvageableMod } from "feature/arsenal/data/salvage";
+import type { DexStatus } from "feature/arsenal/utils/dex";
 import {
   getEffectScrapYield,
   getGuitarScrapYield,
@@ -25,6 +26,7 @@ import type {
 import type { MarketplaceListing } from "../../types/marketplace.types";
 import { BuyButton } from "../BuyButton";
 import { SalvagedModCard } from "../Collection/SalvagedModCard";
+import { DexMarks } from "../DexMarks";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { ScrapYieldStrip } from "../Parts/ScrapYieldStrip";
@@ -33,8 +35,11 @@ import { ModArt } from "../Workshop/ModArt";
 interface MarketListingCardProps {
   listing: MarketplaceListing;
   isOwn: boolean;
-  /** True when the player doesn't own this guitar/effect model yet. */
-  notInCollection?: boolean;
+  /**
+   * Where the listed model stands with the buyer. Absent for a mod — mods are
+   * not collected, so there is nothing to say.
+   */
+  dexStatus?: DexStatus;
   currentFame: number;
   onBuy: () => void;
   onCancel: () => void;
@@ -65,7 +70,7 @@ const getListingScrapYield = (listing: MarketplaceListing): ScrapPart[] => {
 export const MarketListingCard = ({
   listing,
   isOwn,
-  notInCollection = false,
+  dexStatus,
   currentFame,
   onBuy,
   onCancel,
@@ -73,7 +78,7 @@ export const MarketListingCard = ({
   isCancelling,
 }: MarketListingCardProps) => {
   const canAfford = currentFame >= listing.price;
-  const showMissingBadge = notInCollection && !isOwn;
+  const showMissingBadge = dexStatus != null && !dexStatus.isOwned && !isOwn;
 
   const scrapParts = getListingScrapYield(listing);
   // The mod a teardown of this instance would hand over. Picked by hashing the
@@ -155,6 +160,11 @@ export const MarketListingCard = ({
           </Tooltip>
         </TooltipProvider>
       )}
+
+      {/* The same two marks the case preview shows. A seller's own listing
+          skips them: it is theirs, which is the whole point of the cancel
+          button underneath. */}
+      {dexStatus && !isOwn && <DexMarks status={dexStatus} />}
 
       {showMissingBadge && (
         <Chip color='amber' className='self-start px-2 py-1 text-[11px]'>

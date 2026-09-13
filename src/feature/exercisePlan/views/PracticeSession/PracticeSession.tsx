@@ -27,6 +27,7 @@ import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs"
 import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
 import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
 import { SessionDialogs } from "./components/SessionDialogs";
+import { SongSectionMapPanel } from "./components/SongSectionMapPanel";
 import { TuningSettingsModal } from "./components/TuningSettingsModal";
 import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import { GuitarTuningProvider } from "./contexts/GuitarTuningContext";
@@ -59,6 +60,7 @@ import { useRiddleSequenceMatcher } from "./hooks/useRiddleSequenceMatcher";
 import { useScoreSaving } from "./hooks/useScoreSaving";
 import { useSessionAudio } from "./hooks/useSessionAudio";
 import { useSessionControls } from "./hooks/useSessionControls";
+import { useSongExerciseGpFile } from "./hooks/useSongExerciseGpFile";
 import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
 
@@ -167,14 +169,24 @@ export const PracticeSession = ({
 
   // ── GP file loading ───────────────────────────────────────────────────────
 
+  // A song placed in the routine is practised either over the Guitar Pro file
+  // the player attached to it — the same tab its own practice page would open,
+  // backing track included — or over its section map (video + sections), which
+  // wants neither the tab nor the backing recording behind it.
+  const songItem = currentExercise.songData;
+  const songItemOverSections = songItem?.mode === "sections";
+  const songItemTabId = songItem && !songItemOverSections ? songItem.songId : undefined;
+  const songGpFile = useSongExerciseGpFile(songItemTabId, userId ?? null);
+  const gpFileUrl = currentExercise.gpFileUrl ?? songGpFile.gpFileUrl;
+
   const { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks, gpTempo } = useGpFileLoader({
-    rawGpFile, gpFileUrl: currentExercise.gpFileUrl, exerciseTitle: currentExercise.title,
+    rawGpFile, gpFileUrl, exerciseTitle: currentExercise.title,
   });
 
   // ── Guitar tuning (pitch detection + background guitar match the player's own tuning) ──
   // Locked to Standard for Guitar Pro imports (the file already encodes its own tuning)
   // and during exams (prepared only for standard tuning).
-  const isGpFile = !!effectiveRawGpFile || !!currentExercise.gpFileUrl;
+  const isGpFile = !!effectiveRawGpFile || !!gpFileUrl;
   const guitarTuning = useGuitarTuning({ isGpFile, isExamMode });
 
   useEffect(() => {
@@ -287,9 +299,10 @@ export const PracticeSession = ({
   // ── Backing track (song practice only) ────────────────────────────────────
   // Owns an <audio> element / YouTube iframe, so it lives here rather than in a
   // view: the desktop and mobile views mount simultaneously, and two copies
-  // would play the same recording twice. Idle unless the plan is a song.
+  // would play the same recording twice. Idle unless the plan is a song — or
+  // the current item of the routine is one (the recording follows the item).
   const backingTrack = useBackingTrackSession({
-    songId:       plan.song?.id ?? null,
+    songId:       songItemTabId ?? plan.song?.id ?? null,
     userId:       userId ?? null,
     gpTempo,
     isPlaying:    isAudioPlaying,
@@ -824,6 +837,20 @@ export const PracticeSession = ({
     return () => { if (header) header.style.display = ""; };
   }, []);
 
+  // ── Song item over its section map ────────────────────────────────────────
+  // Built once and handed to whichever view is on screen: the desktop view and
+  // the mobile modal are both mounted at the same time (see DesktopSessionView),
+  // and a section map mounted twice would be two YouTube players, two saves
+  // and two hands on every keyboard shortcut.
+  const songSectionMapSlot = songItemOverSections && songItem && userId ? (
+    <SongSectionMapPanel
+      song={songItem}
+      userId={userId}
+      onVideoPlay={startTimer}
+      compact={isMobileView}
+    />
+  ) : undefined;
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
@@ -875,7 +902,7 @@ export const PracticeSession = ({
         </div>
       )}
 
-      <GpLoadingOverlay isLoading={isFetchingGpFile} />
+      <GpLoadingOverlay isLoading={isFetchingGpFile || songGpFile.isResolving} />
 
       {(showSuccessView || examMistakeFailed) && !reportResult && successSnapshot && (
         <ExerciseSuccessView
@@ -943,6 +970,7 @@ export const PracticeSession = ({
           earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
           onEarTrainingGuessed={handleEarTrainingGuessed}
           riddleProgress={riddleProgress} onPlayRiddle={handlePlayRiddle}
+          songSectionMapSlot={isMobileView ? songSectionMapSlot : undefined}
         />,
         document.body,
       )}
@@ -978,6 +1006,7 @@ export const PracticeSession = ({
           />
         ) : undefined}
         backingCinema={backingTrack.isCinema}
+        songSectionMapSlot={isMobileView ? undefined : songSectionMapSlot}
         backingAligning={isAligningBacking}
         countInRemaining={(metronome as any).countInRemaining ?? 0}
         frequencyRef={audioRefs.frequencyRef} volumeRef={audioRefs.volumeRef}

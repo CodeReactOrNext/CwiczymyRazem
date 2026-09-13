@@ -8,6 +8,7 @@ import {
 import {
   computeProgressData, currentWeekDates, isoWeekKey, isSameDay,
   LEVEL_COLORS, LEVELS, localDateStr, milestoneLockedAtLvl, MS_15,
+  PRACTICE_CATEGORIES,
 } from "feature/aiSummary/utils/milestoneLogic";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
@@ -38,24 +39,6 @@ function fmtMin(m: number) {
   return rem > 0 ? `${h}h${rem}m` : `${h}h`;
 }
 
-// ─── Category theme (single source of truth) ───────────────────────────────────
-// One place that defines every practice category's key, label, colour and the
-// matching field on the log. Used by the goal-card day grids and every legend so
-// colours never drift apart again.
-
-type CatKey = "tech" | "theory" | "hearing" | "creat";
-
-const CATEGORIES: {
-  k: CatKey;
-  label: string;
-  color: string;
-  logField: "techniqueTime" | "theoryTime" | "hearingTime" | "creativityTime";
-}[] = [
-  { k: "tech",    label: "Tech",       color: "#ef4444", logField: "techniqueTime"  },
-  { k: "theory",  label: "Theory",     color: "#0891B2", logField: "theoryTime"     },
-  { k: "hearing", label: "Ear",        color: "#10b981", logField: "hearingTime"    },
-  { k: "creat",   label: "Creativity", color: "#f59e0b", logField: "creativityTime" },
-];
 
 // ─── Progress Level System ────────────────────────────────────────────────────
 // Level defs + progress maths live in feature/aiSummary/utils/milestoneLogic so
@@ -277,8 +260,9 @@ function PracticeProgressTracker({
 
 // ─── LevelGoalCard ────────────────────────────────────────────────────────────
 
-// Shares the single CATEGORIES theme defined at the top of the file.
-const CATS = CATEGORIES;
+// Shares the one category theme milestoneLogic defines, so the day grids here
+// and the milestone cards on Home cannot drift apart.
+const CATS = PRACTICE_CATEGORIES;
 
 function buildByDate(logs: FirebaseUserExceriseLog[]) {
   const map = new Map<string, { sumTime: number; tech: number; theory: number; hearing: number; creat: number }>();

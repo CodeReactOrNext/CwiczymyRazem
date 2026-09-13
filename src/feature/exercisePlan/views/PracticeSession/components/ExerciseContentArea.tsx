@@ -19,6 +19,7 @@ import { MetronomeGapTest } from "./MetronomeGapTest";
 import { MicHud } from "./MicHud";
 import { NoteHuntDetector } from "./NoteHuntDetector";
 import { OpenExercisePanel } from "./OpenExercisePanel";
+import { SongPracticePanel } from "./SongPracticePanel";
 import { StrummingSection } from "./StrummingSection";
 import { TablatureSection } from "./TablatureSection";
 import { VideoSection } from "./VideoSection";
@@ -88,6 +89,10 @@ interface ExerciseContentAreaProps {
   /** Backing-track bar, docked directly above the tablature — the video sits in
    *  the same column as the notation you play along to. */
   backingTrackSlot?: React.ReactNode;
+  /** A song item practised over its section map (video + sections) — built
+   *  once in PracticeSession and handed to the view that is on screen, so the
+   *  player never mounts twice (see MobileExerciseContent). */
+  songSectionMapSlot?: React.ReactNode;
   /** Cinema mode — see BackingTrackBar. Turns this card translucent so the
    *  full-bleed video behind it is visible. */
   cinema?: boolean;
@@ -145,6 +150,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   rewardAmount,
   controlsSlot,
   backingTrackSlot,
+  songSectionMapSlot,
   cinema = false,
   obscured = false,
 }: ExerciseContentAreaProps) {
@@ -320,6 +326,13 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           audioContext={audioContext}
           volume={strumSynthVolume(isAudioMuted, trackConfigs?.main)}
         />
+      ) : currentExercise.songData ? (
+        // A song from the routine: its section map when it is practised that
+        // way, otherwise the song panel — with a tab attached, the hasTablature
+        // branch above shows it instead, backing track and all.
+        <div className="p-4">
+          {songSectionMapSlot ?? <SongPracticePanel song={currentExercise.songData} />}
+        </div>
       ) : isOpenExercise(currentExercise) ? (
         <div className="p-4">
           <OpenExercisePanel />

@@ -10,7 +10,7 @@ import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { getPlanColor, getPlanIcon } from "feature/exercisePlan/data/planAppearance";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowUpRight, Globe, Heart, Lock } from "lucide-react";
+import { ArrowUpRight, Globe, Heart, Lock, Music } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
@@ -136,6 +136,8 @@ export const PlanCard = ({
 
   const hasPlayalong = plan.exercises.some(ex => ex.isPlayalong || ex.youtubeVideoId);
   const hasVideo = plan.exercises.some(ex => ex.videoUrl && !ex.youtubeVideoId);
+  // Songs placed in the routine next to its exercises (see songToExercise).
+  const songCount = plan.exercises.filter(ex => !!ex.songData).length;
 
   const categoryStyle = hasPlayalong ? categoryStyles.playalong : (categoryStyles[plan.category as keyof typeof categoryStyles] || categoryStyles.mixed);
 
@@ -397,6 +399,14 @@ export const PlanCard = ({
                 <FaListUl className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-600" : "text-zinc-500")} />
                 <span>{plan.exercises.length}</span>
             </div>
+            {songCount > 0 && (
+              <div
+                className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-zinc-400")}
+                aria-label={`${songCount} ${songCount === 1 ? "song" : "songs"} in this plan`}>
+                <Music className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-600" : "text-zinc-500")} />
+                <span>{songCount}</span>
+              </div>
+            )}
         </div>
 
         {isLocked ? (

@@ -20,30 +20,32 @@ import {
   MAX_BEATS_PER_BAR,
   MIN_BEATS_PER_BAR,
 } from "../../../components/Metronome/utils/accentPattern";
+import {
+  tempoColor,
+  tempoSliderRange,
+} from "../../../components/Metronome/utils/tempoColor";
 import type { Exercise } from "../../../types/exercise.types";
+import { SpeedDropdown } from "./SpeedDropdown";
 
 interface ExerciseQuickActionsBarProps {
   exercise: Exercise;
   metronome: any;
   examMode?: boolean;
   compact?: boolean;
+  /** Playback speed. Pass both to fold the speed picker into the bar, right
+   *  next to the BPM it scales. Left out by the layouts that stack the picker
+   *  underneath instead (mobile sheet, landscape strip). */
+  speedMultiplier?: number;
+  onSpeedMultiplierChange?: (value: number) => void;
 }
-
-const tempoColor = (bpm: number) =>
-  bpm < 80 ? "text-emerald-400" : bpm < 120 ? "text-amber-400" : "text-red-400";
-
-const sliderRange = (bpm: number) =>
-  bpm < 80
-    ? "[&_[data-slot=slider-range]]:bg-emerald-500"
-    : bpm < 120
-      ? "[&_[data-slot=slider-range]]:bg-amber-500"
-      : "[&_[data-slot=slider-range]]:bg-red-500";
 
 export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   exercise,
   metronome,
   examMode = false,
   compact = false,
+  speedMultiplier,
+  onSpeedMultiplierChange,
 }: ExerciseQuickActionsBarProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [input, setInput] = useState("");
@@ -78,6 +80,10 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
     compact ? "h-7 w-7" : "h-8 w-8",
   );
 
+  // The compact strip has no room for the picker; those layouts stack it below.
+  const showSpeed =
+    !compact && speedMultiplier !== undefined && !!onSpeedMultiplierChange;
+
   return (
     <div className={cn("flex w-full justify-center", compact ? "" : "mb-4")}>
       <div
@@ -86,7 +92,10 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           // Compact fits a ~180px side panel: no icon, no slider, tighter gaps.
           compact
             ? "h-10 max-w-[320px] justify-between gap-2 px-2.5"
-            : "h-12 max-w-md gap-3 px-4",
+            : "h-12 gap-3 px-4",
+          // The speed picker ("Speed 75% = 46 BPM") needs the extra width or
+          // the slider shrinks to nothing.
+          !compact && (showSpeed ? "max-w-2xl" : "max-w-md"),
         )}>
         {!compact && <GiMetronome className='h-5 w-5 shrink-0 text-zinc-400' />}
 
@@ -139,7 +148,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
             max={maxBpm}
             step={1}
             onValueChange={(v) => setBpm(v[0])}
-            className={cn("flex-1 cursor-pointer", sliderRange(bpm))}
+            className={cn("flex-1 cursor-pointer", tempoSliderRange(bpm))}
           />
         )}
 
@@ -278,6 +287,20 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               </p>
             </DropdownMenuContent>
           </DropdownMenu>
+        )}
+
+        {/* Speed lives in the same bar as the BPM it scales — a separate button
+            read as an unrelated setting. The trigger spells out the result
+            ("75% = 46 BPM") so the link is visible without opening anything. */}
+        {showSpeed && (
+          <SpeedDropdown
+            inline
+            h='h-8'
+            className='ml-1'
+            speedMultiplier={speedMultiplier}
+            onSpeedMultiplierChange={onSpeedMultiplierChange}
+            baseBpm={bpm}
+          />
         )}
       </div>
     </div>

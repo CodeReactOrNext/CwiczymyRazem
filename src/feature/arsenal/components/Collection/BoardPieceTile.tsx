@@ -1,5 +1,6 @@
 import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
+import type { DexStatus } from "feature/arsenal/utils/dex";
 import type { ReactNode } from "react";
 
 import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
@@ -22,6 +23,11 @@ interface BoardPieceTileProps extends StashPlacement {
   rigSlot?: number | null;
   /** Pedal sockets: wired into the pedalboard. */
   isOnPedalboard?: boolean;
+  /**
+   * Gear sockets on a board that is not the viewer's: owned / on the Dex, as a
+   * corner glyph. Parts and mods are not collected and ignore it.
+   */
+  dexStatus?: DexStatus;
   /** Under the hover card, whatever the piece — see `StashTile`. */
   previewFooter?: ReactNode;
   onClick?: () => void;
@@ -40,6 +46,7 @@ export const BoardPieceTile = ({
   isEquipped = false,
   rigSlot = null,
   isOnPedalboard = false,
+  dexStatus,
   previewFooter,
   onClick,
   ...placement
@@ -51,6 +58,7 @@ export const BoardPieceTile = ({
         item={piece.item}
         isEquipped={isEquipped}
         rigSlot={rigSlot}
+        dexStatus={dexStatus}
         previewFooter={previewFooter}
         onClick={onClick}
       />
@@ -62,6 +70,7 @@ export const BoardPieceTile = ({
         {...placement}
         item={piece.item}
         isOnPedalboard={isOnPedalboard}
+        dexStatus={dexStatus}
         previewFooter={previewFooter}
         onClick={onClick}
       />

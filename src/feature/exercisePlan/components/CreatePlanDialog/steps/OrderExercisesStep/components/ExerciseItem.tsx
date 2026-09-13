@@ -1,8 +1,11 @@
 import type { DraggableProvided } from "@hello-pangea/dnd";
 import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import { SONG_PRACTICE_MODE_LABELS } from "feature/exercisePlan/utils/songToExercise";
 import { useTranslation } from "hooks/useTranslation";
+import { Music } from "lucide-react";
 import {
   FaArrowDown,
   FaArrowUp,
@@ -34,12 +37,13 @@ export const ExerciseItem = ({
 
   const handleMoveUp = () => onMoveUp(index);
   const handleMoveDown = () => onMoveDown(index);
+  const isSong = !!exercise.songData;
 
   return (
     <div
       ref={provided.innerRef}
       {...provided.draggableProps}
-      className='rounded-lg bg-zinc-900/40 p-4'>
+      className={cn("rounded-lg p-4", isSong ? "bg-amber-500/[0.06]" : "bg-zinc-900/40")}>
       <div className='flex items-center gap-4'>
         <div
           {...provided.dragHandleProps}
@@ -68,21 +72,44 @@ export const ExerciseItem = ({
           </Button>
         </div>
 
+        {isSong &&
+          (exercise.songData?.coverUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={exercise.songData.coverUrl}
+              alt=''
+              className='h-10 w-10 shrink-0 rounded object-cover'
+            />
+          ) : (
+            <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded bg-zinc-800 text-zinc-500'>
+              <Music className='h-4 w-4' />
+            </div>
+          ))}
+
         <div className='flex-1'>
           <div className='flex flex-col items-start justify-between gap-2 md:flex-row md:items-center'>
-            <h3 className='font-medium'>{exercise.title}</h3>
+            <h3 className='font-medium' translate={isSong ? 'no' : undefined}>
+              {isSong ? exercise.songData?.title : exercise.title}
+            </h3>
             <div className='flex items-center gap-2'>
               <div className='flex items-center gap-1 text-sm text-muted-foreground'>
                 <FaClock className='h-3 w-3' />
                 <span>{exercise.timeInMinutes} min</span>
               </div>
-              <Badge variant='secondary'>
-                {t(`exercises:categories.${exercise.category}` as any)}
-              </Badge>
+              {isSong ? (
+                <Badge className='border-transparent bg-amber-500/10 text-amber-300 hover:bg-amber-500/15'>
+                  Song
+                  {exercise.songData?.mode && ` · ${SONG_PRACTICE_MODE_LABELS[exercise.songData.mode]}`}
+                </Badge>
+              ) : (
+                <Badge variant='secondary'>
+                  {t(`exercises:categories.${exercise.category}` as any)}
+                </Badge>
+              )}
             </div>
           </div>
           <p className='mt-4 text-sm text-muted-foreground md:mt-1'>
-            {exercise.description}
+            {isSong ? exercise.songData?.artist : exercise.description}
           </p>
         </div>
       </div>

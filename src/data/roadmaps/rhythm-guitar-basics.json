@@ -1,637 +1,730 @@
 {
   "id": "d44c57a7-c2e4-4115-9abb-dde4d318e5f7",
   "title": "Rhythm Guitar Basics",
-  "goal": "Rhythm Guitar Basics",
+  "goal": "Play a full rhythm part through a whole song: steady pulse, chord changes in time, strum patterns and dynamics.",
   "level": "Beginner",
   "phases": [
     {
-      "id": "42d8e095-c57f-49dc-a0f3-4334d89a8f64",
-      "title": "Single-String Technique",
+      "id": "553d3439-b04c-44d8-be58-ed72843bb94a",
+      "title": "Pulse and the Strumming Hand",
       "order": 0,
       "steps": [
         {
-          "id": "02484744-5b49-405c-b209-3ae4c39f2458",
-          "title": "Finger independence",
-          "description": "Finger independence means each finger on your fretting hand can move, press, or lift by itself without unwanted movement from the others. It matters because independent fingers let single-note lines sound clean, avoid buzzing or muting, and make changes between notes smooth and controlled. Develop it with slow, focused drills: isolate one finger at a time while the others stay relaxed and planted, pay attention to even pressure and minimal extra motion, and only increase speed once each finger stays clean and relaxed.",
-          "successCriteria": "You can lift or place any fretting finger without dragging neighboring fingers; individual notes sound clear and sustain without muting or buzz. Transitions between fingers feel smooth and deliberate rather than tense or jerky, and you can gradually increase speed while maintaining clarity and relaxed motion.",
-          "sessionsRequired": 8,
+          "id": "bc6cd6aa-0ac7-42f3-8a9c-110379119758",
+          "title": "Feel the pulse before you play",
+          "description": "[Before you start]\nThis roadmap assumes you can tune your guitar, hold a pick and fret at least two open chords (E minor and A minor are enough), even slowly. No previous rhythm training is needed. By the end you will play a complete rhythm part through a whole song: a steady pulse, chord changes in time, strum patterns with rests, accents and muting, and a performance you can record and play with other people.\n\n[What it is]\nThe pulse is the steady, evenly spaced beat that every rhythm part sits on. Before touching the guitar you learn to keep it in your body: tap a foot, clap or nod with a metronome, then keep going when the click stops.\n\n[Why it matters]\nEverything later in this roadmap (strums, chord changes, rests, syncopation) is placed relative to this beat. If the beat lives only in the metronome and not in you, every rest and every chord change will drift. Good rhythm players predict the beat instead of reacting to it, and that prediction is trained here.\n\n[How to practice]\nSet a metronome between 60 and 80 BPM and clap or tap on every click for a minute. Aim to land exactly with the click so the two sounds merge into one. Then use the Metronome Gap Test: the click plays for two bars, goes silent, and you tap the next downbeat. Watch the deviation reading and try to centre it on zero across several attempts. Finish by tapping along to any song you like and finding beat one of every bar.",
+          "successCriteria": "You can clap with a metronome at 60–80 BPM for 16 beats with tap and click merging into one sound, and in the Metronome Gap Test you land within about 50 ms of the downbeat on three attempts in a row. You can tap beat one of every bar along with a recording you have never played to.",
+          "sessionsRequired": 3,
           "order": 0,
-          "suggestedExerciseId": "finger_independence_1a",
-          "suggestedLessonIds": [
-            "RAaXrvO9RA8",
-            "ZoS0RxlN_E0",
-            "3ee486LAZ2E",
-            "NeNBXDw5uE4",
-            "bBcxaVqYOvg"
+          "suggestedExerciseId": "metronome_gap_test",
+          "lessons": [
+            {
+              "videoId": "QmX6r_1aapM",
+              "title": "Using a Metronome | Beginner Guitar Tips",
+              "channelName": "Guitar Center",
+              "thumbnailUrl": "https://i.ytimg.com/vi/QmX6r_1aapM/mqdefault.jpg"
+            }
           ]
         },
-        {
-          "id": "7842276c-91bc-42fb-932f-46efb813cd05",
-          "title": "Fretting accuracy",
-          "description": "Fretting accuracy is the skill of placing and holding your fretting finger precisely so each note rings clearly without buzz or unwanted muting. It matters because clean, consistent notes are the foundation of any rhythm or single-note part — sloppy fretting muddies the sound and makes steady rhythm harder to hear. Develop it by placing your fingertip close to the metal fret, using only the pressure needed for a clear tone, and practicing slow, deliberate moves between positions; start slow and increase gradually, listen for buzzes or dead strings, and trim any extra finger motion until each press is reliable.",
-          "successCriteria": "Notes sound clean and sustain evenly when fretted; short passages and single notes come out without buzzing or accidental muting, and finger movements are minimal and repeatable so transitions feel smooth and controlled.",
-          "sessionsRequired": 8,
-          "order": 1,
-          "suggestedExerciseId": "spider_one_string",
-          "suggestedLessonIds": [
-            "48o_KNEUJo0",
-            "noFlWeyJzdI"
-          ]
-        },
-        {
-          "id": "a90770c7-7584-4131-9fe2-65659574732b",
-          "title": "Hammer-on control",
-          "description": "A hammer-on is producing a new note on a single string by sharply bringing a fretting finger down so the string sounds without re-picking. It matters because it creates smooth, connected single-note lines and frees your picking hand to keep steady rhythm. Develop it by keeping the fretting hand relaxed, using a quick, controlled downward snap from the fingertip joint, and focusing on producing a clear, ringing tone each time; practice slowly and only increase speed when each hammer-on stays consistent and buzz-free.",
-          "successCriteria": "Hammer-ons sound as loud and clear as adjacent picked notes, with smooth, even transitions and no buzzing or muted strings; you can execute them reliably while maintaining a steady single-string rhythm.",
-          "sessionsRequired": 8,
-          "order": 2,
-          "suggestedExerciseId": "hammer_on_sequence_5_7_9",
-          "suggestedLessonIds": [
-            "7hDdZAjKBjY",
-            "TTBdEDZexOg",
-            "P6_ipwWZROs",
-            "Q-famECZNHw",
-            "zv0PTZVW4dI"
-          ]
-        },
-        {
-          "id": "1332d3b2-9878-4368-881c-2521e05e155f",
-          "title": "Pull-off clarity",
-          "description": "A pull-off is a left‑hand technique that releases a fretted note so the following note sounds without being re‑plucked; clarity means that released note rings cleanly, with steady volume and no extra buzz. It matters because clear pull‑offs make single‑string lines sound smooth and connected, improving phrasing and allowing more fluid legato playing. Develop it by keeping the fretting finger close to the string and using a small, controlled pull/flick so the string vibrates as you lift; practice slow, repeated attempts in any comfortable position on the neck and aim to match the volume and tone of surrounding notes.",
-          "successCriteria": "When mastered, each pull‑off produces a ringing target note immediately after release, consistent in volume and tone from attempt to attempt, with minimal string noise or dead notes. Transitions feel smooth and the line sounds connected rather than choppy.",
-          "sessionsRequired": 8,
-          "order": 3,
-          "suggestedExerciseId": "pull_off_pentatonic_run",
-          "suggestedLessonIds": [
-            "zv0PTZVW4dI",
-            "TTBdEDZexOg",
-            "M6GIre0x4kQ",
-            "a_XSCPlcIVU"
-          ]
-        },
-        {
-          "id": "33a3e4db-0da5-4319-93c4-14146685c7c9",
-          "title": "Slide consistency",
-          "description": "Slide consistency is the ability to move a fretting finger smoothly along a single string so the pitch glides cleanly from one note to the next with steady pressure and even motion. It matters because consistent slides keep your rhythm solid, eliminate scratchy or uneven sounds, and make single-note lines sound intentional instead of sloppy. Develop it by practicing slow, controlled slides up and down the neck with a relaxed wrist, keeping the same finger pressure throughout and repeating short, focused runs until the motion and tone are reliably the same each time.",
-          "successCriteria": "Slides produce a steady, even glide with no extra string noise; the destination pitch is clean and in tune when you arrive; the motion feels controlled and repeatable in both directions and across different positions on the neck.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "one_string_backing"
-        },
-        {
-          "id": "df79e658-ba6d-4124-8b4d-73ff78756b85",
-          "title": "Alternate picking basics",
-          "description": "[What it is]\nAlternate picking is the basic right-hand motion of striking strings with a pick in a strict down-up-down-up pattern. It applies to one note at a time and keeps your strokes consistent so each note sounds even. The goal is a small, relaxed wrist motion that repeats smoothly.\n\n[Why it matters]\nAlternate picking gives you a steady, reliable way to play single-note rhythms and fills without slowing down or losing timing. It makes fast passages easier because each stroke is predictable and economical, and it helps your sound stay clear and even across repetitions. Good alternate picking also reduces extra noise and tension in the hand.\n\n[How to practice]\nBegin with very short, repeated single-note patterns and focus on keeping the pick moving down-up on every note, staying relaxed and keeping the motion close to the strings. Gradually increase the length and variety of patterns, work on clean transitions between notes, and use a steady click or backing pulse to keep timing even. Check for relaxed wrist motion, minimal pick travel, and consistent tone—stop and slow down when mistakes or tension appear, then rebuild the motion cleanly.",
-          "successCriteria": "Strokes alternate regularly (down-up pattern) with an even, consistent tone and no extra unwanted noise; you can sustain short single-note phrases with relaxed wrist motion and accurate timing; pick movement stays small and efficient, and speed increases without tension or loss of clarity.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "alternate_picking_pentatonic_a_positions",
-          "suggestedLessonIds": [
-            "6kZJm6k1b0g",
-            "SCNlFwCXLWQ",
-            "-SzJ147UNcE",
-            "VQjsYPIXI2Q",
-            "v2OuK2ECy10"
-          ]
-        },
-        {
-          "id": "d5913523-a4b2-4a9c-896d-a25628fc44f9",
-          "title": "Single-note rhythm",
-          "description": "[What it is] Single-note rhythm means playing one note at a time with a steady, musical pulse—paying attention to when each note starts, how long it rings, and where the accents fall. It includes short repeating patterns or simple melodic lines that create a rhythmic foundation without full chords.\n\n[Why it matters] This skill anchors a song when chords are sparse or when the guitar is supporting vocals and other instruments; clear single-note rhythm keeps the groove together and fills space tastefully. It also trains your sense of timing and control, so your parts sound intentional rather than loose or wandering.\n\n[How to practice] Work on short, repeatable patterns in any comfortable position and focus on consistent attacks, steady note lengths, and clean silences for rests; begin slowly and increase complexity only when the pattern feels locked. Add simple off-beat accents and occasional rests to build phrasing, record or loop a backing pattern to check how well you stay with the pulse, and correct small timing errors before moving on.",
-          "successCriteria": "Notes land consistently with the pulse, durations are even, rests and accents feel intentional, and short single-note patterns repeat cleanly without drifting. You can add simple off-beat accents and small rhythmic variations while still sounding steady and supportive.",
-          "sessionsRequired": 8,
-          "order": 6,
-          "suggestedExerciseId": "rhythm_training_easy"
-        }
-      ]
-    },
-    {
-      "id": "2bc8df17-0fca-438e-8886-67bc72c58dba",
-      "title": "Open Chord Fluency",
-      "order": 1,
-      "steps": [
-        {
-          "id": "405c2914-5d10-4b60-888f-a274ee96a09b",
-          "title": "Common open chords",
-          "description": "[What it is]\nCommon open chords are the basic chord shapes that use one or more unfretted (open) strings alongside fretted notes. They form the backbone of many simple accompaniments and are usually the first full-chord shapes a player learns. These shapes give full, ringing sounds with relatively small left-hand stretches.\n\n[Why it matters]\nThese chords let you accompany songs, lock in groove with a band or singer, and create clear harmonic motion with minimal hand movement. Because they produce open ringing tones, they make simple progressions sound bigger and more musical than single notes alone. Mastering them gives immediate payoff for rhythm playing and lets you join many common song forms.\n\n[How to practice]\nPick a handful of the most useful shapes and focus on forming each one clearly: check that every shared and open note rings without buzz or accidental muting. Practice switching between two shapes slowly and efficiently, then add a third shape and work on looping common progressions until the changes feel natural and even. Use short, focused runs where you stop and fix any muted strings, and gradually increase the length of continuous playing so you can sustain a steady accompaniment.",
-          "successCriteria": "You can form each common open chord so all notes ring clearly, move between them smoothly without pausing to re-place fingers, and maintain a steady, even accompaniment for a short progression so it sounds musical and supportive.",
-          "sessionsRequired": 8,
-          "order": 0,
-          "suggestedExerciseId": "chord_practice_configurable",
-          "suggestedLessonIds": [
-            "orXDcLai0Ew",
-            "rTMN8rCBWkw"
-          ]
-        },
-        {
-          "id": "20707cb0-811d-4a69-a38f-dcbaf2c4790e",
-          "title": "Smooth chord changes",
-          "description": "Smooth chord changes means moving cleanly and reliably between your common open chords so the harmony flows without hesitation, unwanted string noise, or breaks in the rhythm. It matters because steady transitions keep the groove of a song and let your strumming or accompaniment feel connected and musical. Develop it with short, repeated two- or three-chord loops practiced slowly, focusing on minimizing finger movement and keeping the strumming/hand motion continuous; only raise speed once the change is consistently clean. Use slow repetition, stop-and-start repairs on trouble spots, and repeat until the motion becomes fluid and comfortable.",
-          "successCriteria": "You can switch between the required open chords while maintaining continuous strumming or hand motion, with no audible gaps or persistent muted strings; chord clarity and volume stay even across changes; transitions feel relaxed and consistent when you play through a short progression.",
-          "sessionsRequired": 8,
-          "order": 1,
-          "suggestedExerciseId": "chord_practice_configurable",
-          "suggestedLessonIds": [
-            "n_ijsHYsFAU",
-            "p-Rj4svEyrA",
-            "7VzPzBsm4sU",
-            "9YDevp0mz3I",
-            "DKqbdVSeAEg"
-          ]
-        },
-        {
-          "id": "dba12ae1-2213-49f4-9699-0246fe385b71",
-          "title": "Chord fingering economy",
-          "description": "[What it is]\nChord fingering economy means using the smallest, most efficient finger movements and hand positions to form open chords. It’s about keeping fingers close to the strings, reusing finger placements between shapes, and avoiding unnecessary lifts or stretches. The result is steadier hand placement and less wasted motion.\n\n[Why it matters]\nEconomical fingering reduces tension and timing problems, so chords sound cleaner and you can switch shapes more reliably. It also frees attention for strumming, dynamics, and simple embellishments, and helps you play longer without hand fatigue. Good economy makes your playing feel more musical and controlled.\n\n[How to practice]\nPick a pair or small group of open chords and deliberately plan which finger will move where before you change shapes; practice keeping non-moving fingers resting lightly on their strings. Work slowly, focusing on minimal lifts and smooth pivots, then gradually speed up as the motion becomes automatic. Isolate the trickiest finger paths until they feel effortless, and pay attention to relaxed hand posture so movements stay small and repeatable.",
-          "successCriteria": "Changes between open chords happen with small, efficient finger motions; fingers land accurately without large lifts and chords ring cleanly without accidental muting. Movements feel relaxed, repeatable, and fast enough to play simple chord progressions musically. You can add basic strumming or light embellishments without losing the chord shape.",
-          "sessionsRequired": 8,
-          "order": 2,
-          "suggestedExerciseId": "chord_practice_configurable",
-          "suggestedLessonIds": [
-            "4cR1sa1_d_8"
-          ]
-        },
-        {
-          "id": "8655027a-0cc8-4871-b5b0-81f99c3a6f14",
-          "title": "Bass note awareness",
-          "description": "[What it is]\nBass note awareness is the habit of hearing and controlling the lowest-sounding pitch that anchors a harmony. It means knowing which low tone gives a chord its weight and being able to bring that tone forward or let it sit back in the mix.\n\n[Why it matters]\nA clear bass note grounds the music and makes progressions feel purposeful instead of muddy. Emphasizing the right low pitch helps listeners feel the groove and makes simple accompaniment sound more musical and supportive.\n\n[How to practice]\nIsolate the lowest pitch by plucking it alone, then add the rest of the harmony while keeping that bass audible; repeat this in different comfortable positions on the neck. Practice balancing volume so the bass rings without overpowering the higher tones, and practice switching which low pitch you highlight while keeping the harmony steady. Listen closely for a steady, even tone and aim to make the bass change feel intentional and musical.",
-          "successCriteria": "You can consistently make the lowest pitch in a harmony audible and steady, balancing its volume with the other notes; when you change which low pitch you emphasize it sounds deliberate and supports the music instead of sounding uneven or buried.",
-          "sessionsRequired": 8,
-          "order": 3,
-          "suggestedExerciseId": "chord_spotlight_drill"
-        },
-        {
-          "id": "a3335a9a-3194-4987-8d06-7fe0ae76b6d4",
-          "title": "Open chord transposition",
-          "description": "[What it is]\nOpen chord transposition is the skill of taking the sound of an open-position chord and shifting it so the same progression works in a higher or lower key. The aim is to keep the chord's character—the way it rings and feels—while changing its pitch. You can do this by moving shapes to new neck positions or by using a simple tool that preserves open-string tones.\n\n[Why it matters]\nTransposing makes it easy to match a song to a singer's range or adapt a progression to a different musical context without relearning everything. It gives you flexibility to keep the bright open-string textures or choose alternate voicings that suit the new key. That adaptability makes your rhythm playing more useful in jams, practice, and songwriting.\n\n[How to practice]\nPick a short, familiar chord progression and move it to a higher key using one method at a time—either shift the chord shapes to new positions or use a device that keeps open-string voicings. Play slowly and listen to how the overall pitch of the progression changes; if a shape stops working, find a nearby voicing that preserves the chord quality. Repeat the process going both up and down until shifting keys becomes smooth and intuitive.",
-          "successCriteria": "You can take a simple chord progression and move it to a higher or lower key quickly and confidently, preserving the original chord character or choosing an appropriate alternate voicing. Changes between keys happen smoothly without hesitation, and the progression still sounds musically balanced in the new key.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "chord_practice_configurable"
-        },
-        {
-          "id": "997dffe3-bedb-44e6-ae34-1dcb71663647",
-          "title": "Partial chord voicings",
-          "description": "[What it is] Partial chord voicings are reduced versions of full chords where you play only the essential notes—two or three tones that outline the harmony. They let you imply a chord without sounding every note at once, creating more clarity and space in a rhythm part.\n\n[Why it matters] Using partial voicings keeps the accompaniment lighter and prevents the mix from becoming muddy, so vocals or other instruments can breathe. They also make movement between chords easier and offer more rhythmic and textural variety in comping.\n\n[How to practice] Pick a chord and remove one or two notes to form a two- or three-note shape, then play that shape cleanly in any comfortable position on the neck until the notes ring clearly. Practice moving between different partial shapes, paying attention to which fingers you lift or mute so only the intended notes sound, and vary your attack and dynamics so you hear how each voicing sits in the mix.",
-          "successCriteria": "You can produce clean two- and three-note voicings that clearly outline the harmony, switch between them smoothly, and make the rhythm part feel lighter and more supportive without unwanted noise.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "chord_spotlight_drill"
-        },
-        {
-          "id": "0fdbe4a9-5b05-4d1c-95ac-e067c2e8e233",
-          "title": "Chord ringing control",
-          "description": "[What it is]\nChord ringing control is the skill of letting the notes you want to hear ring cleanly while silencing the ones you don't. It means choosing when a chord should sustain, decay, or be damped so the harmony stays clear.\n\n[Why it matters]\nClear ringing prevents chords from becoming muddy when notes overlap and helps your rhythm part sit correctly in the mix. Controlling sustain also gives you dynamic contrast, so some chord hits can sing while others support the groove.\n\n[How to practice]\nHold a comfortable chord and practice alternating between letting it ring and muting it with a light touch until the change is immediate and reliable. Develop both palm-based dampening and subtle finger lifts to stop individual strings, and practice switching between ringing and muted textures while strumming slowly; increase speed only after the transitions are clean. Listen for unwanted sympathetic notes and repeat isolation drills that damp specific strings until each chord sounds intentional.",
-          "successCriteria": "Chords sound clean and intentional: unwanted strings are reliably muted, desired notes sustain when you want them to, and you can switch smoothly between ringing and muted chord textures during rhythm playing.",
-          "sessionsRequired": 8,
-          "order": 6,
-          "suggestedExerciseId": "chord_spotlight_drill",
-          "suggestedLessonIds": [
-            "p-Rj4svEyrA"
-          ]
-        },
-        {
-          "id": "afb17b46-fb78-483d-bac2-c4f09c3cf8da",
-          "title": "Thumb position control",
-          "description": "Thumb position control is the intentional placement and pressure of your fretting-hand thumb against the neck so the hand can support finger motion without excess tension. It matters because a stable but flexible thumb improves reach and finger accuracy while keeping your hand relaxed and reducing accidental buzzing or muting. Develop it with short drills that alternate a light, floating thumb and a gentle anchor—feel for the minimum pressure that holds the hand steady, practice sliding the thumb when you need extra reach, and keep the wrist relaxed as you gradually speed up.",
-          "successCriteria": "Mastery feels like a relaxed, balanced fretting hand: fingers land cleanly, you can shift thumb position smoothly to reach or release without fumbling, and unwanted buzzing or muted notes no longer occur during normal playing.",
-          "sessionsRequired": 8,
-          "order": 7,
-          "suggestedExerciseId": "chord_spotlight_drill",
-          "suggestedLessonIds": [
-            "6V-X-FJw7yQ",
-            "0BWqplNzEBY"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "ce6ba92e-6bfe-4542-a4c6-27c4d9151c2d",
-      "title": "Strumming and Groove",
-      "order": 2,
-      "steps": [
         {
           "id": "230315dd-5e65-4578-981b-5ba76d782ae1",
-          "title": "Downstroke consistency",
-          "description": "Downstroke consistency is the ability to produce even, controlled down strums so each stroke has the same attack, contact point, and tonal weight. It matters because steady downstrokes form the rhythmic backbone that other parts rely on and make your groove feel solid and predictable. Develop it with a relaxed, compact wrist/forearm motion, striking the strings with the same part of the pick or fingers each time, practicing repeated slow downstrokes while listening for even volume and clean contact, then gradually tightening control before increasing speed.",
-          "successCriteria": "You can play long runs of downstrokes with uniform attack and tone, minimal unwanted string noise, and a relaxed hand; the sound is even across strokes and feels steady enough that other rhythm elements can lock to it.",
-          "sessionsRequired": 8,
-          "order": 0,
-          "suggestedExerciseId": "strumming_basic",
-          "suggestedLessonIds": [
-            "XxYGZmXcK88",
-            "HOAM5N_kd4E"
-          ]
-        },
-        {
-          "id": "22a32c44-138a-4a1d-ade7-e2e6fe0bc650",
-          "title": "Upstroke control",
-          "description": "Upstroke control is the ability to execute clean, controlled upward pick strokes with a small, relaxed wrist motion so each upstroke is even and predictable. Building on your downstroke consistency, it balances the feel of your strumming—allowing lighter accents, off-beat rhythmic shapes, and smooth alternation between strokes. Develop it by using short, wrist-led upward motions, keeping the hand relaxed, practicing repeated upstrokes in place (start slow, increase gradually), and listening for even contact with the strings rather than large sweeping gestures.",
-          "successCriteria": "Upstrokes sound clear and even but lighter than your downstrokes; timing and volume are consistent across repeated upstrokes. The motion is small and economical with no tension in the hand, and you can alternate up/down smoothly without missed or harsh hits. You can use upstrokes reliably to create light accents and rhythmic variation within a steady groove.",
-          "sessionsRequired": 8,
+          "title": "Quarter-note downstrokes",
+          "description": "[What it is]\nOne even downstroke per beat across the strings, with the fretting hand holding a single easy chord (E minor) or lightly muting the strings. Four strums per bar, every strum landing on the click.\n\n[Why it matters]\nThe downstroke on the beat is the most common motion in rhythm guitar and the baseline for every pattern that follows. Freddie Green held the Count Basie band together for decades with four quarter-note strums per bar, and Malcolm Young built AC/DC riffs from downstrokes. If your quarter notes are even in volume and timing, everything else gets easier; if they are not, more complex patterns hide the problem instead of fixing it.\n\n[How to practice]\nHold E minor, set the metronome to 60 BPM and play one downstroke per click. Work on three things: the motion comes from a relaxed wrist and forearm, not the shoulder; the pick hits the same strings from the same depth every time; every strum has the same volume. Play four bars, rest, repeat. Record 30 seconds and listen for strums that stick out as louder, quieter or late. Raise the tempo to 70 and 80 only once a tempo feels effortless for two minutes.",
+          "successCriteria": "A 30-second recording of quarter-note downstrokes on E minor at 60–80 BPM sounds even: no strum is noticeably louder, quieter or off the click. Your wrist and forearm stay loose after two minutes.",
+          "sessionsRequired": 4,
           "order": 1,
-          "suggestedExerciseId": "strumming_pattern_14"
-        },
-        {
-          "id": "8abd83dd-9db8-4a78-a06e-bfe95864086c",
-          "title": "Palm muting basics",
-          "description": "Palm muting is a right-hand technique where the fleshy edge of your picking/strumming hand rests lightly on the strings close to the bridge to reduce sustain and create a tighter, more percussive tone. It matters because it gives you control over dynamics and groove—letting chords and riffs sit with more rhythmic clarity or a chunky, muted feel. To develop it, experiment with light versus firmer contact and small movements toward or away from the bridge to hear the range from slight dampening to a tight 'chug'; practice this while playing your regular strumming and rhythmic patterns, and focus on consistent contact and clean release so open sounds return when you want them.",
-          "successCriteria": "You can produce an even muted tone across the strings that is steady and repeatable, switch reliably between subtle damping and tight muting, and coordinate the palm contact so the rhythmic feel stays clear without unwanted buzz or complete deadness.",
-          "sessionsRequired": 8,
-          "order": 2,
-          "suggestedExerciseId": "rhythm_training_easy",
-          "suggestedLessonIds": [
-            "8OOoUEhhvHw",
-            "76ZOPqcjK8c",
-            "6fm2VihcB54",
-            "lRVhrOuIiE4",
-            "d41GHKVrzCI"
-          ]
-        },
-        {
-          "id": "b0ef5708-51e7-4661-95af-47fbfeedf528",
-          "title": "Strum dynamics",
-          "description": "[What it is]\nStrum dynamics means controlling how loud or soft each strum sounds by varying the force and contact of your strumming hand. It’s about shaping the attack and volume of individual strokes so a repeated pattern has contrast and musical meaning. Small changes in motion and hand position affect tone and perceived intensity.\n\n[Why it matters]\nDynamics make rhythm guitar expressive: softer playing creates space and mood, louder playing adds energy and emphasis. They help the guitar sit in an arrangement, highlight important beats, and keep repeated parts interesting for listeners. Clear dynamic control also makes accent placement and rhythmic phrasing more convincing.\n\n[How to practice]\nChoose a short, repeating strum pattern and practice producing deliberately quieter and louder versions of specific strokes, using controlled wrist and arm motion rather than more speed. Work on smooth fades from loud to soft and back, and on making single accented strums stand out while surrounding strokes remain subdued. Record short takes to judge consistency, then reduce the size of the volume changes until they feel natural and repeatable.",
-          "successCriteria": "You can produce soft and loud strums on cue, shape volume within a pattern so accents are clear but natural, and make transitions between dynamic levels sound smooth and controlled.",
-          "sessionsRequired": 8,
-          "order": 3,
-          "suggestedExerciseId": "dynamic_crescendo",
-          "suggestedLessonIds": [
-            "416rgou7Ijo",
-            "Wu9PpJWjXRg",
-            "8R4Ab4-FxX4",
-            "UCwGNhrjygA"
-          ]
-        },
-        {
-          "id": "2f6bb587-8c77-45cc-b36f-d7508f079276",
-          "title": "Muted strumming",
-          "description": "[What it is]\nMuted strumming is using light, controlled contact with the strings so your strums produce a short, percussive sound instead of sustained ringing. It’s a rhythmic tool where the hand dampens vibration to create a tight, 'chick' or 'tsk' texture that sits with the beat, building on your palm muting basics.\n\n[Why it matters]\nMuted strums lock the groove, create space between chord hits, and add a percussive layer that makes simple progressions feel more rhythmic and alive. It helps you phrase rhythm parts, accent beats, and provide a pocket for singers or other instruments without changing chord shapes.\n\n[How to practice]\nWork on varying the amount of contact so you can move smoothly from fully muted to ringing strums and back again; aim for a consistent, audible percussive tone on every muted stroke. Alternate short muted patterns with open strums to hear contrast, keep the wrist relaxed so motion stays even, and focus on timing and repeatability rather than volume. Record or play along with a steady backing to check that the muted hits sit evenly in the groove and that transitions between muted and open strums are clean.",
-          "successCriteria": "You can produce a clear, consistent percussive sound on muted strums and switch smoothly between muted and ringing strums without changing your chord shapes. Muted strums sit in the groove, emphasizing rhythm without unwanted ringing, and you can vary the length of muting predictably for musical effect.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "rhythm_training_easy",
-          "suggestedLessonIds": [
-            "76ZOPqcjK8c",
-            "8OOoUEhhvHw",
-            "97_u9KqulKQ",
-            "xARmgKQmbYw",
-            "aPosednM-zE"
-          ]
-        },
-        {
-          "id": "4f3a4302-fcde-4bcb-a7ed-ad79e7976dd5",
-          "title": "Accent placement",
-          "description": "[What it is]\nAccent placement is the deliberate choice of which strums to make stronger or more pronounced inside a repeating pattern. By emphasizing a particular strum (or set of strums) you change the shape and forward motion of the rhythm without changing the chords. Accents can be on a main beat, between beats, or slightly ahead/behind the pulse to create different feels.\n\n[Why it matters]\nAccents are what turn a steady rhythm into a musical groove: they highlight phrasing, give energy to chord changes, and communicate feel to other players. Small changes in where you place an accent can make the same chord pattern feel driving, relaxed, or syncopated. Reliable accent control helps you lock with singers, bass, and drums and makes simple progressions sound intentional.\n\n[How to practice]\nWork with a steady, repeated strumming motion and choose one strum to make noticeably stronger; listen to how that single accent changes the pattern, then move it to different positions (on the pulse, between pulses, or slightly late/early). Practice short drills: accent only one strum per cycle, then two accents, then a syncopated placement; record or play along with a steady backing to judge clarity. Aim for the accent to stand out while the rest of the pattern stays even, and practice varying the accent’s strength so you can be subtle or pronounced as the music needs.",
-          "successCriteria": "You can clearly make chosen strums stand out while the rest of the pattern remains even; the overall groove feels intentional and consistent. You can move the accent to different positions and hear the resulting change in feel, and you can control the accent’s intensity to match the musical context.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "strumming_down_up"
-        },
-        {
-          "id": "c3109628-83d9-4e9f-8259-1e41edfa57b5",
-          "title": "Groove locking",
-          "description": "[What it is]\nGroove locking is the skill of making your rhythm playing sit consistently with the underlying pulse so the music feels steady and together. It means your chords and strums land in a way that supports the beat, creating a shared rhythmic pocket with other players or a backing track. The result is playing that sounds intentional and relaxed rather than rushed or floppy.\n\n[Why it matters]\nWhen you lock the groove, the whole band—or a simple accompaniment—feels anchored; singers and instruments can rely on you to keep time and drive the feel. Good groove makes simple parts sound musical and gives dynamic contrast when you want the song to breathe or push. For listeners it’s what makes them tap their foot and for fellow musicians it’s what makes them play with confidence.\n\n[How to practice]\nStart by choosing a short, repeating chord pattern and tap your foot or use a steady click, then focus on placing each strum exactly with that pulse; listen for whether you’re arriving slightly early or late and adjust. Record short takes and compare them to the steady reference—work on making small timing changes so you can feel playing on, ahead of, and behind the beat and decide which feels best for the song. Gradually add small rhythmic variations while keeping the overall pocket steady, and practice playing with a simple backing loop to build the real-world feel of locking with others.",
-          "successCriteria": "Your playing consistently aligns with the pulse so the groove feels steady and effortless; chord changes and strums no longer pull ahead or lag. You can sit in the pocket with a backing track or another player, maintain that feel while adding small rhythmic variations, and hear when you need to nudge your timing to support the song.",
-          "sessionsRequired": 8,
-          "order": 6,
           "suggestedExerciseId": "strumming_basic",
-          "suggestedLessonIds": [
-            "kOtT5c8pD1U"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "79ff65a2-4012-43b4-b60b-a3cc535c2516",
-      "title": "Timing and Subdivision",
-      "order": 3,
-      "steps": [
-        {
-          "id": "bc6cd6aa-0ac7-42f3-8a9c-110379119758",
-          "title": "Metronome consistency",
-          "description": "[What it is]\nMetronome consistency means locking your timing to a steady click so each strum or note lands predictably with the beat. It’s about matching the device’s pulse, starting and stopping in time, and keeping a uniform spacing between events. Think of the metronome as a constant reference that your playing must align with.\n\n[Why it matters]\nA steady connection to the click is the foundation of playing with others, staying in the pocket, and making rhythmic patterns feel intentional instead of sloppy. Consistent time makes transitions, tempo changes, and more complex subdivisions reliable and easier to add later. It also reveals where your internal sense of time needs sharpening so you can fix specific tendencies (rushing or dragging).\n\n[How to practice]\nBegin by playing one clear sound on each click, then switch to silent tapping along with the click to isolate timing without worrying about pitch or chord shapes. Alternate between keeping exactly on the click and intentionally placing sounds between clicks so you learn both alignment and spacing; practice stopping and re-entering with the click to train recovery. Use short focused rounds where you concentrate only on matching the click, gradually holding attention longer as it becomes comfortable.",
-          "successCriteria": "You reliably land events on the click for several measures in a row, recover back to the click quickly after mistakes or pauses, and maintain steady timing while changing simple dynamics or patterns; your playing feels anchored rather than drifting.",
-          "sessionsRequired": 8,
-          "order": 0,
-          "suggestedExerciseId": "strumming_basic",
-          "suggestedLessonIds": [
-            "QmX6r_1aapM",
-            "IcFsHdNMmas"
+          "lessons": [
+            {
+              "videoId": "XxYGZmXcK88",
+              "title": "Basic Downstroke and Upstroke Technique for Rhythm Strumming",
+              "channelName": "Gary Lee",
+              "thumbnailUrl": "https://i.ytimg.com/vi/XxYGZmXcK88/mqdefault.jpg"
+            }
           ]
         },
         {
           "id": "366063d7-2aeb-4937-b006-4d3aa100daec",
-          "title": "Quarter-note pulse",
-          "description": "[What it is]\nThe quarter-note pulse is the steady, evenly spaced beat you feel as the music's backbone — the ",
-          "successCriteria": "",
-          "sessionsRequired": 8,
-          "order": 1,
-          "suggestedExerciseId": "rhythm_training_easy"
-        },
-        {
-          "id": "adcd0c46-b63f-460a-8f7d-6acc55b19dec",
-          "title": "Eighth-note feel",
-          "description": "[What it is]\nBuilding on your quarter-note pulse, the eighth-note feel divides each beat into two evenly spaced subdivisions so you hear twice as many steady hits inside the same beat. On guitar this creates a continuous 'even motion' that usually feels like a steady alternation between the main beats and the off‑beats. It’s the basic subdivision that underpins many common strum patterns and grooves.\n\n[Why it matters]\nEighth-note feel fills the space between the main beats and gives momentum to chords and rhythms, making grooves sound fuller and more forward-moving. It also makes it easier to sync with other musicians, because those extra pulses provide clear places to lock accents and syncopations. Mastering it lets you switch smoothly between simpler whole-beat playing and more active, driving patterns.\n\n[How to practice]\nVocalize the subdivision (for example, saying the beat and the off-beat) while keeping a steady foot tap on the main beats to internalize the spacing. Hold a comfortable chord and play on every subdivision so you hear an unbroken stream of evenly spaced sounds, then alternate between playing only the main beats and then every subdivision to feel the difference. Add simple accent shifts (accent every other subdivision, or accent the off-beats) and practice gradually increasing duration and fluidity—focus on even spacing and steady internal pulse rather than speed.",
-          "successCriteria": "You can consistently produce even, evenly spaced subdivisions so a held chord or strum pattern sounds like a steady stream rather than lumpy or rushed; you can switch between playing only the main beats and playing eighth-note subdivisions without losing the underlying pulse; and you can place accents on any subdivision while keeping the rest even and steady.",
-          "sessionsRequired": 8,
+          "title": "Count out loud and find beat one",
+          "description": "[What it is]\nSaying \"1, 2, 3, 4\" out loud while you play, so you always know which beat you are on and where the bar starts. On the guitar this means strumming quarter notes on one chord while counting, and later counting through a chord change without the count hesitating.\n\n[Why it matters]\nCounting is how you find your place when something goes wrong, how you learn a pattern from a chart, and how you talk to other musicians about rhythm. Beat one is the anchor: chord changes, section changes and most accents are organised around it. Players who lose beat one lose the band.\n\n[How to practice]\nStrum quarter notes on E minor at 60–70 BPM and say each beat number as you strum it, slightly louder on \"1\". If speaking breaks your strumming, slow down until both happen together. Then put a rest on beat 3 and an accent on beat 1, and keep saying every number out loud, including the one you are not playing. Finally count \"1, 2, 3, 4\" through a change from E minor to A minor every bar: the count must not pause while your fingers move.",
+          "successCriteria": "You can strum quarter notes while counting \"1, 2, 3, 4\" aloud in time with the click for two minutes, including a chord change every bar, without the count or the strum stopping. You can point to beat one in any bar of a recording you are listening to.",
+          "sessionsRequired": 3,
           "order": 2,
-          "suggestedExerciseId": "strumming_pattern_3"
-        },
-        {
-          "id": "8388ea63-3ce4-4e59-88dc-ba03c514d3ed",
-          "title": "Triplet subdivision",
-          "description": "[What it is]\nTriplet subdivision means dividing a single steady beat into three equal parts so each beat is felt as three evenly spaced clicks. On guitar this shows up as groups of three strums or notes that fit neatly inside one beat, creating a flowing, rolling rhythmic feel. It's a different way to subdivide time than the more common two- or four-part groupings.\n\n[Why it matters]\nTriplets expand the palette of grooves and fills you can play—used for bluesy licks, flowing arpeggios, and rhythmic interest within a chord progression. Being able to place accents and small motifs on any of the three subdivisions lets you create syncopation and variation without changing the underlying harmony. Mastering triplets also makes it easier to adapt to different rhythmic styles and to move smoothly between straight and more swinging feels.\n\n[How to practice]\nStart by vocalizing or counting three even syllables per beat and matching them with a simple percussive hand or muted strum; keep the syllables steady and evenly spaced. Practice short patterns of three notes or strums inside one beat, then shift the accent to the first, second, and third subdivision so each position feels natural. Use slow, focused repetitions and gradually speed up as spacing becomes even; then apply the same triplet groups while changing chords or adding small melodic fills to test consistency under movement.",
-          "successCriteria": "You can play three evenly spaced notes or strums inside each beat without dragging or rushing, shift accents cleanly to any subdivision, and maintain that spacing while changing chords or adding simple fills. Triplet-based grooves sound even and natural, and you can move into and out of triplet patterns smoothly within a phrase.",
-          "sessionsRequired": 8,
-          "order": 3,
-          "suggestedExerciseId": "rhythm_triole",
-          "suggestedLessonIds": [
-            "7XVHXA5GIAw"
-          ]
-        },
-        {
-          "id": "f545ba6e-884a-4c4e-aa02-0a54d6c5a0d2",
-          "title": "Syncopation basics",
-          "description": "[What it is]\nSyncopation means shifting the listener’s expectation by placing musical energy on the weaker parts of the beat rather than only on the strong ones. That can be done with struck chords, delayed strums, or intentional silences, creating a lopsided, driving, or bouncing feel within the steady pulse. It’s about where sound and silence land inside a measure to create forward motion and surprise.\n\n[Why it matters]\nSyncopation transforms simple chord patterns into grooves that feel alive and musical, giving songs personality and forward momentum. It creates tension and release that supports vocals and other instruments and helps you craft different styles—funky, laid-back, or driving—without changing the harmonic material. Mastering it makes your rhythm playing sound more dynamic and expressive.\n\n[How to practice]\nStart by clapping or tapping short patterns that emphasize off-beats, then move those patterns to simple chord hits or short strums in any comfortable position on the neck. Work in small loops: choose one pattern, play it slowly while keeping the underlying pulse steady, and systematically shift the emphasis so you learn several syncopated placements; build progressively on your subdivision control. Use counting aloud, record-and-listen feedback, and repeat until the syncopation feels intentional and sits cleanly over the steady beat.",
-          "successCriteria": "You can maintain a steady underlying pulse while placing chord hits or silences on off-beats so the groove feels intentionally pushed or pulled. A listener can tap a steady beat while your syncopated pattern moves around it, and your patterns stay even and musical when applied to simple song sections. Your strumming choices feel expressive and controlled rather than random.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "strumming_pattern_4",
-          "suggestedLessonIds": [
-            "2XFZ5vExH7c",
-            "BkvQsj-uW_Y",
-            "dy0_MMA1Dfo",
-            "r3HNaLANUrE",
-            "YCA6YuN0Pug"
-          ]
+          "lessons": [
+            {
+              "videoId": "U1TMGzcbbLE",
+              "title": "Strumming: How to Practice Counting the Beats | Guitar for Beginners",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/U1TMGzcbbLE/mqdefault.jpg"
+            },
+            {
+              "videoId": "SxNh6gKD3aU",
+              "title": "How To Count Rhythm on Guitar for Beginners",
+              "channelName": "Lauren Bateman",
+              "thumbnailUrl": "https://i.ytimg.com/vi/SxNh6gKD3aU/mqdefault.jpg"
+            }
+          ],
+          "noExercise": true
         },
         {
           "id": "bceb8c51-4e24-44fd-9d40-32e0e7bd6749",
-          "title": "Counting rests",
-          "description": "[Why it matters]\nCounting rests means treating silence as an active part of the rhythm: you name and feel the empty beats and subdivisions so your stops and re-entries are precise. Reliable rests keep the pulse steady through gaps, make rhythmic patterns clearer, and create space that strengthens accents and groove. When the silence is as intentional as the sound, your playing feels more musical and together.\n\n[How to practice]\nCount the full pulse aloud while marking it with a hand or foot, vocalizing sounding beats and clearly saying \"rest\" (or remaining silent) on the empty ones; start with short patterns where only one beat is sounded and the rest are counted. Increase the length and complexity of the silent passages, subvocalize subdivisions during rests, and practice re-entering exactly on the counted beat. Record or have someone listen to check that entries are not early or late and keep your body motion minimal and consistent during silence.\n\n[Common traps]\nDon't treat rests as \"nothing\"—avoid filling them unconsciously with extra movements or losing the internal pulse. Beware of anticipating the next sound and re-entering too early, and avoid overcomplicating the count with extra syllables that blur subdivisions. Keep counts consistent and simple so the silence stays as deliberate as the notes.",
-          "successCriteria": "You can stop sounding notes while maintaining a steady internal pulse and count through subdivisions during any silent passage; re-entries land exactly where counted and the silences feel intentional rather than accidental.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "rhythm_training_easy"
-        },
-        {
-          "id": "fe642bd4-df42-4fd9-b46d-791f48440cbe",
-          "title": "Tempo change control",
-          "description": "[What it is]\nTempo change control is the ability to intentionally speed up or slow down the beat and move between tempos smoothly or instantly when the music calls for it. It covers both gradual shifts (accelerando/ritardando) and clear, on-the-spot changes so the rhythm remains steady and musical during the transition. Good control means the change feels deliberate, not accidental.\n\n[Why it matters]\nControlled tempo changes shape phrasing and emotional impact, making sections feel like they breathe rather than run on autopilot. They help you lead bandmates through transitions and keep arrangements tight when a song needs push or release. Listeners notice when tempo shifts are confident versus when they sound like timing problems.\n\n[How to practice]\nWork on short exercises where you deliberately stretch or compress a single phrase: start small and make the change steady and even, then refine so it sounds natural. Practice sudden changes on a cue (a hand signal or vocal count-in) so you can stop or start a new tempo cleanly without losing the underlying pulse; use a consistent physical anchor (foot tap or body sway) to feel the beat. Record yourself to check for uneven pacing, and repeat until the shift is smooth, controlled, and expressive.",
-          "successCriteria": "You can make gradual and sudden tempo shifts that feel deliberate and musical, maintain a steady internal pulse during the change, and execute transitions without sounding rushed, dragged, or wobbly.",
-          "sessionsRequired": 8,
-          "order": 6,
-          "suggestedExerciseId": "strumming_pattern_30"
+          "title": "Rests, long notes and clean stops",
+          "description": "[What it is]\nPlaying silence on purpose. A half note is a strum that rings for two beats, a whole note for four, and a rest is a beat where you stop the strings and play nothing. Stopping means resting the side of your picking hand on the strings, or relaxing the fretting fingers, exactly on the beat.\n\n[Why it matters]\nRhythm guitar is as much about where sound ends as where it starts. Malcolm Young's AC/DC parts are famous for the space between chords, and a band relies on the rhythm guitarist to define that space. Rests also make every pattern later in the roadmap possible: a strum pattern is just a choice of which beats sound and which are silent.\n\n[How to practice]\nHold E minor and count \"1, 2, 3, 4\" aloud. Play this sequence: a bar of four quarter notes; a bar of two half notes (strum on 1 and 3, let them ring); a whole note (strum on 1, let it ring for the bar); a bar with a strum on 1 followed by three counted rests. Stop the strings dead on the rest, no lingering ring, and re-enter exactly on the next downbeat. Then play Rhythm Training — Easy, which mixes quarter notes, half notes and rests on a muted string and checks your timing. Vary it: stop on beat 3, play two bars and rest one.",
+          "successCriteria": "You can loop a bar of quarter notes, a bar of half notes, a whole note and a bar with counted rests at 60–80 BPM without losing the count. Every stop is silent instantly, and every re-entry lands on the intended beat.",
+          "sessionsRequired": 4,
+          "order": 3,
+          "suggestedExerciseId": "rhythm_training_easy",
+          "lessons": [
+            {
+              "videoId": "zV2zH-ewY-M",
+              "title": "Guitar Rhythm theory - Rests - Whole, Half, Quarter and Eighth Notes",
+              "channelName": "Clem Buckley Guitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/zV2zH-ewY-M/mqdefault.jpg"
+            },
+            {
+              "videoId": "MbXPKNonDj0",
+              "title": "Reading Music on Guitar - Note and Rest Values made EASY!",
+              "channelName": "Nick Tolman Music",
+              "thumbnailUrl": "https://i.ytimg.com/vi/MbXPKNonDj0/mqdefault.jpg"
+            }
+          ]
         }
       ]
     },
     {
-      "id": "3179ae68-b653-4cb7-a846-4a9c06269c2d",
-      "title": "Chord Variations and Voicings",
-      "order": 4,
+      "id": "25c0d7e6-18c3-4b3a-9bb6-efcab2bca8be",
+      "title": "Open Chords in Time",
+      "order": 1,
       "steps": [
         {
-          "id": "5de72359-43f3-4137-b72a-7c32a79262c2",
-          "title": "Suspended chords",
-          "description": "[What it is]\nA suspended chord is a simple chord shape that removes the usual note that makes a chord sound clearly 'major' or 'minor' and replaces it with a note that leaves the harmony feeling open or unresolved. The result is a fresh, floating sound that begs to move somewhere else rather than sounding finished.\n\n[Why it matters]\nSuspended chords add instant color and motion to a progression without complicated fingerings; they create mild tension you can release for emotional effect. They work well for intros, turnarounds, and simple accompaniments where you want a sense of movement or surprise.\n\n[How to practice]\nForm the suspended shape in any comfortable position on the neck and listen for the open, unresolved quality—then change to a stable chord to hear the release. Practice switching back and forth slowly at first until the shapes sound clean and consistent, then use them inside short strumming patterns and simple progressions so you learn when the suspension helps the song. Try arpeggiating the notes and vary which beat you accent to explore different feels without changing the basic shape.",
-          "successCriteria": "You can form the suspended shape clearly and switch to a resolved chord without hesitation; the suspended sound is distinct (open/unresolved) and the release to the resolved chord is audible and intentional. You can drop a suspended chord into a short progression and use it to create a clear sense of tension and release.",
+          "id": "405c2914-5d10-4b60-888f-a274ee96a09b",
+          "title": "Essential open chords, ringing clean",
+          "description": "[What it is]\nThe open chords that carry most beginner songs: E minor, A minor, D, A, E, C and G. The goal here is not speed but sound: every string that should ring, rings; every string that should be silent, is silent.\n\n[Why it matters]\nThese seven shapes are enough to accompany hundreds of songs, but only if they ring clean. A buzzing or dead string spoils a rhythm part even when the timing is perfect, and you cannot fix chord sound later while also thinking about a strum pattern. This is the moment to build the habit.\n\n[How to practice]\nLearn two or three shapes at a time in Chord Practice — Pick Your Chords. For each shape, place the fingers, then pick the strings one at a time and listen. Fix a buzz by moving the fingertip closer to the fret wire or arching the finger more; fix a dead string by checking whether a neighbouring finger is touching it. Keep the thumb behind the neck, roughly opposite the middle finger, so the fingers can curl. Once a chord rings clean, strum eight quarter notes on it and check that it stays clean. Only then add the next shape.",
+          "successCriteria": "You can form all seven chords (Em, Am, D, A, E, C, G) so that a string-by-string check produces no buzz or dead note, and you can strum eight quarter notes on any of them without the sound degrading. The hand looks relaxed and the thumb stays behind the neck.",
           "sessionsRequired": 8,
           "order": 0,
           "suggestedExerciseId": "chord_practice_configurable",
-          "suggestedLessonIds": [
-            "qu49nYaBfdM",
-            "16d6nx_pSrs",
-            "otjuDwSMRjk"
+          "lessons": [
+            {
+              "videoId": "rTMN8rCBWkw",
+              "title": "(Part1) 11 Basic Guitar Chords that every Beginner Guitarist should know ~ Open Major & Minor Chords",
+              "channelName": "Piku Attri",
+              "thumbnailUrl": "https://i.ytimg.com/vi/rTMN8rCBWkw/mqdefault.jpg"
+            },
+            {
+              "videoId": "6V-X-FJw7yQ",
+              "title": "Are You Doing It Wrong? Correct Thumb Placement for Guitar",
+              "channelName": "Andre Tonelli",
+              "thumbnailUrl": "https://i.ytimg.com/vi/6V-X-FJw7yQ/mqdefault.jpg"
+            }
           ]
         },
         {
-          "id": "bf631dda-34ca-4e94-a44a-10ac5900aba0",
-          "title": "Open seventh chords",
-          "description": "[What it is]\nOpen seventh chords are open-position chord shapes that add a seventh interval to a basic triad, creating extra color and forward motion. Common varieties include the dominant-seventh, major-seventh, and minor-seventh flavors—each gives a different emotional quality, from bluesy/toothier to smooth or mellow. Because they use open strings, they ring with more resonance than closed voicings.\n\n[Why it matters]\nSeventh chords are a staple of rhythm guitar vocabulary: they change how progressions resolve and give your comping more character without adding complexity. Using open seventh shapes makes it easy to add subtle tension or warmth to common chord sequences, and they help you connect chords smoothly through natural voice-leading. They also expand the textures you can offer in styles like folk, blues, pop, and soul.\n\n[How to practice]\nBuilding on your open-chord fluency, learn a few open-seventh shapes and alternate between each and the corresponding triad to hear the difference in color. Practice cleanly ringing each string involved, isolate the seventh voice by arpeggiating, and work on quieting any unwanted strings with gentle finger placement or palm muting. Move them into simple progressions and focus on smooth, economical finger motion so the seventh can appear and resolve musically.",
-          "successCriteria": "You can play several open seventh shapes with clean ringing strings and no unwanted buzz; you can hear and describe how each seventh color changes a chord; you can switch between triads and seventh voicings within a progression so the harmony moves and resolves naturally; your fingerings are economical and support smooth voice-leading.",
-          "sessionsRequired": 8,
+          "id": "20707cb0-811d-4a69-a38f-dcbaf2c4790e",
+          "title": "Two-chord changes on the beat",
+          "description": "[What it is]\nSwitching between two open chords while the quarter-note strum keeps going, so that the first strum on the new chord lands on beat one and sounds as clean as the others.\n\n[Why it matters]\nChord changes are where beginners lose the beat: the fretting hand takes too long, so the strum arrives late or hits a half-formed chord. A rhythm part that pauses at every change is not usable in a song. Being able to change on the beat is the single most important accompaniment skill.\n\n[How to practice]\nPick an easy pair (Em to Am, Am to C, G to Em, D to A). At 60 BPM, play four quarter-note strums on the first chord and four on the second, in a loop. Start moving the fingers as you play beat 4 so the shape is ready on beat 1. If the first strum after the change is late or dirty, slow down rather than stopping. Add JustinGuitar's One Minute Changes drill: for one minute, change back and forth between the two chords as many times as you can, count the clean changes, and write the number down each session.",
+          "successCriteria": "You can loop two chords with quarter-note strums at 60–70 BPM for two minutes where the first strum after every change is clean and on the click. In One Minute Changes you reach at least 30 clean changes for two different pairs.",
+          "sessionsRequired": 7,
           "order": 1,
           "suggestedExerciseId": "chord_practice_configurable",
-          "suggestedLessonIds": [
-            "i36Py9SmIck",
-            "2sZWwq_MN4M",
-            "dPVTDFUWXxU",
-            "PG2wc4fcv0I",
-            "JgS9ai_KEHE"
+          "lessons": [
+            {
+              "videoId": "7VzPzBsm4sU",
+              "title": "Get Strumming & Chord Changes Right! | Guitar for Beginners",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/7VzPzBsm4sU/mqdefault.jpg"
+            },
+            {
+              "videoId": "DKqbdVSeAEg",
+              "title": "Chord Switching Practice - C to G",
+              "channelName": "Good Guitarist",
+              "thumbnailUrl": "https://i.ytimg.com/vi/DKqbdVSeAEg/mqdefault.jpg"
+            }
           ]
         },
         {
-          "id": "999ee5eb-aed8-45fb-94bd-48ad1b5b78ff",
-          "title": "Major/minor shapes",
-          "description": "[Why it matters]\nMajor and minor shapes are the basic building blocks that give chords their 'major' (brighter) or 'minor' (darker) quality. Learning the core movable patterns lets you play those colors in many places on the neck with the same fingerings, so you can match harmony to melody and create different moods quickly. Recognizing and using these shapes makes arranging and comping far more flexible than relying on a handful of static voicings.\n\n[How to practice]\nLearn one clear movable major shape and one clear movable minor shape, then drill forming each until the fingers land reliably and the notes ring clean. Practice switching back and forth between the two shapes slowly, listening for the change in tonal color; vary where you place them on the neck to hear how the same shape sounds in different ranges. Add simple rhythmic strumming and single-note bass movement so you can use the shapes musically rather than as isolated patterns.\n\n[Common trap]\nA common mistake is treating shapes like finger gymnastics and not listening — that causes muted or buzzy strings and loses the major/minor distinction. Another trap is overcomplicating fingering; aim for the simplest reliable fingering that produces clear tones. Finally, don’t ignore the lowest sounding note in the shape: if the bass is muddy or unclear, the chord’s quality will be hard to hear.",
-          "successCriteria": "You can form both a basic movable major and a basic movable minor shape cleanly anywhere on the neck, switch between them smoothly while maintaining clear ringing notes, and reliably hear and use their different tonal colors in simple comping.",
-          "sessionsRequired": 8,
+          "id": "dba12ae1-2213-49f4-9699-0246fe385b71",
+          "title": "Change without stopping the strum",
+          "description": "[What it is]\nTwo habits that keep the strum going through a change. A pivot finger is a finger that stays on the same string and fret in both chords (the first finger between C and Am, the third finger between G and Em with the right fingering), so fewer fingers move. An air change means the last strum of the bar is played while the fingers are already lifting, so the strumming hand never waits for the fretting hand.\n\n[Why it matters]\nWasted motion is what makes changes slow, and a stopped strumming hand is what makes them audible. Moving fewer fingers a shorter distance, and letting the last strum of the bar be slightly open, is how experienced players change chords at song tempos without a gap.\n\n[How to practice]\nFor each pair you know, say aloud which fingers stay and which move, then practise the change in slow motion keeping the moving fingers within a centimetre of the strings. Then loop the pair with quarter notes and let the strum on beat 4 catch the strings as the fingers lift; the strum on beat 1 must land on the full new chord. Film your fretting hand from above and look for fingers flying up. Use Chord Practice — Pick Your Chords with the pair at 60–80 BPM.",
+          "successCriteria": "For your five most common pairs you can name the pivot fingers, and a video of your hand shows no finger rising more than about a centimetre during the change. You can loop each pair at 80 BPM with quarter notes and no gap in the strumming.",
+          "sessionsRequired": 5,
           "order": 2,
           "suggestedExerciseId": "chord_practice_configurable",
-          "suggestedLessonIds": [
-            "00fHMNiINN8",
-            "0kB4X3w1IBk",
-            "1rkRIoffK7I",
-            "r-1mbf8X9Cg",
-            "0bv1pytJMPg"
+          "lessons": [
+            {
+              "videoId": "p-Rj4svEyrA",
+              "title": "Strings Ringing Out Between Chord Changes",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/p-Rj4svEyrA/mqdefault.jpg"
+            }
           ]
         },
         {
-          "id": "91793f98-04d9-4c76-a6cb-d59385f04c8f",
-          "title": "Slash chord reading",
-          "description": "[What it means]\nSlash-chord notation shows a chord name followed by a slash and a specified low pitch; read it as \"play the named chord while placing that specified low tone under it.\" It tells you both the harmony and which note should sound as the lowest-sounding tone in the mix. For practical playing, treat the left side as the chord quality and the right side as the chosen low tone.\n\n[Why it matters]\nUsing a specified low tone changes the chord's color and the way it connects to the next harmony, so the same chord shape can serve different functions depending on that low choice. Slash chords give simple ways to create smooth low-line motion, clearer arrangements, and stronger support for a singer or melody without changing the basic chord shape. Recognizing them quickly keeps your rhythm parts tight and musically clear in band and studio contexts.\n\n[How to practice]\nPractice by reading the chord symbol left of the slash to confirm the harmony, then read the symbol right of the slash to choose the low tone that must sound underneath; do this slowly and say both parts out loud before playing. Work through short progressions that swap the low tone while keeping the chord name the same so you hear the difference, and repeat each change while strumming and while arpeggiating to internalize the sound. Finally, practice placing that low tone on the strong beat and listen for smoother voice-leading when the low tone moves stepwise between chords.",
-          "successCriteria": "You can glance at a slash chord and immediately know the chord quality and the specified low tone to include, play the chord so that the low tone clearly supports the harmony, and hear how changing the low tone alters the function and connection between chords.",
-          "sessionsRequired": 8,
+          "id": "e924a2b5-062e-4161-b7c8-dd6e8d9c61c8",
+          "title": "Four-chord loops from real songs",
+          "description": "[What it is]\nPlaying progressions of three or four chords in a loop without stopping: G, D, Em, C (I–V–vi–IV in G); C, G, Am, F (with an easy F such as Fmaj7); Am, C, G, D; and the 12-bar blues in A (A, D, E). One bar of quarter notes per chord first, then two beats per chord.\n\n[Why it matters]\nMost popular songs cycle through a few chords. Hooktheory's analysis of 1,300 popular songs found the move from I to V to be the most common change, and the I–V–vi–IV loop is the famous \"four-chord song\"; JustinGuitar's beginner song lists are built on the same loops. Once a four-chord loop runs without stopping, you can accompany a real song from beginning to end. The loop also trains anticipation: while playing one chord you already think of the next.\n\n[How to practice]\nWrite the progression on paper. At 60 BPM play one bar of quarter notes per chord and loop it. Keep the beat even if a change is rough, then clean up the weakest change with One Minute Changes. When a loop is solid at one bar per chord, play two beats per chord. The hardest change is usually from the last chord back to the first; give it extra repetitions. Learn at least two loops from memory so you can look at your hands or a lyric sheet instead of the chart.",
+          "successCriteria": "You can play two different four-chord loops and a 12-bar blues from memory at 70 BPM, one bar and then two beats per chord, for three minutes without stopping, with every chord clean on its first strum.",
+          "sessionsRequired": 6,
           "order": 3,
-          "suggestedExerciseId": "chord_practice_configurable"
-        },
-        {
-          "id": "2e258957-fc2a-49f0-8359-62c66ae10133",
-          "title": "Partial barre preparation",
-          "description": "Partial barre preparation teaches the index finger how to act as a mini-barre: pressing several adjacent strings cleanly with one finger while leaving others free. It matters because a controlled mini-barre produces even ringing across those strings and lets you access compact, fuller-sounding shapes without extra fingers. Develop it by finding a comfortable finger angle (rotate the wrist slightly), practice placing just the fleshy pad or flattened edge of the index finger across the needed strings, hold briefly to check clarity, then release and repeat, gradually increasing hold time and moving the hand into and out of the mini-barre with relaxed motion.",
-          "successCriteria": "You can drop the index finger across multiple adjacent strings so each intended note rings clearly and evenly, create and release the mini-barre quickly without excess tension, and move into and out of the shape smoothly while maintaining consistent tone.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "mini_arpeggio",
-          "suggestedLessonIds": [
-            "2kZmhUuviN8",
-            "PI4Pce2HonM",
-            "eQM9_0NOPFU",
-            "bgkICElkvEY",
-            "p1VsJvuoBN4"
+          "suggestedExerciseId": "chord_practice_configurable",
+          "lessons": [
+            {
+              "videoId": "mpD2AgtjJTM",
+              "title": "10 Easiest Guitar Songs Ever - ONLY 4 CHORDS (G, D, Em, C)",
+              "channelName": "Guitar Dave",
+              "thumbnailUrl": "https://i.ytimg.com/vi/mpD2AgtjJTM/mqdefault.jpg"
+            }
           ]
         },
         {
-          "id": "c88af0f6-5f9c-4147-8de2-f528db807c44",
-          "title": "Voicing economy",
-          "description": "[What it is]\nVoicing economy means choosing chord shapes and note placements that use the fewest fingers and smallest hand movement to convey the harmony. It emphasizes keeping shared notes between consecutive chords and favoring compact, partial voicings so the overall texture stays clear and tight.\n\n[Why it matters]\nEfficient voicings make chord changes smoother and reduce physical strain, so your playing sounds more musical and less mechanical. They also leave sonic space for vocals or other instruments, prevent muddiness, and help the groove feel more connected.\n\n[How to practice]\nPick a short chord progression in any comfortable neck area and work on keeping notes that repeat between chords ringing while you move the rest of the fingers as little as possible. Strip chords to their essential tones, practice moving only one finger at a time, and listen for clean voice-leading; start slow, increase gradually, and record yourself to check for unwanted jumps or clutter.",
-          "successCriteria": "You can move through a progression so that most changes require only tiny finger adjustments, common tones sustain between chords, the accompaniment sounds open and uncluttered, and transitions feel and sound fluid rather than jumpy.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "chord_practice_configurable"
+          "id": "8655027a-0cc8-4871-b5b0-81f99c3a6f14",
+          "title": "Strum the right strings",
+          "description": "[What it is]\nEvery open chord has a lowest string that should sound (the sixth for E, Em and G; the fifth for A, Am and C; the fourth for D) and strings that should stay silent. This step is about starting the strum on the right string and keeping the unwanted ones quiet, either by not hitting them or by muting them with the fretting hand.\n\n[Why it matters]\nThe lowest note defines the chord. A D chord with the open low E ringing sounds like a different, muddy chord, and a C with the sixth string open loses its bass. Controlling which strings sound is also the first step towards bass-strum patterns and the percussive muting later in the roadmap.\n\n[How to practice]\nFor each chord, name its bass string and pluck it alone, then strum the rest. Aim the downstroke to start from that string; for D and C, let the tip of the thumb or the side of a fretting finger lightly touch the strings above the bass note so they stay silent even if the pick brushes them. Use Muting — Inside a D Chord to practise silencing individual strings by relaxing a finger without lifting it. Test yourself by recording a slow strum of each chord and listening for a wrong low note.",
+          "successCriteria": "For all seven open chords you can name the bass string and, in a recording of slow strums, no wrong low string is audible. You can hold a D chord and keep the fifth and sixth strings silent while strumming across all six strings.",
+          "sessionsRequired": 3,
+          "order": 4,
+          "suggestedExerciseId": "chord_spotlight_drill",
+          "lessons": [
+            {
+              "videoId": "aPosednM-zE",
+              "title": "How to stop buzzing and muting guitar strings?",
+              "channelName": "Jaxon Williams Guitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/aPosednM-zE/mqdefault.jpg"
+            }
+          ]
         }
       ]
     },
     {
-      "id": "353b1285-4d13-44fd-b10c-93e330919d58",
-      "title": "Song Application and Arrangement",
+      "id": "1250651c-9cc7-4225-b725-141bd50bba66",
+      "title": "Eighth Notes and Strum Patterns",
+      "order": 2,
+      "steps": [
+        {
+          "id": "adcd0c46-b63f-460a-8f7d-6acc55b19dec",
+          "title": "The eighth-note pendulum",
+          "description": "[What it is]\nSplitting each beat in two: a downstroke on the number (\"1, 2, 3, 4\") and an upstroke on the \"and\". The hand swings like a pendulum, down on the beat and up between beats, and it keeps swinging even when a stroke is later skipped.\n\n[Why it matters]\nAlmost every strum pattern in pop, rock, folk and country is a selection of strokes from this continuous down-up motion. If the pendulum is steady, learning a new pattern is just deciding which strokes miss the strings. If the pendulum stops and starts, every pattern has to be learned from scratch, and the timing wobbles.\n\n[How to practice]\nHold one chord at 60 BPM, count \"1 and 2 and 3 and 4 and\" aloud and play down on the numbers and up on the \"ands\". Keep the upstroke lighter and shallower; it usually catches only the three or four thinnest strings, which is fine. Play Strumming — Down-Up and listen for even spacing between down and up. Then keep the motion going through a chord change: the hand does not wait for the fingers.",
+          "successCriteria": "You can strum continuous eighth notes at 60–80 BPM for two minutes with even spacing between down and up strokes, counting aloud, and keep the motion unbroken through a chord change every bar.",
+          "sessionsRequired": 4,
+          "order": 0,
+          "suggestedExerciseId": "strumming_down_up",
+          "lessons": [
+            {
+              "videoId": "XxYGZmXcK88",
+              "title": "Basic Downstroke and Upstroke Technique for Rhythm Strumming",
+              "channelName": "Gary Lee",
+              "thumbnailUrl": "https://i.ytimg.com/vi/XxYGZmXcK88/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "f090f2c3-217e-4f11-b1e9-144e738f9cec",
+          "title": "Your first patterns: add the upstroke",
+          "description": "[What it is]\nTurning the pendulum into a pattern by letting some strokes miss the strings. The first pattern is four downstrokes with a single upstroke on the \"and\" of 4 (D D D DU). Next comes D DU D DU, where the upstrokes after beats 2 and 4 are played.\n\n[Why it matters]\nThis is the mechanism behind every pattern you will ever learn: the arm keeps its eighth-note swing, and you choose which strokes touch the strings. The first patterns also sound like real songs immediately, so you can accompany a two-chord tune at the end of this step.\n\n[How to practice]\nSay the pattern before playing it (\"down, down, down, down-up\"), tapping it on your leg. Play it on muted strings, then on one chord, then over a two-chord loop. The rule that matters: on a missed stroke the arm still moves, it just passes above the strings. Use Strumming 2 — Downs + Final Up at 60–70 BPM until the upstroke lands exactly on the \"and\" of 4 and is lighter than the downstrokes. Then try D DU D DU the same way.",
+          "successCriteria": "You can play D D D DU and D DU D DU over a two-chord loop at 60–80 BPM for two minutes with the arm swinging continuously, the upstrokes lighter than the downstrokes, and no stroke landing off the count.",
+          "sessionsRequired": 5,
+          "order": 1,
+          "suggestedExerciseId": "strumming_pattern_2",
+          "lessons": [
+            {
+              "videoId": "IXL1bG_ao3c",
+              "title": "Easy Strumming Patterns With Up Strums | Guitar for Beginners",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/IXL1bG_ao3c/mqdefault.jpg"
+            },
+            {
+              "videoId": "6C2WFkVESBk",
+              "title": "3 Essential Strumming Patterns - Beginner Guitar Lessons",
+              "channelName": "Good Guitarist",
+              "thumbnailUrl": "https://i.ytimg.com/vi/6C2WFkVESBk/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "2c3a2ae5-cdad-44d7-98e3-b99a10de2deb",
+          "title": "Count and read strum patterns",
+          "description": "[What it is]\nReading a pattern written as counts and arrows (D on 1, D on 2, DU on 3, DU on 4) and playing it correctly the first time; and the reverse, hearing a pattern and writing it down. You count \"1 and 2 and 3 and 4 and\" and know on which syllable each stroke falls.\n\n[Why it matters]\nA pattern learned only by copying cannot be fixed when it goes wrong and cannot be learned from a chart or a lesson video without endless rewinding. Counting turns patterns into something you understand, which is also how you will later write your own pattern for a song.\n\n[How to practice]\nTake a pattern you know and count it aloud, saying which counts sound and which are missed. Then open Strumming 9 — Skip First & (D, DU, DU, DU) and learn it from the chart alone: count it, tap it, then play it on a chord at 60 BPM. Next, listen to the strumming in three songs you like and write down what you hear as counts and arrows, then check by playing along. Keep a page of patterns you have written down.",
+          "successCriteria": "Given a written pattern of eight eighth-note positions you can play it correctly within a minute at 60–70 BPM. Given a recording of a simply strummed song you can write down its main pattern and play along with it.",
+          "sessionsRequired": 3,
+          "order": 2,
+          "suggestedExerciseId": "strumming_pattern_9",
+          "lessons": [
+            {
+              "videoId": "L-IPl4xu4cs",
+              "title": "How to Read Strumming Notation",
+              "channelName": "Tomas Michaud",
+              "thumbnailUrl": "https://i.ytimg.com/vi/L-IPl4xu4cs/mqdefault.jpg"
+            },
+            {
+              "videoId": "aqL53vVivoE",
+              "title": "7 Tips for Reading Strumming Patterns",
+              "channelName": "Song Notes by David Pots",
+              "thumbnailUrl": "https://i.ytimg.com/vi/aqL53vVivoE/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "e178bd61-32e5-4276-b380-18b0a2b9ebef",
+          "title": "THE pattern: D DU UDU",
+          "description": "[What it is]\nThe pattern that fits more songs than any other: down on 1, down-up on 2, up on the \"and\" of 3, down-up on 4 (D, DU, U, DU). JustinGuitar calls it \"Old Faithful\". The new element is the missed downstroke on beat 3: the arm swings down past the strings, and the upstroke on the \"and\" is the only sound on that beat.\n\n[Why it matters]\nThis one pattern will get you through a large share of pop, folk, rock and country songs, and it contains the skill that all syncopated patterns need: skipping a downbeat while the arm keeps moving. Getting it solid now means every later pattern is a small variation rather than a new problem.\n\n[How to practice]\nCount \"1 and 2 and 3 and 4 and\" and say the strokes: \"down, down-up, up, down-up\". Tap it on your leg, then play it on muted strings, then on one chord at 60 BPM. The app's Strumming 6 — Syncopated Ups is this pattern without the final upstroke (D, DU, U, D): play it as written first, then add the last up yourself. Move it over a four-chord loop at 60–80 BPM and keep the strum unbroken through the changes.",
+          "successCriteria": "You can play D DU UDU over a four-chord loop at 70–80 BPM for three minutes without a break in the pendulum, with the missed downstroke on beat 3 silent and the upstroke on the \"and\" of 3 clearly audible. You can describe the pattern in counts.",
+          "sessionsRequired": 7,
+          "order": 3,
+          "suggestedExerciseId": "strumming_pattern_6",
+          "lessons": [
+            {
+              "videoId": "QJtHzTqAwV0",
+              "title": "Why This Pattern Works for Every Song",
+              "channelName": "Marty Music",
+              "thumbnailUrl": "https://i.ytimg.com/vi/QJtHzTqAwV0/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "0b258c7b-bc87-4664-8f8f-cadf17cdf8e0",
+          "title": "Rests inside a pattern",
+          "description": "[What it is]\nPutting a silence inside a strum pattern on purpose: the chord is stopped on a specific count and re-enters on another, while the arm keeps its swing above the strings. This combines the clean stops from the first phase with eighth-note patterns.\n\n[Why it matters]\nPatterns with rests are what make a groove breathe. The difference between a campfire strum and a part that sounds like a record is often nothing more than a well-placed stop. Rests also prepare you for the muted \"chucks\" and for syncopation, where hits and silences fall between the beats.\n\n[How to practice]\nPlay Strumming 26 — Down-Up Pairs (DU, rest, DU, rest): a down-up on beat 1, silence on beat 2, down-up on 3, silence on 4. Stop the chord by relaxing the fretting fingers or touching the strings with the picking hand, exactly on the count, and count through the silence. Then take THE pattern and insert one rest on beat 4; record it and listen whether the rest sounds intentional. Try longer silences: play a bar, rest a bar, come back on beat 1.",
+          "successCriteria": "You can play patterns that contain rests on beats 2 and 4, or on the \"and\" of a beat, at 60–80 BPM with the silence starting exactly on the count and the arm still swinging. A listener cannot tell a rest from a mistake, because every silence sounds intended.",
+          "sessionsRequired": 4,
+          "order": 4,
+          "suggestedExerciseId": "strumming_pattern_26",
+          "lessons": [
+            {
+              "videoId": "6DHelkAJlcE",
+              "title": "All About Musical Ties & Strumming Patterns",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/6DHelkAJlcE/mqdefault.jpg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a106a2ce-6b45-4ab7-8315-1ae934a4d99c",
+      "title": "Muting, Accents and Dynamics",
+      "order": 3,
+      "steps": [
+        {
+          "id": "0fdbe4a9-5b05-4d1c-95ac-e067c2e8e233",
+          "title": "Long and short: control how long a chord rings",
+          "description": "[What it is]\nDeciding how long each strum sustains. The same progression can be played with chords ringing into each other (legato) or with each strum cut short (staccato), and a good rhythm part mixes both on purpose.\n\n[Why it matters]\nDuration is a dimension of a rhythm part that beginners rarely control. Malcolm Young's verses are built on chords that are hit, held for exactly the right length and stopped; Freddie Green cut every quarter note short so the guitar became part of the drums. Choosing sustain per section is also how you make a verse sound calmer than a chorus with the same chords.\n\n[How to practice]\nPlay Strumming 18 — Half-Time Feel (a strum on 1 and on 3) two ways: first let each chord ring the full two beats, then cut each chord after one beat by relaxing the fretting hand, and count the silence. Alternate four bars long, four bars short. Then mix within a bar: long on 1, short on 3. Do the same with THE pattern, letting the chord ring through the missed downstroke or stopping it there.",
+          "successCriteria": "You can play the same four-chord loop at 70 BPM in a fully ringing version and a fully staccato version, switch between them every four bars on request, and mix long and short strums within a bar with no unintended ring or early stop.",
+          "sessionsRequired": 3,
+          "order": 0,
+          "suggestedExerciseId": "strumming_pattern_18",
+          "lessons": [
+            {
+              "videoId": "p-Rj4svEyrA",
+              "title": "Strings Ringing Out Between Chord Changes",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/p-Rj4svEyrA/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "b0ef5708-51e7-4661-95af-47fbfeedf528",
+          "title": "Loud and soft: dynamics across a song",
+          "description": "[What it is]\nPlaying the same pattern at three clearly different volumes (soft, medium, loud) by changing how deep and how fast the pick moves, not by turning a knob; then assigning volumes to sections, typically a quieter verse and a louder chorus, and moving between them without the tempo changing.\n\n[Why it matters]\nA part played at one volume sounds mechanical, and it leaves the singer no room. Dynamics are how a rhythm guitarist shapes the energy of a song and how a band builds into a chorus. JustinGuitar puts dynamics in the last module of Grade 1 for the same reason: it is what makes the beginner patterns sound like music.\n\n[How to practice]\nPlay Dynamics — Soft to Loud to feel the pick moving from a shallow, light stroke to a deep, fast one. Then play THE pattern over a loop four bars soft, four medium, four loud, four medium, four soft, at a fixed 70 BPM; the rhythm must not change with the volume. Record it and check that the three levels are obviously different and the soft version still sounds like full chords. Finally play a verse-chorus form: eight bars soft, eight bars loud, twice.",
+          "successCriteria": "You can play THE pattern over a chord loop at 70 BPM at three volume levels that are clearly distinguishable in a recording, move between them every four bars without the tempo moving, and the softest level still produces full, clean chords.",
+          "sessionsRequired": 4,
+          "order": 1,
+          "suggestedExerciseId": "dynamic_crescendo",
+          "lessons": [
+            {
+              "videoId": "mP4knhljqj0",
+              "title": "Strumming Dynamics for Beginners | Transform Your Play!",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/mP4knhljqj0/mqdefault.jpg"
+            },
+            {
+              "videoId": "K2oLN4QUQtg",
+              "title": "HOW TO Improve Acoustic Guitar Strumming Dynamics with THIS Strumming Exercise",
+              "channelName": "Lauren Bateman",
+              "thumbnailUrl": "https://i.ytimg.com/vi/K2oLN4QUQtg/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "4f3a4302-fcde-4bcb-a7ed-ad79e7976dd5",
+          "title": "Accents and the backbeat",
+          "description": "[What it is]\nMaking chosen strums louder than the rest. The most useful accent is the backbeat: beats 2 and 4, where the drummer's snare falls. The other strums stay noticeably softer, so the accent stands out by contrast rather than by everything being loud.\n\n[Why it matters]\nAccents are what make a strum sound like a groove instead of a wall of even strokes. Rock, pop, country and R&B live on the backbeat, and a guitarist who accents 2 and 4 automatically sits together with the snare drum. Dave Isaacs' \"Strumming is Drumming\" lesson makes the point directly: treat the guitar as a percussion instrument and match the kick and snare.\n\n[How to practice]\nPlay continuous eighth notes on one chord at 70 BPM with every stroke deliberately soft. Then hit beats 2 and 4 harder, keeping everything else soft; count aloud and say \"2\" and \"4\" louder too. Use Strumming — Rock Accents, which marks the accented strokes. Then move the accent: only beat 1, then the \"and\" of 2 and 4. Record each version and check that the accent is clearly louder and the others stay quiet. Put the backbeat accent into THE pattern over a chord loop.",
+          "successCriteria": "Playing eighth notes or THE pattern over a chord loop at 70–90 BPM, you can put a clear accent on 2 and 4 while the other strums stay soft, then move the accent to beat 1 or to the \"ands\" on request, and a recording shows the difference plainly.",
+          "sessionsRequired": 4,
+          "order": 2,
+          "suggestedExerciseId": "strumming_rock",
+          "lessons": [
+            {
+              "videoId": "kOtT5c8pD1U",
+              "title": "How to create GROOVE in strumming - The 2 Essential Techniques",
+              "channelName": "J. Withrow",
+              "thumbnailUrl": "https://i.ytimg.com/vi/kOtT5c8pD1U/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "8abd83dd-9db8-4a78-a06e-bfe95864086c",
+          "title": "Palm muting",
+          "description": "[What it is]\nResting the fleshy edge of the picking hand on the strings right at the bridge while you strum or pick, so the notes still have pitch but ring short and thick. Moving the hand slightly towards the neck mutes more; moving it back towards the bridge lets more ring.\n\n[Why it matters]\nPalm muting gives you a third sound between open strumming and a full stop, and it is the sound of rock rhythm guitar: chugging low strings, tight verses that open up in the chorus, riffs that stay clean under distortion. Jon Finn also uses palm-muted downstrokes as a timing test, because any deviation from the click is instantly audible when the notes are short.\n\n[How to practice]\nPlay Down Picking — Slow & Heavy: palm-muted downstrokes on the low E string at 60 BPM. Find the spot where the note still has pitch but no sustain; if it turns into a dull thud you are too far from the bridge, if it rings you are too far back. Keep the hand still while the wrist moves. Then apply it to a two-finger power chord (fifth fret on the low E plus seventh fret on the A) and to E minor: two bars muted, two bars open, without changing the tempo. Finally mute only beats 1 and 3 and open the strum on 2 and 4.",
+          "successCriteria": "You can play palm-muted eighth-note downstrokes on the low E and on a power chord at 60–90 BPM with an even, pitched chug, and switch between two bars muted and two bars open on E minor without the tempo or the hand position drifting.",
+          "sessionsRequired": 5,
+          "order": 3,
+          "suggestedExerciseId": "down_picking_doom_pulse",
+          "lessons": [
+            {
+              "videoId": "8OOoUEhhvHw",
+              "title": "Palm Muting | Beginner Guitar Tips",
+              "channelName": "Guitar Center",
+              "thumbnailUrl": "https://i.ytimg.com/vi/8OOoUEhhvHw/mqdefault.jpg"
+            },
+            {
+              "videoId": "76ZOPqcjK8c",
+              "title": "Guitar Palm Muting and Strumming 101",
+              "channelName": "Sean Daniel",
+              "thumbnailUrl": "https://i.ytimg.com/vi/76ZOPqcjK8c/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "2f6bb587-8c77-45cc-b36f-d7508f079276",
+          "title": "Percussive chucks: the fretting hand mutes",
+          "description": "[What it is]\nA strum with no pitch, just a short \"chk\": the fretting fingers relax their pressure but stay touching the strings, and the picking hand strums normally. Placed on beats 2 and 4 it imitates the snare; placed between chord hits it fills the gaps in a pattern with rhythm instead of silence.\n\n[Why it matters]\nThis is the most used percussive sound in acoustic pop, funk, reggae and R&B. Nile Rodgers built a career on \"chucking\": the right hand keeps strumming, the left hand decides which strokes ring and which are choked. For a beginner it solves a common problem: patterns that feel empty between chord hits, and hands that stop moving during rests.\n\n[How to practice]\nHold a chord, strum it, then relax the fingers so the strings are damped but still touched, and strum again: chord, chk, chord, chk on quarter notes at 60 BPM. Use Muting — Inside a D Chord to practise relaxing fingers without lifting them. Then put the chuck on 2 and 4 inside a quarter-note strum, then inside THE pattern on the \"and\" of 2. Watch for open strings ringing when fingers lift too far, and for the fretting hand pressing again too late so the next chord is muted.",
+          "successCriteria": "You can play a chord loop at 70–90 BPM with a clean, unpitched chuck on beats 2 and 4 and no open strings ringing through, then insert chucks into THE pattern on the \"ands\" without the tempo changing, for two minutes.",
+          "sessionsRequired": 6,
+          "order": 4,
+          "suggestedExerciseId": "chord_spotlight_drill",
+          "lessons": [
+            {
+              "videoId": "MP292DdVOKs",
+              "title": "Here's How You Get A Percussive Strumming on Guitar",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/MP292DdVOKs/mqdefault.jpg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7ce3b173-bd0d-4154-8ecd-3ef06a3475a1",
+      "title": "Syncopation, Feel and Groove",
+      "order": 4,
+      "steps": [
+        {
+          "id": "f545ba6e-884a-4c4e-aa02-0a54d6c5a0d2",
+          "title": "Syncopation: hits between the beats",
+          "description": "[What it is]\nPatterns where the important strums fall on the \"ands\" and some downbeats are skipped. Strumming 7 — Inside Upstrokes (DU, U, DU, U: the downstrokes on beats 2 and 4 miss) is the first one; the weight of the pattern moves off the beat while your foot and your count stay on it.\n\n[Why it matters]\nSyncopation is the ingredient that makes a rhythm part push forward instead of marching. Nearly every pop, rock and folk song has it in the strumming, and Berklee's rhythm guitar course treats syncopation as a core skill together with time-feel. It also tests your pulse: you can only play against the beat if you still feel it.\n\n[How to practice]\nCount \"1 and 2 and 3 and 4 and\" aloud and tap the foot on the numbers throughout. Play Strumming 7 at 60 BPM on one chord, saying the strokes; the arm keeps the pendulum, the downstrokes on 2 and 4 pass above the strings. Then try Strumming 10 — Upstroke Run and Strumming 16 — Double Down-Up from the library, always from the chart with counting. Put the one you like best over a four-chord loop with changes on beat 1.",
+          "successCriteria": "You can play two syncopated patterns (including Strumming 7) over a four-chord loop at 70–80 BPM for two minutes with the foot tapping steadily on the beat, the skipped downstrokes silent and the \"and\" strums clearly placed; you can say on which counts the strums fall.",
+          "sessionsRequired": 6,
+          "order": 0,
+          "suggestedExerciseId": "strumming_pattern_7",
+          "lessons": [
+            {
+              "videoId": "2XFZ5vExH7c",
+              "title": "Syncopation Explained for Guitar Players",
+              "channelName": "TenThumbs Productions",
+              "thumbnailUrl": "https://i.ytimg.com/vi/2XFZ5vExH7c/mqdefault.jpg"
+            },
+            {
+              "videoId": "dy0_MMA1Dfo",
+              "title": "Syncopated Strums Guitar Lesson with Tom Butwin",
+              "channelName": "Premier Guitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/dy0_MMA1Dfo/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "22a32c44-138a-4a1d-ade7-e2e6fe0bc650",
+          "title": "Off-beat upstrokes: the skank",
+          "description": "[What it is]\nA pattern of upstrokes only, on every \"and\", with the downstrokes on the beats missing the strings or landing as a chuck: the reggae and ska rhythm, also used in pop verses. The downbeat is silent, so the off-beat carries the whole part.\n\n[Why it matters]\nNothing tests your internal pulse like playing only between the beats. If you can keep a steady skank, you can keep time in any situation, and your upstrokes become as controlled as your downstrokes, which improves every other pattern. It also adds a texture (short, bright, off-beat chords) that you will use for contrast in arrangements.\n\n[How to practice]\nTap the foot on the beat and count aloud. Play Strumming 14 — All Upstrokes at 60 BPM on one chord: the arm still swings down on every beat but passes above the strings. Keep the upstroke short: strike, then relax the fretting fingers on the following beat so the chord stops before the next up. Then replace the missed downstrokes with chucks. Move to a two-chord loop, then four chords, changing on beat 1 during the silent downbeat.",
+          "successCriteria": "You can play upstrokes only on the \"ands\" at 70–90 BPM over a four-chord loop for two minutes with the foot tapping steadily on the beat, the chord stopped before the next upstroke, and the tempo not drifting when the click is turned down.",
+          "sessionsRequired": 5,
+          "order": 1,
+          "suggestedExerciseId": "strumming_pattern_14",
+          "lessons": [
+            {
+              "videoId": "XBCSLXiY3ag",
+              "title": "Reggae rhythm guitar skank - How to play the chop - off-beat tutorial",
+              "channelName": "buffbaffTV",
+              "thumbnailUrl": "https://i.ytimg.com/vi/XBCSLXiY3ag/mqdefault.jpg"
+            },
+            {
+              "videoId": "IpUzXj2ElLE",
+              "title": "How To Play Reggae [Offbeat] Strumming - Guitar Lesson",
+              "channelName": "Guitar Coaching Online",
+              "thumbnailUrl": "https://i.ytimg.com/vi/IpUzXj2ElLE/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "8388ea63-3ce4-4e59-88dc-ba03c514d3ed",
+          "title": "Shuffle and swing feel",
+          "description": "[What it is]\nDividing the beat in three instead of two and playing the first and third part: a long-short, bouncing feel (\"1 and-a 2 and-a\"). Blues, early rock and roll, swing and many country and pop songs use it, and it changes where every upstroke falls: later than in straight eighths.\n\n[Why it matters]\nA shuffle played with straight eighths sounds wrong, and a straight song played with a shuffle sounds equally wrong; Andy Guitar's lesson stresses never mixing the two inside a song. Hearing and playing the difference is a basic requirement for accompanying blues and a large part of the classic rock repertoire. Triplets also sharpen your subdivision: three per beat is harder to feel than two.\n\n[How to practice]\nPlay Timing — Triplets at 60 BPM on a single string, counting \"1 trip-let\" on each beat. Then strum only the first and third triplet: down on the beat, up on \"let\". Take a 12-bar blues in A (A, D, E) and play it as a shuffle with palm-muted downstrokes on the low strings and the up on the \"let\". Play the same progression straight, then shuffled, and record both to compare. Listen to a blues shuffle recording and play along.",
+          "successCriteria": "You can play a 12-bar blues in A as a shuffle at 60–80 BPM for the full form, with the upstroke landing on the third triplet rather than halfway, and switch between straight and shuffled versions of the same progression on request without mixing them.",
+          "sessionsRequired": 6,
+          "order": 2,
+          "suggestedExerciseId": "rhythm_triole",
+          "lessons": [
+            {
+              "videoId": "aOFjHCywtR4",
+              "title": "How to Swing Strum Perfectly",
+              "channelName": "Mark TheGuitarGuy",
+              "thumbnailUrl": "https://i.ytimg.com/vi/aOFjHCywtR4/mqdefault.jpg"
+            },
+            {
+              "videoId": "aMygcs5teLM",
+              "title": "How To Strum The Guitar When Playing The Blues",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/aMygcs5teLM/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "47fe326e-8b41-400d-8a8c-ba0d1f9e76a4",
+          "title": "Switch subdivisions without changing tempo",
+          "description": "[What it is]\nMoving between quarter notes, eighths, triplets and sixteenths while the beat stays exactly where it is. The click does not change; only how many strokes you fit into each beat does.\n\n[Why it matters]\nSongs do this constantly: a verse in quarter notes, a pre-chorus in eighths, a chorus in sixteenths. Players who cannot switch either speed up when the strumming gets busier or slow down when it thins out. The skill is also the best check that the pulse really is inside you and not in your hand.\n\n[How to practice]\nPlay Timing — Switch Subdivisions at 60 BPM: one bar of quarter notes, one of eighths, one of sixteenths, back down, on a single string. Count each subdivision aloud (\"1, 2\", \"1 and\", \"1 e and a\"). Then do the same with strums on one chord, and finally with a triplet bar in the sequence. Record with the click audible and listen for the beat drifting at the moment of the switch; that is where to slow down.",
+          "successCriteria": "You can play four bars cycling quarter notes, eighths, triplets and sixteenths on one chord at 60–80 BPM with the click audible and no drift at the switch points, and repeat it with the click on beats 2 and 4 only.",
+          "sessionsRequired": 4,
+          "order": 3,
+          "suggestedExerciseId": "rhythmic_pocket_mastery",
+          "lessons": [
+            {
+              "videoId": "YKjEWhX-1fA",
+              "title": "Ultimate Right Hand Workout // Rhythmic Subdivisions // Guitar Technique Lesson",
+              "channelName": "Hayes Griffin",
+              "thumbnailUrl": "https://i.ytimg.com/vi/YKjEWhX-1fA/mqdefault.jpg"
+            },
+            {
+              "videoId": "jzJO0HFougM",
+              "title": "How to Start Subdividing on Guitar",
+              "channelName": "Devan Bishop",
+              "thumbnailUrl": "https://i.ytimg.com/vi/jzJO0HFougM/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "c3109628-83d9-4e9f-8259-1e41edfa57b5",
+          "title": "Lock in with the drums",
+          "description": "[What it is]\nPlaying with a drum track or backing track rather than a click, and placing your strums with the drums: downbeats with the kick, accents and chucks with the snare on 2 and 4, subdivisions with the hi-hat. The goal is that the guitar sounds like part of the drum kit.\n\n[Why it matters]\nThis is what a rhythm guitarist is for in a band. Freddie Green said the guitar should never be heard by itself, only as part of the drums; Dave Isaacs teaches strumming as drumming. A part that is in time with a click but fights the drummer's accents still sounds wrong. Learning to hear the kit and match it is the difference between practising rhythm and playing it.\n\n[How to practice]\nTake a drum loop or backing track at 80–100 BPM. First only listen and clap the snare, then the hi-hat subdivision. Then play THE pattern with the accent on the snare and chucks where the snare falls. Turn the track down until you can barely hear it and keep playing; turn it up and check you are still together. Repeat the Metronome Gap Test at song tempos: the silent gap is now what happens between a drum fill and the next downbeat. Do the same with the click on beats 2 and 4 only.",
+          "successCriteria": "Playing THE pattern with a drum track at 80–100 BPM, your accents land with the snare and your downbeats with the kick for a full three-minute track, and when the track is muted for four bars you re-enter on the downbeat without an audible jump.",
+          "sessionsRequired": 5,
+          "order": 4,
+          "suggestedExerciseId": "metronome_gap_test",
+          "lessons": [
+            {
+              "videoId": "7y9sdICaEds",
+              "title": "Learn To Play With A Drummer In 15 Minutes Or Less - Guitar Lesson - Rhythm Tips",
+              "channelName": "Brett Papa",
+              "thumbnailUrl": "https://i.ytimg.com/vi/7y9sdICaEds/mqdefault.jpg"
+            },
+            {
+              "videoId": "x-ZfnAAAK-M",
+              "title": "Playing guitar with drums - kick and snare - Guitar Lesson - Level 4",
+              "channelName": "7 minute music",
+              "thumbnailUrl": "https://i.ytimg.com/vi/x-ZfnAAAK-M/mqdefault.jpg"
+            }
+          ]
+        },
+        {
+          "id": "5bf21b10-1e8d-4f38-8baa-842385ef2244",
+          "title": "Sixteenth notes and the funk scratch",
+          "description": "[What it is]\nFour strokes per beat, counted \"1 e and a\", with the hand moving down-up-down-up continuously and the fretting hand choosing which strokes ring and which are muted scratches. This is the Nile Rodgers approach: the right hand never stops, the left hand plays the rhythm.\n\n[Why it matters]\nSixteenth-note strumming is the basis of funk, disco, R&B and a lot of modern pop, and even in slow ballads the hand often moves in sixteenths. It also makes accents on upstrokes, which Premier Guitar's Alex Nolan calls the biggest accent problem for guitarists, a trained skill instead of an accident.\n\n[How to practice]\nMute the strings with the fretting hand and strum continuous sixteenths at 60 BPM, counting \"1 e and a\" aloud; keep the motion small and the wrist loose. Then play Strumming — Funk 16ths, which marks which strokes ring, which are muted and which are accented. Start by letting only the strokes on the beat ring and scratching the rest, then move the ringing stroke to the \"and\", then to the \"a\". Keep the tempo at 60–70 BPM; speed comes later.",
+          "successCriteria": "You can strum continuous sixteenths on muted strings at 70 BPM for two minutes with even spacing, then play the Funk 16ths pattern with the ringing strokes and accents in the right places, and place a single ringing stroke on the \"e\", \"and\" or \"a\" of a beat on request.",
+          "sessionsRequired": 7,
+          "order": 5,
+          "suggestedExerciseId": "strumming_funk",
+          "lessons": [
+            {
+              "videoId": "Hk4Wfc5BfNE",
+              "title": "Put Hits In Your Scratches. Muted Strumming Guitar Rhythm. Funk Guitar Lesson Grade 6 part 4",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/Hk4Wfc5BfNE/mqdefault.jpg"
+            },
+            {
+              "videoId": "Jjn636xEmWg",
+              "title": "Funk Guitar Lesson - #1 16th Notes Rhythms - Chris Buono",
+              "channelName": "TrueFire",
+              "thumbnailUrl": "https://i.ytimg.com/vi/Jjn636xEmWg/mqdefault.jpg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "58c754dc-e0b9-4ef1-8313-9fce4600695a",
+      "title": "Playing Songs",
       "order": 5,
       "steps": [
         {
           "id": "4393943b-0524-428d-90a4-cff362ca89db",
-          "title": "Chord progression mapping",
-          "description": "[What it is]\nChord progression mapping is the process of creating a clear, simple outline of the sequence of chords through a song—showing the order, where sequences repeat, and where the harmony shifts between sections (intro, verse, chorus, bridge, etc.). The map can be a short written chart, a labeled timeline, or a mental layout that tells you what comes next.\n\n[Why it matters]\nA good map turns a song from a mystery into a road map: you’ll know when to change your accompaniment style, when to simplify or add movement, and where the musical high points happen. Mapping speeds practice, makes learning arrangements consistent, and lets you sight-read or play along with fewer stops and guesses.\n\n[How to practice]\nListen through a short song and mark each distinct harmonic section, then write the chord order for each section using simple labels or numbers; confirm by playing through while following your map. Repeat the process with several different songs to spot common patterns and repeat markers, refining the map when you notice hidden repeats or short turnarounds. Start slow, focus on accuracy over speed, and use the map to guide arranging and rehearsal decisions.",
-          "successCriteria": "You can produce a one-page map for a short song that shows each section and the chord order, follow that map while playing without hesitating at changes, and adjust the map after one playthrough when you notice repeats or alternate endings.",
-          "sessionsRequired": 8,
+          "title": "Read a chord chart and map the song",
+          "description": "[What it is]\nTaking a chord chart or lyric sheet and turning it into a map you can play from: the sections (intro, verse, chorus, bridge, outro), how many bars each has, how many beats each chord lasts, and where the changes fall relative to the lyrics.\n\n[Why it matters]\nA chart tells you the chords but rarely the timing. Players who skip the map get lost in the form, come in wrong after a chorus, or hold a chord for the wrong number of beats. Mapping a song is the first step of every song you will ever learn, and it turns the chord loops from the second phase into a real arrangement.\n\n[How to practice]\nPick a song with three or four open chords. Listen with the chart and count bars per section; write the form as a list (intro 4, verse 8, chorus 8, and so on) and mark on the lyric sheet exactly which word each chord change falls on. Note where the pattern changes, where there are stops, and how the song ends. Then program the song's progression into Chord Practice — Pick Your Chords with the right number of beats per chord and play the form with the recording. Do this for three songs.",
+          "successCriteria": "For three songs you can write the complete form (sections, bar counts, beats per chord, where each change falls in the lyrics) from listening plus a chord chart, and play through the whole form with the recording without losing your place.",
+          "sessionsRequired": 2,
           "order": 0,
           "suggestedExerciseId": "chord_practice_configurable",
-          "suggestedLessonIds": [
-            "pAW7Ln0Y54Y",
-            "M8eItITv8QA",
-            "orXDcLai0Ew",
-            "3dVohgqpZo8",
-            "3JizNRwHYNY"
+          "lessons": [
+            {
+              "videoId": "U0CTA7FFPNM",
+              "title": "Song Structure Guitar Lesson | Guitar Tricks",
+              "channelName": "Guitar Tricks",
+              "thumbnailUrl": "https://i.ytimg.com/vi/U0CTA7FFPNM/mqdefault.jpg"
+            },
+            {
+              "videoId": "pzMS5SCWYww",
+              "title": "Song Structure // Song Sections Explained",
+              "channelName": "Mike George",
+              "thumbnailUrl": "https://i.ytimg.com/vi/pzMS5SCWYww/mqdefault.jpg"
+            }
           ]
         },
         {
           "id": "530fbaf4-31c2-4289-967e-de7a669001fa",
-          "title": "Song strumming adaptation",
-          "description": "[What it is]\nSong strumming adaptation is the ability to choose and shape a strumming approach so the guitar part fits a specific song and each of its sections. It involves selecting a base pattern and making small, musical adjustments so the guitar supports the song’s mood and arrangement without competing with other parts.\n\n[Why it matters]\nGood adaptation keeps the arrangement clear and engaging: the guitar can anchor a quiet verse, drive a chorus, or sit back during a vocal or instrumental feature. Thoughtful strumming helps sections feel distinct and makes the overall performance more musical and communicative.\n\n[How to practice]\nListen to the song and decide the guitar’s role for each section—steady support, sparse punctuations, or rhythmic drive—then pick one simple pattern that suits that role and play it straight through the section. Loop short passages and try one small change at a time (a rhythmic variation, a slight rhythmic fill, or a reduced pattern) to mark a section change; record and compare takes, and start slow, increasing speed until the choices feel natural while accompanying the song.",
-          "successCriteria": "You can select a strumming pattern that consistently supports each section of a song, make purposeful small changes to signal section shifts, and play those choices steadily while accompanying other parts. The guitar part should feel balanced with the arrangement and repeatable under performance conditions.",
-          "sessionsRequired": 8,
+          "title": "Choose and adapt a strum pattern for a song",
+          "description": "[What it is]\nWorking out a pattern that fits a song instead of applying THE pattern to everything: matching the subdivision the drums play, the density of the original guitar part, the tempo and the section. A slow song may need sparse quarter notes; a chorus may need busy eighths with a push.\n\n[Why it matters]\nThe same chords with the wrong pattern sound like a different, worse song. Adapting is the skill that separates \"I know the chords\" from \"I can play the song\", and it is what lets you accompany a singer who wants a song in a different tempo or feel from the record.\n\n[How to practice]\nFor a song you have mapped, listen for the hi-hat subdivision and the guitar's density, and write a candidate pattern in counts. Try three versions: sparser, as heard, busier. Play Strumming 23 — Dense to Sparse to feel how density changes the energy inside one bar. Record each version with the recording and pick the one that sits best, then simplify it for the verse and thicken it for the chorus. Do this for three songs with different tempos.",
+          "successCriteria": "For three songs of different tempos you can propose a pattern in counts, play it with the recording, and explain why it fits (subdivision, density, section). A recording of you playing along sits with the drums and does not fight the original part.",
+          "sessionsRequired": 4,
           "order": 1,
           "suggestedExerciseId": "strumming_pattern_23",
-          "suggestedLessonIds": [
-            "QJtHzTqAwV0",
-            "7VzPzBsm4sU",
-            "6DHelkAJlcE"
+          "lessons": [
+            {
+              "videoId": "UCwGNhrjygA",
+              "title": "How To Sound Better Strumming Guitar - Forget Patterns!",
+              "channelName": "Acoustic Guitar Lessons",
+              "thumbnailUrl": "https://i.ytimg.com/vi/UCwGNhrjygA/mqdefault.jpg"
+            },
+            {
+              "videoId": "dIYw6gFhj98",
+              "title": "How To FIND the Strumming Pattern for ANY Song",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/dIYw6gFhj98/mqdefault.jpg"
+            },
+            {
+              "videoId": "F3sED5nWCpc",
+              "title": "How to Find Strum Pattern in a Song",
+              "channelName": "Tomas Michaud",
+              "thumbnailUrl": "https://i.ytimg.com/vi/F3sED5nWCpc/mqdefault.jpg"
+            }
           ]
         },
         {
-          "id": "e3401f4d-7292-44a5-b3a1-d432e1f35b85",
-          "title": "Intro and outro patterns",
-          "description": "[What it is]\nIntro and outro patterns are short, repeatable musical gestures placed at the beginning and end of a song to establish and close its mood. They can be a compact rhythmic motif, a small melodic or harmonic figure, or a combination of a few purposeful hits and silences. Intros invite the listener in; outros give a clear, intentional finish.\n\n[Why it matters]\nA well-crafted intro immediately communicates the song's character and makes the start feel intentional instead of abrupt. A clear outro resolves the arrangement and signals completion to the listener, which is especially important in live settings and recordings. These patterns also make transitions smoother and help other players (or a backing track) lock in with you.\n\n[How to practice]\nPick one short idea and repeat it until you can start a performance cleanly and end it with confidence—focus on consistent attack, timing, and a tidy finish or controlled fade. Practice variations of the same idea (simpler or slightly embellished) so you can adapt to different sections or energy levels. Record one take, listen for whether the intro sets the mood and the outro feels conclusive, then refine small details like dynamics, muted hits, and the exact moment you stop. Practice starting and stopping from silence so the pattern works reliably at the real song's beginning and end.",
-          "successCriteria": "You can start a song with a recognisable, characterful pattern that immediately establishes the groove and mood, and you can finish with a clear, confident ending—either a tidy final hit or a controlled release—every time. The pattern fits the song, is repeatable under performance conditions, and you can alter it subtly without losing timing or clarity.",
-          "sessionsRequired": 8,
+          "id": "5de72359-43f3-4137-b72a-7c32a79262c2",
+          "title": "Sus-chord embellishments and fills",
+          "description": "[What it is]\nDecorating a chord you are holding by lifting or adding one finger in rhythm: Dsus2, Dsus4, Asus2, Asus4, Esus4, Cadd9, and walking bass notes between chords (G to C through the open A string, C to Am through the open A). The pattern stays the same; a finger moves on a specific count.\n\n[Why it matters]\nEmbellishments are how rhythm guitarists keep two bars of one chord interesting without adding notes for the singer to fight. James Taylor's \"Fire and Rain\" and \"Country Road\" and hundreds of pop and worship songs rely on sus2 and sus4 movement, and a bass walk into the next chord is the simplest fill there is. This step also gives your fretting hand rhythmic independence: it moves on a count while the strum continues.\n\n[How to practice]\nHold D and add the little finger for Dsus4 on the \"and\" of 2, lift it for D on 3, lift the first finger for Dsus2 on 4. Do the same with A and Asus4/Asus2, and with E and Esus4. Keep THE pattern going the whole time at 60–70 BPM. Then between G and C play the open A string on beat 4 as a walk-up. Program D, A, G and C into Chord Practice — Pick Your Chords and add one embellishment per chord.",
+          "successCriteria": "You can play a loop of D, A, G and C at 70 BPM with THE pattern and a sus2 or sus4 movement on a chosen count of every bar, plus a bass walk into at least one change, without the strum stopping or the tempo drifting.",
+          "sessionsRequired": 5,
           "order": 2,
-          "suggestedExerciseId": "strumming_pattern_24"
+          "suggestedExerciseId": "chord_practice_configurable",
+          "lessons": [
+            {
+              "videoId": "otjuDwSMRjk",
+              "title": "The Ultimate Sus Chords Guide For Beginners :)",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/otjuDwSMRjk/mqdefault.jpg"
+            },
+            {
+              "videoId": "16d6nx_pSrs",
+              "title": "A Sus2/4, D Sus2/4 & Esus4 Chords (Guitar Lesson BC-173) Guitar for beginners Stage 7",
+              "channelName": "JustinGuitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/16d6nx_pSrs/mqdefault.jpg"
+            },
+            {
+              "videoId": "pAW7Ln0Y54Y",
+              "title": "Walking between chords on guitar (for songwriting & arranging)",
+              "channelName": "Sound Guitar Lessons With Jared",
+              "thumbnailUrl": "https://i.ytimg.com/vi/pAW7Ln0Y54Y/mqdefault.jpg"
+            }
+          ]
         },
         {
           "id": "d2ec11ca-1ec6-4130-89a8-0b09e0dfa857",
-          "title": "Section transitions",
-          "description": "[What it is]\nSection transitions are the musical moments where you move from one part of a song to another — for example verse to chorus or chorus to bridge. They use clear, intentional changes (rhythmic feel, texture, dynamics, or a short lead-in) to signal that the next section is starting. Good transitions make the form obvious to listeners and performers without stopping the flow.\n\n[Why it matters]\nClear transitions keep the band and singers aligned and maintain the listener’s attention; they turn separate parts into a coherent song. Well-executed transitions also create contrast and momentum, so a chorus feels bigger or a bridge feels like a deliberate detour. They help a simple arrangement sound purposeful and polished.\n\n[How to practice]\nIsolate the boundary between two parts and decide on one simple cue you’ll use every time (a quieter last measure, a brief break, a short melodic lead-in, or a change in texture). Loop that small section and practice repeating the cue consistently until the change feels natural and predictable, then connect full passes through the song. Vary the cue intentionally as you gain confidence so you can choose different transition colors during performance; start slow and increase speed as it becomes reliable.",
-          "successCriteria": "Transitions are consistent and obvious: the next section starts exactly where you intend, other players or singers can anticipate it, and the song’s shape feels natural. You can execute the chosen cue without disrupting timing or energy, and you can vary the cue to create contrast while keeping the move smooth.",
-          "sessionsRequired": 8,
+          "title": "Section changes, intros and endings",
+          "description": "[What it is]\nMaking the joins of a song sound intended: a build in the last bar of the verse into a louder chorus, a drop to a sparse pattern for a bridge, a clean start (count-in, first strum on beat 1) and a real ending (a final downbeat, a ring-out, or a stop on the last chord). Pattern, volume and sustain all change at the barline.\n\n[Why it matters]\nThe joins are where accompaniment falls apart: the verse pattern leaks into the chorus, the ending trails off, the intro starts on a guess. A song with clean sections and a decisive ending sounds finished even when the middle is simple. This also prepares you to lead a band, where the guitarist often signals the changes.\n\n[How to practice]\nPlay Strumming 30 — Slow to Fast, which builds from sparse to dense inside one bar, and use it as the last bar of a verse. Build a verse-chorus form from a song you mapped: eight bars soft and sparse, a build bar, eight bars loud with THE pattern, then a bridge of four bars of half notes, and repeat. Practise two endings: a ring-out on the final chord after a count-in of \"1, 2, 3, 4\", and a stop on the last beat 1. Start every run with a spoken count-in.",
+          "successCriteria": "You can play a verse-chorus-bridge form at 80 BPM with a clearly different pattern and volume in each section, a build into every chorus, a spoken count-in before the first strum and a decisive ending, and a listener can name the sections from the guitar alone.",
+          "sessionsRequired": 4,
           "order": 3,
-          "suggestedExerciseId": "strumming_pattern_27"
-        },
-        {
-          "id": "5b34ad4a-cf08-4c11-b0d8-8915d62a685d",
-          "title": "Dynamic arrangement",
-          "description": "[What it is]\nDynamic arrangement is the skill of shaping a song’s energy by changing texture, density, and emphasis across its sections. It means deciding when your part should be sparse or full, when to add small fills or rhythmic variation, and how to use silence and contrast to highlight key moments. The goal is an intentional plan for how the guitar supports the song from start to finish.\n\n[Why it matters]\nGood dynamic arrangement keeps a performance interesting and helps the main elements—melody, lyrics, or hooks—stand out without being crowded. Thoughtful changes in texture and activity create emotional peaks and rests, make choruses land more strongly, and let simpler sections breathe. It also makes simple parts sound purposeful instead of repetitive.\n\n[How to practice]\nMap each section of a song to two or three distinct textures (for example: minimal, supporting, and full) and practice switching between them cleanly. For each texture, choose which elements you’ll include or omit—rhythmic activity, harmonic fills, repeated motifs, or silence—and rehearse moving between versions until the changes feel natural. Record short runs and listen specifically for clarity, contrast, and whether the arrangement serves the song; refine by removing anything that competes with the main part.",
-          "successCriteria": "You can create 2–3 clear textures for a song’s sections and switch between them smoothly so the arrangement builds and relaxes naturally; each section feels distinct, the important musical line is supported without being crowded, and recorded playthroughs show clear contrast and purposeful pacing.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "strumming_pattern_23"
-        },
-        {
-          "id": "a63094ef-746b-49f5-bfa9-e8081036b0f1",
-          "title": "Simplified accompaniment",
-          "description": "[What it is]\nSimplified accompaniment is the art of playing only the essential harmonic and rhythmic material so the song's main line sits clearly on top. It uses sparse, intentional playing—clear shapes, light rhythmic gestures, and well-placed silence—to outline the song without competing with the melody. The result is support rather than decoration.\n\n[Why it matters]\nA pared-down part keeps the arrangement clean and makes the vocal or lead instrument the focus, improving overall clarity and emotional impact. Simple parts are more adaptable across different sections and players, and they make it easier to react musically in live or recording situations. Listeners perceive the song more directly when the accompaniment breathes.\n\n[How to practice]\nChoose a short song or progression and reduce the guitar to its strongest harmonic outline and one consistent rhythmic gesture, leaving space between events. Work in short repeats: play a phrase, listen back, and remove any notes that crowd the melody until the balance feels right. Practice switching between fuller and sparser textures, and record yourself accompanying a voice or single instrument to judge how much is enough. Start slow and increase speed and musical confidence gradually.",
-          "successCriteria": "Your guitar part consistently supports the melody without drawing attention to itself: the vocal or lead sits clearly above the accompaniment, the overall texture has noticeable space, and small volume or touch changes communicate song shape. You can choose when to add or remove notes quickly and the simplified part fits different song sections naturally.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "two_notes_per_bar_phrasing"
+          "suggestedExerciseId": "strumming_pattern_30"
         },
         {
           "id": "efe35f21-f5ba-4e37-93ab-52efb84796df",
-          "title": "Learning by ear",
-          "description": "[What it is]\nLearning by ear means hearing a recording or a part in your head and reproducing it on guitar without written music. It covers identifying the basic harmony, the main melody, and the rhythmic feel, then matching those elements on your instrument. This skill trains your listening so you can turn sounds into playable parts.\n\n[Why it matters]\nBeing able to learn by ear makes you independent from tabs and charts and lets you pick up new parts quickly from recordings or other players. It improves your musical memory and helps you make better arrangement choices because you can hear what each part is doing. It also makes playing with others smoother because you can adapt on the fly.\n\n[How to practice]\nWork in very short sections: loop a small phrase, hum it, then find the matching notes and chords on your guitar, adjusting until it sounds the same. Use call-and-response: play a phrase, pause, then try to reproduce it, and record yourself to compare. Gradually increase phrase length, practice isolating melody versus rhythm in a mix, and practice recreating simple accompaniments from recordings using trial, checking, and repetition.",
-          "successCriteria": "You can listen to a short recording and reproduce the main guitar part and its basic rhythmic feel within a few attempts; you can hum a melody and match it on the guitar; you can write down or play back the chord changes for a short song section and accompany the recording so your part fits and stays in tune and in time.",
+          "title": "Learn a song by ear",
+          "description": "[What it is]\nWorking out a simple song's rhythm part from the recording without a chart: finding the key by matching the bass or the final chord, hearing when the chord changes (counting bars), identifying whether each chord is major or minor, and copying the strumming by ear.\n\n[Why it matters]\nCharts are often wrong or missing, and a band rehearsal rarely waits for you to find one. Hearing where chords change and how the guitar strums is the fastest way to learn any song and the skill that keeps improving for the rest of your playing life. It ties together everything from counting bars to writing patterns in counts.\n\n[How to practice]\nChoose a song with three or four chords. Find the key by humming the note the song rests on and matching it on the low E string. Count bars aloud while listening and mark every chord change. For each chord, try the diatonic candidates in that key (in G: G, C, D, Em, Am) and keep the one that matches the bass. Write the pattern in counts, then play along. Use Play by Ear — Easy daily to sharpen pitch matching. Do one song per week.",
+          "successCriteria": "You can take a three- or four-chord song you have never seen a chart for, find the key, write its form and chords from listening in under 30 minutes, and play along with the recording using a pattern that matches.",
           "sessionsRequired": 8,
-          "order": 6,
+          "order": 4,
           "suggestedExerciseId": "earTrainingEasy",
-          "suggestedLessonIds": [
-            "3F0U1kXlaUQ",
-            "8Ldj9PLhI1I"
+          "lessons": [
+            {
+              "videoId": "3dVohgqpZo8",
+              "title": "How to Identify Chord Progressions by Ear - Music Theory for Guitarists Unit 2 Lesson 3",
+              "channelName": "Marin Music Center",
+              "thumbnailUrl": "https://i.ytimg.com/vi/3dVohgqpZo8/mqdefault.jpg"
+            },
+            {
+              "videoId": "8Ldj9PLhI1I",
+              "title": "How To Figure Out The KEY Of A Song by EAR On Guitar | GUITAR EAR TRAINING",
+              "channelName": "Samjamguitar",
+              "thumbnailUrl": "https://i.ytimg.com/vi/8Ldj9PLhI1I/mqdefault.jpg"
+            }
           ]
         }
       ]
     },
     {
-      "id": "9cad28d9-f6ab-49dc-8802-505948f6323a",
-      "title": "Performance and Practice",
+      "id": "8c5292a5-5613-4174-b904-3987b0131556",
+      "title": "Performance",
       "order": 6,
       "steps": [
         {
-          "id": "61d5786b-434f-4d3e-a1ac-1942ae82557d",
-          "title": "Warm-up routine",
-          "description": "[What it is]\nA warm-up routine is a short, repeatable sequence of gentle, focused actions you do before practice or playing. It wakes up the hands and mind, loosens joints, and gets your coordination into a ready state without tiring you out. Keep it brief and predictable so it becomes a reliable prep habit.\n\n[Why it matters]\nWarming up reduces the chance of tension or strain and makes physical motions feel more consistent from the first note. It sharpens mental focus so the time you spend practicing is productive, and helps you start pieces or performances with confidence rather than fumbling. Over time a good routine makes progress smoother because you arrive at practice physically and mentally prepared.\n\n[How to build it]\nPick 3–5 short elements that move from very gentle to a little more engaged, finishing with something close to what you plan to work on that day. Keep each element brief enough to avoid fatigue, pay attention to relaxed motion and clear sound, and stop or reset if you feel tension. Repeat the same sequence each session so it becomes automatic, and adjust the order or content when particular fingers or motions need extra attention.",
-          "successCriteria": "You feel hands and mind ready at the end of the routine: movements are relaxed, transitions are smoother, early mistakes are reduced, and you can move directly into focused practice or performance without stiffness.",
-          "sessionsRequired": 8,
+          "id": "8db7c980-070e-47fc-ba31-dba2b1836686",
+          "title": "Play a whole song with the track",
+          "description": "[What it is]\nA complete run-through of one song from the count-in to the ending with the recording or a backing track: right chords, a pattern that fits, changes on time, section dynamics, no stopping and no restarting when something goes wrong.\n\n[Why it matters]\nPractising sections is not the same as playing a song. Endurance, memory of the form and recovering from a mistake without dropping the beat only get trained by playing from start to finish. This is the first checkpoint of what the roadmap promised: a usable rhythm part.\n\n[How to practice]\nUse a song you mapped and adapted. Play it with the recording three times per session, keeping a tally of stops, late changes and lost places. When something goes wrong, keep strumming muted strings and re-enter at the next section; never restart. Track your time on the song in the Songs library so the practice is logged. When a run has no stops, play it with the track turned down to a whisper, then with a drum loop only.",
+          "successCriteria": "You can play one complete song with the recording, count-in to ending, three times in a row without stopping or restarting, with every section in the right place and no more than two late changes per run, and once more with only a drum loop.",
+          "sessionsRequired": 6,
           "order": 0,
-          "suggestedExerciseId": "rhythm_training_easy"
+          "noExercise": true
         },
         {
-          "id": "29f39ac9-3466-42bf-b801-d24d7371b03c",
-          "title": "Focused repetition",
-          "description": "[What it is]\nFocused repetition is a practice method that concentrates on repeating a single, small musical target with full attention. Instead of long unfocused looping, you work in short, purposeful bursts and aim for consistent results each time. The emphasis is on precision, awareness, and making a specific motion or sound reliably reproducible.\n\n[Why it matters]\nThis method turns fragile, effortful actions into automatic, dependable ones by reinforcing the exact movements and listening choices you want to keep. It reduces random mistakes, speeds up the learning curve, and builds confidence so that the target behaves the same way under pressure. Focused repetition also makes progress measurable—you can hear and feel improvement over a session or several sessions.\n\n[How to practice]\nPick a very small, clear target—one short phrase, one rhythmic idea, or one tiny transition—and repeat it in short, concentrated runs, stopping after each attempt to note what changed. Start slow and attentive, aiming for identical results on consecutive attempts; when a run feels consistently the same, gently increase the challenge (longer runs, more dynamic contrast, or a little more speed). Keep bursts brief, take short breaks to preserve focus, and periodically vary the context so the skill transfers into real playing.",
-          "successCriteria": "You can perform the chosen short target repeatedly with consistent sound and timing for several consecutive attempts, quickly notice and correct any slip, and reproduce the same result when you return to it later and when you place it inside a longer musical context.",
-          "sessionsRequired": 8,
+          "id": "fe642bd4-df42-4fd9-b46d-791f48440cbe",
+          "title": "Tempo range and stamina",
+          "description": "[What it is]\nPlaying your song and its pattern comfortably across a range of tempos: 15 percent slower than the record, at the record's tempo, and 10 percent faster; and keeping the strumming even for a whole song without the arm tightening.\n\n[Why it matters]\nSingers ask for songs slower or faster, drummers push, and nerves speed everything up on stage. A part that only works at one tempo is fragile. Playing slower than the record also exposes rushed changes and uneven strums that the faster tempo hides, and stamina keeps the last chorus as clean as the first.\n\n[How to practice]\nFind the song's tempo. Play Strumming 31 — Skip the Last Up (a common pop pattern) with the metronome at the slow, target and fast tempos in one session, one minute each, checking that the strum stays even and the pendulum motion stays the same size. Then play the whole song at each tempo with a click. Between runs, shake the arm out; if the wrist tightens, drop the tempo and reduce the stroke size. Keep a log of the highest tempo at which the song is clean.",
+          "successCriteria": "You can play your song clean at the record's tempo, at 15 percent slower and at 10 percent faster with a click, each in one run without stopping, and the strumming in the final chorus of each run is as even as in the first verse.",
+          "sessionsRequired": 4,
           "order": 1,
-          "suggestedExerciseId": "rhythm_training_easy"
-        },
-        {
-          "id": "6e572622-4e1b-43c6-8427-b7c777763302",
-          "title": "Slow-to-fast buildup",
-          "description": "[What it is]\nSlow-to-fast buildup is a practice method where you begin a phrase, riff, or strumming pattern at a comfortable slow speed and gradually increase the pace while keeping the musical elements intact. The focus is on controlled acceleration so timing, note clarity, and feel remain steady as you move faster. It trains the body and ear to handle speed without losing control.\n\n[Why it matters]\nThis skill transforms accuracy into reliable performance: it prevents sloppy playing when you speed up and reduces tension that causes mistakes. It also builds confidence for live changes in energy or tempo and helps you deliver clean, musical parts under pressure. Musically, it preserves groove and dynamics even as intensity rises.\n\n[How to practice]\nChoose a short, repeatable passage or strumming pattern and play it slowly and comfortably, then increase the speed in small, controlled steps only after the previous speed feels solid. If errors or tension appear, back down until the part is clean, then resume gradual increases; repeat short bursts rather than long runs to avoid fatigue. Focus on relaxed motion, consistent attack, and steady pulse so the shape of the phrase sounds the same at every speed.",
-          "successCriteria": "You can start a phrase slowly and accelerate to a faster playing speed without losing timing, note clarity, or dynamics; mistakes only occur temporarily and are quickly corrected by reducing speed. Your hands stay relaxed and movements remain economical during acceleration, and you can stop, reset, and rebuild speed reliably.",
-          "sessionsRequired": 8,
-          "order": 2,
-          "suggestedExerciseId": "strumming_pattern_30"
-        },
-        {
-          "id": "b32d9664-5aeb-4cf4-afee-d6431e3cc8dc",
-          "title": "Error isolation",
-          "description": "[What it is]\nError isolation is the habit of narrowing a performance problem to its smallest repeatable cause — the exact motion, timing slip, or coordination mismatch that creates the mistake. Instead of re-running whole sections, you test one variable at a time (hand shape, attack, muting, rhythm placement, etc.) until the root cause is clear. The goal is surgical diagnosis: find the minimum change that stops the error.\n\n[Why it matters]\nIsolating errors stops you from reinforcing bad habits and makes practice far more efficient: you spend time fixing the actual failure rather than repeating larger passages that mask the problem. It also builds confidence, because once you can identify causes consistently you can apply the same diagnostic approach to new issues. That reliability transfers straight into cleaner rehearsal and performance work.\n\n[How to practice]\nWhen a mistake appears, shrink focus to the smallest element that contains it — a single transition, a hand shift, or a short rhythmic fragment — and repeat only that element while changing one parameter at a time to see what removes the fault. Alternate between the isolated fragment and the full musical context to check transfer, and keep notes or simple recordings to confirm the fix persists. Aim for clear hypotheses (\"is it my attack or my timing?\") and only change one thing per trial so you can identify what actually works.",
-          "successCriteria": "You can quickly identify the minimal action or timing that causes a recurring mistake, fix it in isolation, and reliably play the corrected phrase within the full context without reintroducing the error. Fixes should hold up when you vary tempo and when you return to the piece after a break.",
-          "sessionsRequired": 8,
-          "order": 3,
-          "suggestedExerciseId": "rhythm_training_easy"
+          "suggestedExerciseId": "strumming_pattern_31"
         },
         {
           "id": "c588cbd0-3b8a-4c48-8692-39f3c5fe8e9d",
-          "title": "Recording self-review",
-          "description": "[What it is]\nRecording self-review is the habit of capturing short performances and listening back with focused intent. Instead of aiming for perfection, you use recordings as objective snapshots of your playing so you can hear things you miss while performing. Keep takes short and clearly labeled so you can compare versions over time.\n\n[Why it matters]\nListening to yourself recorded shows the gap between intention and sound, making problems and strengths obvious in a way that playing alone often doesn't. It gives measurable evidence of progress, helps prioritize what to fix next, and builds confidence as you hear improvement. Recordings also let you evaluate arrangement or tone choices without relying on memory.\n\n[How to practice]\nSet one clear goal for each take, record a few focused attempts, then listen twice: once for an overall impression and again while noting two or three specific moments to improve. After practicing those items, re-record to verify change and keep the best takes for comparison; use simple filenames or dates to track versions. Limit each session to short cycles of record-listen-adjust, and occasionally ask a trusted listener for a second opinion to broaden perspective.",
-          "successCriteria": "You can produce short recordings, identify at least two concrete improvements per take, implement one targeted correction, and hear clear, repeatable progress across sessions; your recordings increasingly match what you intend to communicate.",
-          "sessionsRequired": 8,
-          "order": 4,
-          "suggestedExerciseId": "rhythm_training_easy"
+          "title": "Record, review and fix",
+          "description": "[What it is]\nRecording a full run with the click or track audible, listening back with a checklist, and deciding what to fix: early or late relative to the click, uneven volume, chords not clean on the first strum, sections that do not change, endings that trail off. Then one focused fix per session.\n\n[Why it matters]\nWhile you play you cannot hear yourself the way a listener does; most rhythm problems (rushing the chorus, dragging after a change) are invisible from inside. A recording and a checklist make them concrete, and fixing one thing at a time is how professionals rehearse. It is also the last check before playing with other people.\n\n[How to practice]\nRecord with your phone, click or track clearly audible. Listen once without playing, marking every place you are ahead of or behind the click, then every dirty change, then the dynamics. Pick the single biggest issue and drill only that section for the session, then re-record. Use Rhythm Training — Medium as a warm-up: it scores your placement of eighth notes and rests so you can see whether you tend to rush or drag.",
+          "successCriteria": "You have three recordings of the same song from different sessions, each with a written list of issues, and the last recording shows the first list's biggest problem fixed: no section is consistently ahead of or behind the click, and every chord is clean on its first strum.",
+          "sessionsRequired": 3,
+          "order": 2,
+          "suggestedExerciseId": "rhythm_training_medium"
         },
         {
           "id": "3e7c8d65-be37-4e8a-9cd6-11d9285663aa",
-          "title": "Playing with others",
-          "description": "[What it is]\nPlaying with others is the skill of fitting your rhythm guitar part into a live musical conversation. It means listening closely, holding a steady part that supports the song, and making small adjustments in timing, volume, and attack so the ensemble breathes as one. Nonverbal cues and an awareness of space (when to play and when to leave room) are part of the job.\n\n[Why it matters]\nGood ensemble playing turns individual parts into a cohesive band sound—your role is often to provide the foundation that lets melodies and solos shine. Developing this skill improves timing, musical sensitivity, and the ability to adapt under pressure, which makes rehearsals and performances flow more smoothly. Bands that listen and respond to each other sound tighter and more compelling.\n\n[How to practice]\nRehearse short sections with one or more musicians and focus on listening rather than complexity; repeat the same piece until you feel locked together. Practice simple call-and-response drills, work on matching dynamics and attack so you sit in the mix, and deliberately leave space to let other parts be heard. Agree on clear cues for starts/changes and run transitions repeatedly until they feel natural. Record group runs, review the take to identify one small improvement, and address that in the next session.",
-          "successCriteria": "You maintain a reliable, supportive part that other players can depend on; you stay in the groove with the group without rushing or lagging; you match dynamics and leave space where needed; you respond to cues and carry on through small mistakes so the performance keeps moving.",
-          "sessionsRequired": 8,
-          "order": 5,
-          "suggestedExerciseId": "rhythm_training_easy",
-          "suggestedLessonIds": [
-            "81RxsseTs2k"
+          "title": "Play with other people",
+          "description": "[What it is]\nPlaying your rhythm part with at least one other person (another guitarist, a singer, a drummer, a bassist, or a play-along video with a real band) without a click: listening, keeping the beat when the other person wobbles, leaving room, and following a count-in.\n\n[Why it matters]\nEverything so far has been against a perfect clock. People are not perfect clocks. A rhythm guitarist has to hold the tempo when the singer rushes, stay out of the way of the vocal, and lock with a drummer's feel rather than a click. There is no substitute for doing it, and it is what \"accompaniment\" means.\n\n[How to practice]\nFind one person and one song you both know. Agree the tempo with a spoken count-in and play it through three times. Between runs talk about one thing: who was rushing, whether the guitar was too loud under the vocal, whether the changes were together. If there are two guitarists, split into a sparse and a busy part. Record the session. If nobody is available, use full-band play-along videos with no click and treat them the same way.",
+          "successCriteria": "You have played a full song with at least one other person, without a click, three times through with a count-in, and a recording shows the tempo held steady and the guitar sitting under the vocal or with the drums rather than fighting them.",
+          "sessionsRequired": 3,
+          "order": 3,
+          "noExercise": true,
+          "lessons": [
+            {
+              "videoId": "81RxsseTs2k",
+              "title": "Do THIS when playing with another guitarist",
+              "channelName": "Blues Guitar Institute",
+              "thumbnailUrl": "https://i.ytimg.com/vi/81RxsseTs2k/mqdefault.jpg"
+            }
           ]
         },
         {
-          "id": "222fc7d6-47ba-452c-ba1f-a96a8116c288",
-          "title": "Consistent practice schedule",
-          "description": "[Why it matters]\nA consistent practice schedule is a predictable, repeatable plan that turns practice from an occasional effort into an ongoing habit. Regular, focused sessions produce steady improvement, reduce the friction of getting started, and make progress more reliable than long, infrequent marathons. Over time it protects motivation and makes performance readiness feel normal rather than stressful.\n\n[How to practice]\nDecide on a realistic frequency you can keep, then make sessions easy to start by attaching them to something you already do each day. Give each session a simple structure—one quick review, one small, specific goal to work on, and a short enjoyable wrap-up—so progress is measurable and satisfying. Track sessions with a calendar or habit tracker, allow planned rest days, and adjust the plan when life interferes so you stay consistent rather than all-or-nothing.\n\n[Common trap]\nThe biggest mistake is trying to do too much at once: complex, long plans are hard to maintain and lead to burnout or skipping practice. Another trap is vague goals—without a clear, tiny objective each session you’ll drift and feel stalled. Fix both by keeping goals small, tracking completion, and forgiving yourself when you need to scale back for a week before returning to the plan.",
-          "successCriteria": "You reliably start and complete your planned sessions over several weeks, notice steady small improvements in target areas, feel less resistance to practicing, and can prepare for performances with predictable practice rather than last-minute cramming.",
-          "sessionsRequired": 8,
-          "order": 6,
-          "suggestedExerciseId": "rhythm_training_easy",
-          "suggestedLessonIds": [
-            "BfKY_BlFcjk"
-          ]
+          "id": "5b34ad4a-cf08-4c11-b0d8-8915d62a685d",
+          "title": "Your rhythm part, start to finish",
+          "description": "[What it is]\nThe final performance: one song of your choice with three or more chords, played complete as a rhythm part you arranged yourself: mapped form, a pattern chosen for the song, sections with different dynamics and sustain, at least one embellishment or push, a clean count-in and ending, at the record's tempo, recorded in one take with a backing track or another musician.\n\n[Why it matters]\nThis is the promise of the roadmap made checkable. Every earlier step exists so that this recording is possible: pulse, clean chords, changes on time, patterns with rests and pushes, muting, accents, dynamics, and a form you can hold in your head. When it is done you have a part you could play in a band tomorrow.\n\n[How to practice]\nChoose the song and write a one-page arrangement: form with bar counts, pattern per section, volume per section, where the chucks, palm mutes or sus movements go, how it starts and how it ends. Rehearse sections, then whole runs, using the review checklist from the previous step. Record the take. Then do it again with a second song in a different feel (a shuffle, sixteenth-note strumming or a palm-muted rock part) so the skills are not tied to one song.\n\n[What you can do now]\nYou keep a pulse without a click, play the common open chords cleanly and change them at song tempo, read and write strum patterns, use rests, accents, palm mutes and chucks on purpose, play straight, shuffled and sixteenth-note feels, and carry a whole song with a band or a recording.",
+          "successCriteria": "You have a one-take recording of a complete song, count-in to ending, with a backing track or another musician at the record's tempo, in which the sections are audibly different, the changes are on time, the pattern fits the song and there are no stops; plus a second song in a different feel.",
+          "sessionsRequired": 10,
+          "order": 4,
+          "noExercise": true
         }
       ]
     }

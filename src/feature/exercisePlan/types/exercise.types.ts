@@ -149,6 +149,9 @@ export interface BackingTrack {
   pan?: number; // -1.0 (left) to 1.0 (right)
 }
 
+/** The two ways a song from the library can be practised inside a routine. */
+export type SongPracticeMode = "gp" | "sections";
+
 export interface Exercise {
   id: string;
   premium?: boolean;
@@ -289,6 +292,22 @@ export interface Exercise {
   backingTrackSearchQueries?: string[];
   additionalText?: string;
   isHiddenFromLanding?: boolean;
+  /** Present when this plan item is a song from the library rather than a
+   *  technical exercise (see utils/songToExercise). The session renders the
+   *  player's attached Guitar Pro tab for it, or the song panel when there is
+   *  none, and credits the item's measured time to the song — once, as a slice
+   *  of the session's category totals (see utils/planSongPractice). */
+  songData?: {
+    songId: string;
+    title: string;
+    artist: string;
+    coverUrl?: string;
+    /** How the song is practised in the session, chosen when it was added to
+     *  the plan: the attached Guitar Pro tab, or the section map over the
+     *  pinned YouTube video. Absent on older items — those show the tab when
+     *  one is attached and the plain song panel otherwise. */
+    mode?: SongPracticeMode;
+  };
 }
 
 export interface ExercisePlan {

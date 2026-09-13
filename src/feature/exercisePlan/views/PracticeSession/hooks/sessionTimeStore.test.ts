@@ -32,3 +32,30 @@ describe("sessionTimeStore", () => {
     expect(sumSessionTime(useSessionTimeStore.getState().time)).toBe(3 * 60 * 1000);
   });
 });
+
+describe("sessionTimeStore song time", () => {
+  beforeEach(() => {
+    useSessionTimeStore.getState().reset();
+  });
+
+  it("credits a song item's ticks to the song without adding to the category total", () => {
+    const { add } = useSessionTimeStore.getState();
+    add("technique", 1000, "song-a");
+    add("technique", 2000, "song-a");
+    add("technique", 500);
+    add("hearing", 700, "song-b");
+
+    const state = useSessionTimeStore.getState();
+    expect(state.songTime).toEqual({ "song-a": 3000, "song-b": 700 });
+    // The song shares are a slice of the totals, never on top of them.
+    expect(state.time.technique).toBe(3500);
+    expect(sumSessionTime(state.time)).toBe(4200);
+  });
+
+  it("clears the song ledger with the rest of the session", () => {
+    useSessionTimeStore.getState().add("technique", 1000, "song-a");
+    useSessionTimeStore.getState().reset();
+
+    expect(useSessionTimeStore.getState().songTime).toEqual({});
+  });
+});

@@ -28,6 +28,14 @@ The difficulty label on a generated plan is worked out from the exercises that a
 
 <Checklist items="Difficulty and category::So it can be filtered and so your time is tagged correctly|An estimated length::Which is what Auto Plan uses to fill your session|Instructions and tips::Step by step, written to be followed while holding a guitar|A suggested tempo::Where a metronome range makes sense|Related skills::What the exercise feeds on your skills screen|Tab or a backing track::When the exercise comes with one" />
 
+## Songs in a routine
+
+A routine can hold songs from your library next to its exercises, so a whole session — warm-up, a technique drill, then the song you are learning — lives in one plan.
+
+<ClickPath steps="My Stuff|Create Plan|Songs" caption="Your library, grouped by Learning now, Want to learn and Learned. Pick a song, choose how you will practise it and how long its slot is, then order it like any other item." />
+
+<Checklist items="Guitar Pro tab::Available once you have attached a file to the song — the tab shows up in the routine with note detection and the backing track, just like on the song’s own practice page|Section map::The song’s video with the sections you marked, loops and mastery, exactly as in the song timer. No video pinned yet? Pin one and mark sections right there in the session — it is the same map, saved in the same place|Change your mind later::The time button on a song in the plan reopens the choice|Time goes to the song::Every minute spent on that item counts as time with the song, exactly as it would in the song timer — and only once. There is no separate song log to fill in afterwards|It moves the song along::Practising it in a routine puts a song you only wanted to learn into Learning now|No skill points of its own::A song item feeds the song, not a skill. The exercises around it still do" />
+
 ## Your exercises and the community
 
 Every exercise you create sits in one pool; a single public/private switch decides who sees it.

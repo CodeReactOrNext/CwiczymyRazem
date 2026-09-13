@@ -66,6 +66,8 @@ interface SessionModalProps {
   onPlayRiddle?: () => void;
   riddleProgress?: RiddleProgress | null;
   examMode?: boolean;
+  /** See MobileExerciseContent — a song item's section map, mounted once. */
+  songSectionMapSlot?: React.ReactNode;
 }
 
 const SessionModal = ({
@@ -89,6 +91,7 @@ const SessionModal = ({
   earTrainingScore, earTrainingHighScore, onEarTrainingGuessed,
   riddleProgress, onPlayRiddle,
   examMode,
+  songSectionMapSlot,
 }: SessionModalProps) => {
   const [tabResetKey, setTabResetKey] = useState(0);
   const isLandscape = useIsLandscape();
@@ -170,6 +173,7 @@ const SessionModal = ({
         handleNextExerciseClick={handleNextExerciseClick}
         handleBackExerciseClick={handleBackExerciseClick}
         handleRestart={handleRestart}
+        songSectionMapSlot={songSectionMapSlot}
       />
     );
   }
@@ -217,6 +221,7 @@ const SessionModal = ({
             onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
             isExamMode={examMode}
             strumVolume={strumVolume}
+            songSectionMapSlot={songSectionMapSlot}
           />
 
           {activeTablature && activeTablature.length > 0 && <RotateDeviceHint />}

@@ -15,6 +15,7 @@ import { MetronomeGapTest } from "./MetronomeGapTest";
 import { MobileTablaturePanel } from "./MobileTablaturePanel";
 import { NoteHuntDetector } from "./NoteHuntDetector";
 import { OpenExercisePanel } from "./OpenExercisePanel";
+import { SongPracticePanel } from "./SongPracticePanel";
 import { StrummingSection } from "./StrummingSection";
 
 interface MobileExerciseContentProps {
@@ -46,6 +47,9 @@ interface MobileExerciseContentProps {
   isExamMode?: boolean;
   /** Session guitar level for the strumming synth, 0 = muted. */
   strumVolume?: number;
+  /** A song item practised over its section map — one instance, built in
+   *  PracticeSession and given to whichever view is on screen. */
+  songSectionMapSlot?: React.ReactNode;
 }
 
 export function MobileExerciseContent({
@@ -75,6 +79,7 @@ export function MobileExerciseContent({
   onPlayRiddle,
   isExamMode,
   strumVolume = 1,
+  songSectionMapSlot,
 }: MobileExerciseContentProps) {
   const { openLeaderboard } = useSessionUI();
 
@@ -219,6 +224,11 @@ export function MobileExerciseContent({
             volume={strumVolume}
           />
         </div>
+      ) : currentExercise.songData ? (
+        // A song from the routine: its section map when practised that way,
+        // otherwise the song panel — with a tab attached, the tablature branch
+        // above shows it instead.
+        songSectionMapSlot ?? <SongPracticePanel song={currentExercise.songData} compact />
       ) : (currentExercise.imageUrl || currentExercise.image) ? (
         <ExerciseImage
           image={currentExercise.imageUrl || currentExercise.image || ""}

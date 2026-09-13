@@ -5,7 +5,7 @@ import type {
 } from "../types/arsenal.types";
 import { mulberry32, seededShuffle } from "../utils/seededRandom";
 import { EFFECT_DEFINITIONS } from "./effectDefinitions";
-import { GUITAR_DEFINITIONS } from "./guitarDefinitions";
+import { DROPPABLE_GUITARS } from "./guitarDefinitions";
 
 export const DAILY_POOL_SIZE = 10;
 
@@ -65,7 +65,7 @@ export const getDailyPool = (date: Date = new Date()): DailyPoolEntry[] => {
   const pool: DailyPoolEntry[] = [];
   for (const rarity of POOL_RARITY_ORDER) {
     const candidates: DailyPoolEntry[] = [
-      ...GUITAR_DEFINITIONS.filter((g) => g.rarity === rarity).map((def) => ({
+      ...DROPPABLE_GUITARS.filter((g) => g.rarity === rarity).map((def) => ({
         kind: "guitar" as const,
         def,
       })),

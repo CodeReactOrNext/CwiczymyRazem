@@ -1,5 +1,7 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
 import { isAutoPlanId, isRecognizedPracticePlan } from 'feature/exercisePlan/utils/isRecognizedPracticePlan';
+import { collectPlanSongPractice, pickPrimaryPlanSong } from 'feature/exercisePlan/utils/planSongPractice';
 import { selectUserAuth } from 'feature/user/store/userSlice';
 import { updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
 import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
@@ -19,6 +21,7 @@ interface UseSessionReportingProps {
 
 export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSessionReportingProps) => {
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const userAuth = useAppSelector(selectUserAuth);
   const { reportList } = useActivityLog(userAuth as string);
 
@@ -41,7 +44,10 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         earTrainingHighScore?: { exerciseTitle: string; score: number };
       } | null,
       micPerformance?: { score: number; accuracy: number; bpm?: number; rank?: number } | null,
-      earTrainingPerformance?: { score: number; rank?: number } | null
+      earTrainingPerformance?: { score: number; rank?: number } | null,
+      /** Time the session measured on each song item of the plan, by song id
+       *  (sessionTimeStore.songTime). A slice of `timerData`, not on top of it. */
+      songTime: Record<string, number> = {}
     ) => {
       if (isSubmittingRef.current) return;
       isSubmittingRef.current = true;
@@ -58,6 +64,20 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         const hearMin = Math.round(timerData.hearing / 60000);
         const creatMin = Math.round(timerData.creativity / 60000);
 
+        // Songs placed in the routine as their own items. A plan that *is* a
+        // song (`plan.song`, the single-song wrapper) attributes the whole
+        // session to that song below instead, so the two paths never both
+        // credit the same minutes.
+        const planSongs = plan.song ? [] : collectPlanSongPractice(plan, songTime);
+        const primarySong = plan.song
+          ? { id: plan.song.id, title: plan.song.title, artist: plan.song.artist }
+          : (() => {
+              const primary = pickPrimaryPlanSong(planSongs);
+              return primary
+                ? { id: primary.songId, title: primary.songTitle, artist: primary.songArtist }
+                : null;
+            })();
+
         const reportData: ReportFormikInterface = {
           techniqueHours: Math.floor(techMin / 60).toString(),
           techniqueMinutes: (techMin % 60).toString(),
@@ -72,11 +92,12 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           habbits: ['exercise_plan'],
           avatarUrl: avatar || null,
           planId: plan.id,
-          ...(plan.song && {
-            songId: plan.song.id,
-            songTitle: plan.song.title,
-            songArtist: plan.song.artist,
+          ...(primarySong && {
+            songId: primarySong.id,
+            songTitle: primarySong.title,
+            songArtist: primarySong.artist,
           }),
+          ...(planSongs.length > 0 && { songs: planSongs }),
           skillPointsGained: plan.exercises.reduce((acc, exercise, index) => {
             if (!completedExercises.includes(index)) {
               return acc;
@@ -143,6 +164,36 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           }
         }
 
+        // Songs practised as items of the routine: each one's measured share of
+        // the session lands on its own progress (time, session count) and pulls
+        // it into "learning" — the same bookkeeping the song timer and a manual
+        // song log do, so a song counts the same however it was practised.
+        if (planSongs.length > 0) {
+          dispatch(updateQuestProgress({ type: 'practice_any_song', amount: planSongs.length }));
+          try {
+            const [{ recordPracticeSession }, { ensureSongIsLearning }] = await Promise.all([
+              import('feature/songs/services/userSongProgress.service'),
+              import('feature/songs/services/udateSongStatus'),
+            ]);
+            await Promise.all(
+              planSongs.map(async (song) => {
+                await recordPracticeSession(userAuth as string, song.songId, song.practiceMs, null, null);
+                await ensureSongIsLearning(
+                  userAuth as string,
+                  song.songId,
+                  song.songTitle,
+                  song.songArtist,
+                  avatar ?? undefined
+                );
+              })
+            );
+            queryClient.invalidateQueries({ queryKey: ['user-song-progress', userAuth] });
+            queryClient.invalidateQueries({ queryKey: ['user-songs', userAuth] });
+          } catch (error) {
+            console.error('Failed to record song practice progress for plan songs:', error);
+          }
+        }
+
         const totalMin = techMin + theoryMin + hearMin + creatMin;
         if (totalMin > 0) {
           dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMin }));
@@ -188,7 +239,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         setIsSubmittingReport(false);
       }
     },
-    [plan, avatar, completedExercises, dispatch, reportList, userAuth]
+    [plan, avatar, completedExercises, dispatch, queryClient, reportList, userAuth]
   );
 
   const activityDataToUse = useMemo(() => {

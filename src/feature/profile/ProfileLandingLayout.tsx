@@ -1,7 +1,4 @@
-import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
-import { DashboardSection } from "components/Layout";
-// ActiveChallengeWidget removed
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
@@ -9,26 +6,26 @@ import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { useEquippedGuitar } from "feature/arsenal/hooks/useUserArsenal";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
-import { SupportBanner } from "feature/dashboard/components/SupportBanner";
-import { GettingStartedWidget } from "feature/onboarding/components/GettingStartedWidget/GettingStartedWidget";
+import { DashboardWidgets } from "feature/dashboard/components/DashboardWidgets";
+import type { DashboardDataContextValue } from "feature/dashboard/context/DashboardContext";
+import { DashboardDataProvider } from "feature/dashboard/context/DashboardContext";
 import type { LastSessionInfo } from "feature/practice/utils/lastSession";
 import { loadLastSession } from "feature/practice/utils/lastSession";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
-import { PracticeStatsWidget } from "feature/profile/components/PracticeStatsWidget";
 import { SongTierBadge } from "feature/profile/components/SongTierBadge";
 import { getTrendData } from "feature/profile/utils/getTrendData";
 import { useUserSongs } from "feature/songs/hooks/useUserSongs";
 import { ArrowRight, History } from "lucide-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { convertMsToHM } from "utils/converter";
 
 interface LandingLayoutProps {
   userStats: StatisticsDataInterface;
-  featSlot: React.ReactNode;
+  /** The community feed, pinned to the bottom of Home; the default one is used when absent. */
+  featSlot?: React.ReactNode;
   userAuth: string;
   userInfo?: Partial<ProfileInterface> | any | null;
 }
@@ -61,6 +58,31 @@ const ProfileLandingLayout = ({
     userStats.time.technique + userStats.time.theory + userStats.time.creativity + userStats.time.hearing
   ) : "0:00";
   const timeTrendData = getTrendData(datasWithReports, "time");
+
+  // Everything the cards under the hero read from — handed down once so the
+  // heatmap and the streak share one load of the activity log.
+  const dashboardData = useMemo<DashboardDataContextValue>(
+    () => ({
+      userAuth,
+      userStats,
+      activity: { year, setYear, datasWithReports, isLoading, reportList },
+      totalTimeValue,
+      timeTrendData,
+      feedSlot: featSlot,
+    }),
+    [
+      userAuth,
+      userStats,
+      year,
+      setYear,
+      datasWithReports,
+      isLoading,
+      reportList,
+      totalTimeValue,
+      timeTrendData,
+      featSlot,
+    ],
+  );
 
   const imgPath = userInfo?.selectedGuitar ?? (userStats?.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : userStats?.lvl);
   const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
@@ -145,37 +167,10 @@ const ProfileLandingLayout = ({
         }
       />
 
-      <div className="md:mt-6 space-y-6 p-4 md:p-6">
-        <div className="relative z-10">
-            <DashboardSection compact>
-              <div className="mb-6">
-                <GettingStartedWidget />
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <DailyQuestWidget />
-                <PracticeStatsWidget
-                  userStats={userStats}
-                  totalTimeValue={totalTimeValue}
-                  trendData={timeTrendData}
-                  reportList={reportList}
-                  className="h-full"
-                />
-              </div>
-            </DashboardSection>
-
-            <ActivityLogView
-              year={year}
-              setYear={setYear}
-              datasWithReports={datasWithReports}
-              isLoading={isLoading}
-            />
-
-          <div className="mt-6 mb-6">
-            <SupportBanner />
-          </div>
-
-          {featSlot && featSlot}
-        </div>
+      <div className="relative z-10 p-4 md:mt-6 md:p-6">
+        <DashboardDataProvider value={dashboardData}>
+          <DashboardWidgets />
+        </DashboardDataProvider>
       </div>
     </div>
   );

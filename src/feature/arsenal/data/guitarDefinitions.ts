@@ -17,6 +17,7 @@ import {
   SUPERSTRAT_HH,
   T_TYPE,
 } from "./guitarSpecs";
+import { isTrophyGuitar } from "./trophyGuitars";
 
 export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   // Common (1-10)
@@ -850,7 +851,37 @@ export const GUITARS_BY_ID = new Map<number | string, GuitarDefinition>(
   GUITAR_DEFINITIONS.map((g) => [g.id, g]),
 );
 
+/**
+ * Every guitar in the game, grouped by rarity.
+ *
+ * The complete list, trophies included — use it for the Dex, lookups and
+ * anything that describes the collection. For anything that *hands a guitar
+ * out at random*, use `DROPPABLE_GUITARS_BY_RARITY` instead: roadmap trophies
+ * are not rollable.
+ */
 export const GUITARS_BY_RARITY = GUITAR_DEFINITIONS.reduce(
+  (acc, g) => {
+    if (!acc[g.rarity]) acc[g.rarity] = [];
+    acc[g.rarity].push(g);
+    return acc;
+  },
+  {} as Record<string, GuitarDefinition[]>,
+);
+
+/**
+ * The guitars a random draw may produce: everything except the roadmap
+ * trophies, which are won by finishing the roadmap and by no other route.
+ *
+ * Every case pool filters through this — the open cases, the Featured
+ * rotation and the Supporter slate — as does the reel the opening animation
+ * spins, so the strip never teases a pull that cannot happen.
+ */
+export const DROPPABLE_GUITARS: GuitarDefinition[] = GUITAR_DEFINITIONS.filter(
+  (g) => !isTrophyGuitar(g.id),
+);
+
+/** `DROPPABLE_GUITARS`, grouped by rarity. The pool every case draws from. */
+export const DROPPABLE_GUITARS_BY_RARITY = DROPPABLE_GUITARS.reduce(
   (acc, g) => {
     if (!acc[g.rarity]) acc[g.rarity] = [];
     acc[g.rarity].push(g);

@@ -61,6 +61,13 @@ export interface EffectDefinition {
   countries?: string[];
   /** Flat Item Level bonus for outsized units (e.g. wide multi-effect enclosures). */
   levelBonus?: number;
+  /**
+   * The pedal this one is a finish of — a colourway or signature edition of a
+   * model that already exists under another id. The Dex still collects each
+   * finish on its own, but on the board two finishes of one pedal are the same
+   * pedal twice (see `data/boardDuplicates`). Absent means this is its own model.
+   */
+  variantOf?: number | string;
 }
 
 /**

@@ -16,8 +16,9 @@ import { GiGuitar, GiMetronome } from "react-icons/gi";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { Exercise } from "../../../types/exercise.types";
 import { ExerciseQuickActionsBar } from "./ExerciseQuickActionsBar";
-import { MediaControlsToolbar, SpeedDropdown } from "./MediaControlsToolbar";
+import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { MobileInstructionsCard } from "./MobileInstructionsCard";
+import { SpeedDropdown } from "./SpeedDropdown";
 
 type ToolsTab = "tempo" | "sound" | "info";
 
@@ -141,6 +142,13 @@ export const MobileToolsIsland = ({
               <span className='font-mono text-sm font-bold tabular-nums text-zinc-200'>
                 {metronome.bpm}
               </span>
+              {/* A slowdown left on is invisible once the sheet is closed —
+                  show it on the island so "why is everything slow?" answers itself. */}
+              {speedMultiplier < 1 && (
+                <span className='font-mono text-[10px] font-semibold tabular-nums text-zinc-400'>
+                  {Math.round(speedMultiplier * 100)}%
+                </span>
+              )}
             </RippleButton>
           )}
 
@@ -265,7 +273,6 @@ export const MobileToolsIsland = ({
                         speedMultiplier={speedMultiplier}
                         onSpeedMultiplierChange={onSpeedMultiplierChange}
                         baseBpm={metronome.bpm}
-                        isSlowed={speedMultiplier < 1}
                         h='h-12'
                         className='w-full justify-center'
                       />

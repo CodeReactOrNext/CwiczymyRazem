@@ -1,11 +1,22 @@
 // @vitest-environment jsdom
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CaseShop } from "./CaseShop";
 
 afterEach(cleanup);
+
+const Wrapper = ({ children }: { children: ReactNode }) => (
+  <QueryClientProvider
+    client={
+      new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    }>
+    {children}
+  </QueryClientProvider>
+);
 
 const renderShop = (overrides = {}) => {
   const props = {
@@ -15,7 +26,7 @@ const renderShop = (overrides = {}) => {
     lastResult: null,
     ...overrides,
   };
-  render(<CaseShop {...props} />);
+  render(<CaseShop {...props} />, { wrapper: Wrapper });
   return props;
 };
 

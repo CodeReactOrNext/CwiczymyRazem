@@ -10,11 +10,14 @@ import {
   getDailyPool,
   getNextDailyReset,
 } from "feature/arsenal/data/dailyCase";
+import { useArsenalData } from "feature/arsenal/hooks/useArsenalData";
+import { buildDexLookup } from "feature/arsenal/utils/dex";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { Clock3 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { DexCornerMark, DexMarks } from "../DexMarks";
 import { RARITY_STYLES } from "../RarityBadge";
 import { DropRates, oddsTooltipClass, rollChance } from "./DropRates";
 import { FreeCaseButton } from "./FreeCaseButton";
@@ -58,6 +61,11 @@ export const DailyCaseCard = ({
 
   const pool = getDailyPool(now);
   const msLeft = getNextDailyReset(now).getTime() - now.getTime();
+
+  // Owned / Dex status for each pool entry — off the same cached query the
+  // ArsenalTabs parent already fetches, so no extra request.
+  const { data: arsenalData } = useArsenalData();
+  const dexStatusOf = useMemo(() => buildDexLookup(arsenalData), [arsenalData]);
 
   return (
     <section className='overflow-hidden rounded-lg bg-arsenal-section'>
@@ -140,6 +148,9 @@ export const DailyCaseCard = ({
                 entry.kind === "guitar"
                   ? getRankBadgeSrc(entry.def.imageId, "medium")
                   : getEffectImageSrc(entry.def.imageId, "medium");
+
+              const dexStatus = dexStatusOf(entry.kind, entry.def.id);
+
               return (
                 <Tooltip
                   key={`${entry.kind}-${entry.def.id}`}
@@ -183,6 +194,11 @@ export const DailyCaseCard = ({
                               loading='lazy'
                             />
                           </div>
+
+                          {/* Owned / Dex glyph, top-right of the tile. */}
+                          <div className='absolute right-1.5 top-1.5 z-20'>
+                            <DexCornerMark status={dexStatus} />
+                          </div>
                         </div>
                       </div>
 
@@ -220,6 +236,7 @@ export const DailyCaseCard = ({
                           : "—"}
                       </span>
                     </div>
+                    <DexMarks status={dexStatus} className='mt-2' />
                     <p className='mt-0.5 text-[10px] text-zinc-500'>
                       chance from this case
                     </p>

@@ -15,8 +15,18 @@ import { db } from "utils/firebase/client/firebase.utils";
  * happily create next month's season document ten hours early, stamped with
  * start and end dates taken from that same wrong clock.
  */
-const getSeasonId = (now: Date): string =>
+export const getSeasonId = (now: Date): string =>
   `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+
+/**
+ * The id of the season running right now, without touching Firestore.
+ *
+ * `getCurrentSeason` below creates the season document when it is missing, so
+ * callers that only need to know *which* season it is — ranking a player,
+ * labelling a score — should ask here instead of paying for a read and risking
+ * a write.
+ */
+export const getCurrentSeasonId = (): string => getSeasonId(new Date());
 
 export const getCurrentSeason = async () => {
   try {
@@ -27,9 +37,13 @@ export const getCurrentSeason = async () => {
     const seasonDoc = await getDoc(seasonRef);
 
     if (!seasonDoc.exists()) {
-      const startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+      const startDate = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+      );
       // Day zero of the next month is the last day of this one.
-      const endDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0));
+      const endDate = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0),
+      );
 
       const seasonData = {
         seasonId,

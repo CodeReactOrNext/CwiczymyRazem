@@ -5,7 +5,7 @@ import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { getDailyPool } from "feature/arsenal/data/dailyCase";
 import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
-import { GUITARS_BY_ID, GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
+import { DROPPABLE_GUITARS_BY_RARITY, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
@@ -72,7 +72,7 @@ function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripI
     const wantsGuitar = caseDef.dropKind ? caseDef.dropKind === "guitar" : Math.random() < 0.6;
 
     if (wantsGuitar) {
-      const pool = GUITARS_BY_RARITY[chosen];
+      const pool = DROPPABLE_GUITARS_BY_RARITY[chosen];
       if (pool && pool.length > 0) {
         strip.push({ kind: "guitar", def: pool[Math.floor(Math.random() * pool.length)] });
       } else {

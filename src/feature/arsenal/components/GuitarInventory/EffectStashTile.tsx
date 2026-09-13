@@ -1,6 +1,7 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectLevel } from "feature/arsenal/data/effectStats";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
+import type { DexStatus } from "feature/arsenal/utils/dex";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import {
   rarityLockLvl,
@@ -17,6 +18,8 @@ import { EffectCard } from "./EffectCard";
 interface EffectStashTileProps extends StashPlacement {
   item: EffectInventoryItem;
   isOnPedalboard?: boolean;
+  /** Owned / Dex corner glyph, on a board that is not the viewer's — see `StashTile`. */
+  dexStatus?: DexStatus;
   /** Under the hover card — see `StashTile`. */
   previewFooter?: ReactNode;
   onClick?: () => void;
@@ -26,6 +29,7 @@ interface EffectStashTileProps extends StashPlacement {
 export const EffectStashTile = ({
   item,
   isOnPedalboard = false,
+  dexStatus,
   previewFooter,
   onClick,
   ...placement
@@ -52,6 +56,7 @@ export const EffectStashTile = ({
       isNew={item.isNew}
       locked={lockedLvl != null}
       inUse={isOnPedalboard}
+      dexStatus={dexStatus}
       onClick={onClick}
       preview={
         <EffectCard item={item} isOnPedalboard={isOnPedalboard} readOnly />

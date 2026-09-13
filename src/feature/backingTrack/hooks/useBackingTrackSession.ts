@@ -1,4 +1,4 @@
-import type { MutableRefObject } from "react";
+import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { BackingTrackImportResult, BackingTracksApi } from "types/backingTracks";
 
@@ -215,6 +215,30 @@ export interface BackingTrackController {
 }
 
 /**
+ * State that belongs to one song. Read for any other song it is the initial
+ * value again, and a write is filed under the song it was made for — so a
+ * routine stepping from one song to the next never shows the first one's stored
+ * alignment or video against the second one's tab while its own is loading.
+ */
+function useSongScopedState<T>(
+  songId: string | null,
+  initial: T,
+): [T, Dispatch<SetStateAction<T>>] {
+  const [entry, setEntry] = useState<{ songId: string | null; value: T }>({ songId, value: initial });
+  const value = entry.songId === songId ? entry.value : initial;
+  const setValue = useCallback<Dispatch<SetStateAction<T>>>(
+    (update) =>
+      setEntry((prev) => {
+        const prevValue = prev.songId === songId ? prev.value : initial;
+        const next = typeof update === "function" ? (update as (previous: T) => T)(prevValue) : update;
+        return { songId, value: next };
+      }),
+    [songId, initial],
+  );
+  return [value, setValue];
+}
+
+/**
  * One place that owns the session's backing track: which source is active, how
  * it is aligned with the tab, and the players that keep it there.
  *
@@ -253,8 +277,8 @@ export function useBackingTrackSession({
 
   const [library, setLibrary] = useState<BackingTrackMeta[]>([]);
   const [isImporting, setIsImporting] = useState(false);
-  const [assignment, setAssignment] = useState<BackingTrackAssignment | null>(null);
-  const [youtube, setYouTube] = useState<YouTubeBackingConfig | null>(null);
+  const [assignment, setAssignment] = useSongScopedState<BackingTrackAssignment | null>(songId, null);
+  const [youtube, setYouTube] = useSongScopedState<YouTubeBackingConfig | null>(songId, null);
   const [error, setError] = useState<string | null>(null);
   // Which source the user picked *this* session, if any. Scoped to a song so it
   // can't leak across an exercise switch.
@@ -302,7 +326,7 @@ export function useBackingTrackSession({
     return () => {
       cancelled = true;
     };
-  }, [songId, desktopAvailable]);
+  }, [songId, desktopAvailable, setAssignment]);
 
   useEffect(() => {
     if (!songId || !userId) return;
@@ -319,7 +343,7 @@ export function useBackingTrackSession({
     return () => {
       cancelled = true;
     };
-  }, [songId, userId]);
+  }, [songId, userId, setYouTube]);
 
   const refreshLibrary = useCallback(() => {
     const api = getBackingTrackApi();
@@ -539,7 +563,7 @@ export function useBackingTrackSession({
       }
       schedulePersist();
     },
-    [defaultSourceBpm, schedulePersist],
+    [defaultSourceBpm, schedulePersist, setAssignment, setYouTube],
   );
 
   const setAlignment = useCallback(
@@ -583,7 +607,7 @@ export function useBackingTrackSession({
       schedulePersist();
       setError(null);
     },
-    [defaultSourceBpm, schedulePersist],
+    [defaultSourceBpm, schedulePersist, setAssignment],
   );
 
   const addStem = useCallback(
@@ -845,7 +869,7 @@ export function useBackingTrackSession({
       // files are the sound, where the video was asked for as picture only.
       if (videoId && source !== "file") setSource("youtube");
     },
-    [defaultSourceBpm, schedulePersist, setSource, source],
+    [defaultSourceBpm, schedulePersist, setSource, setYouTube, source],
   );
 
   const playbackRate =

@@ -13,6 +13,25 @@ import {
 export const MS_15 = 15 * 60 * 1000;
 export const MS_20 = 20 * 60 * 1000;
 
+// ─── Category theme (single source of truth) ──────────────────────────────────
+// One place that defines every practice category's key, label, colour and the
+// matching field on the log. Used by the Milestones day grids, every legend and
+// the milestone cards on Home, so colours never drift apart again.
+
+export type PracticeCatKey = "tech" | "theory" | "hearing" | "creat";
+
+export const PRACTICE_CATEGORIES: {
+  k: PracticeCatKey;
+  label: string;
+  color: string;
+  logField: "techniqueTime" | "theoryTime" | "hearingTime" | "creativityTime";
+}[] = [
+  { k: "tech",    label: "Tech",       color: "#ef4444", logField: "techniqueTime"  },
+  { k: "theory",  label: "Theory",     color: "#0891B2", logField: "theoryTime"     },
+  { k: "hearing", label: "Ear",        color: "#10b981", logField: "hearingTime"    },
+  { k: "creat",   label: "Creativity", color: "#f59e0b", logField: "creativityTime" },
+];
+
 export function isSameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }

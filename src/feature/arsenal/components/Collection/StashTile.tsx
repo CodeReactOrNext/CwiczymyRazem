@@ -5,6 +5,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import type { DexStatus } from "feature/arsenal/utils/dex";
 import { lockedArtFilter } from "feature/progression/components/RarityLock";
 import { Lock, Star } from "lucide-react";
 import type {
@@ -15,6 +16,7 @@ import type {
 } from "react";
 import { useResponsiveStore } from "store/useResponsiveStore";
 
+import { DexCornerMark } from "../DexMarks";
 import {
   MOD_ACCENT,
   PLATE_NOISE_BG,
@@ -113,6 +115,14 @@ interface StashTileProps {
   locked?: boolean;
   /** In use somewhere (profile, rig, pedalboard) — a lit frame and a corner dot. */
   inUse?: boolean;
+  /**
+   * Where this model stands with the viewer, for a board that is not theirs —
+   * the guild's shelf. A corner glyph: owned, or on the Dex. Shares the corner
+   * with the in-use dot, which never applies to the same socket: a piece on
+   * the shelf is in nobody's rig, and a piece in the player's own cabinet is
+   * owned by definition and says nothing.
+   */
+  dexStatus?: DexStatus;
   /** Full card shown on hover. Desktop only; touch opens the sheet instead. */
   preview?: ReactNode;
   /**
@@ -155,6 +165,7 @@ export const StashTile = ({
   isNew = false,
   locked = false,
   inUse = false,
+  dexStatus,
   preview,
   previewFooter,
   onClick,
@@ -333,6 +344,15 @@ export const StashTile = ({
           aria-hidden
           className='absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber-400'
           style={{ boxShadow: "0 0 6px rgba(251,191,36,0.9)" }}
+        />
+      )}
+
+      {dexStatus && (
+        <DexCornerMark
+          status={dexStatus}
+          size={12}
+          className='absolute right-0.5 top-0.5'
+          style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.95))" }}
         />
       )}
 

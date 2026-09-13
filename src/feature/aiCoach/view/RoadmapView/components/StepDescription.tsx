@@ -1,5 +1,12 @@
 import { cn } from "assets/lib/utils";
-import { Info, Lightbulb, ListChecks, Sparkles } from "lucide-react";
+import {
+  BookOpen,
+  Flag,
+  Info,
+  Lightbulb,
+  ListChecks,
+  Sparkles,
+} from "lucide-react";
 import React, { useMemo } from "react";
 
 import { parseDescriptionSections } from "../../../utils/parseDescriptionSections";
@@ -12,6 +19,12 @@ const SECTION_META: { match: RegExp; Icon: typeof Info; color: string }[] = [
     Icon: ListChecks,
     color: "text-cyan-400",
   },
+  {
+    match: /before you start|what you can do now/i,
+    Icon: Flag,
+    color: "text-emerald-400",
+  },
+  { match: /sources?/i, Icon: BookOpen, color: "text-purple-400" },
 ];
 
 /** The step's authored text, one block per `[Heading]`, bullets rendered as a list. */

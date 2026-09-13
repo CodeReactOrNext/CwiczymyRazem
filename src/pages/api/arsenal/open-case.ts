@@ -3,7 +3,7 @@ import type { DailyPoolEntry } from "feature/arsenal/data/dailyCase";
 import { getDailyPool } from "feature/arsenal/data/dailyCase";
 import { EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
 import { rollEffectCountry, rollEffectFeatures, rollEffectYear } from "feature/arsenal/data/effectStats";
-import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
+import { DROPPABLE_GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import { rollCondition, rollItemFeatures, rollVintageYear } from "feature/arsenal/data/itemStats";
 import { rollItemTraits } from "feature/arsenal/data/traits";
 import type {
@@ -162,9 +162,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else {
           const rarity = drawOpenRarity(
             caseDef.probabilities,
-            hasUndiscovered(GUITARS_BY_RARITY, discoveredGuitarIds),
+            hasUndiscovered(DROPPABLE_GUITARS_BY_RARITY, discoveredGuitarIds),
           );
-          const pool = GUITARS_BY_RARITY[rarity] || GUITARS_BY_RARITY["Common"];
+          // Trophies are filtered out of this pool, so a roadmap guitar can
+          // never be rolled — the roadmap is the only way to one.
+          const pool =
+            DROPPABLE_GUITARS_BY_RARITY[rarity] ||
+            DROPPABLE_GUITARS_BY_RARITY["Common"];
           guitar = pickBiased(pool, (g) => discoveredGuitarIds.has(g.id));
         }
         const year = rollVintageYear(guitar.yearFrom, guitar.yearTo);

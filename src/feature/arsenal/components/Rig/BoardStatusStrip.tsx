@@ -31,7 +31,7 @@ const LAMP = {
   idle: "bg-zinc-600",
 } as const;
 
-const Lamp = ({ tone }: { tone: keyof typeof LAMP }) => (
+export const Lamp = ({ tone }: { tone: keyof typeof LAMP }) => (
   <span
     aria-hidden
     className={cn("h-2 w-2 shrink-0 rounded-full", LAMP[tone])}

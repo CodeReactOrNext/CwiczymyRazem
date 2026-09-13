@@ -1223,7 +1223,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                 style={{ zIndex: 1 }}>
                 {/* Root node */}
                 <div className='max-w-sm rounded-lg bg-zinc-800/90 px-8 py-4 text-center text-sm font-bold text-zinc-100'>
-                  {roadmap.goal}
+                  {roadmap.title}
                 </div>
 
                 <div className='relative w-full'>

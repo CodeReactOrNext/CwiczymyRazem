@@ -2,8 +2,17 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
-import { Gauge, Lock, Minus, Plus, Volume2, VolumeX } from "lucide-react";
-import { useRef, useState } from "react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Gauge,
+  Lock,
+  Minus,
+  Plus,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 
 import { AccentGrid } from "./AccentGrid";
 import { SubdivisionIcon, SUBDIVISIONS } from "./SubdivisionIcon";
@@ -50,8 +59,15 @@ export const Metronome = ({
   const [isEditingBpm, setIsEditingBpm] = useState(false);
   const [bpmInput, setBpmInput] = useState("");
   const bpmInputRef = useRef<HTMLInputElement>(null);
+  const bpmDisplayRef = useRef<HTMLButtonElement>(null);
+
+  const clampBpm = useCallback(
+    (v: number) => Math.min(maxBpm, Math.max(minBpm, v)),
+    [minBpm, maxBpm],
+  );
 
   const handleBpmClick = () => {
+    if (locked) return;
     setBpmInput(String(bpm));
     setIsEditingBpm(true);
     setTimeout(() => bpmInputRef.current?.select(), 0);
@@ -60,9 +76,25 @@ export const Metronome = ({
   const commitBpmInput = () => {
     const parsed = parseInt(bpmInput, 10);
     if (!isNaN(parsed)) {
-      setBpm(Math.min(maxBpm, Math.max(minBpm, parsed)));
+      setBpm(clampBpm(parsed));
     }
     setIsEditingBpm(false);
+  };
+
+  /** Keyboard handler on the BPM display — arrows nudge ±1 / ±5 (shift). */
+  const handleBpmKeyDown = (e: React.KeyboardEvent) => {
+    if (locked) return;
+    const step = e.shiftKey ? 5 : 1;
+    if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+      e.preventDefault();
+      setBpm(clampBpm(bpm + step));
+    } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+      e.preventDefault();
+      setBpm(clampBpm(bpm - step));
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleBpmClick();
+    }
   };
 
   const tempoColor = getTempoColor(bpm);
@@ -131,20 +163,22 @@ export const Metronome = ({
               if (e.key === "Enter") commitBpmInput();
               if (e.key === "Escape") setIsEditingBpm(false);
             }}
-            className='w-20 rounded-lg bg-zinc-900/50 px-2 py-1 text-center text-4xl font-black tabular-nums text-cyan-400 outline-none ring-2 ring-cyan-500'
+            className='w-24 rounded-lg bg-zinc-900/50 px-2 py-1 text-center text-4xl font-black tabular-nums text-cyan-400 outline-none ring-2 ring-cyan-500'
           />
         ) : (
           <button
+            ref={bpmDisplayRef}
             onClick={handleBpmClick}
+            onKeyDown={handleBpmKeyDown}
             className={cn(
-              "cursor-pointer select-none text-4xl font-black tabular-nums underline decoration-white/20 decoration-dashed underline-offset-4 transition-transform hover:scale-105 hover:decoration-white/50 active:scale-95",
+              "cursor-pointer select-none rounded-lg px-2 py-0.5 text-4xl font-black tabular-nums underline decoration-white/20 decoration-dashed underline-offset-4 transition-colors hover:bg-zinc-800/50 hover:decoration-white/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
               tempoColor,
             )}
-            title='Click to edit BPM'>
+            title='Click to edit · Arrow keys ±1 · Shift+Arrow ±5'>
             {bpm}
           </button>
         )}
-        <span className='mt-2 select-none text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500'>
+        <span className='mt-2 select-none text-[10px] font-bold tracking-[0.2em] text-zinc-500'>
           {locked
             ? "BPM · exam mode"
             : isEditingBpm
@@ -154,16 +188,53 @@ export const Metronome = ({
       </div>
 
       <div className='mt-1 flex flex-col gap-2'>
-        <div className='flex items-center gap-3'>
+        {/* BPM step buttons: ±5 (outer, smaller) and ±1 (inner, larger) */}
+        <div className='flex items-center justify-center gap-1'>
+          <Button
+            variant='ghost'
+            size='icon'
+            className='h-6 w-6 shrink-0 rounded bg-zinc-800/40 text-zinc-400 transition-colors hover:bg-zinc-700/80 hover:text-zinc-100'
+            onClick={() => setBpm(clampBpm(bpm - 5))}
+            disabled={locked || bpm <= minBpm}
+            title='-5 BPM'
+            aria-label='Decrease BPM by 5'>
+            <ChevronDown className='h-3 w-3' strokeWidth={2.5} />
+          </Button>
           <Button
             variant='ghost'
             size='icon'
             className='h-7 w-7 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
-            onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
-            disabled={locked || bpm <= minBpm}>
+            onClick={() => setBpm(clampBpm(bpm - 1))}
+            disabled={locked || bpm <= minBpm}
+            title='-1 BPM'
+            aria-label='Decrease BPM by 1'>
             <Minus className='h-4 w-4' strokeWidth={2.5} />
           </Button>
+          <span className='w-3' />
+          <Button
+            variant='ghost'
+            size='icon'
+            className='h-7 w-7 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
+            onClick={() => setBpm(clampBpm(bpm + 1))}
+            disabled={locked || bpm >= maxBpm}
+            title='+1 BPM'
+            aria-label='Increase BPM by 1'>
+            <Plus className='h-4 w-4' strokeWidth={2.5} />
+          </Button>
+          <Button
+            variant='ghost'
+            size='icon'
+            className='h-6 w-6 shrink-0 rounded bg-zinc-800/40 text-zinc-400 transition-colors hover:bg-zinc-700/80 hover:text-zinc-100'
+            onClick={() => setBpm(clampBpm(bpm + 5))}
+            disabled={locked || bpm >= maxBpm}
+            title='+5 BPM'
+            aria-label='Increase BPM by 5'>
+            <ChevronUp className='h-3 w-3' strokeWidth={2.5} />
+          </Button>
+        </div>
 
+        {/* Slider */}
+        <div className='flex items-center gap-2 px-1'>
           <div className='flex flex-1 flex-col gap-1'>
             <Slider
               value={[bpm]}
@@ -174,7 +245,7 @@ export const Metronome = ({
                 if (!locked) setBpm(value[0]);
               }}
               className={cn(
-                "py-1.5",
+                "py-2 [&_[role=slider]]:h-5 [&_[role=slider]]:w-5",
                 locked ? "cursor-not-allowed opacity-50" : "cursor-pointer",
                 getSliderTrackColor(bpm),
               )}
@@ -184,15 +255,6 @@ export const Metronome = ({
               <span>{maxBpm}</span>
             </div>
           </div>
-
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-7 w-7 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
-            onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
-            disabled={locked || bpm >= maxBpm}>
-            <Plus className='h-4 w-4' strokeWidth={2.5} />
-          </Button>
         </div>
 
         {metronome.setSubdivision && (
@@ -220,7 +282,7 @@ export const Metronome = ({
         {metronome.accentPattern && metronome.setBeatsPerBar && metronome.cycleBeatAccent && (
           <div className='flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-2'>
             <div className='flex items-center justify-between px-1'>
-              <span className='select-none text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500'>
+              <span className='select-none text-[10px] font-bold tracking-[0.2em] text-zinc-500'>
                 {accentLocked && metronome.gridLabel ? metronome.gridLabel : "Beats per bar"}
               </span>
               {accentLocked ? (

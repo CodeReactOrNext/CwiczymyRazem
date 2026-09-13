@@ -58,6 +58,14 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
+      // Per-user preferences: the Home layout (`dashboard`), bought practice
+      // milestone tiers (`practiceLevels`), AI summary prompt config
+      // (`promptConfig`). Nothing here is a role or a reward, so the owner
+      // reads and writes it directly.
+      match /settings/{settingId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
       // Daily submission counters (e.g. community section-map sharing) — the
       // owner may read their own counter, but only the backend (Admin SDK)
       // may write it, otherwise a client could reset its own rate limit.

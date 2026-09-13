@@ -19,6 +19,9 @@ export const isOpenExercise = (exercise: Exercise): boolean =>
   // dialog would be misleading.
   exercise.id !== "chord_practice_configurable" &&
   exercise.id !== "scale_practice_configurable" &&
+  // A song from the library renders its own panel (SongPracticePanel) — and
+  // the attached Guitar Pro tab when the player has one.
+  !exercise.songData &&
   !exercise.riddleConfig &&
   // Listening quizzes render EarQuizPanel in the player slot.
   !exercise.earQuizConfig &&

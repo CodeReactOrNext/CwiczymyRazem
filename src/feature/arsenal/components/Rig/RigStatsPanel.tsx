@@ -4,6 +4,11 @@ import { Star } from "lucide-react";
 import { useMemo } from "react";
 
 import {
+  describeDuplicateRule,
+  readBoardLevel,
+} from "../../data/boardDuplicates";
+import { isPoweredIn } from "../../data/powerSupply";
+import {
   formatRigFameRate,
   getRigFameRate,
   RIG_FAME_HOURLY_CEILING,
@@ -119,10 +124,13 @@ interface RigStatsPanelProps {
  * is what moves them, so they belong beside the pedalboard.
  *
  * Two numbers lead, because two are what a player carries around: the level the
- * gear adds up to, and the Fame an hour of practice is now worth. The working
- * that produces them runs along the same line at stat size: the three sources
- * first, then what each practice category gets on top — each category its own
- * figure under its own name, on the same two lines as everything else.
+ * gear adds up to, and the Fame an hour of practice is now worth. The level
+ * carries one working figure of its own — what duplicates on the board cost it
+ * (`data/boardDuplicates`), muted when nothing did, so the rule is on the sheet
+ * before anyone runs into it. The Fame working runs along the same line at stat
+ * size: the three sources first, then what each practice category gets on top
+ * — each category its own figure under its own name, on the same two lines as
+ * everything else.
  *
  * Colour is spent only where it names a currency — cyan for level, amber for
  * Fame. The working stays neutral, so nothing in it competes with the two
@@ -132,6 +140,13 @@ interface RigStatsPanelProps {
  */
 export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
   const rigLevel = getRigLevel(data);
+  // What the board gave up to duplicates on the way to that level — the one
+  // deduction in the sum, so it is the one figure the level carries with it.
+  const duplicatePenalty = readBoardLevel(
+    data.rig.pedalboardItems,
+    data.effectInventory,
+    isPoweredIn(data.rig),
+  ).penalty;
   const baseRate = getRigFameRate(rigLevel);
   // The saved board, not the live one: this is the sheet of what the gear pays,
   // and the panel over the pedalboard is where a rate still being dragged around
@@ -159,6 +174,12 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
   return (
     <div className='flex flex-wrap items-end gap-x-7 gap-y-5 rounded-lg bg-zinc-900/40 px-5 py-4 sm:px-6'>
       <Headline caption='Rig level' value={rigLevel} tone='level' />
+      <Figure
+        label='Duplicates'
+        title={describeDuplicateRule()}
+        value={duplicatePenalty > 0 ? `−${duplicatePenalty}` : "—"}
+        muted={duplicatePenalty === 0}
+      />
 
       <Divider />
 

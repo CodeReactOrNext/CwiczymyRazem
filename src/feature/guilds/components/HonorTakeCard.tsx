@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { DexMarks } from "feature/arsenal/components/DexMarks";
+import type { DexStatus } from "feature/arsenal/utils/dex";
 import { HonorMark } from "feature/guilds/components/HonorMark";
 import type { StashEntry } from "feature/guilds/types/stash.types";
 import { TAKE_HONOR_COST } from "feature/guilds/utils/guildHonor.utils";
@@ -13,11 +15,17 @@ import { TAKE_HONOR_COST } from "feature/guilds/utils/guildHonor.utils";
  */
 export const HonorTakeCard = ({
   entry,
+  dexStatus,
   balance,
   busy = false,
   onConfirm,
 }: {
   entry: StashEntry;
+  /**
+   * Where the model stands with the taker — owned already, or on the Dex.
+   * Absent for parts and mods, which are not collected.
+   */
+  dexStatus?: DexStatus;
   /** The taker's honor right now. */
   balance: number;
   busy?: boolean;
@@ -35,6 +43,10 @@ export const HonorTakeCard = ({
           left by {entry.depositedByName || "a member"}
         </p>
         <h3 className='text-xl font-black text-zinc-100'>{entry.name}</h3>
+        {/* Said before the price, not after the take: honor spent on a second
+            copy of something already in the cabinet is honor the member
+            should have chosen to spend. */}
+        {dexStatus && <DexMarks status={dexStatus} className='pt-1' />}
       </div>
 
       <div className='flex items-end justify-between gap-6'>

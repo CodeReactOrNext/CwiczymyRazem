@@ -36,8 +36,9 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({
             <span className="text-[10px] font-bold tracking-wide text-red-400">Playalong</span>
           </div>
         )}
-        <span className="truncate">{activeExercise.title}</span>
-        <FavoriteExerciseButton exerciseId={exercise.id} />
+        <span className="truncate" translate={exercise.songData ? "no" : undefined}>{activeExercise.title}</span>
+        {/* Favouriting is for library exercises — a song already lives in the songs library. */}
+        {!exercise.songData && <FavoriteExerciseButton exerciseId={exercise.id} />}
       </h2>
     );
   }

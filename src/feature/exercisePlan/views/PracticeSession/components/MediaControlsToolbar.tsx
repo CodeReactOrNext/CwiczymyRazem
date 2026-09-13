@@ -14,7 +14,7 @@ import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import { TunerDialog } from "feature/tuner/components/TunerDialog";
 import { TuningForkIcon } from "feature/tuner/components/TuningForkIcon";
 import { RippleButton } from "hooks/useRipple";
-import { Bug, Check, ChevronDown, Lock, Snail } from "lucide-react";
+import { Bug, ChevronDown, Lock } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -27,14 +27,8 @@ import {
   MicTroubleshooting,
   MicTroubleshootingDialog,
 } from "./MicTroubleshooting";
+import { SpeedDropdown } from "./SpeedDropdown";
 import { VolumeButton } from "./VolumeButton";
-
-const SPEED_MODES: { value: number; label: string }[] = [
-  { value: 1, label: "100%" },
-  { value: 0.75, label: "75%" },
-  { value: 0.5, label: "50%" },
-  { value: 0.25, label: "25%" },
-];
 
 interface MediaControlsToolbarProps {
   hasMetronome: boolean;
@@ -68,93 +62,12 @@ interface MediaControlsToolbarProps {
    *  elsewhere (mobile tools island keeps BPM + speed in one place). */
   hideSpeed?: boolean;
   disableTuner?: boolean;
+  /** The metronome's set BPM — lets the speed control show what each % works out to. */
   baseBpm?: number;
   trailing?: React.ReactNode;
   examMode?: boolean;
   /** Keep the backing-track (guitar) toggle available even in exam mode (e.g. scale exams). */
   showBackingInExam?: boolean;
-}
-
-export function SpeedDropdown({
-  speedMultiplier,
-  onSpeedMultiplierChange,
-  baseBpm,
-  isSlowed,
-  h,
-  compact = false,
-  className,
-}: {
-  speedMultiplier: number;
-  onSpeedMultiplierChange: (value: number) => void;
-  baseBpm?: number;
-  isSlowed: boolean;
-  h: string;
-  compact?: boolean;
-  className?: string;
-}) {
-  const current =
-    SPEED_MODES.find((m) => m.value === speedMultiplier) ?? SPEED_MODES[0];
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <RippleButton
-          title='Playback speed — slow down to learn tricky passages'
-          className={cn(
-            "flex items-center rounded-lg outline-none transition-all focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
-            h,
-            compact ? "gap-1.5 px-2" : "gap-2 px-3",
-            isSlowed
-              ? "bg-white/15 text-white hover:bg-white/25"
-              : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white",
-            className,
-          )}>
-          <Snail className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
-          <span
-            className={cn(
-              "font-mono font-bold",
-              compact ? "text-[10px]" : "text-sm",
-            )}>
-            {current.label}
-          </span>
-          <ChevronDown
-            className={cn(
-              "shrink-0 opacity-60",
-              compact ? "h-3 w-3" : "h-3.5 w-3.5",
-            )}
-          />
-        </RippleButton>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align='center'
-        // Practice session is a full-screen layer at z-[999999] (desktop) / z-[9999999]
-        // (mobile modal) — the dropdown's default z-50 would paint underneath it.
-        className='z-[99999999] min-w-[9rem] border border-white/10 bg-zinc-900 text-white'>
-        {SPEED_MODES.map(({ value, label }) => {
-          const active = speedMultiplier === value;
-          return (
-            <DropdownMenuItem
-              key={value}
-              onSelect={() => onSpeedMultiplierChange(value)}
-              className={cn(
-                "flex cursor-pointer items-center gap-2 text-xs font-semibold focus:bg-zinc-800 focus:text-white",
-                active ? "text-cyan-300" : "text-zinc-300",
-              )}>
-              <span className='font-mono w-9'>{label}</span>
-              {baseBpm ? (
-                <span className='font-mono text-[10px] text-zinc-500'>
-                  {Math.round(baseBpm * value)} BPM
-                </span>
-              ) : null}
-              {active && (
-                <Check className='ml-auto h-3.5 w-3.5 text-cyan-300' />
-              )}
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
 }
 
 export const MediaControlsToolbar = memo(function MediaControlsToolbar({
@@ -215,7 +128,6 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
   const isNonStandardTuning = tuningId !== "standard";
 
-  const isSlowed = speedMultiplier < 1;
   const hasTuner =
     hasMicControls && !!frequencyRef && !!volumeRef && !disableTuner;
   const h = compact ? "h-8" : "h-12";
@@ -239,7 +151,6 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 speedMultiplier={speedMultiplier}
                 onSpeedMultiplierChange={onSpeedMultiplierChange}
                 baseBpm={baseBpm}
-                isSlowed={isSlowed}
                 h='h-11'
                 className={cn(
                   "w-full min-w-0 justify-center",
@@ -403,7 +314,6 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             speedMultiplier={speedMultiplier}
             onSpeedMultiplierChange={onSpeedMultiplierChange}
             baseBpm={baseBpm}
-            isSlowed={isSlowed}
             h='h-8'
           />
         )}
@@ -542,8 +452,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
   // Desktop layout: controls grouped into "islands" — shared quiet backgrounds
   // build the hierarchy (sound / input / view), spacing separates the groups.
-  // The speed dropdown is intentionally absent here: DesktopSessionView renders
-  // it next to the BPM slider so the whole tempo axis lives in one place.
+  // The speed dropdown is intentionally absent here: on desktop it sits inside
+  // the metronome bar (ExerciseQuickActionsBar), so the whole tempo axis lives in one place.
   const island =
     "flex items-center gap-1.5 rounded-lg bg-zinc-900/40 p-1.5 empty:hidden";
 

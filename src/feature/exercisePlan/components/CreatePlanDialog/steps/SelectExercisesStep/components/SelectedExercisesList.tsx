@@ -18,6 +18,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import { SONG_PRACTICE_MODE_LABELS } from "feature/exercisePlan/utils/songToExercise";
 import { useTranslation } from "hooks/useTranslation";
 import { Clock, Copy, Edit2, GripVertical, ListPlus,Trash2 } from "lucide-react";
 
@@ -119,6 +120,12 @@ const SortableItem = ({
           {!!exercise._generatorConfig && (
             <span className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400/90 border border-indigo-500/20 text-[9px] font-bold tracking-wide">
               Generated
+            </span>
+          )}
+          {!!exercise.songData && (
+            <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 text-[9px] font-bold tracking-wide">
+              Song
+              {exercise.songData.mode && ` · ${SONG_PRACTICE_MODE_LABELS[exercise.songData.mode]}`}
             </span>
           )}
         </div>

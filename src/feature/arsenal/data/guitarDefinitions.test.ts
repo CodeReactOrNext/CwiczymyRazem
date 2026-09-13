@@ -3,6 +3,7 @@ import { eligibleItems } from "feature/supporterCase/utils/slate";
 import { describe, expect, it } from "vitest";
 
 import {
+  DROPPABLE_GUITARS_BY_RARITY,
   GUITAR_DEFINITIONS,
   GUITARS_BY_ID,
   GUITARS_BY_RARITY,
@@ -21,30 +22,40 @@ describe("roadmap trophy guitars", () => {
     }
   });
 
-  // Finishing a roadmap is how you are *given* one, not the only way to own
-  // one: they roll out of the cases like any other Mythic.
-  it("drop from the cases like every other Mythic", () => {
-    const pool = GUITARS_BY_RARITY.Mythic ?? [];
+  // Reversed deliberately: finishing the roadmap used to be how you were
+  // *given* one of these, with the cases as a slower second route. It is now
+  // the only route, so they are absent from every pool a draw reads.
+  // `trophyGuitars.test.ts` owns the full guard; these two keep the story
+  // straight in the file that builds the pools.
+  it("are absent from the pool the cases draw from", () => {
+    const pool = DROPPABLE_GUITARS_BY_RARITY.Mythic ?? [];
     for (const guitar of trophies) {
       expect(
         pool.some((entry) => entry.id === guitar.id),
         String(guitar.id),
-      ).toBe(true);
+      ).toBe(false);
     }
   });
 
-  it("stand on the supporter ballot too", () => {
+  it("are kept off the supporter ballot too", () => {
     for (const guitar of trophies) {
       const onBallot = eligibleItems(guitar.rarity as SlateRarity).some(
         (item) => item.kind === "guitar" && item.id === guitar.id,
       );
-      expect(onBallot, String(guitar.id)).toBe(true);
+      expect(onBallot, String(guitar.id)).toBe(false);
+    }
+  });
+
+  it("still appear in the full catalogue, so the Dex can show them", () => {
+    const all = new Set(GUITAR_DEFINITIONS.map((guitar) => guitar.id));
+    for (const guitar of trophies) {
+      expect(all.has(guitar.id), String(guitar.id)).toBe(true);
     }
   });
 });
 
 describe("guitar definitions", () => {
-  it("puts every model in a draw pool", () => {
+  it("groups every model by rarity, trophies included", () => {
     const pooled = new Set(
       Object.values(GUITARS_BY_RARITY).flatMap((pool) =>
         pool.map((guitar) => guitar.id),

@@ -1,4 +1,4 @@
-import type { GuitarRarity } from "../types/arsenal.types";
+import type { ArsenalUserData, GuitarRarity } from "../types/arsenal.types";
 
 /** Anything definition-like the dex can count: id + rarity. */
 interface DexDefinition {
@@ -49,6 +49,69 @@ export const buildDiscoveredSet = <TItem>(
   const discovered = new Set<number | string>(recorded ?? []);
   for (const item of items ?? []) discovered.add(getDefinitionId(item));
   return discovered;
+};
+
+/** The two kinds of gear the Dex records. Parts and mods are not collected. */
+export type DexItemKind = "guitar" | "effect";
+
+/** Where one definition stands with the player, as shown outside their own cabinet. */
+export interface DexStatus {
+  /** A copy is in the stash right now. */
+  isOwned: boolean;
+  /** Discovered — on the Dex record, or in the stash, which the Dex counts too. */
+  inDex: boolean;
+}
+
+export type DexLookup = (
+  kind: DexItemKind,
+  definitionId: number | string,
+) => DexStatus;
+
+/**
+ * Owned / Dex status per definition, off one read of the arsenal.
+ *
+ * The case preview, the market and the guild's shelf all ask the same question
+ * of a definition — "do I have this, have I ever had this" — so they all ask it
+ * here, and the marks they draw from the answer stay in step. Owned implies
+ * discovered by construction (see `buildDiscoveredSet`); nothing owned and
+ * nothing recorded is a plain `false`/`false`, which is what `undefined` data
+ * resolves to as well.
+ */
+export const buildDexLookup = (
+  data:
+    | Pick<
+        ArsenalUserData,
+        "inventory" | "effectInventory" | "dexGuitars" | "dexEffects"
+      >
+    | undefined,
+): DexLookup => {
+  const ownedGuitars = new Set<number | string>();
+  for (const item of data?.inventory ?? []) ownedGuitars.add(item.guitarId);
+  const ownedEffects = new Set<number | string>();
+  for (const item of data?.effectInventory ?? [])
+    ownedEffects.add(item.effectId);
+
+  const discoveredGuitars = buildDiscoveredSet(
+    data?.dexGuitars,
+    data?.inventory,
+    (i) => i.guitarId,
+  );
+  const discoveredEffects = buildDiscoveredSet(
+    data?.dexEffects,
+    data?.effectInventory,
+    (i) => i.effectId,
+  );
+
+  return (kind, definitionId) =>
+    kind === "guitar"
+      ? {
+          isOwned: ownedGuitars.has(definitionId),
+          inDex: discoveredGuitars.has(definitionId),
+        }
+      : {
+          isOwned: ownedEffects.has(definitionId),
+          inDex: discoveredEffects.has(definitionId),
+        };
 };
 
 export interface RarityCount {

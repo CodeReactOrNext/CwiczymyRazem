@@ -1,5 +1,5 @@
 import { EFFECT_DEFINITIONS } from "feature/arsenal/data/effectDefinitions";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { DROPPABLE_GUITARS } from "feature/arsenal/data/guitarDefinitions";
 import type {
   ItemKey,
   SeatTallies,
@@ -28,7 +28,7 @@ const positive = (value: unknown): number =>
  * proposals board instead.
  */
 export const eligibleItems = (rarity: SlateRarity): SlateItem[] => [
-  ...GUITAR_DEFINITIONS.filter((def) => def.rarity === rarity).map((def) => ({
+  ...DROPPABLE_GUITARS.filter((def) => def.rarity === rarity).map((def) => ({
     key: itemKey("guitar", def.id),
     kind: "guitar" as const,
     id: def.id,

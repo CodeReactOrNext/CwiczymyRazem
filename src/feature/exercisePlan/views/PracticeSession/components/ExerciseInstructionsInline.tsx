@@ -33,7 +33,9 @@ export const ExerciseInstructionsInline = ({
   const hasLinks = !!(exercise.links && exercise.links.length > 0);
   const isPlayalong = !!exercise.isPlayalong;
 
-  const displayAmount = rewardAmount || (
+  // A song item pays no skill points — its time goes to the song (see
+  // planSongPractice) — so it must not advertise a reward it never grants.
+  const displayAmount = exercise.songData ? 0 : rewardAmount || (
     exercise.difficulty === "beginner" ? 1 :
     exercise.difficulty === "easy" ? 1 :
     exercise.difficulty === "medium" ? 2 :

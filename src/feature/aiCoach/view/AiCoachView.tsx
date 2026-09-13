@@ -228,7 +228,7 @@ const AiCoachView = () => {
             <span className='text-sm'>No mastery roadmaps available yet.</span>
           </div>
         ) : (
-          <div className='flex flex-col gap-4'>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             {sortedRoadmaps.map((rm) => {
               const merged = mergeWithProgress(
                 rm,

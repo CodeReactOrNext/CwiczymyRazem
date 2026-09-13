@@ -1,6 +1,5 @@
 import type { ArsenalUserData } from "../types/arsenal.types";
-import { EFFECTS_BY_ID } from "./effectDefinitions";
-import { getEffectLevel } from "./effectStats";
+import { readBoardLevel } from "./boardDuplicates";
 import { GUITARS_BY_ID } from "./guitarDefinitions";
 import { getItemLevel } from "./itemStats";
 import { isPoweredIn } from "./powerSupply";
@@ -14,6 +13,10 @@ import { isPoweredIn } from "./powerSupply";
  * whole Fame rate the brick is supposed to gate simply by standing pedals on the
  * board. A board saved before the brick existed has no links at all and is read
  * as fully powered, so nobody loses a level to the migration.
+ *
+ * The pedal half is not a plain sum either: a second copy of one model counts
+ * half, a third nothing — the rule, and the reasons, live in
+ * `data/boardDuplicates`, which is also what the board reads to show them.
  */
 export const getRigLevel = (
   arsenal:
@@ -31,16 +34,12 @@ export const getRigLevel = (
     if (item && def) total += getItemLevel(item, def);
   }
 
-  const powered = isPoweredIn(arsenal.rig);
-
-  for (const placement of arsenal.rig?.pedalboardItems ?? []) {
-    if (!powered(placement.itemId)) continue;
-    const item = arsenal.effectInventory?.find(
-      (e) => e.id === placement.itemId,
-    );
-    const def = item ? EFFECTS_BY_ID.get(item.effectId) : null;
-    if (item && def) total += getEffectLevel(item, def);
-  }
-
-  return total;
+  return (
+    total +
+    readBoardLevel(
+      arsenal.rig?.pedalboardItems,
+      arsenal.effectInventory,
+      isPoweredIn(arsenal.rig),
+    ).level
+  );
 };

@@ -71,6 +71,8 @@ interface LandscapeSessionModalProps {
   handleNextExerciseClick: () => void;
   handleBackExerciseClick: () => void;
   handleRestart: () => void;
+  /** See MobileExerciseContent — a song item's section map, mounted once. */
+  songSectionMapSlot?: React.ReactNode;
 }
 
 export function LandscapeSessionModal({
@@ -124,6 +126,7 @@ export function LandscapeSessionModal({
   handleNextExerciseClick,
   handleBackExerciseClick,
   handleRestart,
+  songSectionMapSlot,
 }: LandscapeSessionModalProps) {
   const [isPanelExpanded, setIsPanelExpanded] = useState(true);
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
@@ -182,6 +185,7 @@ export function LandscapeSessionModal({
                     onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
                     isExamMode={examMode}
                     strumVolume={strumVolume}
+                    songSectionMapSlot={songSectionMapSlot}
                   />
                 </div>
               </div>
@@ -252,6 +256,7 @@ export function LandscapeSessionModal({
                         frequencyRef={frequencyRef}
                         volumeRef={volumeRef}
                         disableTuner={currentExercise.disableTuner}
+                        baseBpm={metronome?.bpm}
                         metronome={metronome} isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
                         audioTracks={audioTracks} setTrackConfigs={setTrackConfigs}
                         masterVolume={currentExercise.gpFileUrl ? masterVolume : undefined}
