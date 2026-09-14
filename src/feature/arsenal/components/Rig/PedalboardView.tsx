@@ -13,11 +13,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  describeDuplicateCopy,
-  formatDuplicateShare,
-  readBoardLevel,
-} from "../../data/boardDuplicates";
+import { readBoardLevel } from "../../data/boardDuplicates";
 import {
   autoPatch,
   pickOutput,
@@ -66,6 +62,7 @@ import {
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
 import { BoardStatusStrip } from "./BoardStatusStrip";
+import { duplicateGlow,DuplicateMark } from "./DuplicateMark";
 import { DuplicateStrip } from "./DuplicateStrip";
 import { EffectPickerModal } from "./EffectPickerModal";
 import type { PoweredPedal } from "./PowerLoom";
@@ -150,6 +147,12 @@ export const PedalboardView = ({
 
   const [isColliding, setIsColliding] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  // The pedal the pointer is over, as a catalogue id, while that pedal stands
+  // on the board more than once. Every copy of it lights at once, so "a
+  // duplicate of what?" is answered by moving the mouse, not by reading.
+  const [hoverDuplicate, setHoverDuplicate] = useState<number | string | null>(
+    null,
+  );
   // Natural aspect ratio (w/h) per image, measured once the image loads. It
   // only ever corrects EFFECT_IMAGE_ASPECT, which already knows every shipped
   // pedal — so the board can lay itself out before a single image is decoded.
@@ -1083,8 +1086,12 @@ export const PedalboardView = ({
             power={powerState}
             unpowered={unpoweredNames}
           />
-          <DuplicateStrip board={boardLevel} />
-          <SignalOrderStrip verdict={verdict} />
+          <DuplicateStrip
+            board={boardLevel}
+            activeModel={hoverDuplicate}
+            onHoverModel={setHoverDuplicate}
+          />
+          <SignalOrderStrip verdict={verdict} board={boardLevel} />
         </>
       )}
 
@@ -1237,10 +1244,14 @@ export const PedalboardView = ({
             const showCollision = isDragging && isColliding;
             const wPct = widthOf(placement.itemId);
             const powered = hasPower(placement.itemId);
-            // A second copy of a model wears what it is counted at, so the
-            // player can see which copy to swap out without opening a card.
+            // Every copy of a pedal that stands here more than once wears a
+            // mark — the count on the one that keeps its levels, the share on
+            // the ones that lose them — so the player can see which copy to
+            // swap out without opening a card. See `DuplicateMark`.
             const copy = boardLevel.copies.get(placement.itemId);
-            const shareMark = copy ? formatDuplicateShare(copy.share) : null;
+            const dupModel = copy && copy.total > 1 ? copy.model : null;
+            const dupActive = dupModel !== null && hoverDuplicate === dupModel;
+            const dupGlow = duplicateGlow(copy, dupActive);
             // The pedal the loose end of a cable is currently over. Amber when
             // the brick can carry it, red when the drop would be refused — so
             // the answer arrives before the cable is let go, not after.
@@ -1250,11 +1261,15 @@ export const PedalboardView = ({
               <div
                 key={placement.itemId}
                 onMouseDown={(e) => handlePedalMouseDown(e, placement)}
+                onMouseEnter={() => setHoverDuplicate(dupModel)}
                 onMouseMove={(e) => {
                   if (!dragging && invItem)
                     onHover?.(e, <EffectCard item={invItem} readOnly />);
                 }}
-                onMouseLeave={() => onHover?.(null, null)}
+                onMouseLeave={() => {
+                  setHoverDuplicate(null);
+                  onHover?.(null, null);
+                }}
                 onClick={() => {
                   if (onShowCard && invItem)
                     onShowCard(<EffectCard item={invItem} readOnly />);
@@ -1279,9 +1294,10 @@ export const PedalboardView = ({
                           })`
                         : // An unpowered pedal is off. Not dimmed to say "you
                           // cannot have this" — dimmed because there is no
-                          // current in it.
+                          // current in it. A powered one may still be lit as
+                          // one of several copies of the same pedal.
                           powered
-                          ? "none"
+                          ? (dupGlow ?? "none")
                           : "grayscale(0.7) brightness(0.55)",
                   transform: isDragging
                     ? "scale(1.07) translateY(-6px)"
@@ -1314,17 +1330,12 @@ export const PedalboardView = ({
                     );
                   }}
                 />
-                {shareMark && copy && (
-                  <span
-                    title={describeDuplicateCopy(
-                      copy,
-                      boardLevel.duplicates.find((group) =>
-                        group.copies.some((c) => c.itemId === copy.itemId),
-                      )?.name ?? effect.name,
-                    )}
-                    className='absolute bottom-1 right-1 z-10 rounded bg-black/85 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-300'>
-                    {shareMark}
-                  </span>
+                {copy && (
+                  <DuplicateMark
+                    copy={copy}
+                    name={effect.name}
+                    active={dupActive}
+                  />
                 )}
                 {/* The plug in its inlet, over the artwork rather than under
                     it, so it can sit down in a socket drawn on the top face. */}

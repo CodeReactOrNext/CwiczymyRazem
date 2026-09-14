@@ -87,7 +87,7 @@ describe("MobileToolsIsland", () => {
     renderIsland({ examMode: true, hasAudioTrack: true });
 
     expect(screen.queryByTitle("Tempo")).toBeNull();
-    expect(screen.queryByTitle("Backing track on")).toBeNull();
+    expect(screen.queryByTitle("Guitar on")).toBeNull();
     expect(screen.getByTitle("Sound & input")).toBeDefined();
   });
 });

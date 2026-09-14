@@ -1,3 +1,5 @@
+import { cn } from "assets/lib/utils";
+
 import type { BoardLevel } from "../../data/boardDuplicates";
 import {
   describeDuplicateRule,
@@ -22,9 +24,20 @@ import { Lamp } from "./BoardStatusStrip";
 
 interface DuplicateStripProps {
   board: BoardLevel;
+  /**
+   * The pedal whose copies are lit on the board, and how to light them: the
+   * chip a pointer is on lights the same set the pedals themselves do, so the
+   * line above the board and the board below it are one readout, not two.
+   */
+  activeModel?: number | string | null;
+  onHoverModel?: (model: number | string | null) => void;
 }
 
-export const DuplicateStrip = ({ board }: DuplicateStripProps) => {
+export const DuplicateStrip = ({
+  board,
+  activeModel,
+  onHoverModel,
+}: DuplicateStripProps) => {
   if (board.duplicates.length === 0) return null;
 
   return (
@@ -34,12 +47,10 @@ export const DuplicateStrip = ({ board }: DuplicateStripProps) => {
       </span>
 
       <div className='flex items-center gap-2.5'>
-        <Lamp tone='warn' />
-        <span className='flex items-baseline gap-1 text-sm font-bold tabular-nums text-amber-300'>
+        <Lamp tone='idle' />
+        <span className='flex items-baseline gap-1 text-sm font-bold tabular-nums text-zinc-200'>
           <CountUp value={board.penalty} prefix='−' />
-          <span className='text-xs font-semibold text-amber-500/70'>
-            levels
-          </span>
+          <span className='text-xs font-semibold text-zinc-500'>levels</span>
         </span>
       </div>
 
@@ -47,15 +58,20 @@ export const DuplicateStrip = ({ board }: DuplicateStripProps) => {
         {board.duplicates.map((group) => (
           <span
             key={String(group.model)}
+            onMouseEnter={() => onHoverModel?.(group.model)}
+            onMouseLeave={() => onHoverModel?.(null)}
             title={group.copies
               .map(
                 (copy) =>
                   `${copy.name} Lv ${copy.level} → counts ${copy.counted}`,
               )
               .join("\n")}
-            className='flex cursor-default items-center gap-2 rounded-md bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-300'>
+            className={cn(
+              "flex cursor-default items-center gap-2 rounded px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors",
+              activeModel === group.model ? "bg-zinc-700/50" : "bg-zinc-800/40",
+            )}>
             {group.name} ×{group.copies.length}
-            <span className='font-semibold tabular-nums text-amber-500/70'>
+            <span className='font-semibold tabular-nums text-zinc-500'>
               {group.copies
                 .map((copy) => formatDuplicateShare(copy.share) ?? "1")
                 .join(" · ")}

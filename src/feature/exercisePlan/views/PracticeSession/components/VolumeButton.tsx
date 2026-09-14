@@ -53,7 +53,10 @@ export const VolumeButton = ({
   // Shown whenever there's at least the main (backing) track — a GP file with
   // several instruments just means more rows in the same list.
   const showTracks = !!audioTracks && audioTracks.length > 0 && !!setTrackConfigs;
-  const tracksLabel = (audioTracks?.length ?? 0) > 1 ? "Instruments" : "Backing track";
+  // A single row is always the session's own instrument (the tablature sampler or,
+  // in a strumming exercise, the strum synth) — never a backing track. Calling it
+  // one is why players hunted for a way to silence "the guitar" and found none.
+  const tracksLabel = (audioTracks?.length ?? 0) > 1 ? "Instruments" : "Guitar";
 
   if (!showMetronome && !showMasterVolume && !showTracks) return null;
 
@@ -225,8 +228,15 @@ export const VolumeButton = ({
                         }))
                       }
                     />
-                    <span className='w-8 shrink-0 text-right font-mono text-[10px] text-zinc-500'>
-                      {Math.round(track.volume * 100)}%
+                    {/* Read the mute, not the stored level: a muted track kept
+                        showing "100%" next to a slider sitting at zero, which read
+                        as "this is on" to anyone looking for what to silence. */}
+                    <span
+                      className={cn(
+                        "w-10 shrink-0 text-right font-mono text-[10px]",
+                        track.isMuted ? "text-red-400" : "text-zinc-500"
+                      )}>
+                      {track.isMuted ? "Muted" : `${Math.round(track.volume * 100)}%`}
                     </span>
                   </div>
                 </div>

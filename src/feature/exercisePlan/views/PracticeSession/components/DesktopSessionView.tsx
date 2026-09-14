@@ -152,8 +152,12 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
     setTimeout(() => p.metronome.startMetronome({ skipCountIn: true }), 0);
   }, [p.metronome]);
 
+  // Same rule as useUIState's isMobileView (a short viewport is a phone in
+  // landscape, however wide it is) — that hook is what hands the session to the
+  // mobile modal, so anything narrower here would leave this view mounted,
+  // sounding and fighting the modal for the same exercise.
   React.useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
+    const check = () => setIsMobile(window.innerWidth < 768 || window.innerHeight <= 500);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -284,6 +288,10 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     masterVolume={p.masterVolume}
                     trackConfigs={p.trackConfigs}
                     backingTrackIds={p.backingTrackIds}
+                    // This view stays mounted behind the mobile modal (it is only
+                    // hidden), so its strumming pattern would sound alongside the
+                    // modal's — one pattern, two synths, a frame apart.
+                    silenceStrumSynth={isMobile}
                     isMetronomePlaying={p.metronome.isPlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}

@@ -195,7 +195,7 @@ export const DailyCaseCard = ({
                             />
                           </div>
 
-                          {/* Owned / Dex glyph, top-right of the tile. */}
+                          {/* Owned / Dex / new glyph, top-right of the tile. */}
                           <div className='absolute right-1.5 top-1.5 z-20'>
                             <DexCornerMark status={dexStatus} />
                           </div>

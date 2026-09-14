@@ -32,11 +32,13 @@ import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
 import { useSupportPrompt } from "hooks/useSupportPrompt";
 import {
+  Activity,
   BookOpen,
   Brain,
   ChevronDown,
   ClipboardList,
   Clock,
+  Compass,
   Download,
   Dumbbell,
   FilePlus2,
@@ -63,6 +65,7 @@ import {
   Swords,
   Timer,
   Trophy,
+  Users,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -237,7 +240,7 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
     id: "practice-roadmaps",
     name: "Mastery Roadmaps",
     href: "/ai-coach",
-    icon: <ClipboardList size={16} />,
+    icon: <Compass size={16} />,
   },
   {
     id: "practice-journey",
@@ -469,7 +472,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/my-exercises")) return "library";
     if (pathname.startsWith("/tab-editor")) return "library";
     if (pathname.startsWith("/favorites")) return "library";
-    if (pathname.startsWith("/recordings")) return "recordings";
+    if (pathname.startsWith("/recordings")) return "community";
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/roadmap")) return "roadmap";
     if (pathname.startsWith("/supporter")) return "supporter";
@@ -560,7 +563,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           id: "progress-activity",
           name: "Activity",
           href: "/profile/activity",
-          icon: <FaArrowTrendUp size={16} />,
+          icon: <Activity size={16} />,
         },
         {
           id: "progress-milestones",
@@ -584,13 +587,20 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       id: "community",
       name: "Community",
       href: "/seasons",
-      icon: <Trophy size={18} />,
+      icon: <Users size={18} />,
       children: [
         {
           id: "community-rankings",
           name: "Rankings",
           href: "/seasons",
           icon: <Trophy size={16} />,
+        },
+        {
+          id: "community-recordings",
+          name: "Recordings",
+          href: "/recordings",
+          icon: <Mic2 size={16} />,
+          tooltip: "Share your covers and hear what everyone else is recording",
         },
         {
           id: "community-guilds",
@@ -635,13 +645,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   ];
 
   const utilityNavigation = [
-    {
-      id: "recordings",
-      name: "Recordings",
-      href: "/recordings",
-      icon: <Mic2 size={18} />,
-      muted: true,
-    },
     {
       id: "wiki",
       name: "Knowledge Base",

@@ -1,4 +1,3 @@
-import { Chip } from "assets/components/ui/chip";
 import {
   Tooltip,
   TooltipContent,
@@ -14,7 +13,7 @@ import {
   getEffectScrapYield,
   getGuitarScrapYield,
 } from "feature/arsenal/utils/scrap";
-import { Tag, Unplug, X } from "lucide-react";
+import { Unplug, X } from "lucide-react";
 import Link from "next/link";
 
 import type {
@@ -78,7 +77,6 @@ export const MarketListingCard = ({
   isCancelling,
 }: MarketListingCardProps) => {
   const canAfford = currentFame >= listing.price;
-  const showMissingBadge = dexStatus != null && !dexStatus.isOwned && !isOwn;
 
   const scrapParts = getListingScrapYield(listing);
   // The mod a teardown of this instance would hand over. Picked by hashing the
@@ -161,17 +159,10 @@ export const MarketListingCard = ({
         </TooltipProvider>
       )}
 
-      {/* The same two marks the case preview shows. A seller's own listing
-          skips them: it is theirs, which is the whole point of the cancel
-          button underneath. */}
+      {/* The same marks the case preview and the shelf show. A seller's own
+          listing skips them: it is theirs, which is the whole point of the
+          cancel button underneath. */}
       {dexStatus && !isOwn && <DexMarks status={dexStatus} />}
-
-      {showMissingBadge && (
-        <Chip color='amber' className='self-start px-2 py-1 text-[11px]'>
-          <Tag size={11} strokeWidth={2.5} className='shrink-0' />
-          New for your collection
-        </Chip>
-      )}
 
       {isOwn ? (
         <button

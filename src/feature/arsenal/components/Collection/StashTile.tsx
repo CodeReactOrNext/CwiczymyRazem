@@ -369,7 +369,12 @@ export const StashTile = ({
         />
       )}
 
-      {isNew && (
+      {/* Only on the viewer's own board: the star means "arrived since you
+          last looked", which is a fact about the owner, and the copy on the
+          guild's shelf still carries whatever the depositor's copy had. A
+          socket that is answering "do you have this" (dexStatus) would be
+          showing two different amber "new"s at once. */}
+      {isNew && !dexStatus && (
         <Star
           size={11}
           aria-hidden

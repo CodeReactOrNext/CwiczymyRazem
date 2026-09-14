@@ -10,6 +10,7 @@ import type {
   TraderModOffer,
   TraderPartOffer,
 } from "../../types/trader.types";
+import { buildDexLookup } from "../../utils/dex";
 import { ItemOfferCard } from "./ItemOfferCard";
 import { ModOfferCard } from "./ModOfferCard";
 import { PartOfferCard } from "./PartOfferCard";
@@ -43,12 +44,10 @@ export const TraderView = () => {
     );
   };
 
-  const ownedDefIds = useMemo(() => {
-    const set = new Set<number | string>();
-    for (const item of arsenal?.inventory ?? []) set.add(item.guitarId);
-    for (const item of arsenal?.effectInventory ?? []) set.add(item.effectId);
-    return set;
-  }, [arsenal?.inventory, arsenal?.effectInventory]);
+  // Owned / Dex / new, off the same lookup the case preview, the market and
+  // the guild's shelf read. The counter used to check the cabinet alone, so a
+  // model the player had found and scrapped was offered back as new.
+  const dexStatusOf = useMemo(() => buildDexLookup(arsenal), [arsenal]);
 
   const parts = shop.offers.filter(
     (o): o is TraderPartOffer => o.kind === "part",
@@ -136,13 +135,12 @@ export const TraderView = () => {
                 key={offer.id}
                 offer={offer}
                 available={remainingOf(offer.id) > 0}
-                notInCollection={
-                  !ownedDefIds.has(
-                    offer.kind === "guitar"
-                      ? offer.roll.guitarId
-                      : offer.roll.effectId,
-                  )
-                }
+                dexStatus={dexStatusOf(
+                  offer.kind,
+                  offer.kind === "guitar"
+                    ? offer.roll.guitarId
+                    : offer.roll.effectId,
+                )}
                 currentFame={fame}
                 onBuy={() => handleBuy(offer.id, 1)}
                 isBuying={isPending && pendingOfferId === offer.id}

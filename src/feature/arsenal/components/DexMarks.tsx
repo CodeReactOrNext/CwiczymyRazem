@@ -1,16 +1,22 @@
 import { cn } from "assets/lib/utils";
 import type { DexStatus } from "feature/arsenal/utils/dex";
-import { Archive, CheckCircle2 } from "lucide-react";
+import { Archive, CheckCircle2, Tag } from "lucide-react";
 import type { CSSProperties } from "react";
 
 /**
  * Where a piece of gear stands with the player, wherever gear is shown that is
- * not (yet) theirs: a case's pool, a market listing, the guild's shelf.
+ * not (yet) theirs: a case's pool, a market listing, the trader's window, the
+ * guild's shelf.
  *
- * Two marks, always the same two: Owned (cyan) says a copy is in the stash
- * right now, Dex (zinc) says the model is on the record. Owned implies Dex, so
- * an owned piece wears both and a discovered-but-gone one wears Dex alone.
- * Nothing at all is the third answer — a new model says so by staying blank.
+ * Three answers, always the same three: Owned (cyan) says a copy is in the
+ * stash right now, Dex (zinc) says the model is on the record, New (amber) says
+ * neither — this one would be a first. Owned implies Dex, so an owned piece
+ * wears both and a discovered-but-scrapped one wears Dex alone.
+ *
+ * A new model used to say so by staying blank, which reads exactly like a
+ * surface that never asked the question. Every surface that knows the answer
+ * now gives it out loud, in the same words, so "have I got this already" is
+ * read the same way on the shelf as in the shop.
  */
 export const DexMarks = ({
   status,
@@ -18,31 +24,34 @@ export const DexMarks = ({
 }: {
   status: DexStatus;
   className?: string;
-}) => {
-  if (!status.isOwned && !status.inDex) return null;
-
-  return (
-    <div className={cn("flex items-center gap-2 text-[10px]", className)}>
-      {status.isOwned && (
-        <span className='flex items-center gap-1 text-cyan-400'>
-          <CheckCircle2 size={10} />
-          Owned
-        </span>
-      )}
-      {status.inDex && (
-        <span className='flex items-center gap-1 text-zinc-400'>
-          <Archive size={10} />
-          Dex
-        </span>
-      )}
-    </div>
-  );
-};
+}) => (
+  <div className={cn("flex items-center gap-2 text-[10px]", className)}>
+    {status.isOwned && (
+      <span className='flex items-center gap-1 text-cyan-400'>
+        <CheckCircle2 size={10} />
+        Owned
+      </span>
+    )}
+    {status.inDex && (
+      <span className='flex items-center gap-1 text-zinc-400'>
+        <Archive size={10} />
+        Dex
+      </span>
+    )}
+    {!status.isOwned && !status.inDex && (
+      <span className='flex items-center gap-1 font-semibold text-amber-400'>
+        <Tag size={10} strokeWidth={2.5} className='shrink-0' />
+        New for your collection
+      </span>
+    )}
+  </div>
+);
 
 /**
  * The same fact as one glyph, for a corner that has no room for words. Owned
  * wins over Dex — a tile carries one icon, and "you have it" is the one that
- * changes what the player does next.
+ * changes what the player does next. A model they have never had wears the
+ * amber tag the cards spell out.
  */
 export const DexCornerMark = ({
   status,
@@ -73,5 +82,13 @@ export const DexCornerMark = ({
         style={style}
       />
     );
-  return null;
+  return (
+    <Tag
+      size={size - 2}
+      strokeWidth={2.5}
+      aria-label='New for your collection'
+      className={cn("text-amber-400", className)}
+      style={style}
+    />
+  );
 };

@@ -1,4 +1,3 @@
-import { Chip } from "assets/components/ui/chip";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import type {
@@ -7,13 +6,15 @@ import type {
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
 import type { TraderItemOffer } from "feature/arsenal/types/trader.types";
+import type { DexStatus } from "feature/arsenal/utils/dex";
 import {
   getEffectScrapYield,
   getGuitarScrapYield,
 } from "feature/arsenal/utils/scrap";
-import { Check, Tag } from "lucide-react";
+import { Check } from "lucide-react";
 
 import { BuyButton } from "../BuyButton";
+import { DexMarks } from "../DexMarks";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { ScrapYieldStrip } from "../Parts/ScrapYieldStrip";
@@ -38,8 +39,12 @@ interface ItemOfferCardProps {
   offer: TraderItemOffer;
   /** False once the player has taken this offer in the current window. */
   available: boolean;
-  /** True when the player doesn't own this model yet. */
-  notInCollection: boolean;
+  /**
+   * Where this model stands with the player — owned, on the Dex, or new. The
+   * same answer the market and the guild's shelf show, read off the same
+   * lookup, so a duplicate is a duplicate wherever it is offered.
+   */
+  dexStatus?: DexStatus;
   currentFame: number;
   onBuy: () => void;
   isBuying: boolean;
@@ -57,7 +62,7 @@ interface ItemOfferCardProps {
 export const ItemOfferCard = ({
   offer,
   available,
-  notInCollection,
+  dexStatus,
   currentFame,
   onBuy,
   isBuying,
@@ -69,12 +74,7 @@ export const ItemOfferCard = ({
     <div className='flex flex-col gap-2.5 p-2.5'>
       <ScrapYieldStrip parts={scrapParts} />
 
-      {notInCollection && available && (
-        <Chip color='amber' className='self-start px-2 py-1 text-[11px]'>
-          <Tag size={11} strokeWidth={2.5} className='shrink-0' />
-          New for your collection
-        </Chip>
-      )}
+      {dexStatus && <DexMarks status={dexStatus} />}
 
       {available ? (
         <BuyButton

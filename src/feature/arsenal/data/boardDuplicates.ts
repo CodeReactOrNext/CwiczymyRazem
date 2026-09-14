@@ -9,15 +9,15 @@
  *
  * Three decisions worth spelling out:
  *
- *  • **A duplicate is the same model, not the same kind.** Two different
+ *  • **A duplicate is the exact same pedal, not the same kind.** Two different
  *    overdrives stacked is a real board — `signalChain` says so too, and never
- *    marks that cable wrong — so only a second copy of one *model* is a
- *    duplicate. Condition, vintage, rolled features and the workshop's
+ *    marks that cable wrong — so only a second copy of one *catalogue entry* is
+ *    a duplicate. Condition, vintage, rolled features and the workshop's
  *    promotion ladder all vary from copy to copy without making a copy a
- *    different pedal, and neither does a finish: a colourway or signature
- *    edition shares its model through `variantOf`, so three finishes of one
- *    reverb are one reverb three times. The Dex disagrees on purpose — it
- *    collects finishes — but the board is about what the signal goes through.
+ *    different pedal. Anything that looks different is different: two pedals
+ *    with their own art and their own entry are two pedals, however close
+ *    their names read, so a whole shelf of Astral Reverberators is a varied
+ *    board and scores like one.
  *
  *  • **The best copy always counts in full.** Copies are ranked by Item Level
  *    before the shares are dealt, so a player never loses the value of their
@@ -56,15 +56,18 @@ export const duplicateShareOf = (index: number): number =>
     Math.max(0, Math.min(index, DUPLICATE_LEVEL_SHARES.length - 1))
   ];
 
-/** The model a definition is a finish of — itself, unless it says otherwise. */
-export const modelOf = (
-  def: Pick<EffectDefinition, "id" | "variantOf">,
-): number | string => def.variantOf ?? def.id;
+/** The model a copy belongs to — the catalogue entry it was minted from. */
+export const modelOf = (def: Pick<EffectDefinition, "id">): number | string =>
+  def.id;
 
 /** One powered pedal, and what its copy of the model is worth. */
 export interface BoardCopy {
   itemId: string;
-  /** The pedal's own name, finish and all. */
+  /** The catalogue entry this copy and its twins were all minted from. */
+  model: number | string;
+  /** How many copies of that pedal stand powered on the board — 1 when alone. */
+  total: number;
+  /** The pedal's own name, as the catalogue lists it. */
   name: string;
   /** Its Item Level — what it adds on its own. */
   level: number;
@@ -78,7 +81,7 @@ export interface BoardCopy {
 /** A model with more than one powered copy on the board. */
 export interface DuplicateModel {
   model: number | string;
-  /** The base model's name — what the readout calls the whole group. */
+  /** The pedal's name — what the readout calls the whole group. */
   name: string;
   /** Best copy first. */
   copies: BoardCopy[];
@@ -158,7 +161,14 @@ export const readBoardLevel = (
       level += counted;
       fullLevel += copy.level;
       penalty += copy.level - counted;
-      const verdict: BoardCopy = { ...copy, index, share, counted };
+      const verdict: BoardCopy = {
+        ...copy,
+        model,
+        total: ranked.length,
+        index,
+        share,
+        counted,
+      };
       copies.set(copy.itemId, verdict);
       return verdict;
     });
@@ -193,11 +203,18 @@ const ORDINALS = ["first", "second", "third", "fourth", "fifth"];
 
 const ordinalOf = (index: number) => ORDINALS[index] ?? `${index + 1}th`;
 
-/** One sentence for the tooltip on a marked copy: which one it is, and what it adds. */
+/**
+ * One sentence for the tooltip on a marked copy: which one it is, and what it
+ * adds. The copy that counts in full gets a sentence of its own, because the
+ * mark it wears is the group's count rather than a share — it is there to say
+ * "this is the one to keep", not "this one is costing you".
+ */
 export const describeDuplicateCopy = (
   copy: BoardCopy,
   modelName: string,
 ): string => {
+  if (copy.index === 0)
+    return `${copy.total} copies of ${modelName} are powered on the board. This is the best of them, so it counts in full (Lv ${copy.level}) — the marks on the others are what they are counted at.`;
   const worth =
     copy.share === 0
       ? "adds nothing to your Rig Level"

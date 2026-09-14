@@ -7,6 +7,7 @@ import { BOARD_TIERS } from "./rigHardware";
 /** The two-row case these boards are laid out on. */
 const GEO = geometryFor(BOARD_TIERS[0]);
 const ROW_Y_PCT = GEO.rowYPct;
+import { readBoardLevel } from "./boardDuplicates";
 import { EFFECT_DEFINITIONS } from "./effectDefinitions";
 import {
   CHAIN_COMPLETE_FAME,
@@ -19,6 +20,7 @@ import {
   getChainVerdict,
   PLAYABLE_SIGNAL_STAGES,
   readChainNodes,
+  readStageLevels,
   SIGNAL_STAGES,
   stageIndexOf,
   wiredOrder,
@@ -480,5 +482,63 @@ describe("wiredOrder", () => {
     expect(wired.map((i) => i.itemId).sort()).toEqual(
       items.map((i) => i.itemId).sort(),
     );
+  });
+});
+
+describe("readStageLevels", () => {
+  /** The same board, priced — what the strip reads its numbers off. */
+  const pricedBoard = (types: EffectType[]) => {
+    const { items, effectInventory } = board(types);
+    return {
+      verdict: evaluateChain(readChainNodes(GEO, items, effectInventory)),
+      level: readBoardLevel(items, effectInventory),
+      effectInventory,
+    };
+  };
+
+  it("puts every pedal's level under the stage its kind belongs to", () => {
+    const { verdict, level } = pricedBoard(["Overdrive", "Delay"]);
+    const levels = readStageLevels(verdict, level);
+
+    expect(levels.get(stageIndexOf("Overdrive"))).toMatchObject({ count: 1 });
+    expect(levels.get(stageIndexOf("Delay"))).toMatchObject({ count: 1 });
+    // Nothing is invented for a stage the board does not cover.
+    expect(levels.get(stageIndexOf("Reverb"))).toBeUndefined();
+  });
+
+  it("adds up to what the board adds to the rig, stage by stage", () => {
+    const { verdict, level } = pricedBoard([
+      "Overdrive",
+      "Distortion",
+      "Delay",
+      "Reverb",
+    ]);
+    const levels = readStageLevels(verdict, level);
+
+    const summed = [...levels.values()].reduce((all, at) => all + at.level, 0);
+    expect(summed).toBe(level.level);
+  });
+
+  it("gathers a whole family into the one stage it shares", () => {
+    const { verdict, level } = pricedBoard(["Phaser", "Chorus"]);
+    const levels = readStageLevels(verdict, level);
+    const modulation = levels.get(stageIndexOf("Phaser"));
+
+    expect(stageIndexOf("Chorus")).toBe(stageIndexOf("Phaser"));
+    expect(modulation?.count).toBe(2);
+    expect(modulation?.level).toBe(level.level);
+  });
+
+  it("says what a stage gave up to a second copy of one pedal", () => {
+    const { verdict, level } = pricedBoard(["Overdrive", "Overdrive"]);
+    const overdrive = readStageLevels(verdict, level).get(
+      stageIndexOf("Overdrive"),
+    );
+
+    expect(overdrive?.count).toBe(2);
+    expect(overdrive?.penalty).toBeGreaterThan(0);
+    // The level it prints is the counted one, never the flattering raw sum.
+    expect(overdrive?.level).toBe(level.level);
+    expect(overdrive?.level).toBeLessThan(level.fullLevel);
   });
 });

@@ -72,8 +72,9 @@ const entryPiece = (entry: StashEntry): BoardPiece => {
 };
 
 /**
- * Owned / Dex for gear on the shelf, the way the case preview and the market
- * mark it. Parts and mods are not collected, so they have no status to show.
+ * Owned / Dex / new for gear on the shelf, the way the case preview, the
+ * trader and the market all mark it. Parts and mods are not collected, so they
+ * have no status to show.
  */
 const dexStatusOfGear = (
   lookup: DexLookup,
@@ -310,9 +311,9 @@ export const GuildStashTab = ({
     // what a take costs before they click and not from the error after.
     const entry =
       board === "shelf" ? entries.find((e) => e.id === piece.id) : undefined;
-    // And whether they already have one: a glyph on the socket, the two marks
-    // under the hover card. The member's own board says nothing — everything
-    // on it is theirs.
+    // And whether they already have one: a glyph on the socket, the marks
+    // under the hover card — owned, on the Dex, or new to them. The member's
+    // own board says nothing, since everything on it is theirs.
     const dexStatus =
       board === "shelf" ? dexStatusOfGear(dexStatusOf, piece) : undefined;
 

@@ -49,6 +49,7 @@ import type {
 } from "../types/arsenal.types";
 import type { BoardGeometry } from "../utils/pedalboardLayout";
 import { geometryOf, inChainOrder } from "../utils/pedalboardLayout";
+import type { BoardLevel } from "./boardDuplicates";
 import { EFFECT_DEFINITIONS, EFFECTS_BY_ID } from "./effectDefinitions";
 import { poweredPredicateOf } from "./powerSupply";
 
@@ -434,4 +435,49 @@ export const wiredOrder = (
       (stageOf.get(a.itemId) ?? SIGNAL_STAGES.length) -
       (stageOf.get(b.itemId) ?? SIGNAL_STAGES.length),
   );
+};
+
+/** What one stage of the chain is worth, once the board's pedals are priced. */
+export interface StageLevel {
+  /** Levels the pedals of this kind add to the rig, after the duplicate rule. */
+  level: number;
+  /** How many pedals of that kind are in service. */
+  count: number;
+  /** Levels this stage gave up to a second copy of one pedal. */
+  penalty: number;
+}
+
+/**
+ * The chain priced stage by stage: what the rig's overdrive is worth, its
+ * delay, its reverb.
+ *
+ * The strip used to answer only "do I own one of these?", which is the right
+ * question for a player with three pedals and the wrong one for a player with
+ * thirty — by then the gap is not an empty stage but a stage held by the worst
+ * pedal in the rig. A level next to each kind turns the same row into the
+ * answer to "which of these is the weak one?".
+ *
+ * Counted levels, not raw ones: these are the numbers `getRigLevel` adds up, so
+ * the strip sums to the Rig Level on the sheet above it rather than to a
+ * flattering number that appears nowhere else. `penalty` is what the stage lost
+ * on the way, so a stage can say why it reads low.
+ */
+export const readStageLevels = (
+  verdict: ChainVerdict,
+  board: BoardLevel,
+): Map<number, StageLevel> => {
+  const byStage = new Map<number, StageLevel>();
+  for (const node of verdict.nodes) {
+    // A pedal of a kind the chain has no stage for is in nobody's column.
+    if (node.stage < 0) continue;
+    const copy = board.copies.get(node.itemId);
+    if (!copy) continue;
+    const at = byStage.get(node.stage) ?? { level: 0, count: 0, penalty: 0 };
+    byStage.set(node.stage, {
+      level: at.level + copy.counted,
+      count: at.count + 1,
+      penalty: at.penalty + (copy.level - copy.counted),
+    });
+  }
+  return byStage;
 };

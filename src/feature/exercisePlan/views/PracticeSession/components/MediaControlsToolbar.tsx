@@ -163,7 +163,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               <RippleButton
                 onClick={onAudioToggle}
                 disabled={isRiddleMode}
-                title={isAudioMuted ? "Backing track off" : "Backing track on"}
+                title={isAudioMuted ? "Guitar off" : "Guitar on"}
                 className={cn(
                   gridBtn,
                   !showSpeedBtn && "col-span-2",
@@ -174,7 +174,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 )}>
                 <GiGuitar className='shrink-0 text-lg' />
                 <span className='truncate text-[10px] font-semibold tracking-wide'>
-                  Backing
+                  Guitar
                 </span>
               </RippleButton>
             )}
@@ -323,7 +323,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             <RippleButton
               onClick={onAudioToggle}
               disabled={isRiddleMode}
-              title={isAudioMuted ? "Backing track off" : "Backing track on"}
+              title={isAudioMuted ? "Guitar off" : "Guitar on"}
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90",
                 isAudioMuted
@@ -483,7 +483,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 </RippleButton>
               </TooltipTrigger>
               <TooltipContent side='bottom'>
-                {isAudioMuted ? "Backing track off" : "Backing track on"}
+                {isAudioMuted ? "Guitar off" : "Guitar on"}
               </TooltipContent>
             </Tooltip>
           )}

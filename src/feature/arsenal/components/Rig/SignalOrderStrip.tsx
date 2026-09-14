@@ -1,29 +1,52 @@
 import { cn } from "assets/lib/utils";
 import { ChevronRight } from "lucide-react";
 
+import type { BoardLevel } from "../../data/boardDuplicates";
 import {
   type ChainVerdict,
   PLAYABLE_SIGNAL_STAGES,
+  readStageLevels,
   SIGNAL_STAGES,
+  type StageLevel,
 } from "../../data/signalChain";
 
 /**
  * The chain as the craft lays it out: every kind of pedal in the order the
- * signal should meet them, and which of those kinds this rig runs.
+ * signal should meet them, which of those kinds this rig runs, and what each
+ * of them is worth.
  *
  * A lit chip is a stage the board covers, a dim one is a stage the rig has yet
  * to own — so the strip reads as a checklist of what to hunt for next, not as
  * a list of what is already there. A stage on the wrong end of a backwards
  * cable turns amber, which is how the strip points at the pedal the "Wire it
  * up" button is about to move. Why each stage sits where it does is on hover.
+ *
+ * The level beside each filled stage is the second question the strip answers.
+ * "Do I own a delay?" runs out as a useful question early; "which of these
+ * eleven is the one holding my rig back?" never does, and it is the same row
+ * of chips either way. Levels are the counted ones (`readStageLevels`), so
+ * they add up to the Rig Level on the sheet above rather than to a number that
+ * appears nowhere else.
  */
+
+/** The one line the tooltip adds under the stage's reason for being here. */
+const describeStageLevel = (at: StageLevel | undefined): string => {
+  if (!at) return "Nothing of this kind is in service.";
+  const pedals = at.count === 1 ? "1 pedal" : `${at.count} pedals`;
+  const lost =
+    at.penalty > 0 ? ` (${at.penalty} lost to a duplicate copy)` : "";
+  return `${pedals} in service, worth Lv ${at.level} of your Rig Level${lost}.`;
+};
 
 interface SignalOrderStripProps {
   verdict: ChainVerdict;
+  /** The same priced board the duplicate readouts use. */
+  board: BoardLevel;
 }
 
-export const SignalOrderStrip = ({ verdict }: SignalOrderStripProps) => {
+export const SignalOrderStrip = ({ verdict, board }: SignalOrderStripProps) => {
   const filled = new Set(verdict.filledStages);
+  const levels = readStageLevels(verdict, board);
 
   // A stage is at fault when a pedal of that kind sits on either end of a
   // cable that runs backwards.
@@ -51,6 +74,7 @@ export const SignalOrderStrip = ({ verdict }: SignalOrderStripProps) => {
           const stageIndex = SIGNAL_STAGES.indexOf(stage);
           const has = filled.has(stageIndex);
           const wrong = has && faulted.has(stageIndex);
+          const at = levels.get(stageIndex);
           return (
             <span key={stage.id} className='flex shrink-0 items-center gap-1.5'>
               {index > 0 && (
@@ -61,7 +85,7 @@ export const SignalOrderStrip = ({ verdict }: SignalOrderStripProps) => {
                 />
               )}
               <span
-                title={stage.why}
+                title={`${stage.why}\n\n${describeStageLevel(at)}`}
                 className={cn(
                   "flex cursor-default items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
                   wrong
@@ -71,6 +95,18 @@ export const SignalOrderStrip = ({ verdict }: SignalOrderStripProps) => {
                       : "text-arsenal-text-tertiary",
                 )}>
                 {stage.label}
+                {/* An empty stage carries no number at all: a "0" beside ten
+                    real levels reads as a pedal worth nothing rather than as a
+                    pedal the rig has never owned. */}
+                {at && (
+                  <span
+                    className={cn(
+                      "font-mono text-[11px] font-semibold tabular-nums",
+                      wrong ? "text-amber-200/80" : "text-zinc-400",
+                    )}>
+                    {at.level}
+                  </span>
+                )}
                 <span
                   aria-hidden
                   className={cn(

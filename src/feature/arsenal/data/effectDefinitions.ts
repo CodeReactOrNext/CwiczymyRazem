@@ -100,8 +100,6 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     type: "Overdrive",
     imageId: 4,
     rarity: "Epic",
-    // The Friedman-edition Amber Forge: same circuit, black enclosure.
-    variantOf: 3,
   },
   {
     id: 5,
@@ -110,7 +108,6 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     type: "Overdrive",
     imageId: 5,
     rarity: "Uncommon",
-    variantOf: 3,
   },
   {
     id: 6,
@@ -291,8 +288,6 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     rarity: "Legendary",
     jacks: TOP_JACKS.astral,
     draw: 300,
-    // Green and ember finishes of the Astral Reverberator above.
-    variantOf: 14,
   },
   {
     id: 25,
@@ -303,7 +298,6 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     rarity: "Legendary",
     jacks: TOP_JACKS.astral,
     draw: 300,
-    variantOf: 14,
   },
   {
     id: 26,

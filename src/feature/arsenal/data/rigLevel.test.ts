@@ -19,7 +19,7 @@ const GUITAR = GUITAR_DEFINITIONS[0];
  * Five different models — a second copy of one model is scored by the duplicate
  * rule (`boardDuplicates.test`), and these tests are about the brick, not that.
  */
-const EFFECTS = EFFECT_DEFINITIONS.filter((def) => !def.variantOf).slice(0, 5);
+const EFFECTS = EFFECT_DEFINITIONS.slice(0, 5);
 
 const guitar: InventoryItem = {
   id: "g1",

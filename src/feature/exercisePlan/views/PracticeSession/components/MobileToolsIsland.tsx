@@ -158,11 +158,11 @@ export const MobileToolsIsland = ({
               disabled={isRiddleMode}
               aria-label={
                 isAudioMuted
-                  ? "Turn backing track on"
-                  : "Turn backing track off"
+                  ? "Turn guitar on"
+                  : "Turn guitar off"
               }
               aria-pressed={!isAudioMuted}
-              title={isAudioMuted ? "Backing track off" : "Backing track on"}
+              title={isAudioMuted ? "Guitar off" : "Guitar on"}
               className={cn(
                 btn,
                 isAudioMuted ? idle : "bg-cyan-500/10 text-cyan-400",

@@ -42,6 +42,10 @@ interface ExerciseContentAreaProps {
   trackConfigs?: Record<string, { volume: number; isMuted: boolean }>;
   /** Dynamic backing-track ids, used to map `trackConfigs` onto the score's tracks — MUST be memoized by the caller. */
   backingTrackIds?: string[];
+  /** Keep the strumming pattern silent even when the guitar is on — set while the
+   *  mobile session modal owns the screen and this (hidden) copy would be a second
+   *  strum synth playing the same pattern a frame apart. */
+  silenceStrumSynth?: boolean;
 
   // Tablature
   isMetronomePlaying: boolean;
@@ -116,6 +120,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   masterVolume,
   trackConfigs,
   backingTrackIds,
+  silenceStrumSynth,
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
@@ -324,7 +329,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           countInRemaining={countInRemaining}
           isMicEnabled={isMicEnabled}
           audioContext={audioContext}
-          volume={strumSynthVolume(isAudioMuted, trackConfigs?.main)}
+          volume={silenceStrumSynth ? 0 : strumSynthVolume(isAudioMuted, trackConfigs?.main)}
         />
       ) : currentExercise.songData ? (
         // A song from the routine: its section map when it is practised that

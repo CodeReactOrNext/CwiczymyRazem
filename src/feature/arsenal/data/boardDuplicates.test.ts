@@ -38,7 +38,7 @@ const levelOf = (item: EffectInventoryItem) =>
 const boardOf = (ids: string[]): PedalboardPlacement[] =>
   ids.map((itemId, index) => ({ itemId, xPct: 80 - index * 12, yPct: 10 }));
 
-// Two different overdrive models, and a model with two finishes.
+// Three different pedals, two of them near-namesakes with their own art.
 const TS808 = 2;
 const STELLAR = 6;
 const ASTRAL = 14;
@@ -69,21 +69,14 @@ describe("the share table", () => {
 });
 
 describe("modelOf", () => {
-  it("is the definition's own id unless it is a finish of another", () => {
+  it("is the definition's own id, so every catalogue entry is its own pedal", () => {
     expect(modelOf(EFFECTS_BY_ID.get(ASTRAL)!)).toBe(ASTRAL);
-    expect(modelOf(EFFECTS_BY_ID.get(ASTRAL_VERDANT)!)).toBe(ASTRAL);
+    expect(modelOf(EFFECTS_BY_ID.get(ASTRAL_VERDANT)!)).toBe(ASTRAL_VERDANT);
   });
 
-  it("only ever points at a model that exists", () => {
-    for (const def of EFFECT_DEFINITIONS) {
-      if (def.variantOf === undefined) continue;
-      const base = EFFECTS_BY_ID.get(def.variantOf);
-      expect(base, `${def.name} is a finish of a missing id`).toBeDefined();
-      // A finish is the same pedal, so it belongs to the same stage.
-      expect(base!.type).toBe(def.type);
-      // …and a base is never itself a finish of something else.
-      expect(base!.variantOf).toBeUndefined();
-    }
+  it("tells every pedal in the catalogue apart", () => {
+    const models = new Set(EFFECT_DEFINITIONS.map(modelOf));
+    expect(models.size).toBe(EFFECT_DEFINITIONS.length);
   });
 });
 
@@ -163,13 +156,12 @@ describe("readBoardLevel", () => {
     expect(withTwin.level).toBeLessThan(alone.level + levelOf(stash[1]));
   });
 
-  it("treats two finishes of one pedal as the same model", () => {
+  it("treats two near-namesakes with their own art as different pedals", () => {
     const stash = [pedal("green", ASTRAL_VERDANT), pedal("plain", ASTRAL)];
     const board = readBoardLevel(boardOf(["green", "plain"]), stash);
-    expect(board.duplicates).toHaveLength(1);
-    // The group is named after the base model, whichever finish is the better copy.
-    expect(board.duplicates[0].name).toBe("Astral Reverberator");
-    expect(board.penalty).toBeGreaterThan(0);
+    expect(board.duplicates).toEqual([]);
+    expect(board.penalty).toBe(0);
+    expect(board.level).toBe(board.fullLevel);
   });
 
   it("treats a promoted copy as the same model, and as the better one", () => {
@@ -252,5 +244,39 @@ describe("describeDuplicateCopy", () => {
     expect(describeDuplicateCopy(third, "TS-808 Overdrive")).toContain(
       "third TS-808 Overdrive on the board — it adds nothing",
     );
+  });
+
+  it("tells the best copy it is the one to keep, not the one costing levels", () => {
+    const stash = [pedal("a", TS808), pedal("b", TS808)];
+    const board = readBoardLevel(boardOf(["a", "b"]), stash);
+    const best = board.copies.get("a")!;
+
+    const line = describeDuplicateCopy(best, "TS-808 Overdrive");
+    expect(line).toContain("2 copies of TS-808 Overdrive");
+    expect(line).toContain("counts in full");
+  });
+});
+
+describe("what marks a copy", () => {
+  it("carries the model and the size of its group on every copy", () => {
+    const stash = [pedal("a", TS808), pedal("b", TS808), pedal("c", STELLAR)];
+    const board = readBoardLevel(boardOf(["a", "b", "c"]), stash);
+
+    expect(board.copies.get("a")).toMatchObject({ model: TS808, total: 2 });
+    expect(board.copies.get("b")).toMatchObject({ model: TS808, total: 2 });
+    // A pedal standing alone is its own group of one, so nothing marks it.
+    expect(board.copies.get("c")).toMatchObject({ model: STELLAR, total: 1 });
+  });
+
+  it("counts only the powered copies towards the group", () => {
+    const stash = [pedal("a", TS808), pedal("b", TS808)];
+    const board = readBoardLevel(
+      boardOf(["a", "b"]),
+      stash,
+      (itemId) => itemId === "a",
+    );
+
+    expect(board.copies.get("a")).toMatchObject({ total: 1 });
+    expect(board.copies.has("b")).toBe(false);
   });
 });
