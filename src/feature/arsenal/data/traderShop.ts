@@ -162,7 +162,21 @@ export const MOD_ROLL_PREMIUM = 0.6;
  * around.
  */
 const SCREW_STOCK = 40;
-const STANDARD_STOCKS = [8, 6];
+/**
+ * Five Standard slots against two Epic ones.
+ *
+ * Standard is the tier every bill opens with and the tier `fusion.ts` eats five
+ * at a time, and two draws out of eight stockable parts left the shelf silent on
+ * most of the roster on most days — a player one Standard neck short of a build
+ * could go a week without the counter ever offering necks. Five still leaves
+ * three parts undrawn, so the stock turns over instead of becoming the same
+ * shelf every morning.
+ *
+ * The stocks taper because the slots do: the first two are the day's headline
+ * pieces, the three behind them are there to widen the roster rather than to
+ * deepen the pile.
+ */
+const STANDARD_STOCKS = [8, 6, 6, 5, 5];
 const EPIC_STOCKS = [4, 3];
 /**
  * One piece, not a stack. The slot exists to unstick a build the drop tables have

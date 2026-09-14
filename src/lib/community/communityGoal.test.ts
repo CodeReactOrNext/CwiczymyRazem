@@ -352,7 +352,7 @@ describe("ensureCurrentGoal", () => {
     store.set(`communityGoalBallots/${WEEK}`, {
       tallies: { "technique-hours": 3, "hours-push": 1 },
     });
-    // Ten hours of technique last week; the candidate stretches by 1.5.
+    // Ten hours of technique last week; the candidate stretches by 1.2.
     for (let i = 0; i < 10; i++) {
       logLastWeek("u2", i + 1, times(HOUR_MS, { techniqueTime: HOUR_MS }));
     }
@@ -361,7 +361,7 @@ describe("ensureCurrentGoal", () => {
 
     expect(goal.candidateId).toBe("technique-hours");
     expect(goal.metric).toBe("technique");
-    expect(goal.target).toBe(15); // ceil(10 × 1.5)
+    expect(goal.target).toBe(12); // ceil(10 × 1.2)
     expect(store.get(`communityGoals/${WEEK}`)?.baseline).toBe(10);
   });
 
@@ -372,8 +372,8 @@ describe("ensureCurrentGoal", () => {
 
     const goal = await ensureCurrentGoal(NOW);
 
-    // Two supporters at 5 sessions each is under the candidate's own floor.
-    expect(goal.target).toBe(12);
+    // Two supporters at 2.5 sessions each is under the candidate's own floor.
+    expect(goal.target).toBe(6);
     expect(store.get(`communityGoals/${WEEK}`)?.roster).toBe(2);
   });
 
@@ -388,7 +388,7 @@ describe("ensureCurrentGoal", () => {
 
     const goal = await ensureCurrentGoal(NOW);
 
-    expect(goal.target).toBe(8); // ceil(4 × 1.8), not the roster's 60
+    expect(goal.target).toBe(5); // ceil(4 × 1.25), not the roster's 30
   });
 
   it("drops the goal that ran last week off the ballot, even if it won the tally", async () => {
@@ -563,7 +563,7 @@ describe("readState", () => {
 
   it("prices every option with a real number rather than an ellipsis", async () => {
     seedGoal(10);
-    // Six hours of ear training last week, so the option quotes ceil(6 × 1.5).
+    // Six hours of ear training last week, so the option quotes ceil(6 × 1.2).
     for (let i = 0; i < 6; i++) {
       logLastWeek("u2", i + 1, times(HOUR_MS, { hearingTime: HOUR_MS }));
     }
@@ -573,8 +573,8 @@ describe("readState", () => {
       (option) => option.candidateId === "hearing-hours",
     )!;
 
-    expect(hearing.target).toBe(9);
-    expect(hearing.label).toBe("Put in 9 hours of ear training together");
+    expect(hearing.target).toBe(8);
+    expect(hearing.label).toBe("Put in 8 hours of ear training together");
     expect(hearing.unit).toBe("hours of ear training");
     expect(state.ballot.options.every((option) => option.target > 0)).toBe(
       true,
@@ -594,6 +594,6 @@ describe("readState", () => {
 
     // The sessions option is the one that just ran, so depth is what shows the
     // effect: eight hours logged this week against one last week.
-    expect(hours.target).toBe(Math.ceil(8 * 1.35)); // 11, not 2
+    expect(hours.target).toBe(Math.ceil(8 * 1.15)); // 10, not 2
   });
 });

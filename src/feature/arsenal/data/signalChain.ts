@@ -70,8 +70,19 @@ export const CHAIN_FLAWLESS_MIN_PEDALS = 3;
  * modulation, time and everything between, all in service together. Set
  * above the flawless bonus: getting the order right is a rule, owning one of
  * every kind is a collection.
+ *
+ * Raised from 10, and the gap it had to clear is the point. Flawless is a free
+ * bonus — the pedals are already owned, they just have to stand in the right
+ * places — while complete is the only chain bonus that cannot be reached by
+ * rearranging anything. It wants one of every kind of pedal in the game,
+ * powered, on a board with room for all of them: on the starter case that is
+ * every slot filled and a brick two rungs up the ladder. At 10 that whole hunt
+ * paid less than five cables, so the board that took months to assemble read
+ * the same as the board that got lucky. At 50 it is worth about as much as the
+ * rest of a full chain put together, which is the weight a collection-completing
+ * goal should carry.
  */
-export const CHAIN_COMPLETE_FAME = 10;
+export const CHAIN_COMPLETE_FAME = 50;
 
 export interface SignalStage {
   id: string;
@@ -180,10 +191,11 @@ export const stageIndexOf = (type: EffectType): number =>
  * The stages a player can actually fill today, derived from the pedals that
  * exist in the game rather than hand-listed.
  *
- * Three stages have no pedal behind them yet (there is no Wah, Compressor or
- * Distortion in any case), and a ladder inviting the player to hunt for one
- * would be a promise the drop tables cannot keep. Ship those pedals and they
- * appear here on their own.
+ * One stage has no pedal behind it yet (there is no Wah in any case), and a
+ * ladder inviting the player to hunt for one would be a promise the drop tables
+ * cannot keep. Ship that pedal and it appears here on its own — and note that
+ * it also makes the complete bonus one stage harder to hold, which is the
+ * intended shape: a new kind of pedal is a new thing to go and find.
  */
 export const PLAYABLE_SIGNAL_STAGES: readonly SignalStage[] =
   SIGNAL_STAGES.filter((stage) =>

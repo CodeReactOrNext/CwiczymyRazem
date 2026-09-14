@@ -83,10 +83,11 @@ export const perSupporterLine = (
  * neither trivial nor impossible, and whatever is true today stops being true
  * as the app grows. So each candidate carries a *stretch* over what the
  * supporters actually did last week, plus a size for the weeks with no history
- * at all. The goal is always a clear step up from last time — a third more on
- * the two broad goals, half again on a single practice category, because a
- * target the roster would have cleared by accident is not a challenge anybody
- * would spend a token to pick.
+ * at all. The step is deliberately small — a sixth more on the two broad
+ * goals, a fifth on a single practice category. An earlier pass asked for a
+ * third and half again, and the supporters could not land it: a stretch
+ * compounds, so every week the roster does clear raises the next bar by the
+ * same multiple again, and the run can only ever end by failing one.
  */
 export const GOAL_CANDIDATES: GoalCandidate[] = [
   {
@@ -95,9 +96,9 @@ export const GOAL_CANDIDATES: GoalCandidate[] = [
     label: "Log {target} practice sessions together",
     blurb: "Breadth: every session counts the same, however short.",
     icon: "sessions",
-    stretch: 1.35,
-    perSupporter: 5,
-    floor: 12,
+    stretch: 1.15,
+    perSupporter: 2.5,
+    floor: 6,
   },
   {
     id: "hours-push",
@@ -105,9 +106,9 @@ export const GOAL_CANDIDATES: GoalCandidate[] = [
     label: "Put in {target} hours of practice together",
     blurb: "Depth: long sessions carry the week.",
     icon: "hours",
-    stretch: 1.35,
-    perSupporter: 5,
-    floor: 8,
+    stretch: 1.15,
+    perSupporter: 1.5,
+    floor: 4,
   },
   {
     id: "technique-hours",
@@ -115,9 +116,9 @@ export const GOAL_CANDIDATES: GoalCandidate[] = [
     label: "Put in {target} hours of technique together",
     blurb: "Metronome week — scales, picking, the unglamorous reps.",
     icon: "technique",
-    stretch: 1.5,
-    perSupporter: 2.5,
-    floor: 5,
+    stretch: 1.2,
+    perSupporter: 1,
+    floor: 3,
   },
   {
     id: "hearing-hours",
@@ -125,9 +126,9 @@ export const GOAL_CANDIDATES: GoalCandidate[] = [
     label: "Put in {target} hours of ear training together",
     blurb: "The one everybody means to do and nobody logs.",
     icon: "hearing",
-    stretch: 1.5,
-    perSupporter: 1.5,
-    floor: 4,
+    stretch: 1.2,
+    perSupporter: 0.75,
+    floor: 2,
   },
   {
     id: "theory-hours",
@@ -135,9 +136,9 @@ export const GOAL_CANDIDATES: GoalCandidate[] = [
     label: "Put in {target} hours of theory together",
     blurb: "Names for what your fingers already do — a week at the desk.",
     icon: "theory",
-    stretch: 1.5,
-    perSupporter: 1.5,
-    floor: 4,
+    stretch: 1.2,
+    perSupporter: 0.75,
+    floor: 2,
   },
   {
     id: "creativity-hours",
@@ -145,9 +146,9 @@ export const GOAL_CANDIDATES: GoalCandidate[] = [
     label: "Put in {target} hours of creative playing together",
     blurb: "Improvising, writing, jamming — playing with nothing to hit.",
     icon: "creativity",
-    stretch: 1.5,
-    perSupporter: 1.5,
-    floor: 4,
+    stretch: 1.2,
+    perSupporter: 0.75,
+    floor: 2,
   },
 ];
 
@@ -188,7 +189,7 @@ export const defaultCandidateId = (excludeId?: string | null): string => {
  * Without a cap, a donation drive that doubles the roster sets a target nobody
  * on it can reach — the bar would grow with the money rather than the playing.
  */
-export const MAX_ROSTER_LIFT = 1.8;
+export const MAX_ROSTER_LIFT = 1.25;
 
 /**
  * The number the week asks for.

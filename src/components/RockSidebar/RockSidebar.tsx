@@ -73,7 +73,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaArrowTrendUp, FaDiscord } from "react-icons/fa6";
-import { PiCassetteTapeLight, PiMagicWandDuotone } from "react-icons/pi";
+import {
+  PiCassetteTapeLight,
+  PiMagicWandDuotone,
+  PiTreeView,
+} from "react-icons/pi";
 import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
@@ -247,6 +251,13 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
     name: "Learning Path",
     href: "/journey",
     icon: <Route size={16} />,
+  },
+  {
+    id: "practice-scale-map",
+    name: "Scale Map",
+    href: "/scale-tree",
+    icon: <PiTreeView size={16} />,
+    tooltip: "Unlock scales one branch at a time on the fretboard",
   },
 ];
 
@@ -458,11 +469,12 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/profile/skills")) return "practice";
     if (pathname === "/ai-coach") return "practice";
     if (pathname === "/journey") return "practice";
+    if (pathname.startsWith("/scale-tree")) return "practice";
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
     if (pathname === "/summary") return "progress";
-    if (pathname.startsWith("/challenges")) return "progress";
+    if (pathname.startsWith("/challenges")) return "community";
     if (pathname.startsWith("/leaderboard")) return "community";
     if (pathname.startsWith("/seasons")) return "community";
     if (pathname.startsWith("/guilds")) return "community";
@@ -574,13 +586,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           lockedLvl: lockedAtLvl("summary"),
           showBadge: hasUnclaimedMilestone,
         },
-        {
-          id: "progress-challenges",
-          name: "Challenges",
-          href: "/challenges",
-          icon: <Flame size={16} />,
-          tooltip: "Five community-voted songs to record every month",
-        },
       ] as SidebarSubLink[],
     },
     {
@@ -594,6 +599,13 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           name: "Rankings",
           href: "/seasons",
           icon: <Trophy size={16} />,
+        },
+        {
+          id: "community-challenges",
+          name: "Challenges",
+          href: "/challenges",
+          icon: <Flame size={16} />,
+          tooltip: "Five community-voted songs to record every month",
         },
         {
           id: "community-recordings",

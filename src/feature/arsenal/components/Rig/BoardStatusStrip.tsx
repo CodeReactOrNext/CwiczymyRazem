@@ -3,7 +3,11 @@ import { AlertTriangle, Sparkles } from "lucide-react";
 
 import type { PowerState } from "../../data/powerSupply";
 import type { SupplyTier } from "../../data/rigHardware";
-import { CHAIN_TIERS, type ChainVerdict } from "../../data/signalChain";
+import {
+  CHAIN_COMPLETE_FAME,
+  CHAIN_TIERS,
+  type ChainVerdict,
+} from "../../data/signalChain";
 import { CountUp, Pop } from "../Workshop/workshopMotion";
 
 /**
@@ -102,7 +106,12 @@ export const BoardStatusStrip = ({
               {verdict.complete && (
                 <span className='flex items-center gap-1.5 font-semibold text-emerald-400'>
                   <Sparkles size={13} strokeWidth={2.5} />
+                  {/* The number rides along: the strip names every other part
+                      of the rate, and this is the largest single piece of it. */}
                   Full chain
+                  <span className='tabular-nums text-amber-300'>
+                    +{CHAIN_COMPLETE_FAME}/h
+                  </span>
                 </span>
               )}
             </>

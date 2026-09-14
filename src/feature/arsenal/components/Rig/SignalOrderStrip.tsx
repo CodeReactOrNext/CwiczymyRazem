@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 
 import type { BoardLevel } from "../../data/boardDuplicates";
 import {
+  CHAIN_COMPLETE_FAME,
   type ChainVerdict,
   PLAYABLE_SIGNAL_STAGES,
   readStageLevels,
@@ -47,6 +48,7 @@ interface SignalOrderStripProps {
 export const SignalOrderStrip = ({ verdict, board }: SignalOrderStripProps) => {
   const filled = new Set(verdict.filledStages);
   const levels = readStageLevels(verdict, board);
+  const stagesLeft = PLAYABLE_SIGNAL_STAGES.length - filled.size;
 
   // A stage is at fault when a pedal of that kind sits on either end of a
   // cable that runs backwards.
@@ -63,11 +65,33 @@ export const SignalOrderStrip = ({ verdict, board }: SignalOrderStripProps) => {
         Signal order
       </span>
 
-      {verdict.complete && (
-        <span className='rounded-md bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-300'>
-          Full chain
+      {/* Named whether or not it is being paid. A badge that only appears once
+          the bonus is earned can never teach anybody it is there to earn, and
+          this is the one chain bonus no amount of rearranging can reach — the
+          pedals have to be hunted for. So the dim state carries the number and
+          the distance left to it. */}
+      <span
+        title={
+          verdict.complete
+            ? `Every stage is in service. The board pays ${CHAIN_COMPLETE_FAME} Fame an hour on top of its cables.`
+            : `Cover every stage at once and the board pays ${CHAIN_COMPLETE_FAME} Fame an hour on top of its cables.`
+        }
+        className={cn(
+          "flex shrink-0 cursor-default items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold",
+          verdict.complete
+            ? "bg-emerald-400/10 text-emerald-300"
+            : "bg-arsenal-card text-arsenal-text-tertiary",
+        )}>
+        Full chain
+        <span className='tabular-nums text-amber-300'>
+          +{CHAIN_COMPLETE_FAME}/h
         </span>
-      )}
+        {!verdict.complete && (
+          <span className='font-medium text-arsenal-text-tertiary'>
+            · {stagesLeft} to go
+          </span>
+        )}
+      </span>
 
       <div className='no-scrollbar flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto'>
         {PLAYABLE_SIGNAL_STAGES.map((stage, index) => {

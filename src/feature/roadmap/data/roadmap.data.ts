@@ -179,6 +179,7 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     icon: LayoutDashboard,
     label: "Configurable Dashboard",
     kind: "feature",
+    done: true,
     description: "Pick your own layout, widgets, and shortcuts for the main panel.",
   },
   {

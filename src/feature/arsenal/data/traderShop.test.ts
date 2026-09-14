@@ -105,7 +105,7 @@ describe("trader stock", () => {
     expect(tomorrow).not.toEqual(morning);
   });
 
-  it("always stocks screws, pots, two Standard and two Epic slots", () => {
+  it("always stocks screws, pots, five Standard and two Epic slots", () => {
     for (const offers of windows(120)) {
       const parts = partOffers(offers);
       expect(parts.some((p) => p.partId === "screws")).toBe(true);
@@ -114,7 +114,7 @@ describe("trader stock", () => {
       const structural = parts.filter(
         (p) => p.partId !== "screws" && p.partId !== "pot",
       );
-      expect(structural.filter((p) => p.tier === "Standard")).toHaveLength(2);
+      expect(structural.filter((p) => p.tier === "Standard")).toHaveLength(5);
       expect(structural.filter((p) => p.tier === "Epic")).toHaveLength(2);
     }
   });

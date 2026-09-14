@@ -3,14 +3,20 @@ import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
 import {
   AlertTriangle,
+  Expand,
   LayoutGrid,
+  Minimize2,
   Plug,
   Plus,
+  Shrink,
   Unplug,
   X,
   Zap,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
 import { readBoardLevel } from "../../data/boardDuplicates";
@@ -32,6 +38,18 @@ import type {
   PedalboardPlacement,
   PowerLink,
 } from "../../types/arsenal.types";
+import type { BoardView } from "../../utils/boardZoom";
+import {
+  AT_REST,
+  clampZoom,
+  FIT_ZOOM,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  panForZoom,
+  pinchSpan,
+  settleView,
+  ZOOM_STEP,
+} from "../../utils/boardZoom";
 import type { Point } from "../../utils/cableGeometry";
 import { getEffectImageSrc } from "../../utils/effectImage";
 import type { BoardBox, BoardLayout } from "../../utils/pedalboardLayout";
@@ -52,6 +70,7 @@ import {
   rowIndexOf,
   tidyBoard,
 } from "../../utils/pedalboardLayout";
+import { grabOffsetY, hasLeftTheTap } from "../../utils/pedalDrag";
 import type { RowSpan } from "../../utils/powerLayout";
 import {
   dcJackAt,
@@ -59,10 +78,11 @@ import {
   railFor,
   railPaddingPct,
 } from "../../utils/powerLayout";
+import { CardAction, CardActionRow } from "../CardActions";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
 import { BoardStatusStrip } from "./BoardStatusStrip";
-import { duplicateGlow,DuplicateMark } from "./DuplicateMark";
+import { duplicateGlow, DuplicateMark } from "./DuplicateMark";
 import { DuplicateStrip } from "./DuplicateStrip";
 import { EffectPickerModal } from "./EffectPickerModal";
 import type { PoweredPedal } from "./PowerLoom";
@@ -77,6 +97,11 @@ const NOTICE_MS = 8000;
 
 const BOARD_FULL =
   "The board is full — take a pedal off before adding another.";
+
+/** One key of the zoom control that floats over the case on a touch screen.
+    Thumb-sized, unlit, and out of the way until it is aimed at. */
+const ZOOM_KEY =
+  "flex h-10 w-10 items-center justify-center rounded-lg bg-black/70 text-zinc-200 backdrop-blur-sm transition-colors active:bg-black/90 disabled:opacity-25";
 
 /** Says it twice: a toast you cannot miss, and a line that stays on the board. */
 const announce = (message: string, setNotice: (value: string) => void) => {
@@ -97,6 +122,15 @@ interface DragState {
   lockedId: string | null;
   /** Something has been traded, so letting go is an exchange, not a drop. */
   swapped: boolean;
+  /** The pointer carrying it — a second finger cannot steer the same pedal. */
+  pointerId: number;
+  /** Where the press went down, in viewport pixels. The tap threshold is
+   *  measured from here. */
+  startX: number;
+  startY: number;
+  /** Has the press travelled far enough to be a carry rather than a tap? Until
+   *  it has, nothing on the board has moved and letting go opens the card. */
+  active: boolean;
 }
 
 /**
@@ -121,7 +155,8 @@ interface PedalboardViewProps {
     e: React.MouseEvent | null,
     content: React.ReactNode | null,
   ) => void;
-  /** Touch-only: tapping a pedal opens its card in a modal (drag is disabled when set). */
+  /** Touch-only: tapping a pedal opens its card in a modal, since there is no
+   *  hover to read one with. Dragging works either way. */
   onShowCard?: (content: React.ReactNode) => void;
 }
 
@@ -132,6 +167,9 @@ export const PedalboardView = ({
   onHover,
   onShowCard,
 }: PedalboardViewProps) => {
+  // A screen with no cursor: every control that hides behind a hover has to
+  // stand on its own here, and a card is read by tapping rather than pointing.
+  const isTouch = Boolean(onShowCard);
   const boardRef = useRef<HTMLDivElement>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [dragging, setDraggingState] = useState<DragState | null>(null);
@@ -139,11 +177,39 @@ export const PedalboardView = ({
   // before React re-renders, and the second move has to see the slot the
   // first one traded for.
   const draggingRef = useRef<DragState | null>(null);
+  /** Opens a pedal's card. Written further down, where the actions the card
+   *  carries are defined, and kept fresh by the effect beside them — the same
+   *  arrangement as `patchActionsRef`. */
+  const openSheetRef = useRef<(itemId: string) => void>(() => undefined);
 
   const setDragging = (next: DragState | null) => {
     draggingRef.current = next;
     setDraggingState(next);
   };
+
+  // Where the board is being looked at from. Life size on a desktop and never
+  // anything else there; on a phone it is the difference between a picture of a
+  // pedalboard and one that can be worked on. See `utils/boardZoom`.
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const caseRef = useRef<HTMLDivElement>(null);
+  const [view, setViewState] = useState<BoardView>(AT_REST);
+  const viewRef = useRef<BoardView>(AT_REST);
+  /** Fingers on the deck that are moving the view rather than a pedal. */
+  const viewPointersRef = useRef<Map<number, Point> | null>(null);
+  /** The span the pinch was last measured at, and where a one-finger push was. */
+  const pinchRef = useRef(0);
+  const pushRef = useRef<Point | null>(null);
+
+  const setView = (next: BoardView) => {
+    viewRef.current = next;
+    setViewState(next);
+  };
+
+  /** The board, taken out of the page and given the whole screen. */
+  const [fullscreen, setFullscreen] = useState(false);
+  /** How small the board may be drawn here. Only a full screen has room to
+   *  spare, and only there is "show me all of it" a thing worth asking for. */
+  const zoomFloor = fullscreen ? FIT_ZOOM : MIN_ZOOM;
 
   const [isColliding, setIsColliding] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -446,6 +512,13 @@ export const PedalboardView = ({
     [powerState.links, savePower],
   );
 
+  /** Everything with a cable in the brick — and, on a legacy board, everything. */
+  const hasPower = useCallback(
+    (itemId: string) =>
+      localPower === null || powerState.poweredIds.has(itemId),
+    [localPower, powerState],
+  );
+
   const [patch, setPatchState] = useState<PatchState | null>(null);
   const patchRef = useRef<PatchState | null>(null);
 
@@ -571,10 +644,33 @@ export const PedalboardView = ({
     if (target) plugIn(target.itemId);
   };
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      const drag = draggingRef.current;
+  const handleDragMove = useCallback(
+    (e: PointerEvent) => {
+      let drag = draggingRef.current;
       if (!drag || !boardRef.current) return;
+      if (e.pointerId !== drag.pointerId) return;
+
+      // The press decides here what it was. Below the threshold nothing has
+      // happened yet — on a touch screen the very same press is how a card is
+      // opened, and on a mouse a twitch between click and release should not
+      // rearrange a board.
+      if (!drag.active) {
+        if (
+          !hasLeftTheTap(
+            { x: drag.startX, y: drag.startY },
+            { x: e.clientX, y: e.clientY },
+          )
+        )
+          return;
+        drag = {
+          ...drag,
+          active: true,
+          offYPct: grabOffsetY(e.pointerType, drag.offYPct, geo.pedalHPct),
+        };
+        setDragging(drag);
+        onHover?.(null, null);
+      }
+
       const { itemId } = drag;
       const rect = boardRef.current.getBoundingClientRect();
       const wPct = widthOfRef.current(itemId);
@@ -648,76 +744,107 @@ export const PedalboardView = ({
 
       setLocalItems(next);
     },
-    [boardBoxes, geo],
+    [boardBoxes, geo, onHover],
   );
 
-  const handleMouseUp = useCallback(() => {
-    const drag = draggingRef.current;
-    if (!drag) return;
-    const { itemId, swapped } = drag;
-    const home = { xPct: drag.homeXPct, yPct: drag.homeYPct };
-    setDragging(null);
-    setIsColliding(false);
+  const handleDragEnd = useCallback(
+    (e: PointerEvent) => {
+      const drag = draggingRef.current;
+      if (!drag) return;
+      if (e.pointerId !== drag.pointerId) return;
 
-    const prev = localItemsRef.current;
-    const dropped = prev.find((i) => i.itemId === itemId);
-    const wPct = widthOfRef.current(itemId);
-    const others = boardBoxes(itemId);
-    const settleAt = (spot: { xPct: number; yPct: number }) =>
-      prev.map((item) =>
-        item.itemId === itemId ? { ...item, ...spot } : item,
-      );
-    let next = prev;
+      // A press that never travelled is a tap, and the board is exactly as it
+      // was — so there is nothing to settle and nothing to save. On a touch
+      // screen the tap is what opens the pedal's card, which is also where its
+      // actions live.
+      if (!drag.active) {
+        setDragging(null);
+        if (isTouch) openSheetRef.current(drag.itemId);
+        return;
+      }
 
-    if (dropped) {
-      const box = { xPct: dropped.xPct, yPct: dropped.yPct, wPct };
-      const homeBox = { ...home, wPct };
-      const covered = collidesWithAny(geo, box, others);
-      const homeFree = !collidesWithAny(geo, homeBox, others);
+      const { itemId, swapped } = drag;
+      const home = { xPct: drag.homeXPct, yPct: drag.homeYPct };
+      setDragging(null);
+      setIsColliding(false);
 
-      if (
-        homeFree &&
-        (covered || (swapped && collidesWithAny(geo, box, [homeBox])))
-      ) {
-        // An exchange finishes in the slot it traded for, so the two pedals
-        // really do end up in each other's places instead of near enough.
-        next = settleAt(home);
-      } else if (covered) {
-        // Nowhere of its own to go back to — the pedal came off a stack, or
-        // its slot was taken while it was in the air.
-        const spot = findFreeSpot(geo, others, wPct);
-        if (spot) {
-          next = settleAt(spot);
-        } else {
-          setOverflowIds((ids) =>
-            ids.includes(itemId) ? ids : [...ids, itemId],
-          );
-          announce(BOARD_FULL, setNotice);
+      const prev = localItemsRef.current;
+      const dropped = prev.find((i) => i.itemId === itemId);
+      const wPct = widthOfRef.current(itemId);
+      const others = boardBoxes(itemId);
+      const settleAt = (spot: { xPct: number; yPct: number }) =>
+        prev.map((item) =>
+          item.itemId === itemId ? { ...item, ...spot } : item,
+        );
+      let next = prev;
+
+      if (dropped) {
+        const box = { xPct: dropped.xPct, yPct: dropped.yPct, wPct };
+        const homeBox = { ...home, wPct };
+        const covered = collidesWithAny(geo, box, others);
+        const homeFree = !collidesWithAny(geo, homeBox, others);
+
+        if (
+          homeFree &&
+          (covered || (swapped && collidesWithAny(geo, box, [homeBox])))
+        ) {
+          // An exchange finishes in the slot it traded for, so the two pedals
+          // really do end up in each other's places instead of near enough.
+          next = settleAt(home);
+        } else if (covered) {
+          // Nowhere of its own to go back to — the pedal came off a stack, or
+          // its slot was taken while it was in the air.
+          const spot = findFreeSpot(geo, others, wPct);
+          if (spot) {
+            next = settleAt(spot);
+          } else {
+            setOverflowIds((ids) =>
+              ids.includes(itemId) ? ids : [...ids, itemId],
+            );
+            announce(BOARD_FULL, setNotice);
+          }
         }
       }
-    }
 
-    setLocalItems(next);
-    debouncedSave(next);
-  }, [debouncedSave, boardBoxes, geo]);
+      setLocalItems(next);
+      debouncedSave(next);
+    },
+    [debouncedSave, boardBoxes, geo, isTouch],
+  );
 
   useEffect(() => {
-    if (dragging) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
-      return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
-        window.removeEventListener("mouseup", handleMouseUp);
-      };
-    }
-  }, [dragging, handleMouseMove, handleMouseUp]);
+    if (!dragging) return;
+    // Pointer events, not mouse ones: the same handlers then carry a finger,
+    // and the board becomes something a phone can rearrange.
+    const end = (e: PointerEvent) => handleDragEnd(e);
+    // A cancelled pointer (a call, the browser taking the gesture) is not a
+    // drop and never a tap — the pedal simply stays where it was last drawn.
+    const cancel = (e: PointerEvent) => {
+      const drag = draggingRef.current;
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      if (!drag.active) {
+        setDragging(null);
+        return;
+      }
+      handleDragEnd(e);
+    };
+    window.addEventListener("pointermove", handleDragMove);
+    window.addEventListener("pointerup", end);
+    window.addEventListener("pointercancel", cancel);
+    return () => {
+      window.removeEventListener("pointermove", handleDragMove);
+      window.removeEventListener("pointerup", end);
+      window.removeEventListener("pointercancel", cancel);
+    };
+  }, [dragging, handleDragMove, handleDragEnd]);
 
-  const handlePedalMouseDown = (
-    e: React.MouseEvent,
+  const handlePedalPointerDown = (
+    e: React.PointerEvent,
     item: PedalboardPlacement,
   ) => {
-    // On touch devices we open the card on tap instead of dragging.
-    if (onShowCard) return;
+    // A right-click is not a drag, a second finger does not join one in
+    // progress, and a cable already in the air owns the next press.
+    if (e.button !== 0 || draggingRef.current || patch) return;
     e.preventDefault();
     onHover?.(null, null);
     if (!boardRef.current) return;
@@ -732,7 +859,172 @@ export const PedalboardView = ({
       homeYPct: item.yPct,
       lockedId: null,
       swapped: false,
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      active: false,
     });
+  };
+
+  /* ---------------------------------------------------------- the view ---- */
+
+  const viewPointers = () => (viewPointersRef.current ??= new Map());
+
+  /** The window the case is seen through, and the case at its own size. */
+  const viewFrame = () => {
+    const window = viewportRef.current;
+    const board = caseRef.current;
+    if (!window || !board) return null;
+    return {
+      window: window.getBoundingClientRect(),
+      // Layout size, which a transform never touches — so this stays the board
+      // at life size however far into it the player has zoomed.
+      size: { width: board.offsetWidth, height: board.offsetHeight },
+    };
+  };
+
+  /** Grows or shrinks the board about one point, and settles it in its window. */
+  const zoomAbout = (zoom: number, origin: Point) => {
+    const frame = viewFrame();
+    if (!frame) return;
+    const from = viewRef.current;
+    const to = clampZoom(zoom, zoomFloor);
+    setView(
+      settleView(
+        {
+          zoom: to,
+          x: panForZoom(from.x, origin.x, from.zoom, to),
+          y: panForZoom(from.y, origin.y, from.zoom, to),
+        },
+        frame.window,
+        frame.size,
+      ),
+    );
+  };
+
+  /** The zoom keys. They hold the middle of the window, having no finger to
+   *  hold instead. */
+  const stepZoom = (by: number) => {
+    const frame = viewFrame();
+    if (!frame) return;
+    zoomAbout(viewRef.current.zoom + by, {
+      x: frame.window.width / 2,
+      y: frame.window.height / 2,
+    });
+  };
+
+  const handleViewPointerDown = (e: React.PointerEvent) => {
+    // A press already carrying a pedal or a DC cable is not a press on the
+    // view, and a desktop board never moves at all.
+    if (!isTouch || draggingRef.current || patchRef.current) return;
+    const points = viewPointers();
+    points.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const down = [...points.values()];
+    pinchRef.current = down.length === 2 ? pinchSpan(down[0], down[1]) : 0;
+    pushRef.current = down.length === 1 ? down[0] : null;
+  };
+
+  const handleViewPointerMove = (e: React.PointerEvent) => {
+    const points = viewPointersRef.current;
+    if (!points?.has(e.pointerId)) return;
+    points.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const frame = viewFrame();
+    if (!frame) return;
+    const down = [...points.values()];
+
+    // Two fingers: the board grows and shrinks around whatever is between them.
+    if (down.length >= 2) {
+      const span = pinchSpan(down[0], down[1]);
+      if (pinchRef.current > 0) {
+        zoomAbout(viewRef.current.zoom * (span / pinchRef.current), {
+          x: (down[0].x + down[1].x) / 2 - frame.window.left,
+          y: (down[0].y + down[1].y) / 2 - frame.window.top,
+        });
+      }
+      pinchRef.current = span;
+      pushRef.current = null;
+      return;
+    }
+
+    // One finger pushes the board around under the window — but in the page,
+    // only once there is more board than window, or a swipe meant for the page
+    // would be eaten. Full screen there is no page to scroll past.
+    const from = pushRef.current;
+    if (!from || (!fullscreen && viewRef.current.zoom === MIN_ZOOM)) return;
+    const current = viewRef.current;
+    setView(
+      settleView(
+        {
+          ...current,
+          x: current.x + e.clientX - from.x,
+          y: current.y + e.clientY - from.y,
+        },
+        frame.window,
+        frame.size,
+      ),
+    );
+    pushRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  /**
+   * Opens the board on the whole screen.
+   *
+   * The overlay is the part that matters and the part that always works: the
+   * same board, moved to the top of the document. Everything after it is a
+   * bonus the platform may refuse — iOS puts nothing but video full screen for
+   * real, and not every phone will take an orientation lock — so none of it is
+   * waited on and none of it can fail the gesture. A player whose phone refuses
+   * both can still simply turn it, which is what the overlay is sized for.
+   */
+  const openFullscreen = () => {
+    setFullscreen(true);
+    setView(AT_REST);
+    void document.documentElement
+      .requestFullscreen?.()
+      .then(() => window.screen?.orientation?.lock?.("landscape"))
+      .catch(() => undefined);
+  };
+
+  const closeFullscreen = () => {
+    setFullscreen(false);
+    setView(AT_REST);
+    window.screen?.orientation?.unlock?.();
+    if (document.fullscreenElement) void document.exitFullscreen?.();
+  };
+
+  // Escape gets out, the page underneath holds still, and letting go of the
+  // browser's own full screen (the system gesture, the Escape key it swallows)
+  // puts the board back in the page rather than leaving an overlay behind.
+  useEffect(() => {
+    if (!fullscreen) return undefined;
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeFullscreen();
+    };
+    const changed = () => {
+      if (!document.fullscreenElement) setFullscreen(false);
+    };
+    const scroll = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", key);
+    document.addEventListener("fullscreenchange", changed);
+    return () => {
+      document.body.style.overflow = scroll;
+      window.removeEventListener("keydown", key);
+      document.removeEventListener("fullscreenchange", changed);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fullscreen]);
+
+  const handleViewPointerUp = (e: React.PointerEvent) => {
+    const points = viewPointersRef.current;
+    if (!points) return;
+    points.delete(e.pointerId);
+    const left = [...points.values()];
+    // The finger left behind by a pinch carries on pushing from where it is,
+    // not from where the pinch started.
+    pinchRef.current = left.length === 2 ? pinchSpan(left[0], left[1]) : 0;
+    pushRef.current = left.length === 1 ? left[0] : null;
   };
 
   /**
@@ -767,15 +1059,19 @@ export const PedalboardView = ({
     [geo, rail, widthOf],
   );
 
-  const handleRemove = (itemId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const takeOffBoard = (itemId: string) => {
     const remaining = localItems.filter((i) => i.itemId !== itemId);
     // Taking a pedal off can free the room a parked one was waiting for.
     const next = applyLayout(layoutBoard(geo, remaining, widthOf), remaining);
     const links = powerState.links.filter((link) => link.itemId !== itemId);
     setLocalPower(links);
     debouncedSave(next, links);
+  };
+
+  const handleRemove = (itemId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    takeOffBoard(itemId);
   };
 
   const handlePickerSelect = (inventoryItemId: string | null) => {
@@ -818,11 +1114,12 @@ export const PedalboardView = ({
   /**
    * Lays the whole board out in the order the craft asks for.
    *
-   * It is the only way to reorder the board on a touch device, where dragging is
-   * off — but it earns its place on the desktop too, because watching six pedals
-   * slide into place and the cable go green in one motion is the moment that
-   * teaches the rule. Pedals sharing a stage keep the order the player put them
-   * in; only the ones actually standing in the wrong place move.
+   * One button for what is otherwise six drags — and on a phone, where the deck
+   * is thumb-sized, that is the difference between a board somebody wires and a
+   * board they give up on. Watching the pedals slide into place and the cable go
+   * green in one motion is also the moment that teaches the rule. Pedals sharing
+   * a stage keep the order the player put them in; only the ones actually
+   * standing in the wrong place move.
    */
   const handleWireUp = () => {
     const layout = packInOrder(
@@ -873,16 +1170,65 @@ export const PedalboardView = ({
     return invItem ? <EffectCard item={invItem} readOnly /> : null;
   };
 
+  /**
+   * The card a tap opens on a touch screen, with the pedal's two board actions
+   * along the bottom of it.
+   *
+   * On a desktop those actions live on the pedal itself, appearing under the
+   * cursor. A phone has no cursor, and leaving them out permanently turned the
+   * deck into a wall of buttons with the pedals hidden somewhere behind it — so
+   * the board stays a board, and the actions wait inside the card instead.
+   *
+   * Each one closes the card as it fires, which is also what keeps this snapshot
+   * honest: nothing here outlives the state it was built from.
+   */
+  const sheetFor = (itemId: string) => {
+    const invItem = data.effectInventory.find((e) => e.id === itemId);
+    if (!invItem) return null;
+    const onBoard = !overflowIds.includes(itemId);
+    const powered = hasPower(itemId);
+    const close = () => onShowCard?.(null);
+
+    return (
+      <EffectCard
+        item={invItem}
+        isOnPedalboard={onBoard}
+        footer={
+          <CardActionRow>
+            {onBoard && (
+              <CardAction
+                icon={powered ? Unplug : Plug}
+                onClick={() => {
+                  if (powered) unplug(itemId);
+                  else plugIn(itemId);
+                  close();
+                }}>
+                {powered ? "Unplug" : "Plug in"}
+              </CardAction>
+            )}
+            <CardAction
+              icon={X}
+              onClick={() => {
+                takeOffBoard(itemId);
+                close();
+              }}>
+              Off the board
+            </CardAction>
+          </CardActionRow>
+        }
+      />
+    );
+  };
+
+  // Re-written every render, because everything the card's actions do is read
+  // off the board as it stands right now.
+  useEffect(() => {
+    openSheetRef.current = (itemId: string) => onShowCard?.(sheetFor(itemId));
+  });
+
   const occupiedIds = localItems.map((i) => i.itemId);
   const overflowItems = localItems.filter((i) =>
     overflowIds.includes(i.itemId),
-  );
-
-  /** Everything with a cable in the brick — and, on a legacy board, everything. */
-  const hasPower = useCallback(
-    (itemId: string) =>
-      localPower === null || powerState.poweredIds.has(itemId),
-    [localPower, powerState],
   );
 
   // Scored off the *live* board rather than the saved one, so the panel and the
@@ -1013,6 +1359,525 @@ export const PedalboardView = ({
   const canPatch =
     powerState.outputsFree > 0 && powerState.unpoweredIds.length > 0;
 
+  /**
+   * Whether the board is being drawn through a window rather than simply laid
+   * out in the page: clipped to it, moved under it, scaled inside it.
+   *
+   * Life size in the page is neither — no transform, no clipping, nothing for a
+   * gesture to take hold of — which is what keeps a desktop board exactly the
+   * board it has always been. Full screen is always a window, because a case is
+   * taller than a phone lying on its side even at life size.
+   */
+  const movable = fullscreen || view.zoom !== MIN_ZOOM;
+
+  /**
+   * Everything that rearranges the board, kept in one place because the board
+   * has two headings now: the page's, and the bar that floats over it full
+   * screen. The Fame shop is not in here — buying a case is not something
+   * anybody does mid-wiring, and it stays back on the page.
+   */
+  const boardActions = (
+    <>
+      {verdict.tip !== null && boardItems.length > 1 && (
+        <button
+          onClick={handleWireUp}
+          className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
+          title='Lay the whole board out in the order the craft asks for'>
+          <Zap size={12} strokeWidth={2.5} />
+          Wire it up
+        </button>
+      )}
+      {canPatch && (
+        <button
+          onClick={() =>
+            savePower(autoPatch(rail, boardItems, powerState.links, widthOf))
+          }
+          className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
+          title='Plug in everything the brick still has a hole for'>
+          <Plug size={12} strokeWidth={2.5} />
+          Patch power
+        </button>
+      )}
+      {boardItems.length > 1 && (
+        <button
+          onClick={handleTidy}
+          className={RIG_BUTTON}
+          title='Line every pedal up in rows'>
+          <LayoutGrid size={12} strokeWidth={2.5} />
+          Tidy up
+        </button>
+      )}
+      <button
+        onClick={() => setShowPicker(true)}
+        className={RIG_BUTTON_PRIMARY}>
+        <Plus size={12} strokeWidth={2.5} />
+        Add pedal
+      </button>
+    </>
+  );
+
+  /**
+   * The board itself: the window, the case inside it, and the keys that resize
+   * it. Written once and rendered in one of two places — in the page, or at the
+   * top of the document with the screen to itself. Moving it is a move, not a
+   * rebuild: the component never unmounts, so the board comes back from full
+   * screen wired exactly as it was left.
+   */
+  // The outer element is the window the case is seen through. Laid out in the
+  // page at life size it is not a window at all — nothing clipped, nothing
+  // moved, no transform — so a desktop board is exactly the board it has always
+  // been. Full screen it is the screen.
+  const stage = (
+    <div
+      ref={viewportRef}
+      className={cn("relative w-full", fullscreen && "h-full")}
+      style={{
+        overflow: movable ? "hidden" : "visible",
+        // Once the board can move, every gesture on the deck belongs to it.
+        // Sitting still in the page the page still scrolls through it,
+        // because the board is then just one more thing on a long page.
+        touchAction: isTouch ? (movable ? "none" : "pan-y") : undefined,
+      }}
+      onPointerDown={handleViewPointerDown}
+      onPointerMove={handleViewPointerMove}
+      onPointerUp={handleViewPointerUp}
+      onPointerCancel={handleViewPointerUp}>
+      <div
+        ref={caseRef}
+        style={
+          movable
+            ? {
+                transform: `translate(${view.x}px, ${view.y}px) scale(${view.zoom})`,
+                transformOrigin: "0 0",
+              }
+            : undefined
+        }>
+        {/* Case outer shell */}
+        <div
+          className='relative w-full select-none'
+          style={{
+            background:
+              "linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 50%, #222 100%)",
+            borderRadius: 4,
+            padding: "10px 14px 14px",
+            boxShadow:
+              "0 20px 60px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)",
+            border: "2px solid #383838",
+          }}>
+          {/* Top bar: latches + label */}
+          <div className='mb-2.5 flex items-center justify-between px-1'>
+            <div className='flex gap-2'>
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: 32,
+                    height: 11,
+                    background:
+                      "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)",
+                    borderRadius: 4,
+                    boxShadow:
+                      "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
+                  }}
+                />
+              ))}
+            </div>
+            <div className='flex gap-2'>
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: 32,
+                    height: 11,
+                    background:
+                      "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)",
+                    borderRadius: 4,
+                    boxShadow:
+                      "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* The supply, racked on the case above the deck. Its cables carry on
+            into the board below — see `PowerLoom` for the seam. */}
+          <div
+            className='relative w-full'
+            style={{ paddingTop: `${railPaddingPct(geo)}%` }}>
+            <PowerRail
+              rail={rail}
+              used={new Set(patched.map((pedal) => pedal.out))}
+              pending={
+                patch && !patch.armed ? (patchSocket?.index ?? null) : null
+              }
+            />
+            {/* The brick is the grab handle: a cable is dragged out of it and
+              dropped on the pedal it feeds. */}
+            <div
+              onPointerDown={handleBrickPointerDown}
+              title={`${supply.name} — drag a cable onto a pedal to power it`}
+              className='absolute'
+              style={{
+                left: `${(rail.brick.x / geo.viewW) * 100}%`,
+                width: `${(rail.brick.w / geo.viewW) * 100}%`,
+                top: `${(rail.brick.y / RAIL_H) * 100}%`,
+                height: `${(rail.brick.h / RAIL_H) * 100}%`,
+                cursor: patch ? "grabbing" : "grab",
+                touchAction: "none",
+              }}
+            />
+          </div>
+
+          {/* Board surface — perforated */}
+          <div
+            ref={boardRef}
+            className='relative w-full overflow-hidden'
+            style={{
+              aspectRatio: `${geo.w} / ${geo.h}`,
+              borderRadius: 4,
+              backgroundImage:
+                "radial-gradient(circle, #272727 1.4px, transparent 1.4px)",
+              backgroundSize: "9px 9px",
+              backgroundColor: "#141414",
+              // A board wired by the book washes emerald from the inside. It is the
+              // one piece of feedback that needs no reading at all.
+              boxShadow: verdict.flawless
+                ? "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(52,211,153,0.10), inset 0 0 44px rgba(16,185,129,0.11)"
+                : "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.02)",
+              transition: "box-shadow 0.4s ease",
+              cursor: dragging?.active ? "grabbing" : "default",
+            }}>
+            {/* Power first, under everything, the way it is on a real board. The
+              cable in the air picks up where the rail's stub left off, at the
+              deck's own top edge. */}
+            <PowerLoom
+              rail={rail}
+              patched={patched}
+              rowSpans={rowSpans}
+              dragging={
+                patch && !patch.armed && patchSocket
+                  ? {
+                      from: { x: patchSocket.x, y: 0 },
+                      to: patch.to,
+                      allowed: patchAllowed,
+                    }
+                  : null
+              }
+            />
+
+            {/* An armed brick waits for one tap anywhere: on a pedal it patches
+              it, anywhere else it puts the cable away. Touch has no hover to
+              drag with, and this is what it gets instead. */}
+            {patch?.armed && (
+              <div
+                onPointerDown={handleArmedTap}
+                className='absolute inset-0 z-[60]'
+                style={{ touchAction: "none" }}
+              />
+            )}
+
+            <SignalCable
+              geo={geo}
+              verdict={verdict}
+              widthOf={widthOf}
+              jacksOf={jacksOf}
+              isOnBoard={isOnBoard}
+            />
+
+            {/* Pedals */}
+            {boardItems.map((placement) => {
+              const invItem = data.effectInventory.find(
+                (e) => e.id === placement.itemId,
+              );
+              const effect = invItem
+                ? EFFECTS_BY_ID.get(invItem.effectId)
+                : null;
+              const rs = effect
+                ? RARITY_STYLES[
+                    getEffectiveRarity(effect.rarity, invItem?.buildLevel)
+                  ]
+                : null;
+              if (!effect || !rs) return null;
+              // Only once the press has become a carry: a tap that opens a card
+              // should not make the pedal jump off the deck and back again.
+              const isDragging =
+                dragging?.active === true &&
+                dragging.itemId === placement.itemId;
+              const showCollision = isDragging && isColliding;
+              const wPct = widthOf(placement.itemId);
+              const powered = hasPower(placement.itemId);
+              // Every copy of a pedal that stands here more than once wears a
+              // mark — the count on the one that keeps its levels, the share on
+              // the ones that lose them — so the player can see which copy to
+              // swap out without opening a card. See `DuplicateMark`.
+              const copy = boardLevel.copies.get(placement.itemId);
+              const dupModel = copy && copy.total > 1 ? copy.model : null;
+              const dupActive =
+                dupModel !== null && hoverDuplicate === dupModel;
+              const dupGlow = duplicateGlow(copy, dupActive);
+              // The pedal the loose end of a cable is currently over. Amber when
+              // the brick can carry it, red when the drop would be refused — so
+              // the answer arrives before the cable is let go, not after.
+              const aimedAt = patchTarget?.itemId === placement.itemId;
+
+              return (
+                <div
+                  key={placement.itemId}
+                  onPointerDown={(e) => handlePedalPointerDown(e, placement)}
+                  onMouseEnter={() => setHoverDuplicate(dupModel)}
+                  onMouseMove={(e) => {
+                    if (!dragging && invItem)
+                      onHover?.(e, <EffectCard item={invItem} readOnly />);
+                  }}
+                  onMouseLeave={() => {
+                    setHoverDuplicate(null);
+                    onHover?.(null, null);
+                  }}
+                  className='group absolute'
+                  style={{
+                    left: `${placement.xPct}%`,
+                    top: `${placement.yPct}%`,
+                    width: `${wPct}%`,
+                    height: `${geo.pedalHPct}%`,
+                    zIndex: isDragging ? 50 : 2,
+                    cursor: isDragging ? "grabbing" : "grab",
+                    // The pointer drives the drag, so the browser must not take
+                    // the gesture for a scroll — or for a long-press on artwork,
+                    // which is what a phone would otherwise offer to save.
+                    touchAction: "none",
+                    WebkitTouchCallout: "none",
+                    filter: showCollision
+                      ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 16px rgba(220,38,38,0.9))`
+                      : isDragging
+                        ? `drop-shadow(0 18px 32px rgba(0,0,0,0.98)) drop-shadow(0 0 14px ${rs.baseColor}70)`
+                        : aimedAt
+                          ? `drop-shadow(0 0 14px ${
+                              patchAllowed
+                                ? "rgba(245,158,11,0.85)"
+                                : "rgba(248,113,113,0.85)"
+                            })`
+                          : // An unpowered pedal is off. Not dimmed to say "you
+                            // cannot have this" — dimmed because there is no
+                            // current in it. A powered one may still be lit as
+                            // one of several copies of the same pedal.
+                            powered
+                            ? (dupGlow ?? "none")
+                            : "grayscale(0.7) brightness(0.55)",
+                    transform: isDragging
+                      ? "scale(1.07) translateY(-6px)"
+                      : "scale(1)",
+                    // A pedal being traded with slides into its new place, so the
+                    // exchange is something the player watches happen rather than
+                    // a jump they have to work out afterwards.
+                    transition: isDragging
+                      ? "none"
+                      : "left 0.18s ease, top 0.18s ease, filter 0.15s, transform 0.15s",
+                  }}>
+                  <img
+                    src={getEffectImageSrc(effect.imageId, "full")}
+                    alt={effect.name}
+                    className='h-full w-full object-contain'
+                    draggable={false}
+                    onLoad={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.naturalWidth || !img.naturalHeight) return;
+                      const ar = img.naturalWidth / img.naturalHeight;
+                      const known =
+                        EFFECT_IMAGE_ASPECT[effect.imageId] ?? DEFAULT_ASPECT;
+                      // Only worth remembering when the image is not what the
+                      // layout table already assumes.
+                      if (Math.abs(known - ar) < 0.005) return;
+                      setAspectById((prev) =>
+                        prev[effect.imageId] === ar
+                          ? prev
+                          : { ...prev, [effect.imageId]: ar },
+                      );
+                    }}
+                  />
+                  {copy && (
+                    <DuplicateMark
+                      copy={copy}
+                      name={effect.name}
+                      active={dupActive}
+                    />
+                  )}
+                  {/* The plug in its inlet, over the artwork rather than under
+                    it, so it can sit down in a socket drawn on the top face. */}
+                  {patchedIds.has(placement.itemId) && (
+                    <PedalDcPlug
+                      dc={dcOf(placement.itemId)}
+                      widthUnits={(wPct / 100) * geo.viewW}
+                    />
+                  )}
+                  {/* The two controls a pedal carries live under the cursor and
+                    nowhere else. A touch screen has no cursor to hide them
+                    under, and leaving them out permanently buries the board
+                    under its own buttons — so there they move into the card a
+                    tap opens. See `sheetFor`. */}
+                  {!isTouch && (
+                    <>
+                      {/* Pull the DC cable out. It stands over the pedal's own
+                        inlet, so it reads as the plug it removes rather than as
+                        another button in the corner — and it is a whole control
+                        wide, which the drawn plug never could be. */}
+                      {powered && (
+                        <button
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            unplug(placement.itemId);
+                          }}
+                          aria-label={`Unplug ${effect.name}`}
+                          title={`Unplug ${effect.name}`}
+                          className='absolute z-10 flex h-[30px] w-[30px] -translate-x-1/2 items-center justify-center rounded-full bg-black/85 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-amber-300'
+                          style={{
+                            left: `${dcOf(placement.itemId).x * 100}%`,
+                            // Straddling the edge rather than floating clear of
+                            // it: a narrow board leaves only a few pixels of
+                            // margin above the top row, and the deck clips
+                            // whatever spills out.
+                            top: -11,
+                          }}>
+                          <Unplug size={15} strokeWidth={2.5} />
+                        </button>
+                      )}
+                      {/* Take it off the board */}
+                      <button
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => handleRemove(placement.itemId, e)}
+                        aria-label={`Take ${effect.name} off the board`}
+                        className='absolute -right-1.5 -top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded border border-zinc-500 bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:border-zinc-300 hover:text-white'>
+                        <X size={8} />
+                      </button>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom: handles + rubber feet */}
+          <div className='mt-2.5 flex items-center justify-between px-3'>
+            <div
+              style={{
+                width: 52,
+                height: 9,
+                background: "linear-gradient(180deg,#555,#2a2a2a)",
+                borderRadius: 4,
+                boxShadow:
+                  "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)",
+              }}
+            />
+            <div className='flex gap-6'>
+              {[0, 1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: 11,
+                    height: 11,
+                    borderRadius: 4,
+                    background:
+                      "radial-gradient(circle at 35% 35%,#3a3a3a,#0a0a0a)",
+                    boxShadow:
+                      "0 3px 5px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05)",
+                  }}
+                />
+              ))}
+            </div>
+            <div
+              style={{
+                width: 52,
+                height: 9,
+                background: "linear-gradient(180deg,#555,#2a2a2a)",
+                borderRadius: 4,
+                boxShadow:
+                  "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)",
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* The zoom keys, floating over the case rather than riding in the
+            heading: they belong to the board they resize, and a thumb finds
+            them without leaving it. Pinching does the same thing — this is for
+            everybody who has no reason to guess that. */}
+      {isTouch && (
+        <div
+          className='absolute bottom-3 right-3 z-40 flex flex-col gap-1.5'
+          onPointerDown={(e) => e.stopPropagation()}>
+          <button
+            onClick={() => stepZoom(ZOOM_STEP)}
+            disabled={view.zoom >= MAX_ZOOM}
+            aria-label='Zoom in'
+            className={ZOOM_KEY}>
+            <ZoomIn size={17} strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => stepZoom(-ZOOM_STEP)}
+            disabled={view.zoom <= zoomFloor}
+            aria-label='Zoom out'
+            className={ZOOM_KEY}>
+            <ZoomOut size={17} strokeWidth={2.5} />
+          </button>
+          {view.zoom !== MIN_ZOOM && (
+            <button
+              onClick={() => setView(AT_REST)}
+              aria-label='Fit the whole board'
+              className={ZOOM_KEY}>
+              <Minimize2 size={16} strokeWidth={2.5} />
+            </button>
+          )}
+          {/* Zooming into a phone-sized column only goes so far. This is the
+                other half of the answer: the whole screen, and a board that is
+                worth turning the phone sideways for. */}
+          {!fullscreen && (
+            <button
+              onClick={openFullscreen}
+              aria-label='Open the board full screen'
+              className={ZOOM_KEY}>
+              <Expand size={17} strokeWidth={2.5} />
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  /** The same board with the screen to itself, and the controls that belong to
+   *  a board nobody can see the page behind. */
+  const fullscreenStage = (
+    <div className='fixed inset-0 z-[9998] flex flex-col bg-zinc-950'>
+      {/* One slim bar, floating over the deck rather than taking a strip of a
+          screen that has none to spare — a phone on its side is 350 pixels
+          tall, and the case wants every one of them. */}
+      <div className='pointer-events-none absolute inset-x-0 top-0 z-50 flex items-start justify-between gap-2 p-2'>
+        <div className='pointer-events-auto flex flex-wrap items-center gap-2'>
+          {boardActions}
+        </div>
+        <button
+          onClick={closeFullscreen}
+          aria-label='Leave full screen'
+          className={cn(ZOOM_KEY, "pointer-events-auto shrink-0")}>
+          <Shrink size={17} strokeWidth={2.5} />
+        </button>
+      </div>
+
+      <div className='flex min-h-0 flex-1 items-center'>{stage}</div>
+
+      {notice && (
+        <p className='pointer-events-none absolute inset-x-0 bottom-3 z-50 flex items-center justify-center gap-1.5 px-16 text-center text-[11px] font-semibold text-orange-400'>
+          <AlertTriangle size={13} strokeWidth={2.5} className='shrink-0' />
+          {notice}
+        </p>
+      )}
+    </div>
+  );
+
   return (
     <>
       {/* The board's own heading, with every button it has on the same line:
@@ -1024,43 +1889,8 @@ export const PedalboardView = ({
           Pedalboard
         </p>
         <div className='flex flex-wrap items-center gap-2'>
-          {verdict.tip !== null && boardItems.length > 1 && (
-            <button
-              onClick={handleWireUp}
-              className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
-              title='Lay the whole board out in the order the craft asks for'>
-              <Zap size={12} strokeWidth={2.5} />
-              Wire it up
-            </button>
-          )}
-          {canPatch && (
-            <button
-              onClick={() =>
-                savePower(
-                  autoPatch(rail, boardItems, powerState.links, widthOf),
-                )
-              }
-              className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
-              title='Plug in everything the brick still has a hole for'>
-              <Plug size={12} strokeWidth={2.5} />
-              Patch power
-            </button>
-          )}
-          {boardItems.length > 1 && (
-            <button
-              onClick={handleTidy}
-              className={RIG_BUTTON}
-              title='Line every pedal up in rows'>
-              <LayoutGrid size={12} strokeWidth={2.5} />
-              Tidy up
-            </button>
-          )}
-          <button
-            onClick={() => setShowPicker(true)}
-            className={RIG_BUTTON_PRIMARY}>
-            <Plus size={12} strokeWidth={2.5} />
-            Add pedal
-          </button>
+          {/* Full screen, these same buttons are up there with the board. */}
+          {!fullscreen && boardActions}
 
           {/* Set a little apart from the rest, because these two spend Fame. */}
           <div className='flex flex-wrap items-center gap-2 sm:ml-2'>
@@ -1073,6 +1903,18 @@ export const PedalboardView = ({
         <p className='flex items-center gap-1.5 text-[11px] font-semibold text-orange-400'>
           <AlertTriangle size={13} strokeWidth={2.5} className='shrink-0' />
           {notice}
+        </p>
+      )}
+
+      {/* A phone has no cursor to hint with, so the board says out loud what a
+          finger can do to it — but only while there is something to do it to. */}
+      {isTouch && boardItems.length > 0 && (
+        <p className='text-[11px] leading-relaxed text-zinc-500'>
+          Open the board full screen and turn the phone sideways for the most
+          room. Pinch the deck to zoom, push it around with one finger, and drag
+          a pedal to move it or swap it with a neighbour. Tap one for its card,
+          where you can unplug it or take it off the board — and tap the power
+          supply, then a pedal, to run a cable to it.
         </p>
       )}
 
@@ -1095,339 +1937,9 @@ export const PedalboardView = ({
         </>
       )}
 
-      {/* Case outer shell */}
-      <div
-        className='relative w-full select-none'
-        style={{
-          background:
-            "linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 50%, #222 100%)",
-          borderRadius: 4,
-          padding: "10px 14px 14px",
-          boxShadow:
-            "0 20px 60px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)",
-          border: "2px solid #383838",
-        }}>
-        {/* Top bar: latches + label */}
-        <div className='mb-2.5 flex items-center justify-between px-1'>
-          <div className='flex gap-2'>
-            {[0, 1].map((i) => (
-              <div
-                key={i}
-                style={{
-                  width: 32,
-                  height: 11,
-                  background:
-                    "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)",
-                  borderRadius: 4,
-                  boxShadow:
-                    "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
-              />
-            ))}
-          </div>
-          <div className='flex gap-2'>
-            {[0, 1].map((i) => (
-              <div
-                key={i}
-                style={{
-                  width: 32,
-                  height: 11,
-                  background:
-                    "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)",
-                  borderRadius: 4,
-                  boxShadow:
-                    "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* The supply, racked on the case above the deck. Its cables carry on
-            into the board below — see `PowerLoom` for the seam. */}
-        <div
-          className='relative w-full'
-          style={{ paddingTop: `${railPaddingPct(geo)}%` }}>
-          <PowerRail
-            rail={rail}
-            used={new Set(patched.map((pedal) => pedal.out))}
-            pending={
-              patch && !patch.armed ? (patchSocket?.index ?? null) : null
-            }
-          />
-          {/* The brick is the grab handle: a cable is dragged out of it and
-              dropped on the pedal it feeds. */}
-          <div
-            onPointerDown={handleBrickPointerDown}
-            title={`${supply.name} — drag a cable onto a pedal to power it`}
-            className='absolute'
-            style={{
-              left: `${(rail.brick.x / geo.viewW) * 100}%`,
-              width: `${(rail.brick.w / geo.viewW) * 100}%`,
-              top: `${(rail.brick.y / RAIL_H) * 100}%`,
-              height: `${(rail.brick.h / RAIL_H) * 100}%`,
-              cursor: patch ? "grabbing" : "grab",
-              touchAction: "none",
-            }}
-          />
-        </div>
-
-        {/* Board surface — perforated */}
-        <div
-          ref={boardRef}
-          className='relative w-full overflow-hidden'
-          style={{
-            aspectRatio: `${geo.w} / ${geo.h}`,
-            borderRadius: 4,
-            backgroundImage:
-              "radial-gradient(circle, #272727 1.4px, transparent 1.4px)",
-            backgroundSize: "9px 9px",
-            backgroundColor: "#141414",
-            // A board wired by the book washes emerald from the inside. It is the
-            // one piece of feedback that needs no reading at all.
-            boxShadow: verdict.flawless
-              ? "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(52,211,153,0.10), inset 0 0 44px rgba(16,185,129,0.11)"
-              : "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.02)",
-            transition: "box-shadow 0.4s ease",
-            cursor: dragging ? "grabbing" : "default",
-          }}>
-          {/* Power first, under everything, the way it is on a real board. The
-              cable in the air picks up where the rail's stub left off, at the
-              deck's own top edge. */}
-          <PowerLoom
-            rail={rail}
-            patched={patched}
-            rowSpans={rowSpans}
-            dragging={
-              patch && !patch.armed && patchSocket
-                ? {
-                    from: { x: patchSocket.x, y: 0 },
-                    to: patch.to,
-                    allowed: patchAllowed,
-                  }
-                : null
-            }
-          />
-
-          {/* An armed brick waits for one tap anywhere: on a pedal it patches
-              it, anywhere else it puts the cable away. Touch has no hover to
-              drag with, and this is what it gets instead. */}
-          {patch?.armed && (
-            <div
-              onPointerDown={handleArmedTap}
-              className='absolute inset-0 z-[60]'
-              style={{ touchAction: "none" }}
-            />
-          )}
-
-          <SignalCable
-            geo={geo}
-            verdict={verdict}
-            widthOf={widthOf}
-            jacksOf={jacksOf}
-            isOnBoard={isOnBoard}
-          />
-
-          {/* Pedals */}
-          {boardItems.map((placement) => {
-            const invItem = data.effectInventory.find(
-              (e) => e.id === placement.itemId,
-            );
-            const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
-            const rs = effect
-              ? RARITY_STYLES[
-                  getEffectiveRarity(effect.rarity, invItem?.buildLevel)
-                ]
-              : null;
-            if (!effect || !rs) return null;
-            const isDragging = dragging?.itemId === placement.itemId;
-            const showCollision = isDragging && isColliding;
-            const wPct = widthOf(placement.itemId);
-            const powered = hasPower(placement.itemId);
-            // Every copy of a pedal that stands here more than once wears a
-            // mark — the count on the one that keeps its levels, the share on
-            // the ones that lose them — so the player can see which copy to
-            // swap out without opening a card. See `DuplicateMark`.
-            const copy = boardLevel.copies.get(placement.itemId);
-            const dupModel = copy && copy.total > 1 ? copy.model : null;
-            const dupActive = dupModel !== null && hoverDuplicate === dupModel;
-            const dupGlow = duplicateGlow(copy, dupActive);
-            // The pedal the loose end of a cable is currently over. Amber when
-            // the brick can carry it, red when the drop would be refused — so
-            // the answer arrives before the cable is let go, not after.
-            const aimedAt = patchTarget?.itemId === placement.itemId;
-
-            return (
-              <div
-                key={placement.itemId}
-                onMouseDown={(e) => handlePedalMouseDown(e, placement)}
-                onMouseEnter={() => setHoverDuplicate(dupModel)}
-                onMouseMove={(e) => {
-                  if (!dragging && invItem)
-                    onHover?.(e, <EffectCard item={invItem} readOnly />);
-                }}
-                onMouseLeave={() => {
-                  setHoverDuplicate(null);
-                  onHover?.(null, null);
-                }}
-                onClick={() => {
-                  if (onShowCard && invItem)
-                    onShowCard(<EffectCard item={invItem} readOnly />);
-                }}
-                className='group absolute'
-                style={{
-                  left: `${placement.xPct}%`,
-                  top: `${placement.yPct}%`,
-                  width: `${wPct}%`,
-                  height: `${geo.pedalHPct}%`,
-                  zIndex: isDragging ? 50 : 2,
-                  cursor: isDragging ? "grabbing" : "grab",
-                  filter: showCollision
-                    ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 16px rgba(220,38,38,0.9))`
-                    : isDragging
-                      ? `drop-shadow(0 18px 32px rgba(0,0,0,0.98)) drop-shadow(0 0 14px ${rs.baseColor}70)`
-                      : aimedAt
-                        ? `drop-shadow(0 0 14px ${
-                            patchAllowed
-                              ? "rgba(245,158,11,0.85)"
-                              : "rgba(248,113,113,0.85)"
-                          })`
-                        : // An unpowered pedal is off. Not dimmed to say "you
-                          // cannot have this" — dimmed because there is no
-                          // current in it. A powered one may still be lit as
-                          // one of several copies of the same pedal.
-                          powered
-                          ? (dupGlow ?? "none")
-                          : "grayscale(0.7) brightness(0.55)",
-                  transform: isDragging
-                    ? "scale(1.07) translateY(-6px)"
-                    : "scale(1)",
-                  // A pedal being traded with slides into its new place, so the
-                  // exchange is something the player watches happen rather than
-                  // a jump they have to work out afterwards.
-                  transition: isDragging
-                    ? "none"
-                    : "left 0.18s ease, top 0.18s ease, filter 0.15s, transform 0.15s",
-                }}>
-                <img
-                  src={getEffectImageSrc(effect.imageId, "full")}
-                  alt={effect.name}
-                  className='h-full w-full object-contain'
-                  draggable={false}
-                  onLoad={(e) => {
-                    const img = e.currentTarget;
-                    if (!img.naturalWidth || !img.naturalHeight) return;
-                    const ar = img.naturalWidth / img.naturalHeight;
-                    const known =
-                      EFFECT_IMAGE_ASPECT[effect.imageId] ?? DEFAULT_ASPECT;
-                    // Only worth remembering when the image is not what the
-                    // layout table already assumes.
-                    if (Math.abs(known - ar) < 0.005) return;
-                    setAspectById((prev) =>
-                      prev[effect.imageId] === ar
-                        ? prev
-                        : { ...prev, [effect.imageId]: ar },
-                    );
-                  }}
-                />
-                {copy && (
-                  <DuplicateMark
-                    copy={copy}
-                    name={effect.name}
-                    active={dupActive}
-                  />
-                )}
-                {/* The plug in its inlet, over the artwork rather than under
-                    it, so it can sit down in a socket drawn on the top face. */}
-                {patchedIds.has(placement.itemId) && (
-                  <PedalDcPlug
-                    dc={dcOf(placement.itemId)}
-                    widthUnits={(wPct / 100) * geo.viewW}
-                  />
-                )}
-                {/* Pull the DC cable out. It stands over the pedal's own
-                    inlet, so it reads as the plug it removes rather than as
-                    another button in the corner — and it is a whole control
-                    wide, which the drawn plug never could be. */}
-                {powered && (
-                  <button
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      unplug(placement.itemId);
-                    }}
-                    aria-label={`Unplug ${effect.name}`}
-                    title={`Unplug ${effect.name}`}
-                    className={`absolute z-10 flex h-[30px] w-[30px] -translate-x-1/2 items-center justify-center rounded-full bg-black/85 text-zinc-300 transition-opacity hover:text-amber-300 ${
-                      // No hover on a touch screen, so there it simply stays up.
-                      onShowCard
-                        ? "opacity-90"
-                        : "opacity-0 group-hover:opacity-100"
-                    }`}
-                    style={{
-                      left: `${dcOf(placement.itemId).x * 100}%`,
-                      // Straddling the edge rather than floating clear of it:
-                      // a narrow board leaves only a few pixels of margin above
-                      // the top row, and the deck clips whatever spills out.
-                      top: -11,
-                    }}>
-                    <Unplug size={15} strokeWidth={2.5} />
-                  </button>
-                )}
-                {/* Remove */}
-                <button
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onClick={(e) => handleRemove(placement.itemId, e)}
-                  className='absolute -right-1.5 -top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded border border-zinc-500 bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:border-zinc-300 hover:text-white'>
-                  <X size={8} />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Bottom: handles + rubber feet */}
-        <div className='mt-2.5 flex items-center justify-between px-3'>
-          <div
-            style={{
-              width: 52,
-              height: 9,
-              background: "linear-gradient(180deg,#555,#2a2a2a)",
-              borderRadius: 4,
-              boxShadow:
-                "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)",
-            }}
-          />
-          <div className='flex gap-6'>
-            {[0, 1, 2, 3].map((i) => (
-              <div
-                key={i}
-                style={{
-                  width: 11,
-                  height: 11,
-                  borderRadius: 4,
-                  background:
-                    "radial-gradient(circle at 35% 35%,#3a3a3a,#0a0a0a)",
-                  boxShadow:
-                    "0 3px 5px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05)",
-                }}
-              />
-            ))}
-          </div>
-          <div
-            style={{
-              width: 52,
-              height: 9,
-              background: "linear-gradient(180deg,#555,#2a2a2a)",
-              borderRadius: 4,
-              boxShadow:
-                "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)",
-            }}
-          />
-        </div>
-      </div>
+      {fullscreen && typeof document !== "undefined"
+        ? createPortal(fullscreenStage, document.body)
+        : stage}
 
       {/* Parked pedals: still equipped, but the board ran out of room for them. */}
       {overflowItems.length > 0 && (
@@ -1460,7 +1972,9 @@ export const PedalboardView = ({
                   onMouseMove={(e) => onHover?.(e, cardFor(placement.itemId))}
                   onMouseLeave={() => onHover?.(null, null)}
                   onClick={() => {
-                    if (onShowCard) onShowCard(cardFor(placement.itemId));
+                    // Same card as a pedal on the deck, so a parked one can be
+                    // sent away by a thumb too.
+                    if (isTouch) openSheetRef.current(placement.itemId);
                   }}>
                   <img
                     src={getEffectImageSrc(effect.imageId, "small")}
@@ -1468,12 +1982,17 @@ export const PedalboardView = ({
                     className='h-14 w-auto object-contain opacity-60 transition-opacity group-hover:opacity-100'
                     draggable={false}
                   />
-                  <button
-                    onClick={(e) => handleRemove(placement.itemId, e)}
-                    aria-label={`Remove ${effect.name}`}
-                    className='absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white'>
-                    <X size={8} />
-                  </button>
+                  {/* Invisible until hovered, so on a touch screen it is left
+                      out altogether rather than left lying there as a corner
+                      that quietly removes a pedal. */}
+                  {!isTouch && (
+                    <button
+                      onClick={(e) => handleRemove(placement.itemId, e)}
+                      aria-label={`Remove ${effect.name}`}
+                      className='absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white'>
+                      <X size={8} />
+                    </button>
+                  )}
                 </div>
               );
             })}
