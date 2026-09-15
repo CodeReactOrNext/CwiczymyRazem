@@ -3,6 +3,7 @@ import { ActionCard } from 'components/Blog/ActionCard';
 import { AppCard } from 'components/Blog/AppCard';
 import { BlogAlert } from 'components/Blog/BlogAlert';
 import { Checklist } from 'components/Blog/Checklist';
+import { ChordShape } from 'components/Blog/ChordShape';
 import { ExercisePromo } from 'components/Blog/ExercisePromo';
 import { MajorScaleDiagram } from 'components/Blog/MajorScaleDiagram';
 import { PatternBackground } from 'components/Blog/PatternBackground';
@@ -70,6 +71,7 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
   ActionCard,
   AppCard,
   Checklist,
+  ChordShape,
   ExercisePromo,
   MajorScaleDiagram,
   PhotoBlock,
