@@ -3,16 +3,69 @@ import type { SeoLandingConfig } from "../types/seoLanding.types";
 export const guitarScaleRoutineConfig: SeoLandingConfig = {
   slug: "guitar-scale-practice-routine",
   title: "Guitar Scale Practice Routine: How to Practice Scales So They Stick",
-  metaTitle: "Guitar Scale Practice Routine (Daily Plan)",
+  metaTitle: "Guitar Scale Practice Routine + Free PDF",
   metaDescription:
-    "How to practice guitar scales effectively: which scales to practice daily, pentatonic drills with tabs, and a 15-minute CAGED fretboard-mapping routine.",
+    "A 15-minute guitar scale practice routine with a free printable PDF, pentatonic drills with interactive tabs, and a daily CAGED fretboard-mapping plan.",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-09-05",
+  updatedAt: "2026-09-15",
   intro: [
     "Practicing guitar scales means three things done daily: drilling a position until it is automatic, connecting it to the notes it contains, and immediately using it to make music. Run scales up and down for a year and you will be excellent at running scales up and down — and still lost in a solo.",
-    "This routine fixes that. It combines pentatonic drills with interactive tabs, hammer-on and pull-off phrasing work, and a 15-minute daily fretboard-mapping plan built around the CAGED system. Everything here is free to practice with real-time feedback in [Riff Quest](/how-it-works).",
+    "This routine fixes that. It combines pentatonic drills with interactive tabs, hammer-on and pull-off phrasing work, and a 15-minute daily fretboard-mapping plan built around the CAGED system. Everything here is free to practice with real-time feedback in [Riff Quest](/how-it-works), and the 15-minute pentatonic session is also a [free printable PDF](#download-the-guitar-scale-practice-routine-pdf) if you would rather work from paper.",
   ],
   sections: [
+    {
+      heading: "Download the Guitar Scale Practice Routine PDF",
+      blocks: [
+        {
+          kind: "paragraph",
+          text: "The printable version of this routine is two A4 pages. Page one is a 15-minute session on A minor pentatonic box 1 in standard tuning — the box drawn out as tablature, then three five-minute blocks: the position played slowly, the string crossings inside it, and short phrases made from the same notes. Page two is a seven-session log with room for the date, the exercise, the minutes, the tempo and one line about what you noticed. Every field is blank and filled in by hand; nothing on paper counts anything for you.",
+        },
+        {
+          kind: "paragraph",
+          text: "Blocks A and B are the paper version of two drills further down this page, so the sheet and the interactive tabs teach the same thing in the same fingering. Take the PDF to the guitar when you would rather not look at a screen, and use the embedded exercises when you want the tab to scroll and the metronome to run.",
+        },
+        {
+          kind: "download",
+          href: "/downloads/guitar-scale-practice-routine.pdf",
+          label: "Guitar Scale Practice Routine (PDF)",
+          description:
+            "Two A4 pages: the 15-minute box 1 routine and a seven-session practice log. No account needed.",
+          fileMeta: "PDF, 38 KB",
+        },
+        {
+          kind: "schedule",
+          schedule: {
+            title: "The same 15 minutes, on this page",
+            columns: ["Minutes", "Block", "What to do"],
+            rows: [
+              [
+                "0–5",
+                "A — the position, slowly",
+                "[Box 1 ascending and descending](#pentatonic-box1-up-down) at one comfortable, clean tempo. Index on fret 5, ring on fret 7, little finger on fret 8, and never a different finger.",
+              ],
+              [
+                "5–10",
+                "B — string crossings",
+                "[The two crossings inside the box](#pentatonic-string-crossing-3), strings 4–3 then 3–2, strict alternate picking. Loop them until neither one is an event.",
+              ],
+              [
+                "10–15",
+                "C — short phrases",
+                "Three to five notes from the same box, then stop and listen before answering. Over an A minor drone or backing track if you have one; unaccompanied is fine.",
+              ],
+            ],
+          },
+        },
+        {
+          kind: "paragraph",
+          text: "**Practice these exercises in Riff Quest.** Block A is [Pentatonic Box 1 — Up and Down](#pentatonic-box1-up-down) and block B is [Pentatonic — String Crossing](#pentatonic-string-crossing-3), both playable free in the browser with an interactive tab and a metronome. Block C has no fixed tab by design — it is your phrases. When you want the same treatment for another scale or position, the [configurable scale drill](#scale-practice-configurable) builds the pattern for you.",
+        },
+        {
+          kind: "paragraph",
+          text: "This 15-minute session is a scale-position routine. It is not the same thing as the [CAGED fretboard-mapping plan](#caged-fretboard-mapping-a-15-minute-daily-plan) further down, which spends its 15 minutes learning where notes live rather than drilling one shape. Run whichever matches what is currently missing; running both on the same day is fine but not the point.",
+        },
+      ],
+    },
     {
       heading: "How to Practice Guitar Scales (Not Just Run Them)",
       blocks: [

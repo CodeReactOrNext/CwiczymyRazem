@@ -238,7 +238,7 @@ const scaleRoutineHtml = () => `<!doctype html>
     </ul>
     <div class="footer">
       <p>From <span class="label">Riff Quest</span> &mdash; https://riff.quest/guitar-scale-practice-routine</p>
-      <p>Prefer to keep the log digitally? Riff Quest records a session when you log it at https://riff.quest/report and shows the history at https://riff.quest/practice-log.</p>
+      <p>Prefer to keep the log digitally? With a free Riff Quest account you log a session at https://riff.quest/report and read the history at https://riff.quest/practice-log. Nothing on this sheet is imported for you.</p>
     </div>
   </section>
 </body></html>`;
@@ -335,7 +335,7 @@ const beginnerSheetHtml = () => `<!doctype html>
     <div class="notes-line"></div>
     <div class="footer">
       <p>From <span class="label">Riff Quest</span> &mdash; https://riff.quest/beginner-guitar-exercises</p>
-      <p>To keep the same record digitally, log a session at https://riff.quest/report and read it back at https://riff.quest/practice-log.</p>
+      <p>To keep the same record digitally, a free Riff Quest account logs a session at https://riff.quest/report and reads it back at https://riff.quest/practice-log. Nothing on this sheet is imported for you.</p>
     </div>
   </section>
 </body></html>`;
