@@ -19,6 +19,10 @@ export const CLUSTER_PRACTICE_LINK: Record<string, PracticeLink> = {
     label: "Speed & Hand Sync Exercises",
     exerciseCategory: "technique",
   },
+  "guitar-chords": {
+    href: SEO_LANDING_PAGES.beginner,
+    label: "Beginner Guitar Exercises",
+  },
   "guitar-fundamentals": {
     href: SEO_LANDING_PAGES.scales,
     label: "Scale Practice Routine",

@@ -95,7 +95,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
       blocks: [
         {
           kind: "paragraph",
-          text: "Chords and strumming are where beginners live, so train them like technique, not like a vibe. The progression is strict: downstrokes only, then down-up, then chord changes under a moving strumming hand. If you are still learning shapes, drill chord changes in isolation before adding the strumming hand.",
+          text: "Chords and strumming are where beginners live, so train them like technique, not like a vibe. The progression is strict: downstrokes only, then down-up, then chord changes under a moving strumming hand. If you are still learning shapes, start from the [beginner guitar chord diagrams](/blog/guitar-chords-for-beginners) and drill chord changes in isolation before adding the strumming hand.",
         },
         {
           kind: "exercise",
