@@ -10,7 +10,7 @@ import { PatternBackground } from 'components/Blog/PatternBackground';
 import { PhotoBlock } from 'components/Blog/PhotoBlock';
 import { PracticePlanCard } from 'components/Blog/PracticePlanCard';
 import { PracticeTable } from 'components/Blog/PracticeTable';
-import { SessionLengthChart } from 'components/Blog/SessionLengthChart';
+import { SessionLengthStat } from 'components/Blog/SessionLengthStat';
 import { SessionTimeline } from 'components/Blog/SessionTimeline';
 import { SongRanking } from 'components/Blog/SongRanking';
 import { SongTierTable } from 'components/Blog/SongTierTable';
@@ -77,7 +77,7 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
   PhotoBlock,
   PracticePlanCard,
   PracticeTable,
-  SessionLengthChart,
+  SessionLengthStat,
   SessionTimeline,
   StatRow,
   StepList,
