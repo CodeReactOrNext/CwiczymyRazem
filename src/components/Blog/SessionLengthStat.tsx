@@ -18,7 +18,7 @@ const MEAN_MINUTES = 57;
 
 export const SessionLengthStat = () => {
   return (
-    <div className="my-10 rounded-lg bg-zinc-900/40 p-6">
+    <div className="not-prose my-10 rounded-lg bg-zinc-900/40 p-6">
       <p className="text-sm font-medium text-zinc-200">
         How long does a logged Riff Quest session actually run?
       </p>
