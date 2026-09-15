@@ -81,6 +81,81 @@ export const GuideCustomBlock = ({ block }: GuideCustomBlockProps) => {
         </GuideSection>
       );
 
+    case "comparisonTable":
+      return (
+        <GuideSection heading={block.heading} intro={block.intro}>
+          <div className='overflow-x-auto rounded-lg bg-zinc-900/40'>
+            <table className='w-full min-w-[34rem] text-left'>
+              <thead>
+                <tr className='bg-white/5'>
+                  {block.columns.map((column) => (
+                    <th
+                      key={column}
+                      className='px-5 py-3 text-xs font-bold tracking-wider text-cyan-400'>
+                      {column}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {block.rows.map((row) => (
+                  <tr key={row[0]}>
+                    {row.map((cell, index) => (
+                      <td
+                        key={index}
+                        className={
+                          index === 0
+                            ? "px-5 py-4 align-top font-semibold text-zinc-100"
+                            : "px-5 py-4 align-top text-sm leading-relaxed text-zinc-400"
+                        }>
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {block.note && (
+            <p className='mt-5 max-w-3xl text-sm leading-relaxed text-zinc-500'>
+              {block.note}
+            </p>
+          )}
+        </GuideSection>
+      );
+
+    case "prose":
+      return (
+        <GuideSection heading={block.heading} intro={block.intro}>
+          <div className='max-w-3xl space-y-5'>
+            {block.paragraphs.map((paragraph) => (
+              <p key={paragraph} className='leading-relaxed text-zinc-400'>
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          {block.callout && (
+            <div className='mt-8 max-w-3xl rounded-lg bg-zinc-900/40 p-6'>
+              <p className='mb-3 font-semibold text-cyan-400'>
+                {block.callout.title}
+              </p>
+              <ol className='space-y-2'>
+                {block.callout.lines.map((line, index) => (
+                  <li
+                    key={line}
+                    className='flex gap-3 text-sm leading-relaxed text-zinc-400'>
+                    <span className='font-semibold text-zinc-500'>
+                      {index + 1}.
+                    </span>
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </GuideSection>
+      );
+
     case "journey":
       return (
         <GuideSection heading={block.heading} intro={block.intro}>

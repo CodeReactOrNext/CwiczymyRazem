@@ -107,6 +107,34 @@ export type GuideCustomBlock =
       chords: { name: string; shape: string; tip: string }[];
     }
   | {
+      /**
+       * A plain comparison table — for questions whose honest answer is
+       * "it depends which part you mean". Difficulty wording in `rows` is
+       * editorial; keep it out of the community-rating vocabulary.
+       */
+      kind: "comparisonTable";
+      id: string;
+      heading: string;
+      intro: string;
+      columns: string[];
+      rows: string[][];
+      /** Small print under the table, e.g. what the labels are and are not. */
+      note?: string;
+    }
+  | {
+      /**
+       * A short prose answer to one specific question, with an optional
+       * boxed exercise. Use when the answer is a fact plus its source, not a
+       * grid — e.g. "what time signature is this song in".
+       */
+      kind: "prose";
+      id: string;
+      heading: string;
+      intro: string;
+      paragraphs: string[];
+      callout?: { title: string; lines: string[] };
+    }
+  | {
       kind: "journey";
       id: string;
       heading: string;
