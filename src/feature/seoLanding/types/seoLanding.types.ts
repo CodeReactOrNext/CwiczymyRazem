@@ -23,7 +23,17 @@ export type SeoLandingBlock =
       planTitle?: string;
     }
   | { kind: "exercise"; exerciseId: string; commentary: string[] }
-  | { kind: "schedule"; schedule: SeoLandingSchedule };
+  | { kind: "schedule"; schedule: SeoLandingSchedule }
+  | {
+      kind: "download";
+      /** Path under public/, e.g. "/downloads/…​.pdf". Served without a login. */
+      href: string;
+      label: string;
+      /** What the reader gets — one line, shown next to the button. */
+      description: string;
+      /** Rendered as-is; keep it the real exported size (scripts/generatePracticeSheets.mjs prints it). */
+      fileMeta: string;
+    };
 
 export interface SeoLandingSection {
   heading: string;

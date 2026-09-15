@@ -13,6 +13,7 @@ import {
   ArrowDown,
   ArrowRight,
   ChevronRight,
+  Download,
   Lightbulb,
   List,
 } from "lucide-react";
@@ -217,6 +218,27 @@ const Block = ({
     }
     case "schedule":
       return <ScheduleTable schedule={block.schedule} />;
+    case "download":
+      // Plain <a download> on a file in public/ — no auth, no gate, works the
+      // same logged out as logged in, which is the whole point of the handout.
+      return (
+        <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/60 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8'>
+          <div>
+            <p className='mb-1 font-semibold text-white'>{block.label}</p>
+            <p className='text-sm leading-relaxed text-zinc-400'>
+              <InlineText text={block.description} />
+            </p>
+          </div>
+          <a
+            href={block.href}
+            download
+            className='inline-flex shrink-0 items-center gap-2 self-start rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400 sm:self-auto'>
+            <Download className='h-4 w-4' aria-hidden='true' />
+            Download the free practice PDF
+            <span className='font-medium text-zinc-800'>({block.fileMeta})</span>
+          </a>
+        </div>
+      );
     default:
       return null;
   }

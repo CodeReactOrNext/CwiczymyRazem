@@ -22,6 +22,19 @@ describe("InlineText", () => {
     expect(container.textContent).not.toContain("*");
   });
 
+  it("keeps an in-page anchor in the same tab, but opens external links in a new one", () => {
+    render(
+      <InlineText text='[the drill](#pentatonic-box1-up-down) and [a study](https://example.com/study)' />
+    );
+    const anchor = screen.getByRole("link", { name: "the drill" });
+    expect(anchor.getAttribute("href")).toBe("#pentatonic-box1-up-down");
+    expect(anchor.getAttribute("target")).toBeNull();
+
+    const external = screen.getByRole("link", { name: "a study" });
+    expect(external.getAttribute("target")).toBe("_blank");
+    expect(external.getAttribute("rel")).toBe("noopener noreferrer");
+  });
+
   it("keeps emphasis working on both sides of a link", () => {
     render(
       <InlineText text='*before* [the plan](/daily-guitar-practice-plan) **after**' />
