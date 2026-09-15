@@ -3,10 +3,6 @@ import React from "react";
 // MDX content is compiled with no scope, so props must survive as plain strings
 // — same pipe-delimited convention as Checklist/StepList.
 interface ChordShapeProps {
-  /** Chord symbol, e.g. "Em". */
-  name: string;
-  /** Fingering code low E to high e, e.g. "x02210". */
-  code: string;
   /** Diagram path under /images/blog/guitar-chords. */
   src: string;
   /** Alt text describing the shape, not the chord name alone. */
@@ -41,8 +37,6 @@ const parsePairs = (value: string) =>
  * instructions, it is never the only place the information exists.
  */
 export const ChordShape = ({
-  name,
-  code,
   src,
   alt,
   lowest,
@@ -64,9 +58,6 @@ export const ChordShape = ({
           decoding='async'
           className='mx-auto w-[220px] rounded-lg'
         />
-        <figcaption className='mt-3 text-center text-sm text-zinc-500'>
-          {name} · <span className='font-mono text-zinc-400'>{code}</span>
-        </figcaption>
       </div>
 
       <div className='min-w-0 space-y-7'>

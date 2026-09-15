@@ -46,7 +46,7 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
       blocks: [
         {
           kind: "paragraph",
-          text: "The minimum effective dose, and the right starting point for every beginner guitar practice plan: warm-up, one technique, one dose of rhythm. It is deliberately repetitive — you will run the same 15 minutes for weeks, and that repetition is precisely what makes it work.",
+          text: "The minimum effective dose, and the right starting point for every beginner guitar practice plan: warm-up, one technique, one dose of rhythm. It is deliberately repetitive — you will run the same 15 minutes for weeks, and that repetition is precisely what makes it work. If your first chord shapes are still the bottleneck, [practice these open chords](/blog/guitar-chords-for-beginners) in the main block.",
         },
         {
           kind: "schedule",
