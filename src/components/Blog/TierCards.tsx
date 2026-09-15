@@ -9,27 +9,36 @@ interface Tier {
   description: string;
 }
 
+/**
+ * Cards are keyed to what the player is currently working on, not to months
+ * since they started — time owning a guitar says nothing about what the hands
+ * can do, and the 2026-09 SEO review flagged the old month ranges for exactly
+ * that. `time` stays an adjustable starting example, never a minimum.
+ */
 const tiers: Tier[] = [
   {
     icon: Sprout,
     badgeClass: 'bg-emerald-500/10 text-emerald-300',
-    title: 'Beginners',
-    time: '15–30 min/day',
-    description: '4–6 days a week. Focus on chords and finger exercises.',
+    title: 'Building the basics',
+    time: 'from 15–30 min/day',
+    description:
+      'Clean fretted notes, chord changes that don’t stop, strumming in time. Most days of the week.',
   },
   {
     icon: Flame,
     badgeClass: 'bg-amber-500/10 text-amber-300',
-    title: 'Intermediate',
-    time: '60–90 min/day',
-    description: '5–6 days a week. Focused chunks for barre chords, scales, rhythm.',
+    title: 'Working on obstacles',
+    time: 'from 45–90 min/day',
+    description:
+      'Barre chords, scales you can play but not use, songs that fall apart at tempo. Split into ~20-minute blocks.',
   },
   {
     icon: Trophy,
     badgeClass: 'bg-purple-500/10 text-purple-300',
-    title: 'Advanced',
-    time: '60+ min/day',
-    description: 'Highly targeted 20-minute segments to refine specific skills.',
+    title: 'Refining and maintaining',
+    time: 'around 60 min/day',
+    description:
+      'Fundamentals are solid; practice is maintenance plus one named project. Three focused segments with breaks.',
   },
 ];
 

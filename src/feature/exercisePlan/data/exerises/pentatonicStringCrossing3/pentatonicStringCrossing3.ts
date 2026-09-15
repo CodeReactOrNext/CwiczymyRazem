@@ -19,14 +19,14 @@ export const pentatonicStringCrossing3Exercise: Exercise = {
   category: "technique",
   timeInMinutes: 1.37,
   instructions: [
-    "Listen carefully to the reference sequence before reproducing it on the fretboard.",
-    "Sing or hum the pitches aloud to reinforce the brain-to-fretboard connection.",
-    "Transcribe the melody purely by ear, relying on relative interval recognition."
+    "Stay in A minor pentatonic box 1 on strings 4, 3 and 2 — index finger on fret 5, ring or pinky on fret 7 (fret 8 on string 2).",
+    "Pick strictly alternate: down on every first note of a string, up on every second, so each crossing arrives on the pick stroke the tab expects.",
+    "Bar 3 loops the two crossings on their own — repeat it until strings 4\u21943 and 3\u21942 feel identical before playing the whole pattern again."
   ],
   tips: [
-    "Focus on the distance between notes rather than trying to guess absolute fret positions.",
-    "Practice without looking at your fretboard to build pure auditory-motor memory.",
-    "Start with simple three-note phrases before moving to complex arrangements."
+    "Keep the pick close to the strings through a crossing; most speed is lost to travel, not to the fingers.",
+    "If a run hiccups, it is almost always a crossing \u2014 slow down until both crossings are even, then raise the tempo.",
+    "Let the fretting fingers stay hovering over their frets instead of lifting away between strings."
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 50 },
   examBacking: { url: "/static/sounds/exercise/pentatonic_string_crossing___3_strings_backing_track.mp3", sourceBpm: 50 },

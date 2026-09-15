@@ -56,12 +56,17 @@ export const InlineText = ({ text }: { text: string }) => {
           {label}
         </Link>
       ) : (
+        // In-page anchors ("#pentatonic-box1-up-down") are the same document —
+        // sending them to a new tab was making every "jump to this drill" link
+        // reopen the page instead of scrolling. Only real external hrefs get
+        // target="_blank".
         <a
           key={`l${match.index}`}
           href={href}
           className='text-cyan-400 transition-colors hover:text-cyan-300'
-          rel='noopener noreferrer'
-          target='_blank'>
+          {...(href.startsWith("#")
+            ? {}
+            : { rel: "noopener noreferrer", target: "_blank" })}>
           {label}
         </a>
       )

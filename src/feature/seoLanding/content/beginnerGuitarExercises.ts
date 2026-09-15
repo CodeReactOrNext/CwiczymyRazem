@@ -5,12 +5,12 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
   title: "Guitar Exercises for Beginners: What to Practice First",
   metaTitle: "Guitar Exercises for Beginners: 8 Free Drills",
   metaDescription:
-    "Eight free beginner guitar exercises with interactive tabs — finger drills, strumming, timing and your first bend — plus a 15-minute daily routine.",
+    "Free beginner guitar exercises with interactive tabs: finger, strumming and timing drills, where to start on electric, plus a printable practice sheet.",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-09-05",
+  updatedAt: "2026-09-15",
   intro: [
     "As a beginner, you should practice four things on guitar: fretting-hand accuracy, picking consistency, chord changes, and timing. Every exercise on this page trains one of those, takes under ten minutes, and comes with an interactive tab you can play along with for free.",
-    "This is not a random list of beginner guitar drills. It is the same sequence we give new players inside [Riff Quest](/how-it-works): start with one string, add fingers one at a time, and only stack complexity once the previous step feels boring. If you want these drills pre-arranged into a schedule, jump to the [15-minute routine](#a-15-minute-beginner-guitar-practice-routine) below, see the full [daily guitar practice plan](/daily-guitar-practice-plan), or read our breakdown of [how long to practice guitar daily](/blog/how-long-practice-guitar-daily) by skill level.",
+    "This is not a random list of beginner guitar drills. It is the same sequence we give new players inside [Riff Quest](/how-it-works): start with one string, add fingers one at a time, and only stack complexity once the previous step feels boring. If you want these drills pre-arranged into a schedule, jump to the [15-minute routine](#a-15-minute-beginner-guitar-practice-routine) below or print the [free practice sheet](#free-guitar-practice-sheet-for-beginners). Starting on an electric? The [four drills to begin with](#beginner-electric-guitar-exercises-where-to-start) are picked out further down. For the wider plan, see the full [daily guitar practice plan](/daily-guitar-practice-plan) or our breakdown of [how long to practice guitar daily](/blog/how-long-practice-guitar-daily).",
   ],
   sections: [
     {
@@ -188,6 +188,87 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
       ],
     },
     {
+      heading: "Beginner Electric Guitar Exercises: Where to Start",
+      blocks: [
+        {
+          kind: "paragraph",
+          text: "Nothing on this page is acoustic-only. Frets are frets, strings are strings, and the four drills below are the ones to start with on an electric — in this order, because each one removes a problem the next one would otherwise hide.",
+        },
+        {
+          kind: "list",
+          items: [
+            "**Target one string and fret clean notes** — [Spider — One String](#spider-one-string). *Common mistake:* fretting in the middle of the fret, which buzzes on an electric long before it would on an acoustic. *Checkpoint:* four notes in a row, each one ringing for its full beat, without your fretting hand tightening.",
+            "**Coordinate simple alternating pick strokes** — [Timing — Open G Repeats](#open-g-repetition), played strictly down-up-down-up. *Common mistake:* picking from the elbow, which makes the upstroke quieter than the downstroke. *Checkpoint:* eight strokes where you cannot hear which ones were up.",
+            "**Repeat a simple rhythm with a metronome** — [Timing — Quarter Notes](#quarter-notes-drill). *Common mistake:* speeding up the moment it feels comfortable. *Checkpoint:* the click stops being audible as a separate sound for a few beats at a time.",
+            "**Control unintended string noise** — [Muting — Inside a D Chord](#chord-spotlight-drill). *Common mistake:* assuming the extra noise is the amp. *Checkpoint:* strum the chord and hear only the strings that belong in it.",
+          ],
+        },
+        {
+          kind: "tip",
+          title: "Setting up before the first drill",
+          text: "Use a clean sound. Distortion flatters sloppy playing by hiding the buzz and the ringing strings you did not mean to hit, which is exactly the information these four drills are trying to give you. Start at a tempo that feels too slow. Sound detection is optional here — Riff Quest will record a practice session whether or not it can hear you.",
+        },
+        {
+          kind: "paragraph",
+          text: "**Can I use these exercises on an acoustic guitar?** Yes — all four work unchanged. The differences are practical rather than musical: an acoustic's heavier strings need a little more fretting pressure and will tire a new hand faster, while an electric's lighter action makes unwanted string noise much more obvious. Start with shorter blocks on an acoustic; start with a clean amp sound on an electric. The drills themselves do not change.",
+        },
+        {
+          kind: "paragraph",
+          text: "Once the four checkpoints are met, fold them into a real session rather than practicing them forever: the [15-minute routine](#a-15-minute-beginner-guitar-practice-routine) below is the same material with times attached, and the [practice sheet](#free-guitar-practice-sheet-for-beginners) is that session on paper.",
+        },
+      ],
+    },
+    {
+      heading: "Free Guitar Practice Sheet for Beginners",
+      blocks: [
+        {
+          kind: "paragraph",
+          text: "Two A4 pages you can print. Page one is a worked 15-minute session: 3 minutes of single-string finger placement, 4 minutes on one chord change, 4 minutes of down-up strumming, and 4 minutes putting the three together in a short progression. Each block says what to play, what the goal is, how to start, and leaves a labelled line for what needed attention. Page two is a blank weekly sheet — date, exercise, minutes, tempo, notes — to reuse for as long as it is useful.",
+        },
+        {
+          kind: "schedule",
+          schedule: {
+            title: "The example session, block by block",
+            columns: ["Minutes", "Block", "What to play"],
+            rows: [
+              [
+                "0–3",
+                "One string, four fingers",
+                "[Spider — One String](#spider-one-string): frets 1–2–3–4 on the low E, one finger per fret, then back down.",
+              ],
+              [
+                "3–7",
+                "One chord change: Em to Am",
+                "Four slow strums of Em, four of Am, repeat. Your own drill, not an app exercise — do it with a clock.",
+              ],
+              [
+                "7–11",
+                "Steady rhythm",
+                "[Strumming — Down-Up](#strumming-down-up): down on the beat, up on the 'and', on one chord.",
+              ],
+              [
+                "11–15",
+                "Put it together",
+                "Em – Em – Am – Am, one bar each, with the down-up pattern. Your own drill, not an app exercise.",
+              ],
+            ],
+          },
+        },
+        {
+          kind: "download",
+          href: "/downloads/beginner-guitar-practice-sheet.pdf",
+          label: "Beginner Guitar Practice Sheet (PDF)",
+          description:
+            "Two A4 pages: the worked 15-minute session and a blank weekly sheet. No account needed.",
+          fileMeta: "PDF, 30 KB",
+        },
+        {
+          kind: "paragraph",
+          text: "Paper and the app do different jobs. The sheet is for planning a session before you start and scribbling what happened while the guitar is still in your hands. Riff Quest is the record that survives: you log the session yourself on the [Manual Log](/report) screen — how long you played and which areas it went to — and read it back in your [practice log](/practice-log). Both need a free account and will send you to the login page first. Nothing is imported from the PDF; the numbers you write on paper and the ones you log are two separate acts.",
+        },
+      ],
+    },
+    {
       heading: "How to Progress Week to Week",
       blocks: [
         {
@@ -221,6 +302,16 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
       question: "How long until chord changes feel smooth?",
       answer:
         "With daily practice of a two-chord loop while the strumming hand keeps moving, most beginners get usable changes between open chords in two to four weeks. The key is never stopping the strumming hand — slow, uninterrupted changes rewire faster than fast, stuttering ones.",
+    },
+    {
+      question: "Are these exercises different for electric and acoustic guitar?",
+      answer:
+        "No — the same drills work on both. What differs is the practicalities: an acoustic's heavier strings need more fretting pressure and tire a new hand faster, so keep the blocks short; an electric's lighter action makes unwanted string noise far more obvious, so practise on a clean sound rather than distortion. See [where to start on electric](#beginner-electric-guitar-exercises-where-to-start) for the order to take the four core drills in.",
+    },
+    {
+      question: "Is there a printable guitar practice sheet for beginners?",
+      answer:
+        "Yes — a free two-page PDF with a worked 15-minute session on page one and a blank weekly sheet on page two. It needs no account and nothing on it is imported into the app: [download the practice sheet](#free-guitar-practice-sheet-for-beginners) and write the minutes and tempos in yourself.",
     },
     {
       question: "Are these beginner guitar drills enough on their own?",

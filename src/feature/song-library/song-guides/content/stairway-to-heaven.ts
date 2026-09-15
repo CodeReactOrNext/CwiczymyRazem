@@ -7,13 +7,14 @@ export const stairwayToHeaven: SongGuide = {
   artist: "Led Zeppelin",
   author: "Michael Apfel",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-07-20",
+  updatedAt: "2026-09-15",
   seo: {
     metaTitle: "Stairway to Heaven Guitar Difficulty & Roadmap | Riff Quest",
     metaDescription:
       "How hard is Stairway to Heaven on guitar? A stage-by-stage difficulty breakdown, from the fingerpicked intro to the famous solo, with honest learning timelines.",
     keywords: [
       "stairway to heaven guitar difficulty",
+      "stairway to heaven time signature",
       "how hard is stairway to heaven",
       "stairway to heaven guitar lesson",
       "how long to learn stairway to heaven",
@@ -206,7 +207,7 @@ export const stairwayToHeaven: SongGuide = {
   relatedLandingSlugs: ["scales", "beginner"],
   inlineCta: {
     heading: "Climb it stage by stage",
-    text: "Riff Quest tracks Stairway as five sections: log each stage separately, watch your mastery bar fill floor by floor, and know precisely which stage to practice today.",
+    text: "Riff Quest keeps Stairway as one song entry with separate marks for Riff / Fragment, Solo and Whole song, and adds up the time you spend on it. Mark the fingerpicked opening off first, leave the solo unmarked until it is real, and let the practice total grow while you climb.",
   },
   finalCta: {
     headingTop: "Eight minutes.",
@@ -235,6 +236,11 @@ export const stairwayToHeaven: SongGuide = {
         "As a standalone piece it's advanced work: the hardest thing in the song by a clear margin. The opening phrases are very learnable pentatonic vocabulary; the difficulty concentrates in the cascading pull-off runs and the famous repeating triplet climax, which need weeks of metronome work. It's regarded as one of the best phrasing studies in rock for exactly this reason.",
     },
     {
+      title: "What time signature is Stairway to Heaven in?",
+      message:
+        "4/4. The published drum transcription of the 1971 studio recording notates 4/4 from bar 1 and keeps it through the intro, verses, choruses and solo. The exception is the bridge that builds into the solo, where the same transcription uses bars of 5/4, 3/4 and 7/8 before returning to 4/4. What changes far more than the meter is the tempo: it is marked 72 bpm at the intro and climbs in stages to 126 bpm, so no single metronome setting matches the whole recording.",
+    },
+    {
       title: "Do I need a 12-string or two guitars to play it?",
       message:
         "No. The recording layers 6- and 12-string acoustics plus electric, but the song was built to work on one guitar: Jimmy Page performed it live on a doubleneck precisely to cover the stages in sequence. A single acoustic or clean electric carries stages 1–4 beautifully; the solo just wants an electric.",
@@ -243,6 +249,13 @@ export const stairwayToHeaven: SongGuide = {
       title: "What should I learn before attempting the solo?",
       message:
         "Be comfortable with the A-minor pentatonic box around the 5th fret, full-tone bends that land in tune, and basic pull-off runs. If those are shaky, spend two weeks on them in isolation; the solo then assembles from vocabulary you already own instead of fighting you note by note.",
+    },
+  ],
+  sources: [
+    {
+      label:
+        "Drumeo — \u201cStairway To Heaven\u201d full drum transcription by Larry Crowe (Led Zeppelin IV, 1971): 4/4 from bar 1, tempo marks 72 \u2192 126 bpm, and the bridge bars in 5/4, 3/4 and 7/8",
+      url: "https://drumeoblog.s3.amazonaws.com/beat/wp-content/uploads/2021/07/05131417/Led-Zeppelin-Stairway-To-Heaven.pdf",
     },
   ],
   videoLessons: [
@@ -263,6 +276,28 @@ export const stairwayToHeaven: SongGuide = {
     },
   ],
   customBlocks: [
+    {
+      kind: "prose",
+      id: "time-signature",
+      heading: "What Time Signature Is Stairway to Heaven In?",
+      intro:
+        "The version discussed here is the original studio recording from Led Zeppelin IV (1971), not a live or simplified arrangement.",
+      paragraphs: [
+        "Stairway to Heaven is in 4/4. Larry Crowe's published drum transcription of the 1971 studio recording notates 4/4 at bar 1 and keeps it through the intro, every verse and every chorus.",
+        "There is one section that departs from it. In that same transcription the bridge — the build that leads into the guitar solo — runs 5/4, 4/4, 3/4, 4/4, 5/4, then 4/4 with a bar of 7/8 inside it, before settling back into 4/4 for the solo and everything after it. If a passage of this song has ever felt like it dropped or added a beat on you, that is where it happened, and you were counting correctly.",
+        "Those are two different things, and the song is a good place to learn the difference. A time signature describes how beats are grouped into a bar; it says nothing about speed. Tempo is the speed, and here it moves a great deal: the transcription marks 72 bpm at the intro, 80 at the first chorus with an accelerando, then 84, 98 and 126 bpm as the song builds. So the meter is 4/4 almost throughout while the pulse gets steadily faster — which is also why no single metronome setting will follow the record from start to finish.",
+        "That is the practical reason to practise this song one short passage at a time. Loop a few bars on their own and set a metronome tempo that suits that passage — the exercise players in Riff Quest let you set the BPM yourself before you start — rather than picking one number and trying to hold the whole eight minutes to it. Play along with the recording when you want the accelerando; play to a click when you want the notes.",
+      ],
+      callout: {
+        title: "Count it for yourself: the intro of the studio recording",
+        lines: [
+          "Start the 1971 studio recording from silence and count \u201c1 2 3 4\u201d out loud, one number per beat, at roughly 72 bpm.",
+          "Keep counting through the whole acoustic intro, up to the first sung line. It is sixteen bars, and nothing is added or dropped.",
+          "If your count and the music drift apart, it is the count that slipped \u2014 restart rather than inserting a beat to catch up.",
+          "Then try the same thing over the build into the solo. That is where the count genuinely stops fitting, because the bars there are not all four beats long.",
+        ],
+      },
+    },
     {
       kind: "journey",
       id: "five-stages",
@@ -315,6 +350,7 @@ export const stairwayToHeaven: SongGuide = {
   ],
   sectionOrder: [
     "custom:five-stages",
+    "custom:time-signature",
     "videoLessons",
     "verdict",
     "whoFor",
@@ -325,5 +361,6 @@ export const stairwayToHeaven: SongGuide = {
     "practicePlan",
     "progression",
     "relatedExercises",
+    "sources",
   ],
 };
