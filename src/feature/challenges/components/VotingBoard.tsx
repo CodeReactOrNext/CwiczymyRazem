@@ -161,14 +161,16 @@ const NominationRow = ({
           </button>
         </TooltipTrigger>
         {(nomination.voters?.length ?? 0) > 0 && (
-          <TooltipContent side='left' className='max-w-xs bg-zinc-900 text-white border-white/10'>
+          <TooltipContent
+            side='left'
+            className='max-w-xs border-white/10 bg-zinc-900 text-white'>
             <div className='space-y-1'>
-              <p className='text-[11px] font-semibold text-zinc-300 mb-1'>
+              <p className='mb-1 text-[11px] font-semibold text-zinc-300'>
                 Voted by:
               </p>
               {nomination.voters?.map((voter) => (
                 <UserTooltip key={voter.id} userId={voter.id}>
-                  <div className='text-[11px] text-zinc-200 hover:text-white cursor-pointer'>
+                  <div className='cursor-pointer text-[11px] text-zinc-200 hover:text-white'>
                     {voter.name}
                   </div>
                 </UserTooltip>
@@ -208,11 +210,14 @@ export const VotingBoard = ({
   // refetch that follows a vote.
   const preview = nominations.find((n) => n.id === previewId) ?? null;
   const previewHasVoted =
-    !!currentUserId && (preview?.voters ?? []).some((v) => v.id === currentUserId);
+    !!currentUserId &&
+    (preview?.voters ?? []).some((v) => v.id === currentUserId);
 
   const handleToggleVote = (nomination: ChallengeNomination) => {
     if (!currentUserId) return;
-    const hasVoted = (nomination.voters ?? []).some((v) => v.id === currentUserId);
+    const hasVoted = (nomination.voters ?? []).some(
+      (v) => v.id === currentUserId,
+    );
     if (!hasVoted && votesLeft === 0) {
       toast.error(`You've used all ${VOTES_PER_USER} votes this month.`);
       return;
@@ -231,15 +236,10 @@ export const VotingBoard = ({
   };
 
   return (
-    <div className='space-y-7 p-4 sm:p-6 md:p-10'>
+    <div className='space-y-7'>
+      {/* The ballot's month and what it decides are on the page banner — this
+          is the part a voter still needs in front of the list: the rules. */}
       <div className='max-w-2xl space-y-3'>
-        <span className='flex items-center gap-1.5 text-xs font-bold text-amber-300'>
-          <Vote className='h-3.5 w-3.5' />
-          Ballot for {challengeMonthLabel(ballotId)}
-        </span>
-        <h2 className='text-2xl font-black tracking-tight text-white md:text-3xl'>
-          Pick next month’s board
-        </h2>
         <p className='text-sm font-medium leading-relaxed text-zinc-400'>
           You get{" "}
           <span className='font-bold text-white'>{VOTES_PER_USER} votes</span>{" "}
@@ -287,7 +287,7 @@ export const VotingBoard = ({
           </p>
         </div>
       ) : (
-        <div className='max-w-4xl space-y-1.5'>
+        <div className='space-y-1.5'>
           {ranked.map((nomination, index) => (
             <div key={nomination.id}>
               {index === CHALLENGE_SONG_COUNT && (

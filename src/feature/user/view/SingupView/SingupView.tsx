@@ -26,7 +26,6 @@ import {
   Mail,
   Monitor,
   Music,
-  Shield,
   User,
 } from "lucide-react";
 import Image from "next/image";
@@ -48,7 +47,6 @@ export interface SignUpCredentials {
   login: string;
   email: string;
   password: string;
-  repeat_password: string;
 }
 
 const SingupView = () => {
@@ -56,7 +54,6 @@ const SingupView = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const isMobile = useResponsiveStore((state) => state.isMobile);
 
@@ -67,7 +64,6 @@ const SingupView = () => {
     login: "",
     email: "",
     password: "",
-    repeat_password: "",
   };
 
   // Set by links that carried a destination — a song card in the public
@@ -236,6 +232,35 @@ const SingupView = () => {
               </div>
 
             <div className="px-4 pb-4">
+            <p className="text-xs sm:text-sm text-zinc-400 text-center mb-4">
+              {t("signup:value_prop")}
+            </p>
+
+            <Button
+                type='button'
+                onClick={googleLogInHandler}
+                disabled={isGoogleFetching}
+                variant='outline'
+                className='w-full border-white/5 bg-zinc-900/50 rounded-lg hover:bg-zinc-800 hover:text-white transition-colors h-11 text-zinc-300'>
+                <span className='flex items-center justify-center gap-2'>
+                  {isGoogleFetching ? (
+                    <Loader2 className='h-5 w-5 animate-spin' />
+                  ) : (
+                    <FcGoogle className='h-5 w-5' />
+                  )}
+                  {t("signup:google_button")}
+                </span>
+              </Button>
+
+            <div className="relative my-4 sm:my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/10"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                    <span className="bg-zinc-900 px-2 text-zinc-400">{t("signup:email_option")}</span>
+                </div>
+            </div>
+
             <Formik
               initialValues={formikInitialValues}
               validationSchema={signupSchema}
@@ -244,6 +269,33 @@ const SingupView = () => {
                 const strength = getPasswordStrength(values.password);
                 return (
                 <Form className='space-y-3 sm:space-y-4'>
+                  {/* Email Field */}
+                    <div className="space-y-2">
+                        <Label
+                          htmlFor='email'
+                          className='text-xs font-semibold text-zinc-400'>
+                          {t("signup:email_label")}
+                        </Label>
+                        <div className='relative group'>
+                          <Mail className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
+                          <Input
+                            id='email'
+                            name='email'
+                            type='email'
+                            value={values.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            placeholder='name@example.com'
+                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
+                          />
+                        </div>
+                        {errors.email && touched.email && (
+                          <p className='text-xs text-red-400 font-medium'>
+                            {errors.email}
+                          </p>
+                        )}
+                    </div>
+
                    {/* Username Field */}
                    <div className="space-y-2">
                         <Label
@@ -270,33 +322,6 @@ const SingupView = () => {
                           </p>
                         )}
                         <p className="text-xs text-zinc-400">This is how others will see you.</p>
-                    </div>
-
-                  {/* Email Field */}
-                    <div className="space-y-2">
-                        <Label
-                          htmlFor='email'
-                          className='text-xs font-semibold text-zinc-400'>
-                          {t("signup:email_label")}
-                        </Label>
-                        <div className='relative group'>
-                          <Mail className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
-                          <Input
-                            id='email'
-                            name='email'
-                            type='email'
-                            value={values.email}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            placeholder='name@example.com'
-                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
-                          />
-                        </div>
-                        {errors.email && touched.email && (
-                          <p className='text-xs text-red-400 font-medium'>
-                            {errors.email}
-                          </p>
-                        )}
                     </div>
 
                   {/* Password Field */}
@@ -363,48 +388,6 @@ const SingupView = () => {
                     )}
                   </div>
 
-                  {/* Repeat Password Field */}
-                  <div className="space-y-2">
-                         <Label
-                          htmlFor='repeat_password'
-                          className='text-xs font-semibold text-zinc-400'>
-                          {t("signup:repeat_password_label")}
-                        </Label>
-
-                    <div className='relative group'>
-                      <Shield className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
-                      <Input
-                        id='repeat_password'
-                        name='repeat_password'
-                        type={showRepeatPassword ? "text" : "password"}
-                        value={values.repeat_password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        placeholder='••••••••'
-                        className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
-                      />
-                      <button
-                        type='button'
-                        onClick={() =>
-                          setShowRepeatPassword(!showRepeatPassword)
-                        }
-                        aria-label={showRepeatPassword ? "Hide password confirmation" : "Show password confirmation"}
-                        className='absolute right-3 top-2.5 text-zinc-500 hover:text-zinc-300 transition-colors'>
-                        {showRepeatPassword ? (
-                          <EyeOff className='h-5 w-5' />
-                        ) : (
-                          <Eye className='h-5 w-5' />
-                        )}
-                      </button>
-                    </div>
-                    {errors.repeat_password && touched.repeat_password && (
-                      <p className='text-xs text-red-400 font-medium'>
-                        {errors.repeat_password}
-                      </p>
-                    )}
-                  </div>
-
-
                   {/* Signup Button */}
                   <div className="pt-2">
                     <Button
@@ -425,31 +408,6 @@ const SingupView = () => {
                 </Form>
               )}}
             </Formik>
-
-            <div className="relative my-4 sm:my-6">
-                <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/10"></div>
-                </div>
-                <div className="relative flex justify-center text-xs">
-                    <span className="bg-zinc-900 px-2 text-zinc-400">{t("signup:or_continue_with")}</span>
-                </div>
-            </div>
-
-            <Button
-                type='button'
-                onClick={googleLogInHandler}
-                disabled={isGoogleFetching}
-                variant='outline'
-                className='w-full border-white/5 bg-zinc-900/50 rounded-lg hover:bg-zinc-800 hover:text-white transition-colors h-11 text-zinc-300'>
-                <span className='flex items-center justify-center gap-2'>
-                  {isGoogleFetching ? (
-                    <Loader2 className='h-5 w-5 animate-spin' />
-                  ) : (
-                    <FcGoogle className='h-5 w-5' />
-                  )}
-                  {t("signup:google_button")}
-                </span>
-              </Button>
             </div>
             </div>
           </div>

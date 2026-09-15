@@ -74,7 +74,7 @@ describe("CaseShop", () => {
     const { onOpenCase } = renderShop({ freeTokens: 2 });
 
     fireEvent.click(
-      screen.getByRole("button", { name: /Open case\s*·\s*160/ }),
+      screen.getByRole("button", { name: /Open case\s*·\s*200/ }),
     );
     expect(onOpenCase).toHaveBeenLastCalledWith("daily", undefined);
 
@@ -93,6 +93,6 @@ describe("CaseShop", () => {
       /Open case/.test(b.textContent ?? ""),
     ) as HTMLButtonElement;
     expect(openButton.disabled).toBe(true);
-    expect(elite.textContent).toContain("350");
+    expect(elite.textContent).toContain("370");
   });
 });

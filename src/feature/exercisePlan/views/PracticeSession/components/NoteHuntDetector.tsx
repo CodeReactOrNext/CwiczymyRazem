@@ -1,18 +1,22 @@
 import { cn } from "assets/lib/utils";
 import { useMemo } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaMicrophone } from "react-icons/fa";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { huntPositions } from "../hooks/useNoteHunt";
 import { ClickableFretboard, FullNeckToggle, LeftyToggle, useShowFullNeck } from "./ClickableFretboard";
 import { DetectionWave } from "./DetectionWave";
-import { HuntChip, HuntStage, HuntStats, HuntSteps, HuntTargetCard } from "./HuntStage";
+import { HuntPromptCard, HuntStage, HuntStats, HuntSteps, HuntTargetCard } from "./HuntStage";
 
 interface NoteHuntDetectorProps {
   targetNote: string;
   description?: string;
   isMicEnabled: boolean;
   isListening: boolean;
+  /** Session timer running. The standing instruction under the card is written
+   *  to be read before starting, so it drops away once the round is live and
+   *  leaves the target sitting on its own. */
+  isPlaying?: boolean;
   /** Dev-only (non-production): fast-tracks the WHOLE EXAM finish flow instantly.
    *  Undefined outside exam mode. */
   onDevPassExam?: () => void;
@@ -31,6 +35,7 @@ export function NoteHuntDetector({
   description,
   isMicEnabled,
   isListening,
+  isPlaying,
   onDevPassExam,
 }: NoteHuntDetectorProps) {
   const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, noteHuntStrings, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
@@ -104,49 +109,80 @@ export function NoteHuntDetector({
 
   const prompt = (
     <div className="flex flex-col items-center gap-3">
-      <HuntTargetCard
-        value={isPrompt && !solved ? customGoalPrompt!.title : targetNote}
-        complete={complete}
-        foundCount={foundUnits}
-        animationKey={isPrompt && !solved ? customGoalPrompt!.title : targetNote}
-      />
-
       {isPrompt ? (
-        <div className="flex flex-col items-center gap-1.5">
-          {customGoalPrompt!.subtitle && <HuntChip tone='cyan'>{customGoalPrompt!.subtitle}</HuntChip>}
-          {customGoalPrompt!.steps && <HuntSteps {...customGoalPrompt!.steps} />}
-          {solved ? (
-            <span className="text-sm font-bold text-emerald-400">✓ it was {targetNote}</span>
-          ) : (
-            // The chord drills ask for a degree of the chord on the card, not an
-            // interval above a note, so they set their own line here.
-            <p className="text-center text-sm font-bold text-zinc-200">
-              {description ?? "Play the note the interval lands on"}
-            </p>
-          )}
-        </div>
+        <>
+          {/* Chord (or root) and the degree asked for, side by side at the same
+              size: working the degree out is the drill, so it is not a footnote
+              to the chord. The answer takes the degree's tile once it's played. */}
+          <HuntPromptCard
+            title={customGoalPrompt!.title}
+            label={customGoalPrompt!.subtitle}
+            answer={solved ? targetNote : null}
+            complete={complete}
+            foundCount={foundUnits}
+          />
+
+          <div className="flex flex-col items-center gap-2">
+            {customGoalPrompt!.steps && <HuntSteps {...customGoalPrompt!.steps} />}
+            {/* The chord drills ask for a degree of the chord on the card, not an
+                interval above a note, so they set their own line here. Gone once
+                the round is live: by then it has been read, and the pair of tiles
+                already says what to do. */}
+            {!isPlaying && (
+              <p className="text-center text-sm font-semibold text-zinc-400">
+                {description ?? "Play the note the interval lands on"}
+              </p>
+            )}
+          </div>
+        </>
       ) : (
-        <div className="flex flex-col items-center gap-2">
-          {/* Says the quiet part loudly: the note alone isn't the task — the
-              string is half of it. Replaces the prose description, which said
-              the same thing. */}
-          {soleString ? (
-            <p className="text-center text-sm font-bold text-zinc-200">
-              Play it on the <span className="text-cyan-400">{STRING_NAMES[soleString]}</span> string
-              <span className="ml-1 font-semibold text-zinc-500">({STRING_ORDINALS[soleString]})</span>
-            </p>
-          ) : (
-            description && <p className="text-center text-sm font-semibold text-zinc-200">{description}</p>
-          )}
-        </div>
+        <>
+          <HuntTargetCard
+            value={targetNote}
+            complete={complete}
+            foundCount={foundUnits}
+            animationKey={targetNote}
+          />
+
+          <div className="flex flex-col items-center gap-2">
+            {/* Says the quiet part loudly: the note alone isn't the task — the
+                string is half of it. Replaces the prose description, which said
+                the same thing. */}
+            {soleString ? (
+              <p className="text-center text-sm font-bold text-zinc-200">
+                Play it on the <span className="text-cyan-400">{STRING_NAMES[soleString]}</span> string
+                <span className="ml-1 font-semibold text-zinc-500">({STRING_ORDINALS[soleString]})</span>
+              </p>
+            ) : (
+              !isPlaying && description && (
+                <p className="text-center text-sm font-semibold text-zinc-200">{description}</p>
+              )
+            )}
+          </div>
+        </>
       )}
 
       {/* Detection status */}
       {!isMicEnabled ? (
-        <p className="text-center text-xs text-zinc-400">
-          Enable the <span className="font-bold text-emerald-400">mic</span> in the controls below to auto-score, or
-          check off octaves by hand.
-        </p>
+        isPrompt ? (
+          // The prompt drills have nothing to tick off by hand: without the mic
+          // the only way out of a round is Reveal answer, which is the giving-up
+          // path. So the requirement is stated outright rather than offered as a
+          // hint the way the octave hunts can afford to.
+          <div className="flex max-w-xs flex-col items-center gap-1 rounded-lg bg-amber-500/10 px-4 py-3 text-center">
+            <span className="flex items-center gap-2 text-sm font-bold text-amber-300">
+              <FaMicrophone className="h-3.5 w-3.5" aria-hidden /> Needs Pitch Detect
+            </span>
+            <span className="text-xs font-semibold text-amber-200/70">
+              Turn it on in the controls below so the app can hear your answer — without it you can only reveal it.
+            </span>
+          </div>
+        ) : (
+          <p className="text-center text-xs text-zinc-400">
+            Enable the <span className="font-bold text-emerald-400">mic</span> in the controls below to auto-score, or
+            check off octaves by hand.
+          </p>
+        )
       ) : !isListening ? (
         <p className="text-sm font-semibold text-zinc-200">Starting microphone…</p>
       ) : (
@@ -276,6 +312,8 @@ export function NoteHuntDetector({
 
   return (
     <HuntStage
+      // Two tiles side by side need more than the default note-tile rail.
+      railClassName={isPrompt ? "xl:w-64" : undefined}
       stats={stats}
       prompt={prompt}
       board={

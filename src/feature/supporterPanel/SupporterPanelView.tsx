@@ -1,4 +1,4 @@
-import { cn } from "assets/lib/utils";
+import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { CommunityGoalCard } from "feature/communityGoal/components/CommunityGoalCard";
 import { GoalBallot } from "feature/communityGoal/components/GoalBallot";
@@ -108,7 +108,9 @@ export const SupporterPanelView = () => {
         }
       />
 
-      <div className='mx-auto flex w-full max-w-7xl flex-col gap-8 p-4 pb-14 sm:p-6 md:p-8 md:pb-20 lg:p-10 lg:pb-24'>
+      {/* Horizontal padding matches the banner's, so the rail and every tab's
+          content line up with the title above them. */}
+      <div className='flex w-full flex-col gap-6 px-6 pb-16 pt-6 md:px-8 lg:px-10'>
         {isRosterLoading ? (
           // The roster answers "not a supporter" for everyone until it lands,
           // so waiting is what keeps a supporter off the sales pitch.
@@ -119,25 +121,17 @@ export const SupporterPanelView = () => {
           <SupporterPitch />
         ) : (
           <>
-            {/* Scrolls sideways on a phone rather than wrapping into three rows. */}
-            <div className='-mx-4 flex gap-1 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0'>
+            {/* Eight tabs, so the rail scrolls sideways on a phone rather than
+                wrapping into three rows of its own. */}
+            <div className={tabNavListClass}>
               {TABS.map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
                   type='button'
                   onClick={() => openTab(id)}
                   aria-pressed={tab === id}
-                  className={cn(
-                    "flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                    tab === id
-                      ? "bg-cyan-500/10 text-cyan-300"
-                      : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200",
-                  )}>
-                  <Icon
-                    size={16}
-                    className={tab === id ? "text-cyan-400" : "text-zinc-500"}
-                  />
+                  className={tabNavItemClass(tab === id)}>
+                  <Icon size={16} className='shrink-0' />
                   {label}
                 </button>
               ))}

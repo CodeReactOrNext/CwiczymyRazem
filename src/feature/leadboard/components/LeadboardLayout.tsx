@@ -89,7 +89,7 @@ export const LeadboardLayout = ({
           className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
           backgroundContent={<HeroPattern />}
           rightContent={
-            <div className='flex flex-col sm:flex-row items-end sm:items-center gap-6'>
+            <div className='flex flex-col items-start md:items-end gap-4'>
               {rankContent}
               <SeasonRewards />
             </div>
@@ -116,15 +116,18 @@ export const LeadboardLayout = ({
       )}
 
       <div className='mt-8 mx-auto max-w-7xl px-4 w-full'>
-        <div className='flex flex-wrap items-center gap-2 mb-8'>
+        {/* The rail is the row, not just the tabs: the "how points work" link
+            rides on it so the underline has one continuous line to sit against. */}
+        <div className='mb-8 flex items-center gap-2 border-b border-zinc-800'>
           <PageTabs
             tabs={LEADERBOARD_TABS}
             activeHref={activeTabHref}
             ariaLabel='Leaderboard sections'
+            className='border-b-0'
           />
           <Link
             href='/scoring'
-            className='ml-auto rounded-lg px-3 py-2 text-xs text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+            className='ml-auto shrink-0 rounded-lg px-3 py-2 text-xs text-zinc-500 transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
             How points work
           </Link>
         </div>

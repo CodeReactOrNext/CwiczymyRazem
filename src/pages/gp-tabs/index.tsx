@@ -568,7 +568,7 @@ const GpTabsPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+    <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none shadow-sm min-h-screen">
       <HeroBanner
         title="Guitar Pro Files"
         subtitle="Your Guitar Pro file library"

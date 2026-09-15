@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getPublicExercisePlans } from "feature/exercisePlan/services/getPublicExercisePlans";
@@ -51,12 +52,7 @@ const RippleTabsTrigger = ({
     <TabsTrigger
       value={value}
       onClick={createRipple}
-      className={cn(
-        "relative shrink-0 gap-2 overflow-hidden px-4 py-2 rounded text-sm font-bold text-zinc-400 transition-background hover:text-zinc-300",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-cyan-400/50",
-        "data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:shadow-none",
-        "data-[state=active]:hover:bg-zinc-200 data-[state=active]:hover:text-zinc-900",
-      )}
+      className={cn(tabNavTriggerClass, "relative overflow-hidden")}
     >
       {ripple}
       {icon}
@@ -292,7 +288,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                 </button>
               )}
               <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as (typeof PLAN_TABS)[number]); setCategoryFilter("all"); }} className="w-full">
-              <TabsList className="bg-zinc-900 p-1 rounded-lg h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
+              <TabsList className={tabNavListClass}>
                 <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Featured" isActive={activeTab === "routines"} />
                 <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" isActive={activeTab === "playalongs"} tooltip="Practice along with a real song at your own pace" />
                 <RippleTabsTrigger value="my_plans" icon={<Flame size={16} />} label="My Plans" isActive={activeTab === "my_plans"} />

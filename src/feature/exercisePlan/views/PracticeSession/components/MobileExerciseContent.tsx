@@ -137,6 +137,7 @@ export function MobileExerciseContent({
               description={currentExercise.customGoalDescription}
               isMicEnabled={!!isMicEnabled}
               isListening={isListening}
+              isPlaying={isPlaying}
             />
           )}
         </div>

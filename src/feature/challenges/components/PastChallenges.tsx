@@ -26,7 +26,7 @@ export const PastChallenges = ({ challenges, onOpen }: PastChallengesProps) => {
   }
 
   return (
-    <div className='grid gap-4 p-4 sm:grid-cols-2 sm:p-6 md:p-10 lg:grid-cols-3'>
+    <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
       {challenges.map((challenge) => (
         <button
           key={challenge.id}

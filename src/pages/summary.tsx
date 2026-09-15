@@ -1,10 +1,10 @@
-import { cn } from "assets/lib/utils";
+import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { SummaryView } from "feature/aiSummary/view/SummaryView";
 import { SupportChallengeExplainer } from "feature/communityGoal/components/SupportChallengeExplainer";
+import { LevelGate } from "feature/levelGate/components/LevelGate";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
-import { LevelGate } from "feature/levelGate/components/LevelGate";
 import { selectUserInfo } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout/AppLayout";
 import {
@@ -45,24 +45,15 @@ const TabBar = ({
   tab: SummaryTab;
   onChange: (next: SummaryTab) => void;
 }) => (
-  <div className='-mx-4 flex gap-1 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0'>
+  <div className={tabNavListClass}>
     {TABS.map(({ id, label, icon: Icon }) => (
       <button
         key={id}
         type='button'
         onClick={() => onChange(id)}
         aria-pressed={tab === id}
-        className={cn(
-          "flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-colors",
-          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-          tab === id
-            ? "bg-cyan-500/10 text-cyan-300"
-            : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200",
-        )}>
-        <Icon
-          size={16}
-          className={tab === id ? "text-cyan-400" : "text-zinc-500"}
-        />
+        className={tabNavItemClass(tab === id)}>
+        <Icon size={16} className='shrink-0' />
         {label}
       </button>
     ))}
@@ -78,7 +69,7 @@ const SummaryPage: NextPageWithLayout = () => {
 
   if (tab === "challenge") {
     return (
-      <div className='flex min-h-screen w-full flex-col bg-second-600 lg:mt-16'>
+      <div className='flex min-h-screen w-full flex-col bg-second-600'>
         <HeroBanner
           title='Support Challenge'
           subtitle='One target a week, picked and run by the supporters — claimed by everyone.'
@@ -139,7 +130,7 @@ const SummaryPage: NextPageWithLayout = () => {
         />
       </div>
     ) : (
-      <div className='flex min-h-screen flex-col overflow-visible rounded-lg border-none bg-second-600 shadow-sm lg:mt-16'>
+      <div className='flex min-h-screen flex-col overflow-visible rounded-lg border-none bg-second-600 shadow-sm'>
         <PremiumGate feature='summary' requiredPlan='master'>
           <SummaryView tabs={tabs} />
         </PremiumGate>

@@ -14,6 +14,10 @@ import type { CaseDefinition } from "../types/arsenal.types";
  * drop table and duplicate handling are the other half of the same problem, and
  * moving one lever at a time keeps it readable which change did what.
  *
+ * Since then every case has gone back up by 20 Fame (and the Featured Case by
+ * 40, which was underpriced for a pool that is curated rather than rolled), so
+ * the ladder now reads 140 / 200 / 270 / 320 / 370.
+ *
  * ─── The odds ───────────────────────────────────────────────────────────────
  *
  * The tables below were rewritten to point at the collection they draw from.
@@ -42,7 +46,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     id: "standard",
     name: "Standard Case",
     description: "A classic case for every aspiring rocker.",
-    fameCost: 120,
+    fameCost: 140,
     yearFrom: 2020,
     yearTo: 2023,
     country: "China",
@@ -59,7 +63,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     id: "premium-guitar",
     name: "Premium Guitar Case",
     description: "Higher odds for the rare and sought-after.",
-    fameCost: 250,
+    fameCost: 270,
     dropKind: "guitar",
     yearFrom: 2018,
     yearTo: 2023,
@@ -77,7 +81,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     id: "premium-effect",
     name: "Premium Effects Case",
     description: "Higher odds for the rare and sought-after.",
-    fameCost: 250,
+    fameCost: 270,
     dropKind: "effect",
     yearFrom: 2018,
     yearTo: 2023,
@@ -95,7 +99,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     id: "daily",
     name: "Featured Case",
     description: "A rotating pool of 10 items.",
-    fameCost: 160,
+    fameCost: 200,
     yearFrom: 2018,
     yearTo: 2023,
     country: "Japan",
@@ -142,7 +146,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     name: "Supporter Case",
     description:
       "Six items, chosen by the supporters. New slate every fortnight.",
-    fameCost: 300,
+    fameCost: 320,
     yearFrom: 2018,
     yearTo: 2024,
     country: "USA",
@@ -159,7 +163,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     id: "elite-guitar",
     name: "Elite Guitar Case",
     description: "Reserved for the most dedicated players.",
-    fameCost: 350,
+    fameCost: 370,
     dropKind: "guitar",
     yearFrom: 2020,
     yearTo: 2023,
@@ -177,7 +181,7 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
     id: "elite-effect",
     name: "Elite Effects Case",
     description: "Reserved for the most dedicated players.",
-    fameCost: 350,
+    fameCost: 370,
     dropKind: "effect",
     yearFrom: 2020,
     yearTo: 2023,

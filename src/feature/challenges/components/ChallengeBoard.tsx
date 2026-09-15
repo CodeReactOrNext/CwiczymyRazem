@@ -1,11 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { ChallengeCover } from "feature/challenges/components/ChallengeCover";
 import { PlayerStack } from "feature/challenges/components/PlayerStack";
-import {
-  FameIcon,
-  PointsIcon,
-} from "feature/challenges/components/RewardIcons";
+import { FameIcon } from "feature/challenges/components/RewardIcons";
 import { SongPreviewDialog } from "feature/challenges/components/SongPreviewDialog";
 import { SubmissionsDialog } from "feature/challenges/components/SubmissionsDialog";
 import { SubmitRecordingDialog } from "feature/challenges/components/SubmitRecordingDialog";
@@ -14,32 +10,14 @@ import type {
   ChallengeSong,
   ChallengeSubmission,
 } from "feature/challenges/types/challenge.types";
+import { FAME_CLEAR_BONUS } from "feature/challenges/types/challenge.types";
+import { isChallengeLive } from "feature/challenges/utils/challengeMonth";
 import {
-  FAME_CLEAR_BONUS,
-  FAME_PER_SUBMISSION,
-  POINTS_PER_SUBMISSION,
-} from "feature/challenges/types/challenge.types";
-import {
-  challengeMonthLabel,
-  daysLeftInChallenge,
-  isChallengeLive,
-} from "feature/challenges/utils/challengeMonth";
-import {
-  countParticipants,
   getClearedSongIds,
   groupSubmissionsBySong,
 } from "feature/challenges/utils/challengeProgress";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import {
-  Check,
-  Flag,
-  Music,
-  Play,
-  Swords,
-  Trophy,
-  Upload,
-  Users,
-} from "lucide-react";
+import { Check, Flag, Music, Play, Upload, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 
 interface ChallengeBoardProps {
@@ -112,9 +90,7 @@ const ChallengeRow = ({
                 ? "bg-zinc-950 text-amber-300 ring-2 ring-amber-400"
                 : "bg-zinc-800 text-zinc-400 ring-1 ring-white/10",
           )}>
-          {isCleared && (
-            <Check className='h-3.5 w-3.5' strokeWidth={3} />
-          )}
+          {isCleared && <Check className='h-3.5 w-3.5' strokeWidth={3} />}
         </span>
       </div>
 
@@ -243,7 +219,6 @@ export const ChallengeBoard = ({
   const [previewSong, setPreviewSong] = useState<ChallengeSong | null>(null);
 
   const isLive = isChallengeLive(challenge.id);
-  const daysLeft = daysLeftInChallenge(challenge.id);
 
   const bySong = useMemo(
     () => groupSubmissionsBySong(submissions),
@@ -253,10 +228,6 @@ export const ChallengeBoard = ({
     () => getClearedSongIds(submissions, currentUserId),
     [submissions, currentUserId],
   );
-  const participants = useMemo(
-    () => countParticipants(submissions),
-    [submissions],
-  );
 
   const songs = challenge.songs;
   const clearedCount = songs.filter((s) => clearedSongIds.has(s.songId)).length;
@@ -264,204 +235,82 @@ export const ChallengeBoard = ({
   const hasClearedBoard = songs.length > 0 && clearedCount === songs.length;
 
   return (
-    <div className='relative min-h-full'>
-      {/* Hue wash behind the header — amber marks this as a competition */}
-      <div
-        className='pointer-events-none absolute inset-x-0 top-0 h-[360px]'
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(245,158,11,0.18) 0%, rgba(245,158,11,0.07) 45%, transparent 100%)",
-        }}
-      />
-
-      <div className='relative z-10 space-y-7 p-4 sm:p-6 md:p-10'>
-        {/* Header */}
-        <div className='flex flex-col gap-6 md:flex-row md:items-end'>
-          <ChallengeCover
-            songs={songs}
-            className='h-40 w-40 shrink-0 rounded-md shadow-2xl md:h-48 md:w-48'
-            iconSize={48}
+    <>
+      {/* The month, its clock and what a run pays live in the page banner —
+          what's left here is the road through the songs. */}
+      <div>
+        {songs.map((song, index) => (
+          <ChallengeRow
+            key={song.songId}
+            song={song}
+            index={index}
+            isCleared={clearedSongIds.has(song.songId)}
+            isPrevCleared={
+              index > 0 && clearedSongIds.has(songs[index - 1].songId)
+            }
+            isNextUp={index === nextUpIndex}
+            isLocked={!currentUserId}
+            songSubmissions={bySong.get(song.songId) ?? []}
+            onSubmit={() => setSubmitSong(song)}
+            onOpenRuns={() => setRunsSong(song)}
+            onOpenSong={() => setPreviewSong(song)}
           />
+        ))}
 
-          <div className='min-w-0 flex-1 space-y-3'>
-            <div className='flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold'>
-              <span className='flex items-center gap-1.5 text-amber-300'>
-                <Swords className='h-3.5 w-3.5' />
-                Monthly challenge
-              </span>
-              <span className='hidden h-1 w-1 rounded-full bg-zinc-600 sm:block' />
-              <span className='font-medium text-zinc-500'>
-                {isLive
-                  ? daysLeft === 0
-                    ? "closes today"
-                    : `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left`
-                  : "closed"}
-              </span>
-              <span className='hidden h-1 w-1 rounded-full bg-zinc-600 sm:block' />
-              <span className='w-full font-medium text-zinc-500 sm:w-auto'>
-                {isLive
-                  ? `Voted in by the community — record all ${songs.length} to clear it`
-                  : "Still playable — late runs don’t pay points or fame"}
+        {/* Finish flag — lights up once every song has your recording */}
+        {songs.length > 0 && (
+          <div className='flex items-stretch'>
+            <div className='relative h-16 w-10 shrink-0 sm:w-12'>
+              <span
+                className={cn(
+                  "absolute left-1/2 top-0 h-1/2 -translate-x-1/2",
+                  clearedSongIds.has(songs[songs.length - 1].songId)
+                    ? "w-0.5 bg-green-500"
+                    : "w-0 border-l border-dashed border-white/20",
+                )}
+              />
+              <span
+                className={cn(
+                  "absolute left-1/2 top-1/2 z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors",
+                  hasClearedBoard
+                    ? "bg-amber-400 text-black shadow-[0_0_24px_rgba(251,191,36,0.35)]"
+                    : "bg-zinc-900 text-zinc-500 ring-1 ring-white/10",
+                )}>
+                <Flag className='h-3.5 w-3.5' />
               </span>
             </div>
-
-            <h1
-              translate='no'
-              className='break-words text-3xl font-black tracking-tight text-white md:text-5xl'>
-              {challengeMonthLabel(challenge.id)}
-            </h1>
-
-            <p className='flex flex-wrap items-center gap-1.5 text-xs font-medium text-zinc-400'>
-              <span className='flex items-center gap-1.5'>
-                <Users className='h-3.5 w-3.5' />
-                {participants} {participants === 1 ? "player" : "players"}
-              </span>
-              {(challenge.finisherCount ?? 0) > 0 && (
-                <>
-                  <span className='h-1 w-1 rounded-full bg-zinc-600' />
-                  <span className='flex items-center gap-1 text-amber-300'>
-                    <Trophy className='h-3 w-3' />
-                    {challenge.finisherCount} cleared it
-                  </span>
-                </>
-              )}
-            </p>
-
-            {/* Reward ledger — what a run is worth, stated up front. A closed
-                board pays nothing, so it says that instead of quoting rates. */}
-            <div className='flex flex-wrap gap-2 pt-1'>
-              {isLive ? (
-                <>
-                  <span className='inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-400'>
-                    <PointsIcon />
-                    <span className='font-bold text-white'>
-                      +{POINTS_PER_SUBMISSION}
-                    </span>
-                    points per run
-                  </span>
-                  <span className='inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-400'>
-                    <FameIcon />
-                    <span className='font-bold text-amber-300'>
-                      +{FAME_PER_SUBMISSION}
-                    </span>
-                    fame per run
-                  </span>
-                  <span className='inline-flex items-center gap-1.5 rounded-lg bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200/80'>
-                    <FameIcon />
-                    <span className='font-bold text-amber-300'>
-                      +{FAME_CLEAR_BONUS}
-                    </span>
-                    fame for the full board
-                  </span>
-                </>
-              ) : (
-                <span className='inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-400'>
-                  <PointsIcon className='opacity-40 grayscale' />
-                  <FameIcon className='opacity-40 grayscale' />
-                  This month is closed — runs still land on the board, but pay{" "}
-                  <span className='font-bold text-white'>
-                    no points or fame
-                  </span>
-                </span>
-              )}
-            </div>
-
-            {songs.length > 0 && currentUserId && (
-              <div className='max-w-sm space-y-1.5 pt-1'>
-                <div className='flex items-baseline justify-between text-xs font-semibold'>
-                  <span className='text-zinc-400'>
-                    {clearedCount} of {songs.length} recorded
-                  </span>
-                  <span className='tabular-nums text-zinc-500'>
-                    {Math.round((clearedCount / songs.length) * 100)}%
-                  </span>
-                </div>
-                <div className='h-1 overflow-hidden rounded-full bg-white/10'>
-                  <div
-                    className='h-full rounded-full bg-green-500 transition-all duration-700'
-                    style={{ width: `${(clearedCount / songs.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Track list */}
-        <div className='max-w-4xl'>
-          {songs.map((song, index) => (
-            <ChallengeRow
-              key={song.songId}
-              song={song}
-              index={index}
-              isCleared={clearedSongIds.has(song.songId)}
-              isPrevCleared={
-                index > 0 && clearedSongIds.has(songs[index - 1].songId)
-              }
-              isNextUp={index === nextUpIndex}
-              isLocked={!currentUserId}
-              songSubmissions={bySong.get(song.songId) ?? []}
-              onSubmit={() => setSubmitSong(song)}
-              onOpenRuns={() => setRunsSong(song)}
-              onOpenSong={() => setPreviewSong(song)}
-            />
-          ))}
-
-          {/* Finish flag — lights up once every song has your recording */}
-          {songs.length > 0 && (
-            <div className='flex items-stretch'>
-              <div className='relative h-16 w-10 shrink-0 sm:w-12'>
-                <span
-                  className={cn(
-                    "absolute left-1/2 top-0 h-1/2 -translate-x-1/2",
-                    clearedSongIds.has(songs[songs.length - 1].songId)
-                      ? "w-0.5 bg-green-500"
-                      : "w-0 border-l border-dashed border-white/20",
-                  )}
-                />
-                <span
-                  className={cn(
-                    "absolute left-1/2 top-1/2 z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors",
-                    hasClearedBoard
-                      ? "bg-amber-400 text-black shadow-[0_0_24px_rgba(251,191,36,0.35)]"
-                      : "bg-zinc-900 text-zinc-500 ring-1 ring-white/10",
-                  )}>
-                  <Flag className='h-3.5 w-3.5' />
-                </span>
-              </div>
-              <span className='hidden w-3 shrink-0 sm:block' />
-              <div className='flex flex-col justify-center'>
-                <p
-                  className={cn(
-                    "text-sm font-bold",
-                    hasClearedBoard ? "text-amber-300" : "text-white",
-                  )}>
-                  {hasClearedBoard ? "Board cleared" : "Final stop"}
-                </p>
-                <p className='flex flex-wrap items-center gap-1 text-xs font-medium text-zinc-500'>
-                  {hasClearedBoard ? (
-                    isLive ? (
-                      <>
-                        Every song recorded — the
-                        <FameIcon className='h-3.5 w-3.5' />
-                        <span className='font-bold text-amber-300'>
-                          +{FAME_CLEAR_BONUS}
-                        </span>
-                        fame bonus is yours.
-                      </>
-                    ) : (
-                      "Every song recorded — a clean sweep of the archive."
-                    )
+            <span className='hidden w-3 shrink-0 sm:block' />
+            <div className='flex flex-col justify-center'>
+              <p
+                className={cn(
+                  "text-sm font-bold",
+                  hasClearedBoard ? "text-amber-300" : "text-white",
+                )}>
+                {hasClearedBoard ? "Board cleared" : "Final stop"}
+              </p>
+              <p className='flex flex-wrap items-center gap-1 text-xs font-medium text-zinc-500'>
+                {hasClearedBoard ? (
+                  isLive ? (
+                    <>
+                      Every song recorded — the
+                      <FameIcon className='h-3.5 w-3.5' />
+                      <span className='font-bold text-amber-300'>
+                        +{FAME_CLEAR_BONUS}
+                      </span>
+                      fame bonus is yours.
+                    </>
                   ) : (
-                    `${songs.length - clearedCount} more ${
-                      songs.length - clearedCount === 1 ? "run" : "runs"
-                    } to clear ${isLive ? "the month" : "this board"}`
-                  )}
-                </p>
-              </div>
+                    "Every song recorded — a clean sweep of the archive."
+                  )
+                ) : (
+                  `${songs.length - clearedCount} more ${
+                    songs.length - clearedCount === 1 ? "run" : "runs"
+                  } to clear ${isLive ? "the month" : "this board"}`
+                )}
+              </p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <SubmitRecordingDialog
@@ -485,6 +334,6 @@ export const ChallengeBoard = ({
         currentUserId={currentUserId}
         onClose={() => setRunsSong(null)}
       />
-    </div>
+    </>
   );
 };

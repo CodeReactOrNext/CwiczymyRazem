@@ -3,6 +3,7 @@ import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
+import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
 import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
 import { recordExerciseCompletion } from "feature/communityExercises/services/communityExerciseService";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
@@ -292,11 +293,10 @@ export const SkillDashboard = ({
         className="w-full"
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-8">
-          <TabsList className="flex gap-1 bg-zinc-900 rounded p-1 h-auto max-w-full justify-start overflow-x-auto no-scrollbar">
+          <TabsList className={tabNavListClass}>
             <TabsTrigger
               value="skill-tree"
-              className="flex shrink-0 items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200 data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-300"
-            >
+              className={tabNavTriggerClass}>
               <Network className="h-4 w-4 shrink-0" />
               {/* On mobile only the active tab shows its label, so all tabs stay
                   visible at once; from sm up every label is shown. */}
@@ -304,15 +304,13 @@ export const SkillDashboard = ({
             </TabsTrigger>
             <TabsTrigger
               value="browse"
-              className="flex shrink-0 items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200 data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-300"
-            >
+              className={tabNavTriggerClass}>
               <Search className="h-4 w-4 shrink-0" />
               <span className={activeTab === "browse" ? "inline" : "hidden sm:inline"}>Browse Exercises</span>
             </TabsTrigger>
             <TabsTrigger
               value="community"
-              className="flex shrink-0 items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold transition-colors data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:hover:bg-zinc-200 data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-300"
-            >
+              className={tabNavTriggerClass}>
               <Users className="h-4 w-4 shrink-0" />
               <span className={activeTab === "community" ? "inline" : "hidden sm:inline"}>Community</span>
             </TabsTrigger>

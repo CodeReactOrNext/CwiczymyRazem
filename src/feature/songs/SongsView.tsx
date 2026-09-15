@@ -14,6 +14,7 @@ import {
 import { arrayMove,sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { Ripple } from "components/Ripple/Ripple";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
@@ -367,8 +368,9 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
             {/* View switcher — Board / Explore / Playlists. Scrolls away with the content instead of pinning as a second header bar. */}
             {!detailsTarget && (
               <div className={cn(
-                "mb-6 flex items-center gap-1",
-                view === 'playlists' ? "px-4 pt-4 sm:px-6 sm:pt-6 md:px-10 md:pt-8" : ""
+                tabNavListClass,
+                "mb-6",
+                view === 'playlists' ? "mx-4 mt-4 w-auto sm:mx-6 sm:mt-6 md:mx-10 md:mt-8" : ""
               )}>
                 {(
                   [
@@ -384,12 +386,10 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       key={tab.key}
                       onClick={() => handleSwitchView(tab.key)}
                       className={cn(
+                        tabNavItemClass(isActive),
                         // flex-1 until sm so the three tabs fill the phone width
                         // instead of leaving dead space on the right.
-                        "relative flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors active:scale-95 sm:flex-none sm:justify-start",
-                        isActive
-                          ? "bg-zinc-100 text-zinc-900"
-                          : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+                        "relative flex-1 justify-center overflow-hidden sm:flex-none sm:justify-start"
                       )}
                     >
                       <Ripple />

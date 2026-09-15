@@ -127,15 +127,18 @@ const ProfileActivityPage = () => {
 
 
       <div className='p-4'>
-        <div className='mb-6 flex flex-wrap items-center gap-2'>
+        {/* The rail is the row, not just the tabs: the exports ride on it so
+            the underline has one continuous line to sit against. */}
+        <div className='mb-6 flex items-center gap-2 border-b border-zinc-800'>
           <PageTabs
             tabs={tabs}
             activeHref='/profile/activity'
             ariaLabel='Progress sections'
+            className='border-b-0'
           />
           {/* Exports are desktop-only — three CSV buttons wrap onto their own
               row on a phone and push the actual content down for little gain. */}
-          <div className='ml-auto hidden items-center gap-1 md:flex'>
+          <div className='ml-auto hidden shrink-0 items-center gap-1 md:flex'>
             <ExportButton label='Export sessions' onClick={handleExportSessions} />
             <ExportButton label='Export songs' onClick={handleExportSongs} />
             <ExportButton label='Export summary' onClick={handleExportSummary} />

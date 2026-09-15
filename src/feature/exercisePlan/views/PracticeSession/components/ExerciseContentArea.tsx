@@ -265,6 +265,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
               description={currentExercise.customGoalDescription}
               isMicEnabled={!!isMicEnabled}
               isListening={isListening}
+              isPlaying={isPlaying}
               onDevPassExam={onDevPassExam}
             />
           )}

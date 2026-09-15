@@ -28,7 +28,7 @@ Point at a socket to read the full card without leaving the board, and click it 
 
 ## Opening cases
 
-<StatRow stats="120 Fame:Standard Case (anything can drop)|160 Fame:Featured Case (a rotating pool of 10 items)|250 Fame:Premium Case (guitars or effects, better odds)|350 Fame:Elite Case (guitars or effects, Rare or better guaranteed)" caption="The Featured pool rotates on a fixed schedule every few days, and everyone sees the same rotation." />
+<StatRow stats="140 Fame:Standard Case (anything can drop)|200 Fame:Featured Case (a rotating pool of 10 items)|270 Fame:Premium Case (guitars or effects, better odds)|370 Fame:Elite Case (guitars or effects, Rare or better guaranteed)" caption="The Featured pool rotates on a fixed schedule every few days, and everyone sees the same rotation." />
 
 ## Rarity and item level
 

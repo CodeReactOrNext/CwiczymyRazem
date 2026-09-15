@@ -124,25 +124,161 @@ export function HuntStats({ score, mistakes, secondsLeft, complete, children }: 
   );
 }
 
-const CHIP_TONES = {
-  neutral: "bg-zinc-800/40 text-zinc-300",
-  cyan: "bg-cyan-500/10 text-cyan-400",
-  emerald: "bg-emerald-500/10 text-emerald-400",
-  amber: "bg-amber-500/10 text-amber-400",
+/**
+ * Type scale for the tile's value. The square is sized for a note name, but the
+ * chord drills put a whole symbol in it ("Cmaj7", "Bm7b5") — three times as wide,
+ * and at the note size it ran straight off the edge. Stepping the type down with
+ * the length keeps every hunt on the same square instead of giving the chord
+ * prompts a tile of their own; one- and two-character values are untouched.
+ */
+function valueTypeScale(value: ReactNode): string {
+  const length = typeof value === "string" ? value.length : 1;
+  if (length <= 2) return "text-4xl sm:text-5xl";
+  if (length <= 4) return "text-2xl sm:text-3xl";
+  return "text-xl sm:text-2xl";
+}
+
+const PROMPT_TILE_TONES = {
+  /** What the question is about: the chord symbol or the root note. */
+  subject: "bg-zinc-900/90 text-white",
+  /** What the question asks for — the degree or interval. */
+  ask: "bg-cyan-500/15 text-cyan-200",
+  /** The answer, once it has been played. */
+  solved: "bg-emerald-900/80 text-emerald-100",
 } as const;
 
-/** Small scope/answer chip — "frets 0–12", "the B string", "✓ it was D#". */
-export function HuntChip({
-  tone = "neutral",
-  children,
-  className,
-}: {
-  tone?: keyof typeof CHIP_TONES;
-  children: ReactNode;
-  className?: string;
-}) {
+interface PromptTileProps {
+  value: ReactNode;
+  /** The word under the tile that says what the tile is. */
+  caption: string;
+  tone: keyof typeof PROMPT_TILE_TONES;
+  /** Type size + wrapping for the value — the two tiles size their text by
+   *  different rules, so each passes its own. */
+  valueClassName: string;
+  /** Re-runs the swap animation; pass the value the round rolled. */
+  animationKey: string;
+  /** Lets the tile grow past the square for long labels instead of clipping. */
+  grow?: boolean;
+  bump?: boolean;
+  burst?: { foundCount: number; complete: boolean };
+}
+
+function PromptTile({ value, caption, tone, valueClassName, animationKey, grow, bump, burst }: PromptTileProps) {
   return (
-    <span className={cn("rounded px-2.5 py-1 text-xs font-bold", CHIP_TONES[tone], className)}>{children}</span>
+    <div className="flex flex-col items-center gap-1.5">
+      <div className="relative">
+        {burst && <HuntSuccessBurst foundCount={burst.foundCount} complete={burst.complete} />}
+        <motion.div
+          animate={bump ? { scale: [1, 1.12, 1] } : { scale: 1 }}
+          transition={{ duration: 0.4 }}
+          className={cn(
+            "relative flex h-20 items-center justify-center rounded-lg text-center transition-colors duration-500 sm:h-24",
+            grow ? "min-w-[5rem] px-4 sm:min-w-[6rem]" : "w-20 overflow-hidden px-1.5 sm:w-24",
+            PROMPT_TILE_TONES[tone],
+          )}>
+          <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 to-transparent" />
+          <AnimatePresence mode="popLayout">
+            <motion.span
+              key={animationKey}
+              initial={{ opacity: 0, y: 10, scale: 0.85 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.85 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className={cn("relative font-display font-black tracking-tighter", valueClassName)}>
+              {value}
+            </motion.span>
+          </AnimatePresence>
+        </motion.div>
+      </div>
+      <span className="max-w-[7rem] text-center text-xs font-semibold leading-tight text-zinc-400">{caption}</span>
+    </div>
+  );
+}
+
+const MULTI_WORD = /\s/;
+const NOTE_NAME = /^[A-G][#b♯♭]?$/;
+const ORDINAL = /^(\d+)(st|nd|rd|th)$/;
+
+/**
+ * Type scale for the asked-for degree or interval. It is the question itself, so
+ * a short label ("5th", "♭3") is set at the note size — the same weight as the
+ * chord beside it, instead of the footnote chip it used to be. Spelled-out
+ * interval names ("Perfect 5th ↑") are far too wide for that, so they step down
+ * and wrap onto a second line rather than run off the tile.
+ */
+export function promptLabelClass(label: string): string {
+  if (MULTI_WORD.test(label)) return "block max-w-[7rem] whitespace-normal text-2xl leading-none sm:text-3xl";
+  if (label.length <= 3) return "whitespace-nowrap text-4xl sm:text-5xl";
+  return "whitespace-nowrap text-3xl sm:text-4xl";
+}
+
+/** "5th" reads as a degree rather than a count when the suffix is set small —
+ *  and it buys the digit the width to stand as tall as the chord next to it. */
+function promptLabelValue(label: string): ReactNode {
+  const ordinal = ORDINAL.exec(label);
+  if (!ordinal) return label;
+  return (
+    <>
+      {ordinal[1]}
+      <span className="align-top text-[0.42em] tracking-normal">{ordinal[2]}</span>
+    </>
+  );
+}
+
+interface HuntPromptCardProps {
+  /** What the question is about — a chord symbol ("G7") or a root note ("A"). */
+  title: string;
+  /** What to find inside it — "5th", "♭3", "Perfect 5th ↑". */
+  label?: string;
+  /** The note it lands on, once the player has played it; `null` keeps it hidden. */
+  answer?: string | null;
+  complete: boolean;
+  foundCount: number;
+}
+
+/**
+ * The prompt for the drills whose target is hidden behind a question: "the 5th of
+ * G7", "a Perfect 5th up from A".
+ *
+ * Both halves of that question are set on equal tiles. The degree used to be a
+ * chip a fifth the size of the chord, which read as a footnote to the chord —
+ * but the chord is the easy half. The degree is what actually has to be worked
+ * out, so it carries the same weight and takes the accent colour, and the answer
+ * lands in its place once it has been played.
+ */
+export function HuntPromptCard({ title, label, answer, complete, foundCount }: HuntPromptCardProps) {
+  const solved = !!answer;
+  return (
+    <div className="relative flex items-start justify-center gap-2 sm:gap-3">
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-2 top-0 h-20 rounded-lg blur-[18px] transition-opacity duration-500 sm:h-24",
+          complete ? "bg-emerald-500/40 opacity-100" : "bg-cyan-500/10 opacity-60",
+        )}
+      />
+      <PromptTile
+        value={title}
+        caption={NOTE_NAME.test(title) ? "root" : "chord"}
+        tone="subject"
+        animationKey={title}
+        valueClassName={cn("whitespace-nowrap", valueTypeScale(title))}
+      />
+      {label && (
+        <PromptTile
+          // Solved: the tile the question stood in is where the answer belongs,
+          // and the degree drops to the caption so the pair still reads as
+          // "the 5th of G7 is D" rather than losing the question.
+          value={solved ? answer : promptLabelValue(label)}
+          caption={solved ? label : MULTI_WORD.test(label) ? "interval" : "degree"}
+          tone={solved ? "solved" : "ask"}
+          animationKey={solved ? `answer-${answer}` : label}
+          valueClassName={solved ? cn("whitespace-nowrap", valueTypeScale(answer!)) : promptLabelClass(label)}
+          grow={!solved && !ORDINAL.test(label) && label.length > 3}
+          bump={complete}
+          burst={{ foundCount, complete }}
+        />
+      )}
+    </div>
   );
 }
 
@@ -182,20 +318,6 @@ interface HuntTargetCardProps {
   foundCount: number;
   /** Re-runs the swap animation — pass the target note so a new one animates in. */
   animationKey?: string;
-}
-
-/**
- * Type scale for the tile's value. The square is sized for a note name, but the
- * chord drills put a whole symbol in it ("Cmaj7", "Bm7b5") — three times as wide,
- * and at the note size it ran straight off the edge. Stepping the type down with
- * the length keeps every hunt on the same square instead of giving the chord
- * prompts a tile of their own; one- and two-character values are untouched.
- */
-function valueTypeScale(value: ReactNode): string {
-  const length = typeof value === "string" ? value.length : 1;
-  if (length <= 2) return "text-4xl sm:text-5xl";
-  if (length <= 4) return "text-2xl sm:text-3xl";
-  return "text-xl sm:text-2xl";
 }
 
 /** The big note tile every hunt leads with. */

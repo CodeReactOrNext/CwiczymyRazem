@@ -1,22 +1,17 @@
+import { cn } from "assets/lib/utils";
 import { placeSuffix, SEASON_FAME_REWARDS } from "constants/seasonRewards";
+import { FameCoin } from "feature/arsenal/components/Workshop/FameCoin";
 
-/** Places shown as their own row. The rest collapse into one summary line — ten
- *  rows would outgrow the hero banner this card sits in, and the tail is flat
- *  enough that a range says everything a row would. */
-const DETAILED_PLACES = 5;
+/** Places shown as their own badge. The rest collapse into one range — the
+ *  ladder sits in a hero banner, and a ten-row table costs more height than the
+ *  banner has. The tail is flat enough that a range says everything rows would. */
+const DETAILED_PLACES = 3;
 
-const RANKS = [
-  { medal: "👑", gemColor: "#FFD700", rowBg: "rgba(255,215,0,0.07)", labelColor: "#FFD700" },
-  { medal: "🥈", gemColor: "#C0C0C0", rowBg: "rgba(192,192,192,0.05)", labelColor: "#C8C8C8" },
-  { medal: "🥉", gemColor: "#CD7F32", rowBg: "rgba(205,127,50,0.06)", labelColor: "#CD9B6A" },
+const TONES = [
+  { medal: "👑", bg: "bg-amber-400/10", text: "text-amber-300" },
+  { medal: "🥈", bg: "bg-zinc-400/10", text: "text-zinc-200" },
+  { medal: "🥉", bg: "bg-orange-500/10", text: "text-orange-300" },
 ] as const;
-
-const PLAIN_RANK = {
-  medal: null,
-  gemColor: "#6B7280",
-  rowBg: "transparent",
-  labelColor: "#9CA3AF",
-} as const;
 
 const ordinal = (place: number): string => `${place}${placeSuffix(place)}`;
 
@@ -25,110 +20,29 @@ export const SeasonRewards = () => {
   const tail = SEASON_FAME_REWARDS.slice(DETAILED_PLACES);
 
   return (
-    <div
-      style={{
-        background: "rgba(0,0,0,0.28)",
-        backdropFilter: "blur(16px)",
-        borderRadius: "14px",
-        padding: "18px 20px",
-        minWidth: "240px",
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "7px",
-          marginBottom: "14px",
-        }}
-      >
-        <img src="/images/coin.png" alt="coin" style={{ width: 14, height: 14, flexShrink: 0 }} />
-        <span
-          style={{
-            fontSize: "12px",
-            fontWeight: 600,
-            color: "rgba(255,255,255,0.4)",
-          }}
-        >
-          Season Rewards
-        </span>
-      </div>
+    <div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
+      <span className='text-xs text-zinc-500'>Season rewards</span>
 
-      {/* Rows */}
-      <ul
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "5px",
-          margin: 0,
-          padding: 0,
-          listStyle: "none",
-        }}
-      >
+      <ul className='flex flex-wrap items-center gap-2'>
         {detailed.map((fame, i) => {
-          const rank = RANKS[i] ?? PLAIN_RANK;
+          const tone = TONES[i];
           return (
             <li
               key={i}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "7px 10px",
-                borderRadius: "9px",
-                background: rank.rowBg,
-              }}
-            >
-              {/* Medal / rank number */}
-              <span
-                style={{
-                  width: "22px",
-                  textAlign: "center",
-                  flexShrink: 0,
-                  fontSize: rank.medal ? "15px" : "12px",
-                  color: rank.medal ? undefined : "rgba(255,255,255,0.2)",
-                  lineHeight: 1,
-                  fontWeight: 700,
-                }}
-              >
-                {rank.medal ?? i + 1}
+              aria-label={`${ordinal(i + 1)} place, ${fame.toLocaleString()} fame`}
+              className={cn(
+                "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5",
+                tone.bg,
+              )}>
+              <span aria-hidden className='text-sm leading-none'>
+                {tone.medal}
               </span>
-
-              {/* Place label */}
+              <FameCoin size={13} />
               <span
-                style={{
-                  fontSize: "13px",
-                  fontWeight: i < 3 ? 600 : 400,
-                  color: rank.labelColor,
-                  flex: 1,
-                  lineHeight: 1,
-                }}
-              >
-                {ordinal(i + 1)}
-              </span>
-
-              {/* Coin + amount */}
-              <span
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  fontWeight: 700,
-                  fontSize: i === 0 ? "16px" : "13px",
-                  color: rank.gemColor,
-                  lineHeight: 1,
-                }}
-              >
-                <img
-                  src="/images/coin.png"
-                  alt="coin"
-                  style={{
-                    width: i === 0 ? 16 : 13,
-                    height: i === 0 ? 16 : 13,
-                    flexShrink: 0,
-                  }}
-                />
+                className={cn(
+                  "text-sm font-bold tabular-nums leading-none",
+                  tone.text,
+                )}>
                 {fame.toLocaleString()}
               </span>
             </li>
@@ -137,27 +51,20 @@ export const SeasonRewards = () => {
 
         {tail.length > 0 && (
           <li
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: "9px 10px 2px",
-              fontSize: "12px",
-              color: "rgba(255,255,255,0.35)",
-              lineHeight: 1,
-            }}
-          >
-            <span style={{ width: "22px", flexShrink: 0 }} />
-            <span style={{ flex: 1 }}>
-              {ordinal(DETAILED_PLACES + 1)}–{ordinal(SEASON_FAME_REWARDS.length)}
+            aria-label={`${ordinal(DETAILED_PLACES + 1)} to ${ordinal(
+              SEASON_FAME_REWARDS.length,
+            )} place, ${tail[0].toLocaleString()} down to ${tail[
+              tail.length - 1
+            ].toLocaleString()} fame`}
+            className='flex items-center gap-1.5 px-1.5 py-1.5 text-xs text-zinc-500'>
+            <span aria-hidden>
+              {ordinal(DETAILED_PLACES + 1)}–
+              {ordinal(SEASON_FAME_REWARDS.length)}
             </span>
-            <span style={{ display: "flex", alignItems: "center", gap: "5px", fontWeight: 600 }}>
-              <img
-                src="/images/coin.png"
-                alt="coin"
-                style={{ width: 11, height: 11, flexShrink: 0, opacity: 0.6 }}
-              />
-              {tail[0].toLocaleString()}–{tail[tail.length - 1].toLocaleString()}
+            <FameCoin size={11} />
+            <span aria-hidden className='tabular-nums'>
+              {tail[0].toLocaleString()}–
+              {tail[tail.length - 1].toLocaleString()}
             </span>
           </li>
         )}

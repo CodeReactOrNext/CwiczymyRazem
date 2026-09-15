@@ -17,6 +17,8 @@ interface HeroBannerProps {
   onClick?: () => void;
   className?: string;
   leftContent?: ReactNode;
+  /** Replaces the default gap above `leftContent` — for a banner that needs to stay short. */
+  leftContentClassName?: string;
   /** Spans the full banner width, below both columns. */
   footerContent?: ReactNode;
   children?: ReactNode;
@@ -38,6 +40,7 @@ export const HeroBanner = ({
   onClick,
   className = "",
   leftContent,
+  leftContentClassName,
   footerContent,
   children,
   compact = false,
@@ -131,7 +134,7 @@ export const HeroBanner = ({
             )}
           </div>
           {leftContent && (
-            <div className="mt-6 sm:mt-8 relative z-20">
+            <div className={`relative z-20 ${leftContentClassName ?? "mt-6 sm:mt-8"}`}>
               {leftContent}
             </div>
           )}

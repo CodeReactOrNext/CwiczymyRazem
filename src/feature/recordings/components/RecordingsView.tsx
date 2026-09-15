@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { AddRecordingModal } from "feature/recordings/components/AddRecordingModal";
 import { RecordingsGrid } from "feature/recordings/components/RecordingsGrid";
@@ -15,14 +16,7 @@ import { useAppSelector } from "store/hooks";
 type ViewType = "all" | "mine";
 
 /** Segmented control shared by both tabs, so they cannot drift apart. */
-const viewTabClass = (isActive: boolean, isDisabled: boolean) =>
-  cn(
-    "flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-colors",
-    isActive
-      ? "bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
-      : "text-zinc-400 hover:text-zinc-100",
-    isDisabled && "cursor-not-allowed opacity-50 hover:text-zinc-400",
-  );
+const viewTabClass = tabNavItemClass;
 
 const RecordingsView = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -78,8 +72,10 @@ const RecordingsView = () => {
       {/* Horizontal padding matches the banner's, so the toolbar and the cards
           line up with the title above them. */}
       <div className='font-openSans flex flex-col gap-6 px-6 pb-16 pt-6 md:px-8 lg:px-10'>
-        <div className='flex flex-wrap items-center justify-between gap-3'>
-          <div className='flex items-center gap-1 rounded-lg bg-zinc-900/60 p-1'>
+        {/* The rail is the row, not just the tabs: the count rides on it so the
+            underline has one continuous line to sit against. */}
+        <div className='flex items-center gap-3 border-b border-zinc-800'>
+          <div className={cn(tabNavListClass, "border-b-0")}>
             <button
               onClick={() => setView("all")}
               className={viewTabClass(view === "all", false)}>
@@ -96,7 +92,7 @@ const RecordingsView = () => {
           </div>
 
           {!isLoading && total > 0 && (
-            <span className='text-sm text-zinc-400'>
+            <span className='ml-auto shrink-0 text-sm text-zinc-400'>
               {total} {total === 1 ? "recording" : "recordings"}
             </span>
           )}
