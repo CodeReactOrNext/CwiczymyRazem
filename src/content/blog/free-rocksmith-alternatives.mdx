@@ -18,35 +18,39 @@ author: "Michael Apfel"
 
 Rocksmith combines playing songs with following notes on screen and getting feedback from the instrument itself. Free tools can replace different parts of that experience: the gameplay, the work with tabs, or the motivation to practise regularly. Which one you want depends on which of those you need most.
 
-This guide compares five options, Riff Quest among them. Each has a free entry point, described below. With Soundlane you need to factor in the announced Pro plan. Information and screenshots are current as of **16 September 2026**.
-
 :::tip
-**Disclosure: this guide is published by Riff Quest.** We describe our own practice tool alongside alternatives that do something different. Riff Quest hasn't been given a "best overall" position here — it comes first because it covers planning and practice history, and where another tool does something better, we say so plainly.
+**Disclosure: Riff Quest publishes this guide and is included in the comparison.**
 :::
+
+**Looking for scrolling notes and real-guitar feedback? Start with StringTheory or fee[dB]ack.** Prefer a browser-based option? Try Soundlane. Riff Quest focuses on interactive exercises and building a consistent practice routine, while TuxGuitar is for editing and playing tabs.
+
+Four of the five are free open-source projects. Soundlane is the exception: free today, with a paid Pro tier announced. Information and screenshots are current as of **16 September 2026**.
 
 ## Quick Comparison
 
-| Tool | Best at | Feedback from the guitar | Free model | Main limitation |
-|---|---|---|---|---|
-| **Riff Quest** | Practice plans, interactive exercises and a progress history | Pitch Detect in supported exercises | No subscription, no paywall | The detection score doesn't judge the whole quality of a performance |
-| **StringTheory** | Playing along a 3D note highway and drilling song sections | Notes and chords, live scoring | GPL-3.0 code; downloadable releases | Your own song files and audio input setup |
-| **fee[dB]ack** | Playing and learning with support for several instruments | Audio detection; MIDI for instruments that suit it | Free, open source project | Development builds; some features are still being written |
-| **Soundlane** | A quick start in the browser and your own tabs | The developer states it scores notes and performance | Free for now; a Pro plan is on the way | The future scope of the plans may change |
-| **TuxGuitar** | Editing and playing back tabs | No Rocksmith-style scoring of your playing | Free, open source | You judge the accuracy of your playing yourself |
+| Tool | Platform | Real-guitar detection | 3D highway | Song import | Free access |
+|---|---|---|---|---|---|
+| **Riff Quest** | Browser + desktop (Windows, Linux, Apple Silicon) | Yes — Pitch Detect, in supported exercises | No — a scrolling tablature instead | Guitar Pro files you add yourself | Free, no subscription |
+| **StringTheory** | Desktop download; systems Not verified | Yes — single notes and chords, scored live | Yes — Highway3D, plus a tab view | Guitar Pro, MusicXML, Rocksmith .psarc, Clone Hero | Free, GPL-3.0 |
+| **fee[dB]ack** | Windows, macOS (Apple Silicon), Linux, self-host | Yes — notes, bends and chords | Yes — a string-and-fret highway | Guitar Pro, MusicXML, built-in editor | Free, open source (nightly builds) |
+| **Soundlane** | Browser; mobile apps in development | Yes — timing, intonation and note length, per the developer | Yes — a six-string highway | Guitar Pro 3–8 | Free now, paid Pro tier planned |
+| **TuxGuitar** | Linux, Windows, macOS, FreeBSD, Android | No — it plays a tab back, it doesn't listen | No | Guitar Pro, Power Tab, TablEdit, MIDI | Free, open source (LGPL) |
+
+Every tool that listens takes its signal from a microphone or an audio interface; none of them needs a console or a game controller.
 
 Details and sources sit with each tool below. The comparison describes features and availability; it is not a benchmark of detection accuracy or audio latency.
 
-## 1. Riff Quest — When You Want to Know What to Practise and Whether You're Improving
+## Riff Quest — Interactive Practice
 
-Riff Quest combines an exercise library, session planning and a practice history. You can build your own routine, use the [Auto Plan](/wiki/exercise-plans-and-auto-plan), work with Guitar Pro tabs and watch your skills develop. Game elements such as levels and quests help you come back to the instrument. Access is free, with no subscription — the project is funded by community support.
+Riff Quest combines an exercise library, session planning and a practice history. You can build your own routine, use the [Auto Plan](/wiki/exercise-plans-and-auto-plan), import your own Guitar Pro tabs and watch your skills develop. Game elements such as levels and quests help you come back to the instrument. Access is free, with no subscription — the project is funded by community support.
 
 <PhotoBlock
-  src="/images/blog/rocksmith/riff-quest.webp"
-  alt="Riff Quest — the exercise library with filters for practice method, status and duration"
+  src="/images/blog/rocksmith/riff-quest-exercise.webp"
+  alt="Riff Quest — the Pentatonic Box 1 exercise with a colour-coded tablature, a tempo control and the Pitch Detect button"
   ratio="auto"
-  width="750"
-  height="775"
-  caption="Our own screenshot of the running app: Practice → Exercises. The crop leaves out the account panel."
+  width="1096"
+  height="869"
+  caption="Our own screenshot of the running app: an interactive exercise with the tablature, tempo and Pitch Detect. Click to enlarge."
 />
 
 The **Pitch Detect** feature compares the notes it hears with the task in supported exercises. [Note detection](/wiki/note-detection) doesn't judge tone, dynamics or the whole musical quality of a performance. Progress points come from the practice you record, not from the hit percentage alone.
@@ -55,14 +59,9 @@ The **Pitch Detect** feature compares the notes it hears with the task in suppor
 
 **Pick it if:** what you care about most is structured practice, exercises and a visible record of the work you've done.
 
-<ActionCard
-  title="Build your own practice routine"
-  description="An exercise library, a session plan and a practice history in one place. An account is free, with no subscription and no card."
-  ctaText="Start for free"
-  href="/signup"
-/>
+**Its limits:** there's no 3D note highway and no song catalogue — songs come from tabs you bring yourself, and detection only runs in the exercises that support it.
 
-## 2. StringTheory — A 3D Note Highway, Scoring and Looping the Hard Parts
+## StringTheory — Note Highway & Scoring
 
 StringTheory is a guitar and bass game with live detection of single notes and chords. It offers a Highway3D view and tabs, section looping, speed changes and a Note By Note mode that waits for you to play the next note or chord correctly. The built-in Tone Lab lets you shape your sound.
 
@@ -75,13 +74,15 @@ StringTheory is a guitar and bass game with live detection of single notes and c
   caption="A browser screenshot showing the official gameplay image from the author's repository. It does not come from a local test of the game."
 />
 
-The program works with your own material, Guitar Pro and MusicXML among others. The project's code is available under GPL-3.0, and the README points to ready-made releases. Support for additional formats is worth checking for the specific version and its add-ons rather than assuming compatibility with your whole existing library.
+The program works with your own material: Guitar Pro, MusicXML, Clone Hero charts and Rocksmith .psarc files, which the README says you drop into the songs folder. The code is available under GPL-3.0, and the README points to a ready-made build in Releases.
 
-**How to start:** go to the project's releases, pick the build for your system, set up the instrument input and open a supported file of your own. Begin with a short loop at a slow tempo.
+**How to start:** go to the project's releases, download the build, set up the instrument input and open a song file of your own. Begin with a short loop at a slow tempo.
 
 **Pick it if:** what you're after above all is gameplay with a real guitar, scrolling notes and hit scoring. [StringTheory repository and documentation](https://github.com/AnthonySf/TheStringTheory)
 
-## 3. fee[dB]ack — A Broader Platform for Playing and Learning
+**Its limits:** the release page publishes a single archive without saying which systems it covers, so check that before you plan around it. There's no bundled music either — every song is a file you supply.
+
+## fee[dB]ack — Multi-Instrument Practice
 
 fee[dB]ack takes the note highway approach and grows it into a platform for several instruments. In the guitar section the developer describes detection of notes, bends and chords, support for alternative tunings, a tuner, and slowing down and looping sections. Songs can be imported from Guitar Pro and MusicXML, and you can write your own arrangements in the editor.
 
@@ -94,13 +95,15 @@ fee[dB]ack takes the note highway approach and grows it into a platform for seve
   caption="Our own screenshot of the official project site showing the Guitar Highway. This is promotional material, not a locally running app."
 />
 
-The project is free and open source. The site offers desktop builds for Windows, macOS on Apple Silicon and Linux, plus the option to self-host. Bear its development status in mind: the downloads are marked as nightly, and some areas, vocals for instance, are still under construction.
+The project is free and open source. The site offers desktop builds for Windows, macOS on Apple Silicon and Linux, plus the option to self-host with Docker.
 
 **How to start:** download the build for your system, add a tab or an arrangement of your own, set the audio input and begin with a single instrumental part.
 
 **Pick it if:** you want to combine playing with editing your material, and a platform that reaches beyond the guitar appeals to you. [Official fee[dB]ack site](https://got-feedback.org/)
 
-## 4. Soundlane — Your Own Tabs and a Real Guitar in the Browser
+**Its limits:** the downloads are marked as nightly builds of an alpha, and some areas — vocals and bass arrangements — are still being written.
+
+## Soundlane — Play in Your Browser
 
 Soundlane runs without installing an app and without a mandatory account. You can use the built-in material or import Guitar Pro: GP3, GP4, GP5, GPX or GP. The notes travel along a highway of the kind guitar games use, and the app states that it recognises the instrument and scores timing, intonation and note length among other things.
 
@@ -113,15 +116,17 @@ Soundlane runs without installing an app and without a mandatory account. You ca
   caption="Our own screenshot of the running web app: a song preview with no guitar connected. No test of the audio detection was carried out."
 />
 
-According to the developer, the audio analysis happens on your device. There are learning and game modes, exercises and amp tones. **The tool is free at the moment, but the FAQ announces a Pro plan** covering sync, statistics and more extensive practice tools among other things. Its future features shouldn't be presented as free forever.
+According to the developer, the audio analysis happens on your device, and a plain microphone is enough — no interface or special cable needed. There are learning and game modes, exercises and amp tones. **Soundlane is currently free. A paid Pro tier is planned**, covering cloud sync, statistics and deeper practice tools, so check its current pricing before choosing it for long-term practice.
 
 **How to start:** open the app, choose an exercise or a song, set a slow tempo and configure a microphone or an interface when you're ready to play.
 
 **Pick it if:** you want to try the play-along-with-a-tab formula quickly, without installing anything. [Soundlane and its FAQ](https://soundlane.app/)
 
-## 5. TuxGuitar — When What You Mainly Need Is Tabs
+**Its limits:** one demo song ships with the app, so in practice you play your own Guitar Pro files — and the Pro tier means today's free scope isn't a promise about next year's.
 
-TuxGuitar is a free editor and player for multi-track tabs. It opens Guitar Pro, Power Tab, TablEdit and MIDI files among others. The official project ships packages for many systems, including Windows, macOS, Linux and Android.
+## TuxGuitar — Tab Editing & Playback
+
+TuxGuitar is a free editor and player for multi-track tabs. It opens Guitar Pro, Power Tab, TablEdit and MIDI files among others. The official project ships packages for many systems, including Linux, Windows, macOS, FreeBSD and Android.
 
 <PhotoBlock
   src="/images/blog/rocksmith/tuxguitar.webp"
@@ -138,6 +143,8 @@ This one is for people who want to read, correct and play back a written part. I
 
 **Pick it if:** tabs and editing them are what you care about, and automatic scoring isn't needed. [Official TuxGuitar site](https://www.tuxguitar.app/)
 
+**Its limits:** it never listens to your guitar, so nothing here tells you whether what you played matched the page.
+
 ## Which Tool Should You Pick?
 
 - **A note highway and scoring while you play:** start with StringTheory; compare it against fee[dB]ack.
@@ -147,11 +154,30 @@ This one is for people who want to read, correct and play back a written part. I
 
 You can also combine two tools. Work on a song in a tab player, for example, and record the time and goal of the session in Riff Quest. That's a suggested way of working, not an automatic integration between the apps.
 
+<ActionCard
+  title="Build your own practice routine"
+  description="Once you've picked the tool you play along to, Riff Quest is where the practice itself gets planned and counted: an exercise library, a session plan and a history of every minute. Free account, no subscription and no card."
+  ctaText="Start for free"
+  href="/signup"
+/>
+
 ## FAQs
 
-### Does a free app mean free gear and all the songs?
+### Can I use my Real Tone cable?
 
-No. Being free applies to the software described here. The instrument, an audio interface if you need one, and some of the musical material may have to be bought separately. Being able to import a file doesn't mean the app comes with a library of well-known recordings.
+None of the five projects mentions the Rocksmith Real Tone cable by name, so treat it as **Not verified** for your specific version. What they all do support is an ordinary audio path: the cable shows up on a computer as a USB audio interface, and StringTheory, fee[dB]ack, Soundlane and Riff Quest all take their signal from a microphone or an audio interface. Whether your system lists it as an input device is the thing to check before you count on it.
+
+### Can I import my existing Rocksmith songs or CDLC?
+
+Only StringTheory mentions the format: its README says .psarc files dropped into its songs folder work without extra setup. Whether a particular official DLC or CDLC file loads is **Not verified** — we didn't test individual files. The other four don't read .psarc at all; for them you need a Guitar Pro or MusicXML tab of the song instead.
+
+### Which tools work with an acoustic guitar?
+
+Soundlane states that any guitar a microphone can hear works, with no interface or special cable. fee[dB]ack also names a decent microphone as an option for acoustic instruments, and Riff Quest's calibration asks whether you're on a microphone or an interface. StringTheory lists microphone input too, though its documentation is written around electric guitar and bass. A room mic is always the harder signal to read — expect more misses than with a cable.
+
+### Which tools include songs, and which require my own tabs?
+
+None of them ships a library of well-known recordings. Soundlane comes with a single demo song, Riff Quest has a built-in exercise library rather than songs, and StringTheory, fee[dB]ack and TuxGuitar start empty. For actual songs you bring your own files, most often Guitar Pro tabs — which is the part of Rocksmith the free tools don't replace.
 
 ### Does a high score mean I'm playing well?
 
@@ -164,5 +190,5 @@ Pick one short exercise and repeat it in two tools. Judge how readable the notes
 ## How We Put This Comparison Together
 
 :::note
-Features and access models were checked against official sources on 16 September 2026. The screenshots show the interfaces available that day, or the official material named in the captions. No comparative audio measurements were taken. Names, interfaces and promotional material belong to their creators.
+Features and access models were checked against official sources on 16 September 2026. The screenshots show the interfaces available that day, or the official material named in the captions. No comparative audio measurements were taken. Anything the sources don't confirm is marked "Not verified". Names, interfaces and promotional material belong to their creators.
 :::

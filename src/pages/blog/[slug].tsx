@@ -1,6 +1,7 @@
 import { AuthorBio } from 'components/Blog/AuthorBio';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
+import { ZoomableImages } from 'components/Blog/ZoomableImages';
 import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
 import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
 import { serializeExercises } from 'feature/exercises/lib/serializeExercise';
@@ -288,10 +289,12 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
                 </details>
               )}
 
-              <div
-                className="prose prose-invert prose-lg max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-5 prose-h2:text-white prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-li:my-3 prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-table:my-8 prose-th:text-white prose-th:py-3 prose-td:py-3"
-                dangerouslySetInnerHTML={{ __html: contentHtml }}
-              />
+              <ZoomableImages>
+                <div
+                  className="prose prose-invert prose-lg max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-5 prose-h2:text-white prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-li:my-3 prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-table:my-8 prose-th:text-white prose-th:py-3 prose-td:py-3"
+                  dangerouslySetInnerHTML={{ __html: contentHtml }}
+                />
+              </ZoomableImages>
 
               {authorProfile && (
                 <div className="mt-12">
