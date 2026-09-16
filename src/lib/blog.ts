@@ -71,8 +71,14 @@ export interface BlogFrontmatter {
   /** Ranked items for listicle posts, in display order. When present the blog template
    *  emits an ItemList JSON-LD block (eligible for list rich results). */
   listItems?: string[];
+  /** Takes the post off the site without deleting it: it disappears from the blog
+   *  listing, the "Read Also" slots and the sitemap, and its URL stops being built
+   *  (so it 404s). Flip it back to publish the post again. */
+  hidden?: boolean;
 }
 
+/** Every published post, newest first. Posts marked `hidden` in their frontmatter
+ *  are left out, so nothing on the site links to or lists them. */
 export const getAllBlogs = (): BlogFrontmatter[] => {
   if (!fs.existsSync(BLOG_DIR)) {
     return [];
@@ -89,6 +95,7 @@ export const getAllBlogs = (): BlogFrontmatter[] => {
 
       return data as BlogFrontmatter;
     })
+    .filter((blog) => !blog.hidden)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return blogs;

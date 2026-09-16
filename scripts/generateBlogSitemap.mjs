@@ -26,6 +26,8 @@ async function generateBlogSitemap() {
     for (const file of files) {
       const raw = await fs.readFile(join(BLOG_DIR, file), 'utf8');
       const { data } = matter(raw);
+      // Hidden posts are not served, so they must not be advertised either.
+      if (data.hidden) continue;
       const slug = data.slug || file.replace(/\.mdx?$/, '');
       posts.push({
         slug,
