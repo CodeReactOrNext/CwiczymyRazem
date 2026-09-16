@@ -24,7 +24,9 @@ export const BlogCard = ({ blog }: BlogCardProps) => {
           <div className="absolute inset-0 bg-black/20 transition-opacity group-hover:opacity-0" />
         </div>
 
-        <div className="flex flex-1 flex-col p-5">
+        {/* Translated posts sit in the same grid as the English ones, so the card
+            declares its own language rather than inheriting <html lang='en'>. */}
+        <div lang={blog.lang || 'en'} className="flex flex-1 flex-col p-5">
           <div className="mb-2 flex items-center gap-1.5 text-xs text-zinc-500">
             <Calendar className="h-3 w-3" />
             <span>{format(new Date(blog.date), 'MMM dd, yyyy')}</span>

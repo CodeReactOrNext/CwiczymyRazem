@@ -14,9 +14,12 @@ interface BlogHeaderProps {
   author?: string;
   authorImage?: string;
   readTime?: string;
+  /** BCP 47 code of the post's language, so a translated title and subtitle are
+   *  announced correctly on a page whose <html> stays lang='en'. */
+  lang?: string;
 }
 
-export const BlogHeader = ({ title, description, date, updatedAt, image, author, authorImage, readTime = "5 min" }: BlogHeaderProps) => {
+export const BlogHeader = ({ title, description, date, updatedAt, image, author, authorImage, readTime = "5 min", lang = "en" }: BlogHeaderProps) => {
   const showUpdated = Boolean(updatedAt) && updatedAt !== date;
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -29,7 +32,7 @@ export const BlogHeader = ({ title, description, date, updatedAt, image, author,
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
 
   return (
-    <div ref={ref} className="relative min-h-[500px] w-full overflow-hidden bg-zinc-950">
+    <div ref={ref} lang={lang} className="relative min-h-[500px] w-full overflow-hidden bg-zinc-950">
       {/* Parallax Background Image */}
       <motion.div
         style={{ y, scale }}
