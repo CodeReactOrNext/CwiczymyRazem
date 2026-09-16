@@ -188,7 +188,7 @@ export function SongPracticePickerModal({
                   </div>
                 </div>
                 <Link
-                  href="/premium"
+                  href="/supporter"
                   onClick={onClose}
                   className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-500/5 py-2 text-[11px] font-bold uppercase tracking-wider text-amber-400 transition-colors hover:border-amber-500/30 hover:bg-amber-500/10"
                 >

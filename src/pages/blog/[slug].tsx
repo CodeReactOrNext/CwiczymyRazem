@@ -14,7 +14,7 @@ import type { BlogHeading } from 'lib/blogContent';
 import { extractFaqs, renderBlogContent } from 'lib/blogContent';
 import { getExerciseLandingHref } from 'lib/exerciseLandingLink';
 import type { PracticeLink } from 'lib/internalLinks';
-import { CLUSTER_PRACTICE_LINK } from 'lib/internalLinks';
+import { getPracticeLink } from 'lib/internalLinks';
 import { ChevronRight, List } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
@@ -403,7 +403,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // Cross-link to the app: point the reader at the exercise category (or app
   // page) the post's cluster is about, with a few sample exercises to start.
-  const practiceLink = current?.cluster ? CLUSTER_PRACTICE_LINK[current.cluster] ?? null : null;
+  const practiceLink = getPracticeLink(slug, current?.cluster);
   const practiceExercises = practiceLink?.exerciseCategory
     ? serializeExercises(exercisesAgregat)
         .filter(

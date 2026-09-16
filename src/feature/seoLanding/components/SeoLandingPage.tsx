@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { AuthorBio } from "components/Blog/AuthorBio";
 import { BlogCard } from "components/Blog/BlogCard";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import type { SerializedExercise } from "feature/exercises/lib/serializeExercise";
 import { idToSlug } from "feature/exercises/lib/slugUtils";
 import { jakartaLanding } from "feature/landing/lib/fonts";
@@ -354,6 +355,12 @@ export const SeoLandingPage = ({
           {
             "@type": "ListItem",
             position: 2,
+            name: "Practice guides",
+            item: "https://riff.quest/guides",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
             name: config.title,
             item: canonical,
           },
@@ -410,31 +417,7 @@ export const SeoLandingPage = ({
           style={{ scaleX }}
         />
 
-        <nav className='fixed left-0 right-0 top-0 z-50 bg-zinc-950/90 backdrop-blur-sm'>
-          <div className='mx-auto flex h-16 max-w-7xl items-center justify-between px-6'>
-            <Link href='/' className='transition-opacity hover:opacity-70'>
-              <Image
-                src='/images/longlightlogo.svg'
-                alt='Riff Quest'
-                width={120}
-                height={32}
-                className='h-6 w-auto'
-              />
-            </Link>
-            <div className='flex items-center gap-6'>
-              <Link
-                href='/login'
-                className='text-sm text-zinc-400 transition-colors hover:text-white'>
-                Login
-              </Link>
-              <Link
-                href='/signup'
-                className='rounded-lg bg-cyan-500 px-4 py-2 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
-                Start free
-              </Link>
-            </div>
-          </div>
-        </nav>
+        <MarketingNav />
 
         <div className='relative overflow-hidden'>
           {config.heroImage && (
@@ -462,6 +445,12 @@ export const SeoLandingPage = ({
             <div className='mb-8 flex items-center gap-2 text-xs tracking-widest text-zinc-500'>
               <Link href='/' className='transition-colors hover:text-zinc-300'>
                 Home
+              </Link>
+              <ChevronRight className='h-3 w-3' aria-hidden='true' />
+              <Link
+                href='/guides'
+                className='transition-colors hover:text-zinc-300'>
+                Practice guides
               </Link>
               <ChevronRight className='h-3 w-3' aria-hidden='true' />
               <span className='max-w-[280px] truncate text-zinc-400'>

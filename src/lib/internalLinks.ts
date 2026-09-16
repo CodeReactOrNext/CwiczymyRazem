@@ -11,54 +11,64 @@ export interface PracticeLink {
 
 /**
  * Where a blog post's reader should go next to put the article into practice.
- * Keyed by the post's frontmatter `cluster` (see lib/blog.ts).
+ *
+ * Two layers, because a cluster is broader than a post: CLUSTER_PRACTICE_LINK
+ * is the fallback for a whole topic, POST_PRACTICE_LINK overrides it for a
+ * single article. Keeping only the cluster layer sent every post in the
+ * five-strong practice-routine cluster to the same landing page and left two
+ * of the five guides with no blog-side link at all (SEO audit 2026-09-16).
  */
+
+/** Keyed by the post's frontmatter `cluster` (see lib/blog.ts). */
 export const CLUSTER_PRACTICE_LINK: Record<string, PracticeLink> = {
+  "practice-routine": {
+    href: SEO_LANDING_PAGES.daily,
+    label: "Daily Practice Plan",
+  },
   "guitar-technique": {
     href: SEO_LANDING_PAGES.speed,
     label: "Speed & Hand Sync Exercises",
     exerciseCategory: "technique",
   },
-  "guitar-chords": {
+  "song-difficulty": { href: "/song-library", label: "Song Library" },
+  "guitar-apps": { href: "/how-it-works", label: "How It Works" },
+};
+
+/** Keyed by blog slug; wins over the post's cluster entry. */
+export const POST_PRACTICE_LINK: Record<string, PracticeLink> = {
+  "beginner-guitar-practice-checklist-daily-essentials": {
     href: SEO_LANDING_PAGES.beginner,
     label: "Beginner Guitar Exercises",
   },
-  "guitar-fundamentals": {
+  "guitar-chords-for-beginners": {
+    href: SEO_LANDING_PAGES.beginner,
+    label: "Beginner Guitar Exercises",
+  },
+  "how-to-practice-guitar-scales-effectively": {
     href: SEO_LANDING_PAGES.scales,
     label: "Scale Practice Routine",
     exerciseCategory: "theory",
   },
-  "deliberate-practice": {
+  "practice-guitar-every-day-simple-steps": {
+    href: SEO_LANDING_PAGES.speed,
+    label: "Speed & Hand Sync Exercises",
+    exerciseCategory: "technique",
+  },
+  "how-long-practice-guitar-daily": {
     href: SEO_LANDING_PAGES.intermediate,
     label: "Intermediate Practice Routine",
     exerciseCategory: "technique",
   },
-  "guitar-learning-path": {
-    href: SEO_LANDING_PAGES.beginner,
-    label: "Beginner Guitar Exercises",
-  },
-  "practice-routine": {
-    href: SEO_LANDING_PAGES.daily,
-    label: "Daily Practice Plan",
-  },
-  "practice-time": {
-    href: SEO_LANDING_PAGES.daily,
-    label: "Daily Practice Plan",
-  },
-  "improvement-plateau": {
-    href: SEO_LANDING_PAGES.intermediate,
-    label: "Intermediate Practice Routine",
-  },
-  "learn-guitar-faster": {
-    href: SEO_LANDING_PAGES.beginner,
-    label: "Beginner Guitar Exercises",
-  },
-  "guitar-repertoire": { href: "/song-library", label: "Song Library" },
-  "song-difficulty": { href: "/song-library", label: "Song Library" },
-  "progress-tracking": {
+  "how-to-track-guitar-practice-progress-effectively": {
     href: "/how-it-works",
     label: "How Riff Quest Tracks Progress",
   },
-  "practice-goals": { href: "/how-it-works", label: "How It Works" },
-  "guitar-apps": { href: "/how-it-works", label: "How It Works" },
 };
+
+/** The practice link for a post, or null when neither layer covers it. */
+export const getPracticeLink = (
+  slug: string,
+  cluster?: string,
+): PracticeLink | null =>
+  POST_PRACTICE_LINK[slug] ??
+  (cluster ? CLUSTER_PRACTICE_LINK[cluster] ?? null : null);

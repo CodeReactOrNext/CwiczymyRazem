@@ -46,8 +46,13 @@ function StrummingPatternViewerInner({
 
   return (
     <div className={cn("relative w-full bg-[#0a0a0a] rounded-lg overflow-hidden", className)}>
-      <div ref={containerRef} style={{ width: "100%", height: canvasH }}>
-        <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block" }} />
+      {/* The canvas sizes itself: it fits the bar to this box when it can, and
+          only scrolls when the slots would get unreadably narrow. */}
+      <div
+        ref={containerRef}
+        className='w-full overflow-x-auto overflow-y-hidden'
+        style={{ height: canvasH }}>
+        <canvas ref={canvasRef} style={{ height: "100%", display: "block" }} />
       </div>
 
       <CountInOverlay count={countInRemaining} bpm={bpm} />

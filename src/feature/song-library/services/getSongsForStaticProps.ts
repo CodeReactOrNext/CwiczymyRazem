@@ -48,7 +48,26 @@ export async function getSongsForStaticProps(limit = 24): Promise<GetSongsResult
     const total = countSnap.data().count;
 
     return { songs, total };
-  } catch {
-    return { songs: [], total: 0 };
+  } catch (error) {
+    // A bare `catch { return { songs: [], total: 0 } }` used to swallow this,
+    // so a Firestore blip mid-build shipped /song-library with an empty grid,
+    // an empty ItemList and the title "0+ Guitar Songs Ranked by Difficulty"
+    // — and nothing failed (SEO audit 2026-09-16).
+    //
+    // Without a service account there is no Firestore to reach, which is the
+    // normal state of a local build: degrade and say so. With one configured,
+    // an error is a real outage and must not be published.
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+      console.warn(
+        "[song-library] No FIREBASE_SERVICE_ACCOUNT_JSON — building the song grid empty. The written guides still render from static content.",
+      );
+      return { songs: [], total: 0 };
+    }
+
+    throw new Error(
+      `[song-library] Firestore query failed while building /song-library: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
   }
 }

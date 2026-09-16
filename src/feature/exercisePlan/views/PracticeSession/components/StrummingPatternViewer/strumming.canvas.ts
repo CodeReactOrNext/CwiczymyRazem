@@ -1,6 +1,6 @@
 import type { StrumPattern } from "feature/exercisePlan/types/exercise.types";
 
-import { ARROW_AREA_H, CURSOR_COLOR, LABEL_H, PAD, SLOT_W } from "./strumming.constants";
+import { ARROW_AREA_H, CURSOR_COLOR, LABEL_H, MIN_SLOT_W, PAD, SLOT_W } from "./strumming.constants";
 
 export function makeLabels(beats: number, subdivisions: number): string[] {
   const subs4 = ["1","e","&","a","2","e","&","a","3","e","&","a","4","e","&","a","5","e","&","a","6","e","&","a"];
@@ -17,28 +17,53 @@ export function barPixelWidth(p: StrumPattern) {
   return p.timeSignature[0] * p.subdivisions * SLOT_W;
 }
 
+/** Widest the slots may be squeezed down to so a whole bar still fits the
+ *  viewport — 16th patterns on a phone rely on this instead of being clipped. */
+export function fitSlotWidth(viewW: number, totalSlots: number) {
+  if (totalSlots <= 0) return MIN_SLOT_W;
+  return Math.max(MIN_SLOT_W, (viewW - 2 * PAD) / totalSlots);
+}
+
+/** Canvas width: the viewport while the bar fits it, otherwise the bar's own
+ *  width — the container scrolls rather than cutting the last strums off. */
+export function canvasContentWidth(viewW: number, totalSlots: number) {
+  const barW = 2 * PAD + totalSlots * fitSlotWidth(viewW, totalSlots);
+  // A bar that fits keeps the canvas exactly viewport-wide (no stray scrollbar
+  // from a rounding crumb); only a bar stuck at the floor grows the canvas.
+  return barW <= viewW + 0.5 ? viewW : Math.ceil(barW);
+}
+
+/** Arrows are drawn for a comfortable ~34px slot. Narrower slots (16th patterns
+ *  on a phone) shrink the glyph proportionally so heads never bleed into the
+ *  neighbouring slot; wider slots keep the original size. */
+export function slotScale(slotW: number) {
+  return Math.min(1, Math.max(0.6, slotW / 34));
+}
+
 export function drawDownArrow(
   ctx: CanvasRenderingContext2D,
   cx: number, arrowTop: number, h: number,
   color: string, thick: boolean, muted: boolean,
-  glowColor?: string,
+  glowColor?: string, slotW: number = SLOT_W,
 ) {
+  const s       = slotScale(slotW);
   const stemTop = arrowTop + h * 0.08;
   const stemBot = arrowTop + h * 0.72;
   const cy      = arrowTop + h / 2;
-  const hw      = thick ? 11 : 8;
-  const lw      = thick ? 3 : 2;
+  const hw      = (thick ? 11 : 8) * s;
+  const lw      = Math.max(1.5, (thick ? 3 : 2) * s);
+  const xw      = 8 * s;
   ctx.save();
   if (glowColor) { ctx.shadowColor = glowColor; ctx.shadowBlur = 14; }
   ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = "round"; ctx.lineJoin = "round";
   ctx.beginPath(); ctx.moveTo(cx, stemTop); ctx.lineTo(cx, stemBot); ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(cx - hw, stemBot - hw * 1.0); ctx.lineTo(cx, stemBot + 3); ctx.lineTo(cx + hw, stemBot - hw * 1.0);
+  ctx.moveTo(cx - hw, stemBot - hw * 1.0); ctx.lineTo(cx, stemBot + 3 * s); ctx.lineTo(cx + hw, stemBot - hw * 1.0);
   ctx.stroke();
   if (muted) {
     ctx.shadowBlur = 0; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(cx - 8, cy - 8); ctx.lineTo(cx + 8, cy + 8);
-    ctx.moveTo(cx + 8, cy - 8); ctx.lineTo(cx - 8, cy + 8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - xw, cy - xw); ctx.lineTo(cx + xw, cy + xw);
+    ctx.moveTo(cx + xw, cy - xw); ctx.lineTo(cx - xw, cy + xw); ctx.stroke();
   }
   ctx.restore();
 }
@@ -47,24 +72,26 @@ export function drawUpArrow(
   ctx: CanvasRenderingContext2D,
   cx: number, arrowTop: number, h: number,
   color: string, thick: boolean, muted: boolean,
-  glowColor?: string,
+  glowColor?: string, slotW: number = SLOT_W,
 ) {
+  const s       = slotScale(slotW);
   const cy      = arrowTop + h / 2;
   const stemBot = arrowTop + h * 0.92;
   const stemTop = arrowTop + h * 0.28;
-  const hw      = thick ? 11 : 8;
-  const lw      = thick ? 3 : 2;
+  const hw      = (thick ? 11 : 8) * s;
+  const lw      = Math.max(1.5, (thick ? 3 : 2) * s);
+  const xw      = 8 * s;
   ctx.save();
   if (glowColor) { ctx.shadowColor = glowColor; ctx.shadowBlur = 14; }
   ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = "round"; ctx.lineJoin = "round";
   ctx.beginPath(); ctx.moveTo(cx, stemBot); ctx.lineTo(cx, stemTop); ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(cx - hw, stemTop + hw * 1.0); ctx.lineTo(cx, stemTop - 3); ctx.lineTo(cx + hw, stemTop + hw * 1.0);
+  ctx.moveTo(cx - hw, stemTop + hw * 1.0); ctx.lineTo(cx, stemTop - 3 * s); ctx.lineTo(cx + hw, stemTop + hw * 1.0);
   ctx.stroke();
   if (muted) {
     ctx.shadowBlur = 0; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(cx - 8, cy - 8); ctx.lineTo(cx + 8, cy + 8);
-    ctx.moveTo(cx + 8, cy - 8); ctx.lineTo(cx - 8, cy + 8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - xw, cy - xw); ctx.lineTo(cx + xw, cy + xw);
+    ctx.moveTo(cx + xw, cy - xw); ctx.lineTo(cx - xw, cy + xw); ctx.stroke();
   }
   ctx.restore();
 }
@@ -74,29 +101,52 @@ export function drawChordHeader(
   W: number,
   pattern: StrumPattern,
   chordIdx: number,
+  reservedRight: number = 0,
 ) {
   const hasProgression = pattern.chords && pattern.chords.length > 0;
+  // Everything in the header has to live left of the "Rep n / m" counter.
+  const headerRight = W - PAD - reservedRight;
+  let contentRight  = PAD;
+
   if (hasProgression) {
+    const chords = pattern.chords!;
+    // Chips start at their comfortable size and step down once before giving up
+    // and showing only the chord that is playing — a four-chord loop otherwise
+    // runs off the right edge of a phone.
+    const chipsWidth = (size: number, padX: number, gap: number) => {
+      ctx.font = `bold ${size}px ui-sans-serif, system-ui, sans-serif`;
+      return chords.reduce((w, ch) => w + ctx.measureText(ch).width + padX * 2 + gap, 0) - gap;
+    };
     ctx.save();
-    ctx.font = `bold 13px ui-sans-serif, system-ui, sans-serif`;
+    let size = 13, padX = 8, gap = 6;
+    let width = chipsWidth(size, padX, gap);
+    if (PAD + width > headerRight) {
+      size = 11; padX = 5; gap = 4;
+      width = chipsWidth(size, padX, gap);
+    }
+    const visible = PAD + width <= headerRight
+      ? chords.map((ch, i) => [ch, i] as const)
+      : [[`${chords[chordIdx]} · ${chordIdx + 1}/${chords.length}`, chordIdx] as const];
+    ctx.font = `bold ${size}px ui-sans-serif, system-ui, sans-serif`;
     let cx = PAD;
     const py = PAD + 5, ph = 24;
-    pattern.chords!.forEach((ch, i) => {
+    visible.forEach(([ch, i]) => {
       const isSelected = i === chordIdx;
-      const tw = ctx.measureText(ch).width;
-      const pw = tw + 16;
+      const pw = ctx.measureText(ch).width + padX * 2;
       ctx.fillStyle = isSelected ? "rgba(96,165,250,0.28)" : "rgba(96,165,250,0.07)";
       ctx.beginPath(); (ctx as any).roundRect(cx, py, pw, ph, 6); ctx.fill();
       ctx.strokeStyle = isSelected ? "rgba(96,165,250,0.75)" : "rgba(96,165,250,0.18)";
       ctx.lineWidth   = isSelected ? 1.5 : 1; ctx.stroke();
       ctx.fillStyle   = isSelected ? "#93c5fd" : "rgba(147,197,253,0.38)";
-      ctx.textBaseline = "middle"; ctx.fillText(ch, cx + 8, py + ph / 2); ctx.textBaseline = "alphabetic";
-      cx += pw + 6;
+      ctx.textBaseline = "middle"; ctx.fillText(ch, cx + padX, py + ph / 2); ctx.textBaseline = "alphabetic";
+      cx += pw + gap;
     });
+    contentRight = cx - gap + 4;
     ctx.restore();
   } else if (pattern.chord) {
     ctx.save();
-    ctx.font = `bold 28px ui-sans-serif, system-ui, sans-serif`;
+    const size  = W - PAD * 2 < 260 ? 22 : 28;
+    ctx.font = `bold ${size}px ui-sans-serif, system-ui, sans-serif`;
     const textW = ctx.measureText(pattern.chord).width;
     const bx = PAD, by = PAD + 2, bw = textW + 20, bh = 32;
     ctx.fillStyle = "rgba(96,165,250,0.18)";
@@ -104,26 +154,19 @@ export function drawChordHeader(
     ctx.strokeStyle = "rgba(96,165,250,0.35)"; ctx.lineWidth = 1; ctx.stroke();
     ctx.fillStyle = "#93c5fd"; ctx.textBaseline = "middle";
     ctx.fillText(pattern.chord, bx + 10, by + bh / 2); ctx.textBaseline = "alphabetic";
+    contentRight = bx + bw + 10;
     ctx.restore();
   }
+
   if (pattern.name) {
     ctx.save();
     ctx.fillStyle = "rgba(255,255,255,0.35)";
     ctx.font = `12px ui-sans-serif, system-ui, sans-serif`;
-    let nameX = PAD;
-    if (hasProgression && pattern.chords) {
-      ctx.font = `bold 13px ui-sans-serif, system-ui, sans-serif`;
-      let pw = 0;
-      pattern.chords.forEach(ch => { pw += ctx.measureText(ch).width + 16 + 6; });
-      nameX = PAD + pw + 4;
-      ctx.font = `12px ui-sans-serif, system-ui, sans-serif`;
-    } else if (pattern.chord) {
-      ctx.font = `bold 28px ui-sans-serif, system-ui, sans-serif`;
-      const cw = ctx.measureText(pattern.chord).width + 20 + PAD + 10;
-      ctx.font = `12px ui-sans-serif, system-ui, sans-serif`;
-      nameX = cw + PAD;
+    const nameX = contentRight;
+    // Dropped rather than clipped mid-word when the chords already took the row.
+    if (nameX + ctx.measureText(pattern.name).width <= headerRight) {
+      ctx.fillText(pattern.name, nameX, PAD + 20);
     }
-    ctx.fillText(pattern.name, nameX, PAD + 20);
     ctx.restore();
   }
 }
@@ -133,7 +176,8 @@ export function drawRepDots(
   currentRep: number, maxReps: number, W: number, arrowTop: number,
 ) {
   const dotR       = 4;
-  const dotStride  = 14;
+  // Long sets would otherwise run the row off both edges on a narrow canvas.
+  const dotStride  = Math.min(14, (W - 2 * PAD - dotR * 2) / Math.max(1, maxReps - 1));
   const dotsW      = (maxReps - 1) * dotStride + dotR * 2;
   const dotsStartX = Math.max(PAD, (W - dotsW) / 2);
   const dotsY      = arrowTop + ARROW_AREA_H + LABEL_H + 3;

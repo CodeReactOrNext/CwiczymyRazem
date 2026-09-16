@@ -96,6 +96,21 @@ describe("SEO landing content configs", () => {
     }
   });
 
+  it("cross-links the guides as a full mesh", () => {
+    // Three of the five used to link to only three siblings, which left the
+    // set lopsided — /guitar-speed-hand-synchronization-exercises in
+    // particular collected the fewest internal links of any landing page
+    // (SEO audit 2026-09-16). Every guide now points at every other one.
+    const allSlugs = seoLandingConfigs.map((config) => config.slug);
+    for (const config of seoLandingConfigs) {
+      const expected = allSlugs.filter((slug) => slug !== config.slug).sort();
+      expect(
+        [...config.relatedGuideSlugs].sort(),
+        `${config.slug} does not cross-link every sibling guide`
+      ).toEqual(expected);
+    }
+  });
+
   it("resolves every in-page anchor to a heading or embedded exercise", () => {
     for (const config of seoLandingConfigs) {
       const anchors = new Set<string>([

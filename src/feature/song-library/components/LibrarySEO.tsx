@@ -17,8 +17,15 @@ export const LibrarySEO = ({ songs, totalSongs, faqQuestions }: LibrarySEOProps)
   const pageUrl = `${siteUrl}/song-library`;
   const ogImageUrl = `${siteUrl}/promo.png`;
 
-  const title = `${totalSongs}+ Guitar Songs Ranked by Difficulty | Riff Quest`;
-  const description = `Browse ${totalSongs}+ guitar songs ranked by real community difficulty ratings. Filter by tier (S through D), genre, and skill level. Find your next song to learn — free to explore.`;
+  // The body copy has always guarded on `totalSongs > 0`; the tags had not, so
+  // a build that could not reach Firestore shipped the title "0+ Guitar Songs
+  // Ranked by Difficulty" to the SERP (SEO audit 2026-09-16).
+  const countPrefix = totalSongs > 0 ? `${totalSongs}+ ` : "";
+
+  const title = `${countPrefix}Guitar Songs Ranked by Difficulty | Riff Quest`;
+  const description = `Browse ${
+    totalSongs > 0 ? `${totalSongs}+ ` : ""
+  }guitar songs ranked by real community difficulty ratings. Filter by tier (S through D), genre, and skill level. Find your next song to learn — free to explore.`;
   const keywords =
     "guitar song library, learn guitar songs, song difficulty guitar, guitar tier list, guitar practice songs, community rated guitar songs, guitar repertoire, song difficulty ratings";
 
@@ -45,7 +52,9 @@ export const LibrarySEO = ({ songs, totalSongs, faqQuestions }: LibrarySEOProps)
 
       <link rel="canonical" href={pageUrl} />
 
-      {/* ItemList — top 10 songs as MusicRecording */}
+      {/* ItemList — top 10 songs as MusicRecording. Omitted entirely when the
+          build could not read the songs, rather than emitting an empty list. */}
+      {songs.length > 0 && (
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -84,6 +93,7 @@ export const LibrarySEO = ({ songs, totalSongs, faqQuestions }: LibrarySEOProps)
           }),
         }}
       />
+      )}
 
       {/* FAQPage */}
       <script

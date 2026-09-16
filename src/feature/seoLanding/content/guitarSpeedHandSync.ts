@@ -263,6 +263,7 @@ export const guitarSpeedHandSyncConfig: SeoLandingConfig = {
     "intermediate-guitar-practice-routine",
     "guitar-scale-practice-routine",
     "beginner-guitar-exercises",
+    "daily-guitar-practice-plan",
   ],
   relatedBlogSlugs: ["how-to-practice-guitar-scales-effectively"],
   relatedSongGuideSlugs: ["master-of-puppets", "sweet-child-o-mine"],

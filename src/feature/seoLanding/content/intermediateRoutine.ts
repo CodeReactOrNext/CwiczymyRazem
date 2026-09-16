@@ -410,6 +410,7 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
     "guitar-speed-hand-synchronization-exercises",
     "guitar-scale-practice-routine",
     "daily-guitar-practice-plan",
+    "beginner-guitar-exercises",
   ],
   relatedBlogSlugs: ["how-long-practice-guitar-daily"],
   relatedSongGuideSlugs: ["sweet-child-o-mine", "hotel-california"],

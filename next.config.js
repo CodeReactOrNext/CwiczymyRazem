@@ -378,6 +378,14 @@ const nextConfig = {
         destination: '/beginner-guitar-exercises',
         permanent: true,
       },
+      // There is no paywall — the plan picker at /premium contradicted the
+      // "free forever" copy everywhere else, so the page is gone (SEO audit
+      // 2026-09-16). Supporting the project happens at /supporter.
+      {
+        source: '/premium',
+        destination: '/supporter',
+        permanent: true,
+      },
     ]
   },
   async headers() {

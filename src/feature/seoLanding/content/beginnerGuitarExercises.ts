@@ -328,6 +328,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
   relatedBlogSlugs: [
     "beginner-guitar-practice-checklist-daily-essentials",
     "how-long-practice-guitar-daily",
+    "easy-songs-to-play-on-guitar-for-beginners",
   ],
   relatedSongGuideSlugs: [
     "smoke-on-the-water",

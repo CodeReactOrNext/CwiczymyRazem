@@ -1,12 +1,12 @@
 "use client";
 
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { CookieBanner } from "feature/landing/components/CookieBanner";
 import { Footer } from "feature/landing/components/Footer";
 import { LibraryCTASection } from "feature/song-library/components/LibraryCTASection";
 import { LibraryFaqSection } from "feature/song-library/components/LibraryFaqSection";
 import { LibraryGuidesSection } from "feature/song-library/components/LibraryGuidesSection";
 import { LibraryHeroSection } from "feature/song-library/components/LibraryHeroSection";
-import { LibraryNav } from "feature/song-library/components/LibraryNav";
 import { LibrarySEO } from "feature/song-library/components/LibrarySEO";
 import { LibrarySongGrid } from "feature/song-library/components/LibrarySongGrid";
 import { LibraryStatsBar } from "feature/song-library/components/LibraryStatsBar";
@@ -59,7 +59,7 @@ const LibraryLandingPage = ({
   return (
     <>
       <LibrarySEO songs={songs} totalSongs={totalSongs} faqQuestions={faqQuestions} />
-      <LibraryNav />
+      <MarketingNav current='/song-library' />
       <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 relative overflow-x-hidden">
 
         <LibraryHeroSection totalSongs={totalSongs} />

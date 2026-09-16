@@ -86,7 +86,7 @@ const SubscriptionSettings = () => {
           </button>
         ) : (
           <a
-            href="/premium"
+            href="/supporter"
             className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500"
           >
             <Sparkles className="h-4 w-4" />

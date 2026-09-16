@@ -1,11 +1,11 @@
 "use client";
 
 import { AuthorBio } from "components/Blog/AuthorBio";
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { CookieBanner } from "feature/landing/components/CookieBanner";
 import { FaqSection } from "feature/landing/components/FaqSection";
 import { Footer } from "feature/landing/components/Footer";
 import type { SeoLandingGuideLink } from "feature/seoLanding/types/seoLanding.types";
-import { LibraryNav } from "feature/song-library/components/LibraryNav";
 import { getAuthorProfile } from "lib/authors";
 import type { ReactNode } from "react";
 
@@ -126,7 +126,7 @@ const SongGuidePage = ({
   return (
     <>
       <SongGuideSEO guide={guide} liveData={liveData} resolvedFaq={resolvedFaq} />
-      <LibraryNav />
+      <MarketingNav current='/song-library' />
       <GuideProgressBar />
       <GuideToc guide={guide} />
       <main className='relative min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30'>

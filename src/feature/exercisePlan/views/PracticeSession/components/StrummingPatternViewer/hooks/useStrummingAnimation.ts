@@ -5,7 +5,7 @@ import { applySinkId } from "utils/applyAudioSinkId";
 
 import type { SlotResult } from "../../../hooks/useStrummingMatcher";
 import { playStrumSound } from "../strumming.audio";
-import { barPixelWidth } from "../strumming.canvas";
+import { barPixelWidth, canvasContentWidth, fitSlotWidth } from "../strumming.canvas";
 import { PAD, SLOT_W } from "../strumming.constants";
 import { drawFrame } from "../strumming.frame";
 
@@ -57,21 +57,28 @@ export function useStrummingAnimation({
     }
   }, [isPlaying]);
 
+  const totalSlots = pattern ? pattern.timeSignature[0] * pattern.subdivisions : 0;
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => {
-      const w = el.clientWidth;
+    const resize = () => {
+      const viewW = el.clientWidth;
+      if (viewW === 0) return;
+      const w = canvasContentWidth(viewW, totalSlots);
       sizeRef.current = { w, h: canvasH };
       const canvas = canvasRef.current;
       if (!canvas) return;
-      const dpr     = window.devicePixelRatio || 1;
-      canvas.width  = w * dpr;
-      canvas.height = canvasH * dpr;
-    });
+      const dpr           = window.devicePixelRatio || 1;
+      canvas.style.width  = `${w}px`;
+      canvas.width        = Math.round(w * dpr);
+      canvas.height       = Math.round(canvasH * dpr);
+    };
+    const ro = new ResizeObserver(resize);
     ro.observe(el);
+    resize();
     return () => ro.disconnect();
-  }, [canvasH]);
+  }, [canvasH, totalSlots]);
 
   const tick = useCallback(() => {
     const canvas = canvasRef.current;
@@ -83,10 +90,10 @@ export function useStrummingAnimation({
     if (!pattern || w === 0) { rafRef.current = requestAnimationFrame(tick); return; }
 
     const dpr        = window.devicePixelRatio || 1;
-    const totalSlots = pattern.timeSignature[0] * pattern.subdivisions;
+    const slots      = pattern.timeSignature[0] * pattern.subdivisions;
     const bpw        = barPixelWidth(pattern);
-    const drawSlotW  = Math.max(28, (w - 2 * PAD) / totalSlots);
-    const drawBpw    = totalSlots * drawSlotW;
+    const drawSlotW  = fitSlotWidth(w, slots);
+    const drawBpw    = slots * drawSlotW;
 
     let cursorScreenX = -1;
     let totalPixels   = 0;
@@ -128,7 +135,7 @@ export function useStrummingAnimation({
       const totalSlotsElapsed = Math.floor(totalPixels / SLOT_W);
       if (totalSlotsElapsed !== lastSlotRef.current) {
         lastSlotRef.current = totalSlotsElapsed;
-        const slotInBar = totalSlotsElapsed % totalSlots;
+        const slotInBar = totalSlotsElapsed % slots;
         const beat      = pattern.strums[slotInBar];
         // Muted (volume 0) leaves the cursor and the matcher running but never
         // opens or resumes an AudioContext — the pattern plays silently.
@@ -155,6 +162,14 @@ export function useStrummingAnimation({
 
     const idleCursor = !active && countInRemaining === 0;
     if (idleCursor) cursorScreenX = PAD;
+
+    // Only reachable when the bar is too wide even at MIN_SLOT_W (very narrow
+    // container): keep the cursor centred instead of letting it run off-screen.
+    const container = containerRef.current;
+    if (container && active && w > container.clientWidth + 1) {
+      const maxScroll = w - container.clientWidth;
+      container.scrollLeft = Math.max(0, Math.min(maxScroll, cursorScreenX - container.clientWidth / 2));
+    }
 
     drawFrame(
       ctx, dpr, canvas.width, canvas.height, pattern,

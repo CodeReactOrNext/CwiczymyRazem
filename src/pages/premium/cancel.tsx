@@ -33,7 +33,7 @@ export default function PremiumCancelPage() {
           {/* Actions */}
           <div className="flex flex-col gap-3">
             <Link
-              href="/premium"
+              href="/supporter"
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white hover:bg-emerald-500 transition-colors"
             >
               <Zap className="h-4 w-4" />

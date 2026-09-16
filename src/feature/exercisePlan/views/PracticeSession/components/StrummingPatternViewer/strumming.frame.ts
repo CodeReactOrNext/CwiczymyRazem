@@ -1,7 +1,7 @@
 import type { StrumBeat, StrumPattern } from "feature/exercisePlan/types/exercise.types";
 
 import type { SlotResult } from "../../hooks/useStrummingMatcher";
-import { drawChordHeader, drawCursor, drawDownArrow, drawRepDots, drawUpArrow, makeLabels } from "./strumming.canvas";
+import { drawChordHeader, drawCursor, drawDownArrow, drawRepDots, drawUpArrow, makeLabels, slotScale } from "./strumming.canvas";
 import {
   ACCENT_DOT, ARROW_AREA_H, BAR_LINE, BEAT_LINE, BG_COLOR,
   DOWN_COLOR, HEADER_H, LABEL_BEAT, LABEL_H, LABEL_SUB,
@@ -16,6 +16,8 @@ function drawSlots(
   prevSlotFeedback: Map<number, SlotResult>, transitionAlpha: number,
 ) {
   const patternLeft = PAD;
+  const s           = slotScale(drawSlotW);
+  const narrow      = drawSlotW < 24;
   for (let si = 0; si < totalSlots; si++) {
     const slotLeft = patternLeft + si * drawSlotW;
     const slotCX   = slotLeft + drawSlotW / 2;
@@ -79,21 +81,25 @@ function drawSlots(
     }
 
     if (beat.direction === "down") {
-      drawDownArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted, glowColor);
+      drawDownArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted, glowColor, drawSlotW);
     } else if (beat.direction === "up") {
-      drawUpArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted, glowColor);
+      drawUpArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted, glowColor, drawSlotW);
     } else {
-      ctx.fillStyle = MISS_COLOR; ctx.beginPath(); ctx.arc(slotCX, arrowTop + ARROW_AREA_H / 2, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = MISS_COLOR; ctx.beginPath(); ctx.arc(slotCX, arrowTop + ARROW_AREA_H / 2, 3.5 * s, 0, Math.PI * 2); ctx.fill();
     }
 
     if (beat.accented && beat.direction !== "miss") {
-      ctx.fillStyle = ACCENT_DOT; ctx.beginPath(); ctx.arc(slotLeft + drawSlotW - 10, arrowTop + 10, 4, 0, Math.PI * 2); ctx.fill();
+      const dotR  = Math.max(2.5, 4 * s);
+      const dotCX = slotLeft + drawSlotW - Math.max(dotR + 1.5, 10 * s);
+      ctx.fillStyle = ACCENT_DOT; ctx.beginPath(); ctx.arc(dotCX, arrowTop + 10, dotR, 0, Math.PI * 2); ctx.fill();
     }
 
     const label  = labels[si] ?? "";
     const isBeat = si % pattern.subdivisions === 0;
     ctx.fillStyle = isBeat ? LABEL_BEAT : LABEL_SUB;
-    ctx.font      = isBeat ? `bold 12px ui-sans-serif, system-ui, sans-serif` : `11px ui-sans-serif, system-ui, sans-serif`;
+    ctx.font      = isBeat
+      ? `bold ${narrow ? 10 : 12}px ui-sans-serif, system-ui, sans-serif`
+      : `${narrow ? 9 : 11}px ui-sans-serif, system-ui, sans-serif`;
     ctx.textAlign = "center"; ctx.fillText(label, slotCX, arrowTop + ARROW_AREA_H + LABEL_H - 6); ctx.textAlign = "left";
   }
 }
@@ -118,12 +124,16 @@ export function drawFrame(
   const arrowTop     = PAD + HEADER_H;
   const patternWidth = totalSlots * drawSlotW;
 
-  drawChordHeader(ctx, W, pattern, chordIdx);
+  const repLabel = `Rep ${currentRep + 1} / ${maxReps}`;
+  ctx.font = `bold 12px ui-sans-serif, system-ui, sans-serif`;
+  const repWidth = ctx.measureText(repLabel).width + 8;
+
+  drawChordHeader(ctx, W, pattern, chordIdx, repWidth);
 
   ctx.save();
   ctx.font = `bold 12px ui-sans-serif, system-ui, sans-serif`; ctx.fillStyle = "rgba(255,255,255,0.38)";
   ctx.textAlign = "right"; ctx.textBaseline = "middle";
-  ctx.fillText(`Rep ${currentRep + 1} / ${maxReps}`, W - PAD, PAD + HEADER_H / 2);
+  ctx.fillText(repLabel, W - PAD, PAD + HEADER_H / 2);
   ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
   ctx.restore();
 

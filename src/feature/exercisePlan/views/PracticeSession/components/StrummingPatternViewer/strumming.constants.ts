@@ -16,3 +16,8 @@ export const LABEL_BEAT   = "rgba(255,255,255,0.75)";
 export const LABEL_SUB    = "rgba(255,255,255,0.28)";
 export const BEAT_LINE    = "rgba(255,255,255,0.06)";
 export const BAR_LINE     = "rgba(255,255,255,0.18)";
+
+/** Narrowest a slot may get while shrinking to fit. Below this the bar scrolls
+ *  horizontally instead of being clipped. 16 slots (funk 16ths) still fit on a
+ *  320px phone: 16 * 16 + 2 * PAD = 288. */
+export const MIN_SLOT_W = 16;

@@ -149,6 +149,14 @@ export const Footer = () => {
               <ul className='space-y-4'>
                 <li>
                   <Link
+                    href='/guides'
+                    className='group flex items-center text-sm font-bold text-zinc-300 transition-colors hover:text-white'>
+                    All practice guides{" "}
+                    <ChevronRight className='ml-1 h-3 w-3 opacity-0 transition-all group-hover:opacity-100' />
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href='/beginner-guitar-exercises'
                     className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
                     Beginner Exercises{" "}

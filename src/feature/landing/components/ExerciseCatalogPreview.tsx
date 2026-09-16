@@ -51,12 +51,20 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
             playback.
           </p>
 
-          <Link
-            href='/beginner-guitar-exercises'
-            className='inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
-            Explore free beginner guitar exercises
-            <ArrowRight className='h-3.5 w-3.5' />
-          </Link>
+          <div className='flex flex-wrap items-center justify-center gap-x-6 gap-y-3'>
+            <Link
+              href='/beginner-guitar-exercises'
+              className='inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
+              Explore free beginner guitar exercises
+              <ArrowRight className='h-3.5 w-3.5' />
+            </Link>
+            <Link
+              href='/guides'
+              className='inline-flex items-center gap-1 text-sm font-semibold text-zinc-400 transition-colors hover:text-white'>
+              All five practice guides
+              <ArrowRight className='h-3.5 w-3.5' />
+            </Link>
+          </div>
         </Reveal>
 
         {exercises.length > 0 && (

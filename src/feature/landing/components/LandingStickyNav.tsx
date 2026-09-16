@@ -43,8 +43,18 @@ export const LandingStickyNav = () => {
         <Logo compact />
         <div className='flex items-center gap-6'>
           <Link
-            href='/how-it-works'
+            href='/guides'
+            className='text-sm font-medium text-zinc-400 transition-colors hover:text-white'>
+            Guides
+          </Link>
+          <Link
+            href='/song-library'
             className='hidden text-sm font-medium text-zinc-400 transition-colors hover:text-white sm:block'>
+            Songs
+          </Link>
+          <Link
+            href='/how-it-works'
+            className='hidden text-sm font-medium text-zinc-400 transition-colors hover:text-white lg:block'>
             How it works
           </Link>
           <Link

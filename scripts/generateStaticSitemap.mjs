@@ -71,19 +71,28 @@ async function generateStaticSitemap() {
 
     landings.sort((a, b) => (a.path > b.path ? 1 : -1));
 
+    // The hub over the five guides. It has no content of its own to date, so
+    // it is as fresh as the freshest guide it lists.
+    const hub = {
+      path: '/guides',
+      lastmod: landings.map((landing) => landing.lastmod).sort().at(-1),
+      changefreq: 'weekly',
+      priority: '0.9',
+    };
+
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Home and information pages -->
 ${INFO_PAGES.map(urlEntry).join('\n\n')}
 
-  <!-- Practice guide landing pages (replaced the auto-generated /exercises/*) -->
-${landings.map(urlEntry).join('\n\n')}
+  <!-- Practice guide hub and its landing pages (replaced the auto-generated /exercises/*) -->
+${[hub, ...landings].map(urlEntry).join('\n\n')}
 </urlset>
 `;
 
     await fs.writeFile(OUTPUT_PATH, xml, 'utf8');
     console.log(
-      `✓ Generated static sitemap with ${INFO_PAGES.length + landings.length} URLs at ${OUTPUT_PATH}`
+      `✓ Generated static sitemap with ${INFO_PAGES.length + landings.length + 1} URLs at ${OUTPUT_PATH}`
     );
   } catch (error) {
     console.error('✗ Failed to generate static sitemap:', error.message);
