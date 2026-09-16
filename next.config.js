@@ -147,6 +147,13 @@ const nextConfig = {
         destination: '/blog/guitar-practice-routine-builder',
         permanent: true,
       },
+      // The Rocksmith alternatives post was published in Polish and translated to
+      // English (issue #828), which moved it off its Polish slug.
+      {
+        source: '/blog/darmowe-alternatywy-rocksmith',
+        destination: '/blog/free-rocksmith-alternatives',
+        permanent: true,
+      },
       // SEO consolidation (2026-07): merged posts that cannibalized the same query intent
       // into a single canonical post per topic. See issue #626.
       {
