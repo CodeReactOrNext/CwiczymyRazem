@@ -57,6 +57,9 @@ const collectContentSlugs = () => {
   for (const file of readdirSync(BLOG_DIR)) {
     if (!/\.mdx?$/.test(file)) continue;
     const raw = readFileSync(join(BLOG_DIR, file), "utf8");
+    // `hidden: true` posts are left out of getStaticPaths, so their URL 404s and
+    // any link still pointing at one has to be reported as broken.
+    if (/^hidden:\s*true\s*$/m.test(raw)) continue;
     const match = raw.match(/^slug:\s*"([^"]+)"/m);
     slugs.add(`/blog/${match ? match[1] : file.replace(/\.mdx?$/, "")}`);
   }
