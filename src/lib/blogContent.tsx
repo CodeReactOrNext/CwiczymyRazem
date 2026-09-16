@@ -179,17 +179,26 @@ const readingMinutes = (content: string): number => {
 };
 
 /**
- * The `### question` pairs under a post's `## FAQs` heading, for the FAQPage
- * schema. Stops at the next `## ` so a section following the FAQ block — a
- * conclusion, say — is not swallowed into the last answer.
+ * The heading that opens a post's question-and-answer block. English posts write
+ * `## FAQs`; a translated post names the section in its own language, so the
+ * Polish wordings are listed here as well — otherwise those posts would ship
+ * without FAQPage schema.
+ */
+const FAQ_HEADING =
+  /^## (?:FAQs?|Frequently Asked Questions|(?:Najczęstsze )?Pytania[^\n]*)$/m;
+
+/**
+ * The `### question` pairs under a post's FAQ heading, for the FAQPage schema.
+ * Stops at the next `## ` so a section following the FAQ block — a conclusion,
+ * say — is not swallowed into the last answer.
  */
 export const extractFaqs = (
   content: string
 ): { question: string; answer: string }[] => {
-  const start = content.indexOf('## FAQs');
-  if (start === -1) return [];
+  const heading = FAQ_HEADING.exec(content);
+  if (!heading) return [];
 
-  const afterHeading = content.slice(start + '## FAQs'.length);
+  const afterHeading = content.slice(heading.index + heading[0].length);
   const nextSection = afterHeading.search(/\n## /);
   const section =
     nextSection === -1 ? afterHeading : afterHeading.slice(0, nextSection);

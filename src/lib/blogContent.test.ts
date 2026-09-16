@@ -89,6 +89,25 @@ describe("extractFaqs", () => {
     ]);
   });
 
+  it("reads a FAQ section headed in the post's own language", () => {
+    const faqs = extractFaqs(
+      [
+        "## Pytania przed pierwszą sesją",
+        "",
+        "### Czy wysoki wynik oznacza, że gram dobrze?",
+        "",
+        "Wynik jest tylko wskazówką.",
+      ].join("\n")
+    );
+
+    expect(faqs).toEqual([
+      {
+        question: "Czy wysoki wynik oznacza, że gram dobrze?",
+        answer: "Wynik jest tylko wskazówką.",
+      },
+    ]);
+  });
+
   it("returns nothing for a post with no FAQ section", () => {
     expect(extractFaqs("## Something else\n\nBody.")).toEqual([]);
   });

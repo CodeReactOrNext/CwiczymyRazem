@@ -64,6 +64,10 @@ export interface BlogFrontmatter {
   cluster?: string;
   /** Marks the canonical "pillar" post of its cluster (linked first from every spoke). */
   pillar?: boolean;
+  /** BCP 47 code of the language the post is written in. Defaults to English;
+   *  set it (e.g. "pl") on translated posts so the markup declares the right
+   *  language to crawlers and screen readers. */
+  lang?: string;
   /** Ranked items for listicle posts, in display order. When present the blog template
    *  emits an ItemList JSON-LD block (eligible for list rich results). */
   listItems?: string[];

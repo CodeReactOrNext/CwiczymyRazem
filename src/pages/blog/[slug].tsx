@@ -82,6 +82,12 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
 
   const authorProfile = getAuthorProfile(frontmatter.author);
 
+  // Posts are English unless the frontmatter says otherwise. The <html> element
+  // is always lang='en', so a translated post declares its own language on the
+  // article markup and in the metadata instead.
+  const lang = frontmatter.lang || 'en';
+  const ogLocale = lang === 'pl' ? 'pl_PL' : 'en_US';
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -108,6 +114,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
             "url": "https://riff.quest/images/longlightlogo.svg"
           }
         },
+        "inLanguage": lang,
         "datePublished": frontmatter.date,
         "dateModified": frontmatter.updatedAt || frontmatter.date,
         "mainEntityOfPage": {
@@ -176,6 +183,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
         <meta property="og:image" content={absoluteImage} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://riff.quest/blog/${frontmatter.slug}`} />
+        <meta property="og:locale" content={ogLocale} />
         <meta property="article:published_time" content={frontmatter.date} />
         <meta property="article:modified_time" content={frontmatter.updatedAt || frontmatter.date} />
         <meta property="article:author" content={frontmatter.author || "Riff Quest"} />
@@ -226,9 +234,10 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
           image={frontmatter.image}
           author={frontmatter.author}
           authorImage={authorProfile?.image}
+          lang={lang}
         />
 
-        <article className="container mx-auto px-4 py-12 min-w-0">
+        <article lang={lang} className="container mx-auto px-4 py-12 min-w-0">
           <div className="mx-auto max-w-6xl flex flex-col lg:flex-row gap-12">
             {/* Sidebar ToC */}
             <aside className="hidden lg:block w-64 shrink-0 overflow-y-auto max-h-[calc(100vh-200px)] sticky top-32">
