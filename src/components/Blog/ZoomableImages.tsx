@@ -44,13 +44,21 @@ export const ZoomableImages = ({ children, className }: ZoomableImagesProps) => 
 
       <Dialog open={zoomed !== null} onOpenChange={(open) => !open && setZoomed(null)}>
         {zoomed && (
-          <DialogContent className='left-1/2 top-1/2 h-auto max-w-[96vw] -translate-x-1/2 -translate-y-1/2 gap-0 border-0 bg-transparent p-0 shadow-none sm:max-w-5xl'>
+          <DialogContent
+            overlayClassName='bg-zinc-950/95'
+            className='left-1/2 top-1/2 h-auto w-[96vw] max-w-[96vw] -translate-x-1/2 -translate-y-1/2 gap-0 border-0 bg-transparent p-0 shadow-none sm:w-[92vw] sm:max-w-5xl'>
             <DialogTitle className='sr-only'>{zoomed.alt}</DialogTitle>
-            <img
-              src={zoomed.src}
-              alt={zoomed.alt}
-              className='max-h-[88dvh] w-full rounded-lg object-contain'
-            />
+            {/* A phone already shows the screenshot at the full width of the
+                article, so fitting it into the dialog would zoom nothing. There
+                the image keeps its own pixel size and the box pans; from `sm`
+                up it fits the dialog. */}
+            <div className='max-h-[88dvh] overflow-auto rounded-lg'>
+              <img
+                src={zoomed.src}
+                alt={zoomed.alt}
+                className='h-auto w-auto max-w-none rounded-lg sm:w-full sm:max-w-full'
+              />
+            </div>
           </DialogContent>
         )}
       </Dialog>
