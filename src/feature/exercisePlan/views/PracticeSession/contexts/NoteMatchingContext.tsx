@@ -59,6 +59,10 @@ interface NoteMatchingContextValue {
   tuningOffsets?: readonly number[];
   /** Manually advance the hunt to the next target (for no-mic practice). */
   advanceHunt: () => void;
+  /** Whether `advanceHunt` actually leads anywhere — true for every rotating
+   *  hunt and for the ones that wait for an answer, false for the fixed-target
+   *  drills, where a Next button would be a dead control. */
+  canAdvanceHunt: boolean;
   /** Enable the microphone / pitch detection from inside the hunt UI. */
   onEnableMic: () => void;
   /** Toggle an octave as found by hand (no-mic self-check). */
@@ -118,6 +122,7 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   frequencyRef: _fallbackRef,
   tuningOffsets: undefined,
   advanceHunt: () => { /* no-op default */ },
+  canAdvanceHunt: false,
   onEnableMic: () => { /* no-op default */ },
   markNoteHuntOctave: () => { /* no-op default */ },
   markChordTone: () => { /* no-op default */ },
@@ -166,6 +171,8 @@ interface NoteMatchingProviderProps {
   solvedRef?: React.MutableRefObject<boolean>;
   // manually advance the hunt to the next target (for no-mic practice)
   onAdvanceHunt: () => void;
+  // whether the rotation hook is driving this drill, i.e. whether onAdvanceHunt does anything
+  canAdvanceHunt?: boolean;
   // enable the microphone / pitch detection from inside the hunt UI
   onEnableMic: () => void;
   // callback
@@ -203,6 +210,7 @@ export function NoteMatchingProvider({
   noteHuntSecondsLeft,
   solvedRef,
   onAdvanceHunt,
+  canAdvanceHunt = false,
   onEnableMic,
   onReset,
   isExamMode = false,
@@ -256,6 +264,9 @@ export function NoteMatchingProvider({
   const isIntervalClickHunt = isHunt && noteHuntMode === "intervalClick";
   const isNoteHunt = isHunt && !isChordHunt && !isClickHunt && !isIntervalClickHunt; // octaves / region / interval / accumulate
   const isAccumulatingHunt = isNoteHunt && noteHuntMode === "accumulate";
+  // The hidden-answer drills (Interval Hunt, every Degree Hunt): one round, one
+  // answer, so they are scored and graded per round rather than per octave.
+  const isPromptHunt = isNoteHunt && noteHuntMode === "interval";
   // Note/chord hunts target a bare note name with no string attached, authored as
   // if standard-tuned — on a uniformly detuned guitar (half/whole step down) the
   // pitch that actually needs to come out of the strings shifts by the same amount
@@ -285,6 +296,10 @@ export function NoteMatchingProvider({
     fretRange,
     huntStrings,
     huntTuningShift,
+    isPromptHunt,
+    // The question itself, so a fresh round that happens to land on the note
+    // still up counts (and clears) as its own round rather than starting solved.
+    customGoalPrompt ? `${customGoalPrompt.title}|${customGoalPrompt.subtitle ?? ""}` : undefined,
   );
 
   // Chord-mode: derive the chord's member pitch classes from its name.
@@ -392,6 +407,10 @@ export function NoteMatchingProvider({
       .map(key => (hitNotes[key] ? "hit" : "miss"));
   }, [hitNotes, missedNotes]);
 
+  // Prompt drills count rounds, not octaves; read out here so the memo below can
+  // depend on the number rather than on a fresh object every tick.
+  const promptRoundsPresented = noteHunt.rounds?.presented ?? null;
+
   // For the hunts, the timeline is one "hit" per unit found (octave / chord tone)
   // plus a "miss" for each still missing — so the success screen shows real progress.
   const noteTimeline = useMemo((): ("hit" | "miss")[] => {
@@ -414,7 +433,9 @@ export function NoteMatchingProvider({
       return Array.from({ length: total }, (_, i) => (i < found ? "hit" : "miss"));
     }
     if (isNoteHunt) {
-      const total = noteHunt.octaves.length;
+      // Prompt drills: one mark per round the session asked, not per octave of
+      // the note that happened to be up when it ended.
+      const total = promptRoundsPresented ?? noteHunt.octaves.length;
       const found = noteHunt.maxCombo;
       return Array.from({ length: total }, (_, i) => (i < found ? "hit" : "miss"));
     }
@@ -423,7 +444,7 @@ export function NoteMatchingProvider({
     isChordHunt, chordHunt.tones.length, chordHunt.maxCombo,
     isClickHunt, clickHunt.targetPositions.length, clickHunt.maxCombo,
     isIntervalClickHunt, intervalClickHunt.correctClicks, intervalClickHunt.mistakeCount,
-    isNoteHunt, noteHunt.octaves.length, noteHunt.maxCombo,
+    isNoteHunt, noteHunt.octaves.length, noteHunt.maxCombo, promptRoundsPresented,
     tabNoteTimeline,
   ]);
 
@@ -460,6 +481,7 @@ export function NoteMatchingProvider({
       frequencyRef: audioRefs.frequencyRef,
       tuningOffsets,
       advanceHunt: onAdvanceHunt,
+      canAdvanceHunt,
       onEnableMic,
       markNoteHuntOctave,
       markChordTone,
@@ -467,7 +489,7 @@ export function NoteMatchingProvider({
       registerIntervalClick,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
+    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
   );
 
   return (

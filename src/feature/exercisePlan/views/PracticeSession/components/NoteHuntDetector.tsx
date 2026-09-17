@@ -38,7 +38,7 @@ export function NoteHuntDetector({
   isPlaying,
   onDevPassExam,
 }: NoteHuntDetectorProps) {
-  const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, noteHuntStrings, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
+  const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, noteHuntStrings, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, canAdvanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
 
   // Read the live target from context (not the prop) so it updates through the
   // memoized desktop content wrapper when the target rotates. Falls back to the
@@ -116,7 +116,9 @@ export function NoteHuntDetector({
               to the chord. The answer takes the degree's tile once it's played. */}
           <HuntPromptCard
             title={customGoalPrompt!.title}
+            subjectCaption={customGoalPrompt!.subjectCaption}
             label={customGoalPrompt!.subtitle}
+            answerCaption={customGoalPrompt!.answerCaption}
             answer={solved ? targetNote : null}
             complete={complete}
             foundCount={foundUnits}
@@ -241,7 +243,7 @@ export function NoteHuntDetector({
     </div>
   );
 
-  const footer = (isPrompt || octaves.length > 0 || isRotating) && (
+  const footer = (isPrompt || octaves.length > 0 || canAdvanceHunt) && (
     <div className="flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2">
       {octaveChips}
 
@@ -277,8 +279,10 @@ export function NoteHuntDetector({
         </>
       )}
 
-      {/* Manual advance — works with or without the mic */}
-      {isRotating && (
+      {/* Manual advance — works with or without the mic, and on the drills that
+          wait for an answer rather than counting down (which have no timer to
+          skip, but still need a way past a chord you can't crack). */}
+      {canAdvanceHunt && (
         <button
           type="button"
           onClick={advanceHunt}

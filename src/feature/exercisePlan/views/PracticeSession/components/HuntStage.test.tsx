@@ -80,3 +80,23 @@ describe("HuntPromptCard", () => {
     expect(screen.queryByText("degree")).toBeNull();
   });
 });
+
+describe("HuntPromptCard captions", () => {
+  // The chord drills mix "Am" with bare triads like "D": left to guess from the
+  // spelling, one tile said "chord" and the other "root" inside one exercise.
+  it("lets the drill say what the subject is instead of guessing from the spelling", () => {
+    render(<HuntPromptCard title='D' subjectCaption='chord' label='5' complete={false} foundCount={0} />);
+    expect(screen.getByText("chord")).toBeTruthy();
+    expect(screen.queryByText("root")).toBeNull();
+  });
+
+  // "the 7th of E7 is D — that's the ♭7": the reveal is where the ordinal the
+  // prompt asked in gets translated, without giving the quality away up front.
+  it("carries a fuller caption on the revealed answer when one is given", () => {
+    render(
+      <HuntPromptCard title='E7' label='7th' answerCaption='7th · ♭7' answer='D' complete foundCount={1} />,
+    );
+    expect(screen.getByText("D")).toBeTruthy();
+    expect(screen.getByText("7th · ♭7")).toBeTruthy();
+  });
+});

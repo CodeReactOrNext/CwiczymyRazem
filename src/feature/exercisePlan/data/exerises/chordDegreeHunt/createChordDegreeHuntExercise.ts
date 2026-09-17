@@ -72,6 +72,27 @@ export function degreeLabel(round: ChordDegreeRound, style: DegreeLabelStyle): s
   return isTension(round.degree) ? round.degree : FUNCTIONS[round.semitones] ?? ORDINALS[round.degree];
 }
 
+const ACCIDENTAL = /[♭♯]/;
+
+/**
+ * The caption the answer tile carries once the note is on screen.
+ *
+ * A prompt that asks in ordinals ("E7 · 7th") deliberately hides whether that
+ * 7th is major or minor — reading it off the chord symbol is the drill. Once the
+ * answer is revealed there is nothing left to hide, so the caption names the
+ * degree in both languages at once: "7th · ♭7". That is the line that joins the
+ * chord-symbol theory to the chromatic shorthand players use on the neck, and it
+ * answers the question this prompt reliably provokes ("shouldn't that be a ♭7?").
+ *
+ * Only degrees whose function carries an accidental say anything new — "3rd · 3"
+ * would be noise — and the tensions already name themselves.
+ */
+export function degreeAnswerCaption(round: ChordDegreeRound, style: DegreeLabelStyle): string | undefined {
+  if (style !== "ordinal" || isTension(round.degree)) return undefined;
+  const chromatic = FUNCTIONS[round.semitones];
+  return chromatic && ACCIDENTAL.test(chromatic) ? `${ORDINALS[round.degree]} · ${chromatic}` : undefined;
+}
+
 /**
  * Every round a chord can be asked: the degrees its own formula spells, plus the
  * tensions that don't collide with them. Chords with a major 3rd take the 9th and
@@ -160,7 +181,11 @@ export function createChordDegreeHuntExercise(config: ChordDegreeHuntConfig): Ex
   const labelStyle = config.degreeLabels ?? "ordinal";
   const promptFor = (round: ChordDegreeRound) => ({
     title: round.chord,
+    // Said outright: the pool mixes "Am" with bare triads like "D", and left to
+    // guess the card captioned one a chord and the other a root.
+    subjectCaption: "chord",
     subtitle: degreeLabel(round, labelStyle),
+    answerCaption: degreeAnswerCaption(round, labelStyle),
   });
 
   return {

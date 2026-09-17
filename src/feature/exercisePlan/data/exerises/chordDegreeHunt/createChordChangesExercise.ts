@@ -1,7 +1,7 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 import type { ChordDegree, ChordDegreeRound, DegreeLabelStyle } from "./createChordDegreeHuntExercise";
-import { chordDegreeRounds, degreeLabel } from "./createChordDegreeHuntExercise";
+import { chordDegreeRounds, degreeAnswerCaption, degreeLabel } from "./createChordDegreeHuntExercise";
 
 export interface ChordProgression {
   /** Player-facing name of the loop, e.g. "ii–V–I in C". */
@@ -103,7 +103,9 @@ export function createChordChangesExercise(config: ChordChangesConfig): Exercise
 
   const promptFor = (round: ChordDegreeRound) => ({
     title: round.chord,
+    subjectCaption: "chord",
     subtitle: degreeLabel(round, labelStyle),
+    answerCaption: degreeAnswerCaption(round, labelStyle),
     steps: { labels: progressions[progressionIndex].chords, activeIndex: chordIndex },
   });
 

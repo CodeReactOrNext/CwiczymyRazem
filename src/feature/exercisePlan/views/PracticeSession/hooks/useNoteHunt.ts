@@ -31,6 +31,9 @@ export interface NoteHuntState {
   accuracy: number;
   maxPossibleScore: number;
   maxCombo: number;
+  /** Round tally for the prompt drills, `null` for the octave hunts — how many
+   *  questions the session has put up and how many were answered. */
+  rounds: { solved: number; presented: number } | null;
 }
 
 const SAMPLE_MS = 50;            // ~20 Hz, same cadence as the live tuner
@@ -114,21 +117,36 @@ function buildState(
   isMatch: boolean,
   hitId: number,
   scoreOffset = 0,
+  /** Rounds banked so far (the current one excluded from `solved`, included in
+   *  `presented`). `null` grades by octave instead — see below. */
+  rounds: { solved: number; presented: number } | null = null,
 ): NoteHuntState {
   const foundInRange = octaves.filter(o => found.has(o)).length;
-  const multiplier = Math.min(8, Math.floor(foundInRange / 5) + 1);
+
+  // Two different things can be graded here, and grading the wrong one is what
+  // made the prompt drills unwinnable. An octave hunt asks for every octave of a
+  // note, so its unit is the octave. A prompt drill ("the 7th of E7") is answered
+  // by playing the target ONCE, so its unit is the round: playing D in one octave
+  // is a whole correct answer, not a quarter of one. Counting octaves there
+  // capped a perfect run at 100/number-of-playable-octaves — 25% — and reset it
+  // on every rotation, so the grade only ever flickered between 0% and 25%.
+  const units = rounds ? rounds.solved + (foundInRange > 0 ? 1 : 0) : foundInRange;
+  const total = rounds ? rounds.presented : octaves.length;
+  const multiplier = Math.min(8, Math.floor(units / 5) + 1);
   return {
     detectedNote, detectedOctave, cents, isMatch, hitId, octaves,
     foundOctaves: Array.from(found).sort((a, b) => a - b),
     gameState: {
-      // Cumulative across the session: banked total + the current target's score.
-      score: scoreOffset + scoreForCount(foundInRange),
-      combo: foundInRange,
+      // Cumulative across the session either way: the round tally already spans
+      // it, and the octave hunts add the banked total of the targets gone by.
+      score: rounds ? scoreForCount(units) : scoreOffset + scoreForCount(foundInRange),
+      combo: units,
       multiplier,
     },
-    accuracy: octaves.length > 0 ? Math.round((foundInRange / octaves.length) * 100) : 0,
-    maxPossibleScore: scoreForCount(octaves.length),
-    maxCombo: foundInRange,
+    accuracy: total > 0 ? Math.round((units / total) * 100) : 0,
+    maxPossibleScore: scoreForCount(total),
+    maxCombo: units,
+    rounds,
   };
 }
 
@@ -139,7 +157,8 @@ function buildState(
  *
  * Designed to live in a long-lived owner (NoteMatchingProvider): it retargets
  * and clears progress in place when `targetNote` changes, rather than relying on
- * remounting.
+ * remounting. `roundGraded` switches it from grading octaves to grading rounds,
+ * which is what the hidden-answer prompt drills actually ask for.
  */
 export interface NoteHuntControls {
   state: NoteHuntState;
@@ -159,16 +178,29 @@ export function useNoteHunt(
   /** Semitone shift applied to the target before matching the mic's detected
    *  pitch — see getUniformTuningShift. 0 (default) matches literal absolute pitch. */
   tuningShift = 0,
+  /** Prompt drills (interval mode): the target is hidden behind a question and
+   *  playing it once answers the round, so score and grade run across rounds
+   *  rather than across the octaves of the note currently up. */
+  roundGraded = false,
+  /** Identity of the question the target belongs to, for the drills that have
+   *  one. Two rounds in a row can land on the same note — the ♭3 of Am and the
+   *  5th of F are both C — and retargeting on the note alone missed the change:
+   *  the new question opened with the old one's answer already revealed, already
+   *  solved, and never counted as a round of its own. */
+  roundKey?: string,
 ): NoteHuntControls {
   const shiftedTargetNote = shiftNote(targetNote, tuningShift);
   const [state, setState] = useState<NoteHuntState>(() =>
-    buildState(targetOctaves(shiftedTargetNote, fretRange, strings), new Set(), null, null, 0, false, 0),
+    buildState(
+      targetOctaves(shiftedTargetNote, fretRange, strings), new Set(), null, null, 0, false, 0, 0,
+      roundGraded ? { solved: 0, presented: 1 } : null,
+    ),
   );
 
   // Re-roll progress when the note, region window, strings or tuning change.
   // Derived as a primitive key so a fresh fretRange/strings array each render
   // doesn't reset us.
-  const targetKey = `${shiftedTargetNote}|${fretRange ? `${fretRange[0]}-${fretRange[1]}` : ""}|${strings?.join(",") ?? ""}`;
+  const targetKey = `${shiftedTargetNote}|${fretRange ? `${fretRange[0]}-${fretRange[1]}` : ""}|${strings?.join(",") ?? ""}|${roundKey ?? ""}`;
 
   const rafRef         = useRef(0);
   const lastSampleRef  = useRef(0);
@@ -182,12 +214,21 @@ export function useNoteHunt(
   // Score banked from previous targets — keeps the total accumulating across rotations.
   const sessionScoreRef = useRef(0);
   const firstTargetRef  = useRef(true);
+  // Prompt drills: rounds answered (the one on screen excluded until it rotates)
+  // and rounds the session has put up (the one on screen included, so an
+  // unanswered question already counts against the grade).
+  const roundsSolvedRef    = useRef(0);
+  const roundsPresentedRef = useRef(1);
 
   // Retarget in place when the goal note or region changes (no remount). Refs
   // only — the RAF loop pushes the cleared state on its next tick.
   useEffect(() => {
     // Bank the finishing target's score before clearing (skip the initial mount).
-    if (!firstTargetRef.current) sessionScoreRef.current += scoreForCount(prevFoundRef.current);
+    if (!firstTargetRef.current) {
+      sessionScoreRef.current += scoreForCount(prevFoundRef.current);
+      if (prevFoundRef.current > 0) roundsSolvedRef.current += 1;
+      roundsPresentedRef.current += 1;
+    }
     firstTargetRef.current = false;
     targetRef.current     = shiftedTargetNote;
     octavesRef.current    = targetOctaves(shiftedTargetNote, fretRange, strings);
@@ -198,7 +239,10 @@ export function useNoteHunt(
     hitIdRef.current      = 0;
     // Push the cleared state now — the RAF loop is idle when the mic is off, so
     // without this the previous note's found octaves would linger after a rotate.
-    setState(buildState(octavesRef.current, foundRef.current, null, null, 0, false, 0, sessionScoreRef.current));
+    setState(buildState(
+      octavesRef.current, foundRef.current, null, null, 0, false, 0, sessionScoreRef.current,
+      roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
+    ));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetKey]);
 
@@ -247,6 +291,7 @@ export function useNoteHunt(
             const next = buildState(
               octaves, foundRef.current, data.note, data.octave, data.cents,
               isMatch, hitIdRef.current, sessionScoreRef.current,
+              roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
             );
             setState(prev => sameState(prev, next) ? prev : next);
           }
@@ -266,7 +311,7 @@ export function useNoteHunt(
 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [active, frequencyRef, volumeRef]);
+  }, [active, frequencyRef, volumeRef, roundGraded]);
 
   // Self-check for players without a mic: tap to toggle an octave as found. Feeds
   // the same found-set/scoring path as live detection.
@@ -283,8 +328,9 @@ export function useNoteHunt(
     setState(prev => buildState(
       octavesRef.current, found, prev.detectedNote, prev.detectedOctave, prev.cents,
       prev.isMatch, hitIdRef.current, sessionScoreRef.current,
+      roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
     ));
-  }, []);
+  }, [roundGraded]);
 
   return { state, markOctave };
 }

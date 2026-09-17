@@ -872,6 +872,7 @@ export const PracticeSession = ({
       noteHuntSecondsLeft={noteHuntSecondsLeft}
       solvedRef={huntSolvedRef}
       onAdvanceHunt={advanceHunt}
+      canAdvanceHunt={huntTarget !== null}
       onEnableMic={handleMicToggle}
       onReset={handleNoteMatchingReset}
       isExamMode={isExamMode}

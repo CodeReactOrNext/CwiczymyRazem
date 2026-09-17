@@ -17,6 +17,14 @@ export type LocalizedContent = string;
 export interface HuntPrompt {
   title: string;
   subtitle?: string;
+  /** What the title IS, in a word: "chord", "root". Without it the card guesses
+   *  from the spelling, which reads a bare major triad ("D") as a root note. */
+  subjectCaption?: string;
+  /** The caption under the answer once it's revealed, when it should say more
+   *  than the question did. The drills that ask in ordinals name the degree both
+   *  ways there — "7th · ♭7" — so the reveal teaches the chromatic name the
+   *  prompt deliberately withheld. Defaults to `subtitle`. */
+  answerCaption?: string;
   /** Drills that walk a fixed sequence rather than rolling at random: the whole
    *  loop and the step the prompt is currently on. Rendered as a strip under the
    *  card, so the player can see the change that's coming and prepare for it —

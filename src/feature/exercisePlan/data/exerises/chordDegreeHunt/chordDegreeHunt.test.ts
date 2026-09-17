@@ -4,7 +4,8 @@ import { describe, expect, it } from "vitest";
 import { chordDegreeHuntSeventhsExercise } from "./chordDegreeHuntSevenths";
 import { chordDegreeHuntTensionsExercise } from "./chordDegreeHuntTensions";
 import { chordDegreeHuntTriadsExercise } from "./chordDegreeHuntTriads";
-import { chordDegreeRounds, degreeLabel } from "./createChordDegreeHuntExercise";
+import type { ChordDegree } from "./createChordDegreeHuntExercise";
+import { chordDegreeRounds, degreeAnswerCaption, degreeLabel } from "./createChordDegreeHuntExercise";
 
 const exercises = [
   chordDegreeHuntTriadsExercise,
@@ -127,5 +128,37 @@ describe("chord degree hunt drills", () => {
       seen.push(`${rolled.prompt!.title}-${rolled.prompt!.subtitle}`);
     }
     for (let i = 1; i < seen.length; i++) expect(seen[i]).not.toBe(seen[i - 1]);
+  });
+});
+
+describe("answer caption", () => {
+  const round = (chord: string, degree: ChordDegree) => chordDegreeRounds([chord], [degree])[0];
+
+  // The question players keep asking: "E7 · 7th" wants D, and D is a minor 7th.
+  // The prompt stays an ordinal on purpose — reading the quality off the symbol
+  // is the drill — but once the answer is on screen the caption says both.
+  it("names an ordinal degree in chromatic shorthand once the answer is revealed", () => {
+    expect(degreeAnswerCaption(round("E7", "7"), "ordinal")).toBe("7th · ♭7");
+    expect(degreeAnswerCaption(round("Am7", "3"), "ordinal")).toBe("3rd · ♭3");
+    expect(degreeAnswerCaption(round("Bm7b5", "5"), "ordinal")).toBe("5th · ♭5");
+  });
+
+  // "7th · 7" and "3rd · 3" teach nothing, and the drills that already ask in
+  // functions have nothing left to translate.
+  it("stays quiet where the two names would say the same thing", () => {
+    expect(degreeAnswerCaption(round("Cmaj7", "7"), "ordinal")).toBeUndefined();
+    expect(degreeAnswerCaption(round("C", "5"), "ordinal")).toBeUndefined();
+    expect(degreeAnswerCaption(round("Am7", "9"), "ordinal")).toBeUndefined();
+    expect(degreeAnswerCaption(round("Am", "3"), "function")).toBeUndefined();
+  });
+
+  it("calls the subject a chord, whatever the symbol looks like", () => {
+    // A bare major triad is spelled like a note name, and the card used to read
+    // "D · root" in a drill that is asking about the D chord.
+    for (const exercise of exercises) {
+      for (let i = 0; i < 20; i++) {
+        expect(exercise.rollHuntTarget!().prompt?.subjectCaption).toBe("chord");
+      }
+    }
   });
 });

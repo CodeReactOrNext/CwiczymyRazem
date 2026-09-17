@@ -228,8 +228,14 @@ function promptLabelValue(label: string): ReactNode {
 interface HuntPromptCardProps {
   /** What the question is about — a chord symbol ("G7") or a root note ("A"). */
   title: string;
+  /** The word under the title tile. Falls back to guessing from the title, which
+   *  only the drills that don't say get — "D" is a chord in a chord drill and a
+   *  root in an interval one, and the title alone can't tell the two apart. */
+  subjectCaption?: string;
   /** What to find inside it — "5th", "♭3", "Perfect 5th ↑". */
   label?: string;
+  /** The word under the answer tile once it's revealed; defaults to `label`. */
+  answerCaption?: string;
   /** The note it lands on, once the player has played it; `null` keeps it hidden. */
   answer?: string | null;
   complete: boolean;
@@ -246,7 +252,7 @@ interface HuntPromptCardProps {
  * out, so it carries the same weight and takes the accent colour, and the answer
  * lands in its place once it has been played.
  */
-export function HuntPromptCard({ title, label, answer, complete, foundCount }: HuntPromptCardProps) {
+export function HuntPromptCard({ title, subjectCaption, label, answerCaption, answer, complete, foundCount }: HuntPromptCardProps) {
   const solved = !!answer;
   return (
     <div className="relative flex items-start justify-center gap-2 sm:gap-3">
@@ -258,7 +264,7 @@ export function HuntPromptCard({ title, label, answer, complete, foundCount }: H
       />
       <PromptTile
         value={title}
-        caption={NOTE_NAME.test(title) ? "root" : "chord"}
+        caption={subjectCaption ?? (NOTE_NAME.test(title) ? "root" : "chord")}
         tone="subject"
         animationKey={title}
         valueClassName={cn("whitespace-nowrap", valueTypeScale(title))}
@@ -269,7 +275,7 @@ export function HuntPromptCard({ title, label, answer, complete, foundCount }: H
           // and the degree drops to the caption so the pair still reads as
           // "the 5th of G7 is D" rather than losing the question.
           value={solved ? answer : promptLabelValue(label)}
-          caption={solved ? label : MULTI_WORD.test(label) ? "interval" : "degree"}
+          caption={solved ? (answerCaption ?? label) : MULTI_WORD.test(label) ? "interval" : "degree"}
           tone={solved ? "solved" : "ask"}
           animationKey={solved ? `answer-${answer}` : label}
           valueClassName={solved ? cn("whitespace-nowrap", valueTypeScale(answer!)) : promptLabelClass(label)}
