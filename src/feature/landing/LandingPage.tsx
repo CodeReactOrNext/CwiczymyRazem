@@ -1,11 +1,15 @@
 "use client";
 
 import { SectionSeam } from "components/SectionSeam/SectionSeam";
-import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
+import type {
+  faqGroupInterface,
+  faqQuestionInterface,
+} from "feature/faq/components/FaqLayout";
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
 import { LandingStickyNav } from "feature/landing/components/LandingStickyNav";
 import { jakartaLanding } from "feature/landing/lib/fonts";
+import type { TabPreviewNote } from "feature/landing/lib/tabPreview";
 import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 import type { BlogFrontmatter } from "lib/blog";
 import dynamic from "next/dynamic";
@@ -71,6 +75,7 @@ interface LandingPageProps {
     category: string;
     description: string;
     timeInMinutes: number;
+    tabPreview?: TabPreviewNote[];
   }>;
   guideLiveData?: PathSongLiveDataMap;
 }
@@ -80,53 +85,68 @@ const LandingPage = ({
   spotlightExercises = [],
   guideLiveData = {},
 }: LandingPageProps) => {
-  const faqQuestions: faqQuestionInterface[] = [
+  const faqGroups: faqGroupInterface[] = [
     {
-      title: "Is Riff Quest a free guitar practice app?",
-      message:
-        "Yes. Riff Quest is a free guitar practice app — session tracking, the exercise library, community song difficulty ratings and your progress stats are free forever, with no trial and no credit card. It is funded by community donations rather than subscriptions, so there is nothing to unlock later.",
+      section: "Getting started",
+      questions: [
+        {
+          title: "Is Riff Quest a free guitar practice app?",
+          message:
+            "Yes. Riff Quest is a free guitar practice app — session tracking, the exercise library, community song difficulty ratings and your progress stats are free forever, with no trial and no credit card. It is funded by community donations rather than subscriptions, so there is nothing to unlock later.",
+        },
+        {
+          title: "Do I need to download anything?",
+          message:
+            "No. Riff Quest is a web app that runs in your browser on desktop, tablet and phone — you sign up free and start practicing in seconds, with nothing to install and no app store involved. There is an optional desktop app for players who want low-latency audio input, but it is never required.",
+        },
+        {
+          title: "Who is this app for?",
+          message:
+            "Riff Quest is for guitarists who want to turn their practice into visible progress. If you feel inconsistent, stuck, or just want a better way to track your repertoire, this is for you.",
+        },
+        {
+          title: "Is it for beginners or advanced guitarists?",
+          message:
+            "It's designed for both. Beginners use it to stay motivated and track their first skills, while advanced players use it to manage complex repertoires and see where they stand in the community.",
+        },
+      ],
     },
     {
-      title: "Do I need to download anything?",
-      message:
-        "No. Riff Quest is a web app that runs in your browser on desktop, tablet and phone — you sign up free and start practicing in seconds, with nothing to install and no app store involved. There is an optional desktop app for players who want low-latency audio input, but it is never required.",
-    },
-    {
-      title: "Who is this app for?",
-      message:
-        "Riff Quest is for guitarists who want to turn their practice into visible progress. If you feel inconsistent, stuck, or just want a better way to track your repertoire, this is for you.",
-    },
-    {
-      title: "Is it for beginners or advanced guitarists?",
-      message:
-        "It's designed for both. Beginners use it to stay motivated and track their first skills, while advanced players use it to manage complex repertoires and see where they stand in the community.",
-    },
-    {
-      title: "Do I have to practice every day to use it?",
-      message:
-        "Absolutely not. We hate 'streak pressure.' Riff Quest is a companion that tracks your growth whenever you pick up the guitar, whether that's daily or just a few times a week.",
-    },
-    {
-      title: "Where do the song difficulty levels come from?",
-      message:
-        "They are community-rated. Instead of a single expert deciding how hard a song is, the difficulty reflects the real-world experience of guitarists who have actually practiced and learned it.",
-    },
-    {
-      title: "How does progress tracking work?",
-      message:
-        "The app automatically logs your sessions and skill development in areas like Technique, Theory, and Ear Training, giving you a clear bird's-eye view of your improvement.",
-    },
-    {
-      title: "Can I track my own custom songs and exercises?",
-      message:
-        "Yes! You have full flexibility to log any song or exercise you're currently working on, keeping your practice organized and your progress visible.",
-    },
-    {
-      title: "How does the gamification (XP) help me?",
-      message:
-        "By earning skill points and leveling up, you get a tangible sense of achievement for every minute spent with your guitar. It turns 'messy practice' into a rewarding progression system.",
+      section: "Practicing with Riff Quest",
+      questions: [
+        {
+          title: "Do I have to practice every day to use it?",
+          message:
+            "Absolutely not. We hate 'streak pressure.' Riff Quest is a companion that tracks your growth whenever you pick up the guitar, whether that's daily or just a few times a week.",
+        },
+        {
+          title: "Where do the song difficulty levels come from?",
+          message:
+            "They are community-rated. Instead of a single expert deciding how hard a song is, the difficulty reflects the real-world experience of guitarists who have actually practiced and learned it.",
+        },
+        {
+          title: "How does progress tracking work?",
+          message:
+            "The app automatically logs your sessions and skill development in areas like Technique, Theory, and Ear Training, giving you a clear bird's-eye view of your improvement.",
+        },
+        {
+          title: "Can I track my own custom songs and exercises?",
+          message:
+            "Yes! You have full flexibility to log any song or exercise you're currently working on, keeping your practice organized and your progress visible.",
+        },
+        {
+          title: "How does the gamification (XP) help me?",
+          message:
+            "By earning skill points and leveling up, you get a tangible sense of achievement for every minute spent with your guitar. It turns 'messy practice' into a rewarding progression system.",
+        },
+      ],
     },
   ];
+
+  // Flat list for the FAQPage schema in <LandingSEO>.
+  const faqQuestions: faqQuestionInterface[] = faqGroups.flatMap(
+    (group) => group.questions,
+  );
 
   return (
     <>
@@ -146,7 +166,7 @@ const LandingPage = ({
         <TestimonialsSection />
         <MidCTASection />
         <FaqSection
-          questions={faqQuestions}
+          groups={faqGroups}
           moreLink={{
             intro:
               "Still wondering about something? Scoring, note detection, the desktop app and the rest of it are covered on",

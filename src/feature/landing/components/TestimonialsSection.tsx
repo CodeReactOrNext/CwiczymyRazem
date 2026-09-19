@@ -1,9 +1,11 @@
 "use client";
 
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { DISCORD_INVITE_URL } from "constants/community";
 import { Reveal } from "feature/landing/components/Reveal";
-import { Clock, Quote } from "lucide-react";
+import { ArrowRight, Clock, Quote } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 // The logged-hours count is the credibility signal of this section (real
 // usage, not a purchased review), so it renders as an accent pill instead
@@ -47,6 +49,35 @@ const rest = [
   },
 ];
 
+// Nothing here is a claim a visitor has to take on faith: every line links to
+// the place where it can be checked (the about page, the funding page, the
+// server itself). No press logos or store ratings because there are none.
+const trustFacts = [
+  {
+    title: "Built in the open since 2022",
+    body: "One guitarist has been shipping it for four years, and every desktop release is public on GitHub.",
+    link: { href: "/about", label: "Read the story", external: false },
+  },
+  {
+    title: "Funded by players, not investors",
+    body: "No ads and no subscriptions. Running costs are covered by supporters on Buy Me a Coffee, which is the whole business model.",
+    link: {
+      href: "https://buymeacoffee.com/riffquest",
+      label: "See the supporter page",
+      external: true,
+    },
+  },
+  {
+    title: "Ask the community before you sign up",
+    body: "A small, active Discord where the developer answers questions and players share routines and plans.",
+    link: {
+      href: DISCORD_INVITE_URL,
+      label: "Join the Discord",
+      external: true,
+    },
+  },
+];
+
 export const TestimonialsSection = () => {
   return (
     // The one light section on the landing page (see PR writeup for why and
@@ -60,9 +91,13 @@ export const TestimonialsSection = () => {
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <Reveal className='mb-12 max-w-3xl'>
-          <h2 className='font-landingHeading text-3xl font-bold leading-tight tracking-tight text-ivory-fg sm:text-4xl lg:text-5xl'>
+          <h2 className='font-landingHeading text-3xl font-extrabold leading-tight tracking-[-0.03em] text-ivory-fg sm:text-4xl lg:text-5xl'>
             Loved by guitarists who show up.
           </h2>
+          <p className='mt-4 max-w-xl text-base leading-relaxed text-ivory-muted'>
+            Four players, in their own words. The hours next to each name come
+            from their own practice logs.
+          </p>
         </Reveal>
 
         <Reveal
@@ -116,6 +151,29 @@ export const TestimonialsSection = () => {
             </Reveal>
           ))}
         </div>
+
+        <Reveal
+          delay={0.15}
+          className='mt-20 grid grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-8'>
+          {trustFacts.map((fact) => (
+            <div key={fact.title} className='max-w-sm'>
+              <h3 className='mb-2 text-base font-bold tracking-tight text-ivory-fg'>
+                {fact.title}
+              </h3>
+              <p className='mb-3 text-sm leading-relaxed text-ivory-muted'>
+                {fact.body}
+              </p>
+              <Link
+                href={fact.link.href}
+                target={fact.link.external ? "_blank" : undefined}
+                rel={fact.link.external ? "noopener noreferrer" : undefined}
+                className='inline-flex items-center gap-1 text-sm font-bold text-ivory-accent transition-colors hover:text-ivory-fg'>
+                {fact.link.label}
+                <ArrowRight className='h-3.5 w-3.5' aria-hidden='true' />
+              </Link>
+            </div>
+          ))}
+        </Reveal>
       </div>
     </section>
   );

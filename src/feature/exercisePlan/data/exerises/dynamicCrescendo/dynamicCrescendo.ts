@@ -9,9 +9,9 @@ export const dynamicCrescendoExercise: Exercise = {
   category: "technique",
   timeInMinutes: 3,
   instructions: [
-    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
-    "Audit your dynamic consistency and attack angle using a clean tone.",
-    "Transition between positions fluidly without disrupting the rhythmic grid."
+    "Pick the A string at the fifth fret in steady eighth notes; the notation shows how loud each note should be.",
+    "Change volume only with pick depth and attack speed, never with the volume knob: shallow and slow for soft, deep and fast for loud.",
+    "Keep the tempo and the spacing between notes identical at every volume level."
   ],
   tips: [
     "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",

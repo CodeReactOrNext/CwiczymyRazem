@@ -23,7 +23,7 @@ export const BlogSection = ({ blogs }: BlogSectionProps) => {
       <div className='mx-auto max-w-7xl px-6 lg:px-8'>
         <Reveal className='mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end'>
           <div>
-            <h2 className='font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white'>
+            <h2 className='font-landingHeading text-4xl font-extrabold leading-tight tracking-[-0.03em] text-white'>
               Latest from the blog
             </h2>
           </div>

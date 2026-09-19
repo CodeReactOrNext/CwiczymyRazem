@@ -1,11 +1,12 @@
 "use client";
 
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
+import { FeatureList } from "feature/landing/components/FeatureList";
 import { Reveal } from "feature/landing/components/Reveal";
 import { featuredGuides } from "feature/landing/data/featuredGuides";
 import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { ArrowRight, BookMarked, Disc3, Filter, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -15,22 +16,18 @@ interface SongsLibrarySectionProps {
 
 const features = [
   {
-    icon: <Disc3 className='h-4 w-4' />,
     label: "Thousands of songs",
     desc: "A growing library spanning every genre and level",
   },
   {
-    icon: <Star className='h-4 w-4' />,
     label: "Community difficulty ratings",
     desc: "Real scores from guitarists who played the song",
   },
   {
-    icon: <Filter className='h-4 w-4' />,
     label: "Smart filtering",
     desc: "By genre, difficulty, technique, or skill level",
   },
   {
-    icon: <BookMarked className='h-4 w-4' />,
     label: "Want to learn list",
     desc: "Turn your wishlist into a structured plan",
   },
@@ -51,7 +48,7 @@ export const SongsLibrarySection = ({
         <div className='grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.7fr] xl:gap-16'>
           {/* Left - content */}
           <Reveal className='flex flex-col'>
-            <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
+            <h2 className='mb-6 font-landingHeading text-4xl font-extrabold leading-tight tracking-[-0.03em] text-white sm:text-5xl'>
               Every song you want{" "}
               <span className='text-zinc-400'>to learn. Ranked.</span>
             </h2>
@@ -63,32 +60,15 @@ export const SongsLibrarySection = ({
 
             <Link
               href='/song-library'
-              className='mb-8 inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
+              className='mb-10 inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
               Browse the song library
               <ArrowRight className='h-3.5 w-3.5' />
             </Link>
 
-            {/* Feature list */}
-            <ul className='space-y-5'>
-              {features.map((f, i) => (
-                <li key={i} className='flex items-start gap-4'>
-                  <div className='mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
-                    {f.icon}
-                  </div>
-                  <div>
-                    <div className='mb-0.5 text-sm font-bold text-white'>
-                      {f.label}
-                    </div>
-                    <div className='text-sm leading-relaxed text-zinc-400'>
-                      {f.desc}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <FeatureList features={features} />
 
             {/* Featured song guides */}
-            <div className='mt-8'>
+            <div className='mt-10'>
               <p className='mb-2.5 text-sm font-bold text-white'>
                 Popular guides
               </p>
@@ -100,7 +80,7 @@ export const SongsLibrarySection = ({
                   const liveRating =
                     live && live.avgDifficulty > 0 ? live : undefined;
                   const tier = getSongTier(
-                    liveRating?.tier ?? guide.editorial.difficulty
+                    liveRating?.tier ?? guide.editorial.difficulty,
                   );
                   return (
                     <Link
