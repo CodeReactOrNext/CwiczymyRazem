@@ -20,16 +20,16 @@ import { useEffect, useRef } from "react";
 
 const StaticCTA = () => (
   <div className='flex flex-col items-center gap-2'>
-    <Link href='/signup' onClick={() => trackSignupCtaClicked('landing_hero')}>
+    <Link href='/signup' onClick={() => trackSignupCtaClicked("landing_hero")}>
       <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
         <span className='flex items-center gap-3 whitespace-nowrap'>
-          Start tracking free
+          Start tracking
           <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-1.5' />
         </span>
       </Button>
     </Link>
-    <span className='mt-1 whitespace-nowrap text-xs font-medium text-zinc-400'>
-      Free forever, no paywalls
+    <span className='mt-1 max-w-xs text-center text-xs font-medium leading-relaxed text-zinc-400'>
+      No credit card. Funded by player donations, not subscriptions.
     </span>
   </div>
 );
@@ -111,7 +111,7 @@ const StatCounter = ({
 
   return (
     <div className='flex flex-col items-center gap-1'>
-      <motion.span className='font-landingHeading text-3xl font-bold tracking-tight text-white sm:text-4xl'>
+      <motion.span className='font-teko text-5xl font-semibold tabular-nums leading-none text-white sm:text-6xl'>
         {display}
       </motion.span>
       <span className='text-sm font-medium text-zinc-400'>{label}</span>
@@ -246,7 +246,7 @@ export const HeroSection = () => {
             variants={headlineGroup}
             initial={shouldReduceMotion ? "visible" : "hidden"}
             animate='visible'
-            className='mb-6 font-landingHeading text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl'>
+            className='mb-6 font-landingHeading text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl lg:text-6xl'>
             <motion.span variants={headlineLine} className='block'>
               The free guitar practice app
             </motion.span>

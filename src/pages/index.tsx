@@ -2,10 +2,14 @@ import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { serializeExercises } from "feature/exercises/lib/serializeExercise";
 import { featuredGuideSongIds } from "feature/landing/data/featuredGuides";
 import LandingPage from "feature/landing/LandingPage";
+import {
+  getTabPreview,
+  type TabPreviewNote,
+} from "feature/landing/lib/tabPreview";
 import { getPathSongLiveData } from "feature/song-library/song-guides/services/getSongGuideLiveData";
 import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
-import type { BlogFrontmatter} from "lib/blog";
-import {getAllBlogs } from "lib/blog";
+import type { BlogFrontmatter } from "lib/blog";
+import { getAllBlogs } from "lib/blog";
 import type { GetStaticProps } from "next";
 import type { NextPageWithLayout } from "types/page";
 
@@ -14,10 +18,11 @@ interface HomeProps {
   spotlightExercises: Array<{
     id: string;
     title: string;
-    difficulty: 'beginner' | 'easy' | 'medium' | 'hard';
+    difficulty: "beginner" | "easy" | "medium" | "hard";
     category: string;
     description: string;
     timeInMinutes: number;
+    tabPreview?: TabPreviewNote[];
   }>;
   guideLiveData: PathSongLiveDataMap;
 }
@@ -41,15 +46,18 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
 
   // Select 3 free exercises (unmarked as premium) with tablature for landing preview
   const spotlightExercises = serializeExercises(exercisesAgregat)
-    .filter((ex) => !ex.premium && ex.tablature?.length && !ex.isHiddenFromLibrary)
+    .filter(
+      (ex) => !ex.premium && ex.tablature?.length && !ex.isHiddenFromLibrary,
+    )
     .slice(0, 3)
     .map((ex) => ({
       id: ex.id,
       title: ex.title,
-      difficulty: ex.difficulty as 'beginner' | 'easy' | 'medium' | 'hard',
+      difficulty: ex.difficulty as "beginner" | "easy" | "medium" | "hard",
       category: ex.category,
       description: ex.description,
       timeInMinutes: ex.timeInMinutes,
+      tabPreview: getTabPreview(ex.tablature),
     }));
 
   // Live tier badges for the "Popular guides" strip: see featuredGuides.
@@ -67,5 +75,3 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
 Home.minimalLayout = true;
 
 export default Home;
-
-

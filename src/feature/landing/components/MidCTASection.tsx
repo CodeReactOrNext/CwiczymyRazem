@@ -24,7 +24,7 @@ export const MidCTASection = () => {
 
               <div className='relative flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center'>
                 <div>
-                  <h2 className='font-landingHeading text-3xl font-bold tracking-tight text-white sm:text-4xl'>
+                  <h2 className='font-landingHeading text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl'>
                     Make tonight&apos;s practice count.
                   </h2>
                   <p className='mt-3 text-lg leading-relaxed text-zinc-400'>
@@ -34,16 +34,16 @@ export const MidCTASection = () => {
                 <div className='flex shrink-0 flex-col items-start gap-2 sm:items-center'>
                   <Link
                     href='/signup'
-                    onClick={() => trackSignupCtaClicked('landing_mid')}>
+                    onClick={() => trackSignupCtaClicked("landing_mid")}>
                     <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
                       <span className='flex items-center gap-3 whitespace-nowrap'>
-                        Start tracking free
+                        Create your account
                         <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-1.5' />
                       </span>
                     </Button>
                   </Link>
                   <span className='text-xs font-medium text-zinc-400'>
-                    Free forever, no paywalls
+                    Takes about a minute. No credit card.
                   </span>
                 </div>
               </div>

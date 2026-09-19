@@ -62,9 +62,9 @@ export const tripletsDrillExercise: Exercise = {
   category: "technique",
   timeInMinutes: 1.520,
   instructions: [
-    "Execute notes cleanly while suppressing all sympathetic string vibrations.",
-    "Audit your dynamic consistency and attack angle using a clean tone.",
-    "Transition between positions fluidly without disrupting the rhythmic grid."
+    "Play three even notes per beat on the G string, counting \"1 trip-let, 2 trip-let\" aloud.",
+    "Land the first note of every group exactly on the click; the other two split the beat into equal thirds.",
+    "Keep the pick motion the same size for all three notes so the third one is not rushed or swallowed."
   ],
   tips: [
     "Mute low strings with your picking-hand palm and high strings with your fretting-hand index finger.",

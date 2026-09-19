@@ -65,7 +65,7 @@ export const LandingStickyNav = () => {
           <Link href='/signup'>
             <Button className='group/btn h-10 rounded-lg border-none bg-white px-5 text-sm font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
               <span className='flex items-center gap-2 whitespace-nowrap'>
-                Start tracking free
+                Start tracking
                 <ArrowRight className='h-4 w-4 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-1' />
               </span>
             </Button>

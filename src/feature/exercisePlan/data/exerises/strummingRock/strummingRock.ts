@@ -64,5 +64,20 @@ export const strummingRockExercise: Exercise = {
         { direction: "up" },
       ],
     },
+    {
+      name: "Pattern D: Backbeat",
+      timeSignature: [4, 4],
+      subdivisions: 2,
+      strums: [
+        { direction: "down" },
+        { direction: "up" },
+        { direction: "down", accented: true },
+        { direction: "up" },
+        { direction: "down" },
+        { direction: "up" },
+        { direction: "down", accented: true },
+        { direction: "up" },
+      ],
+    },
   ],
 };

@@ -3,6 +3,7 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { LandingExerciseCard } from "feature/landing/components/LandingExerciseCard";
 import { Reveal } from "feature/landing/components/Reveal";
+import type { TabPreviewNote } from "feature/landing/lib/tabPreview";
 import {
   getExerciseLandingPageKey,
   SEO_LANDING_PAGES,
@@ -14,7 +15,7 @@ import Link from "next/link";
 /** Counted from the catalogue rather than hard-coded: the headline said 144
  *  long after the library had grown past 200 (SEO audit 2026-09-05). */
 const CATALOG_SIZE = exercisesAgregat.filter(
-  (exercise) => !exercise.isHiddenFromLibrary
+  (exercise) => !exercise.isHiddenFromLibrary,
 ).length;
 
 interface ExerciseCatalogPreviewProps {
@@ -25,6 +26,7 @@ interface ExerciseCatalogPreviewProps {
     category: string;
     description: string;
     timeInMinutes: number;
+    tabPreview?: TabPreviewNote[];
   }>;
 }
 
@@ -41,7 +43,7 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <Reveal className='mx-auto mb-12 max-w-2xl text-center'>
-          <h2 className='mb-6 font-landingHeading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl'>
+          <h2 className='mb-6 font-landingHeading text-4xl font-extrabold leading-tight tracking-[-0.03em] text-white sm:text-5xl'>
             {CATALOG_SIZE} exercises ready to learn
           </h2>
 
@@ -55,7 +57,7 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
             <Link
               href='/beginner-guitar-exercises'
               className='inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
-              Explore free beginner guitar exercises
+              Explore the beginner guitar exercises
               <ArrowRight className='h-3.5 w-3.5' />
             </Link>
             <Link

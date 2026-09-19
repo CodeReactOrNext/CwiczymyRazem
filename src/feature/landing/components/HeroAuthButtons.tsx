@@ -60,10 +60,10 @@ export const HeroAuthButtons = () => {
             <div className='flex flex-col items-center gap-4 sm:flex-row'>
               <Link
                 href='/signup'
-                onClick={() => trackSignupCtaClicked('landing_hero')}>
+                onClick={() => trackSignupCtaClicked("landing_hero")}>
                 <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
                   <span className='flex items-center gap-3 whitespace-nowrap'>
-                    Start tracking free
+                    Start tracking
                     <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-1.5' />
                   </span>
                 </Button>
@@ -75,8 +75,8 @@ export const HeroAuthButtons = () => {
                 <FcGoogle className='mr-2 h-5 w-5' /> Continue with Google
               </Button>
             </div>
-            <span className='mt-1 whitespace-nowrap text-xs font-medium text-zinc-400'>
-              Free forever, no paywalls
+            <span className='mt-1 max-w-xs text-center text-xs font-medium leading-relaxed text-zinc-400'>
+              No credit card. Funded by player donations, not subscriptions.
             </span>
           </div>
         )}

@@ -86,7 +86,7 @@ let hardTablature = generateTablature("hard");
 export const rhythmTrainingEasy: Exercise = {
   id: "rhythm_training_easy",
   title: "Rhythm Training — Easy",
-  description: "Execute fundamental quarter and half-note rhythms on a muted string to establish a solid internal pulse.",
+  description: "Play quarter notes, half notes and rests on a muted string, with the occasional pair of eighth notes, to establish a solid internal pulse.",
   whyItMatters: "This exercise strips away all melodic and harmonic distractions, forcing you to focus entirely on rhythmic precision. Developing a strong quarter-note pulse is the foundational prerequisite for all complex strumming and lead playing.",
   difficulty: "easy",
   category: "technique",

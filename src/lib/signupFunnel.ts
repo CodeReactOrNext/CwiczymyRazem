@@ -21,6 +21,8 @@ export type SignupCtaLocation =
   | "landing_final"
   | "guide_hero"
   | "guide_cta"
+  | "feature_hero"
+  | "feature_demo"
   | "song_card";
 
 const currentPath = (): string =>

@@ -30,10 +30,8 @@ export const Footer = () => {
                 improving.
               </p>
               <p className='max-w-sm text-sm font-medium leading-relaxed text-zinc-400'>
-                Riff Quest is{" "}
-                <span className='font-bold text-zinc-300'>100% free</span>, no
-                subscriptions, no paywalls. It stays free thanks to the
-                community, funded entirely through{" "}
+                No subscriptions, no paywalls, no ads. Riff Quest is funded by
+                the community through{" "}
                 <span className='font-bold text-amber-400'>
                   Buy Me a Coffee
                 </span>
@@ -137,6 +135,14 @@ export const Footer = () => {
                     href='/how-it-works'
                     className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
                     How it works{" "}
+                    <ChevronRight className='ml-1 h-3 w-3 opacity-0 transition-all group-hover:opacity-100' />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href='/interactive-guitar-practice'
+                    className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
+                    Interactive practice{" "}
                     <ChevronRight className='ml-1 h-3 w-3 opacity-0 transition-all group-hover:opacity-100' />
                   </Link>
                 </li>
