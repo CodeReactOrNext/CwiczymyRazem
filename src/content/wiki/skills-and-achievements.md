@@ -10,16 +10,22 @@ order: 2
 
 The app tracks 23 individual guitar skills (alternate picking, legato, bending, vibrato, chords, scales, rhythm, ear training, improvisation, transcription and so on), grouped under the same four categories used everywhere else: technique, theory, hearing and creativity.
 
-<ClickPath steps="Practice|Skills" caption="Each skill card shows what it is, what feeds it, and the exercises that train it." />
+<ClickPath steps="Practice|Skills" caption="The Skills screen is one big map: a trunk down the middle, seven milestones on it, and every exercise in the library as a single dot on a branch." />
 
-<Screenshot src="/images/wiki/skills-technique.webp" alt="The Technique section of the Skills screen: cards for Alternate Picking at 33 XP, Finger Independence at 14, Legato at 12, Sweep Picking at 4, Rhythm Mastery at 15, String Bending at 6, Tapping at 2 and Articulation at 11, each with a row of small boxes, a few ticked green and the rest crossed out" caption="One card per skill, grouped by category. The boxes under each are the exercises that feed it — green for the ones you've done, so a card that's mostly crosses is a drill you haven't touched yet." />
+The map runs top to bottom, from Foundations through Technique, Theory & Fretboard, Rhythm & Groove, Expression & Style and Ear Training to Creativity, and ends at Mastery. Each milestone fans out into branches named after a skill (Alternate Picking, Legato, Click Hunts, Strumming Patterns…), and each branch is a chain of dots ordered easiest first. A filled dot is an exercise you've played, a hollow dot is still untouched, and a padlock marks a Pro exercise. Exactly one dot on the whole map wears a ring: the exercise you're up to.
+
+Each branch carries its skill's level next to the name, the same number the category summary counts. Two branches that train the same skill show the same level, because it is the same skill split into two stretches of the map.
+
+Hover a dot to see what it is, click it to preview and start it; click a branch name to open the full list for that skill. The card in the bottom corner always holds your next exercise, with a button to start it and another to show where it sits on the map. The list of milestones on one side jumps you to any part of the journey, and the panel opposite keeps the tally of how much of the library you've covered.
+
+Drag anywhere to pan, or use the arrow keys. The plus and minus buttons zoom, as does Ctrl and the scroll wheel, and the fit button brings the whole width back. Open the map after a session and it lands on your next exercise rather than at the top.
 
 Every exercise you complete as part of a logged session feeds the skills it's tagged with. There's no cap and nothing to level up into. A skill is a running total that only ever goes up, so the number is a record of attention paid, not a grade.
 
-The gaps are the point. A card sitting at 2 XP with one green box isn't a failing grade, it's a shortlist: those crossed-out boxes are exercises you could do tonight.
+The gaps are the point. A branch with one filled dot and eight hollow ones isn't a failing grade, it's a shortlist: those hollow dots are exercises you could do tonight.
 
 <BlogAlert type="info">
-The same number is labelled "XP" on an individual skill card and "Level" on the category summary. It's the same value shown two ways, and nothing is being tracked twice.
+The same number is labelled "XP" in the skill list and "Level" on the category summary. It's the same value shown two ways, and nothing is being tracked twice.
 </BlogAlert>
 
 Use it as a mirror rather than a target: if theory has barely moved in a month, that's the useful information here, and Practice → Exercises lets you pick a drill for exactly that gap.

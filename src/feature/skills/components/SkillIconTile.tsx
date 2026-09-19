@@ -2,7 +2,7 @@ import { cn } from "assets/lib/utils";
 import type { IconType } from "react-icons";
 
 /**
- * The tinted tile a skill icon sits on. Lives here rather than inside SkillCard
+ * The tinted tile a skill icon sits on. Lives here as a shared piece
  * so the Skill Tree and the exercise browser show a skill the same way — the
  * gradient and the accent are the only thing that tells a wall of otherwise
  * identical cards apart at a glance.

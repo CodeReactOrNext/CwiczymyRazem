@@ -1010,21 +1010,6 @@
     "permanent": true
   },
   {
-    "source": "/exercises/rhythm-sixteenth-group-2",
-    "destination": "/beginner-guitar-exercises",
-    "permanent": true
-  },
-  {
-    "source": "/exercises/rhythm-sixteenth-group-3",
-    "destination": "/beginner-guitar-exercises",
-    "permanent": true
-  },
-  {
-    "source": "/exercises/rhythm-sixteenth-group-4",
-    "destination": "/intermediate-guitar-practice-routine",
-    "permanent": true
-  },
-  {
     "source": "/exercises/pentatonic-box1-up-down",
     "destination": "/guitar-scale-practice-routine#pentatonic-box1-up-down",
     "permanent": true

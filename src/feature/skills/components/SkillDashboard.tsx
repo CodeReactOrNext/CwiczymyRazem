@@ -2,7 +2,6 @@ import { Button } from "assets/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
-import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
 import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
 import { recordExerciseCompletion } from "feature/communityExercises/services/communityExerciseService";
@@ -16,8 +15,11 @@ import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { SkillRoadmapMobile } from "feature/skills/roadmap/SkillRoadmapMobile";
+import { SkillRoadmapView } from "feature/skills/roadmap/SkillRoadmapView";
 import type { UserSkills } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { useIsCompactViewport } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowLeft, ChevronRight, Ear, Lock,Mic, MousePointerClick, Network, Search, Star, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/router";
@@ -27,7 +29,6 @@ import { useAppSelector } from "store/hooks";
 
 import { ExerciseBrowseTab } from "./ExerciseBrowseTab";
 import { ExerciseCheckmark } from "./ExerciseCheckmark";
-import { SkillCategoryGroup } from "./SkillCategoryGroup";
 
 export interface DashboardExercise {
   id: string;
@@ -55,13 +56,19 @@ interface SkillDashboardProps {
   userSkills: UserSkills;
 }
 
-const CATEGORIES: CategoryKeys[] = ["technique", "theory", "hearing", "creativity"];
 const DIFFICULTY_ORDER = ["beginner", "easy", "medium", "hard"];
 
 export const SkillDashboard = ({
   userSkills,
 }: SkillDashboardProps) => {
   const router = useRouter();
+  const activeTab = (router.query.tab as string) || "skill-tree";
+  // Only the desktop map is a fixed-height view that fills the screen. The two
+  // list tabs stay an ordinary scrolling page, as does the layout around them —
+  // and so does the roadmap on a phone, which is a list rather than a drawing.
+  const isCompact = useIsCompactViewport();
+  const isFullBleedMap = activeTab === "skill-tree" && !isCompact;
+
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [selectedChallenge, setSelectedChallenge] = useState<DashboardExercise | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
@@ -161,23 +168,6 @@ export const SkillDashboard = ({
     }, {} as Record<string, Record<string, DashboardExercise[]>>);
   }, []);
 
-  const skillProgressMap = useMemo(() => {
-    const map: Record<
-      string,
-      { completed: number; total: number; states: { done: boolean; title: string }[] }
-    > = {};
-    exercisesAgregat.forEach((exercise) => {
-      const skillId = exercise.relatedSkills[0] || "general";
-      if (!map[skillId]) map[skillId] = { completed: 0, total: 0, states: [] };
-      map[skillId].total += 1;
-
-      const isCompleted = hasExerciseProgress(progressMap.get(exercise.id));
-      map[skillId].states.push({ done: isCompleted, title: exercise.title as string });
-      if (isCompleted) map[skillId].completed += 1;
-    });
-    return map;
-  }, [progressMap]);
-
   const { filteredTree, uniqueDifficulties } = useMemo(() => {
     if (!selectedSkillId) return { filteredTree: {}, uniqueDifficulties: [] };
     const skillData = guitarSkills.find(s => s.id === selectedSkillId);
@@ -260,7 +250,13 @@ export const SkillDashboard = ({
 
   if (selectedChallenge) {
     return (
-      <div className="w-full min-h-[600px] bg-zinc-900/40 rounded-lg overflow-hidden relative">
+      <div
+        className={cn(
+          "relative w-full bg-zinc-900/40",
+          isFullBleedMap
+            ? "h-full overflow-y-auto"
+            : "min-h-[600px] overflow-hidden rounded-lg"
+        )}>
         <div className="absolute top-6 left-6 z-[100]">
            <Button
             variant="ghost"
@@ -283,16 +279,19 @@ export const SkillDashboard = ({
     );
   }
 
-  const activeTab = (router.query.tab as string) || "skill-tree";
 
   return (
-    <div className="w-full pb-24 flex flex-col">
+    <div className={cn("flex w-full flex-col", isFullBleedMap ? "h-full" : "pb-24")}>
       <Tabs 
         value={activeTab} 
         onValueChange={(val) => router.push({ query: { ...router.query, tab: val } }, undefined, { shallow: true })} 
-        className="w-full"
+        className={cn("w-full", isFullBleedMap && "flex min-h-0 flex-1 flex-col")}
       >
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-8">
+        <div
+          className={cn(
+            "mx-auto w-full max-w-7xl px-4 lg:px-6",
+            isFullBleedMap ? "shrink-0 pt-4" : "pt-8"
+          )}>
           <TabsList className={tabNavListClass}>
             <TabsTrigger
               value="skill-tree"
@@ -317,27 +316,27 @@ export const SkillDashboard = ({
           </TabsList>
         </div>
 
-        <TabsContent value="skill-tree" className="mt-0">
-          <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-12">
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-12">
-                {CATEGORIES.map((category) => {
-                  const categorySkills = guitarSkills.filter(s => s.category === category);
-                  if (categorySkills.length === 0) return null;
-                  return (
-                    <SkillCategoryGroup
-                      key={category}
-                      category={category}
-                      skills={categorySkills}
-                      userSkills={userSkills}
-                      skillProgressMap={skillProgressMap}
-                      onSkillClick={(id) => setSelectedSkillId(id)}
-                    />
-                  );
-                })}
-              </div>
+        <TabsContent value="skill-tree" className="mt-0 min-h-0 flex-1">
+          {isCompact ? (
+            <SkillRoadmapMobile
+              progressMap={progressMap}
+              skillLevels={userSkills.unlockedSkills}
+              isPremium={isPremium}
+              onStartExercise={handleStartChallenge}
+              onShowUpgrade={() => setShowUpgradeModal(true)}
+            />
+          ) : (
+            <div className="h-full w-full">
+              <SkillRoadmapView
+                progressMap={progressMap}
+                skillLevels={userSkills.unlockedSkills}
+                isPremium={isPremium}
+                onStartExercise={handleStartChallenge}
+                onShowUpgrade={() => setShowUpgradeModal(true)}
+                onSkillClick={(id) => setSelectedSkillId(id)}
+              />
             </div>
-          </div>
+          )}
         </TabsContent>
 
         <TabsContent value="browse" className="mt-0">
