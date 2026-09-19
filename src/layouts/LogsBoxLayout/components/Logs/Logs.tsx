@@ -935,6 +935,16 @@ const SongBadge = ({
     </Chip>
   );
 
+/**
+ * The exercise a log's title refers to, or `null` when the catalog no longer
+ * knows it. Old logs store the title text as it was at log time and names get
+ * renamed (#786), so the legacy-title → id map keeps historical rows linking.
+ */
+const findExerciseByTitle = (title: string): Exercise | null =>
+  exercisesAgregat.find((ex) => ex.title === title) ??
+  exercisesAgregat.find((ex) => ex.id === LEGACY_EXERCISE_TITLES[title]) ??
+  null;
+
 /** Renders a single activity's description inside a grouped feed row — same detail as the standalone item, minus the avatar and reaction (those live once on the group). */
 const GroupedLogLine = ({
   log,
@@ -1215,16 +1225,29 @@ const GroupedLogLine = ({
     ? defaultPlans.find((p) => p.id === genericLog.planId)
     : null;
   const matchedExercise: Exercise | null = genericLog.exerciseTitle
-    ? (exercisesAgregat.find((ex) => ex.title === genericLog.exerciseTitle) ??
-      // Old logs store the title text as it was at log time. Names get renamed (#786) —
-      // fall back to the legacy-title → id map so historical logs keep linking correctly.
-      exercisesAgregat.find(
-        (ex) =>
-          ex.id === LEGACY_EXERCISE_TITLES[genericLog.exerciseTitle as string],
-      ) ??
-      null)
+    ? findExerciseByTitle(genericLog.exerciseTitle)
     : null;
-  const planTitle = plan ? plan.title : null;
+  // The session's own name, as the report filed it. A song session's title just
+  // repeats its song line ("Song: …", "Practicing: …"), so it is not one.
+  const sessionTitle =
+    genericLog.exerciseTitle &&
+    !genericLog.exerciseTitle.includes("Practicing: ") &&
+    !genericLog.exerciseTitle.startsWith("Song: ")
+      ? genericLog.exerciseTitle
+      : null;
+  // A custom or community plan is not in `defaultPlans`, so its name only ever
+  // reaches the feed as the session title — without this it used to vanish and
+  // leave a ten-song routine looking like one song. An ad-hoc single-exercise
+  // session carries a planId as well (the library wraps the exercise in a
+  // throwaway plan), so a title the catalog still knows stays an exercise.
+  const planTitle = plan
+    ? plan.title
+    : genericLog.planId && sessionTitle && !matchedExercise
+      ? sessionTitle
+      : null;
+  // `songTitle` only ever holds the song that got the most time, so on a routine
+  // that ran a whole setlist it named one of ten. The plan's name says it all.
+  const hidesPrimarySong = !!planTitle && (genericLog.songs?.length ?? 0) > 1;
   const sessionTimeMs = genericLog.timeSumary?.sumTime ?? 0;
 
   return (
@@ -1291,8 +1314,7 @@ const GroupedLogLine = ({
           </Chip>
         ))}
 
-      {genericLog.exerciseTitle &&
-        !genericLog.exerciseTitle.includes("Practicing: ") &&
+      {sessionTitle &&
         !planTitle &&
         !genericLog.songTitle &&
         (matchedExercise ? (
@@ -1303,14 +1325,14 @@ const GroupedLogLine = ({
             <Chip color='emerald' className='cursor-pointer text-left'>
               <Dumbbell className='h-3.5 w-3.5 shrink-0' />
               <span className='underline-offset-2 hover:underline'>
-                {genericLog.exerciseTitle}
+                {sessionTitle}
               </span>
             </Chip>
           </button>
         ) : (
           <Chip color='emerald'>
             <Dumbbell className='h-3.5 w-3.5 shrink-0' />
-            {genericLog.exerciseTitle}
+            {sessionTitle}
           </Chip>
         ))}
 
@@ -1350,7 +1372,7 @@ const GroupedLogLine = ({
           </span>
         ))}
 
-      {genericLog.songTitle && genericLog.songArtist && (
+      {genericLog.songTitle && genericLog.songArtist && !hidesPrimarySong && (
         <p className='flex flex-wrap items-center gap-1.5 text-sm text-secondText'>
           {t("common:song_status.practiced")}
           {genericLog.songId && (

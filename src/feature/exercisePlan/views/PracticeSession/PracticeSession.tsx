@@ -468,7 +468,7 @@ export const PracticeSession = ({
     isAudioMuted, isAudioPlaying, effectiveBpm, masterVolume,
     currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
     autoStopAfterFirstLoop: isEarTrainingRiddle,
-    isMetronomeMuted, showAlphaTabScore, examMode: isExamMode,
+    isMetronomeMuted, metronomeVolume: metronome.volume, showAlphaTabScore, examMode: isExamMode,
     examBacking: activeExercise.examBacking,
     metronomeAudioContext: metronome.audioContext,
     metronomeStartTime: metronome.startTime,

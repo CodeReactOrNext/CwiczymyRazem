@@ -258,10 +258,11 @@ export const useAlphaTabPlayer = ({
 
   // AlphaTab built-in metronome volume.
   // countInVolume stays 0 — our metronome handles the count-in clicks.
-  // metronomeVolume is driven by the caller (0 when user mutes, 1 otherwise).
+  // metronomeVolume is driven by the caller: the session metronome's own mute toggle
+  // and volume slider, mapped onto AlphaTab's gain (see toAlphaTabClickVolume).
   // isPlayerReady in deps: this is the *only* click the player hears once the
-  // count-in ends (the device metronome mutes itself during GP playback), and its
-  // value normally never changes, so it must be re-applied the moment the API exists.
+  // count-in ends (the device metronome mutes itself during GP playback), so a level
+  // that was already in place before the API existed must still reach it.
   useEffect(() => {
     const api = apiRef.current;
     if (api && isPlayerReady) api.metronomeVolume = metronomeVolume;

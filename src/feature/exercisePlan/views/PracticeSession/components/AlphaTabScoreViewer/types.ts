@@ -31,6 +31,10 @@ export interface AlphaTabScoreViewerProps {
    *  source while notation is shown (the session's separate device-metronome click is
    *  muted for this view), so the click can never drift from the notation playback. */
   isMetronomeMuted?: boolean;
+  /** Session metronome level (0..1, default 0.5 = AlphaTab's normal click loudness).
+   *  The click the slider belongs to is silent in this view, so without this the
+   *  slider would move nothing — see toAlphaTabClickVolume. */
+  metronomeVolume?: number;
   /** Per-track mute/volume for the underlying synth (independent of which track is rendered
    *  visually). Both this and `backingTrackIds` MUST be memoized by the caller. */
   trackConfigs?: Record<string, { isMuted: boolean; volume: number }>;

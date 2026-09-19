@@ -4,11 +4,22 @@ import { useEffect, useState } from "react";
 
 const ITEMS_PER_PAGE = 12;
 
-export const useRecordings = (initialFilterByUserId?: string, initialFilterBySongId?: string) => {
+export const useRecordings = (filterByUserId?: string, filterBySongId?: string) => {
   const [page, setPage] = useState(1);
   const [pageCursors, setPageCursors] = useState<Record<number, any>>({});
-  const [filterByUserId, setFilterByUserId] = useState(initialFilterByUserId);
-  const [filterBySongId, setFilterBySongId] = useState(initialFilterBySongId);
+
+  // The filters are owned by the caller, not by this hook: SongDetailView swaps the
+  // song under a still-mounted recordings section, and copying the arguments into
+  // state once would keep serving the previously opened song's recordings.
+  // Resetting during render (instead of in an effect) means the query below already
+  // runs with page 1 for the new filter, without a throwaway fetch of the old page.
+  const filterKey = `${filterByUserId ?? ""}|${filterBySongId ?? ""}`;
+  const [appliedFilterKey, setAppliedFilterKey] = useState(filterKey);
+  if (appliedFilterKey !== filterKey) {
+    setAppliedFilterKey(filterKey);
+    setPage(1);
+    setPageCursors({});
+  }
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["recordings", page, filterByUserId, filterBySongId],
@@ -32,12 +43,6 @@ export const useRecordings = (initialFilterByUserId?: string, initialFilterBySon
     }
   }, [data?.lastDoc, page]);
 
-  // Reset pagination on filter change
-  useEffect(() => {
-    setPage(1);
-    setPageCursors({});
-  }, [filterByUserId, filterBySongId]);
-
   const totalPages = Math.ceil((data?.total || 0) / ITEMS_PER_PAGE);
 
   return {
@@ -49,8 +54,6 @@ export const useRecordings = (initialFilterByUserId?: string, initialFilterBySon
     totalPages,
     refreshRecordings: refetch,
     filterByUserId,
-    setFilterByUserId,
     filterBySongId,
-    setFilterBySongId,
   };
 };

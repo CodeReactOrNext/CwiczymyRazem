@@ -146,24 +146,45 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
     return () => mediaQuery.removeEventListener("change", handler);
   }, []);
 
+  // ?songId only *seeds* the detail view. Without this guard the effect re-opens
+  // that song on every userSongs identity change — rating any other song
+  // invalidates the songs cache and would yank the user back to the seeded one.
+  const seededSongIdRef = useRef<string>("");
+
   useEffect(() => {
-    if (initialSongId) {
-      const allSongs = [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned];
-      const song = allSongs.find(s => s.id === initialSongId);
-      if (song) {
-        setDetailsTarget(song);
-      } else {
-        const fetchSong = async () => {
-          const { getSongById } = await import("feature/songs/services/getSongs");
-          const fetchedSong = await getSongById(initialSongId);
-          if (fetchedSong) {
-            setDetailsTarget(fetchedSong);
-          }
-        };
-        fetchSong();
-      }
+    if (!initialSongId) {
+      seededSongIdRef.current = "";
+      return;
     }
+    if (seededSongIdRef.current === initialSongId) return;
+    seededSongIdRef.current = initialSongId;
+
+    const allSongs = [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned];
+    const song = allSongs.find(s => s.id === initialSongId);
+    if (song) {
+      setDetailsTarget(song);
+      return;
+    }
+    const fetchSong = async () => {
+      const { getSongById } = await import("feature/songs/services/getSongs");
+      const fetchedSong = await getSongById(initialSongId);
+      if (fetchedSong) {
+        setDetailsTarget(fetchedSong);
+      }
+    };
+    fetchSong();
   }, [initialSongId, userSongs]);
+
+  // Closing the details has to drop ?songId too, otherwise the URL keeps pointing
+  // at a song the user already left and the next remount reopens it.
+  const closeDetails = () => {
+    setDetailsTarget(null);
+    if (router.query.songId) {
+      const query: Record<string, any> = { ...router.query };
+      delete query.songId;
+      router.replace({ query }, undefined, { shallow: true });
+    }
+  };
 
   const disableDnd = isMobile;
 
@@ -323,6 +344,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
   const handleSwitchView = (v: string) => {
     const query: Record<string, any> = { ...router.query, view: v };
     delete query.playlistId;
+    delete query.songId;
     router.push({ query }, undefined, { shallow: true });
     setDetailsTarget(null);
   };
@@ -410,11 +432,11 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                   onPractice={(song) => setPracticeTarget(song)}
                   onRemove={async (id) => {
                       await handleSongRemoval(id);
-                      setDetailsTarget(null);
+                      closeDetails();
                   }}
                   onStatusChange={handleStatusChange}
                   onPartsChange={setSongParts}
-                  onBack={() => setDetailsTarget(null)}
+                  onBack={closeDetails}
                   backLabel={
                     view === 'playlists' ? 'Back to playlist' :
                     view === 'board' ? 'Back to Board' :

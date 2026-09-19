@@ -10,7 +10,7 @@ import { useRecordings } from "feature/recordings/hooks/useRecordings";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { LayoutGrid, Plus, User } from "lucide-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 type ViewType = "all" | "mine";
@@ -43,14 +43,7 @@ const RecordingsView = () => {
     page,
     setPage,
     totalPages,
-    setFilterByUserId,
   } = useRecordings(view === "mine" ? userId || undefined : undefined);
-
-  // useRecordings keeps the filter in its own state, so switching tabs has to push
-  // the new value in rather than relying on the initial prop.
-  useEffect(() => {
-    setFilterByUserId(view === "mine" ? userId || undefined : undefined);
-  }, [view, userId, setFilterByUserId]);
 
   return (
     <MainContainer>

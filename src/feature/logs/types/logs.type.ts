@@ -101,6 +101,13 @@ export interface FirebaseLogsInterface {
   songId?: string;
   songTitle?: string;
   songArtist?: string;
+  /**
+   * Every song of a multi-song session with its own slice of the time. Absent on
+   * single-song and older logs, where `songId`/`songTitle`/`songArtist` — the
+   * session's primary song — describe the whole session.
+   */
+  songs?: ReportSongEntry[];
+  /** The session's own name: a plan title, an exercise title, "Song: …". */
   exerciseTitle?: string;
   skillPointsGained?: Record<string, number>;
   newRecords?: {

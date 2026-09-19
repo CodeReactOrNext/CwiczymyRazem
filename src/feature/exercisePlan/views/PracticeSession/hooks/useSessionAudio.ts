@@ -1,3 +1,4 @@
+import { toAlphaTabClickVolume } from "feature/exercisePlan/components/Metronome/utils/alphaTabClickVolume";
 import type { MutableRefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -23,6 +24,9 @@ interface UseSessionAudioOptions {
   tabRepeatCount:          number;
   loopsCompletedRef:       MutableRefObject<number>;
   isMetronomeMuted:        boolean;
+  /** Session metronome level (0..1). AlphaTab owns the only audible click during GP
+   *  playback, so the volume slider has to reach it or it moves nothing. */
+  metronomeVolume:         number;
   showAlphaTabScore:       boolean;
   examMode:                boolean;
   examBacking:             { url: string; sourceBpm: number } | undefined;
@@ -49,7 +53,7 @@ export function useSessionAudio({
   activeTablature, dynamicBackingTracks, effectiveRawGpFile,
   isAudioMuted, isAudioPlaying, effectiveBpm, masterVolume,
   currentExerciseId, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
-  isMetronomeMuted, showAlphaTabScore, examMode, examBacking,
+  isMetronomeMuted, metronomeVolume, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
   stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce, autoStopAfterFirstLoop,
   onAlphaTabAudioContextReady, tabRestartKey, pendingSeekBeatRef, tuningOffsets,
@@ -142,7 +146,7 @@ export function useSessionAudio({
     onAudioContextReady: useCallback((ctx: AudioContext) => {
       onAlphaTabAudioContextReady(ctx);
     }, [onAlphaTabAudioContextReady]),
-    metronomeVolume: isMetronomeMuted ? 0 : 1,
+    metronomeVolume: toAlphaTabClickVolume(metronomeVolume, isMetronomeMuted),
     masterVolume,
     trackConfigs:    alphaTabTrackConfigs,
     backingTrackIds: alphaTabBackingTrackIds,

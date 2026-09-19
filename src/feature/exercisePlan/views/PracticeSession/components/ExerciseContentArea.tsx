@@ -36,6 +36,9 @@ interface ExerciseContentAreaProps {
   effectiveBpm: number;
   isAudioMuted: boolean;
   isMetronomeMuted: boolean;
+  /** Session metronome level (0..1) — forwarded to the notation viewer, whose own
+   *  AlphaTab click is the only one audible while notation is shown. */
+  metronomeVolume?: number;
   /** Overall boost on top of every track's own volume (1 = normal, up to 2 = +100%). */
   masterVolume?: number;
   /** Per-track mute/volume for the notation viewer's underlying synth — MUST be memoized by the caller. */
@@ -117,6 +120,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   effectiveBpm,
   isAudioMuted,
   isMetronomeMuted,
+  metronomeVolume,
   masterVolume,
   trackConfigs,
   backingTrackIds,
@@ -285,6 +289,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           effectiveBpm={effectiveBpm}
           isAudioMuted={isAudioMuted}
           isMetronomeMuted={isMetronomeMuted}
+          metronomeVolume={metronomeVolume}
           masterVolume={masterVolume}
           trackConfigs={trackConfigs}
           backingTrackIds={backingTrackIds}

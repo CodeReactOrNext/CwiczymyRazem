@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { toAlphaTabClickVolume } from "feature/exercisePlan/components/Metronome/utils/alphaTabClickVolume";
 import { useEffect, useRef } from "react";
 
 import { CountInOverlay } from "../CountInOverlay";
@@ -27,6 +28,7 @@ export const AlphaTabScoreViewer = ({
   bpm,
   volume = 1,
   isMetronomeMuted = false,
+  metronomeVolume,
   trackConfigs,
   backingTrackIds,
   className,
@@ -145,12 +147,16 @@ export const AlphaTabScoreViewer = ({
   }, [volume, uiReady]);
 
   // ── Metronome: AlphaTab's own built-in click, driven by the session's mute
-  // toggle — the single metronome source while notation is shown (see
-  // useSessionAudio, which mutes the separate device-metronome click for this
-  // view) so the click can never drift from the notation playback's own clock.
+  // toggle and volume slider — the single metronome source while notation is
+  // shown (see useSessionAudio, which mutes the separate device-metronome click
+  // for this view) so the click can never drift from the notation playback's own
+  // clock. Reading the slider too is what makes it do anything at all here: for
+  // the whole of this view the device metronome it belongs to is silent.
   useEffect(() => {
-    if (apiRef.current && uiReady) apiRef.current.metronomeVolume = isMetronomeMuted ? 0 : 1;
-  }, [isMetronomeMuted, uiReady]);
+    if (apiRef.current && uiReady) {
+      apiRef.current.metronomeVolume = toAlphaTabClickVolume(metronomeVolume, isMetronomeMuted);
+    }
+  }, [metronomeVolume, isMetronomeMuted, uiReady]);
 
   return (
     <div className={cn("w-full flex flex-col rounded-xl overflow-hidden", className)}>
