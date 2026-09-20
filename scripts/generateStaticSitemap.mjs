@@ -22,6 +22,7 @@ const INFO_PAGES = [
   { path: '/faq', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.5' },
   { path: '/how-it-works', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.6' },
   { path: '/interactive-guitar-practice', lastmod: '2026-09-19', changefreq: 'monthly', priority: '0.8' },
+  { path: '/guitar-practice-planner', lastmod: '2026-09-20', changefreq: 'monthly', priority: '0.8' },
   { path: '/contact', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.5' },
   { path: '/tools', lastmod: '2026-09-08', changefreq: 'monthly', priority: '0.6' },
   { path: '/tools/tuner', lastmod: '2026-09-08', changefreq: 'monthly', priority: '0.8' },

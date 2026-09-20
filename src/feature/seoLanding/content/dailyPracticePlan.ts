@@ -225,7 +225,7 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
-          text: "If motivation itself is the bottleneck, our guide on [practicing every day in simple steps](/blog/practice-guitar-every-day-simple-steps) goes deeper. And when the 30-minute plan starts feeling small, graduate to the full [intermediate practice routine](/intermediate-guitar-practice-routine).",
+          text: "If motivation itself is the bottleneck, our guide on [practicing every day in simple steps](/blog/practice-guitar-every-day-simple-steps) goes deeper. And when the 30-minute plan starts feeling small, graduate to the full [intermediate practice routine](/intermediate-guitar-practice-routine). To turn any of the schedules above into a timed session with your own exercises, [build your own practice plan](/guitar-practice-planner) in the planner.",
         },
       ],
     },

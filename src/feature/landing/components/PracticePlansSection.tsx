@@ -3,7 +3,9 @@
 import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { FeatureList } from "feature/landing/components/FeatureList";
 import { Reveal } from "feature/landing/components/Reveal";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const features = [
   {
@@ -20,7 +22,7 @@ const features = [
   },
   {
     label: "Auto-plan",
-    desc: "One click generates a session from your stats, no planning",
+    desc: "Pick a length and a focus, get a session assembled for you",
   },
 ];
 
@@ -66,6 +68,12 @@ export const PracticePlansSection = () => {
             </p>
 
             <FeatureList features={features} />
+            <Link
+              href='/guitar-practice-planner'
+              className='mt-10 inline-flex items-center gap-2 text-sm font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
+              Guitar practice planner
+              <ArrowRight className='h-4 w-4' aria-hidden='true' />
+            </Link>
           </Reveal>
         </div>
       </div>

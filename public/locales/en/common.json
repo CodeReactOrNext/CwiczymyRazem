@@ -164,7 +164,12 @@
     "string_skipping": "String Skipping",
     "technique": "Technique",
     "phrasing": "Phrasing",
-    "articulation": "Articulation"
+    "articulation": "Articulation",
+    "chords": "Chords",
+    "bending": "String Bending",
+    "tapping": "Tapping",
+    "harmony-ear": "Harmony by Ear",
+    "rythm-recognition": "Rhythm Recognition"
   },
   "back": "Back",
   "next": "Next",
