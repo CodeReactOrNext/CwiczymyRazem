@@ -146,6 +146,14 @@ export const Footer = () => {
                     <ChevronRight className='ml-1 h-3 w-3 opacity-0 transition-all group-hover:opacity-100' />
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    href='/guitar-practice-planner'
+                    className='group flex items-center text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
+                    Practice planner{" "}
+                    <ChevronRight className='ml-1 h-3 w-3 opacity-0 transition-all group-hover:opacity-100' />
+                  </Link>
+                </li>
               </ul>
             </div>
             <div className='space-y-6'>
