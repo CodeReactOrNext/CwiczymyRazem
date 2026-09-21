@@ -12,6 +12,7 @@ import { getLocalDateKey } from 'utils/converter';
 import { getClientReportContext } from 'utils/gameLogic';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
+import { computeSkillPointsGained } from '../utils/skillPoints';
 
 interface UseSessionReportingProps {
   plan: ExercisePlan;
@@ -47,7 +48,11 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
       earTrainingPerformance?: { score: number; rank?: number } | null,
       /** Time the session measured on each song item of the plan, by song id
        *  (sessionTimeStore.songTime). A slice of `timerData`, not on top of it. */
-      songTime: Record<string, number> = {}
+      songTime: Record<string, number> = {},
+      /** Set when the player ended the session early, before the bar the
+       *  session set for itself. The practice time is still logged and scores
+       *  still stand — the skill points are what an early finish gives up. */
+      options?: { skipSkillPoints?: boolean }
     ) => {
       if (isSubmittingRef.current) return;
       isSubmittingRef.current = true;
@@ -98,24 +103,9 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
             songArtist: primarySong.artist,
           }),
           ...(planSongs.length > 0 && { songs: planSongs }),
-          skillPointsGained: plan.exercises.reduce((acc, exercise, index) => {
-            if (!completedExercises.includes(index)) {
-              return acc;
-            }
-
-            let points = 0;
-            if (exercise.difficulty === 'beginner') points = 1;
-            else if (exercise.difficulty === 'easy') points = 1;
-            else if (exercise.difficulty === 'medium') points = 2;
-            else if (exercise.difficulty === 'hard') points = 3;
-
-            if (points > 0 && exercise.relatedSkills) {
-              exercise.relatedSkills.forEach((skillId) => {
-                acc[skillId] = (acc[skillId] || 0) + points;
-              });
-            }
-            return acc;
-          }, {} as Record<string, number>),
+          skillPointsGained: options?.skipSkillPoints
+            ? {}
+            : computeSkillPointsGained(plan.exercises, completedExercises),
           ...(exerciseRecords && { exerciseRecords }),
           ...(micPerformance && { micPerformance }),
           ...(earTrainingPerformance && { earTrainingPerformance }),

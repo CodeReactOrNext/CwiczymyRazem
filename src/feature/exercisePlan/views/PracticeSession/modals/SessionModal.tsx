@@ -7,6 +7,7 @@ import React, { useState } from "react";
 
 import { categoryGradients } from "../../../constants/categoryStyles";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
+import { FinishSessionDialog } from "../components/FinishSessionDialog";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
 import { MobileMicGameHud } from "../components/MobileMicGameHud";
 import { MobileToolsIsland } from "../components/MobileToolsIsland";
@@ -20,8 +21,12 @@ import { LandscapeSessionModal } from "./LandscapeSessionModal";
 interface SessionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onFinish: () => void;
+  onFinish: (options?: { earlyFinish?: boolean }) => void;
   isMounted: boolean;
+  /** The session's own bar is met — finishing awards skill points as usual. */
+  canFinishSession?: boolean;
+  /** At least one exercise got its 20s, so there is something worth logging. */
+  hasLoggedPractice?: boolean;
   currentExercise: any;
   currentExerciseIndex: number;
   totalExercises: number;
@@ -72,6 +77,7 @@ interface SessionModalProps {
 
 const SessionModal = ({
   isOpen, onClose, onFinish, isMounted,
+  canFinishSession = true, hasLoggedPractice = true,
   currentExercise, currentExerciseIndex, totalExercises,
   isLastExercise, isPlaying,
   handleNextExercise, handleBackExercise,
@@ -94,7 +100,17 @@ const SessionModal = ({
   songSectionMapSlot,
 }: SessionModalProps) => {
   const [tabResetKey, setTabResetKey] = useState(0);
+  const [showFinishEarlyDialog, setShowFinishEarlyDialog] = useState(false);
   const isLandscape = useIsLandscape();
+
+  // The phone's Finish button goes through the same gate the desktop bar uses:
+  // below the session's own bar, the player is shown what an early finish costs
+  // before it happens. Exams have no early finish to offer.
+  const isEarlyFinish = !examMode && !canFinishSession;
+  const handleFinishRequest = () => {
+    if (isEarlyFinish) setShowFinishEarlyDialog(true);
+    else onFinish();
+  };
 
   if (!isOpen || !isMounted) return null;
 
@@ -142,10 +158,25 @@ const SessionModal = ({
   const isRiddleMode   = currentExercise.riddleConfig?.mode === "sequenceRepeat";
   const strumVolume    = strumSynthVolume(isAudioMuted, audioTracks?.find(t => t.id === "main"));
 
+  const finishEarlyDialog = (
+    <FinishSessionDialog
+      open={showFinishEarlyDialog}
+      onOpenChange={setShowFinishEarlyDialog}
+      mode='early'
+      disabled={!hasLoggedPractice}
+      isLoading={isFinishing || isSubmittingReport}
+      onConfirm={() => {
+        setShowFinishEarlyDialog(false);
+        onFinish({ earlyFinish: true });
+      }}
+    />
+  );
+
   if (isLandscape) {
     return (
+      <>
       <LandscapeSessionModal
-        isOpen={isOpen} onClose={onClose} onFinish={onFinish}
+        isOpen={isOpen} onClose={onClose} onFinish={handleFinishRequest}
         currentExercise={currentExercise}
         currentExerciseIndex={currentExerciseIndex} totalExercises={totalExercises}
         isLastExercise={isLastExercise} isPlaying={isPlaying}
@@ -175,6 +206,8 @@ const SessionModal = ({
         handleRestart={handleRestart}
         songSectionMapSlot={songSectionMapSlot}
       />
+      {finishEarlyDialog}
+      </>
     );
   }
 
@@ -285,7 +318,7 @@ const SessionModal = ({
         examMode={examMode}
         isPlaying={isPlaying}
         isLastExercise={isLastExercise}
-        onFinish={onFinish}
+        onFinish={handleFinishRequest}
         toggleTimer={handleToggleTimer}
         handleNextExercise={handleNextExerciseClick}
         handleBackExercise={handleBackExerciseClick}
@@ -294,6 +327,8 @@ const SessionModal = ({
         isSubmittingReport={isSubmittingReport}
         onRestart={activeTablature && activeTablature.length > 0 ? handleRestart : undefined}
       />
+
+      {finishEarlyDialog}
     </div>
   );
 };

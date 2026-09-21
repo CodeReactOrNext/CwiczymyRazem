@@ -73,6 +73,7 @@ export const usePracticeSessionState = ({
     showSuccessView,
     setShowSuccessView,
     canFinishSession,
+    hasLoggedPractice,
     resetProgress,
   } = useSessionProgress({
     timer,
@@ -156,7 +157,8 @@ export const usePracticeSessionState = ({
     autoSubmitReport: (
       exerciseRecords?: any,
       micPerformance?: any,
-      earTrainingPerformance?: any
+      earTrainingPerformance?: any,
+      options?: { skipSkillPoints?: boolean }
     ) => {
       // Both read in the same breath: the song shares are a slice of the
       // category totals and must come from the same snapshot.
@@ -167,10 +169,12 @@ export const usePracticeSessionState = ({
         exerciseRecords,
         micPerformance,
         earTrainingPerformance,
-        songTime
+        songTime,
+        options
       );
     },
     canFinishSession,
+    hasLoggedPractice,
     isSkillExercise,
     isSubmittingReport,
     completedExercises,
@@ -186,7 +190,7 @@ export const usePracticeSessionState = ({
     isFullSessionModalOpen, isMounted, currentExercise, isLastExercise,
     setShowCompleteDialog, handleNextExercise, timer, showSuccessView,
     restartFullSession, setVideoDuration, videoDuration, handleFinishSession,
-    canFinishSession, isSkillExercise, isSubmittingReport,
+    canFinishSession, hasLoggedPractice, isSkillExercise, isSubmittingReport,
     completedExercises, reportResult, currentUserStats, previousUserStats,
     planTitleString, activityDataToUse
   ]);

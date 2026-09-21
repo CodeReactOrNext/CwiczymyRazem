@@ -220,7 +220,19 @@
     "finish_plan_early_description": "This ends the plan now and saves the time you've already logged. You won't practice the remaining exercises in this plan.",
     "finish_plan_early_action": "Finish & save time",
     "finish_plan_early_disabled_skill": "Complete the full exercise before finishing the plan early",
-    "finish_plan_early_disabled_time": "Practice at least 20s before finishing the plan early"
+    "finish_plan_early_disabled_time": "Practice at least 20s before finishing the plan early",
+    "finish_early": {
+      "action": "End early",
+      "title": "End early?",
+      "description": "You don't have to play this one all the way through. Ending now keeps every minute you practiced — it just doesn't count as completing the exercise.",
+      "kept_title": "Your practice time is saved",
+      "kept_description": "The minutes still land in your practice log and count toward your streak, your stats and your daily quests.",
+      "lost_title": "Nothing from this run is scored",
+      "lost_description": "No skill points, no high score, no leaderboard entry, and the exercise won't be marked as completed. Play it through to the end to earn all of that.",
+      "confirm": "End early & save time",
+      "blocked": "Practice for at least 20 seconds before the session can be saved.",
+      "hint": "Ends early — time only, nothing scored"
+    }
   },
   "video": "Video",
   "confirm_delete": "Are you sure you want to delete this plan?",
