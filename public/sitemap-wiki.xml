@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://riff.quest/wiki</loc>
-    <lastmod>2026-09-08</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -14,13 +14,13 @@
   </url>
   <url>
     <loc>https://riff.quest/wiki/arsenal-and-gear</loc>
-    <lastmod>2026-09-02</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://riff.quest/wiki/dashboard-and-daily-quests</loc>
-    <lastmod>2026-09-05</lastmod>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -32,7 +32,7 @@
   </url>
   <url>
     <loc>https://riff.quest/wiki/exercise-plans-and-auto-plan</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -98,7 +98,7 @@
   </url>
   <url>
     <loc>https://riff.quest/wiki/skills-and-achievements</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

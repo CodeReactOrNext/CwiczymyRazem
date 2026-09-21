@@ -1,4 +1,7 @@
-import { STREAK_REMINDER_LOCAL_HOUR } from "constants/streakReminder";
+import {
+  DEFAULT_REMINDER_HOUR_UTC,
+  STREAK_REMINDER_LOCAL_HOUR,
+} from "constants/streakReminder";
 import type { ArsenalSummary } from "feature/arsenal/data/arsenalSummary";
 import { EMPTY_ARSENAL_SUMMARY } from "feature/arsenal/data/arsenalSummary";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
@@ -211,14 +214,26 @@ export const reportUpdateUserStats = ({
     lastPracticeLocalDay,
     // Absent zone leaves whatever was stored before untouched (spread above) —
     // one browser that won't resolve `Intl` must not un-schedule the user.
-    ...(timeZone && {
-      timeZone,
-      reminderHourUtc: getReminderHourUtc(
-        timeZone,
-        STREAK_REMINDER_LOCAL_HOUR,
-        clientNow
-      ),
-    }),
+    //
+    // It must still leave the account *scheduled*, though. The cron reaches
+    // users through `reminderHourUtc` alone, so an account that never receives
+    // one would never be considered at all; it used to be caught by a daily
+    // scan of the whole users collection, which cost more than every other
+    // automated read in the project combined. Falling back to the default
+    // bucket here is what let that scan go — and only where nothing is stored
+    // yet, so a user already placed in a zone keeps their own evening.
+    ...(timeZone
+      ? {
+          timeZone,
+          reminderHourUtc: getReminderHourUtc(
+            timeZone,
+            STREAK_REMINDER_LOCAL_HOUR,
+            clientNow
+          ),
+        }
+      : currentUserStats.reminderHourUtc === undefined && {
+          reminderHourUtc: DEFAULT_REMINDER_HOUR_UTC,
+        }),
     guitarStartDate: null
   };
 
