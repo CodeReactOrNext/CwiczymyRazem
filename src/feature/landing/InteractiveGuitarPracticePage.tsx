@@ -1,4 +1,3 @@
-import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { StaticTablature } from "feature/exercises/components/StaticTablature/StaticTablature";
@@ -255,19 +254,17 @@ export const InteractiveGuitarPracticePage = ({
                 </div>
               </header>
 
-              <AuroraGlowFrame>
-                <div className='rounded-lg p-1.5 glass-card'>
-                  <Image
-                    src={`${IMAGES}/exercise-ready.webp`}
-                    alt='Riff Quest exercise "Chromatic — Moving Accents" ready to start: colour-coded tablature across three strings, metronome at 80 BPM and the Pitch Detect button'
-                    width={1325}
-                    height={640}
-                    priority
-                    sizes='(min-width: 1024px) 720px, 100vw'
-                    className='h-auto w-full rounded-lg'
-                  />
-                </div>
-              </AuroraGlowFrame>
+              <div className='rounded-lg p-1.5 glass-card'>
+                <Image
+                  src={`${IMAGES}/exercise-ready.webp`}
+                  alt='Riff Quest exercise "Chromatic — Moving Accents" ready to start: colour-coded tablature across three strings, metronome at 80 BPM and the Pitch Detect button'
+                  width={1325}
+                  height={640}
+                  priority
+                  sizes='(min-width: 1024px) 720px, 100vw'
+                  className='h-auto w-full rounded-lg'
+                />
+              </div>
             </div>
           </div>
         </section>

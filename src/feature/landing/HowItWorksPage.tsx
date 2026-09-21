@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "assets/lib/utils";
+import { YouTube } from "components/Blog/YouTube";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { Footer } from "feature/landing/components/Footer";
@@ -51,6 +53,8 @@ const steps = [
       },
     ],
     screenshot: "/images/how-it-works/step-1.webp",
+    screenshotWidth: 906,
+    screenshotHeight: 466,
     screenshotAlt: "Riff Quest song library screen",
     color: "text-cyan-400",
     line: "bg-cyan-500",
@@ -83,6 +87,8 @@ const steps = [
       },
     ],
     screenshot: "/images/how-it-works/step-2.webp",
+    screenshotWidth: 956,
+    screenshotHeight: 534,
     screenshotAlt: "Riff Quest active practice session",
     color: "text-emerald-400",
     line: "bg-emerald-500",
@@ -118,6 +124,8 @@ const steps = [
       },
     ],
     screenshot: "/images/how-it-works/step-3.webp",
+    screenshotWidth: 726,
+    screenshotHeight: 370,
     screenshotAlt: "Riff Quest progress report screen",
     color: "text-violet-400",
     line: "bg-violet-500",
@@ -137,6 +145,9 @@ function StepSection({
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const isEven = index % 2 === 0;
+  // Steps 01 and 02 are UI-heavy screenshots that were unreadable at half
+  // width, so they get the wider column; step 03 stays at 1:1.
+  const wideImage = index < 2;
 
   return (
     <m.div
@@ -154,7 +165,14 @@ function StepSection({
       </div>
 
       <div
-        className={`grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-24`}>
+        className={cn(
+          "grid grid-cols-1 items-start gap-12 lg:gap-16",
+          wideImage
+            ? isEven
+              ? "lg:grid-cols-[2fr_3fr]"
+              : "lg:grid-cols-[3fr_2fr]"
+            : "lg:grid-cols-2 lg:gap-24",
+        )}>
         {/* ── Text column ── */}
         <div className={`flex flex-col ${!isEven ? "lg:order-2" : ""}`}>
           {/* Giant number — decorative anchor */}
@@ -200,8 +218,9 @@ function StepSection({
           <Image
             src={step.screenshot}
             alt={step.screenshotAlt}
-            width={900}
-            height={600}
+            width={step.screenshotWidth}
+            height={step.screenshotHeight}
+            sizes='(min-width: 1024px) 720px, 100vw'
             className='h-auto w-full'
           />
         </div>
@@ -264,21 +283,18 @@ export const HowItWorksPage = () => {
                 </span>
               </h1>
             </div>
+          </m.div>
 
-            <div className='flex flex-col gap-3 lg:items-end lg:pb-1'>
-              {[
-                { n: "01", label: "Choose what to practice" },
-                { n: "02", label: "Play & track automatically" },
-                { n: "03", label: "See your progress" },
-              ].map((item) => (
-                <div key={item.n} className='flex items-center gap-3 text-sm'>
-                  <span className='text-[10px] font-black tabular-nums text-zinc-700'>
-                    {item.n}
-                  </span>
-                  <span className='text-zinc-400'>{item.label}</span>
-                </div>
-              ))}
-            </div>
+          <m.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className='mx-auto mt-12 max-w-4xl'>
+            <YouTube
+              id='x2wERUdqtL0'
+              title='Getting Started with Riff Quest'
+              className='my-0'
+            />
           </m.div>
         </div>
       </section>

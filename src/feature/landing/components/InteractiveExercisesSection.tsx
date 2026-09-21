@@ -1,6 +1,5 @@
 "use client";
 
-import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { FeatureList } from "feature/landing/components/FeatureList";
 import { Reveal } from "feature/landing/components/Reveal";
 import { ArrowRight } from "lucide-react";
@@ -55,31 +54,29 @@ export const InteractiveExercisesSection = () => {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <AuroraGlowFrame>
-            <div className='relative rounded-lg p-1.5 glass-card'>
-              <div className='relative overflow-hidden rounded-lg'>
-                {/* The full 2336px-wide strip collapses into an unreadable
+          <div className='relative rounded-lg p-1.5 glass-card'>
+            <div className='relative overflow-hidden rounded-lg'>
+              {/* The full 2336px-wide strip collapses into an unreadable
                   sliver on phones, so mobile gets a taller crop of the same
                   screenshot (playhead + detected notes + Pitch Detect). */}
-                <Image
-                  src='/images/tabs-live.webp'
-                  alt='Tablature lighting up in real time as pitch detection recognizes the notes being played'
-                  width={2336}
-                  height={625}
-                  className='hidden h-auto w-full sm:block'
-                  priority={false}
-                />
-                <Image
-                  src='/images/tabs-live-mobile.webp'
-                  alt='Tablature lighting up in real time as pitch detection recognizes the notes being played'
-                  width={972}
-                  height={625}
-                  className='h-auto w-full sm:hidden'
-                  priority={false}
-                />
-              </div>
+              <Image
+                src='/images/tabs-live.webp'
+                alt='Tablature lighting up in real time as pitch detection recognizes the notes being played'
+                width={2336}
+                height={625}
+                className='hidden h-auto w-full sm:block'
+                priority={false}
+              />
+              <Image
+                src='/images/tabs-live-mobile.webp'
+                alt='Tablature lighting up in real time as pitch detection recognizes the notes being played'
+                width={972}
+                height={625}
+                className='h-auto w-full sm:hidden'
+                priority={false}
+              />
             </div>
-          </AuroraGlowFrame>
+          </div>
         </Reveal>
 
         <Reveal delay={0.15} className='mt-14'>

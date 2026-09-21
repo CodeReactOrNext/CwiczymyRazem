@@ -11,7 +11,7 @@ import Link from "next/link";
 // usage, not a purchased review), so it renders as an accent pill instead
 // of muted micro-text.
 const HoursBadge = ({ hours }: { hours: string }) => (
-  <span className='mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-ivory-accent/10 px-2.5 py-1 text-xs font-bold text-ivory-accent'>
+  <span className='mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-ivory-accent px-2.5 py-1 text-xs font-bold text-white'>
     <Clock className='h-3 w-3' />
     {hours}
   </span>
@@ -154,20 +154,20 @@ export const TestimonialsSection = () => {
 
         <Reveal
           delay={0.15}
-          className='mt-20 grid grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-8'>
+          className='mt-6 grid grid-cols-1 gap-10 rounded-lg bg-ivory-surface p-6 sm:grid-cols-3 sm:gap-8 sm:p-10'>
           {trustFacts.map((fact) => (
-            <div key={fact.title} className='max-w-sm'>
+            <div key={fact.title} className='flex max-w-sm flex-col'>
               <h3 className='mb-2 text-base font-bold tracking-tight text-ivory-fg'>
                 {fact.title}
               </h3>
-              <p className='mb-3 text-sm leading-relaxed text-ivory-muted'>
+              <p className='mb-4 flex-1 text-sm leading-relaxed text-ivory-muted'>
                 {fact.body}
               </p>
               <Link
                 href={fact.link.href}
                 target={fact.link.external ? "_blank" : undefined}
                 rel={fact.link.external ? "noopener noreferrer" : undefined}
-                className='inline-flex items-center gap-1 text-sm font-bold text-ivory-accent transition-colors hover:text-ivory-fg'>
+                className='mt-auto inline-flex items-center gap-1 self-start text-sm font-bold text-ivory-accent transition-colors hover:text-ivory-fg'>
                 {fact.link.label}
                 <ArrowRight className='h-3.5 w-3.5' aria-hidden='true' />
               </Link>

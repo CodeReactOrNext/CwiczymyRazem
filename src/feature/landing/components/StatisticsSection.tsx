@@ -1,6 +1,5 @@
 "use client";
 
-import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { FeatureList } from "feature/landing/components/FeatureList";
 import { Reveal } from "feature/landing/components/Reveal";
 import Image from "next/image";
@@ -38,20 +37,18 @@ export const StatisticsSection = () => {
           {/* Left - screenshot */}
           <div className='order-2 flex flex-col lg:order-1'>
             <Reveal>
-              <AuroraGlowFrame>
-                <div className='relative rounded-lg p-1.5 glass-card'>
-                  <div className='relative overflow-hidden rounded-lg'>
-                    <Image
-                      src='/images/stats-overview.webp'
-                      alt='Practice statistics with total time, points, skill split and all-time activity chart'
-                      width={1412}
-                      height={804}
-                      className='h-auto w-full'
-                      priority={false}
-                    />
-                  </div>
+              <div className='relative rounded-lg p-1.5 glass-card'>
+                <div className='relative overflow-hidden rounded-lg'>
+                  <Image
+                    src='/images/stats-overview.webp'
+                    alt='Practice statistics with total time, points, skill split and all-time activity chart'
+                    width={1412}
+                    height={804}
+                    className='h-auto w-full'
+                    priority={false}
+                  />
                 </div>
-              </AuroraGlowFrame>
+              </div>
             </Reveal>
           </div>
 

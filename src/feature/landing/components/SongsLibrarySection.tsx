@@ -1,6 +1,5 @@
 "use client";
 
-import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { FeatureList } from "feature/landing/components/FeatureList";
 import { Reveal } from "feature/landing/components/Reveal";
 import { featuredGuides } from "feature/landing/data/featuredGuides";
@@ -106,22 +105,20 @@ export const SongsLibrarySection = ({
 
           {/* Right - screenshot */}
           <Reveal delay={0.1}>
-            <AuroraGlowFrame>
-              <div className='relative rounded-lg p-1.5 glass-card'>
-                <div className='relative overflow-hidden rounded-lg'>
-                  <Image
-                    src='/images/songs-library.webp'
-                    alt='Song library with community difficulty ratings and genre filters'
-                    width={1122}
-                    height={1125}
-                    className='h-auto w-full object-cover'
-                    priority={false}
-                  />
-                  {/* Bottom fade */}
-                  <div className='pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-zinc-900/70 to-transparent' />
-                </div>
+            <div className='relative rounded-lg p-1.5 glass-card'>
+              <div className='relative overflow-hidden rounded-lg'>
+                <Image
+                  src='/images/songs-library.webp'
+                  alt='Song library with community difficulty ratings and genre filters'
+                  width={1122}
+                  height={1125}
+                  className='h-auto w-full object-cover'
+                  priority={false}
+                />
+                {/* Bottom fade */}
+                <div className='pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-zinc-900/70 to-transparent' />
               </div>
-            </AuroraGlowFrame>
+            </div>
           </Reveal>
         </div>
       </div>

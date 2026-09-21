@@ -1,4 +1,3 @@
-import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import type {
@@ -398,19 +397,17 @@ export const GuitarPracticePlannerPage = ({
               </header>
 
               <div>
-                <AuroraGlowFrame>
-                  <div className='rounded-lg p-1.5 glass-card'>
-                    <Image
-                      src={`${IMAGES}/custom-plan-order.webp`}
-                      alt='Four guitar exercises arranged into a 20-minute custom plan: Spider — One String, Legato — Hammer-on Pentatonic, Play by Ear — Easy and Phrasing — Two Notes Per Bar, with their minutes'
-                      width={992}
-                      height={656}
-                      priority
-                      sizes='(min-width: 1024px) 760px, 100vw'
-                      className='h-auto w-full rounded-lg'
-                    />
-                  </div>
-                </AuroraGlowFrame>
+                <div className='rounded-lg p-1.5 glass-card'>
+                  <Image
+                    src={`${IMAGES}/custom-plan-order.webp`}
+                    alt='Four guitar exercises arranged into a 20-minute custom plan: Spider — One String, Legato — Hammer-on Pentatonic, Play by Ear — Easy and Phrasing — Two Notes Per Bar, with their minutes'
+                    width={992}
+                    height={656}
+                    priority
+                    sizes='(min-width: 1024px) 760px, 100vw'
+                    className='h-auto w-full rounded-lg'
+                  />
+                </div>
                 <ol className='mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 px-2'>
                   {["Choose", "Arrange", "Play"].map((step, idx) => (
                     <li key={step} className='flex items-center gap-3'>

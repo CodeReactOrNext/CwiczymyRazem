@@ -1,6 +1,5 @@
 "use client";
 
-import { AuroraGlowFrame } from "components/AuroraGlowFrame/AuroraGlowFrame";
 import { FeatureList } from "feature/landing/components/FeatureList";
 import { Reveal } from "feature/landing/components/Reveal";
 import { ArrowRight } from "lucide-react";
@@ -40,20 +39,18 @@ export const PracticePlansSection = () => {
           {/* Left - screenshot */}
           <div className='order-2 lg:order-1'>
             <Reveal>
-              <AuroraGlowFrame>
-                <div className='relative rounded-lg p-1.5 glass-card'>
-                  <div className='relative overflow-hidden rounded-lg'>
-                    <Image
-                      src='/images/plans-library.webp'
-                      alt='Practice plans library with ready-made training programs'
-                      width={1401}
-                      height={704}
-                      className='h-auto w-full'
-                      priority={false}
-                    />
-                  </div>
+              <div className='relative rounded-lg p-1.5 glass-card'>
+                <div className='relative overflow-hidden rounded-lg'>
+                  <Image
+                    src='/images/plans-library.webp'
+                    alt='Practice plans library with ready-made training programs'
+                    width={1401}
+                    height={704}
+                    className='h-auto w-full'
+                    priority={false}
+                  />
                 </div>
-              </AuroraGlowFrame>
+              </div>
             </Reveal>
           </div>
 

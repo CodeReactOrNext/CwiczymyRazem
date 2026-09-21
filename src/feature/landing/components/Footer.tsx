@@ -8,9 +8,6 @@ import Link from "next/link";
 export const Footer = () => {
   return (
     <footer className='relative overflow-hidden bg-zinc-950 pb-12 pt-24'>
-      {/* Background decoration */}
-      <div className='absolute left-1/2 top-0 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-cyan-500/5 blur-[120px]'></div>
-
       <GuitarPatternBackground opacity={0.03} />
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
