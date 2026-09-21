@@ -1,11 +1,9 @@
-import { cn } from "assets/lib/utils";
 import { getCountInDurationMs } from "feature/exercisePlan/components/Metronome/utils/countInDuration";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { useIsLandscape } from "hooks/useIsLandscape";
 import type { Dispatch, SetStateAction } from "react";
 import React, { useState } from "react";
 
-import { categoryGradients } from "../../../constants/categoryStyles";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { FinishSessionDialog } from "../components/FinishSessionDialog";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
@@ -146,9 +144,6 @@ const SessionModal = ({
     }, 100);
   };
 
-  const category = currentExercise.category || "mixed";
-  const gradientClasses = categoryGradients[category as keyof typeof categoryGradients];
-
   // activeTablature (not currentExercise.tablature) so generated exercises
   // (configurable chord/scale practice) get mic + backing controls too.
   const hasMicControls = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableMic;
@@ -197,7 +192,7 @@ const SessionModal = ({
         riddleProgress={riddleProgress} onPlayRiddle={onPlayRiddle}
         examMode={examMode} isListening={isListening} frequencyRef={frequencyRef}
         volumeRef={volumeRef} onRecalibrate={onRecalibrate}
-        gradientClasses={gradientClasses} tabResetKey={tabResetKey}
+        tabResetKey={tabResetKey}
         setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}
         startTimer={startTimer} stopTimer={stopTimer}
         handleToggleTimer={handleToggleTimer}
@@ -212,9 +207,9 @@ const SessionModal = ({
   }
 
   return (
-    // bg-gradient-to-b + gradientClasses: the category tint now colours the
-    // whole session surface instead of only the header strip it lost.
-    <div className={cn("fixed inset-0 z-[9999999] flex h-full flex-col overflow-hidden bg-zinc-950 bg-gradient-to-b", gradientClasses)}>
+    // Plain black behind the whole session: the tablature and the note
+    // markers are the only colour that should read here.
+    <div className='fixed inset-0 z-[9999999] flex h-full flex-col overflow-hidden bg-black'>
       <SessionModalHeader
         exerciseTitle={currentExercise.title}
         exerciseId={currentExercise.id}
@@ -224,7 +219,7 @@ const SessionModal = ({
         isPlaying={isPlaying}
       />
 
-      <div className="flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5">
+      <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="space-y-4 p-4">
 
           <MobileExerciseContent

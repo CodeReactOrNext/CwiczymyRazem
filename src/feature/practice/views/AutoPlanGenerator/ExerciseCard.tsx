@@ -65,20 +65,20 @@ export const ExerciseCard = ({
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(255,255,255,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
       {/* Main content wrapper */}
-      <div className="relative flex flex-col sm:flex-row items-stretch min-h-[90px]">
+      <div className="relative flex flex-col sm:flex-row items-stretch sm:min-h-[90px]">
         {/* Texts & Badges */}
-        <div className="flex-1 min-w-0 p-4 pb-5 sm:p-5 flex flex-col justify-center">
+        <div className="flex-1 min-w-0 p-4 sm:p-5 flex flex-col justify-center">
           <div>
             <h3 className="font-semibold text-[15px] sm:text-[16px] leading-tight tracking-tight text-zinc-100 group-hover:text-white transition-colors duration-300">
               {exercise.title}
             </h3>
-            <p className="mt-1.5 text-[13px] sm:text-[14px] line-clamp-1 sm:line-clamp-2 leading-relaxed text-zinc-500 group-hover:text-zinc-300 transition-colors duration-300 pr-2">
+            <p className="mt-1.5 hidden text-[13px] sm:block sm:text-[14px] sm:line-clamp-2 leading-relaxed text-zinc-500 group-hover:text-zinc-300 transition-colors duration-300 pr-2">
               {exercise.description}
             </p>
           </div>
 
           {/* Badges */}
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-4">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-2.5 sm:mt-4">
             <Badge variant="outline" className="px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none text-zinc-300 transition-colors duration-300">
               <Clock className="mr-1 h-3 w-3" />
               {formattedTime}
@@ -121,7 +121,7 @@ export const ExerciseCard = ({
               return (
                 <span
                   key={skill.id}
-                  className="inline-flex items-center gap-1 mt-0.5 sm:mt-0 px-2.5 py-0.5 text-[11px] font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors bg-white/[0.03] border border-white/5 rounded"
+                  className="hidden sm:inline-flex items-center gap-1 mt-0.5 sm:mt-0 px-2.5 py-0.5 text-[11px] font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors bg-white/[0.03] border border-white/5 rounded"
                 >
                   {Icon && <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />}
                   {t(`common:skills.${skill.id}` as any)}

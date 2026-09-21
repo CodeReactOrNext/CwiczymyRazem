@@ -61,7 +61,6 @@ interface LandscapeSessionModalProps {
   frequencyRef?: React.RefObject<number>;
   volumeRef?: React.RefObject<number>;
   onRecalibrate?: () => void;
-  gradientClasses: string;
   tabResetKey: number;
   setVideoDuration: (duration: number) => void;
   setTimerTime: (time: number) => void;
@@ -116,7 +115,6 @@ export function LandscapeSessionModal({
   frequencyRef,
   volumeRef,
   onRecalibrate,
-  gradientClasses,
   tabResetKey,
   setVideoDuration,
   setTimerTime,
@@ -148,7 +146,7 @@ export function LandscapeSessionModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={cn("relative flex h-full flex-row overflow-hidden", gradientClasses)}
+            className='relative flex h-full flex-row overflow-hidden bg-black'
           >
             {/* Left panel: exercise content + timer underneath */}
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden p-2">
@@ -211,7 +209,7 @@ export function LandscapeSessionModal({
                     animate={{ x: 0 }}
                     exit={{ x: "100%" }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    className="absolute bottom-0 right-14 top-0 z-10 flex w-[264px] flex-col overflow-y-auto overscroll-contain scrollbar-hide bg-zinc-950/90 shadow-2xl shadow-black/50 backdrop-blur-xl"
+                    className="absolute bottom-0 right-16 top-0 z-10 flex w-[min(320px,60vw)] flex-col overflow-y-auto overscroll-contain scrollbar-hide bg-zinc-950/90 shadow-2xl shadow-black/50 backdrop-blur-xl"
                   >
                     {/* Title + counter */}
                     <div className="flex items-center gap-1.5 px-3 pt-3 pb-1">
@@ -223,24 +221,24 @@ export function LandscapeSessionModal({
                     {/* Mic stats — ear training keeps its own score inside EarTrainingView,
                         the generic tab accuracy meter doesn't apply to it. */}
                     {isMicEnabled && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
-                      <div className="px-3 py-1 space-y-1">
-                        <div className="flex items-center justify-between text-[9px]">
-                          <span className="text-zinc-600 tracking-widest">Score</span>
-                          <span className="font-black text-white tabular-nums">{gameState.score.toLocaleString()}</span>
+                      <div className="flex items-center justify-between gap-2 px-3 py-1 text-[9px]">
+                        <div className="min-w-0">
+                          <div className="text-zinc-600 tracking-widest">Score</div>
+                          <div className="font-black text-white tabular-nums">{gameState.score.toLocaleString()}</div>
                         </div>
-                        <div className="flex items-center justify-between text-[9px]">
-                          <span className="text-zinc-600 tracking-widest">Acc</span>
-                          <span className="font-black text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
+                        <div className="min-w-0">
+                          <div className="text-zinc-600 tracking-widest">Acc</div>
+                          <div className="font-black text-emerald-400 tabular-nums">{sessionAccuracy}%</div>
                         </div>
-                        <div className="flex items-center justify-between text-[9px]">
-                          <span className="text-zinc-600 tracking-widest">Streak</span>
-                          <span className="font-black text-cyan-400 tabular-nums">{gameState.combo}×{gameState.multiplier}</span>
+                        <div className="min-w-0 text-right">
+                          <div className="text-zinc-600 tracking-widest">Streak</div>
+                          <div className="font-black text-cyan-400 tabular-nums">{gameState.combo}×{gameState.multiplier}</div>
                         </div>
                       </div>
                     )}
 
                     {/* Controls */}
-                    <div className="px-3 py-3 space-y-2">
+                    <div className="space-y-2 px-3 py-2">
                       <MediaControlsToolbar
                         hasMetronome={!!currentExercise.metronomeSpeed}
                         hasAudioTrack={!!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableBackingTrack}
@@ -262,6 +260,7 @@ export function LandscapeSessionModal({
                         masterVolume={currentExercise.gpFileUrl ? masterVolume : undefined}
                         onMasterVolumeChange={currentExercise.gpFileUrl ? setMasterVolume : undefined}
                         mobile
+                        dense
                       />
                       <ExerciseQuickActionsBar
                         exercise={currentExercise}
@@ -276,21 +275,21 @@ export function LandscapeSessionModal({
             </AnimatePresence>
 
             {/* Always-visible controls strip */}
-            <div className="relative z-20 flex w-14 shrink-0 flex-col items-center gap-2 bg-zinc-950/80 py-2 backdrop-blur-xl">
-                <Button variant='ghost' size='icon' onClick={onClose} className='h-8 w-8 shrink-0 text-zinc-500 hover:text-white'>
+            <div className="relative z-20 flex w-16 shrink-0 flex-col items-center gap-1.5 overflow-y-auto overscroll-contain scrollbar-hide bg-zinc-950/80 py-2 backdrop-blur-xl">
+                <Button variant='ghost' size='icon' onClick={onClose} className='h-10 w-10 shrink-0 text-zinc-500 hover:text-white'>
                   <X className='h-4 w-4' />
                 </Button>
 
                 <Button variant='ghost' size='icon'
                   onClick={() => setIsPanelExpanded(prev => !prev)}
-                  className='h-8 w-8 shrink-0 text-zinc-400 hover:text-white'
+                  className='h-10 w-10 shrink-0 text-zinc-400 hover:text-white'
                 >
                   <motion.span
                     animate={{ rotate: isPanelExpanded ? 0 : 180 }}
                     transition={{ duration: 0.2 }}
                     className="flex items-center justify-center"
                   >
-                    <FaStepForward className='h-3 w-3' />
+                    <FaStepForward className='h-4 w-4' />
                   </motion.span>
                 </Button>
 
@@ -298,14 +297,14 @@ export function LandscapeSessionModal({
 
                 {currentExerciseIndex > 0 && (
                   <Button onClick={handleBackExerciseClick} variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white">
-                    <FaStepBackward className="h-3 w-3" />
+                    className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white">
+                    <FaStepBackward className="h-4 w-4" />
                   </Button>
                 )}
                 {activeTablature && activeTablature.length > 0 && (
                   <Button onClick={handleRestart} variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-lg bg-white/5 text-amber-400 hover:text-amber-300">
-                    <FaUndo className="h-3 w-3" />
+                    className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-amber-400 hover:text-amber-300">
+                    <FaUndo className="h-4 w-4" />
                   </Button>
                 )}
 
@@ -313,7 +312,7 @@ export function LandscapeSessionModal({
                   onClick={handleToggleTimer}
                   size="icon"
                   className={cn(
-                    "h-11 w-11 shrink-0 rounded-lg transition-all click-behavior",
+                    "h-12 w-12 shrink-0 rounded-lg transition-all click-behavior",
                     isPlaying ? "bg-white text-black shadow-lg" : "bg-cyan-500 text-black shadow-lg shadow-cyan-500/20"
                   )}
                 >
@@ -325,7 +324,7 @@ export function LandscapeSessionModal({
                     onClick={isLastExercise ? onFinish : handleNextExerciseClick}
                     disabled={isFinishing || isSubmittingReport }
                     variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white"
+                    className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white"
                   >
                     {isFinishing || isSubmittingReport
                       ? <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-lg" />

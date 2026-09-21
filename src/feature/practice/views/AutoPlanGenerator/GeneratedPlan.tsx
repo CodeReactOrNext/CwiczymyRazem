@@ -80,11 +80,11 @@ export const GeneratedPlan = ({
         </div>
       </div>
 
-      <Card className='p-4 sm:p-6'>
+      <Card className='bg-transparent p-0 sm:bg-zinc-800/40 sm:p-6'>
         <h2 className='mb-3 text-lg font-semibold sm:mb-4 sm:text-xl'>
           {getLocalizedText(plan.title)}
         </h2>
-        <p className='mb-4 text-sm text-muted-foreground sm:mb-6'>
+        <p className='mb-4 hidden text-sm text-muted-foreground sm:mb-6 sm:block'>
           {getLocalizedText(plan.description)}
         </p>
 

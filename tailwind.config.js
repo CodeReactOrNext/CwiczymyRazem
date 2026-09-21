@@ -124,6 +124,14 @@ module.exports = {
       xs: "350px",
       xsm: "500px",
       ...defaultTheme.screens,
+      // Height-based screens go last: Tailwind orders variants by this list,
+      // and these must win over the width breakpoints when both match.
+      /** Short viewports — phones in landscape, where a dialog sized for
+       *  a portrait screen would be clipped top and bottom. */
+      short: { raw: "(max-height: 600px)" },
+      /** Short AND wide — a phone held sideways. Layouts that stack a tall
+       *  prompt over a wide board can put them side by side here. */
+      shortwide: { raw: "(max-height: 600px) and (orientation: landscape)" },
     },
     extend: {
       display: ["group-hover"],

@@ -58,6 +58,9 @@ interface MediaControlsToolbarProps {
   compact?: boolean;
   /** Full-width stacked layout for narrow (portrait phone) screens. */
   mobile?: boolean;
+  /** Mobile layout squeezed for a landscape phone: same 44px targets, but
+   *  rows pair up and the mic help line goes, so the stack fits a short screen. */
+  dense?: boolean;
   /** Drop the playback-speed button — used when the tempo controls live
    *  elsewhere (mobile tools island keeps BPM + speed in one place). */
   hideSpeed?: boolean;
@@ -93,6 +96,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   volumeRef,
   compact = false,
   mobile = false,
+  dense = false,
   hideSpeed = false,
   disableTuner = false,
   baseBpm,
@@ -181,8 +185,15 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           </div>
         )}
 
-        {/* Tuning gets its own full-width row — tuning names ("Half-step
-            down", "DADGAD") are too long to share a row in the drawer. */}
+        {/* Tuning and volume each get a full-width row — tuning names
+            ("Half-step down", "DADGAD") are too long to share one. On a
+            landscape phone the height matters more, so they pair up. */}
+        <div
+          className={cn(
+            dense && showTuningBtn && showVolumeButton
+              ? "grid grid-cols-2 gap-2"
+              : "contents",
+          )}>
         {showTuningBtn && (
           <RippleButton
             onClick={openTuningSettings}
@@ -208,8 +219,6 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           </RippleButton>
         )}
 
-        {/* Volume also gets its own full-width row — it's a popover trigger,
-            not a plain click button, so it shares the Tuning row's layout logic. */}
         {showVolumeButton && (
           <VolumeButton
             mobile
@@ -222,6 +231,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             setTrackConfigs={setTrackConfigs}
           />
         )}
+        </div>
 
         {hasMicControls && (
           <div className='grid grid-cols-2 gap-2'>
@@ -284,7 +294,9 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           </div>
         )}
 
-        {hasMicControls && <MicTroubleshooting className='self-center py-1' />}
+        {hasMicControls && !dense && (
+          <MicTroubleshooting className='self-center py-1' />
+        )}
 
         {trailing}
 

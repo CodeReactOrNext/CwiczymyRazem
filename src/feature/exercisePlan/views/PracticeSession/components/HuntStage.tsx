@@ -31,6 +31,11 @@ interface HuntStageProps {
  * wide screens the prompt moves into a side rail and the board keeps the rest of
  * the width. Below `xl` everything falls back into one centered column — the neck
  * renders identically either way, it just gets the width it gets.
+ *
+ * A phone held sideways is the other place the stack doesn't fit: about 390px tall,
+ * and the column alone runs past that. There the rail turns into a single row
+ * above the board instead â pills, a small tile and the instruction side by
+ * side â so the neck keeps the full width and every cell stays big enough to tap.
  */
 export function HuntStage({
   awaitingStart,
@@ -47,6 +52,7 @@ export function HuntStage({
       className={cn(
         "relative flex w-full max-w-7xl flex-col items-center gap-4",
         "xl:flex-row xl:items-center xl:justify-center xl:gap-8",
+        "shortwide:gap-2",
         className,
       )}>
       <AnimatePresence>
@@ -66,14 +72,19 @@ export function HuntStage({
         )}
       </AnimatePresence>
 
-      <div className={cn("flex w-full flex-col items-center gap-3 xl:w-48 xl:shrink-0 xl:gap-4", railClassName)}>
+      <div
+        className={cn(
+          "flex w-full flex-col items-center gap-3 xl:w-48 xl:shrink-0 xl:gap-4",
+          "shortwide:flex-row shortwide:flex-wrap shortwide:justify-center shortwide:gap-4",
+          railClassName,
+        )}>
         {stats}
         {prompt}
         {controls}
       </div>
 
       {(board || footer) && (
-        <div className="flex w-full min-w-0 flex-col items-center gap-3 xl:flex-1">
+        <div className="flex w-full min-w-0 flex-col items-center gap-3 xl:flex-1 shortwide:gap-2">
           {board}
           {footer}
         </div>
@@ -133,9 +144,9 @@ export function HuntStats({ score, mistakes, secondsLeft, complete, children }: 
  */
 function valueTypeScale(value: ReactNode): string {
   const length = typeof value === "string" ? value.length : 1;
-  if (length <= 2) return "text-4xl sm:text-5xl";
-  if (length <= 4) return "text-2xl sm:text-3xl";
-  return "text-xl sm:text-2xl";
+  if (length <= 2) return "text-4xl sm:text-5xl shortwide:text-3xl";
+  if (length <= 4) return "text-2xl sm:text-3xl shortwide:text-xl";
+  return "text-xl sm:text-2xl shortwide:text-lg";
 }
 
 const PROMPT_TILE_TONES = {
@@ -172,8 +183,10 @@ function PromptTile({ value, caption, tone, valueClassName, animationKey, grow, 
           animate={bump ? { scale: [1, 1.12, 1] } : { scale: 1 }}
           transition={{ duration: 0.4 }}
           className={cn(
-            "relative flex h-20 items-center justify-center rounded-lg text-center transition-colors duration-500 sm:h-24",
-            grow ? "min-w-[5rem] px-4 sm:min-w-[6rem]" : "w-20 overflow-hidden px-1.5 sm:w-24",
+            "relative flex h-20 items-center justify-center rounded-lg text-center transition-colors duration-500 sm:h-24 shortwide:h-14",
+            grow
+              ? "min-w-[5rem] px-4 sm:min-w-[6rem] shortwide:min-w-[3.5rem] shortwide:px-2"
+              : "w-20 overflow-hidden px-1.5 sm:w-24 shortwide:w-14",
             PROMPT_TILE_TONES[tone],
           )}>
           <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 to-transparent" />
@@ -207,9 +220,9 @@ const ORDINAL = /^(\d+)(st|nd|rd|th)$/;
  * and wrap onto a second line rather than run off the tile.
  */
 export function promptLabelClass(label: string): string {
-  if (MULTI_WORD.test(label)) return "block max-w-[7rem] whitespace-normal text-2xl leading-none sm:text-3xl";
-  if (label.length <= 3) return "whitespace-nowrap text-4xl sm:text-5xl";
-  return "whitespace-nowrap text-3xl sm:text-4xl";
+  if (MULTI_WORD.test(label)) return "block max-w-[7rem] whitespace-normal text-2xl leading-none sm:text-3xl shortwide:text-lg";
+  if (label.length <= 3) return "whitespace-nowrap text-4xl sm:text-5xl shortwide:text-3xl";
+  return "whitespace-nowrap text-3xl sm:text-4xl shortwide:text-2xl";
 }
 
 /** "5th" reads as a degree rather than a count when the suffix is set small —
@@ -258,7 +271,7 @@ export function HuntPromptCard({ title, subjectCaption, label, answerCaption, an
     <div className="relative flex items-start justify-center gap-2 sm:gap-3">
       <div
         className={cn(
-          "pointer-events-none absolute inset-x-2 top-0 h-20 rounded-lg blur-[18px] transition-opacity duration-500 sm:h-24",
+          "pointer-events-none absolute inset-x-2 top-0 h-20 rounded-lg blur-[18px] transition-opacity duration-500 sm:h-24 shortwide:h-14",
           complete ? "bg-emerald-500/40 opacity-100" : "bg-cyan-500/10 opacity-60",
         )}
       />
@@ -341,7 +354,7 @@ export function HuntTargetCard({ value, complete, foundCount, animationKey }: Hu
         animate={complete ? { scale: [1, 1.15, 1] } : { scale: 1 }}
         transition={{ duration: 0.4 }}
         className={cn(
-          "relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg px-1.5 transition-colors duration-500 sm:h-24 sm:w-24",
+          "relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg px-1.5 transition-colors duration-500 sm:h-24 sm:w-24 shortwide:h-14 shortwide:w-14",
           complete ? "bg-emerald-900/80" : "bg-zinc-900/90",
         )}>
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />

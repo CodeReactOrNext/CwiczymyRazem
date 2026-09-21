@@ -130,9 +130,13 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
         />
       }
       prompt={
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 shortwide:flex-row">
           <HuntTargetCard value={targetNote} complete={complete} foundCount={foundCount} animationKey={targetNote} />
-          {instruction && <p className="text-center text-sm font-bold text-zinc-200">{instruction}</p>}
+          {instruction && (
+            <p className="text-center text-sm font-bold text-zinc-200 shortwide:max-w-[14rem] shortwide:text-left shortwide:text-xs">
+              {instruction}
+            </p>
+          )}
         </div>
       }
       board={

@@ -65,7 +65,8 @@ const TimerAuto: NextPageWithLayout = () => {
               />
             }
             backgroundContent={<HeroPattern withShuffle />}
-            className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+            compact
+            className="w-full !rounded-none !shadow-none"
           />
           <AutoPlanGenerator
             onBack={handleBack}

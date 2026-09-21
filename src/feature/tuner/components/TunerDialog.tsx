@@ -76,7 +76,7 @@ export function TunerDialog({
       className='fixed inset-0 z-[9999999] flex items-center justify-center bg-black/60 backdrop-blur-sm'
       onClick={onClose}>
       <div
-        className='relative w-80 rounded-lg bg-zinc-900 p-6 shadow-2xl'
+        className='relative max-h-[calc(100dvh-1.5rem)] w-80 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-lg bg-zinc-900 p-6 shadow-2xl short:p-4'
         onClick={(e) => e.stopPropagation()}>
         <RippleButton
           onClick={onClose}
@@ -100,7 +100,7 @@ export function TunerDialog({
 
         {/* Every open string of the active tuning — the ones still to tune stay
             quiet, the string being played lifts, tuned ones go green. */}
-        <div className='mt-5 flex justify-center gap-1.5'>
+        <div className='mt-5 flex justify-center gap-1.5 short:mt-3'>
           {strings.map((str, index) => {
             const isDone = tuned[index];
             const isActive = hasNote && index === activeIndex;
@@ -122,14 +122,14 @@ export function TunerDialog({
           })}
         </div>
 
-        <div className='mt-5'>
+        <div className='mx-auto mt-5 short:mt-2 short:max-w-[190px]'>
           <ArcTuner cents={cents} hasNote={hasNote} />
         </div>
 
         <div className='mt-2 flex flex-col items-center gap-0.5'>
           <span
             className={cn(
-              "font-mono text-5xl font-bold tracking-tight transition-colors duration-200",
+              "font-mono text-5xl font-bold tracking-tight transition-colors duration-200 short:text-3xl",
               noteColor,
             )}>
             {targetNote}
@@ -152,7 +152,7 @@ export function TunerDialog({
 
         <p
           className={cn(
-            "mt-4 text-center text-xs font-medium transition-colors duration-200",
+            "mt-4 text-center text-xs font-medium transition-colors duration-200 short:mt-2",
             allTuned ? "text-emerald-400" : "text-zinc-500",
           )}>
           {allTuned ? "All strings in tune" : statusText}

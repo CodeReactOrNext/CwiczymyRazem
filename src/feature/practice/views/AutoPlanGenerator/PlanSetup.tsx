@@ -20,6 +20,7 @@ import {
   toggleDifficultyEverywhere,
 } from "feature/practice/utils/autoPlan";
 import { useTranslation } from "hooks/useTranslation";
+import { Minus } from "lucide-react";
 import { Fragment, useMemo } from "react";
 
 interface PlanSetupProps {
@@ -49,8 +50,8 @@ export const PlanSetup = ({
 
   return (
     <MainContainer noBorder>
-      <div className='font-openSans mx-auto max-w-3xl space-y-8 p-8'>
-        <Card className='space-y-10 p-6'>
+      <div className='font-openSans mx-auto max-w-3xl space-y-8 px-4 py-6 sm:p-8'>
+        <Card className='space-y-10 bg-transparent p-0 sm:bg-zinc-800/40 sm:p-6'>
           {/* Duration Section */}
           <div className='space-y-4'>
             <h2 className='text-xl font-semibold'>
@@ -101,9 +102,8 @@ export const PlanSetup = ({
                   {t("exercises:auto_plan.focus")}
                 </h2>
                 <p className='text-sm text-zinc-400'>
-                  Pick the difficulties you want in each category, for example
-                  medium technique and easy hearing. Leave everything unchecked
-                  to draw from the whole library.
+                  Pick difficulties per category, or leave it empty to draw from
+                  the whole library.
                 </p>
               </div>
 
@@ -174,9 +174,9 @@ export const PlanSetup = ({
                           aria-checked={selected}
                           aria-label={`${t(
                             `exercises:categories.${category}`,
-                          )} ${t(
-                            `exercises:difficulty.${difficulty}`,
-                          )} (${available})`}
+                          )} ${t(`exercises:difficulty.${difficulty}`)}${
+                            available === 0 ? " (none available)" : ""
+                          }`}
                           disabled={available === 0}
                           onClick={() =>
                             setFilter(
@@ -186,22 +186,22 @@ export const PlanSetup = ({
                           className={cn(
                             "flex items-center justify-center gap-1.5 rounded py-2.5 transition-colors",
                             available === 0
-                              ? "cursor-not-allowed opacity-30"
+                              ? "cursor-not-allowed"
                               : "hover:bg-zinc-800/50",
                             selected && "bg-cyan-500/10 hover:bg-cyan-500/20",
                           )}>
-                          <Checkbox
-                            checked={selected}
-                            tabIndex={-1}
-                            className='pointer-events-none border-zinc-600 data-[state=checked]:border-cyan-500 data-[state=checked]:bg-cyan-500 data-[state=checked]:text-zinc-950'
-                          />
-                          <span
-                            className={cn(
-                              "text-xs tabular-nums",
-                              selected ? "text-cyan-400" : "text-zinc-500",
-                            )}>
-                            {available}
-                          </span>
+                          {available === 0 ? (
+                            <Minus
+                              aria-hidden
+                              className='h-4 w-4 text-zinc-600'
+                            />
+                          ) : (
+                            <Checkbox
+                              checked={selected}
+                              tabIndex={-1}
+                              className='pointer-events-none border-zinc-600 data-[state=checked]:border-cyan-500 data-[state=checked]:bg-cyan-500 data-[state=checked]:text-zinc-950'
+                            />
+                          )}
                         </button>
                       );
                     })}

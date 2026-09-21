@@ -19,11 +19,15 @@ export const RotateDeviceHint = () => {
 
   return (
     <button
+      type="button"
       onClick={handleClick}
-      className="mx-auto flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900/60 px-4 py-2 text-[10px] font-semibold tracking-wide text-zinc-400 transition-all hover:text-zinc-200 active:scale-95"
+      className="mx-auto flex items-center gap-3 rounded-lg bg-cyan-500/10 px-4 py-2.5 text-left transition-colors hover:bg-cyan-500/15 active:scale-95"
     >
-      <MdScreenRotation className="h-4 w-4 text-cyan-400/80" />
-      Rotate your phone for a wider view
+      <MdScreenRotation className="h-5 w-5 shrink-0 text-cyan-400" />
+      <span className="flex flex-col gap-0.5 leading-tight">
+        <span className="text-xs font-bold text-cyan-300">Rotate your phone</span>
+        <span className="text-[11px] font-medium text-zinc-400">Wider tab, bigger controls</span>
+      </span>
     </button>
   );
 };
