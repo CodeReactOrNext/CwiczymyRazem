@@ -8,6 +8,8 @@ import { ExercisePromo } from 'components/Blog/ExercisePromo';
 import { MajorScaleDiagram } from 'components/Blog/MajorScaleDiagram';
 import { PatternBackground } from 'components/Blog/PatternBackground';
 import { PhotoBlock } from 'components/Blog/PhotoBlock';
+import { PhotoCompare } from 'components/Blog/PhotoCompare';
+import { PracticeBlueprint } from 'components/Blog/PracticeBlueprint';
 import { PracticePlanCard } from 'components/Blog/PracticePlanCard';
 import { PracticeTable } from 'components/Blog/PracticeTable';
 import { SessionLengthStat } from 'components/Blog/SessionLengthStat';
@@ -75,6 +77,8 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
   ExercisePromo,
   MajorScaleDiagram,
   PhotoBlock,
+  PhotoCompare,
+  PracticeBlueprint,
   PracticePlanCard,
   PracticeTable,
   SessionLengthStat,
