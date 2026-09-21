@@ -9,6 +9,7 @@ import { memo, useState } from "react";
 import { FaCheck, FaFlagCheckered, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons/fa";
 
 import type { Exercise } from "../../../types/exercise.types";
+import { FinishSessionDialog } from "./FinishSessionDialog";
 import { MainTimerSection } from "./MainTimerSection";
 import { ShortcutsLegend } from "./ShortcutsLegend";
 
@@ -25,14 +26,16 @@ interface SessionBottomBarProps {
   handleRestart: () => void;
   handleNextExerciseClick: () => Promise<void>;
 
+  /** The session's own bar is met — finishing awards skill points as usual. */
   canFinishSession: boolean;
-  isSkillExercise: boolean;
+  /** At least one exercise got its 20s, so there is something worth logging. */
+  hasLoggedPractice: boolean;
   currentExerciseIndex: number;
   totalExercises: number;
   onGoToPreviousExercise: () => void;
   isFinishing?: boolean;
   isSubmittingReport: boolean;
-  onFinishSession: () => Promise<void>;
+  onFinishSession: (options?: { earlyFinish?: boolean }) => Promise<void>;
   examMode?: boolean;
 }
 
@@ -49,7 +52,7 @@ const SessionBottomBarComponent = ({
   handleRestart,
   handleNextExerciseClick,
   canFinishSession,
-  isSkillExercise,
+  hasLoggedPractice,
   currentExerciseIndex,
   totalExercises,
   onGoToPreviousExercise,
@@ -67,6 +70,11 @@ const SessionBottomBarComponent = ({
   // Only meaningful mid-plan: the last exercise already has its own "Finish
   // Session" action, and a single-exercise plan has nothing to skip ahead of.
   const canFinishEarly = !examMode && !isLastExercise && totalExercises > 1;
+  // Below the session's own bar — a skill exercise that wasn't played out, or a
+  // plan whose exercises never got their 20s. Finishing from here is still
+  // allowed, it just doesn't earn the skill points; the dialog spells that out.
+  const isEarlyFinish = !canFinishSession;
+  const finishDisabled = !hasLoggedPractice;
 
   return (
     <>
@@ -116,27 +124,25 @@ const SessionBottomBarComponent = ({
           {canFinishEarly && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span tabIndex={canFinishSession ? -1 : 0}>
+                <span tabIndex={finishDisabled ? 0 : -1}>
                   <Button
                     size="sm"
                     variant="ghost"
                     loading={isFinishing || isSubmittingReport}
                     className={cn(
                       "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2",
-                      !canFinishSession && "opacity-50 cursor-not-allowed"
+                      finishDisabled && "opacity-50 cursor-not-allowed"
                     )}
-                    disabled={!canFinishSession}
+                    disabled={finishDisabled}
                     onClick={() => setShowFinishEarlyDialog(true)}
                   >
                     <FaFlagCheckered className="mr-2" /> {t("common:practice.finish_plan_early")}
                   </Button>
                 </span>
               </TooltipTrigger>
-              {!canFinishSession && (
+              {finishDisabled && (
                 <TooltipContent side="top">
-                  {isSkillExercise
-                    ? t("common:practice.finish_plan_early_disabled_skill")
-                    : t("common:practice.finish_plan_early_disabled_time")}
+                  {t("common:practice.finish_early.blocked")}
                 </TooltipContent>
               )}
             </Tooltip>
@@ -151,10 +157,18 @@ const SessionBottomBarComponent = ({
                   isLastExercise
                     ? "h-12 px-6 bg-white text-black shadow-lg shadow-white/20 hover:bg-zinc-200 hover:text-black"
                     : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
-                  isLastExercise && !canFinishSession && "opacity-50 cursor-not-allowed"
+                  isLastExercise && finishDisabled && "opacity-50 cursor-not-allowed"
                 )}
-                onClick={isLastExercise ? onFinishSession : handleNextExerciseClick}
-                disabled={isLastExercise ? !canFinishSession : false}
+                onClick={
+                  !isLastExercise
+                    ? handleNextExerciseClick
+                    : isEarlyFinish
+                      // Below the bar — never finish on the first click, the
+                      // dialog has to state what the player is giving up first.
+                      ? () => setShowFinishEarlyDialog(true)
+                      : () => onFinishSession()
+                }
+                disabled={isLastExercise ? finishDisabled : false}
               >
                 {(isFinishing || isSubmittingReport) ? (
                   <span>Saving...</span>
@@ -168,9 +182,11 @@ const SessionBottomBarComponent = ({
                   </>
                 )}
               </Button>
-              {isLastExercise && !canFinishSession && (
+              {isLastExercise && isEarlyFinish && (
                 <span className="text-[11px] text-zinc-500 tracking-wide">
-                  {isSkillExercise ? "Complete the full exercise to finish" : "Practice at least 20s to finish"}
+                  {finishDisabled
+                    ? t("common:practice.finish_early.blocked")
+                    : t("common:practice.finish_early.hint")}
                 </span>
               )}
             </div>
@@ -201,50 +217,34 @@ const SessionBottomBarComponent = ({
           <Button
             className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
             loading={isFinishing || isSubmittingReport}
-            disabled={!canFinishSession}
-            onClick={async () => { setShowExitDialog(false); await onFinishSession(); }}
+            disabled={finishDisabled}
+            onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}
           >
             <FaCheck className="mr-2" />
             Finish &amp; save time
           </Button>
         </DialogFooter>
-        {!canFinishSession && (
+        {isEarlyFinish && (
           <p className="text-[11px] text-zinc-500 text-center -mt-2">
-            {isSkillExercise ? "Complete the full exercise to save" : "Practice at least 20s to save"}
+            {finishDisabled
+              ? t("common:practice.finish_early.blocked")
+              : t("common:practice.finish_early.hint")}
           </p>
         )}
       </DialogContent>
     </Dialog>
 
-    <Dialog open={showFinishEarlyDialog} onOpenChange={setShowFinishEarlyDialog}>
-      {/* z-index must beat the session view or this dialog opens invisibly behind it. */}
-      <DialogContent className="max-w-md bg-zinc-900 text-white z-[99999999]">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-bold tracking-tight">{t("common:practice.finish_plan_early_title")}</DialogTitle>
-          <DialogDescription className="text-zinc-400 text-sm mt-1">
-            {t("common:practice.finish_plan_early_description")}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
-          <Button
-            variant="ghost"
-            className="flex-1 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 font-semibold text-sm"
-            onClick={() => setShowFinishEarlyDialog(false)}
-          >
-            {t("common:cancel")}
-          </Button>
-          <Button
-            className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
-            loading={isFinishing || isSubmittingReport}
-            disabled={!canFinishSession}
-            onClick={async () => { setShowFinishEarlyDialog(false); await onFinishSession(); }}
-          >
-            <FaFlagCheckered className="mr-2" />
-            {t("common:practice.finish_plan_early_action")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <FinishSessionDialog
+      open={showFinishEarlyDialog}
+      onOpenChange={setShowFinishEarlyDialog}
+      mode={isEarlyFinish ? "early" : "plan"}
+      disabled={finishDisabled}
+      isLoading={isFinishing || isSubmittingReport}
+      onConfirm={async () => {
+        setShowFinishEarlyDialog(false);
+        await onFinishSession({ earlyFinish: isEarlyFinish });
+      }}
+    />
 
     </>
   );

@@ -66,11 +66,15 @@ export const useSessionProgress = ({
   const effectiveDurationSeconds = freeMode ? Number.MAX_SAFE_INTEGER : duration;
   const currentTimeLeft = freeMode ? 0 : Math.max(0, Math.floor((effectiveDurationSeconds * 1000 - time) / 1000));
 
+  // The floor under any finish: at least one exercise got the 20s that make it
+  // count as practised, so a finish can never write an empty report.
+  const hasLoggedPractice = completedExercises.length > 0;
+
   const canFinishSession = freeMode
-    ? completedExercises.length > 0
+    ? hasLoggedPractice
     : isSkillExercise
       ? currentTimeLeft <= 0 && timeLeftWasPositiveRef.current
-      : completedExercises.length > 0;
+      : hasLoggedPractice;
 
   const resetProgress = useCallback(() => {
     setCompletedExercises([]);
@@ -83,6 +87,7 @@ export const useSessionProgress = ({
     showSuccessView,
     setShowSuccessView,
     canFinishSession,
+    hasLoggedPractice,
     resetProgress,
     setCompletedExercises,
   };

@@ -100,11 +100,11 @@ interface DesktopSessionViewProps {
   isLastExercise:           boolean;
   handleRestart:            () => void;
   canFinishSession:         boolean;
-  isSkillExercise:          boolean;
+  hasLoggedPractice:        boolean;
   jumpToExercise:           (idx: number) => void;
   isFinishing:              boolean | undefined;
   isSubmittingReport:       boolean;
-  onFinishSession:          () => Promise<void>;
+  onFinishSession:          (options?: { earlyFinish?: boolean }) => Promise<void>;
   onClose:                  () => void;
   skipExitDialog:           boolean;
   planHasTablature:         boolean;
@@ -324,7 +324,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
 
                 {!p.reportResult && (
                   <SessionBottomBar
-                    examMode={!!p.examMode} onClose={p.onClose} skipExitDialog={p.skipExitDialog}
+                    examMode={p.isExamMode} onClose={p.onClose} skipExitDialog={p.skipExitDialog}
                     exerciseKey={p.exerciseKey} currentExercise={p.currentExercise}
                     isLastExercise={p.isLastExercise} isPlaying={p.isPlaying}
                     toggleTimer={p.handleToggleTimer} handleRestart={p.handleRestart}
@@ -332,7 +332,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     hasBackingTrack={!!p.backingTrackSlot}
                   
                     canFinishSession={p.canFinishSession}
-                    isSkillExercise={p.isSkillExercise}
+                    hasLoggedPractice={p.hasLoggedPractice}
                     currentExerciseIndex={p.currentExerciseIndex}
                     totalExercises={p.plan.exercises.length}
                     onGoToPreviousExercise={() => {

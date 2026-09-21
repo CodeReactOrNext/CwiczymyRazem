@@ -108,7 +108,7 @@ export const PracticeSession = ({
     videoDuration, setVideoDuration, setTimerTime, autoSubmitReport,
     isSubmittingReport, reportResult, currentUserStats, previousUserStats,
     planTitleString,  timer, activityDataToUse,
-    jumpToExercise,  canFinishSession, isSkillExercise,
+    jumpToExercise,  canFinishSession, hasLoggedPractice,
     completedExercises, restartFullSession,
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
 
@@ -671,6 +671,25 @@ export const PracticeSession = ({
     sessionBpm: effectiveBpm,
   });
 
+  /**
+   * Finish from the session chrome — the desktop bottom bar and the mobile
+   * transport, both of which route a below-the-bar finish through
+   * FinishSessionDialog first.
+   *
+   * `earlyFinish` means the session is ending before it was played out. Nothing
+   * from the run is banked — no high score, no leaderboard entry, no completion
+   * stamp in the skill tree and no skill points on the report. The practice time
+   * is the only thing an early finish keeps. Records banked by earlier exercises
+   * of the plan (saved on their way out through Next) still ride along.
+   * Exams never take this path; they have no early finish.
+   */
+  const handleFinishSessionClick = async (options?: { earlyFinish?: boolean }) => {
+    const earlyFinish = !!options?.earlyFinish;
+    metronome.stopMetronome();
+    if (!earlyFinish) await saveCurrentScores();
+    autoSubmitReport(exerciseRecordsRef.current, undefined, undefined, { skipSkillPoints: earlyFinish });
+  };
+
   // Exam mode, hunt exercises only (customGoal set — there's no tablature to
   // "finish" by playing through it): auto-run the same finish sequence the
   // manual Finish button uses, the moment the exercise's own timer
@@ -940,12 +959,18 @@ export const PracticeSession = ({
           examMode={isExamMode}
           isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult && !showSuccessView}
           onClose={onClose}
-          onFinish={isLastExercise ? async () => {
-            const snap = noteMatchingHandle.current?.snapshot();
-            metronome.stopMetronome(); await saveCurrentScores();
+          canFinishSession={canFinishSession} hasLoggedPractice={hasLoggedPractice}
+          onFinish={isLastExercise ? async (options?: { earlyFinish?: boolean }) => {
+            const earlyFinish = !!options?.earlyFinish;
+            // An early finish banks nothing from the run, so there is no
+            // snapshot to score it by and no performance to report either.
+            const snap = earlyFinish ? null : noteMatchingHandle.current?.snapshot();
+            metronome.stopMetronome();
+            if (!earlyFinish) await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,
               hasTrackedPerformance && !isEarTrainingRiddle && snap ? { score: snap.score, accuracy: snap.accuracy, ...micStandingRef.current } : null,
-              isEarTrainingRiddle ? { score: earTrainingScore, ...earTrainingStandingRef.current } : null);
+              !earlyFinish && isEarTrainingRiddle ? { score: earTrainingScore, ...earTrainingStandingRef.current } : null,
+              { skipSkillPoints: earlyFinish });
             if (isExamMode && snap) onExamComplete?.(snap.accuracy);
           } : onFinish}
           isMounted={isMounted} currentExercise={currentExercise}
@@ -1035,10 +1060,10 @@ export const PracticeSession = ({
         examMode={examModeObject} isExamMode={isExamMode} isScaleExam={isScaleExam} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
         onDevPassExam={process.env.NODE_ENV !== "production" && isExamMode && currentExercise.customGoal ? handleDevCompleteExam : undefined}
         handleRestart={handleRestart}
-        canFinishSession={canFinishSession} isSkillExercise={isSkillExercise}
+        canFinishSession={canFinishSession} hasLoggedPractice={hasLoggedPractice}
         jumpToExercise={jumpToExercise} isFinishing={isFinishing}
         isSubmittingReport={isSubmittingReport}
-        onFinishSession={async () => { metronome.stopMetronome(); await saveCurrentScores(); autoSubmitReport(exerciseRecordsRef.current); }}
+        onFinishSession={handleFinishSessionClick}
         onClose={onClose} skipExitDialog={skipExitDialog}
         planHasTablature={planHasTablature} planHasGpFile={planHasGpFile} planHasStrumming={planHasStrumming}
         skillRewardSkillId={skillRewardSkillId} skillRewardAmount={skillRewardAmount}
