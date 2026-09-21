@@ -195,9 +195,16 @@ export default async function handler(
   // ── 2. Streak reminder emails (with 7-day per-user cooldown) ──────────────
   // Runs on every hourly tick, but each user is only ever *considered* on the
   // one tick matching their own evening (`statistics.reminderHourUtc`, written
-  // on every report). That is an indexed equality query, not a scan — the daily
-  // read budget is unchanged, just spread across the day instead of dumping
-  // "your streak ends at midnight" on people at 11am local while they're at work.
+  // on every report — see reportUpdateUserStats, which now also places accounts
+  // whose browser reports no timezone into the default bucket).
+  //
+  // This is the only query that reaches users here. It used to be joined by a
+  // daily scan of the whole collection, to catch accounts carrying no reminder
+  // hour at all; measured over September 2026 that scan was reading ~2,200
+  // documents a day — more than every other scheduled read in the project put
+  // together — to find a population that the write path had already covered.
+  // Do not reintroduce it: an account with no reminder hour cannot be one or
+  // three days lapsed without having reported, and reporting assigns the hour.
   try {
     const scheduledSnapshot = await firestore
       .collection("users")
@@ -206,24 +213,6 @@ export default async function handler(
 
     const docsByUid = new Map<string, any>();
     scheduledSnapshot.docs.forEach((doc: any) => docsByUid.set(doc.id, doc.data()));
-
-    // Accounts that have not reported since per-user scheduling shipped carry no
-    // `reminderHourUtc`, and Firestore cannot query for a missing field — so the
-    // pre-existing full scan survives, once a day, on the hour the cron used to
-    // run. They keep exactly their old behaviour and migrate off this path by
-    // themselves the first time they log a session. No backfill needed.
-    if (isDailyBlockHour) {
-      const legacySnapshot = await firestore
-        .collection("users")
-        .where("email", "!=", null)
-        .get();
-
-      legacySnapshot.docs.forEach((doc: any) => {
-        const data = doc.data();
-        if (typeof data.statistics?.reminderHourUtc === "number") return;
-        docsByUid.set(doc.id, data);
-      });
-    }
 
     interface StreakCandidate {
       uid: string;

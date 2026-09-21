@@ -3,30 +3,6 @@
 // Regenerate with: npx vitest run scripts/generateSeoRedirects.test.ts
 const seoRedirects = require("./scripts/seoRedirects.json");
 
-const withPWA = require("@ducanh2912/next-pwa").default({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-  register: true,
-  skipWaiting: true,
-  extendDefaultRuntimeCaching: true,
-  workboxOptions: {
-    runtimeCaching: [
-      {
-        urlPattern: /\/api\/.*/i,
-        handler: "NetworkOnly",
-      },
-      {
-        urlPattern: /\/monitoring.*/i,
-        handler: "NetworkOnly",
-      },
-      {
-        urlPattern: /\/ingest.*/i,
-        handler: "NetworkOnly",
-      },
-    ],
-  },
-});
-
 const nextConfig = {
   reactStrictMode: true,
   env: {
@@ -60,20 +36,6 @@ const nextConfig = {
     };
     return config;
   },
-  async rewrites() {
-    return [
-      {
-        source: "/ingest/static/:path*",
-        destination: "https://eu-assets.i.posthog.com/static/:path*",
-      },
-      {
-        source: "/ingest/:path*",
-        destination: "https://eu.i.posthog.com/:path*",
-      },
-    ];
-  },
-  // This is required to support PostHog trailing slash API requests
-  skipTrailingSlashRedirect: true,
   async redirects() {
     return [
       // Season emails linked to /leadboard (the feature-folder name) instead of
@@ -418,7 +380,7 @@ const nextConfig = {
   },
 };
 
-module.exports = withPWA(nextConfig);
+module.exports = nextConfig;
 
 // Injected content via Sentry wizard below
 

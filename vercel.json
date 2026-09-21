@@ -1,4 +1,12 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "*": false,
+      "master": true,
+      "develop": true
+    }
+  },
   "crons": [
     {
       "path": "/api/discord/daily-season-update",

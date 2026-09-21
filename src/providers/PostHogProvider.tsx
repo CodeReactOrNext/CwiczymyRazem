@@ -8,7 +8,11 @@ export function PostHogProvider() {
   useEffect(() => {
     const init = () => {
       posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-        api_host: "/ingest",
+        // Analytics goes straight to PostHog rather than through a /ingest rewrite on
+        // our own domain. The proxy only bought resistance to ad blockers, and it made
+        // every event from every browser an edge request — and therefore a billed
+        // observability event — on Vercel.
+        api_host: "https://eu.i.posthog.com",
         ui_host: "https://eu.posthog.com",
         capture_exceptions: false,
         debug: process.env.NODE_ENV === "development",

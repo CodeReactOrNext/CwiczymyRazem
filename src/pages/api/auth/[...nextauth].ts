@@ -1,10 +1,11 @@
 import type { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { AUTH_SECRET } from "utils/auth/authSecret";
 import { auth } from "utils/firebase/api/firebase.config";
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET || "development-secret-change-me",
+  secret: AUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "Firebase",

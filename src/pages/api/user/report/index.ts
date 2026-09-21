@@ -16,6 +16,7 @@ import { firebaseUpdateUserStats } from "feature/report/services/updateUserStats
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { FieldValue } from "firebase-admin/firestore";
 import { ACHIEVEMENT_STATS_PATH, countsAsPlayer } from "lib/achievements/achievementStats";
+import { buildAchievementStatsUpdate } from "lib/achievements/achievementStatsUpdate";
 import { readRewardLedger } from "lib/rewards/rewardLedger";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -237,16 +238,16 @@ export default async function handler(
     const becameAPlayer =
       !countsAsPlayer(report.previousUserStats) && countsAsPlayer(report.currentUserStats);
 
-    if (report.newAchievements.length > 0 || becameAPlayer) {
-      const [statsCollection, statsDoc] = ACHIEVEMENT_STATS_PATH.split("/");
-      const statsUpdate: Record<string, FirebaseFirestore.FieldValue> = {};
+    const statsUpdate = buildAchievementStatsUpdate(
+      report.newAchievements,
+      becameAPlayer,
+      // Wrapped rather than passed bare: a static handed off as a reference
+      // loses its receiver, and this one is not ours to assume is bound.
+      (by) => FieldValue.increment(by)
+    );
 
-      for (const achievementId of report.newAchievements) {
-        statsUpdate[`counts.${achievementId}`] = FieldValue.increment(1);
-      }
-      if (becameAPlayer) {
-        statsUpdate.totalPlayers = FieldValue.increment(1);
-      }
+    if (statsUpdate) {
+      const [statsCollection, statsDoc] = ACHIEVEMENT_STATS_PATH.split("/");
 
       writePromises.push(
         firestore
@@ -254,6 +255,10 @@ export default async function handler(
           .doc(statsDoc)
           // `set(..., { merge: true })` so the very first report of a fresh
           // deployment creates the document instead of failing on a missing one.
+          // It also means the payload must nest its counters rather than name
+          // fields `counts.<id>` — `set` takes a dotted key literally, where
+          // `update` would read it as a path. `buildAchievementStatsUpdate`
+          // owns that shape and the test that pins it.
           .set(statsUpdate, { merge: true })
           .catch((error: unknown) => {
             // A lost count must never cost a player their session.

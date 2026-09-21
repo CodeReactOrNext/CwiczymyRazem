@@ -23,8 +23,14 @@ type StoredLog = AnyFirebaseLog & {
  * Grouping only ever depends on immediate neighbours, so a slice this wide reproduces exactly what
  * the feed rendered unless a single group runs longer than the slice — in which case the server
  * simply pays out for the part it can see.
+ *
+ * Kept deliberately small: these two queries are the single largest source of Firestore reads in
+ * the project (measured 2026-09: ~1.27M reads/month, two thirds of the whole database), because
+ * every click on "Motivate" pays for the full slice on both sides. A group is a handful of
+ * consecutive logs by one user, so eight covers every real case and the longer-than-the-slice
+ * fallback above handles the rest.
  */
-const GROUP_NEIGHBOUR_LIMIT = 50;
+const GROUP_NEIGHBOUR_LIMIT = 8;
 
 /** Mirrors Firestore's ordering for `orderBy("timestamp", "desc")`, including the __name__ tiebreak. */
 const byFeedOrder = (a: StoredLog, b: StoredLog): number => {

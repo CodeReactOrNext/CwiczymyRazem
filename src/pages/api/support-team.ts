@@ -78,9 +78,13 @@ export default async function handler(
         ? await withCurrentProfiles(stored)
         : stored;
 
+    // The roster document is only rewritten when an admin edits it, so five minutes was far
+    // shorter than anything that actually changes here and cost ~450 origin hits a day. Half an
+    // hour is still well inside "a supporter sees their badge the same session they earn it",
+    // since `stale-while-revalidate` refreshes in the background rather than on the next reader.
     res.setHeader(
       "Cache-Control",
-      "public, s-maxage=300, stale-while-revalidate=3600",
+      "public, s-maxage=1800, stale-while-revalidate=86400",
     );
     return res.status(200).json({ members });
   } catch (error) {
