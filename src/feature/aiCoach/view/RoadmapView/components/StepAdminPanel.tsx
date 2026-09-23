@@ -3,6 +3,7 @@ import {
   ChevronRight,
   Dumbbell,
   Loader2,
+  Music,
   RefreshCw,
   Sparkles,
   X,
@@ -31,6 +32,7 @@ export interface StepAdminPanelProps {
   exerciseOptions: string[] | undefined;
   loadingExercise: boolean;
   loadingLessons: boolean;
+  loadingSong: boolean;
   addingCustomLesson: boolean;
   customLessonInput: string;
   onCustomLessonInputChange: (value: string) => void;
@@ -46,6 +48,9 @@ export interface StepAdminPanelProps {
     exerciseId: string,
   ) => void;
   onFindLessons: (step: RoadmapStep, phase: RoadmapPhase) => void;
+  /** Asks which song the step is about and looks it up in the library. */
+  onFindSong: (step: RoadmapStep, phase: RoadmapPhase) => void;
+  onRemoveSong: (stepId: string, phaseId: string) => void;
   onRemoveLesson: (stepId: string, phaseId: string, videoId: string) => void;
   onAddCustomLesson: (stepId: string, phaseId: string, url: string) => void;
 }
@@ -57,6 +62,7 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
   exerciseOptions,
   loadingExercise,
   loadingLessons,
+  loadingSong,
   addingCustomLesson,
   customLessonInput,
   onCustomLessonInputChange,
@@ -64,6 +70,8 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
   onFindExercises,
   onSelectExercise,
   onFindLessons,
+  onFindSong,
+  onRemoveSong,
   onRemoveLesson,
   onAddCustomLesson,
 }) => {
@@ -212,6 +220,60 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
               className={SMALL_BTN_CLS}>
               <X className='h-3.5 w-3.5' /> No exercise
             </button>
+          </div>
+        )}
+      </section>
+
+      {/* Song — only a real one from the library, only on a repertoire step */}
+      <section className='rounded-lg bg-zinc-900/40 p-5'>
+        <h3 className='mb-3 flex items-center gap-2 text-xs font-semibold tracking-wide text-zinc-400'>
+          <Music className='h-3.5 w-3.5 text-purple-300' /> Library song
+        </h3>
+        {loadingSong ? (
+          <div className='flex items-center gap-2 text-xs text-zinc-400'>
+            <Loader2 className='h-3.5 w-3.5 animate-spin' /> Checking the song
+            library…
+          </div>
+        ) : step.suggestedSong ? (
+          <div className='space-y-2'>
+            <div className='flex items-center gap-3 rounded-lg bg-purple-500/10 px-3 py-2.5'>
+              <Music className='h-4 w-4 shrink-0 text-purple-300' />
+              <div className='min-w-0 flex-1'>
+                <p className='truncate text-sm font-bold text-zinc-100'>
+                  {step.suggestedSong.title}
+                </p>
+                <p className='text-[11px] text-zinc-400'>
+                  {step.suggestedSong.artist}
+                </p>
+              </div>
+            </div>
+            <div className='flex items-center gap-3'>
+              <button
+                type='button'
+                onClick={() => onFindSong(step, phase)}
+                className={`flex items-center gap-1`}>
+                <RefreshCw className='h-2.5 w-2.5' /> Search again
+              </button>
+              <button
+                type='button'
+                onClick={() => onRemoveSong(step.id, phase.id)}
+                className='text-[11px] text-zinc-500 underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-red-400'>
+                Remove
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className='space-y-2'>
+            <button
+              type='button'
+              onClick={() => onFindSong(step, phase)}
+              className={SMALL_BTN_CLS}>
+              <Sparkles className='h-3.5 w-3.5' /> Find song
+            </button>
+            <p className='text-[11px] text-zinc-500'>
+              Links the step to a song only when it is about one and the library
+              has it.
+            </p>
           </div>
         )}
       </section>

@@ -2,18 +2,28 @@ import roadmaps from "data/roadmaps";
 import AdminLogin from "feature/admin/components/AdminLogin";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
 import AdminLayout from "feature/admin/layouts/AdminLayout";
-import { generateAiRoadmap } from "feature/aiCoach/services/generateRoadmap";
-import type { Roadmap, RoadmapPhase, RoadmapStep, StaticRoadmap } from "feature/aiCoach/types/roadmap.types";
+import type { Roadmap, RoadmapPhase, StaticRoadmap } from "feature/aiCoach/types/roadmap.types";
 import { doc, getDoc } from "firebase/firestore";
+import type { QualityReport } from "lib/roadmaps/generation/qualityGate";
+import { checkRoadmapQuality } from "lib/roadmaps/generation/qualityGate";
+import type { GeneratedStructure } from "lib/roadmaps/generation/structure";
+import type { TokenUsage } from "lib/roadmaps/generation/usage";
 import {
+  addUsage,
+  emptyUsage,
+  estimateCostUsd,
+  formatUsd,
+} from "lib/roadmaps/generation/usage";
+import {
+  AlertTriangle,
   CheckCircle2,
   Circle,
   Download,
-  Dumbbell,
   Loader2,
   Map,
   Play,
   Plus,
+  RotateCcw,
   Sparkles,
   Trash2,
   XCircle,
@@ -21,7 +31,6 @@ import {
 import type { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
 import { useRef, useState } from "react";
-import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
 import { db } from "utils/firebase/client/firebase.utils";
 import { v4 as uuidv4 } from "uuid";
@@ -89,21 +98,58 @@ interface QueueItem {
   stage: StageInfo;
   progress: number; // 0–100
   roadmap: Roadmap | null;
+  /** What the reviewer said about the skeleton, and whether it was redone. */
+  review?: GeneratedStructure["review"];
+  /** The bar the curated roadmaps pass, applied to this one. */
+  quality?: QualityReport;
+  /** Steps whose lesson search failed outright (not "found nothing"). */
+  lessonErrors?: number;
+  /** Every token the pipeline spent on this roadmap, summed across its calls. */
+  usage?: TokenUsage;
   error?: string;
 }
 
+type WithUsage = { usage?: Partial<TokenUsage> };
+
 // ─── Pipeline ────────────────────────────────────────────────────────────────
 
+const LESSON_BATCH = 3;
+
+const postJson = async <T,>(url: string, password: string, body: unknown): Promise<T> => {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-admin-password": password },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || data.error || `HTTP ${res.status}`);
+  return data as T;
+};
+
+/**
+ * Skeleton (with the reviewer's pass) → one description call per phase →
+ * lessons per step → quality gate. Every stage that cannot deliver fails the
+ * item; the old pipeline marked roadmaps "Complete" with 24 of 25 steps blank.
+ */
 async function runPipeline(
   item: QueueItem,
+  password: string,
   onUpdate: (patch: Partial<QueueItem>) => void
 ) {
-  const update = (patch: Partial<QueueItem>) => onUpdate(patch);
+  const update = onUpdate;
 
   try {
-    // ── 1. Generate structure ──
-    update({ status: "running", progress: 2, stage: { label: "Generating roadmap structure…", done: 0, total: 1 } });
-    const phases = await generateAiRoadmap({ goal: item.goal, level: item.level });
+    // ── 1. Structure + review ──
+    update({
+      status: "running",
+      progress: 2,
+      stage: { label: "Drafting the plan and reviewing it…", done: 0, total: 1 },
+    });
+    const structure = await postJson<GeneratedStructure & WithUsage>("/api/generate-roadmap", password, {
+      goal: item.goal,
+      level: item.level,
+    });
+    let usage = addUsage(emptyUsage(), structure.usage ?? {});
 
     let roadmap: Roadmap = {
       id: uuidv4(),
@@ -113,184 +159,140 @@ async function runPipeline(
       level: item.level,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      phases,
+      phases: structure.phases,
     };
-    update({ roadmap, progress: 15 });
+    update({ roadmap, review: structure.review, usage, progress: 20 });
 
-    // ── 2. Descriptions ──
-    const allSteps: { step: RoadmapStep; phase: RoadmapPhase; stepIdx: number; phaseIdx: number }[] = [];
-    roadmap.phases.forEach((phase, phaseIdx) => {
-      phase.steps.forEach((step, stepIdx) => allSteps.push({ step, phase, stepIdx, phaseIdx }));
-    });
-
-    let descDone = 0;
-    update({ stage: { label: "Generating descriptions", done: 0, total: allSteps.length } });
-
-    for (let i = 0; i < allSteps.length; i += 3) {
-      const batch = allSteps.slice(i, i + 3);
-      const results = await Promise.all(
-        batch.map(async ({ step, phase, stepIdx, phaseIdx }) => {
-          try {
-            const res = await fetch("/api/generate-step-detail", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                goal: item.goal,
-                level: item.level,
-                phaseIndex: phaseIdx,
-                phaseName: phase.title,
-                totalPhases: roadmap.phases.length,
-                stepTitle: step.title,
-                prevSteps: phase.steps.slice(0, stepIdx).map((s) => s.title),
-                nextSteps: phase.steps.slice(stepIdx + 1).map((s) => s.title),
-                allPhases: roadmap.phases.map((p) => ({ title: p.title, steps: p.steps.map((s) => s.title) })),
-              }),
-            });
-            const data = await res.json();
-            return { stepId: step.id, phaseId: phase.id, data };
-          } catch {
-            return { stepId: step.id, phaseId: phase.id, data: null };
-          }
-        })
+    // ── 2. Descriptions, one phase at a time ──
+    const phaseCount = roadmap.phases.length;
+    for (let phaseIndex = 0; phaseIndex < phaseCount; phaseIndex++) {
+      update({
+        stage: { label: `Writing "${roadmap.phases[phaseIndex].title}"`, done: phaseIndex, total: phaseCount },
+      });
+      const { phase, usage: phaseUsage } = await postJson<{ phase: RoadmapPhase } & WithUsage>(
+        "/api/generate-phase-details",
+        password,
+        { goal: item.goal, level: item.level, phases: roadmap.phases, phaseIndex }
       );
-
-      // Apply batch results sequentially to avoid overwrites
-      for (const { stepId, phaseId, data } of results) {
-        if (!data) continue;
-        roadmap = {
-          ...roadmap,
-          phases: roadmap.phases.map((p) =>
-            p.id !== phaseId ? p : {
-              ...p,
-              steps: p.steps.map((s) =>
-                s.id !== stepId ? s : {
-                  ...s,
-                  description: data.description || "",
-                  successCriteria: data.successCriteria || "",
-                  sessionsRequired: Number(data.sessionsRequired) || 8,
-                }
-              ),
-            }
-          ),
-        };
-      }
-      descDone += batch.length;
+      usage = addUsage(usage, phaseUsage ?? {});
+      roadmap = {
+        ...roadmap,
+        phases: roadmap.phases.map((p, i) => (i === phaseIndex ? phase : p)),
+      };
       update({
         roadmap,
-        progress: 15 + Math.round((descDone / allSteps.length) * 45),
-        stage: { label: "Generating descriptions", done: descDone, total: allSteps.length },
+        usage,
+        progress: 20 + Math.round(((phaseIndex + 1) / phaseCount) * 55),
+        stage: { label: "Writing descriptions", done: phaseIndex + 1, total: phaseCount },
       });
     }
 
-    // ── 3. Exercises ──
-    let exDone = 0;
-    update({ progress: 60, stage: { label: "Finding exercises", done: 0, total: allSteps.length } });
-
-    for (let i = 0; i < allSteps.length; i += 3) {
-      const batch = allSteps.slice(i, i + 3);
-      const results = await Promise.all(
-        batch.map(async ({ step, phase }) => {
-          try {
-            const res = await fetch("/api/search-exercise", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                stepTitle: step.title,
-                description: roadmap.phases.flatMap(p => p.steps).find(s => s.id === step.id)?.description || "",
-                goal: item.goal,
-                level: item.level,
-              }),
-            });
-            const data = await res.json();
-            const firstId: string | undefined = data.exercise_ids?.[0];
-            return { stepId: step.id, phaseId: phase.id, exerciseId: firstId ?? null };
-          } catch {
-            return { stepId: step.id, phaseId: phase.id, exerciseId: null };
-          }
-        })
-      );
-
-      for (const { stepId, phaseId, exerciseId } of results) {
-        if (!exerciseId) continue;
-        roadmap = {
-          ...roadmap,
-          phases: roadmap.phases.map((p) =>
-            p.id !== phaseId ? p : {
-              ...p,
-              steps: p.steps.map((s) => s.id !== stepId ? s : { ...s, suggestedExerciseId: exerciseId }),
-            }
-          ),
-        };
-      }
-      exDone += batch.length;
-      update({
-        roadmap,
-        progress: 60 + Math.round((exDone / allSteps.length) * 20),
-        stage: { label: "Finding exercises", done: exDone, total: allSteps.length },
-      });
-    }
-
-    // ── 4. YouTube lessons ──
-    const stepsWithDesc = allSteps.filter(({ step }) =>
-      roadmap.phases.flatMap((p) => p.steps).find((s) => s.id === step.id)?.description
+    // ── 3. YouTube lessons ──
+    const allSteps = roadmap.phases.flatMap((phase) =>
+      phase.steps.map((step) => ({ step, phaseId: phase.id }))
     );
-    let lessDone = 0;
-    update({ progress: 80, stage: { label: "Finding lessons", done: 0, total: stepsWithDesc.length } });
+    let lessonsDone = 0;
+    let lessonErrors = 0;
+    update({ progress: 75, stage: { label: "Finding lessons", done: 0, total: allSteps.length } });
 
-    for (let i = 0; i < stepsWithDesc.length; i += 3) {
-      const batch = stepsWithDesc.slice(i, i + 3);
+    for (let i = 0; i < allSteps.length; i += LESSON_BATCH) {
+      const batch = allSteps.slice(i, i + LESSON_BATCH);
       const results = await Promise.all(
-        batch.map(async ({ step, phase }) => {
+        batch.map(async ({ step, phaseId }) => {
           try {
-            const enrichedStep = roadmap.phases.flatMap((p) => p.steps).find((s) => s.id === step.id);
-            const res = await fetch("/api/search-youtube-lessons", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
+            const data = await postJson<{ lessons?: { videoId: string }[] } & WithUsage>(
+              "/api/search-youtube-lessons",
+              password,
+              {
                 stepTitle: step.title,
-                stepDescription: enrichedStep?.description || "",
+                stepDescription: step.description,
                 roadmapGoal: item.goal,
                 roadmapLevel: item.level,
-              }),
-            });
-            const data = await res.json();
-            const lessons: { videoId: string }[] = data.lessons ?? [];
-            return { stepId: step.id, phaseId: phase.id, lessonIds: lessons.map((l) => l.videoId) };
+              }
+            );
+            return {
+              stepId: step.id,
+              phaseId,
+              lessonIds: (data.lessons ?? []).map((l) => l.videoId),
+              usage: data.usage,
+            };
           } catch {
-            return { stepId: step.id, phaseId: phase.id, lessonIds: [] };
+            lessonErrors++;
+            return { stepId: step.id, phaseId, lessonIds: [], usage: undefined };
           }
         })
       );
 
-      for (const { stepId, phaseId, lessonIds } of results) {
+      for (const { stepId, phaseId, lessonIds, usage: lessonUsage } of results) {
+        usage = addUsage(usage, lessonUsage ?? {});
         if (!lessonIds.length) continue;
         roadmap = {
           ...roadmap,
           phases: roadmap.phases.map((p) =>
             p.id !== phaseId ? p : {
               ...p,
-              steps: p.steps.map((s) => s.id !== stepId ? s : { ...s, suggestedLessonIds: lessonIds }),
+              steps: p.steps.map((s) => (s.id !== stepId ? s : { ...s, suggestedLessonIds: lessonIds })),
             }
           ),
         };
       }
-      lessDone += batch.length;
+      lessonsDone += batch.length;
       update({
         roadmap,
-        progress: 80 + Math.round((lessDone / stepsWithDesc.length) * 20),
-        stage: { label: "Finding lessons", done: lessDone, total: stepsWithDesc.length },
+        lessonErrors,
+        usage,
+        progress: 75 + Math.round((lessonsDone / allSteps.length) * 22),
+        stage: { label: "Finding lessons", done: lessonsDone, total: allSteps.length },
       });
     }
 
-    update({ status: "done", progress: 100, roadmap, stage: { label: "Complete", done: 1, total: 1 } });
+    // ── 4. Quality gate ──
+    const quality = checkRoadmapQuality(roadmap.phases);
+    update({
+      status: "done",
+      progress: 100,
+      roadmap,
+      quality,
+      lessonErrors,
+      usage,
+      stage: { label: quality.problems.length ? "Done — needs fixes" : "Done", done: 1, total: 1 },
+    });
   } catch (err: any) {
     update({ status: "error", stage: { label: err.message || "Error", done: 0, total: 0 }, error: err.message });
   }
 }
 
+// ─── Small pieces ─────────────────────────────────────────────────────────────
+
+const NoteList = ({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: string[];
+  tone: "red" | "amber" | "zinc";
+}) => {
+  if (!items.length) return null;
+  const color = tone === "red" ? "text-red-300" : tone === "amber" ? "text-amber-300" : "text-zinc-400";
+  return (
+    <div className="space-y-1">
+      <p className={`text-[11px] font-bold uppercase tracking-wider ${color}`}>{title}</p>
+      <ul className="space-y-0.5 text-xs text-zinc-400">
+        {items.map((text, index) => (
+          <li key={index} className="flex gap-2">
+            <span className="text-zinc-600">–</span>
+            <span>{text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 // ─── QueueView ────────────────────────────────────────────────────────────────
 
-const QueueView = () => {
+const QueueView = ({ password }: { password: string }) => {
   const [items, setItems] = useState<QueueItem[]>([]);
   const [goal, setGoal] = useState("");
   const [level, setLevel] = useState<Level>("Intermediate");
@@ -320,6 +322,21 @@ const QueueView = () => {
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
+  /** A failed item goes back to the queue from scratch. */
+  const retryItem = (id: string) => {
+    updateItem(id, {
+      status: "pending",
+      stage: { label: "Waiting…", done: 0, total: 0 },
+      progress: 0,
+      roadmap: null,
+      review: undefined,
+      quality: undefined,
+      lessonErrors: undefined,
+      usage: undefined,
+      error: undefined,
+    });
+  };
+
   const startQueue = async () => {
     if (runningRef.current) return;
     runningRef.current = true;
@@ -331,7 +348,7 @@ const QueueView = () => {
     for (const id of pendingIds) {
       const item = items.find((i) => i.id === id);
       if (!item) continue;
-      await runPipeline(item, (patch) => updateItem(id, patch));
+      await runPipeline(item, password, (patch) => updateItem(id, patch));
     }
 
     runningRef.current = false;
@@ -417,6 +434,9 @@ const QueueView = () => {
           const isRunning = item.status === "running";
           const isDone = item.status === "done";
           const isError = item.status === "error";
+          const steps = item.roadmap?.phases.flatMap((p) => p.steps) ?? [];
+          const problems = item.quality?.problems ?? [];
+          const warnings = item.quality?.warnings ?? [];
 
           return (
             <div
@@ -436,12 +456,13 @@ const QueueView = () => {
                 <div className="mt-0.5 shrink-0">
                   {isPending && <Circle className="h-4 w-4 text-zinc-600" />}
                   {isRunning && <Loader2 className="h-4 w-4 animate-spin text-zinc-300" />}
-                  {isDone && <CheckCircle2 className="h-4 w-4 text-emerald-400" />}
+                  {isDone && problems.length === 0 && <CheckCircle2 className="h-4 w-4 text-emerald-400" />}
+                  {isDone && problems.length > 0 && <AlertTriangle className="h-4 w-4 text-amber-400" />}
                   {isError && <XCircle className="h-4 w-4 text-red-400" />}
                 </div>
 
                 {/* Content */}
-                <div className="min-w-0 flex-1 space-y-2">
+                <div className="min-w-0 flex-1 space-y-3">
                   {/* Header row */}
                   <div className="flex items-center gap-2">
                     <p className="truncate text-sm font-semibold text-zinc-100">{item.goal}</p>
@@ -450,7 +471,7 @@ const QueueView = () => {
                     </span>
                   </div>
 
-                  {/* Stage + mini icons */}
+                  {/* Stage */}
                   {(isRunning || isDone || isError) && (
                     <div className="flex items-center gap-3 text-xs text-zinc-500">
                       <span>{item.stage.label}</span>
@@ -458,13 +479,6 @@ const QueueView = () => {
                         <span className="tabular-nums text-zinc-600">
                           {item.stage.done}/{item.stage.total}
                         </span>
-                      )}
-                      {isRunning && (
-                        <div className="ml-auto flex items-center gap-2 text-zinc-600">
-                          {item.stage.label.includes("desc") && <Sparkles className="h-3 w-3" />}
-                          {item.stage.label.includes("exerc") && <Dumbbell className="h-3 w-3" />}
-                          {item.stage.label.includes("less") && <FaYoutube className="h-3 w-3" />}
-                        </div>
                       )}
                     </div>
                   )}
@@ -479,29 +493,62 @@ const QueueView = () => {
                     </div>
                   )}
 
-                  {/* Done: stats + export */}
-                  {isDone && item.roadmap && (
-                    <div className="flex items-center gap-3 pt-1">
-                      <span className="text-xs text-zinc-600">
-                        {item.roadmap.phases.length} phases ·{" "}
-                        {item.roadmap.phases.flatMap((p) => p.steps).length} steps ·{" "}
-                        {item.roadmap.phases.flatMap((p) => p.steps).filter((s) => s.description).length} described ·{" "}
-                        {item.roadmap.phases.flatMap((p) => p.steps).filter((s) => s.suggestedExerciseId).length} exercises ·{" "}
-                        {item.roadmap.phases.flatMap((p) => p.steps).filter((s) => s.suggestedLessonIds?.length).length} lessons
-                      </span>
-                      <button
-                        onClick={() => exportRoadmap(item.roadmap!)}
-                        className="ml-auto flex items-center gap-1.5 rounded-lg bg-zinc-700 px-3 py-1.5 text-xs font-bold text-zinc-100 transition hover:bg-zinc-600"
-                      >
-                        <Download className="h-3.5 w-3.5" />
-                        Export JSON
-                      </button>
+                  {/* Reviewer's verdict on the skeleton */}
+                  {item.review && (isRunning || isDone) && (
+                    <div className="space-y-2 rounded-lg bg-zinc-950/40 p-3">
+                      <p className="text-[11px] text-zinc-500">
+                        Reviewer: {item.review.isValid ? "accepted the first draft" : "rejected the first draft"}
+                        {item.review.revised ? " · plan revised once" : ""}
+                      </p>
+                      <NoteList title="Issues raised" items={item.review.issues} tone="amber" />
+                      <NoteList title="Suggestions" items={item.review.suggestions} tone="zinc" />
                     </div>
+                  )}
+
+                  {/* Done: stats, quality gate, export */}
+                  {isDone && item.roadmap && (
+                    <>
+                      {(problems.length > 0 || warnings.length > 0) && (
+                        <div className="space-y-2 rounded-lg bg-zinc-950/40 p-3">
+                          <NoteList title={`${problems.length} to fix before shipping`} items={problems} tone="red" />
+                          <NoteList title={`${warnings.length} worth a look`} items={warnings} tone="amber" />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-3 pt-1">
+                        <span className="text-xs text-zinc-600">
+                          {item.roadmap.phases.length} phases ·{" "}
+                          {steps.length} steps ·{" "}
+                          {steps.filter((s) => s.description).length} described ·{" "}
+                          {steps.filter((s) => s.suggestedExerciseId).length} exercises ·{" "}
+                          {steps.filter((s) => s.suggestedLessonIds?.length).length} lessons
+                          {item.lessonErrors ? ` · ${item.lessonErrors} lesson searches failed` : ""}
+                          {item.usage
+                            ? ` · ≈ ${formatUsd(estimateCostUsd(item.usage))} (${item.usage.calls} calls, ${Math.round((item.usage.inputTokens + item.usage.outputTokens) / 1000)}k tokens)`
+                            : ""}
+                        </span>
+                        <button
+                          onClick={() => exportRoadmap(item.roadmap!)}
+                          className="ml-auto flex items-center gap-1.5 rounded-lg bg-zinc-700 px-3 py-1.5 text-xs font-bold text-zinc-100 transition hover:bg-zinc-600"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          Export JSON
+                        </button>
+                      </div>
+                    </>
                   )}
 
                   {/* Error */}
                   {isError && (
-                    <p className="text-xs text-red-400">{item.error}</p>
+                    <div className="flex items-center gap-3">
+                      <p className="text-xs text-red-400">{item.error}</p>
+                      <button
+                        onClick={() => retryItem(item.id)}
+                        className="ml-auto flex items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-200 transition hover:bg-zinc-700"
+                      >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        Retry
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -607,7 +654,7 @@ const AdminRoadmapsPage = () => {
           ))}
         </div>
 
-        {tab === "library" ? <LibraryView /> : <QueueView />}
+        {tab === "library" ? <LibraryView /> : <QueueView password={password} />}
       </div>
     </AdminLayout>
   );

@@ -3,6 +3,7 @@ import {
   getRoadmapReward,
   roadmapRewardId,
 } from "feature/aiCoach/data/roadmapRewards";
+import type { PhaseCheckResult } from "feature/aiCoach/types/phaseCheck.types";
 import {
   rollCondition,
   rollItemFeatures,
@@ -79,11 +80,21 @@ export default async function handler(
       .doc(`${userId}_${roadmapId}`)
       .get();
 
-    const stepProgress = progressDoc.exists
-      ? ((progressDoc.data()?.stepProgress ?? {}) as Record<string, number>)
-      : {};
+    const progressData = progressDoc.exists ? progressDoc.data() : undefined;
+    const stepProgress = (progressData?.stepProgress ?? {}) as Record<
+      string,
+      number
+    >;
+    const phaseChecks = (progressData?.phaseChecks ?? {}) as Record<
+      string,
+      PhaseCheckResult
+    >;
 
-    if (!getRoadmapCompletion(roadmapId, stepProgress).isComplete) {
+    // Every step practised to target and every phase's checkpoint passed —
+    // the quiz results live in the same document the steps do.
+    if (
+      !getRoadmapCompletion(roadmapId, stepProgress, phaseChecks).isComplete
+    ) {
       throw new Error("UNFINISHED");
     }
 
@@ -153,9 +164,9 @@ export default async function handler(
   } catch (error) {
     const message = error instanceof Error ? error.message : "";
     if (message === "UNFINISHED") {
-      return res
-        .status(400)
-        .json({ error: "Finish every step of the roadmap first" });
+      return res.status(400).json({
+        error: "Finish every step and pass every checkpoint first",
+      });
     }
     if (message === "ALREADY_CLAIMED") {
       return res.status(400).json({ error: "Reward already collected" });

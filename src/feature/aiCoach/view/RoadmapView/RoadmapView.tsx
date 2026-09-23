@@ -3,8 +3,11 @@ import {
   Check,
   CheckCircle2,
   ChevronRight,
+  ClipboardCheck,
+  Coins,
   Dumbbell,
   Loader2,
+  Lock,
   Play,
   Sparkles,
   Zap,
@@ -23,12 +26,22 @@ import { toast } from "sonner";
 import { isRewardableRoadmap } from "../../data/roadmapRewards";
 import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
 import { firebaseGetLessonsByIds } from "../../services/youtubeLesson.service";
+import type { RefineTransport } from "../../types/refine.types";
 import type {
   Roadmap,
   RoadmapPhase,
+  RoadmapSongRef,
   RoadmapStep,
 } from "../../types/roadmap.types";
 import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
+import type { PhaseCheckState } from "../../utils/phaseCheck";
+import {
+  countPassedCheckpoints,
+  getNextCheckpoint,
+  getPhaseCheckState,
+  isPhaseCleared,
+  withCheckAttempt,
+} from "../../utils/phaseCheck";
 import type { RoadmapStepRef } from "../../utils/roadmapSteps";
 import {
   findRoadmapStep,
@@ -42,12 +55,15 @@ import {
   withResourceStatus,
 } from "../../utils/stepStatus";
 import LessonPracticeModal from "./components/LessonPracticeModal";
+import { PhaseCheckDrawer } from "./components/PhaseCheckDrawer";
 import { RoadmapFinishCard } from "./components/RoadmapFinishCard";
 import type {
   StepDrawerAdminProps,
   StepDrawerView,
 } from "./components/StepDrawer";
 import { StepDrawer } from "./components/StepDrawer";
+import type { RefineBusy } from "./components/StepRefineMenu";
+import { isRefineBusy, StepRefineMenu } from "./components/StepRefineMenu";
 
 // ─── Map styling ─────────────────────────────────────────────────────────────
 
@@ -131,6 +147,66 @@ const StepMapButton = ({
   );
 };
 
+const CHECK_CLS: Record<PhaseCheckState, string> = {
+  locked: "bg-zinc-900/40 text-zinc-500 hover:bg-zinc-900/70",
+  ready: "bg-amber-500/10 text-amber-200 hover:bg-amber-500/15",
+  passed: "bg-emerald-950/30 text-emerald-400/80 hover:bg-emerald-950/50",
+};
+
+const CHECK_LABEL: Record<PhaseCheckState, string> = {
+  locked: "Checkpoint",
+  ready: "Checkpoint · ready",
+  passed: "Checkpoint · passed",
+};
+
+interface CheckpointMapButtonProps {
+  phase: RoadmapPhase;
+  isActive: boolean;
+  textAlign: "left" | "right";
+  fullWidth?: boolean;
+  /** Marks the node the connector line attaches to (the desktop copy). */
+  connector?: boolean;
+  onClick: () => void;
+}
+
+/** The quiz at the end of a phase, drawn after its steps as one more node. */
+const CheckpointMapButton = ({
+  phase,
+  isActive,
+  textAlign,
+  fullWidth = false,
+  connector = false,
+  onClick,
+}: CheckpointMapButtonProps) => {
+  const state = getPhaseCheckState(phase);
+  const Icon =
+    state === "locked" ? Lock : state === "passed" ? Check : ClipboardCheck;
+  return (
+    <button
+      type='button'
+      data-check-id={connector ? phase.id : undefined}
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-2.5 rounded px-3 py-2.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        CHECK_CLS[state],
+        fullWidth ? "w-full" : "max-w-[260px]",
+        textAlign === "right" ? "flex-row-reverse text-right" : "text-left",
+        isActive &&
+          "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950",
+      )}>
+      <Icon className='h-3.5 w-3.5 shrink-0' />
+      <span>
+        {CHECK_LABEL[state]}
+        {state === "passed" && phase.check && (
+          <span className='ml-1.5 tabular-nums opacity-70'>
+            {phase.check.bestScore}/{phase.check.total}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+};
+
 const PhaseBadge = ({
   phaseIdx,
   allDone,
@@ -158,56 +234,62 @@ const withoutId = (set: Set<string>, id: string) => {
   return next;
 };
 
-interface StepDetailResponse {
-  description?: string;
-  successCriteria?: string;
-  sessionsRequired?: number | string;
-}
+/**
+ * The generation routes take the admin password; the editor only ever runs
+ * for the admin, so a missing password simply makes them fail loudly.
+ */
+const generationHeaders = (adminPassword?: string) => ({
+  "Content-Type": "application/json",
+  ...(adminPassword ? { "x-admin-password": adminPassword } : {}),
+});
 
+const readJson = async (res: Response) => {
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok)
+    throw new Error(data.message || data.error || `HTTP ${res.status}`);
+  return data;
+};
+
+/** One step written by the coach, in the context of its whole phase. */
 const fetchStepDetail = async (
   roadmap: Roadmap,
   ref: RoadmapStepRef,
   phases: RoadmapPhase[],
-): Promise<StepDetailResponse> => {
-  const { step, phase, stepIdx, phaseIdx } = ref;
-  const res = await fetch("/api/generate-step-detail", {
+  adminPassword?: string,
+): Promise<RoadmapStep> => {
+  const { step, phaseIdx } = ref;
+  const res = await fetch("/api/generate-phase-details", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: generationHeaders(adminPassword),
     body: JSON.stringify({
       goal: roadmap.goal,
       level: roadmap.level,
+      phases,
       phaseIndex: phaseIdx,
-      phaseName: phase.title,
-      totalPhases: phases.length,
-      stepTitle: step.title,
-      prevSteps: phase.steps.slice(0, stepIdx).map((s) => s.title),
-      nextSteps: phase.steps.slice(stepIdx + 1).map((s) => s.title),
-      allPhases: phases.map((p) => ({
-        title: p.title,
-        steps: p.steps.map((s) => s.title),
-      })),
+      stepIds: [step.id],
     }),
   });
-  return res.json();
+  const data = (await readJson(res)) as { phase?: RoadmapPhase };
+  const written = data.phase?.steps.find((s) => s.id === step.id);
+  if (!written?.description) throw new Error("No description returned");
+  return written;
 };
 
-const enrichStep = (
-  step: RoadmapStep,
-  data: StepDetailResponse,
-): RoadmapStep => ({
+const enrichStep = (step: RoadmapStep, written: RoadmapStep): RoadmapStep => ({
   ...step,
-  description: data.description || "",
-  successCriteria: data.successCriteria || "",
-  sessionsRequired: Number(data.sessionsRequired) || 8,
+  description: written.description,
+  successCriteria: written.successCriteria,
+  sessionsRequired: written.sessionsRequired,
 });
 
 const searchExercise = async (
   roadmap: Roadmap,
   step: RoadmapStep,
+  adminPassword?: string,
 ): Promise<string[]> => {
   const res = await fetch("/api/search-exercise", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: generationHeaders(adminPassword),
     body: JSON.stringify({
       stepTitle: step.title,
       description: step.description || "",
@@ -215,17 +297,18 @@ const searchExercise = async (
       level: roadmap.level,
     }),
   });
-  const data = await res.json();
+  const data = await readJson(res);
   return (data.exercise_ids ?? []) as string[];
 };
 
 const searchLessons = async (
   roadmap: Roadmap,
   step: RoadmapStep,
+  adminPassword?: string,
 ): Promise<YouTubeLessonResult[]> => {
   const res = await fetch("/api/search-youtube-lessons", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: generationHeaders(adminPassword),
     body: JSON.stringify({
       stepTitle: step.title,
       stepDescription: step.description || "",
@@ -233,7 +316,7 @@ const searchLessons = async (
       roadmapLevel: roadmap.level,
     }),
   });
-  const data = await res.json();
+  const data = await readJson(res);
   return (data.lessons ?? []) as YouTubeLessonResult[];
 };
 
@@ -270,7 +353,7 @@ const parseYouTubeId = (url: string): string | null => {
 /** The DOM nodes the connector lines run between, keyed by id. */
 const collectNodes = (
   container: HTMLElement,
-  attribute: "data-phase-id" | "data-step-id",
+  attribute: "data-phase-id" | "data-step-id" | "data-check-id",
 ) => {
   const nodes = new Map<string, HTMLElement>();
   container.querySelectorAll<HTMLElement>(`[${attribute}]`).forEach((el) => {
@@ -300,6 +383,21 @@ interface RoadmapViewProps {
   onUpdate?: (roadmap: Roadmap) => void;
   onPersist?: (phases: RoadmapPhase[]) => Promise<void>;
   adminMode?: boolean;
+  /** Sent with every generation request the admin actions make. */
+  adminPassword?: string;
+  /** Somebody else's roadmap: the map can be read, its checkpoints not sat. */
+  readOnly?: boolean;
+  /**
+   * The owner's paid refining kit. With it, every step's drawer offers to have
+   * the coach redo the step, and the map takes the answers.
+   */
+  refine?: RefineTransport;
+  /**
+   * Where a change to the plan itself goes — a rewritten step, a swapped
+   * exercise, a step added or removed. Progress keeps going through
+   * `onPersist`; the two live in different documents.
+   */
+  onContentChange?: (phases: RoadmapPhase[]) => Promise<void>;
 }
 
 /**
@@ -315,6 +413,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   onUpdate,
   onPersist,
   adminMode = false,
+  adminPassword,
+  readOnly = false,
+  refine,
+  onContentChange,
 }) => {
   const router = useRouter();
 
@@ -343,6 +445,12 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   );
   const [isDrawerOpen, setIsDrawerOpen] = useState(() => activeStepId !== null);
 
+  // The checkpoint panel, same shape: the phase outlives the panel being open.
+  const [activeCheckPhaseId, setActiveCheckPhaseId] = useState<string | null>(
+    null,
+  );
+  const [isCheckOpen, setIsCheckOpen] = useState(false);
+
   const [practiceLesson, setPracticeLesson] = useState<{
     lesson: YouTubeLessonResult;
     stepId: string;
@@ -370,6 +478,11 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   const [loadingLessonIds, setLoadingLessonIds] = useState<Set<string>>(
     new Set(),
   );
+  const [loadingSongIds, setLoadingSongIds] = useState<Set<string>>(new Set());
+  // Refine mode: which paid action is running, per step.
+  const [refineBusyIds, setRefineBusyIds] = useState<
+    Record<string, RefineBusy>
+  >({});
   const [exerciseOptions, setExerciseOptions] = useState<
     Record<string, string[]>
   >({});
@@ -393,6 +506,15 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     [steps, activeStepId],
   );
   const upNext = useMemo(() => getNextUnfinishedStep(steps), [steps]);
+  const nextCheckpoint = useMemo(() => getNextCheckpoint(phases), [phases]);
+  const passedCheckpoints = useMemo(
+    () => countPassedCheckpoints(phases),
+    [phases],
+  );
+  const activeCheck = useMemo(() => {
+    const phaseIdx = phases.findIndex((p) => p.id === activeCheckPhaseId);
+    return phaseIdx === -1 ? null : { phase: phases[phaseIdx], phaseIdx };
+  }, [phases, activeCheckPhaseId]);
   const doneCount = useMemo(
     () => steps.filter((r) => getStepStatus(r.step) === "done").length,
     [steps],
@@ -425,6 +547,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
 
     const phaseNodes = collectNodes(container, "data-phase-id");
     const stepNodes = collectNodes(container, "data-step-id");
+    const checkNodes = collectNodes(container, "data-check-id");
 
     const newPaths: SvgPath[] = [];
     phases.forEach((phase, phaseIdx) => {
@@ -436,10 +559,30 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       const pRX = pRect.right - cRect.left;
       const stepsRight = phaseIdx % 2 === 0;
 
-      phase.steps.forEach((step) => {
-        const stepEl = stepNodes.get(step.id);
-        if (!stepEl) return;
-        const sRect = stepEl.getBoundingClientRect();
+      // The checkpoint hangs off the phase like one more step, in the
+      // colour of where it stands.
+      const checkState = getPhaseCheckState(phase);
+      const targets: { key: string; el: HTMLElement; status: StepStatus }[] =
+        phase.steps.flatMap((step) => {
+          const el = stepNodes.get(step.id);
+          return el ? [{ key: step.id, el, status: getStepStatus(step) }] : [];
+        });
+      const checkEl = checkNodes.get(phase.id);
+      if (checkEl) {
+        targets.push({
+          key: `check-${phase.id}`,
+          el: checkEl,
+          status:
+            checkState === "passed"
+              ? "done"
+              : checkState === "ready"
+                ? "in-progress"
+                : "not-started",
+        });
+      }
+
+      targets.forEach(({ key, el, status }) => {
+        const sRect = el.getBoundingClientRect();
         const sCY = sRect.top + sRect.height / 2 - cRect.top;
 
         let d: string;
@@ -454,11 +597,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
           const span = x0 - x3;
           d = `M ${x0} ${pCY} C ${x0 - span * 0.75} ${pCY} ${x0 - span * 0.25} ${sCY} ${x3} ${sCY}`;
         }
-        newPaths.push({
-          d,
-          key: `${phase.id}-${step.id}`,
-          status: getStepStatus(step),
-        });
+        newPaths.push({ d, key: `${phase.id}-${key}`, status });
       });
     });
 
@@ -550,6 +689,38 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     syncStepQuery(null);
   }, [syncStepQuery]);
 
+  // ─── Checkpoints ───────────────────────────────────────────────────────────
+
+  /** One panel at a time: opening a checkpoint puts the step away first. */
+  const openCheckpoint = useCallback(
+    (phaseId: string) => {
+      if (isDrawerOpen) closeStep();
+      setActiveCheckPhaseId(phaseId);
+      setIsCheckOpen(true);
+    },
+    [isDrawerOpen, closeStep],
+  );
+
+  const closeCheckpoint = useCallback(() => setIsCheckOpen(false), []);
+
+  /** An attempt is recorded the moment the last question is answered. */
+  const handleCheckResult = useCallback(
+    (phaseId: string, score: number, total: number) => {
+      const next = phasesRef.current.map((p) =>
+        p.id !== phaseId ? p : withCheckAttempt(p, score, total),
+      );
+      phasesRef.current = next;
+      setPhases(next);
+      onUpdate?.({
+        ...roadmap,
+        phases: next,
+        updatedAt: new Date().toISOString(),
+      });
+      persist(next).catch(() => toast.error("Failed to save."));
+    },
+    [onUpdate, persist, roadmap],
+  );
+
   const navigateStep = useCallback(
     (stepId: string) => {
       const ref = findRoadmapStep(steps, stepId);
@@ -576,14 +747,16 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       .finally(() => lessonsInFlight.current.delete(step.id));
   }, [activeStep, adminMode, lessonsCache]);
 
-  // The open step's details, written by the coach the first time anyone opens it.
+  // An open step with no copy yet gets written by the coach — in the editor
+  // only. A player, or a supporter browsing somebody else's roadmap, sees the
+  // blank rather than triggering a generation on somebody else's plan.
   useEffect(() => {
-    if (!activeStep || activeStep.step.description) return;
+    if (!adminMode || !activeStep || activeStep.step.description) return;
     const { step, phase } = activeStep;
     if (detailFailedIds.has(step.id) || detailInFlight.current.has(step.id))
       return;
     detailInFlight.current.add(step.id);
-    fetchStepDetail(roadmap, activeStep, phasesRef.current)
+    fetchStepDetail(roadmap, activeStep, phasesRef.current, adminPassword)
       .then((data) => {
         const saved = patchStep(phase.id, step.id, (s) => enrichStep(s, data));
         return persist(saved).catch(() => toast.error("Failed to save."));
@@ -593,7 +766,15 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         setDetailFailedIds((prev) => withId(prev, step.id));
       })
       .finally(() => detailInFlight.current.delete(step.id));
-  }, [activeStep, detailFailedIds, patchStep, persist, roadmap]);
+  }, [
+    activeStep,
+    adminMode,
+    adminPassword,
+    detailFailedIds,
+    patchStep,
+    persist,
+    roadmap,
+  ]);
 
   // ─── Player actions ────────────────────────────────────────────────────────
 
@@ -606,6 +787,23 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         { ...s, exerciseCompleted: !s.exerciseCompleted },
         lessons,
       ),
+    );
+  };
+
+  const handleToggleSong = () => {
+    if (!activeStep) return;
+    const { step, phase } = activeStep;
+    const lessons = lessonsCache[step.id] ?? [];
+    saveStep(phase.id, step.id, (s) =>
+      withResourceStatus({ ...s, songCompleted: !s.songCompleted }, lessons),
+    );
+  };
+
+  /** The song's own practice page: tab, backing track, timed practice. */
+  const handleOpenSong = (songId: string) => {
+    const returnTo = `/ai-coach?roadmapId=${roadmap.id}${activeStep ? `&step=${activeStep.step.id}` : ""}`;
+    void router.push(
+      `/songs/practice/${songId}?returnTo=${encodeURIComponent(returnTo)}`,
     );
   };
 
@@ -686,7 +884,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   const handleFindExercises = async (step: RoadmapStep) => {
     setLoadingExerciseIds((prev) => withId(prev, step.id));
     try {
-      const ids = await searchExercise(roadmap, step);
+      const ids = await searchExercise(roadmap, step, adminPassword);
       setExerciseOptions((prev) => ({ ...prev, [step.id]: ids.slice(0, 3) }));
     } catch {
       toast.error("Exercise search failed.");
@@ -717,7 +915,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     });
     setLoadingLessonIds((prev) => withId(prev, step.id));
     try {
-      const lessons = await searchLessons(roadmap, step);
+      const lessons = await searchLessons(roadmap, step, adminPassword);
       setLessonsCache((prev) => ({ ...prev, [step.id]: lessons }));
       if (lessons.length) {
         handleEditStep(step.id, phase.id, {
@@ -729,6 +927,304 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     } finally {
       setLoadingLessonIds((prev) => withoutId(prev, step.id));
     }
+  };
+
+  /**
+   * Which song the step is about, if the library has it. The model only names
+   * the song; the `songs` collection is the one that says yes or no, so a
+   * step never links to a song the app cannot open.
+   */
+  const handleFindSong = async (step: RoadmapStep, phase: RoadmapPhase) => {
+    if (loadingSongIds.has(step.id)) return;
+    setLoadingSongIds((prev) => withId(prev, step.id));
+    try {
+      const res = await fetch("/api/search-song", {
+        method: "POST",
+        headers: generationHeaders(adminPassword),
+        body: JSON.stringify({
+          stepTitle: step.title,
+          description: step.description || "",
+          goal: roadmap.goal,
+        }),
+      });
+      const data = (await readJson(res)) as {
+        requested: { title: string; artist: string } | null;
+        song: RoadmapSongRef | null;
+      };
+      if (data.song) {
+        const song = data.song;
+        patchStep(phase.id, step.id, (s) => ({ ...s, suggestedSong: song }));
+        toast.success(`Linked to "${song.title}" by ${song.artist}.`);
+      } else if (data.requested) {
+        toast.info(
+          `"${data.requested.title}" by ${data.requested.artist} is not in the song library.`,
+        );
+      } else {
+        toast.info("This step is not about one particular song.");
+      }
+    } catch (err) {
+      console.error("Song search failed:", err);
+      toast.error("Song search failed.");
+    } finally {
+      setLoadingSongIds((prev) => withoutId(prev, step.id));
+    }
+  };
+
+  const handleRemoveSong = (stepId: string, phaseId: string) => {
+    patchStep(phaseId, stepId, ({ suggestedSong: _song, ...rest }) => ({
+      ...rest,
+      songCompleted: false,
+    }));
+  };
+
+  // ─── Refine: the owner's paid changes ──────────────────────────────────────
+
+  /** A change to the plan itself — into the roadmap document, not the progress one. */
+  const saveContent = useCallback(
+    (next: RoadmapPhase[]) =>
+      (onContentChange ?? persist)(next).catch(() =>
+        toast.error("Failed to save the change."),
+      ),
+    [onContentChange, persist],
+  );
+
+  /** Replaces one whole phase, keeps the ref in sync for async callers, tells the parent. */
+  const replacePhase = useCallback(
+    (
+      phaseId: string,
+      patch: (phase: RoadmapPhase) => RoadmapPhase,
+    ): RoadmapPhase[] => {
+      const next = phasesRef.current.map((p) =>
+        p.id !== phaseId ? p : patch(p),
+      );
+      phasesRef.current = next;
+      setPhases(next);
+      onUpdate?.({
+        ...roadmap,
+        phases: next,
+        updatedAt: new Date().toISOString(),
+      });
+      return next;
+    },
+    [roadmap, onUpdate],
+  );
+
+  const setRefineBusy = (stepId: string, key: keyof RefineBusy, on: boolean) =>
+    setRefineBusyIds((prev) => ({
+      ...prev,
+      [stepId]: { ...prev[stepId], [key]: on },
+    }));
+
+  const dropExerciseOptions = (stepId: string) =>
+    setExerciseOptions((prev) => {
+      const next = { ...prev };
+      delete next[stepId];
+      return next;
+    });
+
+  /** The server refunds a failed call before it answers, so the message is all there is to show. */
+  const refineFailed = (error: unknown) =>
+    toast.error(
+      error instanceof Error ? error.message : "The change did not go through.",
+    );
+
+  const refineRewrite = async (ref: RoadmapStepRef, note: string) => {
+    if (!refine) return;
+    const { step, phase, phaseIdx } = ref;
+    setRefineBusy(step.id, "rewriteStep", true);
+    setLoadingDetailIds((prev) => withId(prev, step.id));
+    try {
+      const data = await refine.run<{ phase: RoadmapPhase }>("rewriteStep", {
+        goal: roadmap.goal,
+        level: roadmap.level,
+        phases: phasesRef.current,
+        phaseIndex: phaseIdx,
+        stepId: step.id,
+        guidance: note,
+      });
+      const written = data.phase.steps.find((s) => s.id === step.id);
+      if (!written?.description)
+        throw new Error("The coach wrote nothing back.");
+      const next = patchStep(phase.id, step.id, (s) => ({
+        ...s,
+        description: written.description,
+        successCriteria: written.successCriteria,
+        sessionsRequired: written.sessionsRequired,
+      }));
+      await saveContent(next);
+      toast.success("Step rewritten.");
+    } catch (error) {
+      refineFailed(error);
+    } finally {
+      setRefineBusy(step.id, "rewriteStep", false);
+      setLoadingDetailIds((prev) => withoutId(prev, step.id));
+    }
+  };
+
+  const refineSwapExercise = async (ref: RoadmapStepRef, note: string) => {
+    if (!refine) return;
+    const { step } = ref;
+    setRefineBusy(step.id, "swapExercise", true);
+    try {
+      const data = await refine.run<{ exerciseIds: string[] }>("swapExercise", {
+        goal: roadmap.goal,
+        level: roadmap.level,
+        stepTitle: step.title,
+        description: step.description || "",
+        guidance: note,
+      });
+      setExerciseOptions((prev) => ({
+        ...prev,
+        [step.id]: data.exerciseIds ?? [],
+      }));
+    } catch (error) {
+      refineFailed(error);
+    } finally {
+      setRefineBusy(step.id, "swapExercise", false);
+    }
+  };
+
+  /** A different exercise means the old tick is for something else — it goes too. */
+  const refineSelectExercise = (ref: RoadmapStepRef, exerciseId: string) => {
+    const { step, phase } = ref;
+    const next = patchStep(phase.id, step.id, (s) => ({
+      ...s,
+      suggestedExerciseId: exerciseId,
+      noExercise: false,
+      exerciseCompleted: false,
+    }));
+    dropExerciseOptions(step.id);
+    void Promise.all([saveContent(next), persist(next)]).catch(() => {});
+  };
+
+  const refineRefreshLessons = async (ref: RoadmapStepRef) => {
+    if (!refine) return;
+    const { step, phase } = ref;
+    setRefineBusy(step.id, "refreshLessons", true);
+    try {
+      const data = await refine.run<{ lessons: YouTubeLessonResult[] }>(
+        "refreshLessons",
+        {
+          goal: roadmap.goal,
+          level: roadmap.level,
+          stepTitle: step.title,
+          description: step.description || "",
+        },
+      );
+      const lessons = data.lessons ?? [];
+      setLessonsCache((prev) => ({ ...prev, [step.id]: lessons }));
+      const next = patchStep(phase.id, step.id, (s) => ({
+        ...s,
+        suggestedLessonIds: lessons.map((l) => l.videoId),
+        completedLessonIds: [],
+      }));
+      await Promise.all([saveContent(next), persist(next)]);
+      toast.success(
+        lessons.length
+          ? `Found ${lessons.length} ${lessons.length === 1 ? "lesson" : "lessons"}.`
+          : "No lesson in the index fits this step.",
+      );
+    } catch (error) {
+      refineFailed(error);
+    } finally {
+      setRefineBusy(step.id, "refreshLessons", false);
+    }
+  };
+
+  const refineFindSong = async (ref: RoadmapStepRef) => {
+    if (!refine) return;
+    const { step, phase } = ref;
+    setRefineBusy(step.id, "findSong", true);
+    try {
+      const data = await refine.run<{
+        requested: { title: string; artist: string } | null;
+        song: RoadmapSongRef | null;
+      }>("findSong", {
+        goal: roadmap.goal,
+        level: roadmap.level,
+        stepTitle: step.title,
+        description: step.description || "",
+      });
+      if (data.song) {
+        const song = data.song;
+        const next = patchStep(phase.id, step.id, (s) => ({
+          ...s,
+          suggestedSong: song,
+          songCompleted: false,
+        }));
+        await Promise.all([saveContent(next), persist(next)]);
+        toast.success(`Linked to "${song.title}" by ${song.artist}.`);
+      } else if (data.requested) {
+        toast.info(
+          `"${data.requested.title}" by ${data.requested.artist} is not in the song library.`,
+        );
+      } else {
+        toast.info("This step is not about one particular song.");
+      }
+    } catch (error) {
+      refineFailed(error);
+    } finally {
+      setRefineBusy(step.id, "findSong", false);
+    }
+  };
+
+  const refineAddStep = async (ref: RoadmapStepRef, note: string) => {
+    if (!refine) return;
+    const { step, phase, phaseIdx } = ref;
+    setRefineBusy(step.id, "addSteps", true);
+    try {
+      const data = await refine.run<{
+        phase: RoadmapPhase;
+        addedStepIds: string[];
+      }>("addSteps", {
+        goal: roadmap.goal,
+        level: roadmap.level,
+        phases: phasesRef.current,
+        phaseIndex: phaseIdx,
+        afterStepId: step.id,
+        count: 1,
+        guidance: note,
+      });
+      const next = replacePhase(phase.id, () => data.phase);
+      await saveContent(next);
+      toast.success("Step added.");
+      const [addedId] = data.addedStepIds ?? [];
+      if (addedId) {
+        setActiveStepId(addedId);
+        setIsDrawerOpen(true);
+        syncStepQuery(addedId);
+      }
+    } catch (error) {
+      refineFailed(error);
+    } finally {
+      setRefineBusy(step.id, "addSteps", false);
+    }
+  };
+
+  /** Free: nothing is asked of the coach. The drawer moves to a neighbour. */
+  const refineRemoveStep = (ref: RoadmapStepRef) => {
+    const { step, phase, index } = ref;
+    if (phase.steps.length <= 1) {
+      toast.error("A phase keeps at least one step.");
+      return;
+    }
+    const neighbour =
+      steps[index + 1]?.step.id ?? steps[index - 1]?.step.id ?? null;
+    const next = replacePhase(phase.id, (p) => ({
+      ...p,
+      steps: p.steps
+        .filter((s) => s.id !== step.id)
+        .map((s, order) => ({ ...s, order })),
+    }));
+    void saveContent(next);
+    dropExerciseOptions(step.id);
+    if (neighbour) {
+      setActiveStepId(neighbour);
+      syncStepQuery(neighbour);
+    } else {
+      closeStep();
+    }
+    toast.success("Step removed.");
   };
 
   const handleRemoveLesson = (
@@ -833,7 +1329,12 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         detailInFlight.current.add(ref.step.id);
         setLoadingDetailIds((prev) => withId(prev, ref.step.id));
         try {
-          const data = await fetchStepDetail(roadmap, ref, phasesRef.current);
+          const data = await fetchStepDetail(
+            roadmap,
+            ref,
+            phasesRef.current,
+            adminPassword,
+          );
           patchStep(ref.phase.id, ref.step.id, (s) => enrichStep(s, data));
         } finally {
           detailInFlight.current.delete(ref.step.id);
@@ -861,7 +1362,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       async ({ step, phase }) => {
         setLoadingExerciseIds((prev) => withId(prev, step.id));
         try {
-          const [firstId] = await searchExercise(roadmap, step);
+          const [firstId] = await searchExercise(roadmap, step, adminPassword);
           if (firstId)
             patchStep(phase.id, step.id, (s) => ({
               ...s,
@@ -888,7 +1389,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       "bg-red-500",
       toFind,
       async ({ step, phase }) => {
-        const lessons = await searchLessons(roadmap, step);
+        const lessons = await searchLessons(roadmap, step, adminPassword);
         if (lessons.length) {
           setLessonsCache((prev) => ({ ...prev, [step.id]: lessons }));
           patchStep(phase.id, step.id, (s) => ({
@@ -936,6 +1437,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     adminMode && activeStep
       ? {
           exerciseOptions: exerciseOptions[activeStep.step.id],
+          loadingSong: loadingSongIds.has(activeStep.step.id),
           addingCustomLesson: addingCustomLesson.has(activeStep.step.id),
           customLessonInput: customLessonInput[activeStep.step.id] ?? "",
           onCustomLessonInputChange: (value) =>
@@ -947,6 +1449,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
           onFindExercises: handleFindExercises,
           onSelectExercise: handleSelectExercise,
           onFindLessons: handleFindLessons,
+          onFindSong: handleFindSong,
+          onRemoveSong: handleRemoveSong,
           onRemoveLesson: handleRemoveLesson,
           onAddCustomLesson: handleAddCustomLesson,
           onRegenerate: handleRegenerateStep,
@@ -954,11 +1458,78 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       : undefined;
 
   const markerId = `arr-${roadmap.id.slice(0, 8)}`;
+  const isFinished = progress === 100 && passedCheckpoints === phases.length;
+  // A finished phase's checkpoint comes before the next phase's first step.
+  const checkpointUpNext =
+    nextCheckpoint && (!upNext || nextCheckpoint.phaseIdx < upNext.phaseIdx)
+      ? nextCheckpoint
+      : null;
   const totalSteps = steps.length;
   const hasStarted = doneCount > 0 || inProgressCount > 0;
   const isStepLoading = (step: RoadmapStep) =>
     loadingDetailIds.has(step.id) ||
+    isRefineBusy(refineBusyIds[step.id]) ||
     (step.id === activeStepId && !!drawerView?.isGenerating);
+  const anyRefineBusy = Object.values(refineBusyIds).some(isRefineBusy);
+
+  /**
+   * A step's node, with the owner's refining wand beside it in refine mode.
+   * The wand sits on the outer side, away from the phase the arrows come
+   * from, so the connector still lands on the node itself.
+   */
+  const renderStep = (
+    step: RoadmapStep,
+    textAlign: "left" | "right",
+    fullWidth: boolean,
+  ) => {
+    const node = (
+      <StepMapButton
+        key={step.id}
+        step={step}
+        isActive={isDrawerOpen && activeStepId === step.id}
+        isLoading={isStepLoading(step)}
+        textAlign={textAlign}
+        fullWidth={fullWidth}
+        connector={!fullWidth}
+        onClick={() => navigateStep(step.id)}
+      />
+    );
+    const ref = refine ? findRoadmapStep(steps, step.id) : null;
+    if (!refine || !ref) return node;
+    const menu = (
+      <StepRefineMenu
+        stepRef={ref}
+        costs={refine.costs}
+        tokensLeft={refine.tokensLeft}
+        busy={refineBusyIds[step.id] ?? {}}
+        anyBusy={anyRefineBusy}
+        exerciseOptions={exerciseOptions[step.id]}
+        side={textAlign === "right" ? "left" : "right"}
+        onRewrite={refineRewrite}
+        onSwapExercise={refineSwapExercise}
+        onSelectExercise={refineSelectExercise}
+        onDismissExerciseOptions={(target) =>
+          dropExerciseOptions(target.step.id)
+        }
+        onRefreshLessons={refineRefreshLessons}
+        onFindSong={refineFindSong}
+        onAddStep={refineAddStep}
+        onRemoveStep={refineRemoveStep}
+      />
+    );
+    return (
+      <div
+        key={step.id}
+        className={cn(
+          "flex items-center gap-1.5",
+          fullWidth ? "w-full" : "max-w-[300px]",
+        )}>
+        {textAlign === "right" && menu}
+        {node}
+        {textAlign === "left" && menu}
+      </div>
+    );
+  };
 
   // ─── Render ────────────────────────────────────────────────────────────────
 
@@ -1135,7 +1706,29 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
 
             {/* ─── Up next + legend ─── */}
             <div className='mb-8 flex flex-col gap-3 md:flex-row md:items-stretch'>
-              {upNext ? (
+              {checkpointUpNext ? (
+                <button
+                  type='button'
+                  onClick={() => openCheckpoint(checkpointUpNext.phase.id)}
+                  className='group flex min-w-0 flex-1 items-center gap-4 rounded-lg bg-amber-500/10 px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-amber-500/15'>
+                  <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400'>
+                    <ClipboardCheck className='h-4 w-4' />
+                  </span>
+                  <span className='min-w-0 flex-1'>
+                    <span className='block text-[11px] font-semibold text-amber-400'>
+                      Checkpoint
+                    </span>
+                    <span className='block truncate text-sm font-semibold text-zinc-100'>
+                      Show what you learned in phase{" "}
+                      {checkpointUpNext.phaseIdx + 1}
+                    </span>
+                    <span className='block truncate text-xs text-zinc-400'>
+                      {checkpointUpNext.phase.title} · every step done
+                    </span>
+                  </span>
+                  <ChevronRight className='h-4 w-4 shrink-0 text-amber-500 transition-colors group-hover:text-amber-300' />
+                </button>
+              ) : upNext ? (
                 <button
                   type='button'
                   onClick={() => openStep(upNext)}
@@ -1159,7 +1752,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
               ) : (
                 <div className='flex flex-1 items-center gap-3 rounded-lg bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-400'>
                   <CheckCircle2 className='h-4 w-4 shrink-0' />
-                  Every step done. Your reward is waiting at the finish line.
+                  Every step done and every checkpoint passed. Your reward is
+                  waiting at the finish line.
                 </div>
               )}
 
@@ -1175,6 +1769,21 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                     {label}
                   </span>
                 ))}
+                {refine && (
+                  <span className='flex items-center gap-1.5 text-zinc-300'>
+                    <Coins className='h-3.5 w-3.5 text-amber-300' />
+                    {refine.tokensLeft === null ? (
+                      "tokens"
+                    ) : (
+                      <>
+                        <span className='font-bold tabular-nums'>
+                          {refine.tokensLeft}
+                        </span>{" "}
+                        tokens
+                      </>
+                    )}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -1235,24 +1844,26 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
 
                   {phases.map((phase, phaseIdx) => {
                     const stepsRight = phaseIdx % 2 === 0;
-                    const phaseAllDone = phase.steps.every(
-                      (s) => getStepStatus(s) === "done",
-                    );
+                    const phaseAllDone = isPhaseCleared(phase);
                     const phaseDone = phase.steps.filter(
                       (s) => getStepStatus(s) === "done",
                     ).length;
-                    const columnSteps = (textAlign: "left" | "right") =>
-                      phase.steps.map((step) => (
-                        <StepMapButton
-                          key={step.id}
-                          step={step}
-                          isActive={isDrawerOpen && activeStepId === step.id}
-                          isLoading={isStepLoading(step)}
+                    const columnSteps = (textAlign: "left" | "right") => (
+                      <>
+                        {phase.steps.map((step) =>
+                          renderStep(step, textAlign, false),
+                        )}
+                        <CheckpointMapButton
+                          phase={phase}
+                          isActive={
+                            isCheckOpen && activeCheckPhaseId === phase.id
+                          }
                           textAlign={textAlign}
                           connector
-                          onClick={() => navigateStep(step.id)}
+                          onClick={() => openCheckpoint(phase.id)}
                         />
-                      ));
+                      </>
+                    );
 
                     return (
                       <div
@@ -1275,19 +1886,18 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                             )}
                           </div>
                           <div className='ml-4 flex flex-col gap-3 pl-4'>
-                            {phase.steps.map((step) => (
-                              <StepMapButton
-                                key={step.id}
-                                step={step}
-                                isActive={
-                                  isDrawerOpen && activeStepId === step.id
-                                }
-                                isLoading={isStepLoading(step)}
-                                textAlign='left'
-                                fullWidth
-                                onClick={() => navigateStep(step.id)}
-                              />
-                            ))}
+                            {phase.steps.map((step) =>
+                              renderStep(step, "left", true),
+                            )}
+                            <CheckpointMapButton
+                              phase={phase}
+                              isActive={
+                                isCheckOpen && activeCheckPhaseId === phase.id
+                              }
+                              textAlign='left'
+                              fullWidth
+                              onClick={() => openCheckpoint(phase.id)}
+                            />
                           </div>
                         </div>
 
@@ -1332,16 +1942,17 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                       roadmapId={roadmap.id}
                       done={doneCount}
                       total={totalSteps}
+                      checkpointsLeft={phases.length - passedCheckpoints}
                     />
                   ) : (
                     <div
                       className={cn(
                         "rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-700",
-                        progress === 100
+                        isFinished
                           ? "bg-emerald-500/10 text-emerald-400"
                           : "bg-zinc-900/30 text-zinc-500 opacity-40",
                       )}>
-                      {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
+                      {isFinished ? "🏆 Goal achieved!" : "🏆 Finish"}
                     </div>
                   ))}
               </div>
@@ -1349,6 +1960,17 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
           </div>
         </div>
       </div>
+
+      <PhaseCheckDrawer
+        open={isCheckOpen}
+        phase={activeCheck?.phase ?? null}
+        phaseIdx={activeCheck?.phaseIdx ?? 0}
+        roadmapId={roadmap.id}
+        adminPassword={adminMode ? adminPassword : undefined}
+        readOnly={readOnly}
+        onClose={closeCheckpoint}
+        onResult={handleCheckResult}
+      />
 
       <StepDrawer
         open={isDrawerOpen}
@@ -1360,6 +1982,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         onRetryDetail={handleRetryDetail}
         onOpenExercise={handleOpenExercise}
         onToggleExercise={handleToggleExercise}
+        onOpenSong={handleOpenSong}
+        onToggleSong={handleToggleSong}
         onToggleLesson={handleToggleLesson}
         onPracticeLesson={(lesson) => {
           if (activeStep) {

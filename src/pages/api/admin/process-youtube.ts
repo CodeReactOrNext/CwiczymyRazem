@@ -1,5 +1,7 @@
-import { Index } from "@upstash/vector";
-import type { ScraperConfig, YouTubeLesson } from "feature/aiCoach/types/youtubeLesson.types";
+import type {
+  ScraperConfig,
+  YouTubeLesson,
+} from "feature/aiCoach/types/youtubeLesson.types";
 import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
 import {
   collection,
@@ -11,8 +13,9 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import { analyzeLesson, upsertLessonVector } from "lib/roadmaps/lessonIndexing";
+import { parseChapters } from "lib/roadmaps/lessonText";
 import type { NextApiRequest, NextApiResponse } from "next";
-import OpenAI from "openai";
 import { db } from "utils/firebase/client/firebase.utils";
 
 const LESSONS_COLLECTION = "youtubeLessons";
@@ -20,22 +23,10 @@ const ADMIN_CONFIG_COLLECTION = "adminConfig";
 const SCRAPER_CONFIG_DOC = "youtubeScraper";
 const BATCH_SIZE = 10;
 
-const CATEGORIZE_PROMPT = `You are a guitar lesson analyzer. Given a YouTube lesson title and description, return ONLY valid JSON with no markdown:
-{
-  "level": "beginner" | "intermediate" | "advanced" | "all",
-  "topics": ["topic1", "topic2"],
-  "guitarStyle": ["acoustic" | "electric" | "fingerpicking" | "strumming" | "lead" | "classical" | "blues" | "jazz" | "rock"],
-  "qualityScore": <number 1-10>,
-  "qualityReason": "<brief reason>"
-}
-
-Scoring guide:
-- 8-10: Clear structure, specific topic, professional channel, good description
-- 6-7: Decent content, somewhat specific
-- 4-5: Vague title, poor description, or low-effort content
-- 1-3: Spam, clickbait, or unrelated to guitar learning`;
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -50,11 +41,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const upstashToken = process.env.UPSTASH_VECTOR_REST_TOKEN;
 
   if (!openaiApiKey || !upstashUrl || !upstashToken) {
-    return res.status(500).json({ error: "Missing OPENAI_API_KEY, UPSTASH_VECTOR_REST_URL, or UPSTASH_VECTOR_REST_TOKEN" });
+    return res
+      .status(500)
+      .json({
+        error:
+          "Missing OPENAI_API_KEY, UPSTASH_VECTOR_REST_URL, or UPSTASH_VECTOR_REST_TOKEN",
+      });
   }
-
-  const openai = new OpenAI({ apiKey: openaiApiKey });
-  const vectorIndex = new Index({ url: upstashUrl, token: upstashToken });
 
   // Load config for minQualityScore
   const configRef = doc(db, ADMIN_CONFIG_COLLECTION, SCRAPER_CONFIG_DOC);
@@ -69,7 +62,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const snap = await getDocs(q);
 
   if (snap.empty) {
-    return res.status(200).json({ success: true, processed: 0, message: "No raw lessons to process" });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        processed: 0,
+        message: "No raw lessons to process",
+      });
   }
 
   const lessons = snap.docs.map((d) => d.data() as YouTubeLesson);
@@ -91,29 +90,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   for (const lesson of lessons) {
     try {
-      // Step 1: Categorize with gpt-4o-mini
-      const completion = await openai.chat.completions.create({
-        model: "gpt-5-nano",
-        temperature: 0.1,
-        max_tokens: 200,
-        messages: [
-          { role: "system", content: CATEGORIZE_PROMPT },
-          {
-            role: "user",
-            content: `Title: ${lesson.title}\nChannel: ${lesson.channelName}\nDescription: ${lesson.description}`,
-          },
-        ],
-      });
+      // Step 1: What the video teaches, its level, topics and quality.
+      const parsed = await analyzeLesson(lesson);
+      const chapters = parseChapters(lesson.description);
 
-      const raw = completion.choices[0]?.message?.content?.trim() || "{}";
-      let parsed: any = {};
-      try {
-        parsed = JSON.parse(raw);
-      } catch {
-        parsed = {};
-      }
-
-      const qualityScore: number = parsed.qualityScore ?? 5;
+      const qualityScore = parsed.qualityScore;
       const processedAt = new Date().toISOString();
 
       if (qualityScore < config.minQualityScore) {
@@ -123,6 +104,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           guitarStyle: parsed.guitarStyle ?? [],
           qualityScore,
           qualityReason: parsed.qualityReason ?? "",
+          teaches: parsed.teaches,
+          chapters,
+          source: "scrape",
           status: "rejected",
           processedAt,
         });
@@ -140,25 +124,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         continue;
       }
 
-      // Step 2: Create embedding
-      const textToEmbed = `${lesson.title}. Topics: ${(parsed.topics || []).join(", ")}. Style: ${(parsed.guitarStyle || []).join(", ")}. Level: ${parsed.level ?? ""}. ${lesson.description.slice(0, 200)}`;
-      const embeddingResp = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: textToEmbed,
-      });
-      const embedding = embeddingResp.data[0].embedding;
-
-      // Step 3: Upsert to Upstash Vector
-      await vectorIndex.upsert({
-        id: lesson.videoId,
-        vector: embedding,
-        metadata: {
-          level: parsed.level ?? "all",
-          topics: (parsed.topics ?? []).join(","),
-          guitarStyle: (parsed.guitarStyle ?? []).join(","),
-          qualityScore,
-        },
-      });
+      // Steps 2–3: Embed what it teaches and put it in the vector index.
+      await upsertLessonVector(lesson, parsed);
 
       // Step 4: Update Firestore
       await updateDoc(doc(lessonsRef, lesson.videoId), {
@@ -167,6 +134,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         guitarStyle: parsed.guitarStyle ?? [],
         qualityScore,
         qualityReason: parsed.qualityReason ?? "",
+        teaches: parsed.teaches,
+        chapters,
+        source: "scrape",
         status: "indexed",
         processedAt,
       });
@@ -193,5 +163,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
-  return res.status(200).json({ success: true, processed, indexed, rejected, logs });
+  return res
+    .status(200)
+    .json({ success: true, processed, indexed, rejected, logs });
 }

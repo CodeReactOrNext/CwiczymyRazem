@@ -67,6 +67,8 @@ describe("notificationHref", () => {
 
   it("leaves system notifications without a target", () => {
     expect(notificationHref(notification({ type: "season_start" }))).toBeNull();
-    expect(notificationHref(notification({ type: "season_reward" }))).toBeNull();
+    expect(
+      notificationHref(notification({ type: "season_reward" })),
+    ).toBeNull();
   });
 });

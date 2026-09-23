@@ -1,7 +1,13 @@
 import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { CheckCircle2, ChevronRight, Circle, Dumbbell } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronRight,
+  Circle,
+  Dumbbell,
+  Music,
+} from "lucide-react";
 import React from "react";
 
 import type { RoadmapStep } from "../../../types/roadmap.types";
@@ -54,13 +60,15 @@ interface StepResourcesProps {
   loadingExercise: boolean;
   onOpenExercise: (exerciseId: string) => void;
   onToggleExercise: () => void;
+  onOpenSong: (songId: string) => void;
+  onToggleSong: () => void;
   onToggleLesson: (videoId: string) => void;
   onPracticeLesson: (lesson: YouTubeLessonResult) => void;
 }
 
 /**
- * The step's practice kit: the recommended exercise and the lessons, each as a
- * row you open plus a tick you set. Ticking everything is what completes the step.
+ * The step's practice kit: the recommended exercise, the library song when the
+ * step is about one, and the lessons, each as a row you open plus a tick you set. Ticking everything is what completes the step.
  */
 export const StepResources: React.FC<StepResourcesProps> = ({
   step,
@@ -69,6 +77,8 @@ export const StepResources: React.FC<StepResourcesProps> = ({
   loadingExercise,
   onOpenExercise,
   onToggleExercise,
+  onOpenSong,
+  onToggleSong,
   onToggleLesson,
   onPracticeLesson,
 }) => {
@@ -77,6 +87,8 @@ export const StepResources: React.FC<StepResourcesProps> = ({
       ? exercisesAgregat.find((e) => e.id === step.suggestedExerciseId)
       : undefined;
   const exerciseDone = !!step.exerciseCompleted;
+  const song = step.suggestedSong;
+  const songDone = !!step.songCompleted;
   const { completed, total } = getResourceProgress(step, lessons);
   const allDone = total > 0 && completed >= total;
 
@@ -140,6 +152,56 @@ export const StepResources: React.FC<StepResourcesProps> = ({
                 exerciseDone ? "Practiced. Tap to undo" : "Mark as practiced"
               }
               onClick={onToggleExercise}
+            />
+          </div>
+        )}
+
+        {song && (
+          <div className='flex items-stretch gap-2'>
+            <button
+              type='button'
+              onClick={() => onOpenSong(song.id)}
+              className={cn(
+                "group flex min-w-0 flex-1 items-center gap-4 rounded-lg px-4 py-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                songDone
+                  ? "bg-emerald-500/10 hover:bg-emerald-500/15"
+                  : "bg-zinc-900/40 hover:bg-zinc-800/60",
+              )}>
+              <span
+                className={cn(
+                  "flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg",
+                  songDone
+                    ? "bg-emerald-500/10 text-emerald-400"
+                    : "bg-purple-500/10 text-purple-300",
+                )}>
+                {song.coverUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={song.coverUrl}
+                    alt=''
+                    className={cn(
+                      "h-full w-full object-cover",
+                      songDone && "opacity-60",
+                    )}
+                  />
+                ) : (
+                  <Music className='h-5 w-5' />
+                )}
+              </span>
+              <span className='min-w-0 flex-1'>
+                <span className='block truncate text-sm font-semibold text-zinc-100'>
+                  {song.title}
+                </span>
+                <span className='mt-0.5 block truncate text-xs text-zinc-400'>
+                  {song.artist} · from the song library
+                </span>
+              </span>
+              <ChevronRight className='h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-200' />
+            </button>
+            <ResourceToggle
+              checked={songDone}
+              label={songDone ? "Played. Tap to undo" : "Mark as played"}
+              onClick={onToggleSong}
             />
           </div>
         )}

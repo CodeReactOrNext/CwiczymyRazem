@@ -27,6 +27,23 @@ const SECTION_META: { match: RegExp; Icon: typeof Info; color: string }[] = [
   { match: /sources?/i, Icon: BookOpen, color: "text-purple-400" },
 ];
 
+const HOW_TO = /how to (practice|develop|do it)/i;
+
+/**
+ * The instructions as steps: a "How to practice" written as one paragraph of
+ * several sentences reads as a to-do list, so each sentence becomes a numbered
+ * line. Split only where a sentence ends and a capitalised one begins, so
+ * "e.g. play" or "120 b.p.m." stay whole.
+ */
+export const practiceSteps = (lines: string[]): string[] | null => {
+  if (lines.length !== 1 || lines[0].startsWith("- ")) return null;
+  const sentences = lines[0]
+    .split(/(?<=[.!?])\s+(?=[A-Z])/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  return sentences.length >= 2 ? sentences : null;
+};
+
 /** The step's authored text, one block per `[Heading]`, bullets rendered as a list. */
 export const StepDescription: React.FC<{ description: string }> = ({
   description,
@@ -43,6 +60,10 @@ export const StepDescription: React.FC<{ description: string }> = ({
           ? SECTION_META.find((m) => m.match.test(section.heading as string))
           : undefined;
         const Icon = meta?.Icon ?? Sparkles;
+        const steps =
+          section.heading && HOW_TO.test(section.heading)
+            ? practiceSteps(section.lines)
+            : null;
         return (
           <section key={i} className='flex flex-col gap-3'>
             {section.heading && (
@@ -53,18 +74,31 @@ export const StepDescription: React.FC<{ description: string }> = ({
                 {section.heading}
               </h3>
             )}
-            <div className='flex flex-col gap-2.5 text-sm leading-relaxed text-zinc-300'>
-              {section.lines.map((line, j) =>
-                line.startsWith("- ") ? (
-                  <div key={j} className='flex items-start gap-3'>
-                    <span className='mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-600' />
-                    <span>{line.slice(2)}</span>
-                  </div>
-                ) : (
-                  <p key={j}>{line}</p>
-                ),
-              )}
-            </div>
+            {steps ? (
+              <ol className='flex flex-col gap-2.5 text-sm leading-relaxed text-zinc-300'>
+                {steps.map((sentence, j) => (
+                  <li key={j} className='flex items-start gap-3'>
+                    <span className='mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[11px] font-bold tabular-nums text-zinc-400'>
+                      {j + 1}
+                    </span>
+                    <span>{sentence}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <div className='flex flex-col gap-2.5 text-sm leading-relaxed text-zinc-300'>
+                {section.lines.map((line, j) =>
+                  line.startsWith("- ") ? (
+                    <div key={j} className='flex items-start gap-3'>
+                      <span className='mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-600' />
+                      <span>{line.slice(2)}</span>
+                    </div>
+                  ) : (
+                    <p key={j}>{line}</p>
+                  ),
+                )}
+              </div>
+            )}
           </section>
         );
       })}

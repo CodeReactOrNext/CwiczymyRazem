@@ -401,6 +401,43 @@ service cloud.firestore {
       allow read, write: if false; // Admin SDK only
     }
 
+    // ─── AI roadmaps ─────────────────────────────────────────────────────────
+    // A roadmap a player generated for themselves (feature/aiCoach/services/
+    // roadmap.service.ts) — own document only, and the userId on it can never
+    // change hands. Admin-generated roadmaps and the cross-player listing in
+    // the supporter panel are read through the Admin SDK and never hit this
+    // rule.
+    match /roadmaps/{roadmapId} {
+      allow read: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // A paid generation: the token charge, the roadmap id it minted and the
+    // stored skeleton, all written by /api/generate-roadmap on the Admin SDK.
+    // A client that could write here could hand itself free generations.
+    match /roadmapGenerations/{ticketId} {
+      allow read, write: if false; // Admin SDK only
+    }
+
+    // A player's session count and checked-off resources against one roadmap
+    // (feature/aiCoach/services/userProgress.service.ts). Same shape as above.
+    match /userRoadmapProgress/{progressId} {
+      allow read: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
     // ─── Default: deny everything else ────────────────────────────────────────
     match /{document=**} {
       allow read, write: if false;

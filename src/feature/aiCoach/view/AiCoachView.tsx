@@ -1,16 +1,30 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { cn } from "assets/lib/utils";
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
+import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import roadmaps from "data/roadmaps";
 import {
   firebaseGetAllUserProgress,
   firebaseUpdateUserProgress,
   type UserRoadmapProgress,
-  type UserRoadmapStepResourceProgress,
 } from "feature/aiCoach/services/userProgress.service";
+import { withPhaseChecks } from "feature/aiCoach/utils/phaseCheck";
+import { extractStepProgress } from "feature/aiCoach/utils/roadmapProgress";
+import { PlayerRoadmapsLocked } from "feature/aiCoach/view/PlayerRoadmapsLocked";
+import { UserRoadmapsTab } from "feature/supporterPanel/components/UserRoadmapsTab";
+import { useSupporterRoadmap } from "feature/supporterPanel/hooks/useSupporterRoadmap";
+import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { ArrowLeft, Lightbulb, Loader2, Map } from "lucide-react";
+import {
+  ArrowLeft,
+  Compass,
+  Lightbulb,
+  Loader2,
+  Lock,
+  Map,
+} from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -30,6 +44,11 @@ const LEVEL_ORDER: Record<string, number> = {
   Advanced: 3,
 };
 
+type CoachTab = "mastery" | "players";
+
+const isCoachTab = (value: unknown): value is CoachTab =>
+  value === "mastery" || value === "players";
+
 const progressQueryKey = (userId: string | null) =>
   ["userRoadmapProgress", userId] as const;
 
@@ -48,17 +67,22 @@ function mergeWithProgress(
     userId,
     createdAt: progress?.startedAt ?? new Date().toISOString(),
     updatedAt: progress?.updatedAt ?? new Date().toISOString(),
-    phases: roadmap.phases.map((phase) => ({
-      ...phase,
-      steps: phase.steps.map((step) => ({
-        ...step,
-        sessionsCompleted: progress?.stepProgress[step.id] ?? 0,
-        exerciseCompleted:
-          progress?.resourceProgress?.[step.id]?.exerciseCompleted ?? false,
-        completedLessonIds:
-          progress?.resourceProgress?.[step.id]?.completedLessonIds ?? [],
+    phases: withPhaseChecks(
+      roadmap.phases.map((phase) => ({
+        ...phase,
+        steps: phase.steps.map((step) => ({
+          ...step,
+          sessionsCompleted: progress?.stepProgress[step.id] ?? 0,
+          exerciseCompleted:
+            progress?.resourceProgress?.[step.id]?.exerciseCompleted ?? false,
+          completedLessonIds:
+            progress?.resourceProgress?.[step.id]?.completedLessonIds ?? [],
+          songCompleted:
+            progress?.resourceProgress?.[step.id]?.songCompleted ?? false,
+        })),
       })),
-    })),
+      progress?.phaseChecks,
+    ),
   };
 }
 
@@ -76,6 +100,42 @@ const AiCoachView = () => {
       : null;
   });
   const [suggestOpen, setSuggestOpen] = useState(false);
+  // A player roadmap open on its own takes the whole page, like a curated one.
+  // A notification link (?roadmap=) opens straight onto one.
+  const [linkedRoadmapId] = useState<string | null>(() =>
+    typeof router.query.roadmap === "string" ? router.query.roadmap : null,
+  );
+  const [playerDetailOpen, setPlayerDetailOpen] = useState(
+    () => linkedRoadmapId !== null && router.query.tab === "players",
+  );
+
+  const handlePlayerDetail = (open: boolean) => {
+    setPlayerDetailOpen(open);
+    // Drop the deep link on the way back, or a refresh reopens the roadmap.
+    if (!open && router.query.roadmap) {
+      const { roadmap: _dropped, ...query } = router.query;
+      void router.replace({ pathname: router.pathname, query }, undefined, {
+        shallow: true,
+      });
+    }
+  };
+  const [tab, setTab] = useState<CoachTab>(() =>
+    isCoachTab(router.query.tab) ? router.query.tab : "mastery",
+  );
+
+  const { isSupport, isLoading: isRosterLoading } = useSupportTeam();
+  const isSupporter = isSupport(userAuth);
+  // Only for the wallet on the generator card — the route 403s without the badge.
+  const { data: board } = useSupporterRoadmap(isSupporter && tab === "players");
+
+  const openTab = (next: CoachTab) => {
+    setTab(next);
+    void router.replace(
+      { pathname: router.pathname, query: { ...router.query, tab: next } },
+      undefined,
+      { shallow: true },
+    );
+  };
 
   const progressQuery = useQuery({
     queryKey: progressQueryKey(userId),
@@ -109,23 +169,14 @@ const AiCoachView = () => {
 
   const handlePersist = async (phases: RoadmapPhase[]) => {
     if (!userId || !selectedId) return;
-    const stepProgress: Record<string, number> = {};
-    const resourceProgress: Record<string, UserRoadmapStepResourceProgress> =
-      {};
-    phases.forEach((p) =>
-      p.steps.forEach((s) => {
-        stepProgress[s.id] = s.sessionsCompleted;
-        resourceProgress[s.id] = {
-          exerciseCompleted: s.exerciseCompleted,
-          completedLessonIds: s.completedLessonIds,
-        };
-      }),
-    );
+    const { stepProgress, resourceProgress, phaseChecks } =
+      extractStepProgress(phases);
     await firebaseUpdateUserProgress(
       userId,
       selectedId,
       stepProgress,
       resourceProgress,
+      phaseChecks,
     );
 
     const now = new Date().toISOString();
@@ -137,6 +188,7 @@ const AiCoachView = () => {
           ...(existing ?? { roadmapId: selectedId, userId, startedAt: now }),
           stepProgress,
           resourceProgress,
+          phaseChecks,
           updatedAt: now,
         };
         return existing
@@ -203,70 +255,122 @@ const AiCoachView = () => {
   // ─── List view ───
   return (
     <div className='flex w-full flex-col'>
-      <HeroBanner
-        title='Mastery Roadmaps'
-        subtitle='Your personalized guitar mastery roadmaps.'
-        eyebrowContent={
-          <Breadcrumbs
-            items={[
-              { label: "Practice", href: "/timer" },
-              { label: "Mastery Roadmaps" },
-            ]}
-          />
-        }
-        backgroundContent={<HeroPattern variant='ai' />}
-        className='min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
-      />
-      <div className='mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12'>
-        {loadingProgress ? (
-          <div className='flex justify-center py-16'>
-            <Loader2 className='h-7 w-7 animate-spin text-cyan-500' />
-          </div>
-        ) : roadmaps.length === 0 ? (
-          <div className='flex flex-col items-center justify-center gap-3 py-20 text-zinc-500'>
-            <Map className='h-10 w-10 opacity-30' />
-            <span className='text-sm'>No mastery roadmaps available yet.</span>
-          </div>
-        ) : (
-          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-            {sortedRoadmaps.map((rm) => {
-              const merged = mergeWithProgress(
-                rm,
-                progressMap[rm.id] ?? null,
-                userId ?? "",
-              );
-              return (
-                <RoadmapCard
-                  key={rm.id}
-                  roadmap={merged}
-                  onOpen={() => setSelectedId(rm.id)}
-                />
-              );
-            })}
+      {!playerDetailOpen && (
+        <HeroBanner
+          title='Mastery Roadmaps'
+          subtitle='Your personalized guitar mastery roadmaps.'
+          eyebrowContent={
+            <Breadcrumbs
+              items={[
+                { label: "Practice", href: "/timer" },
+                { label: "Mastery Roadmaps" },
+              ]}
+            />
+          }
+          backgroundContent={<HeroPattern variant='ai' />}
+          className='min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
+        />
+      )}
+      {/* Same element either way, so the open roadmap survives the switch. */}
+      <div
+        className={cn(
+          !playerDetailOpen &&
+            "mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12",
+        )}>
+        {!playerDetailOpen && (
+          <div className={tabNavListClass}>
+            <button
+              type='button'
+              onClick={() => openTab("mastery")}
+              aria-pressed={tab === "mastery"}
+              className={tabNavItemClass(tab === "mastery")}>
+              <Map size={16} className='shrink-0' />
+              Mastery Roadmaps
+            </button>
+            <button
+              type='button'
+              onClick={() => openTab("players")}
+              aria-pressed={tab === "players"}
+              className={tabNavItemClass(tab === "players")}>
+              <Compass size={16} className='shrink-0' />
+              Player Roadmaps
+              {!isRosterLoading && !isSupporter && (
+                <Lock size={13} className='shrink-0 text-amber-400/80' />
+              )}
+            </button>
           </div>
         )}
 
-        {/* ─── Suggest a roadmap ─── */}
-        <button
-          onClick={() => setSuggestOpen(true)}
-          className='mt-2 flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70'>
-          <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800'>
-            <Lightbulb className='h-4 w-4 text-zinc-400' />
-          </div>
-          <div>
-            <p className='text-sm font-semibold text-zinc-300'>
-              Suggest a roadmap
-            </p>
-            <p className='text-xs text-zinc-500'>
-              Missing a topic? Let us know what you&apos;d like to see next.
-            </p>
-          </div>
-        </button>
+        {tab === "players" ? (
+          isRosterLoading ? (
+            // The roster answers "not a supporter" until it lands.
+            <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />
+          ) : isSupporter ? (
+            <UserRoadmapsTab
+              enabled={isSupporter}
+              wallet={board?.wallet}
+              variant='page'
+              onDetailChange={handlePlayerDetail}
+              initialRoadmapId={linkedRoadmapId}
+            />
+          ) : (
+            <PlayerRoadmapsLocked />
+          )
+        ) : (
+          <>
+            {loadingProgress ? (
+              <div className='flex justify-center py-16'>
+                <Loader2 className='h-7 w-7 animate-spin text-cyan-500' />
+              </div>
+            ) : roadmaps.length === 0 ? (
+              <div className='flex flex-col items-center justify-center gap-3 py-20 text-zinc-500'>
+                <Map className='h-10 w-10 opacity-30' />
+                <span className='text-sm'>
+                  No mastery roadmaps available yet.
+                </span>
+              </div>
+            ) : (
+              <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+                {sortedRoadmaps.map((rm) => {
+                  const merged = mergeWithProgress(
+                    rm,
+                    progressMap[rm.id] ?? null,
+                    userId ?? "",
+                  );
+                  return (
+                    <RoadmapCard
+                      key={rm.id}
+                      roadmap={merged}
+                      onOpen={() => setSelectedId(rm.id)}
+                    />
+                  );
+                })}
+              </div>
+            )}
 
-        <FeedbackModal
-          isOpen={suggestOpen}
-          onClose={() => setSuggestOpen(false)}
-        />
+            {/* ─── Suggest a roadmap ─── */}
+            <button
+              onClick={() => setSuggestOpen(true)}
+              className='mt-2 flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70'>
+              <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800'>
+                <Lightbulb className='h-4 w-4 text-zinc-400' />
+              </div>
+              <div>
+                <p className='text-sm font-semibold text-zinc-300'>
+                  Suggest a roadmap
+                </p>
+                <p className='text-xs text-zinc-500'>
+                  Missing a topic? Let us know what you&apos;d like to see next.
+                </p>
+              </div>
+            </button>
+
+            <FeedbackModal
+              isOpen={suggestOpen}
+              onClose={() => setSuggestOpen(false)}
+            />
+          </>
+        )}
       </div>
     </div>
   );

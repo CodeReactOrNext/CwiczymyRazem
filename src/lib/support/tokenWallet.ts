@@ -82,3 +82,57 @@ export const chargeTokens = (
   });
   return true;
 };
+
+export type SpendOutcome =
+  | { ok: true; wallet: SupporterWallet }
+  | { ok: false; status: 402 | 404; error: string };
+
+/**
+ * Charges the wallet in a transaction of its own — for a purchase that is the
+ * whole of what the request does, such as one paid refinement of a roadmap.
+ * Anything that also writes other documents keeps using `chargeTokens` inside
+ * its own transaction, so the charge and the write land together or not at all.
+ */
+export async function spendTokens(
+  uid: string,
+  cost: number,
+): Promise<SpendOutcome> {
+  return firestore.runTransaction(async (tx: Transaction) => {
+    const user = (await tx.get(userRef(uid))) as DocumentSnapshot;
+    if (!user.exists) {
+      return { ok: false, status: 404, error: "User not found" };
+    }
+    if (!chargeTokens(tx, user, cost)) {
+      return { ok: false, status: 402, error: "Not enough tokens left" };
+    }
+    // chargeTokens queued the write; the snapshot in hand is from before it.
+    const data = user.data() ?? {};
+    return {
+      ok: true,
+      wallet: describeWallet({
+        ...data,
+        [WALLET_FIELD]: spendFromWallet(readWallet(data), cost),
+      }),
+    };
+  });
+}
+
+/**
+ * Gives a charge back when what it paid for never happened — a model call that
+ * failed after the tokens were taken. Lifetime spending is what the ledger
+ * tracks, so a refund is that number going back down, never below zero.
+ */
+export async function refundTokens(uid: string, cost: number): Promise<void> {
+  if (!Number.isInteger(cost) || cost <= 0) return;
+  await firestore.runTransaction(async (tx: Transaction) => {
+    const user = (await tx.get(userRef(uid))) as DocumentSnapshot;
+    if (!user.exists) return;
+    const wallet = readWallet(user.data());
+    tx.update(user.ref, {
+      [WALLET_FIELD]: {
+        spent: Math.max(0, wallet.spent - cost),
+        granted: wallet.granted,
+      },
+    });
+  });
+}

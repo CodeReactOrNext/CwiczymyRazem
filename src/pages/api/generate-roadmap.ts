@@ -1,167 +1,306 @@
+import type { RoadmapVisibility } from "feature/aiCoach/types/roadmap.types";
+import { authorizeGeneration } from "lib/roadmaps/generation/adminGuard";
+import {
+  isTicketExpired,
+  markTicketProgress,
+  openTicket,
+  readTicket,
+  refundTicket,
+  storeTicketDraft,
+  storeTicketStructure,
+  ticketId,
+} from "lib/roadmaps/generation/generationTicket";
+import {
+  isRoadmapLevel,
+  MAX_GOAL_LENGTH,
+  type RoadmapLevel,
+} from "lib/roadmaps/generation/levels";
+import { GenerationError } from "lib/roadmaps/generation/openaiJson";
+import {
+  draftRoadmapStructure,
+  generateRoadmapStructure,
+  reviewRoadmapStructure,
+  type StructurePhase,
+} from "lib/roadmaps/generation/structure";
+import type { TokenUsage } from "lib/roadmaps/generation/usage";
+import {
+  addUsage,
+  emptyUsage,
+  UsageLedger,
+} from "lib/roadmaps/generation/usage";
+import { findLibrarySong } from "lib/roadmaps/songLookup";
+import { isRoadmapVisibility } from "lib/roadmaps/visibility";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const ALLOWED_LEVELS = ["Absolute Beginner", "Beginner", "Intermediate", "Advanced"] as const;
-const MAX_GOAL_LENGTH = 500;
+/**
+ * The skeleton of a roadmap: phases, steps, the library exercise each step
+ * practises, the library song a repertoire step is about, and what the
+ * reviewer thought of the draft. Descriptions come from
+ * /api/generate-phase-details, one phase at a time.
+ *
+ * A supporter's browser asks for it in two halves — `stage: "draft"`, then
+ * `stage: "review"` — because the whole thing is two or three model calls and
+ * several minutes, and one request that answers nothing until the end leaves a
+ * progress bar frozen on its first percent. The admin queue asks for both at
+ * once: it reports per roadmap, not per model call, and nobody watches it.
+ *
+ * A supporter pays for it in tokens, once per goal: the charge opens a ticket,
+ * the draft and then the skeleton are stored on it, and any repeat of the same
+ * goal within the hour — a retry, a reload — gets them back without paying
+ * again. A failure before the draft exists refunds the ticket.
+ */
 
-const GUITAR_SYSTEM_PROMPT = `You are an experienced guitar teacher with 20 years of teaching. You create structured multi-month learning plans tailored to the student's level and goal.
+/** Which half of the skeleton this call runs. Absent means both, in one go. */
+type Stage = "draft" | "review";
 
-GUARD: If the goal is not related to playing or learning guitar, return ONLY: {"error":"not_guitar"}
+const isStage = (value: unknown): value is Stage =>
+  value === "draft" || value === "review";
 
----
-
-SKILL LEVEL — apply strictly:
-
-"Absolute Beginner": Start from zero — posture, how to hold the guitar and pick, finger coordination exercises, then chords one at a time (Em, Am, G, C, D). No music theory terms without a brief explanation.
-
-"Beginner": Skip posture and how to hold the guitar/pick. Start with open chords, basic strumming, finger exercises.
-
-"Intermediate": Skip open chords, posture, pick grip. Start with bending, vibrato, scale positions, rhythm techniques.
-
-"Advanced": Skip all fundamentals. Start directly with advanced phrasing, modes, harmony, style-specific feel.
-
----
-
-GOAL RULES:
-
-Specific guitarist (SRV, Hendrix, Dimebag, Slash, etc.):
-- Build the entire plan around their signature techniques, feel, and style
-- Only include techniques you are certain are associated with them
-- The final phase must directly reference their style or catalog — not generic "performance integration"
-
-Genre (blues, metal, jazz, fingerstyle):
-- Focus on techniques and repertoire typical for that genre
-- Final phase = genre-specific application
-
-Specific song:
-- Work backward from that song's techniques — use it as the target in the final phase
-
----
-
-STEP TITLES — concept name only, 2–5 words:
-
-GOOD: "Hammer-on speed", "Vibrato strength and control", "Pull-off consistency", "Finger independence"
-BAD: "Legato on one string — exercise 1-2-3-4", "Minor pentatonic at 70 BPM", "Bending with three fingers — exercise"
-
-No BPM, no fret numbers, no exercise numbers in titles.
-
----
-
-OUTPUT — return ONLY valid JSON:
-{
-  "phases": [
-    {
-      "title": "Phase name (3–6 words)",
-      "steps": [
-        { "title": "Skill name (2–5 words)" }
-      ]
-    }
-  ]
-}
-
-PEDAGOGY — these principles override any naive "all technique first, music last" ordering:
-
-1. THE GOAL IS THE THROUGH-LINE. Whatever the student wants to DO (improvise, play a song, play a style) they must do a simplified version of it from the EARLY phases — not only at the end. Example: for an improvisation goal, the student should already be improvising with a tiny note set over a backing within the first phase or two, then expand. Never gate the target skill behind dozens of prerequisite techniques.
-
-2. THREAD EAR & LISTENING THROUGHOUT. Ear training, singing/audiation, call-and-response, and transcribing short phrases from real music belong across MANY phases starting early — never dumped into a single late step. For any creative or improvisation goal these are primary, not optional extras.
-
-3. CONNECT THEORY TO SOUND. When you introduce scales, pair them with the harmony they work over (chord–scale relationship, chord/target tones, intervals) so the student learns WHY notes work — not isolated shape-running up and down boxes.
-
-4. RUTHLESS PRIORITIZATION. Every step must sit on the critical path to THIS goal. Do not include general guitar skills the goal does not need (e.g. don't teach fingerstyle or economy picking for a pick-based blues-improv goal). Fewer, well-aimed steps beat an exhaustive catalogue.
-
-5. USE CONSTRAINTS for creative skills — frame practice as deliberate limitations (two notes, one string, a fixed rhythm) rather than piling on more technique.
-
----
-
-REQUIREMENTS:
-- 6–8 phases; right-size the total to the goal (aim ~35–55 steps) — never pad with filler
-- 6–9 steps per phase; every step a distinct, meaningful skill on the critical path to the goal
-- Phase 1 already includes a simplified taste of the end goal; difficulty ramps across phases
-- Order by dependency (a skill's prerequisites come before it), BUT interleave musicianship — rhythm, phrasing, ear — from the start rather than saving it all for the final phases
-- Final phase = full application to the goal's specific style / song / context
-- Phase titles: concise top-level themes
-- Step titles: concept names only — no exercise numbers, no BPM`;
-
-const buildUserPrompt = (goal: string, level: string) =>
-  `Goal: "${goal}"
-Skill level: ${level}
-
-Remember: for the "${level}" level do NOT include basic skills the student should already know. If the goal involves a specific guitarist or style — the entire plan should focus on that style, not generic guitar learning.
-
-Return ONLY the structure (phase and step titles) — no descriptions.`;
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+const failWith = (res: NextApiResponse, error: unknown) => {
+  if (error instanceof GenerationError) {
+    console.error("[generate-roadmap]", error.message);
+    return res.status(error.status).json({ message: error.message });
   }
+  console.error("[generate-roadmap]", error);
+  return res.status(500).json({ message: "Unexpected server error." });
+};
 
-  const { goal, level } = req.body as { goal?: string; level?: string };
+/** A progress note must never be what sinks a generation. */
+const noteProgress = (
+  id: string,
+  stage: Parameters<typeof markTicketProgress>[1],
+) =>
+  markTicketProgress(id, stage).catch((error) =>
+    console.error("[generate-roadmap] progress note failed", id, error),
+  );
 
-  if (!goal || typeof goal !== "string" || goal.trim().length < 5) {
-    return res.status(400).json({ message: "Please enter a guitar-related goal (minimum 5 characters)." });
+/**
+ * Stage one for a supporter: the tokens, then the draft.
+ *
+ * A failure here leaves nothing worth keeping, so the ticket goes back and the
+ * next attempt starts clean.
+ */
+async function runDraftStage(
+  res: NextApiResponse,
+  uid: string,
+  goal: string,
+  level: RoadmapLevel,
+  visibility: RoadmapVisibility,
+) {
+  const opened = await openTicket(uid, goal, level, visibility);
+  if (!opened.ok) {
+    return res.status(opened.status).json({ message: opened.error });
   }
+  const { ticket, charged, wallet } = opened;
 
-  if (goal.length > MAX_GOAL_LENGTH) {
-    return res.status(400).json({ message: `Goal must be at most ${MAX_GOAL_LENGTH} characters.` });
-  }
-
-  if (level && !ALLOWED_LEVELS.includes(level as (typeof ALLOWED_LEVELS)[number])) {
-    return res.status(400).json({ message: "Invalid skill level." });
-  }
-
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ message: "AI server configuration missing." });
-  }
-
-  const userPrompt = buildUserPrompt(goal.trim(), level || "Początkujący");
-
-  try {
-    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-5-mini",
-        messages: [
-          { role: "system", content: GUITAR_SYSTEM_PROMPT },
-          { role: "user", content: userPrompt },
-        ],
-        max_completion_tokens: 8000,
-        response_format: { type: "json_object" },
-      }),
+  const answer = (draft: StructurePhase[], usage: TokenUsage, paid: boolean) =>
+    res.status(200).json({
+      draft,
+      ticketId: ticket.id,
+      roadmapId: ticket.roadmapId,
+      usage,
+      charged: paid,
+      tokensCharged: paid ? ticket.tokensCharged : 0,
+      wallet,
     });
 
-    if (!openaiRes.ok) {
-      const err = await openaiRes.json().catch(() => ({}));
-      console.error("OpenAI error:", err);
-      return res.status(502).json({ message: "Error communicating with AI. Please try again." });
-    }
-
-    const data = await openaiRes.json();
-    const content = data.choices?.[0]?.message?.content;
-
-    let parsed: any;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      console.error("Failed to parse OpenAI response:", content);
-      return res.status(502).json({ message: "Failed to parse AI response. Please try again." });
-    }
-
-    if (parsed.error === "not_guitar") {
-      return res.status(400).json({ message: "Please enter a guitar-related goal." });
-    }
-
-    if (!Array.isArray(parsed.phases)) {
-      console.error("Invalid roadmap format:", parsed);
-      return res.status(502).json({ message: "AI returned an invalid format. Please try again." });
-    }
-
-    return res.status(200).json({ phases: parsed.phases });
-  } catch (err) {
-    console.error("generate-roadmap error:", err);
-    return res.status(500).json({ message: "Unexpected server error." });
+  // The draft this ticket already paid for, whether the review then failed or
+  // the tab was simply reloaded.
+  if (ticket.draft?.length) {
+    return answer(ticket.draft, ticket.draftUsage ?? emptyUsage(), false);
   }
+
+  try {
+    const ledger = new UsageLedger();
+    const draft = await draftRoadmapStructure(goal.trim(), level, ledger);
+    const usage = ledger.totals();
+    await storeTicketDraft(ticket.id, draft, usage);
+    return answer(draft, usage, charged);
+  } catch (error) {
+    // No draft was stored, so the ticket has nothing to answer for: the tokens
+    // go back whether this call charged them or an earlier, crashed one did.
+    await refundTicket(ticket).catch((refundError) =>
+      console.error("[generate-roadmap] refund failed", ticket.id, refundError),
+    );
+    return failWith(res, error);
+  }
+}
+
+/**
+ * Stage two for a supporter: the reviewer's pass over the draft already paid
+ * for. The draft is read off the ticket rather than out of the request, so
+ * what gets reviewed is what the model wrote.
+ *
+ * A failure here is deliberately not refunded: the draft survives on the
+ * ticket, so retrying the same goal within the hour reviews it again for free,
+ * which is worth more than the tokens back.
+ */
+async function runReviewStage(
+  res: NextApiResponse,
+  uid: string,
+  goal: string,
+  level: RoadmapLevel,
+  visibility: RoadmapVisibility,
+) {
+  const ticket = await readTicket(ticketId(uid, goal, level, visibility));
+  if (!ticket || isTicketExpired(ticket) || !ticket.draft?.length) {
+    return res
+      .status(409)
+      .json({ message: "This generation has gone stale. Start it again." });
+  }
+
+  if (ticket.structure) {
+    return res.status(200).json({
+      ...ticket.structure,
+      roadmapId: ticket.roadmapId,
+      usage: ticket.reviewUsage ?? emptyUsage(),
+    });
+  }
+
+  try {
+    const ledger = new UsageLedger();
+    await noteProgress(ticket.id, "review");
+    const result = await reviewRoadmapStructure(
+      goal.trim(),
+      level,
+      ticket.draft,
+      {
+        ledger,
+        resolveSong: findLibrarySong,
+        onRevise: () => noteProgress(ticket.id, "revise"),
+      },
+    );
+    const usage = ledger.totals();
+    await storeTicketStructure(
+      ticket.id,
+      result,
+      addUsage(ticket.draftUsage ?? emptyUsage(), usage),
+      usage,
+    );
+    return res
+      .status(200)
+      .json({ ...result, roadmapId: ticket.roadmapId, usage });
+  } catch (error) {
+    return failWith(res, error);
+  }
+}
+
+/** Both stages in one request, for a supporter on a client that asks for that. */
+async function runWholeSkeleton(
+  res: NextApiResponse,
+  uid: string,
+  goal: string,
+  level: RoadmapLevel,
+  visibility: RoadmapVisibility,
+) {
+  const opened = await openTicket(uid, goal, level, visibility);
+  if (!opened.ok) {
+    return res.status(opened.status).json({ message: opened.error });
+  }
+  const { ticket, charged, wallet } = opened;
+
+  if (ticket.structure) {
+    return res.status(200).json({
+      ...ticket.structure,
+      usage: ticket.usage ?? emptyUsage(),
+      roadmapId: ticket.roadmapId,
+      charged: false,
+      tokensCharged: 0,
+      wallet,
+    });
+  }
+
+  try {
+    const ledger = new UsageLedger();
+    const result = await generateRoadmapStructure(
+      goal.trim(),
+      level,
+      ledger,
+      findLibrarySong,
+    );
+    const usage = ledger.totals();
+    await storeTicketStructure(ticket.id, result, usage);
+    return res.status(200).json({
+      ...result,
+      usage,
+      roadmapId: ticket.roadmapId,
+      charged,
+      tokensCharged: charged ? ticket.tokensCharged : 0,
+      wallet,
+    });
+  } catch (error) {
+    await refundTicket(ticket).catch((refundError) =>
+      console.error("[generate-roadmap] refund failed", ticket.id, refundError),
+    );
+    return failWith(res, error);
+  }
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
+  const auth = await authorizeGeneration(req);
+  if (!auth.ok) {
+    return res.status(auth.status).json({ message: auth.message });
+  }
+
+  const { goal, level, stage, visibility } = req.body as {
+    goal?: string;
+    level?: string;
+    stage?: unknown;
+    visibility?: unknown;
+  };
+
+  if (!goal || typeof goal !== "string" || goal.trim().length < 5) {
+    return res.status(400).json({
+      message: "Please enter a guitar-related goal (minimum 5 characters).",
+    });
+  }
+  if (goal.length > MAX_GOAL_LENGTH) {
+    return res
+      .status(400)
+      .json({ message: `Goal must be at most ${MAX_GOAL_LENGTH} characters.` });
+  }
+  if (!isRoadmapLevel(level)) {
+    return res.status(400).json({ message: "Invalid skill level." });
+  }
+  if (stage !== undefined && !isStage(stage)) {
+    return res.status(400).json({ message: "Invalid stage." });
+  }
+  // Absent on a client from before the choice existed: those were all public.
+  const chosenVisibility: RoadmapVisibility = isRoadmapVisibility(visibility)
+    ? visibility
+    : "public";
+  if (visibility !== undefined && !isRoadmapVisibility(visibility)) {
+    return res.status(400).json({ message: "Invalid visibility." });
+  }
+
+  // ── Admin queue: no wallet, no ticket, and no split to report against ──
+  if (!auth.uid) {
+    try {
+      const ledger = new UsageLedger();
+      const result = await generateRoadmapStructure(
+        goal.trim(),
+        level,
+        ledger,
+        findLibrarySong,
+      );
+      return res.status(200).json({ ...result, usage: ledger.totals() });
+    } catch (error) {
+      return failWith(res, error);
+    }
+  }
+
+  // ── Supporter: tokens first, then whichever half was asked for ──
+  if (stage === "draft") {
+    return runDraftStage(res, auth.uid, goal, level, chosenVisibility);
+  }
+  if (stage === "review") {
+    return runReviewStage(res, auth.uid, goal, level, chosenVisibility);
+  }
+  return runWholeSkeleton(res, auth.uid, goal, level, chosenVisibility);
 }

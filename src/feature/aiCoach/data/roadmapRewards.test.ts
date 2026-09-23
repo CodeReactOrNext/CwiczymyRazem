@@ -3,6 +3,7 @@ import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import { PART_TIERS, PARTS_BY_ID } from "feature/arsenal/data/partDefinitions";
 import { describe, expect, it } from "vitest";
 
+import type { PhaseCheckResult } from "../types/phaseCheck.types";
 import type { StaticRoadmap } from "../types/roadmap.types";
 import {
   getCuratedRoadmap,
@@ -15,6 +16,20 @@ import {
 } from "./roadmapRewards";
 
 const ROADMAP_IDS = (staticRoadmaps as StaticRoadmap[]).map((r) => r.id);
+
+/** Every phase of a curated roadmap with its checkpoint passed. */
+const checksFor = (roadmapId: string): Record<string, PhaseCheckResult> =>
+  Object.fromEntries(
+    (getCuratedRoadmap(roadmapId)?.phases ?? []).map((phase) => [
+      phase.id,
+      {
+        passedAt: "2026-09-01T00:00:00.000Z",
+        attempts: 1,
+        bestScore: 6,
+        total: 6,
+      },
+    ]),
+  );
 
 /** Progress with the first `count` steps practised to their session target. */
 const progressWith = (
@@ -169,17 +184,38 @@ describe("getRoadmapCompletion", () => {
     expect(completion.done).toBe(completion.total - 1);
   });
 
-  it("closes once every step is practised to target", () => {
+  it("closes once every step is practised to target and every checkpoint passed", () => {
     for (const roadmapId of ROADMAP_IDS) {
       const total = getRoadmapSteps(roadmapId).length;
       const completion = getRoadmapCompletion(
         roadmapId,
         progressWith(roadmapId, total),
+        checksFor(roadmapId),
       );
 
       expect(completion.isComplete, roadmapId).toBe(true);
       expect(completion.done).toBe(total);
+      expect(completion.checkpointsPassed).toBe(completion.checkpointsTotal);
     }
+  });
+
+  // Practising every step is the work; the checkpoints are the proof. The
+  // reward waits for both.
+  it("stays open with every step done but a checkpoint unpassed", () => {
+    const roadmapId = ROADMAP_IDS[0];
+    const total = getRoadmapSteps(roadmapId).length;
+    const checks = checksFor(roadmapId);
+    const [firstPhaseId] = Object.keys(checks);
+    checks[firstPhaseId] = { ...checks[firstPhaseId], passedAt: null };
+
+    const completion = getRoadmapCompletion(
+      roadmapId,
+      progressWith(roadmapId, total),
+      checks,
+    );
+    expect(completion.done).toBe(total);
+    expect(completion.checkpointsPassed).toBe(completion.checkpointsTotal - 1);
+    expect(completion.isComplete).toBe(false);
   });
 
   // Progress filed under an id the roadmap no longer has must not close it.
@@ -197,6 +233,8 @@ describe("getRoadmapCompletion", () => {
     expect(getRoadmapCompletion("nope", { a: 5 })).toEqual({
       done: 0,
       total: 0,
+      checkpointsPassed: 0,
+      checkpointsTotal: 0,
       isComplete: false,
     });
   });

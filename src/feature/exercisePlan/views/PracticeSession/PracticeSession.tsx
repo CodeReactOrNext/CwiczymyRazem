@@ -928,7 +928,11 @@ export const PracticeSession = ({
         <ExerciseSuccessView
           planTitle={planTitleString} examMode={isExamMode}
           score={examMistakeFailed ? 0 : successSnapshot.score} maxScore={successSnapshot.maxPossibleScore}
-          stats={{ accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }}
+          stats={
+            hasTrackedPerformance && !isEarTrainingRiddle
+              ? { accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }
+              : undefined
+          }
           timeline={successSnapshot.noteTimeline}
           failMessage={examMistakeFailed ? `${CLICK_EXAM_MISTAKE_LIMIT} wrong clicks — exam failed.` : undefined}
           onFinish={async () => {
