@@ -70,6 +70,8 @@ interface StepDrawerProps {
   onRetryDetail: () => void;
   onOpenExercise: (exerciseId: string) => void;
   onToggleExercise: () => void;
+  onOpenSong: (songId: string) => void;
+  onToggleSong: () => void;
   onToggleLesson: (videoId: string) => void;
   onPracticeLesson: (lesson: YouTubeLessonResult) => void;
   admin?: StepDrawerAdminProps;
@@ -126,6 +128,8 @@ const StepDrawerBody = ({
   onRetryDetail,
   onOpenExercise,
   onToggleExercise,
+  onOpenSong,
+  onToggleSong,
   onToggleLesson,
   onPracticeLesson,
   admin,
@@ -201,6 +205,8 @@ const StepDrawerBody = ({
             loadingExercise={loadingExercise}
             onOpenExercise={onOpenExercise}
             onToggleExercise={onToggleExercise}
+            onOpenSong={onOpenSong}
+            onToggleSong={onToggleSong}
             onToggleLesson={onToggleLesson}
             onPracticeLesson={onPracticeLesson}
           />
@@ -331,6 +337,8 @@ export const StepDrawer: React.FC<StepDrawerProps> = ({
   onRetryDetail,
   onOpenExercise,
   onToggleExercise,
+  onOpenSong,
+  onToggleSong,
   onToggleLesson,
   onPracticeLesson,
   admin,
@@ -388,6 +396,8 @@ export const StepDrawer: React.FC<StepDrawerProps> = ({
             onRetryDetail={onRetryDetail}
             onOpenExercise={onOpenExercise}
             onToggleExercise={onToggleExercise}
+            onOpenSong={onOpenSong}
+            onToggleSong={onToggleSong}
             onToggleLesson={onToggleLesson}
             onPracticeLesson={onPracticeLesson}
             admin={admin}

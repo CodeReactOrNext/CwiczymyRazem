@@ -9,12 +9,14 @@ import { RoadmapBoardTab } from "feature/supporterPanel/components/RoadmapBoardT
 import { SupporterInfo } from "feature/supporterPanel/components/SupporterInfo";
 import { SupporterPitch } from "feature/supporterPanel/components/SupporterPitch";
 import { TokenWalletBar } from "feature/supporterPanel/components/TokenWalletBar";
+import { UserRoadmapsTab } from "feature/supporterPanel/components/UserRoadmapsTab";
 import { useSupporterRoadmap } from "feature/supporterPanel/hooks/useSupporterRoadmap";
 import { SupporterWall } from "feature/supportTeam/components/SupporterWall";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { WorkBoardTab } from "feature/workBoard/components/WorkBoardTab";
 import {
+  Compass,
   Guitar,
   Hammer,
   Heart,
@@ -36,7 +38,8 @@ type SupporterTab =
   | "work"
   | "goal"
   | "wall"
-  | "info";
+  | "info"
+  | "players";
 
 const TABS: { id: SupporterTab; label: string; icon: typeof Map }[] = [
   { id: "roadmap", label: "Roadmap", icon: Map },
@@ -46,6 +49,7 @@ const TABS: { id: SupporterTab; label: string; icon: typeof Map }[] = [
   { id: "work", label: "In the works", icon: Hammer },
   { id: "goal", label: "Support Challenge", icon: Target },
   { id: "wall", label: "Supporters", icon: Heart },
+  { id: "players", label: "Player Roadmaps", icon: Compass },
   { id: "info", label: "Info", icon: Info },
 ];
 
@@ -121,7 +125,7 @@ export const SupporterPanelView = () => {
           <SupporterPitch />
         ) : (
           <>
-            {/* Eight tabs, so the rail scrolls sideways on a phone rather than
+            {/* Nine tabs, so the rail scrolls sideways on a phone rather than
                 wrapping into three rows of its own. */}
             <div className={tabNavListClass}>
               {TABS.map(({ id, label, icon: Icon }) => (
@@ -178,6 +182,10 @@ export const SupporterPanelView = () => {
             )}
 
             {tab === "wall" && <SupporterWall />}
+
+            {tab === "players" && (
+              <UserRoadmapsTab enabled={isSupporter} wallet={board?.wallet} />
+            )}
 
             {tab === "info" && <SupporterInfo />}
           </>

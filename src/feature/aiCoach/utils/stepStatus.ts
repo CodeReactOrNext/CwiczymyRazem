@@ -16,8 +16,8 @@ export interface ResourceProgress {
 }
 
 /**
- * How many of the step's checkable resources (the exercise plus the lessons on
- * screen) are ticked off. Only lessons actually in the list count, so an id left
+ * How many of the step's checkable resources (the exercise, the library song
+ * and the lessons on screen) are ticked off. Only lessons actually in the list count, so an id left
  * over from a lesson that was later removed cannot push `completed` past `total`.
  */
 export const getResourceProgress = (
@@ -25,13 +25,17 @@ export const getResourceProgress = (
   lessons: YouTubeLessonResult[],
 ): ResourceProgress => {
   const hasExercise = !!step.suggestedExerciseId && !step.noExercise;
+  const hasSong = !!step.suggestedSong;
   const completedIds = new Set(step.completedLessonIds ?? []);
   const watched = lessons.filter((lesson) =>
     completedIds.has(lesson.videoId),
   ).length;
   return {
-    total: (hasExercise ? 1 : 0) + lessons.length,
-    completed: (hasExercise && step.exerciseCompleted ? 1 : 0) + watched,
+    total: (hasExercise ? 1 : 0) + (hasSong ? 1 : 0) + lessons.length,
+    completed:
+      (hasExercise && step.exerciseCompleted ? 1 : 0) +
+      (hasSong && step.songCompleted ? 1 : 0) +
+      watched,
   };
 };
 

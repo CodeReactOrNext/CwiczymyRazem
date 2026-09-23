@@ -22,7 +22,8 @@ type NotificationType =
   | "playlist_saved"
   | "playlist_liked"
   | "exercise_thanked"
-  | "exercise_completed";
+  | "exercise_completed"
+  | "roadmap_ready";
 
 export interface AppNotification {
   id: string;
@@ -49,6 +50,9 @@ export interface AppNotification {
   // Community exercise thank/completion fields
   exerciseId?: string;
   exerciseTitle?: string;
+  // A roadmap generated in the background
+  roadmapId?: string;
+  roadmapGoal?: string;
   timestamp: any;
   isRead: boolean;
 }
@@ -87,6 +91,8 @@ export const notificationHref = (n: AppNotification): string | null => {
     return `/songs?view=playlists&playlistId=${n.playlistId}`;
   if (n.type === "exercise_thanked" || n.type === "exercise_completed")
     return "/profile/skills?tab=community";
+  if (n.type === "roadmap_ready" && n.roadmapId)
+    return `/ai-coach?tab=players&roadmap=${n.roadmapId}`;
   return null;
 };
 
@@ -147,6 +153,11 @@ export const notificationText = (
       return {
         title: "Exercise practiced",
         body: `${sender}practiced your exercise${n.exerciseTitle ? ` "${n.exerciseTitle}"` : ""} — you got +${n.fameAwarded}`,
+      };
+    case "roadmap_ready":
+      return {
+        title: "Your roadmap is ready",
+        body: `The coach finished writing${n.roadmapGoal ? ` "${n.roadmapGoal}"` : " your roadmap"} — open it to start.`,
       };
     default:
       return {

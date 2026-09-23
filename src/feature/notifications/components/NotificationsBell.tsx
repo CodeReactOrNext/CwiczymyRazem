@@ -22,6 +22,7 @@ import {
   Heart,
   HeartHandshake,
   ListMusic,
+  Map as MapIcon,
   MessageSquare,
   Store,
   Trophy,
@@ -178,6 +179,21 @@ const typeConfig = {
       </span>
     ),
   },
+  roadmap_ready: {
+    icon: <MapIcon className='h-3 w-3 text-white' />,
+    bg: "bg-cyan-500",
+    label: (n: any) => (
+      <span>
+        Your roadmap is ready
+        {n.roadmapGoal ? (
+          <>
+            {": "}
+            <span className='font-semibold text-white'>{n.roadmapGoal}</span>
+          </>
+        ) : null}
+      </span>
+    ),
+  },
 };
 
 export const NotificationsBell = () => {
@@ -318,6 +334,7 @@ export const NotificationsBell = () => {
                 const isSystemNotif =
                   n.type === "season_reward" ||
                   n.type === "season_start" ||
+                  n.type === "roadmap_ready" ||
                   // Legacy marketplace sales stored without a buyer fall back to
                   // the system (Store) icon; new ones show the buyer's avatar.
                   (n.type === "marketplace_sold" && !n.senderName);
@@ -412,6 +429,12 @@ export const NotificationsBell = () => {
                         n.type === "exercise_completed") && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
                           Open Community library
+                          <ArrowRight className='h-3 w-3' />
+                        </p>
+                      )}
+                      {n.type === "roadmap_ready" && n.roadmapId && (
+                        <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
+                          Open roadmap
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}

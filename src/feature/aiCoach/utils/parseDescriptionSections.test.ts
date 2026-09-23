@@ -33,6 +33,35 @@ describe("parseDescriptionSections", () => {
     expect(parseDescriptionSections("\n\n")).toEqual([]);
   });
 
+  it("splits headings that start their paragraph, as the generator writes them", () => {
+    expect(
+      parseDescriptionSections(
+        "[What it is] Finding a phrase by ear.\n\n[Why it matters] Ear and fingers.\n\n[How to practice] Hum it, then find the root.",
+      ),
+    ).toEqual([
+      { heading: "What it is", lines: ["Finding a phrase by ear."] },
+      { heading: "Why it matters", lines: ["Ear and fingers."] },
+      { heading: "How to practice", lines: ["Hum it, then find the root."] },
+    ]);
+  });
+
+  it("splits headings run together on one line", () => {
+    expect(
+      parseDescriptionSections("[What it is] A. [Why it matters] B."),
+    ).toEqual([
+      { heading: "What it is", lines: ["A."] },
+      { heading: "Why it matters", lines: ["B."] },
+    ]);
+  });
+
+  it("leaves a lowercase bracketed aside inside a sentence alone", () => {
+    expect(
+      parseDescriptionSections("Play the root [on the low E] first."),
+    ).toEqual([
+      { heading: null, lines: ["Play the root [on the low E] first."] },
+    ]);
+  });
+
   it("trims indentation around lines and headings", () => {
     expect(
       parseDescriptionSections("  [What it is]  \n   indented line  "),

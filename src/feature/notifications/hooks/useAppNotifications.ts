@@ -6,12 +6,16 @@ import {
   onSnapshot,
   orderBy,
   query,
-  where} from "firebase/firestore";
+  where,
+} from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";
 
 import type { AppNotification } from "../services/notification.service";
-import { markAllNotificationsAsRead, markNotificationAsRead } from "../services/notification.service";
+import {
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+} from "../services/notification.service";
 
 export const useAppNotifications = (userId: string | null) => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -31,7 +35,7 @@ export const useAppNotifications = (userId: string | null) => {
     // Backfill senderAvatarUrl for notifications that were stored without it
     // (legacy data) by pulling the sender's current avatar from their user doc.
     const enrichWithAvatars = async (
-      list: AppNotification[]
+      list: AppNotification[],
     ): Promise<AppNotification[]> => {
       const missing = Array.from(
         new Set(
@@ -40,10 +44,10 @@ export const useAppNotifications = (userId: string | null) => {
               (n) =>
                 !n.senderAvatarUrl &&
                 n.senderId &&
-                !(n.senderId in avatarCache.current)
+                !(n.senderId in avatarCache.current),
             )
-            .map((n) => n.senderId as string)
-        )
+            .map((n) => n.senderId as string),
+        ),
       );
 
       await Promise.all(
@@ -56,13 +60,13 @@ export const useAppNotifications = (userId: string | null) => {
           } catch {
             avatarCache.current[uid] = null;
           }
-        })
+        }),
       );
 
       return list.map((n) =>
         !n.senderAvatarUrl && n.senderId && avatarCache.current[n.senderId]
           ? { ...n, senderAvatarUrl: avatarCache.current[n.senderId] }
-          : n
+          : n,
       );
     };
 
@@ -76,47 +80,54 @@ export const useAppNotifications = (userId: string | null) => {
       collection(db, "notifications"),
       where("userId", "==", userId),
       orderBy("timestamp", "desc"),
-      limit(20)
+      limit(20),
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedNotifications = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as AppNotification[];
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetchedNotifications = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as AppNotification[];
 
-      applySnapshot(fetchedNotifications);
-    }, (error) => {
-      console.error("Notifications listener failed:", error);
+        applySnapshot(fetchedNotifications);
+      },
+      (error) => {
+        console.error("Notifications listener failed:", error);
 
-      // Fallback: If index-related error, try to fetch without orderBy
-      // and sort locally.
-      if (error.code === 'failed-precondition') {
-        console.warn("Missing composite index for notifications. Sorting locally...");
-        const simpleQuery = query(
-          collection(db, "notifications"),
-          where("userId", "==", userId),
-          limit(20)
-        );
+        // Fallback: If index-related error, try to fetch without orderBy
+        // and sort locally.
+        if (error.code === "failed-precondition") {
+          console.warn(
+            "Missing composite index for notifications. Sorting locally...",
+          );
+          const simpleQuery = query(
+            collection(db, "notifications"),
+            where("userId", "==", userId),
+            limit(20),
+          );
 
-        onSnapshot(simpleQuery, (simpleSnapshot) => {
-          const fetched = simpleSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as AppNotification[];
+          onSnapshot(simpleQuery, (simpleSnapshot) => {
+            const fetched = simpleSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            })) as AppNotification[];
 
-          // Sort locally by timestamp
-          fetched.sort((a, b) => {
-            const getMillis = (ts: any) => ts?.toMillis ? ts.toMillis() : Date.now();
-            return getMillis(b.timestamp) - getMillis(a.timestamp);
+            // Sort locally by timestamp
+            fetched.sort((a, b) => {
+              const getMillis = (ts: any) =>
+                ts?.toMillis ? ts.toMillis() : Date.now();
+              return getMillis(b.timestamp) - getMillis(a.timestamp);
+            });
+
+            applySnapshot(fetched);
           });
-
-          applySnapshot(fetched);
-        });
-      } else {
-        setIsLoading(false);
-      }
-    });
+        } else {
+          setIsLoading(false);
+        }
+      },
+    );
 
     return () => unsubscribe();
   }, [userId]);
@@ -126,6 +137,6 @@ export const useAppNotifications = (userId: string | null) => {
     unreadCount,
     isLoading,
     markAsRead: markNotificationAsRead,
-    markAllAsRead: () => userId && markAllNotificationsAsRead(userId)
+    markAllAsRead: () => userId && markAllNotificationsAsRead(userId),
   };
 };

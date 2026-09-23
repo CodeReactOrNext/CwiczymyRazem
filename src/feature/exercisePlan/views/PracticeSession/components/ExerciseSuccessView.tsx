@@ -96,6 +96,7 @@ export const ExerciseSuccessView = ({
   const isPassed = isExam ? score! >= passThreshold : true;
   const nextStarDist = isExam ? Math.max(0, passThreshold - score!) : 0;
 
+  const hasStats = !!stats;
   const displayStats = stats ?? {};
   const accuracy = displayStats.accuracy ?? 0;
   const tierKey = getTierFromAccuracy(accuracy);
@@ -262,14 +263,18 @@ export const ExerciseSuccessView = ({
                 </div>
               )}
 
-              {/* Accuracy / Combo / Score — grouped in one panel, not repeated cards */}
-              <div className="grid grid-cols-3 gap-2 rounded-lg bg-zinc-800/40 px-4 py-4">
-                <StatItem icon={<Target className="h-4 w-4" />} value={`${accuracy}%`} label="Accuracy" accent="text-cyan-400" />
-                <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label="Max combo" accent="text-orange-400" />
-                {!isExam && (
-                  <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label="Score" />
-                )}
-              </div>
+              {/* Accuracy / Combo / Score — grouped in one panel, not repeated cards.
+                  Only shown when something was actually tracked (mic or click hunt) —
+                  otherwise "Accuracy" would just be a stale/default 0%. */}
+              {hasStats && (
+                <div className="grid grid-cols-3 gap-2 rounded-lg bg-zinc-800/40 px-4 py-4">
+                  <StatItem icon={<Target className="h-4 w-4" />} value={`${accuracy}%`} label="Accuracy" accent="text-cyan-400" />
+                  <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label="Max combo" accent="text-orange-400" />
+                  {!isExam && (
+                    <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label="Score" />
+                  )}
+                </div>
+              )}
             </motion.div>
           )}
 

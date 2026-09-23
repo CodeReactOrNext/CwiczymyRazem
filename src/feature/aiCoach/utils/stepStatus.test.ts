@@ -71,6 +71,24 @@ describe("getResourceProgress", () => {
     expect(progress).toEqual({ completed: 0, total: 1 });
   });
 
+  it("counts a library song like an exercise", () => {
+    const song = { id: "song-1", title: "Little Wing", artist: "Jimi Hendrix" };
+    expect(getResourceProgress(step({ suggestedSong: song }), [])).toEqual({
+      completed: 0,
+      total: 1,
+    });
+    expect(
+      getResourceProgress(
+        step({
+          suggestedSong: song,
+          songCompleted: true,
+          suggestedExerciseId: "ex",
+        }),
+        [lesson("a")],
+      ),
+    ).toEqual({ completed: 1, total: 3 });
+  });
+
   it("does not count a watched id whose lesson is no longer listed", () => {
     const progress = getResourceProgress(
       step({ completedLessonIds: ["gone", "a"] }),

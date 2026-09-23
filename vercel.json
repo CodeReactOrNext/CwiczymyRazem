@@ -7,6 +7,15 @@
       "develop": true
     }
   },
+  "functions": {
+    "src/pages/api/generate-roadmap.ts": { "maxDuration": 300 },
+    "src/pages/api/generate-phase-details.ts": { "maxDuration": 180 },
+    "src/pages/api/refine-roadmap.ts": { "maxDuration": 180 },
+    "src/pages/api/search-exercise.ts": { "maxDuration": 60 },
+    "src/pages/api/search-youtube-lessons.ts": { "maxDuration": 60 },
+    "src/pages/api/roadmap-jobs/advance.ts": { "maxDuration": 300 },
+    "src/pages/api/cron/roadmap-jobs.ts": { "maxDuration": 300 }
+  },
   "crons": [
     {
       "path": "/api/discord/daily-season-update",
@@ -19,6 +28,10 @@
     {
       "path": "/api/cron/notifications",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/roadmap-jobs",
+      "schedule": "* * * * *"
     },
     {
       "path": "/api/support-ask-update",

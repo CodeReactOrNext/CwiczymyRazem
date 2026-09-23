@@ -14,6 +14,8 @@ interface RoadmapFinishCardProps {
   roadmapId: string;
   done: number;
   total: number;
+  /** Phase checkpoints still to pass; the guitar waits for these too. */
+  checkpointsLeft: number;
 }
 
 /**
@@ -32,6 +34,7 @@ export const RoadmapFinishCard = ({
   roadmapId,
   done,
   total,
+  checkpointsLeft,
 }: RoadmapFinishCardProps) => {
   const reward = getRoadmapReward(roadmapId);
   const { data: ledger } = useRewardLedger();
@@ -42,7 +45,7 @@ export const RoadmapFinishCard = ({
   const { payout, guitar } = reward;
   const isClaimed =
     ledger?.roadmaps.claimed.includes(roadmapRewardId(roadmapId)) ?? false;
-  const isComplete = done >= total;
+  const isComplete = done >= total && checkpointsLeft === 0;
   const canClaim = isComplete && !isClaimed;
   const rarityColor = getRarityColor(guitar.rarity);
 
@@ -93,7 +96,9 @@ export const RoadmapFinishCard = ({
               ? "In your Arsenal, with a serial nobody else has."
               : canClaim
                 ? "Roadmap complete — the guitar is yours."
-                : `${total - done} of ${total} steps left to earn it.`}
+                : done >= total
+                  ? `${checkpointsLeft} ${checkpointsLeft === 1 ? "checkpoint" : "checkpoints"} left to earn it.`
+                  : `${total - done} of ${total} steps left to earn it.`}
           </p>
         </div>
       </div>
@@ -130,7 +135,9 @@ export const RoadmapFinishCard = ({
           ) : (
             <>
               <Lock size={14} strokeWidth={2.5} />
-              {done}/{total} steps
+              {done >= total
+                ? `${checkpointsLeft} to pass`
+                : `${done}/${total} steps`}
             </>
           )}
         </span>

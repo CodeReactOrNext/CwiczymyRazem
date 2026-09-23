@@ -1,89 +1,59 @@
-import { Agent, fileSearchTool, Runner, withTrace } from "@openai/agents";
+import { isAdminRequest } from "lib/roadmaps/generation/adminGuard";
+import { matchExercisesForStep } from "lib/roadmaps/generation/exerciseMatch";
+import { isRoadmapLevel, MAX_GOAL_LENGTH } from "lib/roadmaps/generation/levels";
+import { GenerationError } from "lib/roadmaps/generation/openaiJson";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { z } from "zod";
 
-const VECTOR_STORE_ID = "vs_69a3216531448191af85bd88fbe35695";
-
-const ExerciseSchema = z.object({ exercise_ids: z.array(z.string()).min(1).max(2) });
-
-const agent = new Agent({
-  name: "Exercise search agent",
-  instructions:
-    "You are a guitar exercise search agent. Search the knowledge base and choose the top 2 best exercises that match the given context. Return ONLY valid JSON: { \"exercise_ids\": [\"<id1>\", \"<id2>\"] }. No explanation. Two IDs only, or one if only one matches well.",
-  model: "gpt-5-mini",
-  tools: [fileSearchTool([VECTOR_STORE_ID])],
-  outputType: ExerciseSchema,
-  modelSettings: {
-    temperature: 1,
-    topP: 1,
-    maxTokens: 2048,
-    store: true,
-  },
-});
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+/**
+ * Exercise search for one step, from the library in context. The queue no
+ * longer needs it — the structure call assigns exercises — but the roadmap
+ * editor still re-searches a single step with it.
+ */
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
-
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: "AI server configuration missing." });
+  if (!isAdminRequest(req)) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
-
-  process.env.OPENAI_API_KEY = apiKey;
-
-  const ALLOWED_LEVELS = ["Absolute Beginner", "Beginner", "Intermediate", "Advanced"];
 
   const { stepTitle, description, goal, level } = req.body as {
-    stepTitle: string;
-    description: string;
-    goal: string;
-    level: string;
+    stepTitle?: string;
+    description?: string;
+    goal?: string;
+    level?: string;
   };
 
-  if (!stepTitle) {
-    return res.status(400).json({ error: "Missing stepTitle" });
-  }
-
-  if (typeof stepTitle !== "string" || stepTitle.length > 100) {
+  if (!stepTitle || typeof stepTitle !== "string" || stepTitle.length > 100) {
     return res.status(400).json({ error: "Invalid stepTitle." });
   }
-
-  if (goal && typeof goal !== "string") {
+  if (goal !== undefined && (typeof goal !== "string" || goal.length > MAX_GOAL_LENGTH)) {
     return res.status(400).json({ error: "Invalid goal." });
   }
-
-  if (description && typeof description !== "string") {
+  if (description !== undefined && typeof description !== "string") {
     return res.status(400).json({ error: "Invalid description." });
   }
-
-  const truncatedGoal = goal?.slice(0, 500);
-  const truncatedDescription = description?.slice(0, 1000);
-
-  if (level && !ALLOWED_LEVELS.includes(level)) {
+  if (level !== undefined && !isRoadmapLevel(level)) {
     return res.status(400).json({ error: "Invalid skill level." });
   }
 
-  const query = `Roadmap step: "${stepTitle}". Student goal: "${truncatedGoal}". Level: ${level}. Description: ${truncatedDescription}. Find the best matching guitar exercise.`;
-
   try {
-    const result = await withTrace("exercise_search", async () => {
-      const runner = new Runner();
-      const runResult = await runner.run(agent, [
-        { role: "user", content: [{ type: "input_text", text: query }] },
-      ]);
-
-      if (!runResult.finalOutput) {
-        throw new Error("No exercise found");
-      }
-
-      return runResult.finalOutput;
+    const exercise_ids = await matchExercisesForStep({
+      stepTitle,
+      description: description ?? "",
+      goal: goal ?? "",
+      level: level ?? "Intermediate",
     });
-
-    return res.status(200).json({ exercise_ids: result.exercise_ids });
-  } catch (err: any) {
-    console.warn("search-exercise error:", err);
-    return res.status(200).json({ exercise_ids: [] });
+    return res.status(200).json({ exercise_ids });
+  } catch (error) {
+    if (error instanceof GenerationError) {
+      console.error("[search-exercise]", error.message);
+      return res.status(error.status).json({ error: error.message });
+    }
+    console.error("[search-exercise]", error);
+    return res.status(500).json({ error: "Unexpected server error." });
   }
 }

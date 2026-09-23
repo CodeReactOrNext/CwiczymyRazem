@@ -16,6 +16,12 @@ export interface YouTubeLesson {
   guitarStyle?: string[];
   qualityScore?: number; // 1-10
   qualityReason?: string;
+  /** What a viewer learns, in a sentence or two — for videos analysed since it existed. */
+  teaches?: string;
+  /** Chapter titles from the description. */
+  chapters?: string[];
+  /** Where the video came from: the admin scraper, or a live search for a roadmap step. */
+  source?: "scrape" | "live";
   status: YouTubeLessonStatus;
   processedAt?: string;
 }

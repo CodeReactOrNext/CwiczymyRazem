@@ -5,8 +5,9 @@ import type { GuitarDefinition } from "feature/arsenal/types/arsenal.types";
 import type { PartSlot, RewardPayout } from "lib/rewards/rewardPayout";
 import { rollRewardParts } from "lib/rewards/rewardPayout";
 
+import type { PhaseCheckResult } from "../types/phaseCheck.types";
 import type { StaticRoadmap } from "../types/roadmap.types";
-
+import { allCheckpointsPassed } from "../utils/phaseCheck";
 
 /**
  * What the parts and the free cases are worth, before the Fame is sized.
@@ -91,6 +92,9 @@ export const getRoadmapReward = (roadmapId: string): RoadmapReward | null => {
 export interface RoadmapCompletion {
   done: number;
   total: number;
+  /** Phase checkpoints passed, out of the roadmap's phases. */
+  checkpointsPassed: number;
+  checkpointsTotal: number;
   isComplete: boolean;
 }
 
@@ -106,17 +110,32 @@ export const getRoadmapCompletion = (
   roadmapId: string,
   /** `stepProgress` as stored: step id → sessions completed. */
   stepProgress: Record<string, number> | null | undefined,
+  /** `phaseChecks` as stored: phase id → checkpoint result. */
+  phaseChecks?: Record<string, PhaseCheckResult> | null,
 ): RoadmapCompletion => {
   const steps = getRoadmapSteps(roadmapId);
   const progress = stepProgress ?? {};
+  const phaseIds = (getCuratedRoadmap(roadmapId)?.phases ?? []).map(
+    (p) => p.id,
+  );
 
   const done = steps.filter(
     (step) => (progress[step.id] ?? 0) >= (step.sessionsRequired || 0),
   ).length;
+  const checkpointsPassed = phaseIds.filter(
+    (phaseId) => !!phaseChecks?.[phaseId]?.passedAt,
+  ).length;
 
+  // The steps and every phase's checkpoint: a roadmap is finished when the
+  // work is done AND the player has shown they understood it.
   return {
     done,
     total: steps.length,
-    isComplete: steps.length > 0 && done === steps.length,
+    checkpointsPassed,
+    checkpointsTotal: phaseIds.length,
+    isComplete:
+      steps.length > 0 &&
+      done === steps.length &&
+      allCheckpointsPassed(phaseIds, phaseChecks),
   };
 };

@@ -126,3 +126,44 @@ export const GUILD_MAX_STASH_UPGRADES = 8;
 
 export const IDEA_TITLE_MAX = 90;
 export const IDEA_DESCRIPTION_MAX = 600;
+
+/**
+ * Generating an AI roadmap for yourself. Priced above a gear proposal because
+ * it is the biggest single thing the panel hands back — a full multi-month
+ * plan, written and reviewed — and below a guild because it claims nothing
+ * from anyone else. It also pays for real compute: the skeleton is written and
+ * reviewed by the stronger model (STRUCTURE_MODEL), so a roadmap costs the app
+ * about 35 cents of model time against the $2.50 of donations 25 tokens
+ * stand for. Charged once per goal; a failed or retried generation is not
+ * charged twice.
+ */
+export const ROADMAP_GENERATION_COST = 25;
+
+/**
+ * Refining a generated roadmap afterwards: rewriting a step, swapping its
+ * exercise, searching lessons or the song again, adding a step to a phase.
+ * Each is one or two model calls, so each is priced at a token or two — cheap
+ * enough to fix what is off, dear enough that "regenerate until perfect" is a
+ * choice the wallet makes visible. Adding a step is the dearest because it is
+ * two calls (the step, then its description). Removing a step is free: it
+ * costs the app nothing.
+ */
+export const ROADMAP_REFINE_COSTS = {
+  rewriteStep: 1,
+  swapExercise: 1,
+  refreshLessons: 1,
+  findSong: 1,
+  addStep: 2,
+} as const;
+
+/** Steps one "add steps" call may add. Small, so a phase grows a step at a time. */
+export const ROADMAP_ADD_STEPS_MAX = 2;
+
+/**
+ * A private roadmap costs more than a public one. The public price is what a
+ * roadmap costs the app to write; a public roadmap then goes on Player
+ * Roadmaps, where every other supporter can read it and learn from it, so the
+ * community gets something back for the compute. A private one serves its
+ * owner alone, and the difference is what that is worth.
+ */
+export const ROADMAP_PRIVATE_GENERATION_COST = 30;
