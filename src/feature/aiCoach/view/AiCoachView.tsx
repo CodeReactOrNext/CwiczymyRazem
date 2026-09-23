@@ -10,9 +10,11 @@ import {
   firebaseUpdateUserProgress,
   type UserRoadmapProgress,
 } from "feature/aiCoach/services/userProgress.service";
+import { newlyCompletedSteps } from "feature/aiCoach/utils/completedSteps";
 import { withPhaseChecks } from "feature/aiCoach/utils/phaseCheck";
 import { extractStepProgress } from "feature/aiCoach/utils/roadmapProgress";
 import { PlayerRoadmapsLocked } from "feature/aiCoach/view/PlayerRoadmapsLocked";
+import { firebaseAddRoadmapStepLog } from "feature/logs/services/addRoadmapStepLog.service";
 import { UserRoadmapsTab } from "feature/supporterPanel/components/UserRoadmapsTab";
 import { useSupporterRoadmap } from "feature/supporterPanel/hooks/useSupporterRoadmap";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
@@ -26,7 +28,7 @@ import {
   Map,
 } from "lucide-react";
 import { useRouter } from "next/router";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 import type {
@@ -137,6 +139,9 @@ const AiCoachView = () => {
     );
   };
 
+  // Steps already put in the activity log during this visit.
+  const loggedStepsRef = useRef(new Set<string>());
+
   const progressQuery = useQuery({
     queryKey: progressQueryKey(userId),
     queryFn: () => firebaseGetAllUserProgress(userId as string),
@@ -169,6 +174,12 @@ const AiCoachView = () => {
 
   const handlePersist = async (phases: RoadmapPhase[]) => {
     if (!userId || !selectedId) return;
+    // What the map showed before this save — the last saved progress — so the
+    // steps that just crossed into "done" can go to the activity log.
+    const finished =
+      mergedRoadmap && selectedStaticRoadmap
+        ? newlyCompletedSteps(mergedRoadmap.phases, phases)
+        : [];
     const { stepProgress, resourceProgress, phaseChecks } =
       extractStepProgress(phases);
     await firebaseUpdateUserProgress(
@@ -178,6 +189,21 @@ const AiCoachView = () => {
       resourceProgress,
       phaseChecks,
     );
+
+    // Once per step per visit: ticking a step off, back on and off again
+    // should not fill the feed with the same step.
+    finished.forEach(({ step, phase }) => {
+      const key = `${selectedId}:${step.id}`;
+      if (loggedStepsRef.current.has(key)) return;
+      loggedStepsRef.current.add(key);
+      void firebaseAddRoadmapStepLog(userId, {
+        roadmapId: selectedId,
+        roadmapTitle: selectedStaticRoadmap?.title ?? "",
+        phaseTitle: phase.title,
+        stepId: step.id,
+        stepTitle: step.title,
+      });
+    });
 
     const now = new Date().toISOString();
     queryClient.setQueryData<UserRoadmapProgress[]>(

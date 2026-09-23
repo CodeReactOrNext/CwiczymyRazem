@@ -248,6 +248,48 @@ export interface FirebaseLogsExamPassedInterface {
   reactionFame?: LogReactionFame;
 }
 
+/** A step of a Mastery Roadmap crossing into "done". */
+export interface FirebaseLogsRoadmapStepInterface {
+  uid: string;
+  userName: string;
+  timestamp: string | number | Date;
+  type: "roadmap_step_completed";
+  data: string;
+  roadmapId: string;
+  roadmapTitle: string;
+  phaseTitle: string;
+  stepId: string;
+  stepTitle: string;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
+  id?: string;
+  reactions?: string[];
+  reactionFame?: LogReactionFame;
+}
+
+/**
+ * A guild moving up a level — a quest cleared. Guild-wide, so no `uid`: nobody
+ * owns the row, it never groups with anything and has nothing to motivate.
+ * Written only by the server when a quest is banked (see lib/guild/guildLevelLog).
+ */
+export interface FirebaseLogsGuildLevelInterface {
+  type: "guild_level_up";
+  data: string;
+  timestamp: string | number | Date;
+  guildId: string;
+  guildName: string;
+  guildBadge: GuildBadge;
+  level: number;
+  previousLevel: number;
+  /** Names of the quests that got it there, at most five. */
+  quests: string[];
+  questsCleared: number;
+  id?: string;
+  reactions?: string[];
+  reactionFame?: LogReactionFame;
+}
+
 export interface FirebaseLogsMarketplaceInterface {
   type: "marketplace_listing";
   uid: string;

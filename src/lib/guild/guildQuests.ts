@@ -30,6 +30,7 @@ import { readTreasury } from "feature/guilds/utils/guildTreasury.utils";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import { AggregateField, FieldValue } from "firebase-admin/firestore";
 import { syncGuildBadges } from "lib/guild/guildBadge";
+import { postGuildLevelUp } from "lib/guild/guildLevelLog";
 import { awardFame } from "lib/support/fameWallet";
 import type { PlayerSession } from "lib/support/supporterAuth";
 import { userRef } from "lib/support/tokenWallet";
@@ -466,6 +467,8 @@ export async function readQuestBoard(
   let ledger: Record<string, any> = data;
   const doneKeys = new Set(readDoneQuests(data).map((quest) => quest.key));
   const rosterNow = members.map((member) => member.uid);
+  const levelBefore = guildLevelOf([...doneKeys]);
+  const bankedNames: string[] = [];
   let banked = false;
 
   let active: GuildQuestProgress[] = [];
@@ -505,6 +508,7 @@ export async function readQuestBoard(
           quests: { ...(ledger.quests ?? {}), ...Object.fromEntries(entries) },
         };
         for (const [key] of entries) doneKeys.add(key);
+        bankedNames.push(...newlyDone.map((quest) => quest.name));
       } catch (error) {
         console.error("[guildQuests] could not bank", guildId, error);
       }
@@ -521,8 +525,19 @@ export async function readQuestBoard(
     if (!allBanked) break;
   }
 
-  // The level rides on every member's badge, so a clear re-stamps the roster.
-  if (banked) await syncGuildBadges(guildId);
+  // The level rides on every member's badge, so a clear re-stamps the roster,
+  // and a new level is news for the activity feed.
+  if (banked) {
+    await syncGuildBadges(guildId);
+    await postGuildLevelUp({
+      guildId,
+      guildData: ledger,
+      fromLevel: levelBefore,
+      toLevel: guildLevelOf([...doneKeys]),
+      questNames: bankedNames,
+      now,
+    });
+  }
 
   const reports = await measurer.reports();
   const perMember: Record<string, GuildMemberEffort> = Object.fromEntries(

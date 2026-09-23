@@ -42,6 +42,8 @@ import type {
   Exercise,
   ExercisePlan,
 } from "feature/exercisePlan/types/exercise.types";
+import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
+import { findCosmetic } from "feature/guilds/data/guildCosmetics";
 import { LogReaction } from "feature/logs/components/LogReaction";
 import {
   markMotivateHintDone,
@@ -53,11 +55,13 @@ import type {
   FirebaseLogsDailyQuestInterface,
   FirebaseLogsDonationInterface,
   FirebaseLogsExamPassedInterface,
+  FirebaseLogsGuildLevelInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsMarketplacePurchaseInterface,
   FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
+  FirebaseLogsRoadmapStepInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsSupportAskInterface,
   FirebaseLogsTopPlayersInterface,
@@ -98,8 +102,10 @@ import {
   GraduationCap,
   Heart,
   ListChecks,
+  Map as MapIcon,
   Music,
   PartyPopper,
+  Shield,
   ShoppingCart,
   Star,
   Tag,
@@ -640,6 +646,63 @@ const FirebaseLogsTopPlayersItem = ({
     </div>
   );
 };
+const FirebaseLogsGuildLevelItem = ({
+  log,
+  isNew,
+}: {
+  log: FirebaseLogsGuildLevelInterface;
+  isNew: boolean;
+}) => {
+  const date = new Date(log.data);
+  const accentHex = findCosmetic(log.guildBadge?.accent)?.hex ?? "#fbbf24";
+  const unlisted = (log.questsCleared ?? 0) - (log.quests?.length ?? 0);
+
+  return (
+    <div
+      className={`my-4 flex flex-col gap-3 rounded-xl bg-main-opposed-bg px-3 py-3 transition-all duration-300 sm:px-5 sm:py-4 ${
+        isNew ? "border border-white/30" : ""
+      }`}>
+      <div className='flex flex-wrap items-center gap-3'>
+        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10'>
+          <Shield size={16} className='text-amber-400' />
+        </div>
+        <div className='min-w-0 flex-1'>
+          <p className='flex items-center gap-2 text-xs font-semibold text-amber-400'>
+            Guild level up
+            <GuildTagBadge badge={log.guildBadge} />
+          </p>
+          <h3 className='text-sm font-bold text-white sm:text-base'>
+            {log.guildName} reached level {log.level}
+          </h3>
+        </div>
+        <span className='ml-auto shrink-0 text-[11px] text-secondText opacity-60'>
+          {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
+          {addZeroToTime(date.getMinutes())}
+        </span>
+      </div>
+
+      {log.quests?.length > 0 && (
+        <div className='flex flex-wrap items-center gap-2'>
+          <span className='text-sm text-secondText'>Cleared</span>
+          {log.quests.map((name) => (
+            <Chip
+              key={name}
+              color='custom'
+              style={getChipCustomStyle(accentHex)}>
+              {name}
+            </Chip>
+          ))}
+          {unlisted > 0 && (
+            <span className='text-sm text-secondText'>
+              and {unlisted} more
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const FirebaseLogsSupportAskItem = ({
   log,
   isNew,
@@ -1195,6 +1258,32 @@ const GroupedLogLine = ({
     );
   }
 
+  if (type === "roadmapStep") {
+    const stepLog = log as FirebaseLogsRoadmapStepInterface;
+
+    return (
+      <GroupedLine>
+        <p className='text-sm text-secondText'>
+          <MapIcon className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
+          completed{" "}
+          <Link
+            href={`/ai-coach?roadmapId=${stepLog.roadmapId}&step=${stepLog.stepId}`}
+            className='font-bold text-white transition-colors hover:text-cyan-400 hover:underline'>
+            {stepLog.stepTitle}
+          </Link>{" "}
+          on the{" "}
+          <span className='font-semibold text-zinc-200'>
+            {stepLog.roadmapTitle}
+          </span>{" "}
+          roadmap
+        </p>
+        {stepLog.phaseTitle && (
+          <Chip color='cyan'>{stepLog.phaseTitle}</Chip>
+        )}
+      </GroupedLine>
+    );
+  }
+
   if (type === "dailyQuest") {
     const questLog = log as FirebaseLogsDailyQuestInterface;
 
@@ -1598,6 +1687,11 @@ const Logs = ({
             {group.type === "topPlayers" ? (
               <FirebaseLogsTopPlayersItem
                 log={representative as FirebaseLogsTopPlayersInterface}
+                isNew={isNew}
+              />
+            ) : group.type === "guildLevel" ? (
+              <FirebaseLogsGuildLevelItem
+                log={representative as FirebaseLogsGuildLevelInterface}
                 isNew={isNew}
               />
             ) : group.type === "supportAsk" ? (

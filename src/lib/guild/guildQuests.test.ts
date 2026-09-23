@@ -159,6 +159,11 @@ vi.mock("lib/guild/guildBadge", () => ({
   syncGuildBadges: (guildId: string) => syncGuildBadges(guildId),
 }));
 
+const postGuildLevelUp = vi.fn(async (_input: Record<string, any>) => {});
+vi.mock("lib/guild/guildLevelLog", () => ({
+  postGuildLevelUp: (input: Record<string, any>) => postGuildLevelUp(input),
+}));
+
 const { claimQuestRewards, readQuestBoard, resetQuestCache } =
   await import("./guildQuests");
 
@@ -232,6 +237,7 @@ beforeEach(() => {
   store.clear();
   resetQuestCache();
   syncGuildBadges.mockClear();
+  postGuildLevelUp.mockClear();
   seedMember("ann");
   seedMember("bob");
   seedGuild();
@@ -294,6 +300,16 @@ describe("readQuestBoard", () => {
     // The level rides on every member's badge.
     expect(syncGuildBadges).toHaveBeenCalledTimes(1);
     expect(syncGuildBadges).toHaveBeenCalledWith(GUILD);
+
+    // And one feed row for the level reached, naming what cleared it.
+    expect(postGuildLevelUp).toHaveBeenCalledTimes(1);
+    expect(postGuildLevelUp.mock.calls[0][0]).toMatchObject({
+      guildId: GUILD,
+      fromLevel: 0,
+      toLevel: 4,
+      now: NOW,
+    });
+    expect(postGuildLevelUp.mock.calls[0][0].questNames).toHaveLength(4);
   });
 
   it("counts nothing from before the guild was founded", async () => {
@@ -310,6 +326,7 @@ describe("readQuestBoard", () => {
     });
     expect(guild().quests).toBeUndefined();
     expect(syncGuildBadges).not.toHaveBeenCalled();
+    expect(postGuildLevelUp).not.toHaveBeenCalled();
   });
 
   it("opens the next chapter in the same read once all five are cleared", async () => {
@@ -345,8 +362,13 @@ describe("readQuestBoard", () => {
     expect(board.done.map((quest) => quest.id).sort()).toEqual(
       [...firstChapterIds, "theory-25"].sort(),
     );
-    // Two writes, one re-stamp of the roster.
+    // Two writes, one re-stamp of the roster, one feed row for the level reached.
     expect(syncGuildBadges).toHaveBeenCalledTimes(1);
+    expect(postGuildLevelUp).toHaveBeenCalledTimes(1);
+    expect(postGuildLevelUp.mock.calls[0][0]).toMatchObject({
+      fromLevel: 0,
+      toLevel: 6,
+    });
   });
 
   it("tells a member where they stand on a quest that counts members", async () => {
