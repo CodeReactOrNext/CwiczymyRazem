@@ -201,6 +201,7 @@ export const nothingElseMatters: SongGuide = {
         artist: "Nirvana",
         difficulty: 3,
         why: "Single-note riff over a steady pulse: trains the same 'melody over drone' feel with a pick.",
+        guideSlug: "come-as-you-are",
         songId: "UgfElrEYe13NL5NmbPvo",
       },
       {

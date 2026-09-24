@@ -305,6 +305,11 @@ const TunerPage = () => {
                 See how it works
               </Link>
               <Link
+                href='/tools/metronome'
+                className='rounded-lg bg-zinc-900/60 px-5 py-2.5 text-sm font-bold text-zinc-300 transition-background hover:bg-zinc-800'>
+                Online metronome
+              </Link>
+              <Link
                 href='/tools'
                 className='rounded-lg px-2 py-2.5 text-sm font-bold text-zinc-400 transition-colors hover:text-white'>
                 All guitar tools →

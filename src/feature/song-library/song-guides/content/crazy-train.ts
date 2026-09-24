@@ -223,6 +223,7 @@ export const crazyTrain: SongGuide = {
         artist: "Metallica",
         difficulty: 5.5,
         why: "Builds the same tight palm-muting and steady picking-hand rhythm the Crazy Train riff depends on.",
+        guideSlug: "enter-sandman",
         songId: "htHQ0wEmYlGtuSS9xoBY",
       },
       {

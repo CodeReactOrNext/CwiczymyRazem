@@ -206,6 +206,7 @@ export const sevenNationArmy: SongGuide = {
         artist: "Nirvana",
         difficulty: 3,
         why: "Another single-note riff over a steady pulse; trains the same muted, hypnotic groove.",
+        guideSlug: "come-as-you-are",
         songId: "UgfElrEYe13NL5NmbPvo",
       },
       {
