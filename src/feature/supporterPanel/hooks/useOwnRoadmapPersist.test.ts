@@ -10,12 +10,22 @@ vi.mock("feature/aiCoach/services/userProgress.service", () => ({
     firebaseUpdateUserProgress(...args),
 }));
 
+const firebaseAddRoadmapStepLog = vi.fn();
+vi.mock("feature/logs/services/addRoadmapStepLog.service", () => ({
+  firebaseAddRoadmapStepLog: (...args: unknown[]) =>
+    firebaseAddRoadmapStepLog(...args),
+}));
+
 const setQueryData = vi.fn();
+const getQueryData = vi.fn();
 vi.mock("@tanstack/react-query", async () => {
   const actual = await vi.importActual<typeof ReactQuery>(
     "@tanstack/react-query",
   );
-  return { ...actual, useQueryClient: () => ({ setQueryData }) };
+  return {
+    ...actual,
+    useQueryClient: () => ({ setQueryData, getQueryData }),
+  };
 });
 
 const { useOwnRoadmapPersist } = await import("./useOwnRoadmapPersist");
@@ -42,9 +52,31 @@ const phases: RoadmapPhase[] = [
   },
 ];
 
+/** The cached detail: the same step, with `saved` sessions at the last save. */
+const cachedDetail = (saved: number) => ({
+  summary: { id: "r1", title: "Shred plan", goal: "" },
+  roadmap: {
+    id: "r1",
+    phases: phases.map((phase) => ({
+      ...phase,
+      steps: phase.steps.map((step) => ({ ...step, sessionsCompleted: 0 })),
+    })),
+  },
+  stepProgress: { s1: saved },
+  resourceProgress: {},
+  phaseChecks: {},
+});
+
+const finishedPhases: RoadmapPhase[] = phases.map((phase) => ({
+  ...phase,
+  steps: phase.steps.map((step) => ({ ...step, sessionsCompleted: 8 })),
+}));
+
 beforeEach(() => {
   firebaseUpdateUserProgress.mockReset();
+  firebaseAddRoadmapStepLog.mockReset();
   setQueryData.mockReset();
+  getQueryData.mockReset();
 });
 
 describe("useOwnRoadmapPersist", () => {
@@ -92,5 +124,34 @@ describe("useOwnRoadmapPersist", () => {
     });
     // Nothing to merge into when the detail was never fetched.
     expect(updater(undefined)).toBeUndefined();
+  });
+
+  it("puts a step that just crossed into done in the runner's activity log", async () => {
+    getQueryData.mockReturnValue(cachedDetail(4));
+    const { result } = renderHook(() =>
+      useOwnRoadmapPersist("owner", "r1", "follower"),
+    );
+
+    await result.current(finishedPhases);
+    // Ticked off again in the same visit: still one feed row.
+    await result.current(finishedPhases);
+
+    expect(firebaseAddRoadmapStepLog).toHaveBeenCalledTimes(1);
+    expect(firebaseAddRoadmapStepLog).toHaveBeenCalledWith("follower", {
+      roadmapId: "r1",
+      roadmapTitle: "Shred plan",
+      phaseTitle: "Phase 1",
+      stepId: "s1",
+      stepTitle: "Step 1",
+    });
+  });
+
+  it("logs nothing for a step that was already done at the last save", async () => {
+    getQueryData.mockReturnValue(cachedDetail(8));
+    const { result } = renderHook(() => useOwnRoadmapPersist("u1", "r1"));
+
+    await result.current(finishedPhases);
+
+    expect(firebaseAddRoadmapStepLog).not.toHaveBeenCalled();
   });
 });
