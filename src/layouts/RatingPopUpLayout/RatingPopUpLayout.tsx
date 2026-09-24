@@ -9,7 +9,7 @@ import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
 import { NextUpCard } from "feature/progression/components/NextUpCard";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Brain, Ear, Flame, Hand, Music, RotateCcw, Sparkles, Timer, Trophy } from "lucide-react";
+import { ArrowRight, Brain, Ear, Flame, Hand, Music, NotebookPen, RotateCcw, Sparkles, Timer, Trophy } from "lucide-react";
 import Router from "next/router";
 import { useMemo } from "react";
 import {
@@ -20,6 +20,7 @@ import { getDailyStreakMultiplier, getReconciledStreak } from "utils/gameLogic";
 
 import { RewardBreakdown } from "./components/RewardBreakdown";
 import { SessionLeaderboardCard } from "./components/SessionLeaderboardCard";
+import { SessionNoteForm } from "./components/SessionNoteForm";
 import { useRatingPopUp } from "./hooks/useRatingPopUp";
 import { buildFameBreakdown, buildPointsBreakdown } from "./utils/rewardBreakdown";
 
@@ -123,6 +124,18 @@ const RatingPopUpLayout = ({
   const isRest = ratingData.totalPoints <= 0;
 
   const handleContinue = () => (onClick ? onClick(false) : Router.push("/dashboard"));
+
+  // The report's doc id is its reportDate as an ISO string. It arrives as a JSON
+  // string despite the Date type, so parse before serialising it back.
+  const reportDate = new Date(ratingData.reportDate);
+  const reportId = Number.isNaN(reportDate.getTime()) ? null : reportDate.toISOString();
+
+  const noteCard = reportId && (
+    <Card>
+      <CardHeading icon={<NotebookPen className="h-4 w-4" />}>Notes for next time</CardHeading>
+      <SessionNoteForm reportId={reportId} />
+    </Card>
+  );
 
   // ── derived data ──
   // Same source of truth as the header / user tooltip: reconcile the stored
@@ -259,7 +272,7 @@ const RatingPopUpLayout = ({
     >
       <div ref={topRef} />
 
-      {isRest ? (
+      {isRest && (
         /* ── No-points hero ──
            The session was too short to earn anything. Say that outright and name
            the threshold — a silent "0" reads like a scoring bug, not a rule. */
@@ -321,7 +334,11 @@ const RatingPopUpLayout = ({
             </div>
           </div>
         </div>
-      ) : (
+      )}
+
+      {isRest && noteCard}
+
+      {!isRest && (
         <>
           {/* ── Hero ── */}
           <div className="relative overflow-hidden rounded-lg bg-zinc-900/60 px-7 py-12 text-center md:px-10 md:py-16">
@@ -432,6 +449,8 @@ const RatingPopUpLayout = ({
               </div>
             </div>
           </div>
+
+          {noteCard}
 
           {/* ── New achievements ── */}
           <AnimatePresence>

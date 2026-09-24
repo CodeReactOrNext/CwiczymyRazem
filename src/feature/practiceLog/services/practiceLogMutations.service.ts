@@ -34,9 +34,23 @@ export const updatePracticeReport = async ({
   });
 };
 
-export const deletePracticeReport = async (
-  reportId: string
+/**
+ * Sets only the session's note. Unlike `updatePracticeReport` this works on
+ * plan and song reports too — the note carries no stats.
+ */
+export const saveReportNote = async (
+  reportId: string,
+  description: string
 ): Promise<void> => {
+  const idToken = await getIdToken();
+  await axios.patch(MANAGE_REPORT_URL, {
+    idToken,
+    reportId,
+    updates: { description },
+  });
+};
+
+export const deletePracticeReport = async (reportId: string): Promise<void> => {
   const idToken = await getIdToken();
   await axios.delete(MANAGE_REPORT_URL, { data: { idToken, reportId } });
 };

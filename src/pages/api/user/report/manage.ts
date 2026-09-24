@@ -14,6 +14,23 @@ const TIME_KEYS = [
   "creativityTime",
 ] as const;
 
+// Returns the trimmed description, or null when it isn't a valid one.
+const parseDescription = (value: unknown): string | null =>
+  typeof value === "string" && value.length <= MAX_DESCRIPTION_LENGTH
+    ? value.trim()
+    : null;
+
+// A PATCH carrying nothing but `description` — the note written on the
+// post-session summary. It touches no stats, so unlike a full edit it is
+// allowed on plan and song reports too.
+const isNoteOnlyUpdate = (
+  updates: unknown
+): updates is { description: unknown } =>
+  !!updates &&
+  typeof updates === "object" &&
+  Object.keys(updates).length === 1 &&
+  "description" in updates;
+
 const isValidTimeMs = (value: unknown): value is number =>
   typeof value === "number" &&
   Number.isFinite(value) &&
@@ -72,6 +89,20 @@ export default async function handler(
   }
 
   const data = snapshot.data() ?? {};
+  const { updates } = req.body ?? {};
+
+  if (req.method === "PATCH" && isNoteOnlyUpdate(updates)) {
+    const description = parseDescription(updates.description);
+    if (description === null) {
+      return res.status(400).json({
+        error: `Description must be a string up to ${MAX_DESCRIPTION_LENGTH} characters`,
+      });
+    }
+    await docRef.update({ description });
+    invalidateActivityLogsCache(uid);
+    return res.status(200).json({ success: true });
+  }
+
   if (data.planId || data.songId) {
     return res
       .status(403)
@@ -100,9 +131,7 @@ export default async function handler(
           "time.technique": FieldValue.increment(
             -(oldTimeSumary.techniqueTime || 0)
           ),
-          "time.theory": FieldValue.increment(
-            -(oldTimeSumary.theoryTime || 0)
-          ),
+          "time.theory": FieldValue.increment(-(oldTimeSumary.theoryTime || 0)),
           "time.hearing": FieldValue.increment(
             -(oldTimeSumary.hearingTime || 0)
           ),
@@ -117,7 +146,6 @@ export default async function handler(
     return res.status(200).json({ success: true });
   }
 
-  const { updates } = req.body ?? {};
   if (!updates || typeof updates !== "object") {
     return res.status(400).json({ error: "Missing updates" });
   }
@@ -131,15 +159,13 @@ export default async function handler(
 
   let description: string | undefined;
   if (updates.description !== undefined) {
-    if (
-      typeof updates.description !== "string" ||
-      updates.description.length > MAX_DESCRIPTION_LENGTH
-    ) {
+    const parsed = parseDescription(updates.description);
+    if (parsed === null) {
       return res.status(400).json({
         error: `Description must be a string up to ${MAX_DESCRIPTION_LENGTH} characters`,
       });
     }
-    description = updates.description.trim();
+    description = parsed;
   }
 
   const timeSumary = updates.timeSumary;
