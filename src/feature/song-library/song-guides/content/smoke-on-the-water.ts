@@ -209,6 +209,7 @@ export const smokeOnTheWater: SongGuide = {
         artist: "Nirvana",
         difficulty: 3,
         why: "A single-note riff at a similar tempo, useful if plucking two strings together is still fighting you.",
+        guideSlug: "come-as-you-are",
         songId: "UgfElrEYe13NL5NmbPvo",
       },
     ],

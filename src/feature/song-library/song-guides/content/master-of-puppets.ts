@@ -215,6 +215,7 @@ export const masterOfPuppets: SongGuide = {
         artist: "Metallica",
         difficulty: 5.5,
         why: "Groove-first metal rhythm with manageable tempo: confirms your palm-muting contrast is solid.",
+        guideSlug: "enter-sandman",
         songId: "htHQ0wEmYlGtuSS9xoBY",
       },
       {

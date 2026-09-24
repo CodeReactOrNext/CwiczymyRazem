@@ -223,6 +223,7 @@ export const wishYouWereHere: SongGuide = {
         artist: "Nirvana",
         difficulty: 3,
         why: "A single-note riff at a similarly relaxed tempo, useful if picking out a melody rather than strumming a shape is still new.",
+        guideSlug: "come-as-you-are",
         songId: "UgfElrEYe13NL5NmbPvo",
       },
       {
