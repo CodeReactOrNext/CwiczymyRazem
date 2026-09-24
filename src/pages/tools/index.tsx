@@ -373,6 +373,13 @@ const INTERNAL_TOOLS: {
       "Microphone tuner reading in cents, for guitar, bass, ukulele, mandolin and banjo. Standard, Drop D, Open G, DADGAD and a dozen more tunings, plus reference tones for tuning by ear.",
     icon: Gauge,
   },
+  {
+    name: "Metronome",
+    href: "/tools/metronome",
+    description:
+      "Metronome built for practice: accents and subdivisions per beat, tap tempo, a ramp that climbs to your target BPM, and a slow/fast speed drill.",
+    icon: Timer,
+  },
 ];
 
 const ALL_TOOLS = CATEGORIES.flatMap((category) => category.tools);
@@ -467,7 +474,11 @@ const ToolsPage = () => {
               <Link href="/tools/tuner" className="font-bold text-cyan-400 transition-colors hover:text-cyan-300">
                 tuner
               </Link>{" "}
-              that runs right here.
+              and{" "}
+              <Link href="/tools/metronome" className="font-bold text-cyan-400 transition-colors hover:text-cyan-300">
+                metronome
+              </Link>{" "}
+              that run right here.
             </p>
           </div>
 

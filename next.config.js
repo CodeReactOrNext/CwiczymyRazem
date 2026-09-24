@@ -263,6 +263,51 @@ const nextConfig = {
         destination: '/blog/guitar-practice-routine-builder',
         permanent: true,
       },
+      // Still reported as 404 in Search Console (audit 2026-09-24). Several were
+      // removed in 6fe516be together with the posts an older plan would have sent
+      // them to, so each points at the closest page that is still live.
+      {
+        source: '/blog/get-better-at-guitar-fast-app',
+        destination: '/blog/best-app-for-guitar-practice',
+        permanent: true,
+      },
+      {
+        source: '/blog/learn-guitar-more-efficiently-deliberate-practice',
+        destination: '/blog/guitar-practice-routine-builder',
+        permanent: true,
+      },
+      {
+        source: '/blog/guitar-practice-mental-preparation',
+        destination: '/blog/guitar-practice-routine-builder',
+        permanent: true,
+      },
+      {
+        source: '/blog/how-to-set-guitar-practice-goals',
+        destination: '/blog/how-to-track-guitar-practice-progress-effectively',
+        permanent: true,
+      },
+      {
+        source: '/blog/skill-goals-vs-song-goals',
+        destination: '/blog/how-to-track-guitar-practice-progress-effectively',
+        permanent: true,
+      },
+      {
+        source: '/blog/best-guitar-techniques-for-speed',
+        destination: '/guitar-speed-hand-synchronization-exercises',
+        permanent: true,
+      },
+      {
+        source: '/blog/why-is-my-guitar-practice-inconsistent',
+        destination: '/blog/practice-guitar-every-day-simple-steps',
+        permanent: true,
+      },
+      // The AI coach itself sits behind login; the public planner page is the
+      // closest thing a searcher can open and use.
+      {
+        source: '/blog/ai-practice-routine-generator',
+        destination: '/guitar-practice-planner',
+        permanent: true,
+      },
       // Cluster: "track guitar practice progress"
       {
         source: '/blog/how-to-measure-guitar-progress',

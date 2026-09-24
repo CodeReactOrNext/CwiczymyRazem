@@ -26,6 +26,7 @@ const INFO_PAGES = [
   { path: '/contact', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.5' },
   { path: '/tools', lastmod: '2026-09-08', changefreq: 'monthly', priority: '0.6' },
   { path: '/tools/tuner', lastmod: '2026-09-08', changefreq: 'monthly', priority: '0.8' },
+  { path: '/tools/metronome', lastmod: '2026-09-24', changefreq: 'monthly', priority: '0.8' },
   { path: '/privacy-policy', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.3' },
   { path: '/terms-of-service', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.3' },
 ];
