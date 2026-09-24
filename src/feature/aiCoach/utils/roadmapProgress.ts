@@ -16,6 +16,9 @@ export interface StepProgressSnapshot {
  * — the shape `RoadmapView`'s `onPersist` hands back on every step change.
  * Shared by the curated-roadmap view and by a player's own generated one, so
  * the two save progress exactly the same way.
+ *
+ * Every field gets a value: a generated roadmap's steps come without the ticks
+ * until one is made, and Firestore refuses a document with `undefined` in it.
  */
 export const extractStepProgress = (
   phases: RoadmapPhase[],
@@ -25,11 +28,11 @@ export const extractStepProgress = (
 
   phases.forEach((phase) =>
     phase.steps.forEach((step) => {
-      stepProgress[step.id] = step.sessionsCompleted;
+      stepProgress[step.id] = step.sessionsCompleted ?? 0;
       resourceProgress[step.id] = {
-        exerciseCompleted: step.exerciseCompleted,
-        completedLessonIds: step.completedLessonIds,
-        songCompleted: step.songCompleted,
+        exerciseCompleted: step.exerciseCompleted ?? false,
+        completedLessonIds: step.completedLessonIds ?? [],
+        songCompleted: step.songCompleted ?? false,
       };
     }),
   );

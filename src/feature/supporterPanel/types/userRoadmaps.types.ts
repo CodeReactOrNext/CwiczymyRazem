@@ -1,3 +1,4 @@
+import type { UserRoadmapStepResourceProgress } from "feature/aiCoach/services/userProgress.service";
 import type { PhaseCheckResult } from "feature/aiCoach/types/phaseCheck.types";
 import type {
   Roadmap,
@@ -59,6 +60,8 @@ export interface UserRoadmapDetail {
   summary: UserRoadmapSummary;
   roadmap: Roadmap;
   stepProgress: Record<string, number>;
+  /** The exercise, lessons and song ticked off on each step. */
+  resourceProgress: Record<string, UserRoadmapStepResourceProgress>;
   phaseChecks: Record<string, PhaseCheckResult>;
 }
 

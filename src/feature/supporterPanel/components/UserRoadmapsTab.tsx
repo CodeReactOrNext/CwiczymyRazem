@@ -9,7 +9,10 @@ import {
 import { cn } from "assets/lib/utils";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { firebaseUpdateRoadmap } from "feature/aiCoach/services/roadmap.service";
-import { firebaseStartRoadmap } from "feature/aiCoach/services/userProgress.service";
+import {
+  firebaseStartRoadmap,
+  type UserRoadmapStepResourceProgress,
+} from "feature/aiCoach/services/userProgress.service";
 import type { PhaseCheckResult } from "feature/aiCoach/types/phaseCheck.types";
 import type {
   Roadmap,
@@ -83,6 +86,7 @@ const formatDate = (iso: string | null) => {
 const withProgress = (
   roadmap: Roadmap,
   stepProgress: Record<string, number>,
+  resourceProgress: Record<string, UserRoadmapStepResourceProgress>,
   phaseChecks: Record<string, PhaseCheckResult>,
 ): Roadmap => ({
   ...roadmap,
@@ -92,6 +96,10 @@ const withProgress = (
       steps: (phase.steps ?? []).map((step) => ({
         ...step,
         sessionsCompleted: stepProgress[step.id] ?? step.sessionsCompleted ?? 0,
+        exerciseCompleted:
+          resourceProgress[step.id]?.exerciseCompleted ?? false,
+        completedLessonIds: resourceProgress[step.id]?.completedLessonIds ?? [],
+        songCompleted: resourceProgress[step.id]?.songCompleted ?? false,
       })),
     })),
     phaseChecks,
@@ -239,7 +247,12 @@ const RoadmapDetail = ({
   const roadmap = useMemo(
     () =>
       data
-        ? withProgress(data.roadmap, data.stepProgress, data.phaseChecks)
+        ? withProgress(
+            data.roadmap,
+            data.stepProgress,
+            data.resourceProgress ?? {},
+            data.phaseChecks,
+          )
         : null,
     [data],
   );

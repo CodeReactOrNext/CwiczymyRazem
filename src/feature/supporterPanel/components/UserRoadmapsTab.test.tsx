@@ -72,6 +72,7 @@ const detail: UserRoadmapDetail = {
     ],
   },
   stepProgress: { s1: 2, s2: 1 },
+  resourceProgress: {},
   phaseChecks: {},
 };
 

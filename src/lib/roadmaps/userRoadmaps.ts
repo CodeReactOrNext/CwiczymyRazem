@@ -1,3 +1,4 @@
+import type { UserRoadmapStepResourceProgress } from "feature/aiCoach/services/userProgress.service";
 import type { PhaseCheckResult } from "feature/aiCoach/types/phaseCheck.types";
 import type { Roadmap } from "feature/aiCoach/types/roadmap.types";
 import type {
@@ -20,6 +21,7 @@ interface StoredProgress {
   updatedAt?: string;
   startedAt?: string;
   stepProgress?: Record<string, number>;
+  resourceProgress?: Record<string, UserRoadmapStepResourceProgress>;
   phaseChecks?: Record<string, PhaseCheckResult>;
 }
 
@@ -273,6 +275,7 @@ export async function getUserRoadmap(
     }),
     roadmap,
     stepProgress: mergeStepProgress(roadmap, run, runner === userId),
+    resourceProgress: run?.resourceProgress ?? {},
     phaseChecks: run?.phaseChecks ?? {},
   };
 }

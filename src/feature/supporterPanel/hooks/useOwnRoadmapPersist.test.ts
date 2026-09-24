@@ -57,7 +57,13 @@ describe("useOwnRoadmapPersist", () => {
       "u1",
       "r1",
       { s1: 4 },
-      { s1: { exerciseCompleted: true, completedLessonIds: ["yt-1"] } },
+      {
+        s1: {
+          exerciseCompleted: true,
+          completedLessonIds: ["yt-1"],
+          songCompleted: false,
+        },
+      },
       {},
     );
   });
@@ -74,6 +80,13 @@ describe("useOwnRoadmapPersist", () => {
     const updater = setQueryData.mock.calls[0][1] as (prev: unknown) => unknown;
     expect(updater({ stepProgress: {}, other: "kept" })).toEqual({
       stepProgress: { s1: 4 },
+      resourceProgress: {
+        s1: {
+          exerciseCompleted: true,
+          completedLessonIds: ["yt-1"],
+          songCompleted: false,
+        },
+      },
       phaseChecks: {},
       other: "kept",
     });

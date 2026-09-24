@@ -54,14 +54,28 @@ describe("extractStepProgress", () => {
     const { stepProgress, resourceProgress } = extractStepProgress(phases);
 
     expect(stepProgress).toEqual({ s1: 3, s2: 0, s3: 5 });
-    expect(resourceProgress.s1).toEqual({
+    expect(resourceProgress.s1).toStrictEqual({
       exerciseCompleted: true,
       completedLessonIds: ["abc"],
+      songCompleted: false,
     });
-    expect(resourceProgress.s2).toEqual({
-      exerciseCompleted: undefined,
-      completedLessonIds: undefined,
+    expect(resourceProgress.s2).toStrictEqual({
+      exerciseCompleted: false,
+      completedLessonIds: [],
+      songCompleted: false,
     });
+  });
+
+  // A generated roadmap's steps carry no ticks until one is made, and
+  // Firestore rejects the whole write over a single `undefined`.
+  it("never hands Firestore an undefined value", () => {
+    const { stepProgress, resourceProgress } = extractStepProgress(phases);
+    const values = [
+      ...Object.values(stepProgress),
+      ...Object.values(resourceProgress).flatMap((r) => Object.values(r)),
+    ];
+
+    expect(values).not.toContain(undefined);
   });
 
   it("returns empty maps for a roadmap with no steps", () => {

@@ -37,7 +37,10 @@ export const useOwnRoadmapPersist = (
 
       queryClient.setQueryData<UserRoadmapDetail>(
         userRoadmapDetailKey(userId, roadmapId, runnerUid),
-        (prev) => (prev ? { ...prev, stepProgress, phaseChecks } : prev),
+        (prev) =>
+          prev
+            ? { ...prev, stepProgress, resourceProgress, phaseChecks }
+            : prev,
       );
     },
     [queryClient, roadmapId, runnerUid, userId],
