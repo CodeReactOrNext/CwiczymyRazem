@@ -171,8 +171,18 @@ export const syncDailyQuestAction = createAsyncThunk(
         }
       }
 
-      if (merged && !isSameQuest(merged, localQuest)) {
-        dispatch(setDailyQuest(merged));
+      // Merged again with the store as it is *now*, not as it was when the run
+      // started. The transaction waits on the network, and a session finish
+      // keeps completing tasks meanwhile ("Practice 3 different exercises"
+      // lands last). Writing `merged` straight into the store threw those
+      // completions away, and the sync queued behind this one then read — and
+      // published — the clobbered copy.
+      const currentQuest =
+        (getState() as RootState).user.currentUserStats?.dailyQuest ?? null;
+      const next = mergeDailyQuests(currentQuest, merged, today);
+
+      if (next && !isSameQuest(next, currentQuest)) {
+        dispatch(setDailyQuest(next));
       }
     })
 );

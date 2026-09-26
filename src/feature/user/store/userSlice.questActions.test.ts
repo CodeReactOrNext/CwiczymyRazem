@@ -238,6 +238,30 @@ describe("syncDailyQuestAction", () => {
     });
   });
 
+  it("keeps progress completed while the transaction was in flight", async () => {
+    let storeProgress = 4;
+    const getState = () => ({
+      user: { currentUserStats: { dailyQuest: buildQuest(storeProgress) } },
+    });
+
+    vi.mocked(runTransaction).mockImplementation(async (_db, updateFn: any) => {
+      // The session finish completes another chunk while this sync waits on
+      // the network — the run already read the store at 4.
+      storeProgress = 9;
+      return updateFn({
+        get: async () => cachedSnapshot(6),
+        update: vi.fn(),
+      });
+    });
+
+    const dispatch = vi.fn((action: any) => action);
+    await syncDailyQuestAction()(dispatch as any, getState as any, undefined);
+
+    // Remote (6) is ahead of what the run read (4) but behind the store (9):
+    // nothing to pull in, and the store must not be rolled back to 6.
+    expect(setDailyQuest).not.toHaveBeenCalled();
+  });
+
   it("does not touch the fallback when the transaction succeeds", async () => {
     vi.mocked(runTransaction).mockImplementation(async (_db, updateFn: any) =>
       updateFn({

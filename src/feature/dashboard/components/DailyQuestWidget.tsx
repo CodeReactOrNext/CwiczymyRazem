@@ -34,7 +34,7 @@ const questRoutes: Record<DailyQuestTaskType, string> = {
   rate_multiple_songs: "/songs?view=library",
   complete_two_plans: "/timer/plans",
   improve_skill: "/profile/skills",
-  practice_three_exercises: "/timer/plans",
+  practice_three_exercises: "/profile/skills?tab=browse",
 };
 
 const DailyQuestSkeleton = () => (
