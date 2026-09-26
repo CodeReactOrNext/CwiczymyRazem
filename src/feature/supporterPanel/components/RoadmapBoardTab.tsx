@@ -3,7 +3,6 @@ import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { NewIdeaDialog } from "feature/supporterPanel/components/NewIdeaDialog";
 import { RoadmapIdeaCard } from "feature/supporterPanel/components/RoadmapIdeaCard";
 import { IDEA_COST } from "feature/supporterPanel/constants/supporterPanel.constants";
-import { IDEA_BACK_COST } from "feature/supporterPanel/constants/supporterPanel.constants";
 import { useRoadmapMutations } from "feature/supporterPanel/hooks/useSupporterRoadmap";
 import type {
   RoadmapBoard,
@@ -69,19 +68,19 @@ export const RoadmapBoardTab = ({
     <div className='space-y-8'>
       <div className='flex flex-wrap items-center justify-between gap-4'>
         <p className='text-sm text-zinc-400'>
-          Back what you want built next —{" "}
-          <SupportToken size={18} className='inline-block align-middle' />{" "}
-          {IDEA_BACK_COST} a push,{" "}
-          <SupportToken size={18} className='inline-block align-middle' />{" "}
-          {IDEA_COST} to put an idea up. Spent is spent — tokens keep until you
-          use them, and nothing puts them back.
+          The most-backed ideas get built first. Spent tokens don&apos;t come back.
         </p>
         <Button
           onClick={() => setIsPosting(true)}
-          disabled={tokensLeft < IDEA_COST}>
+          disabled={tokensLeft < IDEA_COST}
+          title={tokensLeft < IDEA_COST ? "Not enough tokens left" : undefined}>
           <span className='flex items-center gap-2'>
             <Plus size={16} />
             Post an idea
+            <span className='ml-1 inline-flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 text-sm font-bold tabular-nums'>
+              <SupportToken size={16} />
+              {IDEA_COST}
+            </span>
           </span>
         </Button>
       </div>
@@ -90,10 +89,11 @@ export const RoadmapBoardTab = ({
         <EmptyBoard onPost={() => setIsPosting(true)} />
       ) : (
         <div className='space-y-3'>
-          {board.ideas.map((idea) => (
+          {board.ideas.map((idea, index) => (
             <RoadmapIdeaCard
               key={idea.id}
               idea={idea}
+              rank={index + 1}
               mine={board.myBacking[idea.id] ?? 0}
               myUid={board.myUid}
               tokensLeft={tokensLeft}

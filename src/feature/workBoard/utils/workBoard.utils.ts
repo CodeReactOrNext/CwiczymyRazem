@@ -55,3 +55,19 @@ export const swapTargets = (
 
   return neighbour ? { moved: item, neighbour } : null;
 };
+
+const ROADMAP_TAG = /^roadmap\s*[-–—:]\s*|\s*[-–—]\s*roadmap$/i;
+
+/**
+ * Splits the "- Roadmap" that half the titles carry off into a tag. Written by
+ * hand, it lands at either end; shown as text it was the loudest word on a
+ * board where it told nobody anything new.
+ */
+export const splitWorkTitle = (
+  title: string,
+): { title: string; isRoadmap: boolean } => {
+  const stripped = title.replace(ROADMAP_TAG, "").trim();
+  return stripped && stripped !== title.trim()
+    ? { title: stripped, isRoadmap: true }
+    : { title: title.trim(), isRoadmap: false };
+};

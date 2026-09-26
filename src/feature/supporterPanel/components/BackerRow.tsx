@@ -40,6 +40,8 @@ interface BackerRowProps {
   total: number;
   /** Whoever is reading, so their own chip reads as theirs. */
   myUid: string;
+  /** Quieter chips, for a row that sits under a title it must not outshout. */
+  muted?: boolean;
   className?: string;
 }
 
@@ -47,6 +49,7 @@ export const BackerRow = ({
   backers,
   total,
   myUid,
+  muted = false,
   className,
 }: BackerRowProps) => {
   const [expanded, setExpanded] = useState(false);
@@ -82,7 +85,9 @@ export const BackerRow = ({
               CHIP,
               isMe
                 ? "bg-cyan-950/40 text-cyan-300"
-                : "bg-zinc-800/50 text-zinc-300",
+                : muted
+                  ? "bg-zinc-800/30 text-zinc-400"
+                  : "bg-zinc-800/50 text-zinc-300",
             )}>
             <Bubble backer={backer} />
             <span className='max-w-[10rem] truncate font-medium'>

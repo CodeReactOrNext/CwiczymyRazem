@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_SCRAP_TIER,
   effectTypeFor,
+  groupProposals,
   isProposableRarity,
+  isVotingOpen,
   MAX_SCRAP_QTY,
   MAX_SCRAP_SLOTS,
   partsForKind,
@@ -224,5 +226,33 @@ describe("rankProposals", () => {
     ]);
 
     expect(ranked.map((p) => p.id)).toEqual(["early", "late"]);
+  });
+});
+
+describe("isVotingOpen", () => {
+  it("takes tokens while the proposal is still being decided", () => {
+    expect(isVotingOpen("open")).toBe(true);
+    expect(isVotingOpen("accepted")).toBe(true);
+  });
+
+  it("closes once the gear shipped or was turned down", () => {
+    expect(isVotingOpen("in_game")).toBe(false);
+    expect(isVotingOpen("declined")).toBe(false);
+  });
+});
+
+describe("groupProposals", () => {
+  it("splits the board by status and keeps the ranking inside each part", () => {
+    const grouped = groupProposals([
+      { id: "a", status: "in_game" as const },
+      { id: "b", status: "open" as const },
+      { id: "c", status: "declined" as const },
+      { id: "d", status: "accepted" as const },
+      { id: "e", status: "in_game" as const },
+    ]);
+
+    expect(grouped.voting.map((p) => p.id)).toEqual(["b", "d"]);
+    expect(grouped.shipped.map((p) => p.id)).toEqual(["a", "e"]);
+    expect(grouped.declined.map((p) => p.id)).toEqual(["c"]);
   });
 });

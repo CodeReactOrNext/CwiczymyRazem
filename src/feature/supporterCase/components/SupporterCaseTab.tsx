@@ -31,10 +31,10 @@ import { useState } from "react";
 
 const ItemLine = ({ item }: { item: SlateItem }) => (
   <span className='block min-w-0'>
-    <span className='block truncate text-sm font-bold text-zinc-100'>
+    <span className='block truncate text-base font-semibold leading-snug text-zinc-50'>
       {item.name}
     </span>
-    <span className='block truncate text-xs text-zinc-400'>
+    <span className='mt-0.5 block truncate text-sm text-zinc-400'>
       {item.brand}
       {item.effectType && ` · ${item.effectType}`}
     </span>
@@ -85,15 +85,14 @@ const SeatCard = ({
       {/* Fixed height: the token count only shows on some seats, and a row
           that grows with it left the six artworks sitting at two heights. */}
       <span className='flex h-5 items-center justify-between gap-2'>
-        <span
-          className={cn("text-[10px] font-black tracking-widest", styles.text)}>
+        <span className={cn("text-sm font-semibold", styles.text)}>
           {slot.rarity}
         </span>
         {mine > 0 && (
           <span
             title={`${mine} of your tokens are on this seat`}
-            className='flex shrink-0 items-center gap-1 text-[11px] font-bold tabular-nums text-cyan-300'>
-            <SupportToken size={13} />
+            className='flex shrink-0 items-center gap-1 text-xs font-bold tabular-nums text-cyan-300'>
+            <SupportToken size={14} />
             {mine}
           </span>
         )}
@@ -116,22 +115,23 @@ const SeatCard = ({
 
       {/* Pinned to the bottom so the six footers line up however long the
           names above them run. */}
-      <span className='mt-auto flex min-w-0 items-center gap-1.5 text-[11px]'>
+      <span className='mt-auto block min-w-0 rounded bg-zinc-950/40 px-2.5 py-2'>
+        <span className='block text-xs text-zinc-500'>Up next</span>
         {leader ? (
-          <>
+          <span
+            title={`${leader.name} is winning this seat`}
+            className='mt-0.5 flex min-w-0 items-center gap-1 text-sm font-semibold text-zinc-200'>
             <ChevronUp
-              size={13}
+              size={14}
               className='shrink-0'
               style={{ color: styles.baseColor }}
             />
-            <span
-              title={`${leader.name} is winning this seat`}
-              className='truncate font-bold text-zinc-200'>
-              {leader.name}
-            </span>
-          </>
+            <span className='truncate'>{leader.name}</span>
+          </span>
         ) : (
-          <span className='text-zinc-500'>no votes yet</span>
+          <span className='mt-0.5 block text-sm text-zinc-500'>
+            No votes yet
+          </span>
         )}
       </span>
     </button>
@@ -167,12 +167,12 @@ const CandidateRow = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-lg p-2.5",
+        "flex flex-wrap items-center gap-x-4 gap-y-3 rounded-lg p-3 sm:flex-nowrap",
         leading ? "bg-white/[0.07]" : "bg-white/[0.03]",
       )}>
       <span
         className={cn(
-          "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-black tabular-nums",
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums",
           !leading && "text-zinc-500",
         )}
         style={
@@ -194,16 +194,20 @@ const CandidateRow = ({
         <ItemLine item={candidate} />
       </div>
 
-      <VotePill
-        total={candidate.tokens}
-        mine={candidate.mine}
-        tokensLeft={tokensLeft}
-        busy={busy}
-        what='item'
-        name={candidate.name}
-        accent={styles.baseColor}
-        onBack={onVote}
-      />
+      <div className='flex w-full sm:w-56'>
+        <VotePill
+          wide
+          total={candidate.tokens}
+          mine={candidate.mine}
+          tokensLeft={tokensLeft}
+          busy={busy}
+          what='item'
+          name={candidate.name}
+          accent={styles.baseColor}
+          cost={SLATE_VOTE_COST}
+          onBack={onVote}
+        />
+      </div>
     </div>
   );
 };
@@ -259,7 +263,9 @@ const ItemPicker = ({
           onClick={() => setIsOpen((open) => !open)}
           className='flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-white/[0.06] text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/[0.12] hover:text-zinc-100'>
           {isOpen ? <X size={14} /> : <Plus size={14} />}
-          {isOpen ? "Close" : `${rest.length} more ${slot.rarity} items`}
+          {isOpen
+            ? "Close"
+            : `Back another ${slot.rarity} item (${rest.length})`}
         </button>
       )}
 
@@ -303,17 +309,19 @@ const ItemPicker = ({
                     width={92}
                   />
                   <span className='min-w-0 flex-1'>
-                    <span className='block truncate text-sm font-bold text-zinc-200'>
+                    <span className='block truncate text-sm font-semibold text-zinc-100'>
                       {item.name}
                     </span>
-                    <span className='block truncate text-xs text-zinc-400'>
+                    <span className='mt-0.5 block truncate text-xs text-zinc-400'>
                       {item.effectType ?? item.brand}
                     </span>
                   </span>
                   {/* Not a nested button — the tile itself is the control; this
                       is what tells you the tile does something. */}
-                  <span className='flex h-8 w-8 shrink-0 items-center justify-center rounded bg-cyan-500/10 text-cyan-300 transition-colors group-hover:bg-cyan-500/20'>
-                    <Plus size={15} />
+                  <span className='flex shrink-0 items-center gap-1 rounded bg-zinc-100 px-2 py-1.5 text-xs font-semibold tabular-nums text-zinc-900 transition-colors group-hover:bg-white'>
+                    <Plus size={13} strokeWidth={2.5} />
+                    <SupportToken size={13} />
+                    {SLATE_VOTE_COST}
                   </span>
                 </button>
               ))}
@@ -343,14 +351,22 @@ const SeatBallot = ({
 
   return (
     <section className='space-y-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-      <div className='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
-        <h2 className={cn("text-sm font-black tracking-wide", styles.text)}>
-          {slot.rarity} seat
+      <div className='space-y-1'>
+        <h2 className='text-xl font-bold text-white'>
+          <span className={styles.text}>{slot.rarity}</span> seat
         </h2>
-        <p className='text-xs text-zinc-400'>
-          {slot.current
-            ? `back what replaces ${slot.current.name}`
-            : "back what fills it"}
+        <p className='text-sm text-zinc-400'>
+          {slot.current ? (
+            <>
+              Vote for what replaces{" "}
+              <span className='font-semibold text-zinc-200'>
+                {slot.current.name}
+              </span>{" "}
+              when the case changes.
+            </>
+          ) : (
+            "Vote for what fills it when the case changes."
+          )}
         </p>
       </div>
 
@@ -412,13 +428,12 @@ export const SupporterCaseTab = ({
       <div className='space-y-4'>
         <div className='flex flex-wrap items-start justify-between gap-x-4 gap-y-2'>
           <div className='space-y-1'>
-            <h2 className='flex items-center gap-2 text-sm font-bold text-zinc-200'>
-              <Package size={15} className='text-amber-400' />
+            <h2 className='flex items-center gap-2 text-xl font-bold text-white'>
+              <Package size={18} className='text-amber-400' />
               In the case right now
             </h2>
             <p className='max-w-xl text-sm text-zinc-400'>
-              Six items, one per rarity. Pick a seat and back what you want in
-              it next.
+              One item per rarity. Pick a seat, then vote for what goes in next.
             </p>
           </div>
 

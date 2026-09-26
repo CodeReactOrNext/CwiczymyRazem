@@ -152,6 +152,26 @@ export const sanitizeScrapBom = (
 };
 
 /** Most backed first; a tie goes to whoever proposed it first. */
+/**
+ * Whether tokens can still land on a proposal. Once it is in the game — or
+ * turned down — the vote has been decided, and a token spent after that would
+ * buy nothing.
+ */
+export const isVotingOpen = (status: ProposalStatus): boolean =>
+  status === "open" || status === "accepted";
+
+/**
+ * Splits the board into what is still being voted on, what already shipped,
+ * and what will not. Each part keeps the order it was handed in.
+ */
+export const groupProposals = <T extends { status: ProposalStatus }>(
+  proposals: T[],
+): { voting: T[]; shipped: T[]; declined: T[] } => ({
+  voting: proposals.filter((p) => isVotingOpen(p.status)),
+  shipped: proposals.filter((p) => p.status === "in_game"),
+  declined: proposals.filter((p) => p.status === "declined"),
+});
+
 export const rankProposals = <
   T extends { voteCount: number; createdAt: string },
 >(

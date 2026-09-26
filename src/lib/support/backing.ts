@@ -16,7 +16,7 @@ import { firestore } from "utils/firebase/api/firebase.config";
  * counters — and two copies of a money path is one copy too many.
  */
 
-export type BackOutcome = "ok" | "missing" | "capped" | "broke";
+export type BackOutcome = "ok" | "missing" | "closed" | "capped" | "broke";
 
 export interface BackingRefs {
   /** The thing being backed. Must carry `voteCount` and `backerCount`. */
@@ -34,12 +34,17 @@ export async function backWithTokens(params: {
   costPerPoint: number;
   /** Stamped onto the ledger so a board read can name the backer in one query. */
   backer: { name: string; avatar: string | null };
+  /** Whether the item still takes tokens, judged on the copy read inside the
+   *  transaction — so a status flipped a moment ago cannot be outrun. */
+  accepts?: (item: Record<string, unknown>) => boolean;
 }): Promise<BackOutcome> {
-  const { uid, itemId, refs, amount, cap, costPerPoint, backer } = params;
+  const { uid, itemId, refs, amount, cap, costPerPoint, backer, accepts } =
+    params;
 
   return firestore.runTransaction(async (tx: Transaction) => {
     const item = await tx.get(refs.item);
     if (!item.exists) return "missing";
+    if (accepts && !accepts(item.data() ?? {})) return "closed";
 
     const ledger = await tx.get(refs.ledger);
     const user = await tx.get(userRef(uid));
@@ -195,6 +200,9 @@ export const backingError = (
   missing: string,
 ): { status: 400 | 402 | 404; error: string } => {
   if (outcome === "missing") return { status: 404, error: missing };
+  if (outcome === "closed") {
+    return { status: 400, error: "Voting on this one is closed" };
+  }
   if (outcome === "capped") {
     return {
       status: 400,

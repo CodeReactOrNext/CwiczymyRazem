@@ -7,6 +7,7 @@ import type {
   GuildTreasury,
 } from "feature/guilds/types/guild.types";
 import { rankDepositors } from "feature/guilds/utils/guildTreasury.utils";
+import { Landmark } from "lucide-react";
 import type { ReactNode } from "react";
 
 /**
@@ -56,7 +57,7 @@ const Depositors = ({
     "a member who left";
 
   return (
-    <p className='text-xs text-zinc-500'>
+    <p className='text-sm text-zinc-500'>
       Filled by{" "}
       {paid.slice(0, 6).map(({ uid, fame }, index) => (
         <span key={uid}>
@@ -106,6 +107,7 @@ export const GuildTreasuryPanel = ({
   return (
     <GuildSpendPanel
       currency='fame'
+      icon={Landmark}
       title="The guild's Fame"
       blurb={
         goal ? (
@@ -123,17 +125,18 @@ export const GuildTreasuryPanel = ({
       {/* One row: who has already filled it on the left, the ways to put in
           on the right — `ml-auto` rather than `justify-between` so the
           buttons still land on the right with nobody having paid in yet. */}
-      <div className='flex flex-wrap items-center gap-3'>
-        <Depositors treasury={treasury} members={members} />
+      <Depositors treasury={treasury} members={members} />
 
+      <div className='flex flex-wrap items-center gap-3'>
         {amounts.length === 0 ? (
-          <p className='ml-auto text-xs text-zinc-500'>
+          <p className='text-sm text-zinc-500'>
             Nothing in your own Fame this time.
           </p>
         ) : (
           <div
             title={`You have ${fame.toLocaleString()} Fame`}
-            className='ml-auto flex flex-wrap items-center justify-end gap-2'>
+            className='flex flex-wrap items-center gap-2'>
+            <span className='mr-1 text-sm text-zinc-400'>Put in</span>
             {amounts.map((amount) => (
               <PledgeButton
                 key={amount}
@@ -151,7 +154,7 @@ export const GuildTreasuryPanel = ({
       {action}
 
       {goal && treasury.fame !== towards && (
-        <p className='text-xs text-zinc-500'>
+        <p className='text-sm text-zinc-500'>
           {treasury.fame.toLocaleString()} Fame in the bank right now
           {treasury.spent > 0 &&
             `, ${treasury.spent.toLocaleString()} spent back when it could be`}

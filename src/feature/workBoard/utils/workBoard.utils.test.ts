@@ -9,6 +9,7 @@ import {
   isWorkStatus,
   nextOrder,
   sortWork,
+  splitWorkTitle,
   swapTargets,
 } from "./workBoard.utils";
 
@@ -120,5 +121,35 @@ describe("swapTargets", () => {
 
   it("returns nothing for an item that is not there", () => {
     expect(swapTargets(column, "ghost", "up")).toBeNull();
+  });
+});
+
+describe("splitWorkTitle", () => {
+  it("lifts a trailing roadmap marker into a tag", () => {
+    expect(
+      splitWorkTitle("Play in the style of Jimi Hendrix - Roadmap"),
+    ).toEqual({ title: "Play in the style of Jimi Hendrix", isRoadmap: true });
+  });
+
+  it("lifts a leading one too", () => {
+    expect(splitWorkTitle("Roadmap - Rhythm Guitar Basics")).toEqual({
+      title: "Rhythm Guitar Basics",
+      isRoadmap: true,
+    });
+  });
+
+  it("leaves other titles alone, including one that merely mentions it", () => {
+    expect(splitWorkTitle("Onboarding rework")).toEqual({
+      title: "Onboarding rework",
+      isRoadmap: false,
+    });
+    expect(splitWorkTitle("Roadmap refine mode")).toEqual({
+      title: "Roadmap refine mode",
+      isRoadmap: false,
+    });
+    expect(splitWorkTitle("Roadmap")).toEqual({
+      title: "Roadmap",
+      isRoadmap: false,
+    });
   });
 });

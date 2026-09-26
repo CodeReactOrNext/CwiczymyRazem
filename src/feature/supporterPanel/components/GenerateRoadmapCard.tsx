@@ -24,6 +24,7 @@ import {
   Lightbulb,
   Lock,
   Sparkles,
+  X,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useDeferredValue, useState } from "react";
@@ -202,10 +203,14 @@ export const GenerateRoadmapCard = ({
   const [level, setLevel] = useState<RoadmapLevel>("Intermediate");
   const [visibility, setVisibility] = useState<RoadmapVisibility>("public");
   const [context, setContext] = useState<RoadmapGoalContext>(EMPTY_CONTEXT);
+  // Folded to one bar until asked for: the form is a long way to scroll past
+  // for everyone who came to browse the roadmaps below it.
+  const [expanded, setExpanded] = useState(false);
   const { status, stage, progress, error, start, reset } = useGenerateRoadmap({
     onDone: (roadmapId) => {
       setTitle("");
       setGoal("");
+      setExpanded(false);
       reset();
       onGenerated(roadmapId);
     },
@@ -230,6 +235,41 @@ export const GenerateRoadmapCard = ({
     await start(title.trim(), goal.trim(), level, visibility, context);
   };
 
+  // A job in flight, or one that failed, always shows — folding it away would
+  // hide the only place that says what happened to the tokens.
+  if (!expanded && status === "idle") {
+    return (
+      <section className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-5 sm:flex-row sm:items-center sm:justify-between md:px-6'>
+        <div className='flex items-start gap-3.5'>
+          <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300'>
+            <Sparkles size={18} />
+          </span>
+          <div>
+            <h2 className='text-base font-bold text-white'>
+              Build a roadmap around your goal
+            </h2>
+            <p className='mt-0.5 text-sm text-zinc-400'>
+              Describe what you want to play — the coach lays out the phases,
+              exercises and songs.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type='button'
+          onClick={() => setExpanded(true)}
+          className='flex shrink-0 items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
+          <Sparkles size={15} />
+          Create a roadmap
+          <span className='ml-0.5 flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 tabular-nums'>
+            <SupportToken size={14} />
+            {roadmapGenerationCost("public")}
+          </span>
+        </button>
+      </section>
+    );
+  }
+
   return (
     <section className='rounded-lg bg-zinc-900/40 p-6 md:p-8'>
       <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
@@ -246,15 +286,27 @@ export const GenerateRoadmapCard = ({
           </p>
         </div>
 
-        {tokensLeft !== undefined && !running && (
-          <span className='flex w-fit shrink-0 items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 text-sm text-zinc-400'>
-            <SupportToken size={16} />
-            <span className='font-bold tabular-nums text-zinc-100'>
-              {tokensLeft}
+        <div className='flex shrink-0 items-center gap-2'>
+          {tokensLeft !== undefined && !running && (
+            <span className='flex w-fit items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 text-sm text-zinc-400'>
+              <SupportToken size={16} />
+              <span className='font-bold tabular-nums text-zinc-100'>
+                {tokensLeft}
+              </span>
+              {tokensLeft === 1 ? "token" : "tokens"} left
             </span>
-            {tokensLeft === 1 ? "token" : "tokens"} left
-          </span>
-        )}
+          )}
+          {status === "idle" && (
+            <button
+              type='button'
+              onClick={() => setExpanded(false)}
+              aria-label='Close the roadmap builder'
+              title='Close'
+              className='flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+              <X size={18} />
+            </button>
+          )}
+        </div>
       </div>
 
       {status === "idle" && (

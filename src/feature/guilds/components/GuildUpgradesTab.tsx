@@ -8,6 +8,7 @@ import {
   GUILD_MAX_STASH_ROWS,
 } from "feature/guilds/utils/guildUpgrades.utils";
 import { GUILD_SEATS_PER_UPGRADE } from "feature/supporterPanel/constants/supporterPanel.constants";
+import { Armchair, Rows3 } from "lucide-react";
 
 /**
  * Everything a guild pays into, in one place.
@@ -46,47 +47,49 @@ export const GuildUpgradesTab = ({
 
   return (
     <div className='space-y-8'>
-      <div className='space-y-1'>
-        <h2 className='text-lg font-bold text-zinc-100'>Upgrades</h2>
-        <p className='max-w-2xl text-sm text-zinc-400'>
-          Paid together. Anyone in the guild puts in, the pots buy their step
-          the moment they are covered, and nothing anybody put in is ever handed
-          back — it bought room the whole guild is standing in. Everything put
-          in earns <span className='font-semibold text-zinc-200'>honor</span>,
-          the guild&apos;s own currency, which is what gear on the shelf is
-          taken for.
+      <div className='space-y-1.5'>
+        <h2 className='text-xl font-bold text-white'>Upgrades</h2>
+        <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
+          Everyone chips in, and an upgrade buys itself the moment its pot is
+          full. Whatever you put in earns you{" "}
+          <span className='font-semibold text-purple-300'>honor</span> to spend
+          on the shelf.
         </p>
       </div>
 
-      <GuildFundBar
-        fund={guild.funds.seats}
-        title='More seats'
-        standing={
-          freeSeats === 0
-            ? `Every one of the ${guild.memberLimit} seats is taken`
-            : `${guild.memberCount} of ${guild.memberLimit} seats taken, room for ${freeSeats} more`
-        }
-        buys={`${GUILD_SEATS_PER_UPGRADE} more seats`}
-        maxed={`a guild tops out at ${GUILD_MAX_SEATS} seats`}
-        members={guild.members}
-        tokensLeft={tokensLeft}
-        busy={busy}
-        onPledge={(tokens) => fund.mutate({ track: "seats", tokens })}
-      />
+      <div className='grid gap-4 lg:grid-cols-2'>
+        <GuildFundBar
+          icon={Armchair}
+          fund={guild.funds.seats}
+          title='More seats'
+          standing={
+            freeSeats === 0
+              ? `All ${guild.memberLimit} seats taken`
+              : `${guild.memberCount} of ${guild.memberLimit} seats taken`
+          }
+          buys={`${GUILD_SEATS_PER_UPGRADE} more seats`}
+          maxed={`a guild tops out at ${GUILD_MAX_SEATS} seats`}
+          members={guild.members}
+          tokensLeft={tokensLeft}
+          busy={busy}
+          onPledge={(tokens) => fund.mutate({ track: "seats", tokens })}
+        />
 
-      <GuildFundBar
-        fund={guild.funds.stashRows}
-        title='Another shelf row'
-        standing={`The stash has ${guild.stashRowLimit} ${
-          guild.stashRowLimit === 1 ? "row" : "rows"
-        } of sockets`}
-        buys='one more row'
-        maxed={`a shelf tops out at ${GUILD_MAX_STASH_ROWS} rows`}
-        members={guild.members}
-        tokensLeft={tokensLeft}
-        busy={busy}
-        onPledge={(tokens) => fund.mutate({ track: "stashRows", tokens })}
-      />
+        <GuildFundBar
+          icon={Rows3}
+          fund={guild.funds.stashRows}
+          title='Another shelf row'
+          standing={`Stash has ${guild.stashRowLimit} ${
+            guild.stashRowLimit === 1 ? "row" : "rows"
+          }`}
+          buys='one more row'
+          maxed={`a shelf tops out at ${GUILD_MAX_STASH_ROWS} rows`}
+          members={guild.members}
+          tokensLeft={tokensLeft}
+          busy={busy}
+          onPledge={(tokens) => fund.mutate({ track: "stashRows", tokens })}
+        />
+      </div>
 
       <GuildTreasuryPanel
         treasury={guild.treasury}

@@ -84,3 +84,20 @@ export const GUILD_TAG_MESSAGES: Record<
   "too-short": `A tag is at least ${GUILD_TAG_MIN} characters`,
   "too-long": `A tag is at most ${GUILD_TAG_MAX} characters`,
 };
+
+/**
+ * The guild list as a ranking: quests cleared first — the one number every
+ * guild climbs the same way — then a fuller roster, then whoever got there
+ * first, so two guilds on the same level never swap places between renders.
+ */
+export const rankGuilds = <
+  T extends { level: number; memberCount: number; createdAt: string },
+>(
+  guilds: T[],
+): T[] =>
+  [...guilds].sort(
+    (a, b) =>
+      b.level - a.level ||
+      b.memberCount - a.memberCount ||
+      a.createdAt.localeCompare(b.createdAt),
+  );

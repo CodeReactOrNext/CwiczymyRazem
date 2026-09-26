@@ -14,6 +14,7 @@ import {
   GEAR_NAME_MAX,
   isGearKind,
   isProposableRarity,
+  isVotingOpen,
   rankProposals,
   safeImageUrl,
   sanitizeScrapBom,
@@ -66,6 +67,11 @@ const backingRef = (uid: string): DocumentReference =>
 const num = (value: unknown): number =>
   typeof value === "number" && Number.isFinite(value) ? value : 0;
 
+const asStatus = (value: unknown): ProposalStatus =>
+  PROPOSAL_STATUSES.includes(value as ProposalStatus)
+    ? (value as ProposalStatus)
+    : "open";
+
 const toProposal = (doc: DocumentSnapshot, backers: Backer[]): GearProposal => {
   const data = doc.data() ?? {};
   const createdAt = data.createdAt?.toDate?.() ?? null;
@@ -84,9 +90,7 @@ const toProposal = (doc: DocumentSnapshot, backers: Backer[]): GearProposal => {
     imageUrl: safeImageUrl(data.imageUrl),
     inscription: data.inscription ?? "",
     scrapBom: sanitizeScrapBom(kind, data.scrapBom),
-    status: PROPOSAL_STATUSES.includes(data.status as ProposalStatus)
-      ? (data.status as ProposalStatus)
-      : "open",
+    status: asStatus(data.status),
     authorUid: data.authorUid ?? "",
     authorName: data.authorName ?? "Supporter",
     voteCount: num(data.voteCount),
@@ -225,6 +229,8 @@ export async function backProposal(
     cap: MAX_BACKING_PER_GEAR,
     costPerPoint: GEAR_BACK_COST,
     backer: { name: session.displayName, avatar: session.avatar },
+    // Shipped or turned down: the vote is over, so the wallet stays shut.
+    accepts: (item) => isVotingOpen(asStatus(item.status)),
   });
 
   if (outcome !== "ok") {

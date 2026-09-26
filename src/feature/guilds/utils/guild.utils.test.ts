@@ -7,6 +7,7 @@ import {
   GUILD_TAG_MAX,
   guildSlug,
   normaliseTag,
+  rankGuilds,
 } from "./guild.utils";
 
 describe("guildSlug", () => {
@@ -67,5 +68,31 @@ describe("checkGuildTag", () => {
     // "r-!" normalises to "R", which is below the floor.
     expect(checkGuildTag("r-!")).toBe("too-short");
     expect(checkGuildTag("A".repeat(GUILD_TAG_MAX + 1))).toBe("too-long");
+  });
+});
+
+describe("rankGuilds", () => {
+  const guild = (
+    id: string,
+    level: number,
+    memberCount: number,
+    createdAt: string,
+  ) => ({ id, level, memberCount, createdAt });
+
+  it("puts the highest level first", () => {
+    const ranked = rankGuilds([
+      guild("low", 2, 18, "2026-01-01"),
+      guild("high", 9, 3, "2026-05-01"),
+    ]);
+    expect(ranked.map((g) => g.id)).toEqual(["high", "low"]);
+  });
+
+  it("breaks a level tie on members, then on who was founded first", () => {
+    const ranked = rankGuilds([
+      guild("young", 4, 5, "2026-06-01"),
+      guild("full", 4, 9, "2026-07-01"),
+      guild("old", 4, 5, "2026-02-01"),
+    ]);
+    expect(ranked.map((g) => g.id)).toEqual(["full", "old", "young"]);
   });
 });

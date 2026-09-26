@@ -3,6 +3,7 @@ import {
   PledgeButton,
 } from "feature/guilds/components/GuildSpendPanel";
 import type { GuildFund, GuildMember } from "feature/guilds/types/guild.types";
+import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 /**
@@ -24,6 +25,7 @@ import type { ReactNode } from "react";
 
 interface GuildFundBarProps {
   fund: GuildFund;
+  icon?: LucideIcon;
   /** What the track is, as the panel's title: "More seats", "Another shelf row". */
   title: ReactNode;
   /** Where the guild stands now, e.g. "Room for 2 more". */
@@ -64,7 +66,7 @@ const Patrons = ({
     "a member who left";
 
   return (
-    <p className='text-xs text-zinc-500'>
+    <p className='text-sm text-zinc-500'>
       Paid for by{" "}
       {paid.slice(0, 6).map(([uid, tokens], index) => (
         <span key={uid}>
@@ -80,6 +82,7 @@ const Patrons = ({
 
 export const GuildFundBar = ({
   fund,
+  icon,
   title,
   standing,
   buys,
@@ -94,10 +97,12 @@ export const GuildFundBar = ({
     return (
       <GuildSpendPanel
         currency='tokens'
+        icon={icon}
         title={title}
         blurb={
           <>
-            {standing} · {maxed}.
+            <p className='text-zinc-200'>{standing}</p>
+            <p>Maxed out — {maxed}.</p>
           </>
         }
         have={fund.pot}
@@ -114,25 +119,34 @@ export const GuildFundBar = ({
   return (
     <GuildSpendPanel
       currency='tokens'
+      icon={icon}
       title={title}
-      blurb={`Next step: ${buys}.`}
+      blurb={
+        <>
+          <p className='text-zinc-200'>{standing}</p>
+          <p>
+            Next step adds <span className='text-zinc-200'>{buys}</span>
+          </p>
+        </>
+      }
       have={fund.pot}
       need={fund.cost}
       className={className}>
       {/* One row: who has already put in on the left, the ways to put in on
           the right — `ml-auto` rather than `justify-between` so the buttons
           still land on the right with nothing on the left at all. */}
-      <div className='flex flex-wrap items-center gap-3'>
-        <Patrons pledges={fund.pledges} members={members} />
+      <Patrons pledges={fund.pledges} members={members} />
 
+      <div className='flex flex-wrap items-center gap-3'>
         {amounts.length === 0 ? (
-          <p className='ml-auto text-xs text-zinc-500'>
+          <p className='text-sm text-zinc-500'>
             Nothing left in your wallet this time.
           </p>
         ) : (
           <div
             title={`You have ${tokensLeft.toLocaleString()} tokens`}
-            className='ml-auto flex flex-wrap items-center justify-end gap-2'>
+            className='flex flex-wrap items-center gap-2'>
+            <span className='mr-1 text-sm text-zinc-400'>Chip in</span>
             {amounts.map((amount) => (
               <PledgeButton
                 key={amount}

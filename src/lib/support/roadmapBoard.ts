@@ -193,6 +193,8 @@ export async function backIdea(
     cap: MAX_BACKING_PER_IDEA,
     costPerPoint: IDEA_BACK_COST,
     backer: { name: session.displayName, avatar: session.avatar },
+    // Shipped or turned down: the vote is over, so the wallet stays shut.
+    accepts: (item) => item.status !== "shipped" && item.status !== "declined",
   });
 
   if (outcome !== "ok") {
