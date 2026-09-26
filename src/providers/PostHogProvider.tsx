@@ -19,6 +19,13 @@ export function PostHogProvider() {
         person_profiles: "identified_only",
         capture_pageview: false,
       });
+      // Electron loads riff.quest itself, and its user agent parses as plain Chrome,
+      // so without this super property desktop traffic is indistinguishable from web.
+      const desktopVersion = window.electronApp?.appVersion;
+      posthog.register({
+        platform: window.electronWindow ? "desktop" : "web",
+        ...(desktopVersion ? { desktop_version: desktopVersion } : {}),
+      });
       posthog.capture("$pageview");
     };
 
