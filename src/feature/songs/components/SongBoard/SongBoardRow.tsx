@@ -5,16 +5,12 @@ import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMa
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongPart } from "feature/songs/types/songs.type";
+import {
+  ARRANGEMENT_META,
+  formatPlayTime,
+  getPracticedArrangements,
+} from "feature/songs/utils/arrangements.utils";
 import { Heart, ListMusic, Music, Play } from "lucide-react";
-
-const formatPracticeTime = (ms: number) => {
-  const totalMinutes = Math.floor(ms / 60000);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  if (minutes > 0) return `${minutes}m`;
-  return "<1m";
-};
 
 const StatCell = ({
   label,
@@ -71,6 +67,7 @@ export const SongBoardRow = ({
   const lastPracticedAt = progress?.lastPracticedAt ?? null;
   const bestAccuracy = progress?.bestAccuracy ?? null;
   const hasPracticed = sessionCount > 0 || totalPracticeMs > 0;
+  const practicedArrangements = getPracticedArrangements(progress?.arrangements);
 
   const lastPracticeLabel = lastPracticedAt
     ? formatDistanceToNowStrict(lastPracticedAt, { addSuffix: true })
@@ -115,11 +112,25 @@ export const SongBoardRow = ({
               Map
             </Badge>
           )}
+          {practicedArrangements.map(({ arrangement, progress: slice }) => (
+            <span
+              key={arrangement}
+              title={`${ARRANGEMENT_META[arrangement].label}: ${formatPlayTime(slice.totalPracticeMs)}`}
+              className='inline-flex shrink-0 items-center gap-1.5 rounded bg-zinc-800/60 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-zinc-300'>
+              <span
+                aria-hidden
+                className={cn("h-1.5 w-1.5 rounded-full", ARRANGEMENT_META[arrangement].dot)}
+              />
+              <span className='hidden sm:inline'>{ARRANGEMENT_META[arrangement].label}</span>
+              <span className='sm:hidden'>{ARRANGEMENT_META[arrangement].short}</span>
+              <span className='text-zinc-400'>{formatPlayTime(slice.totalPracticeMs)}</span>
+            </span>
+          ))}
           <p className='min-w-0 truncate text-xs text-zinc-500 lg:hidden'>
             {hasPracticed ? (
               <>
                 {sessionCount} session{sessionCount === 1 ? "" : "s"} ·{" "}
-                {formatPracticeTime(totalPracticeMs)}
+                {formatPlayTime(totalPracticeMs)}
                 {lastPracticedAt && <> · {lastPracticeLabel}</>}
                 {bestAccuracy !== null && (
                   <>
@@ -170,7 +181,7 @@ export const SongBoardRow = ({
         />
         <StatCell
           label='Play time'
-          value={hasPracticed ? formatPracticeTime(totalPracticeMs) : "—"}
+          value={hasPracticed ? formatPlayTime(totalPracticeMs) : "—"}
           muted={!hasPracticed}
         />
         <StatCell

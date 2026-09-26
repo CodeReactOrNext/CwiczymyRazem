@@ -20,14 +20,21 @@ import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import Avatar from "components/UI/Avatar/Avatar";
 import { SongRecordingsSection } from "feature/recordings/components/SongRecordingsSection";
+import { ArrangementStrip } from "feature/songs/components/Arrangements/ArrangementStrip";
 import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
 import { MasteryBadge } from "feature/songs/components/SongSections/MasteryBadge";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { useVerifiedSongSectionMaps } from "feature/songs/hooks/useVerifiedSongSectionMaps";
 import { getUserSongMeta, saveUserSongMeta } from "feature/songs/services/songSections.service";
-import type { Song, SongPart } from "feature/songs/types/songs.type";
+import type { Song, SongArrangement, SongPart } from "feature/songs/types/songs.type";
 import type { MasteryLevel,SongSection } from "feature/songs/types/songSection.type";
 import { MASTERY_LABELS } from "feature/songs/types/songSection.type";
+import {
+  ARRANGEMENT_META,
+  getSectionMastery,
+  getSectionsMasteryPct,
+  setSectionMastery,
+} from "feature/songs/utils/arrangements.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { rateSong } from "feature/user/store/userSlice.asyncThunk";
@@ -67,7 +74,8 @@ interface SongDetailViewProps {
   onPractice: (song: Song) => void;
   onRemove: (songId: string) => void;
   onStatusChange: (songId: string, status: any, title: string, artist: string) => void;
-  onPartsChange?: (songId: string, parts: SongPart[]) => void;
+  /** `arrangement` set = the marks of that arrangement; unset = the song-level marks. */
+  onPartsChange?: (songId: string, parts: SongPart[], arrangement?: SongArrangement | null) => void;
   onBack?: () => void;
   /** Text on the back button. Defaults to the library context. */
   backLabel?: string;
@@ -130,6 +138,18 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
   const [raterProfiles, setRaterProfiles] = useState<Record<string, { displayName: string; avatar: string; lvl: number }>>({});
   
   const [optimisticRating, setOptimisticRating] = useState<number | null>(null);
+  // Keyed by song so switching songs falls back to the whole-song view
+  // without a reset effect.
+  const [arrangementPick, setArrangementPick] = useState<{
+    songId: string;
+    arrangement: SongArrangement | null;
+  } | null>(null);
+  const selectedArrangement =
+    arrangementPick?.songId === song.id ? arrangementPick.arrangement : null;
+  const arrangementParts = selectedArrangement
+    ? progress?.arrangements?.[selectedArrangement]?.parts
+    : progress?.parts;
+  const selectedParts = useMemo<SongPart[]>(() => arrangementParts ?? [], [arrangementParts]);
 
   const avgDifficulty = song.avgDifficulty || 0;
   const persistedRating = song.difficulties?.find(d => d.userId === userAuth)?.rating;
@@ -237,42 +257,45 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
 
   const masteryData = useMemo(() => {
     if (!sections || sections.length === 0) return null;
+    const levels = sections.map((s) => getSectionMastery(s, selectedArrangement));
     const totalSections = sections.length;
-    const masteredCount = sections.filter(s => s.mastery === 3).length;
+    const masteredCount = levels.filter((level) => level === 3).length;
     const counts = ([0, 1, 2, 3] as MasteryLevel[]).map(level => ({
       level,
       name: MASTERY_LABELS[level],
-      value: sections.filter(s => s.mastery === level).length
+      value: levels.filter((l) => l === level).length
     })).filter(c => c.value > 0);
 
-    const totalWeighted = sections.reduce((acc, s) => acc + (s.mastery / 3), 0);
-    const progressPct = Math.round((totalWeighted / totalSections) * 100);
+    const progressPct = getSectionsMasteryPct(sections, selectedArrangement) ?? 0;
 
     return { counts, progressPct, totalSections, masteredCount };
-  }, [sections]);
+  }, [sections, selectedArrangement]);
 
   const handleSectionMasteryChange = (id: string, mastery: MasteryLevel) => {
-    setSections((prev) => prev.map((s) => (s.id === id ? { ...s, mastery } : s)));
+    setSections((prev) =>
+      prev.map((s) => (s.id === id ? setSectionMastery(s, selectedArrangement, mastery) : s))
+    );
   };
 
   // Auto-mark the coarse "can play" flags once section mastery implies them:
   // any mastered section counts as a riff/fragment, a mastered section named
   // "solo" covers the solo mark, and mastering every section covers the whole song.
+  // Scoped to the arrangement on screen — mastering the lead's solo marks the lead.
   useEffect(() => {
     if (!onPartsChange || !status || sections.length === 0) return;
-    const currentParts: SongPart[] = progress?.parts ?? [];
-    const impliedParts = new Set<SongPart>(currentParts);
+    const isMastered = (s: SongSection) => getSectionMastery(s, selectedArrangement) === 3;
+    const impliedParts = new Set<SongPart>(selectedParts);
 
-    if (sections.some((s) => s.mastery === 3)) impliedParts.add("riff");
-    if (sections.some((s) => s.mastery === 3 && s.name.toLowerCase().includes("solo"))) {
+    if (sections.some(isMastered)) impliedParts.add("riff");
+    if (sections.some((s) => isMastered(s) && s.name.toLowerCase().includes("solo"))) {
       impliedParts.add("solo");
     }
-    if (sections.every((s) => s.mastery === 3)) impliedParts.add("wholeSong");
+    if (sections.every(isMastered)) impliedParts.add("wholeSong");
 
-    if (impliedParts.size > currentParts.length) {
-      onPartsChange(song.id, Array.from(impliedParts));
+    if (impliedParts.size > selectedParts.length) {
+      onPartsChange(song.id, Array.from(impliedParts), selectedArrangement);
     }
-  }, [sections, progress?.parts, onPartsChange, status, song.id]);
+  }, [sections, selectedParts, selectedArrangement, onPartsChange, status, song.id]);
 
   const totalHours = progress ? Math.floor(progress.totalPracticeMs / 3600000) : 0;
   const totalMinutes = progress ? Math.floor((progress.totalPracticeMs % 3600000) / 60000) : 0;
@@ -463,6 +486,15 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
       {/* Content Section */}
       <div className="p-4 md:p-6 lg:p-8">
          
+         {status && (
+           <ArrangementStrip
+             progress={progress}
+             sections={sections}
+             selected={selectedArrangement}
+             onSelect={(arrangement) => setArrangementPick({ songId: song.id, arrangement })}
+           />
+         )}
+
          {/* Spotify Preview */}
          {song.spotifyId && (
            <div className="animate-in fade-in slide-in-from-top-4 duration-500 mb-6 max-w-md">
@@ -641,8 +673,16 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
              <div className="w-full space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                    <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-zinc-300">
-                         Song mastery
+                      <span className="flex items-center gap-2 text-sm font-semibold text-zinc-300">
+                         {selectedArrangement && (
+                           <span
+                             aria-hidden
+                             className={cn("h-2 w-2 rounded-full", ARRANGEMENT_META[selectedArrangement].dot)}
+                           />
+                         )}
+                         {selectedArrangement
+                           ? `${ARRANGEMENT_META[selectedArrangement].label} mastery`
+                           : "Song mastery"}
                       </span>
                       <p className="text-xs font-medium text-zinc-500 mt-1">
                          {masteryData ? "Practice progression" : "Map sections to track your progression"}
@@ -656,8 +696,12 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                       )}
                       {status && (
                         <SongPartMarks
-                           parts={progress?.parts ?? []}
-                           onChange={onPartsChange ? (parts) => onPartsChange(song.id, parts) : undefined}
+                           parts={selectedParts}
+                           onChange={
+                             onPartsChange
+                               ? (parts) => onPartsChange(song.id, parts, selectedArrangement)
+                               : undefined
+                           }
                            size="lg"
                         />
                       )}
@@ -711,13 +755,13 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                            key={s.id}
                            className={cn(
                              "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors",
-                             s.mastery === 3 ? "bg-green-500/5" : "bg-black/20"
+                             getSectionMastery(s, selectedArrangement) === 3 ? "bg-green-500/5" : "bg-black/20"
                            )}
                          >
                             <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
                             <span className="flex-1 truncate text-sm font-semibold text-zinc-200">{s.name}</span>
                             <MasteryBadge
-                               mastery={s.mastery}
+                               mastery={getSectionMastery(s, selectedArrangement)}
                                onChange={(m) => handleSectionMasteryChange(s.id, m)}
                             />
                          </div>

@@ -18,6 +18,13 @@ export type SongStatus = "wantToLearn" | "learning" | "learned";
 /** Parts of a song a user can mark as playable: the riff/fragment, the solo, or the whole song. */
 export type SongPart = "riff" | "solo" | "wholeSong";
 
+/**
+ * Which guitar part of a song the player practises — Rocksmith-style
+ * arrangements. Each one keeps its own play time, sessions, part marks and
+ * section mastery; the song-level figures stay the sum of all of them.
+ */
+export type SongArrangement = "lead" | "rhythm" | "bass";
+
 export interface Song {
   id: string;
   title: string;

@@ -2,6 +2,8 @@ import { Button } from "assets/components/ui/button";
 import { Checkbox } from "assets/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription,DialogFooter, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
 import { Slider } from "assets/components/ui/slider";
+import { ArrangementPicker } from "feature/songs/components/Arrangements/ArrangementPicker";
+import type { SongArrangement } from "feature/songs/types/songs.type";
 import { useTranslation } from "hooks/useTranslation";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -14,6 +16,9 @@ interface TimeSplitterModalProps {
   onCancel: () => void;
   songTitle: string;
   isLoading?: boolean;
+  /** When given, the modal also asks which arrangement the time goes to. */
+  arrangement?: SongArrangement | null;
+  onArrangementChange?: (arrangement: SongArrangement | null) => void;
 }
 
 export const TimeSplitterModal = ({
@@ -23,6 +28,8 @@ export const TimeSplitterModal = ({
   onCancel,
   songTitle,
   isLoading = false,
+  arrangement,
+  onArrangementChange,
 }: TimeSplitterModalProps) => {
   const { t } = useTranslation("timer");
   const [splitRatio, setSplitRatio] = useState(50); // 0 = 100% Hearing, 100 = 100% Technique
@@ -46,6 +53,17 @@ export const TimeSplitterModal = ({
         </DialogHeader>
         
         <div className="py-6 space-y-6">
+            {onArrangementChange && (
+                <div className="space-y-2">
+                    <p className="text-xs font-semibold text-zinc-400">Which part did you play?</p>
+                    <ArrangementPicker
+                        value={arrangement ?? null}
+                        onChange={onArrangementChange}
+                        noneLabel="Any part"
+                    />
+                </div>
+            )}
+
             <div className="flex justify-between items-center text-sm font-bold uppercase tracking-wider">
                 <span className={splitRatio < 50 ? "text-cyan-400" : "text-zinc-500"}>{t("time_splitter.hearing")}</span>
                 <span className={splitRatio > 50 ? "text-amber-400" : "text-zinc-500"}>{t("time_splitter.technique")}</span>

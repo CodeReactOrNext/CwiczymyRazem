@@ -1,6 +1,7 @@
 import type { MetronomeGrid } from "feature/exercisePlan/components/Metronome/utils/meterGrid";
 import type { EarQuizConfig } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import type { GuitarSkillId } from "feature/skills/skills.types";
+import type { SongArrangement } from "feature/songs/types/songs.type";
 import type { StaticImageData } from "next/image";
 
 
@@ -350,6 +351,8 @@ export interface ExercisePlan {
     id: string;
     title: string;
     artist: string;
+    /** Arrangement (lead / rhythm / bass) the session's time is booked on. */
+    arrangement?: SongArrangement;
   };
 }
 

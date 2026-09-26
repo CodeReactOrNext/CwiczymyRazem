@@ -1,3 +1,5 @@
+import type { SongArrangement } from "feature/songs/types/songs.type";
+
 import type { ReportSongEntry } from "../ReportView.types";
 
 /** The subset of a song the report form needs to identify it in the picker. */
@@ -16,6 +18,8 @@ export interface SessionSong {
 export interface PickedSong extends SessionSong {
   techniqueMinutes: number;
   hearingMinutes: number;
+  /** Which part of the song was played; unset = the time only counts for the song as a whole. */
+  arrangement?: SongArrangement;
 }
 
 export const MINUTE_MS = 60_000;
@@ -38,7 +42,9 @@ export const DEFAULT_TECHNIQUE_MINUTES = 5;
 /** Formik's `reportTitle` is capped at 120 chars by `RaportSchema`. */
 const TITLE_MAX_LENGTH = 120;
 
-export const createPickedSong = (song: SessionSong): PickedSong => ({
+export const createPickedSong = (
+  song: SessionSong & { arrangement?: SongArrangement }
+): PickedSong => ({
   ...song,
   techniqueMinutes: DEFAULT_TECHNIQUE_MINUTES,
   hearingMinutes: 0,
@@ -68,6 +74,9 @@ export const toReportSongEntries = (songs: PickedSong[]): ReportSongEntry[] =>
       techniqueMs: song.techniqueMinutes * MINUTE_MS,
       hearingMs: song.hearingMinutes * MINUTE_MS,
       practiceMs: songTotalMinutes(song) * MINUTE_MS,
+      // Only set when picked — the entry is saved on the report, and Firestore
+      // rejects undefined fields.
+      ...(song.arrangement && { arrangement: song.arrangement }),
     }));
 
 /**

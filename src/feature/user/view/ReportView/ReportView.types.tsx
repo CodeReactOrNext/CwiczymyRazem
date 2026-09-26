@@ -1,3 +1,5 @@
+import type { SongArrangement } from "feature/songs/types/songs.type";
+
 export type HabbitsType =
   | "exercise_plan"
   | "new_things"
@@ -19,6 +21,8 @@ export interface ReportSongEntry {
   practiceMs: number;
   techniqueMs: number;
   hearingMs: number;
+  /** The arrangement (lead / rhythm / bass) the time goes to, when the player picked one. */
+  arrangement?: SongArrangement;
 }
 
 export interface ReportFormikInterface {

@@ -1,4 +1,9 @@
-import type { SongPart } from "feature/songs/types/songs.type";
+import type { SongArrangement, SongPart } from "feature/songs/types/songs.type";
+import {
+  type ArrangementProgressMap,
+  parseArrangement,
+  toArrangementProgressMap,
+} from "feature/songs/utils/arrangements.utils";
 import {
   collection,
   doc,
@@ -23,6 +28,14 @@ export interface UserSongProgress {
   sessionCount: number;
   /** Parts of the song the user marked as playable (riff / solo / whole song). */
   parts: SongPart[];
+  /**
+   * Per-arrangement slice of the figures above (lead / rhythm / bass). Time
+   * logged without an arrangement only lands in the song-level totals, so the
+   * totals are always ≥ the sum of these.
+   */
+  arrangements: ArrangementProgressMap;
+  /** The arrangement practised last — preselected next time. */
+  lastArrangement: SongArrangement | null;
   updatedAt: Date;
 }
 
@@ -40,6 +53,8 @@ const toProgress = (songId: string, data: Record<string, any>): UserSongProgress
   lastAccuracy: data.lastAccuracy ?? null,
   sessionCount: data.sessionCount ?? 0,
   parts: data.parts ?? [],
+  arrangements: toArrangementProgressMap(data.arrangements),
+  lastArrangement: parseArrangement(data.lastArrangement) ?? null,
   updatedAt: data.updatedAt?.toDate?.() ?? new Date(),
 });
 
@@ -97,12 +112,27 @@ export const updateSongParts = async (
   );
 };
 
+/** "I can play this" marks of a single arrangement — the song-level marks stay untouched. */
+export const updateArrangementParts = async (
+  userId: string,
+  songId: string,
+  arrangement: SongArrangement,
+  parts: SongPart[]
+): Promise<void> => {
+  await setDoc(
+    progressRef(userId, songId),
+    { songId, arrangements: { [arrangement]: { parts } }, updatedAt: serverTimestamp() },
+    { merge: true }
+  );
+};
+
 export const recordPracticeSession = async (
   userId: string,
   songId: string,
   sessionMs: number,
   accuracy: number | null,
-  currentBestAccuracy: number | null
+  currentBestAccuracy: number | null,
+  arrangement?: SongArrangement
 ): Promise<void> => {
   const updates: Record<string, any> = {
     songId,
@@ -111,6 +141,20 @@ export const recordPracticeSession = async (
     lastPracticedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };
+
+  // The arrangement gets its own slice on top of the song totals. Increments
+  // only — merge deep-merges the nested map, so the other arrangements and
+  // this one's part marks survive.
+  if (arrangement) {
+    updates.lastArrangement = arrangement;
+    updates.arrangements = {
+      [arrangement]: {
+        totalPracticeMs: increment(sessionMs),
+        sessionCount: increment(1),
+        lastPracticedAt: serverTimestamp(),
+      },
+    };
+  }
 
   if (accuracy !== null) {
     updates.lastAccuracy = accuracy;

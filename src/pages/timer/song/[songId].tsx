@@ -1,7 +1,8 @@
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal";
 import { ensureSongIsLearning,updateSongStatus } from "feature/songs/services/udateSongStatus";
-import type { Song } from "feature/songs/types/songs.type";
+import type { Song, SongArrangement } from "feature/songs/types/songs.type";
+import { parseArrangement } from "feature/songs/utils/arrangements.utils";
 import { resolveSongsReturnPath } from "feature/songs/utils/songsReturnPath";
 import { selectCurrentUserStats, selectPreviousUserStats, selectRaitingData,selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { setActivity } from "feature/user/store/userSlice";
@@ -26,6 +27,10 @@ import { db } from "utils/firebase/client/firebase.utils";
 const SongPracticeTimer: NextPageWithLayout = () => {
     const router = useRouter();
     const { songId, returnTo } = router.query;
+    // Picked in the practice-mode modal; can still be changed when saving.
+    const [arrangement, setArrangement] = useState<SongArrangement | null>(
+        () => parseArrangement(router.query.arrangement) ?? null
+    );
     // Songs are practised in a run — finishing one should leave the user on the
     // songs page, ready to pick the next one, not on the dashboard.
     const songsReturnPath = resolveSongsReturnPath(returnTo);
@@ -140,7 +145,14 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             // gates the "learned" points awarded below.
             if (userId) {
                 const { recordPracticeSession } = await import("feature/songs/services/userSongProgress.service");
-                await recordPracticeSession(userId, song.id, techniqueTime + hearingTime, null, null);
+                await recordPracticeSession(
+                    userId,
+                    song.id,
+                    techniqueTime + hearingTime,
+                    null,
+                    null,
+                    arrangement ?? undefined
+                );
             }
 
             if (markAsLearned && userId) {
@@ -272,6 +284,8 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 onConfirm={handleConfirmSplit}
                 onCancel={() => setIsSplitterOpen(false)}
                 isLoading={isSubmitting}
+                arrangement={arrangement}
+                onArrangementChange={setArrangement}
             />
         </>
     );

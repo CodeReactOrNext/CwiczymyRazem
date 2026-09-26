@@ -191,7 +191,14 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
             // abort the song-item bookkeeping below into the outer catch.
             try {
               const { recordPracticeSession } = await import('feature/songs/services/userSongProgress.service');
-              await recordPracticeSession(userAuth as string, plan.song.id, totalMs, null, null);
+              await recordPracticeSession(
+                userAuth as string,
+                plan.song.id,
+                totalMs,
+                null,
+                null,
+                plan.song.arrangement
+              );
             } catch (error) {
               console.error('Failed to record song practice progress:', error);
             }

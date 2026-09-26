@@ -7,6 +7,8 @@ import Backdrop from "components/UI/Backdrop";
 import { isAutoPlanId, isRecognizedPracticePlanId } from "feature/exercisePlan/utils/isRecognizedPracticePlan";
 import { ensureSongIsLearning } from "feature/songs/services/udateSongStatus";
 import { recordPracticeSession } from "feature/songs/services/userSongProgress.service";
+import type { SongArrangement } from "feature/songs/types/songs.type";
+import { parseArrangement } from "feature/songs/utils/arrangements.utils";
 import {
   selectCurrentUserStats,
   selectIsFetching,
@@ -96,6 +98,7 @@ const ReportView = () => {
             id: songId as string,
             title: songTitle as string,
             artist: (songArtist as string) ?? "",
+            arrangement: parseArrangement(router.query.arrangement),
           }),
         ]
       : []
@@ -303,6 +306,14 @@ const ReportView = () => {
     applySongTimes(nextSongs, setFieldValue);
   };
 
+  const setSongArrangement = (pickedId: string, arrangement: SongArrangement | null) => {
+    setPickedSongs((songs) =>
+      songs.map((song) =>
+        song.id === pickedId ? { ...song, arrangement: arrangement ?? undefined } : song
+      )
+    );
+  };
+
   const switchSessionMode = (mode: SessionMode, setFieldValue: SetFieldValue) => {
     setSessionMode(mode);
 
@@ -396,7 +407,8 @@ const ReportView = () => {
               song.songId,
               song.practiceMs,
               null,
-              null
+              null,
+              song.arrangement
             );
             await ensureSongIsLearning(
               userAuth,
@@ -656,6 +668,7 @@ const ReportView = () => {
                         onSetMinutes={(pickedId, category, minutes) =>
                           setSongMinutes(pickedId, category, minutes, setFieldValue)
                         }
+                        onSetArrangement={setSongArrangement}
                       />
                     ) : (
                       <>

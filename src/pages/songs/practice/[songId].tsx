@@ -9,6 +9,7 @@ import {
   type UserSongProgress,
 } from "feature/songs/services/userSongProgress.service";
 import type { Song } from "feature/songs/types/songs.type";
+import { parseArrangement } from "feature/songs/utils/arrangements.utils";
 import { resolveSongsReturnPath } from "feature/songs/utils/songsReturnPath";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { doc, getDoc } from "firebase/firestore";
@@ -28,6 +29,7 @@ type PageState =
 export default function SongPracticePage() {
   const router = useRouter();
   const { songId } = router.query;
+  const arrangement = parseArrangement(router.query.arrangement);
   const userId = useAppSelector(selectUserAuth);
   const userAvatar = useAppSelector(selectUserAvatar);
 
@@ -91,7 +93,12 @@ export default function SongPracticePage() {
           exercises: [exercise],
           userId: "system",
           image: null,
-          song: { id: song.id, title: song.title, artist: song.artist },
+          song: {
+            id: song.id,
+            title: song.title,
+            artist: song.artist,
+            ...(arrangement && { arrangement }),
+          },
         };
 
         setPageState({ status: "ready", song, plan, rawGpFile, progress });
@@ -101,7 +108,7 @@ export default function SongPracticePage() {
     };
 
     load();
-  }, [songId, userId]);
+  }, [songId, userId, arrangement]);
 
   const handleFinish = async () => {
     setIsFinishing(true);

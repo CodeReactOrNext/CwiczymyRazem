@@ -70,6 +70,17 @@ describe("toReportSongEntries", () => {
     ]);
   });
 
+  it("carries the picked arrangement, and leaves the key out when none was picked", () => {
+    const [lead, unassigned] = toReportSongEntries([
+      { ...picked("a", 10), arrangement: "lead" },
+      picked("b", 10),
+    ]);
+
+    expect(lead.arrangement).toBe("lead");
+    // Firestore rejects undefined fields, so the key must not exist at all.
+    expect("arrangement" in unassigned).toBe(false);
+  });
+
   it("drops songs left at zero — they were picked but not practised", () => {
     const entries = toReportSongEntries([picked("a", 10), picked("b", 0, 0)]);
 

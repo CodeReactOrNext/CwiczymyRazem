@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import { ArrangementPicker } from "feature/songs/components/Arrangements/ArrangementPicker";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
-import type { Song } from "feature/songs/types/songs.type";
+import type { Song, SongArrangement } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import {
   Check,
@@ -43,6 +44,8 @@ interface SessionSongPickerProps {
   selected: PickedSong[];
   onToggle: (song: SessionSong) => void;
   onSetMinutes: (songId: string, category: SongCategory, minutes: number) => void;
+  /** Which part of the song got the time; omit to hide the picker. */
+  onSetArrangement?: (songId: string, arrangement: SongArrangement | null) => void;
 }
 
 /** Snaps to the next/previous multiple of the step, so 7m → 10m → 5m → 0m. */
@@ -167,11 +170,13 @@ const PickedSongRow = ({
   song,
   coverUrl,
   onSetMinutes,
+  onSetArrangement,
   onRemove,
 }: {
   song: PickedSong;
   coverUrl?: string;
   onSetMinutes: (category: SongCategory, minutes: number) => void;
+  onSetArrangement?: (arrangement: SongArrangement | null) => void;
   onRemove: () => void;
 }) => (
   <div className='rounded-lg bg-zinc-800/40 p-3'>
@@ -211,6 +216,16 @@ const PickedSongRow = ({
         onChange={(minutes) => onSetMinutes("hearing", minutes)}
       />
     </div>
+
+    {onSetArrangement && (
+      <ArrangementPicker
+        value={song.arrangement ?? null}
+        onChange={onSetArrangement}
+        noneLabel='Any part'
+        size='sm'
+        className='mt-3'
+      />
+    )}
   </div>
 );
 
@@ -273,6 +288,7 @@ const SessionSongPicker = ({
   selected,
   onToggle,
   onSetMinutes,
+  onSetArrangement,
 }: SessionSongPickerProps) => {
   const [query, setQuery] = useState("");
   const [isAdding, setIsAdding] = useState(false);
@@ -381,6 +397,11 @@ const SessionSongPicker = ({
                 coverUrl={coverById.get(song.id)}
                 onSetMinutes={(category, minutes) =>
                   onSetMinutes(song.id, category, minutes)
+                }
+                onSetArrangement={
+                  onSetArrangement
+                    ? (arrangement) => onSetArrangement(song.id, arrangement)
+                    : undefined
                 }
                 onRemove={() => onToggle(song)}
               />

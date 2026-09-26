@@ -1,6 +1,7 @@
 import { Dialog, DialogContent } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { ArrangementPicker } from "feature/songs/components/Arrangements/ArrangementPicker";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import {
   getUserGpFiles,
@@ -8,7 +9,7 @@ import {
   type UserGpFile,
 } from "feature/songs/services/userGpFiles.service";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
-import type { Song } from "feature/songs/types/songs.type";
+import type { Song, SongArrangement } from "feature/songs/types/songs.type";
 import {
   ArrowLeft,
   ChevronRight,
@@ -53,19 +54,25 @@ export function SongPracticePickerModal({
   const [phase, setPhase] = useState<Phase>("pick");
   const [attachTab, setAttachTab] = useState<AttachTab>("library");
   const [isDetaching, setIsDetaching] = useState(false);
+  // Rocksmith-style: the part being played is picked before the mode, so every
+  // route below books its time on that arrangement. Starts on the last one played.
+  const [arrangement, setArrangement] = useState<SongArrangement | null>(
+    progress?.lastArrangement ?? null
+  );
 
   const hasGpFile = !!progress?.gpFileId;
+  const arrangementQuery = arrangement ? `?arrangement=${arrangement}` : "";
 
   const handleFreePractice = () => {
     onClose();
-    router.push(`/timer/song/${song.id}`);
+    router.push(`/timer/song/${song.id}${arrangementQuery}`);
   };
 
   const handleGp5Practice = () => {
     if (!isPremium) return;
     if (hasGpFile) {
       onClose();
-      router.push(`/songs/practice/${song.id}`);
+      router.push(`/songs/practice/${song.id}${arrangementQuery}`);
     } else {
       setPhase("attach");
     }
@@ -81,6 +88,7 @@ export function SongPracticePickerModal({
         songId: song.id,
         songTitle: song.title,
         songArtist: song.artist,
+        ...(arrangement && { arrangement }),
         returnTo: router.asPath,
       },
     });
@@ -102,7 +110,7 @@ export function SongPracticePickerModal({
     await onAttachGpFile(song.id, gpFileId, gpFileName);
     toast.success("GP file attached!");
     onClose();
-    router.push(`/songs/practice/${song.id}`);
+    router.push(`/songs/practice/${song.id}${arrangementQuery}`);
   };
 
   return (
@@ -132,6 +140,15 @@ export function SongPracticePickerModal({
         {/* Pick phase */}
         {phase === "pick" && (
           <div className="space-y-3 p-5">
+            <div className="space-y-2 pb-3">
+              <p className="text-xs font-semibold text-zinc-400">Which part are you playing?</p>
+              <ArrangementPicker
+                value={arrangement}
+                onChange={setArrangement}
+                noneLabel="Any part"
+              />
+            </div>
+
             {/* Free practice */}
             <button
               onClick={handleFreePractice}
