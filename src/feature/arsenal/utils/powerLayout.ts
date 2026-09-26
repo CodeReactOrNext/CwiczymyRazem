@@ -368,7 +368,8 @@ export const dcJackAt = (
   yPct: number,
   wPct: number,
   jack: { x: number; y: number },
-): Point => toView(geo, xPct + wPct * jack.x, yPct + geo.pedalHPct * jack.y);
+  hPct = geo.pedalHPct,
+): Point => toView(geo, xPct + wPct * jack.x, yPct + hPct * jack.y);
 
 /**
  * The height of the strip the rail occupies, as a share of the deck's width —

@@ -189,6 +189,11 @@ export const EffectCard = ({
             style={{ color: rs.baseColor, opacity: 0.7 }}>
             {rarity} · {effect.type}
           </p>
+          {effect.description && (
+            <p className='mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-400'>
+              {effect.description}
+            </p>
+          )}
         </div>
 
         {item.serial != null && (

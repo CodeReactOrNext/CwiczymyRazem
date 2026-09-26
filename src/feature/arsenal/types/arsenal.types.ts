@@ -38,7 +38,25 @@ export interface EffectJackLayout {
    * power. The enclosures carrying their whole socket strip up there put it at
    * the end of that strip instead, so their DC cable has to be told.
    */
-  dc?: { x: number; y: number };
+  dc?: {
+    x: number;
+    y: number;
+    /**
+     * `y` is where a stepped enclosure's top edge is rather than a socket set
+     * into its face: the plug stands on that edge at its ordinary length.
+     */
+    edge?: boolean;
+  };
+  /**
+   * How far the signal sockets' nuts stand proud of the case, as a fraction of
+   * the pedal's width, when the artwork draws them long enough to matter.
+   *
+   * `in` and `out` stay on the tip of the nut, which is what the cable is routed
+   * to; the plug is pushed on past it to the case wall and drawn over the
+   * artwork, covering the nut the way a seated plug does. Drawn under it, as
+   * every other plug is, the nut would be painted over the plug's tip.
+   */
+  nut?: number;
 }
 
 export interface EffectDefinition {
@@ -46,6 +64,8 @@ export interface EffectDefinition {
   name: string;
   brand: string;
   type: EffectType;
+  /** Short player-facing description shown on the effect card. */
+  description?: string;
   imageId: number | string;
   rarity: GuitarRarity;
   /** Where its sockets sit. Absent means the ordinary side-mounted pair. */
@@ -61,6 +81,8 @@ export interface EffectDefinition {
   countries?: string[];
   /** Flat Item Level bonus for outsized units (e.g. wide multi-effect enclosures). */
   levelBonus?: number;
+  /** Physical size relative to a standard pedal on the board. */
+  boardScale?: number;
 }
 
 /**

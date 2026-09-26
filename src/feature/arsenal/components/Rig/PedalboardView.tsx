@@ -63,6 +63,7 @@ import {
   findFreeSpot,
   findSwapTarget,
   geometryFor,
+  heightPctFor,
   inChainOrder,
   layoutBoard,
   packInOrder,
@@ -339,8 +340,9 @@ export const PedalboardView = ({
         xPct: i.xPct,
         yPct: i.yPct,
         wPct: widthOfRef.current(i.itemId),
+        hPct: heightPctFor(geo, widthOfRef.current, i.itemId),
       }));
-  }, []);
+  }, [geo]);
 
   /** Applies a computed layout: board positions, parked pedals and the save. */
   const applyLayout = useCallback(
@@ -549,7 +551,7 @@ export const PedalboardView = ({
           point.x >= left &&
           point.x <= left + (widthOf(item.itemId) / 100) * geo.viewW &&
           point.y >= top &&
-          point.y <= top + (geo.pedalHPct / 100) * geo.viewH
+          point.y <= top + (heightPctFor(geo, widthOf, item.itemId) / 100) * geo.viewH
         );
       }) ?? null,
     [boardItems, geo, widthOf],
@@ -665,7 +667,7 @@ export const PedalboardView = ({
         drag = {
           ...drag,
           active: true,
-          offYPct: grabOffsetY(e.pointerType, drag.offYPct, geo.pedalHPct),
+          offYPct: grabOffsetY(e.pointerType, drag.offYPct, heightPctFor(geo, widthOfRef.current, drag.itemId)),
         };
         setDragging(drag);
         onHover?.(null, null);
@@ -674,6 +676,7 @@ export const PedalboardView = ({
       const { itemId } = drag;
       const rect = boardRef.current.getBoundingClientRect();
       const wPct = widthOfRef.current(itemId);
+      const hPct = heightPctFor(geo, widthOfRef.current, itemId);
       // A pedal in the air goes wherever the hand takes it — neighbours are
       // traded with rather than bumped into, so nothing is in its way.
       const xPct = Math.max(
@@ -686,7 +689,7 @@ export const PedalboardView = ({
       const yPct = Math.max(
         0,
         Math.min(
-          100 - geo.pedalHPct,
+          100 - hPct,
           ((e.clientY - rect.top) / rect.height) * 100 - drag.offYPct,
         ),
       );
@@ -701,11 +704,11 @@ export const PedalboardView = ({
       // one just vacated. That is the whole of reordering the board — no
       // shuffling anything out of the way first.
       const others = boardBoxes(itemId);
-      const target = findSwapTarget(geo, { xPct, yPct, wPct }, others);
+      const target = findSwapTarget(geo, { xPct, yPct, wPct, hPct }, others);
       if (target && target.itemId !== drag.lockedId) {
         const plan = planSwap(
           geo,
-          { ...home, wPct },
+          { ...home, wPct, hPct },
           target,
           others.filter((box) => box.itemId !== target.itemId),
         );
@@ -736,10 +739,11 @@ export const PedalboardView = ({
         xPct: i.xPct,
         yPct: i.yPct,
         wPct: widthOfRef.current(i.itemId),
+        hPct: heightPctFor(geo, widthOfRef.current, i.itemId),
       }));
       setIsColliding(
-        collidesWithAny(geo, { xPct, yPct, wPct }, boxes) &&
-          collidesWithAny(geo, { ...home, wPct }, boxes),
+        collidesWithAny(geo, { xPct, yPct, wPct, hPct }, boxes) &&
+          collidesWithAny(geo, { ...home, wPct, hPct }, boxes),
       );
 
       setLocalItems(next);
@@ -771,6 +775,7 @@ export const PedalboardView = ({
       const prev = localItemsRef.current;
       const dropped = prev.find((i) => i.itemId === itemId);
       const wPct = widthOfRef.current(itemId);
+      const hPct = heightPctFor(geo, widthOfRef.current, itemId);
       const others = boardBoxes(itemId);
       const settleAt = (spot: { xPct: number; yPct: number }) =>
         prev.map((item) =>
@@ -779,8 +784,8 @@ export const PedalboardView = ({
       let next = prev;
 
       if (dropped) {
-        const box = { xPct: dropped.xPct, yPct: dropped.yPct, wPct };
-        const homeBox = { ...home, wPct };
+        const box = { xPct: dropped.xPct, yPct: dropped.yPct, wPct, hPct };
+        const homeBox = { ...home, wPct, hPct };
         const covered = collidesWithAny(geo, box, others);
         const homeFree = !collidesWithAny(geo, homeBox, others);
 
@@ -794,7 +799,7 @@ export const PedalboardView = ({
         } else if (covered) {
           // Nowhere of its own to go back to — the pedal came off a stack, or
           // its slot was taken while it was in the air.
-          const spot = findFreeSpot(geo, others, wPct);
+          const spot = findFreeSpot(geo, others, wPct, hPct);
           if (spot) {
             next = settleAt(spot);
           } else {
@@ -1080,7 +1085,7 @@ export const PedalboardView = ({
       localItems.some((i) => i.itemId === inventoryItemId)
     )
       return;
-    const spot = findFreeSpot(geo, boardBoxes(), widthOf(inventoryItemId));
+    const spot = findFreeSpot(geo, boardBoxes(), widthOf(inventoryItemId), heightPctFor(geo, widthOf, inventoryItemId));
     if (!spot) {
       announce(BOARD_FULL, setNotice);
       return;
@@ -1279,7 +1284,7 @@ export const PedalboardView = ({
         itemId: link.itemId,
         out: link.out,
         row: rowIndexOf(geo, item.yPct),
-        jack: dcJackAt(geo, item.xPct, item.yPct, wPct, dcOf(link.itemId)),
+        jack: dcJackAt(geo, item.xPct, item.yPct, wPct, dcOf(link.itemId), heightPctFor(geo, widthOf, link.itemId)),
         left: (item.xPct / 100) * geo.viewW,
         right: ((item.xPct + wPct) / 100) * geo.viewW,
       },
@@ -1350,9 +1355,10 @@ export const PedalboardView = ({
     xPct: i.xPct,
     yPct: i.yPct,
     wPct: widthOf(i.itemId),
+    hPct: heightPctFor(geo, widthOf, i.itemId),
   }));
   const canFit = (itemId: string) =>
-    findFreeSpot(geo, occupancy, widthOf(itemId)) !== null;
+    findFreeSpot(geo, occupancy, widthOf(itemId), heightPctFor(geo, widthOf, itemId)) !== null;
 
   // Filling every output the brick still has saves a player eight drags — but
   // only offer it when it would actually do something.
@@ -1639,7 +1645,7 @@ export const PedalboardView = ({
                     left: `${placement.xPct}%`,
                     top: `${placement.yPct}%`,
                     width: `${wPct}%`,
-                    height: `${geo.pedalHPct}%`,
+                    height: `${heightPctFor(geo, widthOf, placement.itemId)}%`,
                     zIndex: isDragging ? 50 : 2,
                     cursor: isDragging ? "grabbing" : "grab",
                     // The pointer drives the drag, so the browser must not take
@@ -1708,6 +1714,10 @@ export const PedalboardView = ({
                     <PedalDcPlug
                       dc={dcOf(placement.itemId)}
                       widthUnits={(wPct / 100) * geo.viewW}
+                      heightUnits={
+                        (heightPctFor(geo, widthOf, placement.itemId) / 100) *
+                        geo.viewH
+                      }
                     />
                   )}
                   {/* The two controls a pedal carries live under the cursor and

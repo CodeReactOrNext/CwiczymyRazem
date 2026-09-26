@@ -41,6 +41,7 @@ import {
   createJackResolver,
   createWidthResolver,
   geometryFor,
+  heightPctFor,
   layoutBoard,
   rowIndexOf,
 } from "feature/arsenal/utils/pedalboardLayout";
@@ -259,7 +260,7 @@ const PedalReadonly = ({
         left: `${placement.xPct}%`,
         top: `${placement.yPct}%`,
         width: `${wPct}%`,
-        height: `${geo.pedalHPct}%`,
+        height: `${geo.pedalHPct * (effect.boardScale ?? 1)}%`,
         // Above the loom, the way the editor's pedals are. Without it the
         // cable's own `z-index: 1` wins and every plug is painted across the
         // enclosure it is supposed to disappear into.
@@ -280,7 +281,15 @@ const PedalReadonly = ({
       {/* The plug in its inlet, over the artwork — the same one the owner's
           board draws, so a socket set into the top face reads as filled here
           too. */}
-      {plug && <PedalDcPlug dc={plug} widthUnits={(wPct / 100) * geo.viewW} />}
+      {plug && (
+        <PedalDcPlug
+          dc={plug}
+          widthUnits={(wPct / 100) * geo.viewW}
+          heightUnits={
+            ((geo.pedalHPct * (effect.boardScale ?? 1)) / 100) * geo.viewH
+          }
+        />
+      )}
       <div
         className='absolute bottom-[10%] left-1/2 -translate-x-1/2 rounded-full'
         style={{
@@ -361,7 +370,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
         itemId: link.itemId,
         out: link.out,
         row: rowIndexOf(geo, item.yPct),
-        jack: dcJackAt(geo, item.xPct, item.yPct, wPct, dcOf(link.itemId)),
+        jack: dcJackAt(geo, item.xPct, item.yPct, wPct, dcOf(link.itemId), heightPctFor(geo, widthOf, link.itemId)),
         left: (item.xPct / 100) * geo.viewW,
         right: ((item.xPct + wPct) / 100) * geo.viewW,
       },

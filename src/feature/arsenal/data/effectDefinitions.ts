@@ -374,6 +374,42 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     // Three clipping stages stacked, each with its own supply rail.
     draw: 60,
   },
+  {
+    id: 33,
+    name: "Blender Fuzz",
+    brand: "Flanders",
+    type: "Fuzz",
+    description:
+      "A vintage-style fuzz with a blend control that mixes a raw, saturated signal back into your clean tone.",
+    imageId: 34,
+    rarity: "Legendary",
+    draw: 15,
+  },
+  {
+    id: 34,
+    name: "Octave Drift",
+    boardScale: 1.2,
+    brand: "Astra-Path",
+    type: "Vibrato",
+    description:
+      "Bend notes in real time with the expression treadle, then jump between octaves for dramatic dives and harmonies.",
+    imageId: 35,
+    rarity: "Mythic",
+    // The signal pair is the upper set of side sockets on this enclosure. Their
+    // nuts stand a good way proud of the case, so the plugs go on past them to
+    // the case wall and cover the nut rather than butting against its tip.
+    jacks: {
+      edge: "side",
+      in: { x: 0.974, y: 0.295 },
+      out: { x: 0.024, y: 0.295 },
+      nut: 0.033,
+      // No inlet is drawn, so power goes into the middle of the control
+      // section's flat top — below the treadle's, which is the box's top edge.
+      dc: { x: 0.275, y: 0.103, edge: true },
+    },
+    draw: 300,
+    levelBonus: 3,
+  },
 ];
 
 export const EFFECTS_BY_ID = new Map<number | string, EffectDefinition>(

@@ -431,9 +431,10 @@ describe("EFFECT_DC_JACK", () => {
       ).toBe(true);
       expect(dc.x, imageId).toBeGreaterThan(0.05);
       expect(dc.x, imageId).toBeLessThan(0.95);
-      // On the edge, or a little way down the top face — never mid-pedal.
+      // On the edge, or a little way down the top face — never mid-pedal. A
+      // case edge sitting below the artwork's margin may be further down.
       expect(dc.y, imageId).toBeGreaterThanOrEqual(0);
-      expect(dc.y, imageId).toBeLessThan(0.08);
+      expect(dc.y, imageId).toBeLessThan(dc.edge ? 0.2 : 0.08);
     }
   });
 });

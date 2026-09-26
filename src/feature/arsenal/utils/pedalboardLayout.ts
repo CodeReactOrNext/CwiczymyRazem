@@ -155,6 +155,8 @@ export const EFFECT_IMAGE_ASPECT: Record<number | string, number> = {
   31: 339 / 535,
   32: 343 / 535,
   33: 355 / 535,
+  34: 777 / 515,
+  35: 454 / 515,
 };
 
 /** How finely `findFreeSpot` walks a row looking for a gap. */
@@ -167,10 +169,19 @@ export interface LayoutBox {
   xPct: number;
   yPct: number;
   wPct: number;
+  hPct?: number;
 }
 
 /** Resolves a pedalboard placement to the width its pedal takes on the board. */
-export type WidthResolver = (itemId: string) => number;
+export type WidthResolver = ((itemId: string) => number) & {
+  heightOf?: (itemId: string) => number;
+};
+
+export const heightPctFor = (
+  geo: BoardGeometry,
+  widthOf: WidthResolver,
+  itemId: string,
+) => widthOf.heightOf?.(itemId) ?? geo.pedalHPct;
 
 const boxesOverlap = (
   geo: BoardGeometry,
@@ -180,8 +191,8 @@ const boxesOverlap = (
 ) =>
   a.xPct < b.xPct + b.wPct + gap &&
   a.xPct + a.wPct + gap > b.xPct &&
-  a.yPct < b.yPct + geo.pedalHPct &&
-  a.yPct + geo.pedalHPct > b.yPct;
+  a.yPct < b.yPct + (b.hPct ?? geo.pedalHPct) &&
+  a.yPct + (a.hPct ?? geo.pedalHPct) > b.yPct;
 
 /**
  * Does `box` hit anything in `others`? `gap` is the clearance demanded on top
@@ -199,7 +210,7 @@ const isOnBoard = (geo: BoardGeometry, box: LayoutBox) =>
   box.xPct >= -EPSILON &&
   box.yPct >= -EPSILON &&
   box.xPct + box.wPct <= 100 + EPSILON &&
-  box.yPct + geo.pedalHPct <= 100 + EPSILON;
+  box.yPct + (box.hPct ?? geo.pedalHPct) <= 100 + EPSILON;
 
 /**
  * First spot in signal order where a `wPct`-wide pedal fits without touching
@@ -211,14 +222,18 @@ export const findFreeSpot = (
   geo: BoardGeometry,
   occupied: LayoutBox[],
   wPct: number,
+  hPct = geo.pedalHPct,
 ): { xPct: number; yPct: number } | null => {
   const startX = 100 - geo.edgePct - wPct;
-  if (startX < geo.edgePct) return null;
+  if (startX < geo.edgePct || hPct > 100) return null;
 
-  for (const yPct of geo.rowYPct) {
+  for (const rowY of geo.rowYPct) {
+    const yPct = Math.min(rowY, 100 - hPct);
     for (let step = 0; ; step++) {
       const xPct = Math.max(startX - step * SCAN_STEP_PCT, geo.edgePct);
-      if (!collidesWithAny(geo, { xPct, yPct, wPct }, occupied, geo.gapPct)) {
+      if (
+        !collidesWithAny(geo, { xPct, yPct, wPct, hPct }, occupied, geo.gapPct)
+      ) {
         return { xPct, yPct };
       }
       if (xPct <= geo.edgePct) break;
@@ -277,14 +292,17 @@ const fitInSlot = (
   slot: LayoutBox,
   wPct: number,
   others: LayoutBox[],
+  hPct = geo.pedalHPct,
 ): { xPct: number; yPct: number } | null => {
   for (const align of SLOT_ALIGNMENTS) {
     const xPct = Math.max(
       0,
       Math.min(100 - wPct, slot.xPct + (slot.wPct - wPct) * align),
     );
-    if (!collidesWithAny(geo, { xPct, yPct: slot.yPct, wPct }, others)) {
-      return { xPct, yPct: slot.yPct };
+    const yPct = Math.min(slot.yPct, 100 - hPct);
+    const box = { xPct, yPct, wPct, hPct };
+    if (isOnBoard(geo, box) && !collidesWithAny(geo, box, others)) {
+      return { xPct, yPct };
     }
   }
   return null;
@@ -303,14 +321,14 @@ export const findSwapTarget = (
   others: BoardBox[],
 ): BoardBox | null => {
   const xPct = dragged.xPct + dragged.wPct / 2;
-  const yPct = dragged.yPct + geo.pedalHPct / 2;
+  const yPct = dragged.yPct + (dragged.hPct ?? geo.pedalHPct) / 2;
   return (
     others.find(
       (box) =>
         xPct >= box.xPct &&
         xPct <= box.xPct + box.wPct &&
         yPct >= box.yPct &&
-        yPct <= box.yPct + geo.pedalHPct,
+        yPct <= box.yPct + (box.hPct ?? geo.pedalHPct),
     ) ?? null
   );
 };
@@ -337,13 +355,16 @@ export const planSwap = (
   target: BoardBox,
   others: LayoutBox[],
 ): SwapPlan | null => {
-  const targetSpot = fitInSlot(geo, home, target.wPct, others);
+  const targetSpot = fitInSlot(geo, home, target.wPct, others, target.hPct);
   if (!targetSpot) return null;
 
-  const homeSpot = fitInSlot(geo, target, home.wPct, [
-    ...others,
-    { ...targetSpot, wPct: target.wPct },
-  ]);
+  const homeSpot = fitInSlot(
+    geo,
+    target,
+    home.wPct,
+    [...others, { ...targetSpot, wPct: target.wPct, hPct: target.hPct }],
+    home.hPct,
+  );
   return homeSpot ? { target: targetSpot, home: homeSpot } : null;
 };
 
@@ -426,6 +447,7 @@ export const layoutBoard = (
       xPct: item.xPct,
       yPct: item.yPct,
       wPct: widthOf(item.itemId),
+      hPct: heightPctFor(geo, widthOf, item.itemId),
     };
     if (isOnBoard(geo, box) && !collidesWithAny(geo, box, kept)) {
       kept.push(box);
@@ -438,12 +460,13 @@ export const layoutBoard = (
   const overflow: PedalboardPlacement[] = [];
   for (const item of loose) {
     const wPct = widthOf(item.itemId);
-    const spot = findFreeSpot(geo, kept, wPct);
+    const hPct = heightPctFor(geo, widthOf, item.itemId);
+    const spot = findFreeSpot(geo, kept, wPct, hPct);
     if (!spot) {
       overflow.push(item);
       continue;
     }
-    kept.push({ ...spot, wPct });
+    kept.push({ ...spot, wPct, hPct });
     placed.push({ ...item, ...spot });
   }
 
@@ -463,6 +486,7 @@ export const packInOrder = (
 ): BoardLayout => {
   const placed: PedalboardPlacement[] = [];
   const overflow: PedalboardPlacement[] = [];
+  const occupied: LayoutBox[] = [];
   let row = 0;
   // The cursor is the right-hand edge of the next pedal, because the chain
   // starts at the input jack in the top right and each pedal is laid down to
@@ -471,15 +495,35 @@ export const packInOrder = (
 
   for (const item of ordered) {
     const wPct = widthOf(item.itemId);
-    if (cursor - wPct < geo.edgePct) {
-      row += 1;
-      cursor = 100 - geo.edgePct;
+    const hPct = heightPctFor(geo, widthOf, item.itemId);
+    let spot: LayoutBox | null = null;
+    if (hPct <= 100 && wPct <= 100 - 2 * geo.edgePct) {
+      while (row < geo.rowYPct.length) {
+        if (cursor - wPct < geo.edgePct) {
+          row += 1;
+          cursor = 100 - geo.edgePct;
+          continue;
+        }
+        const candidate = {
+          xPct: cursor - wPct,
+          yPct: Math.min(geo.rowYPct[row], 100 - hPct),
+          wPct,
+          hPct,
+        };
+        if (!collidesWithAny(geo, candidate, occupied, geo.gapPct)) {
+          spot = candidate;
+          break;
+        }
+        // A tall enclosure in the preceding row may occupy this column too.
+        cursor -= SCAN_STEP_PCT;
+      }
     }
-    if (row >= geo.rowYPct.length || cursor - wPct < geo.edgePct) {
+    if (!spot) {
       overflow.push(item);
       continue;
     }
-    placed.push({ ...item, xPct: cursor - wPct, yPct: geo.rowYPct[row] });
+    occupied.push(spot);
+    placed.push({ ...item, xPct: spot.xPct, yPct: spot.yPct });
     cursor -= wPct + geo.gapPct;
   }
 
@@ -504,7 +548,11 @@ export const createWidthResolver = (
   measured: Record<number | string, number> = {},
 ): WidthResolver => {
   const cache = new Map<string, number>();
-  return (itemId: string) => {
+  const scaleOf = (itemId: string) => {
+    const item = effectInventory.find((entry) => entry.id === itemId);
+    return (item && EFFECTS_BY_ID.get(item.effectId)?.boardScale) || 1;
+  };
+  const resolve: WidthResolver = (itemId: string) => {
     const cached = cache.get(itemId);
     if (cached !== undefined) return cached;
 
@@ -516,10 +564,12 @@ export const createWidthResolver = (
         DEFAULT_ASPECT)
       : DEFAULT_ASPECT;
 
-    const width = widthPctForAspect(geo, aspect);
+    const width = widthPctForAspect(geo, aspect) * scaleOf(itemId);
     cache.set(itemId, width);
     return width;
   };
+  resolve.heightOf = (itemId) => geo.pedalHPct * scaleOf(itemId);
+  return resolve;
 };
 
 /** Where a socket sits down an enclosure's side when nothing better is known. */
@@ -566,6 +616,7 @@ export const EFFECT_JACK_Y: Record<number | string, number> = {
   31: 0.517,
   32: 0.517,
   33: 0.522,
+  34: 0.505,
 };
 
 /**
@@ -600,24 +651,31 @@ export const DEFAULT_DC_JACK = { x: 0.5, y: 0 };
  * table existed. An image missing from here takes `DEFAULT_DC_JACK`; the
  * top-mounted pedals carry their own `dc` on the definition, beside the signal
  * pair it has to stay clear of.
+ *
+ * - **No inlet drawn, and the case well short of the box.** The Blender Fuzz's
+ *   artwork leaves a margin above its enclosure; `edge` puts the plug on the
+ *   case's top edge rather than hanging in that margin.
  */
-export const EFFECT_DC_JACK: Record<number | string, { x: number; y: number }> =
-  {
-    1: { x: 0.49, y: 0.055 },
-    2: { x: 0.5, y: 0.055 },
-    3: { x: 0.797, y: 0 },
-    4: { x: 0.81, y: 0 },
-    5: { x: 0.5, y: 0.05 },
-    6: { x: 0.5, y: 0.047 },
-    8: { x: 0.5, y: 0.055 },
-    19: { x: 0.752, y: 0 },
-    20: { x: 0.759, y: 0 },
-    21: { x: 0.773, y: 0 },
-    22: { x: 0.806, y: 0 },
-    23: { x: 0.802, y: 0 },
-    24: { x: 0.803, y: 0 },
-    27: { x: 0.5, y: 0.055 },
-  };
+export const EFFECT_DC_JACK: Record<
+  number | string,
+  NonNullable<EffectJackLayout["dc"]>
+> = {
+  1: { x: 0.49, y: 0.055 },
+  2: { x: 0.5, y: 0.055 },
+  3: { x: 0.797, y: 0 },
+  4: { x: 0.81, y: 0 },
+  5: { x: 0.5, y: 0.05 },
+  6: { x: 0.5, y: 0.047 },
+  8: { x: 0.5, y: 0.055 },
+  19: { x: 0.752, y: 0 },
+  20: { x: 0.759, y: 0 },
+  21: { x: 0.773, y: 0 },
+  22: { x: 0.806, y: 0 },
+  23: { x: 0.802, y: 0 },
+  24: { x: 0.803, y: 0 },
+  27: { x: 0.5, y: 0.055 },
+  34: { x: 0.5, y: 0.15, edge: true },
+};
 
 /**
  * The ordinary enclosure: in on the right face, out on the left, half way up.
@@ -655,7 +713,9 @@ const sideJacksFor = (imageId?: number | string): EffectJackLayout => {
 export type JackResolver = (itemId: string) => EffectJackLayout;
 
 /** …and to where its power goes in. */
-export type DcResolver = (itemId: string) => { x: number; y: number };
+export type DcResolver = (
+  itemId: string,
+) => NonNullable<EffectJackLayout["dc"]>;
 
 /**
  * DC inlet lookup for a board. The middle of the top edge unless the pedal's own
@@ -665,7 +725,7 @@ export type DcResolver = (itemId: string) => { x: number; y: number };
  * cable does with it, and `PedalDcPlug` for the plug that sits in it.
  */
 export const createDcResolver = (jacksOf: JackResolver): DcResolver => {
-  const cache = new Map<string, { x: number; y: number }>();
+  const cache = new Map<string, NonNullable<EffectJackLayout["dc"]>>();
   return (itemId: string) => {
     const cached = cache.get(itemId);
     if (cached !== undefined) return cached;

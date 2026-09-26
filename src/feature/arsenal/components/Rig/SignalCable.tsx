@@ -5,7 +5,11 @@ import { useId } from "react";
 import type { Point } from "../../utils/cableGeometry";
 import { at, routed as bent, toView } from "../../utils/cableGeometry";
 import type { BoardGeometry, JackResolver } from "../../utils/pedalboardLayout";
-import { rowIndexOf, SIDE_JACKS } from "../../utils/pedalboardLayout";
+import {
+  heightPctFor,
+  rowIndexOf,
+  SIDE_JACKS,
+} from "../../utils/pedalboardLayout";
 
 /**
  * The patch cable, drawn.
@@ -127,6 +131,8 @@ interface Anchor {
   outer: number;
   /** Which row of the board the pedal stands in. */
   row: number;
+  /** How far the socket's nut stands proud of the case, in view units. */
+  nut: number;
 }
 
 /** Every run on this loom bends to the same radius: a fat instrument lead's. */
@@ -406,18 +412,6 @@ const Plug = ({ at: point, spin, metal, reach = PLUG_REACH }: PlugProps) => {
 
   return (
     <g transform={`translate(${at(point)})${turn}`}>
-      {/* A plug lying on the surface throws a shadow across it. One pushed into
-          a top edge is standing on the enclosure, which casts nothing. */}
-      {spin !== 90 && (
-        <ellipse
-          cx={(0.35 + back) / 2}
-          cy={handle + 0.55}
-          rx={(0.35 - back) / 2 + 0.7}
-          ry={0.6}
-          fill='#000000'
-          opacity={0.42}
-        />
-      )}
 
       {/* The moulded strain-relief boot, tapering onto the cable. Lifted off
           black so it separates from the deck it lies on rather than reading as
@@ -625,6 +619,7 @@ export const SignalCable = ({
   const anchorAt = (index: number, which: "in" | "out"): Anchor => {
     const { node } = drawn[index];
     const width = widthOf(node.itemId);
+    const height = heightPctFor(geo, widthOf, node.itemId);
     const jacks = jacksOf ? jacksOf(node.itemId) : SIDE_JACKS;
     const socket = jacks[which];
     const edgeTop = (node.yPct / 100) * geo.viewH;
@@ -633,17 +628,37 @@ export const SignalCable = ({
       at: toView(
         geo,
         node.xPct + width * socket.x,
-        node.yPct + geo.pedalHPct * socket.y,
+        node.yPct + height * socket.y,
       ),
       fromTop: jacks.edge === "top",
       lane: Math.max(1.5, edgeTop - TOP_LANE),
       edgeTop,
-      edgeBottom: ((node.yPct + geo.pedalHPct) / 100) * geo.viewH,
+      edgeBottom: ((node.yPct + height) / 100) * geo.viewH,
       outer:
         ((which === "in" ? node.xPct + width : node.xPct) / 100) * geo.viewW,
       row: rowIndexOf(geo, node.yPct),
+      nut:
+        jacks.edge === "side"
+          ? ((width * (jacks.nut ?? 0)) / 100) * geo.viewW
+          : 0,
     };
   };
+
+  /**
+   * The plug for a side socket. One whose nut stands well proud of the case is
+   * pushed on past the tip to the case wall — by the nut's length, which it
+   * gains on top of its reach so it still stands as far out of the pedal — and
+   * is drawn over the artwork so it covers that nut.
+   */
+  const plugAt = (anchor: Anchor, spin: 0 | 180, reach: number) => ({
+    at: {
+      x: anchor.at.x + (spin === 0 ? anchor.nut : -anchor.nut),
+      y: anchor.at.y,
+    },
+    spin,
+    reach: reach + anchor.nut,
+    raised: anchor.nut > 0,
+  });
 
   // One entry per cable between two pedals. A pair standing closer than two
   // plugs can occupy is marked here rather than at draw time, because it
@@ -701,24 +716,26 @@ export const SignalCable = ({
     return [
       ...(!before || !before.coupled
         ? [
-            {
-              at: inAnchor.at,
-              spin: (inAnchor.fromTop ? 90 : 180) as 90 | 180,
-              reach: inAnchor.fromTop
-                ? topReach(inAnchor)
-                : (before?.reach ?? PLUG_REACH),
-            },
+            inAnchor.fromTop
+              ? {
+                  at: inAnchor.at,
+                  spin: 90 as const,
+                  reach: topReach(inAnchor),
+                  raised: false,
+                }
+              : plugAt(inAnchor, 180, before?.reach ?? PLUG_REACH),
           ]
         : []),
       ...(!after || !after.coupled
         ? [
-            {
-              at: outAnchor.at,
-              spin: (outAnchor.fromTop ? 90 : 0) as 0 | 90,
-              reach: outAnchor.fromTop
-                ? topReach(outAnchor)
-                : (after?.reach ?? PLUG_REACH),
-            },
+            outAnchor.fromTop
+              ? {
+                  at: outAnchor.at,
+                  spin: 90 as const,
+                  reach: topReach(outAnchor),
+                  raised: false,
+                }
+              : plugAt(outAnchor, 0, after?.reach ?? PLUG_REACH),
           ]
         : []),
     ];
@@ -730,173 +747,202 @@ export const SignalCable = ({
     plain ? TONES.plain : ok ? TONES.ok : TONES.bad;
 
   return (
-    <svg
-      viewBox={`0 0 ${geo.viewW} ${geo.viewH}`}
-      preserveAspectRatio='none'
-      className='pointer-events-none absolute inset-0 h-full w-full'
-      style={{ zIndex: 1 }}
-      aria-hidden>
-      <defs>
-        {/* Nickel read as a cylinder: highlight up top, core shadow low, and a
+    <>
+      <svg
+        viewBox={`0 0 ${geo.viewW} ${geo.viewH}`}
+        preserveAspectRatio='none'
+        className='pointer-events-none absolute inset-0 h-full w-full'
+        style={{ zIndex: 1 }}
+        aria-hidden>
+        <defs>
+          {/* Nickel read as a cylinder: highlight up top, core shadow low, and a
             little bounce off the board underneath it. The second copy runs the
             other way across the shape, for the plugs that get turned on their
             side and would otherwise come out lit from the left. */}
-        <linearGradient id={metalDown} x1='0' y1='0' x2='0' y2='1'>
-          <stop offset='0%' stopColor='#c9d1d8' />
-          <stop offset='22%' stopColor='#8e969d' />
-          <stop offset='48%' stopColor='#454b51' />
-          <stop offset='72%' stopColor='#2a2e33' />
-          <stop offset='100%' stopColor='#767d84' />
-        </linearGradient>
-        <linearGradient id={metalAcross} x1='0' y1='0' x2='1' y2='0'>
-          <stop offset='0%' stopColor='#c9d1d8' />
-          <stop offset='22%' stopColor='#8e969d' />
-          <stop offset='48%' stopColor='#454b51' />
-          <stop offset='72%' stopColor='#2a2e33' />
-          <stop offset='100%' stopColor='#767d84' />
-        </linearGradient>
+          <linearGradient id={metalDown} x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0%' stopColor='#c9d1d8' />
+            <stop offset='22%' stopColor='#8e969d' />
+            <stop offset='48%' stopColor='#454b51' />
+            <stop offset='72%' stopColor='#2a2e33' />
+            <stop offset='100%' stopColor='#767d84' />
+          </linearGradient>
+          <linearGradient id={metalAcross} x1='0' y1='0' x2='1' y2='0'>
+            <stop offset='0%' stopColor='#c9d1d8' />
+            <stop offset='22%' stopColor='#8e969d' />
+            <stop offset='48%' stopColor='#454b51' />
+            <stop offset='72%' stopColor='#2a2e33' />
+            <stop offset='100%' stopColor='#767d84' />
+          </linearGradient>
 
-        {/* The two ends fade out towards the edge they leave by. A luminance
+          {/* The two ends fade out towards the edge they leave by. A luminance
             mask rather than a gradient stroke, so every layer of the run —
             cast shadow, glow, jacket, sheen, core and pulse — thins out
             together instead of each needing its own copy of the ramp. Drawn in
             board units and padded past the deck, so the region never clips the
             glow off a run that hugs the rail. */}
-        <linearGradient
-          id={`${feedFade}-ramp`}
-          gradientUnits='userSpaceOnUse'
-          x1='0'
-          y1='0'
-          x2='0'
-          y2={FADE}>
-          <stop offset='0%' stopColor='#000000' />
-          <stop offset='100%' stopColor='#ffffff' />
-        </linearGradient>
-        <linearGradient
-          id={`${exitFade}-ramp`}
-          gradientUnits='userSpaceOnUse'
-          x1='0'
-          y1={geo.viewH - FADE}
-          x2='0'
-          y2={geo.viewH}>
-          <stop offset='0%' stopColor='#ffffff' />
-          <stop offset='100%' stopColor='#000000' />
-        </linearGradient>
-        {[
-          { id: feedFade, ramp: `${feedFade}-ramp` },
-          { id: exitFade, ramp: `${exitFade}-ramp` },
-        ].map((fade) => (
-          <mask
-            key={fade.id}
-            id={fade.id}
-            maskUnits='userSpaceOnUse'
-            x={-OFF_BOARD}
-            y={-OFF_BOARD}
-            width={geo.viewW + OFF_BOARD * 2}
-            height={geo.viewH + OFF_BOARD * 2}>
-            <rect
+          <linearGradient
+            id={`${feedFade}-ramp`}
+            gradientUnits='userSpaceOnUse'
+            x1='0'
+            y1='0'
+            x2='0'
+            y2={FADE}>
+            <stop offset='0%' stopColor='#000000' />
+            <stop offset='100%' stopColor='#ffffff' />
+          </linearGradient>
+          <linearGradient
+            id={`${exitFade}-ramp`}
+            gradientUnits='userSpaceOnUse'
+            x1='0'
+            y1={geo.viewH - FADE}
+            x2='0'
+            y2={geo.viewH}>
+            <stop offset='0%' stopColor='#ffffff' />
+            <stop offset='100%' stopColor='#000000' />
+          </linearGradient>
+          {[
+            { id: feedFade, ramp: `${feedFade}-ramp` },
+            { id: exitFade, ramp: `${exitFade}-ramp` },
+          ].map((fade) => (
+            <mask
+              key={fade.id}
+              id={fade.id}
+              maskUnits='userSpaceOnUse'
               x={-OFF_BOARD}
               y={-OFF_BOARD}
               width={geo.viewW + OFF_BOARD * 2}
-              height={geo.viewH + OFF_BOARD * 2}
-              fill={`url(#${fade.ramp})`}
-            />
-          </mask>
-        ))}
-      </defs>
+              height={geo.viewH + OFF_BOARD * 2}>
+              <rect
+                x={-OFF_BOARD}
+                y={-OFF_BOARD}
+                width={geo.viewW + OFF_BOARD * 2}
+                height={geo.viewH + OFF_BOARD * 2}
+                fill={`url(#${fade.ramp})`}
+              />
+            </mask>
+          ))}
+        </defs>
 
-      {/* Every shadow first, so one run's cast never darkens the next one's
+        {/* Every shadow first, so one run's cast never darkens the next one's
           core. A black loom skips them altogether: the cast under a dark cable
           only thickens it into a smear, where under a lit one it was what
           lifted the cable off the deck. */}
-      {!plain && (
-        <g fill='none' strokeLinecap='round' strokeLinejoin='round'>
-          {runs.map((run, index) => (
-            <path
+        {!plain && (
+          <g fill='none' strokeLinecap='round' strokeLinejoin='round'>
+            {runs.map((run, index) => (
+              <path
+                key={index}
+                d={run.d}
+                stroke='#000000'
+                strokeWidth={2.8}
+                opacity={0.5}
+                transform='translate(0 0.75)'
+                mask={run.mask}
+              />
+            ))}
+          </g>
+        )}
+
+        {runs.map((run, index) => {
+          const tone = toneFor(run.ok);
+
+          return (
+            <g
               key={index}
-              d={run.d}
-              stroke='#000000'
-              strokeWidth={2.8}
-              opacity={0.5}
-              transform='translate(0 0.75)'
-              mask={run.mask}
-            />
-          ))}
-        </g>
-      )}
-
-      {runs.map((run, index) => {
-        const tone = toneFor(run.ok);
-
-        return (
-          <g
-            key={index}
-            fill='none'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            mask={run.mask}>
-            {/* The glow a good run carries, and the alarm a bad one does. */}
-            {!plain && (
+              fill='none'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              mask={run.mask}>
+              {/* The glow a good run carries, and the alarm a bad one does. */}
+              {!plain && (
+                <path
+                  d={run.d}
+                  stroke={tone.core}
+                  strokeWidth={4.1}
+                  opacity={run.ok ? (verdict.flawless ? 0.14 : 0.08) : 0.18}
+                />
+              )}
+              <path d={run.d} stroke={tone.jacket} strokeWidth={JACKET_W} />
+              {/* The sheen off a rubber jacket, which is what makes it round. */}
+              <path
+                d={run.d}
+                stroke='#ffffff'
+                strokeWidth={0.42}
+                opacity={0.12}
+                transform='translate(0 -0.5)'
+              />
               <path
                 d={run.d}
                 stroke={tone.core}
-                strokeWidth={4.1}
-                opacity={run.ok ? (verdict.flawless ? 0.14 : 0.08) : 0.18}
+                strokeWidth={0.62}
+                opacity={0.95}
               />
-            )}
-            <path d={run.d} stroke={tone.jacket} strokeWidth={JACKET_W} />
-            {/* The sheen off a rubber jacket, which is what makes it round. */}
-            <path
-              d={run.d}
-              stroke='#ffffff'
-              strokeWidth={0.42}
-              opacity={0.12}
-              transform='translate(0 -0.5)'
-            />
-            <path
-              d={run.d}
-              stroke={tone.core}
-              strokeWidth={0.62}
-              opacity={0.95}
-            />
-            {pulsing && (
-              <motion.path
-                d={run.d}
-                stroke={tone.pulse}
-                strokeWidth={1.08}
-                strokeDasharray='3 15'
-                initial={{ strokeDashoffset: 0 }}
-                animate={{ strokeDashoffset: -18 }}
-                transition={{
-                  duration: 0.85,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
+              {pulsing && (
+                <motion.path
+                  d={run.d}
+                  stroke={tone.pulse}
+                  strokeWidth={1.08}
+                  strokeDasharray='3 15'
+                  initial={{ strokeDashoffset: 0 }}
+                  animate={{ strokeDashoffset: -18 }}
+                  transition={{
+                    duration: 0.85,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                />
+              )}
+            </g>
+          );
+        })}
+
+        {couplers.map((link, index) => (
+          <Coupler
+            key={`coupler-${index}`}
+            from={link.a.at}
+            to={link.b.at}
+            tone={toneFor(link.ok)}
+            metal={`url(#${metalDown})`}
+          />
+        ))}
+
+        {plugs.map(
+          (plug, index) =>
+            !plug.raised && (
+              <Plug
+                key={index}
+                at={plug.at}
+                spin={plug.spin}
+                reach={plug.reach}
+                metal={`url(#${plug.spin === 90 ? metalAcross : metalDown})`}
               />
-            )}
-          </g>
-        );
-      })}
+            ),
+        )}
+      </svg>
 
-      {couplers.map((link, index) => (
-        <Coupler
-          key={`coupler-${index}`}
-          from={link.a.at}
-          to={link.b.at}
-          tone={toneFor(link.ok)}
-          metal={`url(#${metalDown})`}
-        />
-      ))}
-
-      {plugs.map((plug, index) => (
-        <Plug
-          key={index}
-          at={plug.at}
-          spin={plug.spin}
-          reach={plug.reach}
-          metal={`url(#${plug.spin === 90 ? metalAcross : metalDown})`}
-        />
-      ))}
-    </svg>
+      {/* The plugs that cover a nut have to stand over the pedals, not under
+          them with the rest of the loom. They borrow its gradients. */}
+      {plugs.some((plug) => plug.raised) && (
+        <svg
+          viewBox={`0 0 ${geo.viewW} ${geo.viewH}`}
+          preserveAspectRatio='none'
+          className='pointer-events-none absolute inset-0 h-full w-full'
+          style={{ zIndex: 3 }}
+          aria-hidden>
+          {plugs.map(
+            (plug, index) =>
+              plug.raised && (
+                <Plug
+                  key={index}
+                  at={plug.at}
+                  spin={plug.spin}
+                  reach={plug.reach}
+                  metal={`url(#${metalDown})`}
+                />
+              ),
+          )}
+        </svg>
+      )}
+    </>
   );
 };

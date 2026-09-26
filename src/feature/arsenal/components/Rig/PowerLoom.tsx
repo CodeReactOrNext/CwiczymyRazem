@@ -98,18 +98,6 @@ const DcPlug = ({
 
   return (
     <g>
-      {/* The shadow it drops on whatever it is standing on. Cast off to one
-          side rather than ringed around it, so the plug seats on the metal
-          instead of glowing against it. */}
-      <rect
-        x={point.x - half + 0.3}
-        y={top + 0.22}
-        width={half * 2}
-        height={reach}
-        rx={half * 0.55}
-        fill='#000000'
-        opacity={0.45}
-      />
       {/* The moulded barrel, lit down one side and turning away on the other,
           which is the whole of what makes it round at this size. */}
       <rect
@@ -192,9 +180,11 @@ const DC_PLUG_CLEAR = 0.45;
 
 interface PedalDcPlugProps {
   /** The inlet, as a fraction of the pedal's own box — what a `DcResolver` gives. */
-  dc: { x: number; y: number };
-  /** The pedal's width in board units. Its height is always `PEDAL_H` tall. */
+  dc: { x: number; y: number; edge?: boolean };
+  /** The pedal's width in board units. */
   widthUnits: number;
+  /** …and its height: `PEDAL_H` unless the enclosure is an outsized one. */
+  heightUnits?: number;
 }
 
 /**
@@ -214,12 +204,19 @@ interface PedalDcPlugProps {
  * is set into the face: however deep the seat, the back of the plug clears the
  * edge by `DC_PLUG_CLEAR`, so the cable coming down the margin visibly goes in.
  */
-export const PedalDcPlug = ({ dc, widthUnits }: PedalDcPlugProps) => {
+export const PedalDcPlug = ({
+  dc,
+  widthUnits,
   // Ten view units to the board unit — the scale both looms draw in.
-  const heightUnits = PEDAL_H * 10;
+  heightUnits = PEDAL_H * 10,
+}: PedalDcPlugProps) => {
   const tip = dc.y * heightUnits;
-  const reach = Math.max(DC_PLUG_REACH, tip + DC_PLUG_CLEAR);
-  /** Room either side for the body and the shadow it casts off to the right. */
+  // An inlet on an edge that stands below the top of the box has nothing but
+  // board above it, so the plug keeps its own length rather than reaching up.
+  const reach = dc.edge
+    ? DC_PLUG_REACH
+    : Math.max(DC_PLUG_REACH, tip + DC_PLUG_CLEAR);
+  /** Room either side for the body. */
   const half = DC_PLUG_HALF_W + 0.7;
   const top = tip - reach - 0.3;
   const bottom = tip + 0.4;
