@@ -9,7 +9,7 @@ import type { RoadmapPhase } from "../types/roadmap.types";
 export const stripProgress = (phases: RoadmapPhase[]): RoadmapPhase[] =>
   phases.map(({ check: _check, ...phase }) => ({
     ...phase,
-    steps: phase.steps.map(
+    steps: (phase.steps ?? []).map(
       ({
         exerciseCompleted: _exercise,
         completedLessonIds: _lessons,

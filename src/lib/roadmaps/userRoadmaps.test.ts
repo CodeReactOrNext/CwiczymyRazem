@@ -204,12 +204,31 @@ describe("followers", () => {
       stepProgress: { "g-s1": 1 },
     };
 
-    const mine = await getUserRoadmap("gen-1", "u1", "u2", "u2");
+    const mine = await getUserRoadmap("gen-1", "u2");
     expect(mine?.stepProgress).toEqual({ "g-s1": 1 });
 
-    // Asking for somebody else's run falls back to the owner's.
-    const other = await getUserRoadmap("gen-1", "u1", "u3", "u2");
-    expect(other?.stepProgress).toEqual({ "g-s1": 2, "g-s2": 1 });
+    // A third player sees an empty map: neither the owner's run nor u2's.
+    const other = await getUserRoadmap("gen-1", "u3");
+    expect(other?.stepProgress).toEqual({});
+    expect(other?.phaseChecks).toEqual({});
+  });
+
+  it("never hands the owner's embedded counters to anyone else", async () => {
+    collections.roadmaps["gen-1"] = generatedRoadmap({
+      phases: [
+        {
+          ...generatedRoadmap().phases[0],
+          check: { passedAt: "2026-01-05", attempts: 1, bestScore: 5, total: 5 },
+        },
+      ],
+    });
+
+    const detail = await getUserRoadmap("gen-1", "u2");
+    const [phase] = detail!.roadmap.phases;
+
+    expect(phase.check).toBeUndefined();
+    expect(phase.steps.map((step) => step.sessionsCompleted)).toEqual([0, 0]);
+    expect(detail?.summary.viewerProgress).toBeNull();
   });
 });
 
@@ -231,6 +250,17 @@ describe("getUserRoadmap", () => {
 
   it("answers nothing for an id that is not a generated roadmap", async () => {
     expect(await getUserRoadmap("curated-1", "u1")).toBeNull();
+  });
+
+  it("ignores whose progress the request would like: it is the viewer's", async () => {
+    collections.roadmaps["gen-1"] = generatedRoadmap();
+    collections.userRoadmapProgress["u1_gen-1"] = {
+      roadmapId: "gen-1",
+      userId: "u1",
+      stepProgress: { "g-s2": 3 },
+    };
+
+    expect((await getUserRoadmap("gen-1", "u2"))?.stepProgress).toEqual({});
   });
 });
 
@@ -262,9 +292,9 @@ describe("private roadmaps", () => {
   it("answers not found for somebody else's private roadmap", async () => {
     collections.roadmaps["gen-1"] = generatedRoadmap({ visibility: "private" });
 
-    expect(await getUserRoadmap("gen-1", "u1", "u2")).toBeNull();
-    expect(
-      (await getUserRoadmap("gen-1", "u1", "u1"))?.summary.visibility,
-    ).toBe("private");
+    expect(await getUserRoadmap("gen-1", "u2")).toBeNull();
+    expect((await getUserRoadmap("gen-1", "u1"))?.summary.visibility).toBe(
+      "private",
+    );
   });
 });

@@ -21,20 +21,12 @@ export default async function handler(
   }
 
   try {
-    const { id, userId, progressUid } = (req.body ?? {}) as {
-      id?: string;
-      userId?: string;
-      /** The viewer's own uid, for a roadmap they are following. */
-      progressUid?: string;
-    };
+    // `userId` and `progressUid` still arrive from older clients and are
+    // ignored: the progress on a detail is always the signed-in viewer's.
+    const { id } = (req.body ?? {}) as { id?: string };
 
     if (id) {
-      const detail = await getUserRoadmap(
-        id,
-        userId ?? "",
-        authResult.session.uid,
-        progressUid,
-      );
+      const detail = await getUserRoadmap(id, authResult.session.uid);
       if (!detail) return res.status(404).json({ error: "Roadmap not found" });
       return res.status(200).json(detail);
     }

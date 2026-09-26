@@ -1,6 +1,7 @@
 import type { UserRoadmapStepResourceProgress } from "feature/aiCoach/services/userProgress.service";
 import type { PhaseCheckResult } from "feature/aiCoach/types/phaseCheck.types";
 import type { Roadmap } from "feature/aiCoach/types/roadmap.types";
+import { stripProgress } from "feature/aiCoach/utils/stripProgress";
 import type {
   RoadmapRunProgress,
   UserRoadmapDetail,
@@ -225,28 +226,21 @@ export async function listUserRoadmaps(
 }
 
 /**
- * One roadmap with its steps, and what one player logged against them: the
- * owner by default, or the viewer on a roadmap they are following. Nobody
- * else's run is on offer.
+ * One roadmap with its steps, and what the viewer logged against them — never
+ * anybody else's run. The owner sees their own progress; everyone else sees
+ * theirs, which is empty until they start the roadmap. Whose progress it is
+ * comes from the roadmap document and the session, not from the request.
  */
 export async function getUserRoadmap(
   id: string,
-  userId: string,
   viewerUid?: string | null,
-  progressUid?: string | null,
 ): Promise<UserRoadmapDetail | null> {
-  const runner =
-    progressUid && viewerUid && progressUid === viewerUid ? viewerUid : userId;
-  const [snap, progressSnap, viewerSnap] = await Promise.all([
+  const [snap, runSnap] = await Promise.all([
     firestore
       .collection(ROADMAPS_COLLECTION)
       .doc(id)
       .get() as Promise<DocumentSnapshot>,
-    firestore
-      .collection(PROGRESS_COLLECTION)
-      .doc(progressDocId(userId, id))
-      .get() as Promise<DocumentSnapshot>,
-    viewerUid && viewerUid !== userId
+    viewerUid
       ? (firestore
           .collection(PROGRESS_COLLECTION)
           .doc(progressDocId(viewerUid, id))
@@ -260,21 +254,23 @@ export async function getUserRoadmap(
   // A private roadmap answers "not found" to anyone but its owner, the same
   // as one that is not there: its existence is theirs too.
   if (!isRoadmapVisibleTo(roadmap, viewerUid)) return null;
-  const progress = progressSnap.exists
-    ? (progressSnap.data() as StoredProgress)
-    : undefined;
-  const viewerProgress = viewerSnap?.exists
-    ? (viewerSnap.data() as StoredProgress)
-    : undefined;
+  const isOwner = !!viewerUid && viewerUid === roadmap.userId;
+  const run = runSnap?.exists ? (runSnap.data() as StoredProgress) : undefined;
   const authors = await fetchAuthors(roadmap.userId ? [roadmap.userId] : []);
-  const run = runner === userId ? progress : viewerProgress;
 
   return {
-    summary: summarise(roadmap, authors.get(roadmap.userId), progress, {
-      viewerProgress,
-    }),
-    roadmap,
-    stepProgress: mergeStepProgress(roadmap, run, runner === userId),
+    summary: summarise(
+      roadmap,
+      authors.get(roadmap.userId),
+      isOwner ? run : undefined,
+      { viewerProgress: isOwner ? undefined : run },
+    ),
+    // Anyone but the owner gets the plan without the counters and checkpoint
+    // results a legacy document still carries — those are the owner's.
+    roadmap: isOwner
+      ? roadmap
+      : { ...roadmap, phases: stripProgress(roadmap.phases ?? []) },
+    stepProgress: mergeStepProgress(roadmap, run, isOwner),
     resourceProgress: run?.resourceProgress ?? {},
     phaseChecks: run?.phaseChecks ?? {},
   };

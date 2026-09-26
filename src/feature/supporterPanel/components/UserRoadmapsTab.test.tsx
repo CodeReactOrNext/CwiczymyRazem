@@ -159,12 +159,13 @@ const { UserRoadmapsTab } =
 afterEach(cleanup);
 
 describe("UserRoadmapsTab", () => {
-  it("lists a player's roadmap with their progress", () => {
+  it("lists a player's roadmap without their progress", () => {
     render(<UserRoadmapsTab enabled />);
 
     expect(screen.getByText("Shred like Friedman")).toBeDefined();
     expect(screen.getByText("Ann")).toBeDefined();
-    expect(screen.getByText(/1\/2 steps · 3 sessions/)).toBeDefined();
+    // Ann's 3 sessions are hers: the viewer never started this roadmap.
+    expect(screen.queryByText(/1\/2 steps · 3 sessions/)).toBeNull();
   });
 
   it("puts the viewer's own roadmaps in a section of their own", () => {

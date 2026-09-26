@@ -95,7 +95,9 @@ const withProgress = (
       ...phase,
       steps: (phase.steps ?? []).map((step) => ({
         ...step,
-        sessionsCompleted: stepProgress[step.id] ?? step.sessionsCompleted ?? 0,
+        // Not the step's own counter: on a legacy roadmap that is the owner's,
+        // and the server has already folded it in when the run is theirs.
+        sessionsCompleted: stepProgress[step.id] ?? 0,
         exerciseCompleted:
           resourceProgress[step.id]?.exerciseCompleted ?? false,
         completedLessonIds: resourceProgress[step.id]?.completedLessonIds ?? [],
@@ -350,9 +352,8 @@ const RoadmapDetail = ({
           <>
             {!isOwn && !isFollowing && (
               <p className='text-sm text-zinc-500'>
-                Somebody else&apos;s roadmap — you are looking at their
-                progress. Press Start this roadmap to work through it yourself,
-                free, with your own progress.
+                Somebody else&apos;s roadmap. Press Start this roadmap to work
+                through it yourself, free, with your own progress.
               </p>
             )}
 
@@ -400,26 +401,30 @@ const RoadmapDetail = ({
  * drawn once there is progress to draw; an empty bar on every card says
  * nothing and makes the grid look unfinished.
  *
- * On a roadmap the viewer follows, the numbers are the viewer's own run, not
- * the owner's — it sits among their roadmaps for that reason.
+ * The numbers are only ever the viewer's own run: their roadmap, or one they
+ * follow. On anybody else's roadmap the owner's progress is not shown at all.
  */
 const RoadmapTile = ({
   summary,
+  viewerUid,
   onOpen,
 }: {
   summary: UserRoadmapSummary;
+  viewerUid: string | null;
   onOpen: () => void;
 }) => {
-  const run = summary.viewerProgress ?? summary;
+  const isOwn = viewerUid != null && viewerUid === summary.userId;
+  const run = summary.viewerProgress ?? (isOwn ? summary : null);
   const following = summary.viewerProgress != null;
-  const percent = summary.stepCount
-    ? Math.round((run.completedSteps / summary.stepCount) * 100)
-    : 0;
-  const started = run.sessionsCompleted > 0;
+  const percent =
+    run && summary.stepCount
+      ? Math.round((run.completedSteps / summary.stepCount) * 100)
+      : 0;
+  const started = !!run && run.sessionsCompleted > 0;
   const created = formatDate(
     following ? (summary.viewerProgress?.startedAt ?? null) : summary.createdAt,
   );
-  const practised = formatDate(run.lastPractisedAt);
+  const practised = formatDate(run?.lastPractisedAt ?? null);
 
   return (
     <button
@@ -482,7 +487,7 @@ const RoadmapTile = ({
           )}
         </span>
 
-        {started ? (
+        {started && run ? (
           <span className='flex w-full items-center gap-4'>
             <span className='h-1 flex-1 overflow-hidden rounded-full bg-zinc-800'>
               <span
@@ -515,9 +520,11 @@ const RoadmapTile = ({
 
 const TileGrid = ({
   summaries,
+  viewerUid,
   onOpen,
 }: {
   summaries: UserRoadmapSummary[];
+  viewerUid: string | null;
   onOpen: (summary: UserRoadmapSummary) => void;
 }) => (
   <div className='grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3'>
@@ -525,6 +532,7 @@ const TileGrid = ({
       <RoadmapTile
         key={summary.rowId}
         summary={summary}
+        viewerUid={viewerUid}
         onOpen={() => onOpen(summary)}
       />
     ))}
@@ -796,7 +804,11 @@ export const UserRoadmapsTab = ({
           {own.length > 0 && (
             <section className='space-y-4'>
               <SectionHeading title='Your roadmaps' count={own.length} />
-              <TileGrid summaries={own} onOpen={openFromList} />
+              <TileGrid
+                summaries={own}
+                viewerUid={viewerUid}
+                onOpen={openFromList}
+              />
             </section>
           )}
 
@@ -806,7 +818,11 @@ export const UserRoadmapsTab = ({
                 title='From other players'
                 count={others.length}
               />
-              <TileGrid summaries={others} onOpen={openFromList} />
+              <TileGrid
+                summaries={others}
+                viewerUid={viewerUid}
+                onOpen={openFromList}
+              />
             </section>
           )}
 

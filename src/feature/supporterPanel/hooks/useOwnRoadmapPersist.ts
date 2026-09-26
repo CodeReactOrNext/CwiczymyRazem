@@ -19,8 +19,7 @@ const lastSavedPhases = (detail: UserRoadmapDetail): RoadmapPhase[] =>
     ...phase,
     steps: (phase.steps ?? []).map((step) => ({
       ...step,
-      sessionsCompleted:
-        detail.stepProgress[step.id] ?? step.sessionsCompleted ?? 0,
+      sessionsCompleted: detail.stepProgress[step.id] ?? 0,
     })),
   }));
 
