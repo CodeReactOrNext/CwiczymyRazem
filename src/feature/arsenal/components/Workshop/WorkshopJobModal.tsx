@@ -244,6 +244,9 @@ export const WorkshopJobModal = ({
         onInteractOutside={(e) => isPending && e.preventDefault()}
         className={cn(
           "flex max-h-[100dvh] flex-col gap-7 border-0 bg-zinc-900 p-6 sm:max-h-[90vh] sm:overflow-y-auto sm:p-7",
+          // MobileBottomNav (z-[100]) floats over this dialog below lg; leave room
+          // under the action buttons so they can scroll clear of it.
+          "pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-7",
           // The mod bench is the one job that is a *list*: every row carries art,
           // a name, a whole bill and two buttons, and at the width the other two
           // jobs need those bills wrap into a second line each. Held for the
