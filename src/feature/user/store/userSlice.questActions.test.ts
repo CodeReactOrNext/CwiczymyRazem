@@ -1,21 +1,27 @@
 // @vitest-environment jsdom
 
 import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
-import { runTransaction } from "firebase/firestore";
+import { getDocFromCache, runTransaction, updateDoc } from "firebase/firestore";
+import posthog from "posthog-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getQuestDayKey } from "./questDay";
+import { setDailyQuest } from "./userSlice";
 import {
   claimQuestRewardAction,
   DAILY_QUEST_FAME_REWARD,
   DAILY_QUEST_POINTS_REWARD,
+  syncDailyQuestAction,
 } from "./userSlice.questActions";
 
 const FAME_INCREMENT = Symbol("fame-increment");
 
 vi.mock("firebase/firestore", () => ({
   doc: vi.fn(() => ({ __userRef: true })),
+  getDocFromCache: vi.fn(),
   increment: vi.fn((value: number) => ({ __increment: value })),
   runTransaction: vi.fn(),
+  updateDoc: vi.fn(),
 }));
 
 vi.mock("utils/firebase/client/firebase.utils", () => ({
@@ -140,5 +146,110 @@ describe("claimQuestRewardAction", () => {
       "user1",
       DAILY_QUEST_POINTS_REWARD,
     );
+  });
+});
+
+const buildQuest = (progress: number) => ({
+  date: getQuestDayKey(),
+  isRewardClaimed: false,
+  tasks: [
+    {
+      id: "t1",
+      type: "long_session",
+      title: "Practice for 15 minutes",
+      target: 15,
+      progress,
+      isCompleted: progress >= 15,
+    },
+  ],
+});
+
+const runSync = async (localProgress: number) => {
+  const dispatch = vi.fn((action: any) => action);
+  const getState = () => ({
+    user: { currentUserStats: { dailyQuest: buildQuest(localProgress) } },
+  });
+
+  await syncDailyQuestAction()(dispatch as any, getState as any, undefined);
+
+  return dispatch;
+};
+
+const cachedSnapshot = (progress: number) => ({
+  data: () => ({ statistics: { dailyQuest: buildQuest(progress) } }),
+});
+
+describe("syncDailyQuestAction", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(updateDoc).mockResolvedValue(undefined);
+  });
+
+  it("queues the merged quest as a plain write when the transaction fails", async () => {
+    vi.mocked(runTransaction).mockRejectedValue(
+      new Error("Daily quest sync timed out"),
+    );
+    vi.mocked(getDocFromCache).mockResolvedValue(cachedSnapshot(5) as never);
+
+    await runSync(10);
+
+    expect(updateDoc).toHaveBeenCalledTimes(1);
+    const written = vi.mocked(updateDoc).mock.calls[0][1] as Record<string, any>;
+    expect(written["statistics.dailyQuest"].tasks[0].progress).toBe(10);
+    expect(posthog.capture).toHaveBeenCalledWith("daily_quest_sync_fallback", {
+      reason: "Daily quest sync timed out",
+    });
+    expect(posthog.capture).not.toHaveBeenCalledWith(
+      "daily_quest_sync_failed",
+      expect.anything(),
+    );
+  });
+
+  it("pulls newer cached progress into the store instead of writing it back", async () => {
+    vi.mocked(runTransaction).mockRejectedValue(new Error("Connection failed."));
+    vi.mocked(getDocFromCache).mockResolvedValue(cachedSnapshot(12) as never);
+
+    const dispatch = await runSync(4);
+
+    expect(updateDoc).not.toHaveBeenCalled();
+    expect(setDailyQuest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tasks: [expect.objectContaining({ progress: 12 })],
+      }),
+    );
+    expect(dispatch).toHaveBeenCalledWith({ type: "user/setDailyQuest" });
+  });
+
+  it("refuses a blind overwrite when nothing is cached and reports the failure", async () => {
+    vi.mocked(runTransaction).mockRejectedValue(
+      new Error("Daily quest sync timed out"),
+    );
+    vi.mocked(getDocFromCache).mockRejectedValue(
+      new Error("Failed to get document from cache."),
+    );
+
+    await runSync(10);
+
+    expect(updateDoc).not.toHaveBeenCalled();
+    expect(posthog.capture).toHaveBeenCalledWith("daily_quest_sync_failed", {
+      message: "Daily quest sync timed out",
+      fallbackMessage: "Failed to get document from cache.",
+      stage: "fallback",
+    });
+  });
+
+  it("does not touch the fallback when the transaction succeeds", async () => {
+    vi.mocked(runTransaction).mockImplementation(async (_db, updateFn: any) =>
+      updateFn({
+        get: async () => cachedSnapshot(5),
+        update: vi.fn(),
+      }),
+    );
+
+    await runSync(10);
+
+    expect(getDocFromCache).not.toHaveBeenCalled();
+    expect(updateDoc).not.toHaveBeenCalled();
+    expect(posthog.capture).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
-import { doc, increment, runTransaction } from "firebase/firestore";
+import {
+  doc,
+  type DocumentReference,
+  getDocFromCache,
+  increment,
+  runTransaction,
+  updateDoc,
+} from "firebase/firestore";
 import posthog from "posthog-js";
 import type { RootState } from "store/store";
 import type { DailyQuest, DailyQuestTaskType } from "types/api.types";
@@ -28,8 +35,8 @@ let pendingSyncs = 0;
 
 /**
  * A transaction needs the network, and with no connection it can sit unresolved
- * for a long time. Give up on it rather than letting it block every later sync —
- * the next one (a completed task, tab focus, coming back online) retries.
+ * for a long time. Give up on it rather than letting it block every later sync,
+ * and hand the merge to `syncFromCache` instead.
  */
 const SYNC_TIMEOUT = 15_000;
 
@@ -42,6 +49,49 @@ const withTimeout = <T,>(promise: Promise<T>): Promise<T> => {
       timer = setTimeout(() => reject(new Error("Daily quest sync timed out")), SYNC_TIMEOUT);
     }),
   ]).finally(() => clearTimeout(timer));
+};
+
+const errorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : String(error);
+
+/**
+ * The fallback when the transaction cannot finish: merge against the copy the
+ * local cache holds and publish it as a plain write.
+ *
+ * A transaction is network-only. On a flaky connection — a phone waking up, a
+ * tab resumed after hours, the first seconds after a page load — its reads keep
+ * retrying with backoff well past the timeout, and the progress it carried
+ * never left the tab. That was ~90% of `daily_quest_sync_failed`. An ordinary
+ * write does not need the network to be accepted: the SDK queues it in the
+ * persistent cache and delivers it once the connection is back.
+ *
+ * It is still a merge, never the blind overwrite the transaction replaced. With
+ * no cached copy to merge against it refuses to write at all.
+ */
+const syncFromCache = async (
+  userRef: DocumentReference,
+  localQuest: DailyQuest | null,
+  today: string
+): Promise<DailyQuest | null> => {
+  const snapshot = await getDocFromCache(userRef);
+  const remoteQuest = (snapshot.data()?.statistics?.dailyQuest ??
+    null) as DailyQuest | null;
+  const result = mergeDailyQuests(localQuest, remoteQuest, today);
+
+  if (result && !isSameQuest(result, remoteQuest)) {
+    // Not awaited: the promise settles only when the server acknowledges the
+    // write, which on the connection that just failed can take minutes. The
+    // write is already queued once `updateDoc` returns.
+    updateDoc(userRef, { "statistics.dailyQuest": result }).catch((error) => {
+      console.error("Failed to deliver queued daily quest:", error);
+      posthog.capture("daily_quest_sync_failed", {
+        message: errorMessage(error),
+        stage: "queued_write",
+      });
+    });
+  }
+
+  return result;
 };
 
 const enqueueSync = (run: () => Promise<void>): Promise<void> => {
@@ -84,11 +134,12 @@ export const syncDailyQuestAction = createAsyncThunk(
 
       if (!userId || !state.user.currentUserStats) return;
 
-      try {
-        const userRef = doc(db, "users", userId);
-        const today = getQuestDayKey(state.user.currentUserStats.timeZone);
+      const userRef = doc(db, "users", userId);
+      const today = getQuestDayKey(state.user.currentUserStats.timeZone);
+      let merged: DailyQuest | null;
 
-        const merged = await withTimeout(runTransaction(db, async (transaction) => {
+      try {
+        merged = await withTimeout(runTransaction(db, async (transaction) => {
           const snapshot = await transaction.get(userRef);
           const remoteQuest = (snapshot.data()?.statistics?.dailyQuest ??
             null) as DailyQuest | null;
@@ -100,18 +151,28 @@ export const syncDailyQuestAction = createAsyncThunk(
 
           return result;
         }));
-
-        if (merged && !isSameQuest(merged, localQuest)) {
-          dispatch(setDailyQuest(merged));
+      } catch (transactionError) {
+        try {
+          merged = await syncFromCache(userRef, localQuest, today);
+          posthog.capture("daily_quest_sync_fallback", {
+            reason: errorMessage(transactionError),
+          });
+        } catch (error) {
+          // Swallowing this is what let the widget show tasks as completed while
+          // the server never heard about them. The next sync (a completed task,
+          // tab focus, coming back online) retries; the failure has to be visible.
+          console.error("Failed to sync daily quest:", error);
+          posthog.capture("daily_quest_sync_failed", {
+            message: errorMessage(transactionError),
+            fallbackMessage: errorMessage(error),
+            stage: "fallback",
+          });
+          return;
         }
-      } catch (error) {
-        // Swallowing this is what let the widget show tasks as completed while
-        // the server never heard about them. The next sync (a completed task,
-        // tab focus, coming back online) retries; the failure has to be visible.
-        console.error("Failed to sync daily quest:", error);
-        posthog.capture("daily_quest_sync_failed", {
-          message: error instanceof Error ? error.message : String(error),
-        });
+      }
+
+      if (merged && !isSameQuest(merged, localQuest)) {
+        dispatch(setDailyQuest(merged));
       }
     })
 );
