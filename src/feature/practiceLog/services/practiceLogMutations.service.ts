@@ -1,4 +1,5 @@
 import axios from "axios";
+import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 const MANAGE_REPORT_URL = "/api/user/report/manage";
@@ -48,6 +49,11 @@ export const saveReportNote = async (
     reportId,
     updates: { description },
   });
+  // The summary screen has already re-fetched the logs into the client cache
+  // (weekly chart), so without this the practice log serves the note-less copy.
+  // The API's own invalidation only clears the server's memory.
+  const uid = auth.currentUser?.uid;
+  if (uid) invalidateActivityLogsCache(uid);
 };
 
 export const deletePracticeReport = async (reportId: string): Promise<void> => {
