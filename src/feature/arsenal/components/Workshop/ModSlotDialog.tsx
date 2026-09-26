@@ -6,6 +6,10 @@ import {
 } from "assets/components/ui/dialog";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import {
+  getPartLabel,
+  PART_TIER_COLORS,
+} from "feature/arsenal/data/partDefinitions";
 import type { SalvagedModOption } from "feature/arsenal/data/salvage";
 import type { FittedMod, ModQuote } from "feature/arsenal/data/workshop";
 import { MOD_REMOVE_FAME_COST } from "feature/arsenal/data/workshop";
@@ -15,8 +19,11 @@ import {
   groupSlotChoices,
 } from "feature/arsenal/utils/modSlotOptions";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
+import { AnimatePresence, motion } from "framer-motion";
 import {
+  AlertTriangle,
   CheckCircle2,
+  ChevronDown,
   ChevronRight,
   Dices,
   Plus,
@@ -26,14 +33,21 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import { FameCoin } from "./FameCoin";
+import { PartIcon } from "../Parts/PartIcon";
+import { TierPlate } from "../TierPlate";
 import { ModArt } from "./ModArt";
 import { ModRemoveDialog } from "./ModRemoveDialog";
 
 /** Which socket on the bench was clicked. */
 export type ModSlotTarget =
   | { kind: "free"; index: number }
-  | { kind: "fitted"; index: number; mod: FittedMod };
+  | {
+      kind: "fitted";
+      index: number;
+      mod: FittedMod;
+      /** Open straight on the re-roll confirm (the socket's dice shortcut). */
+      intent?: "reroll";
+    };
 
 interface ModSlotDialogProps {
   /** `null` keeps the dialog shut. */
@@ -44,8 +58,14 @@ interface ModSlotDialogProps {
   salvagedOptions: SalvagedModOption[];
   fame: number;
   onClose: () => void;
-  /** A re-roll has a bill and a before → after; the full job sheet shows both. */
-  onReroll: () => void;
+}
+
+/** The last roll this dialog made, so the player sees it land. */
+interface LastRoll {
+  before: number;
+  after: number;
+  /** Bumps on every roll so an identical result still replays its entrance. */
+  seq: number;
 }
 
 /** The one primary button in these dialogs: white, not the interaction cyan. */
@@ -55,14 +75,240 @@ const SECONDARY =
   "rounded-lg bg-zinc-800 px-5 py-2.5 text-sm font-semibold text-zinc-200 transition-colors hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
 
 /**
+ * Every value a roll can land on, one cell each: amber below what the mod
+ * carries now (a loss), emerald above, and an arrow pointing at the current one.
+ * The player reads the odds off the picture instead of doing "+3 – +7" in
+ * their head.
+ */
+const RollScale = ({
+  min,
+  max,
+  current,
+  was,
+}: {
+  min: number;
+  max: number;
+  current: number;
+  /** The value before the last roll, when it changed — marked so the jump reads. */
+  was: number | null;
+}) => {
+  const values = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+  return (
+    <div
+      className='flex gap-1.5'
+      role='img'
+      aria-label={`Rolls +${min} to +${max}, currently +${current}`}>
+      {values.map((v) => (
+        <div key={v} className='flex min-w-0 flex-1 flex-col items-center'>
+          {/* The pointer is what marks the current value — a label and an
+              arrow over its cell, not a colour the eye has to decode. */}
+          <span className='flex h-9 flex-col items-center justify-end text-[11px] font-semibold leading-none text-zinc-200'>
+            {v === current && (
+              <>
+                now
+                <ChevronDown size={16} strokeWidth={3} className='-mb-0.5' />
+              </>
+            )}
+          </span>
+          <span
+            className={cn(
+              "flex h-10 w-full items-center justify-center rounded-md text-sm font-bold tabular-nums transition-colors",
+              v < current && "bg-amber-500/10 text-amber-300/80",
+              v === current && "bg-zinc-700/60 text-white",
+              v > current && "bg-emerald-500/10 text-emerald-300/90",
+            )}>
+            +{v}
+          </span>
+          <span className='mt-1.5 h-4 text-[11px] font-semibold text-zinc-500'>
+            {v === was ? "was" : ""}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+/**
+ * The re-roll, confirmed where it is asked for.
+ *
+ * Only the two things the decision turns on: the range, and a warning when the
+ * roll can land below what the mod carries now. The button underneath is the
+ * confirmation; after a roll the result goes on top and it becomes "Roll again",
+ * so chasing a number is one click a roll.
+ */
+const RerollStep = ({
+  mod,
+  lastRoll,
+  isPending,
+  onReroll,
+  onBack,
+  onDone,
+}: {
+  mod: FittedMod;
+  lastRoll: LastRoll | null;
+  isPending: boolean;
+  onReroll: () => void;
+  onBack: () => void;
+  onDone: () => void;
+}) => {
+  const delta = lastRoll ? lastRoll.after - lastRoll.before : 0;
+
+  return (
+    <>
+      <div className='flex flex-col gap-5 rounded-lg bg-zinc-800/40 p-4'>
+        <div className='flex items-center gap-4'>
+          <ModArt modId={mod.id} size={56} />
+          <p className='min-w-0 truncate text-base font-bold text-zinc-100'>
+            {mod.label}
+          </p>
+        </div>
+        <RollScale
+          min={mod.min}
+          max={mod.max}
+          current={mod.points}
+          was={lastRoll && delta !== 0 ? lastRoll.before : null}
+        />
+      </div>
+
+      {/* The cost is the headline ("2× Neck"), the stock a whisper under it —
+          the compact bill's "40 / 2" read backwards here. */}
+      <div className='flex flex-col gap-2.5'>
+        <span className='text-sm font-semibold text-zinc-400'>Cost</span>
+        <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+          {mod.recipe.map((line) => {
+            const ok = line.have >= line.need;
+            const tierColor = PART_TIER_COLORS[line.tier];
+            return (
+              <div
+                key={`${line.partId}:${line.tier}`}
+                className='flex items-center gap-3 rounded-lg bg-zinc-800/40 py-2 pl-2 pr-4'>
+                <TierPlate color={tierColor} size={36} muted={!ok}>
+                  <PartIcon partId={line.partId} size={28} />
+                </TierPlate>
+                <div className='min-w-0'>
+                  <p className='truncate text-sm font-bold text-zinc-100'>
+                    <span
+                      className={cn(
+                        "tabular-nums",
+                        ok ? "text-white" : "text-amber-400",
+                      )}>
+                      {line.need}×
+                    </span>{" "}
+                    {getPartLabel(line.partId)}
+                  </p>
+                  <p className='mt-0.5 truncate text-xs'>
+                    <span style={{ color: tierColor }}>{line.tier}</span>
+                    <span
+                      className={cn(
+                        "tabular-nums",
+                        ok ? "text-zinc-500" : "text-amber-400/80",
+                      )}>
+                      {" · "}
+                      {ok
+                        ? `you have ${line.have}`
+                        : `${line.need - line.have} short`}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {mod.points > mod.min && (
+        <p className='flex items-center gap-2 text-sm text-amber-300'>
+          <AlertTriangle size={16} className='shrink-0' />
+          Can roll lower than your current +{mod.points}.
+        </p>
+      )}
+
+      <AnimatePresence mode='wait' initial={false}>
+        {lastRoll && (
+          <motion.div
+            key={lastRoll.seq}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className={cn(
+              "flex items-center justify-between gap-4 rounded-lg px-4 py-3",
+              delta > 0
+                ? "bg-emerald-500/10"
+                : delta < 0
+                  ? "bg-amber-500/10"
+                  : "bg-zinc-800/40",
+            )}>
+            <span className='flex items-baseline gap-2 text-lg font-black tabular-nums'>
+              <span className='text-zinc-500'>+{lastRoll.before}</span>
+              <span className='text-zinc-600'>→</span>
+              <span
+                className={
+                  delta > 0
+                    ? "text-emerald-300"
+                    : delta < 0
+                      ? "text-amber-300"
+                      : "text-zinc-200"
+                }>
+                +{lastRoll.after}
+              </span>
+            </span>
+            <span
+              className={cn(
+                "text-sm font-semibold",
+                delta > 0
+                  ? "text-emerald-400"
+                  : delta < 0
+                    ? "text-amber-400"
+                    : "text-zinc-400",
+              )}>
+              {delta > 0
+                ? `${delta} better`
+                : delta < 0
+                  ? `${-delta} worse`
+                  : "same value"}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className='flex justify-end gap-2 pt-1'>
+        <button
+          type='button'
+          onClick={lastRoll ? onDone : onBack}
+          disabled={isPending}
+          className={SECONDARY}>
+          {lastRoll ? "Done" : "Back"}
+        </button>
+        <button
+          type='button'
+          onClick={onReroll}
+          disabled={!mod.affordable || isPending}
+          className={cn(PRIMARY, "flex items-center gap-2")}>
+          <Dices size={16} />
+          {isPending
+            ? "Rolling…"
+            : !mod.affordable
+              ? "Not enough parts"
+              : lastRoll
+                ? "Roll again"
+                : "Re-roll"}
+        </button>
+      </div>
+    </>
+  );
+};
+
+/**
  * What one socket on the bench opens.
  *
  * An empty socket asks one question — which of the mods you own goes in here —
  * so it is a list to pick from and one button. An occupied socket has two
- * answers, re-roll or remove, and both already have their own sheets: the
- * re-roll's bill and before → after live on the job modal, the removal's
- * warning on its own confirm. This dialog is the doorway to each, with the
- * mod's card at the top so the player knows which slot they are standing at.
+ * answers, re-roll or remove. The removal gives nothing back, so it asks on its
+ * own alert. The re-roll is a step inside this dialog: the bill, the odds and
+ * one button, and once it lands the result sits over the same bill with "Roll
+ * again" beside it — chasing a better roll is one click a roll, and every one of
+ * them is made with the price in view.
  */
 export const ModSlotDialog = ({
   slot,
@@ -71,18 +317,52 @@ export const ModSlotDialog = ({
   salvagedOptions,
   fame,
   onClose,
-  onReroll,
 }: ModSlotDialogProps) => {
   const mod = useWorkshopMod();
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
+  /** `null` until the player moves — then the socket's intent no longer decides. */
+  const [step, setStep] = useState<"manage" | "reroll" | null>(null);
+  const [lastRoll, setLastRoll] = useState<LastRoll | null>(null);
 
   const close = () => {
     setQuery("");
     setPicked(null);
     setRemoving(false);
+    setStep(null);
+    setLastRoll(null);
     onClose();
+  };
+
+  const fittedStep =
+    step ??
+    (slot?.kind === "fitted" && slot.intent === "reroll" ? "reroll" : "manage");
+  // The quote refetches after every roll; the slot target is a snapshot from
+  // the click, so the bill and the value are read off the live quote.
+  const live =
+    slot?.kind === "fitted"
+      ? (modQuote.fitted.find((f) => f.id === slot.mod.id) ?? slot.mod)
+      : null;
+
+  const reroll = () => {
+    if (!live) return;
+    mod.mutate(
+      {
+        itemId: entry.id,
+        kind: entry.kind,
+        featureId: live.id,
+        action: "reroll",
+      },
+      {
+        onSuccess: (data) =>
+          setLastRoll((prev) => ({
+            before: data.pointsBefore ?? live.points,
+            after: data.points,
+            seq: (prev?.seq ?? 0) + 1,
+          })),
+      },
+    );
   };
 
   const choices = groupSlotChoices(salvagedOptions, query);
@@ -128,7 +408,7 @@ export const ModSlotDialog = ({
       }}>
       {slot?.kind === "fitted" && (
         <ModRemoveDialog
-          mod={removing ? slot.mod : null}
+          mod={removing ? live : null}
           itemName={entry.name}
           fameCost={MOD_REMOVE_FAME_COST}
           fame={fame}
@@ -146,9 +426,15 @@ export const ModSlotDialog = ({
         <div className='flex items-start justify-between gap-4'>
           <div>
             <DialogTitle className='text-xl font-bold text-zinc-100'>
-              {slot?.kind === "fitted" ? "Manage mod" : "Install mod"}
+              {slot?.kind !== "fitted"
+                ? "Install mod"
+                : fittedStep === "reroll"
+                  ? "Re-roll mod"
+                  : "Manage mod"}
             </DialogTitle>
-            <DialogDescription className='mt-0.5 text-sm text-zinc-400'>
+            {/* Screen readers only: the item and slot are already obvious from
+                the socket the player just clicked. */}
+            <DialogDescription className='sr-only'>
               {entry.name} · {slotLabel}
             </DialogDescription>
           </div>
@@ -282,20 +568,29 @@ export const ModSlotDialog = ({
           </>
         )}
 
-        {slot?.kind === "fitted" && (
+        {slot?.kind === "fitted" && live && fittedStep === "reroll" && (
+          <RerollStep
+            mod={live}
+            lastRoll={lastRoll}
+            isPending={mod.isPending}
+            onReroll={reroll}
+            onBack={() => {
+              setLastRoll(null);
+              setStep("manage");
+            }}
+            onDone={close}
+          />
+        )}
+
+        {slot?.kind === "fitted" && live && fittedStep === "manage" && (
           <>
             <div className='flex items-center gap-5 rounded-lg bg-zinc-800/40 p-4'>
-              <ModArt modId={slot.mod.id} size={96} />
+              <ModArt modId={live.id} size={96} />
               <div className='min-w-0'>
-                <p className='text-lg font-bold text-zinc-100'>
-                  {slot.mod.label}
-                </p>
-                <span className='mt-1.5 inline-flex items-center rounded-md bg-purple-500/15 px-2 py-0.5 text-xs font-semibold text-purple-300'>
-                  Installed
-                </span>
-                <p className='mt-2 text-sm text-zinc-400'>
+                <p className='text-lg font-bold text-zinc-100'>{live.label}</p>
+                <p className='mt-1 text-sm text-zinc-400'>
                   <span className='font-semibold text-purple-300'>
-                    +{slot.mod.points}
+                    +{live.points}
                   </span>{" "}
                   bonus
                 </p>
@@ -305,8 +600,8 @@ export const ModSlotDialog = ({
             <div className='flex flex-col gap-2'>
               <button
                 type='button'
-                onClick={onReroll}
-                disabled={!slot.mod.affordable || mod.isPending}
+                onClick={() => setStep("reroll")}
+                disabled={!live.affordable || mod.isPending}
                 className='flex w-full items-center gap-4 rounded-lg bg-zinc-800/40 p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 hover:bg-zinc-800/70'>
                 <span className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-purple-500/15 text-purple-300'>
                   <Dices size={20} />
@@ -314,11 +609,6 @@ export const ModSlotDialog = ({
                 <span className='min-w-0 flex-1'>
                   <span className='block text-sm font-semibold text-zinc-100'>
                     Re-roll mod
-                  </span>
-                  <span className='mt-0.5 block text-xs text-zinc-400'>
-                    {slot.mod.affordable
-                      ? `Re-spec for parts — rolls +${slot.mod.min} to +${slot.mod.max}, and can come out lower.`
-                      : "Your wallet does not cover this mod's bill of parts."}
                   </span>
                 </span>
                 <ChevronRight size={18} className='shrink-0 text-zinc-500' />
@@ -335,14 +625,6 @@ export const ModSlotDialog = ({
                 <span className='min-w-0 flex-1'>
                   <span className='block text-sm font-semibold text-zinc-100'>
                     Remove mod
-                  </span>
-                  <span className='mt-0.5 flex flex-wrap items-center gap-x-1 text-xs text-zinc-400'>
-                    Take it off {slotLabel} for
-                    <span className='inline-flex items-center gap-1 font-semibold tabular-nums text-amber-300'>
-                      <FameCoin size={13} />
-                      {MOD_REMOVE_FAME_COST}
-                    </span>
-                    Fame. The mod is destroyed on the way out.
                   </span>
                 </span>
                 <ChevronRight size={18} className='shrink-0 text-zinc-500' />

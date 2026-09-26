@@ -6,7 +6,7 @@ import type {
   SocketSide,
 } from "feature/arsenal/utils/modAnchors";
 import { layoutModSockets } from "feature/arsenal/utils/modAnchors";
-import { Lock, Plus } from "lucide-react";
+import { Dices, Lock, Plus } from "lucide-react";
 import type { CSSProperties } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -30,6 +30,7 @@ interface InstalledModsProps {
 
 /** One connector, in px inside the stage. */
 interface Wire {
+  modId: string;
   side: SocketSide;
   from: { x: number; y: number };
   to: { x: number; y: number };
@@ -87,6 +88,8 @@ export const InstalledMods = ({
   // inside its box, and it is only known once the file has loaded — so the
   // load is a dependency of the measurement, not a thing it polls for.
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  /** The socket under the cursor (or focus) — its wire is the one lit up. */
+  const [hovered, setHovered] = useState<string | null>(null);
 
   const columns = useMemo<Record<SocketSide, Column>>(() => {
     const byId = new Map(fitted.map((m) => [m.id, m]));
@@ -189,6 +192,7 @@ export const InstalledMods = ({
                 : s.left >= visible.left + visible.width - 4;
             if (!beside) continue;
             next.push({
+              modId: item.modId,
               side,
               from: {
                 x: (side === "left" ? s.right : s.left) - box.left,
@@ -224,33 +228,55 @@ export const InstalledMods = ({
         style={
           side === "left" ? { left: columnOffset } : { right: columnOffset }
         }>
-        {column.fitted.map(({ mod }) => (
-          <button
-            key={mod.id}
-            type='button'
-            data-mod-socket={mod.id}
-            onClick={() =>
-              onOpenSlot({ kind: "fitted", index: fitted.indexOf(mod), mod })
-            }
-            title={`${mod.label} · +${mod.points}`}
-            aria-label={`${mod.label}, installed`}
-            className={cn(
-              size,
-              "relative overflow-hidden rounded-lg bg-zinc-950/80 transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-300/60 hover:-translate-y-0.5",
-            )}
-            style={{
-              boxShadow: `inset 0 0 0 1px ${MOD_TILE_COLOR}66, 0 0 16px -4px ${MOD_TILE_COLOR}80`,
-            }}>
-            <ModArt modId={mod.id} />
-            <span
-              className='absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full'
-              style={{
-                backgroundColor: MOD_TILE_COLOR,
-                boxShadow: `0 0 6px ${MOD_TILE_COLOR}`,
-              }}
-            />
-          </button>
-        ))}
+        {column.fitted.map(({ mod }) => {
+          const index = fitted.indexOf(mod);
+          return (
+            <div
+              key={mod.id}
+              className='group relative'
+              onMouseEnter={() => setHovered(mod.id)}
+              onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered(mod.id)}
+              onBlur={() => setHovered(null)}>
+              <button
+                type='button'
+                data-mod-socket={mod.id}
+                onClick={() => onOpenSlot({ kind: "fitted", index, mod })}
+                title={`${mod.label} · +${mod.points}`}
+                aria-label={`${mod.label}, installed`}
+                className={cn(
+                  size,
+                  "relative block overflow-hidden rounded-lg bg-zinc-950/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-300/60",
+                )}
+                style={{ boxShadow: `inset 0 0 0 1px ${MOD_TILE_COLOR}4d` }}>
+                <ModArt modId={mod.id} />
+                <span
+                  className='absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full'
+                  style={{ backgroundColor: MOD_TILE_COLOR }}
+                />
+              </button>
+              {/* The shortcut straight to the re-roll confirm, for the player
+                  chasing a better roll — it still asks before spending parts,
+                  it just skips the "what do you want to do" step. */}
+              {mod.affordable && (
+                <button
+                  type='button'
+                  onClick={() =>
+                    onOpenSlot({ kind: "fitted", index, mod, intent: "reroll" })
+                  }
+                  title={`Re-roll ${mod.label}`}
+                  aria-label={`Re-roll ${mod.label}`}
+                  className={cn(
+                    "absolute -top-3 flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-zinc-300 opacity-0 transition-opacity focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-300/60 group-hover:opacity-100 hover:bg-zinc-700 hover:text-white",
+                    // Outer corner, away from the wire leaving the inner edge.
+                    side === "left" ? "-left-3" : "-right-3",
+                  )}>
+                  <Dices size={18} />
+                </button>
+              )}
+            </div>
+          );
+        })}
 
         {Array.from({ length: column.free }).map((_, i) => (
           <button
@@ -321,28 +347,47 @@ export const InstalledMods = ({
         />
       </div>
 
-      {/* Wires, drawn over the stage but under the sockets: a short run out of
-          the socket, then straight to the part's edge, with a pin at the end. */}
+      {/* Wires, drawn over the stage but under the sockets. At rest they are
+          a faint parts-diagram hint — the instrument is the picture, not the
+          lines — and the socket under the cursor lights its own wire up while
+          the rest step further back. Each is a short level run out of the
+          socket, then straight to the part, with a pin at the end. */}
       {wires.length > 0 && (
         <svg
           className='pointer-events-none absolute inset-0 z-20 hidden h-full w-full md:block'
           aria-hidden>
-          {wires.map((w, i) => {
+          {wires.map((w) => {
+            const lit = hovered === w.modId;
+            const dimmed = hovered !== null && !lit;
             const elbowX = w.side === "left" ? w.from.x + 12 : w.from.x - 12;
             return (
-              <g key={i} stroke={MOD_TILE_COLOR} fill='none'>
+              <g
+                key={w.modId}
+                fill='none'
+                className='transition-opacity duration-200'
+                opacity={lit ? 1 : dimmed ? 0.35 : 1}>
                 <path
                   d={`M ${w.from.x} ${w.from.y} L ${elbowX} ${w.from.y} L ${w.to.x} ${w.to.y}`}
-                  strokeWidth={1}
-                  strokeOpacity={0.45}
+                  stroke={lit ? MOD_TILE_COLOR : "#a1a1aa"}
+                  strokeWidth={lit ? 1.25 : 1}
+                  strokeOpacity={lit ? 0.85 : 0.18}
+                  strokeLinejoin='round'
                 />
+                {lit && (
+                  <circle
+                    cx={w.to.x}
+                    cy={w.to.y}
+                    r={7}
+                    fill={MOD_TILE_COLOR}
+                    fillOpacity={0.18}
+                  />
+                )}
                 <circle
                   cx={w.to.x}
                   cy={w.to.y}
-                  r={3}
-                  fill={MOD_TILE_COLOR}
-                  fillOpacity={0.9}
-                  strokeOpacity={0}
+                  r={lit ? 3 : 2}
+                  fill={lit ? MOD_TILE_COLOR : "#d4d4d8"}
+                  fillOpacity={lit ? 1 : 0.4}
                 />
               </g>
             );

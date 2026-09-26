@@ -92,12 +92,6 @@ export const WorkshopBench = ({
         salvagedOptions={salvagedOptions}
         fame={fame}
         onClose={() => setSlot(null)}
-        // A re-roll has a bill and a before → after, and the job sheet already
-        // shows both — so the slot dialog hands over rather than duplicating it.
-        onReroll={() => {
-          setSlot(null);
-          setJob("mod");
-        }}
       />
 
       <WorkshopJobModal
