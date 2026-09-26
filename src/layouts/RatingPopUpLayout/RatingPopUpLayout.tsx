@@ -77,6 +77,8 @@ interface RatingPopUpProps {
   activityData?: ActivityDay[];
   hideWrapper?: boolean;
   onRestart?: () => void;
+  /** Overrides the restart button's label, e.g. when it starts a new log instead. */
+  restartLabel?: string;
   /** Scored exercises of this session — each gets its leaderboard placing. */
   scoredRuns?: ScoredRun[];
 }
@@ -105,6 +107,7 @@ const RatingPopUpLayout = ({
   activityData = [],
   hideWrapper = false,
   onRestart,
+  restartLabel,
   scoredRuns = [],
 }: RatingPopUpProps) => {
   const {
@@ -318,18 +321,18 @@ const RatingPopUpLayout = ({
                 <Button
                   variant="ghost"
                   onClick={onRestart}
-                  className="w-full gap-2 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto"
+                  className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto"
                 >
-                  <RotateCcw className="h-4 w-4" aria-hidden />
-                  Practise a bit more
+                  <RotateCcw className="mr-2 h-4 w-4" aria-hidden />
+                  {restartLabel ?? "Practise a bit more"}
                 </Button>
               )}
               <Button
                 onClick={handleContinue}
-                className="w-full gap-2 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto"
+                className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto"
               >
                 Back to dashboard
-                <ArrowRight className="h-4 w-4" aria-hidden />
+                <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
               </Button>
             </div>
           </div>
@@ -433,18 +436,18 @@ const RatingPopUpLayout = ({
                   <Button
                     variant="ghost"
                     onClick={onRestart}
-                    className="w-full gap-2 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto"
+                    className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto"
                   >
-                    <RotateCcw className="h-4 w-4" aria-hidden />
-                    Repeat session
+                    <RotateCcw className="mr-2 h-4 w-4" aria-hidden />
+                    {restartLabel ?? "Repeat session"}
                   </Button>
                 )}
                 <Button
                   onClick={handleContinue}
-                  className="w-full gap-2 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto"
+                  className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto"
                 >
                   Continue
-                  <ArrowRight className="h-4 w-4" aria-hidden />
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
                 </Button>
               </div>
             </div>

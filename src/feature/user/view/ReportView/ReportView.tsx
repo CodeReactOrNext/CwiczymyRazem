@@ -118,7 +118,10 @@ const ReportView = () => {
   const userAuth = useAppSelector(selectUserAuth);
   const timerData = useAppSelector(selectTimerData);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
-  const { reportList } = useActivityLog(userAuth as string);
+  // Bumped on "Log another session" so the next summary's heatmap includes the
+  // session just logged.
+  const [logNonce, setLogNonce] = useState(0);
+  const { reportList } = useActivityLog(userAuth as string, logNonce);
   const savedTimerSum =
     timerData.creativity +
     timerData.hearing +
@@ -519,6 +522,20 @@ const ReportView = () => {
     setView('success');
   };
 
+  // Players timing blocks with an external clock log one after another, so the
+  // summary can drop them straight back on a fresh form. The session mode and
+  // picked songs stay (the next block is usually the same kind), only the times
+  // and one-off confirmations are cleared — Formik remounts with fresh values.
+  const logAnotherSession = () => {
+    setPickedSongs((songs) => songs.map((song) => createPickedSong(song)));
+    setAcceptExceedingTime(false);
+    setAcceptLongTime(false);
+    setSubmittedValues(null);
+    setLogNonce((nonce) => nonce + 1);
+    setView('form');
+    window.scrollTo({ top: 0 });
+  };
+
   const applySavedTime = (setFieldValue: (field: string, value: any) => void) => {
     setFieldValue("techniqueHours", techniqueTime.hours);
     setFieldValue("techniqueMinutes", techniqueTime.minutes);
@@ -583,10 +600,12 @@ const ReportView = () => {
     <>
       {view === 'success' && raitingData && currentUserStats && previousUserStats ? (
         <RatingPopUpLayout
-          // The summary ends the log — nothing is left to do on the form, so
-          // Continue always leaves the page: back where the session came from,
-          // or the dashboard when /report was opened directly.
+          // Continue leaves the page: back where the session came from, or the
+          // dashboard when /report was opened directly. Staying to log the
+          // next block is the restart button's job.
           onClick={() => router.push(resolveInternalPath(returnTo, "/dashboard"))}
+          onRestart={logAnotherSession}
+          restartLabel='Log another session'
           ratingData={raitingData}
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}
