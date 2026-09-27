@@ -17,6 +17,7 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { FieldValue } from "firebase-admin/firestore";
 import { ACHIEVEMENT_STATS_PATH, countsAsPlayer } from "lib/achievements/achievementStats";
 import { buildAchievementStatsUpdate } from "lib/achievements/achievementStatsUpdate";
+import { postGuildSessionMessage } from "lib/chat/chatSystemMessages";
 import { readRewardLedger } from "lib/rewards/rewardLedger";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -344,6 +345,13 @@ export default async function handler(
         inputData.micPerformance,
         inputData.earTrainingPerformance
       ));
+
+      // The guild room hears about it too — it only posts for guild members and real sessions.
+      writePromises.push(postGuildSessionMessage({
+        uid: userUid,
+        sumTimeMs: report.timeSummary.sumTime,
+        title: inputData.reportTitle,
+      }));
     }
 
     await Promise.all(writePromises);

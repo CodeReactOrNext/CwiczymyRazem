@@ -1,5 +1,8 @@
 import type { AppNotification } from "feature/notifications/services/notification.service";
-import { notificationHref } from "feature/notifications/services/notification.service";
+import {
+  notificationChatTab,
+  notificationHref,
+} from "feature/notifications/services/notification.service";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("firebase/firestore", () => ({
@@ -70,5 +73,22 @@ describe("notificationHref", () => {
     expect(
       notificationHref(notification({ type: "season_reward" })),
     ).toBeNull();
+  });
+});
+
+describe("notificationChatTab", () => {
+  it("opens the guild tab for a guild room and the chat tab otherwise", () => {
+    expect(
+      notificationChatTab(
+        notification({ type: "chat_mention", chatPath: "guilds/Shred/chat" }),
+      ),
+    ).toBe("guild");
+    expect(
+      notificationChatTab(notification({ type: "chat_reply", chatPath: "chats" })),
+    ).toBe("chat");
+  });
+
+  it("leaves every other notification alone", () => {
+    expect(notificationChatTab(notification({ type: "like" }))).toBeNull();
   });
 });

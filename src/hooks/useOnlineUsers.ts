@@ -17,14 +17,15 @@ interface OnlineUser {
   };
 }
 
-export const useOnlineUsers = () => {
+/** `enabled: false` keeps the listener off — it downloads the whole presence node. */
+export const useOnlineUsers = (enabled = true) => {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   // We explicitly check purely for the ability to use the database
   const [isDbEnabled, setIsDbEnabled] = useState(true);
 
   // Listen to all users
   useEffect(() => {
-    if (!isDatabaseEnabled) return;
+    if (!isDatabaseEnabled || !enabled) return;
 
     let db;
     try {
@@ -47,7 +48,7 @@ export const useOnlineUsers = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [enabled]);
 
   return { onlineUsers, isDbEnabled };
 };

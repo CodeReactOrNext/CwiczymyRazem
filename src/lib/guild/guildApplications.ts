@@ -9,6 +9,7 @@ import type {
   Transaction,
 } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
+import { postGuildMemberJoinedMessage } from "lib/chat/chatSystemMessages";
 import { badgeFor } from "lib/guild/guildBadge";
 import type { PlayerSession } from "lib/support/supporterAuth";
 import { userRef } from "lib/support/tokenWallet";
@@ -235,7 +236,7 @@ export async function decideApplication(
     });
     tx.delete(applicationRef(guildId, applicantUid));
 
-    return "ok" as const;
+    return "joined" as const;
   });
 
   if (outcome === "missing-guild") {
@@ -260,6 +261,10 @@ export async function decideApplication(
   }
   if (outcome === "full") {
     return { ok: false, status: 409, error: "The guild is full" };
+  }
+
+  if (outcome === "joined") {
+    await postGuildMemberJoinedMessage(guildId, applicantUid);
   }
 
   return { ok: true };

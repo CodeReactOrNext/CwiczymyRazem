@@ -23,7 +23,9 @@ type NotificationType =
   | "playlist_liked"
   | "exercise_thanked"
   | "exercise_completed"
-  | "roadmap_ready";
+  | "roadmap_ready"
+  | "chat_mention"
+  | "chat_reply";
 
 export interface AppNotification {
   id: string;
@@ -53,6 +55,10 @@ export interface AppNotification {
   // A roadmap generated in the background
   roadmapId?: string;
   roadmapGoal?: string;
+  // A chat message that tagged or answered the recipient
+  chatPath?: string;
+  chatMessageId?: string;
+  messageSnippet?: string;
   timestamp: any;
   isRead: boolean;
 }
@@ -94,6 +100,17 @@ export const notificationHref = (n: AppNotification): string | null => {
   if (n.type === "roadmap_ready" && n.roadmapId)
     return `/ai-coach?tab=players&roadmap=${n.roadmapId}`;
   return null;
+};
+
+/**
+ * The community-drawer tab a chat notification opens, or `null` for everything
+ * else. A chat has no page of its own to link to — it lives in the drawer.
+ */
+export const notificationChatTab = (
+  n: Pick<AppNotification, "type" | "chatPath">,
+): "chat" | "guild" | null => {
+  if (n.type !== "chat_mention" && n.type !== "chat_reply") return null;
+  return n.chatPath?.startsWith("guilds/") ? "guild" : "chat";
 };
 
 /** Plain-text title/body for surfaces that can't render the bell's JSX labels (OS notifications, emails). */
@@ -158,6 +175,16 @@ export const notificationText = (
       return {
         title: "Your roadmap is ready",
         body: `The coach finished writing${n.roadmapGoal ? ` "${n.roadmapGoal}"` : " your roadmap"} — open it to start.`,
+      };
+    case "chat_mention":
+      return {
+        title: "You were mentioned",
+        body: `${sender}mentioned you in chat${n.messageSnippet ? `: "${n.messageSnippet}"` : ""}`,
+      };
+    case "chat_reply":
+      return {
+        title: "New reply",
+        body: `${sender}replied to you in chat${n.messageSnippet ? `: "${n.messageSnippet}"` : ""}`,
       };
     default:
       return {

@@ -1,5 +1,7 @@
+import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
 import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
 import {
+  notificationChatTab,
   notificationHref,
   notificationText,
 } from "feature/notifications/services/notification.service";
@@ -48,6 +50,11 @@ export const DesktopNotifications = () => {
       toast.onclick = () => {
         window.focus();
         markAsRead(n.id);
+        const chatTab = notificationChatTab(n);
+        if (chatTab) {
+          useCommunityDrawer.getState().openTab(chatTab);
+          return;
+        }
         const href = notificationHref(n);
         if (href) router.push(href);
       };

@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { postChatWelcome } from "feature/chat/services/chatService";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { ArrowLeft, ArrowRight, Library, Loader2 } from "lucide-react";
@@ -192,6 +193,8 @@ const OnboardingView = () => {
       source,
     });
     await firebaseSaveOnboarding({ level, ...result }).catch(() => null);
+    // After the save: the welcome card reads the goal and plan off the user document.
+    void postChatWelcome();
     await router.push(href);
   };
 
@@ -251,13 +254,16 @@ const OnboardingView = () => {
     finish({ goal: "plans" }, ALL_PLANS_HREF, "all-plans");
   };
 
-  const handleSkip = () =>
+  const handleSkip = () => {
     trackOnboardingSkipped({
       step,
       level: step === "level" ? null : level,
       durationMs: clock.total(),
       source,
     });
+    // Skipping is still a new player arriving — they get a card, just without a goal on it.
+    void postChatWelcome();
+  };
 
   const goals = getGoalOptions(level);
   const stepIndex = STEPS.indexOf(step);

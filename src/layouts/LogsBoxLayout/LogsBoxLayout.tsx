@@ -10,6 +10,10 @@ import { useUnreadMessages as useUnreadChatMessages } from "feature/chat/hooks/u
 import { guildChatPath } from "feature/chat/services/chatService";
 import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
 import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
+import {
+  type CommunityTab,
+  useCommunityDrawer,
+} from "feature/logsBox/hooks/useCommunityDrawer";
 import { selectUserGuildBadge } from "feature/user/store/userSlice";
 import { AnimatePresence, m } from "framer-motion";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
@@ -21,7 +25,7 @@ import { useAppSelector } from "store/hooks";
 
 import Logs from "./components/Logs";
 
-type Category = "logs" | "chat" | "guild" | "changelog";
+type Category = CommunityTab;
 
 interface LogsBoxLayoutProps {
   logs: AnyFirebaseLog[];
@@ -46,7 +50,13 @@ const LogsBoxLayout = ({
   onLoadMoreLogs,
   contained = false,
 }: LogsBoxLayoutProps) => {
-  const [showedCategory, setShowedCategory] = useState<Category>("logs");
+  const [localCategory, setLocalCategory] = useState<Category>("logs");
+  // In the drawer the tab lives in its store: it outlasts closing the drawer, and a chat
+  // notification can open the drawer straight on its room.
+  const drawerTab = useCommunityDrawer((state) => state.tab);
+  const setDrawerTab = useCommunityDrawer((state) => state.setTab);
+  const showedCategory = contained ? drawerTab : localCategory;
+  const setShowedCategory = contained ? setDrawerTab : setLocalCategory;
   const [changelogDotHidden, setChangelogDotHidden] = useState(false);
 
   const guildBadge = useAppSelector(selectUserGuildBadge);

@@ -78,6 +78,13 @@ vi.mock("firebase-admin/firestore", () => ({
   FieldValue: { serverTimestamp: () => new Date("2026-08-29T00:00:00.000Z") },
 }));
 
+const postGuildMemberJoinedMessage = vi.fn();
+
+vi.mock("lib/chat/chatSystemMessages", () => ({
+  postGuildMemberJoinedMessage: (...args: unknown[]) =>
+    postGuildMemberJoinedMessage(...args),
+}));
+
 const {
   applyToGuild,
   decideApplication,
@@ -157,6 +164,7 @@ describe("applyToGuild", () => {
 
 describe("decideApplication", () => {
   beforeEach(async () => {
+    postGuildMemberJoinedMessage.mockClear();
     await applyToGuild(session("hopeful"), GUILD, "let me in");
   });
 
@@ -168,6 +176,7 @@ describe("decideApplication", () => {
     expect(members().map((m) => m.uid)).toEqual(["founder", "hopeful"]);
     expect(store.get("users/hopeful")?.guildId).toBe(GUILD);
     expect(application("hopeful")).toBeUndefined();
+    expect(postGuildMemberJoinedMessage).toHaveBeenCalledWith(GUILD, "hopeful");
   });
 
   it("keeps a rejection visible instead of deleting it", async () => {
@@ -178,6 +187,7 @@ describe("decideApplication", () => {
     // The applicant has to be able to see they were answered.
     expect(application("hopeful")?.status).toBe("rejected");
     expect(members()).toHaveLength(1);
+    expect(postGuildMemberJoinedMessage).not.toHaveBeenCalled();
   });
 
   it("refuses anyone who is not the founder — members included", async () => {

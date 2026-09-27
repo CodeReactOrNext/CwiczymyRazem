@@ -6,8 +6,10 @@ import {
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { formatDistanceToNow } from "date-fns";
+import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
 import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
 import {
+  notificationChatTab,
   notificationHref,
   placeSuffix,
 } from "feature/notifications/services/notification.service";
@@ -15,6 +17,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
+  AtSign,
   Bell,
   Clock,
   Dumbbell,
@@ -24,6 +27,7 @@ import {
   ListMusic,
   Map as MapIcon,
   MessageSquare,
+  Reply,
   Store,
   Trophy,
   Zap,
@@ -32,7 +36,32 @@ import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
+const chatLabel = (verb: string) =>
+  function ChatNotificationLabel(n: any) {
+    return (
+      <span>
+    {verb}
+    {n.chatPath?.startsWith("guilds/") ? " in guild chat" : " in chat"}
+    {n.messageSnippet && (
+      <span className='mt-1 block truncate text-xs italic text-zinc-500'>
+        &ldquo;{n.messageSnippet}&rdquo;
+      </span>
+    )}
+      </span>
+    );
+  };
+
 const typeConfig = {
+  chat_mention: {
+    icon: <AtSign className='h-3 w-3 text-white' />,
+    bg: "bg-cyan-500",
+    label: chatLabel("mentioned you"),
+  },
+  chat_reply: {
+    icon: <Reply className='h-3 w-3 text-white' />,
+    bg: "bg-cyan-500",
+    label: chatLabel("replied to you"),
+  },
   like: {
     icon: <Heart className='h-3 w-3 fill-current text-white' />,
     bg: "bg-red-500",
@@ -202,9 +231,16 @@ export const NotificationsBell = () => {
     useAppNotifications(userId);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const openCommunityTab = useCommunityDrawer((state) => state.openTab);
 
   const handleNotificationClick = (n: any) => {
     markAsRead(n.id);
+    const chatTab = notificationChatTab(n);
+    if (chatTab) {
+      setIsOpen(false);
+      openCommunityTab(chatTab);
+      return;
+    }
     const href = notificationHref(n);
     if (href) {
       setIsOpen(false);

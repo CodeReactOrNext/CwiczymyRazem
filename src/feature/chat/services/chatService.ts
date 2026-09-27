@@ -1,5 +1,11 @@
 import { CHAT_LIMIT_MESSAGE } from "feature/chat/chat.setting";
-import type { ChatMessageType } from "feature/chat/types/chat.types";
+import type {
+  ChatAttachment,
+  ChatMention,
+  ChatMessageType,
+  ChatReaction,
+  ChatReplyTo,
+} from "feature/chat/types/chat.types";
 import type { GuildBadge } from "feature/guilds/types/guild.types";
 import {
   addDoc,
@@ -14,7 +20,7 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
+import { auth, db } from "utils/firebase/client/firebase.utils";
 
 /**
  * Where the messages live. The global room is a top-level collection; a guild
@@ -48,6 +54,12 @@ export const fetchChatMessages = (
   });
 };
 
+export interface ChatMessageExtras {
+  replyTo?: ChatReplyTo | null;
+  mentions?: ChatMention[];
+  attachment?: ChatAttachment | null;
+}
+
 export const sendChatMessage = async (
   message: string,
   userId: string,
@@ -55,9 +67,10 @@ export const sendChatMessage = async (
   avatar: string | undefined,
   lvl: number,
   guildBadge: GuildBadge | null | undefined,
-  chatPath: string = GLOBAL_CHAT_PATH
+  chatPath: string = GLOBAL_CHAT_PATH,
+  extras: ChatMessageExtras = {}
 ) => {
-  if (!message.trim()) return undefined
+  if (!message.trim() && !extras.attachment) return undefined
 
   return addDoc(collection(db, chatPath), {
     userId,
@@ -68,21 +81,53 @@ export const sendChatMessage = async (
     lvl,
     guildBadge: guildBadge ?? null,
     likes: [],
+    // Only what the message actually carries — a plain line stays the shape it always was.
+    ...(extras.replyTo && { replyTo: extras.replyTo }),
+    ...(extras.mentions?.length && { mentions: extras.mentions }),
+    ...(extras.attachment && { attachment: extras.attachment }),
   });
 };
 
-export const toggleLikeChatMessage = async (
+/**
+ * Adds or takes back one reaction. Taking one back passes the stored entry
+ * itself: `arrayRemove` only matches an identical object.
+ */
+export const toggleChatReaction = async (
   messageId: string,
-  userId: string,
-  username: string,
-  hasLiked: boolean,
+  reaction: ChatReaction,
+  remove: boolean,
   chatPath: string = GLOBAL_CHAT_PATH
 ) => {
   const messageRef = doc(db, chatPath, messageId);
 
   return updateDoc(messageRef, {
-    likes: hasLiked
-      ? arrayRemove({ id: userId, username })
-      : arrayUnion({ id: userId, username }),
+    likes: remove ? arrayRemove(reaction) : arrayUnion(reaction),
   });
 };
+
+const postWithToken = async (url: string, body: object) => {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken: await user.getIdToken(), ...body }),
+  });
+};
+
+/**
+ * Tells the people a message tagged or answered. The server reads who they are
+ * off the stored message, so nothing here can aim a notification elsewhere.
+ * Fire-and-forget: the message is already posted either way.
+ */
+export const notifyChatMentions = (chatPath: string, messageId: string) =>
+  postWithToken("/api/chat/mentions", { chatPath, messageId }).catch(
+    (error) => console.error("Chat mention notify failed:", error)
+  );
+
+/** Posts the new player's welcome card to the global room — once per account, the server makes sure. */
+export const postChatWelcome = () =>
+  postWithToken("/api/chat/welcome", {}).catch((error) =>
+    console.error("Chat welcome failed:", error)
+  );

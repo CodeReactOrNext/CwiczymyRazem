@@ -1,4 +1,5 @@
 import type { GuildBadge } from "feature/guilds/types/guild.types";
+import { postGuildLevelUpMessage } from "lib/chat/chatSystemMessages";
 import { badgeFor } from "lib/guild/guildBadge";
 import { firestore } from "utils/firebase/api/firebase.config";
 
@@ -83,13 +84,23 @@ export async function postGuildLevelUp(
 ): Promise<void> {
   if (input.toLevel <= input.fromLevel) return;
 
+  const row = buildGuildLevelLog(input);
   try {
     await firestore
       .collection("logs")
       .doc(guildLevelLogId(input.guildId, input.toLevel))
-      .create(buildGuildLevelLog(input));
+      .create(row);
   } catch (error) {
     if ((error as { code?: unknown })?.code === ALREADY_EXISTS) return;
     console.error("[guildLevelLog] could not post", input.guildId, error);
   }
+
+  // The same news in the guild's own room, where the members can answer it.
+  await postGuildLevelUpMessage({
+    guildId: input.guildId,
+    guildName: row.guildName,
+    guildBadge: row.guildBadge,
+    level: row.level,
+    quests: row.quests,
+  });
 }

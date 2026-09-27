@@ -139,7 +139,7 @@ const getLogTimestampMs = (log: AnyFirebaseLog): number =>
 
 /** Splits a rolled inventory instance into its guitar/effect shape and resolves its level,
  * so arsenal feed rows can hand the full card to `ItemPill`. */
-const resolveRolledItem = (
+export const resolveRolledItem = (
   rolled: InventoryItem | EffectInventoryItem | undefined,
 ) => {
   const rolledGuitar = rolled && "guitarId" in rolled ? rolled : null;
@@ -309,7 +309,7 @@ const CardModal = ({
   );
 };
 
-const ItemPill = ({
+export const ItemPill = ({
   itemType,
   itemName,
   itemBrand,

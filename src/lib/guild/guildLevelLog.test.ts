@@ -18,6 +18,12 @@ vi.mock("utils/firebase/api/firebase.config", () => ({
   },
 }));
 
+const postGuildLevelUpMessage = vi.fn();
+
+vi.mock("lib/chat/chatSystemMessages", () => ({
+  postGuildLevelUpMessage: (...args: unknown[]) => postGuildLevelUpMessage(...args),
+}));
+
 vi.mock("lib/guild/guildBadge", () => ({
   badgeFor: (guildId: string, data: Record<string, any>) => ({
     guildId,
@@ -44,7 +50,10 @@ const input = (overrides: Record<string, any> = {}) => ({
   ...overrides,
 });
 
-beforeEach(() => created.clear());
+beforeEach(() => {
+  created.clear();
+  postGuildLevelUpMessage.mockClear();
+});
 
 describe("buildGuildLevelLog", () => {
   it("describes the guild and the level it reached", () => {
@@ -89,11 +98,16 @@ describe("postGuildLevelUp", () => {
     expect([...created.keys()]).toEqual([
       `logs/${guildLevelLogId(GUILD, 4)}`,
     ]);
+    expect(postGuildLevelUpMessage).toHaveBeenCalledTimes(1);
+    expect(postGuildLevelUpMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ guildId: GUILD, level: 4, quests: ["First Hundred"] }),
+    );
   });
 
   it("posts nothing when the level did not move", async () => {
     await postGuildLevelUp(input({ fromLevel: 4, toLevel: 4 }));
 
     expect(created.size).toBe(0);
+    expect(postGuildLevelUpMessage).not.toHaveBeenCalled();
   });
 });

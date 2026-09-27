@@ -1,241 +1,508 @@
-import { Button } from "assets/components/ui/button";
-import { Card } from "assets/components/ui/card";
-import { Input } from "assets/components/ui/input";
-import { ScrollArea } from "assets/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { ChatAttachmentCard } from "feature/chat/components/ChatAttachmentCard";
+import { ChatAttachmentPicker } from "feature/chat/components/ChatAttachmentPicker";
+import { ChatComposer } from "feature/chat/components/ChatComposer";
+import {
+  ChatMessageActions,
+  ChatReactionChips,
+} from "feature/chat/components/ChatReactions";
+import { ChatSystemRow } from "feature/chat/components/ChatSystemRow";
 import { useChat } from "feature/chat/hooks/useChat";
+import { typingLabel, useChatTyping } from "feature/chat/hooks/useChatTyping";
+import { GLOBAL_CHAT_PATH } from "feature/chat/services/chatService";
+import type {
+  ChatMention,
+  ChatMessageType,
+} from "feature/chat/types/chat.types";
+import { splitByMentions } from "feature/chat/utils/chatMentions";
+import type {
+  Exercise,
+  ExercisePlan,
+} from "feature/exercisePlan/types/exercise.types";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
+import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
 import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
+import { useOnlineUsers } from "hooks/useOnlineUsers";
 import { useTranslation } from "hooks/useTranslation";
-import { Heart, SendHorizontal } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
+import { ArrowDown, MessageCircle } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+/** Within this many pixels of the bottom still counts as "at the bottom". */
+const BOTTOM_SLACK_PX = 80;
+
+const isPlain = (message: ChatMessageType) =>
+  !message.type || message.type === "message";
+
+/** The words of a message, with the people it tagged picked out. */
+const MessageText = ({
+  message,
+  viewerId,
+}: {
+  message: ChatMessageType;
+  viewerId: string | null;
+}) => (
+  <>
+    {splitByMentions(message.message, message.mentions).map((segment, index) =>
+      segment.type === "text" ? (
+        <span key={index}>{segment.text}</span>
+      ) : (
+        <span
+          key={index}
+          className={cn(
+            "font-semibold",
+            segment.mention.id === viewerId ? "text-amber-300" : "text-cyan-300",
+          )}>
+          {segment.text}
+        </span>
+      ),
+    )}
+  </>
+);
+
+const EmptyRoom = ({
+  isGuild,
+  onSayHi,
+}: {
+  isGuild: boolean;
+  onSayHi: () => void;
+}) => (
+  <div className='flex h-full flex-col items-center justify-center gap-4 px-6 py-16 text-center'>
+    <span className='flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900'>
+      <MessageCircle className='h-6 w-6 text-zinc-500' />
+    </span>
+    <div className='space-y-1'>
+      <p className='text-sm font-semibold text-zinc-200'>
+        Nobody has said anything yet
+      </p>
+      <p className='text-sm text-zinc-500'>
+        {isGuild
+          ? "Be the first — say hi to your guild."
+          : "Be the first — say hi to everyone."}
+      </p>
+    </div>
+    <button
+      type='button'
+      onClick={onSayHi}
+      className='rounded-lg bg-cyan-500/15 px-4 py-2 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 active:click-behavior'>
+      Say hi 👋
+    </button>
+  </div>
+);
 
 /** `chatPath` picks the room; omitted, it is the global one. */
-const Chat = ({ chatPath }: { chatPath?: string } = {}) => {
+const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   const {
     error,
     messages,
+    isLoading,
     newMessage,
     sendMessage,
     setNewMessage,
-    toggleLike,
+    toggleReaction,
+    replyTo,
+    startReply,
+    cancelReply,
+    attachment,
+    setAttachment,
+    addMention,
     currentUserId,
+    currentUserName,
   } = useChat(chatPath);
 
   const { t } = useTranslation("chat");
-  // Na dotyku nie ma hovera, więc serduszko odsłania się tapnięciem w dymek.
+  const isGuild = chatPath !== GLOBAL_CHAT_PATH;
+  // Touch screens have no hover, so tapping a message is what reveals its actions.
   const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
+  const [flashMessageId, setFlashMessageId] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [activity, setActivity] = useState<{
+    plan?: ExercisePlan;
+    exercise?: Exercise;
+  } | null>(null);
+  const [recordingId, setRecordingId] = useState<string | null>(null);
   const { getSupportMember } = useSupportTeam();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const { typingNames, notifyTyping, stopTyping } = useChatTyping(
+    chatPath,
+    currentUserId,
+    currentUserName,
+  );
+  // Tagging is for the people in the room: in a guild that is who has spoken there, globally it
+  // is also whoever is online right now.
+  const { onlineUsers } = useOnlineUsers(!isGuild);
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const atBottomRef = useRef(true);
+  const lastMessageIdRef = useRef<string | null>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  // The newest message the player has had on screen — whatever came after it is "new".
+  const [lastSeenId, setLastSeenId] = useState<string | null>(null);
+
+  const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+
+  // Follows the conversation only when there is something new at the bottom, and only when the
+  // player was already there (or wrote it). A like or an edit changes `messages` too, and someone
+  // reading further up shouldn't be yanked down by either.
   useEffect(() => {
-    if (scrollRef.current) {
-      const scrollContainer = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    const el = scrollRef.current;
+    const lastId = lastMessage?.id ?? null;
+    if (!el || !lastId || lastId === lastMessageIdRef.current) return;
+
+    const isFirstLoad = lastMessageIdRef.current === null;
+    lastMessageIdRef.current = lastId;
+
+    if (isFirstLoad || atBottomRef.current || lastMessage?.userId === currentUserId) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [lastMessage, currentUserId]);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < BOTTOM_SLACK_PX;
+    atBottomRef.current = atBottom;
+    setIsAtBottom(atBottom);
+    if (atBottom && lastMessage?.id) setLastSeenId(lastMessage.id);
+  };
+
+  const unseenCount = useMemo(() => {
+    if (isAtBottom || !lastSeenId) return 0;
+    const seenIndex = messages.findIndex((message) => message.id === lastSeenId);
+    return messages
+      .slice(seenIndex + 1)
+      .filter((message) => message.userId !== currentUserId).length;
+  }, [isAtBottom, lastSeenId, messages, currentUserId]);
+
+  const jumpToLatest = () => {
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  };
+
+  const jumpToMessage = (messageId: string) => {
+    const target = scrollRef.current?.querySelector(
+      `[data-message-id="${CSS.escape(messageId)}"]`,
+    );
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    setFlashMessageId(messageId);
+    setTimeout(() => setFlashMessageId(null), 1500);
+  };
+
+  const mentionCandidates = useMemo((): ChatMention[] => {
+    const byId = new Map<string, ChatMention>();
+    // Most recent speakers first — they are who a reply is most likely aimed at.
+    for (const message of [...messages].reverse()) {
+      if (
+        message.userId &&
+        message.userId !== "system" &&
+        message.userId !== currentUserId &&
+        message.username &&
+        !byId.has(message.userId)
+      ) {
+        byId.set(message.userId, {
+          id: message.userId,
+          username: message.username,
+        });
       }
     }
-  }, [messages]);
+    for (const user of onlineUsers) {
+      if (user.uid !== currentUserId && user.displayName && !byId.has(user.uid)) {
+        byId.set(user.uid, { id: user.uid, username: user.displayName });
+      }
+    }
+    return [...byId.values()];
+  }, [messages, onlineUsers, currentUserId]);
+
+  const focusInput = () =>
+    requestAnimationFrame(() => {
+      const input = inputRef.current;
+      if (!input) return;
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    });
+
+  const greet = (message: ChatMessageType) => {
+    startReply(message);
+    addMention({ id: message.userId, username: message.username });
+    setNewMessage(`@${message.username} Welcome! 👋 `);
+    focusInput();
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    stopTyping();
+    return sendMessage(event);
+  };
 
   return (
-    <div className='flex h-full flex-col overflow-hidden rounded-2xl  bg-zinc-950/40 '>
-      {/* Header for Chat if needed, otherwise just the list */}
-      <ScrollArea
-        ref={scrollRef}
-        className='flex-1 p-2 sm:p-4 [&>[data-radix-scroll-area-viewport]>div]:!block'>
-        <div className='flex flex-col gap-1 px-2'>
-          {messages.map((msg, index) => {
-            const isMe = msg.userId === currentUserId;
-            const prevMsg = index > 0 ? messages[index - 1] : null;
-            const isFollowUp = prevMsg && prevMsg.userId === msg.userId;
-            const likes = msg.likes ?? [];
-            const hasLiked = currentUserId
-              ? likes.some((l) => l.id === currentUserId)
-              : false;
-            const supportMember = getSupportMember(msg.userId);
-            const isActive = !!msg.id && activeMessageId === msg.id;
+    <div className='flex h-full flex-col overflow-hidden rounded-lg bg-zinc-950/40'>
+      <div className='relative min-h-0 flex-1'>
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className='h-full overflow-y-auto p-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:p-4'>
+          {!isLoading && messages.length === 0 ? (
+            <EmptyRoom
+              isGuild={isGuild}
+              onSayHi={() => {
+                setNewMessage(
+                  isGuild ? "Hi guild! 👋 " : "Hi everyone! 👋 ",
+                );
+                focusInput();
+              }}
+            />
+          ) : (
+            <div className='flex flex-col gap-1 px-2 pt-8'>
+              {messages.map((msg, index) => {
+                const isMe = msg.userId === currentUserId;
+                const prevMsg = index > 0 ? messages[index - 1] : null;
+                const isActive = !!msg.id && activeMessageId === msg.id;
+                const react = (emoji: Parameters<typeof toggleReaction>[1]) =>
+                  msg.id && toggleReaction(msg.id, emoji);
 
-            return (
-              <div
-                key={msg.id}
-                className={`group flex w-full flex-col ${isMe ? "items-end" : "items-start"} ${isFollowUp ? "mt-0.5" : "mt-4"}`}>
-                <div
-                  className={`flex min-w-0 max-w-[90%] gap-3 ${
-                    isMe ? "flex-row-reverse" : "flex-row"
-                  }`}>
+                if (!isPlain(msg)) {
+                  return (
+                    <div
+                      key={msg.id}
+                      data-message-id={msg.id}
+                      className='group relative mt-4 flex flex-col items-center'
+                      onClick={() =>
+                        setActiveMessageId((prev) =>
+                          prev === msg.id ? null : (msg.id ?? null),
+                        )
+                      }>
+                      <ChatMessageActions
+                        visible={isActive}
+                        onReact={react}
+                        className='absolute -top-8 left-1/2 -translate-x-1/2'
+                      />
+                      <ChatSystemRow
+                        message={msg}
+                        onSayHi={
+                          !isMe && msg.userId !== "system"
+                            ? () => greet(msg)
+                            : undefined
+                        }
+                      />
+                      <ChatReactionChips
+                        reactions={msg.likes}
+                        viewerId={currentUserId}
+                        onToggle={react}
+                      />
+                    </div>
+                  );
+                }
 
-                  {/* Avatar Section - Only show if not a follow-up */}
-                  <div className='flex w-10 flex-shrink-0 justify-center'>
-                    {!isFollowUp && (
-                      <UserTooltip userId={msg.userId}>
-                        <div className='mt-0.5'>
-                          {supportMember ? (
-                            <SupportAvatarRing>
-                              <Avatar
-                                size='sm'
-                                name={msg.username}
-                                avatarURL={msg.userPhotoURL}
-                                lvl={msg.lvl}
-                              />
-                            </SupportAvatarRing>
-                          ) : (
-                            <Avatar
-                              size='sm'
-                              name={msg.username}
-                              avatarURL={msg.userPhotoURL}
-                              lvl={msg.lvl}
-                            />
-                          )}
-                        </div>
-                      </UserTooltip>
-                    )}
-                  </div>
+                const isFollowUp =
+                  !!prevMsg &&
+                  isPlain(prevMsg) &&
+                  prevMsg.userId === msg.userId &&
+                  !msg.replyTo;
+                const supportMember = getSupportMember(msg.userId);
+                const tagsMe =
+                  !isMe &&
+                  (msg.mentions?.some((m) => m.id === currentUserId) ||
+                    msg.replyTo?.userId === currentUserId);
 
-                  {/* Message Section */}
+                return (
                   <div
-                    className={`flex min-w-0 flex-col ${isMe ? "items-end" : "items-start"}`}>
-                    {!isFollowUp && (
-                      <div
-                        className={cn(
-                          "mb-1 flex items-center gap-1.5",
-                          isMe && "flex-row-reverse"
-                        )}>
-                        <UserTooltip userId={msg.userId}>
-                          <span className='px-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500/80'>
-                            {msg.username}
-                          </span>
-                        </UserTooltip>
-                        {/* Outside the tooltip on purpose — its trigger takes a
-                            single child, and the tag belongs beside the name
-                            rather than inside what opens the card. */}
-                        <GuildTagBadge badge={msg.guildBadge} />
-                        {supportMember && <SupportBadge member={supportMember} />}
-                      </div>
-                    )}
-
+                    key={msg.id}
+                    data-message-id={msg.id}
+                    className={cn(
+                      "group flex w-full flex-col",
+                      isMe ? "items-end" : "items-start",
+                      isFollowUp ? "mt-0.5" : "mt-4",
+                    )}>
                     <div
                       className={cn(
-                        "relative flex min-w-0 items-center gap-1.5",
-                        isMe && "flex-row-reverse",
-                        likes.length > 0 && "mb-4"
+                        "flex min-w-0 max-w-[90%] gap-3",
+                        isMe ? "flex-row-reverse" : "flex-row",
                       )}>
-                      <div
-                        className='relative min-w-0'
-                        onClick={() =>
-                          setActiveMessageId((prev) =>
-                            prev === msg.id ? null : msg.id ?? null
-                          )
-                        }>
-                        <Card
-                          className={`border-none px-3 py-2 text-sm transition-all [overflow-wrap:anywhere] sm:px-4 ${
-                            isMe
-                              ? `bg-cyan-500/20 text-cyan-50 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tr-sm"}`
-                              : `bg-white/5 text-zinc-100 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tl-sm"}`
-                          }`}>
-                          {msg.message}
-                        </Card>
-
-                        {likes.length > 0 && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                type='button'
-                                aria-label={t("like")}
-                                onClick={() => msg.id && toggleLike(msg.id)}
-                                className={cn(
-                                  "absolute -bottom-3.5 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-background active:click-behavior",
-                                  hasLiked
-                                    ? "bg-red-500/20 text-red-300 hover:bg-red-500/30"
-                                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700",
-                                  isMe ? "left-2" : "right-2"
-                                )}>
-                                <Heart className='h-4 w-4 fill-red-500 text-red-500' />
-                                <span className='leading-none'>{likes.length}</span>
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side='top' className='max-w-xs bg-zinc-900 text-white border-white/10'>
-                              <div className='space-y-1'>
-                                <p className='text-[11px] font-semibold text-zinc-300 mb-1'>
-                                  Liked by:
-                                </p>
-                                {likes.map((liker) => (
-                                  <UserTooltip key={liker.id} userId={liker.id}>
-                                    <div className='text-[11px] text-zinc-200 hover:text-white cursor-pointer'>
-                                      {liker.username}
-                                    </div>
-                                  </UserTooltip>
-                                ))}
-                              </div>
-                            </TooltipContent>
-                          </Tooltip>
+                      {/* Avatar only on the first of a run */}
+                      <div className='flex w-10 flex-shrink-0 justify-center'>
+                        {!isFollowUp && (
+                          <UserTooltip userId={msg.userId}>
+                            <div className='mt-0.5'>
+                              {supportMember ? (
+                                <SupportAvatarRing>
+                                  <Avatar
+                                    size='sm'
+                                    name={msg.username}
+                                    avatarURL={msg.userPhotoURL}
+                                    lvl={msg.lvl}
+                                  />
+                                </SupportAvatarRing>
+                              ) : (
+                                <Avatar
+                                  size='sm'
+                                  name={msg.username}
+                                  avatarURL={msg.userPhotoURL}
+                                  lvl={msg.lvl}
+                                />
+                              )}
+                            </div>
+                          </UserTooltip>
                         )}
                       </div>
 
-                      {likes.length === 0 && (
-                        <button
-                          type='button'
-                          aria-label={t("like")}
-                          onClick={() => msg.id && toggleLike(msg.id)}
-                          className={cn(
-                            // Mobile: poza flowem, żeby nie zjadał szerokości dymka.
-                            "absolute -bottom-3.5 rounded-full bg-zinc-800 p-1.5 text-zinc-400 transition-opacity active:click-behavior",
-                            isMe ? "left-2" : "right-2",
-                            !isActive &&
-                              "max-sm:pointer-events-none max-sm:opacity-0",
-                            // Desktop bez zmian: inline obok dymka, odsłaniany hoverem.
-                            "sm:static sm:bg-transparent sm:p-2 sm:text-zinc-500 sm:opacity-0 sm:hover:bg-white/5 sm:hover:text-red-400 sm:focus-visible:opacity-100 sm:group-hover:opacity-100"
-                          )}>
-                          <Heart className='h-4 w-4 sm:h-5 sm:w-5' />
-                        </button>
-                      )}
+                      <div
+                        className={cn(
+                          "flex min-w-0 flex-col",
+                          isMe ? "items-end" : "items-start",
+                        )}>
+                        {!isFollowUp && (
+                          <div
+                            className={cn(
+                              "mb-1 flex items-center gap-1.5",
+                              isMe && "flex-row-reverse",
+                            )}>
+                            <UserTooltip userId={msg.userId}>
+                              <span className='px-1 text-xs font-semibold text-zinc-400'>
+                                {msg.username}
+                              </span>
+                            </UserTooltip>
+                            {/* Outside the tooltip on purpose — its trigger takes a
+                                single child, and the tag belongs beside the name
+                                rather than inside what opens the card. */}
+                            <GuildTagBadge badge={msg.guildBadge} />
+                            {supportMember && <SupportBadge member={supportMember} />}
+                          </div>
+                        )}
+
+                        <div
+                          className='relative min-w-0'
+                          onClick={() =>
+                            setActiveMessageId((prev) =>
+                              prev === msg.id ? null : (msg.id ?? null),
+                            )
+                          }>
+                          <ChatMessageActions
+                            visible={isActive}
+                            onReact={react}
+                            onReply={() => {
+                              startReply(msg);
+                              focusInput();
+                            }}
+                            className={cn(
+                              "absolute -top-8",
+                              isMe ? "right-0" : "left-0",
+                            )}
+                          />
+                          <div
+                            className={cn(
+                              "flex flex-col gap-2 rounded-lg px-3 py-2 text-sm transition-colors [overflow-wrap:anywhere] sm:px-4",
+                              isMe
+                                ? "bg-cyan-500/20 text-cyan-50"
+                                : tagsMe
+                                  ? "bg-amber-500/15 text-amber-50"
+                                  : "bg-white/5 text-zinc-100",
+                              !isFollowUp && (isMe ? "rounded-tr" : "rounded-tl"),
+                              flashMessageId === msg.id && "bg-cyan-500/30",
+                            )}>
+                            {msg.replyTo && (
+                              <button
+                                type='button'
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  jumpToMessage(msg.replyTo!.id);
+                                }}
+                                className='flex min-w-0 flex-col rounded bg-black/20 px-2.5 py-1.5 text-left text-xs transition-colors hover:bg-black/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
+                                <span className='font-semibold text-zinc-300'>
+                                  ↪ {msg.replyTo.username}
+                                </span>
+                                <span className='truncate text-zinc-400'>
+                                  {msg.replyTo.message}
+                                </span>
+                              </button>
+                            )}
+                            {msg.message && (
+                              <span>
+                                <MessageText message={msg} viewerId={currentUserId} />
+                              </span>
+                            )}
+                            {msg.attachment && (
+                              <div
+                                className='w-72 max-w-full'
+                                onClick={(event) => event.stopPropagation()}>
+                                <ChatAttachmentCard
+                                  attachment={msg.attachment}
+                                  onOpenActivity={setActivity}
+                                  onOpenRecording={setRecordingId}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <ChatReactionChips
+                          reactions={msg.likes}
+                          viewerId={currentUserId}
+                          onToggle={react}
+                          alignEnd={isMe}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          )}
         </div>
-      </ScrollArea>
 
-      {/* Input Section - Standard Shadcn patterns */}
-      <div className='border-t border-white/10 bg-zinc-900/60 p-4 backdrop-blur-xl'>
-        <form 
-          onSubmit={sendMessage} 
-          className='mx-auto flex w-full max-w-4xl items-center gap-3'
-        >
-          <div className='relative flex-1'>
-            <Input
-              type='text'
-              value={newMessage}
-              placeholder={t("send_placeholder")}
-              autoComplete="off"
-              className='h-12 border-white/10 bg-zinc-950/50 pr-12 transition-all focus-visible:ring-cyan-500/50 rounded-xl'
-              onChange={(e) => setNewMessage(e.target.value)}
-            />
-          </div>
-          <Button
-            type='submit'
-            size='icon'
-            className='h-12 w-12 rounded-2xl bg-cyan-500 font-bold text-black shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 active:scale-95'
-          >
-            <SendHorizontal className='h-5 w-5' />
-          </Button>
-        </form>
-        {error && (
-          <p className='mt-2 px-1 text-center text-xs font-medium text-red-400'>
-            {error}
-          </p>
+        {unseenCount > 0 && (
+          <button
+            type='button'
+            onClick={jumpToLatest}
+            className='absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-cyan-500 px-3 py-1.5 text-xs font-semibold text-black transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-200 active:click-behavior'>
+            <ArrowDown className='h-3.5 w-3.5' />
+            {unseenCount} new
+          </button>
         )}
       </div>
+
+      <ChatComposer
+        value={newMessage}
+        onChange={setNewMessage}
+        onSubmit={handleSubmit}
+        placeholder={t("send_placeholder")}
+        inputRef={inputRef}
+        replyTo={replyTo}
+        onCancelReply={cancelReply}
+        attachment={attachment}
+        onClearAttachment={() => setAttachment(null)}
+        onOpenPicker={() => setPickerOpen(true)}
+        mentionCandidates={mentionCandidates}
+        onMention={addMention}
+        onTyping={notifyTyping}
+        typingText={typingLabel(typingNames)}
+        error={error}
+      />
+
+      <ChatAttachmentPicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        userId={currentUserId}
+        onPick={(picked) => {
+          setAttachment(picked);
+          focusInput();
+        }}
+      />
+
+      <ActivityStartModal
+        plan={activity?.plan}
+        exercise={activity?.exercise}
+        onClose={() => setActivity(null)}
+      />
+
+      <RecordingViewModal
+        isOpen={!!recordingId}
+        onClose={() => setRecordingId(null)}
+        recordingId={recordingId}
+      />
     </div>
   );
 };

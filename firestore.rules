@@ -217,15 +217,23 @@ service cloud.firestore {
     match /chats/{messageId} {
       // Any signed-in user can read and post messages
       allow read:   if request.auth != null;
+      // A client posts plain messages only: welcome cards and guild events are
+      // server-written (Admin SDK), and "mentionsNotified" is the server marking
+      // that /api/chat/mentions already rang the tagged players.
       allow create: if request.auth != null
-        && request.resource.data.userId == request.auth.uid;
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.get("type", "message") == "message"
+        && !("mentionsNotified" in request.resource.data);
 
-      // Author edits their own message (author fields immutable). Any other
-      // signed-in user may update ONLY the "likes" field, to like/unlike it.
+      // Author edits their own plain message (author and server fields
+      // immutable). Any other signed-in user may update ONLY the "likes" field —
+      // the reactions, each entry {id, username, emoji?}.
       allow update: if request.auth != null && (
         (
           resource.data.userId == request.auth.uid
-          && !("userId" in request.resource.data.diff(resource.data).affectedKeys())
+          && resource.data.get("type", "message") == "message"
+          && !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(["userId", "type", "mentionsNotified", "system", "welcome"])
         )
         || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
       );
@@ -377,18 +385,25 @@ service cloud.firestore {
         allow read: if request.auth != null
           && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.guildId == guildId;
 
+        // Plain messages only — level-ups, new members and finished sessions
+        // are posted by the server. Same shape as the global chat.
         allow create: if request.auth != null
           && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.guildId == guildId
-          && request.resource.data.userId == request.auth.uid;
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.get("type", "message") == "message"
+          && !("mentionsNotified" in request.resource.data);
 
-        // Author edits their own message (author fields immutable); any member
-        // may touch only "likes" — same shape as the global chat.
+        // Author edits their own plain message (author and server fields
+        // immutable); any member may touch only "likes" — same shape as the
+        // global chat.
         allow update: if request.auth != null
           && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.guildId == guildId
           && (
             (
               resource.data.userId == request.auth.uid
-              && !("userId" in request.resource.data.diff(resource.data).affectedKeys())
+              && resource.data.get("type", "message") == "message"
+              && !request.resource.data.diff(resource.data).affectedKeys()
+                .hasAny(["userId", "type", "mentionsNotified", "system", "welcome"])
             )
             || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
           );
