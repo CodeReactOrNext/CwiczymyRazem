@@ -7,8 +7,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
-import { motion } from "framer-motion";
-import { ChevronRight, Crosshair, Maximize2, Minus, Plus } from "lucide-react";
+import { Maximize2, Minus, Plus } from "lucide-react";
 import type {
   KeyboardEvent as ReactKeyboardEvent,
   PointerEvent as ReactPointerEvent,
@@ -61,77 +60,11 @@ const STATE_LABEL: Record<RoadmapNodeState, string> = {
   locked: "Pro exercise",
 };
 
-const LEGEND: { state: RoadmapNodeState; className: string }[] = [
-  { state: "completed", className: "bg-emerald-400" },
-  { state: "current", className: "bg-zinc-950 ring-2 ring-cyan-400" },
-  { state: "available", className: "bg-zinc-900 ring-1 ring-zinc-600" },
-  { state: "locked", className: "bg-zinc-900 ring-1 ring-zinc-700" },
-];
-
-const ProgressRing = ({
-  percent,
-  size,
-  stroke,
-  showLabel,
-}: {
-  percent: number;
-  size: number;
-  stroke: number;
-  showLabel?: boolean;
-}) => {
-  const r = size / 2 - stroke;
-  const circumference = 2 * Math.PI * r;
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      aria-hidden='true'>
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill='none'
-        stroke='#27272a'
-        strokeWidth={stroke}
-      />
-      <motion.circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill='none'
-        stroke='#22d3ee'
-        strokeWidth={stroke}
-        strokeLinecap='round'
-        strokeDasharray={circumference}
-        initial={{ strokeDashoffset: circumference }}
-        animate={{ strokeDashoffset: circumference * (1 - percent / 100) }}
-        transition={{ duration: 1.1, ease: "easeOut", delay: 0.3 }}
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-      />
-      {showLabel && (
-        <text
-          x={size / 2}
-          y={size / 2}
-          textAnchor='middle'
-          dominantBaseline='central'
-          fontSize='12'
-          fontWeight='700'
-          fill='#f4f4f5'>
-          {percent}%
-        </text>
-      )}
-    </svg>
-  );
-};
-
-const hudPanelClass = "rounded-lg bg-zinc-950/75 backdrop-blur-md";
 const controlButtonClass =
   "flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-950/75 text-zinc-300 backdrop-blur-md transition-background hover:bg-zinc-800 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
 
-const findCurrent = (
+const findCurrentNode = (
   layout: ReturnType<typeof layoutSkillRoadmap>,
-  tiers: ReturnType<typeof buildSkillRoadmap>,
   progress: ReturnType<typeof computeRoadmapProgress>,
 ) => {
   for (const layoutTier of layout.tiers) {
@@ -139,16 +72,7 @@ const findCurrent = (
       const node = layoutBranch.nodes.find(
         (n) => progress.states.get(n.id) === "current",
       );
-      if (!node) continue;
-      const branch = tiers
-        .find((t) => t.id === layoutTier.id)
-        ?.branches.find((b) => b.id === layoutBranch.id);
-      return {
-        node,
-        tierId: layoutTier.id,
-        branchLabel: branch?.label ?? "",
-        skillId: branch?.skillId ?? "",
-      };
+      if (node) return node;
     }
   }
   return null;
@@ -179,11 +103,8 @@ export const SkillRoadmapView = ({
     [tiers, progressMap, isPremium],
   );
 
-  /** The "up next" dot, the tier it sits in and the branch that names it. */
-  const current = findCurrent(layout, tiers, progress);
-  const currentExercise = current
-    ? exerciseById.get(current.node.id)
-    : undefined;
+  /** The "up next" dot — a returning player opens the map on it. */
+  const currentNode = findCurrentNode(layout, progress);
 
   const [scale, setScale] = useState(1);
   const [hovered, setHovered] = useState<RoadmapNodeHover | null>(null);
@@ -276,35 +197,18 @@ export const SkillRoadmapView = ({
     return () => el.removeEventListener("wheel", onWheel);
   }, [scale, zoomTo]);
 
-  const scrollToPoint = useCallback(
-    (x: number, y: number, behavior: ScrollBehavior = "smooth") => {
-      const el = scrollRef.current;
-      if (!el) return;
-      el.scrollTo({
-        left: x * scale - el.clientWidth / 2,
-        top: y * scale - el.clientHeight * 0.45,
-        behavior,
-      });
-    },
-    [scale],
-  );
-
-  const scrollToCurrent = useCallback(() => {
-    if (current) scrollToPoint(current.node.x, current.node.y);
-  }, [current, scrollToPoint]);
-
   // A returning player opens the map where they left off; a blank map stays at
   // the start. Runs once, on the first render that has progress loaded.
   useEffect(() => {
-    if (centeredRef.current || !current || progressMap.size === 0) return;
+    if (centeredRef.current || !currentNode || progressMap.size === 0) return;
     const el = scrollRef.current;
     if (!el || !el.clientWidth) return;
     centeredRef.current = true;
     el.scrollTo({
       left: Math.max(0, (layout.width * scale - el.clientWidth) / 2),
-      top: current.node.y * scale - el.clientHeight * 0.45,
+      top: currentNode.y * scale - el.clientHeight * 0.45,
     });
-  }, [current, progressMap, layout.width, scale]);
+  }, [currentNode, progressMap, layout.width, scale]);
 
   // Mouse drag pans; touch keeps the browser's own scrolling.
   const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -442,11 +346,6 @@ export const SkillRoadmapView = ({
       ? Math.min(Math.max(hovered.screenX, 124), window.innerWidth - 124)
       : 0;
 
-  const percent =
-    progress.total > 0
-      ? Math.round((progress.completed / progress.total) * 100)
-      : 0;
-
   return (
     <div className='relative h-full w-full overflow-hidden bg-[#0b0b10]'>
       {/* Ambient backdrop: the optional artwork under a wash of colour, else a
@@ -509,99 +408,6 @@ export const SkillRoadmapView = ({
         aria-hidden='true'
         className='pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0b0b10] via-[#0b0b10]/70 to-transparent lg:h-16 lg:via-transparent'
       />
-
-      {/* Overall progress: the full panel on a desktop, a pill on a phone. */}
-      <div
-        className={cn(
-          hudPanelClass,
-          "absolute right-4 top-4 hidden w-56 flex-col gap-4 p-4 md:flex",
-        )}>
-        <div className='flex items-center gap-4'>
-          <ProgressRing percent={percent} size={56} stroke={5} showLabel />
-          <div>
-            <p className='text-sm font-bold text-zinc-100'>
-              {progress.completed} / {progress.total}
-            </p>
-            <p className='text-xs text-zinc-400'>exercises completed</p>
-          </div>
-        </div>
-        <ul className='flex flex-col gap-2'>
-          {LEGEND.map(({ state, className: dot }) => (
-            <li
-              key={state}
-              className='flex items-center gap-2 text-xs text-zinc-300'>
-              <span
-                className={cn("h-2.5 w-2.5 flex-shrink-0 rounded-full", dot)}
-              />
-              {STATE_LABEL[state]}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div
-        className={cn(
-          hudPanelClass,
-          "absolute right-4 top-4 flex items-center gap-2 px-3 py-2 md:hidden",
-        )}>
-        <ProgressRing percent={percent} size={26} stroke={3} />
-        <span className='text-xs font-bold tabular-nums text-zinc-100'>
-          {progress.completed}
-          <span className='font-medium text-zinc-500'>/{progress.total}</span>
-        </span>
-      </div>
-
-      {/* Continue: always reachable, and it never covers the map. */}
-      {currentExercise && current && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.4 }}
-          className={cn(
-            hudPanelClass,
-            "absolute bottom-[4.5rem] left-4 right-16 p-3 sm:right-auto sm:w-72 lg:bottom-4",
-          )}>
-          <div className='flex items-center justify-between gap-2'>
-            <p className='text-[11px] font-bold text-cyan-400'>Up next</p>
-            <button
-              type='button'
-              onClick={scrollToCurrent}
-              className='flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold text-zinc-400 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-200'>
-              <Crosshair className='h-3 w-3' />
-              Show on map
-            </button>
-          </div>
-          <p className='mt-1 text-[13px] font-bold leading-snug text-zinc-100'>
-            {currentExercise.title}
-          </p>
-          {current.branchLabel && (
-            <p className='mt-0.5 truncate text-[11px] text-zinc-500'>
-              {current.branchLabel}
-              {!!skillLevels[current.skillId] && (
-                <span className='tabular-nums'>
-                  {" · "}Lvl {skillLevels[current.skillId]}
-                </span>
-              )}
-            </p>
-          )}
-          <div className='mt-3 flex items-center justify-between gap-2'>
-            <Chip
-              color='custom'
-              style={getChipCustomStyle(
-                DIFFICULTY_HEX[currentExercise.difficulty],
-              )}
-              className='px-2 py-0.5 text-[11px] capitalize'>
-              {currentExercise.difficulty}
-            </Chip>
-            <button
-              type='button'
-              onClick={() => startExercise(currentExercise)}
-              className='flex items-center gap-1 rounded-lg bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-950 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
-              <ChevronRight size={14} strokeWidth={2.5} />
-              Start
-            </button>
-          </div>
-        </motion.div>
-      )}
 
       <div className='absolute bottom-[4.5rem] right-4 flex flex-col gap-2 lg:bottom-4'>
         <button
