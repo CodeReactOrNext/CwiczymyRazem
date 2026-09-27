@@ -1,10 +1,18 @@
 import { alternatePickingCrossStringExercise } from "feature/exercisePlan/data/exerises/alternatePickingCrossString/alternatePickingCrossString";
+import { aMajorTriadsExercise } from "feature/exercisePlan/data/exerises/aMajorTriads/aMajorTriads";
+import { aMinorTriadsExercise } from "feature/exercisePlan/data/exerises/aMinorTriads/aMinorTriads";
 import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
 import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
 import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
 import { crazyTrainRiffPreviewExercise } from "feature/exercisePlan/data/exerises/crazyTrainRiffPreview/crazyTrainRiffPreview";
+import { dMajorTriadsExercise } from "feature/exercisePlan/data/exerises/dMajorTriads/dMajorTriads";
+import { dMinorTriadsExercise } from "feature/exercisePlan/data/exerises/dMinorTriads/dMinorTriads";
 import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
+import { eMajorTriadsExercise } from "feature/exercisePlan/data/exerises/eMajorTriads/eMajorTriads";
+import { eMinorTriadsExercise } from "feature/exercisePlan/data/exerises/eMinorTriads/eMinorTriads";
 import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
+import { gMajorInversionsExercise } from "feature/exercisePlan/data/exerises/gMajorInversions/gMajorInversions";
+import { gMinorInversionsExercise } from "feature/exercisePlan/data/exerises/gMinorInversions/gMinorInversions";
 import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
 import { guitarPlayalongsExercises } from "feature/exercisePlan/data/exerises/guitarPlayalongs/guitarPlayalongs";
 import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
@@ -108,6 +116,7 @@ import { sweetChildOMineRiffPreviewExercise } from "feature/exercisePlan/data/ex
 import { thunderstruckRiffPreviewExercise } from "feature/exercisePlan/data/exerises/thunderstruckRiffPreview/thunderstruckRiffPreview";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
+import { writeYourOwnPartExercise } from "feature/exercisePlan/data/exerises/writeYourOwnPart/writeYourOwnPart";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 // Exercises available for free — all others require Pro
@@ -507,6 +516,15 @@ const rawExercises: Exercise[] = [
   nakedToneMelodyExercise,
   mutingSpotlightDrillExercise,
   chordSpotlightDrillExercise,
+  gMajorInversionsExercise,
+  gMinorInversionsExercise,
+  aMajorTriadsExercise,
+  aMinorTriadsExercise,
+  dMajorTriadsExercise,
+  dMinorTriadsExercise,
+  eMajorTriadsExercise,
+  eMinorTriadsExercise,
+  writeYourOwnPartExercise,
   vibratoSustainDrillExercise,
   vibratoLowPositionExercise,
   vibratoHighPositionExercise,

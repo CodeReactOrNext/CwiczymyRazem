@@ -171,8 +171,8 @@ export const ROADMAP_TIERS: RoadmapTier[] = [
     description:
       "Level up from playing. Unlocks milestones, profile layouts, and which gear rarity you can equip.",
   },
-  { id: "t161", goal: 161, icon: Target, label: "+4 New Exercises", kind: "content" },
-  { id: "t171", goal: 171, icon: Target, label: "+1 New Exercise", kind: "content" },
+  { id: "t161", goal: 161, icon: Target, label: "+4 New Exercises", kind: "content", done: true },
+  { id: "t171", goal: 171, icon: Target, label: "+1 New Exercise", kind: "content", done: true },
   {
     id: "t181",
     goal: 181,

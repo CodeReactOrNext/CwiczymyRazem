@@ -965,6 +965,51 @@
     "permanent": true
   },
   {
+    "source": "/exercises/g-major-inversions",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/g-minor-inversions",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/a-major-triads",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/a-minor-triads",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/d-major-triads",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/d-minor-triads",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/e-major-triads",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/e-minor-triads",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/write-your-own-part",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
     "source": "/exercises/vibrato-sustain-drill",
     "destination": "/beginner-guitar-exercises",
     "permanent": true
