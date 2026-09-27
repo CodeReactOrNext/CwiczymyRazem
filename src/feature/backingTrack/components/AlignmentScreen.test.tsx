@@ -122,7 +122,7 @@ describe("AlignmentScreen", () => {
   it("names the track being aligned and shows where it currently sits", () => {
     render(<AlignmentScreen controller={buildController()} beatsPerBar={4} onClose={vi.fn()} />);
 
-    expect(screen.getByText("Do I Wanna Know")).toBeTruthy();
+    expect(screen.getAllByText("Do I Wanna Know").length).toBeGreaterThan(0);
     expect(screen.getByText("+250 ms")).toBeTruthy();
   });
 
@@ -709,14 +709,14 @@ describe("AlignmentScreen orientation", () => {
       />,
     );
 
-    expect(screen.getByText(/drag bar 1 on the ruler/i)).toBeTruthy();
+    expect(screen.getByText(/yellow START flag/i)).toBeTruthy();
   });
 
   it("stops nagging once the recording has been placed", () => {
     // The default fixture already sits at +250 ms, so the job is done.
     render(<AlignmentScreen controller={buildController()} beatsPerBar={4} onClose={vi.fn()} />);
 
-    expect(screen.queryByText(/drag bar 1 on the ruler/i)).toBeNull();
+    expect(screen.queryByText(/yellow START flag/i)).toBeNull();
   });
 
   it("lists every shortcut behind one key, instead of a sentence nobody reads", () => {

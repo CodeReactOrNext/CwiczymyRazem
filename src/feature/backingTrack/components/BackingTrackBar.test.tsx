@@ -46,9 +46,9 @@ afterEach(cleanup);
  */
 function renderWithSettings(ui: React.ReactElement) {
   const result = render(ui);
-  fireEvent.click(screen.getByText(/Mixer & sync|Set up/));
+  fireEvent.click(screen.getByText(/Add a recording|Line up with tab|Sync & mix/));
   // The editor collapses setup once a source is chosen, so open it explicitly.
-  const band = screen.queryByText("Source & mix");
+  const band = screen.queryByText("Choose the recording");
   if (band && band.closest("button")?.getAttribute("aria-expanded") === "false") {
     fireEvent.click(band);
   }
@@ -198,7 +198,7 @@ describe("BackingTrackBar per-source controls", () => {
   it("keeps the master level and recording tempo out of the YouTube view", () => {
     renderWithSettings(<BackingTrackBar controller={buildController()} sessionBpm={120} />);
 
-    expect(screen.queryByText("Master")).toBeNull();
+    expect(screen.queryByText("Volume")).toBeNull();
     expect(screen.queryByText("Recording tempo")).toBeNull();
   });
 
@@ -210,7 +210,7 @@ describe("BackingTrackBar per-source controls", () => {
 
     renderWithSettings(<BackingTrackBar controller={controller} sessionBpm={120} />);
 
-    expect(screen.getByText("Master")).toBeTruthy();
+    expect(screen.getByText("Volume")).toBeTruthy();
     expect(screen.getByText("Recording tempo")).toBeTruthy();
   });
 
@@ -331,9 +331,9 @@ describe("BackingTrackBar alignment mode", () => {
 
   it("opens the alignment screen and explains why YouTube has no waveform", () => {
     render(<BackingTrackBar controller={buildController()} sessionBpm={120} />);
-    fireEvent.click(screen.getByText("Mixer & sync"));
+    fireEvent.click(screen.getByText("Line up with tab"));
 
-    expect(screen.getByText("Align backing track")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Backing track" })).toBeTruthy();
     // A video's waveform has to be learned by listening, which needs tab-audio
     // capture — jsdom has none, the same as Firefox and Safari.
     expect(screen.getByText(/can't share tab audio/i)).toBeTruthy();
@@ -349,7 +349,7 @@ describe("BackingTrackBar alignment mode", () => {
     });
 
     render(<BackingTrackBar controller={controller} sessionBpm={120} />);
-    fireEvent.click(screen.getByText("Mixer & sync"));
+    fireEvent.click(screen.getByText("Line up with tab"));
 
     expect(
       screen.getByLabelText("Backing track alignment grid — drag to move the view"),
@@ -358,10 +358,10 @@ describe("BackingTrackBar alignment mode", () => {
 
   it("closes the screen again", () => {
     render(<BackingTrackBar controller={buildController()} sessionBpm={120} />);
-    fireEvent.click(screen.getByText("Mixer & sync"));
+    fireEvent.click(screen.getByText("Line up with tab"));
     fireEvent.click(screen.getByText("Done"));
 
-    expect(screen.queryByText("Align backing track")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Backing track" })).toBeNull();
   });
 
   it("has nothing to align when no source is playing", () => {
@@ -385,7 +385,7 @@ describe("BackingTrackBar video over a file", () => {
     const setVideoOverlay = vi.fn();
 
     renderWithSettings(<BackingTrackBar controller={fileController({ setVideoOverlay })} sessionBpm={120} />);
-    fireEvent.click(screen.getByText("Video"));
+    fireEvent.click(screen.getByText("Show video"));
 
     expect(setVideoOverlay).toHaveBeenCalledWith(true);
   });

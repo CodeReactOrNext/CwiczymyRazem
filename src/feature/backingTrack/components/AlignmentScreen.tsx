@@ -566,6 +566,42 @@ export function AlignmentScreen({
     anchorCount === 0 &&
     Math.round(alignment.offsetMs) === 0;
 
+  const currentStep = !hasSomethingToAlign ? 1 : needsFirstStep ? 2 : 3;
+  const steps: { n: 1 | 2 | 3; title: string; detail?: string; done: boolean }[] = [
+    {
+      n: 1,
+      title: "Choose the recording",
+      detail: !hasSomethingToAlign
+        ? "a YouTube video or audio files"
+        : source === "file"
+          ? stems.length === 1
+            ? nameOf(stems[0].trackId)
+            : `${stems.length} files as layers`
+          : "YouTube video",
+      done: hasSomethingToAlign,
+    },
+    {
+      n: 2,
+      title: "Put bar 1 on the first beat",
+      detail: hasSomethingToAlign && !needsFirstStep
+        ? `starts at ${alignment.offsetMs > 0 ? "+" : ""}${Math.round(alignment.offsetMs)} ms`
+        : "so the tab and the song start together",
+      done: hasSomethingToAlign && !needsFirstStep,
+    },
+    {
+      n: 3,
+      title: "Listen and fine-tune",
+      detail: "fix any bar that drifts later on",
+      done: false,
+    },
+  ];
+  const stepHint =
+    currentStep === 1
+      ? "Pick where the sound comes from below. It will play under the tab and follow play, pause and every bar you click."
+      : currentStep === 2
+        ? "Press Space to play. Drag the yellow START flag on the Bars row onto the first beat you hear — or nudge the whole recording with [ and ]."
+        : "Play along and listen. If the tab runs ahead or behind later in the song, drag that bar's line onto its beat. Press Done when it sounds right — it is saved for this song.";
+
   const timeline = {
     startTime,
     effectiveBpm,
@@ -804,16 +840,26 @@ export function AlignmentScreen({
           "flex shrink-0 flex-wrap items-center justify-between gap-4 border-b bg-zinc-900 px-6 py-3",
           RULE,
         )}>
-        <div className='flex items-center gap-3'>
-          <Crosshair className='h-4 w-4 text-cyan-400' />
-          <h2 className='text-base font-semibold text-zinc-100'>
-            Align backing track
-          </h2>
-          <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-medium text-zinc-300'>
-            {source === "file"
-              ? `${stems.length} ${stems.length === 1 ? "stem" : "stems"}`
-              : "YouTube"}
-          </span>
+        <div className='flex min-w-0 items-start gap-3'>
+          <Crosshair className='mt-1 h-4 w-4 shrink-0 text-cyan-400' />
+          <div className='flex min-w-0 flex-col gap-0.5'>
+            <div className='flex items-center gap-3'>
+              <h2 className='text-base font-semibold text-zinc-100'>
+                Backing track
+              </h2>
+              {hasSomethingToAlign && (
+                <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-medium text-zinc-300'>
+                  {source === "file"
+                    ? `${stems.length} ${stems.length === 1 ? "stem" : "stems"}`
+                    : "YouTube"}
+                </span>
+              )}
+            </div>
+            <p className='text-xs text-zinc-400'>
+              Play the real song under the tab, lined up so both hit bar 1
+              together.
+            </p>
+          </div>
         </div>
 
         <div className='flex items-center gap-4'>
@@ -843,32 +889,90 @@ export function AlignmentScreen({
         </div>
       </div>
 
-      {setup && (
-        <div className={cn("shrink-0 border-b bg-zinc-900/40", RULE)}>
-          <button
-            type='button'
-            onClick={() => {
-              setSetupTouched(true);
-              setShowSetup((open) => !open);
-            }}
-            aria-expanded={isSetupOpen}
-            className='flex w-full items-center gap-2 px-6 py-2.5 text-left transition-colors hover:bg-zinc-800/40'>
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 text-zinc-400 transition-transform",
-                !isSetupOpen && "-rotate-90",
-              )}
-            />
-            <span className={panelLabel}>Source &amp; mix</span>
-            {!hasSomethingToAlign && (
-              <span className='text-xs text-amber-400'>
-                pick a recording to start
-              </span>
-            )}
-          </button>
-          {isSetupOpen && <div className='px-6 pb-4'>{setup}</div>}
-        </div>
-      )}
+      {/* ── Steps: what this screen is for, in the order it gets done ───── */}
+      {/* The screen used to open on a wall of tools with the one thing that
+          mattered — pick a recording, then put bar 1 on its first beat —
+          folded away under "Source & mix" or written in the footer. */}
+      <div className={cn("shrink-0 border-b bg-zinc-900/40", RULE)}>
+        <ol className='flex flex-wrap items-stretch gap-2 px-6 pt-3'>
+          {steps.map((step) => {
+            const isCurrent = step.n === currentStep;
+            const body = (
+              <>
+                <span
+                  className={cn(
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums",
+                    step.done
+                      ? "bg-emerald-500/15 text-emerald-400"
+                      : isCurrent
+                        ? "bg-cyan-500/15 text-cyan-400"
+                        : "bg-zinc-800/60 text-zinc-500",
+                  )}>
+                  {step.done ? <Check className='h-3.5 w-3.5' /> : step.n}
+                </span>
+                <span className='flex min-w-0 flex-col'>
+                  <span
+                    className={cn(
+                      "text-sm font-semibold",
+                      isCurrent
+                        ? "text-zinc-100"
+                        : step.done
+                          ? "text-zinc-300"
+                          : "text-zinc-500",
+                    )}>
+                    {step.title}
+                  </span>
+                  {step.detail && (
+                    <span className='truncate text-xs text-zinc-400'>
+                      {step.detail}
+                    </span>
+                  )}
+                </span>
+              </>
+            );
+            const stepClass = cn(
+              "flex min-w-[13rem] flex-1 items-center gap-3 rounded-xl px-3.5 py-2.5 text-left",
+              isCurrent ? "bg-zinc-800/60" : "bg-zinc-900/60",
+            );
+            return (
+              <li key={step.n} className='flex min-w-[13rem] flex-1'>
+                {step.n === 1 && setup ? (
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setSetupTouched(true);
+                      setShowSetup(!isSetupOpen);
+                    }}
+                    aria-expanded={isSetupOpen}
+                    className={cn(
+                      stepClass,
+                      "transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800",
+                    )}>
+                    {body}
+                    <ChevronDown
+                      className={cn(
+                        "ml-auto h-4 w-4 shrink-0 text-zinc-400 transition-transform",
+                        !isSetupOpen && "-rotate-90",
+                      )}
+                    />
+                  </button>
+                ) : (
+                  <div className={stepClass}>{body}</div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+        <p
+          className={cn(
+            "flex items-start gap-2 px-6 py-3 text-xs leading-relaxed",
+            currentStep === 3 ? "text-zinc-400" : "text-cyan-400",
+          )}>
+          <Target className='mt-0.5 h-3.5 w-3.5 shrink-0' />
+          {stepHint}
+        </p>
+        {setup && isSetupOpen && <div className='px-6 pb-5'>{setup}</div>}
+      </div>
 
       {!hasSomethingToAlign ? (
         // With a setup panel above, the band already says what to do. Without
@@ -1372,18 +1476,10 @@ export function AlignmentScreen({
               </div>
             </div>
 
-            {needsFirstStep ? (
-              <p className='flex items-center gap-2 text-xs text-cyan-400'>
-                <Target className='h-3.5 w-3.5 shrink-0' />
-                Start here: drag bar 1 on the ruler onto the first beat you
-                hear. Everything else is measured from it.
-              </p>
-            ) : (
-              <p className='text-xs text-zinc-400'>
-                Space plays without a count-in · middle-drag moves the view ·
-                press ? for every shortcut
-              </p>
-            )}
+            <p className='text-xs text-zinc-400'>
+              Space plays without a count-in · middle-drag moves the view ·
+              press ? for every shortcut
+            </p>
           </div>
         </>
       )}
