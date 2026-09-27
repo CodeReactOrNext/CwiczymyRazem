@@ -207,7 +207,10 @@ export const ChatAttachmentPicker = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='dark-theme flex max-h-[85vh] flex-col gap-5 rounded-lg bg-zinc-950 p-6 sm:max-w-lg'>
+      <DialogContent
+        // Opened from the community drawer, which sits at z-[110].
+        overlayClassName='z-[120]'
+        className='dark-theme z-[120] flex max-h-[85vh] flex-col gap-5 rounded-lg bg-zinc-950 p-6 sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle className='text-base'>Share to chat</DialogTitle>
         </DialogHeader>

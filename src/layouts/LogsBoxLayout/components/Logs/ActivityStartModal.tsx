@@ -48,7 +48,7 @@ export const ActivityStartModal = ({ plan, exercise, onClose }: ActivityStartMod
           rather than the rules the modal used to draw across itself. */}
       {/* No `relative` here — DialogContent is `fixed` (which already anchors the
           absolute decorations below), and tailwind-merge would drop the `fixed`. */}
-      <DialogContent className="flex flex-col gap-6 overflow-hidden rounded-lg bg-zinc-950/95 p-6 backdrop-blur-3xl sm:max-w-[480px]">
+      <DialogContent overlayClassName="z-[120]" className="z-[120] flex flex-col gap-6 overflow-hidden rounded-lg bg-zinc-950/95 p-6 backdrop-blur-3xl sm:max-w-[480px]">
         {/* Cyan wash over the top of the card — same treatment the header block
             used to carry, now spanning the whole (borderless) panel. */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-cyan-500/10 to-transparent" />

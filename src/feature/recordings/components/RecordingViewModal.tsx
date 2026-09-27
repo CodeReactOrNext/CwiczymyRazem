@@ -89,7 +89,7 @@ export const RecordingViewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='flex h-full max-w-none flex-col overflow-hidden border-white/5 bg-zinc-950 p-0 text-white sm:h-[85vh] sm:max-w-6xl sm:flex-row sm:rounded-2xl'>
+      <DialogContent overlayClassName='z-[120]' className='z-[120] flex h-full max-w-none flex-col overflow-hidden border-white/5 bg-zinc-950 p-0 text-white sm:h-[85vh] sm:max-w-6xl sm:flex-row sm:rounded-2xl'>
         {/* Left Side: Video & Info */}
         <div className='flex min-h-0 flex-1 flex-col overflow-hidden border-white/5 sm:border-r'>
           <div className='relative z-10 aspect-video shrink-0 bg-black'>
