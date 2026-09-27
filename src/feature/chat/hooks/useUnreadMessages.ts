@@ -16,7 +16,16 @@ interface UnreadMessagesState {
   lastReadTime: Date;
 }
 
-export const useUnreadMessages = (collectionName: "chats" | "logs") => {
+/** A guild keeps its room under its own document — see `guildChatPath`. */
+type GuildChatPath = `guilds/${string}/chat`;
+
+/**
+ * The room to count. `null` switches the listener off, for a room the player has no access to —
+ * a guild chat before they have joined one.
+ */
+export type UnreadSource = "chats" | "logs" | GuildChatPath;
+
+export const useUnreadMessages = (collectionName: UnreadSource | null) => {
   const [state, setState] = useState<UnreadMessagesState>({
     unreadCount: 0,
     hasNewMessages: false,
@@ -26,7 +35,7 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
   const lastReadTimeRef = useRef<Date>(new Date(Date.now() - 3600000));
 
   useEffect(() => {
-    if (!currentUserId) return;
+    if (!currentUserId || !collectionName) return;
 
     const lastReadKey = `${collectionName}_lastRead_${currentUserId}`;
     const lastRead = localStorage.getItem(lastReadKey);
@@ -81,6 +90,9 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
           const data = doc.data();
           // Fix: skip pending writes (null timestamp) instead of treating them as new
           if (!data.timestamp || !data.timestamp.toDate) return false;
+          // Your own message is never news to you — without this, writing and then closing the
+          // chat before switching tabs flagged your own line as unread.
+          if (data.userId === currentUserId) return false;
 
           return data.timestamp.toDate() > currentLastReadTime;
         }).length;
@@ -102,7 +114,7 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
   }, [collectionName, currentUserId]);
 
   const markAsRead = () => {
-    if (!currentUserId) return;
+    if (!currentUserId || !collectionName) return;
     const lastReadKey = `${collectionName}_lastRead_${currentUserId}`;
     const now = Date.now();
     localStorage.setItem(lastReadKey, now.toString());
@@ -123,8 +135,8 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
   };
 
   return {
-    unreadCount: state.unreadCount,
-    hasNewMessages: state.hasNewMessages,
+    unreadCount: collectionName ? state.unreadCount : 0,
+    hasNewMessages: Boolean(collectionName) && state.hasNewMessages,
     markAsRead,
     isNewMessage
   };

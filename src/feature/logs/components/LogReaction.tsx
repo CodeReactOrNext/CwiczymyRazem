@@ -189,9 +189,10 @@ export const LogReaction = ({
           transition={{ duration: 0.4, ease: "easeOut" }}
           className={cn(
             "group relative flex min-h-[32px] cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:min-h-[38px] sm:gap-2 sm:px-3 sm:text-[13px]",
+            // The action is what should catch the eye; a row already motivated steps back.
             isReacted
-              ? "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25"
-              : "bg-zinc-800 text-zinc-300 hover:bg-amber-500/15 hover:text-amber-300",
+              ? "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-300"
+              : "bg-amber-500/15 text-amber-300 hover:bg-amber-500/25",
             showHint && !isReacted && "ring-1 ring-amber-400/40",
             isPending && "cursor-wait opacity-70",
           )}>
@@ -260,7 +261,7 @@ export const LogReaction = ({
             <Coin
               className={cn(
                 "h-5 w-5 transition-opacity duration-200 sm:h-[22px] sm:w-[22px]",
-                !isReacted && "opacity-60 group-hover:opacity-100",
+                isReacted && "opacity-50 group-hover:opacity-80",
               )}
             />
             <span>{isReacted ? "Motivated" : "Motivate"}</span>

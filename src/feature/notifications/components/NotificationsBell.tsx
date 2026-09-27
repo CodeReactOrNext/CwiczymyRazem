@@ -235,7 +235,8 @@ export const NotificationsBell = () => {
           onPointerDown={spawnRipple}
           whileTap={{ scale: 0.88 }}
           transition={{ type: "spring", stiffness: 500, damping: 25 }}
-          className='group relative flex items-center gap-2 overflow-hidden rounded-[8px] bg-white/5 px-2.5 py-2 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 data-[state=open]:bg-white/10 data-[state=open]:ring-1 data-[state=open]:ring-white/15 hover:bg-white/10'>
+          aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
+          className='group relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-[8px] bg-white/5 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 data-[state=open]:bg-white/10 data-[state=open]:ring-1 data-[state=open]:ring-white/15 hover:bg-white/10'>
           <AnimatePresence>
             {ripples.map((r) => (
               <motion.span
@@ -257,7 +258,7 @@ export const NotificationsBell = () => {
             )}
           />
           {unreadCount > 0 && (
-            <span className='flex h-5 min-w-[20px] select-none items-center justify-center rounded-[4px] bg-red-500/20 px-1.5 text-[12px] font-bold text-red-400'>
+            <span className='absolute right-0.5 top-0.5 flex h-4 min-w-[16px] select-none items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white'>
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}

@@ -117,11 +117,11 @@
     "add": "Add",
     "learned": "learned the song",
     "learning": "learning the song",
-    "wantToLearn": "added the song to his list of songs to learn",
-    "added": "added the song to his list of songs",
+    "wantToLearn": "added the song to their list of songs to learn",
+    "added": "added the song to their list of songs",
     "difficulty_rate": "rated the song difficulty",
     "practiced": "practiced the song",
-    "updated": "updated his song progress"
+    "updated": "updated their song progress"
   },
   "chart": {
     "activity_overview": "Activity overview",

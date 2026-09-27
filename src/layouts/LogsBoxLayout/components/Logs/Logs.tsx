@@ -11,7 +11,6 @@ import Avatar from "components/UI/Avatar";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { UserLink } from "components/UserLink";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
-import { formatDistanceToNow } from "date-fns";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
@@ -67,6 +66,7 @@ import type {
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
 import { calculateGroupFame } from "feature/logs/utils/activityFame";
+import { formatLogTime } from "feature/logs/utils/formatLogTime";
 import {
   type AnyFirebaseLog,
   dropIncompleteTailGroup,
@@ -427,7 +427,7 @@ interface LogsBoxLayoutProps {
 }
 
 const TimeStamp = ({ date }: { date: Date }) => (
-  <p className='mb-2 w-full whitespace-nowrap border-main-opposed-400 py-1 text-[0.6rem] text-secondText opacity-60 sm:mb-0 sm:w-auto sm:text-[0.55rem] sm:opacity-100 lg:mr-4 lg:border-r-2 lg:pr-4 lg:text-xs'>
+  <p className='mb-2 w-full whitespace-nowrap py-1 text-[0.6rem] text-zinc-400 opacity-60 sm:mb-0 sm:w-auto sm:text-[0.55rem] sm:opacity-100 lg:mr-4 lg:text-xs'>
     {date.toLocaleDateString() +
       " " +
       addZeroToTime(date.getHours()) +
@@ -444,8 +444,8 @@ const LogItem = ({
   children: React.ReactNode;
 }) => (
   <div
-    className={`my-8 flex flex-col flex-nowrap items-start rounded-xl bg-main-opposed-bg px-4 py-5 transition-all duration-300 sm:px-6 lg:flex-row lg:items-center ${
-      isNew ? "border border-white/30" : ""
+    className={`my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-4 transition-all duration-300 sm:px-5 lg:flex-row lg:items-center ${
+      isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
     }`}>
     {children}
   </div>
@@ -504,12 +504,12 @@ const SeasonHeader = ({
       </h3>
     </div>
 
-    <span className='text-xs font-semibold tracking-wide text-secondText'>
+    <span className='text-xs font-semibold tracking-wide text-zinc-400'>
       {seasonName}
     </span>
 
     {/* Right side with date info - on larger screens */}
-    <div className='ml-auto hidden items-center gap-3 text-xs text-secondText sm:flex'>
+    <div className='ml-auto hidden items-center gap-3 text-xs text-zinc-400 sm:flex'>
       {daysLeftInSeason !== undefined && (
         <Chip color='gray'>
           <IoCalendarOutline className='h-3.5 w-3.5 shrink-0' />
@@ -525,7 +525,7 @@ const SeasonHeader = ({
 
     {/* Days left - on mobile only */}
     {daysLeftInSeason !== undefined && (
-      <div className='mt-2 flex w-full items-center justify-end text-xs text-secondText sm:hidden'>
+      <div className='mt-2 flex w-full items-center justify-end text-xs text-zinc-400 sm:hidden'>
         <Chip color='gray'>
           <IoCalendarOutline className='h-3.5 w-3.5 shrink-0' />
           <span className='tabular-nums'>{daysLeftInSeason}</span>
@@ -568,7 +568,7 @@ const PlayerRow = ({
 
       <div className='ml-auto'>
         <div className='flex items-baseline gap-1.5'>
-          <span className='text-[10px] font-semibold text-secondText opacity-60 sm:text-xs'>
+          <span className='text-[10px] font-semibold text-zinc-400 opacity-60 sm:text-xs'>
             pt:
           </span>
           <span
@@ -591,16 +591,16 @@ const NoTopPlayersData = ({
   t: (key: string) => string;
 }) => (
   <div
-    className={`my-6 flex flex-col flex-nowrap items-start rounded-xl bg-main-opposed-bg px-4 py-5 transition-all duration-300 sm:px-6 lg:flex-row lg:items-center ${
-      isNew ? "border border-white/30" : ""
+    className={`my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-5 transition-all duration-300 sm:px-6 lg:flex-row lg:items-center ${
+      isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
     }`}>
     <TimeStamp date={date} />
     <div className='flex w-full flex-col gap-2 sm:w-[80%]'>
-      <h3 className='flex items-center gap-2 text-sm font-bold text-tertiary'>
+      <h3 className='flex items-center gap-2 text-sm font-bold text-zinc-200'>
         <FaTrophy className='text-yellow-400' />
         <span>{t("logsBox.top_players")}</span>
       </h3>
-      <p className='text-secondText'>No top players data available.</p>
+      <p className='text-zinc-400'>No top players data available.</p>
     </div>
   </div>
 );
@@ -628,8 +628,8 @@ const FirebaseLogsTopPlayersItem = ({
 
   return (
     <div
-      className={`my-4 flex flex-col overflow-hidden rounded-xl bg-main-opposed-bg transition-all duration-300 ${
-        isNew ? "border border-white/30 shadow-xl" : ""
+      className={`my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-300 ${
+        isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <SeasonHeader
         seasonName={seasonName}
@@ -659,8 +659,8 @@ const FirebaseLogsGuildLevelItem = ({
 
   return (
     <div
-      className={`my-4 flex flex-col gap-3 rounded-xl bg-main-opposed-bg px-3 py-3 transition-all duration-300 sm:px-5 sm:py-4 ${
-        isNew ? "border border-white/30" : ""
+      className={`my-3 flex flex-col gap-3 rounded-xl px-3 py-3 transition-all duration-300 sm:px-5 sm:py-4 ${
+        isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <div className='flex flex-wrap items-center gap-3'>
         <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10'>
@@ -675,7 +675,7 @@ const FirebaseLogsGuildLevelItem = ({
             {log.guildName} reached level {log.level}
           </h3>
         </div>
-        <span className='ml-auto shrink-0 text-[11px] text-secondText opacity-60'>
+        <span className='ml-auto shrink-0 text-[11px] text-zinc-400 opacity-60'>
           {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
           {addZeroToTime(date.getMinutes())}
         </span>
@@ -683,7 +683,7 @@ const FirebaseLogsGuildLevelItem = ({
 
       {log.quests?.length > 0 && (
         <div className='flex flex-wrap items-center gap-2'>
-          <span className='text-sm text-secondText'>Cleared</span>
+          <span className='text-sm text-zinc-400'>Cleared</span>
           {log.quests.map((name) => (
             <Chip
               key={name}
@@ -693,9 +693,7 @@ const FirebaseLogsGuildLevelItem = ({
             </Chip>
           ))}
           {unlisted > 0 && (
-            <span className='text-sm text-secondText'>
-              and {unlisted} more
-            </span>
+            <span className='text-sm text-zinc-400'>and {unlisted} more</span>
           )}
         </div>
       )}
@@ -724,8 +722,8 @@ const FirebaseLogsSupportAskItem = ({
 
   return (
     <div
-      className={`relative my-4 flex flex-col overflow-hidden rounded-xl bg-main-opposed-bg transition-all duration-300 ${
-        isNew ? "border border-white/30" : ""
+      className={`relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-300 ${
+        isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       {/* Same tiled icon pattern and warm glow as the "Help build Riff Quest" banner
           (feature/dashboard/components/SupportBanner.tsx), so the funding story looks
@@ -747,14 +745,14 @@ const FirebaseLogsSupportAskItem = ({
             {copy.headline}
           </h3>
         </div>
-        <span className='ml-auto shrink-0 text-[11px] text-secondText opacity-60'>
+        <span className='ml-auto shrink-0 text-[11px] text-zinc-400 opacity-60'>
           {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
           {addZeroToTime(date.getMinutes())}
         </span>
       </div>
 
       <div className='relative z-10 px-3 pb-4 sm:px-5'>
-        <p className='text-sm text-secondText'>{copy.body}</p>
+        <p className='text-sm text-zinc-400'>{copy.body}</p>
         <a
           href={BMC_URL}
           target='_blank'
@@ -789,7 +787,7 @@ const DonationLine = ({ log }: { log: FirebaseLogsDonationInterface }) => {
   const date = new Date(log.data);
 
   return (
-    <div className='flex items-center gap-2 text-sm text-secondText'>
+    <div className='flex items-center gap-2 text-sm text-zinc-400'>
       <Coffee size={14} className='shrink-0 text-orange-400/80' />
       <span className='text-white'>
         {log.kind === "recurring" ? "Monthly support" : `$${log.amount} coffee`}
@@ -830,8 +828,8 @@ const FirebaseLogsDonationItem = ({
 
   return (
     <div
-      className={`relative my-4 flex flex-col overflow-hidden rounded-xl bg-main-opposed-bg transition-all duration-300 ${
-        isNew ? "border border-white/30" : ""
+      className={`relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-300 ${
+        isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <HeroPattern
         className='opacity-[0.1]'
@@ -850,7 +848,7 @@ const FirebaseLogsDonationItem = ({
             {getDonationHeadline(logs)}
           </h3>
         </div>
-        <span className='ml-auto shrink-0 text-[11px] text-secondText opacity-60'>
+        <span className='ml-auto shrink-0 text-[11px] text-zinc-400 opacity-60'>
           {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
           {addZeroToTime(date.getMinutes())}
         </span>
@@ -866,7 +864,7 @@ const FirebaseLogsDonationItem = ({
 
       {uid && (
         <div className='relative z-10 flex items-center gap-2 px-3 pb-4 sm:gap-2.5 sm:px-5'>
-          <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-tertiary'>
+          <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-zinc-200'>
             <UserLink
               uid={uid}
               userName={userName ?? getDonationName(newest)}
@@ -912,12 +910,12 @@ const GroupedLine = ({ children }: { children: React.ReactNode }) => (
  */
 const LeaderboardPlace = ({ rank }: { rank: number }) => (
   <>
-    <span className='text-secondText'>|</span>
+    <span className='text-zinc-400'>|</span>
     <span
       title='Place on this exercise leaderboard when the score was set'
       className={cn(
-        'font-semibold tabular-nums',
-        rank <= 3 ? 'text-amber-300' : 'text-white'
+        "font-semibold tabular-nums",
+        rank <= 3 ? "text-amber-300" : "text-white",
       )}>
       #{rank}
     </span>
@@ -931,22 +929,22 @@ const MicPerformanceStats = ({
 }) => (
   <>
     <Target className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
-    <span className='text-secondText'>Score:</span>
+    <span className='text-zinc-400'>Score:</span>
     <span className='font-semibold tabular-nums text-white'>
       {performance.score}
     </span>
-    <span className='text-secondText'>|</span>
+    <span className='text-zinc-400'>|</span>
     <span className='font-semibold tabular-nums text-white'>
       {performance.accuracy}%
     </span>
     {/* Older logs and metronome-less exercises carry no tempo — say nothing rather than guess one. */}
     {performance.bpm != null && (
       <>
-        <span className='text-secondText'>|</span>
+        <span className='text-zinc-400'>|</span>
         <span className='font-semibold tabular-nums text-white'>
           {performance.bpm}
         </span>
-        <span className='text-secondText'>BPM</span>
+        <span className='text-zinc-400'>BPM</span>
       </>
     )}
     {performance.rank != null && <LeaderboardPlace rank={performance.rank} />}
@@ -961,7 +959,7 @@ const EarTrainingStats = ({
 }) => (
   <>
     <Ear className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
-    <span className='text-secondText'>Score:</span>
+    <span className='text-zinc-400'>Score:</span>
     <span className='font-semibold tabular-nums text-white'>
       {performance.score}
     </span>
@@ -1040,7 +1038,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='flex flex-wrap items-center gap-1.5 text-sm text-secondText'>
+        <p className='flex flex-wrap items-center gap-1.5 text-sm text-zinc-400'>
           {message}
           {songLog.songId && <SongTierChip info={songTiers[songLog.songId]} />}
           {songLog.songId ? (
@@ -1073,7 +1071,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-secondText'>
+        <p className='text-sm text-zinc-400'>
           <Video className='mr-1.5 inline-block h-3 w-3 text-cyan-400' />
           added a new recording:{" "}
           {recLog.recordingId ? (
@@ -1109,9 +1107,9 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <span className='text-sm text-secondText'>opened</span>
+        <span className='text-sm text-zinc-400'>opened</span>
         <span className='text-sm font-bold text-white'>{caseLog.caseName}</span>
-        <span className='text-sm text-secondText'>and got</span>
+        <span className='text-sm text-zinc-400'>and got</span>
         <ItemPill
           itemType={caseLog.itemType}
           itemName={caseLog.itemName}
@@ -1134,7 +1132,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <span className='text-sm text-secondText'>listed</span>
+        <span className='text-sm text-zinc-400'>listed</span>
         <ItemPill
           itemType={marketLog.itemType}
           itemName={marketLog.itemName}
@@ -1168,7 +1166,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <span className='text-sm text-secondText'>
+        <span className='text-sm text-zinc-400'>
           <ShoppingCart className='mr-1.5 inline-block h-3.5 w-3.5 text-amber-400' />
           bought
         </span>
@@ -1182,7 +1180,7 @@ const GroupedLogLine = ({
           rolledGuitar={rolledGuitar}
           rolledEffect={rolledEffect}
         />
-        <span className='text-sm text-secondText'>
+        <span className='text-sm text-zinc-400'>
           from{" "}
           {purchaseLog.sellerId ? (
             <Link
@@ -1218,7 +1216,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-secondText'>
+        <p className='text-sm text-zinc-400'>
           created a new {kindLabel}:{" "}
           <Link
             href={`/songs?view=playlists&playlistId=${playlistLog.playlistId}`}
@@ -1243,7 +1241,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-secondText'>
+        <p className='text-sm text-zinc-400'>
           <GraduationCap className='mr-1.5 inline-block h-3.5 w-3.5 text-emerald-400' />
           passed the{" "}
           <span className='font-bold text-white'>{examLog.stepTitle}</span> exam
@@ -1263,7 +1261,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-secondText'>
+        <p className='text-sm text-zinc-400'>
           <MapIcon className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
           completed{" "}
           <Link
@@ -1277,9 +1275,7 @@ const GroupedLogLine = ({
           </span>{" "}
           roadmap
         </p>
-        {stepLog.phaseTitle && (
-          <Chip color='cyan'>{stepLog.phaseTitle}</Chip>
-        )}
+        {stepLog.phaseTitle && <Chip color='cyan'>{stepLog.phaseTitle}</Chip>}
       </GroupedLine>
     );
   }
@@ -1289,7 +1285,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-secondText'>
+        <p className='text-sm text-zinc-400'>
           completed all{" "}
           <span className='font-semibold text-zinc-200'>Daily Quests!</span>
         </p>
@@ -1341,8 +1337,8 @@ const GroupedLogLine = ({
 
   return (
     <GroupedLine>
-      <span className='text-sm text-secondText'>{t("common:logsBox.get")}</span>
-      <span className='flex items-center gap-1 text-sm text-main'>
+      <span className='text-sm text-zinc-400'>{t("common:logsBox.get")}</span>
+      <span className='flex items-center gap-1 text-sm text-cyan-500'>
         +{genericLog.points}
         <img
           src='/images/points.png'
@@ -1353,7 +1349,7 @@ const GroupedLogLine = ({
 
       {sessionTimeMs > 0 && (
         <span
-          className='inline-flex items-center gap-1.5 text-sm text-secondText'
+          className='inline-flex items-center gap-1.5 text-sm text-zinc-400'
           title='Practice time logged in this session'>
           <Clock className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
           <span className='tabular-nums'>
@@ -1363,7 +1359,7 @@ const GroupedLogLine = ({
       )}
 
       {genericLog.newLevel?.isNewLevel && (
-        <span className='text-sm text-secondText'>
+        <span className='text-sm text-zinc-400'>
           {t("common:logsBox.lvl_up")}
           <span className='ml-1 text-main'>
             {genericLog.newLevel.level}
@@ -1462,7 +1458,7 @@ const GroupedLogLine = ({
         ))}
 
       {genericLog.songTitle && genericLog.songArtist && !hidesPrimarySong && (
-        <p className='flex flex-wrap items-center gap-1.5 text-sm text-secondText'>
+        <p className='flex flex-wrap items-center gap-1.5 text-sm text-zinc-400'>
           {t("common:song_status.practiced")}
           {genericLog.songId && (
             <SongTierChip info={songTiers[genericLog.songId]} />
@@ -1508,7 +1504,8 @@ const GroupedLogItem = ({
   const representative = group.logs[0] as FirebaseLogsInterface;
   const date = new Date(getLogTimestampMs(group.logs[0]));
   const fameAmount = calculateGroupFame(group);
-  const { uid, userName, avatarUrl, userAvatarFrame, guildBadge } = representative;
+  const { uid, userName, avatarUrl, userAvatarFrame, guildBadge } =
+    representative;
 
   // The reaction lives on the oldest log in the group, not the newest one shown at the top: the
   // head keeps changing as the user logs more of the same activity, the tail does not.
@@ -1518,55 +1515,64 @@ const GroupedLogItem = ({
 
   return (
     <LogItem isNew={isNew}>
-      <div className='flex w-full flex-col gap-4 sm:gap-3'>
-        <div className='flex items-center gap-2 sm:gap-2.5'>
-          <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-tertiary'>
-            <UserLink
-              uid={uid}
-              userName={userName}
-              avatarUrl={avatarUrl ?? undefined}
-              lvl={userAvatarFrame}
-              guildBadge={guildBadge}
-              avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
-            />
-          </span>
-          <span className='hidden shrink-0 text-[11px] text-secondText opacity-50 sm:flex sm:items-center'>
-            {formatDistanceToNow(date, { addSuffix: true })}
-          </span>
-
-          {reactionLogId && (
-            <div className='ml-auto shrink-0'>
-              <LogReaction
-                logId={reactionLogId}
-                reactions={reactors}
-                currentUserId={currentUserId}
-                disabled={uid === currentUserId}
-                fameAmount={fameAmount}
-                awardedFame={awardedFame}
-                recipientName={userName}
-                showHint={showMotivateHint}
+      {/* Motivate gets a column of its own, so a long name never has to share a row with it. */}
+      <div className='flex w-full items-start gap-3'>
+        <div className='flex min-w-0 flex-1 flex-col gap-4 sm:gap-3'>
+          <div className='flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1'>
+            <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-zinc-200'>
+              <UserLink
+                uid={uid}
+                userName={userName}
+                avatarUrl={avatarUrl ?? undefined}
+                lvl={userAvatarFrame}
+                guildBadge={guildBadge}
+                avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
               />
-            </div>
-          )}
+            </span>
+            <span className='hidden shrink-0 items-center gap-1.5 text-[11px] text-zinc-500 sm:flex'>
+              {isNew && (
+                <span
+                  aria-label='New since your last visit'
+                  className='h-1.5 w-1.5 rounded-full bg-cyan-400'
+                />
+              )}
+              {formatLogTime(date)}
+            </span>
+          </div>
+
+          <div className='flex flex-col gap-4 sm:gap-2.5'>
+            {group.logs.map((log, index) => (
+              <GroupedLogLine
+                key={
+                  (log as { id?: string }).id ??
+                  `${getLogTimestampMs(log)}-${index}`
+                }
+                log={log}
+                type={getLogActivityType(log)}
+                songTiers={songTiers}
+                onPreviewPlan={onPreviewPlan}
+                onPreviewExercise={onPreviewExercise}
+                onViewRecording={onViewRecording}
+                onOpenLeaderboard={onOpenLeaderboard}
+              />
+            ))}
+          </div>
         </div>
 
-        <div className='flex flex-col gap-4 sm:gap-2.5'>
-          {group.logs.map((log, index) => (
-            <GroupedLogLine
-              key={
-                (log as { id?: string }).id ??
-                `${getLogTimestampMs(log)}-${index}`
-              }
-              log={log}
-              type={getLogActivityType(log)}
-              songTiers={songTiers}
-              onPreviewPlan={onPreviewPlan}
-              onPreviewExercise={onPreviewExercise}
-              onViewRecording={onViewRecording}
-              onOpenLeaderboard={onOpenLeaderboard}
+        {reactionLogId && (
+          <div className='shrink-0'>
+            <LogReaction
+              logId={reactionLogId}
+              reactions={reactors}
+              currentUserId={currentUserId}
+              disabled={uid === currentUserId}
+              fameAmount={fameAmount}
+              awardedFame={awardedFame}
+              recipientName={userName}
+              showHint={showMotivateHint}
             />
-          ))}
-        </div>
+          </div>
+        )}
       </div>
     </LogItem>
   );
@@ -1666,7 +1672,7 @@ const Logs = ({
 
   return (
     <>
-      <div className='mb-2 mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 px-3'>
+      <div className='mb-2 mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 px-3 empty:hidden'>
         <OnlineUsers />
       </div>
       <div ref={spanRef} className='h-1' />

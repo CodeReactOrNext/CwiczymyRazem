@@ -23,7 +23,8 @@ import { db } from "utils/firebase/client/firebase.utils";
  */
 export const GLOBAL_CHAT_PATH = "chats";
 
-export const guildChatPath = (guildId: string) => `guilds/${guildId}/chat`;
+export const guildChatPath = (guildId: string): `guilds/${string}/chat` =>
+  `guilds/${guildId}/chat`;
 
 export const fetchChatMessages = (
   callback: (messages: ChatMessageType[]) => void,

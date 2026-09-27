@@ -55,7 +55,13 @@ const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
 
 const LOGS_PAGE_SIZE = 20;
 
-const LogsBoxView = ({ className }: { className?: string }) => {
+interface LogsBoxViewProps {
+  className?: string;
+  /** Fills a box it doesn't own and scrolls inside it — see `LogsBoxLayout`. */
+  contained?: boolean;
+}
+
+const LogsBoxView = ({ className, contained = false }: LogsBoxViewProps) => {
   const [logs, setLogs] = useState<AnyFirebaseLog[] | null>(null);
   const [pinnedDonations, setPinnedDonations] = useState<AnyFirebaseLog[]>([]);
   const [logsLimit, setLogsLimit] = useState(LOGS_PAGE_SIZE);
@@ -103,6 +109,7 @@ const LogsBoxView = ({ className }: { className?: string }) => {
       className={className}
       hasOlderLogs={hasOlderLogs}
       hasMoreLogs={hasMoreLogs}
+      contained={contained}
       onLoadMoreLogs={() => {
         setHasLoadedMore(true);
         setLogsLimit((prev) => prev + LOGS_PAGE_SIZE);

@@ -14,6 +14,7 @@ import { DISCORD_INVITE_URL } from "constants/community";
 import { DESKTOP_APP_RELEASES_URL } from "constants/desktopApp";
 import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaimedMilestone";
 import { getLockedAtLvl } from "feature/levelGate/data/featureUnlocks";
+import { CommunityIconButton } from "feature/logsBox/components/CommunityIconButton";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 import { SupportModal } from "feature/support/components/SupportModal";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
@@ -885,7 +886,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
                 </span>
               </div>
             </Link>
-            <div className='ml-auto'>
+            <div className='ml-auto flex items-center gap-1.5'>
+              <CommunityIconButton />
               <NotificationsBell />
             </div>
           </div>
@@ -942,6 +944,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
                   </div>
                 </Link>
                 <div className='flex items-center gap-2'>
+                  <CommunityIconButton onOpen={() => setIsMobileOpen(false)} />
                   <NotificationsBell />
                   <Button
                     variant='ghost'

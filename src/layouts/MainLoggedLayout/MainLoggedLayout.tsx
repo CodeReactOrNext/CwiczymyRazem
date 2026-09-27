@@ -1,4 +1,5 @@
 import { RockSidebar } from "components/RockSidebar";
+import { CommunityDrawer } from "feature/logsBox/components/CommunityDrawer";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
@@ -66,6 +67,8 @@ const MainLoggedLayout = ({
           </MainLoggedWrapper>
         </div>
       </div>
+
+      <CommunityDrawer />
     </main>
   );
 };
