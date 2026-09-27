@@ -1,28 +1,28 @@
-export type OnboardingPath = "journey" | "exercises" | "report" | "songs";
+/** How long the player has been playing — the first onboarding question. */
+export type OnboardingLevel = "new" | "some" | "experienced";
+
+/** What the player came to Riff Quest for — the second onboarding question. */
+export type OnboardingGoal = "plans" | "songs" | "roadmap" | "journey" | "log";
 
 export interface OnboardingResult {
-  chosenPath: OnboardingPath;
+  level: OnboardingLevel;
+  goal: OnboardingGoal;
+  /** Only for the "plans" goal — the plan the player picked. */
+  planId?: string;
 }
-
-export const ONBOARDING_TOTAL_STEPS = 2;
 
 /**
  * Persisted progress for the dashboard "Getting Started" checklist shown to new users.
- * `firstExercise` and `firstGuitar` are derived at read time from existing user data
- * (session count / arsenal inventory) instead of being stored here, so they can't drift.
+ * The steps themselves (first session, first song, a second day of practice) are
+ * derived at read time from existing user data instead of being stored here, so
+ * they can't drift or be ticked off by a click.
  */
 export interface GettingStartedQuestState {
-  welcomeSeen: boolean;
-  planIntroSeen: boolean;
-  customPlanClicked: boolean;
   rewardClaimed: boolean;
   dismissed: boolean;
 }
 
 export const GETTING_STARTED_QUEST_DEFAULTS: GettingStartedQuestState = {
-  welcomeSeen: false,
-  planIntroSeen: false,
-  customPlanClicked: false,
   rewardClaimed: false,
   dismissed: false,
 };

@@ -10,9 +10,10 @@ export const firebaseSaveOnboarding = async (result: OnboardingResult) => {
   const userDocRef = doc(db, "users", auth.currentUser.uid);
   await updateDoc(userDocRef, {
     onboarding: {
-      chosenPath: result.chosenPath,
+      level: result.level,
+      goal: result.goal,
+      planId: result.planId ?? null,
       completedAt: serverTimestamp(),
     },
-    onboardingCompleted: true,
   });
 };

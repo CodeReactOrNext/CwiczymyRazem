@@ -1,14 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { LucideIcon } from "lucide-react";
-import {
-  ArrowUpRight,
-  ChevronRight,
-  Clock,
-  Guitar,
-  ListChecks,
-} from "lucide-react";
 import type { ReactNode } from "react";
-import { Fragment } from "react";
 
 interface TutorialStepItem {
   text: ReactNode;
@@ -80,25 +72,6 @@ export const FakeButton = ({
   </span>
 );
 
-/** Breadcrumb-style path showing where something lives in the app (e.g. Practice → Plans). */
-export const FakeNavPath = ({
-  items,
-}: {
-  items: { icon?: LucideIcon; label: string }[];
-}) => (
-  <span aria-hidden='true' className='flex flex-wrap items-center gap-1'>
-    {items.map((item, index) => (
-      <Fragment key={item.label}>
-        {index > 0 && <ChevronRight size={12} className='text-zinc-600' />}
-        <span className='inline-flex select-none items-center gap-1.5 rounded-md bg-zinc-800 px-2.5 py-1 text-xs font-medium text-zinc-300'>
-          {item.icon && <item.icon size={12} className='text-zinc-400' />}
-          {item.label}
-        </span>
-      </Fragment>
-    ))}
-  </span>
-);
-
 /** Mock of a form field styled like the real Add Song modal inputs. */
 export const FakeInput = ({
   label,
@@ -166,38 +139,5 @@ export const FakeStatusCard = ({
       </span>
       <span className='text-[10px] text-zinc-500'>{sub}</span>
     </span>
-  </span>
-);
-
-/** Compact replica of a real PlanCard (gradient background, icon tile, meta row). */
-export const FakePlanCard = ({
-  title,
-  duration,
-  exercises,
-}: {
-  title: string;
-  duration: string;
-  exercises: string;
-}) => (
-  <span
-    aria-hidden='true'
-    className='flex select-none items-center gap-3 rounded-xl bg-gradient-to-br from-blue-500/15 via-zinc-900/60 to-zinc-950 p-3'>
-    <span className='rounded-lg bg-blue-500/10 p-2 text-blue-400'>
-      <Guitar size={14} />
-    </span>
-    <span className='flex min-w-0 flex-1 flex-col gap-0.5'>
-      <span className='truncate text-xs font-bold text-white'>{title}</span>
-      <span className='flex items-center gap-3 text-[10px] text-zinc-400'>
-        <span className='inline-flex items-center gap-1'>
-          <Clock size={10} />
-          {duration}
-        </span>
-        <span className='inline-flex items-center gap-1'>
-          <ListChecks size={10} />
-          {exercises}
-        </span>
-      </span>
-    </span>
-    <ArrowUpRight size={14} className='shrink-0 text-zinc-500' />
   </span>
 );

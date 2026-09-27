@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
+import { onboardingHref } from "feature/onboarding/analytics/onboardingAnalytics";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   createAccount,
@@ -68,7 +69,11 @@ const SingupView = () => {
 
   // Set by links that carried a destination — a song card in the public
   // library, say — so what the visitor picked survives the sign-up form.
-  const destination = safeNextPath(router.query.next);
+  // Everyone else starts on the onboarding.
+  const destination = safeNextPath(
+    router.query.next,
+    onboardingHref("signup"),
+  );
 
   const onSubmit = async (credentials: SignUpCredentials) => {
     try {
@@ -155,7 +160,7 @@ const SingupView = () => {
             onClick={() => router.push(destination)}
             className="w-full h-12 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-base transition-all group"
           >
-            {destination === "/dashboard" ? "Go to Dashboard" : "Continue"}
+            {destination.startsWith("/onboarding") ? "Let's get started" : "Continue"}
             <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Button>
         </div>

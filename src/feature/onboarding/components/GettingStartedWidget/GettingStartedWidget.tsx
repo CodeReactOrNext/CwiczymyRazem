@@ -3,65 +3,57 @@ import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { YouTube } from "components/Blog/YouTube";
 import { HeroPattern } from "components/UI/HeroBanner";
-import { VideoClip } from "components/UI/VideoClip";
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
 import { useArsenalData } from "feature/arsenal/hooks/useArsenalData";
+import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
-import {
-  addFame,
-  selectCurrentUserStats,
-  selectUserAuth,
-} from "feature/user/store/userSlice";
+import { addFame, selectUserAuth } from "feature/user/store/userSlice";
 import {
   BookOpen,
+  CalendarCheck,
   CheckCircle2,
   Compass,
-  Ear,
   Gift,
   Guitar,
-  Lightbulb,
-  ListChecks,
   ListMusic,
   Lock,
-  Mic2,
   Music,
-  PenLine,
+  Play,
+  PlayCircle,
   Plus,
-  Timer,
-  Wand2,
   X,
 } from "lucide-react";
 import Router from "next/router";
 import posthog from "posthog-js";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
+import { getLocalDateKey } from "utils/converter";
 
 import { useGettingStartedQuest } from "../../hooks/useGettingStartedQuest";
+import type { GettingStartedStepId } from "../../utils/gettingStartedProgress";
 import { getGettingStartedProgress } from "../../utils/gettingStartedProgress";
 import { StepInfoModal } from "./StepInfoModal";
 import {
   FakeButton,
   FakeInput,
-  FakeNavPath,
-  FakePlanCard,
   FakeStatusCard,
   TutorialSteps,
 } from "./TutorialSteps";
 
 const REWARD_FAME_AMOUNT = CASE_DEFINITIONS.standard.fameCost;
 
-type ModalId =
-  | "welcome"
-  | "first_exercise"
-  | "first_song"
-  | "exercise_plan"
-  | "custom_plan"
-  | null;
+type ModalId = "intro" | "first_song" | "reward" | null;
+
+const STEP_ICONS: Record<GettingStartedStepId, typeof Compass> = {
+  first_session: Play,
+  first_song: Music,
+  second_day: CalendarCheck,
+};
 
 export const GettingStartedWidget = () => {
   const dispatch = useAppDispatch();
-  const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
+  const { userStats, activity } = useDashboardData();
   const { quest, isLoading, markStep, claimReward, isClaiming } =
     useGettingStartedQuest(userAuth);
   const { data: arsenalData, isLoading: isArsenalLoading } = useArsenalData();
@@ -72,50 +64,43 @@ export const GettingStartedWidget = () => {
     staleTime: 10 * 60 * 1000,
   });
   const [openModal, setOpenModal] = useState<ModalId>(null);
-  const [isRewardModalOpen, setIsRewardModalOpen] = useState(false);
 
-  if (
-    isLoading ||
-    isArsenalLoading ||
-    isUserSongsLoading ||
-    !quest ||
-    !userStats
-  )
+  // The activity log is already loaded once for the whole dashboard; the
+  // second-day step only needs the distinct days in it.
+  const practiceDays = useMemo(
+    () =>
+      new Set(
+        (activity.reportList ?? []).map((report) =>
+          getLocalDateKey(new Date(report.date)),
+        ),
+      ),
+    [activity.reportList],
+  );
+
+  if (isLoading || isArsenalLoading || isUserSongsLoading || !quest) {
     return null;
+  }
 
   const songCount =
     (userSongsData?.wantToLearn.length ?? 0) +
     (userSongsData?.learning.length ?? 0) +
     (userSongsData?.learned.length ?? 0);
+  const sessionCount = userStats.sessionCount ?? 0;
 
   const progress = getGettingStartedProgress({
     quest,
-    sessionCount: userStats.sessionCount ?? 0,
+    sessionCount,
     guitarCount: arsenalData?.inventory?.length ?? 0,
     songCount,
+    practiceDayCount: practiceDays.size,
   });
 
   if (!progress.isVisible) return null;
 
-  const canClaim = progress.allStepsDone;
+  const hasPracticedToday = practiceDays.has(getLocalDateKey());
 
-  // The roadmap has room for a couple of words under each node, so these are
-  // deliberately shorter than the headings the matching modals open with.
-  const stepLabels: Record<Exclude<ModalId, null>, string> = {
-    welcome: "Intro",
-    first_exercise: "First exercise",
-    first_song: "First song",
-    exercise_plan: "Explore plans",
-    custom_plan: "Your own plan",
-  };
-
-  const stepIcons: Record<Exclude<ModalId, null>, typeof Compass> = {
-    welcome: Compass,
-    first_exercise: Mic2,
-    first_song: Music,
-    exercise_plan: ListChecks,
-    custom_plan: Wand2,
-  };
+  const trackStepClick = (step: string) =>
+    posthog.capture("getting_started_step_clicked", { step });
 
   const handleDismiss = () => {
     markStep({ dismissed: true });
@@ -123,25 +108,72 @@ export const GettingStartedWidget = () => {
   };
 
   const handleClaimAndGoToArsenal = async () => {
-    if (!progress.rewardClaimed && !isClaiming) {
+    if (progress.canClaimReward && !isClaiming) {
       await claimReward(REWARD_FAME_AMOUNT);
       dispatch(addFame(REWARD_FAME_AMOUNT));
       posthog.capture("getting_started_reward_claimed", {
         fame: REWARD_FAME_AMOUNT,
       });
     }
-    setIsRewardModalOpen(false);
+    setOpenModal(null);
     Router.push("/arsenal");
   };
 
-  const handleStepClick = (stepId: (typeof progress.steps)[number]["id"]) => {
-    setOpenModal(stepId);
+  const stepNode = (id: GettingStartedStepId) => {
+    const step = progress.steps.find((s) => s.id === id)!;
+    const base = {
+      key: id,
+      icon: STEP_ICONS[id],
+      isDone: step.isDone,
+      tone: "cyan" as const,
+    };
+
+    if (id === "first_session") {
+      return {
+        ...base,
+        label: "First session",
+        onClick: step.isDone
+          ? undefined
+          : () => {
+              trackStepClick(id);
+              Router.push("/timer");
+            },
+      };
+    }
+
+    if (id === "first_song") {
+      return {
+        ...base,
+        label: "First song",
+        onClick: step.isDone
+          ? undefined
+          : () => {
+              trackStepClick(id);
+              setOpenModal("first_song");
+            },
+      };
+    }
+
+    // Day two only opens once there is a day one, and not on the same day:
+    // today's session already counts for today.
+    const isWaitingForTomorrow = sessionCount > 0 && hasPracticedToday;
+    return {
+      ...base,
+      label: isWaitingForTomorrow && !step.isDone ? "Play tomorrow" : "Day two",
+      onClick:
+        step.isDone || sessionCount === 0 || isWaitingForTomorrow
+          ? undefined
+          : () => {
+              trackStepClick(id);
+              Router.push("/timer");
+            },
+    };
   };
 
   /**
-   * The guided steps and the reward flattened into one left-to-right track, so
-   * the reward reads as the destination rather than a separate row below.
-   * `onClick` being undefined is what marks a node as not yet actionable.
+   * Steps and the reward on one left-to-right track. The guitar sits right
+   * after the first session — it is the payoff for playing, not for finishing
+   * a checklist. `onClick` being undefined marks a node as not actionable.
    */
   const nodes: {
     key: string;
@@ -152,27 +184,28 @@ export const GettingStartedWidget = () => {
     onClick?: () => void;
     badge?: string;
   }[] = [
-    ...progress.steps.map((step) => ({
-      key: step.id,
-      label: stepLabels[step.id],
-      icon: stepIcons[step.id],
-      isDone: step.isDone,
-      tone: "cyan" as const,
-      onClick: step.isDone ? undefined : () => handleStepClick(step.id),
-    })),
+    stepNode("first_session"),
     {
       key: "reward",
       label: "First guitar",
-      icon: progress.rewardClaimed ? Guitar : canClaim ? Gift : Lock,
-      isDone: false,
-      tone: "amber" as const,
+      icon: progress.rewardClaimed
+        ? Guitar
+        : progress.canClaimReward
+          ? Gift
+          : Lock,
+      isDone: progress.rewardClaimed && progress.hasGuitar,
+      tone: "amber",
       onClick: progress.rewardClaimed
-        ? () => Router.push("/arsenal")
-        : canClaim
-          ? () => setIsRewardModalOpen(true)
+        ? progress.hasGuitar
+          ? undefined
+          : () => Router.push("/arsenal")
+        : progress.canClaimReward
+          ? () => setOpenModal("reward")
           : undefined,
       badge: progress.rewardClaimed ? undefined : `+${REWARD_FAME_AMOUNT}`,
     },
+    stepNode("first_song"),
+    stepNode("second_day"),
   ];
 
   const doneCount = progress.steps.filter((step) => step.isDone).length;
@@ -180,14 +213,14 @@ export const GettingStartedWidget = () => {
   return (
     <Card className='relative flex-col justify-between overflow-hidden p-4 sm:p-5'>
       {/* Cyan → amber, the same run the roadmap makes from its first step to
-          the guitar at the end. Colour needs more opacity than flat white did
-          to register at all. */}
+          the guitar. Colour needs more opacity than flat white did to
+          register at all. */}
       <HeroPattern
         className='opacity-[0.09]'
         gradient={["#22d3ee", "#f59e0b"]}
         maskImage='linear-gradient(to left, black 0%, transparent 90%)'
       />
-      <div className='relative z-10 mb-3 flex items-center justify-between'>
+      <div className='relative z-10 mb-3 flex items-center justify-between gap-3'>
         <div className='flex items-center gap-2.5'>
           <Compass size={16} className='text-zinc-500' />
           <h3 className='text-sm font-semibold tracking-wide text-zinc-300'>
@@ -197,17 +230,27 @@ export const GettingStartedWidget = () => {
             {doneCount}/{progress.steps.length}
           </span>
         </div>
-        <button
-          onClick={handleDismiss}
-          aria-label='Dismiss getting started checklist'
-          className='rounded-full p-1 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-300'>
-          <X size={14} />
-        </button>
+        <div className='flex items-center gap-1'>
+          <button
+            type='button'
+            onClick={() => {
+              posthog.capture("getting_started_intro_opened");
+              setOpenModal("intro");
+            }}
+            className='flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 hover:bg-white/5 hover:text-zinc-200'>
+            <PlayCircle size={14} />
+            2-min intro
+          </button>
+          <button
+            type='button'
+            onClick={handleDismiss}
+            aria-label='Dismiss getting started checklist'
+            className='rounded-full p-1 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 hover:bg-white/5 hover:text-zinc-300'>
+            <X size={14} />
+          </button>
+        </div>
       </div>
 
-      {/* Six nodes have to fit a 320px phone without scrolling, so everything
-          below shrinks a step on mobile: 36px circles, 10px labels, no
-          horizontal padding between nodes. */}
       <div className='relative z-10 flex items-start pt-1'>
         {nodes.map((node, index) => {
           const Icon = node.isDone ? CheckCircle2 : node.icon;
@@ -239,8 +282,9 @@ export const GettingStartedWidget = () => {
                   ? { type: "button" as const, onClick: node.onClick }
                   : {})}
                 className={cn(
-                  "group flex w-full flex-col items-center gap-2 rounded-lg py-1 text-center transition-transform sm:gap-2.5",
-                  isActionable && "cursor-pointer active:scale-[0.97]",
+                  "group flex w-full flex-col items-center gap-2 rounded-lg py-1 text-center sm:gap-2.5",
+                  isActionable &&
+                    "cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60",
                 )}>
                 <span
                   className={cn(
@@ -248,7 +292,7 @@ export const GettingStartedWidget = () => {
                     node.isDone && "bg-emerald-500/10 text-emerald-400",
                     !node.isDone &&
                       !isActionable &&
-                      "bg-zinc-800/60 text-zinc-600",
+                      "bg-zinc-800/60 text-zinc-500",
                     !node.isDone &&
                       isActionable &&
                       node.tone === "cyan" &&
@@ -266,7 +310,7 @@ export const GettingStartedWidget = () => {
                     "text-[10px] font-medium leading-tight tracking-wide sm:text-xs",
                     node.isDone && "text-zinc-500",
                     !node.isDone && isActionable && "text-zinc-200",
-                    !node.isDone && !isActionable && "text-zinc-600",
+                    !node.isDone && !isActionable && "text-zinc-500",
                   )}>
                   {node.label}
                 </span>
@@ -276,7 +320,7 @@ export const GettingStartedWidget = () => {
                     <span
                       className={cn(
                         "text-[10px] font-medium tabular-nums sm:text-xs",
-                        isActionable ? "text-amber-400" : "text-zinc-600",
+                        isActionable ? "text-amber-400" : "text-zinc-500",
                       )}>
                       {node.badge}
                     </span>
@@ -297,7 +341,7 @@ export const GettingStartedWidget = () => {
       </div>
 
       <StepInfoModal
-        isOpen={openModal === "welcome"}
+        isOpen={openModal === "intro"}
         onOpenChange={(isOpen) => !isOpen && setOpenModal(null)}
         title='Welcome to Riff Quest'
         description='Two minutes on what this is and how it works.'
@@ -309,97 +353,14 @@ export const GettingStartedWidget = () => {
             className='my-0'
           />
         }
-        ctaLabel="Got it, let's go"
-        onCta={() => {
-          markStep({ welcomeSeen: true });
-          posthog.capture("getting_started_step_completed", {
-            step: "welcome",
-          });
-          setOpenModal(null);
-        }}
-      />
-
-      <StepInfoModal
-        isOpen={openModal === "first_exercise"}
-        onOpenChange={(isOpen) => !isOpen && setOpenModal(null)}
-        title='Your first exercise'
-        description='Pick any exercise and give it a shot.'
-        size='wide'
-        body={
-          <>
-            <VideoClip
-              src='/guide/exercise.mp4'
-              label='Screen recording: picking an exercise and starting practice'
-              className='my-0 mb-5'
-            />
-            <TutorialSteps
-              steps={[
-                {
-                  text: (
-                    <>
-                      Head to the exercise library and pick whatever looks fun.
-                      Don&apos;t overthink it — anything works for your first
-                      one:
-                    </>
-                  ),
-                  visual: (
-                    <span className='flex flex-wrap gap-1.5'>
-                      <FakeButton icon={Guitar}>Technique</FakeButton>
-                      <FakeButton icon={BookOpen} tone='violet'>
-                        Theory
-                      </FakeButton>
-                      <FakeButton icon={Ear} tone='sky'>
-                        Hearing
-                      </FakeButton>
-                      <FakeButton icon={Lightbulb} tone='orange'>
-                        Creativity
-                      </FakeButton>
-                    </span>
-                  ),
-                },
-                {
-                  text: <>On the exercise page, click this to start:</>,
-                  visual: (
-                    <FakeButton tone='cyanSolid'>Start Practice →</FakeButton>
-                  ),
-                },
-                {
-                  text: (
-                    <>
-                      Now just play. You can turn on the mic so the app hears
-                      you and gives real-time feedback — or skip that entirely
-                      and simply log your practice time. You earn points either
-                      way:
-                    </>
-                  ),
-                  visual: (
-                    <span className='flex flex-wrap items-center gap-1.5'>
-                      <FakeButton icon={Mic2}>Note detection</FakeButton>
-                      <span className='text-xs text-zinc-500'>or</span>
-                      <FakeButton icon={PenLine} tone='zinc'>
-                        Log time manually
-                      </FakeButton>
-                    </span>
-                  ),
-                },
-              ]}
-            />
-          </>
-        }
-        ctaLabel='Browse exercises'
-        onCta={() => {
-          posthog.capture("getting_started_step_completed", {
-            step: "first_exercise",
-          });
-          setOpenModal(null);
-          Router.push("/profile/skills?tab=browse");
-        }}
+        ctaLabel='Got it'
+        onCta={() => setOpenModal(null)}
       />
 
       <StepInfoModal
         isOpen={openModal === "first_song"}
         onOpenChange={(isOpen) => !isOpen && setOpenModal(null)}
-        title='Add your first song'
+        title='Add a song you want to play'
         description='Keep track of songs you want to learn, are learning, or already know.'
         body={
           <TutorialSteps
@@ -430,9 +391,9 @@ export const GettingStartedWidget = () => {
               {
                 text: (
                   <>
-                    Tell the app where this song is on your journey — click one
-                    of these. Later you can practice it section by section and
-                    watch your mastery grow:
+                    Tell the app where this song is on your journey. Later you
+                    can practice it section by section and watch your mastery
+                    grow:
                   </>
                 ),
                 visual: (
@@ -463,142 +424,16 @@ export const GettingStartedWidget = () => {
         }
         ctaLabel='Browse songs'
         onCta={() => {
-          posthog.capture("getting_started_step_completed", {
-            step: "first_song",
-          });
           setOpenModal(null);
           Router.push("/songs");
         }}
       />
 
       <StepInfoModal
-        isOpen={openModal === "exercise_plan"}
+        isOpen={openModal === "reward"}
         onOpenChange={(isOpen) => !isOpen && setOpenModal(null)}
-        title='Structure it with a Plan'
-        description='Exercise plans bundle several exercises into one guided routine.'
-        body={
-          <TutorialSteps
-            steps={[
-              {
-                text: (
-                  <>
-                    Open the plan picker — you&apos;ll find ready-made routines
-                    and play-alongs for every level, plus plans shared by other
-                    players. You can always come back to it here:
-                  </>
-                ),
-                visual: (
-                  <FakeNavPath
-                    items={[
-                      { icon: Timer, label: "Practice" },
-                      { icon: ListChecks, label: "Plans" },
-                    ]}
-                  />
-                ),
-              },
-              {
-                text: (
-                  <>
-                    Click any plan to peek inside — you&apos;ll see exactly
-                    which exercises it contains and how long it takes:
-                  </>
-                ),
-                visual: (
-                  <FakePlanCard
-                    title='Beginner Daily Routine'
-                    duration='20 min'
-                    exercises='5 exercises'
-                  />
-                ),
-              },
-              {
-                text: (
-                  <>
-                    Hit{" "}
-                    <span className='font-semibold text-cyan-300'>Start</span>{" "}
-                    and just follow along. The timer moves you from exercise to
-                    exercise, so you never wonder what&apos;s next.
-                  </>
-                ),
-              },
-            ]}
-          />
-        }
-        ctaLabel='Browse plans'
-        onCta={() => {
-          markStep({ planIntroSeen: true });
-          posthog.capture("getting_started_step_completed", {
-            step: "exercise_plan",
-          });
-          setOpenModal(null);
-          Router.push("/timer/plans");
-        }}
-      />
-
-      <StepInfoModal
-        isOpen={openModal === "custom_plan"}
-        onOpenChange={(isOpen) => !isOpen && setOpenModal(null)}
-        title='Build your own plan'
-        description='Compose your ideal routine out of any exercises.'
-        body={
-          <TutorialSteps
-            steps={[
-              {
-                text: (
-                  <>
-                    Open the plan builder and name your routine — something like
-                    this:
-                  </>
-                ),
-                visual: <FakeInput label='Plan name' value='Morning warm-up' />,
-              },
-              {
-                text: (
-                  <>
-                    Pick any exercises you like and put them in your order. You
-                    decide how long each one runs:
-                  </>
-                ),
-                visual: (
-                  <span className='flex flex-wrap gap-1.5'>
-                    <FakeButton tone='zinc'>1 · Spider Walk</FakeButton>
-                    <FakeButton tone='zinc'>2 · Alternate Picking</FakeButton>
-                    <FakeButton tone='zinc'>3 · Chord Changes</FakeButton>
-                  </span>
-                ),
-              },
-              {
-                text: (
-                  <>
-                    Save it and it&apos;s yours — from now on, one click starts
-                    the whole routine, any day:
-                  </>
-                ),
-                visual: (
-                  <FakeButton icon={Plus} tone='solid'>
-                    Save plan
-                  </FakeButton>
-                ),
-              },
-            ]}
-          />
-        }
-        ctaLabel='Open plan builder'
-        onCta={() => {
-          markStep({ customPlanClicked: true });
-          posthog.capture("getting_started_step_completed", {
-            step: "custom_plan",
-          });
-          setOpenModal(null);
-          Router.push("/plans/create");
-        }}
-      />
-
-      <StepInfoModal
-        isOpen={isRewardModalOpen}
-        onOpenChange={setIsRewardModalOpen}
         title='Draw your first guitar'
-        description="You've earned it — claim your Fame and open a case."
+        description='You played your first session — claim your Fame and open a case.'
         body={
           <div className='space-y-3'>
             <div className='flex items-center justify-center gap-2 rounded-lg bg-zinc-900/60 py-5'>

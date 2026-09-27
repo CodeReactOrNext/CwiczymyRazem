@@ -6,6 +6,7 @@ import { selectUserAuth } from 'feature/user/store/userSlice';
 import { updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
 import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
+import posthog from 'posthog-js';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getLocalDateKey } from 'utils/converter';
@@ -115,6 +116,16 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         };
 
         const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();
+        // The activation event: a timer session that actually got saved. The
+        // manual log has its own event (`manual_report_saved`).
+        posthog.capture('practice_session_finished', {
+          plan_id: plan.id,
+          total_minutes: techMin + theoryMin + hearMin + creatMin,
+          exercise_count: plan.exercises.length,
+          completed_exercises: completedExercises.length,
+          early_finish: !!options?.skipSkillPoints,
+          has_mic_performance: !!micPerformance,
+        });
         setSessionTimeSnapshot(timerData);
         setReportResult(result.raitingData);
 

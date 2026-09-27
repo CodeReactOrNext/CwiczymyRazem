@@ -509,7 +509,7 @@ const ReportView = () => {
       Number(inputData.theoryHours || 0) * 60 + Number(inputData.theoryMinutes || 0) +
       Number(inputData.hearingHours || 0) * 60 + Number(inputData.hearingMinutes || 0) +
       Number(inputData.creativityHours || 0) * 60 + Number(inputData.creativityMinutes || 0);
-    posthog.capture("practice_session_completed", {
+    posthog.capture("manual_report_saved", {
       total_minutes: totalMinutesForCapture,
       has_song: loggedSongs.length > 0,
       song_count: loggedSongs.length,

@@ -3,10 +3,11 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 // Challenges removed
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
+import { onboardingHref } from "feature/onboarding/analytics/onboardingAnalytics";
 import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateEmailNotifications, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
-import { GoogleAuthProvider } from "firebase/auth";
+import { getAdditionalUserInfo, GoogleAuthProvider } from "firebase/auth";
 import { signIn, signOut } from "next-auth/react";
 import posthog from "posthog-js";
 import type {
@@ -51,13 +52,26 @@ import {
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
 
+/**
+ * A Google account signing in for the first time is a sign-up: it is counted
+ * as one and starts on the onboarding instead of the dashboard.
+ */
+const getGoogleLanding = (isNewUser: boolean, user: User, method: string) => {
+  if (!isNewUser) return "/dashboard";
+  posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });
+  posthog.capture("user_signed_up", { method, email: user.email });
+  return onboardingHref("google_signup");
+};
+
 export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
   async () => {
     try {
-      const { user } = await firebaseSignInWithGooglePopup();
+      const result = await firebaseSignInWithGooglePopup();
+      const { user } = result;
       const token = await user.getIdToken();
-      await signIn("credentials", { idToken: token, callbackUrl: "/dashboard" });
+      const callbackUrl = getGoogleLanding(!!getAdditionalUserInfo(result)?.isNewUser, user, "google");
+      await signIn("credentials", { idToken: token, callbackUrl });
       const userData = await fetchUserData(user);
       posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });
       posthog.capture("user_logged_in", { method: "google", email: user.email });
@@ -74,9 +88,11 @@ export const logInViaGoogleCredential = createAsyncThunk(
   async (credentialId: string) => {
     try {
       const credential = GoogleAuthProvider.credential(credentialId);
-      const { user } = await firebaseSignInWithCredential(credential);
+      const result = await firebaseSignInWithCredential(credential);
+      const { user } = result;
       const token = await user.getIdToken();
-      await signIn("credentials", { idToken: token, callbackUrl: "/dashboard" });
+      const callbackUrl = getGoogleLanding(!!getAdditionalUserInfo(result)?.isNewUser, user, "google_credential");
+      await signIn("credentials", { idToken: token, callbackUrl });
       const userData = await fetchUserData(user);
       posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });
       posthog.capture("user_logged_in", { method: "google_credential", email: user.email });
