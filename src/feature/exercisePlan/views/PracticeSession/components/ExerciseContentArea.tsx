@@ -49,6 +49,11 @@ interface ExerciseContentAreaProps {
    *  mobile session modal owns the screen and this (hidden) copy would be a second
    *  strum synth playing the same pattern a frame apart. */
   silenceStrumSynth?: boolean;
+  /** Leave the video out — set while the mobile session modal owns the screen.
+   *  Its own player follows the same `isPlaying`, so a copy here would start a
+   *  second, hidden video a moment later (and on iOS steal the audio from the
+   *  visible one, which pauses it and stops the session). */
+  suppressVideo?: boolean;
 
   // Tablature
   isMetronomePlaying: boolean;
@@ -125,6 +130,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   trackConfigs,
   backingTrackIds,
   silenceStrumSynth,
+  suppressVideo,
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
@@ -310,7 +316,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         />
         </>
       ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (
-        <VideoSection
+        suppressVideo ? null : <VideoSection
           youtubeVideoId={currentExercise.youtubeVideoId}
           videoUrl={currentExercise.videoUrl}
           isPlayalong={currentExercise.isPlayalong}

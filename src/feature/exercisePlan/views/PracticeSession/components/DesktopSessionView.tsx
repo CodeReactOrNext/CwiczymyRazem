@@ -293,6 +293,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     // hidden), so its strumming pattern would sound alongside the
                     // modal's — one pattern, two synths, a frame apart.
                     silenceStrumSynth={isMobile}
+                    suppressVideo={isMobile}
                     isMetronomePlaying={p.metronome.isPlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}
