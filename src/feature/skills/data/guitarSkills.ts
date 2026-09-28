@@ -2,7 +2,6 @@ import type { GuitarSkill, } from "feature/skills/skills.types";
 import {
   GiBrain,
   GiCompactDisc,
-  GiDrum,
   GiGClef,
   GiGuitarHead,
   GiHand,
@@ -104,11 +103,6 @@ export const guitarSkills: GuitarSkill[] = [
     id: "transcription",
     category: "hearing",
     icon: GiHeadphones,
-  },
-  {
-    id: "rythm-recognition",
-    category: "hearing",
-    icon: GiDrum,
   },
   {
     id: "harmony",

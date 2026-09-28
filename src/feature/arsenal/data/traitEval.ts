@@ -82,7 +82,6 @@ export const SKILL_CATEGORY: Record<string, PracticeCategory> = {
   ear_training: "hearing",
   "harmony-ear": "hearing",
   transcription: "hearing",
-  "rythm-recognition": "hearing",
   phrasing: "creativity",
   improvisation: "creativity",
   composition: "creativity",

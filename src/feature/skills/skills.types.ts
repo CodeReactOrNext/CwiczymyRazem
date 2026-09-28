@@ -23,7 +23,6 @@ export type GuitarSkillId =
   | "phrasing"
   | "harmony-ear"
   | "transcription"
-  | "rythm-recognition"
   | "articulation";
 
 export interface GuitarSkill {
