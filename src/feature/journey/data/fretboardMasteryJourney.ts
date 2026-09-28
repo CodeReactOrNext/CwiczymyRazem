@@ -114,7 +114,7 @@ export const fretboardMasteryModule: JourneyModule = {
             { text: "I know the 6 open string names (low to high): E A D G B e", icon: "Guitar" },
             { text: "I know what a fret is and how frets are numbered", icon: "Hash" },
             { text: "I can see the inlay dots on my own guitar (or the diagram above)", icon: "Dot" },
-            { text: "I understand I'll be clicking a diagram, not playing my guitar, in this path", icon: "MousePointerClick" },
+            { text: "I understand most steps are clicked on a diagram, and the last stage has me play on my guitar", icon: "MousePointerClick" },
           ],
         },
         {

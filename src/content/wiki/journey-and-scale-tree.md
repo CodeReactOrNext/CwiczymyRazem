@@ -16,7 +16,7 @@ Two modules are live today, **Fundamentals** and **Fretboard Mastery**, with rhy
 
 <StepList steps="The first step is always open::No prerequisites, on either module|Steps unlock in order::The next step opens once you've marked the one before it complete|Modules aren't locked::Both live modules are open from day one, and only the steps inside them unlock in sequence" />
 
-**Fretboard Mastery** works by clicking, not listening: you're shown a note name and you click where it lives on the fretboard, so it works fine without a microphone. Exams are graded on accuracy:
+**Fretboard Mastery** works by clicking, not listening: you're shown a note name and you click where it lives on the fretboard, so its first four stages work fine without a microphone. The last stage, **Play!**, has you find the notes on your guitar, and those exams listen. Exams are graded on accuracy:
 
 <ProgressLadder items="Below 80%::No stars, worth another go|80%::One star|90%::Two stars|95% and up::Three stars" highlight="95% and up" />
 
@@ -40,6 +40,6 @@ Each node shows where you stand (locked, available, in progress or done) based o
 
 ## Questions people ask
 
-<FaqList items="Do I need a microphone?::Not for the Learning Path, since Fretboard Mastery is click-based. Modules that do grade your playing say so and won't let you skip the prompt, see note detection. The Scale Map tracks the tempo you record on each pattern|Can I skip a step?::No, that's rather the point. Steps open in order|What if I fail an exam?::Nothing happens except that it stays unfinished. Retake it whenever|Does this count as practice?::Yes, time spent here logs like any other session" />
+<FaqList items="Do I need a microphone?::For the exams that grade your playing, yes: every Fundamentals exam and the Play! stage of Fretboard Mastery. Those won't let you skip the prompt, see note detection. The click-based Fretboard Mastery stages, Practice and the checklists work without one. The Scale Map tracks the tempo you record on each pattern|Can I skip a step?::No, that's rather the point. Steps open in order|What if I fail an exam?::Nothing happens except that it stays unfinished. Retake it whenever|Does this count as practice?::Yes, time spent here logs like any other session" />
 
 <ReadNext links="Skills & achievements::/wiki/skills-and-achievements|Note detection & mic setup::/wiki/note-detection|AI Coach & weekly Milestones::/wiki/ai-coach-and-weekly-milestones|Points, levels & streaks::/wiki/how-scoring-works" />
