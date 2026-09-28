@@ -19,8 +19,8 @@ import { AnimatePresence, m } from "framer-motion";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import {
   feedScrollClass,
-  panelHeightClass,
   PANEL_SCROLL_CLASS,
+  panelHeightClass,
 } from "layouts/LogsBoxLayout/logsBoxPanel";
 import { useState } from "react";
 import { FiBook } from "react-icons/fi";
