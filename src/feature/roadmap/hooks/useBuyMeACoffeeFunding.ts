@@ -33,10 +33,9 @@ const FUNDING_SNAPSHOT: Omit<BuyMeACoffeeFunding, "isLoading"> = {
 /**
  * Matched to the `s-maxage` the endpoint sends: refetching sooner than the edge
  * is willing to answer buys nothing but a round trip. `gcTime` follows it so the
- * numbers survive navigating away from the roadmap and back, rather than being
- * dropped after the default five minutes and fetched again.
+ * numbers survive navigating away from the roadmap and back.
  */
-const FUNDING_CACHE_MS = 60 * 60 * 1000;
+const FUNDING_CACHE_MS = 2 * 60 * 1000;
 
 interface FundingPayload {
   totalRaised: number;
