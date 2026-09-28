@@ -5,6 +5,7 @@ import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
 import { mergePinnedDonations } from "feature/logs/utils/pinnedDonations";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import LogsBoxLayout from "layouts/LogsBoxLayout";
+import { panelHeightClass } from "layouts/LogsBoxLayout/logsBoxPanel";
 import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -32,9 +33,11 @@ const SkeletonLogRow = () => (
 
 const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
   <Card
-    className={`relative m-auto flex ${
-      !className.includes("h-") ? "sm:h-[650px] lg:h-[800px]" : ""
-    } font-openSans flex-col p-1 ${
+    // Same box the loaded panel gets, so the feed doesn't jump when it arrives.
+    className={`relative m-auto flex ${panelHeightClass({
+      tab: "logs",
+      hasOwnHeight: className.includes("h-"),
+    })} font-openSans flex-col p-1 ${
       className.includes("border-none") ? "pb-24" : "pb-3"
     } rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
     {/* Tab bar */}
@@ -45,7 +48,7 @@ const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
     </div>
 
     {/* Rows */}
-    <div className='mb-2 animate-pulse overflow-hidden sm:h-full'>
+    <div className='mb-2 min-h-0 flex-1 animate-pulse overflow-hidden'>
       {Array.from({ length: 7 }).map((_, i) => (
         <SkeletonLogRow key={i} />
       ))}
