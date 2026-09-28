@@ -21,7 +21,8 @@ import { RIG_BUTTON } from "./RigSection";
  * owned one, while "Upgrade power supply" is unmistakable from across the
  * screen. The rung's name, and what is bolted in now, are on the tooltip.
  *
- * At the top of a ladder the button stays, greyed, saying so.
+ * At the top of a ladder the button goes: a greyed "maxed" in a row of live
+ * actions is one more thing to read that asks nothing of the player.
  */
 
 interface HardwareButtonProps {
@@ -46,35 +47,28 @@ const HardwareButton = ({
   pending,
   onBuy,
 }: HardwareButtonProps) => {
-  const affordable = next !== null && fame >= next.fame;
+  if (next === null) return null;
+  const affordable = fame >= next.fame;
 
   return (
     <button
       onClick={onBuy}
-      disabled={next === null || !affordable || pending}
+      disabled={!affordable || pending}
       title={
-        next === null
-          ? `${owned} — the biggest one made`
-          : affordable
-            ? `${owned} → ${next.name}`
-            : `${next.name} costs ${next.fame} Fame — ${next.fame - fame} more needed`
+        affordable
+          ? `${owned} → ${next.name}`
+          : `${next.name} costs ${next.fame} Fame — ${next.fame - fame} more needed`
       }
       className={cn(
         RIG_BUTTON,
         affordable && !pending && "text-arsenal-accent",
       )}>
       {icon}
-      {next === null
-        ? `${label} maxed`
-        : pending
-          ? "Buying…"
-          : `Upgrade ${label.toLowerCase()}`}
-      {next !== null && (
-        <span className='flex items-center gap-1 tabular-nums'>
-          <CurrencyIcon currency='fame' className='mr-0 h-3.5 w-3.5' />
-          {next.fame}
-        </span>
-      )}
+      {pending ? "Buying…" : `Upgrade ${label.toLowerCase()}`}
+      <span className='flex items-center gap-1 tabular-nums'>
+        <CurrencyIcon currency='fame' className='mr-0 h-3.5 w-3.5' />
+        {next.fame}
+      </span>
     </button>
   );
 };

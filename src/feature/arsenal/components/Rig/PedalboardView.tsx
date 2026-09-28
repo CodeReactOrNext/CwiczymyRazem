@@ -331,18 +331,21 @@ export const PedalboardView = ({
   );
 
   /** Everything currently occupying board space, minus one pedal. */
-  const boardBoxes = useCallback((excludeId?: string): BoardBox[] => {
-    const overflow = overflowRef.current;
-    return localItemsRef.current
-      .filter((i) => i.itemId !== excludeId && !overflow.includes(i.itemId))
-      .map((i) => ({
-        itemId: i.itemId,
-        xPct: i.xPct,
-        yPct: i.yPct,
-        wPct: widthOfRef.current(i.itemId),
-        hPct: heightPctFor(geo, widthOfRef.current, i.itemId),
-      }));
-  }, [geo]);
+  const boardBoxes = useCallback(
+    (excludeId?: string): BoardBox[] => {
+      const overflow = overflowRef.current;
+      return localItemsRef.current
+        .filter((i) => i.itemId !== excludeId && !overflow.includes(i.itemId))
+        .map((i) => ({
+          itemId: i.itemId,
+          xPct: i.xPct,
+          yPct: i.yPct,
+          wPct: widthOfRef.current(i.itemId),
+          hPct: heightPctFor(geo, widthOfRef.current, i.itemId),
+        }));
+    },
+    [geo],
+  );
 
   /** Applies a computed layout: board positions, parked pedals and the save. */
   const applyLayout = useCallback(
@@ -551,7 +554,8 @@ export const PedalboardView = ({
           point.x >= left &&
           point.x <= left + (widthOf(item.itemId) / 100) * geo.viewW &&
           point.y >= top &&
-          point.y <= top + (heightPctFor(geo, widthOf, item.itemId) / 100) * geo.viewH
+          point.y <=
+            top + (heightPctFor(geo, widthOf, item.itemId) / 100) * geo.viewH
         );
       }) ?? null,
     [boardItems, geo, widthOf],
@@ -667,7 +671,11 @@ export const PedalboardView = ({
         drag = {
           ...drag,
           active: true,
-          offYPct: grabOffsetY(e.pointerType, drag.offYPct, heightPctFor(geo, widthOfRef.current, drag.itemId)),
+          offYPct: grabOffsetY(
+            e.pointerType,
+            drag.offYPct,
+            heightPctFor(geo, widthOfRef.current, drag.itemId),
+          ),
         };
         setDragging(drag);
         onHover?.(null, null);
@@ -1085,7 +1093,12 @@ export const PedalboardView = ({
       localItems.some((i) => i.itemId === inventoryItemId)
     )
       return;
-    const spot = findFreeSpot(geo, boardBoxes(), widthOf(inventoryItemId), heightPctFor(geo, widthOf, inventoryItemId));
+    const spot = findFreeSpot(
+      geo,
+      boardBoxes(),
+      widthOf(inventoryItemId),
+      heightPctFor(geo, widthOf, inventoryItemId),
+    );
     if (!spot) {
       announce(BOARD_FULL, setNotice);
       return;
@@ -1284,7 +1297,14 @@ export const PedalboardView = ({
         itemId: link.itemId,
         out: link.out,
         row: rowIndexOf(geo, item.yPct),
-        jack: dcJackAt(geo, item.xPct, item.yPct, wPct, dcOf(link.itemId), heightPctFor(geo, widthOf, link.itemId)),
+        jack: dcJackAt(
+          geo,
+          item.xPct,
+          item.yPct,
+          wPct,
+          dcOf(link.itemId),
+          heightPctFor(geo, widthOf, link.itemId),
+        ),
         left: (item.xPct / 100) * geo.viewW,
         right: ((item.xPct + wPct) / 100) * geo.viewW,
       },
@@ -1358,12 +1378,20 @@ export const PedalboardView = ({
     hPct: heightPctFor(geo, widthOf, i.itemId),
   }));
   const canFit = (itemId: string) =>
-    findFreeSpot(geo, occupancy, widthOf(itemId), heightPctFor(geo, widthOf, itemId)) !== null;
+    findFreeSpot(
+      geo,
+      occupancy,
+      widthOf(itemId),
+      heightPctFor(geo, widthOf, itemId),
+    ) !== null;
 
   // Filling every output the brick still has saves a player eight drags — but
   // only offer it when it would actually do something.
   const canPatch =
     powerState.outputsFree > 0 && powerState.unpoweredIds.length > 0;
+  const handlePatch = () =>
+    savePower(autoPatch(rail, boardItems, powerState.links, widthOf));
+  const canWireUp = verdict.tip !== null && boardItems.length > 1;
 
   /**
    * Whether the board is being drawn through a window rather than simply laid
@@ -1377,33 +1405,14 @@ export const PedalboardView = ({
   const movable = fullscreen || view.zoom !== MIN_ZOOM;
 
   /**
-   * Everything that rearranges the board, kept in one place because the board
-   * has two headings now: the page's, and the bar that floats over it full
-   * screen. The Fame shop is not in here — buying a case is not something
-   * anybody does mid-wiring, and it stays back on the page.
+   * The actions that are nobody's fault — tidying and adding. On the page the
+   * two fixes ("Wire it up", "Patch power") sit in the readout they fix; full
+   * screen has no readouts, so they join these in the floating bar. The Fame
+   * shop is in neither — buying a case is not something anybody does
+   * mid-wiring, and it stays back on the page.
    */
   const boardActions = (
     <>
-      {verdict.tip !== null && boardItems.length > 1 && (
-        <button
-          onClick={handleWireUp}
-          className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
-          title='Lay the whole board out in the order the craft asks for'>
-          <Zap size={12} strokeWidth={2.5} />
-          Wire it up
-        </button>
-      )}
-      {canPatch && (
-        <button
-          onClick={() =>
-            savePower(autoPatch(rail, boardItems, powerState.links, widthOf))
-          }
-          className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
-          title='Plug in everything the brick still has a hole for'>
-          <Plug size={12} strokeWidth={2.5} />
-          Patch power
-        </button>
-      )}
       {boardItems.length > 1 && (
         <button
           onClick={handleTidy}
@@ -1867,6 +1876,24 @@ export const PedalboardView = ({
           tall, and the case wants every one of them. */}
       <div className='pointer-events-none absolute inset-x-0 top-0 z-50 flex items-start justify-between gap-2 p-2'>
         <div className='pointer-events-auto flex flex-wrap items-center gap-2'>
+          {canWireUp && (
+            <button
+              onClick={handleWireUp}
+              className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
+              title='Lay the whole board out in the order the craft asks for'>
+              <Zap size={12} strokeWidth={2.5} />
+              Wire it up
+            </button>
+          )}
+          {canPatch && (
+            <button
+              onClick={handlePatch}
+              className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
+              title='Plug in everything the brick still has a hole for'>
+              <Plug size={12} strokeWidth={2.5} />
+              Patch power
+            </button>
+          )}
           {boardActions}
         </div>
         <button
@@ -1890,22 +1917,15 @@ export const PedalboardView = ({
 
   return (
     <>
-      {/* The board's own heading, with every button it has on the same line:
-          the ones that rearrange it, the one that adds to it, and the two that
-          buy it more room. Directly above the readouts, because each button is
-          answering something they are about to show. */}
+      {/* The board's own heading carries only what buys it more room. Tidying
+          and adding sit on the case itself, and the fixes in the readouts they
+          answer. */}
       <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-3'>
         <p className='font-display text-2xl font-black text-arsenal-text-primary'>
           Pedalboard
         </p>
         <div className='flex flex-wrap items-center gap-2'>
-          {/* Full screen, these same buttons are up there with the board. */}
-          {!fullscreen && boardActions}
-
-          {/* Set a little apart from the rest, because these two spend Fame. */}
-          <div className='flex flex-wrap items-center gap-2 sm:ml-2'>
-            <RigHardwarePanel rig={data.rig} fame={fame} />
-          </div>
+          <RigHardwarePanel rig={data.rig} fame={fame} />
         </div>
       </div>
 
@@ -1937,6 +1957,8 @@ export const PedalboardView = ({
             supply={supply}
             power={powerState}
             unpowered={unpoweredNames}
+            onWireUp={canWireUp ? handleWireUp : null}
+            onPatch={canPatch ? handlePatch : null}
           />
           <DuplicateStrip
             board={boardLevel}
@@ -1945,6 +1967,14 @@ export const PedalboardView = ({
           />
           <SignalOrderStrip verdict={verdict} board={boardLevel} />
         </>
+      )}
+
+      {/* Right on top of the case they act on. Full screen, these same
+          buttons float over the board instead. */}
+      {!fullscreen && (
+        <div className='flex flex-wrap items-center justify-end gap-2'>
+          {boardActions}
+        </div>
       )}
 
       {fullscreen && typeof document !== "undefined"
