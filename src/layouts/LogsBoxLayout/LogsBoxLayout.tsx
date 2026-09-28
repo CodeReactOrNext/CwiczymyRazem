@@ -17,6 +17,11 @@ import {
 import { selectUserGuildBadge } from "feature/user/store/userSlice";
 import { AnimatePresence, m } from "framer-motion";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
+import {
+  feedScrollClass,
+  panelHeightClass,
+  PANEL_SCROLL_CLASS,
+} from "layouts/LogsBoxLayout/logsBoxPanel";
 import { useState } from "react";
 import { FiBook } from "react-icons/fi";
 import { IoChatboxEllipses } from "react-icons/io5";
@@ -157,15 +162,15 @@ const LogsBoxLayout = ({
     </>
   );
 
-  const heightClass =
-    activeCategory !== "logs" && !className.includes("h-")
-      ? "sm:h-[650px] lg:h-[800px]"
-      : "";
+  // On phones the panel is a screen-sized box whatever the tab, so the chat's composer and the
+  // feed's tab rail stay on screen instead of being pushed down the page — see `logsBoxPanel`.
+  const heightClass = panelHeightClass({
+    tab: activeCategory,
+    hasOwnHeight: className.includes("h-"),
+  });
 
-  // Inside a fixed box every tab scrolls on its own instead of the page.
-  const scrollClass = contained
-    ? "min-h-0 flex-1 overflow-y-auto scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600"
-    : "";
+  // Inside a bounded box a tab scrolls on its own instead of the page.
+  const scrollClass = feedScrollClass(contained);
 
   return (
     <Card
@@ -181,10 +186,7 @@ const LogsBoxLayout = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className={cn(
-              "mb-2 overflow-visible p-4 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600 sm:h-full sm:overflow-y-auto",
-              scrollClass,
-            )}>
+            className={cn("mb-2 p-4", PANEL_SCROLL_CLASS)}>
             <Changelog month='2026-05' />
           </m.div>
         )}
