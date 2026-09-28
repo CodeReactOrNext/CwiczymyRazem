@@ -2,12 +2,7 @@ import type {
   ChatSystemEvent,
   ChatWelcome,
 } from "feature/chat/types/chat.types";
-import {
-  GUILD_SESSION_MIN_MINUTES,
-  sessionMinutes,
-  systemEventText,
-  welcomeText,
-} from "feature/chat/utils/systemMessages";
+import { systemEventText, welcomeText } from "feature/chat/utils/systemMessages";
 import type { GuildBadge } from "feature/guilds/types/guild.types";
 import type { CollectionReference } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
@@ -19,7 +14,7 @@ import { firestore } from "utils/firebase/api/firebase.config";
  * one that happened.
  *
  * Every writer here is fire-and-forget: the thing that happened (a quest
- * banked, a member seated, a session saved) is already done, and a missing
+ * banked, a member seated) is already done, and a missing
  * chat line is not worth failing it over.
  */
 
@@ -120,36 +115,6 @@ export async function postGuildMemberJoinedMessage(
     );
   } catch (error) {
     console.error("[chatSystemMessages] member joined", guildId, error);
-  }
-}
-
-/**
- * "Ania finished a 45 min session" in the player's guild room — skipped for
- * players without a guild and for sessions too short to be news.
- */
-export async function postGuildSessionMessage(input: {
-  uid: string;
-  sumTimeMs: number;
-  title?: string | null;
-}): Promise<void> {
-  const minutes = sessionMinutes(input.sumTimeMs);
-  if (minutes < GUILD_SESSION_MIN_MINUTES) return;
-
-  try {
-    const user = await firestore.collection("users").doc(input.uid).get();
-    const data = user.data() ?? {};
-    if (typeof data.guildId !== "string" || !data.guildId) return;
-
-    await writeRow(
-      guildChat(data.guildId),
-      eventRow(authorOf(input.uid, data), {
-        kind: "session",
-        minutes,
-        title: input.title?.trim() || null,
-      }),
-    );
-  } catch (error) {
-    console.error("[chatSystemMessages] session", input.uid, error);
   }
 }
 

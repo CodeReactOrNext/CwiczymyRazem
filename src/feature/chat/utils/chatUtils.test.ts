@@ -10,11 +10,7 @@ import {
   splitByMentions,
 } from "./chatMentions";
 import { findOwnReaction, groupReactions, reactionEmoji } from "./chatReactions";
-import {
-  sessionMinutes,
-  systemEventText,
-  welcomeText,
-} from "./systemMessages";
+import { systemEventText, welcomeText } from "./systemMessages";
 
 describe("chat reactions", () => {
   const reactions: ChatReaction[] = [
@@ -114,12 +110,6 @@ describe("chat mentions", () => {
 });
 
 describe("system messages", () => {
-  it("rounds session time down to whole minutes", () => {
-    expect(sessionMinutes(45 * 60_000 + 59_000)).toBe(45);
-    expect(sessionMinutes(undefined)).toBe(0);
-    expect(sessionMinutes(-5)).toBe(0);
-  });
-
   it("describes what a new player came for", () => {
     expect(welcomeText("Ania", "plans", "Beginner")).toBe(
       "Ania just joined, starting with the Beginner plan",
@@ -140,8 +130,5 @@ describe("system messages", () => {
     expect(systemEventText({ kind: "member_joined" }, "Ania")).toBe(
       "Ania joined the guild",
     );
-    expect(
-      systemEventText({ kind: "session", minutes: 45, title: "Blues" }, "Ania"),
-    ).toBe("Ania finished a 45 min session: Blues");
   });
 });

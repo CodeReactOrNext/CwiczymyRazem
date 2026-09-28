@@ -1,17 +1,5 @@
 import type { ChatSystemEvent } from "feature/chat/types/chat.types";
 
-/**
- * Sessions shorter than this don't make it into the guild room: a room full of
- * two-minute warm-ups reads as noise, not as a guild at work.
- */
-export const GUILD_SESSION_MIN_MINUTES = 10;
-
-/** Whole minutes in a session's logged time, or 0 for anything missing or malformed. */
-export const sessionMinutes = (sumTimeMs: unknown): number =>
-  typeof sumTimeMs === "number" && Number.isFinite(sumTimeMs) && sumTimeMs > 0
-    ? Math.floor(sumTimeMs / 60_000)
-    : 0;
-
 /** What the new player said they came for, as the tail of "Ania just joined, …". */
 export const welcomeGoalPhrase = (
   goal: string | null | undefined,
@@ -61,9 +49,5 @@ export const systemEventText = (
         : `${event.guildName} reached level ${event.level}`;
     case "member_joined":
       return `${username} joined the guild`;
-    case "session":
-      return event.title
-        ? `${username} finished a ${event.minutes} min session: ${event.title}`
-        : `${username} finished a ${event.minutes} min session`;
   }
 };

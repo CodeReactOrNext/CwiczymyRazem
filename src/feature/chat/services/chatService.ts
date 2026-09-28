@@ -43,10 +43,13 @@ export const fetchChatMessages = (
   );
 
   return onSnapshot(chatQuery, (snapshot) => {
-    const messages = snapshot.docs.map(
-      (docSnapshot) =>
-        ({ id: docSnapshot.id, ...docSnapshot.data() } as ChatMessageType)
-    );
+    const messages = snapshot.docs
+      // Guild rooms used to announce every finished session; those rows are still stored.
+      .filter((docSnapshot) => docSnapshot.data().system?.kind !== "session")
+      .map(
+        (docSnapshot) =>
+          ({ id: docSnapshot.id, ...docSnapshot.data() } as ChatMessageType)
+      );
     callback(messages.reverse());
   }, (error) => {
     console.error("Chat messages listener failed:", error);

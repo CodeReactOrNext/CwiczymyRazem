@@ -69,13 +69,7 @@ export type ChatSystemEvent =
       /** Names of the quests that got the guild there, at most five. */
       quests: string[];
     }
-  | { kind: "member_joined" }
-  | {
-      kind: "session";
-      minutes: number;
-      /** The session's own name: a plan title, an exercise title. */
-      title?: string | null;
-    };
+  | { kind: "member_joined" };
 
 /** What a player who just finished onboarding came for, shown on their welcome card. */
 export interface ChatWelcome {

@@ -3,7 +3,7 @@ import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import type { ChatMessageType } from "feature/chat/types/chat.types";
 import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
-import { Shield, Timer, UserPlus } from "lucide-react";
+import { Shield, UserPlus } from "lucide-react";
 import type { ReactNode } from "react";
 
 const FOCUS_RING =
@@ -52,7 +52,7 @@ const EventLine = ({
 
 /**
  * Rows the room writes itself: a new player's welcome card, and in a guild the
- * level-ups, new members and finished sessions. They keep a room from looking
+ * level-ups and new members. They keep a room from looking
  * empty when nobody is typing — and each one is something to answer.
  */
 export const ChatSystemRow = ({
@@ -115,21 +115,6 @@ export const ChatSystemRow = ({
           tone='text-emerald-400'
           action={onSayHi && <SayHiButton onClick={onSayHi} />}>
           <Name message={message} /> joined the guild
-        </EventLine>
-      );
-    case "session":
-      return (
-        <EventLine icon={<Timer className='h-5 w-5' />} tone='text-cyan-400'>
-          <Name message={message} /> finished a{" "}
-          <span className='font-semibold text-cyan-300'>
-            {event.minutes} min
-          </span>{" "}
-          session
-          {event.title && (
-            <span className='mt-0.5 block truncate text-xs text-zinc-500'>
-              {event.title}
-            </span>
-          )}
         </EventLine>
       );
   }
