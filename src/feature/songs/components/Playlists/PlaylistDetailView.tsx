@@ -1058,6 +1058,7 @@ export const PlaylistDetailView = ({
             onAdd={handleAddSong}
             collectionSongs={collectionSongs}
             canAdd={!atCapacity}
+            allowCreate
             className="min-h-0 flex-1"
           />
         </DialogContent>
