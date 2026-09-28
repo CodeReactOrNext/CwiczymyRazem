@@ -43,6 +43,7 @@ import {
   ListMusic,
   Music,
   Play,
+  Plus,
   Search,
   SlidersHorizontal,
   Trophy,
@@ -545,6 +546,13 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                               </button>
                             );
                           })}
+                          <Button
+                            variant="ghost"
+                            onClick={() => handleSwitchView("explore")}
+                            className="ml-auto h-10 rounded-lg bg-white/5 px-4 text-sm font-semibold text-zinc-200 hover:bg-white/10 hover:text-white">
+                            <Plus />
+                            Add songs
+                          </Button>
                         </div>
 
                         {activeSection.songs.length > 0 ? (

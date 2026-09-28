@@ -18,7 +18,7 @@ import MainContainer from "components/MainContainer";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Play, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
@@ -270,6 +270,7 @@ const TimerLayout = ({
   timerSubmitHandler,
   chosenSkill,
   choseSkillHandler,
+  onBack,
   onResetTimer,
   isFinishing
 }: TimerLayoutProps) => {
@@ -346,6 +347,15 @@ const TimerLayout = ({
     },
   ];
 
+  const startSkill = (skill: SkillsType) => {
+    choseSkillHandler(skill);
+    startTimer();
+  };
+
+  // Nothing tracked yet: finishing would only open an empty report, so the
+  // main action becomes "back" and the manual log is offered on its own.
+  const hasTrackedTime = sumTime > 0 || timerEnabled;
+
   return (
     <MainContainer noBorder>
       <div className='font-openSans mx-auto h-full w-full max-w-6xl space-y-6 px-3 pb-8 pt-4 sm:space-y-8 sm:px-4 sm:pb-12 md:p-8'>
@@ -361,18 +371,38 @@ const TimerLayout = ({
               />
             </div>
 
-            <div className='grid flex-1 grid-cols-2 gap-6 lg:grid-cols-1 lg:content-center lg:gap-10'>
-              <div className='space-y-2'>
-                <p className='text-sm text-zinc-500'>
-                  {t("currently_exercising")}
-                </p>
-                <div className='flex items-center gap-2'>
-                  <BlinkingDot isActive={timerEnabled} />
-                  <span translate="no" className='font-medium text-white sm:text-lg'>
-                    {chosenSkill ? getSkillName(chosenSkill) : "Not selected"}
-                  </span>
+            <div className='grid flex-1 grid-cols-1 gap-6 lg:content-center lg:gap-10'>
+              {chosenSkill ? (
+                <div className='space-y-2'>
+                  <p className='text-sm text-zinc-500'>
+                    {t("currently_exercising")}
+                  </p>
+                  <div className='flex items-center gap-2'>
+                    <BlinkingDot isActive={timerEnabled} />
+                    <span translate="no" className='font-medium text-white sm:text-lg'>
+                      {getSkillName(chosenSkill)}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className='space-y-3'>
+                  <p className='font-medium text-white sm:text-lg'>
+                    Choose what you are practising
+                  </p>
+                  <div className='grid grid-cols-2 gap-2'>
+                    {skillsData.map((skill) => (
+                      <button
+                        key={skill.id}
+                        type='button'
+                        onClick={() => startSkill(skill.id)}
+                        className='flex items-center gap-2.5 rounded-lg bg-zinc-800/60 px-4 py-3 text-left text-sm font-semibold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
+                        <Play className='h-3.5 w-3.5 shrink-0 fill-current' style={{ color: skill.color }} />
+                        <span translate="no">{skill.title}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className='space-y-2'>
                 <p className='text-sm text-zinc-500'>{t("total_time")}</p>
@@ -430,6 +460,17 @@ const TimerLayout = ({
                 {t("reset_button")}
               </Button>
             )}
+            {!hasTrackedTime ? (
+            <Button
+              onClick={onBack}
+              className='px-6 py-2.5 text-sm sm:px-8 sm:py-3 sm:text-base min-w-[140px]'
+              variant='outline'
+              size='lg'
+            >
+              <ArrowLeft className='h-4 w-4' />
+              Back to Practice
+            </Button>
+            ) : (
             <Button
               onClick={timerSubmitHandler}
               className='px-6 py-2.5 text-sm sm:px-8 sm:py-3 sm:text-base min-w-[140px]'
@@ -449,6 +490,7 @@ const TimerLayout = ({
                   </span>
               )}
             </Button>
+            )}
           </div>
 
           {onResetTimer && (
@@ -477,10 +519,21 @@ const TimerLayout = ({
           )}
 
           <p className='text-center text-xs text-muted-foreground sm:text-sm'>
-            {t("info_about_report")}{" "}
-            <Link href='/report' className='text-primary hover:underline'>
-              {t("report_link")}
-            </Link>
+            {hasTrackedTime ? (
+              <>
+                {t("info_about_report")}{" "}
+                <Link href='/report' className='text-primary hover:underline'>
+                  {t("report_link")}
+                </Link>
+              </>
+            ) : (
+              <>
+                Practised away from the timer?{" "}
+                <Link href='/report' className='text-primary hover:underline'>
+                  Log the time manually
+                </Link>
+              </>
+            )}
           </p>
         </div>
       </div>

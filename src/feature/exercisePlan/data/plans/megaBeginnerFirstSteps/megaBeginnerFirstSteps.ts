@@ -13,7 +13,7 @@ export const beginnerDailyExercisesPlan: ExercisePlan = {
   icon: "graduation",
   color: "lime",
   title: "Beginner: Daily Exercises",
-  description: "Perfect starting point for someone who just picked up the guitar. Focuses on basic string awareness and coordination.",
+  description: "Single notes only, no chords: keep time on open strings, find notes on the neck and run the spider drill. A daily habit for finger control.",
   difficulty: "beginner",
   category: "technique",
   exercises: [
@@ -30,8 +30,8 @@ export const megaBeginnerFirstStepsPlan: ExercisePlan = {
   id: "mega_beginner_first_steps",
   icon: "star",
   color: "emerald",
-  title: "Mega Beginner: First Steps",
-  description: "Super simple exercises perfect for absolute beginners just starting their guitar journey. Focuses on string basics, melody, strumming, and basic chords.",
+  title: "Absolute Beginner: First Steps",
+  description: "A taste of everything: open strings, a slow melody, steady strumming and your first chords. Pick this if you have never played before.",
   difficulty: "beginner",
   category: "technique",
   exercises: [

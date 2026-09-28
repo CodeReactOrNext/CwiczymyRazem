@@ -1,4 +1,3 @@
-import { HeroBanner } from "components/UI/HeroBanner";
 import { CreatePlan } from "feature/exercisePlan/components/CreatePlanDialog/CreatePlan";
 import { createExercisePlan } from "feature/exercisePlan/services/createExercisePlan";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
@@ -55,13 +54,8 @@ const CreatePlanPage: NextPageWithLayout = () => {
   return (
     <PremiumGate feature="plans">
       <div className="flex flex-col min-h-screen rounded-lg bg-zinc-900/40">
-        <HeroBanner
-          title="Create Plan"
-          subtitle="Build your custom practice routine"
-          eyebrow="Practice Plans"
-          className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
-        />
-        <div className="container mx-auto px-4 lg:px-8 pb-12">
+        <div className="container mx-auto px-4 lg:px-8 pb-12 pt-6">
+          <h1 className="mb-5 text-2xl font-bold text-zinc-100">Create plan</h1>
           <CreatePlan onSubmit={handleCreatePlan} />
         </div>
       </div>

@@ -182,26 +182,28 @@ const ModeCard = ({
         {!hero && (
           <div
             className={`mt-2.5 space-y-1 ${
-              !locked && progress && progress.total > 0 ? "" : "invisible"
+              !locked && progress ? "" : "invisible"
             }`}>
-            <div className='h-1.5 w-full overflow-hidden rounded-full bg-white/5'>
+            {/* The bar only measures the one path in progress; libraries get a count. */}
+            <div
+              className={`h-1.5 w-full overflow-hidden rounded-full bg-white/5 ${
+                progress?.total ? "" : "invisible"
+              }`}>
               <div
-                className={`h-full rounded-full transition-all duration-500 ${
-                  progress && progress.done === progress.total ? "bg-emerald-400" : "bg-cyan-400"
-                }`}
+                className='h-full rounded-full bg-cyan-400 transition-all duration-500'
                 style={{
                   width:
-                    progress && progress.total > 0
+                    progress?.total && progress.done !== undefined
                       ? `max(${Math.round((progress.done / progress.total) * 100)}%, 3px)`
                       : 0,
                 }}
               />
             </div>
-            <p
-              className={`text-[11px] font-semibold tabular-nums ${
-                progress && progress.done === progress.total ? "text-emerald-400" : "text-zinc-500"
-              }`}>
-              {progress ? progress.done : 0} of {progress ? progress.total : 0} {progressUnit}
+            <p className='truncate text-[11px] font-semibold tabular-nums text-zinc-500'>
+              {progress?.label}
+              {progress?.total
+                ? ` · ${progress.done ?? 0} of ${progress.total} ${progressUnit ?? ""}`
+                : ""}
             </p>
           </div>
         )}
@@ -401,7 +403,7 @@ export const PracticeModeSelector = () => {
                   "learning-path",
                   Route,
                   "Learning Path",
-                  "Step-by-step progress",
+                  "Start with the basics, one lesson at a time",
                   "/journey",
                   "rose",
                   { progress: modeProgress.learningPath, progressUnit: "steps" }
@@ -410,7 +412,7 @@ export const PracticeModeSelector = () => {
                   "roadmaps",
                   ClipboardList,
                   "Mastery Roadmaps",
-                  "Goal-based practice roadmaps",
+                  "Choose a skill or playing style to focus on",
                   "/ai-coach",
                   "rose",
                   { progress: modeProgress.roadmaps, progressUnit: "steps" }
@@ -422,7 +424,7 @@ export const PracticeModeSelector = () => {
                   "Interactive scale fretboard tree",
                   "/scale-tree",
                   "rose",
-                  { progress: modeProgress.scaleMap, progressUnit: "scales" }
+                  { progress: modeProgress.scaleMap }
                 )}
               </div>
             </div>
@@ -433,16 +435,16 @@ export const PracticeModeSelector = () => {
                   "skills",
                   Brain,
                   "Skills",
-                  "Specific skill focus",
+                  "See your progress by technique",
                   "/profile/skills",
                   "emerald",
-                  { progress: modeProgress.skills, progressUnit: "exercises" }
+                  { progress: modeProgress.skills }
                 )}
                 {modeItem(
                   "exercises",
                   Dumbbell,
                   "Exercises",
-                  "Full exercise library",
+                  "Find an exercise by skill, length or practice mode",
                   "/profile/skills?tab=browse",
                   "emerald"
                 )}

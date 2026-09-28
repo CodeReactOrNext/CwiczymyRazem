@@ -3,8 +3,6 @@ import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import {
-  ChevronDown,
-  ChevronUp,
   Gauge,
   Lock,
   Minus,
@@ -188,48 +186,28 @@ export const Metronome = ({
       </div>
 
       <div className='mt-1 flex flex-col gap-2'>
-        {/* BPM step buttons: ±5 (outer, smaller) and ±1 (inner, larger) */}
-        <div className='flex items-center justify-center gap-1'>
+        {/* BPM step buttons: ±1. Bigger jumps go through the slider, a typed
+            value, or Shift+Arrow (±5) on the BPM display. */}
+        <div className='flex items-center justify-center gap-3'>
           <Button
             variant='ghost'
             size='icon'
-            className='h-6 w-6 shrink-0 rounded bg-zinc-800/40 text-zinc-400 transition-colors hover:bg-zinc-700/80 hover:text-zinc-100'
-            onClick={() => setBpm(clampBpm(bpm - 5))}
-            disabled={locked || bpm <= minBpm}
-            title='-5 BPM'
-            aria-label='Decrease BPM by 5'>
-            <ChevronDown className='h-3 w-3' strokeWidth={2.5} />
-          </Button>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-7 w-7 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
+            className='h-8 w-8 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
             onClick={() => setBpm(clampBpm(bpm - 1))}
             disabled={locked || bpm <= minBpm}
             title='-1 BPM'
             aria-label='Decrease BPM by 1'>
             <Minus className='h-4 w-4' strokeWidth={2.5} />
           </Button>
-          <span className='w-3' />
           <Button
             variant='ghost'
             size='icon'
-            className='h-7 w-7 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
+            className='h-8 w-8 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
             onClick={() => setBpm(clampBpm(bpm + 1))}
             disabled={locked || bpm >= maxBpm}
             title='+1 BPM'
             aria-label='Increase BPM by 1'>
             <Plus className='h-4 w-4' strokeWidth={2.5} />
-          </Button>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-6 w-6 shrink-0 rounded bg-zinc-800/40 text-zinc-400 transition-colors hover:bg-zinc-700/80 hover:text-zinc-100'
-            onClick={() => setBpm(clampBpm(bpm + 5))}
-            disabled={locked || bpm >= maxBpm}
-            title='+5 BPM'
-            aria-label='Increase BPM by 5'>
-            <ChevronUp className='h-3 w-3' strokeWidth={2.5} />
           </Button>
         </div>
 

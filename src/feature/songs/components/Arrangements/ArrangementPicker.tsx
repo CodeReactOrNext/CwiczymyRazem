@@ -46,8 +46,8 @@ export const ArrangementPicker = ({
               "flex flex-1 items-center justify-center gap-2 rounded font-semibold transition-background click-behavior focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
               size === "sm" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm",
               isActive
-                ? "bg-zinc-800 text-zinc-100"
-                : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+                ? "bg-zinc-700/80 text-white"
+                : "text-zinc-300 hover:bg-zinc-800/70 hover:text-white"
             )}>
             {meta && (
               <span
@@ -55,7 +55,7 @@ export const ArrangementPicker = ({
                 className={cn(
                   "h-2 w-2 shrink-0 rounded-full transition-opacity",
                   meta.dot,
-                  !isActive && "opacity-50"
+                  !isActive && "opacity-70"
                 )}
               />
             )}

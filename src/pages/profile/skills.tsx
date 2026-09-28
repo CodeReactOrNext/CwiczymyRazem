@@ -1,6 +1,5 @@
 import { cn } from "assets/lib/utils";
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
-import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { SkillDashboard } from "feature/skills/components/SkillDashboard";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
@@ -25,7 +24,25 @@ const useIsFullBleedMap = () => {
   return isMapTab && !isCompact;
 };
 
+const HEADINGS: Record<string, { title: string; subtitle: string }> = {
+  "skill-tree": {
+    title: "Skills",
+    subtitle: "See your progress by technique and pick what to practise next.",
+  },
+  browse: {
+    title: "Exercises",
+    subtitle: "Search by name, or pick how you want to practise to narrow the list.",
+  },
+  community: {
+    title: "Community Exercises",
+    subtitle: "Exercises other players made and shared.",
+  },
+};
+
 const ProfileSkillsPage: NextPageWithLayout = () => {
+  const router = useRouter();
+  const heading =
+    HEADINGS[(router.query.tab as string) || "skill-tree"] ?? HEADINGS["skill-tree"];
   const userAuth = useAppSelector(selectUserAuth);
   const [userSkills, setUserSkills] = useState<UserSkills>();
   const isMapTab = useIsFullBleedMap();
@@ -42,17 +59,19 @@ const ProfileSkillsPage: NextPageWithLayout = () => {
         "flex flex-col bg-second-600",
         isMapTab ? "h-full overflow-hidden" : "min-h-screen overflow-visible",
       )}>
-      <HeroBanner
-        title='Skills'
-        subtitle='Track and develop your guitar playing skills'
-        eyebrowContent={
-          <Breadcrumbs
-            items={[{ label: "Practice", href: "/timer" }, { label: "Skills" }]}
-          />
-        }
-        backgroundContent={<HeroPattern />}
-        className='min-h-[100px] w-full shrink-0 !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
-      />
+      {/* A plain title that names the open tab — the menu links to each one
+          separately, so "Exercises" should not land on a page called Skills. */}
+      <header className='mx-auto w-full max-w-7xl shrink-0 space-y-3 px-4 pt-6 lg:px-6 lg:pt-8'>
+        <Breadcrumbs
+          items={[{ label: "Practice", href: "/timer" }, { label: heading.title }]}
+        />
+        <div>
+          <h1 className='text-2xl font-bold leading-tight text-white md:text-3xl'>
+            {heading.title}
+          </h1>
+          <p className='mt-1 text-sm text-zinc-400'>{heading.subtitle}</p>
+        </div>
+      </header>
       {userSkills ? (
         <div className='min-h-0 flex-1'>
           <SkillDashboard userSkills={userSkills as UserSkills} />

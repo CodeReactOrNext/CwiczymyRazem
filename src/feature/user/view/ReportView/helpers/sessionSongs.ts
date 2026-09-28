@@ -34,10 +34,11 @@ export const MINUTE_STEP = 5;
 export const MAX_SONG_CATEGORY_MINUTES = 480;
 
 /**
- * A freshly picked song already carries one repeat block, so logging a run of
- * short repeats costs exactly one tap per song.
+ * A freshly picked song starts at 0 — a prefilled block read as time the player
+ * had entered (UX audit #16), so picking a song alone never makes the form
+ * saveable. One tap on "+" still adds a full repeat block.
  */
-export const DEFAULT_TECHNIQUE_MINUTES = 5;
+export const DEFAULT_TECHNIQUE_MINUTES = 0;
 
 /** Formik's `reportTitle` is capped at 120 chars by `RaportSchema`. */
 const TITLE_MAX_LENGTH = 120;

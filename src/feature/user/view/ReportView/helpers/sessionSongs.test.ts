@@ -35,7 +35,7 @@ const entry = (songId: string, minutes: number): ReportSongEntry => ({
 });
 
 describe("createPickedSong", () => {
-  it("arrives with one repeat block already on it, so adding a song is one tap", () => {
+  it("arrives without time, so picking a song never logs minutes on its own", () => {
     const song = createPickedSong({ id: "a", title: "One", artist: "Metallica" });
 
     expect(song.techniqueMinutes).toBe(DEFAULT_TECHNIQUE_MINUTES);

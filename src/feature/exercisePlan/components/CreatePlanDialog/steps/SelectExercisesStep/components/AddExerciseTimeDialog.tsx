@@ -56,7 +56,7 @@ function AddExerciseTimeForm({
             Cancel
           </Button>
           <Button
-            className="rounded-[8px] bg-cyan-600 hover:bg-cyan-500 text-white shadow-[0_0_15px_-3px_rgba(6,182,212,0.4)] transition-all font-bold px-6"
+            className="rounded-[8px] bg-white hover:bg-zinc-200 text-black transition-colors font-bold px-6"
             onClick={handleConfirm}
             disabled={minutes === null}
           >

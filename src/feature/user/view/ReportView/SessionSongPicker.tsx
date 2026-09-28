@@ -112,17 +112,17 @@ const CategoryTime = ({
         className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full'
         style={{
           background: hasValue
-            ? `linear-gradient(135deg, ${color}20, ${color}10)`
-            : "linear-gradient(135deg, #52525b40, #3f3f4630)",
+            ? `linear-gradient(135deg, ${color}33, ${color}1a)`
+            : "linear-gradient(135deg, #52525b80, #3f3f4666)",
         }}>
         <Icon
           className='text-base'
-          style={{ color: hasValue ? color : "#a1a1aa" }}
+          style={{ color: hasValue ? color : "#d4d4d8" }}
           aria-hidden
         />
       </span>
 
-      <span className='w-16 shrink-0 font-sans text-xs text-zinc-300'>{label}</span>
+      <span className='w-20 shrink-0 font-sans text-sm font-medium text-zinc-100'>{label}</span>
 
       <div className='flex items-center gap-1'>
         <button
@@ -130,7 +130,7 @@ const CategoryTime = ({
           aria-label={`5 minutes less of ${label.toLowerCase()}`}
           disabled={minutes <= 0}
           onClick={() => onChange(stepDown(minutes))}
-          className='flex h-8 w-8 items-center justify-center rounded bg-zinc-900/60 text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40 disabled:pointer-events-none disabled:opacity-40'>
+          className='flex h-9 w-9 items-center justify-center rounded bg-zinc-700/60 text-zinc-100 transition-colors hover:bg-zinc-600/70 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40 disabled:pointer-events-none disabled:opacity-30'>
           <Minus className='h-3.5 w-3.5' />
         </button>
 
@@ -147,9 +147,9 @@ const CategoryTime = ({
             onFocus={(event) => event.target.select()}
             onBlur={() => setDraft(null)}
             style={{ color: hasValue ? color : undefined }}
-            className='h-8 w-14 rounded bg-zinc-900/60 pr-4 text-right font-mono text-sm font-bold text-zinc-500 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'
+            className='h-9 w-16 rounded bg-zinc-950/70 pr-5 text-right font-mono text-base font-bold text-zinc-200 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'
           />
-          <span className='pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-zinc-500'>
+          <span className='pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-400'>
             m
           </span>
         </div>
@@ -158,7 +158,7 @@ const CategoryTime = ({
           type='button'
           aria-label={`5 minutes more of ${label.toLowerCase()}`}
           onClick={() => onChange(stepUp(minutes))}
-          className='flex h-8 w-8 items-center justify-center rounded bg-zinc-900/60 text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
+          className='flex h-9 w-9 items-center justify-center rounded bg-zinc-700/60 text-zinc-100 transition-colors hover:bg-zinc-600/70 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
           <Plus className='h-3.5 w-3.5' />
         </button>
       </div>
@@ -179,14 +179,14 @@ const PickedSongRow = ({
   onSetArrangement?: (arrangement: SongArrangement | null) => void;
   onRemove: () => void;
 }) => (
-  <div className='rounded-lg bg-zinc-800/40 p-3'>
+  <div className='rounded-lg bg-zinc-800/60 p-4'>
     <div className='flex items-center gap-3'>
       <SongCover coverUrl={coverUrl ?? song.coverUrl} />
       <div className='min-w-0 flex-1'>
         <p translate='no' className='truncate text-sm font-bold text-zinc-100'>
           {song.title}
         </p>
-        <p translate='no' className='truncate text-xs text-zinc-400'>
+        <p translate='no' className='truncate text-xs text-zinc-300'>
           {song.artist}
         </p>
       </div>
@@ -194,13 +194,13 @@ const PickedSongRow = ({
         type='button'
         onClick={onRemove}
         aria-label={`Remove ${song.title} from this session`}
-        className='flex h-9 w-9 shrink-0 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-900/60 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
+        className='flex h-9 w-9 shrink-0 items-center justify-center rounded text-zinc-300 transition-colors hover:bg-zinc-700/60 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
         <X className='h-4 w-4' />
       </button>
     </div>
 
     {/* The two categories sit side by side once there is room, and stack below. */}
-    <div className='mt-3 flex flex-wrap gap-x-8 gap-y-2.5'>
+    <div className='mt-4 flex flex-wrap gap-x-10 gap-y-3'>
       <CategoryTime
         skill='technique'
         label='Technique'
@@ -223,7 +223,7 @@ const PickedSongRow = ({
         onChange={onSetArrangement}
         noneLabel='Any part'
         size='sm'
-        className='mt-3'
+        className='mt-4 bg-zinc-950/50'
       />
     )}
   </div>
@@ -409,18 +409,18 @@ const SessionSongPicker = ({
           </div>
 
           <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1'>
-            <p className='text-xs text-zinc-500'>
+            <p className='text-sm text-zinc-300'>
               Technique{" "}
-              <span className='font-semibold text-zinc-300'>{totals.technique}m</span> ·
+              <span className='font-bold text-white'>{totals.technique}m</span> ·
               Hearing{" "}
-              <span className='font-semibold text-zinc-300'>{totals.hearing}m</span>
+              <span className='font-bold text-white'>{totals.hearing}m</span>
             </p>
 
             <button
               type='button'
               onClick={() => setIsAdding((open) => !open)}
               disabled={isAtLimit && !isAdding}
-              className='flex items-center gap-1.5 rounded bg-zinc-800/60 px-3 py-2 text-xs font-bold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40 disabled:pointer-events-none disabled:opacity-40'>
+              className='flex items-center gap-1.5 rounded bg-zinc-700/60 px-3 py-2 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-600/70 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40 disabled:pointer-events-none disabled:opacity-40'>
               {isAdding ? (
                 <>
                   <ChevronUp className='h-3.5 w-3.5' />

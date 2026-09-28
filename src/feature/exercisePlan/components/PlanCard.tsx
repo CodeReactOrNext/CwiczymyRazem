@@ -31,6 +31,9 @@ import type { DifficultyLevel, ExercisePlan } from "../types/exercise.types";
 interface PlanCardProps {
   plan: ExercisePlan;
   onSelect?: () => void;
+  /** When set, clicking the card body opens a preview (instead of onSelect) and
+   *  a visible "Preview" button appears next to the start arrow. */
+  onPreview?: () => void;
   onStart?: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
@@ -103,6 +106,7 @@ const categoryStyles = {
 export const PlanCard = ({
   plan,
   onSelect,
+  onPreview,
   onStart,
   onDelete,
   onEdit,
@@ -147,7 +151,8 @@ export const PlanCard = ({
   const Icon: ComponentType<{ className?: string }> =
     getPlanIcon(plan.icon) ?? categoryStyle.icon;
 
-  const isInteractive = isLocked ? !!onUpgrade : !!onSelect;
+  const onCardClick = isLocked ? onUpgrade : (onPreview ?? onSelect);
+  const isInteractive = !!onCardClick;
 
   // Author can come from a built-in plan (StaticImageData avatar) or a published
   // community plan (string avatar URL + authorUsername).
@@ -185,10 +190,9 @@ export const PlanCard = ({
         isInteractive && "cursor-pointer"
       )}
       onClick={(e) => {
-        const handler = isLocked ? onUpgrade : onSelect;
-        if (!handler) return;
+        if (!onCardClick) return;
         createRipple(e);
-        handler();
+        onCardClick();
       }}>
       {ripple}
 
@@ -419,9 +423,22 @@ export const PlanCard = ({
             <Lock className="h-4 w-4" />
           </button>
         ) : onStart && (
+          <div className="flex items-center gap-2">
+          {onPreview && (
+            <button
+              type="button"
+              className="h-10 rounded-full px-3 text-xs font-semibold text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              onClick={(e) => {
+                e.stopPropagation();
+                onPreview();
+              }}>
+              Preview
+            </button>
+          )}
           <button
             type="button"
             aria-label={startButtonText || "Start"}
+            title={startButtonText || "Start"}
             className={cn(
               "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-200 transition-colors duration-300",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60",
@@ -439,6 +456,7 @@ export const PlanCard = ({
               <ArrowUpRight className="h-4 w-4" />
             )}
           </button>
+          </div>
         )}
       </div>
     </Card>

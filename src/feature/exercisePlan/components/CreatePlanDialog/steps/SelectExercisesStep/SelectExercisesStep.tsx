@@ -1,6 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "assets/components/ui/dropdown-menu";
+import {
   getCommunityExercises,
   getUserCommunityExercises,
 } from "feature/communityExercises/services/communityExerciseService";
@@ -14,11 +20,9 @@ import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
-import { ArrowRight, BookOpen, Globe, Music, User } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronDown, Globe, Music, Plus, User } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FaPlus } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
 import { AddExerciseTimeDialog } from "./components/AddExerciseTimeDialog";
@@ -80,7 +84,6 @@ export const SelectExercisesStep = ({
   onExercisesSelect,
   onNext,
 }: SelectExercisesStepProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
   const [isCustomExerciseDialogOpen, setIsCustomExerciseDialogOpen] = useState(false);
   const [editingExercise, setEditingExercise] = useState<Exercise | undefined>(undefined);
   const [customExerciseMode, setCustomExerciseMode] = useState<"create" | "edit" | "clone">("create");
@@ -356,45 +359,10 @@ export const SelectExercisesStep = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className='space-y-8'>
-      <div className='pb-8 flex items-start justify-between gap-4'>
-        <div>
-          <h2 className='text-3xl font-bold text-zinc-100'>
-            {t("exercises:my_plans.create_dialog.exercises")}
-          </h2>
-          <p className='text-sm text-zinc-500 font-medium max-w-md leading-relaxed mt-1'>
-            {t("exercises:my_plans.create_dialog.select_exercises_description")}
-          </p>
-        </div>
-        <Button
-          onClick={onNext}
-          disabled={selectedExercises.length === 0}
-          className="shrink-0 flex items-center gap-2 h-11 px-6 bg-white text-black hover:bg-zinc-200 rounded-lg font-bold transition-all disabled:opacity-40">
-          Next step
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        <div className="lg:col-span-5 lg:sticky top-6 min-w-0 flex flex-col gap-4">
-          <div className="hidden lg:flex flex-wrap gap-2">
-            {[
-              { label: "Create Scale Exercise",  onClick: handleCreateScaleOpen,  cls: "border-indigo-500/30 bg-indigo-950/40 text-indigo-300 hover:border-indigo-400/60 hover:bg-indigo-950/60 hover:text-indigo-200" },
-              { label: "Create Chord Exercise",  onClick: handleCreateChordOpen,  cls: "border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:border-emerald-400/60 hover:bg-emerald-950/60 hover:text-emerald-200" },
-              { label: "Create Custom Exercise", onClick: handleCreateCustomOpen, cls: "border-zinc-600/40 bg-zinc-900/40 text-zinc-400 hover:border-zinc-500/60 hover:bg-zinc-800/50 hover:text-zinc-200" },
-            ].map(({ label, onClick, cls }) => (
-              <button
-                key={label}
-                type="button"
-                onClick={onClick}
-                className={`inline-flex items-center gap-2 h-8 px-3 rounded-lg border text-xs font-bold tracking-tight transition-colors ${cls}`}
-              >
-                <FaPlus className="h-2.5 w-2.5 shrink-0" />
-                {label}
-              </button>
-            ))}
-          </div>
-
+      className='space-y-6'>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Selected list: narrow column on the right from lg, below the library on phones. */}
+        <div className="order-2 lg:col-span-4 lg:sticky top-6 min-w-0 flex flex-col gap-4">
           <SelectedExercisesList
             selectedExercises={selectedExercises}
             onToggleExercise={handleExerciseToggle}
@@ -405,9 +373,10 @@ export const SelectExercisesStep = ({
           />
         </div>
 
-        <div className="lg:col-span-7 space-y-6 min-w-0">
+        <div className="order-1 lg:col-span-8 space-y-5 min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Source tabs */}
-          <div className="flex flex-wrap items-center gap-1 bg-zinc-900 border border-white/5 rounded-lg p-1 w-fit">
+          <div className="flex flex-wrap items-center gap-1 bg-zinc-900 rounded-lg p-1 w-fit">
             {SOURCE_TABS.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
@@ -425,6 +394,25 @@ export const SelectExercisesStep = ({
             ))}
           </div>
 
+          {/* Building a new exercise is a side path — one menu, not three buttons ahead of the library. */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="h-10 rounded-lg bg-zinc-800/60 px-4 text-sm font-semibold text-zinc-200 hover:bg-zinc-700/60 hover:text-white">
+                <Plus className="h-4 w-4" />
+                Create exercise
+                <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem onSelect={handleCreateScaleOpen}>Scale exercise</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleCreateChordOpen}>Chord exercise</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleCreateCustomOpen}>Custom exercise</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          </div>
+
           {sourceTab === "library" ? (
             <>
               <ExerciseFilters
@@ -439,24 +427,6 @@ export const SelectExercisesStep = ({
                 availableSkills={availableSkills}
                 groupedExercises={groupedExercises}
               />
-
-              <div className="flex lg:hidden flex-wrap gap-2">
-                {[
-                  { label: "Create Scale Exercise",  onClick: handleCreateScaleOpen,  cls: "border-indigo-500/30 bg-indigo-950/40 text-indigo-300 hover:border-indigo-400/60 hover:bg-indigo-950/60 hover:text-indigo-200" },
-                  { label: "Create Chord Exercise",  onClick: handleCreateChordOpen,  cls: "border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:border-emerald-400/60 hover:bg-emerald-950/60 hover:text-emerald-200" },
-                  { label: "Create Custom Exercise", onClick: handleCreateCustomOpen, cls: "border-zinc-600/40 bg-zinc-900/40 text-zinc-400 hover:border-zinc-500/60 hover:bg-zinc-800/50 hover:text-zinc-200" },
-                ].map(({ label, onClick, cls }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={onClick}
-                    className={`inline-flex items-center gap-2 h-8 px-3 rounded-lg border text-xs font-bold tracking-tight transition-all ${cls}`}
-                  >
-                    <FaPlus className="h-2.5 w-2.5 shrink-0" />
-                    {label}
-                  </button>
-                ))}
-              </div>
 
               <ExerciseGrid
                 exercises={filteredExercises}
@@ -504,6 +474,30 @@ export const SelectExercisesStep = ({
             </>
           )}
         </div>
+      </div>
+
+      {/* Below lg the app bottom nav (58px + safe area) covers the viewport edge — sit above it. */}
+      <div className="sticky bottom-[calc(58px_+_0.75rem_+_env(safe-area-inset-bottom,0px))] z-40 flex items-center justify-between gap-3 rounded-lg bg-zinc-900/95 px-4 py-3 backdrop-blur-md lg:bottom-4 lg:z-20 lg:px-5">
+        <p className="text-sm text-zinc-300">
+          {selectedExercises.length === 0 ? (
+            "Pick at least one exercise to continue"
+          ) : (
+            <>
+              <span className="font-bold text-white">{selectedExercises.length}</span>{" "}
+              {selectedExercises.length === 1 ? "exercise" : "exercises"} ·{" "}
+              <span className="font-bold text-white">
+                {Math.round(selectedExercises.reduce((sum, e) => sum + e.timeInMinutes, 0))} min
+              </span>
+            </>
+          )}
+        </p>
+        <Button
+          onClick={onNext}
+          disabled={selectedExercises.length === 0}
+          className="shrink-0 flex items-center gap-2 h-11 px-6 bg-white text-black hover:bg-zinc-200 rounded-lg font-bold transition-all disabled:opacity-40">
+          Next step
+          <ArrowRight className="h-4 w-4" />
+        </Button>
       </div>
 
       <CreateCustomExerciseDialog

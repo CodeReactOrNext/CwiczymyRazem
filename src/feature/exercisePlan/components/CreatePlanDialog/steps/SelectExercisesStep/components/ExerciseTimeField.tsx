@@ -65,7 +65,7 @@ export function ExerciseTimeField({
               if (e.key === 'Enter') onSubmit();
               if (e.key === 'Escape') onCancel();
             }}
-            className='h-14 rounded-[8px] border-white/5 bg-white/[0.03] text-center text-xl font-black text-cyan-300 shadow-inner transition-all placeholder:text-zinc-700 focus-visible:border-cyan-500/30 focus-visible:bg-white/[0.06] focus-visible:ring-1 focus-visible:ring-cyan-500/40'
+            className='h-14 rounded-[8px] border-none bg-white/[0.05] text-center text-xl font-black text-cyan-300 transition-all placeholder:text-zinc-700 [appearance:textfield] focus-visible:bg-white/[0.08] focus-visible:ring-1 focus-visible:ring-cyan-500/40 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
             placeholder='0'
           />
           <span className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold tracking-widest text-zinc-500'>
@@ -81,10 +81,10 @@ export function ExerciseTimeField({
             type='button'
             onClick={() => onChange(String(t))}
             className={cn(
-              'min-w-[50px] flex-1 rounded-[8px] border py-2 text-[12px] font-bold transition-all duration-300 active:scale-95',
+              'min-w-[50px] flex-1 rounded-[8px] py-2 text-[12px] font-bold transition-colors duration-300',
               value === String(t)
-                ? 'border-cyan-500/30 bg-cyan-500/15 text-cyan-300 shadow-[0_0_10px_-2px_rgba(6,182,212,0.2)]'
-                : 'border-white/5 bg-white/[0.03] text-zinc-400 hover:border-white/10 hover:bg-white/10 hover:text-zinc-200'
+                ? 'bg-cyan-500/15 text-cyan-300'
+                : 'bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white'
             )}>
             {t}
           </button>

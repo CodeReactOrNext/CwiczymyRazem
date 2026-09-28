@@ -290,7 +290,7 @@ export const SkillDashboard = ({
         <div
           className={cn(
             "mx-auto w-full max-w-7xl px-4 lg:px-6",
-            isFullBleedMap ? "shrink-0 pt-4" : "pt-8"
+            isFullBleedMap ? "shrink-0 pt-4" : "pt-6"
           )}>
           <TabsList className={tabNavListClass}>
             <TabsTrigger

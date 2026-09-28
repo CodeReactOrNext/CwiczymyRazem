@@ -9,6 +9,7 @@ import { memo, useState } from "react";
 import { FaCheck, FaFlagCheckered, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons/fa";
 
 import type { Exercise } from "../../../types/exercise.types";
+import { sumSessionTime, useSessionTimeStore } from "../hooks/sessionTimeStore";
 import { FinishSessionDialog } from "./FinishSessionDialog";
 import { MainTimerSection } from "./MainTimerSection";
 import { ShortcutsLegend } from "./ShortcutsLegend";
@@ -76,6 +77,17 @@ const SessionBottomBarComponent = ({
   const isEarlyFinish = !canFinishSession;
   const finishDisabled = !hasLoggedPractice;
 
+  // Nothing was practised yet (timer never ran) — there is no progress to lose,
+  // so Exit leaves straight away instead of warning about an unsaved session.
+  const handleExitClick = () => {
+    const hasPractised = isPlaying || sumSessionTime(useSessionTimeStore.getState().time) > 0;
+    if (skipExitDialog || !hasPractised) {
+      onClose?.();
+      return;
+    }
+    setShowExitDialog(true);
+  };
+
   return (
     <>
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 border-t border-white/5">
@@ -85,7 +97,7 @@ const SessionBottomBarComponent = ({
         <div className="flex-1 flex items-center justify-start gap-4">
           <Button
             variant="ghost"
-            onClick={skipExitDialog ? onClose : () => setShowExitDialog(true)}
+            onClick={handleExitClick}
             className="rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
           >
             <FaSignOutAlt />
@@ -202,33 +214,50 @@ const SessionBottomBarComponent = ({
         <DialogHeader>
           <DialogTitle className="text-lg font-bold tracking-tight">Leave the session?</DialogTitle>
           <DialogDescription className="text-zinc-400 text-sm mt-1">
-            Your progress won&apos;t be saved if you exit now. Would you like to finish the session and save your practice time instead?
+            {finishDisabled
+              ? "You've practised less than 20 seconds, so there's no time to save yet. Keep playing to log this session, or leave without it."
+              : "Your practice time is saved only when you finish the session. If you exit now, it won't be logged."}
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
+        <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4 sm:space-x-0">
           <Button
             variant="ghost"
             className="flex-1 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 font-semibold text-sm"
             onClick={() => { setShowExitDialog(false); onClose?.(); }}
           >
             <FaSignOutAlt className="mr-2" />
-            Exit without saving
+            {finishDisabled ? "Exit" : "Exit without saving"}
           </Button>
-          <Button
-            className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
-            loading={isFinishing || isSubmittingReport}
-            disabled={finishDisabled}
-            onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}
-          >
-            <FaCheck className="mr-2" />
-            Finish &amp; save time
-          </Button>
+          {finishDisabled ? (
+            <Button
+              className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
+              onClick={() => setShowExitDialog(false)}
+            >
+              Stay in session
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                className="flex-1 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white font-semibold text-sm"
+                onClick={() => setShowExitDialog(false)}
+              >
+                Stay in session
+              </Button>
+              <Button
+                className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
+                loading={isFinishing || isSubmittingReport}
+                onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}
+              >
+                <FaCheck className="mr-2" />
+                Finish &amp; save time
+              </Button>
+            </>
+          )}
         </DialogFooter>
-        {isEarlyFinish && (
+        {isEarlyFinish && !finishDisabled && (
           <p className="text-[11px] text-zinc-500 text-center -mt-2">
-            {finishDisabled
-              ? t("common:practice.finish_early.blocked")
-              : t("common:practice.finish_early.hint")}
+            {t("common:practice.finish_early.hint")}
           </p>
         )}
       </DialogContent>

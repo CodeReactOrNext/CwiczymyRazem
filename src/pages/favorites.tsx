@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
@@ -20,6 +21,7 @@ import {
 import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import { Clock, Heart } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -127,7 +129,7 @@ const FavoritesPage: NextPageWithLayout = () => {
     <div className="bg-second-600 flex min-h-screen flex-col overflow-visible rounded-xl border-none shadow-sm">
       <HeroBanner
         title="Favorites"
-        subtitle="Your hearted plans, exercises and songs, all in one place"
+        subtitle="Saved plans, exercises and songs"
         eyebrow="Favorites"
         eyebrowClassName="text-rose-400/80"
         backgroundContent={<HeroPattern withHeart />}
@@ -148,12 +150,23 @@ const FavoritesPage: NextPageWithLayout = () => {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-rose-500/10">
               <Heart className="h-5 w-5 text-rose-400" />
             </div>
-            <p className="text-sm font-medium text-zinc-300">
-              You haven&apos;t favorited anything yet
+            <p className="text-base font-semibold text-zinc-100">
+              Nothing saved yet
             </p>
-            <p className="mt-2 max-w-sm text-xs text-zinc-500">
-              Tap the heart on any plan or exercise to pin it here for quick access.
+            <p className="mt-2 max-w-sm text-sm text-zinc-400">
+              Tap the heart on a plan, exercise or song to keep it here.
             </p>
+            <Button asChild className="mt-8 h-11 rounded-lg bg-white px-6 font-bold text-black hover:bg-zinc-200">
+              <Link href="/profile/skills?tab=browse">Browse exercises</Link>
+            </Button>
+            <div className="mt-4 flex items-center gap-6 text-sm">
+              <Link href="/timer/plans" className="font-medium text-zinc-300 transition-colors hover:text-white">
+                Browse plans
+              </Link>
+              <Link href="/songs?view=explore" className="font-medium text-zinc-300 transition-colors hover:text-white">
+                Browse songs
+              </Link>
+            </div>
           </div>
         ) : (
           <>

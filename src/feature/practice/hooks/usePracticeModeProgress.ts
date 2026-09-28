@@ -5,14 +5,16 @@ import { getAllBpmProgress } from "feature/exercisePlan/services/bpmProgressServ
 import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
 import { journeyModules } from "feature/journey/data/journeyModules";
 import { firebaseGetJourneyProgress } from "feature/journey/services/journey.service";
-import { SCALE_TREE_NODES } from "feature/scaleTree/data/scaleTreeNodes";
+import type { ModeProgressSummary } from "feature/practice/utils/modeProgress";
+import {
+  summarizeCount,
+  summarizeJourney,
+  summarizeRoadmaps,
+} from "feature/practice/utils/modeProgress";
 import { computeNodeStatuses } from "feature/scaleTree/services/scaleTree.service";
 import { useEffect, useState } from "react";
 
-export interface ModeProgressSummary {
-  done: number;
-  total: number;
-}
+export type { ModeProgressSummary };
 
 interface PracticeModeProgress {
   learningPath?: ModeProgressSummary;
@@ -21,7 +23,7 @@ interface PracticeModeProgress {
   skills?: ModeProgressSummary;
 }
 
-/** Lightweight progress summaries for the Practice mode-selector cards — each feature keeps its own detailed progress model, this just counts done/total for a small badge. */
+/** Lightweight progress summaries for the Practice mode-selector cards — each feature keeps its own detailed progress model, this only says where the player stands. */
 export function usePracticeModeProgress(userId: string | null | undefined) {
   const [progress, setProgress] = useState<PracticeModeProgress>({});
 
@@ -32,15 +34,7 @@ export function usePracticeModeProgress(userId: string | null | undefined) {
     firebaseGetJourneyProgress(userId)
       .then((doc) => {
         if (cancelled) return;
-        const allSteps = journeyModules.flatMap((m) => m.stages.flatMap((s) => s.steps));
-        const done = journeyModules.reduce((sum, m) => {
-          const savedSteps = doc?.moduleProgress?.[m.id]?.steps;
-          const completedInModule = m.stages
-            .flatMap((s) => s.steps)
-            .filter((step) => savedSteps?.[step.id]?.completed).length;
-          return sum + completedInModule;
-        }, 0);
-        setProgress((p) => ({ ...p, learningPath: { done, total: allSteps.length } }));
+        setProgress((p) => ({ ...p, learningPath: summarizeJourney(journeyModules, doc) }));
       })
       .catch(() => {});
 
@@ -52,33 +46,27 @@ export function usePracticeModeProgress(userId: string | null | undefined) {
         bpmProgress.forEach((data, exerciseId) => bpmMap.set(exerciseId, data.completedBpms ?? []));
         const statuses = computeNodeStatuses(bpmMap);
         const scaleMapDone = Object.values(statuses).filter((s) => s === "completed").length;
-        setProgress((p) => ({ ...p, scaleMap: { done: scaleMapDone, total: SCALE_TREE_NODES.length } }));
+        setProgress((p) => ({
+          ...p,
+          scaleMap: summarizeCount(scaleMapDone, ["scale", "scales"], "Start with your first scale"),
+        }));
 
         // Same "completed" rule as the Skill Tree checkmarks — one shared helper,
         // so this count can't drift away from what the tree itself shows.
         const skillsDone = exercisesAgregat.filter((exercise) =>
           hasExerciseProgress(bpmProgress.get(exercise.id))
         ).length;
-        setProgress((p) => ({ ...p, skills: { done: skillsDone, total: exercisesAgregat.length } }));
+        setProgress((p) => ({
+          ...p,
+          skills: summarizeCount(skillsDone, ["exercise", "exercises"], "Pick a technique to start"),
+        }));
       })
       .catch(() => {});
 
     firebaseGetAllUserProgress(userId)
       .then((all) => {
         if (cancelled) return;
-        const progressByRoadmap = new Map(all.map((rp) => [rp.roadmapId, rp]));
-        let done = 0;
-        let total = 0;
-        roadmaps.forEach((rm) => {
-          const stepProgress = progressByRoadmap.get(rm.id)?.stepProgress ?? {};
-          rm.phases.forEach((phase) => {
-            phase.steps.forEach((step) => {
-              total += 1;
-              if ((stepProgress[step.id] ?? 0) >= step.sessionsRequired) done += 1;
-            });
-          });
-        });
-        setProgress((p) => ({ ...p, roadmaps: { done, total } }));
+        setProgress((p) => ({ ...p, roadmaps: summarizeRoadmaps(roadmaps, all) }));
       })
       .catch(() => {});
 

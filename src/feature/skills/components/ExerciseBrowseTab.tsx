@@ -13,9 +13,9 @@ import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgr
 import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
 import { isExerciseNew } from "feature/exercisePlan/utils/isExerciseNew";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
-import { getSkillAccentClass, SkillIconTile } from "feature/skills/components/SkillIconTile";
+import { getSkillAccentClass } from "feature/skills/components/SkillIconTile";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
-import type { GuitarSkill, GuitarSkillId } from "feature/skills/skills.types";
+import type { GuitarSkillId } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
@@ -189,8 +189,9 @@ export const ExerciseBrowseTab = ({
   const [leaderboardRanks, setLeaderboardRanks] = useState<Record<string, number>>({});
   // Mobile only - filters live in a bottom sheet so the list keeps the screen.
   const [showFilters, setShowFilters] = useState(false);
-  // Desktop only - the 22 skill pills open on demand instead of filling three rows.
-  const [showSkills, setShowSkills] = useState(false);
+  // Desktop only - status, length and the 22 skills open on demand, so the
+  // first exercises show up under the search instead of below the fold.
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
 
   const activeFilterCount =
     selectedSkills.length + selectedModes.length + selectedStatuses.length + (selectedLength ? 1 : 0);
@@ -448,12 +449,6 @@ export const ExerciseBrowseTab = ({
     return counts;
   }, [matchesFilters]);
 
-  /** How many skills the picker would show — the number on its collapsed row. */
-  const availableSkillCount = useMemo(
-    () => guitarSkills.filter(skill => (skillCounts.get(skill.id) ?? 0) > 0).length,
-    [skillCounts]
-  );
-
   /** Skills grouped under their category, with the empty ones dropped. */
   const skillGroups = useMemo(() => {
     const categories: { category: string; label: string }[] = [
@@ -691,6 +686,8 @@ export const ExerciseBrowseTab = ({
         ]
       : []),
   ];
+  // Everything but the practice modes, which stay visible on desktop anyway.
+  const moreFilterChips = activeFilterChips.filter(chip => !chip.key.startsWith("mode-"));
 
   // ── One variant row inside an expanded set ──────────────────────────────
   const renderExerciseRow = (exercise: Exercise, showVariantLabel: boolean) => {
@@ -884,7 +881,7 @@ export const ExerciseBrowseTab = ({
    */
   const renderSetCard = (
     entry: (typeof visibleSets)[number],
-    skill?: { category: string; icon?: GuitarSkill["icon"]; label: string }
+    skill?: { category: string; label: string }
   ) => {
     const { set, matches } = entry;
     const isExpanded = expandedSets.includes(set.id);
@@ -904,10 +901,6 @@ export const ExerciseBrowseTab = ({
           aria-expanded={isExpanded}
           className="group flex w-full items-center gap-2.5 px-3.5 py-3 text-left transition-colors duration-200 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 sm:px-4"
         >
-          {skill && (
-            <SkillIconTile category={skill.category} icon={skill.icon} size="sm" />
-          )}
-
           <span className="truncate text-[15px] font-semibold text-zinc-100">{set.title}</span>
 
           {!isSingle && (
@@ -1018,76 +1011,66 @@ export const ExerciseBrowseTab = ({
             </div>
           )}
 
-          {/* Desktop: filters inline */}
+          {/* Desktop: search and the practice modes up front, everything else
+              under More filters — the full bar used to push the first exercise
+              below the fold. Filters picked in there stay in view as chips. */}
           <div className="hidden flex-col gap-3.5 sm:flex">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={cn(groupLabel, "mr-1")}>How you practice</span>
-                {modePills()}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={cn(groupLabel, "mr-1")}>Status</span>
-                {statusPills()}
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={cn(groupLabel, "mr-1")}>Length</span>
-                {lengthPills()}
-              </div>
-            </div>
-
-            {/* All 22 skills laid out flat took three rows and buried everything
-                under it, so they open on demand and the chosen ones stay in view. */}
             <div className="flex flex-wrap items-center gap-2">
+              {modePills()}
               <button
-                onClick={() => setShowSkills(open => !open)}
-                aria-expanded={showSkills}
-                className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-zinc-500 transition-colors hover:text-zinc-300"
+                onClick={() => setShowMoreFilters(open => !open)}
+                aria-expanded={showMoreFilters}
+                className="flex items-center gap-1.5 px-2 py-1.5 text-[12px] font-bold text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
-                <ChevronRight
-                  className={cn("h-3.5 w-3.5 transition-transform", showSkills && "rotate-90")}
-                />
-                Skill
-                {/* Without a number this row was a grey word with a chevron and
-                    nothing to say it hid 22 filters. */}
-                {selectedSkills.length > 0 ? (
-                  <span className="tabular-nums text-cyan-400">
-                    {selectedSkills.length} selected
-                  </span>
-                ) : (
-                  <span className="tabular-nums font-medium text-zinc-600">
-                    {availableSkillCount}
-                  </span>
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                More filters
+                {moreFilterChips.length > 0 && (
+                  <span className="tabular-nums text-cyan-400">{moreFilterChips.length}</span>
                 )}
               </button>
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={clearFilters}
+                  className="flex items-center gap-1.5 px-2 py-1.5 text-[12px] font-bold text-zinc-500 transition-colors hover:text-zinc-300"
+                >
+                  <X className="h-3 w-3" />
+                  Clear filters
+                </button>
+              )}
+            </div>
 
-              {!showSkills &&
-                selectedSkills.map(skill => (
+            {!showMoreFilters && moreFilterChips.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {moreFilterChips.map(chip => (
                   <button
-                    key={skill}
-                    onClick={() => setSelectedSkills(prev => toggle(prev, skill))}
+                    key={chip.key}
+                    onClick={chip.clear}
                     className={cn(filterPill(true), "flex items-center gap-1 pr-2")}
                   >
-                    {String(t(`skills:skills.${skill}.name` as never))}
+                    {chip.label}
                     <X className="h-3 w-3 opacity-60" />
                   </button>
                 ))}
-            </div>
-
-            {showSkills && (
-              <div className="flex flex-col gap-2.5 rounded-lg bg-zinc-950/40 p-3">{skillPills()}</div>
+              </div>
             )}
 
-            {activeFilterCount > 0 && (
-              <button
-                onClick={clearFilters}
-                className="flex items-center gap-1.5 self-start text-[12px] font-bold text-zinc-500 transition-colors hover:text-zinc-300"
-              >
-                <X className="h-3 w-3" />
-                Clear filters
-              </button>
+            {showMoreFilters && (
+              <div className="flex flex-col gap-4 rounded-lg bg-zinc-950/40 p-4">
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={cn(groupLabel, "mr-1")}>Status</span>
+                    {statusPills()}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={cn(groupLabel, "mr-1")}>Length</span>
+                    {lengthPills()}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  <span className={groupLabel}>Skill</span>
+                  {skillPills()}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -1157,7 +1140,6 @@ export const ExerciseBrowseTab = ({
                 {/* The skill is stated once here instead of on every card, which
                     also stops identical tiles stacking up inside a group. */}
                 <div className="flex items-center gap-3 px-1">
-                  <SkillIconTile category={group.category} icon={group.skill?.icon} size="sm" />
                   <span className={cn('text-base font-bold', getSkillAccentClass(group.category))}>
                     {group.label}
                   </span>
@@ -1182,7 +1164,6 @@ export const ExerciseBrowseTab = ({
                 {looseSets.map(entry =>
                   renderSetCard(entry, {
                     category: entry.group.category,
-                    icon: entry.group.skill?.icon,
                     label: entry.group.label,
                   })
                 )}

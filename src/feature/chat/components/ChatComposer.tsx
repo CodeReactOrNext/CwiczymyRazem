@@ -234,7 +234,7 @@ export const ChatComposer = ({
           type='submit'
           size='icon'
           aria-label='Send'
-          className='h-12 w-12 shrink-0 rounded-lg bg-cyan-500 font-bold text-black transition-colors hover:bg-cyan-400 active:click-behavior'>
+          className='h-12 w-12 shrink-0 rounded-lg bg-white font-bold text-black transition-colors hover:bg-zinc-200 active:click-behavior'>
           <SendHorizontal className='h-5 w-5' />
         </Button>
       </form>

@@ -17,7 +17,9 @@ import { useMemo, useState } from "react";
 /** Standard tuning, low→high — the preview is not tied to a real exercise. */
 const STANDARD_TUNING = ["E", "A", "D", "G", "B", "E"];
 
-const PREVIEW_HEIGHT = 300;
+// The score scales with the viewer height (base 300px), so this is the size
+// the notes are drawn at — a little above a session board, to read clearly.
+const PREVIEW_HEIGHT = 340;
 
 type PreviewMode = "tab" | "notation";
 
@@ -90,7 +92,7 @@ export const TablatureAppearance = () => {
           otherwise sits at the same top-0 and would fight this for the same
           spot. */}
       <div className='overflow-hidden rounded-lg bg-[#0f0f12] shadow-lg shadow-black/40 ring-1 ring-white/5 md:sticky md:top-16 md:z-20'>
-        <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3'>
+        <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2'>
           <span className='text-[11px] font-semibold tracking-wide text-zinc-500'>
             Live preview
           </span>
@@ -137,7 +139,7 @@ export const TablatureAppearance = () => {
           />
         )}
 
-        <p className='px-4 pb-3 pt-2 text-[11px] text-zinc-600'>
+        <p className='px-4 pb-3 pt-2 text-[11px] text-zinc-500 md:hidden'>
           {mode === "tab"
             ? "Hit colour and hit animations only show while you are actually playing."
             : "The same viewer used mid-session — toggle the board below to see it on paper or on black."}

@@ -13,6 +13,7 @@ import {
 import { cn } from "assets/lib/utils";
 import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
+import { PlanPreviewDialog } from "feature/exercisePlan/components/PlanPreviewDialog";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getPublicExercisePlans } from "feature/exercisePlan/services/getPublicExercisePlans";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
@@ -96,6 +97,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
 
   const [activeTab, setActiveTab] = useState<(typeof PLAN_TABS)[number]>("routines");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [previewPlan, setPreviewPlan] = useState<ExercisePlan | null>(null);
 
   useEffect(() => {
     const queryTab = router.query.tab;
@@ -155,11 +157,12 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
         plan={plan}
         isLocked={locked}
         onSelect={locked ? undefined : () => handleStartPlan(plan.id)}
+        onPreview={locked ? undefined : () => setPreviewPlan(plan)}
         onStart={locked ? undefined : () => handleStartPlan(plan.id)}
         onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
         onToggleFavorite={userAuth ? () => handleToggleFavorite(plan.id) : undefined}
         isFavorite={favoritePlanIds.includes(plan.id)}
-        startButtonText={t("common:start")}
+        startButtonText="Open plan"
         isLoading={loadingPlanId === plan.id}
       />
     );
@@ -324,9 +327,10 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                           plan={plan}
                           isLocked={locked}
                           onSelect={locked ? undefined : () => handleStartPlan(plan.id)}
+                          onPreview={locked ? undefined : () => setPreviewPlan(plan)}
                           onStart={locked ? undefined : () => handleStartPlan(plan.id)}
                           onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
-                          startButtonText={t("common:start")}
+                          startButtonText="Open plan"
                           isLoading={loadingPlanId === plan.id}
                         />
                       );
@@ -352,8 +356,9 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                         key={plan.id}
                         plan={plan}
                         onSelect={() => handleStartPlan(plan.id)}
+                        onPreview={() => setPreviewPlan(plan)}
                         onStart={() => handleStartPlan(plan.id)}
-                        startButtonText={t("common:start")}
+                        startButtonText="Open plan"
                         isLoading={loadingPlanId === plan.id}
                       />
                     ))}
@@ -364,6 +369,12 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
             </>
           )}
         </motion.div>
+      <PlanPreviewDialog
+        plan={previewPlan}
+        onClose={() => setPreviewPlan(null)}
+        onOpenPlan={handleStartPlan}
+        isLoading={!!previewPlan && loadingPlanId === previewPlan.id}
+      />
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </>
   );

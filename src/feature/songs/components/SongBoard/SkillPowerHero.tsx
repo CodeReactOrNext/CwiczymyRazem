@@ -115,6 +115,47 @@ export const SkillPowerHero = ({
 }: SkillPowerHeroProps) => {
   const isTierLocked = learnedCount < MIN_LEARNED_SONGS_FOR_TIER;
 
+  // Nothing mastered yet: a 0.0 score would read as a rating, and the big card
+  // pushes the song list (the actual next step) to the bottom of the screen.
+  if (learnedCount === 0) {
+    return (
+      <div
+        className={cn(
+          "flex flex-col gap-4 rounded-lg bg-zinc-900/40 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6",
+          className,
+        )}>
+        <div className='flex items-center gap-3'>
+          <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-[4px] bg-white/5 text-zinc-400'>
+            <TrendingUp size={18} />
+          </div>
+          <div>
+            <h2 className='text-sm font-bold text-zinc-200'>
+              Tier not assessed yet
+            </h2>
+            <p className='mt-0.5 text-xs text-zinc-500'>
+              Master {MIN_LEARNED_SONGS_FOR_TIER} songs to get your power score
+              and tier.
+            </p>
+          </div>
+        </div>
+        <div className='flex items-center gap-6 text-xs text-zinc-500'>
+          <span className='flex items-center gap-1.5'>
+            <Star size={14} />
+            <span className='font-bold text-zinc-200'>{totalCount}</span>
+            {totalCount === 1 ? "song" : "songs"} on board
+          </span>
+          <span className='flex items-center gap-1.5'>
+            <Clock size={14} />
+            <span className='font-bold text-zinc-200'>
+              {formatPracticeTime(totalPracticeMs)}
+            </span>
+            practised
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(

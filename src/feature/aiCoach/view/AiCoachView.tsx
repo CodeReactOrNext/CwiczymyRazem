@@ -281,28 +281,31 @@ const AiCoachView = () => {
   // ─── List view ───
   return (
     <div className='flex w-full flex-col'>
-      {!playerDetailOpen && (
-        <HeroBanner
-          title='Mastery Roadmaps'
-          subtitle='Your personalized guitar mastery roadmaps.'
-          eyebrowContent={
-            <Breadcrumbs
-              items={[
-                { label: "Practice", href: "/timer" },
-                { label: "Mastery Roadmaps" },
-              ]}
-            />
-          }
-          backgroundContent={<HeroPattern variant='ai' />}
-          className='min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
-        />
-      )}
       {/* Same element either way, so the open roadmap survives the switch. */}
       <div
         className={cn(
           !playerDetailOpen &&
             "mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12",
         )}>
+        {/* A plain title, not a banner — the room goes to the roadmaps. */}
+        {!playerDetailOpen && (
+          <header className='space-y-3'>
+            <Breadcrumbs
+              items={[
+                { label: "Practice", href: "/timer" },
+                { label: "Mastery Roadmaps" },
+              ]}
+            />
+            <div>
+              <h1 className='text-2xl font-bold leading-tight text-white md:text-3xl'>
+                Mastery Roadmaps
+              </h1>
+              <p className='mt-1 text-sm text-zinc-400'>
+                Guided practice paths for guitar skills and playing styles.
+              </p>
+            </div>
+          </header>
+        )}
         {!playerDetailOpen && (
           <div className={tabNavListClass}>
             <button

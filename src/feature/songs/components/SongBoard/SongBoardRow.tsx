@@ -126,7 +126,7 @@ export const SongBoardRow = ({
               <span className='text-zinc-400'>{formatPlayTime(slice.totalPracticeMs)}</span>
             </span>
           ))}
-          <p className='min-w-0 truncate text-xs text-zinc-500 lg:hidden'>
+          <p className='min-w-0 truncate text-xs text-zinc-500 2xl:hidden'>
             {hasPracticed ? (
               <>
                 {sessionCount} session{sessionCount === 1 ? "" : "s"} ·{" "}
@@ -172,8 +172,9 @@ export const SongBoardRow = ({
         </div>
       )}
 
-      {/* Stats columns (lg+) */}
-      <div className='hidden w-[300px] shrink-0 grid-cols-3 gap-4 lg:grid xl:w-[340px]'>
+      {/* Stats columns (2xl+) — below that the compact line under the title
+          carries them, so the title keeps its width at common laptop sizes. */}
+      <div className='hidden w-[340px] shrink-0 grid-cols-3 gap-4 2xl:grid'>
         <StatCell
           label='Sessions'
           value={hasPracticed ? String(sessionCount) : "—"}

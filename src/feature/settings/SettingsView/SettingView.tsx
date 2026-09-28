@@ -4,6 +4,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
+import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
 import EmailChange from "feature/settings/components/EmailChange";
 import EmailNotificationSettings from "feature/settings/components/EmailNotificationSettings";
 import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
@@ -18,6 +19,14 @@ import { useTranslation } from "hooks/useTranslation";
 import { Bell, Guitar, Lock, Share2, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "store/hooks";
+
+const SETTINGS_TABS = [
+  { value: "profile", label: "Profile", Icon: User },
+  { value: "socials", label: "Social Media", Icon: Share2 },
+  { value: "tablature", label: "Tablature", Icon: Guitar },
+  { value: "notifications", label: "Notifications", Icon: Bell },
+  { value: "security", label: "Security", Icon: Lock },
+] as const;
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings", "toast"]);
@@ -35,64 +44,21 @@ const SettingsView = () => {
   return (
     <SettingsLayout>
       <Tabs defaultValue="profile" className="w-full">
-        <div className="flex flex-col md:flex-row gap-8 items-start">
-          {/* Sidebar-like TabsList */}
-          <div className="w-full md:w-72 space-y-6 shrink-0">
-             <div className="px-4 py-2">
-                <h2 className="text-2xl font-black tracking-tight text-foreground">Settings</h2>
-                <p className="text-sm text-muted-foreground font-medium">Manage your account</p>
-             </div>
-             <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 gap-1.5">
-                <TabsTrigger 
-                  value="profile" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-cyan-500/10 group-data-[state=active]:text-cyan-500 transition-colors">
-                    <User className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold">Profile</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="socials" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-blue-500/10 group-data-[state=active]:text-blue-500 transition-colors">
-                    <Share2 className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold">Social Media</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="tablature"
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-amber-500/10 group-data-[state=active]:text-amber-500 transition-colors">
-                    <Guitar className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold">Tablature</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="notifications"
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-cyan-500/10 group-data-[state=active]:text-cyan-500 transition-colors">
-                    <Bell className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold">Notifications</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="security"
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-lg transition-background data-[state=active]:bg-zinc-900 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <div className="p-2 rounded bg-zinc-900/50 group-data-[state=active]:bg-zinc-100 group-data-[state=active]:text-zinc-950 transition-colors">
-                    <Lock className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold">Security</span>
-                </TabsTrigger>
-             </TabsList>
-          </div>
+        {/* Same underline tab bar as the rest of the app, so the form gets the
+            full width instead of sharing it with a column of category cards. */}
+        <div className="space-y-6">
+          <h1 className="px-1 text-2xl font-bold text-zinc-100">Settings</h1>
+          <TabsList className={tabNavListClass}>
+            {SETTINGS_TABS.map(({ value, label, Icon }) => (
+              <TabsTrigger key={value} value={value} className={tabNavTriggerClass}>
+                <Icon className="h-4 w-4" />
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
           {/* Content Area */}
-          <div className="flex-1 min-w-0 pb-20">
+          <div className="min-w-0 pb-20">
             <TabsContent value="profile" className="mt-0 space-y-8">
               <ProfileBasics />
               <GuitarStartDate />
@@ -128,7 +94,6 @@ const SettingsView = () => {
                  </div>
                )}
             </TabsContent>
-
           </div>
         </div>
       </Tabs>

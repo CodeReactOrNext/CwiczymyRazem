@@ -37,7 +37,7 @@ describe("guitar practice planner landing", () => {
 
   it("quotes real plans and exercises, with the example adding up to 20 minutes", () => {
     expect(props.routines.map((r) => r.title)).toEqual([
-      "Mega Beginner: First Steps",
+      "Absolute Beginner: First Steps",
       "Beginner: Daily Exercises",
       "Strumming Foundations",
     ]);

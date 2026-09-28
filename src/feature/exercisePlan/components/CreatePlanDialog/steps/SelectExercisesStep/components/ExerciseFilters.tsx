@@ -4,7 +4,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import { FaFilter,FaSearch } from "react-icons/fa";
 
@@ -35,20 +35,43 @@ export const ExerciseFilters = ({
 }: ExerciseFiltersProps) => {
   const { t } = useTranslation(["common", "exercises", "skills"]);
   const [isSkillOpen, setIsSkillOpen] = useState(false);
+  const activeExtraFilters =
+    (selectedDifficulty !== "all" ? 1 : 0) + (selectedSkill !== "all" ? 1 : 0);
+  // Difficulty and skill are the rarer filters — folded away so the first
+  // screen reaches the exercise list.
+  const [showMore, setShowMore] = useState(activeExtraFilters > 0);
 
   const difficulties = ["all", "beginner", "easy", "medium", "hard"];
 
   return (
-    <div className='flex flex-col gap-6 relative'>
-      <div className='relative w-full group'>
-        <FaSearch className='absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500 group-focus-within:text-cyan-400 transition-colors duration-300' />
+    <div className='flex flex-col gap-4 relative'>
+      <div className='flex items-center gap-2'>
+      <div className='relative flex-1 group'>
+        <FaSearch className='pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-zinc-400 group-focus-within:text-cyan-400 transition-colors duration-300' />
         <Input
           placeholder={t("common:search.placeholder")}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className='pl-11 h-[42px] bg-white/[0.03] backdrop-blur-md border border-white/5 rounded-lg text-[13px] text-zinc-200 placeholder:text-zinc-500 focus:border-cyan-500/30 focus:bg-white/[0.05] focus:ring-1 focus:ring-cyan-500/20 transition-all duration-300'
+          className='pl-11 h-[42px] bg-white/[0.05] border-none rounded-lg text-[13px] text-zinc-200 placeholder:text-zinc-500 focus:bg-white/[0.08] focus:ring-1 focus:ring-cyan-500/20 transition-all duration-300'
           aria-label='Search exercises'
         />
+      </div>
+        <button
+          type='button'
+          onClick={() => setShowMore((v) => !v)}
+          aria-expanded={showMore}
+          className={cn(
+            "flex h-[42px] shrink-0 items-center gap-2 rounded-lg px-4 text-xs font-semibold transition-colors",
+            showMore || activeExtraFilters > 0
+              ? "bg-cyan-500/15 text-cyan-300"
+              : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
+          )}>
+          <SlidersHorizontal className='h-3.5 w-3.5' />
+          Filters
+          {activeExtraFilters > 0 && (
+            <span className='rounded bg-cyan-500/25 px-1.5 text-[10px] font-bold'>{activeExtraFilters}</span>
+          )}
+        </button>
       </div>
       
       <div className="space-y-5">
@@ -62,10 +85,10 @@ export const ExerciseFilters = ({
                 <button
                     onClick={() => onCategoryChange("all")}
                     className={cn(
-                        "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300 border backdrop-blur-md",
+                        "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300",
                         selectedCategory === "all"
-                            ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-                            : "bg-white/[0.03] border-white/5 text-zinc-400 hover:bg-white/10 hover:border-white/10 hover:text-zinc-200"
+                            ? "bg-cyan-500/15 text-cyan-300"
+                            : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
                     )}
                 >
                     {t("common:filters.all")}
@@ -75,10 +98,10 @@ export const ExerciseFilters = ({
                         key={category}
                         onClick={() => onCategoryChange(category)}
                         className={cn(
-                            "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300 border backdrop-blur-md flex items-center",
+                            "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300 flex items-center",
                             selectedCategory === category
-                                ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-                                : "bg-white/[0.03] border-white/5 text-zinc-400 hover:bg-white/10 hover:border-white/10 hover:text-zinc-200"
+                                ? "bg-cyan-500/15 text-cyan-300"
+                                : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
                         )}
                     >
                         {t(`common:categories.${category}` as any)}
@@ -93,6 +116,8 @@ export const ExerciseFilters = ({
             </div>
         </div>
 
+        {showMore && (
+        <>
         {/* Difficulty Pills */}
         <div className="flex flex-col gap-1.5">
             <span className="text-[10px] font-bold tracking-wider text-zinc-500 mb-0.5">
@@ -104,10 +129,10 @@ export const ExerciseFilters = ({
                         key={diff}
                         onClick={() => onDifficultyChange(diff)}
                         className={cn(
-                            "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300 border capitalize backdrop-blur-md",
+                            "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300 capitalize",
                             selectedDifficulty === diff
-                                ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-                                : "bg-white/[0.03] border-white/5 text-zinc-400 hover:bg-white/10 hover:border-white/10 hover:text-zinc-200"
+                                ? "bg-cyan-500/15 text-cyan-300"
+                                : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
                         )}
                     >
                         {diff === "all" ? t("common:filters.all") : t(`common:difficulty.${diff}` as any)}
@@ -126,10 +151,10 @@ export const ExerciseFilters = ({
                 type="button"
                 onClick={() => setIsSkillOpen(v => !v)}
                 className={cn(
-                  "flex items-center justify-between w-full px-4 py-2.5 rounded-lg text-[11px] scale-100 active:scale-[0.99] font-medium transition-all duration-300 border backdrop-blur-md",
+                  "flex items-center justify-between w-full px-4 py-2.5 rounded-lg text-[11px] scale-100 active:scale-[0.99] font-medium transition-all duration-300",
                   selectedSkill !== "all"
-                    ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-                    : "bg-white/[0.03] border-white/5 text-zinc-400 hover:bg-white/10 hover:border-white/10 hover:text-zinc-200"
+                    ? "bg-cyan-500/15 text-cyan-300"
+                    : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
                 )}
               >
                 <div className="flex items-center gap-2 tracking-wider text-[10px] font-bold">
@@ -150,10 +175,10 @@ export const ExerciseFilters = ({
                   <button
                     onClick={() => { onSkillChange("all"); setIsSkillOpen(false); }}
                     className={cn(
-                      "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300 border backdrop-blur-md",
+                      "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300",
                       selectedSkill === "all"
-                        ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-                        : "bg-white/[0.03] border-white/5 text-zinc-400 hover:bg-white/10 hover:border-white/10 hover:text-zinc-200"
+                        ? "bg-cyan-500/15 text-cyan-300"
+                        : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
                     )}
                   >
                     {t("common:filters.all")}
@@ -166,10 +191,10 @@ export const ExerciseFilters = ({
                         key={skill}
                         onClick={() => { onSkillChange(skill); setIsSkillOpen(false); }}
                         className={cn(
-                          "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300 border backdrop-blur-md",
+                          "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-300",
                           selectedSkill === skill
-                            ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
-                            : "bg-white/[0.03] border-white/5 text-zinc-400 hover:bg-white/10 hover:border-white/10 hover:text-zinc-200"
+                            ? "bg-cyan-500/15 text-cyan-300"
+                            : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
                         )}
                       >
                         {Icon && <Icon className="h-3 w-3 shrink-0 opacity-80" />}
@@ -182,6 +207,8 @@ export const ExerciseFilters = ({
             </div>
           );
         })()}
+        </>
+        )}
       </div>
     </div>
   );

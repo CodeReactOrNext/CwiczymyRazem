@@ -57,6 +57,7 @@ import {
   isLastReportTimeExceeded,
 } from "./helpers/isLastReportTimeExceeded";
 import { RaportSchema } from "./helpers/RaportShcema";
+import { buildSaveSummary } from "./helpers/saveSummary";
 import {
   buildSongsSessionTitle,
   createPickedSong,
@@ -651,9 +652,11 @@ const ReportView = () => {
                           isStep1Done ? "text-emerald-400" : "text-zinc-400"
                         )}>
                           {isStep1Done
-                            ? "Great! Practice time added. You can save now or fill optional details below."
+                            ? "Time entered. Save it now or add optional details below."
                             : isSongMode
-                              ? "Pick the songs you played and set the time on each one."
+                              ? pickedSongs.length > 0
+                                ? "Song selected — set how long you played it."
+                                : "Pick the songs you played and set the time on each one."
                               : "What did you practice today? Add time below."}
                         </p>
                     </div>
@@ -745,6 +748,11 @@ const ReportView = () => {
                           )}
                         </div>
 
+                        {isStep1Done && (
+                          <p className="pr-4 text-xs font-medium text-zinc-300">
+                            {buildSaveSummary(values)}
+                          </p>
+                        )}
                         {isStep1Done ? (
                           <div className="mt-2 flex items-center gap-3 pr-4 duration-700 animate-in fade-in slide-in-from-top-2">
                              <p className="text-[10px] font-semibold tracking-wide text-emerald-400">
