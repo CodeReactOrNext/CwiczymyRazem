@@ -174,7 +174,7 @@ const LogsBoxLayout = ({
 
   return (
     <Card
-      className={`relative m-auto flex ${heightClass} font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
+      className={`relative m-auto flex ${heightClass} font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm w-full min-w-0 ${className}`}>
       <div className={cn(tabNavListClass, "mb-4")}>
         {tabButtons}
       </div>

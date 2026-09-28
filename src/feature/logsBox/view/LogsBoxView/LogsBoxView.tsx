@@ -39,7 +39,7 @@ const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
       hasOwnHeight: className.includes("h-"),
     })} font-openSans flex-col p-1 ${
       className.includes("border-none") ? "pb-24" : "pb-3"
-    } rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
+    } rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm w-full min-w-0 ${className}`}>
     {/* Tab bar */}
     <div className='left-0 top-0 mb-2 flex flex-row justify-around gap-4'>
       {Array.from({ length: 4 }).map((_, i) => (

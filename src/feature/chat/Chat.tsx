@@ -239,12 +239,14 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   };
 
   return (
-    <div className='flex h-full flex-col overflow-hidden rounded-lg bg-zinc-950/40'>
+    // On a phone the room already sits in the feed's card, so it drops its own surface there
+    // rather than nesting a second card (and its padding) inside the first.
+    <div className='flex h-full flex-col overflow-hidden sm:rounded-lg sm:bg-zinc-950/40'>
       <div className='relative min-h-0 flex-1'>
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className='h-full overflow-y-auto p-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:p-4'>
+          className='h-full overflow-y-auto py-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:p-4'>
           {!isLoading && messages.length === 0 ? (
             <EmptyRoom
               isGuild={isGuild}
@@ -256,7 +258,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
               }}
             />
           ) : (
-            <div className='flex flex-col gap-1 px-2 pt-8'>
+            <div className='flex flex-col gap-1 pt-8 sm:px-2'>
               {messages.map((msg, index) => {
                 const isMe = msg.userId === currentUserId;
                 const prevMsg = index > 0 ? messages[index - 1] : null;
@@ -373,8 +375,11 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
                           </div>
                         )}
 
+                        {/* max-w-full, not just min-w-0: a quoted reply or a shared card has a
+                            wide minimum of its own, which would otherwise size the bubble and
+                            push it out past the edge of the column. */}
                         <div
-                          className='relative min-w-0'
+                          className='relative min-w-0 max-w-full'
                           onClick={() =>
                             setActiveMessageId((prev) =>
                               prev === msg.id ? null : (msg.id ?? null),
@@ -410,7 +415,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
                                   event.stopPropagation();
                                   jumpToMessage(msg.replyTo!.id);
                                 }}
-                                className='flex min-w-0 flex-col rounded bg-black/20 px-2.5 py-1.5 text-left text-xs transition-colors hover:bg-black/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
+                                className='flex min-w-0 max-w-full flex-col rounded bg-black/20 px-2.5 py-1.5 text-left text-xs transition-colors hover:bg-black/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
                                 <span className='font-semibold text-zinc-300'>
                                   ↪ {msg.replyTo.username}
                                 </span>

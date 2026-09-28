@@ -146,7 +146,7 @@ export const ChatComposer = ({
   };
 
   return (
-    <div className='flex flex-col gap-2 bg-zinc-900/60 p-4'>
+    <div className='flex flex-col gap-2 pt-3 sm:bg-zinc-900/60 sm:p-4'>
       {replyTo && (
         <ComposerStrip
           icon={<Reply className='h-4 w-4' />}

@@ -1515,9 +1515,11 @@ const GroupedLogItem = ({
 
   return (
     <LogItem isNew={isNew}>
-      {/* Motivate gets a column of its own, so a long name never has to share a row with it. */}
-      <div className='flex w-full items-start gap-3'>
-        <div className='flex min-w-0 flex-1 flex-col gap-4 sm:gap-3'>
+      {/* Motivate gets a column of its own, so a long name never has to share a row with it. On a
+          phone that column would squeeze every line below into a sliver, so there it only sits
+          beside the name and the lines take the card's full width. */}
+      <div className='grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-4 sm:gap-y-3'>
+        <div className='col-start-1 row-start-1 min-w-0 self-center sm:self-start'>
           <div className='flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1'>
             <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-zinc-200'>
               <UserLink
@@ -1539,28 +1541,32 @@ const GroupedLogItem = ({
               {formatLogTime(date)}
             </span>
           </div>
+        </div>
 
-          <div className='flex flex-col gap-4 sm:gap-2.5'>
-            {group.logs.map((log, index) => (
-              <GroupedLogLine
-                key={
-                  (log as { id?: string }).id ??
-                  `${getLogTimestampMs(log)}-${index}`
-                }
-                log={log}
-                type={getLogActivityType(log)}
-                songTiers={songTiers}
-                onPreviewPlan={onPreviewPlan}
-                onPreviewExercise={onPreviewExercise}
-                onViewRecording={onViewRecording}
-                onOpenLeaderboard={onOpenLeaderboard}
-              />
-            ))}
-          </div>
+        <div
+          className={cn(
+            "col-span-2 row-start-2 flex min-w-0 flex-col gap-4 sm:gap-2.5",
+            reactionLogId && "sm:col-span-1",
+          )}>
+          {group.logs.map((log, index) => (
+            <GroupedLogLine
+              key={
+                (log as { id?: string }).id ??
+                `${getLogTimestampMs(log)}-${index}`
+              }
+              log={log}
+              type={getLogActivityType(log)}
+              songTiers={songTiers}
+              onPreviewPlan={onPreviewPlan}
+              onPreviewExercise={onPreviewExercise}
+              onViewRecording={onViewRecording}
+              onOpenLeaderboard={onOpenLeaderboard}
+            />
+          ))}
         </div>
 
         {reactionLogId && (
-          <div className='shrink-0'>
+          <div className='col-start-2 row-start-1 sm:row-span-2'>
             <LogReaction
               logId={reactionLogId}
               reactions={reactors}
