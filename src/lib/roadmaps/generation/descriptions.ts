@@ -97,6 +97,8 @@ interface DescribeParams {
    * rewritten on request rather than written for the first time.
    */
   guidance?: string;
+  /** The student's brief, rendered by `briefForModel`; empty when there is none. */
+  brief?: string;
   /** Where the call's token usage is recorded. */
   ledger?: UsageLedger;
 }
@@ -116,6 +118,7 @@ const buildDescriptionsUser = ({
   phaseIndex,
   stepIds,
   guidance,
+  brief,
 }: DescribeParams): string => {
   const phase = phases[phaseIndex];
   const wanted = new Set(stepIds ?? phase.steps.map((step) => step.id));
@@ -144,7 +147,7 @@ const buildDescriptionsUser = ({
 
   return `Student's goal: "${goal}"
 Skill level: ${level}
-
+${brief?.trim() ? `\n${brief.trim()}\n` : ""}
 ${previous ? `ALREADY MASTERED (earlier phases — never re-explain):\n${previous}\n\n` : ""}CURRENT PHASE ${phaseIndex + 1} of ${phases.length}: ${phase.title}
 ${stepsText}
 ${upcoming ? `\nUPCOMING PHASES (do not teach ahead):\n${upcoming}` : ""}

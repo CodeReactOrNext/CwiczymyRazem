@@ -1,5 +1,6 @@
 import type { RoadmapVisibility } from "feature/aiCoach/types/roadmap.types";
 import { ensureJob } from "lib/roadmaps/generation/backgroundJob";
+import { sanitizeBrief } from "lib/roadmaps/generation/brief";
 import { openTicket } from "lib/roadmaps/generation/generationTicket";
 import {
   MAX_TITLE_LENGTH,
@@ -32,12 +33,13 @@ export default async function handler(
   const auth = await requireSupporter(req);
   if (!auth.ok) return res.status(auth.status).json({ message: auth.error });
 
-  const { title, goal, level, visibility, context } = req.body as {
+  const { title, goal, level, visibility, context, brief } = req.body as {
     title?: unknown;
     goal?: unknown;
     level?: unknown;
     visibility?: unknown;
     context?: unknown;
+    brief?: unknown;
   };
 
   const cleanTitle = sanitizeTitle(title);
@@ -74,6 +76,7 @@ export default async function handler(
       chosenVisibility,
       sanitizeGoalContext(context),
       cleanTitle,
+      sanitizeBrief(brief),
     );
     if (!opened.ok) {
       return res.status(opened.status).json({ message: opened.error });

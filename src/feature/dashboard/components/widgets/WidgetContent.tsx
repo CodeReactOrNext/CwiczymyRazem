@@ -1,5 +1,4 @@
 import { ActivityLogView } from "components/ActivityLog/ActivityLog";
-import { CommunityGoalCard } from "feature/communityGoal/components/CommunityGoalCard";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { isMilestoneWidgetId } from "feature/dashboard/data/milestoneWidgets";
@@ -68,8 +67,6 @@ export const WidgetContent = ({ id }: { id: WidgetId }) => {
       return <RankWidget />;
     case "monthly-challenge":
       return <MonthlyChallengeWidget />;
-    case "community-goal":
-      return <CommunityGoalCard />;
     default: {
       const unreachable: never = id;
       return unreachable;

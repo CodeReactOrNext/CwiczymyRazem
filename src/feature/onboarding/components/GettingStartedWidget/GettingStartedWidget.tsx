@@ -155,11 +155,19 @@ export const GettingStartedWidget = () => {
     }
 
     // Day two only opens once there is a day one, and not on the same day:
-    // today's session already counts for today.
+    // today's session already counts for today. The hint says which of those
+    // it is, so the step never reads as a bare "Day two".
     const isWaitingForTomorrow = sessionCount > 0 && hasPracticedToday;
     return {
       ...base,
-      label: isWaitingForTomorrow && !step.isDone ? "Play tomorrow" : "Day two",
+      label: "Practice a 2nd day",
+      hint: step.isDone
+        ? undefined
+        : sessionCount === 0
+          ? "After your first session"
+          : isWaitingForTomorrow
+            ? "Available tomorrow"
+            : "Play today to finish",
       onClick:
         step.isDone || sessionCount === 0 || isWaitingForTomorrow
           ? undefined
@@ -183,6 +191,8 @@ export const GettingStartedWidget = () => {
     tone: "cyan" | "amber";
     onClick?: () => void;
     badge?: string;
+    /** Status line under the label: what unlocks the step, or when. */
+    hint?: string;
   }[] = [
     stepNode("first_session"),
     {
@@ -314,6 +324,16 @@ export const GettingStartedWidget = () => {
                   )}>
                   {node.label}
                 </span>
+
+                {node.hint && (
+                  <span
+                    className={cn(
+                      "-mt-1 text-[10px] leading-tight sm:-mt-1.5 sm:text-xs",
+                      isActionable ? "text-cyan-400/80" : "text-zinc-500",
+                    )}>
+                    {node.hint}
+                  </span>
+                )}
 
                 {node.badge && (
                   <span className='flex items-center gap-1'>

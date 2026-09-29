@@ -2,6 +2,7 @@ import {
   EFFECT_DEFINITIONS,
   EFFECTS_BY_ID,
 } from "feature/arsenal/data/effectDefinitions";
+import { getEffectValue } from "feature/arsenal/data/effectStats";
 import {
   getSalvageableMod,
   getScrappedMods,
@@ -30,15 +31,6 @@ import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
 import { BulkDuplicatesDialog } from "./BulkDuplicatesDialog";
 import { EffectCard } from "./EffectCard";
 import { SellConfirmDialog } from "./SellConfirmDialog";
-
-const EFFECT_FAME_VALUES: Record<string, number> = {
-  Common: 8,
-  Uncommon: 15,
-  Rare: 40,
-  Epic: 75,
-  Legendary: 150,
-  Mythic: 375,
-};
 
 interface EffectCollectionProps {
   data: ArsenalUserData;
@@ -286,7 +278,7 @@ export const EffectCollection = ({
             isOpen={isDialogOpen}
             itemType='Effect'
             itemName={`${effect.brand} ${effect.name}`}
-            fameReward={EFFECT_FAME_VALUES[effect.rarity] ?? 0}
+            fameReward={getEffectValue(effect)}
             onConfirm={handleConfirmSell}
             onCancel={() => {
               setIsDialogOpen(false);
@@ -306,7 +298,7 @@ export const EffectCollection = ({
             isOpen={isListDialogOpen}
             itemType='Effect'
             itemName={`${effect.brand} ${effect.name}`}
-            minPrice={EFFECT_FAME_VALUES[effect.rarity] ?? 0}
+            minPrice={getEffectValue(effect)}
             currentFame={currentFame}
             onConfirm={handleConfirmList}
             onCancel={closeListDialog}

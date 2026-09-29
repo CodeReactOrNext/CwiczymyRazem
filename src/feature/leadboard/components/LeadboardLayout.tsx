@@ -1,13 +1,17 @@
 import { Skeleton } from "assets/components/ui/skeleton";
 import { TableSkeleton } from "assets/components/ui/table-skeleton";
+import { Tabs, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LEADERBOARD_TABS } from "constants/navTabs";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
 import type { LeaderboardViewType } from "feature/leadboard/hooks/useLeaderboard";
+import type { LeaderboardNeighbors } from "feature/leadboard/services/getLeaderboardNeighbors";
 import { useTranslation } from "hooks/useTranslation";
+import { ArrowDown } from "lucide-react";
 import Link from "next/link";
+import { useRef, useState } from "react";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 
@@ -15,6 +19,9 @@ import { SeasonRewards } from "./SeasonRewards";
 import SeasonSelect from "./SeasonSelect";
 
 export type SortByType = "points" | "sessionCount";
+
+/** The leaders, or the few places around the player. */
+type ListScope = "top" | "around";
 
 interface LeaderboardProps {
   usersData: FirebaseUserDataInterface[];
@@ -31,6 +38,8 @@ interface LeaderboardProps {
   lastAccessiblePage: number;
   userRank?: number | null;
   isRankLoading?: boolean;
+  neighbors?: LeaderboardNeighbors | null;
+  isNeighborsLoading?: boolean;
 }
 
 export const LeadboardLayout = ({
@@ -48,8 +57,12 @@ export const LeadboardLayout = ({
   lastAccessiblePage,
   userRank,
   isRankLoading,
+  neighbors,
+  isNeighborsLoading,
 }: LeaderboardProps) => {
   const { t } = useTranslation("leadboard");
+  const [scope, setScope] = useState<ListScope>("top");
+  const listRef = useRef<HTMLDivElement>(null);
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
   const isSeasonalView = view === "seasonal";
   const isGearView = view === "gear";
@@ -65,6 +78,37 @@ export const LeadboardLayout = ({
     return new Date(dateStr).toLocaleDateString();
   };
 
+  const nextRival = neighbors?.nextRival ?? null;
+  const gapUnit = (gap: number) =>
+    isGearView ? (gap === 1 ? "level" : "levels") : gap === 1 ? "point" : "points";
+  // Worth offering only when the player is not already in the top page.
+  const canShowAround = !!userRank && userRank > itemsPerPage && !!currentUserId;
+  const activeScope: ListScope = canShowAround ? scope : "top";
+
+  const jumpToMyRank = () => {
+    setScope("around");
+    listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const renderRow = (user: FirebaseUserDataInterface, place: number) => (
+    <LeadboardRow
+      key={user.profileId}
+      profileId={user.profileId}
+      place={place}
+      nick={user.displayName}
+      userAvatar={user.avatar}
+      statistics={user.statistics}
+      currentUserId={currentUserId}
+      selectedGuitar={user.selectedGuitar}
+      variant={isGearView ? "gear" : "default"}
+      rigLevel={user.rigLevel ?? 0}
+      guitarsOwned={user.arsenal?.inventory?.length ?? 0}
+      effectsOwned={user.arsenal?.effectInventory?.length ?? 0}
+      arsenal={user.arsenal}
+      guildBadge={user.guildBadge}
+    />
+  );
+
   const rankContent = isRankLoading ? (
     <Skeleton className="h-20 w-40" />
   ) : userRank ? (
@@ -75,6 +119,23 @@ export const LeadboardLayout = ({
       </div>
       {totalUsers > 0 && (
         <span className="text-sm text-zinc-500">out of {totalUsers.toLocaleString()}</span>
+      )}
+      {nextRival && (
+        <span className="text-sm text-zinc-300 md:text-right">
+          <span className="font-semibold tabular-nums text-cyan-300">
+            {nextRival.gap.toLocaleString()}
+          </span>{" "}
+          {gapUnit(nextRival.gap)} to pass {nextRival.displayName} (#{nextRival.place})
+        </span>
+      )}
+      {canShowAround && (
+        <button
+          type="button"
+          onClick={jumpToMyRank}
+          className="mt-1 flex items-center gap-1.5 rounded-lg bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-300 transition-colors hover:bg-cyan-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60">
+          <ArrowDown className="h-3.5 w-3.5" />
+          Jump to my rank
+        </button>
       )}
     </div>
   ) : null;
@@ -132,20 +193,57 @@ export const LeadboardLayout = ({
           </Link>
         </div>
 
-        {isSeasonalView && (
-          <div className='flex flex-wrap items-center gap-6 mb-8'>
-            <SeasonSelect
-              seasons={seasons}
-              selectedSeason={selectedSeason}
-              setSelectedSeason={setSelectedSeason}
-              isLoading={isLoading}
-            />
+        {(isSeasonalView || canShowAround) && (
+          <div className='mb-8 flex flex-wrap items-center gap-6'>
+            {isSeasonalView && (
+              <SeasonSelect
+                seasons={seasons}
+                selectedSeason={selectedSeason}
+                setSelectedSeason={setSelectedSeason}
+                isLoading={isLoading}
+              />
+            )}
+            {canShowAround && (
+              <Tabs
+                value={activeScope}
+                onValueChange={(value) => setScope(value as ListScope)}
+                className='ml-auto'>
+                <TabsList className='h-10 bg-zinc-900/60 text-zinc-400'>
+                  <TabsTrigger
+                    value='top'
+                    className='px-4 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-none'>
+                    Top players
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value='around'
+                    className='px-4 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-none'>
+                    Around you
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            )}
           </div>
         )}
 
-        {/* Enhanced Content Container */}
-        <div className='pb-20'>
-          {isLoading ? (
+        {/* scroll-mt clears the sticky top bar when jumping here. */}
+        <div ref={listRef} className='scroll-mt-24 pb-20'>
+          {activeScope === "around" ? (
+            isNeighborsLoading ? (
+              <ul className='flex flex-col gap-6'>
+                <TableSkeleton rows={5} />
+              </ul>
+            ) : neighbors ? (
+              <ul className='flex flex-col gap-6'>
+                {neighbors.rows.map(({ user, place }) =>
+                  renderRow(user, place),
+                )}
+              </ul>
+            ) : (
+              <p className='py-16 text-center text-sm text-zinc-500'>
+                Could not load the players around you. Try again in a moment.
+              </p>
+            )
+          ) : isLoading ? (
             <>
               <ul className='flex flex-col gap-6'>
                 <TableSkeleton rows={itemsPerPage} />
@@ -175,24 +273,9 @@ export const LeadboardLayout = ({
           ) : (
             <>
               <ul className='flex flex-col gap-6'>
-                {usersData.map((user, index) => (
-                  <LeadboardRow
-                    key={user.profileId}
-                    profileId={user.profileId}
-                    place={(currentPage - 1) * itemsPerPage + index + 1}
-                    nick={user.displayName}
-                    userAvatar={user.avatar}
-                    statistics={user.statistics}
-                    currentUserId={currentUserId}
-                    selectedGuitar={user.selectedGuitar}
-                    variant={isGearView ? "gear" : "default"}
-                    rigLevel={user.rigLevel ?? 0}
-                    guitarsOwned={user.arsenal?.inventory?.length ?? 0}
-                    effectsOwned={user.arsenal?.effectInventory?.length ?? 0}
-                    arsenal={user.arsenal}
-                    guildBadge={user.guildBadge}
-                  />
-                ))}
+                {usersData.map((user, index) =>
+                  renderRow(user, (currentPage - 1) * itemsPerPage + index + 1),
+                )}
               </ul>
 
               {/* Clean Pagination */}

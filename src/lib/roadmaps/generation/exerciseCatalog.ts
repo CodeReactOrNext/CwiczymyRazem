@@ -8,15 +8,34 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
  * generator no longer needs a vector store that goes stale the moment an
  * exercise is added.
  */
+/**
+ * How an exercise is practised, for the brief's "how do you like to practise"
+ * answer: a hunt is a click-to-answer fretboard game, a backing exercise runs
+ * over a track, everything else is a drill against the metronome.
+ */
+export type CatalogKind = "drill" | "backing" | "hunt";
+
 export interface CatalogEntry {
   id: string;
   title: string;
   difficulty: Exercise["difficulty"];
   category: Exercise["category"];
+  kind: CatalogKind;
   skills: string[];
   description: string;
   whyItMatters: string;
 }
+
+const kindOf = (exercise: Exercise): CatalogKind => {
+  if (
+    exercise.noteHuntConfig ||
+    exercise.rollHuntTarget ||
+    exercise.customGoalPrompt
+  ) {
+    return "hunt";
+  }
+  return exercise.backingTracks?.length ? "backing" : "drill";
+};
 
 /**
  * Play-alongs are left out of every list the generator sees.
@@ -37,6 +56,7 @@ const entries: CatalogEntry[] = exercisesAgregat
     title: exercise.title,
     difficulty: exercise.difficulty,
     category: exercise.category,
+    kind: kindOf(exercise),
     skills: exercise.relatedSkills ?? [],
     description: exercise.description,
     whyItMatters: exercise.whyItMatters ?? "",
@@ -55,11 +75,21 @@ export const isCatalogExerciseId = (id: string): boolean => byId.has(id);
 const catalogLine = (entry: CatalogEntry) =>
   `${entry.id} | ${entry.title} | ${entry.difficulty} | ${entry.category} | ${entry.skills.join(",") || "-"} | ${entry.description}`;
 
-export const renderExerciseCatalog = (): string =>
-  [
+/**
+ * The library for a prompt. `keep` narrows it — to the kinds the student said
+ * they like to practise — but never below the whole library: a filter that
+ * would leave nothing hands the model everything instead of an empty list.
+ */
+export const renderExerciseCatalog = (
+  keep?: (entry: CatalogEntry) => boolean,
+): string => {
+  const kept = keep ? entries.filter(keep) : entries;
+  const listed = kept.length ? kept : entries;
+  return [
     "id | title | difficulty | category | skills | what it trains",
-    ...entries.map(catalogLine),
+    ...listed.map(catalogLine),
   ].join("\n");
+};
 
 /**
  * Which library difficulties fit a roadmap level. "beginner" is the handful of

@@ -1,7 +1,7 @@
 import { getNextDailyReset } from "feature/arsenal/data/dailyCase";
 import { getTraderRestockAt } from "feature/arsenal/data/traderShop";
-import { weekEnd } from "feature/communityGoal/utils/goalWeek";
 import { cycleEnd } from "feature/supporterCase/utils/caseCycle";
+import { weekEnd } from "utils/gameLogic/utcWeek";
 
 /**
  * Which clock a rollover runs on.

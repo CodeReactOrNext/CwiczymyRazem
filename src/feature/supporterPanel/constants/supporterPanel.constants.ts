@@ -38,9 +38,6 @@ export const IDEA_BACK_COST = 1;
  */
 export const MAX_BACKING_PER_IDEA = 3;
 
-/** Voting on which community goal runs next week. */
-export const GOAL_VOTE_COST = 1;
-
 /**
  * Proposing gear costs more than an idea: it is a spec somebody has to draw,
  * balance and fit into the drop tables, and the price is what keeps the board a

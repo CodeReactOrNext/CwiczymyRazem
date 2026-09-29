@@ -17,7 +17,6 @@ import {
   BarChart3,
   Flame,
   Gift,
-  HandHeart,
   History,
   Medal,
   Music2,
@@ -141,15 +140,6 @@ const DEFINITIONS: Record<StaticWidgetId, Omit<WidgetDefinition, "id">> = {
     group: "community",
     defaultSize: "half",
     resizable: true,
-  },
-  "community-goal": {
-    title: "Support challenge",
-    description: "The supporters' weekly goal and the reward when it lands.",
-    icon: HandHeart,
-    group: "community",
-    defaultSize: "full",
-    resizable: true,
-    mayBeEmpty: true,
   },
 };
 

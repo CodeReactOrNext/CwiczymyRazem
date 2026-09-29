@@ -4,7 +4,6 @@ import { DISCORD_INVITE_URL } from "constants/community";
 import {
   GEAR_BACK_COST,
   GEAR_PROPOSAL_COST,
-  GOAL_VOTE_COST,
   GUILD_FOUNDING_COST,
   GUILD_SEAT_UPGRADE_COST,
   GUILD_SEATS_PER_UPGRADE,
@@ -26,7 +25,6 @@ import {
   Map,
   Package,
   Shield,
-  Target,
 } from "lucide-react";
 import { FaDiscord } from "react-icons/fa6";
 
@@ -64,11 +62,6 @@ const SURFACES: { icon: typeof Map; title: string; body: string }[] = [
     icon: Package,
     title: "Supporter case",
     body: "Six seats in the next case, and you pick what sits in each one before it ever opens. Only the winner's tokens are spent. Everything backing the rest stays on the board for the next case.",
-  },
-  {
-    icon: Target,
-    title: "Support challenge",
-    body: "Choose the target the whole app plays for next week — every player collects the Fame off the week you set.",
   },
   {
     icon: Heart,
@@ -110,7 +103,6 @@ const COST_GROUPS: {
     title: "Votes",
     rows: [
       { label: "Supporter case item", cost: SLATE_VOTE_COST },
-      { label: "Next support challenge", cost: GOAL_VOTE_COST },
     ],
   },
   {

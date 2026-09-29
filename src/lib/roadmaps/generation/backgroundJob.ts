@@ -15,6 +15,7 @@ import { firestore } from "utils/firebase/api/firebase.config";
 
 import { searchLessonsForStep } from "../lessonSearch";
 import { findLibrarySong } from "../songLookup";
+import { briefForModel, effectiveGoal } from "./brief";
 import { describePhaseSteps } from "./descriptions";
 import type { GenerationTicket } from "./generationTicket";
 import {
@@ -151,7 +152,14 @@ async function runUnit(ticket: TicketWithJob): Promise<TicketWithJob> {
   const goal = ticket.goal.trim();
   // What the player said about themselves rides along with the goal into the
   // prompts; the saved roadmap and the lesson search keep the goal alone.
-  const promptGoal = goalForModel(goal, ticket.context, ticket.title);
+  // A brief's "focus" answer narrows the goal itself; the rest of the brief
+  // travels as its own block of constraints.
+  const brief = ticket.brief ?? null;
+  const promptGoal = goalForModel(
+    effectiveGoal(goal, brief),
+    ticket.context,
+    ticket.title,
+  );
 
   switch (job.step) {
     case "draft": {
@@ -162,7 +170,12 @@ async function runUnit(ticket: TicketWithJob): Promise<TicketWithJob> {
         };
       }
       const ledger = new UsageLedger();
-      const draft = await draftRoadmapStructure(promptGoal, level, ledger);
+      const draft = await draftRoadmapStructure(
+        promptGoal,
+        level,
+        ledger,
+        brief,
+      );
       await storeTicketDraft(ticket.id, draft, ledger.totals());
       return {
         ...ticket,
@@ -203,6 +216,7 @@ async function runUnit(ticket: TicketWithJob): Promise<TicketWithJob> {
           ledger,
           resolveSong: findLibrarySong,
           onRevise: () => noteProgress(ticket.id, "revise"),
+          brief,
         },
       );
       const usage = ledger.totals();
@@ -242,6 +256,7 @@ async function runUnit(ticket: TicketWithJob): Promise<TicketWithJob> {
             level,
             phases: skeleton,
             phaseIndex,
+            brief: briefForModel(brief),
             ledger,
           }),
         ),

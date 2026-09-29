@@ -16,6 +16,7 @@ import { firestore } from "utils/firebase/api/firebase.config";
 import { v4 as uuidv4 } from "uuid";
 
 import { roadmapGenerationCost } from "../visibility";
+import type { RoadmapBrief } from "./brief";
 import type { StoredRoadmapJob } from "./jobPlan";
 import type { GeneratedStructure, StructurePhase } from "./structure";
 import type { TokenUsage } from "./usage";
@@ -76,6 +77,8 @@ export interface GenerationTicket {
   title?: string | null;
   /** What the player added about themselves, for the prompts; never part of the ticket id. */
   context?: RoadmapGoalContext | null;
+  /** What the player answered before paying — the constraints the prompts are held to. */
+  brief?: RoadmapBrief | null;
   /** The server-side run of the rest of the pipeline, when it runs in the background. */
   job?: StoredRoadmapJob | null;
 }
@@ -125,6 +128,7 @@ export async function openTicket(
   visibility: RoadmapVisibility = "public",
   context: RoadmapGoalContext | null = null,
   title: string | null = null,
+  brief: RoadmapBrief | null = null,
 ): Promise<OpenTicketResult> {
   const id = ticketId(uid, goal, level, visibility);
   const ref = ticketRef(id);
@@ -169,6 +173,7 @@ export async function openTicket(
       usage: null,
       context,
       title,
+      brief,
       // A ticket is opened to run a draft, so that is what it is doing.
       progress: { stage: "draft", updatedAt: new Date().toISOString() },
     };

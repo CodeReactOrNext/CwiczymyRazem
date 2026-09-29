@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { LeadboardLayout } from "feature/leadboard/components/LeadboardLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
@@ -5,6 +6,7 @@ import { useCurrentUser } from "./hooks/useCurrentUser";
 import type { LeaderboardViewType } from "./hooks/useLeaderboard";
 import { useLeaderboard } from "./hooks/useLeaderboard";
 import { useUserRank } from "./hooks/useUserRank";
+import { getLeaderboardNeighbors } from "./services/getLeaderboardNeighbors";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -33,10 +35,38 @@ export const LeadboardView = ({
     defaultView,
   });
 
-  const { userRank, isLoading: isRankLoading } = useUserRank(
-    view,
-    selectedSeason
-  );
+  const {
+    userRank,
+    score,
+    isLoading: isRankLoading,
+  } = useUserRank(view, selectedSeason);
+
+  // The slice around the player (who is just above and below), so the page
+  // can say who is next without paging down to the player's place.
+  const { data: neighbors, isLoading: isNeighborsLoading } = useQuery({
+    queryKey: [
+      "leaderboardNeighbors",
+      view,
+      selectedSeason,
+      currentUserId,
+      score,
+      userRank,
+    ],
+    queryFn: () =>
+      getLeaderboardNeighbors({
+        view,
+        userId: currentUserId!,
+        score: score!,
+        rank: userRank!,
+        seasonId: view === "seasonal" ? selectedSeason : undefined,
+      }),
+    enabled:
+      !!currentUserId &&
+      score !== null &&
+      !!userRank &&
+      (view !== "seasonal" || !!selectedSeason),
+    staleTime: 5 * 60 * 1000,
+  });
 
   if (!usersData.length && !isLoading) {
     return <PageLoadingLayout />;
@@ -58,6 +88,8 @@ export const LeadboardView = ({
       lastAccessiblePage={lastAccessiblePage}
       userRank={userRank}
       isRankLoading={isRankLoading}
+      neighbors={neighbors ?? null}
+      isNeighborsLoading={isNeighborsLoading}
     />
   );
 };

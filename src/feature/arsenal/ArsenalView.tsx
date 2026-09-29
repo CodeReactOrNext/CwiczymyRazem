@@ -47,6 +47,7 @@ const TAB_META: Record<ArsenalTab, { label: string; icon: LucideIcon }> = {
   dex: { label: "Dex", icon: BookMarked },
 };
 
+import type { OpenAgainPayment } from "./components/CaseOpeningModal/CaseOpeningModal";
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
 import { CaseShop } from "./components/CaseShop/CaseShop";
 import { CollectionTab } from "./components/Collection/CollectionTab";
@@ -99,6 +100,17 @@ const ArsenalTabs = () => {
       },
     );
   };
+
+  // Fame first, as the shelf's own button does; a free case is spent only
+  // when Fame falls short, and the button says so before the click.
+  const openAgainCost = openedCaseType ? CASE_DEFINITIONS[openedCaseType].fameCost : 0;
+  const openAgainPayment: OpenAgainPayment = !openedCaseType
+    ? null
+    : fame >= openAgainCost
+      ? { kind: "fame", cost: openAgainCost }
+      : freeCases > 0
+        ? { kind: "token" }
+        : null;
 
   return (
     <MainContainer noBorder>
@@ -257,6 +269,11 @@ const ArsenalTabs = () => {
         result={openResult}
         caseDef={openedCaseType ? CASE_DEFINITIONS[openedCaseType] : undefined}
         onClose={() => { setOpenResult(null); setOpenedCaseType(null); }}
+        onOpenAgain={(useToken) => {
+          if (openedCaseType) handleOpenCase(openedCaseType, useToken || undefined);
+        }}
+        openAgainPayment={openAgainPayment}
+        isOpeningAgain={isOpening}
       />
     </MainContainer>
   );

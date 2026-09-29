@@ -5,7 +5,9 @@ import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { getDailyPool } from "feature/arsenal/data/dailyCase";
 import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
+import { getEffectValue } from "feature/arsenal/data/effectStats";
 import { DROPPABLE_GUITARS_BY_RARITY, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getItemValue } from "feature/arsenal/data/itemStats";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
@@ -23,16 +25,6 @@ import { RARITY_STYLES } from "../RarityBadge";
 const ITEM_WIDTH = 250;
 const VISIBLE_ITEMS = 60;
 const WIN_INDEX = 45;
-
-// Keep in sync with /api/arsenal/sell-guitar.ts and /api/arsenal/sell-effect.ts
-const GUITAR_SELL_VALUES: Record<GuitarRarity, number> = {
-  Common: 15, Uncommon: 30, Rare: 75, Epic: 150, Legendary: 300, Mythic: 750,
-  "Custom Shop": 1500,
-};
-const EFFECT_SELL_VALUES: Record<GuitarRarity, number> = {
-  Common: 8, Uncommon: 15, Rare: 40, Epic: 75, Legendary: 150, Mythic: 375,
-  "Custom Shop": 750,
-};
 
 type StripItem =
   | { kind: "guitar"; def: GuitarDefinition }
@@ -91,20 +83,37 @@ function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripI
   return strip;
 }
 
+/** How the same case can be opened once more, if at all. */
+export type OpenAgainPayment =
+  | { kind: "fame"; cost: number }
+  | { kind: "token" }
+  | null;
+
 interface CaseOpeningModalProps {
   result: OpenCaseResult | null;
   caseDef?: CaseDefinition;
   onClose: () => void;
+  /** Pays for and opens the same case again; the new result replaces this one. */
+  onOpenAgain?: (useToken: boolean) => void;
+  openAgainPayment?: OpenAgainPayment;
+  isOpeningAgain?: boolean;
 }
 
-export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalProps) => {
+export const CaseOpeningModal = ({
+  result,
+  caseDef,
+  onClose,
+  onOpenAgain,
+  openAgainPayment = null,
+  isOpeningAgain = false,
+}: CaseOpeningModalProps) => {
   const [phase, setPhase] = useState<"idle" | "spinning" | "reveal" | "done">("idle");
   const [mounted, setMounted] = useState(false);
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
   const { mutate: sellGuitar, isPending: isSellingGuitar } = useSellGuitar();
   const { mutate: sellEffect, isPending: isSellingEffect } = useSellEffect();
   const isSelling = isSellingGuitar || isSellingEffect;
-  const isBusy = isEquipping || isSelling;
+  const isBusy = isEquipping || isSelling || isOpeningAgain;
   const isOpen = result !== null;
   const containerRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
@@ -123,10 +132,15 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
   const revealRarity = guitar?.rarity ?? effect?.rarity ?? null;
   const rarityStyles = revealRarity ? RARITY_STYLES[revealRarity] : null;
 
+  // The same functions /api/arsenal/sell-guitar and sell-effect pay out with:
+  // a guitar is worth its own rolled condition and year, not a flat rarity
+  // price, so the reveal and the Arsenal quote the same number.
   const sellValue = winDef
     ? winDef.kind === "guitar"
-      ? GUITAR_SELL_VALUES[winDef.def.rarity]
-      : EFFECT_SELL_VALUES[winDef.def.rarity]
+      ? result?.newItem
+        ? getItemValue(result.newItem, winDef.def)
+        : 0
+      : getEffectValue(winDef.def)
     : 0;
 
   const handleSell = () => {
@@ -222,7 +236,11 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
               <div className="absolute inset-y-0 left-0 w-40 z-20 bg-gradient-to-r from-zinc-950 to-transparent pointer-events-none" />
               <div className="absolute inset-y-0 right-0 w-40 z-20 bg-gradient-to-l from-zinc-950 to-transparent pointer-events-none" />
 
+              {/* Keyed by the drop, so "Open another" remounts the reel at
+                  x: 0 — otherwise it already sits at the target offset and the
+                  second spin would not move at all. */}
               <motion.div
+                key={result?.newItem?.id ?? result?.effectItem?.id ?? "strip"}
                 ref={stripRef}
                 className="flex items-center h-full"
                 initial={{ x: 0 }}
@@ -382,8 +400,9 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex w-full flex-col gap-2 sm:flex-row sm:gap-3"
+                  className="flex w-full flex-col gap-2 sm:gap-3"
                 >
+                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-3">
                   {winDef.kind === "guitar" && guitar && (
                     <Button
                       onClick={() => equip({ guitarId: guitar.id, year: result?.newItem?.year, country: result?.newItem?.country }, { onSuccess: onClose })}
@@ -419,6 +438,37 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       </span>
                     )}
                   </Button>
+                  </div>
+
+                  {onOpenAgain && caseDef && (
+                    <Button
+                      variant="outline"
+                      onClick={() => onOpenAgain(openAgainPayment?.kind === "token")}
+                      disabled={isBusy || !openAgainPayment}
+                      className="h-12 w-full border-zinc-700 bg-zinc-900 text-sm font-medium tracking-widest text-white hover:bg-zinc-800 disabled:opacity-50"
+                    >
+                      {isOpeningAgain ? (
+                        "Opening…"
+                      ) : (
+                        <span className="flex items-center gap-3">
+                          <span>Open another {caseDef.name}</span>
+                          {openAgainPayment?.kind === "fame" ? (
+                            <span className="flex items-center gap-1.5 text-amber-400">
+                              <img src="/images/coin.png" alt="" className="h-5 w-5 object-contain" />
+                              {openAgainPayment.cost}
+                            </span>
+                          ) : openAgainPayment?.kind === "token" ? (
+                            <span className="text-emerald-400">Free case</span>
+                          ) : (
+                            <span className="flex items-center gap-1.5 text-zinc-500">
+                              <img src="/images/coin.png" alt="" className="h-5 w-5 object-contain opacity-50" />
+                              {caseDef.fameCost} needed
+                            </span>
+                          )}
+                        </span>
+                      )}
+                    </Button>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

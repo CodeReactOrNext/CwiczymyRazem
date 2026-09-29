@@ -1,4 +1,4 @@
-import { weekStart } from "feature/communityGoal/utils/goalWeek";
+import { weekStart } from "utils/gameLogic/utcWeek";
 
 /**
  * How long one supporter slate runs.

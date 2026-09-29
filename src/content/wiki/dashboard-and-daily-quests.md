@@ -27,7 +27,7 @@ Three things stay put no matter what: the getting-started checklist at the top, 
 Your layout is saved to your account, so it looks the same in the browser and in the desktop app.
 
 <BlogAlert type="tip">
-Some cards only appear when they have something to say. The getting-started checklist goes away on its own once you've claimed it, and the support challenge card shows up only while one is running. No need to hide them yourself.
+Some cards only appear when they have something to say. The getting-started checklist goes away on its own once you've claimed it. No need to hide them yourself.
 </BlogAlert>
 
 ## Daily quests

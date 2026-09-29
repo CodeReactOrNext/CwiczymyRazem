@@ -23,7 +23,6 @@ import {
   Check, CheckCircle2, ChevronLeft, ChevronRight, Info,
   Lock, Sparkles, TrendingUp, Trophy, X,
 } from "lucide-react";
-import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
@@ -959,8 +958,7 @@ function RulesAlert() {
 
 // ─── SummaryView ──────────────────────────────────────────────────────────────
 
-/** Rendered directly under the hero, so the page can hang a tab bar there. */
-export const SummaryView = ({ tabs }: { tabs?: ReactNode }) => {
+export const SummaryView = () => {
   const userAuth  = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
   const dispatch  = useAppDispatch();
@@ -1082,9 +1080,6 @@ export const SummaryView = ({ tabs }: { tabs?: ReactNode }) => {
       />
 
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 p-4 pb-14 md:gap-10 md:p-8 md:pb-20 lg:p-10 lg:pb-24">
-
-        {tabs}
-
         <RulesAlert />
 
         {/* Progress tracker */}

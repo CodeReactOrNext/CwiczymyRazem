@@ -7,6 +7,13 @@ import { v4 as uuidv4 } from "uuid";
 
 import type { SongRequest } from "../songLookup";
 import {
+  briefForModel,
+  briefSongByRequest,
+  catalogKeep,
+  ensureRequiredSongs,
+  type RoadmapBrief,
+} from "./brief";
+import {
   DIFFICULTY_FOR_LEVEL,
   findCatalogEntry,
   renderExerciseCatalog,
@@ -224,14 +231,20 @@ SIZE: ${STRUCTURE_LIMITS.phases.min}–${STRUCTURE_LIMITS.phases.max} phases, ${
 
 GUARD: if the goal is not about playing or learning guitar, set guitarRelated=false, fill rejectionReason, and return the minimum phases the schema allows with placeholder titles.`;
 
-const buildStructureUser = (goal: string, level: RoadmapLevel) =>
-  `Goal: "${goal}"
+const buildStructureUser = (
+  goal: string,
+  level: RoadmapLevel,
+  brief?: RoadmapBrief | null,
+) => {
+  const constraints = briefForModel(brief);
+  return `Goal: "${goal}"
 Skill level: ${level}
 
 For the "${level}" level do NOT include basics the student already has. If the goal names a guitarist, style or song, the whole plan is about that — not general guitar learning.
-
+${constraints ? `\n${constraints}\n` : ""}
 EXERCISE LIBRARY:
-${renderExerciseCatalog()}`;
+${renderExerciseCatalog(catalogKeep(brief))}`;
+};
 
 const REVIEW_SYSTEM = `You are a senior guitar curriculum designer reviewing a roadmap skeleton before it is written out in full.
 
@@ -243,6 +256,7 @@ Judge it on:
 5. Gaps and misplacements — missing essentials; steps in the wrong phase.
 6. Duplicates — two steps (in the same phase or different ones) that teach the same skill under different words, or share the same exercise for no reason. Name both titles and say which one to cut or what to merge them into.
 7. One-off tasks — a step that is really a single checklist item (change strings, set an amp knob, read about a pedal) rather than a skill practised over several sessions. Name it and say what repeatable skill it should become, or that it should be cut.
+8. The student's brief — when a STUDENT BRIEF is given, every line of it is a hard constraint: a required song with no step, a side they excluded that still has a phase, a tone phase they declined, a creative step where they asked for the record. Each breach is an issue, and the brief wins over the general pedagogy where the two disagree.
 
 Rules:
 - "issues" = problems that make the roadmap worse than a good teacher's plan (max 4, empty if none), each one sentence naming actual phase/step titles and what to do instead.
@@ -275,10 +289,11 @@ const generateDraft = (
   goal: string,
   level: RoadmapLevel,
   ledger?: UsageLedger,
+  brief?: RoadmapBrief | null,
 ) =>
   completeJson<StructureOutput>({
     system: STRUCTURE_SYSTEM,
-    user: buildStructureUser(goal, level),
+    user: buildStructureUser(goal, level, brief),
     schemaName: "roadmap_structure",
     schema: STRUCTURE_SCHEMA,
     maxTokens: STRUCTURE_TOKENS,
@@ -292,10 +307,14 @@ const reviewDraft = (
   level: RoadmapLevel,
   phases: StructurePhase[],
   ledger?: UsageLedger,
-) =>
-  completeJson<StructureReview>({
+  brief?: RoadmapBrief | null,
+) => {
+  const constraints = briefForModel(brief);
+  return completeJson<StructureReview>({
     system: REVIEW_SYSTEM,
-    user: `Goal: "${goal}"\nSkill level: ${level}\n\nRoadmap skeleton:\n${renderStructure(phases)}`,
+    user: `Goal: "${goal}"\nSkill level: ${level}\n${
+      constraints ? `\n${constraints}\n` : ""
+    }\nRoadmap skeleton:\n${renderStructure(phases)}`,
     schemaName: "roadmap_review",
     schema: REVIEW_SCHEMA,
     maxTokens: REVIEW_TOKENS,
@@ -303,6 +322,7 @@ const reviewDraft = (
     reasoningEffort: "low",
     ledger,
   });
+};
 
 const reviseDraft = (
   goal: string,
@@ -310,10 +330,11 @@ const reviseDraft = (
   phases: StructurePhase[],
   review: StructureReview,
   ledger?: UsageLedger,
+  brief?: RoadmapBrief | null,
 ) =>
   completeJson<StructureOutput>({
     system: STRUCTURE_SYSTEM,
-    user: `${buildStructureUser(goal, level)}
+    user: `${buildStructureUser(goal, level, brief)}
 
 ---
 
@@ -450,8 +471,9 @@ export async function draftRoadmapStructure(
   goal: string,
   level: RoadmapLevel,
   ledger?: UsageLedger,
+  brief?: RoadmapBrief | null,
 ): Promise<StructurePhase[]> {
-  const draft = await generateDraft(goal, level, ledger);
+  const draft = await generateDraft(goal, level, ledger, brief);
   if (!draft.guitarRelated) {
     throw new GenerationError(
       draft.rejectionReason || "Please enter a guitar-related goal.",
@@ -472,6 +494,8 @@ export interface ReviewStructureOptions {
    * roadmap that is otherwise going fine.
    */
   onRevise?: () => void | Promise<void>;
+  /** The student's answers; its songs are guaranteed a step, its lines are reviewed. */
+  brief?: RoadmapBrief | null;
 }
 
 /**
@@ -485,19 +509,26 @@ export async function reviewRoadmapStructure(
   goal: string,
   level: RoadmapLevel,
   draft: StructurePhase[],
-  { ledger, resolveSong, onRevise }: ReviewStructureOptions = {},
+  { ledger, resolveSong, onRevise, brief }: ReviewStructureOptions = {},
 ): Promise<GeneratedStructure> {
   if (!draft.length) {
     throw new GenerationError("There is no draft to review.", 400);
   }
 
-  const review = await reviewDraft(goal, level, draft, ledger);
+  const review = await reviewDraft(goal, level, draft, ledger, brief);
   let phases = draft;
   let revised = false;
 
   if (!review.isValid && review.issues.length) {
     await onRevise?.();
-    const revision = await reviseDraft(goal, level, draft, review, ledger);
+    const revision = await reviseDraft(
+      goal,
+      level,
+      draft,
+      review,
+      ledger,
+      brief,
+    );
     if (revision.phases.length) {
       phases = revision.phases;
       revised = true;
@@ -505,15 +536,29 @@ export async function reviewRoadmapStructure(
   }
 
   const converted = toRoadmapPhases(phases, level);
-  const withSongs = resolveSong
+  // A song the player picked from the library is already resolved — no read,
+  // and no chance of the lookup missing what the picker found.
+  const resolve: SongResolver | undefined = brief?.songs.length
+    ? async (request) =>
+        briefSongByRequest(brief, request) ??
+        (resolveSong ? resolveSong(request) : null)
+    : resolveSong;
+  const withSongs = resolve
     ? await attachLibrarySongs(
         converted.phases,
         converted.songRequests,
-        resolveSong,
+        resolve,
       )
     : { phases: converted.phases, unmatchedSongs: [] };
+  const guaranteed = ensureRequiredSongs(withSongs.phases, brief?.songs ?? []);
+  if (guaranteed.added.length) {
+    console.warn(
+      "[structure] required songs appended after the model left them out:",
+      guaranteed.added.join(", "),
+    );
+  }
   return {
-    phases: withSongs.phases,
+    phases: guaranteed.phases,
     review: { ...review, revised },
     unknownExerciseIds: converted.unknownExerciseIds,
     unmatchedSongs: withSongs.unmatchedSongs,

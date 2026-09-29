@@ -4,7 +4,9 @@ import type {
   RoadmapJobView,
 } from "feature/supporterPanel/types/roadmapJob.types";
 import type { SupporterWallet } from "feature/supporterPanel/types/supporterPanel.types";
+import type { RoadmapBrief } from "lib/roadmaps/generation/brief";
 import type { RoadmapLevel } from "lib/roadmaps/generation/levels";
+import type { PreflightResult } from "lib/roadmaps/generation/preflight";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 const post = async <T>(path: string, body: Record<string, unknown>) => {
@@ -36,11 +38,18 @@ export interface RoadmapJobRequest {
   level: RoadmapLevel;
   visibility: RoadmapVisibility;
   context?: RoadmapGoalContext | null;
+  brief?: RoadmapBrief | null;
 }
 
 /** Pays for a generation and puts it on the server; nothing is written yet. */
 export const startRoadmapJob = (request: RoadmapJobRequest) =>
   post<StartRoadmapJobResult>("start", { ...request });
+
+export type PreflightRequest = Omit<RoadmapJobRequest, "visibility" | "brief">;
+
+/** Looks at the goal before paying: verdict, how it was read, which questions to ask. Free. */
+export const preflightRoadmap = (request: PreflightRequest) =>
+  post<PreflightResult>("preflight", { ...request });
 
 /** Runs the job for up to a few minutes and answers where it got to. */
 export const advanceRoadmapJob = async (ticketId: string) =>

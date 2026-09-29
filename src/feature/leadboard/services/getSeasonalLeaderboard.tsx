@@ -12,6 +12,8 @@ import { memoryCache } from "utils/cache/memoryCache";
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 
+import { mapSeasonalUser } from "./getLeaderboardNeighbors";
+
 export const getSeasonalLeaderboard = async (
   seasonId: string,
   sortBy: SortByType,
@@ -50,31 +52,9 @@ export const getSeasonalLeaderboard = async (
 
     const querySnapshot = await trackedGetDocs(q);
 
-    const users = querySnapshot.docs.map((doc: any) => {
-      const data = doc.data();
-      return {
-        profileId: doc.id,
-        displayName: data.displayName || "",
-        avatar: data.avatar || "",
-        selectedGuitar: data.selectedGuitar || "",
-        selectedGuitarYear: data.selectedGuitarYear || 0,
-        selectedGuitarCountry: data.selectedGuitarCountry || "",
-        statistics: {
-          points: data.points || 0,
-          sessionCount: data.sessionCount || 0,
-          time: {
-            creativity: data.time?.creativity || 0,
-            hearing: data.time?.hearing || 0,
-            technique: data.time?.technique || 0,
-            theory: data.time?.theory || 0,
-            longestSession: data.time?.longestSession || 0,
-          },
-          achievements: data.achievements || [],
-          lvl: data.lvl || 1,
-          lastReportDate: data.lastReportDate || "",
-        },
-      };
-    });
+    const users = querySnapshot.docs.map((doc) =>
+      mapSeasonalUser(doc.id, doc.data())
+    );
 
     const result = {
       users,

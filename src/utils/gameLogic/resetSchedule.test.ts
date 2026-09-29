@@ -1,5 +1,5 @@
 import { getTraderRestockAt } from "feature/arsenal/data/traderShop";
-import { weekEnd } from "feature/communityGoal/utils/goalWeek";
+import { weekEnd } from "utils/gameLogic/utcWeek";
 import { describe, expect, it } from "vitest";
 
 import {

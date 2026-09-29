@@ -22,7 +22,6 @@ export const WIDGET_IDS = [
   "songs",
   "rank",
   "monthly-challenge",
-  "community-goal",
 ] as const;
 
 export type StaticWidgetId = (typeof WIDGET_IDS)[number];

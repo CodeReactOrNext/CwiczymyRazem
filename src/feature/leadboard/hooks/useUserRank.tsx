@@ -11,6 +11,8 @@ import type { LeaderboardViewType } from "./useLeaderboard";
 
 interface UseUserRankReturn {
   userRank: number | null;
+  /** The score the rank was counted from: points, or rig level for gear. */
+  score: number | null;
   isLoading: boolean;
 }
 
@@ -75,5 +77,9 @@ export const useUserRank = (
     staleTime: 5 * 60 * 1000,
   });
 
-  return { userRank: userRank ?? null, isLoading };
+  return {
+    userRank: userRank ?? null,
+    score: canQueryRank ? scoreToQuery : null,
+    isLoading,
+  };
 };

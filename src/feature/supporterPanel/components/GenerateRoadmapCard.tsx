@@ -3,9 +3,14 @@ import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import type { RoadmapVisibility } from "feature/aiCoach/types/roadmap.types";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { GenerationStepper } from "feature/supporterPanel/components/GenerationStepper";
+import { BriefWizard } from "feature/supporterPanel/components/roadmapBrief/BriefWizard";
+import { PreflightChecking } from "feature/supporterPanel/components/roadmapBrief/PreflightChecking";
 import { useGenerateRoadmap } from "feature/supporterPanel/hooks/useGenerateRoadmap";
+import { preflightRoadmap } from "feature/supporterPanel/services/roadmapJob.service";
 import type { RoadmapGoalContext } from "feature/supporterPanel/types/roadmapJob.types";
 import type { SupporterWallet } from "feature/supporterPanel/types/supporterPanel.types";
+import { AnimatePresence, motion } from "framer-motion";
+import type { RoadmapBrief } from "lib/roadmaps/generation/brief";
 import {
   goalHint,
   MAX_CONTEXT_FIELD_LENGTH,
@@ -16,9 +21,11 @@ import {
   ROADMAP_LEVELS,
   type RoadmapLevel,
 } from "lib/roadmaps/generation/levels";
+import type { PreflightResult } from "lib/roadmaps/generation/preflight";
 import { roadmapGenerationCost } from "lib/roadmaps/visibility";
 import {
   AlertTriangle,
+  ArrowRight,
   ChevronDown,
   Globe,
   Lightbulb,
@@ -26,8 +33,15 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import posthog from "posthog-js";
 import type { ReactNode } from "react";
 import { useDeferredValue, useState } from "react";
+
+/**
+ * Where the composer is before anything is paid: writing the goal, the few
+ * seconds the preflight takes, or the questions it picked.
+ */
+type ComposerPhase = "goal" | "checking" | "brief";
 
 const MAX_GOAL_LENGTH = 500;
 const MIN_GOAL_LENGTH = 5;
@@ -172,6 +186,14 @@ const TokenAmount = ({ value }: { value: number }) => (
   </span>
 );
 
+/** The same amount inside a sentence. */
+const TokenAmountInline = ({ value }: { value: number }) => (
+  <span className='inline-flex items-center gap-1 align-middle font-bold tabular-nums text-zinc-200'>
+    <SupportToken size={13} />
+    {value}
+  </span>
+);
+
 /**
  * Lets a supporter generate their own AI roadmap — the same pipeline the admin
  * queue runs (a drafted skeleton, a review pass, house-style descriptions per
@@ -206,11 +228,18 @@ export const GenerateRoadmapCard = ({
   // Folded to one bar until asked for: the form is a long way to scroll past
   // for everyone who came to browse the roadmaps below it.
   const [expanded, setExpanded] = useState(false);
+  const [phase, setPhase] = useState<ComposerPhase>("goal");
+  const [preflight, setPreflight] = useState<PreflightResult | null>(null);
+  // What the preflight said no to — a goal that is not about guitar, or a
+  // check that could not run. Shown by the goal, where it can be fixed.
+  const [goalNotice, setGoalNotice] = useState<string | null>(null);
   const { status, stage, progress, error, start, reset } = useGenerateRoadmap({
     onDone: (roadmapId) => {
       setTitle("");
       setGoal("");
       setExpanded(false);
+      setPhase("goal");
+      setPreflight(null);
       reset();
       onGenerated(roadmapId);
     },
@@ -230,9 +259,69 @@ export const GenerateRoadmapCard = ({
     (option) => option.value === visibility,
   );
 
-  const handleGenerate = async () => {
+  /**
+   * The free look before paying. A goal that is not about guitar stops here;
+   * a check that fails lets the player generate anyway — the questions are an
+   * improvement, not a gate.
+   */
+  const handleContinue = async () => {
+    if (!goalReady) return;
+    setGoalNotice(null);
+    setPhase("checking");
+    try {
+      const result = await preflightRoadmap({
+        title: title.trim(),
+        goal: goal.trim(),
+        level,
+        context,
+      });
+      posthog.capture("roadmap_preflight", {
+        verdict: result.verdict,
+        asked: result.questions.asked.map((question) => question.id),
+        custom: result.questions.custom.length,
+        songsFound: result.songsFound.length,
+        songsMissing: result.songsMissing.length,
+      });
+      if (result.verdict === "not_guitar") {
+        setGoalNotice(
+          result.reason ||
+            "This roadmap is about playing guitar — describe what you want to play.",
+        );
+        setPhase("goal");
+        return;
+      }
+      setPreflight(result);
+      setPhase("brief");
+    } catch (caught) {
+      posthog.capture("roadmap_preflight_failed", {
+        message: caught instanceof Error ? caught.message : "unknown",
+      });
+      setPreflight({
+        verdict: "ok",
+        reason: "",
+        understood: "",
+        questions: { asked: [], custom: [] },
+        songsFound: [],
+        songsMissing: [],
+      });
+      setPhase("brief");
+    }
+  };
+
+  const handleGenerate = async (brief: RoadmapBrief | null) => {
     if (!goalReady || !canAfford) return;
-    await start(title.trim(), goal.trim(), level, visibility, context);
+    posthog.capture("roadmap_brief_submitted", {
+      answered: brief?.answers.map((answer) => answer.id) ?? [],
+      songs: brief?.songs.length ?? 0,
+      otherSongs: Boolean(brief?.otherSongs),
+      notes: Boolean(brief?.notes),
+    });
+    await start(title.trim(), goal.trim(), level, visibility, context, brief);
+  };
+
+  const backToGoal = () => {
+    setPhase("goal");
+    setPreflight(null);
   };
 
   // A job in flight, or one that failed, always shows — folding it away would
@@ -282,7 +371,9 @@ export const GenerateRoadmapCard = ({
           <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
             {running
               ? "It takes a few minutes and runs on our side — you can leave this page or close the tab, and you will get a notification when it is ready. Stay here and it opens on its own."
-              : "Describe what you want to be able to play. The coach lays out the phases, exercises, lessons and songs to get you there."}
+              : phase === "brief"
+                ? "A few questions the coach wants answered before writing — each one changes the shape of the plan, and each one can be skipped."
+                : "Describe what you want to be able to play. The coach lays out the phases, exercises, lessons and songs to get you there."}
           </p>
         </div>
 
@@ -299,7 +390,10 @@ export const GenerateRoadmapCard = ({
           {status === "idle" && (
             <button
               type='button'
-              onClick={() => setExpanded(false)}
+              onClick={() => {
+                setExpanded(false);
+                backToGoal();
+              }}
               aria-label='Close the roadmap builder'
               title='Close'
               className='flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
@@ -309,8 +403,45 @@ export const GenerateRoadmapCard = ({
         </div>
       </div>
 
-      {status === "idle" && (
+      {status === "idle" && phase === "checking" && (
+        <div className='mt-4'>
+          <PreflightChecking />
+        </div>
+      )}
+
+      {status === "idle" && phase === "brief" && preflight && (
+        <div className='mt-8'>
+          <BriefWizard
+            preflight={preflight}
+            cost={cost}
+            tokensLeft={tokensLeft}
+            canAfford={canAfford}
+            onBack={backToGoal}
+            onGenerate={(brief) => void handleGenerate(brief)}
+          />
+        </div>
+      )}
+
+      {status === "idle" && phase === "goal" && (
         <div className='mt-8 space-y-8'>
+          <AnimatePresence>
+            {goalNotice && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                className='flex items-start gap-3 rounded-lg bg-red-950/20 px-4 py-3'>
+                <AlertTriangle
+                  size={16}
+                  className='mt-0.5 shrink-0 text-red-400'
+                />
+                <p className='text-sm leading-relaxed text-red-200'>
+                  {goalNotice}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <Field label='Title'>
             <input
               type='text'
@@ -428,20 +559,20 @@ export const GenerateRoadmapCard = ({
                   </a>
                 </>
               ) : (
-                "Takes a few minutes. You can leave while it writes — we will notify you."
+                <>
+                  Next, the coach checks the goal and asks a few questions —
+                  free. Generating costs <TokenAmountInline value={cost} />.
+                </>
               )}
             </p>
 
             <button
               type='button'
-              onClick={() => void handleGenerate()}
-              disabled={!goalReady || !canAfford}
-              className='flex min-h-11 shrink-0 items-center justify-center gap-2.5 rounded-lg bg-amber-400 px-5 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-amber-300'>
-              <Sparkles size={16} />
-              Generate roadmap
-              <span className='rounded-md bg-zinc-950/10 px-1.5 py-0.5'>
-                <TokenAmount value={cost} />
-              </span>
+              onClick={() => void handleContinue()}
+              disabled={!goalReady}
+              className='flex min-h-11 shrink-0 items-center justify-center gap-2.5 rounded-lg bg-zinc-100 px-5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-white'>
+              Continue
+              <ArrowRight size={16} />
             </button>
           </div>
         </div>

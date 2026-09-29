@@ -57,7 +57,7 @@ export const WidgetFrame = ({
 
   if (!isEditing) {
     // `empty:hidden` — a card that decided to render nothing (checklist
-    // claimed, no support challenge this week) must not leave a blank cell.
+    // claimed, no level reward waiting) must not leave a blank cell.
     return (
       <div ref={setNodeRef} className={cn(colSpan, "empty:hidden")}>
         {children}

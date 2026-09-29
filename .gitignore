@@ -43,3 +43,6 @@ next-env.d.ts
 .env.sentry-build-plugin
 nul
 .env.local
+
+# roadmap preflight probe output
+scripts/roadmapPreflightProbe.report.txt

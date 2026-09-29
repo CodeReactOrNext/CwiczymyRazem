@@ -1,7 +1,5 @@
 import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { CommunityGoalCard } from "feature/communityGoal/components/CommunityGoalCard";
-import { GoalBallot } from "feature/communityGoal/components/GoalBallot";
 import { GearBoardTab } from "feature/gearProposals/components/GearBoardTab";
 import { GuildFoundingPanel } from "feature/guilds/components/GuildFoundingPanel";
 import { SupporterCaseTab } from "feature/supporterCase/components/SupporterCaseTab";
@@ -24,7 +22,6 @@ import {
   Map,
   Package,
   Shield,
-  Target,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -36,7 +33,6 @@ type SupporterTab =
   | "case"
   | "guild"
   | "work"
-  | "goal"
   | "wall"
   | "info"
   | "players";
@@ -47,7 +43,6 @@ const TABS: { id: SupporterTab; label: string; icon: typeof Map }[] = [
   { id: "case", label: "Supporter Case", icon: Package },
   { id: "guild", label: "Found a Guild", icon: Shield },
   { id: "work", label: "In the works", icon: Hammer },
-  { id: "goal", label: "Support Challenge", icon: Target },
   { id: "wall", label: "Supporters", icon: Heart },
   { id: "players", label: "Player Roadmaps", icon: Compass },
   { id: "info", label: "Info", icon: Info },
@@ -63,8 +58,8 @@ const isSupporterTab = (value: unknown): value is SupporterTab =>
  * The page wears the same full-bleed banner as Milestones and Arsenal, and the
  * wallet rides in it rather than in a card of its own. Every tab here spends
  * the same wallet, and the tabs that used to draw their own copy of it left
- * the case, the work board and the goal ballot asking for tokens without ever
- * saying how many were left.
+ * the case and the work board asking for tokens without ever saying how many
+ * were left.
  */
 export const SupporterPanelView = () => {
   const router = useRouter();
@@ -159,27 +154,6 @@ export const SupporterPanelView = () => {
             )}
 
             {tab === "work" && <WorkBoardTab enabled={isSupporter} />}
-
-            {tab === "goal" && (
-              <div className='space-y-8'>
-                <CommunityGoalCard />
-
-                <div className='space-y-4'>
-                  <div className='flex flex-col gap-1'>
-                    <h2 className='text-sm font-bold text-zinc-200'>
-                      Next week is yours to pick
-                    </h2>
-                    <p className='text-sm text-zinc-400'>
-                      Whatever carries the most votes on Monday is what the
-                      whole app plays for. The one running now sits this ballot
-                      out.
-                    </p>
-                  </div>
-
-                  <GoalBallot tokensLeft={board?.wallet.left ?? 0} />
-                </div>
-              </div>
-            )}
 
             {tab === "wall" && <SupporterWall />}
 

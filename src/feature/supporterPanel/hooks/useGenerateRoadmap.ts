@@ -14,6 +14,7 @@ import {
   type StructureStep,
 } from "feature/supporterPanel/types/roadmapJob.types";
 import type { RoadmapBoard } from "feature/supporterPanel/types/supporterPanel.types";
+import type { RoadmapBrief } from "lib/roadmaps/generation/brief";
 import type { RoadmapLevel } from "lib/roadmaps/generation/levels";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -303,6 +304,7 @@ export const useGenerateRoadmap = ({
       level: RoadmapLevel,
       visibility: RoadmapVisibility = "public",
       context: RoadmapGoalContext | null = null,
+      brief: RoadmapBrief | null = null,
     ): Promise<boolean> => {
       setState({
         ...IDLE_STATE,
@@ -319,6 +321,7 @@ export const useGenerateRoadmap = ({
           level,
           visibility,
           context,
+          brief,
         });
         // The charge already happened server-side; the wallet in the banner
         // should say so without waiting for the board to refetch.

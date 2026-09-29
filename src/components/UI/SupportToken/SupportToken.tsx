@@ -11,7 +11,7 @@ interface SupportTokenProps {
  * The support token, at the size of the text it stands next to.
  *
  * Tokens are the supporter allowance — the roadmap, the gear board, the case
- * slate, the goal ballot and founding a guild all charge in them — and every
+ * slate and founding a guild all charge in them — and every
  * one of those screens used to draw a generic coin glyph. One asset in one
  * component means a price on the gear board is read as the same currency the
  * wallet in the header counts, and re-drawing the token is a file to replace

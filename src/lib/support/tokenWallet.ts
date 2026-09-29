@@ -17,7 +17,7 @@ import { firestore } from "utils/firebase/api/firebase.config";
 
 /**
  * Reading and spending the one currency, shared by the roadmap board, the gear
- * board, the case slate, the goal ballot and the guilds.
+ * board, the case slate and the guilds.
  *
  * Every spend happens inside the caller's transaction against the *stored*
  * user document, never against numbers the client sent — a token is bought with
