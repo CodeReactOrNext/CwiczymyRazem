@@ -1,4 +1,5 @@
 import Soundfont from "soundfont-player";
+import { createAudioContext, wakeAudioContext } from "utils/audio/audioContext";
 import { midiToFrequency } from "utils/audio/noteUtils";
 
 import { playSoundfontNote } from "./soundfontVoice";
@@ -10,16 +11,8 @@ import { playSoundfontNote } from "./soundfontVoice";
 let _previewCtx: AudioContext | null = null;
 
 function getPreviewCtx(): AudioContext | null {
-  try {
-    const AudioContextClass =
-      window.AudioContext ??
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextClass) return null;
-    if (!_previewCtx || _previewCtx.state === "closed") _previewCtx = new AudioContextClass();
-    return _previewCtx;
-  } catch {
-    return null;
-  }
+  if (!_previewCtx || _previewCtx.state === "closed") _previewCtx = createAudioContext();
+  return _previewCtx;
 }
 
 // ── Output bus: dry + a small room ────────────────────────────────────────────
@@ -263,7 +256,7 @@ export function playGuitarNotePreview(midi: number, duration = 1.6, volume = 0.9
 
   const ctx = getPreviewCtx();
   if (!ctx) return;
-  if (ctx.state === "suspended") void ctx.resume().catch(() => {});
+  wakeAudioContext(ctx);
 
   const bus = getPreviewBus(ctx);
 
@@ -314,7 +307,7 @@ const SEQUENCE_LEAD_SECONDS = 0.06;
 export function playGuitarSequence(events: PreviewEvent[], volume = 0.9): () => void {
   const ctx = getPreviewCtx();
   if (!ctx) return () => {};
-  if (ctx.state === "suspended") void ctx.resume().catch(() => {});
+  wakeAudioContext(ctx);
 
   const bus = getPreviewBus(ctx);
 

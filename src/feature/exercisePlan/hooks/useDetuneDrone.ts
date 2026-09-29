@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createAudioContext, wakeAudioContext } from "utils/audio/audioContext";
 import { midiToFrequency } from "utils/audio/noteUtils";
 
 import { centsToRatio } from "../logic/earQuiz/questions";
@@ -87,19 +88,14 @@ export function useDetuneDrone(referenceMidi: number, offsetCents: number) {
 
   const start = useCallback(() => {
     try {
-      const AudioContextClass =
-        window.AudioContext ??
-        (window as unknown as { webkitAudioContext?: typeof AudioContext })
-          .webkitAudioContext;
-      if (!AudioContextClass) return;
-
       if (!ctxRef.current || ctxRef.current.state === "closed") {
-        ctxRef.current = new AudioContextClass();
+        ctxRef.current = createAudioContext();
         referenceVoiceRef.current = null;
         tunedVoiceRef.current = null;
       }
       const ctx = ctxRef.current;
-      if (ctx.state === "suspended") void ctx.resume().catch(() => {});
+      if (!ctx) return;
+      wakeAudioContext(ctx);
 
       const referenceFrequency = midiToFrequency(referenceMidi);
       if (!referenceVoiceRef.current)
