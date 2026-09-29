@@ -10,7 +10,7 @@ describe("panelHeightClass", () => {
   it("bounds every tab to the screen on phones", () => {
     for (const tab of ["logs", "chat", "guild", "changelog"] as const) {
       expect(panelHeightClass({ tab, hasOwnHeight: false })).toContain(
-        "h-[70dvh]",
+        "h-[85dvh]",
       );
     }
   });

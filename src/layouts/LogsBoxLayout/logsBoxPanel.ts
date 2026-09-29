@@ -11,7 +11,7 @@ import type { CommunityTab } from "feature/logsBox/hooks/useCommunityDrawer";
  */
 
 /** A box the height of the phone's screen, with the bottom nav still in view under it. */
-const MOBILE_PANEL_HEIGHT = "h-[70dvh]";
+const MOBILE_PANEL_HEIGHT = "h-[85dvh]";
 
 /** The box the tall tabs have always had on wider screens. */
 const DESKTOP_PANEL_HEIGHT = "sm:h-[650px] lg:h-[800px]";
