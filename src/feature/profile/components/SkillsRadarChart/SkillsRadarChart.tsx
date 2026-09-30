@@ -110,7 +110,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
                       );
                       const hours = Math.floor(minutes / 60);
                       const mins = minutes % 60;
-                      return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                      return hours > 0 ? `${hours}h ${mins} min` : `${mins} min`;
                     })()}
                   </div>
                 </div>
@@ -155,7 +155,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
                 const totalMinutes = Math.round(totalTime / 60000);
                 const hours = Math.floor(totalMinutes / 60);
                 const mins = totalMinutes % 60;
-                return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                return hours > 0 ? `${hours}h ${mins} min` : `${mins} min`;
               })()}
             </div>
           </div>

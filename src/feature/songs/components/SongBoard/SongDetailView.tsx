@@ -405,7 +405,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                         <Clock size={12} className="text-zinc-500" />
                         <span className="text-xs font-medium tracking-wider text-zinc-400">Play time</span>
                      </div>
-                     <span className="text-sm font-bold text-zinc-200">{totalHours}h {totalMinutes}m</span>
+                     <span className="text-sm font-bold text-zinc-200">{totalHours}h {totalMinutes} min</span>
                   </div>
                </div>
             </div>

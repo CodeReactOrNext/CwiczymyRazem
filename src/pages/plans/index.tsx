@@ -10,6 +10,7 @@ import AppLayout from "layouts/AppLayout";
 import { CheckCircle,Clock, Settings, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
+import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 
@@ -17,6 +18,10 @@ const MyPlansPage: NextPageWithLayout = () => {
   const router = useRouter();
   const userInfo = useAppSelector(selectUserInfo);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
+
+  // With no plans yet the empty state carries the one "create" action; the
+  // header button only comes back once there's a list to add to.
+  const [planCount, setPlanCount] = useState<number | null>(null);
 
   const handlePlanSelect = (plan: ExercisePlan) => {
     router.push(`/timer/plans?planId=${plan.id}`);
@@ -76,7 +81,7 @@ const MyPlansPage: NextPageWithLayout = () => {
           eyebrow="Practice Plans"
           backgroundContent={<HeroPattern />}
           className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
-          buttonText="Create Plan"
+          buttonText={planCount ? "Create Plan" : undefined}
           onClick={() => router.push('/plans/create')}
         />
         <div className="mb-6 px-4 md:px-6">
@@ -86,7 +91,7 @@ const MyPlansPage: NextPageWithLayout = () => {
             ariaLabel="Library sections"
           />
         </div>
-        <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["routines", "playalongs"]} hideLayout hideSectionHeader />
+        <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["routines", "playalongs"]} hideLayout hideSectionHeader onPlansLoaded={setPlanCount} />
       </div>
     </PremiumGate>
   );

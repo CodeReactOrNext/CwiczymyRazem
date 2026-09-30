@@ -245,7 +245,7 @@ const EditReportForm = ({
                 totalMs === 0 ? "text-zinc-500" : "text-cyan-300"
               )}
             >
-              {convertMsToHM(totalMs)}h
+              {convertMsToHM(totalMs)}
             </span>
           </div>
           {totalMs === 0 && (

@@ -3,6 +3,7 @@ import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 import Backdrop from "components/UI/Backdrop";
 import { isAutoPlanId, isRecognizedPracticePlanId } from "feature/exercisePlan/utils/isRecognizedPracticePlan";
 import { ensureSongIsLearning } from "feature/songs/services/udateSongStatus";
@@ -37,9 +38,6 @@ import { ArrowDown, Check, Flame, Music, Tags } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useState } from "react";
-import { FaBrain, FaMusic } from "react-icons/fa";
-import { IoMdHand } from "react-icons/io";
-import { MdSchool } from "react-icons/md";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
@@ -168,7 +166,7 @@ const ReportView = () => {
       questionMarkProps: {
         description: i18n?.t("report:description.technique"),
       },
-      Icon: IoMdHand,
+      Icon: SKILL_CATEGORY_ICONS.technique,
       hoursName: "techniqueHours",
       minutesName: "techniqueMinutes",
       skillId: "technique",
@@ -178,7 +176,7 @@ const ReportView = () => {
       questionMarkProps: {
         description: i18n?.t("report:description.theory"),
       },
-      Icon: MdSchool,
+      Icon: SKILL_CATEGORY_ICONS.theory,
       hoursName: "theoryHours",
       minutesName: "theoryMinutes",
       skillId: "theory",
@@ -188,7 +186,7 @@ const ReportView = () => {
       questionMarkProps: {
         description: i18n?.t("report:description.hearing"),
       },
-      Icon: FaMusic,
+      Icon: SKILL_CATEGORY_ICONS.hearing,
       hoursName: "hearingHours",
       minutesName: "hearingMinutes",
       skillId: "hearing",
@@ -198,7 +196,7 @@ const ReportView = () => {
       questionMarkProps: {
         description: i18n?.t("report:description.creative"),
       },
-      Icon: FaBrain,
+      Icon: SKILL_CATEGORY_ICONS.creativity,
       hoursName: "creativityHours",
       minutesName: "creativityMinutes",
       skillId: "creativity",
@@ -736,16 +734,17 @@ const ReportView = () => {
                             </span>
                           </div>
 
-                          {isStep1Done && (
-                            <Button
-                              type='submit'
-                              loading={isFetching}
-                              className="bg-emerald-600 text-white hover:bg-emerald-500"
-                            >
-                              <Check className="mr-2 h-4 w-4" />
-                              Save Now
-                            </Button>
-                          )}
+                          {/* Always on screen, disabled until there's time to
+                              save — a missing button said nothing about why. */}
+                          <Button
+                            type='submit'
+                            loading={isFetching}
+                            disabled={!isStep1Done}
+                            className="bg-emerald-600 text-white hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-400 disabled:opacity-100"
+                          >
+                            <Check className="mr-2 h-4 w-4" />
+                            Save Now
+                          </Button>
                         </div>
 
                         {isStep1Done && (
@@ -761,7 +760,7 @@ const ReportView = () => {
                              <ArrowDown className="h-5 w-5 animate-bounce text-emerald-500" />
                           </div>
                         ) : (
-                          <p className="mt-2 pr-4 text-[10px] font-semibold italic tracking-wide text-zinc-500">Complete Step 1 to continue</p>
+                          <p className="mt-1 text-sm text-zinc-300">Add time to at least one category to save</p>
                         )}
                       </div>
                     </div>

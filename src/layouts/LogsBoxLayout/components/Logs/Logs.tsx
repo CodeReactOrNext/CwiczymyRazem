@@ -122,7 +122,7 @@ import { IoCalendarOutline } from "react-icons/io5";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import { addZeroToTime } from "utils/converter";
 
-/** Compact practice duration shown next to the points in a feed row — "1h 20m", "45m",
+/** Compact practice duration shown next to the points in a feed row — "1h 20 min", "45 min",
  * or seconds for sub-minute sessions (so a short drill never reads as "0m"). */
 const formatSessionTime = (ms: number): string => {
   const totalMinutes = Math.floor(ms / 60000);
@@ -131,7 +131,7 @@ const formatSessionTime = (ms: number): string => {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
-  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  return hours > 0 ? `${hours}h ${minutes} min` : `${minutes} min`;
 };
 
 const getLogTimestampMs = (log: AnyFirebaseLog): number =>

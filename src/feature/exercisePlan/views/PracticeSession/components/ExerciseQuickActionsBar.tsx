@@ -25,6 +25,7 @@ import {
   tempoSliderRange,
 } from "../../../components/Metronome/utils/tempoColor";
 import type { Exercise } from "../../../types/exercise.types";
+import { SessionTooltip } from "./SessionTooltip";
 import { SpeedDropdown } from "./SpeedDropdown";
 
 interface ExerciseQuickActionsBarProps {
@@ -97,18 +98,26 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           // the slider shrinks to nothing.
           !compact && (showSpeed ? "max-w-2xl" : "max-w-md"),
         )}>
-        {!compact && <GiMetronome className='h-5 w-5 shrink-0 text-zinc-400' />}
+        {!compact && (
+          <SessionTooltip label='Metronome tempo — reset to recommended' keys={["Enter"]}>
+            <span className='shrink-0'>
+              <GiMetronome className='h-5 w-5 text-zinc-400' />
+            </span>
+          </SessionTooltip>
+        )}
 
-        <RippleButton
-          className={stepBtn}
-          onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
-          disabled={bpm <= minBpm}
-          title='Slower'>
-          <Minus
-            className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
-            strokeWidth={2.5}
-          />
-        </RippleButton>
+        <SessionTooltip label='Slower (Shift: −5 BPM)' keys={["↓"]}>
+          <RippleButton
+            className={stepBtn}
+            onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
+            disabled={bpm <= minBpm}
+            aria-label='Slower'>
+            <Minus
+              className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
+              strokeWidth={2.5}
+            />
+          </RippleButton>
+        </SessionTooltip>
 
         {isEditing ? (
           <input
@@ -129,16 +138,18 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
             )}
           />
         ) : (
-          <button
-            onClick={startEdit}
-            title='Click to edit BPM'
-            className={cn(
-              "font-mono shrink-0 font-black tabular-nums tracking-tight transition-transform active:scale-95",
-              compact ? "text-lg" : "text-2xl",
-              tempoColor(bpm),
-            )}>
-            {bpm}
-          </button>
+          <SessionTooltip label='Tempo in BPM — click to type a value'>
+            <button
+              onClick={startEdit}
+              aria-label='Edit BPM'
+              className={cn(
+                "font-mono shrink-0 font-black tabular-nums tracking-tight transition-transform active:scale-95",
+                compact ? "text-lg" : "text-2xl",
+                tempoColor(bpm),
+              )}>
+              {bpm}
+            </button>
+          </SessionTooltip>
         )}
 
         {!compact && (
@@ -152,34 +163,38 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           />
         )}
 
-        <RippleButton
-          className={stepBtn}
-          onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
-          disabled={bpm >= maxBpm}
-          title='Faster'>
-          <Plus
-            className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
-            strokeWidth={2.5}
-          />
-        </RippleButton>
+        <SessionTooltip label='Faster (Shift: +5 BPM)' keys={["↑"]}>
+          <RippleButton
+            className={stepBtn}
+            onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
+            disabled={bpm >= maxBpm}
+            aria-label='Faster'>
+            <Plus
+              className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
+              strokeWidth={2.5}
+            />
+          </RippleButton>
+        </SessionTooltip>
 
         {metronome.setSubdivision && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type='button'
-                title='Subdivision'
-                className={cn(
-                  stepBtn,
-                  metronome.subdivision !== 1 &&
-                    "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25",
-                )}>
-                <SubdivisionIcon
-                  value={metronome.subdivision}
-                  className={compact ? "h-4 w-4" : "h-5 w-5"}
-                />
-              </button>
-            </DropdownMenuTrigger>
+            <SessionTooltip label='Click subdivision: quarters, eighths, triplets…'>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type='button'
+                  aria-label='Subdivision'
+                  className={cn(
+                    stepBtn,
+                    metronome.subdivision !== 1 &&
+                      "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25",
+                  )}>
+                  <SubdivisionIcon
+                    value={metronome.subdivision}
+                    className={compact ? "h-4 w-4" : "h-5 w-5"}
+                  />
+                </button>
+              </DropdownMenuTrigger>
+            </SessionTooltip>
             <DropdownMenuContent
               align='end'
               // Practice session is a full-screen layer at z-[999999] (desktop) / z-[9999999]
@@ -212,22 +227,25 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
 
         {metronome.accentPattern && metronome.setBeatsPerBar && metronome.cycleBeatAccent && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type='button'
-                title={
-                  accentLocked
-                    ? `Accents are set by this exercise${gridLabel ? ` (${gridLabel})` : ""}`
-                    : "Beats per bar & accents"
-                }
-                className={cn(
-                  stepBtn,
-                  "font-mono text-xs font-bold",
-                  accentLocked && "text-amber-400",
-                )}>
-                {metronome.accentPattern.length}
-              </button>
-            </DropdownMenuTrigger>
+            <SessionTooltip
+              label={
+                accentLocked
+                  ? `Accents are set by this exercise${gridLabel ? ` (${gridLabel})` : ""}`
+                  : "Beats per bar & accents"
+              }>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type='button'
+                  aria-label='Beats per bar'
+                  className={cn(
+                    stepBtn,
+                    "font-mono text-xs font-bold",
+                    accentLocked && "text-amber-400",
+                  )}>
+                  {metronome.accentPattern.length}
+                </button>
+              </DropdownMenuTrigger>
+            </SessionTooltip>
             <DropdownMenuContent
               align='end'
               // Practice session is a full-screen layer at z-[999999] (desktop) / z-[9999999]

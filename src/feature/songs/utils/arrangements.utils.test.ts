@@ -123,8 +123,8 @@ describe("getSectionsMasteryPct", () => {
 
 describe("formatPlayTime", () => {
   it("formats minutes and hours", () => {
-    expect(formatPlayTime(30_000)).toBe("<1m");
-    expect(formatPlayTime(4 * 60_000)).toBe("4m");
-    expect(formatPlayTime(80 * 60_000)).toBe("1h 20m");
+    expect(formatPlayTime(30_000)).toBe("<1 min");
+    expect(formatPlayTime(4 * 60_000)).toBe("4 min");
+    expect(formatPlayTime(80 * 60_000)).toBe("1h 20 min");
   });
 });

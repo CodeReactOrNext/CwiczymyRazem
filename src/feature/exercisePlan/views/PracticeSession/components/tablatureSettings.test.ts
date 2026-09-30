@@ -60,3 +60,22 @@ describe("metronomeSound", () => {
     });
   });
 });
+
+describe("noteStyle", () => {
+  it("defaults to head + tail", () => {
+    expect(DEFAULT_SETTINGS.noteStyle).toBe("headTail");
+  });
+
+  it("heals a missing or unknown stored style and keeps a valid one", () => {
+    const migrate = migrateTablatureSettings;
+    expect(
+      migrate({ ...DEFAULT_SETTINGS, noteStyle: undefined }),
+    ).toMatchObject({ noteStyle: "headTail" });
+    expect(
+      migrate({ ...DEFAULT_SETTINGS, noteStyle: "blob" }),
+    ).toMatchObject({ noteStyle: "headTail" });
+    expect(
+      migrate({ ...DEFAULT_SETTINGS, noteStyle: "bar" }),
+    ).toMatchObject({ noteStyle: "bar" });
+  });
+});

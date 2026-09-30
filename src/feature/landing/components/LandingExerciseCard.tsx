@@ -5,6 +5,7 @@ import { TabPreviewGlyph } from "feature/landing/components/TabPreviewGlyph";
 import type { TabPreviewNote } from "feature/landing/lib/tabPreview";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { formatMinutesDuration } from "utils/converter";
 
 interface LandingExerciseCardProps {
   exercise: {
@@ -44,7 +45,7 @@ const CATEGORY_LABEL: Record<ExerciseCategory, string> = {
 };
 
 const formatDuration = (minutes: number) =>
-  minutes < 1 ? `${Math.round(minutes * 60)}s` : `${minutes} min`;
+  minutes < 1 ? `${Math.round(minutes * 60)}s` : formatMinutesDuration(minutes);
 
 /**
  * Landing-only exercise preview card. Intentionally separate from

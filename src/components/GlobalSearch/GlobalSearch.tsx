@@ -115,7 +115,7 @@ export const GlobalSearch = () => {
       <button
         type='button'
         onClick={() => setIsOpen(true)}
-        className='hidden w-48 items-center gap-2 rounded-lg bg-zinc-900/60 px-3 py-2 text-left text-sm text-zinc-500 transition-colors hover:bg-zinc-900 hover:text-zinc-300 sm:flex lg:w-64'>
+        className='hidden w-48 items-center gap-2 rounded-lg bg-zinc-900/60 px-3 py-2 text-left text-sm text-zinc-500 transition-colors hover:bg-zinc-900 hover:text-zinc-300 sm:flex lg:w-72 xl:w-96'>
         <Search className='h-4 w-4 shrink-0' />
         <span className='flex-1 truncate'>Search...</span>
         <kbd className='hidden shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 lg:inline-block'>

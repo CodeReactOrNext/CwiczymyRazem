@@ -129,12 +129,12 @@ export const getSectionsMasteryPct = (
   return Math.round((weighted / levels.length) * 100);
 };
 
-/** "1h 20m" / "45m" / "<1m" — play time in the song views. */
+/** "1h 20 min" / "45 min" / "<1 min" — play time in the song views. */
 export const formatPlayTime = (ms: number): string => {
   const totalMinutes = Math.floor(ms / 60000);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  if (minutes > 0) return `${minutes}m`;
-  return "<1m";
+  if (hours > 0) return `${hours}h ${minutes} min`;
+  if (minutes > 0) return `${minutes} min`;
+  return "<1 min";
 };

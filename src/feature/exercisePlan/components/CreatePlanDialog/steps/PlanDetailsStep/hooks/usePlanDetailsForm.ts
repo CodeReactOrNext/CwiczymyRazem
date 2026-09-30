@@ -32,6 +32,8 @@ export const usePlanDetailsForm = ({
   };
 
   const { register, handleSubmit, formState, control, watch, setValue } = useForm<PlanDetailsFormData>({
+    // Validate when a field is left, then live — not only on the final click.
+    mode: "onTouched",
     defaultValues: {
       title: getInitialValue(initialData?.title),
       description: getInitialValue(initialData?.description),

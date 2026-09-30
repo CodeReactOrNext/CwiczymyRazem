@@ -2,7 +2,7 @@ import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
-import { getPerformanceGrade } from "../hooks/noteMatchingFeedback";
+import { getAccuracyDisplay } from "../hooks/noteMatchingFeedback";
 
 /** Mirrors the multiplier curve in useNoteMatching: min(8, floor(combo / 5) + 1). */
 const MAX_MULTIPLIER = 8;
@@ -33,12 +33,13 @@ export const MicHud = ({
   className?: string;
   variant?: "docked" | "full";
 }) => {
-  const { gameState, sessionAccuracy } = useNoteMatchingContext();
+  const { gameState, sessionAccuracy, sessionStats } = useNoteMatchingContext();
   const { score, combo, multiplier } = gameState;
 
   const full = variant === "full";
   const ringPx = full ? 104 : RING_PX;
-  const grade = getPerformanceGrade(sessionAccuracy);
+  const accuracy = getAccuracyDisplay(sessionAccuracy, sessionStats);
+  const accuracyHint = accuracy.kind === "value" ? undefined : accuracy.hint;
   const tier = getMultiplierTier(multiplier);
 
   const comboProgress =
@@ -71,11 +72,13 @@ export const MicHud = ({
             {score.toLocaleString()}
           </motion.span>
           <span
+            title={accuracyHint}
             className={cn(
-              "mt-1.5 text-2xl font-bold tabular-nums leading-none",
-              grade.color,
+              "mt-1.5 font-bold tabular-nums leading-none",
+              accuracy.kind === "silent" ? "text-sm" : "text-2xl",
+              accuracy.color,
             )}>
-            {sessionAccuracy}%
+            {accuracy.text}
           </span>
         </div>
       ) : (
@@ -99,8 +102,14 @@ export const MicHud = ({
             <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
               Accuracy
             </span>
-            <span className={cn("text-xl font-bold tabular-nums", grade.color)}>
-              {sessionAccuracy}%
+            <span
+              title={accuracyHint}
+              className={cn(
+                "font-bold tabular-nums",
+                accuracy.kind === "silent" ? "text-sm leading-7" : "text-xl",
+                accuracy.color,
+              )}>
+              {accuracy.text}
             </span>
           </div>
         </>

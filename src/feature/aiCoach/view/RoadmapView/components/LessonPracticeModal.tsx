@@ -7,6 +7,7 @@ import {
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
@@ -15,9 +16,7 @@ import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportV
 import useTimer from "hooks/useTimer";
 import { Check, Loader2, Pause, Play, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FaBrain, FaMusic } from "react-icons/fa";
-import { IoMdHand } from "react-icons/io";
-import { MdSchool } from "react-icons/md";
+import type { IconType } from "react-icons/lib";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { DailyQuestTaskType } from "types/api.types";
@@ -27,12 +26,12 @@ import { getClientReportContext } from "utils/gameLogic";
 const SKILL_OPTIONS: {
   id: SkillsType;
   label: string;
-  Icon: typeof MdSchool;
+  Icon: IconType;
 }[] = [
-  { id: "technique", label: "Technique", Icon: IoMdHand },
-  { id: "theory", label: "Theory", Icon: MdSchool },
-  { id: "hearing", label: "Hearing", Icon: FaMusic },
-  { id: "creativity", label: "Creativity", Icon: FaBrain },
+  { id: "technique", label: "Technique", Icon: SKILL_CATEGORY_ICONS.technique },
+  { id: "theory", label: "Theory", Icon: SKILL_CATEGORY_ICONS.theory },
+  { id: "hearing", label: "Hearing", Icon: SKILL_CATEGORY_ICONS.hearing },
+  { id: "creativity", label: "Creativity", Icon: SKILL_CATEGORY_ICONS.creativity },
 ];
 
 const SKILL_TIME_QUEST: Record<SkillsType, DailyQuestTaskType> = {

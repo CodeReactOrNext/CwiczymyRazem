@@ -226,7 +226,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
                         <div className="flex items-baseline gap-2">
                            <span className={`font-bold text-xl tracking-tight ${isNegative ? "text-rose-500" : "text-emerald-400"}`}>
                             {Number(hm.hours) > 0 && `${Number(hm.hours)}h `}
-                            {Number(hm.minutes)}m
+                            {Number(hm.minutes)} min
                           </span>
                         </div>
                       </div>

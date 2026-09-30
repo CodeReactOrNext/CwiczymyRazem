@@ -3,31 +3,11 @@ import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import type { ChatMessageType } from "feature/chat/types/chat.types";
 import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
-import { Shield, UserPlus } from "lucide-react";
+import { Hand, Shield } from "lucide-react";
 import type { ReactNode } from "react";
 
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60";
-
-const SayHiButton = ({ onClick }: { onClick: () => void }) => (
-  <button
-    type='button'
-    onClick={onClick}
-    className={cn(
-      "shrink-0 rounded-lg bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 active:click-behavior",
-      FOCUS_RING,
-    )}>
-    Say hi 👋
-  </button>
-);
-
-const Name = ({ message }: { message: ChatMessageType }) => (
-  <UserTooltip userId={message.userId}>
-    <span className='cursor-pointer font-semibold text-zinc-100'>
-      {message.username}
-    </span>
-  </UserTooltip>
-);
 
 /** A quiet line in the middle of the room: an icon, what happened, sometimes a button. */
 const EventLine = ({
@@ -50,18 +30,122 @@ const EventLine = ({
   </div>
 );
 
+/** How many greeters are named before the rest become "and 3 others". */
+const NAMED_GREETERS = 2;
+
+/** Their faces, then "Ania and Bob said hi" — names bright enough to read at a glance. */
+const Greeters = ({ greeters }: { greeters: ChatMessageType[] }) => {
+  const named = greeters.slice(0, NAMED_GREETERS);
+  const rest = greeters.length - named.length;
+
+  return (
+    <div className='flex min-w-0 items-center gap-2.5'>
+      <div className='flex shrink-0 -space-x-2'>
+        {greeters.slice(0, 3).map((greeter) => (
+          <UserTooltip key={greeter.userId} userId={greeter.userId}>
+            <div className='cursor-pointer rounded-full ring-2 ring-zinc-900'>
+              <Avatar
+                size='xs'
+                name={greeter.username}
+                avatarURL={greeter.userPhotoURL}
+              />
+            </div>
+          </UserTooltip>
+        ))}
+      </div>
+      <p className='min-w-0 text-sm text-zinc-500'>
+        {named.map((greeter, index) => (
+          <span key={greeter.userId}>
+            {index > 0 && (rest > 0 ? ", " : " and ")}
+            <span className='font-semibold text-zinc-200'>
+              {greeter.username}
+            </span>
+          </span>
+        ))}
+        {rest > 0 && ` and ${rest} other${rest === 1 ? "" : "s"}`} said hi
+      </p>
+    </div>
+  );
+};
+
 /**
- * Rows the room writes itself: a new player's welcome card, and in a guild the
+ * Someone arriving, drawn where a message of theirs would be: their avatar and
+ * name, one line of what brought them, and the greetings beneath.
+ */
+const JoinRow = ({
+  message,
+  text,
+  onSayHi,
+  greeters,
+}: {
+  message: ChatMessageType;
+  text: string;
+  onSayHi?: () => void;
+  greeters: ChatMessageType[];
+}) => (
+  <div className='flex min-w-0 max-w-[90%] gap-3'>
+    <div className='flex w-10 flex-shrink-0 justify-center'>
+      <UserTooltip userId={message.userId}>
+        <div className='mt-0.5 cursor-pointer'>
+          <Avatar
+            size='sm'
+            name={message.username}
+            avatarURL={message.userPhotoURL}
+            lvl={message.lvl}
+          />
+        </div>
+      </UserTooltip>
+    </div>
+    <div className='flex min-w-0 flex-col items-start'>
+      <UserTooltip userId={message.userId}>
+        <span className='mb-1 cursor-pointer px-1 text-xs font-semibold text-zinc-400'>
+          {message.username}
+        </span>
+      </UserTooltip>
+      <p className='rounded-lg rounded-tl bg-white/5 px-3 py-2 text-sm text-zinc-300 sm:px-4'>
+        {text}
+      </p>
+      {(onSayHi || greeters.length > 0) && (
+        <div className='mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2'>
+          {onSayHi && (
+            <button
+              type='button'
+              onClick={onSayHi}
+              className={cn(
+                "flex items-center gap-2 rounded-lg bg-cyan-500/15 px-3.5 py-1.5 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 active:click-behavior",
+                FOCUS_RING,
+              )}>
+              <Hand className='h-4 w-4' />
+              Say hi
+            </button>
+          )}
+          {greeters.length > 0 && <Greeters greeters={greeters} />}
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+/** Rows drawn like someone speaking, on the left, rather than as a line across the room. */
+export const isJoinRow = (message: ChatMessageType) =>
+  message.type === "welcome" ||
+  (message.type === "system" && message.system?.kind === "member_joined");
+
+/**
+ * Rows the room writes itself: a new player arriving, and in a guild the
  * level-ups and new members. They keep a room from looking
  * empty when nobody is typing — and each one is something to answer.
  */
 export const ChatSystemRow = ({
   message,
   onSayHi,
+  greeters = [],
 }: {
   message: ChatMessageType;
-  /** Missing for the viewer's own rows — nobody greets themselves. */
+  /** Missing for the viewer's own rows, and once they have already said hi. */
   onSayHi?: () => void;
+  /** Stock greetings answering this row, named in one line instead of a bubble each. */
+  greeters?: ChatMessageType[];
 }) => {
   if (message.type === "welcome") {
     const phrase = welcomeGoalPhrase(
@@ -70,24 +154,12 @@ export const ChatSystemRow = ({
     );
 
     return (
-      <div className='mx-auto flex w-full max-w-md flex-col items-center gap-3 rounded-lg bg-zinc-900/60 px-5 py-5 text-center'>
-        <UserTooltip userId={message.userId}>
-          <div className='cursor-pointer'>
-            <Avatar
-              size='sm'
-              name={message.username}
-              avatarURL={message.userPhotoURL}
-              lvl={message.lvl}
-            />
-          </div>
-        </UserTooltip>
-        <p className='text-sm leading-relaxed text-zinc-400'>
-          <span aria-hidden>🎸 </span>
-          <Name message={message} /> just joined
-          {phrase ? `, ${phrase}` : " Riff Quest"}
-        </p>
-        {onSayHi && <SayHiButton onClick={onSayHi} />}
-      </div>
+      <JoinRow
+        message={message}
+        text={phrase ? `Joined Riff Quest, ${phrase}` : "Joined Riff Quest"}
+        onSayHi={onSayHi}
+        greeters={greeters}
+      />
     );
   }
 
@@ -110,12 +182,12 @@ export const ChatSystemRow = ({
       );
     case "member_joined":
       return (
-        <EventLine
-          icon={<UserPlus className='h-5 w-5' />}
-          tone='text-emerald-400'
-          action={onSayHi && <SayHiButton onClick={onSayHi} />}>
-          <Name message={message} /> joined the guild
-        </EventLine>
+        <JoinRow
+          message={message}
+          text='Joined the guild'
+          onSayHi={onSayHi}
+          greeters={greeters}
+        />
       );
   }
 };

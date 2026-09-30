@@ -107,14 +107,14 @@ describe("formatTimeLeft", () => {
   });
 
   it("shows hours and minutes within a day", () => {
-    expect(formatTimeLeft(5 * 3_600_000 + 9 * 60_000)).toBe("5h 9m");
+    expect(formatTimeLeft(5 * 3_600_000 + 9 * 60_000)).toBe("5h 9 min");
   });
 
   it("shows minutes alone in the last hour", () => {
-    expect(formatTimeLeft(42 * 60_000)).toBe("42m");
+    expect(formatTimeLeft(42 * 60_000)).toBe("42 min");
   });
 
   it("never counts below zero", () => {
-    expect(formatTimeLeft(-5_000)).toBe("0m");
+    expect(formatTimeLeft(-5_000)).toBe("0 min");
   });
 });

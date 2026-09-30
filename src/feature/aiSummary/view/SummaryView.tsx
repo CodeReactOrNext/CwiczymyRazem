@@ -30,12 +30,12 @@ import { useAppSelector } from "store/hooks";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
-// Compact hours format ("98m" → "1h38m") matching the activity widget.
+// Compact hours format ("98 min" → "1h 38 min") matching the activity widget.
 function fmtMin(m: number) {
-  if (m < 60) return `${m}m`;
+  if (m < 60) return `${m} min`;
   const h = Math.floor(m / 60);
   const rem = m % 60;
-  return rem > 0 ? `${h}h${rem}m` : `${h}h`;
+  return rem > 0 ? `${h}h ${rem} min` : `${h}h`;
 }
 
 

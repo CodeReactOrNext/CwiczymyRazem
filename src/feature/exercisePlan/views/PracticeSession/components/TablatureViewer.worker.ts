@@ -33,18 +33,20 @@ const BLOCK_GAP = 4;    // gap between consecutive block right edges and next be
 const BLOCK_PAD = 4;    // left padding from beat start
 const STAFF_TOP = 62;
 const STEM_TOP_Y = 12;
-const RHY_HEAD_Y = STAFF_TOP - 36;
-const RHY_HEAD_R = 3.5;
+// Noteheads sit low in the lane so the stems get a readable length (~19px).
+const RHY_HEAD_Y = STAFF_TOP - 31;
+const RHY_HEAD_R = 4;
+const RHY_STEM_W = 1.1;
 // Picking-direction markers (⊓ / ⋁) sit in the empty strip between the rhythm
 // lane's noteheads and the top string, exactly where a printed score puts them.
 const PICK_Y = STAFF_TOP - 17;
 const PICK_W = 9;
 const PICK_H = 8;
-const BEAM_H = 3;
-const BEAM_GAP = 4.5;
+const BEAM_H = 2.5;
+const BEAM_GAP = 2.5;
 // Recomputed from `inkColor` whenever a STYLE message lands (see below), so the
 // rhythm lane stays legible on light boards too.
-let RHYTHM_COLOR = "rgba(255,255,255,0.4)";
+let RHYTHM_COLOR = "rgba(255,255,255,0.6)";
 /** Picking markers read as an instruction, so they sit a shade above the rhythm lane. */
 let PICK_COLOR = "rgba(255,255,255,0.65)";
 
@@ -81,6 +83,8 @@ let showChordNames = true;
 let showMeasureLines = true;
 let showTechniqueLabels = true;
 let hitAnimations = true;
+/** Head + thin sustain tail (true) or the classic one-block bar (false). */
+let noteTails = true;
 
 /** "#rrggbb" → "rgba(r,g,b,a)". Used where a hit colour needs a live alpha. */
 function withAlpha(hex: string, a: number): string {
@@ -275,7 +279,7 @@ let showRestWarning = false;
 // runtime can't load fonts inside a worker — `bravuraReady` stays false and every
 // symbol falls back to the drawn shapes below, so the tab never renders blank.
 let bravuraReady = false;
-const RHY_GLYPH_PX = 25; // Bravura rhythm-symbol size, tuned to the ruler height
+const RHY_GLYPH_PX = 30; // Bravura rhythm-symbol size, tuned to the ruler height
 // SMuFL codepoints (Bravura is SMuFL-compliant).
 const GLYPH_NOTEHEAD = { whole: "", half: "", black: "" };
 const GLYPH_FLAG_UP: Record<number, string> = { 1: "", 2: "", 3: "" }; // 8th / 16th / 32nd
@@ -384,10 +388,11 @@ function drawBendBadge(
 }
 
 // ── Rounded rectangle (pill) helper ──────────────────────────────────────────
-function drawPill(x: number, y: number, w: number, h: number, r: number) {
+/** Adds a pill sub-path to the current path without starting a new one, so
+ *  several pills (a note's head + tail) can be filled or clipped as one shape. */
+function pillPath(x: number, y: number, w: number, h: number, r: number) {
   if (!ctx || w <= 0 || h <= 0) return;
   const cr = Math.max(0, Math.min(r, h / 2, w / 2));
-  ctx.beginPath();
   ctx.moveTo(x + cr, y);
   ctx.lineTo(x + w - cr, y);
   ctx.arcTo(x + w, y, x + w, y + cr, cr);
@@ -398,6 +403,12 @@ function drawPill(x: number, y: number, w: number, h: number, r: number) {
   ctx.lineTo(x, y + cr);
   ctx.arcTo(x, y, x + cr, y, cr);
   ctx.closePath();
+}
+
+function drawPill(x: number, y: number, w: number, h: number, r: number) {
+  if (!ctx) return;
+  ctx.beginPath();
+  pillPath(x, y, w, h, r);
 }
 
 // Strings whose notes sit under the cursor or within the look-ahead window —
@@ -798,11 +809,19 @@ function render() {
           ctx.stroke();
         }
       } else {
-        // Stem — shared by half, quarter and shorter notes.
-        ctx.lineWidth = 1.5;
+        // Stem — shared by half, quarter and shorter notes. As in engraved music
+        // it rises from the notehead's right edge, not through its middle (SMuFL
+        // noteheadBlack is 1.18 staff spaces wide, a staff space is ¼ em, and the
+        // stem attaches 0.168 sp above the head's centre).
+        const sp = RHY_GLYPH_PX / 4;
+        const stemX = bravuraReady
+          ? beatL + 0.59 * sp - RHY_STEM_W / 2
+          : beatL + RHY_HEAD_R - RHY_STEM_W / 2;
+        ctx.lineWidth = RHY_STEM_W;
+        ctx.lineCap = "butt";
         ctx.beginPath();
-        ctx.moveTo(beatL, RHY_HEAD_Y - RHY_HEAD_R);
-        ctx.lineTo(beatL, STEM_TOP_Y);
+        ctx.moveTo(stemX, RHY_HEAD_Y - (bravuraReady ? 0.168 * sp : 0));
+        ctx.lineTo(stemX, STEM_TOP_Y);
         ctx.stroke();
 
         if (dur >= 2.0) {
@@ -819,7 +838,7 @@ function render() {
           const isBeamed = beat.beamRight || beat.beamRight2 || beat.prevBeamRight || beat.prevBeamRight2;
           if (flags > 0 && !isBeamed && bravuraReady) {
             // Isolated note → one real flag glyph (8th / 16th / 32nd).
-            drawGlyph(GLYPH_FLAG_UP[flags] ?? GLYPH_FLAG_UP[3], beatL, STEM_TOP_Y, "left", "alphabetic");
+            drawGlyph(GLYPH_FLAG_UP[flags] ?? GLYPH_FLAG_UP[3], stemX - RHY_STEM_W / 2, STEM_TOP_Y, "left", "alphabetic");
           } else {
             for (let f = 0; f < flags; f++) {
               const beamY = STEM_TOP_Y + f * (BEAM_H + BEAM_GAP);
@@ -827,14 +846,15 @@ function render() {
               const leftBeam = f === 0 ? beat.prevBeamRight : beat.prevBeamRight2;
 
               if (drawRight) {
+                // Spans stem to stem, covering both stems' full thickness.
                 ctx.fillStyle = RHYTHM_COLOR;
-                ctx.fillRect(beatL, beamY, beat.duration * dynBW, BEAM_H);
+                ctx.fillRect(stemX - RHY_STEM_W / 2, beamY, beat.duration * dynBW + RHY_STEM_W, BEAM_H);
               } else if (!leftBeam) {
                 ctx.strokeStyle = RHYTHM_COLOR;
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.moveTo(beatL, beamY);
-                ctx.bezierCurveTo(beatL + 10, beamY + 3, beatL + 8, beamY + 8, beatL + 2, beamY + 12);
+                ctx.moveTo(stemX, beamY);
+                ctx.bezierCurveTo(stemX + 10, beamY + 3, stemX + 8, beamY + 8, stemX + 2, beamY + 12);
                 ctx.stroke();
               }
             }
@@ -873,8 +893,29 @@ function render() {
         const baseAlpha = dynAlpha * accentDim * ghostAlpha * missedDim;
 
         const blockY = note.noteY - BLOCK_H / 2;
-        // Label sits in the "head" — left portion of block, capped at block center for narrow blocks
-        const labelX = blockX + Math.min(blockW / 2, BLOCK_H * 0.65);
+        // A note is drawn as a solid "head" (where you pick it, carrying the fret
+        // number) plus a slimmer, translucent "tail" running along the string for
+        // as long as it rings — onset and length read at a glance instead of every
+        // note being one same-looking bar. With tails off ("Solid bar") the head
+        // simply spans the whole block, as the tab used to draw it.
+        const baseFs = 13 * fretFontScale;
+        const fs = hasDynamics ? Math.max(9, Math.round(baseFs * (0.75 + 0.25 * dyn))) : Math.round(baseFs);
+        const labelChars = note.fret.toString().length + (note.isGhost ? 2 : 0);
+        const headW = noteTails
+          ? Math.min(blockW, Math.max(BLOCK_H, Math.ceil(labelChars * fs * 0.62 + 10)))
+          : blockW;
+        const tailH = Math.max(6, Math.round(BLOCK_H * 0.42));
+        const tailY = note.noteY - tailH / 2;
+        const tailX = blockX + headW / 2;
+        const tailW = blockX + blockW - tailX;
+        const hasTail = noteTails && blockW - headW > 4;
+        const notePath = () => {
+          ctx!.beginPath();
+          pillPath(blockX, blockY, headW, BLOCK_H, BLOCK_CORNER);
+          if (hasTail) pillPath(tailX, tailY, tailW, tailH, tailH / 2);
+        };
+        // Bar mode keeps the label in the left "head" of the long block.
+        const labelX = noteTails ? blockX + headW / 2 : blockX + Math.min(blockW / 2, BLOCK_H * 0.65);
 
         // ── Slide-in line ────────────────────────────────────────────────
         if (note.slideIn && note.slideIn > 0) {
@@ -912,14 +953,14 @@ function render() {
         // Active/hit notes get a lighter block instead of a white digit.
         else if (isActive || isHit) fillColor = lightenHex(note.color, 0.72);
 
-        // ── Active glow — translucent ring behind block ───────────────────
+        // ── Active glow — translucent ring behind the head ────────────────
         if (isActive && !isHit) {
           ctx.fillStyle = note.color;
           ctx.globalAlpha = ghostAlpha * 0.12;
-          drawPill(blockX - 6, blockY - 6, blockW + 12, BLOCK_H + 12, BLOCK_CORNER + 5);
+          drawPill(blockX - 6, blockY - 6, headW + 12, BLOCK_H + 12, BLOCK_CORNER + 5);
           ctx.fill();
           ctx.globalAlpha = ghostAlpha * 0.22;
-          drawPill(blockX - 3, blockY - 3, blockW + 6, BLOCK_H + 6, BLOCK_CORNER + 2);
+          drawPill(blockX - 3, blockY - 3, headW + 6, BLOCK_H + 6, BLOCK_CORNER + 2);
           ctx.fill();
           ctx.globalAlpha = 1;
         }
@@ -957,10 +998,15 @@ function render() {
           // Harmonic: outlined pill
           const col = note.harmonicType === 1 ? note.color : "#e879f9";
           ctx.globalAlpha = ghostAlpha * accentDim;
+          if (hasTail) {
+            ctx.fillStyle = (isHit ? hitFill : col) + "33";
+            drawPill(tailX, tailY, tailW, tailH, tailH / 2);
+            ctx.fill();
+          }
           ctx.strokeStyle = isHit ? hitFill : col;
           ctx.lineWidth = 2;
           ctx.fillStyle = (isHit ? hitFill : col) + "22";
-          drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
+          drawPill(blockX, blockY, headW, BLOCK_H, BLOCK_CORNER);
           ctx.fill();
           ctx.stroke();
           ctx.globalAlpha = 1;
@@ -968,7 +1014,7 @@ function render() {
           // Progressive fill for harmonic
           if (fillW > 0) {
             ctx.save();
-            drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
+            notePath();
             ctx.clip();
             ctx.fillStyle = withAlpha(hitFill, 0.4);
             ctx.fillRect(blockX, blockY, fillW, BLOCK_H);
@@ -976,31 +1022,42 @@ function render() {
           }
 
         } else {
-          ctx.globalAlpha = isHit ? 1.0 : baseAlpha;
+          const alpha = isHit ? 1.0 : baseAlpha;
+
+          // Sustain tail: the string's colour, dimmed so the head stays the
+          // thing your eye lands on. Palm-muted / dead notes keep their grey.
+          if (hasTail) {
+            ctx.globalAlpha = alpha * (isActive ? 0.6 : 0.38);
+            ctx.fillStyle = note.isPalmMute || isDead ? fillColor : note.color;
+            drawPill(tailX, tailY, tailW, tailH, tailH / 2);
+            ctx.fill();
+          }
+
+          ctx.globalAlpha = alpha;
           ctx.fillStyle = fillColor;
 
-          // Glow behind the pill for fresh hits
+          // Glow behind the head for fresh hits
           if (isAnimatingHit && hitAnimations && hitAge < 0.55) {
             const glowStr = 1 - hitAge / 0.55;
             ctx.shadowColor = hitGlow;
             ctx.shadowBlur = glowStr * 20;
           }
 
-          drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
+          drawPill(blockX, blockY, headW, BLOCK_H, BLOCK_CORNER);
           ctx.fill();
           ctx.shadowBlur = 0;
 
-          // Subtle inner highlight (lighter strip on top half)
-          if (!isDead) {
+          // Solid bar keeps its original sheen: a lighter strip on the top half.
+          if (!noteTails && !isDead) {
             ctx.fillStyle = "rgba(255,255,255,0.14)";
             drawPill(blockX + 1, blockY + 1, blockW - 2, BLOCK_H / 2 - 1, BLOCK_CORNER);
             ctx.fill();
           }
-          
+
           // Progressive filling with green tied to the playback cursor
           if (fillW > 0) {
             ctx.save();
-            drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
+            notePath();
             ctx.clip();
             
             // The solid green fill
@@ -1016,13 +1073,6 @@ function render() {
               sweepGrad.addColorStop(1, "rgba(255,255,255,0.85)");
               ctx.fillStyle = sweepGrad;
               ctx.fillRect(sweepX, blockY, sweepW, BLOCK_H);
-            }
-            
-            // Inner highlight for the filled green part
-            if (fillW > 2) {
-              ctx.fillStyle = "rgba(255,255,255,0.2)";
-              drawPill(blockX, blockY + 1, fillW - 1, BLOCK_H / 2 - 1, BLOCK_CORNER);
-              ctx.fill();
             }
 
             ctx.restore();
@@ -1051,17 +1101,17 @@ function render() {
             const flashA = (1 - hitAge / 0.2) * 0.7;
             ctx.globalAlpha = flashA;
             ctx.fillStyle = "#ffffff";
-            drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
+            notePath();
             ctx.fill();
             ctx.globalAlpha = 1;
           }
 
-          // Shockwave 1 — pill outline expanding outwards
+          // Shockwave 1 — head outline expanding outwards
           const exp1 = eased * 8; // expands by 8px
           const a1 = (1 - hitAge) * 0.8;
           ctx.strokeStyle = withAlpha(hitGlow, a1);
           ctx.lineWidth = Math.max(0.5, 3 * (1 - hitAge));
-          drawPill(blockX - exp1, blockY - exp1, blockW + exp1 * 2, BLOCK_H + exp1 * 2, BLOCK_CORNER + exp1);
+          drawPill(blockX - exp1, blockY - exp1, headW + exp1 * 2, BLOCK_H + exp1 * 2, BLOCK_CORNER + exp1);
           ctx.stroke();
 
           // Shockwave 2 — delayed, smaller outline
@@ -1072,7 +1122,7 @@ function render() {
             const a2 = (1 - age2) * 0.4;
             ctx.strokeStyle = withAlpha(hitFill, a2);
             ctx.lineWidth = Math.max(0.5, 2 * (1 - age2));
-            drawPill(blockX - exp2, blockY - exp2, blockW + exp2 * 2, BLOCK_H + exp2 * 2, BLOCK_CORNER + exp2);
+            drawPill(blockX - exp2, blockY - exp2, headW + exp2 * 2, BLOCK_H + exp2 * 2, BLOCK_CORNER + exp2);
             ctx.stroke();
           }
 
@@ -1081,8 +1131,6 @@ function render() {
 
         // ── Fret label ────────────────────────────────────────────────────
         if (!isDead) {
-          const baseFs = 13 * fretFontScale;
-          const fs = hasDynamics ? Math.max(9, Math.round(baseFs * (0.75 + 0.25 * dyn))) : Math.round(baseFs);
           // "auto" reads the pill's own colour, so a dark palette gets light digits.
           ctx.fillStyle = fretTextColor === "auto" ? readableInk(note.color) : fretTextColor;
           ctx.font = `bold ${fs}px Inter, sans-serif`;
@@ -1098,7 +1146,7 @@ function render() {
         // Turned off as a group: skip every marker but still record this block
         // for the next note's slide line, which is note geometry, not a label.
         if (!showTechniqueLabels) {
-          stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + blockW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
+          stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + headW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
           continue;
         }
         ctx.textAlign = "center";
@@ -1116,7 +1164,7 @@ function render() {
           if (prev && blockX - prev.x > 4) {
             // Draw slur arc from centre of previous block to centre of this block
             const x0 = prev.cx;
-            const x1 = blockX + blockW / 2;
+            const x1 = blockX + headW / 2;
             const midX = (x0 + x1) / 2;
             const slurY = note.noteY - BLOCK_H / 2 + 1;
             const arcH = Math.min(28, Math.max(16, (x1 - x0) * 0.4));
@@ -1141,7 +1189,7 @@ function render() {
             ctx.font = "bold 12px Inter";
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
-            drawText(label, blockX + blockW / 2, blockY - 3);
+            drawText(label, labelX, blockY - 3);
           }
         }
         if (note.isTap) {
@@ -1206,50 +1254,35 @@ function render() {
           drawBendBadge(bLabel, bIcon, bgCol, txCol, labelX, bendBadgeY, blockY);
         }
 
-        // Vibrato – wavy coloured outline over the block
+        // Vibrato – a wave running along the sustain tail (the part of the note
+        // you actually shake); a tail-less note gets a short wave above its head.
         if (note.isVibrato) {
           const vibratoColor = isHit ? "#34d399" : note.color;
-          const cr = Math.min(BLOCK_CORNER, BLOCK_H / 2, blockW / 2);
-          const innerW = blockW - 2 * cr;
-          const cycles = Math.max(2, Math.round(innerW / 7));
-          const amp = 2.5;
-          const vstep = 6; // sample every 6px instead of 1px — ~6× fewer path points
+          const x0 = hasTail ? blockX + headW + 3 : blockX;
+          const x1 = hasTail ? blockRX - 3 : blockX + headW;
+          const y = hasTail ? note.noteY : blockY - 5;
+          const len = x1 - x0;
+          if (len > 4) {
+            const amp = hasTail ? tailH / 2 + 1.5 : 2;
+            const cycles = Math.max(1, Math.round(len / 9));
+            const vstep = 2;
 
-          ctx.strokeStyle = vibratoColor;
-          ctx.lineWidth = 2.5;
-          ctx.lineJoin = "round";
-          ctx.lineCap = "round";
-          ctx.beginPath();
-
-          // Top-left arc → top edge
-          ctx.moveTo(blockX + cr, blockY);
-          for (let i = vstep; i < innerW; i += vstep) {
-            ctx.lineTo(blockX + cr + i, blockY + Math.sin((i / innerW) * Math.PI * cycles) * amp);
+            ctx.strokeStyle = vibratoColor;
+            ctx.lineWidth = 2;
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(x0, y);
+            for (let i = vstep; i < len; i += vstep) {
+              ctx.lineTo(x0 + i, y + Math.sin((i / len) * Math.PI * 2 * cycles) * amp);
+            }
+            ctx.lineTo(x1, y);
+            ctx.stroke();
           }
-          ctx.lineTo(blockX + cr + innerW, blockY + Math.sin(Math.PI * cycles) * amp);
-          // Top-right corner
-          ctx.arcTo(blockX + blockW, blockY, blockX + blockW, blockY + cr, cr);
-          // Right edge
-          ctx.lineTo(blockX + blockW, blockY + BLOCK_H - cr);
-          // Bottom-right corner
-          ctx.arcTo(blockX + blockW, blockY + BLOCK_H, blockX + blockW - cr, blockY + BLOCK_H, cr);
-          // Bottom edge (wavy, right → left, phase-inverted for ripple effect)
-          for (let i = innerW - vstep; i > 0; i -= vstep) {
-            ctx.lineTo(blockX + cr + i, blockY + BLOCK_H - Math.sin((i / innerW) * Math.PI * cycles) * amp);
-          }
-          ctx.lineTo(blockX + cr, blockY + BLOCK_H);
-          // Bottom-left corner
-          ctx.arcTo(blockX, blockY + BLOCK_H, blockX, blockY + BLOCK_H - cr, cr);
-          // Left edge
-          ctx.lineTo(blockX, blockY + cr);
-          // Back to start
-          ctx.arcTo(blockX, blockY, blockX + cr, blockY, cr);
-          ctx.closePath();
-          ctx.stroke();
         }
 
         // ── Update slide tracking (right edge of block) ───────────────────
-        stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + blockW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
+        stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + headW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
       }
     }
 
@@ -1651,6 +1684,7 @@ self.onmessage = (e: MessageEvent) => {
       // otherwise a new setting wouldn't appear until playback resumed.
       if (msg.pillHeight !== undefined) BLOCK_H = msg.pillHeight;
       if (msg.pillCorner !== undefined) BLOCK_CORNER = msg.pillCorner;
+      if (msg.noteTails !== undefined) noteTails = msg.noteTails;
       if (msg.fretFontScale !== undefined) fretFontScale = msg.fretFontScale;
       if (msg.stringColors !== undefined) stringColors = msg.stringColors;
       if (msg.hitFill !== undefined) hitFill = msg.hitFill;
@@ -1664,7 +1698,7 @@ self.onmessage = (e: MessageEvent) => {
         inkColor = msg.ink;
         // Cached string rather than a per-draw call — the rhythm lane paints it
         // dozens of times per frame.
-        RHYTHM_COLOR = withAlpha(inkColor, 0.4);
+        RHYTHM_COLOR = withAlpha(inkColor, 0.6);
         PICK_COLOR = withAlpha(inkColor, 0.65);
       }
       if (msg.showRhythmLane !== undefined) showRhythmLane = msg.showRhythmLane;

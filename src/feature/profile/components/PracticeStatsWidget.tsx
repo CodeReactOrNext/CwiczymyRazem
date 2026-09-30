@@ -47,16 +47,16 @@ const formatMin = (ms: number) => {
   if (m < 60) return `${m} min`;
   const h = Math.floor(m / 60);
   const rem = m % 60;
-  return rem > 0 ? `${h}h ${rem}m` : `${h}h`;
+  return rem > 0 ? `${h}h ${rem} min` : `${h}h`;
 };
 
 const formatBarLabel = (ms: number) => {
   const m = Math.floor(ms / 60000);
   if (m === 0) return "";
-  if (m < 60) return `${m}m`;
+  if (m < 60) return `${m} min`;
   const h = Math.floor(m / 60);
   const rem = m % 60;
-  return rem > 0 ? `${h}h${rem}m` : `${h}h`;
+  return rem > 0 ? `${h}h ${rem} min` : `${h}h`;
 };
 
 const CustomTooltip = ({ active, payload }: any) => {

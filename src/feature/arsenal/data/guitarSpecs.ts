@@ -131,6 +131,12 @@ export const OFFSET_FLOATING: GuitarSpec = {
 /** Offset with a pair of soapbars — single coils, so nothing to split. */
 export const OFFSET_P90: GuitarSpec = { ...OFFSET_TOM, pickups: "P90" };
 
+/** Offset soapbars paired with a floating vibrato. */
+export const OFFSET_FLOATING_P90: GuitarSpec = {
+  ...OFFSET_FLOATING,
+  pickups: "P90",
+};
+
 /** No headstock: the tuners are at the bridge, so there are none to lock. */
 export const HEADLESS: GuitarSpec = {
   ...SOLID_ELECTRIC,

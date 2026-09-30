@@ -7,8 +7,8 @@ import type { ReportSongEntry } from "feature/user/view/ReportView/ReportView.ty
 
 /**
  * Fame each reactor was actually granted when they motivated this log, keyed by their uid.
- * Written only by `/api/logs/react` (Admin SDK) so undoing a reaction refunds exactly what was
- * awarded, even if the row's grouping — and therefore its current payout — changed since.
+ * Written only by `/api/logs/react` (Admin SDK) — a record of what was paid out, even if the row's
+ * grouping — and therefore its current payout — changed since. Reactions can't be undone.
  */
 export type LogReactionFame = Record<string, number>;
 

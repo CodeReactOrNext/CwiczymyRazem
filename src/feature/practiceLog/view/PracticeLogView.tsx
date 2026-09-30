@@ -226,7 +226,7 @@ export const PracticeLogView = () => {
                                 count: group.sessions.length,
                               })}
                             </span>
-                            <span>{convertMsToHM(group.totalTimeMs)}h</span>
+                            <span>{convertMsToHM(group.totalTimeMs)}</span>
                             <span className='flex items-center gap-1'>
                               <img
                                 src='/images/points.png'

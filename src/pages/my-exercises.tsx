@@ -10,7 +10,7 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
-import { Globe, Lock, Music2, Pencil, Play, Plus, Star, Trash2 } from "lucide-react";
+import { FileText, Globe, Lock, Music2, Pencil, Play, Plus, Star, Trash2 } from "lucide-react";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
@@ -90,7 +90,14 @@ const MyExercisesPage: NextPageWithLayout = () => {
     router.push("/tab-editor");
   };
 
-  const handleEdit = (ex: CommunityExercise) => {
+  // No tab to write — skip the editor and go straight to the details form,
+  // which saves an exercise with instructions only.
+  const handleCreateWithoutTab = () => {
+    clearTabEditorDraft();
+    router.push("/tab-editor/publish");
+  };
+
+  const handleEdit =(ex: CommunityExercise) => {
     saveTabEditorDraft(ex.id, ex.tablature ?? []);
     router.push(`/tab-editor?edit=${ex.id}`);
   };
@@ -129,7 +136,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
     <div className="bg-second-600 rounded-lg overflow-visible flex flex-col min-h-screen ">
       <HeroBanner
         title="My Exercises"
-        subtitle="Create and share your own guitar exercises with the community"
+        subtitle="Create your own guitar exercises — keep them private or share them with the community"
         eyebrow="Custom Exercises"
         backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
@@ -159,17 +166,27 @@ const MyExercisesPage: NextPageWithLayout = () => {
             </div>
             <div className="space-y-2">
               <p className="text-zinc-100 font-semibold">No exercises yet</p>
-              <p className="text-zinc-400 text-sm max-w-xs">
-                Use the Tab Editor to build a tablature, then publish it as a community exercise.
+              <p className="text-zinc-400 text-sm max-w-sm">
+                Create an exercise with tablature or with written instructions only. On the last step you
+                choose whether it stays private or goes to the community.
               </p>
             </div>
-            <button
-              onClick={handleCreate}
-              className="flex items-center gap-2 px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 text-sm font-bold rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <Plus size={16} />
-              Create your first exercise
-            </button>
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <button
+                onClick={handleCreate}
+                className="flex items-center gap-2 px-5 py-2.5 bg-zinc-100 hover:bg-white text-zinc-950 text-sm font-semibold rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <Music2 size={16} />
+                With tablature
+              </button>
+              <button
+                onClick={handleCreateWithoutTab}
+                className="flex items-center gap-2 px-5 py-2.5 bg-zinc-800/60 hover:bg-zinc-800 text-zinc-200 text-sm font-semibold rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <FileText size={16} />
+                Instructions only
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-3">

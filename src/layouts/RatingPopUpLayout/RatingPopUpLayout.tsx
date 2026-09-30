@@ -56,7 +56,7 @@ const CATS: { key: CatKey; label: string; field: keyof ActivityDay; Icon: typeof
 
 const CAT_BY_KEY = Object.fromEntries(CATS.map((c) => [c.key, c]));
 
-const fmtMin = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}min` : `${m}min`);
+const fmtMin = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h ${m % 60} min` : `${m} min`);
 // Sub-minute precision — the no-points screen quotes sessions that fmtMin would
 // flatten to a confusing "0min".
 const fmtShort = (ms: number) => {

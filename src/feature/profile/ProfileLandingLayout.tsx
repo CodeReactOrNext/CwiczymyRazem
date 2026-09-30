@@ -56,7 +56,7 @@ const ProfileLandingLayout = ({
 
   const totalTimeValue = userStats ? convertMsToHM(
     userStats.time.technique + userStats.time.theory + userStats.time.creativity + userStats.time.hearing
-  ) : "0:00";
+  ) : "0 min";
   const timeTrendData = getTrendData(datasWithReports, "time");
 
   // Everything the cards under the hero read from — handed down once so the

@@ -14,12 +14,15 @@ export const DescriptionField = ({ register }: DescriptionFieldProps) => {
 
   return (
     <div className='space-y-2'>
-      <Label htmlFor='description'>{t("plan.description")}</Label>
+      <Label htmlFor='description'>
+        {t("plan.description")}{" "}
+        <span className='font-normal text-zinc-500'>(optional)</span>
+      </Label>
       <Textarea
         id='description'
         placeholder={t("plan.description_placeholder")}
         rows={4}
-        {...register("description", { required: true })}
+        {...register("description")}
       />
       <p className='text-xs text-muted-foreground'>
         {t("plan.tips.good_description")}

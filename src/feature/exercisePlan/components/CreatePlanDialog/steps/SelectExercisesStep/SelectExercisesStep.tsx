@@ -524,6 +524,7 @@ export const SelectExercisesStep = ({
       <ExercisePreviewDialog
         exercise={previewingExercise ?? null}
         onClose={() => setPreviewingExercise(undefined)}
+        hidePlanActions
       />
 
       <ScaleSelectionDialog

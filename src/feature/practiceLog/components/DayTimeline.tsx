@@ -81,7 +81,7 @@ export const DayTimeline = ({ sessions }: DayTimelineProps) => {
         </h3>
         <p className="flex items-center gap-2.5 text-[11px] tabular-nums text-zinc-500">
           <span>{t("page.day_sessions", { count: model.count })}</span>
-          <span>{convertMsToHM(model.totalMs)}h</span>
+          <span>{convertMsToHM(model.totalMs)}</span>
         </p>
       </div>
 

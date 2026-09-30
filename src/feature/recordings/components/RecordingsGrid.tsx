@@ -14,8 +14,9 @@ interface RecordingsGridProps {
   setPage: (page: number) => void;
 }
 
-const GRID_CLASS =
-  "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+// Capped at three columns: at four a card is ~195px wide next to the sidebar and
+// titles, songs and author names all get clipped.
+const GRID_CLASS = "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3";
 
 /** Mirrors RecordingCard's shape so the grid keeps its geometry while loading. */
 const RecordingCardSkeleton = () => (
@@ -23,8 +24,8 @@ const RecordingCardSkeleton = () => (
     <Skeleton className='aspect-video w-full rounded-none' />
     <div className='flex flex-col gap-3 p-4'>
       <Skeleton className='h-[2.75rem] w-full rounded' />
-      <Skeleton className='h-[28px] w-2/3 rounded' />
-      <Skeleton className='h-[2.5rem] w-full rounded' />
+      <Skeleton className='h-4 w-2/3 rounded' />
+      <Skeleton className='h-5 w-full rounded' />
       <div className='flex items-center gap-2 pt-1'>
         <Skeleton className='h-8 w-8 rounded-full' />
         <Skeleton className='h-3 w-28 rounded' />

@@ -4,11 +4,13 @@ import { WikiPublicNav } from "feature/wiki/components/WikiPublicNav";
 import WikiLayout from "feature/wiki/WikiLayout";
 import AppLayout from "layouts/AppLayout";
 import { getWikiSections, type WikiSection } from "lib/wiki";
+import { ArrowRight, Search } from "lucide-react";
 import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import type { ReactElement } from "react";
+import { useState } from "react";
 import type { NextPageWithLayout } from "types/page";
 
 const SITE_URL = "https://riff.quest";
@@ -18,8 +20,6 @@ const DESCRIPTION =
 
 /** One line of context per section, so the index reads as a guide rather than a list of links. */
 const SECTION_INTROS: Record<string, string> = {
-  "Start Here":
-    "The two articles worth reading on day one: what the app actually does, the ten minutes that get you from signing up to a logged session, and the Home screen you land on every day afterwards with its three daily quests.",
   "Scoring & Progress":
     "Where points come from and why you can never spend them, how the streak multiplier grows everything you log, what Fame buys and why it never touches your level, and why technique, theory, hearing and creative work are all worth exactly the same per minute.",
   Practice:
@@ -42,8 +42,27 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
   const { status } = useSession();
   const isLogged = status === "authenticated";
 
-  // The very first article in reading order doubles as the "start here" card.
-  const firstPage = sections[0]?.pages[0];
+  const [query, setQuery] = useState("");
+
+  // The first section is the "start here" block at the top: its first article
+  // is the one action, the next one is offered as the follow-up. It isn't
+  // repeated in the topic list below.
+  const [startSection, ...topicSections] = sections;
+  const firstPage = startSection?.pages[0];
+  const nextPage = startSection?.pages[1];
+
+  const q = query.trim().toLowerCase();
+  const results = q
+    ? sections.flatMap((s) =>
+        s.pages
+          .filter((p) =>
+            `${p.title} ${p.description} ${s.section}`
+              .toLowerCase()
+              .includes(q),
+          )
+          .map((p) => ({ ...p, section: s.section })),
+      )
+    : [];
 
   return (
     <>
@@ -51,19 +70,25 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
         <title>Riff Quest Knowledge Base — How the Guitar App Works</title>
         <meta name='description' content={DESCRIPTION} />
         <link rel='canonical' href={`${SITE_URL}/wiki`} />
-        <meta property='og:title' content='Riff Quest Knowledge Base — How the Guitar App Works' />
+        <meta
+          property='og:title'
+          content='Riff Quest Knowledge Base — How the Guitar App Works'
+        />
         <meta property='og:description' content={DESCRIPTION} />
         <meta property='og:url' content={`${SITE_URL}/wiki`} />
         <meta property='og:type' content='website' />
         <meta property='og:site_name' content='Riff Quest' />
         <meta property='og:image' content={OG_IMAGE} />
         <meta name='twitter:card' content='summary_large_image' />
-        <meta name='twitter:title' content='Riff Quest Knowledge Base — How the Guitar App Works' />
+        <meta
+          name='twitter:title'
+          content='Riff Quest Knowledge Base — How the Guitar App Works'
+        />
         <meta name='twitter:description' content={DESCRIPTION} />
         <meta name='twitter:image' content={OG_IMAGE} />
       </Head>
       {!isLogged && <WikiPublicNav />}
-      <div className='bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen'>
+      <div className='flex min-h-screen flex-col overflow-visible rounded-xl border-none bg-second-600 shadow-sm'>
         <HeroBanner
           title='Wiki'
           subtitle='Everything riff.quest does, explained in plain language'
@@ -78,58 +103,106 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
               <p className='text-sm text-zinc-500'>No wiki articles yet.</p>
             )}
 
-            <div className='rounded-lg bg-zinc-900/40 p-6 sm:p-8'>
+            <div className='flex flex-col gap-4'>
               <p className='max-w-3xl text-base leading-relaxed text-zinc-300'>
-                This is the manual for riff.quest, written for the person playing
-                the guitar rather than for the person who built the app. No URLs,
-                no field names, no formulas to decode: each article takes one part
-                of the app, explains what it does, what it is worth in points or
-                Fame, and shows the screen it is describing.
+                How every part of riff.quest works, written for the person
+                playing the guitar.
               </p>
-              <p className='mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400'>
-                Most people read Getting Started once, start logging sessions, and
-                come back later with something specific: why the streak reset, what
-                the Arsenal is for, how the app decides a song is hard, or why note
-                detection is hearing nothing. Nothing here is required reading. The
-                app works if you only ever type in your minutes.
-              </p>
+              <div className='relative max-w-xl'>
+                <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500' />
+                <input
+                  type='search'
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder='Search the Wiki — streak, Fame, mic, playlists…'
+                  aria-label='Search the Wiki'
+                  className='h-11 w-full rounded-lg bg-zinc-900/60 pl-10 pr-4 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/40'
+                />
+              </div>
             </div>
-            {firstPage && (
-              <Link
-                href={`/wiki/${firstPage.slug}`}
-                className='flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-6 transition-background hover:bg-zinc-800/60'>
-                <span className='text-xs font-bold text-cyan-400'>New here?</span>
-                <span className='text-lg font-bold text-white'>{firstPage.title}</span>
-                <span className='text-sm leading-relaxed text-zinc-400'>
-                  {firstPage.description}
-                </span>
-              </Link>
-            )}
-            {sections.map((section) => (
-              <div key={section.section}>
-                <h2 className='mb-2 text-base font-bold tracking-wide text-white'>
-                  {section.section}
-                </h2>
-                {SECTION_INTROS[section.section] && (
-                  <p className='mb-5 max-w-3xl text-sm leading-relaxed text-zinc-400'>
-                    {SECTION_INTROS[section.section]}
-                  </p>
-                )}
+
+            {q ? (
+              results.length === 0 ? (
+                <p className='text-sm text-zinc-500'>
+                  No article matches “{query.trim()}”.
+                </p>
+              ) : (
                 <div className='grid gap-4 md:grid-cols-2'>
-                  {section.pages.map((page) => (
+                  {results.map((page) => (
                     <Link
                       key={page.slug}
                       href={`/wiki/${page.slug}`}
                       className='rounded-lg bg-zinc-900/40 p-5 transition-background hover:bg-zinc-800/60'>
-                      <div className='font-bold text-white'>{page.title}</div>
+                      <div className='text-xs font-semibold text-zinc-500'>
+                        {page.section}
+                      </div>
+                      <div className='mt-1 font-bold text-white'>
+                        {page.title}
+                      </div>
                       <p className='mt-2 text-sm leading-relaxed text-zinc-400'>
                         {page.description}
                       </p>
                     </Link>
                   ))}
                 </div>
-              </div>
-            ))}
+              )
+            ) : (
+              <>
+                {firstPage && (
+                  <div className='flex flex-col gap-3'>
+                    <Link
+                      href={`/wiki/${firstPage.slug}`}
+                      className='flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-6 transition-background hover:bg-zinc-800/60'>
+                      <span className='text-xs font-bold text-cyan-400'>
+                        Start here
+                      </span>
+                      <span className='text-lg font-bold text-white'>
+                        {firstPage.title}
+                      </span>
+                      <span className='text-sm leading-relaxed text-zinc-400'>
+                        {firstPage.description}
+                      </span>
+                    </Link>
+                    {nextPage && (
+                      <Link
+                        href={`/wiki/${nextPage.slug}`}
+                        className='flex items-center gap-2 px-1 text-sm text-zinc-400 transition-colors hover:text-cyan-400'>
+                        <span className='text-zinc-500'>Then:</span>
+                        <span className='font-semibold'>{nextPage.title}</span>
+                        <ArrowRight size={14} />
+                      </Link>
+                    )}
+                  </div>
+                )}
+                {topicSections.map((section) => (
+                  <div key={section.section}>
+                    <h2 className='mb-2 text-base font-bold tracking-wide text-white'>
+                      {section.section}
+                    </h2>
+                    {SECTION_INTROS[section.section] && (
+                      <p className='mb-5 max-w-3xl text-sm leading-relaxed text-zinc-400'>
+                        {SECTION_INTROS[section.section]}
+                      </p>
+                    )}
+                    <div className='grid gap-4 md:grid-cols-2'>
+                      {section.pages.map((page) => (
+                        <Link
+                          key={page.slug}
+                          href={`/wiki/${page.slug}`}
+                          className='rounded-lg bg-zinc-900/40 p-5 transition-background hover:bg-zinc-800/60'>
+                          <div className='font-bold text-white'>
+                            {page.title}
+                          </div>
+                          <p className='mt-2 text-sm leading-relaxed text-zinc-400'>
+                            {page.description}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
 
             <div className='rounded-lg bg-zinc-900/40 p-6 sm:p-8'>
               <h2 className='text-base font-bold tracking-wide text-white'>

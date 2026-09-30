@@ -10,6 +10,7 @@ import {
   convertMsToHM,
   convertMsToHMObject,
   convertMsToHMS,
+  formatMinutesDuration,
 } from "./timeConverter";
 
 export {
@@ -18,6 +19,7 @@ export {
   convertMsToHM,
   convertMsToHMObject,
   convertMsToHMS,
+  formatMinutesDuration,
   getDateFromPast,
   getLocalDateKey,
   getServerDateKey,

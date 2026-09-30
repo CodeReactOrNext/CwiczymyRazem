@@ -27,6 +27,7 @@ import type {
   DefaultViewMode,
   FretTextKey,
   HitColorKey,
+  NoteStyleKey,
   PaletteKey,
   TablatureSettings,
 } from "./tablatureSettings";
@@ -42,6 +43,7 @@ import {
   NOTATION_ZOOM_MIN,
   NOTE_SPACING_MAX,
   NOTE_SPACING_MIN,
+  NOTE_STYLES,
   STRING_PALETTES,
   STRING_SPACING_MAX,
   STRING_SPACING_MIN,
@@ -133,6 +135,19 @@ function PillSwatch({ presetKey }: { presetKey: PillPresetKey }) {
       className='block bg-cyan-400'
       style={{ height, width: height * 1.9, borderRadius: corner }}
     />
+  );
+}
+
+/** A long note drawn the way each note style renders it on the tab. */
+function NoteStyleSwatch({ styleKey }: { styleKey: NoteStyleKey }) {
+  if (styleKey === "bar") {
+    return <span className='block h-5 w-20 rounded bg-cyan-400' />;
+  }
+  return (
+    <span className='relative flex h-5 w-20 items-center'>
+      <span className='absolute inset-x-2 h-2 rounded-full bg-cyan-400/40' />
+      <span className='relative h-5 w-5 rounded bg-cyan-400' />
+    </span>
   );
 }
 
@@ -390,7 +405,7 @@ export function TablatureSettingsPanel() {
 
       <Section
         title='Note pills'
-        hint='Shape of the blocks carrying the fret numbers.'>
+        hint='Shape of the blocks carrying the fret numbers, and how a note’s length is drawn.'>
         <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
           {PILL_PRESET_ORDER.map((key) => (
             <OptionCard
@@ -405,6 +420,24 @@ export function TablatureSettingsPanel() {
               </span>
               <span className='text-[10px] leading-tight text-zinc-500'>
                 {PILL_PRESETS[key].desc}
+              </span>
+            </OptionCard>
+          ))}
+        </div>
+        <div className='mt-4 grid grid-cols-2 gap-2'>
+          {(Object.keys(NOTE_STYLES) as NoteStyleKey[]).map((key) => (
+            <OptionCard
+              key={key}
+              active={settings.noteStyle === key}
+              onClick={() => set("noteStyle", key)}>
+              <span className='flex h-8 items-center'>
+                <NoteStyleSwatch styleKey={key} />
+              </span>
+              <span className='text-xs font-semibold text-zinc-100'>
+                {NOTE_STYLES[key].label}
+              </span>
+              <span className='text-[10px] leading-tight text-zinc-500'>
+                {NOTE_STYLES[key].desc}
               </span>
             </OptionCard>
           ))}

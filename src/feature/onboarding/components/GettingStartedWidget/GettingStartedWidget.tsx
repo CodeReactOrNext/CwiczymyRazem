@@ -213,12 +213,19 @@ export const GettingStartedWidget = () => {
           ? () => setOpenModal("reward")
           : undefined,
       badge: progress.rewardClaimed ? undefined : `+${REWARD_FAME_AMOUNT}`,
+      // Claimed but no case opened yet — say what's left to do there.
+      hint:
+        progress.rewardClaimed && !progress.hasGuitar
+          ? "Open a case"
+          : undefined,
     },
     stepNode("first_song"),
     stepNode("second_day"),
   ];
 
-  const doneCount = progress.steps.filter((step) => step.isDone).length;
+  // Counted over every node on the track, the guitar included — "3/3" above
+  // four circles read as finished while the reward was still waiting.
+  const doneCount = nodes.filter((node) => node.isDone).length;
 
   return (
     <Card className='relative flex-col justify-between overflow-hidden p-4 sm:p-5'>
@@ -237,7 +244,7 @@ export const GettingStartedWidget = () => {
             Getting Started
           </h3>
           <span className='text-xs tabular-nums text-zinc-500'>
-            {doneCount}/{progress.steps.length}
+            {doneCount}/{nodes.length}
           </span>
         </div>
         <div className='flex items-center gap-1'>
@@ -335,24 +342,37 @@ export const GettingStartedWidget = () => {
                   </span>
                 )}
 
-                {node.badge && (
-                  <span className='flex items-center gap-1'>
-                    <span
-                      className={cn(
-                        "text-[10px] font-medium tabular-nums sm:text-xs",
-                        isActionable ? "text-amber-400" : "text-zinc-500",
-                      )}>
-                      {node.badge}
-                    </span>
+                {/* A claimable reward reads as a button, not as one more step.
+                    The whole node is the button, so this is only its face. */}
+                {node.badge && isActionable && node.tone === "amber" ? (
+                  <span className='flex items-center gap-1 rounded-md bg-amber-500 px-2.5 py-1 text-[10px] font-bold text-zinc-950 transition-colors group-hover:bg-amber-400 sm:text-xs'>
+                    Claim {node.badge}
                     <img
                       src='/images/coin.png'
                       alt='fame'
-                      className={cn(
-                        "h-3 w-3 object-contain sm:h-3.5 sm:w-3.5",
-                        !isActionable && "opacity-40",
-                      )}
+                      className='h-3 w-3 object-contain sm:h-3.5 sm:w-3.5'
                     />
                   </span>
+                ) : (
+                  node.badge && (
+                    <span className='flex items-center gap-1'>
+                      <span
+                        className={cn(
+                          "text-[10px] font-medium tabular-nums sm:text-xs",
+                          isActionable ? "text-amber-400" : "text-zinc-500",
+                        )}>
+                        {node.badge}
+                      </span>
+                      <img
+                        src='/images/coin.png'
+                        alt='fame'
+                        className={cn(
+                          "h-3 w-3 object-contain sm:h-3.5 sm:w-3.5",
+                          !isActionable && "opacity-40",
+                        )}
+                      />
+                    </span>
+                  )
                 )}
               </Tag>
             </div>

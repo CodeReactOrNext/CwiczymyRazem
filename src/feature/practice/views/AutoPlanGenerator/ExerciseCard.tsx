@@ -1,55 +1,88 @@
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "assets/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
-import type {
-  Exercise,
-  ExercisePlan,
-} from "feature/exercisePlan/types/exercise.types";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowDown, ArrowUp, Clock, Info, Shuffle, Trash2, Video } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Clock,
+  GripVertical,
+  Info,
+  MoreHorizontal,
+  Shuffle,
+  Trash2,
+  Video,
+} from "lucide-react";
 import { FaYoutube } from "react-icons/fa6";
+import { formatMinutesDuration } from "utils/converter";
 
 interface ExerciseCardProps {
   exercise: Exercise;
   index: number;
-  generatedPlan: ExercisePlan | null;
-  onMoveUp: (index: number) => void;
-  onMoveDown: (index: number) => void;
+  exerciseCount: number;
+  onMove: (from: number, to: number) => void;
   onReplace: (index: number) => void;
   onRemove: (index: number) => void;
   onPreview?: (exercise: Exercise) => void;
 }
 
+/**
+ * One row of a generated plan. Reordering is a drag on the grip (keyboard:
+ * focus the grip, Space, arrows); everything else — details, swap, remove,
+ * and a move up/down fallback for anyone who'd rather not drag — lives in
+ * the "…" menu, so the row doesn't carry five same-weight icon buttons with
+ * a destructive one right next to the arrows.
+ */
 export const ExerciseCard = ({
   exercise,
   index,
-  generatedPlan,
-  onMoveUp,
-  onMoveDown,
+  exerciseCount,
+  onMove,
   onReplace,
   onRemove,
   onPreview,
 }: ExerciseCardProps) => {
   const { t } = useTranslation(["exercises", "common"]);
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: exercise.id });
 
   const skills = exercise.relatedSkills
     .map((skillId) => guitarSkills.find((s) => s.id === skillId))
     .filter(Boolean);
 
   const isFirst = index === 0;
-  const isLast = !generatedPlan || index >= generatedPlan.exercises.length - 1;
+  const isLast = index >= exerciseCount - 1;
 
   const formattedTime =
     exercise.timeInMinutes < 1
       ? `${Math.round(exercise.timeInMinutes * 60)}s`
-      : `${exercise.timeInMinutes} min`;
+      : formatMinutesDuration(exercise.timeInMinutes);
 
   return (
     <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn(
         "group relative flex flex-col rounded-lg border border-transparent transition-all duration-500 overflow-hidden",
-        "bg-zinc-900/20 ring-1 ring-inset ring-white/5 hover:ring-white/15 hover:bg-zinc-800/40"
+        "bg-zinc-900/20 ring-1 ring-inset ring-white/5 hover:ring-white/15 hover:bg-zinc-800/40",
+        isDragging && "z-20 bg-zinc-800/60 opacity-90"
       )}
     >
       {/* Top Colorful Line effect */}
@@ -64,10 +97,22 @@ export const ExerciseCard = ({
       {/* Subtle radial glow in background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(255,255,255,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-      {/* Main content wrapper */}
-      <div className="relative flex flex-col sm:flex-row items-stretch sm:min-h-[90px]">
+      <div className="relative flex items-stretch sm:min-h-[90px]">
+        {/* Drag handle — the whole left strip, so it's an easy target on touch */}
+        <button
+          ref={setActivatorNodeRef}
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label={`Reorder ${exercise.title}`}
+          title="Drag to reorder"
+          className="flex shrink-0 cursor-grab touch-none items-center pl-2 pr-1 text-zinc-600 transition-colors hover:text-zinc-300 focus-visible:text-zinc-200 focus-visible:outline-none active:cursor-grabbing sm:pl-3"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+
         {/* Texts & Badges */}
-        <div className="flex-1 min-w-0 p-4 sm:p-5 flex flex-col justify-center">
+        <div className="flex-1 min-w-0 py-4 pr-2 pl-1 sm:py-5 flex flex-col justify-center">
           <div>
             <h3 className="font-semibold text-[15px] sm:text-[16px] leading-tight tracking-tight text-zinc-100 group-hover:text-white transition-colors duration-300">
               {exercise.title}
@@ -131,108 +176,74 @@ export const ExerciseCard = ({
           </div>
         </div>
 
-        {/* Desktop Right Side: Tablature stacked above Action Buttons */}
-        <div className="hidden sm:flex flex-col shrink-0 items-end justify-center gap-3 py-4 pr-5">
-          {/* Tablature Preview Desktop */}
-          {exercise.tablature && exercise.tablature.length > 0 && (
-            <div className="relative w-[220px] shrink-0 opacity-40 group-hover:opacity-90 transition-opacity duration-500 flex items-center justify-end">
-               <TablaturePreview measures={exercise.tablature} />
-            </div>
-          )}
-
-          {/* Action buttons on Desktop */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            {onPreview && (
+        {/* Right side: tablature (desktop) with the row menu above it */}
+        <div className="flex shrink-0 flex-col items-end gap-3 py-3 pr-3 sm:py-4 sm:pr-5">
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); onPreview(exercise); }}
-                className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10"
-                title={t("exercises:common.preview") as string}
+                aria-label={`Options for ${exercise.title}`}
+                title="Options"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-white/10 data-[state=open]:text-zinc-100"
               >
-                <Info className="h-4 w-4" />
+                <MoreHorizontal className="h-4 w-4" />
               </button>
-            )}
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onReplace(index); }}
-              className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 bg-white/5 text-zinc-400 hover:text-cyan-300 hover:bg-cyan-500/10 ring-1 ring-white/10"
-              title={t("common:button.random") as string}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              sideOffset={6}
+              collisionPadding={16}
+              className="w-48 border-white/10 bg-zinc-900 p-1.5 text-zinc-100 shadow-none"
             >
-              <Shuffle className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onMoveUp(index); }}
-              disabled={isFirst}
-              className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10 disabled:opacity-30 disabled:pointer-events-none"
-            >
-              <ArrowUp className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onMoveDown(index); }}
-              disabled={isLast}
-              className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10 disabled:opacity-30 disabled:pointer-events-none"
-            >
-              <ArrowDown className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onRemove(index); }}
-              className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 bg-white/5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 ring-1 ring-white/10"
-              title={t("common:button.remove") as string}
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+              {onPreview && (
+                <DropdownMenuItem
+                  onSelect={() => onPreview(exercise)}
+                  className="cursor-pointer focus:bg-white/10 focus:text-zinc-100"
+                >
+                  <Info />
+                  {t("exercises:common.preview")}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                onSelect={() => onReplace(index)}
+                className="cursor-pointer focus:bg-white/10 focus:text-zinc-100"
+              >
+                <Shuffle />
+                Swap for another
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={isFirst}
+                onSelect={() => onMove(index, index - 1)}
+                className="cursor-pointer focus:bg-white/10 focus:text-zinc-100"
+              >
+                <ArrowUp />
+                Move up
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={isLast}
+                onSelect={() => onMove(index, index + 1)}
+                className="cursor-pointer focus:bg-white/10 focus:text-zinc-100"
+              >
+                <ArrowDown />
+                Move down
+              </DropdownMenuItem>
+              {/* Gap instead of a separator line, so the destructive action
+                  sits apart from the rest. */}
+              <DropdownMenuItem
+                onSelect={() => onRemove(index)}
+                className="mt-1.5 cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-300"
+              >
+                <Trash2 />
+                {t("common:button.remove")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        {/* Mobile Action Bar */}
-        <div className="sm:hidden w-full border-t border-white/5 py-3 px-4 flex justify-between items-center bg-white/[0.02]">
-          {onPreview ? (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onPreview(exercise); }}
-              className="flex items-center gap-1.5 text-[12px] font-medium text-zinc-400"
-            >
-              <Info className="h-4 w-4" />
-              {t("exercises:common.preview")}
-            </button>
-          ) : (
-            <span className="text-[12px] font-medium text-zinc-500">#{index + 1}</span>
+          {exercise.tablature && exercise.tablature.length > 0 && (
+            <div className="relative hidden w-[220px] shrink-0 items-center justify-end opacity-40 transition-opacity duration-500 group-hover:opacity-90 sm:flex">
+              <TablaturePreview measures={exercise.tablature} />
+            </div>
           )}
-          <div className="flex flex-row items-center gap-2">
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onReplace(index); }}
-              className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg bg-white/5 text-zinc-300 ring-1 ring-white/10"
-            >
-              <Shuffle className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onMoveUp(index); }}
-              disabled={isFirst}
-              className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg bg-white/5 text-zinc-300 ring-1 ring-white/10 disabled:opacity-30 disabled:pointer-events-none"
-            >
-              <ArrowUp className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onMoveDown(index); }}
-              disabled={isLast}
-              className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg bg-white/5 text-zinc-300 ring-1 ring-white/10 disabled:opacity-30 disabled:pointer-events-none"
-            >
-              <ArrowDown className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onRemove(index); }}
-              className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg bg-white/5 text-red-400 ring-1 ring-white/10"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
         </div>
       </div>
     </div>

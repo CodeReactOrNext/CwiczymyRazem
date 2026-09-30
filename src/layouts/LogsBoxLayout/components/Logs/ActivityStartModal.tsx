@@ -9,6 +9,7 @@ import {
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { Clock, ListChecks, Play } from "lucide-react";
 import { useRouter } from "next/router";
+import { formatMinutesDuration } from "utils/converter";
 
 interface ActivityStartModalProps {
   plan?: ExercisePlan | null;
@@ -17,7 +18,7 @@ interface ActivityStartModalProps {
 }
 
 const formatDuration = (minutes: number) =>
-  minutes < 1 ? `${Math.round(minutes * 60)}s` : `${Math.round(minutes)} min`;
+  minutes < 1 ? `${Math.round(minutes * 60)}s` : formatMinutesDuration(minutes);
 
 export const ActivityStartModal = ({ plan, exercise, onClose }: ActivityStartModalProps) => {
   const router = useRouter();

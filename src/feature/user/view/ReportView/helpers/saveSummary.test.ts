@@ -29,7 +29,7 @@ describe("buildSaveSummary", () => {
         hearingMinutes: "15",
         countBackDays: 1,
       }),
-    ).toBe("1h 15m · Technique 1h, Hearing 15 min · Yesterday");
+    ).toBe("1h 15 min · Technique 1h, Hearing 15 min · Yesterday");
   });
 
   it("counts days back further than yesterday", () => {

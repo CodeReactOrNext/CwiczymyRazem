@@ -7,67 +7,121 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "assets/components/ui/dialog";
-import { cn } from "assets/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "assets/components/ui/dropdown-menu";
+import {
+  selectUserAuth,
+  selectUserAvatar,
+  selectUserName,
+} from "feature/user/store/userSlice";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
-import { useTranslation } from "hooks/useTranslation";
-import { LogOut } from "lucide-react";
+import { ChevronDown, LogOut, Settings, User } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
-import { useAppDispatch } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
-interface UserNavProps {
-  flexDirection?: "row" | "col";
-  showOnlyLogout?: boolean;
-}
-
-const UserNav = ({ flexDirection, showOnlyLogout }: UserNavProps) => {
-  const { t } = useTranslation("common");
+/**
+ * Account menu in the header. Log out is a rare action, so it lives in here
+ * behind the avatar instead of as a bordered button next to the profile.
+ */
+const UserNav = () => {
   const dispatch = useAppDispatch();
+  const userId = useAppSelector(selectUserAuth);
+  const userName = useAppSelector(selectUserName);
+  const avatar = useAppSelector(selectUserAvatar);
 
+  // The confirm dialog sits outside the menu: the menu closes on select, and a
+  // dialog mounted inside its content would unmount with it.
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
   return (
-    <div
-      className={`relative z-30 flex gap-2 text-center font-openSans text-[0.6rem] font-bold text-mainText xs:text-xs  ${
-        flexDirection === "col"
-          ? "flex-col items-start justify-center"
-          : "flex-row justify-around"
-      }`}>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type='button'
+            aria-label='Account menu'
+            className='relative z-30 flex items-center gap-1.5 rounded-lg p-1 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-zinc-800/60'>
+            {avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={avatar}
+                alt=''
+                className='h-7 w-7 rounded-full object-cover'
+              />
+            ) : (
+              <span className='flex h-7 w-7 items-center justify-center rounded-full bg-zinc-800 text-xs font-bold text-zinc-300'>
+                {userName?.[0]?.toUpperCase() ?? <User size={14} />}
+              </span>
+            )}
+            <ChevronDown size={14} />
+          </button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          align='end'
+          sideOffset={8}
+          className='w-52 border-white/10 bg-zinc-900 p-1.5 text-zinc-100 shadow-none'>
+          {userName && (
+            <div className='truncate px-2.5 pb-2 pt-1.5 text-xs font-semibold text-zinc-500'>
+              {userName}
+            </div>
+          )}
+          <DropdownMenuItem asChild>
+            <Link href={`/user/${userId}`} className='flex items-center gap-2'>
+              <User size={14} />
+              See your profile
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href='/settings' className='flex items-center gap-2'>
+              <Settings size={14} />
+              Settings
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => setIsLogoutDialogOpen(true)}
+            className='mt-1 flex items-center gap-2 text-zinc-400'>
+            <LogOut size={14} />
+            Log out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
-        <DialogTrigger asChild>
-          <Button
-            size={showOnlyLogout ? 'icon' : 'sm'}
-            variant='outline'
-            className={cn(showOnlyLogout && "h-8 w-8 border-white/10 bg-zinc-800/40")}
-          >
-            {showOnlyLogout ? <LogOut size={14} className="text-zinc-400" /> : t("button.logout")}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md border-white/10 bg-zinc-950 text-white">
-           <DialogHeader>
-              <DialogTitle>Sign out</DialogTitle>
-              <DialogDescription className="text-zinc-400">
-                 Are you sure you want to sign out?
-              </DialogDescription>
-           </DialogHeader>
-           <DialogFooter className="gap-2 sm:gap-0">
-               <DialogClose asChild>
-                  <Button variant="ghost" className="hover:bg-white/10 hover:text-white">Cancel</Button>
-               </DialogClose>
-               <Button 
-                  variant="destructive" 
-                  onClick={() => {
-                     dispatch(logUserOff());
-                     setIsLogoutDialogOpen(false);
-                  }}
-               >
-                  Sign out
-               </Button>
-           </DialogFooter>
+        <DialogContent className='border-white/10 bg-zinc-950 text-white sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Sign out</DialogTitle>
+            <DialogDescription className='text-zinc-400'>
+              Are you sure you want to sign out?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className='gap-2 sm:gap-0'>
+            <DialogClose asChild>
+              <Button
+                variant='ghost'
+                className='hover:bg-white/10 hover:text-white'>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              variant='destructive'
+              onClick={() => {
+                dispatch(logUserOff());
+                setIsLogoutDialogOpen(false);
+              }}>
+              Sign out
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
+
 export default UserNav;

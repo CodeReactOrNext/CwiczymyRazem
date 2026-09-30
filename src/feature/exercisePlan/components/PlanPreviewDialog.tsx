@@ -9,7 +9,7 @@ import {
 } from "assets/components/ui/dialog";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowUpRight, Music } from "lucide-react";
+import { Music, Play } from "lucide-react";
 import { FaClock, FaListUl } from "react-icons/fa";
 
 interface PlanPreviewDialogProps {
@@ -101,9 +101,10 @@ export const PlanPreviewDialog = ({
               <Button
                 onClick={() => onOpenPlan(plan.id)}
                 loading={isLoading}
-                className='bg-cyan-500 text-zinc-950 hover:bg-cyan-400'>
-                Open plan
-                <ArrowUpRight />
+                className='bg-white text-zinc-950 hover:bg-zinc-200'>
+                {/* It drops you straight into the session — not a link out. */}
+                <Play className='fill-current' />
+                Start plan
               </Button>
             </DialogFooter>
           </>

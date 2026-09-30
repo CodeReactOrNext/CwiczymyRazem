@@ -107,12 +107,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const groupLogs = await loadTargetGroup(target);
 
     // Whether this user already reacted — and if so, on which member — is decided here rather than
-    // taken from the request, so a stale client can't double-award or double-refund.
+    // taken from the request, so a stale client can't double-award. Motivating is one-way: a
+    // reaction can't be taken back, so a repeat click is a no-op that reports the existing state.
     const reactedLog = groupLogs.find((log) => (log.reactions ?? []).includes(userId));
-    const anchor = getGroupReactionAnchor({ logs: groupLogs });
-    const targetLogId = (reactedLog ?? anchor ?? target).id as string;
+    if (reactedLog) {
+      return res.status(200).json({ reacted: true, fameAwarded: 0, logId: reactedLog.id });
+    }
 
-    const isRemoving = Boolean(reactedLog);
+    const anchor = getGroupReactionAnchor({ logs: groupLogs });
+    const targetLogId = (anchor ?? target).id as string;
+
     const groupFame = calculateGroupFame({ logs: groupLogs });
 
     const logRef = firestore.collection("logs").doc(targetLogId) as DocumentReference;
@@ -129,26 +133,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!recipientDoc.exists || !reactorDoc.exists) throw new Error("USER_NOT_FOUND");
 
       const logData = logDoc.data() as StoredLog;
-      const alreadyReacted = (logData.reactions ?? []).includes(userId);
 
-      // The read inside the transaction is the authority: if it disagrees with what we saw a
-      // moment ago, a concurrent request already applied this toggle.
-      if (alreadyReacted !== isRemoving) throw new Error("RACED");
-
-      if (isRemoving) {
-        // Refund exactly what was granted. Reactions from before per-reactor amounts were recorded
-        // have no entry, so they fall back to the row's current payout — best effort on old data.
-        const granted = logData.reactionFame?.[userId] ?? groupFame;
-
-        t.update(logRef, {
-          reactions: FieldValue.arrayRemove(userId),
-          [`reactionFame.${userId}`]: FieldValue.delete(),
-        });
-        t.update(recipientRef, { "statistics.fame": FieldValue.increment(-granted) });
-        t.update(reactorRef, { "statistics.fame": FieldValue.increment(-1) });
-
-        return -granted;
-      }
+      // The read inside the transaction is the authority: if a concurrent request already
+      // reacted, this one must not pay out a second time.
+      if ((logData.reactions ?? []).includes(userId)) throw new Error("RACED");
 
       t.update(logRef, {
         reactions: FieldValue.arrayUnion(userId),
@@ -175,7 +163,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return groupFame;
     });
 
-    return res.status(200).json({ reacted: !isRemoving, fameAwarded, logId: targetLogId });
+    return res.status(200).json({ reacted: true, fameAwarded, logId: targetLogId });
   } catch (error: any) {
     switch (error?.message) {
       case "LOG_NOT_FOUND":

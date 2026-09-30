@@ -33,6 +33,9 @@ interface PlaylistsViewProps {
   onOpenSong: (songId: string) => void;
 }
 
+/** Below this many playlists the grid's "New playlist" tile is the create entry. */
+const FEW_PLAYLISTS = 4;
+
 const GRID_CLASS =
   "grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5";
 
@@ -200,6 +203,14 @@ export const PlaylistsView = ({
   // ── Grid ────────────────────────────────────────────────────────────────
   const shownPlaylists = tab === "mine" ? myPlaylists : discoverPlaylists;
 
+  // One "new playlist" entry at a time: the tile in the grid while the list is
+  // short, the header button once the tile would sit off among many cards.
+  // The empty state carries its own "Create one", so neither shows there.
+  const hasMine = !isLoading && myPlaylists.length > 0;
+  const showCreateTile = tab === "mine" && myPlaylists.length < FEW_PLAYLISTS;
+  const showCreateButton =
+    tab === "discover" || (hasMine && myPlaylists.length >= FEW_PLAYLISTS);
+
   return (
     <div className="space-y-8 p-4 sm:p-6 md:p-10 animate-in fade-in-50 duration-300">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -240,15 +251,17 @@ export const PlaylistsView = ({
           </div>
         </div>
 
-        <Button
-          onClick={() => setIsCreatorOpen(true)}
-          className="h-10 px-5 font-bold"
-        >
-          <span className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            New playlist
-          </span>
-        </Button>
+        {showCreateButton && (
+          <Button
+            onClick={() => setIsCreatorOpen(true)}
+            className="h-10 px-5 font-bold"
+          >
+            <span className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              New playlist
+            </span>
+          </Button>
+        )}
       </div>
 
       {isLoading && userAuth ? (
@@ -305,7 +318,7 @@ export const PlaylistsView = ({
         </div>
       ) : (
         <div className={GRID_CLASS}>
-          {tab === "mine" && (
+          {showCreateTile && (
             <button
               type="button"
               onClick={() => setIsCreatorOpen(true)}

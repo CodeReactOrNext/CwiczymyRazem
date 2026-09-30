@@ -4,6 +4,7 @@ import type { SerializedExercise } from "feature/exercises/lib/serializeExercise
 import { idToSlug } from "feature/exercises/lib/slugUtils";
 import { ArrowRight, Clock, Music } from "lucide-react";
 import Link from "next/link";
+import { formatMinutesDuration } from "utils/converter";
 
 import { notationEmbedHeightPx } from "../lib/notationEmbedHeight";
 import { InlineText } from "./InlineText";
@@ -47,7 +48,7 @@ export const ExerciseShowcase = ({
   const duration =
     exercise.timeInMinutes < 1
       ? `${Math.round(exercise.timeInMinutes * 60)} sec`
-      : `${exercise.timeInMinutes} min`;
+      : formatMinutesDuration(exercise.timeInMinutes);
 
   return (
     <div

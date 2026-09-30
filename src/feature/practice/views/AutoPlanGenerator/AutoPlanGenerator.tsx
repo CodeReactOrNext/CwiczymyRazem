@@ -1,3 +1,4 @@
+import { arrayMove } from "@dnd-kit/sortable";
 import MainContainer from "components/MainContainer";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { CategoryDifficultyFilter } from "feature/practice/utils/autoPlan";
@@ -89,31 +90,14 @@ export const AutoPlanGenerator = ({
     setGeneratedPlan(newPlan);
   };
 
-  const moveExerciseUp = (index: number) => {
-    if (!generatedPlan || index === 0) return;
-
-    const updatedExercises = [...generatedPlan.exercises];
-    const temp = updatedExercises[index];
-    updatedExercises[index] = updatedExercises[index - 1];
-    updatedExercises[index - 1] = temp;
+  const moveExercise = (from: number, to: number) => {
+    if (!generatedPlan || from === to) return;
+    const last = generatedPlan.exercises.length - 1;
+    if (from < 0 || from > last || to < 0 || to > last) return;
 
     setGeneratedPlan({
       ...generatedPlan,
-      exercises: updatedExercises,
-    });
-  };
-
-  const moveExerciseDown = (index: number) => {
-    if (!generatedPlan || index === generatedPlan.exercises.length - 1) return;
-
-    const updatedExercises = [...generatedPlan.exercises];
-    const temp = updatedExercises[index];
-    updatedExercises[index] = updatedExercises[index + 1];
-    updatedExercises[index + 1] = temp;
-
-    setGeneratedPlan({
-      ...generatedPlan,
-      exercises: updatedExercises,
+      exercises: arrayMove(generatedPlan.exercises, from, to),
     });
   };
 
@@ -168,8 +152,8 @@ export const AutoPlanGenerator = ({
           onBack={() => setGeneratedPlan(null)}
           onRegenerate={generatePlan}
           onStart={handleStart}
-          onMoveExerciseUp={moveExerciseUp}
-          onMoveExerciseDown={moveExerciseDown}
+          targetMinutes={time}
+          onMoveExercise={moveExercise}
           onReplaceExercise={replaceExercise}
           onRemoveExercise={removeExercise}
           isStarting={isStarting}

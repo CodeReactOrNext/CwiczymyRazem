@@ -25,8 +25,8 @@ function formatPracticeMs(ms: number): string {
   const totalSec = Math.floor(ms / 1000);
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  if (m > 0) return `${m}m`;
+  if (h > 0) return `${h}h ${m} min`;
+  if (m > 0) return `${m} min`;
   return `${totalSec}s`;
 }
 
@@ -73,7 +73,7 @@ export const SongCard = ({
   useEffect(() => {
     const el = titleRef.current;
     if (!el) return;
-    const check = () => setIsTitleTruncated(el.scrollWidth > el.clientWidth);
+    const check = () => setIsTitleTruncated(el.scrollHeight > el.clientHeight);
     check();
     const ro = new ResizeObserver(check);
     ro.observe(el);
@@ -172,14 +172,14 @@ export const SongCard = ({
       </div>
 
       {/* Info */}
-      <div className="relative z-10 flex flex-col pt-3">
+      <div className="relative z-10 flex flex-1 flex-col pt-3">
         <TooltipProvider delayDuration={300}>
           <Tooltip open={isTitleTruncated && isTitleHovered} onOpenChange={setIsTitleHovered}>
             <TooltipTrigger asChild>
               <h3
                 ref={titleRef}
                 translate="no"
-                className="w-full truncate text-base font-bold text-white"
+                className="line-clamp-2 w-full break-words text-base font-bold leading-snug text-white"
               >
                 {song.title}
               </h3>
@@ -194,7 +194,8 @@ export const SongCard = ({
           {song.artist}
         </p>
 
-        <div className="mt-3.5 flex items-center justify-between gap-2">
+        {/* mt-auto keeps the stats row aligned across a grid row when titles wrap to two lines */}
+        <div className="mt-auto flex items-center justify-between gap-2 pt-3.5">
           <div className="flex min-w-0 items-center gap-2">
             {showPracticeStatus ? (
               practiceMs && practiceMs > 0 ? (

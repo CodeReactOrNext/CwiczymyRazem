@@ -7,6 +7,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { GiGuitar, GiMetronome } from "react-icons/gi";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
+import { SessionTooltip } from "./SessionTooltip";
 
 interface VolumeButtonProps {
   /** Metronome click volume — omit (with its setters) to hide the metronome section. */
@@ -77,7 +78,7 @@ export const VolumeButton = ({
     </RippleButton>
   ) : (
     <RippleButton
-      title='Volume'
+      aria-label='Volume'
       className={cn(
         "flex items-center justify-center shrink-0 rounded-lg transition-all outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
         compact ? "h-8 w-8 active:scale-90" : cn("w-12 active:scale-95", h),
@@ -91,7 +92,13 @@ export const VolumeButton = ({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      {mobile ? (
+        <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      ) : (
+        <SessionTooltip label='Volume: metronome, guitar playback and tracks'>
+          <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+        </SessionTooltip>
+      )}
       <DropdownMenuContent
         align='center'
         sideOffset={8}

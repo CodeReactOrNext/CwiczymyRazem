@@ -2,13 +2,19 @@ const padTo2Digits = (number: number) => {
   return number.toString().padStart(2, "0");
 };
 
+/** Duration as "Xh Y min" ("Y min" under an hour, "Xh" on a full hour). */
 export const convertMsToHM = (milliseconds: number) => {
-  const totalMinutes = Math.round(milliseconds / 60000);
+  const totalMinutes = Math.max(0, Math.round(milliseconds / 60000));
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
-  return `${padTo2Digits(hours)}:${padTo2Digits(minutes)}`;
+  if (hours === 0) return `${minutes} min`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${minutes} min`;
 };
+
+export const formatMinutesDuration = (minutes: number) =>
+  convertMsToHM(minutes * 60000);
 
 export const convertMsToHMObject = (milliseconds: number) => {
   const totalMinutes = Math.floor(milliseconds / 60000);

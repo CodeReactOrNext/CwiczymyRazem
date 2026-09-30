@@ -169,9 +169,9 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                 <StatsBox
                   Icon={FaClock}
                   label={t("tooltip.totalTime")}
-                  value={`${convertMsToHM(
+                  value={convertMsToHM(
                     userData.statistics.totalPracticeTime
-                  )}h`}
+                  )}
                 />
                 <StatsBox
                   Icon={() => <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />}

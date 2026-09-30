@@ -27,6 +27,7 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { formatMinutesDuration } from "utils/converter";
 
 export interface InteractiveGuitarPracticePageProps {
   /** The demo drill, serialized in getStaticProps. */
@@ -137,7 +138,7 @@ export const InteractiveGuitarPracticePage = ({
   const duration =
     exercise.timeInMinutes < 1
       ? `${Math.round(exercise.timeInMinutes * 60)} sec`
-      : `${exercise.timeInMinutes} min`;
+      : formatMinutesDuration(exercise.timeInMinutes);
 
   const jsonLd = {
     "@context": "https://schema.org",

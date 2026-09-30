@@ -104,7 +104,7 @@ const ChallengeRow = ({
       {/* Station */}
       <div
         className={cn(
-          "relative my-1 flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-3 rounded-lg bg-white/[0.02] px-2 py-2.5 transition-colors group-hover:bg-white/[0.06] sm:flex-nowrap sm:px-3",
+          "relative my-1 flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-3 rounded-lg bg-white/[0.02] px-2 py-3 transition-colors group-hover:bg-white/[0.06] sm:flex-nowrap sm:px-3",
           isCleared && "opacity-80 group-hover:opacity-100",
         )}>
         {/* The station itself opens the song — everything already interactive
@@ -118,7 +118,7 @@ const ChallengeRow = ({
           </span>
         </button>
 
-        <div className='pointer-events-none relative h-10 w-10 shrink-0 overflow-hidden rounded-[4px] bg-zinc-800'>
+        <div className='pointer-events-none relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-zinc-800'>
           {song.coverUrl ? (
             <img
               src={song.coverUrl}
@@ -127,21 +127,21 @@ const ChallengeRow = ({
             />
           ) : (
             <div className='flex h-full w-full items-center justify-center text-zinc-600'>
-              <Music className='h-4 w-4' />
+              <Music className='h-5 w-5' />
             </div>
           )}
           <span className='absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100'>
-            <Play className='h-4 w-4 fill-current' />
+            <Play className='h-5 w-5 fill-current' />
           </span>
         </div>
 
         <div className='min-w-0 flex-1'>
           <p
             translate='no'
-            className='truncate text-sm font-semibold text-white'>
+            className='truncate text-base font-semibold text-white'>
             {song.title}
           </p>
-          <p translate='no' className='truncate text-xs text-zinc-500'>
+          <p translate='no' className='mt-0.5 truncate text-sm text-zinc-500'>
             {song.artist}
             {song.votes > 0 && (
               <span className='ml-2 text-zinc-600'>

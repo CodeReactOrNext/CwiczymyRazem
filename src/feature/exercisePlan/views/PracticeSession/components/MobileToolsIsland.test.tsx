@@ -62,7 +62,7 @@ describe("MobileToolsIsland", () => {
     // The BPM sits on the island button, but the tempo panel behind it stays shut.
     expect(screen.getByTitle("Tempo")).toBeDefined();
     expect(screen.queryByRole("tab", { name: "Tempo" })).toBeNull();
-    expect(screen.queryByTitle("Slower")).toBeNull();
+    expect(screen.queryByLabelText("Slower")).toBeNull();
   });
 
   it("opens the tempo panel with the other tool groups next to it", () => {
@@ -72,7 +72,7 @@ describe("MobileToolsIsland", () => {
     expect(screen.getByRole("tab", { name: "Tempo" })).toBeDefined();
     expect(screen.getByRole("tab", { name: "Sound" })).toBeDefined();
     expect(screen.getByRole("tab", { name: "Guide" })).toBeDefined();
-    expect(screen.getByTitle("Slower")).toBeDefined();
+    expect(screen.getByLabelText("Slower")).toBeDefined();
   });
 
   it("toggles pitch detect straight from the island", () => {

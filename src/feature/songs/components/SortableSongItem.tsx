@@ -36,8 +36,8 @@ function formatPracticeMs(ms: number): string {
   const totalSec = Math.floor(ms / 1000);
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  if (m > 0) return `${m}m`;
+  if (h > 0) return `${h}h ${m} min`;
+  if (m > 0) return `${m} min`;
   return `${totalSec}s`;
 }
 

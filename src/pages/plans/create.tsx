@@ -43,7 +43,10 @@ const CreatePlanPage: NextPageWithLayout = () => {
         color: appearance?.color,
       });
 
-      toast.success(t("exercises:my_plans.create_success") as string);
+      // Bottom corner: top-right lands on the plans list's own "Create Plan" button.
+      toast.success(t("exercises:my_plans.create_success") as string, {
+        position: "bottom-right",
+      });
       router.push("/plans");
     } catch (error) {
       logger.error(error, { context: "CreatePlanPage.handleCreatePlan" });

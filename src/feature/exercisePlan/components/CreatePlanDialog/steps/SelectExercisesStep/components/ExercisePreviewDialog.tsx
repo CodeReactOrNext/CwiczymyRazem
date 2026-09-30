@@ -7,16 +7,31 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import { useTablatureStyle } from "feature/exercisePlan/views/PracticeSession/components/tablatureSettings";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
+import type { TuningGutterString } from "feature/exercisePlan/views/PracticeSession/components/useTablatureWorkerBridge";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
 import { Clock, Play } from "lucide-react";
+import { useMemo } from "react";
+import { convertMsToHMS } from "utils/converter";
+
+import { ExercisePreviewActions } from "./ExercisePreviewActions";
 
 interface ExercisePreviewDialogProps {
   exercise: Exercise | null;
   onClose: () => void;
   onStart?: () => void;
+  /** Hides "Add to plan" and the heart — e.g. while the player is already
+   *  building a plan and picking exercises for it. */
+  hidePlanActions?: boolean;
 }
+
+/** Standard tuning, low→high — exercises are written for it. */
+const STANDARD_TUNING = ["E", "A", "D", "G", "B", "E"];
+
+// Same size the settings preview draws the tab at.
+const PREVIEW_HEIGHT = 340;
 
 const chipClassName =
   "flex items-center gap-1.5 rounded border-transparent bg-zinc-800/40 px-2.5 py-1 text-xs font-medium text-zinc-300";
@@ -25,8 +40,21 @@ export function ExercisePreviewDialog({
   exercise,
   onClose,
   onStart,
+  hidePlanActions = false,
 }: ExercisePreviewDialogProps) {
   const { t } = useTranslation(["common", "exercises"]);
+  // The player's own look (palette, pills, board) plus the string names, so the
+  // preview reads exactly like the tab they get in the session.
+  const { settings, palette, isLightBoard, style } = useTablatureStyle();
+
+  const tuningStrings = useMemo<TuningGutterString[]>(() => {
+    if (!settings.showTuningGutter) return [];
+    return [1, 2, 3, 4, 5, 6].map((string) => ({
+      string,
+      label: STANDARD_TUNING[6 - string] ?? "",
+      color: palette[string - 1] ?? "#ffffff",
+    }));
+  }, [palette, settings.showTuningGutter]);
 
   if (!exercise) return null;
 
@@ -55,9 +83,8 @@ export function ExercisePreviewDialog({
               <div className='mt-5 hidden flex-wrap items-center gap-2 sm:flex'>
                 <Badge variant='outline' className={chipClassName}>
                   <Clock className='h-3 w-3 text-zinc-500' />
-                  {exercise.timeInMinutes < 1
-                    ? `${Math.round(exercise.timeInMinutes * 60)}s`
-                    : `${exercise.timeInMinutes} min`}
+                  {/* Same m:ss clock the session timer shows. */}
+                  {convertMsToHMS(Math.round(exercise.timeInMinutes * 60) * 1000)}
                 </Badge>
 
                 <Badge variant='outline' className={chipClassName}>
@@ -90,13 +117,19 @@ export function ExercisePreviewDialog({
             {exercise.tablature && exercise.tablature.length > 0 && (
               <div className='space-y-3'>
                 <h4 className='text-sm font-medium text-zinc-400'>Tablature</h4>
-                <div className='overflow-hidden rounded-lg bg-zinc-900/40'>
+                <div className='overflow-hidden rounded-lg'>
                   <TablatureViewer
                     measures={exercise.tablature}
                     bpm={exercise.metronomeSpeed?.recommended || 100}
                     isPlaying={false}
                     startTime={null}
-                    className='min-h-[340px] w-full cursor-grab active:cursor-grabbing'
+                    heightPx={PREVIEW_HEIGHT}
+                    zoom={settings.noteSpacing}
+                    style={style}
+                    palette={palette}
+                    tuningStrings={tuningStrings}
+                    ambientGlow={false}
+                    isLightBoard={isLightBoard}
                   />
                 </div>
               </div>
@@ -178,7 +211,8 @@ export function ExercisePreviewDialog({
         </div>
 
         {/* Footer — always visible, outside the scroll area */}
-        <div className='flex shrink-0 items-center justify-end gap-3 p-6 pb-8 pt-4 sm:pb-6'>
+        <div className='flex shrink-0 flex-wrap items-center justify-end gap-3 p-6 pb-8 pt-4 sm:pb-6'>
+          {!hidePlanActions && <ExercisePreviewActions exercise={exercise} />}
           <Button
             variant='ghost'
             onClick={onClose}

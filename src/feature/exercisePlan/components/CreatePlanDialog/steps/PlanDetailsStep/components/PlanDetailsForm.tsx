@@ -31,7 +31,7 @@ export const PlanDetailsForm = ({
   initialData,
 }: PlanDetailsFormProps) => {
   const { t } = useTranslation("exercises");
-  const { register, handleSubmit, control } = usePlanDetailsForm({
+  const { register, handleSubmit, control, formState } = usePlanDetailsForm({
     selectedExercises,
     onSubmit,
     initialData,
@@ -39,6 +39,12 @@ export const PlanDetailsForm = ({
 
   // Reactive form values — drives the live preview as the user types / picks.
   const watched = useWatch({ control });
+
+  // Title is the only required field — spell out what's missing next to the
+  // button instead of letting it look ready while the submit silently fails.
+  const missingFields = [!watched.title?.trim() && "plan title"].filter(
+    Boolean,
+  ) as string[];
 
   const previewPlan: ExercisePlan = {
     id: "preview",
@@ -63,7 +69,7 @@ export const PlanDetailsForm = ({
       onSubmit={handleSubmit}
       className='space-y-6 pt-4'>
       <div className='space-y-4'>
-        <TitleField register={register} />
+        <TitleField register={register} error={formState.errors.title} />
         <DescriptionField register={register} />
       </div>
 
@@ -143,11 +149,20 @@ export const PlanDetailsForm = ({
         )}
       />
 
-      <div className='flex justify-end gap-3 pt-6'>
+      <div className='flex flex-wrap items-center justify-end gap-3 pt-6'>
+        {missingFields.length > 0 && (
+          <p className='mr-auto text-xs text-zinc-500' aria-live='polite'>
+            {missingFields.length} field{missingFields.length > 1 ? "s" : ""}{" "}
+            left: {missingFields.join(", ")}
+          </p>
+        )}
         <Button type="button" variant="ghost" onClick={onBack}>
           Back
         </Button>
-        <Button type="submit">
+        <Button
+          type="submit"
+          aria-disabled={missingFields.length > 0}
+          className={cn(missingFields.length > 0 && "opacity-50")}>
           Create Plan
         </Button>
       </div>

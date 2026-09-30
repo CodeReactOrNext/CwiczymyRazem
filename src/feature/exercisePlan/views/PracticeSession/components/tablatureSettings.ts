@@ -228,6 +228,18 @@ export const FRET_TEXT_COLORS: Record<FretTextKey, FretTextColor> = {
   auto: { label: "Auto", desc: "Follows each pill's brightness" },
 };
 
+export type NoteStyleKey = "headTail" | "bar";
+
+/** How a note's length is drawn on the tab. */
+export const NOTE_STYLES: Record<NoteStyleKey, { label: string; desc: string }> =
+  {
+    headTail: {
+      label: "Head + tail",
+      desc: "Solid head, thin sustain tail",
+    },
+    bar: { label: "Solid bar", desc: "One block for the whole length" },
+  };
+
 export const FRET_FONT_MIN = 0.8;
 export const FRET_FONT_MAX = 1.4;
 
@@ -256,6 +268,7 @@ export interface TablatureSettings {
   metronomeSound: MetronomeSoundKey;
   // ── Shape ──
   pillPreset: PillPresetKey;
+  noteStyle: NoteStyleKey;
   /** Multiplier on the fret-number type size (1 = the worker's 13px base). */
   fretFontScale: number;
   fretTextColor: FretTextKey;
@@ -303,6 +316,7 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   defaultViewMode: "tab",
   metronomeSound: DEFAULT_METRONOME_SOUND,
   pillPreset: DEFAULT_PILL_PRESET,
+  noteStyle: "headTail",
   fretFontScale: 1,
   fretTextColor: "black",
   noteSpacing: 1,
@@ -341,6 +355,7 @@ export function migrateTablatureSettings(
   s.metronomeSound = normalizeMetronomeSound(s.metronomeSound);
   if (!(s.pillPreset in PILL_PRESETS))
     s.pillPreset = DEFAULT_SETTINGS.pillPreset;
+  if (!(s.noteStyle in NOTE_STYLES)) s.noteStyle = DEFAULT_SETTINGS.noteStyle;
   if (!(s.palette in STRING_PALETTES)) s.palette = DEFAULT_SETTINGS.palette;
   if (!(s.hitColor in HIT_COLORS)) s.hitColor = DEFAULT_SETTINGS.hitColor;
   if (!(s.background in BACKGROUNDS))
@@ -429,6 +444,7 @@ export function useTablatureStyle(): {
     return {
       pillHeight: pill.height,
       pillCorner: pill.corner,
+      noteTails: settings.noteStyle !== "bar",
       fretFontScale: settings.fretFontScale,
       stringColors: palette,
       hitFill: hit.fill,
@@ -451,6 +467,7 @@ export function useTablatureStyle(): {
     background,
     board.ink,
     settings.pillPreset,
+    settings.noteStyle,
     settings.hitColor,
     settings.fretFontScale,
     settings.fretTextColor,

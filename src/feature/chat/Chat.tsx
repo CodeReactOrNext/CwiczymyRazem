@@ -8,7 +8,10 @@ import {
   ChatMessageActions,
   ChatReactionChips,
 } from "feature/chat/components/ChatReactions";
-import { ChatSystemRow } from "feature/chat/components/ChatSystemRow";
+import {
+  ChatSystemRow,
+  isJoinRow,
+} from "feature/chat/components/ChatSystemRow";
 import { useChat } from "feature/chat/hooks/useChat";
 import { typingLabel, useChatTyping } from "feature/chat/hooks/useChatTyping";
 import { GLOBAL_CHAT_PATH } from "feature/chat/services/chatService";
@@ -16,6 +19,7 @@ import type {
   ChatMention,
   ChatMessageType,
 } from "feature/chat/types/chat.types";
+import { foldGreetings } from "feature/chat/utils/chatGreetings";
 import { splitByMentions } from "feature/chat/utils/chatMentions";
 import type {
   Exercise,
@@ -143,6 +147,11 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   // The newest message the player has had on screen — whatever came after it is "new".
   const [lastSeenId, setLastSeenId] = useState<string | null>(null);
 
+  const { visible: visibleMessages, greetersById } = useMemo(
+    () => foldGreetings(messages),
+    [messages],
+  );
+
   const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
 
   // Follows the conversation only when there is something new at the bottom, and only when the
@@ -259,19 +268,28 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
             />
           ) : (
             <div className='flex flex-col gap-1 pt-8 sm:px-2'>
-              {messages.map((msg, index) => {
+              {visibleMessages.map((msg, index) => {
                 const isMe = msg.userId === currentUserId;
-                const prevMsg = index > 0 ? messages[index - 1] : null;
+                const prevMsg = index > 0 ? visibleMessages[index - 1] : null;
                 const isActive = !!msg.id && activeMessageId === msg.id;
                 const react = (emoji: Parameters<typeof toggleReaction>[1]) =>
                   msg.id && toggleReaction(msg.id, emoji);
 
                 if (!isPlain(msg)) {
+                  const greeters = (msg.id && greetersById.get(msg.id)) || [];
+                  const canGreet =
+                    !isMe &&
+                    msg.userId !== "system" &&
+                    !greeters.some((g) => g.userId === currentUserId);
+                  const isJoin = isJoinRow(msg);
                   return (
                     <div
                       key={msg.id}
                       data-message-id={msg.id}
-                      className='group relative mt-4 flex flex-col items-center'
+                      className={cn(
+                        "group relative mt-4 flex flex-col",
+                        isJoin ? "items-start" : "items-center",
+                      )}
                       onClick={() =>
                         setActiveMessageId((prev) =>
                           prev === msg.id ? null : (msg.id ?? null),
@@ -280,21 +298,24 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
                       <ChatMessageActions
                         visible={isActive}
                         onReact={react}
-                        className='absolute -top-8 left-1/2 -translate-x-1/2'
+                        className={cn(
+                          "absolute -top-8",
+                          // Past the avatar column, over the bubble like a message's.
+                          isJoin ? "left-[52px]" : "left-1/2 -translate-x-1/2",
+                        )}
                       />
                       <ChatSystemRow
                         message={msg}
-                        onSayHi={
-                          !isMe && msg.userId !== "system"
-                            ? () => greet(msg)
-                            : undefined
-                        }
+                        onSayHi={canGreet ? () => greet(msg) : undefined}
+                        greeters={greeters}
                       />
-                      <ChatReactionChips
-                        reactions={msg.likes}
-                        viewerId={currentUserId}
-                        onToggle={react}
-                      />
+                      <div className={cn(isJoin && "pl-[52px]")}>
+                        <ChatReactionChips
+                          reactions={msg.likes}
+                          viewerId={currentUserId}
+                          onToggle={react}
+                        />
+                      </div>
                     </div>
                   );
                 }

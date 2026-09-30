@@ -4,11 +4,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import { TunerDialog } from "feature/tuner/components/TunerDialog";
@@ -27,6 +22,7 @@ import {
   MicTroubleshooting,
   MicTroubleshootingDialog,
 } from "./MicTroubleshooting";
+import { SessionTooltip } from "./SessionTooltip";
 import { SpeedDropdown } from "./SpeedDropdown";
 import { VolumeButton } from "./VolumeButton";
 
@@ -52,7 +48,9 @@ interface MediaControlsToolbarProps {
   setIsMetronomeMuted?: (v: boolean) => void;
   /** Per-track mixer — shown in the volume popover only when there's more than one track. */
   audioTracks?: AudioTrackConfig[];
-  setTrackConfigs?: Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
+  setTrackConfigs?: Dispatch<
+    SetStateAction<Record<string, { volume: number; isMuted: boolean }>>
+  >;
   frequencyRef?: React.RefObject<number>;
   volumeRef?: React.RefObject<number>;
   compact?: boolean;
@@ -126,7 +124,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   const showVolumeButton =
     (hasMetronome && showSpeed && !!metronome && !!setIsMetronomeMuted) ||
     showMasterVolume ||
-    (showBacking && hasAudioTrack && (audioTracks?.length ?? 0) > 0 && !!setTrackConfigs);
+    (showBacking &&
+      hasAudioTrack &&
+      (audioTracks?.length ?? 0) > 0 &&
+      !!setTrackConfigs);
 
   if (!hasMetronome && !hasAudioTrack && !hasMicControls) return null;
 
@@ -194,43 +195,47 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               ? "grid grid-cols-2 gap-2"
               : "contents",
           )}>
-        {showTuningBtn && (
-          <RippleButton
-            onClick={openTuningSettings}
-            title={
-              isTuningLocked
-                ? "Tuning is locked for this exercise"
-                : "Guitar tuning"
-            }
-            className={cn(
-              gridBtn,
-              isNonStandardTuning
-                ? "bg-cyan-500/10 text-cyan-400"
-                : "bg-zinc-800 text-zinc-400",
-            )}>
-            {isTuningLocked ? (
-              <Lock className='h-3.5 w-3.5 shrink-0' />
-            ) : (
-              <GiGuitarHead className='h-4 w-4 shrink-0' />
-            )}
-            <span className='truncate text-[10px] font-semibold tracking-wide'>
-              {preferredTuning.name}
-            </span>
-          </RippleButton>
-        )}
+          {showTuningBtn && (
+            <RippleButton
+              onClick={openTuningSettings}
+              title={
+                isTuningLocked
+                  ? "Tuning is locked for this exercise"
+                  : "Guitar tuning"
+              }
+              className={cn(
+                gridBtn,
+                isNonStandardTuning
+                  ? "bg-cyan-500/10 text-cyan-400"
+                  : "bg-zinc-800 text-zinc-400",
+              )}>
+              {isTuningLocked ? (
+                <Lock className='h-3.5 w-3.5 shrink-0' />
+              ) : (
+                <GiGuitarHead className='h-4 w-4 shrink-0' />
+              )}
+              <span className='truncate text-[10px] font-semibold tracking-wide'>
+                {preferredTuning.name}
+              </span>
+            </RippleButton>
+          )}
 
-        {showVolumeButton && (
-          <VolumeButton
-            mobile
-            metronome={hasMetronome && showSpeed ? metronome : undefined}
-            isMetronomeMuted={isMetronomeMuted}
-            setIsMetronomeMuted={hasMetronome && showSpeed ? setIsMetronomeMuted : undefined}
-            masterVolume={masterVolume}
-            onMasterVolumeChange={onMasterVolumeChange}
-            audioTracks={showBacking && hasAudioTrack ? audioTracks : undefined}
-            setTrackConfigs={setTrackConfigs}
-          />
-        )}
+          {showVolumeButton && (
+            <VolumeButton
+              mobile
+              metronome={hasMetronome && showSpeed ? metronome : undefined}
+              isMetronomeMuted={isMetronomeMuted}
+              setIsMetronomeMuted={
+                hasMetronome && showSpeed ? setIsMetronomeMuted : undefined
+              }
+              masterVolume={masterVolume}
+              onMasterVolumeChange={onMasterVolumeChange}
+              audioTracks={
+                showBacking && hasAudioTrack ? audioTracks : undefined
+              }
+              setTrackConfigs={setTrackConfigs}
+            />
+          )}
         </div>
 
         {hasMicControls && (
@@ -352,10 +357,14 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               compact
               metronome={hasMetronome && showSpeed ? metronome : undefined}
               isMetronomeMuted={isMetronomeMuted}
-              setIsMetronomeMuted={hasMetronome && showSpeed ? setIsMetronomeMuted : undefined}
+              setIsMetronomeMuted={
+                hasMetronome && showSpeed ? setIsMetronomeMuted : undefined
+              }
               masterVolume={masterVolume}
               onMasterVolumeChange={onMasterVolumeChange}
-              audioTracks={showBacking && hasAudioTrack ? audioTracks : undefined}
+              audioTracks={
+                showBacking && hasAudioTrack ? audioTracks : undefined
+              }
               setTrackConfigs={setTrackConfigs}
             />
           )}
@@ -478,26 +487,27 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
         showVolumeButton) && (
         <div className={island}>
           {showBacking && hasAudioTrack && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <RippleButton
-                  onClick={onAudioToggle}
-                  disabled={isRiddleMode}
-                  className={cn(
-                    "flex w-12 items-center justify-center rounded-lg transition-all active:scale-95",
-                    h,
-                    isAudioMuted
-                      ? "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
-                      : "bg-white/15 text-white hover:bg-white/25",
-                    isRiddleMode && "cursor-not-allowed opacity-50",
-                  )}>
-                  <GiGuitar className='text-lg' />
-                </RippleButton>
-              </TooltipTrigger>
-              <TooltipContent side='bottom'>
-                {isAudioMuted ? "Guitar off" : "Guitar on"}
-              </TooltipContent>
-            </Tooltip>
+            <SessionTooltip
+              label={
+                isAudioMuted
+                  ? "Guitar playback off — click to hear the tab"
+                  : "Guitar playback on — click to mute the tab"
+              }>
+              <RippleButton
+                onClick={onAudioToggle}
+                disabled={isRiddleMode}
+                aria-label='Guitar playback'
+                className={cn(
+                  "flex w-12 items-center justify-center rounded-lg transition-all active:scale-95",
+                  h,
+                  isAudioMuted
+                    ? "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
+                    : "bg-white/15 text-white hover:bg-white/25",
+                  isRiddleMode && "cursor-not-allowed opacity-50",
+                )}>
+                <GiGuitar className='text-lg' />
+              </RippleButton>
+            </SessionTooltip>
           )}
 
           {showVolumeButton && (
@@ -505,42 +515,44 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               h={h}
               metronome={hasMetronome && showSpeed ? metronome : undefined}
               isMetronomeMuted={isMetronomeMuted}
-              setIsMetronomeMuted={hasMetronome && showSpeed ? setIsMetronomeMuted : undefined}
+              setIsMetronomeMuted={
+                hasMetronome && showSpeed ? setIsMetronomeMuted : undefined
+              }
               masterVolume={masterVolume}
               onMasterVolumeChange={onMasterVolumeChange}
-              audioTracks={showBacking && hasAudioTrack ? audioTracks : undefined}
+              audioTracks={
+                showBacking && hasAudioTrack ? audioTracks : undefined
+              }
               setTrackConfigs={setTrackConfigs}
             />
           )}
 
           {(hasAudioTrack || hasMicControls) && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <RippleButton
-                  onClick={openTuningSettings}
-                  className={cn(
-                    "flex items-center gap-2 rounded-lg px-3 transition-all active:scale-95",
-                    h,
-                    isNonStandardTuning
-                      ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
-                      : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
-                  )}>
-                  {isTuningLocked ? (
-                    <Lock className='h-3.5 w-3.5 shrink-0' />
-                  ) : (
-                    <GiGuitarHead className='h-4 w-4 shrink-0' />
-                  )}
-                  <span className='text-[10px] font-semibold tracking-wide'>
-                    {preferredTuning.name}
-                  </span>
-                </RippleButton>
-              </TooltipTrigger>
-              <TooltipContent side='bottom'>
-                {isTuningLocked
+            <SessionTooltip
+              label={
+                isTuningLocked
                   ? "Tuning is locked for this exercise"
-                  : "Guitar tuning"}
-              </TooltipContent>
-            </Tooltip>
+                  : "Guitar tuning — click to change"
+              }>
+              <RippleButton
+                onClick={openTuningSettings}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg px-3 transition-all active:scale-95",
+                  h,
+                  isNonStandardTuning
+                    ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
+                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
+                )}>
+                {isTuningLocked ? (
+                  <Lock className='h-3.5 w-3.5 shrink-0' />
+                ) : (
+                  <GiGuitarHead className='h-4 w-4 shrink-0' />
+                )}
+                <span className='text-[10px] font-semibold tracking-wide'>
+                  {preferredTuning.name}
+                </span>
+              </RippleButton>
+            </SessionTooltip>
           )}
         </div>
       )}
@@ -548,50 +560,50 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
       {/* ── INPUT island: pitch detect + mic-tools menu ── */}
       {hasMicControls && (
         <div className={island}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <RippleButton
-                onClick={examMode && isMicEnabled ? undefined : onMicToggle}
-                disabled={examMode && isMicEnabled}
-                className={cn(
-                  "flex items-center gap-2 rounded-lg px-4 font-semibold transition-all active:scale-95",
-                  h,
-                  isMicEnabled
-                    ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
-                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
-                  examMode &&
-                    isMicEnabled &&
-                    "cursor-not-allowed hover:bg-emerald-950 active:scale-100",
-                )}>
-                <FaMicrophone className='h-4 w-4 shrink-0' />
-                <span className='text-[10px] font-semibold tracking-wide'>
-                  Pitch Detect
-                </span>
-              </RippleButton>
-            </TooltipTrigger>
-            <TooltipContent side='bottom'>
-              {examMode && isMicEnabled
+          <SessionTooltip
+            label={
+              examMode && isMicEnabled
                 ? "Pitch Detect required during the exam"
                 : isMicEnabled
                   ? "Microphone active — app is listening to your guitar"
-                  : "Enable microphone to detect what you're playing"}
-            </TooltipContent>
-          </Tooltip>
+                  : "Enable microphone to detect what you're playing"
+            }>
+            <RippleButton
+              onClick={examMode && isMicEnabled ? undefined : onMicToggle}
+              disabled={examMode && isMicEnabled}
+              className={cn(
+                "flex items-center gap-2 rounded-lg px-4 font-semibold transition-all active:scale-95",
+                h,
+                isMicEnabled
+                  ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
+                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
+                examMode &&
+                  isMicEnabled &&
+                  "cursor-not-allowed hover:bg-emerald-950 active:scale-100",
+              )}>
+              <FaMicrophone className='h-4 w-4 shrink-0' />
+              <span className='text-[10px] font-semibold tracking-wide'>
+                Pitch Detect
+              </span>
+            </RippleButton>
+          </SessionTooltip>
 
           {/* Rarely-used mic tools live behind one chevron, so toggling the mic
               never adds/removes buttons and the row keeps a constant width. */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <RippleButton
-                title='Mic tools'
-                className={cn(
-                  "flex w-8 items-center justify-center rounded-lg outline-none transition-all focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
-                  h,
-                  "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
-                )}>
-                <ChevronDown className='h-3.5 w-3.5' />
-              </RippleButton>
-            </DropdownMenuTrigger>
+            <SessionTooltip label='Mic tools: recalibrate, tuner, troubleshooting'>
+              <DropdownMenuTrigger asChild>
+                <RippleButton
+                  aria-label='Mic tools'
+                  className={cn(
+                    "flex w-8 items-center justify-center rounded-lg outline-none transition-all focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
+                    h,
+                    "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
+                  )}>
+                  <ChevronDown className='h-3.5 w-3.5' />
+                </RippleButton>
+              </DropdownMenuTrigger>
+            </SessionTooltip>
             <DropdownMenuContent
               align='end'
               sideOffset={8}

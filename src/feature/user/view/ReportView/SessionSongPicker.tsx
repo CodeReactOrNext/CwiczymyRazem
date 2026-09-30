@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 import { ArrangementPicker } from "feature/songs/components/Arrangements/ArrangementPicker";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
@@ -19,8 +20,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { FaMusic } from "react-icons/fa";
-import { IoMdHand } from "react-icons/io";
 import type { IconType } from "react-icons/lib";
 
 import {
@@ -204,14 +203,14 @@ const PickedSongRow = ({
       <CategoryTime
         skill='technique'
         label='Technique'
-        Icon={IoMdHand}
+        Icon={SKILL_CATEGORY_ICONS.technique}
         minutes={song.techniqueMinutes}
         onChange={(minutes) => onSetMinutes("technique", minutes)}
       />
       <CategoryTime
         skill='hearing'
         label='Hearing'
-        Icon={FaMusic}
+        Icon={SKILL_CATEGORY_ICONS.hearing}
         minutes={song.hearingMinutes}
         onChange={(minutes) => onSetMinutes("hearing", minutes)}
       />

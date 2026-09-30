@@ -87,6 +87,8 @@ export interface TablatureSelection {
 export interface TablatureStylePatch {
   pillHeight?: number;
   pillCorner?: number;
+  /** Draw notes as a head + thin sustain tail instead of one solid bar. */
+  noteTails?: boolean;
   fretFontScale?: number;
   stringColors?: readonly string[];
   hitFill?: string;

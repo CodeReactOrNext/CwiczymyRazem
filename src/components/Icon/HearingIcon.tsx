@@ -1,4 +1,4 @@
-import { IoEarOutline } from "react-icons/io5";
+import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 
 type HearingIconProps = {
   className?: string;
@@ -12,7 +12,8 @@ const HearingIcon = ({ className = "", size = "medium" }: HearingIconProps) => {
     large: "text-xl",
   };
 
-  return <IoEarOutline className={`${sizeClasses[size]} ${className}`} />;
+  const Icon = SKILL_CATEGORY_ICONS.hearing;
+  return <Icon className={`${sizeClasses[size]} ${className}`} />;
 };
 
 export default HearingIcon;

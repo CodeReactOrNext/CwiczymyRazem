@@ -1,5 +1,3 @@
-import { Separator } from "assets/components/ui/separator";
-import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
 import { GlobalSearch } from "components/GlobalSearch/GlobalSearch";
 import UserNav from "components/UserNav";
 import { FameBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/FameBox";
@@ -15,18 +13,9 @@ interface UserHeaderProps {
   avatar?: string;
 }
 
-const UserHeader = ({
-  userStats,
-  userName,
-}: UserHeaderProps) => {
-  const {
-    points,
-    lvl,
-    lastReportDate,
-    actualDayWithoutBreak,
-    fame,
-  } = userStats;
-
+// Props kept for the caller's signature; the boxes and the account menu read
+// the user from the store themselves.
+const UserHeader = (_props: UserHeaderProps) => {
   return (
     <header className='sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 shadow-lg backdrop-blur-xl'>
       <div className='relative w-full'>
@@ -57,17 +46,8 @@ const UserHeader = ({
             <div className='flex items-center gap-2'>
               <GlobalSearch />
 
-              {/* Desktop Actions */}
-              <div className='hidden sm:flex items-center gap-1'>
-                <CopyLinkProfile />
-                <Separator orientation='vertical' className='mx-2 h-6 bg-white/10' />
-                <UserNav />
-              </div>
-
-              {/* Mobile Actions */}
-              <div className='flex items-center gap-1 sm:hidden'>
-                 <UserNav showOnlyLogout />
-              </div>
+              {/* Profile, settings and log out all live in the account menu */}
+              <UserNav />
             </div>
         </div>
       </div>

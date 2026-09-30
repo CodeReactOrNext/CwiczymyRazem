@@ -181,7 +181,8 @@ const RankBadge = ({
   );
 };
 
-const AverageStars = ({
+/** One star + average — a five-star strip cost the table ~160px it needs for the title. */
+const AverageRating = ({
   average,
   count,
 }: {
@@ -191,34 +192,18 @@ const AverageStars = ({
   if (count === 0) {
     return (
       <span className='whitespace-nowrap text-[11px] text-zinc-500'>
-        No ratings yet
+        No ratings
       </span>
     );
   }
-  const pct = Math.max(0, Math.min(100, (average / 5) * 100));
   return (
-    <div className='flex items-center gap-1.5'>
-      <div className='relative shrink-0'>
-        <div className='flex items-center gap-0.5 text-zinc-700'>
-          {STAR_VALUES.map((s) => (
-            <Star key={s} size={14} strokeWidth={1.5} />
-          ))}
-        </div>
-        <div
-          className='absolute inset-y-0 left-0 overflow-hidden'
-          style={{ width: `${pct}%` }}>
-          <div className='flex w-max items-center gap-0.5 text-amber-400'>
-            {STAR_VALUES.map((s) => (
-              <Star key={s} size={14} strokeWidth={1.5} fill='currentColor' />
-            ))}
-          </div>
-        </div>
-      </div>
-      <span className='text-[11px] font-bold tabular-nums text-zinc-300'>
-        {average.toFixed(1)}
-      </span>
-      <span className='text-[10px] tabular-nums text-zinc-500'>({count})</span>
-    </div>
+    <span
+      className='flex items-center gap-1 whitespace-nowrap text-xs font-bold tabular-nums text-amber-400'
+      title={`Rated ${average.toFixed(1)} by ${count} player${count === 1 ? "" : "s"}`}>
+      <Star size={13} fill='currentColor' strokeWidth={1.5} />
+      {average.toFixed(1)}
+      <span className='text-[11px] font-normal text-zinc-500'>({count})</span>
+    </span>
   );
 };
 
@@ -471,21 +456,19 @@ const ExerciseRow = ({
                 </span>
                 <RankBadge rank={rank} ratingCount={exercise.ratingCount} />
               </span>
-              <UserTooltip userId={exercise.authorId}>
-                <Link
-                  href={`/user/${exercise.authorId}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className='w-fit max-w-full truncate text-[11px] font-medium text-zinc-400 transition-colors hover:text-cyan-400'>
-                  {exercise.authorUsername}
-                </Link>
-              </UserTooltip>
+              <span className='flex min-w-0 items-center gap-2'>
+                <UserTooltip userId={exercise.authorId}>
+                  <Link
+                    href={`/user/${exercise.authorId}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className='min-w-0 truncate text-[11px] font-medium text-zinc-400 transition-colors hover:text-cyan-400'>
+                    {exercise.authorUsername}
+                  </Link>
+                </UserTooltip>
+                <CategoryBadge category={exercise.category} />
+              </span>
             </div>
           </div>
-        </td>
-
-        {/* Category */}
-        <td className={cn(cellBg, "px-3 py-4")}>
-          <CategoryBadge category={exercise.category} />
         </td>
 
         {/* Difficulty */}
@@ -493,65 +476,24 @@ const ExerciseRow = ({
           <DifficultyBadge difficulty={exercise.difficulty} />
         </td>
 
-        {/* BPM */}
-        <td
-          className={cn(
-            cellBg,
-            "font-mono whitespace-nowrap px-3 py-4 text-xs text-zinc-400",
-          )}>
-          {exercise.metronomeSpeed ? (
-            `${exercise.metronomeSpeed.min}–${exercise.metronomeSpeed.max}`
-          ) : (
-            <span className='text-zinc-500'>—</span>
-          )}
-        </td>
-
-        {/* Min */}
+        {/* Min — BPM, plays and thanks live in the expanded row */}
         <td className={cn(cellBg, "px-3 py-4 text-xs text-zinc-400")}>
           {exercise.timeInMinutes}m
         </td>
 
-        {/* Plays */}
-        <td className={cn(cellBg, "whitespace-nowrap px-3 py-4")}>
-          <span
-            className={cn(
-              "flex items-center gap-1.5 text-xs font-medium tabular-nums",
-              (exercise.playCount || 0) > 0 ? "text-cyan-400" : "text-zinc-500",
-            )}
-            title={`Practiced ${exercise.playCount || 0} times`}>
-            <Guitar size={14} />
-            {exercise.playCount || 0}
-          </span>
-        </td>
-
-        {/* Thanks */}
-        <td className={cn(cellBg, "whitespace-nowrap px-3 py-4")}>
-          <span
-            className={cn(
-              "flex items-center gap-1.5 text-xs font-medium tabular-nums",
-              (exercise.thanksCount || 0) > 0
-                ? "text-amber-400"
-                : "text-zinc-500",
-            )}
-            title={`The author was thanked ${exercise.thanksCount || 0} times`}>
-            <HandHeart size={14} />
-            {exercise.thanksCount || 0}
-          </span>
-        </td>
-
         {/* Rating */}
-        <td className={cn(cellBg, "whitespace-nowrap px-3 py-4")}>
-          <div className='flex justify-end'>
-            <AverageStars
-              average={exercise.averageRating}
-              count={exercise.ratingCount}
-            />
-          </div>
+        <td className={cn(cellBg, "px-3 py-4")}>
+          <AverageRating
+            average={exercise.averageRating}
+            count={exercise.ratingCount}
+          />
         </td>
 
         {/* Start */}
         <td className={cn(cellBg, "rounded-r-lg border-r py-4 pl-3 pr-4")}>
-          <StartButton exercise={exercise} onStart={onStart} />
+          <div className='flex justify-end'>
+            <StartButton exercise={exercise} onStart={onStart} />
+          </div>
         </td>
       </tr>
 
@@ -559,7 +501,7 @@ const ExerciseRow = ({
       {isExpanded && (
         <tr>
           <td
-            colSpan={9}
+            colSpan={5}
             className='rounded-lg border border-zinc-800 bg-zinc-900/40 p-6'>
             <ExerciseDetails
               exercise={exercise}
@@ -980,31 +922,21 @@ export const CommunityExercisesTab = ({
               <table className='w-full table-fixed border-separate border-spacing-y-3 text-sm'>
                 <thead>
                   <tr>
-                    <th className='w-[220px] px-4 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                    {/* The title column takes whatever the fixed ones leave, so
+                        the Start column never gets pushed past the edge. */}
+                    <th className='px-4 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Exercise
-                    </th>
-                    <th className='w-24 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      Category
                     </th>
                     <th className='w-24 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Difficulty
                     </th>
-                    <th className='w-20 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      BPM
-                    </th>
-                    <th className='w-14 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-16 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Min
                     </th>
-                    <th className='w-16 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      Plays
-                    </th>
-                    <th className='w-16 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      Thanks
-                    </th>
-                    <th className='w-40 px-3 pb-2 text-right text-[11px] font-bold tracking-wider text-zinc-500'>
+                    <th className='w-28 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
                       Rating
                     </th>
-                    <th className='w-24 px-3 pb-2'></th>
+                    <th className='w-28 px-3 pb-2'></th>
                   </tr>
                 </thead>
                 <tbody>

@@ -32,11 +32,11 @@ export const SessionStats = ({
   const formatMs = (ms: number) => {
     if (ms <= 0) return null;
     const totalMinutes = Math.round(ms / 60000);
-    if (totalMinutes === 0) return "< 1m";
+    if (totalMinutes === 0) return "<1 min";
     const hours = Math.floor(totalMinutes / 60);
     const mins = totalMinutes % 60;
-    if (hours > 0) return `${hours}h ${mins > 0 ? `${mins}m` : ""}`;
-    return `${mins}m`;
+    if (hours > 0) return mins > 0 ? `${hours}h ${mins} min` : `${hours}h`;
+    return `${mins} min`;
   };
 
   const performanceDiff = averageWeeklyTime > 0

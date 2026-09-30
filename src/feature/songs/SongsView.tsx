@@ -393,7 +393,9 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
               <div className={cn(
                 tabNavListClass,
                 "mb-6",
-                view === 'playlists' ? "mx-4 mt-4 w-auto sm:mx-6 sm:mt-6 md:mx-10 md:mt-8" : ""
+                // Same offsets as the p-4/sm:p-6/md:p-10 the other views get
+                // from <main>, so the tabs don't jump when switching views.
+                view === 'playlists' ? "mx-4 mt-4 w-auto sm:mx-6 sm:mt-6 md:mx-10 md:mt-10" : ""
               )}>
                 {(
                   [

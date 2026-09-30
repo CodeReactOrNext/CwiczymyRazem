@@ -1,5 +1,5 @@
 
-import { FaBrain } from "react-icons/fa";
+import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 
 
 type TheoryIconProps = {
@@ -17,7 +17,8 @@ const TheoryIcon = ({
     large: "text-xl",
   };
 
-  return <FaBrain className={`${sizeClasses[size]} ${className}`} />;
+  const Icon = SKILL_CATEGORY_ICONS.theory;
+  return <Icon className={`${sizeClasses[size]} ${className}`} />;
 };
 
 export default TheoryIcon;

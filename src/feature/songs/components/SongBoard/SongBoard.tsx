@@ -109,7 +109,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
                    <StatCard 
                     icon={Clock} 
                     label="Practice Time" 
-                    value={`${totalHours}h ${totalMinutes}m`} 
+                    value={`${totalHours}h ${totalMinutes} min`} 
                     color="text-blue-400"
                     bg="bg-blue-500/5"
                    />

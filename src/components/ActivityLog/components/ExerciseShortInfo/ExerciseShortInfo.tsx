@@ -54,7 +54,7 @@ const ExerciseShortInfo = ({
             <span className="text-[10px] font-bold tracking-wider text-stone-500 mb-0.5">Total</span>
             <div className="flex flex-row items-center gap-1.5">
               <FaClock className="text-cyan-600" size={12} />
-              <p className="text-[13px] font-bold text-stone-900">{convertMsToHM(report.totalTime)}h</p>
+              <p className="text-[13px] font-bold text-stone-900">{convertMsToHM(report.totalTime)}</p>
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@ const ExerciseShortInfo = ({
                         <FaStar className="text-yellow-500" size={12} /> {activity.points}
                       </span>
                       <span className="flex items-center gap-1.5 text-stone-600">
-                        <FaClock className="text-cyan-600" size={12} /> {convertMsToHM(activity.time)}h
+                        <FaClock className="text-cyan-600" size={12} /> {convertMsToHM(activity.time)}
                       </span>
                   </div>
                </div>
@@ -110,28 +110,28 @@ const ExerciseShortInfo = ({
           <div className='grid grid-cols-4 gap-2'>
           <div className='flex flex-col items-center justify-center rounded-lg bg-black/[0.03] p-2 border border-transparent transition-colors hover:bg-black/[0.06] hover:border-[#e8e4db]'>
             <p className='text-[13px] font-bold tracking-tight text-stone-900'>
-              {convertMsToHM(report.timeSumary.techniqueTime)}h
+              {convertMsToHM(report.timeSumary.techniqueTime)}
             </p>
             <p className="text-[10px] font-medium tracking-wider text-stone-500 mt-0.5">{t("common:calendar.technique") as string}</p>
           </div>
 
           <div className='flex flex-col items-center justify-center rounded-lg bg-black/[0.03] p-2 border border-transparent transition-colors hover:bg-black/[0.06] hover:border-[#e8e4db]'>
             <p className='text-[13px] font-bold tracking-tight text-stone-900'>
-              {convertMsToHM(report.timeSumary.theoryTime)}h
+              {convertMsToHM(report.timeSumary.theoryTime)}
             </p>
             <p className="text-[10px] font-medium tracking-wider text-stone-500 mt-0.5">{t("common:calendar.theory") as string}</p>
           </div>
 
           <div className='flex flex-col items-center justify-center rounded-lg bg-black/[0.03] p-2 border border-transparent transition-colors hover:bg-black/[0.06] hover:border-[#e8e4db]'>
             <p className='text-[13px] font-bold tracking-tight text-stone-900'>
-              {convertMsToHM(report.timeSumary.hearingTime)}h
+              {convertMsToHM(report.timeSumary.hearingTime)}
             </p>
             <p className="text-[10px] font-medium tracking-wider text-stone-500 mt-0.5">{t("common:calendar.hearing") as string}</p>
           </div>
 
           <div className='flex flex-col items-center justify-center rounded-lg bg-black/[0.03] p-2 border border-transparent transition-colors hover:bg-black/[0.06] hover:border-[#e8e4db]'>
             <p className='text-[13px] font-bold tracking-tight text-stone-900'>
-              {convertMsToHM(report.timeSumary.creativityTime)}h
+              {convertMsToHM(report.timeSumary.creativityTime)}
             </p>
             <p className="text-[10px] font-medium tracking-wider text-stone-500 mt-0.5">{t("common:calendar.creativity") as string}</p>
           </div>

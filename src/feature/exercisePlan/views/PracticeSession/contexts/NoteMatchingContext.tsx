@@ -28,6 +28,9 @@ interface NoteMatchingContextValue {
   gameState: GameState;
   maxPossibleScore: number;
   sessionAccuracy: number;
+  /** Hits/misses judged so far (tab + strumming), null for hunts — lets the HUD
+   *  tell "nothing played yet" and "mic hears nothing" apart from a real 100% / 0%. */
+  sessionStats: { hits: number; misses: number } | null;
   /** Live note-hunt state — populated for octave/region/interval modes. */
   noteHunt: NoteHuntState | null;
   /** Live chord-hunt state — populated only for chord-mode exercises. */
@@ -108,6 +111,7 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   gameState: defaultGameState,
   maxPossibleScore: 0,
   sessionAccuracy: 100,
+  sessionStats: null,
   noteHunt: null,
   chordHunt: null,
   clickHunt: null,
@@ -220,6 +224,7 @@ export function NoteMatchingProvider({
     hitNotes,
     missedNotes,
     sessionAccuracy: tabAccuracy,
+    sessionStats: tabStats,
     gameState: tabGameState,
     maxCombo,
     maxPossibleScore,
@@ -247,6 +252,7 @@ export function NoteMatchingProvider({
     slotFeedback: strumSlotFeedback,
     gameState: strumGameState,
     sessionAccuracy: strumAccuracy,
+    sessionStats: strumStats,
   } = useStrummingMatcher({
     isPlaying,
     startTime,
@@ -390,6 +396,7 @@ export function NoteMatchingProvider({
   const isStrummingExercise = !!activeStrumPattern;
   const gameState = isHunt ? huntGameState : isStrummingExercise ? strumGameState : tabGameState;
   const sessionAccuracy = isHunt ? huntAccuracy : isStrummingExercise ? strumAccuracy : tabAccuracy;
+  const sessionStats = isHunt ? null : isStrummingExercise ? strumStats : tabStats;
   const effectiveMaxPossibleScore = isHunt ? huntMaxScore : maxPossibleScore;
   const effectiveMaxCombo = isHunt ? huntMaxCombo : maxCombo;
 
@@ -466,7 +473,7 @@ export function NoteMatchingProvider({
   const value = useMemo<NoteMatchingContextValue>(
     () => ({
       hitNotes, missedNotes, currentBeatsElapsedRef, strumSlotFeedback, gameState,
-      maxPossibleScore: effectiveMaxPossibleScore, sessionAccuracy,
+      maxPossibleScore: effectiveMaxPossibleScore, sessionAccuracy, sessionStats,
       noteHunt: isNoteHunt ? noteHunt : null,
       chordHunt: isChordHunt ? chordHunt : null,
       clickHunt: isClickHunt ? clickHunt : null,
@@ -489,7 +496,7 @@ export function NoteMatchingProvider({
       registerIntervalClick,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
+    [hitNotes, missedNotes, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
   );
 
   return (

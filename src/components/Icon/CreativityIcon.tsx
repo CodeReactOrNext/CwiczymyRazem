@@ -1,4 +1,4 @@
-import { FaLightbulb } from "react-icons/fa";
+import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 
 type CreativityIconProps = {
   className?: string;
@@ -15,7 +15,8 @@ const CreativityIcon = ({
     large: "text-xl",
   };
 
-  return <FaLightbulb className={`${sizeClasses[size]} ${className}`} />;
+  const Icon = SKILL_CATEGORY_ICONS.creativity;
+  return <Icon className={`${sizeClasses[size]} ${className}`} />;
 };
 
 export default CreativityIcon;

@@ -22,6 +22,7 @@ import { useTranslation } from "hooks/useTranslation";
 import { ArrowUpDown, Check, ChevronRight, Ear, Hand, Heart, Info, LayoutGrid, Lightbulb, Lock, Music, Search, SlidersHorizontal, Timer, Trophy, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
+import { formatMinutesDuration } from "utils/converter";
 
 import type { DashboardExercise } from "./SkillDashboard";
 
@@ -565,7 +566,7 @@ export const ExerciseBrowseTab = ({
   };
 
   const formatMinutes = (minutes: number) =>
-    minutes < 1 ? `${Math.round(minutes * 60)} s` : `${Number(minutes.toFixed(1))} min`;
+    minutes < 1 ? `${Math.round(minutes * 60)} s` : formatMinutesDuration(minutes);
 
   const rankClass = (rank: number) =>
     rank === 1

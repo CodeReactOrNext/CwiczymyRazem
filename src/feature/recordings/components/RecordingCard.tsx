@@ -11,7 +11,6 @@ import {
 } from "assets/components/ui/alert-dialog";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
-import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { UserLink } from "components/UserLink";
 import { AddRecordingModal } from "feature/recordings/components/AddRecordingModal";
@@ -60,12 +59,17 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
 
   const songLabel = [recording.songArtist, recording.songTitle]
     .filter(Boolean)
-    .join(" - ");
+    .join(" · ");
+  // Most titles already are "Artist - Song"; repeating that underneath only
+  // pushes the description out, so the caption shows up only when it adds info.
+  const titleRepeatsSong =
+    !!recording.songTitle &&
+    recording.title.toLowerCase().includes(recording.songTitle.toLowerCase());
 
   return (
-    // Every text row below has a reserved height (title = 2 lines, song chip = 1 line,
-    // description = 2 lines) so that cards with a short title or no description still
-    // line their avatar row and footer up with their neighbours in the grid.
+    // Title and song caption have a reserved height (title = 2 lines, caption = 1 line)
+    // so the description starts at the same height across a row; the author row is
+    // pushed to the bottom (mt-auto), so it lines up regardless of the text above.
     <Card className='group/card flex h-full flex-col overflow-hidden bg-zinc-900/40 p-0 transition-colors hover:bg-zinc-900/60'>
       <button
         type='button'
@@ -141,22 +145,22 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
           )}
         </div>
 
-        <div className='min-h-[28px]'>
-          {songLabel && (
-            <Chip
-              color='cyan'
-              title={songLabel}
-              className='block max-w-full truncate px-2 py-1 text-[11px] leading-4'>
-              {songLabel}
-            </Chip>
-          )}
-        </div>
-
-        <p className='line-clamp-2 min-h-[2.5rem] text-sm leading-5 text-zinc-400'>
-          {recording.description}
+        <p
+          translate='no'
+          title={songLabel || undefined}
+          className='-mt-1 min-h-4 truncate text-xs font-medium leading-4 text-cyan-400/80'>
+          {songLabel && !titleRepeatsSong ? songLabel : null}
         </p>
 
-        <div className='mt-auto flex items-center gap-2 pt-1'>
+        {recording.description && (
+          <p className='line-clamp-1 text-sm leading-5 text-zinc-400'>
+            {recording.description}
+          </p>
+        )}
+
+        {/* The author gets the whole row — the date moved to the footer — and a
+            long name wraps to a second line instead of being cut to "Coo…". */}
+        <div className='mt-auto pt-1'>
           <UserLink
             uid={recording.userId}
             userName={recording.userDisplayName || "?"}
@@ -164,11 +168,8 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
             lvl={recording.userAvatarFrame}
             guildBadge={recording.userGuildBadge}
             size='xs'
-            nameClassName='text-xs font-medium text-zinc-300'
+            nameClassName='line-clamp-2 !whitespace-normal break-words text-xs font-medium text-zinc-300'
           />
-          <span className='shrink-0 text-xs font-medium text-zinc-500'>
-            • {formattedDate}
-          </span>
         </div>
       </div>
 
@@ -195,6 +196,10 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
           <MessageSquare className='mr-1.5 h-4 w-4' />
           <span className='text-xs font-bold'>{recording.commentCount}</span>
         </Button>
+
+        <span className='ml-auto pr-2 text-xs font-medium text-zinc-500'>
+          {formattedDate}
+        </span>
       </div>
 
       {isOwner && (

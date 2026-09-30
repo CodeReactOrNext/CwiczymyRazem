@@ -45,21 +45,57 @@ export const SupporterPitch = () => {
           A donation opens the supporter panel
         </h2>
         <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
-          Behind the badge is the room where riff.quest is decided out loud. You
-          watch what is being built right now, say what gets built after it,
-          pick the gear that goes into the Arsenal and into the cases, and set
-          the challenge the whole app plays for that week.
+          Behind the badge is the room where riff.quest is decided out loud:
         </p>
+        <ul className='max-w-2xl space-y-1.5 text-sm text-zinc-300'>
+          {[
+            "Watch what is being built now and vote on what comes next",
+            "Pick the gear that goes into the Arsenal and the cases",
+            "Set the challenge the whole app plays for that week",
+          ].map((perk) => (
+            <li key={perk} className='flex gap-2'>
+              <span className='text-amber-400'>•</span>
+              {perk}
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <Button asChild size='lg' className='relative'>
-        <a href={BMC_URL} target='_blank' rel='noreferrer'>
-          <span className='flex items-center gap-2'>
-            <Heart size={16} fill='currentColor' />
-            Support the project
+      {/* The unlock condition sits right above the button, readable at the
+          same weight as the action: pay from the wrong address and the badge
+          stays off, so it can't be small grey print below the fold. */}
+      <div className='relative flex max-w-2xl flex-col gap-4'>
+        <div className='rounded-lg bg-amber-500/10 px-4 py-3 text-sm leading-relaxed text-zinc-200'>
+          Use the email this account is on to unlock Supporter
+          {email ? (
+            <>
+              {": "}
+              <span className='font-bold text-white'>{email}</span>
+            </>
+          ) : null}
+          .
+          <span className='mt-1 block text-zinc-400'>
+            Using a different email?{" "}
+            <a
+              href={DISCORD_INVITE_URL}
+              target='_blank'
+              rel='noreferrer'
+              className='font-semibold text-amber-300 underline underline-offset-2 hover:text-amber-200'>
+              Write to me on Discord
+            </a>{" "}
+            and I&apos;ll attach it by hand.
           </span>
-        </a>
-      </Button>
+        </div>
+
+        <Button asChild size='lg' className='w-fit'>
+          <a href={BMC_URL} target='_blank' rel='noreferrer'>
+            <span className='flex items-center gap-2'>
+              <Heart size={16} fill='currentColor' />
+              Support the project
+            </span>
+          </a>
+        </Button>
+      </div>
 
       {/* Faces right under the button, because this is the one spot on the page
           where they are an argument rather than a thank-you: whoever is reading
@@ -68,26 +104,6 @@ export const SupporterPitch = () => {
       {/* w-full, not the column's default max-content: the row has to know how
           wide the box is to wrap inside it instead of running past the edge. */}
       <SupporterStrip className='relative w-full' />
-
-      <p className='relative max-w-2xl text-sm leading-relaxed text-zinc-500'>
-        Pay with the email this account is on
-        {email ? (
-          <>
-            {" — "}
-            <span className='font-bold text-zinc-300'>{email}</span>
-          </>
-        ) : null}
-        ; that match is what opens the panel. Donated from another address
-        already? Nothing is lost —{" "}
-        <a
-          href={DISCORD_INVITE_URL}
-          target='_blank'
-          rel='noreferrer'
-          className='font-bold text-zinc-400 underline underline-offset-2 hover:text-zinc-200'>
-          write to me on Discord
-        </a>{" "}
-        and I&apos;ll attach it by hand.
-      </p>
     </section>
   );
 };

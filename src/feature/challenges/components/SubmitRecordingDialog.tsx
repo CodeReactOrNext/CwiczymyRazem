@@ -145,9 +145,15 @@ export const SubmitRecordingDialog = ({
                 className='h-12 border-white/5 bg-white/5 pl-10 font-medium transition-all focus:border-cyan-500/50'
               />
             </div>
-            {videoUrl.trim() && !videoId && (
+            {videoUrl.trim() && !videoId ? (
               <p className='ml-1 text-xs font-semibold text-amber-400'>
-                That doesn’t look like a YouTube link.
+                That doesn’t look like a YouTube link — use one like
+                youtube.com/watch?v=… or youtu.be/…
+              </p>
+            ) : (
+              <p className='ml-1 text-xs font-medium text-zinc-500'>
+                Like youtube.com/watch?v=… or youtu.be/… — unlisted videos
+                work, private ones won’t play for others.
               </p>
             )}
           </div>
@@ -220,19 +226,24 @@ export const SubmitRecordingDialog = ({
                     </span>
                   )}
                 </div>
-                <p className='text-xs font-medium text-zinc-500'>
-                  {isFinalSong && "This is your last song on the board. "}Lands
-                  in your Recordings too.
-                </p>
+                {isFinalSong && (
+                  <p className='text-xs font-medium text-zinc-500'>
+                    This is your last song on the board.
+                  </p>
+                )}
               </>
             ) : (
               <p className='text-xs font-medium text-zinc-500'>
                 This board is closed, so the run earns{" "}
                 <span className='font-bold text-white'>no points or fame</span>{" "}
-                — it just takes its place in the archive. Lands in your
-                Recordings too.
+                — it just takes its place in the archive.
               </p>
             )}
+            <p className='text-xs font-medium text-zinc-500'>
+              Everyone can watch it in this song’s runs, the activity feed and
+              your Recordings. One run per song, so send the take you’re happy
+              with.
+            </p>
           </div>
         </div>
 

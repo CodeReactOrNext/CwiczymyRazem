@@ -72,13 +72,25 @@ export const PlaylistCard = ({
           {playlist.name}
         </h3>
 
-        <p className="mt-1 flex items-center gap-1.5 truncate text-xs font-medium text-zinc-400">
-          <span className="text-zinc-300">{meta.label}</span>
-          <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+        {/* The kind lives on the cover chip only; this line is just the count,
+            and who it's from gets a line of its own instead of being cut to
+            "f…" at the end of this one. */}
+        <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-zinc-400">
           <span>{songCount === 1 ? "1 song" : `${songCount} songs`}</span>
-          {showOwner && playlist.ownerName ? (
+          {!showOwner && !playlist.importedFrom?.ownerName && playlist.isPublic && (
             <>
               <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+              <span className="flex items-center gap-1 text-zinc-500">
+                <Globe className="h-3 w-3" />
+                public
+              </span>
+            </>
+          )}
+        </p>
+
+        <div className="mt-1 flex min-w-0 text-xs font-medium text-zinc-400 empty:hidden">
+          {showOwner && playlist.ownerName ? (
+            <>
               <UserTooltip userId={playlist.ownerId}>
                 <Link
                   href={`/user/${playlist.ownerId}`}
@@ -102,7 +114,6 @@ export const PlaylistCard = ({
             </>
           ) : playlist.importedFrom?.ownerName ? (
             <>
-              <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
               <UserTooltip userId={playlist.importedFrom.ownerId ?? null}>
                 <Link
                   href={
@@ -135,18 +146,8 @@ export const PlaylistCard = ({
                 </Link>
               </UserTooltip>
             </>
-          ) : (
-            playlist.isPublic && (
-              <>
-                <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
-                <span className="flex items-center gap-1 text-zinc-500">
-                  <Globe className="h-3 w-3" />
-                  public
-                </span>
-              </>
-            )
-          )}
-        </p>
+          ) : null}
+        </div>
 
         {showPathProgress && (
           <div className="mt-2.5 flex items-center gap-2">

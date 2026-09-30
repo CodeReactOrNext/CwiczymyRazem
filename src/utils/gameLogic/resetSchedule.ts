@@ -149,6 +149,6 @@ export const formatTimeLeft = (msLeft: number): string => {
   const minutes = Math.floor(total / 60_000) % 60;
 
   if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m`;
+  if (hours > 0) return `${hours}h ${minutes} min`;
+  return `${minutes} min`;
 };

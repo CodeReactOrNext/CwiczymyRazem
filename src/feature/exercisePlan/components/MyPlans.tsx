@@ -77,9 +77,11 @@ interface MyPlansProps {
   controlledTab?: string;
   onTabChange?: (tab: string) => void;
   hideSectionHeader?: boolean;
+  /** Reports how many custom plans the user has once they're loaded. */
+  onPlansLoaded?: (count: number) => void;
 }
 
-export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab, onTabChange, hideSectionHeader }: MyPlansProps) => {
+export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab, onTabChange, hideSectionHeader, onPlansLoaded }: MyPlansProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const [plans, setPlans] = useState<ExercisePlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -111,6 +113,10 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
 
     loadPlans();
   }, [userAuth]);
+
+  useEffect(() => {
+    if (!isLoading) onPlansLoaded?.(plans.length);
+  }, [isLoading, plans.length, onPlansLoaded]);
 
   // Filter playalongs from routines
   const playalongPlans = defaultPlans.filter(p => p.exercises.some(e => e.isPlayalong));
@@ -345,14 +351,41 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
             />
           )}
           {plans.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/[0.08] bg-zinc-900/20 p-12 text-center">
-              <p className="text-zinc-500 text-sm">{t("exercises:my_plans.no_custom_plans")}</p>
-              <Button
-                onClick={() => isPremium ? router.push('/plans/create') : setShowUpgradeModal(true)}
-                className="mt-6"
-              >
-                {t("exercises:my_plans.create_first")}
-              </Button>
+            // The one place to start a first plan: say what a plan is, show a
+            // tiny example, and offer the ready-made plans as a way in.
+            <div className="flex flex-col items-center gap-6 rounded-lg bg-zinc-900/40 px-6 py-12 text-center">
+              <div className="space-y-2">
+                <p className="font-semibold text-zinc-100">{t("exercises:my_plans.no_custom_plans")}</p>
+                <p className="mx-auto max-w-md text-sm text-zinc-400">
+                  A plan is your own practice routine: pick exercises, set how long each one runs, then play it
+                  through in one session.
+                </p>
+              </div>
+              <div className="w-full max-w-xs space-y-1.5 rounded-lg bg-zinc-800/40 p-4 text-left text-sm">
+                <p className="text-xs font-semibold text-zinc-500">For example</p>
+                {[
+                  ["Chromatic warm-up", "5 min"],
+                  ["Alternate picking", "10 min"],
+                  ["Pentatonic licks", "10 min"],
+                ].map(([name, time]) => (
+                  <div key={name} className="flex items-center justify-between text-zinc-300">
+                    <span>{name}</span>
+                    <span className="tabular-nums text-zinc-500">{time}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col items-center gap-3">
+                <Button onClick={() => isPremium ? router.push('/plans/create') : setShowUpgradeModal(true)}>
+                  {t("exercises:my_plans.create_first")}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => router.push("/timer/plans")}
+                  className="text-xs font-semibold text-zinc-400 transition-colors hover:text-cyan-400"
+                >
+                  Or start from a ready-made plan
+                </button>
+              </div>
             </div>
           ) : (
             <motion.div

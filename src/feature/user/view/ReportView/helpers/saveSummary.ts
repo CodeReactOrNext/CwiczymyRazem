@@ -15,7 +15,7 @@ const formatMinutes = (total: number) => {
   const minutes = total % 60;
   if (hours === 0) return `${minutes} min`;
   if (minutes === 0) return `${hours}h`;
-  return `${hours}h ${minutes}m`;
+  return `${hours}h ${minutes} min`;
 };
 
 const formatDay = (countBackDays: number) => {

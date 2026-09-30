@@ -2,10 +2,11 @@ import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
-import { getPerformanceGrade } from "../hooks/noteMatchingFeedback";
+import { getAccuracyDisplay } from "../hooks/noteMatchingFeedback";
 
 export function MobileMicGameHud() {
-  const { gameState, maxPossibleScore, sessionAccuracy } = useNoteMatchingContext();
+  const { gameState, maxPossibleScore, sessionAccuracy, sessionStats } = useNoteMatchingContext();
+  const accuracy = getAccuracyDisplay(sessionAccuracy, sessionStats);
 
   return (
     <div className="mb-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
@@ -34,10 +35,17 @@ export function MobileMicGameHud() {
         <div className="flex-1 text-center">
           <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">Accuracy</span>
           <div className="flex items-center justify-center gap-1.5">
-            <span className="text-xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
+            <span
+              title={accuracy.kind === "value" ? undefined : accuracy.hint}
+              className={cn(
+                "font-bold tabular-nums",
+                accuracy.kind === "value" ? "text-xl text-emerald-400" : cn(accuracy.color, accuracy.kind === "silent" ? "text-xs" : "text-xl"),
+              )}>
+              {accuracy.text}
+            </span>
             <AnimatePresence mode="wait">
-              {(() => {
-                const grade = getPerformanceGrade(sessionAccuracy);
+              {accuracy.kind === "value" && (() => {
+                const grade = accuracy.grade;
                 return (
                   <motion.span
                     key={grade.letter}

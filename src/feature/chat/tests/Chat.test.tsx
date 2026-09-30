@@ -207,4 +207,36 @@ describe("Chat Component", () => {
     expect(startReply).toHaveBeenCalled();
     expect(mockSetNewMessage).toHaveBeenCalledWith("@Ann Welcome! 👋 ");
   });
+
+  it("folds stock greetings into the welcome line and drops Say hi once greeted", () => {
+    (useChat as any).mockReturnValue(
+      chatState({
+        messages: [
+          {
+            id: "w1",
+            type: "welcome",
+            userId: "ann",
+            username: "Ann",
+            message: "Ann just joined Riff Quest",
+            timestamp: new Date(),
+          },
+          {
+            id: "g1",
+            userId: "user1",
+            username: "Test User",
+            message: "@Ann Welcome! 👋",
+            timestamp: new Date(),
+            replyTo: { id: "w1", userId: "ann", username: "Ann", message: "Ann just joined Riff Quest" },
+          },
+        ],
+      })
+    );
+
+    renderChat();
+
+    expect(screen.getByText("Test User")).toBeDefined();
+    expect(screen.getByText(/said hi/)).toBeDefined();
+    expect(screen.queryByText("@Ann")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Say hi/ })).toBeNull();
+  });
 });

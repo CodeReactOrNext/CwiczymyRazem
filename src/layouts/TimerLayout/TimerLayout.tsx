@@ -371,7 +371,7 @@ const TimerLayout = ({
               />
             </div>
 
-            <div className='grid flex-1 grid-cols-1 gap-6 lg:content-center lg:gap-10'>
+            <div className='grid min-w-0 flex-1 grid-cols-1 gap-6 lg:content-center lg:gap-10'>
               {chosenSkill ? (
                 <div className='space-y-2'>
                   <p className='text-sm text-zinc-500'>
@@ -389,15 +389,18 @@ const TimerLayout = ({
                   <p className='font-medium text-white sm:text-lg'>
                     Choose what you are practising
                   </p>
-                  <div className='grid grid-cols-2 gap-2'>
+                  {/* One column where this middle column gets squeezed between
+                      the clock and the metronome (lg), so labels never run
+                      into the neighbouring button. */}
+                  <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2'>
                     {skillsData.map((skill) => (
                       <button
                         key={skill.id}
                         type='button'
                         onClick={() => startSkill(skill.id)}
-                        className='flex items-center gap-2.5 rounded-lg bg-zinc-800/60 px-4 py-3 text-left text-sm font-semibold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
+                        className='flex min-w-0 items-center gap-2.5 rounded-lg bg-zinc-800/60 px-4 py-3 text-left text-sm font-semibold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
                         <Play className='h-3.5 w-3.5 shrink-0 fill-current' style={{ color: skill.color }} />
-                        <span translate="no">{skill.title}</span>
+                        <span translate="no" className='min-w-0 break-words'>{skill.title}</span>
                       </button>
                     ))}
                   </div>
@@ -442,6 +445,9 @@ const TimerLayout = ({
               onStop={stopTimer}
               percent={skill.percent}
               chosen={chosenSkill === skill.id}
+              // Until a category is picked the chooser above is the one way
+              // to start; the cards only switch or pause once a session runs.
+              showControls={!!chosenSkill}
             />
           ))}
         </div>

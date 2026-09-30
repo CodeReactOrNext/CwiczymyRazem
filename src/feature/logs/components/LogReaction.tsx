@@ -80,7 +80,8 @@ export const LogReaction = ({
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (disabled || isPending) return;
+    // Motivating is one-way — once given it stays, so a motivated row ignores further clicks.
+    if (disabled || isPending || isReacted) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
     const rippleId = Date.now();
@@ -92,18 +93,10 @@ export const LogReaction = ({
       setRipples((prev) => prev.filter((r) => r.id !== rippleId));
     }, 600);
 
-    const nowReacted = !isReacted;
-
-    setOptimistic({
-      reacted: nowReacted,
-      fame: Math.max(0, totalFame + (nowReacted ? fameAmount : -fameAmount)),
-    });
+    setOptimistic({ reacted: true, fame: totalFame + fameAmount });
     setIsPending(true);
-
-    if (nowReacted) {
-      setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), 900);
-    }
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 900);
 
     try {
       const result = await toggleLogReaction(logId);
@@ -114,7 +107,7 @@ export const LogReaction = ({
         fame: Math.max(0, totalFame + result.fameAwarded),
       });
 
-      if (result.reacted) {
+      if (result.reacted && result.fameAwarded > 0) {
         // The button has been used once, so it no longer has to advertise itself anywhere.
         markMotivateHintDone();
         toast.success(
@@ -179,20 +172,21 @@ export const LogReaction = ({
           onClick={handleToggle}
           disabled={isPending}
           aria-pressed={isReacted}
+          aria-disabled={isReacted}
           aria-label={
             isReacted
-              ? `Motivated. Click to take it back. This activity earned ${totalFame} Fame`
+              ? `Motivated. This activity earned ${totalFame} Fame`
               : `Motivate ${recipient} and give them ${fameAmount} Fame`
           }
-          whileTap={{ scale: 0.85 }}
+          whileTap={isReacted ? undefined : { scale: 0.85 }}
           animate={isAnimating ? { scale: [1, 1.15, 1] } : { scale: 1 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
           className={cn(
-            "group relative flex min-h-[32px] cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:min-h-[38px] sm:gap-2 sm:px-3 sm:text-[13px]",
+            "group relative flex min-h-[32px] items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:min-h-[38px] sm:gap-2 sm:px-3 sm:text-[13px]",
             // A motivated row lights up amber; one still waiting for you stays neutral.
             isReacted
-              ? "bg-amber-500/15 text-amber-300 hover:bg-amber-500/25"
-              : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-300",
+              ? "cursor-default bg-amber-500/15 text-amber-300"
+              : "cursor-pointer bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-300",
             showHint && !isReacted && "ring-1 ring-amber-400/40",
             isPending && "cursor-wait opacity-70",
           )}>
@@ -283,7 +277,7 @@ export const LogReaction = ({
         <div className='flex flex-wrap items-center gap-1.5 py-0.5'>
           {isReacted ? (
             <>
-              <span>You motivated this — click again to take it back.</span>
+              <span>You motivated this</span>
               <span className='opacity-50'>|</span>
               <span>earned +{totalFame}</span>
               <Coin className='h-4 w-4' />

@@ -1,6 +1,19 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { useEffect, useState } from "react";
 import { FaPause, FaPlay, FaStepForward } from "react-icons/fa";
+
+// The "Press Start to play" nudge is for a first session only — once someone
+// has started an exercise it just covers the Pro Tips underneath the button.
+const START_HINT_KEY = "practice:start-hint-seen";
+
+const readStartHintSeen = () => {
+  try {
+    return typeof window !== "undefined" && localStorage.getItem(START_HINT_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
 
 interface ExerciseControlsProps {
   isPlaying: boolean;
@@ -28,6 +41,19 @@ const ExerciseControls = ({
   isFinished = false,
   handleRestart
 }: ExerciseControlsProps) => {
+  const [startHintSeen, setStartHintSeen] = useState(readStartHintSeen);
+  // Space starts the timer without touching this button, so key off isPlaying.
+  if (isPlaying && !startHintSeen) setStartHintSeen(true);
+
+  useEffect(() => {
+    if (!startHintSeen) return;
+    try {
+      localStorage.setItem(START_HINT_KEY, "1");
+    } catch {
+      // Private mode / blocked storage — the hint just shows again next time.
+    }
+  }, [startHintSeen]);
+
   const btnSizes = {
     sm: "h-10 w-10",
     md: "h-12 w-12",
@@ -58,7 +84,7 @@ const ExerciseControls = ({
                 ? "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20"
                 : "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20 animate-pulse"
             )}>
-            {!isPlaying && (
+            {!isPlaying && !startHintSeen && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 whitespace-nowrap z-[60] pointer-events-none">
                 <div className="animate-bounce flex flex-col items-center">
                   <div className="bg-white  px-4 py-1.5 rounded-lg  text-[13px]  tracking-wider shadow-2xl shadow-white/20 flex items-center gap-1.5">

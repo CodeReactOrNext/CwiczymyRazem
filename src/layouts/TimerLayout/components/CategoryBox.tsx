@@ -6,7 +6,6 @@ import TheoryIcon from "components/Icon/TheoryIcon";
 import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
 import { VscDebugPause, VscDebugStart } from "react-icons/vsc";
-import { convertMsToHMObject } from "utils/converter";
 
 interface CategoryBox {
   title: string;
@@ -18,7 +17,19 @@ interface CategoryBox {
   skillId: string;
   onStart: () => void;
   onStop: () => void;
+  /** False = a time summary only: no start button, card not clickable. */
+  showControls?: boolean;
 }
+
+/** One clock format for the whole card: mm:ss, h:mm:ss past the hour. */
+const formatCategoryTime = (ms: number) => {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const mmss = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  return hours > 0 ? `${hours}:${mmss}` : mmss;
+};
 
 const CategoryBox = ({
   title,
@@ -30,9 +41,9 @@ const CategoryBox = ({
   skillColor,
   skillId,
   timerEnabled,
+  showControls = true,
 }: CategoryBox) => {
   const { t } = useTranslation("timer");
-  const timeObject = convertMsToHMObject(time);
   const isActive = timerEnabled && chosen;
 
   const [shadowIntensity, setShadowIntensity] = useState(2);
@@ -116,8 +127,6 @@ const CategoryBox = ({
     }
   };
 
-
-
   const getGradientStyle = () => {
     if (!chosen) return {};
 
@@ -133,6 +142,7 @@ const CategoryBox = ({
 
   // Handler for the whole card click
   const handleCardClick = () => {
+    if (!showControls) return;
     if (isActive) {
       onStop();
     } else {
@@ -142,19 +152,19 @@ const CategoryBox = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border-[0.5px] bg-[#171717] p-5 text-white transition-all duration-300 hover:scale-[1.01] ${
+      className={`relative overflow-hidden rounded-xl border-[0.5px] bg-[#171717] p-5 text-white transition-all duration-300 ${
         isActive ? "z-10" : ""
-      } cursor-pointer`}
+      } ${showControls ? "cursor-pointer" : ""}`}
       style={{
         borderColor: chosen ? `${skillColor}4D` : "rgba(255, 255, 255, 0.05)",
         boxShadow: isActive
           ? `0 0 ${shadowBlur}px ${shadowSize}px ${skillColor}${Math.round(
-              shadowOpacity * 100
+              shadowOpacity * 100,
             )}`
           : chosen
-          ? `0 1px 3px ${skillColor}20, 0 1px 2px ${skillColor}30`
-          : "",
-        transform: isHovered && !isActive ? "scale(1.01)" : "",
+            ? `0 1px 3px ${skillColor}20, 0 1px 2px ${skillColor}30`
+            : "",
+        transform: showControls && isHovered && !isActive ? "scale(1.01)" : "",
         ...getGradientStyle(),
       }}
       onClick={handleCardClick}
@@ -181,7 +191,7 @@ const CategoryBox = ({
           {renderCategoryIcon()}
         </div>
         <span
-          translate="no"
+          translate='no'
           className={`text-sm font-medium md:text-base ${
             isActive ? "text-white" : "text-gray-300"
           }`}>
@@ -189,24 +199,22 @@ const CategoryBox = ({
         </span>
       </div>
 
-      <div className='relative z-10 mb-6 flex items-end justify-between'>
-        <div className='flex items-baseline'>
-          <h3
-            translate="no"
-            className={`text-xl font-bold tracking-wide md:text-3xl ${
-              isActive ? "text-white" : "text-gray-200"
-            }`}>
-            {timeObject.hours}:{timeObject.minutes}
-          </h3>
-          <span translate="no" className={`text-sm font-bold opacity-40 ml-1 md:text-lg ${isActive ? "text-white" : "text-gray-400"}`}>
-            :{timeObject.seconds.toString().padStart(2, '0')}
-          </span>
-        </div>
+      <div
+        className={`relative z-10 flex flex-wrap items-end justify-between gap-2 ${
+          showControls ? "mb-6" : ""
+        }`}>
+        <h3
+          translate='no'
+          className={`text-xl font-bold tabular-nums tracking-wide md:text-3xl ${
+            isActive ? "text-white" : "text-gray-200"
+          }`}>
+          {formatCategoryTime(time)}
+        </h3>
 
         <div className='flex items-center gap-1 text-base'>
           <span
-            translate="no"
-            className={`rounded-md px-2 py-0.5 text-sm font-medium ${
+            translate='no'
+            className={`whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-medium md:text-sm ${
               chosen ? "" : "bg-gray-700/30 text-gray-400"
             }`}
             style={
@@ -219,35 +227,37 @@ const CategoryBox = ({
                   }
                 : {}
             }>
-            {percent ? Math.round(percent) : 0}%
+            {percent ? Math.round(percent) : 0}% of session
           </span>
         </div>
       </div>
 
-      <Button
-        variant={isActive ? "default" : "outline"}
-        size='sm'
-        className={`relative z-10 w-full transition-all duration-300 ${
-          isActive
-            ? "border-none shadow-md hover:shadow-lg"
-            : "border-gray-700 bg-black/40 text-white hover:border-gray-600 hover:bg-black/60"
-        }`}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleCardClick();
-        }}>
-        {isActive ? (
-          <span translate="no" className="flex items-center">
-            <VscDebugPause className='mr-2 h-4 w-4' />
-            {t("pause")}
-          </span>
-        ) : (
-          <span translate="no" className="flex items-center">
-            <VscDebugStart className='mr-2 h-4 w-4' />
-            {t("start")}
-          </span>
-        )}
-      </Button>
+      {showControls && (
+        <Button
+          variant={isActive ? "default" : "outline"}
+          size='sm'
+          className={`relative z-10 w-full transition-all duration-300 ${
+            isActive
+              ? "border-none shadow-md hover:shadow-lg"
+              : "border-gray-700 bg-black/40 text-white hover:border-gray-600 hover:bg-black/60"
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCardClick();
+          }}>
+          {isActive ? (
+            <span translate='no' className='flex items-center'>
+              <VscDebugPause className='mr-2 h-4 w-4' />
+              {t("pause")}
+            </span>
+          ) : (
+            <span translate='no' className='flex items-center'>
+              <VscDebugStart className='mr-2 h-4 w-4' />
+              {t("start")}
+            </span>
+          )}
+        </Button>
+      )}
 
       <style jsx>{`
         @keyframes subtleGradientAnimation {

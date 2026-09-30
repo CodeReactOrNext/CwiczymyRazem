@@ -119,13 +119,13 @@ export const buildSongsSessionTitle = (
   return compose(named).slice(0, TITLE_MAX_LENGTH);
 };
 
-/** "1h 20m" / "45m" — friendlier than the HH:MM the timer boxes use. */
+/** "1h 20 min" / "45 min" — friendlier than the HH:MM the timer boxes use. */
 export const formatPracticed = (ms: number) => {
   const totalMinutes = Math.round(ms / MINUTE_MS);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
-  if (hours === 0) return `${minutes}m`;
+  if (hours === 0) return `${minutes} min`;
   if (minutes === 0) return `${hours}h`;
-  return `${hours}h ${minutes}m`;
+  return `${hours}h ${minutes} min`;
 };

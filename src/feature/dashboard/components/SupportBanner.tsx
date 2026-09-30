@@ -1,3 +1,4 @@
+import { Skeleton } from "assets/components/ui/skeleton";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { FundingStatusBlock } from "feature/roadmap/components/FundingStatusBlock";
 import { ROADMAP_RAISED_OFFSET } from "feature/roadmap/data/roadmap.data";
@@ -44,7 +45,21 @@ export const SupportBanner = () => {
         </div>
 
         {/* Compact progress block: full-width row when stacked, fixed column on desktop */}
-        {!isLoading && (
+        {/* While the funding request is in flight a placeholder of the same
+            shape holds the block's space, so the banner doesn't grow and push
+            the feed down when the numbers arrive. */}
+        {isLoading ? (
+          <div aria-hidden className='w-full lg:w-80'>
+            <div className='flex h-4 items-center justify-between gap-4 sm:h-5'>
+              <Skeleton className='h-3 w-40 sm:h-3.5' />
+              <Skeleton className='h-3 w-14 sm:h-3.5' />
+            </div>
+            <Skeleton className='mt-2 h-1.5 w-full rounded-full' />
+            <div className='mt-3 flex h-4 items-center'>
+              <Skeleton className='h-3 w-48' />
+            </div>
+          </div>
+        ) : (
           <FundingStatusBlock
             totalRaised={totalRaised}
             raisedThisMonth={raisedThisMonth}

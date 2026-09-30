@@ -21,6 +21,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { SONG_PRACTICE_MODE_LABELS } from "feature/exercisePlan/utils/songToExercise";
 import { useTranslation } from "hooks/useTranslation";
 import { Clock, Copy, Edit2, GripVertical, ListPlus,Trash2 } from "lucide-react";
+import { formatMinutesDuration } from "utils/converter";
 
 interface SelectedExercisesListProps {
   selectedExercises: Exercise[];
@@ -210,7 +211,7 @@ export const SelectedExercisesList = ({
           <span className="text-[13px] font-bold text-zinc-200">
             {totalDuration < 1 
               ? `${Math.round(totalDuration * 60)}s` 
-              : `${Math.round(totalDuration * 10) / 10} min`}
+              : formatMinutesDuration(totalDuration)}
           </span>
         </div>
       </div>

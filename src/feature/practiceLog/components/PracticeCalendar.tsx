@@ -126,7 +126,7 @@ export const PracticeCalendar = ({
       if (!group) return undefined;
       return `${t("page.day_sessions", {
         count: group.sessions.length,
-      })} · ${convertMsToHM(group.totalTimeMs)}h`;
+      })} · ${convertMsToHM(group.totalTimeMs)}`;
     },
     [byKey, t],
   );

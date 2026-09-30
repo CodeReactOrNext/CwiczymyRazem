@@ -1,4 +1,4 @@
-import { FaHandPaper } from "react-icons/fa";
+import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 
 type TechniqueIconProps = {
   className?: string;
@@ -15,7 +15,8 @@ const TechniqueIcon = ({
     large: "text-xl",
   };
 
-  return <FaHandPaper className={`${sizeClasses[size]} ${className}`} />;
+  const Icon = SKILL_CATEGORY_ICONS.technique;
+  return <Icon className={`${sizeClasses[size]} ${className}`} />;
 };
 
 export default TechniqueIcon;

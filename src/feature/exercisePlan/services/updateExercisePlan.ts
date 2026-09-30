@@ -21,7 +21,9 @@ export const updateExercisePlan = async (
       ) {
         const newObj: any = {};
         Object.keys(obj).forEach((key) => {
-          if (obj[key] !== undefined) {
+          // Catalog exercises carry function fields (rollHuntTarget…) that
+          // Firestore rejects — same filter as createExercisePlan.
+          if (obj[key] !== undefined && typeof obj[key] !== "function") {
             newObj[key] = sanitize(obj[key]);
           }
         });

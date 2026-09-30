@@ -10,7 +10,7 @@ import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { getPlanColor, getPlanIcon } from "feature/exercisePlan/data/planAppearance";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowUpRight, Globe, Heart, Lock, Music } from "lucide-react";
+import { ArrowRight, Globe, Heart, Lock, Music } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
@@ -393,7 +393,7 @@ export const PlanCard = ({
       </div>
 
       {/* Footer: Stats & Action */}
-      <div className="relative mt-5 flex items-center justify-between">
+      <div className="relative mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         <div className="flex items-center gap-4">
             <div className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-zinc-400")}>
                 <FaClock className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-600" : "text-zinc-500")} />
@@ -435,12 +435,13 @@ export const PlanCard = ({
               Preview
             </button>
           )}
+          {/* Labelled pill rather than a bare ↗ — that glyph reads as "opens a
+              new tab", and next to the text Preview it was unclear which of
+              the two actually starts the plan. */}
           <button
             type="button"
-            aria-label={startButtonText || "Start"}
-            title={startButtonText || "Start"}
             className={cn(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-200 transition-colors duration-300",
+              "flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-white/10 px-4 text-xs font-semibold text-zinc-100 transition-colors duration-300",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60",
               style.cta
             )}
@@ -450,10 +451,11 @@ export const PlanCard = ({
             }}
             disabled={isLoading}
           >
+            <span>{startButtonText || "Start"}</span>
             {isLoading ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
             ) : (
-              <ArrowUpRight className="h-4 w-4" />
+              <ArrowRight className="h-3.5 w-3.5" />
             )}
           </button>
           </div>

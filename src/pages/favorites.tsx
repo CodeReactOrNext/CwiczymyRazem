@@ -28,6 +28,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
+import { formatMinutesDuration } from "utils/converter";
 
 const DIFFICULTY_COLORS: Record<string, string> = {
   beginner: "bg-sky-500/[0.12] text-sky-400 border-sky-500/30",
@@ -290,7 +291,7 @@ const FavoritesPage: NextPageWithLayout = () => {
                         <Clock className="h-3 w-3" />
                         {exercise.timeInMinutes < 1
                           ? `${Math.round(exercise.timeInMinutes * 60)} s`
-                          : `${exercise.timeInMinutes} min`}
+                          : formatMinutesDuration(exercise.timeInMinutes)}
                       </span>
 
                       <span

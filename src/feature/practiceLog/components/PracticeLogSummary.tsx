@@ -18,14 +18,14 @@ export const PracticeLogSummary = ({ summary }: PracticeLogSummaryProps) => {
   const stats = [
     {
       label: t("summary.total_time"),
-      value: `${convertMsToHM(summary.totalTimeMs)}h`,
+      value: convertMsToHM(summary.totalTimeMs),
     },
     { label: t("summary.sessions"), value: String(summary.sessionCount) },
     { label: t("summary.points"), value: String(summary.totalPoints) },
     { label: t("summary.active_days"), value: String(summary.activeDays) },
     {
       label: t("summary.avg_session"),
-      value: `${convertMsToHM(summary.avgSessionMs)}h`,
+      value: convertMsToHM(summary.avgSessionMs),
     },
   ];
 
@@ -58,7 +58,7 @@ export const PracticeLogSummary = ({ summary }: PracticeLogSummaryProps) => {
             <li key={key} className="flex items-center gap-2.5">
               <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
               <span className="text-sm font-semibold tabular-nums text-zinc-200">
-                {convertMsToHM(summary.perCategoryMs[key])}h
+                {convertMsToHM(summary.perCategoryMs[key])}
               </span>
               <span className="text-xs text-zinc-500">{t(labelKey)}</span>
             </li>
