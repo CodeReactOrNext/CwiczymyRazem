@@ -13,6 +13,7 @@ import type { ShortcutId } from "feature/dashboard/data/shortcutCatalog";
  */
 export const WIDGET_IDS = [
   "daily-quests",
+  "daily-exercise",
   "practice-stats",
   "streak",
   "shortcuts",

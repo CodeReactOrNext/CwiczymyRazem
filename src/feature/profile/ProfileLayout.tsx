@@ -1,34 +1,37 @@
 import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
-import { DaySinceMessage } from "components/DaySince/DaySince";
-import Avatar from "components/UI/Avatar";
-import { HeroBanner } from "components/UI/HeroBanner";
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
-import { EarnedAchievementsList } from "feature/achievements";
-import { getRarityColor } from "feature/arsenal/components/RarityBadge";
-import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
-import { useEquippedGuitar } from "feature/arsenal/hooks/useUserArsenal";
-import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
+import { useProfileLayout } from "feature/profile/hooks/useProfileLayout";
+import { useSongPracticeTimes } from "feature/profile/hooks/useSongPracticeTimes";
+import type { ProfileSectionId } from "feature/profile/types/profileLayout.types";
+import {
+  resolveFeaturedSongs,
+  resolveTrophies,
+} from "feature/profile/utils/profileLayout";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
 import { useUserSongs } from "feature/songs/hooks/useUserSongs";
-import { useTranslation } from "hooks/useTranslation";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
-import { FaFire, FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
 import type { ProfileInterface } from "types/ProfileInterface";
-import { getYearsOfPlaying } from "utils/converter";
-import { getPointsToLvlUp, getReconciledStreak } from "utils/gameLogic";
+import { getReconciledStreak } from "utils/gameLogic";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
 import { ProfileArsenal } from "./components/ProfileArsenal";
+import { ProfileHeader } from "./components/ProfileHeader";
+import { ProfileSections } from "./components/ProfileSections";
+import {
+  AboutSection,
+  LearningSection,
+} from "./components/ProfileTextSections";
+import { SongCase } from "./components/SongCase";
 import { SongSkillShowcase } from "./components/SongSkillShowcase";
-import { SongTierBadge } from "./components/SongTierBadge";
 import { StatsSection } from "./components/StatsSection";
+import { TrophyCase } from "./components/TrophyCase";
+import { UserRecordingsSection } from "./components/UserRecordingsSection";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -41,22 +44,19 @@ const ProfileLayout = ({
   userData,
   userAuth,
 }: LandingLayoutProps) => {
-  const { t } = useTranslation("profile");
-  const {
-    statistics,
-    displayName,
-    avatar,
-    guildBadge,
-    createdAt,
-    band,
-    soundCloudLink,
-    youTubeLink,
-    guitarStartDate,
-    selectedGuitar,
-  } = userData;
+  const { statistics } = userData;
   const { lastReportDate, achievements } = statistics;
   const [userSkills, setUserSkills] = useState<UserSkills>();
-  const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
+  const { reportList, datasWithReports, year, setYear, isLoading } =
+    useActivityLog(userAuth);
+
+  const currentUserId = useAppSelector(selectUserAuth);
+  const isOwner = !!currentUserId && currentUserId === userAuth;
+  const { layout, updateLayout } = useProfileLayout(
+    userAuth,
+    userData.profileLayout,
+    isOwner,
+  );
 
   // Streak: same logic as the header — the activity log (local time) is the
   // timezone-correct source of truth, with the stored counter as a fallback
@@ -65,255 +65,134 @@ const ProfileLayout = ({
     actualDayWithoutBreak: statistics.actualDayWithoutBreak || 0,
     lastReportDate,
     reportDates: (reportList ?? []).map(
-      (report: { date: Date | string }) => report.date
+      (report: { date: Date | string }) => report.date,
     ),
   });
-
-  const yearsOfPlaying = guitarStartDate
-    ? getYearsOfPlaying(guitarStartDate.toDate())
-    : null;
-
-  const lvlXpStart = getPointsToLvlUp(statistics.lvl - 1);
-  const lvlXpEnd = getPointsToLvlUp(statistics.lvl);
-  let effectivePts = statistics.points;
-  if (statistics.points < lvlXpStart && statistics.lvl > 1) effectivePts += lvlXpStart;
-  const ptsInLevel = Math.max(0, effectivePts - lvlXpStart);
-  const lvlRange = Math.max(1, lvlXpEnd - lvlXpStart);
-  const xpPercent = Math.min(Math.max((ptsInLevel / lvlRange) * 100, 0), 100);
-  const arcR = 38;
-  const arcC = 2 * Math.PI * arcR;
-  const arcOffset = arcC * (1 - xpPercent / 100);
 
   const {
     songs,
     isLoading: isSongsLoading,
     isError: isSongsError,
   } = useUserSongs(userAuth);
+  const practiceTimes = useSongPracticeTimes(userAuth);
 
   useEffect(() => {
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
   }, [userAuth]);
 
-  const { item: equippedGuitar } = useEquippedGuitar(userAuth);
-
-  const imgPath = selectedGuitar ?? (statistics.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : statistics.lvl);
-  const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
-  const specialGuitarDef = isSpecialGuitar ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath) : null;
-  // The banner is lit by what the guitar is now, not by what it was at mint —
-  // the workshop can promote it, and the promotion only exists on the item.
-  // (The same read feeds the rig below, so the profile pays for it once.)
-  const equippedRarity = getEquippedRarity(equippedGuitar, specialGuitarDef);
-  // No special guitar equipped falls back to the brand cyan, not to a rarity.
-  const glowColor = equippedRarity ? getRarityColor(equippedRarity) : "#0891b2";
-
-  return (
-    <div className='bg-second-600 rounded-xl flex flex-col shadow-sm border-none overflow-hidden md:overflow-visible'>
-      <HeroBanner
-        eyebrow='Player Profile'
-        // The banner takes its title as a string, so the tag rides in the
-        // eyebrow instead — directly above the name, which is where a profile
-        // says who this player plays with.
-        eyebrowContent={
-          guildBadge ? (
-            <div className='flex items-center gap-2'>
-              <p className='text-xs font-semibold uppercase tracking-[0.2em] text-orange-400/80'>
-                Player Profile
-              </p>
-              <GuildTagBadge badge={guildBadge} size='md' />
-            </div>
-          ) : undefined
-        }
-        title={displayName}
-        subtitle={`${statistics.points.toLocaleString()} ${t("points")}${band ? ` · ${band}` : ""}`}
-        className='w-full !rounded-none !shadow-none'
-        backgroundContent={
-          isSpecialGuitar ? (
-            <div className="absolute inset-0 z-0 overflow-hidden rounded-none md:rounded-xl">
-              {/* Glow Blur on the left */}
-              <div className='absolute left-[0%] md:left-[5%] top-[-10%] md:top-[-15%] blur-[80px] opacity-25 md:opacity-30 pointer-events-none' style={{ backgroundColor: glowColor, width: '350px', height: '350px', borderRadius: '50%' }} />
-
-              {/* Guitar with CSS fade on the right side */}
-              <img
-                src={getRankBadgeSrc(imgPath, "large")}
-                className="absolute top-[-15%] md:top-[-35%] left-[0%] md:left-[8%] max-w-none h-[300px] md:h-[480px] -rotate-[90deg] md:-rotate-[15deg] opacity-[0.75] pointer-events-none"
-                style={{ 
-                  filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
-                  WebkitMaskImage: 'linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)',
-                  maskImage: 'linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)'
-                }}
-                alt="Background Guitar"
-              />
-            </div>
-          ) : null
-        }
-        rightContent={
-          <div className='relative flex select-none items-center gap-4 pr-2'>
-
-            {/* Song tier badge */}
-            <SongTierBadge
-              learnedSongs={songs?.learned}
-              isLoading={isSongsLoading}
-              isError={isSongsError}
-            />
-
-            {/* Level ring */}
-            <div className='relative flex flex-col items-center gap-1'>
-              <svg width='120' height='120' viewBox='0 0 100 100' className='relative shrink-0'>
-                <defs>
-                  <linearGradient id='lvlArcGrad' x1='0%' y1='0%' x2='100%' y2='100%'>
-                    <stop offset='0%' stopColor='#a5f3fc' />
-                    <stop offset='100%' stopColor='#0891b2' />
-                  </linearGradient>
-                  <filter id='lvlGlow' x='-30%' y='-30%' width='160%' height='160%'>
-                    <feGaussianBlur stdDeviation='2.5' result='blur' />
-                    <feMerge><feMergeNode in='blur' /><feMergeNode in='SourceGraphic' /></feMerge>
-                  </filter>
-                </defs>
-                <circle cx='50' cy='50' r='46' fill='rgba(0,0,0,0.45)' />
-                <circle cx='50' cy='50' r={arcR} fill='none' stroke='rgba(255,255,255,0.1)' strokeWidth='6' />
-                <circle
-                  cx='50' cy='50' r={arcR}
-                  fill='none'
-                  stroke='url(#lvlArcGrad)'
-                  strokeWidth='6'
-                  strokeLinecap='round'
-                  strokeDasharray={arcC}
-                  strokeDashoffset={arcOffset}
-                  transform='rotate(-90 50 50)'
-                  filter='url(#lvlGlow)'
-                />
-                <text x='50' y='54' textAnchor='middle' fill='white' fontSize='24' fontWeight='900' style={{ fontFamily: 'system-ui, sans-serif' }}>
-                  {statistics.lvl}
-                </text>
-                <text x='50' y='67' textAnchor='middle' fill='#67e8f9' fontSize='9' fontWeight='700' letterSpacing='3' style={{ fontFamily: 'system-ui, sans-serif' }}>
-                  LVL
-                </text>
-              </svg>
-              <span className='text-[10px] font-semibold tracking-widest text-zinc-400'>Level progress</span>
-              <span className='text-[11px] tabular-nums text-zinc-500'>{ptsInLevel.toLocaleString()} / {lvlRange.toLocaleString()} XP</span>
-            </div>
+  const renderSection = (id: ProfileSectionId) => {
+    switch (id) {
+      case "trophies": {
+        const owned = new Set(achievements ?? []);
+        return (
+          <TrophyCase
+            trophies={resolveTrophies(layout, achievements ?? [])}
+            isPinned={layout.trophies.some((t) => owned.has(t))}
+            isOwner={isOwner}
+          />
+        );
+      }
+      case "signature-songs": {
+        const learned = songs?.learned ?? [];
+        const learnedIds = new Set(learned.map((song) => song.id));
+        return (
+          <SongCase
+            songs={resolveFeaturedSongs(layout, learned)}
+            isPinned={layout.featuredSongs.some((songId) =>
+              learnedIds.has(songId),
+            )}
+            isOwner={isOwner}
+            practiceTimes={practiceTimes}
+          />
+        );
+      }
+      case "about":
+        return <AboutSection text={layout.about} />;
+      case "insights":
+        return (
+          <div className='font-openSans'>
+            <PracticeInsights statistics={statistics} />
           </div>
-        }
-        leftContent={
-          <div className='flex items-center gap-5'>
-            {/* Avatar with level badge */}
-            <div className='relative shrink-0'>
-              <Avatar
-                name={displayName}
-                avatarURL={avatar}
-                lvl={statistics.lvl}
-                selectedGuitar={selectedGuitar}
-                userId={userAuth}
-              />
-            </div>
-
-            {/* Info */}
-            <div className='space-y-2 bg-black/40 backdrop-blur-md px-4 py-3 rounded-xl border border-white/5 shadow-2xl'>
-              <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
-                <DaySinceMessage date={new Date(lastReportDate)} />
-                {streak > 0 && (
-                  <div className='flex items-center gap-1.5 rounded-[4px] bg-orange-500/15 px-2.5 py-1 border border-orange-500/30'>
-                    <FaFire className='text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]' size={13} />
-                    <span className='text-xs font-black text-white tabular-nums'>{streak}</span>
-                    <span className='text-[11px] font-semibold tracking-wide text-orange-400/90'>
-                      day streak
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className='flex flex-wrap gap-x-4 gap-y-1'>
-                <div className='flex items-center gap-1.5 text-[11px] font-semibold tracking-widest text-zinc-400'>
-                  <div className='h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]'></div>
-                  <span>Joined: <span className='tracking-normal text-zinc-200 tabular-nums drop-shadow-md'>{createdAt.toDate().toLocaleDateString()}</span></span>
-                </div>
-                {yearsOfPlaying != null && yearsOfPlaying > 0 && (
-                  <div className='flex items-center gap-1.5 text-[11px] font-semibold tracking-widest text-zinc-400'>
-                    <div className='h-1.5 w-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]'></div>
-                    <span>Playing for <span className='tracking-normal text-zinc-200 tabular-nums drop-shadow-md'>{yearsOfPlaying} years</span></span>
-                  </div>
-                )}
-              </div>
-              {(youTubeLink || soundCloudLink) && (
-                <div className='flex flex-wrap gap-2 pt-1'>
-                  {youTubeLink && (
-                    <a target='_blank' rel='noreferrer' href={youTubeLink}
-                      className='flex items-center gap-1.5 rounded-lg bg-red-500/20 px-2.5 py-1.5 text-xs font-semibold text-white transition-all hover:bg-red-500/40 border border-red-500/30'>
-                      <FaYoutube size={13} /> YouTube
-                    </a>
-                  )}
-                  {soundCloudLink && (
-                    <a target='_blank' rel='noreferrer' href={soundCloudLink}
-                      className='flex items-center gap-1.5 rounded-lg bg-orange-500/20 px-2.5 py-1.5 text-xs font-semibold text-white transition-all hover:bg-orange-500/40 border border-orange-500/30'>
-                      <FaSoundcloud size={13} /> SoundCloud
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        }
-      />
-
-      <div className='space-y-8 p-4 md:p-6'>
-        {/* Practice Insights */}
-        <div className='font-openSans'>
-          <PracticeInsights statistics={statistics} />
-        </div>
-
-        {/* Activity Heatmap */}
-        <ActivityLogView
-          year={year}
-          setYear={setYear}
-          datasWithReports={datasWithReports}
-          isLoading={isLoading}
-        />
-
-        {/* Stats Section */}
-        <div className='rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
-          <h2 className='mb-6 text-2xl font-bold text-white'>Statistics</h2>
-          <StatsSection
-            statsField={statsField}
-            statistics={statistics}
-            datasWithReports={datasWithReports}
-            userSongs={songs}
-            userAuth={userAuth}
-            achievements={achievements}
+        );
+      case "activity":
+        return (
+          <ActivityLogView
             year={year}
             setYear={setYear}
-            isLoadingActivity={isLoading}
+            datasWithReports={datasWithReports}
+            isLoading={isLoading}
           />
-        </div>
-
-        {/* Song Skill Showcase — the profile owner sees it too */}
-        <SongSkillShowcase userSongs={songs} profileUserId={userAuth} />
-
-        {/* Skills Section */}
-        {userSkills && Object.keys(userSkills.unlockedSkills ?? {}).length > 0 && (
+        );
+      case "statistics":
+        return (
+          <div className='rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
+            <h2 className='mb-6 text-2xl font-bold text-white'>Statistics</h2>
+            <StatsSection
+              statsField={statsField}
+              statistics={statistics}
+              datasWithReports={datasWithReports}
+              userSongs={songs}
+              userAuth={userAuth}
+              achievements={achievements}
+              year={year}
+              setYear={setYear}
+              isLoadingActivity={isLoading}
+            />
+          </div>
+        );
+      case "repertoire":
+        return (
+          <SongSkillShowcase
+            userSongs={songs}
+            profileUserId={userAuth}
+            practiceTimes={practiceTimes}
+          />
+        );
+      case "learning":
+        return (
+          <LearningSection
+            songs={songs?.learning}
+            practiceTimes={practiceTimes}
+          />
+        );
+      case "skills":
+        return userSkills &&
+          Object.keys(userSkills.unlockedSkills ?? {}).length > 0 ? (
           <div className='rounded-lg bg-zinc-900/30 p-4 sm:p-6'>
             <h2 className='mb-6 text-2xl font-bold text-white'>Skills</h2>
             <SkillTreeCards isUserProfile userSkills={userSkills} />
           </div>
-        )}
+        ) : null;
+      case "rig":
+        return <ProfileArsenal userAuth={userAuth} />;
+      case "recordings":
+        return <UserRecordingsSection userId={userAuth} />;
+      case "seasonal":
+        return <SeasonalAchievements userId={userAuth} hideWhenEmpty />;
+    }
+  };
 
-        {/* Arsenal Section */}
-        <ProfileArsenal userAuth={userAuth} />
+  return (
+    <div className='flex flex-col overflow-hidden rounded-xl border-none bg-second-600 shadow-sm md:overflow-visible'>
+      <ProfileHeader
+        userData={userData}
+        userAuth={userAuth}
+        layout={layout}
+        streak={streak}
+        learnedSongs={songs?.learned}
+        isSongsLoading={isSongsLoading}
+        isSongsError={isSongsError}
+      />
 
-        {/* Achievement Sections */}
-        <div className='space-y-8'>
-          <SeasonalAchievements userId={userAuth} hideWhenEmpty />
-
-          {(achievements?.length ?? 0) > 0 && (
-            <div className='space-y-4 px-2'>
-              <div className='flex items-center gap-2'>
-                <h2 className='text-xl font-bold text-white capitalize tracking-wider'>Achievements</h2>
-                <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
-                  {achievements?.length || 0}
-                </span>
-              </div>
-              <EarnedAchievementsList userAchievements={achievements ?? []} />
-            </div>
-          )}
-        </div>
+      <div className='p-4 md:p-6'>
+        <ProfileSections
+          layout={layout}
+          updateLayout={updateLayout}
+          isOwner={isOwner}
+          renderSection={renderSection}
+          earned={achievements ?? []}
+          learnedSongs={songs?.learned ?? []}
+        />
       </div>
     </div>
   );

@@ -33,6 +33,8 @@ const ProfileView = () => {
     <AppLayout pageId={null} subtitle='Profile' variant='secondary'>
       {userData ? (
         <ProfileLayout
+          // One mount per profile: the layout state is seeded from the doc.
+          key={profileId as string}
           statsField={
             getUserStatsField(userData?.statistics) as StatsFieldProps[]
           }

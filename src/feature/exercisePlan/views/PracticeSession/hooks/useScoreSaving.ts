@@ -1,3 +1,5 @@
+import { submitDailyExerciseScore } from "feature/dailyExercise/services/dailyExercise.service";
+import { findDailyDayKeyFor } from "feature/dailyExercise/utils/dailyExercise";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import type { RefObject } from "react";
@@ -108,6 +110,13 @@ export function useScoreSaving({
       const result = await updateMicHighScore(userAuth, exId, snap.score, snap.accuracy, exTitle, exCategory);
       recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: snap.score, scoreType: "mic", previousBest: result.previousScore, bpm: runBpm });
       micStandingRef.current = await placeOnLeaderboard(userAuth, snap.score, result.previousScore);
+      // The exercise of the day keeps its own board on top of the all-time one.
+      // Not awaited — a failed daily write must never hold up the report.
+      const dailyDayKey = findDailyDayKeyFor(exId);
+      if (dailyDayKey) {
+        submitDailyExerciseScore({ dayKey: dailyDayKey, exerciseId: exId, score: snap.score, accuracy: snap.accuracy, bpm: runBpm })
+          .catch((error) => console.error("Daily exercise score was not saved", error));
+      }
       if (result.isNewRecord) {
         exerciseRecordsRef.current = {
           ...exerciseRecordsRef.current,

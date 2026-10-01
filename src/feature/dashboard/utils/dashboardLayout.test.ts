@@ -91,7 +91,7 @@ describe("normalizeLayout", () => {
   it("returns fresh arrays rather than aliasing the default", () => {
     const layout = normalizeLayout(undefined);
     layout.widgets.push({ id: "streak", size: "half" });
-    expect(DEFAULT_LAYOUT.widgets).toHaveLength(3);
+    expect(DEFAULT_LAYOUT.widgets).toHaveLength(4);
   });
 
   it("drops cards an older layout still lists but the app has since retired", () => {
