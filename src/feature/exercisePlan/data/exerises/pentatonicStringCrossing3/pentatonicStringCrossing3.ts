@@ -28,7 +28,7 @@ export const pentatonicStringCrossing3Exercise: Exercise = {
     "If a run hiccups, it is almost always a crossing \u2014 slow down until both crossings are even, then raise the tempo.",
     "Let the fretting fingers stay hovering over their frets instead of lifting away between strings."
   ],
-  metronomeSpeed: { min: 40, max: 80, recommended: 50 },
+  metronomeSpeed: { min: 40, max: 180, recommended: 50 },
   examBacking: { url: "/static/sounds/exercise/pentatonic_string_crossing___3_strings_backing_track.mp3", sourceBpm: 50 },
   relatedSkills: ["alternate_picking"],
   tablature: [
