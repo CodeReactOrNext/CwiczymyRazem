@@ -1,4 +1,5 @@
 import { ActivityLogView } from "components/ActivityLog/ActivityLog";
+import { DailyExerciseWidget } from "feature/dailyExercise/components/DailyExerciseWidget";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { isMilestoneWidgetId } from "feature/dashboard/data/milestoneWidgets";
@@ -30,6 +31,8 @@ export const WidgetContent = ({ id }: { id: WidgetId }) => {
   switch (id) {
     case "daily-quests":
       return <DailyQuestWidget />;
+    case "daily-exercise":
+      return <DailyExerciseWidget />;
     case "practice-stats":
       return (
         <PracticeStatsWidget

@@ -1,7 +1,6 @@
 import { RecordingsGrid } from "feature/recordings/components/RecordingsGrid";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { useRecordings } from "feature/recordings/hooks/useRecordings";
-import { Video } from "lucide-react";
 import { useState } from "react";
 
 interface UserRecordingsSectionProps {
@@ -21,14 +20,9 @@ export const UserRecordingsSection = ({ userId }: UserRecordingsSectionProps) =>
 
   return (
     <div className="rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-          <Video className="h-6 w-6 text-cyan-400" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-white leading-tight">Recordings</h2>
-          <p className="text-sm text-zinc-500 font-medium">Performance and practice covers</p>
-        </div>
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-white leading-tight">Recordings</h2>
+        <p className="mt-1 text-sm text-zinc-400">Performance and practice covers</p>
       </div>
 
       <RecordingsGrid 

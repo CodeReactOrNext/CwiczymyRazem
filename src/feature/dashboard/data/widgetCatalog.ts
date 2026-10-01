@@ -15,6 +15,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Activity,
   BarChart3,
+  CalendarClock,
   Flame,
   Gift,
   History,
@@ -61,6 +62,15 @@ const DEFINITIONS: Record<StaticWidgetId, Omit<WidgetDefinition, "id">> = {
     icon: Swords,
     group: "practice",
     defaultSize: "half",
+    resizable: true,
+  },
+  "daily-exercise": {
+    title: "Exercise of the day",
+    description:
+      "One mic-scored exercise for everyone, new every day, with the day's top five.",
+    icon: CalendarClock,
+    group: "practice",
+    defaultSize: "full",
     resizable: true,
   },
   "practice-stats": {

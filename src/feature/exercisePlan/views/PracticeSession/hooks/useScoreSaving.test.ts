@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 
 import { act, renderHook } from "@testing-library/react";
+import { submitDailyExerciseScore } from "feature/dailyExercise/services/dailyExercise.service";
+import { findDailyDayKeyFor } from "feature/dailyExercise/utils/dailyExercise";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -15,6 +17,14 @@ vi.mock("../../../services/bpmProgressService", () => ({
   updateClickHighScore: vi.fn(),
   updateEarTrainingHighScore: vi.fn(),
   updateMicHighScore: vi.fn(),
+}));
+
+vi.mock("feature/dailyExercise/services/dailyExercise.service", () => ({
+  submitDailyExerciseScore: vi.fn(),
+}));
+
+vi.mock("feature/dailyExercise/utils/dailyExercise", () => ({
+  findDailyDayKeyFor: vi.fn(),
 }));
 
 vi.mock("feature/leadboard/services/getExerciseUserRank", () => ({
@@ -154,5 +164,35 @@ describe("useScoreSaving completion", () => {
   it("still marks it done alongside a saved score", async () => {
     await saveRun({ score: 900, previousBest: 0 });
     expect(markExerciseCompleted).toHaveBeenCalledWith("me", "ex1", "C Minor Pentatonic", "technique");
+  });
+});
+
+describe("useScoreSaving daily board", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getExerciseUserRank).mockResolvedValue(2);
+    vi.mocked(submitDailyExerciseScore).mockResolvedValue({ isNewBest: true });
+  });
+
+  it("puts a run of the exercise of the day on the daily board", async () => {
+    vi.mocked(findDailyDayKeyFor).mockReturnValue("2026-09-30");
+
+    await saveRun({ score: 21_375, previousBest: 40_000 });
+
+    expect(submitDailyExerciseScore).toHaveBeenCalledWith({
+      dayKey: "2026-09-30",
+      exerciseId: "ex1",
+      score: 21_375,
+      accuracy: 99,
+      bpm: 90,
+    });
+  });
+
+  it("leaves the daily board alone for any other exercise", async () => {
+    vi.mocked(findDailyDayKeyFor).mockReturnValue(null);
+
+    await saveRun({ score: 21_375, previousBest: 0 });
+
+    expect(submitDailyExerciseScore).not.toHaveBeenCalled();
   });
 });

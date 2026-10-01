@@ -1,9 +1,10 @@
 import { cn } from "assets/lib/utils";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { Song } from "feature/songs/types/songs.type";
+import { formatPlayTime } from "feature/songs/utils/arrangements.utils";
 import { getAllTiers, getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { Music } from "lucide-react";
+import { Clock, Music } from "lucide-react";
 import { useMemo } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -16,11 +17,55 @@ interface SongSkillShowcaseProps {
       }
     | undefined;
   profileUserId: string;
+  /** Milliseconds per song id — see useSongPracticeTimes. */
+  practiceTimes?: Record<string, number>;
 }
+
+/** One song with its cover, artist and tier — shared by the song sections. */
+export const ProfileSongRow = ({
+  song,
+  practiceMs,
+}: {
+  song: Song;
+  /** Time spent on the song; hidden when unknown or zero. */
+  practiceMs?: number;
+}) => (
+  <div className='flex items-center gap-3 rounded-xl bg-zinc-800/20 p-3'>
+    {song.coverUrl ? (
+      <img
+        src={song.coverUrl}
+        alt={song.title}
+        className='h-10 w-10 shrink-0 rounded-lg object-cover'
+      />
+    ) : (
+      <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-700/30'>
+        <Music className='h-4 w-4 text-zinc-500' />
+      </div>
+    )}
+    <div className='min-w-0 flex-1'>
+      <p translate='no' className='truncate text-sm font-semibold text-white'>
+        {song.title}
+      </p>
+      <p translate='no' className='truncate text-xs text-zinc-400'>
+        {song.artist}
+      </p>
+    </div>
+    {!!practiceMs && practiceMs > 0 && (
+      <span
+        title='Time spent practising this song'
+        className='flex shrink-0 items-center gap-1 text-xs tabular-nums text-zinc-400'>
+        <Clock size={12} className='text-zinc-500' />
+        {formatPlayTime(practiceMs)}
+      </span>
+    )}
+    <TierBadge song={song} className='shrink-0' />
+  </div>
+);
 
 export const SongSkillShowcase = ({
   userSongs,
   profileUserId,
+  practiceTimes,
 }: SongSkillShowcaseProps) => {
   const currentUserId = useAppSelector(selectUserAuth);
   const isOwnProfile = currentUserId === profileUserId;
@@ -56,7 +101,9 @@ export const SongSkillShowcase = ({
         <p className='mt-2 text-sm text-zinc-400'>
           {isOwnProfile
             ? `Songs land here once you mark them as learned on your song board${
-                learningCount > 0 ? `, and ${learningCount} are still in progress` : ""
+                learningCount > 0
+                  ? `, and ${learningCount} are still in progress`
+                  : ""
               }.`
             : `No songs marked as learned yet${
                 learningCount > 0 ? `, ${learningCount} in progress` : ""
@@ -114,34 +161,11 @@ export const SongSkillShowcase = ({
             {/* Songs grid */}
             <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3'>
               {songs.map((song) => (
-                <div
+                <ProfileSongRow
                   key={song.id}
-                  className='flex items-center gap-3 rounded-xl bg-zinc-800/20 p-3'>
-                  {song.coverUrl ? (
-                    <img
-                      src={song.coverUrl}
-                      alt={song.title}
-                      className='h-10 w-10 shrink-0 rounded-lg object-cover'
-                    />
-                  ) : (
-                    <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-700/30'>
-                      <Music className='h-4 w-4 text-zinc-500' />
-                    </div>
-                  )}
-                  <div className='min-w-0 flex-1'>
-                    <p
-                      translate='no'
-                      className='truncate text-sm font-semibold text-white'>
-                      {song.title}
-                    </p>
-                    <p
-                      translate='no'
-                      className='truncate text-xs text-zinc-400'>
-                      {song.artist}
-                    </p>
-                  </div>
-                  <TierBadge song={song} className='shrink-0' />
-                </div>
+                  song={song}
+                  practiceMs={practiceTimes?.[song.id]}
+                />
               ))}
             </div>
           </div>

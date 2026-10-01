@@ -766,9 +766,19 @@ const FirebaseLogsSupportAskItem = ({
   );
 };
 
-/** Who the card thanks: the name Buy Me a Coffee sent, or the account it was matched to. */
-const getDonationName = (log: FirebaseLogsDonationInterface): string =>
-  log.supporterName?.trim() || log.userName?.trim() || "Someone";
+/**
+ * Who the card thanks: the player's nick when the donation is matched to an account, otherwise
+ * the name Buy Me a Coffee sent — unless that name is just the donor's email, which stays private.
+ */
+const getDonationName = (log: FirebaseLogsDonationInterface): string => {
+  const userName = log.userName?.trim();
+  if (log.uid && userName) return userName;
+
+  const supporterName = log.supporterName?.trim();
+  if (supporterName && !supporterName.includes("@")) return supporterName;
+
+  return userName || "Someone";
+};
 
 /** The sentence the card leads with — the day's whole support when there was more than one. */
 const getDonationHeadline = (logs: FirebaseLogsDonationInterface[]): string => {

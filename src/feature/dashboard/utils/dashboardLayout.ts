@@ -27,6 +27,7 @@ export const DEFAULT_LAYOUT: DashboardLayout = {
   widgets: [
     { id: "daily-quests", size: "half" },
     { id: "practice-stats", size: "half" },
+    { id: "daily-exercise", size: "full" },
     { id: "activity-log", size: "full" },
   ],
   shortcuts: [

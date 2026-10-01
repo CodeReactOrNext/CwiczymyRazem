@@ -11,6 +11,8 @@ interface AchievementPhysicalCardProps extends React.HTMLAttributes<HTMLDivEleme
   isMobileView?: boolean;
   customStyle?: React.CSSProperties;
   cardSize?: "sm" | "lg";
+  /** How much the card grows on hover; the small grid cards pop to 2x. */
+  hoverScale?: number;
 }
 
 const getEpicCardStyle = (rarity: string) => {
@@ -31,6 +33,7 @@ export const AchievementPhysicalCard = forwardRef<HTMLDivElement, AchievementPhy
       isMobileView,
       customStyle,
       cardSize = "sm",
+      hoverScale = 2.0,
       ...props
     },
     forwardedRef
@@ -116,7 +119,7 @@ export const AchievementPhysicalCard = forwardRef<HTMLDivElement, AchievementPhy
             ...customStyle,
           }}
           whileHover={isMobileView ? {} : { 
-            scale: 2.0, 
+            scale: hoverScale, 
             zIndex: 50,
             transition: { duration: 0.1 }
           }}
