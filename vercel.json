@@ -36,6 +36,10 @@
     {
       "path": "/api/support-ask-update",
       "schedule": "0 17 * * *"
+    },
+    {
+      "path": "/api/cron/daily-exercise",
+      "schedule": "5 1 * * *"
     }
   ]
 }

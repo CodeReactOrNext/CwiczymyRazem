@@ -208,6 +208,17 @@ const typeConfig = {
       </span>
     ),
   },
+  daily_exercise_win: {
+    icon: <Trophy className='h-3 w-3 fill-current text-white' />,
+    bg: "bg-amber-500",
+    label: (n: any) => (
+      <span>
+        You won the exercise of the day —{" "}
+        <span className='font-semibold text-white'>{n.prizeName ?? "your prize"}</span>{" "}
+        is in your Arsenal
+      </span>
+    ),
+  },
   roadmap_ready: {
     icon: <MapIcon className='h-3 w-3 text-white' />,
     bg: "bg-cyan-500",
@@ -372,6 +383,7 @@ export const NotificationsBell = () => {
                   n.type === "season_reward" ||
                   n.type === "season_start" ||
                   n.type === "roadmap_ready" ||
+                  n.type === "daily_exercise_win" ||
                   // Legacy marketplace sales stored without a buyer fall back to
                   // the system (Store) icon; new ones show the buyer's avatar.
                   (n.type === "marketplace_sold" && !n.senderName);
@@ -472,6 +484,12 @@ export const NotificationsBell = () => {
                       {n.type === "roadmap_ready" && n.roadmapId && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
                           Open roadmap
+                          <ArrowRight className='h-3 w-3' />
+                        </p>
+                      )}
+                      {n.type === "daily_exercise_win" && (
+                        <p className='mt-1 flex items-center gap-1 text-xs font-medium text-amber-400/80'>
+                          Open Arsenal
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}

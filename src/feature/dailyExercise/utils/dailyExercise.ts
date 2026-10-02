@@ -3,6 +3,8 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { hasTablatureNotes } from "feature/exercisePlan/utils/hasTablatureNotes";
 import { getServerDateKey } from "utils/converter/getServerDateKey";
 
+import type { DailyExerciseEntry } from "../types/dailyExercise.types";
+
 /** How many places the daily board shows. */
 export const DAILY_LEADERBOARD_SIZE = 5;
 
@@ -120,6 +122,58 @@ export const findDailyDayKeyFor = (
   const yesterday = previousDayKey(today);
   if (getDailyExercise(yesterday, pool)?.id === exerciseId) return yesterday;
   return null;
+};
+
+/**
+ * How long past midnight UTC a run of the day before still counts — enough for
+ * a session started just before midnight to be played out. After it the board
+ * is closed for good, and only then is its #1 paid.
+ */
+export const DAILY_BOARD_GRACE_MS = 60 * 60 * 1000;
+
+/** A board's #1 only wins something if they beat at least one other player. */
+export const DAILY_PRIZE_MIN_PLAYERS = 2;
+
+/** How many past days a board check looks back for one still unsettled. */
+const SETTLE_LOOKBACK_DAYS = 3;
+
+const dayStartMs = (dayKey: string): number => Date.parse(`${dayKey}T00:00:00Z`);
+
+/** Whether a run can still land on `dayKey`'s board at `now`. */
+export const isDailyBoardOpen = (dayKey: string, now: Date = new Date()): boolean => {
+  const t = now.getTime();
+  return t >= dayStartMs(dayKey) && t < dayStartMs(dayKey) + DAY_MS + DAILY_BOARD_GRACE_MS;
+};
+
+/** Whether `dayKey`'s board is closed for good, so its winner can be settled. */
+export const canSettleDailyBoard = (dayKey: string, now: Date = new Date()): boolean =>
+  now.getTime() >= dayStartMs(dayKey) + DAY_MS + DAILY_BOARD_GRACE_MS;
+
+/**
+ * The recent days whose boards are closed, newest first. The settlement cron
+ * looks a few days back, so a run that never happened is caught up by the next.
+ */
+export const getSettleableDayKeys = (now: Date = new Date()): string[] => {
+  const today = getDailyDayKey(now);
+  const days: string[] = [];
+  let day = today;
+  for (let i = 0; i < SETTLE_LOOKBACK_DAYS; i++) {
+    day = previousDayKey(day);
+    if (canSettleDailyBoard(day, now)) days.push(day);
+  }
+  return days;
+};
+
+/**
+ * The board's winner: the best score, and on a tie whoever set it first. No
+ * winner on a board nobody else played.
+ */
+export const pickDailyWinner = (
+  topEntries: readonly DailyExerciseEntry[],
+  players: number,
+): DailyExerciseEntry | null => {
+  if (players < DAILY_PRIZE_MIN_PLAYERS || topEntries.length === 0) return null;
+  return [...topEntries].sort((a, b) => b.score - a.score || a.updatedAt - b.updatedAt)[0];
 };
 
 /** Milliseconds until the next exercise — the next UTC midnight. */

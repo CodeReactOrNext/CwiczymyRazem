@@ -1,6 +1,7 @@
 import type { DailyExerciseEntry, DailyExerciseLeaderboard } from "feature/dailyExercise/types/dailyExercise.types";
 import { DAILY_LEADERBOARD_SIZE, getDailyDayKey } from "feature/dailyExercise/utils/dailyExercise";
 import type { QueryDocumentSnapshot } from "firebase-admin/firestore";
+import { getDailyPrize } from "lib/dailyExercise/dailyPrize";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { firestore } from "utils/firebase/api/firebase.config";
 
@@ -50,6 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       top,
       me,
       players: countSnap.data().count,
+      prize: getDailyPrize(dayKey),
     };
     return res.status(200).json(body);
   } catch (error) {

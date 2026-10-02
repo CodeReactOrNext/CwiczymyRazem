@@ -66,6 +66,9 @@ describe("notificationHref", () => {
     expect(notificationHref(notification({ type: "exercise_thanked" }))).toBe(
       "/profile/skills?tab=community",
     );
+    expect(notificationHref(notification({ type: "daily_exercise_win" }))).toBe(
+      "/arsenal",
+    );
   });
 
   it("leaves system notifications without a target", () => {

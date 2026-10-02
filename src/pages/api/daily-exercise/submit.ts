@@ -1,13 +1,14 @@
 import type { DailyExerciseEntry, DailyExerciseSubmission } from "feature/dailyExercise/types/dailyExercise.types";
-import { findDailyDayKeyFor } from "feature/dailyExercise/utils/dailyExercise";
+import { findDailyDayKeyFor, isDailyBoardOpen } from "feature/dailyExercise/utils/dailyExercise";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
 /**
  * Banks a mic-scored run of the exercise of the day. Only the day's own
- * exercise counts (or yesterday's, for a session that ran over midnight UTC),
- * and only a player's best run stays on the board.
+ * exercise counts (or yesterday's, for a session that ran over midnight UTC —
+ * within the hour after it), and only a player's best run stays on the board.
+ * Once a board closes and its #1 is paid, it takes no more runs.
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -28,6 +29,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (findDailyDayKeyFor(exerciseId) !== dayKey) {
     return res.status(400).json({ error: "Not the exercise of the day" });
   }
+  if (!isDailyBoardOpen(dayKey)) {
+    return res.status(409).json({ error: "That day's board is closed" });
+  }
 
   let userId: string;
   try {
@@ -44,6 +48,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const entryRef: DocumentReference = boardRef.collection("entries").doc(userId);
 
     const isNewBest = await firestore.runTransaction(async (tx: Transaction) => {
+      // Settled means its #1 is already paid — a late run must not reshuffle it.
+      if ((await tx.get(boardRef)).data()?.settled) throw new Error("BOARD_CLOSED");
       const existing = await tx.get(entryRef);
       if (existing.exists && (existing.data()?.score ?? 0) >= score) return false;
 
@@ -64,6 +70,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ isNewBest });
   } catch (error) {
+    if (error instanceof Error && error.message === "BOARD_CLOSED") {
+      return res.status(409).json({ error: "That day's board is closed" });
+    }
     console.error("daily-exercise/submit failed", error);
     return res.status(500).json({ error: "Could not save the score" });
   }

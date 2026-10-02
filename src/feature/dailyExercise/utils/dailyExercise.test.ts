@@ -1,13 +1,18 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { describe, expect, it } from "vitest";
 
+import type { DailyExerciseEntry } from "../types/dailyExercise.types";
 import {
+  canSettleDailyBoard,
   DAILY_EXERCISE_POOL,
   findDailyDayKeyFor,
   getDailyDayKey,
   getDailyExercise,
   getMsUntilNextDailyExercise,
+  getSettleableDayKeys,
+  isDailyBoardOpen,
   isDailyExerciseCandidate,
+  pickDailyWinner,
 } from "./dailyExercise";
 
 const fakePool = (size: number) =>
@@ -83,5 +88,58 @@ describe("findDailyDayKeyFor", () => {
 describe("getMsUntilNextDailyExercise", () => {
   it("counts down to the next UTC midnight", () => {
     expect(getMsUntilNextDailyExercise(new Date("2026-09-30T23:00:00Z"))).toBe(3_600_000);
+  });
+});
+
+const at = (iso: string) => new Date(iso);
+
+describe("isDailyBoardOpen", () => {
+  it("takes runs all through its own day", () => {
+    expect(isDailyBoardOpen("2026-10-01", at("2026-10-01T00:00:00Z"))).toBe(true);
+    expect(isDailyBoardOpen("2026-10-01", at("2026-10-01T23:59:00Z"))).toBe(true);
+  });
+
+  it("still takes a session that ran over midnight, for an hour", () => {
+    expect(isDailyBoardOpen("2026-10-01", at("2026-10-02T00:45:00Z"))).toBe(true);
+  });
+
+  it("closes once the hour after midnight is up", () => {
+    expect(isDailyBoardOpen("2026-10-01", at("2026-10-02T01:00:00Z"))).toBe(false);
+    expect(isDailyBoardOpen("2026-10-01", at("2026-10-02T14:00:00Z"))).toBe(false);
+  });
+});
+
+describe("canSettleDailyBoard", () => {
+  it("waits for the board to close before it is settled", () => {
+    expect(canSettleDailyBoard("2026-10-01", at("2026-10-02T00:30:00Z"))).toBe(false);
+    expect(canSettleDailyBoard("2026-10-01", at("2026-10-02T01:00:00Z"))).toBe(true);
+  });
+});
+
+describe("getSettleableDayKeys", () => {
+  it("skips yesterday while its board is still open", () => {
+    expect(getSettleableDayKeys(at("2026-10-05T00:30:00Z"))).toEqual(["2026-10-03", "2026-10-02"]);
+  });
+
+  it("looks a few days back, newest first", () => {
+    expect(getSettleableDayKeys(at("2026-10-05T09:00:00Z"))).toEqual(["2026-10-04", "2026-10-03", "2026-10-02"]);
+  });
+});
+
+describe("pickDailyWinner", () => {
+  const entry = (userId: string, score: number, updatedAt = 0) =>
+    ({ userId, score, updatedAt }) as DailyExerciseEntry;
+
+  it("crowns the best score", () => {
+    expect(pickDailyWinner([entry("a", 100), entry("b", 300), entry("c", 200)], 3)?.userId).toBe("b");
+  });
+
+  it("gives a tie to whoever set the score first", () => {
+    expect(pickDailyWinner([entry("late", 300, 20), entry("early", 300, 10)], 2)?.userId).toBe("early");
+  });
+
+  it("names no winner on a board nobody else played", () => {
+    expect(pickDailyWinner([entry("alone", 900)], 1)).toBeNull();
+    expect(pickDailyWinner([], 0)).toBeNull();
   });
 });

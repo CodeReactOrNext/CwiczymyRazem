@@ -1,5 +1,4 @@
 import { Card } from "assets/components/ui/card";
-import { Chip } from "assets/components/ui/chip";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
@@ -10,10 +9,12 @@ import { WidgetHeader } from "feature/dashboard/components/widgets/WidgetHeader"
 import { TabPreviewGlyph } from "feature/landing/components/TabPreviewGlyph";
 import { getTabPreview } from "feature/landing/lib/tabPreview";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { CalendarClock, Clock, Gauge, Mic, Play, Users } from "lucide-react";
+import { CalendarClock, Clock, Play, Users } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { useAppSelector } from "store/hooks";
+
+import { DailyPrize } from "./DailyPrize";
 
 const formatTimeLeft = (ms: number): string => {
   const minutes = Math.max(1, Math.ceil(ms / 60_000));
@@ -23,17 +24,11 @@ const formatTimeLeft = (ms: number): string => {
 
 const formatScore = (score: number) => score.toLocaleString("en-US");
 
-const PLACE_COLORS = ["text-amber-400", "text-zinc-300", "text-orange-400"];
-
 /** Places the empty board still shows, so a quiet morning reads as "up for grabs", not "broken". */
 const EMPTY_PLACES = 3;
 
 const PlaceNumber = ({ place }: { place: number }) => (
-  <span
-    className={cn(
-      "w-5 shrink-0 text-center text-sm font-bold tabular-nums",
-      PLACE_COLORS[place - 1] ?? "text-zinc-500",
-    )}>
+  <span className='w-5 shrink-0 text-center text-sm font-bold tabular-nums text-zinc-400'>
     {place}
   </span>
 );
@@ -136,41 +131,31 @@ export const DailyExerciseWidget = () => {
       {!exercise ? (
         <p className='text-sm text-zinc-400'>No exercise today.</p>
       ) : (
-        <div className='grid flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-10'>
-          <div className='flex min-w-0 flex-col'>
+        // Three panels that wrap rather than a fixed grid: the card can sit full or
+        // half width on the dashboard, so it lays out by its own width. Full
+        // width holds all three in one row; half drops the board below; a phone
+        // stacks them.
+        <div className='flex flex-1 flex-wrap gap-8 lg:gap-10'>
+          <div className='flex min-w-0 flex-[3_1_22rem] flex-col'>
             <h4 className='text-xl font-semibold text-zinc-100 sm:text-2xl'>
               {exercise.title}
             </h4>
 
-            <div className='mt-3 flex flex-wrap items-center gap-2'>
-              <Chip className='capitalize'>{exercise.difficulty}</Chip>
-              {exercise.metronomeSpeed && (
-                <Chip>
-                  <Gauge size={12} />
-                  {exercise.metronomeSpeed.recommended} BPM
-                </Chip>
-              )}
-              <Chip color='emerald'>
-                <Mic size={12} />
-                Mic scored
-              </Chip>
-            </div>
-
             {tabPreview.length > 0 && (
               <TabPreviewGlyph
                 notes={tabPreview}
-                className='mt-6 h-auto w-full max-w-xs'
+                className='mt-6 h-auto w-full max-w-sm'
               />
             )}
 
             <div className='mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-6'>
               <Link
                 href={`/practice/exercise/${exercise.id}`}
-                className='inline-flex h-10 items-center gap-2 rounded-lg bg-cyan-500 px-5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900'>
+                className='inline-flex h-10 items-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900'>
                 <Play size={16} className='fill-current' />
                 {me ? "Beat your score" : "Play"}
               </Link>
-              {me ? (
+              {me && (
                 <p className='text-sm text-zinc-400'>
                   Your best{" "}
                   <span className='font-semibold tabular-nums text-zinc-100'>
@@ -178,15 +163,13 @@ export const DailyExerciseWidget = () => {
                   </span>{" "}
                   · #{me.rank} of {board?.players}
                 </p>
-              ) : (
-                <p className='text-sm text-zinc-400'>
-                  Mic on, play it through, land on the board.
-                </p>
               )}
             </div>
           </div>
 
-          <div className='min-w-0 lg:rounded-lg lg:bg-zinc-900/40 lg:p-4'>
+          {board?.prize && <DailyPrize prize={board.prize} className='flex-[1_1_14rem]' />}
+
+          <div className='min-w-0 flex-[2_1_20rem] lg:rounded-lg lg:bg-zinc-900/40 lg:p-4'>
             <div className='mb-3 flex items-center justify-between gap-3 px-3'>
               <span className='text-sm font-semibold text-zinc-200'>
                 Today&apos;s board
