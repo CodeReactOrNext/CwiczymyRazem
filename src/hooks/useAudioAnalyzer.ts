@@ -32,6 +32,9 @@ export interface AudioRefs {
    *  attack), each entry carries the timestamp of its own onset — so a consumer
    *  can attribute a late-arriving pitch to the note that actually produced it. */
   noteEventsRef: React.MutableRefObject<DetectedNoteEvent[]>;
+  /** Precise time of the most recent attack (see guitarBufferProcessor) — what
+   *  note timing is graded against. 0 until the first attack. */
+  lastAttackMsRef?: React.MutableRefObject<number>;
 }
 
 const GAIN_STORAGE_KEY = "audio_input_gain";
@@ -102,6 +105,7 @@ export const useAudioAnalyzer = () => {
   const lastOnsetTimeRef = useRef<number>(0);
   const lastTickTimeRef = useRef<number>(0);
   const noteEventsRef = useRef<DetectedNoteEvent[]>([]);
+  const lastAttackMsRef = useRef<number>(0);
 
   const init = useCallback(async () => {
     try {
@@ -176,7 +180,7 @@ export const useAudioAnalyzer = () => {
         analyser: analyserNodeRef, // chromagram-at-onset snapshots (web path)
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef, noteEventsRef,
+          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef, noteEventsRef, lastAttackMsRef,
         },
         onActive: () => {
           setState(prev =>
@@ -261,6 +265,7 @@ export const useAudioAnalyzer = () => {
     lastOnsetTimeRef.current = 0;
     lastTickTimeRef.current = 0;
     noteEventsRef.current = [];
+    lastAttackMsRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false }));
   }, []);
@@ -289,7 +294,7 @@ export const useAudioAnalyzer = () => {
     return baseLatency + outputLatency + bufferLatency + 30;
   }, []);
 
-  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef, noteEventsRef };
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef, noteEventsRef, lastAttackMsRef };
 
   return useMemo(() => ({
     ...state,

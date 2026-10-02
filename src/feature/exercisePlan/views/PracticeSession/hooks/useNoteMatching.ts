@@ -3,6 +3,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { computeChromagram, correctOctaveForLowStrings, freqToPitchClass, getAdaptiveVolumeGate, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
+import { tempoScoreFactor } from "../utils/tempoScoreFactor";
+import { gradeTiming, isPerfectTiming, TIMING_GRADE_POINTS } from "../utils/timingGrade";
 import type { ExpectedAttack } from "./noteEventGrader";
 import { assignAttacks } from "./noteEventGrader";
 import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
@@ -23,7 +25,7 @@ interface UseNoteMatchingOptions {
   /** AudioContext.currentTime of the first scheduled beat (same instant as startTime). */
   audioStartTime?: number | null;
   effectiveBpm: number;
-  /** raw metronome BPM — used for score bonus calculation */
+  /** raw metronome BPM — × speedMultiplier gives the tempo a note scores at */
   rawBpm: number;
   activeTablature: TablatureMeasure[] | null | undefined;
   isMicEnabled: boolean;
@@ -36,17 +38,21 @@ interface UseNoteMatchingOptions {
    *  Only applied to notes without a real `midiNote` — GP imports already carry their actual pitch. */
   tuningOffsets?: readonly number[];
   onReset?: () => void;
+  /** Measured end-to-end latency (timing calibration). Replaces getLatencyMs()
+   *  here when set; null/undefined = not calibrated, use the estimate. */
+  calibratedLatencyMs?: number | null;
 }
 
 export function useNoteMatching({
   isPlaying, startTime, audioContext, audioStartTime, effectiveBpm, rawBpm,
   activeTablature, isMicEnabled, currentExerciseIndex,
-  speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset,
+  speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset, calibratedLatencyMs,
 }: UseNoteMatchingOptions) {
   const {
-    hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState,
+    hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
-    maxComboRef, consecutiveMissesRef, needsFlushRef,
+    maxComboRef, consecutiveMissesRef, needsFlushRef, minScoredBpmRef,
+    noteTimingsRef, timingCountsRef,
     flushToReact, reset: resetGame,
   } = useGameState(currentExerciseIndex, onReset);
 
@@ -67,11 +73,10 @@ export function useNoteMatching({
 
   const maxPossibleScore = useMemo(() => {
     if (totalNotes === 0) return 0;
-    const halfPenalty = speedMultiplier;
-    const bpmB        = 1 + (rawBpm - 100) * 0.001;
+    const tempoFactor = tempoScoreFactor(rawBpm * speedMultiplier);
     let total = 0;
     for (let i = 0; i < totalNotes; i++) {
-      total += Math.round(100 * Math.min(8, Math.floor(i / 5) + 1) * halfPenalty * bpmB);
+      total += Math.round(100 * Math.min(8, Math.floor(i / 5) + 1) * tempoFactor);
     }
     return total;
   }, [totalNotes, speedMultiplier, rawBpm]);
@@ -134,8 +139,8 @@ export function useNoteMatching({
     const totalExBeats = pos;
     if (totalExBeats === 0) return;
 
-    const halfSpeedPenalty = speedMultiplier;
-    const bpmBonus         = 1 + (rawBpm - 100) * 0.001;
+    const scoredBpm        = rawBpm * speedMultiplier;
+    const tempoFactor      = tempoScoreFactor(scoredBpm);
 
     /** Expected pitch of a note, plus the unbent pitch of an in-progress bend.
      *  Shared by the attack-assignment pre-pass and the live grading pass so the
@@ -192,7 +197,7 @@ export function useNoteMatching({
       const rawElapsedSec = audioContext && audioStartTime != null
         ? audioContext.currentTime - audioStartTime
         : (now - startTime) / 1000;
-      const elapsedSec = rawElapsedSec - getLatencyMs() / 1000;
+      const elapsedSec = rawElapsedSec - (calibratedLatencyMs ?? getLatencyMs()) / 1000;
       const beatsTotal = beatClock
         ? beatClock.toBeats(elapsedSec)
         : elapsedSec * beatsPerSec;
@@ -398,14 +403,48 @@ export function useNoteMatching({
               // it was neither processed nor hit before.
               processedNotesRef.current.add(noteKey);
 
+              // ── Timing: how far the attack landed from the note's due time ──
+              // The attack route carries its own Δt. A live hit is timed by the
+              // latest attack — the pitch that proved the hit arrives tens of ms
+              // after it, so the moment of the hit itself would read as late.
+              let beatsUntilDue = beatStart - loopedBeatsElapsed;
+              // The last note, graded late just after the loop wrapped.
+              if (beatsUntilDue > totalExBeats / 2) beatsUntilDue -= totalExBeats;
+              const dueMs = now + beatsUntilDue * beatDurationMs;
+              const liveAttackDeltaMs = (): number | null => {
+                // Legato notes have no attack of their own, and a tick alone
+                // (muted note) leaves no precise time — neither can be timed.
+                const attackMs = audioRefs.lastAttackMsRef?.current ?? 0;
+                if (!requiresOnset || !hasRecentOnset || attackMs <= 0) return null;
+                const deltaMs = attackMs - dueMs;
+                // An attack nearer the previous note's due time than this one's
+                // was that note's — a repeated pitch still ringing, say. This
+                // note's own attack wasn't seen, so there is nothing to time.
+                const prevBeat = flatBeats[i > 0 ? i - 1 : flatBeats.length - 1];
+                const prevGapMs = (prevBeat.beatEnd - prevBeat.beatStart) * beatDurationMs;
+                return deltaMs < -prevGapMs / 2 ? null : deltaMs;
+              };
+              const attackDeltaMs = eventHits.get(noteKey) ?? liveAttackDeltaMs();
+              const timingGrade = gradeTiming(attackDeltaMs, (beatEnd - beatStart) * beatDurationMs);
+
               s.hits++;
               consecutiveMissesRef.current = 0;
               const newCombo      = gs.combo + 1;
               if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
               const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
-              gs.score += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
+              gs.score += Math.round(100 * newMultiplier * tempoFactor * TIMING_GRADE_POINTS[timingGrade]);
               gs.combo  = newCombo;
               gs.multiplier = newMultiplier;
+              if (minScoredBpmRef.current === null || scoredBpm < minScoredBpmRef.current) {
+                minScoredBpmRef.current = scoredBpm;
+              }
+
+              noteTimingsRef.current[noteKey] = {
+                grade: timingGrade,
+                perfect: isPerfectTiming(attackDeltaMs),
+                offsetBeats: attackDeltaMs === null ? null : attackDeltaMs / beatDurationMs,
+              };
+              timingCountsRef.current[timingGrade]++;
 
               hitNotesRef.current[noteKey] = loopedBeatsElapsed;
               needsFlushRef.current = true;
@@ -430,7 +469,7 @@ export function useNoteMatching({
     rafIdRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafIdRef.current);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, startTime, audioContext, audioStartTime, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm]);
+  }, [isPlaying, startTime, audioContext, audioStartTime, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm, calibratedLatencyMs]);
 
-  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, resetGame };
+  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, resetGame };
 }

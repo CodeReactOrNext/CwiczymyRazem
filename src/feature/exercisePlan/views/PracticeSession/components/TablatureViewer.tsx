@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import { SkipBack } from "lucide-react";
 import React, { memo, useEffect, useRef, useState } from "react";
 
@@ -13,6 +14,8 @@ import { TAB_BASE_HEIGHT, useTablatureWorkerBridge } from "./useTablatureWorkerB
 /** Wash under the staff in cinema mode: dark enough to bind the notes together
  *  over a moving picture, light enough that the video still reads through. */
 const CINEMA_BOARD_WASH = "rgba(0, 0, 0, 0.35)";
+/** Stable default, so a viewer without timings doesn't re-post an empty map every render. */
+const NO_TIMINGS: Record<string, NoteTiming> = {};
 
 interface TablatureViewerProps {
   measures?: TablatureMeasure[];
@@ -25,6 +28,8 @@ interface TablatureViewerProps {
   isListening?: boolean;
   hitNotes?: Record<string, boolean | number>;
   missedNotes?: Record<string, boolean>;
+  /** noteKey -> how the hit was timed; an off-beat hit marks where it was played. */
+  noteTimings?: Record<string, NoteTiming>;
   currentBeatsElapsed?: number;
   hideNotes?: boolean;
   audioContext?: AudioContext | null;
@@ -88,6 +93,7 @@ const TablatureViewerInner = ({
   frequencyRef,
   hitNotes = {},
   missedNotes = {},
+  noteTimings = NO_TIMINGS,
   hideNotes = false,
   audioContext,
   audioStartTime,
@@ -126,7 +132,7 @@ const TablatureViewerInner = ({
   const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat } = useTablatureWorkerBridge({
     canvasRef, containerRef, containerSize, renderData,
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,
-    hitNotes, missedNotes, hideNotes, hideDynamicsLane,
+    hitNotes, missedNotes, noteTimings, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
     loopStartBeat, loopEndBeat, zoom, tuningStrings, style, selection, obscured,
   });
@@ -249,6 +255,7 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.className        === next.className          &&
   prev.hitNotes         === next.hitNotes           &&
   prev.missedNotes      === next.missedNotes        &&
+  prev.noteTimings      === next.noteTimings        &&
   prev.hideDynamicsLane === next.hideDynamicsLane   &&
   prev.currentBeat      === next.currentBeat        &&
   prev.obscured         === next.obscured           &&

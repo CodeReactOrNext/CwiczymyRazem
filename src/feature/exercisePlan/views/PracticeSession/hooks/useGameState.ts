@@ -1,5 +1,7 @@
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 
+import type { NoteTiming, TimingCounts } from "../utils/timingGrade";
+import { emptyTimingCounts } from "../utils/timingGrade";
 import type { GameState } from "./noteMatchingFeedback";
 
 const INITIAL_GS: GameState = { score: 0, combo: 0, multiplier: 1 };
@@ -11,6 +13,7 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   const [sessionStats,    setSessionStats]    = useState({ hits: 0, misses: 0 });
   const [maxCombo,        setMaxCombo]        = useState(0);
   const [gameState,       setGameState]       = useState<GameState>(INITIAL_GS);
+  const [noteTimings,     setNoteTimings]     = useState<Record<string, NoteTiming>>({});
 
   // Mutable refs for direct mutation inside the RAF loop (zero re-render overhead)
   const hitNotesRef          = useRef<Record<string, boolean | number>>({});
@@ -21,6 +24,15 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   const consecutiveMissesRef = useRef(0);
   const lastFlushRef         = useRef(0);
   const needsFlushRef        = useRef(false);
+  /** Slowest tempo a note was scored at this run — the tempo the run is
+   *  stamped with, so speeding up at the end cannot claim the faster BPM. */
+  const minScoredBpmRef      = useRef<number | null>(null);
+  /** noteKey -> timing of its latest hit. Unlike hitNotes it survives a
+   *  loop wrap: the frozen tail of the finished pass still paints its grades,
+   *  and a note hit again in the new pass simply overwrites its own. */
+  const noteTimingsRef       = useRef<Record<string, NoteTiming>>({});
+  /** Hits per timing grade over the whole run, loops included — like the score. */
+  const timingCountsRef      = useRef<TimingCounts>(emptyTimingCounts());
 
   const reset = useCallback(() => {
     setHitNotes({});    hitNotesRef.current          = {};
@@ -33,6 +45,9 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     maxComboRef.current          = 0;
     consecutiveMissesRef.current = 0;
     needsFlushRef.current        = false;
+    minScoredBpmRef.current      = null;
+    setNoteTimings({}); noteTimingsRef.current = {};
+    timingCountsRef.current      = emptyTimingCounts();
   }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,6 +65,7 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     const total = s.hits + s.misses;
     startTransition(() => {
       setHitNotes({ ...hitNotesRef.current });
+      setNoteTimings({ ...noteTimingsRef.current });
       setMissedNotes({ ...missedNotesRef.current });
       setSessionStats({ hits: s.hits, misses: s.misses });
       setSessionAccuracy(total > 0 ? Math.round((s.hits / total) * 100) : 100);
@@ -59,9 +75,10 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   }, []);
 
   return {
-    hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState,
+    hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
-    maxComboRef, consecutiveMissesRef, needsFlushRef,
+    maxComboRef, consecutiveMissesRef, needsFlushRef, minScoredBpmRef,
+    noteTimingsRef, timingCountsRef,
     flushToReact, reset,
   };
 }

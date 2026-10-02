@@ -1,11 +1,12 @@
 import { Button } from "assets/components/ui/button";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter,
-DialogHeader, DialogTitle, } from "assets/components/ui/dialog";
+  Dialog, DialogContent, DialogDescription,
+  DialogHeader, DialogTitle,
+} from "assets/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { memo, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { FaCheck, FaFlagCheckered, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons/fa";
 
 import type { Exercise } from "../../../types/exercise.types";
@@ -66,6 +67,7 @@ const SessionBottomBarComponent = ({
 }: SessionBottomBarProps) => {
   const { t } = useTranslation(["common"]);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const stayButtonRef = useRef<HTMLButtonElement>(null);
   const hasTempoControl = !!currentExercise.metronomeSpeed;
   const [showFinishEarlyDialog, setShowFinishEarlyDialog] = useState(false);
   // Only meaningful mid-plan: the last exercise already has its own "Finish
@@ -209,57 +211,63 @@ const SessionBottomBarComponent = ({
     </div>
 
     <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-      {/* z-index must beat the session view or this dialog opens invisibly behind it. */}
-      <DialogContent className="max-w-md bg-zinc-900 text-white z-[99999999]">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-bold tracking-tight">Leave the session?</DialogTitle>
-          <DialogDescription className="text-zinc-400 text-sm mt-1">
+      {/* z-index must beat the session view, overlay included, or this dialog
+          opens invisibly behind it. */}
+      <DialogContent
+        className='max-w-md bg-zinc-900 text-white sm:p-8 z-[99999999]'
+        overlayClassName='z-[99999998]'
+        // Radix would focus the first button — Exit — so a stray Enter threw the
+        // session away. Land on the harmless choice instead.
+        onOpenAutoFocus={(e) => { e.preventDefault(); stayButtonRef.current?.focus(); }}>
+        <DialogHeader className='space-y-3 pr-10'>
+          <DialogTitle className='text-xl font-bold tracking-tight'>Leave the session?</DialogTitle>
+          <DialogDescription className='text-sm leading-relaxed text-zinc-400'>
             {finishDisabled
               ? "You've practised less than 20 seconds, so there's no time to save yet. Keep playing to log this session, or leave without it."
               : "Your practice time is saved only when you finish the session. If you exit now, it won't be logged."}
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4 sm:space-x-0">
-          <Button
-            variant="ghost"
-            className="flex-1 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 font-semibold text-sm"
-            onClick={() => { setShowExitDialog(false); onClose?.(); }}
-          >
-            <FaSignOutAlt className="mr-2" />
-            {finishDisabled ? "Exit" : "Exit without saving"}
-          </Button>
-          {finishDisabled ? (
-            <Button
-              className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
-              onClick={() => setShowExitDialog(false)}
-            >
-              Stay in session
-            </Button>
-          ) : (
-            <>
+
+        <div className='mt-6 flex flex-col gap-3'>
+          {!finishDisabled && (
+            <div className='flex flex-col gap-2'>
               <Button
-                variant="ghost"
-                className="flex-1 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white font-semibold text-sm"
-                onClick={() => setShowExitDialog(false)}
-              >
-                Stay in session
-              </Button>
-              <Button
-                className="flex-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-sm shadow-lg shadow-white/20"
+                className='h-10 w-full rounded-lg bg-white text-sm font-bold text-black shadow-none transition-background hover:bg-zinc-200'
                 loading={isFinishing || isSubmittingReport}
-                onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}
-              >
-                <FaCheck className="mr-2" />
+                onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}>
+                <FaCheck className='mr-2' />
                 Finish &amp; save time
               </Button>
-            </>
+              {isEarlyFinish && (
+                <p className='text-center text-xs text-zinc-400'>
+                  {t("common:practice.finish_early.hint")}
+                </p>
+              )}
+            </div>
           )}
-        </DialogFooter>
-        {isEarlyFinish && !finishDisabled && (
-          <p className="text-[11px] text-zinc-500 text-center -mt-2">
-            {t("common:practice.finish_early.hint")}
-          </p>
-        )}
+
+          <div className='flex flex-col-reverse gap-2 sm:flex-row'>
+            <Button
+              variant='ghost'
+              className='flex-1 rounded-lg bg-white/5 text-sm font-semibold text-zinc-400 transition-background hover:bg-red-500/10 hover:text-red-400'
+              onClick={() => { setShowExitDialog(false); onClose?.(); }}>
+              <FaSignOutAlt className='mr-2' />
+              {finishDisabled ? "Exit" : "Exit without saving"}
+            </Button>
+            <Button
+              ref={stayButtonRef}
+              variant='ghost'
+              className={cn(
+                "flex-1 rounded-lg text-sm font-semibold transition-background",
+                finishDisabled
+                  ? "bg-white font-bold text-black hover:bg-zinc-200 hover:text-black"
+                  : "bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white",
+              )}
+              onClick={() => setShowExitDialog(false)}>
+              Stay in session
+            </Button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
 

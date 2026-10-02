@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { Settings2, X, ZoomIn, ZoomOut } from "lucide-react";
+import { Settings2, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
 import React, {
   memo,
   useCallback,
@@ -12,6 +12,7 @@ import React, {
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { useSessionUI } from "../contexts/SessionUIContext";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { MicHud } from "./MicHud";
 import { TablatureMinimapBar } from "./TablatureMinimapBar";
@@ -178,7 +179,8 @@ export const TablatureSection = memo(function TablatureSection({
   isMicEnabled = false,
   obscured = false,
 }: TablatureSectionProps) {
-  const { hitNotes, missedNotes } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, noteTimings } = useNoteMatchingContext();
+  const { canCalibrateTiming, openTimingCalibration } = useSessionUI();
   const { tuning } = useGuitarTuningContext();
   const {
     settings,
@@ -426,6 +428,16 @@ export const TablatureSection = memo(function TablatureSection({
           </button>
         )}
       </div>
+      {isMicEnabled && canCalibrateTiming && (
+        <button
+          type='button'
+          onClick={openTimingCalibration}
+          title='Measure your audio delay, so timing grades match what you hear'
+          className='flex shrink-0 items-center gap-1.5 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50 hover:bg-white/10 hover:text-zinc-100'>
+          <Timer className='h-3.5 w-3.5' />
+          <span>Calibrate timing</span>
+        </button>
+      )}
       {isMicEnabled && <MicHud className='mr-1' />}
     </div>
   );
@@ -491,6 +503,7 @@ export const TablatureSection = memo(function TablatureSection({
               isListening={isListening}
               hitNotes={hitNotes}
               missedNotes={missedNotes}
+              noteTimings={noteTimings}
               currentBeatsElapsed={0}
               hideNotes={hideNotes}
               audioContext={audioContext}

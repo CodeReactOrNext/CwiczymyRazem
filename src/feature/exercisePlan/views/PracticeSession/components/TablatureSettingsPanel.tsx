@@ -572,6 +572,12 @@ export function TablatureSettingsPanel() {
             onChange={(next) => set("hitAnimations", next)}
           />
           <ToggleRow
+            label='Timing hints'
+            desc='"Early", "Late" or a green + over a note as you hit it, and a late note filling from where you played it. Timing still counts toward your score either way.'
+            checked={settings.timingHints}
+            onChange={(next) => set("timingHints", next)}
+          />
+          <ToggleRow
             label='Ambient mic glow'
             desc='Glow under the tab reacting to your playing volume'
             checked={settings.ambientGlow}

@@ -74,4 +74,13 @@ describe("SessionBottomBar exit", () => {
     expect(screen.getByRole("button", { name: /stay in session/i })).toBeDefined();
     expect(screen.getByRole("button", { name: /exit without saving/i })).toBeDefined();
   });
+
+  it("opens with focus on Stay, so Enter never drops the session", () => {
+    useSessionTimeStore.getState().add("technique", 30000);
+    renderBar({ hasLoggedPractice: true, canFinishSession: true });
+
+    clickExit();
+
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: /stay in session/i }));
+  });
 });

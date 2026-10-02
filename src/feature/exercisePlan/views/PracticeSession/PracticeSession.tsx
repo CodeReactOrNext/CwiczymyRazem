@@ -28,6 +28,7 @@ import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
 import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
 import { SessionDialogs } from "./components/SessionDialogs";
 import { SongSectionMapPanel } from "./components/SongSectionMapPanel";
+import { TimingCalibrationDialog } from "./components/TimingCalibrationDialog";
 import { TuningSettingsModal } from "./components/TuningSettingsModal";
 import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import { GuitarTuningProvider } from "./contexts/GuitarTuningContext";
@@ -61,6 +62,7 @@ import { useScoreSaving } from "./hooks/useScoreSaving";
 import { useSessionAudio } from "./hooks/useSessionAudio";
 import { useSessionControls } from "./hooks/useSessionControls";
 import { useSongExerciseGpFile } from "./hooks/useSongExerciseGpFile";
+import { useTimingCalibration } from "./hooks/useTimingCalibration";
 import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
 
@@ -130,6 +132,8 @@ export const PracticeSession = ({
   // Desktop-only: a downloaded update sat unapplied too long (see
   // useUpdateRequiredGate). Checked once at session start, never mid-session.
   const updateRequired = useUpdateRequiredGate();
+  // Read up here, above the early returns; picked per input path once it is known.
+  const measuredLatencyMs = useTimingCalibration((s) => s.latencyMs);
 
   if (updateRequired) {
     return (
@@ -508,6 +512,9 @@ export const PracticeSession = ({
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
   const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel } = useGuitarAudioInput();
+  // The player's measured latency — browser path only. The desktop app's native
+  // capture works its own latency out from the driver and IPC, and it holds up.
+  const calibratedLatencyMs = isNative ? null : measuredLatencyMs;
 
   const {
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
@@ -880,7 +887,7 @@ export const PracticeSession = ({
       effectiveBpm={effectiveBpm} rawBpm={metronome.bpm}
       activeTablature={isEarTrainingRiddle ? undefined : activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
-      speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
+      speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} calibratedLatencyMs={calibratedLatencyMs} audioRefs={audioRefs}
       getAdjustedTargetFreq={getAdjustedTargetFreq} tuningOffsets={guitarTuning.tuning.offsets}
       activeStrumPattern={activeStrumPattern}
       customGoal={huntTarget ? huntTarget.goal : currentExercise.customGoal}
@@ -899,7 +906,7 @@ export const PracticeSession = ({
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>
-    <SessionUIProvider>
+    <SessionUIProvider canCalibrateTiming={!isNative}>
     <>
       {/* Intro splash that always plays on session mount, then parts open
           (door-reveal) to show the session beneath. */}
@@ -934,6 +941,7 @@ export const PracticeSession = ({
               : undefined
           }
           timeline={successSnapshot.noteTimeline}
+          timing={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.timing : null}
           failMessage={examMistakeFailed ? `${CLICK_EXAM_MISTAKE_LIMIT} wrong clicks — exam failed.` : undefined}
           onFinish={async () => {
             metronome.stopMetronome(); await saveCurrentScores();
@@ -950,6 +958,7 @@ export const PracticeSession = ({
             examAutoFinishedRef.current = false;
             const usesMetronome = !!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat";
             resetSuccessView(); resetTimer(); metronome.restartMetronome();
+            noteMatchingHandle.current?.resetGame(); setEarTrainingScore(0);
             // Hold the timer for the count-in — it must not eat practice time.
             startTimer(usesMetronome ? getCountInDurationMs(effectiveBpm) : 0);
             if (usesMetronome) metronome.startMetronome();
@@ -984,6 +993,7 @@ export const PracticeSession = ({
           handleBackExercise={() => { stopTimer(); metronome.restartMetronome(); jumpToExercise(currentExerciseIndex - 1); }}
           setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}
           startTimer={startTimer} stopTimer={stopTimer}
+          resetScore={() => { noteMatchingHandle.current?.resetGame(); setEarTrainingScore(0); }}
           isFinishing={isFinishing} isSubmittingReport={isSubmittingReport}
           metronome={metronome} effectiveBpm={effectiveBpm}
           isMicEnabled={isMicEnabled} toggleMic={handleMicToggle}
@@ -1088,6 +1098,13 @@ export const PracticeSession = ({
         exerciseId={activeExercise.id} isMounted={isMounted}
         hasReportResult={!!reportResult} showSuccessView={showSuccessView}
         isLastExercise={isLastExercise}
+      />
+
+      <TimingCalibrationDialog
+        audioRefs={audioRefs} audioContext={metronome.audioContext}
+        isListening={isListening} estimateLatencyMs={getLatencyMs}
+        onEnableMic={() => { if (isMicEnabled) void initAudio(); else updateMicPersistence(true); }}
+        onBeforeStart={() => { stopTimer(); metronome.stopMetronome(); }}
       />
 
       {/* Dev-only shortcut for exams with no hunt panel to host the button —

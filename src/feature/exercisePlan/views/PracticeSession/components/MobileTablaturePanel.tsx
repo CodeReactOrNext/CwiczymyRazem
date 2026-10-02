@@ -62,7 +62,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   isListening,
   resetKey,
 }: MobileTablaturePanelProps) {
-  const { hitNotes, missedNotes } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, noteTimings } = useNoteMatchingContext();
   const { tuning } = useGuitarTuningContext();
   const {
     settings,
@@ -118,6 +118,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
           isListening={isListening}
           hitNotes={hitNotes}
           missedNotes={missedNotes}
+          noteTimings={noteTimings}
           currentBeatsElapsed={0}
           resetKey={resetKey}
           zoom={zoom * MOBILE_FIT}

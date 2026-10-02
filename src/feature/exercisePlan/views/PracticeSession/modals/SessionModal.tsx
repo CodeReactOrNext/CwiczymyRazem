@@ -36,6 +36,8 @@ interface SessionModalProps {
   setTimerTime: (time: number) => void;
   startTimer: (delayMs?: number) => void;
   stopTimer: () => void;
+  /** Clears the run's score — a restart starts a new run. */
+  resetScore: () => void;
   isFinishing?: boolean;
   isSubmittingReport?: boolean;
   metronome: any;
@@ -79,7 +81,7 @@ const SessionModal = ({
   currentExercise, currentExerciseIndex, totalExercises,
   isLastExercise, isPlaying,
   handleNextExercise, handleBackExercise,
-  setVideoDuration, setTimerTime, startTimer, stopTimer,
+  setVideoDuration, setTimerTime, startTimer, stopTimer, resetScore,
   isFinishing, isSubmittingReport,
   metronome, effectiveBpm,
   isMicEnabled, toggleMic,
@@ -138,6 +140,7 @@ const SessionModal = ({
   const handleBackExerciseClick = () => { stopTimer(); metronome.stopMetronome(); handleBackExercise(); };
   const handleRestart = () => {
     stopTimer(); metronome.restartMetronome(); setTimerTime(0); setTabResetKey(prev => prev + 1);
+    resetScore();
     setTimeout(() => {
       startTimer(countInDelayMs());
       if (startsMetronome) metronome.startMetronome();

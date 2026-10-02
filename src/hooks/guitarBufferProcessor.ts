@@ -62,6 +62,11 @@ export interface ProcessorTargets {
   /** Optional ring buffer of onset-anchored note events, oldest first. Omit it
    *  and no events are produced — every other output is unaffected either way. */
   noteEventsRef?: React.MutableRefObject<DetectedNoteEvent[]>;
+  /** Optional: Date.now()-domain time of the most recent attack, refined to hop
+   *  resolution like DetectedNoteEvent.onsetMs. lastOnsetTimeRef stamps the end
+   *  of the block instead — good enough for "was there an attack lately", too
+   *  coarse to grade timing by. */
+  lastAttackMsRef?: React.MutableRefObject<number>;
 }
 
 export interface BufferProcessorOptions {
@@ -274,12 +279,14 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
 
       if (onsetDetector.do(chunk)) {
         isOnset = true;
+        // nowMs stamps the END of the block; walk back to this hop, then
+        // back again by the detector's own one-window reporting lag.
+        const onsetMs = nowMs - (totalHops - 1 - hopIndex) * hopMs - ONSET_REPORT_LAG_MS;
+        if (targets.lastAttackMsRef) targets.lastAttackMsRef.current = onsetMs;
         if (targets.noteEventsRef) {
           commitPending(); // a new attack ends the previous one, resolved or not
           pending = {
-            // nowMs stamps the END of the block; walk back to this hop, then
-            // back again by the detector's own one-window reporting lag.
-            onsetMs: nowMs - (totalHops - 1 - hopIndex) * hopMs - ONSET_REPORT_LAG_MS,
+            onsetMs,
             long: [], high: [], peakVolume: rawVolume, longHops: 0, highHops: 0,
           };
         }

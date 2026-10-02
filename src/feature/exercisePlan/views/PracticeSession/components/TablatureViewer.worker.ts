@@ -57,6 +57,8 @@ let stringColors: string[] = ["#f87171", "#fb923c", "#facc15", "#4ade80", "#60a5
 // Scoring feedback colours: solid fill over a sustained note + brighter glow.
 let hitFill = "#10b981";
 let hitGlow = "#34d399";
+/** How long a hit's timing label stays up — a glance, not a verdict. */
+const TIMING_LABEL_MS = 700;
 /** Board colour. The gutter strip and the played-notes fade paint with it so
  *  scrolled-past notes dissolve into the same background the container shows. */
 let bgColor = "#09090b";
@@ -83,6 +85,8 @@ let showChordNames = true;
 let showMeasureLines = true;
 let showTechniqueLabels = true;
 let hitAnimations = true;
+/** Timing feedback on the notes — labels and the late fill (STYLE.timingHints). */
+let timingHints = true;
 /** Head + thin sustain tail (true) or the classic one-block bar (false). */
 let noteTails = true;
 
@@ -209,6 +213,13 @@ let audioCurrentSec: number | null = null;
 // (see there for how HIT_NOTES/MISSED_NOTES/RESET/DATA update it) so it can be
 // unit tested without a real Worker/OffscreenCanvas.
 const visual = createNoteHitVisualState();
+/** noteKey -> timing of its hit (NOTE_TIMINGS, see timingGrade.ts). Kept apart
+ *  from the hit maps: it isn't frozen per pass, a re-hit note just overwrites
+ *  its own entry. */
+let noteTimings: Record<string, { grade: number; perfect: boolean; offsetBeats: number | null }> = {};
+type TimingLabelKind = "early" | "late" | "perfect";
+/** noteKey -> the timing label it shows and when it went up. Emptied as labels expire. */
+const timingLabels = new Map<string, { kind: TimingLabelKind; at: number }>();
 let hideNotes = false;
 
 // Per-string tuning legend drawn pinned to the left edge (string 1 = high e …
@@ -602,8 +613,15 @@ function render() {
   // once with whatever arrived in the meantime rather than showing a stale board.
   if (!isVisible) return;
 
+  // Labels expire here, not where they are drawn — a note scrolled out of view
+  // would otherwise keep its label (and the paused repaint below) alive forever.
+  const frameNow = Date.now();
+  for (const [key, label] of timingLabels) {
+    if (frameNow - label.at >= TIMING_LABEL_MS) timingLabels.delete(key);
+  }
+
   // Skip paint when paused and nothing animating
-  if (!isPlaying && !needsRedraw && visual.hitTimestampsCount === 0) {
+  if (!isPlaying && !needsRedraw && visual.hitTimestampsCount === 0 && timingLabels.size === 0) {
     if (lastRestActive) {
       lastRestActive = false;
       self.postMessage({ type: 'REST_ACTIVE', isRest: false });
@@ -971,6 +989,17 @@ function render() {
           hitAge = Math.min(1, (Date.now() - visual.hitTimestamps[note.noteKey]) / HIT_ANIM_MS);
         }
 
+        // Timing, shown as words and position rather than as a colour — only
+        // for hits off the beat; an on-time hit looks like any other hit.
+        // Late: the fill starts at the attack, leaving the note's front open.
+        // Both: a short "Early"/"Late" over the note that fades right away —
+        // and now and then a dead-on hit earns a green "+" the same way.
+        const timing = isHit && timingHints ? noteTimings[note.noteKey] : undefined;
+        const offBeatPx = timing && timing.grade < 3 && timing.offsetBeats !== null
+          ? timing.offsetBeats * dynBW
+          : 0;
+        const fillStartW = Math.max(0, Math.min(blockW - 2, offBeatPx));
+
         let fillW = 0;
         if (isHit && isOutgoing) {
           // Frozen tail strictly behind the cursor: keep notes fully filled and
@@ -1017,7 +1046,7 @@ function render() {
             notePath();
             ctx.clip();
             ctx.fillStyle = withAlpha(hitFill, 0.4);
-            ctx.fillRect(blockX, blockY, fillW, BLOCK_H);
+            ctx.fillRect(blockX + fillStartW, blockY, Math.max(0, fillW - fillStartW), BLOCK_H);
             ctx.restore();
           }
 
@@ -1060,9 +1089,9 @@ function render() {
             notePath();
             ctx.clip();
             
-            // The solid green fill
+            // The solid green fill — from where the note was played on
             ctx.fillStyle = finalHitColor;
-            ctx.fillRect(blockX, blockY, fillW, BLOCK_H);
+            ctx.fillRect(blockX + fillStartW, blockY, Math.max(0, fillW - fillStartW), BLOCK_H);
             
             // White shining leading edge of the fill
             const sweepW = 12;
@@ -1090,6 +1119,30 @@ function render() {
             ctx.moveTo(cx + xr, note.noteY - xr); ctx.lineTo(cx - xr, note.noteY + xr);
             ctx.stroke();
           }
+        }
+
+        // ── Timing label over the note, fading right away ─────────────────
+        // "Early"/"Late" in the board's ink, a dead-on "+" in the hit colour.
+        // One label per beat: a chord's notes share one attack, so only its top
+        // note speaks for it.
+        const timingLabel = isHit && timingHints && note.noteY === beat.topNoteY
+          ? timingLabels.get(note.noteKey)
+          : undefined;
+        if (timingLabel) {
+          const age = Math.min(1, (frameNow - timingLabel.at) / TIMING_LABEL_MS);
+          const isPerfect = timingLabel.kind === "perfect";
+          ctx.save();
+          ctx.globalAlpha = 0.9 * (1 - age * age);
+          ctx.fillStyle = isPerfect ? hitGlow : inkColor;
+          ctx.font = isPerfect ? "700 15px Inter, sans-serif" : "600 11px Inter, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "bottom";
+          drawText(
+            isPerfect ? "+" : timingLabel.kind === "early" ? "Early" : "Late",
+            blockX + headW / 2,
+            blockY - 4 - age * 6,
+          );
+          ctx.restore();
         }
 
         // ── Hit animation (Block Shockwave + Sweet Flash) ───────────────────────
@@ -1648,6 +1701,26 @@ self.onmessage = (e: MessageEvent) => {
       applyHitNotes(visual, msg.hitNotes as Record<string, boolean>, Date.now(), lastFinishedTile);
       break;
     }
+    case 'NOTE_TIMINGS': {
+      const next = msg.noteTimings as typeof noteTimings;
+      const now = Date.now();
+      // Compared by value: every message arrives as freshly cloned objects.
+      // A note hit again in a later pass with a new timing gets a new label.
+      for (const key of Object.keys(next)) {
+        if (!timingHints) break;
+        const t = next[key];
+        const prev = noteTimings[key];
+        if (t.offsetBeats === null) continue;
+        if (prev && prev.grade === t.grade && prev.offsetBeats === t.offsetBeats) continue;
+        if (t.grade < 3) {
+          timingLabels.set(key, { kind: t.offsetBeats < 0 ? "early" : "late", at: now });
+        } else if (t.perfect) {
+          timingLabels.set(key, { kind: "perfect", at: now });
+        }
+      }
+      noteTimings = next;
+      break;
+    }
     case 'MISSED_NOTES': {
       applyMissedNotes(visual, msg.missedNotes as Record<string, boolean>, lastFinishedTile);
       needsRedraw = true;
@@ -1706,6 +1779,10 @@ self.onmessage = (e: MessageEvent) => {
       if (msg.showMeasureLines !== undefined) showMeasureLines = msg.showMeasureLines;
       if (msg.showTechniqueLabels !== undefined) showTechniqueLabels = msg.showTechniqueLabels;
       if (msg.hitAnimations !== undefined) hitAnimations = msg.hitAnimations;
+      if (msg.timingHints !== undefined) {
+        timingHints = msg.timingHints;
+        if (!timingHints) timingLabels.clear();
+      }
       needsRedraw = true;
       break;
     }
@@ -1721,6 +1798,8 @@ self.onmessage = (e: MessageEvent) => {
       // made previously-played notes stay lit green after a restart, even
       // though the score/game state had already been reset back to zero.
       resetNoteHitVisualState(visual);
+      noteTimings = {};
+      timingLabels.clear();
       // loop range is intentionally NOT cleared here so it survives loop restarts
       break;
     }

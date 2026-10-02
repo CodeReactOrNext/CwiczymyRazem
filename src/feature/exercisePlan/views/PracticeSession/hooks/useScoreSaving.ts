@@ -88,8 +88,11 @@ export function useScoreSaving({
     const exCategory = activeExercise.category;
     // Only exercises that carry a tempo get one on the board. Everything else
     // sits at the metronome's fallback 60 BPM, which would read as a real —
-    // and identical — result for every player.
-    const runBpm     = activeExercise.metronomeSpeed ? Math.round(sessionBpmRef.current) : undefined;
+    // and identical — result for every player. A run whose tempo moved is
+    // stamped with the slowest tempo it scored at, not the one it ended on.
+    const runBpm     = activeExercise.metronomeSpeed
+      ? Math.round(snap?.minScoredBpm ?? sessionBpmRef.current)
+      : undefined;
     // A branch that doesn't fire this time must not report the previous
     // exercise's standing as if it belonged to this one.
     micStandingRef.current = {};

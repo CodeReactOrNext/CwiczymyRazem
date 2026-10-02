@@ -1,4 +1,5 @@
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 
@@ -44,6 +45,7 @@ interface WorkerBridgeOptions {
   countInRemaining: number;
   hitNotes:        Record<string, boolean | number>;
   missedNotes:     Record<string, boolean>;
+  noteTimings:     Record<string, NoteTiming>;
   hideNotes:       boolean;
   hideDynamicsLane: boolean;
   measures:        TablatureMeasure[] | undefined;
@@ -109,12 +111,13 @@ export interface TablatureStylePatch {
   showMeasureLines?: boolean;
   showTechniqueLabels?: boolean;
   hitAnimations?: boolean;
+  timingHints?: boolean;
 }
 
 export function useTablatureWorkerBridge({
   canvasRef, containerRef, containerSize, renderData,
   isPlaying, startTime, audioStartTime, bpm, countInRemaining,
-  hitNotes, missedNotes, hideNotes, hideDynamicsLane,
+  hitNotes, missedNotes, noteTimings, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
   loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style, selection,
   obscured = false,
@@ -233,6 +236,7 @@ export function useTablatureWorkerBridge({
   useEffect(() => { workerRef.current?.postMessage({ type: 'SHOW_REST_WARNING', show: showRestWarning }); }, [showRestWarning]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'HIT_NOTES',    hitNotes });   }, [hitNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'MISSED_NOTES', missedNotes }); }, [missedNotes]);
+  useEffect(() => { workerRef.current?.postMessage({ type: 'NOTE_TIMINGS', noteTimings }); }, [noteTimings]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'HIDE_NOTES',   hideNotes });  }, [hideNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'TUNING', strings: tuningStrings ?? [] }); }, [tuningStrings]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'SELECTION', selection: selection ?? null }); }, [selection]);

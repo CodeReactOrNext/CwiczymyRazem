@@ -302,6 +302,9 @@ export interface TablatureSettings {
   showTechniqueLabels: boolean;
   // ── Feedback ──
   hitAnimations: boolean;
+  /** "Early"/"Late"/"+" over notes and a late note's fill starting where it was
+   *  played. Visual only — timing still scores either way. */
+  timingHints: boolean;
   ambientGlow: boolean;
   // ── Notation ──
   /** Renders the standard-notation (sheet music) viewer on a black board instead of white paper. */
@@ -332,6 +335,7 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   showMeasureLines: true,
   showTechniqueLabels: true,
   hitAnimations: true,
+  timingHints: true,
   ambientGlow: true,
   notationDarkMode: false,
   notationZoom: 1,
@@ -461,6 +465,7 @@ export function useTablatureStyle(): {
       showMeasureLines: settings.showMeasureLines,
       showTechniqueLabels: settings.showTechniqueLabels,
       hitAnimations: settings.hitAnimations,
+      timingHints: settings.timingHints,
     };
   }, [
     palette,
@@ -479,6 +484,7 @@ export function useTablatureStyle(): {
     settings.showMeasureLines,
     settings.showTechniqueLabels,
     settings.hitAnimations,
+    settings.timingHints,
   ]);
 
   return {

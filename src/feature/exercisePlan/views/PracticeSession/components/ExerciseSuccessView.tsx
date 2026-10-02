@@ -9,6 +9,9 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 
+import type { TimingCounts } from "../utils/timingGrade";
+import { TimingBreakdown } from "./TimingBreakdown";
+
 interface ExerciseStats {
   accuracy?: number;
   maxStreak?: number;
@@ -26,6 +29,8 @@ interface ExerciseSuccessViewProps {
   maxScore?: number;
   stats?: ExerciseStats;
   timeline?: ('hit' | 'miss' | 'perfect' | 'early' | 'late')[];
+  /** Hits per timing grade — shown under the stats when the run was timed. */
+  timing?: TimingCounts | null;
   /** Overrides the default "Missed by X pts…" subtitle for a failed exam —
    *  used when the fail wasn't a score shortfall (e.g. the click-hunt mistake
    *  limit), where that message would be misleading. */
@@ -85,6 +90,7 @@ export const ExerciseSuccessView = ({
   maxScore,
   stats,
   timeline,
+  timing,
   failMessage,
 }: ExerciseSuccessViewProps) => {
   const { t } = useTranslation("common");
@@ -267,12 +273,15 @@ export const ExerciseSuccessView = ({
                   Only shown when something was actually tracked (mic or click hunt) —
                   otherwise "Accuracy" would just be a stale/default 0%. */}
               {hasStats && (
-                <div className="grid grid-cols-3 gap-2 rounded-lg bg-zinc-800/40 px-4 py-4">
-                  <StatItem icon={<Target className="h-4 w-4" />} value={`${accuracy}%`} label="Accuracy" accent="text-cyan-400" />
-                  <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label="Max combo" accent="text-orange-400" />
-                  {!isExam && (
-                    <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label="Score" />
-                  )}
+                <div className="rounded-lg bg-zinc-800/40 px-4 py-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    <StatItem icon={<Target className="h-4 w-4" />} value={`${accuracy}%`} label="Accuracy" accent="text-cyan-400" />
+                    <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label="Max combo" accent="text-orange-400" />
+                    {!isExam && (
+                      <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label="Score" />
+                    )}
+                  </div>
+                  {timing && <TimingBreakdown timing={timing} className="mt-6" />}
                 </div>
               )}
             </motion.div>

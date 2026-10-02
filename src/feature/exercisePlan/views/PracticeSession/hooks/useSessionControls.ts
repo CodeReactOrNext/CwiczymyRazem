@@ -107,9 +107,15 @@ export function useSessionControls({
     }, 100);
   }, [stopTimer, metronome, resetTimer, startTimer, startsMetronome, countInDelayMs, setEarTrainingScore, noteMatchingHandle]);
 
+  // A one-exercise session (the exercise of the day) stays on index 0, so the
+  // index-change reset never fires — the run's score has to be cleared here,
+  // or the next run banks on top of the last one.
   const handleRestartFullSession = useCallback(() => {
     restartFullSession(); setTabRestartKey(prev => prev + 1);
-  }, [restartFullSession]);
+    loopsCompletedRef.current = 0;
+    setEarTrainingScore(0);
+    noteMatchingHandle.current?.resetGame();
+  }, [restartFullSession, loopsCompletedRef, setEarTrainingScore, noteMatchingHandle]);
 
   const handleSpeedMultiplierChange = useCallback((value: number) => {
     setSpeedMultiplier((prev: number) => {

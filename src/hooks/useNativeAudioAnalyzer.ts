@@ -79,6 +79,7 @@ export const useNativeAudioAnalyzer = () => {
   const lastOnsetTimeRef = useRef<number>(0);
   const lastTickTimeRef = useRef<number>(0);
   const noteEventsRef = useRef<DetectedNoteEvent[]>([]);
+  const lastAttackMsRef = useRef<number>(0);
   const onsetChromaRef = useRef<Float32Array | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null); // always null here (no Web Audio graph)
 
@@ -259,7 +260,7 @@ export const useNativeAudioAnalyzer = () => {
         analyser: null, // no AnalyserNode in the native path → no chroma snapshots
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef, noteEventsRef,
+          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef, noteEventsRef, lastAttackMsRef,
         },
         onActive: () => {
           setState(prev =>
@@ -337,6 +338,7 @@ export const useNativeAudioAnalyzer = () => {
     lastTickTimeRef.current = 0;
     onsetChromaRef.current = null;
     noteEventsRef.current = [];
+    lastAttackMsRef.current = 0;
     ipcDelayEmaRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false, streamInfo: null, connectionStatus: "ok" }));
@@ -402,7 +404,7 @@ export const useNativeAudioAnalyzer = () => {
 
   const audioRefs: AudioRefs = {
     frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef,
-    lastTickTimeRef, confidenceRef, analyserRef, onsetChromaRef, noteEventsRef,
+    lastTickTimeRef, confidenceRef, analyserRef, onsetChromaRef, noteEventsRef, lastAttackMsRef,
   };
 
   return useMemo(() => ({

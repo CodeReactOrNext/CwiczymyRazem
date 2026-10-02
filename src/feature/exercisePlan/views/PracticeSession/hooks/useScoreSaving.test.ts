@@ -52,8 +52,8 @@ const exercise = {
 /** An exercise the player can't set a tempo on, so no tempo is worth reporting. */
 const untimedExercise = { ...exercise, metronomeSpeed: undefined } as unknown as Exercise;
 
-const handleFor = (score: number) =>
-  ({ current: { snapshot: () => ({ score, accuracy: 99 }) } }) as unknown as {
+const handleFor = (score: number, minScoredBpm?: number | null) =>
+  ({ current: { snapshot: () => ({ score, accuracy: 99, minScoredBpm }) } }) as unknown as {
     current: NoteMatchingHandle | null;
   };
 
@@ -62,11 +62,13 @@ const saveRun = async ({
   previousBest,
   activeExercise = exercise,
   sessionBpm = 90,
+  minScoredBpm,
 }: {
   score: number;
   previousBest: number;
   activeExercise?: Exercise;
   sessionBpm?: number;
+  minScoredBpm?: number | null;
 }) => {
   vi.mocked(updateMicHighScore).mockResolvedValue({
     isNewRecord: score > previousBest,
@@ -79,7 +81,7 @@ const saveRun = async ({
       currentExercise: activeExercise,
       isMicEnabled: true,
       earTrainingScore: 0,
-      noteMatchingHandle: handleFor(score),
+      noteMatchingHandle: handleFor(score, minScoredBpm),
       sessionBpm,
     })
   );
@@ -123,6 +125,13 @@ describe("useScoreSaving standings", () => {
     const result = await saveRun({ score: 21_375, previousBest: 0 });
 
     expect(result.current.micStandingRef.current).toEqual({ bpm: 90 });
+  });
+
+  it("stamps a run whose tempo moved with the slowest tempo it scored at", async () => {
+    const result = await saveRun({ score: 21_375, previousBest: 0, sessionBpm: 120, minScoredBpm: 60 });
+
+    expect(saveLeaderboardEntry).toHaveBeenCalledWith("me", "ex1", 21_375, "Kasia", "kasia.png", 60);
+    expect(result.current.micStandingRef.current).toEqual({ bpm: 60, rank: 2 });
   });
 
   it("leaves no standing behind when nothing was scored", async () => {
