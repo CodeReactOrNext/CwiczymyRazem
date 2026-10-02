@@ -21,7 +21,6 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   const gameStateRef         = useRef<GameState>({ ...INITIAL_GS });
   const statsRef             = useRef({ hits: 0, misses: 0 });
   const maxComboRef          = useRef(0);
-  const consecutiveMissesRef = useRef(0);
   const lastFlushRef         = useRef(0);
   const needsFlushRef        = useRef(false);
   /** Slowest tempo a note was scored at this run — the tempo the run is
@@ -43,7 +42,6 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     setGameState({ ...INITIAL_GS }); gameStateRef.current = { ...INITIAL_GS };
     statsRef.current             = { hits: 0, misses: 0 };
     maxComboRef.current          = 0;
-    consecutiveMissesRef.current = 0;
     needsFlushRef.current        = false;
     minScoredBpmRef.current      = null;
     setNoteTimings({}); noteTimingsRef.current = {};
@@ -77,7 +75,7 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   return {
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
-    maxComboRef, consecutiveMissesRef, needsFlushRef, minScoredBpmRef,
+    maxComboRef, needsFlushRef, minScoredBpmRef,
     noteTimingsRef, timingCountsRef,
     flushToReact, reset,
   };

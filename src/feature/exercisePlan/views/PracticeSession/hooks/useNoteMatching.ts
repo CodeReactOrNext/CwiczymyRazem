@@ -51,7 +51,7 @@ export function useNoteMatching({
   const {
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
-    maxComboRef, consecutiveMissesRef, needsFlushRef, minScoredBpmRef,
+    maxComboRef, needsFlushRef, minScoredBpmRef,
     noteTimingsRef, timingCountsRef,
     flushToReact, reset: resetGame,
   } = useGameState(currentExerciseIndex, onReset);
@@ -428,7 +428,6 @@ export function useNoteMatching({
               const timingGrade = gradeTiming(attackDeltaMs, (beatEnd - beatStart) * beatDurationMs);
 
               s.hits++;
-              consecutiveMissesRef.current = 0;
               const newCombo      = gs.combo + 1;
               if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
               const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
@@ -455,9 +454,10 @@ export function useNoteMatching({
             missedNotesRef.current[noteKey] = true;
             needsFlushRef.current = true;
             s.misses++;
-            consecutiveMissesRef.current++;
+            // A miss breaks the streak, and the multiplier is the streak's — the
+            // next hit scores at x1 — so the HUD drops to x1 right away too.
             gs.combo = 0;
-            if (consecutiveMissesRef.current >= 3) gs.multiplier = 1;
+            gs.multiplier = 1;
           }
         });
       }
