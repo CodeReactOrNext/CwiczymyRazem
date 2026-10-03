@@ -249,6 +249,10 @@ export const masterOfPuppets: SongGuide = {
         songId: "kR7wfb4rE7q4NcI6dSuC",
       },
     ],
+    moreSongs: {
+      href: "/blog/easiest-metal-songs-to-play-on-guitar",
+      label: "15 easiest metal songs to play on guitar, ranked by players",
+    },
   },
   progression: {
     heading: "Where it sits on the ladder",

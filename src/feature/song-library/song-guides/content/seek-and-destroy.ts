@@ -228,6 +228,10 @@ export const seekAndDestroy: SongGuide = {
         songId: "5MMsi76x10KeuC0QZGUX",
       },
     ],
+    moreSongs: {
+      href: "/blog/easiest-metal-songs-to-play-on-guitar",
+      label: "15 easiest metal songs to play on guitar, ranked by players",
+    },
   },
   relatedLandingSlugs: ["speed", "intermediate"],
   progression: {

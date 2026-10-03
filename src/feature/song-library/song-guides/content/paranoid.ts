@@ -192,6 +192,10 @@ export const paranoid: SongGuide = {
         songId: "KwZ17fUDZNnEw32VM6mS",
       },
     ],
+    moreSongs: {
+      href: "/blog/easiest-metal-songs-to-play-on-guitar",
+      label: "15 easiest metal songs to play on guitar, ranked by players",
+    },
   },
   relatedLandingSlugs: ["speed", "intermediate"],
   progression: {

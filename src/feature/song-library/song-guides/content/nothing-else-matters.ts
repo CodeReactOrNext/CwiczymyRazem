@@ -238,6 +238,10 @@ export const nothingElseMatters: SongGuide = {
         songId: "2EJ3e2txxh0VBCkaxUMU",
       },
     ],
+    moreSongs: {
+      href: "/blog/easiest-metal-songs-to-play-on-guitar",
+      label: "15 easiest metal songs to play on guitar, ranked by players",
+    },
   },
   progression: {
     heading: "Where it sits on the ladder",
