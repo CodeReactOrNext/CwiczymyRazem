@@ -254,6 +254,8 @@ export interface SongGuide {
     intro: string;
     easier: GuidePathSong[];
     harder: GuidePathSong[];
+    /** Optional page listing more songs at this song's level, linked under the path. */
+    moreSongs?: { href: string; label: string };
   };
   /** SEO landing pages (exercise programs) that train this song's core techniques. */
   relatedLandingSlugs: SeoLandingPageKey[];

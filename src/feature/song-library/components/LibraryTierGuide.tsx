@@ -1,6 +1,7 @@
 "use client";
 
 import { getAllTiers } from "feature/songs/utils/getSongTier";
+import Link from "next/link";
 
 const tierDetails: Record<string, { range: string; desc: string }> = {
   D: { range: "1 – 3.9", desc: "Great starting point. Simple chord progressions and beginner-friendly riffs." },
@@ -25,6 +26,13 @@ export const LibraryTierGuide = () => {
           <p className="mt-4 text-zinc-400 text-sm leading-relaxed">
             Every song in our library is rated 1–10 by guitarists who actually practiced it.
             We group these into 5 tiers — so you always know what you&apos;re getting into.
+            New to guitar? Start with the{" "}
+            <Link
+              href="/blog/easy-songs-to-play-on-guitar-for-beginners"
+              className="text-cyan-400 transition-colors hover:text-cyan-300">
+              15 easiest D-tier songs, ranked by player ratings
+            </Link>
+            .
           </p>
         </div>
 

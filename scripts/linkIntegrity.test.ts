@@ -107,10 +107,20 @@ const stripQuery = (href: string) => href.split(/[?#]/)[0].replace(/\/$/, "") ||
 const isKnownPage = (path: string) =>
   staticRoutes.has(path) || contentSlugs.has(path);
 
+/**
+ * Dynamic routes built only from content files (`fallback: false`): any slug
+ * outside `contentSlugs` 404s, so the generic `[slug]` pattern must not
+ * vouch for it.
+ */
+const CONTENT_ROUTE_PREFIXES = ["/blog/", "/song-library/", "/wiki/"];
+
 const isServedPage = (href: string) => {
   const path = stripQuery(href);
   if (path.includes(":")) return true; // redirect pattern such as /leadboard/:path*
   if (isKnownPage(path)) return true;
+  if (CONTENT_ROUTE_PREFIXES.some((prefix) => path.startsWith(prefix))) {
+    return false;
+  }
   return dynamicRoutes.some((pattern) => pattern.test(path));
 };
 
@@ -179,6 +189,8 @@ describe("internal links in content", () => {
       const links = [
         ...raw.matchAll(/\]\((\/[^)\s]*)\)/g),
         ...raw.matchAll(/href="(\/[^"]*)"/g),
+        // Structured link fields in the guide/landing configs (`href: "/…"`).
+        ...raw.matchAll(/href:\s*"(\/[^"]*)"/g),
       ].map((match) => match[1]);
 
       for (const link of new Set(links)) {
@@ -199,6 +211,7 @@ describe("internal links in content", () => {
       const links = [
         ...raw.matchAll(/\]\((\/[^)\s]*)\)/g),
         ...raw.matchAll(/href="(\/[^"]*)"/g),
+        ...raw.matchAll(/href:\s*"(\/[^"]*)"/g),
       ].map((match) => match[1]);
 
       for (const link of new Set(links)) {

@@ -199,6 +199,10 @@ export const houseOfTheRisingSun: SongGuide = {
         songId: "6FYgvvvp2VSUkIzuHtIo",
       },
     ],
+    moreSongs: {
+      href: "/blog/easy-songs-to-play-on-guitar-for-beginners",
+      label: "15 easiest songs to play on guitar, ranked by players",
+    },
   },
   relatedLandingSlugs: ["beginner", "daily"],
   progression: {

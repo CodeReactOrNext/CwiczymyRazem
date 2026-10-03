@@ -238,6 +238,10 @@ export const smokeOnTheWater: SongGuide = {
         songId: "bFniERauZnH1az68JY6S",
       },
     ],
+    moreSongs: {
+      href: "/blog/easy-songs-to-play-on-guitar-for-beginners",
+      label: "15 easiest songs to play on guitar, ranked by players",
+    },
   },
   relatedLandingSlugs: ["beginner", "daily"],
   progression: {

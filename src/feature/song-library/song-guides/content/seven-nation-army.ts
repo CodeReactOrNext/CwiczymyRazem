@@ -243,6 +243,10 @@ export const sevenNationArmy: SongGuide = {
         songId: "2EJ3e2txxh0VBCkaxUMU",
       },
     ],
+    moreSongs: {
+      href: "/blog/easy-songs-to-play-on-guitar-for-beginners",
+      label: "15 easiest songs to play on guitar, ranked by players",
+    },
   },
   progression: {
     heading: "Where it sits on the ladder",

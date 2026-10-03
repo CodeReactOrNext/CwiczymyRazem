@@ -259,6 +259,10 @@ export const wishYouWereHere: SongGuide = {
         songId: "1Fa5YMCeNKOiTXpRuOZF",
       },
     ],
+    moreSongs: {
+      href: "/blog/easy-songs-to-play-on-guitar-for-beginners",
+      label: "15 easiest songs to play on guitar, ranked by players",
+    },
   },
   relatedLandingSlugs: ["beginner", "intermediate"],
   progression: {

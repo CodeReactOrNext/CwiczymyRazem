@@ -141,6 +141,18 @@ export const GuideLearningPath = ({
             song library ranked by community difficulty
           </Link>{" "}
           to build your own path.
+          {guide.learningPath.moreSongs && (
+            <>
+              {" "}
+              Or pick from the{" "}
+              <Link
+                href={guide.learningPath.moreSongs.href}
+                className='text-cyan-400 transition-colors hover:text-cyan-300'>
+                {guide.learningPath.moreSongs.label}
+              </Link>
+              .
+            </>
+          )}
         </p>
       </div>
     </GuideSection>
