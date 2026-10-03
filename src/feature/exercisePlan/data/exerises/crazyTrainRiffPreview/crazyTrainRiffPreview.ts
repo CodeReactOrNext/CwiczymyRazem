@@ -31,6 +31,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -48,6 +49,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -82,6 +84,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -116,6 +119,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -150,6 +154,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -190,6 +195,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 5,
+              isPalmMute: true,
               midiNote: 45,
               dynamics: 0.8,
               isGhost: false,
@@ -207,6 +213,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 4,
+              isPalmMute: true,
               midiNote: 44,
               dynamics: 0.8,
               isGhost: false,
@@ -224,6 +231,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 5,
+              isPalmMute: true,
               midiNote: 45,
               dynamics: 0.8,
               isGhost: false,
@@ -258,6 +266,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 5,
+              isPalmMute: true,
               midiNote: 45,
               dynamics: 0.8,
               isGhost: false,
@@ -275,6 +284,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 4,
+              isPalmMute: true,
               midiNote: 44,
               dynamics: 0.8,
               isGhost: false,
@@ -292,6 +302,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 0,
+              isPalmMute: true,
               midiNote: 40,
               dynamics: 0.8,
               isGhost: false,
@@ -314,6 +325,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -331,6 +343,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -365,6 +378,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -399,6 +413,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -433,6 +448,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -472,6 +488,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 5,
+              isPalmMute: true,
               midiNote: 45,
               dynamics: 0.8,
               isGhost: false,
@@ -489,6 +506,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 4,
+              isPalmMute: true,
               midiNote: 44,
               dynamics: 0.8,
               isGhost: false,
@@ -506,6 +524,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 5,
+              isPalmMute: true,
               midiNote: 45,
               dynamics: 0.8,
               isGhost: false,
@@ -540,6 +559,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 5,
+              isPalmMute: true,
               midiNote: 45,
               dynamics: 0.8,
               isGhost: false,
@@ -557,6 +577,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 4,
+              isPalmMute: true,
               midiNote: 44,
               dynamics: 0.8,
               isGhost: false,
@@ -574,6 +595,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 0,
+              isPalmMute: true,
               midiNote: 40,
               dynamics: 0.8,
               isGhost: false,
@@ -596,6 +618,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -613,6 +636,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -647,6 +671,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -681,6 +706,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -715,6 +741,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 2,
+              isPalmMute: true,
               midiNote: 42,
               dynamics: 0.8,
               isGhost: false,
@@ -754,6 +781,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 5,
+              isPalmMute: true,
               midiNote: 45,
               dynamics: 0.8,
               isGhost: false,
@@ -771,6 +799,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 4,
+              isPalmMute: true,
               midiNote: 44,
               dynamics: 0.8,
               isGhost: false,
@@ -788,6 +817,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 5,
+              isPalmMute: true,
               midiNote: 45,
               dynamics: 0.8,
               isGhost: false,
@@ -822,6 +852,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 5,
+              isPalmMute: true,
               midiNote: 45,
               dynamics: 0.8,
               isGhost: false,
@@ -839,6 +870,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 4,
+              isPalmMute: true,
               midiNote: 44,
               dynamics: 0.8,
               isGhost: false,
@@ -856,6 +888,7 @@ export const crazyTrainRiffPreviewExercise: Exercise = {
             {
               string: 6,
               fret: 0,
+              isPalmMute: true,
               midiNote: 40,
               dynamics: 0.8,
               isGhost: false,

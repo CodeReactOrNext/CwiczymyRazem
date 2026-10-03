@@ -48,6 +48,8 @@ export interface BeatRD {
   isRest: boolean;
   tuplet?: number;
   pickStroke?: PickStroke;
+  /** The beat's bar has an accented note — only there do unaccented notes step back. */
+  inAccentedBar: boolean;
 }
 
 export interface TimeSigMarker { x: number; sig: [number, number]; }
@@ -103,6 +105,8 @@ export function useTablatureRenderData(
         prevSig = sig;
       }
 
+      const inAccentedBar = measure.beats.some((b) => b.notes.some((n) => n.isAccented));
+
       measure.beats.forEach((beat, bIdx) => {
         const next        = measure.beats[bIdx + 1];
         const beatStartX  = currentX;
@@ -153,6 +157,7 @@ export function useTablatureRenderData(
           isRest: beat.notes.length === 0,
           tuplet: beat.tuplet,
           pickStroke: beat.pickStroke,
+          inAccentedBar,
         });
         currentX += beat.duration;
 

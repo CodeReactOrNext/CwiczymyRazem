@@ -13,18 +13,18 @@ import { useState } from "react";
 
 const COLUMNS = [
   {
-    key: "in_progress" as const,
-    title: "In progress",
-    blurb: "Being built now",
-    icon: Hammer,
-    tone: "text-amber-400",
-  },
-  {
     key: "queue" as const,
     title: "Queue",
     blurb: "Up next, in order",
     icon: ListOrdered,
     tone: "text-cyan-400",
+  },
+  {
+    key: "in_progress" as const,
+    title: "In progress",
+    blurb: "Being built now",
+    icon: Hammer,
+    tone: "text-amber-400",
   },
   {
     key: "done" as const,

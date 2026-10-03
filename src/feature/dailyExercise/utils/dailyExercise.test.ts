@@ -13,6 +13,7 @@ import {
   isDailyBoardOpen,
   isDailyExerciseCandidate,
   pickDailyWinner,
+  rankDailyBoard,
 } from "./dailyExercise";
 
 const fakePool = (size: number) =>
@@ -141,5 +142,22 @@ describe("pickDailyWinner", () => {
   it("names no winner on a board nobody else played", () => {
     expect(pickDailyWinner([entry("alone", 900)], 1)).toBeNull();
     expect(pickDailyWinner([], 0)).toBeNull();
+  });
+});
+
+describe("rankDailyBoard", () => {
+  const entry = (userId: string, score: number, updatedAt = 0) =>
+    ({ userId, score, updatedAt }) as DailyExerciseEntry;
+
+  it("orders by score, breaking ties by who set the score first", () => {
+    const ranked = rankDailyBoard(
+      [entry("c", 100), entry("late", 300, 20), entry("b", 200), entry("early", 300, 10)],
+      4,
+    );
+    expect(ranked.map((e) => e.userId)).toEqual(["early", "late", "b", "c"]);
+  });
+
+  it("places nobody on a board nobody else played", () => {
+    expect(rankDailyBoard([entry("alone", 900)], 1)).toEqual([]);
   });
 });

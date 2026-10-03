@@ -165,16 +165,22 @@ export const getSettleableDayKeys = (now: Date = new Date()): string[] => {
 };
 
 /**
- * The board's winner: the best score, and on a tie whoever set it first. No
- * winner on a board nobody else played.
+ * The board's final places: best score first, and on a tie whoever set it
+ * first. Empty on a board nobody else played — there is no race to place in.
  */
+export const rankDailyBoard = (
+  topEntries: readonly DailyExerciseEntry[],
+  players: number,
+): DailyExerciseEntry[] => {
+  if (players < DAILY_PRIZE_MIN_PLAYERS) return [];
+  return [...topEntries].sort((a, b) => b.score - a.score || a.updatedAt - b.updatedAt);
+};
+
+/** The board's winner — its #1 by rankDailyBoard, or none on a board nobody else played. */
 export const pickDailyWinner = (
   topEntries: readonly DailyExerciseEntry[],
   players: number,
-): DailyExerciseEntry | null => {
-  if (players < DAILY_PRIZE_MIN_PLAYERS || topEntries.length === 0) return null;
-  return [...topEntries].sort((a, b) => b.score - a.score || a.updatedAt - b.updatedAt)[0];
-};
+): DailyExerciseEntry | null => rankDailyBoard(topEntries, players)[0] ?? null;
 
 /** Milliseconds until the next exercise — the next UTC midnight. */
 export const getMsUntilNextDailyExercise = (now: Date = new Date()): number => {

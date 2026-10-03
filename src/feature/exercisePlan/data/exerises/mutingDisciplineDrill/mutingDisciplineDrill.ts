@@ -27,60 +27,60 @@ export const mutingDisciplineDrillExercise: Exercise = {
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 4, fret: 2 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 3 }] }, { duration: 0.5, notes: [{ string: 4, fret: 0 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 4, fret: 2 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 2 }] }, { duration: 0.5, notes: [{ string: 4, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 4, fret: 2 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 3, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 4, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 4, fret: 2 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 2, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 4, fret: 0 }] },
       ],
     },
     // M2: String-skip between strings 6 and 3 (wider skip)
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 3 }] }, { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 3, fret: 2 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 2 }] }, { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 3, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 3, fret: 2 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 2, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
       ],
     },
-    // M3: Palm mute section — low string riff (strings 6-5)
+    // M3: Palm mute section — low string riff (strings 6-5); accents ring open
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 0.5, notes: [{ string: 6, fret: 0, isAccented: true }] }, { duration: 0.5, notes: [{ string: 6, fret: 0 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 5, fret: 2, isAccented: true }] },
-        { duration: 0.5, notes: [{ string: 5, fret: 2 }] }, { duration: 0.5, notes: [{ string: 6, fret: 0, isAccented: true }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 3 }] }, { duration: 0.5, notes: [{ string: 6, fret: 2 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isAccented: true, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 5, fret: 2, isAccented: true }] },
+        { duration: 0.5, notes: [{ string: 5, fret: 2, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 6, fret: 0, isAccented: true, isPalmMute: true }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 3, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 6, fret: 2, isPalmMute: true }] },
       ],
     },
     // M4: Palm mute with open string accents
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 0.5, notes: [{ string: 6, fret: 0, isAccented: true }] }, { duration: 0.5, notes: [{ string: 6, fret: 0 }] },
-        { duration: 0.5, notes: [{ string: 5, fret: 0 }] }, { duration: 0.5, notes: [{ string: 5, fret: 2, isAccented: true }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 6, fret: 3, isAccented: true }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 2 }] }, { duration: 0.5, notes: [{ string: 6, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isAccented: true, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] },
+        { duration: 0.5, notes: [{ string: 5, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 5, fret: 2, isAccented: true }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 6, fret: 3, isAccented: true, isPalmMute: true }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 2, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] },
       ],
     },
     // M5: Wide skip — strings 6 to 2
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 2, fret: 0 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 3 }] }, { duration: 0.5, notes: [{ string: 2, fret: 0 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 2, fret: 3 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 2 }] }, { duration: 0.5, notes: [{ string: 2, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 2, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 3, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 2, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 2, fret: 3 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 2, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 2, fret: 0 }] },
       ],
     },
     // M6: Maximum skip — strings 6 to 1
     {
       timeSignature: [4, 4],
       beats: [
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 1, fret: 0 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 3 }] }, { duration: 0.5, notes: [{ string: 1, fret: 3 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 0 }] }, { duration: 0.5, notes: [{ string: 1, fret: 0 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 2 }] }, { duration: 0.5, notes: [{ string: 1, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 1, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 3, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 1, fret: 3 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 0, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 1, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 2, isPalmMute: true }] }, { duration: 0.5, notes: [{ string: 1, fret: 0 }] },
       ],
     },
   ],

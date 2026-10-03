@@ -26,7 +26,8 @@ type NotificationType =
   | "roadmap_ready"
   | "chat_mention"
   | "chat_reply"
-  | "daily_exercise_win";
+  | "daily_exercise_win"
+  | "daily_exercise_place";
 
 export interface AppNotification {
   id: string;
@@ -60,7 +61,8 @@ export interface AppNotification {
   chatPath?: string;
   chatMessageId?: string;
   messageSnippet?: string;
-  // Exercise-of-the-day win: the board's day and the prize, in words
+  // Exercise of the day: the board's day, and for a win the prize in words
+  // (places 2–5 reuse `place` and `exerciseTitle`)
   dayKey?: string;
   prizeName?: string;
   timestamp: any;
@@ -104,6 +106,8 @@ export const notificationHref = (n: AppNotification): string | null => {
   if (n.type === "roadmap_ready" && n.roadmapId)
     return `/ai-coach?tab=players&roadmap=${n.roadmapId}`;
   if (n.type === "daily_exercise_win") return "/arsenal";
+  // The board it reports on is closed — send them to today's, on the dashboard.
+  if (n.type === "daily_exercise_place") return "/dashboard";
   return null;
 };
 
@@ -195,6 +199,11 @@ export const notificationText = (
       return {
         title: "You won the exercise of the day!",
         body: `#1 on the board — ${n.prizeName ?? "your prize"} is in your Arsenal.`,
+      };
+    case "daily_exercise_place":
+      return {
+        title: "Exercise of the day results",
+        body: `You finished ${n.place}${placeSuffix(n.place ?? 0)}${n.exerciseTitle ? ` on ${n.exerciseTitle}` : ""}.`,
       };
     default:
       return {

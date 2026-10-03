@@ -34,8 +34,11 @@ const STATUS_COLOR: Record<RoadmapIdeaStatus, ChipColor> = {
 
 interface RoadmapIdeaCardProps {
   idea: RoadmapIdea;
-  /** Place on the board, 1-based — the board is already ranked by backing. */
-  rank: number;
+  /**
+   * Place on the board, 1-based — the board is already ranked by backing.
+   * Left out for decided ideas, where the order no longer means "what's next".
+   */
+  rank?: number;
   mine: number;
   myUid: string;
   tokensLeft: number;
@@ -66,14 +69,16 @@ export const RoadmapIdeaCard = ({
       )}>
       {/* The place on the board, so "what is next" is a number, not a guess.
           The top three are lit; the rest are just order. */}
-      <span
-        aria-label={`Rank ${rank}`}
-        className={cn(
-          "w-8 shrink-0 text-right text-3xl font-bold tabular-nums leading-none",
-          rank <= 3 ? "text-zinc-400" : "text-zinc-700",
-        )}>
-        {rank}
-      </span>
+      {rank !== undefined && (
+        <span
+          aria-label={`Rank ${rank}`}
+          className={cn(
+            "w-8 shrink-0 text-right text-3xl font-bold tabular-nums leading-none",
+            rank <= 3 ? "text-zinc-400" : "text-zinc-700",
+          )}>
+          {rank}
+        </span>
+      )}
 
       <div className='flex min-w-0 flex-1 flex-col gap-5 sm:flex-row'>
         <div className='min-w-0 flex-1'>

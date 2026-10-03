@@ -1,13 +1,20 @@
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
+import { SubmitRecordingDialog } from "feature/challenges/components/SubmitRecordingDialog";
 import {
   useChallengeSubmissions,
   useCurrentChallenge,
 } from "feature/challenges/hooks/useChallenges";
+import type { ChallengeSong } from "feature/challenges/types/challenge.types";
+import { isChallengeLive } from "feature/challenges/utils/challengeMonth";
+import { getClearedSongIds } from "feature/challenges/utils/challengeProgress";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
+import { SongPracticePickerLauncher } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerLauncher";
+import { selectUserName } from "feature/user/store/userSlice";
 import type { Timestamp } from "firebase/firestore";
-import { Check, Medal, Music } from "lucide-react";
-import { useMemo } from "react";
+import { Check, Medal, Music, Play, Plus } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 import { WidgetHeader, WidgetLink } from "./WidgetHeader";
 
@@ -22,20 +29,20 @@ const daysLeftLabel = (endsAt: Timestamp | undefined): string | null => {
 
 /**
  * The month's board in five rows: which songs are up, which ones already have
- * a recording from this player, and how long is left to add the rest.
+ * a recording from this player, and how long is left to add the rest. A row
+ * opens the song's practice picker; the plus next to it sends the recording,
+ * so the board can be played through without leaving Home.
  */
 export const MonthlyChallengeWidget = () => {
   const { userAuth } = useDashboardData();
+  const userName = useAppSelector(selectUserName) ?? "Player";
   const { data: challenge, isLoading } = useCurrentChallenge();
   const { data: submissions = [] } = useChallengeSubmissions(challenge?.id);
+  const [practiceSongId, setPracticeSongId] = useState<string | null>(null);
+  const [submitSong, setSubmitSong] = useState<ChallengeSong | null>(null);
 
   const recorded = useMemo(
-    () =>
-      new Set(
-        submissions
-          .filter((submission) => submission.userId === userAuth)
-          .map((submission) => submission.songId),
-      ),
+    () => getClearedSongIds(submissions, userAuth),
     [submissions, userAuth],
   );
 
@@ -72,36 +79,65 @@ export const MonthlyChallengeWidget = () => {
             )}
           </div>
 
-          <ul className='space-y-1.5'>
+          <ul className='space-y-0.5'>
             {songs.map((song) => {
               const done = recorded.has(song.songId);
               return (
-                <li key={song.songId} className='flex items-center gap-3'>
-                  {song.coverUrl ? (
-                    <img
-                      src={song.coverUrl}
-                      alt=''
-                      className='h-9 w-9 shrink-0 rounded object-cover'
-                    />
+                <li key={song.songId} className='flex items-center gap-2'>
+                  {/* The negative margin keeps covers on the card's text edge
+                      while the hover background still gets room around them. */}
+                  <button
+                    type='button'
+                    onClick={() => setPracticeSongId(song.songId)}
+                    aria-label={`Practice ${song.title} by ${song.artist}`}
+                    className='group -ml-2 flex min-w-0 flex-1 items-center gap-3 rounded-lg px-2 py-1 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-800/50'>
+                    <span className='relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded bg-zinc-800'>
+                      {song.coverUrl ? (
+                        <img
+                          src={song.coverUrl}
+                          alt=''
+                          className='h-full w-full object-cover'
+                        />
+                      ) : (
+                        <Music size={14} className='text-zinc-500' />
+                      )}
+                      <span className='absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'>
+                        <Play size={14} className='fill-current' />
+                      </span>
+                    </span>
+                    <span className='min-w-0 flex-1'>
+                      <span
+                        translate='no'
+                        className='block truncate text-sm text-zinc-100'>
+                        {song.title}
+                      </span>
+                      <span
+                        translate='no'
+                        className='block truncate text-xs text-zinc-500'>
+                        {song.artist}
+                      </span>
+                    </span>
+                  </button>
+
+                  {/* One slot, two states: the plus turns into the check once
+                      the recording is in. */}
+                  {done ? (
+                    <span className='flex h-8 w-8 shrink-0 items-center justify-center'>
+                      <Check
+                        size={16}
+                        className='text-emerald-400'
+                        aria-label='Recorded'
+                      />
+                    </span>
                   ) : (
-                    <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded bg-zinc-800'>
-                      <Music size={14} className='text-zinc-500' />
-                    </div>
-                  )}
-                  <div className='min-w-0 flex-1'>
-                    <p className='truncate text-sm text-zinc-100'>
-                      {song.title}
-                    </p>
-                    <p className='truncate text-xs text-zinc-500'>
-                      {song.artist}
-                    </p>
-                  </div>
-                  {done && (
-                    <Check
-                      size={16}
-                      className='shrink-0 text-emerald-400'
-                      aria-label='Recorded'
-                    />
+                    <button
+                      type='button'
+                      onClick={() => setSubmitSong(song)}
+                      aria-label={`Submit a recording of ${song.title}`}
+                      title='Submit a recording'
+                      className='flex h-8 w-8 shrink-0 items-center justify-center rounded text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-800 hover:text-zinc-100'>
+                      <Plus size={16} />
+                    </button>
                   )}
                 </li>
               );
@@ -114,8 +150,24 @@ export const MonthlyChallengeWidget = () => {
             </span>{" "}
             recorded
           </p>
+
+          <SubmitRecordingDialog
+            challenge={challenge}
+            song={submitSong}
+            userId={userAuth}
+            userName={userName}
+            isFinalSong={recorded.size === songs.length - 1}
+            paysReward={isChallengeLive(challenge.id)}
+            onClose={() => setSubmitSong(null)}
+          />
         </div>
       )}
+
+      <SongPracticePickerLauncher
+        songId={practiceSongId}
+        userId={userAuth}
+        onClose={() => setPracticeSongId(null)}
+      />
     </Card>
   );
 };

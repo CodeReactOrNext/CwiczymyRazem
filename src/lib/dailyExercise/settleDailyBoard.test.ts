@@ -92,6 +92,9 @@ vi.mock("firebase-admin/firestore", () => ({
 
 const { settleDailyBoard } = await import("./settleDailyBoard");
 const { getDailyPrize } = await import("./dailyPrize");
+const { DAILY_EXERCISE_POOL } = await import(
+  "feature/dailyExercise/utils/dailyExercise"
+);
 
 const DAY = "2026-10-01";
 const boardOf = (day: string) => `dailyExerciseLeaderboards/${day}`;
@@ -113,6 +116,8 @@ const notifications = () =>
   [...store.entries()]
     .filter(([key]) => key.startsWith("notifications/"))
     .map(([, data]) => data);
+const notificationsOf = (type: string) =>
+  notifications().filter((n) => n.type === type);
 /** Mods in the stash plus parts in the wallet — everything a prize can be. */
 const prizesOf = (uid: string) =>
   (user(uid).arsenal?.salvagedMods?.length ?? 0) +
@@ -149,13 +154,69 @@ describe("settleDailyBoard", () => {
       settled: true,
       winner: { userId: "kafar", prize: getDailyPrize(DAY) },
     });
-    expect(notifications()).toEqual([
+    expect(notificationsOf("daily_exercise_win")).toEqual([
       expect.objectContaining({
         userId: "kafar",
         type: "daily_exercise_win",
         dayKey: DAY,
         isRead: false,
       }),
+    ]);
+  });
+
+  it("tells the rest of the top five where they finished, and nobody below", async () => {
+    const exercise = DAILY_EXERCISE_POOL[0];
+    store.set(BOARD, { exerciseId: exercise.id });
+    ["p1", "p2", "p3", "p4", "p5", "p6"].forEach((uid, i) => {
+      store.set(`users/${uid}`, { displayName: uid, arsenal: {} });
+      addEntry(uid, 600 - i * 100);
+    });
+
+    await settleDailyBoard(DAY);
+
+    expect(
+      notificationsOf("daily_exercise_place")
+        .map((n) => [n.userId, n.place])
+        .sort(),
+    ).toEqual([
+      ["p2", 2],
+      ["p3", 3],
+      ["p4", 4],
+      ["p5", 5],
+    ]);
+    expect(notificationsOf("daily_exercise_place")[0]).toMatchObject({
+      dayKey: DAY,
+      exerciseTitle: exercise.title,
+      isRead: false,
+    });
+    expect(notifications().some((n) => n.userId === "p6")).toBe(false);
+    expect(notifications().filter((n) => n.userId === "p1")).toEqual([
+      expect.objectContaining({ type: "daily_exercise_win" }),
+    ]);
+  });
+
+  it("places a tie the way it pays it — whoever set the score first", async () => {
+    addEntry("cookie", 500, 20);
+    addEntry("kafar", 500, 10);
+
+    await settleDailyBoard(DAY);
+
+    expect(notificationsOf("daily_exercise_place")).toEqual([
+      expect.objectContaining({ userId: "cookie", place: 2 }),
+    ]);
+  });
+
+  it("still tells the places when the #1's account is gone", async () => {
+    store.delete("users/kafar");
+    addEntry("kafar", 300);
+    addEntry("cookie", 200);
+
+    await settleDailyBoard(DAY);
+
+    expect(store.get(BOARD)).toMatchObject({ settled: true, winner: null });
+    expect(notificationsOf("daily_exercise_win")).toHaveLength(0);
+    expect(notificationsOf("daily_exercise_place")).toEqual([
+      expect.objectContaining({ userId: "cookie", place: 2 }),
     ]);
   });
 
@@ -206,7 +267,7 @@ describe("settleDailyBoard", () => {
     await settleDailyBoard(DAY);
 
     expect(prizesOf("cookie")).toBe(1);
-    expect(notifications()).toHaveLength(1);
+    expect(notifications()).toHaveLength(2);
   });
 
   it("gives a tie to whoever set the score first", async () => {

@@ -8,6 +8,7 @@ import type {
   RoadmapBoard,
   RoadmapIdeaStatus,
 } from "feature/supporterPanel/types/supporterPanel.types";
+import { groupIdeas } from "feature/supporterPanel/utils/ideaGroups";
 import { Lightbulb, Plus } from "lucide-react";
 import { useState } from "react";
 
@@ -22,6 +23,13 @@ const BoardSkeleton = () => (
       ))}
     </div>
   </div>
+);
+
+const SectionHeading = ({ title, count }: { title: string; count: number }) => (
+  <h2 className='flex items-baseline gap-2 text-sm font-bold text-zinc-200'>
+    {title}
+    <span className='font-normal tabular-nums text-zinc-500'>{count}</span>
+  </h2>
 );
 
 const EmptyBoard = ({ onPost }: { onPost: () => void }) => (
@@ -68,7 +76,8 @@ export const RoadmapBoardTab = ({
     <div className='space-y-8'>
       <div className='flex flex-wrap items-center justify-between gap-4'>
         <p className='text-sm text-zinc-400'>
-          The most-backed ideas get built first. Spent tokens don&apos;t come back.
+          The most-backed ideas get built first. Spent tokens don&apos;t come
+          back.
         </p>
         <Button
           onClick={() => setIsPosting(true)}
@@ -88,22 +97,29 @@ export const RoadmapBoardTab = ({
       {board.ideas.length === 0 ? (
         <EmptyBoard onPost={() => setIsPosting(true)} />
       ) : (
-        <div className='space-y-3'>
-          {board.ideas.map((idea, index) => (
-            <RoadmapIdeaCard
-              key={idea.id}
-              idea={idea}
-              rank={index + 1}
-              mine={board.myBacking[idea.id] ?? 0}
-              myUid={board.myUid}
-              tokensLeft={tokensLeft}
-              busy={busy}
-              isOwner={board.isOwner}
-              onBack={() => back.mutate({ ideaId: idea.id, amount: 1 })}
-              onStatusChange={(status: RoadmapIdeaStatus) =>
-                changeStatus.mutate({ ideaId: idea.id, status })
-              }
-            />
+        <div className='space-y-12'>
+          {groupIdeas(board.ideas).map((group) => (
+            <section key={group.key} className='space-y-4'>
+              <SectionHeading title={group.title} count={group.ideas.length} />
+              <div className='space-y-3'>
+                {group.ideas.map((idea, index) => (
+                  <RoadmapIdeaCard
+                    key={idea.id}
+                    idea={idea}
+                    rank={group.key === "open" ? index + 1 : undefined}
+                    mine={board.myBacking[idea.id] ?? 0}
+                    myUid={board.myUid}
+                    tokensLeft={tokensLeft}
+                    busy={busy}
+                    isOwner={board.isOwner}
+                    onBack={() => back.mutate({ ideaId: idea.id, amount: 1 })}
+                    onStatusChange={(status: RoadmapIdeaStatus) =>
+                      changeStatus.mutate({ ideaId: idea.id, status })
+                    }
+                  />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}

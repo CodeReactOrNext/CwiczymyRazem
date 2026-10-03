@@ -148,6 +148,7 @@ interface BeatRD {
   isRest: boolean;
   tuplet?: number;
   pickStroke?: "down" | "up";
+  inAccentedBar?: boolean;
 }
 
 interface TimeSigMarker { x: number; sig: [number, number]; }
@@ -350,6 +351,29 @@ function drawPickStroke(stroke: "down" | "up", x: number) {
     ctx.lineTo(x + half, PICK_Y - PICK_H / 2);
   }
   ctx.stroke();
+}
+
+// ── Palm mute ─────────────────────────────────────────────────────────────────
+// Measured once — the label and its font never change.
+let palmMuteLabelW = 0;
+
+/**
+ * "P.M." under a palm-muted beat, centred on its note head, in the row below
+ * the staff. One per muted note rather than a span line, so nothing runs under
+ * the notes that ring. `room` is the beat's width: too narrow a beat gets "PM".
+ */
+function drawPalmMuteLabel(x: number, room: number, live: boolean) {
+  if (!ctx) return;
+  const staffBottom = STAFF_TOP + 5 * STRING_SPACING;
+  // Below the dynamics bars when there are any; held inside the board when
+  // wide string spacing leaves little room under the staff.
+  const y = Math.min(BASE_H - 7, hasDynamics ? staffBottom + 47 : staffBottom + BLOCK_H / 2 + 11);
+  ctx.font = "bold 11px Inter, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = withAlpha(inkColor, live ? 0.95 : 0.6);
+  if (palmMuteLabelW === 0) palmMuteLabelW = ctx.measureText("P.M.").width;
+  drawText(palmMuteLabelW + 6 <= room ? "P.M." : "PM", x, y);
 }
 
 // ── Bend badge ────────────────────────────────────────────────────────────────
@@ -897,6 +921,8 @@ function render() {
 
       // Badge Y: above the topmost block in this beat
       const bendBadgeY = beat.topNoteY - BLOCK_H / 2 - 28;
+      // Head centre of the beat's first palm-muted note — where its "P.M." goes.
+      let palmMuteX: number | null = null;
 
       for (const note of beat.notes) {
         const hitVal = reached ? tileHit[note.noteKey] : undefined;
@@ -905,7 +931,10 @@ function render() {
         const isHarm = !!(note.harmonicType && note.harmonicType > 0);
         const dyn = hasDynamics && note.dynamics !== undefined ? note.dynamics : 1.0;
         const ghostAlpha = 1.0; // Disabled transparency for ghost notes
-        const accentDim = hasAccentedNotes && !note.isAccented ? 0.25 : 1.0;
+        // Unaccented notes step back so the accents pop — but only in a bar that
+        // has accents. Dimming every bar for one accented passage made whole
+        // stretches of the tab look muted.
+        const accentDim = hasAccentedNotes && beat.inAccentedBar && !note.isAccented ? 0.25 : 1.0;
         const dynAlpha = hasDynamics && note.dynamics !== undefined ? 0.3 + 0.7 * dyn : 1.0;
         const missedDim = reached && !tileHit[note.noteKey] && tileMissed[note.noteKey] ? 0.2 : 1.0;
         const baseAlpha = dynAlpha * accentDim * ghostAlpha * missedDim;
@@ -934,6 +963,7 @@ function render() {
         };
         // Bar mode keeps the label in the left "head" of the long block.
         const labelX = noteTails ? blockX + headW / 2 : blockX + Math.min(blockW / 2, BLOCK_H * 0.65);
+        if (note.isPalmMute && palmMuteX === null) palmMuteX = labelX;
 
         // ── Slide-in line ────────────────────────────────────────────────
         if (note.slideIn && note.slideIn > 0) {
@@ -966,8 +996,9 @@ function render() {
         const finalHitColor = hitFill;
         const isAnimatingHit = isHit && visual.hitTimestamps[note.noteKey] !== undefined;
 
-        if (!isHit && note.isPalmMute) fillColor = "#78716c";
-        else if (!isHit && isDead) fillColor = "#374151";
+        // Palm-muted notes keep their string colour — the P.M. lane under the
+        // staff marks them, and a grey pill read as a disabled note.
+        if (!isHit && isDead) fillColor = "#374151";
         // Active/hit notes get a lighter block instead of a white digit.
         else if (isActive || isHit) fillColor = lightenHex(note.color, 0.72);
 
@@ -1054,10 +1085,10 @@ function render() {
           const alpha = isHit ? 1.0 : baseAlpha;
 
           // Sustain tail: the string's colour, dimmed so the head stays the
-          // thing your eye lands on. Palm-muted / dead notes keep their grey.
+          // thing your eye lands on. Dead notes keep their grey.
           if (hasTail) {
             ctx.globalAlpha = alpha * (isActive ? 0.6 : 0.38);
-            ctx.fillStyle = note.isPalmMute || isDead ? fillColor : note.color;
+            ctx.fillStyle = isDead ? fillColor : note.color;
             drawPill(tailX, tailY, tailW, tailH, tailH / 2);
             ctx.fill();
           }
@@ -1259,14 +1290,6 @@ function render() {
           drawText(hLabel, labelX, note.noteY);
         }
 
-        // Palm mute label below block
-        if (note.isPalmMute) {
-          ctx.font = "bold 7px Inter";
-          ctx.fillStyle = "#a8a29e";
-          ctx.textAlign = "left";
-          drawText("PM", blockX + 3, blockY + BLOCK_H + 8);
-        }
-
         // Staccato: dot above block
         if (note.isStaccato) {
           ctx.fillStyle = isHit ? "#10b981" : note.color;
@@ -1336,6 +1359,10 @@ function render() {
 
         // ── Update slide tracking (right edge of block) ───────────────────
         stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + headW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
+      }
+
+      if (palmMuteX !== null && showTechniqueLabels) {
+        drawPalmMuteLabel(palmMuteX, beat.duration * dynBW, isActive);
       }
     }
 

@@ -26,6 +26,7 @@ import {
   HeartHandshake,
   ListMusic,
   Map as MapIcon,
+  Medal,
   MessageSquare,
   Reply,
   Store,
@@ -219,6 +220,25 @@ const typeConfig = {
       </span>
     ),
   },
+  daily_exercise_place: {
+    icon: <Medal className='h-3 w-3 text-white' />,
+    bg: "bg-cyan-500",
+    label: (n: any) => (
+      <span>
+        You finished{" "}
+        <span className='font-semibold text-white'>
+          {n.place}
+          {placeSuffix(n.place)}
+        </span>{" "}
+        in the exercise of the day
+        {n.exerciseTitle && (
+          <span className='mt-1 block truncate text-xs text-zinc-500'>
+            {n.exerciseTitle}
+          </span>
+        )}
+      </span>
+    ),
+  },
   roadmap_ready: {
     icon: <MapIcon className='h-3 w-3 text-white' />,
     bg: "bg-cyan-500",
@@ -384,6 +404,7 @@ export const NotificationsBell = () => {
                   n.type === "season_start" ||
                   n.type === "roadmap_ready" ||
                   n.type === "daily_exercise_win" ||
+                  n.type === "daily_exercise_place" ||
                   // Legacy marketplace sales stored without a buyer fall back to
                   // the system (Store) icon; new ones show the buyer's avatar.
                   (n.type === "marketplace_sold" && !n.senderName);
@@ -490,6 +511,12 @@ export const NotificationsBell = () => {
                       {n.type === "daily_exercise_win" && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-amber-400/80'>
                           Open Arsenal
+                          <ArrowRight className='h-3 w-3' />
+                        </p>
+                      )}
+                      {n.type === "daily_exercise_place" && (
+                        <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
+                          Play today&apos;s exercise
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}

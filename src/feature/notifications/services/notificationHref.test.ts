@@ -69,6 +69,9 @@ describe("notificationHref", () => {
     expect(notificationHref(notification({ type: "daily_exercise_win" }))).toBe(
       "/arsenal",
     );
+    expect(
+      notificationHref(notification({ type: "daily_exercise_place", place: 3 })),
+    ).toBe("/dashboard");
   });
 
   it("leaves system notifications without a target", () => {
