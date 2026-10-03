@@ -33,6 +33,15 @@ export const GuideRelatedExercises = ({ links }: GuideRelatedExercisesProps) => 
           </Link>
         ))}
       </div>
+      <p className='mt-8 max-w-3xl text-sm leading-relaxed text-zinc-500'>
+        Each program runs in the browser with a scrolling tab, a metronome and{" "}
+        <Link
+          href='/interactive-guitar-practice'
+          className='text-cyan-400 transition-colors hover:text-cyan-300'>
+          live note feedback
+        </Link>{" "}
+        from a mic or audio interface.
+      </p>
     </GuideSection>
   );
 };

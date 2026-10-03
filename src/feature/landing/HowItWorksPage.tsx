@@ -38,10 +38,16 @@ const steps = [
         label: "Ready-made training plans",
         sub: "structured programs you can follow from day one",
         count: defaultPlans.length,
+        href: "/guitar-practice-planner",
       },
       {
         label: "Auto-planner",
         sub: "not sure what to practice? Riff Quest picks what's next",
+      },
+      {
+        label: "Learning path",
+        sub: "step-by-step stages, each closed by an exam",
+        href: "/features/guitar-learning-path",
       },
       {
         label: "Guitar Pro import",
@@ -72,6 +78,7 @@ const steps = [
       {
         label: "Live performance scoring",
         sub: "play into your mic, get scored in real time, like Guitar Hero on a real guitar",
+        href: "/interactive-guitar-practice",
       },
       {
         label: "Built-in metronome",
@@ -195,9 +202,17 @@ function StepSection({
             {step.features.map((f) => (
               <li key={f.label} className='flex flex-col gap-0.5'>
                 <div className='flex items-baseline gap-2'>
-                  <span className='text-sm font-semibold leading-snug text-white'>
-                    {f.label}
-                  </span>
+                  {"href" in f && f.href ? (
+                    <Link
+                      href={f.href}
+                      className='text-sm font-semibold leading-snug text-cyan-400 transition-colors hover:text-cyan-300'>
+                      {f.label}
+                    </Link>
+                  ) : (
+                    <span className='text-sm font-semibold leading-snug text-white'>
+                      {f.label}
+                    </span>
+                  )}
                   {"count" in f && f.count != null && (
                     <span
                       className={`text-[10px] font-black tabular-nums ${step.color}`}>

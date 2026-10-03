@@ -183,7 +183,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
         {
           kind: "cta",
           title: "Run this routine with real-time feedback",
-          text: "Every exercise on this page is built into Riff Quest with interactive tabs, a metronome, and note detection that hears what you play. Track your streak and watch the practice heatmap fill up.",
+          text: "Every exercise on this page is built into Riff Quest with interactive tabs, a metronome, and [note detection](/interactive-guitar-practice) that hears what you play. Track your streak and watch the practice heatmap fill up.",
         },
       ],
     },
@@ -277,7 +277,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
-          text: "After three to four weeks, this page stops being enough — that is the plan working. Your next steps are the [guitar speed and hand synchronization exercises](/guitar-speed-hand-synchronization-exercises) for technique, and the [scale practice routine](/guitar-scale-practice-routine) when you are ready to start playing lead. Once chords, timing and a first song are solid, the [intermediate guitar practice routine](/intermediate-guitar-practice-routine) is the 45-minute structure that replaces this one. If motivation is the bottleneck rather than technique, read our guide on [practicing every day in simple steps](/blog/practice-guitar-every-day-simple-steps).",
+          text: "After three to four weeks, this page stops being enough — that is the plan working. Your next steps are the [guitar speed and hand synchronization exercises](/guitar-speed-hand-synchronization-exercises) for technique, and the [scale practice routine](/guitar-scale-practice-routine) when you are ready to start playing lead. Once chords, timing and a first song are solid, the [intermediate guitar practice routine](/intermediate-guitar-practice-routine) is the 45-minute structure that replaces this one. If you would rather not choose the next drill yourself, the [guitar learning path](/features/guitar-learning-path) lays the same fundamentals out as stages, one step at a time, each closed by an exam. If motivation is the bottleneck rather than technique, read our guide on [practicing every day in simple steps](/blog/practice-guitar-every-day-simple-steps).",
         },
       ],
     },

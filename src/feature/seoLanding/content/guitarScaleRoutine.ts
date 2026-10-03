@@ -219,7 +219,7 @@ export const guitarScaleRoutineConfig: SeoLandingConfig = {
         {
           kind: "cta",
           title: "Run the whole routine inside Riff Quest",
-          text: "Interactive tabs for every drill, a metronome, note detection that hears whether you hit the right fret, and a heatmap that shows your daily scale streak.",
+          text: "Interactive tabs for every drill, a metronome, [note detection](/interactive-guitar-practice) that hears whether you hit the right fret, and a heatmap that shows your daily scale streak.",
         },
       ],
     },

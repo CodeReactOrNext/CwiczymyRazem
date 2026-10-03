@@ -100,7 +100,7 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
         {
           kind: "cta",
           title: "Build your own version in Riff Quest",
-          text: "Take this routine as a starting point, or build a plan from scratch: pick drills from the exercise library, set the minutes per block, and the app runs the session with a metronome and note detection, logging the clean BPM for you.",
+          text: "Take this routine as a starting point, or [build a plan from scratch](/guitar-practice-planner): pick drills from the exercise library, set the minutes per block, and the app runs the session with a metronome and note detection, logging the clean BPM for you.",
           ctaLabel: "Build your own plan",
           planTitle: "This routine as a plan",
           plan: [

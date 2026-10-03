@@ -301,6 +301,17 @@ const nextConfig = {
         destination: '/blog/practice-guitar-every-day-simple-steps',
         permanent: true,
       },
+      // Still 404 with impressions in Search Console (2026-10-03 export).
+      {
+        source: '/blog/is-deliberate-practice-necessary-for-guitar',
+        destination: '/blog/guitar-practice-routine-builder',
+        permanent: true,
+      },
+      {
+        source: '/blog/guitar-practice-stagnation-solutions',
+        destination: '/intermediate-guitar-practice-routine',
+        permanent: true,
+      },
       // The AI coach itself sits behind login; the public planner page is the
       // closest thing a searcher can open and use.
       {
