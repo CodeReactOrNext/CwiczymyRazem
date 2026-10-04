@@ -5,6 +5,7 @@ import {
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
 import type { TraderPartOffer } from "feature/arsenal/types/trader.types";
+import { useHoldRepeat } from "hooks/useHoldRepeat";
 import type { LucideIcon } from "lucide-react";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
@@ -23,25 +24,29 @@ interface PartOfferCardProps {
   isBuying: boolean;
 }
 
+/** Held down, it keeps stepping — and faster — until let go or out of room. */
 const PickerButton = ({
   icon: Icon,
   label,
   disabled,
-  onClick,
+  onStep,
 }: {
   icon: LucideIcon;
   label: string;
   disabled: boolean;
-  onClick: () => void;
-}) => (
-  <button
-    onClick={onClick}
-    disabled={disabled}
-    aria-label={label}
-    className='flex h-8 w-9 shrink-0 items-center justify-center rounded-md text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white'>
-    <Icon size={13} strokeWidth={3} />
-  </button>
-);
+  onStep: () => void;
+}) => {
+  const hold = useHoldRepeat(onStep, disabled);
+  return (
+    <button
+      {...hold}
+      disabled={disabled}
+      aria-label={label}
+      className='flex h-8 w-9 shrink-0 touch-manipulation select-none items-center justify-center rounded-md text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white'>
+      <Icon size={13} strokeWidth={3} />
+    </button>
+  );
+};
 
 /**
  * One part on the counter. Parts sell by the piece, so the card is a quantity
@@ -61,10 +66,15 @@ export const PartOfferCard = ({
   isBuying,
 }: PartOfferCardProps) => {
   const [picked, setQty] = useState(1);
+  // What is in the field while the player is typing into it — only ever
+  // differs from `qty` while they have cleared it to type a new number.
+  const [draft, setDraft] = useState<string | null>(null);
   // Clamped on the way out rather than stored clamped: a restock, or a purchase
   // that emptied the slot, must never leave the picker on a quantity that can no
   // longer be bought.
-  const qty = Math.min(Math.max(1, picked), Math.max(1, remaining));
+  const clamp = (n: number) => Math.min(Math.max(1, n), Math.max(1, remaining));
+  const qty = clamp(picked);
+  const step = (delta: number) => setQty((p) => clamp(clamp(p) + delta));
 
   const affordable = Math.floor(currentFame / offer.unitPrice);
   const total = offer.unitPrice * qty;
@@ -123,16 +133,42 @@ export const PartOfferCard = ({
                   icon={Minus}
                   label='One fewer'
                   disabled={qty <= 1}
-                  onClick={() => setQty(Math.max(1, qty - 1))}
+                  onStep={() => step(-1)}
                 />
-                <span className='w-8 text-center text-sm font-black tabular-nums text-white'>
-                  {qty}
-                </span>
+                {/* Typed straight in, for when the player already knows the
+                    number — over the stock just lands on the stock. */}
+                <input
+                  type='text'
+                  inputMode='numeric'
+                  aria-label='Quantity'
+                  value={draft ?? String(qty)}
+                  onFocus={(e) => e.currentTarget.select()}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D/g, "");
+                    if (!digits) {
+                      setDraft("");
+                      return;
+                    }
+                    const next = clamp(Number(digits));
+                    setQty(next);
+                    setDraft(String(next));
+                  }}
+                  onBlur={() => setDraft(null)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") e.currentTarget.blur();
+                    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                      e.preventDefault();
+                      setDraft(null);
+                      step(e.key === "ArrowUp" ? 1 : -1);
+                    }
+                  }}
+                  className='h-8 w-9 rounded-md bg-transparent text-center text-sm font-black tabular-nums text-white transition-colors focus:bg-zinc-100/10 focus:outline-none'
+                />
                 <PickerButton
                   icon={Plus}
                   label='One more'
                   disabled={qty >= remaining}
-                  onClick={() => setQty(Math.min(remaining, qty + 1))}
+                  onStep={() => step(1)}
                 />
               </span>
             )}
