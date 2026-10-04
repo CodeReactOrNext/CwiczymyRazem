@@ -73,12 +73,7 @@ import {
 } from "../../utils/pedalboardLayout";
 import { grabOffsetY, hasLeftTheTap } from "../../utils/pedalDrag";
 import type { RowSpan } from "../../utils/powerLayout";
-import {
-  dcJackAt,
-  RAIL_H,
-  railFor,
-  railPaddingPct,
-} from "../../utils/powerLayout";
+import { dcJackAt, RAIL_H, railFor } from "../../utils/powerLayout";
 import { CardAction, CardActionRow } from "../CardActions";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { RARITY_STYLES } from "../RarityBadge";
@@ -86,6 +81,7 @@ import { BoardStatusStrip } from "./BoardStatusStrip";
 import { duplicateGlow, DuplicateMark } from "./DuplicateMark";
 import { DuplicateStrip } from "./DuplicateStrip";
 import { EffectPickerModal } from "./EffectPickerModal";
+import { PedalboardCase } from "./PedalboardCase";
 import type { PoweredPedal } from "./PowerLoom";
 import { PedalDcPlug, PowerLoom, PowerRail } from "./PowerLoom";
 import { RigHardwarePanel } from "./RigHardwarePanel";
@@ -1467,358 +1463,248 @@ export const PedalboardView = ({
               }
             : undefined
         }>
-        {/* Case outer shell */}
-        <div
-          className='relative w-full select-none'
-          style={{
-            background:
-              "linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 50%, #222 100%)",
-            borderRadius: 4,
-            padding: "10px 14px 14px",
-            boxShadow:
-              "0 20px 60px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)",
-            border: "2px solid #383838",
-          }}>
-          {/* Top bar: latches + label */}
-          <div className='mb-2.5 flex items-center justify-between px-1'>
-            <div className='flex gap-2'>
-              {[0, 1].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: 32,
-                    height: 11,
-                    background:
-                      "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)",
-                    borderRadius: 4,
-                    boxShadow:
-                      "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
-                  }}
-                />
-              ))}
-            </div>
-            <div className='flex gap-2'>
-              {[0, 1].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: 32,
-                    height: 11,
-                    background:
-                      "linear-gradient(180deg,#aaa 0%,#666 50%,#888 100%)",
-                    borderRadius: 4,
-                    boxShadow:
-                      "0 2px 5px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* The supply, racked on the case above the deck. Its cables carry on
-            into the board below — see `PowerLoom` for the seam. */}
-          <div
-            className='relative w-full'
-            style={{ paddingTop: `${railPaddingPct(geo)}%` }}>
-            <PowerRail
-              rail={rail}
-              used={new Set(patched.map((pedal) => pedal.out))}
-              pending={
-                patch && !patch.armed ? (patchSocket?.index ?? null) : null
-              }
-            />
-            {/* The brick is the grab handle: a cable is dragged out of it and
-              dropped on the pedal it feeds. */}
-            <div
-              onPointerDown={handleBrickPointerDown}
-              title={`${supply.name} — drag a cable onto a pedal to power it`}
-              className='absolute'
-              style={{
-                left: `${(rail.brick.x / geo.viewW) * 100}%`,
-                width: `${(rail.brick.w / geo.viewW) * 100}%`,
-                top: `${(rail.brick.y / RAIL_H) * 100}%`,
-                height: `${(rail.brick.h / RAIL_H) * 100}%`,
-                cursor: patch ? "grabbing" : "grab",
-                touchAction: "none",
-              }}
-            />
-          </div>
-
-          {/* Board surface — perforated */}
-          <div
-            ref={boardRef}
-            className='relative w-full overflow-hidden'
-            style={{
-              aspectRatio: `${geo.w} / ${geo.h}`,
-              borderRadius: 4,
-              backgroundImage:
-                "radial-gradient(circle, #272727 1.4px, transparent 1.4px)",
-              backgroundSize: "9px 9px",
-              backgroundColor: "#141414",
-              // A board wired by the book washes emerald from the inside. It is the
-              // one piece of feedback that needs no reading at all.
-              boxShadow: verdict.flawless
-                ? "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(52,211,153,0.10), inset 0 0 44px rgba(16,185,129,0.11)"
-                : "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.02)",
-              transition: "box-shadow 0.4s ease",
-              cursor: dragging?.active ? "grabbing" : "default",
-            }}>
-            {/* Power first, under everything, the way it is on a real board. The
+        <PedalboardCase
+          geo={geo}
+          flawless={verdict.flawless}
+          deckRef={boardRef}
+          deckCursor={dragging?.active ? "grabbing" : "default"}
+          rail={
+            <>
+              <PowerRail
+                rail={rail}
+                used={new Set(patched.map((pedal) => pedal.out))}
+                pending={
+                  patch && !patch.armed ? (patchSocket?.index ?? null) : null
+                }
+              />
+              {/* The brick is the grab handle: a cable is dragged out of it
+                  and dropped on the pedal it feeds. */}
+              <div
+                onPointerDown={handleBrickPointerDown}
+                title={`${supply.name} — drag a cable onto a pedal to power it`}
+                className='absolute'
+                style={{
+                  left: `${(rail.brick.x / geo.viewW) * 100}%`,
+                  width: `${(rail.brick.w / geo.viewW) * 100}%`,
+                  top: `${(rail.brick.y / RAIL_H) * 100}%`,
+                  height: `${(rail.brick.h / RAIL_H) * 100}%`,
+                  cursor: patch ? "grabbing" : "grab",
+                  touchAction: "none",
+                }}
+              />
+            </>
+          }>
+          {/* Power first, under everything, the way it is on a real board. The
               cable in the air picks up where the rail's stub left off, at the
               deck's own top edge. */}
-            <PowerLoom
-              rail={rail}
-              patched={patched}
-              rowSpans={rowSpans}
-              dragging={
-                patch && !patch.armed && patchSocket
-                  ? {
-                      from: { x: patchSocket.x, y: 0 },
-                      to: patch.to,
-                      allowed: patchAllowed,
-                    }
-                  : null
-              }
-            />
+          <PowerLoom
+            rail={rail}
+            patched={patched}
+            rowSpans={rowSpans}
+            dragging={
+              patch && !patch.armed && patchSocket
+                ? {
+                    from: { x: patchSocket.x, y: 0 },
+                    to: patch.to,
+                    allowed: patchAllowed,
+                  }
+                : null
+            }
+          />
 
-            {/* An armed brick waits for one tap anywhere: on a pedal it patches
+          {/* An armed brick waits for one tap anywhere: on a pedal it patches
               it, anywhere else it puts the cable away. Touch has no hover to
               drag with, and this is what it gets instead. */}
-            {patch?.armed && (
-              <div
-                onPointerDown={handleArmedTap}
-                className='absolute inset-0 z-[60]'
-                style={{ touchAction: "none" }}
-              />
-            )}
-
-            <SignalCable
-              geo={geo}
-              verdict={verdict}
-              widthOf={widthOf}
-              jacksOf={jacksOf}
-              isOnBoard={isOnBoard}
+          {patch?.armed && (
+            <div
+              onPointerDown={handleArmedTap}
+              className='absolute inset-0 z-[60]'
+              style={{ touchAction: "none" }}
             />
+          )}
 
-            {/* Pedals */}
-            {boardItems.map((placement) => {
-              const invItem = data.effectInventory.find(
-                (e) => e.id === placement.itemId,
-              );
-              const effect = invItem
-                ? EFFECTS_BY_ID.get(invItem.effectId)
-                : null;
-              const rs = effect
-                ? RARITY_STYLES[
-                    getEffectiveRarity(effect.rarity, invItem?.buildLevel)
-                  ]
-                : null;
-              if (!effect || !rs) return null;
-              // Only once the press has become a carry: a tap that opens a card
-              // should not make the pedal jump off the deck and back again.
-              const isDragging =
-                dragging?.active === true &&
-                dragging.itemId === placement.itemId;
-              const showCollision = isDragging && isColliding;
-              const wPct = widthOf(placement.itemId);
-              const powered = hasPower(placement.itemId);
-              // Every copy of a pedal that stands here more than once wears a
-              // mark — the count on the one that keeps its levels, the share on
-              // the ones that lose them — so the player can see which copy to
-              // swap out without opening a card. See `DuplicateMark`.
-              const copy = boardLevel.copies.get(placement.itemId);
-              const dupModel = copy && copy.total > 1 ? copy.model : null;
-              const dupActive =
-                dupModel !== null && hoverDuplicate === dupModel;
-              const dupGlow = duplicateGlow(copy, dupActive);
-              // The pedal the loose end of a cable is currently over. Amber when
-              // the brick can carry it, red when the drop would be refused — so
-              // the answer arrives before the cable is let go, not after.
-              const aimedAt = patchTarget?.itemId === placement.itemId;
+          <SignalCable
+            geo={geo}
+            verdict={verdict}
+            widthOf={widthOf}
+            jacksOf={jacksOf}
+            isOnBoard={isOnBoard}
+          />
 
-              return (
-                <div
-                  key={placement.itemId}
-                  onPointerDown={(e) => handlePedalPointerDown(e, placement)}
-                  onMouseEnter={() => setHoverDuplicate(dupModel)}
-                  onMouseMove={(e) => {
-                    if (!dragging && invItem)
-                      onHover?.(e, <EffectCard item={invItem} readOnly />);
+          {/* Pedals */}
+          {boardItems.map((placement) => {
+            const invItem = data.effectInventory.find(
+              (e) => e.id === placement.itemId,
+            );
+            const effect = invItem ? EFFECTS_BY_ID.get(invItem.effectId) : null;
+            const rs = effect
+              ? RARITY_STYLES[
+                  getEffectiveRarity(effect.rarity, invItem?.buildLevel)
+                ]
+              : null;
+            if (!effect || !rs) return null;
+            // Only once the press has become a carry: a tap that opens a card
+            // should not make the pedal jump off the deck and back again.
+            const isDragging =
+              dragging?.active === true && dragging.itemId === placement.itemId;
+            const showCollision = isDragging && isColliding;
+            const wPct = widthOf(placement.itemId);
+            const powered = hasPower(placement.itemId);
+            // Every copy of a pedal that stands here more than once wears a
+            // mark — the count on the one that keeps its levels, the share on
+            // the ones that lose them — so the player can see which copy to
+            // swap out without opening a card. See `DuplicateMark`.
+            const copy = boardLevel.copies.get(placement.itemId);
+            const dupModel = copy && copy.total > 1 ? copy.model : null;
+            const dupActive = dupModel !== null && hoverDuplicate === dupModel;
+            const dupGlow = duplicateGlow(copy, dupActive);
+            // The pedal the loose end of a cable is currently over. Amber when
+            // the brick can carry it, red when the drop would be refused — so
+            // the answer arrives before the cable is let go, not after.
+            const aimedAt = patchTarget?.itemId === placement.itemId;
+
+            return (
+              <div
+                key={placement.itemId}
+                onPointerDown={(e) => handlePedalPointerDown(e, placement)}
+                onMouseEnter={() => setHoverDuplicate(dupModel)}
+                onMouseMove={(e) => {
+                  if (!dragging && invItem)
+                    onHover?.(e, <EffectCard item={invItem} readOnly />);
+                }}
+                onMouseLeave={() => {
+                  setHoverDuplicate(null);
+                  onHover?.(null, null);
+                }}
+                className='group absolute'
+                style={{
+                  left: `${placement.xPct}%`,
+                  top: `${placement.yPct}%`,
+                  width: `${wPct}%`,
+                  height: `${heightPctFor(geo, widthOf, placement.itemId)}%`,
+                  zIndex: isDragging ? 50 : 2,
+                  cursor: isDragging ? "grabbing" : "grab",
+                  // The pointer drives the drag, so the browser must not take
+                  // the gesture for a scroll — or for a long-press on artwork,
+                  // which is what a phone would otherwise offer to save.
+                  touchAction: "none",
+                  WebkitTouchCallout: "none",
+                  filter: showCollision
+                    ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 16px rgba(220,38,38,0.9))`
+                    : isDragging
+                      ? `drop-shadow(0 18px 32px rgba(0,0,0,0.98)) drop-shadow(0 0 14px ${rs.baseColor}70)`
+                      : aimedAt
+                        ? `drop-shadow(0 0 14px ${
+                            patchAllowed
+                              ? "rgba(245,158,11,0.85)"
+                              : "rgba(248,113,113,0.85)"
+                          })`
+                        : // An unpowered pedal is off. Not dimmed to say "you
+                          // cannot have this" — dimmed because there is no
+                          // current in it. A powered one may still be lit as
+                          // one of several copies of the same pedal.
+                          powered
+                          ? (dupGlow ?? "none")
+                          : "grayscale(0.7) brightness(0.55)",
+                  transform: isDragging
+                    ? "scale(1.07) translateY(-6px)"
+                    : "scale(1)",
+                  // A pedal being traded with slides into its new place, so the
+                  // exchange is something the player watches happen rather than
+                  // a jump they have to work out afterwards.
+                  transition: isDragging
+                    ? "none"
+                    : "left 0.18s ease, top 0.18s ease, filter 0.15s, transform 0.15s",
+                }}>
+                <img
+                  src={getEffectImageSrc(effect.imageId, "full")}
+                  alt={effect.name}
+                  className='h-full w-full object-contain'
+                  draggable={false}
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    if (!img.naturalWidth || !img.naturalHeight) return;
+                    const ar = img.naturalWidth / img.naturalHeight;
+                    const known =
+                      EFFECT_IMAGE_ASPECT[effect.imageId] ?? DEFAULT_ASPECT;
+                    // Only worth remembering when the image is not what the
+                    // layout table already assumes.
+                    if (Math.abs(known - ar) < 0.005) return;
+                    setAspectById((prev) =>
+                      prev[effect.imageId] === ar
+                        ? prev
+                        : { ...prev, [effect.imageId]: ar },
+                    );
                   }}
-                  onMouseLeave={() => {
-                    setHoverDuplicate(null);
-                    onHover?.(null, null);
-                  }}
-                  className='group absolute'
-                  style={{
-                    left: `${placement.xPct}%`,
-                    top: `${placement.yPct}%`,
-                    width: `${wPct}%`,
-                    height: `${heightPctFor(geo, widthOf, placement.itemId)}%`,
-                    zIndex: isDragging ? 50 : 2,
-                    cursor: isDragging ? "grabbing" : "grab",
-                    // The pointer drives the drag, so the browser must not take
-                    // the gesture for a scroll — or for a long-press on artwork,
-                    // which is what a phone would otherwise offer to save.
-                    touchAction: "none",
-                    WebkitTouchCallout: "none",
-                    filter: showCollision
-                      ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 16px rgba(220,38,38,0.9))`
-                      : isDragging
-                        ? `drop-shadow(0 18px 32px rgba(0,0,0,0.98)) drop-shadow(0 0 14px ${rs.baseColor}70)`
-                        : aimedAt
-                          ? `drop-shadow(0 0 14px ${
-                              patchAllowed
-                                ? "rgba(245,158,11,0.85)"
-                                : "rgba(248,113,113,0.85)"
-                            })`
-                          : // An unpowered pedal is off. Not dimmed to say "you
-                            // cannot have this" — dimmed because there is no
-                            // current in it. A powered one may still be lit as
-                            // one of several copies of the same pedal.
-                            powered
-                            ? (dupGlow ?? "none")
-                            : "grayscale(0.7) brightness(0.55)",
-                    transform: isDragging
-                      ? "scale(1.07) translateY(-6px)"
-                      : "scale(1)",
-                    // A pedal being traded with slides into its new place, so the
-                    // exchange is something the player watches happen rather than
-                    // a jump they have to work out afterwards.
-                    transition: isDragging
-                      ? "none"
-                      : "left 0.18s ease, top 0.18s ease, filter 0.15s, transform 0.15s",
-                  }}>
-                  <img
-                    src={getEffectImageSrc(effect.imageId, "full")}
-                    alt={effect.name}
-                    className='h-full w-full object-contain'
-                    draggable={false}
-                    onLoad={(e) => {
-                      const img = e.currentTarget;
-                      if (!img.naturalWidth || !img.naturalHeight) return;
-                      const ar = img.naturalWidth / img.naturalHeight;
-                      const known =
-                        EFFECT_IMAGE_ASPECT[effect.imageId] ?? DEFAULT_ASPECT;
-                      // Only worth remembering when the image is not what the
-                      // layout table already assumes.
-                      if (Math.abs(known - ar) < 0.005) return;
-                      setAspectById((prev) =>
-                        prev[effect.imageId] === ar
-                          ? prev
-                          : { ...prev, [effect.imageId]: ar },
-                      );
-                    }}
+                />
+                {copy && (
+                  <DuplicateMark
+                    copy={copy}
+                    name={effect.name}
+                    active={dupActive}
                   />
-                  {copy && (
-                    <DuplicateMark
-                      copy={copy}
-                      name={effect.name}
-                      active={dupActive}
-                    />
-                  )}
-                  {/* The plug in its inlet, over the artwork rather than under
+                )}
+                {/* The plug in its inlet, over the artwork rather than under
                     it, so it can sit down in a socket drawn on the top face. */}
-                  {patchedIds.has(placement.itemId) && (
-                    <PedalDcPlug
-                      dc={dcOf(placement.itemId)}
-                      widthUnits={(wPct / 100) * geo.viewW}
-                      heightUnits={
-                        (heightPctFor(geo, widthOf, placement.itemId) / 100) *
-                        geo.viewH
-                      }
-                    />
-                  )}
-                  {/* The two controls a pedal carries live under the cursor and
+                {patchedIds.has(placement.itemId) && (
+                  <PedalDcPlug
+                    dc={dcOf(placement.itemId)}
+                    widthUnits={(wPct / 100) * geo.viewW}
+                    heightUnits={
+                      (heightPctFor(geo, widthOf, placement.itemId) / 100) *
+                      geo.viewH
+                    }
+                  />
+                )}
+                {/* The two controls a pedal carries live under the cursor and
                     nowhere else. A touch screen has no cursor to hide them
                     under, and leaving them out permanently buries the board
                     under its own buttons — so there they move into the card a
                     tap opens. See `sheetFor`. */}
-                  {!isTouch && (
-                    <>
-                      {/* Pull the DC cable out. It stands over the pedal's own
+                {!isTouch && (
+                  <>
+                    {/* Pull the DC cable out. It stands over the pedal's own
                         inlet, so it reads as the plug it removes rather than as
                         another button in the corner — and it is a whole control
                         wide, which the drawn plug never could be. */}
-                      {powered && (
-                        <button
-                          onMouseDown={(e) => e.stopPropagation()}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            unplug(placement.itemId);
-                          }}
-                          aria-label={`Unplug ${effect.name}`}
-                          title={`Unplug ${effect.name}`}
-                          className='absolute z-10 flex h-[30px] w-[30px] -translate-x-1/2 items-center justify-center rounded-full bg-black/85 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-amber-300'
-                          style={{
-                            left: `${dcOf(placement.itemId).x * 100}%`,
-                            // Straddling the edge rather than floating clear of
-                            // it: a narrow board leaves only a few pixels of
-                            // margin above the top row, and the deck clips
-                            // whatever spills out.
-                            top: -11,
-                          }}>
-                          <Unplug size={15} strokeWidth={2.5} />
-                        </button>
-                      )}
-                      {/* Take it off the board */}
+                    {powered && (
                       <button
                         onMouseDown={(e) => e.stopPropagation()}
                         onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => handleRemove(placement.itemId, e)}
-                        aria-label={`Take ${effect.name} off the board`}
-                        className='absolute -right-1.5 -top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded border border-zinc-500 bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:border-zinc-300 hover:text-white'>
-                        <X size={8} />
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          unplug(placement.itemId);
+                        }}
+                        aria-label={`Unplug ${effect.name}`}
+                        title={`Unplug ${effect.name}`}
+                        className='absolute z-10 flex h-[30px] w-[30px] -translate-x-1/2 items-center justify-center rounded-full bg-black/85 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-amber-300'
+                        style={{
+                          left: `${dcOf(placement.itemId).x * 100}%`,
+                          // Straddling the edge rather than floating clear of
+                          // it: a narrow board leaves only a few pixels of
+                          // margin above the top row, and the deck clips
+                          // whatever spills out.
+                          top: -11,
+                        }}>
+                        <Unplug size={15} strokeWidth={2.5} />
                       </button>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Bottom: handles + rubber feet */}
-          <div className='mt-2.5 flex items-center justify-between px-3'>
-            <div
-              style={{
-                width: 52,
-                height: 9,
-                background: "linear-gradient(180deg,#555,#2a2a2a)",
-                borderRadius: 4,
-                boxShadow:
-                  "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)",
-              }}
-            />
-            <div className='flex gap-6'>
-              {[0, 1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: 11,
-                    height: 11,
-                    borderRadius: 4,
-                    background:
-                      "radial-gradient(circle at 35% 35%,#3a3a3a,#0a0a0a)",
-                    boxShadow:
-                      "0 3px 5px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05)",
-                  }}
-                />
-              ))}
-            </div>
-            <div
-              style={{
-                width: 52,
-                height: 9,
-                background: "linear-gradient(180deg,#555,#2a2a2a)",
-                borderRadius: 4,
-                boxShadow:
-                  "0 3px 6px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)",
-              }}
-            />
-          </div>
-        </div>
+                    )}
+                    {/* Take it off the board */}
+                    <button
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => handleRemove(placement.itemId, e)}
+                      aria-label={`Take ${effect.name} off the board`}
+                      className='absolute -right-1.5 -top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded border border-zinc-500 bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:border-zinc-300 hover:text-white'>
+                      <X size={8} />
+                    </button>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </PedalboardCase>
       </div>
 
       {/* The zoom keys, floating over the case rather than riding in the

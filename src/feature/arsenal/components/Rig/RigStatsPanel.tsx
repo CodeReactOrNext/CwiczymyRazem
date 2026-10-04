@@ -65,17 +65,22 @@ interface HeadlineProps {
   icon?: React.ReactNode;
   /** Cyan for level, amber for Fame — the currency each is quoted in. */
   tone: "level" | "fame";
+  title?: string;
 }
 
-/** One of the two numbers the strip is read for. */
-const Headline = ({
+/**
+ * One of the two numbers the strip is read for. Exported so a visitor reads
+ * the rig level on a profile in the same type the owner reads it here.
+ */
+export const RigHeadline = ({
   caption,
   value,
   decimals = 0,
   icon,
   tone,
+  title,
 }: HeadlineProps) => (
-  <Stat caption={caption} rowClassName='h-9'>
+  <Stat caption={caption} title={title} rowClassName='h-9'>
     {icon}
     <CountUp
       value={value}
@@ -173,7 +178,7 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
 
   return (
     <div className='flex flex-wrap items-end gap-x-7 gap-y-5 rounded-lg bg-zinc-900/40 px-5 py-4 sm:px-6'>
-      <Headline caption='Rig level' value={rigLevel} tone='level' />
+      <RigHeadline caption='Rig level' value={rigLevel} tone='level' />
       <Figure
         label='Duplicates'
         title={describeDuplicateRule()}
@@ -183,7 +188,7 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
 
       <Divider />
 
-      <Headline
+      <RigHeadline
         caption='Fame / hour'
         value={totalRate}
         decimals={1}

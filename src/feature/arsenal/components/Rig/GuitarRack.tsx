@@ -13,7 +13,17 @@ import {
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import type { MotionValue } from "framer-motion";
+import {
+  animate,
+  motion,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+} from "framer-motion";
 import { ArrowLeftRight, CirclePlus, MoreVertical, Trash2 } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 import type { InventoryItem, RigSetup } from "../../types/arsenal.types";
 import { ConditionMeter } from "../ConditionMeter";
@@ -49,11 +59,43 @@ const alphaHex = (v: number) =>
     .toString(16)
     .padStart(2, "0");
 
+/**
+ * Every gradient the lamp paints, for a lamp in `color` driven at `s` (`1` is
+ * a full-rarity bay, `0` is switched off). Plain strings, so the lamp can be
+ * brought up frame by frame without the bay re-rendering.
+ */
+const lampLayers = (color: string, s: number) => {
+  const a = (v: number) => `${color}${alphaHex(v * s)}`;
+  return {
+    spill: [
+      `radial-gradient(24% 9% at 50% 3.5%, ${a(0.38)} 0%, ${a(0.12)} 55%, transparent 100%)`,
+      `radial-gradient(48% 12% at 50% 100%, ${a(0.07)} 0%, transparent 100%)`,
+      `radial-gradient(110% 105% at 50% 6%, ${a(0.15)} 0%, ${a(0.075)} 40%, ${a(0.025)} 70%, transparent 92%)`,
+    ].join(", "),
+    beam: `conic-gradient(from 0deg at 50% -8%, transparent 148deg, ${a(0.09)} 164deg, ${a(0.18)} 180deg, ${a(0.09)} 196deg, transparent 212deg)`,
+    underLedge: `radial-gradient(22% 100% at 50% 0%, ${a(0.6)} 0%, ${a(0.25)} 40%, transparent 100%)`,
+    ledge: [
+      "linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 20%, transparent 40%, transparent 60%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.85) 100%)",
+      `radial-gradient(20% 300% at 50% 100%, ${a(0.4)} 0%, transparent 100%)`,
+      "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.4) 100%)",
+      WALL_FLOOR,
+    ].join(", "),
+    fixture: `linear-gradient(${a(0.55)}, ${a(0.55)}), rgba(255,255,255,${0.5 * s})`,
+    fixtureGlow: `0 0 5px 1px ${a(0.45)}, 0 0 14px 3px ${a(0.28)}`,
+    floor: [
+      "linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 14%, transparent 32%, transparent 68%, rgba(0,0,0,0.45) 86%, rgba(0,0,0,0.85) 100%)",
+      `radial-gradient(46% 220% at 50% 0%, ${a(0.5)} 0%, ${a(0.16)} 55%, transparent 100%)`,
+      "radial-gradient(70% 300% at 50% 0%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 50%, transparent 100%)",
+      WALL_FLOOR,
+    ].join(", "),
+  };
+};
+
 interface LampProps {
   /** `#rrggbb` — the rarity for an occupied bay, white for an empty one. */
   color: string;
-  /** How hard the lamp is driven; `1` is a full-rarity bay. */
-  strength: number;
+  /** How hard the lamp is driven right now; `1` is a full-rarity bay. */
+  level: MotionValue<number>;
 }
 
 /**
@@ -64,28 +106,35 @@ interface LampProps {
  * right around the fixture, light spilling in under the ledge at the top, the
  * ledge itself, and the floor with its pool where the beam lands. All of it is
  * the light, none of it the wall — the wall stays a plain dark gradient
- * underneath.
+ * underneath, and so do the ledge, the floor, the grain and the vignette when
+ * the lamp is off.
  */
-const Lamp = ({ color, strength }: LampProps) => {
-  const a = (v: number) => `${color}${alphaHex(v * strength)}`;
+const Lamp = ({ color, level }: LampProps) => {
+  const spill = useTransform(level, (s) => lampLayers(color, s).spill);
+  const beam = useTransform(level, (s) => lampLayers(color, s).beam);
+  const underLedge = useTransform(
+    level,
+    (s) => lampLayers(color, s).underLedge,
+  );
+  const ledge = useTransform(level, (s) => lampLayers(color, s).ledge);
+  const fixture = useTransform(level, (s) => lampLayers(color, s).fixture);
+  const fixtureGlow = useTransform(
+    level,
+    (s) => lampLayers(color, s).fixtureGlow,
+  );
+  const floor = useTransform(level, (s) => lampLayers(color, s).floor);
   return (
     <>
       {/* Ambient spill + hot spot + floor pool. */}
-      <div
+      <motion.div
         className='pointer-events-none absolute inset-0'
-        style={{
-          background: [
-            `radial-gradient(24% 9% at 50% 3.5%, ${a(0.38)} 0%, ${a(0.12)} 55%, transparent 100%)`,
-            `radial-gradient(48% 12% at 50% 100%, ${a(0.07)} 0%, transparent 100%)`,
-            `radial-gradient(110% 105% at 50% 6%, ${a(0.15)} 0%, ${a(0.075)} 40%, ${a(0.025)} 70%, transparent 92%)`,
-          ].join(", "),
-        }}
+        style={{ background: spill }}
       />
       {/* The beam: a cone from the fixture, masked so it fades on the way down. */}
-      <div
+      <motion.div
         className='pointer-events-none absolute inset-0'
         style={{
-          background: `conic-gradient(from 0deg at 50% -8%, transparent 148deg, ${a(0.09)} 164deg, ${a(0.18)} 180deg, ${a(0.09)} 196deg, transparent 212deg)`,
+          background: beam,
           maskImage:
             "linear-gradient(180deg, #000 0%, #000 30%, rgba(0,0,0,0.5) 65%, transparent 100%)",
           WebkitMaskImage:
@@ -95,34 +144,22 @@ const Lamp = ({ color, strength }: LampProps) => {
       {/* Light spilling in under the ledge: only where the fixture is. A
           tight patch under the lamp that is already gone a third of the way
           across the bay, so the top corners stay as dark as the wall. */}
-      <div
+      <motion.div
         className='pointer-events-none absolute inset-x-0 top-[1.2%] h-[8%]'
-        style={{
-          background: `radial-gradient(22% 100% at 50% 0%, ${a(0.6)} 0%, ${a(0.25)} 40%, transparent 100%)`,
-        }}
+        style={{ background: underLedge }}
       />
       {/* The ledge across the top: the underside of the shelf above the bay,
           a thin dark lip. It only catches light right above the fixture and
           falls to black toward the sides. */}
-      <div
+      <motion.div
         className='pointer-events-none absolute inset-x-0 top-0 h-[1.2%]'
-        style={{
-          background: [
-            "linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 20%, transparent 40%, transparent 60%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.85) 100%)",
-            `radial-gradient(20% 300% at 50% 100%, ${a(0.4)} 0%, transparent 100%)`,
-            "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.4) 100%)",
-            WALL_FLOOR,
-          ].join(", "),
-        }}
+        style={{ background: ledge }}
       />
       {/* The fixture itself: a short strip light under the ledge, its core
           almost white, with the colour in the glow around it. */}
-      <div
+      <motion.div
         className='pointer-events-none absolute left-1/2 top-[0.5%] h-[2px] w-[7%] -translate-x-1/2 rounded-full'
-        style={{
-          background: `linear-gradient(${a(0.55)}, ${a(0.55)}), rgba(255,255,255,${0.5 * strength})`,
-          boxShadow: `0 0 5px 1px ${a(0.45)}, 0 0 14px 3px ${a(0.28)}`,
-        }}
+        style={{ background: fixture, boxShadow: fixtureGlow }}
       />
       {/* The wall darkens just above the floor, so the floor reads as a lit
           surface meeting a dark one rather than as a stripe on the wall. */}
@@ -131,16 +168,9 @@ const Lamp = ({ color, strength }: LampProps) => {
           it and falling into shadow toward both sides — the lit patch is an
           ellipse, the lightening of the surface fades out sideways with it,
           and the outer quarter on each side is pulled down to black. */}
-      <div
+      <motion.div
         className='pointer-events-none absolute inset-x-0 bottom-0 h-[2%]'
-        style={{
-          background: [
-            "linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 14%, transparent 32%, transparent 68%, rgba(0,0,0,0.45) 86%, rgba(0,0,0,0.85) 100%)",
-            `radial-gradient(46% 220% at 50% 0%, ${a(0.5)} 0%, ${a(0.16)} 55%, transparent 100%)`,
-            "radial-gradient(70% 300% at 50% 0%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 50%, transparent 100%)",
-            WALL_FLOOR,
-          ].join(", "),
-        }}
+        style={{ background: floor }}
       />
       {/* The grain, over wall and floor alike, on top of the light so the beam
           picks it out. */}
@@ -163,17 +193,77 @@ const Lamp = ({ color, strength }: LampProps) => {
   );
 };
 
+/**
+ * How a lamp comes up: off, a stutter, on — the way a stage spot catches.
+ * Fractions of the lamp's full strength, at `SWITCH_ON_TIMES` of `SWITCH_ON_S`.
+ */
+const SWITCH_ON = [0, 0.7, 0.12, 0.9, 0.35, 1];
+const SWITCH_ON_TIMES = [0, 0.1, 0.18, 0.34, 0.46, 1];
+const SWITCH_ON_S = 1.1;
+
+/** How far apart the three bays come on, left to right. */
+const BAY_STAGGER_S = 0.35;
+
+/** A bay's lamp on a wall that switches its lamps on: whether the moment has
+    come yet, and how long after it this bay's turn is. */
+interface LampPower {
+  on: boolean;
+  delay: number;
+}
+
+/**
+ * Where a bay's lamp is, `0` (off) to `strength`.
+ *
+ * Without `power` the lamp simply burns at `strength`, the way the owner's own
+ * wall does. With it the lamp waits dark until `power.on`, then comes up once
+ * through `SWITCH_ON` — unless the player asked for less motion, in which case
+ * it is just on.
+ */
+const useLampLevel = (strength: number, power?: LampPower) => {
+  const reduceMotion = useReducedMotion();
+  const switches = power !== undefined;
+  const on = power?.on ?? true;
+  const delay = power?.delay ?? 0;
+  const level = useMotionValue(switches ? 0 : strength);
+
+  useEffect(() => {
+    // Burning steadily, or still waiting for its turn in the dark.
+    if (!switches || reduceMotion || !on) {
+      level.set(switches && !reduceMotion ? 0 : strength);
+      return undefined;
+    }
+    const controls = animate(
+      level,
+      SWITCH_ON.map((k) => k * strength),
+      { duration: SWITCH_ON_S, times: SWITCH_ON_TIMES, delay, ease: "linear" },
+    );
+    return () => controls.stop();
+  }, [level, strength, switches, on, delay, reduceMotion]);
+
+  return level;
+};
+
 interface GuitarRackProps {
   slots: RigSetup["guitarSlots"];
   inventory: InventoryItem[];
-  onOpenPicker: (slotIndex: number) => void;
-  onRemove: (slotIndex: number) => void;
+  /**
+   * Leave both out for someone else's wall (their profile): no buttons and no
+   * condition — just what hangs there, under its lamp, with its level.
+   */
+  onOpenPicker?: (slotIndex: number) => void;
+  onRemove?: (slotIndex: number) => void;
   onHover?: (
     e: React.MouseEvent | null,
     content: React.ReactNode | null,
   ) => void;
-  /** Touch-only: tapping a bay opens its card in a modal. */
+  /** Clicking/tapping a bay opens its card in a modal. */
   onShowCard?: (content: React.ReactNode) => void;
+  /**
+   * The lamps wait dark and come on, I → II → III, the first time each bay is
+   * scrolled into view — a showing for a visitor. Off on the owner's own wall,
+   * which they open far too often to sit through it.
+   */
+  switchOn?: boolean;
 }
 
 /**
@@ -241,51 +331,85 @@ const Hook = ({ lit }: { lit: boolean }) => {
 interface BayProps {
   index: number;
   item: InventoryItem | null;
-  onOpenPicker: (slotIndex: number) => void;
+  /** Absent on a read-only wall, where an empty bay is just a bare hook. */
+  onOpenPicker?: (slotIndex: number) => void;
   onHover?: GuitarRackProps["onHover"];
   onShowCard?: GuitarRackProps["onShowCard"];
+  /** See `GuitarRackProps.switchOn`. */
+  switchOn?: boolean;
 }
+
+/** A dim lamp: white, only enough to find an empty bay's hook by. */
+const EMPTY_LAMP = 0.22;
 
 /**
  * One bay of the rack: a hook under a lamp, and whatever hangs on it.
  *
  * An occupied bay is lit in the guitar's rarity, with its level emblem in
- * one corner. An empty one keeps a dim lamp and one button to fill it.
+ * one corner. An empty one keeps a dim lamp and, on the owner's own wall, one
+ * button to fill it.
  */
-const Bay = ({ index, item, onOpenPicker, onHover, onShowCard }: BayProps) => {
+const Bay = ({
+  index,
+  item,
+  onOpenPicker,
+  onHover,
+  onShowCard,
+  switchOn = false,
+}: BayProps) => {
   const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
+  const hung = Boolean(item && guitar);
+  // Each bay watches for itself: on a phone they are stacked, and a lamp that
+  // came on a screen below would be over before anybody saw it.
+  const bayRef = useRef<HTMLDivElement>(null);
+  const seen = useInView(bayRef, { once: true, amount: 0.5 });
+  const light = useLampLevel(
+    hung ? 1 : EMPTY_LAMP,
+    switchOn ? { on: seen, delay: index * BAY_STAGGER_S } : undefined,
+  );
+  // The guitar and its emblem are only seen by the lamp's light: dark before
+  // it comes on, stuttering with it while it does. At full light the filter
+  // is exactly the drop shadow the guitar has always worn.
+  const guitarFilter = useTransform(
+    light,
+    (s) =>
+      `${s < 1 ? `brightness(${0.12 + 0.88 * s}) ` : ""}drop-shadow(0 18px 22px rgba(0,0,0,0.85))`,
+  );
+  const emblemOpacity = useTransform(light, [0, 1], [0, 1]);
 
   if (!item || !guitar) {
     return (
       <div
+        ref={bayRef}
         className={cn(
           "relative flex h-[26rem] flex-col items-center overflow-hidden md:row-start-1 md:h-[36rem]",
           BAY_COLUMN[index],
         )}
         style={{ background: WALL }}>
-        {/* A dim lamp: white, only enough to find the hook by. */}
-        <Lamp color='#ffffff' strength={0.22} />
+        <Lamp color='#ffffff' level={light} />
         <Hook lit={false} />
         {/* The one way to fill the bay, where the guitar's body would hang. */}
-        <div
-          className={cn(
-            "absolute inset-x-0 flex items-start justify-center",
-            GUITAR_TOP,
-            GUITAR_BOTTOM,
-          )}>
-          <button
-            type='button'
-            onClick={() => onOpenPicker(index)}
-            aria-label={`Fit a guitar in slot ${index + 1}`}
-            className='group absolute inset-0 flex flex-col items-center justify-end gap-3 pb-[18%] focus-visible:outline-none'>
-            <span className='flex h-12 w-12 items-center justify-center rounded-full text-zinc-300 transition-colors group-hover:bg-zinc-100/10 group-hover:text-white group-focus-visible:ring-1 group-focus-visible:ring-ring'>
-              <CirclePlus size={44} strokeWidth={1.1} />
-            </span>
-            <span className='text-base font-medium text-zinc-300 transition-colors group-hover:text-white'>
-              Equip guitar
-            </span>
-          </button>
-        </div>
+        {onOpenPicker && (
+          <div
+            className={cn(
+              "absolute inset-x-0 flex items-start justify-center",
+              GUITAR_TOP,
+              GUITAR_BOTTOM,
+            )}>
+            <button
+              type='button'
+              onClick={() => onOpenPicker(index)}
+              aria-label={`Fit a guitar in slot ${index + 1}`}
+              className='group absolute inset-0 flex flex-col items-center justify-end gap-3 pb-[18%] focus-visible:outline-none'>
+              <span className='flex h-12 w-12 items-center justify-center rounded-full text-zinc-300 transition-colors group-hover:bg-zinc-100/10 group-hover:text-white group-focus-visible:ring-1 group-focus-visible:ring-ring'>
+                <CirclePlus size={44} strokeWidth={1.1} />
+              </span>
+              <span className='text-base font-medium text-zinc-300 transition-colors group-hover:text-white'>
+                Equip guitar
+              </span>
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -298,8 +422,10 @@ const Bay = ({ index, item, onOpenPicker, onHover, onShowCard }: BayProps) => {
 
   return (
     <div
+      ref={bayRef}
       className={cn(
-        "group relative flex h-[26rem] cursor-default flex-col items-center overflow-hidden md:row-start-1 md:h-[36rem]",
+        "group relative flex h-[26rem] flex-col items-center overflow-hidden md:row-start-1 md:h-[36rem]",
+        onShowCard ? "cursor-pointer" : "cursor-default",
         BAY_COLUMN[index],
       )}
       style={{ background: WALL }}
@@ -309,18 +435,21 @@ const Bay = ({ index, item, onOpenPicker, onHover, onShowCard }: BayProps) => {
       {/* The lamp: the rarity's colour poured down the back wall. Custom Shop
           gets its own ice-cyan light like any other rarity here — the bench's
           animated holo foil is a card treatment, not a wall one. */}
-      <Lamp color={rs.baseColor} strength={1} />
+      <Lamp color={rs.baseColor} level={light} />
 
       <Hook lit />
 
       {/* The level, in the same rarity-ringed emblem the card wears. */}
-      <LevelEmblem
-        level={level}
-        rarity={rarity}
-        size={40}
-        title='Guitar level'
+      <motion.div
         className='absolute right-5 top-[4rem] z-20'
-      />
+        style={{ opacity: emblemOpacity }}>
+        <LevelEmblem
+          level={level}
+          rarity={rarity}
+          size={40}
+          title='Guitar level'
+        />
+      </motion.div>
 
       {/* The instrument, hung from the hanger: the box starts just under the
           wall plate, so the headstock tip slips behind it and the neck lands
@@ -343,10 +472,11 @@ const Bay = ({ index, item, onOpenPicker, onHover, onShowCard }: BayProps) => {
               "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 55%, rgba(0,0,0,0.5) 100%)",
           }}
         />
-        <img
+        <motion.img
           src={getRankBadgeSrc(guitar.imageId, "large")}
           alt={guitar.name}
-          className='relative z-10 aspect-square h-full max-w-none -rotate-90 object-contain drop-shadow-[0_18px_22px_rgba(0,0,0,0.85)]'
+          className='relative z-10 aspect-square h-full max-w-none -rotate-90 object-contain'
+          style={{ filter: guitarFilter }}
           draggable={false}
         />
       </div>
@@ -464,6 +594,27 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
 };
 
 /**
+ * The label under a bay on someone else's wall: only what hangs there. The
+ * level is already on the bay, and condition is the owner's business.
+ */
+const ShowcasePlate = ({ index, item }: Pick<PlateProps, "index" | "item">) => {
+  const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
+
+  // Nothing to label: the bare hook above already says the bay is empty. The
+  // plate's own background still fills the row beside its neighbours.
+  if (!item || !guitar) return null;
+
+  return (
+    <div className={cn("min-w-0 px-6 py-5 md:row-start-2", BAY_COLUMN[index])}>
+      <p className='truncate font-display text-xl font-semibold text-zinc-50'>
+        {guitar.name}
+      </p>
+      <p className='mt-0.5 truncate text-sm text-zinc-400'>{guitar.brand}</p>
+    </div>
+  );
+};
+
+/**
  * The three guitar bays of the rig, as one wall.
  *
  * Bays across the top, their plates in a row underneath, on md and up; on a
@@ -480,6 +631,7 @@ export const GuitarRack = ({
   onRemove,
   onHover,
   onShowCard,
+  switchOn = false,
 }: GuitarRackProps) => {
   const itemOf = (id: string | null) =>
     id ? (inventory.find((i) => i.id === id) ?? null) : null;
@@ -499,6 +651,7 @@ export const GuitarRack = ({
               onOpenPicker={onOpenPicker}
               onHover={onHover}
               onShowCard={onShowCard}
+              switchOn={switchOn}
             />,
             <div
               key={`plate-${index}`}
@@ -506,12 +659,16 @@ export const GuitarRack = ({
                 "bg-arsenal-section md:row-start-2",
                 BAY_COLUMN[index],
               )}>
-              <Plate
-                index={index}
-                item={item}
-                onOpenPicker={onOpenPicker}
-                onRemove={onRemove}
-              />
+              {onOpenPicker && onRemove ? (
+                <Plate
+                  index={index}
+                  item={item}
+                  onOpenPicker={onOpenPicker}
+                  onRemove={onRemove}
+                />
+              ) : (
+                <ShowcasePlate index={index} item={item} />
+              )}
             </div>,
           ];
         })}
