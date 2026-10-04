@@ -9,7 +9,7 @@ export const nothingElseMatters: SongGuide = {
   publishedAt: "2026-07-20",
   updatedAt: "2026-07-20",
   seo: {
-    metaTitle: "How Hard Is Nothing Else Matters on Guitar? | Riff Quest",
+    metaTitle: "How to Play Nothing Else Matters on Guitar: Picking Roadmap",
     metaDescription:
       "How hard is Nothing Else Matters on guitar? Which parts are beginner-friendly, where the fingerpicking gets hard, and how long it takes to learn.",
     keywords: [
@@ -22,7 +22,7 @@ export const nothingElseMatters: SongGuide = {
       "metallica easy guitar songs",
     ],
   },
-  h1: "How Hard Is Nothing Else Matters on Guitar? An Honest Breakdown",
+  h1: "How to Play Nothing Else Matters on Guitar: An Honest Breakdown",
   quickAnswer:
     "Easier than its reputation for the first sixteen bars — the real difficulty starts after the second chorus, in the interlude and solo.",
   intro: [

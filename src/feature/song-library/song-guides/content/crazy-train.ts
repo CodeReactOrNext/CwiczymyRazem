@@ -11,7 +11,7 @@ export const crazyTrain: SongGuide = {
   publishedAt: "2026-08-06",
   updatedAt: "2026-08-06",
   seo: {
-    metaTitle: "Crazy Train Guitar Difficulty: Real Data | Riff Quest",
+    metaTitle: "How to Play Crazy Train on Guitar: Riff Tab & Solo Map",
     metaDescription:
       "How hard is Crazy Train on guitar? The Randy Rhoads riff is beginner-friendly, but the tapping-and-legato solo is a genuine shred exam — real tempo, key, and technique data inside.",
     keywords: [
@@ -24,7 +24,7 @@ export const crazyTrain: SongGuide = {
       "randy rhoads guitar technique",
     ],
   },
-  h1: "Crazy Train on Guitar: How Hard Is It Really?",
+  h1: "How to Play Crazy Train on Guitar: From the Gallop Riff to Rhoads' Solo",
   quickAnswer:
     "The gallop riff is beginner-friendly — the real test is the tapping, legato, and pinch-harmonic solo Randy Rhoads built on top of it.",
   intro: [

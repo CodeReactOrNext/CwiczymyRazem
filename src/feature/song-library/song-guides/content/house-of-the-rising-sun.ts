@@ -9,7 +9,7 @@ export const houseOfTheRisingSun: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle: "House of the Rising Sun Guitar: Difficulty & 6/8 Picking",
+    metaTitle: "How to Play House of the Rising Sun on Guitar: 6/8 Picking",
     metaDescription:
       "How hard is House of the Rising Sun on guitar? Community difficulty data, the 6/8 arpeggio pattern Hilton Valentine made famous, the F chord problem and a week-by-week plan.",
     keywords: [
@@ -22,7 +22,7 @@ export const houseOfTheRisingSun: SongGuide = {
       "easy fingerpicking songs",
     ],
   },
-  h1: "House of the Rising Sun on Guitar: The Song That Teaches You to Pick",
+  h1: "How to Play House of the Rising Sun on Guitar: The Song That Teaches You to Pick",
   quickAnswer:
     "It is a beginner song with one real obstacle: six chords you probably know, broken into a rolling 6/8 arpeggio, and an F chord that has to arrive on time.",
   intro: [

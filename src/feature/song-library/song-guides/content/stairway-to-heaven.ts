@@ -9,7 +9,7 @@ export const stairwayToHeaven: SongGuide = {
   publishedAt: "2026-07-20",
   updatedAt: "2026-09-15",
   seo: {
-    metaTitle: "Stairway to Heaven Guitar Difficulty & Roadmap | Riff Quest",
+    metaTitle: "How to Play Stairway to Heaven on Guitar: 5-Stage Roadmap",
     metaDescription:
       "How hard is Stairway to Heaven on guitar? A stage-by-stage difficulty breakdown, from the fingerpicked intro to the famous solo, with honest learning timelines.",
     keywords: [
@@ -23,7 +23,7 @@ export const stairwayToHeaven: SongGuide = {
       "led zeppelin guitar songs",
     ],
   },
-  h1: "Stairway to Heaven on Guitar: Difficulty, Roadmap, and What to Learn First",
+  h1: "How to Play Stairway to Heaven on Guitar: Difficulty, Roadmap, and What to Learn First",
   quickAnswer:
     "No single difficulty score means much here — it's five songs of rising difficulty stitched into one, from a beginner-friendly intro to an advanced solo.",
   intro: [

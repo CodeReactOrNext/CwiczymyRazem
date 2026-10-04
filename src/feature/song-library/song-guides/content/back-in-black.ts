@@ -9,7 +9,7 @@ export const backInBlack: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle: "Back in Black Guitar Difficulty: Riff, Muting & Solo",
+    metaTitle: "How to Play Back in Black on Guitar: The Riff in 4 Moves",
     metaDescription:
       "How hard is Back in Black on guitar? Community difficulty data, why the E-D-A riff is built on silence and muting, the rhythm vs lead guitar jobs, and a plan for Angus Young's solo.",
     keywords: [
@@ -22,7 +22,7 @@ export const backInBlack: SongGuide = {
       "rock rhythm guitar muting",
     ],
   },
-  h1: "Back in Black on Guitar: A Riff Made of Silence",
+  h1: "How to Play Back in Black on Guitar: A Riff Made of Silence",
   quickAnswer:
     "The chords are three open shapes, but the riff lives in the gaps between them; clean stops and muting, not fretting, are what make it hard.",
   intro: [

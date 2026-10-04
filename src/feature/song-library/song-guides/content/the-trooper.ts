@@ -9,7 +9,7 @@ export const theTrooper: SongGuide = {
   publishedAt: "2026-08-14",
   updatedAt: "2026-08-14",
   seo: {
-    metaTitle: "The Trooper Guitar Difficulty & BPM | Riff Quest",
+    metaTitle: "How to Play The Trooper on Guitar: Gallop Riff & Twin Leads",
     metaDescription:
       "How hard is The Trooper on guitar? The gallop is the whole exam: one rhythm, palm muted, at ~160 BPM for four minutes. Real tempo, key and technique data inside.",
     keywords: [
@@ -22,7 +22,7 @@ export const theTrooper: SongGuide = {
       "learn the trooper guitar",
     ],
   },
-  h1: "The Trooper on Guitar: Can You Hold the Gallop?",
+  h1: "How to Play The Trooper on Guitar: Can You Hold the Gallop?",
   quickAnswer:
     "One rhythm figure decides this song: an eighth note plus two 16ths, palm muted, held at roughly 160 BPM for four minutes. Learnable in an afternoon, exhausting for months.",
   intro: [

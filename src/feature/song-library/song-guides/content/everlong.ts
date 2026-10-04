@@ -9,7 +9,7 @@ export const everlong: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle: "Everlong Guitar Difficulty: Drop D & Strumming | Riff Quest",
+    metaTitle: "How to Play Everlong on Guitar: Drop D Shapes & Strumming",
     metaDescription:
       "How hard is Everlong on guitar? Community difficulty data, why drop D and ringing open strings make the chords easy, the 158 BPM strumming stamina, and a tempo ladder to full speed.",
     keywords: [
@@ -22,7 +22,7 @@ export const everlong: SongGuide = {
       "foo fighters guitar songs",
     ],
   },
-  h1: "Everlong on Guitar: Drop D, Open Strings, No Rest",
+  h1: "How to Play Everlong on Guitar: Drop D, Open Strings, No Rest",
   quickAnswer:
     "Drop D makes the chord shapes surprisingly easy; the challenge is strumming them evenly at about 158 BPM for four minutes without letting the open strings turn to noise.",
   intro: [

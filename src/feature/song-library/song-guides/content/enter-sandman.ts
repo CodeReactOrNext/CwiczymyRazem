@@ -9,7 +9,7 @@ export const enterSandman: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle: "Enter Sandman Guitar Difficulty: Riff, Solo & First Metallica",
+    metaTitle: "How to Play Enter Sandman on Guitar: Riff, 3+1 Count & Solo",
     metaDescription:
       "How hard is Enter Sandman on guitar? Community difficulty data, Kirk Hammett's tritone riff and Lars Ulrich's 3+1 bar structure, the wah solo, and where it sits among other Metallica songs.",
     keywords: [
@@ -22,7 +22,7 @@ export const enterSandman: SongGuide = {
       "first metallica song to learn",
     ],
   },
-  h1: "Enter Sandman on Guitar: Is This the Right First Metallica Song?",
+  h1: "How to Play Enter Sandman on Guitar: Is This the Right First Metallica Song?",
   quickAnswer:
     "For most players, yes: the riff is mid-tempo and palm-muted, and only the wah solo pushes it past what a player six months in can manage.",
   intro: [

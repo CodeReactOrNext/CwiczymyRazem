@@ -11,7 +11,7 @@ export const sevenNationArmy: SongGuide = {
   publishedAt: "2026-07-30",
   updatedAt: "2026-07-30",
   seo: {
-    metaTitle: "Seven Nation Army Guitar Difficulty: Real Data | Riff Quest",
+    metaTitle: "How to Play Seven Nation Army on Guitar: Riff Tab & Muting",
     metaDescription:
       "How hard is Seven Nation Army on guitar? The four-note riff is easy to learn, but clean muting, real dynamics, and the wah-driven solo are the actual test.",
     keywords: [
@@ -24,7 +24,7 @@ export const sevenNationArmy: SongGuide = {
       "easy guitar riffs for beginners",
     ],
   },
-  h1: "Seven Nation Army on Guitar: How Hard Is It Really?",
+  h1: "How to Play Seven Nation Army on Guitar: One Riff, Four Sections",
   quickAnswer:
     "The four-note riff takes five minutes to learn — the real challenge is keeping it locked to a beat with no drummer, not the notes themselves.",
   intro: [

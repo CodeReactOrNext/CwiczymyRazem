@@ -11,7 +11,7 @@ export const sweetChildOMine: SongGuide = {
   publishedAt: "2026-07-20",
   updatedAt: "2026-07-20",
   seo: {
-    metaTitle: "Sweet Child O' Mine Guitar Difficulty Guide | Riff Quest",
+    metaTitle: "How to Play Sweet Child O' Mine on Guitar: Intro Riff Tab",
     metaDescription:
       "How hard is Sweet Child O' Mine on guitar? Intro riff anatomy, Slash's solo graded phrase by phrase, the E♭ tuning question, and realistic learning timelines.",
     keywords: [
@@ -24,7 +24,7 @@ export const sweetChildOMine: SongGuide = {
       "slash guitar songs",
     ],
   },
-  h1: "Sweet Child O' Mine on Guitar: From the Intro Riff to the Solo",
+  h1: "How to Play Sweet Child O' Mine on Guitar: From the Intro Riff to the Solo",
   quickAnswer:
     "The famous intro riff is honest intermediate work — the real test starts after the second chorus, in Slash's two solos.",
   intro: [

@@ -11,7 +11,7 @@ export const thunderstruck: SongGuide = {
   publishedAt: "2026-08-01",
   updatedAt: "2026-08-01",
   seo: {
-    metaTitle: "Thunderstruck Guitar Difficulty: Real Data | Riff Quest",
+    metaTitle: "How to Play Thunderstruck on Guitar: Intro Riff Tab",
     metaDescription:
       "How hard is Thunderstruck on guitar? The truth about Angus Young's famous one-string riff (it's picked, not tapped), real tempo data, and an honest learning timeline.",
     keywords: [
@@ -24,7 +24,7 @@ export const thunderstruck: SongGuide = {
       "ac/dc guitar songs",
     ],
   },
-  h1: "Thunderstruck on Guitar: How Hard Is Angus Young's Famous Riff, Really?",
+  h1: "How to Play Thunderstruck on Guitar: Inside Angus Young's Intro Riff",
   quickAnswer:
     "It looks like the hardest thing in rock — it isn't. The whole intro is one four-note pattern moved up one string, and the real challenge is picking-hand speed, not complexity.",
   intro: [

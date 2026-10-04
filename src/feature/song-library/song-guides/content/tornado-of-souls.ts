@@ -9,7 +9,7 @@ export const tornadoOfSouls: SongGuide = {
   publishedAt: "2026-08-14",
   updatedAt: "2026-08-14",
   seo: {
-    metaTitle: "Tornado Of Souls Guitar Difficulty & BPM | Riff Quest",
+    metaTitle: "How to Play Tornado of Souls on Guitar: Solo Tempo Ladder",
     metaDescription:
       "How hard is Tornado Of Souls on guitar? The riffs are a picking exam, the Marty Friedman solo is a different sport. Real tempo, tuning and technique data inside.",
     keywords: [
@@ -22,7 +22,7 @@ export const tornadoOfSouls: SongGuide = {
       "learn tornado of souls guitar",
     ],
   },
-  h1: "Tornado Of Souls: Riff Hard, Solo Harder",
+  h1: "How to Play Tornado of Souls on Guitar: Riff Hard, Solo Harder",
   quickAnswer:
     "The riffs are an alternate-picking exam you can grind down with a metronome; Marty Friedman's solo is not, and the bends, not the speed, are where almost everyone falls short.",
   intro: [

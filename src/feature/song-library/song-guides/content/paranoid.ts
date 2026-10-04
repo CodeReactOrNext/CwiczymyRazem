@@ -9,7 +9,7 @@ export const paranoid: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle: "Paranoid Guitar Difficulty: Riff, Tempo & Stamina | Riff Quest",
+    metaTitle: "How to Play Paranoid on Guitar: Riff & 163 BPM Stamina Plan",
     metaDescription:
       "How hard is Paranoid on guitar? Community difficulty data, why the 163 BPM riff is a stamina test rather than a finger test, a tempo ladder to full speed, and Iommi's ring-modulator solo.",
     keywords: [
@@ -22,7 +22,7 @@ export const paranoid: SongGuide = {
       "fast power chord songs",
     ],
   },
-  h1: "Paranoid on Guitar: A Three-Minute Endurance Test",
+  h1: "How to Play Paranoid on Guitar: A Three-Minute Endurance Test",
   quickAnswer:
     "Every shape in Paranoid is a beginner power chord; holding the riff at about 163 BPM for almost three minutes without tensing up is the real difficulty.",
   intro: [

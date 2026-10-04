@@ -9,8 +9,7 @@ export const underTheBridge: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle:
-      "Under the Bridge Guitar Difficulty: Intro & Chords | Riff Quest",
+    metaTitle: "How to Play Under the Bridge on Guitar: Intro & Chord Fills",
     metaDescription:
       "How hard is Under the Bridge on guitar? Community difficulty data, Frusciante's Hendrix-style chord embellishments, the D and F# intro, the Emaj7 stop, and a realistic learning timeline.",
     keywords: [
@@ -23,7 +22,7 @@ export const underTheBridge: SongGuide = {
       "hendrix style chords",
     ],
   },
-  h1: "Under the Bridge on Guitar: The Intro Is the Whole Exam",
+  h1: "How to Play Under the Bridge on Guitar: The Intro Is the Whole Exam",
   quickAnswer:
     "The verses are ordinary chords, but the intro asks for Hendrix-style embellishments (hammer-ons and melodic fills inside chord shapes), which puts it firmly in intermediate territory.",
   intro: [

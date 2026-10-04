@@ -6,8 +6,10 @@ import type { GuideLiveData, SongGuide } from "../types";
  * These pages sit around position 7–9 for "is {song} hard to play", a SERP
  * owned by Reddit and Ultimate Guitar threads and not winnable from there.
  * They also rank for "{song} bpm / key / tuning / difficulty", where forums
- * are weak and a clean data answer can take the snippet. The composers below
- * retarget the title and description at those lookups.
+ * are weak and a clean data answer can take the snippet. The composer below
+ * retargets the description at those lookups. (A matching title composer was
+ * removed on 2026-10-04: two lookup-title variants moved neither CTR nor
+ * clicks, and titles are now hand-written "How to Play …" lines.)
  *
  * Two rules run through all of it: never emit a segment whose data is missing
  * (fall through to a shorter variant instead of printing "null" or a gap), and
@@ -15,68 +17,8 @@ import type { GuideLiveData, SongGuide } from "../types";
  * single key simply has no key here — so every read is guarded.
  */
 
-/** Google truncates the title around here; measured on the rendered string. */
-const TITLE_MAX = 60;
 /** Description cutoff. Clauses drop from the end until it fits. */
 const DESCRIPTION_MAX = 155;
-
-/**
- * Community rating when the song has one, editorial estimate otherwise — the
- * same precedence `resolveGuideFaq` already uses, so the number in the title
- * matches the number in the FAQ body. Both are real authored/measured values;
- * neither is invented.
- */
-const resolveRating = (
-  guide: SongGuide,
-  liveData: GuideLiveData,
-): string | null => {
-  const live =
-    liveData.song && liveData.song.ratingsCount > 0
-      ? liveData.song.avgDifficulty
-      : null;
-  const rating = live ?? guide.editorial.difficulty;
-  return Number.isFinite(rating) ? rating.toFixed(1) : null;
-};
-
-/**
- * First variant that has all its data *and* fits the budget wins. The last
- * variant needs nothing beyond the song name, so the chain always terminates.
- *
- * The title used to lead with the raw lookup values — "212 BPM, E standard,
- * 8.5/10". Those pages collected impressions and almost no clicks (master of
- * puppets bpm: 472 impressions, 0 clicks in the 2026-09-05 audit), because a
- * number is exactly what Google can answer without the visit. The tempo and
- * tuning still carry the query in the description; the title now leads with
- * what only opening the page gives you — the section-by-section breakdown.
- */
-export const composeGuideTitle = (
-  guide: SongGuide,
-  liveData: GuideLiveData,
-): string => {
-  const { bpm, tuning } = guide.lookup ?? {};
-  const song = guide.title;
-  const rating = resolveRating(guide, liveData);
-
-  const variants = [
-    `${song} Guitar Difficulty: Section Map & Practice Plan`,
-    `${song} Guitar Difficulty: Section Map & Practice`,
-    rating ? `${song} Guitar Difficulty: ${rating}/10, Section Map` : null,
-    rating ? `${song} Guitar Difficulty: ${rating}/10` : null,
-    bpm && tuning && rating
-      ? `${song}: ${bpm} BPM, ${tuning}, ${rating}/10 Difficulty`
-      : null,
-    `${song} on Guitar: Difficulty, BPM & Tuning`,
-  ];
-
-  // The last variant is returned even if it overruns: a too-long title Google
-  // trims still beats no title at all.
-  return (
-    variants.find(
-      (variant): variant is string =>
-        Boolean(variant) && (variant as string).length <= TITLE_MAX,
-    ) ?? (variants[variants.length - 1] as string)
-  );
-};
 
 /**
  * Built clause by clause, then trimmed from the end until it fits — the

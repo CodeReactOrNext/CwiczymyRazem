@@ -9,7 +9,7 @@ export const doIWannaKnow: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle: "Do I Wanna Know? Guitar Difficulty & Riff Feel | Riff Quest",
+    metaTitle: "How to Play Do I Wanna Know? on Guitar: Riff Feel & Slides",
     metaDescription:
       "How hard is Do I Wanna Know? on guitar? Community difficulty data, why the 85 BPM riff is easy to learn and hard to groove, slides and hammer-ons explained, plus a practice plan.",
     keywords: [
@@ -22,7 +22,7 @@ export const doIWannaKnow: SongGuide = {
       "slow guitar riffs",
     ],
   },
-  h1: "Do I Wanna Know? on Guitar: The Slow Riff Everyone Rushes",
+  h1: "How to Play Do I Wanna Know? on Guitar: The Slow Riff Everyone Rushes",
   quickAnswer:
     "The notes take an afternoon; playing them as slowly and heavily as the record, at about 85 BPM, is the actual skill.",
   intro: [

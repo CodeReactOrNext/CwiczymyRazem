@@ -2,16 +2,14 @@ import { getAuthorProfile } from "lib/authors";
 import Head from "next/head";
 
 import type { GuideFaqEntry, GuideLiveData, SongGuide } from "../types";
-import {
-  composeGuideDescription,
-  composeGuideTitle,
-} from "../utils/composeGuideSeo";
+import { composeGuideDescription } from "../utils/composeGuideSeo";
 
 /**
- * Guides whose title/description are generated from `lookup` data instead of
- * the hand-written `seo` block, retargeting them at "{song} bpm / key / tuning"
- * lookups. Staged rather than switched on everywhere at once so the change can
- * be attributed and rolled back; clearing the set moves every guide over.
+ * Guides whose description is generated from `lookup` data instead of the
+ * hand-written `seo` block, so the snippet still answers "{song} bpm / key /
+ * tuning". Titles are always hand-written: the generated lookup titles were
+ * dropped on 2026-10-04 for "How to Play …" titles aimed at learn-to-play
+ * queries (0.66% CTR vs 0.14% for bpm lookups in the 2026-10-03 GSC export).
  */
 const LOOKUP_SEO_SLUGS = new Set([
   "master-of-puppets",
@@ -38,9 +36,7 @@ export const SongGuideSEO = ({
   const authorProfile = getAuthorProfile(guide.author);
 
   const useLookupSeo = LOOKUP_SEO_SLUGS.has(guide.slug);
-  const metaTitle = useLookupSeo
-    ? composeGuideTitle(guide, liveData)
-    : guide.seo.metaTitle;
+  const metaTitle = guide.seo.metaTitle;
   const metaDescription = useLookupSeo
     ? composeGuideDescription(guide, liveData)
     : guide.seo.metaDescription;

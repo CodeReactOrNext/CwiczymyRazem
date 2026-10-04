@@ -9,7 +9,7 @@ export const creep: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle: "Creep Guitar Difficulty: Chords, Barres & Dead Notes",
+    metaTitle: "How to Play Creep on Guitar: 4 Chords, 2 Barres & Mutes",
     metaDescription:
       "How hard is Creep on guitar? Community difficulty data, the G–B–C–Cm progression and its two barre chords, Jonny Greenwood's dead-note blasts before the chorus, and a practice plan.",
     keywords: [
@@ -22,7 +22,7 @@ export const creep: SongGuide = {
       "songs with barre chords for beginners",
     ],
   },
-  h1: "Creep on Guitar: Four Chords, Two Barres, Three Blasts of Noise",
+  h1: "How to Play Creep on Guitar: Four Chords, Two Barres, Three Blasts of Noise",
   quickAnswer:
     "Creep is a four-chord song, but two of those chords are barres (B major and C minor), so it is usually the song where beginners finally have to learn them.",
   intro: [

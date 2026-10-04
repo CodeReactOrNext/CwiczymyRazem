@@ -9,7 +9,7 @@ export const seekAndDestroy: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle: "Seek & Destroy Guitar Difficulty: Riffs & Solo | Riff Quest",
+    metaTitle: "How to Play Seek & Destroy on Guitar: Riffs & Downpicking",
     metaDescription:
       "How hard is Seek & Destroy on guitar? Community difficulty data, the downpicked E riffs at about 140 BPM, Kirk Hammett's admitted bum note, and a path from here to Master of Puppets.",
     keywords: [
@@ -22,7 +22,7 @@ export const seekAndDestroy: SongGuide = {
       "easy thrash metal songs guitar",
     ],
   },
-  h1: "Seek & Destroy on Guitar: The Thrash Song That Doesn't Punish You",
+  h1: "How to Play Seek & Destroy on Guitar: The Thrash Song That Doesn't Punish You",
   quickAnswer:
     "It is the most forgiving early Metallica song: riffs around the open E string at about 140 BPM, downpicked but not at Master of Puppets speed, with a solo that is fast only in places.",
   intro: [

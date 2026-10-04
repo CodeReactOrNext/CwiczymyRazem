@@ -9,7 +9,7 @@ export const smokeOnTheWater: SongGuide = {
   publishedAt: "2026-08-25",
   updatedAt: "2026-08-25",
   seo: {
-    metaTitle: "Smoke on the Water: Guitar Difficulty & Riff | Riff Quest",
+    metaTitle: "How to Play Smoke on the Water on Guitar: The Real Riff",
     metaDescription:
       "How hard is Smoke on the Water on guitar? Community difficulty data, the parallel-fourths riff Blackmore actually plays, and why most beginners learn it wrong.",
     keywords: [
@@ -22,7 +22,7 @@ export const smokeOnTheWater: SongGuide = {
       "easy guitar riffs for beginners",
     ],
   },
-  h1: "Smoke on the Water on Guitar: Easy Riff, Wrong Riff",
+  h1: "How to Play Smoke on the Water on Guitar: Easy Riff, Wrong Riff",
   quickAnswer:
     "The riff is one of the easiest in rock to play, and the single-note version almost everyone learns is not the one on the record.",
   intro: [

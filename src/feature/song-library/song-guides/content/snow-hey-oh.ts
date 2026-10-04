@@ -9,7 +9,7 @@ export const snowHeyOh: SongGuide = {
   publishedAt: "2026-08-14",
   updatedAt: "2026-08-14",
   seo: {
-    metaTitle: "Snow (Hey Oh) Guitar Difficulty & BPM | Riff Quest",
+    metaTitle: "How to Play Snow (Hey Oh) on Guitar: Riff Shapes & Picking",
     metaDescription:
       "How hard is Snow (Hey Oh) on guitar? No fast licks, no stretches, just 16th notes at 105 BPM that never stop. Real tempo, key and technique data inside.",
     keywords: [
@@ -22,7 +22,7 @@ export const snowHeyOh: SongGuide = {
       "learn snow hey oh guitar",
     ],
   },
-  h1: "Snow (Hey Oh): Why an Easy Riff Is So Hard",
+  h1: "How to Play Snow (Hey Oh) on Guitar: Why an Easy Riff Is So Hard",
   quickAnswer:
     "Nothing in this riff is fast or stretchy on its own. The difficulty is that the same 16th-note pattern runs at 105 BPM for five and a half minutes without ever giving your picking hand a bar off.",
   intro: [

@@ -9,7 +9,7 @@ export const hotelCalifornia: SongGuide = {
   publishedAt: "2026-07-20",
   updatedAt: "2026-09-15",
   seo: {
-    metaTitle: "Hotel California Guitar Difficulty: Full Guide | Riff Quest",
+    metaTitle: "How to Play Hotel California on Guitar: Chords, Capo & Solo",
     metaDescription:
       "How hard is Hotel California on guitar? Graded part by part: simplified rhythm, the capo-7 intro, the verse and chorus maps, and that harmonized outro solo.",
     keywords: [
@@ -22,7 +22,7 @@ export const hotelCalifornia: SongGuide = {
       "eagles guitar songs",
     ],
   },
-  h1: "Hotel California on Guitar: Difficulty, Chords, and That Solo",
+  h1: "How to Play Hotel California on Guitar: Difficulty, Chords, and That Solo",
   quickAnswer:
     "It depends which part you mean: a simplified accompaniment is late-beginner work, the recorded-style capo-7 intro is early-intermediate, the full barre-chord rhythm part is intermediate, and the outro solo is advanced.",
   intro: [

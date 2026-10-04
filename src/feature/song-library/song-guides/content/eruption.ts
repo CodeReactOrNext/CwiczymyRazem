@@ -9,7 +9,7 @@ export const eruption: SongGuide = {
   publishedAt: "2026-08-14",
   updatedAt: "2026-08-14",
   seo: {
-    metaTitle: "Eruption Guitar Difficulty: How Hard Is It? | Riff Quest",
+    metaTitle: "How to Play Eruption on Guitar: Tapping, Part by Part",
     metaDescription:
       "How hard is Eruption on guitar? 1:42 of tapping, dive bombs and tremolo picking, recorded a half step down. Real difficulty, tuning and technique data inside.",
     keywords: [
@@ -22,7 +22,7 @@ export const eruption: SongGuide = {
       "two hand tapping song",
     ],
   },
-  h1: "Eruption on Guitar: How Hard Is Van Halen's Solo?",
+  h1: "How to Play Eruption on Guitar: Inside Van Halen's Tapping Solo",
   quickAnswer:
     "The tapping section is the easiest part to learn and the last part to sound right. Everything around it (tremolo picking, dive bombs, and Eddie's loose, unmetered phrasing) is what actually makes this a years-long project.",
   intro: [

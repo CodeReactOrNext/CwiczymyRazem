@@ -11,7 +11,7 @@ export const masterOfPuppets: SongGuide = {
   publishedAt: "2026-07-20",
   updatedAt: "2026-07-20",
   seo: {
-    metaTitle: "Master of Puppets Guitar Difficulty: Real Data | Riff Quest",
+    metaTitle: "How to Play Master of Puppets on Guitar: Riff Tab & 212 BPM",
     metaDescription:
       "How hard is Master of Puppets on guitar? Riff-by-riff difficulty map, the 212 BPM downpicking ladder, and a realistic timeline of 3–6 months to full tempo.",
     keywords: [
@@ -24,7 +24,7 @@ export const masterOfPuppets: SongGuide = {
       "hardest metallica songs guitar",
     ],
   },
-  h1: "Master of Puppets on Guitar: How Hard Is It Really?",
+  h1: "How to Play Master of Puppets on Guitar, and Why It Takes Months",
   quickAnswer:
     "Hard, but not for the reason you'd assume — the problem is eight minutes of downpicking at 212 BPM, not any single lick.",
   intro: [

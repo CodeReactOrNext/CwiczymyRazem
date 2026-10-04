@@ -9,7 +9,7 @@ export const wishYouWereHere: SongGuide = {
   publishedAt: "2026-09-05",
   updatedAt: "2026-09-05",
   seo: {
-    metaTitle: "Wish You Were Here Guitar Difficulty & BPM | Riff Quest",
+    metaTitle: "How to Play Wish You Were Here on Guitar: Riff & Chords",
     metaDescription:
       "How hard is Wish You Were Here on guitar? Around 60 BPM in G major, E standard, no barre chords — the difficulty is the bends and the two-guitar intro.",
     keywords: [
@@ -22,7 +22,7 @@ export const wishYouWereHere: SongGuide = {
       "pink floyd guitar songs",
     ],
   },
-  h1: "Wish You Were Here: Easy to Play, Hard to Play Right",
+  h1: "How to Play Wish You Were Here on Guitar: Easy to Play, Hard to Play Right",
   quickAnswer:
     "Every note in this song is within reach of a player a few months in: open chords, no barres, no capo, around 60 BPM. What separates a version that sounds like the record from one that does not is bend pitch, note length and the fact that the intro is two guitars, not one.",
   intro: [

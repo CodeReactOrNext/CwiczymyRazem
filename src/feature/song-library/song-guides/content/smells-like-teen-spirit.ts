@@ -9,8 +9,7 @@ export const smellsLikeTeenSpirit: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle:
-      "Smells Like Teen Spirit Guitar: Difficulty & Strum | Riff Quest",
+    metaTitle: "How to Play Smells Like Teen Spirit on Guitar: Strum & Mutes",
     metaDescription:
       "How hard is Smells Like Teen Spirit on guitar? Community difficulty data, the syncopated sixteenth-note strum with muted scratches, half-step-down tuning, and the quiet-loud structure.",
     keywords: [
@@ -23,7 +22,7 @@ export const smellsLikeTeenSpirit: SongGuide = {
       "power chord strumming",
     ],
   },
-  h1: "Smells Like Teen Spirit on Guitar: Four Chords and the Scratches Between Them",
+  h1: "How to Play Smells Like Teen Spirit on Guitar: Four Chords and the Scratches Between Them",
   quickAnswer:
     "Four power chords in a fixed pattern are easy; the constant sixteenth-note strum with muted scratches between the chords is what takes weeks.",
   intro: [

@@ -9,7 +9,7 @@ export const comeAsYouAre: SongGuide = {
   publishedAt: "2026-09-24",
   updatedAt: "2026-09-24",
   seo: {
-    metaTitle: "Come As You Are Guitar: Difficulty, Tuning & Tone | Riff Quest",
+    metaTitle: "How to Play Come As You Are on Guitar: Riff & Tuning",
     metaDescription:
       "How hard is Come As You Are on guitar? Community difficulty data, which tuning to use (the record is a whole step down), the watery chorus tone and Cobain's melodic solo.",
     keywords: [
@@ -22,7 +22,7 @@ export const comeAsYouAre: SongGuide = {
       "easy guitar riffs",
     ],
   },
-  h1: "Come As You Are on Guitar: Two Frets, One Tuning Question",
+  h1: "How to Play Come As You Are on Guitar: Two Frets, One Tuning Question",
   quickAnswer:
     "The riff uses two frets and open strings, so it is beginner material; sounding like the record depends on tuning down a whole step and a watery chorus tone.",
   intro: [
