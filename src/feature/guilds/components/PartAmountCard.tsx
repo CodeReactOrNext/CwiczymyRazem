@@ -15,10 +15,11 @@ interface PartAmountCardProps {
   part: ScrapPart;
   /** Which side of the shelf the pieces are crossing. */
   mode: "deposit" | "take";
-  /** Deposit only: honor earned per piece left — leaving more earns more. */
-  honorPerPiece?: number;
-  /** Take only: the flat honor a take costs, however many pieces come with it. */
-  honorCost?: number;
+  /**
+   * The honor `qty` pieces move: what leaving them earns, or what taking them
+   * costs — the flat toll, or the honor handed back for the member's own.
+   */
+  honorFor?: (qty: number) => number;
   /** Take only: the honor the member has to pay with. */
   honorBalance?: number;
   busy?: boolean;
@@ -43,8 +44,7 @@ const minorButtonClass =
 export const PartAmountCard = ({
   part,
   mode,
-  honorPerPiece,
-  honorCost,
+  honorFor,
   honorBalance,
   busy = false,
   onConfirm,
@@ -53,20 +53,8 @@ export const PartAmountCard = ({
   const color = PART_TIER_COLORS[part.tier];
   const verb = mode === "deposit" ? "Leave" : "Take";
 
-  // A deposit earns per piece; a take costs the same flat price whatever the
-  // slider says, because how much of the stack moves is not what is priced.
-  const honor =
-    mode === "take"
-      ? (honorCost ?? null)
-      : honorPerPiece === undefined
-        ? null
-        : honorPerPiece * qty;
-  const honorAll =
-    mode === "take"
-      ? (honorCost ?? null)
-      : honorPerPiece === undefined
-        ? null
-        : honorPerPiece * part.qty;
+  const honor = honorFor ? honorFor(qty) : null;
+  const honorAll = honorFor ? honorFor(part.qty) : null;
   // Only a take is limited by the balance; a deposit only ever adds to it.
   const cannotPay = (amount: number | null) =>
     mode === "take" &&

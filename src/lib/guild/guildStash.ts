@@ -2,18 +2,20 @@ import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import type { GuildMember } from "feature/guilds/types/guild.types";
 import type {
   GuildStash,
+  PartsFromShelf,
   StashDeposit,
   StashEntry,
   StashItemKind,
   StashLogEntry,
   StashTally,
 } from "feature/guilds/types/stash.types";
+import type { StashCredit } from "feature/guilds/utils/guildHonor.utils";
 import {
   honorFor,
   readHonor,
   stashHonorValue,
   TAKE_DAILY_LIMIT,
-  TAKE_HONOR_COST,
+  takePrice,
 } from "feature/guilds/utils/guildHonor.utils";
 import {
   shelfHasRoom,
@@ -71,11 +73,21 @@ import { firestore } from "utils/firebase/api/firebase.config";
  * funnel above closed without a rule about who may take — and `TAKE_DAILY_LIMIT`
  * is the other half of it: honor alone cannot walk out with the whole shelf
  * in one visit, however big the balance behind it.
+ *
+ * A flat toll under a rarity-priced deposit is only safe if each piece earns
+ * once, or one Mythic left and lifted on repeat prints honor forever. So every
+ * entry records who earned what leaving it (`credits`), and taking your own
+ * back hands that honor back instead of paying the toll. And anything taken by
+ * anyone else remembers the shelf it came off — gear and mods on the instance
+ * (`honorEarnedIn`), parts as a per-member count (`partsFromShelf`) — so
+ * leaving it here again earns nothing.
  */
 
 const GUILDS = "guilds";
 const STASH = "stash";
 const LOG = "stashLog";
+/** Guild document field: parts each member took off the shelf and has not put back. */
+const PARTS_FROM_SHELF = "partsFromShelf";
 
 /** Plenty for a shelf a guild reads through; the log is trimmed to a page. */
 const STASH_LIMIT = 200;
@@ -92,6 +104,66 @@ const iso = (value: any): string | null => {
   return date ? date.toISOString() : null;
 };
 
+/**
+ * Who on an entry earned honor for it, and how much.
+ *
+ * Entries left before credits were stored have none written down, but a gear
+ * or mod deposit then always earned its full value for whoever left it, so
+ * that is rebuilt. A part stack from then may have been topped up by several
+ * members with no record of who left how many — it reads as nobody's, and
+ * taking from it is an ordinary take.
+ */
+const creditsOf = (data: Record<string, any>): Record<string, StashCredit> => {
+  if (data.credits && typeof data.credits === "object") {
+    return Object.fromEntries(
+      Object.entries(data.credits as Record<string, any>)
+        .map(([uid, credit]) => [
+          uid,
+          {
+            qty: Math.max(0, Math.floor(Number(credit?.qty) || 0)),
+            honor: Math.max(0, Math.floor(Number(credit?.honor) || 0)),
+          },
+        ])
+        .filter(([, credit]) => (credit as StashCredit).qty > 0),
+    );
+  }
+
+  const kind = (data.kind ?? "guitar") as StashItemKind;
+  if (kind === "part" || !data.depositedByUid) return {};
+  return {
+    [data.depositedByUid]: {
+      qty: 1,
+      honor: stashHonorValue(kind, data.rarity ?? ""),
+    },
+  };
+};
+
+/** Whether this guitar, pedal or mod has already earned honor on this shelf. */
+const earnedHonorIn = (item: Record<string, any>, guildId: string) =>
+  Array.isArray(item.honorEarnedIn) && item.honorEarnedIn.includes(guildId);
+
+const markHonorEarned = <T extends Record<string, any>>(
+  item: T,
+  guildId: string,
+): T =>
+  earnedHonorIn(item, guildId)
+    ? item
+    : { ...item, honorEarnedIn: [...(item.honorEarnedIn ?? []), guildId] };
+
+/** Pieces of one (part, tier) this member took off the shelf and has not put back. */
+const partsFromShelfOf = (
+  guildData: Record<string, any>,
+  uid: string,
+  partId: string,
+  tier: string,
+): number =>
+  Math.max(
+    0,
+    Math.floor(
+      Number(guildData[PARTS_FROM_SHELF]?.[uid]?.[partId]?.[tier]) || 0,
+    ),
+  );
+
 const toEntry = (doc: DocumentSnapshot): StashEntry => {
   const data = doc.data() ?? {};
   return {
@@ -103,6 +175,7 @@ const toEntry = (doc: DocumentSnapshot): StashEntry => {
     depositedByUid: data.depositedByUid ?? "",
     depositedByName: data.depositedByName ?? "",
     depositedAt: iso(data.depositedAt) ?? new Date(0).toISOString(),
+    credits: creditsOf(data),
   } as StashEntry;
 };
 
@@ -181,6 +254,10 @@ export async function readStash(
     log,
     tallies: buildTallies(members, log),
     honor: readHonor(guildData),
+    partsFromShelf: (guildData?.[PARTS_FROM_SHELF] ?? {}) as Record<
+      string,
+      PartsFromShelf
+    >,
   };
 }
 
@@ -289,17 +366,19 @@ export async function depositItem(
 
     // A stack landing on a socket that is already there costs no room, so only
     // a deposit that opens a new socket has to look at how big the shelf is.
+    // The guild is read either way: it also holds what this member has taken
+    // off the shelf, which earns nothing going back on.
     const opensASocket = !existing?.exists;
-    const [guild, shelf] = opensASocket
-      ? await Promise.all([
-          tx.get(guildRef(guildId)),
-          // Two fields per entry: what it is, and when it landed. That is
-          // everything the board needs to work out the shape it would draw.
-          tx.get(
+    const [guild, shelf] = await Promise.all([
+      tx.get(guildRef(guildId)),
+      // Two fields per entry: what it is, and when it landed. That is
+      // everything the board needs to work out the shape it would draw.
+      opensASocket
+        ? tx.get(
             stashRef(guildId).select("kind", "depositedAt").limit(STASH_LIMIT),
-          ),
-        ])
-      : [null, null];
+          )
+        : null,
+    ]);
 
     if (user.data()?.guildId !== guildId) return "not-a-member" as const;
 
@@ -312,7 +391,7 @@ export async function depositItem(
           { id: entryRef.id, tall: request.kind === "guitar" },
           ...onShelfNewestFirst(shelf).map(shelfPiece),
         ],
-        guildStashRowLimit(guild?.data()?.stashUpgrades),
+        guildStashRowLimit(guild.data()?.stashUpgrades),
       )
     ) {
       return "full" as const;
@@ -323,6 +402,39 @@ export async function depositItem(
 
     const { detached } = result;
     const moved = amountOf(request);
+
+    // Pieces that came off this shelf go back on it as nobody's: they earned
+    // their honor the first time they were left.
+    const returning =
+      request.kind === "part"
+        ? Math.min(
+            moved,
+            partsFromShelfOf(
+              guild.data() ?? {},
+              session.uid,
+              request.partId,
+              request.tier,
+            ),
+          )
+        : earnedHonorIn(detached.item, guildId)
+          ? 1
+          : 0;
+    const earning = moved - returning;
+    const honor =
+      earning > 0 ? stashHonorValue(request.kind, detached.rarity, earning) : 0;
+
+    const previous = existing?.exists ? creditsOf(existing.data() ?? {}) : {};
+    const mine = previous[session.uid] ?? { qty: 0, honor: 0 };
+    const credits =
+      earning > 0
+        ? {
+            ...previous,
+            [session.uid]: {
+              qty: mine.qty + earning,
+              honor: mine.honor + honor,
+            },
+          }
+        : previous;
 
     // A stack lands on whatever is already there rather than beside it.
     const onShelf =
@@ -343,6 +455,7 @@ export async function depositItem(
       depositedByUid: session.uid,
       depositedByName: session.displayName,
       depositedAt: FieldValue.serverTimestamp(),
+      credits,
     });
     tx.set(historyRef, {
       action: "deposit",
@@ -353,12 +466,20 @@ export async function depositItem(
       at: FieldValue.serverTimestamp(),
     });
     // The receipt: what the piece is worth on the shelf, in honor, credited to
-    // whoever left it — the same number it will cost whoever takes it.
-    tx.update(guildRef(guildId), {
-      [`honor.${session.uid}.earned`]: FieldValue.increment(
-        stashHonorValue(request.kind, detached.rarity, moved),
-      ),
-    });
+    // whoever left it — and kept on the entry in `credits`, which is what
+    // taking it back hands back.
+    const guildUpdate: Record<string, any> = {};
+    if (honor > 0) {
+      guildUpdate[`honor.${session.uid}.earned`] = FieldValue.increment(honor);
+    }
+    if (request.kind === "part" && returning > 0) {
+      guildUpdate[
+        `${PARTS_FROM_SHELF}.${session.uid}.${request.partId}.${request.tier}`
+      ] = FieldValue.increment(-returning);
+    }
+    if (Object.keys(guildUpdate).length > 0) {
+      tx.update(guildRef(guildId), guildUpdate);
+    }
 
     return "ok" as const;
   });
@@ -392,12 +513,14 @@ export async function depositItem(
  * the eight screws their build wants without emptying the shelf, and only
  * honest if asking for more than exists hands over no more than exists.
  *
- * The price is `TAKE_HONOR_COST` flat — never the item's own value, see
- * `guildHonor.utils.ts` for why — checked against the balance on the stored
- * guild document inside the same transaction that moves the piece, so two
- * takes racing for one balance are settled by Firestore rather than by
- * whoever's request arrived first. `TAKE_DAILY_LIMIT` is checked the same way,
- * off a per-member count also stored on the guild document.
+ * The price is `takePrice`: the member's own pieces come back for the honor
+ * leaving them earned, anything else for the flat `TAKE_HONOR_COST` — never
+ * the item's own value, see `guildHonor.utils.ts` for why. It is checked
+ * against the balance on the stored guild document inside the same
+ * transaction that moves the piece, so two takes racing for one balance are
+ * settled by Firestore rather than by whoever's request arrived first.
+ * `TAKE_DAILY_LIMIT` is checked the same way, off a per-member count also
+ * stored on the guild document, and only for a take that pays the toll.
  */
 export async function takeItem(
   session: PlayerSession,
@@ -424,9 +547,6 @@ export async function takeItem(
     if (!entry.exists) return "gone" as const;
 
     const guildData = guild.data() ?? {};
-    const takenToday = takesToday(guildData, session.uid, today);
-    if (takenToday >= TAKE_DAILY_LIMIT) return { limited: true as const };
-
     const data = entry.data() ?? {};
     const kind = (data.kind ?? "guitar") as StashItemKind;
     const owner = user.data() ?? {};
@@ -443,29 +563,67 @@ export async function takeItem(
       moved = want;
     }
 
-    // Flat, whatever is moving, and checked against the stored balance before
-    // anything does.
-    const cost = TAKE_HONOR_COST;
+    // The member's own pieces come back for what leaving them earned, anything
+    // else for the flat toll — and all of it checked against the stored
+    // balance before anything moves.
+    const credits = creditsOf(data);
+    const price = takePrice(credits[session.uid], moved);
+
+    // Only a take that pays the toll counts against the day: taking back your
+    // own moves nothing that was anybody else's.
+    const takenToday = takesToday(guildData, session.uid, today);
+    if (price.toll > 0 && takenToday >= TAKE_DAILY_LIMIT) {
+      return { limited: true as const };
+    }
+
     const { balance } = honorFor(guildData, session.uid);
-    if (balance < cost) return { poor: true as const, cost, balance };
+    if (balance < price.total) {
+      return {
+        poor: true as const,
+        cost: price.total,
+        balance,
+        reclaim: price.refund > 0,
+      };
+    }
 
     if (kind === "part") {
       const stack = (data.item ?? {}) as ScrapPart;
-      const want = moved;
       tx.update(
         userRef(session.uid),
-        attachPart(owner, { ...stack, qty: want }),
+        attachPart(owner, { ...stack, qty: moved }),
       );
       // What is left stays on the shelf under the same id, so the socket does
       // not move out from under whoever is looking at it.
-      if (want < stack.qty)
-        tx.update(entryRef, { "item.qty": stack.qty - want });
-      else tx.delete(entryRef);
-    } else if (kind === "mod") {
-      tx.update(userRef(session.uid), attachMod(owner, data.item ?? {}));
-      tx.delete(entryRef);
+      if (moved < stack.qty) {
+        const { [session.uid]: mine, ...others } = credits;
+        const stillLeft = (mine?.qty ?? 0) - price.own;
+        tx.update(entryRef, {
+          "item.qty": stack.qty - moved,
+          credits:
+            mine && stillLeft > 0
+              ? {
+                  ...others,
+                  [session.uid]: {
+                    qty: stillLeft,
+                    honor: mine.honor - price.refund,
+                  },
+                }
+              : others,
+        });
+      } else tx.delete(entryRef);
     } else {
-      tx.update(userRef(session.uid), attachItem(owner, kind, data.item ?? {}));
+      // Handed to anybody but the member who left it, the piece remembers this
+      // shelf: its honor here has been paid out, and leaving it again earns
+      // nothing. Taken back by its depositor it is the deposit undone, and
+      // comes back exactly as it went on.
+      const item =
+        price.own > 0
+          ? (data.item ?? {})
+          : markHonorEarned(data.item ?? {}, guildId);
+      tx.update(
+        userRef(session.uid),
+        kind === "mod" ? attachMod(owner, item) : attachItem(owner, kind, item),
+      );
       tx.delete(entryRef);
     }
 
@@ -477,10 +635,33 @@ export async function takeItem(
       rarity: data.rarity ?? "",
       at: FieldValue.serverTimestamp(),
     });
-    tx.update(guildRef(guildId), {
-      [`honor.${session.uid}.spent`]: FieldValue.increment(cost),
-      [`stashTakes.${session.uid}`]: { day: today, count: takenToday + 1 },
-    });
+
+    const guildUpdate: Record<string, any> = {};
+    if (price.refund > 0) {
+      // Off what the member earned rather than onto what they spent: the
+      // roster ranks by earned, and a piece taken straight back was never given.
+      guildUpdate[`honor.${session.uid}.earned`] = FieldValue.increment(
+        -price.refund,
+      );
+    }
+    if (price.toll > 0) {
+      guildUpdate[`honor.${session.uid}.spent`] = FieldValue.increment(
+        price.toll,
+      );
+      guildUpdate[`stashTakes.${session.uid}`] = {
+        day: today,
+        count: takenToday + 1,
+      };
+    }
+    if (kind === "part" && moved > price.own) {
+      const stack = data.item as ScrapPart;
+      guildUpdate[
+        `${PARTS_FROM_SHELF}.${session.uid}.${stack.partId}.${stack.tier}`
+      ] = FieldValue.increment(moved - price.own);
+    }
+    if (Object.keys(guildUpdate).length > 0) {
+      tx.update(guildRef(guildId), guildUpdate);
+    }
 
     return "ok" as const;
   });
@@ -502,7 +683,9 @@ export async function takeItem(
     return {
       ok: false,
       status: 402,
-      error: `That takes ${outcome.cost} honor and you have ${outcome.balance} — put something into the guild first`,
+      error: outcome.reclaim
+        ? `Taking back what you left returns the honor it earned you — that is ${outcome.cost} and you have ${outcome.balance}`
+        : `That takes ${outcome.cost} honor and you have ${outcome.balance} — put something into the guild first`,
     };
   }
 

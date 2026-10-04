@@ -58,7 +58,7 @@ export const FEATURE_UNLOCKS: Record<LockedFeatureId, FeatureUnlock> = {
     id: "commissions",
     name: "Commissions",
     href: "/arsenal?tab=commissions",
-    requiredLvl: 30,
+    requiredLvl: 50,
     reason:
       "Commissions are the way round the drop tables, so they wait until you have played the case game for a while. By then the last few models missing from your Dex are the hardest ones to pull — and that is exactly what the bench is for.",
     perks: [

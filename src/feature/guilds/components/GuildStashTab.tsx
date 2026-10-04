@@ -42,6 +42,7 @@ import {
   stashHonorValue,
   TAKE_DAILY_LIMIT,
   TAKE_HONOR_COST,
+  takePrice,
 } from "feature/guilds/utils/guildHonor.utils";
 import { shelfRowsUsed } from "feature/guilds/utils/guildShelf.utils";
 import { ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
@@ -169,6 +170,22 @@ export const GuildStashTab = ({
     earned: 0,
     spent: 0,
     balance: 0,
+  };
+
+  /** What taking `qty` off an entry costs this member — the server's own sum. */
+  const priceOf = (entry: StashEntry, qty: number) =>
+    takePrice(myUid ? entry.credits?.[myUid] : undefined, qty);
+
+  /**
+   * What leaving `qty` of a stack earns: pieces that came off the shelf go
+   * back on it for nothing, and only the rest are paid for.
+   */
+  const depositHonorOf = (part: ScrapPart, qty: number) => {
+    const fromShelf =
+      (myUid && stash?.partsFromShelf?.[myUid]?.[part.partId]?.[part.tier]) ||
+      0;
+    const earning = qty - Math.min(qty, fromShelf);
+    return earning > 0 ? stashHonorValue("part", part.tier, earning) : 0;
   };
 
   const entries = useMemo(() => stash?.entries ?? [], [stash]);
@@ -335,7 +352,12 @@ export const GuildStashTab = ({
                   className='mt-2 rounded-lg bg-zinc-900/95 px-3 py-2'
                 />
               )}
-              <HonorPriceTag />
+              <HonorPriceTag
+                price={priceOf(
+                  entry,
+                  entry.kind === "part" ? entry.item.qty : 1,
+                )}
+              />
             </>
           ) : undefined
         }
@@ -402,7 +424,7 @@ export const GuildStashTab = ({
             ? "Nothing here yet. Drag something down from your gear and somebody will use it."
             : rowsFree === 0
               ? "The shelf is full — take something off it, or put a few tokens towards another row in the Upgrades tab."
-              : `Drag a socket into your own cabinet to take it, or click it. Leaving something earns honor by its rarity; taking anything off the shelf costs a flat ${TAKE_HONOR_COST}, up to ${TAKE_DAILY_LIMIT} times a day. Who left what is in the ledger below.`}
+              : `Drag a socket into your own cabinet to take it, or click it. Leaving something earns honor by its rarity, once — taking back your own hands that honor back, and a piece that came off this shelf earns nothing going back on. Anything else costs a flat ${TAKE_HONOR_COST}, up to ${TAKE_DAILY_LIMIT} times a day. Who left what is in the ledger below.`}
         </p>
       </section>
 
@@ -494,6 +516,7 @@ export const GuildStashTab = ({
         {amount?.mode === "confirm" && (
           <HonorTakeCard
             entry={amount.entry}
+            price={priceOf(amount.entry, 1)}
             dexStatus={dexStatusOfGear(dexStatusOf, amount.entry)}
             balance={myHonor.balance}
             busy={busy}
@@ -508,12 +531,13 @@ export const GuildStashTab = ({
           <PartAmountCard
             part={amount.part}
             mode={amount.mode}
-            honorPerPiece={
-              amount.mode === "deposit"
-                ? stashHonorValue("part", amount.part.tier, 1)
-                : undefined
-            }
-            honorCost={amount.mode === "take" ? TAKE_HONOR_COST : undefined}
+            honorFor={(qty) => {
+              if (amount.mode === "deposit") {
+                return depositHonorOf(amount.part, qty);
+              }
+              const entry = entries.find((e) => e.id === amount.entryId);
+              return entry ? priceOf(entry, qty).total : TAKE_HONOR_COST;
+            }}
             honorBalance={amount.mode === "take" ? myHonor.balance : undefined}
             busy={busy}
             onConfirm={(qty) => {

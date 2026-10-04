@@ -9,6 +9,7 @@ import {
   stashHonorValue,
   TAKE_DAILY_LIMIT,
   TAKE_HONOR_COST,
+  takePrice,
 } from "feature/guilds/utils/guildHonor.utils";
 import { describe, expect, it } from "vitest";
 
@@ -35,6 +36,50 @@ describe("taking off the shelf", () => {
   it("caps a member's takes well under what the toll alone would allow", () => {
     expect(TAKE_DAILY_LIMIT).toBeGreaterThan(0);
     expect(TAKE_DAILY_LIMIT).toBeLessThan(50);
+  });
+});
+
+describe("takePrice", () => {
+  it("charges the flat toll for something that is not the taker's", () => {
+    expect(takePrice(undefined, 1)).toEqual({
+      own: 0,
+      refund: 0,
+      toll: TAKE_HONOR_COST,
+      total: TAKE_HONOR_COST,
+    });
+  });
+
+  it("hands back exactly what leaving it earned when it is the taker's own", () => {
+    const mythic = stashHonorValue("guitar", "Mythic");
+
+    expect(takePrice({ qty: 1, honor: mythic }, 1)).toEqual({
+      own: 1,
+      refund: mythic,
+      toll: 0,
+      total: mythic,
+    });
+  });
+
+  it("splits a stack between the taker's own pieces and everybody else's", () => {
+    // Twelve of the taker's own, at 3 each, and they reach for twenty.
+    expect(takePrice({ qty: 12, honor: 36 }, 20)).toEqual({
+      own: 12,
+      refund: 36,
+      toll: TAKE_HONOR_COST,
+      total: 36 + TAKE_HONOR_COST,
+    });
+  });
+
+  it("hands back a share for part of the taker's own, rounded against them", () => {
+    expect(takePrice({ qty: 3, honor: 10 }, 1).refund).toBe(4);
+    expect(takePrice({ qty: 3, honor: 10 }, 2).refund).toBe(7);
+  });
+
+  it("never makes taking back and leaving again come out ahead", () => {
+    for (const rarity of ["Common", "Mythic", "Custom Shop"]) {
+      const earned = stashHonorValue("guitar", rarity);
+      expect(takePrice({ qty: 1, honor: earned }, 1).total).toBe(earned);
+    }
   });
 });
 

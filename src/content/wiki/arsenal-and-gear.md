@@ -10,7 +10,7 @@ The Arsenal is the part of riff.quest that has nothing to do with your fingers. 
 
 <ClickPath steps="Arsenal" caption="Eight tabs, in the order you use them: Cases, Collection, Rig, Workshop, Commissions, Trader, Market and Dex." />
 
-<Checklist items="Cases::Where you spend Fame to open new gear|Collection::Every guitar and pedal you own, ready to filter by kind, search and sort|Rig::Where you equip the gear you want to be ranked on|Workshop::Restore and upgrade what you've got|Commissions::From level 30, order any model still missing from your Dex|Trader::The game's own shop, stocking parts, one mod and four instruments a day|Market::Listings from other players, priced by whoever put them up — guitars, pedals and loose mods|Dex::A gallery of every item in the game, found or not, for the completionists" />
+<Checklist items="Cases::Where you spend Fame to open new gear|Collection::Every guitar and pedal you own, ready to filter by kind, search and sort|Rig::Where you equip the gear you want to be ranked on|Workshop::Restore and upgrade what you've got|Commissions::From level 50, order any model still missing from your Dex|Trader::The game's own shop, stocking parts, one mod and four instruments a day|Market::Listings from other players, priced by whoever put them up — guitars, pedals and loose mods|Dex::A gallery of every item in the game, found or not, for the completionists" />
 
 ## Your collection
 
@@ -98,9 +98,9 @@ The Trader also stocks **two guitars and two pedals a day**, each a specific ins
 
 ## Commissions
 
-From **level 30**, the bench takes orders. Any guitar or pedal still missing from your Dex can be built for you, by name, for Fame plus the parts it's made of.
+From **level 50**, the bench takes orders. Any guitar or pedal still missing from your Dex can be built for you, by name, for Fame plus the parts it's made of.
 
-<ClickPath steps="Arsenal|Commissions" caption="Every model still missing from your Dex, rarest first. Pick one to see the exact instrument you'd get and the full bill. Below level 30 the tab shows how far you have to go." />
+<ClickPath steps="Arsenal|Commissions" caption="Every model still missing from your Dex, rarest first. Pick one to see the exact instrument you'd get and the full bill. Below level 50 the tab shows how far you have to go." />
 
 <StatRow stats="500 Fame:Common|650 Fame:Uncommon|900 Fame:Rare|1,600 Fame:Epic|4,500 Fame:Legendary|13,500 Fame:Mythic" caption="Same price for a guitar and a pedal of the same rarity. On top of the Fame comes a bill of parts." />
 

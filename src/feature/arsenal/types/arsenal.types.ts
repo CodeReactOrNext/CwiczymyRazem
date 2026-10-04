@@ -134,6 +134,8 @@ export interface EffectInventoryItem {
   restored?: boolean;
   /** Bench work done in the workshop, newest last. Trimmed to the last 10. */
   buildLog?: BuildLogLine[];
+  /** Guilds whose shelf this pedal has already earned honor on. */
+  honorEarnedIn?: string[];
 }
 
 /**
@@ -364,6 +366,8 @@ export interface InventoryItem {
   restored?: boolean;
   /** Bench work done in the workshop, newest last. Trimmed to the last 10. */
   buildLog?: BuildLogLine[];
+  /** Guilds whose shelf this guitar has already earned honor on. */
+  honorEarnedIn?: string[];
 }
 
 export interface PedalboardPlacement {
@@ -432,6 +436,8 @@ export interface SalvagedMod {
   /** The instrument it was pulled out of. Flavour on the tile. */
   sourceName: string;
   salvagedAt: number;
+  /** Guilds whose shelf this mod has already earned honor on. */
+  honorEarnedIn?: string[];
 }
 
 export interface ArsenalUserData {

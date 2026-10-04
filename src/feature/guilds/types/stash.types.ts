@@ -7,6 +7,7 @@ import type {
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
 import type { GuildHonor } from "feature/guilds/types/guild.types";
+import type { StashCredit } from "feature/guilds/utils/guildHonor.utils";
 
 export type StashItemKind = "guitar" | "effect" | "part" | "mod";
 
@@ -18,6 +19,11 @@ interface StashEntryBase {
   depositedByUid: string;
   depositedByName: string;
   depositedAt: string;
+  /**
+   * Who earned honor leaving this, per uid — what taking their own back
+   * hands back. One member for a piece of gear, several for a part stack.
+   */
+  credits: Record<string, StashCredit>;
 }
 
 /**
@@ -80,4 +86,13 @@ export interface GuildStash {
    * without waiting on the guild page to refetch.
    */
   honor: Record<string, GuildHonor>;
+  /**
+   * Parts each member has taken off the shelf and not put back, by uid, part
+   * and tier. Leaving those earns nothing, so a deposit says so up front.
+   */
+  partsFromShelf: Record<string, PartsFromShelf>;
 }
+
+export type PartsFromShelf = Partial<
+  Record<PartId, Partial<Record<PartTier, number>>>
+>;

@@ -3,7 +3,7 @@ import { DexMarks } from "feature/arsenal/components/DexMarks";
 import type { DexStatus } from "feature/arsenal/utils/dex";
 import { HonorMark } from "feature/guilds/components/HonorMark";
 import type { StashEntry } from "feature/guilds/types/stash.types";
-import { TAKE_HONOR_COST } from "feature/guilds/utils/guildHonor.utils";
+import type { TakePrice } from "feature/guilds/utils/guildHonor.utils";
 
 /**
  * The moment before a piece leaves the shelf: what it costs, what you have.
@@ -15,12 +15,15 @@ import { TAKE_HONOR_COST } from "feature/guilds/utils/guildHonor.utils";
  */
 export const HonorTakeCard = ({
   entry,
+  price,
   dexStatus,
   balance,
   busy = false,
   onConfirm,
 }: {
   entry: StashEntry;
+  /** What this take costs this member — see `takePrice`. */
+  price: TakePrice;
   /**
    * Where the model stands with the taker — owned already, or on the Dex.
    * Absent for parts and mods, which are not collected.
@@ -31,7 +34,9 @@ export const HonorTakeCard = ({
   busy?: boolean;
   onConfirm: () => void;
 }) => {
-  const cost = TAKE_HONOR_COST;
+  const cost = price.total;
+  // No toll means every piece is the member's own deposit coming back.
+  const takingBack = price.toll === 0;
   const short = Math.max(0, cost - balance);
   const canPay = short === 0;
 
@@ -40,7 +45,7 @@ export const HonorTakeCard = ({
       <div className='space-y-1'>
         <p className='text-[11px] font-semibold text-zinc-500'>
           {entry.rarity ? `${entry.rarity} · ` : ""}
-          left by {entry.depositedByName || "a member"}
+          left by {takingBack ? "you" : entry.depositedByName || "a member"}
         </p>
         <h3 className='text-xl font-black text-zinc-100'>{entry.name}</h3>
         {/* Said before the price, not after the take: honor spent on a second
@@ -77,13 +82,18 @@ export const HonorTakeCard = ({
           "rounded-lg px-4 py-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40",
           "bg-purple-500/15 text-purple-200 hover:bg-purple-500/25",
         )}>
-        {canPay ? `Take it for ${cost} honor` : `${short} honor short`}
+        {!canPay
+          ? `${short} honor short`
+          : takingBack
+            ? `Take it back for ${cost} honor`
+            : `Take it for ${cost} honor`}
       </button>
 
       {!canPay && (
         <p className='text-xs leading-relaxed text-zinc-500'>
-          Honor is earned by putting into the guild: Fame into the bank, tokens
-          into a pot, or gear onto this shelf.
+          {takingBack
+            ? "Taking back what you left returns the honor leaving it earned you."
+            : "Honor is earned by putting into the guild: Fame into the bank, tokens into a pot, or gear onto this shelf."}
         </p>
       )}
     </div>

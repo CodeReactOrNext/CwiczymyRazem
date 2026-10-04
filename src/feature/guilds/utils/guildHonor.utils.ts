@@ -33,6 +33,13 @@ import type { StashItemKind } from "feature/guilds/types/stash.types";
  * paid for it. `TAKE_DAILY_LIMIT` is what stops a big balance from clearing
  * the shelf in one visit; the flat price is what makes reaching it in the
  * first place not feel like a toll on every single thing.
+ *
+ * The flat toll only holds up if a piece earns its honor once. A deposit that
+ * could be taken straight back for ten honor, or taken by anyone and left
+ * again for its full value, printed honor out of one guitar going round in a
+ * circle. So taking back what you left yourself is an undo — it hands back
+ * the honor leaving it earned (`takePrice`) — and a piece that came off the
+ * shelf earns nothing going back on it (see `lib/guild/guildStash.ts`).
  */
 
 export const HONOR_PER_FAME = 1;
@@ -104,6 +111,51 @@ export const stashHonorValue = (
     default:
       return GEAR_HONOR.Common;
   }
+};
+
+/**
+ * What one member's deposits put into a shelf entry: how many pieces, and the
+ * honor leaving them earned. Only pieces that earned something are counted —
+ * a piece that had come off this shelf before is on it as nobody's.
+ */
+export interface StashCredit {
+  qty: number;
+  honor: number;
+}
+
+export interface TakePrice {
+  /** Pieces that are the taker's own deposit coming back. */
+  own: number;
+  /** The honor those pieces earned when they were left, handed back. */
+  refund: number;
+  /** The flat toll, owed as soon as anything that is not the taker's comes along. */
+  toll: number;
+  total: number;
+}
+
+/**
+ * What taking `moved` pieces off an entry costs a member holding `credit` on
+ * it. Their own pieces come back first and cost what leaving them earned —
+ * the deposit undone, so a piece cannot be left and lifted at a profit — and
+ * anything beyond them is an ordinary take at the flat toll.
+ *
+ * A partial reclaim of a stack hands back its share of the honor, rounded up:
+ * a rounding error that has to fall somewhere falls on the reclaim.
+ */
+export const takePrice = (
+  credit: StashCredit | undefined,
+  moved: number,
+): TakePrice => {
+  const pieces = Math.max(1, Math.floor(num(moved)));
+  const held = Math.max(0, Math.floor(num(credit?.qty)));
+  const honor = Math.max(0, Math.floor(num(credit?.honor)));
+
+  const own = Math.min(pieces, held);
+  const refund =
+    own === 0 ? 0 : own === held ? honor : Math.ceil((honor * own) / held);
+  const toll = pieces > own ? TAKE_HONOR_COST : 0;
+
+  return { own, refund, toll, total: refund + toll };
 };
 
 /** Honor for Fame put into the guild's bank. */

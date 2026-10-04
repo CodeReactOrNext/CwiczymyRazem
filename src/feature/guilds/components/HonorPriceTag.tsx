@@ -1,5 +1,5 @@
 import { HonorMark } from "feature/guilds/components/HonorMark";
-import { TAKE_HONOR_COST } from "feature/guilds/utils/guildHonor.utils";
+import type { TakePrice } from "feature/guilds/utils/guildHonor.utils";
 
 /**
  * The price band under a shelf piece's hover card: what taking it costs in
@@ -15,10 +15,10 @@ import { TAKE_HONOR_COST } from "feature/guilds/utils/guildHonor.utils";
  * elsewhere (the shelf header, the take card), not printed on a tile anyone
  * hovering can see.
  *
- * The price is flat — see `TAKE_HONOR_COST` — the same for one guitar or a
- * whole stack of parts, so there is nothing here to multiply any more.
+ * The price is the flat toll, or — for a piece the onlooker left themselves —
+ * the honor leaving it earned, handed back. See `takePrice`.
  */
-export const HonorPriceTag = () => (
+export const HonorPriceTag = ({ price }: { price: TakePrice }) => (
   <div className='mt-2 rounded-lg bg-blue-950/95 px-4 py-3'>
     <span className='flex items-center gap-3'>
       <span className='flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-500/20'>
@@ -26,10 +26,10 @@ export const HonorPriceTag = () => (
       </span>
       <span className='leading-tight'>
         <span className='block text-[11px] font-semibold text-blue-200/70'>
-          Take it for
+          {price.toll === 0 ? "Take it back for" : "Take it for"}
         </span>
         <span className='block text-xl font-black tabular-nums text-blue-100'>
-          {TAKE_HONOR_COST.toLocaleString()} honor
+          {price.total.toLocaleString()} honor
         </span>
       </span>
     </span>

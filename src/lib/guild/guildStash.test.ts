@@ -5,6 +5,7 @@ import {
   TAKE_HONOR_COST,
 } from "feature/guilds/utils/guildHonor.utils";
 import type { PlayerSession } from "lib/support/supporterAuth";
+import { getServerDateKey } from "utils/converter";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 /** Fake Firestore with subcollections, ordered log reads and transactions. */
@@ -289,7 +290,10 @@ describe("takeItem", () => {
     await takeItem(session("taker"), "riff-raiders", entryId);
 
     // Taking it costs the flat toll, not the piece's own value.
-    expect(honorOf("taker")).toEqual({ earned: 10_000, spent: TAKE_HONOR_COST });
+    expect(honorOf("taker")).toEqual({
+      earned: 10_000,
+      spent: TAKE_HONOR_COST,
+    });
   });
 
   it("refuses a taker who cannot pay, and moves nothing", async () => {
@@ -326,6 +330,203 @@ describe("takeItem", () => {
   });
 });
 
+/**
+ * The loop a player reported: leave a Mythic, take it straight back for the
+ * flat toll, keep the difference, repeat. Every way round the circle — your
+ * own piece, somebody else's, a stack of parts — has to come out at zero.
+ */
+describe("the honor loop", () => {
+  const entryId = () => ref(shelf()[0]).id;
+
+  const PICKUPS = { partId: "pickup", tier: "Unique" } as const;
+  const GIVE_PICKUPS = (qty: number): StashDeposit => ({
+    kind: "part",
+    ...PICKUPS,
+    qty,
+  });
+  const PICKUP_HONOR = stashHonorValue("part", PICKUPS.tier, 1);
+
+  const seedParts = (uid: string, qty: number) =>
+    store.set(`users/${uid}`, {
+      ...store.get(`users/${uid}`),
+      arsenal: {
+        ...store.get(`users/${uid}`)?.arsenal,
+        parts: [{ ...PICKUPS, qty }],
+      },
+    });
+
+  const partsFromShelf = (uid: string) =>
+    store.get("guilds/riff-raiders")?.partsFromShelf?.[uid]?.pickup?.Unique ??
+    0;
+
+  it("hands the honor back when the depositor takes their own piece back", async () => {
+    await depositItem(session("giver"), "riff-raiders", GIVE_GUITAR);
+    expect(honorOf("giver").earned).toBeGreaterThan(TAKE_HONOR_COST);
+
+    expect(await takeItem(session("giver"), "riff-raiders", entryId())).toEqual(
+      { ok: true },
+    );
+
+    expect(honorOf("giver")).toEqual({ earned: 0, spent: 0 });
+    expect(inventoryOf("giver")).toHaveLength(1);
+    expect(shelf()).toHaveLength(0);
+  });
+
+  it("comes out at zero however many times it goes round", async () => {
+    for (let round = 0; round < 3; round++) {
+      await depositItem(session("giver"), "riff-raiders", GIVE_GUITAR);
+      await takeItem(session("giver"), "riff-raiders", entryId());
+    }
+
+    expect(honorOf("giver")).toEqual({ earned: 0, spent: 0 });
+  });
+
+  it("lets a piece taken back be left again for its full value", async () => {
+    await depositItem(session("giver"), "riff-raiders", GIVE_GUITAR);
+    const value = honorOf("giver").earned;
+    await takeItem(session("giver"), "riff-raiders", entryId());
+
+    await depositItem(session("giver"), "riff-raiders", GIVE_GUITAR);
+
+    expect(honorOf("giver").earned).toBe(value);
+  });
+
+  it("will not hand a piece back once the honor it earned is spent", async () => {
+    await depositItem(session("giver"), "riff-raiders", GIVE_GUITAR);
+    const { earned } = honorOf("giver");
+    store.set("guilds/riff-raiders", {
+      ...store.get("guilds/riff-raiders"),
+      honor: {
+        ...store.get("guilds/riff-raiders")?.honor,
+        giver: { earned, spent: earned - 1 },
+      },
+    });
+
+    const result = await takeItem(session("giver"), "riff-raiders", entryId());
+
+    expect(result).toMatchObject({ ok: false, status: 402 });
+    expect((result as { error: string }).error).toContain("honor");
+    expect(shelf()).toHaveLength(1);
+    expect(inventoryOf("giver")).toHaveLength(0);
+  });
+
+  it("does not count taking back your own against the daily limit", async () => {
+    store.set("guilds/riff-raiders", {
+      ...store.get("guilds/riff-raiders"),
+      stashTakes: {
+        giver: { day: getServerDateKey(), count: TAKE_DAILY_LIMIT },
+      },
+    });
+    await depositItem(session("giver"), "riff-raiders", GIVE_GUITAR);
+
+    expect(await takeItem(session("giver"), "riff-raiders", entryId())).toEqual(
+      { ok: true },
+    );
+  });
+
+  it("earns nothing for a piece left again by whoever took it", async () => {
+    await depositItem(session("giver"), "riff-raiders", GIVE_GUITAR);
+    await takeItem(session("taker"), "riff-raiders", entryId());
+    expect(inventoryOf("taker")[0].honorEarnedIn).toEqual(["riff-raiders"]);
+    const before = honorOf("taker");
+
+    expect(
+      await depositItem(session("taker"), "riff-raiders", GIVE_GUITAR),
+    ).toEqual({ ok: true });
+    expect(honorOf("taker")).toEqual(before);
+
+    // It earned nobody anything this time, so it is nobody's to take back:
+    // lifting it again is an ordinary take at the toll.
+    await takeItem(session("taker"), "riff-raiders", entryId());
+    expect(honorOf("taker")).toEqual({
+      earned: before.earned,
+      spent: before.spent + TAKE_HONOR_COST,
+    });
+  });
+
+  it("rebuilds the credit on an entry left before credits were stored", async () => {
+    const mythic = stashHonorValue("guitar", "Mythic");
+    store.set("guilds/riff-raiders/stash/legacy", {
+      kind: "guitar",
+      name: "Old Mythic",
+      rarity: "Mythic",
+      item: { id: "old-1", guitarId: 1, condition: 90 },
+      depositedByUid: "giver",
+      depositedByName: "giver",
+    });
+    store.set("guilds/riff-raiders", {
+      ...store.get("guilds/riff-raiders"),
+      honor: {
+        ...store.get("guilds/riff-raiders")?.honor,
+        giver: { earned: mythic, spent: 0 },
+      },
+    });
+
+    await takeItem(session("giver"), "riff-raiders", "legacy");
+
+    expect(honorOf("giver")).toEqual({ earned: 0, spent: 0 });
+  });
+
+  it("hands back a part deposit's honor when the depositor lifts it", async () => {
+    seedParts("giver", 10);
+    await depositItem(session("giver"), "riff-raiders", GIVE_PICKUPS(10));
+    expect(honorOf("giver").earned).toBe(10 * PICKUP_HONOR);
+
+    await takeItem(session("giver"), "riff-raiders", entryId(), 4);
+    expect(honorOf("giver").earned).toBe(6 * PICKUP_HONOR);
+
+    await takeItem(session("giver"), "riff-raiders", entryId());
+    expect(honorOf("giver")).toEqual({ earned: 0, spent: 0 });
+    expect(partsFromShelf("giver")).toBe(0);
+  });
+
+  it("earns nothing for parts taken off the shelf and left again", async () => {
+    seedParts("giver", 10);
+    await depositItem(session("giver"), "riff-raiders", GIVE_PICKUPS(10));
+    await takeItem(session("taker"), "riff-raiders", entryId());
+    expect(partsFromShelf("taker")).toBe(10);
+    const before = honorOf("taker");
+
+    await depositItem(session("taker"), "riff-raiders", GIVE_PICKUPS(10));
+
+    expect(honorOf("taker")).toEqual(before);
+    expect(partsFromShelf("taker")).toBe(0);
+  });
+
+  it("pays for only the fresh pieces in a deposit mixing them with returned ones", async () => {
+    seedParts("giver", 4);
+    await depositItem(session("giver"), "riff-raiders", GIVE_PICKUPS(4));
+    await takeItem(session("taker"), "riff-raiders", entryId());
+    seedParts("taker", 10); // the four from the shelf, and six of their own
+    const before = honorOf("taker").earned;
+
+    await depositItem(session("taker"), "riff-raiders", GIVE_PICKUPS(10));
+
+    expect(honorOf("taker").earned - before).toBe(6 * PICKUP_HONOR);
+  });
+
+  it("splits a take between the member's own parts and everybody else's", async () => {
+    seedParts("giver", 10);
+    await depositItem(session("giver"), "riff-raiders", GIVE_PICKUPS(10));
+    seedParts("taker", 5);
+    await depositItem(session("taker"), "riff-raiders", GIVE_PICKUPS(5));
+    const before = honorOf("taker");
+    expect(before.earned).toBe(10_000 + 5 * PICKUP_HONOR);
+
+    await takeItem(session("taker"), "riff-raiders", entryId(), 15);
+
+    // Their own five come back for what they earned; the giver's ten are a
+    // take at the toll, and go on the taker's tab.
+    expect(honorOf("taker")).toEqual({
+      earned: 10_000,
+      spent: before.spent + TAKE_HONOR_COST,
+    });
+    expect(partsFromShelf("taker")).toBe(10);
+    // The giver gave theirs away and keeps what that earned.
+    expect(honorOf("giver").earned).toBe(10 * PICKUP_HONOR);
+  });
+});
+
 describe("the daily take limit", () => {
   beforeEach(async () => {
     await depositItem(session("giver"), "riff-raiders", GIVE_GUITAR);
@@ -357,10 +558,16 @@ describe("the daily take limit", () => {
       ).toEqual({ ok: true });
     }
 
-    const result = await takeItem(session("taker"), "riff-raiders", ids[TAKE_DAILY_LIMIT]);
+    const result = await takeItem(
+      session("taker"),
+      "riff-raiders",
+      ids[TAKE_DAILY_LIMIT],
+    );
 
     expect(result).toMatchObject({ ok: false, status: 429 });
-    expect(shelf()).toContain(`guilds/riff-raiders/stash/${ids[TAKE_DAILY_LIMIT]}`);
+    expect(shelf()).toContain(
+      `guilds/riff-raiders/stash/${ids[TAKE_DAILY_LIMIT]}`,
+    );
   });
 
   it("does not count against a different member's limit", async () => {
