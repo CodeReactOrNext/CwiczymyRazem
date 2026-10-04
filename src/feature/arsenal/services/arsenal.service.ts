@@ -17,6 +17,7 @@ import type {
   RigSetup,
   ScrapResult,
   WorkshopBuildResult,
+  WorkshopCommissionResult,
   WorkshopKind,
   WorkshopModAction,
   WorkshopModResult,
@@ -272,6 +273,23 @@ export const buildItem = async (
       idToken,
       itemId,
       kind,
+    },
+  );
+  return data;
+};
+
+/** Orders a model the account has never held — see `data/commission.ts`. */
+export const commissionItem = async (
+  kind: WorkshopKind,
+  definitionId: number | string,
+): Promise<WorkshopCommissionResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<WorkshopCommissionResult>(
+    "/api/arsenal/workshop/commission",
+    {
+      idToken,
+      kind,
+      definitionId,
     },
   );
   return data;

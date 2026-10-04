@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { EFFECT_DEFINITIONS } from "feature/arsenal/data/effectDefinitions";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -55,8 +56,9 @@ describe("DexView", () => {
 
     expect(screen.getByText(first.name)).toBeTruthy();
     // The count sits in its own span, so read the whole line, not one text node.
-    expect(screen.getByText(/discovered ·/).textContent).toMatch(
-      /1 \/ 105 discovered · 1%/,
+    const total = GUITAR_DEFINITIONS.length + EFFECT_DEFINITIONS.length;
+    expect(screen.getByText(/discovered ·/).textContent).toBe(
+      `1 / ${total} discovered · ${Math.round(100 / total)}%`,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Missing" }));

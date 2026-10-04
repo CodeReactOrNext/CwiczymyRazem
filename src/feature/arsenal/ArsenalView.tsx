@@ -4,10 +4,21 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/to
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { LevelGate } from "feature/levelGate/components/LevelGate";
 import { PlayerLvlProvider } from "feature/progression/hooks/usePlayerLvl";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import type { LucideIcon } from "lucide-react";
-import { BookMarked, Guitar, Hammer, PackageOpen, Store, Swords, Ticket, Users } from "lucide-react";
+import {
+  BookMarked,
+  DraftingCompass,
+  Guitar,
+  Hammer,
+  PackageOpen,
+  Store,
+  Swords,
+  Ticket,
+  Users,
+} from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -15,6 +26,9 @@ import { useAppSelector } from "store/hooks";
 // Ordered like the loop the module is built around: get gear, look at what you
 // own, put it on the rig, improve it, then trade what is left over. Dex is the
 // completionist view and sits at the end rather than between Workshop and Rig.
+// Commissions sit right after the Workshop: same bench, building from scratch
+// instead of improving — and level-gated, so a new account sees the lock screen
+// telling it when the tab opens rather than a tab that silently is not there.
 //
 // The two markets are separate tabs rather than halves of one. They are shopped
 // for different reasons — the counter is where you go to *fix* a shortage, with
@@ -25,6 +39,7 @@ const ARSENAL_TABS = [
   "collection",
   "rig",
   "workshop",
+  "commissions",
   "trader",
   "market",
   "dex",
@@ -42,6 +57,7 @@ const TAB_META: Record<ArsenalTab, { label: string; icon: LucideIcon }> = {
   collection: { label: "Collection", icon: Swords },
   rig: { label: "Rig", icon: Guitar },
   workshop: { label: "Workshop", icon: Hammer },
+  commissions: { label: "Commissions", icon: DraftingCompass },
   trader: { label: "Trader", icon: Store },
   market: { label: "Market", icon: Users },
   dex: { label: "Dex", icon: BookMarked },
@@ -51,6 +67,7 @@ import type { OpenAgainPayment } from "./components/CaseOpeningModal/CaseOpening
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
 import { CaseShop } from "./components/CaseShop/CaseShop";
 import { CollectionTab } from "./components/Collection/CollectionTab";
+import { CommissionsView } from "./components/Commissions/CommissionsView";
 import { DexView } from "./components/Dex/DexView";
 import { MarketplaceView } from "./components/Marketplace/MarketplaceView";
 import { RigView } from "./components/Rig/RigView";
@@ -237,6 +254,21 @@ const ArsenalTabs = () => {
                 {isLoading ? <WorkshopSkeleton /> : <WorkshopTab data={data} fame={fame} />}
               </TabsContent>
             )}
+
+            <TabsContent value="commissions" className="mt-4">
+              {/* The gate is presentational — the API checks the level again. */}
+              <LevelGate feature="commissions">
+                {isLoading ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                    {Array.from({ length: 10 }).map((_, i) => (
+                      <Skeleton key={i} className="h-56 rounded-lg bg-zinc-800/50" />
+                    ))}
+                  </div>
+                ) : data ? (
+                  <CommissionsView data={data} fame={fame} />
+                ) : null}
+              </LevelGate>
+            </TabsContent>
 
             <TabsContent value="dex" className="mt-4">
               {isLoading ? (

@@ -1,13 +1,18 @@
 /**
  * Features that stay shut until the account reaches a level.
  *
- * Both of these read better with a little history behind them — milestones are
+ * The first two read better with a little history behind them — milestones are
  * derived from how your week actually went, and a guild is other people
  * counting on you to turn up. Handing them to somebody on their first session
  * buries the two screens that matter then (practice and the dashboard) under
  * pages that are still empty.
+ *
+ * Commissions are gated for a different reason: they are a late-game way round
+ * the drop tables, and opening them early would let a new account skip the
+ * case loop the rest of the Arsenal is built on. The level here is also the
+ * one the API enforces — see `feature/arsenal/data/commission.ts`.
  */
-export type LockedFeatureId = "summary" | "guilds";
+export type LockedFeatureId = "summary" | "guilds" | "commissions";
 
 export interface FeatureUnlock {
   id: LockedFeatureId;
@@ -47,6 +52,19 @@ export const FEATURE_UNLOCKS: Record<LockedFeatureId, FeatureUnlock> = {
       "A chat with guitarists practising the same week as you",
       "A weekly challenge the whole guild clears together",
       "A shared stash and a crest your guild wears",
+    ],
+  },
+  commissions: {
+    id: "commissions",
+    name: "Commissions",
+    href: "/arsenal?tab=commissions",
+    requiredLvl: 30,
+    reason:
+      "Commissions are the way round the drop tables, so they wait until you have played the case game for a while. By then the last few models missing from your Dex are the hardest ones to pull — and that is exactly what the bench is for.",
+    perks: [
+      "Order any guitar or pedal still missing from your Dex",
+      "Paid in Fame and the parts the instrument is made of",
+      "Built stock, with every mod slot free for the mods in your stash",
     ],
   },
 };

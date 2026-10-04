@@ -563,6 +563,18 @@ export interface WorkshopModResult {
   rigLevel: number;
 }
 
+/** A model built from scratch at the bench — see `data/commission.ts`. */
+export interface WorkshopCommissionResult {
+  kind: WorkshopKind;
+  /** The delivered instance, so the result renders without waiting for a refetch. */
+  item: InventoryItem | EffectInventoryItem;
+  /** Fame charged — mirrored into the client's counter, which lives outside the query. */
+  fameSpent: number;
+  spent: ScrapPart[];
+  newParts: ScrapPart[];
+  newFame: number;
+}
+
 export interface WorkshopRepairResult {
   grade: string;
   condition: number;
