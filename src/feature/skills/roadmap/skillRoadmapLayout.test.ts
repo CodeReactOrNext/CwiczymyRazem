@@ -6,6 +6,8 @@ import {
   chainPathBetween,
   chainPathFor,
   chainPositions,
+  difficultyBreaks,
+  difficultyMarksFor,
   dotsPerRowFor,
   layoutSkillRoadmap,
   ROADMAP_GEOMETRY as G,
@@ -75,6 +77,81 @@ describe("chainPositions", () => {
     const keys = new Set(pts.map((p) => `${p.x},${p.y}`));
     expect(keys.size).toBe(40);
   });
+
+  describe("with difficulty breaks", () => {
+    const count = 16; // two rows of eight
+    const perRow = dotsPerRowFor(count);
+
+    it("keeps a turn straight down even when a gap came before it", () => {
+      const pts = chainPositions(count, 0, 0, new Set([3]));
+      expect(pts[perRow].x).toBe(pts[perRow - 1].x);
+      expect(pts[perRow].y).toBe(pts[perRow - 1].y + G.rowSpacing);
+    });
+
+    it("moves the chain right when a row running back would leave the lane", () => {
+      // Gaps only on the second row push its far end past the lane's start.
+      const x0 = 100;
+      const pts = chainPositions(count, x0, 0, new Set([10, 13]));
+      expect(Math.min(...pts.map((p) => p.x))).toBe(x0);
+      expect(pts[0].x).toBe(x0 + 2 * G.groupGap);
+    });
+
+    it("stays within a row plus three gaps, however the gaps fall", () => {
+      const pts = chainPositions(count, 0, 0, new Set([2, 9, 14]));
+      const span =
+        Math.max(...pts.map((p) => p.x)) - Math.min(...pts.map((p) => p.x));
+      expect(span).toBeLessThanOrEqual(
+        (G.dotsPerRow - 1) * G.dotSpacing + 3 * G.groupGap,
+      );
+    });
+  });
+});
+
+describe("difficultyMarksFor", () => {
+  const withDifficulties = (...levels: Exercise["difficulty"][]) =>
+    levels.map((difficulty, i) => ({
+      id: `e${i}`,
+      difficulty,
+    })) as unknown as Exercise[];
+
+  it("marks a group on a row that runs back at its leftmost dot", () => {
+    // 5 + 5: the easy group starts on the second row, which runs right-to-left.
+    const exercises = withDifficulties(
+      "beginner",
+      "beginner",
+      "beginner",
+      "beginner",
+      "beginner",
+      "beginner",
+      "easy",
+      "easy",
+      "easy",
+      "easy",
+    );
+    const breaks = difficultyBreaks(exercises);
+    const points = chainPositions(exercises.length, 0, 0, breaks);
+    const [beginner, easy] = difficultyMarksFor(points, exercises, breaks);
+
+    expect(beginner).toEqual({ x: points[0].x, y: 0, level: 1 });
+    expect(easy).toEqual({ x: points[9].x, y: G.rowSpacing, level: 2 });
+  });
+});
+
+describe("difficultyBreaks", () => {
+  it("marks the first exercise of every new difficulty", () => {
+    const breaks = difficultyBreaks([
+      { difficulty: "beginner" },
+      { difficulty: "beginner" },
+      { difficulty: "easy" },
+      { difficulty: "hard" },
+      { difficulty: "hard" },
+    ] as unknown as Exercise[]);
+    expect([...breaks]).toEqual([2, 3]);
+  });
+
+  it("is empty for a branch of one difficulty", () => {
+    expect(difficultyBreaks([exercise("a"), exercise("b")]).size).toBe(0);
+  });
 });
 
 describe("chainPathFor", () => {
@@ -86,6 +163,13 @@ describe("chainPathFor", () => {
 
   it("is empty for an empty chain", () => {
     expect(chainPathFor([])).toBe("");
+  });
+
+  it("leaves the line open between difficulty groups", () => {
+    const points = chainPositions(4, 0, 0, new Set([2]));
+    expect(chainPathFor(points, new Set([2]))).toBe(
+      `M ${points[0].x} 0 L ${points[1].x} 0 M ${points[2].x} 0 L ${points[3].x} 0`,
+    );
   });
 });
 
@@ -152,7 +236,48 @@ describe("layoutSkillRoadmap", () => {
     );
     expect(layout.masteryY).toBeGreaterThan(b.bottom);
     expect(layout.height).toBeGreaterThan(layout.masteryY);
-    expect(layout.startY).toBeLessThan(a.y);
+  });
+
+  it("opens a gap in a branch where the difficulty steps up", () => {
+    const branchTier: RoadmapTier = {
+      id: "a",
+      title: "a",
+      subtitle: "",
+      branches: [
+        {
+          id: "a_b0",
+          label: "a",
+          skillId: "legato",
+          exercises: [
+            { id: "x1", difficulty: "beginner" },
+            { id: "x2", difficulty: "beginner" },
+            { id: "x3", difficulty: "medium" },
+          ] as unknown as Exercise[],
+        },
+      ],
+    };
+    const [branch] = layoutSkillRoadmap([branchTier]).tiers[0].branches;
+    const [first, second, third] = branch.nodes;
+    expect(second.x - first.x).toBe(G.dotSpacing);
+    expect(third.x - second.x).toBe(G.dotSpacing + G.groupGap);
+    // The line stops at the second dot and does not reach into the next group.
+    expect(branch.chainPath).toBe(
+      `M ${first.x} ${first.y} L ${second.x} ${second.y}`,
+    );
+    // Each group is marked at its first dot with its difficulty.
+    expect(branch.difficultyMarks).toEqual([
+      { x: first.x, y: first.y, level: 1 },
+      { x: third.x, y: third.y, level: 3 },
+    ]);
+  });
+
+  it("measures the first row's right edge for the level to close on", () => {
+    const [branch] = layoutSkillRoadmap([tier("a", [10])]).tiers[0].branches;
+    const firstRow = branch.nodes.filter((n) => n.y === branch.nodes[0].y);
+    expect(firstRow).toHaveLength(dotsPerRowFor(10));
+    expect(branch.firstRowRight).toBe(
+      Math.max(...firstRow.map((n) => n.x)) + G.dotRadius,
+    );
   });
 
   it("keeps a band's dots above the next band", () => {

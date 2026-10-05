@@ -186,7 +186,8 @@ export const SKILL_ROADMAP_TIERS: RoadmapTierConfig[] = [
  */
 export const SKILL_ROADMAP_BACKDROP_SRC: string | null = null;
 
-const DIFFICULTY_RANK: Record<Exercise["difficulty"], number> = {
+/** Easiest first: the order a branch's chain runs in. */
+export const DIFFICULTY_RANK: Record<Exercise["difficulty"], number> = {
   beginner: 0,
   easy: 1,
   medium: 2,

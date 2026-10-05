@@ -12,11 +12,11 @@ The app tracks 23 individual guitar skills (alternate picking, legato, bending, 
 
 <ClickPath steps="Practice|Skills" caption="The Skills screen is one big map: a trunk down the middle, seven milestones on it, and every exercise in the library as a single dot on a branch." />
 
-The map runs top to bottom, from Foundations through Technique, Theory & Fretboard, Rhythm & Groove, Expression & Style and Ear Training to Creativity, and ends at Mastery. Each milestone fans out into branches named after a skill (Alternate Picking, Legato, Click Hunts, Strumming Patterns…), and each branch is a chain of dots ordered easiest first. A filled dot is an exercise you've played, a hollow dot is still untouched, and a padlock marks a Pro exercise. Exactly one dot on the whole map wears a ring: the exercise you're up to.
+The map runs top to bottom, from Foundations through Technique, Theory & Fretboard, Rhythm & Groove, Expression & Style and Ear Training to Creativity, and ends at Mastery. Each milestone fans out into branches named after a skill (Alternate Picking, Legato, Click Hunts, Strumming Patterns…), and each branch is a chain of dots ordered easiest first. Small gaps split a chain into difficulty steps, and the faint marks under each step tell you how hard it is: one for beginner, up to four for hard. A green dot is an exercise you've played, a dark dot is still waiting, and a padlock marks a Pro exercise. Exactly one dot on the whole map wears a ring: the exercise you're up to. A milestone's circle fills up as you play its exercises and turns solid green once every one of them is done.
 
-Each branch carries its skill's level next to the name, the same number the category summary counts. Two branches that train the same skill show the same level, because it is the same skill split into two stretches of the map.
+Each branch carries its skill's level in its header, the same number the category summary counts. Two branches that train the same skill show the same level, because it is the same skill split into two stretches of the map. Branches you haven't touched yet have a dimmer name, so the ones you're working on stand out.
 
-Hover a dot to see what it is, click it to preview and start it; click a branch name to open the full list for that skill. The card in the bottom corner always holds your next exercise, with a button to start it and another to show where it sits on the map. The list of milestones on one side jumps you to any part of the journey, and the panel opposite keeps the tally of how much of the library you've covered.
+Hover a dot to see what it is, click it to preview and start it; click a skill's name to open the full list for that skill.
 
 Drag anywhere to pan, or use the arrow keys. The plus and minus buttons zoom, as does Ctrl and the scroll wheel, and the fit button brings the whole width back. Open the map after a session and it lands on your next exercise rather than at the top.
 

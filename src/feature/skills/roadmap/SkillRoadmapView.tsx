@@ -306,7 +306,7 @@ export const SkillRoadmapView = ({
         suppressClickRef.current = false;
         return;
       }
-      if (skillId !== "general") onSkillClick(skillId);
+      onSkillClick(skillId);
     },
     [onSkillClick],
   );
@@ -347,20 +347,20 @@ export const SkillRoadmapView = ({
       : 0;
 
   return (
-    <div className='relative h-full w-full overflow-hidden bg-[#0b0b10]'>
-      {/* Ambient backdrop: the optional artwork under a wash of colour, else a
-          near-black sky the map's own stars sit on. */}
-      <div className='pointer-events-none absolute inset-0' aria-hidden='true'>
-        {SKILL_ROADMAP_BACKDROP_SRC && (
-          // eslint-disable-next-line @next/next/no-img-element
+    <div className='relative h-full w-full overflow-hidden bg-zinc-950'>
+      {/* Flat ground, with the optional artwork underneath when set. */}
+      {SKILL_ROADMAP_BACKDROP_SRC && (
+        <div
+          className='pointer-events-none absolute inset-0'
+          aria-hidden='true'>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={SKILL_ROADMAP_BACKDROP_SRC}
             alt=''
             className='h-full w-full object-cover opacity-50'
           />
-        )}
-        <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(34,211,238,0.10),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(251,191,36,0.10),transparent_55%)]' />
-      </div>
+        </div>
+      )}
 
       <div
         ref={scrollRef}
@@ -395,6 +395,7 @@ export const SkillRoadmapView = ({
             onNodeClick={handleNodeClick}
             onBranchClick={handleBranchClick}
             skillLevels={skillLevels}
+            scale={scale}
           />
         </div>
       </div>
@@ -402,11 +403,11 @@ export const SkillRoadmapView = ({
       {/* The map dissolves into the page instead of ending on a hard edge. */}
       <div
         aria-hidden='true'
-        className='pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-[#0b0b10] to-transparent'
+        className='pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-zinc-950 to-transparent'
       />
       <div
         aria-hidden='true'
-        className='pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0b0b10] via-[#0b0b10]/70 to-transparent lg:h-16 lg:via-transparent'
+        className='pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent lg:h-16 lg:via-transparent'
       />
 
       <div className='absolute bottom-[4.5rem] right-4 flex flex-col gap-2 lg:bottom-4'>

@@ -1,4 +1,10 @@
-import type { RoadmapBranch, RoadmapTier } from "./skillRoadmap.data";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+
+import {
+  DIFFICULTY_RANK,
+  type RoadmapBranch,
+  type RoadmapTier,
+} from "./skillRoadmap.data";
 
 /**
  * Geometry of the roadmap in map units (the SVG viewBox); the view scales it.
@@ -17,6 +23,11 @@ export const ROADMAP_GEOMETRY = {
   laneStarts: [40, 290, 690, 940],
   dotSpacing: 27,
   rowSpacing: 32,
+  /**
+   * Extra room where a chain steps up a difficulty, on top of `dotSpacing`.
+   * A branch has at most four difficulties, so at most three of these.
+   */
+  groupGap: 10,
   /** Upper bound on a row; a branch that wraps spreads its dots evenly instead. */
   dotsPerRow: 8,
   /** Dot radius; the chain starts this far into the lane. */
@@ -24,18 +35,18 @@ export const ROADMAP_GEOMETRY = {
   /** The branch's name plus breathing room above its first row of dots. */
   branchHeaderHeight: 26,
   /** Vertical room between two bands of the same tier. */
-  bandGap: 40,
+  bandGap: 30,
   /** How far above a band its rail runs — clear of the branch names. */
   railOffset: 16,
   milestoneRadius: 24,
   /** From the milestone's bottom edge to the first band: the tier's name and count sit here, then the connectors swoop out below them. */
-  milestoneLabelHeight: 84,
-  tierGap: 44,
-  /** Start marker and its caption sit here, above the first milestone. */
-  topPadding: 130,
-  /** Mastery marker and its caption below the last tier. */
-  masteryOffset: 90,
-  bottomPadding: 170,
+  milestoneLabelHeight: 80,
+  tierGap: 16,
+  /** Above the first milestone, clear of the view's top fade. */
+  topPadding: 56,
+  /** Mastery marker below the last tier, as far down as a milestone would be. */
+  masteryOffset: 40,
+  bottomPadding: 120,
 } as const;
 
 export interface LayoutNode {
@@ -57,8 +68,15 @@ export interface LayoutBranch {
   /** Where the connector lands: a small root marker left of the label. */
   root: { x: number; y: number };
   nodes: LayoutNode[];
-  /** SVG path through every dot, with the serpentine turns. */
+  /** Right edge of the first row's last dot; the branch's level closes the header here. */
+  firstRowRight: number;
+  /** SVG path through the dots, with the serpentine turns, broken where the difficulty steps up. */
   chainPath: string;
+  /**
+   * The first dot of each difficulty group and how hard the group is, from
+   * 1 (beginner) to 4 (hard) — that many pips sit under the dot.
+   */
+  difficultyMarks: { x: number; y: number; level: number }[];
   /** Short vertical drop from the band's rail down to the root marker. */
   connectorPath: string;
 }
@@ -79,7 +97,6 @@ export interface RoadmapLayout {
   width: number;
   height: number;
   trunkX: number;
-  startY: number;
   masteryY: number;
   tiers: LayoutTier[];
 }
@@ -115,21 +132,49 @@ export const dotsPerRowFor = (exerciseCount: number): number =>
 const branchHeight = (exerciseCount: number): number =>
   G.branchHeaderHeight + branchRowCount(exerciseCount) * G.rowSpacing;
 
-/** Serpentine dot positions for a chain that starts at (x0, y0). */
+const NO_BREAKS: ReadonlySet<number> = new Set();
+
+/**
+ * Where a branch steps up a difficulty: the index of the first exercise of
+ * each new difficulty. Branches are sorted easiest first, so these split the
+ * chain into its beginner, easy, medium and hard groups.
+ */
+export const difficultyBreaks = (exercises: Exercise[]): Set<number> =>
+  new Set(
+    exercises.flatMap((exercise, i) =>
+      i > 0 && exercise.difficulty !== exercises[i - 1].difficulty ? [i] : [],
+    ),
+  );
+
+/**
+ * Serpentine dot positions for a chain that starts at (x0, y0), with a wider
+ * step before every index in `breaksBefore`.
+ */
 export const chainPositions = (
   count: number,
   x0: number,
   y0: number,
+  breaksBefore: ReadonlySet<number> = NO_BREAKS,
 ): { x: number; y: number }[] => {
   const perRow = dotsPerRowFor(count);
-  return Array.from({ length: count }, (_, i) => {
-    const row = Math.floor(i / perRow);
-    const col = i % perRow;
-    // Odd rows run back the other way, so the chain reads as one continuous
-    // line rather than as separate rows.
-    const slot = row % 2 === 0 ? col : perRow - 1 - col;
-    return { x: x0 + slot * G.dotSpacing, y: y0 + row * G.rowSpacing };
-  });
+  const points: { x: number; y: number }[] = [];
+  let x = 0;
+  let direction = 1;
+  for (let i = 0; i < count; i += 1) {
+    if (i > 0 && i % perRow === 0) {
+      // A new row starts right under the last dot and runs back the other
+      // way, so the chain reads as one continuous line rather than as rows.
+      direction = -direction;
+    } else if (i > 0) {
+      x +=
+        direction * (G.dotSpacing + (breaksBefore.has(i) ? G.groupGap : 0));
+    }
+    points.push({ x, y: y0 + Math.floor(i / perRow) * G.rowSpacing });
+  }
+  // A gap on a row that runs back can carry it past the lane's left edge; the
+  // whole chain then moves right so its leftmost dot still starts the lane.
+  const minX = Math.min(0, ...points.map((p) => p.x));
+  return points.map((p) => ({ x: x0 + p.x - minX, y: p.y }));
 };
 
 /**
@@ -160,9 +205,49 @@ export const chainPathBetween = (
   return d;
 };
 
-/** The whole chain, dot to dot. */
-export const chainPathFor = (points: { x: number; y: number }[]): string =>
-  points.length === 0 ? "" : chainPathBetween(points, 0, points.length - 1);
+/**
+ * The whole chain, dot to dot, left open before every index in `breaksBefore`
+ * so each difficulty group is its own stretch of line.
+ */
+export const chainPathFor = (
+  points: { x: number; y: number }[],
+  breaksBefore: ReadonlySet<number> = NO_BREAKS,
+): string => {
+  const stretches: string[] = [];
+  let start = 0;
+  for (let i = 1; i <= points.length; i += 1) {
+    if (i === points.length || breaksBefore.has(i)) {
+      const stretch = chainPathBetween(points, start, i - 1);
+      if (stretch) stretches.push(stretch);
+      start = i;
+    }
+  }
+  return stretches.join(" ");
+};
+
+/**
+ * One mark per difficulty group, under the leftmost dot of the row the group
+ * starts on — on a row that runs back, that is the group's last dot there,
+ * not its first, so the marks always sit at the left edge the eye starts from.
+ */
+export const difficultyMarksFor = (
+  points: { x: number; y: number }[],
+  exercises: Exercise[],
+  breaks: ReadonlySet<number>,
+): LayoutBranch["difficultyMarks"] => {
+  const perRow = dotsPerRowFor(points.length);
+  const starts = [0, ...breaks].filter((i) => i < points.length);
+  return starts.map((start, k) => {
+    const groupEnd = (starts[k + 1] ?? points.length) - 1;
+    const rowEnd = (Math.floor(start / perRow) + 1) * perRow - 1;
+    const onRow = points.slice(start, Math.min(groupEnd, rowEnd) + 1);
+    return {
+      x: Math.min(...onRow.map((p) => p.x)),
+      y: points[start].y,
+      level: DIFFICULTY_RANK[exercises[start].difficulty] + 1,
+    };
+  });
+};
 
 /** The horizontal rail a band hangs from, always reaching the trunk. */
 export const railPathFor = (rootXs: number[], railY: number): string => {
@@ -187,7 +272,6 @@ const chunk = <T>(items: T[], size: number): T[][] => {
 export const layoutSkillRoadmap = (tiers: RoadmapTier[]): RoadmapLayout => {
   const laneCount = G.laneStarts.length;
   let cursor = G.topPadding;
-  const startY = G.topPadding / 2;
 
   const laidOut: LayoutTier[] = tiers.map((tier) => {
     const milestoneY = cursor + G.milestoneRadius;
@@ -208,10 +292,12 @@ export const layoutSkillRoadmap = (tiers: RoadmapTier[]): RoadmapLayout => {
         const labelY = bandTop + 14;
         const root = { x: x + G.dotRadius, y: bandTop + 8 };
         rootXs.push(root.x);
+        const breaks = difficultyBreaks(branch.exercises);
         const points = chainPositions(
           branch.exercises.length,
           x + G.dotRadius,
           bandTop + G.branchHeaderHeight + G.dotRadius,
+          breaks,
         );
         const nodes = points.map((p, index) => ({
           id: branch.exercises[index].id,
@@ -226,7 +312,12 @@ export const layoutSkillRoadmap = (tiers: RoadmapTier[]): RoadmapLayout => {
           labelY,
           root,
           nodes,
-          chainPath: chainPathFor(points),
+          firstRowRight:
+            Math.max(
+              ...points.filter((p) => p.y === points[0].y).map((p) => p.x),
+            ) + G.dotRadius,
+          chainPath: chainPathFor(points, breaks),
+          difficultyMarks: difficultyMarksFor(points, branch.exercises, breaks),
           connectorPath: dropPathFor(root, railY),
         });
       });
@@ -254,7 +345,6 @@ export const layoutSkillRoadmap = (tiers: RoadmapTier[]): RoadmapLayout => {
     width: G.width,
     height: masteryY + G.bottomPadding,
     trunkX: G.trunkX,
-    startY,
     masteryY,
     tiers: laidOut,
   };
