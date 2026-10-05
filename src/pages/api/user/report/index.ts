@@ -9,6 +9,10 @@ import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
 import { firebaseAddLogReport } from "feature/logs/services/addLogReport.service";
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import {
+  sanitizeLessonVideoId,
+  sanitizeLoggedExerciseIds,
+} from "feature/logs/utils/loggedPractice";
+import {
   firebaseGetUserData,
   firebaseSetUserExerciseRaprot,
 } from "feature/report/services/setUserExerciseRaport";
@@ -342,7 +346,11 @@ export default async function handler(
         inputData.exerciseRecords,
         inputData.reportTitle,
         inputData.micPerformance,
-        inputData.earTrainingPerformance
+        inputData.earTrainingPerformance,
+        {
+          exerciseIds: sanitizeLoggedExerciseIds(inputData.exerciseIds),
+          lessonVideoId: sanitizeLessonVideoId(inputData.lessonVideoId),
+        }
       ));
     }
 

@@ -9,7 +9,12 @@ import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
-import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
+import { LESSON_TITLE_PREFIX } from "feature/logs/utils/loggedPractice";
+import {
+  selectUserAuth,
+  selectUserAvatar,
+  setActivity,
+} from "feature/user/store/userSlice";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
@@ -95,6 +100,22 @@ const LessonPracticeModal = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Shows the player as practicing in "Live now" while the window is open — and lets anyone there
+  // open the same lesson.
+  useEffect(() => {
+    dispatch(
+      setActivity({
+        planTitle: "AI Coach lesson",
+        exerciseTitle: lesson.title,
+        timestamp: Date.now(),
+        lessonVideoId: lesson.videoId,
+      }),
+    );
+    return () => {
+      dispatch(setActivity(null));
+    };
+  }, [dispatch, lesson.title, lesson.videoId]);
+
   const handleToggle = () => {
     if (isRunning) timer.stopTimer();
     else timer.startTimer();
@@ -129,7 +150,9 @@ const LessonPracticeModal = ({
         skill === "creativity" ? skillTime.minutes : zero.minutes,
       habbits: [],
       countBackDays: 0,
-      reportTitle: `Lesson: ${lesson.title}`,
+      reportTitle: `${LESSON_TITLE_PREFIX}${lesson.title}`,
+      // Lets other players open the same lesson straight from the activity feed.
+      lessonVideoId: lesson.videoId,
       avatarUrl: userAvatar ?? null,
       ...getClientReportContext(
         ((reportList as any[]) ?? []).map((report) => report.date),

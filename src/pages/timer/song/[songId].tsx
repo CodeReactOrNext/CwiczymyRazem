@@ -216,7 +216,8 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 planTitle: "Practicing Song",
                 exerciseTitle: `${song.artist} - ${song.title}`,
                 category: "technique", // Songs are mostly technique
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                songId: song.id,
             }));
         }
 

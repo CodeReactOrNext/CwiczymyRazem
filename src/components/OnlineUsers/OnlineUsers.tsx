@@ -5,10 +5,16 @@ import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { sortSupportFirst } from "feature/supportTeam/utils/supportTeam.utils";
 import { motion } from "framer-motion";
 import { useOnlineUsers } from "hooks/useOnlineUsers";
+import type { ActivityPreview } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { Monitor } from "lucide-react";
 import Link from "next/link";
 
-export const OnlineUsers = () => {
+interface OnlineUsersProps {
+    /** Opens what a practicing player is on right now — named in their card. */
+    onOpenActivity?: (preview: ActivityPreview) => void;
+}
+
+export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
     const { onlineUsers, isDbEnabled } = useOnlineUsers();
     const { isSupport, getSupportMember } = useSupportTeam();
 
@@ -56,7 +62,11 @@ export const OnlineUsers = () => {
                             className="relative -ml-3 first:ml-0 hover:z-20 transition-all duration-300"
                             style={{ zIndex: displayUsers.length - i }}
                         >
-                            <UserTooltip userId={user.uid} currentActivity={user.currentActivity}>
+                            <UserTooltip
+                                userId={user.uid}
+                                currentActivity={user.currentActivity}
+                                onOpenActivity={onOpenActivity}
+                            >
                                 <Link href={`/user/${user.uid}`}>
                                     <div className="cursor-pointer relative transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
                                         {/* Practicing Animation */}

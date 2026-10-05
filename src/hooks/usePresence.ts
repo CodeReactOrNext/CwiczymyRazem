@@ -3,7 +3,21 @@ import { getDatabase, onDisconnect, onValue, ref, serverTimestamp, set } from "f
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useEffect } from "react";
 import { useAppSelector } from "store/hooks";
+import type { CurrentActivityInterface } from "types/api.types";
 import { firebaseApp, isDatabaseEnabled } from "utils/firebase/client/firebase.config";
+
+/**
+ * The Realtime Database refuses a write that holds an `undefined` anywhere — and a refused presence
+ * write takes the player out of "Live now" altogether — so optional ids that came out empty go.
+ */
+export const toPresenceActivity = (
+  activity: CurrentActivityInterface | null
+): CurrentActivityInterface | null =>
+  activity
+    ? (Object.fromEntries(
+        Object.entries(activity).filter(([, value]) => value !== undefined)
+      ) as unknown as CurrentActivityInterface)
+    : null;
 
 export const usePresence = () => {
   const userInfo = useAppSelector(selectUserInfo);
@@ -33,7 +47,7 @@ export const usePresence = () => {
         avatar: userInfo.avatar,
         state: "online",
         last_changed: serverTimestamp(),
-        currentActivity: currentActivity || null,
+        currentActivity: toPresenceActivity(currentActivity),
         platform: isElectron ? "desktop" : "web",
       });
       fetch("/api/presence/cleanup", { method: "POST" }).catch(() => {});

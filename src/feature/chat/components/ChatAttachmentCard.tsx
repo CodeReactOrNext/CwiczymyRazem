@@ -2,10 +2,7 @@ import { cn } from "assets/lib/utils";
 import type { ChatAttachment } from "feature/chat/types/chat.types";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import type {
-  Exercise,
-  ExercisePlan,
-} from "feature/exercisePlan/types/exercise.types";
+import type { ActivityPreview } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import {
   ItemPill,
   resolveRolledItem,
@@ -75,7 +72,7 @@ export const ChatAttachmentCard = ({
   onOpenRecording,
 }: {
   attachment: ChatAttachment;
-  onOpenActivity: (target: { plan?: ExercisePlan; exercise?: Exercise }) => void;
+  onOpenActivity: (preview: ActivityPreview) => void;
   onOpenRecording: (recordingId: string) => void;
 }) => {
   switch (attachment.kind) {
@@ -85,7 +82,9 @@ export const ChatAttachmentCard = ({
         <button
           type='button'
           disabled={!exercise}
-          onClick={() => exercise && onOpenActivity({ exercise })}
+          onClick={() =>
+            exercise && onOpenActivity({ kind: "exercise", exercise })
+          }
           className={cardClass}>
           <CardBody
             kind='exercise'
@@ -102,7 +101,7 @@ export const ChatAttachmentCard = ({
         <button
           type='button'
           disabled={!plan}
-          onClick={() => plan && onOpenActivity({ plan })}
+          onClick={() => plan && onOpenActivity({ kind: "plan", plan })}
           className={cardClass}>
           <CardBody
             kind='plan'

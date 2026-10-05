@@ -1,5 +1,6 @@
 import { getDatabase, onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
+import type { CurrentActivityInterface } from "types/api.types";
 import { firebaseApp, isDatabaseEnabled } from "utils/firebase/client/firebase.config";
 
 interface OnlineUser {
@@ -9,12 +10,7 @@ interface OnlineUser {
   state: "online" | "offline";
   last_changed: number;
   platform?: "desktop" | "web";
-  currentActivity?: {
-    planTitle: string;
-    exerciseTitle: string;
-    category?: string;
-    timestamp: number;
-  };
+  currentActivity?: CurrentActivityInterface;
 }
 
 /** `enabled: false` keeps the listener off — it downloads the whole presence node. */

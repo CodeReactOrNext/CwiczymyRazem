@@ -44,6 +44,10 @@ export interface ReportFormikInterface {
   songArtist?: string;
   /** Every song of this session with its own time; empty/absent for non-song sessions. */
   songs?: ReportSongEntry[];
+  /** Ids of the exercises a timed session ran — lets the activity feed open what was practiced. */
+  exerciseIds?: string[];
+  /** YouTube id of the lesson a lesson session played along to. */
+  lessonVideoId?: string;
   skillPointsGained?: Record<string, number>;
   exerciseRecords?: {
     micHighScore?: { exerciseTitle: string; score: number; accuracy: number };

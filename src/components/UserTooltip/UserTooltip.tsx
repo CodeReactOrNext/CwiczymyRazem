@@ -4,15 +4,19 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
 import { IconBox } from "components/IconBox/IconBox";
+import { resolveLiveActivity } from "components/OnlineUsers/liveActivity";
 import Avatar from "components/UI/Avatar";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
+import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
 import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { useTranslation } from "hooks/useTranslation";
+import type { ActivityPreview } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -26,6 +30,7 @@ import {
   FaTrophy,
 } from "react-icons/fa";
 import { useResponsiveStore } from "store/useResponsiveStore";
+import type { CurrentActivityInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 import type { UserTooltipData } from "utils/firebase/client/firebase.utils";
 import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
@@ -48,16 +53,24 @@ const StatsBox = ({
     </div>
   </div>
 );
+/** A name in the "Live now" card that opens what it names. */
+const LIVE_LINK_CLASS =
+  "block text-left underline decoration-gray-300 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-600 hover:decoration-cyan-400";
+
 interface UserTooltipProps {
   userId: string | null;
   children: React.ReactNode;
-  currentActivity?: {
-    planTitle: string;
-    exerciseTitle: string;
-  } | null;
+  currentActivity?: CurrentActivityInterface | null;
+  /** Opens what the player is practicing right now. Without it the card only names it. */
+  onOpenActivity?: (preview: ActivityPreview) => void;
 }
 
-export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipProps) => {
+export const UserTooltip = ({
+  userId,
+  children,
+  currentActivity,
+  onOpenActivity,
+}: UserTooltipProps) => {
   const [userData, setUserData] = useState<UserTooltipData | null>(null);
   const [reconciledStreak, setReconciledStreak] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -113,6 +126,20 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
 
   if (!userId) return <>{children}</>;
 
+  const live = currentActivity ? resolveLiveActivity(currentActivity) : null;
+  const currentPreview =
+    onOpenActivity && live?.current && "preview" in live.current
+      ? live.current.preview
+      : null;
+  const currentHref =
+    live?.current && "href" in live.current ? live.current.href : null;
+  const planPreview = onOpenActivity ? (live?.plan ?? null) : null;
+  // The card closes first: on a phone it sits above everything, the preview included.
+  const openActivity = (preview: ActivityPreview) => {
+    setOpen(false);
+    onOpenActivity?.(preview);
+  };
+
   const panel = (
     <>
       {loading ? (
@@ -130,10 +157,41 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                     <div className="p-2 rounded-md bg-cyan-100 text-cyan-600">
                       <FaMusic className="h-3 w-3" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-[10px] text-gray-500 font-medium">Practicing:</p>
-                      <p className="text-xs font-bold text-gray-900 leading-tight">{currentActivity.exerciseTitle}</p>
-                      <p className="text-[10px] text-gray-400 italic mt-0.5">{currentActivity.planTitle}</p>
+                      {currentPreview ? (
+                        <button
+                          type="button"
+                          onClick={() => openActivity(currentPreview)}
+                          className={cn("text-xs font-bold text-gray-900 leading-tight", LIVE_LINK_CLASS)}>
+                          {currentActivity.exerciseTitle}
+                        </button>
+                      ) : currentHref ? (
+                        <Link
+                          href={currentHref}
+                          onClick={() => {
+                            setOpen(false);
+                            // The page would otherwise open under the Community drawer.
+                            useCommunityDrawer.getState().setOpen(false);
+                          }}
+                          className={cn("text-xs font-bold text-gray-900 leading-tight", LIVE_LINK_CLASS)}>
+                          {currentActivity.exerciseTitle}
+                        </Link>
+                      ) : (
+                        <p className="text-xs font-bold text-gray-900 leading-tight">{currentActivity.exerciseTitle}</p>
+                      )}
+                      {/* A single exercise runs inside a plan named after it — no need to say it twice. */}
+                      {currentActivity.planTitle !== currentActivity.exerciseTitle &&
+                        (planPreview ? (
+                          <button
+                            type="button"
+                            onClick={() => openActivity(planPreview)}
+                            className={cn("mt-0.5 text-[10px] italic text-gray-400", LIVE_LINK_CLASS)}>
+                            {currentActivity.planTitle}
+                          </button>
+                        ) : (
+                          <p className="text-[10px] text-gray-400 italic mt-0.5">{currentActivity.planTitle}</p>
+                        ))}
                     </div>
                   </div>
                 </div>
@@ -297,7 +355,10 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
     <TooltipProvider>
       <Tooltip
         delayDuration={200}
+        // Controlled, so opening a live activity can shut the card — it sits above dialogs.
+        open={open}
         onOpenChange={(isOpen) => {
+          setOpen(isOpen);
           if (isOpen) setHasOpened(true);
         }}>
         <TooltipTrigger

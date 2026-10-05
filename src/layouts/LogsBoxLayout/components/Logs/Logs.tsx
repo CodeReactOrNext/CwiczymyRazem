@@ -1,4 +1,8 @@
-import { Chip, getChipCustomStyle } from "assets/components/ui/chip";
+import {
+  Chip,
+  type ChipProps,
+  getChipCustomStyle,
+} from "assets/components/ui/chip";
 import {
   Tooltip,
   TooltipContent,
@@ -12,6 +16,7 @@ import { HeroPattern } from "components/UI/HeroBanner";
 import { UserLink } from "components/UserLink";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
+import LessonPracticeModal from "feature/aiCoach/view/RoadmapView/components/LessonPracticeModal";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
 import { GuitarCard } from "feature/arsenal/components/GuitarInventory/GuitarCard";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
@@ -34,13 +39,8 @@ import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { LEGACY_EXERCISE_TITLES } from "feature/exercisePlan/data/legacyExerciseTitles";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import type {
-  Exercise,
-  ExercisePlan,
-} from "feature/exercisePlan/types/exercise.types";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { findCosmetic } from "feature/guilds/data/guildCosmetics";
 import { LogReaction } from "feature/logs/components/LogReaction";
@@ -80,7 +80,15 @@ import {
   getGroupReactionAnchor,
   getGroupReactors,
 } from "feature/logs/utils/groupReactions";
+import {
+  getLessonTitle,
+  resolveLoggedExercises,
+} from "feature/logs/utils/loggedPractice";
 import { splitPinnedDonations } from "feature/logs/utils/pinnedDonations";
+import {
+  EXERCISES_BY_ID,
+  findExerciseByTitle,
+} from "feature/logs/utils/practiceCatalog";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
@@ -91,7 +99,10 @@ import {
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { getSupportVariantCopy } from "feature/support/content/supportVariants";
 import { useTranslation } from "hooks/useTranslation";
-import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
+import {
+  type ActivityPreview,
+  ActivityStartModal,
+} from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import {
   Clock,
   Coffee,
@@ -102,7 +113,9 @@ import {
   GraduationCap,
   Heart,
   ListChecks,
+  type LucideIcon,
   Map as MapIcon,
+  MonitorPlay,
   Music,
   PartyPopper,
   Shield,
@@ -1007,30 +1020,49 @@ const SongBadge = ({
   );
 
 /**
- * The exercise a log's title refers to, or `null` when the catalog no longer
- * knows it. Old logs store the title text as it was at log time and names get
- * renamed (#786), so the legacy-title → id map keeps historical rows linking.
+ * The chip naming what a session practiced. It opens that plan, exercise or lesson when the feed
+ * knows how to, and stays a plain label when it doesn't — a free-text manual report, an older log.
  */
-const findExerciseByTitle = (title: string): Exercise | null =>
-  exercisesAgregat.find((ex) => ex.title === title) ??
-  exercisesAgregat.find((ex) => ex.id === LEGACY_EXERCISE_TITLES[title]) ??
-  null;
+const PracticedChip = ({
+  color,
+  icon: Icon,
+  label,
+  hint,
+  onOpen,
+}: {
+  color: ChipProps["color"];
+  icon: LucideIcon;
+  label: string;
+  hint: string;
+  onOpen?: () => void;
+}) =>
+  onOpen ? (
+    <button type='button' onClick={onOpen} title={hint}>
+      <Chip color={color} className='cursor-pointer text-left'>
+        <Icon className='h-3.5 w-3.5 shrink-0' />
+        <span className='underline-offset-2 hover:underline'>{label}</span>
+      </Chip>
+    </button>
+  ) : (
+    <Chip color={color}>
+      <Icon className='h-3.5 w-3.5 shrink-0' />
+      {label}
+    </Chip>
+  );
 
 /** Renders a single activity's description inside a grouped feed row — same detail as the standalone item, minus the avatar and reaction (those live once on the group). */
 const GroupedLogLine = ({
   log,
   type,
   songTiers,
-  onPreviewPlan,
-  onPreviewExercise,
+  onPreview,
   onViewRecording,
   onOpenLeaderboard,
 }: {
   log: AnyFirebaseLog;
   type: LogActivityType;
   songTiers: Record<string, SongTierInfo>;
-  onPreviewPlan: (plan: ExercisePlan) => void;
-  onPreviewExercise: (exercise: Exercise) => void;
+  onPreview: (preview: ActivityPreview) => void;
   onViewRecording: (id: string) => void;
   onOpenLeaderboard: (exerciseId: string, exerciseTitle: string) => void;
 }) => {
@@ -1316,12 +1348,20 @@ const GroupedLogLine = ({
 
   // "exercise" | "exercisePlan" — general practice log (points, level ups, achievements, plan/exercise/song refs).
   const genericLog = log as FirebaseLogsInterface;
-  const plan: any = genericLog.planId
-    ? defaultPlans.find((p) => p.id === genericLog.planId)
+  const plan = genericLog.planId
+    ? (defaultPlans.find((p) => p.id === genericLog.planId) ?? null)
     : null;
   const matchedExercise: Exercise | null = genericLog.exerciseTitle
     ? findExerciseByTitle(genericLog.exerciseTitle)
     : null;
+  // A plan that isn't in the catalog — someone's own, an auto plan — can only be opened through
+  // the exercises its log lists. Logs written before those were recorded stay plain labels.
+  const loggedExercises = resolveLoggedExercises(
+    genericLog.exerciseIds,
+    EXERCISES_BY_ID,
+  );
+  const lessonTitle = getLessonTitle(genericLog.exerciseTitle);
+  const lessonVideoId = genericLog.lessonVideoId;
   // The session's own name, as the report filed it. A song session's title just
   // repeats its song line ("Song: …", "Practicing: …"), so it is not one.
   const sessionTitle =
@@ -1389,46 +1429,60 @@ const GroupedLogLine = ({
         </span>
       )}
 
-      {planTitle &&
-        (plan ? (
-          <button
-            type='button'
-            onClick={() => onPreviewPlan(plan)}
-            title='Click to preview and start this plan'>
-            <Chip color='cyan' className='cursor-pointer text-left'>
-              <ListChecks className='h-3.5 w-3.5 shrink-0' />
-              <span className='underline-offset-2 hover:underline'>
-                {planTitle}
-              </span>
-            </Chip>
-          </button>
-        ) : (
-          <Chip color='cyan'>
-            <ListChecks className='h-3.5 w-3.5 shrink-0' />
-            {planTitle}
-          </Chip>
-        ))}
+      {planTitle && (
+        <PracticedChip
+          color='cyan'
+          icon={ListChecks}
+          label={planTitle}
+          hint='Click to see what this plan practices'
+          onOpen={
+            plan
+              ? () => onPreview({ kind: "plan", plan })
+              : loggedExercises.length > 0
+                ? () =>
+                    onPreview({
+                      kind: "routine",
+                      title: planTitle,
+                      exercises: loggedExercises,
+                    })
+                : undefined
+          }
+        />
+      )}
 
       {sessionTitle &&
         !planTitle &&
         !genericLog.songTitle &&
-        (matchedExercise ? (
-          <button
-            type='button'
-            onClick={() => onPreviewExercise(matchedExercise)}
-            title='Click to preview and start this exercise'>
-            <Chip color='emerald' className='cursor-pointer text-left'>
-              <Dumbbell className='h-3.5 w-3.5 shrink-0' />
-              <span className='underline-offset-2 hover:underline'>
-                {sessionTitle}
-              </span>
-            </Chip>
-          </button>
+        (lessonTitle ? (
+          <PracticedChip
+            color='emerald'
+            icon={MonitorPlay}
+            label={lessonTitle}
+            hint='Click to watch this lesson'
+            onOpen={
+              lessonVideoId
+                ? () =>
+                    onPreview({
+                      kind: "lesson",
+                      title: lessonTitle,
+                      videoId: lessonVideoId,
+                    })
+                : undefined
+            }
+          />
         ) : (
-          <Chip color='emerald'>
-            <Dumbbell className='h-3.5 w-3.5 shrink-0' />
-            {sessionTitle}
-          </Chip>
+          <PracticedChip
+            color='emerald'
+            icon={Dumbbell}
+            label={sessionTitle}
+            hint='Click to preview and start this exercise'
+            onOpen={
+              matchedExercise
+                ? () =>
+                    onPreview({ kind: "exercise", exercise: matchedExercise })
+                : undefined
+            }
+          />
         ))}
 
       {genericLog.micPerformance &&
@@ -1496,8 +1550,7 @@ const GroupedLogItem = ({
   currentUserId,
   songTiers,
   showMotivateHint,
-  onPreviewPlan,
-  onPreviewExercise,
+  onPreview,
   onViewRecording,
   onOpenLeaderboard,
 }: {
@@ -1506,8 +1559,7 @@ const GroupedLogItem = ({
   currentUserId: string;
   songTiers: Record<string, SongTierInfo>;
   showMotivateHint: boolean;
-  onPreviewPlan: (plan: ExercisePlan) => void;
-  onPreviewExercise: (exercise: Exercise) => void;
+  onPreview: (preview: ActivityPreview) => void;
   onViewRecording: (id: string) => void;
   onOpenLeaderboard: (exerciseId: string, exerciseTitle: string) => void;
 }) => {
@@ -1567,8 +1619,7 @@ const GroupedLogItem = ({
               log={log}
               type={getLogActivityType(log)}
               songTiers={songTiers}
-              onPreviewPlan={onPreviewPlan}
-              onPreviewExercise={onPreviewExercise}
+              onPreview={onPreview}
               onViewRecording={onViewRecording}
               onOpenLeaderboard={onOpenLeaderboard}
             />
@@ -1606,8 +1657,11 @@ const Logs = ({
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(
     null,
   );
-  const [previewPlan, setPreviewPlan] = useState<ExercisePlan | null>(null);
-  const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
+  const [preview, setPreview] = useState<ActivityPreview | null>(null);
+  const [practicingLesson, setPracticingLesson] = useState<{
+    title: string;
+    videoId: string;
+  } | null>(null);
   const [leaderboardExercise, setLeaderboardExercise] = useState<{
     id: string;
     title: string;
@@ -1689,7 +1743,7 @@ const Logs = ({
   return (
     <>
       <div className='mb-2 mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 px-3 empty:hidden'>
-        <OnlineUsers />
+        <OnlineUsers onOpenActivity={setPreview} />
       </div>
       <div ref={spanRef} className='h-1' />
       {groups.map((group, groupIndex) => {
@@ -1735,8 +1789,7 @@ const Logs = ({
                 currentUserId={currentUserId}
                 songTiers={songTiers}
                 showMotivateHint={groupIndex === hintGroupIndex}
-                onPreviewPlan={setPreviewPlan}
-                onPreviewExercise={setPreviewExercise}
+                onPreview={setPreview}
                 onViewRecording={setActiveRecordingId}
                 onOpenLeaderboard={(id, title) =>
                   setLeaderboardExercise({ id, title })
@@ -1764,14 +1817,28 @@ const Logs = ({
         recordingId={activeRecordingId}
       />
 
-      <ActivityStartModal
-        plan={previewPlan}
-        exercise={previewExercise}
-        onClose={() => {
-          setPreviewPlan(null);
-          setPreviewExercise(null);
-        }}
-      />
+      {preview && (
+        <ActivityStartModal
+          preview={preview}
+          onClose={() => setPreview(null)}
+          onStartLesson={setPracticingLesson}
+        />
+      )}
+
+      {/* The same practice window the AI Coach plays lessons in: the video with a stopwatch,
+          logging the time on finish. */}
+      {practicingLesson && (
+        <LessonPracticeModal
+          lesson={{
+            videoId: practicingLesson.videoId,
+            title: practicingLesson.title,
+            channelName: "",
+            thumbnailUrl: "",
+          }}
+          onFinish={() => setPracticingLesson(null)}
+          onClose={() => setPracticingLesson(null)}
+        />
+      )}
 
       <EarTrainingLeaderboardDialog
         isOpen={!!leaderboardExercise}

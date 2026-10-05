@@ -104,6 +104,9 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
             songArtist: primarySong.artist,
           }),
           ...(planSongs.length > 0 && { songs: planSongs }),
+          // What lets another player open this routine from the activity feed when it's one only
+          // this player has (their own plan, an auto plan). A song wrapper has its song for that.
+          ...(!plan.song && { exerciseIds: plan.exercises.map((exercise) => exercise.id) }),
           skillPointsGained: options?.skipSkillPoints
             ? {}
             : computeSkillPointsGained(plan.exercises, completedExercises),

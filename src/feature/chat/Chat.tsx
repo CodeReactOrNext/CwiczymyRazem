@@ -21,10 +21,6 @@ import type {
 } from "feature/chat/types/chat.types";
 import { foldGreetings } from "feature/chat/utils/chatGreetings";
 import { splitByMentions } from "feature/chat/utils/chatMentions";
-import type {
-  Exercise,
-  ExercisePlan,
-} from "feature/exercisePlan/types/exercise.types";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
@@ -32,7 +28,10 @@ import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { useOnlineUsers } from "hooks/useOnlineUsers";
 import { useTranslation } from "hooks/useTranslation";
-import { ActivityStartModal } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
+import {
+  type ActivityPreview,
+  ActivityStartModal,
+} from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { ArrowDown, MessageCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -124,10 +123,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
   const [flashMessageId, setFlashMessageId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [activity, setActivity] = useState<{
-    plan?: ExercisePlan;
-    exercise?: Exercise;
-  } | null>(null);
+  const [activity, setActivity] = useState<ActivityPreview | null>(null);
   const [recordingId, setRecordingId] = useState<string | null>(null);
   const { getSupportMember } = useSupportTeam();
   const { typingNames, notifyTyping, stopTyping } = useChatTyping(
@@ -518,11 +514,12 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
         }}
       />
 
-      <ActivityStartModal
-        plan={activity?.plan}
-        exercise={activity?.exercise}
-        onClose={() => setActivity(null)}
-      />
+      {activity && (
+        <ActivityStartModal
+          preview={activity}
+          onClose={() => setActivity(null)}
+        />
+      )}
 
       <RecordingViewModal
         isOpen={!!recordingId}

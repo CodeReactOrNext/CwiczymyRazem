@@ -22,6 +22,13 @@ export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivity
           exerciseTitle: currentExercise.title,
           category: currentExercise.category,
           timestamp: Date.now(),
+          // What lets the "Live now" row open this session for someone else. A song wrapper is
+          // opened through its song; anything else through its plan and exercises.
+          planId: plan.id,
+          exerciseId: currentExercise.id,
+          ...(plan.song
+            ? { songId: plan.song.id }
+            : { exerciseIds: plan.exercises.map((exercise) => exercise.id) }),
         })
       );
     }

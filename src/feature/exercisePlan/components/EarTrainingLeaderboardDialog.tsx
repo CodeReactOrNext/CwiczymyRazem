@@ -48,7 +48,8 @@ export const EarTrainingLeaderboardDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-xl bg-zinc-950 border-0 p-0 sm:rounded-lg shadow-2xl max-h-[85vh] flex flex-col">
+      {/* Above the Community drawer (z-110) — the activity feed opens this from inside it. */}
+      <DialogContent overlayClassName="z-[120]" className="z-[120] max-w-xl bg-zinc-950 border-0 p-0 sm:rounded-lg shadow-2xl max-h-[85vh] flex flex-col">
         <div className="p-8 pb-5 pr-14 sm:pr-16 shrink-0">
           <DialogHeader className="mb-0 text-left">
             <div className="flex items-center gap-3 mb-3">

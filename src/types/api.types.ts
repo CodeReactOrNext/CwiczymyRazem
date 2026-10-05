@@ -179,6 +179,26 @@ interface UserSliceProviderData {
   email: string | null;
   photoURL: string | null;
 }
+/**
+ * What a player is practicing right now — published to their presence entry, where the "Live now"
+ * row shows it. The ids let other players open the same thing. Players on an older build send
+ * only the titles. Every field must be defined: the Realtime Database rejects `undefined`.
+ */
+export interface CurrentActivityInterface {
+  planTitle: string;
+  exerciseTitle: string;
+  category?: string;
+  timestamp: number;
+  planId?: string;
+  /** The catalog exercise being played. */
+  exerciseId?: string;
+  /** Every exercise of the session, so a routine outside the catalog can be opened. */
+  exerciseIds?: string[];
+  songId?: string;
+  /** YouTube id of an AI Coach lesson being practiced along to. */
+  lessonVideoId?: string;
+}
+
 export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: {
@@ -208,12 +228,7 @@ export interface userSliceInitialState {
     favoriteSongIds?: string[];
   } | null;
   timer: TimerInterface;
-  currentActivity: {
-    planTitle: string;
-    exerciseTitle: string;
-    category?: string;
-    timestamp: number;
-  } | null;
+  currentActivity: CurrentActivityInterface | null;
   isLoggedOut: true | null;
   autoLogInFailed?: boolean;
   currentUserStats: StatisticsDataInterface | null;

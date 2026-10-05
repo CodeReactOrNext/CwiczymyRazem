@@ -46,7 +46,9 @@ export const firebaseAddLogReport = async (
   },
   exerciseTitle?: string,
   micPerformance?: { score: number; accuracy: number; bpm?: number; rank?: number },
-  earTrainingPerformance?: { score: number; rank?: number }
+  earTrainingPerformance?: { score: number; rank?: number },
+  /** What the session practiced, so the feed can open it — already sanitized by the caller. */
+  practiced?: { exerciseIds?: string[]; lessonVideoId?: string }
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -73,6 +75,8 @@ export const firebaseAddLogReport = async (
     ...(exerciseTitle && { exerciseTitle }),
     ...(micPerformance && { micPerformance }),
     ...(earTrainingPerformance && { earTrainingPerformance }),
+    ...(practiced?.exerciseIds && { exerciseIds: practiced.exerciseIds }),
+    ...(practiced?.lessonVideoId && { lessonVideoId: practiced.lessonVideoId }),
     ...songDetails,
     ...(skillPointsGained && Object.keys(skillPointsGained).length > 0 && { skillPointsGained }),
     ...(newRecords && { newRecords }),

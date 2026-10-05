@@ -109,6 +109,13 @@ export interface FirebaseLogsInterface {
   songs?: ReportSongEntry[];
   /** The session's own name: a plan title, an exercise title, "Song: …". */
   exerciseTitle?: string;
+  /**
+   * Ids of the exercises the session ran, in order — what lets another player open a routine that
+   * isn't in the catalog (someone's own plan, an auto plan). Absent on older logs.
+   */
+  exerciseIds?: string[];
+  /** YouTube id of the lesson an AI Coach lesson session ("Lesson: …") practiced along to. */
+  lessonVideoId?: string;
   skillPointsGained?: Record<string, number>;
   newRecords?: {
     maxPoints?: boolean;
