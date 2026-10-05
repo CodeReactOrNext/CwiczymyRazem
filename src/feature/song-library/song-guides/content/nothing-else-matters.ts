@@ -7,7 +7,7 @@ export const nothingElseMatters: SongGuide = {
   artist: "Metallica",
   author: "Michael Apfel",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-07-20",
+  updatedAt: "2026-10-05",
   seo: {
     metaTitle: "How to Play Nothing Else Matters on Guitar: Picking Roadmap",
     metaDescription:
@@ -225,8 +225,9 @@ export const nothingElseMatters: SongGuide = {
       {
         title: "Fade to Black",
         artist: "Metallica",
-        difficulty: 7,
-        why: "Metallica's own step up: clean arpeggios again, but faster solos and a heavy second half.",
+        difficulty: 5,
+        why: "Metallica's other clean ballad: picked arpeggios that many find easier, then a heavy second half and a much faster outro solo.",
+        guideSlug: "fade-to-black",
         songId: "KVdM1RGahqdFosb0qgfu",
       },
       {
@@ -287,7 +288,7 @@ export const nothingElseMatters: SongGuide = {
     {
       title: "What should I learn after Nothing Else Matters?",
       message:
-        "If the fingerpicking hooked you, Stairway to Heaven is the natural next climb. If you want to stay with Metallica, Fade to Black uses the same clean-arpeggio DNA with a bigger challenge. Both are one tier up: a real step, not a leap.",
+        "If the fingerpicking hooked you, Stairway to Heaven is the natural next climb, one tier up: a real step, not a leap. If you want to stay with Metallica, Fade to Black uses the same clean-arpeggio DNA with a pick, and its outro solo is a bigger project than anything in Nothing Else Matters.",
     },
   ],
   videoLessons: [

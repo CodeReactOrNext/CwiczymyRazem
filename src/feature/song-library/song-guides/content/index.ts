@@ -7,6 +7,7 @@ import { doIWannaKnow } from "./do-i-wanna-know";
 import { enterSandman } from "./enter-sandman";
 import { eruption } from "./eruption";
 import { everlong } from "./everlong";
+import { fadeToBlack } from "./fade-to-black";
 import { hotelCalifornia } from "./hotel-california";
 import { houseOfTheRisingSun } from "./house-of-the-rising-sun";
 import { masterOfPuppets } from "./master-of-puppets";
@@ -51,6 +52,7 @@ export const songGuides: SongGuide[] = [
   creep,
   underTheBridge,
   everlong,
+  fadeToBlack,
 ];
 
 export const getSongGuideBySlug = (slug: string): SongGuide | undefined =>
