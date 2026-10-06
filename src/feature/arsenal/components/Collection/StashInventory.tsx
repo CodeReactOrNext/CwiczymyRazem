@@ -83,6 +83,8 @@ import {
   resolveLayout,
   rowOf,
 } from "feature/arsenal/utils/stashLayout";
+import { ShelfDepositDialog } from "feature/guilds/components/ShelfDepositDialog";
+import { useShelfDeposit } from "feature/guilds/hooks/useShelfDeposit";
 import { rarityLockLabel } from "feature/progression/components/RarityLock";
 import {
   rarityLockLvl,
@@ -92,6 +94,7 @@ import { guitarEquipRarity } from "feature/progression/utils/equipGuard";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import {
   ArrowDownWideNarrow,
+  Boxes,
   Guitar,
   Info,
   Layers,
@@ -220,6 +223,7 @@ export const StashInventory = ({
   const { mutate: sellPart, isPending: isSellingPart } = useSellPart();
   const { mutate: fusePartsStack, isPending: isFusingPart } = useFuseParts();
   const { mutate: fitMod, isPending: isFitting } = useWorkshopMod();
+  const shelf = useShelfDeposit(data);
   const currentFame = useAppSelector(selectCurrentUserStats)?.fame || 0;
   const playerLvl = usePlayerLvl();
   const isMobile = useResponsiveStore((state) => state.isMobile);
@@ -531,6 +535,11 @@ export const StashInventory = ({
     closeDetail();
     setPending({ action, kind, itemId });
   };
+  /** Same for the guild stash, which confirms in a dialog of its own. */
+  const askShelf = (kind: Kind, itemId: string) => {
+    closeDetail();
+    shelf.ask(kind, itemId);
+  };
 
   const handleEquipTo = (itemId: string, target: EquipTarget) => {
     const found = guitarOf(itemId);
@@ -719,6 +728,18 @@ export const StashInventory = ({
           reason,
           onSelect: () => open("list", "guitar", piece.id),
         },
+        ...(shelf.inGuild
+          ? [
+              {
+                id: "guild",
+                label: "Guild stash",
+                icon: Boxes,
+                disabled: shelf.isDepositing || inUse,
+                reason,
+                onSelect: () => askShelf("guitar", piece.id),
+              },
+            ]
+          : []),
         {
           id: "scrap",
           label: "Scrap",
@@ -770,6 +791,18 @@ export const StashInventory = ({
           reason,
           onSelect: () => open("list", "effect", piece.id),
         },
+        ...(shelf.inGuild
+          ? [
+              {
+                id: "guild",
+                label: "Guild stash",
+                icon: Boxes,
+                disabled: shelf.isDepositing || onBoard,
+                reason,
+                onSelect: () => askShelf("effect", piece.id),
+              },
+            ]
+          : []),
         {
           id: "scrap",
           label: "Scrap",
@@ -1000,6 +1033,12 @@ export const StashInventory = ({
                 isListing={isListing}
                 onScrapClick={(itemId) => open("scrap", "guitar", itemId)}
                 isScrapping={isScrappingGuitar}
+                onStashClick={
+                  shelf.inGuild
+                    ? (itemId) => askShelf("guitar", itemId)
+                    : undefined
+                }
+                isStashing={shelf.isDepositing}
               />
             </StashItemDialog>
           );
@@ -1021,12 +1060,20 @@ export const StashInventory = ({
               isListing={isListing}
               onScrapClick={(itemId) => open("scrap", "effect", itemId)}
               isScrapping={isScrappingEffect}
+              onStashClick={
+                shelf.inGuild
+                  ? (itemId) => askShelf("effect", itemId)
+                  : undefined
+              }
+              isStashing={shelf.isDepositing}
               onRemoveFromBoard={handleRemoveFromBoard}
               isRemovingFromBoard={isRemovingFromBoard}
             />
           </StashItemDialog>
         );
       })()}
+
+      <ShelfDepositDialog {...shelf.dialog} />
 
       {/* Dropped a rescued mod onto an instrument: confirm, then the job. */}
       {(() => {

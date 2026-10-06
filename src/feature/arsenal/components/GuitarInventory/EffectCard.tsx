@@ -32,7 +32,7 @@ import {
   rarityLockLvl,
   usePlayerLvl,
 } from "feature/progression/hooks/usePlayerLvl";
-import { Store, Trash2, Unplug, Wrench } from "lucide-react";
+import { Boxes, Store, Trash2, Unplug, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 
@@ -59,6 +59,9 @@ interface EffectCardProps {
   isListing?: boolean;
   onScrapClick?: (inventoryItemId: string, effectId: number | string) => void;
   isScrapping?: boolean;
+  /** Leaves the pedal in the guild stash. Only passed for a guild member. */
+  onStashClick?: (inventoryItemId: string) => void;
+  isStashing?: boolean;
   /** Takes the pedal off the pedalboard straight from the collection tab. */
   onRemoveFromBoard?: (inventoryItemId: string) => void;
   isRemovingFromBoard?: boolean;
@@ -85,6 +88,8 @@ export const EffectCard = ({
   isListing,
   onScrapClick,
   isScrapping,
+  onStashClick,
+  isStashing,
   onRemoveFromBoard,
   isRemovingFromBoard,
   readOnly = false,
@@ -356,6 +361,21 @@ export const EffectCard = ({
                   : "List on the market"
               }>
               Market
+            </CardAction>
+          )}
+
+          {onStashClick && (
+            <CardAction
+              tone='guild'
+              icon={Boxes}
+              onClick={() => onStashClick(item.id)}
+              disabled={isStashing || isOnPedalboard}
+              title={
+                isOnPedalboard
+                  ? "Remove from pedalboard before giving it to the guild"
+                  : "Leave it in your guild's stash, for honor"
+              }>
+              Guild
             </CardAction>
           )}
 
