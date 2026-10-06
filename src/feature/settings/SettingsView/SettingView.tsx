@@ -8,6 +8,7 @@ import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav"
 import EmailChange from "feature/settings/components/EmailChange";
 import EmailNotificationSettings from "feature/settings/components/EmailNotificationSettings";
 import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
+import { LanguageSettings } from "feature/settings/components/LanguageSettings";
 import MediaLinks from "feature/settings/components/MediaLinks";
 import PasswordChange from "feature/settings/components/PasswordChange";
 import ProfileBasics from "feature/settings/components/ProfileBasics";
@@ -62,6 +63,7 @@ const SettingsView = () => {
             <TabsContent value="profile" className="mt-0 space-y-8">
               <ProfileBasics />
               <GuitarStartDate />
+              <LanguageSettings />
             </TabsContent>
 
             <TabsContent value="socials" className="mt-0">

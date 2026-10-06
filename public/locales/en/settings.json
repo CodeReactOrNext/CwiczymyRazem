@@ -35,5 +35,10 @@
   "customize_your_experience": "Customize your experience",
   "danger_zone": "Danger Zone",
   "irreversible_actions": "Irreversible actions - proceed with caution",
-  "danger_zone_warning": "The following actions are irreversible. Make sure you understand the consequences."
+  "danger_zone_warning": "The following actions are irreversible. Make sure you understand the consequences.",
+  "language": {
+    "title": "Language",
+    "subtitle": "Applies to the app on this device.",
+    "work_in_progress": "Translations are still being written — anything not translated yet stays in English."
+  }
 }
