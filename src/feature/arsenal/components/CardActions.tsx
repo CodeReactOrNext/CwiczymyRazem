@@ -38,6 +38,9 @@ const cardAction = cva(
           "text-zinc-300 enabled:hover:bg-zinc-700/60 enabled:hover:text-white",
         market:
           "text-zinc-400 enabled:hover:bg-amber-500/15 enabled:hover:text-amber-300",
+        /** Given to the guild stash — paid in honor, which is purple wherever it is counted. */
+        guild:
+          "text-zinc-400 enabled:hover:bg-purple-500/15 enabled:hover:text-purple-300",
         scrap:
           "text-zinc-400 enabled:hover:bg-orange-500/15 enabled:hover:text-orange-300",
         sell: "text-zinc-400 enabled:hover:bg-red-500/15 enabled:hover:text-red-300",

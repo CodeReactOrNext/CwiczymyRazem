@@ -18,6 +18,8 @@ import type { CollectionSort } from "feature/arsenal/utils/collectionFilter";
 import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
 import { getEffectDuplicates } from "feature/arsenal/utils/duplicates";
 import { getEffectScrapYield } from "feature/arsenal/utils/scrap";
+import { ShelfDepositDialog } from "feature/guilds/components/ShelfDepositDialog";
+import { useShelfDeposit } from "feature/guilds/hooks/useShelfDeposit";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { Layers } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -52,6 +54,7 @@ export const EffectCollection = ({
     useScrapEffectsBulk();
   const { mutate: savePedalboard, isPending: isRemovingFromBoard } =
     useUpdatePedalboard();
+  const shelf = useShelfDeposit(data);
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentFame = userStats?.fame || 0;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -227,6 +230,12 @@ export const EffectCollection = ({
                 isListing={isListing}
                 onScrapClick={handleScrapClick}
                 isScrapping={isScrapping}
+                onStashClick={
+                  shelf.inGuild
+                    ? (itemId) => shelf.ask("effect", itemId)
+                    : undefined
+                }
+                isStashing={shelf.isDepositing}
                 onRemoveFromBoard={handleRemoveFromBoard}
                 isRemovingFromBoard={isRemovingFromBoard}
               />
@@ -306,6 +315,8 @@ export const EffectCollection = ({
           />
         ) : null;
       })()}
+
+      <ShelfDepositDialog {...shelf.dialog} />
     </>
   );
 };

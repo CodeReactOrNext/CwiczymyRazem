@@ -31,7 +31,7 @@ import {
   rarityLockLvl,
   usePlayerLvl,
 } from "feature/progression/hooks/usePlayerLvl";
-import { Check, Lock, Store, Trash2, Wrench } from "lucide-react";
+import { Boxes, Check, Lock, Store, Trash2, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 
@@ -64,6 +64,9 @@ interface GuitarCardProps {
   isListing?: boolean;
   onScrapClick?: (inventoryItemId: string, guitarId: number | string) => void;
   isScrapping?: boolean;
+  /** Leaves the guitar in the guild stash. Only passed for a guild member. */
+  onStashClick?: (inventoryItemId: string) => void;
+  isStashing?: boolean;
   /** Rig slot index (0-2) this item occupies, or null/undefined if not in the rig. */
   rigSlot?: number | null;
   /** Hide the Equip/Sell footer — for tooltips, reveals and read-only previews. */
@@ -91,6 +94,8 @@ export const GuitarCard = ({
   isListing,
   onScrapClick,
   isScrapping,
+  onStashClick,
+  isStashing,
   rigSlot,
   readOnly = false,
   footer,
@@ -137,6 +142,11 @@ export const GuitarCard = ({
   const sellTooltip = isEquipped
     ? "Unequip from your profile before selling"
     : "Sell for fame";
+  const stashTooltip = isEquipped
+    ? "Unequip from your profile before giving it to the guild"
+    : rigSlot != null
+      ? `Remove from rig slot ${rigSlot + 1} before giving it to the guild`
+      : "Leave it in your guild's stash, for honor";
 
   // Scrap potential is deterministic, so the exact payout can be shown up front.
   const scrapParts = getGuitarScrapYield(item, guitar);
@@ -397,6 +407,28 @@ export const GuitarCard = ({
                   side='top'
                   className='border border-zinc-700 bg-zinc-950 text-xs text-white'>
                   {marketTooltip}
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            {onStashClick && (
+              <Tooltip delayDuration={150}>
+                <TooltipTrigger asChild>
+                  {/* Wrapper span keeps the tooltip working while the button is disabled. */}
+                  <span className='flex flex-1'>
+                    <CardAction
+                      tone='guild'
+                      icon={Boxes}
+                      onClick={() => onStashClick(item.id)}
+                      disabled={isStashing || isEquipped || rigSlot != null}>
+                      Guild
+                    </CardAction>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent
+                  side='top'
+                  className='border border-zinc-700 bg-zinc-950 text-xs text-white'>
+                  {stashTooltip}
                 </TooltipContent>
               </Tooltip>
             )}

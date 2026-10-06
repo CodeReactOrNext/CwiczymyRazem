@@ -21,6 +21,8 @@ import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
 import { getGuitarDuplicates } from "feature/arsenal/utils/duplicates";
 import { getInUseGuitarIds } from "feature/arsenal/utils/inUse";
 import { getGuitarScrapYield } from "feature/arsenal/utils/scrap";
+import { ShelfDepositDialog } from "feature/guilds/components/ShelfDepositDialog";
+import { useShelfDeposit } from "feature/guilds/hooks/useShelfDeposit";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { Layers } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -72,6 +74,7 @@ export const GuitarInventory = ({
   const { mutate: scrapBulk, isPending: isScrappingBulk } =
     useScrapGuitarsBulk();
   const { mutate: saveRig } = useUpdateRig();
+  const shelf = useShelfDeposit(data);
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentFame = userStats?.fame || 0;
 
@@ -274,6 +277,12 @@ export const GuitarInventory = ({
                 isListing={isListing}
                 onScrapClick={handleScrapClick}
                 isScrapping={isScrapping}
+                onStashClick={
+                  shelf.inGuild
+                    ? (itemId) => shelf.ask("guitar", itemId)
+                    : undefined
+                }
+                isStashing={shelf.isDepositing}
               />
             ))}
           </div>
@@ -351,6 +360,8 @@ export const GuitarInventory = ({
           />
         ) : null;
       })()}
+
+      <ShelfDepositDialog {...shelf.dialog} />
 
       <BulkDuplicatesDialog
         isOpen={isBulkSellOpen}
