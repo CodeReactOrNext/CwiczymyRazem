@@ -7,10 +7,44 @@ import {
 } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { useSetLocale, useStoredLocale } from "lib/i18n/localeStore";
 import type { AppLocale } from "lib/i18n/locales";
 import { SUPPORTED_LOCALES } from "lib/i18n/locales";
+import { useSetLocale, useStoredLocale } from "lib/i18n/localeStore";
 import { Check } from "lucide-react";
+
+interface LocaleOptionProps {
+  code: AppLocale;
+  label: string;
+  englishLabel: string;
+  active: boolean;
+  onSelect: (locale: AppLocale) => void;
+}
+
+const LocaleOption = ({
+  code,
+  label,
+  englishLabel,
+  active,
+  onSelect,
+}: LocaleOptionProps) => (
+  <button
+    type='button'
+    lang={code}
+    // The visible label is in its own language, so the accessible name carries the
+    // English one too — a screen reader set to English still announces it.
+    aria-label={englishLabel}
+    aria-pressed={active}
+    onClick={() => onSelect(code)}
+    className={cn(
+      "flex items-center justify-between gap-2 rounded-lg px-4 py-3 text-left text-sm font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50",
+      active
+        ? "bg-cyan-500/10 text-cyan-300"
+        : "bg-zinc-900/40 text-zinc-300 hover:bg-zinc-900/70",
+    )}>
+    <span className='min-w-0 truncate'>{label}</span>
+    {active && <Check className='h-4 w-4 shrink-0' />}
+  </button>
+);
 
 /**
  * Settings → Profile. Picks the language the app is shown in.
@@ -49,37 +83,3 @@ export const LanguageSettings = () => {
     </Card>
   );
 };
-
-interface LocaleOptionProps {
-  code: AppLocale;
-  label: string;
-  englishLabel: string;
-  active: boolean;
-  onSelect: (locale: AppLocale) => void;
-}
-
-const LocaleOption = ({
-  code,
-  label,
-  englishLabel,
-  active,
-  onSelect,
-}: LocaleOptionProps) => (
-  <button
-    type='button'
-    lang={code}
-    // The visible label is in its own language, so the accessible name carries the
-    // English one too — a screen reader set to English still announces it.
-    aria-label={englishLabel}
-    aria-pressed={active}
-    onClick={() => onSelect(code)}
-    className={cn(
-      "flex items-center justify-between gap-2 rounded-lg px-4 py-3 text-left text-sm font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50",
-      active
-        ? "bg-cyan-500/10 text-cyan-300"
-        : "bg-zinc-900/40 text-zinc-300 hover:bg-zinc-900/70",
-    )}>
-    <span className='min-w-0 truncate'>{label}</span>
-    {active && <Check className='h-4 w-4 shrink-0' />}
-  </button>
-);

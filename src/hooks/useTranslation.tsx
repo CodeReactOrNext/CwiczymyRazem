@@ -1,7 +1,7 @@
-import { useActiveLocale } from "lib/i18n/LocalizedRegion";
-import { loadNamespaces, useCatalogs, useSetLocale } from "lib/i18n/localeStore";
 import type { AppLocale } from "lib/i18n/locales";
 import { normalizeLocale } from "lib/i18n/locales";
+import { loadNamespaces, useCatalogs, useSetLocale } from "lib/i18n/localeStore";
+import { useActiveLocale } from "lib/i18n/LocalizedRegion";
 import type { TranslationNamespace } from "lib/i18n/namespaces";
 import { DEFAULT_NAMESPACE, isTranslationNamespace } from "lib/i18n/namespaces";
 import type { Translate } from "lib/i18n/translate";

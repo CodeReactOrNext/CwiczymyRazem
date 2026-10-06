@@ -13,6 +13,12 @@ interface LocaleState {
   locale: AppLocale;
   /** Everything loaded so far, English included (bundled, never fetched). */
   catalogs: CatalogsByLocale;
+  /**
+   * Overlay files already asked for, keyed `<locale>/<namespace>`. Lives in the
+   * store rather than in a module-level Set so that resetting the store (tests,
+   * a fresh page) resets what has been requested with it.
+   */
+  requested: Record<string, true>;
   setLocale: (locale: AppLocale) => void;
 }
 
@@ -26,6 +32,7 @@ export const useLocaleStore = create<LocaleState>()(
     (set) => ({
       locale: DEFAULT_LOCALE,
       catalogs: { en: EN_CATALOG },
+      requested: {},
       setLocale: (locale) => set({ locale: normalizeLocale(locale) }),
     }),
     {
@@ -44,16 +51,17 @@ export const useLocaleStore = create<LocaleState>()(
   ),
 );
 
-/** In-flight (or settled) fetches, so a namespace is never requested twice. */
-const requested = new Set<string>();
-
 async function fetchNamespace(
   locale: AppLocale,
   namespace: TranslationNamespace,
 ): Promise<void> {
   const token = `${locale}/${namespace}`;
-  if (requested.has(token)) return;
-  requested.add(token);
+  // Claimed before the first `await`, so several components mounting in the same
+  // render pass share one request instead of each starting their own.
+  if (useLocaleStore.getState().requested[token]) return;
+  useLocaleStore.setState((state) => ({
+    requested: { ...state.requested, [token]: true },
+  }));
 
   // A missing file is not an error: that language simply has no overlay for this
   // namespace yet, and every key falls back to English. It is still stored as `{}`
@@ -63,9 +71,12 @@ async function fetchNamespace(
     const response = await fetch(`/locales/${locale}/${namespace}.json`);
     if (response.ok) dict = (await response.json()) as TranslationDict;
   } catch {
-    // Offline, or the request died in flight. Nothing is stored and the token is
+    // Offline, or the request died in flight. Nothing is stored and the claim is
     // released, so the next component asking for this namespace tries again.
-    requested.delete(token);
+    useLocaleStore.setState((state) => {
+      const { [token]: _released, ...rest } = state.requested;
+      return { requested: rest };
+    });
     return;
   }
 
