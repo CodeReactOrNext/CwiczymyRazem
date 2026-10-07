@@ -1,0 +1,51 @@
+{
+  "fret_diagram": "Fretboard diagram",
+  "toast": {
+    "load_failed": "Failed to load progress. Please refresh the page.",
+    "exam_failed": "Exam failed — score: {{accuracy}}%. Practice more and try again!",
+    "exam_passed": "Exam passed! {{stars}} — {{accuracy}}% accuracy",
+    "step_completed": "Step completed! 🎸",
+    "save_failed": "Failed to save. Please try again."
+  },
+  "sidebar": {
+    "status": {
+      "locked": "Locked",
+      "available": "Available",
+      "in-progress": "In Progress",
+      "completed": "Completed"
+    },
+    "close": "Close",
+    "step": "Step {{n}}",
+    "goal": "Goal",
+    "complete_tasks": "Please complete all mandatory tasks below by ticking the checkboxes to proceed to the next stage.",
+    "your_tasks": "Your Tasks",
+    "choose_target": "Choose a target",
+    "saving": "Saving...",
+    "done_complete": "Done & Complete",
+    "unlock_hint": "Read through the content and check all the boxes above to unlock this",
+    "practice": "Practice",
+    "retake": "Retake",
+    "exam": "Exam"
+  },
+  "finish": {
+    "in_arsenal": "In your Arsenal, with a serial nobody else has.",
+    "complete": "Roadmap complete — the guitar is yours.",
+    "steps_left": "{{left}} of {{total}} steps left to earn it.",
+    "collecting": "Collecting...",
+    "collect": "Collect the guitar",
+    "collected": "Collected",
+    "steps": "{{done}}/{{total}} steps"
+  },
+  "path": {
+    "modules": "Modules"
+  },
+  "modules": {
+    "title": "Learning path",
+    "subtitle": "Pick up where you left off, or jump into any module.",
+    "continue": "Continue",
+    "start": "Start",
+    "suggest": "Suggest a learning path",
+    "missing_coming": "Missing a topic? {{topics}} are coming next — let us know what else you'd like to see.",
+    "missing": "Missing a topic? Let us know what you'd like to see next."
+  }
+}

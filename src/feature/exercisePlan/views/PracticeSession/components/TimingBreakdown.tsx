@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 
 import type { TimingCounts, TimingGrade } from "../utils/timingGrade";
 
@@ -22,6 +23,7 @@ interface TimingBreakdownProps {
  * lower than the hit count suggests when some of them were off the beat.
  */
 export const TimingBreakdown = ({ timing, className }: TimingBreakdownProps) => {
+  const { t } = useTranslation("session");
   const total = timing[3] + timing[2] + timing[1];
   if (total === 0) return null;
   const onTimePct = Math.round((timing[3] / total) * 100);
@@ -29,7 +31,7 @@ export const TimingBreakdown = ({ timing, className }: TimingBreakdownProps) => 
   return (
     <div className={className}>
       <div className='flex items-baseline justify-between'>
-        <p className='text-[11px] font-semibold tracking-wide text-zinc-500'>Timing</p>
+        <p className='text-[11px] font-semibold tracking-wide text-zinc-500'>{t("timing_breakdown.title")}</p>
         <p className='text-[11px] tabular-nums text-zinc-400'>{onTimePct}% on time</p>
       </div>
 
@@ -51,7 +53,7 @@ export const TimingBreakdown = ({ timing, className }: TimingBreakdownProps) => 
             </span>
             <div>
               <div className='text-sm font-bold leading-none tabular-nums text-zinc-100'>{timing[grade]}</div>
-              <div className='mt-1 text-[11px] text-zinc-500'>{GRADE_STYLE[grade].label}</div>
+              <div className='mt-1 text-[11px] text-zinc-500'>{t(`timing_breakdown.grades.${grade}`, GRADE_STYLE[grade].label)}</div>
             </div>
           </div>
         ))}

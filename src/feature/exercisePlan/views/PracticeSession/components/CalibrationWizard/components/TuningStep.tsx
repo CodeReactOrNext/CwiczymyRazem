@@ -3,6 +3,7 @@ import { cn } from "assets/lib/utils";
 import { ArcTuner } from "feature/tuner/components/ArcTuner";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
+import { useTranslation } from "hooks/useTranslation";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 
@@ -29,6 +30,7 @@ export const TuningStep = React.memo(function TuningStep({
   currentIndex, offsets, sampleCount, stringState, currentOffset,
   audioRefs, strings, onRetry, onAdvance, onCancel,
 }: TuningStepProps) {
+  const { t } = useTranslation("calibration");
   const str = strings[currentIndex];
   const { cents, hasNote } = useTuningFrequency(audioRefs, str.hz);
 
@@ -40,10 +42,10 @@ export const TuningStep = React.memo(function TuningStep({
 
 
 
-  const statusText = isWrongString ? "Wrong string?"
-    : !hasNote    ? `Play the open ${str.name} string`
-    : isInTune    ? "In tune — keep holding…"
-    : `${Math.round(abs)}¢ ${cents > 0 ? "sharp ↓ tune down" : "flat ↑ tune up"}`;
+  const statusText = isWrongString ? t("tuning.wrong_string")
+    : !hasNote    ? t("tuning.play_open", { string: str.name })
+    : isInTune    ? t("tuning.in_tune")
+    : `${Math.round(abs)}¢ ${cents > 0 ? t("tuning.sharp") : t("tuning.flat")}`;
 
   const statusColor = isWrongString ? "text-zinc-500"
     : !hasNote  ? "text-zinc-600"
@@ -55,7 +57,7 @@ export const TuningStep = React.memo(function TuningStep({
     <div className="flex h-full flex-col px-5 py-5 text-white">
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h2 className="text-base font-bold tracking-tight">Tune Your Guitar</h2>
+          <h2 className="text-base font-bold tracking-tight">{t("tuning.title")}</h2>
           <p className="text-[10px] text-zinc-600 font-bold tracking-widest mt-0.5">
             String {currentIndex + 1} of {strings.length}
           </p>
@@ -89,8 +91,8 @@ export const TuningStep = React.memo(function TuningStep({
         <div className="w-full max-w-xs flex flex-col items-center">
           <ArcTuner cents={cents} hasNote={hasNote} />
           <div className="flex justify-between w-full px-3 -mt-1 mb-2">
-            <span className="text-[9px] font-bold tracking-widest text-zinc-700">← Flat</span>
-            <span className="text-[9px] font-bold tracking-widest text-zinc-700">Sharp →</span>
+            <span className="text-[9px] font-bold tracking-widest text-zinc-700">← {t("tuning.flat_label")}</span>
+            <span className="text-[9px] font-bold tracking-widest text-zinc-700">{t("tuning.sharp_label")} →</span>
           </div>
 
           <div className="text-center space-y-0.5 mb-3">
@@ -158,8 +160,8 @@ export const TuningStep = React.memo(function TuningStep({
               )}
             >
               {stringState === "done" 
-                ? (currentIndex < strings.length - 1 ? "Next String" : "Finish Calibration")
-                : "Skip String"
+                ? (currentIndex < strings.length - 1 ? t("tuning.next_string") : t("tuning.finish"))
+                : t("tuning.skip_string")
               }
             </Button>
           </motion.div>
@@ -170,7 +172,7 @@ export const TuningStep = React.memo(function TuningStep({
               onClick={onRetry}
               className="w-full h-8 text-zinc-500 hover:text-zinc-300"
             >
-              Redo this string
+              {t("tuning.redo")}
             </Button>
           )}
         </div>

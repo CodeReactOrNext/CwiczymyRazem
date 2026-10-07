@@ -1,1 +1,243 @@
-{}
+{
+  "or": "o",
+  "favorites": "Favoritos",
+  "start": "Iniciar",
+  "finish": "Terminar",
+  "min": "min",
+  "button": {
+    "sign_in": "Iniciar sesión",
+    "sign_up": "Registrarse",
+    "edit": "Editar",
+    "logout": "Cerrar sesión",
+    "link_copy_profile": "Copiar el enlace a tu perfil",
+    "random": "Aleatorio",
+    "remove": "Eliminar"
+  },
+  "google_button": {
+    "sign_in": "Iniciar sesión con Google",
+    "sign_up": "Registrarse con Google"
+  },
+  "input": {
+    "login": "Usuario",
+    "password": "Contraseña",
+    "repeat_password": "Repite la contraseña",
+    "email": "Correo electrónico"
+  },
+  "loading": {
+    "subtitle": "Cargando...",
+    "loading_text": "Cargando..."
+  },
+  "nav": {
+    "profile": "Perfil",
+    "leadboard": "Clasificación",
+    "discord": "Discord",
+    "faq": "Preguntas frecuentes",
+    "exercise": "Práctica",
+    "report": "Registro",
+    "songs": "Canciones",
+    "challenges": "Retos"
+  },
+  "day_since": {
+    "no_practice": "Aún no has practicado",
+    "practice_last_24": "Has practicado hoy",
+    "practice_yesterday": "Practicaste ayer",
+    "practice_day": "Última práctica: hace {{days}} días",
+    "actual_streak": "Racha actual:"
+  },
+  "discord_event": {
+    "active": "Activo",
+    "deadline": "Fecha límite:",
+    "join_us": "Únete a nuestra comunidad en Discord y participa en el evento",
+    "join_us_offline": "Únete a nuestra comunidad en Discord y propón o vota el próximo evento",
+    "link": "Enlace al material:",
+    "offline": "Ahora mismo no hay ningún evento activo en Discord",
+    "data_none": "Ninguno:",
+    "get": "obtuvo",
+    "points": "pts"
+  },
+  "header": {
+    "hey": "Hola",
+    "lvl_short": "nv.",
+    "earned_points": "Has conseguido puntos",
+    "your_level": "Nivel",
+    "points": "Puntos",
+    "points_short": "pts",
+    "practice_today": "¿Practicas hoy?",
+    "total_practice_time": "Tiempo total"
+  },
+  "logsBox": {
+    "logs": "Actividad",
+    "events": "Eventos",
+    "lvl_up": "Sube al nivel",
+    "lvl": "nv.",
+    "achievement": "Logro",
+    "achievements": "Logros:",
+    "get": "obtuvo",
+    "points": "pts",
+    "top_players": "Clasificación de la temporada",
+    "level": "Nivel",
+    "days_left": "días restantes"
+  },
+  "calendar": {
+    "title": "Calendario de actividad",
+    "monday": "Lun",
+    "thursday": "Jue",
+    "sunday": "Dom",
+    "points": "Puntos",
+    "technique": "Técnica",
+    "theory": "Teoría",
+    "hearing": "Oído",
+    "creativity": "Creatividad",
+    "backDate": "Registro con fecha anterior",
+    "hasTitle": "Registro con título"
+  },
+  "sort": {
+    "sort_by": "Ordenar por:",
+    "points": "Puntos",
+    "time": "Tiempo",
+    "session_count": "Número de sesiones"
+  },
+  "tooltip": {
+    "totalTime": "Tiempo total",
+    "points": "Puntos",
+    "sessions": "Sesiones",
+    "habits": "Hábitos",
+    "userNotFound": "Usuario no encontrado",
+    "actual_streak": "Racha",
+    "fame_description": "Los puntos de Fame se obtienen por los «me gusta» recibidos y la actividad en la comunidad.",
+    "viewProfile": "Ver perfil"
+  },
+  "song_status": {
+    "move_to": "Mover a",
+    "remove": "Eliminar",
+    "add": "Añadir",
+    "learned": "aprendió la canción",
+    "learning": "está aprendiendo la canción",
+    "wantToLearn": "añadió la canción a su lista de canciones por aprender",
+    "added": "añadió la canción a su lista de canciones",
+    "difficulty_rate": "valoró la dificultad de la canción",
+    "practiced": "practicó la canción",
+    "updated": "actualizó su progreso en la canción"
+  },
+  "chart": {
+    "activity_overview": "Resumen de actividad",
+    "showing_activity": "Datos de actividad del periodo seleccionado",
+    "time_ranges": {
+      "all_time": "Todo el tiempo",
+      "last_3_months": "Últimos 3 meses",
+      "last_30_days": "Últimos 30 días",
+      "last_7_days": "Últimos 7 días"
+    },
+    "categories": {
+      "technique": "Técnica",
+      "theory": "Teoría",
+      "hearing": "Oído",
+      "creativity": "Creatividad",
+      "mixed": "Mixto"
+    }
+  },
+  "skills": {
+    "alternate_picking": "Púa alterna",
+    "legato": "Legato",
+    "sweep_picking": "Sweep picking",
+    "chord_theory": "Teoría de acordes",
+    "scales": "Escalas",
+    "rhythm": "Ritmo",
+    "ear_training": "Entrenamiento auditivo",
+    "sight_reading": "Lectura a primera vista",
+    "improvisation": "Improvisación",
+    "composition": "Composición",
+    "harmony": "Armonía",
+    "vibrato": "Vibrato",
+    "music_theory": "Teoría musical",
+    "slide_guitar": "Guitarra slide",
+    "audio_production": "Producción de audio",
+    "hybrid_picking": "Control de la púa",
+    "transcription": "Transcripción",
+    "picking": "Púa",
+    "finger_independence": "Independencia de dedos",
+    "string_skipping": "Salto de cuerdas",
+    "technique": "Técnica",
+    "phrasing": "Fraseo",
+    "articulation": "Articulación",
+    "chords": "Acordes",
+    "bending": "Bending",
+    "tapping": "Tapping",
+    "harmony-ear": "Armonía de oído"
+  },
+  "back": "Atrás",
+  "next": "Siguiente",
+  "search": {
+    "placeholder": "Buscar..."
+  },
+  "filters": {
+    "category": "Categoría",
+    "all": "Todas",
+    "difficulty": "Dificultad"
+  },
+  "difficulty": {
+    "beginner": "Principiante",
+    "easy": "Fácil",
+    "medium": "Media",
+    "hard": "Difícil"
+  },
+  "categories": {
+    "technique": "Técnica",
+    "theory": "Teoría",
+    "creativity": "Creatividad",
+    "hearing": "Oído",
+    "mixed": "Mixto"
+  },
+  "minutes": "minutos",
+  "cancel": "Cancelar",
+  "select": "Elegir",
+  "details": "Detalles",
+  "timer_status": {
+    "active": "Activo",
+    "paused": "En pausa"
+  },
+  "finish_session": "Terminar sesión",
+  "next_step": "Siguiente paso",
+  "skip": "Siguiente",
+  "practice": {
+    "congratulations": "¡Enhorabuena!",
+    "completed_session": "Has completado la sesión de entrenamiento:",
+    "practice_again": "Practicar otra vez",
+    "finish": "Terminar",
+    "exit": "Salir",
+    "finish_plan_early": "Terminar el plan antes",
+    "finish_plan_early_title": "¿Terminar el plan antes de tiempo?",
+    "finish_plan_early_description": "El plan termina ahora y se guarda el tiempo que ya has registrado. No practicarás los ejercicios restantes de este plan.",
+    "finish_plan_early_action": "Terminar y guardar tiempo",
+    "finish_plan_early_disabled_skill": "Completa el ejercicio entero antes de terminar el plan antes de tiempo",
+    "finish_plan_early_disabled_time": "Practica al menos 20 s antes de terminar el plan antes de tiempo",
+    "finish_early": {
+      "action": "Terminar antes",
+      "title": "¿Terminar antes?",
+      "description": "No tienes que tocar este hasta el final. Si terminas ahora, conservas cada minuto que practicaste; simplemente no cuenta como ejercicio completado.",
+      "kept_title": "Tu tiempo de práctica está guardado",
+      "kept_description": "Los minutos siguen llegando a tu diario de práctica y cuentan para tu racha, tus estadísticas y tus misiones diarias.",
+      "lost_title": "Nada de este intento puntúa",
+      "lost_description": "Sin puntos de habilidad, sin récord, sin entrada en la clasificación, y el ejercicio no se marcará como completado. Tócalo hasta el final para conseguir todo eso.",
+      "confirm": "Terminar antes y guardar tiempo",
+      "blocked": "Practica al menos 20 segundos para poder guardar la sesión.",
+      "hint": "Termina antes: solo tiempo, sin puntuación"
+    }
+  },
+  "video": "Vídeo",
+  "confirm_delete": "¿Seguro que quieres eliminar este plan?",
+  "create": "Crear",
+  "success": "Éxito",
+  "error": "Error",
+  "cookies": {
+    "title": "Cookies",
+    "description": "Usamos cookies para ofrecerte la mejor experiencia en nuestra web y para analizar el tráfico.",
+    "accept": "Aceptar"
+  },
+  "pwa": {
+    "install_title": "Instala Riff Quest",
+    "install_description_android": "Añade la app a tu móvil",
+    "install_description_ios": "Toca Compartir y «Añadir a pantalla de inicio»",
+    "install_button": "Descargar"
+  }
+}

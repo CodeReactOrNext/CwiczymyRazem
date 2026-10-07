@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 
 /**
  * Shown in the player slot for "open" exercises that have no tablature/player on
@@ -65,6 +66,7 @@ const OpenExerciseArt = ({ size = 76 }: { size?: number }) => (
 );
 
 export const OpenExercisePanel = ({ compact }: OpenExercisePanelProps) => {
+  const { t } = useTranslation("session");
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -89,22 +91,21 @@ export const OpenExercisePanel = ({ compact }: OpenExercisePanelProps) => {
           <div className="mb-1.5 flex items-center gap-2 sm:justify-start" >
             <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-indigo-500/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
               <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
-              Open Exercise
+              {t("open_exercise.title")}
             </span>
           </div>
 
           <h3 className={cn("font-bold text-white tracking-tight", compact ? "text-base" : "text-lg sm:text-xl")}>
-            No tab for this one — it&apos;s open-ended.
+            {t("open_exercise.no_tab")}
           </h3>
 
           <p className={cn("mt-1.5 leading-relaxed text-zinc-400", compact ? "text-sm" : "text-sm sm:text-[15px]")}>
-            Some exercises can&apos;t be captured in a tab — this is one of them. It&apos;s
-            guided by the steps below, so work through them at your own pace.
+            {t("open_exercise.body")}
           </p>
 
           <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-300/80">
             <span className="animate-bounce">↓</span>
-            Read the instructions below to get started
+            {t("open_exercise.read")}
           </div>
         </div>
       </div>

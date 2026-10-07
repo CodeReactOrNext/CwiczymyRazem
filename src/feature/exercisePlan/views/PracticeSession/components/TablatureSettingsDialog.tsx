@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { useTranslation } from "hooks/useTranslation";
 
 import { TablatureSettingsPanel } from "./TablatureSettingsPanel";
 
@@ -22,6 +23,7 @@ export function TablatureSettingsDialog({
   open,
   onOpenChange,
 }: TablatureSettingsDialogProps) {
+  const { t } = useTranslation("session");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* The practice session is itself a full-screen layer — z-[999999] on desktop,
@@ -33,10 +35,9 @@ export function TablatureSettingsDialog({
         className='z-[99999999] bg-zinc-950 text-white sm:max-w-2xl'
         overlayClassName='z-[99999998]'>
         <DialogHeader>
-          <DialogTitle>Tablature settings</DialogTitle>
+          <DialogTitle>{t("tab.settings")}</DialogTitle>
           <DialogDescription className='text-zinc-400'>
-            Personalise how the tab looks. Changes apply straight away and are
-            remembered on this device.
+            {t("tab.settings_description")}
           </DialogDescription>
         </DialogHeader>
 

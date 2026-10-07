@@ -7,6 +7,7 @@ import {
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { RippleButton } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import { Info, SlidersHorizontal, X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
@@ -88,6 +89,7 @@ export const MobileToolsIsland = ({
   volumeRef,
   disableTuner,
 }: MobileToolsIslandProps) => {
+  const { t } = useTranslation("session");
   const [openTab, setOpenTab] = useState<ToolsTab | null>(null);
 
   // The sheet lives inside the session layer, so it has no dialog of its own to
@@ -135,8 +137,8 @@ export const MobileToolsIsland = ({
           {hasTempo && (
             <RippleButton
               onClick={() => setOpenTab("tempo")}
-              aria-label='Tempo settings'
-              title='Tempo'
+              aria-label={t("tools.tempo_settings")}
+              title={t("tools.tempo")}
               className={cn(btn, idle)}>
               <GiMetronome className='h-4 w-4 shrink-0' />
               <span className='font-mono text-sm font-bold tabular-nums text-zinc-200'>
@@ -158,11 +160,11 @@ export const MobileToolsIsland = ({
               disabled={isRiddleMode}
               aria-label={
                 isAudioMuted
-                  ? "Turn guitar on"
-                  : "Turn guitar off"
+                  ? t("tools.guitar_turn_on")
+                  : t("tools.guitar_turn_off")
               }
               aria-pressed={!isAudioMuted}
-              title={isAudioMuted ? "Guitar off" : "Guitar on"}
+              title={isAudioMuted ? t("media.guitar_off") : t("media.guitar_on")}
               className={cn(
                 btn,
                 isAudioMuted ? idle : "bg-cyan-500/10 text-cyan-400",
@@ -177,15 +179,15 @@ export const MobileToolsIsland = ({
               onClick={isMicLocked ? undefined : onMicToggle}
               disabled={isMicLocked}
               aria-label={
-                isMicEnabled ? "Turn pitch detect off" : "Turn pitch detect on"
+                isMicEnabled ? t("tools.pitch_turn_off") : t("tools.pitch_turn_on")
               }
               aria-pressed={isMicEnabled}
               title={
                 isMicLocked
-                  ? "Pitch Detect required during exam"
+                  ? t("media.pitch_required")
                   : isMicEnabled
-                    ? "Pitch Detect on"
-                    : "Pitch Detect off"
+                    ? t("media.pitch_on")
+                    : t("media.pitch_off")
               }
               className={cn(
                 btn,
@@ -199,8 +201,8 @@ export const MobileToolsIsland = ({
           {hasSound && (
             <RippleButton
               onClick={() => setOpenTab("sound")}
-              aria-label='Sound and input settings'
-              title='Sound & input'
+              aria-label={t("tools.sound_settings")}
+              title={t("tools.sound_input")}
               className={cn(btn, idle)}>
               <SlidersHorizontal className='h-4 w-4 shrink-0' />
             </RippleButton>
@@ -209,8 +211,8 @@ export const MobileToolsIsland = ({
           {hasInfo && (
             <RippleButton
               onClick={() => setOpenTab("info")}
-              aria-label='Exercise guide'
-              title='Guide'
+              aria-label={t("tools.exercise_guide")}
+              title={t("tools.info")}
               className={cn(btn, idle)}>
               <Info className='h-4 w-4 shrink-0' />
             </RippleButton>
@@ -248,14 +250,14 @@ export const MobileToolsIsland = ({
                         key={tab}
                         value={tab}
                         className='flex-1 text-xs font-semibold text-zinc-400 data-[state=active]:bg-zinc-800 data-[state=active]:text-white'>
-                        {TAB_LABELS[tab]}
+                        {t(`tools.${tab}`, TAB_LABELS[tab])}
                       </TabsTrigger>
                     ))}
                   </TabsList>
 
                   <RippleButton
                     onClick={() => setOpenTab(null)}
-                    aria-label='Close settings'
+                    aria-label={t("tools.close_settings")}
                     className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white'>
                     <X className='h-4 w-4' />
                   </RippleButton>

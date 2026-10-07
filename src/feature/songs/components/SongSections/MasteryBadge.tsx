@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import type { MasteryLevel } from "feature/songs/types/songSection.type";
 import { MASTERY_LABELS } from "feature/songs/types/songSection.type";
@@ -31,6 +32,7 @@ export const MasteryBadge = ({
   onChange,
   readonly,
 }: MasteryBadgeProps) => {
+  const { t } = useTranslation("timer");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -51,7 +53,7 @@ export const MasteryBadge = ({
           "inline-block w-24 whitespace-nowrap rounded-lg px-2 py-0.5 text-center text-xs font-medium",
           MASTERY_STYLES[mastery],
         )}>
-        {MASTERY_LABELS[mastery]}
+        {t(`sections.mastery_${mastery}`, MASTERY_LABELS[mastery])}
       </span>
     );
   }
@@ -65,7 +67,7 @@ export const MasteryBadge = ({
           "flex w-28 items-center justify-center gap-1 whitespace-nowrap rounded-lg px-2 py-0.5 text-center text-xs font-medium transition-colors",
           MASTERY_STYLES[mastery],
         )}>
-        {MASTERY_LABELS[mastery]}
+        {t(`sections.mastery_${mastery}`, MASTERY_LABELS[mastery])}
         <ChevronDown
           className={cn("h-3 w-3 shrink-0 opacity-60 transition-transform", open && "rotate-180")}
         />
@@ -87,7 +89,7 @@ export const MasteryBadge = ({
                 OPTION_STYLES[level],
                 level === 4 && "line-through",
               )}>
-              {MASTERY_LABELS[level]}
+              {t(`sections.mastery_${level}`, MASTERY_LABELS[level])}
             </button>
           ))}
         </div>

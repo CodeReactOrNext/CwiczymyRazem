@@ -36,7 +36,7 @@ interface TrophyCaseProps {
  * in its rarity colour — plus how many players hold it and the title it gives.
  */
 export const TrophyCase = ({ trophies, isPinned, isOwner }: TrophyCaseProps) => {
-  const { t } = useTranslation("achievements");
+  const { t } = useTranslation(["achievements", "profile"]);
   const { data: stats } = useAchievementStats();
   const isMobileView = useResponsiveStore((state) => state.isMobile);
 
@@ -46,14 +46,14 @@ export const TrophyCase = ({ trophies, isPinned, isOwner }: TrophyCaseProps) => 
     <div className='rounded-2xl bg-zinc-900/30 p-6'>
       <div className='flex flex-wrap items-end justify-between gap-2'>
         <div>
-          <h2 className='text-2xl font-bold text-white'>Trophy case</h2>
+          <h2 className='text-2xl font-bold text-white'>{t("profile:layout.sections.trophies.title")}</h2>
           {!isPinned && (
-            <p className='mt-1 text-sm text-zinc-400'>Rarest achievements</p>
+            <p className='mt-1 text-sm text-zinc-400'>{t("profile:cases.rarest")}</p>
           )}
         </div>
         {isOwner && !isPinned && (
           <p className='text-xs text-zinc-500'>
-            Pin your own in Customize profile → Profile card.
+            {t("profile:cases.pin_hint")}
           </p>
         )}
       </div>
@@ -86,12 +86,12 @@ export const TrophyCase = ({ trophies, isPinned, isOwner }: TrophyCaseProps) => 
               </p>
               <p className='mt-1 text-xs text-zinc-500'>
                 <span className={achievementsRarity[rarity].tailwindClass}>
-                  {RARITY_LABELS[rarity]}
+                  {t(`profile:layout.rarity.${rarity}`, RARITY_LABELS[rarity])}
                 </span>{" "}
-                · {rate}% of players
+                · {t("profile:cases.players_rate", { rate })}
               </p>
               <p className='mt-3 text-[11px] italic text-zinc-400'>
-                Title: {ACHIEVEMENT_TITLES[id]}
+                {t("profile:cases.title", { title: t(`profile:layout.titles.${id}`, ACHIEVEMENT_TITLES[id]) })}
               </p>
             </div>
           );

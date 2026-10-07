@@ -1,10 +1,12 @@
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { getAccuracyDisplay } from "../hooks/noteMatchingFeedback";
 
 export function MobileMicGameHud() {
+  const { t } = useTranslation("session");
   const { gameState, maxPossibleScore, sessionAccuracy, sessionStats } = useNoteMatchingContext();
   const accuracy = getAccuracyDisplay(sessionAccuracy, sessionStats);
 
@@ -14,7 +16,7 @@ export function MobileMicGameHud() {
 
         {/* Score */}
         <div className="flex-1">
-          <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">Score</span>
+          <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">{t("success.score")}</span>
           <div className="flex items-baseline gap-1">
             <motion.span
               key={gameState.score}
@@ -33,15 +35,15 @@ export function MobileMicGameHud() {
 
         {/* Accuracy */}
         <div className="flex-1 text-center">
-          <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">Accuracy</span>
+          <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">{t("success.accuracy")}</span>
           <div className="flex items-center justify-center gap-1.5">
             <span
-              title={accuracy.kind === "value" ? undefined : accuracy.hint}
+              title={accuracy.kind === "value" ? undefined : t(`hud.${accuracy.kind}_hint`, accuracy.hint)}
               className={cn(
                 "font-bold tabular-nums",
                 accuracy.kind === "value" ? "text-xl text-emerald-400" : cn(accuracy.color, accuracy.kind === "silent" ? "text-xs" : "text-xl"),
               )}>
-              {accuracy.text}
+              {accuracy.kind === "silent" ? t("hud.no_notes", accuracy.text) : accuracy.text}
             </span>
             <AnimatePresence mode="wait">
               {accuracy.kind === "value" && (() => {
@@ -68,7 +70,7 @@ export function MobileMicGameHud() {
 
         {/* Streak */}
         <div className="flex-1 text-right">
-          <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">Streak</span>
+          <span className="block text-[8px] font-black capitalize tracking-[0.2em] text-zinc-500 mb-0.5">{t("hud.streak")}</span>
           <div className="flex items-center justify-end gap-1.5">
             <span className="text-2xl font-black text-cyan-400 tabular-nums">{gameState.combo}</span>
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-main/20 border border-main/20">

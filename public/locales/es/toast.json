@@ -1,1 +1,36 @@
-{}
+{
+  "errors": {
+    "fetch_error": "No se pudieron obtener los datos",
+    "password": "Contraseña incorrecta",
+    "email": "Correo electrónico no válido",
+    "timeout": "No se pudo iniciar sesión: se agotó el tiempo",
+    "email_already-in-use": "Este correo electrónico ya está en uso",
+    "login": "No se pudo iniciar sesión",
+    "popup_closed_by_user": "No se pudo iniciar sesión: se cerró la ventana de inicio de sesión",
+    "credential_already_in_use": "Estas credenciales ya están en uso",
+    "nick_already_in_use": "Este apodo ya está en uso",
+    "singup": "No se pudo completar el registro",
+    "upadate": "No se pudieron actualizar los datos. Inténtalo de nuevo.",
+    "avatar_max": "El avatar puede medir como máximo 250 × 250 px.",
+    "wrong_file_type": "Solo se permiten archivos png y jpg/jpeg",
+    "generic": "Algo salió mal. Inténtalo de nuevo."
+  },
+  "info": {
+    "new_user_tip": "Consulta las preguntas frecuentes para aprender a usar Riff Quest",
+    "log_in_again": "Para cambiar tus datos tienes que volver a iniciar sesión.",
+    "copy_link": "Copiar al portapapeles",
+    "update_ready": "Hay una nueva versión de riff.quest lista para instalar.",
+    "update_ready_action": "Reiniciar ahora"
+  },
+  "success": {
+    "update_email": "Correo electrónico actualizado",
+    "update": "Datos actualizados",
+    "update_password": "Contraseña actualizada",
+    "update_avatar ": "Avatar actualizado",
+    "logOut": "Sesión cerrada",
+    "report_success": "Registro guardado",
+    "update_displayname": "Apodo cambiado",
+    "restart": "Estadísticas reiniciadas",
+    "singup": "Registro completado"
+  }
+}

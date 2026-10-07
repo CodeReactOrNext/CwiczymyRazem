@@ -3,6 +3,7 @@ import { RewardSummary } from "components/Rewards/RewardSummary";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { useClaimJourneyReward, useRewardLedger } from "hooks/useRewardLedger";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Lock } from "lucide-react";
 
 import { getJourneyReward, journeyRewardId } from "../../data/journeyRewards";
@@ -31,6 +32,7 @@ export const JourneyFinishCard = ({
   done,
   total,
 }: JourneyFinishCardProps) => {
+  const { t } = useTranslation("journey");
   const reward = getJourneyReward(moduleId);
   const { data: ledger } = useRewardLedger();
   const { mutate: claim, isPending } = useClaimJourneyReward();
@@ -91,10 +93,10 @@ export const JourneyFinishCard = ({
           </p>
           <p className='mt-1.5 text-xs text-zinc-400'>
             {isClaimed
-              ? "In your Arsenal, with a serial nobody else has."
+              ? t("finish.in_arsenal")
               : canClaim
-                ? "Roadmap complete — the guitar is yours."
-                : `${total - done} of ${total} steps left to earn it.`}
+                ? t("finish.complete")
+                : t("finish.steps_left", { left: total - done, total })}
           </p>
         </div>
       </div>
@@ -115,7 +117,7 @@ export const JourneyFinishCard = ({
             "relative rounded-lg bg-zinc-100 px-6 py-2.5 text-xs font-bold capitalize tracking-wide text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white",
             isPending && "cursor-wait opacity-70",
           )}>
-          {isPending ? "Collecting..." : "Collect the guitar"}
+          {isPending ? t("finish.collecting") : t("finish.collect")}
         </button>
       ) : (
         <span
@@ -126,12 +128,12 @@ export const JourneyFinishCard = ({
           {isClaimed ? (
             <>
               <Check size={14} strokeWidth={3} />
-              Collected
+              {t("finish.collected")}
             </>
           ) : (
             <>
               <Lock size={14} strokeWidth={2.5} />
-              {done}/{total} steps
+              {t("finish.steps", { done, total })}
             </>
           )}
         </span>

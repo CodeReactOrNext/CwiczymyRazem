@@ -1,0 +1,16 @@
+{
+  "changelog": {
+    "empty": "No hay entradas este mes",
+    "new": "Nuevo",
+    "bug_fix": "Corrección de error"
+  },
+  "open_in_practice_log": "Abrir en el diario de práctica",
+  "activity": "Actividad",
+  "minutes_short": "{{minutes}} min",
+  "live_now": "En directo",
+  "close": "Cerrar",
+  "using_desktop_app": "Usa la app de escritorio",
+  "free_cases": "{{count}} cajas gratis",
+  "free_case": "Caja gratis",
+  "daily_practice": "Práctica diaria"
+}

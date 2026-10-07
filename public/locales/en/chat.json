@@ -3,5 +3,73 @@
   "send_placeholder": "Type a message...",
   "like": "Like",
   "validation_too_long": "Message cannot exceed 2000 characters.",
-  "error": "Error sending message"
+  "error": "Error sending message",
+  "empty_room": {
+    "title": "Nobody has said anything yet",
+    "guild": "Be the first — say hi to your guild.",
+    "everyone": "Be the first — say hi to everyone.",
+    "say_hi": "Say hi 👋"
+  },
+  "greetings": {
+    "welcome": "Welcome! 👋",
+    "hi_guild": "Hi guild! 👋",
+    "hi_everyone": "Hi everyone! 👋"
+  },
+  "welcome_goal": {
+    "plan_named": "starting with the {{plan}} plan",
+    "plan": "starting with a practice plan",
+    "songs": "here to learn songs",
+    "roadmap": "building a practice roadmap",
+    "journey": "starting the Journey",
+    "log": "here to log their practice"
+  },
+  "system": {
+    "and": "and",
+    "and_other": "and {{count}} other",
+    "and_others": "and {{count}} others",
+    "said_hi": "said hi",
+    "say_hi": "Say hi",
+    "joined_with": "Joined Riff Quest, {{phrase}}",
+    "joined": "Joined Riff Quest",
+    "reached_level": "reached level",
+    "cleared": "Cleared: {{quests}}",
+    "joined_guild": "Joined the guild"
+  },
+  "attachment": {
+    "kinds": {
+      "exercise": "Exercise",
+      "plan": "Plan",
+      "song": "Song",
+      "recording": "Recording"
+    },
+    "play": "Play",
+    "open": "Open",
+    "watch": "Watch",
+    "guitar": "Guitar",
+    "pedal": "Pedal",
+    "share_title": "Share to chat",
+    "tabs": {
+      "exercise": "Exercise",
+      "plan": "Plan",
+      "song": "My songs",
+      "recording": "My recordings",
+      "item": "My gear"
+    },
+    "search": "Search…",
+    "loading": "Loading…",
+    "empty": "Nothing to share here yet."
+  },
+  "composer": {
+    "replying_to": "Replying to",
+    "cancel_reply": "Cancel reply",
+    "sharing": "Sharing",
+    "remove_attachment": "Remove attachment",
+    "mention": "Mention someone",
+    "share": "Share an exercise, song or item",
+    "send": "Send"
+  },
+  "reactions": {
+    "react_with": "React with {{emoji}}",
+    "reply": "Reply"
+  }
 }

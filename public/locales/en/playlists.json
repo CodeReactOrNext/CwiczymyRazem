@@ -1,0 +1,139 @@
+{
+  "practice": "Practice",
+  "remove_from_playlist": "Remove from playlist",
+  "reorder": "Reorder",
+  "up_next": "up next",
+  "deleted": "Playlist deleted",
+  "saved_copy": "Saved to your playlists",
+  "from_owner": "from {{name}}",
+  "mastered_of": "{{done}} of {{total}} mastered",
+  "add_songs": "Add songs",
+  "share": "Share",
+  "options": "Playlist options",
+  "edit_details": "Edit details",
+  "delete": "Delete",
+  "save_to_yours": "Save to your playlists",
+  "like": "Like",
+  "path_complete": "Path complete",
+  "final_stop": "Final stop",
+  "every_mastered": "Every song mastered — take a bow.",
+  "more_to_master_one": "1 more song to master",
+  "more_to_master": "{{count}} more songs to master",
+  "private": "Private",
+  "private_hint": "Only you can see it",
+  "public": "Public",
+  "public_hint": "Listed in Discover for everyone",
+  "private_note": "Only you can see it. Switch to public to share it in Discover.",
+  "name": "Name",
+  "description": "Description",
+  "top_full": "That’s the full top {{count}} — remove a song from the list to swap one in.",
+  "delete_title": "Delete “{{name}}”?",
+  "keep_it": "Keep it",
+  "added_to": "Added to “{{name}}”",
+  "add_to_playlist": "Add to playlist",
+  "loading": "Loading...",
+  "no_playlists": "No playlists yet",
+  "errors": {
+    "save_changes": "Couldn't save changes. Try again.",
+    "visibility": "Couldn't change visibility.",
+    "save_details": "Couldn't save details.",
+    "delete": "Couldn't delete the playlist.",
+    "save_copy": "Couldn't save this playlist.",
+    "like": "Couldn't update your like.",
+    "create": "Couldn't create the playlist. Try again.",
+    "add_song": "Couldn't add the song. Try again.",
+    "add_to_library": "Couldn't add that song to the library."
+  },
+  "kinds": {
+    "playlist": {
+      "label": "Playlist",
+      "tagline": "A free-form collection of songs",
+      "hint": "Group songs however you like — moods, bands, practice sets."
+    },
+    "path": {
+      "label": "Learning path",
+      "tagline": "Songs meant to be learned in order — a roadmap for your repertoire",
+      "hint": "A roadmap from first to last. Progress fills in as you master each song."
+    },
+    "top": {
+      "label": "Top 10",
+      "tagline": "A ranked list, best first",
+      "hint": "Your top picks with big rank numbers. Capped at ten."
+    }
+  },
+  "empty": {
+    "title": "Nothing here yet",
+    "owner_top": "Pick your top {{count}} — the order is the ranking.",
+    "owner": "Add songs from the library or your collection to fill this in.",
+    "other": "The author hasn't added any songs yet."
+  },
+  "share_title": {
+    "playlist": "Share this playlist",
+    "path": "Share this learning path",
+    "top": "Share this top 10"
+  },
+  "live_in_discover": {
+    "playlist": "This playlist is live in Discover — other players can open it and save a copy to their library.",
+    "path": "This learning path is live in Discover — other players can open it and save a copy to their library.",
+    "top": "This top 10 is live in Discover — other players can open it and save a copy to their library."
+  },
+  "delete_body": {
+    "playlist": "This removes the playlist for good. Songs themselves stay in the library and your collection.",
+    "path": "This removes the learning path for good. Songs themselves stay in the library and your collection.",
+    "top": "This removes the top 10 for good. Songs themselves stay in the library and your collection."
+  },
+  "created": {
+    "playlist": "Playlist created",
+    "path": "Learning path created",
+    "top": "Top 10 created"
+  },
+  "creator": {
+    "what_making": "What are you making?",
+    "new": {
+      "playlist": "New playlist",
+      "path": "New learning path",
+      "top": "New top 10"
+    },
+    "placeholder_top": "e.g. Top 10 riffs of the 90s",
+    "placeholder_path": "e.g. From campfire to Hendrix",
+    "placeholder_playlist": "e.g. Slow blues evenings",
+    "optional": "(optional)",
+    "description_placeholder": "What's this list about?",
+    "visibility": "Visibility",
+    "public_hint": "Anyone can find and save it",
+    "next": "Next",
+    "picked": "Picked {{count}}/{{max}}",
+    "added": "{{count}} added",
+    "top_full": "That’s the full top {{count}} — remove a song to swap one in.",
+    "add_later": "You can keep adding songs later.",
+    "create_with_one": "Create with 1 song",
+    "create_with": "Create with {{count}} songs",
+    "create_empty": "Create empty"
+  },
+  "view": {
+    "not_available": "Playlist not available",
+    "not_available_body": "It may have been deleted, or it’s private and only its owner can open it.",
+    "back": "Back to playlists",
+    "title": "Playlists",
+    "yours": "Your playlists",
+    "discover": "Discover",
+    "new": "New playlist",
+    "first_title": "Make your first playlist",
+    "first_body": "Group songs into anything — a mood, a set for the next jam, a learning roadmap or a top 10 you’d defend in an argument.",
+    "create_one": "Create one",
+    "nothing_public": "Nothing public yet",
+    "nothing_public_body": "When players share their playlists, they’ll show up here. Make one of yours public to get things going.",
+    "kinds_hint": "Playlist, path or top 10"
+  },
+  "picker": {
+    "search_create": "Search for a song or artist...",
+    "search_library": "Search the library...",
+    "nothing_found": "Nothing found — try a different title or artist.",
+    "not_in_library": "Not in the library yet — adds it there too",
+    "add_as_typed": "{{artist}} · add as typed, no cover art",
+    "cant_find": "Can’t find it? Type it as “Artist - Title” to add it as typed.",
+    "from_collection": "From your collection",
+    "min_chars_create": "Type at least two characters to search for a song.",
+    "min_chars_library": "Type at least two characters to search the song library."
+  }
+}

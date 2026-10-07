@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import {
@@ -41,6 +42,7 @@ export const RewardSummary = ({
   size = "sm",
   className,
 }: RewardSummaryProps) => {
+  const { t } = useTranslation("ui");
   const isLarge = size === "lg";
   // Large enough to read the part *art* rather than merely register that a
   // glyph is there — the pickup and the bridge are only tellable apart at this
@@ -62,8 +64,8 @@ export const RewardSummary = ({
         <span className={cn(row, "text-cyan-300")}>
           <Ticket size={iconSize} strokeWidth={2.5} className='shrink-0' />
           {reward.caseTokens > 1
-            ? `${reward.caseTokens} free cases`
-            : "Free case"}
+            ? t("free_cases", { count: reward.caseTokens })
+            : t("free_case")}
         </span>
       )}
 

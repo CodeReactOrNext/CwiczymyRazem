@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar/Avatar";
@@ -36,6 +37,7 @@ interface StandingRowProps {
 }
 
 function StandingRow({ rank, name, avatar, score, bpm, isPlayer = false, runScore }: StandingRowProps) {
+  const { t } = useTranslation("session_summary");
   return (
     <div
       className={cn(
@@ -50,14 +52,14 @@ function StandingRow({ rank, name, avatar, score, bpm, isPlayer = false, runScor
         {rank}
       </span>
 
-      <Avatar avatarURL={avatar} name={name || 'Player'} size='sm' />
+      <Avatar avatarURL={avatar} name={name || t('player')} size='sm' />
 
       <div className='min-w-0 flex-1'>
         <p translate='no' className={cn('truncate text-sm font-semibold', isPlayer ? 'text-cyan-300' : 'text-zinc-300')}>
-          {isPlayer ? 'You' : name}
+          {isPlayer ? t('you') : name}
         </p>
         {runScore !== undefined && (
-          <p className='text-[11px] tabular-nums text-zinc-500'>this run {runScore.toLocaleString()}</p>
+          <p className='text-[11px] tabular-nums text-zinc-500'>{t('this_run', { score: runScore.toLocaleString() })}</p>
         )}
       </div>
 
@@ -72,24 +74,25 @@ function StandingRow({ rank, name, avatar, score, bpm, isPlayer = false, runScor
 }
 
 function DeltaChip({ run }: { run: ScoredRun }) {
+  const { t } = useTranslation("session_summary");
   const delta = run.score - run.previousBest;
 
   if (run.previousBest === 0) {
-    return <span className='shrink-0 rounded bg-zinc-800/60 px-2.5 py-1 text-[11px] font-semibold text-zinc-400'>First score</span>;
+    return <span className='shrink-0 rounded bg-zinc-800/60 px-2.5 py-1 text-[11px] font-semibold text-zinc-400'>{t('first_score')}</span>;
   }
   if (delta > 0) {
     return (
       <span className='shrink-0 rounded bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-emerald-400'>
-        +{delta.toLocaleString()} vs your best
+        {t('vs_best', { delta: `+${delta.toLocaleString()}` })}
       </span>
     );
   }
   if (delta === 0) {
-    return <span className='shrink-0 rounded bg-zinc-800/60 px-2.5 py-1 text-[11px] font-semibold text-zinc-400'>Matched your best</span>;
+    return <span className='shrink-0 rounded bg-zinc-800/60 px-2.5 py-1 text-[11px] font-semibold text-zinc-400'>{t('matched_best')}</span>;
   }
   return (
     <span className='shrink-0 rounded bg-zinc-800/60 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-zinc-400'>
-      {delta.toLocaleString()} vs your best
+      {t('vs_best', { delta: delta.toLocaleString() })}
     </span>
   );
 }
@@ -162,8 +165,9 @@ interface SessionLeaderboardCardProps {
  * leaderboard, with the players standing directly above and below.
  */
 export const SessionLeaderboardCard = ({ runs }: SessionLeaderboardCardProps) => {
+  const { t } = useTranslation("session_summary");
   const userAuth = useAppSelector(selectUserAuth);
-  const playerName = useAppSelector(selectUserName) || 'You';
+  const playerName = useAppSelector(selectUserName) || t('you');
   const playerAvatar = useAppSelector(selectUserAvatar) || '';
 
   const { data, isLoading } = useQuery({
@@ -193,7 +197,7 @@ export const SessionLeaderboardCard = ({ runs }: SessionLeaderboardCardProps) =>
       className='rounded-lg bg-zinc-900/40 p-7 md:p-8'>
       <div className='mb-6 flex items-center gap-2'>
         <Trophy className='h-4 w-4 text-amber-500' aria-hidden />
-        <h3 className='text-sm font-semibold text-zinc-300'>Where you stand</h3>
+        <h3 className='text-sm font-semibold text-zinc-300'>{t('where_you_stand')}</h3>
       </div>
 
       <div className='space-y-10'>

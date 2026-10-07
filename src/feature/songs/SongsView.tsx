@@ -399,9 +399,9 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
               )}>
                 {(
                   [
-                    { key: "board", label: "Board", icon: LayoutGrid },
-                    { key: "explore", label: "Explore", icon: Search },
-                    { key: "playlists", label: "Playlists", icon: ListMusic },
+                    { key: "board", label: t("learning_section.board"), icon: LayoutGrid },
+                    { key: "explore", label: t("learning_section.explore"), icon: Search },
+                    { key: "playlists", label: t("learning_section.playlists"), icon: ListMusic },
                   ] as const
                 ).map((tab) => {
                   const isActive = view === tab.key || (tab.key === "board" && view !== "explore" && view !== "playlists");
@@ -441,9 +441,9 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                   onPartsChange={setSongParts}
                   onBack={closeDetails}
                   backLabel={
-                    view === 'playlists' ? 'Back to playlist' :
-                    view === 'board' ? 'Back to Board' :
-                    'Back to Explore'
+                    view === 'playlists' ? t('view.back_to_playlist') :
+                    view === 'board' ? t('view.back_to_board') :
+                    t('view.back_to_explore')
                   }
                   showBackOnDesktop
                 />
@@ -466,13 +466,15 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       <input
                         value={boardSearchQuery}
                         onChange={(e) => setBoardSearchQuery(e.target.value)}
-                        placeholder="Search your songs..."
+                        placeholder={t("view.search_yours")}
                         className="h-10 w-full rounded-lg border-none bg-zinc-900/50 pl-9 pr-3 text-sm text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-900/70 focus:outline-none focus:ring-4 focus:ring-cyan-500/5"
                       />
                     </div>
                     <div className="flex shrink-0 items-center gap-2 rounded-lg bg-zinc-900/40 px-4 py-2 text-xs font-bold text-zinc-400">
                       <LibraryIcon size={14} />
-                      {totalSongsCount} {totalSongsCount === 1 ? "song" : "songs"} total
+                      {totalSongsCount === 1
+  ? t("view.total_one")
+  : t("view.total", { count: totalSongsCount })}
                     </div>
                   </div>
                 )}
@@ -488,19 +490,19 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                     const sections = [
                       {
                         key: "learning",
-                        title: "Currently learning",
+                        title: t("view.sections.learning"),
                         icon: <Play size={15} className="fill-current" />,
                         songs: userSongs.learning.filter(matchesQuery),
                       },
                       {
                         key: "wantToLearn",
-                        title: "Want to learn",
+                        title: t("view.sections.wantToLearn"),
                         icon: <Music size={15} />,
                         songs: userSongs.wantToLearn.filter(matchesQuery),
                       },
                       {
                         key: "learned",
-                        title: "Mastered songs",
+                        title: t("view.sections.learned"),
                         icon: <Trophy size={15} />,
                         songs: userSongs.learned.filter(matchesQuery),
                       },
@@ -553,7 +555,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                             onClick={() => handleSwitchView("explore")}
                             className="ml-auto h-10 rounded-lg bg-white/5 px-4 text-sm font-semibold text-zinc-200 hover:bg-white/10 hover:text-white">
                             <Plus />
-                            Add songs
+                            {t("view.add_songs")}
                           </Button>
                         </div>
 
@@ -576,11 +578,11 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                             <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
                               <Search size={32} className="text-zinc-500" />
                             </div>
-                            <h3 className="mb-2 text-xl font-bold text-white">No songs match &ldquo;{boardSearchQuery}&rdquo;</h3>
+                            <h3 className="mb-2 text-xl font-bold text-white">{t("view.no_match", { query: boardSearchQuery })}</h3>
                             <p className="max-w-xs text-sm text-zinc-400">
                               {visibleCount > 0
-                                ? "Nothing here — check the other tabs."
-                                : "Try a different title or artist."}
+                                ? t("view.check_other_tabs")
+                                : t("view.try_different")}
                             </p>
                           </div>
                         ) : (
@@ -589,10 +591,10 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                               {activeSection.icon}
                             </div>
                             <h3 className="mb-2 text-lg font-bold text-white">
-                              Nothing in &ldquo;{activeSection.title}&rdquo; yet
+                              {t("view.section_empty", { section: activeSection.title })}
                             </h3>
                             <p className="max-w-xs text-sm text-zinc-400">
-                              Move a song here from another tab, or add a new one from the library.
+                              {t("view.section_empty_hint")}
                             </p>
                           </div>
                         )}
@@ -605,15 +607,15 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
                         <Music size={32} className="text-zinc-500" />
                       </div>
-                      <h3 className="mb-2 text-xl font-bold text-white">No songs in your board yet</h3>
+                      <h3 className="mb-2 text-xl font-bold text-white">{t("view.board_empty")}</h3>
                       <p className="max-w-xs text-sm text-zinc-400">
-                        Add songs from the library to practice them and track your progress here.
+                        {t("view.board_empty_hint")}
                       </p>
                       <Button
                         onClick={() => handleSwitchView("explore")}
                         className="mt-8 h-11 rounded-lg bg-white px-8 font-bold text-black hover:bg-zinc-100"
                       >
-                        Explore library
+                        {t("view.explore_library")}
                       </Button>
                     </div>
                   )}
@@ -633,7 +635,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                 {/* Tier Selection Grid */}
                 <div className="space-y-4">
                   <div className="flex flex-col gap-1">
-                    <p className="text-xs font-bold text-zinc-400">Filter by Tier</p>
+                    <p className="text-xs font-bold text-zinc-400">{t("view.filter_by_tier")}</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {getAllTiers().map((tier) => {
@@ -699,7 +701,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                         )}
                       >
                         <SlidersHorizontal className="mr-2.5 h-4 w-4" />
-                        Filters & Sort
+                        {t("filter_sheet.title")}
                       </Button>
                     </div>
                   </div>

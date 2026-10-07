@@ -30,6 +30,9 @@ import {
 import { SongPickerPanel } from "feature/songs/components/Playlists/SongPickerPanel";
 import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { ChevronUp, Music, Play, Plus, Vote } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -66,6 +69,7 @@ const NominationRow = ({
   onToggleVote,
   onPreview,
 }: NominationRowProps) => {
+  const { t } = useTranslation("challenges");
   const tier = getSongTier(
     (nomination.avgDifficulty ?? 0) === 0
       ? "?"
@@ -87,7 +91,7 @@ const NominationRow = ({
         onClick={onPreview}
         className='absolute inset-0 rounded-lg'>
         <span className='sr-only'>
-          Listen to {nomination.title} by {nomination.artist}
+          {t("board.listen", { title: nomination.title, artist: nomination.artist })}
         </span>
       </button>
 
@@ -129,7 +133,7 @@ const NominationRow = ({
             <Link
               href={`/user/${nomination.nominatedBy}`}
               className='relative z-10 hover:text-zinc-300'>
-              put up by {nomination.nominatedByName}
+              {t("ballot.put_up_by", { name: nomination.nominatedByName })}
             </Link>
           </UserTooltip>
         </p>
@@ -166,7 +170,7 @@ const NominationRow = ({
             className='max-w-xs border-white/10 bg-zinc-900 text-white'>
             <div className='space-y-1'>
               <p className='mb-1 text-[11px] font-semibold text-zinc-300'>
-                Voted by:
+                {t("ballot.voted_by")}
               </p>
               {nomination.voters?.map((voter) => (
                 <UserTooltip key={voter.id} userId={voter.id}>
@@ -194,6 +198,8 @@ export const VotingBoard = ({
   currentUserId,
   userName,
 }: VotingBoardProps) => {
+  const { t } = useTranslation("challenges");
+  const intlLocale = useIntlLocale();
   const [isNominateOpen, setIsNominateOpen] = useState(false);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const { nominate, isNominating, toggleVote } = useChallengeMutations();
@@ -219,7 +225,7 @@ export const VotingBoard = ({
       (v) => v.id === currentUserId,
     );
     if (!hasVoted && votesLeft === 0) {
-      toast.error(`You've used all ${VOTES_PER_USER} votes this month.`);
+      toast.error(t("ballot.out_of_votes", { count: VOTES_PER_USER }));
       return;
     }
     toggleVote({ nomination, userId: currentUserId, userName });
@@ -228,7 +234,7 @@ export const VotingBoard = ({
   const handleNominate = async (song: Song) => {
     if (!currentUserId) return;
     if (votesLeft === 0 && !nominatedIds.has(song.id)) {
-      toast.error(`You've used all ${VOTES_PER_USER} votes this month.`);
+      toast.error(t("ballot.out_of_votes", { count: VOTES_PER_USER }));
       return;
     }
     await nominate({ song, userId: currentUserId, userName });
@@ -241,12 +247,13 @@ export const VotingBoard = ({
           is the part a voter still needs in front of the list: the rules. */}
       <div className='max-w-2xl space-y-3'>
         <p className='text-sm font-medium leading-relaxed text-zinc-400'>
-          You get{" "}
-          <span className='font-bold text-white'>{VOTES_PER_USER} votes</span>{" "}
-          per month. Put a song up or back one that’s already on the ballot —
-          nominating spends a vote too. When the month turns, the top{" "}
-          <span className='font-bold text-white'>{CHALLENGE_SONG_COUNT}</span>{" "}
-          become the new challenge. Ties go to whoever proposed it first.
+          <Interpolate
+            text={t("ballot.rules")}
+            values={{
+              votes: <span className='font-bold text-white'>{t("ballot.votes_count", { count: VOTES_PER_USER })}</span>,
+              top: <span className='font-bold text-white'>{CHALLENGE_SONG_COUNT}</span>,
+            }}
+          />
         </p>
 
         <div className='flex flex-wrap items-center gap-2 pt-1'>
@@ -256,7 +263,7 @@ export const VotingBoard = ({
             className='h-10 px-5 font-bold'>
             <span className='flex items-center gap-2'>
               <Plus className='h-4 w-4' />
-              Nominate a song
+              {t("ballot.nominate")}
             </span>
           </Button>
           <span
@@ -267,8 +274,8 @@ export const VotingBoard = ({
                 : "bg-white/5 text-zinc-500",
             )}>
             {currentUserId
-              ? `${votesLeft} of ${VOTES_PER_USER} votes left`
-              : "Sign in to vote"}
+              ? t("ballot.votes_left_of", { left: votesLeft, total: VOTES_PER_USER })
+              : t("ballot.sign_in")}
           </span>
         </div>
       </div>
@@ -279,11 +286,10 @@ export const VotingBoard = ({
             <Vote size={26} />
           </div>
           <h3 className='mb-1 text-lg font-bold text-white'>
-            The ballot is empty
+            {t("ballot.empty_title")}
           </h3>
           <p className='max-w-xs text-sm text-zinc-500'>
-            Nothing has been put up for {challengeMonthLabel(ballotId)} yet.
-            First nomination sets the tone.
+            {t("ballot.empty_body", { month: challengeMonthLabel(ballotId, intlLocale) })}
           </p>
         </div>
       ) : (
@@ -292,7 +298,7 @@ export const VotingBoard = ({
             <div key={nomination.id}>
               {index === CHALLENGE_SONG_COUNT && (
                 <p className='px-3 pb-2 pt-6 text-[11px] font-bold text-zinc-600'>
-                  below the cut — needs more votes to make the board
+                  {t("ballot.below_cut")}
                 </p>
               )}
               <NominationRow
@@ -331,15 +337,14 @@ export const VotingBoard = ({
         <DialogContent className='flex h-full max-w-none flex-col border-white/5 bg-zinc-950 p-6 sm:h-[560px] sm:max-w-lg sm:rounded-2xl'>
           <DialogHeader className='mb-2'>
             <DialogTitle className='font-openSans text-xl font-bold text-white'>
-              Nominate a song
+              {t("ballot.nominate")}
               <span className='ml-2 text-sm font-semibold text-zinc-500'>
-                {votesLeft} {votesLeft === 1 ? "vote" : "votes"} left
+                {votesLeft === 1 ? t("ballot.vote_left", { count: votesLeft }) : t("ballot.votes_left", { count: votesLeft })}
               </span>
             </DialogTitle>
           </DialogHeader>
           <p className='mb-2 rounded-lg bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-zinc-500'>
-            Picking a song that’s already on the ballot just adds your vote to
-            it.
+            {t("ballot.pick_existing")}
           </p>
           <SongPickerPanel
             existingIds={new Set<string>()}

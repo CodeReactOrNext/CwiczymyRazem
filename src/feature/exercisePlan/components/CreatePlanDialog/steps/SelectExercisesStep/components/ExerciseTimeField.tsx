@@ -3,6 +3,7 @@
 import { Input } from 'assets/components/ui/input';
 import { Label } from 'assets/components/ui/label';
 import { cn } from 'assets/lib/utils';
+import { useTranslation } from "hooks/useTranslation";
 import { Clock } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
@@ -36,6 +37,7 @@ export function ExerciseTimeField({
   onCancel,
   selectOnMount = true,
 }: ExerciseTimeFieldProps) {
+  const { t } = useTranslation("plans");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export function ExerciseTimeField({
           htmlFor='exercise-time'
           className='flex items-center gap-1.5 text-[12px] font-bold tracking-wider text-zinc-500'>
           <Clock className='h-3.5 w-3.5 text-cyan-500/70' />
-          Practice duration
+          {t("practice_duration")}
         </Label>
         <div className='relative'>
           <Input

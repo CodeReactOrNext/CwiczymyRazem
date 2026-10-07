@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
+import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -26,15 +27,22 @@ interface PageTabsProps {
   className?: string;
 }
 
+const tabKey = (href: string) =>
+  href.replace(/^\//, "").replace(/[^a-z0-9]+/gi, "_");
+
 export const PageTabs = ({
   tabs,
   activeHref,
   ariaLabel = "Sections",
   className,
-}: PageTabsProps) => (
+}: PageTabsProps) => {
+  const { t } = useTranslation("nav");
+  return (
   <nav aria-label={ariaLabel} className={cn(tabNavListClass, className)}>
     {tabs.map(({ label, href, tooltip, badge, icon: Icon }) => {
       const isActive = href === activeHref;
+      // Tabs are defined in English next to their routes; the route is the key.
+      const key = `page_tabs.${tabKey(href)}`;
       const link = (
         <Link
           key={href}
@@ -42,7 +50,7 @@ export const PageTabs = ({
           aria-current={isActive ? "page" : undefined}
           className={tabNavItemClass(isActive)}>
           {Icon && <Icon size={16} className='shrink-0' />}
-          {label}
+          {t(`${key}.label`, label)}
           {badge && (
             <span className='text-xs font-semibold tabular-nums text-zinc-500'>
               {badge}
@@ -58,11 +66,12 @@ export const PageTabs = ({
           <Tooltip delayDuration={300}>
             <TooltipTrigger asChild>{link}</TooltipTrigger>
             <TooltipContent className='max-w-[200px] text-center'>
-              <p>{tooltip}</p>
+              <p>{t(`${key}.tooltip`, tooltip)}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       );
     })}
   </nav>
-);
+  );
+};

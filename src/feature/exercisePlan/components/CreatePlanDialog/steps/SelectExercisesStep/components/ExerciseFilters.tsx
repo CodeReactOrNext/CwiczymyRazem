@@ -33,7 +33,7 @@ export const ExerciseFilters = ({
   availableSkills,
   groupedExercises,
 }: ExerciseFiltersProps) => {
-  const { t } = useTranslation(["common", "exercises", "skills"]);
+  const { t } = useTranslation(["common", "exercises", "skills", "plans"]);
   const [isSkillOpen, setIsSkillOpen] = useState(false);
   const activeExtraFilters =
     (selectedDifficulty !== "all" ? 1 : 0) + (selectedSkill !== "all" ? 1 : 0);
@@ -53,7 +53,7 @@ export const ExerciseFilters = ({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className='pl-11 h-[42px] bg-white/[0.05] border-none rounded-lg text-[13px] text-zinc-200 placeholder:text-zinc-500 focus:bg-white/[0.08] focus:ring-1 focus:ring-cyan-500/20 transition-all duration-300'
-          aria-label='Search exercises'
+          aria-label={t("plans:search_exercises")}
         />
       </div>
         <button
@@ -67,7 +67,7 @@ export const ExerciseFilters = ({
               : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
           )}>
           <SlidersHorizontal className='h-3.5 w-3.5' />
-          Filters
+          {t("plans:filters")}
           {activeExtraFilters > 0 && (
             <span className='rounded bg-cyan-500/25 px-1.5 text-[10px] font-bold'>{activeExtraFilters}</span>
           )}
@@ -159,7 +159,7 @@ export const ExerciseFilters = ({
               >
                 <div className="flex items-center gap-2 tracking-wider text-[10px] font-bold">
                   <FaFilter className="h-2.5 w-2.5 opacity-70" />
-                  <span>Skill</span>
+                  <span>{t("plans:skill")}</span>
                   {activeSkillData && (
                     <span className="flex items-center gap-1.5 normal-case tracking-normal text-[11px] font-semibold bg-cyan-500/20 px-2 py-0.5 rounded ml-1">
                       {ActiveIcon && <ActiveIcon className="h-3 w-3" />}

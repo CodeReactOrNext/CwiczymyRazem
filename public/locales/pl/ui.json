@@ -1,0 +1,16 @@
+{
+  "changelog": {
+    "empty": "Brak wpisów w tym miesiącu",
+    "new": "Nowe",
+    "bug_fix": "Poprawka błędu"
+  },
+  "open_in_practice_log": "Otwórz w dzienniku ćwiczeń",
+  "activity": "Aktywność",
+  "minutes_short": "{{minutes}} min",
+  "live_now": "Teraz na żywo",
+  "close": "Zamknij",
+  "using_desktop_app": "Korzysta z aplikacji na komputer",
+  "free_cases": "Darmowe skrzynki: {{count}}",
+  "free_case": "Darmowa skrzynka",
+  "daily_practice": "Codzienne ćwiczenia"
+}

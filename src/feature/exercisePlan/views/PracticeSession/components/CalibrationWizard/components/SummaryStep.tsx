@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { CheckCircle2 } from "lucide-react";
 import React from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
@@ -13,10 +14,11 @@ export const SummaryStep = React.memo(function SummaryStep({
   onConfirm: () => void;
   onCancel:  () => void;
 }) {
+  const { t } = useTranslation("calibration");
   return (
     <div className="flex h-full flex-col px-5 py-5 text-white">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold tracking-tight">All Done</h2>
+        <h2 className="text-lg font-bold tracking-tight">{t("summary.title")}</h2>
         <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
           <FaTimes className="h-4 w-4" />
         </button>
@@ -35,21 +37,20 @@ export const SummaryStep = React.memo(function SummaryStep({
         </motion.div>
 
         <div className="space-y-4 text-center">
-          <h3 className="text-xl font-bold text-white tracking-tight">Everything's ready!</h3>
+          <h3 className="text-xl font-bold text-white tracking-tight">{t("summary.ready")}</h3>
           <p className="text-sm text-zinc-400 leading-relaxed">
-            Your calibration is complete. If you feel the detection is still slightly off,
-            consider re-tuning your guitar or adjusting the input sensitivity.
+            {t("summary.body")}
           </p>
           <p className="text-emerald-400 font-bold tracking-[0.2em] text-[10px]">
-            Good luck!
+            {t("summary.good_luck")}
           </p>
         </div>
 
         <div className="flex w-full gap-3 pt-1 pb-2">
           <Button onClick={onConfirm} className="flex-1 h-11">
-            <FaCheck className="mr-2 h-3.5 w-3.5" /> Save & Close
+            <FaCheck className="mr-2 h-3.5 w-3.5" /> {t("summary.save")}
           </Button>
-          <Button variant="ghost" onClick={onCancel} className="text-zinc-500 hover:text-zinc-300">Discard</Button>
+          <Button variant="ghost" onClick={onCancel} className="text-zinc-500 hover:text-zinc-300">{t("summary.discard")}</Button>
         </div>
       </div>
     </div>

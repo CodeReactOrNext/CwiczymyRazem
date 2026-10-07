@@ -1,1 +1,334 @@
-{}
+{
+  "common": "Pospolite",
+  "rare": "Rzadkie",
+  "veryRare": "Bardzo rzadkie",
+  "empty": "Pusto",
+  "epic": "Epickie",
+  "panel": {
+    "earnedHeadline": "Zdobyte osiągnięcia: {{owned}} z {{total}}",
+    "globalColumn": "% wszystkich graczy",
+    "readyHint": "Wymaganie spełnione — odblokuje się przy następnej zapisanej sesji",
+    "earned": "Zdobyte",
+    "rewards": {
+      "claim": "Odbierz",
+      "claimAll": "Odbierz wszystkie",
+      "claiming": "Odbieranie...",
+      "waiting": "Nagrody czekające na odbiór: {{count}}",
+      "waitingOne": "1 nagroda czeka na odbiór",
+      "tokensHeld": "Darmowe skrzynki do wykorzystania: {{count}} — wydaj je na dowolną skrzynkę w Arsenale.",
+      "tokensHeldOne": "Masz 1 darmową skrzynkę — wydaj ją na dowolną skrzynkę w Arsenale.",
+      "readyToCollect": "Nagroda gotowa do odbioru",
+      "onCompletion": "Nagroda za zdobycie tego osiągnięcia",
+      "collected": "Nagroda już odebrana"
+    }
+  },
+  "time_1": {
+    "title": "Ciężka praca się opłaca",
+    "description": "Przekrocz próg 10 godzin ćwiczeń."
+  },
+  "time_2": {
+    "title": "Niezłomna determinacja",
+    "description": "Przekrocz próg 30 godzin ćwiczeń."
+  },
+  "time_3": {
+    "title": "1% — reguła 10 000 h",
+    "description": "Przekrocz próg 100 godzin ćwiczeń."
+  },
+  "balance": {
+    "title": "Złoty środek",
+    "description": "Zaraportuj jednocześnie co najmniej 1 godzinę z każdego filaru umiejętności."
+  },
+  "fire": {
+    "title": "Gitarowa moc",
+    "description": "Zdobądź 60 punktów w jednym raporcie."
+  },
+  "health_habits": {
+    "title": "Zdrowy jak ryba",
+    "description": "Zastosuj wszystkie zdrowe nawyki w jednym raporcie."
+  },
+  "points_1": {
+    "title": "Pierwsze kroki",
+    "description": "Zdobądź 100 punktów"
+  },
+  "points_2": {
+    "title": "Ptasie akordy",
+    "description": "Zdobądź 1000 punktów"
+  },
+  "points_3": {
+    "title": "Żabie akordy",
+    "description": "Zdobądź 10 000 punktów"
+  },
+  "doctor": {
+    "title": "Doktor",
+    "description": "Zastosuj 100 zdrowych nawyków"
+  },
+  "tired": {
+    "title": "Już nie mogę...",
+    "description": "Ukończ 5-godzinną sesję"
+  },
+  "diamond": {
+    "title": "Diamentowa gitara",
+    "description": "Osiągnij 28. poziom"
+  },
+  "scientist": {
+    "title": "Naukowiec",
+    "description": "Osiągnij 50 godzin teorii"
+  },
+  "artist": {
+    "title": "Artysta muzyk",
+    "description": "Osiągnij 10 godzin pracy twórczej"
+  },
+  "book": {
+    "title": "Erudyta",
+    "description": "Osiągnij 10 godzin teorii"
+  },
+  "bigear": {
+    "title": "Duże ucho",
+    "description": "Osiągnij 50 godzin kształcenia słuchu"
+  },
+  "wizard": {
+    "title": "Czarodziej",
+    "description": "Osiągnij 50 godzin pracy twórczej"
+  },
+  "medal": {
+    "title": "Odznaczony",
+    "description": "Zdobądź 20 osiągnięć"
+  },
+  "day_1": {
+    "title": "Konsekwencja",
+    "description": "Ćwicz 3 dni z rzędu"
+  },
+  "day_2": {
+    "title": "Tydzień",
+    "description": "Ćwicz 7 dni z rzędu"
+  },
+  "day_3": {
+    "title": "Nieskończoność",
+    "description": "Ćwicz 15 dni z rzędu"
+  },
+  "session_1": {
+    "title": "Klikacz",
+    "description": "Ukończ 20 sesji"
+  },
+  "session_2": {
+    "title": "Gitarowy podróżnik",
+    "description": "Ukończ 50 sesji"
+  },
+  "session_3": {
+    "title": "Kowboj",
+    "description": "Ukończ 100 sesji"
+  },
+  "ring": {
+    "title": "Strunowy pierścień",
+    "description": "Spędź ponad 5 godzin w każdym filarze"
+  },
+  "headphones": {
+    "title": "Osłuchany",
+    "description": "Spędź ponad 10 godzin na kształceniu słuchu"
+  },
+  "ninja": {
+    "title": "Wojownik techniki",
+    "description": "Spędź ponad 10 godzin na technice"
+  },
+  "record": {
+    "title": "Coś się nagrało",
+    "description": "Ten gracz intensywnie coś nagrywał."
+  },
+  "vinyl": {
+    "title": "Nagrany pomysł",
+    "description": "Ten gracz wpadł na pomysł i go nagrał... chyba."
+  },
+  "dumbbel": {
+    "title": "Prawdziwa ciężka praca",
+    "description": "Ten gracz naprawdę ciężko pracuje."
+  },
+  "rightway": {
+    "title": "Bez kontuzji",
+    "description": "Ten gracz rozgrzewa się podręcznikowo."
+  },
+  "path": {
+    "title": "Świetny plan",
+    "description": "Ten gracz ma świetny plan treningowy i jest na dobrej drodze do swoich celów."
+  },
+  "yolo": {
+    "title": "Yolo",
+    "description": "Ten gracz nie przejmuje się zdrowymi nawykami."
+  },
+  "vip": {
+    "title": "Zasłużony",
+    "description": "Ten gracz pomógł w rozwoju Riff Quest"
+  },
+  "short": {
+    "title": "Wytrwałość",
+    "description": "Ten gracz za wszelką cenę utrzymał regularność ćwiczeń"
+  },
+  "event": {
+    "title": "Wydarzenie",
+    "description": "Ten gracz wziął udział w wydarzeniu na Discordzie"
+  },
+  "lvl100": {
+    "title": "Legendarna kostka",
+    "description": "Ten gracz osiągnął 100. poziom"
+  },
+  "fireSession": {
+    "title": "Ognista sesja",
+    "description": "Ten gracz ukończył perfekcyjny raport"
+  },
+  "batteryHearth": {
+    "title": "Serce z baterii",
+    "description": "Ten gracz ma 2000 nawyków"
+  },
+  "100days": {
+    "title": "100 dni",
+    "description": "Ten gracz ćwiczył przez 100 dni"
+  },
+  "bomb": {
+    "title": "Sytuacja krytyczna",
+    "description": "Ten gracz uratował swoją serię"
+  },
+  "wannaLearn1": {
+    "title": "Samotny wojownik",
+    "description": "Chcesz nauczyć się swojego pierwszego utworu"
+  },
+  "wannaLearn2": {
+    "title": "Podwójna moc",
+    "description": "Chcesz nauczyć się dwóch utworów"
+  },
+  "wannaLearn3": {
+    "title": "Zapełniony zeszyt",
+    "description": "Chcesz nauczyć się trzech utworów"
+  },
+  "wannaLearn10": {
+    "title": "Zagubiony w nutach",
+    "description": "Chcesz nauczyć się dziesięciu utworów"
+  },
+  "wannaLearn30": {
+    "title": "Nieskończona pętla",
+    "description": "Chcesz nauczyć się trzydziestu utworów"
+  },
+  "learning1": {
+    "title": "Pierwszy ciężar",
+    "description": "Uczysz się swojego pierwszego utworu"
+  },
+  "learning3": {
+    "title": "Podnosząc poprzeczkę",
+    "description": "Uczysz się jednocześnie trzech utworów"
+  },
+  "learning5": {
+    "title": "Naprzód",
+    "description": "Uczysz się jednocześnie pięciu utworów"
+  },
+  "learning10": {
+    "title": "Muzyczne mięśnie",
+    "description": "Uczysz się jednocześnie dziesięciu utworów"
+  },
+  "learning20": {
+    "title": "Multiinstrumentalista",
+    "description": "Uczysz się jednocześnie dwudziestu utworów"
+  },
+  "learning30": {
+    "title": "Muzyczna aura",
+    "description": "Uczysz się jednocześnie trzydziestu utworów"
+  },
+  "learned1": {
+    "title": "Dwójka kier",
+    "description": "Nauczyłeś się swojego pierwszego utworu"
+  },
+  "learned3": {
+    "title": "Trójka karo",
+    "description": "Nauczyłeś się trzech utworów"
+  },
+  "learned5": {
+    "title": "Czwórka karo",
+    "description": "Nauczyłeś się pięciu utworów"
+  },
+  "learned10": {
+    "title": "Piątka karo",
+    "description": "Nauczyłeś się dziesięciu utworów"
+  },
+  "learned20": {
+    "title": "Szóstka karo",
+    "description": "Nauczyłeś się dwudziestu utworów"
+  },
+  "learned30": {
+    "title": "Walet karo",
+    "description": "Nauczyłeś się trzydziestu utworów"
+  },
+  "learned50": {
+    "title": "Król karo",
+    "description": "Nauczyłeś się pięćdziesięciu utworów"
+  },
+  "learned100": {
+    "title": "As karo",
+    "description": "Nauczyłeś się stu utworów — jesteś prawdziwym asem!"
+  },
+  "rig_50": {
+    "title": "Tor sygnału",
+    "description": "Zbuduj zestaw o Poziomie zestawu 50."
+  },
+  "rig_150": {
+    "title": "Gotowy na scenę",
+    "description": "Zbuduj zestaw o Poziomie zestawu 150."
+  },
+  "rig_300": {
+    "title": "Ściana studyjna",
+    "description": "Zbuduj zestaw o Poziomie zestawu 300."
+  },
+  "rig_500": {
+    "title": "Zestaw headlinera",
+    "description": "Zbuduj zestaw o Poziomie zestawu 500."
+  },
+  "rig_800": {
+    "title": "Ściana dźwięku",
+    "description": "Zbuduj zestaw o Poziomie zestawu 800."
+  },
+  "rig_1000": {
+    "title": "Cztery cyfry",
+    "description": "Zbuduj zestaw o Poziomie zestawu 1000."
+  },
+  "first_rare": {
+    "title": "Coś wyjątkowego",
+    "description": "Zdobądź swój pierwszy Rzadki sprzęt."
+  },
+  "first_epic": {
+    "title": "Klasa kolekcjonerska",
+    "description": "Zdobądź swój pierwszy Epicki sprzęt."
+  },
+  "first_legendary": {
+    "title": "Jeden z wielkich",
+    "description": "Zdobądź swój pierwszy Legendarny sprzęt."
+  },
+  "first_mythic": {
+    "title": "Święty Graal",
+    "description": "Zdobądź swój pierwszy Mityczny sprzęt."
+  },
+  "rarity_full_set": {
+    "title": "Pełna rozpiętość",
+    "description": "Posiadaj sprzęt każdej rzadkości, jaka może wypaść ze skrzynki."
+  },
+  "museum_1": {
+    "title": "Za szkłem",
+    "description": "Posiadaj sprzęt w Klasie muzealnej."
+  },
+  "museum_5": {
+    "title": "Prywatna kolekcja",
+    "description": "Posiadaj pięć sztuk sprzętu w Klasie muzealnej."
+  },
+  "serial_one": {
+    "title": "Numer jeden",
+    "description": "Posiadaj pierwszy egzemplarz dowolnego modelu, jaki kiedykolwiek wybito."
+  },
+  "globetrotter": {
+    "title": "Obieżyświat",
+    "description": "Posiadaj sprzęt zbudowany w ośmiu różnych krajach."
+  },
+  "vintage_1970": {
+    "title": "Starszy niż wzmacniacz",
+    "description": "Posiadaj gitarę zbudowaną przed 1970 rokiem."
+  },
+  "performance": {
+    "title": "Debiut sceniczny",
+    "description": "Zapisz pełną sesję występu — przećwicz utwór, poświęć 1 h na technikę i nagraj się."
+  },
+  "progress": "Postęp"
+}

@@ -9,6 +9,7 @@ import {
   milestoneChartKind,
   milestoneDayRule,
 } from "feature/dashboard/utils/milestoneWeek";
+import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
 
 import { MilestoneChart } from "./MilestoneChart";
@@ -32,6 +33,7 @@ export const MilestoneCard = ({
   const { statuses, days, weekKey, isLoading, isError } =
     useMilestoneProgress();
   const claim = useClaimMilestone();
+  const { t } = useTranslation("milestones");
 
   // The layout only ever holds ids the catalog accepts, so a missing tier means
   // the table changed under a saved layout — nothing to draw.
@@ -77,7 +79,7 @@ export const MilestoneCard = ({
         <div className='min-w-0 flex-1'>
           <div className='flex items-baseline gap-2'>
             <h3 className='truncate text-sm font-semibold text-zinc-100'>
-              {status.name}
+              {t(`levels.${status.id}.name`, status.name)}
             </h3>
             {!locked && (
               <span className='shrink-0 text-xs font-semibold tabular-nums text-zinc-500'>
@@ -86,7 +88,7 @@ export const MilestoneCard = ({
             )}
           </div>
           <p className='mt-0.5 text-xs leading-relaxed text-zinc-400'>
-            {status.req}
+            {t(`levels.${status.id}.req`, status.req)}
           </p>
         </div>
 
@@ -94,13 +96,13 @@ export const MilestoneCard = ({
           one for an unbought tier too, but that one is a shop, not a wall. */}
         {status.lockedAtLvl !== null ? (
           <span className='shrink-0 text-xs text-zinc-500'>
-            Opens at level {status.lockedAtLvl}
+            {t("card.opens_at", { lvl: status.lockedAtLvl })}
           </span>
         ) : !status.owned ? (
           <Link
             href='/summary'
             className='shrink-0 rounded-lg bg-zinc-900/60 px-3 py-2 text-xs font-semibold text-zinc-200 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-900'>
-            Unlock · {status.cost} Fame
+            {t("card.unlock", { cost: status.cost })}
           </Link>
         ) : canClaim ? (
           <button
@@ -119,13 +121,13 @@ export const MilestoneCard = ({
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500 hover:bg-amber-500/20",
               "disabled:pointer-events-none disabled:opacity-50",
             )}>
-            {claim.isPending ? "Claiming…" : `Claim +${status.reward}`}
+            {claim.isPending ? t("card.claiming") : t("card.claim", { reward: status.reward })}
           </button>
         ) : status.claimed ? (
-          <span className='shrink-0 text-xs text-zinc-500'>Claimed</span>
+          <span className='shrink-0 text-xs text-zinc-500'>{t("card.claimed")}</span>
         ) : (
           <span className='shrink-0 text-xs font-semibold text-amber-400'>
-            +{status.reward} Fame
+            {t("card.reward", { reward: status.reward })}
           </span>
         )}
       </div>

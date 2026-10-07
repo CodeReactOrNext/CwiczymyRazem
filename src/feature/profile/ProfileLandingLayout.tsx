@@ -15,6 +15,7 @@ import { LevelProgressCircle } from "feature/profile/components/LevelProgressCir
 import { SongTierBadge } from "feature/profile/components/SongTierBadge";
 import { getTrendData } from "feature/profile/utils/getTrendData";
 import { useUserSongs } from "feature/songs/hooks/useUserSongs";
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, History } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -36,6 +37,7 @@ const ProfileLandingLayout = ({
   featSlot,
   userInfo,
 }: LandingLayoutProps) => {
+  const { t } = useTranslation("profile");
   const router = useRouter();
   const { datasWithReports, year, setYear, isLoading, reportList } = useActivityLog(userAuth);
   const {
@@ -96,7 +98,7 @@ const ProfileLandingLayout = ({
   return (
     <div className="bg-second-600 rounded-xl flex flex-col shadow-sm border-none">
       <HeroBanner
-        title={isTodayCompleted ? "Great job today!" : "Start today's practice"}
+        title={isTodayCompleted ? t("landing.great_job") : t("landing.start_today")}
         className="w-full !rounded-none !shadow-none !flex-row !items-center !justify-between min-h-[160px] md:min-h-[200px] lg:min-h-[240px]"
 
         backgroundContent={

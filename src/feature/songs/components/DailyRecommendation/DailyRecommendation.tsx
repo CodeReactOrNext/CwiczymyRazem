@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
@@ -20,6 +21,7 @@ interface DailyRecommendationProps {
 }
 
 export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDetails }: DailyRecommendationProps) => {
+  const { t } = useTranslation("songs");
   const router = useRouter();
   const [isAdding, setIsAdding] = React.useState(false);
   const { handleStatusChange } = useSongsStatusChange({
@@ -90,7 +92,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
               size="icon"
               onClick={() => onOpenDetails(song)}
               className="h-10 w-10 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-white"
-              title="View Details"
+              title={t("recommendation.view_details")}
             >
               <Info className="h-5 w-5" />
             </Button>
@@ -113,7 +115,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
                 className="flex-1 sm:flex-none whitespace-nowrap"
               >
                 <Plus className="mr-1 h-3.5 w-3.5" />
-                {isAdding ? "Adding..." : "Want to Learn"}
+                {isAdding ? t("recommendation.adding") : t("want_to_learn")}
               </Button>
             )}
             
@@ -123,7 +125,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
                 onClick={() => handleAdd("learning")}
                 className="flex-1 sm:flex-none whitespace-nowrap"
               >
-                {isAdding ? "Adding..." : "Start Learning"}
+                {isAdding ? t("recommendation.adding") : t("recommendation.start_learning")}
                 <ChevronRight size={14} strokeWidth={3} className="ml-1" />
               </Button>
             )}

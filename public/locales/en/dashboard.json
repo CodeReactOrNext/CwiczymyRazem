@@ -1,0 +1,217 @@
+{
+  "daily_quests": {
+    "title": "Daily Quests",
+    "claim": "Claim {{points}}",
+    "claimed": "Reward Claimed",
+    "tasks": {
+      "rate_song": "Rate a Song",
+      "add_want_to_learn": "Add song to \"Want to Learn\"",
+      "practice_any_song": "Practice any Song",
+      "healthy_habits": "Use 2 Healthy Habits",
+      "auto_plan": "Generate & Practice Auto Plan",
+      "practice_plan": "Complete a Practice Plan",
+      "practice_total_time": "Practice for 15 minutes",
+      "practice_technique_time": "Practice Technique for 10 minutes",
+      "practice_specific_exercise": "Practice: {{exercise}}",
+      "practice_theory_time": "Practice Theory for 10 minutes",
+      "practice_hearing_time": "Train your Ear for 10 minutes",
+      "practice_creativity_time": "Be Creative for 10 minutes",
+      "creativity_focus": "Spend 15 minutes on Creativity",
+      "long_session": "Practice for 30 minutes total",
+      "well_rounded": "Practice 3 different categories",
+      "two_categories_min": "Practice 2 categories for 5 min each",
+      "balanced_session": "Practice Technique & Theory in one session",
+      "rate_multiple_songs": "Rate 3 Songs",
+      "complete_two_plans": "Complete 2 Practice Plans",
+      "improve_skill": "Earn points in any Skill",
+      "practice_three_exercises": "Practice 3 different exercises"
+    }
+  },
+  "customize": {
+    "hint": "Drag cards to reorder, hide what you don't need, add what you do.",
+    "add_widget": "Add widget",
+    "reset": "Reset",
+    "done": "Done",
+    "customize": "Customize",
+    "empty_title": "Nothing here yet.",
+    "empty_editing": "Add a widget to fill this space.",
+    "empty_hint": "Customize Home to put cards back here."
+  },
+  "widget_groups": {
+    "practice": "Practice",
+    "progress": "Progress",
+    "milestones": "Weekly goals",
+    "community": "Community"
+  },
+  "widgets": {
+    "daily-quests": {
+      "title": "Daily quests",
+      "description": "Today's three tasks and the Claim button."
+    },
+    "daily-exercise": {
+      "title": "Exercise of the day",
+      "description": "One mic-scored exercise for everyone, new every day, with the day's top five."
+    },
+    "practice-stats": {
+      "title": "This week",
+      "description": "Minutes per day against your daily target, plus the streak."
+    },
+    "streak": {
+      "title": "Streak",
+      "description": "Days in a row, the points bonus it earns, and whether today is done."
+    },
+    "shortcuts": {
+      "title": "Shortcuts",
+      "description": "Your own row of quick links to anywhere in the app."
+    },
+    "recent-sessions": {
+      "title": "Recent sessions",
+      "description": "Your last ten logged sessions, editable in place."
+    },
+    "activity-log": {
+      "title": "Activity",
+      "description": "A square for every day you have practised this year."
+    },
+    "level-rewards": {
+      "title": "Level rewards",
+      "description": "What the next levels unlock and anything a level-up has just paid out."
+    },
+    "songs": {
+      "title": "Songs",
+      "description": "Learned, learning and want-to-learn counts with your song tier."
+    },
+    "rank": {
+      "title": "Your rank",
+      "description": "Where you sit on the all-time ladder and in the season running now."
+    },
+    "monthly-challenge": {
+      "title": "Monthly challenge",
+      "description": "This month's five songs and which ones you have recorded."
+    }
+  },
+  "add_sheet": {
+    "title": "Add to Home",
+    "description": "Pick what you want to see first. New cards land at the bottom — drag them where they belong.",
+    "empty": "Everything is already on your Home."
+  },
+  "frame": {
+    "move": "Move {{title}}",
+    "drag": "Drag to move",
+    "make_half": "Make {{title}} half width",
+    "make_full": "Make {{title}} full width",
+    "half": "Half width",
+    "full": "Full width",
+    "hide": "Hide {{title}}",
+    "hide_from_home": "Hide from Home",
+    "empty": "Nothing to show right now. This card only appears when there is something in it."
+  },
+  "support": {
+    "title": "Help build Riff Quest",
+    "body": "Riff Quest is a one person project, free and built in the open. Your support keeps it that way.",
+    "cta": "Support"
+  },
+  "shortcuts": {
+    "title": "Shortcuts",
+    "tap_to_pin": "Tap a destination to pin it.",
+    "limit_reached": "That's the lot — unpin one to swap it.",
+    "up_to": "Up to {{count}} fit.",
+    "empty": "No shortcuts pinned yet. Customize Home to add some.",
+    "groups": {
+      "practice": "Practice",
+      "songs": "Songs",
+      "library": "My Stuff",
+      "progress": "Progress",
+      "community": "Community",
+      "gear": "Arsenal",
+      "other": "Other"
+    },
+    "items": {
+      "practice-plans": "Practice Routines",
+      "practice-auto": "Auto Plan",
+      "practice-free-timer": "Free Timer",
+      "practice-report": "Manual Log",
+      "practice-gp-tabs": "Guitar Pro Files",
+      "practice-skills": "Skills",
+      "practice-exercises": "Exercises",
+      "practice-roadmaps": "Mastery Roadmaps",
+      "practice-journey": "Learning Path",
+      "practice-scale-map": "Scale Map",
+      "songs-board": "Song Board",
+      "songs-explore": "Explore Songs",
+      "songs-playlists": "Playlists",
+      "library-favorites": "Favorites",
+      "library-plans": "My Plans",
+      "library-exercises": "My Exercises",
+      "library-create-plan": "Create Plan",
+      "library-create-exercise": "Create Exercise",
+      "progress-activity": "Activity",
+      "progress-milestones": "Milestones",
+      "community-rankings": "Rankings",
+      "progress-challenges": "Challenges",
+      "recordings": "Recordings",
+      "community-guilds": "Guilds",
+      "arsenal": "Arsenal",
+      "tone-studio": "Tone Studio",
+      "wiki": "Knowledge Base",
+      "settings": "Settings"
+    }
+  },
+  "streak": {
+    "title": "Streak",
+    "day": "day",
+    "days": "days",
+    "bonus": "+{{pct}}% points on every session",
+    "done_today": "Today is in the bag.",
+    "not_yet": "Nothing logged yet today. A short session keeps it alive.",
+    "practice_now": "Practice now"
+  },
+  "rank": {
+    "title": "Your rank",
+    "rankings": "Rankings",
+    "all_time": "All time",
+    "not_on_board": "Not on the board yet.",
+    "no_season_points": "No points this season yet.",
+    "this_season": "this season",
+    "points_level": "points · level {{level}}"
+  },
+  "challenge": {
+    "ends_today": "ends today",
+    "one_day_left": "1 day left",
+    "days_left": "{{count}} days left",
+    "player": "Player",
+    "title": "Monthly challenge",
+    "open": "Open challenge",
+    "none": "No challenge is running right now. The next board opens with the new month.",
+    "practice_song": "Practice {{title}} by {{artist}}",
+    "recorded": "Recorded",
+    "submit_song": "Submit a recording of {{title}}",
+    "submit": "Submit a recording",
+    "recorded_count": "{{count}} recorded",
+    "x_of_y": "{{done}} of {{total}}"
+  },
+  "songs": {
+    "title": "Songs",
+    "board": "Song board",
+    "error": "Couldn't load your songs right now."
+  },
+  "errors": {
+    "claim_failed": "Claim failed",
+    "claim_success": "+{{reward}} Fame from {{name}}",
+    "layout_save": "Couldn't save your Home layout"
+  },
+  "daily_exercise": {
+    "open_spot": "Open spot",
+    "no_scores": "No scores yet. The first run takes #1.",
+    "title": "Exercise of the day",
+    "new_in": "New in {{time}}",
+    "none_today": "No exercise today.",
+    "beat_score": "Beat your score",
+    "play": "Play",
+    "your_best": "Your best",
+    "rank_of": "#{{rank}} of {{players}}",
+    "todays_board": "Today's board",
+    "board_error": "The board could not be loaded.",
+    "prize": "Prize for #1",
+    "mod": "{{label}} mod"
+  }
+}

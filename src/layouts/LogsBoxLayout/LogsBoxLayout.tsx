@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import Changelog, {
@@ -55,6 +56,7 @@ const LogsBoxLayout = ({
   onLoadMoreLogs,
   contained = false,
 }: LogsBoxLayoutProps) => {
+  const { t } = useTranslation("feed");
   const [localCategory, setLocalCategory] = useState<Category>("logs");
   // In the drawer the tab lives in its store: it outlasts closing the drawer, and a chat
   // notification can open the drawer straight on its room.
@@ -125,7 +127,7 @@ const LogsBoxLayout = ({
   const tabButtons = (
     <>
       <LogsBoxButton
-        title='Activity'
+        title={t("activity")}
         active={activeCategory === "logs"}
         onClick={() => handleCategoryChange("logs")}
         Icon={LuLogs}
@@ -133,7 +135,7 @@ const LogsBoxLayout = ({
         hasNewMessages={hasNewLogs}
       />
       <LogsBoxButton
-        title='Chat'
+        title={t("chat")}
         active={activeCategory === "chat"}
         onClick={() => handleCategoryChange("chat")}
         Icon={IoChatboxEllipses}
@@ -142,7 +144,7 @@ const LogsBoxLayout = ({
       />
       {guildPath && (
         <LogsBoxButton
-          title='Guild'
+          title={t("guild")}
           active={activeCategory === "guild"}
           onClick={() => handleCategoryChange("guild")}
           Icon={LuShield}
@@ -152,7 +154,7 @@ const LogsBoxLayout = ({
       )}
       {showsChangelog && (
         <LogsBoxButton
-          title='Changelog'
+          title={t("changelog")}
           active={activeCategory === "changelog"}
           onClick={() => handleCategoryChange("changelog")}
           Icon={FiBook}

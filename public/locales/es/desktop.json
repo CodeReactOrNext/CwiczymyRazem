@@ -1,0 +1,26 @@
+{
+  "back": "Atrás",
+  "forward": "Adelante",
+  "dashboard": "Panel",
+  "minimize": "Minimizar",
+  "maximize": "Maximizar",
+  "restore": "Restaurar",
+  "close": "Cerrar",
+  "menu": {
+    "cut": "Cortar",
+    "copy": "Copiar",
+    "paste": "Pegar",
+    "select_all": "Seleccionar todo",
+    "copy_link": "Copiar dirección del enlace"
+  },
+  "update_required": {
+    "title": "Actualización necesaria",
+    "body": "Esta app de escritorio (v{{version}}) es demasiado antigua para seguir funcionando con riff.quest. Descarga la última versión para continuar.",
+    "download": "Descargar la última versión"
+  },
+  "tuner": {
+    "title": "Afinador",
+    "in_use": "La entrada la está usando tu sesión de práctica — usa su botón Afinador.",
+    "opening": "Abriendo la interfaz de audio…"
+  }
+}

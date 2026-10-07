@@ -39,11 +39,6 @@ interface AddSongModalProps {
 
 type ModalStep = "info" | "category";
 
-const STATUS_LABELS: Record<string, string> = {
-  learning: "Learning",
-  wantToLearn: "Want to Learn",
-  learned: "Learned",
-};
 
 interface SongResultRowProps {
   title: string;
@@ -295,7 +290,7 @@ const AddSongModal = ({
   const handleSelectCategory = async (status: SongStatus | "skip") => {
     if (status === "skip") {
       posthog.capture("song_addition_flow", { action: "skip_status", song_id: addedSongId });
-      toast.success('Song added to library');
+      toast.success(t("add_modal.added"));
       onSuccess();
       handleClose();
       return;
@@ -331,7 +326,7 @@ const AddSongModal = ({
               <div className="p-2 rounded-lg bg-cyan-500/10">
                 <Music className="h-6 w-6 text-cyan-400" />
               </div>
-              {step === "info" ? 'Add new song' : 'Set status'}
+              {step === "info" ? t("add_modal.title_info") : t("add_modal.title_status")}
             </DialogTitle>
           </DialogHeader>
 
@@ -345,7 +340,7 @@ const AddSongModal = ({
                     value={artist}
                     onChange={(e) => setArtist(e.target.value)}
                     required
-                    placeholder="e.g. Led Zeppelin"
+                    placeholder={t("add_modal.artist_placeholder")}
                     className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                   />
                 </div>
@@ -356,7 +351,7 @@ const AddSongModal = ({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
-                    placeholder="e.g. Stairway to Heaven"
+                    placeholder={t("add_modal.title_placeholder")}
                     className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                   />
                 </div>
@@ -372,13 +367,13 @@ const AddSongModal = ({
                   ) : (
                     <Search className="h-3 w-3" />
                   )}
-                  {isBusySearching ? "Searching..." : "Search results"}
+                  {isBusySearching ? t("searching") : t("add_modal.results")}
                 </span>
 
                 <div className="custom-scrollbar h-64 space-y-1 overflow-y-auto pr-2">
                   {!hasQuery ? (
                     <div className="flex h-full items-center justify-center px-6 text-center text-sm font-medium text-zinc-500">
-                      Type an artist and a title to search
+                      {t("add_modal.type_to_search")}
                     </div>
                   ) : isBusySearching ? (
                     Array.from({ length: 4 }).map((_, i) => (
@@ -401,7 +396,7 @@ const AddSongModal = ({
                           coverUrl={song.coverUrl}
                           title={song.title}
                           subtitle={song.artist}
-                          badge="In your library"
+                          badge={t("add_modal.in_library")}
                           disabled={isLoading}
                           onClick={() => handleSelectMatch(song)}
                           action={
@@ -437,7 +432,7 @@ const AddSongModal = ({
                       {canAddManually && (
                         <SongResultRow
                           title={title.trim()}
-                          subtitle={`${artist.trim()} · add as typed, no cover art`}
+                          subtitle={t("add_modal.add_as_typed", { artist: artist.trim() })}
                           isActive={isLoading && !pendingSuggestionId}
                           disabled={isLoading}
                           onClick={() => submitSong(title.trim(), artist.trim(), null)}
@@ -462,7 +457,7 @@ const AddSongModal = ({
                 <div className="text-zinc-400 font-bold">{artist}</div>
                 <div className="pt-2">
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold tracking-wide">
-                    Song added to library
+                    {t("add_modal.added")}
                   </span>
                 </div>
               </div>
@@ -478,8 +473,7 @@ const AddSongModal = ({
               )}
 
               <p className="mx-auto max-w-sm text-center text-sm leading-relaxed text-zinc-400">
-                Pick how far along you are with this song — it decides which of
-                your lists it lands on. You can change it anytime.
+                {t("add_modal.status_hint")}
               </p>
 
               <div className="grid grid-cols-1 gap-3">
@@ -505,12 +499,10 @@ const AddSongModal = ({
                     </div>
                     <div className="flex-1">
                       <div className={cn("font-bold tracking-tight", config.color)}>
-                        {STATUS_LABELS[status] || status}
+                        {t(`add_modal.status.${status}.label`, status)}
                       </div>
                       <div className="text-xs text-zinc-500 font-medium leading-tight mt-0.5">
-                        {status === "learning" && "Focus on this song today"}
-                        {status === "wantToLearn" && "Save for later inspiration"}
-                        {status === "learned" && "Mastered and in repertoire"}
+                        {t(`add_modal.status.${status}.hint`, "")}
                       </div>
                     </div>
                   </button>
@@ -526,10 +518,10 @@ const AddSongModal = ({
                   </div>
                   <div>
                     <div className="font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors">
-                      Skip for now
+                      {t("add_modal.skip")}
                     </div>
                     <div className="text-xs text-zinc-500 font-medium mt-0.5">
-                      Adjust status later from the lists
+                      {t("add_modal.skip_hint")}
                     </div>
                   </div>
                 </button>

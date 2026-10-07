@@ -1,1 +1,36 @@
-{}
+{
+  "errors": {
+    "fetch_error": "Nie udało się pobrać danych",
+    "password": "Nieprawidłowe hasło",
+    "email": "Nieprawidłowy adres e-mail",
+    "timeout": "Nie udało się zalogować — upłynął czas",
+    "email_already-in-use": "Ten adres e-mail jest już używany",
+    "login": "Nie udało się zalogować",
+    "popup_closed_by_user": "Nie udało się zalogować — okno logowania zostało zamknięte",
+    "credential_already_in_use": "Te dane logowania są już używane",
+    "nick_already_in_use": "Ten nick jest już zajęty",
+    "singup": "Nie udało się zarejestrować",
+    "upadate": "Nie udało się zaktualizować danych. Spróbuj ponownie.",
+    "avatar_max": "Awatar może mieć najwyżej 250 × 250 px.",
+    "wrong_file_type": "Dozwolone są tylko pliki png i jpg/jpeg",
+    "generic": "Coś poszło nie tak. Spróbuj ponownie."
+  },
+  "info": {
+    "new_user_tip": "Zajrzyj do FAQ, żeby dowiedzieć się, jak korzystać z Riff Quest",
+    "log_in_again": "Aby zmienić dane, musisz zalogować się ponownie.",
+    "copy_link": "Kopiuj do schowka",
+    "update_ready": "Nowa wersja riff.quest jest gotowa do instalacji.",
+    "update_ready_action": "Uruchom ponownie"
+  },
+  "success": {
+    "update_email": "Zaktualizowano e-mail",
+    "update": "Dane zostały zaktualizowane",
+    "update_password": "Zaktualizowano hasło",
+    "update_avatar ": "Zaktualizowano awatar",
+    "logOut": "Wylogowano",
+    "report_success": "Raport zapisany",
+    "update_displayname": "Zmieniono nick",
+    "restart": "Statystyki zostały zresetowane",
+    "singup": "Rejestracja zakończona"
+  }
+}

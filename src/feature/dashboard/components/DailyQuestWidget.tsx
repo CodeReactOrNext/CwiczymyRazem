@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
@@ -37,13 +38,15 @@ const questRoutes: Record<DailyQuestTaskType, string> = {
   practice_three_exercises: "/profile/skills?tab=browse",
 };
 
-const DailyQuestSkeleton = () => (
+const DailyQuestSkeleton = () => {
+  const { t } = useTranslation("dashboard");
+  return (
   <Card className='flex-col justify-between p-5 sm:p-6'>
     <div className='mb-4 flex items-center justify-between'>
       <div className='flex items-center gap-3'>
         <Swords size={18} className='text-zinc-700' />
         <h3 className='text-[12px] font-semibold tracking-wide text-zinc-400'>
-          Daily Quests
+          {t("daily_quests.title")}
         </h3>
       </div>
       <div className='h-5 w-12 rounded bg-white/[0.06]' />
@@ -59,9 +62,11 @@ const DailyQuestSkeleton = () => (
       ))}
     </div>
   </Card>
-);
+  );
+};
 
 export const DailyQuestWidget = () => {
+  const { t } = useTranslation("dashboard");
   const dispatch = useAppDispatch();
   const dailyQuest = useAppSelector(selectDailyQuest);
 
@@ -90,7 +95,7 @@ export const DailyQuestWidget = () => {
           />
           <div>
             <h3 className='text-[12px] font-semibold tracking-wide text-zinc-400'>
-              Daily Quests
+              {t("daily_quests.title")}
             </h3>
           </div>
         </div>
@@ -165,7 +170,11 @@ export const DailyQuestWidget = () => {
                   ? "font-medium line-through opacity-50"
                   : "font-medium",
               )}>
-              {task.title}
+              {task.type === "practice_specific_exercise"
+                ? t("daily_quests.tasks.practice_specific_exercise", {
+                    exercise: task.title.replace(/^Practice: /, ""),
+                  })
+                : t(`daily_quests.tasks.${task.type}`, task.title)}
             </span>
 
             {task.isCompleted ? (
@@ -188,7 +197,7 @@ export const DailyQuestWidget = () => {
           className='h-10 w-full rounded-sm bg-gradient-to-r from-orange-500 to-amber-500 text-xs font-bold tracking-wide text-white shadow-md shadow-orange-500/20 transition-all hover:scale-105'>
           <span className='flex items-center gap-2'>
             <Gift size={14} className='animate-bounce' />
-            Claim 10{" "}
+            {t("daily_quests.claim", { points: 10 })}{" "}
             <img
               src='/images/points.png'
               alt='points'
@@ -207,7 +216,7 @@ export const DailyQuestWidget = () => {
       {isClaimed && (
         <div className='flex h-10 w-full items-center justify-center gap-2 rounded-sm border border-white/5 bg-zinc-800/40 text-[10px] font-black uppercase tracking-widest text-zinc-400'>
           <CheckCircle2 size={14} className='text-emerald-500' />
-          Reward Claimed
+          {t("daily_quests.claimed")}
         </div>
       )}
     </Card>

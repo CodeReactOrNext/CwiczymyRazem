@@ -15,6 +15,7 @@ import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getRecordings } from "feature/recordings/services/getRecordings";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
+import { useTranslation } from "hooks/useTranslation";
 import { useMemo, useState } from "react";
 
 type PickerTab = "exercise" | "plan" | "song" | "recording" | "item";
@@ -64,6 +65,7 @@ export const ChatAttachmentPicker = ({
   userId: string | null;
   onPick: (attachment: ChatAttachment) => void;
 }) => {
+  const { t } = useTranslation("chat");
   const [tab, setTab] = useState<PickerTab>("exercise");
   const [query, setQuery] = useState("");
 
@@ -158,7 +160,7 @@ export const ChatAttachmentPicker = ({
             {
               key: item.id,
               title: `${def.brand} ${def.name}`,
-              subtitle: `Guitar · ${def.rarity}`,
+              subtitle: `${t("attachment.guitar")} · ${def.rarity}`,
               attachment: {
                 kind: "item",
                 itemType: "guitar",
@@ -179,7 +181,7 @@ export const ChatAttachmentPicker = ({
               {
                 key: item.id,
                 title: `${def.brand} ${def.name}`,
-                subtitle: `Pedal · ${def.rarity}`,
+                subtitle: `${t("attachment.pedal")} · ${def.rarity}`,
                 attachment: {
                   kind: "item",
                   itemType: "effect",
@@ -198,7 +200,7 @@ export const ChatAttachmentPicker = ({
         );
       }
     }
-  }, [tab, query, songsQuery.data, recordingsQuery.data, arsenalQuery.data]);
+  }, [tab, query, songsQuery.data, recordingsQuery.data, arsenalQuery.data, t]);
 
   const isLoading =
     (tab === "song" && songsQuery.isLoading) ||
@@ -212,7 +214,7 @@ export const ChatAttachmentPicker = ({
         overlayClassName='z-[120]'
         className='dark-theme z-[120] flex max-h-[85vh] flex-col gap-5 rounded-lg bg-zinc-950 p-6 sm:max-w-lg'>
         <DialogHeader>
-          <DialogTitle className='text-base'>Share to chat</DialogTitle>
+          <DialogTitle className='text-base'>{t("attachment.share_title")}</DialogTitle>
         </DialogHeader>
 
         <div className='flex flex-wrap gap-2'>
@@ -228,7 +230,7 @@ export const ChatAttachmentPicker = ({
                   ? "bg-cyan-500/20 text-cyan-100"
                   : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
               )}>
-              {item.label}
+              {t(`attachment.tabs.${item.id}`, item.label)}
             </button>
           ))}
         </div>
@@ -236,17 +238,17 @@ export const ChatAttachmentPicker = ({
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder='Search…'
+          placeholder={t("attachment.search")}
           autoComplete='off'
           className='h-10 rounded-lg border-none bg-zinc-900'
         />
 
         <div className='-mx-2 min-h-[200px] flex-1 overflow-y-auto px-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700'>
           {isLoading ? (
-            <p className='py-10 text-center text-sm text-zinc-500'>Loading…</p>
+            <p className='py-10 text-center text-sm text-zinc-500'>{t("attachment.loading")}</p>
           ) : rows.length === 0 ? (
             <p className='py-10 text-center text-sm text-zinc-500'>
-              Nothing to share here yet.
+              {t("attachment.empty")}
             </p>
           ) : (
             <div className='flex flex-col gap-1'>

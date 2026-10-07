@@ -1,1 +1,60 @@
-{}
+{
+  "fetch_error": "Se produjo un error al obtener los datos. Recarga la página.",
+  "points": "Puntos",
+  "exercise_time": "Tiempo de práctica",
+  "achievements": "Logros",
+  "empty": "Vacío",
+  "sort_by_points": "Ordenar por puntos",
+  "sort_by_sessions": "Ordenar por sesiones",
+  "global_leaderboard": "Global",
+  "seasonal_leaderboard": "Temporada",
+  "gear_leaderboard": "Equipo",
+  "gear_title": "Clasificación de equipo",
+  "gear_subtitle": "Descubre qué equipo manda sobre todos",
+  "rig_level": "Nivel de equipo",
+  "guitars": "Guitarras",
+  "effects": "Efectos",
+  "no_gear_data_found": "No se encontraron usuarios con equipo",
+  "current_season": "Temporada actual",
+  "showing": "Mostrando",
+  "of": "de",
+  "users": "usuarios",
+  "no_users_found": "No se encontraron usuarios",
+  "no_seasonal_data": "No hay datos de temporada",
+  "no_seasonal_data_found": "No se encontraron usuarios en esta temporada",
+  "seasons_fetch_error": "No se pudieron cargar las temporadas",
+  "season_change_error": "No se pudo cambiar de temporada",
+  "view_change_error": "No se pudo cambiar la vista",
+  "empty_users_title": "No hay jugadores",
+  "select_season": "Elige una temporada",
+  "rank": {
+    "your_position": "Tu posición",
+    "out_of": "de {{total}}",
+    "to_pass": "{{unit}} para superar a {{name}} (#{{place}})",
+    "jump": "Ir a mi posición",
+    "level": "nivel",
+    "levels": "niveles",
+    "point": "punto",
+    "points": "puntos"
+  },
+  "hero": {
+    "season": "Temporada",
+    "season_subtitle": "Practica para subir en la clasificación.",
+    "seasonal_eyebrow": "Clasificación de temporada",
+    "rig_eyebrow": "Clasificación de rig",
+    "title": "Clasificación",
+    "subtitle": "Mira cómo quedas frente a otros jugadores",
+    "all_time_eyebrow": "Clasificación histórica",
+    "sections": "Secciones de la clasificación",
+    "how_points": "Cómo funcionan los puntos"
+  },
+  "scope": {
+    "top": "Mejores jugadores",
+    "around": "A tu alrededor",
+    "around_error": "No se pudieron cargar los jugadores a tu alrededor. Inténtalo en un momento."
+  },
+  "rig": {
+    "guitar_level": "Nivel de guitarra",
+    "empty_slot": "Hueco vacío {{n}}"
+  }
+}

@@ -1,1 +1,117 @@
-{}
+{
+  "seconds": "sekundy",
+  "pause": "Pauza",
+  "start": "Start",
+  "total_time": "Łączny czas:",
+  "currently_exercising": "Aktualnie ćwiczysz:",
+  "info_about_report": "Możesz ręcznie wpisać swój czas, przechodząc do zakładki",
+  "end_button": "Zakończ ćwiczenie",
+  "report_link": "raport",
+  "technique": "Technika",
+  "theory": "Teoria",
+  "hearing": "Słuch",
+  "creativity": "Praca twórcza",
+  "choose": "Wybierz kategorię",
+  "select_practice_mode": "Wybierz tryb ćwiczenia",
+  "choose_practice_description": "Wybierz sposób ćwiczenia, który najbardziej Ci odpowiada",
+  "modes": {
+    "timer": {
+      "title": "Zwykłe ćwiczenie",
+      "description": "Ćwicz dowolnie wybrane umiejętności i śledź swoje postępy"
+    },
+    "plan": {
+      "title": "Plan ćwiczeń",
+      "description": "Wybierz gotowy plan i podążaj za nim"
+    },
+    "auto": {
+      "title": "Plan automatyczny",
+      "description": "Pozwól nam ułożyć plan dopasowany do Twojego czasu"
+    }
+  },
+  "time_splitter": {
+    "title": "Podsumowanie sesji",
+    "description": "Ćwiczyłeś <1>{{songTitle}}</1> przez <3>{{time}}</3>.",
+    "question": "Na co poświęciłeś ten czas?",
+    "hearing": "Słuch",
+    "technique": "Technika",
+    "learned_title": "Nauczyłem się tego utworu!",
+    "learned_description": "Oznacz jako „Nauczone” i przenieś do ukończonych",
+    "resume": "Wznów stoper",
+    "confirm": "Zatwierdź i zakończ",
+    "saving": "Zapisywanie..."
+  },
+  "practice_session": "Sesja ćwiczeń",
+  "finish": "Zakończ",
+  "youtube": {
+    "add_link": "Wklej link do YouTube",
+    "change_link": "Zmień wideo",
+    "no_link": "Brak podpiętego wideo"
+  },
+  "sections": {
+    "add": "Dodaj sekcję",
+    "name_placeholder": "Nazwa sekcji",
+    "mastery_0": "Nienauczone",
+    "mastery_1": "Słabo",
+    "mastery_2": "Średnio",
+    "mastery_3": "Opanowane",
+    "mastery_4": "Pomiń"
+  },
+  "rating_summary": "Podsumowanie ćwiczenia",
+  "reset_button": "Resetuj",
+  "reset_dialog": {
+    "title": "Zresetować stoper?",
+    "description": "Wyczyści to cały zmierzony czas wszystkich umiejętności w tej sesji. Tej operacji nie da się cofnąć.",
+    "cancel": "Anuluj",
+    "confirm": "Resetuj"
+  },
+  "metronome": {
+    "title": "Metronom",
+    "start": "Włącz metronom",
+    "stop": "Wyłącz metronom"
+  },
+  "interval_alert": {
+    "title": "Przypomnienie interwałowe",
+    "description": "Dostawaj przypomnienie co kilka minut, żeby zmienić umiejętność",
+    "minutes_short": "{{minutes}} min",
+    "next_in": "Następne przypomnienie za {{time}}",
+    "enable": "Włącz przypomnienie",
+    "disable": "Wyłącz przypomnienie",
+    "toast": "Czas na zmianę! Minęło {{minutes}} min",
+    "custom_placeholder": "Własny",
+    "custom_aria": "Własny interwał w minutach"
+  },
+  "community_map": {
+    "banner_title": "Dostępna mapa społeczności",
+    "banner_description": "Liczba muzyków, którzy potwierdzili te podziały na sekcje: {{count}}.",
+    "explainer": "Inni gracze zaznaczyli, gdzie zaczyna się każda część tego utworu — intro, zwrotka, refren, solo — na podstawie dokładnie tego wideo z YouTube.",
+    "disclaimer": "Nie weryfikujemy ich dokładności — traktuj to jako punkt wyjścia. Każdą sekcję możesz potem przemianować, przesunąć lub usunąć, a mapa może się w każdej chwili zmienić.",
+    "import": "Importuj sekcje",
+    "not_now": "Nie teraz"
+  },
+  "choose_practising": "Wybierz, co ćwiczysz",
+  "back_to_practice": "Wróć do ćwiczeń",
+  "saving": "Zapisywanie...",
+  "practised_away": "Ćwiczyłeś bez stopera?",
+  "log_manually": "Wpisz czas ręcznie",
+  "song_timer": {
+    "shortcuts": "Skróty",
+    "key_space": "Spacja",
+    "play_pause": "Odtwórz/Pauza",
+    "mark_section": "Zaznacz sekcję",
+    "toggle_loop": "Włącz/wyłącz pętlę",
+    "seek": "Przewiń o 5 s",
+    "practice_notes": "Notatki z ćwiczeń",
+    "lines": "{{count}} / 300 linii",
+    "notes_placeholder": "Dodaj tutaj notatki z ćwiczeń... (np. ustawienia, wskazówki do trudnych fragmentów, użyty sprzęt)"
+  },
+  "youtube_player": {
+    "paste_new": "Wklej nowy link do YouTube",
+    "paste": "Wklej link do YouTube",
+    "placeholder": "np. youtube.com/watch?v=…",
+    "save": "Zapisz",
+    "suggestions": "Wybierz z propozycji",
+    "speed": "Prędkość",
+    "unlock": "Odblokuj edycję",
+    "lock": "Zablokuj edycję"
+  }
+}

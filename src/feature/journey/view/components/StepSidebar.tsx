@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import {
   AlertCircle,
 CheckCircle2, Play,   Square, SquareCheck,
@@ -40,6 +41,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
   onStart,
   isSaving,
 }) => {
+  const { t } = useTranslation("journey");
   const [checklistState, setChecklistState] = useState<boolean[]>(
     () => (step.checklist ?? []).map(() => false)
   );
@@ -76,7 +78,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
         <button
           onClick={onClose}
           data-vaul-no-drag
-          aria-label="Close"
+          aria-label={t("sidebar.close")}
           className="absolute right-4 top-4 z-10 rounded-full bg-zinc-900/70 p-2 text-zinc-300 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:right-6 sm:top-6"
         >
           <X size={20} />
@@ -94,9 +96,9 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
           <div className="min-w-0">
             <div className="mb-1.5 flex items-center gap-2">
               <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-widest", status.cls)}>
-                {status.label}
+                {t(`sidebar.status.${step.status}`, status.label)}
               </span>
-              <span className="text-[10px] font-bold tracking-widest text-zinc-500">Step {step.order}</span>
+              <span className="text-[10px] font-bold tracking-widest text-zinc-500">{t("sidebar.step", { n: step.order })}</span>
             </div>
             <h2 className="font-display text-xl font-black leading-tight text-zinc-100 sm:text-2xl">{step.title}</h2>
           </div>
@@ -112,7 +114,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
           <div className="rounded-lg bg-zinc-800/40 p-4">
             <div className="mb-1 flex items-center gap-2 font-bold text-zinc-200">
               <Target size={16} className="shrink-0 text-zinc-400" />
-              <p>Goal</p>
+              <p>{t("sidebar.goal")}</p>
             </div>
             <p className="text-sm leading-relaxed text-zinc-400">{step.examGoal}</p>
           </div>
@@ -161,13 +163,13 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
               <div className="flex items-start gap-3 rounded-lg bg-amber-500/10 p-4 text-amber-200/80">
                 <AlertCircle size={18} className="mt-0.5 shrink-0 text-amber-500" />
                 <p className="text-xs font-medium leading-relaxed">
-                  Please complete all mandatory tasks below by ticking the checkboxes to proceed to the next stage.
+                  {t("sidebar.complete_tasks")}
                 </p>
               </div>
             )}
             <div className="space-y-4 rounded-lg bg-zinc-900/40 p-5">
               <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-black tracking-wider text-zinc-100">Your Tasks</h3>
+                  <h3 className="text-sm font-black tracking-wider text-zinc-100">{t("sidebar.your_tasks")}</h3>
                   <span className="text-[10px] font-bold text-zinc-500">{checklistState.filter(Boolean).length}/{checklistState.length}</span>
               </div>
               <div className="space-y-2">
@@ -193,7 +195,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
         {/* Song Picker */}
         {step.songPicker && step.songPicker.length > 0 && (
             <div className="space-y-4">
-                <h3 className="text-sm font-black tracking-wider text-zinc-100">Choose a target</h3>
+                <h3 className="text-sm font-black tracking-wider text-zinc-100">{t("sidebar.choose_target")}</h3>
                 <div className="grid grid-cols-1 gap-2">
                     {pickerLoading ? (
                         <div className="h-16 animate-pulse rounded-lg bg-zinc-900/40" />
@@ -241,12 +243,12 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                 disabled={isLocked || isSaving || !canComplete}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               >
-                {isSaving ? "Saving..." : "Done & Complete"}
+                {isSaving ? t("sidebar.saving") : t("sidebar.done_complete")}
                 <CheckCircle2 size={18} />
               </button>
               {!canComplete && !isLocked && (
                 <p className="text-center text-[11px] font-medium text-zinc-500">
-                  Read through the content and check all the boxes above to unlock this
+                  {t("sidebar.unlock_hint")}
                 </p>
               )}
             </div>
@@ -259,7 +261,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
               className="flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 py-3 text-sm font-bold text-zinc-100 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               <Play size={16} fill="currentColor" />
-              Practice
+              {t("sidebar.practice")}
             </button>
             <button
               onClick={async () => {
@@ -271,13 +273,13 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
               className="flex items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               <Target size={16} />
-              {isCompleted ? "Retake" : "Exam"}
+              {isCompleted ? t("sidebar.retake") : t("sidebar.exam")}
             </button>
           </div>
         )}
         {isCompleted && (
             <div className="flex items-center justify-center gap-2 rounded-lg bg-emerald-500/10 py-2.5 text-xs font-bold text-emerald-400">
-                <CheckCircle2 size={14} /> Completed
+                <CheckCircle2 size={14} /> {t("sidebar.status.completed")}
                 {step.stars && <span className="ml-2 flex items-center gap-0.5">
                     {[1,2,3].map(n => <Star key={n} size={10} className={n <= step.stars! ? "fill-current" : "text-zinc-700"} />)}
                 </span>}

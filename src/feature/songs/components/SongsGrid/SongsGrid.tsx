@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { SongCardRow, SongRowSkeleton } from "feature/songs/components/SongsGrid/SongCardRow";
@@ -50,6 +51,7 @@ export const SongsGrid = ({
   progressMap,
   onPartsChange,
 }: SongsGridProps) => {
+  const { t } = useTranslation("songs");
 
   const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
     onChange: updateUserSongsCache,
@@ -80,7 +82,7 @@ export const SongsGrid = ({
   };
 
   if (!userSongs) {
-    return <div>Loading...</div>;
+    return <div>{t("loading")}</div>;
   }
 
   const getUserStatus = (song: Song): SongStatus | undefined => {
@@ -185,7 +187,7 @@ export const SongsGrid = ({
               </Button>
               
               <div className="text-xs font-bold text-zinc-500 px-2">
-                Page {currentPage}
+                {t("page", { page: currentPage })}
               </div>
 
               <Button

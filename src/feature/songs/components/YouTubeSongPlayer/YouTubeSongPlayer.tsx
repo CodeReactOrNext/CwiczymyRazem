@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import {
   Tooltip,
@@ -63,6 +64,7 @@ export const YouTubeSongPlayer = forwardRef<
     },
     ref,
   ) => {
+    const { t } = useTranslation("timer");
     const playerRef = useRef<any>(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const [urlInput, setUrlInput] = useState("");
@@ -177,8 +179,8 @@ export const YouTubeSongPlayer = forwardRef<
                 <Link className='h-3.5 w-3.5 text-zinc-500' />
                 <span className='text-xs font-semibold text-zinc-400'>
                   {isEditing
-                    ? "Paste a new YouTube link"
-                    : "Paste a YouTube link"}
+                    ? t("youtube_player.paste_new")
+                    : t("youtube_player.paste")}
                 </span>
               </div>
             </div>
@@ -188,7 +190,7 @@ export const YouTubeSongPlayer = forwardRef<
                   "h-10 flex-1 rounded-lg bg-zinc-800/40 px-4 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-500 focus:bg-zinc-800/60",
                   inputError && "bg-red-500/10",
                 )}
-                placeholder='e.g. youtube.com/watch?v=…'
+                placeholder={t("youtube_player.placeholder")}
                 value={urlInput}
                 onChange={(e) => {
                   setUrlInput(e.target.value);
@@ -199,7 +201,7 @@ export const YouTubeSongPlayer = forwardRef<
               <Button
                 onClick={handleSaveUrl}
                 className='h-10 rounded-lg border-none bg-cyan-500/10 px-5 text-sm font-bold text-cyan-400 transition-colors hover:bg-cyan-500/20'>
-                Save
+                {t("youtube_player.save")}
               </Button>
               {isEditing && (
                 <Button
@@ -210,7 +212,7 @@ export const YouTubeSongPlayer = forwardRef<
                     setInputError(false);
                   }}
                   className='h-10 rounded-lg text-zinc-500 hover:bg-white/5 hover:text-white'>
-                  Cancel
+                  {t("reset_dialog.cancel")}
                 </Button>
               )}
             </div>
@@ -236,7 +238,7 @@ export const YouTubeSongPlayer = forwardRef<
                   <div className='flex items-center gap-1.5'>
                     <Search className='h-3.5 w-3.5 text-zinc-500' />
                     <span className='text-xs font-semibold text-zinc-400'>
-                      Pick from suggestions
+                      {t("youtube_player.suggestions")}
                     </span>
                   </div>
                 </div>
@@ -294,7 +296,7 @@ export const YouTubeSongPlayer = forwardRef<
             }}
             className='flex items-center gap-1.5 rounded-lg bg-zinc-800/40 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
             <Pencil className='h-3.5 w-3.5' />
-            Change video
+            {t("youtube.change_link")}
           </button>
         </div>
 
@@ -310,7 +312,7 @@ export const YouTubeSongPlayer = forwardRef<
         </div>
 
         <div className='flex items-center gap-1.5 pt-0.5'>
-          <span className='mr-1 text-xs font-medium text-zinc-500'>Speed</span>
+          <span className='mr-1 text-xs font-medium text-zinc-500'>{t("youtube_player.speed")}</span>
           {[0.5, 0.75, 1, 1.25, 1.5].map((rate) => (
             <button
               key={rate}
@@ -350,7 +352,7 @@ export const YouTubeSongPlayer = forwardRef<
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side='top'>
-                  <p>{isLocked ? "Unlock editing" : "Lock editing"}</p>
+                  <p>{isLocked ? t("youtube_player.unlock") : t("youtube_player.lock")}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

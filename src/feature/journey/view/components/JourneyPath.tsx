@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, ChevronLeft, Guitar } from "lucide-react";
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { FaStar } from "react-icons/fa";
@@ -25,6 +26,7 @@ function PathNode({
   onClick: () => void;
   registerRef: (el: HTMLButtonElement | null) => void;
 }) {
+  const { t } = useTranslation("journey");
   const isLocked = step.status === "locked";
   const isCompleted = step.status === "completed";
   const isCurrent = step.status === "available" || step.status === "in-progress";
@@ -93,7 +95,7 @@ function PathNode({
         </p>
         {step.status === "in-progress" && (
           <span className="mt-1 rounded bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-cyan-400">
-            In progress
+            {t("sidebar.status.in-progress")}
           </span>
         )}
         {isCompleted && step.stars && (
@@ -144,6 +146,7 @@ interface JourneyPathProps {
 }
 
 export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, onBack }) => {
+  const { t } = useTranslation("journey");
   const entries = buildEntries(module);
   const stepEntries = entries.filter((e): e is Extract<PathEntry, { kind: "step" }> => e.kind === "step");
 
@@ -220,7 +223,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
               className="group flex items-center gap-1.5 rounded px-2.5 py-1 text-[10px] font-semibold text-zinc-400 transition-background hover:bg-white/5 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <ChevronLeft size={12} strokeWidth={3} className="transition-transform group-hover:-translate-x-0.5" />
-              Modules
+              {t("path.modules")}
             </button>
           </div>
 
@@ -245,7 +248,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
                 }}
               />
             </div>
-            <span className="text-xs text-zinc-500">{module.completedCount}/{module.totalCount} steps</span>
+            <span className="text-xs text-zinc-500">{t("finish.steps", { done: module.completedCount, total: module.totalCount })}</span>
           </div>
         </div>
       </div>

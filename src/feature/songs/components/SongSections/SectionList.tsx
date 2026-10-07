@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
 import { SECTION_COLORS } from "feature/songs/types/songSection.type";
 import { Plus } from "lucide-react";
@@ -36,6 +37,7 @@ export const SectionList = ({
   onAddNamed,
   isLocked,
 }: SectionListProps) => {
+  const { t } = useTranslation("songs");
   const sorted = [...sections].sort((a, b) => a.startTime - b.startTime);
 
   return (
@@ -43,7 +45,7 @@ export const SectionList = ({
       {sorted.length === 0 && (
         <div className="py-6 flex flex-col items-center gap-4">
           <p className="text-xs text-zinc-600">
-            No sections yet — click below to mark the current timestamp
+            {t("sections.empty")}
           </p>
           {!isLocked && (
             <div className="flex flex-wrap justify-center gap-1.5">
@@ -91,7 +93,7 @@ export const SectionList = ({
           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-white/[0.03] text-xs font-medium text-white hover:bg-white/5 transition-all mt-1"
         >
           <Plus className="h-4 w-4" />
-          Add section
+          {t("sections.add")}
         </button>
       )}
     </div>

@@ -7,6 +7,8 @@ import {
   pointsToReachLvl,
 } from "feature/levelGate/utils/levelGate.utils";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Check, Lock } from "lucide-react";
 import Link from "next/link";
 
@@ -23,7 +25,9 @@ const LevelTrack = ({
 }: {
   lvl: number;
   requiredLvl: number;
-}) => (
+}) => {
+  const { t } = useTranslation("level_gate");
+  return (
   <div className='flex items-center justify-center gap-2'>
     {buildLevelTrack(lvl, requiredLvl).map((step) =>
       step.kind === "gap" ? (
@@ -41,8 +45,8 @@ const LevelTrack = ({
           )}
           aria-label={
             step.state === "target"
-              ? `Level ${step.lvl}, where the page opens`
-              : `Level ${step.lvl}`
+              ? t("track.target", { lvl: step.lvl })
+              : t("track.level", { lvl: step.lvl })
           }>
           {step.state === "target" ? (
             <span className='flex items-center gap-1'>
@@ -56,7 +60,8 @@ const LevelTrack = ({
       ),
     )}
   </div>
-);
+  );
+};
 
 /**
  * What a level-gated page shows before you have the level for it.
@@ -70,7 +75,11 @@ export const FeatureLockedView = ({
   lvl,
   points,
 }: FeatureLockedViewProps) => {
-  const { name, requiredLvl, reason, perks } = feature;
+  const { t } = useTranslation("level_gate");
+  const { id, requiredLvl } = feature;
+  const name = t(`features.${id}.name`, feature.name);
+  const reason = t(`features.${id}.reason`, feature.reason);
+  const perks = feature.perks.map((perk, i) => t(`features.${id}.perks.${i}`, perk));
   const pointsLeft = pointsToReachLvl(points, requiredLvl);
   const levelsLeft = requiredLvl - lvl;
 
@@ -91,14 +100,21 @@ export const FeatureLockedView = ({
 
         <div className='flex flex-col items-center gap-3'>
           <h1 className='text-2xl font-black tracking-tight text-zinc-100 md:text-3xl'>
-            {name} opens at level {requiredLvl}
+            {t("opens_at", { name, lvl: requiredLvl })}
           </h1>
           <p className='text-sm text-zinc-300'>
-            You are level {lvl} —{" "}
-            <span className='font-bold text-cyan-300'>
-              {levelsLeft} {levelsLeft === 1 ? "level" : "levels"} to go
-            </span>
-            , or {pointsLeft.toLocaleString()} points of practice.
+            <Interpolate
+              text={t("you_are")}
+              values={{
+                lvl,
+                left: (
+                  <span className='font-bold text-cyan-300'>
+                    {t(levelsLeft === 1 ? "levels_left_one" : "levels_left", { count: levelsLeft })}
+                  </span>
+                ),
+                points: pointsLeft.toLocaleString(),
+              }}
+            />
           </p>
         </div>
 
@@ -119,19 +135,19 @@ export const FeatureLockedView = ({
 
         <div className='flex flex-wrap items-center justify-center gap-3'>
           <Button asChild className='bg-white text-zinc-950 hover:bg-zinc-200'>
-            <Link href='/timer'>Practise now</Link>
+            <Link href='/timer'>{t("practise_now")}</Link>
           </Button>
           <Button
             asChild
             variant='ghost'
             className='bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-zinc-100'>
-            <Link href='/wiki/how-scoring-works'>How levels work</Link>
+            <Link href='/wiki/how-scoring-works'>{t("how_levels")}</Link>
           </Button>
         </div>
 
         <div className='mt-4 flex w-full flex-col items-center gap-4'>
           <span className='text-xs font-semibold text-zinc-500'>
-            What else opens up
+            {t("what_else")}
           </span>
           <div className='flex flex-wrap items-center justify-center gap-2'>
             {FEATURE_UNLOCK_LIST.map((entry) => {
@@ -150,8 +166,8 @@ export const FeatureLockedView = ({
                   ) : (
                     <Lock size={12} className='text-zinc-500' />
                   )}
-                  {entry.name}
-                  <span className='text-zinc-500'>lvl {entry.requiredLvl}</span>
+                  {t(`features.${entry.id}.name`, entry.name)}
+                  <span className='text-zinc-500'>{t("lvl", { lvl: entry.requiredLvl })}</span>
                 </span>
               );
             })}

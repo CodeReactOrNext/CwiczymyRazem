@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { useCallback, useMemo, useState } from "react";
 import type { GuitarTuningPreset } from "utils/audio/tunings";
 import { getTuningPreset, GUITAR_TUNINGS, STANDARD_TUNING_ID } from "utils/audio/tunings";
@@ -42,6 +43,7 @@ export interface GuitarTuningState {
 }
 
 export function useGuitarTuning({ isGpFile, isExamMode }: UseGuitarTuningOptions): GuitarTuningState {
+  const { t } = useTranslation("session");
   const [tuningId, setTuningIdState] = useState<string>(loadTuningId);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -51,9 +53,9 @@ export function useGuitarTuning({ isGpFile, isExamMode }: UseGuitarTuningOptions
   }, []);
 
   const lockReason = isGpFile
-    ? "This song comes from a Guitar Pro import — the tuning is stored in the file and can't be changed here."
+    ? t("tuning_lock.gp")
     : isExamMode
-      ? "Tuning is locked during the exam — tasks are prepared exclusively for standard tuning (E A D G B E)."
+      ? t("tuning_lock.exam")
       : null;
   const isLocked = lockReason !== null;
 

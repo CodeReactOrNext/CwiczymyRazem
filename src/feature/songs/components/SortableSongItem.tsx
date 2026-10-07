@@ -75,6 +75,7 @@ const GpPracticeButton = ({
   isPremium: boolean;
   onPracticeWithGp?: (song: Song) => void;
 }) => {
+  const { t } = useTranslation("songs");
   if (onPracticeWithGp) {
     return (
       <button
@@ -88,7 +89,7 @@ const GpPracticeButton = ({
             className="h-8 w-full bg-cyan-600 text-[11px] font-bold text-white hover:bg-cyan-500 active:scale-95 transition-all shadow-lg shadow-cyan-500/10"
           >
             <Play className="mr-1.5 h-3 w-3 fill-current" />
-            Practice
+            {t("card.practice")}
           </Button>
         ) : (
           <Button
@@ -115,7 +116,7 @@ const GpPracticeButton = ({
           className="h-8 w-full bg-cyan-600 text-[11px] font-bold text-white hover:bg-cyan-500 active:scale-95 transition-all shadow-lg shadow-cyan-500/10"
         >
           <Play className="mr-1.5 h-3 w-3 fill-current" />
-          Practice
+          {t("card.practice")}
         </Button>
       ) : (
         <Button
@@ -150,12 +151,13 @@ const PracticeTimeBadge = ({ progress }: { progress: UserSongProgress | null | u
 };
 
 const SongMasteryProgress = ({ progress, totalSections }: { progress: number; totalSections?: number }) => {
+  const { t } = useTranslation("songs");
   if (totalSections === undefined || totalSections === 0) return null;
   
   return (
     <div className="mt-2.5 space-y-1">
       <div className="flex items-center justify-between text-[10px] font-bold">
-        <span className="text-zinc-500">Mastery</span>
+        <span className="text-zinc-500">{t("sortable.mastery")}</span>
         <span className="text-cyan-400 font-black">{progress}%</span>
       </div>
       <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800/50">
@@ -286,7 +288,7 @@ export const SortableSongItem = ({
                     className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white cursor-pointer rounded-lg"
                   >
                     <Play className="h-3 w-3 fill-current" />
-                    Practice
+                    {t("card.practice")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() =>
@@ -327,7 +329,7 @@ export const SortableSongItem = ({
                     className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white cursor-pointer rounded-lg"
                   >
                     <Trash2 className="h-3 w-3" />
-                    Remove
+                    {t("sortable.remove")}
                   </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

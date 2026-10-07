@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import {
   Sheet,
@@ -79,6 +80,7 @@ const SongSheet = ({
   onStatusChange,
   onRatingChange,
 }: SongSheetProps) => {
+  const { t } = useTranslation("songs");
   const [practitioners, setPractitioners] = useState<PractitionerProfile[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<string | null>(null);
@@ -99,7 +101,7 @@ const SongSheet = ({
         
         const profiles = snapshot.docs.map(d => ({
           id: d.id,
-          displayName: d.data().displayName || "Unknown Musician",
+          displayName: d.data().displayName || t("detail.unknown_musician"),
           avatar: d.data().avatar || ""
         }));
         
@@ -206,7 +208,7 @@ const SongSheet = ({
             {/* Spotify Player */}
             {song.spotifyId && (
               <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                <p className="text-xs font-bold text-zinc-400 mb-3">Spotify playback</p>
+                <p className="text-xs font-bold text-zinc-400 mb-3">{t("sheet.spotify")}</p>
                 <div className="rounded-lg overflow-hidden">
                    <SpotifyPlayer trackId={song.spotifyId} height={80} />
                 </div>
@@ -216,13 +218,13 @@ const SongSheet = ({
             {/* Stats Row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg bg-white/[0.03] p-4">
-                <p className="text-xs font-bold text-zinc-400 mb-1">Popularity</p>
+                <p className="text-xs font-bold text-zinc-400 mb-1">{t("sheet.popularity")}</p>
                 <div className="flex items-center gap-2 text-white">
                   <span className="text-lg font-black">{song.popularity || 0}</span>
                 </div>
               </div>
               <div className="rounded-lg bg-white/[0.03] p-4">
-                <p className="text-xs font-bold text-zinc-400 mb-1">Difficulty</p>
+                <p className="text-xs font-bold text-zinc-400 mb-1">{t("difficulty")}</p>
                 <div className="flex items-center gap-2 text-white">
                   <TierBadge song={song} className="h-6 w-6 rounded-md text-[11px]" />
                   <span className="text-lg font-black">{avgDifficulty.toFixed(1)}</span>
@@ -232,7 +234,7 @@ const SongSheet = ({
 
             {/* Status Options */}
             <div className="space-y-4 pt-4">
-              <h4 className="text-xs font-bold text-zinc-400">Music library status</h4>
+              <h4 className="text-xs font-bold text-zinc-400">{t("sheet.library_status")}</h4>
               <div className="grid gap-2">
                 {STATUS_OPTIONS.map((opt) => {
                   const Icon = opt.icon;
@@ -263,9 +265,9 @@ const SongSheet = ({
                             "text-xs font-bold transition-colors", 
                             isActive ? "text-white" : "text-zinc-400"
                           )}>
-                            {opt.label}
+                            {t(`status_labels.${opt.id}`, opt.label)}
                           </p>
-                          <p className="text-[10px] font-medium text-zinc-600">{opt.desc}</p>
+                          <p className="text-[10px] font-medium text-zinc-600">{t(`sheet.status_desc.${opt.id}`, opt.desc)}</p>
                         </div>
                       </div>
                       {isActive && !isPending && <CheckCircle className="h-4 w-4 text-cyan-500" />}
@@ -277,7 +279,7 @@ const SongSheet = ({
 
             {/* Practitioners Section */}
             <div className="space-y-4 pt-4">
-               <h4 className="text-xs font-bold text-zinc-400">In libraries</h4>
+               <h4 className="text-xs font-bold text-zinc-400">{t("sheet.in_libraries")}</h4>
                {isLoadingUsers ? (
                  <div className="flex gap-2">
                     {[...Array(3)].map((_, i) => (
@@ -309,7 +311,7 @@ const SongSheet = ({
                    )}
                  </div>
                ) : (
-                 <p className="text-[11px] font-medium text-zinc-600 italic">No one practicing yet. Be the first!</p>
+                 <p className="text-[11px] font-medium text-zinc-600 italic">{t("sheet.nobody_practicing")}</p>
                )}
             </div>
 
@@ -322,20 +324,20 @@ const SongSheet = ({
                       <HelpCircle className="h-3 w-3 cursor-help text-cyan-500" />
                     </TooltipTrigger>
                     <TooltipContent className="bg-zinc-900 text-zinc-300">
-                      <p>Rate how difficult this song is to play for you.</p>
+                      <p>{t("sheet.rate_tooltip")}</p>
                       <p className="mt-1 flex items-center gap-1">
-                        You&apos;ll receive +{RATE_SONG_FAME_REWARD}
+                        {t("sheet.you_receive", { amount: RATE_SONG_FAME_REWARD })}
                         <img
                           src="/images/coin.png"
                           alt="fame"
                           className="h-4 w-4 object-contain"
                         />
-                        Fame Points.
+                        {t("sheet.fame_points")}
                       </p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                Rate playback difficulty
+                {t("sheet.rate_difficulty")}
               </h4>
               <div className="rounded-lg bg-white/[0.03] p-5 backdrop-blur-sm transition-all hover:bg-white/[0.05]">
                 <SongRating 
@@ -354,7 +356,7 @@ const SongSheet = ({
             >
               <span className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/3 animate-shine bg-gradient-to-r from-transparent via-black/[0.07] to-transparent" />
               <Play className="mr-3 h-5 w-5 fill-current" />
-              <span className="text-sm">Practice</span>
+              <span className="text-sm">{t("card.practice")}</span>
             </Button>
           </Link>
           <Button

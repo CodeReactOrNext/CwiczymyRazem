@@ -1,0 +1,117 @@
+{
+  "close": "Close",
+  "back": "Back",
+  "start": "Start",
+  "exercises": "Exercises",
+  "activity": "Activity",
+  "chat": "Chat",
+  "guild": "Guild",
+  "changelog": "Changelog",
+  "item_level": "Item level",
+  "item_level_short": "Lv {{level}}",
+  "points_short": "pt:",
+  "no_top_players": "No top players data available.",
+  "guild_level_up": "Guild level up",
+  "guild_reached_level": "{{guild}} reached level {{level}}",
+  "cleared": "Cleared",
+  "and_more": "and {{count}} more",
+  "support_riff_quest": "Support Riff Quest",
+  "someone": "Someone",
+  "donation_backed_times": "{{name}} backed Riff Quest {{count}} times",
+  "donation_monthly": "{{name}} became a monthly supporter",
+  "donation_coffee": "{{name}} bought Riff Quest a ${{amount}} coffee",
+  "monthly_support": "Monthly support",
+  "coffee_amount": "${{amount}} coffee",
+  "new_supporter": "New supporter",
+  "leaderboard_place_hint": "Place on this exercise leaderboard when the score was set",
+  "score": "Score:",
+  "open_song_hint": "Click to open this song",
+  "difficulty_rated": "Difficulty rated {{rating}}/10 ({{tier}})",
+  "added_recording": "added a new recording:",
+  "opened_case": "opened {{case}} and got",
+  "listed": "listed",
+  "bought": "bought",
+  "from": "from",
+  "playlist_kind": {
+    "playlist": "playlist",
+    "path": "learning path",
+    "top": "top 10"
+  },
+  "created_playlist": "created a new {{kind}}:",
+  "song_count_one": "1 song",
+  "song_count_other": "{{count}} songs",
+  "passed_exam": "passed the {{step}} exam",
+  "completed_roadmap_step": "completed {{step}} on the {{roadmap}} roadmap",
+  "completed_daily_quests": "completed all {{quests}}",
+  "daily_quests": "Daily Quests!",
+  "session_time_hint": "Practice time logged in this session",
+  "level_short": "{{level}} lvl",
+  "plan_hint": "Click to see what this plan practices",
+  "lesson_hint": "Click to watch this lesson",
+  "exercise_hint": "Click to preview and start this exercise",
+  "ranking_hint": "Click to view the ranking for this exercise",
+  "new_since_last_visit": "New since your last visit",
+  "show_more": "Show more",
+  "just_now": "just now",
+  "activity_kind": {
+    "plan": "Plan",
+    "routine": "Routine",
+    "exercise": "Exercise",
+    "lesson": "Lesson"
+  },
+  "support_ask": {
+    "roadmap": {
+      "eyebrow": "Roadmap"
+    },
+    "server_cost": {
+      "eyebrow": "Help build Riff Quest",
+      "headline_covered": "Server cost this month is covered",
+      "headline": "Server cost needs your help",
+      "body_covered": "This month's hosting is already funded. Anything extra goes straight to the roadmap below.",
+      "body": "Riff Quest is a one person project, free and built in the open. ${{raised}} of ${{goal}} raised so far this month."
+    },
+    "one_person": {
+      "eyebrow": "One person project",
+      "headline": "Riff Quest is built by one person, in the open",
+      "body": "No team, no investors, no growth targets. Support is what decides how much time goes into it and what gets built next."
+    },
+    "one_off_ok": {
+      "eyebrow": "No subscription needed",
+      "headline": "A one-off coffee counts as much as a monthly one",
+      "body": "There is nothing to sign up for and nothing to cancel later. One coffee, once, is a completely normal way to support this."
+    },
+    "roadmap_tier": {
+      "headline_done": "Every roadmap goal is funded, thank you",
+      "body_done": "The community has funded everything on the roadmap so far. Whatever comes in next kicks off the next tier.",
+      "headline": "${{amount}} to go for \"{{tier}}\"",
+      "body_covered": "This month's hosting is already paid for, so everything from here goes straight into building the next unlock.",
+      "body": "Lifetime support unlocks the roadmap tier by tier. This is the next one in line."
+    },
+    "roadmap_momentum": {
+      "headline": "{{funded}} of {{total}} roadmap goals funded so far",
+      "body_next": "Servers are paid for — support now goes into building. \"{{tier}}\" is next in line.",
+      "body": "Servers are paid for, so support now goes straight into building the roadmap."
+    },
+    "value_received": {
+      "eyebrow": "Stays free",
+      "headline": "Riff Quest stays free for every session you practice",
+      "body_covered": "No paywalls on exercises, plans, or tracking. Hosting is covered this month, so a coffee now funds the next thing on the roadmap.",
+      "body": "No paywalls on exercises, plans, or tracking. If it's helped your playing, a coffee keeps it that way."
+    },
+    "social_proof": {
+      "eyebrow": "Community support",
+      "headline": "{{supporters}} supporters have chipped in ${{raised}} this month",
+      "headline_none": "Riff Quest is funded by the community",
+      "body": "It keeps Riff Quest free and funds the roadmap. Tap to see where it goes."
+    }
+  },
+  "community": {
+    "label": "Activity and chat",
+    "new_in_feed": "{{count}} new in the feed",
+    "unread_messages": "unread messages",
+    "title": "Activity & Chat",
+    "online": "{{count}} online",
+    "practicing": "{{count}} practicing",
+    "sheet_title": "Community"
+  }
+}

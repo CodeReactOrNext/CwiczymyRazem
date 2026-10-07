@@ -71,7 +71,7 @@ export const SongRating = ({ song,  tierColor }: SongRatingInterface) => {
 
       if (timeDiff < fifteenSeconds) {
         const remaining = Math.ceil((fifteenSeconds - timeDiff) / 1000);
-        toast.warning(`Wait ${remaining}s before rating this song again.`);
+        toast.warning(t("rating_cooldown", { seconds: remaining }));
         return;
       }
     }
@@ -81,7 +81,7 @@ export const SongRating = ({ song,  tierColor }: SongRatingInterface) => {
     const now = Date.now();
     if (lastClickTime && now - lastClickTime < 15000) {
        const remaining = Math.ceil((15000 - (now - lastClickTime)) / 1000);
-       toast.warning(`Wait ${remaining}s before rating this song again.`);
+       toast.warning(t("rating_cooldown", { seconds: remaining }));
        return;
     }
 

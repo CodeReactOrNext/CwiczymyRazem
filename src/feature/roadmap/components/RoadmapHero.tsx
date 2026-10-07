@@ -1,5 +1,6 @@
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { SupporterStrip } from "feature/supportTeam/components/SupporterStrip";
+import { useTranslation } from "hooks/useTranslation";
 
 import { FundingStatusBlock } from "./FundingStatusBlock";
 import { SupportCta } from "./SupportCta";
@@ -20,11 +21,13 @@ export const RoadmapHero = ({
   totalRaised,
   raisedThisMonth,
   isLoading,
-}: RoadmapHeroProps) => (
+}: RoadmapHeroProps) => {
+  const { t } = useTranslation("supporter");
+  return (
   <HeroBanner
-    title='Help build Riff Quest'
-    subtitle='Riff Quest is free and made by one person. Your support pays the hosting bill first, and everything above it unlocks the next feature on the roadmap, for everyone.'
-    eyebrow='Community funded'
+    title={t("hero.title")}
+    subtitle={t("hero.subtitle")}
+    eyebrow={t("hero.eyebrow")}
     backgroundContent={<HeroPattern variant='heart' />}
     className='w-full !rounded-none !shadow-none'
     leftContent={
@@ -51,9 +54,10 @@ export const RoadmapHero = ({
       <div className='flex flex-col items-start gap-2.5 md:items-end'>
         <SupportCta className='px-7' />
         <p className='text-xs text-zinc-500'>
-          A one-off coffee is enough. Nothing to sign up for, nothing to cancel.
+          {t("hero.coffee_hint")}
         </p>
       </div>
     }
   />
-);
+  );
+};

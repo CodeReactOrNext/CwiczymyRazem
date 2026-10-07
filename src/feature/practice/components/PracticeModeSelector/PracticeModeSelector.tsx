@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Ripple } from "components/Ripple/Ripple";
 import { HeroPattern } from "components/UI/HeroBanner";
 import type { ModeProgressSummary } from "feature/practice/hooks/usePracticeModeProgress";
@@ -96,6 +97,7 @@ const ModeCard = ({
   progressUnit,
   onActivate,
 }: ModeCardProps) => {
+  const { t } = useTranslation("practice_hub");
   const c = colorMap[ck];
   const { createRipple, ripple } = useRipple("bg-white/15");
   // A card with links is a group: the header is a label and only the list rows
@@ -200,9 +202,15 @@ const ModeCard = ({
               />
             </div>
             <p className='truncate text-[11px] font-semibold tabular-nums text-zinc-500'>
-              {progress?.label}
+              {progress?.labelKey
+                ? t(progress.labelKey, progress.labelVars)
+                : progress?.label}
               {progress?.total
-                ? ` · ${progress.done ?? 0} of ${progress.total} ${progressUnit ?? ""}`
+                ? ` · ${t("progress.of_total", {
+                    done: progress.done ?? 0,
+                    total: progress.total,
+                    unit: progressUnit ?? "",
+                  })}`
                 : ""}
             </p>
           </div>
@@ -231,6 +239,7 @@ const ModeCard = ({
 };
 
 export const PracticeModeSelector = () => {
+  const { t } = useTranslation("practice_hub");
   const userInfo = useAppSelector(selectUserInfo);
   const isPremium =
     userInfo?.role === "pro" ||
@@ -306,7 +315,7 @@ export const PracticeModeSelector = () => {
               <div className='flex flex-col gap-2.5'>
                 <p className='flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-zinc-500'>
                   <History className='h-3.5 w-3.5' />
-                  Continue
+                  {t("continue")}
                 </p>
                 <div className='-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:px-0'>
                   {lastSessions.map((session) => (
@@ -334,32 +343,32 @@ export const PracticeModeSelector = () => {
                 {modeItem(
                   "routine",
                   ListChecks,
-                  "Practice Routines",
-                  "Follow daily guided routine",
+                  t("modes.routine.title"),
+                  t("modes.routine.description"),
                   "/timer/plans",
                   "indigo",
                   {
                     hero: true,
                     links: [
-                      { label: "All Routines", href: "/timer/plans" },
-                      { label: "Playalongs", href: "/timer/plans?tab=playalongs" },
-                      { label: "My Plans", href: "/timer/plans?tab=my_plans" },
-                      { label: "Community", href: "/timer/plans?tab=community" },
+                      { label: t("modes.routine.all"), href: "/timer/plans" },
+                      { label: t("modes.routine.playalongs"), href: "/timer/plans?tab=playalongs" },
+                      { label: t("modes.routine.my_plans"), href: "/timer/plans?tab=my_plans" },
+                      { label: t("modes.routine.community"), href: "/timer/plans?tab=community" },
                     ],
                   }
                 )}
                 {modeItem(
                   "log",
                   NotebookPen,
-                  "Log",
-                  "Track a session by hand or with a stopwatch",
+                  t("modes.log.title"),
+                  t("modes.log.description"),
                   "/report",
                   "indigo",
                   {
                     hero: true,
                     links: [
-                      { label: "Manual Log", href: "/report" },
-                      { label: "Free Timer", href: "/timer/practice" },
+                      { label: t("modes.log.manual"), href: "/report" },
+                      { label: t("modes.log.free_timer"), href: "/timer/practice" },
                     ],
                   }
                 )}
@@ -371,28 +380,28 @@ export const PracticeModeSelector = () => {
                 {modeItem(
                   "song",
                   PiCassetteTapeLight,
-                  "Songs",
-                  "Track practice time for your repertoire",
+                  t("modes.songs.title"),
+                  t("modes.songs.description"),
                   "/songs?view=board",
                   "amber"
                 )}
                 {modeItem(
                   "smart",
                   PiMagicWandDuotone,
-                  "Auto Plan",
-                  "Automatically generated session",
+                  t("modes.auto.title"),
+                  t("modes.auto.description"),
                   "/timer/auto",
                   "amber",
-                  { locked: !isMaster, lockLabel: "Master" }
+                  { locked: !isMaster, lockLabel: t("lock.master") }
                 )}
                 {modeItem(
                   "gp",
                   SiGuitarpro,
-                  "Guitar Pro Files",
-                  "Practice your imported Guitar Pro tabs",
+                  t("modes.gp.title"),
+                  t("modes.gp.description"),
                   "/gp-tabs",
                   "amber",
-                  { locked: !isPremium, lockLabel: "Premium" }
+                  { locked: !isPremium, lockLabel: t("lock.premium") }
                 )}
               </div>
             </div>
@@ -402,26 +411,26 @@ export const PracticeModeSelector = () => {
                 {modeItem(
                   "learning-path",
                   Route,
-                  "Learning Path",
-                  "Start with the basics, one lesson at a time",
+                  t("modes.learning_path.title"),
+                  t("modes.learning_path.description"),
                   "/journey",
                   "rose",
-                  { progress: modeProgress.learningPath, progressUnit: "steps" }
+                  { progress: modeProgress.learningPath, progressUnit: t("progress.steps") }
                 )}
                 {modeItem(
                   "roadmaps",
                   ClipboardList,
-                  "Mastery Roadmaps",
-                  "Choose a skill or playing style to focus on",
+                  t("modes.roadmaps.title"),
+                  t("modes.roadmaps.description"),
                   "/ai-coach",
                   "rose",
-                  { progress: modeProgress.roadmaps, progressUnit: "steps" }
+                  { progress: modeProgress.roadmaps, progressUnit: t("progress.steps") }
                 )}
                 {modeItem(
                   "scales",
                   PiTreeView,
-                  "Scale Map",
-                  "Interactive scale fretboard tree",
+                  t("modes.scales.title"),
+                  t("modes.scales.description"),
                   "/scale-tree",
                   "rose",
                   { progress: modeProgress.scaleMap }
@@ -434,8 +443,8 @@ export const PracticeModeSelector = () => {
                 {modeItem(
                   "skills",
                   Brain,
-                  "Skills",
-                  "See your progress by technique",
+                  t("modes.skills.title"),
+                  t("modes.skills.description"),
                   "/profile/skills",
                   "emerald",
                   { progress: modeProgress.skills }
@@ -443,16 +452,16 @@ export const PracticeModeSelector = () => {
                 {modeItem(
                   "exercises",
                   Dumbbell,
-                  "Exercises",
-                  "Find an exercise by skill, length or practice mode",
+                  t("modes.exercises.title"),
+                  t("modes.exercises.description"),
                   "/profile/skills?tab=browse",
                   "emerald"
                 )}
                 {modeItem(
                   "community-exercises",
                   Users,
-                  "Community Exercises",
-                  "Exercises shared by the community",
+                  t("modes.community_exercises.title"),
+                  t("modes.community_exercises.description"),
                   "/profile/skills?tab=community",
                   "emerald"
                 )}

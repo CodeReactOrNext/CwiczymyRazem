@@ -1,0 +1,49 @@
+{
+  "levels": {
+    "1": {
+      "name": "Chispa",
+      "req": "1 día con 15+ min de práctica esta semana"
+    },
+    "2": {
+      "name": "Groove",
+      "req": "3 días con 20+ min esta semana"
+    },
+    "3": {
+      "name": "Racha caliente",
+      "req": "Racha de 3 días con 15+ min cada uno"
+    },
+    "4": {
+      "name": "Impulso",
+      "req": "5 días con 15+ min esta semana"
+    },
+    "5": {
+      "name": "Imparable",
+      "req": "Racha de 7 días con 15+ min cada uno"
+    },
+    "6": {
+      "name": "Todoterreno",
+      "req": "3 días esta semana con las 4 categorías a 15+ min"
+    },
+    "7": {
+      "name": "En la zona",
+      "short": "Zona",
+      "req": "Racha de 3 días con las 4 categorías a 15+ min"
+    },
+    "8": {
+      "name": "Shredder",
+      "req": "Racha de 5 días con las 4 categorías a 15+ min"
+    },
+    "9": {
+      "name": "Virtuoso",
+      "req": "Racha de 7 días con las 4 categorías a 15+ min"
+    }
+  },
+  "card": {
+    "opens_at": "Se abre en el nivel {{lvl}}",
+    "unlock": "Desbloquear · {{cost}} de Fama",
+    "claiming": "Reclamando…",
+    "claim": "Reclamar +{{reward}}",
+    "claimed": "Reclamado",
+    "reward": "+{{reward}} de Fama"
+  }
+}

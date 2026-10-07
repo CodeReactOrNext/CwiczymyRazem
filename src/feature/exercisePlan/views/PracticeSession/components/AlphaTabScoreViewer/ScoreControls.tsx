@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 function formatTime(ms: number): string {
   const s = Math.floor(ms / 1000);
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
@@ -21,6 +22,7 @@ export const ScoreControls = ({
   uiReady,
   uiPlaying,
 }: ScoreControlsProps) => {
+  const { t } = useTranslation("session");
   const progress = totalMs > 0 ? (currentMs / totalMs) * 100 : 0;
 
   return (
@@ -39,7 +41,7 @@ export const ScoreControls = ({
       </span>
 
       {!uiReady && (
-        <span className="text-[10px] text-zinc-500 animate-pulse">Loading…</span>
+        <span className="text-[10px] text-zinc-500 animate-pulse">{t("loading")}</span>
       )}
       {uiReady && uiPlaying && (
         <span className="text-[10px] text-blue-400">▶</span>

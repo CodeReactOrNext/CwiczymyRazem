@@ -29,7 +29,7 @@ export const AchievementCardDesktop = ({ name, description, children, progress }
         
         {progress && (
           <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between gap-4">
-             <span className="text-[10px] font-bold text-gray-500 uppercase">Progress</span>
+             <span className="text-[10px] font-bold text-gray-500 uppercase">{t("progress", "Progress")}</span>
              <span className={`text-xs font-bold ${progress.current >= progress.max ? "text-amber-500" : "text-green-600"}`}>
                 {progress.current} / {progress.max}
              </span>

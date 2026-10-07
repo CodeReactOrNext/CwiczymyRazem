@@ -1,3 +1,5 @@
+import { useTranslation } from "hooks/useTranslation";
+
 import { SupportCta } from "./SupportCta";
 
 /**
@@ -5,6 +7,7 @@ import { SupportCta } from "./SupportCta";
  * for the ones who never cared about tiers and just want to say thanks.
  */
 export const RoadmapThanks = () => {
+  const { t } = useTranslation("supporter");
   return (
     <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-7'>
       <div className='flex flex-wrap items-center gap-x-12 gap-y-6'>
@@ -12,16 +15,15 @@ export const RoadmapThanks = () => {
             copy down to a word per line on a phone. */}
         <div className='w-full min-w-0 lg:w-auto lg:flex-1'>
           <p className='text-base font-semibold text-zinc-100'>
-            Just want to say thanks?
+            {t("thanks.title")}
           </p>
           <p className='mt-1.5 max-w-2xl text-sm leading-relaxed text-zinc-400'>
-            Knowing Riff Quest is useful to you is already the good part. A
-            coffee on top of that genuinely makes my day.
+            {t("thanks.body")}
           </p>
         </div>
 
         <SupportCta className='w-full sm:w-auto'>
-          Say thanks with a coffee
+          {t("thanks.cta")}
         </SupportCta>
       </div>
     </section>

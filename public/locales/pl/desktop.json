@@ -1,0 +1,26 @@
+{
+  "back": "Wstecz",
+  "forward": "Dalej",
+  "dashboard": "Panel główny",
+  "minimize": "Minimalizuj",
+  "maximize": "Maksymalizuj",
+  "restore": "Przywróć",
+  "close": "Zamknij",
+  "menu": {
+    "cut": "Wytnij",
+    "copy": "Kopiuj",
+    "paste": "Wklej",
+    "select_all": "Zaznacz wszystko",
+    "copy_link": "Kopiuj adres linku"
+  },
+  "update_required": {
+    "title": "Wymagana aktualizacja",
+    "body": "Ta wersja aplikacji (v{{version}}) jest zbyt stara, by dalej współpracować z riff.quest. Pobierz najnowszą wersję, aby kontynuować.",
+    "download": "Pobierz najnowszą wersję"
+  },
+  "tuner": {
+    "title": "Stroik",
+    "in_use": "Wejście jest używane przez sesję ćwiczeń — użyj jej przycisku Stroik.",
+    "opening": "Otwieranie interfejsu audio…"
+  }
+}

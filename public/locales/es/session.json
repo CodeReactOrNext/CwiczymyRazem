@@ -1,0 +1,526 @@
+{
+  "close": "Cerrar",
+  "start": "Empezar",
+  "cancel": "Cancelar",
+  "media": {
+    "guitar_off": "Guitarra apagada",
+    "guitar_on": "Guitarra encendida",
+    "guitar": "Guitarra",
+    "tuning_locked": "La afinación está fijada en este ejercicio",
+    "guitar_tuning": "Afinación de la guitarra",
+    "guitar_tuning_named": "Afinación: {{name}}",
+    "guitar_tuning_change": "Afinación: haz clic para cambiarla",
+    "pitch_required": "La detección de notas es obligatoria en el examen",
+    "pitch_on": "Detección de notas activada",
+    "pitch_off": "Detección de notas desactivada",
+    "pitch_detect": "Detección",
+    "tuner": "Afinador",
+    "recalibrate": "Recalibrar",
+    "playback_off": "Reproducción de guitarra apagada: haz clic para oír la tablatura",
+    "playback_on": "Reproducción de guitarra encendida: haz clic para silenciar la tablatura",
+    "playback": "Reproducción de guitarra",
+    "mic_active": "Micrófono activo: la app está escuchando tu guitarra",
+    "mic_enable": "Activa el micrófono para detectar lo que tocas",
+    "mic_tools_hint": "Herramientas del micrófono: recalibrar, afinador, solución de problemas",
+    "mic_tools": "Herramientas del micrófono",
+    "mic_not_working": "¿No funciona el micrófono?",
+    "boost_hint": "Sube la reproducción de Guitar Pro por encima del 100 % si suena demasiado baja."
+  },
+  "mic_help": {
+    "title": "Problemas con el micrófono",
+    "intro": "Si la app no oye tu guitarra o detecta notas equivocadas, sigue estos pasos. La mayoría de los problemas vienen de los permisos del navegador o de otra app que usa el micrófono.",
+    "resetting": "Restableciendo…",
+    "reset": "Restablecer ajustes del micrófono y recargar",
+    "reset_hint": "Borra la calibración y las preferencias de micrófono guardadas por la app y recarga la página.",
+    "tips": {
+      "0": {
+        "title": "Permite el acceso al micrófono",
+        "description": "Haz clic en el icono del candado / micrófono de la barra de direcciones y asegúrate de que este sitio puede usar el micrófono. Si lo bloqueaste sin querer, vuelve a ponerlo en «Permitir» y recarga la página."
+      },
+      "1": {
+        "title": "Elige el dispositivo de entrada correcto",
+        "description": "Si tienes varios micrófonos o una interfaz de audio, pon el correcto como entrada predeterminada en los ajustes de sonido del sistema (y en los permisos del sitio en el navegador) y recarga."
+      },
+      "2": {
+        "title": "Libera el micrófono",
+        "description": "Cierra otras apps que puedan estar usando el micrófono: Zoom, Discord, OBS, Teams u otra pestaña del navegador. Solo una app a la vez puede capturar una entrada de baja latencia."
+      },
+      "3": {
+        "title": "Recalibra",
+        "description": "Usa el botón Recalibrar para repetir la calibración de afinación. Así se arreglan la mayoría de los problemas de «no detecta notas» o «nota equivocada» tras cambiar de equipo o de sala."
+      },
+      "4": {
+        "title": "Revisa niveles y afinación",
+        "description": "Asegúrate de que la guitarra está afinada y suena lo bastante fuerte. Acércate al micrófono, sube la ganancia de entrada y reduce el ruido de fondo. Las señales muy bajas o distorsionadas son difíciles de detectar."
+      },
+      "5": {
+        "title": "Revisa la privacidad del sistema",
+        "description": "En Windows: Configuración → Privacidad y seguridad → Micrófono, y permite tu navegador. En macOS: Ajustes del Sistema → Privacidad y seguridad → Micrófono. El navegador también debe estar activado ahí."
+      },
+      "6": {
+        "title": "Borra cookies y datos del sitio",
+        "description": "Los permisos obsoletos o los datos en caché pueden estropear la captura. Borra las cookies y los datos de este sitio en los ajustes del navegador, recarga y vuelve a permitir el micrófono. (Usa el botón de abajo para borrar la configuración de micrófono guardada por la app.)"
+      },
+      "7": {
+        "title": "Prueba otro navegador",
+        "description": "Chrome y Edge tienen la captura de audio más fiable. Algunos navegadores limitan o bloquean el micrófono en pestañas en segundo plano o en conexiones no seguras: mantén esta pestaña en primer plano y en https."
+      }
+    }
+  },
+  "timing": {
+    "title": "Calibrar el tempo",
+    "intro": "Los altavoces, auriculares e interfaces de audio añaden un retardo entre el clic que oyes y la nota que captamos. Toca al ritmo de unos clics y mediremos el tuyo, para que la valoración del tempo coincida con lo que oyes.",
+    "step1": "Usa los altavoces o auriculares con los que practicas.",
+    "step2": "Pulsa la cuerda de mi grave al aire en cada clic y déjala sonar: no la apagues entre clics. {{bpm}} BPM, {{countIn}} clics para prepararte y luego {{clicks}} que cuentan.",
+    "step3": "Toca con el clic, no antes.",
+    "now_using": "Ahora se usa",
+    "measured_here": "medido en este navegador",
+    "estimate": "una estimación, aún sin medir",
+    "mic_first": "Activa primero el micrófono",
+    "forget": "Olvidar la medición y volver a la estimación",
+    "get_ready": "Prepárate: escucha el pulso",
+    "pluck": "Pulsa la cuerda en cada clic",
+    "fail": {
+      "too_few": "No se han oído suficientes clics",
+      "ahead": "Las notas llegaron antes del clic",
+      "spread": "Los golpes estaban demasiado dispersos",
+      "too_few_body": "Captamos {{hits}} de {{total}} y hacen falta al menos {{min}}. Pulsa un poco más fuerte y comprueba que el micrófono elegido es el de tu guitarra.",
+      "ahead_body": "El sonido no puede llegarnos antes de tocarse, así que se oyó otra cosa. Deja sonar la cuerda entre clics en vez de apagarla y toca con el clic, no antes.",
+      "spread_body": "Variaron unos ±{{spread}} ms, lo que dice más del intento que de tu equipo. Inténtalo de nuevo, tocando justo con el clic y dejando sonar la cuerda."
+    },
+    "try_again": "Reintentar",
+    "measured_delay": "Retardo medido",
+    "heard": "{{hits}} de {{total}} clics oídos, estable dentro de ±{{spread}} ms",
+    "saved_before": "Guardado antes",
+    "estimated_before": "Estimado antes",
+    "use": "Usar {{ms}} ms"
+  },
+  "add_to_plan": "Añadir al plan",
+  "saving": "Guardando…",
+  "scale_dialog": {
+    "title": "Elige la escala a practicar",
+    "description": "Configura los parámetros de la práctica de escala. El sistema generará la tablatura automáticamente.",
+    "root": "Nota raíz",
+    "select_note": "Elige nota",
+    "scale_type": "Tipo de escala",
+    "select_scale": "Elige escala",
+    "pattern": "Patrón de práctica",
+    "select_pattern": "Elige patrón",
+    "position": "Posición en el mástil",
+    "select_position": "Elige posición",
+    "full_fretboard": "Mástil completo (todas las posiciones)",
+    "position_frets": "Posición {{pos}} (trastes {{from}}-{{to}})",
+    "all_hint": "Esto generará un ejercicio más largo que recorre todas las posiciones principales del mástil",
+    "position_hint": "La posición determina en qué parte del mástil practicas la escala",
+    "preview_all": "Todas las posiciones: trastes 0–15",
+    "preview_position": "Posición {{pos}}: trastes {{from}}–{{to}}"
+  },
+  "chord_dialog": {
+    "title": "Configurar práctica de acordes",
+    "description": "Crea tu ejercicio. Encadena hasta 8 acordes.",
+    "click_to_add": "Haz clic en los acordes de abajo para añadirlos...",
+    "beginner": "Principiante",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzado",
+    "frequency": "Frecuencia de cambio",
+    "every_bar": "Cada compás",
+    "every_2_beats": "Cada 2 pulsos",
+    "every_beat": "Cada pulso",
+    "hide_tabs": "Ocultar tablatura",
+    "by_ear": "Tocar de oído/de memoria"
+  },
+  "hunt": {
+    "press_play": "Pulsa Play abajo para iniciar el temporizador",
+    "click_now": "ya puedes hacer clic"
+  },
+  "quick": {
+    "tempo_reset": "Tempo del metrónomo: volver al recomendado",
+    "slower_hint": "Más lento (Mayús: −5 BPM)",
+    "slower": "Más lento",
+    "tempo_type": "Tempo en BPM: haz clic para escribir un valor",
+    "edit_bpm": "Editar BPM",
+    "faster_hint": "Más rápido (Mayús: +5 BPM)",
+    "faster": "Más rápido",
+    "subdivision_hint": "Subdivisión del clic: negras, corcheas, tresillos…",
+    "subdivision": "Subdivisión",
+    "accents_set": "Los acentos los fija este ejercicio",
+    "beats_accents": "Pulsos por compás y acentos",
+    "beats_per_bar": "Pulsos por compás"
+  },
+  "tab": {
+    "zoom_out_hint": "Alejar: ver más del ejercicio",
+    "zoom_out": "Alejar",
+    "reset_zoom": "Restablecer zoom",
+    "zoom_in_hint": "Acercar: notas más grandes",
+    "zoom_in": "Acercar",
+    "settings": "Ajustes de tablatura",
+    "look": "Aspecto",
+    "remove_loop": "Quitar el bucle",
+    "clear_loop": "Borrar bucle",
+    "calibrate_hint": "Mide el retardo de audio para que la valoración del tempo coincida con lo que oyes",
+    "minimap_hint": "Haz clic en un compás para saltar · arrastra sobre compases para hacer bucle",
+    "settings_description": "Personaliza cómo se ve la tablatura. Los cambios se aplican al instante y se recuerdan en este dispositivo.",
+    "rest": "silencio",
+    "from_start": "Desde el principio",
+    "resize_height": "Cambiar la altura del visor",
+    "drag_resize": "Arrastra para cambiar el tamaño"
+  },
+  "note_hunt": {
+    "play_interval": "Toca la nota a la que llega el intervalo",
+    "needs_pitch": "Requiere detección de notas",
+    "turn_on": "Actívala en los controles de abajo para que la app oiga tu respuesta; sin ella solo puedes revelarla.",
+    "enable_mic": "Activa el micrófono en los controles de abajo para puntuar automáticamente, o marca las octavas a mano.",
+    "starting_mic": "Iniciando micrófono…",
+    "wrong_octave": "Nota correcta, octava equivocada: era {{note}}.",
+    "string_gives": "La cuerda {{string}} te da {{note}}.",
+    "stay_inside": "Quédate entre los trastes {{from}}–{{to}}.",
+    "correct": "correcto",
+    "find_target": "Encuentra la nota objetivo",
+    "reveal": "Revelar respuesta",
+    "strings": {
+      "1": "mi aguda",
+      "2": "si",
+      "3": "sol",
+      "4": "re",
+      "5": "la",
+      "6": "mi grave"
+    },
+    "tap_octaves": "Toca cada octava que encuentres",
+    "tap_octaves_region": "Toca cada octava que encuentres en la región"
+  },
+  "tools": {
+    "tempo": "Tempo",
+    "sound": "Sonido",
+    "info": "Guía",
+    "tempo_settings": "Ajustes de tempo",
+    "guitar_turn_on": "Activar guitarra",
+    "guitar_turn_off": "Desactivar guitarra",
+    "pitch_turn_off": "Desactivar detección de notas",
+    "pitch_turn_on": "Activar detección de notas",
+    "sound_settings": "Ajustes de sonido y entrada",
+    "sound_input": "Sonido y entrada",
+    "exercise_guide": "Guía del ejercicio",
+    "close_settings": "Cerrar ajustes"
+  },
+  "success": {
+    "mastered": "¡Dominado!",
+    "passed": "¡Examen aprobado!",
+    "failed": "Examen suspendido",
+    "flawless": "Interpretación impecable.",
+    "nice_work": "Buen trabajo: unos intentos más y clavarás cada nota.",
+    "missed_by": "Te faltaron {{points}} pts. ¡Inténtalo otra vez!",
+    "total_score": "Puntuación total",
+    "grade": "Nota",
+    "accuracy": "Precisión",
+    "max_combo": "Combo máx.",
+    "score": "Puntuación",
+    "over_time": "Rendimiento a lo largo del tiempo",
+    "pass": "Aprobado",
+    "back_to_menu": "Volver al menú"
+  },
+  "quiz": {
+    "stop": "Parar",
+    "play_again": "Volver a reproducir",
+    "play": "Reproducir",
+    "correct": "Correcto",
+    "wrong": "Incorrecto",
+    "next": "Siguiente",
+    "start_hint": "Pulsa Play abajo para iniciar el temporizador: el quiz ya funciona",
+    "which_progression": "¿Qué progresión es?",
+    "play_progression": "Reproducir progresión",
+    "hear_tonic": "Escuchar el acorde I",
+    "slot_filled": "Hueco {{n}}: {{chord}}, toca para borrar",
+    "slot_empty": "Hueco {{n}}: vacío",
+    "check": "Comprobar",
+    "clear": "Borrar",
+    "heard_in": "Se oye en: {{songs}}",
+    "play_it_again": "Volver a reproducir",
+    "detune_in_tune": "Afinado: {{cents}} cents de desvío, dentro del margen de {{window}} cents.",
+    "detune_sharp": "{{cents}} cents alto: el margen era de {{window}} cents.",
+    "detune_flat": "{{cents}} cents bajo: el margen era de {{window}} cents.",
+    "tune_second": "Afina la segunda nota con la primera",
+    "stop_notes": "Parar las notas",
+    "play_both": "Reproducir ambas notas",
+    "second_pitch": "Altura de la segunda nota",
+    "flatter": "más bajo",
+    "sharper": "más alto",
+    "no_beating": "Ya no se oye batimiento: así suena estar afinado.",
+    "beating": "Dos notas tan separadas baten unas {{beats}} veces por segundo. Cuanto más lenta la ondulación, más cerca estás.",
+    "detune_footnote": "En una guitarra real funciona el mismo truco: pisa el traste 5 y compáralo con la cuerda al aire de arriba.",
+    "snap": "Afinar automáticamente",
+    "which_scale": "¿Qué escala es?",
+    "play_scale": "Reproducir escala",
+    "play_slowly": "Reproducir despacio",
+    "root": "Raíz: {{root}}",
+    "root_held": "La raíz suena de fondo: mide cada nota respecto a ella",
+    "hear_again_slowly": "Escuchar otra vez, despacio",
+    "which_chord": "¿Qué tipo de acorde es?",
+    "play_chord": "Reproducir acorde",
+    "one_note": "Nota a nota",
+    "root_moves": "La raíz cambia cada ronda: escucha el color, no la altura",
+    "formula": "Fórmula: {{formula}}",
+    "modes": {
+      "chordType": "Tipo de acorde",
+      "progression": "Progresiones de acordes",
+      "detune": "Afinar de oído",
+      "scaleMode": "Escalas y modos"
+    },
+    "key_of_build": "Tonalidad de {{key}} — arma los grados que oyes, en orden",
+    "listen_for": "Fíjate en: {{tell}} — {{formula}}"
+  },
+  "backing": {
+    "required": "Este ejercicio necesita una pista de acompañamiento",
+    "find_hint": "Busca una en YouTube para tocar encima",
+    "find": "Buscar pista en YouTube",
+    "searching": "Buscando en YouTube...",
+    "search_again": "Buscar otra vez",
+    "change": "Cambiar pista de acompañamiento"
+  },
+  "ear": {
+    "correct": "Correcto: punto ganado",
+    "next_melody": "La siguiente melodía está en camino…",
+    "tab_shows": "La tablatura de abajo muestra la melodía. Vuelve a reproducirla para comparar.",
+    "revealed": "Respuesta revelada",
+    "compare": "Compara con la tablatura de abajo: ¿la tocaste bien?",
+    "playing": "Reproduciendo melodía…",
+    "plays_once": "Suena una vez y se detiene sola; luego es tu turno",
+    "listen_repeat": "Escucha y repite",
+    "listen_repeat_caption": "Reproduce la melodía y luego encuéntrala en la guitarra",
+    "listening": "Esperando tu respuesta",
+    "listening_caption": "Toca las notas que oíste: si las aciertas todas, avanza solo",
+    "your_turn": "Tu turno",
+    "your_turn_mic": "Toca tu respuesta en la guitarra o vuelve a escuchar la melodía primero",
+    "your_turn_memory": "Tócala de memoria y luego revela para comprobarlo",
+    "title": "Entrenamiento auditivo",
+    "new_best": "Nuevo récord",
+    "best": "Récord",
+    "replay": "Repetir",
+    "stuck_reveal": "¿Atascado? Revelar",
+    "show_answer": "Mostrar respuesta",
+    "replay_melody": "Repetir melodía",
+    "had_it": "Lo tenía"
+  },
+  "volume": {
+    "instruments": "Instrumentos",
+    "title": "Volumen",
+    "hint": "Volumen: metrónomo, reproducción de guitarra y pistas",
+    "metronome": "Metrónomo",
+    "muted": "Silenciado",
+    "unmute_metronome": "Activar sonido del metrónomo",
+    "mute_metronome": "Silenciar metrónomo",
+    "boost": "Subir volumen",
+    "unmute": "Activar sonido",
+    "mute": "Silenciar",
+    "main_instrument": "Instrumento principal"
+  },
+  "interval_click": {
+    "now_above": "Ahora la {{interval}} por encima de esa raíz, a su alcance",
+    "click_any": "Haz clic en cualquier {{note}}",
+    "on_highlighted": "en las cuerdas resaltadas",
+    "root": "Raíz",
+    "target": "Objetivo",
+    "play_root": "Toca la nota raíz desde la que se mide el intervalo",
+    "hide_distance": "Ocultar la distancia",
+    "how_far": "¿A qué distancia está?",
+    "autoplay": "Reproducción automática"
+  },
+  "instructions": {
+    "support_author": "Apoyar al autor",
+    "instructions": "Instrucciones",
+    "why": "Por qué importa",
+    "backing_recommended": "Pista de acompañamiento recomendada",
+    "backing_hint": "Usa el buscador de pistas de arriba para tocar encima.",
+    "pro_tips": "Consejos",
+    "difficulty": "Dificultad",
+    "reward": "Recompensa posible",
+    "skill_labels": {
+      "technique": "Técnica",
+      "speed": "Velocidad",
+      "theory": "Teoría",
+      "rhythm": "Ritmo",
+      "earTraining": "Entrenamiento auditivo",
+      "knowledge": "Conocimiento"
+    }
+  },
+  "song_panel": {
+    "song": "Canción",
+    "body": "Tócala como la ensayas: de memoria, sobre la grabación o con tu propia tablatura. El reloj de la sesión suma este tiempo a la canción.",
+    "open": "Abrir canción"
+  },
+  "hud": {
+    "idle_hint": "La precisión aparece tras tu primera nota",
+    "silent_hint": "La detección aún no ha reconocido ninguna nota: comprueba que el micrófono oye tu guitarra",
+    "no_notes": "No se oyen notas",
+    "streak": "Racha",
+    "acc_short": "Prec."
+  },
+  "fretboard": {
+    "whole_neck_hint": "Mostrar el mástil entero en lugar de solo la ventana de búsqueda",
+    "whole_neck": "Mástil entero",
+    "lefty_hint": "Reflejar el mástil como lo ve un zurdo: cejuela a la derecha",
+    "lefty": "Zurdo",
+    "aria_lefty": "Mástil clicable, zurdo",
+    "aria": "Mástil clicable",
+    "diagram": "Diagrama del mástil",
+    "diagram_lefty": "Diagrama del mástil, zurdo",
+    "scale_note": "Nota de la escala"
+  },
+  "exit": {
+    "title": "¿Salir de la sesión?",
+    "too_short": "Has practicado menos de 20 segundos, así que aún no hay tiempo que guardar. Sigue tocando para registrar la sesión, o sal sin ella.",
+    "not_saved": "Tu tiempo de práctica solo se guarda al terminar la sesión. Si sales ahora, no se registrará.",
+    "finish_save": "Terminar y guardar tiempo",
+    "exit": "Salir",
+    "exit_no_save": "Salir sin guardar",
+    "stay": "Seguir en la sesión"
+  },
+  "dialogs": {
+    "finished": "¡Ejercicio terminado!",
+    "great_job": "¡Buen trabajo!"
+  },
+  "speed": {
+    "active_hint": "Velocidad {{speed}}: el clic y la pista suenan a {{effective}} BPM en lugar de {{base}}",
+    "hint": "Velocidad de reproducción: ralentiza el clic y la pista para aprender pasajes difíciles",
+    "speed": "Velocidad",
+    "title": "Velocidad de reproducción",
+    "subtitle": "Ralentiza el clic y la pista por debajo del BPM fijado"
+  },
+  "update": {
+    "title": "Actualización lista",
+    "body": "Hace tiempo que hay una nueva versión de riff.quest lista para instalar. Reinicia la app para seguir practicando.",
+    "restart": "Reiniciar ahora",
+    "return": "Volver"
+  },
+  "improv": {
+    "paused": "En pausa: pulsa Play para empezar las propuestas"
+  },
+  "loading": "Cargando…",
+  "track": "Pista:",
+  "loading_track": "Cargando pista…",
+  "timing_breakdown": {
+    "title": "Timing",
+    "grades": {
+      "1": "Suelto",
+      "2": "Cerca",
+      "3": "A tiempo"
+    }
+  },
+  "shortcuts": {
+    "title": "Atajos de teclado",
+    "tempo": "Tempo",
+    "backing": "Pista de acompañamiento",
+    "nav": {
+      "0": "Reproducir / pausa",
+      "1": "Ejercicio anterior",
+      "2": "Ejercicio siguiente"
+    },
+    "tempo_rows": {
+      "0": "Tempo +1 BPM",
+      "1": "Tempo -1 BPM",
+      "2": "Tempo +5 BPM",
+      "3": "Tempo -5 BPM",
+      "4": "Restablecer tempo recomendado"
+    },
+    "backing_rows": {
+      "0": "Acompañamiento 20 ms antes",
+      "1": "Acompañamiento 20 ms después",
+      "2": "Acompañamiento 100 ms antes",
+      "3": "Acompañamiento 100 ms después"
+    }
+  },
+  "timer_section": {
+    "session": "Sesión",
+    "exercise": "Ejercicio",
+    "total": "Total de la sesión"
+  },
+  "click_hunt": {
+    "play_note": "Reproduce la nota que buscas"
+  },
+  "strum": {
+    "down": "Abajo",
+    "up": "Arriba",
+    "muted": "Apagado",
+    "accent": "Acento"
+  },
+  "open_exercise": {
+    "title": "Ejercicio abierto",
+    "no_tab": "Este no tiene tablatura — es abierto.",
+    "body": "Algunos ejercicios no se pueden plasmar en una tablatura — este es uno de ellos. Lo guían los pasos de abajo, así que avanza a tu propio ritmo.",
+    "read": "Lee las instrucciones de abajo para empezar"
+  },
+  "progress": {
+    "title": "Progreso de la sesión",
+    "song": "Canción: {{title}}",
+    "exercise": "Ejercicio {{n}}",
+    "go_to": "Ir a {{label}}"
+  },
+  "controls": {
+    "press_start": "Pulsa Start para tocar",
+    "pause": "Pausa",
+    "restart": "Reiniciar ejercicio"
+  },
+  "chord_hunt": {
+    "enable_mic": "Activa el micrófono en los controles de abajo para iluminar notas, o toca un ? para revelarla.",
+    "tap_tone": "Toca una nota para revelarla"
+  },
+  "tuning_modal": {
+    "description": "Elige cómo está afinada tu guitarra — la detección de tono y el audio de acompañamiento se ajustarán a esta afinación."
+  },
+  "header": {
+    "close_session": "Cerrar sesión de práctica"
+  },
+  "speeds_mastered": {
+    "hint": "Velocidades que dominas en este ejercicio",
+    "label": "Velocidades dominadas"
+  },
+  "rotate": {
+    "title": "Gira tu teléfono",
+    "body": "Tablatura más ancha, controles más grandes"
+  },
+  "video": {
+    "player": "Reproductor de YouTube",
+    "unavailable": "Vídeo no disponible",
+    "invalid": "URL de YouTube no válida"
+  },
+  "image": {
+    "enlarge": "Ampliar"
+  },
+  "gap": {
+    "title": "Test de silencio",
+    "listen": "Escucha — {{bars}} compases, siente el pulso",
+    "get_ready": "Prepárate — toca en el “1” que regresa",
+    "counting": "Contando el silencio — compás {{bar}} de {{total}}",
+    "nailed": "¡Clavado — subes de nivel!",
+    "close": "Cerca — repítelo para lograr un PERFECT",
+    "no_hit": "Ningún golpe a tiempo — inténtalo de nuevo",
+    "off_grid": "Fuera de la rejilla — inténtalo de nuevo",
+    "intro": "Pulsa Start. Mantén el pulso durante el silencio y toca una vez, justo en el siguiente “1”.",
+    "step_listen": "Escucha",
+    "step_listen_sub": "{{bars}} compases de clic",
+    "step_silence": "Silencio",
+    "bar_of": "compás {{bar}} de {{total}}",
+    "bars_keep": "{{bars}} compases · mantén el pulso",
+    "step_tap": "Toca",
+    "step_tap_sub": "en el “1” que regresa",
+    "level_up": "Subir nivel → {{bars}} compases en silencio",
+    "or_space": "o pulsa Espacio",
+    "reset": "Reiniciar nivel",
+    "recent": "Recientes",
+    "silent_bars": "compases en silencio: {{bars}}",
+    "miss": "fallo",
+    "no_attempts": "Aún no hay intentos — pulsa Start."
+  },
+  "tuning_lock": {
+    "gp": "Esta canción viene de una importación de Guitar Pro — la afinación está guardada en el archivo y no se puede cambiar aquí.",
+    "exam": "La afinación está bloqueada durante el examen — las tareas están preparadas solo para afinación estándar (E A D G B E)."
+  },
+  "tuner": {
+    "enable_pitch": "Activa la detección de tono para usar el afinador",
+    "play_open": "Toca una cuerda al aire",
+    "in_tune": "Afinada — mantenla",
+    "sharp": "{{cents}}¢ alta — baja la afinación",
+    "flat": "{{cents}}¢ baja — sube la afinación",
+    "string": "Cuerda {{n}} — {{name}} ({{hz}} Hz)",
+    "all_tuned": "Todas las cuerdas afinadas"
+  }
+}

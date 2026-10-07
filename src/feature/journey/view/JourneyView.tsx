@@ -1,5 +1,6 @@
 import { Drawer, DrawerContent } from "assets/components/ui/drawer";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -70,6 +71,7 @@ function buildModuleWithStatus(
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const JourneyView: React.FC = () => {
+  const { t } = useTranslation("journey");
   const userAuth = useAppSelector(selectUserAuth);
   const router = useRouter();
 
@@ -105,7 +107,7 @@ const JourneyView: React.FC = () => {
         }
       })
       .catch(() => {
-        toast.error("Failed to load progress. Please refresh the page.");
+        toast.error(t("toast.load_failed"));
       })
       .finally(() => setLoading(false));
   }, [userAuth]);
@@ -140,11 +142,11 @@ const JourneyView: React.FC = () => {
     examResultHandled.current = true;
 
     if (examResult === "fail") {
-      toast.error(`Exam failed — score: ${accuracy}%. Practice more and try again!`);
+      toast.error(t("toast.exam_failed", { accuracy }));
     } else {
       const stars = Number(examResult);
       const starStr = "⭐".repeat(stars);
-      toast.success(`Exam passed! ${starStr} — ${accuracy}% accuracy`);
+      toast.success(t("toast.exam_passed", { stars: starStr, accuracy }));
       if (userAuth) {
         firebaseGetJourneyProgress(userAuth as string).then((doc) => {
           if (doc) setProgressDoc(doc);
@@ -194,11 +196,11 @@ const JourneyView: React.FC = () => {
 
       try {
         await firebaseCompleteJourneyStep(userAuth as string, selectedModuleId, stepId);
-        toast.success("Step completed! 🎸");
+        toast.success(t("toast.step_completed"));
         handleCloseModal();
       } catch {
         setProgressDoc(prev);
-        toast.error("Failed to save. Please try again.");
+        toast.error(t("toast.save_failed"));
       } finally {
         setIsSaving(false);
       }

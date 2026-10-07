@@ -1,0 +1,201 @@
+{
+  "spacing": "Abstände",
+  "spacing_hint": "Wie weit Noten im Takt und zwischen den Saiten auseinanderstehen.",
+  "note_spacing": "Notenabstand",
+  "string_spacing": "Saitenabstand",
+  "fret_numbers": "Bundzahlen",
+  "size": "Größe",
+  "default_view": "Standardansicht",
+  "default_view_hint": "Welche Ansicht sich beim Start einer Übungssession automatisch öffnet.",
+  "metronome_sound": "Metronom-Sound",
+  "metronome_sound_hint": "Antippen zum Anhören. Wird für den Einzähler und die Tab-Ansicht verwendet; die Notenansicht behält den eigenen Klick von AlphaTab.",
+  "note_pills": "Notenform",
+  "note_pills_hint": "Form der Blöcke mit den Bundzahlen und wie die Länge einer Note gezeichnet wird.",
+  "string_palette": "Saitenfarben",
+  "string_palette_hint": "Eine Farbe pro Saite, hohe e zuerst.",
+  "hit_colour": "Trefferfarbe",
+  "hit_colour_hint": "Füllt eine Note, während du sie korrekt aushältst.",
+  "board_background": "Hintergrund",
+  "board_background_hint": "Farbe hinter Notenzeile, Rand und Ausblendung.",
+  "visible_elements": "Sichtbare Elemente",
+  "visible_elements_hint": "Blende Ebenen aus, die du nicht brauchst, um die Ansicht aufzuräumen.",
+  "handedness": "Händigkeit",
+  "handedness_hint": "Für Linkshänder. Gilt überall auf diesem Gerät.",
+  "mirror": "Griffbrett-Diagramme spiegeln",
+  "mirror_desc": "Sattel rechts in den Klick- und Such-Drills. Der Tab hat keine Halsachse zum Spiegeln und bleibt, wie er ist.",
+  "rtl": "Von rechts nach links",
+  "rtl_desc": "Der Tab beginnt am rechten Rand und der Cursor läuft nach links, wie auf einem gespiegelten Hals. Nur Tab; die Notenansicht behält ihre normale Richtung.",
+  "flip": "Saitenreihenfolge umkehren",
+  "flip_desc": "Tiefe E oben – für eine Rechtshändergitarre, die umgekehrt besaitet ist. Nur Tab; die Notenansicht behält die Standardreihenfolge.",
+  "feedback": "Feedback",
+  "hit_animations": "Treffer-Animationen",
+  "hit_animations_desc": "Blitz und Schockwellenringe, wenn eine Note sitzt",
+  "timing_hints": "Timing-Hinweise",
+  "timing_hints_desc": "„Früh“, „Spät“ oder ein grünes + über der Note beim Treffer, und eine späte Note füllt sich ab der Stelle, wo du sie gespielt hast. Das Timing zählt so oder so für deinen Score.",
+  "ambient_glow": "Mikrofon-Leuchten",
+  "ambient_glow_desc": "Leuchten unter dem Tab, das auf deine Spiellautstärke reagiert",
+  "reset": "Tab-Einstellungen zurücksetzen",
+  "sizing": "Größe",
+  "sizing_hint": "Eigener Zoom und Notenabstand von AlphaTab – unabhängig von den Reglern des flachen Tabs oben.",
+  "zoom": "Zoom",
+  "board": "Hintergrund",
+  "board_hint": "Farbe des Notenblatts.",
+  "dark_score": "Dunkles Notenblatt",
+  "dark_score_desc": "Schwarzer Hintergrund mit weißen Linien und Noten statt weißem Papier",
+  "toggles": {
+    "rhythm_lane": "Rhythmusspur",
+    "rhythm_lane_desc": "Hälse, Balken und Pausen über der Notenzeile",
+    "chord_names": "Akkordnamen",
+    "chord_names_desc": "Weiße Akkord-Labels über dem Takt",
+    "tuning_gutter": "Stimmungsrand",
+    "tuning_gutter_desc": "Fixierte Saitennamen links",
+    "measure_lines": "Taktstriche",
+    "measure_lines_desc": "Senkrechte Taktteiler",
+    "technique": "Technik-Markierungen",
+    "technique_desc": "H/P, Bendings, PM, Vibrato, Flageoletts, Anschlag ⊓/⋁"
+  },
+  "views": {
+    "tab": {
+      "label": "Tabulatur",
+      "desc": "Klassischer Griffbrett-Tab"
+    },
+    "notation": {
+      "label": "Noten",
+      "desc": "Standard-Notenschrift"
+    }
+  },
+  "fret_text": {
+    "black": {
+      "label": "Schwarz",
+      "desc": "Tinte auf hellen Blöcken"
+    },
+    "white": {
+      "label": "Weiß",
+      "desc": "Für dunklere Paletten"
+    },
+    "auto": {
+      "label": "Auto",
+      "desc": "Richtet sich nach der Helligkeit des Blocks"
+    }
+  },
+  "note_styles": {
+    "headTail": {
+      "label": "Kopf + Schweif",
+      "desc": "Voller Kopf, dünner Halteschweif"
+    },
+    "bar": {
+      "label": "Voller Balken",
+      "desc": "Ein Block für die ganze Länge"
+    }
+  },
+  "pills": {
+    "capsule": {
+      "label": "Kapsel",
+      "desc": "Komplett abgerundete Enden"
+    },
+    "rounded": {
+      "label": "Abgerundet",
+      "desc": "Weiche Ecken"
+    },
+    "sharp": {
+      "label": "Kantig",
+      "desc": "Fast quadratisch, technisch"
+    },
+    "chunky": {
+      "label": "Wuchtig",
+      "desc": "Höher und kräftiger"
+    }
+  },
+  "palettes": {
+    "rainbow": {
+      "label": "Regenbogen",
+      "desc": "Ein Farbton pro Saite"
+    },
+    "stringCode": {
+      "label": "Saitencode",
+      "desc": "Tiefe E rot, hohe e lila"
+    },
+    "ocean": {
+      "label": "Ozean",
+      "desc": "Kühle Blau- und Violetttöne"
+    },
+    "sunset": {
+      "label": "Sonnenuntergang",
+      "desc": "Warme Rottöne bis Gold"
+    },
+    "forest": {
+      "label": "Wald",
+      "desc": "Grün- und Türkistöne"
+    },
+    "neon": {
+      "label": "Neon",
+      "desc": "Maximaler Kontrast auf dunklem Hintergrund"
+    },
+    "pastel": {
+      "label": "Pastell",
+      "desc": "Weichere Töne, angenehmer bei langen Sessions"
+    },
+    "poster": {
+      "label": "Poster",
+      "desc": "Flache Druckfarben, matt und kräftig"
+    },
+    "vintage": {
+      "label": "Vintage",
+      "desc": "Verblasste, staubige Töne wie ein altes Poster"
+    },
+    "colorblind": {
+      "label": "Farbenblind-tauglich",
+      "desc": "Okabe–Ito, für die meisten Typen unterscheidbar"
+    },
+    "mono": {
+      "label": "Mono",
+      "desc": "Graustufen – zählt die Position, nicht die Farbe"
+    }
+  },
+  "backgrounds": {
+    "midnight": {
+      "label": "Mitternacht",
+      "desc": "Standard, fast schwarz"
+    },
+    "black": {
+      "label": "Reines Schwarz",
+      "desc": "Tiefster Kontrast, OLED-freundlich"
+    },
+    "charcoal": {
+      "label": "Anthrazit",
+      "desc": "Aufgehelltes Grau, weniger Blendung"
+    },
+    "navy": {
+      "label": "Marine",
+      "desc": "Kühles Blauschwarz"
+    },
+    "plum": {
+      "label": "Pflaume",
+      "desc": "Warmes Violettschwarz"
+    },
+    "paper": {
+      "label": "Papier",
+      "desc": "Warmes Weiß wie gedruckt"
+    },
+    "white": {
+      "label": "Weiß",
+      "desc": "Schlichtes weißes Blatt"
+    },
+    "sepia": {
+      "label": "Sepia",
+      "desc": "Gealtertes Papier, wenig Blendung"
+    }
+  },
+  "hit_colors": {
+    "emerald": "Smaragd",
+    "cyan": "Cyan",
+    "amber": "Bernstein",
+    "white": "Weiß",
+    "magenta": "Magenta",
+    "lime": "Limette"
+  },
+  "view_menu": {
+    "hint": "Ändern, wie die Übung angezeigt wird",
+    "view": "Ansicht"
+  }
+}

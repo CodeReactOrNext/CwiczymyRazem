@@ -16,6 +16,7 @@ import type {
 import { logger } from "feature/logger/Logger";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Heart, ListPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -33,6 +34,7 @@ const userPlansQueryKey = (userId: string) => [
 
 /** Appends the previewed exercise to one of the player's own plans. */
 export function AddToPlanMenu({ exercise, userId }: AddToPlanMenuProps) {
+  const { t } = useTranslation("plans");
   const queryClient = useQueryClient();
 
   const { data: plans, isLoading } = useQuery({
@@ -47,12 +49,12 @@ export function AddToPlanMenu({ exercise, userId }: AddToPlanMenuProps) {
         exercises: [...plan.exercises, exercise],
       }),
     onSuccess: (_, plan) => {
-      toast.success(`Added to ${plan.title}`);
+      toast.success(t("added_to", { title: plan.title }));
       queryClient.invalidateQueries({ queryKey: userPlansQueryKey(userId) });
     },
     onError: (error) => {
       logger.error(error, { context: "AddToPlanMenu" });
-      toast.error("Couldn't add the exercise to this plan");
+      toast.error(t("add_error"));
     },
   });
 
@@ -68,18 +70,18 @@ export function AddToPlanMenu({ exercise, userId }: AddToPlanMenuProps) {
           ) : (
             <ListPlus className='h-3.5 w-3.5' />
           )}
-          Add to plan
+          {t("add_to_plan")}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='end'
         className='max-h-72 w-64 overflow-y-auto'>
         {isLoading && (
-          <DropdownMenuItem disabled>Loading your plans…</DropdownMenuItem>
+          <DropdownMenuItem disabled>{t("loading_plans")}</DropdownMenuItem>
         )}
         {!isLoading && (plans?.length ?? 0) === 0 && (
           <DropdownMenuItem asChild>
-            <Link href='/timer/plans'>You have no plans yet — create one</Link>
+            <Link href='/timer/plans'>{t("no_plans_create")}</Link>
           </DropdownMenuItem>
         )}
         {plans?.map((plan) => {
@@ -102,6 +104,7 @@ export function AddToPlanMenu({ exercise, userId }: AddToPlanMenuProps) {
 
 /** Heart + "Add to plan" for the preview footer. Renders nothing for guests. */
 export function ExercisePreviewActions({ exercise }: { exercise: Exercise }) {
+  const { t } = useTranslation("plans");
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
@@ -110,7 +113,7 @@ export function ExercisePreviewActions({ exercise }: { exercise: Exercise }) {
 
   const isFavorite =
     userInfo?.favoriteExerciseIds?.includes(exercise.id) ?? false;
-  const label = isFavorite ? "Remove from favorites" : "Add to favorites";
+  const label = isFavorite ? t("remove_favorite") : t("add_favorite");
 
   return (
     <>

@@ -1,1 +1,17 @@
-{}
+{
+  "subtitlebar_text": "Ćwicz, raportuj, zdobywaj punkty!",
+  "back_to_login": "Wróć do logowania",
+  "title": "Dołącz do nas",
+  "subtitle": "Załóż konto i zacznij swoją przygodę",
+  "value_prop": "Za darmo na zawsze, bez paywalli. Śledź prawdziwy czas ćwiczeń, utwory i postępy.",
+  "username_label": "Nazwa użytkownika",
+  "username_placeholder": "Twój nick",
+  "email_label": "E-mail",
+  "email_placeholder": "imie@przyklad.pl",
+  "email_option": "lub zarejestruj się e-mailem",
+  "password_label": "Hasło",
+  "submit_button": "Załóż konto",
+  "google_button": "Kontynuuj z Google",
+  "already_have_account": "Masz już konto?",
+  "login_link": "Zaloguj się"
+}

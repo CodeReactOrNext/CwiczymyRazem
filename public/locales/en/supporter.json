@@ -1,0 +1,175 @@
+{
+  "tiers": {
+    "content": {
+      "exercises": "+{{count}} New Exercises",
+      "exercise_one": "+{{count}} New Exercise",
+      "gear": "+{{count}} New Guitars & Pedals"
+    },
+    "t13": {
+      "label": "Scrap Guitars for Parts",
+      "description": "Scrap guitars you don't want. Different guitars break down into different parts, so what you keep (and what you scrap) actually matters."
+    },
+    "t25": {
+      "label": "Luthier: Guitar Parts & Upgrading",
+      "description": "Gear drops parts by rarity as you play, and the parts you scrap from guitars you don't want feed right back in. Spend matching parts at the Luthier to level up a guitar or effect and push its rarity higher."
+    },
+    "t51": {
+      "label": "Gear Affects Fame Points",
+      "description": "The gear you're using changes how many Fame Points you earn per exercise type, so pick the right rig for the right drill."
+    },
+    "t61": {
+      "label": "Sync Backing Track to Tablature",
+      "description": "Backing tracks for songs synced to the tab, so you can play along in time without hunting for the beat."
+    },
+    "t79": {
+      "label": "Pedalboard Synergy",
+      "description": "Effects interact with each other, so pick and order your pedals carefully."
+    },
+    "t89": {
+      "label": "Achievements Rework",
+      "description": "A full redo of achievements, plus new ones. Each one actually gives you something, not just a badge."
+    },
+    "t107": {
+      "label": "Pedalboard Power Cap",
+      "description": "Your pedalboard has a power limit, so upgrade it if you want to run stronger effects."
+    },
+    "t117": {
+      "label": "Gamification: Path/Skill Completion Rewards",
+      "description": "Finish a Journey, Roadmap, or Skill track and get a guitar or effect dropped as a reward."
+    },
+    "t153": {
+      "label": "Player Progression System",
+      "description": "Level up from playing. Unlocks milestones, profile layouts, and which gear rarity you can equip."
+    },
+    "t181": {
+      "label": "Configurable Dashboard",
+      "description": "Pick your own layout, widgets, and shortcuts for the main panel."
+    },
+    "t191": {
+      "label": "Daily Unlock",
+      "description": "A time-based unlock that resets once a day, giving you a reason to come back."
+    },
+    "t201": {
+      "label": "Configurable Guitarist Profile",
+      "description": "Show off what you want, how you want, using layouts unlocked through progression."
+    },
+    "t229": {
+      "label": "Practice Mode",
+      "description": "Set goals per exercise and track your progress toward hitting them."
+    },
+    "t244": {
+      "label": "Riff Cards",
+      "description": "Build a personal deck of riffs, songs and exercises that you can review with spaced repetition or play through freely anytime."
+    },
+    "t262": {
+      "label": "Signature Guitars at the Luthier",
+      "description": "The Luthier stocks one-of-a-kind guitars you won't find anywhere else."
+    },
+    "t346": {
+      "label": "Duels",
+      "description": "Challenge another player for Fame Points, like who can rack up more practice time before the clock runs out."
+    },
+    "t415": {
+      "label": "New Practice Mode: Boss",
+      "description": "A new practice mode: Boss. Each boss sets a real requirement to clear. Hit the score and you level up, fall short and you're knocked out, no partial credit."
+    }
+  },
+  "funding": {
+    "title": "The roadmap",
+    "subtitle": "A running total, not a subscription. Every goal it reaches gets built and stays unlocked for everyone, for good.",
+    "goals_funded": "goals funded",
+    "scroll_left": "Scroll left",
+    "scroll_right": "Scroll right",
+    "feature": "Feature",
+    "done": "Done",
+    "in_progress": "In progress",
+    "funded": "Funded",
+    "locked": "Locked",
+    "next_unlock": "Next unlock",
+    "to_go": "${{amount}} to go",
+    "covered": "Server cost this month covered",
+    "needs_help": "Server cost needs your help",
+    "all_funded": "Every roadmap goal is funded, thank you"
+  },
+  "perks": {
+    "title": "What you get",
+    "tokens": "Supporting turns into tokens: {{welcome}} land with the badge and {{perDollar}} more for every dollar after that. They never expire, and they buy a say over what gets built.",
+    "open_panel": "Open the supporter panel",
+    "discord_body": "A supporter role on {{discord}} and a channel where I show what I am building before it ships.",
+    "items": {
+      "0": {
+        "title": "The roadmap board",
+        "body": "Post what you want built and back the ideas other supporters posted."
+      },
+      "1": {
+        "title": "Gear you picked",
+        "body": "Propose a guitar or a pedal for the Arsenal, or back somebody else's spec."
+      },
+      "2": {
+        "title": "The supporter case",
+        "body": "Vote on which items get a seat in the next supporter case."
+      },
+      "3": {
+        "title": "A guild of your own",
+        "body": "Found one with its own name and tag, a shared stash and a harder practice week."
+      },
+      "4": {
+        "title": "The next challenge",
+        "body": "Pick the community challenge everybody plays next week."
+      },
+      "5": {
+        "title": "The supporter channel"
+      }
+    }
+  },
+  "faq": {
+    "title": "Questions",
+    "discord_link": "message me on Discord",
+    "panel_link": "supporter panel",
+    "badge_answer": "By matching the email on the donation to your account. If you paid from another address, just {{discord}} so I can attach it by hand. Tokens are spent in the {{panel}}.",
+    "items": {
+      "0": {
+        "q": "Why does everyone get access for free?",
+        "a": "Riff Quest stays free for everyone, full stop. When you support it you are not buying access for yourself, you are paying for development that the whole community gets to use. It works as a running total, not a subscription, so once a goal is reached it stays unlocked for good."
+      },
+      "1": {
+        "q": "How long does it take to ship one goal?",
+        "a": "It really depends on the goal. Something small can be ready in a couple of days, while a more demanding tier might take around two weeks. As a rule, the bigger the unlock the more time it needs, and I would rather take a few extra days than ship something half finished."
+      },
+      "2": {
+        "q": "How does the supporter badge find my account?"
+      },
+      "3": {
+        "q": "What happens when every goal is reached?",
+        "a": "The counter resets and a brand new roadmap goes up, built around the ideas you send in. Reaching the end is not a finish line, it is just the start of the next round of features."
+      }
+    }
+  },
+  "pulse": {
+    "this_month": "this month",
+    "support": "Support the roadmap",
+    "supporters": "{{count}} supporters · community",
+    "community": "community support",
+    "tooltip": "{{count}} supporters have chipped in ${{amount}} this month. It keeps Riff Quest free and funds the roadmap. Tap to see where it goes.",
+    "tooltip_empty": "Riff Quest is free and funded by the community. Tap to see the roadmap and what your support unlocks next."
+  },
+  "hero": {
+    "title": "Help build Riff Quest",
+    "subtitle": "Riff Quest is free and made by one person. Your support pays the hosting bill first, and everything above it unlocks the next feature on the roadmap, for everyone.",
+    "eyebrow": "Community funded",
+    "coffee_hint": "A one-off coffee is enough. Nothing to sign up for, nothing to cancel."
+  },
+  "cta": {
+    "support": "Support Riff Quest"
+  },
+  "thanks": {
+    "title": "Just want to say thanks?",
+    "body": "Knowing Riff Quest is useful to you is already the good part. A coffee on top of that genuinely makes my day.",
+    "cta": "Say thanks with a coffee"
+  },
+  "modal": {
+    "why": "Why support Riff Quest?",
+    "body": "Riff Quest is a one person project, free and built in the open. Your support covers the domain, hosting, and database first. Everything raised on top of that funds the roadmap: new exercises, gear, and features, unlocked tier by tier as the community funds them.",
+    "later": "Maybe later"
+  }
+}

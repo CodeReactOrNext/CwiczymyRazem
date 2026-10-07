@@ -1,1 +1,17 @@
-{}
+{
+  "subtitlebar_text": "¡Practica, registra, gana puntos!",
+  "back_to_login": "Volver al inicio de sesión",
+  "title": "Únete",
+  "subtitle": "Crea una cuenta y empieza tu camino",
+  "value_prop": "Gratis para siempre, sin muros de pago. Registra tu tiempo real de práctica, tus canciones y tu progreso.",
+  "username_label": "Nombre de usuario",
+  "username_placeholder": "Tu apodo",
+  "email_label": "Correo electrónico",
+  "email_placeholder": "nombre@ejemplo.com",
+  "email_option": "o regístrate con tu correo",
+  "password_label": "Contraseña",
+  "submit_button": "Crear cuenta",
+  "google_button": "Continuar con Google",
+  "already_have_account": "¿Ya tienes una cuenta?",
+  "login_link": "Inicia sesión"
+}

@@ -65,7 +65,7 @@ const SessionBottomBarComponent = ({
   examMode = false,
   hasBackingTrack = false,
 }: SessionBottomBarProps) => {
-  const { t } = useTranslation(["common"]);
+  const { t } = useTranslation(["common", "session"]);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const stayButtonRef = useRef<HTMLButtonElement>(null);
   const hasTempoControl = !!currentExercise.metronomeSpeed;
@@ -185,7 +185,7 @@ const SessionBottomBarComponent = ({
                 disabled={isLastExercise ? finishDisabled : false}
               >
                 {(isFinishing || isSubmittingReport) ? (
-                  <span>Saving...</span>
+                  <span>{t("session:saving")}</span>
                 ) : isLastExercise ? (
                   <>
                     <span className="flex items-center gap-2">{t("common:finish_session")}</span> <FaCheck />
@@ -220,11 +220,11 @@ const SessionBottomBarComponent = ({
         // session away. Land on the harmless choice instead.
         onOpenAutoFocus={(e) => { e.preventDefault(); stayButtonRef.current?.focus(); }}>
         <DialogHeader className='space-y-3 pr-10'>
-          <DialogTitle className='text-xl font-bold tracking-tight'>Leave the session?</DialogTitle>
+          <DialogTitle className='text-xl font-bold tracking-tight'>{t("session:exit.title")}</DialogTitle>
           <DialogDescription className='text-sm leading-relaxed text-zinc-400'>
             {finishDisabled
-              ? "You've practised less than 20 seconds, so there's no time to save yet. Keep playing to log this session, or leave without it."
-              : "Your practice time is saved only when you finish the session. If you exit now, it won't be logged."}
+              ? t("session:exit.too_short")
+              : t("session:exit.not_saved")}
           </DialogDescription>
         </DialogHeader>
 
@@ -236,7 +236,7 @@ const SessionBottomBarComponent = ({
                 loading={isFinishing || isSubmittingReport}
                 onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}>
                 <FaCheck className='mr-2' />
-                Finish &amp; save time
+                {t("session:exit.finish_save")}
               </Button>
               {isEarlyFinish && (
                 <p className='text-center text-xs text-zinc-400'>
@@ -252,7 +252,7 @@ const SessionBottomBarComponent = ({
               className='flex-1 rounded-lg bg-white/5 text-sm font-semibold text-zinc-400 transition-background hover:bg-red-500/10 hover:text-red-400'
               onClick={() => { setShowExitDialog(false); onClose?.(); }}>
               <FaSignOutAlt className='mr-2' />
-              {finishDisabled ? "Exit" : "Exit without saving"}
+              {finishDisabled ? t("session:exit.exit") : t("session:exit.exit_no_save")}
             </Button>
             <Button
               ref={stayButtonRef}
@@ -264,7 +264,7 @@ const SessionBottomBarComponent = ({
                   : "bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white",
               )}
               onClick={() => setShowExitDialog(false)}>
-              Stay in session
+              {t("session:exit.stay")}
             </Button>
           </div>
         </div>

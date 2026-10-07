@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import type { ChatAttachment } from "feature/chat/types/chat.types";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import { useTranslation } from "hooks/useTranslation";
 import type { ActivityPreview } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import {
   ItemPill,
@@ -32,6 +33,7 @@ const CardBody = ({
   subtitle?: string | null;
   action: string;
 }) => {
+  const { t } = useTranslation("chat");
   const { label, Icon, tone } = KIND_META[kind];
 
   return (
@@ -40,7 +42,7 @@ const CardBody = ({
         <Icon className={cn("h-5 w-5", tone)} />
       </span>
       <span className='flex min-w-0 flex-1 flex-col'>
-        <span className={cn("text-[11px] font-semibold", tone)}>{label}</span>
+        <span className={cn("text-[11px] font-semibold", tone)}>{t(`attachment.kinds.${kind}`, label)}</span>
         <span className='truncate text-sm font-semibold text-zinc-100'>
           {title}
         </span>
@@ -75,6 +77,7 @@ export const ChatAttachmentCard = ({
   onOpenActivity: (preview: ActivityPreview) => void;
   onOpenRecording: (recordingId: string) => void;
 }) => {
+  const { t } = useTranslation("chat");
   switch (attachment.kind) {
     case "exercise": {
       const exercise = exercisesAgregat.find((ex) => ex.id === attachment.id);
@@ -90,7 +93,7 @@ export const ChatAttachmentCard = ({
             kind='exercise'
             title={attachment.title}
             subtitle={attachment.subtitle}
-            action='Play'
+            action={t("attachment.play")}
           />
         </button>
       );
@@ -107,7 +110,7 @@ export const ChatAttachmentCard = ({
             kind='plan'
             title={attachment.title}
             subtitle={attachment.subtitle}
-            action='Play'
+            action={t("attachment.play")}
           />
         </button>
       );
@@ -121,7 +124,7 @@ export const ChatAttachmentCard = ({
             kind='song'
             title={attachment.title}
             subtitle={attachment.artist}
-            action='Open'
+            action={t("attachment.open")}
           />
         </Link>
       );
@@ -135,7 +138,7 @@ export const ChatAttachmentCard = ({
             kind='recording'
             title={attachment.title}
             subtitle={attachment.subtitle}
-            action='Watch'
+            action={t("attachment.watch")}
           />
         </button>
       );

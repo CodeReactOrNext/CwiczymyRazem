@@ -3,6 +3,7 @@ import { guildChatPath } from "feature/chat/services/chatService";
 import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
 import { selectUserGuildBadge } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { MessagesSquare } from "lucide-react";
 import { useAppSelector } from "store/hooks";
 
@@ -18,6 +19,7 @@ interface CommunityIconButtonProps {
  * chat — kept apart because a person writing to you asks for more than another logged session.
  */
 export const CommunityIconButton = ({ onOpen }: CommunityIconButtonProps) => {
+  const { t } = useTranslation("feed");
   const setOpen = useCommunityDrawer((state) => state.setOpen);
   const { unreadCount } = useUnreadMessages();
 
@@ -29,9 +31,9 @@ export const CommunityIconButton = ({ onOpen }: CommunityIconButtonProps) => {
   const hasUnreadMessage = hasNewChat || hasNewGuild;
 
   const label = [
-    "Activity and chat",
-    unreadCount > 0 && `${unreadCount} new in the feed`,
-    hasUnreadMessage && "unread messages",
+    t("community.label"),
+    unreadCount > 0 && t("community.new_in_feed", { count: unreadCount }),
+    hasUnreadMessage && t("community.unread_messages"),
   ]
     .filter(Boolean)
     .join(", ");
@@ -43,7 +45,7 @@ export const CommunityIconButton = ({ onOpen }: CommunityIconButtonProps) => {
         onOpen?.();
         setOpen(true);
       }}
-      title='Activity & Chat'
+      title={t("community.title")}
       aria-label={label}
       className='group relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-[8px] bg-white/5 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 hover:bg-white/10'>
       <MessagesSquare className='h-4 w-4 text-zinc-400 transition-colors group-hover:text-white' />

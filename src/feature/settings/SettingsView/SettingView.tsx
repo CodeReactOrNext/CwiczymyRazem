@@ -48,12 +48,12 @@ const SettingsView = () => {
         {/* Same underline tab bar as the rest of the app, so the form gets the
             full width instead of sharing it with a column of category cards. */}
         <div className="space-y-6">
-          <h1 className="px-1 text-2xl font-bold text-zinc-100">Settings</h1>
+          <h1 className="px-1 text-2xl font-bold text-zinc-100">{t("settings:tabs.title")}</h1>
           <TabsList className={tabNavListClass}>
             {SETTINGS_TABS.map(({ value, label, Icon }) => (
               <TabsTrigger key={value} value={value} className={tabNavTriggerClass}>
                 <Icon className="h-4 w-4" />
-                {label}
+                {t(`settings:tabs.${value}`, label)}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -85,7 +85,7 @@ const SettingsView = () => {
                        <Lock className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-semibold text-cyan-300">Google OAuth Authentication</p>
+                      <p className="font-semibold text-cyan-300">{t("settings:tabs.google_auth")}</p>
                       <p className="text-sm text-zinc-400">{t("settings:logged_in_via_google")}</p>
                     </div>
                   </div>

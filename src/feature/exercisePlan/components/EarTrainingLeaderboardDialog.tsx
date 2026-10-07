@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/compone
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar/Avatar";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -33,6 +34,7 @@ export const EarTrainingLeaderboardDialog = ({
   exerciseId,
   exerciseTitle,
 }: EarTrainingLeaderboardDialogProps) => {
+  const { t } = useTranslation("plans");
   const userAuth = useAppSelector(selectUserAuth);
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,10 +56,10 @@ export const EarTrainingLeaderboardDialog = ({
           <DialogHeader className="mb-0 text-left">
             <div className="flex items-center gap-3 mb-3">
               <Trophy className="w-5 h-5 text-amber-400" />
-              <span className="text-[10px] font-semibold text-zinc-500 tracking-wide">Leaderboard</span>
+              <span className="text-[10px] font-semibold text-zinc-500 tracking-wide">{t("leaderboard.title")}</span>
               {entries.length > 0 && (
                 <span className="text-[10px] font-semibold text-zinc-600 tabular-nums">
-                  · {entries.length} {entries.length === 1 ? "player" : "players"}
+                  · {entries.length === 1 ? t("leaderboard.player_one") : t("leaderboard.players", { count: entries.length })}
                 </span>
               )}
             </div>
@@ -82,8 +84,8 @@ export const EarTrainingLeaderboardDialog = ({
           ) : entries.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-zinc-600">
               <Trophy size={32} className="mb-4 opacity-10" />
-              <p className="text-sm font-semibold text-zinc-500">No scores yet</p>
-              <p className="text-xs text-zinc-700 mt-1">Be the first to set a record!</p>
+              <p className="text-sm font-semibold text-zinc-500">{t("leaderboard.empty")}</p>
+              <p className="text-xs text-zinc-700 mt-1">{t("leaderboard.empty_hint")}</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
@@ -123,7 +125,7 @@ export const EarTrainingLeaderboardDialog = ({
                       "flex-1 min-w-0 text-sm font-bold truncate",
                       isCurrentUser ? "text-cyan-300" : "text-zinc-300"
                     )}>
-                      {entry.displayName || "Anonymous"}
+                      {entry.displayName || t("custom.anonymous")}
                     </span>
 
                     {/* Score, and the tempo it was set at — older entries and

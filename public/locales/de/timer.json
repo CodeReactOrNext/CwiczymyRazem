@@ -1,1 +1,117 @@
-{}
+{
+  "seconds": "Sekunden",
+  "pause": "Pause",
+  "start": "Start",
+  "total_time": "Gesamtzeit:",
+  "currently_exercising": "Du übst gerade:",
+  "info_about_report": "Du kannst deine Zeit auch manuell eintragen unter",
+  "end_button": "Üben beenden",
+  "report_link": "Eintrag",
+  "technique": "Technik",
+  "theory": "Theorie",
+  "hearing": "Gehör",
+  "creativity": "Kreative Arbeit",
+  "choose": "Kategorie wählen",
+  "select_practice_mode": "Übungsmodus wählen",
+  "choose_practice_description": "Wähle die Übungsmethode, die am besten zu dir passt",
+  "modes": {
+    "timer": {
+      "title": "Standard-Übung",
+      "description": "Übe gewählte Fähigkeiten frei und verfolge deinen Fortschritt"
+    },
+    "plan": {
+      "title": "Übungsplan",
+      "description": "Wähle einen fertigen Plan und folge ihm"
+    },
+    "auto": {
+      "title": "Auto-Plan",
+      "description": "Lass uns einen Plan erstellen, der zu deiner Zeit passt"
+    }
+  },
+  "time_splitter": {
+    "title": "Session-Zusammenfassung",
+    "description": "Du hast <1>{{songTitle}}</1> für <3>{{time}}</3> geübt.",
+    "question": "Wie hast du deine Zeit genutzt?",
+    "hearing": "Gehör",
+    "technique": "Technik",
+    "learned_title": "Ich habe diesen Song gelernt!",
+    "learned_description": "Als „Gelernt“ markieren und zu den abgeschlossenen verschieben",
+    "resume": "Timer fortsetzen",
+    "confirm": "Bestätigen & beenden",
+    "saving": "Wird gespeichert..."
+  },
+  "practice_session": "Übungssession",
+  "finish": "Beenden",
+  "youtube": {
+    "add_link": "YouTube-Link einfügen",
+    "change_link": "Video ändern",
+    "no_link": "Noch kein Video verknüpft"
+  },
+  "sections": {
+    "add": "Abschnitt hinzufügen",
+    "name_placeholder": "Name des Abschnitts",
+    "mastery_0": "Nicht gelernt",
+    "mastery_1": "Schlecht",
+    "mastery_2": "Mittel",
+    "mastery_3": "Beherrscht",
+    "mastery_4": "Überspringen"
+  },
+  "rating_summary": "Übungszusammenfassung",
+  "reset_button": "Zurücksetzen",
+  "reset_dialog": {
+    "title": "Timer zurücksetzen?",
+    "description": "Damit wird die gesamte erfasste Zeit aller Fähigkeiten in dieser Session gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "cancel": "Abbrechen",
+    "confirm": "Zurücksetzen"
+  },
+  "metronome": {
+    "title": "Metronom",
+    "start": "Metronom starten",
+    "stop": "Metronom stoppen"
+  },
+  "interval_alert": {
+    "title": "Intervall-Erinnerung",
+    "description": "Lass dich alle paar Minuten daran erinnern, die Fähigkeit zu wechseln",
+    "minutes_short": "{{minutes}} Min.",
+    "next_in": "Nächste Erinnerung in {{time}}",
+    "enable": "Erinnerung aktivieren",
+    "disable": "Erinnerung deaktivieren",
+    "toast": "Zeit für einen Wechsel! {{minutes}} Minuten sind vergangen",
+    "custom_placeholder": "Eigener",
+    "custom_aria": "Eigenes Intervall in Minuten"
+  },
+  "community_map": {
+    "banner_title": "Community-Karte verfügbar",
+    "banner_description": "{{count}} Musiker haben diese Abschnittszeiten bestätigt.",
+    "explainer": "Andere Spieler haben markiert, wo jeder Teil dieses Songs beginnt – Intro, Strophe, Refrain, Solo – und zwar genau in diesem YouTube-Video.",
+    "disclaimer": "Wir prüfen nicht, ob das stimmt – sieh es als Ausgangspunkt. Du kannst jeden Abschnitt danach umbenennen, verschieben oder löschen, und die Karte kann sich jederzeit ändern.",
+    "import": "Abschnitte importieren",
+    "not_now": "Nicht jetzt"
+  },
+  "choose_practising": "Wähle, was du übst",
+  "back_to_practice": "Zurück zum Üben",
+  "saving": "Wird gespeichert...",
+  "practised_away": "Ohne Timer geübt?",
+  "log_manually": "Zeit manuell eintragen",
+  "song_timer": {
+    "shortcuts": "Tastenkürzel",
+    "key_space": "Leertaste",
+    "play_pause": "Abspielen/Pause",
+    "mark_section": "Abschnitt markieren",
+    "toggle_loop": "Loop an/aus",
+    "seek": "5 s springen",
+    "practice_notes": "Übungsnotizen",
+    "lines": "{{count}} / 300 Zeilen",
+    "notes_placeholder": "Füge hier deine Übungsnotizen hinzu... (z. B. Einstellungen, Tipps für schwierige Stellen, verwendetes Equipment)"
+  },
+  "youtube_player": {
+    "paste_new": "Neuen YouTube-Link einfügen",
+    "paste": "YouTube-Link einfügen",
+    "placeholder": "z. B. youtube.com/watch?v=…",
+    "save": "Speichern",
+    "suggestions": "Aus Vorschlägen wählen",
+    "speed": "Tempo",
+    "unlock": "Bearbeitung entsperren",
+    "lock": "Bearbeitung sperren"
+  }
+}

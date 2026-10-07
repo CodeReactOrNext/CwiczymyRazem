@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import {
   Select,
@@ -52,6 +53,7 @@ const FilterSheet = ({
   onClearFilters,
   hasFilters,
 }: FilterSheetProps) => {
+  const { t } = useTranslation("songs");
   const tiers = getAllTiers();
 
   const [localDifficulty, setLocalDifficulty] = React.useState(difficultyFilter);
@@ -103,11 +105,11 @@ const FilterSheet = ({
         <div className="flex flex-col h-full">
           <SheetHeader className="p-6">
             <SheetTitle className="pr-10 text-2xl font-semibold text-white">
-              Filter & Sort
+              {t("filter_sheet.title")}
             </SheetTitle>
             <div className="mt-1 flex items-center justify-between gap-3">
               <SheetDescription className="text-zinc-500">
-                Refine your song discovery experience
+                {t("filter_sheet.subtitle")}
               </SheetDescription>
               {hasFilters && (
                 <Button
@@ -118,7 +120,7 @@ const FilterSheet = ({
                   }}
                   className="h-9 shrink-0 rounded-md border border-red-400/30 px-3 text-sm font-bold text-red-400 hover:border-red-400/50 hover:bg-red-500/10 hover:text-red-300"
                 >
-                  Reset
+                  {t("filter_sheet.reset")}
                 </Button>
               )}
             </div>
@@ -128,8 +130,8 @@ const FilterSheet = ({
             {/* Tier Section (Multi-select) */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-zinc-300">Skill tiers</h4>
-                <span className="text-[10px] text-zinc-600 font-bold">{localTiers.length} selected</span>
+                <h4 className="text-sm font-semibold text-zinc-300">{t("filter_sheet.tiers")}</h4>
+                <span className="text-[10px] text-zinc-600 font-bold">{t("filter_sheet.selected", { count: localTiers.length })}</span>
               </div>
               <div className="grid grid-cols-8 gap-2">
                 {tiers.map((t) => {
@@ -158,13 +160,13 @@ const FilterSheet = ({
             {/* Genre Section (Multi-select) */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-semibold text-zinc-300">Music genres</h4>
+                  <h4 className="text-sm font-semibold text-zinc-300">{t("filter_sheet.genres")}</h4>
                   {localGenres.length > 0 && (
                     <button
                         onClick={() => setLocalGenres([])}
                         className="rounded-md px-2 py-1 text-xs font-bold text-cyan-500 hover:bg-cyan-500/10 hover:text-cyan-400"
                     >
-                        Clear
+                        {t("filter_sheet.clear")}
                     </button>
                   )}
                 </div>
@@ -213,7 +215,7 @@ const FilterSheet = ({
 
             {/* Sort Section */}
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-zinc-300">Display order</h4>
+              <h4 className="text-sm font-semibold text-zinc-300">{t("filter_sheet.order")}</h4>
               <Select 
                 value={localSortBy} 
                 onValueChange={(val) => {
@@ -224,13 +226,13 @@ const FilterSheet = ({
                 <SelectTrigger className="h-12 w-full rounded-lg bg-white/[0.02] text-zinc-300 focus:ring-0 border-none">
                   <div className="flex items-center gap-2">
                     <ArrowUpDown className="h-4 w-4 opacity-50 text-cyan-500" />
-                    <SelectValue placeholder="Sort by..." />
+                    <SelectValue placeholder={t("filter_sheet.sort_by")} />
                   </div>
                 </SelectTrigger>
                 <SelectContent className="bg-zinc-900 shadow-2xl border-none">
-                  <SelectItem value="title">Title (A-Z)</SelectItem>
-                  <SelectItem value="popularity">Popularity (High-Low)</SelectItem>
-                  <SelectItem value="createdAt">Date added (Newest)</SelectItem>
+                  <SelectItem value="title">{t("filter_sheet.sort_title")}</SelectItem>
+                  <SelectItem value="popularity">{t("filter_sheet.sort_popularity")}</SelectItem>
+                  <SelectItem value="createdAt">{t("filter_sheet.sort_date")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -241,7 +243,7 @@ const FilterSheet = ({
                 onClick={handleApply}
                 className="h-14 w-full rounded-lg bg-white font-semibold text-black shadow-xl hover:bg-zinc-200 transition-all active:scale-[0.98]"
             >
-              Apply changes
+              {t("filter_sheet.apply")}
             </Button>
           </div>
         </div>

@@ -32,7 +32,7 @@ export const ExerciseItem = ({
   onMoveUp,
   onMoveDown,
 }: ExerciseItemProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common", "plans"]);
   /* Removed currentLang logic */
 
   const handleMoveUp = () => onMoveUp(index);
@@ -58,7 +58,7 @@ export const ExerciseItem = ({
             className='h-6 w-6 p-1'
             onClick={handleMoveUp}
             disabled={isFirst}
-            aria-label='Move exercise up'>
+            aria-label={t("plans:create.move_up")}>
             <FaArrowUp />
           </Button>
           <Button
@@ -67,7 +67,7 @@ export const ExerciseItem = ({
             className='h-6 w-6 p-1'
             onClick={handleMoveDown}
             disabled={isLast}
-            aria-label='Move exercise down'>
+            aria-label={t("plans:create.move_down")}>
             <FaArrowDown />
           </Button>
         </div>
@@ -98,7 +98,7 @@ export const ExerciseItem = ({
               </div>
               {isSong ? (
                 <Badge className='border-transparent bg-amber-500/10 text-amber-300 hover:bg-amber-500/15'>
-                  Song
+                  {t("plans:song")}
                   {exercise.songData?.mode && ` · ${SONG_PRACTICE_MODE_LABELS[exercise.songData.mode]}`}
                 </Badge>
               ) : (

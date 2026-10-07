@@ -1,3 +1,5 @@
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
@@ -9,10 +11,14 @@ import { useState } from "react";
 import { WidgetHeader, WidgetLink } from "./WidgetHeader";
 
 /** The month a season id names, as a player would say it. */
-const seasonLabel = (seasonId: string): string => {
+const seasonLabel = (
+  seasonId: string,
+  fallback: string,
+  locale = "en-US",
+): string => {
   const [year, month] = seasonId.split("-").map(Number);
-  if (!year || !month) return "this season";
-  return new Date(Date.UTC(year, month - 1, 1)).toLocaleDateString("en-US", {
+  if (!year || !month) return fallback;
+  return new Date(Date.UTC(year, month - 1, 1)).toLocaleDateString(locale, {
     month: "long",
     timeZone: "UTC",
   });
@@ -47,7 +53,9 @@ const Standing = ({
  * they answer different questions and neither is worth a click to reach.
  */
 export const RankWidget = () => {
+  const { t } = useTranslation("dashboard");
   const { userStats } = useDashboardData();
+  const intlLocale = useIntlLocale();
   // The season only rolls over at UTC midnight on the 1st, so reading it once
   // per mount is plenty and keeps both queries on a stable key.
   const [seasonId] = useState(getCurrentSeasonId);
@@ -63,30 +71,30 @@ export const RankWidget = () => {
       <WidgetHeader
         icon={Trophy}
         iconClassName='text-amber-400'
-        title='Your rank'
-        action={<WidgetLink href='/seasons'>Rankings</WidgetLink>}
+        title={t("rank.title")}
+        action={<WidgetLink href='/seasons'>{t("rank.rankings")}</WidgetLink>}
       />
 
       <div className='flex items-start gap-6'>
         <Standing
-          label='All time'
+          label={t("rank.all_time")}
           rank={allTime.userRank}
           isLoading={allTime.isLoading}
-          emptyText='Not on the board yet.'
+          emptyText={t("rank.not_on_board")}
         />
         <Standing
-          label={seasonLabel(seasonId)}
+          label={seasonLabel(seasonId, t("rank.this_season"), intlLocale)}
           rank={seasonal.userRank}
           isLoading={seasonal.isLoading}
-          emptyText='No points this season yet.'
+          emptyText={t("rank.no_season_points")}
         />
       </div>
 
       <p className='mt-4 text-xs text-zinc-500'>
         <span className='font-semibold text-cyan-400'>
-          {points.toLocaleString("en-US")}
+          {points.toLocaleString(intlLocale ?? "en-US")}
         </span>{" "}
-        points · level {lvl}
+        {t("rank.points_level", { level: lvl })}
       </p>
     </Card>
   );

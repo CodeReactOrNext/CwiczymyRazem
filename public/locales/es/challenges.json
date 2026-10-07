@@ -1,0 +1,118 @@
+{
+  "view": {
+    "ballot_eyebrow": "Votación de la comunidad",
+    "monthly": "Desafío mensual",
+    "vote_title": "Elige el tablero del mes que viene",
+    "archive_title": "Archivo de desafíos",
+    "vote_subtitle": "Las {{count}} más votadas de {{month}} forman el próximo tablero.",
+    "archive_subtitle": "Cada tablero cerrado — se puede seguir explorando y tocando.",
+    "board_subtitle": "Cinco canciones votadas por la comunidad cada mes. Grábalas todas para completarlo.",
+    "tabs": {
+      "board": "Este mes",
+      "vote": "Votar",
+      "archive": "Archivo"
+    },
+    "not_up_title": "El tablero de este mes aún no está listo",
+    "not_up_body": "Sale de la votación de la comunidad. Ve a Votar y propón una canción.",
+    "open_ballot": "Abrir la votación",
+    "back_to_archive": "Volver al archivo"
+  },
+  "hero": {
+    "live_subtitle": "Elegidas por la comunidad — graba las {{count}} para completarlo",
+    "closed_subtitle": "Cerrado — las grabaciones siguen llegando al tablero, pero sin puntos ni fama",
+    "closes_today": "cierra hoy",
+    "day_left": "queda {{count}} día",
+    "days_left": "quedan {{count}} días",
+    "closed": "cerrado",
+    "points_per_run": "puntos por grabación",
+    "fame_per_run": "fama por grabación",
+    "fame_full_board": "fama por el tablero completo",
+    "your_runs": "Tus grabaciones",
+    "player": "{{count}} jugador",
+    "players": "{{count}} jugadores",
+    "cleared": "{{count}} lo completaron"
+  },
+  "board": {
+    "listen": "Escuchar {{title}} de {{artist}}",
+    "vote": "{{count}} voto",
+    "votes": "{{count}} votos",
+    "done": "Hecho",
+    "submit": "Enviar",
+    "cleared": "Tablero completado",
+    "final_stop": "Última parada",
+    "bonus_yours": "Todas las canciones grabadas — el bonus de {{bonus}} de fama es tuyo.",
+    "clean_sweep": "Todas las canciones grabadas — pleno en el archivo.",
+    "one_more_month": "Falta {{count}} grabación para completar el mes",
+    "more_month": "Faltan {{count}} grabaciones para completar el mes",
+    "one_more_board": "Falta {{count}} grabación para completar este tablero",
+    "more_board": "Faltan {{count}} grabaciones para completar este tablero"
+  },
+  "archive": {
+    "empty_title": "Aún no hay archivo",
+    "empty_body": "Cuando cierre este mes llegará aquí, con cada grabación que entró en el tablero.",
+    "songs_runs": "{{songs}} canciones · {{runs}} grabaciones",
+    "cleared_it": "{{count}} lo completaron"
+  },
+  "submit": {
+    "title": "Envía tu grabación",
+    "youtube_link": "Enlace de YouTube",
+    "bad_link": "Eso no parece un enlace de YouTube — usa uno como youtube.com/watch?v=… o youtu.be/…",
+    "link_hint": "Como youtube.com/watch?v=… o youtu.be/… — los vídeos ocultos funcionan, los privados no se reproducirán para otros.",
+    "title_label": "Título",
+    "notes": "Notas",
+    "optional": "opcional",
+    "notes_placeholder": "Equipo, tempo, con qué te costó…",
+    "points": "puntos",
+    "fame": "fama",
+    "clear_bonus": "bonus por completar",
+    "last_song": "Esta es tu última canción del tablero.",
+    "closed_board": "Este tablero está cerrado, así que la grabación da {{none}} — solo ocupa su lugar en el archivo.",
+    "no_rewards": "ni puntos ni fama",
+    "visibility": "Todos pueden verla en las grabaciones de esta canción, en el feed de actividad y en tus Grabaciones. Una grabación por canción, así que envía la toma que te guste.",
+    "cancel": "Cancelar",
+    "submit_run": "Enviar grabación"
+  },
+  "runs": {
+    "nobody": "Nadie se ha atrevido aún con esta — sé el primero.",
+    "count_one": "{{count}} grabación de {{artist}}",
+    "count": "{{count}} grabaciones de {{artist}}",
+    "you": "tú",
+    "tap_hint": "Toca una grabación para verla, comentar o dar like.",
+    "empty": "Aún no hay grabaciones. Grábala, publica el enlace y ocupa el primer puesto.",
+    "open_song": "Abrir «{{title}}» en el tablero de canciones"
+  },
+  "preview": {
+    "no_spotify": "No hay pista de Spotify para esta — búscala en YouTube",
+    "backed": "Apoyada",
+    "back": "Apoyar esta canción",
+    "open_board": "Abrir en el tablero de canciones"
+  },
+  "ballot": {
+    "put_up_by": "propuesta por {{name}}",
+    "voted_by": "Votada por:",
+    "out_of_votes": "Ya has usado tus {{count}} votos este mes.",
+    "rules": "Tienes {{votes}} al mes. Propón una canción o apoya una que ya esté en la votación — proponer también gasta un voto. Al cambiar de mes, las {{top}} primeras forman el nuevo desafío. Los empates se los lleva quien la propuso primero.",
+    "votes_count": "{{count}} votos",
+    "nominate": "Proponer una canción",
+    "votes_left_of": "Te quedan {{left}} de {{total}} votos",
+    "sign_in": "Inicia sesión para votar",
+    "empty_title": "La votación está vacía",
+    "empty_body": "Aún no se ha propuesto nada para {{month}}. La primera propuesta marca el tono.",
+    "below_cut": "bajo el corte — necesita más votos para entrar en el tablero",
+    "vote_left": "queda {{count}} voto",
+    "votes_left": "quedan {{count}} votos",
+    "pick_existing": "Elegir una canción que ya está en la votación solo le suma tu voto."
+  },
+  "toast": {
+    "archive_cleared": "¡Tablero del archivo completado! Las grabaciones tardías no dan puntos ni fama.",
+    "archive_added": "Grabación añadida al archivo — un tablero cerrado no da puntos ni fama.",
+    "accepted_fame_only": "Grabación aceptada — +{{fame}} de fama. Los puntos se acaban tras {{count}} canciones en un tablero.",
+    "board_cleared": "¡Tablero completado! +{{points}} puntos y +{{fame}} de fama",
+    "accepted": "Grabación aceptada — +{{points}} puntos, +{{fame}} de fama",
+    "already_submitted": "Ya tienes una grabación de esa canción.",
+    "submit_failed": "No se pudo enviar tu grabación. Inténtalo de nuevo.",
+    "nominated": "Propuesta — tu voto ya está en ella.",
+    "nominate_failed": "No se pudo añadir la propuesta.",
+    "vote_failed": "No se pudo registrar tu voto."
+  }
+}

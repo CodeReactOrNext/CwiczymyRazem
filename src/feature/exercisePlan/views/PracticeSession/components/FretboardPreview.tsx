@@ -3,6 +3,7 @@
 import type { FretPosition } from 'feature/exercisePlan/scales/fretboardMapper';
 import { rootNotes } from 'feature/exercisePlan/scales/scaleDefinitions';
 import { mirrorStyle, uprightTransform, useIsLeftHanded } from 'hooks/useHandedness';
+import { useTranslation } from "hooks/useTranslation";
 
 interface FretboardPreviewProps {
   positions: FretPosition[];
@@ -24,6 +25,7 @@ const LEFT_PAD = 16;  // space for string names
 const BOT_PAD = 10;   // space for inlay dots
 
 export function FretboardPreview({ positions, startFret, endFret, rootMidi, label }: FretboardPreviewProps) {
+  const { t } = useTranslation("session");
   const fretCount = endFret - startFret + 1;
 
   // Same mirror as the big board: nut on the right for left-handed players,
@@ -45,7 +47,7 @@ export function FretboardPreview({ positions, startFret, endFret, rootMidi, labe
           height="100%"
           preserveAspectRatio="xMidYMid meet"
           style={{ transform: mirrorStyle(leftHanded) }}
-          aria-label={leftHanded ? 'Fretboard diagram, left-handed' : 'Fretboard diagram'}
+          aria-label={leftHanded ? t('fretboard.diagram_lefty') : t('fretboard.diagram')}
         >
           {/* String lines */}
           {STRING_LABELS.map((_, i) => {
@@ -145,11 +147,11 @@ export function FretboardPreview({ positions, startFret, endFret, rootMidi, labe
       <div className="flex gap-4 text-xs text-muted-foreground/70 justify-center mt-0.5">
         <span className="flex items-center gap-1">
           <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
-          Root
+          {t("interval_click.root")}
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
-          Scale note
+          {t("fretboard.scale_note")}
         </span>
       </div>
     </div>

@@ -1,1 +1,105 @@
-{}
+{
+  "page": {
+    "empty": "Aún no hay sesiones de práctica",
+    "empty_hint": "Completa una sesión de práctica o añade un registro manual para verlo aquí.",
+    "empty_filtered": "Nada coincide con tus filtros",
+    "empty_filtered_hint": "Prueba a ampliar el rango de fechas o a borrar los filtros.",
+    "sessions_heading": "Sesiones",
+    "day_sessions": "{{count}} sesión(es)"
+  },
+  "pagination": {
+    "label": "Páginas de sesiones",
+    "previous": "Página anterior",
+    "next": "Página siguiente",
+    "page_of": "Página {{page}} de {{total}}"
+  },
+  "timeline": {
+    "heading": "Cronología del día"
+  },
+  "calendar": {
+    "prev_month": "Mes anterior",
+    "next_month": "Mes siguiente",
+    "clear_range": "Borrar las fechas seleccionadas",
+    "hint": "Toca dos días para elegir un rango",
+    "less": "Menos",
+    "more": "Más"
+  },
+  "filters": {
+    "heading": "Filtros",
+    "range_7d": "7 días",
+    "range_30d": "30 días",
+    "range_90d": "90 días",
+    "range_all": "Todo el tiempo",
+    "clear_custom": "Borrar las fechas seleccionadas",
+    "clear_all": "Borrar filtros",
+    "type_label": "Tipo de sesión",
+    "type_all": "Todos los tipos",
+    "type_manual": "Registros manuales",
+    "type_plan": "Sesiones de plan",
+    "type_song": "Práctica de canciones",
+    "duration_label": "Duración",
+    "duration_all": "Cualquier duración",
+    "duration_short": "Menos de 15 min",
+    "duration_medium": "15–45 min",
+    "duration_long": "Más de 45 min",
+    "sort_label": "Ordenar",
+    "sort_date_desc": "Más recientes primero",
+    "sort_date_asc": "Más antiguas primero",
+    "sort_time_desc": "Más largas primero",
+    "sort_points_desc": "Más puntos"
+  },
+  "summary": {
+    "heading": "Resumen",
+    "time_split": "Reparto del tiempo",
+    "total_time": "Tiempo total",
+    "sessions": "Sesiones",
+    "points": "Puntos",
+    "active_days": "Días activos",
+    "avg_session": "Sesión media"
+  },
+  "card": {
+    "type_manual": "Manual",
+    "type_plan": "Plan",
+    "type_song": "Canción",
+    "backdated": "Con fecha anterior",
+    "duration": "Tiempo",
+    "points": "Puntos",
+    "edit": "Editar registro",
+    "delete": "Eliminar registro",
+    "recorded_tooltip": "Ejercicio grabado: no se puede editar"
+  },
+  "edit_modal": {
+    "title": "Editar registro",
+    "date_locked": "la fecha no se puede cambiar",
+    "title_label": "Título",
+    "description_label": "Descripción",
+    "description_placeholder": "Notas opcionales sobre esta sesión",
+    "time_label": "Tiempo de práctica",
+    "hours": "h",
+    "minutes": "min",
+    "total": "Total",
+    "total_required": "El tiempo total debe ser mayor que cero.",
+    "stats_note": "Editar no cambia los puntos, el nivel, la racha ni los logros.",
+    "cancel": "Cancelar",
+    "save": "Guardar cambios",
+    "saving": "Guardando..."
+  },
+  "delete_dialog": {
+    "title": "¿Eliminar este registro?",
+    "description": "«{{title}}» se eliminará de tu diario de práctica. Los puntos, el nivel y los logros que ya conseguiste no cambiarán. Esta acción no se puede deshacer.",
+    "cancel": "Cancelar",
+    "confirm": "Eliminar",
+    "deleting": "Eliminando..."
+  },
+  "toast": {
+    "edit_success": "Registro actualizado.",
+    "edit_error": "No se pudo actualizar el registro. Inténtalo de nuevo.",
+    "delete_success": "Registro eliminado.",
+    "delete_error": "No se pudo eliminar el registro. Inténtalo de nuevo."
+  },
+  "widget": {
+    "title": "Sesiones recientes",
+    "view_all": "Ver todas",
+    "empty": "Aún no hay sesiones: aquí aparecerá tu práctica reciente."
+  }
+}

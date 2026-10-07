@@ -47,12 +47,6 @@ vi.mock("feature/chat/services/chatService", () => ({
   GLOBAL_CHAT_PATH: "chats",
 }));
 
-vi.mock("hooks/useTranslation", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
 const mockSendMessage = vi.fn((e) => {
   e?.preventDefault();
 });

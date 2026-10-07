@@ -9,6 +9,7 @@ import {
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import { RippleButton } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Bug,
   Globe,
@@ -100,6 +101,7 @@ export const MicTroubleshootingDialog = ({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) => {
+  const { t } = useTranslation("session");
   const [didReset, setDidReset] = useState(false);
 
   const handleResetMicSettings = () => {
@@ -121,12 +123,10 @@ export const MicTroubleshootingDialog = ({
             <Mic className='h-6 w-6' />
           </div>
           <DialogTitle className='text-center text-xl'>
-            Microphone Troubleshooting
+            {t("mic_help.title")}
           </DialogTitle>
           <DialogDescription className='pt-1 text-center leading-relaxed text-zinc-400'>
-            If the app can&apos;t hear your guitar or detects the wrong notes,
-            work through these steps. Most issues come from browser permissions
-            or another app using the mic.
+            {t("mic_help.intro")}
           </DialogDescription>
         </DialogHeader>
 
@@ -142,10 +142,10 @@ export const MicTroubleshootingDialog = ({
                 </div>
                 <div>
                   <p className='text-sm font-semibold text-zinc-100'>
-                    {tip.title}
+                    {t(`mic_help.tips.${idx}.title`, tip.title)}
                   </p>
                   <p className='text-xs leading-relaxed text-zinc-400'>
-                    {tip.description}
+                    {t(`mic_help.tips.${idx}.description`, tip.description)}
                   </p>
                 </div>
               </li>
@@ -160,17 +160,16 @@ export const MicTroubleshootingDialog = ({
             variant='destructive'
             className='w-full font-bold'>
             <RotateCcw className='mr-2 h-4 w-4' />
-            {didReset ? "Resetting…" : "Reset mic settings & reload"}
+            {didReset ? t("mic_help.resetting") : t("mic_help.reset")}
           </Button>
           <p className='text-center text-[10px] text-zinc-500'>
-            Clears this app&apos;s saved calibration and mic preferences, then
-            reloads the page.
+            {t("mic_help.reset_hint")}
           </p>
           <Button
             variant='ghost'
             onClick={() => onOpenChange(false)}
             className='w-full text-zinc-500 hover:text-zinc-300'>
-            Close
+            {t("close")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -182,6 +181,7 @@ export const MicTroubleshooting = ({
   compact = false,
   className,
 }: MicTroubleshootingProps) => {
+  const { t } = useTranslation("session");
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -189,7 +189,7 @@ export const MicTroubleshooting = ({
       {compact ? (
         <RippleButton
           onClick={() => setIsOpen(true)}
-          title='Microphone troubleshooting'
+          title={t("mic_help.title")}
           className={cn(
             "flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-all hover:text-white active:scale-90",
             className,
@@ -204,7 +204,7 @@ export const MicTroubleshooting = ({
             className,
           )}>
           <Bug className='h-3.5 w-3.5' />
-          Mic not working?
+          {t("media.mic_not_working")}
         </RippleButton>
       )}
 

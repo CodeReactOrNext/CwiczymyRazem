@@ -232,33 +232,33 @@ export const SongTimerLayout = ({
               <div className='flex items-center gap-2 text-zinc-500'>
                 <Keyboard className='h-4 w-4' />
                 <span className='text-xs font-bold text-zinc-500'>
-                  Shortcuts
+                  {t("song_timer.shortcuts")}
                 </span>
               </div>
               <div className='flex flex-wrap gap-x-6 gap-y-2'>
                 <div className='flex items-center gap-2'>
                   <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
-                    Space
+                    {t("song_timer.key_space")}
                   </kbd>
-                  <span className='text-xs text-zinc-500'>Play/Pause</span>
+                  <span className='text-xs text-zinc-500'>{t("song_timer.play_pause")}</span>
                 </div>
                 <div className='flex items-center gap-2'>
                   <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
                     M
                   </kbd>
-                  <span className='text-xs text-zinc-500'>Mark section</span>
+                  <span className='text-xs text-zinc-500'>{t("song_timer.mark_section")}</span>
                 </div>
                 <div className='flex items-center gap-2'>
                   <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
                     L
                   </kbd>
-                  <span className='text-xs text-zinc-500'>Toggle loop</span>
+                  <span className='text-xs text-zinc-500'>{t("song_timer.toggle_loop")}</span>
                 </div>
                 <div className='flex items-center gap-2'>
                   <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
                     ← →
                   </kbd>
-                  <span className='text-xs text-zinc-500'>Seek 5s</span>
+                  <span className='text-xs text-zinc-500'>{t("song_timer.seek")}</span>
                 </div>
               </div>
             </div>
@@ -270,13 +270,13 @@ export const SongTimerLayout = ({
               <div className='flex items-center gap-2 text-zinc-400'>
                 <FileText className='h-4 w-4' />
                 <span className='text-xs font-bold text-zinc-500'>
-                  Practice notes
+                  {t("song_timer.practice_notes")}
                 </span>
               </div>
               <div className='flex items-center gap-2'>
                 {isSaving && (
                   <span className='animate-pulse text-[10px] text-zinc-500'>
-                    Saving...
+                    {t("saving")}
                   </span>
                 )}
                 <span
@@ -286,7 +286,7 @@ export const SongTimerLayout = ({
                       ? "text-amber-400"
                       : "text-zinc-500",
                   )}>
-                  {notes.split("\n").length} / 300 lines
+                  {t("song_timer.lines", { count: notes.split("\n").length })}
                 </span>
               </div>
             </div>
@@ -298,7 +298,7 @@ export const SongTimerLayout = ({
                   setNotes(e.target.value);
                 }
               }}
-              placeholder='Add your practice notes here... (e.g. settings, tips for difficult parts, gear used)'
+              placeholder={t("song_timer.notes_placeholder")}
               className='min-h-[160px] w-full resize-none bg-transparent px-5 pb-5 pt-3 text-sm leading-relaxed text-zinc-300 placeholder:text-zinc-600 focus:outline-none'
             />
           </div>

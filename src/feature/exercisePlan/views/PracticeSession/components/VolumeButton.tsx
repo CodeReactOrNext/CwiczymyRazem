@@ -2,6 +2,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "assets/c
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { RippleButton } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import { Volume1, Volume2, VolumeX } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { GiGuitar, GiMetronome } from "react-icons/gi";
@@ -49,6 +50,7 @@ export const VolumeButton = ({
   h = "h-12",
   mobile = false,
 }: VolumeButtonProps) => {
+  const { t } = useTranslation("session");
   const showMetronome = !!metronome && !!setIsMetronomeMuted && metronome.volume !== undefined;
   const showMasterVolume = masterVolume !== undefined && !!onMasterVolumeChange;
   // Shown whenever there's at least the main (backing) track — a GP file with
@@ -57,7 +59,7 @@ export const VolumeButton = ({
   // A single row is always the session's own instrument (the tablature sampler or,
   // in a strumming exercise, the strum synth) — never a backing track. Calling it
   // one is why players hunted for a way to silence "the guitar" and found none.
-  const tracksLabel = (audioTracks?.length ?? 0) > 1 ? "Instruments" : "Guitar";
+  const tracksLabel = (audioTracks?.length ?? 0) > 1 ? t("volume.instruments") : t("media.guitar");
 
   if (!showMetronome && !showMasterVolume && !showTracks) return null;
 
@@ -71,14 +73,14 @@ export const VolumeButton = ({
 
   const trigger = mobile ? (
     <RippleButton
-      title='Volume'
+      title={t("volume.title")}
       className='flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-lg bg-zinc-800 text-zinc-400 transition-all active:scale-95'>
       <VolumeIcon className='h-4 w-4 shrink-0' strokeWidth={2.5} />
-      <span className='truncate text-[10px] font-semibold tracking-wide'>Volume</span>
+      <span className='truncate text-[10px] font-semibold tracking-wide'>{t("volume.title")}</span>
     </RippleButton>
   ) : (
     <RippleButton
-      aria-label='Volume'
+      aria-label={t("volume.title")}
       className={cn(
         "flex items-center justify-center shrink-0 rounded-lg transition-all outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
         compact ? "h-8 w-8 active:scale-90" : cn("w-12 active:scale-95", h),
@@ -95,7 +97,7 @@ export const VolumeButton = ({
       {mobile ? (
         <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       ) : (
-        <SessionTooltip label='Volume: metronome, guitar playback and tracks'>
+        <SessionTooltip label={t("volume.hint")}>
           <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
         </SessionTooltip>
       )}
@@ -112,16 +114,16 @@ export const VolumeButton = ({
             <div className='mb-3 flex items-center justify-between'>
               <span className={cn(sectionLabel, "flex items-center gap-1.5")}>
                 <GiMetronome className='h-3 w-3' />
-                Metronome
+                {t("volume.metronome")}
               </span>
               <span className={valueBadge(!isMetronomeMuted)}>
-                {isMetronomeMuted ? "Muted" : `${Math.round(metronomeVolume * 100)}%`}
+                {isMetronomeMuted ? t("volume.muted") : `${Math.round(metronomeVolume * 100)}%`}
               </span>
             </div>
             <div className='flex items-center gap-2.5'>
               <button
                 onClick={() => setIsMetronomeMuted!(!isMetronomeMuted)}
-                title={isMetronomeMuted ? "Unmute metronome" : "Mute metronome"}
+                title={isMetronomeMuted ? t("volume.unmute_metronome") : t("volume.mute_metronome")}
                 className={cn(
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors active:scale-95",
                   isMetronomeMuted
@@ -158,7 +160,7 @@ export const VolumeButton = ({
         {showMasterVolume && (
           <div className={showMetronome ? "mt-4" : undefined}>
             <div className='mb-3 flex items-center justify-between'>
-              <span className={sectionLabel}>Boost volume</span>
+              <span className={sectionLabel}>{t("volume.boost")}</span>
               <span className={valueBadge(isBoosted)}>{Math.round(masterVolume! * 100)}%</span>
             </div>
             <Slider
@@ -176,7 +178,7 @@ export const VolumeButton = ({
               )}
             />
             <p className='mt-2 text-[10px] leading-relaxed text-zinc-500'>
-              Boost the Guitar Pro playback above 100% if it sounds too quiet.
+              {t("media.boost_hint")}
             </p>
           </div>
         )}
@@ -196,7 +198,7 @@ export const VolumeButton = ({
                       [track.id]: { ...prev[track.id], isMuted: !prev[track.id]?.isMuted },
                     }))
                   }
-                  title={track.isMuted ? "Unmute" : "Mute"}
+                  title={track.isMuted ? t("volume.unmute") : t("volume.mute")}
                   className={cn(
                     "shrink-0 rounded p-1 transition-colors",
                     track.isMuted ? "bg-red-500/10 text-red-400" : "text-zinc-500 hover:text-white"
@@ -216,7 +218,7 @@ export const VolumeButton = ({
                   {audioTracks!.length > 1 && (
                     <div className='flex items-center justify-between'>
                       <span className='max-w-[150px] truncate text-[11px] font-semibold text-zinc-300'>
-                        {track.id === "main" ? "Main Instrument" : track.name}
+                        {track.id === "main" ? t("volume.main_instrument") : track.name}
                       </span>
                       {muteButton}
                     </div>
@@ -243,7 +245,7 @@ export const VolumeButton = ({
                         "w-10 shrink-0 text-right font-mono text-[10px]",
                         track.isMuted ? "text-red-400" : "text-zinc-500"
                       )}>
-                      {track.isMuted ? "Muted" : `${Math.round(track.volume * 100)}%`}
+                      {track.isMuted ? t("volume.muted") : `${Math.round(track.volume * 100)}%`}
                     </span>
                   </div>
                 </div>

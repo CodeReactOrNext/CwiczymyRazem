@@ -1,0 +1,49 @@
+{
+  "levels": {
+    "1": {
+      "name": "Spark",
+      "req": "1 day with 15+ min practice this week"
+    },
+    "2": {
+      "name": "Groove",
+      "req": "3 days with 20+ min this week"
+    },
+    "3": {
+      "name": "Hot Streak",
+      "req": "3-day streak with 15+ min each"
+    },
+    "4": {
+      "name": "Momentum",
+      "req": "5 days with 15+ min this week"
+    },
+    "5": {
+      "name": "Unstoppable",
+      "req": "7-day streak with 15+ min each"
+    },
+    "6": {
+      "name": "All-Rounder",
+      "req": "3 days this week with all 4 categories at 15+ min"
+    },
+    "7": {
+      "name": "In the Zone",
+      "short": "Zone",
+      "req": "3-day streak with all 4 categories at 15+ min"
+    },
+    "8": {
+      "name": "Shredder",
+      "req": "5-day streak with all 4 categories at 15+ min"
+    },
+    "9": {
+      "name": "Virtuoso",
+      "req": "7-day streak with all 4 categories at 15+ min"
+    }
+  },
+  "card": {
+    "opens_at": "Opens at level {{lvl}}",
+    "unlock": "Unlock · {{cost}} Fame",
+    "claiming": "Claiming…",
+    "claim": "Claim +{{reward}}",
+    "claimed": "Claimed",
+    "reward": "+{{reward}} Fame"
+  }
+}

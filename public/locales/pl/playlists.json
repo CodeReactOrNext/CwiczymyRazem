@@ -1,0 +1,139 @@
+{
+  "practice": "Ćwicz",
+  "remove_from_playlist": "Usuń z playlisty",
+  "reorder": "Zmień kolejność",
+  "up_next": "następny",
+  "deleted": "Playlista usunięta",
+  "saved_copy": "Zapisano w Twoich playlistach",
+  "from_owner": "od {{name}}",
+  "mastered_of": "Opanowane: {{done}} z {{total}}",
+  "add_songs": "Dodaj utwory",
+  "share": "Udostępnij",
+  "options": "Opcje playlisty",
+  "edit_details": "Edytuj szczegóły",
+  "delete": "Usuń",
+  "save_to_yours": "Zapisz w swoich playlistach",
+  "like": "Lubię to",
+  "path_complete": "Ścieżka ukończona",
+  "final_stop": "Ostatni przystanek",
+  "every_mastered": "Każdy utwór opanowany — ukłoń się.",
+  "more_to_master_one": "Został 1 utwór do opanowania",
+  "more_to_master": "Utwory do opanowania: {{count}}",
+  "private": "Prywatna",
+  "private_hint": "Widzisz ją tylko Ty",
+  "public": "Publiczna",
+  "public_hint": "Widoczna dla wszystkich w Odkrywaj",
+  "private_note": "Widzisz ją tylko Ty. Przełącz na publiczną, żeby udostępnić ją w Odkrywaj.",
+  "name": "Nazwa",
+  "description": "Opis",
+  "top_full": "To już pełne top {{count}} — usuń utwór z listy, żeby wstawić inny.",
+  "delete_title": "Usunąć „{{name}}”?",
+  "keep_it": "Zostaw",
+  "added_to": "Dodano do „{{name}}”",
+  "add_to_playlist": "Dodaj do playlisty",
+  "loading": "Wczytywanie...",
+  "no_playlists": "Brak playlist",
+  "errors": {
+    "save_changes": "Nie udało się zapisać zmian. Spróbuj ponownie.",
+    "visibility": "Nie udało się zmienić widoczności.",
+    "save_details": "Nie udało się zapisać szczegółów.",
+    "delete": "Nie udało się usunąć playlisty.",
+    "save_copy": "Nie udało się zapisać tej playlisty.",
+    "like": "Nie udało się zaktualizować polubienia.",
+    "create": "Nie udało się utworzyć playlisty. Spróbuj ponownie.",
+    "add_song": "Nie udało się dodać utworu. Spróbuj ponownie.",
+    "add_to_library": "Nie udało się dodać tego utworu do biblioteki."
+  },
+  "kinds": {
+    "playlist": {
+      "label": "Playlista",
+      "tagline": "Dowolny zbiór utworów",
+      "hint": "Grupuj utwory, jak chcesz — nastroje, zespoły, zestawy do ćwiczeń."
+    },
+    "path": {
+      "label": "Ścieżka nauki",
+      "tagline": "Utwory do nauki po kolei — roadmapa Twojego repertuaru",
+      "hint": "Roadmapa od pierwszego do ostatniego. Postęp wypełnia się, gdy opanowujesz kolejne utwory."
+    },
+    "top": {
+      "label": "Top 10",
+      "tagline": "Ranking od najlepszego",
+      "hint": "Twoje ulubione z dużymi numerami miejsc. Maksymalnie dziesięć."
+    }
+  },
+  "empty": {
+    "title": "Nic tu jeszcze nie ma",
+    "owner_top": "Wybierz swoje top {{count}} — kolejność to ranking.",
+    "owner": "Dodaj utwory z biblioteki albo ze swojej kolekcji, żeby to wypełnić.",
+    "other": "Autor nie dodał jeszcze żadnych utworów."
+  },
+  "share_title": {
+    "playlist": "Udostępnij tę playlistę",
+    "path": "Udostępnij tę ścieżkę nauki",
+    "top": "Udostępnij to top 10"
+  },
+  "live_in_discover": {
+    "playlist": "Ta playlista jest widoczna w Odkrywaj — inni gracze mogą ją otworzyć i zapisać jej kopię w swojej bibliotece.",
+    "path": "Ta ścieżka nauki jest widoczna w Odkrywaj — inni gracze mogą ją otworzyć i zapisać jej kopię w swojej bibliotece.",
+    "top": "To top 10 jest widoczne w Odkrywaj — inni gracze mogą je otworzyć i zapisać jego kopię w swojej bibliotece."
+  },
+  "delete_body": {
+    "playlist": "Playlista zostanie usunięta na zawsze. Same utwory zostają w bibliotece i w Twojej kolekcji.",
+    "path": "Ścieżka nauki zostanie usunięta na zawsze. Same utwory zostają w bibliotece i w Twojej kolekcji.",
+    "top": "Top 10 zostanie usunięte na zawsze. Same utwory zostają w bibliotece i w Twojej kolekcji."
+  },
+  "created": {
+    "playlist": "Utworzono playlistę",
+    "path": "Utworzono ścieżkę nauki",
+    "top": "Utworzono top 10"
+  },
+  "creator": {
+    "what_making": "Co tworzysz?",
+    "new": {
+      "playlist": "Nowa playlista",
+      "path": "Nowa ścieżka nauki",
+      "top": "Nowe top 10"
+    },
+    "placeholder_top": "np. Top 10 riffów lat 90.",
+    "placeholder_path": "np. Od ogniska do Hendrixa",
+    "placeholder_playlist": "np. Wolne bluesowe wieczory",
+    "optional": "(opcjonalnie)",
+    "description_placeholder": "O czym jest ta lista?",
+    "visibility": "Widoczność",
+    "public_hint": "Każdy może ją znaleźć i zapisać",
+    "next": "Dalej",
+    "picked": "Wybrano {{count}}/{{max}}",
+    "added": "Dodano: {{count}}",
+    "top_full": "To już pełne top {{count}} — usuń utwór, żeby wstawić inny.",
+    "add_later": "Utwory możesz dodawać także później.",
+    "create_with_one": "Utwórz z 1 utworem",
+    "create_with": "Utwórz z utworami ({{count}})",
+    "create_empty": "Utwórz pustą"
+  },
+  "view": {
+    "not_available": "Playlista niedostępna",
+    "not_available_body": "Mogła zostać usunięta albo jest prywatna i może ją otworzyć tylko właściciel.",
+    "back": "Wróć do playlist",
+    "title": "Playlisty",
+    "yours": "Twoje playlisty",
+    "discover": "Odkrywaj",
+    "new": "Nowa playlista",
+    "first_title": "Stwórz swoją pierwszą playlistę",
+    "first_body": "Grupuj utwory w cokolwiek — nastrój, zestaw na najbliższy jam, ścieżkę nauki albo top 10, którego broniłbyś w kłótni.",
+    "create_one": "Utwórz",
+    "nothing_public": "Nic publicznego jeszcze nie ma",
+    "nothing_public_body": "Gdy gracze udostępnią swoje playlisty, pojawią się tutaj. Ustaw jedną ze swoich jako publiczną, żeby to rozkręcić.",
+    "kinds_hint": "Playlista, ścieżka albo top 10"
+  },
+  "picker": {
+    "search_create": "Szukaj utworu lub wykonawcy...",
+    "search_library": "Przeszukaj bibliotekę...",
+    "nothing_found": "Nic nie znaleziono — spróbuj innego tytułu lub wykonawcy.",
+    "not_in_library": "Jeszcze nie ma go w bibliotece — zostanie tam dodany",
+    "add_as_typed": "{{artist}} · dodaj tak, jak wpisano, bez okładki",
+    "cant_find": "Nie możesz znaleźć? Wpisz „Wykonawca - Tytuł”, aby dodać tak, jak wpisano.",
+    "from_collection": "Z Twojej kolekcji",
+    "min_chars_create": "Wpisz co najmniej dwa znaki, aby wyszukać utwór.",
+    "min_chars_library": "Wpisz co najmniej dwa znaki, aby przeszukać bibliotekę utworów."
+  }
+}

@@ -8,6 +8,7 @@ import { RecordingsGrid } from "feature/recordings/components/RecordingsGrid";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { useRecordings } from "feature/recordings/hooks/useRecordings";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { LayoutGrid, Plus, User } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -19,6 +20,7 @@ type ViewType = "all" | "mine";
 const viewTabClass = tabNavItemClass;
 
 const RecordingsView = () => {
+  const { t } = useTranslation("recordings");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [view, setView] = useState<ViewType>("all");
 
@@ -48,8 +50,8 @@ const RecordingsView = () => {
   return (
     <MainContainer>
       <HeroBanner
-        title='Recordings'
-        subtitle='Listen back and share your practice sessions'
+        title={t("view.title")}
+        subtitle={t("view.subtitle")}
         eyebrow='Recordings'
         className='w-full !rounded-none'
         rightContent={
@@ -57,7 +59,7 @@ const RecordingsView = () => {
             onClick={() => setIsAddModalOpen(true)}
             className='h-11 bg-cyan-600 px-6 font-bold text-white hover:bg-cyan-500'>
             <Plus className='mr-2 h-5 w-5' />
-            Add Recording
+            {t("view.add")}
           </Button>
         }
       />
@@ -73,14 +75,14 @@ const RecordingsView = () => {
               onClick={() => setView("all")}
               className={viewTabClass(view === "all", false)}>
               <LayoutGrid className='h-4 w-4' />
-              All Recordings
+              {t("view.all")}
             </button>
             <button
               onClick={() => setView("mine")}
               disabled={!userId}
               className={viewTabClass(view === "mine", !userId)}>
               <User className='h-4 w-4' />
-              My Recordings
+              {t("view.mine")}
             </button>
           </div>
 

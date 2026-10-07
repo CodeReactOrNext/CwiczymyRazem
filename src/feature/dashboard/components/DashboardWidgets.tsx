@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import type { DragEndEvent } from "@dnd-kit/core";
 import {
   closestCenter,
@@ -19,7 +20,12 @@ import {
   DashboardLayoutProvider,
   useDashboardData,
 } from "feature/dashboard/context/DashboardContext";
-import { getWidgetDefinition } from "feature/dashboard/data/widgetCatalog";
+import {
+  getWidgetDefinition,
+  WIDGET_GROUP_LABELS,
+  WIDGET_GROUP_ORDER,
+} from "feature/dashboard/data/widgetCatalog";
+import { useLocalizeWidget } from "feature/dashboard/hooks/useLocalizeWidget";
 import { useDashboardLayout } from "feature/dashboard/hooks/useDashboardLayout";
 import {
   addWidget,
@@ -50,6 +56,7 @@ const GRID = "grid grid-cols-1 gap-6 lg:grid-cols-2";
  * the toolbars.
  */
 export const DashboardWidgets = () => {
+  const { t } = useTranslation("dashboard");
   const { userAuth, feedSlot } = useDashboardData();
   const { layout, isLoading, updateLayout } = useDashboardLayout(userAuth);
   const [isEditing, setIsEditing] = useState(false);
@@ -78,6 +85,13 @@ export const DashboardWidgets = () => {
     [layout, isEditing, updateLayout],
   );
   const widgetIds = layout.widgets.map((w) => w.id);
+  const localizeWidget = useLocalizeWidget();
+  const localizedGroupLabels = Object.fromEntries(
+    WIDGET_GROUP_ORDER.map((group) => [
+      group,
+      t(`widget_groups.${group}`, WIDGET_GROUP_LABELS[group]),
+    ]),
+  );
 
   return (
     <DashboardLayoutProvider value={contextValue}>
@@ -92,8 +106,7 @@ export const DashboardWidgets = () => {
           <div className='flex flex-wrap items-center justify-between gap-3'>
             {isEditing ? (
               <p className='text-sm text-zinc-400'>
-                Drag cards to reorder, hide what you don&apos;t need, add what
-                you do.
+                {t("customize.hint")}
               </p>
             ) : (
               <span />
@@ -108,7 +121,7 @@ export const DashboardWidgets = () => {
                     className='gap-1.5'
                     onClick={() => setIsAddOpen(true)}>
                     <Plus size={14} />
-                    Add widget
+                    {t("customize.add_widget")}
                   </Button>
                   <Button
                     type='button'
@@ -118,7 +131,7 @@ export const DashboardWidgets = () => {
                     disabled={isDefaultLayout(layout)}
                     onClick={() => updateLayout(normalizeLayout(undefined))}>
                     <RotateCcw size={14} />
-                    Reset
+                    {t("customize.reset")}
                   </Button>
                   <Button
                     type='button'
@@ -126,7 +139,7 @@ export const DashboardWidgets = () => {
                     className='gap-1.5'
                     onClick={() => setIsEditing(false)}>
                     <Check size={14} />
-                    Done
+                    {t("customize.done")}
                   </Button>
                 </>
               ) : (
@@ -138,7 +151,7 @@ export const DashboardWidgets = () => {
                   disabled={isLoading}
                   onClick={() => setIsEditing(true)}>
                   <Settings2 size={14} />
-                  Customize
+                  {t("customize.customize")}
                 </Button>
               )}
             </div>
@@ -153,12 +166,12 @@ export const DashboardWidgets = () => {
           ) : layout.widgets.length === 0 ? (
             <div className='rounded-lg bg-zinc-900/40 px-6 py-12 text-center'>
               <p className='text-sm font-semibold text-zinc-200'>
-                Nothing here yet.
+                {t("customize.empty_title")}
               </p>
               <p className='mt-1 text-sm text-zinc-400'>
                 {isEditing
-                  ? "Add a widget to fill this space."
-                  : "Customize Home to put cards back here."}
+                  ? t("customize.empty_editing")
+                  : t("customize.empty_hint")}
               </p>
               <Button
                 type='button'
@@ -170,7 +183,7 @@ export const DashboardWidgets = () => {
                   setIsAddOpen(true);
                 }}>
                 <Plus size={14} />
-                Add widget
+                {t("customize.add_widget")}
               </Button>
             </div>
           ) : (
@@ -182,7 +195,9 @@ export const DashboardWidgets = () => {
               <SortableContext items={widgetIds} strategy={rectSortingStrategy}>
                 <div className={GRID}>
                   {layout.widgets.map((placement) => {
-                    const definition = getWidgetDefinition(placement.id);
+                    const definition = localizeWidget(
+                      getWidgetDefinition(placement.id),
+                    );
                     return (
                       <WidgetFrame
                         key={placement.id}
@@ -216,7 +231,8 @@ export const DashboardWidgets = () => {
       <AddWidgetSheet
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
-        hidden={hidden}
+        hidden={hidden.map(localizeWidget)}
+        groupLabels={localizedGroupLabels}
         onAdd={(id) => updateLayout(addWidget(layout, id))}
       />
     </DashboardLayoutProvider>

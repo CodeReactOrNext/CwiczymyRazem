@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { PracticeLevelsState } from "feature/aiSummary/services/practiceLevels.service";
 import { firebaseClaimLevel } from "feature/aiSummary/services/practiceLevels.service";
@@ -23,6 +24,7 @@ export const useClaimMilestone = () => {
   const { userAuth } = useDashboardData();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
+  const { t } = useTranslation("dashboard");
   const queryKey = practiceLevelsQueryKey(userAuth);
 
   return useMutation({
@@ -45,14 +47,14 @@ export const useClaimMilestone = () => {
       return { previous };
     },
     onSuccess: (_data, { name, reward }) => {
-      toast.success(`+${reward} Fame from ${name}`);
+      toast.success(t("errors.claim_success", { reward, name }));
     },
     onError: (error, { reward }, context) => {
       dispatch(addFame(-reward));
       if (context?.previous)
         queryClient.setQueryData(queryKey, context.previous);
       console.error("[claim milestone]", error);
-      toast.error("Claim failed");
+      toast.error(t("errors.claim_failed"));
     },
   });
 };

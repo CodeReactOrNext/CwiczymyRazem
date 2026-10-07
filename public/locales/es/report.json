@@ -1,1 +1,191 @@
-{}
+{
+  "subtitlebar_text": "Registro",
+  "exercise_type_title": "Introduce el tiempo de práctica",
+  "technique": "Técnica",
+  "theory": "Teoría",
+  "hearing": "Oído",
+  "creativity": "Trabajo creativo",
+  "healthy_habits_title": "Hábitos saludables",
+  "report_button": "Registrar",
+  "exceeding_time": "¿Seguro que quieres añadir el registro?",
+  "sesion_title": "Objetivos de esta sesión de práctica:",
+  "optional": "opcional",
+  "days": "Días",
+  "date_back": "Fecha anterior",
+  "max_days": "Máx. {{days}} días",
+  "add_report_to_day": "Añades el registro al día:",
+  "total_time": "Tiempo total",
+  "toast": {
+    "log_out": "Sesión cerrada",
+    "24h_error": "No es posible practicar más de 24 horas al día",
+    "input_time": "Introduce el tiempo",
+    "not_logged": "No has iniciado sesión",
+    "stoper_entered": "Tienes tiempo sin registrar de una sesión de práctica anterior",
+    "exceeding_time": "Has introducido más tiempo del que ha pasado desde el último registro. Te has excedido en  "
+  },
+  "description": {
+    "technique": "P. ej. tocar y aprender canciones, calentar, practicar el ritmo y distintas técnicas como la púa alterna o el legato",
+    "hearing": "P. ej. tocar o escuchar canciones o fragmentos de oído, escuchar e identificar intervalos, cantar",
+    "theory": "P. ej. transcribir y analizar canciones, aprender las notas del mástil, leer partituras",
+    "creative": "P. ej. escribir canciones propias, improvisar, trabajar en tu propio estilo",
+    "exceeding_time": "Marca esta casilla si olvidaste añadir tiempo o un hábito saludable al registro anterior, o si quieres registrar una sesión adicional que hiciste antes.",
+    "sesion_title": "Ponle un título a tu sesión. Se verá en tu calendario.",
+    "max_days": "Si se te olvidó, puedes añadir tu registro hasta {{days}} días atrás. Pero no contará para los días consecutivos y se destacará en el calendario."
+  },
+  "habits": {
+    "exercise_plan": {
+      "title": "¿Cumpliste tu plan de ejercicios?",
+      "description": "Fijar objetivos y planificar tu práctica de guitarra es importante porque te ayuda a mantener la motivación, seguir tu progreso y alcanzar tus metas."
+    },
+    "new_things": {
+      "title": "¿Practicaste cosas nuevas?",
+      "description": "Practicar cosas nuevas en la guitarra es importante por varias razones. Ante todo, te ayuda a desarrollar habilidades nuevas y mejorar las que ya tienes. Al afrontar nuevos retos, puedes convertirte en mejor músico y ampliar tus capacidades. "
+    },
+    "warmup": {
+      "title": "¿Calentaste?",
+      "description": "Calentar prepara tus músculos y articulaciones para el esfuerzo físico de tocar. Así reduces el riesgo de lesiones y tus sesiones de práctica resultan más cómodas. También puede mejorar tu técnica y precisión, porque pone en marcha tus dedos y músculos."
+    },
+    "metronome": {
+      "title": "¿Usaste el metrónomo?",
+      "description": "El metrónomo te ayuda a mejorar tu sentido del tiempo y del ritmo. Practicando con él, aprendes a tocar a tiempo con un pulso constante y desarrollas una base rítmica más sólida."
+    },
+    "recording": {
+      "title": "¿Te grabaste?",
+      "description": "Grabarte te permite ver y escuchar tu forma de tocar desde una perspectiva distinta a la de tocar en directo. Así puedes notar errores o puntos débiles que se te habrían escapado. "
+    }
+  },
+  "rating_popup": {
+    "title": "HAS GANADO",
+    "points": "pts",
+    "skill_points_gained": "Puntos de habilidad obtenidos",
+    "spend_skill_points": "Gasta tus puntos de habilidad",
+    "back": "Atrás",
+    "regularity": "por la regularidad",
+    "streak": "días seguidos",
+    "habits": "por hábitos saludables",
+    "habitsWithCount_one": "has adoptado {{count}} hábito saludable",
+    "habitsWithCount_other": "has adoptado {{count}} hábitos saludables",
+    "time": "por la cantidad de tiempo",
+    "time_amount": "practicaste durante",
+    "new_level": "¡Subes de nivel!",
+    "new_achievements": "Nuevos logros:",
+    "achievement_reward": "Recompensa pendiente:",
+    "collect_reward": "Recógela en tu perfil"
+  },
+  "skills": {
+    "technique": "Técnica",
+    "theory": "Teoría",
+    "hearing": "Oído",
+    "creativity": "Creatividad"
+  },
+  "chart": {
+    "categories": {
+      "technique": "Técnica",
+      "theory": "Teoría",
+      "hearing": "Oído",
+      "creativity": "Creatividad"
+    }
+  },
+  "back": "Atrás",
+  "hours": "Horas",
+  "minutes": "Minutos",
+  "double_click_to_type": "Doble clic para escribir",
+  "errors": {
+    "invalid_time": "Has introducido un tiempo no válido",
+    "title_too_long": "El título de la sesión es demasiado largo (máx. 60 caracteres)",
+    "check_fields": "Revisa todos los campos e inténtalo de nuevo"
+  },
+  "long_session": {
+    "title": "¡Qué sesión tan larga!",
+    "body": "Vas a registrar {{time}} de práctica. Sabemos que es mucho: comprueba que no sea un error antes de enviarlo.",
+    "confirm": "¿Seguro que quieres registrar este tiempo?",
+    "back": "Volver a editar",
+    "accept": "Sí, registrarlo"
+  },
+  "form": {
+    "log_another": "Registrar otra sesión",
+    "time_entered": "Tiempo introducido. Guárdalo ahora o añade detalles opcionales abajo.",
+    "song_selected": "Canción elegida — indica cuánto tiempo la tocaste.",
+    "pick_songs": "Elige las canciones que tocaste y fija el tiempo de cada una.",
+    "what_practiced": "¿Qué practicaste hoy? Añade tiempo abajo.",
+    "mode_free": "Sesión libre",
+    "mode_songs": "Canciones",
+    "save_now": "Guardar ahora",
+    "more_details": "O añade más detalles abajo",
+    "add_time_hint": "Añade tiempo a al menos una categoría para guardar",
+    "healthy_habits": "Hábitos saludables",
+    "focus_habits": "Enfoque y hábitos de la sesión",
+    "optional": "Opcional",
+    "session_title": "Título de la sesión",
+    "session_title_placeholder": "p. ej. Practicando escalas mayores",
+    "habits_checklist": "Lista de hábitos",
+    "streak_bonus": "Racha de {{count}} días — puntos ×{{multiplier}}",
+    "no_streak_bonus": "Aún sin racha — puntos ×{{multiplier}}",
+    "finalize": "Finalizar registro",
+    "optional_details": "Detalles opcionales",
+    "when": "¿Cuándo ocurrió?",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "days_ago": "Hace {{count}} días",
+    "selected": "Seleccionado:",
+    "saving": "Guardando...",
+    "finish_save": "Terminar y guardar práctica"
+  },
+  "tag_groups": {
+    "goal": "Objetivo",
+    "playing_style": "Estilo de toque",
+    "techniques": "Técnicas",
+    "theory_knowledge": "Teoría y conocimiento",
+    "creative": "Creatividad",
+    "performance": "Actuación"
+  },
+  "tags": {
+    "warmup": "Calentamiento",
+    "technique": "Técnica",
+    "speed_building": "Ganar velocidad",
+    "ear_training": "Entrenamiento auditivo",
+    "fingerpicking": "Fingerpicking",
+    "rhythm_training": "Entrenamiento rítmico",
+    "vibrato": "Vibrato",
+    "bends": "Bends",
+    "legato": "Legato",
+    "alt_picking": "Púa alterna",
+    "hybrid_picking": "Hybrid picking",
+    "sweep_picking": "Sweep picking",
+    "tapping": "Tapping",
+    "picking_control": "Control de púa",
+    "string_skipping": "Salto de cuerdas",
+    "down_picking": "Púa hacia abajo",
+    "scales": "Escalas",
+    "arpeggios": "Arpegios",
+    "chords": "Acordes",
+    "theory": "Teoría",
+    "sight_reading": "Lectura a primera vista",
+    "transcribing": "Transcripción",
+    "improvisation": "Improvisación",
+    "new_song": "Canción nueva",
+    "song_writing": "Composición de canciones",
+    "composition": "Composición",
+    "jamming": "Jam",
+    "performance_prep": "Preparar actuación",
+    "performing": "Actuar",
+    "cover_song": "Cover",
+    "soloing": "Solos",
+    "recording": "Grabación"
+  },
+  "songs": {
+    "less": "5 minutos menos de {{label}}",
+    "minutes_of": "Minutos de {{label}} en esta canción",
+    "more": "5 minutos más de {{label}}",
+    "remove": "Quitar {{title}} de esta sesión",
+    "any_part": "Cualquier parte",
+    "empty_title": "Tu biblioteca está vacía",
+    "empty_body": "Añade las canciones en las que trabajas y podrás registrar tiempo de práctica directamente en ellas.",
+    "browse": "Explorar canciones",
+    "done_adding": "Terminar de añadir",
+    "add_song": "Añadir canción",
+    "search": "Busca en tu biblioteca...",
+    "limit": "Una sesión admite como máximo {{max}} canciones.",
+    "no_match": "Nada en tu biblioteca coincide."
+  }
+}

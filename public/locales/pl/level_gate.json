@@ -1,0 +1,43 @@
+{
+  "track": {
+    "target": "Poziom {{lvl}} — tu strona się otwiera",
+    "level": "Poziom {{lvl}}"
+  },
+  "opens_at": "{{name}} otwiera się na poziomie {{lvl}}",
+  "you_are": "Jesteś na poziomie {{lvl}} — {{left}}, czyli {{points}} punktów ćwiczeń.",
+  "levels_left_one": "został {{count}} poziom",
+  "levels_left": "pozostałe poziomy: {{count}}",
+  "practise_now": "Ćwicz teraz",
+  "how_levels": "Jak działają poziomy",
+  "what_else": "Co jeszcze się otwiera",
+  "lvl": "poz. {{lvl}}",
+  "features": {
+    "summary": {
+      "name": "Kamienie milowe",
+      "reason": "Kamienie milowe powstają z twojej własnej historii ćwiczeń. Kilka zapisanych sesji sprawia, że cele tygodniowe pasują do tego, jak grasz, zamiast zgadywać.",
+      "perks": {
+        "0": "Cele tygodniowe dobrane do tego, jak naprawdę ćwiczysz",
+        "1": "Fame do odebrania za każdy zaliczony cel",
+        "2": "Podsumowanie, na co poszedł tydzień, kategoria po kategorii"
+      }
+    },
+    "guilds": {
+      "name": "Gildie",
+      "reason": "Gildia działa dzięki ludziom, którzy pojawiają się dla siebie nawzajem. Po kilku poziomach masz już własną rutynę — i wtedy dołączenie daje coś także reszcie gildii, nie tylko tobie.",
+      "perks": {
+        "0": "Czat z gitarzystami ćwiczącymi w tym samym tygodniu co ty",
+        "1": "Tygodniowe wyzwanie, które cała gildia zalicza razem",
+        "2": "Wspólny schowek i herb, który nosi twoja gildia"
+      }
+    },
+    "commissions": {
+      "name": "Zamówienia",
+      "reason": "Zamówienia omijają tabele losowań, więc czekają, aż trochę pograsz w skrzynki. Wtedy ostatnie brakujące w Dexie modele są najtrudniejsze do wylosowania — i właśnie po to jest warsztat.",
+      "perks": {
+        "0": "Zamów dowolną gitarę albo efekt, którego brakuje w Dexie",
+        "1": "Płacisz Fame i częściami, z których zbudowany jest instrument",
+        "2": "Wersja fabryczna, z każdym slotem modów wolnym na mody z twojego schowka"
+      }
+    }
+  }
+}

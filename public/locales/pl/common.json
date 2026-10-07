@@ -1,1 +1,243 @@
-{}
+{
+  "or": "lub",
+  "favorites": "Ulubione",
+  "start": "Start",
+  "finish": "Zakończ",
+  "min": "min",
+  "button": {
+    "sign_in": "Zaloguj się",
+    "sign_up": "Zarejestruj się",
+    "edit": "Edytuj",
+    "logout": "Wyloguj się",
+    "link_copy_profile": "Skopiuj link do swojego profilu",
+    "random": "Losuj",
+    "remove": "Usuń"
+  },
+  "google_button": {
+    "sign_in": "Zaloguj się przez Google",
+    "sign_up": "Zarejestruj się przez Google"
+  },
+  "input": {
+    "login": "Login",
+    "password": "Hasło",
+    "repeat_password": "Powtórz hasło",
+    "email": "E-mail"
+  },
+  "loading": {
+    "subtitle": "Wczytywanie...",
+    "loading_text": "Wczytywanie..."
+  },
+  "nav": {
+    "profile": "Profil",
+    "leadboard": "Ranking",
+    "discord": "Discord",
+    "faq": "FAQ",
+    "exercise": "Ćwiczenia",
+    "report": "Raport",
+    "songs": "Utwory",
+    "challenges": "Wyzwania"
+  },
+  "day_since": {
+    "no_practice": "Jeszcze nie ćwiczyłeś",
+    "practice_last_24": "Ćwiczyłeś dzisiaj",
+    "practice_yesterday": "Ćwiczyłeś wczoraj",
+    "practice_day": "Ostatnie ćwiczenie: {{days}} dni temu",
+    "actual_streak": "Obecna seria:"
+  },
+  "discord_event": {
+    "active": "Aktywny",
+    "deadline": "Termin:",
+    "join_us": "Dołącz do naszej społeczności na Discordzie i weź udział w wydarzeniu",
+    "join_us_offline": "Dołącz do naszej społeczności na Discordzie i zaproponuj albo zagłosuj na kolejne wydarzenie",
+    "link": "Link do materiału:",
+    "offline": "Na Discordzie nie trwa obecnie żadne wydarzenie",
+    "data_none": "Brak:",
+    "get": "zdobył",
+    "points": "pkt"
+  },
+  "header": {
+    "hey": "Hej",
+    "lvl_short": "poz.",
+    "earned_points": "Zdobyłeś punkty",
+    "your_level": "Poziom",
+    "points": "Punkty",
+    "points_short": "pkt",
+    "practice_today": "Ćwiczysz dzisiaj?",
+    "total_practice_time": "Łączny czas"
+  },
+  "logsBox": {
+    "logs": "Dziennik",
+    "events": "Wydarzenia",
+    "lvl_up": "Awans na",
+    "lvl": "poz.",
+    "achievement": "Osiągnięcie",
+    "achievements": "Osiągnięcia:",
+    "get": "zdobył",
+    "points": "pkt",
+    "top_players": "Ranking sezonu",
+    "level": "Poziom",
+    "days_left": "dni do końca"
+  },
+  "calendar": {
+    "title": "Kalendarz aktywności",
+    "monday": "Pon",
+    "thursday": "Czw",
+    "sunday": "Nd",
+    "points": "Punkty",
+    "technique": "Technika",
+    "theory": "Teoria",
+    "hearing": "Słuch",
+    "creativity": "Kreatywność",
+    "backDate": "Raport z datą wsteczną",
+    "hasTitle": "Raport z tytułem"
+  },
+  "sort": {
+    "sort_by": "Sortuj według:",
+    "points": "Punkty",
+    "time": "Czas",
+    "session_count": "Liczba sesji"
+  },
+  "tooltip": {
+    "totalTime": "Łączny czas",
+    "points": "Punkty",
+    "sessions": "Sesje",
+    "habits": "Nawyki",
+    "userNotFound": "Nie znaleziono użytkownika",
+    "actual_streak": "Seria",
+    "fame_description": "Punkty Fame dostajesz za otrzymane polubienia i aktywność w społeczności.",
+    "viewProfile": "Zobacz profil"
+  },
+  "song_status": {
+    "move_to": "Przenieś do",
+    "remove": "Usuń",
+    "add": "Dodaj",
+    "learned": "nauczył się utworu",
+    "learning": "uczy się utworu",
+    "wantToLearn": "dodał utwór do listy utworów do nauczenia",
+    "added": "dodał utwór do swojej listy utworów",
+    "difficulty_rate": "ocenił trudność utworu",
+    "practiced": "ćwiczył utwór",
+    "updated": "zaktualizował postęp w utworze"
+  },
+  "chart": {
+    "activity_overview": "Przegląd aktywności",
+    "showing_activity": "Dane aktywności z wybranego okresu",
+    "time_ranges": {
+      "all_time": "Cały okres",
+      "last_3_months": "Ostatnie 3 miesiące",
+      "last_30_days": "Ostatnie 30 dni",
+      "last_7_days": "Ostatnie 7 dni"
+    },
+    "categories": {
+      "technique": "Technika",
+      "theory": "Teoria",
+      "hearing": "Słuch",
+      "creativity": "Kreatywność",
+      "mixed": "Mieszane"
+    }
+  },
+  "skills": {
+    "alternate_picking": "Kostkowanie naprzemienne",
+    "legato": "Legato",
+    "sweep_picking": "Sweep picking",
+    "chord_theory": "Teoria akordów",
+    "scales": "Skale",
+    "rhythm": "Rytm",
+    "ear_training": "Kształcenie słuchu",
+    "sight_reading": "Czytanie a vista",
+    "improvisation": "Improwizacja",
+    "composition": "Kompozycja",
+    "harmony": "Harmonia",
+    "vibrato": "Wibrato",
+    "music_theory": "Teoria muzyki",
+    "slide_guitar": "Gra slide",
+    "audio_production": "Produkcja audio",
+    "hybrid_picking": "Kontrola kostki",
+    "transcription": "Transkrypcja",
+    "picking": "Kostkowanie",
+    "finger_independence": "Niezależność palców",
+    "string_skipping": "Przeskakiwanie strun",
+    "technique": "Technika",
+    "phrasing": "Frazowanie",
+    "articulation": "Artykulacja",
+    "chords": "Akordy",
+    "bending": "Podciąganie strun",
+    "tapping": "Tapping",
+    "harmony-ear": "Harmonia ze słuchu"
+  },
+  "back": "Wstecz",
+  "next": "Dalej",
+  "search": {
+    "placeholder": "Szukaj..."
+  },
+  "filters": {
+    "category": "Kategoria",
+    "all": "Wszystkie",
+    "difficulty": "Trudność"
+  },
+  "difficulty": {
+    "beginner": "Początkujący",
+    "easy": "Łatwy",
+    "medium": "Średni",
+    "hard": "Trudny"
+  },
+  "categories": {
+    "technique": "Technika",
+    "theory": "Teoria",
+    "creativity": "Kreatywność",
+    "hearing": "Słuch",
+    "mixed": "Mieszane"
+  },
+  "minutes": "minut",
+  "cancel": "Anuluj",
+  "select": "Wybierz",
+  "details": "Szczegóły",
+  "timer_status": {
+    "active": "Aktywny",
+    "paused": "Wstrzymany"
+  },
+  "finish_session": "Zakończ sesję",
+  "next_step": "Następny krok",
+  "skip": "Dalej",
+  "practice": {
+    "congratulations": "Gratulacje!",
+    "completed_session": "Ukończyłeś sesję treningową:",
+    "practice_again": "Ćwicz ponownie",
+    "finish": "Zakończ",
+    "exit": "Wyjdź",
+    "finish_plan_early": "Zakończ plan wcześniej",
+    "finish_plan_early_title": "Zakończyć plan wcześniej?",
+    "finish_plan_early_description": "Plan zakończy się teraz, a zapisany zostanie czas, który już przećwiczyłeś. Pozostałe ćwiczenia z planu przepadną.",
+    "finish_plan_early_action": "Zakończ i zapisz czas",
+    "finish_plan_early_disabled_skill": "Ukończ całe ćwiczenie, zanim zakończysz plan wcześniej",
+    "finish_plan_early_disabled_time": "Ćwicz co najmniej 20 s, zanim zakończysz plan wcześniej",
+    "finish_early": {
+      "action": "Zakończ wcześniej",
+      "title": "Zakończyć wcześniej?",
+      "description": "Nie musisz grać tego do samego końca. Zakończenie teraz zachowuje każdą przećwiczoną minutę — po prostu ćwiczenie nie zostanie uznane za ukończone.",
+      "kept_title": "Twój czas ćwiczeń jest zapisany",
+      "kept_description": "Minuty i tak trafią do dziennika ćwiczeń i liczą się do serii, statystyk i dziennych zadań.",
+      "lost_title": "Nic z tego podejścia nie jest punktowane",
+      "lost_description": "Bez punktów umiejętności, bez rekordu, bez wpisu w rankingu, a ćwiczenie nie zostanie oznaczone jako ukończone. Zagraj je do końca, żeby to wszystko zdobyć.",
+      "confirm": "Zakończ wcześniej i zapisz czas",
+      "blocked": "Ćwicz co najmniej 20 sekund, zanim sesję będzie można zapisać.",
+      "hint": "Kończy wcześniej — tylko czas, bez punktacji"
+    }
+  },
+  "video": "Wideo",
+  "confirm_delete": "Czy na pewno chcesz usunąć ten plan?",
+  "create": "Utwórz",
+  "success": "Sukces",
+  "error": "Błąd",
+  "cookies": {
+    "title": "Ciasteczka",
+    "description": "Używamy ciasteczek, aby zapewnić Ci jak najlepsze działanie strony i analizować ruch.",
+    "accept": "Akceptuję"
+  },
+  "pwa": {
+    "install_title": "Zainstaluj Riff Quest",
+    "install_description_android": "Dodaj aplikację do telefonu",
+    "install_description_ios": "Stuknij Udostępnij i „Do ekranu początkowego”",
+    "install_button": "Pobierz"
+  }
+}

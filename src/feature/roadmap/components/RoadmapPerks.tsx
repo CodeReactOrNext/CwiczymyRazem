@@ -5,6 +5,8 @@ import {
   SUPPORTER_WELCOME_TOKENS,
   TOKENS_PER_DOLLAR,
 } from "feature/supporterPanel/constants/supporterPanel.constants";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { ArrowRight, Guitar, Map, Package, Shield, Target } from "lucide-react";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
@@ -68,6 +70,7 @@ const PERKS: Perk[] = [
 ];
 
 export const RoadmapPerks = () => {
+  const { t } = useTranslation("supporter");
   return (
     <section className='relative overflow-hidden rounded-lg bg-zinc-900/40 p-5 sm:p-7'>
       {/* Amber, the colour the app already spends on supporters (the badge, the
@@ -86,19 +89,17 @@ export const RoadmapPerks = () => {
         <div className='min-w-0 max-w-2xl'>
           <h2 className='flex items-center gap-2.5 text-base font-semibold text-zinc-100'>
             <SupportToken size={18} />
-            What you get
+            {t("perks.title")}
           </h2>
           <p className='mt-1.5 text-sm leading-relaxed text-zinc-400'>
-            Supporting turns into tokens: {SUPPORTER_WELCOME_TOKENS} land with
-            the badge and {TOKENS_PER_DOLLAR} more for every dollar after that.
-            They never expire, and they buy a say over what gets built.
+            {t("perks.tokens", { welcome: SUPPORTER_WELCOME_TOKENS, perDollar: TOKENS_PER_DOLLAR })}
           </p>
         </div>
 
         <Link
           href='/supporter'
           className='group flex shrink-0 items-center gap-1.5 rounded-lg bg-amber-500/15 px-4 py-2.5 text-sm font-semibold text-amber-300 transition-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50 hover:bg-amber-500/25'>
-          Open the supporter panel
+          {t("perks.open_panel")}
           <ArrowRight
             size={16}
             className='transition-transform duration-300 group-hover:translate-x-0.5'
@@ -109,13 +110,30 @@ export const RoadmapPerks = () => {
       {/* Plain rows, not tiles: six tinted boxes were the loudest thing on the
           page, and on a phone they nested a card inside a card. */}
       <ul className='relative mt-8 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3'>
-        {PERKS.map(({ icon: Icon, title, body }) => (
+        {PERKS.map(({ icon: Icon, title, body }, i) => (
           <li key={title} className='flex gap-3.5'>
             <Icon size={18} className='mt-0.5 shrink-0 text-amber-400' />
             <div className='min-w-0'>
-              <p className='text-sm font-semibold text-zinc-100'>{title}</p>
+              <p className='text-sm font-semibold text-zinc-100'>{t(`perks.items.${i}.title`, title)}</p>
               <p className='mt-1 text-sm leading-relaxed text-zinc-400'>
-                {body}
+                {typeof body === "string" ? (
+                  t(`perks.items.${i}.body`, body)
+                ) : (
+                  <Interpolate
+                    text={t("perks.discord_body")}
+                    values={{
+                      discord: (
+                        <a
+                          href={DISCORD_INVITE_URL}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='text-amber-300 underline decoration-amber-500/40 underline-offset-2 transition-colors hover:text-amber-200 hover:decoration-amber-400'>
+                          Discord
+                        </a>
+                      ),
+                    }}
+                  />
+                )}
               </p>
             </div>
           </li>

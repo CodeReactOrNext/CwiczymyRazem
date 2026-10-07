@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
+import { useTranslation } from "hooks/useTranslation";
 import { Heart } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
@@ -24,6 +25,7 @@ export const FavoriteExerciseButton = ({
   compact = false,
   className,
 }: FavoriteExerciseButtonProps) => {
+  const { t } = useTranslation("plans");
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
@@ -41,9 +43,9 @@ export const FavoriteExerciseButton = ({
     <button
       type="button"
       onClick={handleClick}
-      aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      aria-label={isFavorite ? t("remove_favorite") : t("add_favorite")}
       aria-pressed={isFavorite}
-      title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      title={isFavorite ? t("remove_favorite") : t("add_favorite")}
       className={cn(
         "flex shrink-0 items-center justify-center rounded-lg ring-1 transition-colors duration-300",
         compact ? "h-6 w-6" : "h-9 w-9",

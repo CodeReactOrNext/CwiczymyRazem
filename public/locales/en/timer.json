@@ -53,7 +53,8 @@
     "mastery_0": "Not learned",
     "mastery_1": "Bad",
     "mastery_2": "Medium",
-    "mastery_3": "Mastered"
+    "mastery_3": "Mastered",
+    "mastery_4": "Skip"
   },
   "rating_summary": "Practice Summary",
   "reset_button": "Reset",
@@ -86,5 +87,31 @@
     "disclaimer": "We don't verify these are accurate — think of it as a starting point. You can rename, move, or delete any section afterward, and this can change at any time.",
     "import": "Import sections",
     "not_now": "Not now"
+  },
+  "choose_practising": "Choose what you are practising",
+  "back_to_practice": "Back to Practice",
+  "saving": "Saving...",
+  "practised_away": "Practised away from the timer?",
+  "log_manually": "Log the time manually",
+  "song_timer": {
+    "shortcuts": "Shortcuts",
+    "key_space": "Space",
+    "play_pause": "Play/Pause",
+    "mark_section": "Mark section",
+    "toggle_loop": "Toggle loop",
+    "seek": "Seek 5s",
+    "practice_notes": "Practice notes",
+    "lines": "{{count}} / 300 lines",
+    "notes_placeholder": "Add your practice notes here... (e.g. settings, tips for difficult parts, gear used)"
+  },
+  "youtube_player": {
+    "paste_new": "Paste a new YouTube link",
+    "paste": "Paste a YouTube link",
+    "placeholder": "e.g. youtube.com/watch?v=…",
+    "save": "Save",
+    "suggestions": "Pick from suggestions",
+    "speed": "Speed",
+    "unlock": "Unlock editing",
+    "lock": "Lock editing"
   }
 }

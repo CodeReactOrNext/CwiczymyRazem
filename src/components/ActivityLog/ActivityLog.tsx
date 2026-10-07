@@ -64,7 +64,7 @@ export const ActivityLogView = ({
   datasWithReports,
   isLoading,
 }: ActivityLogViewProps) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation(["common", "ui"]);
 
   const [hoveredItem, setHoveredItem] = useState<DateWithReport | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
@@ -237,7 +237,7 @@ export const ActivityLogView = ({
                   href={`/practice-log?date=${getLocalDateKey(selectedDay.date)}`}
                   className="mt-4 flex items-center justify-center gap-1.5 rounded-lg border border-[#e8e4db] bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:bg-black/[0.06] hover:text-stone-900"
                 >
-                  Open in Practice Log
+                  {t("ui:open_in_practice_log")}
                   <ArrowRight size={14} />
                 </Link>
               </>

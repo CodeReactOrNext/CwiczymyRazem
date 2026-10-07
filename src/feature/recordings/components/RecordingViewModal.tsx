@@ -8,6 +8,8 @@ import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMuta
 import { getComments } from "feature/recordings/services/comments.service";
 import { getRecordingById } from "feature/recordings/services/getRecordings";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import {
   Calendar,
   Heart,
@@ -32,6 +34,8 @@ export const RecordingViewModal = ({
   recordingId,
   initialRecording,
 }: RecordingViewModalProps) => {
+  const { t } = useTranslation("recordings");
+  const intlLocale = useIntlLocale();
   const [newComment, setNewComment] = useState("");
   const userId = useAppSelector(selectUserAuth);
   const { addComment, isAddingComment, toggleLike } = useRecordingMutations();
@@ -84,7 +88,7 @@ export const RecordingViewModal = ({
         (recording.createdAt as any)?.toDate
           ? (recording.createdAt as any).toDate()
           : recording.createdAt,
-      ).toLocaleDateString()
+      ).toLocaleDateString(intlLocale)
     : "";
 
   return (
@@ -173,7 +177,7 @@ export const RecordingViewModal = ({
                 </div>
               ) : (
                 <div className='py-20 text-center text-zinc-500'>
-                  Recording not found
+                  {t("viewer.not_found")}
                 </div>
               )}
             </div>
@@ -183,7 +187,7 @@ export const RecordingViewModal = ({
               <div className='flex items-center gap-2 p-4'>
                 <MessageSquare className='h-4 w-4 text-cyan-400' />
                 <span className='text-sm font-bold'>
-                  Comments ({comments?.length || 0})
+                  {t("viewer.comments", { count: comments?.length || 0 })}
                 </span>
               </div>
               <div className='space-y-4 p-4'>
@@ -211,7 +215,7 @@ export const RecordingViewModal = ({
                                 (comment.createdAt as any).toDate
                                   ? (comment.createdAt as any).toDate()
                                   : comment.createdAt,
-                              ).toLocaleDateString()
+                              ).toLocaleDateString(intlLocale)
                             : ""}
                         </span>
                       </div>
@@ -223,7 +227,7 @@ export const RecordingViewModal = ({
                 ))}
                 {comments?.length === 0 && (
                   <p className='py-4 text-center text-xs text-zinc-500'>
-                    No comments yet.
+                    {t("viewer.no_comments")}
                   </p>
                 )}
               </div>
@@ -232,7 +236,7 @@ export const RecordingViewModal = ({
                   <Input
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    placeholder='Write a comment...'
+                    placeholder={t("viewer.write_comment")}
                     className='h-10 border-white/10 bg-zinc-900 text-sm'
                     disabled={isAddingComment}
                   />
@@ -259,7 +263,7 @@ export const RecordingViewModal = ({
             <div className='flex items-center gap-2'>
               <MessageSquare className='h-4 w-4 text-cyan-400' />
               <span className='font-bold'>
-                Comments ({comments?.length || 0})
+                {t("viewer.comments", { count: comments?.length || 0 })}
               </span>
             </div>
           </div>
@@ -271,7 +275,7 @@ export const RecordingViewModal = ({
               </div>
             ) : comments?.length === 0 ? (
               <div className='py-12 text-center text-sm italic text-zinc-500'>
-                No comments yet.
+                {t("viewer.no_comments")}
               </div>
             ) : (
               comments?.map((comment) => (
@@ -296,7 +300,7 @@ export const RecordingViewModal = ({
                               (comment.createdAt as any).toDate
                                 ? (comment.createdAt as any).toDate()
                                 : comment.createdAt,
-                            ).toLocaleDateString()
+                            ).toLocaleDateString(intlLocale)
                           : ""}
                       </span>
                     </div>
@@ -314,7 +318,7 @@ export const RecordingViewModal = ({
               <Input
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder='Write a comment...'
+                placeholder={t("viewer.write_comment")}
                 className='h-9 border-white/10 bg-zinc-900 text-sm'
                 disabled={isAddingComment}
               />

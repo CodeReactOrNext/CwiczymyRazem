@@ -1,0 +1,118 @@
+{
+  "view": {
+    "ballot_eyebrow": "Community ballot",
+    "monthly": "Monthly challenge",
+    "vote_title": "Pick next month’s board",
+    "archive_title": "Challenge archive",
+    "vote_subtitle": "The top {{count}} of the {{month}} ballot become the next board.",
+    "archive_subtitle": "Every board that has closed — still browsable, still playable.",
+    "board_subtitle": "Five community-voted songs every month. Record them all to clear it.",
+    "tabs": {
+      "board": "This month",
+      "vote": "Vote",
+      "archive": "Archive"
+    },
+    "not_up_title": "This month’s board isn’t up yet",
+    "not_up_body": "It gets drawn from the community ballot. Head to Vote and put a song forward.",
+    "open_ballot": "Open the ballot",
+    "back_to_archive": "Back to archive"
+  },
+  "hero": {
+    "live_subtitle": "Voted in by the community — record all {{count}} to clear it",
+    "closed_subtitle": "Closed — runs still land on the board, but pay no points or fame",
+    "closes_today": "closes today",
+    "day_left": "{{count}} day left",
+    "days_left": "{{count}} days left",
+    "closed": "closed",
+    "points_per_run": "points per run",
+    "fame_per_run": "fame per run",
+    "fame_full_board": "fame for the full board",
+    "your_runs": "Your runs",
+    "player": "{{count}} player",
+    "players": "{{count}} players",
+    "cleared": "{{count}} cleared"
+  },
+  "board": {
+    "listen": "Listen to {{title}} by {{artist}}",
+    "vote": "{{count}} vote",
+    "votes": "{{count}} votes",
+    "done": "Done",
+    "submit": "Submit",
+    "cleared": "Board cleared",
+    "final_stop": "Final stop",
+    "bonus_yours": "Every song recorded — the {{bonus}} fame bonus is yours.",
+    "clean_sweep": "Every song recorded — a clean sweep of the archive.",
+    "one_more_month": "{{count}} more run to clear the month",
+    "more_month": "{{count}} more runs to clear the month",
+    "one_more_board": "{{count}} more run to clear this board",
+    "more_board": "{{count}} more runs to clear this board"
+  },
+  "archive": {
+    "empty_title": "No archive yet",
+    "empty_body": "Once this month closes it lands here, with every run that made it onto the board.",
+    "songs_runs": "{{songs}} songs · {{runs}} runs",
+    "cleared_it": "{{count}} cleared it"
+  },
+  "submit": {
+    "title": "Submit your run",
+    "youtube_link": "YouTube link",
+    "bad_link": "That doesn’t look like a YouTube link — use one like youtube.com/watch?v=… or youtu.be/…",
+    "link_hint": "Like youtube.com/watch?v=… or youtu.be/… — unlisted videos work, private ones won’t play for others.",
+    "title_label": "Title",
+    "notes": "Notes",
+    "optional": "optional",
+    "notes_placeholder": "Gear, tempo, what you struggled with…",
+    "points": "points",
+    "fame": "fame",
+    "clear_bonus": "clear bonus",
+    "last_song": "This is your last song on the board.",
+    "closed_board": "This board is closed, so the run earns {{none}} — it just takes its place in the archive.",
+    "no_rewards": "no points or fame",
+    "visibility": "Everyone can watch it in this song’s runs, the activity feed and your Recordings. One run per song, so send the take you’re happy with.",
+    "cancel": "Cancel",
+    "submit_run": "Submit run"
+  },
+  "runs": {
+    "nobody": "Nobody has taken this one on yet — be first.",
+    "count_one": "{{count}} run on {{artist}}",
+    "count": "{{count}} runs on {{artist}}",
+    "you": "you",
+    "tap_hint": "Tap a run to watch it, leave a comment or drop a like.",
+    "empty": "No runs yet. Record it, post the link, and take the first slot.",
+    "open_song": "Open “{{title}}” in the song board"
+  },
+  "preview": {
+    "no_spotify": "No Spotify track on this one — look it up on YouTube",
+    "backed": "Backed",
+    "back": "Back this song",
+    "open_board": "Open on the song board"
+  },
+  "ballot": {
+    "put_up_by": "put up by {{name}}",
+    "voted_by": "Voted by:",
+    "out_of_votes": "You've used all {{count}} votes this month.",
+    "rules": "You get {{votes}} per month. Put a song up or back one that’s already on the ballot — nominating spends a vote too. When the month turns, the top {{top}} become the new challenge. Ties go to whoever proposed it first.",
+    "votes_count": "{{count}} votes",
+    "nominate": "Nominate a song",
+    "votes_left_of": "{{left}} of {{total}} votes left",
+    "sign_in": "Sign in to vote",
+    "empty_title": "The ballot is empty",
+    "empty_body": "Nothing has been put up for {{month}} yet. First nomination sets the tone.",
+    "below_cut": "below the cut — needs more votes to make the board",
+    "vote_left": "{{count}} vote left",
+    "votes_left": "{{count}} votes left",
+    "pick_existing": "Picking a song that’s already on the ballot just adds your vote to it."
+  },
+  "toast": {
+    "archive_cleared": "Archive board cleared! Late runs don't pay points or fame.",
+    "archive_added": "Run added to the archive — no points or fame for a closed board.",
+    "accepted_fame_only": "Recording accepted — +{{fame}} fame. Points stop after {{count}} songs on one board.",
+    "board_cleared": "Board cleared! +{{points}} points and +{{fame}} fame",
+    "accepted": "Recording accepted — +{{points}} points, +{{fame}} fame",
+    "already_submitted": "You already have a recording on that song.",
+    "submit_failed": "Couldn't submit your recording. Try again.",
+    "nominated": "Nominated — your vote is on it.",
+    "nominate_failed": "Couldn't add that nomination.",
+    "vote_failed": "Couldn't register your vote."
+  }
+}

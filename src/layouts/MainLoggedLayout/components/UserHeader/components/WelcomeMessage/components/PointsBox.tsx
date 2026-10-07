@@ -5,9 +5,11 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 
 export const PointsBox = () => {
+  const { t } = useTranslation("nav");
   const userStats = useAppSelector(selectCurrentUserStats);
   const points = userStats?.points || 0;
 
@@ -23,7 +25,7 @@ export const PointsBox = () => {
           </div>
         </TooltipTrigger>
         <TooltipContent className='max-w-[200px] text-center'>
-          <p>Points are earned by completing exercises and practice sessions — they track your overall progress.</p>
+          <p>{t("points_tooltip")}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

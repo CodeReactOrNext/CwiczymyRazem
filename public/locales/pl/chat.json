@@ -1,1 +1,75 @@
-{}
+{
+  "send": "Wyślij",
+  "send_placeholder": "Napisz wiadomość...",
+  "like": "Lubię to",
+  "validation_too_long": "Wiadomość nie może przekraczać 2000 znaków.",
+  "error": "Nie udało się wysłać wiadomości",
+  "empty_room": {
+    "title": "Nikt jeszcze nic nie napisał",
+    "guild": "Bądź pierwszy — przywitaj się z gildią.",
+    "everyone": "Bądź pierwszy — przywitaj się ze wszystkimi.",
+    "say_hi": "Przywitaj się 👋"
+  },
+  "greetings": {
+    "welcome": "Witaj! 👋",
+    "hi_guild": "Cześć, gildio! 👋",
+    "hi_everyone": "Cześć wszystkim! 👋"
+  },
+  "welcome_goal": {
+    "plan_named": "zaczyna od planu {{plan}}",
+    "plan": "zaczyna od planu ćwiczeń",
+    "songs": "chce uczyć się utworów",
+    "roadmap": "buduje roadmapę ćwiczeń",
+    "journey": "zaczyna Ścieżkę nauki",
+    "log": "chce zapisywać swoje ćwiczenia"
+  },
+  "system": {
+    "and": "i",
+    "and_other": "i {{count}} inna osoba",
+    "and_others": "i inni (+{{count}})",
+    "said_hi": "przywitali się",
+    "say_hi": "Przywitaj się",
+    "joined_with": "Dołączył(a) do Riff Quest, {{phrase}}",
+    "joined": "Dołączył(a) do Riff Quest",
+    "reached_level": "osiąga poziom",
+    "cleared": "Zaliczone: {{quests}}",
+    "joined_guild": "Dołączył(a) do gildii"
+  },
+  "attachment": {
+    "kinds": {
+      "exercise": "Ćwiczenie",
+      "plan": "Plan",
+      "song": "Utwór",
+      "recording": "Nagranie"
+    },
+    "play": "Graj",
+    "open": "Otwórz",
+    "watch": "Obejrzyj",
+    "guitar": "Gitara",
+    "pedal": "Efekt",
+    "share_title": "Udostępnij na czacie",
+    "tabs": {
+      "exercise": "Ćwiczenie",
+      "plan": "Plan",
+      "song": "Moje utwory",
+      "recording": "Moje nagrania",
+      "item": "Mój sprzęt"
+    },
+    "search": "Szukaj…",
+    "loading": "Ładowanie…",
+    "empty": "Nie ma tu jeszcze nic do udostępnienia."
+  },
+  "composer": {
+    "replying_to": "Odpowiadasz:",
+    "cancel_reply": "Anuluj odpowiedź",
+    "sharing": "Udostępniasz",
+    "remove_attachment": "Usuń załącznik",
+    "mention": "Oznacz kogoś",
+    "share": "Udostępnij ćwiczenie, utwór albo przedmiot",
+    "send": "Wyślij"
+  },
+  "reactions": {
+    "react_with": "Zareaguj: {{emoji}}",
+    "reply": "Odpowiedz"
+  }
+}

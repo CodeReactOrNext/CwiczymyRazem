@@ -50,9 +50,12 @@ export const challengeWindow = (
   };
 };
 
-export const challengeMonthLabel = (challengeId: string): string => {
+export const challengeMonthLabel = (
+  challengeId: string,
+  locale: string = "en-US",
+): string => {
   const { startsAt } = challengeWindow(challengeId);
-  return startsAt.toLocaleDateString("en-US", {
+  return startsAt.toLocaleDateString(locale, {
     month: "long",
     year: "numeric",
     timeZone: "UTC",

@@ -1,0 +1,26 @@
+{
+  "back": "Zurück",
+  "forward": "Vorwärts",
+  "dashboard": "Dashboard",
+  "minimize": "Minimieren",
+  "maximize": "Maximieren",
+  "restore": "Wiederherstellen",
+  "close": "Schließen",
+  "menu": {
+    "cut": "Ausschneiden",
+    "copy": "Kopieren",
+    "paste": "Einfügen",
+    "select_all": "Alles auswählen",
+    "copy_link": "Linkadresse kopieren"
+  },
+  "update_required": {
+    "title": "Update erforderlich",
+    "body": "Diese Desktop-App (v{{version}}) ist zu alt, um weiter mit riff.quest zu funktionieren. Lade die neueste Version herunter, um fortzufahren.",
+    "download": "Neueste Version herunterladen"
+  },
+  "tuner": {
+    "title": "Stimmgerät",
+    "in_use": "Der Eingang wird von deiner Übungssession genutzt — nimm dort den Stimmgerät-Button.",
+    "opening": "Audio-Interface wird geöffnet…"
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "spacing": "Odstępy",
+  "spacing_hint": "Jak daleko od siebie stoją nuty w takcie i między strunami.",
+  "note_spacing": "Odstęp nut",
+  "string_spacing": "Odstęp strun",
+  "fret_numbers": "Numery progów",
+  "size": "Rozmiar",
+  "default_view": "Widok domyślny",
+  "default_view_hint": "Który widok otwiera się automatycznie po rozpoczęciu sesji ćwiczeń.",
+  "metronome_sound": "Dźwięk metronomu",
+  "metronome_sound_hint": "Stuknij, aby odsłuchać. Używany w odliczaniu i w widoku tabulatury; widok nut ma własny klik AlphaTab.",
+  "note_pills": "Kształt nut",
+  "note_pills_hint": "Kształt bloczków z numerami progów i sposób rysowania długości nuty.",
+  "string_palette": "Kolory strun",
+  "string_palette_hint": "Jeden kolor na strunę, zaczynając od wysokiej e.",
+  "hit_colour": "Kolor trafienia",
+  "hit_colour_hint": "Wypełnia nutę, gdy poprawnie ją wybrzmiewasz.",
+  "board_background": "Tło planszy",
+  "board_background_hint": "Kolor pod pięciolinią, marginesem i wygaszeniem.",
+  "visible_elements": "Widoczne elementy",
+  "visible_elements_hint": "Ukryj warstwy, których nie potrzebujesz, żeby odciążyć zapis.",
+  "handedness": "Ręczność",
+  "handedness_hint": "Dla leworęcznych. Działa wszędzie na tym urządzeniu.",
+  "mirror": "Odbij diagramy gryfu",
+  "mirror_desc": "Siodełko po prawej w ćwiczeniach klikania i polowania. Tabulatura nie ma osi gryfu do odbicia, więc zostaje bez zmian.",
+  "rtl": "Plansza od prawej do lewej",
+  "rtl_desc": "Tabulatura zaczyna się przy prawej krawędzi, a kursor biegnie w lewo, jak na odbitym gryfie. Tylko tabulatura; widok nut zachowuje normalny kierunek.",
+  "flip": "Odwróć kolejność strun",
+  "flip_desc": "Niska E na górnej linii — dla praworęcznej gitary nawleczonej odwrotnie. Tylko tabulatura; widok nut zachowuje standardową kolejność.",
+  "feedback": "Informacja zwrotna",
+  "hit_animations": "Animacje trafień",
+  "hit_animations_desc": "Błysk i fala uderzeniowa, gdy nuta trafi",
+  "timing_hints": "Podpowiedzi timingu",
+  "timing_hints_desc": "„Za wcześnie”, „Za późno” albo zielony plus nad nutą przy trafieniu, a spóźniona nuta wypełnia się od miejsca, w którym ją zagrałeś. Timing i tak liczy się do wyniku.",
+  "ambient_glow": "Poświata mikrofonu",
+  "ambient_glow_desc": "Poświata pod tabulaturą reagująca na głośność gry",
+  "reset": "Resetuj ustawienia tabulatury",
+  "sizing": "Rozmiar",
+  "sizing_hint": "Własny zoom i odstępy nut AlphaTab — niezależne od suwaków płaskiej tabulatury powyżej.",
+  "zoom": "Powiększenie",
+  "board": "Plansza",
+  "board_hint": "Kolor planszy z nutami.",
+  "dark_score": "Ciemne nuty",
+  "dark_score_desc": "Czarna plansza z białą pięciolinią i nutami zamiast białego papieru",
+  "toggles": {
+    "rhythm_lane": "Pas rytmu",
+    "rhythm_lane_desc": "Laseczki, belki i pauzy nad pięciolinią",
+    "chord_names": "Nazwy akordów",
+    "chord_names_desc": "Białe etykiety akordów nad taktem",
+    "tuning_gutter": "Margines stroju",
+    "tuning_gutter_desc": "Przypięte nazwy strun po lewej",
+    "measure_lines": "Kreski taktowe",
+    "measure_lines_desc": "Pionowe podziały taktów",
+    "technique": "Oznaczenia technik",
+    "technique_desc": "H/P, podciągnięcia, PM, wibrato, flażolety, kostkowanie ⊓/⋁"
+  },
+  "views": {
+    "tab": {
+      "label": "Tabulatura",
+      "desc": "Klasyczna tabulatura gryfu"
+    },
+    "notation": {
+      "label": "Nuty",
+      "desc": "Standardowy zapis nutowy"
+    }
+  },
+  "fret_text": {
+    "black": {
+      "label": "Czarny",
+      "desc": "Atrament na jasnych bloczkach"
+    },
+    "white": {
+      "label": "Biały",
+      "desc": "Do ciemniejszych palet"
+    },
+    "auto": {
+      "label": "Auto",
+      "desc": "Dopasowuje się do jasności bloczka"
+    }
+  },
+  "note_styles": {
+    "headTail": {
+      "label": "Główka + ogon",
+      "desc": "Pełna główka, cienki ogon wybrzmienia"
+    },
+    "bar": {
+      "label": "Pełny pasek",
+      "desc": "Jeden blok na całą długość"
+    }
+  },
+  "pills": {
+    "capsule": {
+      "label": "Kapsułka",
+      "desc": "W pełni zaokrąglone końce"
+    },
+    "rounded": {
+      "label": "Zaokrąglony",
+      "desc": "Miękkie rogi"
+    },
+    "sharp": {
+      "label": "Ostry",
+      "desc": "Prawie kwadratowy, techniczny"
+    },
+    "chunky": {
+      "label": "Masywny",
+      "desc": "Wyższy i grubszy"
+    }
+  },
+  "palettes": {
+    "rainbow": {
+      "label": "Tęcza",
+      "desc": "Jeden odcień na strunę"
+    },
+    "stringCode": {
+      "label": "Kod strun",
+      "desc": "Niska E czerwona, wysoka e fioletowa"
+    },
+    "ocean": {
+      "label": "Ocean",
+      "desc": "Chłodne błękity i fiolety"
+    },
+    "sunset": {
+      "label": "Zachód słońca",
+      "desc": "Ciepłe czerwienie aż po złoto"
+    },
+    "forest": {
+      "label": "Las",
+      "desc": "Zielenie i turkusy"
+    },
+    "neon": {
+      "label": "Neon",
+      "desc": "Maksymalny kontrast na ciemnej planszy"
+    },
+    "pastel": {
+      "label": "Pastel",
+      "desc": "Łagodniejsze tony, lżejsze przy długich sesjach"
+    },
+    "poster": {
+      "label": "Plakat",
+      "desc": "Płaskie kolory druku, matowe i wyraziste"
+    },
+    "vintage": {
+      "label": "Vintage",
+      "desc": "Przykurzone, wyblakłe tony jak stary plakat"
+    },
+    "colorblind": {
+      "label": "Dla daltonistów",
+      "desc": "Okabe–Ito, rozróżnialne dla większości typów"
+    },
+    "mono": {
+      "label": "Mono",
+      "desc": "Odcienie szarości — liczy się pozycja, nie kolor"
+    }
+  },
+  "backgrounds": {
+    "midnight": {
+      "label": "Północ",
+      "desc": "Domyślna prawie czerń"
+    },
+    "black": {
+      "label": "Czysta czerń",
+      "desc": "Najgłębszy kontrast, przyjazna dla OLED"
+    },
+    "charcoal": {
+      "label": "Grafit",
+      "desc": "Rozjaśniona szarość, mniej oślepia"
+    },
+    "navy": {
+      "label": "Granat",
+      "desc": "Chłodna niebieska czerń"
+    },
+    "plum": {
+      "label": "Śliwka",
+      "desc": "Ciepła fioletowa czerń"
+    },
+    "paper": {
+      "label": "Papier",
+      "desc": "Ciepła biel jak w druku"
+    },
+    "white": {
+      "label": "Biel",
+      "desc": "Zwykła biała kartka"
+    },
+    "sepia": {
+      "label": "Sepia",
+      "desc": "Postarzały papier, mało odblasków"
+    }
+  },
+  "hit_colors": {
+    "emerald": "Szmaragd",
+    "cyan": "Cyjan",
+    "amber": "Bursztyn",
+    "white": "Biel",
+    "magenta": "Magenta",
+    "lime": "Limonka"
+  },
+  "view_menu": {
+    "hint": "Zmień sposób wyświetlania ćwiczenia",
+    "view": "Widok"
+  }
+}

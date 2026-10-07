@@ -86,7 +86,7 @@ interface PlanSelectorProps {
 }
 
 export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelectorProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common", "practice_hub"]);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
@@ -162,7 +162,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
         onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
         onToggleFavorite={userAuth ? () => handleToggleFavorite(plan.id) : undefined}
         isFavorite={favoritePlanIds.includes(plan.id)}
-        startButtonText="Open plan"
+        startButtonText={t("practice_hub:plans.open_plan")}
         isLoading={loadingPlanId === plan.id}
       />
     );
@@ -287,15 +287,15 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                   className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-4"
                 >
                   <ArrowLeft size={16} />
-                  <span className="text-sm font-medium">Back</span>
+                  <span className="text-sm font-medium">{t("practice_hub:back")}</span>
                 </button>
               )}
               <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as (typeof PLAN_TABS)[number]); setCategoryFilter("all"); }} className="w-full">
               <TabsList className={tabNavListClass}>
-                <RippleTabsTrigger value="routines" icon={<Music size={16} />} label="Featured" isActive={activeTab === "routines"} />
-                <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label="Playalongs" isActive={activeTab === "playalongs"} tooltip="Practice along with a real song at your own pace" />
-                <RippleTabsTrigger value="my_plans" icon={<Flame size={16} />} label="My Plans" isActive={activeTab === "my_plans"} />
-                <RippleTabsTrigger value="community" icon={<Globe size={16} />} label="Community" isActive={activeTab === "community"} />
+                <RippleTabsTrigger value="routines" icon={<Music size={16} />} label={t("practice_hub:plans.featured")} isActive={activeTab === "routines"} />
+                <RippleTabsTrigger value="playalongs" icon={<Zap size={16} />} label={t("practice_hub:plans.playalongs")} isActive={activeTab === "playalongs"} tooltip={t("practice_hub:plans.playalongs_tooltip")} />
+                <RippleTabsTrigger value="my_plans" icon={<Flame size={16} />} label={t("practice_hub:plans.my_plans")} isActive={activeTab === "my_plans"} />
+                <RippleTabsTrigger value="community" icon={<Globe size={16} />} label={t("practice_hub:plans.community")} isActive={activeTab === "community"} />
               </TabsList>
 
               <TabsContent value="routines" className="mt-6 focus-visible:outline-none space-y-8">
@@ -330,7 +330,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                           onPreview={locked ? undefined : () => setPreviewPlan(plan)}
                           onStart={locked ? undefined : () => handleStartPlan(plan.id)}
                           onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
-                          startButtonText="Open plan"
+                          startButtonText={t("practice_hub:plans.open_plan")}
                           isLoading={loadingPlanId === plan.id}
                         />
                       );
@@ -342,8 +342,8 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
               <TabsContent value="community" className="mt-6 focus-visible:outline-none space-y-8">
                 {communityPlans.length === 0 ? (
                   <div className='rounded-lg p-12 text-center bg-zinc-900/30'>
-                    <p className='text-zinc-400 text-sm'>No community plans published yet.</p>
-                    <p className='text-zinc-500 text-xs mt-2'>Go to My Plans and publish one of your plans to share it here.</p>
+                    <p className='text-zinc-400 text-sm'>{t("practice_hub:no_community_plans")}</p>
+                    <p className='text-zinc-500 text-xs mt-2'>{t("practice_hub:publish_hint")}</p>
                   </div>
                 ) : (
                   <motion.div
@@ -358,7 +358,7 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                         onSelect={() => handleStartPlan(plan.id)}
                         onPreview={() => setPreviewPlan(plan)}
                         onStart={() => handleStartPlan(plan.id)}
-                        startButtonText="Open plan"
+                        startButtonText={t("practice_hub:plans.open_plan")}
                         isLoading={loadingPlanId === plan.id}
                       />
                     ))}

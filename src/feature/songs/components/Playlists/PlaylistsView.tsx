@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
@@ -55,6 +56,7 @@ export const PlaylistsView = ({
   onPracticeSong,
   onOpenSong,
 }: PlaylistsViewProps) => {
+  const { t } = useTranslation("playlists");
   const userAuth = useAppSelector(selectUserAuth);
 
   const [tab, setTab] = useState<PlaylistTab>("mine");
@@ -154,16 +156,16 @@ export const PlaylistsView = ({
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500">
             <ListMusic size={26} />
           </div>
-          <h3 className="mb-1 text-lg font-bold text-white">Playlist not available</h3>
+          <h3 className="mb-1 text-lg font-bold text-white">{t("view.not_available")}</h3>
           <p className="max-w-xs text-sm text-zinc-500">
-            It may have been deleted, or it’s private and only its owner can open it.
+            {t("view.not_available_body")}
           </p>
           <Button
             variant="ghost"
             onClick={() => onOpenPlaylist(null)}
             className="mt-6 h-10 bg-white/5 px-5 font-bold text-zinc-300 hover:bg-white/10 hover:text-white"
           >
-            Back to playlists
+            {t("view.back")}
           </Button>
         </div>
       );
@@ -215,7 +217,7 @@ export const PlaylistsView = ({
     <div className="space-y-8 p-4 sm:p-6 md:p-10 animate-in fade-in-50 duration-300">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="space-y-3">
-          <h1 className="text-2xl font-bold text-white">Playlists</h1>
+          <h1 className="text-2xl font-bold text-white">{t("view.title")}</h1>
           <div className="flex w-fit rounded-xl bg-zinc-900/50 p-1">
             <button
               type="button"
@@ -229,7 +231,7 @@ export const PlaylistsView = ({
             >
               <Ripple />
               <ListMusic size={14} className={tab === "mine" ? "text-white" : ""} />
-              Your playlists
+              {t("view.yours")}
             </button>
             <button
               type="button"
@@ -246,7 +248,7 @@ export const PlaylistsView = ({
             >
               <Ripple />
               <Compass size={14} className={tab === "discover" ? "text-white" : ""} />
-              Discover
+              {t("view.discover")}
             </button>
           </div>
         </div>
@@ -258,7 +260,7 @@ export const PlaylistsView = ({
           >
             <span className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
-              New playlist
+              {t("view.new")}
             </span>
           </Button>
         )}
@@ -272,10 +274,9 @@ export const PlaylistsView = ({
         </div>
       ) : tab === "mine" && myPlaylists.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-14 text-center">
-          <h3 className="mb-2 text-xl font-bold text-white">Make your first playlist</h3>
+          <h3 className="mb-2 text-xl font-bold text-white">{t("view.first_title")}</h3>
           <p className="mb-8 max-w-sm text-sm text-zinc-400">
-            Group songs into anything — a mood, a set for the next jam, a learning
-            roadmap or a top 10 you’d defend in an argument.
+            {t("view.first_body")}
           </p>
           <div className="mb-8 grid w-full max-w-2xl gap-3 sm:grid-cols-3">
             {(Object.keys(KIND_META) as (keyof typeof KIND_META)[]).map((k) => {
@@ -287,9 +288,9 @@ export const PlaylistsView = ({
                   className="flex flex-col items-start gap-2 rounded-xl bg-white/[0.03] p-4 text-left"
                 >
                   <Icon className="h-4 w-4 text-zinc-400" />
-                  <p className="text-sm font-bold text-white">{meta.label}</p>
+                  <p className="text-sm font-bold text-white">{t(`kinds.${k}.label`, meta.label)}</p>
                   <p className="text-xs font-medium leading-snug text-zinc-500">
-                    {meta.tagline}
+                    {t(`kinds.${k}.tagline`, meta.tagline)}
                   </p>
                 </div>
               );
@@ -301,7 +302,7 @@ export const PlaylistsView = ({
           >
             <span className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
-              Create one
+              {t("view.create_one")}
             </span>
           </Button>
         </div>
@@ -310,10 +311,9 @@ export const PlaylistsView = ({
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500">
             <ListMusic size={26} />
           </div>
-          <h3 className="mb-1 text-lg font-bold text-white">Nothing public yet</h3>
+          <h3 className="mb-1 text-lg font-bold text-white">{t("view.nothing_public")}</h3>
           <p className="max-w-xs text-sm text-zinc-500">
-            When players share their playlists, they’ll show up here. Make one of
-            yours public to get things going.
+            {t("view.nothing_public_body")}
           </p>
         </div>
       ) : (
@@ -328,9 +328,9 @@ export const PlaylistsView = ({
               <div className="flex aspect-square w-full items-center justify-center rounded-md bg-white/[0.04] text-zinc-500 transition-colors group-hover:text-white">
                 <Plus className="h-8 w-8" />
               </div>
-              <p className="pt-3 text-base font-bold text-white">New playlist</p>
+              <p className="pt-3 text-base font-bold text-white">{t("view.new")}</p>
               <p className="mt-1 text-xs font-medium text-zinc-500">
-                Playlist, path or top 10
+                {t("view.kinds_hint")}
               </p>
             </button>
           )}

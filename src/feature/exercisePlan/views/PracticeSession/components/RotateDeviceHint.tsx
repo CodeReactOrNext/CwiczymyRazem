@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { MdScreenRotation } from "react-icons/md";
 
 /**
@@ -8,6 +9,7 @@ import { MdScreenRotation } from "react-icons/md";
  * the user rotates manually.
  */
 export const RotateDeviceHint = () => {
+  const { t } = useTranslation("session");
   const handleClick = async () => {
     try {
       await document.documentElement.requestFullscreen?.();
@@ -25,8 +27,8 @@ export const RotateDeviceHint = () => {
     >
       <MdScreenRotation className="h-5 w-5 shrink-0 text-cyan-400" />
       <span className="flex flex-col gap-0.5 leading-tight">
-        <span className="text-xs font-bold text-cyan-300">Rotate your phone</span>
-        <span className="text-[11px] font-medium text-zinc-400">Wider tab, bigger controls</span>
+        <span className="text-xs font-bold text-cyan-300">{t("rotate.title")}</span>
+        <span className="text-[11px] font-medium text-zinc-400">{t("rotate.body")}</span>
       </span>
     </button>
   );

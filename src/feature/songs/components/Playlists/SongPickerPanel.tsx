@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { addSong } from "feature/songs/services/addSong";
@@ -164,6 +165,7 @@ export const SongPickerPanel = ({
   allowCreate = false,
   className,
 }: SongPickerPanelProps) => {
+  const { t } = useTranslation("playlists");
   const userId = useAppSelector(selectUserAuth);
   const avatar = useAppSelector(selectUserAvatar);
 
@@ -299,7 +301,7 @@ export const SongPickerPanel = ({
       onAdd(song);
     } catch (error) {
       console.error("Adding a new song from the playlist picker failed:", error);
-      toast.error("Couldn't add that song to the library.");
+      toast.error(t("errors.add_to_library"));
     } finally {
       setPendingId(null);
     }
@@ -315,7 +317,7 @@ export const SongPickerPanel = ({
           <Search className="h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white" />
         </div>
         <Input
-          placeholder={allowCreate ? "Search for a song or artist..." : "Search the library..."}
+          placeholder={allowCreate ? t("picker.search_create") : t("picker.search_library")}
           value={searchQuery}
           onChange={(e) => handleQueryChange(e.target.value)}
           className="h-11 w-full border-none bg-zinc-900/60 pl-10 text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10"
@@ -332,7 +334,7 @@ export const SongPickerPanel = ({
             )}
             {!isSearching && !hasAnyResult && (
               <p className="px-2 py-6 text-center text-xs font-medium text-zinc-500">
-                Nothing found — try a different title or artist.
+                {t("picker.nothing_found")}
               </p>
             )}
             {results.map((song) => (
@@ -348,7 +350,7 @@ export const SongPickerPanel = ({
             {allowCreate && (newSongs.length > 0 || showTypedRow) && (
               <>
                 <p className="px-2 pb-1 pt-4 text-xs font-bold text-zinc-500">
-                  Not in the library yet — adds it there too
+                  {t("picker.not_in_library")}
                 </p>
                 {newSongs.map((s) => (
                   <NewSongRow
@@ -364,7 +366,7 @@ export const SongPickerPanel = ({
                 {showTypedRow && typedSong && (
                   <NewSongRow
                     title={typedSong.title}
-                    subtitle={`${typedSong.artist} · add as typed, no cover art`}
+                    subtitle={t("picker.add_as_typed", { artist: typedSong.artist })}
                     isPending={pendingId === MANUAL_ROW_ID}
                     disabled={!canCreate}
                     onAdd={() =>
@@ -377,14 +379,14 @@ export const SongPickerPanel = ({
 
             {allowCreate && !isSearching && !typedSong && (
               <p className="px-2 pb-2 pt-4 text-xs text-zinc-600">
-                Can’t find it? Type it as “Artist - Title” to add it as typed.
+                {t("picker.cant_find")}
               </p>
             )}
           </>
         ) : suggestions.length > 0 ? (
           <>
             <p className="px-2 pb-1 pt-1 text-xs font-bold text-zinc-500">
-              From your collection
+              {t("picker.from_collection")}
             </p>
             {suggestions.map((song) => (
               <SongPickerRow
@@ -399,8 +401,8 @@ export const SongPickerPanel = ({
         ) : (
           <p className="px-2 py-6 text-center text-xs font-medium text-zinc-500">
             {allowCreate
-              ? "Type at least two characters to search for a song."
-              : "Type at least two characters to search the song library."}
+              ? t("picker.min_chars_create")
+              : t("picker.min_chars_library")}
           </p>
         )}
       </div>

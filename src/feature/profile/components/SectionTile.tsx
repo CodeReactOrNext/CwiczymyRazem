@@ -4,6 +4,7 @@ import { cn } from "assets/lib/utils";
 import type { WidgetSize } from "feature/dashboard/types/dashboard.types";
 import type { ProfileSectionDefinition } from "feature/profile/data/profileSectionCatalog";
 import type { ProfileSectionPlacement } from "feature/profile/types/profileLayout.types";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowDown,
   ArrowUp,
@@ -50,6 +51,7 @@ export const SectionTile = ({
   onResize,
   children,
 }: SectionTileProps) => {
+  const { t } = useTranslation("profile");
   const {
     attributes,
     listeners,
@@ -84,8 +86,8 @@ export const SectionTile = ({
         type='button'
         {...attributes}
         {...listeners}
-        aria-label={`Move ${definition.title}`}
-        title='Drag to move'
+        aria-label={t("tile.move", { title: definition.title })}
+        title={t("tile.drag")}
         className={cn(controlButton, "cursor-grab touch-none active:cursor-grabbing")}>
         <GripVertical size={18} />
       </button>
@@ -101,8 +103,8 @@ export const SectionTile = ({
           type='button'
           disabled={isFirst}
           onClick={() => onMove(-1)}
-          aria-label={`Move ${definition.title} up`}
-          title='Move up'
+          aria-label={t("tile.move_up_aria", { title: definition.title })}
+          title={t("tile.move_up")}
           className={controlButton}>
           <ArrowUp size={16} />
         </button>
@@ -110,8 +112,8 @@ export const SectionTile = ({
           type='button'
           disabled={isLast}
           onClick={() => onMove(1)}
-          aria-label={`Move ${definition.title} down`}
-          title='Move down'
+          aria-label={t("tile.move_down_aria", { title: definition.title })}
+          title={t("tile.move_down")}
           className={controlButton}>
           <ArrowDown size={16} />
         </button>
@@ -121,10 +123,10 @@ export const SectionTile = ({
             onClick={() => onResize(isFull ? "half" : "full")}
             aria-label={
               isFull
-                ? `Make ${definition.title} half width`
-                : `Make ${definition.title} full width`
+                ? t("tile.make_half", { title: definition.title })
+                : t("tile.make_full", { title: definition.title })
             }
-            title={isFull ? "Half width" : "Full width"}
+            title={isFull ? t("tile.half") : t("tile.full")}
             className={controlButton}>
             {isFull ? <Columns2 size={16} /> : <RectangleHorizontal size={16} />}
           </button>
@@ -132,8 +134,8 @@ export const SectionTile = ({
         <button
           type='button'
           onClick={onRemove}
-          aria-label={`Hide ${definition.title}`}
-          title='Hide from profile'
+          aria-label={t("tile.hide_aria", { title: definition.title })}
+          title={t("tile.hide")}
           className={controlButton}>
           <EyeOff size={16} />
         </button>

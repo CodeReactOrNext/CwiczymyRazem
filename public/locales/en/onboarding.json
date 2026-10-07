@@ -1,0 +1,101 @@
+{
+  "back": "Back",
+  "skip": "Skip for now",
+  "progress": "Setup progress",
+  "close": "Close",
+  "level_step": {
+    "title": "How long have you been playing?",
+    "description": "So we only show you what fits where you are."
+  },
+  "goal_step": {
+    "title": "What brings you to Riff Quest?",
+    "description": "Pick where to start. Everything else stays one click away."
+  },
+  "plan_step": {
+    "title": "Pick a plan to start with",
+    "description": "Short routines where the timer walks you through each exercise. Nothing starts until you press Play — with the mic for live feedback, or without it.",
+    "open": "Open plan",
+    "browse_all": "Browse all {{count}} plans"
+  },
+  "levels": {
+    "new": {
+      "unit": "year",
+      "label": "I'm just starting",
+      "description": "First chords, or I haven't picked up a guitar yet"
+    },
+    "some": {
+      "unit": "years",
+      "label": "I know the basics",
+      "description": "Chords and simple songs, I want to get better"
+    },
+    "experienced": {
+      "unit": "years",
+      "label": "I've played for years",
+      "description": "Comfortable on the neck, I want to keep improving"
+    }
+  },
+  "goals": {
+    "journey": {
+      "label": "Follow the Learning Path",
+      "description": "Learn guitar from scratch, one step at a time"
+    },
+    "plans": {
+      "label": "Practice with exercise plans",
+      "description": "Ready-made routines with a timer that guides you"
+    },
+    "songs": {
+      "label": "Learn songs and track them",
+      "description": "Save songs you want to play and see your progress"
+    },
+    "roadmap": {
+      "label": "Follow a roadmap to a goal",
+      "description": "A step-by-step path, like playing in the style of your hero"
+    },
+    "log": {
+      "label": "Log the practice I already do",
+      "description": "Track your time, streak and progress"
+    }
+  },
+  "checklist": {
+    "title": "Getting Started",
+    "intro": "2-min intro",
+    "dismiss": "Dismiss getting started checklist",
+    "claim": "Claim {{badge}}",
+    "first_session": "First session",
+    "first_song": "First song",
+    "second_day": "Practice a 2nd day",
+    "first_guitar": "First guitar",
+    "after_first": "After your first session",
+    "tomorrow": "Available tomorrow",
+    "play_today": "Play today to finish",
+    "open_case": "Open a case"
+  },
+  "intro": {
+    "title": "Welcome to Riff Quest",
+    "description": "Two minutes on what this is and how it works.",
+    "cta": "Got it"
+  },
+  "first_song": {
+    "title": "Add a song you want to play",
+    "description": "Keep track of songs you want to learn, are learning, or already know.",
+    "step1": "Go to the Songs page and click this button:",
+    "add_button": "Add New Song",
+    "step2": "Type the artist and title of any song you'd love to play. Already in the library? Just pick the match. Not there yet? No problem — you're adding it:",
+    "artist": "Artist",
+    "song_title": "Song Title",
+    "step3": "Tell the app where this song is on your journey. Later you can practice it section by section and watch your mastery grow:",
+    "want": "Want to Learn",
+    "want_sub": "Save for later inspiration",
+    "learning": "Learning",
+    "learning_sub": "Focus on this song today",
+    "learned": "Learned",
+    "learned_sub": "Mastered and in repertoire",
+    "cta": "Browse songs"
+  },
+  "reward": {
+    "title": "Draw your first guitar",
+    "description": "You played your first session — claim your Fame and open a case.",
+    "body": "That's exactly enough to open a case in the Arsenal. Claim it and you'll land there ready to pick your guitar.",
+    "cta": "Claim & choose your guitar"
+  }
+}

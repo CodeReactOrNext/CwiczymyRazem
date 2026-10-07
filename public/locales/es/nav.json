@@ -1,0 +1,146 @@
+{
+  "home": "Inicio",
+  "practice": "Práctica",
+  "songs": "Canciones",
+  "my_stuff": "Mis cosas",
+  "progress": "Progreso",
+  "activity": "Actividad",
+  "milestones": "Hitos",
+  "milestones_tooltip": "Recompensas semanales por cumplir objetivos de práctica",
+  "community": "Comunidad",
+  "rankings": "Clasificaciones",
+  "challenges": "Retos",
+  "challenges_tooltip": "Cinco canciones votadas por la comunidad para grabar cada mes",
+  "recordings": "Grabaciones",
+  "recordings_tooltip": "Comparte tus covers y escucha lo que graban los demás",
+  "guilds": "Gremios",
+  "guilds_tooltip": "Practica junto a otras personas: chat y un reto semanal",
+  "arsenal": "Arsenal",
+  "tone_studio": "Tone Studio",
+  "supporter": "Mecenas",
+  "support": "Apoyar",
+  "supporter_tooltip": "Propón ideas y usa tus votos para decidir qué se construye después",
+  "support_tooltip": "Qué te da apoyar el proyecto y cómo hacerlo",
+  "knowledge_base": "Base de conocimiento",
+  "knowledge_base_tooltip": "Cómo funciona cada parte de la app, en lenguaje sencillo",
+  "settings": "Ajustes",
+  "discord": "Discord",
+  "discord_tooltip": "Únete al servidor de la comunidad",
+  "practice_routines": "Rutinas de práctica",
+  "auto_plan": "Plan automático",
+  "free_timer": "Temporizador libre",
+  "manual_log": "Registro manual",
+  "guitar_pro_files": "Archivos Guitar Pro",
+  "skills": "Habilidades",
+  "exercises": "Ejercicios",
+  "mastery_roadmaps": "Mastery Roadmaps",
+  "learning_path": "Ruta de aprendizaje",
+  "scale_map": "Mapa de escalas",
+  "scale_map_tooltip": "Desbloquea escalas en el mástil rama a rama",
+  "board": "Tablero",
+  "explore": "Explorar",
+  "playlists": "Playlists",
+  "favorites": "Favoritos",
+  "my_plans": "Mis planes",
+  "my_exercises": "Mis ejercicios",
+  "create_plan": "Crear plan",
+  "create_exercise": "Crear ejercicio",
+  "locked_until_level": "Bloqueado hasta el nivel {{level}}",
+  "opens_at_level": "Se desbloquea en el nivel {{level}}",
+  "unclaimed_reward": "Recompensa sin reclamar",
+  "collapse_section": "Contraer {{name}}",
+  "expand_section": "Desplegar {{name}}",
+  "get_desktop_app": "Descarga la app de escritorio",
+  "sign_out": "Cerrar sesión",
+  "sign_out_confirm": "¿Seguro que quieres cerrar sesión?",
+  "cancel": "Cancelar",
+  "log_out": "Cerrar sesión",
+  "see_your_profile": "Ver tu perfil",
+  "account_menu": "Menú de la cuenta",
+  "open_menu": "Abrir menú",
+  "more": "Más",
+  "points_tooltip": "Los puntos se ganan completando ejercicios y sesiones de práctica: reflejan tu progreso general.",
+  "weekday_letters": "L,M,X,J,V,S,D",
+  "search": {
+    "button": "Buscar...",
+    "title": "Buscar",
+    "description": "Busca en tus planes, ejercicios y canciones",
+    "placeholder": "Buscar planes, ejercicios, canciones...",
+    "start_typing": "Empieza a escribir para buscar en tus planes, ejercicios y canciones.",
+    "no_results": "Sin resultados para «{{query}}».",
+    "group_plans": "Planes",
+    "group_exercises": "Ejercicios",
+    "group_songs": "Canciones"
+  },
+  "reset": {
+    "aria": "Hora del servidor y lo próximo que se reinicia",
+    "server_time_short": "hora del servidor",
+    "scope_server": "servidor",
+    "scope_local": "tu hora",
+    "next_in": "{{label}} en {{time}}",
+    "tooltip_hint": "El día de juego empieza a las 00:00 UTC para todos. Haz clic para ver la lista completa.",
+    "dialog_title": "Hora del servidor · {{time}} UTC",
+    "dialog_description": "Todo lo que comparten los jugadores funciona con un solo reloj, así que un plazo significa lo mismo estés donde estés. La excepción es tu racha de práctica: sigue tu propia medianoche.",
+    "entries": {
+      "daily": {
+        "label": "Reinicio diario",
+        "detail": "Un nuevo bonus diario de Fame."
+      },
+      "trader": {
+        "label": "Reposición del comerciante",
+        "detail": "El comerciante vacía el mostrador y saca género nuevo."
+      },
+      "case-pool": {
+        "label": "Caja destacada",
+        "detail": "Nuevas guitarras y efectos entran en la caja diaria."
+      },
+      "weekly": {
+        "label": "Objetivos semanales",
+        "detail": "El objetivo de la comunidad y los retos de gremio empiezan una nueva semana."
+      },
+      "supporter-slate": {
+        "label": "Cajas de mecenas",
+        "detail": "Un nuevo par de cajas de mecenas sale a votación."
+      },
+      "monthly": {
+        "label": "Temporada y reto mensual",
+        "detail": "La clasificación se reinicia y se abre un nuevo tablero de retos."
+      },
+      "streak": {
+        "label": "Tu día de práctica",
+        "detail": "Las misiones diarias sacan un nuevo lote y la racha pide una sesión antes: esto sigue tu zona horaria, no la del servidor."
+      }
+    }
+  },
+  "page_tabs": {
+    "favorites": {
+      "label": "Favoritos"
+    },
+    "plans": {
+      "label": "Mis planes"
+    },
+    "my_exercises": {
+      "label": "Mis ejercicios"
+    },
+    "profile_activity": {
+      "label": "Actividad"
+    },
+    "practice_log": {
+      "label": "Registro de práctica"
+    },
+    "profile_achievements": {
+      "label": "Logros"
+    },
+    "seasons": {
+      "label": "Temporadas"
+    },
+    "leaderboard": {
+      "label": "Clasificación"
+    },
+    "leaderboard_gear": {
+      "label": "Equipo",
+      "tooltip": "Clasificado por la guitarra equipada y el nivel del rig, no por la puntuación de práctica"
+    }
+  },
+  "language_wip": "La traducción está en curso — algunas partes pueden seguir en inglés."
+}

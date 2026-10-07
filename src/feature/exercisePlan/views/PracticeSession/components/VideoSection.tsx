@@ -1,4 +1,5 @@
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
+import { useTranslation } from "hooks/useTranslation";
 import { memo } from "react";
 
 interface VideoSectionProps {
@@ -26,6 +27,7 @@ export const VideoSection = memo(function VideoSection({
   setTimerTime,
   onVideoEnd,
 }: VideoSectionProps) {
+  const { t } = useTranslation("session");
   if (isPlayalong && youtubeVideoId && !isMobileView) {
     return (
       <div className="w-full max-w-6xl mx-auto">
@@ -54,14 +56,14 @@ export const VideoSection = memo(function VideoSection({
           <iframe
             className="h-full w-full"
             src={`https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1`}
-            title="YouTube video player"
+            title={t("video.player")}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-zinc-800 text-zinc-500">
-            Video not available
+            {t("video.unavailable")}
           </div>
         )}
       </div>

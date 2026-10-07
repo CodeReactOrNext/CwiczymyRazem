@@ -9,6 +9,7 @@ import {
   MIN_LEARNED_SONGS_FOR_TIER,
 } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { useTranslation } from "hooks/useTranslation";
 
 interface SongTierBadgeProps {
   /** Learned songs of the profile owner. Undefined once the fetch has failed. */
@@ -40,6 +41,7 @@ export const SongTierBadge = ({
   isOwnProfile = false,
   onClick,
 }: SongTierBadgeProps) => {
+  const { t } = useTranslation("profile");
   const learned = learnedSongs ?? [];
   const skillPower = getGatedSkillPower(learned);
   const tier = getSongTier(skillPower > 0 ? skillPower : "?");
@@ -52,36 +54,36 @@ export const SongTierBadge = ({
   // A failed fetch has no repertoire to judge, so it is answered before the
   // "not enough songs yet" wording — otherwise an outage reads as an empty
   // song board.
+  const moreSongs = (key: "more" | "learn_own" | "learn_other") =>
+    t(`tier_badge.${key}${songsToUnlock === 1 ? "_one" : ""}`, { count: songsToUnlock });
+  const howItWorks = t("tier_badge.how_it_works", HOW_IT_WORKS);
+
   const subLabel = isError
-    ? "Unavailable"
+    ? t("tier_badge.unavailable")
     : hasTier
       ? tier.label
       : songsToUnlock > 0
-        ? `${songsToUnlock} more song${songsToUnlock > 1 ? "s" : ""}`
-        : "No rated songs";
+        ? moreSongs("more")
+        : t("tier_badge.no_rated");
 
   const tooltip = isLoading
-    ? "Loading the song tier…"
+    ? t("tier_badge.loading")
     : isError
-      ? "These songs could not be loaded, so there is no tier to show. Refreshing usually fixes it."
+      ? t("tier_badge.error")
       : hasTier
-        ? `${HOW_IT_WORKS}${isOwnProfile ? " Click to see your song board." : ""}`
+        ? `${howItWorks}${isOwnProfile ? ` ${t("tier_badge.click_board")}` : ""}`
         : songsToUnlock > 0
-          ? `${
-              isOwnProfile
-                ? `Learn ${songsToUnlock} more song${songsToUnlock > 1 ? "s" : ""} to unlock your tier.`
-                : `${songsToUnlock} more learned song${songsToUnlock > 1 ? "s" : ""} needed before a tier shows up.`
-            } ${HOW_IT_WORKS}`
+          ? `${isOwnProfile ? moreSongs("learn_own") : moreSongs("learn_other")} ${howItWorks}`
           : `${
               isOwnProfile
-                ? "None of your learned songs are rated yet, so there is no tier to work out."
-                : "None of these learned songs are rated yet, so there is no tier to work out."
-            } ${HOW_IT_WORKS}`;
+                ? t("tier_badge.none_rated_own")
+                : t("tier_badge.none_rated_other")
+            } ${howItWorks}`;
 
   const content = (
     <>
       <span className='text-[10px] font-semibold tracking-widest text-zinc-400'>
-        Song tier
+        {t("tier_badge.label")}
       </span>
       {isLoading ? (
         <div className='h-14 w-14 shrink-0 animate-pulse rounded-xl bg-zinc-800/60' />

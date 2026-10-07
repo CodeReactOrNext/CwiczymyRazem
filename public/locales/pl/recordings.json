@@ -1,0 +1,60 @@
+{
+  "toast": {
+    "added": "Nagranie dodane!",
+    "add_failed": "Nie udało się dodać nagrania.",
+    "comment_added": "Komentarz dodany!",
+    "comment_failed": "Nie udało się dodać komentarza.",
+    "logged_out": "Musisz być zalogowany.",
+    "bad_url": "Wpisz prawidłowy link do YouTube."
+  },
+  "modal": {
+    "edit_title": "Edytuj nagranie",
+    "add_title": "Dodaj nowe nagranie",
+    "which_song": "Jaki to utwór?",
+    "optional": "(opcjonalnie)",
+    "artist": "Wykonawca...",
+    "song_title": "Tytuł utworu...",
+    "search_hint": "Wpisz wykonawcę albo tytuł, żeby przeszukać bibliotekę",
+    "not_in_library": "Nie ma w bibliotece",
+    "saved_as_typed": "Nie szkodzi — zapiszemy dokładnie tak, jak wpisałeś.",
+    "youtube_url": "Link do YouTube *",
+    "title": "Tytuł *",
+    "title_placeholder": "Mój świetny cover",
+    "description": "Opis",
+    "description_placeholder": "Opowiedz o swoim nagraniu...",
+    "cancel": "Anuluj",
+    "save": "Zapisz zmiany",
+    "share": "Udostępnij nagranie"
+  },
+  "card": {
+    "play": "Odtwórz {{title}}",
+    "edit": "Edytuj nagranie",
+    "delete_aria": "Usuń nagranie",
+    "confirm_title": "Na pewno?",
+    "confirm_body": "Tej operacji nie da się cofnąć. Nagranie zostanie trwale usunięte.",
+    "deleting": "Usuwanie...",
+    "delete": "Usuń",
+    "like": "Polub nagranie",
+    "comments": "Zobacz komentarze"
+  },
+  "grid": {
+    "empty_title": "Brak nagrań",
+    "empty_body": "Bądź pierwszy i wrzuć swój cover!"
+  },
+  "view": {
+    "title": "Nagrania",
+    "subtitle": "Odsłuchuj i udostępniaj swoje sesje ćwiczeń",
+    "add": "Dodaj nagranie",
+    "all": "Wszystkie nagrania",
+    "mine": "Moje nagrania"
+  },
+  "viewer": {
+    "not_found": "Nie znaleziono nagrania",
+    "comments": "Komentarze ({{count}})",
+    "no_comments": "Brak komentarzy.",
+    "write_comment": "Napisz komentarz..."
+  },
+  "song_section": {
+    "empty": "Nie ma jeszcze nagrań tego utworu — bądź pierwszy i udostępnij swój cover."
+  }
+}

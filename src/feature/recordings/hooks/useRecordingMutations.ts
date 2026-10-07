@@ -8,21 +8,23 @@ import type {
   RecordingCreateData,
   RecordingUpdateData,
 } from "feature/recordings/types/types";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 
 export const useRecordingMutations = () => {
+  const { t } = useTranslation("recordings");
   const queryClient = useQueryClient();
 
   const addRecordingMutation = useMutation({
     mutationFn: (data: { userId: string; recordingData: RecordingCreateData }) =>
       addRecording(data.userId, data.recordingData),
     onSuccess: () => {
-      toast.success("Recording added successfully!");
+      toast.success(t("toast.added"));
       queryClient.invalidateQueries(["recordings"] as any);
     },
     onError: (error: any) => {
       console.error(error);
-      toast.error("Failed to add recording.");
+      toast.error(t("toast.add_failed"));
     },
   });
 
@@ -40,10 +42,10 @@ export const useRecordingMutations = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries(["comments", variables.recordingId] as any);
       queryClient.invalidateQueries(["recordings"] as any); // Update comment count
-      toast.success("Comment added!");
+      toast.success(t("toast.comment_added"));
     },
     onError: () => {
-      toast.error("Failed to add comment.");
+      toast.error(t("toast.comment_failed"));
     },
   });
 

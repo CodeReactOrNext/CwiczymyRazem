@@ -1,0 +1,51 @@
+{
+  "fret_diagram": "Griffbrett-Diagramm",
+  "toast": {
+    "load_failed": "Fortschritt konnte nicht geladen werden. Bitte lade die Seite neu.",
+    "exam_failed": "Prüfung nicht bestanden — Ergebnis: {{accuracy}} %. Übe mehr und versuch es nochmal!",
+    "exam_passed": "Prüfung bestanden! {{stars}} — {{accuracy}} % Genauigkeit",
+    "step_completed": "Schritt abgeschlossen! 🎸",
+    "save_failed": "Speichern fehlgeschlagen. Bitte versuch es nochmal."
+  },
+  "sidebar": {
+    "status": {
+      "locked": "Gesperrt",
+      "available": "Verfügbar",
+      "in-progress": "In Arbeit",
+      "completed": "Abgeschlossen"
+    },
+    "close": "Schließen",
+    "step": "Schritt {{n}}",
+    "goal": "Ziel",
+    "complete_tasks": "Erledige alle Pflichtaufgaben unten und hake sie ab, um zur nächsten Stufe zu gelangen.",
+    "your_tasks": "Deine Aufgaben",
+    "choose_target": "Wähle ein Ziel",
+    "saving": "Wird gespeichert...",
+    "done_complete": "Fertig & abschließen",
+    "unlock_hint": "Lies den Inhalt und hake alle Kästchen oben ab, um das freizuschalten",
+    "practice": "Üben",
+    "retake": "Wiederholen",
+    "exam": "Prüfung"
+  },
+  "finish": {
+    "in_arsenal": "In deinem Arsenal, mit einer Seriennummer, die sonst niemand hat.",
+    "complete": "Roadmap abgeschlossen — die Gitarre gehört dir.",
+    "steps_left": "Noch {{left}} von {{total}} Schritten, um sie zu verdienen.",
+    "collecting": "Wird abgeholt...",
+    "collect": "Gitarre abholen",
+    "collected": "Abgeholt",
+    "steps": "{{done}}/{{total}} Schritte"
+  },
+  "path": {
+    "modules": "Module"
+  },
+  "modules": {
+    "title": "Lernpfad",
+    "subtitle": "Mach weiter, wo du aufgehört hast, oder spring in ein beliebiges Modul.",
+    "continue": "Weiter",
+    "start": "Starten",
+    "suggest": "Einen Lernpfad vorschlagen",
+    "missing_coming": "Fehlt ein Thema? Als Nächstes kommen {{topics}} — sag uns, was du sonst noch sehen möchtest.",
+    "missing": "Fehlt ein Thema? Sag uns, was du als Nächstes sehen möchtest."
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "levels": {
+    "1": {
+      "name": "Iskra",
+      "req": "1 dzień z 15+ min ćwiczeń w tym tygodniu"
+    },
+    "2": {
+      "name": "Groove",
+      "req": "3 dni z 20+ min w tym tygodniu"
+    },
+    "3": {
+      "name": "Gorąca seria",
+      "req": "3 dni z rzędu po 15+ min"
+    },
+    "4": {
+      "name": "Rozpęd",
+      "req": "5 dni z 15+ min w tym tygodniu"
+    },
+    "5": {
+      "name": "Nie do zatrzymania",
+      "req": "7 dni z rzędu po 15+ min"
+    },
+    "6": {
+      "name": "Wszechstronny",
+      "req": "3 dni w tym tygodniu ze wszystkimi 4 kategoriami po 15+ min"
+    },
+    "7": {
+      "name": "W strefie",
+      "short": "Strefa",
+      "req": "3 dni z rzędu ze wszystkimi 4 kategoriami po 15+ min"
+    },
+    "8": {
+      "name": "Shredder",
+      "req": "5 dni z rzędu ze wszystkimi 4 kategoriami po 15+ min"
+    },
+    "9": {
+      "name": "Wirtuoz",
+      "req": "7 dni z rzędu ze wszystkimi 4 kategoriami po 15+ min"
+    }
+  },
+  "card": {
+    "opens_at": "Otwiera się na poziomie {{lvl}}",
+    "unlock": "Odblokuj · {{cost}} Fame",
+    "claiming": "Odbieranie…",
+    "claim": "Odbierz +{{reward}}",
+    "claimed": "Odebrano",
+    "reward": "+{{reward}} Fame"
+  }
+}

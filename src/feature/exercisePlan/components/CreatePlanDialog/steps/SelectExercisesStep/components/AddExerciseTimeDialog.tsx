@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from 'assets/components/ui/dialog';
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
+import { useTranslation } from "hooks/useTranslation";
 import { useState } from 'react';
 
 import { ExerciseTimeField, parseExerciseMinutes } from './ExerciseTimeField';
@@ -27,6 +28,7 @@ function AddExerciseTimeForm({
   onConfirm: (exercise: Exercise, timeInMinutes: number) => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation("plans");
   const [time, setTime] = useState(String(exercise.timeInMinutes));
   const minutes = parseExerciseMinutes(time);
 
@@ -53,14 +55,14 @@ function AddExerciseTimeForm({
 
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="ghost" className="rounded-[8px] text-zinc-400 hover:text-white hover:bg-white/5 transition-colors font-semibold" onClick={onCancel}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             className="rounded-[8px] bg-white hover:bg-zinc-200 text-black transition-colors font-bold px-6"
             onClick={handleConfirm}
             disabled={minutes === null}
           >
-            Add to plan
+            {t("add_to_plan")}
           </Button>
         </div>
       </div>

@@ -1,1 +1,462 @@
-{}
+{
+  "cta_button": "Mach mit!",
+  "hero_line_1": "Steig in der Rangliste auf.",
+  "hero_line_2": "Sammle Statistiken zu deinen Übungen.",
+  "hero_line_3": "Bekomm Punkte für tägliches Üben.",
+  "hero_line_4": "Mach mit und motivier dich zum Gitarrespielen!",
+  "subtitlebar_text": "Üben, eintragen, Punkte sammeln!",
+  "technique": "Technik",
+  "theory": "Theorie",
+  "hearing": "Gehör",
+  "creativity": "Kreativität",
+  "lvl_short": "Lvl",
+  "your_level": "Level",
+  "points": "Punkte",
+  "points_short": "Pkt.",
+  "profile": "Profil",
+  "statistics": "Statistiken",
+  "band": "Band:",
+  "joined": "Dabei seit:",
+  "stats": {
+    "spent_time": "Gesamtzeit",
+    "num_sessions": "Sessions",
+    "num_points": "Punkte",
+    "num_habbits": "Gesunde Gewohnheiten",
+    "num_achievements": "Erfolge",
+    "longest_session": "Längste Session",
+    "consecutive days": "Längste Serie",
+    "max_points": "Höchste Punktzahl",
+    "learned_music": "Gelernte Songs"
+  },
+  "nav": {
+    "overview": "Überblick",
+    "activity": "Aktivität",
+    "songs": "Songs",
+    "skills": "Fähigkeiten",
+    "exercises": "Übungen"
+  },
+  "cards": {
+    "practice": {
+      "title": "Üben",
+      "description": "Übe regelmäßig, um dein Gitarrenspiel zu verbessern.",
+      "choose": "Übung wählen",
+      "report": "Eintrag"
+    },
+    "songs": {
+      "title": "Songs",
+      "description": "Verwalte Songs, die du lernst oder lernen willst."
+    },
+    "skills": {
+      "title": "Fähigkeiten",
+      "description": "Verfolge deinen Fortschritt und entwickle deine Gitarrenfähigkeiten."
+    },
+    "library": {
+      "title": "Übungsbibliothek",
+      "description": "Entdecke Übungen, die dir beim Gitarrelernen helfen."
+    }
+  },
+  "yearsOfPlaying": "Jahre am Instrument:",
+  "practice_insights": "Übungs-Insights",
+  "insights": {
+    "avg_session": "Ø Session-Länge",
+    "avg_session_desc": "Die typische Dauer deiner Übungssessions",
+    "points_per_hour": "Punkte pro Stunde",
+    "points_per_hour_desc": "Deine Übungseffizienz",
+    "strongest_area": "Stärkster Bereich",
+    "strongest_area_desc": "Wo du die meiste Übungszeit verbringst",
+    "focus_suggestion": "Fokus-Vorschlag",
+    "focus_suggestion_desc": "Bereich, der mehr Aufmerksamkeit brauchen könnte",
+    "focus_technique": "Konzentrier dich auf Technikübungen",
+    "focus_theory": "Konzentrier dich auf Musiktheorie",
+    "focus_hearing": "Konzentrier dich auf Gehörbildung",
+    "focus_creativity": "Konzentrier dich auf kreative Übungen",
+    "focus_balanced": "Bleib bei deinem ausgewogenen Üben",
+    "advice": {
+      "first_steps": "Erfasse deine Übungszeit in allen Bereichen, um persönliche Insights zu bekommen",
+      "complement_technique": "Mit deinem starken technischen Fundament solltest du mehr Theorie und Gehörbildung einbauen",
+      "complement_theory": "Wende dein Theoriewissen in praktischen Übungen und in der Gehörbildung an",
+      "complement_hearing": "Verbinde deine Gehörbildung mit Technikübungen und Theorie",
+      "complement_creativity": "Gleiche dein kreatives Üben mit Technikübungen und Theorie aus",
+      "balance_early_technique": "Bau mehr Technikübungen in deine Routine ein, um ein solides Fundament zu schaffen",
+      "balance_early_theory": "Ergänze etwas Theorie, um zu verstehen, was du übst",
+      "balance_early_hearing": "Nimm Gehörbildungsübungen in deine Übungsroutine auf",
+      "balance_early_creativity": "Ergänze deine Übungsroutine um kreative Übungen",
+      "increase_complexity": "Dein Üben ist gut ausgewogen. Versuch, in jedem Bereich die Komplexität zu steigern",
+      "build_foundation": "Gute Balance! Konzentrier dich auf Regelmäßigkeit und steigere die Übungszeit nach und nach",
+      "technique_foundation_needed": "Gib Technikübungen Vorrang, um ein starkes Fundament aufzubauen",
+      "theory_basics_needed": "Bau grundlegende Theorie ein, um dein Üben zu unterstützen",
+      "steady_progress": "Behalte deinen ausgewogenen Ansatz bei und steigere die Intensität nach und nach",
+      "mastery_level": "Du hast in allen Bereichen ein hohes Niveau erreicht. Konzentrier dich darauf, diese Fähigkeiten in komplexen musikalischen Projekten zu verbinden",
+      "apply_knowledge_creatively": "Du hast ein starkes technisches und theoretisches Fundament. Lenk es in kreativen Ausdruck",
+      "technique_to_theoretical": "Deine Technik ist fortgeschritten. Wenn du die Theorie verstehst, kannst du sie noch wirkungsvoller einsetzen",
+      "technique_specialist": "Dein Techniktraining ist beeindruckend. Wende diese Fähigkeiten in komplexeren Stücken an",
+      "theory_specialist": "Dein Theoriewissen ist fortgeschritten. Versuch dich am Komponieren oder Arrangieren, um es anzuwenden",
+      "hearing_specialist": "Dein Gehör ist außergewöhnlich. Denk über Transkriptionsprojekte oder Unterricht nach Gehör nach",
+      "creativity_specialist": "Deine kreativen Fähigkeiten sind stark. Konzentrier dich darauf, einen eigenen Stil zu entwickeln oder eigene Stücke zu komponieren",
+      "rapid_balanced_progress": "Du machst in allen Bereichen hervorragende Fortschritte. Bleib bei diesem ausgewogenen Ansatz und steigere die Komplexität"
+    }
+  },
+  "seasonal_achievements": {
+    "title": "Saison-Erfolge",
+    "points": "Punkte",
+    "no_achievements": "Noch keine Saison-Erfolge"
+  },
+  "activity": "Aktivität",
+  "detailed_stats": {
+    "title": "Detaillierte Statistiken",
+    "description": "Vollständiger Überblick über deine Erfolge und deinen Lernfortschritt",
+    "songs_title": "Songs",
+    "songs_description": "Lernstatus der Songs in deiner Bibliothek",
+    "records_title": "Rekorde und Erfolge"
+  },
+  "no_songs_title": "Noch keine Songs",
+  "no_songs_description": "Füge deine ersten Songs zur Bibliothek hinzu, um deinen Fortschritt zu verfolgen.",
+  "browse_library": "Bibliothek durchsuchen",
+  "weekly_summary": "Wochenübersicht",
+  "sessions_this_week": "Sessions diese Woche",
+  "recordings_hint": "Auftritte und Übungs-Cover",
+  "days_ago": {
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "days": "vor {{count}} Tagen",
+    "month": "Vor einem Monat",
+    "months": "vor {{count}} Monaten",
+    "year": "Vor einem Jahr",
+    "years": "vor {{count}} Jahren"
+  },
+  "layout": {
+    "sections": {
+      "trophies": {
+        "title": "Trophäenvitrine",
+        "description": "Bis zu fünf Erfolge, auf die du am stolzesten bist, mit ihrer Seltenheit."
+      },
+      "signature-songs": {
+        "title": "Signature-Songs",
+        "description": "Bis zu fünf gelernte Songs, für die du bekannt sein willst."
+      },
+      "about": {
+        "title": "Über mich",
+        "description": "Ein paar Worte über dich, dein Equipment oder deine Ziele."
+      },
+      "insights": {
+        "title": "Übungs-Einblicke",
+        "description": "Durchschnittliche Session-Länge, Punkte pro Stunde, stärkster Bereich."
+      },
+      "activity": {
+        "title": "Aktivität",
+        "description": "Die Übungs-Heatmap über das ganze Jahr."
+      },
+      "statistics": {
+        "title": "Statistiken",
+        "description": "Gesamtzeit, Punkte, Sessions und Skill-Verteilung."
+      },
+      "repertoire": {
+        "title": "Song-Repertoire",
+        "description": "Gelernte Songs nach Schwierigkeitsstufe gruppiert."
+      },
+      "learning": {
+        "title": "Lerne gerade",
+        "description": "Songs, an denen du gerade arbeitest."
+      },
+      "skills": {
+        "title": "Skills",
+        "description": "Freigeschaltete Skills und ihre Level."
+      },
+      "rig": {
+        "title": "Rig",
+        "description": "Deine Gitarren und dein Pedalboard."
+      },
+      "recordings": {
+        "title": "Aufnahmen",
+        "description": "Cover und Übungsvideos, die du hochgeladen hast."
+      },
+      "seasonal": {
+        "title": "Saison-Erfolge",
+        "description": "Abzeichen aus monatlichen Saisons."
+      }
+    },
+    "facts": {
+      "last-practice": "Letzte Übung",
+      "streak": "Serie",
+      "joined": "Dabei seit",
+      "playing-for": "Spielt seit",
+      "band": "Band",
+      "guild": "Gilde",
+      "links": "YouTube / SoundCloud"
+    },
+    "badges": {
+      "level": "Level-Ring",
+      "song-tier": "Song-Tier"
+    },
+    "accents": {
+      "cyan": "Cyan",
+      "emerald": "Smaragd",
+      "amber": "Bernstein",
+      "orange": "Orange",
+      "purple": "Lila"
+    },
+    "accent_unlocks": {
+      "cyan": "Gratis",
+      "emerald": "Gratis",
+      "orange": "Halte eine 15-Tage-Serie (Unendlichkeit)",
+      "amber": "Verdiene einen sehr seltenen Erfolg",
+      "purple": "Verdiene einen epischen Erfolg"
+    },
+    "banners": {
+      "classic": {
+        "label": "Klassisch",
+        "requirement": "Gratis"
+      },
+      "midnight": {
+        "label": "Mitternacht",
+        "requirement": "Gratis"
+      },
+      "stage": {
+        "label": "Bühnenlicht",
+        "requirement": "Trage eine Auftritts-Session ein (Bühnendebüt) oder 100 Sessions"
+      },
+      "on-air": {
+        "label": "On Air",
+        "requirement": "Nimm dein Üben auf (Etwas wurde aufgenommen oder Idee aufnehmen)"
+      },
+      "ember": {
+        "label": "Glut",
+        "requirement": "Verdiene 60 Punkte in einem Bericht (Gitarrenpower)"
+      },
+      "golden-hour": {
+        "label": "Goldene Stunde",
+        "requirement": "Übe 100 Stunden (1 % – 10000-h-Regel)"
+      },
+      "deep-water": {
+        "label": "Tiefes Wasser",
+        "requirement": "Halte eine 15-Tage-Serie oder übe an 100 Tagen"
+      },
+      "amethyst": {
+        "label": "Amethyst",
+        "requirement": "Verdiene einen epischen Erfolg"
+      }
+    },
+    "rarity": {
+      "common": "Gewöhnlich",
+      "rare": "Selten",
+      "veryRare": "Sehr selten",
+      "epic": "Episch"
+    },
+    "titles": {
+      "time_1": "der Fleißige",
+      "time_2": "der Unerschütterliche",
+      "time_3": "der Zehntausend-Stunden-Pilger",
+      "balance": "der goldenen Mitte",
+      "fire": "das Kraftpaket",
+      "health_habits": "der Gesunde",
+      "points_1": "der Oberflächenkratzer",
+      "points_2": "der Akkordvogel",
+      "points_3": "der Froschkönig",
+      "doctor": "der Doktor",
+      "tired": "der Erschöpfte",
+      "diamond": "der Diamantgitarre",
+      "scientist": "der Wissenschaftler",
+      "artist": "der Künstler",
+      "book": "der Gelehrte",
+      "bigear": "das große Ohr",
+      "wizard": "der Zauberer",
+      "medal": "der Dekorierte",
+      "day_1": "der Beständige",
+      "day_2": "der vollen Woche",
+      "day_3": "der Unermüdliche",
+      "session_1": "der Klicker",
+      "session_2": "der Reisende",
+      "session_3": "der Cowboy",
+      "ring": "des Saitenrings",
+      "headphones": "der Zuhörer",
+      "ninja": "der Technik-Krieger",
+      "record": "der Aufnehmer",
+      "vinyl": "die auf Vinyl gepresste Idee",
+      "rightway": "der Aufgewärmte",
+      "yolo": "der Waghalsige",
+      "path": "der Planer",
+      "dumbbel": "der Gewichtheber",
+      "vip": "der Erbauer von Riff Quest",
+      "short": "der Ausdauernde",
+      "event": "der Eventgänger",
+      "lvl100": "das legendäre Plektrum",
+      "fireSession": "der perfekten Session",
+      "batteryHearth": "das Batterieherz",
+      "100days": "der hundert Tage",
+      "bomb": "der Serienretter",
+      "wannaLearn1": "der einsame Krieger",
+      "wannaLearn2": "der Zwiegespaltene",
+      "wannaLearn3": "der Notizbuchfüller",
+      "wannaLearn10": "Verloren in Noten",
+      "wannaLearn30": "der endlosen Wunschliste",
+      "learning1": "der erste Hub",
+      "learning3": "der Latten-Heber",
+      "learning5": "der Antreiber",
+      "learning10": "der musikalischen Muskeln",
+      "learning20": "der Jongleur",
+      "learning30": "der musikalischen Aura",
+      "learned1": "die Herz-Zwei",
+      "learned3": "die Karo-Drei",
+      "learned5": "die Karo-Vier",
+      "learned10": "die Karo-Fünf",
+      "learned20": "die Karo-Sechs",
+      "learned30": "der Karo-Bube",
+      "learned50": "der Karo-König",
+      "learned100": "das Karo-Ass",
+      "performance": "des Bühnendebüts",
+      "rig_50": "des Signalwegs",
+      "rig_150": "der Bühnenreife",
+      "rig_300": "der Studiowand",
+      "rig_500": "der Headliner",
+      "rig_800": "der Wall of Sound",
+      "rig_1000": "der vier Ziffern",
+      "first_rare": "das gewisse Etwas",
+      "first_epic": "der Sammler",
+      "first_legendary": "einer der Großen",
+      "first_mythic": "der Gralshüter",
+      "rarity_full_set": "der vollen Bandbreite",
+      "museum_1": "der Kurator",
+      "museum_5": "der Privatsammlung",
+      "serial_one": "die Nummer eins",
+      "globetrotter": "der Weitgereiste",
+      "vintage_1970": "Älter als der Amp"
+    }
+  },
+  "card_sheet": {
+    "title": "Profilkarte",
+    "description": "Entscheide, was Besucher zuerst sehen. Änderungen werden automatisch gespeichert.",
+    "tabs": {
+      "card": "Karte",
+      "style": "Stil",
+      "title": "Titel",
+      "trophies": "Trophäen",
+      "songs": "Songs"
+    },
+    "tagline": "Slogan",
+    "tagline_placeholder": "Metal-Rhythmusgitarrist auf dem Weg zu 200 bpm",
+    "tagline_hint": "Wird unter deinem Namen angezeigt.",
+    "about": "Über mich",
+    "about_placeholder": "Was du spielst, woran du arbeitest, dein Equipment…",
+    "about_hint": "Wird im Abschnitt Über mich angezeigt.",
+    "facts": "Infos unter deinem Namen",
+    "facts_settings_hint": "Band, Links und das Jahr, in dem du angefangen hast, legst du fest in den",
+    "settings_link": "Einstellungen",
+    "badges": "Abzeichen rechts",
+    "no_achievements": "Du hast noch keine Erfolge. Jeder neue bringt einen Titel und eine Trophäe zur Auswahl hierher.",
+    "title_hint": "Jeder Erfolg bringt einen Titel. Trag einen über deinem Namen — seltenere stehen oben.",
+    "no_title": "Kein Titel",
+    "trophies_hint": "Pinne bis zu {{max}} ({{count}}/{{max}}) in der gewählten Reihenfolge. Ohne Pins zeigt die Vitrine deine seltensten.",
+    "no_songs": "Markiere Songs auf deinem Song-Board als gelernt, dann kannst du sie hier anpinnen.",
+    "songs_hint": "Pinne bis zu {{max}} ({{count}}/{{max}}) gelernte Songs in der gewählten Reihenfolge. Ohne Pins zeigt die Vitrine deine schwersten.",
+    "background": "Hintergrund",
+    "background_hint": "Szenen hinter deinem Header. Jede wird durch einen Erfolg verdient.",
+    "emblem": "Emblem",
+    "emblem_hint": "Eines deiner Erfolgs-Icons, groß in den Header-Hintergrund gestempelt, in seiner Seltenheitsfarbe.",
+    "no_emblem": "Kein Emblem",
+    "none": "Keins",
+    "accent": "Akzentfarbe",
+    "accent_hint": "Farben werden freigeschaltet, wenn du seltenere Erfolge verdienst."
+  },
+  "sections": {
+    "slots": "{{count}}/{{max}} Plätze",
+    "edit_hint": "Ziehen zum Umordnen, blende aus, was du nicht zeigen willst.",
+    "add": "Abschnitt hinzufügen",
+    "reset": "Zurücksetzen",
+    "done": "Fertig",
+    "customize": "Profil anpassen",
+    "empty_owner": "Dein Profil zeigt gerade nur die Karte.",
+    "empty_visitor": "Dieser Spieler hält sein Profil kurz.",
+    "add_title": "Zum Profil hinzufügen",
+    "add_description": "Neue Abschnitte landen unten — zieh sie dorthin, wo sie hingehören.",
+    "add_empty": "Jeder Abschnitt ist schon auf deinem Profil.",
+    "full": "Dein Profil ist voll — {{max}} von {{max}} Plätzen belegt. Blende einen Abschnitt aus, um Platz zu schaffen."
+  },
+  "tile": {
+    "move": "{{title}} verschieben",
+    "drag": "Ziehen zum Verschieben",
+    "move_up_aria": "{{title}} nach oben",
+    "move_up": "Nach oben",
+    "move_down_aria": "{{title}} nach unten",
+    "move_down": "Nach unten",
+    "make_half": "{{title}} halbe Breite",
+    "make_full": "{{title}} volle Breite",
+    "half": "Halbe Breite",
+    "full": "Volle Breite",
+    "hide_aria": "{{title}} ausblenden",
+    "hide": "Vom Profil ausblenden"
+  },
+  "header": {
+    "not_yet": "Noch nicht",
+    "days_one": "{{count}} Tag",
+    "days": "{{count}} Tage",
+    "playing_guitar": "Spielt Gitarre",
+    "years_one": "{{count}} Jahr",
+    "years": "{{count}} Jahre",
+    "eyebrow": "Spielerprofil",
+    "title_from": "Titel aus einem Erfolg · {{rarity}}"
+  },
+  "cases": {
+    "rarest": "Seltenste Erfolge",
+    "hardest": "Schwerste gelernte Songs",
+    "pin_hint": "Pinne eigene unter Profil anpassen → Profilkarte.",
+    "players_rate": "{{rate}} % der Spieler",
+    "title": "Titel: {{title}}",
+    "time_spent": "Mit diesem Song verbrachte Übungszeit"
+  },
+  "tier_badge": {
+    "label": "Song-Tier",
+    "unavailable": "Nicht verfügbar",
+    "no_rated": "Keine bewerteten Songs",
+    "more_one": "Noch {{count}} Song",
+    "more": "Noch {{count}} Songs",
+    "loading": "Song-Tier wird geladen…",
+    "error": "Diese Songs konnten nicht geladen werden, daher gibt es kein Tier. Neu laden hilft meistens.",
+    "how_it_works": "Ein Tier ist ein gewichteter Durchschnitt der schwersten gemeisterten Songs, begrenzt durch die Schwierigkeit des schwersten — ein einzelner schwerer Song hebt niemanden in ein hohes Tier.",
+    "click_board": "Klicke, um dein Song-Board zu sehen.",
+    "learn_own_one": "Lerne noch {{count}} Song, um dein Tier freizuschalten.",
+    "learn_own": "Lerne noch {{count}} Songs, um dein Tier freizuschalten.",
+    "learn_other_one": "Noch {{count}} gelernter Song nötig, bevor ein Tier erscheint.",
+    "learn_other": "Noch {{count}} gelernte Songs nötig, bevor ein Tier erscheint.",
+    "none_rated_own": "Keiner deiner gelernten Songs ist bisher bewertet, daher lässt sich kein Tier berechnen.",
+    "none_rated_other": "Keiner dieser gelernten Songs ist bisher bewertet, daher lässt sich kein Tier berechnen."
+  },
+  "score_tooltip": {
+    "streak": "{{count}}-Tage-Serie",
+    "no_streak": "Noch keine Serie",
+    "earn_now": "Das verdienst du gerade",
+    "per_hour": "Pro Übungsstunde",
+    "per_habit": "Pro abgehakter Gewohnheit",
+    "ladder": {
+      "0": "Tag 1",
+      "1": "Tag 2",
+      "2": "Tag 3",
+      "3": "Tag 4",
+      "4": "Tag 5+"
+    }
+  },
+  "repertoire": {
+    "empty_owner": "Songs landen hier, sobald du sie auf deinem Song-Board als gelernt markierst.",
+    "empty_owner_learning": "Songs landen hier, sobald du sie auf deinem Song-Board als gelernt markierst, und {{count}} sind noch in Arbeit.",
+    "empty_visitor": "Noch keine Songs als gelernt markiert.",
+    "empty_visitor_learning": "Noch keine Songs als gelernt markiert, {{count}} in Arbeit.",
+    "learned": "{{count}} Songs gelernt",
+    "in_progress": "{{count}} in Arbeit"
+  },
+  "week_widget": {
+    "this_week": "Diese Woche",
+    "total": "Gesamt",
+    "practiced": "{{time}} geübt"
+  },
+  "stats_section": {
+    "skills_hint": "Verteilung der Übungszeit nach Kategorie"
+  },
+  "rig": {
+    "level": "Rig-Level",
+    "level_hint": "Gesamtes Rig-Level (ausgerüstete Gitarren + Pedalboard)",
+    "off_board": "Neben dem Board"
+  },
+  "landing": {
+    "great_job": "Super gemacht heute!",
+    "start_today": "Starte das heutige Üben"
+  }
+}

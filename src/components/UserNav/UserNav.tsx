@@ -20,6 +20,7 @@ import {
   selectUserName,
 } from "feature/user/store/userSlice";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -30,6 +31,7 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
  * behind the avatar instead of as a bordered button next to the profile.
  */
 const UserNav = () => {
+  const { t } = useTranslation("nav");
   const dispatch = useAppDispatch();
   const userId = useAppSelector(selectUserAuth);
   const userName = useAppSelector(selectUserName);
@@ -45,7 +47,7 @@ const UserNav = () => {
         <DropdownMenuTrigger asChild>
           <button
             type='button'
-            aria-label='Account menu'
+            aria-label={t("account_menu")}
             className='relative z-30 flex items-center gap-1.5 rounded-lg p-1 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-zinc-800/60'>
             {avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -75,20 +77,20 @@ const UserNav = () => {
           <DropdownMenuItem asChild>
             <Link href={`/user/${userId}`} className='flex items-center gap-2'>
               <User size={14} />
-              See your profile
+              {t("see_your_profile")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href='/settings' className='flex items-center gap-2'>
               <Settings size={14} />
-              Settings
+              {t("settings")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setIsLogoutDialogOpen(true)}
             className='mt-1 flex items-center gap-2 text-zinc-400'>
             <LogOut size={14} />
-            Log out
+            {t("log_out")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -96,9 +98,9 @@ const UserNav = () => {
       <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
         <DialogContent className='border-white/10 bg-zinc-950 text-white sm:max-w-md'>
           <DialogHeader>
-            <DialogTitle>Sign out</DialogTitle>
+            <DialogTitle>{t("sign_out")}</DialogTitle>
             <DialogDescription className='text-zinc-400'>
-              Are you sure you want to sign out?
+              {t("sign_out_confirm")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className='gap-2 sm:gap-0'>
@@ -106,7 +108,7 @@ const UserNav = () => {
               <Button
                 variant='ghost'
                 className='hover:bg-white/10 hover:text-white'>
-                Cancel
+                {t("cancel")}
               </Button>
             </DialogClose>
             <Button
@@ -115,7 +117,7 @@ const UserNav = () => {
                 dispatch(logUserOff());
                 setIsLogoutDialogOpen(false);
               }}>
-              Sign out
+              {t("sign_out")}
             </Button>
           </DialogFooter>
         </DialogContent>

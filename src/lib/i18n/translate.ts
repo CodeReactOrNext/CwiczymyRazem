@@ -125,3 +125,20 @@ export function createTranslator(
     return defaultValue ?? key;
   };
 }
+
+/**
+ * For copy built outside a component (content modules, utils) that keeps its
+ * English inline: with a translator the key is looked up, and a key nobody has
+ * (not even the English catalog) falls back to the inline English. Without one
+ * — tests, server code — the inline English is used as is.
+ */
+export function translateOr(
+  t: Translate | undefined,
+  key: string,
+  english: string,
+  vars?: Record<string, unknown>,
+): string {
+  if (!t) return interpolate(english, vars);
+  const hit = t(key, vars);
+  return hit === key ? interpolate(english, vars) : hit;
+}

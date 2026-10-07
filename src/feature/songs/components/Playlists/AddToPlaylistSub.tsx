@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import {
   DropdownMenuItem,
   DropdownMenuSub,
@@ -29,6 +30,7 @@ import { KIND_META } from "./playlistVisuals";
  * from the playlists memory cache after the first open).
  */
 export const AddToPlaylistSub = ({ song }: { song: Song }) => {
+  const { t } = useTranslation("playlists");
   const router = useRouter();
   const userId = useAppSelector(selectUserAuth);
   const [playlists, setPlaylists] = useState<Playlist[] | null>(null);
@@ -57,10 +59,10 @@ export const AddToPlaylistSub = ({ song }: { song: Song }) => {
         action: "add_song_from_menu",
         playlist_id: playlist.id,
       });
-      toast.success(`Added to “${playlist.name}”`);
+      toast.success(t("added_to", { name: playlist.name }));
     } catch (error) {
       console.error("Failed to add song to playlist:", error);
-      toast.error("Couldn't add the song. Try again.");
+      toast.error(t("errors.add_song"));
     }
   };
 
@@ -68,16 +70,16 @@ export const AddToPlaylistSub = ({ song }: { song: Song }) => {
     <DropdownMenuSub>
       <DropdownMenuSubTrigger className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white data-[state=open]:bg-zinc-800 data-[state=open]:text-white">
         <ListPlus className="h-3.5 w-3.5" />
-        Add to playlist
+        {t("add_to_playlist")}
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent className="w-56 space-y-1 rounded-lg border-white/5 bg-zinc-950 p-2 text-zinc-400 shadow-2xl">
         {playlists === null ? (
-          <div className="px-3 py-2.5 text-xs font-medium text-zinc-500">Loading...</div>
+          <div className="px-3 py-2.5 text-xs font-medium text-zinc-500">{t("loading")}</div>
         ) : (
           <>
             {playlists.length === 0 && (
               <div className="px-3 py-2.5 text-xs font-medium text-zinc-500">
-                No playlists yet
+                {t("no_playlists")}
               </div>
             )}
             {playlists.map((playlist) => {
@@ -109,7 +111,7 @@ export const AddToPlaylistSub = ({ song }: { song: Song }) => {
               className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white"
             >
               <Plus className="h-3.5 w-3.5" />
-              New playlist
+              {t("view.new")}
             </DropdownMenuItem>
           </>
         )}

@@ -1,1 +1,117 @@
-{}
+{
+  "seconds": "segundos",
+  "pause": "Pausa",
+  "start": "Iniciar",
+  "total_time": "Tiempo total:",
+  "currently_exercising": "Ahora estás practicando:",
+  "info_about_report": "Puedes introducir tu tiempo manualmente en",
+  "end_button": "Terminar práctica",
+  "report_link": "registro",
+  "technique": "Técnica",
+  "theory": "Teoría",
+  "hearing": "Oído",
+  "creativity": "Trabajo creativo",
+  "choose": "Elige una categoría",
+  "select_practice_mode": "Elige el modo de práctica",
+  "choose_practice_description": "Elige el método de práctica que mejor se adapte a ti",
+  "modes": {
+    "timer": {
+      "title": "Práctica estándar",
+      "description": "Practica libremente las habilidades que elijas y sigue tu progreso"
+    },
+    "plan": {
+      "title": "Plan de ejercicios",
+      "description": "Elige un plan ya preparado y síguelo"
+    },
+    "auto": {
+      "title": "Plan automático",
+      "description": "Deja que creemos un plan ajustado a tu tiempo"
+    }
+  },
+  "time_splitter": {
+    "title": "Resumen de la sesión",
+    "description": "Has practicado <1>{{songTitle}}</1> durante <3>{{time}}</3>.",
+    "question": "¿En qué empleaste tu tiempo?",
+    "hearing": "Oído",
+    "technique": "Técnica",
+    "learned_title": "¡Ya me sé esta canción!",
+    "learned_description": "Márcala como «Aprendida» y muévela a completadas",
+    "resume": "Reanudar temporizador",
+    "confirm": "Confirmar y terminar",
+    "saving": "Guardando..."
+  },
+  "practice_session": "Sesión de práctica",
+  "finish": "Terminar",
+  "youtube": {
+    "add_link": "Pega un enlace de YouTube",
+    "change_link": "Cambiar vídeo",
+    "no_link": "Aún no hay ningún vídeo vinculado"
+  },
+  "sections": {
+    "add": "Añadir sección",
+    "name_placeholder": "Nombre de la sección",
+    "mastery_0": "Sin aprender",
+    "mastery_1": "Mal",
+    "mastery_2": "Regular",
+    "mastery_3": "Dominada",
+    "mastery_4": "Saltar"
+  },
+  "rating_summary": "Resumen de la práctica",
+  "reset_button": "Reiniciar",
+  "reset_dialog": {
+    "title": "¿Reiniciar el temporizador?",
+    "description": "Se borrará todo el tiempo registrado de todas las habilidades en esta sesión. Esta acción no se puede deshacer.",
+    "cancel": "Cancelar",
+    "confirm": "Reiniciar"
+  },
+  "metronome": {
+    "title": "Metrónomo",
+    "start": "Iniciar metrónomo",
+    "stop": "Detener metrónomo"
+  },
+  "interval_alert": {
+    "title": "Aviso por intervalos",
+    "description": "Recibe un aviso cada pocos minutos para cambiar de habilidad",
+    "minutes_short": "{{minutes}} min",
+    "next_in": "Próximo aviso en {{time}}",
+    "enable": "Activar aviso",
+    "disable": "Desactivar aviso",
+    "toast": "¡Hora de cambiar! Han pasado {{minutes}} minutos",
+    "custom_placeholder": "Personalizado",
+    "custom_aria": "Intervalo personalizado en minutos"
+  },
+  "community_map": {
+    "banner_title": "Mapa de la comunidad disponible",
+    "banner_description": "{{count}} músicos han confirmado estos tiempos de sección.",
+    "explainer": "Otros jugadores marcaron dónde empieza cada parte de esta canción (intro, estrofa, estribillo, solo) usando exactamente este vídeo de YouTube.",
+    "disclaimer": "No verificamos que sean exactos: tómalo como punto de partida. Después puedes renombrar, mover o borrar cualquier sección, y el mapa puede cambiar en cualquier momento.",
+    "import": "Importar secciones",
+    "not_now": "Ahora no"
+  },
+  "choose_practising": "Elige qué estás practicando",
+  "back_to_practice": "Volver a la práctica",
+  "saving": "Guardando...",
+  "practised_away": "¿Has practicado sin el temporizador?",
+  "log_manually": "Registra el tiempo a mano",
+  "song_timer": {
+    "shortcuts": "Atajos",
+    "key_space": "Espacio",
+    "play_pause": "Reproducir/Pausa",
+    "mark_section": "Marcar sección",
+    "toggle_loop": "Activar/desactivar bucle",
+    "seek": "Saltar 5 s",
+    "practice_notes": "Notas de práctica",
+    "lines": "{{count}} / 300 líneas",
+    "notes_placeholder": "Añade aquí tus notas de práctica... (p. ej. ajustes, consejos para partes difíciles, equipo usado)"
+  },
+  "youtube_player": {
+    "paste_new": "Pega un nuevo enlace de YouTube",
+    "paste": "Pega un enlace de YouTube",
+    "placeholder": "p. ej. youtube.com/watch?v=…",
+    "save": "Guardar",
+    "suggestions": "Elegir entre sugerencias",
+    "speed": "Velocidad",
+    "unlock": "Desbloquear edición",
+    "lock": "Bloquear edición"
+  }
+}

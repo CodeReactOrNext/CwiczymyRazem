@@ -1,0 +1,109 @@
+{
+  "continue": "Continue",
+  "loading": "Loading...",
+  "any_part": "Any part",
+  "lock": {
+    "master": "Master",
+    "premium": "Premium"
+  },
+  "modes": {
+    "routine": {
+      "title": "Practice Routines",
+      "description": "Follow daily guided routine",
+      "all": "All Routines",
+      "playalongs": "Playalongs",
+      "my_plans": "My Plans",
+      "community": "Community"
+    },
+    "log": {
+      "title": "Log",
+      "description": "Track a session by hand or with a stopwatch",
+      "manual": "Manual Log",
+      "free_timer": "Free Timer"
+    },
+    "songs": {
+      "title": "Songs",
+      "description": "Track practice time for your repertoire"
+    },
+    "auto": {
+      "title": "Auto Plan",
+      "description": "Automatically generated session"
+    },
+    "gp": {
+      "title": "Guitar Pro Files",
+      "description": "Practice your imported Guitar Pro tabs"
+    },
+    "learning_path": {
+      "title": "Learning Path",
+      "description": "Start with the basics, one lesson at a time"
+    },
+    "roadmaps": {
+      "title": "Mastery Roadmaps",
+      "description": "Choose a skill or playing style to focus on"
+    },
+    "scales": {
+      "title": "Scale Map",
+      "description": "Interactive scale fretboard tree"
+    },
+    "skills": {
+      "title": "Skills",
+      "description": "See your progress by technique"
+    },
+    "exercises": {
+      "title": "Exercises",
+      "description": "Find an exercise by skill, length or practice mode"
+    },
+    "community_exercises": {
+      "title": "Community Exercises",
+      "description": "Exercises shared by the community"
+    }
+  },
+  "progress": {
+    "steps": "steps",
+    "of_total": "{{done}} of {{total}} {{unit}}",
+    "all_modules": "All modules completed",
+    "first_lesson": "Start with the first lesson",
+    "next_roadmap": "Choose your next roadmap",
+    "first_roadmap": "Choose your first roadmap",
+    "scale_one": "1 scale completed",
+    "scale_many": "{{count}} scales completed",
+    "first_scale": "Start with your first scale",
+    "exercise_one": "1 exercise completed",
+    "exercise_many": "{{count}} exercises completed",
+    "first_technique": "Pick a technique to start"
+  },
+  "plans": {
+    "open_plan": "Open plan",
+    "featured": "Featured",
+    "playalongs": "Playalongs",
+    "playalongs_tooltip": "Practice along with a real song at your own pace",
+    "my_plans": "My Plans",
+    "community": "Community"
+  },
+  "auto": {
+    "regenerate": "Regenerate",
+    "of_target": "of {{minutes}} min",
+    "exercise_one": "1 exercise",
+    "exercise_many": "{{count}} exercises",
+    "pick_hint": "Pick difficulties per category, or leave it empty to draw from the whole library.",
+    "select_all": "Select all",
+    "clear_all": "Clear all",
+    "toggle_difficulty": "Toggle {{difficulty}} in every category",
+    "toggle_category": "Toggle every difficulty in {{category}}",
+    "none_available": "(none available)",
+    "reorder": "Reorder {{title}}",
+    "drag_to_reorder": "Drag to reorder",
+    "playalong": "Playalong",
+    "video": "Video",
+    "options_for": "Options for {{title}}",
+    "options": "Options",
+    "swap": "Swap for another",
+    "move_up": "Move up",
+    "move_down": "Move down"
+  },
+  "back": "Back",
+  "no_community_plans": "No community plans published yet.",
+  "publish_hint": "Go to My Plans and publish one of your plans to share it here.",
+  "time_splitter_practiced": "You practiced {{song}} for {{time}}.",
+  "which_part": "Which part did you play?"
+}

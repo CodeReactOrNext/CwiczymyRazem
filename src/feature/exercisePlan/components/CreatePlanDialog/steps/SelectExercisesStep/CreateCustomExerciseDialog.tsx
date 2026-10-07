@@ -56,7 +56,7 @@ export const CreateCustomExerciseDialog = ({
   initialData,
   mode = "create",
 }: CreateCustomExerciseDialogProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common", "plans"]);
   const userId = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
   const [title, setTitle] = useState("");
@@ -214,7 +214,7 @@ export const CreateCustomExerciseDialog = ({
     let gpFileUrl: string | undefined;
     if (gpRawFile) {
       if (!userId) {
-        toast.error("You must be logged in to upload a GP file");
+        toast.error(t("plans:custom.login_required"));
         return;
       }
       setIsUploading(true);
@@ -222,7 +222,7 @@ export const CreateCustomExerciseDialog = ({
         const uploaded = await uploadUserGpFile(userId, gpRawFile);
         gpFileUrl = uploaded.downloadUrl;
       } catch {
-        toast.error("Failed to upload GP file");
+        toast.error(t("plans:custom.upload_error"));
         setIsUploading(false);
         return;
       }
@@ -282,7 +282,7 @@ export const CreateCustomExerciseDialog = ({
       const savedId = await createCommunityExercise(
         libraryInput,
         userId,
-        userInfo?.displayName || "Anonymous"
+        userInfo?.displayName || t("plans:custom.anonymous")
       );
       setIsSavingToLibrary(false);
       librarySave = savedId ? "saved" : "failed";
@@ -293,7 +293,7 @@ export const CreateCustomExerciseDialog = ({
     onOpenChange(false);
 
     const savedToLibrary = librarySave === "saved"
-      ? { description: "Also saved privately to My Exercises." }
+      ? { description: t("plans:custom.saved_privately") }
       : undefined;
 
     if (mode === "edit") {
@@ -305,7 +305,7 @@ export const CreateCustomExerciseDialog = ({
     }
 
     if (librarySave === "failed") {
-      toast.error("Couldn't save it to My Exercises — it's still added to this plan.");
+      toast.error(t("plans:custom.library_save_error"));
     }
 
     resetForm();
@@ -356,7 +356,7 @@ export const CreateCustomExerciseDialog = ({
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-zinc-300 font-medium">
                 <FileMusic className="h-4 w-4 text-cyan-500" />
-                <span>Guitar Pro File <span className="text-zinc-600 font-normal text-xs">(optional)</span></span>
+                <span>{t("plans:custom.gp_file")} <span className="text-zinc-600 font-normal text-xs">{t("plans:optional")}</span></span>
               </div>
 
               {gpFileName ? (
@@ -369,7 +369,7 @@ export const CreateCustomExerciseDialog = ({
                     type="button"
                     onClick={clearGpFile}
                     className="text-zinc-500 hover:text-red-400 transition-colors shrink-0"
-                    title="Remove GP file"
+                    title={t("plans:custom.remove_gp")}
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -389,7 +389,7 @@ export const CreateCustomExerciseDialog = ({
                         id="title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="e.g., Spider Walk"
+                        placeholder={t("plans:custom.title_placeholder")}
                         className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 h-10"
                     />
                 </div>
@@ -446,7 +446,7 @@ export const CreateCustomExerciseDialog = ({
                           <div className="mt-2 relative aspect-[3.5/1] w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
                               <img
                                   src={imageUrl}
-                                  alt="Preview"
+                                  alt={t("plans:details.preview")}
                                   className="h-full w-full object-contain"
                                   onError={() => setIsImageValid(false)}
                                   onLoad={() => setIsImageValid(true)}
@@ -536,7 +536,7 @@ export const CreateCustomExerciseDialog = ({
                 {useMetronome && (
                     <div className="grid grid-cols-3 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="space-y-2">
-                            <Label htmlFor="minBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Min BPM</Label>
+                            <Label htmlFor="minBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">{t("plans:custom.min_bpm")}</Label>
                             <Input
                                 id="minBpm"
                                 type="number"
@@ -546,7 +546,7 @@ export const CreateCustomExerciseDialog = ({
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="maxBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Max BPM</Label>
+                            <Label htmlFor="maxBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">{t("plans:custom.max_bpm")}</Label>
                             <Input
                                 id="maxBpm"
                                 type="number"
@@ -556,7 +556,7 @@ export const CreateCustomExerciseDialog = ({
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="recBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Recommended BPM</Label>
+                            <Label htmlFor="recBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">{t("plans:custom.rec_bpm")}</Label>
                             <Input
                                 id="recBpm"
                                 type="number"
@@ -661,11 +661,10 @@ export const CreateCustomExerciseDialog = ({
                 <div className="space-y-1.5">
                   <Label htmlFor="saveToLibrary" className="flex items-center gap-2 text-zinc-300 font-medium">
                     <BookMarked className="h-4 w-4 text-cyan-500" />
-                    Save to My Exercises
+                    {t("plans:custom.save_to_mine")}
                   </Label>
                   <p className="text-xs text-zinc-500 leading-relaxed">
-                    Keeps a private copy in your own exercise library, so you can reuse it in other plans.
-                    Nobody else sees it unless you publish it later.
+                    {t("plans:custom.save_to_mine_hint")}
                   </p>
                 </div>
                 <Checkbox
@@ -686,9 +685,9 @@ export const CreateCustomExerciseDialog = ({
                 </Button>
                 <Button type="submit" form="create-exercise-form" disabled={isUploading || isSavingToLibrary} className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200">
                     {isUploading ? (
-                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Uploading GP file...</>
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("plans:custom.uploading")}</>
                     ) : isSavingToLibrary ? (
-                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</>
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("plans:saving")}</>
                     ) : mode === "edit" ? t("exercises:custom_exercise.save_button") : t("common:create" as any)}
                 </Button>
             </DialogFooter>

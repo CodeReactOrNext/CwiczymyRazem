@@ -1,1 +1,18 @@
-{}
+{
+  "select_practice_mode": "Elige el modo de práctica",
+  "select": "Elegir",
+  "modes": {
+    "timer": {
+      "title": "Práctica libre",
+      "description": "Practica las habilidades que elijas y sigue tu progreso"
+    },
+    "plan": {
+      "title": "Plan de ejercicios",
+      "description": "Elige un plan de ejercicios ya preparado y síguelo"
+    },
+    "auto": {
+      "title": "Plan automático",
+      "description": "Deja que creemos un plan adaptado a tu tiempo"
+    }
+  }
+}

@@ -9,6 +9,7 @@ import { WidgetHeader } from "feature/dashboard/components/widgets/WidgetHeader"
 import { TabPreviewGlyph } from "feature/landing/components/TabPreviewGlyph";
 import { getTabPreview } from "feature/landing/lib/tabPreview";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { CalendarClock, Clock, Play, Users } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -22,7 +23,7 @@ const formatTimeLeft = (ms: number): string => {
   return hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
 };
 
-const formatScore = (score: number) => score.toLocaleString("en-US");
+const formatScore = (score: number) => score.toLocaleString();
 
 /** Places the empty board still shows, so a quiet morning reads as "up for grabs", not "broken". */
 const EMPTY_PLACES = 3;
@@ -72,23 +73,26 @@ const BoardRow = ({
   </li>
 );
 
-const EmptyBoard = () => (
+const EmptyBoard = () => {
+  const { t } = useTranslation("dashboard");
+  return (
   <div>
     <ol className='space-y-1'>
       {Array.from({ length: EMPTY_PLACES }, (_, i) => (
         <li key={i} className='flex items-center gap-3 rounded-lg px-3 py-2'>
           <PlaceNumber place={i + 1} />
           <span className='size-7 shrink-0 rounded-full bg-zinc-800/80' />
-          <span className='flex-1 text-sm text-zinc-500'>Open spot</span>
+          <span className='flex-1 text-sm text-zinc-500'>{t("daily_exercise.open_spot")}</span>
           <span className='h-2 w-12 rounded-full bg-zinc-800/80' />
         </li>
       ))}
     </ol>
     <p className='mt-3 px-3 text-sm text-zinc-400'>
-      No scores yet. The first run takes #1.
+      {t("daily_exercise.no_scores")}
     </p>
   </div>
-);
+  );
+};
 
 const BoardSkeleton = () => (
   <div className='space-y-2'>
@@ -104,6 +108,7 @@ const BoardSkeleton = () => (
  * exercise is played through with the mic on, wherever it was started from.
  */
 export const DailyExerciseWidget = () => {
+  const { t } = useTranslation("dashboard");
   const uid = useAppSelector(selectUserAuth) ?? null;
   const { exercise, msLeft, leaderboard } = useDailyExercise(uid);
   const board = leaderboard.data;
@@ -119,17 +124,17 @@ export const DailyExerciseWidget = () => {
       <WidgetHeader
         icon={CalendarClock}
         iconClassName='text-cyan-400'
-        title='Exercise of the day'
+        title={t("daily_exercise.title")}
         action={
           <span className='flex items-center gap-1.5 text-xs tabular-nums text-zinc-400'>
             <Clock size={12} className='text-zinc-500' />
-            New in {formatTimeLeft(msLeft)}
+            {t("daily_exercise.new_in", { time: formatTimeLeft(msLeft) })}
           </span>
         }
       />
 
       {!exercise ? (
-        <p className='text-sm text-zinc-400'>No exercise today.</p>
+        <p className='text-sm text-zinc-400'>{t("daily_exercise.none_today")}</p>
       ) : (
         // Three panels that wrap rather than a fixed grid: the card can sit full or
         // half width on the dashboard, so it lays out by its own width. Full
@@ -153,15 +158,15 @@ export const DailyExerciseWidget = () => {
                 href={`/practice/exercise/${exercise.id}`}
                 className='inline-flex h-10 items-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900'>
                 <Play size={16} className='fill-current' />
-                {me ? "Beat your score" : "Play"}
+                {me ? t("daily_exercise.beat_score") : t("daily_exercise.play")}
               </Link>
               {me && (
                 <p className='text-sm text-zinc-400'>
-                  Your best{" "}
+                  {t("daily_exercise.your_best")}{" "}
                   <span className='font-semibold tabular-nums text-zinc-100'>
                     {formatScore(me.score)}
                   </span>{" "}
-                  · #{me.rank} of {board?.players}
+                  · {t("daily_exercise.rank_of", { rank: me.rank, players: board?.players })}
                 </p>
               )}
             </div>
@@ -172,7 +177,7 @@ export const DailyExerciseWidget = () => {
           <div className='min-w-0 flex-[2_1_20rem] lg:rounded-lg lg:bg-zinc-900/40 lg:p-4'>
             <div className='mb-3 flex items-center justify-between gap-3 px-3'>
               <span className='text-sm font-semibold text-zinc-200'>
-                Today&apos;s board
+                {t("daily_exercise.todays_board")}
               </span>
               {!!board?.players && (
                 <span className='flex items-center gap-1.5 text-xs tabular-nums text-zinc-400'>
@@ -186,7 +191,7 @@ export const DailyExerciseWidget = () => {
               <BoardSkeleton />
             ) : leaderboard.isError ? (
               <p className='px-3 text-sm text-zinc-400'>
-                The board could not be loaded.
+                {t("daily_exercise.board_error")}
               </p>
             ) : !board?.top.length ? (
               <EmptyBoard />

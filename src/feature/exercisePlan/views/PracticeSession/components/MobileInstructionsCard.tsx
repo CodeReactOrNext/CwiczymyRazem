@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { FaGraduationCap, FaInfoCircle, FaLightbulb } from "react-icons/fa";
@@ -18,6 +19,7 @@ interface MobileInstructionsCardProps {
  * the small screen; tapping expands the full content.
  */
 export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstructionsCardProps) => {
+  const { t } = useTranslation("session");
   const [isExpanded, setIsExpanded] = useState(false);
 
   const instructions = exercise.instructions ?? [];
@@ -32,7 +34,7 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-zinc-200">
             <FaGraduationCap size={12} />
-            <h4 className="text-[10px] font-semibold capitalize tracking-wider">Why This Matters</h4>
+            <h4 className="text-[10px] font-semibold capitalize tracking-wider">{t("instructions.why")}</h4>
           </div>
           <p className="text-xs leading-relaxed text-zinc-400">{exercise.whyItMatters}</p>
         </div>
@@ -42,7 +44,7 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
         <div className="space-y-2.5">
           <div className="flex items-center gap-2 text-zinc-200">
             <FaInfoCircle size={12} />
-            <h4 className="text-[10px] font-semibold capitalize tracking-wider">Instructions</h4>
+            <h4 className="text-[10px] font-semibold capitalize tracking-wider">{t("instructions.instructions")}</h4>
           </div>
           <ol className="space-y-2.5">
             {instructions.map((instruction, idx) => (
@@ -59,7 +61,7 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
         <div className="space-y-2.5">
           <div className="flex items-center gap-2 text-zinc-200">
             <FaLightbulb size={12} className="text-amber-400/80" />
-            <h4 className="text-[10px] font-semibold capitalize tracking-wider">Pro Tips</h4>
+            <h4 className="text-[10px] font-semibold capitalize tracking-wider">{t("instructions.pro_tips")}</h4>
           </div>
           <div className="space-y-2.5">
             {tips.map((tip, idx) => (
@@ -84,7 +86,7 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
       >
         <FaInfoCircle size={14} className="shrink-0 text-cyan-400/80" />
         <span className="flex-1 text-[11px] font-semibold capitalize tracking-wider text-zinc-200">
-          Instructions
+          {t("instructions.instructions")}
         </span>
         <ChevronDown
           className={cn(

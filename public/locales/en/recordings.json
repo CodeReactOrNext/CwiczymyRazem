@@ -1,0 +1,60 @@
+{
+  "toast": {
+    "added": "Recording added successfully!",
+    "add_failed": "Failed to add recording.",
+    "comment_added": "Comment added!",
+    "comment_failed": "Failed to add comment.",
+    "logged_out": "You must be logged in.",
+    "bad_url": "Please enter a valid YouTube URL."
+  },
+  "modal": {
+    "edit_title": "Edit Recording",
+    "add_title": "Add New Recording",
+    "which_song": "What song is this?",
+    "optional": "(optional)",
+    "artist": "Artist...",
+    "song_title": "Song title...",
+    "search_hint": "Type an artist or song title to search your library",
+    "not_in_library": "Not in the library",
+    "saved_as_typed": "No problem — we'll save it exactly as typed.",
+    "youtube_url": "YouTube URL *",
+    "title": "Title *",
+    "title_placeholder": "My awesome cover",
+    "description": "Description",
+    "description_placeholder": "Tell us about your recording...",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "share": "Share Recording"
+  },
+  "card": {
+    "play": "Play {{title}}",
+    "edit": "Edit recording",
+    "delete_aria": "Delete recording",
+    "confirm_title": "Are you sure?",
+    "confirm_body": "This action cannot be undone. This will permanently delete your recording.",
+    "deleting": "Deleting...",
+    "delete": "Delete",
+    "like": "Like recording",
+    "comments": "View comments"
+  },
+  "grid": {
+    "empty_title": "No recordings found",
+    "empty_body": "Be the first to upload your cover!"
+  },
+  "view": {
+    "title": "Recordings",
+    "subtitle": "Listen back and share your practice sessions",
+    "add": "Add Recording",
+    "all": "All Recordings",
+    "mine": "My Recordings"
+  },
+  "viewer": {
+    "not_found": "Recording not found",
+    "comments": "Comments ({{count}})",
+    "no_comments": "No comments yet.",
+    "write_comment": "Write a comment..."
+  },
+  "song_section": {
+    "empty": "No recordings yet for this song — be the first to share your cover."
+  }
+}

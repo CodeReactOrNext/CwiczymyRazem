@@ -4,6 +4,7 @@ import {
   PLAN_COLORS,
   PLAN_ICONS,
 } from "feature/exercisePlan/data/planAppearance";
+import { useTranslation } from "hooks/useTranslation";
 import { Check } from "lucide-react";
 
 interface PlanAppearancePickerProps {
@@ -19,6 +20,7 @@ export const PlanAppearancePicker = ({
   onIconChange,
   onColorChange,
 }: PlanAppearancePickerProps) => {
+  const { t } = useTranslation("plans");
   const accent = getPlanColor(color);
 
   return (
@@ -26,14 +28,14 @@ export const PlanAppearancePicker = ({
       {/* Icon */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold tracking-wider text-zinc-500">Icon</p>
+          <p className="text-xs font-bold tracking-wider text-zinc-500">{t("appearance.icon")}</p>
           {icon && (
             <button
               type="button"
               onClick={() => onIconChange(undefined)}
               className="text-[11px] font-medium text-zinc-500 hover:text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded px-1"
             >
-              Reset to auto
+              {t("appearance.reset")}
             </button>
           )}
         </div>
@@ -67,14 +69,14 @@ export const PlanAppearancePicker = ({
       {/* Color */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold tracking-wider text-zinc-500">Color</p>
+          <p className="text-xs font-bold tracking-wider text-zinc-500">{t("appearance.color")}</p>
           {color && (
             <button
               type="button"
               onClick={() => onColorChange(undefined)}
               className="text-[11px] font-medium text-zinc-500 hover:text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded px-1"
             >
-              Reset to auto
+              {t("appearance.reset")}
             </button>
           )}
         </div>
@@ -103,7 +105,7 @@ export const PlanAppearancePicker = ({
       </div>
 
       <p className="text-[11px] leading-relaxed text-zinc-600">
-        Leave unselected to use the automatic style based on your exercises.
+        {t("appearance.hint")}
       </p>
     </div>
   );

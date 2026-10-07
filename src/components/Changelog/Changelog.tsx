@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import { DashboardSection } from "components/Layout";
 import type { LucideIcon } from "lucide-react";
@@ -228,6 +229,7 @@ export const useChangelogData = (month: string = "2026-05") => {
 };
 
 const Changelog = ({ month = "2026-05" }: { month?: string }) => {
+  const { t } = useTranslation("ui");
   const { changelog, isLoading } = useChangelogData(month);
   const [lastViewedDate] = useState<string | null>(() =>
     typeof window === "undefined"
@@ -253,7 +255,7 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
     return (
       <DashboardSection compact>
         <div className='py-8 text-center text-zinc-400'>
-          No entries this month
+          {t("changelog.empty")}
         </div>
       </DashboardSection>
     );
@@ -282,7 +284,7 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
                 </p>
                 {unread && (
                   <span className='rounded bg-cyan-500/10 px-1.5 py-0.5 text-[11px] font-medium text-cyan-400'>
-                    New
+                    {t("changelog.new")}
                   </span>
                 )}
               </div>
@@ -316,7 +318,7 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
                               {isBug ? (
                                 <Bug
                                   className='mt-1 h-3.5 w-3.5 flex-shrink-0 text-red-400/80'
-                                  aria-label='Bug fix'
+                                  aria-label={t("changelog.bug_fix")}
                                 />
                               ) : (
                                 <span

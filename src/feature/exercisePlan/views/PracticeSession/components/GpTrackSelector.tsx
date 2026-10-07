@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Drum, Music } from "lucide-react";
 import { memo } from "react";
 
@@ -11,10 +12,11 @@ interface GpTrackSelectorProps {
 }
 
 export const GpTrackSelector = memo(function GpTrackSelector({ tracks, selectedIdx, onChange }: GpTrackSelectorProps) {
+  const { t } = useTranslation("session");
   if (tracks.length <= 1) return null;
   return (
     <div className="flex flex-wrap items-center gap-2 mb-2">
-      <span className="text-[10px] font-bold capitalize tracking-[0.2em] text-zinc-500">Track:</span>
+      <span className="text-[10px] font-bold capitalize tracking-[0.2em] text-zinc-500">{t("track")}</span>
       {tracks.map((track, idx) => (
         <button
           key={track.id}

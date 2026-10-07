@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { DESKTOP_APP_RELEASES_URL, MIN_DESKTOP_APP_VERSION } from "constants/desktopApp";
 import { useDesktopAppVersion } from "hooks/useDesktopAppVersion";
@@ -15,21 +16,21 @@ import { isVersionBelow } from "utils/version";
  * No-op on the web build, where window.electronApp is undefined.
  */
 export const DesktopUpdateRequired = () => {
+  const { t } = useTranslation("desktop");
   const appVersion = useDesktopAppVersion();
   if (!appVersion || !isVersionBelow(appVersion, MIN_DESKTOP_APP_VERSION)) return null;
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-zinc-950 p-6">
       <div className="w-full max-w-md space-y-6 text-center">
-        <h1 className="text-xl font-semibold text-zinc-100">Update required</h1>
+        <h1 className="text-xl font-semibold text-zinc-100">{t("update_required.title")}</h1>
         <p className="text-sm text-zinc-400">
-          This desktop app (v{appVersion}) is too old to keep working with riff.quest. Download
-          the latest version to continue.
+          {t("update_required.body", { version: appVersion })}
         </p>
         <Button asChild size="lg">
           <a href={DESKTOP_APP_RELEASES_URL} target="_blank" rel="noreferrer">
             <Download className="mr-2 h-4 w-4" />
-            Download latest version
+            {t("update_required.download")}
           </a>
         </Button>
       </div>

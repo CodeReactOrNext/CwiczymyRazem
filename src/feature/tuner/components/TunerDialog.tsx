@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { RippleButton } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import { Lock, X } from "lucide-react";
 import type { GuitarTuningPreset } from "utils/audio/tunings";
 
@@ -38,11 +39,12 @@ export function TunerDialog({
   frequencyRef,
   volumeRef,
   isMicEnabled,
-  micHint = "Enable Pitch Detect to use the tuner",
+  micHint,
   tuning,
   isTuningLocked = false,
   onClose,
 }: TunerDialogProps) {
+  const { t } = useTranslation("session");
   const { cents, hasNote, activeIndex, strings, tuned } = useLiveTuner(
     frequencyRef,
     volumeRef,
@@ -64,12 +66,12 @@ export function TunerDialog({
   const allTuned = tuned.every(Boolean);
 
   const statusText = !hasNote
-    ? "Play an open string"
+    ? t("tuner.play_open")
     : isInTune
-      ? "In tune — hold it"
+      ? t("tuner.in_tune")
       : cents > 0
-        ? `${Math.round(abs)}¢ sharp — tune down`
-        : `${Math.round(abs)}¢ flat — tune up`;
+        ? t("tuner.sharp", { cents: Math.round(abs) })
+        : t("tuner.flat", { cents: Math.round(abs) });
 
   return (
     <div
@@ -95,7 +97,7 @@ export function TunerDialog({
         </p>
 
         {!isMicEnabled && (
-          <p className='mt-4 text-center text-xs text-zinc-500'>{micHint}</p>
+          <p className='mt-4 text-center text-xs text-zinc-500'>{micHint ?? t("tuner.enable_pitch")}</p>
         )}
 
         {/* Every open string of the active tuning — the ones still to tune stay
@@ -107,7 +109,7 @@ export function TunerDialog({
             return (
               <span
                 key={str.string}
-                title={`String ${str.string} — ${str.name} (${str.hz.toFixed(1)} Hz)`}
+                title={t("tuner.string", { n: str.string, name: str.name, hz: str.hz.toFixed(1) })}
                 className={cn(
                   "font-mono rounded-md px-2 py-1.5 text-[11px] font-bold tabular-nums transition-colors duration-200",
                   isDone
@@ -155,7 +157,7 @@ export function TunerDialog({
             "mt-4 text-center text-xs font-medium transition-colors duration-200 short:mt-2",
             allTuned ? "text-emerald-400" : "text-zinc-500",
           )}>
-          {allTuned ? "All strings in tune" : statusText}
+          {allTuned ? t("tuner.all_tuned") : statusText}
         </p>
       </div>
     </div>

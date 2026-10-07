@@ -1,1 +1,255 @@
-{}
+{
+  "availablePoints": "dostępne punkty",
+  "level": "Poziom",
+  "progress": "Postęp",
+  "maxed": "MAKS.",
+  "click_for_details": "Kliknij, aby zobaczyć szczegóły",
+  "upgrade_skill": "Ulepsz tę umiejętność",
+  "upgrade": "Ulepsz",
+  "current_level": "Obecny poziom",
+  "points_to_distribute": "punktów do rozdania",
+  "skill_categories": "Kategorie umiejętności",
+  "categories_description": "Wybierz kategorię poniżej, aby rozdzielić punkty umiejętności",
+  "no_skills_unlocked": "Brak odblokowanych umiejętności w kategorii {{category}}",
+  "unlock_skills_hint": "Zdobywaj punkty, ćwicząc, aby odblokować umiejętności",
+  "no_skills_unlocked_yet": "Nie odblokowałeś jeszcze żadnej umiejętności",
+  "show_all_skills": "Pokaż wszystkie dostępne umiejętności",
+  "available_points": "Dostępne punkty",
+  "point_usage_hint": "Kliknij przycisk +, aby ulepszać umiejętności w tych kategoriach",
+  "show_unlocked": "Pokaż tylko odblokowane umiejętności",
+  "show_all": "Pokaż wszystkie umiejętności",
+  "category_description": {
+    "technique": "Przydzielaj tu punkty, aby rozwijać technikę gry. Punkty zdobyte w ćwiczeniach pomagają śledzić Twój rozwój techniczny.",
+    "theory": "Rozdzielaj punkty, aby poszerzać wiedzę z teorii muzyki. Równoważ to z innymi obszarami, żeby rozwijać się wszechstronnie.",
+    "hearing": "Przydzielaj punkty, aby rozwijać słuch. Śledź postępy, żeby nie zaniedbać tej ważnej umiejętności.",
+    "creativity": "Używaj punktów, aby rozwijać ekspresję twórczą. Śledź, które obszary rozwijasz, a które wymagają uwagi."
+  },
+  "intro": {
+    "title": "Rozwój umiejętności gitarowych",
+    "description": "Rozdzielaj punkty umiejętności zdobyte podczas sesji ćwiczeń, aby rozwijać konkretne obszary swojej gry.",
+    "point1": "Zdobywaj punkty umiejętności, wykonując ćwiczenia",
+    "point2": "Przydzielaj punkty według obszarów, które chcesz rozwijać",
+    "point3": "Śledź postępy, żeby widzieć, które umiejętności rozwijasz, a które zaniedbujesz",
+    "got_it": "Rozumiem"
+  },
+  "categories": {
+    "technique": "Technika",
+    "theory": "Teoria",
+    "hearing": "Słuch",
+    "creativity": "Kreatywność"
+  },
+  "skills": {
+    "alternate_picking": {
+      "name": "Kostkowanie naprzemienne",
+      "description": "Opanuj sztukę naprzemiennych uderzeń w dół i w górę"
+    },
+    "legato": {
+      "name": "Legato",
+      "description": "Płynna technika gry oparta na hammer-onach i pull-offach"
+    },
+    "sweep_picking": {
+      "name": "Sweep picking",
+      "description": "Zaawansowana technika kostkowania do grania arpeggiów"
+    },
+    "chord_theory": {
+      "name": "Teoria akordów",
+      "description": "Zrozumienie budowy akordów i progresji"
+    },
+    "scales": {
+      "name": "Skale",
+      "description": "Poznaj i opanuj najważniejsze skale gitarowe"
+    },
+    "rhythm": {
+      "name": "Mistrzostwo rytmu",
+      "description": "Rozwijaj precyzyjne wyczucie czasu i kontrolę rytmu"
+    },
+    "finger_independence": {
+      "name": "Niezależność palców",
+      "description": "Rozwijaj umiejętność niezależnego poruszania palcami"
+    },
+    "phrasing": {
+      "name": "Frazowanie",
+      "description": "Kształtuj linie melodyczne przestrzenią, dynamiką i doborem dźwięków"
+    },
+    "articulation": {
+      "name": "Artykulacja",
+      "description": "Opanuj różne techniki artykulacji dla większej ekspresji muzycznej"
+    },
+    "bending": {
+      "name": "Podciąganie strun",
+      "description": "Opanuj sztukę podciągania strun dla ekspresyjnej gry"
+    },
+    "tapping": {
+      "name": "Tapping",
+      "description": "Zaawansowana technika z użyciem obu rąk na gryfie"
+    },
+    "string_skipping": {
+      "name": "Przeskakiwanie strun",
+      "description": "Rozwijaj precyzję i koordynację przy przeskakiwaniu strun"
+    },
+    "improvisation": {
+      "name": "Improwizacja",
+      "description": "Twórz spontaniczne pomysły muzyczne i solówki"
+    },
+    "ear_training": {
+      "name": "Kształcenie słuchu",
+      "description": "Rozwijaj umiejętność rozpoznawania dźwięków, interwałów i akordów ze słuchu"
+    },
+    "sight_reading": {
+      "name": "Czytanie a vista",
+      "description": "Naucz się płynnie czytać i grać z nut"
+    },
+    "fingerpicking": {
+      "name": "Fingerpicking",
+      "description": "Opanuj techniki gry palcami"
+    },
+    "music_composition": {
+      "name": "Kompozycja muzyczna",
+      "description": "Naucz się pisać i aranżować własną muzykę"
+    },
+    "pitch_recognition": {
+      "name": "Rozpoznawanie wysokości dźwięku",
+      "description": "Rozwijaj słuch absolutny i względny"
+    },
+    "harmony": {
+      "name": "Harmonia",
+      "description": "Opanuj złożone progresje akordów i prowadzenie głosów"
+    },
+    "vibrato": {
+      "name": "Wibrato",
+      "description": "Opanuj sztukę nadawania ekspresji przez drganie struny"
+    },
+    "music_theory": {
+      "name": "Gryf i teoria",
+      "description": "Znaj każdy dźwięk na gryfie i teorię, która za nim stoi"
+    },
+    "rhythm_variations": {
+      "name": "Zaawansowany rytm",
+      "description": "Opanuj złożone metrum i polirytmy"
+    },
+    "songwriting": {
+      "name": "Pisanie piosenek",
+      "description": "Twórz kompletne utwory z tekstem i aranżacją"
+    },
+    "slide_guitar": {
+      "name": "Gra slide",
+      "description": "Opanuj technikę gry ze slidem"
+    },
+    "modal_theory": {
+      "name": "Teoria skal modalnych",
+      "description": "Zrozumienie i stosowanie skal modalnych"
+    },
+    "audio_production": {
+      "name": "Brzmienie",
+      "description": "Naucz się nagrywać i produkować ścieżki gitarowe"
+    },
+    "hybrid_picking": {
+      "name": "Hybrid picking",
+      "description": "Łącz grę kostką z grą palcami"
+    },
+    "harmony-ear": {
+      "name": "Harmonia ze słuchu",
+      "description": "Rozwijaj umiejętność rozpoznawania akordów i progresji ze słuchu"
+    },
+    "chords": {
+      "name": "Akordy",
+      "description": "Opanuj budowę akordów i progresje"
+    },
+    "transcription": {
+      "name": "Transkrypcja",
+      "description": "Naucz się zapisywać muzykę ze słuchu w nutach lub tabulaturze"
+    },
+    "picking": {
+      "name": "Kostkowanie",
+      "description": "Opanuj podstawowe techniki kostkowania i precyzyjne uderzanie w struny"
+    },
+    "basic_chords": {
+      "name": "Podstawowe akordy",
+      "description": "Podstawy akordów otwartych i power chordów"
+    },
+    "intermediate_chords": {
+      "name": "Akordy średniozaawansowane",
+      "description": "Akordy barré i złożone układy"
+    },
+    "advanced_chords": {
+      "name": "Akordy zaawansowane",
+      "description": "Rozszerzone i alterowane układy akordów"
+    },
+    "basic_scales": {
+      "name": "Podstawowe skale",
+      "description": "Skale durowe, molowe i pentatoniczne"
+    },
+    "intermediate_scales": {
+      "name": "Skale średniozaawansowane",
+      "description": "Skale modalne i dodatkowe wzory"
+    },
+    "advanced_scales": {
+      "name": "Skale zaawansowane",
+      "description": "Egzotyczne i złożone systemy skal"
+    },
+    "rhythm_basics": {
+      "name": "Podstawy rytmu",
+      "description": "Podstawowe bicia i wzory rytmiczne"
+    },
+    "rhythm_intermediate": {
+      "name": "Rytm średniozaawansowany",
+      "description": "Złożone bicia i synkopy"
+    },
+    "rhythm_advanced": {
+      "name": "Rytm zaawansowany",
+      "description": "Polirytmy i zaawansowane koncepcje rytmiczne"
+    },
+    "music_theory_basics": {
+      "name": "Podstawy teorii",
+      "description": "Podstawy zapisu nutowego i harmonii"
+    },
+    "music_theory_intermediate": {
+      "name": "Teoria średniozaawansowana",
+      "description": "Progresje akordów i zaawansowana harmonia"
+    },
+    "music_theory_advanced": {
+      "name": "Teoria zaawansowana",
+      "description": "Złożone systemy harmoniczne i analiza"
+    },
+    "ear_training_basic": {
+      "name": "Podstawy kształcenia słuchu",
+      "description": "Rozpoznawanie dźwięków i prostych interwałów"
+    },
+    "ear_training_intermediate": {
+      "name": "Kształcenie słuchu — poziom średni",
+      "description": "Rozpoznawanie akordów i transkrypcja"
+    },
+    "ear_training_advanced": {
+      "name": "Kształcenie słuchu — poziom zaawansowany",
+      "description": "Transkrypcja złożonej harmonii i rytmu"
+    },
+    "improvisation_basic": {
+      "name": "Podstawy improwizacji",
+      "description": "Prosta improwizacja melodyczna na podstawowych progresjach"
+    },
+    "improvisation_intermediate": {
+      "name": "Improwizacja średniozaawansowana",
+      "description": "Frazowanie i bardziej złożone koncepcje improwizacyjne"
+    },
+    "improvisation_advanced": {
+      "name": "Improwizacja zaawansowana",
+      "description": "Rozwijanie własnego głosu i zaawansowane techniki"
+    },
+    "composition_basic": {
+      "name": "Podstawy kompozycji",
+      "description": "Proste pisanie piosenek i rozwijanie melodii"
+    },
+    "composition_intermediate": {
+      "name": "Kompozycja średniozaawansowana",
+      "description": "Bardziej złożone struktury utworów i aranżacje"
+    },
+    "composition_advanced": {
+      "name": "Kompozycja zaawansowana",
+      "description": "Wyrafinowane techniki kompozytorskie"
+    },
+    "composition": {
+      "name": "Kompozycja",
+      "description": "Naucz się pisać i aranżować własną muzykę"
+    }
+  }
+}

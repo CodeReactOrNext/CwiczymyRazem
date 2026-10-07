@@ -32,6 +32,7 @@ import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
 import { useSupportPrompt } from "hooks/useSupportPrompt";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
   BookOpen,
@@ -124,6 +125,7 @@ const SidebarNavLink = ({
   /** Level the page opens at — set only while the account is below it. */
   lockedLvl?: number;
 }) => {
+  const { t } = useTranslation("nav");
   const { createRipple, ripple } = useRipple();
   const link = (
     <Link
@@ -151,7 +153,7 @@ const SidebarNavLink = ({
       </span>
       {lockedLvl && (
         <span
-          aria-label={`Locked until level ${lockedLvl}`}
+          aria-label={t("locked_until_level", { level: lockedLvl })}
           className='flex shrink-0 items-center gap-1 text-[11px] font-bold tabular-nums text-zinc-600'>
           <Lock size={11} />
           {lockedLvl}
@@ -161,7 +163,7 @@ const SidebarNavLink = ({
         <span className={NAV_INDICATOR_SLOT}>
           {showBadge ? (
             <span
-              aria-label='Unclaimed reward'
+              aria-label={t("unclaimed_reward")}
               className='h-2 w-2 animate-pulse rounded-full bg-amber-500'
             />
           ) : (
@@ -172,7 +174,7 @@ const SidebarNavLink = ({
     </Link>
   );
 
-  const hint = lockedLvl ? `Opens at level ${lockedLvl}` : tooltip;
+  const hint = lockedLvl ? t("opens_at_level", { level: lockedLvl }) : tooltip;
 
   if (!hint) return link;
 
@@ -201,83 +203,83 @@ interface SidebarSubLink {
 const PRACTICE_SUB_NAV: SidebarSubLink[] = [
   {
     id: "practice-plans",
-    name: "Practice Routines",
+    name: "practice_routines",
     href: "/timer/plans",
     icon: <ListChecks size={16} />,
   },
   {
     id: "practice-auto",
-    name: "Auto Plan",
+    name: "auto_plan",
     href: "/timer/auto",
     icon: <PiMagicWandDuotone size={16} />,
   },
   {
     id: "practice-free-timer",
-    name: "Free Timer",
+    name: "free_timer",
     href: "/timer/practice",
     icon: <Clock size={16} />,
   },
   {
     id: "practice-report",
-    name: "Manual Log",
+    name: "manual_log",
     href: "/report",
     icon: <NotebookPen size={16} />,
   },
   {
     id: "practice-gp-tabs",
-    name: "Guitar Pro Files",
+    name: "guitar_pro_files",
     href: "/gp-tabs",
     icon: <SiGuitarpro size={16} />,
   },
   {
     id: "practice-skills",
-    name: "Skills",
+    name: "skills",
     href: "/profile/skills?tab=skill-tree",
     icon: <Brain size={16} />,
   },
   {
     id: "practice-exercises",
-    name: "Exercises",
+    name: "exercises",
     href: "/profile/skills?tab=browse",
     icon: <Dumbbell size={16} />,
   },
   {
     id: "practice-roadmaps",
-    name: "Mastery Roadmaps",
+    name: "mastery_roadmaps",
     href: "/ai-coach",
     icon: <Compass size={16} />,
   },
   {
     id: "practice-journey",
-    name: "Learning Path",
+    name: "learning_path",
     href: "/journey",
     icon: <Route size={16} />,
   },
   {
     id: "practice-scale-map",
-    name: "Scale Map",
+    name: "scale_map",
     href: "/scale-tree",
     icon: <PiTreeView size={16} />,
-    tooltip: "Unlock scales one branch at a time on the fretboard",
+    tooltip: "scale_map_tooltip",
   },
 ];
 
 const SONGS_SUB_NAV: SidebarSubLink[] = [
   {
     id: "songs-board",
-    name: "Board",
+    name: "board",
     href: "/songs?view=board",
     icon: <LayoutDashboard size={16} />,
   },
   {
     id: "songs-explore",
-    name: "Explore",
+    name: "explore",
     href: "/songs?view=explore",
     icon: <Search size={16} />,
   },
   {
     id: "songs-playlists",
-    name: "Playlists",
+    name: "playlists",
     href: "/songs?view=playlists",
     icon: <ListMusic size={16} />,
   },
@@ -286,31 +288,31 @@ const SONGS_SUB_NAV: SidebarSubLink[] = [
 const LIBRARY_SUB_NAV: SidebarSubLink[] = [
   {
     id: "library-favorites",
-    name: "Favorites",
+    name: "favorites",
     href: "/favorites",
     icon: <Star size={16} />,
   },
   {
     id: "library-plans",
-    name: "My Plans",
+    name: "my_plans",
     href: "/plans",
     icon: <ClipboardList size={16} />,
   },
   {
     id: "library-exercises",
-    name: "My Exercises",
+    name: "my_exercises",
     href: "/my-exercises",
     icon: <Music2 size={16} />,
   },
   {
     id: "library-create-plan",
-    name: "Create Plan",
+    name: "create_plan",
     href: "/plans/create",
     icon: <PlusCircle size={16} />,
   },
   {
     id: "library-create-exercise",
-    name: "Create Exercise",
+    name: "create_exercise",
     href: "/tab-editor",
     icon: <FilePlus2 size={16} />,
   },
@@ -345,6 +347,7 @@ const SidebarExpandableNavLink = ({
   isSubLinkActive: (href: string) => boolean;
   showBadge?: boolean;
 }) => {
+  const { t } = useTranslation("nav");
   const { createRipple, ripple } = useRipple();
 
   return (
@@ -371,7 +374,7 @@ const SidebarExpandableNavLink = ({
           {showBadge && !isExpanded && (
             <span className={NAV_INDICATOR_SLOT}>
               <span
-                aria-label='Unclaimed reward'
+                aria-label={t("unclaimed_reward")}
                 className='h-2 w-2 animate-pulse rounded-full bg-amber-500'
               />
             </span>
@@ -379,7 +382,11 @@ const SidebarExpandableNavLink = ({
         </Link>
         <button
           type='button'
-          aria-label={isExpanded ? `Collapse ${name}` : `Expand ${name}`}
+          aria-label={
+            isExpanded
+              ? t("collapse_section", { name })
+              : t("expand_section", { name })
+          }
           aria-expanded={isExpanded}
           onClick={(e) => {
             e.preventDefault();
@@ -408,11 +415,11 @@ const SidebarExpandableNavLink = ({
                 <SidebarNavLink
                   key={subLink.id}
                   href={subLink.href}
-                  name={subLink.name}
+                  name={t(subLink.name)}
                   icon={subLink.icon}
                   isActive={isSubLinkActive(subLink.href)}
                   onClick={onLinkClick}
-                  tooltip={subLink.tooltip}
+                  tooltip={subLink.tooltip && t(subLink.tooltip)}
                   lockedLvl={subLink.lockedLvl}
                   showBadge={subLink.showBadge}
                 />
@@ -440,6 +447,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const { isElectron } = useElectronWindowControls();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation("nav");
 
   // Surfacing it next to the logo makes a stale desktop install (see
   // useUpdateRequiredGate) obvious at a glance instead of hidden.
@@ -543,47 +551,47 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   };
 
   const mainNavigation = [
-    { id: "home", name: "Home", href: "/dashboard", icon: <Home size={18} /> },
+    { id: "home", name: t("home"), href: "/dashboard", icon: <Home size={18} /> },
     {
       id: "practice",
-      name: "Practice",
+      name: t("practice"),
       href: "/timer",
       icon: <Timer size={18} />,
       children: PRACTICE_SUB_NAV,
     },
     {
       id: "songs",
-      name: "Songs",
+      name: t("songs"),
       href: "/songs",
       icon: <PiCassetteTapeLight size={18} />,
       children: SONGS_SUB_NAV,
     },
     {
       id: "library",
-      name: "My Stuff",
+      name: t("my_stuff"),
       href: "/favorites",
       icon: <Library size={18} />,
       children: LIBRARY_SUB_NAV,
     },
     {
       id: "progress",
-      name: "Progress",
+      name: t("progress"),
       href: "/profile/activity",
       icon: <FaArrowTrendUp size={18} />,
       showBadge: hasUnclaimedMilestone,
       children: [
         {
           id: "progress-activity",
-          name: "Activity",
+          name: t("activity"),
           href: "/profile/activity",
           icon: <Activity size={16} />,
         },
         {
           id: "progress-milestones",
-          name: "Milestones",
+          name: t("milestones"),
           href: "/summary",
           icon: <Milestone size={16} />,
-          tooltip: "Weekly rewards for hitting practice goals",
+          tooltip: t("milestones_tooltip"),
           lockedLvl: lockedAtLvl("summary"),
           showBadge: hasUnclaimedMilestone,
         },
@@ -591,44 +599,43 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     },
     {
       id: "community",
-      name: "Community",
+      name: t("community"),
       href: "/seasons",
       icon: <Users size={18} />,
       children: [
         {
           id: "community-rankings",
-          name: "Rankings",
+          name: t("rankings"),
           href: "/seasons",
           icon: <Trophy size={16} />,
         },
         {
           id: "community-challenges",
-          name: "Challenges",
+          name: t("challenges"),
           href: "/challenges",
           icon: <Flame size={16} />,
-          tooltip: "Five community-voted songs to record every month",
+          tooltip: t("challenges_tooltip"),
         },
         {
           id: "community-recordings",
-          name: "Recordings",
+          name: t("recordings"),
           href: "/recordings",
           icon: <Mic2 size={16} />,
-          tooltip: "Share your covers and hear what everyone else is recording",
+          tooltip: t("recordings_tooltip"),
         },
         {
           id: "community-guilds",
-          name: "Guilds",
+          name: t("guilds"),
           href: "/guilds",
           icon: <Shield size={16} />,
-          tooltip:
-            "Practise alongside other people — chat and a weekly challenge",
+          tooltip: t("guilds_tooltip"),
           lockedLvl: lockedAtLvl("guilds"),
         },
       ] as SidebarSubLink[],
     },
     {
       id: "arsenal",
-      name: "Arsenal",
+      name: t("arsenal"),
       href: "/arsenal",
       icon: <Swords size={18} />,
     },
@@ -637,7 +644,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       ? [
           {
             id: "tone-studio",
-            name: "Tone Studio",
+            name: t("tone_studio"),
             href: "/tone-studio",
             icon: <SlidersHorizontal size={18} />,
           },
@@ -648,39 +655,39 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     // by the only people it was written for.
     {
       id: "supporter",
-      name: isSupporter ? "Supporter" : "Support",
+      name: isSupporter ? t("supporter") : t("support"),
       href: "/supporter",
       icon: <Heart size={18} />,
       tooltip: isSupporter
-        ? "Post ideas and spend your votes on what gets built next"
-        : "What supporting the project gets you, and how to get it",
+        ? t("supporter_tooltip")
+        : t("support_tooltip"),
     },
   ];
 
   const utilityNavigation = [
     {
       id: "wiki",
-      name: "Knowledge Base",
+      name: t("knowledge_base"),
       href: "/wiki",
       icon: <BookOpen size={18} />,
       muted: true,
-      tooltip: "How every part of the app works, in plain language",
+      tooltip: t("knowledge_base_tooltip"),
     },
     {
       id: "settings",
-      name: "Settings",
+      name: t("settings"),
       href: "/settings",
       icon: <Settings size={18} />,
       muted: true,
     },
     {
       id: "discord",
-      name: "Discord",
+      name: t("discord"),
       href: DISCORD_INVITE_URL,
       icon: <FaDiscord size={18} />,
       muted: true,
       external: true,
-      tooltip: "Join the community server",
+      tooltip: t("discord_tooltip"),
     },
   ];
 
@@ -836,7 +843,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           </span>
           <div className='relative min-w-0 flex-1'>
             <p className='text-sm font-semibold text-orange-300'>
-              Get the desktop app
+              {t("get_desktop_app")}
             </p>
           </div>
         </a>
@@ -853,7 +860,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             <span className={`${NAV_ICON_SLOT} text-zinc-600`}>
               <LogOut size={16} />
             </span>
-            <span>Sign Out</span>
+            <span>{t("sign_out")}</span>
           </button>
         </>
       )}

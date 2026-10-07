@@ -1,0 +1,217 @@
+{
+  "daily_quests": {
+    "title": "Tagesquests",
+    "claim": "{{points}} abholen",
+    "claimed": "Belohnung abgeholt",
+    "tasks": {
+      "rate_song": "Bewerte einen Song",
+      "add_want_to_learn": "Füge einen Song zu „Will ich lernen“ hinzu",
+      "practice_any_song": "Übe einen beliebigen Song",
+      "healthy_habits": "Wende 2 gesunde Gewohnheiten an",
+      "auto_plan": "Erstelle und übe einen Auto-Plan",
+      "practice_plan": "Schließ einen Übungsplan ab",
+      "practice_total_time": "Übe 15 Minuten",
+      "practice_technique_time": "Übe 10 Minuten Technik",
+      "practice_specific_exercise": "Üben: {{exercise}}",
+      "practice_theory_time": "Übe 10 Minuten Theorie",
+      "practice_hearing_time": "Trainiere 10 Minuten dein Gehör",
+      "practice_creativity_time": "Sei 10 Minuten kreativ",
+      "creativity_focus": "Verbringe 15 Minuten mit Kreativität",
+      "long_session": "Übe insgesamt 30 Minuten",
+      "well_rounded": "Übe 3 verschiedene Kategorien",
+      "two_categories_min": "Übe 2 Kategorien je 5 Min.",
+      "balanced_session": "Übe Technik & Theorie in einer Session",
+      "rate_multiple_songs": "Bewerte 3 Songs",
+      "complete_two_plans": "Schließ 2 Übungspläne ab",
+      "improve_skill": "Sammle Punkte in einer beliebigen Fähigkeit",
+      "practice_three_exercises": "Übe 3 verschiedene Übungen"
+    }
+  },
+  "customize": {
+    "hint": "Zieh Karten, um sie neu anzuordnen, blende Unnötiges aus und füge hinzu, was du brauchst.",
+    "add_widget": "Widget hinzufügen",
+    "reset": "Zurücksetzen",
+    "done": "Fertig",
+    "customize": "Anpassen",
+    "empty_title": "Hier ist noch nichts.",
+    "empty_editing": "Füge ein Widget hinzu, um diesen Platz zu füllen.",
+    "empty_hint": "Passe die Startseite an, um Karten zurückzuholen."
+  },
+  "widget_groups": {
+    "practice": "Üben",
+    "progress": "Fortschritt",
+    "milestones": "Wochenziele",
+    "community": "Community"
+  },
+  "widgets": {
+    "daily-quests": {
+      "title": "Tagesquests",
+      "description": "Die drei heutigen Aufgaben und der Abholen-Button."
+    },
+    "daily-exercise": {
+      "title": "Übung des Tages",
+      "description": "Eine per Mikrofon bewertete Übung für alle, jeden Tag neu, mit den Top 5 des Tages."
+    },
+    "practice-stats": {
+      "title": "Diese Woche",
+      "description": "Minuten pro Tag im Vergleich zu deinem Tagesziel, dazu die Serie."
+    },
+    "streak": {
+      "title": "Serie",
+      "description": "Tage in Folge, der Punktebonus, den sie bringt, und ob heute erledigt ist."
+    },
+    "shortcuts": {
+      "title": "Shortcuts",
+      "description": "Deine eigene Reihe von Schnelllinks zu jedem Teil der App."
+    },
+    "recent-sessions": {
+      "title": "Letzte Sessions",
+      "description": "Deine letzten zehn eingetragenen Sessions, direkt bearbeitbar."
+    },
+    "activity-log": {
+      "title": "Aktivität",
+      "description": "Ein Kästchen für jeden Tag, an dem du dieses Jahr geübt hast."
+    },
+    "level-rewards": {
+      "title": "Level-Belohnungen",
+      "description": "Was die nächsten Level freischalten und was ein Level-Up gerade ausgezahlt hat."
+    },
+    "songs": {
+      "title": "Songs",
+      "description": "Anzahl gelernter, laufender und geplanter Songs mit deiner Song-Stufe."
+    },
+    "rank": {
+      "title": "Dein Rang",
+      "description": "Wo du in der Gesamtrangliste und in der laufenden Saison stehst."
+    },
+    "monthly-challenge": {
+      "title": "Monats-Challenge",
+      "description": "Die fünf Songs dieses Monats und welche du aufgenommen hast."
+    }
+  },
+  "add_sheet": {
+    "title": "Zur Startseite hinzufügen",
+    "description": "Wähle, was du zuerst sehen willst. Neue Karten landen unten – zieh sie dorthin, wo sie hingehören.",
+    "empty": "Alles ist schon auf deiner Startseite."
+  },
+  "frame": {
+    "move": "{{title}} verschieben",
+    "drag": "Zum Verschieben ziehen",
+    "make_half": "{{title}} auf halbe Breite",
+    "make_full": "{{title}} auf volle Breite",
+    "half": "Halbe Breite",
+    "full": "Volle Breite",
+    "hide": "{{title}} ausblenden",
+    "hide_from_home": "Von der Startseite ausblenden",
+    "empty": "Gerade gibt es nichts anzuzeigen. Diese Karte erscheint nur, wenn etwas drin ist."
+  },
+  "support": {
+    "title": "Hilf mit, Riff Quest zu bauen",
+    "body": "Riff Quest ist ein Ein-Personen-Projekt, kostenlos und offen entwickelt. Deine Unterstützung sorgt dafür, dass es so bleibt.",
+    "cta": "Unterstützen"
+  },
+  "shortcuts": {
+    "title": "Shortcuts",
+    "tap_to_pin": "Tippe auf ein Ziel, um es anzuheften.",
+    "limit_reached": "Das war's – löse eines, um zu tauschen.",
+    "up_to": "Bis zu {{count}} passen.",
+    "empty": "Noch keine Shortcuts angeheftet. Passe die Startseite an, um welche hinzuzufügen.",
+    "groups": {
+      "practice": "Üben",
+      "songs": "Songs",
+      "library": "Meine Sachen",
+      "progress": "Fortschritt",
+      "community": "Community",
+      "gear": "Arsenal",
+      "other": "Sonstiges"
+    },
+    "items": {
+      "practice-plans": "Übungsroutinen",
+      "practice-auto": "Auto-Plan",
+      "practice-free-timer": "Freier Timer",
+      "practice-report": "Manueller Eintrag",
+      "practice-gp-tabs": "Guitar-Pro-Dateien",
+      "practice-skills": "Fähigkeiten",
+      "practice-exercises": "Übungen",
+      "practice-roadmaps": "Mastery Roadmaps",
+      "practice-journey": "Lernpfad",
+      "practice-scale-map": "Scale Map",
+      "songs-board": "Song-Board",
+      "songs-explore": "Songs entdecken",
+      "songs-playlists": "Playlists",
+      "library-favorites": "Favoriten",
+      "library-plans": "Meine Pläne",
+      "library-exercises": "Meine Übungen",
+      "library-create-plan": "Plan erstellen",
+      "library-create-exercise": "Übung erstellen",
+      "progress-activity": "Aktivität",
+      "progress-milestones": "Meilensteine",
+      "community-rankings": "Ranglisten",
+      "progress-challenges": "Challenges",
+      "recordings": "Aufnahmen",
+      "community-guilds": "Gilden",
+      "arsenal": "Arsenal",
+      "tone-studio": "Tone Studio",
+      "wiki": "Wissensdatenbank",
+      "settings": "Einstellungen"
+    }
+  },
+  "streak": {
+    "title": "Serie",
+    "day": "Tag",
+    "days": "Tage",
+    "bonus": "+{{pct}} % Punkte auf jede Session",
+    "done_today": "Heute ist erledigt.",
+    "not_yet": "Heute noch nichts eingetragen. Eine kurze Session hält die Serie am Leben.",
+    "practice_now": "Jetzt üben"
+  },
+  "rank": {
+    "title": "Dein Rang",
+    "rankings": "Ranglisten",
+    "all_time": "Gesamt",
+    "not_on_board": "Noch nicht in der Rangliste.",
+    "no_season_points": "Diese Saison noch keine Punkte.",
+    "this_season": "diese Saison",
+    "points_level": "Punkte · Level {{level}}"
+  },
+  "challenge": {
+    "ends_today": "endet heute",
+    "one_day_left": "noch 1 Tag",
+    "days_left": "noch {{count}} Tage",
+    "player": "Spieler",
+    "title": "Monats-Challenge",
+    "open": "Challenge öffnen",
+    "none": "Gerade läuft keine Challenge. Das nächste Board startet mit dem neuen Monat.",
+    "practice_song": "{{title}} von {{artist}} üben",
+    "recorded": "Aufgenommen",
+    "submit_song": "Aufnahme von {{title}} einreichen",
+    "submit": "Aufnahme einreichen",
+    "recorded_count": "{{count}} aufgenommen",
+    "x_of_y": "{{done}} von {{total}}"
+  },
+  "songs": {
+    "title": "Songs",
+    "board": "Song-Board",
+    "error": "Deine Songs konnten gerade nicht geladen werden."
+  },
+  "errors": {
+    "claim_failed": "Abholen fehlgeschlagen",
+    "claim_success": "+{{reward}} Fame von {{name}}",
+    "layout_save": "Das Layout deiner Startseite konnte nicht gespeichert werden"
+  },
+  "daily_exercise": {
+    "open_spot": "Freier Platz",
+    "no_scores": "Noch keine Ergebnisse. Der erste Durchgang holt #1.",
+    "title": "Übung des Tages",
+    "new_in": "Neu in {{time}}",
+    "none_today": "Heute keine Übung.",
+    "beat_score": "Schlag dein Ergebnis",
+    "play": "Spielen",
+    "your_best": "Dein Bestes",
+    "rank_of": "#{{rank}} von {{players}}",
+    "todays_board": "Heutiges Board",
+    "board_error": "Das Board konnte nicht geladen werden.",
+    "prize": "Preis für #1",
+    "mod": "{{label}}-Mod"
+  }
+}

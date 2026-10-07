@@ -1,0 +1,43 @@
+{
+  "track": {
+    "target": "Level {{lvl}}, hier öffnet sich die Seite",
+    "level": "Level {{lvl}}"
+  },
+  "opens_at": "{{name}} öffnet sich ab Level {{lvl}}",
+  "you_are": "Du bist Level {{lvl}} — {{left}}, also {{points}} Punkte Übung.",
+  "levels_left_one": "noch {{count}} Level",
+  "levels_left": "noch {{count}} Level",
+  "practise_now": "Jetzt üben",
+  "how_levels": "So funktionieren Level",
+  "what_else": "Was sich noch öffnet",
+  "lvl": "Lvl {{lvl}}",
+  "features": {
+    "summary": {
+      "name": "Meilensteine",
+      "reason": "Meilensteine entstehen aus deiner eigenen Übungshistorie. Ein paar eingetragene Sessions sorgen dafür, dass die Wochenziele zu deinem Spiel passen, statt zu raten.",
+      "perks": {
+        "0": "Wochenziele, die zu deinem tatsächlichen Üben passen",
+        "1": "Fame zum Abholen für jedes erreichte Ziel",
+        "2": "Ein Blick darauf, wohin die Woche ging, Kategorie für Kategorie"
+      }
+    },
+    "guilds": {
+      "name": "Gilden",
+      "reason": "Eine Gilde lebt davon, dass Leute füreinander da sind. Nach ein paar Leveln hast du eine eigene Routine — dann bringt dein Beitritt auch dem Rest der Gilde etwas, nicht nur dir.",
+      "perks": {
+        "0": "Ein Chat mit Gitarristen, die in derselben Woche üben wie du",
+        "1": "Eine Wochen-Challenge, die die ganze Gilde gemeinsam schafft",
+        "2": "Ein gemeinsames Lager und ein Wappen für deine Gilde"
+      }
+    },
+    "commissions": {
+      "name": "Aufträge",
+      "reason": "Aufträge umgehen die Drop-Tabellen, darum warten sie, bis du eine Weile Kisten geöffnet hast. Dann sind die letzten fehlenden Modelle in deinem Dex die schwersten — und genau dafür ist die Werkbank da.",
+      "perks": {
+        "0": "Bestelle jede Gitarre oder jedes Pedal, das in deinem Dex fehlt",
+        "1": "Bezahlt mit Fame und den Teilen, aus denen das Instrument besteht",
+        "2": "Serienzustand, mit jedem Mod-Slot frei für die Mods in deinem Lager"
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
 import { Play, Repeat2, Trash2 } from "lucide-react";
@@ -53,6 +54,7 @@ export const SectionRow = ({
   onDelete,
   isLocked,
 }: SectionRowProps) => {
+  const { t } = useTranslation("songs");
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(section.name);
   const [editingTime, setEditingTime] = useState(false);
@@ -249,7 +251,7 @@ export const SectionRow = ({
           <button
             type="button"
             onClick={() => onPlay(section)}
-            title="Play from here"
+            title={t("sections.play_from_here")}
             className="p-2 sm:p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5 transition-all"
           >
             <Play className="h-4 w-4 fill-current" />
@@ -258,7 +260,7 @@ export const SectionRow = ({
           <button
             type="button"
             onClick={() => onLoop(section)}
-            title={isLooping ? "Stop loop" : "Loop this section"}
+            title={isLooping ? t("sections.stop_loop") : t("sections.loop")}
             className={cn(
               "p-2 sm:p-1.5 rounded-lg transition-all",
               isLooping
@@ -281,7 +283,7 @@ export const SectionRow = ({
             <button
               type="button"
               onClick={() => onDelete(section.id)}
-              title="Delete section"
+              title={t("sections.delete")}
               className="p-2 sm:p-1.5 rounded-lg text-zinc-700 hover:text-red-400 hover:bg-red-500/10 transition-all"
             >
               <Trash2 className="h-4 w-4" />

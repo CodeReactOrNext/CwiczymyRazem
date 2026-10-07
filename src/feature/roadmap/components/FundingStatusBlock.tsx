@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { tierLabel } from "feature/roadmap/utils/tierText";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, TriangleAlert } from "lucide-react";
 
 import { MONTHLY_RUNNING_COST } from "../data/roadmap.data";
@@ -26,6 +28,7 @@ export const FundingStatusBlock = ({
   raisedThisMonth,
   className,
 }: FundingStatusBlockProps) => {
+  const { t } = useTranslation("supporter");
   const { covered, isCovered, costPct, nextTier, toGo, tierPct, showsTier } =
     getFundingStatus(totalRaised, raisedThisMonth);
   const NextTierIcon = nextTier?.icon;
@@ -40,14 +43,14 @@ export const FundingStatusBlock = ({
                 <NextTierIcon size={14} className='shrink-0 text-cyan-400' />
               )}
               <span className='truncate'>
-                Next unlock{" "}
+                {t("funding.next_unlock")}{" "}
                 <span className='font-medium text-zinc-100'>
-                  {nextTier.label}
+                  {tierLabel(nextTier, t)}
                 </span>
               </span>
             </span>
             <span className='shrink-0 font-semibold text-cyan-400'>
-              ${toGo} to go
+              {t("funding.to_go", { amount: toGo })}
             </span>
           </>
         ) : (
@@ -63,9 +66,7 @@ export const FundingStatusBlock = ({
                   "truncate font-medium",
                   isCovered ? "text-zinc-300" : "text-orange-200",
                 )}>
-                {isCovered
-                  ? "Server cost this month covered"
-                  : "Server cost needs your help"}
+                {isCovered ? t("funding.covered") : t("funding.needs_help")}
               </span>
             </span>
             {!isCovered && (
@@ -95,26 +96,26 @@ export const FundingStatusBlock = ({
         {showsTier ? (
           <span className='flex min-w-0 items-center gap-1.5'>
             <Check size={12} className='shrink-0 text-emerald-400' />
-            <span className='truncate'>Server cost this month covered</span>
+            <span className='truncate'>{t("funding.covered")}</span>
           </span>
         ) : nextTier ? (
           <>
             <span className='flex min-w-0 items-center gap-1.5'>
               {NextTierIcon && <NextTierIcon size={12} className='shrink-0' />}
               <span className='truncate'>
-                Next unlock{" "}
+                {t("funding.next_unlock")}{" "}
                 <span className='font-medium text-zinc-300'>
-                  {nextTier.label}
+                  {tierLabel(nextTier, t)}
                 </span>
               </span>
             </span>
             <span className='shrink-0 font-medium text-zinc-300'>
-              ${toGo} to go
+              {t("funding.to_go", { amount: toGo })}
             </span>
           </>
         ) : (
           <span className='font-medium text-emerald-400'>
-            Every roadmap goal is funded, thank you
+            {t("funding.all_funded")}
           </span>
         )}
       </div>

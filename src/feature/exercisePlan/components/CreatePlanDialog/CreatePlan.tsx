@@ -3,6 +3,7 @@ import { OrderExercisesStep } from "feature/exercisePlan/components/CreatePlanDi
 import { PlanDetailsStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/PlanDetailsStep/PlanDetailsStep";
 import { SelectExercisesStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/SelectExercisesStep";
 import { AnimatePresence } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { Check } from "lucide-react";
 import { useState } from "react";
 
@@ -33,6 +34,7 @@ interface CreatePlanProps {
 }
 
 export const CreatePlan = ({ initialPlan, onSubmit, onUpdate }: CreatePlanProps) => {
+  const { t } = useTranslation("plans");
   const [step, setStep] = useState<Step>("select");
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>(
     initialPlan?.exercises || []
@@ -53,7 +55,7 @@ export const CreatePlan = ({ initialPlan, onSubmit, onUpdate }: CreatePlanProps)
 
   return (
     <div className='w-full'>
-      <div className='mb-6 flex items-center gap-2' aria-label={`Step ${currentIndex + 1} of ${STEPS.length}`}>
+      <div className='mb-6 flex items-center gap-2' aria-label={t("create.step_of", { step: currentIndex + 1, total: STEPS.length })}>
         {STEPS.map((s, i) => (
           <div key={s.id} className='flex flex-1 items-center gap-2 last:flex-none'>
             <div
@@ -72,7 +74,7 @@ export const CreatePlan = ({ initialPlan, onSubmit, onUpdate }: CreatePlanProps)
                 "hidden text-xs font-semibold sm:inline",
                 i === currentIndex ? "text-white" : "text-zinc-500"
               )}>
-              {s.label}
+              {t(`create.steps.${s.id}`, s.label)}
             </span>
             {i < STEPS.length - 1 && (
               <div

@@ -3,5 +3,90 @@
     "title": "Język",
     "subtitle": "Dotyczy aplikacji na tym urządzeniu.",
     "work_in_progress": "Tłumaczenia dopiero powstają — co nie jest jeszcze przetłumaczone, zostaje po angielsku."
+  },
+  "settings_subtilte": "Edytuj profil",
+  "edit": "Edytuj",
+  "save": "Zapisz",
+  "back": "Wstecz",
+  "nickname": "Nick:",
+  "new_nickname": "Nowy nick",
+  "new_email": "Nowy e-mail",
+  "password": "Hasło:",
+  "new_password": "Nowe hasło",
+  "repeat_new_password": "Powtórz nowe hasło",
+  "reset_stats": "Resetuj statystyki",
+  "reset_warning": "Uwaga. Kliknięcie tego przycisku zresetuje Twoje statystyki.",
+  "reset_approve_info": "Czy na pewno chcesz usunąć wszystkie swoje statystyki?",
+  "reset": "Resetuj",
+  "anonimity": "Anonimowość:",
+  "anonimity_info": "Czy chcesz ukryć swój nick w rankingu?",
+  "resolution_info": "Maksymalna rozdzielczość 250 × 250",
+  "logged_in_via_google": "Zmiana hasła i e-maila jest wyłączona, ponieważ logujesz się przez Google.",
+  "bands": "Twoje zespoły",
+  "guitarStartDate": {
+    "title": "Kiedy zacząłeś grać na gitarze?",
+    "placeholder": "Wybierz datę",
+    "save": "Zapisz",
+    "success": "Zaktualizowano datę rozpoczęcia!",
+    "error": "Nie udało się zaktualizować daty rozpoczęcia",
+    "duration_years": "Grasz już od {{years}} lat!"
+  },
+  "profile_settings": "Ustawienia profilu",
+  "manage_your_profile_information": "Zarządzaj informacjami w profilu",
+  "security": "Bezpieczeństwo",
+  "manage_your_account_security": "Zarządzaj bezpieczeństwem konta",
+  "google_account_notice": "Konto Google — ograniczone opcje",
+  "additional_info": "Dodatkowe informacje",
+  "customize_your_experience": "Dostosuj aplikację do siebie",
+  "danger_zone": "Strefa zagrożenia",
+  "irreversible_actions": "Nieodwracalne działania — zachowaj ostrożność",
+  "danger_zone_warning": "Poniższych działań nie da się cofnąć. Upewnij się, że rozumiesz ich skutki.",
+  "bands_placeholder": "Twoje zespoły...",
+  "email_label": "E-mail",
+  "email_notifications": {
+    "title": "Powiadomienia e-mail",
+    "description": "Wybierz, jakie e-maile chcesz dostawać od Riff Quest.",
+    "options": {
+      "streakReminders": {
+        "title": "Przypomnienia o serii",
+        "description": "Dostaniesz przypomnienie, gdy nie ćwiczysz dzień lub dwa, żeby nie przerwać serii."
+      },
+      "seasonUpdates": {
+        "title": "Informacje o sezonach",
+        "description": "E-maile o starcie nowych sezonów, zbliżającym się końcu sezonu i twoich wynikach."
+      }
+    },
+    "always_sent": "E-maile dotyczące konta i bezpieczeństwa (np. zmiana adresu) są wysyłane zawsze i nie da się ich wyłączyć.",
+    "saving": "Zapisywanie...",
+    "save": "Zapisz zmiany"
+  },
+  "tablature": {
+    "title": "Tabulatura",
+    "description": "Zmień sposób rysowania ćwiczeń. Wszystko zapisuje się na tym urządzeniu i działa od następnej sesji ćwiczeń.",
+    "live_preview": "Podgląd na żywo",
+    "mode_tab": "Tabulatura",
+    "mode_notation": "Nuty",
+    "hint_tab": "Kolor trafień i animacje trafień widać tylko podczas faktycznego grania.",
+    "hint_notation": "Ten sam podgląd co w trakcie sesji — przełącz tło poniżej, żeby zobaczyć go na papierze albo na czarnym."
+  },
+  "profile_basics": {
+    "description": "Zarządzaj publicznymi informacjami profilu",
+    "change_avatar": "Zmień awatar",
+    "display_name": "Wyświetlana nazwa",
+    "display_name_placeholder": "Wpisz wyświetlaną nazwę",
+    "display_name_hint": "Ta nazwa jest widoczna w rankingach i na twoim publicznym profilu.",
+    "adjust_image": "Dopasuj obraz",
+    "zoom": "Powiększenie",
+    "cancel": "Anuluj",
+    "set_avatar": "Ustaw awatar"
+  },
+  "tabs": {
+    "title": "Ustawienia",
+    "profile": "Profil",
+    "socials": "Media społecznościowe",
+    "tablature": "Tabulatura",
+    "notifications": "Powiadomienia",
+    "security": "Bezpieczeństwo",
+    "google_auth": "Logowanie przez Google"
   }
 }

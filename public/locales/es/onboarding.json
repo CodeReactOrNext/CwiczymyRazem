@@ -1,0 +1,101 @@
+{
+  "back": "Atrás",
+  "skip": "Omitir por ahora",
+  "progress": "Progreso de la configuración",
+  "close": "Cerrar",
+  "level_step": {
+    "title": "¿Cuánto tiempo llevas tocando?",
+    "description": "Para mostrarte solo lo que encaja con tu nivel."
+  },
+  "goal_step": {
+    "title": "¿Qué te trae a Riff Quest?",
+    "description": "Elige por dónde empezar. Todo lo demás queda a un clic."
+  },
+  "plan_step": {
+    "title": "Elige un plan para empezar",
+    "description": "Rutinas cortas en las que el temporizador te guía por cada ejercicio. Nada empieza hasta que pulses Play — con micrófono para feedback en directo, o sin él.",
+    "open": "Abrir plan",
+    "browse_all": "Ver los {{count}} planes"
+  },
+  "levels": {
+    "new": {
+      "unit": "año",
+      "label": "Estoy empezando",
+      "description": "Primeros acordes, o aún no he cogido una guitarra"
+    },
+    "some": {
+      "unit": "años",
+      "label": "Sé lo básico",
+      "description": "Acordes y canciones sencillas, quiero mejorar"
+    },
+    "experienced": {
+      "unit": "años",
+      "label": "Llevo años tocando",
+      "description": "Me muevo bien por el mástil, quiero seguir mejorando"
+    }
+  },
+  "goals": {
+    "journey": {
+      "label": "Seguir la Ruta de aprendizaje",
+      "description": "Aprende guitarra desde cero, paso a paso"
+    },
+    "plans": {
+      "label": "Practicar con planes de ejercicios",
+      "description": "Rutinas listas con un temporizador que te guía"
+    },
+    "songs": {
+      "label": "Aprender canciones y seguirlas",
+      "description": "Guarda las canciones que quieres tocar y mira tu progreso"
+    },
+    "roadmap": {
+      "label": "Seguir una hoja de ruta hacia una meta",
+      "description": "Un camino paso a paso, como tocar al estilo de tu ídolo"
+    },
+    "log": {
+      "label": "Registrar la práctica que ya hago",
+      "description": "Sigue tu tiempo, tu racha y tu progreso"
+    }
+  },
+  "checklist": {
+    "title": "Primeros pasos",
+    "intro": "Intro de 2 min",
+    "dismiss": "Ocultar la lista de primeros pasos",
+    "claim": "Reclamar {{badge}}",
+    "first_session": "Primera sesión",
+    "first_song": "Primera canción",
+    "second_day": "Practica un 2.º día",
+    "first_guitar": "Primera guitarra",
+    "after_first": "Tras tu primera sesión",
+    "tomorrow": "Disponible mañana",
+    "play_today": "Toca hoy para completarlo",
+    "open_case": "Abre una caja"
+  },
+  "intro": {
+    "title": "Bienvenido a Riff Quest",
+    "description": "Dos minutos sobre qué es esto y cómo funciona.",
+    "cta": "Entendido"
+  },
+  "first_song": {
+    "title": "Añade una canción que quieras tocar",
+    "description": "Sigue las canciones que quieres aprender, estás aprendiendo o ya sabes.",
+    "step1": "Ve a la página de Canciones y pulsa este botón:",
+    "add_button": "Añadir canción nueva",
+    "step2": "Escribe el artista y el título de cualquier canción que te encantaría tocar. ¿Ya está en la biblioteca? Elige la coincidencia. ¿Aún no está? No pasa nada — la estás añadiendo:",
+    "artist": "Artista",
+    "song_title": "Título de la canción",
+    "step3": "Dile a la app en qué punto estás con esta canción. Más adelante podrás practicarla sección a sección y ver crecer tu dominio:",
+    "want": "Quiero aprender",
+    "want_sub": "Guárdala como inspiración para más tarde",
+    "learning": "Aprendiendo",
+    "learning_sub": "Céntrate hoy en esta canción",
+    "learned": "Aprendida",
+    "learned_sub": "Dominada y en el repertorio",
+    "cta": "Explorar canciones"
+  },
+  "reward": {
+    "title": "Saca tu primera guitarra",
+    "description": "Has tocado tu primera sesión — reclama tu Fama y abre una caja.",
+    "body": "Es justo lo necesario para abrir una caja en el Arsenal. Reclámalo y llegarás allí listo para elegir tu guitarra.",
+    "cta": "Reclamar y elegir guitarra"
+  }
+}

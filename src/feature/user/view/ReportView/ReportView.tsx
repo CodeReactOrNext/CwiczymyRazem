@@ -34,6 +34,7 @@ import {
 } from "layouts/ReportFormLayout/components";
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import { ArrowDown, Check, Flame, Music, Tags } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
@@ -75,6 +76,9 @@ type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
 type SessionMode = "free" | "songs";
 
+/** Tag labels double as ids; this is the key their translation lives under. */
+const tagKey = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+
 const ReportView = () => {
   const router = useRouter();
   const { songId, songTitle, songArtist, planId, planTitle, applyTimer, returnTo } = router.query;
@@ -107,6 +111,7 @@ const ReportView = () => {
   );
   const autoApplyTimer = applyTimer === "true";
   const { t } = useTranslation("report");
+  const intlLocale = useIntlLocale();
 
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
@@ -604,7 +609,7 @@ const ReportView = () => {
           // next block is the restart button's job.
           onClick={() => router.push(resolveInternalPath(returnTo, "/dashboard"))}
           onRestart={logAnotherSession}
-          restartLabel='Log another session'
+          restartLabel={t("form.log_another")}
           ratingData={raitingData}
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}
@@ -650,19 +655,19 @@ const ReportView = () => {
                           isStep1Done ? "text-emerald-400" : "text-zinc-400"
                         )}>
                           {isStep1Done
-                            ? "Time entered. Save it now or add optional details below."
+                            ? t("form.time_entered")
                             : isSongMode
                               ? pickedSongs.length > 0
-                                ? "Song selected — set how long you played it."
-                                : "Pick the songs you played and set the time on each one."
-                              : "What did you practice today? Add time below."}
+                                ? t("form.song_selected")
+                                : t("form.pick_songs")
+                              : t("form.what_practiced")}
                         </p>
                     </div>
 
                     <div className='mb-6 flex gap-1 rounded-lg bg-zinc-900/60 p-1'>
                       {([
-                        { mode: "free" as const, label: "Free session", Icon: Tags },
-                        { mode: "songs" as const, label: "Songs", Icon: Music },
+                        { mode: "free" as const, label: t("form.mode_free"), Icon: Tags },
+                        { mode: "songs" as const, label: t("form.mode_songs"), Icon: Music },
                       ]).map(({ mode, label, Icon }) => (
                         <button
                           key={mode}
@@ -743,24 +748,24 @@ const ReportView = () => {
                             className="bg-emerald-600 text-white hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-400 disabled:opacity-100"
                           >
                             <Check className="mr-2 h-4 w-4" />
-                            Save Now
+                            {t("form.save_now")}
                           </Button>
                         </div>
 
                         {isStep1Done && (
                           <p className="pr-4 text-xs font-medium text-zinc-300">
-                            {buildSaveSummary(values)}
+                            {buildSaveSummary(values, t)}
                           </p>
                         )}
                         {isStep1Done ? (
                           <div className="mt-2 flex items-center gap-3 pr-4 duration-700 animate-in fade-in slide-in-from-top-2">
                              <p className="text-[10px] font-semibold tracking-wide text-emerald-400">
-                                Or add more details below
+                                {t("form.more_details")}
                              </p>
                              <ArrowDown className="h-5 w-5 animate-bounce text-emerald-500" />
                           </div>
                         ) : (
-                          <p className="mt-1 text-sm text-zinc-300">Add time to at least one category to save</p>
+                          <p className="mt-1 text-sm text-zinc-300">{t("form.add_time_hint")}</p>
                         )}
                       </div>
                     </div>
@@ -781,9 +786,9 @@ const ReportView = () => {
                       </div>
                       <div className="flex items-baseline gap-3">
                         <h3 className='font-display text-xl font-bold tracking-tight text-zinc-100'>
-                           {isSongMode ? "Healthy habits" : "Session focus & habits"}
+                           {isSongMode ? t("form.healthy_habits") : t("form.focus_habits")}
                         </h3>
-                        <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-400">Optional</span>
+                        <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-400">{t("form.optional")}</span>
                       </div>
                     </div>
 
@@ -793,13 +798,13 @@ const ReportView = () => {
                         <div className='space-y-4'>
                           <div className="flex items-center justify-between">
                             <label className='font-sans text-sm font-bold text-zinc-400'>
-                              Session title
+                              {t("form.session_title")}
                             </label>
                           </div>
                           <div className='relative'>
                             <Input
                               name='reportTitle'
-                              placeholder='e.g. Practicing major scales'
+                              placeholder={t("form.session_title_placeholder")}
                               className={cn(
                                 "h-11 bg-zinc-900/40 text-sm focus-visible:ring-cyan-500/40",
                                 errors.reportTitle && "ring-1 ring-red-500/40"
@@ -863,7 +868,7 @@ const ReportView = () => {
                             ].map((group) => (
                               <div key={group.label} className="space-y-2">
                                 <p className="text-[10px] font-bold tracking-wide text-zinc-400">
-                                  {group.icon} {group.label}
+                                  {group.icon} {t(`tag_groups.${tagKey(group.label)}`, group.label)}
                                 </p>
                                 <div className='flex flex-wrap gap-2'>
                                   {group.tags.map((tag) => {
@@ -875,9 +880,9 @@ const ReportView = () => {
                                         onClick={() => {
                                           setSelectedTags(prev => {
                                             const newTags = prev.includes(tag.label)
-                                              ? prev.filter(t => t !== tag.label)
+                                              ? prev.filter((label) => label !== tag.label)
                                               : [...prev, tag.label];
-                                            setFieldValue("reportTitle", newTags.join(" + "));
+                                            setFieldValue("reportTitle", newTags.map((label) => t(`tags.${tagKey(label)}`, label)).join(" + "));
                                             return newTags;
                                           });
                                         }}
@@ -889,7 +894,7 @@ const ReportView = () => {
                                         )}
                                       >
                                         <span className={cn("transition-opacity", isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100")}>{tag.icon}</span>
-                                        {tag.label}
+                                        {t(`tags.${tagKey(tag.label)}`, tag.label)}
                                       </button>
                                     );
                                   })}
@@ -906,7 +911,7 @@ const ReportView = () => {
                          isSongMode ? "xl:col-span-12" : "xl:col-span-5"
                        )}>
                           <div className="flex items-center justify-between gap-2 px-1">
-                            <p className="text-lg font-bold text-zinc-200">Habits checklist</p>
+                            <p className="text-lg font-bold text-zinc-200">{t("form.habits_checklist")}</p>
                             <span
                               className={cn(
                                 "flex shrink-0 items-center gap-1 rounded px-2 py-0.5 text-xs font-bold",
@@ -916,8 +921,8 @@ const ReportView = () => {
                               )}
                               title={
                                 hasStreakBonus
-                                  ? `${streak}-day streak — points ×${streakMultiplier.toFixed(1)}`
-                                  : `No streak yet — points ×${streakMultiplier.toFixed(1)}`
+                                  ? t("form.streak_bonus", { count: streak, multiplier: streakMultiplier.toFixed(1) })
+                                  : t("form.no_streak_bonus", { multiplier: streakMultiplier.toFixed(1) })
                               }>
                               <Flame
                                 className={cn("h-3.5 w-3.5", !hasStreakBonus && "text-zinc-500")}
@@ -954,19 +959,19 @@ const ReportView = () => {
                         )}>3</div>
                         <div className="flex items-baseline gap-3">
                           <h3 className='font-display text-lg font-bold text-zinc-100'>
-                             Finalize Log
+                             {t("form.finalize")}
                           </h3>
-                          <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-400">Optional Details</span>
+                          <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-400">{t("form.optional_details")}</span>
                         </div>
                       </div>
 
                       <div className='flex flex-col items-center gap-8 py-4'>
                           <div className='flex flex-col items-center gap-4'>
-                            <p className='text-xs font-semibold tracking-wide text-zinc-400'>When did this happen?</p>
+                            <p className='text-xs font-semibold tracking-wide text-zinc-400'>{t("form.when")}</p>
                             <div className='flex flex-wrap items-center justify-center gap-3'>
                               {[0, 1, 2, 3, 4].map((days) => {
                                 const isSelected = values.countBackDays === days;
-                                let label = (days === 0 ? "Today" : days === 1 ? "Yesterday" : `${days} days ago`);
+                                const label = days === 0 ? t("form.today") : days === 1 ? t("form.yesterday") : t("form.days_ago", { count: days });
 
                                 return (
                                   <Button
@@ -986,7 +991,7 @@ const ReportView = () => {
                               })}
                             </div>
                             <p className='text-xs font-medium text-zinc-400'>
-                              Selected: <span className="text-zinc-200">{getDateFromPast(values.countBackDays).toLocaleDateString()}</span>
+                              {t("form.selected")} <span className="text-zinc-200">{getDateFromPast(values.countBackDays).toLocaleDateString(intlLocale)}</span>
                             </p>
                           </div>
 
@@ -1000,7 +1005,7 @@ const ReportView = () => {
                              >
                               <div className="flex items-center gap-2">
                                 <Check className='h-6 w-6 text-emerald-600' />
-                                <span>{isFetching ? "Saving..." : "Finish & Save Practice"}</span>
+                                <span>{isFetching ? t("form.saving") : t("form.finish_save")}</span>
                               </div>
                             </Button>
                           </div>

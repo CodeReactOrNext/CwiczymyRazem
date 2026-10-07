@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Dialog, DialogContent } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
@@ -50,6 +51,7 @@ export function SongPracticePickerModal({
   onDetachGpFile,
   onClose,
 }: SongPracticePickerModalProps) {
+  const { t } = useTranslation("songs");
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("pick");
   const [attachTab, setAttachTab] = useState<AttachTab>("library");
@@ -98,9 +100,9 @@ export function SongPracticePickerModal({
     setIsDetaching(true);
     try {
       await onDetachGpFile(song.id);
-      toast.success("GP file detached");
+      toast.success(t("picker.detached"));
     } catch {
-      toast.error("Failed to detach file");
+      toast.error(t("picker.detach_error"));
     } finally {
       setIsDetaching(false);
     }
@@ -108,7 +110,7 @@ export function SongPracticePickerModal({
 
   const handleFileAttached = async (gpFileId: string, gpFileName: string) => {
     await onAttachGpFile(song.id, gpFileId, gpFileName);
-    toast.success("GP file attached!");
+    toast.success(t("picker.attached"));
     onClose();
     router.push(`/songs/practice/${song.id}${arrangementQuery}`);
   };
@@ -128,7 +130,7 @@ export function SongPracticePickerModal({
           )}
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
-              {phase === "pick" ? "Choose practice mode" : "Attach GP file"}
+              {phase === "pick" ? t("picker.choose_mode") : t("picker.attach_gp")}
             </p>
             <p className="truncate text-sm font-bold text-white">
               {song.title}
@@ -141,11 +143,11 @@ export function SongPracticePickerModal({
         {phase === "pick" && (
           <div className="space-y-3 p-5">
             <div className="space-y-2 pb-3">
-              <p className="text-xs font-semibold text-zinc-400">Which part are you playing?</p>
+              <p className="text-xs font-semibold text-zinc-400">{t("picker.which_part")}</p>
               <ArrangementPicker
                 value={arrangement}
                 onChange={setArrangement}
-                noneLabel="Any part"
+                noneLabel={t("picker.any_part")}
               />
             </div>
 
@@ -158,8 +160,8 @@ export function SongPracticePickerModal({
                 <PiCassetteTapeLight className="h-5 w-5 text-indigo-400" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-white">Free Practice</p>
-                <p className="text-[11px] text-zinc-500">Timer, YouTube player and section mapping</p>
+                <p className="text-sm font-bold text-white">{t("picker.free_practice")}</p>
+                <p className="text-[11px] text-zinc-500">{t("picker.free_practice_hint")}</p>
               </div>
               <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover:text-zinc-400" />
             </button>
@@ -174,14 +176,14 @@ export function SongPracticePickerModal({
                   <SiGuitarpro className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white">GP File Practice</p>
+                  <p className="text-sm font-bold text-white">{t("picker.gp_practice")}</p>
                   {hasGpFile ? (
                     <div className="mt-0.5 flex items-center gap-1.5">
                       <FileMusic className="h-3 w-3 shrink-0 text-cyan-400/70" />
                       <span className="truncate text-[11px] text-cyan-400/70">{progress?.gpFileName}</span>
                     </div>
                   ) : (
-                    <p className="text-[11px] text-zinc-500">Attach a GP file for interactive tablature</p>
+                    <p className="text-[11px] text-zinc-500">{t("picker.gp_practice_hint")}</p>
                   )}
                 </div>
                 <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition-colors group-hover:text-cyan-400" />
@@ -195,13 +197,13 @@ export function SongPracticePickerModal({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-zinc-400">GP File Practice</p>
+                      <p className="text-sm font-bold text-zinc-400">{t("picker.gp_practice")}</p>
                       <span className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-400">
                         <Crown className="h-2.5 w-2.5" />
-                        Premium
+                        {t("picker.premium")}
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-600">Attach your own GP5 file for interactive tablature</p>
+                    <p className="text-[11px] text-zinc-600">{t("picker.gp_premium_hint")}</p>
                   </div>
                 </div>
                 <Link
@@ -210,7 +212,7 @@ export function SongPracticePickerModal({
                   className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-500/5 py-2 text-[11px] font-bold uppercase tracking-wider text-amber-400 transition-colors hover:border-amber-500/30 hover:bg-amber-500/10"
                 >
                   <Crown className="h-3 w-3" />
-                  Upgrade to Premium
+                  {t("picker.upgrade")}
                 </Link>
               </div>
             )}
@@ -222,7 +224,7 @@ export function SongPracticePickerModal({
                   onClick={() => setPhase("attach")}
                   className="flex-1 rounded-lg border border-white/5 px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500 transition-colors hover:border-white/10 hover:text-zinc-300"
                 >
-                  Change GP file
+                  {t("picker.change_gp")}
                 </button>
                 <button
                   onClick={handleDetach}
@@ -248,8 +250,8 @@ export function SongPracticePickerModal({
                 <NotebookPen className="h-5 w-5 text-emerald-400" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-white">Log Practice</p>
-                <p className="text-[11px] text-zinc-500">Already played it? Add the time by hand</p>
+                <p className="text-sm font-bold text-white">{t("picker.log_practice")}</p>
+                <p className="text-[11px] text-zinc-500">{t("picker.log_practice_hint")}</p>
               </div>
               <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover:text-zinc-400" />
             </button>
@@ -273,9 +275,9 @@ export function SongPracticePickerModal({
                   )}
                 >
                   {tab === "library" ? (
-                    <><FolderOpen className="h-3.5 w-3.5" /> My files</>
+                    <><FolderOpen className="h-3.5 w-3.5" /> {t("picker.my_files")}</>
                   ) : (
-                    <><Upload className="h-3.5 w-3.5" /> Import</>
+                    <><Upload className="h-3.5 w-3.5" /> {t("picker.import")}</>
                   )}
                 </button>
               ))}
@@ -304,6 +306,7 @@ function GpFileLibraryPicker({
   userId: string;
   onSelect: (gpFileId: string, gpFileName: string) => Promise<void>;
 }) {
+  const { t } = useTranslation("songs");
   const [files, setFiles] = useState<UserGpFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -311,7 +314,7 @@ function GpFileLibraryPicker({
   useEffect(() => {
     getUserGpFiles(userId)
       .then(setFiles)
-      .catch(() => toast.error("Failed to load files"))
+      .catch(() => toast.error(t("picker.load_error")))
       .finally(() => setIsLoading(false));
   }, [userId]);
 
@@ -327,8 +330,8 @@ function GpFileLibraryPicker({
     return (
       <div className="flex flex-col items-center gap-3 py-8 text-zinc-600">
         <FolderOpen className="h-8 w-8 opacity-40" />
-        <p className="text-xs font-bold uppercase tracking-widest">No saved files</p>
-        <p className="text-[10px] text-zinc-700">Switch to the Import tab to add a file</p>
+        <p className="text-xs font-bold uppercase tracking-widest">{t("picker.no_files")}</p>
+        <p className="text-[10px] text-zinc-700">{t("picker.no_files_hint")}</p>
       </div>
     );
   }
@@ -344,7 +347,7 @@ function GpFileLibraryPicker({
             try {
               await onSelect(file.id, file.name);
             } catch {
-              toast.error("Failed to attach file");
+              toast.error(t("picker.attach_error"));
               setLoadingId(null);
             }
           }}
@@ -372,6 +375,7 @@ function GpFileImporter({
   userId: string;
   onAttached: (gpFileId: string, gpFileName: string) => Promise<void>;
 }) {
+  const { t } = useTranslation("songs");
   const [isSaving, setIsSaving] = useState(false);
 
   const handleImported = async (
@@ -387,7 +391,7 @@ function GpFileImporter({
       const uploaded = await uploadUserGpFile(userId, rawFile);
       await onAttached(uploaded.id, uploaded.name);
     } catch {
-      toast.error("Failed to save file");
+      toast.error(t("picker.save_error"));
       setIsSaving(false);
     }
   };
@@ -399,7 +403,7 @@ function GpFileImporter({
         <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-zinc-950/80 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-2 text-zinc-400">
             <Loader2 className="h-5 w-5 animate-spin text-cyan-500" />
-            <span className="text-[11px] font-bold uppercase tracking-widest">Saving…</span>
+            <span className="text-[11px] font-bold uppercase tracking-widest">{t("detail.saving")}</span>
           </div>
         </div>
       )}

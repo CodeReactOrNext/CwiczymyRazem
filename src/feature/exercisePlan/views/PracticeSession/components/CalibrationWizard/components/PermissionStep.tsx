@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronLeft } from "lucide-react";
 import { FaMicrophone, FaTimes } from "react-icons/fa";
 
@@ -10,6 +11,7 @@ interface PermissionStepProps {
 }
 
 export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: PermissionStepProps) => {
+  const { t } = useTranslation("calibration");
   return (
     <div className="flex h-full flex-col px-6 py-6 text-white">
       <div className="flex items-center justify-between mb-8">
@@ -30,10 +32,9 @@ export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: Permiss
         </div>
 
         <div className="space-y-3 max-w-[280px]">
-          <h2 className="text-xl font-bold tracking-tight">Microphone Access</h2>
+          <h2 className="text-xl font-bold tracking-tight">{t("permission.title")}</h2>
           <p className="text-sm text-zinc-400 leading-relaxed">
-            To detect your guitar notes, we need permission to use your audio input. 
-            No audio is ever recorded or sent to any server.
+            {t("permission.body")}
           </p>
         </div>
 
@@ -43,16 +44,16 @@ export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: Permiss
             disabled={isLoading}
             className="w-full h-12"
           >
-            {isLoading ? "Allowing..." : "Allow Microphone Access"}
+            {isLoading ? t("permission.allowing") : t("permission.allow")}
           </Button>
           <p className="text-[10px] text-zinc-600 font-bold tracking-widest">
-            A browser prompt will appear
+            {t("permission.prompt")}
           </p>
         </div>
       </div>
 
       <button onClick={onCancel} className="text-xs text-zinc-700 hover:text-zinc-500 transition-colors text-center py-2 mt-4">
-        Skip for now
+        {t("permission.skip")}
       </button>
     </div>
   );

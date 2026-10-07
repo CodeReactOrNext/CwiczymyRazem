@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Coffee } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -16,8 +17,10 @@ interface SupportCtaProps {
  */
 export const SupportCta = ({
   className,
-  children = "Support Riff Quest",
-}: SupportCtaProps) => (
+  children,
+}: SupportCtaProps) => {
+  const { t } = useTranslation("supporter");
+  return (
   <a
     href={BMC_URL}
     target='_blank'
@@ -27,6 +30,7 @@ export const SupportCta = ({
       className,
     )}>
     <Coffee size={16} />
-    {children}
+    {children ?? t("cta.support")}
   </a>
-);
+  );
+};

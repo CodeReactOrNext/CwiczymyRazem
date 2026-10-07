@@ -1,0 +1,146 @@
+{
+  "home": "Start",
+  "practice": "Ćwiczenia",
+  "songs": "Utwory",
+  "my_stuff": "Moje rzeczy",
+  "progress": "Postępy",
+  "activity": "Aktywność",
+  "milestones": "Kamienie milowe",
+  "milestones_tooltip": "Cotygodniowe nagrody za osiąganie celów ćwiczeniowych",
+  "community": "Społeczność",
+  "rankings": "Rankingi",
+  "challenges": "Wyzwania",
+  "challenges_tooltip": "Pięć utworów wybranych przez społeczność do nagrania w każdym miesiącu",
+  "recordings": "Nagrania",
+  "recordings_tooltip": "Udostępniaj swoje covery i słuchaj, co nagrywają inni",
+  "guilds": "Gildie",
+  "guilds_tooltip": "Ćwicz razem z innymi — czat i cotygodniowe wyzwanie",
+  "arsenal": "Arsenał",
+  "tone_studio": "Tone Studio",
+  "supporter": "Wspierający",
+  "support": "Wsparcie",
+  "supporter_tooltip": "Zgłaszaj pomysły i głosuj, co powstanie w następnej kolejności",
+  "support_tooltip": "Co daje wspieranie projektu i jak to zrobić",
+  "knowledge_base": "Baza wiedzy",
+  "knowledge_base_tooltip": "Jak działa każda część aplikacji, prostym językiem",
+  "settings": "Ustawienia",
+  "discord": "Discord",
+  "discord_tooltip": "Dołącz do serwera społeczności",
+  "practice_routines": "Rutyny ćwiczeń",
+  "auto_plan": "Plan automatyczny",
+  "free_timer": "Wolny stoper",
+  "manual_log": "Ręczny wpis",
+  "guitar_pro_files": "Pliki Guitar Pro",
+  "skills": "Umiejętności",
+  "exercises": "Ćwiczenia",
+  "mastery_roadmaps": "Mastery Roadmaps",
+  "learning_path": "Ścieżka nauki",
+  "scale_map": "Mapa skal",
+  "scale_map_tooltip": "Odblokowuj skale na gryfie gałąź po gałęzi",
+  "board": "Tablica",
+  "explore": "Odkrywaj",
+  "playlists": "Playlisty",
+  "favorites": "Ulubione",
+  "my_plans": "Moje plany",
+  "my_exercises": "Moje ćwiczenia",
+  "create_plan": "Utwórz plan",
+  "create_exercise": "Utwórz ćwiczenie",
+  "locked_until_level": "Zablokowane do poziomu {{level}}",
+  "opens_at_level": "Odblokowuje się na poziomie {{level}}",
+  "unclaimed_reward": "Nieodebrana nagroda",
+  "collapse_section": "Zwiń: {{name}}",
+  "expand_section": "Rozwiń: {{name}}",
+  "get_desktop_app": "Pobierz aplikację na komputer",
+  "sign_out": "Wyloguj się",
+  "sign_out_confirm": "Czy na pewno chcesz się wylogować?",
+  "cancel": "Anuluj",
+  "log_out": "Wyloguj się",
+  "see_your_profile": "Zobacz swój profil",
+  "account_menu": "Menu konta",
+  "open_menu": "Otwórz menu",
+  "more": "Więcej",
+  "points_tooltip": "Punkty zdobywasz za ukończone ćwiczenia i sesje — pokazują Twój ogólny postęp.",
+  "weekday_letters": "P,W,Ś,C,P,S,N",
+  "search": {
+    "button": "Szukaj...",
+    "title": "Szukaj",
+    "description": "Przeszukaj swoje plany, ćwiczenia i utwory",
+    "placeholder": "Szukaj planów, ćwiczeń, utworów...",
+    "start_typing": "Zacznij pisać, aby przeszukać swoje plany, ćwiczenia i utwory.",
+    "no_results": "Brak wyników dla „{{query}}”.",
+    "group_plans": "Plany",
+    "group_exercises": "Ćwiczenia",
+    "group_songs": "Utwory"
+  },
+  "reset": {
+    "aria": "Czas serwera i najbliższe resety",
+    "server_time_short": "czas serwera",
+    "scope_server": "serwer",
+    "scope_local": "Twój czas",
+    "next_in": "{{label}} za {{time}}",
+    "tooltip_hint": "Dzień gry zaczyna się o 00:00 UTC dla wszystkich. Kliknij, aby zobaczyć pełną listę.",
+    "dialog_title": "Czas serwera · {{time}} UTC",
+    "dialog_description": "Wszystko, co gracze dzielą, działa według jednego zegara, więc termin znaczy to samo bez względu na to, gdzie jesteś. Wyjątkiem jest Twoja seria ćwiczeń — liczy się według Twojej własnej północy.",
+    "entries": {
+      "daily": {
+        "label": "Reset dzienny",
+        "detail": "Nowy dzienny bonus Fame."
+      },
+      "trader": {
+        "label": "Dostawa u handlarza",
+        "detail": "Handlarz czyści ladę i wykłada nowy towar."
+      },
+      "case-pool": {
+        "label": "Pula wyróżnionej skrzynki",
+        "detail": "Do dziennej skrzynki trafiają nowe gitary i efekty."
+      },
+      "weekly": {
+        "label": "Cele tygodniowe",
+        "detail": "Cel społeczności i wyzwania gildii zaczynają nowy tydzień."
+      },
+      "supporter-slate": {
+        "label": "Skrzynki wspierających",
+        "detail": "Nowa para skrzynek wspierających trafia pod głosowanie."
+      },
+      "monthly": {
+        "label": "Sezon i wyzwanie miesiąca",
+        "detail": "Ranking się resetuje i rusza nowa tablica wyzwań."
+      },
+      "streak": {
+        "label": "Twój dzień ćwiczeń",
+        "detail": "Dzienne zadania losują nowy zestaw, a seria wymaga sesji przed tym momentem — ten reset działa według Twojej strefy czasowej, nie serwera."
+      }
+    }
+  },
+  "page_tabs": {
+    "favorites": {
+      "label": "Ulubione"
+    },
+    "plans": {
+      "label": "Moje plany"
+    },
+    "my_exercises": {
+      "label": "Moje ćwiczenia"
+    },
+    "profile_activity": {
+      "label": "Aktywność"
+    },
+    "practice_log": {
+      "label": "Dziennik ćwiczeń"
+    },
+    "profile_achievements": {
+      "label": "Osiągnięcia"
+    },
+    "seasons": {
+      "label": "Sezony"
+    },
+    "leaderboard": {
+      "label": "Ranking"
+    },
+    "leaderboard_gear": {
+      "label": "Sprzęt",
+      "tooltip": "Ranking według założonej gitary i poziomu riga, nie wyniku z ćwiczeń"
+    }
+  },
+  "language_wip": "Tłumaczenie jest w trakcie — niektóre części mogą być jeszcze po angielsku."
+}

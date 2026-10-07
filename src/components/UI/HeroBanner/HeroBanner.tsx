@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -34,7 +35,7 @@ export const HeroBanner = ({
   backgroundContent,
   characterImage,
   secondaryImage,
-  eyebrow = "Daily practice",
+  eyebrow,
   eyebrowContent,
   eyebrowClassName = "text-orange-400/80",
   onClick,
@@ -45,6 +46,7 @@ export const HeroBanner = ({
   children,
   compact = false,
 }: HeroBannerProps) => {
+  const { t } = useTranslation("ui");
   return (
     <div
       className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible ${compact ? '' : 'min-h-[220px] md:min-h-[160px] lg:min-h-[180px]'} ${className}`}
@@ -121,7 +123,7 @@ export const HeroBanner = ({
           ) : (
             eyebrow && (
               <p className={`text-xs font-semibold tracking-[0.2em] uppercase md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none ${eyebrowClassName}`}>
-                {eyebrow}
+                {eyebrow ?? t("daily_practice")}
               </p>
             )
           )}

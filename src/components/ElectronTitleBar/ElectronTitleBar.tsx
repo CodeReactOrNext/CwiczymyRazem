@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import { TunerButton } from "feature/tuner/components/TunerButton";
@@ -51,6 +52,7 @@ const NavButton = ({
  * (injected by electron/preload.js).
  */
 export const ElectronTitleBar = () => {
+  const { t } = useTranslation("desktop");
   const router = useRouter();
   const { isElectron, isMac, isMaximized, minimize, toggleMaximize, close } =
     useElectronWindowControls();
@@ -62,14 +64,14 @@ export const ElectronTitleBar = () => {
       className='fixed left-0 right-0 top-0 z-[2147483647] flex h-10 select-none items-center justify-between bg-zinc-950 [-webkit-app-region:drag]'
       onDoubleClick={toggleMaximize}>
       <div className={cn("flex items-center gap-1.5 px-3", isMac && "pl-20")}>
-        <NavButton label='Wstecz' onClick={() => router.back()}>
+        <NavButton label={t("back")} onClick={() => router.back()}>
           <ChevronLeft size={16} strokeWidth={2} />
         </NavButton>
-        <NavButton label='Dalej' onClick={() => window.history.forward()}>
+        <NavButton label={t("forward")} onClick={() => window.history.forward()}>
           <ChevronRight size={16} strokeWidth={2} />
         </NavButton>
         <NavButton
-          label='Panel główny'
+          label={t("dashboard")}
           onClick={() => router.push("/dashboard")}>
           <House size={14} strokeWidth={2} />
         </NavButton>

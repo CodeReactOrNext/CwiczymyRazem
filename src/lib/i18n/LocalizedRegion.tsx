@@ -47,3 +47,15 @@ export function useActiveLocale(): AppLocale {
   const stored = useStoredLocale();
   return useIsLocalizedRegion() ? stored : DEFAULT_LOCALE;
 }
+
+/**
+ * For app chrome mounted outside any page layout — the desktop title bar, its
+ * context menu, the forced-update screen. They only ever appear in the desktop
+ * app, which is the logged-in product, so they follow the player's language
+ * without taking over `<html lang>` the way a page-level region does.
+ */
+export const LocalizedChrome = ({ children }: { children: React.ReactNode }) => (
+  <LocalizedRegionContext.Provider value={true}>
+    {children}
+  </LocalizedRegionContext.Provider>
+);

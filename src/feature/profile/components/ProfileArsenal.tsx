@@ -41,6 +41,7 @@ import {
 } from "feature/arsenal/utils/pedalboardLayout";
 import type { RowSpan } from "feature/arsenal/utils/powerLayout";
 import { dcJackAt, railFor } from "feature/arsenal/utils/powerLayout";
+import { useTranslation } from "hooks/useTranslation";
 import { useState } from "react";
 
 /** How a visitor's eye is told what they are looking at. Chip pattern, no border. */
@@ -158,6 +159,7 @@ interface ProfileArsenalProps {
 }
 
 export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
+  const { t } = useTranslation("profile");
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   // Clicking/tapping an item opens its card in a centered modal, matching the
   // arsenal editor and the activity view.
@@ -265,12 +267,12 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
       {/* The level as the owner reads it on their own Rig tab: a figure, not
           a chip — set against the title, on the same bottom line. */}
       <div className='mb-6 flex items-end justify-between gap-6'>
-        <h2 className='text-2xl font-bold text-white'>Rig</h2>
+        <h2 className='text-2xl font-bold text-white'>{t("layout.sections.rig.title")}</h2>
         <RigHeadline
-          caption='Rig level'
+          caption={t("rig.level")}
           value={getRigLevel(arsenal)}
           tone='level'
-          title='Total rig level (equipped guitars + pedalboard)'
+          title={t("rig.level_hint")}
         />
       </div>
 
@@ -374,7 +376,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
           {board.overflow.length > 0 && (
             <div className='mt-4 flex flex-col gap-2'>
               <p className='text-xs font-semibold tracking-wide text-zinc-500'>
-                Off the board
+                {t("rig.off_board")}
               </p>
               <div className='flex flex-wrap items-end gap-5'>
                 {board.overflow.map((placement) => {

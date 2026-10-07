@@ -1,6 +1,7 @@
 import { getCountInDurationMs } from "feature/exercisePlan/components/Metronome/utils/countInDuration";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { useIsLandscape } from "hooks/useIsLandscape";
+import { useTranslation } from "hooks/useTranslation";
 import type { Dispatch, SetStateAction } from "react";
 import React, { useState } from "react";
 
@@ -99,6 +100,7 @@ const SessionModal = ({
   examMode,
   songSectionMapSlot,
 }: SessionModalProps) => {
+  const { t } = useTranslation("session");
   const [tabResetKey, setTabResetKey] = useState(0);
   const [showFinishEarlyDialog, setShowFinishEarlyDialog] = useState(false);
   const isLandscape = useIsLandscape();
@@ -154,7 +156,7 @@ const SessionModal = ({
   // playback toggle too — without it there is no way to silence the strum.
   const hasAudioTrack  = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableBackingTrack;
   const isRiddleMode   = currentExercise.riddleConfig?.mode === "sequenceRepeat";
-  const strumVolume    = strumSynthVolume(isAudioMuted, audioTracks?.find(t => t.id === "main"));
+  const strumVolume    = strumSynthVolume(isAudioMuted, audioTracks?.find(track => track.id === "main"));
 
   const finishEarlyDialog = (
     <FinishSessionDialog
@@ -268,7 +270,7 @@ const SessionModal = ({
           {currentExercise.links && currentExercise.links.length > 0 && (
             <div className="rounded-lg bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-5 space-y-4">
               <div className="flex items-center gap-2 text-red-400 font-bold text-xs tracking-widest">
-                <span>Support Author</span>
+                <span>{t("instructions.support_author")}</span>
               </div>
               <div className="flex flex-col gap-2">
                 {currentExercise.links.map((link: any, idx: number) => (

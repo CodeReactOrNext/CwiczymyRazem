@@ -25,6 +25,7 @@ import {
   getCategorizedChords,
 } from 'feature/exercisePlan/chords/chordExerciseGenerator';
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
+import { useTranslation } from "hooks/useTranslation";
 import { X } from 'lucide-react';
 import { useEffect,useState } from 'react';
 
@@ -41,6 +42,7 @@ export function ChordSelectionDialog({
   onExerciseGenerated,
   initialExercise,
 }: ChordSelectionDialogProps) {
+  const { t } = useTranslation("session");
   const [selectedChords, setSelectedChords] = useState<string[]>(['G', 'C']);
   const [hideNotes, setHideNotes] = useState(false);
   const [changesPerMeasure, setChangesPerMeasure] = useState(1);
@@ -104,10 +106,10 @@ export function ChordSelectionDialog({
       >
         <DialogHeader className="shrink-0">
           <DialogTitle className="text-2xl font-black italic tracking-tighter text-white capitalize">
-            Chord Practice Setup
+            {t("chord_dialog.title")}
           </DialogTitle>
           <DialogDescription className="text-zinc-400">
-            Build your exercise. Sequence up to 8 chords.
+            {t("chord_dialog.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -128,16 +130,16 @@ export function ChordSelectionDialog({
                     {idx < selectedChords.length - 1 && <span className="mx-1 text-zinc-700 font-bold">→</span>}
                 </div>
               ))}
-              {selectedChords.length === 0 && <span className="text-zinc-600 text-sm font-medium pl-1">Click chords below to add...</span>}
+              {selectedChords.length === 0 && <span className="text-zinc-600 text-sm font-medium pl-1">{t("chord_dialog.click_to_add")}</span>}
             </div>
           </div>
 
           <div className="space-y-3">
             <Tabs defaultValue="beginner" className="w-full">
               <TabsList className="grid w-full grid-cols-3 bg-zinc-900/50 border border-white/5 p-1 h-11">
-                <TabsTrigger value="beginner" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">Beginner</TabsTrigger>
-                <TabsTrigger value="intermediate" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">Inter</TabsTrigger>
-                <TabsTrigger value="advanced" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">Advanced</TabsTrigger>
+                <TabsTrigger value="beginner" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">{t("chord_dialog.beginner")}</TabsTrigger>
+                <TabsTrigger value="intermediate" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">{t("chord_dialog.intermediate")}</TabsTrigger>
+                <TabsTrigger value="advanced" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">{t("chord_dialog.advanced")}</TabsTrigger>
               </TabsList>
               
               {(Object.keys(categorizedChords) as Array<keyof typeof categorizedChords>).map((level) => (
@@ -162,7 +164,7 @@ export function ChordSelectionDialog({
 
           <div className="grid grid-cols-2 gap-6 pt-2">
             <div className="space-y-2">
-              <Label className="text-zinc-500 font-bold capitalize text-[10px] tracking-widest pl-1">Changes Frequency</Label>
+              <Label className="text-zinc-500 font-bold capitalize text-[10px] tracking-widest pl-1">{t("chord_dialog.frequency")}</Label>
               <Select
                 value={changesPerMeasure.toString()}
                 onValueChange={(v) => setChangesPerMeasure(parseInt(v))}
@@ -171,9 +173,9 @@ export function ChordSelectionDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-zinc-900 border-white/10 text-white">
-                  <SelectItem value="1">Every Bar</SelectItem>
-                  <SelectItem value="2">Every 2 Beats</SelectItem>
-                  <SelectItem value="4">Every Beat</SelectItem>
+                  <SelectItem value="1">{t("chord_dialog.every_bar")}</SelectItem>
+                  <SelectItem value="2">{t("chord_dialog.every_2_beats")}</SelectItem>
+                  <SelectItem value="4">{t("chord_dialog.every_beat")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -188,10 +190,10 @@ export function ChordSelectionDialog({
                 />
                 <div className="grid gap-1 leading-none">
                     <Label htmlFor="hide-notes-dlg" className="text-sm font-bold text-zinc-200 cursor-pointer">
-                        Hide Fret Tabs
+                        {t("chord_dialog.hide_tabs")}
                     </Label>
                     <p className="text-[10px] text-zinc-500 font-medium leading-relaxed italic">
-                        Play by ear/memory
+                        {t("chord_dialog.by_ear")}
                     </p>
                 </div>
               </div>
@@ -201,10 +203,10 @@ export function ChordSelectionDialog({
 
         <div className="flex shrink-0 justify-end gap-3 pt-4 border-t border-white/5">
           <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white hover:bg-white/5 font-bold capitalize tracking-widest text-[11px]">
-            Cancel
+            {t("cancel")}
           </Button>
           <Button onClick={handleGenerate} disabled={selectedChords.length === 0} className="bg-white text-black hover:bg-zinc-200 px-8 font-black capitalize tracking-widest text-[11px] shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-            Add to Plan
+            {t("add_to_plan")}
           </Button>
         </div>
       </DialogContent>

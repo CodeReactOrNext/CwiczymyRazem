@@ -1,0 +1,98 @@
+{
+  "skip_calibration": "Kalibrierung überspringen",
+  "setup": {
+    "title_native": "Audio-Einrichtung",
+    "title_interface": "Audio-Interface einrichten",
+    "title_mic": "Mikrofon einrichten",
+    "connecting": "Verbinde…",
+    "start_listening": "Zuhören starten",
+    "grant": "Mikrofonzugriff erlauben",
+    "signal_level": "Signalpegel",
+    "too_quiet": "Zu leise – schlag eine Saite an",
+    "good_level": "Guter Pegel ✓",
+    "input_sensitivity": "Eingangsempfindlichkeit",
+    "play_notes": "Spiel ein paar Töne… {{seconds}} s",
+    "calibrated": "Kalibriert ✓",
+    "auto_gain": "Gain automatisch kalibrieren",
+    "tune_guitar": "Gitarre stimmen",
+    "headphones": "Kabelgebundene Kopfhörer nutzen",
+    "headphones_body": "Ohne Kopfhörer nimmt das Mikrofon den Backing Track aus den Lautsprechern auf und erzeugt falsche Erkennungen.",
+    "quiet": "Such dir einen ruhigen Ort",
+    "quiet_body": "Hintergrundgeräusche erzeugen falsche Notenerkennungen. Schließ Türen und mach Musik aus.",
+    "interface": "Interface",
+    "refresh": "Geräteliste aktualisieren",
+    "no_inputs": "Keine Eingabegeräte gefunden",
+    "inputs": "{{count}} Eingänge",
+    "which_jack": "An welcher Buchse steckt deine Gitarre?",
+    "channel": "Kanal {{n}}",
+    "native_hint": "Native Aufnahme mit geringer Latenz – umgeht den Browser komplett. Steck deine Gitarre direkt ins Interface oben.",
+    "output_auto": "Ausgang: {{label}} (auto)",
+    "matched": "abgestimmt",
+    "change": "Ändern",
+    "output": "Ausgang",
+    "no_outputs": "Keine Ausgabegeräte gefunden",
+    "output_hint": "Sollte zum Interface oben passen, damit Wiedergabe und Aufnahme dasselbe Gerät nutzen.",
+    "before_start": "Bevor du startest",
+    "before_start_body": "Stell sicher, dass dein Interface als Mikrofoneingang des Browsers gewählt ist und deine Gitarre eingesteckt ist. Den Gain stellst du im nächsten Schritt ein."
+  },
+  "tuning": {
+    "wrong_string": "Falsche Saite?",
+    "play_open": "Spiel die leere {{string}}-Saite",
+    "in_tune": "Gestimmt – weiter halten…",
+    "sharp": "zu hoch ↓ runterstimmen",
+    "flat": "zu tief ↑ hochstimmen",
+    "title": "Gitarre stimmen",
+    "flat_label": "Tief",
+    "sharp_label": "Hoch",
+    "next_string": "Nächste Saite",
+    "finish": "Kalibrierung abschließen",
+    "skip_string": "Saite überspringen",
+    "redo": "Diese Saite wiederholen"
+  },
+  "source": {
+    "title": "Gitarren-Kalibrierung",
+    "question": "Wie ist deine Gitarre mit dem Computer verbunden?",
+    "interface": "Audio-Interface",
+    "interface_desc": "USB- oder Thunderbolt-Audio-Interface",
+    "mic": "Mikrofon",
+    "mic_desc": "Eingebautes Laptop-Mikro oder externes USB-Mikro"
+  },
+  "summary": {
+    "title": "Fertig",
+    "ready": "Alles bereit!",
+    "body": "Deine Kalibrierung ist abgeschlossen. Wenn die Erkennung noch leicht danebenliegt, stimm die Gitarre nach oder passe die Eingangsempfindlichkeit an.",
+    "good_luck": "Viel Erfolg!",
+    "save": "Speichern & schließen",
+    "discard": "Verwerfen"
+  },
+  "permission": {
+    "title": "Mikrofonzugriff",
+    "body": "Um deine Gitarrentöne zu erkennen, brauchen wir Zugriff auf deinen Audioeingang. Es wird nie Audio aufgenommen oder an einen Server gesendet.",
+    "allowing": "Wird erlaubt...",
+    "allow": "Mikrofonzugriff erlauben",
+    "prompt": "Der Browser fragt gleich nach",
+    "skip": "Vorerst überspringen"
+  },
+  "error": {
+    "title": "Mikrofon blockiert",
+    "body": "Erlaube den Mikrofonzugriff in deinen Browser-Einstellungen und versuch es dann noch einmal.",
+    "retry": "Erneut versuchen",
+    "cancel": "Abbrechen"
+  },
+  "choice": {
+    "title": "Vorhandene Kalibrierung",
+    "body": "Du hast Kalibrierungsdaten vom {{date}}.",
+    "old": "Diese Kalibrierung ist über 30 Tage alt – kalibriere für beste Genauigkeit neu.",
+    "reuse": "Vorhandene nutzen",
+    "recalibrate": "Neu kalibrieren"
+  },
+  "mic_mode": {
+    "alt": "Mikrofon-Illustration",
+    "required": "Mikrofon erforderlich",
+    "tracking": "Mikrofon-Tracking",
+    "exam_body": "Dieses Modul erfordert ein eingerichtetes Mikrofon. Aktiviere dein Mikrofon, damit das System dein Spiel in der Prüfung bewerten kann.",
+    "body": "Dieser Plan enthält Tab-Übungen. Aktiviere dein Mikrofon, damit das System deiner Gitarre zuhört und dein Spiel in Echtzeit bewertet.",
+    "enable": "Mikrofon aktivieren",
+    "skip": "Überspringen"
+  }
+}

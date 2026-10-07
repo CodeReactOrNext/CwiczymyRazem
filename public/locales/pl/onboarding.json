@@ -1,0 +1,101 @@
+{
+  "back": "Wstecz",
+  "skip": "Pomiń na razie",
+  "progress": "Postęp konfiguracji",
+  "close": "Zamknij",
+  "level_step": {
+    "title": "Od jak dawna grasz?",
+    "description": "Żebyśmy pokazywali tylko to, co pasuje do twojego poziomu."
+  },
+  "goal_step": {
+    "title": "Co cię sprowadza do Riff Quest?",
+    "description": "Wybierz, od czego zacząć. Wszystko inne będzie o jedno kliknięcie dalej."
+  },
+  "plan_step": {
+    "title": "Wybierz plan na start",
+    "description": "Krótkie rutyny, w których timer prowadzi cię przez każde ćwiczenie. Nic nie startuje, dopóki nie naciśniesz Play — z mikrofonem dla informacji zwrotnej na żywo albo bez niego.",
+    "open": "Otwórz plan",
+    "browse_all": "Przeglądaj wszystkie plany ({{count}})"
+  },
+  "levels": {
+    "new": {
+      "unit": "rok",
+      "label": "Dopiero zaczynam",
+      "description": "Pierwsze akordy albo jeszcze nie miałem gitary w rękach"
+    },
+    "some": {
+      "unit": "lata",
+      "label": "Znam podstawy",
+      "description": "Akordy i proste utwory, chcę być lepszy"
+    },
+    "experienced": {
+      "unit": "lata",
+      "label": "Gram od lat",
+      "description": "Swobodnie poruszam się po gryfie, chcę się dalej rozwijać"
+    }
+  },
+  "goals": {
+    "journey": {
+      "label": "Idź Ścieżką nauki",
+      "description": "Ucz się gry od zera, krok po kroku"
+    },
+    "plans": {
+      "label": "Ćwicz z planami ćwiczeń",
+      "description": "Gotowe rutyny z timerem, który cię prowadzi"
+    },
+    "songs": {
+      "label": "Ucz się utworów i śledź postępy",
+      "description": "Zapisuj utwory, które chcesz grać, i obserwuj swoje postępy"
+    },
+    "roadmap": {
+      "label": "Idź roadmapą do celu",
+      "description": "Ścieżka krok po kroku, np. do gry w stylu twojego idola"
+    },
+    "log": {
+      "label": "Zapisuj ćwiczenia, które już robię",
+      "description": "Śledź czas, serię i postępy"
+    }
+  },
+  "checklist": {
+    "title": "Pierwsze kroki",
+    "intro": "Wprowadzenie (2 min)",
+    "dismiss": "Ukryj listę pierwszych kroków",
+    "claim": "Odbierz {{badge}}",
+    "first_session": "Pierwsza sesja",
+    "first_song": "Pierwszy utwór",
+    "second_day": "Ćwicz drugiego dnia",
+    "first_guitar": "Pierwsza gitara",
+    "after_first": "Po pierwszej sesji",
+    "tomorrow": "Dostępne jutro",
+    "play_today": "Zagraj dziś, żeby ukończyć",
+    "open_case": "Otwórz skrzynkę"
+  },
+  "intro": {
+    "title": "Witaj w Riff Quest",
+    "description": "Dwie minuty o tym, czym to jest i jak działa.",
+    "cta": "Rozumiem"
+  },
+  "first_song": {
+    "title": "Dodaj utwór, który chcesz grać",
+    "description": "Śledź utwory, które chcesz poznać, których się uczysz albo które już umiesz.",
+    "step1": "Wejdź na stronę Utwory i kliknij ten przycisk:",
+    "add_button": "Dodaj nowy utwór",
+    "step2": "Wpisz wykonawcę i tytuł dowolnego utworu, który chciałbyś zagrać. Jest już w bibliotece? Po prostu wybierz go. Nie ma go? Nie szkodzi — właśnie go dodajesz:",
+    "artist": "Wykonawca",
+    "song_title": "Tytuł utworu",
+    "step3": "Powiedz aplikacji, na jakim etapie jesteś z tym utworem. Później przećwiczysz go fragment po fragmencie i zobaczysz, jak rośnie twoje opanowanie:",
+    "want": "Chcę się nauczyć",
+    "want_sub": "Zapisz na później jako inspirację",
+    "learning": "Uczę się",
+    "learning_sub": "Skup się dziś na tym utworze",
+    "learned": "Opanowane",
+    "learned_sub": "Opanowany i w repertuarze",
+    "cta": "Przeglądaj utwory"
+  },
+  "reward": {
+    "title": "Wylosuj swoją pierwszą gitarę",
+    "description": "Zagrałeś pierwszą sesję — odbierz Fame i otwórz skrzynkę.",
+    "body": "To dokładnie tyle, ile trzeba, żeby otworzyć skrzynkę w Arsenale. Odbierz nagrodę, a trafisz tam gotowy do wyboru gitary.",
+    "cta": "Odbierz i wybierz gitarę"
+  }
+}

@@ -20,6 +20,7 @@ import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight, BookOpen, ChevronDown, Globe, Music, Plus, User } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -84,6 +85,7 @@ export const SelectExercisesStep = ({
   onExercisesSelect,
   onNext,
 }: SelectExercisesStepProps) => {
+  const { t } = useTranslation("plans");
   const [isCustomExerciseDialogOpen, setIsCustomExerciseDialogOpen] = useState(false);
   const [editingExercise, setEditingExercise] = useState<Exercise | undefined>(undefined);
   const [customExerciseMode, setCustomExerciseMode] = useState<"create" | "edit" | "clone">("create");
@@ -339,10 +341,10 @@ export const SelectExercisesStep = ({
   const remoteLoading = isMineTab ? myLoading : communityLoading;
   const remoteExercises = isMineTab ? filteredMyExercises : filteredCommunityExercises;
   const remoteEmptyMessage = remoteSearch
-    ? "No exercises match your search."
+    ? t("select.no_search_match")
     : isMineTab
-      ? "You haven't created any exercises yet. Build one in the Tab Editor — it shows up here whether you publish it or keep it private."
-      : "No community exercises published yet.";
+      ? t("select.no_own")
+      : t("select.no_community");
 
   const handleChordGenerated = (generatedExercise: Exercise) => {
       if (editingBuiltinExercise) {
@@ -401,14 +403,14 @@ export const SelectExercisesStep = ({
                 variant="ghost"
                 className="h-10 rounded-lg bg-zinc-800/60 px-4 text-sm font-semibold text-zinc-200 hover:bg-zinc-700/60 hover:text-white">
                 <Plus className="h-4 w-4" />
-                Create exercise
+                {t("select.create_exercise")}
                 <ChevronDown className="h-3.5 w-3.5 opacity-70" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuItem onSelect={handleCreateScaleOpen}>Scale exercise</DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleCreateChordOpen}>Chord exercise</DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleCreateCustomOpen}>Custom exercise</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleCreateScaleOpen}>{t("select.scale_exercise")}</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleCreateChordOpen}>{t("select.chord_exercise")}</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleCreateCustomOpen}>{t("select.custom_exercise")}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           </div>
@@ -449,7 +451,7 @@ export const SelectExercisesStep = ({
                 type="text"
                 value={remoteSearch}
                 onChange={e => setRemoteSearch(e.target.value)}
-                placeholder={isMineTab ? "Search your exercises…" : "Search community exercises…"}
+                placeholder={isMineTab ? t("select.search_mine") : t("select.search_community")}
                 className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-4 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/50"
               />
               {remoteLoading ? (
@@ -480,13 +482,13 @@ export const SelectExercisesStep = ({
       <div className="sticky bottom-[calc(58px_+_0.75rem_+_env(safe-area-inset-bottom,0px))] z-40 flex items-center justify-between gap-3 rounded-lg bg-zinc-900/95 px-4 py-3 backdrop-blur-md lg:bottom-4 lg:z-20 lg:px-5">
         <p className="text-sm text-zinc-300">
           {selectedExercises.length === 0 ? (
-            "Pick at least one exercise to continue"
+            t("select.pick_one")
           ) : (
             <>
               <span className="font-bold text-white">{selectedExercises.length}</span>{" "}
-              {selectedExercises.length === 1 ? "exercise" : "exercises"} ·{" "}
+              {selectedExercises.length === 1 ? t("select.exercise_one") : t("select.exercises")} ·{" "}
               <span className="font-bold text-white">
-                {Math.round(selectedExercises.reduce((sum, e) => sum + e.timeInMinutes, 0))} min
+                {Math.round(selectedExercises.reduce((sum, e) => sum + e.timeInMinutes, 0))} {t("min")}
               </span>
             </>
           )}
@@ -495,7 +497,7 @@ export const SelectExercisesStep = ({
           onClick={onNext}
           disabled={selectedExercises.length === 0}
           className="shrink-0 flex items-center gap-2 h-11 px-6 bg-white text-black hover:bg-zinc-200 rounded-lg font-bold transition-all disabled:opacity-40">
-          Next step
+          {t("select.next_step")}
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>

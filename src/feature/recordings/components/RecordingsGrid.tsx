@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
 import type { Recording } from "feature/recordings/types/types";
+import { useTranslation } from "hooks/useTranslation";
 import { Video } from "lucide-react";
 
 import { RecordingCard } from "./RecordingCard";
@@ -43,6 +44,7 @@ export const RecordingsGrid = ({
   totalPages,
   setPage,
 }: RecordingsGridProps) => {
+  const { t } = useTranslation("recordings");
   if (isLoading && recordings.length === 0) {
     return (
       <div className={GRID_CLASS}>
@@ -57,9 +59,9 @@ export const RecordingsGrid = ({
     return (
       <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
         <Video className='h-8 w-8 text-zinc-500' />
-        <h3 className='text-lg font-bold text-zinc-100'>No recordings found</h3>
+        <h3 className='text-lg font-bold text-zinc-100'>{t("grid.empty_title")}</h3>
         <p className='text-sm text-zinc-400'>
-          Be the first to upload your cover!
+          {t("grid.empty_body")}
         </p>
       </div>
     );

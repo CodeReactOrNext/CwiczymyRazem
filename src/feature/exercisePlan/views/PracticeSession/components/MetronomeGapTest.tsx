@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { motion, useReducedMotion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronRight, Volume2, VolumeX } from "lucide-react";
 import { type ReactNode, useEffect, useSyncExternalStore } from "react";
 
@@ -171,6 +172,7 @@ interface MetronomeGapTestProps {
 }
 
 export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: MetronomeGapTestProps) {
+  const { t } = useTranslation("session");
   const s = useSyncExternalStore(gapTestEngine.subscribe, gapTestEngine.getSnapshot, gapTestEngine.getSnapshot);
 
   useEffect(() => {
@@ -198,19 +200,19 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
 
   const phaseText = running
     ? s.phase === "lead"
-      ? `Listen — ${LEAD_BARS} bars, feel the pulse`
+      ? t("gap.listen", { bars: LEAD_BARS })
       : s.getReady
-        ? "Get ready — tap the returning “1”"
-        : `Counting the silence — bar ${s.silentBar + 1} of ${s.gapBars}`
+        ? t("gap.get_ready")
+        : t("gap.counting", { bar: s.silentBar + 1, total: s.gapBars })
     : res
       ? res.verdict === "super"
-        ? "Nailed it — level up!"
+        ? t("gap.nailed")
         : res.verdict === "good"
-          ? "Close — repeat it to lock a PERFECT"
+          ? t("gap.close")
           : res.verdict === "miss"
-            ? "No hit in time — try again"
-            : "Off the grid — try again"
-      : `Press Start. Keep the pulse through the silence and tap once, on the very next “1”.`;
+            ? t("gap.no_hit")
+            : t("gap.off_grid")
+      : t("gap.intro");
 
   const markerPct =
     res && res.dev !== null ? Math.max(0, Math.min(100, 50 + (res.dev / RULER_RANGE) * 50)) : 50;
@@ -231,7 +233,7 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
         <div className="flex items-center justify-between gap-3">
           <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-cyan-500/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-cyan-300">
             <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-            Gap Test
+            {t("gap.title")}
           </span>
         </div>
 
@@ -239,15 +241,15 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
         <div className="flex flex-wrap items-center justify-center gap-2">
           <Step
             icon={<Volume2 className="h-4 w-4" strokeWidth={2.25} />}
-            title="Listen"
-            sub={`${LEAD_BARS} bars of clicks`}
+            title={t("gap.step_listen")}
+            sub={t("gap.step_listen_sub", { bars: LEAD_BARS })}
             active={s.phase === "lead"}
           />
           <ChevronRight className={cn("h-4 w-4 shrink-0", s.phase === "gap" && !s.getReady ? "text-cyan-400/70" : "text-zinc-600")} aria-hidden />
           <Step
             icon={<VolumeX className="h-4 w-4" strokeWidth={2.25} />}
-            title="Silence"
-            sub={s.phase === "gap" ? `bar ${s.silentBar + 1} of ${s.gapBars}` : `${s.gapBars} bars · keep the pulse`}
+            title={t("gap.step_silence")}
+            sub={s.phase === "gap" ? t("gap.bar_of", { bar: s.silentBar + 1, total: s.gapBars }) : t("gap.bars_keep", { bars: s.gapBars })}
             active={s.phase === "gap" && !s.getReady}
           />
           <ChevronRight className={cn("h-4 w-4 shrink-0", tapActive ? "text-cyan-400/70" : "text-zinc-600")} aria-hidden />
@@ -262,8 +264,8 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
                 1
               </span>
             }
-            title="Tap"
-            sub="on the returning “1”"
+            title={t("gap.step_tap")}
+            sub={t("gap.step_tap_sub")}
           />
         </div>
 
@@ -328,9 +330,9 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
                 type="button"
                 onClick={() => gapTestEngine.start()}
                 className="rounded-xl bg-cyan-500 px-8 py-3 text-base font-bold text-zinc-950 transition hover:bg-cyan-400 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400">
-                {res ? (res.verdict === "super" ? `Level up → ${s.gapBars} silent bars` : "Try again") : "Start"}
+                {res ? (res.verdict === "super" ? t("gap.level_up", { bars: s.gapBars }) : t("timing.try_again")) : t("start")}
               </button>
-              {!compact && <span className="text-[11px] text-zinc-500">or press Space</span>}
+              {!compact && <span className="text-[11px] text-zinc-500">{t("gap.or_space")}</span>}
             </div>
           )}
         </div>
@@ -398,30 +400,30 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
                 onClick={() => gapTestEngine.reset()}
                 disabled={running}
                 className="rounded-md border border-white/10 px-2.5 py-1 text-zinc-400 transition hover:border-cyan-400/60 hover:text-white disabled:cursor-not-allowed disabled:opacity-40">
-                Reset level
+                {t("gap.reset")}
               </button>
             </div>
 
             <div className="flex flex-1 flex-col rounded-xl border border-white/5 bg-black/20 p-3">
-              <div className="mb-2.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500">Recent</div>
+              <div className="mb-2.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500">{t("gap.recent")}</div>
               {s.history.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                   {s.history.slice(0, 12).map((a, i) => (
                     <span
                       key={i}
-                      title={`silent bars: ${a.gap}`}
+                      title={t("gap.silent_bars", { bars: a.gap })}
                       className={cn(
                         "inline-flex items-center gap-1.5 rounded-md border px-2 py-1 font-mono text-[11px] font-bold tabular-nums",
                         VERDICT[a.cls].chip,
                       )}>
                       <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
-                      {a.dev === null ? "miss" : `${a.dev > 0 ? "+" : ""}${a.dev}`}
+                      {a.dev === null ? t("gap.miss") : `${a.dev > 0 ? "+" : ""}${a.dev}`}
                     </span>
                   ))}
                 </div>
               ) : (
                 <div className="flex flex-1 items-center justify-center py-3 text-[11px] text-zinc-600">
-                  No attempts yet — press Start.
+                  {t("gap.no_attempts")}
                 </div>
               )}
             </div>

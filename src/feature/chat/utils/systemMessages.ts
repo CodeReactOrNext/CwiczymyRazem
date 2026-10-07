@@ -1,23 +1,26 @@
 import type { ChatSystemEvent } from "feature/chat/types/chat.types";
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
 
 /** What the new player said they came for, as the tail of "Ania just joined, …". */
 export const welcomeGoalPhrase = (
   goal: string | null | undefined,
   planTitle: string | null | undefined,
+  t?: Translate,
 ): string | null => {
   switch (goal) {
     case "plans":
       return planTitle
-        ? `starting with the ${planTitle} plan`
-        : "starting with a practice plan";
+        ? translateOr(t, "chat:welcome_goal.plan_named", "starting with the {{plan}} plan", { plan: planTitle })
+        : translateOr(t, "chat:welcome_goal.plan", "starting with a practice plan");
     case "songs":
-      return "here to learn songs";
+      return translateOr(t, "chat:welcome_goal.songs", "here to learn songs");
     case "roadmap":
-      return "building a practice roadmap";
+      return translateOr(t, "chat:welcome_goal.roadmap", "building a practice roadmap");
     case "journey":
-      return "starting the Journey";
+      return translateOr(t, "chat:welcome_goal.journey", "starting the Journey");
     case "log":
-      return "here to log their practice";
+      return translateOr(t, "chat:welcome_goal.log", "here to log their practice");
     default:
       return null;
   }

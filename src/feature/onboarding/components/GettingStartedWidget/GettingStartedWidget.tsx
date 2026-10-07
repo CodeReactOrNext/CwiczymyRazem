@@ -8,6 +8,7 @@ import { useArsenalData } from "feature/arsenal/hooks/useArsenalData";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { addFame, selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import {
   BookOpen,
   CalendarCheck,
@@ -51,6 +52,7 @@ const STEP_ICONS: Record<GettingStartedStepId, typeof Compass> = {
 };
 
 export const GettingStartedWidget = () => {
+  const { t } = useTranslation("onboarding");
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
   const { userStats, activity } = useDashboardData();
@@ -131,7 +133,7 @@ export const GettingStartedWidget = () => {
     if (id === "first_session") {
       return {
         ...base,
-        label: "First session",
+        label: t("checklist.first_session"),
         onClick: step.isDone
           ? undefined
           : () => {
@@ -144,7 +146,7 @@ export const GettingStartedWidget = () => {
     if (id === "first_song") {
       return {
         ...base,
-        label: "First song",
+        label: t("checklist.first_song"),
         onClick: step.isDone
           ? undefined
           : () => {
@@ -160,14 +162,14 @@ export const GettingStartedWidget = () => {
     const isWaitingForTomorrow = sessionCount > 0 && hasPracticedToday;
     return {
       ...base,
-      label: "Practice a 2nd day",
+      label: t("checklist.second_day"),
       hint: step.isDone
         ? undefined
         : sessionCount === 0
-          ? "After your first session"
+          ? t("checklist.after_first")
           : isWaitingForTomorrow
-            ? "Available tomorrow"
-            : "Play today to finish",
+            ? t("checklist.tomorrow")
+            : t("checklist.play_today"),
       onClick:
         step.isDone || sessionCount === 0 || isWaitingForTomorrow
           ? undefined
@@ -197,7 +199,7 @@ export const GettingStartedWidget = () => {
     stepNode("first_session"),
     {
       key: "reward",
-      label: "First guitar",
+      label: t("checklist.first_guitar"),
       icon: progress.rewardClaimed
         ? Guitar
         : progress.canClaimReward
@@ -216,7 +218,7 @@ export const GettingStartedWidget = () => {
       // Claimed but no case opened yet — say what's left to do there.
       hint:
         progress.rewardClaimed && !progress.hasGuitar
-          ? "Open a case"
+          ? t("checklist.open_case")
           : undefined,
     },
     stepNode("first_song"),
@@ -241,7 +243,7 @@ export const GettingStartedWidget = () => {
         <div className='flex items-center gap-2.5'>
           <Compass size={16} className='text-zinc-500' />
           <h3 className='text-sm font-semibold tracking-wide text-zinc-300'>
-            Getting Started
+            {t("checklist.title")}
           </h3>
           <span className='text-xs tabular-nums text-zinc-500'>
             {doneCount}/{nodes.length}
@@ -256,12 +258,12 @@ export const GettingStartedWidget = () => {
             }}
             className='flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 hover:bg-white/5 hover:text-zinc-200'>
             <PlayCircle size={14} />
-            2-min intro
+            {t("checklist.intro")}
           </button>
           <button
             type='button'
             onClick={handleDismiss}
-            aria-label='Dismiss getting started checklist'
+            aria-label={t("checklist.dismiss")}
             className='rounded-full p-1 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 hover:bg-white/5 hover:text-zinc-300'>
             <X size={14} />
           </button>
@@ -346,7 +348,7 @@ export const GettingStartedWidget = () => {
                     The whole node is the button, so this is only its face. */}
                 {node.badge && isActionable && node.tone === "amber" ? (
                   <span className='flex items-center gap-1 rounded-md bg-amber-500 px-2.5 py-1 text-[10px] font-bold text-zinc-950 transition-colors group-hover:bg-amber-400 sm:text-xs'>
-                    Claim {node.badge}
+                    {t("checklist.claim", { badge: node.badge })}
                     <img
                       src='/images/coin.png'
                       alt='fame'
@@ -383,8 +385,8 @@ export const GettingStartedWidget = () => {
       <StepInfoModal
         isOpen={openModal === "intro"}
         onOpenChange={(isOpen) => !isOpen && setOpenModal(null)}
-        title='Welcome to Riff Quest'
-        description='Two minutes on what this is and how it works.'
+        title={t("intro.title")}
+        description={t("intro.description")}
         size='wide'
         body={
           <YouTube
@@ -393,47 +395,43 @@ export const GettingStartedWidget = () => {
             className='my-0'
           />
         }
-        ctaLabel='Got it'
+        ctaLabel={t("intro.cta")}
         onCta={() => setOpenModal(null)}
       />
 
       <StepInfoModal
         isOpen={openModal === "first_song"}
         onOpenChange={(isOpen) => !isOpen && setOpenModal(null)}
-        title='Add a song you want to play'
-        description='Keep track of songs you want to learn, are learning, or already know.'
+        title={t("first_song.title")}
+        description={t("first_song.description")}
         body={
           <TutorialSteps
             steps={[
               {
-                text: <>Go to the Songs page and click this button:</>,
+                text: <>{t("first_song.step1")}</>,
                 visual: (
                   <FakeButton icon={Plus} tone='solid'>
-                    Add New Song
+                    {t("first_song.add_button")}
                   </FakeButton>
                 ),
               },
               {
                 text: (
                   <>
-                    Type the artist and title of any song you&apos;d love to
-                    play. Already in the library? Just pick the match. Not there
-                    yet? No problem — you&apos;re adding it:
+                    {t("first_song.step2")}
                   </>
                 ),
                 visual: (
                   <span className='grid grid-cols-2 gap-2'>
-                    <FakeInput label='Artist' value='Led Zeppelin' />
-                    <FakeInput label='Song Title' value='Stairway to Heaven' />
+                    <FakeInput label={t("first_song.artist")} value='Led Zeppelin' />
+                    <FakeInput label={t("first_song.song_title")} value='Stairway to Heaven' />
                   </span>
                 ),
               },
               {
                 text: (
                   <>
-                    Tell the app where this song is on your journey. Later you
-                    can practice it section by section and watch your mastery
-                    grow:
+                    {t("first_song.step3")}
                   </>
                 ),
                 visual: (
@@ -441,20 +439,20 @@ export const GettingStartedWidget = () => {
                     <FakeStatusCard
                       icon={ListMusic}
                       tone='zinc'
-                      label='Want to Learn'
-                      sub='Save for later inspiration'
+                      label={t("first_song.want")}
+                      sub={t("first_song.want_sub")}
                     />
                     <FakeStatusCard
                       icon={BookOpen}
                       tone='amber'
-                      label='Learning'
-                      sub='Focus on this song today'
+                      label={t("first_song.learning")}
+                      sub={t("first_song.learning_sub")}
                     />
                     <FakeStatusCard
                       icon={CheckCircle2}
                       tone='green'
-                      label='Learned'
-                      sub='Mastered and in repertoire'
+                      label={t("first_song.learned")}
+                      sub={t("first_song.learned_sub")}
                     />
                   </span>
                 ),
@@ -462,7 +460,7 @@ export const GettingStartedWidget = () => {
             ]}
           />
         }
-        ctaLabel='Browse songs'
+        ctaLabel={t("first_song.cta")}
         onCta={() => {
           setOpenModal(null);
           Router.push("/songs");
@@ -472,8 +470,8 @@ export const GettingStartedWidget = () => {
       <StepInfoModal
         isOpen={openModal === "reward"}
         onOpenChange={(isOpen) => !isOpen && setOpenModal(null)}
-        title='Draw your first guitar'
-        description='You played your first session — claim your Fame and open a case.'
+        title={t("reward.title")}
+        description={t("reward.description")}
         body={
           <div className='space-y-3'>
             <div className='flex items-center justify-center gap-2 rounded-lg bg-zinc-900/60 py-5'>
@@ -487,12 +485,11 @@ export const GettingStartedWidget = () => {
               />
             </div>
             <p className='text-center text-sm leading-relaxed text-zinc-300'>
-              That&apos;s exactly enough to open a case in the Arsenal. Claim it
-              and you&apos;ll land there ready to pick your guitar.
+              {t("reward.body")}
             </p>
           </div>
         }
-        ctaLabel='Claim & choose your guitar'
+        ctaLabel={t("reward.cta")}
         onCta={handleClaimAndGoToArsenal}
       />
     </Card>

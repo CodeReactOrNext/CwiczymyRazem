@@ -1,6 +1,7 @@
 import type { Song } from "feature/songs/types/songs.type";
 import { formatPlayTime } from "feature/songs/utils/arrangements.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { useTranslation } from "hooks/useTranslation";
 import { Clock } from "lucide-react";
 
 import { ShinyCover } from "./ShinyCover";
@@ -27,20 +28,21 @@ export const SongCase = ({
   isOwner,
   practiceTimes,
 }: SongCaseProps) => {
+  const { t } = useTranslation("profile");
   if (songs.length === 0) return null;
 
   return (
     <div className='rounded-2xl bg-zinc-900/30 p-6'>
       <div className='flex flex-wrap items-end justify-between gap-2'>
         <div>
-          <h2 className='text-2xl font-bold text-white'>Signature songs</h2>
+          <h2 className='text-2xl font-bold text-white'>{t("layout.sections.signature-songs.title")}</h2>
           {!isPinned && (
-            <p className='mt-1 text-sm text-zinc-400'>Hardest songs learned</p>
+            <p className='mt-1 text-sm text-zinc-400'>{t("cases.hardest")}</p>
           )}
         </div>
         {isOwner && !isPinned && (
           <p className='text-xs text-zinc-500'>
-            Pin your own in Customize profile → Profile card.
+            {t("cases.pin_hint")}
           </p>
         )}
       </div>
@@ -76,7 +78,7 @@ export const SongCase = ({
               </p>
               {(practiceTimes?.[song.id] ?? 0) > 0 && (
                 <p
-                  title='Time spent practising this song'
+                  title={t("cases.time_spent")}
                   className='mt-2 flex items-center gap-1.5 text-xs tabular-nums text-zinc-300'>
                   <Clock size={12} className='text-zinc-500' />
                   {formatPlayTime(practiceTimes?.[song.id] ?? 0)}

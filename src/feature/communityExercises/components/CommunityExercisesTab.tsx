@@ -12,6 +12,7 @@ import type { CommunityExercise } from "feature/communityExercises/types";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ChevronDown,
   ChevronLeft,
@@ -81,25 +82,31 @@ const DIFFICULTY_COLORS: Record<string, string> = {
   hard: "bg-rose-500/15 text-rose-400",
 };
 
-const CategoryBadge = ({ category }: { category: string }) => (
+const CategoryBadge = ({ category }: { category: string }) => {
+  const { t } = useTranslation(["community","exercises"]);
+  return (
   <span
     className={cn(
       "rounded px-2 py-0.5 text-[10px] font-bold capitalize tracking-wider",
       CATEGORY_COLORS[category] ?? CATEGORY_COLORS.mixed,
     )}>
-    {category}
+    {t(`exercises:categories.${category}`, category)}
   </span>
-);
+  );
+};
 
-const DifficultyBadge = ({ difficulty }: { difficulty: string }) => (
+const DifficultyBadge = ({ difficulty }: { difficulty: string }) => {
+  const { t } = useTranslation(["community","exercises"]);
+  return (
   <span
     className={cn(
       "rounded px-2 py-0.5 text-[10px] font-bold capitalize tracking-wider",
       DIFFICULTY_COLORS[difficulty],
     )}>
-    {difficulty}
+    {t(`exercises:difficulty.${difficulty}`, difficulty)}
   </span>
-);
+  );
+};
 
 const AuthorAvatar = ({
   authorId,
@@ -110,6 +117,7 @@ const AuthorAvatar = ({
   authorUsername: string;
   avatar?: string | null;
 }) => {
+  const { t } = useTranslation("community");
   const initial = authorUsername?.[0]?.toUpperCase() ?? "?";
   return (
     <UserTooltip userId={authorId}>
@@ -117,7 +125,7 @@ const AuthorAvatar = ({
         href={`/user/${authorId}`}
         onClick={(e) => e.stopPropagation()}
         className='shrink-0'
-        aria-label={`View ${authorUsername}'s profile`}>
+        aria-label={t("view_profile", { name: authorUsername })}>
         {avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -141,30 +149,33 @@ const StatCounters = ({
 }: {
   playCount: number;
   thanksCount: number;
-}) => (
+}) => {
+  const { t } = useTranslation(["community","exercises"]);
+  return (
   <>
     <span
       className={cn(
         "flex items-center gap-1.5 whitespace-nowrap text-xs font-medium tabular-nums",
         playCount > 0 ? "text-cyan-400" : "text-zinc-500",
       )}
-      title={`Practiced ${playCount} times`}>
+      title={t("practiced_times", { count: playCount })}>
       <Guitar size={15} />
       {playCount}
-      <span className='font-normal'>plays</span>
+      <span className='font-normal'>{t("plays")}</span>
     </span>
     <span
       className={cn(
         "flex items-center gap-1.5 whitespace-nowrap text-xs font-medium tabular-nums",
         thanksCount > 0 ? "text-amber-400" : "text-zinc-500",
       )}
-      title={`The author was thanked ${thanksCount} times`}>
+      title={t("thanked_times", { count: thanksCount })}>
       <HandHeart size={15} />
       {thanksCount}
-      <span className='font-normal'>thanks</span>
+      <span className='font-normal'>{t("thanks")}</span>
     </span>
   </>
-);
+  );
+};
 
 const RankBadge = ({
   rank,
@@ -189,17 +200,18 @@ const AverageRating = ({
   average: number;
   count: number;
 }) => {
+  const { t } = useTranslation("community");
   if (count === 0) {
     return (
       <span className='whitespace-nowrap text-[11px] text-zinc-500'>
-        No ratings
+        {t("no_ratings")}
       </span>
     );
   }
   return (
     <span
       className='flex items-center gap-1 whitespace-nowrap text-xs font-bold tabular-nums text-amber-400'
-      title={`Rated ${average.toFixed(1)} by ${count} player${count === 1 ? "" : "s"}`}>
+      title={t("rated_by", { avg: average.toFixed(1), count })}>
       <Star size={13} fill='currentColor' strokeWidth={1.5} />
       {average.toFixed(1)}
       <span className='text-[11px] font-normal text-zinc-500'>({count})</span>
@@ -220,6 +232,7 @@ const RateStars = ({
   onRate,
   isLoading,
 }: RateStarsProps) => {
+  const { t } = useTranslation("community");
   const [hovered, setHovered] = useState<number | null>(null);
   const display = hovered ?? userRating ?? 0;
 
@@ -232,7 +245,7 @@ const RateStars = ({
           onMouseEnter={() => setHovered(star)}
           onMouseLeave={() => setHovered(null)}
           onClick={() => onRate(exerciseId, star)}
-          aria-label={`Rate ${star} star${star === 1 ? "" : "s"}`}
+          aria-label={t("rate_stars", { count: star })}
           className={cn(
             "rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-wait",
             star <= display
@@ -272,7 +285,9 @@ const ExerciseDetails = ({
   isThanksLoading,
   onThank,
   showHeader = false,
-}: ExerciseDetailsProps) => (
+}: ExerciseDetailsProps) => {
+  const { t } = useTranslation(["community","exercises"]);
+  return (
   <div className='space-y-6' onClick={(e) => e.stopPropagation()}>
     {showHeader && (
       <div className='space-y-2'>
@@ -317,7 +332,7 @@ const ExerciseDetails = ({
     <div className='grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-10'>
       {exercise.description && (
         <div className='space-y-1'>
-          <p className='text-xs font-semibold text-zinc-500'>About</p>
+          <p className='text-xs font-semibold text-zinc-500'>{t("about")}</p>
           <p className='text-sm leading-relaxed text-zinc-300'>
             {exercise.description}
           </p>
@@ -326,7 +341,7 @@ const ExerciseDetails = ({
 
       {exercise.instructions?.length > 0 && (
         <div className='space-y-2'>
-          <p className='text-xs font-semibold text-zinc-500'>Instructions</p>
+          <p className='text-xs font-semibold text-zinc-500'>{t("instructions")}</p>
           <ol className='list-none space-y-1.5'>
             {exercise.instructions.map((inst, i) => (
               <li key={i} className='flex gap-2 text-sm text-zinc-300'>
@@ -343,7 +358,7 @@ const ExerciseDetails = ({
 
     {exercise.tips?.filter(Boolean).length > 0 && (
       <div className='space-y-2'>
-        <p className='text-xs font-semibold text-zinc-500'>Tips</p>
+        <p className='text-xs font-semibold text-zinc-500'>{t("tips")}</p>
         <ul className='space-y-1'>
           {exercise.tips.filter(Boolean).map((tip, i) => (
             <li key={i} className='flex gap-2 text-sm text-zinc-400'>
@@ -357,7 +372,7 @@ const ExerciseDetails = ({
 
     <div className='flex flex-wrap items-center justify-between gap-4'>
       <div className='flex items-center gap-3'>
-        <span className='text-sm text-zinc-400'>Your rating</span>
+        <span className='text-sm text-zinc-400'>{t("your_rating")}</span>
         <RateStars
           exerciseId={exercise.id}
           userRating={userRating}
@@ -375,11 +390,12 @@ const ExerciseDetails = ({
             : "bg-amber-500/10 text-amber-300 disabled:opacity-40 hover:bg-amber-500/20 disabled:hover:bg-amber-500/10",
         )}>
         <HandHeart size={16} />
-        {hasThanked ? "Thanked" : "Thank the author"}
+        {hasThanked ? t("thanked") : t("thank_author")}
       </button>
     </div>
   </div>
-);
+  );
+};
 
 interface ExerciseRowProps extends ExerciseDetailsProps {
   authorAvatar?: string | null;
@@ -395,7 +411,9 @@ const StartButton = ({
 }: {
   exercise: CommunityExercise;
   onStart: (exercise: CommunityExercise) => void;
-}) => (
+}) => {
+  const { t } = useTranslation(["community","exercises"]);
+  return (
   <button
     onClick={(e) => {
       e.stopPropagation();
@@ -403,9 +421,10 @@ const StartButton = ({
     }}
     className='flex items-center gap-1.5 rounded bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
     <StartIcon size={12} strokeWidth={2.5} />
-    Start
+    {t("start")}
   </button>
-);
+  );
+};
 
 const ExerciseRow = ({
   exercise,
@@ -625,6 +644,7 @@ interface CommunityExercisesTabProps {
 export const CommunityExercisesTab = ({
   onStartExercise,
 }: CommunityExercisesTabProps) => {
+  const { t } = useTranslation(["community", "exercises"]);
   const userAuth = useAppSelector(selectUserAuth);
   const [exercises, setExercises] = useState<CommunityExercise[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -852,14 +872,14 @@ export const CommunityExercisesTab = ({
           <input
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder='Search community exercises…'
+            placeholder={t("search")}
             className='h-9 w-full rounded-lg border border-zinc-700/60 bg-zinc-800/70 pl-9 pr-4 text-sm text-zinc-200 transition-colors placeholder:text-zinc-500 focus:border-cyan-500/40 focus:outline-none focus:ring-1 focus:ring-cyan-500/20'
           />
         </div>
 
         <div className='flex flex-wrap items-center gap-2'>
           <span className='mr-1 text-[10px] font-bold capitalize tracking-wider text-zinc-500'>
-            Category
+            {t("category")}
           </span>
           {["all", "technique", "theory", "hearing", "creativity", "mixed"].map(
             (cat) => (
@@ -867,7 +887,7 @@ export const CommunityExercisesTab = ({
                 key={cat}
                 onClick={() => handleCategoryChange(cat)}
                 className={filterPill(selectedCategory === cat)}>
-                {cat === "all" ? "All" : cat}
+                {cat === "all" ? t("all") : t(`exercises:categories.${cat}`, cat)}
               </button>
             ),
           )}
@@ -875,14 +895,14 @@ export const CommunityExercisesTab = ({
 
         <div className='flex flex-wrap items-center gap-2'>
           <span className='mr-1 text-[10px] font-bold capitalize tracking-wider text-zinc-500'>
-            Difficulty
+            {t("difficulty")}
           </span>
           {["all", "easy", "medium", "hard"].map((d) => (
             <button
               key={d}
               onClick={() => handleDifficultyChange(d)}
               className={filterPill(selectedDifficulty === d)}>
-              {d === "all" ? "All" : d}
+              {d === "all" ? t("all") : t(`exercises:difficulty.${d}`, d)}
             </button>
           ))}
         </div>
@@ -891,11 +911,10 @@ export const CommunityExercisesTab = ({
       {/* List */}
       <div className='flex flex-col gap-3'>
         <p className='text-xs text-zinc-500'>
-          {filteredExercises.length} exercise
-          {filteredExercises.length !== 1 ? "s" : ""} · sorted by rating
+          {t(filteredExercises.length === 1 ? "count_one" : "count", { count: filteredExercises.length })} · {t("sorted_by_rating")}
           {totalPages > 1 && (
             <span className='ml-1'>
-              — page {safePage} / {totalPages}
+              — {t("page_of", { page: safePage, total: totalPages })}
             </span>
           )}
         </p>
@@ -912,8 +931,8 @@ export const CommunityExercisesTab = ({
         ) : pageExercises.length === 0 ? (
           <div className='rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 py-12 text-center text-sm text-zinc-500'>
             {exercises.length === 0
-              ? "No community exercises yet. Be the first to publish one!"
-              : "No exercises match the current filters."}
+              ? t("empty")
+              : t("no_match")}
           </div>
         ) : (
           <>
@@ -925,16 +944,16 @@ export const CommunityExercisesTab = ({
                     {/* The title column takes whatever the fixed ones leave, so
                         the Start column never gets pushed past the edge. */}
                     <th className='px-4 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      Exercise
+                      {t("col_exercise")}
                     </th>
                     <th className='w-24 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      Difficulty
+                      {t("difficulty")}
                     </th>
                     <th className='w-16 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      Min
+                      {t("col_min")}
                     </th>
                     <th className='w-28 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      Rating
+                      {t("col_rating")}
                     </th>
                     <th className='w-28 px-3 pb-2'></th>
                   </tr>
@@ -964,7 +983,7 @@ export const CommunityExercisesTab = ({
               disabled={safePage === 1}
               className='flex items-center gap-1.5 rounded bg-zinc-800/50 px-3 py-1.5 text-xs font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200'>
               <ChevronLeft size={13} />
-              Previous
+              {t("previous")}
             </button>
             <div className='flex items-center gap-1'>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
@@ -997,7 +1016,7 @@ export const CommunityExercisesTab = ({
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={safePage === totalPages}
               className='flex items-center gap-1.5 rounded bg-zinc-800/50 px-3 py-1.5 text-xs font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200'>
-              Next
+              {t("next")}
               <ChevronRight size={13} />
             </button>
           </div>

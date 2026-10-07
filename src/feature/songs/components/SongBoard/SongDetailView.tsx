@@ -42,6 +42,7 @@ import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { collection, documentId, getDocs, query, where } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import {
   ArrowLeft,
   Check,
@@ -122,8 +123,9 @@ const InfoRow = ({ label, value, icon: Icon }: any) => (
   </div>
 );
 
-export const SongDetailView = ({ song, progress, status, onPractice, onRemove, onStatusChange, onPartsChange, onBack, backLabel = "Back to library", showBackOnDesktop = false }: SongDetailViewProps) => {
+export const SongDetailView = ({ song, progress, status, onPractice, onRemove, onStatusChange, onPartsChange, onBack, backLabel, showBackOnDesktop = false }: SongDetailViewProps) => {
   const { t } = useTranslation("songs");
+  const intlLocale = useIntlLocale();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
@@ -321,7 +323,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                 className="gap-2 text-zinc-400 hover:text-white bg-white/5 backdrop-blur-md rounded-full px-4"
               >
                 <ArrowLeft size={16} />
-                <span className="text-xs font-bold">{backLabel}</span>
+                <span className="text-xs font-bold">{backLabel ?? t("detail.back_to_library")}</span>
               </Button>
            </div>
          )}
@@ -344,7 +346,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             <div className="flex-1 text-left">
                <div className="flex items-center justify-start gap-3 mb-1 sm:mb-2">
                    <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-[4px] bg-zinc-800 text-[9px] sm:text-[10px] font-bold capitalize text-zinc-400 backdrop-blur-sm">
-                     {song.genres?.[0] || "Guitar track"}
+                     {song.genres?.[0] || t("detail.guitar_track")}
                    </span>
                </div>
                <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-md">{song.title}</h2>
@@ -361,7 +363,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                >
                    <div className="absolute inset-0 opacity-10" style={{ backgroundColor: tier.color }} />
                    <span className="text-3xl md:text-4xl font-black relative z-10" style={{ color: tier.color }}>{tier.tier}</span>
-                   <span className="text-[8px] md:text-[10px] font-bold capitalize relative z-10" style={{ color: `${tier.color}90` }}>Tier</span>
+                   <span className="text-[8px] md:text-[10px] font-bold capitalize relative z-10" style={{ color: `${tier.color}90` }}>{t("detail.tier")}</span>
                </div>
             </div>
          </div>
@@ -389,21 +391,21 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                {/* Steam-style Info Boxes */}
                <div className="flex items-center gap-6 sm:gap-10 pt-6 sm:pt-0 sm:pl-8 w-full sm:w-auto justify-around sm:justify-start">
                   <div className="flex flex-col items-center sm:items-start">
-                     <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">Sessions</span>
+                     <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">{t("board.sessions")}</span>
                      <span className="text-sm font-bold text-zinc-200">{progress?.sessionCount || 0}</span>
                   </div>
 
                   <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                     <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">Last practiced</span>
+                     <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">{t("detail.last_practiced")}</span>
                      <span className="text-sm font-bold text-zinc-200">
-                        {progress?.lastPracticedAt ? progress.lastPracticedAt.toLocaleDateString() : "Never"}
+                        {progress?.lastPracticedAt ? progress.lastPracticedAt.toLocaleDateString(intlLocale) : t("detail.never")}
                      </span>
                   </div>
 
                   <div className="flex flex-col items-center sm:items-start">
                      <div className="flex items-center gap-2 mb-1">
                         <Clock size={12} className="text-zinc-500" />
-                        <span className="text-xs font-medium tracking-wider text-zinc-400">Play time</span>
+                        <span className="text-xs font-medium tracking-wider text-zinc-400">{t("board.play_time")}</span>
                      </div>
                      <span className="text-sm font-bold text-zinc-200">{totalHours}h {totalMinutes} min</span>
                   </div>
@@ -457,14 +459,14 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                <AlertDialog open={showRemoveConfirm} onOpenChange={setShowRemoveConfirm}>
                  <AlertDialogContent className="border-none bg-zinc-900 text-zinc-100 sm:rounded-xl">
                    <AlertDialogHeader>
-                     <AlertDialogTitle className="font-display text-zinc-50">Remove song</AlertDialogTitle>
+                     <AlertDialogTitle className="font-display text-zinc-50">{t("detail.remove_title")}</AlertDialogTitle>
                      <AlertDialogDescription className="leading-relaxed text-zinc-400">
-                       Are you sure you want to remove this song from your board?
+                       {t("detail.remove_body")}
                      </AlertDialogDescription>
                    </AlertDialogHeader>
                    <AlertDialogFooter>
                      <AlertDialogCancel className="border-none bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-zinc-100">
-                       Cancel
+                       {t("cancel")}
                      </AlertDialogCancel>
                      <AlertDialogAction
                        onClick={(event) => {
@@ -513,26 +515,26 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             <div className="bg-zinc-800/40 rounded-lg p-6 space-y-6 shadow-sm backdrop-blur-sm">
                <div className="flex items-center gap-2">
                   <TrendingUp size={18} className="transition-all duration-500 text-zinc-700" />
-                  <span className="text-sm font-semibold text-zinc-300">Your progress</span>
+                  <span className="text-sm font-semibold text-zinc-300">{t("your_progress")}</span>
                </div>
                
                <div className="space-y-8">
                   <div className="group/rate px-1">
                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs font-semibold text-zinc-400">My rating</p>
+                        <p className="text-xs font-semibold text-zinc-400">{t("detail.my_rating")}</p>
                         {isRating ? (
                            <span className="inline-flex items-center gap-1.5 text-[9px] font-bold text-cyan-400">
                               <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                              Saving…
+                              {t("detail.saving")}
                            </span>
                         ) : userRating !== undefined ? (
                            <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400">
                               <Check size={11} strokeWidth={3} />
-                              Rated
+                              {t("detail.rated")}
                            </span>
                         ) : (
                            <span className="inline-flex items-center gap-1 rounded-[8px] border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-bold text-cyan-400 animate-pulse">
-                              Tap to rate
+                              {t("detail.tap_to_rate")}
                            </span>
                         )}
                      </div>
@@ -556,20 +558,20 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                            </TooltipTrigger>
                            <TooltipContent className="bg-zinc-950 text-zinc-100 shadow-2xl">
                               {userRating !== undefined
-                                 ? `You rated this song ${userRating}/10 — click a star to change it`
-                                 : "Click a star to rate this song's difficulty (1–10)"}
+                                 ? t("detail.rated_tooltip", { rating: userRating })
+                                 : t("detail.rate_tooltip")}
                            </TooltipContent>
                         </Tooltip>
                      </TooltipProvider>
                      <p className="text-[9px] text-zinc-500 mt-3 transition-opacity">
-                        Click the stars to {userRating !== undefined ? "change" : "set"} your rating
+                        {userRating !== undefined ? t("detail.change_rating") : t("detail.set_rating")}
                      </p>
                   </div>
 
                   <div className="space-y-3">
-                     <InfoRow label="Mastery progress" value={`${song.masteryProgress || 0}%`} icon={Target} />
-                     <InfoRow label="Last practiced" value={progress?.lastPracticedAt ? progress.lastPracticedAt.toLocaleDateString() : "Never"} icon={Clock} />
-                     <InfoRow label="Attached file" value={progress?.gpFileName || "None"} icon={FileText} />
+                     <InfoRow label={t("detail.mastery_progress")} value={`${song.masteryProgress || 0}%`} icon={Target} />
+                     <InfoRow label={t("detail.last_practiced")} value={progress?.lastPracticedAt ? progress.lastPracticedAt.toLocaleDateString(intlLocale) : t("detail.never")} icon={Clock} />
+                     <InfoRow label={t("detail.attached_file")} value={progress?.gpFileName || t("detail.none")} icon={FileText} />
                   </div>
                </div>
             </div>
@@ -578,14 +580,14 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             <div className="bg-zinc-800/40 rounded-lg p-6 space-y-6 shadow-sm backdrop-blur-sm">
                <div className="flex items-center gap-2">
                   <Music size={18} className="transition-all duration-500 text-zinc-700" />
-                  <span className="text-sm font-semibold text-zinc-300">Song data</span>
+                  <span className="text-sm font-semibold text-zinc-300">{t("detail.song_data")}</span>
                </div>
 
                <div className="space-y-5">
                   <div className="space-y-3 mt-4">
-                     <InfoRow label="Artist" value={song.artist} icon={Users} />
-                     <InfoRow label="Total sections" value={song.totalSections || 0} icon={FileText} />
-                     <InfoRow label="Practicing users" value={song.practicingUsers?.length || 0} icon={Users} />
+                     <InfoRow label={t("artist")} value={song.artist} icon={Users} />
+                     <InfoRow label={t("detail.total_sections")} value={song.totalSections || 0} icon={FileText} />
+                     <InfoRow label={t("detail.practicing_users")} value={song.practicingUsers?.length || 0} icon={Users} />
                   </div>
                </div>
             </div>
@@ -594,11 +596,11 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             <div className="bg-zinc-800/40 rounded-lg p-6 flex flex-col gap-6 shadow-sm backdrop-blur-sm">
                <div className="flex items-center gap-2">
                   <Star size={18} className="transition-all duration-500 text-zinc-700" />
-                  <span className="text-sm font-semibold text-zinc-300">Community ratings</span>
+                  <span className="text-sm font-semibold text-zinc-300">{t("detail.community_ratings")}</span>
                </div>
 
                <div className="px-1">
-                  <p className="text-xs font-semibold text-zinc-400 mb-3">Avg. difficulty</p>
+                  <p className="text-xs font-semibold text-zinc-400 mb-3">{t("detail.avg_difficulty")}</p>
                   <div className="flex flex-wrap items-center justify-between gap-y-2">
                      <div className="flex items-center gap-3 shrink-0">
                         <TierBadge song={song} className="h-8 w-8 rounded-md text-sm" />
@@ -613,7 +615,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      {song.difficulties && song.difficulties.length > 0 ? (
                        song.difficulties.slice(0, 15).map((diff, i) => {
                          const profile = raterProfiles[diff.userId];
-                         const t = getSongTier(diff.rating);
+                         const raterTier = getSongTier(diff.rating);
                          
                          return (
                            <div key={diff.userId || i} className="relative group/avatar hover:z-20">
@@ -622,7 +624,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                                   <TooltipTrigger asChild>
                                     <div className="relative">
                                        <Avatar
-                                         name={profile?.displayName || "Musician"}
+                                         name={profile?.displayName || t("detail.musician")}
                                          avatarURL={profile?.avatar}
                                          lvl={profile?.lvl || 0}
                                          size="sm"
@@ -630,7 +632,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                                        />
                                        <div
                                          className="absolute -bottom-1.5 -right-1.5 z-20 flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-black shadow-lg ring-2 ring-zinc-900"
-                                         style={{ backgroundColor: t.color, color: "#09090b" }}
+                                         style={{ backgroundColor: raterTier.color, color: "#09090b" }}
                                        >
                                          {diff.rating}
                                        </div>
@@ -638,9 +640,9 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                                   </TooltipTrigger>
                                   <TooltipContent className="bg-zinc-950 p-3 shadow-2xl">
                                     <div className="space-y-1">
-                                       <p className="text-xs font-black text-white">{profile?.displayName || "Unknown Musician"}</p>
-                                       <p className="text-[10px] text-zinc-400">Rating: <span className="font-bold" style={{ color: t.color }}>{diff.rating}/10</span></p>
-                                       <p className="text-[10px] text-zinc-400">Tier: <span className="font-bold" style={{ color: t.color }}>{t.label}</span></p>
+                                       <p className="text-xs font-black text-white">{profile?.displayName || t("detail.unknown_musician")}</p>
+                                       <p className="text-[10px] text-zinc-400">{t("detail.rating_label")} <span className="font-bold" style={{ color: raterTier.color }}>{diff.rating}/10</span></p>
+                                       <p className="text-[10px] text-zinc-400">{t("detail.tier_label")} <span className="font-bold" style={{ color: raterTier.color }}>{raterTier.label}</span></p>
                                     </div>
                                   </TooltipContent>
                                 </Tooltip>
@@ -649,7 +651,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                          );
                        })
                      ) : (
-                       <p className="text-xs text-zinc-600 italic">No ratings yet</p>
+                       <p className="text-xs text-zinc-600 italic">{t("detail.no_ratings")}</p>
                      )}
                      {song.difficulties && song.difficulties.length > 15 && (
                        <div className="h-8 w-8 rounded-full bg-zinc-800/40 border border-dashed border-white/10 flex items-center justify-center text-[10px] font-bold text-zinc-500">
@@ -681,17 +683,26 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                            />
                          )}
                          {selectedArrangement
-                           ? `${ARRANGEMENT_META[selectedArrangement].label} mastery`
-                           : "Song mastery"}
+                           ? t("detail.arrangement_mastery", {
+                               arrangement: t(
+                                 `arrangements.${selectedArrangement}.label`,
+                                 ARRANGEMENT_META[selectedArrangement].label,
+                               ),
+                             })
+                           : t("detail.song_mastery")}
                       </span>
                       <p className="text-xs font-medium text-zinc-500 mt-1">
-                         {masteryData ? "Practice progression" : "Map sections to track your progression"}
+                         {masteryData ? t("detail.progression") : t("detail.map_to_track")}
                       </p>
                    </div>
                    <div className="flex items-center gap-4">
                       {masteryData && (
                         <span className="text-xs font-semibold text-zinc-400 tabular-nums">
-                           {masteryData.masteredCount} / {masteryData.totalSections} Sections ({masteryData.progressPct}%)
+                           {t("detail.sections_progress", {
+  done: masteryData.masteredCount,
+  total: masteryData.totalSections,
+  pct: masteryData.progressPct,
+})}
                         </span>
                       )}
                       {status && (
@@ -721,9 +732,9 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                         </div>
 
                         <div className="space-y-1">
-                           <p className="text-base font-bold text-white">Unlock section-by-section mastery</p>
+                           <p className="text-base font-bold text-white">{t("detail.unlock_sections")}</p>
                            <p className="max-w-sm text-sm text-zinc-400">
-                              Mark where the intro, verse, chorus and solo start — every section then tracks its own progress as you practice.
+                              {t("detail.unlock_sections_body")}
                            </p>
                         </div>
 
@@ -732,13 +743,13 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                            className="mt-1 rounded-lg bg-white px-6 text-sm font-bold text-zinc-950 hover:bg-zinc-200"
                         >
                            <ListMusic className="mr-2 h-4 w-4" />
-                           Map this song
+                           {t("detail.map_song")}
                         </Button>
 
                         {communityMap && (
                           <div className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-300">
                              <Sparkles className="h-3.5 w-3.5 shrink-0" />
-                             {communityMap.contributorCount} musician{communityMap.contributorCount === 1 ? "" : "s"} already mapped this — you&apos;ll be offered to import it when you start.
+                             {t("detail.community_mapped", { count: communityMap.contributorCount })}
                           </div>
                         )}
                      </div>
@@ -773,7 +784,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                         className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/5 py-3 text-xs font-semibold text-zinc-300 transition-colors hover:bg-white/10"
                      >
                         <Plus className="h-4 w-4" />
-                        Add new section
+                        {t("detail.add_section")}
                      </button>
                   </div>
                 )}
@@ -785,20 +796,20 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
               <div className="flex items-center justify-between">
                  <div className="flex items-center gap-2">
                     <MessageSquare size={18} className="transition-all duration-500 text-zinc-700" />
-                    <span className="text-sm font-semibold text-zinc-300">Practice notes</span>
+                    <span className="text-sm font-semibold text-zinc-300">{t("detail.practice_notes")}</span>
                  </div>
                  <div className="flex items-center gap-3">
                     {isSaving && (
                        <div className="flex items-center gap-1.5 animate-pulse">
                           <Save size={10} className="text-zinc-500" />
-                          <span className="text-[9px] text-zinc-500 font-bold">Saving</span>
+                          <span className="text-[9px] text-zinc-500 font-bold">{t("detail.saving")}</span>
                        </div>
                     )}
                     <span className={cn(
                       "text-[9px] font-bold",
                       notes.length > 450 ? "text-amber-500" : "text-zinc-600"
                     )}>
-                      {notes.length} / 500 CHARACTERS
+                      {t("detail.characters", { count: notes.length })}
                     </span>
                  </div>
               </div>
@@ -810,7 +821,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                       setNotes(e.target.value);
                    }
                  }}
-                 placeholder="Add your practice notes here... (e.g. guitar settings, tips for difficult parts, gear used)"
+                 placeholder={t("detail.notes_placeholder")}
                  className="w-full min-h-[250px] bg-black/20 rounded-lg p-4 text-sm text-zinc-300 placeholder:text-zinc-700 focus:outline-none focus:ring-1 focus:ring-white/10 transition-all resize-none leading-relaxed shadow-inner"
               />
            </div>

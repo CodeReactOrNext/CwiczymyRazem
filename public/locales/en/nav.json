@@ -1,0 +1,146 @@
+{
+  "home": "Home",
+  "practice": "Practice",
+  "songs": "Songs",
+  "my_stuff": "My Stuff",
+  "progress": "Progress",
+  "activity": "Activity",
+  "milestones": "Milestones",
+  "milestones_tooltip": "Weekly rewards for hitting practice goals",
+  "community": "Community",
+  "rankings": "Rankings",
+  "challenges": "Challenges",
+  "challenges_tooltip": "Five community-voted songs to record every month",
+  "recordings": "Recordings",
+  "recordings_tooltip": "Share your covers and hear what everyone else is recording",
+  "guilds": "Guilds",
+  "guilds_tooltip": "Practise alongside other people — chat and a weekly challenge",
+  "arsenal": "Arsenal",
+  "tone_studio": "Tone Studio",
+  "supporter": "Supporter",
+  "support": "Support",
+  "supporter_tooltip": "Post ideas and spend your votes on what gets built next",
+  "support_tooltip": "What supporting the project gets you, and how to get it",
+  "knowledge_base": "Knowledge Base",
+  "knowledge_base_tooltip": "How every part of the app works, in plain language",
+  "settings": "Settings",
+  "discord": "Discord",
+  "discord_tooltip": "Join the community server",
+  "practice_routines": "Practice Routines",
+  "auto_plan": "Auto Plan",
+  "free_timer": "Free Timer",
+  "manual_log": "Manual Log",
+  "guitar_pro_files": "Guitar Pro Files",
+  "skills": "Skills",
+  "exercises": "Exercises",
+  "mastery_roadmaps": "Mastery Roadmaps",
+  "learning_path": "Learning Path",
+  "scale_map": "Scale Map",
+  "scale_map_tooltip": "Unlock scales one branch at a time on the fretboard",
+  "board": "Board",
+  "explore": "Explore",
+  "playlists": "Playlists",
+  "favorites": "Favorites",
+  "my_plans": "My Plans",
+  "my_exercises": "My Exercises",
+  "create_plan": "Create Plan",
+  "create_exercise": "Create Exercise",
+  "locked_until_level": "Locked until level {{level}}",
+  "opens_at_level": "Opens at level {{level}}",
+  "unclaimed_reward": "Unclaimed reward",
+  "collapse_section": "Collapse {{name}}",
+  "expand_section": "Expand {{name}}",
+  "get_desktop_app": "Get the desktop app",
+  "sign_out": "Sign out",
+  "sign_out_confirm": "Are you sure you want to sign out?",
+  "cancel": "Cancel",
+  "log_out": "Log out",
+  "see_your_profile": "See your profile",
+  "account_menu": "Account menu",
+  "open_menu": "Open menu",
+  "more": "More",
+  "points_tooltip": "Points are earned by completing exercises and practice sessions — they track your overall progress.",
+  "weekday_letters": "M,T,W,T,F,S,S",
+  "search": {
+    "button": "Search...",
+    "title": "Search",
+    "description": "Search your plans, exercises and songs",
+    "placeholder": "Search plans, exercises, songs...",
+    "start_typing": "Start typing to search your plans, exercises and songs.",
+    "no_results": "No results for “{{query}}”.",
+    "group_plans": "Plans",
+    "group_exercises": "Exercises",
+    "group_songs": "Songs"
+  },
+  "reset": {
+    "aria": "Server time and what resets next",
+    "server_time_short": "server time",
+    "scope_server": "server",
+    "scope_local": "your time",
+    "next_in": "{{label}} in {{time}}",
+    "tooltip_hint": "The game day starts at 00:00 UTC for everyone. Click for the full list.",
+    "dialog_title": "Server time · {{time}} UTC",
+    "dialog_description": "Everything players share runs on one clock, so a deadline means the same thing wherever you are. Your practice streak is the exception — it follows your own midnight.",
+    "entries": {
+      "daily": {
+        "label": "Daily reset",
+        "detail": "A fresh daily Fame bonus."
+      },
+      "trader": {
+        "label": "Trader restock",
+        "detail": "The trader clears the counter and lays out new stock."
+      },
+      "case-pool": {
+        "label": "Featured case pool",
+        "detail": "New guitars and effects rotate into the daily case."
+      },
+      "weekly": {
+        "label": "Weekly goals",
+        "detail": "Community Goal and guild challenges start a new week."
+      },
+      "supporter-slate": {
+        "label": "Supporter slate",
+        "detail": "A new pair of supporter cases goes up for voting."
+      },
+      "monthly": {
+        "label": "Season & Monthly Challenge",
+        "detail": "The leaderboard resets and a new challenge board opens."
+      },
+      "streak": {
+        "label": "Your practice day",
+        "detail": "Daily Quests draw a new set and the streak wants a session before then — this one follows your timezone, not the server."
+      }
+    }
+  },
+  "page_tabs": {
+    "favorites": {
+      "label": "Favorites"
+    },
+    "plans": {
+      "label": "My Plans"
+    },
+    "my_exercises": {
+      "label": "My Exercises"
+    },
+    "profile_activity": {
+      "label": "Activity"
+    },
+    "practice_log": {
+      "label": "Practice Log"
+    },
+    "profile_achievements": {
+      "label": "Achievements"
+    },
+    "seasons": {
+      "label": "Seasons"
+    },
+    "leaderboard": {
+      "label": "Leaderboard"
+    },
+    "leaderboard_gear": {
+      "label": "Gear",
+      "tooltip": "Ranked by equipped guitar & rig level, not practice score"
+    }
+  },
+  "language_wip": "Translations are a work in progress — some parts may still be in English."
+}

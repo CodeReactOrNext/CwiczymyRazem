@@ -51,7 +51,7 @@ export const GeneratedPlan = ({
   onRemoveExercise,
   isStarting
 }: GeneratedPlanProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common", "practice_hub"]);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
 
   const sensors = useSensors(
@@ -95,7 +95,7 @@ export const GeneratedPlan = ({
           </Button>
           <Button variant='secondary' onClick={onRegenerate} disabled={isStarting}>
             <RefreshCw className='mr-2 h-4 w-4' />
-            Regenerate
+            {t("practice_hub:auto.regenerate")}
           </Button>
           <Button
             onClick={() => onStart(plan)}
@@ -106,7 +106,7 @@ export const GeneratedPlan = ({
               {isStarting ? (
                   <>
                     <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Loading...</span>
+                    <span>{t("practice_hub:loading")}</span>
                   </>
               ) : (
                   <>
@@ -124,11 +124,13 @@ export const GeneratedPlan = ({
           <h2 className='text-lg font-semibold sm:text-xl'>
             {formatMinutesDuration(totalMinutes)}{" "}
             <span className='font-normal text-zinc-500'>
-              of {targetMinutes} min
+              {t("practice_hub:auto.of_target", { minutes: targetMinutes })}
             </span>
           </h2>
           <span className='text-sm text-zinc-400'>
-            {exerciseCount} {exerciseCount === 1 ? "exercise" : "exercises"}
+            {exerciseCount === 1
+              ? t("practice_hub:auto.exercise_one")
+              : t("practice_hub:auto.exercise_many", { count: exerciseCount })}
           </span>
         </div>
 
@@ -169,7 +171,7 @@ export const GeneratedPlan = ({
               {isStarting ? (
                   <>
                     <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Loading...</span>
+                    <span>{t("practice_hub:loading")}</span>
                   </>
               ) : (
                   <>

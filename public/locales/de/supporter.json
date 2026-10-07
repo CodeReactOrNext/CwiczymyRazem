@@ -1,0 +1,175 @@
+{
+  "tiers": {
+    "content": {
+      "exercises": "+{{count}} neue Übungen",
+      "exercise_one": "+{{count}} neue Übung",
+      "gear": "+{{count}} neue Gitarren & Pedale"
+    },
+    "t13": {
+      "label": "Gitarren in Teile zerlegen",
+      "description": "Zerlege Gitarren, die du nicht willst. Verschiedene Gitarren zerfallen in verschiedene Teile, also ist es wichtig, was du behältst (und was du zerlegst)."
+    },
+    "t25": {
+      "label": "Gitarrenbauer: Teile & Upgrades",
+      "description": "Equipment wirft beim Spielen Teile nach Seltenheit ab, und Teile aus zerlegten Gitarren fließen zurück. Gib passende Teile beim Gitarrenbauer aus, um eine Gitarre oder einen Effekt aufzuleveln und seine Seltenheit zu erhöhen."
+    },
+    "t51": {
+      "label": "Equipment beeinflusst Fame-Punkte",
+      "description": "Dein Equipment ändert, wie viele Fame-Punkte du pro Übungsart bekommst — wähl das richtige Rig für die richtige Übung."
+    },
+    "t61": {
+      "label": "Begleitspur mit Tabulatur synchronisieren",
+      "description": "Begleitspuren für Songs, synchron zur Tabulatur, damit du im Takt mitspielst, ohne den Beat zu suchen."
+    },
+    "t79": {
+      "label": "Pedalboard-Synergie",
+      "description": "Effekte beeinflussen sich gegenseitig, also wähl und ordne deine Pedale mit Bedacht."
+    },
+    "t89": {
+      "label": "Erfolge neu gemacht",
+      "description": "Erfolge komplett überarbeitet, plus neue. Jeder bringt dir wirklich etwas, nicht nur ein Abzeichen."
+    },
+    "t107": {
+      "label": "Stromlimit fürs Pedalboard",
+      "description": "Dein Pedalboard hat ein Stromlimit — rüste es auf, wenn du stärkere Effekte betreiben willst."
+    },
+    "t117": {
+      "label": "Gamification: Belohnungen für Pfade & Skills",
+      "description": "Schließ einen Lernpfad, eine Roadmap oder einen Skill-Zweig ab und bekomm eine Gitarre oder einen Effekt als Belohnung."
+    },
+    "t153": {
+      "label": "Spieler-Progressionssystem",
+      "description": "Steig durchs Spielen im Level auf. Schaltet Meilensteine, Profil-Layouts und die ausrüstbare Equipment-Seltenheit frei."
+    },
+    "t181": {
+      "label": "Anpassbares Dashboard",
+      "description": "Wähl dein eigenes Layout, Widgets und Shortcuts für das Hauptpanel."
+    },
+    "t191": {
+      "label": "Tägliche Freischaltung",
+      "description": "Eine zeitbasierte Freischaltung, die sich täglich zurücksetzt — ein Grund wiederzukommen."
+    },
+    "t201": {
+      "label": "Anpassbares Gitarristen-Profil",
+      "description": "Zeig, was du willst, wie du willst, mit Layouts, die du durch Fortschritt freischaltest."
+    },
+    "t229": {
+      "label": "Übungsmodus",
+      "description": "Setz Ziele pro Übung und verfolge deinen Fortschritt dorthin."
+    },
+    "t244": {
+      "label": "Riff-Karten",
+      "description": "Bau dir ein eigenes Deck aus Riffs, Songs und Übungen, das du mit verteilter Wiederholung lernst oder jederzeit frei durchspielst."
+    },
+    "t262": {
+      "label": "Signature-Gitarren beim Gitarrenbauer",
+      "description": "Der Gitarrenbauer führt Einzelstücke, die du nirgendwo sonst findest."
+    },
+    "t346": {
+      "label": "Duelle",
+      "description": "Fordere einen anderen Spieler um Fame-Punkte heraus, etwa wer mehr Übungszeit sammelt, bevor die Uhr abläuft."
+    },
+    "t415": {
+      "label": "Neuer Übungsmodus: Boss",
+      "description": "Ein neuer Übungsmodus: Boss. Jeder Boss stellt eine echte Anforderung. Erreich die Punktzahl und du steigst auf, bleibst du drunter, fliegst du raus — keine Teilpunkte."
+    }
+  },
+  "funding": {
+    "title": "Die Roadmap",
+    "subtitle": "Eine laufende Summe, kein Abo. Jedes erreichte Ziel wird gebaut und bleibt für alle dauerhaft freigeschaltet.",
+    "goals_funded": "Ziele finanziert",
+    "scroll_left": "Nach links scrollen",
+    "scroll_right": "Nach rechts scrollen",
+    "feature": "Feature",
+    "done": "Fertig",
+    "in_progress": "In Arbeit",
+    "funded": "Finanziert",
+    "locked": "Gesperrt",
+    "next_unlock": "Nächste Freischaltung",
+    "to_go": "noch ${{amount}}",
+    "covered": "Serverkosten diesen Monat gedeckt",
+    "needs_help": "Serverkosten brauchen deine Hilfe",
+    "all_funded": "Jedes Roadmap-Ziel ist finanziert, danke"
+  },
+  "perks": {
+    "title": "Was du bekommst",
+    "tokens": "Unterstützung wird zu Tokens: {{welcome}} kommen mit dem Abzeichen und {{perDollar}} mehr für jeden weiteren Dollar. Sie verfallen nie und geben dir ein Mitspracherecht, was gebaut wird.",
+    "open_panel": "Supporter-Panel öffnen",
+    "discord_body": "Eine Supporter-Rolle auf {{discord}} und ein Kanal, in dem ich zeige, woran ich baue, bevor es erscheint.",
+    "items": {
+      "0": {
+        "title": "Das Roadmap-Board",
+        "body": "Poste, was gebaut werden soll, und unterstütze die Ideen anderer Supporter."
+      },
+      "1": {
+        "title": "Equipment nach deiner Wahl",
+        "body": "Schlag eine Gitarre oder ein Pedal fürs Arsenal vor oder unterstütze den Vorschlag eines anderen."
+      },
+      "2": {
+        "title": "Die Supporter-Kiste",
+        "body": "Stimm ab, welche Items einen Platz in der nächsten Supporter-Kiste bekommen."
+      },
+      "3": {
+        "title": "Eine eigene Gilde",
+        "body": "Gründe eine mit eigenem Namen und Tag, gemeinsamem Lager und einer härteren Übungswoche."
+      },
+      "4": {
+        "title": "Die nächste Challenge",
+        "body": "Wähl die Community-Challenge, die nächste Woche alle spielen."
+      },
+      "5": {
+        "title": "Der Supporter-Kanal"
+      }
+    }
+  },
+  "faq": {
+    "title": "Fragen",
+    "discord_link": "schreib mir auf Discord",
+    "panel_link": "Supporter-Panel",
+    "badge_answer": "Über die E-Mail der Spende, die mit deinem Konto abgeglichen wird. Hast du von einer anderen Adresse gezahlt, {{discord}}, dann verknüpfe ich es von Hand. Tokens gibst du im {{panel}} aus.",
+    "items": {
+      "0": {
+        "q": "Warum bekommt jeder kostenlosen Zugang?",
+        "a": "Riff Quest bleibt für alle kostenlos, Punkt. Wenn du unterstützt, kaufst du keinen Zugang für dich, sondern bezahlst Entwicklung, die die ganze Community nutzt. Es ist eine laufende Summe, kein Abo — ein erreichtes Ziel bleibt dauerhaft freigeschaltet."
+      },
+      "1": {
+        "q": "Wie lange dauert es, ein Ziel umzusetzen?",
+        "a": "Das hängt wirklich vom Ziel ab. Etwas Kleines kann in ein paar Tagen fertig sein, eine anspruchsvollere Stufe kann rund zwei Wochen dauern. Je größer die Freischaltung, desto mehr Zeit braucht sie — und ich nehme mir lieber ein paar Tage mehr, als etwas Halbfertiges zu veröffentlichen."
+      },
+      "2": {
+        "q": "Wie findet das Supporter-Abzeichen mein Konto?"
+      },
+      "3": {
+        "q": "Was passiert, wenn jedes Ziel erreicht ist?",
+        "a": "Der Zähler wird zurückgesetzt und eine brandneue Roadmap entsteht, gebaut aus euren Ideen. Das Ende ist keine Ziellinie, sondern der Start der nächsten Runde Features."
+      }
+    }
+  },
+  "pulse": {
+    "this_month": "diesen Monat",
+    "support": "Roadmap unterstützen",
+    "supporters": "{{count}} Supporter · Community",
+    "community": "Community-Unterstützung",
+    "tooltip": "{{count}} Supporter haben diesen Monat ${{amount}} beigesteuert. Das hält Riff Quest kostenlos und finanziert die Roadmap. Tippe, um zu sehen, wohin es geht.",
+    "tooltip_empty": "Riff Quest ist kostenlos und wird von der Community finanziert. Tippe, um die Roadmap zu sehen und was deine Unterstützung als Nächstes freischaltet."
+  },
+  "hero": {
+    "title": "Hilf, Riff Quest zu bauen",
+    "subtitle": "Riff Quest ist kostenlos und von einer Person gemacht. Deine Unterstützung zahlt zuerst das Hosting, und alles darüber schaltet das nächste Feature der Roadmap frei — für alle.",
+    "eyebrow": "Von der Community finanziert",
+    "coffee_hint": "Ein einmaliger Kaffee reicht. Keine Anmeldung, nichts zu kündigen."
+  },
+  "cta": {
+    "support": "Riff Quest unterstützen"
+  },
+  "thanks": {
+    "title": "Willst du einfach Danke sagen?",
+    "body": "Zu wissen, dass dir Riff Quest nützt, ist schon das Beste daran. Ein Kaffee obendrauf macht meinen Tag.",
+    "cta": "Mit einem Kaffee danken"
+  },
+  "modal": {
+    "why": "Warum Riff Quest unterstützen?",
+    "body": "Riff Quest ist ein Ein-Personen-Projekt, kostenlos und offen gebaut. Deine Unterstützung deckt zuerst Domain, Hosting und Datenbank. Alles darüber finanziert die Roadmap: neue Übungen, Equipment und Features, Stufe für Stufe freigeschaltet, sobald die Community sie finanziert.",
+    "later": "Vielleicht später"
+  }
+}

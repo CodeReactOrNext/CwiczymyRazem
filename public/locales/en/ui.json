@@ -1,0 +1,16 @@
+{
+  "changelog": {
+    "empty": "No entries this month",
+    "new": "New",
+    "bug_fix": "Bug fix"
+  },
+  "open_in_practice_log": "Open in Practice Log",
+  "activity": "Activity",
+  "minutes_short": "{{minutes}} min",
+  "live_now": "Live Now",
+  "close": "Close",
+  "using_desktop_app": "Using the desktop app",
+  "free_cases": "{{count}} free cases",
+  "free_case": "Free case",
+  "daily_practice": "Daily practice"
+}

@@ -4,6 +4,7 @@ import { cn } from "assets/lib/utils";
 import { playGuitarNotePreview, preloadGuitarNotePreview } from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
 import { intervalBySemitones, semitonesBetween } from "feature/exercisePlan/intervals/intervalDefinitions";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaArrowRight, FaVolumeUp } from "react-icons/fa";
 
@@ -121,6 +122,7 @@ export function IntervalClickPanel({
   isExamMode,
   onDevPassExam,
 }: IntervalClickPanelProps) {
+  const { t } = useTranslation("session");
   const { intervalClickHunt, huntTarget, customGoalPrompt, noteHuntSecondsLeft, advanceHunt, registerIntervalClick } =
     useNoteMatchingContext();
 
@@ -195,8 +197,8 @@ export function IntervalClickPanel({
   const promptKey = `${rootNote}>${targetNote}`;
   useEffect(() => {
     if (!noteSound || !isPlaying) return undefined;
-    const t = setTimeout(playRoot, PROMPT_ROOT_DELAY_MS);
-    return () => clearTimeout(t);
+    const timer = setTimeout(playRoot, PROMPT_ROOT_DELAY_MS);
+    return () => clearTimeout(timer);
   }, [noteSound, isPlaying, playRoot, promptKey]);
 
   // The lowest root the player actually located — the pitch the closing phrase is
@@ -241,8 +243,8 @@ export function IntervalClickPanel({
   // the reveal to read.
   useEffect(() => {
     if (!complete) return undefined;
-    const t = setTimeout(() => advanceHuntRef.current(), noteSound ? INTERVAL_PHRASE_HOLD_MS : SILENT_ADVANCE_MS);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => advanceHuntRef.current(), noteSound ? INTERVAL_PHRASE_HOLD_MS : SILENT_ADVANCE_MS);
+    return () => clearTimeout(timer);
   }, [complete, noteSound]);
 
   // A correct click in step 1 sounds the pitch of the cell that was hit; wrong
@@ -267,12 +269,12 @@ export function IntervalClickPanel({
   const intervalName = interval?.name ?? intervalLabel.replace(" ↑", "");
   // Which strings are live is already obvious on the board (the rest sit behind a
   // scrim), so the prompt only points at it rather than listing string names.
-  const scope = strings && strings.length < 6 ? " on the highlighted strings" : "";
+  const scope = strings && strings.length < 6 ? ` ${t("interval_click.on_highlighted")}` : "";
   const stepPrompt = complete
     ? `${intervalName} above ${rootNote} = ${targetNote}`
     : onInterval
-      ? `Now the ${intervalName} above that root — within reach of it`
-      : `Click any ${rootNote}${scope}`;
+      ? t("interval_click.now_above", { interval: intervalName })
+      : t("interval_click.click_any", { note: `${rootNote}${scope}` });
 
   return (
     <HuntStage
@@ -292,7 +294,7 @@ export function IntervalClickPanel({
           <div className="flex items-start justify-center gap-3 sm:gap-5">
             <StepTile
               step={1}
-              caption="Root"
+              caption={t("interval_click.root")}
               value={rootNote}
               state={onInterval ? "done" : "active"}
               progress={onInterval ? "placed" : "pick one spot"}
@@ -316,7 +318,7 @@ export function IntervalClickPanel({
 
             <StepTile
               step={2}
-              caption="Target"
+              caption={t("interval_click.target")}
               value={complete ? targetNote : "?"}
               state={complete ? "done" : onInterval ? "active" : "waiting"}
               progress={complete ? "found" : onInterval ? "from that root" : undefined}
@@ -364,14 +366,14 @@ export function IntervalClickPanel({
               onClick={hearRoot}
               disabled={heardRootMidi === null}
               className="inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-              title="Play the root note the interval is measured from">
+              title={t("interval_click.play_root")}>
               <FaVolumeUp className="h-3 w-3 text-zinc-400" /> Hear the root
             </button>
             <button
               type="button"
               onClick={() => setShowSemitones((v) => !v)}
               className="rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-              {showSemitones ? "Hide the distance" : "How far is it?"}
+              {showSemitones ? t("interval_click.hide_distance") : t("interval_click.how_far")}
             </button>
             <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
             <LeftyToggle />
@@ -382,7 +384,7 @@ export function IntervalClickPanel({
                 onCheckedChange={(checked) => toggleNoteSound(checked === true)}
               />
               <Label htmlFor="interval-click-note-sound" className="cursor-pointer text-xs font-semibold text-zinc-400">
-                Autoplay
+                {t("interval_click.autoplay")}
               </Label>
             </div>
           </div>

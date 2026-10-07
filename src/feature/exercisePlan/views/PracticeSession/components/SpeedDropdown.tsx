@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
 import { RippleButton } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, ChevronDown, Snail } from "lucide-react";
 
 import { tempoColor } from "../../../components/Metronome/utils/tempoColor";
@@ -53,6 +54,7 @@ export function SpeedDropdown({
   inline = false,
   className,
 }: SpeedDropdownProps) {
+  const { t } = useTranslation("session");
   const current =
     SPEED_MODES.find((m) => m.value === speedMultiplier) ?? SPEED_MODES[0];
   const isSlowed = speedMultiplier < 1;
@@ -61,8 +63,8 @@ export function SpeedDropdown({
 
   const title =
     effective !== null
-      ? `Playback speed ${current.label} — the click and backing track run at ${effective} BPM instead of ${baseBpm}`
-      : "Playback speed — slow the click and backing track down to learn tricky passages";
+      ? t("speed.active_hint", { speed: current.label, effective, base: baseBpm })
+      : t("speed.hint");
 
   return (
     <DropdownMenu>
@@ -89,7 +91,7 @@ export function SpeedDropdown({
           />
           {!compact && (
             <span className='text-[10px] font-semibold tracking-wide'>
-              Speed
+              {t("speed.speed")}
             </span>
           )}
           <span
@@ -127,10 +129,10 @@ export function SpeedDropdown({
         className='z-[99999999] min-w-[12rem] border border-white/10 bg-zinc-900 p-1.5 text-white'>
         <div className='select-none px-2 pb-2 pt-1'>
           <p className='text-[10px] font-bold tracking-wide text-zinc-400'>
-            Playback speed
+            {t("speed.title")}
           </p>
           <p className='mt-0.5 text-[10px] leading-snug text-zinc-500'>
-            Slows the click and backing track below the set BPM
+            {t("speed.subtitle")}
           </p>
         </div>
         {SPEED_MODES.map(({ value, label }) => {

@@ -1,0 +1,41 @@
+{
+  "thanks": "Danke für dein Feedback!",
+  "error": "Etwas ist schiefgelaufen, bitte versuch es noch einmal.",
+  "title": "Teile dein Feedback",
+  "subtitle": "Hilf uns, Riff Quest besser zu machen – jede Nachricht wird gelesen.",
+  "sending": "Wird gesendet...",
+  "send_feedback": "Feedback senden",
+  "sending_as": "Senden als {{name}}",
+  "anonymous": "anonym",
+  "cancel": "Abbrechen",
+  "categories": {
+    "bug": {
+      "label": "Fehler melden",
+      "description": "Etwas funktioniert nicht",
+      "placeholder": "Beschreib, was passiert ist und was du erwartet hast..."
+    },
+    "idea": {
+      "label": "Feature-Idee",
+      "description": "Schlag eine Verbesserung vor",
+      "placeholder": "Was würdest du gern hinzugefügt oder verbessert sehen?"
+    },
+    "question": {
+      "label": "Frage",
+      "description": "Frag uns alles",
+      "placeholder": "Was möchtest du wissen?"
+    }
+  },
+  "prompt": {
+    "title_named": "Hey {{name}}, hast du kurz Zeit? 👋",
+    "title": "Hey, hast du kurz Zeit? 👋",
+    "intro": "Wir arbeiten hart daran, Riff Quest zum besten Übungstool für Gitarristen zu machen. Dafür müssen wir von echten Nutzern hören – nicht von Annahmen.",
+    "questions": "Was stört dich an der App? Was fehlt? Was sollte anders funktionieren?",
+    "got_idea": "Eine Idee?",
+    "found_bug": "Einen Bug gefunden?",
+    "annoys": "Nervt dich etwas?",
+    "anytime": "Du kannst jederzeit über den Button {{button}} in der Seitenleiste Feedback geben.",
+    "placeholder": "Sag uns, was dich beschäftigt...",
+    "maybe_later": "Vielleicht später",
+    "share": "Feedback teilen"
+  }
+}

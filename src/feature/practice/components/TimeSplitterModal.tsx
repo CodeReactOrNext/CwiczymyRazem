@@ -5,6 +5,7 @@ import { Slider } from "assets/components/ui/slider";
 import { ArrangementPicker } from "feature/songs/components/Arrangements/ArrangementPicker";
 import type { SongArrangement } from "feature/songs/types/songs.type";
 import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { convertMsToHMS } from "utils/converter";
@@ -31,7 +32,7 @@ export const TimeSplitterModal = ({
   arrangement,
   onArrangementChange,
 }: TimeSplitterModalProps) => {
-  const { t } = useTranslation("timer");
+  const { t } = useTranslation(["timer", "practice_hub"]);
   const [splitRatio, setSplitRatio] = useState(50); // 0 = 100% Hearing, 100 = 100% Technique
   const [markAsLearned, setMarkAsLearned] = useState(false);
 
@@ -45,7 +46,13 @@ export const TimeSplitterModal = ({
           <DialogTitle>{t("time_splitter.title")}</DialogTitle>
           <DialogDescription className="text-zinc-400">
             <span>
-              You practiced <span className="text-white font-bold">{songTitle}</span> for <span className="text-cyan-400 font-bold">{convertMsToHMS(totalTime)}</span>.
+              <Interpolate
+                text={t("practice_hub:time_splitter_practiced")}
+                values={{
+                  song: <span className="text-white font-bold">{songTitle}</span>,
+                  time: <span className="text-cyan-400 font-bold">{convertMsToHMS(totalTime)}</span>,
+                }}
+              />
             </span>
             <br />
             {t("time_splitter.question")}
@@ -55,11 +62,11 @@ export const TimeSplitterModal = ({
         <div className="py-6 space-y-6">
             {onArrangementChange && (
                 <div className="space-y-2">
-                    <p className="text-xs font-semibold text-zinc-400">Which part did you play?</p>
+                    <p className="text-xs font-semibold text-zinc-400">{t("practice_hub:which_part")}</p>
                     <ArrangementPicker
                         value={arrangement ?? null}
                         onChange={onArrangementChange}
-                        noneLabel="Any part"
+                        noneLabel={t("practice_hub:any_part")}
                     />
                 </div>
             )}

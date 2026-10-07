@@ -1,1 +1,334 @@
-{}
+{
+  "common": "Gewöhnlich",
+  "rare": "Selten",
+  "veryRare": "Sehr selten",
+  "empty": "Leer",
+  "epic": "Episch",
+  "panel": {
+    "earnedHeadline": "{{owned}} von {{total}} Erfolgen erreicht",
+    "globalColumn": "% aller Spieler",
+    "readyHint": "Anforderung erfüllt – wird mit deiner nächsten eingetragenen Session freigeschaltet",
+    "earned": "Erreicht",
+    "rewards": {
+      "claim": "Abholen",
+      "claimAll": "Alle abholen",
+      "claiming": "Wird abgeholt...",
+      "waiting": "{{count}} Belohnungen warten darauf, abgeholt zu werden",
+      "waitingOne": "1 Belohnung wartet darauf, abgeholt zu werden",
+      "tokensHeld": "{{count}} kostenlose Cases auf Lager – lös sie für ein beliebiges Case im Arsenal ein.",
+      "tokensHeldOne": "1 kostenloses Case auf Lager – lös es für ein beliebiges Case im Arsenal ein.",
+      "readyToCollect": "Belohnung bereit zum Abholen",
+      "onCompletion": "Belohnung für diesen Erfolg",
+      "collected": "Belohnung bereits abgeholt"
+    }
+  },
+  "time_1": {
+    "title": "Harte Arbeit zahlt sich aus",
+    "description": "Überschreite die Marke von 10 Übungsstunden."
+  },
+  "time_2": {
+    "title": "Unerschütterliche Entschlossenheit",
+    "description": "Überschreite die Marke von 30 Übungsstunden."
+  },
+  "time_3": {
+    "title": "1 % – die 10.000-Stunden-Regel",
+    "description": "Überschreite die Marke von 100 Übungsstunden."
+  },
+  "balance": {
+    "title": "Goldene Mitte",
+    "description": "Trag in einem Eintrag mindestens 1 Stunde aus jeder Säule ein."
+  },
+  "fire": {
+    "title": "Gitarrenpower",
+    "description": "Hol 60 Punkte in einem Eintrag."
+  },
+  "health_habits": {
+    "title": "Kerngesund",
+    "description": "Erfülle alle gesunden Gewohnheiten in einem Eintrag."
+  },
+  "points_1": {
+    "title": "An der Oberfläche kratzen",
+    "description": "Sammle 100 Punkte"
+  },
+  "points_2": {
+    "title": "Vogelakkorde",
+    "description": "Sammle 1000 Punkte"
+  },
+  "points_3": {
+    "title": "Froschakkorde",
+    "description": "Sammle 10.000 Punkte"
+  },
+  "doctor": {
+    "title": "Doktor",
+    "description": "Wende 100 gesunde Gewohnheiten an"
+  },
+  "tired": {
+    "title": "Ich kann nicht mehr...",
+    "description": "Schließ eine 5-stündige Session ab"
+  },
+  "diamond": {
+    "title": "Diamantgitarre",
+    "description": "Erreiche Level 28"
+  },
+  "scientist": {
+    "title": "Wissenschaftler",
+    "description": "Erreiche 50 Stunden Theorie"
+  },
+  "artist": {
+    "title": "Musikalischer Künstler",
+    "description": "Erreiche 10 Stunden kreative Arbeit"
+  },
+  "book": {
+    "title": "Gelehrter",
+    "description": "Erreiche 10 Stunden Theorie"
+  },
+  "bigear": {
+    "title": "Großes Ohr",
+    "description": "Erreiche 50 Stunden Gehörbildung"
+  },
+  "wizard": {
+    "title": "Zauberer",
+    "description": "Erreiche 50 Stunden kreative Arbeit"
+  },
+  "medal": {
+    "title": "Ausgezeichnet",
+    "description": "Sammle 20 Erfolge"
+  },
+  "day_1": {
+    "title": "Beständigkeit",
+    "description": "Übe 3 Tage am Stück"
+  },
+  "day_2": {
+    "title": "Woche",
+    "description": "Übe 7 Tage am Stück"
+  },
+  "day_3": {
+    "title": "Unendlichkeit",
+    "description": "Übe 15 Tage am Stück"
+  },
+  "session_1": {
+    "title": "Klicker",
+    "description": "Schließ 20 Sessions ab"
+  },
+  "session_2": {
+    "title": "Gitarrenreisender",
+    "description": "Schließ 50 Sessions ab"
+  },
+  "session_3": {
+    "title": "Cowboy",
+    "description": "Schließ 100 Sessions ab"
+  },
+  "ring": {
+    "title": "Saitenring",
+    "description": "Verbringe mehr als 5 Stunden in jeder Säule"
+  },
+  "headphones": {
+    "title": "Gut gehört",
+    "description": "Verbringe mehr als 10 Stunden mit Hören"
+  },
+  "ninja": {
+    "title": "Technik-Krieger",
+    "description": "Verbringe mehr als 10 Stunden mit Technik"
+  },
+  "record": {
+    "title": "Da wurde was aufgenommen",
+    "description": "Dieser Spieler hat intensiv etwas aufgenommen."
+  },
+  "vinyl": {
+    "title": "Aufgenommene Idee",
+    "description": "Dieser Spieler hatte eine Idee und hat sie aufgenommen... wahrscheinlich."
+  },
+  "dumbbel": {
+    "title": "Echte Schwerstarbeit",
+    "description": "Dieser Spieler arbeitet wirklich hart."
+  },
+  "rightway": {
+    "title": "Keine Verletzungen",
+    "description": "Dieser Spieler wärmt sich wie aus dem Lehrbuch auf."
+  },
+  "path": {
+    "title": "Großartiger Plan",
+    "description": "Dieser Spieler hat einen großartigen Trainingsplan und ist auf dem besten Weg zu seinen Zielen."
+  },
+  "yolo": {
+    "title": "Yolo",
+    "description": "Diesem Spieler sind gesunde Gewohnheiten egal."
+  },
+  "vip": {
+    "title": "Verdient",
+    "description": "Dieser Spieler hat bei der Entwicklung von Riff Quest geholfen"
+  },
+  "short": {
+    "title": "Ausdauer",
+    "description": "Dieser Spieler hat seine Übungsregelmäßigkeit um jeden Preis gehalten"
+  },
+  "event": {
+    "title": "Event",
+    "description": "Dieser Spieler hat an einem Discord-Event teilgenommen"
+  },
+  "lvl100": {
+    "title": "Legendäres Plektrum",
+    "description": "Dieser Spieler hat Level 100 erreicht"
+  },
+  "fireSession": {
+    "title": "Feuer-Session",
+    "description": "Dieser Spieler hat einen perfekten Eintrag abgeschlossen"
+  },
+  "batteryHearth": {
+    "title": "Batterieherz",
+    "description": "Dieser Spieler hat 2000 Gewohnheiten"
+  },
+  "100days": {
+    "title": "100 Tage",
+    "description": "Dieser Spieler hat an 100 Tagen geübt"
+  },
+  "bomb": {
+    "title": "Kritische Lage",
+    "description": "Dieser Spieler hat seine Serie gerettet"
+  },
+  "wannaLearn1": {
+    "title": "Einsamer Krieger",
+    "description": "Du willst deinen ersten Song lernen"
+  },
+  "wannaLearn2": {
+    "title": "Doppelte Kraft",
+    "description": "Du willst zwei Songs lernen"
+  },
+  "wannaLearn3": {
+    "title": "Volles Notizbuch",
+    "description": "Du willst drei Songs lernen"
+  },
+  "wannaLearn10": {
+    "title": "In Noten verloren",
+    "description": "Du willst zehn Songs lernen"
+  },
+  "wannaLearn30": {
+    "title": "Endlosschleife",
+    "description": "Du willst dreißig Songs lernen"
+  },
+  "learning1": {
+    "title": "Erstes Gewicht",
+    "description": "Du lernst deinen ersten Song"
+  },
+  "learning3": {
+    "title": "Die Latte höher legen",
+    "description": "Du lernst drei Songs gleichzeitig"
+  },
+  "learning5": {
+    "title": "Vorwärts",
+    "description": "Du lernst fünf Songs gleichzeitig"
+  },
+  "learning10": {
+    "title": "Musikalische Muskeln",
+    "description": "Du lernst zehn Songs gleichzeitig"
+  },
+  "learning20": {
+    "title": "Multiinstrumentalist",
+    "description": "Du lernst zwanzig Songs gleichzeitig"
+  },
+  "learning30": {
+    "title": "Musikalische Aura",
+    "description": "Du lernst dreißig Songs gleichzeitig"
+  },
+  "learned1": {
+    "title": "Herz Zwei",
+    "description": "Du hast deinen ersten Song gelernt"
+  },
+  "learned3": {
+    "title": "Karo Drei",
+    "description": "Du hast drei Songs gelernt"
+  },
+  "learned5": {
+    "title": "Karo Vier",
+    "description": "Du hast fünf Songs gelernt"
+  },
+  "learned10": {
+    "title": "Karo Fünf",
+    "description": "Du hast zehn Songs gelernt"
+  },
+  "learned20": {
+    "title": "Karo Sechs",
+    "description": "Du hast zwanzig Songs gelernt"
+  },
+  "learned30": {
+    "title": "Karo Bube",
+    "description": "Du hast dreißig Songs gelernt"
+  },
+  "learned50": {
+    "title": "Karo König",
+    "description": "Du hast fünfzig Songs gelernt"
+  },
+  "learned100": {
+    "title": "Karo Ass",
+    "description": "Du hast hundert Songs gelernt – du bist ein echtes Ass!"
+  },
+  "rig_50": {
+    "title": "Signalweg",
+    "description": "Bau ein Rig mit 50 Rig-Level."
+  },
+  "rig_150": {
+    "title": "Bühnenreif",
+    "description": "Bau ein Rig mit 150 Rig-Level."
+  },
+  "rig_300": {
+    "title": "Studiowand",
+    "description": "Bau ein Rig mit 300 Rig-Level."
+  },
+  "rig_500": {
+    "title": "Headliner-Rig",
+    "description": "Bau ein Rig mit 500 Rig-Level."
+  },
+  "rig_800": {
+    "title": "Wall of Sound",
+    "description": "Bau ein Rig mit 800 Rig-Level."
+  },
+  "rig_1000": {
+    "title": "Vierstellig",
+    "description": "Bau ein Rig mit 1000 Rig-Level."
+  },
+  "first_rare": {
+    "title": "Etwas Besonderes",
+    "description": "Besitze dein erstes seltenes Equipment."
+  },
+  "first_epic": {
+    "title": "Sammlerqualität",
+    "description": "Besitze dein erstes episches Equipment."
+  },
+  "first_legendary": {
+    "title": "Einer der Großen",
+    "description": "Besitze dein erstes legendäres Equipment."
+  },
+  "first_mythic": {
+    "title": "Heiliger Gral",
+    "description": "Besitze dein erstes mythisches Equipment."
+  },
+  "rarity_full_set": {
+    "title": "Volles Spektrum",
+    "description": "Besitze Equipment jeder Seltenheit, die ein Case droppen kann."
+  },
+  "museum_1": {
+    "title": "Hinter Glas",
+    "description": "Besitze ein Equipment in Museumsqualität."
+  },
+  "museum_5": {
+    "title": "Privatsammlung",
+    "description": "Besitze fünf Equipment-Stücke in Museumsqualität."
+  },
+  "serial_one": {
+    "title": "Nummer eins",
+    "description": "Besitze das allererste Exemplar eines beliebigen Modells."
+  },
+  "globetrotter": {
+    "title": "Weit gereist",
+    "description": "Besitze Equipment, das in acht verschiedenen Ländern gebaut wurde."
+  },
+  "vintage_1970": {
+    "title": "Älter als der Amp",
+    "description": "Besitze eine Gitarre, die vor 1970 gebaut wurde."
+  },
+  "performance": {
+    "title": "Bühnendebüt",
+    "description": "Trag eine vollständige Performance-Session ein – übe einen Song, investiere 1 Std. in Technik und nimm dich auf."
+  },
+  "progress": "Fortschritt"
+}

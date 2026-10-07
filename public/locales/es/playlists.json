@@ -1,0 +1,139 @@
+{
+  "practice": "Practicar",
+  "remove_from_playlist": "Quitar de la playlist",
+  "reorder": "Reordenar",
+  "up_next": "siguiente",
+  "deleted": "Playlist eliminada",
+  "saved_copy": "Guardada en tus playlists",
+  "from_owner": "de {{name}}",
+  "mastered_of": "{{done}} de {{total}} dominadas",
+  "add_songs": "Añadir canciones",
+  "share": "Compartir",
+  "options": "Opciones de la playlist",
+  "edit_details": "Editar detalles",
+  "delete": "Eliminar",
+  "save_to_yours": "Guardar en tus playlists",
+  "like": "Me gusta",
+  "path_complete": "Ruta completada",
+  "final_stop": "Última parada",
+  "every_mastered": "Todas las canciones dominadas: haz una reverencia.",
+  "more_to_master_one": "Queda 1 canción por dominar",
+  "more_to_master": "Quedan {{count}} canciones por dominar",
+  "private": "Privada",
+  "private_hint": "Solo tú puedes verla",
+  "public": "Pública",
+  "public_hint": "Visible para todos en Descubrir",
+  "private_note": "Solo tú puedes verla. Hazla pública para compartirla en Descubrir.",
+  "name": "Nombre",
+  "description": "Descripción",
+  "top_full": "El top {{count}} está completo: quita una canción de la lista para meter otra.",
+  "delete_title": "¿Eliminar «{{name}}»?",
+  "keep_it": "Conservarla",
+  "added_to": "Añadida a «{{name}}»",
+  "add_to_playlist": "Añadir a playlist",
+  "loading": "Cargando...",
+  "no_playlists": "Aún no hay playlists",
+  "errors": {
+    "save_changes": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+    "visibility": "No se pudo cambiar la visibilidad.",
+    "save_details": "No se pudieron guardar los detalles.",
+    "delete": "No se pudo eliminar la playlist.",
+    "save_copy": "No se pudo guardar esta playlist.",
+    "like": "No se pudo actualizar tu «me gusta».",
+    "create": "No se pudo crear la playlist. Inténtalo de nuevo.",
+    "add_song": "No se pudo añadir la canción. Inténtalo de nuevo.",
+    "add_to_library": "No se pudo añadir esa canción a la biblioteca."
+  },
+  "kinds": {
+    "playlist": {
+      "label": "Playlist",
+      "tagline": "Una colección libre de canciones",
+      "hint": "Agrupa canciones como quieras: estados de ánimo, bandas, sesiones de práctica."
+    },
+    "path": {
+      "label": "Ruta de aprendizaje",
+      "tagline": "Canciones para aprender en orden: una roadmap para tu repertorio",
+      "hint": "Una roadmap de la primera a la última. El progreso se va llenando a medida que dominas cada canción."
+    },
+    "top": {
+      "label": "Top 10",
+      "tagline": "Una lista ordenada, la mejor primero",
+      "hint": "Tus favoritas con grandes números de puesto. Máximo diez."
+    }
+  },
+  "empty": {
+    "title": "Aún no hay nada aquí",
+    "owner_top": "Elige tu top {{count}}: el orden es la clasificación.",
+    "owner": "Añade canciones de la biblioteca o de tu colección para llenarla.",
+    "other": "El autor aún no ha añadido canciones."
+  },
+  "share_title": {
+    "playlist": "Compartir esta playlist",
+    "path": "Compartir esta ruta de aprendizaje",
+    "top": "Compartir este top 10"
+  },
+  "live_in_discover": {
+    "playlist": "Esta playlist está visible en Descubrir: otros jugadores pueden abrirla y guardar una copia en su biblioteca.",
+    "path": "Esta ruta de aprendizaje está visible en Descubrir: otros jugadores pueden abrirla y guardar una copia en su biblioteca.",
+    "top": "Este top 10 está visible en Descubrir: otros jugadores pueden abrirlo y guardar una copia en su biblioteca."
+  },
+  "delete_body": {
+    "playlist": "Esto elimina la playlist para siempre. Las canciones siguen en la biblioteca y en tu colección.",
+    "path": "Esto elimina la ruta de aprendizaje para siempre. Las canciones siguen en la biblioteca y en tu colección.",
+    "top": "Esto elimina el top 10 para siempre. Las canciones siguen en la biblioteca y en tu colección."
+  },
+  "created": {
+    "playlist": "Playlist creada",
+    "path": "Ruta de aprendizaje creada",
+    "top": "Top 10 creado"
+  },
+  "creator": {
+    "what_making": "¿Qué estás creando?",
+    "new": {
+      "playlist": "Nueva playlist",
+      "path": "Nueva ruta de aprendizaje",
+      "top": "Nuevo top 10"
+    },
+    "placeholder_top": "p. ej. Top 10 riffs de los 90",
+    "placeholder_path": "p. ej. De la hoguera a Hendrix",
+    "placeholder_playlist": "p. ej. Tardes de blues lento",
+    "optional": "(opcional)",
+    "description_placeholder": "¿De qué va esta lista?",
+    "visibility": "Visibilidad",
+    "public_hint": "Cualquiera puede encontrarla y guardarla",
+    "next": "Siguiente",
+    "picked": "Elegidas {{count}}/{{max}}",
+    "added": "{{count}} añadidas",
+    "top_full": "El top {{count}} está completo: quita una canción para meter otra.",
+    "add_later": "Puedes seguir añadiendo canciones más tarde.",
+    "create_with_one": "Crear con 1 canción",
+    "create_with": "Crear con {{count}} canciones",
+    "create_empty": "Crear vacía"
+  },
+  "view": {
+    "not_available": "Playlist no disponible",
+    "not_available_body": "Puede que se haya eliminado o que sea privada y solo su dueño pueda abrirla.",
+    "back": "Volver a las playlists",
+    "title": "Playlists",
+    "yours": "Tus playlists",
+    "discover": "Descubrir",
+    "new": "Nueva playlist",
+    "first_title": "Crea tu primera playlist",
+    "first_body": "Agrupa canciones en lo que quieras: un estado de ánimo, un set para el próximo jam, una ruta de aprendizaje o un top 10 que defenderías en una discusión.",
+    "create_one": "Crear una",
+    "nothing_public": "Aún no hay nada público",
+    "nothing_public_body": "Cuando los jugadores compartan sus playlists, aparecerán aquí. Haz pública una de las tuyas para empezar.",
+    "kinds_hint": "Playlist, ruta o top 10"
+  },
+  "picker": {
+    "search_create": "Busca una canción o un artista...",
+    "search_library": "Buscar en la biblioteca...",
+    "nothing_found": "No se ha encontrado nada: prueba con otro título o artista.",
+    "not_in_library": "Aún no está en la biblioteca: también se añadirá allí",
+    "add_as_typed": "{{artist}} · añadir tal cual, sin portada",
+    "cant_find": "¿No la encuentras? Escríbela como «Artista - Título» para añadirla tal cual.",
+    "from_collection": "De tu colección",
+    "min_chars_create": "Escribe al menos dos caracteres para buscar una canción.",
+    "min_chars_library": "Escribe al menos dos caracteres para buscar en la biblioteca de canciones."
+  }
+}

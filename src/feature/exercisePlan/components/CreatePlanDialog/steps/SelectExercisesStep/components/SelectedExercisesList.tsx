@@ -38,7 +38,7 @@ interface SortableItemProps {
   onEditExercise?: (exercise: Exercise) => void;
   onCloneExercise?: (exercise: Exercise) => void;
   onEditTimeRequest?: (exercise: Exercise) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown> | string) => string;
 }
 
 const SortableItem = ({
@@ -82,7 +82,7 @@ const SortableItem = ({
         {...attributes}
         {...listeners}
         tabIndex={-1}
-        aria-label="Drag to reorder"
+        aria-label={t("plans:drag_to_reorder")}
       >
         <GripVertical className="h-4 w-4" />
       </button>
@@ -96,7 +96,7 @@ const SortableItem = ({
             type="button"
             onClick={() => onEditTimeRequest?.(exercise)}
             className="flex items-center gap-1.5 text-zinc-300 hover:text-cyan-300 transition-all group/time bg-black/20 hover:bg-black/40 px-2 py-1 rounded-[6px]"
-            title="Click to change time"
+            title={t("plans:change_time")}
           >
             <Clock className="h-3 w-3 text-cyan-500/70 group-hover/time:text-cyan-400 transition-colors" />
             {exercise.timeInMinutes < 1 ? (
@@ -107,7 +107,7 @@ const SortableItem = ({
             ) : (
               <>
                 <span className="text-[12px] font-bold">{exercise.timeInMinutes}</span>
-                <span className="text-[10px] font-medium text-zinc-500 group-hover/time:text-cyan-500/70 transition-colors">min</span>
+                <span className="text-[10px] font-medium text-zinc-500 group-hover/time:text-cyan-500/70 transition-colors">{t("plans:min")}</span>
               </>
             )}
             <Edit2 className="h-3 w-3 text-zinc-600 group-hover/time:text-cyan-400 transition-colors ml-0.5" />
@@ -115,18 +115,19 @@ const SortableItem = ({
           
           {isCustom && (
             <span className="px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400/90 text-[9px] font-bold tracking-wide">
-              Custom
+              {t("plans:custom")}
             </span>
           )}
           {!!exercise._generatorConfig && (
             <span className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400/90 text-[9px] font-bold tracking-wide">
-              Generated
+              {t("plans:generated")}
             </span>
           )}
           {!!exercise.songData && (
             <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 text-[9px] font-bold tracking-wide">
-              Song
-              {exercise.songData.mode && ` · ${SONG_PRACTICE_MODE_LABELS[exercise.songData.mode]}`}
+              {t("plans:song")}
+              {exercise.songData.mode &&
+                ` · ${t(`plans:song_modes.${exercise.songData.mode}`, SONG_PRACTICE_MODE_LABELS[exercise.songData.mode])}`}
             </span>
           )}
         </div>
@@ -177,7 +178,7 @@ export const SelectedExercisesList = ({
   onEditTimeRequest,
   onReorder,
 }: SelectedExercisesListProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common", "plans"]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -248,9 +249,9 @@ export const SelectedExercisesList = ({
               <ListPlus className="h-6 w-6 opacity-50" />
             </div>
             <p className="text-zinc-400 font-medium text-[13px] leading-relaxed max-w-[180px]">
-              No exercises selected yet.
+              {t("plans:none_selected")}
               <span className="block text-zinc-600 text-[11px] mt-1.5 tracking-wider text-balance">
-                Choose from the library →
+                {t("plans:choose_from_library")}
               </span>
             </p>
           </div>

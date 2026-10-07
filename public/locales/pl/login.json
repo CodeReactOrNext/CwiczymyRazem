@@ -1,1 +1,16 @@
-{}
+{
+  "subtitlebar_text": "Ćwicz, raportuj, zdobywaj punkty!",
+  "title": "Witaj ponownie",
+  "subtitle": "Zaloguj się, aby kontynuować swoje postępy",
+  "email_label": "E-mail",
+  "password_label": "Hasło",
+  "google_button": "Kontynuuj z Google",
+  "or_continue_with": "lub kontynuuj przez",
+  "not_have_account": "Nie masz jeszcze konta?",
+  "signup_link": "Załóż konto",
+  "submit_button": "Zaloguj się",
+  "forgot_password": "Nie pamiętasz hasła?",
+  "reset_password_success": "Wysłaliśmy e-mail do resetu hasła. Sprawdź swoją skrzynkę.",
+  "reset_password_error": "Nie udało się wysłać e-maila do resetu hasła. Upewnij się, że adres e-mail jest poprawny.",
+  "enter_email_error": "Najpierw wpisz swój adres e-mail."
+}

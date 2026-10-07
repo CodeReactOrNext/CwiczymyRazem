@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -42,6 +43,7 @@ export const StepInfoModal = ({
   ctaLabel,
   onCta,
 }: StepInfoModalProps) => {
+  const { t } = useTranslation("onboarding");
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
@@ -52,7 +54,7 @@ export const StepInfoModal = ({
         )}>
         <DialogClose className='absolute right-4 top-4 z-[100] flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 outline-none transition-all focus:ring-2 focus:ring-cyan-500/50 hover:bg-zinc-700 hover:text-white'>
           <X className='h-5 w-5' />
-          <span className='sr-only'>Close</span>
+          <span className='sr-only'>{t("close")}</span>
         </DialogClose>
 
         <div className='space-y-4 overflow-y-auto p-6'>

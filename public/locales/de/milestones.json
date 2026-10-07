@@ -1,0 +1,49 @@
+{
+  "levels": {
+    "1": {
+      "name": "Funke",
+      "req": "1 Tag mit 15+ Min. Übung diese Woche"
+    },
+    "2": {
+      "name": "Groove",
+      "req": "3 Tage mit 20+ Min. diese Woche"
+    },
+    "3": {
+      "name": "Heiße Serie",
+      "req": "3 Tage am Stück mit je 15+ Min."
+    },
+    "4": {
+      "name": "Schwung",
+      "req": "5 Tage mit 15+ Min. diese Woche"
+    },
+    "5": {
+      "name": "Unaufhaltsam",
+      "req": "7 Tage am Stück mit je 15+ Min."
+    },
+    "6": {
+      "name": "Allrounder",
+      "req": "3 Tage diese Woche mit allen 4 Kategorien je 15+ Min."
+    },
+    "7": {
+      "name": "In der Zone",
+      "short": "Zone",
+      "req": "3 Tage am Stück mit allen 4 Kategorien je 15+ Min."
+    },
+    "8": {
+      "name": "Shredder",
+      "req": "5 Tage am Stück mit allen 4 Kategorien je 15+ Min."
+    },
+    "9": {
+      "name": "Virtuose",
+      "req": "7 Tage am Stück mit allen 4 Kategorien je 15+ Min."
+    }
+  },
+  "card": {
+    "opens_at": "Öffnet sich ab Level {{lvl}}",
+    "unlock": "Freischalten · {{cost}} Fame",
+    "claiming": "Wird abgeholt…",
+    "claim": "+{{reward}} abholen",
+    "claimed": "Abgeholt",
+    "reward": "+{{reward}} Fame"
+  }
+}

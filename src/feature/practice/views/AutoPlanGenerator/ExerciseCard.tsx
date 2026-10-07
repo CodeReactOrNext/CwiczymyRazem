@@ -52,7 +52,7 @@ export const ExerciseCard = ({
   onRemove,
   onPreview,
 }: ExerciseCardProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common", "practice_hub"]);
   const {
     attributes,
     listeners,
@@ -104,8 +104,8 @@ export const ExerciseCard = ({
           type="button"
           {...attributes}
           {...listeners}
-          aria-label={`Reorder ${exercise.title}`}
-          title="Drag to reorder"
+          aria-label={t("practice_hub:auto.reorder", { title: exercise.title })}
+          title={t("practice_hub:auto.drag_to_reorder")}
           className="flex shrink-0 cursor-grab touch-none items-center pl-2 pr-1 text-zinc-600 transition-colors hover:text-zinc-300 focus-visible:text-zinc-200 focus-visible:outline-none active:cursor-grabbing sm:pl-3"
         >
           <GripVertical className="h-4 w-4" />
@@ -151,12 +151,12 @@ export const ExerciseCard = ({
 
             {exercise.isPlayalong && (
               <Badge className="bg-red-500/10 text-red-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
-                <FaYoutube className="mr-1 h-3.5 w-3.5" />Playalong
+                <FaYoutube className="mr-1 h-3.5 w-3.5" />{t("practice_hub:auto.playalong")}
               </Badge>
             )}
             {exercise.videoUrl && !exercise.isPlayalong && (
               <Badge className="bg-cyan-500/10 text-cyan-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
-                <Video className="mr-1 h-3.5 w-3.5" />Video
+                <Video className="mr-1 h-3.5 w-3.5" />{t("practice_hub:auto.video")}
               </Badge>
             )}
 
@@ -182,8 +182,8 @@ export const ExerciseCard = ({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                aria-label={`Options for ${exercise.title}`}
-                title="Options"
+                aria-label={t("practice_hub:auto.options_for", { title: exercise.title })}
+                title={t("practice_hub:auto.options")}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-white/10 data-[state=open]:text-zinc-100"
               >
                 <MoreHorizontal className="h-4 w-4" />
@@ -209,7 +209,7 @@ export const ExerciseCard = ({
                 className="cursor-pointer focus:bg-white/10 focus:text-zinc-100"
               >
                 <Shuffle />
-                Swap for another
+                {t("practice_hub:auto.swap")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 disabled={isFirst}
@@ -217,7 +217,7 @@ export const ExerciseCard = ({
                 className="cursor-pointer focus:bg-white/10 focus:text-zinc-100"
               >
                 <ArrowUp />
-                Move up
+                {t("practice_hub:auto.move_up")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 disabled={isLast}
@@ -225,7 +225,7 @@ export const ExerciseCard = ({
                 className="cursor-pointer focus:bg-white/10 focus:text-zinc-100"
               >
                 <ArrowDown />
-                Move down
+                {t("practice_hub:auto.move_down")}
               </DropdownMenuItem>
               {/* Gap instead of a separator line, so the destructive action
                   sits apart from the rest. */}

@@ -15,6 +15,7 @@ import type { Recording } from "feature/recordings/types/types";
 import { getSongs } from "feature/songs/services/getSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import debounce from "lodash/debounce";
 import { ArrowRight, Loader2, Music, Pencil, Search, Video, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -63,6 +64,7 @@ export const AddRecordingModal = ({
   initialSong,
   recording,
 }: AddRecordingModalProps) => {
+  const { t } = useTranslation("recordings");
   const [videoUrl, setVideoUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -180,11 +182,11 @@ export const AddRecordingModal = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userId) {
-      toast.error("You must be logged in.");
+      toast.error(t("toast.logged_out"));
       return;
     }
     if (!isValidFaYoutubeUrl(videoUrl)) {
-      toast.error("Please enter a valid YouTube URL.");
+      toast.error(t("toast.bad_url"));
       return;
     }
 
@@ -227,7 +229,7 @@ export const AddRecordingModal = ({
                   <Video className="h-5 w-5 text-cyan-400" />
                 )}
               </div>
-              {isEditing ? "Edit Recording" : "Add New Recording"}
+              {isEditing ? t("modal.edit_title") : t("modal.add_title")}
             </DialogTitle>
           </DialogHeader>
 
@@ -235,7 +237,7 @@ export const AddRecordingModal = ({
             {/* Song Linking Section — first, so picking it can auto-fill the title below */}
             <div className="space-y-2">
                <Label className="text-zinc-400 font-bold ml-1">
-                  What song is this? <span className="font-normal text-zinc-600">(optional)</span>
+                  {t("modal.which_song")} <span className="font-normal text-zinc-600">{t("modal.optional")}</span>
                </Label>
 
                {selectedSong ? (
@@ -269,13 +271,13 @@ export const AddRecordingModal = ({
                          <Input
                              value={searchArtist}
                              onChange={(e) => setSearchArtist(e.target.value)}
-                             placeholder="Artist..."
+                             placeholder={t("modal.artist")}
                              className={cn("h-11", fieldClass)}
                          />
                          <Input
                              value={searchTitle}
                              onChange={(e) => setSearchTitle(e.target.value)}
-                             placeholder="Song title..."
+                             placeholder={t("modal.song_title")}
                              className={cn("h-11", fieldClass)}
                          />
                       </div>
@@ -287,7 +289,7 @@ export const AddRecordingModal = ({
                         {!hasSongQuery ? (
                           <div className="flex h-full items-center justify-center px-6 text-center text-sm font-medium text-zinc-500">
                             <Search className="mr-2 h-4 w-4 shrink-0" />
-                            Type an artist or song title to search your library
+                            {t("modal.search_hint")}
                           </div>
                         ) : isSearching ? (
                           Array.from({ length: 3 }).map((_, i) => (
@@ -305,8 +307,8 @@ export const AddRecordingModal = ({
                           ))
                         ) : (
                           <div className="flex h-full flex-col items-center justify-center gap-1 px-6 text-center">
-                            <p className="text-sm font-semibold text-zinc-300">Not in the library</p>
-                            <p className="text-xs text-zinc-500">No problem — we&apos;ll save it exactly as typed.</p>
+                            <p className="text-sm font-semibold text-zinc-300">{t("modal.not_in_library")}</p>
+                            <p className="text-xs text-zinc-500">{t("modal.saved_as_typed")}</p>
                           </div>
                         )}
                       </div>
@@ -316,7 +318,7 @@ export const AddRecordingModal = ({
 
             {/* YouTube Field */}
             <div className="space-y-2">
-              <Label htmlFor="videoUrl" className="text-zinc-400 font-bold ml-1">YouTube URL *</Label>
+              <Label htmlFor="videoUrl" className="text-zinc-400 font-bold ml-1">{t("modal.youtube_url")}</Label>
               <div className="relative">
                   <FaYoutube className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                   <Input
@@ -332,35 +334,35 @@ export const AddRecordingModal = ({
 
             {/* Title Field */}
             <div className="space-y-2">
-              <Label htmlFor="title" className="text-zinc-400 font-bold ml-1">Title *</Label>
+              <Label htmlFor="title" className="text-zinc-400 font-bold ml-1">{t("modal.title")}</Label>
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="My awesome cover"
+                placeholder={t("modal.title_placeholder")}
                 className={cn("h-11", fieldClass)}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-zinc-400 font-bold ml-1">Description</Label>
+              <Label htmlFor="description" className="text-zinc-400 font-bold ml-1">{t("modal.description")}</Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Tell us about your recording..."
+                placeholder={t("modal.description_placeholder")}
                 className={cn("min-h-[90px]", fieldClass)}
               />
             </div>
 
             <DialogFooter className="pt-2">
               <Button type="button" variant="ghost" onClick={handleClose} disabled={isSaving}>
-                Cancel
+                {t("modal.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving} className="bg-cyan-600 hover:bg-cyan-500 text-white">
                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEditing ? "Save Changes" : "Share Recording"}
+                {isEditing ? t("modal.save") : t("modal.share")}
               </Button>
             </DialogFooter>
           </form>

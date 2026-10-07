@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { Chip } from "assets/components/ui/chip";
 import {
@@ -37,12 +38,7 @@ interface ActivityStartModalProps {
   onStartLesson?: (lesson: { title: string; videoId: string }) => void;
 }
 
-const KIND_LABEL: Record<ActivityPreview["kind"], string> = {
-  plan: "Plan",
-  routine: "Routine",
-  exercise: "Exercise",
-  lesson: "Lesson",
-};
+
 
 const formatDuration = (minutes: number) =>
   minutes < 1 ? `${Math.round(minutes * 60)}s` : formatMinutesDuration(minutes);
@@ -56,6 +52,7 @@ export const ActivityStartModal = ({
   onClose,
   onStartLesson,
 }: ActivityStartModalProps) => {
+  const { t } = useTranslation("feed");
   const router = useRouter();
   // An exercise picked from the plan's or routine's list — the modal shows that one until "Back".
   const [pickedExercise, setPickedExercise] = useState<Exercise | null>(null);
@@ -125,7 +122,7 @@ export const ActivityStartModal = ({
 
         <DialogHeader className='relative space-y-2 text-left'>
           <span className='text-xs font-semibold text-cyan-400'>
-            {KIND_LABEL[kind]}
+            {t(`activity_kind.${kind}`)}
           </span>
           <DialogTitle className='pr-10 text-xl font-bold leading-tight text-zinc-100'>
             {title}
@@ -171,7 +168,7 @@ export const ActivityStartModal = ({
         {listedExercises && listedExercises.length > 0 && (
           <div className='scrollbar-premium relative -mx-2 max-h-[40vh] overflow-y-auto'>
             <h4 className='mb-2 px-2 text-xs font-semibold text-zinc-500'>
-              Exercises
+              {t("exercises")}
             </h4>
             <ul className='space-y-1'>
               {listedExercises.map((ex, i) => (
@@ -202,7 +199,7 @@ export const ActivityStartModal = ({
             variant='ghost'
             onClick={pickedExercise ? () => setPickedExercise(null) : onClose}
             className='rounded-[8px] text-[11px] font-bold uppercase tracking-widest text-zinc-500 hover:bg-white/5 hover:text-white'>
-            {pickedExercise ? "Back" : "Close"}
+            {pickedExercise ? t("back") : t("close")}
           </Button>
           {/* Button wraps its children in its own flex span, so the variant's
               `gap-2` never reaches the icon — the margin has to live here. */}
@@ -210,7 +207,7 @@ export const ActivityStartModal = ({
             <Button
               onClick={handleStart}
               className='rounded-[8px] text-[11px] font-bold uppercase tracking-widest'>
-              Start
+              {t("start")}
               <Play className='ml-2 h-3 w-3' />
             </Button>
           )}

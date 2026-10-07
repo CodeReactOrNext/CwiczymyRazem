@@ -1,1 +1,444 @@
-{}
+{
+  "tabs": {
+    "my_plans": "Mis planes",
+    "library": "Biblioteca de ejercicios",
+    "practice": "Práctica"
+  },
+  "filters": {
+    "all": "Todas",
+    "difficulty": "Dificultad",
+    "category": "Categoría",
+    "categories": {
+      "technique": "Técnica",
+      "theory": "Teoría",
+      "creativity": "Creatividad",
+      "hearing": "Oído",
+      "mixed": "Mixto"
+    }
+  },
+  "library": {
+    "title": "Biblioteca de ejercicios",
+    "search_placeholder": "Buscar ejercicios...",
+    "no_exercises": "No se encontraron ejercicios",
+    "add_exercise": "Añadir ejercicio",
+    "recommended": "Recomendados para ti",
+    "all_exercises": "Todos los ejercicios",
+    "fetch_error": "No se pudieron cargar los ejercicios",
+    "no_exercises_yet": "Aún no has creado ningún ejercicio",
+    "create_first": "Crea tu primer ejercicio",
+    "no_matches": "Ningún ejercicio coincide con tus filtros"
+  },
+  "practice": {
+    "start": "Empezar práctica",
+    "pause": "Pausa",
+    "resume": "Reanudar",
+    "next": "Siguiente ejercicio",
+    "finish": "Terminar sesión",
+    "notes": "Notas de práctica",
+    "metronome": {
+      "title": "Metrónomo",
+      "bpm": "BPM",
+      "start": "Empezar en",
+      "target": "Objetivo",
+      "max": "Máx."
+    }
+  },
+  "my_plans": {
+    "title": "Mis planes de práctica",
+    "create_new": "Crear nuevo plan",
+    "start": "Empezar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "no_plans": "Aún no tienes planes de práctica",
+    "create_dialog": {
+      "title": "Crear nuevo plan de ejercicios",
+      "description": "Crea un nuevo plan de ejercicios para organizar tu rutina de práctica",
+      "plan_title": "Título del plan",
+      "plan_description": "Descripción del plan",
+      "exercises": "Elegir ejercicios",
+      "add_exercise": "Añadir ejercicio",
+      "exercise": "Ejercicio",
+      "exercise_title": "Título del ejercicio",
+      "exercise_description": "Descripción del ejercicio",
+      "duration": "Duración (minutos)",
+      "metronome": "Ajustes del metrónomo",
+      "min_bpm": "BPM mín.",
+      "max_bpm": "BPM máx.",
+      "recommended_bpm": "BPM recomendados",
+      "order_exercises": "Ordenar ejercicios",
+      "order_description": "Arrastra los ejercicios para cambiar su orden. Empieza con el calentamiento y termina con los ejercicios más exigentes.",
+      "selected_exercises": "Ejercicios elegidos ({{count}})",
+      "select_exercises_description": "Elige los ejercicios que quieres añadir a tu plan"
+    },
+    "form": {
+      "title": "Título del plan",
+      "title_placeholder": "Escribe el título del plan...",
+      "description": "Descripción",
+      "description_placeholder": "Describe tu plan de práctica...",
+      "difficulty": "Nivel de dificultad",
+      "category": "Enfoque principal",
+      "create": "Crear plan"
+    },
+    "create_success": "Plan creado",
+    "create_success_description": "Tu plan de práctica se ha creado",
+    "create_error": "No se pudo crear el plan",
+    "create_error_description": "Hubo un problema al crear tu plan. Inténtalo de nuevo.",
+    "empty_state": "Aún no tienes planes de práctica",
+    "custom_plans": "Planes personalizados",
+    "custom_plans_description": "Tus planes de práctica personalizados",
+    "predefined_plans": "Planes listos",
+    "predefined_plans_description": "Planes de práctica preparados por nosotros",
+    "create_plan": "Crear plan",
+    "create_first": "Crear el primer plan",
+    "no_custom_plans": "Aún no tienes planes de práctica personalizados"
+  },
+  "categories": {
+    "technique": "Técnica",
+    "theory": "Teoría",
+    "creativity": "Creatividad",
+    "hearing": "Oído",
+    "mixed": "Mixto"
+  },
+  "difficulty": {
+    "beginner": "Principiante",
+    "easy": "Fácil",
+    "medium": "Media",
+    "hard": "Difícil"
+  },
+  "common": {
+    "duration": "{{minutes}} min",
+    "exercises": "Ejercicios",
+    "difficulty": "Dificultad",
+    "category": "Categoría",
+    "skills": "Habilidades",
+    "instructions": "Instrucciones",
+    "tips": "Consejos",
+    "min": "min",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "edit": "Editar",
+    "preview": "Vista previa",
+    "save": "Guardar cambios",
+    "back_to_edit": "Volver a editar",
+    "back": "Atrás",
+    "selected": "elegidos",
+    "recommended": "Recomendado",
+    "more": "más",
+    "loading": "Cargando...",
+    "next": "Siguiente"
+  },
+  "practice_session": {
+    "title": "Sesión de práctica",
+    "current_exercise": "Ejercicio actual",
+    "next_up": "A continuación",
+    "complete": "Completar ejercicio",
+    "skip": "Siguiente",
+    "finish": "Terminar sesión",
+    "metronome": "Metrónomo",
+    "notes": "Notas de práctica",
+    "save_note": "Guardar nota",
+    "time_practiced": "Tiempo practicado",
+    "streak": "Racha actual",
+    "next_milestone": "Próximo hito",
+    "no_exercise": "No se encontró el ejercicio",
+    "exit": "Salir de la sesión",
+    "load_error": "No se pudo cargar el plan de práctica",
+    "plan_not_found": "No se encontró el plan de práctica",
+    "total_progress": "Progreso total",
+    "exercises": "ejercicios",
+    "session_time": "Tiempo de sesión",
+    "total_duration": "Duración total",
+    "tablature": "Tablatura",
+    "fullscreen": "Pantalla completa",
+    "zoom_in": "Acercar",
+    "zoom_out": "Alejar",
+    "reset_zoom": "Restablecer zoom",
+    "timer": "Temporizador",
+    "start_timer": "Iniciar temporizador",
+    "pause_timer": "Pausar temporizador",
+    "time_left": "Tiempo restante"
+  },
+  "exercise_cards": {
+    "beginner_fingerpicking": {
+      "title": "Fingerpicking para principiantes",
+      "description": "Patrones de fingerpicking esenciales para principiantes"
+    },
+    "scale_mastery": {
+      "title": "Dominio de escalas: bases de la pentatónica",
+      "description": "Domina los patrones esenciales de la escala pentatónica"
+    },
+    "rhythm_mastery": {
+      "title": "Dominio del ritmo: patrones de rasgueo",
+      "description": "Patrones de rasgueo esenciales para varios géneros"
+    },
+    "music_theory": {
+      "title": "Fundamentos de teoría musical",
+      "description": "Conceptos esenciales de teoría musical para guitarristas"
+    }
+  },
+  "skills": {
+    "fingerpicking": "Fingerpicking",
+    "scales": "Escalas",
+    "chords": "Acordes",
+    "rhythm": "Ritmo",
+    "theory": "Teoría",
+    "ear_training": "Entrenamiento auditivo",
+    "sight_reading": "Lectura a primera vista",
+    "improvisation": "Improvisación",
+    "technique": "Técnica",
+    "music_theory": "Teoría musical"
+  },
+  "exercise": {
+    "create_dialog": {
+      "title": "Crear nuevo ejercicio",
+      "description": "Crea un nuevo ejercicio que se pueda añadir a los planes de práctica",
+      "details": "Detalles",
+      "start_practice": "Empezar práctica",
+      "exercise_title": "Título del ejercicio",
+      "exercise_description": "Descripción del ejercicio",
+      "metronome_settings": "Ajustes del metrónomo",
+      "min_bpm": "BPM mínimos",
+      "max_bpm": "BPM máximos",
+      "recommended_bpm": "BPM recomendados",
+      "media": "Multimedia",
+      "video_url": "URL del vídeo (YouTube, Vimeo, etc.)",
+      "notation_url": "URL de la partitura/tablatura",
+      "attachments": "Adjuntos",
+      "tabs": {
+        "basic": "Información básica",
+        "details": "Detalles",
+        "media": "Multimedia"
+      },
+      "instructions_placeholder": "Instrucciones paso a paso para el ejercicio...",
+      "tips_placeholder": "Consejos útiles para practicar mejor...",
+      "skills_select": "Elige las habilidades que desarrolla este ejercicio",
+      "settings_description": "Configura los ajustes del ejercicio",
+      "metronome_description": "Define el rango de tempo de este ejercicio"
+    },
+    "edit_dialog": {
+      "title": "Editar ejercicio",
+      "description": "Modifica los detalles del ejercicio"
+    },
+    "create_success": "Ejercicio creado",
+    "create_error": "No se pudo crear el ejercicio",
+    "create_success_description": "Tu ejercicio se ha creado y añadido a tu biblioteca",
+    "create_error_description": "Hubo un problema al crear tu ejercicio. Inténtalo de nuevo.",
+    "focus_areas": "Áreas de enfoque",
+    "category": "Categoría",
+    "related_skills": "Habilidades relacionadas",
+    "instructions": "Instrucciones",
+    "tips": "Consejos",
+    "metronome": "Ajustes del metrónomo",
+    "min_bpm": "BPM mínimos",
+    "recommended_bpm": "BPM recomendados",
+    "max_bpm": "BPM máximos",
+    "practice_speed": "Velocidad de práctica",
+    "start_at": "Empezar en",
+    "target": "Objetivo",
+    "max": "Máx.",
+    "bpm": "BPM",
+    "next": "Siguiente ejercicio",
+    "finish": "Terminar sesión",
+    "go_to_report": "Ir al registro",
+    "tab": "Tab"
+  },
+  "welcome": {
+    "title": "Bienvenido a la práctica de guitarra",
+    "description": "Tu asistente personal de práctica para mejorar tus habilidades con la guitarra",
+    "quick_start": "Guía de inicio rápido",
+    "get_started": "Empieza ahora",
+    "features": {
+      "library": {
+        "title": "Biblioteca de ejercicios",
+        "description": "Explora nuestra colección de ejercicios pensados para todos los niveles",
+        "action": "Explorar biblioteca"
+      },
+      "plans": {
+        "title": "Planes de práctica",
+        "description": "Crea rutinas de práctica personalizadas para alcanzar tus metas",
+        "action": "Crear plan"
+      },
+      "progress": {
+        "title": "Sigue tu progreso",
+        "description": "Controla tu mejora y mantén la motivación",
+        "action": "Ver progreso"
+      }
+    },
+    "steps": {
+      "browse": "Explora la biblioteca de ejercicios y encuentra los que encajan con tu nivel",
+      "create": "Crea un plan de práctica o añade ejercicios sueltos a tu rutina",
+      "practice": "Empieza a practicar con el metrónomo y el temporizador integrados",
+      "track": "Sigue tu progreso y celebra tus mejoras"
+    }
+  },
+  "tooltips": {
+    "metronome": "Usa el metrónomo para mantener el ritmo y subir la velocidad poco a poco",
+    "timer": "Fija la duración de la práctica para mantener la concentración y registrar tu tiempo",
+    "difficulty": "Empieza con ejercicios acordes a tu nivel actual",
+    "skills": "Céntrate en ejercicios que desarrollan técnicas concretas de guitarra"
+  },
+  "empty_states": {
+    "no_exercises": {
+      "title": "Descubre ejercicios de guitarra",
+      "description": "Empieza con nuestra colección seleccionada de ejercicios de guitarra o crea los tuyos",
+      "browse": "Explorar biblioteca",
+      "create": "Crear ejercicio",
+      "features": {
+        "browse": "Explora ejercicios",
+        "browse_desc": "Encuentra ejercicios adaptados a tu nivel e intereses",
+        "create": "Ejercicios personalizados",
+        "create_desc": "Crea y comparte tus propios ejercicios"
+      }
+    },
+    "no_plans": {
+      "title": "Empieza tu camino con la guitarra",
+      "description": "Crea tu primer plan de práctica y desarrolla tu forma de tocar",
+      "action": "Crea tu primer plan",
+      "features": {
+        "practice": "Práctica estructurada",
+        "practice_desc": "Organiza tu rutina de práctica con planes personalizados",
+        "learn": "Sigue tu progreso",
+        "learn_desc": "Controla tu desarrollo y mantén la motivación siguiendo tu progreso"
+      }
+    }
+  },
+  "help": {
+    "title": "Ayuda y primeros pasos",
+    "description": "Aprende a usar el módulo de ejercicios de forma eficaz",
+    "need_help": "¿Necesitas ayuda?",
+    "watch_video": "Ver tutorial",
+    "getting_started": {
+      "title": "Primeros pasos",
+      "content": "Aprende lo básico para crear y seguir planes de ejercicios"
+    },
+    "creating_plans": {
+      "title": "Crear planes de práctica",
+      "content": "Aprende a crear planes de práctica eficaces que encajen con tus metas"
+    }
+  },
+  "goals": {
+    "current_streak": "Racha actual",
+    "best_streak": "Mejor racha",
+    "days": "días",
+    "weekly_goal": "Objetivo semanal",
+    "minutes": "minutos",
+    "keep_going": "¡Sigue así! ¡Lo estás haciendo genial!",
+    "almost_there": "¡Ya casi!",
+    "goal_reached": "¡Objetivo cumplido! 🎉"
+  },
+  "progression": {
+    "level_up": "¡Subes de nivel!",
+    "new_milestone": "Nuevo hito alcanzado",
+    "next_milestone": "Próximo hito",
+    "mastery": "Progreso de dominio",
+    "difficulty": "Nivel de dificultad actual"
+  },
+  "quick_practice": {
+    "title": "Sesión de práctica rápida",
+    "description": "Genera un plan de práctica aleatorio según el tiempo que tengas",
+    "duration": "Tiempo disponible",
+    "difficulty": "Nivel",
+    "focus": "Enfoque de la práctica",
+    "generate": "Generar plan",
+    "no_exercises": "No se encontraron ejercicios adecuados para estos criterios",
+    "shortcuts": {
+      "title": "Atajos de teclado",
+      "duration": "Ajustar duración",
+      "difficulty": "Elegir dificultad",
+      "category": "Elegir categoría",
+      "generate": "Generar plan",
+      "close": "Cerrar ventana"
+    }
+  },
+  "plan": {
+    "create_title": "Crear nuevo plan de práctica",
+    "create_description": "Crea un plan de práctica personalizado eligiendo ejercicios y ordenándolos como quieras.",
+    "title": "Título del plan",
+    "title_placeholder": "p. ej., Fingerpicking diario",
+    "description": "Descripción del plan",
+    "description_placeholder": "Describe tu plan de práctica...",
+    "exercises": "Ejercicios elegidos",
+    "add_exercise": "Añadir ejercicio",
+    "select_exercises": "Elegir ejercicios",
+    "create_success": "Plan de práctica creado",
+    "total_duration": "Duración total: {{duration}} minutos",
+    "steps": {
+      "details": "Detalles",
+      "exercises": "Elegir ejercicios",
+      "order": "Orden"
+    },
+    "categories": "Categorías",
+    "selected_exercises": "Ejercicios elegidos: {{count}}",
+    "tips": {
+      "good_description": "Una buena descripción te ayudará más adelante a entender el propósito de este plan",
+      "exercise_order": "Arrastra los ejercicios para cambiar su orden. Empieza con el calentamiento y termina con los ejercicios más exigentes."
+    },
+    "summary": "Resumen del plan",
+    "total_exercises": "Total de ejercicios",
+    "total_duration_label": "Duración total",
+    "create": "Crear plan"
+  },
+  "errors": {
+    "auth_required": "Tienes que iniciar sesión para crear un plan",
+    "create_plan_failed": "No se pudo crear el plan de práctica",
+    "load_plan_failed": "No se pudo cargar el plan de práctica",
+    "load_plans_failed": "No se pudieron cargar los planes"
+  },
+  "exercise_complete": {
+    "title": "¡Ejercicio completado!",
+    "duration": "Duración: {{duration}} minutos",
+    "repeat": "Repetir ejercicio",
+    "continue": "Continuar"
+  },
+  "metronome": {
+    "recommended_tempo": "Tempo recomendado",
+    "start": "Iniciar",
+    "stop": "Detener"
+  },
+  "instructions": "Instrucciones",
+  "hints": "Pistas",
+  "no_instructions": "No hay instrucciones disponibles.",
+  "auto_plan": {
+    "title": "Plan de práctica generado automáticamente",
+    "description": "Genera un plan de práctica aleatorio según el tiempo que tengas",
+    "duration": "Tiempo disponible",
+    "difficulty": "Nivel",
+    "focus": "Enfoque de la práctica",
+    "generate": "Generar plan",
+    "generated_plan": "Plan generado",
+    "no_exercises": "No se encontraron ejercicios adecuados para estos criterios"
+  },
+  "plans": {
+    "title": "Elige un plan de práctica",
+    "description": "Elige el plan que mejor se adapte a tus necesidades",
+    "exercises_count": "{{count}} ejercicios",
+    "exercises_count_one": "{{count}} ejercicio"
+  },
+  "custom_exercise": {
+    "title": "Crear ejercicio personalizado",
+    "description": "Añade un ejercicio concreto a tu plan.",
+    "exercise_title": "Título",
+    "exercise_desc": "Descripción",
+    "duration": "Duración (minutos)",
+    "category": "Categoría",
+    "difficulty": "Dificultad",
+    "title_required": "El título es obligatorio",
+    "created_success": "Ejercicio personalizado añadido",
+    "edit_success": "Ejercicio personalizado actualizado",
+    "clone_success": "Ejercicio personalizado clonado",
+    "button_label": "Añadir ejercicio personalizado",
+    "edit_button": "Editar",
+    "clone_button": "Clonar",
+    "save_button": "Guardar cambios",
+    "instructions": "Instrucciones",
+    "tips": "Consejos y pistas",
+    "add_instruction_placeholder": "Añade un paso (pulsa Intro)",
+    "add_tip_placeholder": "Añade un consejo (pulsa Intro)",
+    "no_instructions_hint": "Aún no se han añadido instrucciones.",
+    "no_tips_hint": "Aún no se han añadido consejos.",
+    "use_metronome": "Metrónomo",
+    "video_url": "Enlace de YouTube",
+    "image_url": "URL de la imagen (tab/partitura)",
+    "invalid_image": "URL de imagen no válida"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "fret_diagram": "Diagram gryfu",
+  "toast": {
+    "load_failed": "Nie udało się wczytać postępów. Odśwież stronę.",
+    "exam_failed": "Egzamin niezaliczony — wynik: {{accuracy}}%. Poćwicz jeszcze i spróbuj ponownie!",
+    "exam_passed": "Egzamin zaliczony! {{stars}} — celność {{accuracy}}%",
+    "step_completed": "Krok ukończony! 🎸",
+    "save_failed": "Nie udało się zapisać. Spróbuj ponownie."
+  },
+  "sidebar": {
+    "status": {
+      "locked": "Zablokowany",
+      "available": "Dostępny",
+      "in-progress": "W trakcie",
+      "completed": "Ukończony"
+    },
+    "close": "Zamknij",
+    "step": "Krok {{n}}",
+    "goal": "Cel",
+    "complete_tasks": "Wykonaj wszystkie obowiązkowe zadania poniżej, zaznaczając pola, żeby przejść do następnego etapu.",
+    "your_tasks": "Twoje zadania",
+    "choose_target": "Wybierz cel",
+    "saving": "Zapisywanie...",
+    "done_complete": "Gotowe — ukończ",
+    "unlock_hint": "Przeczytaj treść i zaznacz wszystkie pola powyżej, żeby to odblokować",
+    "practice": "Ćwicz",
+    "retake": "Powtórz",
+    "exam": "Egzamin"
+  },
+  "finish": {
+    "in_arsenal": "W twoim Arsenale, z numerem seryjnym, którego nie ma nikt inny.",
+    "complete": "Roadmapa ukończona — gitara jest twoja.",
+    "steps_left": "Do zdobycia zostało kroków: {{left}} z {{total}}.",
+    "collecting": "Odbieranie...",
+    "collect": "Odbierz gitarę",
+    "collected": "Odebrano",
+    "steps": "Kroki: {{done}}/{{total}}"
+  },
+  "path": {
+    "modules": "Moduły"
+  },
+  "modules": {
+    "title": "Ścieżka nauki",
+    "subtitle": "Wróć tam, gdzie skończyłeś, albo wskocz do dowolnego modułu.",
+    "continue": "Kontynuuj",
+    "start": "Zacznij",
+    "suggest": "Zaproponuj ścieżkę nauki",
+    "missing_coming": "Brakuje tematu? Następne będą: {{topics}} — daj znać, co jeszcze chciałbyś zobaczyć.",
+    "missing": "Brakuje tematu? Daj znać, co chciałbyś zobaczyć następne."
+  }
+}

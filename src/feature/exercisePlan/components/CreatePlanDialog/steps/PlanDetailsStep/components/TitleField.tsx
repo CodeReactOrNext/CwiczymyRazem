@@ -12,7 +12,7 @@ interface TitleFieldProps {
 }
 
 export const TitleField = ({ register, error }: TitleFieldProps) => {
-  const { t } = useTranslation("exercises");
+  const { t } = useTranslation(["exercises", "plans"]);
 
   return (
     <div className='space-y-2'>
@@ -31,7 +31,7 @@ export const TitleField = ({ register, error }: TitleFieldProps) => {
         )}
         {...register("title", {
           validate: (value) =>
-            value.trim().length > 0 || "Give your plan a name",
+            value.trim().length > 0 || t("plans:details.name_required"),
         })}
       />
       {error?.message && (

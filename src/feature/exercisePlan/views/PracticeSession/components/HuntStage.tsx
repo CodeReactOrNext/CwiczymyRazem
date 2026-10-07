@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import type { ReactNode } from "react";
 
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
@@ -47,6 +48,7 @@ export function HuntStage({
   className,
   railClassName,
 }: HuntStageProps) {
+  const { t } = useTranslation("session");
   return (
     <div
       className={cn(
@@ -64,9 +66,9 @@ export function HuntStage({
             transition={{ duration: 0.3 }}
             className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-zinc-950/40 backdrop-blur-[1px]">
             <span className="rounded-lg bg-zinc-900/90 px-5 py-3 text-center text-sm font-bold tracking-wide text-amber-200">
-              ▶ Press Play below to start the timer
+              ▶ {t("hunt.press_play")}
               <br />
-              <span className="text-xs font-semibold text-zinc-400">you can click right away</span>
+              <span className="text-xs font-semibold text-zinc-400">{t("hunt.click_now")}</span>
             </span>
           </motion.div>
         )}

@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Globe2 } from "lucide-react";
 import { useMemo, useSyncExternalStore } from "react";
 import type { ResetEntry } from "utils/gameLogic/resetSchedule";
@@ -59,7 +60,9 @@ const useClientNow = (): Date | null => {
 };
 
 /** Which clock a row runs on. The streak is the only one that is not the server's. */
-const ScopeTag = ({ scope }: { scope: ResetEntry["scope"] }) => (
+const ScopeTag = ({ scope }: { scope: ResetEntry["scope"] }) => {
+  const { t } = useTranslation("nav");
+  return (
   <span
     className={cn(
       "shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold",
@@ -67,25 +70,33 @@ const ScopeTag = ({ scope }: { scope: ResetEntry["scope"] }) => (
         ? "bg-cyan-500/10 text-cyan-400/90"
         : "bg-amber-500/10 text-amber-400/90",
     )}>
-    {scope === "server" ? "server" : "your time"}
+    {scope === "server" ? t("reset.scope_server") : t("reset.scope_local")}
   </span>
-);
+  );
+};
 
 /** One rollover, as the modal lists it. */
-const ResetRow = ({ entry, now }: { entry: ResetEntry; now: Date }) => (
+const ResetRow = ({ entry, now }: { entry: ResetEntry; now: Date }) => {
+  const { t } = useTranslation("nav");
+  return (
   <div>
     <div className='flex items-baseline justify-between gap-3'>
-      <span className='text-sm font-semibold text-zinc-200'>{entry.label}</span>
+      <span className='text-sm font-semibold text-zinc-200'>
+        {t(`reset.entries.${entry.id}.label`, entry.label)}
+      </span>
       <span className='shrink-0 text-sm font-bold tabular-nums text-cyan-300'>
         {formatTimeLeft(entry.nextResetAt - now.getTime())}
       </span>
     </div>
     <div className='mt-2 flex items-start gap-2.5'>
       <ScopeTag scope={entry.scope} />
-      <p className='text-xs leading-relaxed text-zinc-500'>{entry.detail}</p>
+      <p className='text-xs leading-relaxed text-zinc-500'>
+        {t(`reset.entries.${entry.id}.detail`, entry.detail)}
+      </p>
     </div>
   </div>
-);
+  );
+};
 
 /** Same footprint as the live clock, so the sidebar does not shift on hydration. */
 const ResetClockPlaceholder = () => (
@@ -114,6 +125,7 @@ const ResetClockPlaceholder = () => (
  * would quietly imply the streak dies at 4pm.
  */
 export const ResetClock = () => {
+  const { t } = useTranslation("nav");
   const now = useClientNow();
 
   if (!now) return <ResetClockPlaceholder />;
@@ -129,14 +141,14 @@ export const ResetClock = () => {
             <DialogTrigger asChild>
               <button
                 type='button'
-                aria-label='Server time and what resets next'
+                aria-label={t("reset.aria")}
                 className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-white/5'>
                 <Globe2 size={13} className='shrink-0 text-zinc-600' />
                 <span className='text-xs font-semibold tabular-nums text-zinc-400'>
                   {formatServerTime(now)}
                 </span>
                 <span className='text-[10px] font-medium text-zinc-600'>
-                  server time
+                  {t("reset.server_time_short")}
                 </span>
               </button>
             </DialogTrigger>
@@ -144,11 +156,13 @@ export const ResetClock = () => {
 
           <TooltipContent side='right' className='max-w-[240px]'>
             <p className='font-semibold'>
-              {next.label} in {formatTimeLeft(next.nextResetAt - now.getTime())}
+              {t("reset.next_in", {
+                label: t(`reset.entries.${next.id}.label`, next.label),
+                time: formatTimeLeft(next.nextResetAt - now.getTime()),
+              })}
             </p>
             <p className='mt-1 text-zinc-400'>
-              The game day starts at 00:00 UTC for everyone. Click for the full
-              list.
+              {t("reset.tooltip_hint")}
             </p>
           </TooltipContent>
         </Tooltip>
@@ -156,11 +170,11 @@ export const ResetClock = () => {
 
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Server time · {formatServerTime(now)} UTC</DialogTitle>
+          <DialogTitle>
+            {t("reset.dialog_title", { time: formatServerTime(now) })}
+          </DialogTitle>
           <DialogDescription>
-            Everything players share runs on one clock, so a deadline means the
-            same thing wherever you are. Your practice streak is the exception —
-            it follows your own midnight.
+            {t("reset.dialog_description")}
           </DialogDescription>
         </DialogHeader>
 

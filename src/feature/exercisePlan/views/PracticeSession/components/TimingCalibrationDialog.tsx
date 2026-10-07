@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
+import { useTranslation } from "hooks/useTranslation";
 import { Mic, Timer } from "lucide-react";
 
 import { useSessionUI } from "../contexts/SessionUIContext";
@@ -44,41 +45,48 @@ const IdleStep = ({
   onStart: () => void;
   onEnableMic: () => void;
   onUseEstimate: () => void;
-}) => (
+}) => {
+  const { t } = useTranslation("session");
+  return (
   <>
     <DialogDescription className='mt-4 text-sm leading-relaxed text-zinc-400'>
-      Speakers, headphones and audio interfaces each add a delay between the click you hear and the note we
-      pick up. Play along to a few clicks and we&apos;ll measure yours, so timing grades match what you hear.
+      {t("timing.intro")}
     </DialogDescription>
 
     <ol className='mt-6 space-y-3 text-sm text-zinc-300'>
-      <Step n={1}>Use the speakers or headphones you practice with.</Step>
-      <Step n={2}>Pluck the open low E on every click and let it ring — don&apos;t mute between clicks. {CALIBRATION_BPM} BPM, {CALIBRATION_COUNT_IN} clicks to get ready, then {CALIBRATION_CLICKS} counted.</Step>
-      <Step n={3}>Play with the click, not ahead of it.</Step>
+      <Step n={1}>{t("timing.step1")}</Step>
+      <Step n={2}>
+        {t("timing.step2", {
+          bpm: CALIBRATION_BPM,
+          countIn: CALIBRATION_COUNT_IN,
+          clicks: CALIBRATION_CLICKS,
+        })}
+      </Step>
+      <Step n={3}>{t("timing.step3")}</Step>
     </ol>
 
     <div className='mt-6 rounded-lg bg-zinc-900/60 px-4 py-3 text-sm'>
-      <span className='text-zinc-400'>Now using </span>
+      <span className='text-zinc-400'>{t("timing.now_using")} </span>
       {savedLatencyMs !== null ? (
         <>
           <span className='font-semibold tabular-nums text-zinc-100'>{savedLatencyMs} ms</span>
-          <span className='text-zinc-400'> — measured in this browser</span>
+          <span className='text-zinc-400'> — {t("timing.measured_here")}</span>
         </>
       ) : (
         <>
           <span className='font-semibold tabular-nums text-zinc-100'>~{Math.round(estimateLatencyMs())} ms</span>
-          <span className='text-zinc-400'> — an estimate, not measured yet</span>
+          <span className='text-zinc-400'> — {t("timing.estimate")}</span>
         </>
       )}
     </div>
 
     <div className='mt-6 flex gap-2.5'>
       {isListening ? (
-        <Button onClick={onStart} className={PRIMARY}>Start</Button>
+        <Button onClick={onStart} className={PRIMARY}>{t("start")}</Button>
       ) : (
         <Button onClick={onEnableMic} className={PRIMARY}>
           <Mic className='h-4 w-4' />
-          Turn on the mic first
+          {t("timing.mic_first")}
         </Button>
       )}
     </div>
@@ -88,11 +96,12 @@ const IdleStep = ({
         type='button'
         onClick={onUseEstimate}
         className='mt-4 rounded text-xs text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500'>
-        Forget the measurement and go back to the estimate
+        {t("timing.forget")}
       </button>
     )}
   </>
-);
+  );
+};
 
 const RunningStep = ({
   state, onCancel,
@@ -100,6 +109,7 @@ const RunningStep = ({
   state: Extract<CalibrationRunState, { phase: "running" }>;
   onCancel: () => void;
 }) => {
+  const { t } = useTranslation("session");
   const heard = state.delays.filter((d) => typeof d === "number").length;
   const counting = state.countInLeft > 0;
 
@@ -110,7 +120,7 @@ const RunningStep = ({
           {counting ? state.countInLeft : `${heard}/${CALIBRATION_CLICKS}`}
         </span>
         <p className='mt-3 text-sm text-zinc-400'>
-          {counting ? "Get ready — listen to the pulse" : "Pluck on every click"}
+          {counting ? t("timing.get_ready") : t("timing.pluck")}
         </p>
       </div>
 
@@ -129,7 +139,7 @@ const RunningStep = ({
       </div>
 
       <div className='mt-8 flex'>
-        <Button onClick={onCancel} className={SECONDARY}>Cancel</Button>
+        <Button onClick={onCancel} className={SECONDARY}>{t("cancel")}</Button>
       </div>
     </>
   );
@@ -144,25 +154,30 @@ const ResultStep = ({
   onSave: (latencyMs: number) => void;
   onRetry: () => void;
 }) => {
+  const { t } = useTranslation("session");
   if (!result.ok) {
     return (
       <>
         <p className='mt-6 text-sm font-semibold text-zinc-100'>
           {result.reason === "tooFewHits"
-            ? "Not enough clicks heard"
+            ? t("timing.fail.too_few")
             : result.reason === "ahead"
-              ? "The notes came in ahead of the click"
-              : "The hits were too spread out"}
+              ? t("timing.fail.ahead")
+              : t("timing.fail.spread")}
         </p>
         <p className='mt-2 text-sm leading-relaxed text-zinc-400'>
           {result.reason === "tooFewHits"
-            ? `We picked up ${result.hits} of ${result.total} — it takes at least ${CALIBRATION_MIN_HITS}. Pluck a little harder, and check the mic is the one your guitar is on.`
+            ? t("timing.fail.too_few_body", {
+                hits: result.hits,
+                total: result.total,
+                min: CALIBRATION_MIN_HITS,
+              })
             : result.reason === "ahead"
-              ? "Sound can't reach us before it's played, so something else was heard. Let the string ring between clicks instead of muting it, and play with the click, not ahead of it."
-              : `They wandered by about ±${result.spreadMs} ms, which says more about the run than about your setup. Try again, playing right on the click and letting the string ring.`}
+              ? t("timing.fail.ahead_body")
+              : t("timing.fail.spread_body", { spread: result.spreadMs })}
         </p>
         <div className='mt-6 flex'>
-          <Button onClick={onRetry} className={PRIMARY}>Try again</Button>
+          <Button onClick={onRetry} className={PRIMARY}>{t("timing.try_again")}</Button>
         </div>
       </>
     );
@@ -173,21 +188,23 @@ const ResultStep = ({
   return (
     <>
       <div className='mt-8 flex flex-col items-center text-center'>
-        <span className='text-[11px] font-semibold tracking-wide text-zinc-500'>Measured delay</span>
+        <span className='text-[11px] font-semibold tracking-wide text-zinc-500'>{t("timing.measured_delay")}</span>
         <span className='mt-1 font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100'>
           {result.latencyMs} ms
         </span>
         <p className='mt-3 text-sm text-zinc-400'>
-          {result.hits} of {result.total} clicks heard, steady within ±{result.spreadMs} ms
+          {t("timing.heard", { hits: result.hits, total: result.total, spread: result.spreadMs })}
         </p>
         <p className='mt-1 text-xs text-zinc-500'>
-          {savedLatencyMs !== null ? "Saved before" : "Estimated before"}: {previous} ms
+          {savedLatencyMs !== null ? t("timing.saved_before") : t("timing.estimated_before")}: {previous} ms
         </p>
       </div>
 
       <div className='mt-8 flex gap-2.5'>
-        <Button onClick={onRetry} className={SECONDARY}>Try again</Button>
-        <Button onClick={() => onSave(result.latencyMs)} className={PRIMARY}>Use {result.latencyMs} ms</Button>
+        <Button onClick={onRetry} className={SECONDARY}>{t("timing.try_again")}</Button>
+        <Button onClick={() => onSave(result.latencyMs)} className={PRIMARY}>
+          {t("timing.use", { ms: result.latencyMs })}
+        </Button>
       </div>
     </>
   );
@@ -200,6 +217,7 @@ const ResultStep = ({
 export const TimingCalibrationDialog = ({
   audioRefs, audioContext, isListening, estimateLatencyMs, onEnableMic, onBeforeStart,
 }: TimingCalibrationDialogProps) => {
+  const { t } = useTranslation("session");
   const { isTimingCalibrationOpen, closeTimingCalibration } = useSessionUI();
   const savedLatencyMs = useTimingCalibration((s) => s.latencyMs);
   const setLatency = useTimingCalibration((s) => s.setLatency);
@@ -226,7 +244,7 @@ export const TimingCalibrationDialog = ({
         <div className='px-7 pb-7 pt-7'>
           <div className='flex items-center gap-2.5 pr-10'>
             <Timer className='h-4 w-4 text-zinc-400' />
-            <DialogTitle className='text-base font-semibold text-zinc-100'>Calibrate timing</DialogTitle>
+            <DialogTitle className='text-base font-semibold text-zinc-100'>{t("timing.title")}</DialogTitle>
           </div>
 
           {state.phase === "idle" && (

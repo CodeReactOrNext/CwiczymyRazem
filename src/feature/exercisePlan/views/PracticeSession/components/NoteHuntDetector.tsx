@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { useMemo } from "react";
 import { FaArrowRight, FaMicrophone } from "react-icons/fa";
 
@@ -38,6 +39,7 @@ export function NoteHuntDetector({
   isPlaying,
   onDevPassExam,
 }: NoteHuntDetectorProps) {
+  const { t } = useTranslation("session");
   const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, noteHuntStrings, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, canAdvanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
 
   // Read the live target from context (not the prop) so it updates through the
@@ -132,7 +134,7 @@ export function NoteHuntDetector({
                 already says what to do. */}
             {!isPlaying && (
               <p className="text-center text-sm font-semibold text-zinc-400">
-                {description ?? "Play the note the interval lands on"}
+                {description ?? t("note_hunt.play_interval")}
               </p>
             )}
           </div>
@@ -173,20 +175,19 @@ export function NoteHuntDetector({
           // hint the way the octave hunts can afford to.
           <div className="flex max-w-xs flex-col items-center gap-1 rounded-lg bg-amber-500/10 px-4 py-3 text-center">
             <span className="flex items-center gap-2 text-sm font-bold text-amber-300">
-              <FaMicrophone className="h-3.5 w-3.5" aria-hidden /> Needs Pitch Detect
+              <FaMicrophone className="h-3.5 w-3.5" aria-hidden /> {t("note_hunt.needs_pitch")}
             </span>
             <span className="text-xs font-semibold text-amber-200/70">
-              Turn it on in the controls below so the app can hear your answer — without it you can only reveal it.
+              {t("note_hunt.turn_on")}
             </span>
           </div>
         ) : (
           <p className="text-center text-xs text-zinc-400">
-            Enable the <span className="font-bold text-emerald-400">mic</span> in the controls below to auto-score, or
-            check off octaves by hand.
+            {t("note_hunt.enable_mic")}
           </p>
         )
       ) : !isListening ? (
-        <p className="text-sm font-semibold text-zinc-200">Starting microphone…</p>
+        <p className="text-sm font-semibold text-zinc-200">{t("note_hunt.starting_mic")}</p>
       ) : (
         <DetectionWave volumeRef={volumeRef} active={isListening} isMatch={isMatch} />
       )}
@@ -196,10 +197,16 @@ export function NoteHuntDetector({
           so without this the score just silently refuses to move. */}
       {isMicEnabled && wrongOctave && (
         <p className="text-center text-xs font-bold text-amber-400">
-          Right note, wrong octave — that was {targetNote}{toSuperscript(detectedOctave!)}.{" "}
+          {t("note_hunt.wrong_octave", { note: `${targetNote}${toSuperscript(detectedOctave!)}` })}{" "}
           {soleString
-            ? `The ${STRING_NAMES[soleString]} string gives you ${targetNote}${toSuperscript(octaves[0])}.`
-            : `Stay inside frets ${noteHuntRegion?.startFret}–${noteHuntRegion?.endFret}.`}
+            ? t("note_hunt.string_gives", {
+                string: t(`note_hunt.strings.${soleString}`, STRING_NAMES[soleString]),
+                note: `${targetNote}${toSuperscript(octaves[0])}`,
+              })
+            : t("note_hunt.stay_inside", {
+                from: noteHuntRegion?.startFret,
+                to: noteHuntRegion?.endFret,
+              })}
         </p>
       )}
     </div>
@@ -211,7 +218,7 @@ export function NoteHuntDetector({
     <div className="flex flex-col items-center gap-1.5">
       {!isMicEnabled && (
         <span className="text-xs font-semibold text-zinc-400">
-          Tap each octave you find{noteHuntRegion ? " in the region" : ""}
+          {noteHuntRegion ? t("note_hunt.tap_octaves_region") : t("note_hunt.tap_octaves")}
         </span>
       )}
       <div className="flex flex-wrap items-center justify-center gap-2">
@@ -251,14 +258,14 @@ export function NoteHuntDetector({
       {isPrompt ? (
         <div className="flex flex-col items-center gap-2">
           <p className={cn("text-sm font-extrabold transition-colors", solved ? "text-emerald-400" : "text-zinc-300")}>
-            {solved ? "★ correct" : "Find the target note"}
+            {solved ? `★ ${t("note_hunt.correct")}` : t("note_hunt.find_target")}
           </p>
           {!isMicEnabled && !solved && octaves.length > 0 && (
             <button
               type="button"
               onClick={() => markNoteHuntOctave(octaves[0])}
               className="rounded bg-emerald-500/10 px-4 py-1.5 text-sm font-bold text-emerald-400 transition-colors hover:bg-emerald-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-              Reveal answer
+              {t("note_hunt.reveal")}
             </button>
           )}
         </div>

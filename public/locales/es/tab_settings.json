@@ -1,0 +1,201 @@
+{
+  "spacing": "Espaciado",
+  "spacing_hint": "Cuánto se separan las notas en el compás y entre cuerdas.",
+  "note_spacing": "Espaciado de notas",
+  "string_spacing": "Espaciado de cuerdas",
+  "fret_numbers": "Números de traste",
+  "size": "Tamaño",
+  "default_view": "Vista predeterminada",
+  "default_view_hint": "Qué vista se abre automáticamente al empezar una sesión de práctica.",
+  "metronome_sound": "Sonido del metrónomo",
+  "metronome_sound_hint": "Toca uno para oírlo. Se usa en la cuenta atrás y en la vista de tablatura; la vista de partitura mantiene el clic propio de AlphaTab.",
+  "note_pills": "Forma de las notas",
+  "note_pills_hint": "Forma de los bloques con los números de traste y cómo se dibuja la duración de una nota.",
+  "string_palette": "Colores de cuerdas",
+  "string_palette_hint": "Un color por cuerda, empezando por la e aguda.",
+  "hit_colour": "Color de acierto",
+  "hit_colour_hint": "Rellena la nota mientras la sostienes correctamente.",
+  "board_background": "Fondo",
+  "board_background_hint": "Color detrás del pentagrama, el margen y el difuminado.",
+  "visible_elements": "Elementos visibles",
+  "visible_elements_hint": "Oculta las capas que no necesites para despejar la partitura.",
+  "handedness": "Lateralidad",
+  "handedness_hint": "Para zurdos. Se aplica en todo este dispositivo.",
+  "mirror": "Reflejar diagramas del mástil",
+  "mirror_desc": "Cejuela a la derecha en los ejercicios de clic y búsqueda. La tablatura no tiene eje de mástil que reflejar, así que se queda igual.",
+  "rtl": "Tablero de derecha a izquierda",
+  "rtl_desc": "La tablatura empieza en el borde derecho y el cursor avanza hacia la izquierda, como un mástil reflejado. Solo tablatura; la partitura mantiene su dirección normal.",
+  "flip": "Invertir orden de cuerdas",
+  "flip_desc": "Mi grave en la línea superior: para una guitarra diestra encordada al revés. Solo tablatura; la partitura mantiene el orden estándar.",
+  "feedback": "Respuesta visual",
+  "hit_animations": "Animaciones de acierto",
+  "hit_animations_desc": "Destello y ondas expansivas cuando aciertas una nota",
+  "timing_hints": "Indicaciones de tempo",
+  "timing_hints_desc": "«Pronto», «Tarde» o un + verde sobre la nota al acertarla, y una nota tardía se rellena desde donde la tocaste. El tempo cuenta para tu puntuación igualmente.",
+  "ambient_glow": "Brillo del micrófono",
+  "ambient_glow_desc": "Brillo bajo la tablatura que reacciona al volumen con que tocas",
+  "reset": "Restablecer ajustes de tablatura",
+  "sizing": "Tamaño",
+  "sizing_hint": "Zoom y espaciado propios de AlphaTab, independientes de los controles de la tablatura plana de arriba.",
+  "zoom": "Zoom",
+  "board": "Fondo",
+  "board_hint": "Color del fondo de la partitura.",
+  "dark_score": "Partitura oscura",
+  "dark_score_desc": "Fondo negro con pentagrama y notas blancas, en vez de papel blanco",
+  "toggles": {
+    "rhythm_lane": "Carril rítmico",
+    "rhythm_lane_desc": "Plicas, barras y silencios sobre el pentagrama",
+    "chord_names": "Nombres de acordes",
+    "chord_names_desc": "Etiquetas blancas de acordes sobre el compás",
+    "tuning_gutter": "Margen de afinación",
+    "tuning_gutter_desc": "Nombres de cuerdas fijos a la izquierda",
+    "measure_lines": "Líneas divisorias",
+    "measure_lines_desc": "Separadores verticales de compás",
+    "technique": "Marcas de técnica",
+    "technique_desc": "H/P, bendings, PM, vibrato, armónicos, púa ⊓/⋁"
+  },
+  "views": {
+    "tab": {
+      "label": "Tablatura",
+      "desc": "Tablatura clásica del mástil"
+    },
+    "notation": {
+      "label": "Partitura",
+      "desc": "Notación musical estándar"
+    }
+  },
+  "fret_text": {
+    "black": {
+      "label": "Negro",
+      "desc": "Tinta sobre bloques claros"
+    },
+    "white": {
+      "label": "Blanco",
+      "desc": "Para paletas oscuras"
+    },
+    "auto": {
+      "label": "Auto",
+      "desc": "Se adapta al brillo de cada bloque"
+    }
+  },
+  "note_styles": {
+    "headTail": {
+      "label": "Cabeza + cola",
+      "desc": "Cabeza sólida, cola fina de sostenido"
+    },
+    "bar": {
+      "label": "Barra sólida",
+      "desc": "Un solo bloque para toda la duración"
+    }
+  },
+  "pills": {
+    "capsule": {
+      "label": "Cápsula",
+      "desc": "Extremos totalmente redondeados"
+    },
+    "rounded": {
+      "label": "Redondeado",
+      "desc": "Esquinas suaves"
+    },
+    "sharp": {
+      "label": "Recto",
+      "desc": "Casi cuadrado, técnico"
+    },
+    "chunky": {
+      "label": "Grueso",
+      "desc": "Más alto y marcado"
+    }
+  },
+  "palettes": {
+    "rainbow": {
+      "label": "Arcoíris",
+      "desc": "Un tono por cuerda"
+    },
+    "stringCode": {
+      "label": "Código de cuerdas",
+      "desc": "Mi grave rojo, mi agudo morado"
+    },
+    "ocean": {
+      "label": "Océano",
+      "desc": "Azules y violetas fríos"
+    },
+    "sunset": {
+      "label": "Atardecer",
+      "desc": "Rojos cálidos hasta el dorado"
+    },
+    "forest": {
+      "label": "Bosque",
+      "desc": "Verdes y turquesas"
+    },
+    "neon": {
+      "label": "Neón",
+      "desc": "Máximo contraste sobre fondo oscuro"
+    },
+    "pastel": {
+      "label": "Pastel",
+      "desc": "Tonos suaves, más llevaderos en sesiones largas"
+    },
+    "poster": {
+      "label": "Póster",
+      "desc": "Colores planos de imprenta, mates e intensos"
+    },
+    "vintage": {
+      "label": "Vintage",
+      "desc": "Tonos desvaídos, aire de póster antiguo"
+    },
+    "colorblind": {
+      "label": "Apto para daltónicos",
+      "desc": "Okabe–Ito, distinguible para la mayoría de tipos"
+    },
+    "mono": {
+      "label": "Mono",
+      "desc": "Escala de grises: cuenta la posición, no el color"
+    }
+  },
+  "backgrounds": {
+    "midnight": {
+      "label": "Medianoche",
+      "desc": "Casi negro, por defecto"
+    },
+    "black": {
+      "label": "Negro puro",
+      "desc": "Máximo contraste, ideal para OLED"
+    },
+    "charcoal": {
+      "label": "Carbón",
+      "desc": "Gris aclarado, menos deslumbramiento"
+    },
+    "navy": {
+      "label": "Marino",
+      "desc": "Negro azulado frío"
+    },
+    "plum": {
+      "label": "Ciruela",
+      "desc": "Negro violáceo cálido"
+    },
+    "paper": {
+      "label": "Papel",
+      "desc": "Blanco cálido, como impreso"
+    },
+    "white": {
+      "label": "Blanco",
+      "desc": "Hoja blanca sencilla"
+    },
+    "sepia": {
+      "label": "Sepia",
+      "desc": "Papel envejecido, pocos reflejos"
+    }
+  },
+  "hit_colors": {
+    "emerald": "Esmeralda",
+    "cyan": "Cian",
+    "amber": "Ámbar",
+    "white": "Blanco",
+    "magenta": "Magenta",
+    "lime": "Lima"
+  },
+  "view_menu": {
+    "hint": "Cambia cómo se muestra el ejercicio",
+    "view": "Vista"
+  }
+}

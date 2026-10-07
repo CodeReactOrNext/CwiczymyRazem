@@ -1,0 +1,53 @@
+{
+  "half_speed": "Połowa tempa",
+  "bpm_edit_hint": "Kliknij, aby edytować · Strzałki ±1 · Shift+strzałka ±5",
+  "bpm_exam": "BPM · tryb egzaminu",
+  "bpm_confirm": "↵, aby zatwierdzić",
+  "bpm_click_to_edit": "BPM · kliknij, aby edytować",
+  "decrease": "Zmniejsz BPM o 1",
+  "increase": "Zwiększ BPM o 1",
+  "remove_beat": "Usuń uderzenie",
+  "add_beat": "Dodaj uderzenie",
+  "subdivisions": {
+    "1": "Ćwierćnuty — bez podziału",
+    "2": "Ósemki",
+    "3": "Triole ósemkowe",
+    "4": "Szesnastki"
+  },
+  "accent": {
+    "accent": "Akcent — kliknij, aby wyciszyć",
+    "click": "Klik — kliknij, aby zaakcentować",
+    "muted": "Wyciszone — kliknij, aby przywrócić",
+    "locked": "To ćwiczenie samo ustawia akcenty",
+    "follows_tab": "Klik zmienia metrum razem z tabulaturą",
+    "from_exercise": "Akcenty wynikają z metrum tego ćwiczenia",
+    "hint": "Kliknij uderzenie, aby je zaakcentować, kliknij ponownie, aby wyciszyć"
+  },
+  "sounds": {
+    "classic": {
+      "label": "Klasyczny",
+      "desc": "Czysty sinusowy pisk, ten, z którym startowała aplikacja"
+    },
+    "wood": {
+      "label": "Wood block",
+      "desc": "Ciepłe, głuche stuknięcie, łagodne przy długich sesjach"
+    },
+    "digital": {
+      "label": "Cyfrowy",
+      "desc": "Ostry prostokątny blip, jak klik w DAW"
+    },
+    "sticks": {
+      "label": "Pałeczki",
+      "desc": "Suche stuknięcie pałeczką, przebija się przez głośny wzmacniacz"
+    },
+    "hihat": {
+      "label": "Hi-hat",
+      "desc": "Zamknięty hi-hat, naturalnie siedzi w perkusyjnym groovie"
+    },
+    "cowbell": {
+      "label": "Krowi dzwonek",
+      "desc": "Dwa rozstrojone prostokąty — więcej cowbella"
+    }
+  },
+  "beats_per_bar": "Uderzenia w takcie"
+}

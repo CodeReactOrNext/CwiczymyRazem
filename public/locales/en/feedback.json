@@ -1,0 +1,41 @@
+{
+  "thanks": "Thanks for your feedback!",
+  "error": "Something went wrong, please try again.",
+  "title": "Share your feedback",
+  "subtitle": "Help us make Riff Quest better — every message is read.",
+  "sending": "Sending...",
+  "send_feedback": "Send Feedback",
+  "sending_as": "Sending as {{name}}",
+  "anonymous": "anonymous",
+  "cancel": "Cancel",
+  "categories": {
+    "bug": {
+      "label": "Bug Report",
+      "description": "Something isn't working",
+      "placeholder": "Describe what happened and what you expected..."
+    },
+    "idea": {
+      "label": "Feature Idea",
+      "description": "Suggest an improvement",
+      "placeholder": "What would you like to see added or improved?"
+    },
+    "question": {
+      "label": "Question",
+      "description": "Ask us anything",
+      "placeholder": "What would you like to know?"
+    }
+  },
+  "prompt": {
+    "title_named": "Hey {{name}}, got a minute? 👋",
+    "title": "Hey there, got a minute? 👋",
+    "intro": "We're working hard to make Riff Quest the best practice tool for guitarists. To do that, we need to hear from real users — not assumptions.",
+    "questions": "What bothers you about the app? What's missing? What do you wish worked differently?",
+    "got_idea": "Got an idea?",
+    "found_bug": "Found a bug?",
+    "annoys": "Something annoys you?",
+    "anytime": "You can also share feedback anytime via the {{button}} button in the sidebar.",
+    "placeholder": "Tell us what's on your mind...",
+    "maybe_later": "Maybe later",
+    "share": "Share feedback"
+  }
+}

@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { useGuitarTuning } from "feature/exercisePlan/views/PracticeSession/hooks/useGuitarTuning";
 import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
 import { RippleButton } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ interface TunerButtonProps {
  * own Tuner button covers that case.
  */
 export const TunerButton = ({ h = "h-7" }: TunerButtonProps) => {
+  const { t } = useTranslation("desktop");
   const audio = useGuitarAudioInput();
   const { tuning } = useGuitarTuning({ isGpFile: false, isExamMode: false });
   const [open, setOpen] = useState(false);
@@ -43,7 +45,7 @@ export const TunerButton = ({ h = "h-7" }: TunerButtonProps) => {
     const status = await window.nativeAudio?.getStatus().catch(() => null);
     if (status?.isOpen) {
       toast.info(
-        "The input is in use by your practice session — use its Tuner button.",
+        t("tuner.in_use"),
       );
       return;
     }
@@ -52,7 +54,7 @@ export const TunerButton = ({ h = "h-7" }: TunerButtonProps) => {
 
   if (!isNative) return null;
 
-  const micHint = audio.error ?? "Opening the audio interface…";
+  const micHint = audio.error ?? t("tuner.opening");
 
   return (
     <>
@@ -60,7 +62,7 @@ export const TunerButton = ({ h = "h-7" }: TunerButtonProps) => {
           violet (the tuner's colour everywhere else) while it's open. */}
       <RippleButton
         onClick={open ? () => setOpen(false) : handleOpen}
-        title='Tuner'
+        title={t("tuner.title")}
         className={cn(
           "flex items-center gap-1.5 rounded-full pl-2.5 pr-3 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-400/50",
           h,
@@ -69,7 +71,7 @@ export const TunerButton = ({ h = "h-7" }: TunerButtonProps) => {
             : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100",
         )}>
         <TuningForkIcon className='h-3.5 w-3.5 shrink-0' />
-        <span>Tuner</span>
+        <span>{t("tuner.title")}</span>
       </RippleButton>
 
       {open &&

@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { Timer } from "lucide-react";
 import { memo } from "react";
 
@@ -22,6 +23,7 @@ interface ExerciseHeroHeaderProps {
 export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({
   exercise, activeExercise, plan, variant = "header"
 }: ExerciseHeroHeaderProps) {
+  const { t } = useTranslation("plans");
   const streakPlan = plan as any;
 
   if (variant === "header") {
@@ -33,7 +35,7 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({
         {exercise.isPlayalong && (
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-red-500/10 shrink-0">
             <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-[10px] font-bold tracking-wide text-red-400">Playalong</span>
+            <span className="text-[10px] font-bold tracking-wide text-red-400">{t("playalong")}</span>
           </div>
         )}
         <span className="truncate" translate={exercise.songData ? "no" : undefined}>{activeExercise.title}</span>

@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "assets/lib/utils";
@@ -43,6 +44,7 @@ export const WidgetFrame = ({
   onResize,
   children,
 }: WidgetFrameProps) => {
+  const { t } = useTranslation("dashboard");
   const {
     attributes,
     listeners,
@@ -83,8 +85,8 @@ export const WidgetFrame = ({
           type='button'
           {...attributes}
           {...listeners}
-          aria-label={`Move ${definition.title}`}
-          title='Drag to move'
+          aria-label={t("frame.move", { title: definition.title })}
+          title={t("frame.drag")}
           className={cn(
             controlButton,
             "cursor-grab touch-none active:cursor-grabbing",
@@ -101,10 +103,10 @@ export const WidgetFrame = ({
             onClick={() => onResize(isFull ? "half" : "full")}
             aria-label={
               isFull
-                ? `Make ${definition.title} half width`
-                : `Make ${definition.title} full width`
+                ? t("frame.make_half", { title: definition.title })
+                : t("frame.make_full", { title: definition.title })
             }
-            title={isFull ? "Half width" : "Full width"}
+            title={isFull ? t("frame.half") : t("frame.full")}
             className={controlButton}>
             {isFull ? (
               <Columns2 size={16} />
@@ -116,8 +118,8 @@ export const WidgetFrame = ({
         <button
           type='button'
           onClick={onRemove}
-          aria-label={`Hide ${definition.title}`}
-          title='Hide from Home'
+          aria-label={t("frame.hide", { title: definition.title })}
+          title={t("frame.hide_from_home")}
           className={controlButton}>
           <EyeOff size={16} />
         </button>
@@ -133,8 +135,7 @@ export const WidgetFrame = ({
 
       {definition.mayBeEmpty && (
         <p className='hidden rounded-lg bg-zinc-900/40 px-4 py-6 text-center text-sm text-zinc-500 peer-empty:block'>
-          Nothing to show right now. This card only appears when there is
-          something in it.
+          {t("frame.empty")}
         </p>
       )}
     </div>

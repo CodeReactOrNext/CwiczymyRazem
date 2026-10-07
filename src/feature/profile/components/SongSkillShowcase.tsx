@@ -4,6 +4,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import { formatPlayTime } from "feature/songs/utils/arrangements.utils";
 import { getAllTiers, getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { Clock, Music } from "lucide-react";
 import { useMemo } from "react";
 import { useAppSelector } from "store/hooks";
@@ -67,6 +68,7 @@ export const SongSkillShowcase = ({
   profileUserId,
   practiceTimes,
 }: SongSkillShowcaseProps) => {
+  const { t } = useTranslation("profile");
   const currentUserId = useAppSelector(selectUserAuth);
   const isOwnProfile = currentUserId === profileUserId;
 
@@ -78,11 +80,11 @@ export const SongSkillShowcase = ({
       .slice(0, 12);
 
     return getAllTiers()
-      .map((t) => ({
-        tier: t,
+      .map((tierDef) => ({
+        tier: tierDef,
         songs: sortedLearned.filter((s) => {
           const songTier = getSongTier(s.avgDifficulty ?? 0);
-          return songTier.tier === t.tier;
+          return songTier.tier === tierDef.tier;
         }),
       }))
       .filter((g) => g.songs.length > 0);
@@ -97,17 +99,15 @@ export const SongSkillShowcase = ({
     const learningCount = userSongs.learning.length;
     return (
       <div className='rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
-        <h2 className='text-2xl font-bold text-white'>Song Repertoire</h2>
+        <h2 className='text-2xl font-bold text-white'>{t("layout.sections.repertoire.title")}</h2>
         <p className='mt-2 text-sm text-zinc-400'>
           {isOwnProfile
-            ? `Songs land here once you mark them as learned on your song board${
-                learningCount > 0
-                  ? `, and ${learningCount} are still in progress`
-                  : ""
-              }.`
-            : `No songs marked as learned yet${
-                learningCount > 0 ? `, ${learningCount} in progress` : ""
-              }.`}
+            ? learningCount > 0
+              ? t("repertoire.empty_owner_learning", { count: learningCount })
+              : t("repertoire.empty_owner")
+            : learningCount > 0
+              ? t("repertoire.empty_visitor_learning", { count: learningCount })
+              : t("repertoire.empty_visitor")}
         </p>
       </div>
     );
@@ -118,12 +118,12 @@ export const SongSkillShowcase = ({
       {/* Header */}
       <div className='mb-6 flex items-center justify-between gap-4'>
         <div>
-          <h2 className='text-2xl font-bold text-white'>Song Repertoire</h2>
+          <h2 className='text-2xl font-bold text-white'>{t("layout.sections.repertoire.title")}</h2>
           <p className='mt-1 text-sm text-zinc-400'>
-            {userSongs.learned.length} songs learned
+            {t("repertoire.learned", { count: userSongs.learned.length })}
             {userSongs.learning.length > 0 && (
               <span className='ml-2 text-cyan-400'>
-                · {userSongs.learning.length} in progress
+                · {t("repertoire.in_progress", { count: userSongs.learning.length })}
               </span>
             )}
           </p>

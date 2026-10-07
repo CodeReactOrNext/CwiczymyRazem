@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { StrumPattern } from "feature/exercisePlan/types/exercise.types";
+import { useTranslation } from "hooks/useTranslation";
 import { memo } from "react";
 
 import type { SlotResult } from "../../hooks/useStrummingMatcher";
@@ -32,6 +33,7 @@ function StrummingPatternViewerInner({
   className, slotFeedback, isMicEnabled, maxReps = 10,
   audioContext: externalAudioContext, volume = 1,
 }: StrummingPatternViewerProps) {
+  const { t } = useTranslation("session");
   const pattern = patterns[0];
   const canvasH = PAD + HEADER_H + ARROW_AREA_H + LABEL_H + DOTS_H + PAD;
 
@@ -63,22 +65,22 @@ function StrummingPatternViewerInner({
             <line x1={4.5} y1={1} x2={4.5} y2={9} stroke={DOWN_COLOR} strokeWidth={2} strokeLinecap="round"/>
             <polyline points="1,6 4.5,12 8,6" fill="none" stroke={DOWN_COLOR} strokeWidth={2} strokeLinejoin="round"/>
           </svg>
-          Down
+          {t("strum.down")}
         </span>
         <span className="flex items-center gap-1">
           <svg width={9} height={14} viewBox="0 0 9 14">
             <line x1={4.5} y1={13} x2={4.5} y2={5} stroke={UP_COLOR} strokeWidth={2} strokeLinecap="round"/>
             <polyline points="1,8 4.5,2 8,8" fill="none" stroke={UP_COLOR} strokeWidth={2} strokeLinejoin="round"/>
           </svg>
-          Up
+          {t("strum.up")}
         </span>
         <span className="flex items-center gap-1">
           <span style={{ color: MUTED_COLOR, fontWeight: 700, fontSize: 11 }}>✕</span>
-          Muted
+          {t("strum.muted")}
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block rounded-lg" style={{ width: 6, height: 6, background: ACCENT_DOT }}/>
-          Accent
+          {t("strum.accent")}
         </span>
         <span className="flex-1" />
         {hasChords && (

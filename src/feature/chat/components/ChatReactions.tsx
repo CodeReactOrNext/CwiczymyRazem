@@ -10,6 +10,7 @@ import {
   type ChatReactionEmoji,
 } from "feature/chat/types/chat.types";
 import { groupReactions } from "feature/chat/utils/chatReactions";
+import { useTranslation } from "hooks/useTranslation";
 import { Reply } from "lucide-react";
 
 const FOCUS_RING =
@@ -27,6 +28,7 @@ export const ChatReactionChips = ({
   onToggle: (emoji: ChatReactionEmoji) => void;
   alignEnd?: boolean;
 }) => {
+  const { t } = useTranslation("chat");
   const groups = groupReactions(reactions, viewerId);
   if (groups.length === 0) return null;
 
@@ -41,7 +43,7 @@ export const ChatReactionChips = ({
           <TooltipTrigger asChild>
             <button
               type='button'
-              aria-label={`React with ${group.emoji}`}
+              aria-label={t("reactions.react_with", { emoji: group.emoji })}
               aria-pressed={group.mine}
               onClick={() => onToggle(group.emoji)}
               className={cn(
@@ -84,7 +86,9 @@ export const ChatMessageActions = ({
   className?: string;
   onReact: (emoji: ChatReactionEmoji) => void;
   onReply?: () => void;
-}) => (
+}) => {
+  const { t } = useTranslation("chat");
+  return (
   <div
     className={cn(
       "z-10 flex shrink-0 items-center gap-0.5 rounded-full bg-zinc-800 p-0.5 transition-opacity",
@@ -97,7 +101,7 @@ export const ChatMessageActions = ({
       <button
         key={emoji}
         type='button'
-        aria-label={`React with ${emoji}`}
+        aria-label={t("reactions.react_with", { emoji })}
         onClick={(event) => {
           event.stopPropagation();
           onReact(emoji);
@@ -112,7 +116,7 @@ export const ChatMessageActions = ({
     {onReply && (
       <button
         type='button'
-        aria-label='Reply'
+        aria-label={t("reactions.reply")}
         onClick={(event) => {
           event.stopPropagation();
           onReply();
@@ -125,4 +129,5 @@ export const ChatMessageActions = ({
       </button>
     )}
   </div>
-);
+  );
+};

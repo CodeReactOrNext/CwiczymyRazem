@@ -9,6 +9,7 @@ import { cn } from "assets/lib/utils";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { useSong } from "feature/songs/hooks/useSong";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronUp, ExternalLink, Music } from "lucide-react";
 import Link from "next/link";
 
@@ -53,6 +54,7 @@ export const SongPreviewDialog = ({
   onClose,
   vote,
 }: SongPreviewDialogProps) => {
+  const { t } = useTranslation("challenges");
   const { data: fullSong, isLoading } = useSong(song?.songId);
 
   const tier = getSongTier(
@@ -115,7 +117,7 @@ export const SongPreviewDialog = ({
                 rel='noopener noreferrer'
                 className='flex items-center gap-3 rounded-lg bg-white/[0.03] px-4 py-5 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-zinc-200'>
                 <ExternalLink className='h-4 w-4 shrink-0' />
-                No Spotify track on this one — look it up on YouTube
+                {t("preview.no_spotify")}
               </a>
             )}
 
@@ -135,7 +137,7 @@ export const SongPreviewDialog = ({
                     <ChevronUp
                       className={cn("h-4 w-4", vote.hasVoted && "fill-current")}
                     />
-                    {vote.hasVoted ? "Backed" : "Back this song"}
+                    {vote.hasVoted ? t("preview.backed") : t("preview.back")}
                     <span className='tabular-nums opacity-60'>
                       {vote.count}
                     </span>
@@ -149,7 +151,7 @@ export const SongPreviewDialog = ({
                   "flex h-11 items-center justify-center rounded-lg bg-white/5 px-4 text-xs font-bold text-zinc-300 transition-colors hover:bg-white/10 hover:text-white",
                   !vote && "flex-1",
                 )}>
-                Open on the song board
+                {t("preview.open_board")}
               </Link>
             </div>
           </div>

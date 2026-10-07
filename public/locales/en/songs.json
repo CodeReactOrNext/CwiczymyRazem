@@ -81,5 +81,286 @@
   "add_songs_from_library": "Add songs from library",
   "your_progress": "Your Progress",
   "drag_and_drop_description": "Drag and drop songs to track your learning journey. Move items between columns to update their status.",
-  "search_placeholder": "Search title or artist..."
+  "search_placeholder": "Search title or artist...",
+  "loading": "Loading...",
+  "page": "Page {{page}}",
+  "rating_cooldown": "Wait {{seconds}}s before rating this song again.",
+  "add_modal": {
+    "added": "Song added to library",
+    "title_info": "Add new song",
+    "title_status": "Set status",
+    "artist_placeholder": "e.g. Led Zeppelin",
+    "title_placeholder": "e.g. Stairway to Heaven",
+    "results": "Search results",
+    "type_to_search": "Type an artist and a title to search",
+    "in_library": "In your library",
+    "add_as_typed": "{{artist}} · add as typed, no cover art",
+    "status_hint": "Pick how far along you are with this song — it decides which of your lists it lands on. You can change it anytime.",
+    "status": {
+      "learning": {
+        "label": "Learning",
+        "hint": "Focus on this song today"
+      },
+      "wantToLearn": {
+        "label": "Want to Learn",
+        "hint": "Save for later inspiration"
+      },
+      "learned": {
+        "label": "Learned",
+        "hint": "Mastered and in repertoire"
+      }
+    },
+    "skip": "Skip for now",
+    "skip_hint": "Adjust status later from the lists"
+  },
+  "arrangements": {
+    "whole_song": "Whole song",
+    "title": "Arrangements",
+    "subtitle": "Each part keeps its own time and mastery",
+    "aria": "Arrangement",
+    "session_one": "1 session",
+    "sessions": "{{count}} sessions",
+    "lead": {
+      "label": "Lead",
+      "hint": "Melodies, licks and solos"
+    },
+    "rhythm": {
+      "label": "Rhythm",
+      "hint": "Chords, riffs and the groove"
+    },
+    "bass": {
+      "label": "Bass",
+      "hint": "The bass line"
+    }
+  },
+  "recommendation": {
+    "view_details": "View Details",
+    "adding": "Adding...",
+    "start_learning": "Start Learning"
+  },
+  "filter_sheet": {
+    "title": "Filter & Sort",
+    "subtitle": "Refine your song discovery experience",
+    "reset": "Reset",
+    "tiers": "Skill tiers",
+    "selected": "{{count}} selected",
+    "genres": "Music genres",
+    "clear": "Clear",
+    "order": "Display order",
+    "sort_by": "Sort by...",
+    "sort_title": "Title (A-Z)",
+    "sort_popularity": "Popularity (High-Low)",
+    "sort_date": "Date added (Newest)",
+    "apply": "Apply changes"
+  },
+  "import_tab": {
+    "unsupported": "Unsupported format. Supported: {{formats}}",
+    "read_error": "Error reading Guitar Pro file. Make sure the file is not corrupted.",
+    "remove": "Remove file",
+    "choose_track": "You hear all tracks, but choose the one you'll practice:",
+    "all_tracks": "All tracks active in background",
+    "drums": "Drum track — no tab notation",
+    "drums_hint": "Drums will play automatically during the session",
+    "processing": "Processing...",
+    "drop": "Drop file here",
+    "import": "Import Tablature",
+    "analyzing": "Analyzing tracks and tempo...",
+    "upload": "Upload GP3 / GP4 / GP5 / GPX / GP file"
+  },
+  "power": {
+    "songs_learned": "{{done}}/{{total}} songs learned",
+    "reveal_one": "Master 1 more song to reveal your tier",
+    "reveal": "Master {{count}} more songs to reveal your tier",
+    "more_songs": "{{count}} more songs",
+    "more_song_one": "1 more song",
+    "as_hard_as": "as hard as {{tier}} to level up",
+    "not_assessed": "Tier not assessed yet",
+    "not_assessed_hint": "Master {{count}} songs to get your power score and tier.",
+    "on_board_one": "song on board",
+    "on_board": "songs on board",
+    "title": "Your skill power",
+    "subtitle": "Based on mastered songs difficulty",
+    "score": "Power score",
+    "score_label": "Power score:",
+    "current_tier": "Current tier",
+    "mastered": "Mastered",
+    "total": "Total",
+    "time_spent": "Time spent",
+    "master_more": "Master more songs to evaluate your level."
+  },
+  "board": {
+    "map_available": "Community section map available",
+    "map": "Map",
+    "not_practiced": "Not practiced yet",
+    "sessions": "Sessions",
+    "play_time": "Play time",
+    "last_practice": "Last practice",
+    "best": "Best",
+    "no_accuracy": "No GP accuracy yet",
+    "remove_favorite": "Remove from favorites",
+    "add_favorite": "Add to favorites",
+    "practice_song": "Practice {{title}}"
+  },
+  "detail": {
+    "back_to_library": "Back to library",
+    "guitar_track": "Guitar track",
+    "tier": "Tier",
+    "last_practiced": "Last practiced",
+    "never": "Never",
+    "remove_title": "Remove song",
+    "remove_body": "Are you sure you want to remove this song from your board?",
+    "my_rating": "My rating",
+    "saving": "Saving…",
+    "rated": "Rated",
+    "tap_to_rate": "Tap to rate",
+    "rated_tooltip": "You rated this song {{rating}}/10 — click a star to change it",
+    "rate_tooltip": "Click a star to rate this song's difficulty (1–10)",
+    "change_rating": "Click the stars to change your rating",
+    "set_rating": "Click the stars to set your rating",
+    "mastery_progress": "Mastery progress",
+    "attached_file": "Attached file",
+    "none": "None",
+    "song_data": "Song data",
+    "total_sections": "Total sections",
+    "practicing_users": "Practicing users",
+    "community_ratings": "Community ratings",
+    "avg_difficulty": "Avg. difficulty",
+    "musician": "Musician",
+    "unknown_musician": "Unknown Musician",
+    "rating_label": "Rating:",
+    "tier_label": "Tier:",
+    "no_ratings": "No ratings yet",
+    "arrangement_mastery": "{{arrangement}} mastery",
+    "song_mastery": "Song mastery",
+    "progression": "Practice progression",
+    "map_to_track": "Map sections to track your progression",
+    "sections_progress": "{{done}} / {{total}} Sections ({{pct}}%)",
+    "unlock_sections": "Unlock section-by-section mastery",
+    "unlock_sections_body": "Mark where the intro, verse, chorus and solo start — every section then tracks its own progress as you practice.",
+    "map_song": "Map this song",
+    "community_mapped": "{{count}} musician(s) already mapped this — you'll be offered to import it when you start.",
+    "add_section": "Add new section",
+    "practice_notes": "Practice notes",
+    "characters": "{{count}} / 500 CHARACTERS",
+    "notes_placeholder": "Add your practice notes here... (e.g. guitar settings, tips for difficult parts, gear used)"
+  },
+  "learning_section": {
+    "browse_library": "Browse Library",
+    "empty_title": "Build your practice list",
+    "empty_body": "Your song board is empty. Add songs from the library to track your progress and manage your learning journey.",
+    "board": "Board",
+    "explore": "Explore",
+    "playlists": "Playlists",
+    "collection": "Your collection"
+  },
+  "parts": {
+    "riff": {
+      "label": "Riff / Fragment",
+      "hint": "You can play the main riff or a fragment of this song."
+    },
+    "solo": {
+      "label": "Solo",
+      "hint": "You can play this song's solo."
+    },
+    "wholeSong": {
+      "label": "Whole song",
+      "hint": "You can play this song start to finish — riff and solo included."
+    },
+    "marked": "marked",
+    "covered": "Covered by Whole song — you already play the full track.",
+    "tap_unmark": "Tap to unmark.",
+    "tap_mark": "Tap to mark it."
+  },
+  "sections": {
+    "empty": "No sections yet — click below to mark the current timestamp",
+    "add": "Add section",
+    "play_from_here": "Play from here",
+    "stop_loop": "Stop loop",
+    "loop": "Loop this section",
+    "delete": "Delete section"
+  },
+  "card": {
+    "practice": "Practice",
+    "not_practiced": "Not practiced",
+    "rated_by_you": "Rated by you",
+    "actions": "Song actions",
+    "open_in_board": "Open in board",
+    "move_to": "Move to {{status}}",
+    "remove_from_collection": "Remove from collection"
+  },
+  "status_labels": {
+    "wantToLearn": "Want to Learn",
+    "learning": "Learning",
+    "learned": "Learned"
+  },
+  "picker": {
+    "not_found": "Song not found",
+    "detached": "GP file detached",
+    "detach_error": "Failed to detach file",
+    "attached": "GP file attached!",
+    "choose_mode": "Choose practice mode",
+    "attach_gp": "Attach GP file",
+    "which_part": "Which part are you playing?",
+    "any_part": "Any part",
+    "free_practice": "Free Practice",
+    "free_practice_hint": "Timer, YouTube player and section mapping",
+    "gp_practice": "GP File Practice",
+    "gp_practice_hint": "Attach a GP file for interactive tablature",
+    "premium": "Premium",
+    "gp_premium_hint": "Attach your own GP5 file for interactive tablature",
+    "upgrade": "Upgrade to Premium",
+    "change_gp": "Change GP file",
+    "log_practice": "Log Practice",
+    "log_practice_hint": "Already played it? Add the time by hand",
+    "my_files": "My files",
+    "import": "Import",
+    "load_error": "Failed to load files",
+    "no_files": "No saved files",
+    "no_files_hint": "Switch to the Import tab to add a file",
+    "attach_error": "Failed to attach file",
+    "save_error": "Failed to save file"
+  },
+  "sheet": {
+    "spotify": "Spotify playback",
+    "popularity": "Popularity",
+    "library_status": "Music library status",
+    "status_desc": {
+      "wantToLearn": "Add to your bucket list",
+      "learning": "Currently practicing",
+      "learned": "Mastered this song"
+    },
+    "in_libraries": "In libraries",
+    "nobody_practicing": "No one practicing yet. Be the first!",
+    "rate_tooltip": "Rate how difficult this song is to play for you.",
+    "you_receive": "You'll receive +{{amount}}",
+    "fame_points": "Fame Points.",
+    "rate_difficulty": "Rate playback difficulty"
+  },
+  "sortable": {
+    "mastery": "Mastery",
+    "remove": "Remove"
+  },
+  "view": {
+    "back_to_playlist": "Back to playlist",
+    "back_to_board": "Back to Board",
+    "back_to_explore": "Back to Explore",
+    "search_yours": "Search your songs...",
+    "total_one": "1 song total",
+    "total": "{{count}} songs total",
+    "sections": {
+      "learning": "Currently learning",
+      "wantToLearn": "Want to learn",
+      "learned": "Mastered songs"
+    },
+    "add_songs": "Add songs",
+    "no_match": "No songs match “{{query}}”",
+    "check_other_tabs": "Nothing here — check the other tabs.",
+    "try_different": "Try a different title or artist.",
+    "section_empty": "Nothing in “{{section}}” yet",
+    "section_empty_hint": "Move a song here from another tab, or add a new one from the library.",
+    "board_empty": "No songs in your board yet",
+    "board_empty_hint": "Add songs from the library to practice them and track your progress here.",
+    "explore_library": "Explore library",
+    "filter_by_tier": "Filter by Tier"
+  }
 }

@@ -1,1 +1,444 @@
-{}
+{
+  "tabs": {
+    "my_plans": "Meine Pläne",
+    "library": "Übungsbibliothek",
+    "practice": "Üben"
+  },
+  "filters": {
+    "all": "Alle",
+    "difficulty": "Schwierigkeit",
+    "category": "Kategorie",
+    "categories": {
+      "technique": "Technik",
+      "theory": "Theorie",
+      "creativity": "Kreativität",
+      "hearing": "Gehör",
+      "mixed": "Gemischt"
+    }
+  },
+  "library": {
+    "title": "Übungsbibliothek",
+    "search_placeholder": "Übungen suchen...",
+    "no_exercises": "Keine Übungen gefunden",
+    "add_exercise": "Übung hinzufügen",
+    "recommended": "Für dich empfohlen",
+    "all_exercises": "Alle Übungen",
+    "fetch_error": "Übungen konnten nicht geladen werden",
+    "no_exercises_yet": "Du hast noch keine Übungen erstellt",
+    "create_first": "Erstelle deine erste Übung",
+    "no_matches": "Keine Übungen entsprechen deinen Filtern"
+  },
+  "practice": {
+    "start": "Üben starten",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
+    "next": "Nächste Übung",
+    "finish": "Session beenden",
+    "notes": "Übungsnotizen",
+    "metronome": {
+      "title": "Metronom",
+      "bpm": "BPM",
+      "start": "Starten bei",
+      "target": "Ziel",
+      "max": "Max."
+    }
+  },
+  "my_plans": {
+    "title": "Meine Übungspläne",
+    "create_new": "Neuen Plan erstellen",
+    "start": "Start",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "no_plans": "Du hast noch keine Übungspläne",
+    "create_dialog": {
+      "title": "Neuen Übungsplan erstellen",
+      "description": "Erstelle einen neuen Übungsplan, um deine Routine zu organisieren",
+      "plan_title": "Titel des Plans",
+      "plan_description": "Beschreibung des Plans",
+      "exercises": "Übungen auswählen",
+      "add_exercise": "Übung hinzufügen",
+      "exercise": "Übung",
+      "exercise_title": "Titel der Übung",
+      "exercise_description": "Beschreibung der Übung",
+      "duration": "Dauer (Minuten)",
+      "metronome": "Metronom-Einstellungen",
+      "min_bpm": "Min. BPM",
+      "max_bpm": "Max. BPM",
+      "recommended_bpm": "Empfohlene BPM",
+      "order_exercises": "Übungen anordnen",
+      "order_description": "Zieh die Übungen, um ihre Reihenfolge zu ändern. Beginne mit dem Aufwärmen und ende mit anspruchsvolleren Übungen.",
+      "selected_exercises": "Ausgewählte Übungen ({{count}})",
+      "select_exercises_description": "Wähle die Übungen aus, die du zu deinem Plan hinzufügen willst"
+    },
+    "form": {
+      "title": "Titel des Plans",
+      "title_placeholder": "Titel des Plans eingeben...",
+      "description": "Beschreibung",
+      "description_placeholder": "Beschreibe deinen Übungsplan...",
+      "difficulty": "Schwierigkeitsgrad",
+      "category": "Hauptfokus",
+      "create": "Plan erstellen"
+    },
+    "create_success": "Plan erfolgreich erstellt",
+    "create_success_description": "Dein Übungsplan wurde erstellt",
+    "create_error": "Plan konnte nicht erstellt werden",
+    "create_error_description": "Beim Erstellen deines Plans ist ein Problem aufgetreten. Bitte versuch es noch einmal.",
+    "empty_state": "Du hast noch keine Übungspläne",
+    "custom_plans": "Eigene Pläne",
+    "custom_plans_description": "Deine persönlichen Übungspläne",
+    "predefined_plans": "Fertige Pläne",
+    "predefined_plans_description": "Von uns vorbereitete Übungspläne",
+    "create_plan": "Plan erstellen",
+    "create_first": "Ersten Plan erstellen",
+    "no_custom_plans": "Du hast noch keine eigenen Übungspläne"
+  },
+  "categories": {
+    "technique": "Technik",
+    "theory": "Theorie",
+    "creativity": "Kreativität",
+    "hearing": "Gehör",
+    "mixed": "Gemischt"
+  },
+  "difficulty": {
+    "beginner": "Anfänger",
+    "easy": "Leicht",
+    "medium": "Mittel",
+    "hard": "Schwer"
+  },
+  "common": {
+    "duration": "{{minutes}} Min.",
+    "exercises": "Übungen",
+    "difficulty": "Schwierigkeit",
+    "category": "Kategorie",
+    "skills": "Fähigkeiten",
+    "instructions": "Anleitung",
+    "tips": "Tipps",
+    "min": "Min.",
+    "cancel": "Abbrechen",
+    "create": "Erstellen",
+    "edit": "Bearbeiten",
+    "preview": "Vorschau",
+    "save": "Änderungen speichern",
+    "back_to_edit": "Zurück zur Bearbeitung",
+    "back": "Zurück",
+    "selected": "ausgewählt",
+    "recommended": "Empfohlen",
+    "more": "mehr",
+    "loading": "Wird geladen...",
+    "next": "Weiter"
+  },
+  "practice_session": {
+    "title": "Übungssession",
+    "current_exercise": "Aktuelle Übung",
+    "next_up": "Als Nächstes",
+    "complete": "Übung abschließen",
+    "skip": "Weiter",
+    "finish": "Session beenden",
+    "metronome": "Metronom",
+    "notes": "Übungsnotizen",
+    "save_note": "Notiz speichern",
+    "time_practiced": "Geübte Zeit",
+    "streak": "Aktuelle Serie",
+    "next_milestone": "Nächster Meilenstein",
+    "no_exercise": "Keine Übung gefunden",
+    "exit": "Session verlassen",
+    "load_error": "Übungsplan konnte nicht geladen werden",
+    "plan_not_found": "Übungsplan nicht gefunden",
+    "total_progress": "Gesamtfortschritt",
+    "exercises": "Übungen",
+    "session_time": "Session-Zeit",
+    "total_duration": "Gesamtdauer",
+    "tablature": "Tabulatur",
+    "fullscreen": "Vollbild umschalten",
+    "zoom_in": "Vergrößern",
+    "zoom_out": "Verkleinern",
+    "reset_zoom": "Zoom zurücksetzen",
+    "timer": "Timer",
+    "start_timer": "Timer starten",
+    "pause_timer": "Timer pausieren",
+    "time_left": "Verbleibende Zeit"
+  },
+  "exercise_cards": {
+    "beginner_fingerpicking": {
+      "title": "Fingerpicking für Anfänger",
+      "description": "Grundlegende Fingerpicking-Muster für Anfänger"
+    },
+    "scale_mastery": {
+      "title": "Tonleiter-Meisterschaft: Pentatonik-Grundlagen",
+      "description": "Meistere die wichtigsten Pentatonik-Muster"
+    },
+    "rhythm_mastery": {
+      "title": "Rhythmus-Meisterschaft: Schlagmuster",
+      "description": "Wichtige Schlagmuster für verschiedene Genres"
+    },
+    "music_theory": {
+      "title": "Grundlagen der Musiktheorie",
+      "description": "Wichtige Konzepte der Musiktheorie für Gitarristen"
+    }
+  },
+  "skills": {
+    "fingerpicking": "Fingerpicking",
+    "scales": "Tonleitern",
+    "chords": "Akkorde",
+    "rhythm": "Rhythmus",
+    "theory": "Theorie",
+    "ear_training": "Gehörbildung",
+    "sight_reading": "Vom-Blatt-Spiel",
+    "improvisation": "Improvisation",
+    "technique": "Technik",
+    "music_theory": "Musiktheorie"
+  },
+  "exercise": {
+    "create_dialog": {
+      "title": "Neue Übung erstellen",
+      "description": "Erstelle eine neue Übung, die du zu Übungsplänen hinzufügen kannst",
+      "details": "Details",
+      "start_practice": "Üben starten",
+      "exercise_title": "Titel der Übung",
+      "exercise_description": "Beschreibung der Übung",
+      "metronome_settings": "Metronom-Einstellungen",
+      "min_bpm": "Minimale BPM",
+      "max_bpm": "Maximale BPM",
+      "recommended_bpm": "Empfohlene BPM",
+      "media": "Medien",
+      "video_url": "Video-URL (YouTube, Vimeo usw.)",
+      "notation_url": "URL zu Noten/Tabs",
+      "attachments": "Anhänge",
+      "tabs": {
+        "basic": "Grunddaten",
+        "details": "Details",
+        "media": "Medien"
+      },
+      "instructions_placeholder": "Schritt-für-Schritt-Anleitung für die Übung...",
+      "tips_placeholder": "Hilfreiche Tipps für besseres Üben...",
+      "skills_select": "Wähle die Fähigkeiten, die mit dieser Übung trainiert werden",
+      "settings_description": "Übungseinstellungen festlegen",
+      "metronome_description": "Lege den Tempobereich für diese Übung fest"
+    },
+    "edit_dialog": {
+      "title": "Übung bearbeiten",
+      "description": "Ändere die Details der Übung"
+    },
+    "create_success": "Übung erfolgreich erstellt",
+    "create_error": "Übung konnte nicht erstellt werden",
+    "create_success_description": "Deine Übung wurde erstellt und zu deiner Bibliothek hinzugefügt",
+    "create_error_description": "Beim Erstellen deiner Übung ist ein Problem aufgetreten. Bitte versuch es noch einmal.",
+    "focus_areas": "Schwerpunkte",
+    "category": "Kategorie",
+    "related_skills": "Zugehörige Fähigkeiten",
+    "instructions": "Anleitung",
+    "tips": "Tipps",
+    "metronome": "Metronom-Einstellungen",
+    "min_bpm": "Minimale BPM",
+    "recommended_bpm": "Empfohlene BPM",
+    "max_bpm": "Maximale BPM",
+    "practice_speed": "Übungstempo",
+    "start_at": "Starten bei",
+    "target": "Ziel",
+    "max": "Max.",
+    "bpm": "BPM",
+    "next": "Nächste Übung",
+    "finish": "Session beenden",
+    "go_to_report": "Zum Eintrag",
+    "tab": "Tab"
+  },
+  "welcome": {
+    "title": "Willkommen beim Gitarrenüben",
+    "description": "Dein persönlicher Übungsassistent, der dir hilft, deine Gitarrenfähigkeiten zu verbessern",
+    "quick_start": "Schnellstart",
+    "get_started": "Jetzt loslegen",
+    "features": {
+      "library": {
+        "title": "Übungsbibliothek",
+        "description": "Stöbere in unserer Sammlung von Übungen für jedes Niveau",
+        "action": "Bibliothek durchsuchen"
+      },
+      "plans": {
+        "title": "Übungspläne",
+        "description": "Erstelle persönliche Übungsroutinen, um deine Ziele zu erreichen",
+        "action": "Plan erstellen"
+      },
+      "progress": {
+        "title": "Fortschritt verfolgen",
+        "description": "Behalte deine Verbesserung im Blick und bleib motiviert",
+        "action": "Fortschritt ansehen"
+      }
+    },
+    "steps": {
+      "browse": "Durchsuche die Übungsbibliothek und finde Übungen, die zu deinem Niveau passen",
+      "create": "Erstelle einen Übungsplan oder füge einzelne Übungen zu deiner Routine hinzu",
+      "practice": "Fang an zu üben – mit eingebautem Metronom und Timer",
+      "track": "Verfolge deinen Fortschritt und feiere deine Verbesserungen"
+    }
+  },
+  "tooltips": {
+    "metronome": "Nutze das Metronom, um im Rhythmus zu bleiben und das Tempo nach und nach zu steigern",
+    "timer": "Leg eine Übungsdauer fest, um konzentriert zu bleiben und deine Übungszeit zu erfassen",
+    "difficulty": "Beginne mit Übungen, die zu deinem aktuellen Niveau passen",
+    "skills": "Konzentrier dich auf Übungen, die bestimmte Gitarrentechniken entwickeln"
+  },
+  "empty_states": {
+    "no_exercises": {
+      "title": "Entdecke Gitarrenübungen",
+      "description": "Starte mit unserer kuratierten Sammlung von Gitarrenübungen oder erstelle eigene",
+      "browse": "Bibliothek durchsuchen",
+      "create": "Übung erstellen",
+      "features": {
+        "browse": "Übungen entdecken",
+        "browse_desc": "Finde Übungen, die zu deinem Niveau und deinen Interessen passen",
+        "create": "Eigene Übungen",
+        "create_desc": "Erstelle und teile deine eigenen Übungen"
+      }
+    },
+    "no_plans": {
+      "title": "Starte deine Gitarrenreise",
+      "description": "Erstelle deinen ersten Übungsplan und entwickle dein Gitarrenspiel",
+      "action": "Ersten Plan erstellen",
+      "features": {
+        "practice": "Strukturiertes Üben",
+        "practice_desc": "Organisiere deine Übungsroutine mit eigenen Plänen",
+        "learn": "Fortschritt verfolgen",
+        "learn_desc": "Behalte deine Entwicklung im Blick und bleib mit Fortschrittsverfolgung motiviert"
+      }
+    }
+  },
+  "help": {
+    "title": "Hilfe & erste Schritte",
+    "description": "Erfahre, wie du das Übungsmodul effektiv nutzt",
+    "need_help": "Brauchst du Hilfe?",
+    "watch_video": "Tutorial ansehen",
+    "getting_started": {
+      "title": "Erste Schritte",
+      "content": "Lerne die Grundlagen zum Erstellen und Befolgen von Übungsplänen"
+    },
+    "creating_plans": {
+      "title": "Übungspläne erstellen",
+      "content": "Erfahre, wie du wirksame Übungspläne erstellst, die zu deinen Zielen passen"
+    }
+  },
+  "goals": {
+    "current_streak": "Aktuelle Serie",
+    "best_streak": "Beste Serie",
+    "days": "Tage",
+    "weekly_goal": "Wochenziel",
+    "minutes": "Minuten",
+    "keep_going": "Weiter so! Du machst das super!",
+    "almost_there": "Fast geschafft!",
+    "goal_reached": "Ziel erreicht! 🎉"
+  },
+  "progression": {
+    "level_up": "Level-Up!",
+    "new_milestone": "Neuer Meilenstein erreicht",
+    "next_milestone": "Nächster Meilenstein",
+    "mastery": "Meisterschaftsfortschritt",
+    "difficulty": "Aktueller Schwierigkeitsgrad"
+  },
+  "quick_practice": {
+    "title": "Schnelle Übungssession",
+    "description": "Erstelle einen zufälligen Übungsplan auf Basis deiner verfügbaren Zeit",
+    "duration": "Verfügbare Zeit",
+    "difficulty": "Niveau",
+    "focus": "Übungsfokus",
+    "generate": "Plan erstellen",
+    "no_exercises": "Keine passenden Übungen für diese Kriterien gefunden",
+    "shortcuts": {
+      "title": "Tastenkürzel",
+      "duration": "Dauer anpassen",
+      "difficulty": "Schwierigkeit wählen",
+      "category": "Kategorie wählen",
+      "generate": "Plan erstellen",
+      "close": "Dialog schließen"
+    }
+  },
+  "plan": {
+    "create_title": "Neuen Übungsplan erstellen",
+    "create_description": "Erstelle einen persönlichen Übungsplan, indem du Übungen auswählst und in die gewünschte Reihenfolge bringst.",
+    "title": "Titel des Plans",
+    "title_placeholder": "z. B. Tägliches Fingerpicking",
+    "description": "Beschreibung des Plans",
+    "description_placeholder": "Beschreibe deinen Übungsplan...",
+    "exercises": "Ausgewählte Übungen",
+    "add_exercise": "Übung hinzufügen",
+    "select_exercises": "Übungen auswählen",
+    "create_success": "Übungsplan erfolgreich erstellt",
+    "total_duration": "Gesamtdauer: {{duration}} Minuten",
+    "steps": {
+      "details": "Details",
+      "exercises": "Übungen auswählen",
+      "order": "Reihenfolge"
+    },
+    "categories": "Kategorien",
+    "selected_exercises": "Ausgewählte Übungen: {{count}}",
+    "tips": {
+      "good_description": "Eine gute Beschreibung hilft dir später, den Zweck dieses Plans zu verstehen",
+      "exercise_order": "Zieh die Übungen, um ihre Reihenfolge zu ändern. Beginne mit dem Aufwärmen und ende mit anspruchsvolleren Übungen."
+    },
+    "summary": "Zusammenfassung des Plans",
+    "total_exercises": "Übungen gesamt",
+    "total_duration_label": "Gesamtdauer",
+    "create": "Plan erstellen"
+  },
+  "errors": {
+    "auth_required": "Du musst angemeldet sein, um einen Plan zu erstellen",
+    "create_plan_failed": "Übungsplan konnte nicht erstellt werden",
+    "load_plan_failed": "Übungsplan konnte nicht geladen werden",
+    "load_plans_failed": "Pläne konnten nicht geladen werden"
+  },
+  "exercise_complete": {
+    "title": "Übung abgeschlossen!",
+    "duration": "Dauer: {{duration}} Minuten",
+    "repeat": "Übung wiederholen",
+    "continue": "Weiter"
+  },
+  "metronome": {
+    "recommended_tempo": "Empfohlenes Tempo",
+    "start": "Start",
+    "stop": "Stopp"
+  },
+  "instructions": "Anleitung",
+  "hints": "Hinweise",
+  "no_instructions": "Keine Anleitung verfügbar.",
+  "auto_plan": {
+    "title": "Automatisch erstellter Übungsplan",
+    "description": "Erstelle einen zufälligen Übungsplan auf Basis deiner verfügbaren Zeit",
+    "duration": "Verfügbare Zeit",
+    "difficulty": "Niveau",
+    "focus": "Übungsfokus",
+    "generate": "Plan erstellen",
+    "generated_plan": "Erstellter Plan",
+    "no_exercises": "Keine passenden Übungen für diese Kriterien gefunden"
+  },
+  "plans": {
+    "title": "Wähle einen Übungsplan",
+    "description": "Wähle den Plan, der am besten zu deinen Bedürfnissen passt",
+    "exercises_count": "{{count}} Übungen",
+    "exercises_count_one": "{{count}} Übung"
+  },
+  "custom_exercise": {
+    "title": "Eigene Übung erstellen",
+    "description": "Füge deinem Plan eine bestimmte Übung hinzu.",
+    "exercise_title": "Titel",
+    "exercise_desc": "Beschreibung",
+    "duration": "Dauer (Minuten)",
+    "category": "Kategorie",
+    "difficulty": "Schwierigkeit",
+    "title_required": "Titel ist erforderlich",
+    "created_success": "Eigene Übung hinzugefügt",
+    "edit_success": "Eigene Übung aktualisiert",
+    "clone_success": "Eigene Übung geklont",
+    "button_label": "Eigene Übung hinzufügen",
+    "edit_button": "Bearbeiten",
+    "clone_button": "Klonen",
+    "save_button": "Änderungen speichern",
+    "instructions": "Anleitung",
+    "tips": "Tipps & Hinweise",
+    "add_instruction_placeholder": "Schritt hinzufügen (Enter drücken)",
+    "add_tip_placeholder": "Tipp hinzufügen (Enter drücken)",
+    "no_instructions_hint": "Noch keine Anleitung hinzugefügt.",
+    "no_tips_hint": "Noch keine Tipps hinzugefügt.",
+    "use_metronome": "Metronom",
+    "video_url": "YouTube-Link",
+    "image_url": "Bild-URL (Tab/Noten)",
+    "invalid_image": "Ungültige Bild-URL"
+  }
+}

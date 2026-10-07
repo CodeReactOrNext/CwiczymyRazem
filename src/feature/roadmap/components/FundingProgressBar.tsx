@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { tierDescription, tierLabel } from "feature/roadmap/utils/tierText";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Check,
   ChevronLeft,
@@ -37,6 +39,7 @@ export const FundingProgressBar = ({
 }: {
   totalRaised: number;
 }) => {
+  const { t } = useTranslation("supporter");
   const scrollRef = useRef<HTMLDivElement>(null);
   const didAutoScroll = useRef(false);
   const goals = ROADMAP_TIERS.map((t) => t.goal);
@@ -116,11 +119,10 @@ export const FundingProgressBar = ({
         <header className='mb-2 flex items-start justify-between gap-4'>
           <div>
             <h2 className='text-base font-semibold text-zinc-100'>
-              The roadmap
+              {t("funding.title")}
             </h2>
             <p className='mt-1 text-sm text-zinc-400'>
-              A running total, not a subscription. Every goal it reaches gets
-              built and stays unlocked for everyone, for good.
+              {t("funding.subtitle")}
             </p>
           </div>
           <div className='shrink-0 text-right'>
@@ -128,7 +130,7 @@ export const FundingProgressBar = ({
               {fundedCount}
               <span className='text-zinc-500'> / {ROADMAP_TIERS.length}</span>
             </p>
-            <p className='text-[11px] text-zinc-500'>goals funded</p>
+            <p className='text-[11px] text-zinc-500'>{t("funding.goals_funded")}</p>
           </div>
         </header>
 
@@ -140,7 +142,7 @@ export const FundingProgressBar = ({
               <div className='pointer-events-none absolute inset-y-0 left-0 z-30 w-16 bg-gradient-to-r from-zinc-900 to-transparent' />
               <button
                 type='button'
-                aria-label='Scroll left'
+                aria-label={t("funding.scroll_left")}
                 onClick={() => scrollBy(-1)}
                 className={cn(
                   SCROLL_BUTTON_CLASS,
@@ -159,7 +161,7 @@ export const FundingProgressBar = ({
               <div className='pointer-events-none absolute inset-y-0 right-0 z-30 w-20 bg-gradient-to-l from-zinc-900 to-transparent' />
               <button
                 type='button'
-                aria-label='Scroll right'
+                aria-label={t("funding.scroll_right")}
                 onClick={() => scrollBy(1)}
                 className={cn(
                   SCROLL_BUTTON_CLASS,
@@ -273,7 +275,7 @@ export const FundingProgressBar = ({
                       {isFeature && (
                         <span className='mb-2 inline-flex items-center gap-1 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300'>
                           <Sparkles size={11} />
-                          Feature
+                          {t("funding.feature")}
                         </span>
                       )}
 
@@ -303,14 +305,14 @@ export const FundingProgressBar = ({
                                     : "text-zinc-600",
                           )}>
                           {done
-                            ? "Done"
+                            ? t("funding.done")
                             : inProgress
-                              ? "In progress"
+                              ? t("funding.in_progress")
                               : reached
-                                ? "Funded"
+                                ? t("funding.funded")
                                 : isNext
                                   ? `+$${tier.goal - totalRaised}`
-                                  : "Locked"}
+                                  : t("funding.locked")}
                         </span>
                       </div>
 
@@ -329,12 +331,12 @@ export const FundingProgressBar = ({
                               ? "font-semibold text-zinc-100"
                               : "text-zinc-300",
                           )}>
-                          {tier.label}
+                          {tierLabel(tier, t)}
                         </p>
                       </div>
                       {tier.description && (
                         <p className='mt-2 text-xs leading-relaxed text-zinc-400'>
-                          {tier.description}
+                          {tierDescription(tier, t)}
                         </p>
                       )}
                     </div>

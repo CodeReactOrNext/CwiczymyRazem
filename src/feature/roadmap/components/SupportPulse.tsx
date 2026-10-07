@@ -4,6 +4,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowUpRight, Heart } from "lucide-react";
 import Link from "next/link";
 
@@ -14,6 +15,7 @@ import { useBuyMeACoffeeFunding } from "../hooks/useBuyMeACoffeeFunding";
  * Mirrors the "Live Now" header styling and links through to the roadmap.
  */
 export const SupportPulse = ({ className = "" }: { className?: string }) => {
+  const { t } = useTranslation("supporter");
   const { raisedThisMonth, supporters, isLoading } = useBuyMeACoffeeFunding();
 
   if (isLoading) return null;
@@ -36,15 +38,15 @@ export const SupportPulse = ({ className = "" }: { className?: string }) => {
               {hasSupport ? (
                 <span className='text-[13px] font-bold'>
                   ${raisedThisMonth}{" "}
-                  <span className='font-medium text-zinc-500'>this month</span>
+                  <span className='font-medium text-zinc-500'>{t("pulse.this_month")}</span>
                 </span>
               ) : (
-                <span className='text-[13px] font-bold'>Support the roadmap</span>
+                <span className='text-[13px] font-bold'>{t("pulse.support")}</span>
               )}
               <span className='text-[11px] font-medium text-zinc-500'>
                 {supporters > 0
-                  ? `${supporters} supporters · community`
-                  : "community support"}
+                  ? t("pulse.supporters", { count: supporters })
+                  : t("pulse.community")}
               </span>
             </div>
             <ArrowUpRight
@@ -57,8 +59,8 @@ export const SupportPulse = ({ className = "" }: { className?: string }) => {
           side='bottom'
           className='max-w-[230px] border-white/10 bg-zinc-900 font-normal leading-relaxed text-zinc-300'>
           {hasSupport
-            ? `${supporters} supporters have chipped in $${raisedThisMonth} this month. It keeps Riff Quest free and funds the roadmap. Tap to see where it goes.`
-            : "Riff Quest is free and funded by the community. Tap to see the roadmap and what your support unlocks next."}
+            ? t("pulse.tooltip", { count: supporters, amount: raisedThisMonth })
+            : t("pulse.tooltip_empty")}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -74,7 +74,7 @@ export const UserTooltip = ({
   const [userData, setUserData] = useState<UserTooltipData | null>(null);
   const [reconciledStreak, setReconciledStreak] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const { t } = useTranslation("common");
+  const { t } = useTranslation(["common", "ui"]);
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [open, setOpen] = useState(false);
   // The card is a hover/tap surface and the feeds using it render a dozen at a
@@ -151,7 +151,7 @@ export const UserTooltip = ({
                 <div className="relative z-10 mb-2 p-3 rounded-lg bg-cyan-50 border border-cyan-100">
                   <div className="flex items-center gap-2 text-cyan-600 font-bold text-[12px]  mb-1.5">
                     <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                    Live Now
+                    {t("ui:live_now")}
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-md bg-cyan-100 text-cyan-600">
@@ -337,7 +337,7 @@ export const UserTooltip = ({
               >
                 <button
                   onClick={() => setOpen(false)}
-                  aria-label="Close"
+                  aria-label={t("ui:close")}
                   className="absolute right-2 top-2 z-30 flex h-7 w-7 items-center justify-center rounded-full bg-gray-900/80 text-gray-200 shadow-lg hover:text-white"
                 >
                   <X size={15} />

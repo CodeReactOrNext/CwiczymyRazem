@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import {
   Tooltip,
   TooltipContent,
@@ -71,6 +72,7 @@ export const SongPartMarks = ({
   size = "sm",
   className,
 }: SongPartMarksProps) => {
+  const { t } = useTranslation("songs");
   // The mark that was just switched on — drives the one-shot pop/burst animation.
   const [justMarked, setJustMarked] = useState<SongPart | null>(null);
   const clearTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -167,17 +169,17 @@ export const SongPartMarks = ({
                 className="max-w-[230px] border-white/10 bg-zinc-900 text-xs text-zinc-200"
               >
                 <p className="font-bold">
-                  {meta.label}
-                  {isMarked && !isCovered && " — marked"}
+                  {t(`parts.${part}.label`, meta.label)}
+                  {isMarked && !isCovered && ` — ${t("parts.marked")}`}
                 </p>
                 <p className="mt-1 text-zinc-400">
                   {isCovered
-                    ? "Covered by Whole song — you already play the full track."
-                    : meta.hint}
+                    ? t("parts.covered")
+                    : t(`parts.${part}.hint`, meta.hint)}
                 </p>
                 {isInteractive && (
                   <p className="mt-1 text-zinc-500">
-                    {isMarked ? "Tap to unmark." : "Tap to mark it."}
+                    {isMarked ? t("parts.tap_unmark") : t("parts.tap_mark")}
                   </p>
                 )}
               </TooltipContent>

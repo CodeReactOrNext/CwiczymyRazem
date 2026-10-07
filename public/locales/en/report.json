@@ -15,7 +15,6 @@
   "max_days": "Max {{days}} days",
   "add_report_to_day": "You add report do day:",
   "total_time": "Total time",
-
   "toast": {
     "log_out": "Log out successfully",
     "24h_error": "It is not possible to exercise more than 24 hours per day",
@@ -55,7 +54,6 @@
       "description": "Recording yourself allows you to see and hear your playing from a different perspective than when you play live. This can help you notice mistakes or weaknesses that you might have missed. "
     }
   },
-
   "rating_popup": {
     "title": "YOU GOT",
     "points": "pts",
@@ -74,14 +72,12 @@
     "achievement_reward": "Reward waiting:",
     "collect_reward": "Collect it in your profile"
   },
-
   "skills": {
     "technique": "Technique",
     "theory": "Theory",
     "hearing": "Hearing",
     "creativity": "Creativity"
   },
-
   "chart": {
     "categories": {
       "technique": "Technique",
@@ -89,5 +85,107 @@
       "hearing": "Hearing",
       "creativity": "Creativity"
     }
+  },
+  "back": "Back",
+  "hours": "Hours",
+  "minutes": "Minutes",
+  "double_click_to_type": "Double-click to type",
+  "errors": {
+    "invalid_time": "Invalid time values entered",
+    "title_too_long": "Session headlines is too long (max 60 characters)",
+    "check_fields": "Please check all fields and try again"
+  },
+  "long_session": {
+    "title": "That's a long session!",
+    "body": "You're about to report {{time}} of practice. We know that's a lot — please double-check it's not a mistake before submitting.",
+    "confirm": "Are you sure you want to report this time?",
+    "back": "Back to edit",
+    "accept": "Yes, report it"
+  },
+  "form": {
+    "log_another": "Log another session",
+    "time_entered": "Time entered. Save it now or add optional details below.",
+    "song_selected": "Song selected — set how long you played it.",
+    "pick_songs": "Pick the songs you played and set the time on each one.",
+    "what_practiced": "What did you practice today? Add time below.",
+    "mode_free": "Free session",
+    "mode_songs": "Songs",
+    "save_now": "Save Now",
+    "more_details": "Or add more details below",
+    "add_time_hint": "Add time to at least one category to save",
+    "healthy_habits": "Healthy habits",
+    "focus_habits": "Session focus & habits",
+    "optional": "Optional",
+    "session_title": "Session title",
+    "session_title_placeholder": "e.g. Practicing major scales",
+    "habits_checklist": "Habits checklist",
+    "streak_bonus": "{{count}}-day streak — points ×{{multiplier}}",
+    "no_streak_bonus": "No streak yet — points ×{{multiplier}}",
+    "finalize": "Finalize Log",
+    "optional_details": "Optional Details",
+    "when": "When did this happen?",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "days_ago": "{{count}} days ago",
+    "selected": "Selected:",
+    "saving": "Saving...",
+    "finish_save": "Finish & Save Practice"
+  },
+  "tag_groups": {
+    "goal": "Goal",
+    "playing_style": "Playing Style",
+    "techniques": "Techniques",
+    "theory_knowledge": "Theory & Knowledge",
+    "creative": "Creative",
+    "performance": "Performance"
+  },
+  "tags": {
+    "warmup": "Warmup",
+    "technique": "Technique",
+    "speed_building": "Speed Building",
+    "ear_training": "Ear Training",
+    "fingerpicking": "Fingerpicking",
+    "rhythm_training": "Rhythm Training",
+    "vibrato": "Vibrato",
+    "bends": "Bends",
+    "legato": "Legato",
+    "alt_picking": "Alt Picking",
+    "hybrid_picking": "Hybrid Picking",
+    "sweep_picking": "Sweep Picking",
+    "tapping": "Tapping",
+    "picking_control": "Picking Control",
+    "string_skipping": "String Skipping",
+    "down_picking": "Down Picking",
+    "scales": "Scales",
+    "arpeggios": "Arpeggios",
+    "chords": "Chords",
+    "theory": "Theory",
+    "sight_reading": "Sight Reading",
+    "transcribing": "Transcribing",
+    "improvisation": "Improvisation",
+    "new_song": "New Song",
+    "song_writing": "Song Writing",
+    "composition": "Composition",
+    "jamming": "Jamming",
+    "performance_prep": "Performance Prep",
+    "performing": "Performing",
+    "cover_song": "Cover Song",
+    "soloing": "Soloing",
+    "recording": "Recording"
+  },
+  "songs": {
+    "less": "5 minutes less of {{label}}",
+    "minutes_of": "Minutes of {{label}} on this song",
+    "more": "5 minutes more of {{label}}",
+    "remove": "Remove {{title}} from this session",
+    "any_part": "Any part",
+    "empty_title": "Your library is empty",
+    "empty_body": "Add songs you are working on and you will be able to log practice time straight onto them.",
+    "browse": "Browse songs",
+    "done_adding": "Done adding",
+    "add_song": "Add song",
+    "search": "Search your library...",
+    "limit": "{{max}} songs is the most one session can hold.",
+    "no_match": "Nothing in your library matches that."
   }
 }

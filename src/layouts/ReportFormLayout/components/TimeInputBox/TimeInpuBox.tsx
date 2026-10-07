@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Card } from "assets/components/ui/card";
 import type {
   WheelPickerOption} from "assets/components/wheel-picker";
@@ -44,6 +45,7 @@ const TimeInputBox = ({
   skillId,
   errors,
 }: TimeInputBoxProps) => {
+  const { t } = useTranslation("report");
   const { values, setFieldValue } = useFormikContext<ReportFormikInterface>();
   const [isOpen, setIsOpen] = useState(false);
   const [editingHours, setEditingHours] = useState(false);
@@ -211,7 +213,7 @@ const TimeInputBox = ({
               <div
                 className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-lg bg-zinc-800/60 backdrop-blur-sm"
                 onDoubleClick={startEditHours}
-                title="Double-click to type">
+                title={t("double_click_to_type")}>
                 {editingHours ? (
                   <input
                     ref={hoursInputRef}
@@ -242,7 +244,7 @@ const TimeInputBox = ({
                 )}
               </div>
               <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
-                Hours
+                {t("hours")}
               </span>
             </div>
 
@@ -255,7 +257,7 @@ const TimeInputBox = ({
               <div
                 className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-lg bg-zinc-800/60 backdrop-blur-sm"
                 onDoubleClick={startEditMinutes}
-                title="Double-click to type">
+                title={t("double_click_to_type")}>
                 {editingMinutes ? (
                   <input
                     ref={minutesInputRef}
@@ -286,7 +288,7 @@ const TimeInputBox = ({
                 )}
               </div>
               <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
-                Minutes
+                {t("minutes")}
               </span>
             </div>
           </div>

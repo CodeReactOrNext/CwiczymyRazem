@@ -11,6 +11,7 @@ import type {
 } from "feature/challenges/types/challenge.types";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { extractVideoId } from "feature/songs/utils/youtube.utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Music, Play } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -34,6 +35,7 @@ export const SubmissionsDialog = ({
   currentUserId,
   onClose,
 }: SubmissionsDialogProps) => {
+  const { t } = useTranslation("challenges");
   const [openRecordingId, setOpenRecordingId] = useState<string | null>(null);
 
   return (
@@ -46,10 +48,11 @@ export const SubmissionsDialog = ({
             </DialogTitle>
             <p className='text-sm font-medium text-zinc-500'>
               {submissions.length === 0
-                ? "Nobody has taken this one on yet — be first."
-                : `${submissions.length} ${
-                    submissions.length === 1 ? "run" : "runs"
-                  } on ${song?.artist}`}
+                ? t("runs.nobody")
+                : t(submissions.length === 1 ? "runs.count_one" : "runs.count", {
+                    count: submissions.length,
+                    artist: song?.artist,
+                  })}
             </p>
           </DialogHeader>
 
@@ -102,7 +105,7 @@ export const SubmissionsDialog = ({
                       )}
                       {submission.userName}
                       {isMine && (
-                        <span className='font-bold text-cyan-300'>you</span>
+                        <span className='font-bold text-cyan-300'>{t("runs.you")}</span>
                       )}
                     </span>
                   </span>
@@ -112,7 +115,7 @@ export const SubmissionsDialog = ({
 
             {submissions.length > 0 && (
               <p className='px-1 pt-2 text-[11px] font-medium text-zinc-600'>
-                Tap a run to watch it, leave a comment or drop a like.
+                {t("runs.tap_hint")}
               </p>
             )}
 
@@ -122,8 +125,7 @@ export const SubmissionsDialog = ({
                   <Music size={26} />
                 </div>
                 <p className='max-w-xs text-sm text-zinc-500'>
-                  No runs yet. Record it, post the link, and take the first
-                  slot.
+                  {t("runs.empty")}
                 </p>
               </div>
             )}
@@ -133,7 +135,7 @@ export const SubmissionsDialog = ({
             <Link
               href={`/songs?view=explore&songId=${song.songId}`}
               className='mt-2 text-xs font-bold text-cyan-400 hover:text-cyan-300'>
-              Open “{song.title}” in the song board
+              {t("runs.open_song", { title: song.title })}
             </Link>
           )}
         </DialogContent>

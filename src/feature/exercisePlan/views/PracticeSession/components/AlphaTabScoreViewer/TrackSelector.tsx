@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 
 import type { Track } from "./types";
 
@@ -10,11 +11,12 @@ interface TrackSelectorProps {
 
 /** Renders track-selection buttons. Hidden when there is only one track. */
 export const TrackSelector = ({ tracks, selectedIdx, onSelect }: TrackSelectorProps) => {
+  const { t } = useTranslation("session");
   if (tracks.length <= 1) return null;
 
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-[10px] text-zinc-500 shrink-0">Track:</span>
+      <span className="text-[10px] text-zinc-500 shrink-0">{t("track")}</span>
       {tracks.map((track) => (
         <button
           key={track.idx}

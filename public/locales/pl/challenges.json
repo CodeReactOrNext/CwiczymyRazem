@@ -1,0 +1,118 @@
+{
+  "view": {
+    "ballot_eyebrow": "Głosowanie społeczności",
+    "monthly": "Wyzwanie miesiąca",
+    "vote_title": "Wybierz tablicę na przyszły miesiąc",
+    "archive_title": "Archiwum wyzwań",
+    "vote_subtitle": "Top {{count}} z głosowania na {{month}} trafi na następną tablicę.",
+    "archive_subtitle": "Każda zamknięta tablica — nadal do przeglądania i grania.",
+    "board_subtitle": "Pięć utworów wybranych przez społeczność co miesiąc. Nagraj wszystkie, żeby zaliczyć.",
+    "tabs": {
+      "board": "Ten miesiąc",
+      "vote": "Głosuj",
+      "archive": "Archiwum"
+    },
+    "not_up_title": "Tablica na ten miesiąc jeszcze nie wisi",
+    "not_up_body": "Powstaje z głosowania społeczności. Wejdź w Głosuj i zgłoś utwór.",
+    "open_ballot": "Otwórz głosowanie",
+    "back_to_archive": "Wróć do archiwum"
+  },
+  "hero": {
+    "live_subtitle": "Wybrane przez społeczność — nagraj wszystkie ({{count}}), żeby zaliczyć",
+    "closed_subtitle": "Zamknięte — nagrania nadal trafiają na tablicę, ale bez punktów i fame",
+    "closes_today": "zamyka się dziś",
+    "day_left": "został {{count}} dzień",
+    "days_left": "Pozostało dni: {{count}}",
+    "closed": "zamknięte",
+    "points_per_run": "punktów za nagranie",
+    "fame_per_run": "fame za nagranie",
+    "fame_full_board": "fame za całą tablicę",
+    "your_runs": "Twoje nagrania",
+    "player": "{{count}} gracz",
+    "players": "Gracze: {{count}}",
+    "cleared": "Zaliczyli: {{count}}"
+  },
+  "board": {
+    "listen": "Posłuchaj: {{title}} — {{artist}}",
+    "vote": "{{count}} głos",
+    "votes": "Głosy: {{count}}",
+    "done": "Gotowe",
+    "submit": "Wyślij",
+    "cleared": "Tablica zaliczona",
+    "final_stop": "Ostatni przystanek",
+    "bonus_yours": "Wszystkie utwory nagrane — bonus {{bonus}} fame jest twój.",
+    "clean_sweep": "Wszystkie utwory nagrane — komplet w archiwum.",
+    "one_more_month": "Jeszcze {{count}} nagranie do zaliczenia miesiąca",
+    "more_month": "Brakujące nagrania do zaliczenia miesiąca: {{count}}",
+    "one_more_board": "Jeszcze {{count}} nagranie do zaliczenia tej tablicy",
+    "more_board": "Brakujące nagrania do zaliczenia tej tablicy: {{count}}"
+  },
+  "archive": {
+    "empty_title": "Archiwum jest puste",
+    "empty_body": "Gdy ten miesiąc się zamknie, trafi tutaj razem z każdym nagraniem, które dostało się na tablicę.",
+    "songs_runs": "Utwory: {{songs}} · nagrania: {{runs}}",
+    "cleared_it": "Zaliczyli: {{count}}"
+  },
+  "submit": {
+    "title": "Wyślij nagranie",
+    "youtube_link": "Link do YouTube",
+    "bad_link": "To nie wygląda na link do YouTube — użyj np. youtube.com/watch?v=… albo youtu.be/…",
+    "link_hint": "Np. youtube.com/watch?v=… albo youtu.be/… — niepubliczne filmy działają, prywatne nie odtworzą się innym.",
+    "title_label": "Tytuł",
+    "notes": "Notatki",
+    "optional": "opcjonalne",
+    "notes_placeholder": "Sprzęt, tempo, z czym miałeś problem…",
+    "points": "punktów",
+    "fame": "fame",
+    "clear_bonus": "bonus za zaliczenie",
+    "last_song": "To twój ostatni utwór na tablicy.",
+    "closed_board": "Ta tablica jest zamknięta, więc nagranie daje {{none}} — po prostu zajmuje swoje miejsce w archiwum.",
+    "no_rewards": "zero punktów i fame",
+    "visibility": "Każdy może je obejrzeć w nagraniach tego utworu, w aktywności i w twoich Nagraniach. Jedno nagranie na utwór, więc wyślij wersję, z której jesteś zadowolony.",
+    "cancel": "Anuluj",
+    "submit_run": "Wyślij nagranie"
+  },
+  "runs": {
+    "nobody": "Nikt jeszcze się tego nie podjął — bądź pierwszy.",
+    "count_one": "{{count}} nagranie: {{artist}}",
+    "count": "Nagrania ({{artist}}): {{count}}",
+    "you": "ty",
+    "tap_hint": "Stuknij nagranie, żeby je obejrzeć, skomentować albo polubić.",
+    "empty": "Brak nagrań. Nagraj, wrzuć link i zajmij pierwsze miejsce.",
+    "open_song": "Otwórz „{{title}}” na tablicy utworów"
+  },
+  "preview": {
+    "no_spotify": "Brak tego utworu na Spotify — poszukaj go na YouTube",
+    "backed": "Poparty",
+    "back": "Poprzyj ten utwór",
+    "open_board": "Otwórz na tablicy utworów"
+  },
+  "ballot": {
+    "put_up_by": "zgłosił(a) {{name}}",
+    "voted_by": "Głosowali:",
+    "out_of_votes": "Wykorzystałeś już wszystkie głosy w tym miesiącu ({{count}}).",
+    "rules": "Masz {{votes}} na miesiąc. Zgłoś utwór albo poprzyj taki, który już jest w głosowaniu — zgłoszenie też zużywa głos. Gdy miesiąc się skończy, top {{top}} staje się nowym wyzwaniem. Przy remisie wygrywa ten, kto zgłosił utwór wcześniej.",
+    "votes_count": "głosy: {{count}}",
+    "nominate": "Zgłoś utwór",
+    "votes_left_of": "Pozostałe głosy: {{left}} z {{total}}",
+    "sign_in": "Zaloguj się, żeby głosować",
+    "empty_title": "Głosowanie jest puste",
+    "empty_body": "Na {{month}} nikt jeszcze nic nie zgłosił. Pierwsze zgłoszenie nada ton.",
+    "below_cut": "pod kreską — potrzeba więcej głosów, żeby trafić na tablicę",
+    "vote_left": "został {{count}} głos",
+    "votes_left": "Pozostałe głosy: {{count}}",
+    "pick_existing": "Wybranie utworu, który już jest w głosowaniu, po prostu dodaje do niego twój głos."
+  },
+  "toast": {
+    "archive_cleared": "Tablica z archiwum zaliczona! Spóźnione nagrania nie dają punktów ani fame.",
+    "archive_added": "Nagranie dodane do archiwum — zamknięta tablica nie daje punktów ani fame.",
+    "accepted_fame_only": "Nagranie przyjęte — +{{fame}} fame. Punkty kończą się po {{count}} utworach na jednej tablicy.",
+    "board_cleared": "Tablica zaliczona! +{{points}} punktów i +{{fame}} fame",
+    "accepted": "Nagranie przyjęte — +{{points}} punktów, +{{fame}} fame",
+    "already_submitted": "Masz już nagranie tego utworu.",
+    "submit_failed": "Nie udało się wysłać nagrania. Spróbuj ponownie.",
+    "nominated": "Zgłoszone — twój głos już na nim jest.",
+    "nominate_failed": "Nie udało się dodać zgłoszenia.",
+    "vote_failed": "Nie udało się zapisać głosu."
+  }
+}

@@ -4,6 +4,7 @@ import { cn } from "assets/lib/utils";
 import confetti from "canvas-confetti";
 import { animate, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Check, Flame, Star, Target, Trophy } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -93,7 +94,7 @@ export const ExerciseSuccessView = ({
   timing,
   failMessage,
 }: ExerciseSuccessViewProps) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation(["common", "session"]);
   const [isVisible, setIsVisible] = useState(false);
   const [displayScore, setDisplayScore] = useState(0);
 
@@ -221,14 +222,21 @@ export const ExerciseSuccessView = ({
                   <h2 className={cn('text-2xl font-bold tracking-tight',
                     stars === 3 ? 'text-amber-400' : isPassed ? 'text-zinc-100' : 'text-red-400'
                   )}>
-                    {stars === 3 ? 'Mastered!' : isPassed ? 'Exam Passed!' : 'Exam Failed'}
+                    {stars === 3 ? t('session:success.mastered') : isPassed ? t('session:success.passed') : t('session:success.failed')}
                   </h2>
                   <p className="text-zinc-500 text-sm mt-0.5">
                     {stars === 3
-                      ? 'Flawless performance.'
+                      ? t('session:success.flawless')
                       : isPassed
-                      ? 'Nice work — a couple more runs and you\'ll nail every note.'
-                      : failMessage ?? <>Missed by <span className="text-zinc-200 font-semibold">{Math.ceil(nextStarDist)}</span> pts. Give it another shot!</>
+                      ? t('session:success.nice_work')
+                      : failMessage ?? (
+                          <Interpolate
+                            text={t('session:success.missed_by')}
+                            values={{
+                              points: <span className="text-zinc-200 font-semibold">{Math.ceil(nextStarDist)}</span>,
+                            }}
+                          />
+                        )
                     }
                   </p>
                 </motion.div>
@@ -258,13 +266,13 @@ export const ExerciseSuccessView = ({
               {isExam && (
                 <div className="flex items-end justify-between mb-6">
                   <div>
-                    <p className="text-[11px] font-semibold text-zinc-500 tracking-wide mb-1">Total score</p>
+                    <p className="text-[11px] font-semibold text-zinc-500 tracking-wide mb-1">{t("session:success.total_score")}</p>
                     <div className="font-teko text-5xl font-bold text-zinc-100 tabular-nums leading-none">{displayScore.toLocaleString()}</div>
                   </div>
                   {/* Tier badge */}
                   <div className={cn('flex flex-col items-center justify-center h-14 w-14 rounded-lg', tier.bg)}>
                     <span className={cn('text-2xl font-black leading-none', tier.color)}>{tierKey}</span>
-                    <span className="text-zinc-500 text-[9px] tracking-wide mt-0.5">Grade</span>
+                    <span className="text-zinc-500 text-[9px] tracking-wide mt-0.5">{t("session:success.grade")}</span>
                   </div>
                 </div>
               )}
@@ -275,10 +283,10 @@ export const ExerciseSuccessView = ({
               {hasStats && (
                 <div className="rounded-lg bg-zinc-800/40 px-4 py-4">
                   <div className="grid grid-cols-3 gap-2">
-                    <StatItem icon={<Target className="h-4 w-4" />} value={`${accuracy}%`} label="Accuracy" accent="text-cyan-400" />
-                    <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label="Max combo" accent="text-orange-400" />
+                    <StatItem icon={<Target className="h-4 w-4" />} value={`${accuracy}%`} label={t("session:success.accuracy")} accent="text-cyan-400" />
+                    <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label={t("session:success.max_combo")} accent="text-orange-400" />
                     {!isExam && (
-                      <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label="Score" />
+                      <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label={t("session:success.score")} />
                     )}
                   </div>
                   {timing && <TimingBreakdown timing={timing} className="mt-6" />}
@@ -293,12 +301,12 @@ export const ExerciseSuccessView = ({
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
               className="relative px-7 py-5">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-[11px] font-semibold text-zinc-500 tracking-wide">Performance over time</p>
+                <p className="text-[11px] font-semibold text-zinc-500 tracking-wide">{t("session:success.over_time")}</p>
                 <span className="text-[11px] text-zinc-600">{timeline!.length} notes</span>
               </div>
 
               <ChartContainer
-                config={{ accuracy: { label: "Accuracy", color: chartStroke } }}
+                config={{ accuracy: { label: t("session:success.accuracy"), color: chartStroke } }}
                 className="h-[90px] w-full">
                 <AreaChart data={chartData} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
                   <defs>
@@ -315,7 +323,7 @@ export const ExerciseSuccessView = ({
                       y={80}
                       stroke="rgba(255,255,255,0.1)"
                       strokeDasharray="4 3"
-                      label={{ value: "Pass", position: 'right', fontSize: 9, fill: 'rgba(255,255,255,0.2)' }}
+                      label={{ value: t("session:success.pass"), position: 'right', fontSize: 9, fill: 'rgba(255,255,255,0.2)' }}
                     />
                   )}
                   <ChartTooltip
@@ -325,7 +333,7 @@ export const ExerciseSuccessView = ({
                       if (active && payload?.length) {
                         return (
                           <div className="rounded-lg bg-zinc-950/90 px-3 py-2 text-xs">
-                            <span className="text-zinc-400">Accuracy </span>
+                            <span className="text-zinc-400">{t("session:success.accuracy")} </span>
                             <span className="text-zinc-100 font-bold">{payload[0].value}%</span>
                           </div>
                         );
@@ -356,7 +364,7 @@ export const ExerciseSuccessView = ({
                 onClick={onRestart}
                 disabled={isLoading}
                 className="flex-1 h-10 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-sm font-medium">
-                Try Again
+                {t("session:timing.try_again")}
               </Button>
             )}
             <Button
@@ -371,11 +379,11 @@ export const ExerciseSuccessView = ({
               {isLoading ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 border-zinc-400 border-t-zinc-950 rounded-full animate-spin" />
-                  <span>Saving…</span>
+                  <span>{t("session:saving")}</span>
                 </>
               ) : (
                 <>
-                  <span>{isExam && !isPassed ? 'Back to Menu' : t("practice.finish")}</span>
+                  <span>{isExam && !isPassed ? t('session:success.back_to_menu') : t("practice.finish")}</span>
                   {(!isExam || isPassed) && <Check className="h-3.5 w-3.5" />}
                 </>
               )}

@@ -2,6 +2,7 @@ import type {
   EarQuizConfig,
   EarQuizMode,
 } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
+import { useTranslation } from "hooks/useTranslation";
 
 import { useEarQuizGame } from "../../hooks/useEarQuizGame";
 import { ChordTypeQuiz } from "./ChordTypeQuiz";
@@ -36,6 +37,7 @@ export function EarQuizPanel({
   exerciseId,
   isSessionRunning,
 }: EarQuizPanelProps) {
+  const { t } = useTranslation("session");
   const { question, round, isAnswered, isCorrect, stats, answer, next } =
     useEarQuizGame(config, exerciseId);
 
@@ -45,7 +47,7 @@ export function EarQuizPanel({
 
   return (
     <EarQuizCard>
-      <EarQuizHeader label={MODE_LABEL[config.mode]} stats={stats} />
+      <EarQuizHeader label={t(`quiz.modes.${config.mode}`, MODE_LABEL[config.mode])} stats={stats} />
       {isSessionRunning === false && <StartTimerHint />}
 
       {question.kind === "chordType" && (
