@@ -3,10 +3,8 @@ import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import { TierPlate } from "feature/arsenal/components/TierPlate";
-import {
-  getPartLabel,
-  PART_TIER_COLORS,
-} from "feature/arsenal/data/partDefinitions";
+import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { HonorMark } from "feature/guilds/components/HonorMark";
 import { useTranslation } from "hooks/useTranslation";
@@ -53,6 +51,7 @@ export const PartAmountCard = ({
 }: PartAmountCardProps) => {
   const [qty, setQty] = useState(part.qty);
   const { t } = useTranslation("guilds");
+  const labels = useArsenalLabels();
   const color = PART_TIER_COLORS[part.tier];
   const verbKey = mode === "deposit" ? "parts.leave" : "parts.take";
 
@@ -88,12 +87,12 @@ export const PartAmountCard = ({
             className='text-[11px] font-semibold tracking-wide'
             style={{ color }}>
             {t("parts.tier_part", {
-              tier: t(`parts.tiers.${part.tier}`, part.tier),
+              tier: labels.partTier(part.tier),
             })}
           </span>
           <div className='flex min-w-0 items-center gap-2'>
             <span className='truncate text-xl font-black text-zinc-100'>
-              {getPartLabel(part.partId)}
+              {labels.part(part.partId)}
             </span>
             <Chip className='shrink-0 px-2 py-0.5 tabular-nums'>
               ×{part.qty}

@@ -483,12 +483,6 @@
   },
   "parts": {
     "tier_part": "{{tier}}-Teil",
-    "tiers": {
-      "Standard": "Standard",
-      "Epic": "Episch",
-      "Legendary": "Legendär",
-      "Unique": "Einzigartig"
-    },
     "of": "von {{count}}",
     "how_many_leave": "Wie viele ablegen",
     "how_many_take": "Wie viele nehmen",

@@ -483,12 +483,6 @@
   },
   "parts": {
     "tier_part": "Pieza {{tier}}",
-    "tiers": {
-      "Standard": "estándar",
-      "Epic": "épica",
-      "Legendary": "legendaria",
-      "Unique": "única"
-    },
     "of": "de {{count}}",
     "how_many_leave": "Cuántas dejar",
     "how_many_take": "Cuántas llevarte",

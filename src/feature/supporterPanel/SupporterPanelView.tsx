@@ -13,6 +13,7 @@ import { SupporterWall } from "feature/supportTeam/components/SupporterWall";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { WorkBoardTab } from "feature/workBoard/components/WorkBoardTab";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Compass,
   Guitar,
@@ -37,15 +38,16 @@ type SupporterTab =
   | "info"
   | "players";
 
-const TABS: { id: SupporterTab; label: string; icon: typeof Map }[] = [
-  { id: "roadmap", label: "Roadmap", icon: Map },
-  { id: "gear", label: "Gear", icon: Guitar },
-  { id: "case", label: "Supporter Case", icon: Package },
-  { id: "guild", label: "Found a Guild", icon: Shield },
-  { id: "work", label: "In the works", icon: Hammer },
-  { id: "wall", label: "Supporters", icon: Heart },
-  { id: "players", label: "Player Roadmaps", icon: Compass },
-  { id: "info", label: "Info", icon: Info },
+/** Labels are keys in `supporter:panel.tabs`. */
+const TABS: { id: SupporterTab; icon: typeof Map }[] = [
+  { id: "roadmap", icon: Map },
+  { id: "gear", icon: Guitar },
+  { id: "case", icon: Package },
+  { id: "guild", icon: Shield },
+  { id: "work", icon: Hammer },
+  { id: "wall", icon: Heart },
+  { id: "players", icon: Compass },
+  { id: "info", icon: Info },
 ];
 
 /** A tab somebody linked to — the gear board sends people back to its own. */
@@ -62,6 +64,7 @@ const isSupporterTab = (value: unknown): value is SupporterTab =>
  * were left.
  */
 export const SupporterPanelView = () => {
+  const { t } = useTranslation("supporter");
   const router = useRouter();
   const [tab, setTab] = useState<SupporterTab>(() =>
     isSupporterTab(router.query.tab) ? router.query.tab : "roadmap",
@@ -90,9 +93,9 @@ export const SupporterPanelView = () => {
   return (
     <div className='font-openSans flex w-full flex-col'>
       <HeroBanner
-        title='Supporter panel'
-        subtitle='See what is being built, pick what comes next, and set the week the whole app plays.'
-        eyebrow='Supporters'
+        title={t("panel.title")}
+        subtitle={t("panel.subtitle")}
+        eyebrow={t("panel.eyebrow")}
         eyebrowClassName='text-amber-400/80'
         backgroundContent={<HeroPattern variant='heart' />}
         className='min-h-[150px] w-full !rounded-none !shadow-none md:min-h-[120px] lg:min-h-[140px]'
@@ -123,7 +126,7 @@ export const SupporterPanelView = () => {
             {/* Nine tabs, so the rail scrolls sideways on a phone rather than
                 wrapping into three rows of its own. */}
             <div className={tabNavListClass}>
-              {TABS.map(({ id, label, icon: Icon }) => (
+              {TABS.map(({ id, icon: Icon }) => (
                 <button
                   key={id}
                   type='button'
@@ -131,7 +134,7 @@ export const SupporterPanelView = () => {
                   aria-pressed={tab === id}
                   className={tabNavItemClass(tab === id)}>
                   <Icon size={16} className='shrink-0' />
-                  {label}
+                  {t(`panel.tabs.${id}`)}
                 </button>
               ))}
             </div>

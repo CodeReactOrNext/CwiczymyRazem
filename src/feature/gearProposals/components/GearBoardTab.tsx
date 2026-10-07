@@ -12,6 +12,7 @@ import type {
 } from "feature/gearProposals/types/gearProposal.types";
 import { groupProposals } from "feature/gearProposals/utils/gearProposal.utils";
 import { GEAR_PROPOSAL_COST } from "feature/supporterPanel/constants/supporterPanel.constants";
+import { useTranslation } from "hooks/useTranslation";
 import { Guitar, Plus } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -48,29 +49,28 @@ const ProposeGearButton = ({
 }: {
   affordable: boolean;
   className?: string;
-}) =>
-  affordable ? (
+}) => {
+  const { t } = useTranslation("supporter");
+  return affordable ? (
     <Button asChild className={className}>
       <Link href={PROPOSE_GEAR_HREF}>
         <span className='flex items-center gap-2'>
           <Plus size={16} />
-          Propose gear
+          {t("panel.gear.propose")}
           <Price cost={GEAR_PROPOSAL_COST} />
         </span>
       </Link>
     </Button>
   ) : (
-    <Button
-      disabled
-      title='Not enough tokens left to propose gear'
-      className={className}>
+    <Button disabled title={t("panel.gear.not_enough")} className={className}>
       <span className='flex items-center gap-2'>
         <Plus size={16} />
-        Propose gear
+        {t("panel.gear.propose")}
         <Price cost={GEAR_PROPOSAL_COST} />
       </span>
     </Button>
   );
+};
 
 /** One part of the board: still being voted on, shipped, or turned down. */
 const Section = ({
@@ -99,6 +99,7 @@ const Section = ({
  * why writing one happens on its own page rather than in a box over this list.
  */
 export const GearBoardTab = ({ enabled }: { enabled: boolean }) => {
+  const { t } = useTranslation("supporter");
   const { data: board, isLoading } = useGearBoard(enabled);
   const { back, changeStatus } = useGearMutations();
 
@@ -127,9 +128,7 @@ export const GearBoardTab = ({ enabled }: { enabled: boolean }) => {
   return (
     <div className='space-y-8'>
       <div className='flex flex-wrap items-center justify-between gap-4'>
-        <p className='text-sm text-zinc-400'>
-          The most-backed gear is drawn into the Arsenal next.
-        </p>
+        <p className='text-sm text-zinc-400'>{t("panel.gear.intro")}</p>
         <ProposeGearButton affordable={tokensLeft >= GEAR_PROPOSAL_COST} />
       </div>
 
@@ -139,7 +138,7 @@ export const GearBoardTab = ({ enabled }: { enabled: boolean }) => {
             <Guitar size={26} />
           </span>
           <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-            No gear proposed yet
+            {t("panel.gear.empty")}
           </h3>
           <ProposeGearButton
             affordable={tokensLeft >= GEAR_PROPOSAL_COST}
@@ -150,19 +149,23 @@ export const GearBoardTab = ({ enabled }: { enabled: boolean }) => {
         <div className='space-y-12'>
           {/* Nothing open is said by the Propose button above, not a box. */}
           {voting.length > 0 && (
-            <Section title='Up for a vote' count={voting.length}>
+            <Section title={t("panel.gear.voting")} count={voting.length}>
               {voting.map(renderCard)}
             </Section>
           )}
 
           {shipped.length > 0 && (
-            <Section title='In the game' count={shipped.length}>
+            <Section
+              title={t("panel.gear.status.in_game")}
+              count={shipped.length}>
               {shipped.map(renderCard)}
             </Section>
           )}
 
           {declined.length > 0 && (
-            <Section title='Not doing' count={declined.length}>
+            <Section
+              title={t("panel.gear.status.declined")}
+              count={declined.length}>
               {declined.map(renderCard)}
             </Section>
           )}

@@ -5,10 +5,8 @@ import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { TierPlate } from "feature/arsenal/components/TierPlate";
-import {
-  getPartLabel,
-  PART_TIER_COLORS,
-} from "feature/arsenal/data/partDefinitions";
+import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import {
   renderEffectIcon,
   renderKindIcon,
@@ -17,6 +15,7 @@ import { GEAR_BOARD_HREF } from "feature/gearProposals/constants/gearProposal.co
 import type { GearDraft } from "feature/gearProposals/types/gearProposal.types";
 import { safeImageUrl } from "feature/gearProposals/utils/gearProposal.utils";
 import { GEAR_PROPOSAL_COST } from "feature/supporterPanel/constants/supporterPanel.constants";
+import { useTranslation } from "hooks/useTranslation";
 import { ImageOff } from "lucide-react";
 import Link from "next/link";
 
@@ -41,6 +40,8 @@ export const GearProposalSummary = ({
   busy,
   onSubmit,
 }: GearProposalSummaryProps) => {
+  const { t } = useTranslation("supporter");
+  const labels = useArsenalLabels();
   const styles = RARITY_STYLES[draft.rarity];
   const preview = safeImageUrl(draft.imageUrl);
   const named = draft.name.trim().length > 0;
@@ -75,7 +76,7 @@ export const GearProposalSummary = ({
               "break-words text-lg font-bold leading-tight",
               named ? styles.text : "text-zinc-600",
             )}>
-            {named ? draft.name.trim() : "Still unnamed"}
+            {named ? draft.name.trim() : t("panel.gear.unnamed")}
           </p>
           {draft.brand.trim() && (
             <p className='truncate text-sm text-zinc-500'>
@@ -87,16 +88,16 @@ export const GearProposalSummary = ({
 
       <div className='flex flex-wrap gap-2'>
         <Chip color='custom' style={getChipCustomStyle(styles.baseColor)}>
-          {draft.rarity}
+          {labels.rarity(draft.rarity)}
         </Chip>
         <Chip color='gray'>
           {renderKindIcon(draft.kind, 13)}
-          {draft.kind === "guitar" ? "Guitar" : "Pedal"}
+          {labels.kind(draft.kind)}
         </Chip>
         {draft.kind === "effect" && (
           <Chip color='cyan'>
             {renderEffectIcon(draft.effectType, 13)}
-            {draft.effectType}
+            {labels.effectType(draft.effectType)}
           </Chip>
         )}
       </div>
@@ -108,10 +109,12 @@ export const GearProposalSummary = ({
       )}
 
       <div className='space-y-2.5'>
-        <p className='text-xs font-bold text-zinc-500'>Breaks down into</p>
+        <p className='text-xs font-bold text-zinc-500'>
+          {t("panel.gear.breaks_down")}
+        </p>
         {draft.scrapBom.length === 0 ? (
           <p className='text-sm text-zinc-500'>
-            Nothing picked — the bench decides.
+            {t("panel.gear.bench_decides")}
           </p>
         ) : (
           <div className='flex flex-wrap gap-2'>
@@ -128,9 +131,7 @@ export const GearProposalSummary = ({
         )}
         {draft.scrapBom.length > 0 && (
           <p className='text-xs text-zinc-500'>
-            {draft.scrapBom
-              .map((slot) => getPartLabel(slot.partId))
-              .join(" → ")}
+            {draft.scrapBom.map((slot) => labels.part(slot.partId)).join(" → ")}
           </p>
         )}
       </div>
@@ -143,25 +144,27 @@ export const GearProposalSummary = ({
           className='w-full'>
           {affordable ? (
             <span className='flex items-center gap-1.5'>
-              Propose for
+              {t("panel.gear.propose_for")}
               <SupportToken size={20} />
               {GEAR_PROPOSAL_COST}
             </span>
           ) : (
-            "Not enough tokens"
+            t("panel.not_enough")
           )}
         </Button>
 
         <p className='text-center text-xs text-zinc-500'>
           {!affordable
-            ? `${GEAR_PROPOSAL_COST - tokensLeft} more tokens and this is yours to file.`
+            ? t("panel.gear.more_tokens", {
+                count: GEAR_PROPOSAL_COST - tokensLeft,
+              })
             : !named
-              ? "Give it a name and it can go on the board."
-              : `You have ${tokensLeft} tokens left.`}
+              ? t("panel.gear.give_name")
+              : t("panel.gear.tokens_left", { count: tokensLeft })}
         </p>
 
         <Button asChild variant='ghost' className='w-full text-zinc-400'>
-          <Link href={GEAR_BOARD_HREF}>Back to the board</Link>
+          <Link href={GEAR_BOARD_HREF}>{t("panel.gear.back_to_board")}</Link>
         </Button>
       </div>
     </aside>

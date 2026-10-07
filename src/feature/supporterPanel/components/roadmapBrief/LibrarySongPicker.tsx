@@ -8,6 +8,7 @@ import {
 } from "feature/songs/services/searchSpotifySongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { MAX_BRIEF_SONGS } from "lib/roadmaps/generation/questionBank";
 import { Check, Loader2, Music, Plus, Search, X } from "lucide-react";
 import posthog from "posthog-js";
@@ -171,6 +172,7 @@ export const LibrarySongPicker = ({
   onOtherSongsChange,
   missing: missingAtStart,
 }: LibrarySongPickerProps) => {
+  const { t } = useTranslation("supporter");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Song[]>([]);
   const [suggestions, setSuggestions] = useState<SpotifySongSuggestion[]>([]);
@@ -280,7 +282,7 @@ export const LibrarySongPicker = ({
       );
     } catch (error) {
       console.error("Adding a song from the roadmap brief failed:", error);
-      toast.error("Couldn't add that song to the library.");
+      toast.error(t("panel.songs.add_failed"));
     } finally {
       setPending(null);
     }
@@ -300,9 +302,7 @@ export const LibrarySongPicker = ({
       {missing.length > 0 && (
         <div className='space-y-2 rounded-lg bg-amber-500/10 px-4 py-3'>
           <p className='text-sm leading-relaxed text-amber-200/90'>
-            Not in the library yet. Add them and each gets a real step with a
-            tab and a backing track — or leave them as a reference for the
-            coach.
+            {t("panel.songs.missing_body")}
           </p>
           <ul className='space-y-0.5'>
             {missing.map((name) => {
@@ -313,7 +313,7 @@ export const LibrarySongPicker = ({
                     title={name.title}
                     artist={name.artist}
                     state={rowState(key, name)}
-                    tag='add to the library'
+                    tag={t("panel.songs.add_tag")}
                     onClick={() => void create(key, name, null, "missing")}
                   />
                 </li>
@@ -343,7 +343,7 @@ export const LibrarySongPicker = ({
               <button
                 type='button'
                 onClick={() => remove(song.id)}
-                aria-label={`Remove ${song.title}`}
+                aria-label={t("panel.songs.remove", { title: song.title })}
                 className='ml-1 rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-600 hover:text-zinc-100'>
                 <X size={14} />
               </button>
@@ -352,7 +352,7 @@ export const LibrarySongPicker = ({
         </AnimatePresence>
         {!songs.length && (
           <span className='self-center text-sm text-zinc-500'>
-            No songs picked yet — the coach chooses them.
+            {t("panel.songs.none")}
           </span>
         )}
       </div>
@@ -374,8 +374,8 @@ export const LibrarySongPicker = ({
             disabled={full}
             placeholder={
               full
-                ? `That is ${MAX_BRIEF_SONGS} — the most one roadmap takes`
-                : "Search by title or artist — anything missing can be added"
+                ? t("panel.songs.full", { max: MAX_BRIEF_SONGS })
+                : t("panel.songs.search")
             }
             className='w-full bg-transparent text-sm text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-not-allowed'
           />
@@ -408,7 +408,7 @@ export const LibrarySongPicker = ({
               {suggestions.length > 0 && (
                 <div className='space-y-0.5'>
                   <p className='px-2 pt-1 text-[11px] font-semibold text-zinc-500'>
-                    Not in the library yet — one click adds it
+                    {t("panel.songs.spotify_hint")}
                   </p>
                   <ul className='space-y-0.5'>
                     {suggestions.map((track) => {
@@ -420,7 +420,7 @@ export const LibrarySongPicker = ({
                             artist={track.artist}
                             coverUrl={track.coverUrl}
                             state={rowState(key, track)}
-                            tag='add to the library'
+                            tag={t("panel.songs.add_tag")}
                             onClick={() =>
                               void create(key, track, track, "spotify")
                             }
@@ -438,14 +438,14 @@ export const LibrarySongPicker = ({
 
       <label className='block space-y-1.5'>
         <span className='text-xs font-semibold text-zinc-400'>
-          Songs we do not have, as a reference for the coach
+          {t("panel.songs.reference")}
         </span>
         <input
           type='text'
           value={otherSongs}
           onChange={(event) => onOtherSongsChange(event.target.value)}
           maxLength={300}
-          placeholder='e.g. Romeo and Juliet, Brothers in Arms'
+          placeholder={t("panel.songs.reference_placeholder")}
           className='w-full rounded-lg bg-zinc-800/50 px-4 py-2.5 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-zinc-600'
         />
       </label>

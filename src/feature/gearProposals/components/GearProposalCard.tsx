@@ -14,14 +14,8 @@ import {
   GEAR_BACK_COST,
   MAX_BACKING_PER_GEAR,
 } from "feature/supporterPanel/constants/supporterPanel.constants";
+import { useTranslation } from "hooks/useTranslation";
 import { Hourglass } from "lucide-react";
-
-const STATUS_LABEL: Record<ProposalStatus, string> = {
-  open: "Open",
-  accepted: "Accepted",
-  in_game: "In the game",
-  declined: "Not doing",
-};
 
 /**
  * The engraving, drawn as what it is: a line cut into metal. Inset shadow above,
@@ -65,6 +59,7 @@ export const GearProposalCard = ({
   onBack,
   onStatusChange,
 }: GearProposalCardProps) => {
+  const { t } = useTranslation("supporter");
   const styles = RARITY_STYLES[proposal.rarity];
 
   return (
@@ -77,7 +72,7 @@ export const GearProposalCard = ({
         proposal.status === "accepted" && (
           <span className='inline-flex items-center gap-1 rounded bg-cyan-500/15 px-2 py-1 text-xs font-semibold text-cyan-300'>
             <Hourglass size={12} />
-            Accepted
+            {t("panel.gear.status.accepted")}
           </span>
         )
       }>
@@ -111,7 +106,7 @@ export const GearProposalCard = ({
 
         {isOwner && (
           <select
-            aria-label='Proposal status'
+            aria-label={t("panel.gear.status_label")}
             value={proposal.status}
             disabled={busy}
             onChange={(event) =>
@@ -120,7 +115,7 @@ export const GearProposalCard = ({
             className='shrink-0 rounded bg-zinc-800/60 px-2 py-2.5 text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800'>
             {PROPOSAL_STATUSES.map((status) => (
               <option key={status} value={status}>
-                {STATUS_LABEL[status]}
+                {t(`panel.gear.status.${status}`)}
               </option>
             ))}
           </select>

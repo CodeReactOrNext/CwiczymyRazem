@@ -1,6 +1,7 @@
 import not_found from "../../../public/locales/en/404.json";
 import achievements from "../../../public/locales/en/achievements.json";
 import ai_coach from "../../../public/locales/en/ai_coach.json";
+import arsenal from "../../../public/locales/en/arsenal.json";
 import calibration from "../../../public/locales/en/calibration.json";
 import challenges from "../../../public/locales/en/challenges.json";
 import chat from "../../../public/locales/en/chat.json";
@@ -49,6 +50,7 @@ export const TRANSLATION_NAMESPACES = [
   "404",
   "achievements",
   "ai_coach",
+  "arsenal",
   "calibration",
   "challenges",
   "chat",
@@ -115,6 +117,7 @@ export const EN_CATALOG: LocaleCatalog = {
   "404": not_found,
   achievements,
   ai_coach,
+  arsenal,
   calibration,
   challenges,
   chat,

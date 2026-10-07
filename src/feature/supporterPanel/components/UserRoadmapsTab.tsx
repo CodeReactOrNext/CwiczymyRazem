@@ -47,6 +47,9 @@ import {
   levelTone,
 } from "feature/supporterPanel/utils/roadmapGoal";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { ROADMAP_LEVELS } from "lib/roadmaps/generation/levels";
 import {
   ArrowLeft,
@@ -66,12 +69,12 @@ import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
-const formatDate = (iso: string | null) => {
+const formatDate = (iso: string | null, locale?: string) => {
   if (!iso) return null;
   const date = new Date(iso);
   return Number.isNaN(date.getTime())
     ? null
-    : date.toLocaleDateString(undefined, {
+    : date.toLocaleDateString(locale, {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -206,6 +209,7 @@ const RoadmapDetail = ({
   onBack: () => void;
   variant: UserRoadmapsTabVariant;
 }) => {
+  const { t } = useTranslation(["supporter", "ai_coach"]);
   const isPage = variant === "page";
   const isOwn = viewerUid != null && viewerUid === summary.userId;
   const [startedHere, setStartedHere] = useState(false);
@@ -238,9 +242,9 @@ const RoadmapDetail = ({
         queryKey: USER_ROADMAPS_KEY,
         exact: true,
       });
-      toast.success("Roadmap started — your progress on it is your own.");
+      toast.success(t("panel.players.started"));
     } catch {
-      toast.error("Could not start this roadmap. Try again.");
+      toast.error(t("panel.players.start_failed"));
     } finally {
       setStarting(false);
     }
@@ -265,7 +269,7 @@ const RoadmapDetail = ({
       onClick={onBack}
       className='flex w-fit items-center gap-2 rounded-lg bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-200'>
       <ArrowLeft className='h-4 w-4' />
-      Back
+      {t("panel.brief.back")}
     </button>
   );
 
@@ -277,7 +281,7 @@ const RoadmapDetail = ({
         disabled={starting}
         className='flex w-fit items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 disabled:cursor-wait disabled:opacity-70 hover:bg-cyan-400'>
         <Play className='h-4 w-4' />
-        {starting ? "Starting…" : "Start this roadmap"}
+        {starting ? t("panel.players.starting") : t("panel.players.start")}
       </button>
     ) : null;
 
@@ -294,7 +298,9 @@ const RoadmapDetail = ({
             : "bg-zinc-900/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100",
         )}>
         <Sparkles className='h-4 w-4' />
-        {refining ? "Done refining" : "Refine"}
+        {refining
+          ? t("panel.players.done_refining")
+          : t("panel.players.refine")}
       </button>
     ) : null;
 
@@ -307,15 +313,18 @@ const RoadmapDetail = ({
         subtitle={
           displayDescription(summary) ??
           [
-            summary.level,
-            `${summary.phaseCount} phases`,
-            `${summary.stepCount} steps`,
-            summary.visibility === "private" ? "Private" : null,
+            summary.level &&
+              t(`ai_coach:levels.${summary.level}`, summary.level),
+            t("ai_coach:n_phases", { count: summary.phaseCount }),
+            t("ai_coach:n_steps", { count: summary.stepCount }),
+            summary.visibility === "private"
+              ? t("panel.generate.visibility.private.label")
+              : null,
           ]
             .filter(Boolean)
             .join(" · ")
         }
-        eyebrow={summary.displayName ?? "Unknown player"}
+        eyebrow={summary.displayName ?? t("panel.players.unknown")}
         backgroundContent={<HeroPattern variant='ai' />}
         className={cn(
           "min-h-[100px] w-full !shadow-none md:min-h-[90px] lg:min-h-[100px]",
@@ -345,32 +354,26 @@ const RoadmapDetail = ({
             ))}
           </div>
         ) : !roadmap ? (
-          <p className='text-sm text-zinc-400'>
-            Nothing is left of this roadmap but the progress counters.
-          </p>
+          <p className='text-sm text-zinc-400'>{t("panel.players.gone")}</p>
         ) : (
           <>
             {!isOwn && !isFollowing && (
               <p className='text-sm text-zinc-500'>
-                Somebody else&apos;s roadmap. Press Start this roadmap to work
-                through it yourself, free, with your own progress.
+                {t("panel.players.someone_else")}
               </p>
             )}
 
             {isFollowing && (
               <p className='text-sm text-zinc-500'>
-                You are working through{" "}
-                {summary.displayName ?? "another player"}&apos;s roadmap. The
-                progress on the map is yours; theirs stays their own.
+                {t("panel.players.following_note", {
+                  name: summary.displayName ?? t("panel.players.another"),
+                })}
               </p>
             )}
 
             {isOwn && refining && (
               <p className='text-sm text-zinc-400'>
-                Refine mode. Use the wand next to a step on the map to have the
-                coach rewrite it, swap its exercise, search its lessons or its
-                song again, or add a step after it — each for a token or two,
-                saved to your roadmap straight away. Removing a step is free.
+                {t("panel.players.refine_note")}
               </p>
             )}
 
@@ -413,6 +416,8 @@ const RoadmapTile = ({
   viewerUid: string | null;
   onOpen: () => void;
 }) => {
+  const { t } = useTranslation(["supporter", "ai_coach"]);
+  const intl = useIntlLocale();
   const isOwn = viewerUid != null && viewerUid === summary.userId;
   const run = summary.viewerProgress ?? (isOwn ? summary : null);
   const following = summary.viewerProgress != null;
@@ -423,8 +428,9 @@ const RoadmapTile = ({
   const started = !!run && run.sessionsCompleted > 0;
   const created = formatDate(
     following ? (summary.viewerProgress?.startedAt ?? null) : summary.createdAt,
+    intl,
   );
-  const practised = formatDate(run?.lastPractisedAt ?? null);
+  const practised = formatDate(run?.lastPractisedAt ?? null, intl);
 
   return (
     <button
@@ -434,17 +440,22 @@ const RoadmapTile = ({
       <span className='flex w-full items-center gap-3'>
         <PlayerAvatar summary={summary} />
         <span className='min-w-0 flex-1 truncate text-sm text-zinc-400'>
-          {following ? "by " : ""}
-          {summary.displayName ?? "Unknown player"}
+          {following
+            ? t("panel.by", {
+                name: summary.displayName ?? t("panel.players.unknown"),
+              })
+            : (summary.displayName ?? t("panel.players.unknown"))}
         </span>
         {summary.visibility === "private" && (
           <span className='flex shrink-0 items-center gap-1 rounded-md bg-zinc-800 px-2 py-0.5 text-[11px] font-bold text-zinc-400'>
             <Lock size={11} />
-            Private
+            {t("panel.generate.visibility.private.label")}
           </span>
         )}
         {summary.level && (
-          <Pill tone={levelTone(summary.level)}>{summary.level}</Pill>
+          <Pill tone={levelTone(summary.level)}>
+            {t(`ai_coach:levels.${summary.level}`, summary.level)}
+          </Pill>
         )}
       </span>
 
@@ -462,27 +473,37 @@ const RoadmapTile = ({
       <span className='mt-auto flex w-full flex-col gap-3'>
         <span className='flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500'>
           <span>
-            {summary.phaseCount} phases · {summary.stepCount} steps
+            {t("ai_coach:phases_steps", {
+              phases: summary.phaseCount,
+              steps: summary.stepCount,
+            })}
           </span>
-          <span className='flex items-center gap-1.5' title='Exercises'>
+          <span
+            className='flex items-center gap-1.5'
+            title={t("panel.players.exercises")}>
             <Dumbbell size={13} />
             {summary.exerciseSteps}
           </span>
           {summary.songSteps > 0 && (
-            <span className='flex items-center gap-1.5' title='Songs'>
+            <span
+              className='flex items-center gap-1.5'
+              title={t("panel.players.songs")}>
               <Music size={13} />
               {summary.songSteps}
             </span>
           )}
-          <span className='flex items-center gap-1.5' title='Video lessons'>
+          <span
+            className='flex items-center gap-1.5'
+            title={t("panel.players.lessons")}>
             <FaYoutube size={13} />
             {summary.lessonSteps}
           </span>
           {summary.followerCount > 0 && (
             <span className='flex items-center gap-1.5'>
               <Users size={13} />
-              {summary.followerCount}{" "}
-              {summary.followerCount === 1 ? "player" : "players"} following
+              {t("panel.players.following_count", {
+                count: summary.followerCount,
+              })}
             </span>
           )}
         </span>
@@ -496,21 +517,27 @@ const RoadmapTile = ({
               />
             </span>
             <span className='shrink-0 text-sm tabular-nums text-zinc-400'>
-              {run.completedSteps}/{summary.stepCount} steps ·{" "}
-              {run.sessionsCompleted} sessions
+              {t("ai_coach:steps_of", {
+                done: run.completedSteps,
+                total: summary.stepCount,
+              })}{" "}
+              ·{" "}
+              {t("ai_coach:refine.sessions", { count: run.sessionsCompleted })}
             </span>
           </span>
         ) : (
           <span className='text-sm text-zinc-500'>
-            {following ? "Following, no sessions yet" : "Not started yet"}
+            {following
+              ? t("panel.players.following_none")
+              : t("panel.players.not_started")}
             {created
-              ? ` · ${following ? "started" : "created"} ${created}`
+              ? ` · ${following ? t("panel.players.started_on", { date: created }) : t("panel.players.created_on", { date: created })}`
               : ""}
           </span>
         )}
         {started && practised && (
           <span className='-mt-1 text-sm text-zinc-500'>
-            Last practised {practised}
+            {t("panel.players.last_practised", { date: practised })}
           </span>
         )}
       </span>
@@ -574,6 +601,7 @@ export const UserRoadmapsTab = ({
   /** A roadmap to open once the list is in — the link in a "roadmap ready" notification. */
   initialRoadmapId?: string | null;
 }) => {
+  const { t } = useTranslation(["supporter", "ai_coach"]);
   const { data, isLoading } = useUserRoadmaps(enabled);
   const [openRow, setOpenRowState] = useState<UserRoadmapSummary | null>(null);
   // Waits for the list rather than for an effect: the row is looked up on
@@ -676,14 +704,14 @@ export const UserRoadmapsTab = ({
     ) : (
       <div className='flex flex-col items-start gap-4 rounded-lg bg-zinc-900/40 p-6 md:p-8'>
         <p className='text-sm text-zinc-400'>
-          That roadmap is not on the board any more.
+          {t("panel.players.not_on_board")}
         </p>
         <button
           type='button'
           onClick={closeRow}
           className='flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700'>
           <ArrowLeft className='h-4 w-4' />
-          Back to Player Roadmaps
+          {t("panel.players.back_to_list")}
         </button>
       </div>
     );
@@ -721,24 +749,31 @@ export const UserRoadmapsTab = ({
             <MapIcon size={26} />
           </span>
           <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-            No roadmaps yet
+            {t("panel.players.empty_title")}
           </h3>
           <p className='max-w-sm text-sm text-zinc-400'>
-            This is where the roadmaps players generate for themselves show up.
+            {t("panel.players.empty_body")}
           </p>
         </div>
       ) : (
         <>
           <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
             <p className='text-sm text-zinc-400'>
-              <span className='font-semibold tabular-nums text-zinc-200'>
-                {roadmaps.length}
-              </span>{" "}
-              roadmaps from{" "}
-              <span className='font-semibold tabular-nums text-zinc-200'>
-                {playerCount}
-              </span>{" "}
-              {playerCount === 1 ? "player" : "players"}
+              <Interpolate
+                text={t("panel.players.count", { count: playerCount })}
+                values={{
+                  total: (
+                    <span className='font-semibold tabular-nums text-zinc-200'>
+                      {roadmaps.length}
+                    </span>
+                  ),
+                  players: (
+                    <span className='font-semibold tabular-nums text-zinc-200'>
+                      {playerCount}
+                    </span>
+                  ),
+                }}
+              />
             </p>
 
             <div className='relative w-full sm:max-w-xs'>
@@ -750,7 +785,7 @@ export const UserRoadmapsTab = ({
                 type='text'
                 value={term}
                 onChange={(event) => setTerm(event.target.value)}
-                placeholder='Filter by goal or player…'
+                placeholder={t("panel.players.filter")}
                 className='w-full rounded-lg bg-zinc-900/60 py-2.5 pl-11 pr-4 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-700'
               />
             </div>
@@ -759,7 +794,7 @@ export const UserRoadmapsTab = ({
           <div className='-mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
             <div
               role='group'
-              aria-label='Level'
+              aria-label={t("panel.generate.level")}
               className='flex flex-wrap gap-1 rounded-lg bg-zinc-900/40 p-1'>
               {["all", ...ROADMAP_LEVELS].map((candidate) => (
                 <button
@@ -773,7 +808,9 @@ export const UserRoadmapsTab = ({
                       ? "bg-zinc-700 text-zinc-50"
                       : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
                   )}>
-                  {candidate === "all" ? "All levels" : candidate}
+                  {candidate === "all"
+                    ? t("panel.players.all_levels")
+                    : t(`ai_coach:levels.${candidate}`, candidate)}
                 </button>
               ))}
             </div>
@@ -782,19 +819,23 @@ export const UserRoadmapsTab = ({
               value={sort}
               onValueChange={(value) => setSort(value as RoadmapSort)}>
               <SelectTrigger
-                aria-label='Sort by'
+                aria-label={t("panel.players.sort_by")}
                 className='h-10 w-full gap-2 border-0 bg-zinc-900/60 px-3 text-sm font-semibold text-zinc-200 md:w-48'>
                 <span className='flex items-center gap-1.5 text-zinc-500'>
                   <ArrowUpDown size={14} aria-hidden />
                 </span>
                 <SelectValue>
-                  {ROADMAP_SORTS.find((option) => option.id === sort)?.label}
+                  {t(
+                    `panel.players.sorts.${sort}`,
+                    ROADMAP_SORTS.find((option) => option.id === sort)?.label ??
+                      sort,
+                  )}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {ROADMAP_SORTS.map((option) => (
                   <SelectItem key={option.id} value={option.id}>
-                    {option.label}
+                    {t(`panel.players.sorts.${option.id}`, option.label)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -803,7 +844,10 @@ export const UserRoadmapsTab = ({
 
           {own.length > 0 && (
             <section className='space-y-4'>
-              <SectionHeading title='Your roadmaps' count={own.length} />
+              <SectionHeading
+                title={t("panel.players.yours")}
+                count={own.length}
+              />
               <TileGrid
                 summaries={own}
                 viewerUid={viewerUid}
@@ -815,7 +859,7 @@ export const UserRoadmapsTab = ({
           {others.length > 0 && (
             <section className='space-y-4'>
               <SectionHeading
-                title='From other players'
+                title={t("panel.players.others")}
                 count={others.length}
               />
               <TileGrid
@@ -828,7 +872,7 @@ export const UserRoadmapsTab = ({
 
           {!filtered.length && (
             <p className='py-10 text-center text-sm text-zinc-400'>
-              Nothing matches this filter.
+              {t("panel.players.no_match")}
             </p>
           )}
         </>

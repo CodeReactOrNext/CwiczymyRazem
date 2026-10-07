@@ -507,12 +507,6 @@
   },
   "parts": {
     "tier_part": "Część: {{tier}}",
-    "tiers": {
-      "Standard": "Standardowa",
-      "Epic": "Epicka",
-      "Legendary": "Legendarna",
-      "Unique": "Unikatowa"
-    },
     "of": "z {{count}}",
     "how_many_leave": "Ile zostawić",
     "how_many_take": "Ile wziąć",

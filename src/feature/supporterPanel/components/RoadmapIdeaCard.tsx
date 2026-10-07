@@ -13,16 +13,10 @@ import type {
   RoadmapIdeaStatus,
 } from "feature/supporterPanel/types/supporterPanel.types";
 import { ROADMAP_IDEA_STATUSES } from "feature/supporterPanel/types/supporterPanel.types";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 
 type ChipColor = React.ComponentProps<typeof Chip>["color"];
-
-const STATUS_LABEL: Record<RoadmapIdeaStatus, string> = {
-  open: "Open",
-  planned: "Planned",
-  in_progress: "In progress",
-  shipped: "Shipped",
-  declined: "Not doing",
-};
 
 const STATUS_COLOR: Record<RoadmapIdeaStatus, ChipColor> = {
   open: "gray",
@@ -59,6 +53,9 @@ export const RoadmapIdeaCard = ({
   onBack,
   onStatusChange,
 }: RoadmapIdeaCardProps) => {
+  const { t } = useTranslation("supporter");
+  const statusLabel = (status: RoadmapIdeaStatus) =>
+    t(`panel.board.status.${status}`);
   const decided = idea.status === "shipped" || idea.status === "declined";
 
   return (
@@ -71,7 +68,7 @@ export const RoadmapIdeaCard = ({
           The top three are lit; the rest are just order. */}
       {rank !== undefined && (
         <span
-          aria-label={`Rank ${rank}`}
+          aria-label={t("panel.rank", { rank })}
           className={cn(
             "w-8 shrink-0 text-right text-3xl font-bold tabular-nums leading-none",
             rank <= 3 ? "text-zinc-400" : "text-zinc-700",
@@ -89,7 +86,7 @@ export const RoadmapIdeaCard = ({
             </h3>
             {!isOwner && idea.status !== "open" && (
               <Chip color={STATUS_COLOR[idea.status]}>
-                {STATUS_LABEL[idea.status]}
+                {statusLabel(idea.status)}
               </Chip>
             )}
           </div>
@@ -100,10 +97,16 @@ export const RoadmapIdeaCard = ({
 
           <div className='mt-5 flex flex-wrap items-center gap-x-5 gap-y-2'>
             <p className='text-xs text-zinc-500'>
-              by{" "}
-              <span className='font-medium text-zinc-400'>
-                {idea.authorName}
-              </span>
+              <Interpolate
+                text={t("panel.by")}
+                values={{
+                  name: (
+                    <span className='font-medium text-zinc-400'>
+                      {idea.authorName}
+                    </span>
+                  ),
+                }}
+              />
             </p>
             <BackerRow
               muted
@@ -131,7 +134,7 @@ export const RoadmapIdeaCard = ({
 
           {isOwner && (
             <select
-              aria-label='Idea status'
+              aria-label={t("panel.board.status_label")}
               value={idea.status}
               disabled={busy}
               onChange={(event) =>
@@ -140,7 +143,7 @@ export const RoadmapIdeaCard = ({
               className='rounded bg-zinc-800/60 px-2 py-1.5 text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800'>
               {ROADMAP_IDEA_STATUSES.map((status) => (
                 <option key={status} value={status}>
-                  {STATUS_LABEL[status]}
+                  {statusLabel(status)}
                 </option>
               ))}
             </select>

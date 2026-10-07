@@ -483,12 +483,6 @@
   },
   "parts": {
     "tier_part": "{{tier}} part",
-    "tiers": {
-      "Standard": "Standard",
-      "Epic": "Epic",
-      "Legendary": "Legendary",
-      "Unique": "Unique"
-    },
     "of": "of {{count}}",
     "how_many_leave": "How many to leave",
     "how_many_take": "How many to take",

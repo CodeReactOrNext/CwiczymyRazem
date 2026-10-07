@@ -5,6 +5,8 @@ import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { LibrarySongPicker } from "feature/supporterPanel/components/roadmapBrief/LibrarySongPicker";
 import { QuestionScreen } from "feature/supporterPanel/components/roadmapBrief/QuestionScreen";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import type { BriefAnswer, RoadmapBrief } from "lib/roadmaps/generation/brief";
 import type { PreflightResult } from "lib/roadmaps/generation/preflight";
 import {
@@ -78,6 +80,27 @@ export const BriefWizard = ({
   onBack,
   onGenerate,
 }: BriefWizardProps) => {
+  const { t } = useTranslation("supporter");
+  // The bank is written in English, and the brief the model reads stays that
+  // way; only what is shown here is said in the player's language.
+  const bankText = (id: BankQuestionId) => {
+    const bank = bankQuestion(id);
+    return {
+      question: t(`panel.brief.bank.${id}.question`, bank.question),
+      hint: bank.hint && t(`panel.brief.bank.${id}.hint`, bank.hint),
+    };
+  };
+  const localOptions = (id: BankQuestionId, options: QuestionOption[]) =>
+    options.map((option) => ({
+      ...option,
+      label: t(
+        `panel.brief.bank.${id}.options.${option.value}.label`,
+        option.label,
+      ),
+      hint:
+        option.hint &&
+        t(`panel.brief.bank.${id}.options.${option.value}.hint`, option.hint),
+    }));
   const screens = useMemo<Screen[]>(() => {
     const list: Screen[] = [];
     if (preflight.verdict === "too_obscure") list.push({ kind: "notes" });
@@ -170,12 +193,12 @@ export const BriefWizard = ({
       if (item.kind === "bank") {
         const chosen = values[item.id] ?? [];
         if (!chosen.length) return null;
-        const bank = bankQuestion(item.id);
+        const shown = localOptions(item.id, item.options);
         return {
           at,
-          question: bank.question,
+          question: bankText(item.id).question,
           answer: chosen
-            .map((v) => item.options.find((o) => o.value === v)?.label ?? v)
+            .map((v) => shown.find((o) => o.value === v)?.label ?? v)
             .join(", "),
         };
       }
@@ -193,7 +216,7 @@ export const BriefWizard = ({
       if (item.kind === "notes" && notes.trim()) {
         return {
           at,
-          question: "What you told the coach",
+          question: t("panel.brief.told_coach"),
           answer: notes.trim(),
         };
       }
@@ -213,11 +236,13 @@ export const BriefWizard = ({
           onClick={() => (index === 0 ? onBack() : go(index - 1))}
           className='flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
           <ArrowLeft size={15} />
-          {index === 0 ? "Edit the goal" : "Back"}
+          {index === 0 ? t("panel.brief.edit_goal") : t("panel.brief.back")}
         </button>
 
         {questionCount > 0 && (
-          <ol className='flex items-center gap-1.5' aria-label='Progress'>
+          <ol
+            className='flex items-center gap-1.5'
+            aria-label={t("panel.brief.progress")}>
             {screens.map((item, at) => (
               <motion.li
                 key={at}
@@ -234,7 +259,9 @@ export const BriefWizard = ({
                       : "bg-zinc-600",
                 )}
                 aria-current={at === index ? "step" : undefined}
-                title={item.kind === "confirm" ? "Summary" : undefined}
+                title={
+                  item.kind === "confirm" ? t("panel.brief.summary") : undefined
+                }
               />
             ))}
           </ol>
@@ -255,11 +282,10 @@ export const BriefWizard = ({
               <div className='space-y-5'>
                 <div className='space-y-1.5'>
                   <h3 className='text-lg font-bold text-zinc-100'>
-                    The coach does not know this one well
+                    {t("panel.brief.obscure_title")}
                   </h3>
                   <p className='text-sm leading-relaxed text-zinc-400'>
-                    {preflight.reason ||
-                      "Name two or three songs or techniques you want from it, and the plan is built on those rather than on guesses."}
+                    {preflight.reason || t("panel.brief.obscure_body")}
                   </p>
                 </div>
                 <textarea
@@ -267,7 +293,7 @@ export const BriefWizard = ({
                   value={notes}
                   maxLength={MAX_NOTES}
                   onChange={(event) => setNotes(event.target.value)}
-                  placeholder='e.g. the intro riff of Song A, the way they use open strings in Song B, the fingerpicked verse of Song C'
+                  placeholder={t("panel.brief.notes_placeholder")}
                   className='block w-full resize-none rounded-lg bg-zinc-800/50 px-4 py-3 text-sm leading-relaxed text-zinc-100 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-zinc-600'
                 />
               </div>
@@ -277,10 +303,10 @@ export const BriefWizard = ({
               <div className='space-y-6'>
                 <div className='space-y-1.5'>
                   <h3 className='text-lg font-bold text-zinc-100'>
-                    {bankQuestion("songs").question}
+                    {bankText("songs").question}
                   </h3>
                   <p className='text-sm text-zinc-400'>
-                    {bankQuestion("songs").hint}
+                    {bankText("songs").hint}
                   </p>
                 </div>
                 <LibrarySongPicker
@@ -295,9 +321,9 @@ export const BriefWizard = ({
 
             {screen.kind === "bank" && screen.id !== "songs" && (
               <QuestionScreen
-                question={bankQuestion(screen.id).question}
-                hint={bankQuestion(screen.id).hint}
-                options={screen.options}
+                question={bankText(screen.id).question}
+                hint={bankText(screen.id).hint}
+                options={localOptions(screen.id, screen.options)}
                 multi={MULTI_KINDS.has(bankQuestion(screen.id).kind)}
                 values={values[screen.id] ?? []}
                 onChange={(next) =>
@@ -327,11 +353,10 @@ export const BriefWizard = ({
                   />
                   <div className='space-y-1'>
                     <p className='text-xs font-semibold text-zinc-400'>
-                      How the coach read your goal
+                      {t("panel.brief.how_read")}
                     </p>
                     <p className='text-sm leading-relaxed text-zinc-100'>
-                      {preflight.understood ||
-                        "A roadmap built around the goal as you wrote it."}
+                      {preflight.understood || t("panel.brief.as_written")}
                     </p>
                   </div>
                 </div>
@@ -345,7 +370,9 @@ export const BriefWizard = ({
                           className='mt-0.5 shrink-0 text-zinc-500'
                         />
                         <span className='min-w-0 flex-1 text-sm'>
-                          <span className='text-zinc-400'>Songs in it: </span>
+                          <span className='text-zinc-400'>
+                            {t("panel.brief.songs_in_it")}{" "}
+                          </span>
                           <span className='text-zinc-100'>
                             {songs.map((song) => song.title).join(", ")}
                           </span>
@@ -354,7 +381,7 @@ export const BriefWizard = ({
                           <button
                             type='button'
                             onClick={() => go(songsScreenAt)}
-                            aria-label='Change the songs'
+                            aria-label={t("panel.brief.change_songs")}
                             className='rounded p-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
                             <Pencil size={14} />
                           </button>
@@ -375,7 +402,9 @@ export const BriefWizard = ({
                         <button
                           type='button'
                           onClick={() => go(line.at)}
-                          aria-label={`Change: ${line.question}`}
+                          aria-label={t("panel.brief.change", {
+                            question: line.question,
+                          })}
                           className='rounded p-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
                           <Pencil size={14} />
                         </button>
@@ -386,7 +415,7 @@ export const BriefWizard = ({
 
                 {!songs.length && !summary.length && (
                   <p className='text-sm text-zinc-500'>
-                    Nothing to add — the coach takes it from here.
+                    {t("panel.brief.nothing_to_add")}
                   </p>
                 )}
               </div>
@@ -400,23 +429,32 @@ export const BriefWizard = ({
           {isConfirm ? (
             !canAfford ? (
               <>
-                This one needs{" "}
-                <span className='font-bold text-zinc-200'>{cost}</span> tokens
-                and you have{" "}
-                <span className='font-bold text-zinc-200'>{tokensLeft}</span>.{" "}
+                <Interpolate
+                  text={t("panel.generate.needs")}
+                  values={{
+                    cost: (
+                      <span className='font-bold text-zinc-200'>{cost}</span>
+                    ),
+                    left: (
+                      <span className='font-bold text-zinc-200'>
+                        {tokensLeft}
+                      </span>
+                    ),
+                  }}
+                />{" "}
                 <a
                   href={BMC_URL}
                   target='_blank'
                   rel='noreferrer'
                   className='font-semibold text-amber-300 underline-offset-2 hover:underline'>
-                  Every donation adds tokens
+                  {t("panel.generate.donation_adds")}
                 </a>
               </>
             ) : (
-              "Takes a few minutes. You can leave while it writes — we will notify you."
+              t("panel.brief.takes_minutes")
             )
           ) : (
-            `${index + 1} of ${questionCount} — every one can be skipped.`
+            t("panel.brief.n_of", { n: index + 1, total: questionCount })
           )}
         </p>
 
@@ -426,7 +464,7 @@ export const BriefWizard = ({
               type='button'
               onClick={() => go(index + 1)}
               className='rounded-lg px-4 py-2.5 text-sm font-semibold text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
-              Skip
+              {t("panel.brief.skip")}
             </button>
           )}
           {isConfirm ? (
@@ -436,7 +474,7 @@ export const BriefWizard = ({
               disabled={!canAfford}
               className='flex min-h-11 items-center justify-center gap-2.5 rounded-lg bg-amber-400 px-5 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-amber-300'>
               <Sparkles size={16} />
-              Generate roadmap
+              {t("panel.brief.generate")}
               <span className='flex items-center gap-1 rounded-md bg-zinc-950/10 px-1.5 py-0.5 tabular-nums'>
                 <SupportToken size={15} />
                 {cost}
@@ -447,7 +485,7 @@ export const BriefWizard = ({
               type='button'
               onClick={() => go(index + 1)}
               className='flex min-h-11 items-center justify-center gap-2 rounded-lg bg-zinc-100 px-5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
-              Next
+              {t("panel.brief.next")}
               <ArrowRight size={15} />
             </button>
           )}

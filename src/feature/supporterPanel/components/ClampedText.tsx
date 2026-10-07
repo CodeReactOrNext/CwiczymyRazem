@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
@@ -16,6 +17,7 @@ export const ClampedText = ({
   fold?: number;
   className?: string;
 }) => {
+  const { t } = useTranslation("supporter");
   const [expanded, setExpanded] = useState(false);
   const long = text.length > fold || text.split("\n").length > 3;
 
@@ -34,7 +36,7 @@ export const ClampedText = ({
           aria-expanded={expanded}
           onClick={() => setExpanded((open) => !open)}
           className='inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-cyan-300'>
-          {expanded ? "Show less" : "Show more"}
+          {expanded ? t("panel.show_less") : t("panel.show_more")}
           <ChevronDown
             size={15}
             className={cn("transition-transform", expanded && "rotate-180")}

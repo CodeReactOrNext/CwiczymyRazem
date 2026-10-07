@@ -4,6 +4,8 @@ import { DISCORD_INVITE_URL } from "constants/community";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { useAccountEmail } from "feature/supporterPanel/hooks/useAccountEmail";
 import { SupporterStrip } from "feature/supportTeam/components/SupporterStrip";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Heart } from "lucide-react";
 
 /**
@@ -21,6 +23,7 @@ import { Heart } from "lucide-react";
  * page rather than at the Info tab.
  */
 export const SupporterPitch = () => {
+  const { t } = useTranslation("supporter");
   const email = useAccountEmail();
 
   return (
@@ -42,22 +45,20 @@ export const SupporterPitch = () => {
 
       <div className='relative space-y-3'>
         <h2 className='text-xl font-bold text-zinc-100'>
-          A donation opens the supporter panel
+          {t("panel.pitch.title")}
         </h2>
         <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
-          Behind the badge is the room where riff.quest is decided out loud:
+          {t("panel.pitch.intro")}
         </p>
         <ul className='max-w-2xl space-y-1.5 text-sm text-zinc-300'>
-          {[
-            "Watch what is being built now and vote on what comes next",
-            "Pick the gear that goes into the Arsenal and the cases",
-            "Set the challenge the whole app plays for that week",
-          ].map((perk) => (
-            <li key={perk} className='flex gap-2'>
-              <span className='text-amber-400'>•</span>
-              {perk}
-            </li>
-          ))}
+          {[0, 1, 2]
+            .map((i) => t(`panel.pitch.perks.${i}`))
+            .map((perk) => (
+              <li key={perk} className='flex gap-2'>
+                <span className='text-amber-400'>•</span>
+                {perk}
+              </li>
+            ))}
         </ul>
       </div>
 
@@ -66,24 +67,31 @@ export const SupporterPitch = () => {
           stays off, so it can't be small grey print below the fold. */}
       <div className='relative flex max-w-2xl flex-col gap-4'>
         <div className='rounded-lg bg-amber-500/10 px-4 py-3 text-sm leading-relaxed text-zinc-200'>
-          Use the email this account is on to unlock Supporter
           {email ? (
-            <>
-              {": "}
-              <span className='font-bold text-white'>{email}</span>
-            </>
-          ) : null}
-          .
+            <Interpolate
+              text={t("panel.pitch.email_known")}
+              values={{
+                email: <span className='font-bold text-white'>{email}</span>,
+              }}
+            />
+          ) : (
+            t("panel.pitch.email")
+          )}
           <span className='mt-1 block text-zinc-400'>
-            Using a different email?{" "}
-            <a
-              href={DISCORD_INVITE_URL}
-              target='_blank'
-              rel='noreferrer'
-              className='font-semibold text-amber-300 underline underline-offset-2 hover:text-amber-200'>
-              Write to me on Discord
-            </a>{" "}
-            and I&apos;ll attach it by hand.
+            <Interpolate
+              text={t("panel.pitch.other_email")}
+              values={{
+                discord: (
+                  <a
+                    href={DISCORD_INVITE_URL}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='font-semibold text-amber-300 underline underline-offset-2 hover:text-amber-200'>
+                    {t("panel.pitch.write_discord")}
+                  </a>
+                ),
+              }}
+            />
           </span>
         </div>
 
@@ -91,7 +99,7 @@ export const SupporterPitch = () => {
           <a href={BMC_URL} target='_blank' rel='noreferrer'>
             <span className='flex items-center gap-2'>
               <Heart size={16} fill='currentColor' />
-              Support the project
+              {t("panel.pitch.support")}
             </span>
           </a>
         </Button>

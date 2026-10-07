@@ -171,5 +171,576 @@
     "why": "Warum Riff Quest unterstützen?",
     "body": "Riff Quest ist ein Ein-Personen-Projekt, kostenlos und offen gebaut. Deine Unterstützung deckt zuerst Domain, Hosting und Datenbank. Alles darüber finanziert die Roadmap: neue Übungen, Equipment und Features, Stufe für Stufe freigeschaltet, sobald die Community sie finanziert.",
     "later": "Vielleicht später"
+  },
+  "badge": {
+    "label": "Supporter",
+    "tooltip": "{{label}} — unterstützt Riff Quest mit einer Spende"
+  },
+  "wall": {
+    "funded_by": "Finanziert von {{players}}",
+    "players": "{{count}} Spielern",
+    "players_one": "1 Spieler",
+    "lvl": "Lvl {{lvl}}",
+    "title": "Die Leute, die riff.quest finanzieren",
+    "body": "{{count}} Spieler sorgen dafür, dass diese App weitergebaut wird. Jede Gitarre, jede Übung und jede Woche, die die App spielt, wurde hier bezahlt.",
+    "body_one": "1 Spieler sorgt dafür, dass diese App weitergebaut wird. Jede Gitarre, jede Übung und jede Woche, die die App spielt, wurde hier bezahlt.",
+    "body_empty": "Hier steht jeder, der das Projekt unterstützt, mit dem Level, auf dem er spielt.",
+    "empty": "Noch niemand an der Wand — der erste Platz ist noch frei."
+  },
+  "panel": {
+    "title": "Supporter-Panel",
+    "subtitle": "Sieh, was gerade gebaut wird, wähl, was als Nächstes kommt, und bestimm die Woche, die die ganze App spielt.",
+    "eyebrow": "Supporter",
+    "tabs": {
+      "roadmap": "Roadmap",
+      "gear": "Equipment",
+      "case": "Supporter-Kiste",
+      "guild": "Gilde gründen",
+      "work": "In Arbeit",
+      "wall": "Supporter",
+      "players": "Spieler-Roadmaps",
+      "info": "Info"
+    },
+    "wallet": "Tokens zum Ausgeben",
+    "wallet_one": "Token zum Ausgeben",
+    "show_less": "Weniger anzeigen",
+    "show_more": "Mehr anzeigen",
+    "rank": "Platz {{rank}}",
+    "by": "von {{name}}",
+    "optional": "optional",
+    "cancel": "Abbrechen",
+    "not_enough": "Nicht genug Tokens",
+    "not_enough_left": "Nicht genug Tokens übrig",
+    "close": "Schließen",
+    "try_again": "Erneut versuchen",
+    "info": {
+      "what_you_do": "Was du hier machst",
+      "surfaces": {
+        "roadmap": {
+          "title": "Roadmap",
+          "body": "Stell ein, was der App fehlt, und schieb die Ideen an, die du gebaut sehen willst. Was das Board am stärksten trägt, wird als Nächstes angepackt."
+        },
+        "work": {
+          "title": "In Arbeit",
+          "body": "Die tatsächliche Bau-Reihenfolge — was in Arbeit ist, was in der Warteschlange steht, was erschienen ist. Kein Rätselraten mehr, was aus deiner Idee wurde."
+        },
+        "gear": {
+          "title": "Equipment",
+          "body": "Schlag eine Gitarre, einen Amp oder ein Pedal fürs Arsenal vor und schieb die an, die du gezeichnet sehen willst. Was hier aufsteigt, wird gemacht."
+        },
+        "case": {
+          "title": "Supporter-Kiste",
+          "body": "Sechs Plätze in der nächsten Kiste, und du bestimmst, was in jedem liegt, bevor sie je geöffnet wird. Nur die Tokens des Siegers werden ausgegeben. Alles, was den Rest unterstützt, bleibt fürs nächste Mal auf dem Board."
+        },
+        "wall": {
+          "title": "Supporter",
+          "body": "Alle, die die App finanzieren, mit dem Level, auf dem sie spielen. Das Abzeichen bringt dich am Tag seiner Ankunft an diese Wand."
+        },
+        "guild": {
+          "title": "Gilde",
+          "body": "Sichere dir einen Namen und einen Tag, die niemand sonst nehmen kann, und vergrößere Raum und Regal, wenn Mitglieder dazukommen."
+        }
+      },
+      "how_tokens": "So bekommst du Tokens",
+      "badge_once": "Supporter-Abzeichen, einmalig",
+      "per_dollar": "Pro gespendetem $1",
+      "in_total": "${{usd}} insgesamt",
+      "membership": "Eine Mitgliedschaft zahlt bei jeder Verlängerung erneut. Tokens verfallen nie und füllen sich nicht von selbst auf — ausgegebene sind weg.",
+      "what_cost": "Was sie kosten",
+      "costs": {
+        "roadmap": {
+          "title": "Roadmap",
+          "post_idea": "Idee einstellen",
+          "back_idea": "Idee unterstützen (max. {{max}})"
+        },
+        "gear": {
+          "title": "Equipment",
+          "propose_gear": "Equipment vorschlagen",
+          "back_proposal": "Vorschlag unterstützen"
+        },
+        "votes": {
+          "title": "Stimmen",
+          "case_item": "Gegenstand der Supporter-Kiste"
+        },
+        "guild": {
+          "title": "Gilde",
+          "found_guild": "Gilde gründen",
+          "seats": "+{{seats}} Plätze",
+          "stash_row": "+1 Lagerreihe"
+        }
+      },
+      "donate_email": "Spende mit der E-Mail deines Kontos",
+      "email": "Jede Spende wird über die E-Mail-Adresse, mit der sie kommt, einem Konto zugeordnet — eine Spende von einer anderen Adresse bringt diesem Wallet also keine Tokens. Schon passiert? Nichts ist verloren — schreib mir auf Discord, und ich ordne sie von Hand zu.",
+      "email_known": "Jede Spende wird über die E-Mail-Adresse, mit der sie kommt, einem Konto zugeordnet — deine ist {{email}} —, eine Spende von einer anderen Adresse bringt diesem Wallet also keine Tokens. Schon passiert? Nichts ist verloren — schreib mir auf Discord, und ich ordne sie von Hand zu.",
+      "message_discord": "Schreib mir auf Discord"
+    },
+    "pitch": {
+      "title": "Eine Spende öffnet das Supporter-Panel",
+      "intro": "Hinter dem Abzeichen liegt der Raum, in dem riff.quest offen entschieden wird:",
+      "perks": {
+        "0": "Sieh, was gerade gebaut wird, und stimm ab, was als Nächstes kommt",
+        "1": "Wähl das Equipment, das ins Arsenal und in die Kisten kommt",
+        "2": "Bestimm die Challenge, die die ganze App diese Woche spielt"
+      },
+      "email": "Nutze die E-Mail-Adresse dieses Kontos, um Supporter freizuschalten.",
+      "email_known": "Nutze die E-Mail-Adresse dieses Kontos, um Supporter freizuschalten: {{email}}.",
+      "other_email": "Eine andere E-Mail-Adresse? {{discord}}, und ich ordne sie von Hand zu.",
+      "write_discord": "Schreib mir auf Discord",
+      "support": "Projekt unterstützen"
+    },
+    "backers": {
+      "count": "Unterstützt von {{count}} Supportern",
+      "count_one": "Unterstützt von 1 Supporter",
+      "by": "Unterstützt von",
+      "put_in": "{{name}} hat {{count}} gegeben",
+      "you": "Du",
+      "more": "+{{count}} weitere"
+    },
+    "vote": {
+      "this": {
+        "idea": "diese Idee",
+        "piece of gear": "dieses Equipment",
+        "item": "diesen Gegenstand"
+      },
+      "closed_mine": "Abstimmung beendet — du hast {{mine}} gegeben",
+      "closed": "Abstimmung beendet",
+      "maxed_label": "Du hast {{mine}} gegeben — so viel wie eine Person kann",
+      "broke": "Nichts mehr in deinem Wallet",
+      "spend_another": "Noch ein Token für {{target}} — du hast {{mine}} gegeben",
+      "spend": "Ein Token für {{target}} ausgeben",
+      "tokens_word": "Tokens",
+      "tokens_word_one": "Token",
+      "you": "du {{mine}}",
+      "closed_short": "Beendet",
+      "maxed": "Maximum",
+      "back": "Unterstützen"
+    },
+    "board": {
+      "empty_title": "Noch nichts auf dem Board",
+      "empty_body": "Was hier zuerst landet, gibt die Richtung vor. Stell das ein, was dir in der App immer wieder fehlt.",
+      "post": "Idee einstellen",
+      "intro": "Die am stärksten unterstützten Ideen werden zuerst gebaut. Ausgegebene Tokens kommen nicht zurück.",
+      "groups": {
+        "open": "Offen",
+        "shipped": "Erschienen",
+        "declined": "Wird nicht gemacht"
+      },
+      "status": {
+        "open": "Offen",
+        "planned": "Geplant",
+        "in_progress": "In Arbeit",
+        "shipped": "Erschienen",
+        "declined": "Wird nicht gemacht"
+      },
+      "status_label": "Status der Idee"
+    },
+    "icons": {
+      "idea": "Allgemeine Idee",
+      "guitar": "Gitarre & Griffbrett",
+      "song": "Songs & Tabs",
+      "practice": "Üben & Timer",
+      "tone": "Sound & Audio",
+      "recording": "Aufnahme",
+      "gear": "Arsenal & Equipment",
+      "ranking": "Ranglisten & Saisons",
+      "stats": "Statistiken & Fortschritt",
+      "mobile": "Mobile & Desktop-App",
+      "bug": "Etwas ist kaputt",
+      "polish": "Feinschliff & kleine Fixes"
+    },
+    "new_idea": {
+      "title": "Eine Idee auf die Roadmap setzen",
+      "description": "Sie landet direkt auf dem Board, damit jeder Supporter sie unterstützen kann. Kostet {{cost}} — du hast noch {{left}}.",
+      "idea": "Idee",
+      "idea_placeholder": "Metronom, das der Tempo-Map der Tab folgt",
+      "icon": "Icon",
+      "why": "Warum es wichtig ist",
+      "why_placeholder": "Was du heute versuchst und wo die App dir im Weg steht.",
+      "post_for": "Einstellen für"
+    },
+    "stepper": {
+      "blocks": {
+        "draft": {
+          "title": "Entwurf",
+          "doing": "Der Plan wird skizziert"
+        },
+        "review": {
+          "title": "Prüfung",
+          "doing": "Der Plan wird geprüft"
+        },
+        "phases": {
+          "title": "Phasen",
+          "doing": "Jeder Schritt wird geschrieben"
+        },
+        "lessons": {
+          "title": "Lektionen",
+          "doing": "Lektionen werden gesucht"
+        },
+        "ready": {
+          "title": "Fertig",
+          "doing": "Deine Roadmap wird gespeichert"
+        }
+      },
+      "revising": "Überarbeitung nach Anmerkungen",
+      "written": "{{done}} von {{total}} geschrieben",
+      "steps": "{{done}} von {{total}} Schritten",
+      "done": "fertig",
+      "up_next": "als Nächstes",
+      "step_of": "Schritt {{n}} von {{total}}"
+    },
+    "generate": {
+      "examples": {
+        "0": {
+          "title": "Blues wie Stevie Ray Vaughan",
+          "goal": "Texas-Blues spielen wie Stevie Ray Vaughan: der Shuffle-Rhythmus, große Bendings und breites Vibrato und seine typischen Licks über einen 12-Takt-Blues."
+        },
+        "1": {
+          "title": "Zurück nach einer Pause",
+          "goal": "Nach ein paar Monaten Pause wieder in Form kommen: Hornhaut und Ausdauer ohne Verletzung, saubere Akkordwechsel, Timing und die Songs, die ich früher gespielt habe."
+        },
+        "2": {
+          "title": "Singen und spielen",
+          "goal": "Gleichzeitig singen und spielen: ein Anschlag, der auf Autopilot läuft, während die Stimme führt, beginnend mit leichten Songs."
+        },
+        "3": {
+          "title": "Tighter Metal-Rhythmus",
+          "goal": "Tighte Metal-Rhythmusgitarre: Ausdauer beim Downpicking, Palm Muting und Galopps, exakt zum Metronom."
+        }
+      },
+      "visibility": {
+        "public": {
+          "label": "Öffentlich",
+          "hint": "Erscheint bei den Spieler-Roadmaps, damit auch andere davon lernen können."
+        },
+        "private": {
+          "label": "Privat",
+          "hint": "Nur du siehst sie. Kostet mehr, weil niemand sonst davon lernt."
+        }
+      },
+      "more": {
+        "title": "Erzähl dem Coach mehr",
+        "answered": "{{count}} von 2 beantwortet",
+        "body": "Lieblingskünstler und -songs, was du schon spielen kannst.",
+        "favourites": "Künstler oder Songs, die du liebst",
+        "favourites_placeholder": "z. B. John Mayer, Slow Dancing in a Burning Room",
+        "can_play": "Was du schon spielen kannst",
+        "can_play_placeholder": "z. B. offene Akkorde, die Moll-Pentatonik-Box"
+      },
+      "not_guitar": "Diese Roadmap dreht sich ums Gitarrespielen — beschreib, was du spielen willst.",
+      "title": "Bau eine Roadmap um dein Ziel",
+      "folded_body": "Beschreib, was du spielen willst — der Coach legt die Phasen, Übungen und Songs fest.",
+      "create": "Roadmap erstellen",
+      "writing": "Deine Roadmap wird geschrieben",
+      "running_body": "Das dauert ein paar Minuten und läuft bei uns — du kannst die Seite verlassen oder den Tab schließen und bekommst eine Benachrichtigung, wenn sie fertig ist. Bleib hier, und sie öffnet sich von selbst.",
+      "brief_body": "Ein paar Fragen, die der Coach vor dem Schreiben beantwortet haben will — jede verändert die Form des Plans, und jede lässt sich überspringen.",
+      "goal_body": "Beschreib, was du spielen können willst. Der Coach legt die Phasen, Übungen, Lektionen und Songs fest, die dich dorthin bringen.",
+      "tokens_left": "Tokens übrig",
+      "tokens_left_one": "Token übrig",
+      "close_builder": "Roadmap-Editor schließen",
+      "title_label": "Titel",
+      "title_placeholder": "z. B. Spielen wie Mark Knopfler",
+      "goal_label": "Was willst du spielen können?",
+      "description": "Beschreibung",
+      "goal_placeholder": "z. B. Ich will in jeder Tonart über Blues improvisieren und mich im Solo nicht mehr verlieren…",
+      "level": "Dein Level",
+      "who_sees": "Wer sie sieht",
+      "needs": "Diese braucht {{cost}} Tokens, und du hast {{left}}.",
+      "donation_adds": "Jede Spende bringt Tokens",
+      "next_free": "Als Nächstes prüft der Coach das Ziel und stellt ein paar Fragen — kostenlos. Die Erstellung kostet {{cost}}.",
+      "continue": "Weiter"
+    },
+    "brief": {
+      "told_coach": "Was du dem Coach gesagt hast",
+      "edit_goal": "Ziel bearbeiten",
+      "back": "Zurück",
+      "progress": "Fortschritt",
+      "summary": "Zusammenfassung",
+      "obscure_title": "Das kennt der Coach nicht gut",
+      "obscure_body": "Nenne zwei oder drei Songs oder Techniken, die du davon willst, und der Plan baut auf ihnen auf statt auf Vermutungen.",
+      "notes_placeholder": "z. B. das Intro-Riff von Song A, wie Leersaiten in Song B genutzt werden, die gezupfte Strophe von Song C",
+      "how_read": "So hat der Coach dein Ziel verstanden",
+      "as_written": "Eine Roadmap rund um das Ziel, so wie du es geschrieben hast.",
+      "songs_in_it": "Songs darin:",
+      "change_songs": "Songs ändern",
+      "change": "Ändern: {{question}}",
+      "nothing_to_add": "Nichts hinzuzufügen — ab hier übernimmt der Coach.",
+      "takes_minutes": "Dauert ein paar Minuten. Du kannst gehen, während sie geschrieben wird — wir benachrichtigen dich.",
+      "n_of": "{{n}} von {{total}} — jede lässt sich überspringen.",
+      "skip": "Überspringen",
+      "generate": "Roadmap erstellen",
+      "next": "Weiter",
+      "bank": {
+        "focus": {
+          "question": "Das Ziel ist weit gefasst — was genau?",
+          "hint": "Der Coach baut die Roadmap rund um das, was du wählst."
+        },
+        "useFor": {
+          "question": "Wofür willst du es nutzen?",
+          "hint": "Dieselbe Technik ist in einem anderen Stil eine andere Roadmap."
+        },
+        "sides": {
+          "question": "Welche Seiten dieses Stils willst du abdecken?",
+          "hint": "Nimm eine Seite raus, und ihre Phasen fallen weg."
+        },
+        "songs": {
+          "question": "Welche Songs sollen in die Roadmap?",
+          "hint": "Songs aus der Bibliothek öffnen sich mit Tab und Backing Track. Andere werden zu Schritten ohne beides."
+        },
+        "repertoireDepth": {
+          "question": "Weniger Songs gründlich oder mehr Songs leichter?",
+          "options": {
+            "deep": {
+              "label": "2–3 Songs, Teil für Teil",
+              "hint": "Jeder Song bekommt mehrere Schritte: Teile, reduziertes Tempo, Album-Tempo, eine Aufnahme."
+            },
+            "wide": {
+              "label": "5–6 Songs, je ein Schritt",
+              "hint": "Jeder Song ist ein Schritt — der ganze Part in spielbarem Tempo."
+            }
+          }
+        },
+        "startingPoint": {
+          "question": "Wo stehst du damit gerade?",
+          "hint": "Phase 1 beginnt hier — nichts darunter wird unterrichtet."
+        },
+        "target": {
+          "question": "Was würde als geschafft gelten?",
+          "hint": "Darauf werden die Erfolgskriterien der letzten Phase geschrieben."
+        },
+        "weakSpot": {
+          "question": "Was an diesem Stil macht dir am meisten Mühe?",
+          "hint": "Es bekommt früher eine eigene Phase, mit mehr Sessions."
+        },
+        "replicateOrCreate": {
+          "question": "Wie auf der Platte spielen oder dein eigenes Spiel in diesem Stil?",
+          "options": {
+            "replicate": {
+              "label": "Wie auf der Platte",
+              "hint": "Songs Teil für Teil bis zum Album-Tempo. Keine Improvisationsschritte."
+            },
+            "create": {
+              "label": "Mein eigenes Spiel in diesem Stil",
+              "hint": "Ein kreativer Schritt in jeder Phase: Improvisieren, eigene Fills, eigene Parts."
+            }
+          }
+        },
+        "entry": {
+          "question": "Wo soll es anfangen?",
+          "options": {
+            "song": {
+              "label": "Ein Stück eines Songs ab der ersten Phase",
+              "hint": "Gleich ein vereinfachtes Stück des Ziels, die Technik drumherum aufgebaut."
+            },
+            "foundation": {
+              "label": "Erst Grundlagen, Songs später",
+              "hint": "Die ersten Phasen sind Technik; die Songs warten, bis sie sitzt."
+            }
+          }
+        },
+        "includes": {
+          "question": "Was soll drin sein?",
+          "hint": "Standardmäßig ist alles drin — nimm raus, was du nicht willst.",
+          "options": {
+            "tone": {
+              "label": "Eine Phase zum Sound",
+              "hint": "Rig, Sound nach Gehör treffen, das Equipment des Künstlers."
+            },
+            "theory": {
+              "label": "Theorie über das Minimum hinaus",
+              "hint": "Warum die Töne funktionieren, nicht nur welche."
+            },
+            "ear": {
+              "label": "Gehörarbeit",
+              "hint": "Phrasen transkribieren, Parts nach Gehör lernen."
+            }
+          }
+        },
+        "ending": {
+          "question": "Wie soll es enden?",
+          "options": {
+            "set": {
+              "label": "Ein aufgenommenes Set",
+              "hint": "Eine letzte Phase: die Songs am Stück, aufgenommen, wie ein kleiner Gig."
+            },
+            "none": {
+              "label": "Keine letzte Phase",
+              "hint": "Die Roadmap endet mit dem letzten Song oder Skill."
+            }
+          }
+        },
+        "practiceStyle": {
+          "question": "Wie übst du gern?",
+          "hint": "Der Coach wählt Übungen dieser Art. Nimm raus, was du nie öffnest.",
+          "options": {
+            "drill": {
+              "label": "Drills mit Metronom"
+            },
+            "backing": {
+              "label": "Zu einem Backing Track spielen"
+            },
+            "hunt": {
+              "label": "Griffbrett-Spiele",
+              "hint": "Klick-Jagden, ohne Mikrofon."
+            }
+          }
+        }
+      }
+    },
+    "preflight": {
+      "lines": {
+        "0": "Dein Ziel wird gelesen",
+        "1": "Die Song-Bibliothek wird geprüft",
+        "2": "Die Fragen an dich werden ausgewählt"
+      },
+      "free": "Dafür wird nichts berechnet — Tokens gehen erst bei der Erstellung."
+    },
+    "songs": {
+      "add_failed": "Der Song konnte nicht zur Bibliothek hinzugefügt werden.",
+      "missing_body": "Noch nicht in der Bibliothek. Füg sie hinzu, und jeder bekommt einen echten Schritt mit Tab und Backing Track — oder lass sie als Hinweis für den Coach.",
+      "add_tag": "zur Bibliothek hinzufügen",
+      "remove": "{{title}} entfernen",
+      "none": "Noch keine Songs gewählt — der Coach sucht sie aus.",
+      "full": "Das sind {{max}} — mehr fasst eine Roadmap nicht",
+      "search": "Nach Titel oder Künstler suchen — Fehlendes kann hinzugefügt werden",
+      "spotify_hint": "Noch nicht in der Bibliothek — ein Klick fügt ihn hinzu",
+      "reference": "Songs, die wir nicht haben, als Hinweis für den Coach",
+      "reference_placeholder": "z. B. Romeo and Juliet, Brothers in Arms"
+    },
+    "players": {
+      "started": "Roadmap gestartet — dein Fortschritt darauf gehört dir.",
+      "start_failed": "Die Roadmap konnte nicht gestartet werden. Versuch es noch mal.",
+      "starting": "Wird gestartet…",
+      "start": "Diese Roadmap starten",
+      "done_refining": "Überarbeitung beenden",
+      "refine": "Überarbeiten",
+      "unknown": "Unbekannter Spieler",
+      "another": "einem anderen Spieler",
+      "gone": "Von dieser Roadmap sind nur noch die Fortschrittszähler übrig.",
+      "someone_else": "Die Roadmap von jemand anderem. Klick auf „Diese Roadmap starten“, um sie selbst durchzuarbeiten, kostenlos, mit deinem eigenen Fortschritt.",
+      "following_note": "Du arbeitest die Roadmap von {{name}} durch. Der Fortschritt auf der Karte gehört dir; seiner bleibt seiner.",
+      "refine_note": "Überarbeitungsmodus. Nutz den Zauberstab neben einem Schritt auf der Karte, damit der Coach ihn neu schreibt, die Übung tauscht, Lektionen oder den Song neu sucht oder danach einen Schritt einfügt — je ein, zwei Tokens, sofort in deiner Roadmap gespeichert. Einen Schritt zu entfernen ist kostenlos.",
+      "exercises": "Übungen",
+      "songs": "Songs",
+      "lessons": "Videolektionen",
+      "following_count": "{{count}} Spieler folgen",
+      "following_count_one": "1 Spieler folgt",
+      "following_none": "Du folgst, noch keine Sessions",
+      "not_started": "Noch nicht gestartet",
+      "started_on": "gestartet am {{date}}",
+      "created_on": "erstellt am {{date}}",
+      "last_practised": "Zuletzt geübt am {{date}}",
+      "not_on_board": "Diese Roadmap ist nicht mehr auf dem Board.",
+      "back_to_list": "Zurück zu den Spieler-Roadmaps",
+      "empty_title": "Noch keine Roadmaps",
+      "empty_body": "Hier erscheinen die Roadmaps, die Spieler für sich erstellen.",
+      "count": "{{total}} Roadmaps von {{players}} Spielern",
+      "count_one": "{{total}} Roadmaps von {{players}} Spieler",
+      "filter": "Nach Ziel oder Spieler filtern…",
+      "all_levels": "Alle Level",
+      "sort_by": "Sortieren nach",
+      "sorts": {
+        "recent": "Zuletzt aktiv",
+        "newest": "Neueste",
+        "practised": "Meistgeübt",
+        "followed": "Meistgefolgt"
+      },
+      "yours": "Deine Roadmaps",
+      "others": "Von anderen Spielern",
+      "no_match": "Nichts passt zu diesem Filter."
+    },
+    "gear": {
+      "propose_title": "Equipment vorschlagen",
+      "propose_subtitle": "Gib ihm einen Namen, wähl die Seltenheit, sag, worin es zerfällt — und hinterlass deine Zeile darauf.",
+      "propose": "Equipment vorschlagen",
+      "not_enough": "Nicht genug Tokens für einen Equipment-Vorschlag",
+      "intro": "Das am stärksten unterstützte Equipment wird als Nächstes ins Arsenal gezeichnet.",
+      "empty": "Noch kein Equipment vorgeschlagen",
+      "voting": "Zur Abstimmung",
+      "status": {
+        "open": "Offen",
+        "accepted": "Angenommen",
+        "in_game": "Im Spiel",
+        "declined": "Wird nicht gemacht"
+      },
+      "status_label": "Status des Vorschlags",
+      "unnamed": "Noch namenlos",
+      "breaks_down": "Zerfällt in",
+      "bench_decides": "Nichts gewählt — die Werkbank entscheidet.",
+      "propose_for": "Vorschlagen für",
+      "more_tokens": "Noch {{count}} Tokens, dann kannst du ihn einreichen.",
+      "more_tokens_one": "Noch 1 Token, dann kannst du ihn einreichen.",
+      "give_name": "Gib ihm einen Namen, dann kann er aufs Board.",
+      "tokens_left": "Du hast noch {{count}} Tokens.",
+      "tokens_left_one": "Du hast noch 1 Token.",
+      "back_to_board": "Zurück zum Board",
+      "scraps_into": "Zerfällt in",
+      "how_many_part": "Wie viele dieses Teils — gerade {{count}}",
+      "take_out": "{{part}} aus der Zerlegung nehmen",
+      "form": {
+        "what_title": "Was ist es",
+        "what_hint": "Eine Gitarre oder ein Pedal, wie es im Arsenal heißen würde und wie selten es sein soll.",
+        "name": "Name",
+        "brand": "Marke",
+        "brand_placeholder": "Marke — optional",
+        "image": "Bildlink",
+        "image_placeholder": "https://… Bildlink, optional",
+        "bad_link": "Nur https-Links werden angezeigt — dieser fällt weg.",
+        "rarity": "Seltenheit",
+        "what_it_does": "Was es macht",
+        "origin_title": "Woher es kommt",
+        "origin_hint": "Wie es klingt und warum es ins Spiel gehört — dazu die eine Zeile, die jedes Exemplar tragen soll.",
+        "description_placeholder": "Woher es kommt, wie es klingt, warum es ins Spiel gehört.",
+        "engraving": "Gravur",
+        "engraving_placeholder": "Eine Zeile, deine, auf jedem Exemplar",
+        "engraving_hint": "Wenn es gebaut wird, kommt deine Zeile auf den Gegenstand — noch {{count}} Zeichen.",
+        "scrap_hint": "Was die Werkbank bekommt, wenn jemand es zerlegt, in Bergungsreihenfolge und mit welcher Stufe. Bis zu {{max}} Teile — leer lassen, und die Werkbank entscheidet."
+      }
+    },
+    "case": {
+      "mine_on_seat": "{{count}} deiner Tokens liegen auf diesem Platz",
+      "mine_on_seat_one": "1 deiner Tokens liegt auf diesem Platz",
+      "empty": "leer",
+      "up_next": "Als Nächstes",
+      "winning": "{{name}} gewinnt diesen Platz",
+      "no_votes": "Noch keine Stimmen",
+      "back_another": "Weiteren Gegenstand unterstützen: {{rarity}} ({{count}})",
+      "search": "Gegenstände suchen: {{rarity}}…",
+      "no_match": "Nichts passt zu „{{search}}“",
+      "back_item": "{{name}} unterstützen",
+      "seat": "Platz: {{rarity}}",
+      "replaces": "Stimm ab, was {{item}} beim Wechsel der Kiste ersetzt.",
+      "fills": "Stimm ab, was ihn beim Wechsel der Kiste füllt.",
+      "title": "Gerade in der Kiste",
+      "intro": "Ein Gegenstand pro Seltenheit. Wähl einen Platz und stimm dann ab, was als Nächstes hineinkommt.",
+      "changes_tomorrow": "wechselt morgen",
+      "changes_in": "wechselt in {{count}} Tagen",
+      "chosen_by": "Von Supportern gewählt",
+      "slate_tomorrow": "neue Auswahl morgen",
+      "slate_in": "neue Auswahl in {{count}} Tagen",
+      "open_for": "Für {{cost}} Fame öffnen",
+      "needs": "Braucht {{cost}} Fame",
+      "supporters_pick": "Supporter wählen, was hier hineinkommt →"
+    },
+    "work": {
+      "columns": {
+        "queue": {
+          "title": "Warteschlange",
+          "blurb": "Als Nächstes, der Reihe nach"
+        },
+        "in_progress": {
+          "title": "In Arbeit",
+          "blurb": "Wird gerade gebaut"
+        },
+        "done": {
+          "title": "Fertig",
+          "blurb": "Erschienen, neueste zuerst"
+        }
+      },
+      "from_idea": "Stammt aus einer Supporter-Idee",
+      "idea": "Supporter-Idee",
+      "nothing_here": "Hier ist nichts",
+      "show_all": "Alle {{count}} anzeigen",
+      "empty_body": "Hier erscheint die Warteschlange, sobald etwas darin ist."
+    }
   }
 }
