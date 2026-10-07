@@ -74,25 +74,35 @@ describe("splitKey", () => {
 
 describe("resolve", () => {
   it("prefers the active locale and falls back to English per key", () => {
-    expect(resolve(catalogs, "pl", ["settings"], "language.title")).toBe("Język");
+    expect(resolve(catalogs, "pl", ["settings"], "language.title")).toBe(
+      "Język",
+    );
     expect(resolve(catalogs, "pl", ["settings"], "language.subtitle")).toBe(
       "On this device",
     );
   });
 
   it("reads English straight off, with no second lookup", () => {
-    expect(resolve(catalogs, "en", ["settings"], "language.title")).toBe("Language");
+    expect(resolve(catalogs, "en", ["settings"], "language.title")).toBe(
+      "Language",
+    );
   });
 
   it("honours namespace order over translated-ness", () => {
     // `common` is listed second, so settings' English "Save" wins even though
     // `common` is where a Polish string would have been found.
-    expect(resolve(catalogs, "pl", ["settings", "common"], "save")).toBe("Save");
-    expect(resolve(catalogs, "pl", ["common", "settings"], "save")).toBe("Store");
+    expect(resolve(catalogs, "pl", ["settings", "common"], "save")).toBe(
+      "Save",
+    );
+    expect(resolve(catalogs, "pl", ["common", "settings"], "save")).toBe(
+      "Store",
+    );
   });
 
   it("uses the namespace in the key when there is one", () => {
-    expect(resolve(catalogs, "pl", ["settings"], "common:shared")).toBe("Wspólne");
+    expect(resolve(catalogs, "pl", ["settings"], "common:shared")).toBe(
+      "Wspólne",
+    );
     expect(resolve(catalogs, "pl", ["settings"], "common:save")).toBe("Store");
   });
 
@@ -134,5 +144,49 @@ describe("createTranslator", () => {
   it("searches `common` when asked for no namespace", () => {
     const t = createTranslator(catalogs, "en", []);
     expect(t("shared")).toBe("Shared");
+  });
+});
+
+describe("plural forms", () => {
+  const plural: CatalogsByLocale = {
+    en: {
+      common: { songs: "{{count}} songs", songs_one: "1 song", plain: "Plain" },
+    },
+    pl: {
+      common: {
+        songs: "Utwory: {{count}}",
+        songs_one: "1 utwór",
+        songs_few: "{{count}} utwory",
+        songs_many: "{{count}} utworów",
+      },
+    },
+  };
+
+  it("picks the form the language's rules ask for", () => {
+    const t = createTranslator(plural, "pl", ["common"]);
+    expect(t("songs", { count: 1 })).toBe("1 utwór");
+    expect(t("songs", { count: 3 })).toBe("3 utwory");
+    expect(t("songs", { count: 5 })).toBe("5 utworów");
+    expect(t("songs", { count: 22 })).toBe("22 utwory");
+  });
+
+  it("falls back to the bare key when a form is missing", () => {
+    const t = createTranslator(plural, "pl", ["common"]);
+    expect(t("songs", { count: 2.5 })).toBe("Utwory: 2.5");
+  });
+
+  it("uses English forms for English, and English rules for its fallback", () => {
+    const en = createTranslator(plural, "en", ["common"]);
+    expect(en("songs", { count: 1 })).toBe("1 song");
+    expect(en("songs", { count: 4 })).toBe("4 songs");
+
+    const de = createTranslator(plural, "de", ["common"]);
+    expect(de("songs", { count: 1 })).toBe("1 song");
+    expect(de("plain", { count: 7 })).toBe("Plain");
+  });
+
+  it("ignores a count that is not a number", () => {
+    const t = createTranslator(plural, "pl", ["common"]);
+    expect(t("songs", { count: "1" })).toBe("Utwory: 1");
   });
 });

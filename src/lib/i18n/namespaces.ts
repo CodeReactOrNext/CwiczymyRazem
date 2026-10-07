@@ -12,6 +12,7 @@ import faq from "../../../public/locales/en/faq.json";
 import feed from "../../../public/locales/en/feed.json";
 import feedback from "../../../public/locales/en/feedback.json";
 import footer from "../../../public/locales/en/footer.json";
+import guilds from "../../../public/locales/en/guilds.json";
 import journey from "../../../public/locales/en/journey.json";
 import leadboard from "../../../public/locales/en/leadboard.json";
 import level_gate from "../../../public/locales/en/level_gate.json";
@@ -58,6 +59,7 @@ export const TRANSLATION_NAMESPACES = [
   "feed",
   "feedback",
   "footer",
+  "guilds",
   "journey",
   "leadboard",
   "level_gate",
@@ -97,7 +99,9 @@ export const DEFAULT_NAMESPACE: TranslationNamespace = "common";
 /** A parsed namespace file: nested objects of strings, addressed with dot paths. */
 export type TranslationDict = Record<string, unknown>;
 
-export type LocaleCatalog = Partial<Record<TranslationNamespace, TranslationDict>>;
+export type LocaleCatalog = Partial<
+  Record<TranslationNamespace, TranslationDict>
+>;
 
 /**
  * English, bundled rather than fetched.
@@ -120,6 +124,7 @@ export const EN_CATALOG: LocaleCatalog = {
   feed,
   feedback,
   footer,
+  guilds,
   journey,
   leadboard,
   level_gate,

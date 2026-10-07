@@ -1,0 +1,847 @@
+{
+  "tabs": {
+    "browse": "Gildie",
+    "members": "Członkowie",
+    "chat": "Czat",
+    "stash": "Schowek",
+    "quests": "Zadania",
+    "upgrades": "Ulepszenia",
+    "kit": "Wygląd"
+  },
+  "tab_locked": "{{label}} — najpierw dołącz do gildii",
+  "seats_taken": "Zajęte miejsca: {{count}} z {{limit}}",
+  "lvl": "poz.",
+  "level_ring": "Poziom gildii {{level}} · zadania na tym okrążeniu: {{done}} z {{lap}}",
+  "needs_guild": {
+    "title": "Najpierw dołącz do gildii",
+    "browse": "Zobacz gildie",
+    "members": "Skład to ludzie, z którymi jesteś w gildii — a Ty jeszcze w żadnej nie jesteś.",
+    "chat": "Czat jest dla ludzi, z którymi grasz.",
+    "stash": "Półka należy do gildii, a Ty w żadnej nie jesteś.",
+    "quests": "Zadania zalicza gildia, a Ty jeszcze w żadnej nie jesteś.",
+    "upgrades": "Za ulepszenia płaci gildia, a Ty jeszcze w żadnej nie jesteś."
+  },
+  "header": {
+    "founded_by": "Założyciel: {{name}}.",
+    "intro": "Znajdź ludzi, z którymi będziesz ćwiczyć. Dołączenie jest darmowe."
+  },
+  "browser": {
+    "rank": "Miejsce {{rank}}",
+    "yours": "Twoja",
+    "by": "zał. {{name}}",
+    "level": "Poziom {{level}}",
+    "leave": "Opuść",
+    "waiting": "Oczekuje",
+    "turned_down": "Odrzucono",
+    "withdraw": "Wycofaj",
+    "clear": "Usuń",
+    "no_seats": "Brak wolnych miejsc",
+    "leave_first": "Opuść swoją gildię, zanim poprosisz o dołączenie do innej",
+    "full": "Pełna",
+    "join": "Dołącz",
+    "asking": "Chcą dołączyć",
+    "already_turned_down": "Już odrzucono — ta osoba wciąż może wycofać prośbę.",
+    "accept": "Przyjmij",
+    "intro": "Gildie awansują, zaliczając razem zadania. Dołączenie jest darmowe.",
+    "leave_before_founding": "Opuść swoją gildię, zanim założysz własną",
+    "not_enough_tokens": "Za mało tokenów",
+    "name_yours": "Nazwa będzie Twoja na stałe",
+    "found": "Załóż gildię",
+    "search": "Szukaj gildii po nazwie, tagu lub opisie…",
+    "empty_title": "Nie ma jeszcze gildii",
+    "empty_body": "Nikt jeszcze nie zajął nazwy. Pierwsza wciąż czeka.",
+    "no_match": "Żadna gildia nie pasuje do „{{search}}”",
+    "ranking": "Ranking gildii"
+  },
+  "members": {
+    "sessions_one": "1 sesja",
+    "sessions": "Sesje: {{count}}",
+    "sessions_few": "{{count}} sesje",
+    "sessions_many": "{{count}} sesji",
+    "hours": "{{hours}} h ćwiczeń",
+    "honor_title": "Zdobyty honor: {{earned}} · do wydania na półce: {{balance}}",
+    "founder": "Założyciel",
+    "you": "To Ty",
+    "roster": "Skład",
+    "room_for": "wolne miejsca: {{count}}",
+    "room_full": "brak miejsc — kolejne kupuje się w zakładce Ulepszenia",
+    "together": "Razem: sesje {{sessions}} i {{hours}}",
+    "together_since": "Razem od {{since}}: sesje {{sessions}} i {{hours}}",
+    "honor_explainer": "Honor to własna waluta gildii: zdobywasz go, wkładając do gildii Fame, tokeny lub sprzęt, a wydajesz, zabierając sprzęt z półki."
+  },
+  "upgrades": {
+    "intro": "Każdy dorzuca, a ulepszenie kupuje się samo, gdy pula się zapełni. Za wszystko, co włożysz, dostajesz {{honor}} do wydania na półce.",
+    "honor": "honor",
+    "seats_title": "Więcej miejsc",
+    "all_seats": "Wszystkie miejsca zajęte ({{count}})",
+    "seats_buys": "dodatkowe miejsca: {{count}}",
+    "seats_max": "gildia może mieć najwyżej {{count}} miejsc",
+    "rows_title": "Kolejny rząd półki",
+    "rows_one": "Schowek ma 1 rząd",
+    "rows": "Rzędy w schowku: {{count}}",
+    "rows_buys": "jeden rząd więcej",
+    "rows_max": "półka może mieć najwyżej {{count}} rzędów"
+  },
+  "founding": {
+    "seats": "Miejsca: {{count}} z {{limit}}",
+    "yours": "Twoja",
+    "open": "Otwórz",
+    "founder_note": "Założyłeś tę gildię, a jedna osoba może należeć tylko do jednej gildii naraz. Założyciel może odejść dopiero wtedy, gdy odejdą wszyscy pozostali.",
+    "member_note": "Należysz do gildii, a jedna osoba może być tylko w jednej naraz. Opuść ją na stronie Gildie, zanim założysz własną.",
+    "seats_note": "Miejsca kupuje się za tokeny, po {{count}} naraz, i może to zrobić każdy członek — przycisk jest na karcie gildii w /guilds.",
+    "title": "Załóż gildię za",
+    "body": "Najdroższa rzecz w panelu, bo jako jedyna zabiera coś, czego potem nikt inny nie może mieć: nazwę i tag, na zawsze. Każdy może potem poprosić o dołączenie, a Ty decydujesz, kto wchodzi.",
+    "cta": "Załóż za",
+    "not_enough": "Za mało tokenów",
+    "see_existing": "Zobacz istniejące gildie →"
+  },
+  "fund": {
+    "member_left": "osoba, która odeszła",
+    "paid_by": "Zapłacili:",
+    "and_more": "i jeszcze {{count}}",
+    "maxed": "Maksimum — {{maxed}}.",
+    "next_step": "Następny krok dodaje: {{buys}}",
+    "wallet_empty": "Tym razem nie masz już nic w portfelu.",
+    "you_have": "Masz tokeny: {{count}}",
+    "chip_in": "Dorzuć"
+  },
+  "treasury": {
+    "filled_by": "Wpłacili:",
+    "title": "Fame gildii",
+    "counting_towards": "Liczy się do: {{goal}}.",
+    "counts": "Liczy się do zadań gildii, nigdy nie jest wydawane.",
+    "empty": "Tym razem nie masz własnego Fame.",
+    "you_have": "Masz {{count}} Fame",
+    "put_in": "Wpłać",
+    "bank": "W skarbcu jest teraz {{fame}} Fame.",
+    "bank_spent": "W skarbcu jest teraz {{fame}} Fame, a {{spent}} wydano, kiedy jeszcze było można."
+  },
+  "honor": {
+    "left_by": "zostawił(a): {{name}}",
+    "a_member": "członek gildii",
+    "costs": "Kosztuje",
+    "yours": "Twój honor",
+    "take_for": "Weź za {{cost}} honoru",
+    "short": "Brakuje honoru: {{count}}",
+    "how_to_earn": "Honor zdobywasz, wkładając coś do gildii: Fame do skarbca, tokeny do puli albo sprzęt na tę półkę.",
+    "take_label": "Weź za",
+    "amount": "{{count}} honoru"
+  },
+  "deposit": {
+    "title": "Zostaw {{name}} w schowku gildii",
+    "into_stash": "do schowka gildii",
+    "earns": "Zdobywasz",
+    "from_then_on": "Od tej chwili należy do gildii — może to wziąć każdy członek.",
+    "leaving": "Zostawianie…",
+    "confirm": "Zostaw w schowku"
+  },
+  "badge": {
+    "with_level": "Gildia: {{tag}} · poziom {{level}}",
+    "plain": "Gildia: {{tag}}"
+  },
+  "cover": {
+    "your_honor": "Twój honor: zdobyty {{earned}} · do wydania na półce {{balance}}"
+  },
+  "units": {
+    "sessions": "{{value}} sesji",
+    "sessions_one": "{{value}} sesja",
+    "sessions_few": "{{value}} sesje",
+    "sessions_many": "{{value}} sesji",
+    "hours": "{{value}} h",
+    "fame": "{{value}} Fame",
+    "members": "{{value}} członka",
+    "members_one": "{{value}} członek",
+    "members_few": "{{value}} członków",
+    "members_many": "{{value}} członków",
+    "songs": "{{value}} utworu",
+    "songs_one": "{{value}} utwór",
+    "songs_few": "{{value}} utwory",
+    "songs_many": "{{value}} utworów",
+    "recordings": "{{value}} nagrania",
+    "recordings_one": "{{value}} nagranie",
+    "recordings_few": "{{value}} nagrania",
+    "recordings_many": "{{value}} nagrań",
+    "quests": "{{value}} zadania",
+    "quests_one": "{{value}} zadanie",
+    "quests_few": "{{value}} zadania",
+    "quests_many": "{{value}} zadań",
+    "exams": "{{value}} egzaminu",
+    "exams_one": "{{value}} egzamin",
+    "exams_few": "{{value}} egzaminy",
+    "exams_many": "{{value}} egzaminów",
+    "entries": "{{value}} zgłoszenia",
+    "entries_one": "{{value}} zgłoszenie",
+    "entries_few": "{{value}} zgłoszenia",
+    "entries_many": "{{value}} zgłoszeń",
+    "points": "{{value}} punktu",
+    "points_one": "{{value}} punkt",
+    "points_few": "{{value}} punkty",
+    "points_many": "{{value}} punktów"
+  },
+  "asks": {
+    "all_categories": "{{amount}} w każdej z czterech kategorii",
+    "streak": "serii {{days}} dni"
+  },
+  "describe": {
+    "members": "Członkowie: {{count}}",
+    "members_one": "Jeden członek",
+    "members_few": "{{count}} członków",
+    "members_many": "{{count}} członków",
+    "each": "{{members}} z wynikiem {{amount}} każdy.",
+    "sessions": "{{amount}} łącznie.",
+    "time": "{{amount}} ćwiczeń łącznie.",
+    "technique": "{{amount}} techniki.",
+    "theory": "{{amount}} teorii.",
+    "hearing": "{{amount}} kształcenia słuchu.",
+    "creativity": "{{amount}} twórczego grania.",
+    "points": "Punkty zdobyte łącznie: {{count}}.",
+    "all_categories": "{{members}} z {{amount}} w każdej z czterech kategorii.",
+    "treasury": "{{amount}} wpłacone do skarbca gildii.",
+    "streak": "{{members}} z serią {{days}} dni w tym samym czasie.",
+    "songs": "Utwory oznaczone jako opanowane: {{amount}}.",
+    "recordings": "Opublikowane nagrania: {{amount}}.",
+    "exams": "Zaliczone egzaminy ścieżki: {{count}}.",
+    "daily_quests": "Ukończone zadania dzienne: {{count}}.",
+    "submissions": "Zgłoszenia do miesięcznego wyzwania: {{amount}}."
+  },
+  "quests": {
+    "waiting": "Fame czekające na Ciebie",
+    "fame": "{{amount}} Fame",
+    "plus_fame": "+{{amount}} Fame",
+    "claim": "Odbierz {{amount}} Fame",
+    "cleared_while_here": "Zadania zaliczone, gdy byłeś w składzie: {{count}}.",
+    "cleared_while_here_one": "Jedno zadanie zaliczone, gdy byłeś w składzie.",
+    "all_taken": "Wszystko z zadań, przy których byłeś, zostało odebrane. Następna nagroda pojawi się tutaj.",
+    "guild_level": "Poziom gildii {{level}}",
+    "level": "poziom",
+    "lap": "okrążenie {{lap}}",
+    "level_up": "Każde zaliczone zadanie to jeden poziom wyżej i {{reward}}.",
+    "lap_cleared": "Zaliczone zadania: {{done}} z {{total}}",
+    "lap_cleared_on": "Zaliczone zadania na okrążeniu {{lap}}: {{done}} z {{total}}",
+    "chapter_of": "rozdział {{index}} z {{total}}",
+    "chapter_of_cap": "Rozdział {{index}} z {{total}}",
+    "chapter": "Rozdział {{index}}",
+    "road_ahead": "Droga przed wami",
+    "ladder": "Dziesięć rozdziałów po pięć zadań, otwieranych po kolei. Późniejsze rozdziały wymagają więcej i płacą więcej.",
+    "ladder_lap": "Po dziesiątym drabina zaczyna się od nowa — to okrążenie {{lap}}, a każdy cel i każda nagroda są ×{{times}}.",
+    "ladder_first": "Po dziesiątym drabina zaczyna się od nowa, a wszystkie liczby rosną dwa, potem trzy razy — nigdy się nie kończy.",
+    "you_are_here": "tu jesteście",
+    "n_quests": "Zadania: {{count}}",
+    "n_cleared": "Zaliczone: {{done}} z {{total}}",
+    "per_member": "na członka za każde zadanie",
+    "chapter_cleared": "Rozdział zaliczony",
+    "to_clear": "Zadania do zaliczenia: {{count}}",
+    "to_clear_one": "Jedno zadanie do zaliczenia",
+    "clear_all_five": "Zalicz wszystkie pięć, a otworzy się kolejny rozdział.",
+    "cleared_of": "Zaliczone: {{done}} z {{total}}",
+    "cleared_in_chapter": "Zaliczone w tym rozdziale",
+    "counted": "Liczone dla wszystkich w składzie. Zadanie, które liczy członków, jest zaliczone, gdy dojdzie do celu wystarczająco wielu z nich; reszta sumuje się w całej gildii.",
+    "counted_since": "Liczone dla wszystkich w składzie od {{since}}. Zadanie, które liczy członków, jest zaliczone, gdy dojdzie do celu wystarczająco wielu z nich; reszta sumuje się w całej gildii.",
+    "chapters": {
+      "0": {
+        "name": "Rozgrzewka",
+        "blurb": "Pojawiajcie się razem i zacznijcie liczyć."
+      },
+      "1": {
+        "name": "Próba",
+        "blurb": "Godziny zaczynają się sumować, a do gry wchodzi słuch."
+      },
+      "2": {
+        "name": "Repertuar",
+        "blurb": "Utwory opanowane, zagrane, nagrane."
+      },
+      "3": {
+        "name": "Dyscyplina",
+        "blurb": "Wszyscy ciągną, codziennie."
+      },
+      "4": {
+        "name": "Równowaga",
+        "blurb": "Każda strona grania, od każdego członka."
+      },
+      "5": {
+        "name": "Tempo",
+        "blurb": "Egzaminy, tysiąc sesji i teoria do kompletu."
+      },
+      "6": {
+        "name": "Scena",
+        "blurb": "Przed publicznością, z nazwą gildii na plakacie."
+      },
+      "7": {
+        "name": "Maszyna",
+        "blurb": "Gildia działa sama. Tysiąc godzin za nią."
+      },
+      "8": {
+        "name": "Uczeni",
+        "blurb": "Trudne kategorie, w poważnych ilościach."
+      },
+      "9": {
+        "name": "Legendy",
+        "blurb": "Liczby, których większość gildii nigdy nie zobaczy."
+      }
+    },
+    "items": {
+      "sessions-100": {
+        "name": "Pierwsza setka",
+        "blurb": "Sto sesji ćwiczeń łącznie."
+      },
+      "hours-50": {
+        "name": "Pięćdziesiąt godzin",
+        "blurb": "Pięćdziesiąt godzin ćwiczeń w sumie."
+      },
+      "members-sessions-5-x3": {
+        "name": "Trzech stałych bywalców",
+        "blurb": "Trzech członków z pięcioma sesjami każdy."
+      },
+      "technique-10": {
+        "name": "Ręce do roboty",
+        "blurb": "Dziesięć godzin techniki."
+      },
+      "treasury-300": {
+        "name": "Kapitał zalążkowy",
+        "blurb": "Trzysta Fame wpłacone do skarbca gildii."
+      },
+      "sessions-250": {
+        "name": "Ćwierć tysiąca",
+        "blurb": "Dwieście pięćdziesiąt sesji."
+      },
+      "hours-150": {
+        "name": "Długi dystans",
+        "blurb": "Sto pięćdziesiąt godzin ćwiczeń."
+      },
+      "theory-25": {
+        "name": "Mole książkowe",
+        "blurb": "Dwadzieścia pięć godzin teorii."
+      },
+      "hearing-25": {
+        "name": "Otwarte uszy",
+        "blurb": "Dwadzieścia pięć godzin kształcenia słuchu."
+      },
+      "streak-7-x3": {
+        "name": "Trzy płomienie",
+        "blurb": "Trzech członków z siedmiodniową serią w tym samym czasie."
+      },
+      "songs-learned-25": {
+        "name": "Setlista",
+        "blurb": "Dwadzieścia pięć utworów oznaczonych jako opanowane w całej gildii."
+      },
+      "points-2000": {
+        "name": "Dwa tysiące punktów",
+        "blurb": "Dwa tysiące punktów ćwiczeń zdobytych łącznie."
+      },
+      "recordings-5": {
+        "name": "Na taśmie",
+        "blurb": "Pięć nagrań opublikowanych przez członków."
+      },
+      "technique-50": {
+        "name": "Pięćdziesiąt techniki",
+        "blurb": "Pięćdziesiąt godzin techniki."
+      },
+      "creativity-25": {
+        "name": "Sala prób",
+        "blurb": "Dwadzieścia pięć godzin twórczego grania."
+      },
+      "sessions-500": {
+        "name": "Pięćset",
+        "blurb": "Pięćset sesji."
+      },
+      "hours-300": {
+        "name": "Trzysta godzin",
+        "blurb": "Trzysta godzin ćwiczeń."
+      },
+      "members-sessions-20-x4": {
+        "name": "Czterech stałych bywalców",
+        "blurb": "Czterech członków z dwudziestoma sesjami każdy."
+      },
+      "daily-quests-30": {
+        "name": "Dziennik zadań",
+        "blurb": "Trzydzieści zadań dziennych ukończonych łącznie."
+      },
+      "streak-30-x1": {
+        "name": "Miesiąc",
+        "blurb": "Jeden członek z trzydziestodniową serią."
+      },
+      "technique-100": {
+        "name": "Setka techniki",
+        "blurb": "Sto godzin techniki."
+      },
+      "theory-50": {
+        "name": "Teoria: pięćdziesiąt",
+        "blurb": "Pięćdziesiąt godzin teorii."
+      },
+      "hearing-50": {
+        "name": "Słuch: pięćdziesiąt",
+        "blurb": "Pięćdziesiąt godzin kształcenia słuchu."
+      },
+      "creativity-50": {
+        "name": "Twórczość: pięćdziesiąt",
+        "blurb": "Pięćdziesiąt godzin twórczego grania."
+      },
+      "members-all-categories-x4": {
+        "name": "Wszechstronni",
+        "blurb": "Czterech członków z godziną w każdej z czterech kategorii."
+      },
+      "theory-100": {
+        "name": "Teoria: setka",
+        "blurb": "Sto godzin teorii."
+      },
+      "exams-10": {
+        "name": "Egzaminowani",
+        "blurb": "Dziesięć zaliczonych egzaminów ścieżki."
+      },
+      "sessions-1000": {
+        "name": "Tysiąc",
+        "blurb": "Tysiąc sesji."
+      },
+      "hours-600": {
+        "name": "Sześćset godzin",
+        "blurb": "Sześćset godzin ćwiczeń."
+      },
+      "hearing-100": {
+        "name": "Słuch: setka",
+        "blurb": "Sto godzin kształcenia słuchu."
+      },
+      "recordings-20": {
+        "name": "Dwadzieścia taśm",
+        "blurb": "Dwadzieścia opublikowanych nagrań."
+      },
+      "submissions-5": {
+        "name": "Pretendenci",
+        "blurb": "Pięć zgłoszeń do miesięcznego wyzwania."
+      },
+      "songs-learned-50": {
+        "name": "Pięćdziesiąt utworów",
+        "blurb": "Pięćdziesiąt utworów oznaczonych jako opanowane."
+      },
+      "points-20000": {
+        "name": "Dwadzieścia tysięcy punktów",
+        "blurb": "Dwadzieścia tysięcy punktów ćwiczeń zdobytych łącznie."
+      },
+      "treasury-3000": {
+        "name": "Skarbiec wojenny",
+        "blurb": "Trzy tysiące Fame wpłacone do skarbca gildii."
+      },
+      "sessions-2000": {
+        "name": "Dwa tysiące",
+        "blurb": "Dwa tysiące sesji."
+      },
+      "hours-1000": {
+        "name": "Tysiąc godzin",
+        "blurb": "Tysiąc godzin ćwiczeń."
+      },
+      "technique-250": {
+        "name": "Technika 250",
+        "blurb": "Dwieście pięćdziesiąt godzin techniki."
+      },
+      "members-sessions-50-x5": {
+        "name": "Pięciu stałych bywalców",
+        "blurb": "Pięciu członków z pięćdziesięcioma sesjami każdy."
+      },
+      "streak-14-x5": {
+        "name": "Pięć płomieni",
+        "blurb": "Pięciu członków z czternastodniową serią w tym samym czasie."
+      },
+      "theory-150": {
+        "name": "Teoria 150",
+        "blurb": "Sto pięćdziesiąt godzin teorii."
+      },
+      "hearing-150": {
+        "name": "Słuch 150",
+        "blurb": "Sto pięćdziesiąt godzin kształcenia słuchu."
+      },
+      "creativity-150": {
+        "name": "Twórczość 150",
+        "blurb": "Sto pięćdziesiąt godzin twórczego grania."
+      },
+      "daily-quests-100": {
+        "name": "Sto zadań",
+        "blurb": "Sto ukończonych zadań dziennych."
+      },
+      "exams-50": {
+        "name": "Pięćdziesiąt egzaminów",
+        "blurb": "Pięćdziesiąt zaliczonych egzaminów ścieżki."
+      },
+      "sessions-5000": {
+        "name": "Pięć tysięcy",
+        "blurb": "Pięć tysięcy sesji."
+      },
+      "hours-2500": {
+        "name": "2500 godzin",
+        "blurb": "Dwa i pół tysiąca godzin ćwiczeń."
+      },
+      "songs-learned-100": {
+        "name": "Sto utworów",
+        "blurb": "Sto utworów oznaczonych jako opanowane."
+      },
+      "recordings-50": {
+        "name": "Pięćdziesiąt taśm",
+        "blurb": "Pięćdziesiąt opublikowanych nagrań."
+      },
+      "streak-100-x1": {
+        "name": "Sto dni",
+        "blurb": "Jeden członek ze studniową serią."
+      }
+    }
+  },
+  "card": {
+    "you_of": "Ty: {{mine}} / {{target}}",
+    "you_categories": "Ty: {{mine}} / {{count}} kategorii",
+    "your_streak": "Twoja seria: {{mine}} / {{count}} dni",
+    "members_need": "Jeszcze {{count}} członków potrzebuje: {{ask}}",
+    "members_need_one": "Jeszcze 1 członek potrzebuje: {{ask}}",
+    "members_need_few": "Jeszcze {{count}} członków potrzebuje: {{ask}}",
+    "members_need_many": "Jeszcze {{count}} członków potrzebuje: {{ask}}",
+    "to_go": "Zostało: {{amount}}",
+    "you": "Ty: {{amount}}",
+    "cleared_on": "Zaliczone {{date}}"
+  },
+  "spend": {
+    "token_amount": "{{amount}} tokena",
+    "token_amount_one": "{{amount}} token",
+    "token_amount_few": "{{amount}} tokeny",
+    "token_amount_many": "{{amount}} tokenów",
+    "fame_amount": "{{amount}} Fame",
+    "in_bank": "w skarbcu",
+    "covered": "opłacone",
+    "have_of": "{{have}} z {{need}}",
+    "finish": "domknij"
+  },
+  "parts": {
+    "tier_part": "Część: {{tier}}",
+    "tiers": {
+      "Standard": "Standardowa",
+      "Epic": "Epicka",
+      "Legendary": "Legendarna",
+      "Unique": "Unikatowa"
+    },
+    "of": "z {{count}}",
+    "how_many_leave": "Ile zostawić",
+    "how_many_take": "Ile wziąć",
+    "earns_honor": "zdobywasz {{honor}} honoru",
+    "costs_honor": "kosztuje {{honor}} honoru",
+    "you_have": "masz {{count}}",
+    "leave": "Zostaw {{count}}",
+    "take": "Weź {{count}}",
+    "leave_all": "Zostaw wszystkie ({{count}})",
+    "take_all": "Weź wszystkie ({{count}})"
+  },
+  "kit": {
+    "slot": "Miejsce {{index}}: {{icon}}",
+    "slot_lit": "Miejsce {{index}}: {{icon}} — wybierasz dla niego",
+    "pick_for": "Wybierz dla miejsca {{index}} — albo kliknij miejsce, żeby zmienić tylko je.",
+    "unlocked_of": "Odblokowane: {{done}} z {{total}}",
+    "unlocks_at": "odblokowuje się na poziomie gildii {{level}}",
+    "unlocks_at_cap": "Odblokowuje się na poziomie gildii {{level}}",
+    "wear_four": "Załóż te cztery",
+    "back_to_worn": "Wróć do obecnych",
+    "worn_now": "Założone",
+    "wear_it": "Załóż",
+    "lvl": "poz. {{level}}",
+    "intro": "Karta po lewej to wygląd gildii wszędzie indziej. Każdy kolor, baner, ikona i tag poniżej są darmowe, a wybierasz je, bo to Ty założyłeś tę gildię. Prostsze są dostępne od początku; reszta odblokowuje się wraz z poziomem gildii, a każdy kafelek mówi, na którym. Wybierz coś, a chwilę później cały skład to nosi.",
+    "unlocked_at_level": "Odblokowane na poziomie gildii {{level}}: {{done}} z {{total}}"
+  },
+  "new": {
+    "logo_types": "Tylko PNG, JPG lub WebP",
+    "logo_size": "Ten plik ma ponad {{mb}} MB",
+    "logo_unreadable": "Nie udało się odczytać tego obrazu",
+    "description": "Koszt: {{cost}} — zostało Ci {{left}}. Nazwa i tag są wyłącznie Twoje, gdy je zajmiesz.",
+    "name": "Nazwa",
+    "name_problems": {
+      "too-short": "Nazwa gildii musi mieć co najmniej {{min}} znaki",
+      "too-long": "Nazwa gildii może mieć najwyżej {{max}} znaków",
+      "no-letters": "Nazwa gildii musi zawierać litery lub cyfry"
+    },
+    "tag": "Tag",
+    "tag_hint": "wyświetlany obok Twojego nicku",
+    "tag_problems": {
+      "too-short": "Tag musi mieć co najmniej {{min}} znaki",
+      "too-long": "Tag może mieć najwyżej {{max}} znaków"
+    },
+    "picture": "Obrazek",
+    "picture_hint": "opcjonalny, najlepiej kwadratowy",
+    "change": "Zmień",
+    "add_image": "Dodaj obrazek",
+    "remove": "Usuń",
+    "what_for": "Do czego służy",
+    "optional": "opcjonalne",
+    "what_for_placeholder": "Dla kogo jest, co ćwiczycie, kiedy się spotykacie.",
+    "cancel": "Anuluj"
+  },
+  "stash": {
+    "on_shelf": "Na półce",
+    "rows_of": "Rzędy: {{done}} z {{count}}",
+    "honor_title": "Zdobyty honor: {{earned}}, wydany: {{spent}}",
+    "guild_stash": "Schowek gildii",
+    "empty": "Jeszcze nic tu nie ma. Przeciągnij coś ze swojego sprzętu, a ktoś na pewno z tego skorzysta.",
+    "full": "Półka jest pełna — zabierz coś z niej albo dorzuć kilka tokenów na kolejny rząd w zakładce Ulepszenia.",
+    "how": "Przeciągnij gniazdo do własnej szafki, żeby to wziąć, albo je kliknij. Zostawienie czegoś daje honor zależny od rzadkości; zabranie czegokolwiek z półki kosztuje stałe {{cost}}, maksymalnie {{limit}} razy dziennie. Kto co zostawił, widać w zestawieniu poniżej.",
+    "your_gear": "Twój sprzęt",
+    "no_gear": "Nie masz wolnego sprzętu do oddania.",
+    "your_stash": "Twój schowek",
+    "gear_how": "Gitary, efekty, odzyskane części i uratowane mody — wszystko może trafić na półkę: przeciągnij w górę albo kliknij. Przeciąganie w obrębie tej planszy tylko zmienia układ, i właśnie ten układ pokazuje Twój Arsenał. Założony sprzęt zostanie zdjęty automatycznie; efekt trzeba najpierw zdjąć z pedalboardu.",
+    "ledger_title": "Kto daje, kto bierze",
+    "ledger_body": "Każde odłożenie i każde zabranie, liczone dla każdego członka.",
+    "recent": "Ostatnie ruchy",
+    "log_left": "{{name}} zostawił(a) {{item}}",
+    "log_took": "{{name}} wziął/wzięła {{item}}",
+    "take_it": "Weź",
+    "how_many": "Ile"
+  },
+  "cosmetics": {
+    "slots": {
+      "accent": {
+        "label": "Kolor",
+        "blurb": "Z niego rysowana jest reszta wyglądu — zmień go, a baner, ikony i ramka pójdą za nim."
+      },
+      "banner": {
+        "label": "Baner",
+        "blurb": "Pas u góry Twojej karty, na liście gildii i na tej stronie."
+      },
+      "motif": {
+        "label": "Ikony",
+        "blurb": "Cztery ikony powtarzane na banerze. Dowolne cztery."
+      },
+      "frame": {
+        "label": "Tag",
+        "blurb": "Jak Twój tag wygląda obok nicku każdego członka w rankingu."
+      }
+    },
+    "items": {
+      "accent_steel": {
+        "name": "Stal",
+        "blurb": "Zwykły kolor, od którego zaczyna każda gildia."
+      },
+      "accent_ivory": {
+        "name": "Kość słoniowa",
+        "blurb": "Prawie biały. Rzuca się w oczy przed wszystkim innym w rankingu."
+      },
+      "accent_bone": {
+        "name": "Kość",
+        "blurb": "Ciepła szarość, jak stary pickguard."
+      },
+      "accent_signal": {
+        "name": "Sygnał",
+        "blurb": "Cyjan samej aplikacji."
+      },
+      "accent_sky": {
+        "name": "Niebo",
+        "blurb": "Jaśniejszy i chłodniejszy niż Kobalt."
+      },
+      "accent_cobalt": {
+        "name": "Kobalt",
+        "blurb": "Głęboki błękit, zimny jak sala prób w lutym."
+      },
+      "accent_indigo": {
+        "name": "Indygo",
+        "blurb": "Niebieski wpadający w fiolet."
+      },
+      "accent_nightshade": {
+        "name": "Psianka",
+        "blurb": "Fiolet — kolor rzadkiego poziomu."
+      },
+      "accent_neon": {
+        "name": "Neon",
+        "blurb": "Fuksja. Nic innego w rankingu tak nie wygląda."
+      },
+      "accent_bubblegum": {
+        "name": "Guma balonowa",
+        "blurb": "Róż, bez przeprosin."
+      },
+      "accent_crimson": {
+        "name": "Karmazyn",
+        "blurb": "Głośny, i nikt inny w rankingu go nie nosi."
+      },
+      "accent_ember": {
+        "name": "Żar",
+        "blurb": "Pomarańcz serii, dla gildii, która nigdy nie odpuszcza."
+      },
+      "accent_brass": {
+        "name": "Mosiądz",
+        "blurb": "Złoto samego Fame."
+      },
+      "accent_sulphur": {
+        "name": "Siarka",
+        "blurb": "Żółty, o odcień ostrzejszy niż Mosiądz."
+      },
+      "accent_acid": {
+        "name": "Kwas",
+        "blurb": "Limonka. Głośna inaczej niż Karmazyn."
+      },
+      "accent_verdant": {
+        "name": "Zieleń",
+        "blurb": "Zielony, kolor zaliczonego tygodnia."
+      },
+      "accent_lagoon": {
+        "name": "Laguna",
+        "blurb": "Morski, między cyjanem aplikacji a zaliczonym tygodniem."
+      },
+      "banner_none": {
+        "name": "Goły",
+        "blurb": "Bez koloru — tylko Twoje ikony na zwykłym pasie."
+      },
+      "banner_wash": {
+        "name": "Przelew",
+        "blurb": "Po przekątnej: kolor wchodzi od lewego górnego rogu i rzednie ku prawemu dolnemu."
+      },
+      "banner_aurora": {
+        "name": "Zorza",
+        "blurb": "Od lewej do prawej przez dwóch sąsiadów koloru."
+      },
+      "banner_sunburst": {
+        "name": "Wschód słońca",
+        "blurb": "Ciemno u góry, kolor zbiera się ku dolnej krawędzi."
+      },
+      "banner_stage": {
+        "name": "Zmierzch",
+        "blurb": "Od koloru w prawym górnym rogu do jego chłodniejszego sąsiada w lewym dolnym."
+      },
+      "banner_halo": {
+        "name": "Przejście",
+        "blurb": "Z ciemności po lewej w kolor po prawej."
+      },
+      "frame_plain": {
+        "name": "Zwykły",
+        "blurb": "Tag w kolorze gildii, nic wokół."
+      },
+      "frame_ring": {
+        "name": "Obwódka",
+        "blurb": "Cienka obwódka w kolorze gildii."
+      },
+      "frame_double": {
+        "name": "Podwójny",
+        "blurb": "Dwie cienkie obwódki z odrobiną ciemności między nimi."
+      },
+      "frame_plate": {
+        "name": "Płytka",
+        "blurb": "Wypełniony, żeby tag było widać pierwszy w zatłoczonym wierszu."
+      },
+      "frame_heavy": {
+        "name": "Ciężki",
+        "blurb": "Wypełniony i obwiedziony. Najgłośniejszy tag, jaki się da."
+      },
+      "frame_solid": {
+        "name": "Pełny",
+        "blurb": "Blok koloru z tagiem wyciętym na czarno."
+      },
+      "frame_pill": {
+        "name": "Pigułka",
+        "blurb": "Wypełniony i w pełni zaokrąglony, jak przycisk, który nic nie robi."
+      },
+      "frame_sunken": {
+        "name": "Wpuszczony",
+        "blurb": "Wcięty w wiersz: ciemne gniazdo z tagiem w kolorze."
+      },
+      "frame_brackets": {
+        "name": "Nawiasy",
+        "blurb": "Pasek koloru po obu stronach tagu."
+      },
+      "frame_dot": {
+        "name": "Kropka",
+        "blurb": "Kropka koloru przed tagiem, jak lampka statusu przed nazwą."
+      }
+    },
+    "motif_groups": {
+      "instruments": "Instrumenty",
+      "beasts": "Bestie",
+      "arms": "Broń i herby",
+      "elements": "Żywioły",
+      "things": "Cała reszta"
+    },
+    "motif_icons": {
+      "guitar": "Gitara",
+      "bass": "Główka basu",
+      "headstock": "Główka gryfu",
+      "notes": "Nuty",
+      "score": "Partytura",
+      "mic": "Mikrofon",
+      "oldmic": "Stary mikrofon",
+      "speaker": "Głośnik",
+      "headphones": "Słuchawki",
+      "drum": "Bęben",
+      "drumkit": "Perkusja",
+      "piano": "Klawisze fortepianu",
+      "keyboard": "Keyboard",
+      "trombone": "Puzon",
+      "cassette": "Kaseta",
+      "vinyl": "Płyta",
+      "horn": "Róg",
+      "metalhand": "Rogi w górę",
+      "skull": "Czaszka",
+      "crossbones": "Czaszka i piszczele",
+      "bones": "Skrzyżowane kości",
+      "pirate": "Piracka czaszka",
+      "burning": "Płonąca czaszka",
+      "dragon": "Smok",
+      "wolf": "Wilk",
+      "howl": "Wyjący wilk",
+      "werewolf": "Wilkołak",
+      "raven": "Kruk",
+      "eagle": "Orzeł",
+      "lion": "Lew",
+      "tiger": "Tygrys",
+      "bear": "Niedźwiedź",
+      "bull": "Byk",
+      "snake": "Wąż",
+      "spider": "Pająk",
+      "web": "Pajęczyna",
+      "bat": "Nietoperz",
+      "owl": "Sowa",
+      "cat": "Kot",
+      "shark": "Rekin",
+      "octopus": "Ośmiornica",
+      "scorpion": "Skorpion",
+      "reaper": "Żniwiarz",
+      "ghost": "Duch",
+      "devil": "Diabeł",
+      "robot": "Robot",
+      "crown": "Korona",
+      "imperial": "Korona cesarska",
+      "laurel": "Wieniec laurowy",
+      "swords": "Skrzyżowane miecze",
+      "sword": "Miecz",
+      "axes": "Skrzyżowane topory",
+      "battleaxe": "Topór bojowy",
+      "hammer": "Młot",
+      "warhammer": "Młot bojowy",
+      "shield": "Tarcza",
+      "spartan": "Hełm spartański",
+      "viking": "Hełm wikinga",
+      "knight": "Hełm rycerski",
+      "samurai": "Hełm samuraja",
+      "hornedhelm": "Rogaty hełm",
+      "castle": "Zamek",
+      "banner": "Sztandar",
+      "pirateflag": "Flaga piracka",
+      "fist": "Pięść",
+      "anarchy": "Anarchia",
+      "wings": "Skrzydła",
+      "angelwings": "Anielskie skrzydła",
+      "bullseye": "Tarcza strzelnicza",
+      "bomb": "Bomba",
+      "key": "Wytrych",
+      "flame": "Płomień",
+      "candle": "Świeca",
+      "campfire": "Ognisko",
+      "lightning": "Błyskawica",
+      "storm": "Burza",
+      "sun": "Słońce",
+      "moon": "Księżyc",
+      "star": "Gwiazda",
+      "shuriken": "Shuriken",
+      "comet": "Kometa",
+      "crystal": "Kryształowa kula",
+      "potion": "Mikstura",
+      "heart": "Skrzydlate serce",
+      "rose": "Róża i sztylet",
+      "beer": "Piwo",
+      "drinkinghorn": "Róg do picia",
+      "coffee": "Kawa",
+      "anvil": "Kowadło",
+      "gears": "Zębatki",
+      "dice": "Kości do gry",
+      "trophy": "Trofeum",
+      "rocket": "Rakieta",
+      "compass": "Kompas",
+      "anchor": "Kotwica"
+    }
+  }
+}

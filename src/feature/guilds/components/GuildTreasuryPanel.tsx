@@ -7,6 +7,8 @@ import type {
   GuildTreasury,
 } from "feature/guilds/types/guild.types";
 import { rankDepositors } from "feature/guilds/utils/guildTreasury.utils";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Landmark } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -49,16 +51,17 @@ const Depositors = ({
   treasury: GuildTreasury;
   members: GuildMember[];
 }) => {
+  const { t } = useTranslation("guilds");
   const paid = rankDepositors(treasury);
   if (paid.length === 0) return null;
 
   const named = (uid: string) =>
     members.find((member) => member.uid === uid)?.displayName ??
-    "a member who left";
+    t("fund.member_left");
 
   return (
     <p className='text-sm text-zinc-500'>
-      Filled by{" "}
+      {t("treasury.filled_by")}{" "}
       {paid.slice(0, 6).map(({ uid, fame }, index) => (
         <span key={uid}>
           {index > 0 && ", "}
@@ -66,7 +69,7 @@ const Depositors = ({
           {fame.toLocaleString()}
         </span>
       ))}
-      {paid.length > 6 && ` and ${paid.length - 6} more`}
+      {paid.length > 6 && ` ${t("fund.and_more", { count: paid.length - 6 })}`}
     </p>
   );
 };
@@ -100,6 +103,7 @@ export const GuildTreasuryPanel = ({
   action?: ReactNode;
   className?: string;
 }) => {
+  const { t } = useTranslation("guilds");
   const towards = saved ?? treasury.fame;
   const short = goal ? Math.max(0, goal.cost - towards) : 0;
   const amounts = offers(fame, short);
@@ -108,15 +112,21 @@ export const GuildTreasuryPanel = ({
     <GuildSpendPanel
       currency='fame'
       icon={Landmark}
-      title="The guild's Fame"
+      title={t("treasury.title")}
       blurb={
         goal ? (
-          <>
-            Counting towards{" "}
-            <span className='font-semibold text-zinc-200'>{goal.label}</span>.
-          </>
+          <Interpolate
+            text={t("treasury.counting_towards")}
+            values={{
+              goal: (
+                <span className='font-semibold text-zinc-200'>
+                  {goal.label}
+                </span>
+              ),
+            }}
+          />
         ) : (
-          "Counts towards the guild's quests, never spent."
+          t("treasury.counts")
         )
       }
       have={goal ? towards : treasury.fame}
@@ -129,14 +139,14 @@ export const GuildTreasuryPanel = ({
 
       <div className='flex flex-wrap items-center gap-3'>
         {amounts.length === 0 ? (
-          <p className='text-sm text-zinc-500'>
-            Nothing in your own Fame this time.
-          </p>
+          <p className='text-sm text-zinc-500'>{t("treasury.empty")}</p>
         ) : (
           <div
-            title={`You have ${fame.toLocaleString()} Fame`}
+            title={t("treasury.you_have", { count: fame.toLocaleString() })}
             className='flex flex-wrap items-center gap-2'>
-            <span className='mr-1 text-sm text-zinc-400'>Put in</span>
+            <span className='mr-1 text-sm text-zinc-400'>
+              {t("treasury.put_in")}
+            </span>
             {amounts.map((amount) => (
               <PledgeButton
                 key={amount}
@@ -155,10 +165,12 @@ export const GuildTreasuryPanel = ({
 
       {goal && treasury.fame !== towards && (
         <p className='text-sm text-zinc-500'>
-          {treasury.fame.toLocaleString()} Fame in the bank right now
-          {treasury.spent > 0 &&
-            `, ${treasury.spent.toLocaleString()} spent back when it could be`}
-          .
+          {treasury.spent > 0
+            ? t("treasury.bank_spent", {
+                fame: treasury.fame.toLocaleString(),
+                spent: treasury.spent.toLocaleString(),
+              })
+            : t("treasury.bank", { fame: treasury.fame.toLocaleString() })}
         </p>
       )}
     </GuildSpendPanel>

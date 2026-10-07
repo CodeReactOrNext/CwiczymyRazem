@@ -1,0 +1,823 @@
+{
+  "tabs": {
+    "browse": "Guilds",
+    "members": "Members",
+    "chat": "Chat",
+    "stash": "Stash",
+    "quests": "Quests",
+    "upgrades": "Upgrades",
+    "kit": "Kit"
+  },
+  "tab_locked": "{{label}} — join a guild first",
+  "seats_taken": "{{count}} of {{limit}} seats taken",
+  "lvl": "lvl",
+  "level_ring": "Guild level {{level}} · {{done}} of {{lap}} quests on this lap",
+  "needs_guild": {
+    "title": "Join a guild first",
+    "browse": "See the guilds",
+    "members": "A roster is the people you are in it with, and you are not in one yet.",
+    "chat": "The chat is for the people you play with.",
+    "stash": "The shelf belongs to a guild, and you are not in one.",
+    "quests": "Quests are cleared by a guild, and you are not in one yet.",
+    "upgrades": "Upgrades are paid for by a guild, and you are not in one yet."
+  },
+  "header": {
+    "founded_by": "Founded by {{name}}.",
+    "intro": "Find people to practise alongside. Joining is free."
+  },
+  "browser": {
+    "rank": "Rank {{rank}}",
+    "yours": "Yours",
+    "by": "by {{name}}",
+    "level": "Level {{level}}",
+    "leave": "Leave",
+    "waiting": "Waiting",
+    "turned_down": "Turned down",
+    "withdraw": "Withdraw",
+    "clear": "Clear",
+    "no_seats": "No free seats",
+    "leave_first": "Leave your guild before asking to join another",
+    "full": "Full",
+    "join": "Join",
+    "asking": "Asking to join",
+    "already_turned_down": "Already turned down — they can still withdraw it.",
+    "accept": "Accept",
+    "intro": "Guilds climb by clearing quests together. Joining one is free.",
+    "leave_before_founding": "Leave your guild before founding one",
+    "not_enough_tokens": "Not enough tokens left",
+    "name_yours": "The name is yours for good",
+    "found": "Found a guild",
+    "search": "Search guilds by name, tag or description…",
+    "empty_title": "No guilds yet",
+    "empty_body": "Nobody has taken a name. The first one is still there.",
+    "no_match": "No guild matches “{{search}}”",
+    "ranking": "Guild ranking"
+  },
+  "members": {
+    "sessions_one": "1 session",
+    "sessions": "{{count}} sessions",
+    "hours": "{{hours}}h of practice",
+    "honor_title": "{{earned}} honor earned · {{balance}} left to spend on the shelf",
+    "founder": "Founder",
+    "you": "That is you",
+    "roster": "The roster",
+    "room_for": "room for {{count}} more",
+    "room_full": "the room is full, and more seats are bought from the Upgrades tab",
+    "together": "{{sessions}} sessions and {{hours}} together",
+    "together_since": "{{sessions}} sessions and {{hours}} together since {{since}}",
+    "honor_explainer": "Honor is the guild's own currency: earned by putting Fame, tokens or gear into the guild, spent taking gear off the shelf."
+  },
+  "upgrades": {
+    "intro": "Everyone chips in, and an upgrade buys itself the moment its pot is full. Whatever you put in earns you {{honor}} to spend on the shelf.",
+    "honor": "honor",
+    "seats_title": "More seats",
+    "all_seats": "All {{count}} seats taken",
+    "seats_buys": "{{count}} more seats",
+    "seats_max": "a guild tops out at {{count}} seats",
+    "rows_title": "Another shelf row",
+    "rows_one": "Stash has 1 row",
+    "rows": "Stash has {{count}} rows",
+    "rows_buys": "one more row",
+    "rows_max": "a shelf tops out at {{count}} rows"
+  },
+  "founding": {
+    "seats": "{{count}} of {{limit}} seats",
+    "yours": "yours",
+    "open": "Open it",
+    "founder_note": "You founded this one, and a person belongs to one guild at a time. A founder can only leave once everyone else has.",
+    "member_note": "You are in a guild, and a person belongs to one at a time. Leave it from the Guilds page before founding your own.",
+    "seats_note": "Seats come {{count}} at a time for tokens, and anybody inside can buy them — the button sits on the guild's own card at /guilds.",
+    "title": "Found a guild for",
+    "body": "The dearest thing in the panel, because it is the only one that takes something nobody else can have afterwards: a name and a tag, permanently. Anyone can then ask to join, and you decide who gets in.",
+    "cta": "Found it for",
+    "not_enough": "Not enough tokens",
+    "see_existing": "See the guilds that already exist →"
+  },
+  "fund": {
+    "member_left": "a member who left",
+    "paid_by": "Paid for by",
+    "and_more": "and {{count}} more",
+    "maxed": "Maxed out — {{maxed}}.",
+    "next_step": "Next step adds {{buys}}",
+    "wallet_empty": "Nothing left in your wallet this time.",
+    "you_have": "You have {{count}} tokens",
+    "chip_in": "Chip in"
+  },
+  "treasury": {
+    "filled_by": "Filled by",
+    "title": "The guild's Fame",
+    "counting_towards": "Counting towards {{goal}}.",
+    "counts": "Counts towards the guild's quests, never spent.",
+    "empty": "Nothing in your own Fame this time.",
+    "you_have": "You have {{count}} Fame",
+    "put_in": "Put in",
+    "bank": "{{fame}} Fame in the bank right now.",
+    "bank_spent": "{{fame}} Fame in the bank right now, {{spent}} spent back when it could be."
+  },
+  "honor": {
+    "left_by": "left by {{name}}",
+    "a_member": "a member",
+    "costs": "Costs",
+    "yours": "Your honor",
+    "take_for": "Take it for {{cost}} honor",
+    "short": "{{count}} honor short",
+    "how_to_earn": "Honor is earned by putting into the guild: Fame into the bank, tokens into a pot, or gear onto this shelf.",
+    "take_label": "Take it for",
+    "amount": "{{count}} honor"
+  },
+  "deposit": {
+    "title": "Leave {{name}} in the guild stash",
+    "into_stash": "into the guild stash",
+    "earns": "Earns you",
+    "from_then_on": "From then on it is the guild's — any member can take it.",
+    "leaving": "Leaving it…",
+    "confirm": "Leave it in the stash"
+  },
+  "badge": {
+    "with_level": "Guild: {{tag}} · level {{level}}",
+    "plain": "Guild: {{tag}}"
+  },
+  "cover": {
+    "your_honor": "Your honor: {{earned}} earned · {{balance}} to spend on the shelf"
+  },
+  "units": {
+    "sessions": "{{value}} sessions",
+    "sessions_one": "{{value}} session",
+    "hours": "{{value}}h",
+    "fame": "{{value}} Fame",
+    "members": "{{value}} members",
+    "members_one": "{{value}} member",
+    "songs": "{{value}} songs",
+    "songs_one": "{{value}} song",
+    "recordings": "{{value}} recordings",
+    "recordings_one": "{{value}} recording",
+    "quests": "{{value}} quests",
+    "quests_one": "{{value}} quest",
+    "exams": "{{value}} exams",
+    "exams_one": "{{value}} exam",
+    "entries": "{{value}} entries",
+    "entries_one": "{{value}} entry",
+    "points": "{{value}} points",
+    "points_one": "{{value}} point"
+  },
+  "asks": {
+    "all_categories": "{{amount}} in all four categories",
+    "streak": "a {{days}}-day streak"
+  },
+  "describe": {
+    "members": "{{count}} members",
+    "members_one": "One member",
+    "each": "{{members}} with {{amount}} each.",
+    "sessions": "{{amount}} between you.",
+    "time": "{{amount}} of practice, all told.",
+    "technique": "{{amount}} on technique.",
+    "theory": "{{amount}} of theory.",
+    "hearing": "{{amount}} of ear training.",
+    "creativity": "{{amount}} of creative playing.",
+    "points": "{{count}} practice points scored between you.",
+    "all_categories": "{{members}} with {{amount}} in each of the four categories.",
+    "treasury": "{{amount}} put into the guild's own.",
+    "streak": "{{members}} on a {{days}}-day streak at the same time.",
+    "songs": "{{amount}} marked learned.",
+    "recordings": "{{amount}} published.",
+    "exams": "{{count}} journey exams passed.",
+    "daily_quests": "{{count}} daily quests completed.",
+    "submissions": "{{amount}} into the monthly challenge."
+  },
+  "quests": {
+    "waiting": "Fame waiting for you",
+    "fame": "{{amount}} Fame",
+    "plus_fame": "+{{amount}} Fame",
+    "claim": "Claim {{amount}} Fame",
+    "cleared_while_here": "{{count}} quests cleared while you were on the roster.",
+    "cleared_while_here_one": "One quest cleared while you were on the roster.",
+    "all_taken": "Every quest you were here for is taken. The next one lands here.",
+    "guild_level": "Guild level {{level}}",
+    "level": "level",
+    "lap": "lap {{lap}}",
+    "level_up": "Every quest cleared is one level up, and {{reward}}.",
+    "lap_cleared": "{{done}} of {{total}} quests cleared",
+    "lap_cleared_on": "{{done}} of {{total}} quests cleared on lap {{lap}}",
+    "chapter_of": "chapter {{index}} of {{total}}",
+    "chapter_of_cap": "Chapter {{index}} of {{total}}",
+    "chapter": "Chapter {{index}}",
+    "road_ahead": "The road ahead",
+    "ladder": "Ten chapters of five quests, opened one at a time. Later chapters ask more and pay more.",
+    "ladder_lap": "After the tenth the ladder comes round again — this is lap {{lap}}, with every target and every reward ×{{times}}.",
+    "ladder_first": "After the tenth the ladder comes round again with every number doubled, then tripled — it never runs out.",
+    "you_are_here": "you are here",
+    "n_quests": "{{count}} quests",
+    "n_cleared": "{{done}} of {{total}} cleared",
+    "per_member": "a member, for each quest",
+    "chapter_cleared": "Chapter cleared",
+    "to_clear": "{{count}} quests to clear",
+    "to_clear_one": "One quest to clear",
+    "clear_all_five": "Clear all five and the next chapter opens.",
+    "cleared_of": "{{done}} of {{total}} cleared",
+    "cleared_in_chapter": "Cleared in this chapter",
+    "counted": "Counted over everyone on the roster. A quest that counts members is cleared when enough of them get there; the rest add up across the guild.",
+    "counted_since": "Counted over everyone on the roster since {{since}}. A quest that counts members is cleared when enough of them get there; the rest add up across the guild.",
+    "chapters": {
+      "0": {
+        "name": "Warm-up",
+        "blurb": "Show up together and start counting."
+      },
+      "1": {
+        "name": "Rehearsal",
+        "blurb": "The hours start to add up, and the ears join in."
+      },
+      "2": {
+        "name": "Repertoire",
+        "blurb": "Songs learned, songs played, songs recorded."
+      },
+      "3": {
+        "name": "Discipline",
+        "blurb": "Everybody pulling, every day."
+      },
+      "4": {
+        "name": "Balanced",
+        "blurb": "Every side of playing, from every member."
+      },
+      "5": {
+        "name": "Tempo",
+        "blurb": "Examined, a thousand sessions deep, with the theory to match."
+      },
+      "6": {
+        "name": "Stage",
+        "blurb": "Out in front of people, with the guild's name on it."
+      },
+      "7": {
+        "name": "Machine",
+        "blurb": "The guild runs itself. A thousand hours behind it."
+      },
+      "8": {
+        "name": "Scholars",
+        "blurb": "The hard categories, in serious quantities."
+      },
+      "9": {
+        "name": "Legends",
+        "blurb": "Numbers most guilds never see."
+      }
+    },
+    "items": {
+      "sessions-100": {
+        "name": "First Hundred",
+        "blurb": "A hundred practice sessions between you."
+      },
+      "hours-50": {
+        "name": "Fifty Hours",
+        "blurb": "Fifty hours of practice, all told."
+      },
+      "members-sessions-5-x3": {
+        "name": "Three Regulars",
+        "blurb": "Three members with five sessions each."
+      },
+      "technique-10": {
+        "name": "Hands On",
+        "blurb": "Ten hours on technique."
+      },
+      "treasury-300": {
+        "name": "Seed Money",
+        "blurb": "Three hundred Fame put into the guild's own."
+      },
+      "sessions-250": {
+        "name": "Quarter Thousand",
+        "blurb": "Two hundred and fifty sessions."
+      },
+      "hours-150": {
+        "name": "Long Haul",
+        "blurb": "A hundred and fifty hours of practice."
+      },
+      "theory-25": {
+        "name": "Bookworms",
+        "blurb": "Twenty-five hours of theory."
+      },
+      "hearing-25": {
+        "name": "Open Ears",
+        "blurb": "Twenty-five hours of ear training."
+      },
+      "streak-7-x3": {
+        "name": "Three Flames",
+        "blurb": "Three members on a seven-day streak at the same time."
+      },
+      "songs-learned-25": {
+        "name": "Setlist",
+        "blurb": "Twenty-five songs marked learned across the guild."
+      },
+      "points-2000": {
+        "name": "Two Thousand Points",
+        "blurb": "Two thousand practice points scored between you."
+      },
+      "recordings-5": {
+        "name": "On Tape",
+        "blurb": "Five recordings published by members."
+      },
+      "technique-50": {
+        "name": "Fifty of Technique",
+        "blurb": "Fifty hours on technique."
+      },
+      "creativity-25": {
+        "name": "Jam Room",
+        "blurb": "Twenty-five hours of creative playing."
+      },
+      "sessions-500": {
+        "name": "Five Hundred",
+        "blurb": "Five hundred sessions."
+      },
+      "hours-300": {
+        "name": "Three Hundred Hours",
+        "blurb": "Three hundred hours of practice."
+      },
+      "members-sessions-20-x4": {
+        "name": "Four Regulars",
+        "blurb": "Four members with twenty sessions each."
+      },
+      "daily-quests-30": {
+        "name": "Quest Log",
+        "blurb": "Thirty daily quests completed between you."
+      },
+      "streak-30-x1": {
+        "name": "The Month",
+        "blurb": "One member on a thirty-day streak."
+      },
+      "technique-100": {
+        "name": "Hundred of Technique",
+        "blurb": "A hundred hours on technique."
+      },
+      "theory-50": {
+        "name": "Theory Fifty",
+        "blurb": "Fifty hours of theory."
+      },
+      "hearing-50": {
+        "name": "Hearing Fifty",
+        "blurb": "Fifty hours of ear training."
+      },
+      "creativity-50": {
+        "name": "Creative Fifty",
+        "blurb": "Fifty hours of creative playing."
+      },
+      "members-all-categories-x4": {
+        "name": "All-Rounders",
+        "blurb": "Four members with an hour in each of the four categories."
+      },
+      "theory-100": {
+        "name": "Theory Hundred",
+        "blurb": "A hundred hours of theory."
+      },
+      "exams-10": {
+        "name": "Examined",
+        "blurb": "Ten journey exams passed."
+      },
+      "sessions-1000": {
+        "name": "One Thousand",
+        "blurb": "A thousand sessions."
+      },
+      "hours-600": {
+        "name": "Six Hundred Hours",
+        "blurb": "Six hundred hours of practice."
+      },
+      "hearing-100": {
+        "name": "Hearing Hundred",
+        "blurb": "A hundred hours of ear training."
+      },
+      "recordings-20": {
+        "name": "Twenty Tapes",
+        "blurb": "Twenty recordings published."
+      },
+      "submissions-5": {
+        "name": "Contenders",
+        "blurb": "Five entries into the monthly challenge."
+      },
+      "songs-learned-50": {
+        "name": "Fifty Songs",
+        "blurb": "Fifty songs marked learned."
+      },
+      "points-20000": {
+        "name": "Twenty Thousand Points",
+        "blurb": "Twenty thousand practice points scored between you."
+      },
+      "treasury-3000": {
+        "name": "War Chest",
+        "blurb": "Three thousand Fame put into the guild's own."
+      },
+      "sessions-2000": {
+        "name": "Two Thousand",
+        "blurb": "Two thousand sessions."
+      },
+      "hours-1000": {
+        "name": "Thousand Hours",
+        "blurb": "A thousand hours of practice."
+      },
+      "technique-250": {
+        "name": "Technique 250",
+        "blurb": "Two hundred and fifty hours on technique."
+      },
+      "members-sessions-50-x5": {
+        "name": "Five Regulars",
+        "blurb": "Five members with fifty sessions each."
+      },
+      "streak-14-x5": {
+        "name": "Five Flames",
+        "blurb": "Five members on a fourteen-day streak at the same time."
+      },
+      "theory-150": {
+        "name": "Theory 150",
+        "blurb": "A hundred and fifty hours of theory."
+      },
+      "hearing-150": {
+        "name": "Hearing 150",
+        "blurb": "A hundred and fifty hours of ear training."
+      },
+      "creativity-150": {
+        "name": "Creative 150",
+        "blurb": "A hundred and fifty hours of creative playing."
+      },
+      "daily-quests-100": {
+        "name": "Hundred Quests",
+        "blurb": "A hundred daily quests completed."
+      },
+      "exams-50": {
+        "name": "Fifty Exams",
+        "blurb": "Fifty journey exams passed."
+      },
+      "sessions-5000": {
+        "name": "Five Thousand",
+        "blurb": "Five thousand sessions."
+      },
+      "hours-2500": {
+        "name": "2500 Hours",
+        "blurb": "Two and a half thousand hours of practice."
+      },
+      "songs-learned-100": {
+        "name": "Hundred Songs",
+        "blurb": "A hundred songs marked learned."
+      },
+      "recordings-50": {
+        "name": "Fifty Tapes",
+        "blurb": "Fifty recordings published."
+      },
+      "streak-100-x1": {
+        "name": "Hundred Days",
+        "blurb": "One member on a hundred-day streak."
+      }
+    }
+  },
+  "card": {
+    "you_of": "you: {{mine}} / {{target}}",
+    "you_categories": "you: {{mine}} / {{count}} categories",
+    "your_streak": "your streak: {{mine}} / {{count}} days",
+    "members_need": "{{count}} more members need {{ask}}",
+    "members_need_one": "1 more member needs {{ask}}",
+    "to_go": "{{amount}} to go",
+    "you": "you: {{amount}}",
+    "cleared_on": "Cleared {{date}}"
+  },
+  "spend": {
+    "token_amount": "{{amount}} tokens",
+    "token_amount_one": "{{amount}} token",
+    "fame_amount": "{{amount}} Fame",
+    "in_bank": "in the bank",
+    "covered": "covered",
+    "have_of": "{{have}} of {{need}}",
+    "finish": "finish it"
+  },
+  "parts": {
+    "tier_part": "{{tier}} part",
+    "tiers": {
+      "Standard": "Standard",
+      "Epic": "Epic",
+      "Legendary": "Legendary",
+      "Unique": "Unique"
+    },
+    "of": "of {{count}}",
+    "how_many_leave": "How many to leave",
+    "how_many_take": "How many to take",
+    "earns_honor": "earns {{honor}} honor",
+    "costs_honor": "costs {{honor}} honor",
+    "you_have": "you have {{count}}",
+    "leave": "Leave {{count}}",
+    "take": "Take {{count}}",
+    "leave_all": "Leave all {{count}}",
+    "take_all": "Take all {{count}}"
+  },
+  "kit": {
+    "slot": "Slot {{index}}: {{icon}}",
+    "slot_lit": "Slot {{index}}: {{icon}} — picking for this one",
+    "pick_for": "Pick for slot {{index}} — or click a slot to change just that one.",
+    "unlocked_of": "{{done}} of {{total}} unlocked",
+    "unlocks_at": "unlocks at guild level {{level}}",
+    "unlocks_at_cap": "Unlocks at guild level {{level}}",
+    "wear_four": "Wear these four",
+    "back_to_worn": "Back to what is worn",
+    "worn_now": "Worn now",
+    "wear_it": "Wear it",
+    "lvl": "lvl {{level}}",
+    "intro": "The card on the left is what the guild looks like everywhere else. Every colour, banner, icon and tag below costs nothing, and you pick between them because you founded this guild. The plainer ones are yours from the start; the rest unlock as the guild levels up, and each tile says at what level. Choose one and the whole roster is wearing it a moment later.",
+    "unlocked_at_level": "{{done}} of {{total}} unlocked at guild level {{level}}"
+  },
+  "new": {
+    "logo_types": "PNG, JPG or WebP only",
+    "logo_size": "That file is over {{mb}}MB",
+    "logo_unreadable": "That image could not be read",
+    "description": "Costs {{cost}} — you have {{left}} left. The name and the tag are yours alone once taken.",
+    "name": "Name",
+    "name_problems": {
+      "too-short": "A guild name is at least {{min}} characters",
+      "too-long": "A guild name is at most {{max}} characters",
+      "no-letters": "A guild name needs letters or numbers in it"
+    },
+    "tag": "Tag",
+    "tag_hint": "worn next to your name",
+    "tag_problems": {
+      "too-short": "A tag is at least {{min}} characters",
+      "too-long": "A tag is at most {{max}} characters"
+    },
+    "picture": "Picture",
+    "picture_hint": "optional, square works best",
+    "change": "Change",
+    "add_image": "Add an image",
+    "remove": "Remove",
+    "what_for": "What is it for",
+    "optional": "optional",
+    "what_for_placeholder": "Who it is for, what you practise, when you show up.",
+    "cancel": "Cancel"
+  },
+  "stash": {
+    "on_shelf": "On the shelf",
+    "rows_of": "{{done}} of {{count}} rows",
+    "honor_title": "{{earned}} honor earned, {{spent}} spent",
+    "guild_stash": "Guild stash",
+    "empty": "Nothing here yet. Drag something down from your gear and somebody will use it.",
+    "full": "The shelf is full — take something off it, or put a few tokens towards another row in the Upgrades tab.",
+    "how": "Drag a socket into your own cabinet to take it, or click it. Leaving something earns honor by its rarity; taking anything off the shelf costs a flat {{cost}}, up to {{limit}} times a day. Who left what is in the ledger below.",
+    "your_gear": "Your gear",
+    "no_gear": "You have no spare gear to give.",
+    "your_stash": "Your stash",
+    "gear_how": "Guitars, pedals, salvaged parts and rescued mods all go on the shelf — drag one up, or click it. Dragging inside this board just rearranges it, and that is the arrangement your Arsenal shows. Equipping is cleared for you; a pedal has to come off the board first.",
+    "ledger_title": "Who gives, who takes",
+    "ledger_body": "Every deposit and every withdrawal, counted per member.",
+    "recent": "Recent moves",
+    "log_left": "{{name}} left {{item}}",
+    "log_took": "{{name}} took {{item}}",
+    "take_it": "Take it",
+    "how_many": "How many"
+  },
+  "cosmetics": {
+    "slots": {
+      "accent": {
+        "label": "Colour",
+        "blurb": "The one the rest of the kit is drawn from — change it and the banner, the icons and the frame follow."
+      },
+      "banner": {
+        "label": "Banner",
+        "blurb": "The strip across the top of your card, in the guild list and on this page."
+      },
+      "motif": {
+        "label": "Icons",
+        "blurb": "The four icons tiled across the banner. Any four you like."
+      },
+      "frame": {
+        "label": "Tag",
+        "blurb": "How your tag is drawn next to every member's name on the board."
+      }
+    },
+    "items": {
+      "accent_steel": {
+        "name": "Steel",
+        "blurb": "The plain one every guild starts in."
+      },
+      "accent_ivory": {
+        "name": "Ivory",
+        "blurb": "Almost white. Reads before anything else on the board."
+      },
+      "accent_bone": {
+        "name": "Bone",
+        "blurb": "Warm grey, like an old pickguard."
+      },
+      "accent_signal": {
+        "name": "Signal",
+        "blurb": "The app's own cyan."
+      },
+      "accent_sky": {
+        "name": "Sky",
+        "blurb": "Lighter and cooler than Cobalt."
+      },
+      "accent_cobalt": {
+        "name": "Cobalt",
+        "blurb": "Deep blue, cold as a rehearsal room in February."
+      },
+      "accent_indigo": {
+        "name": "Indigo",
+        "blurb": "Blue, leaning violet."
+      },
+      "accent_nightshade": {
+        "name": "Nightshade",
+        "blurb": "Violet — the rare tier's colour."
+      },
+      "accent_neon": {
+        "name": "Neon",
+        "blurb": "Fuchsia. Nothing else on the board looks like it."
+      },
+      "accent_bubblegum": {
+        "name": "Bubblegum",
+        "blurb": "Pink, and unapologetic."
+      },
+      "accent_crimson": {
+        "name": "Crimson",
+        "blurb": "Loud, and nobody else on the board is wearing it."
+      },
+      "accent_ember": {
+        "name": "Ember",
+        "blurb": "Streak orange, for a guild that never misses."
+      },
+      "accent_brass": {
+        "name": "Brass",
+        "blurb": "Fame's own gold."
+      },
+      "accent_sulphur": {
+        "name": "Sulphur",
+        "blurb": "Yellow, a shade sharper than Brass."
+      },
+      "accent_acid": {
+        "name": "Acid",
+        "blurb": "Lime. Loud in a different way to Crimson."
+      },
+      "accent_verdant": {
+        "name": "Verdant",
+        "blurb": "Green, the colour of a week cleared."
+      },
+      "accent_lagoon": {
+        "name": "Lagoon",
+        "blurb": "Teal, between the app's cyan and a week cleared."
+      },
+      "banner_none": {
+        "name": "Bare",
+        "blurb": "No colour at all — just your icons on the plain strip."
+      },
+      "banner_wash": {
+        "name": "Wash",
+        "blurb": "Corner to corner: the colour laid in from the top left, thinning out towards the bottom right."
+      },
+      "banner_aurora": {
+        "name": "Aurora",
+        "blurb": "Left to right through the colour's two neighbours."
+      },
+      "banner_sunburst": {
+        "name": "Sunburst",
+        "blurb": "Dark along the top, the colour gathering towards the bottom edge."
+      },
+      "banner_stage": {
+        "name": "Dusk",
+        "blurb": "From the colour at the top right into its cooler neighbour at the bottom left."
+      },
+      "banner_halo": {
+        "name": "Fade",
+        "blurb": "Out of the dark on the left and into the colour on the right."
+      },
+      "frame_plain": {
+        "name": "Plain",
+        "blurb": "Tag in the guild's colour, nothing around it."
+      },
+      "frame_ring": {
+        "name": "Ring",
+        "blurb": "A thin ring in the guild's colour."
+      },
+      "frame_double": {
+        "name": "Double",
+        "blurb": "Two thin rings, with a hair of dark between them."
+      },
+      "frame_plate": {
+        "name": "Plate",
+        "blurb": "Filled, so the tag reads first on a busy row."
+      },
+      "frame_heavy": {
+        "name": "Heavy",
+        "blurb": "Filled and ringed. The loudest a tag gets."
+      },
+      "frame_solid": {
+        "name": "Solid",
+        "blurb": "A block of the colour with the tag cut out of it in black."
+      },
+      "frame_pill": {
+        "name": "Pill",
+        "blurb": "Filled and fully rounded, like a button that never does anything."
+      },
+      "frame_sunken": {
+        "name": "Sunken",
+        "blurb": "Cut into the row: a dark slot with the tag in the colour."
+      },
+      "frame_brackets": {
+        "name": "Brackets",
+        "blurb": "A bar of the colour down each side of the tag."
+      },
+      "frame_dot": {
+        "name": "Dot",
+        "blurb": "A dot of the colour before the tag, the way a status light sits before a name."
+      }
+    },
+    "motif_groups": {
+      "instruments": "Instruments",
+      "beasts": "Beasts",
+      "arms": "Arms",
+      "elements": "Elements",
+      "things": "Everything else"
+    },
+    "motif_icons": {
+      "guitar": "Guitar",
+      "bass": "Bass headstock",
+      "headstock": "Headstock",
+      "notes": "Notes",
+      "score": "Score",
+      "mic": "Microphone",
+      "oldmic": "Old microphone",
+      "speaker": "Speaker",
+      "headphones": "Headphones",
+      "drum": "Drum",
+      "drumkit": "Drum kit",
+      "piano": "Piano keys",
+      "keyboard": "Keyboard",
+      "trombone": "Trombone",
+      "cassette": "Cassette",
+      "vinyl": "Record",
+      "horn": "Horn",
+      "metalhand": "Horns up",
+      "skull": "Skull",
+      "crossbones": "Skull and crossbones",
+      "bones": "Crossed bones",
+      "pirate": "Pirate skull",
+      "burning": "Burning skull",
+      "dragon": "Dragon",
+      "wolf": "Wolf",
+      "howl": "Howling wolf",
+      "werewolf": "Werewolf",
+      "raven": "Raven",
+      "eagle": "Eagle",
+      "lion": "Lion",
+      "tiger": "Tiger",
+      "bear": "Bear",
+      "bull": "Bull",
+      "snake": "Snake",
+      "spider": "Spider",
+      "web": "Spider web",
+      "bat": "Bat",
+      "owl": "Owl",
+      "cat": "Cat",
+      "shark": "Shark",
+      "octopus": "Octopus",
+      "scorpion": "Scorpion",
+      "reaper": "Reaper",
+      "ghost": "Ghost",
+      "devil": "Devil",
+      "robot": "Robot",
+      "crown": "Crown",
+      "imperial": "Imperial crown",
+      "laurel": "Laurel crown",
+      "swords": "Crossed swords",
+      "sword": "Sword",
+      "axes": "Crossed axes",
+      "battleaxe": "Battle axe",
+      "hammer": "Hammer",
+      "warhammer": "Warhammer",
+      "shield": "Shield",
+      "spartan": "Spartan helmet",
+      "viking": "Viking helmet",
+      "knight": "Knight's helm",
+      "samurai": "Samurai helmet",
+      "hornedhelm": "Horned helm",
+      "castle": "Castle",
+      "banner": "Banner",
+      "pirateflag": "Pirate flag",
+      "fist": "Fist",
+      "anarchy": "Anarchy",
+      "wings": "Wings",
+      "angelwings": "Angel wings",
+      "bullseye": "Bullseye",
+      "bomb": "Bomb",
+      "key": "Skeleton key",
+      "flame": "Flame",
+      "candle": "Candle",
+      "campfire": "Campfire",
+      "lightning": "Lightning",
+      "storm": "Storm",
+      "sun": "Sun",
+      "moon": "Moon",
+      "star": "Star",
+      "shuriken": "Shuriken",
+      "comet": "Comet",
+      "crystal": "Crystal ball",
+      "potion": "Potion",
+      "heart": "Winged heart",
+      "rose": "Rose and dagger",
+      "beer": "Beer",
+      "drinkinghorn": "Drinking horn",
+      "coffee": "Coffee",
+      "anvil": "Anvil",
+      "gears": "Gears",
+      "dice": "Dice",
+      "trophy": "Trophy",
+      "rocket": "Rocket",
+      "compass": "Compass",
+      "anchor": "Anchor"
+    }
+  }
+}

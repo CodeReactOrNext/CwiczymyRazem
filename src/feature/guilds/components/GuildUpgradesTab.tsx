@@ -2,12 +2,15 @@ import { GuildFundBar } from "feature/guilds/components/GuildFundBar";
 import { GuildTreasuryPanel } from "feature/guilds/components/GuildTreasuryPanel";
 import { questById } from "feature/guilds/data/guildQuests";
 import { useGuildMutations } from "feature/guilds/hooks/useGuilds";
+import { useGuildText } from "feature/guilds/hooks/useGuildText";
 import type { Guild, GuildQuestBoard } from "feature/guilds/types/guild.types";
 import {
   GUILD_MAX_SEATS,
   GUILD_MAX_STASH_ROWS,
 } from "feature/guilds/utils/guildUpgrades.utils";
 import { GUILD_SEATS_PER_UPGRADE } from "feature/supporterPanel/constants/supporterPanel.constants";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Armchair, Rows3 } from "lucide-react";
 
 /**
@@ -34,6 +37,8 @@ export const GuildUpgradesTab = ({
   /** The caller's tokens — a pledge comes out of them. */
   tokensLeft: number;
 }) => {
+  const { t } = useTranslation("guilds");
+  const { questName } = useGuildText();
   const { fund, depositFame } = useGuildMutations();
   const busy = fund.isPending || depositFame.isPending;
 
@@ -48,12 +53,18 @@ export const GuildUpgradesTab = ({
   return (
     <div className='space-y-8'>
       <div className='space-y-1.5'>
-        <h2 className='text-xl font-bold text-white'>Upgrades</h2>
+        <h2 className='text-xl font-bold text-white'>{t("tabs.upgrades")}</h2>
         <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
-          Everyone chips in, and an upgrade buys itself the moment its pot is
-          full. Whatever you put in earns you{" "}
-          <span className='font-semibold text-purple-300'>honor</span> to spend
-          on the shelf.
+          <Interpolate
+            text={t("upgrades.intro")}
+            values={{
+              honor: (
+                <span className='font-semibold text-purple-300'>
+                  {t("upgrades.honor")}
+                </span>
+              ),
+            }}
+          />
         </p>
       </div>
 
@@ -61,14 +72,17 @@ export const GuildUpgradesTab = ({
         <GuildFundBar
           icon={Armchair}
           fund={guild.funds.seats}
-          title='More seats'
+          title={t("upgrades.seats_title")}
           standing={
             freeSeats === 0
-              ? `All ${guild.memberLimit} seats taken`
-              : `${guild.memberCount} of ${guild.memberLimit} seats taken`
+              ? t("upgrades.all_seats", { count: guild.memberLimit })
+              : t("seats_taken", {
+                  count: guild.memberCount,
+                  limit: guild.memberLimit,
+                })
           }
-          buys={`${GUILD_SEATS_PER_UPGRADE} more seats`}
-          maxed={`a guild tops out at ${GUILD_MAX_SEATS} seats`}
+          buys={t("upgrades.seats_buys", { count: GUILD_SEATS_PER_UPGRADE })}
+          maxed={t("upgrades.seats_max", { count: GUILD_MAX_SEATS })}
           members={guild.members}
           tokensLeft={tokensLeft}
           busy={busy}
@@ -78,12 +92,14 @@ export const GuildUpgradesTab = ({
         <GuildFundBar
           icon={Rows3}
           fund={guild.funds.stashRows}
-          title='Another shelf row'
-          standing={`Stash has ${guild.stashRowLimit} ${
-            guild.stashRowLimit === 1 ? "row" : "rows"
-          }`}
-          buys='one more row'
-          maxed={`a shelf tops out at ${GUILD_MAX_STASH_ROWS} rows`}
+          title={t("upgrades.rows_title")}
+          standing={
+            guild.stashRowLimit === 1
+              ? t("upgrades.rows_one")
+              : t("upgrades.rows", { count: guild.stashRowLimit })
+          }
+          buys={t("upgrades.rows_buys")}
+          maxed={t("upgrades.rows_max", { count: GUILD_MAX_STASH_ROWS })}
           members={guild.members}
           tokensLeft={tokensLeft}
           busy={busy}
@@ -97,7 +113,14 @@ export const GuildUpgradesTab = ({
         fame={fame}
         goal={
           treasuryQuest
-            ? { label: treasuryQuest.name, cost: treasuryQuest.target }
+            ? {
+                label: questName(
+                  treasuryQuest.questId,
+                  treasuryQuest.name,
+                  treasuryQuest.lap,
+                ),
+                cost: treasuryQuest.target,
+              }
             : null
         }
         saved={treasuryQuest?.progress}

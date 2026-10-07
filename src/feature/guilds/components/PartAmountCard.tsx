@@ -9,6 +9,8 @@ import {
 } from "feature/arsenal/data/partDefinitions";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { HonorMark } from "feature/guilds/components/HonorMark";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { useState } from "react";
 
 interface PartAmountCardProps {
@@ -50,8 +52,9 @@ export const PartAmountCard = ({
   onConfirm,
 }: PartAmountCardProps) => {
   const [qty, setQty] = useState(part.qty);
+  const { t } = useTranslation("guilds");
   const color = PART_TIER_COLORS[part.tier];
-  const verb = mode === "deposit" ? "Leave" : "Take";
+  const verbKey = mode === "deposit" ? "parts.leave" : "parts.take";
 
   // A deposit earns per piece; a take costs the same flat price whatever the
   // slider says, because how much of the stack moves is not what is priced.
@@ -84,7 +87,9 @@ export const PartAmountCard = ({
           <span
             className='text-[11px] font-semibold tracking-wide'
             style={{ color }}>
-            {part.tier} part
+            {t("parts.tier_part", {
+              tier: t(`parts.tiers.${part.tier}`, part.tier),
+            })}
           </span>
           <div className='flex min-w-0 items-center gap-2'>
             <span className='truncate text-xl font-black text-zinc-100'>
@@ -105,7 +110,7 @@ export const PartAmountCard = ({
             {qty}
           </span>
           <span className='text-sm font-semibold text-zinc-500'>
-            of {part.qty}
+            {t("parts.of", { count: part.qty })}
           </span>
         </div>
 
@@ -116,21 +121,33 @@ export const PartAmountCard = ({
           step={1}
           disabled={busy}
           onValueChange={([next]) => setQty(next)}
-          aria-label={`How many to ${verb.toLowerCase()}`}
+          aria-label={
+            mode === "deposit"
+              ? t("parts.how_many_leave")
+              : t("parts.how_many_take")
+          }
         />
       </div>
 
       {honor !== null && (
         <p className='flex items-center justify-center gap-2 text-xs tabular-nums text-zinc-400'>
           <HonorMark size={18} />
-          {mode === "deposit" ? "earns" : "costs"}{" "}
-          <span className='font-bold text-purple-300'>{honor}</span> honor
+          <Interpolate
+            text={
+              mode === "deposit"
+                ? t("parts.earns_honor")
+                : t("parts.costs_honor")
+            }
+            values={{
+              honor: <span className='font-bold text-purple-300'>{honor}</span>,
+            }}
+          />
           {mode === "take" && honorBalance !== undefined && (
             <span
               className={cn(
                 cannotPay(honor) ? "text-orange-400" : "text-zinc-500",
               )}>
-              · you have {honorBalance.toLocaleString()}
+              · {t("parts.you_have", { count: honorBalance.toLocaleString() })}
             </span>
           )}
         </p>
@@ -144,7 +161,7 @@ export const PartAmountCard = ({
             confirmButtonClass,
             "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25",
           )}>
-          {verb} {qty}
+          {t(verbKey, { count: qty })}
         </button>
 
         {qty !== part.qty && (
@@ -152,7 +169,7 @@ export const PartAmountCard = ({
             onClick={() => onConfirm(part.qty)}
             disabled={busy || cannotPay(honorAll)}
             className={minorButtonClass}>
-            {verb} all {part.qty}
+            {t(`${verbKey}_all`, { count: part.qty })}
           </button>
         )}
       </div>

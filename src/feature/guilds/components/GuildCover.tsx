@@ -10,6 +10,7 @@ import {
   equippedItem,
   motifIcons,
 } from "feature/guilds/utils/guildCosmetics.utils";
+import { useTranslation } from "hooks/useTranslation";
 import type { ReactNode } from "react";
 import { auth } from "utils/firebase/client/firebase.utils";
 
@@ -46,6 +47,7 @@ export const GuildCover = ({
   actions,
   className,
 }: GuildCoverProps) => {
+  const { t } = useTranslation("guilds");
   const hex = accentHex(guild.cosmetics);
   const banner = equippedItem(guild.cosmetics, "banner");
   const large = size === "lg";
@@ -87,7 +89,10 @@ export const GuildCover = ({
           )}>
           {myHonor && (
             <span
-              title={`Your honor: ${myHonor.earned.toLocaleString()} earned · ${myHonor.balance.toLocaleString()} to spend on the shelf`}
+              title={t("cover.your_honor", {
+                earned: myHonor.earned.toLocaleString(),
+                balance: myHonor.balance.toLocaleString(),
+              })}
               className={cn(
                 "flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-950/75 font-bold tabular-nums text-purple-200",
                 large ? "px-3 py-2 text-base" : "px-2 py-1.5 text-sm",

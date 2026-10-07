@@ -44,6 +44,8 @@ import {
   TAKE_HONOR_COST,
 } from "feature/guilds/utils/guildHonor.utils";
 import { shelfRowsUsed } from "feature/guilds/utils/guildShelf.utils";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -148,6 +150,7 @@ export const GuildStashTab = ({
   enabled: boolean;
   guild: Guild;
 }) => {
+  const { t } = useTranslation("guilds");
   const { data: stash, isLoading } = useGuildStash(enabled);
   const { data: gear } = useMyGear(enabled);
   const { deposit, take } = useStashMutations();
@@ -371,19 +374,25 @@ export const GuildStashTab = ({
       <section className='space-y-4'>
         <h2 className='flex items-center gap-2 text-sm font-bold text-zinc-200'>
           <ArrowDownToLine size={15} className='text-cyan-400' />
-          On the shelf
+          {t("stash.on_shelf")}
           <span className='font-medium text-zinc-500'>
             {shelfPieces.length}
           </span>
           <span className='ml-auto flex items-center gap-3 text-xs font-medium tabular-nums text-zinc-500'>
             <span>
-              {rowsUsed} of {guild.stashRowLimit} rows
+              {t("stash.rows_of", {
+                done: rowsUsed,
+                count: guild.stashRowLimit,
+              })}
             </span>
             <span
-              title={`${myHonor.earned.toLocaleString()} honor earned, ${myHonor.spent.toLocaleString()} spent`}
+              title={t("stash.honor_title", {
+                earned: myHonor.earned.toLocaleString(),
+                spent: myHonor.spent.toLocaleString(),
+              })}
               className='flex items-center gap-1.5 font-bold text-purple-300'>
               <HonorMark size={18} />
-              {myHonor.balance.toLocaleString()} honor
+              {t("honor.amount", { count: myHonor.balance.toLocaleString() })}
             </span>
           </span>
         </h2>
@@ -393,29 +402,30 @@ export const GuildStashTab = ({
           gridRef={shelfGrid}
           drop={drop?.board === "shelf" ? drop : null}
           receiving={receiving === "shelf"}
-          label='Guild stash'>
+          label={t("stash.guild_stash")}>
           {shelfPieces.map((piece) => renderPiece("shelf", piece))}
         </StashBoard>
 
         <p className='text-xs text-zinc-500'>
           {shelfPieces.length === 0
-            ? "Nothing here yet. Drag something down from your gear and somebody will use it."
+            ? t("stash.empty")
             : rowsFree === 0
-              ? "The shelf is full — take something off it, or put a few tokens towards another row in the Upgrades tab."
-              : `Drag a socket into your own cabinet to take it, or click it. Leaving something earns honor by its rarity; taking anything off the shelf costs a flat ${TAKE_HONOR_COST}, up to ${TAKE_DAILY_LIMIT} times a day. Who left what is in the ledger below.`}
+              ? t("stash.full")
+              : t("stash.how", {
+                  cost: TAKE_HONOR_COST,
+                  limit: TAKE_DAILY_LIMIT,
+                })}
         </p>
       </section>
 
       <section className='space-y-4'>
         <h2 className='flex items-center gap-2 text-sm font-bold text-zinc-200'>
           <ArrowUpFromLine size={15} className='text-emerald-400' />
-          Your gear
+          {t("stash.your_gear")}
         </h2>
 
         {gearPieces.length === 0 ? (
-          <p className='text-sm text-zinc-500'>
-            You have no spare gear to give.
-          </p>
+          <p className='text-sm text-zinc-500'>{t("stash.no_gear")}</p>
         ) : (
           <>
             <StashBoard
@@ -423,17 +433,11 @@ export const GuildStashTab = ({
               gridRef={gearGrid}
               drop={drop?.board === "gear" ? drop : null}
               receiving={receiving === "gear"}
-              label='Your stash'>
+              label={t("stash.your_stash")}>
               {gearPieces.map((piece) => renderPiece("gear", piece))}
             </StashBoard>
 
-            <p className='text-xs text-zinc-500'>
-              Guitars, pedals, salvaged parts and rescued mods all go on the
-              shelf — drag one up, or click it. Dragging inside this board just
-              rearranges it, and that is the arrangement your Arsenal shows.
-              Equipping is cleared for you; a pedal has to come off the board
-              first.
-            </p>
+            <p className='text-xs text-zinc-500'>{t("stash.gear_how")}</p>
           </>
         )}
       </section>
@@ -441,26 +445,38 @@ export const GuildStashTab = ({
       <section className='space-y-4'>
         <div className='flex flex-col gap-1'>
           <h2 className='text-sm font-bold text-zinc-200'>
-            Who gives, who takes
+            {t("stash.ledger_title")}
           </h2>
-          <p className='text-sm text-zinc-400'>
-            Every deposit and every withdrawal, counted per member.
-          </p>
+          <p className='text-sm text-zinc-400'>{t("stash.ledger_body")}</p>
         </div>
         <Ledger tallies={stash.tallies} />
       </section>
 
       {stash.log.length > 0 && (
         <section className='space-y-4'>
-          <h2 className='text-sm font-bold text-zinc-200'>Recent moves</h2>
+          <h2 className='text-sm font-bold text-zinc-200'>
+            {t("stash.recent")}
+          </h2>
           <div className='space-y-2 rounded-lg bg-zinc-900/40 px-4 py-3.5'>
             {stash.log.map((entry) => (
               <p key={entry.id} className='text-xs text-zinc-500'>
-                <span className='font-semibold text-zinc-300'>
-                  {entry.displayName}
-                </span>{" "}
-                {entry.action === "deposit" ? "left" : "took"}{" "}
-                <span className='text-zinc-400'>{entry.itemName}</span>
+                <Interpolate
+                  text={
+                    entry.action === "deposit"
+                      ? t("stash.log_left")
+                      : t("stash.log_took")
+                  }
+                  values={{
+                    name: (
+                      <span className='font-semibold text-zinc-300'>
+                        {entry.displayName}
+                      </span>
+                    ),
+                    item: (
+                      <span className='text-zinc-400'>{entry.itemName}</span>
+                    ),
+                  }}
+                />
               </p>
             ))}
           </div>
@@ -490,7 +506,9 @@ export const GuildStashTab = ({
       <StashItemDialog
         isOpen={amount != null}
         onClose={() => setAmount(null)}
-        title={amount?.mode === "confirm" ? "Take it" : "How many"}>
+        title={
+          amount?.mode === "confirm" ? t("stash.take_it") : t("stash.how_many")
+        }>
         {amount?.mode === "confirm" && (
           <HonorTakeCard
             entry={amount.entry}

@@ -6,7 +6,9 @@ import {
   questById,
   reportFieldUnit,
 } from "feature/guilds/data/guildQuests";
+import { useGuildText } from "feature/guilds/hooks/useGuildText";
 import type { GuildQuestProgress } from "feature/guilds/types/guild.types";
+import type { Translate } from "lib/i18n/translate";
 import type { LucideIcon, LucideProps } from "lucide-react";
 import {
   Activity,
@@ -97,33 +99,38 @@ const dayOf = (iso: string): string =>
 const eachLine = (
   quest: GuildQuest | undefined,
   each: NonNullable<GuildQuestProgress["each"]>,
+  t: Translate,
 ): string => {
   const measure = quest?.measure;
   switch (measure?.kind) {
     case "reports":
-      return `you: ${tenth(each.mine)} / ${formatQuestAmount(
-        reportFieldUnit(measure.field),
-        each.target,
-      )}`;
+      return t("card.you_of", {
+        mine: tenth(each.mine),
+        target: formatQuestAmount(
+          reportFieldUnit(measure.field),
+          each.target,
+          t,
+        ),
+      });
     case "allCategoriesEach":
-      return `you: ${each.mine} / ${each.target} categories`;
+      return t("card.you_categories", { mine: each.mine, count: each.target });
     case "streak":
-      return `your streak: ${each.mine} / ${each.target} days`;
+      return t("card.your_streak", { mine: each.mine, count: each.target });
     default:
-      return `you: ${each.mine} / ${each.target}`;
+      return t("card.you_of", { mine: each.mine, target: each.target });
   }
 };
 
 /** What is still missing, in the quest's own words: "588 sessions to go". */
-const remainingLine = (quest: GuildQuestProgress): string => {
+const remainingLine = (
+  quest: GuildQuestProgress,
+  ask: string,
+  t: Translate,
+): string => {
   const left = Math.max(0, quest.target - quest.progress);
 
-  if (quest.each) {
-    return left === 1
-      ? `1 more member needs ${quest.each.ask}`
-      : `${left} more members need ${quest.each.ask}`;
-  }
-  return `${formatQuestAmount(quest.unit, left)} to go`;
+  if (quest.each) return t("card.members_need", { count: left, ask });
+  return t("card.to_go", { amount: formatQuestAmount(quest.unit, left, t) });
 };
 
 /**
@@ -137,7 +144,9 @@ const remainingLine = (quest: GuildQuestProgress): string => {
  * so the eye can tell done from open without reading anything.
  */
 export const GuildQuestCard = ({ quest }: { quest: GuildQuestProgress }) => {
+  const { t, questName, questBlurb, questAsk } = useGuildText();
   const spec = questById(quest.questId);
+  const name = questName(quest.questId, quest.name, quest.lap);
   const done = quest.doneAt !== null;
   const percent = done ? 100 : percentOf(quest.progress, quest.target);
 
@@ -161,10 +170,10 @@ export const GuildQuestCard = ({ quest }: { quest: GuildQuestProgress }) => {
         <div className='min-w-0 flex-1 space-y-4'>
           <div className='flex flex-wrap items-start justify-between gap-x-6 gap-y-2'>
             <div className='min-w-0'>
-              <h3 className='text-base font-bold text-zinc-100'>
-                {quest.name}
-              </h3>
-              <p className='mt-0.5 text-sm text-zinc-400'>{quest.blurb}</p>
+              <h3 className='text-base font-bold text-zinc-100'>{name}</h3>
+              <p className='mt-0.5 text-sm text-zinc-400'>
+                {questBlurb(quest)}
+              </p>
             </div>
 
             <div className='shrink-0 text-right'>
@@ -175,7 +184,8 @@ export const GuildQuestCard = ({ quest }: { quest: GuildQuestProgress }) => {
                     ? "bg-emerald-500/10 text-emerald-400"
                     : "bg-amber-500/10 text-amber-400",
                 )}>
-                <FameCoin size={14} />+{quest.reward} Fame
+                <FameCoin size={14} />
+                {t("quests.plus_fame", { amount: quest.reward })}
               </p>
             </div>
           </div>
@@ -186,7 +196,7 @@ export const GuildQuestCard = ({ quest }: { quest: GuildQuestProgress }) => {
                 <span className='text-xl font-bold text-zinc-100'>
                   {tenth(quest.progress).toLocaleString()}
                 </span>{" "}
-                / {formatQuestAmount(quest.unit, quest.target)}
+                / {formatQuestAmount(quest.unit, quest.target, t)}
               </p>
               <p
                 className={cn(
@@ -202,7 +212,7 @@ export const GuildQuestCard = ({ quest }: { quest: GuildQuestProgress }) => {
               aria-valuenow={Math.min(quest.progress, quest.target)}
               aria-valuemin={0}
               aria-valuemax={quest.target}
-              aria-label={`${quest.name}: ${percent}%`}
+              aria-label={`${name}: ${percent}%`}
               className='h-2.5 overflow-hidden rounded-full bg-zinc-800/60'>
               <div
                 className={cn(
@@ -222,11 +232,13 @@ export const GuildQuestCard = ({ quest }: { quest: GuildQuestProgress }) => {
                   quest.each.done ? "text-emerald-400" : "text-zinc-400",
                 )}>
                 {quest.each.done && <Check size={12} />}
-                {eachLine(spec, quest.each)}
+                {eachLine(spec, quest.each, t)}
               </span>
             ) : quest.mine !== null ? (
               <span className='tabular-nums text-zinc-400'>
-                you: {formatQuestAmount(quest.unit, quest.mine)}
+                {t("card.you", {
+                  amount: formatQuestAmount(quest.unit, quest.mine, t),
+                })}
               </span>
             ) : (
               <span />
@@ -238,8 +250,12 @@ export const GuildQuestCard = ({ quest }: { quest: GuildQuestProgress }) => {
                 done ? "text-emerald-400" : "text-zinc-300",
               )}>
               {done && quest.doneAt
-                ? `Cleared ${dayOf(quest.doneAt)}`
-                : remainingLine(quest)}
+                ? t("card.cleared_on", { date: dayOf(quest.doneAt) })
+                : remainingLine(
+                    quest,
+                    quest.each ? questAsk(quest, quest.each.ask) : "",
+                    t,
+                  )}
             </span>
           </div>
         </div>

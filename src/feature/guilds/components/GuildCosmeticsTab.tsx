@@ -7,6 +7,7 @@ import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import type { GuildCosmeticItem } from "feature/guilds/data/guildCosmetics";
 import { COSMETIC_SLOTS } from "feature/guilds/data/guildCosmetics";
 import { useGuildMutations } from "feature/guilds/hooks/useGuilds";
+import { useGuildText } from "feature/guilds/hooks/useGuildText";
 import type { Guild } from "feature/guilds/types/guild.types";
 import { tint } from "feature/guilds/utils/guildCosmetics.style";
 import {
@@ -151,57 +152,63 @@ const CosmeticTile = ({
   locked: boolean;
   busy: boolean;
   onWear: () => void;
-}) => (
-  <div
-    className={cn(
-      "flex h-full flex-col gap-4 rounded-lg p-4 transition-background",
-      worn ? "bg-white/[0.07]" : "bg-zinc-900/40",
-      locked && "opacity-70",
-    )}
-    style={worn ? { backgroundColor: tint(hex, 0.09) } : undefined}>
-    <Preview item={item} guild={guild} hex={hex} />
-
-    <div className='min-w-0'>
-      <p className='flex items-center gap-1.5 text-sm font-bold text-zinc-100'>
-        {item.name}
-        {worn && <Check size={13} style={{ color: hex }} />}
-        {locked && (
-          <span className='rounded bg-cyan-500/10 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-cyan-300'>
-            lvl {unlockLevel(item)}
-          </span>
-        )}
-      </p>
-      <p className='mt-1 text-xs leading-relaxed text-zinc-500'>{item.blurb}</p>
-    </div>
-
-    {/* Held at the bottom, so the buttons across a row sit on one line however
-        long the blurb above each of them ran. */}
-    <div className='mt-auto'>
-      {worn ? (
-        <p
-          className='flex h-9 items-center gap-1.5 text-xs font-bold'
-          style={{ color: hex }}>
-          Worn now
-        </p>
-      ) : locked ? (
-        <p className='flex h-9 items-center gap-1.5 text-xs font-semibold text-zinc-400'>
-          <Lock size={13} />
-          Unlocks at guild level {unlockLevel(item)}
-        </p>
-      ) : (
-        <button
-          type='button'
-          disabled={busy}
-          onClick={onWear}
-          className='flex h-9 w-full items-center justify-center rounded-lg bg-white/5 text-xs font-bold text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-white/10'>
-          Wear it
-        </button>
+}) => {
+  const { t, cosmeticName, cosmeticBlurb } = useGuildText();
+  return (
+    <div
+      className={cn(
+        "flex h-full flex-col gap-4 rounded-lg p-4 transition-background",
+        worn ? "bg-white/[0.07]" : "bg-zinc-900/40",
+        locked && "opacity-70",
       )}
+      style={worn ? { backgroundColor: tint(hex, 0.09) } : undefined}>
+      <Preview item={item} guild={guild} hex={hex} />
+
+      <div className='min-w-0'>
+        <p className='flex items-center gap-1.5 text-sm font-bold text-zinc-100'>
+          {cosmeticName(item)}
+          {worn && <Check size={13} style={{ color: hex }} />}
+          {locked && (
+            <span className='rounded bg-cyan-500/10 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-cyan-300'>
+              {t("kit.lvl", { level: unlockLevel(item) })}
+            </span>
+          )}
+        </p>
+        <p className='mt-1 text-xs leading-relaxed text-zinc-500'>
+          {cosmeticBlurb(item)}
+        </p>
+      </div>
+
+      {/* Held at the bottom, so the buttons across a row sit on one line however
+        long the blurb above each of them ran. */}
+      <div className='mt-auto'>
+        {worn ? (
+          <p
+            className='flex h-9 items-center gap-1.5 text-xs font-bold'
+            style={{ color: hex }}>
+            {t("kit.worn_now")}
+          </p>
+        ) : locked ? (
+          <p className='flex h-9 items-center gap-1.5 text-xs font-semibold text-zinc-400'>
+            <Lock size={13} />
+            {t("kit.unlocks_at_cap", { level: unlockLevel(item) })}
+          </p>
+        ) : (
+          <button
+            type='button'
+            disabled={busy}
+            onClick={onWear}
+            className='flex h-9 w-full items-center justify-center rounded-lg bg-white/5 text-xs font-bold text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-white/10'>
+            {t("kit.wear_it")}
+          </button>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const GuildCosmeticsTab = ({ guild }: { guild: Guild }) => {
+  const { t, cosmeticName, slotLabel, slotBlurb } = useGuildText();
   const { equipCosmetic } = useGuildMutations();
   const busy = equipCosmetic.isPending;
 
@@ -222,7 +229,10 @@ export const GuildCosmeticsTab = ({ guild }: { guild: Guild }) => {
             meta={
               <span className='inline-flex items-center gap-1.5 tabular-nums'>
                 <Users size={13} />
-                {guild.memberCount} of {guild.memberLimit} seats
+                {t("founding.seats", {
+                  count: guild.memberCount,
+                  limit: guild.memberLimit,
+                })}
               </span>
             }
           />
@@ -236,12 +246,7 @@ export const GuildCosmeticsTab = ({ guild }: { guild: Guild }) => {
 
         <div className='flex min-w-0 flex-1 items-center rounded-lg bg-zinc-900/40 p-5'>
           <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
-            The card on the left is what the guild looks like everywhere else.
-            Every colour, banner, icon and tag below costs nothing, and you pick
-            between them because you founded this guild. The plainer ones are
-            yours from the start; the rest unlock as the guild levels up, and
-            each tile says at what level. Choose one and the whole roster is
-            wearing it a moment later.
+            {t("kit.intro")}
           </p>
         </div>
       </section>
@@ -251,19 +256,25 @@ export const GuildCosmeticsTab = ({ guild }: { guild: Guild }) => {
           <div className='flex flex-wrap items-end justify-between gap-x-6 gap-y-1'>
             <div>
               <h3 className='flex items-baseline gap-2 text-sm font-bold text-zinc-200'>
-                {label}
+                {slotLabel(slot, label)}
                 {/* What is on right now, said here rather than found by hunting
                     the grid below for the one tile with a tick on it. */}
                 <span className='text-xs font-medium' style={{ color: hex }}>
-                  {equippedItem(cosmetics, slot).name}
+                  {cosmeticName(equippedItem(cosmetics, slot))}
                 </span>
               </h3>
-              <p className='mt-1 text-xs text-zinc-500'>{blurb}</p>
+              <p className='mt-1 text-xs text-zinc-500'>
+                {slotBlurb(slot, blurb)}
+              </p>
             </div>
             {items.length > 0 && (
               <p className='text-xs tabular-nums text-zinc-500'>
-                {items.filter((item) => isUnlocked(item, guild.level)).length}{" "}
-                of {items.length} unlocked at guild level {guild.level}
+                {t("kit.unlocked_at_level", {
+                  done: items.filter((item) => isUnlocked(item, guild.level))
+                    .length,
+                  total: items.length,
+                  level: guild.level,
+                })}
               </p>
             )}
           </div>

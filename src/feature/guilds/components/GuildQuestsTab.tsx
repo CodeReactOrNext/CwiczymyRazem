@@ -9,7 +9,9 @@ import {
   romanNumeral,
 } from "feature/guilds/data/guildQuests";
 import { useGuildMutations } from "feature/guilds/hooks/useGuilds";
+import { useGuildText } from "feature/guilds/hooks/useGuildText";
 import type { GuildQuestBoard } from "feature/guilds/types/guild.types";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Check, Lock } from "lucide-react";
 
 /**
@@ -53,19 +55,20 @@ const Payout = ({
   busy: boolean;
   onClaim: () => void;
 }) => {
+  const { t } = useGuildText();
   const { fame, quests } = board.claimable;
   const taken = board.done.filter((quest) => quest.claimed).length;
 
   return (
     <div className='flex flex-col items-start gap-2 sm:items-end sm:text-right'>
-      <p className='text-xs text-zinc-500'>Fame waiting for you</p>
+      <p className='text-xs text-zinc-500'>{t("quests.waiting")}</p>
       <p
         className={cn(
           "flex items-center gap-2 text-2xl font-bold tabular-nums",
           fame > 0 ? "text-amber-400" : "text-zinc-500",
         )}>
         <FameCoin size={20} />
-        {fame.toLocaleString()} Fame
+        {t("quests.fame", { amount: fame.toLocaleString() })}
       </p>
 
       {fame > 0 ? (
@@ -75,18 +78,16 @@ const Payout = ({
             disabled={busy}
             onClick={onClaim}
             className='bg-amber-500 text-zinc-900 hover:bg-amber-400'>
-            Claim {fame.toLocaleString()} Fame
+            {t("quests.claim", { amount: fame.toLocaleString() })}
           </Button>
           <p className='text-xs text-zinc-500'>
-            {quests === 1
-              ? "One quest cleared while you were on the roster."
-              : `${quests} quests cleared while you were on the roster.`}
+            {t("quests.cleared_while_here", { count: quests })}
           </p>
         </>
       ) : (
         taken > 0 && (
           <p className='max-w-xs text-xs text-zinc-500'>
-            Every quest you were here for is taken. The next one lands here.
+            {t("quests.all_taken")}
           </p>
         )
       )}
@@ -104,6 +105,7 @@ const LevelCard = ({
   busy: boolean;
   onClaim: () => void;
 }) => {
+  const { t } = useGuildText();
   const percent = Math.min(
     100,
     Math.round((board.lapCleared / board.lapSize) * 100),
@@ -114,9 +116,11 @@ const LevelCard = ({
       <div className='flex flex-wrap items-start justify-between gap-x-8 gap-y-6'>
         <div className='flex items-center gap-5'>
           <span
-            aria-label={`Guild level ${board.level}`}
+            aria-label={t("quests.guild_level", { level: board.level })}
             className='flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-300'>
-            <span className='text-[10px] leading-none opacity-70'>level</span>
+            <span className='text-[10px] leading-none opacity-70'>
+              {t("quests.level")}
+            </span>
             <span className='mt-1 text-4xl font-bold tabular-nums leading-none'>
               {board.level}
             </span>
@@ -124,19 +128,24 @@ const LevelCard = ({
 
           <div className='space-y-1'>
             <h2 className='text-lg font-bold text-zinc-100'>
-              Guild level {board.level}
+              {t("quests.guild_level", { level: board.level })}
               {board.lap > 1 && (
                 <span className='ml-2 text-sm font-semibold text-cyan-300'>
-                  lap {romanNumeral(board.lap)}
+                  {t("quests.lap", { lap: romanNumeral(board.lap) })}
                 </span>
               )}
             </h2>
             <p className='max-w-md text-sm text-zinc-400'>
-              Every quest cleared is one level up, and{" "}
-              <span className='font-bold text-amber-400'>
-                +{board.chapter.reward} Fame
-              </span>
-              .
+              <Interpolate
+                text={t("quests.level_up")}
+                values={{
+                  reward: (
+                    <span className='font-bold text-amber-400'>
+                      {t("quests.plus_fame", { amount: board.chapter.reward })}
+                    </span>
+                  ),
+                }}
+              />
             </p>
           </div>
         </div>
@@ -147,11 +156,22 @@ const LevelCard = ({
       <div className='space-y-1.5'>
         <div className='flex items-baseline justify-between text-xs tabular-nums text-zinc-500'>
           <span>
-            {board.lapCleared} of {board.lapSize} quests cleared
-            {board.lap > 1 ? ` on lap ${board.lap}` : ""}
+            {board.lap > 1
+              ? t("quests.lap_cleared_on", {
+                  done: board.lapCleared,
+                  total: board.lapSize,
+                  lap: board.lap,
+                })
+              : t("quests.lap_cleared", {
+                  done: board.lapCleared,
+                  total: board.lapSize,
+                })}
           </span>
           <span>
-            chapter {board.chapter.index + 1} of {board.chaptersTotal}
+            {t("quests.chapter_of", {
+              index: board.chapter.index + 1,
+              total: board.chaptersTotal,
+            })}
           </span>
         </div>
         <div
@@ -159,7 +179,10 @@ const LevelCard = ({
           aria-valuenow={board.lapCleared}
           aria-valuemin={0}
           aria-valuemax={board.lapSize}
-          aria-label={`${board.lapCleared} of ${board.lapSize} quests cleared on this lap`}
+          aria-label={t("quests.lap_cleared", {
+            done: board.lapCleared,
+            total: board.lapSize,
+          })}
           className='h-2.5 overflow-hidden rounded-full bg-zinc-800/60'>
           <div
             className='h-full rounded-full bg-cyan-400 transition-[width] duration-500'
@@ -177,26 +200,30 @@ const ChapterPlate = ({
 }: {
   index: number;
   state: ChapterState;
-}) => (
-  <span
-    aria-label={`Chapter ${index + 1}`}
-    className={cn(
-      "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-base font-bold tabular-nums",
-      state === "passed" && "bg-emerald-500/10 text-emerald-400",
-      state === "worn" && "bg-cyan-500/10 text-cyan-300",
-      state === "locked" && "bg-zinc-800/40 text-zinc-500",
-    )}>
-    {state === "passed" ? (
-      <Check size={18} />
-    ) : state === "locked" ? (
-      <Lock size={15} />
-    ) : (
-      index + 1
-    )}
-  </span>
-);
+}) => {
+  const { t } = useGuildText();
+  return (
+    <span
+      aria-label={t("quests.chapter", { index: index + 1 })}
+      className={cn(
+        "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-base font-bold tabular-nums",
+        state === "passed" && "bg-emerald-500/10 text-emerald-400",
+        state === "worn" && "bg-cyan-500/10 text-cyan-300",
+        state === "locked" && "bg-zinc-800/40 text-zinc-500",
+      )}>
+      {state === "passed" ? (
+        <Check size={18} />
+      ) : state === "locked" ? (
+        <Lock size={15} />
+      ) : (
+        index + 1
+      )}
+    </span>
+  );
+};
 
 const Chapters = ({ board }: { board: GuildQuestBoard }) => {
+  const { t, chapterName, chapterBlurb } = useGuildText();
   const activeIndex = board.chapter.index;
   const times = lapMultiplier(board.lap);
   const doneIn = (index: number) =>
@@ -208,19 +235,18 @@ const Chapters = ({ board }: { board: GuildQuestBoard }) => {
     <section className='space-y-4'>
       <div className='space-y-1'>
         <h2 className='text-base font-bold text-zinc-100'>
-          The road ahead
+          {t("quests.road_ahead")}
           {board.lap > 1 && (
             <span className='ml-2 text-sm font-semibold text-cyan-300'>
-              lap {romanNumeral(board.lap)}
+              {t("quests.lap", { lap: romanNumeral(board.lap) })}
             </span>
           )}
         </h2>
         <p className='max-w-2xl text-sm text-zinc-400'>
-          Ten chapters of five quests, opened one at a time. Later chapters ask
-          more and pay more.{" "}
+          {t("quests.ladder")}{" "}
           {board.lap > 1
-            ? `After the tenth the ladder comes round again — this is lap ${board.lap}, with every target and every reward ×${times}.`
-            : "After the tenth the ladder comes round again with every number doubled, then tripled — it never runs out."}
+            ? t("quests.ladder_lap", { lap: board.lap, times })
+            : t("quests.ladder_first")}
         </p>
       </div>
 
@@ -246,28 +272,33 @@ const Chapters = ({ board }: { board: GuildQuestBoard }) => {
               <div className='min-w-0 flex-1'>
                 <div className='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
                   <p className='text-sm font-bold text-zinc-100'>
-                    {chapter.name}
+                    {chapterName(index, chapter.name)}
                     {state === "worn" && (
                       <span className='ml-2 text-xs font-semibold text-cyan-300'>
-                        you are here
+                        {t("quests.you_are_here")}
                       </span>
                     )}
                   </p>
                   <p className='text-xs tabular-nums text-zinc-500'>
                     {state === "locked"
-                      ? `${GUILD_QUESTS_PER_CHAPTER} quests`
-                      : `${doneIn(index)} of ${GUILD_QUESTS_PER_CHAPTER} cleared`}
+                      ? t("quests.n_quests", {
+                          count: GUILD_QUESTS_PER_CHAPTER,
+                        })
+                      : t("quests.n_cleared", {
+                          done: doneIn(index),
+                          total: GUILD_QUESTS_PER_CHAPTER,
+                        })}
                   </p>
                 </div>
                 <p className='mt-0.5 text-xs leading-relaxed text-zinc-500'>
-                  {chapter.blurb}
+                  {chapterBlurb(index, chapter.blurb)}
                 </p>
                 <p className='mt-1.5 flex items-center gap-1.5 text-xs text-zinc-500'>
                   <FameCoin size={12} />
                   <span className='font-semibold text-amber-400'>
-                    +{chapter.reward * times} Fame
+                    {t("quests.plus_fame", { amount: chapter.reward * times })}
                   </span>
-                  a member, for each quest
+                  {t("quests.per_member")}
                 </p>
               </div>
             </div>
@@ -279,6 +310,7 @@ const Chapters = ({ board }: { board: GuildQuestBoard }) => {
 };
 
 export const GuildQuestsTab = ({ board }: { board: GuildQuestBoard }) => {
+  const { t, chapterName, chapterBlurb } = useGuildText();
   const { claimQuests } = useGuildMutations();
   const busy = claimQuests.isPending;
 
@@ -298,25 +330,38 @@ export const GuildQuestsTab = ({ board }: { board: GuildQuestBoard }) => {
         <div className='flex flex-wrap items-end justify-between gap-x-6 gap-y-3'>
           <div className='space-y-1'>
             <p className='text-xs font-semibold text-cyan-300'>
-              Chapter {board.chapter.index + 1} of {board.chaptersTotal} ·{" "}
-              {board.chapter.name}
-              {board.lap > 1 ? ` · lap ${romanNumeral(board.lap)}` : ""}
+              {t("quests.chapter_of_cap", {
+                index: board.chapter.index + 1,
+                total: board.chaptersTotal,
+              })}{" "}
+              · {chapterName(board.chapter.index, board.chapter.name)}
+              {board.lap > 1
+                ? ` · ${t("quests.lap", { lap: romanNumeral(board.lap) })}`
+                : ""}
             </p>
             <h2 className='text-lg font-bold text-zinc-100'>
               {open.length === 0
-                ? "Chapter cleared"
-                : open.length === 1
-                  ? "One quest to clear"
-                  : `${open.length} quests to clear`}
+                ? t("quests.chapter_cleared")
+                : t("quests.to_clear", { count: open.length })}
             </h2>
             <p className='max-w-2xl text-sm text-zinc-400'>
-              {board.chapter.blurb} Clear all five and the next chapter opens.
+              {chapterBlurb(board.chapter.index, board.chapter.blurb)}{" "}
+              {t("quests.clear_all_five")}
             </p>
           </div>
 
           <p className='text-sm tabular-nums text-zinc-400'>
-            <span className='font-bold text-zinc-100'>{cleared.length}</span> of{" "}
-            {board.active.length} cleared
+            <Interpolate
+              text={t("quests.cleared_of")}
+              values={{
+                done: (
+                  <span className='font-bold text-zinc-100'>
+                    {cleared.length}
+                  </span>
+                ),
+                total: board.active.length,
+              }}
+            />
           </p>
         </div>
 
@@ -331,7 +376,7 @@ export const GuildQuestsTab = ({ board }: { board: GuildQuestBoard }) => {
         {cleared.length > 0 && (
           <div className='space-y-3 pt-2'>
             <p className='text-xs font-semibold text-emerald-400'>
-              Cleared in this chapter
+              {t("quests.cleared_in_chapter")}
             </p>
             {cleared.map((quest) => (
               <GuildQuestCard key={quest.id} quest={quest} />
@@ -340,10 +385,7 @@ export const GuildQuestsTab = ({ board }: { board: GuildQuestBoard }) => {
         )}
 
         <p className='text-xs leading-relaxed text-zinc-500'>
-          Counted over everyone on the roster
-          {since ? ` since ${since}` : ""}. A quest that counts members is
-          cleared when enough of them get there; the rest add up across the
-          guild.
+          {since ? t("quests.counted_since", { since }) : t("quests.counted")}
         </p>
       </section>
 
