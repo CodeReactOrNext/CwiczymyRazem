@@ -137,6 +137,7 @@ import { FaTrophy } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import { addZeroToTime } from "utils/converter";
+import { TOUCH_TARGET } from "utils/touchTarget";
 
 /** Compact practice duration shown next to the points in a feed row — "1h 20 min", "45 min",
  * or seconds for sub-minute sessions (so a short drill never reads as "0m"). */
@@ -210,13 +211,13 @@ const ItemTooltipCard = ({
       {/* Header */}
       <div className='px-3 pb-1 pt-3'>
         <p
-          className='text-[10px] font-bold tracking-wide'
+          className='text-xs font-bold tracking-wide'
           style={{ color: `${color}cc` }}>
           {itemBrand}
         </p>
         <p className='text-sm font-bold leading-tight text-white'>{itemName}</p>
         <span
-          className='mt-1.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wide'
+          className='mt-1.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-bold tracking-wide'
           style={{
             backgroundColor: `${color}20`,
             color,
@@ -264,7 +265,7 @@ const ItemTooltipCard = ({
       {/* Footer */}
       {(guitarDef || effectDef) && (
         <div
-          className='flex items-center justify-between px-3 py-2 text-[10px] text-gray-400'
+          className='flex items-center justify-between px-3 py-2 text-xs text-gray-400'
           style={{
             borderTop: `1px solid ${color}20`,
             background: `${color}08`,
@@ -274,7 +275,7 @@ const ItemTooltipCard = ({
               <span className='font-semibold text-gray-300'>
                 {guitarDef.yearFrom}
               </span>
-              <span className='text-[9px] uppercase tracking-widest text-gray-500'>
+              <span className='text-xs uppercase tracking-widest text-gray-500'>
                 {guitarDef.countries[0]}
               </span>
             </>
@@ -387,14 +388,14 @@ export const ItemPill = ({
         <span className='order-2 flex shrink-0 items-center gap-1.5 sm:order-1'>
           <Chip
             color='custom'
-            className='whitespace-nowrap px-1.5 py-0.5 text-[10px] tracking-wide'
+            className='whitespace-nowrap px-1.5 py-0.5 text-xs tracking-wide'
             style={getChipCustomStyle(color)}>
             {itemRarity}
           </Chip>
           {level !== null && (
             <Chip
               color='gray'
-              className='whitespace-nowrap px-1.5 py-0.5 text-[10px] tabular-nums tracking-wide'
+              className='whitespace-nowrap px-1.5 py-0.5 text-xs tabular-nums tracking-wide'
               title={t("item_level")}>
               {t("item_level_short", { level })}
             </Chip>
@@ -441,7 +442,7 @@ interface LogsBoxLayoutProps {
 }
 
 const TimeStamp = ({ date }: { date: Date }) => (
-  <p className='mb-2 w-full whitespace-nowrap py-1 text-[0.6rem] text-zinc-400 opacity-60 sm:mb-0 sm:w-auto sm:text-[0.55rem] sm:opacity-100 lg:mr-4 lg:text-xs'>
+  <p className='mb-2 w-full whitespace-nowrap py-1 text-[0.6rem] text-zinc-400 sm:mb-0 sm:w-auto sm:text-[0.55rem] lg:mr-4 lg:text-xs'>
     {date.toLocaleDateString() +
       " " +
       addZeroToTime(date.getHours()) +
@@ -480,7 +481,7 @@ const SongTierChip = ({ info }: { info?: SongTierInfo }) => {
 
   return (
     <span title={tier.label} className='inline-flex shrink-0'>
-      <TierBadge song={info} className='h-5 w-5 rounded text-[10px]' />
+      <TierBadge song={info} className='h-5 w-auto min-w-5 rounded px-1 text-xs' />
     </span>
   );
 };
@@ -531,7 +532,7 @@ const SeasonHeader = ({
           <span>{t("logsBox.days_left")}</span>
         </Chip>
       )}
-      <span className='opacity-60'>
+      <span className='text-zinc-400'>
         {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
         {addZeroToTime(date.getMinutes())}
       </span>
@@ -572,7 +573,7 @@ const PlayerRow = ({
 
         <UserTooltip userId={player.uid}>
           <Link
-            className={`text-sm font-bold tracking-wide transition-colors sm:text-base ${
+            className={`${TOUCH_TARGET} text-sm font-bold tracking-wide transition-colors sm:text-base ${
               index === 0 ? "text-yellow-500/90" : "text-white/90"
             } hover:text-white`}
             href={`/user/${player.uid}`}>
@@ -583,7 +584,7 @@ const PlayerRow = ({
 
       <div className='ml-auto'>
         <div className='flex items-baseline gap-1.5'>
-          <span className='text-[10px] font-semibold text-zinc-400 opacity-60 sm:text-xs'>
+          <span className='text-xs font-semibold text-zinc-400'>
             {t("points_short")}
           </span>
           <span
@@ -694,7 +695,7 @@ const FirebaseLogsGuildLevelItem = ({
             })}
           </h3>
         </div>
-        <span className='ml-auto shrink-0 text-[11px] text-zinc-400 opacity-60'>
+        <span className='ml-auto shrink-0 text-[11px] text-zinc-400'>
           {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
           {addZeroToTime(date.getMinutes())}
         </span>
@@ -764,14 +765,14 @@ const FirebaseLogsSupportAskItem = ({
           <Heart size={16} className='text-orange-400' fill='currentColor' />
         </div>
         <div className='min-w-0 flex-1'>
-          <p className='text-[10px] font-semibold uppercase tracking-widest text-orange-400/80'>
+          <p className='text-xs font-semibold uppercase tracking-widest text-orange-400/80'>
             {copy.eyebrow}
           </p>
           <h3 className='text-sm font-bold text-white sm:text-base'>
             {copy.headline}
           </h3>
         </div>
-        <span className='ml-auto shrink-0 text-[11px] text-zinc-400 opacity-60'>
+        <span className='ml-auto shrink-0 text-[11px] text-zinc-400'>
           {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
           {addZeroToTime(date.getMinutes())}
         </span>
@@ -838,7 +839,7 @@ const DonationLine = ({ log }: { log: FirebaseLogsDonationInterface }) => {
           ? t("monthly_support")
           : t("coffee_amount", { amount: log.amount })}
       </span>
-      <span className='text-[11px] opacity-60'>
+      <span className='text-[11px] text-zinc-400'>
         {addZeroToTime(date.getHours())}:{addZeroToTime(date.getMinutes())}
       </span>
     </div>
@@ -888,14 +889,14 @@ const FirebaseLogsDonationItem = ({
           <PartyPopper size={16} className='text-orange-400' />
         </div>
         <div className='min-w-0 flex-1'>
-          <p className='text-[10px] font-semibold uppercase tracking-widest text-orange-400'>
+          <p className='text-xs font-semibold uppercase tracking-widest text-orange-400'>
             {t("new_supporter")}
           </p>
           <h3 className='text-sm font-bold text-white sm:text-base'>
             {getDonationHeadline(logs, t)}
           </h3>
         </div>
-        <span className='ml-auto shrink-0 text-[11px] text-zinc-400 opacity-60'>
+        <span className='ml-auto shrink-0 text-[11px] text-zinc-400'>
           {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
           {addZeroToTime(date.getMinutes())}
         </span>
@@ -1072,7 +1073,11 @@ const PracticedChip = ({
   onOpen?: () => void;
 }) =>
   onOpen ? (
-    <button type='button' onClick={onOpen} title={hint}>
+    <button
+      type='button'
+      onClick={onOpen}
+      title={hint}
+      className={TOUCH_TARGET}>
       <Chip color={color} className='cursor-pointer text-left'>
         <Icon className='h-3.5 w-3.5 shrink-0' />
         <span className='underline-offset-2 hover:underline'>{label}</span>
@@ -1121,7 +1126,7 @@ const GroupedLogLine = ({
           {songLog.songId ? (
             <Link
               href={`/songs?view=management&songId=${songLog.songId}`}
-              className='text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60'>
+              className={cn(TOUCH_TARGET, "text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
               {songLog.songArtist} - {songLog.songTitle}
             </Link>
           ) : (
@@ -1157,7 +1162,7 @@ const GroupedLogLine = ({
           {recLog.recordingId ? (
             <button
               onClick={() => onViewRecording(recLog.recordingId as string)}
-              className='text-left font-bold text-white transition-colors hover:text-cyan-400 hover:underline'>
+              className={cn(TOUCH_TARGET, "text-left font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
               {recLog.recordingTitle}
             </button>
           ) : (
@@ -1165,7 +1170,7 @@ const GroupedLogLine = ({
               href={recLog.videoUrl}
               target='_blank'
               rel='noopener noreferrer'
-              className='font-bold text-white transition-colors hover:text-cyan-400 hover:underline'>
+              className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
               {recLog.recordingTitle}
             </a>
           )}{" "}
@@ -1272,7 +1277,7 @@ const GroupedLogLine = ({
           {purchaseLog.sellerId ? (
             <Link
               href={`/user/${purchaseLog.sellerId}`}
-              className='font-bold text-white transition-colors hover:text-cyan-400 hover:underline'>
+              className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
               {purchaseLog.sellerName}
             </Link>
           ) : (
@@ -1308,7 +1313,7 @@ const GroupedLogLine = ({
           {t("feed:created_playlist", { kind: kindLabel })}{" "}
           <Link
             href={`/songs?view=playlists&playlistId=${playlistLog.playlistId}`}
-            className='inline-flex items-center gap-1 font-bold text-white transition-colors hover:text-cyan-400 hover:underline'>
+            className={cn(TOUCH_TARGET, "inline-flex items-center gap-1 font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
             {playlistLog.playlistName}
             <ExternalLink className='h-3 w-3 opacity-60' />
           </Link>
@@ -1364,7 +1369,7 @@ const GroupedLogLine = ({
               step: (
                 <Link
                   href={`/ai-coach?roadmapId=${stepLog.roadmapId}&step=${stepLog.stepId}`}
-                  className='font-bold text-white transition-colors hover:text-cyan-400 hover:underline'>
+                  className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
                   {stepLog.stepTitle}
                 </Link>
               ),
@@ -1560,7 +1565,7 @@ const GroupedLogLine = ({
               onOpenLeaderboard(matchedExercise.id, matchedExercise.title)
             }
             title={t("feed:ranking_hint")}
-            className='inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60'>
+            className={cn(TOUCH_TARGET, "inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
             <MicPerformanceStats performance={genericLog.micPerformance} />
           </button>
         ) : (
@@ -1578,7 +1583,7 @@ const GroupedLogLine = ({
               onOpenLeaderboard(matchedExercise.id, matchedExercise.title)
             }
             title={t("feed:ranking_hint")}
-            className='inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60'>
+            className={cn(TOUCH_TARGET, "inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
             <EarTrainingStats performance={genericLog.earTrainingPerformance} />
           </button>
         ) : (
@@ -1596,7 +1601,7 @@ const GroupedLogLine = ({
           {genericLog.songId ? (
             <Link
               href={`/songs?view=management&songId=${genericLog.songId}`}
-              className='text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60'>
+              className={cn(TOUCH_TARGET, "text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
               {genericLog.songArtist} - {genericLog.songTitle}
             </Link>
           ) : (
@@ -1661,7 +1666,7 @@ const GroupedLogItem = ({
                 avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
               />
             </span>
-            <span className='hidden shrink-0 items-center gap-1.5 text-[11px] text-zinc-500 sm:flex'>
+            <span className='hidden shrink-0 items-center gap-1.5 text-[11px] text-zinc-400 sm:flex'>
               {isNew && (
                 <span
                   aria-label={t("new_since_last_visit")}

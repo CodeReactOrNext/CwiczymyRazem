@@ -84,7 +84,7 @@ const StreakWeek = ({ days, rule, color }: ChartProps) => {
                   style={{ color: streak[index] ? color : "#71717a" }}
                 />
               ) : day.minutes > 0 ? (
-                <span className='text-[10px] font-semibold tabular-nums text-zinc-400'>
+                <span className='text-xs font-semibold tabular-nums text-zinc-400'>
                   {day.minutes}
                 </span>
               ) : missed ? (
@@ -106,7 +106,7 @@ const CategoryLegend = () => (
     {PRACTICE_CATEGORIES.map((cat) => (
       <span
         key={cat.k}
-        className='flex items-center gap-1 text-[10px] leading-none text-zinc-500'>
+        className='flex items-center gap-1 text-xs leading-none text-zinc-400'>
         <span
           className='h-1.5 w-1.5 rounded-full'
           style={{ backgroundColor: cat.color }}

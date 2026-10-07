@@ -66,10 +66,21 @@
     "remove_attachment": "Quitar adjunto",
     "mention": "Mencionar a alguien",
     "share": "Compartir un ejercicio, canción u objeto",
-    "send": "Enviar"
+    "send": "Enviar",
+    "message_label": "Mensaje"
   },
   "reactions": {
     "react_with": "Reaccionar con {{emoji}}",
     "reply": "Responder"
+  },
+  "menu": {
+    "copy": "Copiar texto",
+    "copied": "Copiado",
+    "copy_failed": "No se pudo copiar",
+    "more": "Acciones del mensaje"
+  },
+  "time": {
+    "today": "Hoy",
+    "yesterday": "Ayer"
   }
 }

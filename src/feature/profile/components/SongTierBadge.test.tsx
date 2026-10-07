@@ -10,12 +10,12 @@ const learnedSongs = (count: number, avgDifficulty: number) =>
 describe("SongTierBadge", () => {
   afterEach(cleanup);
 
-  it("says how many songs are still missing instead of only a '?'", () => {
+  it("shows a lock and how many songs are still missing, not a bare '?'", () => {
     // Players read the bare "?" as a broken profile, so the badge spells out
     // that the tier is gated behind five learned songs.
     render(<SongTierBadge learnedSongs={learnedSongs(2, 8)} />);
 
-    expect(screen.getByText("?")).toBeTruthy();
+    expect(screen.queryByText("?")).toBeNull();
     expect(screen.getByText("3 more songs")).toBeTruthy();
   });
 

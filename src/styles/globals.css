@@ -22,8 +22,6 @@ html {
      pages of different content height (e.g. library tabs) doesn't shift
      the layout horizontally when the scrollbar appears/disappears. */
   scrollbar-gutter: stable;
-  /* Firefox */
-  scrollbar-color: #a1a1aa #18181b;
   /* Full-bleed sections (e.g. the song guide riff player) use `w-screen` +
      negative margins to break out of their reading column. `100vw` includes
      the vertical scrollbar's width, so that trick overshoots the real
@@ -34,6 +32,14 @@ html {
      from `main`'s own overflow-x, which previously broke `position: sticky`
      for its descendants when set there directly. */
   overflow-x: hidden;
+}
+
+/* The logged-in shell is a fixed 100dvh box that scrolls inside
+   MainLoggedWrapper, so `html` never scrolls there. A stable gutter would
+   leave an empty bar-wide strip at the window edge, with the real scrollbar
+   sitting left of it. */
+html:has(main[data-app-shell]) {
+  scrollbar-gutter: auto;
 }
 
 html,
@@ -55,7 +61,8 @@ body {
    theme class, so themed colors resolved to nothing and the scrollbar was
    invisible there. */
 ::-webkit-scrollbar {
-  width: 13px;
+  width: 16px;
+  height: 16px;
 }
 
 ::-webkit-scrollbar-track {
@@ -64,8 +71,18 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background-color: #a1a1aa;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 3px solid #18181b;
+}
+
+/* Firefox only. Chromium 121+ also reads `scrollbar-color`, and once it is
+   set every ::-webkit-scrollbar rule above is ignored — the bar fell back to
+   the thin native one. Firefox has no ::-webkit-scrollbar, so this gate
+   keeps it there. */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-color: #a1a1aa #18181b;
+  }
 }
 
 ::-webkit-scrollbar-thumb:hover {

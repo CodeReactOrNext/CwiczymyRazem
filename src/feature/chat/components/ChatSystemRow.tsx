@@ -55,7 +55,7 @@ const Greeters = ({ greeters }: { greeters: ChatMessageType[] }) => {
           </UserTooltip>
         ))}
       </div>
-      <p className='min-w-0 text-sm text-zinc-500'>
+      <p className='min-w-0 text-sm text-zinc-400'>
         {named.map((greeter, index) => (
           <span key={greeter.userId}>
             {index > 0 && (rest > 0 ? ", " : ` ${t("system.and")} `)}
@@ -117,7 +117,7 @@ const JoinRow = ({
               type='button'
               onClick={onSayHi}
               className={cn(
-                "flex items-center gap-2 rounded-lg bg-cyan-500/15 px-3.5 py-1.5 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 active:click-behavior",
+                "flex min-h-11 items-center gap-2 rounded-lg bg-cyan-500/15 px-4 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 active:click-behavior",
                 FOCUS_RING,
               )}>
               <Hand className='h-4 w-4' />
@@ -182,7 +182,7 @@ export const ChatSystemRow = ({
           {t("system.reached_level")}{" "}
           <span className='font-semibold text-amber-300'>{event.level}</span>
           {event.quests.length > 0 && (
-            <span className='mt-0.5 block text-xs text-zinc-500'>
+            <span className='mt-0.5 block text-xs text-zinc-400'>
               {t("system.cleared", { quests: event.quests.join(", ") })}
             </span>
           )}

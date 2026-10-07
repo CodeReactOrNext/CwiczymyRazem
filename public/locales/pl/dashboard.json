@@ -3,6 +3,7 @@
     "title": "Dzienne zadania",
     "claim": "Odbierz {{points}}",
     "claimed": "Nagroda odebrana",
+    "reward_hint": "Ukończ wszystkie {{count}}, aby zdobyć",
     "tasks": {
       "rate_song": "Oceń utwór",
       "add_want_to_learn": "Dodaj utwór do „Chcę się nauczyć”",

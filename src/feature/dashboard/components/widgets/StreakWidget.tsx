@@ -56,7 +56,7 @@ export const StreakWidget = () => {
       {!didPracticeToday && (
         <Link
           href='/timer'
-          className='mt-4 inline-flex w-fit items-center gap-1.5 rounded-lg bg-zinc-900/60 px-3 py-2 text-sm font-semibold text-zinc-100 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-900'>
+          className='mt-4 inline-flex min-h-11 w-fit items-center gap-1.5 rounded-lg bg-zinc-900/60 px-3 py-2 text-sm font-semibold text-zinc-100 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-900'>
           {t("streak.practice_now")}
           <ArrowRight size={14} />
         </Link>

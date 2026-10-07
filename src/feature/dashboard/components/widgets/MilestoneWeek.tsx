@@ -42,12 +42,12 @@ export const MilestoneDayLabels = ({ days }: { days: MilestoneDay[] }) => (
       <span
         key={day.date.toISOString()}
         className={cn(
-          "flex-1 text-center text-[10px] font-semibold leading-none",
+          "flex-1 text-center text-xs font-semibold leading-none",
           day.isToday
-            ? "text-zinc-200"
+            ? "text-zinc-100"
             : day.isFuture
-              ? "text-zinc-700"
-              : "text-zinc-500",
+              ? "text-zinc-400"
+              : "text-zinc-300",
         )}>
         {day.label}
       </span>

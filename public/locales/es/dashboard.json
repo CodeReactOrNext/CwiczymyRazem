@@ -3,6 +3,7 @@
     "title": "Misiones diarias",
     "claim": "Reclamar {{points}}",
     "claimed": "Recompensa reclamada",
+    "reward_hint": "Completa las {{count}} para ganar",
     "tasks": {
       "rate_song": "Valora una canción",
       "add_want_to_learn": "Añade una canción a «Quiero aprender»",

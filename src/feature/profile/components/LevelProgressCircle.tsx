@@ -70,7 +70,7 @@ export const LevelProgressCircle = ({
           />
           <text
             x="50"
-            y="54"
+            y="51"
             textAnchor="middle"
             fill="white"
             fontSize="24"
@@ -81,12 +81,12 @@ export const LevelProgressCircle = ({
           </text>
           <text
             x="50"
-            y="67"
+            y="69"
             textAnchor="middle"
             fill="#67e8f9"
-            fontSize="9"
+            fontSize="15"
             fontWeight="700"
-            letterSpacing="3"
+            letterSpacing="2"
             style={{ fontFamily: "system-ui, sans-serif" }}
           >
             LVL
@@ -95,9 +95,9 @@ export const LevelProgressCircle = ({
       </div>
       {showLabel && (
         <div className="hidden md:flex flex-col items-center gap-0.5">
-          <span className="text-[11px] font-semibold tracking-[0.1em] text-zinc-400">Level Progress</span>
+          <span className="text-[11px] font-semibold tracking-[0.1em] text-zinc-400">Level {lvl} XP</span>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs tabular-nums text-zinc-500">
+            <span className="text-xs tabular-nums text-zinc-400">
               {ptsInLevel.toLocaleString()} / {lvlRange.toLocaleString()}
             </span>
             <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain opacity-80" />

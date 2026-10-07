@@ -104,6 +104,38 @@ describe("Chat Component", () => {
     expect(mockSendMessage).toHaveBeenCalled();
   });
 
+  it("labels the message field and sends on Enter, not on Shift+Enter", () => {
+    renderChat();
+    const field = screen.getByRole("textbox", { name: "Message" });
+
+    expect(field.tagName).toBe("TEXTAREA");
+    expect(field.getAttribute("enterkeyhint")).toBe("send");
+
+    fireEvent.keyDown(field, { key: "Enter", shiftKey: true });
+    expect(mockSendMessage).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(mockSendMessage).toHaveBeenCalled();
+  });
+
+  it("dates the day and times the group", () => {
+    const { container } = renderChat();
+
+    expect(screen.getByText("Today")).toBeDefined();
+    expect(container.querySelectorAll("time[datetime]").length).toBe(2);
+  });
+
+  it("opens the message menu from ⋯ with Reply and Copy", () => {
+    const startReply = vi.fn();
+    (useChat as any).mockReturnValue(chatState({ startReply }));
+    renderChat();
+
+    fireEvent.click(screen.getByRole("button", { name: "Message actions" }));
+    fireEvent.click(screen.getByRole("button", { name: "Reply" }));
+
+    expect(startReply).toHaveBeenCalled();
+  });
+
   it("should display error when present", () => {
     (useChat as any).mockReturnValue(
       chatState({ messages: [], newMessage: "", error: "Error message" })

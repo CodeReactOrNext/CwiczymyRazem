@@ -1,5 +1,4 @@
 import { Button } from "assets/components/ui/button";
-import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import type {
   ChatAttachment,
@@ -12,13 +11,21 @@ import {
 } from "feature/chat/utils/chatMentions";
 import { useTranslation } from "hooks/useTranslation";
 import { Paperclip, Reply, SendHorizontal, X } from "lucide-react";
-import { type FormEvent, type RefObject, useState } from "react";
+import {
+  type FormEvent,
+  type RefObject,
+  useLayoutEffect,
+  useState,
+} from "react";
 
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60";
 
 /** How many names the @ list shows at once. */
 const MAX_SUGGESTIONS = 6;
+
+/** The field grows with what is typed up to about six lines, then scrolls. */
+const MAX_INPUT_HEIGHT_PX = 168;
 
 const attachmentLabel = (attachment: ChatAttachment): string =>
   attachment.kind === "item"
@@ -50,7 +57,7 @@ const ComposerStrip = ({
       aria-label={clearLabel}
       onClick={onClear}
       className={cn(
-        "rounded-full p-1 text-zinc-500 transition-colors hover:bg-white/10 hover:text-zinc-200",
+        "-my-2 -mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-200",
         FOCUS_RING,
       )}>
       <X className='h-4 w-4' />
@@ -79,7 +86,7 @@ export const ChatComposer = ({
   onChange: (value: string) => void;
   onSubmit: (event: FormEvent) => void;
   placeholder: string;
-  inputRef: RefObject<HTMLInputElement | null>;
+  inputRef: RefObject<HTMLTextAreaElement | null>;
   replyTo: ChatReplyTo | null;
   onCancelReply: () => void;
   attachment: ChatAttachment | null;
@@ -129,8 +136,28 @@ export const ChatComposer = ({
     });
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showSuggestions) return;
+  // Grows the field to fit its text, so a longer message stays readable while it is written.
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.style.height = "auto";
+    input.style.height = `${Math.min(input.scrollHeight, MAX_INPUT_HEIGHT_PX)}px`;
+  }, [value, inputRef]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!showSuggestions) {
+      // Enter sends, Shift+Enter starts a new line. Not mid-composition — an IME
+      // uses Enter to accept the word it is building.
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey &&
+        !event.nativeEvent.isComposing
+      ) {
+        event.preventDefault();
+        event.currentTarget.form?.requestSubmit();
+      }
+      return;
+    }
 
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
@@ -148,7 +175,9 @@ export const ChatComposer = ({
   };
 
   return (
-    <div className='flex flex-col gap-2 pt-3 sm:bg-zinc-900/60 sm:p-4'>
+    // Same side padding as the message list above, so the paperclip lines up with the avatars
+    // and the send button with the edge of your own bubbles.
+    <div className='flex flex-col gap-2 pt-3 sm:bg-zinc-900/60 sm:px-6 sm:py-4'>
       {replyTo && (
         <ComposerStrip
           icon={<Reply className='h-4 w-4' />}
@@ -177,7 +206,7 @@ export const ChatComposer = ({
 
       <form
         onSubmit={onSubmit}
-        className='relative mx-auto flex w-full max-w-4xl items-center gap-2'>
+        className='relative flex w-full items-end gap-2'>
         {showSuggestions && (
           <div
             role='listbox'
@@ -193,7 +222,7 @@ export const ChatComposer = ({
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => pick(candidate)}
                 className={cn(
-                  "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                  "flex min-h-11 w-full items-center rounded-lg px-3 text-left text-sm transition-colors",
                   index === highlighted
                     ? "bg-cyan-500/20 text-cyan-50"
                     : "text-zinc-300 hover:bg-white/5",
@@ -214,13 +243,19 @@ export const ChatComposer = ({
           )}>
           <Paperclip className='h-5 w-5' />
         </button>
-        <Input
+        <textarea
           ref={inputRef}
-          type='text'
+          rows={1}
           value={value}
           placeholder={placeholder}
+          aria-label={t("composer.message_label")}
           autoComplete='off'
-          className='h-12 flex-1 rounded-lg border-none bg-zinc-950/50 transition-colors focus-visible:ring-cyan-500/50'
+          autoCapitalize='sentences'
+          enterKeyHint='send'
+          className={cn(
+            "min-h-12 flex-1 resize-none rounded-lg bg-zinc-950/50 px-3 py-3 text-base leading-6 text-zinc-100 transition-colors placeholder:text-zinc-400 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-700",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
+          )}
           onChange={(event) => {
             onChange(event.target.value);
             readCaret(event.target.value, event.target.selectionStart);
@@ -242,7 +277,7 @@ export const ChatComposer = ({
       </form>
 
       <div className='flex min-h-4 items-center justify-between gap-3 px-1'>
-        <p aria-live='polite' className='truncate text-xs text-zinc-500'>
+        <p aria-live='polite' className='truncate text-xs text-zinc-400'>
           {typingText}
         </p>
         {error && (

@@ -12,6 +12,7 @@ import {
 import { groupReactions } from "feature/chat/utils/chatReactions";
 import { useTranslation } from "hooks/useTranslation";
 import { Reply } from "lucide-react";
+import { TOUCH_TARGET } from "utils/touchTarget";
 
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60";
@@ -35,7 +36,7 @@ export const ChatReactionChips = ({
   return (
     <div
       className={cn(
-        "mt-1.5 flex flex-wrap gap-1.5",
+        "mt-1.5 flex flex-wrap gap-2",
         alignEnd && "justify-end",
       )}>
       {groups.map((group) => (
@@ -47,7 +48,8 @@ export const ChatReactionChips = ({
               aria-pressed={group.mine}
               onClick={() => onToggle(group.emoji)}
               className={cn(
-                "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums transition-colors active:click-behavior",
+                "flex min-h-8 items-center gap-1.5 rounded-full px-3 text-sm tabular-nums transition-colors active:click-behavior",
+                TOUCH_TARGET,
                 FOCUS_RING,
                 group.mine
                   ? "bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
@@ -62,7 +64,7 @@ export const ChatReactionChips = ({
           <TooltipContent
             side='top'
             className='max-w-xs border-none bg-zinc-900 text-white'>
-            <p className='text-[11px] text-zinc-300'>
+            <p className='text-xs text-zinc-300'>
               {group.reactors.map((reactor) => reactor.username).join(", ")}
             </p>
           </TooltipContent>
@@ -73,16 +75,16 @@ export const ChatReactionChips = ({
 };
 
 /**
- * The quick actions beside a message: the five reactions and Reply. Revealed on
- * hover on desktop, by tapping the message on touch screens.
+ * The quick actions beside a message: the five reactions and Reply, revealed
+ * on hover (or keyboard focus) inside a `group/msg`. Only where there is a
+ * hover — a touch screen gets the same actions from a held finger or the ⋯
+ * button, as a sheet (`ChatMessageMenu`).
  */
 export const ChatMessageActions = ({
-  visible,
   onReact,
   onReply,
   className,
 }: {
-  visible: boolean;
   className?: string;
   onReact: (emoji: ChatReactionEmoji) => void;
   onReply?: () => void;
@@ -91,11 +93,9 @@ export const ChatMessageActions = ({
   return (
   <div
     className={cn(
-      "z-10 flex shrink-0 items-center gap-0.5 rounded-full bg-zinc-800 p-0.5 transition-opacity",
+      "pointer-events-none z-10 hidden shrink-0 items-center gap-0.5 rounded-full bg-zinc-800 p-1 opacity-0 transition-opacity [@media(hover:hover)]:flex",
+      "group-focus-within/msg:pointer-events-auto group-focus-within/msg:opacity-100 group-hover/msg:pointer-events-auto group-hover/msg:opacity-100",
       className,
-      visible
-        ? "opacity-100"
-        : "pointer-events-none opacity-0 sm:group-focus-within:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100",
     )}>
     {CHAT_REACTIONS.map((emoji) => (
       <button
@@ -107,7 +107,7 @@ export const ChatMessageActions = ({
           onReact(emoji);
         }}
         className={cn(
-          "flex h-7 w-7 items-center justify-center rounded-full text-sm transition-colors hover:bg-white/10 active:click-behavior",
+          "flex h-11 w-11 items-center justify-center rounded-full text-lg transition-colors hover:bg-white/10 active:click-behavior",
           FOCUS_RING,
         )}>
         {emoji}
@@ -122,10 +122,10 @@ export const ChatMessageActions = ({
           onReply();
         }}
         className={cn(
-          "flex h-7 w-7 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100 active:click-behavior",
+          "flex h-11 w-11 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100 active:click-behavior",
           FOCUS_RING,
         )}>
-        <Reply className='h-4 w-4' />
+        <Reply className='h-5 w-5' />
       </button>
     )}
   </div>

@@ -33,7 +33,7 @@ export const StreakBox = () => {
     <ScoreBreakdownTooltip streak={dayWithoutBreak}>
     <div
       onClick={() => router.push("/practice-log")}
-      className='flex h-10 cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-zinc-800/70'>
+      className='flex h-11 cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-zinc-800/70'>
       <div className="flex items-center gap-1.5 shrink-0 px-1">
         <FaFire className={cn(
           "text-xl transition-all duration-500",
@@ -65,10 +65,10 @@ export const StreakBox = () => {
             <div
               key={index}
               className={cn(
-                "flex h-5 w-5 items-center justify-center rounded-[4px] text-[9px] font-bold transition-all duration-300",
+                "flex h-6 w-6 items-center justify-center rounded-[4px] text-xs font-bold transition-all duration-300",
                 isActive
                   ? "bg-white text-zinc-900 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                  : "bg-zinc-800 text-zinc-600"
+                  : "bg-zinc-800 text-zinc-300"
               )}
               title={dayDate.toDateString()}
             >

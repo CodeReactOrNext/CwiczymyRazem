@@ -118,7 +118,7 @@ export const DashboardWidgets = () => {
                     type='button'
                     variant='outline'
                     size='sm'
-                    className='gap-1.5'
+                    className='h-11 gap-1.5'
                     onClick={() => setIsAddOpen(true)}>
                     <Plus size={14} />
                     {t("customize.add_widget")}
@@ -127,7 +127,7 @@ export const DashboardWidgets = () => {
                     type='button'
                     variant='ghost'
                     size='sm'
-                    className='gap-1.5'
+                    className='h-11 gap-1.5'
                     disabled={isDefaultLayout(layout)}
                     onClick={() => updateLayout(normalizeLayout(undefined))}>
                     <RotateCcw size={14} />
@@ -136,7 +136,7 @@ export const DashboardWidgets = () => {
                   <Button
                     type='button'
                     size='sm'
-                    className='gap-1.5'
+                    className='h-11 gap-1.5'
                     onClick={() => setIsEditing(false)}>
                     <Check size={14} />
                     {t("customize.done")}
@@ -147,7 +147,7 @@ export const DashboardWidgets = () => {
                   type='button'
                   variant='ghost'
                   size='sm'
-                  className='gap-1.5 text-zinc-400 hover:text-zinc-100'
+                  className='h-11 gap-1.5 text-zinc-400 hover:text-zinc-100'
                   disabled={isLoading}
                   onClick={() => setIsEditing(true)}>
                   <Settings2 size={14} />
@@ -177,7 +177,7 @@ export const DashboardWidgets = () => {
                 type='button'
                 variant='outline'
                 size='sm'
-                className='mt-5 gap-1.5'
+                className='mt-5 h-11 gap-1.5'
                 onClick={() => {
                   setIsEditing(true);
                   setIsAddOpen(true);

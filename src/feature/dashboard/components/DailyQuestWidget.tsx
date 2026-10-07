@@ -1,18 +1,18 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
-import { cn } from "assets/lib/utils";
 import { selectDailyQuest } from "feature/user/store/userSlice";
 import {
   claimQuestRewardAction,
   DAILY_QUEST_FAME_REWARD,
+  DAILY_QUEST_POINTS_REWARD,
   initializeDailyQuestAction,
 } from "feature/user/store/userSlice.questActions";
-import { ArrowRight, CheckCircle2, Gift, Swords } from "lucide-react";
+import { useTranslation } from "hooks/useTranslation";
+import { CheckCircle2, ChevronRight, Gift, Swords } from "lucide-react";
 import Router from "next/router";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import type { DailyQuestTaskType } from "types/api.types";
+import type { DailyQuestTask, DailyQuestTaskType } from "types/api.types";
 
 const questRoutes: Record<DailyQuestTaskType, string> = {
   rate_song: "/songs?view=library",
@@ -41,29 +41,32 @@ const questRoutes: Record<DailyQuestTaskType, string> = {
 const DailyQuestSkeleton = () => {
   const { t } = useTranslation("dashboard");
   return (
-  <Card className='flex-col justify-between p-5 sm:p-6'>
-    <div className='mb-4 flex items-center justify-between'>
-      <div className='flex items-center gap-3'>
-        <Swords size={18} className='text-zinc-700' />
-        <h3 className='text-[12px] font-semibold tracking-wide text-zinc-400'>
-          {t("daily_quests.title")}
-        </h3>
-      </div>
-      <div className='h-5 w-12 rounded bg-white/[0.06]' />
-    </div>
-    <div className='mb-4 animate-pulse space-y-2'>
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className='flex min-h-[44px] items-center justify-between rounded-sm bg-zinc-800/60 p-3'>
-          <div className='h-3 w-40 rounded bg-white/[0.08]' />
-          <div className='h-3 w-8 rounded bg-white/[0.08]' />
+    <Card className='flex-col justify-between p-5 sm:p-6'>
+      <div className='mb-5 flex items-start gap-3'>
+        <Swords size={18} className='mt-px shrink-0 text-zinc-700' />
+        <div>
+          <h3 className='text-[12px] font-semibold tracking-wide text-zinc-400'>
+            {t("daily_quests.title")}
+          </h3>
+          <div className='mt-2 h-3 w-40 rounded bg-white/[0.06]' />
         </div>
-      ))}
-    </div>
-  </Card>
+      </div>
+      <div className='mb-4 animate-pulse space-y-2'>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div
+            key={i}
+            className='flex min-h-[52px] items-center justify-between rounded-sm bg-zinc-800/60 px-3 py-2.5'>
+            <div className='h-3 w-40 rounded bg-white/[0.08]' />
+            <div className='h-3 w-8 rounded bg-white/[0.08]' />
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 };
+
+const progressPercent = (task: DailyQuestTask) =>
+  Math.min(100, (task.progress / Math.max(1, task.target)) * 100);
 
 export const DailyQuestWidget = () => {
   const { t } = useTranslation("dashboard");
@@ -85,110 +88,99 @@ export const DailyQuestWidget = () => {
     }
   };
 
+  const openTask = (task: DailyQuestTask) => {
+    if (task.type === "practice_specific_exercise" && task.exerciseId) {
+      Router.push(`/profile/skills?exerciseId=${task.exerciseId}`);
+    } else {
+      Router.push(questRoutes[task.type]);
+    }
+  };
+
+  const taskLabel = (task: DailyQuestTask) =>
+    task.type === "practice_specific_exercise"
+      ? t("daily_quests.tasks.practice_specific_exercise", {
+          exercise: task.title.replace(/^Practice: /, ""),
+        })
+      : t(`daily_quests.tasks.${task.type}`, task.title);
+
   return (
     <Card className='flex-col justify-between p-5 sm:p-6'>
-      <div className='mb-4 flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <Swords
-            size={18}
-            className='text-lg text-zinc-700 transition-all duration-500'
-          />
-          <div>
-            <h3 className='text-[12px] font-semibold tracking-wide text-zinc-400'>
-              {t("daily_quests.title")}
-            </h3>
-          </div>
-        </div>
-        <div className='flex items-center gap-3'>
+      <div className='mb-5 flex items-start gap-3'>
+        <Swords size={18} className='mt-px shrink-0 text-zinc-700' />
+        <div className='min-w-0'>
+          <h3 className='text-[12px] font-semibold tracking-wide text-zinc-400'>
+            {t("daily_quests.title")}
+          </h3>
+          {/* The reward is for the whole set, so it sits next to the rule that
+              earns it instead of floating in the corner. */}
           {!isClaimed && (
-            <div className='mr-1 flex items-center gap-2.5'>
-              <div className='flex items-center gap-1.5'>
-                <span className='text-xs font-medium tracking-tight text-cyan-400'>
-                  +10
-                </span>
+            <p className='mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-400'>
+              <span>
+                {t("daily_quests.reward_hint", {
+                  count: dailyQuest.tasks.length,
+                })}
+              </span>
+              <span className='flex items-center gap-1 font-semibold text-cyan-400'>
+                +{DAILY_QUEST_POINTS_REWARD}
                 <img
                   src='/images/points.png'
                   alt='points'
-                  className='h-5 w-5 object-contain'
+                  className='h-4 w-4 object-contain'
                 />
-              </div>
-              <div className='flex items-center gap-1.5'>
-                <span className='text-xs font-medium tracking-tight text-amber-400'>
-                  +{DAILY_QUEST_FAME_REWARD}
-                </span>
+              </span>
+              <span className='flex items-center gap-1 font-semibold text-amber-400'>
+                +{DAILY_QUEST_FAME_REWARD}
                 <img
                   src='/images/coin.png'
                   alt='fame'
-                  className='h-5 w-5 object-contain'
+                  className='h-4 w-4 object-contain'
                 />
-              </div>
-            </div>
+              </span>
+            </p>
           )}
         </div>
       </div>
 
       <div className='mb-4 space-y-2'>
-        {dailyQuest.tasks.map((task) => (
-          <div
-            key={task.id}
-            role={!task.isCompleted ? "button" : undefined}
-            tabIndex={!task.isCompleted ? 0 : undefined}
-            onClick={() => {
-              if (!task.isCompleted) {
-                if (
-                  task.type === "practice_specific_exercise" &&
-                  task.exerciseId
-                ) {
-                  Router.push(`/profile/skills?exerciseId=${task.exerciseId}`);
-                } else {
-                  Router.push(questRoutes[task.type]);
-                }
-              }
-            }}
-            onKeyDown={(e) => {
-              if (!task.isCompleted && (e.key === "Enter" || e.key === " ")) {
-                if (
-                  task.type === "practice_specific_exercise" &&
-                  task.exerciseId
-                ) {
-                  Router.push(`/profile/skills?exerciseId=${task.exerciseId}`);
-                } else {
-                  Router.push(questRoutes[task.type]);
-                }
-              }
-            }}
-            className={cn(
-              "flex min-h-[44px] items-center justify-between rounded-sm p-3 transition-all",
-              task.isCompleted
-                ? "bg-green-900/25 text-green-400/70"
-                : "cursor-pointer bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700/80 active:scale-[0.98]",
-            )}>
-            <span
-              className={cn(
-                "text-xs tracking-wide",
-                task.isCompleted
-                  ? "font-medium line-through opacity-50"
-                  : "font-medium",
-              )}>
-              {task.type === "practice_specific_exercise"
-                ? t("daily_quests.tasks.practice_specific_exercise", {
-                    exercise: task.title.replace(/^Practice: /, ""),
-                  })
-                : t(`daily_quests.tasks.${task.type}`, task.title)}
-            </span>
-
-            {task.isCompleted ? (
-              <CheckCircle2 size={14} className='text-green-500/70' />
-            ) : (
-              <div className='flex items-center gap-2'>
-                <span className='text-[10px] font-bold text-zinc-400'>
-                  {task.progress}/{task.target}
-                </span>
-                <ArrowRight size={12} className='text-zinc-400' />
+        {dailyQuest.tasks.map((task) =>
+          task.isCompleted ? (
+            <div
+              key={task.id}
+              className='flex min-h-[52px] items-center justify-between gap-3 rounded-sm bg-green-900/25 px-3 py-2.5 text-green-400/70'>
+              <span className='text-xs font-medium tracking-wide line-through opacity-50'>
+                {taskLabel(task)}
+              </span>
+              <CheckCircle2 size={16} className='shrink-0 text-green-500/70' />
+            </div>
+          ) : (
+            <button
+              key={task.id}
+              type='button'
+              onClick={() => openTask(task)}
+              className='group flex min-h-[52px] w-full items-center gap-3 rounded-sm bg-zinc-800/80 px-3 py-2.5 text-left text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-700/80 hover:text-zinc-100'>
+              <div className='min-w-0 flex-1'>
+                <div className='flex items-baseline justify-between gap-3'>
+                  <span className='text-xs font-medium tracking-wide'>
+                    {taskLabel(task)}
+                  </span>
+                  <span className='shrink-0 text-xs font-semibold tabular-nums text-zinc-200'>
+                    {task.progress}/{task.target}
+                  </span>
+                </div>
+                <div className='mt-2 h-1 overflow-hidden rounded-full bg-zinc-900/80'>
+                  <div
+                    className='h-full rounded-full bg-cyan-400 transition-[width] duration-500'
+                    style={{ width: `${progressPercent(task)}%` }}
+                  />
+                </div>
               </div>
-            )}
-          </div>
-        ))}
+              <ChevronRight
+                size={16}
+                className='shrink-0 text-zinc-500 transition-transform group-hover:translate-x-0.5 group-hover:text-zinc-100'
+              />
+            </button>
+          ),
+        )}
       </div>
 
       {allCompleted && !isClaimed && (
@@ -197,7 +189,9 @@ export const DailyQuestWidget = () => {
           className='h-10 w-full rounded-sm bg-gradient-to-r from-orange-500 to-amber-500 text-xs font-bold tracking-wide text-white shadow-md shadow-orange-500/20 transition-all hover:scale-105'>
           <span className='flex items-center gap-2'>
             <Gift size={14} className='animate-bounce' />
-            {t("daily_quests.claim", { points: 10 })}{" "}
+            {t("daily_quests.claim", {
+              points: DAILY_QUEST_POINTS_REWARD,
+            })}{" "}
             <img
               src='/images/points.png'
               alt='points'
@@ -214,7 +208,7 @@ export const DailyQuestWidget = () => {
       )}
 
       {isClaimed && (
-        <div className='flex h-10 w-full items-center justify-center gap-2 rounded-sm border border-white/5 bg-zinc-800/40 text-[10px] font-black uppercase tracking-widest text-zinc-400'>
+        <div className='flex h-10 w-full items-center justify-center gap-2 rounded-sm border border-white/5 bg-zinc-800/40 text-xs font-black uppercase tracking-widest text-zinc-400'>
           <CheckCircle2 size={14} className='text-emerald-500' />
           {t("daily_quests.claimed")}
         </div>

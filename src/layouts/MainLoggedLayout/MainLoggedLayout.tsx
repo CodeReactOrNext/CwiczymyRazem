@@ -35,6 +35,7 @@ const MainLoggedLayout = ({
     // to nothing outside it — the public pages stay English. See LocalizedRegion.
     <LocalizedRegion>
       <main
+        data-app-shell
         className={`bg-zinc-950 font-sans overflow-hidden ${
           isElectron ? "h-[calc(100dvh-2.5rem)]" : "h-[100dvh]"
         }`}>

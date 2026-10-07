@@ -60,7 +60,7 @@ export function SupportModal({ isOpen, onClose, onDonate }: SupportModalProps) {
           </div>
 
           <div>
-            <p className='text-[10px] font-semibold uppercase tracking-[0.3em] text-amber-500/80'>
+            <p className='text-xs font-semibold uppercase tracking-[0.3em] text-amber-500/80'>
               {t("hero.title")}
             </p>
             <h2 className='mt-2 text-2xl font-semibold tracking-tight text-white'>
@@ -107,7 +107,7 @@ export function SupportModal({ isOpen, onClose, onDonate }: SupportModalProps) {
             </div>
 
             {nextTier && (
-              <div className='mt-3 flex items-center justify-between gap-4 text-xs text-zinc-500'>
+              <div className='mt-3 flex items-center justify-between gap-4 text-xs text-zinc-400'>
                 <span className='truncate'>
                   {t("funding.next_unlock")}{" "}
                   <span className='font-medium text-zinc-300'>{tierLabel(nextTier, t)}</span>
@@ -131,7 +131,7 @@ export function SupportModal({ isOpen, onClose, onDonate }: SupportModalProps) {
 
           <button
             onClick={onClose}
-            className='text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-300'>
+            className='text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-200'>
             {t("modal.later")}
           </button>
         </div>

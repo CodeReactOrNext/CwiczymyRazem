@@ -24,12 +24,12 @@ export const tabNavListClass =
 
 /** Shared by every item; the active/inactive half is added by the two below. */
 const tabNavItemBase =
-  "flex shrink-0 items-center gap-2 rounded-none border-b-2 bg-transparent px-4 py-3 text-sm font-semibold shadow-none transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-zinc-600";
+  "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-none border-b-2 bg-transparent px-4 py-3 text-sm font-semibold shadow-none transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-zinc-600";
 
 /** A Radix `TabsTrigger` — active state comes from `data-state`. */
 export const tabNavTriggerClass = cn(
   tabNavItemBase,
-  "border-transparent text-zinc-500 hover:text-zinc-100",
+  "border-transparent text-zinc-400 hover:text-zinc-100",
   "data-[state=active]:border-white data-[state=active]:bg-transparent data-[state=active]:text-zinc-50 data-[state=active]:shadow-none",
 );
 
@@ -39,6 +39,6 @@ export const tabNavItemClass = (isActive: boolean, isDisabled = false) =>
     tabNavItemBase,
     isActive
       ? "border-white text-zinc-50"
-      : "border-transparent text-zinc-500 hover:text-zinc-100",
-    isDisabled && "cursor-not-allowed opacity-50 hover:text-zinc-500",
+      : "border-transparent text-zinc-400 hover:text-zinc-100",
+    isDisabled && "cursor-not-allowed opacity-50 hover:text-zinc-400",
   );

@@ -26,13 +26,13 @@ export const SupportBadge = ({
   <span
     title={getSupportTooltip(member)}
     className={cn(
-      "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold leading-none",
+      "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold leading-none",
       tone === "light"
         ? "bg-amber-100 text-amber-700"
         : "bg-amber-500/15 text-amber-300",
       className,
     )}>
-    <Heart size={10} strokeWidth={2.5} fill='currentColor' />
+    <Heart size={12} strokeWidth={2.5} fill='currentColor' />
     {getSupportLabel(member)}
   </span>
 );

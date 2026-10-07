@@ -4,10 +4,10 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import styles from "feature/logs/components/LogReaction.module.css";
 import { markMotivateHintDone } from "feature/logs/hooks/useMotivateHint";
 import { toggleLogReaction } from "feature/logs/services/toggleLogReaction.service";
-import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import { toast } from "sonner";
 
 interface LogReactionProps {
@@ -21,26 +21,53 @@ interface LogReactionProps {
   fameAmount: number;
   /** Fame the row has already earned from earlier reactions. */
   awardedFame: number;
-  /** Player the row belongs to — named in the tooltip and toast so the reward feels addressed. */
+  /** Player the row belongs to — named in the button's label for screen readers. */
   recipientName?: string;
   /** Nudge this button as the one to try. The feed marks a single row, until the user gets it. */
   showHint?: boolean;
 }
 
-interface Ripple {
-  id: number;
-  x: number;
-  y: number;
-}
+/** How long the whole celebration runs — the last spilled coin fades out just before this. */
+const CELEBRATION_MS = 1300;
 
-/** Coin shrapnel launched from the button center on a successful reaction. */
-const BURST_COINS = [
-  { x: -30, y: -36, rotate: -45, delay: 0 },
-  { x: -13, y: -50, rotate: 20, delay: 0.05 },
-  { x: 3, y: -56, rotate: -10, delay: 0.1 },
-  { x: 19, y: -46, rotate: 40, delay: 0.03 },
-  { x: 32, y: -32, rotate: -25, delay: 0.08 },
+/** When the tossed coin lands back in the button (72% of its 640 ms toss). */
+const LANDING_MS = 440;
+
+/**
+ * The "+1 for you" receipt waits until the spilled coins have mostly fallen, so it never lands on
+ * top of them, then stays up long enough to be read.
+ */
+const RECEIPT_AFTER_MS = 900;
+const RECEIPT_MS = 2200;
+
+/**
+ * Coins the landing knocks loose, flying out of the tossed coin: sideways drift, peak height,
+ * where they drop to (px), spin (deg), size and stagger (ms after the landing).
+ */
+const SPILL = [
+  { dx: -30, peak: -24, fall: 12, spin: -220, size: 0.8, delay: 0 },
+  { dx: -14, peak: -34, fall: 16, spin: 160, size: 1, delay: 30 },
+  { dx: 4, peak: -38, fall: 10, spin: -140, size: 0.9, delay: 10 },
+  { dx: 20, peak: -30, fall: 18, spin: 240, size: 1, delay: 45 },
+  { dx: 34, peak: -20, fall: 12, spin: -180, size: 0.75, delay: 20 },
 ];
+
+const spillStyle = ({
+  dx,
+  peak,
+  fall,
+  spin,
+  size,
+  delay,
+}: (typeof SPILL)[number]) =>
+  ({
+    "--dx": `${dx}px`,
+    "--peak": `${peak}px`,
+    "--fall": `${fall}px`,
+    "--spin": `${spin}deg`,
+    "--size": size,
+    "--delay": `${LANDING_MS + delay}ms`,
+  }) as CSSProperties;
 
 const Coin = ({ className }: { className?: string }) => (
   <img
@@ -65,8 +92,10 @@ export const LogReaction = ({
     fame: number;
   } | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [ripples, setRipples] = useState<Ripple[]>([]);
+  // Id of the celebration on screen (0 = none); keys its pieces so a retry after an error replays it.
+  const [celebration, setCelebration] = useState(0);
+  // The motivator's own +1 shows as a bubble pinned to the button — the only time it has a tooltip.
+  const [showReceipt, setShowReceipt] = useState(false);
 
   // The optimistic guess only stands in until the logs stream reports the same thing; the moment
   // props agree it stops applying on its own, so there's nothing to clear and no flicker in between.
@@ -83,20 +112,15 @@ export const LogReaction = ({
     // Motivating is one-way — once given it stays, so a motivated row ignores further clicks.
     if (disabled || isPending || isReacted) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const rippleId = Date.now();
-    setRipples((prev) => [
-      ...prev,
-      { id: rippleId, x: e.clientX - rect.left, y: e.clientY - rect.top },
-    ]);
-    setTimeout(() => {
-      setRipples((prev) => prev.filter((r) => r.id !== rippleId));
-    }, 600);
+    const celebrationId = Date.now();
+    setCelebration(celebrationId);
+    setTimeout(
+      () => setCelebration((id) => (id === celebrationId ? 0 : id)),
+      CELEBRATION_MS,
+    );
 
     setOptimistic({ reacted: true, fame: totalFame + fameAmount });
     setIsPending(true);
-    setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 900);
 
     try {
       const result = await toggleLogReaction(logId);
@@ -110,26 +134,19 @@ export const LogReaction = ({
       if (result.reacted && result.fameAwarded > 0) {
         // The button has been used once, so it no longer has to advertise itself anywhere.
         markMotivateHintDone();
-        toast.success(
-          <div className='flex flex-wrap items-center gap-1'>
-            <span>You motivated {recipient}! They got</span>
-            <span className='font-bold text-amber-400'>
-              +{result.fameAwarded}
-            </span>
-            <Coin className='h-4 w-4' />
-            <span>— you get</span>
-            <span className='font-bold text-amber-400'>+1</span>
-            <Coin className='h-4 w-4' />
-          </div>,
-          {
-            icon: <Coin className='h-5 w-5' />,
+        // Their +N already lifted off the button; the receipt is only for what the motivator earned.
+        setTimeout(
+          () => {
+            setShowReceipt(true);
+            setTimeout(() => setShowReceipt(false), RECEIPT_MS);
           },
+          Math.max(0, celebrationId + RECEIPT_AFTER_MS - Date.now()),
         );
       }
     } catch {
       // Drop the guess and fall back to whatever the stream says — nothing was written.
       setOptimistic(null);
-      setIsAnimating(false);
+      setCelebration(0);
       toast.error("Could not update the reaction. Try again.");
     } finally {
       setIsPending(false);
@@ -144,7 +161,7 @@ export const LogReaction = ({
     return (
       <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>
-          <span className='flex min-h-[32px] items-center gap-1.5 rounded-lg bg-amber-500/10 px-2.5 text-xs font-semibold text-amber-400 sm:min-h-[38px] sm:gap-2 sm:px-3 sm:text-[13px]'>
+          <span className='flex min-h-11 items-center gap-1.5 rounded-lg bg-amber-500/10 px-2.5 text-xs font-semibold text-amber-400 sm:gap-2 sm:px-3 sm:text-[13px]'>
             <Coin className='h-5 w-5 sm:h-[22px] sm:w-[22px]' />
             <span className='tabular-nums'>{totalFame}</span>
           </span>
@@ -165,136 +182,114 @@ export const LogReaction = ({
   }
 
   return (
-    <Tooltip delayDuration={300}>
-      <TooltipTrigger asChild>
-        <motion.button
-          type='button'
-          onClick={handleToggle}
-          disabled={isPending}
-          aria-pressed={isReacted}
-          aria-disabled={isReacted}
-          aria-label={
-            isReacted
-              ? `Motivated. This activity earned ${totalFame} Fame`
-              : `Motivate ${recipient} and give them ${fameAmount} Fame`
-          }
-          whileTap={isReacted ? undefined : { scale: 0.85 }}
-          animate={isAnimating ? { scale: [1, 1.15, 1] } : { scale: 1 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className={cn(
-            "group relative flex min-h-[32px] items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:min-h-[38px] sm:gap-2 sm:px-3 sm:text-[13px]",
-            // A motivated row lights up amber; one still waiting for you stays neutral.
-            isReacted
-              ? "cursor-default bg-amber-500/15 text-amber-300"
-              : "cursor-pointer bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-300",
-            showHint && !isReacted && "ring-1 ring-amber-400/40",
-            isPending && "cursor-wait opacity-70",
-          )}>
-          {showHint && !isReacted && (
-            <motion.span
-              aria-hidden
-              initial={{ opacity: 0.2 }}
-              animate={{ opacity: [0.2, 0.7, 0.2] }}
-              transition={{
-                duration: 2.2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className='pointer-events-none absolute -inset-1 rounded-lg bg-amber-400/25 blur-md'
-            />
-          )}
-          <span className='pointer-events-none absolute inset-0 overflow-hidden rounded-lg'>
-            {ripples.map((ripple) => (
-              <motion.span
-                key={ripple.id}
-                initial={{ opacity: 0.5, scale: 0 }}
-                animate={{ opacity: 0, scale: 4 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className='absolute h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-400/40'
-                style={{ left: ripple.x, top: ripple.y }}
-              />
-            ))}
-          </span>
-          <AnimatePresence>
-            {isAnimating && (
-              <motion.span
-                key='pulse'
-                initial={{ opacity: 0.6, scale: 1 }}
-                animate={{ opacity: 0, scale: 1.5 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.55, ease: "easeOut" }}
-                className='pointer-events-none absolute inset-0 rounded-lg bg-amber-400/40'
+    <>
+      {/* No hover tooltip — this one opens only for the receipt. */}
+      <Tooltip open={showReceipt}>
+        <TooltipTrigger asChild>
+          <button
+            type='button'
+            onClick={handleToggle}
+            disabled={isPending}
+            aria-pressed={isReacted}
+            aria-disabled={isReacted}
+            aria-label={
+              isReacted
+                ? `Motivated. This activity earned ${totalFame} Fame`
+                : `Motivate ${recipient} and give them ${fameAmount} Fame`
+            }
+            className={cn(
+              "group relative flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-[color,background-color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:gap-2 sm:px-3 sm:text-[13px]",
+              // A motivated row lights up amber; one still waiting for you stays neutral.
+              isReacted
+                ? "cursor-default bg-amber-500/15 text-amber-300"
+                : "cursor-pointer bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-300 active:scale-95",
+              showHint && !isReacted && "ring-1 ring-amber-400/40",
+            )}>
+            {showHint && !isReacted && (
+              <span
+                aria-hidden
+                className={cn(
+                  "pointer-events-none absolute -inset-1 rounded-lg bg-amber-400/25 blur-md",
+                  styles.hint,
+                )}
               />
             )}
-          </AnimatePresence>
-          <AnimatePresence>
-            {isAnimating &&
-              BURST_COINS.map((coin, index) => (
-                <motion.span
-                  key={`burst-${index}`}
-                  initial={{ opacity: 1, scale: 0.4, x: 0, y: 0, rotate: 0 }}
-                  animate={{
-                    opacity: 0,
-                    scale: 1,
-                    x: coin.x,
-                    y: coin.y,
-                    rotate: coin.rotate,
-                  }}
-                  exit={{ opacity: 0 }}
-                  transition={{
-                    duration: 0.7,
-                    delay: coin.delay,
-                    ease: "easeOut",
-                  }}
-                  className='pointer-events-none absolute left-1/2 top-1/2 -ml-2 -mt-2 sm:-ml-2.5 sm:-mt-2.5'>
-                  <Coin className='h-4 w-4 sm:h-5 sm:w-5' />
-                </motion.span>
-              ))}
-          </AnimatePresence>
-          <span className='relative flex items-center gap-1.5 sm:gap-2'>
-            <Coin
-              className={cn(
-                "h-5 w-5 transition-opacity duration-200 sm:h-[22px] sm:w-[22px]",
-                !isReacted && "opacity-50 group-hover:opacity-80",
-              )}
-            />
-            <span>{isReacted ? "Motivated" : "Motivate"}</span>
-            <motion.span
-              key={isReacted ? `total-${totalFame}` : `preview-${fameAmount}`}
-              initial={isReacted ? { scale: 1.5 } : false}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 500, damping: 22 }}
-              className={cn(
-                "font-bold tabular-nums",
-                isReacted && "text-amber-400",
-              )}>
-              {isReacted ? totalFame : `+${fameAmount}`}
-            </motion.span>
-          </span>
-        </motion.button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <div className='flex flex-wrap items-center gap-1.5 py-0.5'>
-          {isReacted ? (
-            <>
-              <span>You motivated this</span>
-              <span className='opacity-50'>|</span>
-              <span>earned +{totalFame}</span>
-              <Coin className='h-4 w-4' />
-            </>
-          ) : (
-            <>
-              <span>
-                Click to motivate — {recipient} gets +{fameAmount}
+            {celebration !== 0 && (
+              <span
+                key={`pulse-${celebration}`}
+                aria-hidden
+                className={cn(
+                  "pointer-events-none absolute inset-0 rounded-lg bg-amber-400/30",
+                  styles.pulse,
+                )}
+              />
+            )}
+            <span className='relative flex items-center gap-1.5 sm:gap-2'>
+              <span className='relative flex [perspective:240px]'>
+                <Coin
+                  className={cn(
+                    "h-5 w-5 transition-opacity duration-200 sm:h-[22px] sm:w-[22px]",
+                    !isReacted && "opacity-50 group-hover:opacity-80",
+                    celebration !== 0 && styles.toss,
+                  )}
+                />
+                {celebration !== 0 &&
+                  SPILL.map((coin, index) => (
+                    <span
+                      key={`spill-${celebration}-${index}`}
+                      aria-hidden
+                      style={spillStyle(coin)}
+                      className={cn(
+                        "pointer-events-none absolute left-1/2 top-1/2",
+                        styles.drift,
+                      )}>
+                      <span className={cn("absolute left-0 top-0", styles.arc)}>
+                        <Coin className='absolute -left-1.5 -top-1.5 h-3 w-3 max-w-none' />
+                      </span>
+                    </span>
+                  ))}
               </span>
-              <Coin className='h-4 w-4' />
-              <span className='opacity-50'>|</span>
-              <span>you get +1</span>
-              <Coin className='h-4 w-4' />
-            </>
-          )}
-        </div>
-      </TooltipContent>
-    </Tooltip>
+              <span>{isReacted ? "Motivated" : "Motivate"}</span>
+              <span className='relative'>
+                <span
+                  className={cn(
+                    "inline-block font-bold tabular-nums",
+                    isReacted && "text-amber-400",
+                    celebration !== 0 && styles.pop,
+                  )}>
+                  {isReacted ? totalFame : `+${fameAmount}`}
+                </span>
+                {celebration !== 0 && (
+                  // The preview "+N" lifts off as the new total takes its place.
+                  <span
+                    key={`lift-${celebration}`}
+                    aria-hidden
+                    className={cn(
+                      "pointer-events-none absolute inset-0 flex items-center justify-center whitespace-nowrap font-bold tabular-nums text-amber-300",
+                      styles.lift,
+                    )}>
+                    +{fameAmount}
+                  </span>
+                )}
+              </span>
+            </span>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent
+          side='top'
+          sideOffset={8}
+          className='translate-y-0 rounded-full border-0 bg-amber-400 px-4 py-1.5 text-sm font-bold text-zinc-950 shadow-none'>
+          <div className='flex items-center gap-2'>
+            <span className='text-base tabular-nums'>+1</span>
+            <Coin className='h-5 w-5' />
+            <span>for you</span>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+      {/* The receipt bubble is visual only — say the same thing to screen readers. */}
+      <span role='status' className='sr-only'>
+        {showReceipt ? "You earned 1 Fame for motivating" : ""}
+      </span>
+    </>
   );
 };

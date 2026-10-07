@@ -66,10 +66,21 @@
     "remove_attachment": "Usuń załącznik",
     "mention": "Oznacz kogoś",
     "share": "Udostępnij ćwiczenie, utwór albo przedmiot",
-    "send": "Wyślij"
+    "send": "Wyślij",
+    "message_label": "Wiadomość"
   },
   "reactions": {
     "react_with": "Zareaguj: {{emoji}}",
     "reply": "Odpowiedz"
+  },
+  "menu": {
+    "copy": "Kopiuj tekst",
+    "copied": "Skopiowano",
+    "copy_failed": "Nie udało się skopiować",
+    "more": "Akcje wiadomości"
+  },
+  "time": {
+    "today": "Dzisiaj",
+    "yesterday": "Wczoraj"
   }
 }

@@ -65,7 +65,7 @@ const ScopeTag = ({ scope }: { scope: ResetEntry["scope"] }) => {
   return (
   <span
     className={cn(
-      "shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold",
+      "shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold",
       scope === "server"
         ? "bg-cyan-500/10 text-cyan-400/90"
         : "bg-amber-500/10 text-amber-400/90",
@@ -100,7 +100,7 @@ const ResetRow = ({ entry, now }: { entry: ResetEntry; now: Date }) => {
 
 /** Same footprint as the live clock, so the sidebar does not shift on hydration. */
 const ResetClockPlaceholder = () => (
-  <div className='flex items-center gap-2 px-3 py-2'>
+  <div className='flex min-h-11 items-center gap-2 px-3 py-2'>
     <Globe2 size={13} className='shrink-0 text-zinc-700' />
     <div className='h-3 w-20 rounded bg-white/[0.05]' />
   </div>
@@ -142,12 +142,12 @@ export const ResetClock = () => {
               <button
                 type='button'
                 aria-label={t("reset.aria")}
-                className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-white/5'>
-                <Globe2 size={13} className='shrink-0 text-zinc-600' />
-                <span className='text-xs font-semibold tabular-nums text-zinc-400'>
+                className='flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-white/5'>
+                <Globe2 size={13} className='shrink-0 text-zinc-400' />
+                <span className='text-xs font-semibold tabular-nums text-zinc-300'>
                   {formatServerTime(now)}
                 </span>
-                <span className='text-[10px] font-medium text-zinc-600'>
+                <span className='text-xs font-medium text-zinc-400'>
                   {t("reset.server_time_short")}
                 </span>
               </button>

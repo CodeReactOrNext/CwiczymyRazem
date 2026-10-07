@@ -7,6 +7,7 @@ import { achievementsMap } from "feature/achievements/data/achievementsData";
 import { achievementsRarity } from "feature/achievements/data/achievementsRarity";
 import type { AchievementList } from "feature/achievements/types";
 import { useTranslation } from "hooks/useTranslation";
+import { TOUCH_TARGET } from "utils/touchTarget";
 
 const AchievementIcon = ({ id }: { id: AchievementList }) => {
   const { t } = useTranslation("achievements");
@@ -23,7 +24,7 @@ const AchievementIcon = ({ id }: { id: AchievementList }) => {
 
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger className={TOUCH_TARGET}>
         <div>
           <Icon
             className={`text-md cursor-help drop-shadow-md ${achievementsRarity[rarity].tailwindClass}`}

@@ -21,7 +21,7 @@ export const FameBox = () => {
         <TooltipTrigger asChild>
           <button
             onClick={() => router.push("/arsenal")}
-            className='hidden h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-amber-500/10 px-3 py-2 shadow-sm backdrop-blur-sm md:flex hover:bg-amber-500/20 transition-colors'
+            className='hidden h-11 cursor-pointer items-center justify-center gap-2 rounded-lg bg-amber-500/10 px-3 py-2 shadow-sm backdrop-blur-sm md:flex hover:bg-amber-500/20 transition-colors'
           >
             <img
               src="/images/coin.png"

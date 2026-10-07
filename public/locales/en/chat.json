@@ -66,10 +66,21 @@
     "remove_attachment": "Remove attachment",
     "mention": "Mention someone",
     "share": "Share an exercise, song or item",
-    "send": "Send"
+    "send": "Send",
+    "message_label": "Message"
   },
   "reactions": {
     "react_with": "React with {{emoji}}",
     "reply": "Reply"
+  },
+  "menu": {
+    "copy": "Copy text",
+    "copied": "Copied",
+    "copy_failed": "Couldn't copy",
+    "more": "Message actions"
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday"
   }
 }

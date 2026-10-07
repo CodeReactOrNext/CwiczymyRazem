@@ -66,12 +66,24 @@ const BoardRow = ({
       <span className='block text-sm font-semibold tabular-nums text-zinc-100'>
         {formatScore(entry.score)}
       </span>
-      <span className='block text-[11px] tabular-nums text-zinc-500'>
+      <span className='block text-[11px] tabular-nums text-zinc-400'>
         {entry.accuracy}%{entry.bpm ? ` · ${entry.bpm} BPM` : ""}
       </span>
     </span>
   </li>
 );
+
+const OpenSpotRow = ({ place }: { place: number }) => {
+  const { t } = useTranslation("dashboard");
+  return (
+    <li className='flex items-center gap-3 rounded-lg px-3 py-2'>
+      <PlaceNumber place={place} />
+      <span className='size-7 shrink-0 rounded-full bg-zinc-800/80' />
+      <span className='flex-1 text-sm text-zinc-400'>{t("daily_exercise.open_spot")}</span>
+      <span className='h-2 w-12 rounded-full bg-zinc-800/80' />
+    </li>
+  );
+};
 
 const EmptyBoard = () => {
   const { t } = useTranslation("dashboard");
@@ -79,12 +91,7 @@ const EmptyBoard = () => {
   <div>
     <ol className='space-y-1'>
       {Array.from({ length: EMPTY_PLACES }, (_, i) => (
-        <li key={i} className='flex items-center gap-3 rounded-lg px-3 py-2'>
-          <PlaceNumber place={i + 1} />
-          <span className='size-7 shrink-0 rounded-full bg-zinc-800/80' />
-          <span className='flex-1 text-sm text-zinc-500'>{t("daily_exercise.open_spot")}</span>
-          <span className='h-2 w-12 rounded-full bg-zinc-800/80' />
-        </li>
+        <OpenSpotRow key={i} place={i + 1} />
       ))}
     </ol>
     <p className='mt-3 px-3 text-sm text-zinc-400'>
@@ -123,7 +130,6 @@ export const DailyExerciseWidget = () => {
     <Card className='flex h-full flex-col p-5 sm:p-6'>
       <WidgetHeader
         icon={CalendarClock}
-        iconClassName='text-cyan-400'
         title={t("daily_exercise.title")}
         action={
           <span className='flex items-center gap-1.5 text-xs tabular-nums text-zinc-400'>
@@ -136,27 +142,30 @@ export const DailyExerciseWidget = () => {
       {!exercise ? (
         <p className='text-sm text-zinc-400'>{t("daily_exercise.none_today")}</p>
       ) : (
-        // Three panels that wrap rather than a fixed grid: the card can sit full or
-        // half width on the dashboard, so it lays out by its own width. Full
-        // width holds all three in one row; half drops the board below; a phone
-        // stacks them.
-        <div className='flex flex-1 flex-wrap gap-8 lg:gap-10'>
-          <div className='flex min-w-0 flex-[3_1_22rem] flex-col'>
-            <h4 className='text-xl font-semibold text-zinc-100 sm:text-2xl'>
+        // Two columns with no panels of their own, like the rest of Home: the
+        // exercise (what, how it looks, what #1 takes home, the button) and
+        // the board. They wrap rather than sit in a fixed grid, because the
+        // card can be full or half width on the dashboard; half width and
+        // phones stack the board under the exercise.
+        <div className='flex flex-1 flex-wrap gap-x-12 gap-y-8'>
+          <div className='flex min-w-0 flex-[1_1_20rem] flex-col'>
+            <h4 className='text-lg font-semibold text-zinc-100 sm:text-xl'>
               {exercise.title}
             </h4>
 
             {tabPreview.length > 0 && (
               <TabPreviewGlyph
                 notes={tabPreview}
-                className='mt-6 h-auto w-full max-w-sm'
+                className='mt-5 h-auto w-full max-w-sm'
               />
             )}
+
+            {board?.prize && <DailyPrize prize={board.prize} className='mt-6' />}
 
             <div className='mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-6'>
               <Link
                 href={`/practice/exercise/${exercise.id}`}
-                className='inline-flex h-10 items-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900'>
+                className='inline-flex h-11 items-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900'>
                 <Play size={16} className='fill-current' />
                 {me ? t("daily_exercise.beat_score") : t("daily_exercise.play")}
               </Link>
@@ -172,11 +181,9 @@ export const DailyExerciseWidget = () => {
             </div>
           </div>
 
-          {board?.prize && <DailyPrize prize={board.prize} className='flex-[1_1_14rem]' />}
-
-          <div className='min-w-0 flex-[2_1_20rem] lg:rounded-lg lg:bg-zinc-900/40 lg:p-4'>
-            <div className='mb-3 flex items-center justify-between gap-3 px-3'>
-              <span className='text-sm font-semibold text-zinc-200'>
+          <div className='min-w-0 flex-[1_1_20rem]'>
+            <div className='mb-3 flex items-center justify-between gap-3'>
+              <span className='text-sm font-semibold text-zinc-100'>
                 {t("daily_exercise.todays_board")}
               </span>
               {!!board?.players && (
@@ -187,29 +194,39 @@ export const DailyExerciseWidget = () => {
               )}
             </div>
 
-            {leaderboard.isLoading ? (
-              <BoardSkeleton />
-            ) : leaderboard.isError ? (
-              <p className='px-3 text-sm text-zinc-400'>
-                {t("daily_exercise.board_error")}
-              </p>
-            ) : !board?.top.length ? (
-              <EmptyBoard />
-            ) : (
-              <ol className='space-y-1'>
-                {board.top.map((entry, i) => (
-                  <BoardRow
-                    key={entry.userId}
-                    entry={entry}
-                    place={i + 1}
-                    isMe={entry.userId === uid}
-                  />
-                ))}
-                {me && !meInTop && (
-                  <BoardRow entry={me} place={me.rank} isMe />
-                )}
-              </ol>
-            )}
+            {/* Rows keep their padding for the "you" highlight; the negative
+                margin puts place numbers back on the column's text edge. */}
+            <div className='-mx-3'>
+              {leaderboard.isLoading ? (
+                <BoardSkeleton />
+              ) : leaderboard.isError ? (
+                <p className='px-3 text-sm text-zinc-400'>
+                  {t("daily_exercise.board_error")}
+                </p>
+              ) : !board?.top.length ? (
+                <EmptyBoard />
+              ) : (
+                <ol className='space-y-1'>
+                  {board.top.map((entry, i) => (
+                    <BoardRow
+                      key={entry.userId}
+                      entry={entry}
+                      place={i + 1}
+                      isMe={entry.userId === uid}
+                    />
+                  ))}
+                  {Array.from(
+                    { length: Math.max(0, EMPTY_PLACES - board.top.length) },
+                    (_, i) => (
+                      <OpenSpotRow key={i} place={board.top.length + i + 1} />
+                    ),
+                  )}
+                  {me && !meInTop && (
+                    <BoardRow entry={me} place={me.rank} isMe />
+                  )}
+                </ol>
+              )}
+            </div>
           </div>
         </div>
       )}

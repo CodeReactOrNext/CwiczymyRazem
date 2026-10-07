@@ -3,6 +3,7 @@
     "title": "Daily Quests",
     "claim": "Claim {{points}}",
     "claimed": "Reward Claimed",
+    "reward_hint": "Finish all {{count}} to earn",
     "tasks": {
       "rate_song": "Rate a Song",
       "add_want_to_learn": "Add song to \"Want to Learn\"",

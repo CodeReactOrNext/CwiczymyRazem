@@ -78,8 +78,8 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, userId 
           />
         ) : (
           <p
-            className={`font-openSans font-bold uppercase text-main-opposed ${
-              isCompact ? "text-[14px]" : "text-4xl"
+            className={`font-openSans font-bold uppercase text-zinc-800 ${
+              isCompact ? "text-base" : "text-4xl"
             }`}>
             {name?.[0]}
           </p>

@@ -1,12 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { YouTube } from "components/Blog/YouTube";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
-import { useArsenalData } from "feature/arsenal/hooks/useArsenalData";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
-import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { addFame, selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import {
@@ -26,13 +23,12 @@ import {
 } from "lucide-react";
 import Router from "next/router";
 import posthog from "posthog-js";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { getLocalDateKey } from "utils/converter";
 
-import { useGettingStartedQuest } from "../../hooks/useGettingStartedQuest";
+import { useGettingStartedProgress } from "../../hooks/useGettingStartedProgress";
 import type { GettingStartedStepId } from "../../utils/gettingStartedProgress";
-import { getGettingStartedProgress } from "../../utils/gettingStartedProgress";
 import { StepInfoModal } from "./StepInfoModal";
 import {
   FakeButton,
@@ -56,46 +52,23 @@ export const GettingStartedWidget = () => {
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
   const { userStats, activity } = useDashboardData();
-  const { quest, isLoading, markStep, claimReward, isClaiming } =
-    useGettingStartedQuest(userAuth);
-  const { data: arsenalData, isLoading: isArsenalLoading } = useArsenalData();
-  const { data: userSongsData, isLoading: isUserSongsLoading } = useQuery({
-    queryKey: ["user-songs", userAuth],
-    queryFn: () => getUserSongs(userAuth as string),
-    enabled: !!userAuth,
-    staleTime: 10 * 60 * 1000,
-  });
+  const {
+    progress,
+    isLoading,
+    practiceDays,
+    markStep,
+    claimReward,
+    isClaiming,
+  } = useGettingStartedProgress(
+    userAuth,
+    userStats.sessionCount ?? 0,
+    activity.reportList,
+  );
   const [openModal, setOpenModal] = useState<ModalId>(null);
 
-  // The activity log is already loaded once for the whole dashboard; the
-  // second-day step only needs the distinct days in it.
-  const practiceDays = useMemo(
-    () =>
-      new Set(
-        (activity.reportList ?? []).map((report) =>
-          getLocalDateKey(new Date(report.date)),
-        ),
-      ),
-    [activity.reportList],
-  );
+  if (isLoading || !progress) return null;
 
-  if (isLoading || isArsenalLoading || isUserSongsLoading || !quest) {
-    return null;
-  }
-
-  const songCount =
-    (userSongsData?.wantToLearn.length ?? 0) +
-    (userSongsData?.learning.length ?? 0) +
-    (userSongsData?.learned.length ?? 0);
   const sessionCount = userStats.sessionCount ?? 0;
-
-  const progress = getGettingStartedProgress({
-    quest,
-    sessionCount,
-    guitarCount: arsenalData?.inventory?.length ?? 0,
-    songCount,
-    practiceDayCount: practiceDays.size,
-  });
 
   if (!progress.isVisible) return null;
 
@@ -228,6 +201,13 @@ export const GettingStartedWidget = () => {
   // Counted over every node on the track, the guitar included — "3/3" above
   // four circles read as finished while the reward was still waiting.
   const doneCount = nodes.filter((node) => node.isDone).length;
+  // The step to do now — the first unfinished one you can act on, else the
+  // first unfinished one at all. It gets the track's emphasis; finished steps
+  // step back so they don't outweigh it.
+  const nextKey = (
+    nodes.find((node) => !node.isDone && node.onClick) ??
+    nodes.find((node) => !node.isDone)
+  )?.key;
 
   return (
     <Card className='relative flex-col justify-between overflow-hidden p-4 sm:p-5'>
@@ -275,6 +255,7 @@ export const GettingStartedWidget = () => {
           const Icon = node.isDone ? CheckCircle2 : node.icon;
           const isActionable = Boolean(node.onClick);
           const Tag = isActionable ? "button" : "div";
+          const isNext = node.key === nextKey;
 
           return (
             <div
@@ -308,7 +289,7 @@ export const GettingStartedWidget = () => {
                 <span
                   className={cn(
                     "relative flex h-9 w-9 items-center justify-center rounded-full transition-colors sm:h-10 sm:w-10",
-                    node.isDone && "bg-emerald-500/10 text-emerald-400",
+                    node.isDone && "bg-emerald-500/10 text-emerald-400/70",
                     !node.isDone &&
                       !isActionable &&
                       "bg-zinc-800/60 text-zinc-500",
@@ -316,6 +297,12 @@ export const GettingStartedWidget = () => {
                       isActionable &&
                       node.tone === "cyan" &&
                       "bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20",
+                    isNext &&
+                      node.tone === "cyan" &&
+                      "bg-cyan-500/20 text-cyan-300 ring-2 ring-cyan-400/60",
+                    isNext &&
+                      node.tone === "amber" &&
+                      "bg-amber-500/20 text-amber-300 ring-2 ring-amber-400/60",
                     !node.isDone &&
                       isActionable &&
                       node.tone === "amber" &&
@@ -327,9 +314,10 @@ export const GettingStartedWidget = () => {
                 <span
                   className={cn(
                     "text-[10px] font-medium leading-tight tracking-wide sm:text-xs",
-                    node.isDone && "text-zinc-500",
+                    node.isDone && "text-zinc-600",
                     !node.isDone && isActionable && "text-zinc-200",
                     !node.isDone && !isActionable && "text-zinc-500",
+                    isNext && "font-semibold text-white sm:text-sm",
                   )}>
                   {node.label}
                 </span>
@@ -338,7 +326,11 @@ export const GettingStartedWidget = () => {
                   <span
                     className={cn(
                       "-mt-1 text-[10px] leading-tight sm:-mt-1.5 sm:text-xs",
-                      isActionable ? "text-cyan-400/80" : "text-zinc-500",
+                      isNext
+                        ? "font-medium text-cyan-300"
+                        : isActionable
+                          ? "text-cyan-400/80"
+                          : "text-zinc-500",
                     )}>
                     {node.hint}
                   </span>
@@ -416,24 +408,22 @@ export const GettingStartedWidget = () => {
                 ),
               },
               {
-                text: (
-                  <>
-                    {t("first_song.step2")}
-                  </>
-                ),
+                text: <>{t("first_song.step2")}</>,
                 visual: (
                   <span className='grid grid-cols-2 gap-2'>
-                    <FakeInput label={t("first_song.artist")} value='Led Zeppelin' />
-                    <FakeInput label={t("first_song.song_title")} value='Stairway to Heaven' />
+                    <FakeInput
+                      label={t("first_song.artist")}
+                      value='Led Zeppelin'
+                    />
+                    <FakeInput
+                      label={t("first_song.song_title")}
+                      value='Stairway to Heaven'
+                    />
                   </span>
                 ),
               },
               {
-                text: (
-                  <>
-                    {t("first_song.step3")}
-                  </>
-                ),
+                text: <>{t("first_song.step3")}</>,
                 visual: (
                   <span className='flex flex-col gap-1.5'>
                     <FakeStatusCard

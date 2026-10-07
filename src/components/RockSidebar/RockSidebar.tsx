@@ -1,4 +1,3 @@
-import { Button } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -9,6 +8,11 @@ import { FeedbackModal } from "components/FeedbackBubble";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import { ResetClock } from "components/ResetClock/ResetClock";
+import {
+  MobileMoreSheet,
+  type MoreSheetGroup,
+  type MoreSheetItem,
+} from "components/RockSidebar/MobileMoreSheet";
 import Avatar from "components/UI/Avatar";
 import { DISCORD_INVITE_URL } from "constants/community";
 import { DESKTOP_APP_RELEASES_URL } from "constants/desktopApp";
@@ -68,7 +72,6 @@ import {
   Timer,
   Trophy,
   Users,
-  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -136,11 +139,11 @@ const SidebarNavLink = ({
         createRipple(e);
         onClick?.();
       }}
-      className={`relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 active:scale-[0.98] ${
+      className={`relative flex min-h-11 items-center gap-3 overflow-hidden rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 active:scale-[0.98] ${
         isActive
           ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
           : muted
-            ? "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+            ? "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
             : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
       }`}>
       {ripple}
@@ -364,7 +367,7 @@ const SidebarExpandableNavLink = ({
             createRipple(e);
             onLinkClick?.();
           }}
-          className='relative flex flex-1 items-center gap-3 overflow-hidden px-3 py-2.5 active:scale-[0.98]'>
+          className='relative flex min-h-11 flex-1 items-center gap-3 overflow-hidden px-3 py-2 active:scale-[0.98]'>
           {ripple}
           <span
             className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
@@ -392,7 +395,7 @@ const SidebarExpandableNavLink = ({
             e.preventDefault();
             onToggle();
           }}
-          className='flex items-center px-3 py-2.5 text-zinc-600 transition-colors duration-200 hover:text-zinc-300'>
+          className='flex min-h-11 min-w-11 items-center justify-center px-3 text-zinc-400 transition-colors duration-200 hover:text-zinc-200'>
           <span className={NAV_INDICATOR_SLOT}>
             <ChevronDown
               size={16}
@@ -755,32 +758,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       },
     );
 
-  const userProfileSection = (mobile?: boolean) => {
+  const userProfileSection = () => {
     if (!userStats || !userName) return null;
-
-    if (mobile) {
-      return (
-        <Link
-          href={`/user/${userAuth}`}
-          onClick={handleLinkClick}
-          className='block border-b border-white/10 p-4 transition-colors duration-200 hover:bg-white/5'>
-          <div className='flex items-center gap-3'>
-            <Avatar
-              avatarURL={userAvatar}
-              name={userName}
-              lvl={userStats.lvl}
-              selectedGuitar={userInfo?.selectedGuitar}
-              userId={userAuth}
-            />
-            <div className='min-w-0 flex-1'>
-              <span className='truncate text-[15px] font-bold tracking-wide text-white'>
-                {userName}
-              </span>
-            </div>
-          </div>
-        </Link>
-      );
-    }
 
     return (
       <Link
@@ -804,25 +783,15 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     );
   };
 
-  const navContent = (mobile?: boolean) => (
-    <nav
-      className={`flex min-h-0 flex-1 flex-col overflow-y-auto p-4 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 ${
-        mobile ? "pb-20" : ""
-      }`}>
+  const navContent = () => (
+    <nav className='flex min-h-0 flex-1 flex-col overflow-y-auto p-4 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5'>
       <div className='space-y-8'>
-        <div className='space-y-1'>
-          {renderNavLinks(mainNavigation, mobile ? handleLinkClick : undefined)}
-        </div>
+        <div className='space-y-1'>{renderNavLinks(mainNavigation)}</div>
 
-        <div className='space-y-1'>
-          {renderNavLinks(
-            utilityNavigation,
-            mobile ? handleLinkClick : undefined,
-          )}
-        </div>
+        <div className='space-y-1'>{renderNavLinks(utilityNavigation)}</div>
       </div>
 
-      <div className='hidden lg:block lg:flex-1' />
+      <div className='flex-1' />
 
       {/* Sits below the nav on both layouts: reference, not a destination. Kept
           to one quiet line — the detail is a click away rather than a panel the
@@ -831,7 +800,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         <ResetClock />
       </div>
 
-      {!isElectron && !mobile && (
+      {!isElectron && (
         <a
           href={DESKTOP_APP_RELEASES_URL}
           target='_blank'
@@ -848,34 +817,118 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           </div>
         </a>
       )}
-
-      {mobile && (
-        <>
-          <button
-            onClick={() => {
-              handleLinkClick();
-              dispatch(logUserOff());
-            }}
-            className='mb-12 mt-8 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-500 transition-all duration-200 hover:bg-red-500/10 hover:text-red-500'>
-            <span className={`${NAV_ICON_SLOT} text-zinc-600`}>
-              <LogOut size={16} />
-            </span>
-            <span>{t("sign_out")}</span>
-          </button>
-        </>
-      )}
     </nav>
+  );
+
+  const toSheetItems = (subLinks: SidebarSubLink[]): MoreSheetItem[] =>
+    subLinks.map((subLink) => ({
+      id: subLink.id,
+      name: t(subLink.name),
+      href: subLink.href,
+      icon: subLink.icon,
+      isActive: isSubLinkActive(subLink.href),
+      lockedLvl: subLink.lockedLvl,
+      showBadge: subLink.showBadge,
+    }));
+
+  const sectionGroup = (id: string): MoreSheetGroup[] => {
+    const section = mainNavigation.find((item) => item.id === id);
+    return section?.children
+      ? [{ id, title: section.name, items: toSheetItems(section.children) }]
+      : [];
+  };
+
+  // What the four tabs do not reach comes first; the tabs' own sub-pages
+  // follow, so no destination is phone-unreachable.
+  const moreSheetGroups: MoreSheetGroup[] = [
+    ...sectionGroup("community"),
+    ...sectionGroup("library"),
+    {
+      id: "places",
+      items: mainNavigation
+        .filter((item) => !item.children && item.id !== "home")
+        .map((item) => ({
+          id: item.id,
+          name: item.name,
+          href: item.href,
+          icon: item.icon,
+          isActive: isLinkActive(item.id, item.href),
+        })),
+    },
+    ...sectionGroup("practice"),
+    ...sectionGroup("songs"),
+    ...sectionGroup("progress"),
+    {
+      id: "utility",
+      items: utilityNavigation.map((item) => ({
+        id: item.id,
+        name: item.name,
+        href: item.href,
+        icon: item.icon,
+        external: item.external,
+        isActive: isLinkActive(item.id, item.href),
+      })),
+    },
+  ];
+
+  const moreSheetHeader = (
+    <div className='flex items-center gap-2'>
+      {userStats && userName ? (
+        <Link
+          href={`/user/${userAuth}`}
+          onClick={handleLinkClick}
+          className='flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg pr-2 transition-colors duration-200 hover:bg-white/5'>
+          <Avatar
+            avatarURL={userAvatar}
+            name={userName}
+            lvl={userStats.lvl}
+            selectedGuitar={userInfo?.selectedGuitar}
+            userId={userAuth}
+            size='sm'
+          />
+          <span className='truncate text-[15px] font-bold tracking-wide text-white'>
+            {userName}
+          </span>
+        </Link>
+      ) : (
+        <div className='flex-1' />
+      )}
+      <CommunityIconButton onOpen={handleLinkClick} />
+      <NotificationsBell />
+    </div>
+  );
+
+  const moreSheetFooter = (
+    <div className='space-y-1'>
+      <ResetClock />
+      <button
+        type='button'
+        onClick={() => {
+          handleLinkClick();
+          dispatch(logUserOff());
+        }}
+        className='flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-400 transition-colors duration-200 hover:bg-red-500/10 hover:text-red-400'>
+        <span className={NAV_ICON_SLOT}>
+          <LogOut size={16} />
+        </span>
+        <span>{t("sign_out")}</span>
+      </button>
+    </div>
   );
 
   return (
     <>
-      <MobileBottomNav onMenuClick={() => setIsMobileOpen(true)} />
+      <MobileBottomNav
+        isMenuOpen={isMobileOpen}
+        onMenuClick={() => setIsMobileOpen((open) => !open)}
+        onNavigate={handleLinkClick}
+      />
 
       {/* Desktop Sidebar */}
       <aside className='hidden h-full bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col'>
         <div className='p-4'>
           <div className='flex items-center gap-3'>
-            <Link href='/dashboard' className='flex items-center gap-3'>
+            <Link href='/dashboard' className='flex min-h-11 items-center gap-3'>
               <div className='flex h-9 w-9 items-center justify-center'>
                 <Image
                   src='/images/logolight.svg'
@@ -887,7 +940,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
               </div>
               <div className='flex flex-col'>
                 <h2 className='text-sm font-semibold text-white'>Riff Quest</h2>
-                <span className='flex items-center gap-1.5 text-[10px] font-medium text-zinc-600'>
+                <span className='flex items-center gap-1.5 text-xs font-medium text-zinc-400'>
                   <span className='text-amber-500/80'>beta</span>
                   {appVersion && <span>v{appVersion}</span>}
                 </span>
@@ -904,71 +957,13 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         {navContent()}
       </aside>
 
-      {/* Mobile Sidebar Overlay */}
-      <AnimatePresence>
-        {isMobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileOpen(false)}
-              className='fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden'
-            />
-
-            <motion.aside
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className={`fixed left-0 z-50 flex w-72 flex-col border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden ${
-                isElectron
-                  ? "top-10 h-[calc(100dvh-2.5rem)]"
-                  : "top-0 h-[100dvh]"
-              }`}>
-              <div className='flex items-center justify-between border-b border-white/10 p-4'>
-                <Link
-                  href='/dashboard'
-                  onClick={() => setIsMobileOpen(false)}
-                  className='flex items-center gap-3'>
-                  <div className='flex h-9 w-9 items-center justify-center'>
-                    <Image
-                      src='/images/logolight.svg'
-                      alt='Logo'
-                      width={32}
-                      height={32}
-                      className='h-8 w-8'
-                    />
-                  </div>
-                  <div className='flex flex-col'>
-                    <h2 className='text-sm font-semibold text-white'>
-                      Riff Quest
-                    </h2>
-                    <span className='flex items-center gap-1.5 text-[10px] font-medium text-zinc-600'>
-                      <span className='text-amber-500/80'>beta</span>
-                      {appVersion && <span>v{appVersion}</span>}
-                    </span>
-                  </div>
-                </Link>
-                <div className='flex items-center gap-2'>
-                  <CommunityIconButton onOpen={() => setIsMobileOpen(false)} />
-                  <NotificationsBell />
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    onClick={() => setIsMobileOpen(false)}
-                    className='text-zinc-400 hover:bg-white/10 hover:text-white'>
-                    <X size={16} />
-                  </Button>
-                </div>
-              </div>
-
-              {userProfileSection(true)}
-              {navContent(true)}
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+      <MobileMoreSheet
+        open={isMobileOpen}
+        onOpenChange={setIsMobileOpen}
+        header={moreSheetHeader}
+        groups={moreSheetGroups}
+        footer={moreSheetFooter}
+      />
 
       <FeedbackModal
         variant='prompt'

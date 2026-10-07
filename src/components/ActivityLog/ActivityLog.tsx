@@ -40,7 +40,7 @@ const YearTabButton = ({
         createRipple(e);
         onSelect();
       }}
-      className={`relative overflow-hidden rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+      className={`relative min-h-11 min-w-11 overflow-hidden rounded-md px-3 py-1 text-xs font-medium transition-colors ${
         active
           ? "bg-white/20 text-white"
           : "text-white/60 hover:bg-white/15 hover:text-white"
@@ -166,7 +166,7 @@ export const ActivityLogView = ({
 
         <div className='flex items-start gap-3'>
           <div
-            className='flex shrink-0 flex-col justify-between text-[10px] text-zinc-500 font-medium pr-2'
+            className='flex shrink-0 flex-col justify-between text-xs text-zinc-400 font-medium pr-2'
             style={{ height: CALENDAR_HEIGHT, paddingTop: 2, paddingBottom: 2 }}>
             <span>{t("calendar.monday")}</span>
             <span>{t("calendar.thursday")}</span>

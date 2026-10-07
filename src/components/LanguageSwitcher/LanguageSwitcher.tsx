@@ -64,7 +64,7 @@ export const LanguageSwitcher = () => {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={`Language: ${current?.englishLabel ?? "English"}`}
-        className='flex h-9 items-center justify-center rounded-[8px] bg-white/5 px-2.5 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 hover:bg-white/10'>
+        className='flex h-11 min-w-11 items-center justify-center rounded-[8px] bg-white/5 px-2.5 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 hover:bg-white/10'>
         <Flag locale={locale} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='min-w-[10rem]'>

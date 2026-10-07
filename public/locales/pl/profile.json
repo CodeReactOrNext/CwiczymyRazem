@@ -457,6 +457,9 @@
   },
   "landing": {
     "great_job": "Świetna robota dzisiaj!",
+    "last_session": "Ostatnia sesja",
+    "continue": "Kontynuuj",
+    "your_progress": "Twój postęp",
     "start_today": "Zacznij dzisiejsze ćwiczenia"
   }
 }

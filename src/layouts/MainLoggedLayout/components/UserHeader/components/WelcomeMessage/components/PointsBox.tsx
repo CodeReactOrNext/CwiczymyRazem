@@ -17,7 +17,7 @@ export const PointsBox = () => {
     <TooltipProvider>
       <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>
-          <div className='hidden h-10 items-center justify-center gap-2 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm sm:flex'>
+          <div className='hidden h-11 items-center justify-center gap-2 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm sm:flex'>
             <img src="/images/points.png" alt="points" className="h-6 w-6 object-contain" />
             <span className='text-xs font-semibold text-white'>
               {points.toLocaleString()}

@@ -1,9 +1,11 @@
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { format } from "date-fns";
 import { ChatAttachmentCard } from "feature/chat/components/ChatAttachmentCard";
 import { ChatAttachmentPicker } from "feature/chat/components/ChatAttachmentPicker";
 import { ChatComposer } from "feature/chat/components/ChatComposer";
+import { ChatMessageMenu } from "feature/chat/components/ChatMessageMenu";
 import {
   ChatMessageActions,
   ChatReactionChips,
@@ -14,13 +16,19 @@ import {
 } from "feature/chat/components/ChatSystemRow";
 import { useChat } from "feature/chat/hooks/useChat";
 import { typingLabel, useChatTyping } from "feature/chat/hooks/useChatTyping";
+import { useLongPress } from "feature/chat/hooks/useLongPress";
 import { GLOBAL_CHAT_PATH } from "feature/chat/services/chatService";
 import type {
   ChatMention,
   ChatMessageType,
+  ChatReactionEmoji,
 } from "feature/chat/types/chat.types";
 import { foldGreetings } from "feature/chat/utils/chatGreetings";
 import { splitByMentions } from "feature/chat/utils/chatMentions";
+import {
+  buildChatTimeline,
+  chatDayKind,
+} from "feature/chat/utils/chatTimeline";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
@@ -32,14 +40,23 @@ import {
   type ActivityPreview,
   ActivityStartModal,
 } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
-import { ArrowDown, MessageCircle } from "lucide-react";
+import { useDateFnsLocale } from "lib/i18n/dateLocale";
+import { ArrowDown, Ellipsis, MessageCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /** Within this many pixels of the bottom still counts as "at the bottom". */
 const BOTTOM_SLACK_PX = 80;
 
-const isPlain = (message: ChatMessageType) =>
-  !message.type || message.type === "message";
+/** Avatar column (w-10) plus the gap beside it — where a group's text starts. */
+const AVATAR_INSET = "pl-[52px]";
+const AVATAR_INSET_END = "pr-[52px]";
+
+/**
+ * Keeps iOS from selecting a held message's text and raising its callout over
+ * our menu (which has Copy).
+ */
+const PRESSABLE =
+  "[-webkit-touch-callout:none] [@media(hover:none)]:select-none";
 
 /** The words of a message, with the people it tagged picked out. */
 const MessageText = ({
@@ -84,17 +101,237 @@ const EmptyRoom = ({
       <p className='text-sm font-semibold text-zinc-200'>
         {t("empty_room.title")}
       </p>
-      <p className='text-sm text-zinc-500'>
+      <p className='text-sm text-zinc-400'>
         {isGuild ? t("empty_room.guild") : t("empty_room.everyone")}
       </p>
     </div>
     <button
       type='button'
       onClick={onSayHi}
-      className='rounded-lg bg-cyan-500/15 px-4 py-2 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 active:click-behavior'>
+      className='min-h-11 rounded-lg bg-cyan-500/15 px-4 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 active:click-behavior'>
       {t("empty_room.say_hi")}
     </button>
   </div>
+  );
+};
+
+/** "Today", "Yesterday" or the date, centred between two days of talk. */
+const DayDivider = ({ date }: { date: Date }) => {
+  const { t } = useTranslation("chat");
+  const locale = useDateFnsLocale();
+  const now = new Date();
+  const kind = chatDayKind(date, now);
+  const label =
+    kind === "today"
+      ? t("time.today")
+      : kind === "yesterday"
+        ? t("time.yesterday")
+        : format(
+            date,
+            date.getFullYear() === now.getFullYear()
+              ? "EEEE, d MMMM"
+              : "d MMMM yyyy",
+            { locale },
+          );
+
+  return (
+    <div className='mt-6 flex justify-center first:mt-2'>
+      <time
+        dateTime={format(date, "yyyy-MM-dd")}
+        className='rounded-full bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300'>
+        {label}
+      </time>
+    </div>
+  );
+};
+
+/** The ⋯ that opens a message's menu — only where there is no hover to reveal the actions. */
+const MoreButton = ({ onClick }: { onClick: () => void }) => {
+  const { t } = useTranslation("chat");
+  return (
+    <button
+      type='button'
+      aria-label={t("menu.more")}
+      onClick={onClick}
+      // -my-1 keeps a one-line bubble's row as tall as the bubble; the hit area stays 44px.
+      className='-my-1 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 active:bg-white/10 [@media(hover:none)]:flex'>
+      <Ellipsis className='h-5 w-5' />
+    </button>
+  );
+};
+
+/** What a single row needs to react, answer, or open its menu and attachments. */
+interface MessageHandlers {
+  viewerId: string | null;
+  onReact: (message: ChatMessageType, emoji: ChatReactionEmoji) => void;
+  onReply: (message: ChatMessageType) => void;
+  onOpenMenu: (message: ChatMessageType) => void;
+  onJumpTo: (messageId: string) => void;
+  onOpenActivity: (preview: ActivityPreview) => void;
+  onOpenRecording: (recordingId: string) => void;
+}
+
+const MessageRow = ({
+  msg,
+  isMe,
+  isFirst,
+  avatar,
+  tagsMe,
+  isFlashing,
+  handlers,
+}: {
+  msg: ChatMessageType;
+  isMe: boolean;
+  isFirst: boolean;
+  avatar: React.ReactNode;
+  tagsMe: boolean;
+  isFlashing: boolean;
+  handlers: MessageHandlers;
+}) => {
+  const longPress = useLongPress(() => handlers.onOpenMenu(msg));
+
+  return (
+    <div
+      data-message-id={msg.id}
+      className={cn(
+        "group/msg flex w-full",
+        isMe ? "justify-end" : "justify-start",
+        !isFirst && "mt-0.5",
+      )}>
+      <div
+        className={cn(
+          "flex min-w-0 max-w-[90%] gap-3",
+          isMe ? "flex-row-reverse" : "flex-row",
+        )}>
+        {/* Avatar only on the first of a run */}
+        <div className='flex w-10 flex-shrink-0 justify-center'>
+          {isFirst && avatar}
+        </div>
+
+        <div
+          className={cn(
+            "flex min-w-0 flex-col",
+            isMe ? "items-end" : "items-start",
+          )}>
+          <div
+            className={cn(
+              "flex min-w-0 max-w-full items-center gap-1",
+              isMe && "flex-row-reverse",
+            )}>
+            {/* max-w-full, not just min-w-0: a quoted reply or a shared card has a
+                wide minimum of its own, which would otherwise size the bubble and
+                push it out past the edge of the column. */}
+            <div
+              className={cn("relative min-w-0 max-w-full", PRESSABLE)}
+              {...longPress}>
+              <ChatMessageActions
+                onReact={(emoji) => handlers.onReact(msg, emoji)}
+                onReply={() => handlers.onReply(msg)}
+                className={cn("absolute -top-12", isMe ? "right-0" : "left-0")}
+              />
+              <div
+                className={cn(
+                  "flex flex-col gap-2 rounded-lg px-3 py-2 text-sm transition-colors [overflow-wrap:anywhere] sm:px-4",
+                  isMe
+                    ? "bg-cyan-500/20 text-cyan-50"
+                    : tagsMe
+                      ? "bg-amber-500/15 text-amber-50"
+                      : "bg-white/5 text-zinc-100",
+                  isFirst && (isMe ? "rounded-tr" : "rounded-tl"),
+                  isFlashing && "bg-cyan-500/30",
+                )}>
+                {msg.replyTo && (
+                  <button
+                    type='button'
+                    onClick={() => handlers.onJumpTo(msg.replyTo!.id)}
+                    className='flex min-w-0 max-w-full flex-col rounded bg-black/20 px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-black/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
+                    <span className='font-semibold text-zinc-300'>
+                      ↪ {msg.replyTo.username}
+                    </span>
+                    <span className='truncate text-zinc-300'>
+                      {msg.replyTo.message}
+                    </span>
+                  </button>
+                )}
+                {msg.message && (
+                  <span className='whitespace-pre-wrap'>
+                    <MessageText message={msg} viewerId={handlers.viewerId} />
+                  </span>
+                )}
+                {msg.attachment && (
+                  <div className='w-72 max-w-full'>
+                    <ChatAttachmentCard
+                      attachment={msg.attachment}
+                      onOpenActivity={handlers.onOpenActivity}
+                      onOpenRecording={handlers.onOpenRecording}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            <MoreButton onClick={() => handlers.onOpenMenu(msg)} />
+          </div>
+
+          <ChatReactionChips
+            reactions={msg.likes}
+            viewerId={handlers.viewerId}
+            onToggle={(emoji) => handlers.onReact(msg, emoji)}
+            alignEnd={isMe}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/** A server event (a join, a level, a cleared quest) — reactions, but nobody to reply to. */
+const EventRow = ({
+  msg,
+  greeters,
+  onSayHi,
+  handlers,
+}: {
+  msg: ChatMessageType;
+  greeters: ChatMessageType[];
+  onSayHi?: () => void;
+  handlers: MessageHandlers;
+}) => {
+  const longPress = useLongPress(() => handlers.onOpenMenu(msg));
+  const isJoin = isJoinRow(msg);
+
+  return (
+    <div
+      data-message-id={msg.id}
+      className={cn(
+        "group/msg relative mt-4 flex flex-col",
+        isJoin ? "items-start" : "items-center",
+      )}>
+      <ChatMessageActions
+        onReact={(emoji) => handlers.onReact(msg, emoji)}
+        className={cn(
+          "absolute -top-12",
+          // Past the avatar column, over the bubble like a message's.
+          isJoin ? "left-[52px]" : "left-1/2 -translate-x-1/2",
+        )}
+      />
+      <div
+        className={cn(
+          "flex w-full items-center gap-1",
+          isJoin ? "justify-start" : "justify-center",
+          PRESSABLE,
+        )}
+        {...longPress}>
+        <ChatSystemRow message={msg} onSayHi={onSayHi} greeters={greeters} />
+        <MoreButton onClick={() => handlers.onOpenMenu(msg)} />
+      </div>
+      <div className={cn(isJoin && AVATAR_INSET)}>
+        <ChatReactionChips
+          reactions={msg.likes}
+          viewerId={handlers.viewerId}
+          onToggle={(emoji) => handlers.onReact(msg, emoji)}
+        />
+      </div>
+    </div>
   );
 };
 
@@ -119,9 +356,10 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   } = useChat(chatPath);
 
   const { t } = useTranslation("chat");
+  const dateLocale = useDateFnsLocale();
   const isGuild = chatPath !== GLOBAL_CHAT_PATH;
-  // Touch screens have no hover, so tapping a message is what reveals its actions.
-  const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
+  // The message whose menu is open — a held finger or ⋯ on a touch screen.
+  const [menuMessage, setMenuMessage] = useState<ChatMessageType | null>(null);
   const [flashMessageId, setFlashMessageId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [activity, setActivity] = useState<ActivityPreview | null>(null);
@@ -137,7 +375,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   const { onlineUsers } = useOnlineUsers(!isGuild);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const atBottomRef = useRef(true);
   const lastMessageIdRef = useRef<string | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
@@ -147,6 +385,11 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   const { visible: visibleMessages, greetersById } = useMemo(
     () => foldGreetings(messages),
     [messages],
+  );
+
+  const timeline = useMemo(
+    () => buildChatTimeline(visibleMessages),
+    [visibleMessages],
   );
 
   const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
@@ -244,6 +487,43 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
     return sendMessage(event);
   };
 
+  const handlers: MessageHandlers = {
+    viewerId: currentUserId,
+    onReact: (message, emoji) => {
+      if (message.id) toggleReaction(message.id, emoji);
+    },
+    onReply: (message) => {
+      startReply(message);
+      focusInput();
+    },
+    onOpenMenu: setMenuMessage,
+    onJumpTo: jumpToMessage,
+    onOpenActivity: setActivity,
+    onOpenRecording: setRecordingId,
+  };
+
+  const avatarFor = (msg: ChatMessageType) => {
+    const avatar = (
+      <Avatar
+        size='sm'
+        name={msg.username}
+        avatarURL={msg.userPhotoURL}
+        lvl={msg.lvl}
+      />
+    );
+    return (
+      <UserTooltip userId={msg.userId}>
+        <div className='mt-0.5'>
+          {getSupportMember(msg.userId) ? (
+            <SupportAvatarRing>{avatar}</SupportAvatarRing>
+          ) : (
+            avatar
+          )}
+        </div>
+      </UserTooltip>
+    );
+  };
+
   return (
     // On a phone the room already sits in the feed's card, so it drops its own surface there
     // rather than nesting a second card (and its padding) inside the first.
@@ -252,7 +532,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className='h-full overflow-y-auto py-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:p-4'>
+          className='h-full overflow-y-auto py-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:px-6 sm:py-4'>
           {!isLoading && messages.length === 0 ? (
             <EmptyRoom
               isGuild={isGuild}
@@ -264,212 +544,90 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
               }}
             />
           ) : (
-            <div className='flex flex-col gap-1 pt-8 sm:px-2'>
-              {visibleMessages.map((msg, index) => {
-                const isMe = msg.userId === currentUserId;
-                const prevMsg = index > 0 ? visibleMessages[index - 1] : null;
-                const isActive = !!msg.id && activeMessageId === msg.id;
-                const react = (emoji: Parameters<typeof toggleReaction>[1]) =>
-                  msg.id && toggleReaction(msg.id, emoji);
+            <div className='flex flex-col'>
+              {timeline.map((entry) => {
+                if (entry.kind === "day") {
+                  return <DayDivider key={entry.key} date={entry.date} />;
+                }
 
-                if (!isPlain(msg)) {
+                if (entry.kind === "event") {
+                  const msg = entry.message;
                   const greeters = (msg.id && greetersById.get(msg.id)) || [];
                   const canGreet =
-                    !isMe &&
+                    msg.userId !== currentUserId &&
                     msg.userId !== "system" &&
                     !greeters.some((g) => g.userId === currentUserId);
-                  const isJoin = isJoinRow(msg);
                   return (
-                    <div
-                      key={msg.id}
-                      data-message-id={msg.id}
-                      className={cn(
-                        "group relative mt-4 flex flex-col",
-                        isJoin ? "items-start" : "items-center",
-                      )}
-                      onClick={() =>
-                        setActiveMessageId((prev) =>
-                          prev === msg.id ? null : (msg.id ?? null),
-                        )
-                      }>
-                      <ChatMessageActions
-                        visible={isActive}
-                        onReact={react}
-                        className={cn(
-                          "absolute -top-8",
-                          // Past the avatar column, over the bubble like a message's.
-                          isJoin ? "left-[52px]" : "left-1/2 -translate-x-1/2",
-                        )}
-                      />
-                      <ChatSystemRow
-                        message={msg}
-                        onSayHi={canGreet ? () => greet(msg) : undefined}
-                        greeters={greeters}
-                      />
-                      <div className={cn(isJoin && "pl-[52px]")}>
-                        <ChatReactionChips
-                          reactions={msg.likes}
-                          viewerId={currentUserId}
-                          onToggle={react}
-                        />
-                      </div>
-                    </div>
+                    <EventRow
+                      key={entry.key}
+                      msg={msg}
+                      greeters={greeters}
+                      onSayHi={canGreet ? () => greet(msg) : undefined}
+                      handlers={handlers}
+                    />
                   );
                 }
 
-                const isFollowUp =
-                  !!prevMsg &&
-                  isPlain(prevMsg) &&
-                  prevMsg.userId === msg.userId &&
-                  !msg.replyTo;
-                const supportMember = getSupportMember(msg.userId);
-                const tagsMe =
-                  !isMe &&
-                  (msg.mentions?.some((m) => m.id === currentUserId) ||
-                    msg.replyTo?.userId === currentUserId);
+                const [first] = entry.messages;
+                const isMe = entry.userId === currentUserId;
+                const supportMember = getSupportMember(entry.userId);
 
                 return (
-                  <div
-                    key={msg.id}
-                    data-message-id={msg.id}
+                  <section
+                    key={entry.key}
                     className={cn(
-                      "group flex w-full flex-col",
+                      "mt-4 flex flex-col",
                       isMe ? "items-end" : "items-start",
-                      isFollowUp ? "mt-0.5" : "mt-4",
                     )}>
-                    <div
+                    {/* Sticks to the top of the list for as long as any of the group is
+                        on screen, so a run cut off by the edge still says whose it is. */}
+                    <header
                       className={cn(
-                        "flex min-w-0 max-w-[90%] gap-3",
-                        isMe ? "flex-row-reverse" : "flex-row",
+                        "sticky top-0 z-[5] mb-1 flex",
+                        isMe ? AVATAR_INSET_END : AVATAR_INSET,
                       )}>
-                      {/* Avatar only on the first of a run */}
-                      <div className='flex w-10 flex-shrink-0 justify-center'>
-                        {!isFollowUp && (
-                          <UserTooltip userId={msg.userId}>
-                            <div className='mt-0.5'>
-                              {supportMember ? (
-                                <SupportAvatarRing>
-                                  <Avatar
-                                    size='sm'
-                                    name={msg.username}
-                                    avatarURL={msg.userPhotoURL}
-                                    lvl={msg.lvl}
-                                  />
-                                </SupportAvatarRing>
-                              ) : (
-                                <Avatar
-                                  size='sm'
-                                  name={msg.username}
-                                  avatarURL={msg.userPhotoURL}
-                                  lvl={msg.lvl}
-                                />
-                              )}
-                            </div>
-                          </UserTooltip>
-                        )}
-                      </div>
-
                       <div
                         className={cn(
-                          "flex min-w-0 flex-col",
-                          isMe ? "items-end" : "items-start",
+                          "flex items-center gap-1.5 rounded-md bg-zinc-950/80 px-1.5 py-0.5",
+                          isMe && "flex-row-reverse",
                         )}>
-                        {!isFollowUp && (
-                          <div
-                            className={cn(
-                              "mb-1 flex items-center gap-1.5",
-                              isMe && "flex-row-reverse",
-                            )}>
-                            <UserTooltip userId={msg.userId}>
-                              <span className='px-1 text-xs font-semibold text-zinc-400'>
-                                {msg.username}
-                              </span>
-                            </UserTooltip>
-                            {/* Outside the tooltip on purpose — its trigger takes a
-                                single child, and the tag belongs beside the name
-                                rather than inside what opens the card. */}
-                            <GuildTagBadge badge={msg.guildBadge} />
-                            {supportMember && <SupportBadge member={supportMember} />}
-                          </div>
-                        )}
-
-                        {/* max-w-full, not just min-w-0: a quoted reply or a shared card has a
-                            wide minimum of its own, which would otherwise size the bubble and
-                            push it out past the edge of the column. */}
-                        <div
-                          className='relative min-w-0 max-w-full'
-                          onClick={() =>
-                            setActiveMessageId((prev) =>
-                              prev === msg.id ? null : (msg.id ?? null),
-                            )
-                          }>
-                          <ChatMessageActions
-                            visible={isActive}
-                            onReact={react}
-                            onReply={() => {
-                              startReply(msg);
-                              focusInput();
-                            }}
-                            className={cn(
-                              "absolute -top-8",
-                              isMe ? "right-0" : "left-0",
-                            )}
-                          />
-                          <div
-                            className={cn(
-                              "flex flex-col gap-2 rounded-lg px-3 py-2 text-sm transition-colors [overflow-wrap:anywhere] sm:px-4",
-                              isMe
-                                ? "bg-cyan-500/20 text-cyan-50"
-                                : tagsMe
-                                  ? "bg-amber-500/15 text-amber-50"
-                                  : "bg-white/5 text-zinc-100",
-                              !isFollowUp && (isMe ? "rounded-tr" : "rounded-tl"),
-                              flashMessageId === msg.id && "bg-cyan-500/30",
-                            )}>
-                            {msg.replyTo && (
-                              <button
-                                type='button'
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  jumpToMessage(msg.replyTo!.id);
-                                }}
-                                className='flex min-w-0 max-w-full flex-col rounded bg-black/20 px-2.5 py-1.5 text-left text-xs transition-colors hover:bg-black/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
-                                <span className='font-semibold text-zinc-300'>
-                                  ↪ {msg.replyTo.username}
-                                </span>
-                                <span className='truncate text-zinc-400'>
-                                  {msg.replyTo.message}
-                                </span>
-                              </button>
-                            )}
-                            {msg.message && (
-                              <span>
-                                <MessageText message={msg} viewerId={currentUserId} />
-                              </span>
-                            )}
-                            {msg.attachment && (
-                              <div
-                                className='w-72 max-w-full'
-                                onClick={(event) => event.stopPropagation()}>
-                                <ChatAttachmentCard
-                                  attachment={msg.attachment}
-                                  onOpenActivity={setActivity}
-                                  onOpenRecording={setRecordingId}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <ChatReactionChips
-                          reactions={msg.likes}
-                          viewerId={currentUserId}
-                          onToggle={react}
-                          alignEnd={isMe}
-                        />
+                        <UserTooltip userId={first.userId}>
+                          <span className='text-xs font-semibold text-zinc-300'>
+                            {first.username}
+                          </span>
+                        </UserTooltip>
+                        {/* Outside the tooltip on purpose — its trigger takes a
+                            single child, and the tag belongs beside the name
+                            rather than inside what opens the card. */}
+                        <GuildTagBadge badge={first.guildBadge} />
+                        {supportMember && <SupportBadge member={supportMember} />}
+                        <time
+                          dateTime={entry.sentAt.toISOString()}
+                          className='text-xs tabular-nums text-zinc-400'>
+                          {format(entry.sentAt, "p", { locale: dateLocale })}
+                        </time>
                       </div>
-                    </div>
-                  </div>
+                    </header>
+
+                    {entry.messages.map((msg, index) => (
+                      <MessageRow
+                        key={msg.id ?? `${entry.key}-${index}`}
+                        msg={msg}
+                        isMe={isMe}
+                        isFirst={index === 0}
+                        avatar={avatarFor(msg)}
+                        tagsMe={
+                          !isMe &&
+                          !!(
+                            msg.mentions?.some((m) => m.id === currentUserId) ||
+                            msg.replyTo?.userId === currentUserId
+                          )
+                        }
+                        isFlashing={flashMessageId === msg.id}
+                        handlers={handlers}
+                      />
+                    ))}
+                  </section>
                 );
               })}
             </div>
@@ -480,7 +638,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
           <button
             type='button'
             onClick={jumpToLatest}
-            className='absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-cyan-500 px-3 py-1.5 text-xs font-semibold text-black transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-200 active:click-behavior'>
+            className='absolute bottom-3 left-1/2 flex min-h-11 -translate-x-1/2 items-center gap-1.5 rounded-full bg-cyan-500 px-4 text-xs font-semibold text-black transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-200 active:click-behavior'>
             <ArrowDown className='h-3.5 w-3.5' />
             {unseenCount} new
           </button>
@@ -503,6 +661,19 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
         onTyping={notifyTyping}
         typingText={typingLabel(typingNames)}
         error={error}
+      />
+
+      <ChatMessageMenu
+        message={menuMessage}
+        viewerId={currentUserId}
+        onClose={() => setMenuMessage(null)}
+        onReact={handlers.onReact}
+        // Server events take reactions only — there is nobody to answer.
+        onReply={
+          menuMessage && (!menuMessage.type || menuMessage.type === "message")
+            ? handlers.onReply
+            : undefined
+        }
       />
 
       <ChatAttachmentPicker

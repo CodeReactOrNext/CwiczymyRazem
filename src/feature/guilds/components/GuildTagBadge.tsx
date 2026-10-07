@@ -3,6 +3,7 @@ import { findCosmetic } from "feature/guilds/data/guildCosmetics";
 import type { GuildBadge } from "feature/guilds/types/guild.types";
 import { frameStyle } from "feature/guilds/utils/guildCosmetics.style";
 import Link from "next/link";
+import { TOUCH_TARGET } from "utils/touchTarget";
 
 /**
  * A member's guild tag, drawn the way their guild pays for it to be drawn.
@@ -51,7 +52,7 @@ export const GuildTagBadge = ({
       style={frameStyle(badge.frame, hex, tone)}
       className={cn(
         "inline-flex shrink-0 items-center rounded font-black tracking-wider",
-        size === "sm" ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-[11px]",
+        size === "sm" ? "px-1.5 py-0.5 text-xs" : "px-2 py-1 text-xs",
         className,
       )}>
       {badge.tag}
@@ -66,7 +67,7 @@ export const GuildTagBadge = ({
   return (
     <Link
       href='/guilds'
-      className='inline-flex transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:opacity-80'>
+      className={cn(TOUCH_TARGET, "inline-flex transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:opacity-80")}>
       {body}
     </Link>
   );

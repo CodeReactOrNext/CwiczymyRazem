@@ -43,7 +43,7 @@ const Standing = ({
     ) : (
       <p className='py-1 text-sm text-zinc-400'>{emptyText}</p>
     )}
-    <p className='mt-1 truncate text-xs text-zinc-500'>{label}</p>
+    <p className='mt-1 truncate text-xs text-zinc-400'>{label}</p>
   </div>
 );
 
@@ -90,7 +90,7 @@ export const RankWidget = () => {
         />
       </div>
 
-      <p className='mt-4 text-xs text-zinc-500'>
+      <p className='mt-4 text-xs text-zinc-400'>
         <span className='font-semibold text-cyan-400'>
           {points.toLocaleString(intlLocale ?? "en-US")}
         </span>{" "}

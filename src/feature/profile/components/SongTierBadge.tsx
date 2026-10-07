@@ -10,6 +10,7 @@ import {
 } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
+import { Lock } from "lucide-react";
 
 interface SongTierBadgeProps {
   /** Learned songs of the profile owner. Undefined once the fetch has failed. */
@@ -55,7 +56,9 @@ export const SongTierBadge = ({
   // "not enough songs yet" wording — otherwise an outage reads as an empty
   // song board.
   const moreSongs = (key: "more" | "learn_own" | "learn_other") =>
-    t(`tier_badge.${key}${songsToUnlock === 1 ? "_one" : ""}`, { count: songsToUnlock });
+    t(`tier_badge.${key}${songsToUnlock === 1 ? "_one" : ""}`, {
+      count: songsToUnlock,
+    });
   const howItWorks = t("tier_badge.how_it_works", HOW_IT_WORKS);
 
   const subLabel = isError
@@ -82,7 +85,7 @@ export const SongTierBadge = ({
 
   const content = (
     <>
-      <span className='text-[10px] font-semibold tracking-widest text-zinc-400'>
+      <span className='text-xs font-semibold tracking-widest text-zinc-400'>
         {t("tier_badge.label")}
       </span>
       {isLoading ? (
@@ -95,7 +98,11 @@ export const SongTierBadge = ({
             backgroundColor: "rgba(10,10,10,0.9)",
             borderColor: `${tier.color}40`,
           }}>
-          {tier.tier}
+          {hasTier || isError ? (
+            tier.tier
+          ) : (
+            <Lock className='h-5 w-5 text-zinc-500' aria-hidden />
+          )}
         </div>
       )}
       {isLoading ? (

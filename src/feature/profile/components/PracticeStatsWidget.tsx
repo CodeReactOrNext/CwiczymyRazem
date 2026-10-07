@@ -76,14 +76,14 @@ const CustomTooltip = ({ active, payload }: any) => {
             {data.activities.map((act: ActivityDetail, i: number) => (
               <div key={i} className="flex items-center justify-between gap-3">
                 <span className="text-xs text-zinc-200 truncate min-w-0">{act.title}</span>
-                <span className="text-[11px] text-zinc-500 shrink-0 tabular-nums">
+                <span className="text-[11px] text-zinc-400 shrink-0 tabular-nums">
                   {formatMin(act.time)}
                 </span>
               </div>
             ))}
           </div>
           <div className="border-t border-white/10 pt-1.5 mt-1.5 flex items-center justify-between">
-            <span className="text-[11px] text-zinc-500">{t("week_widget.total")}</span>
+            <span className="text-[11px] text-zinc-400">{t("week_widget.total")}</span>
             <span className={cn(
               "text-[11px] font-bold tabular-nums",
               data.minutes >= DAILY_GOAL_MIN ? "text-green-400" : "text-zinc-300"
@@ -231,7 +231,7 @@ export const PracticeStatsWidget = ({
                         x={cx}
                         y={labelY}
                         textAnchor="middle"
-                        fontSize={9}
+                        fontSize={12}
                         fontWeight={700}
                         fill={labelColor}
                       >
@@ -314,7 +314,7 @@ export const PracticeStatsWidget = ({
                           x={x + width / 2}
                           y={y - 5}
                           textAnchor="middle"
-                          fontSize={9}
+                          fontSize={12}
                           fontWeight={600}
                           fill={labelColor}
                         >

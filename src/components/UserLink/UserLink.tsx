@@ -64,7 +64,7 @@ export const UserLink = ({
     <UserTooltip userId={uid}>
       <Link
         className={cn(
-          "flex min-w-0 items-center gap-2 text-white hover:underline",
+          "flex min-h-11 min-w-0 items-center gap-2 text-white hover:underline",
           className,
         )}
         href={`/user/${uid}`}>

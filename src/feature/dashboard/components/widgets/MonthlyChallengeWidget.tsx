@@ -83,7 +83,7 @@ export const MonthlyChallengeWidget = () => {
               {challenge.title}
             </p>
             {daysLeft && (
-              <span className='text-xs text-zinc-500'>{daysLeft}</span>
+              <span className='text-xs text-zinc-400'>{daysLeft}</span>
             )}
           </div>
 
@@ -124,7 +124,7 @@ export const MonthlyChallengeWidget = () => {
                       </span>
                       <span
                         translate='no'
-                        className='block truncate text-xs text-zinc-500'>
+                        className='block truncate text-xs text-zinc-400'>
                         {song.artist}
                       </span>
                     </span>
@@ -155,7 +155,7 @@ export const MonthlyChallengeWidget = () => {
             })}
           </ul>
 
-          <p className='mt-auto text-xs text-zinc-500'>
+          <p className='mt-auto text-xs text-zinc-400'>
             <Interpolate
               text={t("challenge.recorded_count")}
               values={{

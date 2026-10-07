@@ -459,6 +459,9 @@
   },
   "landing": {
     "great_job": "Great job today!",
+    "last_session": "Last session",
+    "continue": "Continue",
+    "your_progress": "Your progress",
     "start_today": "Start today's practice"
   }
 }

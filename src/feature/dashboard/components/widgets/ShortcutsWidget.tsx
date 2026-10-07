@@ -39,7 +39,7 @@ export const ShortcutsWidget = () => {
           icon={Zap}
           title={t("shortcuts.title")}
           action={
-            <span className='text-xs tabular-nums text-zinc-500'>
+            <span className='text-xs tabular-nums text-zinc-400'>
               {selected.length}/{MAX_SHORTCUTS}
             </span>
           }
@@ -54,7 +54,7 @@ export const ShortcutsWidget = () => {
         <div className='space-y-5'>
           {SHORTCUT_GROUP_ORDER.map((group) => (
             <div key={group}>
-              <p className='mb-2 text-xs font-semibold text-zinc-500'>
+              <p className='mb-2 text-xs font-semibold text-zinc-400'>
                 {t(`shortcuts.groups.${group}`, SHORTCUT_GROUP_LABELS[group])}
               </p>
               <div className='flex flex-wrap gap-2'>

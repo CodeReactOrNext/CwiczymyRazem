@@ -92,7 +92,7 @@ export const FundingStatusBlock = ({
         />
       </div>
 
-      <div className='mt-3 flex items-center justify-between gap-4 text-xs text-zinc-500'>
+      <div className='mt-3 flex items-center justify-between gap-4 text-xs text-zinc-400'>
         {showsTier ? (
           <span className='flex min-w-0 items-center gap-1.5'>
             <Check size={12} className='shrink-0 text-emerald-400' />

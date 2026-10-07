@@ -3,6 +3,7 @@
     "title": "Tagesquests",
     "claim": "{{points}} abholen",
     "claimed": "Belohnung abgeholt",
+    "reward_hint": "Schließe alle {{count}} ab für",
     "tasks": {
       "rate_song": "Bewerte einen Song",
       "add_want_to_learn": "Füge einen Song zu „Will ich lernen“ hinzu",

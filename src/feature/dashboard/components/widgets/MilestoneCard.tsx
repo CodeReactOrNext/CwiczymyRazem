@@ -82,7 +82,7 @@ export const MilestoneCard = ({
               {t(`levels.${status.id}.name`, status.name)}
             </h3>
             {!locked && (
-              <span className='shrink-0 text-xs font-semibold tabular-nums text-zinc-500'>
+              <span className='shrink-0 text-xs font-semibold tabular-nums text-zinc-400'>
                 {status.progress.value}/{status.progress.max}
               </span>
             )}
@@ -95,7 +95,7 @@ export const MilestoneCard = ({
         {/* Branch on the level gate rather than on the padlock: the disc wears
           one for an unbought tier too, but that one is a shop, not a wall. */}
         {status.lockedAtLvl !== null ? (
-          <span className='shrink-0 text-xs text-zinc-500'>
+          <span className='shrink-0 text-xs text-zinc-400'>
             {t("card.opens_at", { lvl: status.lockedAtLvl })}
           </span>
         ) : !status.owned ? (
@@ -124,7 +124,7 @@ export const MilestoneCard = ({
             {claim.isPending ? t("card.claiming") : t("card.claim", { reward: status.reward })}
           </button>
         ) : status.claimed ? (
-          <span className='shrink-0 text-xs text-zinc-500'>{t("card.claimed")}</span>
+          <span className='shrink-0 text-xs text-zinc-400'>{t("card.claimed")}</span>
         ) : (
           <span className='shrink-0 text-xs font-semibold text-amber-400'>
             {t("card.reward", { reward: status.reward })}

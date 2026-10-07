@@ -20,7 +20,7 @@ describe("tabNav", () => {
     const inactive = tabNavItemClass(false);
 
     expect(inactive).toContain("border-transparent");
-    expect(inactive).toContain("text-zinc-500");
+    expect(inactive).toContain("text-zinc-400");
     expect(inactive).not.toContain("border-white");
   });
 

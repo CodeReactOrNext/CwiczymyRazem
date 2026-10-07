@@ -48,7 +48,7 @@ const UserNav = () => {
           <button
             type='button'
             aria-label={t("account_menu")}
-            className='relative z-30 flex items-center gap-1.5 rounded-lg p-1 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-zinc-800/60'>
+            className='relative z-30 flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-1.5 text-zinc-400 transition-colors hover:bg-zinc-800/60 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-zinc-800/60'>
             {avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img

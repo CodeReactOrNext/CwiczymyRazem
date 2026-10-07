@@ -134,7 +134,7 @@ export const WidgetFrame = ({
       </div>
 
       {definition.mayBeEmpty && (
-        <p className='hidden rounded-lg bg-zinc-900/40 px-4 py-6 text-center text-sm text-zinc-500 peer-empty:block'>
+        <p className='hidden rounded-lg bg-zinc-900/40 px-4 py-6 text-center text-sm text-zinc-400 peer-empty:block'>
           {t("frame.empty")}
         </p>
       )}

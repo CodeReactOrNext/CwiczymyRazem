@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { MOBILE_BOTTOM_NAV_ATTR } from "components/RockSidebar/MobileMoreSheet";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { Home, Menu, Timer } from "lucide-react";
@@ -9,6 +10,10 @@ import { PiCassetteTapeLight } from "react-icons/pi";
 
 interface MobileBottomNavProps {
   onMenuClick: () => void;
+  /** The "More" sheet is up — its tab reads as the current one. */
+  isMenuOpen?: boolean;
+  /** A tab was tapped — the sheet closes even when the tab is the current page. */
+  onNavigate?: () => void;
 }
 
 /** Both lucide and react-icons components take these — the nav mixes the two. */
@@ -24,12 +29,12 @@ const navItems: { label: string; href: string; icon: NavIcon }[] = [
 ];
 
 const itemClass =
-  "relative flex min-h-[52px] flex-1 flex-col items-center justify-center py-1 active:scale-95 transition-transform duration-150";
+  "relative flex min-h-[52px] min-w-0 flex-1 flex-col items-center justify-center py-1 active:scale-95 transition-transform duration-150";
 
 // A pill highlight wraps both the icon and the label of the active item.
 const pillClass = (active: boolean) =>
   cn(
-    "relative flex w-16 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg px-2 py-1.5 transition-colors duration-300",
+    "relative flex w-full max-w-20 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg px-1 py-1.5 transition-colors duration-300",
     active ? "bg-white/10" : "bg-transparent"
   );
 
@@ -38,8 +43,8 @@ const iconClass = (active: boolean) =>
 
 const labelClass = (active: boolean) =>
   cn(
-    "text-[10px] capitalize tracking-tight transition-colors duration-200",
-    active ? "font-medium text-white" : "font-normal text-zinc-500"
+    "whitespace-nowrap text-xs capitalize tracking-tight transition-colors duration-200",
+    active ? "font-medium text-white" : "font-normal text-zinc-400"
   );
 
 const BottomNavItem = ({
@@ -47,18 +52,23 @@ const BottomNavItem = ({
   href,
   icon: Icon,
   active,
+  onNavigate,
 }: {
   label: string;
   href: string;
   icon: NavIcon;
   active: boolean;
+  onNavigate?: () => void;
 }) => {
   const { createRipple, ripple } = useRipple("bg-cyan-400/30");
   return (
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      onClick={createRipple}
+      onClick={(e) => {
+        createRipple(e);
+        onNavigate?.();
+      }}
       className={itemClass}
     >
       <span className={pillClass(active)}>
@@ -73,7 +83,11 @@ const BottomNavItem = ({
   );
 };
 
-export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
+export const MobileBottomNav = ({
+  onMenuClick,
+  isMenuOpen = false,
+  onNavigate,
+}: MobileBottomNavProps) => {
   const { t } = useTranslation("nav");
   const router = useRouter();
   const { createRipple, ripple } = useRipple("bg-cyan-400/30");
@@ -92,7 +106,14 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-zinc-900/95 pb-safe pt-1.5 px-2 backdrop-blur-xl lg:hidden transform-gpu">
+    <nav
+      {...{ [MOBILE_BOTTOM_NAV_ATTR]: "" }}
+      // The open sheet is a modal that switches pointer events off on <body>;
+      // the bar opts back in so its tabs keep working underneath.
+      className={cn(
+        "fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-zinc-900/95 pb-safe pt-1.5 px-2 backdrop-blur-xl lg:hidden transform-gpu",
+        isMenuOpen && "pointer-events-auto"
+      )}>
       <div className="mx-auto flex max-w-md items-stretch justify-around gap-0.5">
         {navItems.map((item) => (
           <BottomNavItem
@@ -100,7 +121,8 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
             label={t(item.label)}
             href={item.href}
             icon={item.icon}
-            active={isActive(item.href)}
+            active={!isMenuOpen && isActive(item.href)}
+            onNavigate={onNavigate}
           />
         ))}
 
@@ -109,13 +131,14 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
             createRipple(e);
             onMenuClick();
           }}
-          aria-label={t("open_menu")}
+          aria-label={isMenuOpen ? t("close_menu") : t("open_menu")}
+          aria-expanded={isMenuOpen}
           className={itemClass}
         >
-          <span className={pillClass(false)}>
+          <span className={pillClass(isMenuOpen)}>
             {ripple}
-            <Menu size={20} className={iconClass(false)} />
-            <span className={labelClass(false)}>{t("more")}</span>
+            <Menu size={20} className={iconClass(isMenuOpen)} />
+            <span className={labelClass(isMenuOpen)}>{t("more")}</span>
           </span>
         </button>
       </div>
