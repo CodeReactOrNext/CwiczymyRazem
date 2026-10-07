@@ -251,5 +251,89 @@
       "name": "Composición",
       "description": "Aprende a escribir y arreglar tu propia música"
     }
+  },
+  "roadmap": {
+    "aria": "Mapa de habilidades",
+    "drag_aria": "Mapa de habilidades, arrastra para moverte",
+    "zoom_in": "Acercar",
+    "zoom_out": "Alejar",
+    "fit": "Ajustar el mapa a la pantalla",
+    "bpm_stages": "{{done}} / {{total}} etapas de BPM",
+    "click_preview": "Haz clic para ver",
+    "lvl": "Nv. {{level}}",
+    "done_of": "{{done}} de {{total}}",
+    "up_next": "A continuación",
+    "start": "Empezar",
+    "show_in_path": "Mostrar este ejercicio en el camino",
+    "jump_tier": "Saltar a una etapa",
+    "mastery": "Maestría",
+    "mastery_done": "Maestría — completaste todos los ejercicios del camino.",
+    "mastery_left": "Maestría · faltan {{count}} ejercicios",
+    "state": {
+      "completed": "Completado",
+      "current": "A continuación",
+      "available": "Sin empezar",
+      "locked": "Ejercicio Pro"
+    },
+    "tiers": {
+      "foundations": {
+        "title": "Fundamentos",
+        "subtitle": "Toma la guitarra. Construye la base."
+      },
+      "technique": {
+        "title": "Técnica",
+        "subtitle": "Precisión, velocidad y control."
+      },
+      "theory": {
+        "title": "Teoría y diapasón",
+        "subtitle": "Conoce el mástil. Nombra lo que tocas."
+      },
+      "rhythm": {
+        "title": "Ritmo y groove",
+        "subtitle": "Engánchate al pulso."
+      },
+      "expression": {
+        "title": "Expresión y estilo",
+        "subtitle": "Haz que cada nota cante."
+      },
+      "hearing": {
+        "title": "Entrenamiento auditivo",
+        "subtitle": "Óyelo antes de tocarlo."
+      },
+      "creativity": {
+        "title": "Creatividad",
+        "subtitle": "Encuentra tu propia voz."
+      }
+    },
+    "branches": {
+      "getting_started": "Primeros pasos",
+      "clean_tone": "Sonido limpio y apagado",
+      "first_scales": "Primeras escalas",
+      "play_alongs": "Tocar con pistas",
+      "alternate_picking": "Púa alterna",
+      "finger_independence": "Independencia de dedos",
+      "legato": "Legato",
+      "string_skipping": "Salto de cuerdas",
+      "spider_permutations": "Permutaciones araña",
+      "sweep_picking": "Sweep picking",
+      "tapping": "Tapping",
+      "hybrid_picking": "Hybrid picking",
+      "note_hunts": "Caza de notas",
+      "click_hunts": "Caza con clic",
+      "interval_clicks": "Intervalos con clic",
+      "chords": "Acordes",
+      "harmony": "Armonía",
+      "strumming_styles": "Rasgueo",
+      "strumming_patterns": "Patrones de rasgueo",
+      "timing_meter": "Tiempo y compás",
+      "bending": "Bending",
+      "vibrato": "Vibrato",
+      "phrasing": "Fraseo",
+      "tone": "Sonido",
+      "play_by_ear": "Tocar de oído",
+      "ear_quizzes": "Quizzes de oído",
+      "improvisation": "Improvisación",
+      "composition": "Composición"
+    }
   }
 }

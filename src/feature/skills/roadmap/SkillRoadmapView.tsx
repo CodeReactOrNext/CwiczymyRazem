@@ -7,6 +7,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
+import { useTranslation } from "hooks/useTranslation";
 import { Maximize2, Minus, Plus } from "lucide-react";
 import type {
   KeyboardEvent as ReactKeyboardEvent,
@@ -54,10 +55,10 @@ const clampScale = (value: number) =>
 const PAN_STEP = 90;
 
 const STATE_LABEL: Record<RoadmapNodeState, string> = {
-  completed: "Completed",
-  current: "Up next",
-  available: "Not started",
-  locked: "Pro exercise",
+  completed: "roadmap.state.completed",
+  current: "roadmap.state.current",
+  available: "roadmap.state.available",
+  locked: "roadmap.state.locked",
 };
 
 const controlButtonClass =
@@ -86,6 +87,7 @@ export const SkillRoadmapView = ({
   onShowUpgrade,
   onSkillClick,
 }: SkillRoadmapViewProps) => {
+  const { t } = useTranslation(["skills", "common"]);
   const tiers = useMemo(() => buildSkillRoadmap(exercisesAgregat), []);
   const layout = useMemo(() => layoutSkillRoadmap(tiers), [tiers]);
   const exerciseById = useMemo(
@@ -366,7 +368,7 @@ export const SkillRoadmapView = ({
         ref={scrollRef}
         tabIndex={0}
         role='application'
-        aria-label='Skill roadmap, drag to pan'
+        aria-label={t("roadmap.drag_aria")}
         className={cn(
           // The map is navigated by dragging, the zoom buttons and the tier
           // list, so the bars themselves are hidden on every engine.
@@ -415,21 +417,21 @@ export const SkillRoadmapView = ({
           type='button'
           className={controlButtonClass}
           onClick={() => zoomTo(scale * ZOOM_STEP)}
-          aria-label='Zoom in'>
+          aria-label={t("roadmap.zoom_in")}>
           <Plus className='h-4 w-4' />
         </button>
         <button
           type='button'
           className={controlButtonClass}
           onClick={() => zoomTo(scale / ZOOM_STEP)}
-          aria-label='Zoom out'>
+          aria-label={t("roadmap.zoom_out")}>
           <Minus className='h-4 w-4' />
         </button>
         <button
           type='button'
           className={controlButtonClass}
           onClick={fitToWidth}
-          aria-label='Fit the map to the screen'>
+          aria-label={t("roadmap.fit")}>
           <Maximize2 className='h-4 w-4' />
         </button>
       </div>
@@ -456,7 +458,7 @@ export const SkillRoadmapView = ({
                 DIFFICULTY_HEX[hoveredExercise.difficulty],
               )}
               className='px-2 py-0.5 text-[11px] capitalize'>
-              {hoveredExercise.difficulty}
+              {t(`common:difficulty.${hoveredExercise.difficulty}`, hoveredExercise.difficulty)}
             </Chip>
             <span
               className={cn(
@@ -466,17 +468,21 @@ export const SkillRoadmapView = ({
                 hoveredState === "locked" && "text-amber-400",
                 hoveredState === "available" && "text-zinc-400",
               )}>
-              {STATE_LABEL[hoveredState]}
+              {t(STATE_LABEL[hoveredState])}
             </span>
           </div>
           {hoveredStages.length > 0 &&
             (hoveredProgress?.completedBpms?.length ?? 0) > 0 && (
               <p className='mt-2 text-[11px] text-zinc-400'>
-                {hoveredProgress?.completedBpms.length} / {hoveredStages.length}{" "}
-                BPM stages
+                {t("roadmap.bpm_stages", {
+                  done: hoveredProgress?.completedBpms.length ?? 0,
+                  total: hoveredStages.length,
+                })}
               </p>
             )}
-          <p className='mt-2 text-[11px] text-zinc-500'>Click to preview</p>
+          <p className='mt-2 text-[11px] text-zinc-500'>
+            {t("roadmap.click_preview")}
+          </p>
         </div>
       )}
 

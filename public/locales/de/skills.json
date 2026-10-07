@@ -251,5 +251,89 @@
       "name": "Komposition",
       "description": "Lerne, eigene Musik zu schreiben und zu arrangieren"
     }
+  },
+  "roadmap": {
+    "aria": "Skill-Roadmap",
+    "drag_aria": "Skill-Roadmap, zum Verschieben ziehen",
+    "zoom_in": "Vergrößern",
+    "zoom_out": "Verkleinern",
+    "fit": "Karte an den Bildschirm anpassen",
+    "bpm_stages": "{{done}} / {{total}} BPM-Stufen",
+    "click_preview": "Zum Ansehen klicken",
+    "lvl": "Lvl {{level}}",
+    "done_of": "{{done}} von {{total}}",
+    "up_next": "Als Nächstes",
+    "start": "Start",
+    "show_in_path": "Diese Übung im Pfad zeigen",
+    "jump_tier": "Zu einer Stufe springen",
+    "mastery": "Meisterschaft",
+    "mastery_done": "Meisterschaft — jede Übung auf dem Pfad ist geschafft.",
+    "mastery_left": "Meisterschaft · noch {{count}} Übungen",
+    "state": {
+      "completed": "Abgeschlossen",
+      "current": "Als Nächstes",
+      "available": "Nicht begonnen",
+      "locked": "Pro-Übung"
+    },
+    "tiers": {
+      "foundations": {
+        "title": "Grundlagen",
+        "subtitle": "Gitarre in die Hand. Die Basics aufbauen."
+      },
+      "technique": {
+        "title": "Technik",
+        "subtitle": "Präzision, Tempo und Kontrolle."
+      },
+      "theory": {
+        "title": "Theorie & Griffbrett",
+        "subtitle": "Kenne das Griffbrett. Benenne, was du spielst."
+      },
+      "rhythm": {
+        "title": "Rhythmus & Groove",
+        "subtitle": "Finde den Beat."
+      },
+      "expression": {
+        "title": "Ausdruck & Stil",
+        "subtitle": "Lass jeden Ton singen."
+      },
+      "hearing": {
+        "title": "Gehörbildung",
+        "subtitle": "Hör es, bevor du es spielst."
+      },
+      "creativity": {
+        "title": "Kreativität",
+        "subtitle": "Finde deine eigene Stimme."
+      }
+    },
+    "branches": {
+      "getting_started": "Erste Schritte",
+      "clean_tone": "Sauberer Ton & Abdämpfen",
+      "first_scales": "Erste Tonleitern",
+      "play_alongs": "Play-alongs",
+      "alternate_picking": "Wechselschlag",
+      "finger_independence": "Fingerunabhängigkeit",
+      "legato": "Legato",
+      "string_skipping": "String Skipping",
+      "spider_permutations": "Spider-Permutationen",
+      "sweep_picking": "Sweep Picking",
+      "tapping": "Tapping",
+      "hybrid_picking": "Hybrid Picking",
+      "note_hunts": "Notenjagd",
+      "click_hunts": "Klickjagd",
+      "interval_clicks": "Intervall-Klicks",
+      "chords": "Akkorde",
+      "harmony": "Harmonie",
+      "strumming_styles": "Anschlag",
+      "strumming_patterns": "Schlagmuster",
+      "timing_meter": "Timing & Takt",
+      "bending": "Saitenziehen",
+      "vibrato": "Vibrato",
+      "phrasing": "Phrasierung",
+      "tone": "Sound",
+      "play_by_ear": "Nach Gehör spielen",
+      "ear_quizzes": "Gehör-Quiz",
+      "improvisation": "Improvisation",
+      "composition": "Komposition"
+    }
   }
 }

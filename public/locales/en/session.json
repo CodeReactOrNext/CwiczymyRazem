@@ -521,6 +521,7 @@
     "sharp": "{{cents}}¢ sharp — tune down",
     "flat": "{{cents}}¢ flat — tune up",
     "string": "String {{n}} — {{name}} ({{hz}} Hz)",
-    "all_tuned": "All strings in tune"
+    "all_tuned": "All strings in tune",
+    "title": "Tuner"
   }
 }

@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { memo, useLayoutEffect, useRef } from "react";
 
 import type { RoadmapTier } from "./skillRoadmap.data";
 import type { LayoutBranch, RoadmapLayout } from "./skillRoadmapLayout";
 import { ROADMAP_GEOMETRY as G } from "./skillRoadmapLayout";
 import type { RoadmapNodeState, RoadmapProgress } from "./skillRoadmapStates";
+import { useSkillRoadmapLabels } from "./useSkillRoadmapLabels";
 
 export interface RoadmapNodeHover {
   id: string;
@@ -229,7 +231,8 @@ const BranchHeader = ({
 }) => {
   const nameRef = useRef<SVGTextElement>(null);
   const levelRef = useRef<SVGTextElement>(null);
-  const levelText = level ? `Lvl ${level}` : null;
+  const { t } = useTranslation("skills");
+  const levelText = level ? t("roadmap.lvl", { level }) : null;
   const estimatedLevelX = levelText
     ? Math.max(
         firstRowRight,
@@ -550,7 +553,8 @@ export const SkillRoadmapTree = memo(function SkillRoadmapTree({
   scale = 1,
   animate = true,
 }: SkillRoadmapTreeProps) {
-  const tierById = new Map(tiers.map((t) => [t.id, t]));
+  const labels = useSkillRoadmapLabels();
+  const tierById = new Map(tiers.map((tier) => [tier.id, tier]));
   const type = typeScaleFor(scale);
   // The spine is lit down to the last tier the player has actually touched.
   const lastStartedIndex = layout.tiers.reduce(
@@ -567,7 +571,7 @@ export const SkillRoadmapTree = memo(function SkillRoadmapTree({
       width='100%'
       height='100%'
       className='block select-none'
-      aria-label='Skill roadmap'>
+      aria-label={labels.t("roadmap.aria")}>
       <motion.g
         initial={animate ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
@@ -610,7 +614,7 @@ export const SkillRoadmapTree = memo(function SkillRoadmapTree({
                 x={lt.x}
                 y={lt.y}
                 number={index + 1}
-                title={tier.title}
+                title={labels.tierTitle(tier)}
                 completed={stats.completed}
                 total={stats.total}
                 type={type}
@@ -631,7 +635,7 @@ export const SkillRoadmapTree = memo(function SkillRoadmapTree({
                   <Branch
                     key={lb.id}
                     branch={lb}
-                    label={branch.label}
+                    label={labels.branchLabel(branch)}
                     skillId={branch.skillId}
                     level={skillLevels[branch.skillId]}
                     progress={progress}
@@ -652,7 +656,7 @@ export const SkillRoadmapTree = memo(function SkillRoadmapTree({
           x={layout.trunkX}
           y={layout.masteryY}
           number={layout.tiers.length + 1}
-          title='Mastery'
+          title={labels.t("roadmap.mastery")}
           completed={progress.completed}
           total={progress.total}
           type={type}

@@ -521,6 +521,7 @@
     "sharp": "{{cents}}¢ alta — baja la afinación",
     "flat": "{{cents}}¢ baja — sube la afinación",
     "string": "Cuerda {{n}} — {{name}} ({{hz}} Hz)",
-    "all_tuned": "Todas las cuerdas afinadas"
+    "all_tuned": "Todas las cuerdas afinadas",
+    "title": "Afinador"
   }
 }

@@ -521,6 +521,7 @@
     "sharp": "{{cents}}¢ za wysoko — obniż",
     "flat": "{{cents}}¢ za nisko — podciągnij",
     "string": "Struna {{n}} — {{name}} ({{hz}} Hz)",
-    "all_tuned": "Wszystkie struny nastrojone"
+    "all_tuned": "Wszystkie struny nastrojone",
+    "title": "Stroik"
   }
 }
