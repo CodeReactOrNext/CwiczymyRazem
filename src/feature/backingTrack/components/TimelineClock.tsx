@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useRef } from "react";
 
 import { useTimelineFrame } from "../hooks/useTimelineFrame";
@@ -38,6 +39,7 @@ export function TimelineClock({
   beatsPerBar,
   className,
 }: TimelineClockProps) {
+  const { t } = useTranslation("backing_track");
   const timeRef = useRef<HTMLSpanElement | null>(null);
   const barRef = useRef<HTMLSpanElement | null>(null);
 
@@ -76,7 +78,7 @@ export function TimelineClock({
       <span
         ref={timeRef}
         className='text-sm font-semibold tabular-nums text-zinc-100'
-        aria-label='Position in the recording'>
+        aria-label={t("clock.position")}>
         0:00
       </span>
       <span ref={barRef} className='text-xs tabular-nums text-zinc-400'>

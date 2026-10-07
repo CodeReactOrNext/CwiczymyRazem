@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import type { MutableRefObject } from "react";
 import { useEffect, useRef } from "react";
 
@@ -108,6 +109,7 @@ export function AlignmentGrid({
   onPanEnd,
   className,
 }: AlignmentGridProps) {
+  const { t } = useTranslation("backing_track");
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const sizeRef = useCanvasSize(canvasRef, heightPx);
@@ -440,8 +442,8 @@ export function AlignmentGrid({
       ref={canvasRef}
       aria-label={
         dragMode === "pan"
-          ? "Backing track alignment grid — drag to move the view"
-          : "Backing track alignment grid — drag to shift the recording"
+          ? t("lanes_aria.grid_pan")
+          : t("lanes_aria.grid_shift")
       }
       style={{ height: heightPx }}
       className={cn(

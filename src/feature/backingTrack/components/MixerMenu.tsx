@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { SlidersHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -25,6 +26,7 @@ interface MixerMenuProps {
  * the first press should shut the menu, not the editor behind it.
  */
 export function MixerMenu({ tracks, onChange, className }: MixerMenuProps) {
+  const { t } = useTranslation("backing_track");
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -65,8 +67,8 @@ export function MixerMenu({ tracks, onChange, className }: MixerMenuProps) {
         type='button'
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
-        aria-label='Instrument levels'
-        title='Instrument levels — what you hear'
+        aria-label={t("mixer.levels")}
+        title={t("mixer.levels_title")}
         className={cn(
           "flex h-7 w-7 items-center justify-center rounded-md transition-colors",
           "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",

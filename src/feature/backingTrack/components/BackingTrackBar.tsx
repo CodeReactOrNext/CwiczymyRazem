@@ -1,6 +1,7 @@
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { extractVideoId } from "feature/songs/utils/youtube.utils";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Check,
   ChevronLeft,
@@ -33,26 +34,8 @@ import type { MixerTrack } from "./TrackMixer";
 /** One nudge, in ms. Shift multiplies it — see NUDGE_COARSE_FACTOR. */
 const NUDGE_MS = 20;
 const NUDGE_COARSE_FACTOR = 5;
-const SOURCES: { value: BackingSource; label: string; description: string }[] = [
-  {
-    value: "off",
-    label: "Nothing",
-    description:
-      "Just the tab. Pick a recording to hear the real song underneath it — it follows play, pause and every bar you click.",
-  },
-  {
-    value: "file",
-    label: "Audio files",
-    description:
-      "Recordings on your computer — one backing track, or separate stems (drums, bass, vocals) played as layers.",
-  },
-  {
-    value: "youtube",
-    label: "YouTube video",
-    description:
-      "Paste a link to the song. The video plays under the tab and its sound is what you hear.",
-  },
-];
+/** Label and description are `backing_track:sources.<value>`. */
+const SOURCES: BackingSource[] = ["off", "file", "youtube"];
 
 /** A card inside the setup panel. Separated by background, never by a line. */
 const panel = "flex flex-col gap-4 rounded-xl bg-zinc-900/60 p-4";
@@ -119,6 +102,7 @@ export function BackingTrackBar({
   onMixerChange,
   className,
 }: BackingTrackBarProps) {
+  const { t } = useTranslation("backing_track");
   const {
     source,
     setSource,
@@ -255,7 +239,7 @@ export function BackingTrackBar({
 
   const sourceSwitch = (
     <div className='flex w-fit items-center gap-1 rounded-lg bg-zinc-950/60 p-1'>
-      {SOURCES.map(({ value, label }) => (
+      {SOURCES.map((value) => (
         <button
           key={value}
           type='button'
@@ -267,7 +251,7 @@ export function BackingTrackBar({
               ? "bg-cyan-500/10 text-cyan-400"
               : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
           )}>
-          {label}
+          {t(`sources.${value}.label`)}
         </button>
       ))}
     </div>
@@ -328,12 +312,12 @@ export function BackingTrackBar({
           onKeyDown={(e) => e.key === "Enter" && handleSaveUrl()}
         />
         <button type='button' onClick={handleSaveUrl} className={buttonClass}>
-          Use video
+          {t("bar.use_video")}
         </button>
       </div>
       {urlError && (
         <p className='text-xs text-red-400'>
-          That isn&apos;t a YouTube link — try youtube.com/watch?v=… or youtu.be/…
+          {t("bar.bad_link")}
         </p>
       )}
     </div>
@@ -341,7 +325,7 @@ export function BackingTrackBar({
 
   const tempoFixes = onSessionBpmChange && nearestAchievableBpms.length > 0 && (
     <div className='flex flex-wrap items-center gap-2'>
-      <span className='text-xs text-zinc-400'>Locks at</span>
+      <span className='text-xs text-zinc-400'>{t("bar.locks_at")}</span>
       {nearestAchievableBpms.map((bpm) => (
         <button
           key={bpm}
@@ -364,7 +348,7 @@ export function BackingTrackBar({
         isCinema && "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20",
       )}>
       {isCinema ? <Minimize2 className='h-3.5 w-3.5' /> : <Maximize2 className='h-3.5 w-3.5' />}
-      {isCinema ? "Leave cinema" : "Cinema"}
+      {isCinema ? t("bar.leave_cinema") : t("bar.cinema")}
     </button>
   );
 
@@ -375,11 +359,8 @@ export function BackingTrackBar({
     <div className={panel}>
       <div className='flex flex-wrap items-start justify-between gap-3'>
         <div className='flex min-w-0 flex-col gap-1'>
-          <span className={panelTitle}>Sound</span>
-          <p className={panelText}>
-            Tick the files that belong to this song. Several ticked at once play as layers of one
-            recording.
-          </p>
+          <span className={panelTitle}>{t("sound.title")}</span>
+          <p className={panelText}>{t("sound.body")}</p>
         </div>
         <button
           type='button'
@@ -390,15 +371,15 @@ export function BackingTrackBar({
             "flex shrink-0 items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50",
           )}>
           <FolderOpen className='h-3.5 w-3.5 text-zinc-400' />
-          {isImporting ? "Importing…" : "Add files"}
+          {isImporting ? t("sound.importing") : t("sound.add_files")}
         </button>
       </div>
 
-      {isTrackLoading && <p className={panelText}>Loading stems…</p>}
+      {isTrackLoading && <p className={panelText}>{t("sound.loading")}</p>}
 
       {library.length === 0 ? (
         <p className={panelText}>
-          No files yet — add some, or drop audio files anywhere on this screen.
+          {t("sound.empty")}
         </p>
       ) : (
         <div className='flex max-h-44 flex-col gap-1.5 overflow-y-auto'>
@@ -417,8 +398,8 @@ export function BackingTrackBar({
                   onClick={() => (isStem ? removeStem(track.id) : addStem(track.id))}
                   aria-label={
                     isStem
-                      ? `Remove ${track.name} from this song`
-                      : `Add ${track.name} to this song`
+                      ? t("sound.remove_from_song", { name: track.name })
+                      : t("sound.add_to_song", { name: track.name })
                   }
                   className='flex min-w-0 flex-1 items-center gap-2.5 text-left focus-visible:outline-none'>
                   {isStem ? (
@@ -434,13 +415,15 @@ export function BackingTrackBar({
                     {track.name}
                   </span>
                   {isStem && (
-                    <span className='shrink-0 text-xs text-cyan-400'>Layer {stemIndex + 1}</span>
+                    <span className='shrink-0 text-xs text-cyan-400'>
+                      {t("sound.layer", { n: stemIndex + 1 })}
+                    </span>
                   )}
                 </button>
                 <button
                   type='button'
                   onClick={() => deleteTrack(track.id)}
-                  aria-label={`Delete ${track.name} from the library`}
+                  aria-label={t("sound.delete", { name: track.name })}
                   className='rounded p-1.5 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/5 hover:text-zinc-100'>
                   <Trash2 className='h-3.5 w-3.5' />
                 </button>
@@ -453,12 +436,14 @@ export function BackingTrackBar({
       {stems.length > 0 && (
         <div className='flex flex-col gap-3 rounded-lg bg-zinc-950/40 p-3'>
           <div className='flex flex-wrap items-center gap-2'>
-            <span className={cn(sectionLabel, "w-28 shrink-0")}>Recording tempo</span>
+            <span className={cn(sectionLabel, "w-28 shrink-0")}>
+              {t("sound.recording_tempo")}
+            </span>
             <input
               type='number'
               min={20}
               max={400}
-              aria-label='Tempo the files were recorded at'
+              aria-label={t("sound.tempo_aria")}
               value={bpmDraft ?? Math.round(alignment.sourceBpm)}
               onChange={(e) => setBpmDraft(e.target.value)}
               onBlur={(e) => commitBpm(e.target.value)}
@@ -470,7 +455,7 @@ export function BackingTrackBar({
               type='button'
               onClick={() => setAlignment({ sourceBpm: sessionBpm })}
               className={buttonClass}>
-              Match session
+              {t("sound.match_session")}
             </button>
             {/* A warning that the recording is being stretched past
                 where it still sounds like itself has to look like one. */}
@@ -479,17 +464,19 @@ export function BackingTrackBar({
                 "text-xs tabular-nums",
                 isCleanStretch(playbackRate) ? "text-zinc-500" : "text-amber-400",
               )}>
-              plays at {playbackRate.toFixed(2)}×
-              {isCleanStretch(playbackRate) ? "" : " — stretched hard"}
+              {t("sound.plays_at", { rate: playbackRate.toFixed(2) })}
+              {isCleanStretch(playbackRate) ? "" : ` — ${t("sound.stretched")}`}
             </span>
           </div>
 
           <div className='flex items-center gap-2'>
-            <span className={cn(sectionLabel, "w-28 shrink-0")}>Volume</span>
+            <span className={cn(sectionLabel, "w-28 shrink-0")}>
+              {t("sound.volume")}
+            </span>
             <button
               type='button'
               onClick={() => setAlignment({ muted: !alignment.muted })}
-              aria-label={alignment.muted ? "Unmute the backing track" : "Mute the backing track"}
+              aria-label={alignment.muted ? t("sound.unmute") : t("sound.mute")}
               className={cn(
                 "rounded-lg p-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                 alignment.muted
@@ -522,13 +509,10 @@ export function BackingTrackBar({
       <div className='flex flex-wrap items-start justify-between gap-3'>
         <div className='flex min-w-0 flex-col gap-1'>
           <span className='flex items-baseline gap-2'>
-            <span className={panelTitle}>Video on top</span>
-            <span className='text-xs text-zinc-500'>optional</span>
+            <span className={panelTitle}>{t("video.title")}</span>
+            <span className='text-xs text-zinc-500'>{t("video.optional")}</span>
           </span>
-          <p className={panelText}>
-            Picture only — the video is muted and your files stay the sound. Each keeps its own
-            sync.
-          </p>
+          <p className={panelText}>{t("video.body")}</p>
         </div>
         <button
           type='button'
@@ -540,7 +524,7 @@ export function BackingTrackBar({
             videoOverlay && "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20",
           )}>
           <Film className='h-3.5 w-3.5' />
-          {videoOverlay ? "Hide video" : "Show video"}
+          {videoOverlay ? t("video.hide") : t("video.show")}
         </button>
       </div>
 
@@ -552,20 +536,21 @@ export function BackingTrackBar({
             <>
               <p className='flex items-start gap-2 text-xs leading-relaxed text-amber-400'>
                 <TriangleAlert className='mt-0.5 h-3.5 w-3.5 shrink-0' />
-                YouTube has no speed for {Math.round(sessionBpm)} BPM, so the picture runs free.
-                What you hear stays locked either way.
+                {t("video.no_speed", { bpm: Math.round(sessionBpm) })}
               </p>
               {tempoFixes}
             </>
           )}
 
           <div className='flex flex-wrap items-center gap-2'>
-            <span className={cn(sectionLabel, "w-28 shrink-0")}>Video sync</span>
+            <span className={cn(sectionLabel, "w-28 shrink-0")}>
+              {t("video.sync")}
+            </span>
             <button
               type='button'
               onClick={(e) => nudgeVideo(e.shiftKey ? -NUDGE_COARSE_FACTOR : -1)}
-              title={`Earlier — hold Shift for ${NUDGE_MS * NUDGE_COARSE_FACTOR} ms`}
-              aria-label='Nudge the video earlier'
+              title={t("nudge.earlier", { ms: NUDGE_MS * NUDGE_COARSE_FACTOR })}
+              aria-label={t("video.nudge_earlier")}
               className={nudgeButton}>
               <ChevronLeft className='h-4 w-4' />
             </button>
@@ -576,8 +561,8 @@ export function BackingTrackBar({
             <button
               type='button'
               onClick={(e) => nudgeVideo(e.shiftKey ? NUDGE_COARSE_FACTOR : 1)}
-              title={`Later — hold Shift for ${NUDGE_MS * NUDGE_COARSE_FACTOR} ms`}
-              aria-label='Nudge the video later'
+              title={t("nudge.later", { ms: NUDGE_MS * NUDGE_COARSE_FACTOR })}
+              aria-label={t("video.nudge_later")}
               className={nudgeButton}>
               <ChevronRight className='h-4 w-4' />
             </button>
@@ -585,7 +570,7 @@ export function BackingTrackBar({
               type='button'
               onClick={() => setYouTubeVideoId(null)}
               className={cn(buttonClass, "ml-auto")}>
-              Change video
+              {t("video.change")}
             </button>
           </div>
         </>
@@ -601,28 +586,26 @@ export function BackingTrackBar({
           {youtubeCanFollowTempo ? (
             <p className='flex items-start gap-2 text-xs leading-relaxed text-emerald-400'>
               <Check className='mt-0.5 h-3.5 w-3.5 shrink-0' />
-              Locked to the tab at {playbackRate.toFixed(2)}× — the video holds this tempo exactly.
+              {t("youtube.locked", { rate: playbackRate.toFixed(2) })}
             </p>
           ) : (
             <>
               <p className='flex items-start gap-2 text-xs leading-relaxed text-amber-400'>
                 <TriangleAlert className='mt-0.5 h-3.5 w-3.5 shrink-0' />
-                YouTube only plays at its own fixed speeds and {Math.round(sessionBpm)} BPM
-                isn&apos;t one of them, so the video runs free instead of being yanked back into
-                place.
+                {t("youtube.runs_free", { bpm: Math.round(sessionBpm) })}
               </p>
               {tempoFixes}
             </>
           )}
           <div>
             <button type='button' onClick={() => setYouTubeVideoId(null)} className={buttonClass}>
-              Change video
+              {t("video.change")}
             </button>
           </div>
         </>
       ) : (
         <>
-          <span className={panelTitle}>Paste the song&apos;s YouTube link</span>
+          <span className={panelTitle}>{t("youtube.paste")}</span>
           {videoPicker}
         </>
       )}
@@ -642,7 +625,7 @@ export function BackingTrackBar({
     <div className='flex flex-col gap-4'>
       <div className='flex flex-col gap-2.5'>
         {sourceSwitch}
-        <p className={panelText}>{SOURCES.find(({ value }) => value === source)?.description}</p>
+        <p className={panelText}>{t(`sources.${source}.description`)}</p>
       </div>
 
       {source === "youtube" && youtubePanel}
@@ -655,8 +638,7 @@ export function BackingTrackBar({
           </div>
         ) : (
           <p className={cn(panel, panelText)}>
-            Backing-track files live on your computer, so this source is part of the desktop app.
-            In the browser, use a YouTube video instead.
+            {t("sound.desktop_only")}
           </p>
         ))}
 
@@ -676,9 +658,9 @@ export function BackingTrackBar({
   const summary =
     source === "file"
       ? stems.length === 1
-        ? (nameOf(stems[0].trackId) ?? "1 file")
-        : `${stems.length} files`
-      : "YouTube video";
+        ? (nameOf(stems[0].trackId) ?? t("bar.files", { count: 1 }))
+        : t("bar.files", { count: stems.length })
+      : t("sources.youtube.label");
 
   const primaryButton =
     "flex items-center gap-2 rounded-lg bg-cyan-500/15 px-3.5 py-2 text-xs font-semibold text-cyan-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-cyan-500/25";
@@ -711,7 +693,7 @@ export function BackingTrackBar({
             <div className='flex min-w-0 flex-col gap-1'>
               <div className='flex min-w-0 items-baseline gap-2'>
                 <span className='shrink-0 text-sm font-semibold text-zinc-100'>
-                  {hasActiveSource ? "Backing track" : "Play along with the real song"}
+                  {hasActiveSource ? t("bar.title") : t("bar.title_empty")}
                 </span>
                 {hasActiveSource && (
                   <span className='truncate text-xs text-zinc-400'>{summary}</span>
@@ -723,10 +705,10 @@ export function BackingTrackBar({
                   hasActiveSource && !isLinedUp ? "text-amber-400" : "text-zinc-400",
                 )}>
                 {!hasActiveSource
-                  ? "Add a YouTube video or an audio file of this song. It plays under the tab and follows play, pause and every bar you click."
+                  ? t("bar.hint_empty")
                   : !isLinedUp
-                    ? "Not lined up with the tab yet, so it may play ahead or behind. It takes a minute: put bar 1 on the first beat."
-                    : "Lined up with the tab. Drifting while you play? Nudge it with [ and ]."}
+                    ? t("bar.hint_unaligned")
+                    : t("bar.hint_aligned")}
               </p>
             </div>
           </div>
@@ -735,12 +717,12 @@ export function BackingTrackBar({
             {!hasActiveSource ? (
               <button type='button' onClick={() => openAligning(true)} className={primaryButton}>
                 <Plus className='h-3.5 w-3.5' />
-                Add a recording
+                {t("bar.add_recording")}
               </button>
             ) : !isLinedUp ? (
               <button type='button' onClick={() => openAligning(true)} className={primaryButton}>
                 <Crosshair className='h-3.5 w-3.5' />
-                Line up with tab
+                {t("bar.line_up")}
               </button>
             ) : (
               <button
@@ -748,7 +730,7 @@ export function BackingTrackBar({
                 onClick={() => openAligning(true)}
                 className={cn(buttonClass, "flex items-center gap-2")}>
                 <SlidersHorizontal className='h-3.5 w-3.5 text-zinc-400' />
-                Sync &amp; mix
+                {t("bar.sync_mix")}
               </button>
             )}
             {(source === "youtube" || videoOverlay) && youtubeVideoId && cinemaButton}
@@ -779,7 +761,7 @@ export function BackingTrackBar({
           onClick={() => setCinema(false)}
           className='fixed right-6 top-6 z-10 flex items-center gap-2 rounded-lg bg-zinc-950/70 px-3 py-2 text-xs font-medium text-zinc-300 opacity-40 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:opacity-100'>
           <Minimize2 className='h-3.5 w-3.5' />
-          Leave cinema — Esc
+          {t("bar.leave_cinema_esc")}
         </button>
       )}
     </div>

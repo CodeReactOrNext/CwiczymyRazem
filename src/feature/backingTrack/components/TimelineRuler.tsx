@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import type { MutableRefObject } from "react";
 import { useEffect, useRef } from "react";
 
@@ -147,18 +148,25 @@ export function TimelineRuler({
   tempoEditing,
   className,
 }: TimelineWindow & { tempoEditing?: TempoEditing; className?: string }) {
+  const { t } = useTranslation("backing_track");
+  /** Words the canvas paints; read off the params ref like everything else. */
+  const words = {
+    start: t("ruler.start"),
+    onBeat: t("ruler.on_beat"),
+    was: (bpm: string) => t("ruler.was", { bpm }),
+  };
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const sizeRef = useCanvasSize(canvasRef, HEIGHT_PX);
 
   const paramsRef = useRef({
     startTime, effectiveBpm, scoreClockRef, getResumeBeat, sourceBpm, offsetMs, tempoMap,
-    beatsPerBar, windowSec, centreSecOverride, tempoEditing,
+    beatsPerBar, windowSec, centreSecOverride, tempoEditing, words,
   });
   useEffect(() => {
     paramsRef.current = {
       startTime, effectiveBpm, scoreClockRef, getResumeBeat, sourceBpm, offsetMs, tempoMap,
-      beatsPerBar, windowSec, centreSecOverride, tempoEditing,
+      beatsPerBar, windowSec, centreSecOverride, tempoEditing, words,
     };
   });
 
@@ -398,8 +406,8 @@ export function TimelineRuler({
       const label =
         drag.beat === 0
           ? `${(drag.currentSec * 1000).toFixed(0)} ms`
-          : `${formatBpm(nowBpm)}${locked ? "  on beat" : ""}`;
-      const was = drag.beat === 0 ? null : `was ${formatBpm(wasBpm)}`;
+          : `${formatBpm(nowBpm)}${locked ? `  ${p.words.onBeat}` : ""}`;
+      const was = drag.beat === 0 ? null : p.words.was(formatBpm(wasBpm));
 
       ctx.font = "600 11px ui-monospace, monospace";
       const boxW = Math.max(ctx.measureText(label).width, was ? ctx.measureText(was).width : 0) + 12;
@@ -432,7 +440,7 @@ export function TimelineRuler({
       ctx.lineTo(x, HEIGHT_PX);
       ctx.stroke();
 
-      const label = "START";
+      const label = p.words.start;
       const labelW = ctx.measureText(label).width + 10;
       ctx.fillStyle = TIMELINE_COLORS.start;
       ctx.fillRect(x, TEMPO_ROW_PX, labelW, 14);
@@ -625,7 +633,7 @@ export function TimelineRuler({
       ref={canvasRef}
       aria-label={
         tempoEditing
-          ? "Bar ruler — drag a bar line onto the beat you hear, Shift for fine, double-click to unpin it"
+          ? t("ruler.aria")
           : undefined
       }
       aria-hidden={tempoEditing ? undefined : true}
