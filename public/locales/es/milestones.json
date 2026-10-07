@@ -45,5 +45,72 @@
     "claim": "Reclamar +{{reward}}",
     "claimed": "Reclamado",
     "reward": "+{{reward}} de Fama"
+  },
+  "page": {
+    "title": "Hitos",
+    "subtitle": "Recompensas semanales por cumplir objetivos de práctica — {{date}}",
+    "eyebrow": "Práctica",
+    "prev_level": "Nivel anterior",
+    "next_level": "Nivel siguiente",
+    "reached_lc": "alcanzado",
+    "locked_lc": "bloqueado",
+    "in_progress_lc": "en curso",
+    "reward_ready": "Recompensa lista para reclamar",
+    "reward_claimed": "Recompensa reclamada",
+    "reached": "Alcanzado",
+    "current_goal": "Objetivo actual",
+    "locked": "Bloqueado",
+    "reached_of": "{{done}}/{{total}} alcanzados",
+    "all_unlocked": "Todos los niveles desbloqueados — ¡eres un Virtuoso!",
+    "unlocks_at": "Se desbloquea en el nivel {{lvl}}",
+    "you_are_level": "Eres nivel {{lvl}}. Practicar lo sube.",
+    "you_are_level_cost": "Eres nivel {{lvl}}. Practicar lo sube — luego desbloquearlo cuesta {{cost}} Fame.",
+    "unlock_once": "Desbloquear una vez por",
+    "need_more": "(te faltan {{count}})",
+    "claim_reward": "Reclamar recompensa",
+    "claimed_line": "{{reward}} reclamados — este nivel vuelve a pagar la próxima semana.",
+    "reward_line": "Recompensa: {{reward}} — reclámala cuando cumplas el objetivo.",
+    "goal_complete": "Objetivo cumplido",
+    "goal_this_week": "Tu objetivo de esta semana",
+    "claim": "Reclamar",
+    "cost_once": "{{cost}} una vez",
+    "per_week": "/sem.",
+    "percent_done": "{{percent}} % hecho",
+    "min_goal": "objetivo: {{min}} min",
+    "min_plus": "{{min}}+ min",
+    "bars_hint": "Cuenta cada día con {{min}} de práctica — las barras verdes son los días cumplidos.",
+    "streak_hint": "Practica {{rule}} — un día sin practicar reinicia la racha.",
+    "streak_rule": "15+ min cada día seguido",
+    "cats_hint": "Un día solo cuenta cuando {{rule}}.",
+    "cats_rule": "las 4 categorías llegan a 15+ min",
+    "streak_cats_hint": "Cada barra es una categoría — llena {{rule}}.",
+    "streak_cats_rule": "las 4 hasta 15+ min, cada día seguido",
+    "investment": "Inversión única. Se paga sola en {{weeks}}, y después sigues reclamando {{reward}} en que cumplas el objetivo — para siempre.",
+    "weeks": "{{count}} semanas",
+    "weeks_one": "1 semana",
+    "reward_weekly": "+{{reward}} Fame cada semana",
+    "dismiss": "Cerrar",
+    "how_it_works": "Cómo funciona",
+    "rules": {
+      "0": {
+        "title": "Alcánzalo y desbloquéalo una vez",
+        "desc": "cada nivel se abre a partir de cierto nivel de tu cuenta y luego cuesta Fame una sola vez — después es tuyo para siempre. El primero es gratis."
+      },
+      "1": {
+        "title": "Practica",
+        "desc": "cumple el objetivo semanal de ese nivel."
+      },
+      "2": {
+        "title": "Reclama",
+        "desc": "recoge la recompensa de Fame — otra vez cada semana que cumplas el objetivo."
+      }
+    },
+    "example": "Ejemplo: Groove cuesta 40 Fame una vez y paga +30 a la semana, así que se paga solo en la segunda semana. Los objetivos y las recompensas se reinician cada semana — una por nivel a la semana, los niveles altos pagan más.",
+    "toast_locked": "{{name}} se desbloquea en el nivel {{lvl}} — eres nivel {{player}}",
+    "toast_no_fame": "No tienes suficiente Fame (necesitas {{cost}}, tienes {{fame}})",
+    "toast_unlocked": "¡{{name}} desbloqueado!",
+    "toast_purchase_failed": "La compra falló",
+    "toast_claimed": "+{{reward}} Fame de {{name}}",
+    "toast_claim_failed": "No se pudo reclamar"
   }
 }

@@ -45,5 +45,72 @@
     "claim": "Claim +{{reward}}",
     "claimed": "Claimed",
     "reward": "+{{reward}} Fame"
+  },
+  "page": {
+    "title": "Milestones",
+    "subtitle": "Weekly rewards for hitting practice goals — {{date}}",
+    "eyebrow": "Practice",
+    "prev_level": "Previous level",
+    "next_level": "Next level",
+    "reached_lc": "reached",
+    "locked_lc": "locked",
+    "in_progress_lc": "in progress",
+    "reward_ready": "Reward ready to claim",
+    "reward_claimed": "Reward claimed",
+    "reached": "Reached",
+    "current_goal": "Current goal",
+    "locked": "Locked",
+    "reached_of": "{{done}}/{{total}} reached",
+    "all_unlocked": "All levels unlocked — you're a Virtuoso!",
+    "unlocks_at": "Unlocks at level {{lvl}}",
+    "you_are_level": "You're level {{lvl}}. Practice raises it.",
+    "you_are_level_cost": "You're level {{lvl}}. Practice raises it — then it's {{cost}} Fame to unlock.",
+    "unlock_once": "Unlock once for",
+    "need_more": "(need {{count}} more)",
+    "claim_reward": "Claim reward",
+    "claimed_line": "{{reward}} claimed — this level pays again next week.",
+    "reward_line": "Reward: {{reward}} — claim it once the goal is done.",
+    "goal_complete": "Goal complete",
+    "goal_this_week": "Your goal this week",
+    "claim": "Claim",
+    "cost_once": "{{cost}} once",
+    "per_week": "/wk",
+    "percent_done": "{{percent}}% done",
+    "min_goal": "{{min}} min goal",
+    "min_plus": "{{min}}+ min",
+    "bars_hint": "Each day with {{min}} of practice counts — green bars are days you completed.",
+    "streak_hint": "Practice {{rule}} — a skipped day resets the streak.",
+    "streak_rule": "15+ min every day in a row",
+    "cats_hint": "A day counts only when {{rule}}.",
+    "cats_rule": "all 4 categories reach 15+ min",
+    "streak_cats_hint": "Each bar is one category — fill {{rule}}.",
+    "streak_cats_rule": "all 4 to 15+ min, every day in a row",
+    "investment": "One-time investment. It pays for itself in {{weeks}}, then you keep claiming {{reward}} you hit the goal — for good.",
+    "weeks": "{{count}} weeks",
+    "weeks_one": "1 week",
+    "reward_weekly": "+{{reward}} Fame every week",
+    "dismiss": "Dismiss",
+    "how_it_works": "How it works",
+    "rules": {
+      "0": {
+        "title": "Reach it, then unlock it once",
+        "desc": "each level opens at a practice level of your own, and then costs Fame once — after that it's yours for good. The first one is free."
+      },
+      "1": {
+        "title": "Practice",
+        "desc": "hit that level's weekly goal."
+      },
+      "2": {
+        "title": "Claim",
+        "desc": "collect the Fame reward — again every week you hit the goal."
+      }
+    },
+    "example": "Example: Groove costs 40 Fame once and pays +30 a week, so it pays for itself in week two. Goals and claims reset every week — one claim per level a week, higher levels pay more.",
+    "toast_locked": "{{name}} unlocks at level {{lvl}} — you're level {{player}}",
+    "toast_no_fame": "Not enough Fame (need {{cost}}, have {{fame}})",
+    "toast_unlocked": "{{name}} unlocked!",
+    "toast_purchase_failed": "Purchase failed",
+    "toast_claimed": "+{{reward}} Fame from {{name}}",
+    "toast_claim_failed": "Claim failed"
   }
 }

@@ -12,13 +12,16 @@ import {
 } from "feature/aiSummary/utils/milestoneLogic";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
-import { unlocksAtLevelLabel } from "feature/progression/data/levelLock";
 import {
   addFame,
   deductFame,
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
+import { Interpolate } from "lib/i18n/Interpolate";
+import type { Translate } from "lib/i18n/translate";
 import {
   Check, CheckCircle2, ChevronLeft, ChevronRight, Info,
   Lock, Sparkles, TrendingUp, Trophy, X,
@@ -37,6 +40,18 @@ function fmtMin(m: number) {
   const rem = m % 60;
   return rem > 0 ? `${h}h ${rem} min` : `${h}h`;
 }
+
+/** Level names and goals are catalogued by id in `milestones:levels`. */
+const levelName = (t: Translate, level: { id: number; name: string }) =>
+  t(`levels.${level.id}.name`, level.name);
+
+/** Category labels, keyed the way `PRACTICE_CATEGORIES` keys them. */
+const CAT_KEY: Record<string, string> = {
+  tech: "technique",
+  theory: "theory",
+  hearing: "hearing",
+  creat: "creativity",
+};
 
 
 // ─── Progress Level System ────────────────────────────────────────────────────
@@ -58,6 +73,7 @@ function PracticeProgressTracker({
   claimedSet: Set<number>;
   playerLvl: number;
 }) {
+  const { t } = useTranslation("milestones");
   const data = useMemo(() => computeProgressData(logs, today), [logs, today]);
 
   const levelStatuses = LEVELS.map(l => ({
@@ -94,7 +110,7 @@ function PracticeProgressTracker({
         <button
           onClick={() => onPreviewChange(Math.max(0, activeIdx - 1))}
           disabled={activeIdx === 0}
-          aria-label="Previous level"
+          aria-label={t("page.prev_level")}
           className="mt-3.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
         >
           <ChevronLeft size={20} strokeWidth={2.5} />
@@ -131,7 +147,7 @@ function PracticeProgressTracker({
               ref={isCurrent ? activeRef : undefined}
               type="button"
               onClick={() => onPreviewChange(idx)}
-              aria-label={`${level.name} — ${level.met ? "reached" : showLock ? "locked" : "in progress"}`}
+              aria-label={`${levelName(t, level)} — ${level.met ? t("page.reached_lc") : showLock ? t("page.locked_lc") : t("page.in_progress_lc")}`}
               className="group relative flex w-[80px] shrink-0 snap-center flex-col items-center gap-3 outline-none sm:w-auto sm:flex-1 sm:min-w-0"
             >
               {/* trail segment linking this node to the previous one */}
@@ -198,13 +214,13 @@ function PracticeProgressTracker({
                 {/* reward status: amber pulse = uncollected reward, emerald = claimed */}
                 {isClaimable && (
                   <span
-                    aria-label="Reward ready to claim"
+                    aria-label={t("page.reward_ready")}
                     className="absolute -right-0.5 -top-0.5 z-20 h-3.5 w-3.5 rounded-full bg-amber-500 animate-pulse ring-2 ring-zinc-900"
                   />
                 )}
                 {isClaimed && (
                   <span
-                    aria-label="Reward claimed"
+                    aria-label={t("page.reward_claimed")}
                     className="absolute -right-0.5 -top-0.5 z-20 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-zinc-900"
                   >
                     <Check size={9} strokeWidth={3.5} className="text-zinc-950" />
@@ -216,9 +232,9 @@ function PracticeProgressTracker({
               <span
                 className="w-full max-w-[72px] truncate px-0.5 text-center text-[11px] font-semibold leading-none"
                 style={{ color: isCurrent ? "#fafafa" : level.met ? "#d4d4d8" : "#8e8e98" }}
-                title={level.name}
+                title={levelName(t, level)}
               >
-                {level.short ?? level.name.split(" ")[0]}
+                {t(`levels.${level.id}.short`, level.short ?? levelName(t, level).split(" ")[0])}
               </span>
             </button>
           );
@@ -228,7 +244,7 @@ function PracticeProgressTracker({
         <button
           onClick={() => onPreviewChange(Math.min(LEVELS.length - 1, activeIdx + 1))}
           disabled={activeIdx === LEVELS.length - 1}
-          aria-label="Next level"
+          aria-label={t("page.next_level")}
           className="mt-3.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
         >
           <ChevronRight size={20} strokeWidth={2.5} />
@@ -239,18 +255,18 @@ function PracticeProgressTracker({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-zinc-800 pt-4">
         <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
           <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: GREEN }} />
-          Reached
+          {t("page.reached")}
         </span>
         <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
           <span className="h-2.5 w-2.5 rounded-full border-2 bg-transparent" style={{ borderColor: activeColor }} />
-          Current goal
+          {t("page.current_goal")}
         </span>
         <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
           <Lock size={11} className="text-zinc-500" />
-          Locked
+          {t("page.locked")}
         </span>
         <span className="ml-auto text-[11px] font-semibold tabular-nums text-zinc-500">
-          {metCount}/{LEVELS.length} reached
+          {t("page.reached_of", { done: metCount, total: LEVELS.length })}
         </span>
       </div>
     </div>
@@ -297,6 +313,10 @@ function LevelGoalCard({
   onClaim: (levelId: number) => void;
   playerLvl: number;
 }) {
+  const { t } = useTranslation(["milestones", "common"]);
+  const intl = useIntlLocale() ?? "en-US";
+  const catLabel = (cat: { k: string; label: string }) =>
+    t(`common:categories.${CAT_KEY[cat.k]}`, cat.label);
   const progressData  = useMemo(() => computeProgressData(logs, today), [logs, today]);
   const levelStatuses = useMemo(
     () => LEVELS.map(l => ({ ...l, met: l.isMet(progressData), progress: l.getProgress(progressData) })),
@@ -311,7 +331,7 @@ function LevelGoalCard({
     return (
       <div className="flex items-center gap-3 rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm px-5 py-4">
         <Trophy size={20} className="text-amber-400" />
-        <p className="text-sm font-semibold text-zinc-200">All levels unlocked — you&apos;re a Virtuoso!</p>
+        <p className="text-sm font-semibold text-zinc-200">{t("page.all_unlocked")}</p>
       </div>
     );
   }
@@ -363,7 +383,7 @@ function LevelGoalCard({
     const isToday  = isSameDay(day, today);
     const isFuture = day.getTime() > today.getTime();
     return {
-      label: day.toLocaleDateString("en-US", { weekday: "short" }),
+      label: day.toLocaleDateString(intl, { weekday: "short" }),
       minutes, ok, isToday, isFuture,
       isSelected: isSameDay(day, displayDate),
     };
@@ -392,11 +412,12 @@ function LevelGoalCard({
           style={{ backgroundColor: "#27272a", color: "#a1a1aa", border: "2px solid #3f3f46" }}
         >
           <Lock size={18} />
-          <span>{unlocksAtLevelLabel(lockedLvl)}</span>
+          <span>{t("page.unlocks_at", { lvl: lockedLvl })}</span>
         </div>
         <p className="text-center text-[12px] leading-snug text-zinc-500">
-          You&apos;re level {playerLvl}. Practice raises it
-          {nextLevel.cost > 0 && <> — then it&apos;s {nextLevel.cost} Fame to unlock</>}.
+          {nextLevel.cost > 0
+            ? t("page.you_are_level_cost", { lvl: playerLvl, cost: nextLevel.cost })
+            : t("page.you_are_level", { lvl: playerLvl })}
         </p>
       </div>
     );
@@ -414,10 +435,14 @@ function LevelGoalCard({
         }}
       >
         <Lock size={18} />
-        <span>Unlock once for</span>
+        <span>{t("page.unlock_once")}</span>
         <img src="/images/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
         <span className="tabular-nums">{nextLevel.cost}</span>
-        {!canAfford && <span className="text-xs font-medium text-zinc-500">(need {nextLevel.cost - fame} more)</span>}
+        {!canAfford && (
+          <span className="text-xs font-medium text-zinc-500">
+            {t("page.need_more", { count: nextLevel.cost - fame })}
+          </span>
+        )}
       </button>
     );
   } else if (canClaim) {
@@ -434,7 +459,7 @@ function LevelGoalCard({
         }}
       >
         <Sparkles size={18} />
-        <span>Claim reward</span>
+        <span>{t("page.claim_reward")}</span>
         <img src="/images/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
         <span className="tabular-nums">+{nextLevel.reward}</span>
       </button>
@@ -445,7 +470,16 @@ function LevelGoalCard({
       <p className="flex items-center gap-2 text-[13px] text-zinc-500">
         <CheckCircle2 size={15} className="shrink-0 text-emerald-500" />
         <span>
-          <span className="font-semibold text-zinc-300">+{nextLevel.reward} Fame</span> claimed — this level pays again next week.
+          <Interpolate
+            text={t("page.claimed_line")}
+            values={{
+              reward: (
+                <span className="font-semibold text-zinc-300">
+                  {t("card.reward", { reward: nextLevel.reward })}
+                </span>
+              ),
+            }}
+          />
         </span>
       </p>
     );
@@ -455,7 +489,16 @@ function LevelGoalCard({
       <p className="flex items-center gap-2 text-[13px] text-zinc-500">
         <img src="/images/coin.png" alt="Fame" className="h-4 w-4 shrink-0 object-contain" />
         <span>
-          Reward: <span className="font-semibold text-amber-400">+{nextLevel.reward} Fame</span> — claim it once the goal is done.
+          <Interpolate
+            text={t("page.reward_line")}
+            values={{
+              reward: (
+                <span className="font-semibold text-amber-400">
+                  {t("card.reward", { reward: nextLevel.reward })}
+                </span>
+              ),
+            }}
+          />
         </span>
       </p>
     );
@@ -477,9 +520,11 @@ function LevelGoalCard({
       </div>
       <div className="min-w-0 flex-1 leading-tight">
         <p className="text-xs font-medium" style={{ color: isMet ? goalAccent : "#a1a1aa" }}>
-          {isMet ? "Goal complete" : "Your goal this week"}
+          {isMet ? t("page.goal_complete") : t("page.goal_this_week")}
         </p>
-        <p className="mt-0.5 text-lg font-bold leading-snug text-zinc-50">{nextLevel.req}</p>
+        <p className="mt-0.5 text-lg font-bold leading-snug text-zinc-50">
+          {t(`levels.${nextLevel.id}.req`, nextLevel.req)}
+        </p>
       </div>
     </div>
   );
@@ -501,12 +546,18 @@ function LevelGoalCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-sm font-bold text-zinc-100 leading-tight">{nextLevel.name}</p>
+            <p className="text-sm font-bold text-zinc-100 leading-tight">
+              {levelName(t, nextLevel)}
+            </p>
             {isOwned && isClaimedThisWeek && (
-              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">Claimed</span>
+              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">
+                {t("card.claimed")}
+              </span>
             )}
             {isOwned && !isClaimedThisWeek && isMet && (
-              <span className="animate-pulse rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">Claim</span>
+              <span className="animate-pulse rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
+                {t("page.claim")}
+              </span>
             )}
           </div>
         </div>
@@ -516,12 +567,14 @@ function LevelGoalCard({
             <>
               <p className="flex items-center justify-end gap-1 text-xs font-semibold text-zinc-500 line-through">
                 <img src="/images/coin.png" alt="" className="h-3 w-3 object-contain opacity-50" />
-                <span className="tabular-nums">{nextLevel.cost} once</span>
+                <span className="tabular-nums">
+                  {t("page.cost_once", { cost: nextLevel.cost })}
+                </span>
               </p>
               <p className="mt-0.5 flex items-center justify-end gap-1 font-black leading-none text-amber-400">
                 <img src="/images/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
                 <span className="text-2xl tabular-nums">+{nextLevel.reward}</span>
-                <span className="text-sm text-zinc-500">/wk</span>
+                <span className="text-sm text-zinc-500">{t("page.per_week")}</span>
               </p>
             </>
           ) : (
@@ -530,7 +583,9 @@ function LevelGoalCard({
                 <span className="text-3xl">{value}</span>
                 <span className="text-lg text-zinc-600">/{max}</span>
               </p>
-              <p className="text-[10px] text-zinc-600 mt-1">{Math.round((value / max) * 100)}% done</p>
+              <p className="text-[10px] text-zinc-600 mt-1">
+                {t("page.percent_done", { percent: Math.round((value / max) * 100) })}
+              </p>
             </>
           )}
         </div>
@@ -568,7 +623,7 @@ function LevelGoalCard({
             >
               <div className="flex-1 border-t border-dashed border-white/25" />
               <span className="-mb-2 ml-2 rounded bg-zinc-900/70 px-1.5 py-0.5 text-[11px] font-semibold text-white/45">
-                {dayGoalMin} min goal
+                {t("page.min_goal", { min: dayGoalMin })}
               </span>
             </div>
             <div className="flex items-end gap-1.5 sm:gap-2.5">
@@ -640,7 +695,7 @@ function LevelGoalCard({
                         ) : null}
                       </span>
                       <span className="text-xs sm:text-sm font-bold transition-colors" style={{ color: labelColor }}>
-                        <span className="sm:hidden">{day.toLocaleDateString("en-US", { weekday: "narrow" })}</span>
+                        <span className="sm:hidden">{day.toLocaleDateString(intl, { weekday: "narrow" })}</span>
                         <span className="hidden sm:inline">{entry.label}</span>
                       </span>
                     </div>
@@ -651,7 +706,18 @@ function LevelGoalCard({
             </div>
             <p className="mt-5 flex items-center gap-1.5 text-[11px] leading-snug text-zinc-500">
               <CheckCircle2 size={12} style={{ color: GREEN }} className="shrink-0" />
-              <span>Each day with <span className="font-semibold text-zinc-300">{dayGoalMin}+ min</span> of practice counts — green bars are days you completed.</span>
+              <span>
+                <Interpolate
+                  text={t("page.bars_hint")}
+                  values={{
+                    min: (
+                      <span className="font-semibold text-zinc-300">
+                        {t("page.min_plus", { min: dayGoalMin })}
+                      </span>
+                    ),
+                  }}
+                />
+              </span>
             </p>
           </div>
         );
@@ -703,7 +769,7 @@ function LevelGoalCard({
                     )}
                   </div>
                   <span className="text-sm font-bold transition-colors" style={{ color: isShown ? color : "#a1a1aa" }}>
-                    {day.toLocaleDateString("en-US", { weekday: "narrow" })}
+                    {day.toLocaleDateString(intl, { weekday: "narrow" })}
                   </span>
                 </button>
               );
@@ -711,7 +777,18 @@ function LevelGoalCard({
           </div>
           <p className="flex items-center gap-1.5 text-[10px] leading-snug text-zinc-500">
             <CheckCircle2 size={11} style={{ color }} className="shrink-0" />
-            <span>Practice <span className="font-semibold text-zinc-300">15+ min every day in a row</span> — a skipped day resets the streak.</span>
+            <span>
+              <Interpolate
+                text={t("page.streak_hint")}
+                values={{
+                  rule: (
+                    <span className="font-semibold text-zinc-300">
+                      {t("page.streak_rule")}
+                    </span>
+                  ),
+                }}
+              />
+            </span>
           </p>
         </div>
       )}
@@ -747,7 +824,7 @@ function LevelGoalCard({
                     {CATS.map((cat, ci) => (
                       <div
                         key={cat.k}
-                        title={`${cat.label}${met[ci] ? " ✓" : ""}`}
+                        title={`${catLabel(cat)}${met[ci] ? " ✓" : ""}`}
                         className="h-3 w-3 sm:h-4 sm:w-4 rounded-full transition-all"
                         style={{
                           backgroundColor: met[ci] ? cat.color : "#27272a",
@@ -764,7 +841,7 @@ function LevelGoalCard({
                     <span className="text-sm font-bold tabular-nums text-zinc-400">{metCount}/4</span>
                   )}
                   <span className="text-sm font-bold" style={{ color: isShown || allMet ? color : "#a1a1aa" }}>
-                    {day.toLocaleDateString("en-US", { weekday: "narrow" })}
+                    {day.toLocaleDateString(intl, { weekday: "narrow" })}
                   </span>
                 </button>
               );
@@ -772,13 +849,24 @@ function LevelGoalCard({
           </div>
           <p className="flex items-center gap-1.5 text-[10px] leading-snug text-zinc-500">
             <CheckCircle2 size={11} style={{ color }} className="shrink-0" />
-            <span>A day counts only when <span className="font-semibold text-zinc-300">all 4 categories reach 15+ min</span>.</span>
+            <span>
+              <Interpolate
+                text={t("page.cats_hint")}
+                values={{
+                  rule: (
+                    <span className="font-semibold text-zinc-300">
+                      {t("page.cats_rule")}
+                    </span>
+                  ),
+                }}
+              />
+            </span>
           </p>
           <div className="flex gap-3 flex-wrap">
             {CATS.map(cat => (
               <div key={cat.k} className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
-                <span className="text-xs font-medium text-zinc-400">{cat.label}</span>
+                <span className="text-xs font-medium text-zinc-400">{catLabel(cat)}</span>
               </div>
             ))}
           </div>
@@ -847,8 +935,8 @@ function LevelGoalCard({
                     className="text-xs sm:text-sm font-bold transition-colors"
                     style={{ color: isShown ? color : allMet ? color : isToday ? "#e4e4e7" : "#a1a1aa" }}
                   >
-                    <span className="sm:hidden">{day.toLocaleDateString("en-US", { weekday: "narrow" })}</span>
-                    <span className="hidden sm:inline">{day.toLocaleDateString("en-US", { weekday: "short" })}</span>
+                    <span className="sm:hidden">{day.toLocaleDateString(intl, { weekday: "narrow" })}</span>
+                    <span className="hidden sm:inline">{day.toLocaleDateString(intl, { weekday: "short" })}</span>
                   </span>
                 </button>
               );
@@ -856,13 +944,24 @@ function LevelGoalCard({
           </div>
           <p className="flex items-center gap-1.5 text-[10px] leading-snug text-zinc-500">
             <CheckCircle2 size={11} style={{ color }} className="shrink-0" />
-            <span>Each bar is one category — fill <span className="font-semibold text-zinc-300">all 4 to 15+ min, every day in a row</span>.</span>
+            <span>
+              <Interpolate
+                text={t("page.streak_cats_hint")}
+                values={{
+                  rule: (
+                    <span className="font-semibold text-zinc-300">
+                      {t("page.streak_cats_rule")}
+                    </span>
+                  ),
+                }}
+              />
+            </span>
           </p>
           <div className="flex gap-3 flex-wrap">
             {CATS.map(cat => (
               <div key={cat.k} className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
-                <span className="text-xs font-medium text-zinc-400">{cat.label}</span>
+                <span className="text-xs font-medium text-zinc-400">{catLabel(cat)}</span>
               </div>
             ))}
           </div>
@@ -882,9 +981,21 @@ function LevelGoalCard({
               <div className="flex w-full max-w-md items-start gap-2.5">
                 <TrendingUp size={16} className="mt-0.5 shrink-0 text-emerald-400" aria-hidden />
                 <p className="text-[12px] leading-snug text-zinc-400">
-                  One-time investment. It pays for itself in{" "}
-                  <span className="font-semibold text-zinc-200">{weeks} week{weeks > 1 ? "s" : ""}</span>, then you keep claiming{" "}
-                  <span className="font-semibold text-amber-400">+{nextLevel.reward} Fame every week</span> you hit the goal — for good.
+                  <Interpolate
+                    text={t("page.investment")}
+                    values={{
+                      weeks: (
+                        <span className="font-semibold text-zinc-200">
+                          {t("page.weeks", { count: weeks })}
+                        </span>
+                      ),
+                      reward: (
+                        <span className="font-semibold text-amber-400">
+                          {t("page.reward_weekly", { reward: nextLevel.reward })}
+                        </span>
+                      ),
+                    }}
+                  />
                 </p>
               </div>
             );
@@ -903,6 +1014,7 @@ const RULES_DISMISSED_KEY = "practiceLevels.rulesDismissed";
 // Quiet, manual-style instructions — plain numbered text, not a callout that
 // competes with the milestones themselves.
 function RulesAlert() {
+  const { t } = useTranslation("milestones");
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
@@ -916,25 +1028,26 @@ function RulesAlert() {
     setDismissed(true);
   };
 
-  const steps: { title: string; desc: React.ReactNode }[] = [
-    { title: "Reach it, then unlock it once", desc: <>each level opens at a practice level of your own, and then costs Fame once — after that it&apos;s yours for good. The first one is free.</> },
-    { title: "Practice",            desc: <>hit that level&apos;s weekly goal.</> },
-    { title: "Claim",               desc: <>collect the Fame reward — again every week you hit the goal.</> },
-  ];
+  const steps: { title: string; desc: React.ReactNode }[] = [0, 1, 2].map(
+    (i) => ({
+      title: t(`page.rules.${i}.title`),
+      desc: t(`page.rules.${i}.desc`),
+    }),
+  );
 
   return (
     <div className="relative rounded-lg border border-zinc-800 bg-zinc-900/50 px-6 py-5 pr-14 sm:px-7 sm:py-6">
       <button
         onClick={dismiss}
         className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-300 transition-colors"
-        aria-label="Dismiss"
+        aria-label={t("page.dismiss")}
       >
         <X size={16} />
       </button>
 
       <p className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
         <Info size={15} className="text-zinc-400" />
-        How it works
+        {t("page.how_it_works")}
       </p>
 
       <ol className="mt-4 space-y-2.5 text-[13px] leading-relaxed text-zinc-400">
@@ -949,8 +1062,7 @@ function RulesAlert() {
       </ol>
 
       <p className="mt-5 border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-500">
-        Example: Groove costs 40 Fame once and pays +30 a week, so it pays for itself in week two.
-        Goals and claims reset every week — one claim per level a week, higher levels pay more.
+        {t("page.example")}
       </p>
     </div>
   );
@@ -959,6 +1071,8 @@ function RulesAlert() {
 // ─── SummaryView ──────────────────────────────────────────────────────────────
 
 export const SummaryView = () => {
+  const { t } = useTranslation("milestones");
+  const intl = useIntlLocale() ?? "en-US";
   const userAuth  = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
   const dispatch  = useAppDispatch();
@@ -1017,11 +1131,17 @@ export const SummaryView = () => {
     // same reason: this is the one door every purchase goes through.
     const lockedLvl = milestoneLockedAtLvl(lvl, playerLvl, ownedSet.has(levelId));
     if (lockedLvl != null) {
-      toast.error(`${lvl.name} ${unlocksAtLevelLabel(lockedLvl).toLowerCase()} — you're level ${playerLvl}`);
+      toast.error(
+        t("page.toast_locked", {
+          name: levelName(t, lvl),
+          lvl: lockedLvl,
+          player: playerLvl,
+        }),
+      );
       return;
     }
     if (fame < lvl.cost) {
-      toast.error(`Not enough Fame (need ${lvl.cost}, have ${fame})`);
+      toast.error(t("page.toast_no_fame", { cost: lvl.cost, fame }));
       return;
     }
     setBusyLevelId(levelId);
@@ -1030,11 +1150,11 @@ export const SummaryView = () => {
       dispatch(deductFame(lvl.cost));
       setLevelsState(s => ({ ...s, ownedLevelIds: Array.from(new Set([...s.ownedLevelIds, levelId])) }));
       await firebasePurchaseLevel(userAuth, levelId, lvl.cost, prevOwned);
-      toast.success(`${lvl.name} unlocked!`);
+      toast.success(t("page.toast_unlocked", { name: levelName(t, lvl) }));
     } catch (err) {
       dispatch(deductFame(-lvl.cost));
       setLevelsState(s => ({ ...s, ownedLevelIds: prevOwned }));
-      toast.error("Purchase failed");
+      toast.error(t("page.toast_purchase_failed"));
       console.error(err);
     } finally {
       setBusyLevelId(null);
@@ -1054,27 +1174,29 @@ export const SummaryView = () => {
         claims: { ...s.claims, [levelId]: { weekKey: currentWeekKey, claimedAt: new Date().toISOString() } },
       }));
       await firebaseClaimLevel(userAuth, levelId, currentWeekKey, lvl.reward);
-      toast.success(`+${lvl.reward} Fame from ${lvl.name}`);
+      toast.success(
+        t("page.toast_claimed", { reward: lvl.reward, name: levelName(t, lvl) }),
+      );
     } catch (err) {
       dispatch(addFame(-lvl.reward));
       setLevelsState(s => ({ ...s, claims: prevClaims }));
-      toast.error("Claim failed");
+      toast.error(t("page.toast_claim_failed"));
       console.error(err);
     } finally {
       setBusyLevelId(null);
     }
   };
 
-  const subtitleDate = displayDate.toLocaleDateString("en-US", {
+  const subtitleDate = displayDate.toLocaleDateString(intl, {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   });
 
   return (
     <div className="flex w-full flex-col">
       <HeroBanner
-        title="Milestones"
-        subtitle={`Weekly rewards for hitting practice goals — ${subtitleDate}`}
-        eyebrow="Practice"
+        title={t("page.title")}
+        subtitle={t("page.subtitle", { date: subtitleDate })}
+        eyebrow={t("page.eyebrow")}
         backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
