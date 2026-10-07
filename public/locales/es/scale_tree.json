@@ -1,0 +1,101 @@
+{
+  "view": {
+    "close_sidebar": "Cerrar panel",
+    "open_selector": "Abrir selector de escalas",
+    "scales": "Escalas",
+    "back_to_practice": "Volver a la práctica",
+    "practice": "Práctica"
+  },
+  "scales": {
+    "minor_pentatonic": "Pentatónica menor",
+    "major_pentatonic": "Pentatónica mayor",
+    "minor": "Menor natural",
+    "major": "Escala mayor",
+    "dorian": "Modo dórico",
+    "phrygian": "Modo frigio",
+    "mixolydian": "Modo mixolidio",
+    "lydian": "Modo lidio",
+    "locrian": "Modo locrio"
+  },
+  "families": {
+    "pentatonic": {
+      "tree": "Árbol pentatónico",
+      "label": "Pentatónica",
+      "group": "Pentatónicas"
+    },
+    "diatonic": {
+      "tree": "Árbol diatónico",
+      "label": "Escala diatónica",
+      "group": "Diatónicas"
+    },
+    "mode": {
+      "tree": "Árbol de modos",
+      "label": "Modo",
+      "group": "Modos"
+    }
+  },
+  "grid": {
+    "title": "{{scale}} de {{root}}",
+    "done": "hecho",
+    "key": "Tonalidad"
+  },
+  "shape": {
+    "box": "Caja {{n}}",
+    "fret": "Traste {{n}}",
+    "fret_lc": "traste {{n}}"
+  },
+  "patterns": {
+    "ascending": "Ascendente",
+    "descending": "Descendente",
+    "ascending_descending": "Ascendente + descendente",
+    "intervals_thirds": "Terceras",
+    "intervals_fourths": "Cuartas",
+    "sequence_3_notes": "Secuencia 3",
+    "sequence_4_notes": "Secuencia 4"
+  },
+  "patterns_short": {
+    "ascending": "ascendente",
+    "descending": "descendente",
+    "ascending_descending": "sube y baja",
+    "intervals_thirds": "terceras",
+    "intervals_fourths": "cuartas",
+    "sequence_3_notes": "sec. 3 notas",
+    "sequence_4_notes": "sec. 4 notas"
+  },
+  "node": {
+    "record": "Récord: {{bpm}} BPM",
+    "reward": "Recompensa",
+    "single_string": "Una cuerda",
+    "single_string_cap": "Una cuerda"
+  },
+  "reward": {
+    "collected": "Recompensa de la caja recogida",
+    "collect": "Caja superada — recógela",
+    "left_final": "Quedan {{count}} formas — esta caja completa el árbol",
+    "left_final_one": "Queda 1 forma — esta caja completa el árbol",
+    "left": "Quedan {{count}} formas en esta caja",
+    "left_one": "Queda 1 forma en esta caja"
+  },
+  "modal": {
+    "close": "Cerrar",
+    "string": "Cuerda {{n}}",
+    "frets": "Trastes {{low}}–{{high}}",
+    "key_of": "Tonalidad de {{root}}",
+    "locked": "Completa los ejercicios requeridos para desbloquear",
+    "practice": "Practicar",
+    "retake": "Repetir",
+    "exam": "Examen",
+    "record_run": "Intento de récord",
+    "no_record": "Sin récord todavía",
+    "lower_tempo": "Bajar el tempo objetivo",
+    "raise_tempo": "Subir el tempo objetivo",
+    "beat_it": "Superarlo",
+    "set_record": "Marcar récord",
+    "clean_run": "Solo cuenta un intento limpio — mantén el tempo hasta el final y se guarda el más rápido.",
+    "pass_exam": "Aprueba el examen para abrir intentos de récord por encima de {{bpm}} BPM."
+  },
+  "sidebar": {
+    "title": "Selector de escalas",
+    "body": "Elige una escala para ver su árbol y sus formas."
+  }
+}

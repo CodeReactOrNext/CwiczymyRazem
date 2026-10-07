@@ -32,6 +32,7 @@ import practice_log from "../../../public/locales/en/practice_log.json";
 import profile from "../../../public/locales/en/profile.json";
 import recordings from "../../../public/locales/en/recordings.json";
 import report from "../../../public/locales/en/report.json";
+import scale_tree from "../../../public/locales/en/scale_tree.json";
 import session from "../../../public/locales/en/session.json";
 import session_summary from "../../../public/locales/en/session_summary.json";
 import settings from "../../../public/locales/en/settings.json";
@@ -81,6 +82,7 @@ export const TRANSLATION_NAMESPACES = [
   "profile",
   "recordings",
   "report",
+  "scale_tree",
   "session",
   "session_summary",
   "settings",
@@ -148,6 +150,7 @@ export const EN_CATALOG: LocaleCatalog = {
   profile,
   recordings,
   report,
+  scale_tree,
   session,
   session_summary,
   settings,

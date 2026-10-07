@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslation } from 'hooks/useTranslation';
 import { ArrowLeft, Menu, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -24,6 +25,7 @@ const PREFIX_TO_SCALE: Record<string, string> = {
 };
 
 export function ScaleTreeView() {
+  const { t } = useTranslation('scale_tree');
   const router = useRouter();
   const {
     rfNodes,
@@ -156,7 +158,7 @@ export function ScaleTreeView() {
                 <button
                   onClick={() => setIsSidebarOpen(false)}
                   className="absolute right-2 top-2 z-50 flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  aria-label="Close sidebar"
+                  aria-label={t('view.close_sidebar')}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -184,19 +186,19 @@ export function ScaleTreeView() {
       <button
         onClick={() => setIsSidebarOpen(true)}
         className="absolute left-3 top-3 z-10 flex h-9 items-center gap-2 rounded-lg bg-zinc-900/80 px-3 backdrop-blur-md transition-background hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:hidden"
-        aria-label="Open scale selector"
+        aria-label={t('view.open_selector')}
       >
         <Menu className="h-4 w-4 text-zinc-400" />
-        <span className="text-xs font-semibold text-zinc-300">Scales</span>
+        <span className="text-xs font-semibold text-zinc-300">{t('view.scales')}</span>
       </button>
 
       <button
         onClick={() => router.push('/timer')}
         className="absolute right-3 top-3 z-10 flex h-9 items-center gap-2 rounded-lg bg-zinc-900/80 px-3 backdrop-blur-md transition-background hover:bg-zinc-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        aria-label="Back to Practice"
+        aria-label={t('view.back_to_practice')}
       >
         <ArrowLeft className="h-4 w-4 text-zinc-400" />
-        <span className="text-xs font-semibold text-zinc-300">Practice</span>
+        <span className="text-xs font-semibold text-zinc-300">{t('view.practice')}</span>
       </button>
 
       <ScaleNodeModal

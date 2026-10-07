@@ -7,6 +7,7 @@ import { cn } from "assets/lib/utils";
 import { RewardSummary } from "components/Rewards/RewardSummary";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import { useClaimScaleReward, useRewardLedger } from "hooks/useRewardLedger";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Gift, Lock, Ticket } from "lucide-react";
 
 import { boxRewardId, getBoxReward } from "../data/scaleTreeRewards";
@@ -42,6 +43,7 @@ export const BoxRewardBlock = ({
   total,
   accentColor,
 }: BoxRewardBlockProps) => {
+  const { t } = useTranslation("scale_tree");
   const reward = getBoxReward(scaleType, position);
   const { data: ledger } = useRewardLedger();
   const { mutate: claim, isPending } = useClaimScaleReward();
@@ -56,12 +58,12 @@ export const BoxRewardBlock = ({
   const holdsFreeCase = reward.caseTokens > 0;
 
   const heading = isClaimed
-    ? "Box reward collected"
+    ? t("reward.collected")
     : canClaim
-      ? "Box cleared — collect it"
+      ? t("reward.collect")
       : holdsFreeCase
-        ? `${total - done} shapes left — this box finishes the tree`
-        : `${total - done} shapes left in this box`;
+        ? t("reward.left_final", { count: total - done })
+        : t("reward.left", { count: total - done });
 
   const block = (
     <button

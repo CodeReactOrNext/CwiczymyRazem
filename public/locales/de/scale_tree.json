@@ -1,0 +1,101 @@
+{
+  "view": {
+    "close_sidebar": "Seitenleiste schließen",
+    "open_selector": "Tonleiterauswahl öffnen",
+    "scales": "Tonleitern",
+    "back_to_practice": "Zurück zum Üben",
+    "practice": "Üben"
+  },
+  "scales": {
+    "minor_pentatonic": "Moll-Pentatonik",
+    "major_pentatonic": "Dur-Pentatonik",
+    "minor": "Natürliches Moll",
+    "major": "Dur-Tonleiter",
+    "dorian": "Dorisch",
+    "phrygian": "Phrygisch",
+    "mixolydian": "Mixolydisch",
+    "lydian": "Lydisch",
+    "locrian": "Lokrisch"
+  },
+  "families": {
+    "pentatonic": {
+      "tree": "Pentatonik-Baum",
+      "label": "Pentatonik",
+      "group": "Pentatonik"
+    },
+    "diatonic": {
+      "tree": "Diatonischer Baum",
+      "label": "Diatonische Tonleiter",
+      "group": "Diatonisch"
+    },
+    "mode": {
+      "tree": "Modi-Baum",
+      "label": "Kirchentonart",
+      "group": "Kirchentonarten"
+    }
+  },
+  "grid": {
+    "title": "{{root}} {{scale}}",
+    "done": "geschafft",
+    "key": "Tonart"
+  },
+  "shape": {
+    "box": "Box {{n}}",
+    "fret": "Bund {{n}}",
+    "fret_lc": "Bund {{n}}"
+  },
+  "patterns": {
+    "ascending": "Aufwärts",
+    "descending": "Abwärts",
+    "ascending_descending": "Auf- und abwärts",
+    "intervals_thirds": "Terzen",
+    "intervals_fourths": "Quarten",
+    "sequence_3_notes": "Sequenz 3",
+    "sequence_4_notes": "Sequenz 4"
+  },
+  "patterns_short": {
+    "ascending": "aufwärts",
+    "descending": "abwärts",
+    "ascending_descending": "auf und ab",
+    "intervals_thirds": "Terzen",
+    "intervals_fourths": "Quarten",
+    "sequence_3_notes": "Seq. 3 Töne",
+    "sequence_4_notes": "Seq. 4 Töne"
+  },
+  "node": {
+    "record": "Rekord: {{bpm}} BPM",
+    "reward": "Belohnung",
+    "single_string": "Eine Saite",
+    "single_string_cap": "Eine Saite"
+  },
+  "reward": {
+    "collected": "Box-Belohnung abgeholt",
+    "collect": "Box geschafft — hol sie dir",
+    "left_final": "Noch {{count}} Formen — diese Box schließt den Baum ab",
+    "left_final_one": "Noch 1 Form — diese Box schließt den Baum ab",
+    "left": "Noch {{count}} Formen in dieser Box",
+    "left_one": "Noch 1 Form in dieser Box"
+  },
+  "modal": {
+    "close": "Schließen",
+    "string": "Saite {{n}}",
+    "frets": "Bünde {{low}}–{{high}}",
+    "key_of": "Tonart {{root}}",
+    "locked": "Schließ die geforderten Übungen ab, um freizuschalten",
+    "practice": "Üben",
+    "retake": "Wiederholen",
+    "exam": "Prüfung",
+    "record_run": "Rekordversuch",
+    "no_record": "Noch kein Rekord",
+    "lower_tempo": "Zieltempo senken",
+    "raise_tempo": "Zieltempo erhöhen",
+    "beat_it": "Schlag ihn",
+    "set_record": "Rekord aufstellen",
+    "clean_run": "Nur ein sauberer Durchlauf zählt — halte das Tempo bis zum Ende, der schnellste wird gespeichert.",
+    "pass_exam": "Besteh die Prüfung, um Rekordversuche über {{bpm}} BPM freizuschalten."
+  },
+  "sidebar": {
+    "title": "Tonleiterauswahl",
+    "body": "Wähle eine Tonleiter, um ihren Baum und ihre Formen zu sehen."
+  }
+}

@@ -3,6 +3,7 @@ import { cn } from "assets/lib/utils";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { Flame, Lock, Minus, Play, Plus, Target, Trophy, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -10,21 +11,6 @@ import { BASE_ROOT_NOTE, transposeFret } from "../data/scaleTreeKeys";
 import { nextRecordTarget, RECORD_MAX_BPM, RECORD_MIN_BPM, stepRecordBpm } from "../data/scaleTreeRecords";
 import type { NodeStatus, ScaleRecord, ScaleTreeNodeDef } from "../types/scaleTree.types";
 
-const PATTERN_LABELS: Record<string, string> = {
-  ascending:            "Ascending",
-  descending:           "Descending",
-  ascending_descending: "Ascending + Descending",
-  intervals_thirds:     "Thirds",
-  intervals_fourths:    "Fourths",
-  sequence_3_notes:     "Sequence 3",
-  sequence_4_notes:     "Sequence 4",
-};
-
-const FAMILY_LABEL: Record<string, string> = {
-  pentatonic: "Pentatonic",
-  diatonic:   "Diatonic Scale",
-  mode:       "Modal Mode",
-};
 
 const FAMILY_COLOR: Record<string, string> = {
   pentatonic: "text-amber-400",
@@ -58,6 +44,7 @@ export function ScaleNodeModal({
   onStartPractice,
   onStartRecord,
 }: ScaleNodeModalProps) {
+  const { t } = useTranslation("scale_tree");
   const req = node?.requiredExercises[0];
   const isLocked = status === "locked";
   const isCompleted = status === "completed";
@@ -125,6 +112,19 @@ export function ScaleNodeModal({
     return frets.length > 0 ? { low: Math.min(...frets), high: Math.max(...frets) } : null;
   }, [tablature]);
 
+  // The node's name is built from what it is rather than read off the data,
+  // so it can be said in any language: the scale, then the shape and pattern.
+  const title = node ? t(`scales.${node.scaleType}`, node.label) : "";
+  const subtitle = !req
+    ? node?.subtitle
+    : req.stringNum != null
+      ? t("node.single_string_cap")
+      : `${
+          req.boxNumber != null
+            ? t("shape.box", { n: req.boxNumber })
+            : t("shape.fret", { n: fret })
+        } – ${t(`patterns.${req.patternType}`, req.patternType)}`;
+
   return (
     <AnimatePresence>
       {node && (
@@ -143,7 +143,7 @@ export function ScaleNodeModal({
           <motion.div
             role='dialog'
             aria-modal='true'
-            aria-label={node.label}
+            aria-label={title}
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
@@ -152,19 +152,19 @@ export function ScaleNodeModal({
             {/* Header */}
             <div className='flex items-start gap-4'>
               <div className='min-w-0 flex-1'>
-                <p className={cn("text-xs font-semibold capitalize tracking-wide", FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400")}>
-                  {FAMILY_LABEL[node.scaleFamily] ?? node.scaleFamily}
+                <p className={cn("text-xs font-semibold tracking-wide", FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400")}>
+                  {t(`families.${node.scaleFamily}.label`, node.scaleFamily)}
                 </p>
                 <h2 className='mt-1 font-display text-xl font-bold leading-tight text-zinc-100'>
-                  {node.label}
+                  {title}
                 </h2>
-                {node.subtitle && (
-                  <p className='mt-1 text-sm text-zinc-400'>{node.subtitle}</p>
+                {subtitle && (
+                  <p className='mt-1 text-sm text-zinc-400'>{subtitle}</p>
                 )}
               </div>
               <button
                 onClick={onClose}
-                aria-label='Close'
+                aria-label={t("modal.close")}
                 className='-mr-1 -mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
                 <X className='h-4 w-4' />
               </button>
@@ -173,19 +173,25 @@ export function ScaleNodeModal({
             {/* Exercise tags */}
             {req && (
               <div className='flex flex-wrap gap-2'>
-                <Chip>{PATTERN_LABELS[req.patternType] ?? req.patternType}</Chip>
+                <Chip>{t(`patterns.${req.patternType}`, req.patternType)}</Chip>
                 {req.stringNum != null ? (
-                  <Chip>String {req.stringNum}</Chip>
+                  <Chip>{t("modal.string", { n: req.stringNum })}</Chip>
                 ) : (
                   // Box names exist for pentatonics only — elsewhere the fret
                   // range chip below already says everything there is to say.
-                  req.boxNumber != null && <Chip>Box {req.boxNumber}</Chip>
+                  req.boxNumber != null && (
+                    <Chip>{t("shape.box", { n: req.boxNumber })}</Chip>
+                  )
                 )}
                 {req.stringNum == null && fretRange && (
-                  <Chip>Frets {fretRange.low}–{fretRange.high}</Chip>
+                  <Chip>
+                    {t("modal.frets", { low: fretRange.low, high: fretRange.high })}
+                  </Chip>
                 )}
                 <Chip color='cyan'>{req.requiredBpm} BPM</Chip>
-                {rootNote !== BASE_ROOT_NOTE && <Chip color='purple'>Key of {rootNote}</Chip>}
+                {rootNote !== BASE_ROOT_NOTE && (
+                  <Chip color='purple'>{t("modal.key_of", { root: rootNote })}</Chip>
+                )}
               </div>
             )}
 
@@ -198,7 +204,7 @@ export function ScaleNodeModal({
             {isLocked ? (
               <div className='flex items-center gap-2.5 rounded-lg bg-zinc-800/40 px-4 py-3 text-sm text-zinc-400'>
                 <Lock className='h-4 w-4 shrink-0 text-zinc-400' />
-                Complete the required exercises to unlock
+                {t("modal.locked")}
               </div>
             ) : (
               <div className='grid grid-cols-2 gap-3'>
@@ -206,13 +212,13 @@ export function ScaleNodeModal({
                   onClick={onStartPractice}
                   className='flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 py-3 text-sm font-bold text-zinc-100 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
                   <Play className='h-4 w-4' fill='currentColor' />
-                  Practice
+                  {t("modal.practice")}
                 </button>
                 <button
                   onClick={onStartExam}
                   className='flex items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
                   <Target className='h-4 w-4' />
-                  {isCompleted ? "Retake" : "Exam"}
+                  {isCompleted ? t("modal.retake") : t("modal.exam")}
                 </button>
               </div>
             )}
@@ -224,7 +230,9 @@ export function ScaleNodeModal({
                 <div className='flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-4'>
                   <div className='flex items-center gap-3'>
                     <Flame className='h-4 w-4 shrink-0 text-orange-400' />
-                    <span className='flex-1 text-sm font-bold text-zinc-100'>Record run</span>
+                    <span className='flex-1 text-sm font-bold text-zinc-100'>
+                      {t("modal.record_run")}
+                    </span>
                     {record ? (
                       <span className='flex items-center gap-1.5 text-sm font-bold tabular-nums text-orange-400'>
                         <Trophy className='h-3.5 w-3.5' />
@@ -234,7 +242,9 @@ export function ScaleNodeModal({
                         )}
                       </span>
                     ) : (
-                      <span className='text-xs text-zinc-500'>No record yet</span>
+                      <span className='text-xs text-zinc-500'>
+                        {t("modal.no_record")}
+                      </span>
                     )}
                   </div>
 
@@ -243,7 +253,7 @@ export function ScaleNodeModal({
                       <button
                         onClick={() => setRecordTarget((bpm) => stepRecordBpm(bpm, -1))}
                         disabled={recordTarget <= RECORD_MIN_BPM}
-                        aria-label='Lower target tempo'
+                        aria-label={t("modal.lower_tempo")}
                         className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-40'>
                         <Minus className='h-4 w-4' />
                       </button>
@@ -253,7 +263,7 @@ export function ScaleNodeModal({
                       <button
                         onClick={() => setRecordTarget((bpm) => stepRecordBpm(bpm, 1))}
                         disabled={recordTarget >= RECORD_MAX_BPM}
-                        aria-label='Raise target tempo'
+                        aria-label={t("modal.raise_tempo")}
                         className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-40'>
                         <Plus className='h-4 w-4' />
                       </button>
@@ -262,17 +272,19 @@ export function ScaleNodeModal({
                       onClick={() => onStartRecord(recordTarget)}
                       className='flex shrink-0 items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-orange-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
                       <Flame className='h-4 w-4' />
-                      {record ? "Beat it" : "Set record"}
+                      {record ? t("modal.beat_it") : t("modal.set_record")}
                     </button>
                   </div>
 
                   <p className='text-xs leading-relaxed text-zinc-500'>
-                    Only a clean run counts — hold the tempo to the end and the fastest one is kept.
+                    {t("modal.clean_run")}
                   </p>
                 </div>
               ) : (
                 <p className='text-xs leading-relaxed text-zinc-500'>
-                  Pass the exam to open record runs above {req?.requiredBpm ?? RECORD_MIN_BPM} BPM.
+                  {t("modal.pass_exam", {
+                    bpm: req?.requiredBpm ?? RECORD_MIN_BPM,
+                  })}
                 </p>
               )
             )}

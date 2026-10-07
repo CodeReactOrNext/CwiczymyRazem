@@ -1,0 +1,101 @@
+{
+  "view": {
+    "close_sidebar": "Zamknij panel",
+    "open_selector": "Otwórz wybór skali",
+    "scales": "Skale",
+    "back_to_practice": "Wróć do ćwiczeń",
+    "practice": "Ćwiczenia"
+  },
+  "scales": {
+    "minor_pentatonic": "Pentatonika molowa",
+    "major_pentatonic": "Pentatonika durowa",
+    "minor": "Moll naturalny",
+    "major": "Gama durowa",
+    "dorian": "Skala dorycka",
+    "phrygian": "Skala frygijska",
+    "mixolydian": "Skala miksolidyjska",
+    "lydian": "Skala lidyjska",
+    "locrian": "Skala lokrycka"
+  },
+  "families": {
+    "pentatonic": {
+      "tree": "Drzewo pentatoniczne",
+      "label": "Pentatonika",
+      "group": "Pentatoniki"
+    },
+    "diatonic": {
+      "tree": "Drzewo diatoniczne",
+      "label": "Skala diatoniczna",
+      "group": "Diatoniczne"
+    },
+    "mode": {
+      "tree": "Drzewo skal modalnych",
+      "label": "Skala modalna",
+      "group": "Skale modalne"
+    }
+  },
+  "grid": {
+    "title": "{{scale}} {{root}}",
+    "done": "zrobione",
+    "key": "Tonacja"
+  },
+  "shape": {
+    "box": "Pudełko {{n}}",
+    "fret": "Próg {{n}}",
+    "fret_lc": "próg {{n}}"
+  },
+  "patterns": {
+    "ascending": "W górę",
+    "descending": "W dół",
+    "ascending_descending": "W górę i w dół",
+    "intervals_thirds": "Tercje",
+    "intervals_fourths": "Kwarty",
+    "sequence_3_notes": "Sekwencja 3",
+    "sequence_4_notes": "Sekwencja 4"
+  },
+  "patterns_short": {
+    "ascending": "w górę",
+    "descending": "w dół",
+    "ascending_descending": "góra i dół",
+    "intervals_thirds": "tercje",
+    "intervals_fourths": "kwarty",
+    "sequence_3_notes": "sekw. 3 dźwięki",
+    "sequence_4_notes": "sekw. 4 dźwięki"
+  },
+  "node": {
+    "record": "Rekord: {{bpm}} BPM",
+    "reward": "Nagroda",
+    "single_string": "Jedna struna",
+    "single_string_cap": "Jedna struna"
+  },
+  "reward": {
+    "collected": "Nagroda za pudełko odebrana",
+    "collect": "Pudełko zaliczone — odbierz nagrodę",
+    "left_final": "Zostało kształtów: {{count}} — to pudełko kończy drzewo",
+    "left_final_one": "Został 1 kształt — to pudełko kończy drzewo",
+    "left": "Zostało kształtów w tym pudełku: {{count}}",
+    "left_one": "W tym pudełku został 1 kształt"
+  },
+  "modal": {
+    "close": "Zamknij",
+    "string": "Struna {{n}}",
+    "frets": "Progi {{low}}–{{high}}",
+    "key_of": "Tonacja {{root}}",
+    "locked": "Ukończ wymagane ćwiczenia, aby odblokować",
+    "practice": "Ćwicz",
+    "retake": "Powtórz",
+    "exam": "Egzamin",
+    "record_run": "Podejście na rekord",
+    "no_record": "Brak rekordu",
+    "lower_tempo": "Obniż docelowe tempo",
+    "raise_tempo": "Podnieś docelowe tempo",
+    "beat_it": "Pobij go",
+    "set_record": "Ustaw rekord",
+    "clean_run": "Liczy się tylko czyste podejście — utrzymaj tempo do końca, a zapisane zostanie najszybsze.",
+    "pass_exam": "Zalicz egzamin, aby odblokować podejścia na rekord powyżej {{bpm}} BPM."
+  },
+  "sidebar": {
+    "title": "Wybór skali",
+    "body": "Wybierz skalę, aby zobaczyć jej drzewo i kształty."
+  }
+}

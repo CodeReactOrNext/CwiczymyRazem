@@ -1,5 +1,6 @@
 import { cn } from 'assets/lib/utils';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'hooks/useTranslation';
 import { CheckCircle,Lock } from 'lucide-react';
 
 interface ScaleSidebarItem {
@@ -40,6 +41,7 @@ export function ScaleTreeSidebar({
   onSelectScale,
   rfNodes,
 }: ScaleTreeSidebarProps) {
+  const { t } = useTranslation('scale_tree');
   const getScaleStats = (scaleType: string) => {
     const scaleNodes = rfNodes.filter((n) => n.data?.scaleType === scaleType);
     const total = scaleNodes.length;
@@ -56,10 +58,10 @@ export function ScaleTreeSidebar({
     <div className="flex h-full w-[280px] sm:w-[320px] flex-col bg-zinc-950 p-5 select-none">
       <div className="mb-7 px-1">
         <h2 className="font-display text-base font-bold text-zinc-100">
-          Scale selector
+          {t('sidebar.title')}
         </h2>
         <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
-          Pick a scale to see its tree and shapes.
+          {t('sidebar.body')}
         </p>
       </div>
 
@@ -71,7 +73,7 @@ export function ScaleTreeSidebar({
           return (
             <div key={family} className="space-y-2.5">
               <span className={cn("block px-1 text-xs font-semibold tracking-wide", meta.text)}>
-                {meta.title}
+                {t(`families.${family}.group`, meta.title)}
               </span>
 
               <div className="space-y-2">
@@ -98,7 +100,7 @@ export function ScaleTreeSidebar({
                             isActive ? "text-zinc-100" : "text-zinc-300 group-hover:text-zinc-100"
                           )}
                         >
-                          {item.label}
+                          {t(`scales.${item.scaleType}`, item.label)}
                         </span>
 
                         {isLocked ? (
