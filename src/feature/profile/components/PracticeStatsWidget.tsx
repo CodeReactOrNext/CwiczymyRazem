@@ -1,6 +1,8 @@
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
-import { addDays, isSameDay, startOfWeek } from "date-fns";
+import { addDays, format, isSameDay, startOfWeek } from "date-fns";
+import { useTranslation } from "hooks/useTranslation";
+import { useDateFnsLocale, useIntlLocale } from "lib/i18n/dateLocale";
 import { FaFire } from "react-icons/fa";
 import {
   Bar,
@@ -60,6 +62,7 @@ const formatBarLabel = (ms: number) => {
 };
 
 const CustomTooltip = ({ active, payload }: any) => {
+  const { t } = useTranslation("profile");
   if (!active || !payload?.length) return null;
   const data = payload[0]?.payload;
   if (!data || data.minutes == null || data.minutes === 0) return null;
@@ -80,7 +83,7 @@ const CustomTooltip = ({ active, payload }: any) => {
             ))}
           </div>
           <div className="border-t border-white/10 pt-1.5 mt-1.5 flex items-center justify-between">
-            <span className="text-[11px] text-zinc-500">Total</span>
+            <span className="text-[11px] text-zinc-500">{t("week_widget.total")}</span>
             <span className={cn(
               "text-[11px] font-bold tabular-nums",
               data.minutes >= DAILY_GOAL_MIN ? "text-green-400" : "text-zinc-300"
@@ -90,7 +93,7 @@ const CustomTooltip = ({ active, payload }: any) => {
           </div>
         </div>
       ) : (
-        <p className="text-xs text-zinc-300">{formatMin(data.totalMs)} practiced</p>
+        <p className="text-xs text-zinc-300">{t("week_widget.practiced", { time: formatMin(data.totalMs) })}</p>
       )}
     </div>
   );
@@ -103,7 +106,10 @@ export const PracticeStatsWidget = ({
   reportList,
   className,
 }: PracticeStatsWidgetProps) => {
+  const { t } = useTranslation("profile");
   const today = new Date();
+  const dateFnsLocale = useDateFnsLocale();
+  const intlLocale = useIntlLocale();
 
   const lastReportDate = userStats?.lastReportDate || "";
   const actualDayWithoutBreak = userStats?.actualDayWithoutBreak || 0;
@@ -138,16 +144,16 @@ export const PracticeStatsWidget = ({
       isGoalMet,
       activities: dayReport?.activities,
       dateLabel: isToday
-        ? "Today"
-        : dayDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }),
+        ? t("days_ago.today")
+        : dayDate.toLocaleDateString(intlLocale, { weekday: "short", month: "short", day: "numeric" }),
     };
   });
 
   const practicedDaysThisWeek = weekDays.filter((d) => d.timeMs > 0 && !d.isFuture).length;
   const maxMinutes = Math.max(DAILY_GOAL_MIN * 2, ...weekDays.map((d) => d.timeMs / 60000));
 
-  const chartData = weekDays.map(({ label, timeMs, isFuture, isToday, isGoalMet, activities, dateLabel }) => ({
-    day: label,
+  const chartData = weekDays.map(({ label, dayDate, timeMs, isFuture, isToday, isGoalMet, activities, dateLabel }) => ({
+    day: format(dayDate, "EEE", { locale: dateFnsLocale }) || label,
     minutes: isFuture && !isToday ? 0 : Math.round(timeMs / 60000),
     totalMs: timeMs,
     isGoalMet,
@@ -171,13 +177,13 @@ export const PracticeStatsWidget = ({
                   : "text-zinc-700"
               )}
             />
-            <span className="text-[12px] font-semibold text-zinc-400 tracking-wide">This week</span>
+            <span className="text-[12px] font-semibold text-zinc-400 tracking-wide">{t("week_widget.this_week")}</span>
           </div>
           <div className="flex items-center gap-3">
             {dayWithoutBreak > 0 && (
               <div className="flex items-center gap-1.5">
                 <span className="text-base font-black text-white tabular-nums">{dayWithoutBreak}</span>
-                <span className="text-[11px] text-white/80 font-bold tracking-tight">Streak</span>
+                <span className="text-[11px] text-white/80 font-bold tracking-tight">{t("layout.facts.streak")}</span>
               </div>
             )}
           </div>

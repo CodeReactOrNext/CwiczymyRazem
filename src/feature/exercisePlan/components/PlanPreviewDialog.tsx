@@ -29,7 +29,7 @@ export const PlanPreviewDialog = ({
   onOpenPlan,
   isLoading,
 }: PlanPreviewDialogProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common", "plans"]);
 
   const totalDuration = plan
     ? Math.round(plan.exercises.reduce((acc, ex) => acc + ex.timeInMinutes, 0))
@@ -55,7 +55,7 @@ export const PlanPreviewDialog = ({
               <div className='flex items-center gap-4 pt-1 text-xs font-medium text-zinc-400'>
                 <span className='flex items-center gap-1.5'>
                   <FaClock className='h-3.5 w-3.5 text-zinc-500' />
-                  {totalDuration} min
+                  {totalDuration} {t("plans:min")}
                 </span>
                 <span className='flex items-center gap-1.5'>
                   <FaListUl className='h-3.5 w-3.5 text-zinc-500' />
@@ -85,7 +85,7 @@ export const PlanPreviewDialog = ({
                     </p>
                   </div>
                   <span className='shrink-0 text-xs font-medium text-zinc-400'>
-                    {Math.round(exercise.timeInMinutes)} min
+                    {Math.round(exercise.timeInMinutes)} {t("plans:min")}
                   </span>
                 </li>
               ))}
@@ -96,7 +96,7 @@ export const PlanPreviewDialog = ({
                 variant='ghost'
                 onClick={onClose}
                 className='text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-100'>
-                Close
+                {t("plans:close")}
               </Button>
               <Button
                 onClick={() => onOpenPlan(plan.id)}
@@ -104,7 +104,7 @@ export const PlanPreviewDialog = ({
                 className='bg-white text-zinc-950 hover:bg-zinc-200'>
                 {/* It drops you straight into the session — not a link out. */}
                 <Play className='fill-current' />
-                Start plan
+                {t("plans:start_plan")}
               </Button>
             </DialogFooter>
           </>

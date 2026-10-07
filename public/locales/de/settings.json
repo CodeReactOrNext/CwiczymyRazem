@@ -1,0 +1,92 @@
+{
+  "language": {
+    "title": "Sprache",
+    "subtitle": "Gilt für die App auf diesem Gerät.",
+    "work_in_progress": "Die Übersetzungen entstehen noch — alles, was noch nicht übersetzt ist, bleibt auf Englisch."
+  },
+  "settings_subtilte": "Profil bearbeiten",
+  "edit": "Bearbeiten",
+  "save": "Speichern",
+  "back": "Zurück",
+  "nickname": "Nickname:",
+  "new_nickname": "Neuer Nickname",
+  "new_email": "Neue E-Mail",
+  "password": "Passwort:",
+  "new_password": "Neues Passwort",
+  "repeat_new_password": "Neues Passwort wiederholen",
+  "reset_stats": "Statistiken zurücksetzen",
+  "reset_warning": "Achtung. Mit diesem Button werden deine Statistiken zurückgesetzt.",
+  "reset_approve_info": "Willst du wirklich alle deine Statistiken löschen?",
+  "reset": "Zurücksetzen",
+  "anonimity": "Anonymität:",
+  "anonimity_info": "Möchtest du deinen Nickname in der Rangliste verbergen?",
+  "resolution_info": "Maximale Auflösung 250 × 250",
+  "logged_in_via_google": "E-Mail und Passwort können nicht geändert werden, weil du dich mit Google angemeldet hast.",
+  "bands": "Deine Bands",
+  "guitarStartDate": {
+    "title": "Wann hast du angefangen, Gitarre zu spielen?",
+    "placeholder": "Datum wählen",
+    "save": "Speichern",
+    "success": "Startdatum aktualisiert!",
+    "error": "Startdatum konnte nicht aktualisiert werden",
+    "duration_years": "Du spielst schon seit {{years}} Jahren!"
+  },
+  "profile_settings": "Profileinstellungen",
+  "manage_your_profile_information": "Verwalte deine Profilinformationen",
+  "security": "Sicherheit",
+  "manage_your_account_security": "Verwalte die Sicherheit deines Kontos",
+  "google_account_notice": "Google-Konto – eingeschränkte Optionen",
+  "additional_info": "Weitere Informationen",
+  "customize_your_experience": "Passe die App an dich an",
+  "danger_zone": "Gefahrenzone",
+  "irreversible_actions": "Unumkehrbare Aktionen – mit Vorsicht fortfahren",
+  "danger_zone_warning": "Die folgenden Aktionen können nicht rückgängig gemacht werden. Stell sicher, dass du die Folgen verstehst.",
+  "bands_placeholder": "Deine Bands...",
+  "email_label": "E-Mail",
+  "email_notifications": {
+    "title": "E-Mail-Benachrichtigungen",
+    "description": "Wähle, welche E-Mails du von Riff Quest erhalten möchtest.",
+    "options": {
+      "streakReminders": {
+        "title": "Serien-Erinnerungen",
+        "description": "Ein kleiner Anstoß, wenn du ein, zwei Tage nicht geübt hast, damit deine Serie nicht reißt."
+      },
+      "seasonUpdates": {
+        "title": "Saison-Updates",
+        "description": "E-Mails zu neuen Saisons, bald endenden Saisons und deinen Endergebnissen."
+      }
+    },
+    "always_sent": "Konto- und Sicherheits-E-Mails (z. B. E-Mail-Änderungen) werden immer gesendet und lassen sich nicht abschalten.",
+    "saving": "Wird gespeichert...",
+    "save": "Änderungen speichern"
+  },
+  "tablature": {
+    "title": "Tabulatur",
+    "description": "Ändere, wie Übungen gezeichnet werden. Alles wird auf diesem Gerät gespeichert und gilt ab deiner nächsten Übungssession.",
+    "live_preview": "Live-Vorschau",
+    "mode_tab": "Tabulatur",
+    "mode_notation": "Notation",
+    "hint_tab": "Trefferfarbe und Trefferanimationen erscheinen nur, während du wirklich spielst.",
+    "hint_notation": "Dieselbe Ansicht wie in der Session — schalte unten den Hintergrund um, um sie auf Papier oder auf Schwarz zu sehen."
+  },
+  "profile_basics": {
+    "description": "Verwalte deine öffentlichen Profilinformationen",
+    "change_avatar": "Avatar ändern",
+    "display_name": "Anzeigename",
+    "display_name_placeholder": "Gib deinen Anzeigenamen ein",
+    "display_name_hint": "Dieser Name ist in Ranglisten und auf deinem öffentlichen Profil sichtbar.",
+    "adjust_image": "Bild anpassen",
+    "zoom": "Zoom",
+    "cancel": "Abbrechen",
+    "set_avatar": "Avatar festlegen"
+  },
+  "tabs": {
+    "title": "Einstellungen",
+    "profile": "Profil",
+    "socials": "Soziale Medien",
+    "tablature": "Tabulatur",
+    "notifications": "Benachrichtigungen",
+    "security": "Sicherheit",
+    "google_auth": "Google-OAuth-Anmeldung"
+  }
+}

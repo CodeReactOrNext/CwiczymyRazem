@@ -7,6 +7,7 @@ import {
 import { cn } from "assets/lib/utils";
 import type { GlobalSearchResult } from "components/GlobalSearch/useGlobalSearch";
 import { useGlobalSearch } from "components/GlobalSearch/useGlobalSearch";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ClipboardList,
   Dumbbell,
@@ -18,10 +19,10 @@ import { useRouter } from "next/router";
 import type { KeyboardEvent } from "react";
 import { Fragment, useEffect, useRef, useState } from "react";
 
-const GROUP_LABELS: Record<GlobalSearchResult["type"], string> = {
-  plan: "Plans",
-  exercise: "Exercises",
-  song: "Songs",
+const GROUP_LABEL_KEYS: Record<GlobalSearchResult["type"], string> = {
+  plan: "search.group_plans",
+  exercise: "search.group_exercises",
+  song: "search.group_songs",
 };
 
 const GROUP_ICONS: Record<GlobalSearchResult["type"], typeof Music> = {
@@ -55,6 +56,7 @@ const highlightMatch = (text: string, query: string) => {
 };
 
 export const GlobalSearch = () => {
+  const { t } = useTranslation("nav");
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -117,7 +119,7 @@ export const GlobalSearch = () => {
         onClick={() => setIsOpen(true)}
         className='hidden w-48 items-center gap-2 rounded-lg bg-zinc-900/60 px-3 py-2 text-left text-sm text-zinc-500 transition-colors hover:bg-zinc-900 hover:text-zinc-300 sm:flex lg:w-72 xl:w-96'>
         <Search className='h-4 w-4 shrink-0' />
-        <span className='flex-1 truncate'>Search...</span>
+        <span className='flex-1 truncate'>{t("search.button")}</span>
         <kbd className='hidden shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 lg:inline-block'>
           Ctrl K
         </kbd>
@@ -126,7 +128,7 @@ export const GlobalSearch = () => {
       <button
         type='button'
         onClick={() => setIsOpen(true)}
-        aria-label='Search'
+        aria-label={t("search.title")}
         className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/40 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 sm:hidden'>
         <Search className='h-4 w-4' />
       </button>
@@ -138,9 +140,9 @@ export const GlobalSearch = () => {
             inputRef.current?.focus();
           }}
           className='gap-0 border-none bg-zinc-950 p-0 shadow-none sm:top-24 sm:max-w-2xl sm:translate-y-0'>
-          <DialogTitle className='sr-only'>Search</DialogTitle>
+          <DialogTitle className='sr-only'>{t("search.title")}</DialogTitle>
           <DialogDescription className='sr-only'>
-            Search your plans, exercises and songs
+            {t("search.description")}
           </DialogDescription>
 
           <div className='flex items-center gap-3 bg-zinc-900/40 px-4 py-3 pr-14 sm:px-5 sm:py-4'>
@@ -150,7 +152,7 @@ export const GlobalSearch = () => {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder='Search plans, exercises, songs...'
+              placeholder={t("search.placeholder")}
               autoComplete='off'
               className='flex-1 bg-transparent text-base text-zinc-100 outline-none placeholder:text-zinc-500'
             />
@@ -160,12 +162,12 @@ export const GlobalSearch = () => {
           <div className='max-h-[60vh] overflow-y-auto p-2 sm:p-3'>
             {!hasQuery && (
               <p className='px-3 py-10 text-center text-sm text-zinc-500'>
-                Start typing to search your plans, exercises and songs.
+                {t("search.start_typing")}
               </p>
             )}
             {hasQuery && results.length === 0 && !isLoading && (
               <p className='px-3 py-10 text-center text-sm text-zinc-500'>
-                No results for &ldquo;{query.trim()}&rdquo;.
+                {t("search.no_results", { query: query.trim() })}
               </p>
             )}
             {results.map((result, index) => {
@@ -176,7 +178,7 @@ export const GlobalSearch = () => {
                 <Fragment key={`${result.type}-${result.id}`}>
                   {showGroupLabel && (
                     <p className='px-3 pb-1 pt-3 text-xs font-medium text-zinc-500 first:pt-1'>
-                      {GROUP_LABELS[result.type]}
+                      {t(GROUP_LABEL_KEYS[result.type])}
                     </p>
                   )}
                   <button

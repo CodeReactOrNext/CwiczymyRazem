@@ -7,6 +7,11 @@ import { AUTH_SECRET } from "./authSecret";
 type WithAuthOptions = {
   redirectIfAuthenticated?: string;
   redirectIfUnauthenticated?: string;
+  /**
+   * Accepted and ignored. Pages are rendered in English and the chosen language
+   * is applied in the browser (see `lib/i18n`), so there is nothing for the server
+   * to preload — but ~40 pages pass this, and dropping it would touch all of them.
+   */
   translations?: string[];
 };
 

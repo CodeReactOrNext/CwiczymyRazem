@@ -1,0 +1,201 @@
+{
+  "spacing": "Spacing",
+  "spacing_hint": "How far apart notes sit across the bar and between strings.",
+  "note_spacing": "Note spacing",
+  "string_spacing": "String spacing",
+  "fret_numbers": "Fret numbers",
+  "size": "Size",
+  "default_view": "Default view",
+  "default_view_hint": "Which view opens automatically when you start a practice session.",
+  "metronome_sound": "Metronome sound",
+  "metronome_sound_hint": "Tap one to hear it. Used for the count-in and the tab view; the notation view keeps AlphaTab’s own click.",
+  "note_pills": "Note pills",
+  "note_pills_hint": "Shape of the blocks carrying the fret numbers, and how a note’s length is drawn.",
+  "string_palette": "String palette",
+  "string_palette_hint": "One colour per string, high e first.",
+  "hit_colour": "Hit colour",
+  "hit_colour_hint": "Fills a note as you sustain it correctly.",
+  "board_background": "Board background",
+  "board_background_hint": "Colour behind the staff, gutter and fade.",
+  "visible_elements": "Visible elements",
+  "visible_elements_hint": "Hide layers you do not need to declutter the score.",
+  "handedness": "Handedness",
+  "handedness_hint": "For left-handed players. Applies everywhere on this device.",
+  "mirror": "Mirror fretboard diagrams",
+  "mirror_desc": "Nut on the right in the click and hunt drills. The tab has no neck axis to mirror, so it stays as it is.",
+  "rtl": "Right-to-left board",
+  "rtl_desc": "The tab starts at the right edge and the cursor runs left, like a mirrored neck. Tab only; the notation view keeps its normal direction.",
+  "flip": "Flip string order",
+  "flip_desc": "Low E on the top line — for a right-handed guitar strung the other way round. Tab only; the notation view keeps standard order.",
+  "feedback": "Feedback",
+  "hit_animations": "Hit animations",
+  "hit_animations_desc": "Flash and shockwave rings when a note lands",
+  "timing_hints": "Timing hints",
+  "timing_hints_desc": "\"Early\", \"Late\" or a green + over a note as you hit it, and a late note filling from where you played it. Timing still counts toward your score either way.",
+  "ambient_glow": "Ambient mic glow",
+  "ambient_glow_desc": "Glow under the tab reacting to your playing volume",
+  "reset": "Reset tablature settings",
+  "sizing": "Sizing",
+  "sizing_hint": "AlphaTab’s own zoom and note spacing — independent of the flat-tab sliders above.",
+  "zoom": "Zoom",
+  "board": "Board",
+  "board_hint": "Colour of the sheet-music board.",
+  "dark_score": "Dark score",
+  "dark_score_desc": "Black board with white staff and notes, instead of white paper",
+  "toggles": {
+    "rhythm_lane": "Rhythm lane",
+    "rhythm_lane_desc": "Stems, beams and rests above the staff",
+    "chord_names": "Chord names",
+    "chord_names_desc": "White chord pills over the bar",
+    "tuning_gutter": "Tuning gutter",
+    "tuning_gutter_desc": "Pinned string names on the left",
+    "measure_lines": "Measure lines",
+    "measure_lines_desc": "Vertical bar dividers",
+    "technique": "Technique markers",
+    "technique_desc": "H/P, bends, PM, vibrato, harmonics, picking ⊓/⋁"
+  },
+  "views": {
+    "tab": {
+      "label": "Tablature",
+      "desc": "Classic fretboard tab"
+    },
+    "notation": {
+      "label": "Notation",
+      "desc": "Standard sheet music"
+    }
+  },
+  "fret_text": {
+    "black": {
+      "label": "Black",
+      "desc": "Ink on bright pills"
+    },
+    "white": {
+      "label": "White",
+      "desc": "For darker palettes"
+    },
+    "auto": {
+      "label": "Auto",
+      "desc": "Follows each pill's brightness"
+    }
+  },
+  "note_styles": {
+    "headTail": {
+      "label": "Head + tail",
+      "desc": "Solid head, thin sustain tail"
+    },
+    "bar": {
+      "label": "Solid bar",
+      "desc": "One block for the whole length"
+    }
+  },
+  "pills": {
+    "capsule": {
+      "label": "Capsule",
+      "desc": "Fully rounded ends"
+    },
+    "rounded": {
+      "label": "Rounded",
+      "desc": "Soft corners"
+    },
+    "sharp": {
+      "label": "Sharp",
+      "desc": "Near-square, technical"
+    },
+    "chunky": {
+      "label": "Chunky",
+      "desc": "Taller and bolder"
+    }
+  },
+  "palettes": {
+    "rainbow": {
+      "label": "Rainbow",
+      "desc": "One hue per string"
+    },
+    "stringCode": {
+      "label": "String code",
+      "desc": "Low E red, high e purple"
+    },
+    "ocean": {
+      "label": "Ocean",
+      "desc": "Cool blues and violets"
+    },
+    "sunset": {
+      "label": "Sunset",
+      "desc": "Warm reds through to gold"
+    },
+    "forest": {
+      "label": "Forest",
+      "desc": "Greens and teals"
+    },
+    "neon": {
+      "label": "Neon",
+      "desc": "Maximum contrast on a dark board"
+    },
+    "pastel": {
+      "label": "Pastel",
+      "desc": "Softer tones, easier on long sessions"
+    },
+    "poster": {
+      "label": "Poster",
+      "desc": "Flat print colours, matte and bold"
+    },
+    "vintage": {
+      "label": "Vintage",
+      "desc": "Dusty faded tones, old-poster feel"
+    },
+    "colorblind": {
+      "label": "Colourblind-safe",
+      "desc": "Okabe–Ito, distinct for most types"
+    },
+    "mono": {
+      "label": "Mono",
+      "desc": "Greyscale — rely on position, not colour"
+    }
+  },
+  "backgrounds": {
+    "midnight": {
+      "label": "Midnight",
+      "desc": "Default near-black"
+    },
+    "black": {
+      "label": "True black",
+      "desc": "Deepest contrast, OLED friendly"
+    },
+    "charcoal": {
+      "label": "Charcoal",
+      "desc": "Lifted grey, softer glare"
+    },
+    "navy": {
+      "label": "Navy",
+      "desc": "Cool blue-black"
+    },
+    "plum": {
+      "label": "Plum",
+      "desc": "Warm violet-black"
+    },
+    "paper": {
+      "label": "Paper",
+      "desc": "Warm white, print-like"
+    },
+    "white": {
+      "label": "White",
+      "desc": "Plain white sheet"
+    },
+    "sepia": {
+      "label": "Sepia",
+      "desc": "Aged paper, low glare"
+    }
+  },
+  "hit_colors": {
+    "emerald": "Emerald",
+    "cyan": "Cyan",
+    "amber": "Amber",
+    "white": "White",
+    "magenta": "Magenta",
+    "lime": "Lime"
+  },
+  "view_menu": {
+    "hint": "Change how the exercise is shown",
+    "view": "View"
+  }
+}

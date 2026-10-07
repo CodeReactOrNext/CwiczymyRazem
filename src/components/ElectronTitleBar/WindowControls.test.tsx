@@ -24,9 +24,9 @@ describe("WindowControls", () => {
       />
     );
 
-    fireEvent.click(screen.getByLabelText("Minimalizuj"));
-    fireEvent.click(screen.getByLabelText("Maksymalizuj"));
-    fireEvent.click(screen.getByLabelText("Zamknij"));
+    fireEvent.click(screen.getByLabelText("Minimize"));
+    fireEvent.click(screen.getByLabelText("Maximize"));
+    fireEvent.click(screen.getByLabelText("Close"));
 
     expect(onMinimize).toHaveBeenCalledTimes(1);
     expect(onToggleMaximize).toHaveBeenCalledTimes(1);
@@ -42,8 +42,8 @@ describe("WindowControls", () => {
         onClose={vi.fn()}
       />
     );
-    expect(screen.getByLabelText("Maksymalizuj")).toBeTruthy();
-    expect(screen.queryByLabelText("Przywróć")).toBeNull();
+    expect(screen.getByLabelText("Maximize")).toBeTruthy();
+    expect(screen.queryByLabelText("Restore")).toBeNull();
 
     rerender(
       <WindowControls
@@ -53,7 +53,7 @@ describe("WindowControls", () => {
         onClose={vi.fn()}
       />
     );
-    expect(screen.getByLabelText("Przywróć")).toBeTruthy();
-    expect(screen.queryByLabelText("Maksymalizuj")).toBeNull();
+    expect(screen.getByLabelText("Restore")).toBeTruthy();
+    expect(screen.queryByLabelText("Maximize")).toBeNull();
   });
 });

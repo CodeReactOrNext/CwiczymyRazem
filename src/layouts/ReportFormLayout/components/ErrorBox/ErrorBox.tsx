@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import type { FormikErrors } from "formik";
 import { FaTimesCircle } from "react-icons/fa";
@@ -7,6 +8,7 @@ interface ErrorBoxProps {
 }
 
 const ErrorBox = ({ errors }: ErrorBoxProps) => {
+  const { t } = useTranslation("report");
   const hasTimeError = Object.keys(errors).some(key => 
     key.includes('Hours') || key.includes('Minutes')
   );
@@ -18,9 +20,9 @@ const ErrorBox = ({ errors }: ErrorBoxProps) => {
         <FaTimesCircle className='text-xl' />
       </div>
       <div className="flex flex-col items-center gap-1 text-xs text-red-400/80">
-        {hasTimeError && <p>Invalid time values entered</p>}
-        {hasTitleError && <p>Session headlines is too long (max 60 characters)</p>}
-        {!hasTimeError && !hasTitleError && <p>Please check all fields and try again</p>}
+        {hasTimeError && <p>{t("errors.invalid_time")}</p>}
+        {hasTitleError && <p>{t("errors.title_too_long")}</p>}
+        {!hasTimeError && !hasTitleError && <p>{t("errors.check_fields")}</p>}
       </div>
     </div>
   );

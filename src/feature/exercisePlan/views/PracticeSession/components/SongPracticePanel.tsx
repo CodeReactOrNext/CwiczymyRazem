@@ -4,6 +4,7 @@ import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { formatPracticed } from "feature/user/view/ReportView/helpers/sessionSongs";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { ExternalLink, Music } from "lucide-react";
 import { memo } from "react";
 import { useAppSelector } from "store/hooks";
@@ -28,6 +29,7 @@ export const SongPracticePanel = memo(function SongPracticePanel({
   song,
   compact = false,
 }: SongPracticePanelProps) {
+  const { t } = useTranslation("session");
   const userId = useAppSelector(selectUserAuth);
 
   // Same key as the songs board and the session log's picker, so the number
@@ -80,7 +82,7 @@ export const SongPracticePanel = memo(function SongPracticePanel({
         <div className='min-w-0 flex-1'>
           <span className='inline-flex items-center gap-1.5 rounded bg-amber-500/15 px-2.5 py-1 text-[10px] font-bold tracking-wider text-amber-300'>
             <span className='h-1.5 w-1.5 rounded-full bg-amber-400' />
-            Song
+            {t("song_panel.song")}
           </span>
 
           <h3
@@ -100,9 +102,7 @@ export const SongPracticePanel = memo(function SongPracticePanel({
 
           {!compact && (
             <p className='mt-3 text-sm leading-relaxed text-zinc-400'>
-              Play it the way you rehearse it — from memory, along the record, or
-              with your own tab. The session clock is counting this time towards
-              the song.
+              {t("song_panel.body")}
             </p>
           )}
 
@@ -112,7 +112,7 @@ export const SongPracticePanel = memo(function SongPracticePanel({
             rel='noreferrer'
             className='mt-3 inline-flex items-center gap-1.5 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/40'>
             <ExternalLink className='h-3.5 w-3.5 text-zinc-400' />
-            Open song
+            {t("song_panel.open")}
           </a>
         </div>
       </div>

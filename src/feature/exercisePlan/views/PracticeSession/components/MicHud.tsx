@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { getAccuracyDisplay } from "../hooks/noteMatchingFeedback";
@@ -33,13 +34,17 @@ export const MicHud = ({
   className?: string;
   variant?: "docked" | "full";
 }) => {
+  const { t } = useTranslation("session");
   const { gameState, sessionAccuracy, sessionStats } = useNoteMatchingContext();
   const { score, combo, multiplier } = gameState;
 
   const full = variant === "full";
   const ringPx = full ? 104 : RING_PX;
   const accuracy = getAccuracyDisplay(sessionAccuracy, sessionStats);
-  const accuracyHint = accuracy.kind === "value" ? undefined : accuracy.hint;
+  const accuracyHint =
+    accuracy.kind === "value" ? undefined : t(`hud.${accuracy.kind}_hint`, accuracy.hint);
+  const accuracyText =
+    accuracy.kind === "silent" ? t("hud.no_notes", accuracy.text) : accuracy.text;
   const tier = getMultiplierTier(multiplier);
 
   const comboProgress =
@@ -61,7 +66,7 @@ export const MicHud = ({
         // Full screen: score stacked over accuracy, right-aligned next to the ring.
         <div className='flex flex-col items-end'>
           <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
-            Score
+            {t("success.score")}
           </span>
           <motion.span
             key={score}
@@ -78,14 +83,14 @@ export const MicHud = ({
               accuracy.kind === "silent" ? "text-sm" : "text-2xl",
               accuracy.color,
             )}>
-            {accuracy.text}
+            {accuracyText}
           </span>
         </div>
       ) : (
         <>
           <div className='flex flex-col items-start'>
             <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
-              Score
+              {t("success.score")}
             </span>
 
             <motion.span
@@ -100,7 +105,7 @@ export const MicHud = ({
 
           <div className='flex flex-col items-start'>
             <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
-              Accuracy
+              {t("success.accuracy")}
             </span>
             <span
               title={accuracyHint}
@@ -109,7 +114,7 @@ export const MicHud = ({
                 accuracy.kind === "silent" ? "text-sm leading-7" : "text-xl",
                 accuracy.color,
               )}>
-              {accuracy.text}
+              {accuracyText}
             </span>
           </div>
         </>

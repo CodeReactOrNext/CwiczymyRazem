@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Card } from "assets/components/ui/card";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { ArrowRight, Flame } from "lucide-react";
@@ -11,6 +12,7 @@ import { WidgetHeader } from "./WidgetHeader";
  * what it is worth right now and whether today has been taken care of.
  */
 export const StreakWidget = () => {
+  const { t } = useTranslation("dashboard");
   const { userStats, activity } = useDashboardData();
 
   // Same reconciliation as the This Week card: the activity log is the
@@ -27,7 +29,7 @@ export const StreakWidget = () => {
       <WidgetHeader
         icon={Flame}
         iconClassName='text-orange-400'
-        title='Streak'
+        title={t("streak.title")}
       />
 
       <div className='flex items-baseline gap-2'>
@@ -35,27 +37,27 @@ export const StreakWidget = () => {
           {dayWithoutBreak}
         </span>
         <span className='text-sm text-zinc-400'>
-          {dayWithoutBreak === 1 ? "day" : "days"}
+          {dayWithoutBreak === 1 ? t("streak.day") : t("streak.days")}
         </span>
       </div>
 
       {multiplier > 0 && (
         <p className='mt-2 text-xs font-semibold text-orange-400'>
-          +{Math.round(multiplier * 100)}% points on every session
+          {t("streak.bonus", { pct: Math.round(multiplier * 100) })}
         </p>
       )}
 
       <p className='mt-4 text-sm text-zinc-400'>
         {didPracticeToday
-          ? "Today is in the bag."
-          : "Nothing logged yet today. A short session keeps it alive."}
+          ? t("streak.done_today")
+          : t("streak.not_yet")}
       </p>
 
       {!didPracticeToday && (
         <Link
           href='/timer'
           className='mt-4 inline-flex w-fit items-center gap-1.5 rounded-lg bg-zinc-900/60 px-3 py-2 text-sm font-semibold text-zinc-100 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-900'>
-          Practice now
+          {t("streak.practice_now")}
           <ArrowRight size={14} />
         </Link>
       )}

@@ -1,3 +1,5 @@
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
@@ -110,6 +112,8 @@ const RatingPopUpLayout = ({
   restartLabel,
   scoredRuns = [],
 }: RatingPopUpProps) => {
+  const { t } = useTranslation("session_summary");
+  const intlLocale = useIntlLocale();
   const {
     currentLevel,
     displayedPoints,
@@ -135,7 +139,7 @@ const RatingPopUpLayout = ({
 
   const noteCard = reportId && (
     <Card>
-      <CardHeading icon={<NotebookPen className="h-4 w-4" />}>Notes for next time</CardHeading>
+      <CardHeading icon={<NotebookPen className="h-4 w-4" />}>{t("notes_heading")}</CardHeading>
       <SessionNoteForm reportId={reportId} />
     </Card>
   );
@@ -158,12 +162,15 @@ const RatingPopUpLayout = ({
   // being read as sums of the chips beside them. Habits pay points and never
   // fame, the rig pays fame and never points — which is precisely what a player
   // cannot work out from two bare totals.
-  const pointRows = buildPointsBreakdown({
-    totalPoints: ratingData.totalPoints,
-    timePoints: ratingData.bonusPoints?.timePoints,
-    habitPoints: ratingData.bonusPoints?.additionalPoints,
-    streakMultiplier: ratingData.bonusPoints?.multiplier,
-  });
+  const pointRows = buildPointsBreakdown(
+    {
+      totalPoints: ratingData.totalPoints,
+      timePoints: ratingData.bonusPoints?.timePoints,
+      habitPoints: ratingData.bonusPoints?.additionalPoints,
+      streakMultiplier: ratingData.bonusPoints?.multiplier,
+    },
+    t,
+  );
   const fameRows = buildFameBreakdown({
     fame,
     streakBonus: ratingData.fameStreakBonus,
@@ -172,7 +179,7 @@ const RatingPopUpLayout = ({
     chainBonus: ratingData.fameChainBonus,
     traitBonus: ratingData.fameTraitBonus,
     accuracyBonus: ratingData.fameAccuracyBonus,
-  });
+  }, t);
 
   const skillGains = Object.entries(ratingData.skillPointsGained ?? {}).filter(([, v]) => v > 0);
 
@@ -200,12 +207,12 @@ const RatingPopUpLayout = ({
       d.setDate(d.getDate() - (6 - i));
       const key = dayStr(d);
       return {
-        label: d.toLocaleDateString("en-US", { weekday: "short" }),
+        label: d.toLocaleDateString(intlLocale ?? "en-US", { weekday: "short" }),
         minutes: Math.round(byDay.get(key) ?? 0),
         isToday: key === todayKey,
       };
     });
-  }, [activityData]);
+  }, [activityData, intlLocale]);
   const weekTotalMin = weekData.reduce((acc, d) => acc + d.minutes, 0);
 
   // skill balance — last 7 days vs previous 7 days
@@ -243,7 +250,7 @@ const RatingPopUpLayout = ({
     const scaleMax = Math.max(1, ...CATS.flatMap((c) => [cur[c.key], prv[c.key]]));
 
     const radarData = CATS.map((c) => ({
-      cat: c.label,
+      cat: c.key,
       prev: Math.round((prv[c.key] / scaleMax) * 100),
       current: Math.round((cur[c.key] / scaleMax) * 100),
     }));
@@ -287,17 +294,19 @@ const RatingPopUpLayout = ({
             </div>
 
             <div className="flex flex-col items-center gap-3">
-              <p className="text-xl font-semibold text-zinc-100">No points this time</p>
+              <p className="text-xl font-semibold text-zinc-100">{t("no_points_title")}</p>
               <p className="max-w-md text-sm leading-relaxed text-zinc-400">
-                You practised {fmtShort(sessionTimeMs)} — too short to score. Points start at{" "}
-                {fmtMin(Math.round(FIRST_POINT_MS / MIN))} of practice, so this session added nothing to your total.
+                {t("no_points_body", {
+                  time: fmtShort(sessionTimeMs),
+                  threshold: fmtMin(Math.round(FIRST_POINT_MS / MIN)),
+                })}
               </p>
             </div>
 
             {/* progress toward the first point */}
             <div className="mt-2 w-full max-w-xs">
               <div className="mb-2 flex items-baseline justify-between text-xs">
-                <span className="font-medium text-zinc-400">Next point</span>
+                <span className="font-medium text-zinc-400">{t("next_point")}</span>
                 <span className="font-semibold tabular-nums text-zinc-400">
                   {fmtShort(sessionTimeMs)} / {fmtMin(Math.round(FIRST_POINT_MS / MIN))}
                 </span>
@@ -313,7 +322,7 @@ const RatingPopUpLayout = ({
             </div>
 
             <p className="max-w-md text-xs leading-relaxed text-zinc-500">
-              The session was still logged — your {streak}-day streak is safe.
+              {t("streak_safe", { days: streak })}
             </p>
 
             <div className="mt-2 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
@@ -324,14 +333,14 @@ const RatingPopUpLayout = ({
                   className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto"
                 >
                   <RotateCcw className="mr-2 h-4 w-4" aria-hidden />
-                  {restartLabel ?? "Practise a bit more"}
+                  {restartLabel ?? t("practise_more")}
                 </Button>
               )}
               <Button
                 onClick={handleContinue}
                 className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto"
               >
-                Back to dashboard
+                {t("back_to_dashboard")}
                 <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
               </Button>
             </div>
@@ -352,7 +361,7 @@ const RatingPopUpLayout = ({
             />
 
             <div className="relative">
-              <p className="text-sm font-medium text-zinc-400">Great progress!</p>
+              <p className="text-sm font-medium text-zinc-400">{t("great_progress")}</p>
 
               <div className="mt-4 flex items-center justify-center gap-4">
                 <span className="font-teko text-8xl font-bold leading-none tabular-nums text-cyan-400">
@@ -370,7 +379,7 @@ const RatingPopUpLayout = ({
                     <span className="font-teko text-5xl font-bold leading-none tabular-nums text-amber-400">
                       +{fame}
                     </span>
-                    <span className="text-base font-semibold text-amber-400">Fame</span>
+                    <span className="text-base font-semibold text-amber-400">{t("fame")}</span>
                   </div>
 
                   <RewardBreakdown rows={fameRows} delay={0.8} className="mt-7" />
@@ -391,7 +400,7 @@ const RatingPopUpLayout = ({
                         className="flex items-center gap-2 rounded bg-zinc-800/50 px-3.5 py-2"
                       >
                         {Icon && <Icon size={14} className="text-zinc-400" />}
-                        <span className="text-sm text-zinc-300">{cat?.label ?? prettify(key)}</span>
+                        <span className="text-sm text-zinc-300">{cat ? t(`cat.${cat.key}`) : prettify(key)}</span>
                         <span className="text-sm font-bold tabular-nums text-cyan-400">+{points}</span>
                       </motion.div>
                     );
@@ -403,7 +412,7 @@ const RatingPopUpLayout = ({
               <div className="mx-auto mt-10 max-w-md">
                 <div className="mb-2.5 flex items-baseline justify-between text-sm">
                   <span className="font-medium text-zinc-300">
-                    Level <span className="font-bold text-zinc-100">{currentLevel}</span>
+                    {t("level")} <span className="font-bold text-zinc-100">{currentLevel}</span>
                     <ArrowRight className="mx-1.5 inline h-3.5 w-3.5 text-zinc-500" />
                     <span className="font-bold text-cyan-400">{currentLevel + 1}</span>
                   </span>
@@ -414,7 +423,7 @@ const RatingPopUpLayout = ({
                       transition={{ delay: 1.1, type: "spring", stiffness: 220, damping: 12 }}
                       className="inline-flex items-center gap-1 rounded bg-cyan-500/15 px-2 py-0.5 text-xs font-bold text-cyan-300"
                     >
-                      <Sparkles className="h-3 w-3" aria-hidden /> Level Up!
+                      <Sparkles className="h-3 w-3" aria-hidden /> {t("level_up")}
                     </motion.span>
                   ) : (
                     <span className="font-bold tabular-nums text-cyan-400">{Math.round(currProgressPercent)}%</span>
@@ -439,14 +448,14 @@ const RatingPopUpLayout = ({
                     className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto"
                   >
                     <RotateCcw className="mr-2 h-4 w-4" aria-hidden />
-                    {restartLabel ?? "Repeat session"}
+                    {restartLabel ?? t("repeat_session")}
                   </Button>
                 )}
                 <Button
                   onClick={handleContinue}
                   className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto"
                 >
-                  Continue
+                  {t("continue")}
                   <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
                 </Button>
               </div>
@@ -474,7 +483,7 @@ const RatingPopUpLayout = ({
           <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2">
             {/* Session time */}
             <Card className="h-full">
-              <CardHeading>Session time</CardHeading>
+              <CardHeading>{t("session_time")}</CardHeading>
               <p className="font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100">{fmtMin(Math.round(sessionTimeMs / MIN))}</p>
 
               <div className="mt-8 space-y-5">
@@ -488,7 +497,7 @@ const RatingPopUpLayout = ({
                         <c.Icon size={15} className="shrink-0 text-zinc-400" />
                         <div className="flex-1">
                           <div className="mb-1.5 flex items-center justify-between text-xs">
-                            <span className="font-medium text-zinc-300">{c.label}</span>
+                            <span className="font-medium text-zinc-300">{t(`cat.${c.key}`)}</span>
                             <span className="font-semibold tabular-nums text-zinc-400">{fmtMin(Math.round(c.ms / MIN))}</span>
                           </div>
                           <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
@@ -503,17 +512,17 @@ const RatingPopUpLayout = ({
 
             {/* Streak */}
             <Card className="h-full">
-              <CardHeading icon={<Flame className="h-4 w-4 text-orange-500" />}>Streak</CardHeading>
+              <CardHeading icon={<Flame className="h-4 w-4 text-orange-500" />}>{t("streak")}</CardHeading>
 
               <div className="flex items-baseline gap-2">
                 <span className="font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100">{streak}</span>
-                <span className="text-sm font-medium text-zinc-400">days in a row</span>
+                <span className="text-sm font-medium text-zinc-400">{t("days_in_a_row")}</span>
               </div>
 
               {streakBonusPct > 0 && (
                 <div className="mt-3 inline-flex items-center gap-1.5 rounded bg-orange-500/10 px-2.5 py-1">
                   <Flame className="h-3.5 w-3.5 text-orange-400" aria-hidden />
-                  <span className="text-xs font-bold text-orange-400">+{streakBonusPct}% points</span>
+                  <span className="text-xs font-bold text-orange-400">{t("streak_bonus_points", { pct: streakBonusPct })}</span>
                 </div>
               )}
 
@@ -532,7 +541,7 @@ const RatingPopUpLayout = ({
                         {active && <Flame className="h-4 w-4 text-orange-400/80" aria-hidden />}
                       </div>
                       <span className={cn("text-[10px] font-medium", d.isToday ? "text-zinc-300" : "text-zinc-500")}>
-                        {d.isToday ? "today" : d.label.slice(0, 1)}
+                        {d.isToday ? t("today") : d.label.slice(0, 1)}
                       </span>
                     </div>
                   );
@@ -546,7 +555,7 @@ const RatingPopUpLayout = ({
             {/* Weekly */}
             <Card className="h-full">
               <div className="mb-6 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-zinc-300">This week</h3>
+                <h3 className="text-sm font-semibold text-zinc-300">{t("this_week")}</h3>
                 <span className="font-teko text-3xl font-bold leading-none tabular-nums text-zinc-100">{fmtMin(weekTotalMin)}</span>
               </div>
               <div className="h-[180px] w-full">
@@ -563,7 +572,7 @@ const RatingPopUpLayout = ({
                       y={DAILY_GOAL_MIN}
                       stroke="#3f3f46"
                       strokeDasharray="4 4"
-                      label={{ value: "goal", position: "right", fontSize: 9, fill: "#52525b" }}
+                      label={{ value: t("goal"), position: "right", fontSize: 9, fill: "#52525b" }}
                     />
                     <Area dataKey="minutes" type="monotone" stroke="#22d3ee" strokeWidth={2} fill="url(#weekGrad)" dot={renderWeeklyDot} />
                   </AreaChart>
@@ -573,7 +582,7 @@ const RatingPopUpLayout = ({
 
             {/* Skill balance */}
             <Card className="h-full">
-              <CardHeading suffix={<span className="text-xs text-zinc-500">· last 7 days</span>}>Skill balance</CardHeading>
+              <CardHeading suffix={<span className="text-xs text-zinc-500">· {t("last_7_days")}</span>}>{t("skill_balance")}</CardHeading>
 
               <div className="h-[260px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -581,7 +590,7 @@ const RatingPopUpLayout = ({
                       clipped on narrow mobile cards */}
                   <RadarChart data={radarData} outerRadius="70%">
                     <PolarGrid stroke="#3f3f46" />
-                    <PolarAngleAxis dataKey="cat" tick={{ fontSize: 11, fill: "#a1a1aa" }} />
+                    <PolarAngleAxis dataKey="cat" tick={{ fontSize: 11, fill: "#a1a1aa" }} tickFormatter={(key: string) => t(`cat.${key}`)} />
                     <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
                     <Radar dataKey="prev" stroke="#52525b" fill="#52525b" fillOpacity={0.12} />
                     <Radar dataKey="current" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.25} />
@@ -591,10 +600,10 @@ const RatingPopUpLayout = ({
 
               <div className="mt-2 flex justify-center gap-5">
                 <span className="flex items-center gap-1.5 text-xs text-zinc-400">
-                  <span className="h-2 w-2 rounded-full bg-cyan-400" /> This week
+                  <span className="h-2 w-2 rounded-full bg-cyan-400" /> {t("this_week")}
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-zinc-500">
-                  <span className="h-2 w-2 rounded-full bg-zinc-600" /> Previous
+                  <span className="h-2 w-2 rounded-full bg-zinc-600" /> {t("previous")}
                 </span>
               </div>
 
@@ -602,7 +611,7 @@ const RatingPopUpLayout = ({
                 {radarRows.map((c) => (
                   <div key={c.key} className="flex min-w-0 items-center gap-2.5">
                     <c.Icon size={14} className="shrink-0 text-zinc-400" />
-                    <span className="min-w-0 flex-1 truncate text-xs text-zinc-300">{c.label}</span>
+                    <span className="min-w-0 flex-1 truncate text-xs text-zinc-300">{t(`cat.${c.key}`)}</span>
                     <span className="whitespace-nowrap text-xs font-semibold tabular-nums text-zinc-200">{fmtMin(c.curMin)}</span>
                     {c.deltaMin !== 0 && (
                       <span className={cn("whitespace-nowrap text-[10px] font-bold tabular-nums", c.deltaMin > 0 ? "text-emerald-400" : "text-zinc-500")}>
@@ -627,10 +636,11 @@ const RatingPopUpLayout = ({
 // ─── Achievements (reuses the real AchievementCard) ───────────────────────────
 
 function Achievements({ achievements }: { achievements: AchievementList[] }) {
+  const { t } = useTranslation("session_summary");
   const context = useAchievementContext();
   return (
     <Card>
-      <CardHeading icon={<Trophy className="h-4 w-4 text-amber-500" />}>New achievements</CardHeading>
+      <CardHeading icon={<Trophy className="h-4 w-4 text-amber-500" />}>{t("new_achievements")}</CardHeading>
       <div className="flex flex-wrap gap-5">
         {achievements.map((id) => (
           <div key={id} className="h-16 w-16">

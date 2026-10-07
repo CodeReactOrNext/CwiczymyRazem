@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
@@ -12,6 +13,7 @@ import { WidgetHeader, WidgetLink } from "./WidgetHeader";
  * a card inside a card is exactly what the phone layout must not do.
  */
 export const SongsWidget = () => {
+  const { t } = useTranslation("dashboard");
   const { userAuth } = useDashboardData();
   const { songs, isLoading, isError } = useUserSongs(userAuth);
 
@@ -19,14 +21,14 @@ export const SongsWidget = () => {
     <div>
       <WidgetHeader
         icon={Music2}
-        title='Songs'
+        title={t("songs.title")}
         className='mb-3 px-1'
-        action={<WidgetLink href='/songs?view=board'>Song board</WidgetLink>}
+        action={<WidgetLink href='/songs?view=board'>{t("songs.board")}</WidgetLink>}
       />
 
       {isError ? (
         <p className='rounded-lg bg-zinc-900/40 p-4 text-sm text-zinc-400'>
-          Couldn&apos;t load your songs right now.
+          {t("songs.error")}
         </p>
       ) : isLoading || !songs ? (
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>

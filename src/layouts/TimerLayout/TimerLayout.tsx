@@ -387,7 +387,7 @@ const TimerLayout = ({
               ) : (
                 <div className='space-y-3'>
                   <p className='font-medium text-white sm:text-lg'>
-                    Choose what you are practising
+                    {t("choose_practising")}
                   </p>
                   {/* One column where this middle column gets squeezed between
                       the clock and the metronome (lg), so labels never run
@@ -474,7 +474,7 @@ const TimerLayout = ({
               size='lg'
             >
               <ArrowLeft className='h-4 w-4' />
-              Back to Practice
+              {t("back_to_practice")}
             </Button>
             ) : (
             <Button
@@ -487,7 +487,7 @@ const TimerLayout = ({
               {isFinishing ? (
                   <div translate="no" className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Saving...</span>
+                      <span>{t("saving")}</span>
                   </div>
               ) : (
                   <span translate="no" className="flex items-center gap-2">
@@ -534,9 +534,9 @@ const TimerLayout = ({
               </>
             ) : (
               <>
-                Practised away from the timer?{" "}
+                {t("practised_away")}{" "}
                 <Link href='/report' className='text-primary hover:underline'>
-                  Log the time manually
+                  {t("log_manually")}
                 </Link>
               </>
             )}

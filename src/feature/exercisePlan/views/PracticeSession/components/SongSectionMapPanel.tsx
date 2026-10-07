@@ -4,6 +4,7 @@ import { SectionList } from "feature/songs/components/SongSections/SectionList";
 import { SectionTimeline } from "feature/songs/components/SongSections/SectionTimeline";
 import { YouTubeSongPlayer } from "feature/songs/components/YouTubeSongPlayer";
 import { useSongSectionMap } from "feature/songs/hooks/useSongSectionMap";
+import { useTranslation } from "hooks/useTranslation";
 import { Keyboard } from "lucide-react";
 import { memo } from "react";
 
@@ -33,12 +34,19 @@ const SHORTCUTS: { keys: string; label: string }[] = [
  * Space is left to the session (its own play/pause); everything else the song
  * timer's keyboard does works here too.
  */
+const SHORTCUT_KEYS: Record<string, string> = {
+  "Mark section": "mark_section",
+  "Toggle loop": "toggle_loop",
+  "Seek 5s": "seek",
+};
+
 export const SongSectionMapPanel = memo(function SongSectionMapPanel({
   song,
   userId,
   onVideoPlay,
   compact = false,
 }: SongSectionMapPanelProps) {
+  const { t } = useTranslation("timer");
   const map = useSongSectionMap({
     userId,
     songId: song.songId,
@@ -92,14 +100,14 @@ export const SongSectionMapPanel = memo(function SongSectionMapPanel({
             <div className='flex flex-wrap items-center gap-x-6 gap-y-2 px-1'>
               <span className='flex items-center gap-2 text-xs font-bold text-zinc-500'>
                 <Keyboard className='h-4 w-4 text-zinc-500' />
-                Shortcuts
+                {t("song_timer.shortcuts")}
               </span>
               {SHORTCUTS.map(({ keys, label }) => (
                 <span key={keys} className='flex items-center gap-2'>
                   <kbd className='rounded bg-zinc-800/60 px-1.5 py-0.5 font-mono text-[10px] text-zinc-100'>
                     {keys}
                   </kbd>
-                  <span className='text-xs text-zinc-500'>{label}</span>
+                  <span className='text-xs text-zinc-500'>{t(`song_timer.${SHORTCUT_KEYS[label] ?? "shortcuts"}`, label)}</span>
                 </span>
               ))}
             </div>

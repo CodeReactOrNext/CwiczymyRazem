@@ -3,6 +3,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Keyboard } from "lucide-react";
 import { memo, useState } from "react";
 
@@ -67,14 +68,17 @@ export const ShortcutsLegend = memo(function ShortcutsLegend({
   hasBackingTrack?: boolean;
   className?: string;
 }) {
+  const { t } = useTranslation("session");
   const [isOpen, setIsOpen] = useState(false);
+  const localize = (rows: ShortcutRow[], group: string): ShortcutRow[] =>
+    rows.map((row, i) => ({ ...row, label: t(`shortcuts.${group}.${i}`, row.label) }));
 
   return (
     <>
       <Button
         variant="ghost"
         size="icon"
-        title="Keyboard shortcuts"
+        title={t("shortcuts.title")}
         onClick={() => setIsOpen(true)}
         className={cn("h-9 w-9 rounded-lg text-zinc-500 hover:text-white hover:bg-white/10", className)}
       >
@@ -87,26 +91,26 @@ export const ShortcutsLegend = memo(function ShortcutsLegend({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold tracking-tight">
               <Keyboard className="h-5 w-5 text-zinc-400" />
-              Keyboard shortcuts
+              {t("shortcuts.title")}
             </DialogTitle>
           </DialogHeader>
 
           <div className="flex flex-col gap-5">
-            <ShortcutList rows={NAV_SHORTCUTS} />
+            <ShortcutList rows={localize(NAV_SHORTCUTS, "nav")} />
             {hasTempoControl && (
               <div className="flex flex-col gap-2.5 pt-4">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                  Tempo
+                  {t("shortcuts.tempo")}
                 </span>
-                <ShortcutList rows={TEMPO_SHORTCUTS} />
+                <ShortcutList rows={localize(TEMPO_SHORTCUTS, "tempo_rows")} />
               </div>
             )}
             {hasBackingTrack && (
               <div className="flex flex-col gap-2.5 pt-4">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                  Backing track
+                  {t("shortcuts.backing")}
                 </span>
-                <ShortcutList rows={BACKING_SHORTCUTS} />
+                <ShortcutList rows={localize(BACKING_SHORTCUTS, "backing_rows")} />
               </div>
             )}
           </div>

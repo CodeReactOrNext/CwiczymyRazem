@@ -1,0 +1,51 @@
+{
+  "fret_diagram": "Diagrama del mástil",
+  "toast": {
+    "load_failed": "No se pudo cargar el progreso. Recarga la página.",
+    "exam_failed": "Examen suspendido — puntuación: {{accuracy}} %. ¡Practica más e inténtalo de nuevo!",
+    "exam_passed": "¡Examen aprobado! {{stars}} — {{accuracy}} % de precisión",
+    "step_completed": "¡Paso completado! 🎸",
+    "save_failed": "No se pudo guardar. Inténtalo de nuevo."
+  },
+  "sidebar": {
+    "status": {
+      "locked": "Bloqueado",
+      "available": "Disponible",
+      "in-progress": "En curso",
+      "completed": "Completado"
+    },
+    "close": "Cerrar",
+    "step": "Paso {{n}}",
+    "goal": "Objetivo",
+    "complete_tasks": "Completa todas las tareas obligatorias de abajo marcando las casillas para pasar a la siguiente etapa.",
+    "your_tasks": "Tus tareas",
+    "choose_target": "Elige un objetivo",
+    "saving": "Guardando...",
+    "done_complete": "Hecho y completar",
+    "unlock_hint": "Lee el contenido y marca todas las casillas de arriba para desbloquearlo",
+    "practice": "Practicar",
+    "retake": "Repetir",
+    "exam": "Examen"
+  },
+  "finish": {
+    "in_arsenal": "En tu Arsenal, con un número de serie que nadie más tiene.",
+    "complete": "Hoja de ruta completada — la guitarra es tuya.",
+    "steps_left": "Te quedan {{left}} de {{total}} pasos para ganarla.",
+    "collecting": "Recogiendo...",
+    "collect": "Recoger la guitarra",
+    "collected": "Recogida",
+    "steps": "{{done}}/{{total}} pasos"
+  },
+  "path": {
+    "modules": "Módulos"
+  },
+  "modules": {
+    "title": "Ruta de aprendizaje",
+    "subtitle": "Sigue donde lo dejaste o salta a cualquier módulo.",
+    "continue": "Continuar",
+    "start": "Empezar",
+    "suggest": "Sugerir una ruta de aprendizaje",
+    "missing_coming": "¿Falta un tema? Lo próximo será {{topics}} — dinos qué más te gustaría ver.",
+    "missing": "¿Falta un tema? Dinos qué te gustaría ver a continuación."
+  }
+}

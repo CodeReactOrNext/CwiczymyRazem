@@ -1,4 +1,6 @@
+import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
+import { Interpolate } from "lib/i18n/Interpolate";
 import type { NextTierProgress } from "feature/songs/utils/difficulty.utils";
 import { MIN_LEARNED_SONGS_FOR_TIER } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
@@ -29,6 +31,7 @@ const TierUnlockTrack = ({
   learnedCount: number;
   className?: string;
 }) => {
+  const { t } = useTranslation("songs");
   const remaining = Math.max(0, MIN_LEARNED_SONGS_FOR_TIER - learnedCount);
   return (
     <div className={cn("flex flex-col items-center gap-2", className)}>
@@ -44,11 +47,15 @@ const TierUnlockTrack = ({
         ))}
       </div>
       <span className='text-center text-xs font-bold leading-tight text-zinc-300'>
-        {learnedCount}/{MIN_LEARNED_SONGS_FOR_TIER} songs learned
+        {t("power.songs_learned", {
+          done: learnedCount,
+          total: MIN_LEARNED_SONGS_FOR_TIER,
+        })}
       </span>
       <span className='text-center text-[11px] leading-tight text-zinc-500'>
-        Master {remaining} more song{remaining === 1 ? "" : "s"} to reveal your
-        tier
+        {remaining === 1
+          ? t("power.reveal_one")
+          : t("power.reveal", { count: remaining })}
       </span>
     </div>
   );
@@ -61,6 +68,7 @@ const NextTierHint = ({
   nextTierProgress: NextTierProgress;
   className?: string;
 }) => {
+  const { t } = useTranslation("songs");
   const nextTier = getSongTier(nextTierProgress.nextTier);
   return (
     <div
@@ -69,15 +77,21 @@ const NextTierHint = ({
         className,
       )}>
       <span className='text-xs font-bold text-zinc-200'>
-        {nextTierProgress.songsNeeded} more song
-        {nextTierProgress.songsNeeded > 1 ? "s" : ""}
+        {nextTierProgress.songsNeeded > 1
+          ? t("power.more_songs", { count: nextTierProgress.songsNeeded })
+          : t("power.more_song_one")}
       </span>
       <span className='text-[11px] leading-tight text-zinc-500'>
-        as hard as{" "}
-        <span className='font-black' style={{ color: nextTier.color }}>
-          {nextTier.label}
-        </span>{" "}
-        to level up
+        <Interpolate
+          text={t("power.as_hard_as")}
+          values={{
+            tier: (
+              <span className='font-black' style={{ color: nextTier.color }}>
+                {nextTier.label}
+              </span>
+            ),
+          }}
+        />
       </span>
     </div>
   );
@@ -113,6 +127,7 @@ export const SkillPowerHero = ({
   nextTierProgress,
   className,
 }: SkillPowerHeroProps) => {
+  const { t } = useTranslation("songs");
   const isTierLocked = learnedCount < MIN_LEARNED_SONGS_FOR_TIER;
 
   // Nothing mastered yet: a 0.0 score would read as a rating, and the big card
@@ -130,11 +145,10 @@ export const SkillPowerHero = ({
           </div>
           <div>
             <h2 className='text-sm font-bold text-zinc-200'>
-              Tier not assessed yet
+              {t("power.not_assessed")}
             </h2>
             <p className='mt-0.5 text-xs text-zinc-500'>
-              Master {MIN_LEARNED_SONGS_FOR_TIER} songs to get your power score
-              and tier.
+              {t("power.not_assessed_hint", { count: MIN_LEARNED_SONGS_FOR_TIER })}
             </p>
           </div>
         </div>
@@ -142,7 +156,7 @@ export const SkillPowerHero = ({
           <span className='flex items-center gap-1.5'>
             <Star size={14} />
             <span className='font-bold text-zinc-200'>{totalCount}</span>
-            {totalCount === 1 ? "song" : "songs"} on board
+            {totalCount === 1 ? t("power.on_board_one") : t("power.on_board")}
           </span>
           <span className='flex items-center gap-1.5'>
             <Clock size={14} />
@@ -177,10 +191,10 @@ export const SkillPowerHero = ({
               </div>
               <div>
                 <h2 className='text-sm font-bold leading-none text-zinc-500'>
-                  Your skill power
+                  {t("power.title")}
                 </h2>
                 <p className='mt-1 text-[11px] leading-tight text-zinc-600 sm:text-xs'>
-                  Based on mastered songs difficulty
+                  {t("power.subtitle")}
                 </p>
               </div>
             </div>
@@ -190,7 +204,7 @@ export const SkillPowerHero = ({
                 {skillPower.toFixed(1)}
               </span>
               <span className='text-base font-bold leading-none text-white sm:text-xl'>
-                Power score
+                {t("power.score")}
               </span>
             </div>
           </div>
@@ -198,7 +212,7 @@ export const SkillPowerHero = ({
           <div className='flex shrink-0 flex-col items-center gap-1.5 md:hidden'>
             <TierBadge playerTier={playerTier} className='h-16 w-16 text-3xl' />
             <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
-              Current tier
+              {t("power.current_tier")}
             </span>
           </div>
         </div>
@@ -207,7 +221,7 @@ export const SkillPowerHero = ({
           <div className='grid grid-cols-3 gap-3 rounded-lg bg-white/5 p-3 sm:gap-8 sm:bg-transparent sm:p-0'>
             <div className='space-y-1.5 sm:space-y-2.5'>
               <p className='text-[10px] font-bold tracking-wider text-zinc-500'>
-                Mastered
+                {t("power.mastered")}
               </p>
               <div className='flex items-center gap-2'>
                 <Music2 size={14} className='text-zinc-500' />
@@ -218,7 +232,7 @@ export const SkillPowerHero = ({
             </div>
             <div className='space-y-1.5 sm:space-y-2.5'>
               <p className='text-[10px] font-bold tracking-wider text-zinc-500'>
-                Total
+                {t("power.total")}
               </p>
               <div className='flex items-center gap-2'>
                 <Star size={14} className='text-zinc-500' />
@@ -229,7 +243,7 @@ export const SkillPowerHero = ({
             </div>
             <div className='space-y-1.5 sm:space-y-2.5'>
               <p className='text-[10px] font-bold tracking-wider text-zinc-500'>
-                Time spent
+                {t("power.time_spent")}
               </p>
               <div className='flex items-center gap-2'>
                 <Clock size={14} className='text-zinc-500' />
@@ -252,7 +266,7 @@ export const SkillPowerHero = ({
             ) : (
               <div className='flex flex-col items-center gap-2'>
                 <span className='text-xs font-bold tracking-wider text-zinc-500'>
-                  Current tier
+                  {t("power.current_tier")}
                 </span>
                 {nextTierProgress && (
                   <NextTierHint

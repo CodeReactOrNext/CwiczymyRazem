@@ -1,4 +1,5 @@
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
+import { useTranslation } from "hooks/useTranslation";
 import React from "react";
 
 import { isOpenExercise } from "../../../utils/isOpenExercise";
@@ -81,6 +82,7 @@ export function MobileExerciseContent({
   strumVolume = 1,
   songSectionMapSlot,
 }: MobileExerciseContentProps) {
+  const { t } = useTranslation("session");
   const { openLeaderboard } = useSessionUI();
 
   // Listening quizzes are the whole player slot — they carry no tab, video or
@@ -203,12 +205,12 @@ export function MobileExerciseContent({
                 return (
                   <iframe width='100%' height='100%'
                     src={`https://www.youtube.com/embed/${videoId}`}
-                    title='YouTube video player' frameBorder='0'
+                    title={t("video.player")} frameBorder='0'
                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
                     allowFullScreen />
                 );
               }
-              return <div className='flex h-full items-center justify-center text-xs text-zinc-500'>Invalid YouTube URL</div>;
+              return <div className='flex h-full items-center justify-center text-xs text-zinc-500'>{t("video.invalid")}</div>;
             })()}
           </div>
         </div>

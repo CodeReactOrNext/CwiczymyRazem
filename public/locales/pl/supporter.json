@@ -1,0 +1,175 @@
+{
+  "tiers": {
+    "content": {
+      "exercises": "+{{count}} nowe ćwiczenia",
+      "exercise_one": "+{{count}} nowe ćwiczenie",
+      "gear": "+{{count}} nowych gitar i efektów"
+    },
+    "t13": {
+      "label": "Rozbieranie gitar na części",
+      "description": "Rozbieraj gitary, których nie chcesz. Różne gitary rozpadają się na różne części, więc to, co zostawiasz (i co rozbierasz), naprawdę ma znaczenie."
+    },
+    "t25": {
+      "label": "Lutnik: części i ulepszanie gitar",
+      "description": "Sprzęt zrzuca części według rzadkości, gdy grasz, a części z rozebranych gitar wracają do obiegu. Wydawaj pasujące części u Lutnika, żeby podnieść poziom gitary lub efektu i jego rzadkość."
+    },
+    "t51": {
+      "label": "Sprzęt wpływa na punkty Fame",
+      "description": "Sprzęt, którego używasz, zmienia liczbę punktów Fame za dany typ ćwiczenia, więc dobierz odpowiedni rig do ćwiczenia."
+    },
+    "t61": {
+      "label": "Synchronizacja podkładu z tabulaturą",
+      "description": "Podkłady do utworów zsynchronizowane z tabulaturą, żebyś grał do rytmu bez szukania beatu."
+    },
+    "t79": {
+      "label": "Synergia pedalboardu",
+      "description": "Efekty oddziałują na siebie, więc wybieraj i ustawiaj pedały z rozwagą."
+    },
+    "t89": {
+      "label": "Przebudowa osiągnięć",
+      "description": "Osiągnięcia zrobione od nowa, plus nowe. Każde naprawdę coś daje, nie tylko odznakę."
+    },
+    "t107": {
+      "label": "Limit mocy pedalboardu",
+      "description": "Pedalboard ma limit mocy, więc ulepsz go, jeśli chcesz używać mocniejszych efektów."
+    },
+    "t117": {
+      "label": "Grywalizacja: nagrody za ukończenie ścieżek i umiejętności",
+      "description": "Ukończ Ścieżkę, Roadmapę albo gałąź umiejętności i dostań gitarę lub efekt w nagrodę."
+    },
+    "t153": {
+      "label": "System progresji gracza",
+      "description": "Zdobywaj poziomy, grając. Odblokowują kamienie milowe, układy profilu i rzadkość sprzętu, którą możesz założyć."
+    },
+    "t181": {
+      "label": "Konfigurowalny dashboard",
+      "description": "Wybierz własny układ, widgety i skróty na głównym panelu."
+    },
+    "t191": {
+      "label": "Dzienne odblokowanie",
+      "description": "Odblokowanie czasowe resetujące się raz dziennie, które daje powód, żeby wracać."
+    },
+    "t201": {
+      "label": "Konfigurowalny profil gitarzysty",
+      "description": "Pokaż to, co chcesz, tak jak chcesz, korzystając z układów odblokowanych progresją."
+    },
+    "t229": {
+      "label": "Tryb ćwiczeń",
+      "description": "Ustaw cele dla każdego ćwiczenia i śledź postęp w ich osiąganiu."
+    },
+    "t244": {
+      "label": "Karty riffów",
+      "description": "Zbuduj własną talię riffów, utworów i ćwiczeń, którą powtarzasz metodą powtórek rozłożonych w czasie albo grasz swobodnie."
+    },
+    "t262": {
+      "label": "Gitary sygnowane u Lutnika",
+      "description": "Lutnik ma unikatowe gitary, których nie znajdziesz nigdzie indziej."
+    },
+    "t346": {
+      "label": "Pojedynki",
+      "description": "Wyzwij innego gracza o punkty Fame, np. kto uzbiera więcej czasu ćwiczeń, zanim skończy się zegar."
+    },
+    "t415": {
+      "label": "Nowy tryb ćwiczeń: Boss",
+      "description": "Nowy tryb ćwiczeń: Boss. Każdy boss stawia realny wymóg do zaliczenia. Osiągnij wynik i awansujesz, zabraknie — odpadasz, bez częściowego zaliczenia."
+    }
+  },
+  "funding": {
+    "title": "Roadmapa",
+    "subtitle": "Suma narastająca, nie subskrypcja. Każdy osiągnięty cel zostaje zbudowany i odblokowany dla wszystkich na zawsze.",
+    "goals_funded": "sfinansowanych celów",
+    "scroll_left": "Przewiń w lewo",
+    "scroll_right": "Przewiń w prawo",
+    "feature": "Funkcja",
+    "done": "Gotowe",
+    "in_progress": "W trakcie",
+    "funded": "Sfinansowane",
+    "locked": "Zablokowane",
+    "next_unlock": "Następne odblokowanie:",
+    "to_go": "Brakuje ${{amount}}",
+    "covered": "Koszt serwera w tym miesiącu pokryty",
+    "needs_help": "Koszt serwera potrzebuje twojej pomocy",
+    "all_funded": "Wszystkie cele roadmapy sfinansowane, dziękuję"
+  },
+  "perks": {
+    "title": "Co dostajesz",
+    "tokens": "Wsparcie zamienia się w tokeny: {{welcome}} przychodzi razem z odznaką, a potem {{perDollar}} za każdego kolejnego dolara. Nie wygasają i dają głos w tym, co powstanie.",
+    "open_panel": "Otwórz panel supportera",
+    "discord_body": "Rola supportera na {{discord}} i kanał, na którym pokazuję, co buduję, zanim to wyjdzie.",
+    "items": {
+      "0": {
+        "title": "Tablica roadmapy",
+        "body": "Zgłaszaj, co chcesz, żeby powstało, i popieraj pomysły innych supporterów."
+      },
+      "1": {
+        "title": "Sprzęt, który wybrałeś",
+        "body": "Zaproponuj gitarę albo efekt do Arsenału lub poprzyj czyjąś propozycję."
+      },
+      "2": {
+        "title": "Skrzynka supporterów",
+        "body": "Głosuj, które przedmioty trafią do następnej skrzynki supporterów."
+      },
+      "3": {
+        "title": "Własna gildia",
+        "body": "Załóż gildię z własną nazwą i tagiem, wspólnym schowkiem i trudniejszym tygodniem ćwiczeń."
+      },
+      "4": {
+        "title": "Następne wyzwanie",
+        "body": "Wybierz wyzwanie społeczności, które wszyscy zagrają w przyszłym tygodniu."
+      },
+      "5": {
+        "title": "Kanał supporterów"
+      }
+    }
+  },
+  "faq": {
+    "title": "Pytania",
+    "discord_link": "napisz do mnie na Discordzie",
+    "panel_link": "panelu supportera",
+    "badge_answer": "Przez dopasowanie e-maila z wpłaty do twojego konta. Jeśli płaciłeś z innego adresu, po prostu {{discord}}, a podepnę to ręcznie. Tokeny wydajesz w {{panel}}.",
+    "items": {
+      "0": {
+        "q": "Dlaczego wszyscy mają dostęp za darmo?",
+        "a": "Riff Quest zostaje darmowy dla wszystkich, kropka. Wspierając go, nie kupujesz dostępu dla siebie, tylko płacisz za rozwój, z którego korzysta cała społeczność. To suma narastająca, nie subskrypcja, więc osiągnięty cel zostaje odblokowany na zawsze."
+      },
+      "1": {
+        "q": "Ile trwa zrobienie jednego celu?",
+        "a": "To naprawdę zależy od celu. Coś małego może być gotowe w kilka dni, a bardziej wymagający próg może zająć około dwóch tygodni. Zasada jest taka: im większe odblokowanie, tym więcej czasu, i wolę dać sobie kilka dni więcej, niż wypuścić coś w połowie."
+      },
+      "2": {
+        "q": "Jak odznaka supportera znajduje moje konto?"
+      },
+      "3": {
+        "q": "Co się stanie, gdy wszystkie cele zostaną osiągnięte?",
+        "a": "Licznik się zeruje i powstaje zupełnie nowa roadmapa, zbudowana wokół pomysłów, które przysyłacie. Koniec to nie meta, tylko start kolejnej rundy funkcji."
+      }
+    }
+  },
+  "pulse": {
+    "this_month": "w tym miesiącu",
+    "support": "Wesprzyj roadmapę",
+    "supporters": "Supporterzy: {{count}} · społeczność",
+    "community": "wsparcie społeczności",
+    "tooltip": "Supporterzy ({{count}}) wpłacili w tym miesiącu ${{amount}}. To utrzymuje Riff Quest za darmo i finansuje roadmapę. Stuknij, żeby zobaczyć, na co idzie.",
+    "tooltip_empty": "Riff Quest jest darmowy i finansowany przez społeczność. Stuknij, żeby zobaczyć roadmapę i co twoje wsparcie odblokuje dalej."
+  },
+  "hero": {
+    "title": "Pomóż budować Riff Quest",
+    "subtitle": "Riff Quest jest darmowy i tworzony przez jedną osobę. Twoje wsparcie najpierw opłaca hosting, a wszystko ponad to odblokowuje kolejną funkcję z roadmapy — dla wszystkich.",
+    "eyebrow": "Finansowane przez społeczność",
+    "coffee_hint": "Jednorazowa kawa wystarczy. Nic do rejestracji, nic do anulowania."
+  },
+  "cta": {
+    "support": "Wesprzyj Riff Quest"
+  },
+  "thanks": {
+    "title": "Chcesz po prostu podziękować?",
+    "body": "Świadomość, że Riff Quest ci się przydaje, to już najlepsza część. Kawa do tego naprawdę poprawia mi dzień.",
+    "cta": "Podziękuj kawą"
+  },
+  "modal": {
+    "why": "Dlaczego wspierać Riff Quest?",
+    "body": "Riff Quest to projekt jednej osoby, darmowy i budowany otwarcie. Twoje wsparcie najpierw pokrywa domenę, hosting i bazę danych. Wszystko ponad to finansuje roadmapę: nowe ćwiczenia, sprzęt i funkcje, odblokowywane próg po progu, w miarę jak społeczność je finansuje.",
+    "later": "Może później"
+  }
+}

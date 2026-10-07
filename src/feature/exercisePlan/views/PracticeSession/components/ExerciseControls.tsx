@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
 import { FaPause, FaPlay, FaStepForward } from "react-icons/fa";
 
@@ -41,6 +42,7 @@ const ExerciseControls = ({
   isFinished = false,
   handleRestart
 }: ExerciseControlsProps) => {
+  const { t } = useTranslation("session");
   const [startHintSeen, setStartHintSeen] = useState(readStartHintSeen);
   // Space starts the timer without touching this button, so key off isPlaying.
   if (isPlaying && !startHintSeen) setStartHintSeen(true);
@@ -89,7 +91,7 @@ const ExerciseControls = ({
                 <div className="animate-bounce flex flex-col items-center">
                   <div className="bg-white  px-4 py-1.5 rounded-lg  text-[13px]  tracking-wider shadow-2xl shadow-white/20 flex items-center gap-1.5">
                     <FaPlay className="h-2.5 w-2.5" /> 
-                    <span>Press Start to play</span>
+                    <span>{t("controls.press_start")}</span>
                   </div>
                   <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white -mt-[1px]"></div>
                 </div>
@@ -97,12 +99,12 @@ const ExerciseControls = ({
             )}
             {isPlaying ? (
               <div className="flex items-center gap-2">
-                <span>Pause</span>
+                <span>{t("controls.pause")}</span>
                 <FaPause className={iconSizes[size]} />
               </div>
             ) : (
                <div className="flex items-center gap-2">
-                <span>Start</span>
+                <span>{t("start")}</span>
                 <FaPlay className={cn(iconSizes[size], "ml-0.5")} />
               </div>
             )}
@@ -119,7 +121,7 @@ const ExerciseControls = ({
              btnSizes[size],
              "rounded-lg transition-all click-behavior text-zinc-400 hover:text-white hover:bg-white/5 border border-white/5"
            )}
-           title="Restart Exercise"
+           title={t("controls.restart")}
          >
            <svg 
              className={iconSizes[size]} 

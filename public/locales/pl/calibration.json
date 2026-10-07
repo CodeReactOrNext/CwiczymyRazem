@@ -1,0 +1,98 @@
+{
+  "skip_calibration": "Pomiń kalibrację",
+  "setup": {
+    "title_native": "Konfiguracja audio",
+    "title_interface": "Konfiguracja interfejsu audio",
+    "title_mic": "Konfiguracja mikrofonu",
+    "connecting": "Łączenie…",
+    "start_listening": "Zacznij nasłuchiwać",
+    "grant": "Zezwól na mikrofon",
+    "signal_level": "Poziom sygnału",
+    "too_quiet": "Za cicho — uderz w strunę",
+    "good_level": "Dobry poziom ✓",
+    "input_sensitivity": "Czułość wejścia",
+    "play_notes": "Zagraj kilka dźwięków… {{seconds}} s",
+    "calibrated": "Skalibrowano ✓",
+    "auto_gain": "Automatyczna kalibracja wzmocnienia",
+    "tune_guitar": "Nastrój gitarę",
+    "headphones": "Użyj słuchawek przewodowych",
+    "headphones_body": "Bez słuchawek mikrofon zbiera podkład z głośników i powoduje fałszywe wykrycia.",
+    "quiet": "Znajdź ciche miejsce",
+    "quiet_body": "Hałas w tle powoduje fałszywe wykrycia dźwięków. Zamknij drzwi i wyłącz muzykę.",
+    "interface": "Interfejs",
+    "refresh": "Odśwież listę urządzeń",
+    "no_inputs": "Nie znaleziono urządzeń wejściowych",
+    "inputs": "wejścia: {{count}}",
+    "which_jack": "Do którego wejścia podłączona jest gitara?",
+    "channel": "Kanał {{n}}",
+    "native_hint": "Natywne przechwytywanie z niskim opóźnieniem — całkowicie omija przeglądarkę. Podłącz gitarę bezpośrednio do interfejsu powyżej.",
+    "output_auto": "Wyjście: {{label}} (auto)",
+    "matched": "dopasowane",
+    "change": "Zmień",
+    "output": "Wyjście",
+    "no_outputs": "Nie znaleziono urządzeń wyjściowych",
+    "output_hint": "Powinno pasować do interfejsu powyżej, żeby dźwięk i nagrywanie szły przez to samo urządzenie.",
+    "before_start": "Zanim zaczniesz",
+    "before_start_body": "Upewnij się, że interfejs jest wybrany jako wejście mikrofonowe przeglądarki, a gitara jest podłączona. Wzmocnienie ustawisz na następnym ekranie."
+  },
+  "tuning": {
+    "wrong_string": "Zła struna?",
+    "play_open": "Zagraj pustą strunę {{string}}",
+    "in_tune": "Nastrojona — trzymaj dalej…",
+    "sharp": "za wysoko ↓ obniż",
+    "flat": "za nisko ↑ podciągnij",
+    "title": "Nastrój gitarę",
+    "flat_label": "Nisko",
+    "sharp_label": "Wysoko",
+    "next_string": "Następna struna",
+    "finish": "Zakończ kalibrację",
+    "skip_string": "Pomiń strunę",
+    "redo": "Powtórz tę strunę"
+  },
+  "source": {
+    "title": "Kalibracja gitary",
+    "question": "Jak gitara jest podłączona do komputera?",
+    "interface": "Interfejs audio",
+    "interface_desc": "Interfejs audio USB lub Thunderbolt",
+    "mic": "Mikrofon",
+    "mic_desc": "Wbudowany mikrofon laptopa lub zewnętrzny mikrofon USB"
+  },
+  "summary": {
+    "title": "Gotowe",
+    "ready": "Wszystko gotowe!",
+    "body": "Kalibracja zakończona. Jeśli wykrywanie nadal wydaje się trochę nietrafione, nastrój gitarę jeszcze raz albo dostosuj czułość wejścia.",
+    "good_luck": "Powodzenia!",
+    "save": "Zapisz i zamknij",
+    "discard": "Odrzuć"
+  },
+  "permission": {
+    "title": "Dostęp do mikrofonu",
+    "body": "Aby wykrywać dźwięki gitary, potrzebujemy zgody na użycie wejścia audio. Żaden dźwięk nie jest nagrywany ani wysyłany na serwer.",
+    "allowing": "Zezwalanie...",
+    "allow": "Zezwól na mikrofon",
+    "prompt": "Pojawi się okno przeglądarki",
+    "skip": "Na razie pomiń"
+  },
+  "error": {
+    "title": "Mikrofon zablokowany",
+    "body": "Zezwól na dostęp do mikrofonu w ustawieniach przeglądarki i spróbuj ponownie.",
+    "retry": "Spróbuj ponownie",
+    "cancel": "Anuluj"
+  },
+  "choice": {
+    "title": "Istniejąca kalibracja",
+    "body": "Masz dane kalibracji z dnia {{date}}.",
+    "old": "Ta kalibracja ma ponad 30 dni — rozważ ponowną kalibrację dla najlepszej dokładności.",
+    "reuse": "Użyj istniejącej",
+    "recalibrate": "Skalibruj ponownie"
+  },
+  "mic_mode": {
+    "alt": "Ilustracja mikrofonu",
+    "required": "Wymagany mikrofon",
+    "tracking": "Śledzenie mikrofonem",
+    "exam_body": "Ten moduł wymaga konfiguracji mikrofonu. Włącz mikrofon, żeby system mógł ocenić Twoją grę podczas egzaminu.",
+    "body": "Ten plan zawiera ćwiczenia z tabulaturą. Włącz mikrofon, żeby system mógł słuchać gitary i oceniać Twoją grę na bieżąco.",
+    "enable": "Włącz mikrofon",
+    "skip": "Pomiń"
+  }
+}

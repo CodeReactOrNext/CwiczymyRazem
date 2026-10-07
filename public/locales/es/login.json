@@ -1,0 +1,16 @@
+{
+  "subtitlebar_text": "¡Practica, registra, gana puntos!",
+  "title": "Bienvenido de nuevo",
+  "subtitle": "Inicia sesión para seguir con tu progreso",
+  "email_label": "Correo electrónico",
+  "password_label": "Contraseña",
+  "google_button": "Continuar con Google",
+  "or_continue_with": "o continúa con",
+  "not_have_account": "¿Aún no tienes cuenta?",
+  "signup_link": "Crear cuenta",
+  "submit_button": "Iniciar sesión",
+  "forgot_password": "¿Has olvidado tu contraseña?",
+  "reset_password_success": "Te hemos enviado un correo para restablecer la contraseña. Revisa tu bandeja de entrada.",
+  "reset_password_error": "No se pudo enviar el correo para restablecer la contraseña. Comprueba que la dirección sea correcta.",
+  "enter_email_error": "Primero introduce tu correo electrónico."
+}

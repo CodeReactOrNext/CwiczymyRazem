@@ -1,0 +1,36 @@
+{
+  "errors": {
+    "fetch_error": "Daten konnten nicht geladen werden",
+    "password": "Falsches Passwort",
+    "email": "Ungültige E-Mail-Adresse",
+    "timeout": "Anmeldung fehlgeschlagen – Zeit abgelaufen",
+    "email_already-in-use": "Diese E-Mail-Adresse wird bereits verwendet",
+    "login": "Anmeldung fehlgeschlagen",
+    "popup_closed_by_user": "Anmeldung fehlgeschlagen – Anmeldefenster wurde geschlossen",
+    "credential_already_in_use": "Diese Anmeldedaten werden bereits verwendet",
+    "nick_already_in_use": "Dieser Nickname ist bereits vergeben",
+    "singup": "Registrierung fehlgeschlagen",
+    "upadate": "Daten konnten nicht aktualisiert werden. Bitte versuch es noch einmal.",
+    "avatar_max": "Der Avatar darf höchstens 250 × 250 px groß sein.",
+    "wrong_file_type": "Nur png- und jpg/jpeg-Dateien sind erlaubt",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuch es noch einmal."
+  },
+  "info": {
+    "new_user_tip": "Sieh dir die FAQ an, um zu erfahren, wie Riff Quest funktioniert",
+    "log_in_again": "Um Daten zu ändern, musst du dich erneut anmelden.",
+    "copy_link": "In die Zwischenablage kopieren",
+    "update_ready": "Eine neue Version von riff.quest ist bereit zur Installation.",
+    "update_ready_action": "Jetzt neu starten"
+  },
+  "success": {
+    "update_email": "E-Mail aktualisiert",
+    "update": "Daten erfolgreich aktualisiert",
+    "update_password": "Passwort aktualisiert",
+    "update_avatar ": "Avatar aktualisiert",
+    "logOut": "Erfolgreich abgemeldet",
+    "report_success": "Erfolgreich eingetragen",
+    "update_displayname": "Nickname geändert",
+    "restart": "Statistiken erfolgreich zurückgesetzt",
+    "singup": "Registrierung erfolgreich"
+  }
+}

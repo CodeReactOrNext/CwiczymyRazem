@@ -1,0 +1,26 @@
+{
+  "back": "Back",
+  "forward": "Forward",
+  "dashboard": "Dashboard",
+  "minimize": "Minimize",
+  "maximize": "Maximize",
+  "restore": "Restore",
+  "close": "Close",
+  "menu": {
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste",
+    "select_all": "Select All",
+    "copy_link": "Copy Link Address"
+  },
+  "update_required": {
+    "title": "Update required",
+    "body": "This desktop app (v{{version}}) is too old to keep working with riff.quest. Download the latest version to continue.",
+    "download": "Download latest version"
+  },
+  "tuner": {
+    "title": "Tuner",
+    "in_use": "The input is in use by your practice session — use its Tuner button.",
+    "opening": "Opening the audio interface…"
+  }
+}

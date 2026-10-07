@@ -20,6 +20,8 @@ import {
   PROFILE_FACT_IDS,
   PROFILE_SECTION_IDS,
 } from "feature/profile/types/profileLayout.types";
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
 
 export const MAX_TAGLINE_LENGTH = 80;
 export const MAX_ABOUT_LENGTH = 300;
@@ -288,18 +290,24 @@ export const isDefaultProfileLayout = (layout: ProfileLayoutConfig): boolean =>
 export const formatDaysAgo = (
   date: Date | null | undefined,
   now: Date = new Date(),
+  t?: Translate,
 ): string | null => {
   if (!date || Number.isNaN(date.getTime())) return null;
   const startOf = (d: Date) =>
     new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const days = Math.round((startOf(now) - startOf(date)) / 86_400_000);
-  if (days <= 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days < 30) return `${days} days ago`;
+  if (days <= 0) return translateOr(t, "profile:days_ago.today", "Today");
+  if (days === 1) return translateOr(t, "profile:days_ago.yesterday", "Yesterday");
+  if (days < 30) return translateOr(t, "profile:days_ago.days", "{{count}} days ago", { count: days });
   const months = Math.floor(days / 30);
-  if (months < 12) return months === 1 ? "A month ago" : `${months} months ago`;
+  if (months < 12)
+    return months === 1
+      ? translateOr(t, "profile:days_ago.month", "A month ago")
+      : translateOr(t, "profile:days_ago.months", "{{count}} months ago", { count: months });
   const years = Math.floor(days / 365);
-  return years <= 1 ? "A year ago" : `${years} years ago`;
+  return years <= 1
+    ? translateOr(t, "profile:days_ago.year", "A year ago")
+    : translateOr(t, "profile:days_ago.years", "{{count}} years ago", { count: years });
 };
 
 /** Pins or unpins a trophy; pinning past the limit leaves the case as it was. */

@@ -1,0 +1,98 @@
+{
+  "skip_calibration": "Saltar calibración",
+  "setup": {
+    "title_native": "Configuración de audio",
+    "title_interface": "Configurar interfaz de audio",
+    "title_mic": "Configurar micrófono",
+    "connecting": "Conectando…",
+    "start_listening": "Empezar a escuchar",
+    "grant": "Permitir el micrófono",
+    "signal_level": "Nivel de señal",
+    "too_quiet": "Muy bajo: toca una cuerda",
+    "good_level": "Buen nivel ✓",
+    "input_sensitivity": "Sensibilidad de entrada",
+    "play_notes": "Toca unas notas… {{seconds}} s",
+    "calibrated": "Calibrado ✓",
+    "auto_gain": "Calibrar ganancia automáticamente",
+    "tune_guitar": "Afinar guitarra",
+    "headphones": "Usa auriculares con cable",
+    "headphones_body": "Sin auriculares, el micrófono capta la pista de acompañamiento de los altavoces y provoca detecciones falsas.",
+    "quiet": "Busca un sitio tranquilo",
+    "quiet_body": "El ruido de fondo provoca detecciones falsas. Cierra las puertas y apaga la música.",
+    "interface": "Interfaz",
+    "refresh": "Actualizar lista de dispositivos",
+    "no_inputs": "No se encontraron dispositivos de entrada",
+    "inputs": "{{count}} entradas",
+    "which_jack": "¿En qué entrada está conectada tu guitarra?",
+    "channel": "Canal {{n}}",
+    "native_hint": "Captura nativa de baja latencia: evita por completo el navegador. Conecta la guitarra directamente a la interfaz de arriba.",
+    "output_auto": "Salida: {{label}} (auto)",
+    "matched": "emparejada",
+    "change": "Cambiar",
+    "output": "Salida",
+    "no_outputs": "No se encontraron dispositivos de salida",
+    "output_hint": "Debería coincidir con la interfaz de arriba para que el audio y la captura usen el mismo dispositivo.",
+    "before_start": "Antes de empezar",
+    "before_start_body": "Asegúrate de que tu interfaz está seleccionada como entrada de micrófono del navegador y de que la guitarra está conectada. Ajustarás la ganancia en la siguiente pantalla."
+  },
+  "tuning": {
+    "wrong_string": "¿Cuerda equivocada?",
+    "play_open": "Toca la cuerda {{string}} al aire",
+    "in_tune": "Afinada: mantén la nota…",
+    "sharp": "alta ↓ baja la afinación",
+    "flat": "baja ↑ sube la afinación",
+    "title": "Afina tu guitarra",
+    "flat_label": "Bajo",
+    "sharp_label": "Alto",
+    "next_string": "Siguiente cuerda",
+    "finish": "Terminar calibración",
+    "skip_string": "Saltar cuerda",
+    "redo": "Repetir esta cuerda"
+  },
+  "source": {
+    "title": "Calibración de la guitarra",
+    "question": "¿Cómo está conectada tu guitarra al ordenador?",
+    "interface": "Interfaz de audio",
+    "interface_desc": "Interfaz de audio USB o Thunderbolt",
+    "mic": "Micrófono",
+    "mic_desc": "Micrófono integrado del portátil o micrófono USB externo"
+  },
+  "summary": {
+    "title": "Listo",
+    "ready": "¡Todo preparado!",
+    "body": "La calibración ha terminado. Si la detección sigue algo desajustada, vuelve a afinar la guitarra o ajusta la sensibilidad de entrada.",
+    "good_luck": "¡Suerte!",
+    "save": "Guardar y cerrar",
+    "discard": "Descartar"
+  },
+  "permission": {
+    "title": "Acceso al micrófono",
+    "body": "Para detectar las notas de tu guitarra necesitamos permiso para usar tu entrada de audio. Nunca se graba ni se envía audio a ningún servidor.",
+    "allowing": "Permitiendo...",
+    "allow": "Permitir el micrófono",
+    "prompt": "Aparecerá un aviso del navegador",
+    "skip": "Saltar por ahora"
+  },
+  "error": {
+    "title": "Micrófono bloqueado",
+    "body": "Permite el acceso al micrófono en los ajustes del navegador y vuelve a intentarlo.",
+    "retry": "Reintentar",
+    "cancel": "Cancelar"
+  },
+  "choice": {
+    "title": "Calibración existente",
+    "body": "Tienes datos de calibración del {{date}}.",
+    "old": "Esta calibración tiene más de 30 días: plantéate recalibrar para mayor precisión.",
+    "reuse": "Usar la existente",
+    "recalibrate": "Recalibrar"
+  },
+  "mic_mode": {
+    "alt": "Ilustración de micrófono",
+    "required": "Micrófono necesario",
+    "tracking": "Seguimiento por micrófono",
+    "exam_body": "Este módulo requiere configurar el micrófono. Actívalo para que el sistema pueda evaluar cómo tocas durante el examen.",
+    "body": "Este plan incluye ejercicios con tablatura. Activa el micrófono para que el sistema escuche tu guitarra y puntúe cómo tocas en tiempo real.",
+    "enable": "Activar micrófono",
+    "skip": "Saltar"
+  }
+}

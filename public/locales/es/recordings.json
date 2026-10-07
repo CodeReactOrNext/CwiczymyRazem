@@ -1,0 +1,60 @@
+{
+  "toast": {
+    "added": "¡Grabación añadida!",
+    "add_failed": "No se pudo añadir la grabación.",
+    "comment_added": "¡Comentario añadido!",
+    "comment_failed": "No se pudo añadir el comentario.",
+    "logged_out": "Debes iniciar sesión.",
+    "bad_url": "Introduce una URL de YouTube válida."
+  },
+  "modal": {
+    "edit_title": "Editar grabación",
+    "add_title": "Añadir nueva grabación",
+    "which_song": "¿Qué canción es?",
+    "optional": "(opcional)",
+    "artist": "Artista...",
+    "song_title": "Título de la canción...",
+    "search_hint": "Escribe un artista o título para buscar en tu biblioteca",
+    "not_in_library": "No está en la biblioteca",
+    "saved_as_typed": "No pasa nada — la guardaremos tal como la escribiste.",
+    "youtube_url": "URL de YouTube *",
+    "title": "Título *",
+    "title_placeholder": "Mi cover increíble",
+    "description": "Descripción",
+    "description_placeholder": "Cuéntanos sobre tu grabación...",
+    "cancel": "Cancelar",
+    "save": "Guardar cambios",
+    "share": "Compartir grabación"
+  },
+  "card": {
+    "play": "Reproducir {{title}}",
+    "edit": "Editar grabación",
+    "delete_aria": "Eliminar grabación",
+    "confirm_title": "¿Seguro?",
+    "confirm_body": "Esta acción no se puede deshacer. Tu grabación se eliminará para siempre.",
+    "deleting": "Eliminando...",
+    "delete": "Eliminar",
+    "like": "Me gusta",
+    "comments": "Ver comentarios"
+  },
+  "grid": {
+    "empty_title": "No se encontraron grabaciones",
+    "empty_body": "¡Sé el primero en subir tu cover!"
+  },
+  "view": {
+    "title": "Grabaciones",
+    "subtitle": "Escucha y comparte tus sesiones de práctica",
+    "add": "Añadir grabación",
+    "all": "Todas las grabaciones",
+    "mine": "Mis grabaciones"
+  },
+  "viewer": {
+    "not_found": "Grabación no encontrada",
+    "comments": "Comentarios ({{count}})",
+    "no_comments": "Aún no hay comentarios.",
+    "write_comment": "Escribe un comentario..."
+  },
+  "song_section": {
+    "empty": "Aún no hay grabaciones de esta canción — sé el primero en compartir tu cover."
+  }
+}

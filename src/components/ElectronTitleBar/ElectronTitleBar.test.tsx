@@ -37,12 +37,12 @@ describe("ElectronTitleBar", () => {
     window.electronWindow = buildApi();
     render(<ElectronTitleBar />);
 
-    expect(await screen.findByLabelText("Zamknij")).toBeTruthy();
-    expect(screen.getByLabelText("Minimalizuj")).toBeTruthy();
-    expect(screen.getByLabelText("Maksymalizuj")).toBeTruthy();
-    expect(screen.getByLabelText("Wstecz")).toBeTruthy();
-    expect(screen.getByLabelText("Dalej")).toBeTruthy();
-    expect(screen.getByLabelText("Panel główny")).toBeTruthy();
+    expect(await screen.findByLabelText("Close")).toBeTruthy();
+    expect(screen.getByLabelText("Minimize")).toBeTruthy();
+    expect(screen.getByLabelText("Maximize")).toBeTruthy();
+    expect(screen.getByLabelText("Back")).toBeTruthy();
+    expect(screen.getByLabelText("Forward")).toBeTruthy();
+    expect(screen.getByLabelText("Dashboard")).toBeTruthy();
   });
 
   it("carries the amp switch, outside the bar's drag region", async () => {
@@ -105,8 +105,8 @@ describe("ElectronTitleBar", () => {
     render(<ElectronTitleBar />);
     await act(async () => {});
 
-    expect(screen.getByLabelText("Wstecz")).toBeTruthy();
-    expect(screen.queryByLabelText("Zamknij")).toBeNull();
-    expect(screen.queryByLabelText("Minimalizuj")).toBeNull();
+    expect(screen.getByLabelText("Back")).toBeTruthy();
+    expect(screen.queryByLabelText("Close")).toBeNull();
+    expect(screen.queryByLabelText("Minimize")).toBeNull();
   });
 });

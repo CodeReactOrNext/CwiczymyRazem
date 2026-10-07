@@ -20,6 +20,7 @@ import {
   getProfileSectionDefinition,
   PROFILE_SECTION_CATALOG,
 } from "feature/profile/data/profileSectionCatalog";
+import { useProfileLabels } from "feature/profile/hooks/useProfileLabels";
 import type {
   ProfileLayoutConfig,
   ProfileSectionId,
@@ -69,6 +70,8 @@ export const ProfileSections = ({
   earned,
   learnedSongs,
 }: ProfileSectionsProps) => {
+  const labels = useProfileLabels();
+  const { t } = labels;
   const [isEditing, setIsEditing] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isCardOpen, setIsCardOpen] = useState(false);
@@ -93,8 +96,12 @@ export const ProfileSections = ({
     () =>
       PROFILE_SECTION_CATALOG.filter(
         (definition) => !hasSection(layout, definition.id),
-      ),
-    [layout],
+      ).map((definition) => ({
+        ...definition,
+        title: labels.sectionTitle(definition),
+        description: labels.sectionDescription(definition),
+      })),
+    [layout, labels],
   );
 
   return (
@@ -104,9 +111,9 @@ export const ProfileSections = ({
           {editing ? (
             <p className='text-sm text-zinc-400'>
               <span className='font-semibold tabular-nums text-zinc-200'>
-                {layout.sections.length}/{MAX_SECTIONS} slots
+                {t("sections.slots", { count: layout.sections.length, max: MAX_SECTIONS })}
               </span>{" "}
-              · Drag to reorder, hide what you don&apos;t want to show.
+              · {t("sections.edit_hint")}
             </p>
           ) : (
             <span />
@@ -121,7 +128,7 @@ export const ProfileSections = ({
                   className='gap-1.5'
                   onClick={() => setIsCardOpen(true)}>
                   <IdCard size={14} />
-                  Profile card
+                  {t("card_sheet.title")}
                 </Button>
                 <Button
                   type='button'
@@ -130,7 +137,7 @@ export const ProfileSections = ({
                   className='gap-1.5'
                   onClick={() => setIsAddOpen(true)}>
                   <Plus size={14} />
-                  Add section
+                  {t("sections.add")}
                 </Button>
                 <Button
                   type='button'
@@ -152,7 +159,7 @@ export const ProfileSections = ({
                     })
                   }>
                   <RotateCcw size={14} />
-                  Reset
+                  {t("sections.reset")}
                 </Button>
                 <Button
                   type='button'
@@ -160,7 +167,7 @@ export const ProfileSections = ({
                   className='gap-1.5'
                   onClick={() => setIsEditing(false)}>
                   <Check size={14} />
-                  Done
+                  {t("sections.done")}
                 </Button>
               </>
             ) : (
@@ -171,7 +178,7 @@ export const ProfileSections = ({
                 className='gap-1.5 text-zinc-400 hover:text-zinc-100'
                 onClick={() => setIsEditing(true)}>
                 <Settings2 size={14} />
-                Customize profile
+                {t("sections.customize")}
               </Button>
             )}
           </div>
@@ -182,8 +189,8 @@ export const ProfileSections = ({
         <div className='rounded-2xl bg-zinc-900/30 px-6 py-12 text-center'>
           <p className='text-sm font-semibold text-zinc-200'>
             {isOwner
-              ? "Your profile shows only the card right now."
-              : "This player keeps their profile short."}
+              ? t("sections.empty_owner")
+              : t("sections.empty_visitor")}
           </p>
           {isOwner && (
             <Button
@@ -196,7 +203,7 @@ export const ProfileSections = ({
                 setIsAddOpen(true);
               }}>
               <Plus size={14} />
-              Add section
+              {t("sections.add")}
             </Button>
           )}
         </div>
@@ -211,7 +218,12 @@ export const ProfileSections = ({
             strategy={rectSortingStrategy}>
             <div className={cn(GRID, editing ? "gap-3" : "gap-8")}>
               {layout.sections.map((placement, index) => {
-                const definition = getProfileSectionDefinition(placement.id);
+                const base = getProfileSectionDefinition(placement.id);
+                const definition = {
+                  ...base,
+                  title: labels.sectionTitle(base),
+                  description: labels.sectionDescription(base),
+                };
                 return (
                   <SectionTile
                     key={placement.id}
@@ -246,12 +258,12 @@ export const ProfileSections = ({
             onOpenChange={setIsAddOpen}
             hidden={hidden}
             onAdd={(id) => updateLayout(addSection(layout, id))}
-            title='Add to profile'
-            description='New sections land at the bottom — drag them where they belong.'
-            emptyText='Every section is already on your profile.'
+            title={t("sections.add_title")}
+            description={t("sections.add_description")}
+            emptyText={t("sections.add_empty")}
             disabledReason={
               isProfileFull(layout)
-                ? `Your profile is full — ${MAX_SECTIONS} of ${MAX_SECTIONS} slots used. Hide a section to make room.`
+                ? t("sections.full", { max: MAX_SECTIONS })
                 : undefined
             }
           />

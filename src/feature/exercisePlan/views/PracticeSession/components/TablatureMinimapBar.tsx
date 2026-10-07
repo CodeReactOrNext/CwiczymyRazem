@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 interface TablatureMinimapBarProps {
@@ -85,6 +86,7 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   onSeek,
   onLoopRangeChange,
 }: TablatureMinimapBarProps) {
+  const { t } = useTranslation("session");
   const scrollRef  = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -311,7 +313,7 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
           className="relative cursor-pointer"
           // The on-screen hint used to sit below the strip, but it appeared and
           // disappeared with the loop and shifted everything under it.
-          title="Click a bar to jump · drag across bars to loop"
+          title={t("tab.minimap_hint")}
           style={{ width: contentWidth, height: CONTENT_H, touchAction: "pan-x" }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

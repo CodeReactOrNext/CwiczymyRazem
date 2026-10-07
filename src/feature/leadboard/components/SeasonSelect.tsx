@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import type { SeasonDataInterface } from "types/api.types";
 
 interface SeasonSelectProps {
@@ -22,6 +23,7 @@ const SeasonSelect = ({
   isLoading,
 }: SeasonSelectProps) => {
   const { t } = useTranslation("leadboard");
+  const intlLocale = useIntlLocale();
   const isCurrentSeason = (season: SeasonDataInterface) =>
     new Date(season.endDate) > new Date();
 
@@ -31,13 +33,13 @@ const SeasonSelect = ({
       onValueChange={setSelectedSeason}
       disabled={isLoading}>
       <SelectTrigger translate="no" className="max-w-md w-full">
-        <SelectValue placeholder='Select a season' />
+        <SelectValue placeholder={t("select_season")} />
       </SelectTrigger>
       <SelectContent translate="no">
         {seasons.map((season) => (
           <SelectItem key={season.seasonId} value={season.seasonId} translate="no">
-            {`${new Date(season.startDate).toLocaleDateString()} -
-               ${new Date(season.endDate).toLocaleDateString()}`}
+            {`${new Date(season.startDate).toLocaleDateString(intlLocale)} -
+               ${new Date(season.endDate).toLocaleDateString(intlLocale)}`}
             {isCurrentSeason(season) && ` (${t("current_season")})`}
           </SelectItem>
         ))}

@@ -32,7 +32,7 @@ export const ExerciseCard = ({
   onToggleFavorite,
   isPrivate = false,
 }: ExerciseCardProps) => {
-  const { t } = useTranslation(["common", "exercises"]);
+  const { t } = useTranslation(["common", "exercises", "plans"]);
 
   const skills = exercise.relatedSkills
     .map((skillId) => guitarSkills.find((s) => s.id === skillId))
@@ -120,18 +120,18 @@ export const ExerciseCard = ({
 
             {isPrivate && (
               <Badge className="bg-cyan-500/10 text-cyan-400 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
-                <Lock className="mr-1 h-3 w-3" />Private
+                <Lock className="mr-1 h-3 w-3" />{t("plans:private")}
               </Badge>
             )}
 
             {exercise.isPlayalong && (
               <Badge className="bg-red-500/10 text-red-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
-                <FaYoutube className="mr-1 h-3.5 w-3.5" />Playalong
+                <FaYoutube className="mr-1 h-3.5 w-3.5" />{t("plans:playalong")}
               </Badge>
             )}
             {exercise.videoUrl && !exercise.isPlayalong && (
               <Badge className="bg-cyan-500/10 text-cyan-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
-                <Video className="mr-1 h-3.5 w-3.5" />Video
+                <Video className="mr-1 h-3.5 w-3.5" />{t("plans:video")}
               </Badge>
             )}
 
@@ -164,7 +164,7 @@ export const ExerciseCard = ({
           {isLocked ? (
             <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 ring-1 ring-amber-500/20">
               <Lock className="h-3.5 w-3.5 text-amber-500" />
-              <span className="text-[11px] font-bold text-amber-500">Pro</span>
+              <span className="text-[11px] font-bold text-amber-500">{t("plans:pro")}</span>
             </div>
           ) : (
             <div className="flex items-center gap-1.5 shrink-0">
@@ -172,7 +172,7 @@ export const ExerciseCard = ({
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
-                  aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                  aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                   aria-pressed={isFavorite}
                   className={cn(
                     "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden ring-1",
@@ -180,7 +180,7 @@ export const ExerciseCard = ({
                       ? "bg-rose-500/15 text-rose-400 ring-rose-500/30 hover:bg-rose-500/25 hover:text-rose-300"
                       : "bg-white/5 text-zinc-400 ring-white/10 hover:text-rose-300 hover:bg-rose-500/10"
                   )}
-                  title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                  title={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                 >
                   <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
                 </button>
@@ -189,7 +189,7 @@ export const ExerciseCard = ({
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
                 className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10"
-                title="Preview Exercise Details"
+                title={t("plans:preview_details")}
               >
                 <Info className="h-4 w-4" />
               </button>
@@ -215,12 +215,12 @@ export const ExerciseCard = ({
         {/* Mobile Action Button */}
         <div className="sm:hidden w-full border-t border-white/5 py-3 px-4 flex justify-between items-center bg-white/[0.02]">
            <span className="text-[12px] font-medium text-zinc-400">
-             {isSelected ? "Exercise added" : "Pick this exercise"}
+             {isSelected ? t("plans:card.exercise_added") : t("plans:card.pick_exercise")}
            </span>
            {isLocked ? (
              <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 ring-1 ring-amber-500/20">
                <Lock className="h-3.5 w-3.5 text-amber-500" />
-               <span className="text-[11px] font-bold text-amber-500">Pro</span>
+               <span className="text-[11px] font-bold text-amber-500">{t("plans:pro")}</span>
              </div>
            ) : (
              <div className="flex flex-row items-center gap-2">
@@ -228,7 +228,7 @@ export const ExerciseCard = ({
                  <button
                    type="button"
                    onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
-                   aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                   aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                    aria-pressed={isFavorite}
                    className={cn(
                      "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden ring-1",

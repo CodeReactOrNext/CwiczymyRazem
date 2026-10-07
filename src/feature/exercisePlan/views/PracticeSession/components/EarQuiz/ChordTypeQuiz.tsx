@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { CHORD_QUALITIES } from "feature/exercisePlan/logic/earQuiz/chordQualities";
 import type { ChordQualityId } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import type { ChordTypeQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
+import { useTranslation } from "hooks/useTranslation";
 import { AudioWaveform } from "lucide-react";
 import { useState } from "react";
 
@@ -34,6 +35,7 @@ export function ChordTypeQuiz({
   onAnswer,
   onNext,
 }: ChordTypeQuizProps) {
+  const { t } = useTranslation("session");
   const { isPlaying, play, stop } = useEarQuizPlayback();
   const [picked, setPicked] = useState<ChordQualityId | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
@@ -62,25 +64,25 @@ export function ChordTypeQuiz({
     <>
       <div className='flex flex-col items-center gap-4 py-2'>
         <p className='text-center text-lg font-semibold text-zinc-100'>
-          What kind of chord is this?
+          {t("quiz.which_chord")}
         </p>
         <div className='flex flex-wrap items-center justify-center gap-3'>
           <ListenButton
             onClick={toggleChord}
             isPlaying={isPlaying}
-            label='Play chord'
+            label={t("quiz.play_chord")}
             hasPlayed={hasPlayed}
           />
           <QuizSecondaryButton
             onClick={() => playChord(ARPEGGIO_SPREAD)}
             icon={<AudioWaveform className='h-4 w-4' />}>
-            One note at a time
+            {t("quiz.one_note")}
           </QuizSecondaryButton>
         </div>
         <p className='text-center text-xs text-zinc-500'>
           {isAnswered
-            ? `Root: ${question.rootName}`
-            : "The root moves every round — listen to the colour, not the pitch"}
+            ? t("quiz.root", { root: question.rootName })
+            : t("quiz.root_moves")}
         </p>
       </div>
 
@@ -118,13 +120,13 @@ export function ChordTypeQuiz({
           isCorrect={isCorrect}
           answer={`${question.rootName}${answerQuality.suffix} — ${answerQuality.name}`}
           explanation={answerQuality.character}
-          footnote={`Formula: ${answerQuality.formula}`}
+          footnote={t("quiz.formula", { formula: answerQuality.formula })}
           onNext={onNext}
           extraAction={
             <QuizSecondaryButton
               onClick={() => playChord(ARPEGGIO_SPREAD)}
               icon={<AudioWaveform className='h-4 w-4' />}>
-              Hear it again, slowly
+              {t("quiz.hear_again_slowly")}
             </QuizSecondaryButton>
           }
         />

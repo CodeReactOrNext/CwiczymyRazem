@@ -3,12 +3,14 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { addDays, isSameDay, startOfWeek } from "date-fns";
 import { ScoreBreakdownTooltip } from "feature/profile/components/ScoreBreakdownTooltip";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
 import { FaFire } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 import { getReconciledStreak } from "utils/gameLogic";
 
 export const StreakBox = () => {
+  const { t } = useTranslation("nav");
   const router = useRouter();
   const userAuth = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -47,7 +49,7 @@ export const StreakBox = () => {
       </div>
 
       <div className='flex items-center gap-1 border-l border-white/5 pl-2'>
-        {["M", "T", "W", "T", "F", "S", "S"].map((dayLabel, index) => {
+        {t("weekday_letters").split(",").map((dayLabel, index) => {
           const today = new Date();
           const start = startOfWeek(today, { weekStartsOn: 1 });
           const dayDate = addDays(start, index);

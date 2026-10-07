@@ -1,0 +1,191 @@
+{
+  "subtitlebar_text": "Raport",
+  "exercise_type_title": "Wpisz czas ćwiczeń",
+  "technique": "Technika",
+  "theory": "Teoria",
+  "hearing": "Słuch",
+  "creativity": "Praca twórcza",
+  "healthy_habits_title": "Zdrowe nawyki",
+  "report_button": "Raportuj",
+  "exceeding_time": "Czy na pewno chcesz dodać raport?",
+  "sesion_title": "Cele tej sesji ćwiczeń:",
+  "optional": "opcjonalnie",
+  "days": "Dni",
+  "date_back": "Data wsteczna",
+  "max_days": "Maks. {{days}} dni",
+  "add_report_to_day": "Dodajesz raport do dnia:",
+  "total_time": "Łączny czas",
+  "toast": {
+    "log_out": "Wylogowano",
+    "24h_error": "Nie da się ćwiczyć więcej niż 24 godziny na dobę",
+    "input_time": "Wpisz czas",
+    "not_logged": "Nie jesteś zalogowany",
+    "stoper_entered": "Masz niezaraportowany czas z poprzedniej sesji ćwiczeń",
+    "exceeding_time": "Wpisałeś więcej czasu, niż upłynęło od ostatniego raportu. Przekroczenie wynosi  "
+  },
+  "description": {
+    "technique": "Np. granie i nauka utworów, rozgrzewka, ćwiczenie rytmu i różnych technik, takich jak kostkowanie naprzemienne czy legato",
+    "hearing": "Np. granie lub słuchanie utworów albo ich fragmentów ze słuchu, słuchanie i rozpoznawanie interwałów, śpiew",
+    "theory": "Np. transkrypcja i analiza utworów, nauka dźwięków na gryfie, czytanie nut",
+    "creative": "Np. pisanie własnych utworów, improwizacja, praca nad własnym stylem",
+    "exceeding_time": "Zaznacz to pole, jeśli zapomniałeś dodać czas lub zdrowy nawyk do poprzedniego raportu albo chcesz zaraportować dodatkową sesję, którą odbyłeś wcześniej.",
+    "sesion_title": "Nadaj sesji tytuł. Będzie widoczny w Twoim kalendarzu.",
+    "max_days": "Jeśli zapomniałeś, możesz dodać raport do {{days}} dni wstecz. Nie będzie on jednak liczony do serii dni z rzędu i zostanie wyróżniony w kalendarzu."
+  },
+  "habits": {
+    "exercise_plan": {
+      "title": "Czy zrealizowałeś swój plan ćwiczeń?",
+      "description": "Wyznaczanie celów i planowanie ćwiczeń na gitarze jest ważne, bo pomaga utrzymać motywację, śledzić postępy i osiągać zamierzone cele."
+    },
+    "new_things": {
+      "title": "Czy ćwiczyłeś nowe rzeczy?",
+      "description": "Ćwiczenie nowych rzeczy na gitarze jest ważne z kilku powodów. Przede wszystkim pomaga rozwijać nowe umiejętności i doskonalić te, które już masz. Podejmując nowe wyzwania, stajesz się lepszym muzykiem i poszerzasz swoje możliwości. "
+    },
+    "warmup": {
+      "title": "Czy zrobiłeś rozgrzewkę?",
+      "description": "Rozgrzewka przygotowuje mięśnie i stawy do fizycznego wysiłku, jakim jest gra. Zmniejsza ryzyko kontuzji i sprawia, że ćwiczenie jest wygodniejsze. Pomaga też poprawić technikę i precyzję, bo rozrusza palce i mięśnie."
+    },
+    "metronome": {
+      "title": "Czy używałeś metronomu?",
+      "description": "Metronom pomaga poprawić poczucie czasu i rytmu. Ćwicząc z nim, uczysz się grać równo do stałego pulsu i budujesz solidne podstawy rytmiczne."
+    },
+    "recording": {
+      "title": "Czy nagrywałeś się?",
+      "description": "Nagrywanie pozwala zobaczyć i usłyszeć swoją grę z innej perspektywy niż podczas grania na żywo. Dzięki temu zauważysz błędy lub słabsze strony, które mogły Ci umknąć. "
+    }
+  },
+  "rating_popup": {
+    "title": "ZDOBYŁEŚ",
+    "points": "pkt",
+    "skill_points_gained": "Zdobyte punkty umiejętności",
+    "spend_skill_points": "Wydaj punkty umiejętności",
+    "back": "Wstecz",
+    "regularity": "za regularność",
+    "streak": "dni z rzędu",
+    "habits": "za zdrowe nawyki",
+    "habitsWithCount_one": "zastosowałeś {{count}} zdrowy nawyk",
+    "habitsWithCount_other": "liczba zastosowanych zdrowych nawyków: {{count}}",
+    "time": "za ilość czasu",
+    "time_amount": "ćwiczyłeś przez",
+    "new_level": "Nowy poziom!",
+    "new_achievements": "Nowe osiągnięcia:",
+    "achievement_reward": "Czeka nagroda:",
+    "collect_reward": "Odbierz ją w swoim profilu"
+  },
+  "skills": {
+    "technique": "Technika",
+    "theory": "Teoria",
+    "hearing": "Słuch",
+    "creativity": "Kreatywność"
+  },
+  "chart": {
+    "categories": {
+      "technique": "Technika",
+      "theory": "Teoria",
+      "hearing": "Słuch",
+      "creativity": "Kreatywność"
+    }
+  },
+  "back": "Wstecz",
+  "hours": "Godziny",
+  "minutes": "Minuty",
+  "double_click_to_type": "Kliknij dwukrotnie, aby wpisać",
+  "errors": {
+    "invalid_time": "Wpisano nieprawidłowy czas",
+    "title_too_long": "Tytuł sesji jest za długi (maks. 60 znaków)",
+    "check_fields": "Sprawdź wszystkie pola i spróbuj ponownie"
+  },
+  "long_session": {
+    "title": "To długa sesja!",
+    "body": "Zamierzasz zaraportować {{time}} ćwiczeń. Wiemy, że to dużo — sprawdź, proszę, czy to nie pomyłka, zanim wyślesz.",
+    "confirm": "Czy na pewno chcesz zaraportować ten czas?",
+    "back": "Wróć do edycji",
+    "accept": "Tak, raportuj"
+  },
+  "form": {
+    "log_another": "Zapisz kolejną sesję",
+    "time_entered": "Czas wpisany. Zapisz teraz albo dodaj opcjonalne szczegóły poniżej.",
+    "song_selected": "Utwór wybrany — ustaw, jak długo go grałeś.",
+    "pick_songs": "Wybierz utwory, które grałeś, i ustaw czas dla każdego z nich.",
+    "what_practiced": "Co dziś ćwiczyłeś? Dodaj czas poniżej.",
+    "mode_free": "Wolna sesja",
+    "mode_songs": "Utwory",
+    "save_now": "Zapisz teraz",
+    "more_details": "Albo dodaj więcej szczegółów poniżej",
+    "add_time_hint": "Dodaj czas do co najmniej jednej kategorii, żeby zapisać",
+    "healthy_habits": "Zdrowe nawyki",
+    "focus_habits": "Cel sesji i nawyki",
+    "optional": "Opcjonalne",
+    "session_title": "Tytuł sesji",
+    "session_title_placeholder": "np. Ćwiczenie skal durowych",
+    "habits_checklist": "Lista nawyków",
+    "streak_bonus": "Seria dni: {{count}} — punkty ×{{multiplier}}",
+    "no_streak_bonus": "Brak serii — punkty ×{{multiplier}}",
+    "finalize": "Zakończ wpis",
+    "optional_details": "Opcjonalne szczegóły",
+    "when": "Kiedy to było?",
+    "today": "Dziś",
+    "yesterday": "Wczoraj",
+    "days_ago": "{{count}} dni temu",
+    "selected": "Wybrano:",
+    "saving": "Zapisywanie...",
+    "finish_save": "Zakończ i zapisz ćwiczenia"
+  },
+  "tag_groups": {
+    "goal": "Cel",
+    "playing_style": "Styl gry",
+    "techniques": "Techniki",
+    "theory_knowledge": "Teoria i wiedza",
+    "creative": "Kreatywność",
+    "performance": "Występy"
+  },
+  "tags": {
+    "warmup": "Rozgrzewka",
+    "technique": "Technika",
+    "speed_building": "Budowanie szybkości",
+    "ear_training": "Trening słuchu",
+    "fingerpicking": "Fingerpicking",
+    "rhythm_training": "Trening rytmu",
+    "vibrato": "Wibrato",
+    "bends": "Podciągnięcia",
+    "legato": "Legato",
+    "alt_picking": "Kostkowanie naprzemienne",
+    "hybrid_picking": "Hybrid picking",
+    "sweep_picking": "Sweep picking",
+    "tapping": "Tapping",
+    "picking_control": "Kontrola kostki",
+    "string_skipping": "Przeskakiwanie strun",
+    "down_picking": "Kostkowanie w dół",
+    "scales": "Skale",
+    "arpeggios": "Arpeggia",
+    "chords": "Akordy",
+    "theory": "Teoria",
+    "sight_reading": "Czytanie a vista",
+    "transcribing": "Transkrypcja",
+    "improvisation": "Improwizacja",
+    "new_song": "Nowy utwór",
+    "song_writing": "Pisanie piosenek",
+    "composition": "Kompozycja",
+    "jamming": "Jamowanie",
+    "performance_prep": "Przygotowanie do występu",
+    "performing": "Występ",
+    "cover_song": "Cover",
+    "soloing": "Solówki",
+    "recording": "Nagrywanie"
+  },
+  "songs": {
+    "less": "5 minut mniej: {{label}}",
+    "minutes_of": "Minuty ({{label}}) na tym utworze",
+    "more": "5 minut więcej: {{label}}",
+    "remove": "Usuń {{title}} z tej sesji",
+    "any_part": "Dowolna partia",
+    "empty_title": "Twoja biblioteka jest pusta",
+    "empty_body": "Dodaj utwory, nad którymi pracujesz, a będziesz mógł zapisywać czas ćwiczeń bezpośrednio na nich.",
+    "browse": "Przeglądaj utwory",
+    "done_adding": "Koniec dodawania",
+    "add_song": "Dodaj utwór",
+    "search": "Szukaj w bibliotece...",
+    "limit": "Jedna sesja może zawierać maksymalnie {{max}} utworów.",
+    "no_match": "Nic w twojej bibliotece nie pasuje."
+  }
+}

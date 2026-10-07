@@ -1,0 +1,255 @@
+{
+  "availablePoints": "verfügbare Punkte",
+  "level": "Level",
+  "progress": "Fortschritt",
+  "maxed": "MAX.",
+  "click_for_details": "Für Details klicken",
+  "upgrade_skill": "Diese Fähigkeit verbessern",
+  "upgrade": "Verbessern",
+  "current_level": "Aktuelles Level",
+  "points_to_distribute": "Punkte zu verteilen",
+  "skill_categories": "Fähigkeitskategorien",
+  "categories_description": "Wähle unten eine Kategorie, um deine Skillpunkte zu verteilen",
+  "no_skills_unlocked": "Noch keine Fähigkeiten in {{category}} freigeschaltet",
+  "unlock_skills_hint": "Sammle durch Üben Punkte, um Fähigkeiten freizuschalten",
+  "no_skills_unlocked_yet": "Du hast noch keine Fähigkeiten freigeschaltet",
+  "show_all_skills": "Alle verfügbaren Fähigkeiten anzeigen",
+  "available_points": "Verfügbare Punkte",
+  "point_usage_hint": "Klick auf +, um Fähigkeiten in diesen Kategorien zu verbessern",
+  "show_unlocked": "Nur freigeschaltete Fähigkeiten anzeigen",
+  "show_all": "Alle Fähigkeiten anzeigen",
+  "category_description": {
+    "technique": "Verteile hier Punkte, um deine Spieltechnik zu verbessern. Punkte aus Übungen helfen dir, deine technische Entwicklung zu verfolgen.",
+    "theory": "Verteile Punkte, um dein Wissen in Musiktheorie auszubauen. Gleiche das mit anderen Bereichen aus, um dich vielseitig zu entwickeln.",
+    "hearing": "Vergib Punkte, um dein Gehör zu trainieren. Behalte deinen Fortschritt im Blick, damit du diese wichtige Fähigkeit nicht vernachlässigst.",
+    "creativity": "Nutze Punkte, um deinen kreativen Ausdruck zu stärken. Verfolge, welche Bereiche du entwickelst und welche Aufmerksamkeit brauchen."
+  },
+  "intro": {
+    "title": "Gitarrenfähigkeiten entwickeln",
+    "description": "Verteile die Skillpunkte aus deinen Übungssessions, um bestimmte Bereiche deines Spiels zu entwickeln.",
+    "point1": "Sammle Skillpunkte, indem du Übungen abschließt",
+    "point2": "Verteile Punkte auf die Bereiche, die du entwickeln willst",
+    "point3": "Verfolge deinen Fortschritt, um zu sehen, welche Fähigkeiten du entwickelst und welche du vernachlässigst",
+    "got_it": "Verstanden"
+  },
+  "categories": {
+    "technique": "Technik",
+    "theory": "Theorie",
+    "hearing": "Gehör",
+    "creativity": "Kreativität"
+  },
+  "skills": {
+    "alternate_picking": {
+      "name": "Wechselschlag",
+      "description": "Meistere den Wechsel zwischen Ab- und Aufschlag"
+    },
+    "legato": {
+      "name": "Legato",
+      "description": "Fließende Spieltechnik mit Hammer-ons und Pull-offs"
+    },
+    "sweep_picking": {
+      "name": "Sweep Picking",
+      "description": "Fortgeschrittene Anschlagstechnik zum Spielen von Arpeggien"
+    },
+    "chord_theory": {
+      "name": "Akkordlehre",
+      "description": "Aufbau von Akkorden und Akkordfolgen verstehen"
+    },
+    "scales": {
+      "name": "Tonleitern",
+      "description": "Lerne und meistere die wichtigsten Gitarrentonleitern"
+    },
+    "rhythm": {
+      "name": "Rhythmus-Meisterschaft",
+      "description": "Entwickle präzises Timing und Rhythmuskontrolle"
+    },
+    "finger_independence": {
+      "name": "Fingerunabhängigkeit",
+      "description": "Entwickle die Fähigkeit, die Finger unabhängig voneinander zu bewegen"
+    },
+    "phrasing": {
+      "name": "Phrasierung",
+      "description": "Forme Linien mit Pausen, Dynamik und Tonauswahl"
+    },
+    "articulation": {
+      "name": "Artikulation",
+      "description": "Meistere verschiedene Artikulationstechniken für mehr musikalischen Ausdruck"
+    },
+    "bending": {
+      "name": "Bendings",
+      "description": "Meistere das Ziehen von Saiten für ausdrucksstarkes Spiel"
+    },
+    "tapping": {
+      "name": "Tapping",
+      "description": "Fortgeschrittene Technik mit beiden Händen auf dem Griffbrett"
+    },
+    "string_skipping": {
+      "name": "String Skipping",
+      "description": "Entwickle Präzision und Koordination beim Überspringen von Saiten"
+    },
+    "improvisation": {
+      "name": "Improvisation",
+      "description": "Erschaffe spontane musikalische Ideen und Soli"
+    },
+    "ear_training": {
+      "name": "Gehörbildung",
+      "description": "Entwickle die Fähigkeit, Töne, Intervalle und Akkorde nach Gehör zu erkennen"
+    },
+    "sight_reading": {
+      "name": "Vom-Blatt-Spiel",
+      "description": "Lerne, Notenschrift flüssig zu lesen und zu spielen"
+    },
+    "fingerpicking": {
+      "name": "Fingerpicking",
+      "description": "Meistere Fingerstyle-Techniken"
+    },
+    "music_composition": {
+      "name": "Komposition",
+      "description": "Lerne, eigene Musik zu schreiben und zu arrangieren"
+    },
+    "pitch_recognition": {
+      "name": "Tonhöhenerkennung",
+      "description": "Entwickle absolutes und relatives Gehör"
+    },
+    "harmony": {
+      "name": "Harmonielehre",
+      "description": "Meistere komplexe Akkordfolgen und Stimmführung"
+    },
+    "vibrato": {
+      "name": "Vibrato",
+      "description": "Meistere die Kunst, durch Saitenschwingung Ausdruck zu erzeugen"
+    },
+    "music_theory": {
+      "name": "Griffbrett & Theorie",
+      "description": "Kenne jeden Ton auf dem Hals und die Theorie dahinter"
+    },
+    "rhythm_variations": {
+      "name": "Fortgeschrittener Rhythmus",
+      "description": "Meistere komplexe Taktarten und Polyrhythmen"
+    },
+    "songwriting": {
+      "name": "Songwriting",
+      "description": "Schreibe komplette Songs mit Text und Arrangement"
+    },
+    "slide_guitar": {
+      "name": "Slide-Gitarre",
+      "description": "Meistere das Spielen mit einem Bottleneck"
+    },
+    "modal_theory": {
+      "name": "Modale Theorie",
+      "description": "Kirchentonarten verstehen und anwenden"
+    },
+    "audio_production": {
+      "name": "Sound",
+      "description": "Lerne, Gitarrenspuren aufzunehmen und zu produzieren"
+    },
+    "hybrid_picking": {
+      "name": "Hybrid Picking",
+      "description": "Kombiniere Plektrum- und Fingertechnik"
+    },
+    "harmony-ear": {
+      "name": "Harmonien nach Gehör",
+      "description": "Entwickle die Fähigkeit, Akkorde und Akkordfolgen nach Gehör zu erkennen"
+    },
+    "chords": {
+      "name": "Akkorde",
+      "description": "Meistere Akkordaufbau und Akkordfolgen"
+    },
+    "transcription": {
+      "name": "Transkription",
+      "description": "Lerne, Musik nach Gehör in Noten oder Tabulatur aufzuschreiben"
+    },
+    "picking": {
+      "name": "Anschlag",
+      "description": "Meistere grundlegende Anschlagstechniken und präzises Anschlagen der Saiten"
+    },
+    "basic_chords": {
+      "name": "Grundakkorde",
+      "description": "Grundlagen offener Akkorde und Powerchords"
+    },
+    "intermediate_chords": {
+      "name": "Akkorde für Fortgeschrittene",
+      "description": "Barréakkorde und komplexe Voicings"
+    },
+    "advanced_chords": {
+      "name": "Akkorde für Profis",
+      "description": "Erweiterte und alterierte Akkord-Voicings"
+    },
+    "basic_scales": {
+      "name": "Grundtonleitern",
+      "description": "Dur-, Moll- und Pentatonik-Tonleitern"
+    },
+    "intermediate_scales": {
+      "name": "Tonleitern für Fortgeschrittene",
+      "description": "Modale Tonleitern und weitere Muster"
+    },
+    "advanced_scales": {
+      "name": "Tonleitern für Profis",
+      "description": "Exotische und komplexe Tonleitersysteme"
+    },
+    "rhythm_basics": {
+      "name": "Rhythmus-Grundlagen",
+      "description": "Grundlegende Schlagmuster und Timing"
+    },
+    "rhythm_intermediate": {
+      "name": "Rhythmus für Fortgeschrittene",
+      "description": "Komplexe Schlagmuster und Synkopen"
+    },
+    "rhythm_advanced": {
+      "name": "Rhythmus für Profis",
+      "description": "Polyrhythmen und fortgeschrittene Timing-Konzepte"
+    },
+    "music_theory_basics": {
+      "name": "Theorie-Grundlagen",
+      "description": "Grundlagen der Notenschrift und Harmonielehre"
+    },
+    "music_theory_intermediate": {
+      "name": "Theorie für Fortgeschrittene",
+      "description": "Akkordfolgen und fortgeschrittene Harmonielehre"
+    },
+    "music_theory_advanced": {
+      "name": "Theorie für Profis",
+      "description": "Komplexe harmonische Systeme und Analyse"
+    },
+    "ear_training_basic": {
+      "name": "Gehörbildung – Grundlagen",
+      "description": "Töne und einfache Intervalle erkennen"
+    },
+    "ear_training_intermediate": {
+      "name": "Gehörbildung – Fortgeschritten",
+      "description": "Akkorderkennung und Transkription"
+    },
+    "ear_training_advanced": {
+      "name": "Gehörbildung – Profi",
+      "description": "Transkription komplexer Harmonik und Rhythmik"
+    },
+    "improvisation_basic": {
+      "name": "Improvisation – Grundlagen",
+      "description": "Einfache melodische Improvisation über einfache Akkordfolgen"
+    },
+    "improvisation_intermediate": {
+      "name": "Improvisation – Fortgeschritten",
+      "description": "Phrasierung und komplexere Improvisationskonzepte"
+    },
+    "improvisation_advanced": {
+      "name": "Improvisation – Profi",
+      "description": "Eine eigene Stimme und fortgeschrittene Techniken entwickeln"
+    },
+    "composition_basic": {
+      "name": "Komposition – Grundlagen",
+      "description": "Einfaches Songwriting und melodische Entwicklung"
+    },
+    "composition_intermediate": {
+      "name": "Komposition – Fortgeschritten",
+      "description": "Komplexere Songstrukturen und Arrangements"
+    },
+    "composition_advanced": {
+      "name": "Komposition – Profi",
+      "description": "Anspruchsvolle Kompositionstechniken"
+    },
+    "composition": {
+      "name": "Komposition",
+      "description": "Lerne, eigene Musik zu schreiben und zu arrangieren"
+    }
+  }
+}

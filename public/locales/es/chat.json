@@ -1,0 +1,75 @@
+{
+  "send": "Enviar",
+  "send_placeholder": "Escribe un mensaje...",
+  "like": "Me gusta",
+  "validation_too_long": "El mensaje no puede superar los 2000 caracteres.",
+  "error": "No se pudo enviar el mensaje",
+  "empty_room": {
+    "title": "Nadie ha dicho nada todavía",
+    "guild": "Sé el primero — saluda a tu gremio.",
+    "everyone": "Sé el primero — saluda a todos.",
+    "say_hi": "Saludar 👋"
+  },
+  "greetings": {
+    "welcome": "¡Bienvenido! 👋",
+    "hi_guild": "¡Hola, gremio! 👋",
+    "hi_everyone": "¡Hola a todos! 👋"
+  },
+  "welcome_goal": {
+    "plan_named": "empieza con el plan {{plan}}",
+    "plan": "empieza con un plan de práctica",
+    "songs": "viene a aprender canciones",
+    "roadmap": "está creando una hoja de ruta",
+    "journey": "empieza la Ruta de aprendizaje",
+    "log": "viene a registrar su práctica"
+  },
+  "system": {
+    "and": "y",
+    "and_other": "y {{count}} persona más",
+    "and_others": "y {{count}} más",
+    "said_hi": "saludaron",
+    "say_hi": "Saludar",
+    "joined_with": "Se unió a Riff Quest, {{phrase}}",
+    "joined": "Se unió a Riff Quest",
+    "reached_level": "alcanzó el nivel",
+    "cleared": "Completadas: {{quests}}",
+    "joined_guild": "Se unió al gremio"
+  },
+  "attachment": {
+    "kinds": {
+      "exercise": "Ejercicio",
+      "plan": "Plan",
+      "song": "Canción",
+      "recording": "Grabación"
+    },
+    "play": "Tocar",
+    "open": "Abrir",
+    "watch": "Ver",
+    "guitar": "Guitarra",
+    "pedal": "Pedal",
+    "share_title": "Compartir en el chat",
+    "tabs": {
+      "exercise": "Ejercicio",
+      "plan": "Plan",
+      "song": "Mis canciones",
+      "recording": "Mis grabaciones",
+      "item": "Mi equipo"
+    },
+    "search": "Buscar…",
+    "loading": "Cargando…",
+    "empty": "Aún no hay nada que compartir aquí."
+  },
+  "composer": {
+    "replying_to": "Respondiendo a",
+    "cancel_reply": "Cancelar respuesta",
+    "sharing": "Compartiendo",
+    "remove_attachment": "Quitar adjunto",
+    "mention": "Mencionar a alguien",
+    "share": "Compartir un ejercicio, canción u objeto",
+    "send": "Enviar"
+  },
+  "reactions": {
+    "react_with": "Reaccionar con {{emoji}}",
+    "reply": "Responder"
+  }
+}

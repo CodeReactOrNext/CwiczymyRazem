@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
 import { useSong } from "feature/songs/hooks/useSong";
@@ -29,6 +30,7 @@ export const SongPracticePickerLauncher = ({
   userId,
   onClose,
 }: SongPracticePickerLauncherProps) => {
+  const { t } = useTranslation("songs");
   const queryClient = useQueryClient();
   const userInfo = useAppSelector(selectUserInfo);
   const isPremium =
@@ -50,7 +52,7 @@ export const SongPracticePickerLauncher = ({
   const isMissing = !!songId && isSongFetched && !song;
   useEffect(() => {
     if (!isMissing) return;
-    toast.error("Song not found");
+    toast.error(t("picker.not_found"));
     onClose();
   }, [isMissing, onClose]);
 

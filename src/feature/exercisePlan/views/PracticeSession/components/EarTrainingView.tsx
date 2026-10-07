@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Check, Ear, Eye, Mic, Play, Square, Trophy, Volume2, X } from "lucide-react";
 
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
@@ -45,21 +46,22 @@ export const EarTrainingView = ({
   className,
   onRecordsClick,
 }: EarTrainingViewProps) => {
+  const { t } = useTranslation("session");
   const listening = !!riddleProgress?.listening;
   const showDots = !!isMicEnabled && !!riddleProgress && riddleProgress.total > 0 && !isRevealed;
   const isNewBest = highScore != null && highScore > 0 && score > highScore;
 
   const status = isRevealed
     ? isGuessed
-      ? { title: "Correct — point earned", caption: isMicEnabled ? "Next melody is on its way…" : "The tab below shows the melody. Replay it to compare." }
-      : { title: "Answer revealed", caption: "Compare with the tab below — did you play it right?" }
+      ? { title: t("ear.correct"), caption: isMicEnabled ? t("ear.next_melody") : t("ear.tab_shows") }
+      : { title: t("ear.revealed"), caption: t("ear.compare") }
     : isPlaying
-      ? { title: "Playing melody…", caption: "It plays once and stops on its own — then it's your turn" }
+      ? { title: t("ear.playing"), caption: t("ear.plays_once") }
       : !canGuess
-        ? { title: "Listen & repeat", caption: "Play the melody, then find it on your guitar" }
+        ? { title: t("ear.listen_repeat"), caption: t("ear.listen_repeat_caption") }
         : listening
-          ? { title: "Listening for your answer", caption: "Play the notes you heard — get them all right and it advances on its own" }
-          : { title: "Your turn", caption: isMicEnabled ? "Play your answer on your guitar, or replay the melody first" : "Play it back from memory, then reveal to check yourself" };
+          ? { title: t("ear.listening"), caption: t("ear.listening_caption") }
+          : { title: t("ear.your_turn"), caption: isMicEnabled ? t("ear.your_turn_mic") : t("ear.your_turn_memory") };
 
   return (
     <div className={cn("mx-auto w-full max-w-xl", className)}>
@@ -70,7 +72,7 @@ export const EarTrainingView = ({
           <div className="flex min-w-0 items-center gap-2">
             <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", difficultyDot[difficulty])} />
             <span className="truncate text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Ear training
+              {t("ear.title")}
             </span>
           </div>
           <div className="flex shrink-0 items-center gap-3 text-xs tabular-nums">
@@ -89,8 +91,8 @@ export const EarTrainingView = ({
               >
                 <Trophy className="h-3 w-3" />
                 {isNewBest
-                  ? <span className="font-bold">New best</span>
-                  : <>Best <span className="font-bold">{highScore}</span></>}
+                  ? <span className="font-bold">{t("ear.new_best")}</span>
+                  : <>{t("ear.best")} <span className="font-bold">{highScore}</span></>}
               </button>
             )}
           </div>
@@ -165,8 +167,8 @@ export const EarTrainingView = ({
               onClick={onPlayRiddle}
             >
               {isPlaying
-                ? <><Square className="mr-1.5 h-3.5 w-3.5" /> Stop</>
-                : <><Play className="mr-1.5 h-3.5 w-3.5" /> {canGuess ? "Replay" : "Play"}</>}
+                ? <><Square className="mr-1.5 h-3.5 w-3.5" /> {t("quiz.stop")}</>
+                : <><Play className="mr-1.5 h-3.5 w-3.5" /> {canGuess ? t("ear.replay") : t("quiz.play")}</>}
             </Button>
             <Button
               size="sm"
@@ -174,7 +176,7 @@ export const EarTrainingView = ({
               className="h-9 px-4 text-zinc-400 hover:text-zinc-100"
               onClick={onReveal}
             >
-              <Eye className="mr-1.5 h-3.5 w-3.5" /> {isMicEnabled ? "Stuck? Reveal" : "Show answer"}
+              <Eye className="mr-1.5 h-3.5 w-3.5" /> {isMicEnabled ? t("ear.stuck_reveal") : t("ear.show_answer")}
             </Button>
           </div>
         ) : !isGuessed ? (
@@ -184,7 +186,7 @@ export const EarTrainingView = ({
               variant="ghost"
               className="h-9 px-3 text-zinc-400 hover:text-zinc-100"
               onClick={onPlayRiddle}
-              title={isPlaying ? "Stop" : "Replay melody"}
+              title={isPlaying ? t("quiz.stop") : t("ear.replay_melody")}
             >
               {isPlaying ? <Square className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             </Button>
@@ -193,7 +195,7 @@ export const EarTrainingView = ({
               className="h-9 flex-1 bg-emerald-500/90 font-semibold text-emerald-950 hover:bg-emerald-400"
               onClick={() => { onGuessed(); onNextRiddle(); }}
             >
-              <Check className="mr-1.5 h-3.5 w-3.5" /> I had it&nbsp;<span className="opacity-70">+1</span>
+              <Check className="mr-1.5 h-3.5 w-3.5" /> {t("ear.had_it")}&nbsp;<span className="opacity-70">+1</span>
             </Button>
             <Button
               size="sm"
@@ -211,7 +213,7 @@ export const EarTrainingView = ({
               variant="ghost"
               className="h-9 px-3 text-zinc-400 hover:text-zinc-100"
               onClick={onPlayRiddle}
-              title={isPlaying ? "Stop" : "Replay melody"}
+              title={isPlaying ? t("quiz.stop") : t("ear.replay_melody")}
             >
               {isPlaying ? <Square className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             </Button>

@@ -1,0 +1,16 @@
+{
+  "valid_email": "Introduce un correo electrónico válido",
+  "stronger_password": "Introduce una contraseña más segura",
+  "password_char_number": "La contraseña debe tener al menos 8 caracteres",
+  "username_char_number": "El nombre de usuario debe tener al menos 3 caracteres",
+  "username_char_max_number": "El nombre de usuario puede tener como máximo 28 caracteres",
+  "required": "Obligatorio",
+  "same_passwords": "Las contraseñas deben coincidir",
+  "no_ends_whitespace": "El nombre de usuario no puede empezar ni terminar con un espacio",
+  "allowed_signs": "Solo se permiten letras, números y los caracteres - _",
+  "not_yt_link": "No es un enlace válido a un canal de YouTube",
+  "not_sc_link": "No es un enlace válido de SoundCloud",
+  "empty": "No puede estar vacío",
+  "max_bands": "No puede tener más de 60 caracteres",
+  "min_bands": "No puede tener menos de 2 caracteres"
+}

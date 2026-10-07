@@ -6,6 +6,7 @@ import {
 } from "feature/exercisePlan/components/Metronome/utils/clickTones";
 import { previewMetronomeSound } from "feature/exercisePlan/components/Metronome/utils/previewMetronomeSound";
 import { useHandednessStore, useIsLeftHanded } from "hooks/useHandedness";
+import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import {
   AlignJustify,
@@ -248,6 +249,7 @@ function ResetButton({
  * preview is on screen updates as the controls move.
  */
 export function TablatureSettingsPanel() {
+  const { t } = useTranslation(["tab_settings", "metronome"]);
   const settings = useTablatureSettings();
   const { set, reset } = settings;
   // Handedness lives in its own store: it is a property of the player rather
@@ -262,28 +264,28 @@ export function TablatureSettingsPanel() {
   }[] = [
     {
       key: "showRhythmLane",
-      label: "Rhythm lane",
-      desc: "Stems, beams and rests above the staff",
+      label: t("toggles.rhythm_lane"),
+      desc: t("toggles.rhythm_lane_desc"),
     },
     {
       key: "showChordNames",
-      label: "Chord names",
-      desc: "White chord pills over the bar",
+      label: t("toggles.chord_names"),
+      desc: t("toggles.chord_names_desc"),
     },
     {
       key: "showTuningGutter",
-      label: "Tuning gutter",
-      desc: "Pinned string names on the left",
+      label: t("toggles.tuning_gutter"),
+      desc: t("toggles.tuning_gutter_desc"),
     },
     {
       key: "showMeasureLines",
-      label: "Measure lines",
-      desc: "Vertical bar dividers",
+      label: t("toggles.measure_lines"),
+      desc: t("toggles.measure_lines_desc"),
     },
     {
       key: "showTechniqueLabels",
-      label: "Technique markers",
-      desc: "H/P, bends, PM, vibrato, harmonics, picking ⊓/⋁",
+      label: t("toggles.technique"),
+      desc: t("toggles.technique_desc"),
     },
   ];
 
@@ -293,11 +295,11 @@ export function TablatureSettingsPanel() {
           reach for most, mid-session, to fit more on screen or read fret
           numbers more easily. */}
       <Section
-        title='Spacing'
-        hint='How far apart notes sit across the bar and between strings.'>
+        title={t("spacing")}
+        hint={t("spacing_hint")}>
         <div className='grid gap-x-8 gap-y-4 sm:grid-cols-2'>
           <SliderRow
-            label='Note spacing'
+            label={t("note_spacing")}
             value={settings.noteSpacing}
             min={NOTE_SPACING_MIN}
             max={NOTE_SPACING_MAX}
@@ -306,7 +308,7 @@ export function TablatureSettingsPanel() {
             onChange={(v) => set("noteSpacing", Math.round(v * 100) / 100)}
           />
           <SliderRow
-            label='String spacing'
+            label={t("string_spacing")}
             value={settings.stringSpacing}
             min={STRING_SPACING_MIN}
             max={STRING_SPACING_MAX}
@@ -317,9 +319,9 @@ export function TablatureSettingsPanel() {
         </div>
       </Section>
 
-      <Section title='Fret numbers'>
+      <Section title={t("fret_numbers")}>
         <SliderRow
-          label='Size'
+          label={t("size")}
           value={settings.fretFontScale}
           min={FRET_FONT_MIN}
           max={FRET_FONT_MAX}
@@ -341,10 +343,10 @@ export function TablatureSettingsPanel() {
                 </span>
               </span>
               <span className='text-xs font-semibold text-zinc-100'>
-                {FRET_TEXT_COLORS[key].label}
+                {t(`fret_text.${key}.label`, FRET_TEXT_COLORS[key].label)}
               </span>
               <span className='text-[10px] leading-tight text-zinc-500'>
-                {FRET_TEXT_COLORS[key].desc}
+                {t(`fret_text.${key}.desc`, FRET_TEXT_COLORS[key].desc)}
               </span>
             </OptionCard>
           ))}
@@ -352,8 +354,8 @@ export function TablatureSettingsPanel() {
       </Section>
 
       <Section
-        title='Default view'
-        hint='Which view opens automatically when you start a practice session.'>
+        title={t("default_view")}
+        hint={t("default_view_hint")}>
         <div className='grid grid-cols-2 gap-2'>
           {DEFAULT_VIEW_OPTIONS.map(({ key, label, desc, Icon }) => (
             <OptionCard
@@ -364,10 +366,10 @@ export function TablatureSettingsPanel() {
                 <Icon className='h-5 w-5 text-zinc-200' />
               </span>
               <span className='flex items-center gap-1.5 text-xs font-semibold text-zinc-100'>
-                {label}
+                {t(`views.${key}.label`, label)}
               </span>
               <span className='text-[10px] leading-tight text-zinc-500'>
-                {desc}
+                {t(`views.${key}.desc`, desc)}
               </span>
             </OptionCard>
           ))}
@@ -375,8 +377,8 @@ export function TablatureSettingsPanel() {
       </Section>
 
       <Section
-        title='Metronome sound'
-        hint='Tap one to hear it. Used for the count-in and the tab view; the notation view keeps AlphaTab’s own click.'>
+        title={t("metronome_sound")}
+        hint={t("metronome_sound_hint")}>
         <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
           {METRONOME_SOUND_ORDER.map((key) => {
             const Icon = METRONOME_SOUND_ICONS[key];
@@ -392,10 +394,10 @@ export function TablatureSettingsPanel() {
                   <Icon className='h-5 w-5 text-zinc-200' />
                 </span>
                 <span className='text-xs font-semibold text-zinc-100'>
-                  {METRONOME_SOUNDS[key].label}
+                  {t(`metronome:sounds.${key}.label`, METRONOME_SOUNDS[key].label)}
                 </span>
                 <span className='text-[10px] leading-tight text-zinc-500'>
-                  {METRONOME_SOUNDS[key].desc}
+                  {t(`metronome:sounds.${key}.desc`, METRONOME_SOUNDS[key].desc)}
                 </span>
               </OptionCard>
             );
@@ -404,8 +406,8 @@ export function TablatureSettingsPanel() {
       </Section>
 
       <Section
-        title='Note pills'
-        hint='Shape of the blocks carrying the fret numbers, and how a note’s length is drawn.'>
+        title={t("note_pills")}
+        hint={t("note_pills_hint")}>
         <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
           {PILL_PRESET_ORDER.map((key) => (
             <OptionCard
@@ -416,10 +418,10 @@ export function TablatureSettingsPanel() {
                 <PillSwatch presetKey={key} />
               </span>
               <span className='text-xs font-semibold text-zinc-100'>
-                {PILL_PRESETS[key].label}
+                {t(`pills.${key}.label`, PILL_PRESETS[key].label)}
               </span>
               <span className='text-[10px] leading-tight text-zinc-500'>
-                {PILL_PRESETS[key].desc}
+                {t(`pills.${key}.desc`, PILL_PRESETS[key].desc)}
               </span>
             </OptionCard>
           ))}
@@ -434,10 +436,10 @@ export function TablatureSettingsPanel() {
                 <NoteStyleSwatch styleKey={key} />
               </span>
               <span className='text-xs font-semibold text-zinc-100'>
-                {NOTE_STYLES[key].label}
+                {t(`note_styles.${key}.label`, NOTE_STYLES[key].label)}
               </span>
               <span className='text-[10px] leading-tight text-zinc-500'>
-                {NOTE_STYLES[key].desc}
+                {t(`note_styles.${key}.desc`, NOTE_STYLES[key].desc)}
               </span>
             </OptionCard>
           ))}
@@ -445,8 +447,8 @@ export function TablatureSettingsPanel() {
       </Section>
 
       <Section
-        title='String palette'
-        hint='One colour per string, high e first.'>
+        title={t("string_palette")}
+        hint={t("string_palette_hint")}>
         <div className='grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-4'>
           {(Object.keys(STRING_PALETTES) as PaletteKey[]).map((key) => (
             <OptionCard
@@ -463,10 +465,10 @@ export function TablatureSettingsPanel() {
                 ))}
               </span>
               <span className='text-xs font-semibold text-zinc-100'>
-                {STRING_PALETTES[key].label}
+                {t(`palettes.${key}.label`, STRING_PALETTES[key].label)}
               </span>
               <span className='text-[10px] leading-tight text-zinc-500'>
-                {STRING_PALETTES[key].desc}
+                {t(`palettes.${key}.desc`, STRING_PALETTES[key].desc)}
               </span>
             </OptionCard>
           ))}
@@ -474,8 +476,8 @@ export function TablatureSettingsPanel() {
       </Section>
 
       <Section
-        title='Hit colour'
-        hint='Fills a note as you sustain it correctly.'>
+        title={t("hit_colour")}
+        hint={t("hit_colour_hint")}>
         <div className='grid grid-cols-3 gap-2 sm:grid-cols-6'>
           {(Object.keys(HIT_COLORS) as HitColorKey[]).map((key) => (
             <OptionCard
@@ -489,7 +491,7 @@ export function TablatureSettingsPanel() {
                 />
               </span>
               <span className='text-xs font-semibold text-zinc-100'>
-                {HIT_COLORS[key].label}
+                {t(`hit_colors.${key}`, HIT_COLORS[key].label)}
               </span>
             </OptionCard>
           ))}
@@ -497,8 +499,8 @@ export function TablatureSettingsPanel() {
       </Section>
 
       <Section
-        title='Board background'
-        hint='Colour behind the staff, gutter and fade.'>
+        title={t("board_background")}
+        hint={t("board_background_hint")}>
         <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
           {(Object.keys(BACKGROUNDS) as BackgroundKey[]).map((key) => (
             <OptionCard
@@ -512,10 +514,10 @@ export function TablatureSettingsPanel() {
                 />
               </span>
               <span className='text-xs font-semibold text-zinc-100'>
-                {BACKGROUNDS[key].label}
+                {t(`backgrounds.${key}.label`, BACKGROUNDS[key].label)}
               </span>
               <span className='text-[10px] leading-tight text-zinc-500'>
-                {BACKGROUNDS[key].desc}
+                {t(`backgrounds.${key}.desc`, BACKGROUNDS[key].desc)}
               </span>
             </OptionCard>
           ))}
@@ -523,8 +525,8 @@ export function TablatureSettingsPanel() {
       </Section>
 
       <Section
-        title='Visible elements'
-        hint='Hide layers you do not need to declutter the score.'>
+        title={t("visible_elements")}
+        hint={t("visible_elements_hint")}>
         <div className='space-y-1'>
           {toggles.map(({ key, label, desc }) => (
             <ToggleRow
@@ -539,54 +541,54 @@ export function TablatureSettingsPanel() {
       </Section>
 
       <Section
-        title='Handedness'
-        hint='For left-handed players. Applies everywhere on this device.'>
+        title={t("handedness")}
+        hint={t("handedness_hint")}>
         <div className='space-y-1'>
           <ToggleRow
-            label='Mirror fretboard diagrams'
-            desc='Nut on the right in the click and hunt drills. The tab has no neck axis to mirror, so it stays as it is.'
+            label={t("mirror")}
+            desc={t("mirror_desc")}
             checked={leftHanded}
             onChange={setLeftHanded}
           />
           <ToggleRow
-            label='Right-to-left board'
-            desc='The tab starts at the right edge and the cursor runs left, like a mirrored neck. Tab only; the notation view keeps its normal direction.'
+            label={t("rtl")}
+            desc={t("rtl_desc")}
             checked={settings.rightToLeft}
             onChange={(next) => set("rightToLeft", next)}
           />
           <ToggleRow
-            label='Flip string order'
-            desc='Low E on the top line — for a right-handed guitar strung the other way round. Tab only; the notation view keeps standard order.'
+            label={t("flip")}
+            desc={t("flip_desc")}
             checked={settings.flipStrings}
             onChange={(next) => set("flipStrings", next)}
           />
         </div>
       </Section>
 
-      <Section title='Feedback'>
+      <Section title={t("feedback")}>
         <div className='space-y-1'>
           <ToggleRow
-            label='Hit animations'
-            desc='Flash and shockwave rings when a note lands'
+            label={t("hit_animations")}
+            desc={t("hit_animations_desc")}
             checked={settings.hitAnimations}
             onChange={(next) => set("hitAnimations", next)}
           />
           <ToggleRow
-            label='Timing hints'
-            desc='"Early", "Late" or a green + over a note as you hit it, and a late note filling from where you played it. Timing still counts toward your score either way.'
+            label={t("timing_hints")}
+            desc={t("timing_hints_desc")}
             checked={settings.timingHints}
             onChange={(next) => set("timingHints", next)}
           />
           <ToggleRow
-            label='Ambient mic glow'
-            desc='Glow under the tab reacting to your playing volume'
+            label={t("ambient_glow")}
+            desc={t("ambient_glow_desc")}
             checked={settings.ambientGlow}
             onChange={(next) => set("ambientGlow", next)}
           />
         </div>
       </Section>
 
-      <ResetButton onClick={reset} label='Reset tablature settings' />
+      <ResetButton onClick={reset} label={t("reset")} />
     </div>
   );
 }
@@ -597,17 +599,18 @@ export function TablatureSettingsPanel() {
  * panel above, even though it persists to the same tablature settings store.
  */
 export function NotationSettingsPanel() {
+  const { t } = useTranslation("tab_settings");
   const settings = useTablatureSettings();
   const { set } = settings;
 
   return (
     <div className='space-y-4'>
       <Section
-        title='Sizing'
-        hint='AlphaTab’s own zoom and note spacing — independent of the flat-tab sliders above.'>
+        title={t("sizing")}
+        hint={t("sizing_hint")}>
         <div className='grid gap-x-8 gap-y-4 sm:grid-cols-2'>
           <SliderRow
-            label='Zoom'
+            label={t("zoom")}
             value={settings.notationZoom}
             min={NOTATION_ZOOM_MIN}
             max={NOTATION_ZOOM_MAX}
@@ -616,7 +619,7 @@ export function NotationSettingsPanel() {
             onChange={(v) => set("notationZoom", Math.round(v * 100) / 100)}
           />
           <SliderRow
-            label='Note spacing'
+            label={t("note_spacing")}
             value={settings.notationSpacing}
             min={NOTATION_SPACING_MIN}
             max={NOTATION_SPACING_MAX}
@@ -627,10 +630,10 @@ export function NotationSettingsPanel() {
         </div>
       </Section>
 
-      <Section title='Board' hint='Colour of the sheet-music board.'>
+      <Section title={t("board")} hint={t("board_hint")}>
         <ToggleRow
-          label='Dark score'
-          desc='Black board with white staff and notes, instead of white paper'
+          label={t("dark_score")}
+          desc={t("dark_score_desc")}
           checked={settings.notationDarkMode}
           onChange={(next) => set("notationDarkMode", next)}
         />

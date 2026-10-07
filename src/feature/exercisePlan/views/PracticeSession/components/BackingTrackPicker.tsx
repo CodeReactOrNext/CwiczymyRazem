@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { useRef, useState } from "react";
 import { FaMusic,FaPlay, FaSearch, FaYoutube } from "react-icons/fa";
 
@@ -33,6 +34,7 @@ interface BackingTrackPickerProps {
 }
 
 export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrackPickerProps) {
+  const { t } = useTranslation("session");
   const { setBackingVideoId } = useSessionUI();
   const [state, setState] = useState<PickerState>("idle");
   const [videos, setVideos] = useState<VideoResult[]>([]);
@@ -69,8 +71,8 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrac
     <div className="w-full h-full flex flex-col items-center justify-center p-8 gap-8 min-h-[260px]">
       <div className="flex flex-col items-center gap-2 text-center">
         <FaMusic size={28} className="text-amber-500/70" />
-        <p className="text-zinc-300 font-semibold text-base">This exercise requires a backing track</p>
-        <p className="text-zinc-500 text-sm">Find one on YouTube to play along</p>
+        <p className="text-zinc-300 font-semibold text-base">{t("backing.required")}</p>
+        <p className="text-zinc-500 text-sm">{t("backing.find_hint")}</p>
       </div>
 
       {state === "idle" && (
@@ -79,14 +81,14 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrac
           className="flex items-center gap-2.5 px-6 py-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/20 hover:border-amber-500/40 text-amber-400 font-semibold text-sm transition-all"
         >
           <FaYoutube size={18} className="text-amber-500" />
-          Find Backing Track on YouTube
+          {t("backing.find")}
         </button>
       )}
 
       {state === "loading" && (
         <div className="flex items-center gap-2.5 text-zinc-500 text-sm font-medium animate-pulse">
           <FaSearch size={14} />
-          Searching YouTube...
+          {t("backing.searching")}
         </div>
       )}
 
@@ -121,7 +123,7 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrac
 
       {state === "results" && (
         <button onClick={search} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors underline underline-offset-2">
-          Search again
+          {t("backing.search_again")}
         </button>
       )}
     </div>
@@ -134,6 +136,7 @@ interface BackingVideoPlayerProps {
 }
 
 export function BackingVideoPlayer({ videoId, onChangeClick }: BackingVideoPlayerProps) {
+  const { t } = useTranslation("session");
   return (
     <div className="w-full relative group p-4 flex flex-col items-center gap-2">
       <div className="aspect-video w-full max-w-sm rounded-lg overflow-hidden bg-zinc-900 shadow-2xl border-2 border-amber-500/30 relative ring-2 ring-amber-500/10 transition-all duration-300 hover:border-amber-500/50 hover:ring-amber-500/20">
@@ -152,7 +155,7 @@ export function BackingVideoPlayer({ videoId, onChangeClick }: BackingVideoPlaye
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/20 hover:border-amber-500/40 text-amber-400 text-xs font-semibold transition-all"
       >
         <FaYoutube size={14} className="text-amber-500" />
-        Change backing track
+        {t("backing.change")}
       </button>
     </div>
   );

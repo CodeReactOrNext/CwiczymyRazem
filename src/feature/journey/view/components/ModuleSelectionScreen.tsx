@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Check,
   ChevronRight,
@@ -73,6 +74,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
   placeholders,
   onSelectModule,
 }) => {
+  const { t } = useTranslation("journey");
   const [suggestOpen, setSuggestOpen] = useState(false);
 
   // First module that isn't fully finished yet — gets the "continue" treatment.
@@ -89,8 +91,8 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
 
       <div className="relative mx-auto max-w-3xl px-4 py-10 md:px-8">
         <div className="mb-6">
-          <h1 className="font-display text-2xl font-bold text-white">Learning path</h1>
-          <p className="mt-1 text-sm text-zinc-400">Pick up where you left off, or jump into any module.</p>
+          <h1 className="font-display text-2xl font-bold text-white">{t("modules.title")}</h1>
+          <p className="mt-1 text-sm text-zinc-400">{t("modules.subtitle")}</p>
         </div>
 
         <div className="space-y-3">
@@ -137,7 +139,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                     <h2 className="truncate font-display text-base font-bold text-white">{module.title}</h2>
                     {isCurrent && !isComplete && (
                       <span className={cn("shrink-0 text-xs font-semibold", cfg.label)}>
-                        {completed > 0 ? "Continue" : "Start"}
+                        {completed > 0 ? t("modules.continue") : t("modules.start")}
                       </span>
                     )}
                   </div>
@@ -171,11 +173,11 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
               <Lightbulb className="h-4 w-4 text-zinc-400" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-zinc-300">Suggest a learning path</p>
+              <p className="text-sm font-semibold text-zinc-300">{t("modules.suggest")}</p>
               <p className="text-xs text-zinc-500">
                 {placeholders.length > 0
-                  ? `Missing a topic? ${placeholders.map((p) => p.title).join(", ")} are coming next — let us know what else you'd like to see.`
-                  : "Missing a topic? Let us know what you'd like to see next."}
+                  ? t("modules.missing_coming", { topics: placeholders.map((p) => p.title).join(", ") })
+                  : t("modules.missing")}
               </p>
             </div>
           </button>

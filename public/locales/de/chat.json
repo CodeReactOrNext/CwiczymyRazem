@@ -1,0 +1,75 @@
+{
+  "send": "Senden",
+  "send_placeholder": "Nachricht schreiben...",
+  "like": "Gefällt mir",
+  "validation_too_long": "Eine Nachricht darf höchstens 2000 Zeichen lang sein.",
+  "error": "Nachricht konnte nicht gesendet werden",
+  "empty_room": {
+    "title": "Noch hat niemand etwas gesagt",
+    "guild": "Sei der Erste — sag deiner Gilde hallo.",
+    "everyone": "Sei der Erste — sag allen hallo.",
+    "say_hi": "Hallo sagen 👋"
+  },
+  "greetings": {
+    "welcome": "Willkommen! 👋",
+    "hi_guild": "Hallo Gilde! 👋",
+    "hi_everyone": "Hallo zusammen! 👋"
+  },
+  "welcome_goal": {
+    "plan_named": "startet mit dem Plan {{plan}}",
+    "plan": "startet mit einem Übungsplan",
+    "songs": "will Songs lernen",
+    "roadmap": "baut eine Übungs-Roadmap",
+    "journey": "startet den Lernpfad",
+    "log": "will sein Üben eintragen"
+  },
+  "system": {
+    "and": "und",
+    "and_other": "und {{count}} weitere Person",
+    "and_others": "und {{count}} weitere",
+    "said_hi": "haben hallo gesagt",
+    "say_hi": "Hallo sagen",
+    "joined_with": "Ist Riff Quest beigetreten, {{phrase}}",
+    "joined": "Ist Riff Quest beigetreten",
+    "reached_level": "hat Level erreicht:",
+    "cleared": "Abgeschlossen: {{quests}}",
+    "joined_guild": "Ist der Gilde beigetreten"
+  },
+  "attachment": {
+    "kinds": {
+      "exercise": "Übung",
+      "plan": "Plan",
+      "song": "Song",
+      "recording": "Aufnahme"
+    },
+    "play": "Spielen",
+    "open": "Öffnen",
+    "watch": "Ansehen",
+    "guitar": "Gitarre",
+    "pedal": "Pedal",
+    "share_title": "Im Chat teilen",
+    "tabs": {
+      "exercise": "Übung",
+      "plan": "Plan",
+      "song": "Meine Songs",
+      "recording": "Meine Aufnahmen",
+      "item": "Mein Equipment"
+    },
+    "search": "Suchen…",
+    "loading": "Wird geladen…",
+    "empty": "Hier gibt es noch nichts zu teilen."
+  },
+  "composer": {
+    "replying_to": "Antwort an",
+    "cancel_reply": "Antwort abbrechen",
+    "sharing": "Teilen",
+    "remove_attachment": "Anhang entfernen",
+    "mention": "Jemanden erwähnen",
+    "share": "Eine Übung, einen Song oder ein Item teilen",
+    "send": "Senden"
+  },
+  "reactions": {
+    "react_with": "Mit {{emoji}} reagieren",
+    "reply": "Antworten"
+  }
+}

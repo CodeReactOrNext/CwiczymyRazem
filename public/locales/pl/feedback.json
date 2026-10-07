@@ -1,0 +1,41 @@
+{
+  "thanks": "Dziękujemy za opinię!",
+  "error": "Coś poszło nie tak, spróbuj ponownie.",
+  "title": "Podziel się opinią",
+  "subtitle": "Pomóż nam ulepszać Riff Quest — czytamy każdą wiadomość.",
+  "sending": "Wysyłanie...",
+  "send_feedback": "Wyślij opinię",
+  "sending_as": "Wysyłasz jako {{name}}",
+  "anonymous": "anonimowo",
+  "cancel": "Anuluj",
+  "categories": {
+    "bug": {
+      "label": "Zgłoś błąd",
+      "description": "Coś nie działa",
+      "placeholder": "Opisz, co się stało i czego się spodziewałeś..."
+    },
+    "idea": {
+      "label": "Pomysł",
+      "description": "Zaproponuj ulepszenie",
+      "placeholder": "Co chciałbyś, żeby zostało dodane albo poprawione?"
+    },
+    "question": {
+      "label": "Pytanie",
+      "description": "Zapytaj o cokolwiek",
+      "placeholder": "Czego chciałbyś się dowiedzieć?"
+    }
+  },
+  "prompt": {
+    "title_named": "Hej {{name}}, masz chwilę? 👋",
+    "title": "Hej, masz chwilę? 👋",
+    "intro": "Ciężko pracujemy, żeby Riff Quest był najlepszym narzędziem do ćwiczeń dla gitarzystów. Do tego potrzebujemy głosu prawdziwych użytkowników — nie domysłów.",
+    "questions": "Co Ci przeszkadza w aplikacji? Czego brakuje? Co chciałbyś, żeby działało inaczej?",
+    "got_idea": "Masz pomysł?",
+    "found_bug": "Znalazłeś błąd?",
+    "annoys": "Coś Cię irytuje?",
+    "anytime": "Opinią możesz się też podzielić w każdej chwili przyciskiem {{button}} w panelu bocznym.",
+    "placeholder": "Napisz, co myślisz...",
+    "maybe_later": "Może później",
+    "share": "Podziel się opinią"
+  }
+}

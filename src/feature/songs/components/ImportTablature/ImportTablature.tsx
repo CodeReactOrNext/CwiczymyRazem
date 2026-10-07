@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
@@ -50,6 +51,7 @@ function buildBackingTracks(data: ParsedGp, selectedIdx: number): BackingTrack[]
 }
 
 export const ImportTablature = ({ onImported, className }: ImportTablatureProps) => {
+  const { t } = useTranslation("songs");
   const [isParsing, setIsParsing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedGp | null>(null);
@@ -68,7 +70,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
     if (!selectedFile) return;
 
     if (!isGpFile(selectedFile.name)) {
-      toast.error(`Unsupported format. Supported: ${GP_EXTENSIONS.join(', ')}`);
+      toast.error(t("import_tab.unsupported", { formats: GP_EXTENSIONS.join(", ") }));
       return;
     }
 
@@ -83,7 +85,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
       toast.success(`"${selectedFile.name}" imported successfully!`);
     } catch (error) {
       console.error("Failed to parse Guitar Pro file:", error);
-      toast.error("Error reading Guitar Pro file. Make sure the file is not corrupted.");
+      toast.error(t("import_tab.read_error"));
       setFile(null);
       setParsedData(null);
     } finally {
@@ -129,14 +131,14 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
               onClick={removeFile}
               className="h-7 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-red-400 hover:bg-red-400/10"
             >
-              Remove file
+              {t("import_tab.remove")}
             </Button>
           </div>
 
           {/* Track Selection */}
           <div className="space-y-2">
             <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.2em] px-1">
-              You hear all tracks, but choose the one you'll practice:
+              {t("import_tab.choose_track")}
             </div>
             <div className="flex flex-wrap gap-2">
               {parsedData.tracks.map((track, idx) => (
@@ -173,14 +175,14 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
               <div className="absolute top-4 right-4 px-2 py-1 rounded bg-black/60 border border-white/10 backdrop-blur-md text-[10px] font-medium text-zinc-400 flex items-center gap-2 text-center">
                 <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                All tracks active in background
+                {t("import_tab.all_tracks")}
               </div>
             </div>
           ) : selectedTrack?.trackType === 'drums' ? (
             <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] py-10 text-zinc-500">
               <Drum className="h-8 w-8 opacity-40" />
-              <p className="text-xs font-bold uppercase tracking-widest">Drum track — no tab notation</p>
-              <p className="text-[10px] text-zinc-600">Drums will play automatically during the session</p>
+              <p className="text-xs font-bold uppercase tracking-widest">{t("import_tab.drums")}</p>
+              <p className="text-[10px] text-zinc-600">{t("import_tab.drums_hint")}</p>
             </div>
           ) : null}
         </div>
@@ -214,7 +216,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
                   <FileMusic className="h-4 w-4 text-green-400" />
                   {file.name}
                 </div>
-                {!parsedData && <div className="text-xs text-zinc-500">Przetwarzanie...</div>}
+                {!parsedData && <div className="text-xs text-zinc-500">{t("import_tab.processing")}</div>}
                 {parsedData && (
                   <div className="flex items-center gap-2 text-[10px] text-zinc-500 justify-center uppercase tracking-widest font-bold">
                     <Zap className="h-3 w-3 text-yellow-500" /> {parsedData.tracks.length} tracks detected
@@ -237,10 +239,10 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
 
               <div className="space-y-1">
                 <div className="font-bold text-white uppercase tracking-wider text-xs">
-                  {isDragActive ? "Drop file here" : "Import Tablature"}
+                  {isDragActive ? t("import_tab.drop") : t("import_tab.import")}
                 </div>
                 <div className="text-sm text-zinc-500">
-                  {isParsing ? "Analyzing tracks and tempo..." : "Upload GP3 / GP4 / GP5 / GPX / GP file"}
+                  {isParsing ? t("import_tab.analyzing") : t("import_tab.upload")}
                 </div>
               </div>
 

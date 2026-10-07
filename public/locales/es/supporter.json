@@ -1,0 +1,175 @@
+{
+  "tiers": {
+    "content": {
+      "exercises": "+{{count}} ejercicios nuevos",
+      "exercise_one": "+{{count}} ejercicio nuevo",
+      "gear": "+{{count}} guitarras y pedales nuevos"
+    },
+    "t13": {
+      "label": "Desguazar guitarras para piezas",
+      "description": "Desguaza las guitarras que no quieras. Cada guitarra se desmonta en piezas distintas, así que lo que conservas (y lo que desguazas) importa de verdad."
+    },
+    "t25": {
+      "label": "Luthier: piezas y mejoras de guitarra",
+      "description": "El equipo suelta piezas según su rareza mientras tocas, y las piezas de las guitarras que desguazas vuelven al ciclo. Gasta piezas compatibles en el Luthier para subir de nivel una guitarra o efecto y aumentar su rareza."
+    },
+    "t51": {
+      "label": "El equipo afecta a los puntos de Fama",
+      "description": "El equipo que usas cambia cuántos puntos de Fama ganas por tipo de ejercicio, así que elige el rig adecuado para cada ejercicio."
+    },
+    "t61": {
+      "label": "Sincronizar pista de acompañamiento con la tablatura",
+      "description": "Pistas de acompañamiento sincronizadas con la tablatura, para que toques a tiempo sin buscar el pulso."
+    },
+    "t79": {
+      "label": "Sinergia de pedalera",
+      "description": "Los efectos interactúan entre sí, así que elige y ordena tus pedales con cuidado."
+    },
+    "t89": {
+      "label": "Rediseño de logros",
+      "description": "Los logros rehechos por completo, más logros nuevos. Cada uno te da algo de verdad, no solo una insignia."
+    },
+    "t107": {
+      "label": "Límite de potencia de la pedalera",
+      "description": "Tu pedalera tiene un límite de potencia, así que mejórala si quieres usar efectos más potentes."
+    },
+    "t117": {
+      "label": "Gamificación: recompensas por completar rutas y habilidades",
+      "description": "Completa una Ruta, una Hoja de ruta o una rama de habilidades y recibe una guitarra o un efecto como recompensa."
+    },
+    "t153": {
+      "label": "Sistema de progresión del jugador",
+      "description": "Sube de nivel tocando. Desbloquea hitos, diseños de perfil y la rareza de equipo que puedes equipar."
+    },
+    "t181": {
+      "label": "Panel configurable",
+      "description": "Elige tu propio diseño, widgets y accesos directos para el panel principal."
+    },
+    "t191": {
+      "label": "Desbloqueo diario",
+      "description": "Un desbloqueo temporal que se reinicia una vez al día, para darte un motivo para volver."
+    },
+    "t201": {
+      "label": "Perfil de guitarrista configurable",
+      "description": "Muestra lo que quieras, como quieras, con diseños desbloqueados al progresar."
+    },
+    "t229": {
+      "label": "Modo práctica",
+      "description": "Fija objetivos por ejercicio y sigue tu progreso hacia ellos."
+    },
+    "t244": {
+      "label": "Cartas de riffs",
+      "description": "Crea un mazo personal de riffs, canciones y ejercicios para repasar con repetición espaciada o tocarlo libremente cuando quieras."
+    },
+    "t262": {
+      "label": "Guitarras signature en el Luthier",
+      "description": "El Luthier tiene guitarras únicas que no encontrarás en ningún otro sitio."
+    },
+    "t346": {
+      "label": "Duelos",
+      "description": "Reta a otro jugador por puntos de Fama, por ejemplo a ver quién acumula más tiempo de práctica antes de que acabe el reloj."
+    },
+    "t415": {
+      "label": "Nuevo modo de práctica: Jefe",
+      "description": "Un nuevo modo de práctica: Jefe. Cada jefe pone un requisito real para superarlo. Consigue la puntuación y subes de nivel; si te quedas corto, quedas fuera, sin crédito parcial."
+    }
+  },
+  "funding": {
+    "title": "La hoja de ruta",
+    "subtitle": "Un total acumulado, no una suscripción. Cada objetivo alcanzado se construye y queda desbloqueado para todos, para siempre.",
+    "goals_funded": "objetivos financiados",
+    "scroll_left": "Desplazar a la izquierda",
+    "scroll_right": "Desplazar a la derecha",
+    "feature": "Función",
+    "done": "Hecho",
+    "in_progress": "En curso",
+    "funded": "Financiado",
+    "locked": "Bloqueado",
+    "next_unlock": "Próximo desbloqueo",
+    "to_go": "faltan ${{amount}}",
+    "covered": "Coste del servidor de este mes cubierto",
+    "needs_help": "El coste del servidor necesita tu ayuda",
+    "all_funded": "Todos los objetivos de la hoja de ruta financiados, gracias"
+  },
+  "perks": {
+    "title": "Qué obtienes",
+    "tokens": "Apoyar se convierte en tokens: {{welcome}} llegan con la insignia y {{perDollar}} más por cada dólar después. Nunca caducan y te dan voz sobre lo que se construye.",
+    "open_panel": "Abrir el panel de supporter",
+    "discord_body": "Un rol de supporter en {{discord}} y un canal donde enseño lo que estoy construyendo antes de lanzarlo.",
+    "items": {
+      "0": {
+        "title": "El tablero de la hoja de ruta",
+        "body": "Publica lo que quieres que se construya y apoya las ideas de otros supporters."
+      },
+      "1": {
+        "title": "Equipo elegido por ti",
+        "body": "Propón una guitarra o un pedal para el Arsenal, o apoya la propuesta de otro."
+      },
+      "2": {
+        "title": "La caja de supporters",
+        "body": "Vota qué objetos entran en la próxima caja de supporters."
+      },
+      "3": {
+        "title": "Un gremio propio",
+        "body": "Funda uno con su propio nombre y etiqueta, un almacén compartido y una semana de práctica más dura."
+      },
+      "4": {
+        "title": "El próximo desafío",
+        "body": "Elige el desafío de la comunidad que todos tocarán la semana que viene."
+      },
+      "5": {
+        "title": "El canal de supporters"
+      }
+    }
+  },
+  "faq": {
+    "title": "Preguntas",
+    "discord_link": "escríbeme en Discord",
+    "panel_link": "panel de supporter",
+    "badge_answer": "Comparando el correo de la donación con tu cuenta. Si pagaste desde otra dirección, simplemente {{discord}} y lo vincularé a mano. Los tokens se gastan en el {{panel}}.",
+    "items": {
+      "0": {
+        "q": "¿Por qué todos tienen acceso gratis?",
+        "a": "Riff Quest sigue siendo gratis para todos, punto. Cuando apoyas no compras acceso para ti, pagas un desarrollo que usa toda la comunidad. Funciona como un total acumulado, no una suscripción, así que un objetivo alcanzado queda desbloqueado para siempre."
+      },
+      "1": {
+        "q": "¿Cuánto se tarda en completar un objetivo?",
+        "a": "Depende mucho del objetivo. Algo pequeño puede estar listo en un par de días, y un nivel más exigente puede llevar unas dos semanas. Por norma, cuanto mayor el desbloqueo, más tiempo necesita, y prefiero tardar unos días más que lanzar algo a medias."
+      },
+      "2": {
+        "q": "¿Cómo encuentra la insignia de supporter mi cuenta?"
+      },
+      "3": {
+        "q": "¿Qué pasa cuando se alcanzan todos los objetivos?",
+        "a": "El contador se reinicia y aparece una hoja de ruta totalmente nueva, construida con las ideas que enviáis. Llegar al final no es una meta, es el comienzo de la siguiente ronda de funciones."
+      }
+    }
+  },
+  "pulse": {
+    "this_month": "este mes",
+    "support": "Apoya la hoja de ruta",
+    "supporters": "{{count}} supporters · comunidad",
+    "community": "apoyo de la comunidad",
+    "tooltip": "{{count}} supporters han aportado ${{amount}} este mes. Mantiene Riff Quest gratis y financia la hoja de ruta. Toca para ver adónde va.",
+    "tooltip_empty": "Riff Quest es gratis y lo financia la comunidad. Toca para ver la hoja de ruta y qué desbloquea tu apoyo a continuación."
+  },
+  "hero": {
+    "title": "Ayuda a construir Riff Quest",
+    "subtitle": "Riff Quest es gratis y lo hace una sola persona. Tu apoyo paga primero el alojamiento, y todo lo que sobra desbloquea la siguiente función de la hoja de ruta, para todos.",
+    "eyebrow": "Financiado por la comunidad",
+    "coffee_hint": "Basta con un café puntual. Nada que registrar, nada que cancelar."
+  },
+  "cta": {
+    "support": "Apoyar Riff Quest"
+  },
+  "thanks": {
+    "title": "¿Solo quieres dar las gracias?",
+    "body": "Saber que Riff Quest te resulta útil ya es lo mejor. Un café además de eso me alegra el día de verdad.",
+    "cta": "Da las gracias con un café"
+  },
+  "modal": {
+    "why": "¿Por qué apoyar Riff Quest?",
+    "body": "Riff Quest es un proyecto de una sola persona, gratis y construido en abierto. Tu apoyo cubre primero el dominio, el alojamiento y la base de datos. Todo lo que se recauda por encima financia la hoja de ruta: nuevos ejercicios, equipo y funciones, desbloqueados nivel a nivel a medida que la comunidad los financia.",
+    "later": "Quizá más tarde"
+  }
+}

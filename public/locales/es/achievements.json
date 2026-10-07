@@ -1,0 +1,334 @@
+{
+  "common": "Común",
+  "rare": "Raro",
+  "veryRare": "Muy raro",
+  "empty": "Vacío",
+  "epic": "Épico",
+  "panel": {
+    "earnedHeadline": "{{owned}} de {{total}} logros conseguidos",
+    "globalColumn": "% de todos los jugadores",
+    "readyHint": "Requisito cumplido: se desbloquea con tu próxima sesión registrada",
+    "earned": "Conseguido",
+    "rewards": {
+      "claim": "Reclamar",
+      "claimAll": "Recoger todas",
+      "claiming": "Recogiendo...",
+      "waiting": "{{count}} recompensas esperando a que las recojas",
+      "waitingOne": "1 recompensa esperando a que la recojas",
+      "tokensHeld": "Tienes {{count}} cajas gratis: úsalas en cualquier caja del Arsenal.",
+      "tokensHeldOne": "Tienes 1 caja gratis: úsala en cualquier caja del Arsenal.",
+      "readyToCollect": "Recompensa lista para recoger",
+      "onCompletion": "Recompensa por conseguir este logro",
+      "collected": "Recompensa ya recogida"
+    }
+  },
+  "time_1": {
+    "title": "El trabajo duro da frutos",
+    "description": "Supera las 10 horas de práctica."
+  },
+  "time_2": {
+    "title": "Determinación inquebrantable",
+    "description": "Supera las 30 horas de práctica."
+  },
+  "time_3": {
+    "title": "1 %: la regla de las 10 000 h",
+    "description": "Supera las 100 horas de práctica."
+  },
+  "balance": {
+    "title": "Término medio",
+    "description": "Registra a la vez al menos 1 hora de cada pilar de habilidad."
+  },
+  "fire": {
+    "title": "Poder guitarrero",
+    "description": "Consigue 60 puntos en un solo registro."
+  },
+  "health_habits": {
+    "title": "Sano como una manzana",
+    "description": "Cumple todos los hábitos saludables en un solo registro."
+  },
+  "points_1": {
+    "title": "Rascando la superficie",
+    "description": "Consigue 100 puntos"
+  },
+  "points_2": {
+    "title": "Acordes de pájaro",
+    "description": "Consigue 1000 puntos"
+  },
+  "points_3": {
+    "title": "Acordes de rana",
+    "description": "Consigue 10 000 puntos"
+  },
+  "doctor": {
+    "title": "Doctor",
+    "description": "Aplica 100 hábitos saludables"
+  },
+  "tired": {
+    "title": "No puedo más...",
+    "description": "Completa una sesión de 5 horas"
+  },
+  "diamond": {
+    "title": "Guitarra de diamante",
+    "description": "Alcanza el nivel 28"
+  },
+  "scientist": {
+    "title": "Científico",
+    "description": "Alcanza 50 horas de teoría"
+  },
+  "artist": {
+    "title": "Artista musical",
+    "description": "Alcanza 10 horas de trabajo creativo"
+  },
+  "book": {
+    "title": "Erudito",
+    "description": "Alcanza 10 horas de teoría"
+  },
+  "bigear": {
+    "title": "Gran oído",
+    "description": "Alcanza 50 horas de oído"
+  },
+  "wizard": {
+    "title": "Mago",
+    "description": "Alcanza 50 horas de trabajo creativo"
+  },
+  "medal": {
+    "title": "Condecorado",
+    "description": "Consigue 20 logros"
+  },
+  "day_1": {
+    "title": "Constancia",
+    "description": "Practica 3 días seguidos"
+  },
+  "day_2": {
+    "title": "Semana",
+    "description": "Practica 7 días seguidos"
+  },
+  "day_3": {
+    "title": "Infinito",
+    "description": "Practica 15 días seguidos"
+  },
+  "session_1": {
+    "title": "Clicador",
+    "description": "Completa 20 sesiones"
+  },
+  "session_2": {
+    "title": "Viajero guitarrero",
+    "description": "Completa 50 sesiones"
+  },
+  "session_3": {
+    "title": "Vaquero",
+    "description": "Completa 100 sesiones"
+  },
+  "ring": {
+    "title": "Anillo de cuerdas",
+    "description": "Dedica más de 5 horas a cada pilar"
+  },
+  "headphones": {
+    "title": "Buen oyente",
+    "description": "Dedica más de 10 horas a escuchar"
+  },
+  "ninja": {
+    "title": "Guerrero técnico",
+    "description": "Dedica más de 10 horas a la técnica"
+  },
+  "record": {
+    "title": "Algo se grabó",
+    "description": "Este jugador ha estado grabando algo intensamente."
+  },
+  "vinyl": {
+    "title": "Idea grabada",
+    "description": "Este jugador tuvo una idea y la grabó... probablemente."
+  },
+  "dumbbel": {
+    "title": "Trabajo duro de verdad",
+    "description": "Este jugador se está esforzando de verdad."
+  },
+  "rightway": {
+    "title": "Sin lesiones",
+    "description": "Este jugador calienta como dicen los libros."
+  },
+  "path": {
+    "title": "Gran plan",
+    "description": "Este jugador tiene un gran plan de entrenamiento y va bien encaminado hacia sus metas."
+  },
+  "yolo": {
+    "title": "Yolo",
+    "description": "A este jugador no le importan los hábitos saludables."
+  },
+  "vip": {
+    "title": "Merecedor",
+    "description": "Este jugador ayudó en el desarrollo de Riff Quest"
+  },
+  "short": {
+    "title": "Resistencia",
+    "description": "Este jugador mantuvo la constancia de su práctica a toda costa"
+  },
+  "event": {
+    "title": "Evento",
+    "description": "Este jugador participó en un evento de Discord"
+  },
+  "lvl100": {
+    "title": "Púa legendaria",
+    "description": "Este jugador alcanzó el nivel 100"
+  },
+  "fireSession": {
+    "title": "Sesión de fuego",
+    "description": "Este jugador completó un registro perfecto"
+  },
+  "batteryHearth": {
+    "title": "Corazón de batería",
+    "description": "Este jugador tiene 2000 hábitos"
+  },
+  "100days": {
+    "title": "100 días",
+    "description": "Este jugador ha practicado durante 100 días"
+  },
+  "bomb": {
+    "title": "Situación crítica",
+    "description": "Este jugador salvó su racha"
+  },
+  "wannaLearn1": {
+    "title": "Guerrero solitario",
+    "description": "Quieres aprender tu primera canción"
+  },
+  "wannaLearn2": {
+    "title": "Doble poder",
+    "description": "Quieres aprender dos canciones"
+  },
+  "wannaLearn3": {
+    "title": "Cuaderno lleno",
+    "description": "Quieres aprender tres canciones"
+  },
+  "wannaLearn10": {
+    "title": "Perdido entre notas",
+    "description": "Quieres aprender diez canciones"
+  },
+  "wannaLearn30": {
+    "title": "Bucle infinito",
+    "description": "Quieres aprender treinta canciones"
+  },
+  "learning1": {
+    "title": "Primera pesa",
+    "description": "Estás aprendiendo tu primera canción"
+  },
+  "learning3": {
+    "title": "Subiendo el listón",
+    "description": "Estás aprendiendo tres canciones a la vez"
+  },
+  "learning5": {
+    "title": "Hacia delante",
+    "description": "Estás aprendiendo cinco canciones a la vez"
+  },
+  "learning10": {
+    "title": "Músculos musicales",
+    "description": "Estás aprendiendo diez canciones a la vez"
+  },
+  "learning20": {
+    "title": "Multiinstrumentista",
+    "description": "Estás aprendiendo veinte canciones a la vez"
+  },
+  "learning30": {
+    "title": "Aura musical",
+    "description": "Estás aprendiendo treinta canciones a la vez"
+  },
+  "learned1": {
+    "title": "Dos de corazones",
+    "description": "Has aprendido tu primera canción"
+  },
+  "learned3": {
+    "title": "Tres de diamantes",
+    "description": "Has aprendido tres canciones"
+  },
+  "learned5": {
+    "title": "Cuatro de diamantes",
+    "description": "Has aprendido cinco canciones"
+  },
+  "learned10": {
+    "title": "Cinco de diamantes",
+    "description": "Has aprendido diez canciones"
+  },
+  "learned20": {
+    "title": "Seis de diamantes",
+    "description": "Has aprendido veinte canciones"
+  },
+  "learned30": {
+    "title": "Jota de diamantes",
+    "description": "Has aprendido treinta canciones"
+  },
+  "learned50": {
+    "title": "Rey de diamantes",
+    "description": "Has aprendido cincuenta canciones"
+  },
+  "learned100": {
+    "title": "As de diamantes",
+    "description": "Has aprendido cien canciones: ¡eres todo un as!"
+  },
+  "rig_50": {
+    "title": "Cadena de señal",
+    "description": "Monta un equipo de nivel 50."
+  },
+  "rig_150": {
+    "title": "Listo para el escenario",
+    "description": "Monta un equipo de nivel 150."
+  },
+  "rig_300": {
+    "title": "Muro de estudio",
+    "description": "Monta un equipo de nivel 300."
+  },
+  "rig_500": {
+    "title": "Equipo de cabeza de cartel",
+    "description": "Monta un equipo de nivel 500."
+  },
+  "rig_800": {
+    "title": "Muro de sonido",
+    "description": "Monta un equipo de nivel 800."
+  },
+  "rig_1000": {
+    "title": "Cuatro cifras",
+    "description": "Monta un equipo de nivel 1000."
+  },
+  "first_rare": {
+    "title": "Algo especial",
+    "description": "Consigue tu primera pieza de equipo Rara."
+  },
+  "first_epic": {
+    "title": "Calidad de coleccionista",
+    "description": "Consigue tu primera pieza de equipo Épica."
+  },
+  "first_legendary": {
+    "title": "Uno de los grandes",
+    "description": "Consigue tu primera pieza de equipo Legendaria."
+  },
+  "first_mythic": {
+    "title": "Santo Grial",
+    "description": "Consigue tu primera pieza de equipo Mítica."
+  },
+  "rarity_full_set": {
+    "title": "Abanico completo",
+    "description": "Ten equipo de cada rareza que puede salir de una caja."
+  },
+  "museum_1": {
+    "title": "Tras el cristal",
+    "description": "Ten una pieza de equipo de Calidad de museo."
+  },
+  "museum_5": {
+    "title": "Colección privada",
+    "description": "Ten cinco piezas de equipo de Calidad de museo."
+  },
+  "serial_one": {
+    "title": "Número uno",
+    "description": "Ten la primerísima unidad acuñada de cualquier modelo."
+  },
+  "globetrotter": {
+    "title": "Trotamundos",
+    "description": "Ten equipo fabricado en ocho países distintos."
+  },
+  "vintage_1970": {
+    "title": "Más viejo que el ampli",
+    "description": "Ten una guitarra fabricada antes de 1970."
+  },
+  "performance": {
+    "title": "Debut en el escenario",
+    "description": "Registra una sesión de actuación completa: practica una canción, dedica 1 h a la técnica y grábate."
+  },
+  "progress": "Progreso"
+}

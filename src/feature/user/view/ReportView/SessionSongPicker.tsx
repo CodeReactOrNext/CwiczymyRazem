@@ -7,6 +7,7 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongArrangement } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Check,
   ChevronUp,
@@ -99,6 +100,7 @@ const CategoryTime = ({
   minutes: number;
   onChange: (minutes: number) => void;
 }) => {
+  const { t } = useTranslation("report");
   // While the field is focused the raw text wins, so clearing it to type a new
   // number doesn't snap back to "0" under the cursor.
   const [draft, setDraft] = useState<string | null>(null);
@@ -126,7 +128,7 @@ const CategoryTime = ({
       <div className='flex items-center gap-1'>
         <button
           type='button'
-          aria-label={`5 minutes less of ${label.toLowerCase()}`}
+          aria-label={t("songs.less", { label: label.toLowerCase() })}
           disabled={minutes <= 0}
           onClick={() => onChange(stepDown(minutes))}
           className='flex h-9 w-9 items-center justify-center rounded bg-zinc-700/60 text-zinc-100 transition-colors hover:bg-zinc-600/70 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40 disabled:pointer-events-none disabled:opacity-30'>
@@ -136,7 +138,7 @@ const CategoryTime = ({
         <div className='relative'>
           <input
             inputMode='numeric'
-            aria-label={`Minutes of ${label.toLowerCase()} on this song`}
+            aria-label={t("songs.minutes_of", { label: label.toLowerCase() })}
             value={draft ?? String(minutes)}
             onChange={(event) => {
               const cleaned = event.target.value.replace(/\D/g, "").slice(0, 3);
@@ -155,7 +157,7 @@ const CategoryTime = ({
 
         <button
           type='button'
-          aria-label={`5 minutes more of ${label.toLowerCase()}`}
+          aria-label={t("songs.more", { label: label.toLowerCase() })}
           onClick={() => onChange(stepUp(minutes))}
           className='flex h-9 w-9 items-center justify-center rounded bg-zinc-700/60 text-zinc-100 transition-colors hover:bg-zinc-600/70 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
           <Plus className='h-3.5 w-3.5' />
@@ -177,7 +179,9 @@ const PickedSongRow = ({
   onSetMinutes: (category: SongCategory, minutes: number) => void;
   onSetArrangement?: (arrangement: SongArrangement | null) => void;
   onRemove: () => void;
-}) => (
+}) => {
+  const { t } = useTranslation("report");
+  return (
   <div className='rounded-lg bg-zinc-800/60 p-4'>
     <div className='flex items-center gap-3'>
       <SongCover coverUrl={coverUrl ?? song.coverUrl} />
@@ -192,7 +196,7 @@ const PickedSongRow = ({
       <button
         type='button'
         onClick={onRemove}
-        aria-label={`Remove ${song.title} from this session`}
+        aria-label={t("songs.remove", { title: song.title })}
         className='flex h-9 w-9 shrink-0 items-center justify-center rounded text-zinc-300 transition-colors hover:bg-zinc-700/60 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
         <X className='h-4 w-4' />
       </button>
@@ -202,14 +206,14 @@ const PickedSongRow = ({
     <div className='mt-4 flex flex-wrap gap-x-10 gap-y-3'>
       <CategoryTime
         skill='technique'
-        label='Technique'
+        label={t("technique")}
         Icon={SKILL_CATEGORY_ICONS.technique}
         minutes={song.techniqueMinutes}
         onChange={(minutes) => onSetMinutes("technique", minutes)}
       />
       <CategoryTime
         skill='hearing'
-        label='Hearing'
+        label={t("hearing")}
         Icon={SKILL_CATEGORY_ICONS.hearing}
         minutes={song.hearingMinutes}
         onChange={(minutes) => onSetMinutes("hearing", minutes)}
@@ -220,13 +224,14 @@ const PickedSongRow = ({
       <ArrangementPicker
         value={song.arrangement ?? null}
         onChange={onSetArrangement}
-        noneLabel='Any part'
+        noneLabel={t("songs.any_part")}
         size='sm'
         className='mt-4 bg-zinc-950/50'
       />
     )}
   </div>
-);
+  );
+};
 
 const SongRow = ({
   song,
@@ -289,6 +294,7 @@ const SessionSongPicker = ({
   onSetMinutes,
   onSetArrangement,
 }: SessionSongPickerProps) => {
+  const { t } = useTranslation(["report", "plans"]);
   const [query, setQuery] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
@@ -330,9 +336,9 @@ const SessionSongPicker = ({
 
   const groups = useMemo(() => {
     const all = [
-      { label: "Learning now", songs: userSongs?.learning ?? [] },
-      { label: "Want to learn", songs: userSongs?.wantToLearn ?? [] },
-      { label: "Learned", songs: userSongs?.learned ?? [] },
+      { label: t("plans:song_picker.learning"), songs: userSongs?.learning ?? [] },
+      { label: t("plans:song_picker.want_to_learn"), songs: userSongs?.wantToLearn ?? [] },
+      { label: t("plans:song_picker.learned"), songs: userSongs?.learned ?? [] },
     ];
     const q = query.trim().toLowerCase();
     if (!q) return all.filter((group) => group.songs.length > 0);
@@ -345,7 +351,7 @@ const SessionSongPicker = ({
         ),
       }))
       .filter((group) => group.songs.length > 0);
-  }, [userSongs, query]);
+  }, [userSongs, query, t]);
 
   const hasAnySong =
     (userSongs?.learning.length ?? 0) +
@@ -370,15 +376,14 @@ const SessionSongPicker = ({
     return (
       <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 py-10 text-center'>
         <Library className='h-8 w-8 text-zinc-700' />
-        <p className='text-sm font-semibold text-zinc-300'>Your library is empty</p>
+        <p className='text-sm font-semibold text-zinc-300'>{t("songs.empty_title")}</p>
         <p className='max-w-xs text-xs text-zinc-500'>
-          Add songs you are working on and you will be able to log practice time straight
-          onto them.
+          {t("songs.empty_body")}
         </p>
         <Link
           href='/songs'
           className='mt-1 rounded-lg bg-cyan-500/10 px-4 py-2 text-xs font-bold text-cyan-400 transition-colors hover:bg-cyan-500/20'>
-          Browse songs
+          {t("songs.browse")}
         </Link>
       </div>
     );
@@ -409,9 +414,9 @@ const SessionSongPicker = ({
 
           <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1'>
             <p className='text-sm text-zinc-300'>
-              Technique{" "}
-              <span className='font-bold text-white'>{totals.technique}m</span> ·
-              Hearing{" "}
+              {t("technique")}{" "}
+              <span className='font-bold text-white'>{totals.technique}m</span> ·{" "}
+              {t("hearing")}{" "}
               <span className='font-bold text-white'>{totals.hearing}m</span>
             </p>
 
@@ -423,12 +428,12 @@ const SessionSongPicker = ({
               {isAdding ? (
                 <>
                   <ChevronUp className='h-3.5 w-3.5' />
-                  Done adding
+                  {t("songs.done_adding")}
                 </>
               ) : (
                 <>
                   <Plus className='h-3.5 w-3.5' />
-                  Add song
+                  {t("songs.add_song")}
                 </>
               )}
             </button>
@@ -443,7 +448,7 @@ const SessionSongPicker = ({
               <Search className='h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-zinc-200' />
             </div>
             <Input
-              placeholder='Search your library...'
+              placeholder={t("songs.search")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className='h-11 border-none bg-zinc-900/40 pl-10 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-cyan-500/40'
@@ -452,14 +457,14 @@ const SessionSongPicker = ({
 
           {isAtLimit && (
             <p className='px-2 text-xs font-semibold text-amber-400'>
-              {MAX_SESSION_SONGS} songs is the most one session can hold.
+              {t("songs.limit", { max: MAX_SESSION_SONGS })}
             </p>
           )}
 
           <div className='max-h-80 space-y-4 overflow-y-auto pr-1'>
             {groups.length === 0 ? (
               <p className='py-8 text-center text-xs font-medium text-zinc-500'>
-                Nothing in your library matches that.
+                {t("songs.no_match")}
               </p>
             ) : (
               groups.map((group) => (

@@ -1,0 +1,255 @@
+{
+  "availablePoints": "puntos disponibles",
+  "level": "Nivel",
+  "progress": "Progreso",
+  "maxed": "AL MÁXIMO",
+  "click_for_details": "Haz clic para ver detalles",
+  "upgrade_skill": "Mejorar esta habilidad",
+  "upgrade": "Mejorar",
+  "current_level": "Nivel actual",
+  "points_to_distribute": "puntos por repartir",
+  "skill_categories": "Categorías de habilidades",
+  "categories_description": "Elige una categoría para repartir tus puntos de habilidad",
+  "no_skills_unlocked": "Aún no hay habilidades de {{category}} desbloqueadas",
+  "unlock_skills_hint": "Gana puntos practicando para desbloquear habilidades",
+  "no_skills_unlocked_yet": "Aún no has desbloqueado ninguna habilidad",
+  "show_all_skills": "Mostrar todas las habilidades disponibles",
+  "available_points": "Puntos disponibles",
+  "point_usage_hint": "Haz clic en el botón + para mejorar habilidades de estas categorías",
+  "show_unlocked": "Mostrar solo habilidades desbloqueadas",
+  "show_all": "Mostrar todas las habilidades",
+  "category_description": {
+    "technique": "Asigna puntos aquí para mejorar tu técnica. Los puntos que ganas con los ejercicios te ayudan a seguir tu desarrollo técnico.",
+    "theory": "Reparte puntos para ampliar tus conocimientos de teoría musical. Equilíbralo con otras áreas para crecer de forma completa.",
+    "hearing": "Asigna puntos para mejorar tu oído. Sigue tu progreso para no descuidar esta habilidad tan importante.",
+    "creativity": "Usa puntos para potenciar tu expresión creativa. Sigue qué áreas desarrollas y cuáles necesitan atención."
+  },
+  "intro": {
+    "title": "Desarrollo de habilidades con la guitarra",
+    "description": "Reparte los puntos de habilidad que ganas en tus sesiones de práctica para desarrollar áreas concretas de tu forma de tocar.",
+    "point1": "Gana puntos de habilidad completando ejercicios de práctica",
+    "point2": "Asigna los puntos según las áreas que quieras desarrollar",
+    "point3": "Sigue tu progreso para ver qué habilidades desarrollas y cuáles descuidas",
+    "got_it": "Entendido"
+  },
+  "categories": {
+    "technique": "Técnica",
+    "theory": "Teoría",
+    "hearing": "Oído",
+    "creativity": "Creatividad"
+  },
+  "skills": {
+    "alternate_picking": {
+      "name": "Púa alterna",
+      "description": "Domina el arte de alternar púa hacia abajo y hacia arriba"
+    },
+    "legato": {
+      "name": "Legato",
+      "description": "Técnica fluida basada en hammer-ons y pull-offs"
+    },
+    "sweep_picking": {
+      "name": "Sweep picking",
+      "description": "Técnica avanzada de púa para tocar arpegios"
+    },
+    "chord_theory": {
+      "name": "Teoría de acordes",
+      "description": "Entiende cómo se construyen los acordes y las progresiones"
+    },
+    "scales": {
+      "name": "Escalas",
+      "description": "Aprende y domina las escalas esenciales de la guitarra"
+    },
+    "rhythm": {
+      "name": "Dominio del ritmo",
+      "description": "Desarrolla un tempo preciso y control del ritmo"
+    },
+    "finger_independence": {
+      "name": "Independencia de dedos",
+      "description": "Desarrolla la capacidad de mover los dedos de forma independiente"
+    },
+    "phrasing": {
+      "name": "Fraseo",
+      "description": "Da forma a tus líneas con espacio, dinámica y elección de notas"
+    },
+    "articulation": {
+      "name": "Articulación",
+      "description": "Domina distintas técnicas de articulación para una mayor expresión musical"
+    },
+    "bending": {
+      "name": "Bending",
+      "description": "Domina el arte de estirar las cuerdas para tocar con expresión"
+    },
+    "tapping": {
+      "name": "Tapping",
+      "description": "Técnica avanzada con ambas manos sobre el mástil"
+    },
+    "string_skipping": {
+      "name": "Salto de cuerdas",
+      "description": "Desarrolla precisión y coordinación al saltar cuerdas"
+    },
+    "improvisation": {
+      "name": "Improvisación",
+      "description": "Crea ideas musicales y solos espontáneos"
+    },
+    "ear_training": {
+      "name": "Entrenamiento auditivo",
+      "description": "Desarrolla la capacidad de reconocer notas, intervalos y acordes de oído"
+    },
+    "sight_reading": {
+      "name": "Lectura a primera vista",
+      "description": "Aprende a leer y tocar partituras con fluidez"
+    },
+    "fingerpicking": {
+      "name": "Fingerpicking",
+      "description": "Domina las técnicas de guitarra fingerstyle"
+    },
+    "music_composition": {
+      "name": "Composición musical",
+      "description": "Aprende a escribir y arreglar tu propia música"
+    },
+    "pitch_recognition": {
+      "name": "Reconocimiento de alturas",
+      "description": "Desarrolla el oído absoluto y el relativo"
+    },
+    "harmony": {
+      "name": "Armonía",
+      "description": "Domina progresiones de acordes complejas y la conducción de voces"
+    },
+    "vibrato": {
+      "name": "Vibrato",
+      "description": "Domina el arte de añadir expresión haciendo vibrar la cuerda"
+    },
+    "music_theory": {
+      "name": "Mástil y teoría",
+      "description": "Conoce cada nota del mástil y la teoría que hay detrás"
+    },
+    "rhythm_variations": {
+      "name": "Ritmo avanzado",
+      "description": "Domina compases complejos y polirritmias"
+    },
+    "songwriting": {
+      "name": "Composición de canciones",
+      "description": "Crea canciones completas con letra y arreglos"
+    },
+    "slide_guitar": {
+      "name": "Guitarra slide",
+      "description": "Domina la técnica de tocar con slide"
+    },
+    "modal_theory": {
+      "name": "Teoría modal",
+      "description": "Comprensión y aplicación de los modos musicales"
+    },
+    "audio_production": {
+      "name": "Tono",
+      "description": "Aprende a grabar y producir pistas de guitarra"
+    },
+    "hybrid_picking": {
+      "name": "Hybrid picking",
+      "description": "Combina la púa con la técnica de dedos"
+    },
+    "harmony-ear": {
+      "name": "Armonía de oído",
+      "description": "Desarrolla la capacidad de reconocer acordes y progresiones de oído"
+    },
+    "chords": {
+      "name": "Acordes",
+      "description": "Domina la construcción de acordes y las progresiones"
+    },
+    "transcription": {
+      "name": "Transcripción",
+      "description": "Aprende a escribir música de oído en partitura o tablatura"
+    },
+    "picking": {
+      "name": "Púa",
+      "description": "Domina las técnicas básicas de púa y el ataque preciso a las cuerdas"
+    },
+    "basic_chords": {
+      "name": "Acordes básicos",
+      "description": "Base de acordes abiertos y power chords"
+    },
+    "intermediate_chords": {
+      "name": "Acordes intermedios",
+      "description": "Acordes con cejilla y voicings complejos"
+    },
+    "advanced_chords": {
+      "name": "Acordes avanzados",
+      "description": "Voicings extendidos y alterados"
+    },
+    "basic_scales": {
+      "name": "Escalas básicas",
+      "description": "Escalas mayores, menores y pentatónicas"
+    },
+    "intermediate_scales": {
+      "name": "Escalas intermedias",
+      "description": "Escalas modales y patrones adicionales"
+    },
+    "advanced_scales": {
+      "name": "Escalas avanzadas",
+      "description": "Sistemas de escalas exóticos y complejos"
+    },
+    "rhythm_basics": {
+      "name": "Fundamentos del ritmo",
+      "description": "Rasgueos básicos y patrones de tiempo"
+    },
+    "rhythm_intermediate": {
+      "name": "Ritmo intermedio",
+      "description": "Rasgueos complejos y síncopas"
+    },
+    "rhythm_advanced": {
+      "name": "Ritmo avanzado",
+      "description": "Polirritmias y conceptos de tiempo avanzados"
+    },
+    "music_theory_basics": {
+      "name": "Fundamentos de teoría",
+      "description": "Fundamentos de la notación musical y la armonía"
+    },
+    "music_theory_intermediate": {
+      "name": "Teoría intermedia",
+      "description": "Progresiones de acordes y armonía avanzada"
+    },
+    "music_theory_advanced": {
+      "name": "Teoría avanzada",
+      "description": "Sistemas armónicos complejos y análisis"
+    },
+    "ear_training_basic": {
+      "name": "Entrenamiento auditivo básico",
+      "description": "Identificar notas e intervalos sencillos"
+    },
+    "ear_training_intermediate": {
+      "name": "Entrenamiento auditivo intermedio",
+      "description": "Reconocimiento de acordes y transcripción"
+    },
+    "ear_training_advanced": {
+      "name": "Entrenamiento auditivo avanzado",
+      "description": "Transcripción armónica y rítmica compleja"
+    },
+    "improvisation_basic": {
+      "name": "Improvisación básica",
+      "description": "Improvisación melódica sencilla sobre progresiones básicas"
+    },
+    "improvisation_intermediate": {
+      "name": "Improvisación intermedia",
+      "description": "Fraseo y conceptos de improvisación más complejos"
+    },
+    "improvisation_advanced": {
+      "name": "Improvisación avanzada",
+      "description": "Desarrollar una voz propia y técnicas avanzadas"
+    },
+    "composition_basic": {
+      "name": "Composición básica",
+      "description": "Composición de canciones sencilla y desarrollo melódico"
+    },
+    "composition_intermediate": {
+      "name": "Composición intermedia",
+      "description": "Estructuras de canción y arreglos más complejos"
+    },
+    "composition_advanced": {
+      "name": "Composición avanzada",
+      "description": "Técnicas de composición sofisticadas"
+    },
+    "composition": {
+      "name": "Composición",
+      "description": "Aprende a escribir y arreglar tu propia música"
+    }
+  }
+}

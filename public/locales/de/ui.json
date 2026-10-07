@@ -1,0 +1,16 @@
+{
+  "changelog": {
+    "empty": "Diesen Monat keine Einträge",
+    "new": "Neu",
+    "bug_fix": "Fehlerbehebung"
+  },
+  "open_in_practice_log": "Im Übungsprotokoll öffnen",
+  "activity": "Aktivität",
+  "minutes_short": "{{minutes}} Min.",
+  "live_now": "Gerade live",
+  "close": "Schließen",
+  "using_desktop_app": "Nutzt die Desktop-App",
+  "free_cases": "{{count}} kostenlose Cases",
+  "free_case": "Kostenloses Case",
+  "daily_practice": "Tägliches Üben"
+}

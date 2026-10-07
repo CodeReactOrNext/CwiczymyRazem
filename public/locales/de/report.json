@@ -1,0 +1,191 @@
+{
+  "subtitlebar_text": "Eintrag",
+  "exercise_type_title": "Übungszeit eintragen",
+  "technique": "Technik",
+  "theory": "Theorie",
+  "hearing": "Gehör",
+  "creativity": "Kreative Arbeit",
+  "healthy_habits_title": "Gesunde Gewohnheiten",
+  "report_button": "Eintragen",
+  "exceeding_time": "Willst du den Eintrag wirklich hinzufügen?",
+  "sesion_title": "Ziele dieser Übungssession:",
+  "optional": "optional",
+  "days": "Tage",
+  "date_back": "Rückdatieren",
+  "max_days": "Max. {{days}} Tage",
+  "add_report_to_day": "Du fügst einen Eintrag hinzu für den Tag:",
+  "total_time": "Gesamtzeit",
+  "toast": {
+    "log_out": "Erfolgreich abgemeldet",
+    "24h_error": "Mehr als 24 Stunden pro Tag zu üben ist nicht möglich",
+    "input_time": "Zeit eingeben",
+    "not_logged": "Du bist nicht angemeldet",
+    "stoper_entered": "Du hast noch nicht eingetragene Zeit aus einer früheren Übungssession",
+    "exceeding_time": "Du hast mehr Zeit eingetragen, als seit dem letzten Eintrag vergangen ist. Überschreitung um  "
+  },
+  "description": {
+    "technique": "Z. B. Songs spielen und lernen, Aufwärmen, Rhythmus und verschiedene Techniken wie Wechselschlag oder Legato üben",
+    "hearing": "Z. B. Songs oder Teile davon nach Gehör spielen oder anhören, Intervalle hören und erkennen, Singen",
+    "theory": "Z. B. Songs transkribieren und analysieren, Töne auf dem Griffbrett lernen, Noten lesen",
+    "creative": "Z. B. eigene Songs schreiben, improvisieren, am eigenen Stil arbeiten",
+    "exceeding_time": "Setz hier einen Haken, wenn du vergessen hast, Zeit oder eine gesunde Gewohnheit zum vorherigen Eintrag hinzuzufügen, oder wenn du eine zusätzliche, frühere Übungssession eintragen willst.",
+    "sesion_title": "Gib deiner Session einen Titel. Er ist in deinem Kalender sichtbar.",
+    "max_days": "Falls du es vergessen hast, kannst du deinen Eintrag bis zu {{days}} Tage rückwirkend hinzufügen. Er zählt dann aber nicht für aufeinanderfolgende Tage und wird im Kalender hervorgehoben."
+  },
+  "habits": {
+    "exercise_plan": {
+      "title": "Hast du deinen Übungsplan erfüllt?",
+      "description": "Ziele zu setzen und dein Gitarrenüben zu planen ist wichtig, weil es dir hilft, motiviert zu bleiben, deinen Fortschritt zu verfolgen und deine Ziele zu erreichen."
+    },
+    "new_things": {
+      "title": "Hast du Neues geübt?",
+      "description": "Neues auf der Gitarre zu üben ist aus mehreren Gründen wichtig. Vor allem hilft es dir, neue Fähigkeiten zu entwickeln und bestehende zu verbessern. Wenn du dich neuen Herausforderungen stellst, kannst du ein besserer Musiker werden und deine Möglichkeiten erweitern. "
+    },
+    "warmup": {
+      "title": "Hast du dich aufgewärmt?",
+      "description": "Aufwärmen bereitet Muskeln und Gelenke auf die körperliche Belastung beim Spielen vor. Das senkt das Verletzungsrisiko und macht deine Übungssessions angenehmer. Außerdem kann es Technik und Präzision verbessern, weil Finger und Muskeln richtig in Gang kommen."
+    },
+    "metronome": {
+      "title": "Hast du ein Metronom benutzt?",
+      "description": "Ein Metronom kann dein Timing und Rhythmusgefühl verbessern. Wenn du damit übst, lernst du, gleichmäßig zu einem festen Puls zu spielen, und baust ein solides rhythmisches Fundament auf."
+    },
+    "recording": {
+      "title": "Hast du dich aufgenommen?",
+      "description": "Wenn du dich aufnimmst, kannst du dein Spiel aus einer anderen Perspektive sehen und hören als beim Spielen selbst. So bemerkst du Fehler oder Schwächen, die dir sonst entgangen wären. "
+    }
+  },
+  "rating_popup": {
+    "title": "DU HAST BEKOMMEN",
+    "points": "Pkt.",
+    "skill_points_gained": "Erhaltene Skillpunkte",
+    "spend_skill_points": "Skillpunkte ausgeben",
+    "back": "Zurück",
+    "regularity": "für Regelmäßigkeit",
+    "streak": "Tage in Folge",
+    "habits": "für gesunde Gewohnheiten",
+    "habitsWithCount_one": "du hast {{count}} gesunde Gewohnheit angewendet",
+    "habitsWithCount_other": "du hast {{count}} gesunde Gewohnheiten angewendet",
+    "time": "für die Übungszeit",
+    "time_amount": "du hast geübt",
+    "new_level": "Level-Up!",
+    "new_achievements": "Neue Erfolge:",
+    "achievement_reward": "Belohnung wartet:",
+    "collect_reward": "Hol sie dir in deinem Profil ab"
+  },
+  "skills": {
+    "technique": "Technik",
+    "theory": "Theorie",
+    "hearing": "Gehör",
+    "creativity": "Kreativität"
+  },
+  "chart": {
+    "categories": {
+      "technique": "Technik",
+      "theory": "Theorie",
+      "hearing": "Gehör",
+      "creativity": "Kreativität"
+    }
+  },
+  "back": "Zurück",
+  "hours": "Stunden",
+  "minutes": "Minuten",
+  "double_click_to_type": "Doppelklick zum Eintippen",
+  "errors": {
+    "invalid_time": "Ungültige Zeitangaben",
+    "title_too_long": "Der Session-Titel ist zu lang (max. 60 Zeichen)",
+    "check_fields": "Bitte prüfe alle Felder und versuch es noch einmal"
+  },
+  "long_session": {
+    "title": "Das ist eine lange Session!",
+    "body": "Du willst {{time}} Übungszeit eintragen. Das ist viel – prüf bitte, ob es kein Versehen ist, bevor du absendest.",
+    "confirm": "Willst du diese Zeit wirklich eintragen?",
+    "back": "Zurück zur Bearbeitung",
+    "accept": "Ja, eintragen"
+  },
+  "form": {
+    "log_another": "Weitere Session eintragen",
+    "time_entered": "Zeit eingetragen. Speichere jetzt oder füge unten optionale Details hinzu.",
+    "song_selected": "Song gewählt — lege fest, wie lange du ihn gespielt hast.",
+    "pick_songs": "Wähle die gespielten Songs und lege für jeden die Zeit fest.",
+    "what_practiced": "Was hast du heute geübt? Füge unten Zeit hinzu.",
+    "mode_free": "Freie Session",
+    "mode_songs": "Songs",
+    "save_now": "Jetzt speichern",
+    "more_details": "Oder füge unten weitere Details hinzu",
+    "add_time_hint": "Füge mindestens einer Kategorie Zeit hinzu, um zu speichern",
+    "healthy_habits": "Gesunde Gewohnheiten",
+    "focus_habits": "Session-Fokus & Gewohnheiten",
+    "optional": "Optional",
+    "session_title": "Session-Titel",
+    "session_title_placeholder": "z. B. Dur-Tonleitern üben",
+    "habits_checklist": "Gewohnheiten-Checkliste",
+    "streak_bonus": "{{count}}-Tage-Serie — Punkte ×{{multiplier}}",
+    "no_streak_bonus": "Noch keine Serie — Punkte ×{{multiplier}}",
+    "finalize": "Eintrag abschließen",
+    "optional_details": "Optionale Details",
+    "when": "Wann war das?",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "days_ago": "vor {{count}} Tagen",
+    "selected": "Ausgewählt:",
+    "saving": "Wird gespeichert...",
+    "finish_save": "Übung abschließen & speichern"
+  },
+  "tag_groups": {
+    "goal": "Ziel",
+    "playing_style": "Spielstil",
+    "techniques": "Techniken",
+    "theory_knowledge": "Theorie & Wissen",
+    "creative": "Kreativ",
+    "performance": "Auftritt"
+  },
+  "tags": {
+    "warmup": "Aufwärmen",
+    "technique": "Technik",
+    "speed_building": "Tempoaufbau",
+    "ear_training": "Gehörtraining",
+    "fingerpicking": "Fingerpicking",
+    "rhythm_training": "Rhythmustraining",
+    "vibrato": "Vibrato",
+    "bends": "Bendings",
+    "legato": "Legato",
+    "alt_picking": "Wechselschlag",
+    "hybrid_picking": "Hybrid Picking",
+    "sweep_picking": "Sweep Picking",
+    "tapping": "Tapping",
+    "picking_control": "Anschlagskontrolle",
+    "string_skipping": "String Skipping",
+    "down_picking": "Abschlag",
+    "scales": "Tonleitern",
+    "arpeggios": "Arpeggios",
+    "chords": "Akkorde",
+    "theory": "Theorie",
+    "sight_reading": "Vom-Blatt-Spiel",
+    "transcribing": "Transkribieren",
+    "improvisation": "Improvisation",
+    "new_song": "Neuer Song",
+    "song_writing": "Songwriting",
+    "composition": "Komposition",
+    "jamming": "Jammen",
+    "performance_prep": "Auftrittsvorbereitung",
+    "performing": "Auftreten",
+    "cover_song": "Cover-Song",
+    "soloing": "Solospiel",
+    "recording": "Aufnahme"
+  },
+  "songs": {
+    "less": "5 Minuten weniger {{label}}",
+    "minutes_of": "Minuten {{label}} bei diesem Song",
+    "more": "5 Minuten mehr {{label}}",
+    "remove": "{{title}} aus dieser Session entfernen",
+    "any_part": "Beliebiger Part",
+    "empty_title": "Deine Bibliothek ist leer",
+    "empty_body": "Füge Songs hinzu, an denen du arbeitest, dann kannst du Übungszeit direkt auf sie eintragen.",
+    "browse": "Songs durchsuchen",
+    "done_adding": "Fertig mit Hinzufügen",
+    "add_song": "Song hinzufügen",
+    "search": "Bibliothek durchsuchen...",
+    "limit": "Mehr als {{max}} Songs passen nicht in eine Session.",
+    "no_match": "Nichts in deiner Bibliothek passt dazu."
+  }
+}

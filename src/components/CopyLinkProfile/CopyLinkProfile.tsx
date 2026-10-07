@@ -9,7 +9,7 @@ import { MdCheck } from "react-icons/md";
 import { useAppSelector } from "store/hooks";
 
 export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon" }) => {
-  const { t } = useTranslation(["common", "toast"]);
+  const { t } = useTranslation(["common", "toast", "nav"]);
   const profilePath = useAppSelector(selectUserAuth);
   const [isCopied, setIsCopied] = useState(false);
 
@@ -35,7 +35,7 @@ export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon
           className="z-40 click-behavior m-auto flex max-w-[220px] flex-row items-center gap-2 border-dashed text-center text-[0.7rem] xs:text-xs"
         >
           <User className="text-[1rem]" />
-          See your profile
+          {t("nav:see_your_profile")}
         </Button>
       </Link>
     );

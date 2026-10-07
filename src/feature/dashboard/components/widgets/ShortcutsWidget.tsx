@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { useDashboardLayoutContext } from "feature/dashboard/context/DashboardContext";
@@ -26,6 +27,7 @@ const chip =
  * will be used rather than in a separate settings screen.
  */
 export const ShortcutsWidget = () => {
+  const { t } = useTranslation("dashboard");
   const { layout, isEditing, updateLayout } = useDashboardLayoutContext();
   const selected = layout.shortcuts;
   const limitReached = isShortcutLimitReached(layout);
@@ -35,7 +37,7 @@ export const ShortcutsWidget = () => {
       <Card className='p-5 sm:p-6'>
         <WidgetHeader
           icon={Zap}
-          title='Shortcuts'
+          title={t("shortcuts.title")}
           action={
             <span className='text-xs tabular-nums text-zinc-500'>
               {selected.length}/{MAX_SHORTCUTS}
@@ -43,17 +45,17 @@ export const ShortcutsWidget = () => {
           }
         />
         <p className='mb-5 text-sm text-zinc-400'>
-          Tap a destination to pin it.{" "}
+          {t("shortcuts.tap_to_pin")}{" "}
           {limitReached
-            ? "That's the lot — unpin one to swap it."
-            : `Up to ${MAX_SHORTCUTS} fit.`}
+            ? t("shortcuts.limit_reached")
+            : t("shortcuts.up_to", { count: MAX_SHORTCUTS })}
         </p>
 
         <div className='space-y-5'>
           {SHORTCUT_GROUP_ORDER.map((group) => (
             <div key={group}>
               <p className='mb-2 text-xs font-semibold text-zinc-500'>
-                {SHORTCUT_GROUP_LABELS[group]}
+                {t(`shortcuts.groups.${group}`, SHORTCUT_GROUP_LABELS[group])}
               </p>
               <div className='flex flex-wrap gap-2'>
                 {SHORTCUTS.filter((shortcut) => shortcut.group === group).map(
@@ -83,7 +85,7 @@ export const ShortcutsWidget = () => {
                             active ? "text-cyan-400" : "text-zinc-500",
                           )}
                         />
-                        {shortcut.label}
+                        {t(`shortcuts.items.${shortcut.id}`, shortcut.label)}
                       </button>
                     );
                   },
@@ -98,10 +100,10 @@ export const ShortcutsWidget = () => {
 
   return (
     <Card className='p-5 sm:p-6'>
-      <WidgetHeader icon={Zap} title='Shortcuts' />
+      <WidgetHeader icon={Zap} title={t("shortcuts.title")} />
       {selected.length === 0 ? (
         <p className='text-sm text-zinc-400'>
-          No shortcuts pinned yet. Customize Home to add some.
+          {t("shortcuts.empty")}
         </p>
       ) : (
         <div className='flex flex-wrap gap-2'>
@@ -117,7 +119,7 @@ export const ShortcutsWidget = () => {
                   "bg-zinc-900/40 text-zinc-200 hover:bg-zinc-800/60 hover:text-zinc-100",
                 )}>
                 <Icon size={14} className='shrink-0 text-zinc-500' />
-                {shortcut.label}
+                {t(`shortcuts.items.${shortcut.id}`, shortcut.label)}
               </Link>
             );
           })}

@@ -10,6 +10,7 @@ import {
 import { cn } from 'assets/lib/utils';
 import type { SongPracticeMode } from 'feature/exercisePlan/types/exercise.types';
 import { DEFAULT_SONG_EXERCISE_MINUTES } from 'feature/exercisePlan/utils/songToExercise';
+import { useTranslation } from "hooks/useTranslation";
 import { Check, FileMusic, ListVideo, Music } from 'lucide-react';
 import { useState } from 'react';
 
@@ -63,6 +64,7 @@ function AddSongToPlanForm({
   onConfirm: (timeInMinutes: number, mode: SongPracticeMode) => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation("plans");
   const [time, setTime] = useState(
     String(song.current?.timeInMinutes ?? DEFAULT_SONG_EXERCISE_MINUTES)
   );
@@ -107,18 +109,20 @@ function AddSongToPlanForm({
 
       <div className='space-y-6 pt-2'>
         <div className='space-y-2.5'>
-          <p className='text-[12px] font-bold tracking-wider text-zinc-500'>Practise it with</p>
-          <div className='grid gap-2' role='radiogroup' aria-label='How to practise this song'>
+          <p className='text-[12px] font-bold tracking-wider text-zinc-500'>{t("add_song.practise_with")}</p>
+          <div className='grid gap-2' role='radiogroup' aria-label={t("add_song.how_aria")}>
             {MODE_OPTIONS.map(({ id, label, description, Icon }) => {
               const available = isModeAvailable(id);
               const selected = mode === id;
               const hint =
                 id === 'gp' && !available
-                  ? 'No Guitar Pro file attached — add one on the song’s page.'
+                  ? t('add_song.no_gp')
                   : id === 'sections' && song.sectionCount === 0
-                    ? 'No sections yet — you can pin a video and mark them during the session.'
+                    ? t('add_song.no_sections')
                     : id === 'sections' && song.sectionCount !== null
-                      ? `${song.sectionCount} ${song.sectionCount === 1 ? 'section' : 'sections'} marked.`
+                      ? song.sectionCount === 1
+                        ? t('add_song.sections_one')
+                        : t('add_song.sections', { count: song.sectionCount })
                       : null;
               return (
                 <button
@@ -142,11 +146,11 @@ function AddSongToPlanForm({
                   </span>
                   <span className='min-w-0 flex-1'>
                     <span className='flex items-center gap-2 text-sm font-semibold text-zinc-100'>
-                      {label}
+                      {t(`add_song.modes.${id}.label`, label)}
                       {selected && <Check className='h-3.5 w-3.5 text-cyan-400' />}
                     </span>
                     <span className='mt-0.5 block text-xs leading-relaxed text-zinc-400'>
-                      {description}
+                      {t(`add_song.modes.${id}.description`, description)}
                     </span>
                     {hint && (
                       <span className='mt-1 block text-[11px] text-zinc-500'>{hint}</span>
@@ -170,13 +174,13 @@ function AddSongToPlanForm({
             variant='ghost'
             className='rounded-[8px] font-semibold text-zinc-400 transition-colors hover:bg-white/5 hover:text-white'
             onClick={onCancel}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             className='rounded-[8px] bg-cyan-600 px-6 font-bold text-white shadow-[0_0_15px_-3px_rgba(6,182,212,0.4)] transition-all hover:bg-cyan-500'
             onClick={handleConfirm}
             disabled={!canConfirm}>
-            {song.current ? 'Save' : 'Add to plan'}
+            {song.current ? t('save') : t('add_to_plan')}
           </Button>
         </div>
       </div>

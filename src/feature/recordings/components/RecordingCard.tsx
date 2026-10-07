@@ -17,6 +17,8 @@ import { AddRecordingModal } from "feature/recordings/components/AddRecordingMod
 import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMutations";
 import type { Recording } from "feature/recordings/types/types";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Heart, MessageSquare, Pencil, Play, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -33,6 +35,8 @@ const getYoutubeId = (url: string) => {
 };
 
 export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
+  const { t } = useTranslation("recordings");
+  const intlLocale = useIntlLocale();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const userId = useAppSelector(selectUserAuth);
   const { toggleLike, deleteRecording, isDeleting } = useRecordingMutations();
@@ -55,7 +59,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
     (recording.createdAt as any)?.toDate
       ? (recording.createdAt as any).toDate()
       : recording.createdAt || new Date(),
-  ).toLocaleDateString();
+  ).toLocaleDateString(intlLocale);
 
   const songLabel = [recording.songArtist, recording.songTitle]
     .filter(Boolean)
@@ -73,7 +77,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
     <Card className='group/card flex h-full flex-col overflow-hidden bg-zinc-900/40 p-0 transition-colors hover:bg-zinc-900/60'>
       <button
         type='button'
-        aria-label={`Play ${recording.title}`}
+        aria-label={t("card.play", { title: recording.title })}
         onClick={() => onView(recording.id)}
         className='group/thumb relative block aspect-video w-full overflow-hidden bg-black'>
         <div
@@ -105,7 +109,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
               <Button
                 variant='ghost'
                 size='icon'
-                aria-label='Edit recording'
+                aria-label={t("card.edit")}
                 onClick={() => setIsEditOpen(true)}
                 className='h-8 w-8 text-zinc-500 hover:bg-cyan-500/10 hover:text-cyan-400'>
                 <Pencil className='h-4 w-4' />
@@ -115,28 +119,27 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
                   <Button
                     variant='ghost'
                     size='icon'
-                    aria-label='Delete recording'
+                    aria-label={t("card.delete_aria")}
                     className='h-8 w-8 text-zinc-500 hover:bg-red-500/10 hover:text-red-400'>
                     <Trash2 className='h-4 w-4' />
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='bg-zinc-950 text-white'>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogTitle>{t("card.confirm_title")}</AlertDialogTitle>
                     <AlertDialogDescription className='text-zinc-400'>
-                      This action cannot be undone. This will permanently delete
-                      your recording.
+                      {t("card.confirm_body")}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel className='bg-zinc-900 text-white hover:bg-zinc-800'>
-                      Cancel
+                      {t("modal.cancel")}
                     </AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDelete}
                       disabled={isDeleting}
                       className='border-none bg-red-600 text-white hover:bg-red-700'>
-                      {isDeleting ? "Deleting..." : "Delete"}
+                      {isDeleting ? t("card.deleting") : t("card.delete")}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -177,7 +180,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
         <Button
           variant='ghost'
           size='sm'
-          aria-label='Like recording'
+          aria-label={t("card.like")}
           className={cn(
             "text-zinc-400 hover:bg-zinc-800/60 hover:text-red-400",
             hasLiked && "text-red-400 hover:text-red-300",
@@ -190,7 +193,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
         <Button
           variant='ghost'
           size='sm'
-          aria-label='View comments'
+          aria-label={t("card.comments")}
           className='text-zinc-400 hover:bg-zinc-800/60 hover:text-cyan-400'
           onClick={() => onView(recording.id)}>
           <MessageSquare className='mr-1.5 h-4 w-4' />

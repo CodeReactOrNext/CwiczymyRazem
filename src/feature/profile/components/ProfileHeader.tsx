@@ -9,9 +9,9 @@ import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { useEquippedGuitar } from "feature/arsenal/hooks/useUserArsenal";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
-import { ACHIEVEMENT_TITLES } from "feature/profile/data/achievementTitles";
 import { getProfileBanner } from "feature/profile/data/profileBanners";
 import { PROFILE_ACCENT_COLORS } from "feature/profile/data/profileSectionCatalog";
+import { useProfileLabels } from "feature/profile/hooks/useProfileLabels";
 import type { ProfileLayoutConfig } from "feature/profile/types/profileLayout.types";
 import {
   formatDaysAgo,
@@ -21,6 +21,7 @@ import {
   resolveTitle,
 } from "feature/profile/utils/profileLayout";
 import type { Song } from "feature/songs/types/songs.type";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import type { ReactNode } from "react";
 import { FaFire, FaSoundcloud, FaYoutube } from "react-icons/fa";
 import type { ProfileInterface } from "types/ProfileInterface";
@@ -28,7 +29,6 @@ import { getYearsOfPlaying } from "utils/converter";
 import { getPointsToLvlUp } from "utils/gameLogic";
 
 import { SongTierBadge } from "./SongTierBadge";
-import { RARITY_LABELS } from "./TrophyCase";
 
 interface ProfileHeaderProps {
   userData: ProfileInterface;
@@ -77,6 +77,9 @@ export const ProfileHeader = ({
     guitarStartDate,
     selectedGuitar,
   } = userData;
+  const labels = useProfileLabels();
+  const { t } = labels;
+  const intlLocale = useIntlLocale();
   const facts = new Set(layout.facts);
   const badges = new Set(layout.badges);
   const earned = statistics.achievements ?? [];
@@ -90,7 +93,7 @@ export const ProfileHeader = ({
   const yearsOfPlaying = guitarStartDate
     ? getYearsOfPlaying(guitarStartDate.toDate())
     : null;
-  const lastPractice = formatDaysAgo(new Date(statistics.lastReportDate));
+  const lastPractice = formatDaysAgo(new Date(statistics.lastReportDate), undefined, t);
 
   const lvlXpStart = getPointsToLvlUp(statistics.lvl - 1);
   const lvlXpEnd = getPointsToLvlUp(statistics.lvl);
@@ -124,25 +127,25 @@ export const ProfileHeader = ({
   const factItems: ReactNode[] = [];
   if (facts.has("last-practice")) {
     factItems.push(
-      <Fact key='last' label='Last practice'>
-        {lastPractice ?? "Not yet"}
+      <Fact key='last' label={labels.fact("last-practice")}>
+        {lastPractice ?? t("header.not_yet")}
       </Fact>,
     );
   }
   if (facts.has("streak") && streak > 0) {
     factItems.push(
-      <Fact key='streak' label='Streak'>
+      <Fact key='streak' label={labels.fact("streak")}>
         <FaFire className='text-orange-500' size={13} />
         <span className='tabular-nums'>
-          {streak} {streak === 1 ? "day" : "days"}
+          {t(streak === 1 ? "header.days_one" : "header.days", { count: streak })}
         </span>
       </Fact>,
     );
   }
   if (facts.has("joined")) {
     factItems.push(
-      <Fact key='joined' label='Joined'>
-        {createdAt.toDate().toLocaleDateString(undefined, {
+      <Fact key='joined' label={labels.fact("joined")}>
+        {createdAt.toDate().toLocaleDateString(intlLocale, {
           month: "short",
           year: "numeric",
         })}
@@ -155,21 +158,21 @@ export const ProfileHeader = ({
     yearsOfPlaying > 0
   ) {
     factItems.push(
-      <Fact key='playing' label='Playing guitar'>
-        {yearsOfPlaying} {yearsOfPlaying === 1 ? "year" : "years"}
+      <Fact key='playing' label={t("header.playing_guitar")}>
+        {t(yearsOfPlaying === 1 ? "header.years_one" : "header.years", { count: yearsOfPlaying })}
       </Fact>,
     );
   }
   if (facts.has("guild") && guildBadge?.tag) {
     factItems.push(
-      <Fact key='guild' label='Guild'>
+      <Fact key='guild' label={labels.fact("guild")}>
         <GuildTagBadge badge={guildBadge} size='md' />
       </Fact>,
     );
   }
   if (facts.has("band") && band?.trim()) {
     factItems.push(
-      <Fact key='band' label='Band'>
+      <Fact key='band' label={labels.fact("band")}>
         <span translate='no' className='truncate'>
           {band}
         </span>
@@ -182,14 +185,14 @@ export const ProfileHeader = ({
 
   return (
     <HeroBanner
-      eyebrow='Player Profile'
+      eyebrow={t("header.eyebrow")}
       // A worn title replaces the generic eyebrow: it sits right above the
       // name the way a nameplate in a game reads — name, the Wizard.
       eyebrowContent={
         titleId && titleData ? (
           <p
             className='flex items-center gap-2 text-sm font-semibold'
-            title={`Title from an achievement · ${RARITY_LABELS[titleData.rarity]}`}>
+            title={t("header.title_from", { rarity: labels.rarity(titleData.rarity) })}>
             <titleData.Icon
               size={14}
               className={achievementsRarity[titleData.rarity].tailwindClass}
@@ -197,7 +200,7 @@ export const ProfileHeader = ({
             />
             <span
               className={achievementsRarity[titleData.rarity].tailwindClass}>
-              {ACHIEVEMENT_TITLES[titleId]}
+              {labels.achievementTitle(titleId)}
             </span>
           </p>
         ) : undefined

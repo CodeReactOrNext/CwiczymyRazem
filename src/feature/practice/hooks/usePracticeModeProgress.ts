@@ -48,7 +48,16 @@ export function usePracticeModeProgress(userId: string | null | undefined) {
         const scaleMapDone = Object.values(statuses).filter((s) => s === "completed").length;
         setProgress((p) => ({
           ...p,
-          scaleMap: summarizeCount(scaleMapDone, ["scale", "scales"], "Start with your first scale"),
+          scaleMap: summarizeCount(
+            scaleMapDone,
+            ["scale", "scales"],
+            "Start with your first scale",
+            {
+              one: "progress.scale_one",
+              many: "progress.scale_many",
+              empty: "progress.first_scale",
+            },
+          ),
         }));
 
         // Same "completed" rule as the Skill Tree checkmarks — one shared helper,
@@ -58,7 +67,16 @@ export function usePracticeModeProgress(userId: string | null | undefined) {
         ).length;
         setProgress((p) => ({
           ...p,
-          skills: summarizeCount(skillsDone, ["exercise", "exercises"], "Pick a technique to start"),
+          skills: summarizeCount(
+            skillsDone,
+            ["exercise", "exercises"],
+            "Pick a technique to start",
+            {
+              one: "progress.exercise_one",
+              many: "progress.exercise_many",
+              empty: "progress.first_technique",
+            },
+          ),
         }));
       })
       .catch(() => {});

@@ -3,6 +3,7 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import React, { useEffect, useState } from "react";
@@ -126,10 +127,11 @@ export function LandscapeSessionModal({
   handleRestart,
   songSectionMapSlot,
 }: LandscapeSessionModalProps) {
+  const { t } = useTranslation("session");
   const [isPanelExpanded, setIsPanelExpanded] = useState(true);
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
   const { formattedTimeLeft } = useTimerContext();
-  const strumVolume = strumSynthVolume(isAudioMuted, audioTracks?.find(t => t.id === "main"));
+  const strumVolume = strumSynthVolume(isAudioMuted, audioTracks?.find(track => track.id === "main"));
 
   // If landscape was forced via RotateDeviceHint (fullscreen + orientation
   // lock), release both when the session closes so the app isn't stuck sideways.
@@ -223,15 +225,15 @@ export function LandscapeSessionModal({
                     {isMicEnabled && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
                       <div className="flex items-center justify-between gap-2 px-3 py-1 text-[9px]">
                         <div className="min-w-0">
-                          <div className="text-zinc-600 tracking-widest">Score</div>
+                          <div className="text-zinc-600 tracking-widest">{t("success.score")}</div>
                           <div className="font-black text-white tabular-nums">{gameState.score.toLocaleString()}</div>
                         </div>
                         <div className="min-w-0">
-                          <div className="text-zinc-600 tracking-widest">Acc</div>
+                          <div className="text-zinc-600 tracking-widest">{t("hud.acc_short")}</div>
                           <div className="font-black text-emerald-400 tabular-nums">{sessionAccuracy}%</div>
                         </div>
                         <div className="min-w-0 text-right">
-                          <div className="text-zinc-600 tracking-widest">Streak</div>
+                          <div className="text-zinc-600 tracking-widest">{t("hud.streak")}</div>
                           <div className="font-black text-cyan-400 tabular-nums">{gameState.combo}×{gameState.multiplier}</div>
                         </div>
                       </div>

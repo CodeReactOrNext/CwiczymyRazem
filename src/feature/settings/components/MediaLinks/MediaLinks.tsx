@@ -100,7 +100,7 @@ const MediaLinks = () => {
         <Input
           value={state.bands}
           onChange={(e) => handleChange("bands", e.target.value)}
-          placeholder="Your bands..."
+          placeholder={t("settings:bands_placeholder")}
         />
       </div>
 

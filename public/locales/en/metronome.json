@@ -1,0 +1,53 @@
+{
+  "half_speed": "Half Speed",
+  "bpm_edit_hint": "Click to edit · Arrow keys ±1 · Shift+Arrow ±5",
+  "bpm_exam": "BPM · exam mode",
+  "bpm_confirm": "↵ to confirm",
+  "bpm_click_to_edit": "BPM · click to edit",
+  "decrease": "Decrease BPM by 1",
+  "increase": "Increase BPM by 1",
+  "remove_beat": "Remove beat",
+  "add_beat": "Add beat",
+  "subdivisions": {
+    "1": "Quarter notes — no subdivision",
+    "2": "Eighth notes",
+    "3": "Eighth-note triplets",
+    "4": "Sixteenth notes"
+  },
+  "accent": {
+    "accent": "Accent — click to mute",
+    "click": "Click — click to accent",
+    "muted": "Muted — click to reset",
+    "locked": "This exercise sets its own accents",
+    "follows_tab": "The click changes meter with the tab",
+    "from_exercise": "Accents come from this exercise's meter",
+    "hint": "Click a beat to accent, click again to mute"
+  },
+  "sounds": {
+    "classic": {
+      "label": "Classic",
+      "desc": "Clean sine beep, the one the app shipped with"
+    },
+    "wood": {
+      "label": "Wood block",
+      "desc": "Warm hollow knock, easy on long sessions"
+    },
+    "digital": {
+      "label": "Digital",
+      "desc": "Sharp square-wave blip, like a DAW click"
+    },
+    "sticks": {
+      "label": "Sticks",
+      "desc": "Dry drumstick tap, cuts through a loud amp"
+    },
+    "hihat": {
+      "label": "Hi-hat",
+      "desc": "Closed hi-hat, sits naturally in a drum groove"
+    },
+    "cowbell": {
+      "label": "Cowbell",
+      "desc": "Two detuned squares — more cowbell"
+    }
+  },
+  "beats_per_bar": "Beats per bar"
+}

@@ -6,6 +6,8 @@ import {
   ROADMAP_TIERS,
 } from "feature/roadmap/data/roadmap.data";
 import { useBuyMeACoffeeFunding } from "feature/roadmap/hooks/useBuyMeACoffeeFunding";
+import { tierLabel } from "feature/roadmap/utils/tierText";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Coffee, Heart, TriangleAlert, X } from "lucide-react";
 
 interface SupportModalProps {
@@ -20,6 +22,7 @@ interface SupportModalProps {
  * The live numbers (cost covered, next tier) are real, just the copy is fixed.
  */
 export function SupportModal({ isOpen, onClose, onDonate }: SupportModalProps) {
+  const { t } = useTranslation("supporter");
   const {
     totalRaised: rawTotalRaised,
     raisedThisMonth,
@@ -58,16 +61,13 @@ export function SupportModal({ isOpen, onClose, onDonate }: SupportModalProps) {
 
           <div>
             <p className='text-[10px] font-semibold uppercase tracking-[0.3em] text-amber-500/80'>
-              Help build Riff Quest
+              {t("hero.title")}
             </p>
             <h2 className='mt-2 text-2xl font-semibold tracking-tight text-white'>
-              Why support Riff Quest?
+              {t("modal.why")}
             </h2>
             <p className='mt-3 text-sm leading-relaxed text-zinc-400'>
-              Riff Quest is a one person project, free and built in the open. Your
-              support covers the domain, hosting, and database first. Everything
-              raised on top of that funds the roadmap: new exercises, gear, and
-              features, unlocked tier by tier as the community funds them.
+              {t("modal.body")}
             </p>
           </div>
 
@@ -84,9 +84,7 @@ export function SupportModal({ isOpen, onClose, onDonate }: SupportModalProps) {
                     "truncate font-medium",
                     isCovered ? "text-zinc-300" : "text-orange-200"
                   )}>
-                  {isCovered
-                    ? "Server cost this month covered"
-                    : "Server cost needs your help"}
+                  {isCovered ? t("funding.covered") : t("funding.needs_help")}
                 </span>
               </span>
               {!isCovered && (
@@ -111,11 +109,11 @@ export function SupportModal({ isOpen, onClose, onDonate }: SupportModalProps) {
             {nextTier && (
               <div className='mt-3 flex items-center justify-between gap-4 text-xs text-zinc-500'>
                 <span className='truncate'>
-                  Next unlock{" "}
-                  <span className='font-medium text-zinc-300'>{nextTier.label}</span>
+                  {t("funding.next_unlock")}{" "}
+                  <span className='font-medium text-zinc-300'>{tierLabel(nextTier, t)}</span>
                 </span>
                 <span className='shrink-0 font-medium text-white'>
-                  ${nextTier.goal - totalRaised} to go
+                  {t("funding.to_go", { amount: nextTier.goal - totalRaised })}
                 </span>
               </div>
             )}
@@ -128,13 +126,13 @@ export function SupportModal({ isOpen, onClose, onDonate }: SupportModalProps) {
             onClick={onDonate}
             className='flex items-center justify-center gap-2 rounded-md bg-amber-500 py-3.5 text-sm font-semibold text-zinc-950 transition-all hover:bg-amber-400'>
             <Coffee size={16} />
-            Support Riff Quest
+            {t("cta.support")}
           </a>
 
           <button
             onClick={onClose}
             className='text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-300'>
-            Maybe later
+            {t("modal.later")}
           </button>
         </div>
       </div>

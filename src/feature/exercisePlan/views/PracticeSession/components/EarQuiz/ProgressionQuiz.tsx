@@ -7,6 +7,7 @@ import {
 } from "feature/exercisePlan/logic/earQuiz/progressions";
 import type { ProgressionQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
 import { checkProgressionAnswer } from "feature/exercisePlan/logic/earQuiz/questions";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Music2, Undo2 } from "lucide-react";
 import { useState } from "react";
 
@@ -41,6 +42,7 @@ export function ProgressionQuiz({
   onAnswer,
   onNext,
 }: ProgressionQuizProps) {
+  const { t } = useTranslation("session");
   const { isPlaying, play, stop } = useEarQuizPlayback();
   const [slots, setSlots] = useState<(DegreeId | null)[]>(() =>
     question.degrees.map(() => null),
@@ -110,23 +112,23 @@ export function ProgressionQuiz({
     <>
       <div className='flex flex-col items-center gap-4 py-2'>
         <p className='text-center text-lg font-semibold text-zinc-100'>
-          Which progression is this?
+          {t("quiz.which_progression")}
         </p>
         <div className='flex flex-wrap items-center justify-center gap-3'>
           <ListenButton
             onClick={toggleProgression}
             isPlaying={isPlaying}
-            label='Play progression'
+            label={t("quiz.play_progression")}
             hasPlayed={hasPlayed}
           />
           <QuizSecondaryButton
             onClick={playTonic}
             icon={<Music2 className='h-4 w-4' />}>
-            Hear the I chord
+            {t("quiz.hear_tonic")}
           </QuizSecondaryButton>
         </div>
         <p className='text-center text-xs text-zinc-500'>
-          Key of {question.keyName} — build the degrees you hear, in order
+          {t("quiz.key_of_build", { key: question.keyName })}
         </p>
       </div>
 
@@ -142,8 +144,8 @@ export function ProgressionQuiz({
               disabled={isAnswered || slot === null}
               aria-label={
                 slot
-                  ? `Slot ${index + 1}: ${slot}, tap to clear`
-                  : `Slot ${index + 1}: empty`
+                  ? t("quiz.slot_filled", { n: index + 1, chord: slot })
+                  : t("quiz.slot_empty", { n: index + 1 })
               }
               className={cn(
                 "flex h-16 w-20 flex-col items-center justify-center gap-0.5 rounded-lg text-lg font-semibold transition-colors",
@@ -195,7 +197,7 @@ export function ProgressionQuiz({
             disabled={!isComplete}
             className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
             <Check className='h-4 w-4' />
-            Check
+            {t("quiz.check")}
           </Button>
           <Button
             variant='ghost'
@@ -203,7 +205,7 @@ export function ProgressionQuiz({
             disabled={slots.every((slot) => slot === null)}
             className='h-10 gap-2 text-zinc-400 hover:text-zinc-100'>
             <Undo2 className='h-4 w-4' />
-            Clear
+            {t("quiz.clear")}
           </Button>
         </div>
       )}
@@ -213,13 +215,13 @@ export function ProgressionQuiz({
           isCorrect={isCorrect}
           answer={formatDegrees(question.degrees)}
           explanation={question.chords.map((chord) => chord.name).join("  ·  ")}
-          footnote={`Heard in: ${question.heardIn}`}
+          footnote={t("quiz.heard_in", { songs: question.heardIn })}
           onNext={onNext}
           extraAction={
             <QuizSecondaryButton
               onClick={playProgression}
               icon={<Music2 className='h-4 w-4' />}>
-              Play it again
+              {t("quiz.play_it_again")}
             </QuizSecondaryButton>
           }
         />

@@ -1,3 +1,5 @@
+import { useTranslation } from "hooks/useTranslation";
+import { useDateFnsLocale } from "lib/i18n/dateLocale";
 import { Badge } from "assets/components/ui/badge";
 import { cn } from "assets/lib/utils";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -62,6 +64,8 @@ export const SongBoardRow = ({
   onPartsChange,
   hasSectionMap,
 }: SongBoardRowProps) => {
+  const { t } = useTranslation("songs");
+  const dateLocale = useDateFnsLocale();
   const sessionCount = progress?.sessionCount ?? 0;
   const totalPracticeMs = progress?.totalPracticeMs ?? 0;
   const lastPracticedAt = progress?.lastPracticedAt ?? null;
@@ -70,7 +74,10 @@ export const SongBoardRow = ({
   const practicedArrangements = getPracticedArrangements(progress?.arrangements);
 
   const lastPracticeLabel = lastPracticedAt
-    ? formatDistanceToNowStrict(lastPracticedAt, { addSuffix: true })
+    ? formatDistanceToNowStrict(lastPracticedAt, {
+        addSuffix: true,
+        locale: dateLocale,
+      })
     : "—";
 
   return (
@@ -106,22 +113,24 @@ export const SongBoardRow = ({
           {hasSectionMap && (
             <Badge
               variant='secondary'
-              title='Community section map available'
+              title={t("board.map_available")}
               className='shrink-0 gap-1 px-1.5 py-0 text-[10px]'>
               <ListMusic className='h-3 w-3' />
-              Map
+              {t("board.map")}
             </Badge>
           )}
           {practicedArrangements.map(({ arrangement, progress: slice }) => (
             <span
               key={arrangement}
-              title={`${ARRANGEMENT_META[arrangement].label}: ${formatPlayTime(slice.totalPracticeMs)}`}
+              title={`${t(`arrangements.${arrangement}.label`, ARRANGEMENT_META[arrangement].label)}: ${formatPlayTime(slice.totalPracticeMs)}`}
               className='inline-flex shrink-0 items-center gap-1.5 rounded bg-zinc-800/60 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-zinc-300'>
               <span
                 aria-hidden
                 className={cn("h-1.5 w-1.5 rounded-full", ARRANGEMENT_META[arrangement].dot)}
               />
-              <span className='hidden sm:inline'>{ARRANGEMENT_META[arrangement].label}</span>
+              <span className='hidden sm:inline'>
+                {t(`arrangements.${arrangement}.label`, ARRANGEMENT_META[arrangement].label)}
+              </span>
               <span className='sm:hidden'>{ARRANGEMENT_META[arrangement].short}</span>
               <span className='text-zinc-400'>{formatPlayTime(slice.totalPracticeMs)}</span>
             </span>
@@ -129,7 +138,10 @@ export const SongBoardRow = ({
           <p className='min-w-0 truncate text-xs text-zinc-500 2xl:hidden'>
             {hasPracticed ? (
               <>
-                {sessionCount} session{sessionCount === 1 ? "" : "s"} ·{" "}
+                {sessionCount === 1
+                  ? t("arrangements.session_one")
+                  : t("arrangements.sessions", { count: sessionCount })}{" "}
+                ·{" "}
                 {formatPlayTime(totalPracticeMs)}
                 {lastPracticedAt && <> · {lastPracticeLabel}</>}
                 {bestAccuracy !== null && (
@@ -143,7 +155,7 @@ export const SongBoardRow = ({
                 )}
               </>
             ) : (
-              "Not practiced yet"
+              t("board.not_practiced")
             )}
           </p>
         </div>
@@ -176,17 +188,17 @@ export const SongBoardRow = ({
           carries them, so the title keeps its width at common laptop sizes. */}
       <div className='hidden w-[340px] shrink-0 grid-cols-3 gap-4 2xl:grid'>
         <StatCell
-          label='Sessions'
+          label={t("board.sessions")}
           value={hasPracticed ? String(sessionCount) : "—"}
           muted={!hasPracticed}
         />
         <StatCell
-          label='Play time'
+          label={t("board.play_time")}
           value={hasPracticed ? formatPlayTime(totalPracticeMs) : "—"}
           muted={!hasPracticed}
         />
         <StatCell
-          label='Last practice'
+          label={t("board.last_practice")}
           value={lastPracticeLabel}
           muted={!lastPracticedAt}
         />
@@ -197,7 +209,7 @@ export const SongBoardRow = ({
         {bestAccuracy !== null ? (
           <>
             <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
-              Best
+              {t("board.best")}
             </span>
             <span className='text-xl font-black tabular-nums leading-tight text-amber-400'>
               {Math.round(bestAccuracy)}%
@@ -205,7 +217,7 @@ export const SongBoardRow = ({
           </>
         ) : (
           <span
-            aria-label='No GP accuracy yet'
+            aria-label={t("board.no_accuracy")}
             className='text-sm text-zinc-600'>
             —
           </span>
@@ -217,7 +229,7 @@ export const SongBoardRow = ({
       {onToggleFavorite && (
         <button
           type='button'
-          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          aria-label={isFavorite ? t("board.remove_favorite") : t("board.add_favorite")}
           onClick={(e) => {
             e.stopPropagation();
             onToggleFavorite();
@@ -234,7 +246,7 @@ export const SongBoardRow = ({
 
       <button
         type='button'
-        aria-label={`Practice ${song.title}`}
+        aria-label={t("board.practice_song", { title: song.title })}
         onClick={(e) => {
           e.stopPropagation();
           onPractice();

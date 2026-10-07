@@ -6,12 +6,14 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Lock } from "lucide-react";
 import { GUITAR_TUNINGS } from "utils/audio/tunings";
 
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 
 export const TuningSettingsModal = () => {
+  const { t } = useTranslation("session");
   const { isModalOpen, closeModal, preferredTuning, setTuningId, isLocked, lockReason, tuning } = useGuitarTuningContext();
 
   return (
@@ -22,9 +24,9 @@ export const TuningSettingsModal = () => {
           becomes unresponsive with no visible way to close it. */}
       <DialogContent className="max-w-md z-[99999999]">
         <DialogHeader>
-          <DialogTitle>Guitar tuning</DialogTitle>
+          <DialogTitle>{t("media.guitar_tuning")}</DialogTitle>
           <DialogDescription>
-            Choose how your guitar is tuned — pitch detection and backing audio will be matched to this tuning.
+            {t("tuning_modal.description")}
           </DialogDescription>
         </DialogHeader>
 

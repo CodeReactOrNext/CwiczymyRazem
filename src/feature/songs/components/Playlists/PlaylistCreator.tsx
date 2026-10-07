@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import {
   Dialog,
@@ -49,6 +50,7 @@ export const PlaylistCreator = ({
   onCreated,
   collectionSongs,
 }: PlaylistCreatorProps) => {
+  const { t } = useTranslation("playlists");
   const userAuth = useAppSelector(selectUserAuth);
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
@@ -113,12 +115,12 @@ export const PlaylistCreator = ({
         song_count: entries.length,
         is_public: isPublic,
       });
-      toast.success(`${KIND_META[kind].label} created`);
+      toast.success(t(`created.${kind}`));
       handleClose();
       onCreated(playlistId);
     } catch (error) {
       console.error("Failed to create playlist:", error);
-      toast.error("Couldn't create the playlist. Try again.");
+      toast.error(t("errors.create"));
     } finally {
       setIsSaving(false);
     }
@@ -126,10 +128,10 @@ export const PlaylistCreator = ({
 
   const stepTitle =
     step === "kind"
-      ? "What are you making?"
+      ? t("creator.what_making")
       : step === "details"
-      ? `New ${KIND_META[kind].label.toLowerCase()}`
-      : "Add songs";
+      ? t(`creator.new.${kind}`)
+      : t("add_songs");
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -166,9 +168,9 @@ export const PlaylistCreator = ({
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold text-white">{meta.label}</p>
+                      <p className="font-bold text-white">{t(`kinds.${k}.label`, meta.label)}</p>
                       <p className="mt-0.5 text-xs font-medium leading-snug text-zinc-500">
-                        {meta.hint}
+                        {t(`kinds.${k}.hint`, meta.hint)}
                       </p>
                     </div>
                     <ArrowRight className="h-4 w-4 shrink-0 text-zinc-600 transition-all group-hover:translate-x-0.5 group-hover:text-white" />
@@ -192,7 +194,7 @@ export const PlaylistCreator = ({
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="playlist-name" className="ml-1 font-bold text-zinc-400">
-                    Name
+                    {t("name")}
                   </Label>
                   <Input
                     id="playlist-name"
@@ -201,10 +203,10 @@ export const PlaylistCreator = ({
                     onChange={(e) => setName(e.target.value)}
                     placeholder={
                       kind === "top"
-                        ? "e.g. Top 10 riffs of the 90s"
+                        ? t("creator.placeholder_top")
                         : kind === "path"
-                        ? "e.g. From campfire to Hendrix"
-                        : "e.g. Slow blues evenings"
+                        ? t("creator.placeholder_path")
+                        : t("creator.placeholder_playlist")
                     }
                     maxLength={80}
                     className="h-12 border-white/5 bg-white/5 font-medium transition-all focus:border-cyan-500/50"
@@ -214,13 +216,14 @@ export const PlaylistCreator = ({
 
               <div className="space-y-2">
                 <Label htmlFor="playlist-desc" className="ml-1 font-bold text-zinc-400">
-                  Description <span className="font-medium text-zinc-600">(optional)</span>
+                  {t("description")}{" "}
+<span className="font-medium text-zinc-600">{t("creator.optional")}</span>
                 </Label>
                 <Textarea
                   id="playlist-desc"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="What's this list about?"
+                  placeholder={t("creator.description_placeholder")}
                   maxLength={300}
                   rows={3}
                   className="resize-none border-white/5 bg-white/5 font-medium transition-all focus:border-cyan-500/50"
@@ -228,7 +231,7 @@ export const PlaylistCreator = ({
               </div>
 
               <div className="space-y-2">
-                <Label className="ml-1 font-bold text-zinc-400">Visibility</Label>
+                <Label className="ml-1 font-bold text-zinc-400">{t("creator.visibility")}</Label>
                 <div className="flex gap-2">
                   <button
                     type="button"
@@ -241,9 +244,9 @@ export const PlaylistCreator = ({
                     <Lock className={cn("h-4 w-4 shrink-0", !isPublic ? "text-white" : "text-zinc-500")} />
                     <div>
                       <p className={cn("text-sm font-bold", !isPublic ? "text-white" : "text-zinc-400")}>
-                        Private
+                        {t("private")}
                       </p>
-                      <p className="text-[11px] font-medium text-zinc-500">Only you can see it</p>
+                      <p className="text-[11px] font-medium text-zinc-500">{t("private_hint")}</p>
                     </div>
                   </button>
                   <button
@@ -257,10 +260,10 @@ export const PlaylistCreator = ({
                     <Globe className={cn("h-4 w-4 shrink-0", isPublic ? "text-white" : "text-zinc-500")} />
                     <div>
                       <p className={cn("text-sm font-bold", isPublic ? "text-white" : "text-zinc-400")}>
-                        Public
+                        {t("public")}
                       </p>
                       <p className="text-[11px] font-medium text-zinc-500">
-                        Anyone can find and save it
+                        {t("creator.public_hint")}
                       </p>
                     </div>
                   </button>
@@ -281,7 +284,7 @@ export const PlaylistCreator = ({
                   className="h-11 px-6"
                 >
                   <span className="flex items-center gap-2">
-                    Next
+                    {t("creator.next")}
                     <ArrowRight className="h-4 w-4" />
                   </span>
                 </Button>
@@ -295,8 +298,8 @@ export const PlaylistCreator = ({
                 <div className="space-y-0.5">
                   <p className="px-1 pb-1 text-xs font-bold text-zinc-500">
                     {isTop
-                      ? `Picked ${entries.length}/${TOP_LIST_LIMIT}`
-                      : `${entries.length} added`}
+                      ? t("creator.picked", { count: entries.length, max: TOP_LIST_LIMIT })
+                      : t("creator.added", { count: entries.length })}
                   </p>
                   <div className="max-h-40 space-y-0.5 overflow-y-auto pr-1">
                     {entries.map((entry, index) => (
@@ -343,7 +346,7 @@ export const PlaylistCreator = ({
 
               {atCapacity ? (
                 <p className="rounded-lg bg-amber-400/10 px-3 py-2.5 text-xs font-semibold text-amber-300">
-                  That’s the full top {TOP_LIST_LIMIT} — remove a song to swap one in.
+                  {t("creator.top_full", { count: TOP_LIST_LIMIT })}
                 </p>
               ) : (
                 <SongPickerPanel
@@ -358,7 +361,7 @@ export const PlaylistCreator = ({
 
               <div className="flex items-center justify-between gap-2 pt-1">
                 <p className="text-xs font-medium text-zinc-600">
-                  You can keep adding songs later.
+                  {t("creator.add_later")}
                 </p>
                 <Button
                   onClick={handleCreate}
@@ -368,9 +371,11 @@ export const PlaylistCreator = ({
                   {isSaving ? (
                     <span className="loading loading-spinner loading-sm" />
                   ) : entries.length > 0 ? (
-                    `Create with ${entries.length} ${entries.length === 1 ? "song" : "songs"}`
+                    entries.length === 1
+                      ? t("creator.create_with_one")
+                      : t("creator.create_with", { count: entries.length })
                   ) : (
-                    "Create empty"
+                    t("creator.create_empty")
                   )}
                 </Button>
               </div>

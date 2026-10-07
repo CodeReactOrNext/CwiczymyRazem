@@ -1,0 +1,118 @@
+{
+  "view": {
+    "ballot_eyebrow": "Community-Abstimmung",
+    "monthly": "Monats-Challenge",
+    "vote_title": "Wähle das Board für nächsten Monat",
+    "archive_title": "Challenge-Archiv",
+    "vote_subtitle": "Die Top {{count}} der Abstimmung für {{month}} werden das nächste Board.",
+    "archive_subtitle": "Jedes geschlossene Board — weiter durchsuchbar, weiter spielbar.",
+    "board_subtitle": "Fünf von der Community gewählte Songs pro Monat. Nimm alle auf, um es abzuschließen.",
+    "tabs": {
+      "board": "Dieser Monat",
+      "vote": "Abstimmen",
+      "archive": "Archiv"
+    },
+    "not_up_title": "Das Board für diesen Monat steht noch nicht",
+    "not_up_body": "Es wird aus der Community-Abstimmung gezogen. Geh zu Abstimmen und schlag einen Song vor.",
+    "open_ballot": "Abstimmung öffnen",
+    "back_to_archive": "Zurück zum Archiv"
+  },
+  "hero": {
+    "live_subtitle": "Von der Community gewählt — nimm alle {{count}} auf, um es abzuschließen",
+    "closed_subtitle": "Geschlossen — Aufnahmen landen noch auf dem Board, bringen aber keine Punkte oder Fame",
+    "closes_today": "endet heute",
+    "day_left": "noch {{count}} Tag",
+    "days_left": "noch {{count}} Tage",
+    "closed": "geschlossen",
+    "points_per_run": "Punkte pro Aufnahme",
+    "fame_per_run": "Fame pro Aufnahme",
+    "fame_full_board": "Fame für das ganze Board",
+    "your_runs": "Deine Aufnahmen",
+    "player": "{{count}} Spieler",
+    "players": "{{count}} Spieler",
+    "cleared": "{{count}} abgeschlossen"
+  },
+  "board": {
+    "listen": "{{title}} von {{artist}} anhören",
+    "vote": "{{count}} Stimme",
+    "votes": "{{count}} Stimmen",
+    "done": "Erledigt",
+    "submit": "Einreichen",
+    "cleared": "Board abgeschlossen",
+    "final_stop": "Letzte Station",
+    "bonus_yours": "Jeder Song aufgenommen — der {{bonus}} Fame-Bonus gehört dir.",
+    "clean_sweep": "Jeder Song aufgenommen — ein komplettes Archiv-Board.",
+    "one_more_month": "Noch {{count}} Aufnahme, um den Monat abzuschließen",
+    "more_month": "Noch {{count}} Aufnahmen, um den Monat abzuschließen",
+    "one_more_board": "Noch {{count}} Aufnahme, um dieses Board abzuschließen",
+    "more_board": "Noch {{count}} Aufnahmen, um dieses Board abzuschließen"
+  },
+  "archive": {
+    "empty_title": "Noch kein Archiv",
+    "empty_body": "Sobald dieser Monat endet, landet er hier — mit jeder Aufnahme, die es aufs Board geschafft hat.",
+    "songs_runs": "{{songs}} Songs · {{runs}} Aufnahmen",
+    "cleared_it": "{{count}} haben es abgeschlossen"
+  },
+  "submit": {
+    "title": "Aufnahme einreichen",
+    "youtube_link": "YouTube-Link",
+    "bad_link": "Das sieht nicht nach einem YouTube-Link aus — nutze etwa youtube.com/watch?v=… oder youtu.be/…",
+    "link_hint": "Etwa youtube.com/watch?v=… oder youtu.be/… — nicht gelistete Videos gehen, private werden anderen nicht abgespielt.",
+    "title_label": "Titel",
+    "notes": "Notizen",
+    "optional": "optional",
+    "notes_placeholder": "Equipment, Tempo, womit du gekämpft hast…",
+    "points": "Punkte",
+    "fame": "Fame",
+    "clear_bonus": "Abschlussbonus",
+    "last_song": "Das ist dein letzter Song auf dem Board.",
+    "closed_board": "Dieses Board ist geschlossen, daher bringt die Aufnahme {{none}} — sie nimmt nur ihren Platz im Archiv ein.",
+    "no_rewards": "keine Punkte oder Fame",
+    "visibility": "Alle können sie in den Aufnahmen dieses Songs, im Aktivitäts-Feed und in deinen Aufnahmen sehen. Eine Aufnahme pro Song, also schick die, mit der du zufrieden bist.",
+    "cancel": "Abbrechen",
+    "submit_run": "Aufnahme einreichen"
+  },
+  "runs": {
+    "nobody": "Noch niemand hat sich daran gewagt — sei der Erste.",
+    "count_one": "{{count}} Aufnahme zu {{artist}}",
+    "count": "{{count}} Aufnahmen zu {{artist}}",
+    "you": "du",
+    "tap_hint": "Tippe auf eine Aufnahme, um sie anzusehen, zu kommentieren oder zu liken.",
+    "empty": "Noch keine Aufnahmen. Nimm es auf, poste den Link und hol dir den ersten Platz.",
+    "open_song": "„{{title}}“ im Song-Board öffnen"
+  },
+  "preview": {
+    "no_spotify": "Kein Spotify-Track dafür — such ihn auf YouTube",
+    "backed": "Unterstützt",
+    "back": "Diesen Song unterstützen",
+    "open_board": "Im Song-Board öffnen"
+  },
+  "ballot": {
+    "put_up_by": "vorgeschlagen von {{name}}",
+    "voted_by": "Abgestimmt von:",
+    "out_of_votes": "Du hast diesen Monat alle {{count}} Stimmen verbraucht.",
+    "rules": "Du hast {{votes}} pro Monat. Schlag einen Song vor oder unterstütze einen, der schon zur Wahl steht — ein Vorschlag kostet auch eine Stimme. Zum Monatswechsel werden die Top {{top}} die neue Challenge. Bei Gleichstand gewinnt, wer zuerst vorgeschlagen hat.",
+    "votes_count": "{{count}} Stimmen",
+    "nominate": "Song vorschlagen",
+    "votes_left_of": "{{left}} von {{total}} Stimmen übrig",
+    "sign_in": "Melde dich an, um abzustimmen",
+    "empty_title": "Die Abstimmung ist leer",
+    "empty_body": "Für {{month}} wurde noch nichts vorgeschlagen. Der erste Vorschlag gibt den Ton an.",
+    "below_cut": "unter dem Strich — braucht mehr Stimmen fürs Board",
+    "vote_left": "{{count}} Stimme übrig",
+    "votes_left": "{{count}} Stimmen übrig",
+    "pick_existing": "Wählst du einen Song, der schon zur Wahl steht, kommt einfach deine Stimme dazu."
+  },
+  "toast": {
+    "archive_cleared": "Archiv-Board abgeschlossen! Verspätete Aufnahmen bringen keine Punkte oder Fame.",
+    "archive_added": "Aufnahme ins Archiv gelegt — ein geschlossenes Board bringt keine Punkte oder Fame.",
+    "accepted_fame_only": "Aufnahme angenommen — +{{fame}} Fame. Punkte gibt es nur für {{count}} Songs pro Board.",
+    "board_cleared": "Board abgeschlossen! +{{points}} Punkte und +{{fame}} Fame",
+    "accepted": "Aufnahme angenommen — +{{points}} Punkte, +{{fame}} Fame",
+    "already_submitted": "Du hast für diesen Song schon eine Aufnahme.",
+    "submit_failed": "Deine Aufnahme konnte nicht eingereicht werden. Versuch es nochmal.",
+    "nominated": "Vorgeschlagen — deine Stimme liegt darauf.",
+    "nominate_failed": "Der Vorschlag konnte nicht hinzugefügt werden.",
+    "vote_failed": "Deine Stimme konnte nicht gezählt werden."
+  }
+}

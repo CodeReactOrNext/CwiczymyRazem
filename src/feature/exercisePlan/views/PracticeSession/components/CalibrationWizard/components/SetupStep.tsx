@@ -4,6 +4,7 @@ import { cn } from "assets/lib/utils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
 import { useNativeOutputDevice } from "hooks/useNativeOutputDevice";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronLeft, RefreshCw, Speaker, Wand2 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronRight, FaHeadphones, FaMicrophone, FaPlug, FaTimes, FaVolumeOff } from "react-icons/fa";
@@ -31,6 +32,7 @@ export const SetupStep = React.memo(function SetupStep({
   isListening, isLoading, inputSource, audioRefs, inputGain, onInputGainChange,
   isNative, onSelectDevice, onSelectChannel, onGrant, onNext, onBack, onCancel,
 }: SetupStepProps) {
+  const { t } = useTranslation("calibration");
   const [volume, setVolume] = useState(0);
   const rafRef = useRef(0);
   const { autoState, countdown, startAutoGain } = useAutoGain(audioRefs, inputGain, onInputGainChange);
@@ -69,7 +71,7 @@ export const SetupStep = React.memo(function SetupStep({
             <ChevronLeft size={16} />
           </button>
           <h2 className="text-lg font-bold tracking-tight">
-            {isNative ? "Audio Setup" : inputSource === "interface" ? "Audio Interface Setup" : "Microphone Setup"}
+            {isNative ? t("setup.title_native") : inputSource === "interface" ? t("setup.title_interface") : t("setup.title_mic")}
           </h2>
         </div>
         <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
@@ -104,10 +106,10 @@ export const SetupStep = React.memo(function SetupStep({
               <FaMicrophone className="mr-2 h-4 w-4" />
             )}
             {isLoading
-              ? "Connecting…"
+              ? t("setup.connecting")
               : isNative
-                ? "Start Listening"
-                : "Grant Microphone Access"}
+                ? t("setup.start_listening")
+                : t("setup.grant")}
           </Button>
         )}
 
@@ -120,12 +122,12 @@ export const SetupStep = React.memo(function SetupStep({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <FaMicrophone className={cn("h-3 w-3 transition-colors", signalGood ? "text-emerald-400 animate-pulse" : "text-zinc-500")} />
-                    <span className="text-[10px] font-bold tracking-widest text-zinc-500">Signal Level</span>
+                    <span className="text-[10px] font-bold tracking-widest text-zinc-500">{t("setup.signal_level")}</span>
                   </div>
                   <span className={cn("text-[10px] font-bold transition-colors",
                     tooQuiet ? "text-amber-400" : "text-emerald-400"
                   )}>
-                    {tooQuiet ? "Too quiet — strum a string" : "Good level ✓"}
+                    {tooQuiet ? t("setup.too_quiet") : t("setup.good_level")}
                   </span>
                 </div>
                 <div className="relative h-5 rounded-lg bg-zinc-800 overflow-hidden">
@@ -147,7 +149,7 @@ export const SetupStep = React.memo(function SetupStep({
                   the slider after. */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold tracking-widest text-zinc-500">Input Sensitivity</span>
+                  <span className="text-[10px] font-bold tracking-widest text-zinc-500">{t("setup.input_sensitivity")}</span>
                   <span className="text-xs font-mono text-zinc-400">{inputGain.toFixed(1)}×</span>
                 </div>
                 <Slider
@@ -165,10 +167,10 @@ export const SetupStep = React.memo(function SetupStep({
                 >
                   <Wand2 className="mr-1.5 h-3 w-3" />
                   {autoState === "measuring"
-                    ? `Play a few notes… ${countdown}s`
+                    ? t("setup.play_notes", { seconds: countdown })
                     : autoState === "done"
-                      ? "Calibrated ✓"
-                      : "Auto-Calibrate Gain"}
+                      ? t("setup.calibrated")
+                      : t("setup.auto_gain")}
                 </Button>
               </div>
             </div>
@@ -179,13 +181,13 @@ export const SetupStep = React.memo(function SetupStep({
               onClick={onNext}
               className="w-full h-12 mt-4"
             >
-              Tune Guitar <FaChevronRight className="ml-1.5 h-3 w-3" />
+              {t("setup.tune_guitar")} <FaChevronRight className="ml-1.5 h-3 w-3" />
             </Button>
           </>
         )}
 
         <button onClick={onCancel} className="text-xs text-zinc-700 hover:text-zinc-500 transition-colors text-center py-1">
-          Skip calibration
+          {t("skip_calibration")}
         </button>
       </div>
     </div>
@@ -193,6 +195,7 @@ export const SetupStep = React.memo(function SetupStep({
 });
 
 function MicrophoneTips() {
+  const { t } = useTranslation("calibration");
   return (
     <div className="space-y-3">
       <div className="rounded-lg bg-amber-500/10 p-4 flex items-start gap-4">
@@ -200,9 +203,9 @@ function MicrophoneTips() {
           <FaHeadphones className="text-lg text-amber-400" />
         </div>
         <div>
-          <p className="text-sm font-bold text-amber-300 mb-1">Use wired headphones</p>
+          <p className="text-sm font-bold text-amber-300 mb-1">{t("setup.headphones")}</p>
           <p className="text-xs text-amber-200/60 leading-relaxed">
-            Without headphones the mic picks up the backing track through your speakers and causes false detections.
+            {t("setup.headphones_body")}
           </p>
         </div>
       </div>
@@ -212,9 +215,9 @@ function MicrophoneTips() {
           <FaVolumeOff className="text-lg text-amber-400" />
         </div>
         <div>
-          <p className="text-sm font-bold text-amber-300 mb-1">Find a quiet spot</p>
+          <p className="text-sm font-bold text-amber-300 mb-1">{t("setup.quiet")}</p>
           <p className="text-xs text-amber-200/60 leading-relaxed">
-            Background noise causes false note detections. Close doors and turn off any music.
+            {t("setup.quiet_body")}
           </p>
         </div>
       </div>
@@ -234,6 +237,7 @@ function NativeInterfaceSelector({
   onSelectDevice?: (deviceId: number) => Promise<void>;
   onSelectChannel?: (channel: number) => Promise<void>;
 }) {
+  const { t } = useTranslation("calibration");
   const { devices, api, selectedId, selectedChannel, loading, refresh, select, selectChannel } = useNativeAudioDevices();
   const output = useNativeOutputDevice(devices.find((d) => d.id === selectedId)?.name);
   const [outputExpanded, setOutputExpanded] = useState(false);
@@ -259,13 +263,13 @@ function NativeInterfaceSelector({
         <div className="flex items-center gap-2">
           <FaPlug className="h-3 w-3 text-cyan-400" />
           <span className="text-[10px] font-bold tracking-widest text-zinc-500">
-            Interface{api ? ` · ${api}` : ""}
+            {t("setup.interface")}{api ? ` · ${api}` : ""}
           </span>
         </div>
         <button
           type="button"
           onClick={() => refresh()}
-          title="Refresh device list"
+          title={t("setup.refresh")}
           className="text-zinc-500 hover:text-white transition-colors"
         >
           <RefreshCw className={cn("h-3 w-3", loading && "animate-spin")} />
@@ -277,31 +281,31 @@ function NativeInterfaceSelector({
         onChange={(e) => handleSelect(Number(e.target.value))}
         className="w-full rounded-lg bg-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
       >
-        {devices.length === 0 && <option value="">No input devices found</option>}
+        {devices.length === 0 && <option value="">{t("setup.no_inputs")}</option>}
         {devices.map((d) => (
           <option key={d.id} value={d.id}>
-            {d.name} ({d.inputChannels} in)
+            {d.name} ({t("setup.inputs", { count: d.inputChannels })})
           </option>
         ))}
       </select>
 
       {(selectedDevice?.inputChannels || 0) > 1 && (
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] text-zinc-500">Which jack is your guitar plugged into?</span>
+          <span className="text-[11px] text-zinc-500">{t("setup.which_jack")}</span>
           <select
             value={selectedChannel}
             onChange={(e) => handleSelectChannel(Number(e.target.value))}
             className="w-20 shrink-0 rounded-lg bg-zinc-800 px-2 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
           >
             {Array.from({ length: selectedDevice?.inputChannels || 0 }, (_, i) => (
-              <option key={i} value={i}>Channel {i + 1}</option>
+              <option key={i} value={i}>{t("setup.channel", { n: i + 1 })}</option>
             ))}
           </select>
         </div>
       )}
 
       <p className="text-[11px] text-zinc-500 leading-relaxed">
-        Native low-latency capture — bypasses the browser entirely. Plug your guitar straight into the interface above.
+        {t("setup.native_hint")}
       </p>
 
       {/* ── Output routing — ASIO is exclusive, so app audio (metronome, backing
@@ -311,7 +315,7 @@ function NativeInterfaceSelector({
           <div className="flex items-center gap-2 min-w-0">
             <Speaker className="h-3 w-3 shrink-0 text-zinc-500" />
             <span className="text-[11px] text-zinc-500 truncate">
-              Output: {selectedOutput?.label || "matched"} (auto)
+              {t("setup.output_auto", { label: selectedOutput?.label || t("setup.matched") })}
             </span>
           </div>
           <button
@@ -319,21 +323,21 @@ function NativeInterfaceSelector({
             onClick={() => setOutputExpanded(true)}
             className="shrink-0 text-[11px] text-cyan-400 hover:text-cyan-300 transition-colors"
           >
-            Change
+            {t("setup.change")}
           </button>
         </div>
       ) : (
         <div className="space-y-1.5 pt-1">
           <div className="flex items-center gap-2">
             <Speaker className="h-3 w-3 text-zinc-500" />
-            <span className="text-[10px] font-bold tracking-widest text-zinc-500">Output</span>
+            <span className="text-[10px] font-bold tracking-widest text-zinc-500">{t("setup.output")}</span>
           </div>
           <select
             value={output.selectedId ?? ""}
             onChange={(e) => output.select(e.target.value)}
             className="w-full rounded-lg bg-zinc-800 px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
           >
-            {output.devices.length === 0 && <option value="">No output devices found</option>}
+            {output.devices.length === 0 && <option value="">{t("setup.no_outputs")}</option>}
             {output.devices.map((d) => (
               <option key={d.deviceId} value={d.deviceId}>
                 {d.label || d.deviceId}
@@ -341,7 +345,7 @@ function NativeInterfaceSelector({
             ))}
           </select>
           <p className="text-[11px] text-zinc-500 leading-relaxed">
-            Should match the interface above so audio and capture use the same device.
+            {t("setup.output_hint")}
           </p>
         </div>
       )}
@@ -350,16 +354,16 @@ function NativeInterfaceSelector({
 }
 
 function InterfaceTips() {
+  const { t } = useTranslation("calibration");
   return (
     <div className="rounded-lg bg-zinc-900/70 p-4 flex items-start gap-4">
       <div className="shrink-0 w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
         <FaPlug className="text-lg text-zinc-400" />
       </div>
       <div>
-        <p className="text-sm font-bold text-zinc-200 mb-1">Before you start</p>
+        <p className="text-sm font-bold text-zinc-200 mb-1">{t("setup.before_start")}</p>
         <p className="text-xs text-zinc-400 leading-relaxed">
-          Make sure your interface is selected as the browser's microphone input and your guitar is plugged in.
-          You'll set the gain level on the next screen.
+          {t("setup.before_start_body")}
         </p>
       </div>
     </div>

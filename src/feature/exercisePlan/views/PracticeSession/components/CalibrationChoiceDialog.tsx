@@ -7,6 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { FaGuitar } from "react-icons/fa";
 
 interface CalibrationChoiceDialogProps {
@@ -26,6 +28,7 @@ export const CalibrationChoiceDialog = ({
   onRecalibrate,
   onCancel,
 }: CalibrationChoiceDialogProps) => {
+  const { t } = useTranslation("calibration");
   const formattedDate = calibrationTimestamp
     ? new Date(calibrationTimestamp).toLocaleDateString(undefined, {
         year: "numeric",
@@ -43,25 +46,28 @@ export const CalibrationChoiceDialog = ({
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
             <FaGuitar className="h-6 w-6 text-emerald-400" />
           </div>
-          <DialogTitle className="text-center text-xl">Existing Calibration</DialogTitle>
+          <DialogTitle className="text-center text-xl">{t("choice.title")}</DialogTitle>
           <DialogDescription className="text-center text-zinc-400 leading-relaxed pt-2">
-            You have calibration data from <span className="text-zinc-200 font-medium">{formattedDate}</span>.
+            <Interpolate
+              text={t("choice.body")}
+              values={{ date: <span className="text-zinc-200 font-medium">{formattedDate}</span> }}
+            />
           </DialogDescription>
           {isOld && (
             <p className="text-center text-xs text-amber-400/80 mt-2">
-              This calibration is over 30 days old — consider recalibrating for best accuracy.
+              {t("choice.old")}
             </p>
           )}
         </DialogHeader>
         <DialogFooter className="flex flex-col gap-2 sm:flex-col sm:gap-2 pt-4">
           <Button onClick={onReuse} className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold">
-            Use Existing
+            {t("choice.reuse")}
           </Button>
           <Button variant="secondary" onClick={onRecalibrate} className="w-full">
-            Recalibrate
+            {t("choice.recalibrate")}
           </Button>
           <Button variant="ghost" onClick={onCancel} className="w-full text-zinc-500 hover:text-zinc-300">
-            Cancel
+            {t("error.cancel")}
           </Button>
         </DialogFooter>
       </DialogContent>

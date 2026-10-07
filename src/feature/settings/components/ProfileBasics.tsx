@@ -132,7 +132,7 @@ const ProfileBasics = () => {
       <Card className="h-full">
         <CardHeader>
           <CardTitle>{t("settings:profile_settings")}</CardTitle>
-          <CardDescription>Manage your public profile information</CardDescription>
+          <CardDescription>{t("settings:profile_basics.description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
           <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -148,7 +148,7 @@ const ProfileBasics = () => {
                 <Label
                   htmlFor="avatar-upload"
                   className="cursor-pointer text-sm text-primary hover:underline">
-                  Change Avatar
+                  {t("settings:profile_basics.change_avatar")}
                 </Label>
                 <input
                   id="avatar-upload"
@@ -164,15 +164,15 @@ const ProfileBasics = () => {
 
             <div className="flex-1 space-y-4 w-full">
               <div className="space-y-2">
-                <Label htmlFor="display-name">Display Name</Label>
+                <Label htmlFor="display-name">{t("settings:profile_basics.display_name")}</Label>
                 <Input
                   id="display-name"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Enter your display name"
+                  placeholder={t("settings:profile_basics.display_name_placeholder")}
                 />
                 <p className="text-sm text-muted-foreground">
-                  This name is visible on leaderboards and your public profile.
+                  {t("settings:profile_basics.display_name_hint")}
                 </p>
               </div>
             </div>
@@ -196,7 +196,7 @@ const ProfileBasics = () => {
       <Dialog open={isCropModalOpen} onOpenChange={setIsCropModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Adjust Image</DialogTitle>
+            <DialogTitle>{t("settings:profile_basics.adjust_image")}</DialogTitle>
           </DialogHeader>
           <div className="relative h-64 w-full bg-black/50 overflow-hidden rounded-lg">
             {tempImageSrc && (
@@ -212,7 +212,7 @@ const ProfileBasics = () => {
             )}
           </div>
           <div className="space-y-2 py-2">
-            <Label>Zoom</Label>
+            <Label>{t("settings:profile_basics.zoom")}</Label>
              <Slider 
                 min={1} 
                 max={3} 
@@ -223,9 +223,9 @@ const ProfileBasics = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCropModalOpen(false)}>
-              Cancel
+              {t("settings:profile_basics.cancel")}
             </Button>
-            <Button onClick={handleCropSave}>Set Avatar</Button>
+            <Button onClick={handleCropSave}>{t("settings:profile_basics.set_avatar")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

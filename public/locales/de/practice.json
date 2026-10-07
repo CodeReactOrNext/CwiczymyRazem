@@ -1,0 +1,18 @@
+{
+  "select_practice_mode": "Übungsmodus wählen",
+  "select": "Auswählen",
+  "modes": {
+    "timer": {
+      "title": "Freies Üben",
+      "description": "Übe frei gewählte Fähigkeiten und verfolge deinen Fortschritt"
+    },
+    "plan": {
+      "title": "Übungsplan",
+      "description": "Wähle einen fertigen Übungsplan und folge ihm"
+    },
+    "auto": {
+      "title": "Automatischer Plan",
+      "description": "Lass uns einen Plan erstellen, der zu deiner Zeit passt"
+    }
+  }
+}

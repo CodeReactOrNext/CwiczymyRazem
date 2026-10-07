@@ -4,7 +4,6 @@
   "veryRare": "Very Rare",
   "empty": "Empty",
   "epic": "Epic",
-
   "panel": {
     "earnedHeadline": "{{owned}} of {{total}} achievements earned",
     "globalColumn": "% of all players",
@@ -187,7 +186,6 @@
     "title": "Critical Situation",
     "description": "This player saved their streak"
   },
-
   "wannaLearn1": {
     "title": "Lone Warrior",
     "description": "You want to learn your first song"
@@ -328,9 +326,9 @@
     "title": "Older Than the Amp",
     "description": "Own a guitar built before 1970."
   },
-
   "performance": {
     "title": "Stage Debut",
     "description": "Log a full performance session — practice a song, put in 1h of technique, and hit record."
-  }
+  },
+  "progress": "Progress"
 }

@@ -1,0 +1,243 @@
+{
+  "or": "oder",
+  "favorites": "Favoriten",
+  "start": "Start",
+  "finish": "Beenden",
+  "min": "Min.",
+  "button": {
+    "sign_in": "Anmelden",
+    "sign_up": "Registrieren",
+    "edit": "Bearbeiten",
+    "logout": "Abmelden",
+    "link_copy_profile": "Link zu deinem Profil kopieren",
+    "random": "Zufällig",
+    "remove": "Entfernen"
+  },
+  "google_button": {
+    "sign_in": "Mit Google anmelden",
+    "sign_up": "Mit Google registrieren"
+  },
+  "input": {
+    "login": "Login",
+    "password": "Passwort",
+    "repeat_password": "Passwort wiederholen",
+    "email": "E-Mail"
+  },
+  "loading": {
+    "subtitle": "Wird geladen...",
+    "loading_text": "Wird geladen..."
+  },
+  "nav": {
+    "profile": "Profil",
+    "leadboard": "Rangliste",
+    "discord": "Discord",
+    "faq": "FAQ",
+    "exercise": "Üben",
+    "report": "Eintrag",
+    "songs": "Songs",
+    "challenges": "Challenges"
+  },
+  "day_since": {
+    "no_practice": "Noch nicht geübt",
+    "practice_last_24": "Heute geübt",
+    "practice_yesterday": "Gestern geübt",
+    "practice_day": "Zuletzt geübt: vor {{days}} Tagen",
+    "actual_streak": "Aktuelle Serie:"
+  },
+  "discord_event": {
+    "active": "Aktiv",
+    "deadline": "Deadline:",
+    "join_us": "Tritt unserer Community auf Discord bei und mach beim Event mit",
+    "join_us_offline": "Tritt unserer Community auf Discord bei und schlag das nächste Event vor oder stimm dafür ab",
+    "link": "Link zum Material:",
+    "offline": "Auf Discord läuft gerade kein Event",
+    "data_none": "Keine:",
+    "get": "hat",
+    "points": "Pkt."
+  },
+  "header": {
+    "hey": "Hey",
+    "lvl_short": "Lvl",
+    "earned_points": "Du hast Punkte bekommen",
+    "your_level": "Level",
+    "points": "Punkte",
+    "points_short": "Pkt.",
+    "practice_today": "Übst du heute?",
+    "total_practice_time": "Gesamtzeit"
+  },
+  "logsBox": {
+    "logs": "Protokoll",
+    "events": "Events",
+    "lvl_up": "Level-Up auf",
+    "lvl": "Lvl",
+    "achievement": "Erfolg",
+    "achievements": "Erfolge:",
+    "get": "hat",
+    "points": "Pkt.",
+    "top_players": "Saison-Rangliste",
+    "level": "Level",
+    "days_left": "Tage übrig"
+  },
+  "calendar": {
+    "title": "Aktivitätskalender",
+    "monday": "Mo",
+    "thursday": "Do",
+    "sunday": "So",
+    "points": "Punkte",
+    "technique": "Technik",
+    "theory": "Theorie",
+    "hearing": "Gehör",
+    "creativity": "Kreativität",
+    "backDate": "Nachgetragener Eintrag",
+    "hasTitle": "Eintrag mit Titel"
+  },
+  "sort": {
+    "sort_by": "Sortieren nach:",
+    "points": "Punkte",
+    "time": "Zeit",
+    "session_count": "Anzahl Sessions"
+  },
+  "tooltip": {
+    "totalTime": "Gesamtzeit",
+    "points": "Punkte",
+    "sessions": "Sessions",
+    "habits": "Gewohnheiten",
+    "userNotFound": "Nutzer nicht gefunden",
+    "actual_streak": "Serie",
+    "fame_description": "Fame-Punkte bekommst du für erhaltene Likes und Aktivität in der Community.",
+    "viewProfile": "Profil ansehen"
+  },
+  "song_status": {
+    "move_to": "Verschieben nach",
+    "remove": "Entfernen",
+    "add": "Hinzufügen",
+    "learned": "hat den Song gelernt",
+    "learning": "lernt den Song",
+    "wantToLearn": "hat den Song auf die Liste der zu lernenden Songs gesetzt",
+    "added": "hat den Song zur eigenen Songliste hinzugefügt",
+    "difficulty_rate": "hat die Schwierigkeit des Songs bewertet",
+    "practiced": "hat den Song geübt",
+    "updated": "hat den Fortschritt beim Song aktualisiert"
+  },
+  "chart": {
+    "activity_overview": "Aktivitätsübersicht",
+    "showing_activity": "Aktivitätsdaten für den gewählten Zeitraum",
+    "time_ranges": {
+      "all_time": "Gesamter Zeitraum",
+      "last_3_months": "Letzte 3 Monate",
+      "last_30_days": "Letzte 30 Tage",
+      "last_7_days": "Letzte 7 Tage"
+    },
+    "categories": {
+      "technique": "Technik",
+      "theory": "Theorie",
+      "hearing": "Gehör",
+      "creativity": "Kreativität",
+      "mixed": "Gemischt"
+    }
+  },
+  "skills": {
+    "alternate_picking": "Wechselschlag",
+    "legato": "Legato",
+    "sweep_picking": "Sweep Picking",
+    "chord_theory": "Akkordlehre",
+    "scales": "Tonleitern",
+    "rhythm": "Rhythmus",
+    "ear_training": "Gehörbildung",
+    "sight_reading": "Vom-Blatt-Spiel",
+    "improvisation": "Improvisation",
+    "composition": "Komposition",
+    "harmony": "Harmonielehre",
+    "vibrato": "Vibrato",
+    "music_theory": "Musiktheorie",
+    "slide_guitar": "Slide-Gitarre",
+    "audio_production": "Audioproduktion",
+    "hybrid_picking": "Plektrumkontrolle",
+    "transcription": "Transkription",
+    "picking": "Anschlag",
+    "finger_independence": "Fingerunabhängigkeit",
+    "string_skipping": "String Skipping",
+    "technique": "Technik",
+    "phrasing": "Phrasierung",
+    "articulation": "Artikulation",
+    "chords": "Akkorde",
+    "bending": "Bendings",
+    "tapping": "Tapping",
+    "harmony-ear": "Harmonien nach Gehör"
+  },
+  "back": "Zurück",
+  "next": "Weiter",
+  "search": {
+    "placeholder": "Suchen..."
+  },
+  "filters": {
+    "category": "Kategorie",
+    "all": "Alle",
+    "difficulty": "Schwierigkeit"
+  },
+  "difficulty": {
+    "beginner": "Anfänger",
+    "easy": "Leicht",
+    "medium": "Mittel",
+    "hard": "Schwer"
+  },
+  "categories": {
+    "technique": "Technik",
+    "theory": "Theorie",
+    "creativity": "Kreativität",
+    "hearing": "Gehör",
+    "mixed": "Gemischt"
+  },
+  "minutes": "Minuten",
+  "cancel": "Abbrechen",
+  "select": "Auswählen",
+  "details": "Details",
+  "timer_status": {
+    "active": "Aktiv",
+    "paused": "Pausiert"
+  },
+  "finish_session": "Session beenden",
+  "next_step": "Nächster Schritt",
+  "skip": "Weiter",
+  "practice": {
+    "congratulations": "Glückwunsch!",
+    "completed_session": "Du hast die Trainingssession abgeschlossen:",
+    "practice_again": "Nochmal üben",
+    "finish": "Beenden",
+    "exit": "Verlassen",
+    "finish_plan_early": "Plan vorzeitig beenden",
+    "finish_plan_early_title": "Plan vorzeitig beenden?",
+    "finish_plan_early_description": "Damit endet der Plan jetzt, und die bereits erfasste Zeit wird gespeichert. Die restlichen Übungen dieses Plans übst du dann nicht mehr.",
+    "finish_plan_early_action": "Beenden & Zeit speichern",
+    "finish_plan_early_disabled_skill": "Schließ die ganze Übung ab, bevor du den Plan vorzeitig beendest",
+    "finish_plan_early_disabled_time": "Übe mindestens 20 s, bevor du den Plan vorzeitig beendest",
+    "finish_early": {
+      "action": "Vorzeitig beenden",
+      "title": "Vorzeitig beenden?",
+      "description": "Du musst diese Übung nicht bis zum Ende spielen. Wenn du jetzt aufhörst, bleibt jede geübte Minute erhalten – die Übung zählt nur nicht als abgeschlossen.",
+      "kept_title": "Deine Übungszeit ist gespeichert",
+      "kept_description": "Die Minuten landen trotzdem in deinem Übungsprotokoll und zählen für deine Serie, deine Statistiken und deine Tagesquests.",
+      "lost_title": "Aus diesem Durchgang wird nichts gewertet",
+      "lost_description": "Keine Skillpunkte, kein Highscore, kein Ranglisteneintrag, und die Übung wird nicht als abgeschlossen markiert. Spiel sie bis zum Ende, um all das zu bekommen.",
+      "confirm": "Vorzeitig beenden & Zeit speichern",
+      "blocked": "Übe mindestens 20 Sekunden, bevor die Session gespeichert werden kann.",
+      "hint": "Endet vorzeitig – nur Zeit, keine Wertung"
+    }
+  },
+  "video": "Video",
+  "confirm_delete": "Willst du diesen Plan wirklich löschen?",
+  "create": "Erstellen",
+  "success": "Erfolg",
+  "error": "Fehler",
+  "cookies": {
+    "title": "Cookies",
+    "description": "Wir verwenden Cookies, damit du unsere Website bestmöglich nutzen kannst, und um den Traffic zu analysieren.",
+    "accept": "Akzeptieren"
+  },
+  "pwa": {
+    "install_title": "Riff Quest installieren",
+    "install_description_android": "Füge die App deinem Handy hinzu",
+    "install_description_ios": "Tippe auf Teilen und „Zum Home-Bildschirm“",
+    "install_button": "Herunterladen"
+  }
+}

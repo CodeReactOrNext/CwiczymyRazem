@@ -1,4 +1,6 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { AlertTriangle } from "lucide-react";
 import type { SetStateAction } from "react";
 import { convertMsToHM } from "utils/converter";
@@ -18,6 +20,7 @@ const LongPracticeConfirmPopUp = ({
   onAccept,
   isFetching,
 }: PopUpProps) => {
+  const { t } = useTranslation("report");
   const handleAccept = () => {
     setAcceptLongTime(true);
     onAccept();
@@ -29,25 +32,29 @@ const LongPracticeConfirmPopUp = ({
         <AlertTriangle className='h-6 w-6 text-amber-400' />
       </div>
       <p className='font-sans text-lg font-bold text-zinc-100'>
-        That&apos;s a long session!
+        {t("long_session.title")}
       </p>
       <p className='font-sans text-sm text-zinc-400'>
-        You&apos;re about to report{" "}
-        <span className='font-bold text-amber-400'>
-          {convertMsToHM(totalTime)}
-        </span>{" "}
-        of practice. We know that&apos;s a lot — please double-check it&apos;s not a
-        mistake before submitting.
+        <Interpolate
+          text={t("long_session.body")}
+          values={{
+            time: (
+              <span className='font-bold text-amber-400'>
+                {convertMsToHM(totalTime)}
+              </span>
+            ),
+          }}
+        />
       </p>
       <p className='font-sans text-xs text-zinc-500'>
-        Are you sure you want to report this time?
+        {t("long_session.confirm")}
       </p>
       <div className='flex gap-4'>
         <Button onClick={() => setLongTimePopUpVisible(false)} variant='outline'>
-          Back to edit
+          {t("long_session.back")}
         </Button>
         <Button onClick={handleAccept} disabled={isFetching}>
-          Yes, report it
+          {t("long_session.accept")}
         </Button>
       </div>
     </div>

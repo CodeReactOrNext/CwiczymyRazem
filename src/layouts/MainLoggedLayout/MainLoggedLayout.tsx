@@ -1,6 +1,7 @@
 import { RockSidebar } from "components/RockSidebar";
 import { CommunityDrawer } from "feature/logsBox/components/CommunityDrawer";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
+import { LocalizedRegion } from "lib/i18n/LocalizedRegion";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
 
@@ -30,46 +31,50 @@ const MainLoggedLayout = ({
   const { isElectron } = useElectronWindowControls();
 
   return (
-    <main
-      className={`bg-zinc-950 font-sans overflow-hidden ${
-        isElectron ? "h-[calc(100dvh-2.5rem)]" : "h-[100dvh]"
-      }`}>
-      {/* Subtle background texture */}
-      <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.02)_0%,transparent_80%)] opacity-20'></div>
+    // The language picked in Settings applies to everything inside this shell and
+    // to nothing outside it — the public pages stay English. See LocalizedRegion.
+    <LocalizedRegion>
+      <main
+        className={`bg-zinc-950 font-sans overflow-hidden ${
+          isElectron ? "h-[calc(100dvh-2.5rem)]" : "h-[100dvh]"
+        }`}>
+        {/* Subtle background texture */}
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.02)_0%,transparent_80%)] opacity-20'></div>
 
-      <div className='relative flex h-full w-full'>
-        <RockSidebar  pageId={pageId} />
+        <div className='relative flex h-full w-full'>
+          <RockSidebar  pageId={pageId} />
 
-        <div className='relative flex h-full flex-1 flex-col overflow-hidden'>
-          <MainLoggedWrapper>
-            <DesktopHeaderWrapper>
-              <UserHeader
-                avatar={userAvatar}
-                userStats={userStats}
-                userName={userName}
-              />
-            </DesktopHeaderWrapper>
+          <div className='relative flex h-full flex-1 flex-col overflow-hidden'>
+            <MainLoggedWrapper>
+              <DesktopHeaderWrapper>
+                <UserHeader
+                  avatar={userAvatar}
+                  userStats={userStats}
+                  userName={userName}
+                />
+              </DesktopHeaderWrapper>
 
 
-            {variant === "fullscreen" ? (
-              <div className='z-20 w-full flex-1 h-full'>
-                <div className='relative w-full h-full'>
-                  {children}
-                </div>
-              </div>
-            ) : (
-              <div className={`z-20 mx-auto w-full px-0 pb-24 md:pt-8 md:pb-8 lg:px-8 ${wide ? "max-w-[1800px]" : "max-w-[1490px]"}`}>
-                  <div className='relative'>
+              {variant === "fullscreen" ? (
+                <div className='z-20 w-full flex-1 h-full'>
+                  <div className='relative w-full h-full'>
                     {children}
                   </div>
-              </div>
-            )}
-          </MainLoggedWrapper>
+                </div>
+              ) : (
+                <div className={`z-20 mx-auto w-full px-0 pb-24 md:pt-8 md:pb-8 lg:px-8 ${wide ? "max-w-[1800px]" : "max-w-[1490px]"}`}>
+                    <div className='relative'>
+                      {children}
+                    </div>
+                </div>
+              )}
+            </MainLoggedWrapper>
+          </div>
         </div>
-      </div>
 
-      <CommunityDrawer />
-    </main>
+        <CommunityDrawer />
+      </main>
+    </LocalizedRegion>
   );
 };
 

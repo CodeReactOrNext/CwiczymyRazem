@@ -13,6 +13,7 @@ import {
   TIME_POINTS_VALUE,
   TWO_DAY_MULTIPLER,
 } from "constants/ratingValue";
+import { useTranslation } from "hooks/useTranslation";
 import type { ReactNode } from "react";
 import { FaFire } from "react-icons/fa";
 import { getDailyStreakMultiplier } from "utils/gameLogic";
@@ -41,6 +42,7 @@ export const ScoreBreakdownTooltip = ({
   streak,
   children,
 }: ScoreBreakdownTooltipProps) => {
+  const { t } = useTranslation("profile");
   const multiplier = getDailyStreakMultiplier(streak); // 0 / .2 / .3 / .4 / .5
   const totalMultiplier = 1 + multiplier;
 
@@ -69,7 +71,7 @@ export const ScoreBreakdownTooltip = ({
                   )}
                 />
                 <span className='text-sm font-bold text-white'>
-                  {streak > 0 ? `${streak}-day streak` : "No streak yet"}
+                  {streak > 0 ? t("score_tooltip.streak", { count: streak }) : t("score_tooltip.no_streak")}
                 </span>
               </div>
               <span className='rounded-md bg-orange-500/20 px-2 py-0.5 text-sm font-black tabular-nums text-orange-300'>
@@ -80,10 +82,10 @@ export const ScoreBreakdownTooltip = ({
             {/* What you earn right now */}
             <div className='space-y-2.5 rounded-lg bg-white/5 p-3'>
               <p className='text-[10px] font-semibold tracking-wider text-zinc-400'>
-                You earn right now
+                {t("score_tooltip.earn_now")}
               </p>
               <div className='flex items-center justify-between text-xs'>
-                <span className='text-zinc-300'>Per hour of practice</span>
+                <span className='text-zinc-300'>{t("score_tooltip.per_hour")}</span>
                 <span className='flex items-center gap-1 font-bold tabular-nums text-white'>
                   {pointsPerHour}
                   <img
@@ -94,7 +96,7 @@ export const ScoreBreakdownTooltip = ({
                 </span>
               </div>
               <div className='flex items-center justify-between text-xs'>
-                <span className='text-zinc-300'>Per habit ticked</span>
+                <span className='text-zinc-300'>{t("score_tooltip.per_habit")}</span>
                 <span className='flex items-center gap-1 font-bold tabular-nums text-white'>
                   {fmtPts(pointsPerHabit)}
                   <img
@@ -121,7 +123,7 @@ export const ScoreBreakdownTooltip = ({
                     )}
                   >
                     <div className='text-[8px] tracking-wide text-zinc-400'>
-                      {tier.label}
+                      {t(`score_tooltip.ladder.${index}`, tier.label)}
                     </div>
                     <div
                       className={cn(

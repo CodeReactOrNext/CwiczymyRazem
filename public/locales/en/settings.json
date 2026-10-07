@@ -35,5 +35,58 @@
   "customize_your_experience": "Customize your experience",
   "danger_zone": "Danger Zone",
   "irreversible_actions": "Irreversible actions - proceed with caution",
-  "danger_zone_warning": "The following actions are irreversible. Make sure you understand the consequences."
+  "danger_zone_warning": "The following actions are irreversible. Make sure you understand the consequences.",
+  "language": {
+    "title": "Language",
+    "subtitle": "Applies to the app on this device.",
+    "work_in_progress": "Translations are still being written — anything not translated yet stays in English."
+  },
+  "bands_placeholder": "Your bands...",
+  "email_label": "Email",
+  "email_notifications": {
+    "title": "Email notifications",
+    "description": "Choose which emails you want to receive from Riff Quest.",
+    "options": {
+      "streakReminders": {
+        "title": "Streak reminders",
+        "description": "Get a nudge when you haven't practiced for a day or two, so you don't break your streak."
+      },
+      "seasonUpdates": {
+        "title": "Season updates",
+        "description": "Emails about new seasons starting, seasons ending soon and your final results."
+      }
+    },
+    "always_sent": "Account and security emails (like email changes) are always sent and can't be turned off.",
+    "saving": "Saving...",
+    "save": "Save changes"
+  },
+  "tablature": {
+    "title": "Tablature",
+    "description": "Change how exercises are drawn. Everything is saved on this device and applies to your next practice session.",
+    "live_preview": "Live preview",
+    "mode_tab": "Tablature",
+    "mode_notation": "Notation",
+    "hint_tab": "Hit colour and hit animations only show while you are actually playing.",
+    "hint_notation": "The same viewer used mid-session — toggle the board below to see it on paper or on black."
+  },
+  "profile_basics": {
+    "description": "Manage your public profile information",
+    "change_avatar": "Change Avatar",
+    "display_name": "Display Name",
+    "display_name_placeholder": "Enter your display name",
+    "display_name_hint": "This name is visible on leaderboards and your public profile.",
+    "adjust_image": "Adjust Image",
+    "zoom": "Zoom",
+    "cancel": "Cancel",
+    "set_avatar": "Set Avatar"
+  },
+  "tabs": {
+    "title": "Settings",
+    "profile": "Profile",
+    "socials": "Social Media",
+    "tablature": "Tablature",
+    "notifications": "Notifications",
+    "security": "Security",
+    "google_auth": "Google OAuth Authentication"
+  }
 }

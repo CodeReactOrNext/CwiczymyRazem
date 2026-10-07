@@ -5,6 +5,8 @@ import {
   AccordionTrigger,
 } from "assets/components/ui/accordion";
 import { DISCORD_INVITE_URL } from "constants/community";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -53,18 +55,41 @@ const FAQ: { q: string; a: ReactNode }[] = [
  * add a screen of text for everyone.
  */
 export const RoadmapFaq = () => {
+  const { t } = useTranslation("supporter");
   return (
     <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-7'>
-      <h2 className='text-base font-semibold text-zinc-100'>Questions</h2>
+      <h2 className='text-base font-semibold text-zinc-100'>{t("faq.title")}</h2>
 
       <Accordion type='single' collapsible className='mt-2 w-full'>
         {FAQ.map(({ q, a }, i) => (
           <AccordionItem key={q} value={`faq-${i}`} className='border-b-0'>
             <AccordionTrigger className='py-4 text-left text-sm font-semibold text-zinc-200 hover:text-white hover:no-underline'>
-              {q}
+              {t(`faq.items.${i}.q`, q)}
             </AccordionTrigger>
             <AccordionContent className='max-w-3xl pb-5 text-sm leading-relaxed text-zinc-400'>
-              {a}
+              {typeof a === "string" ? (
+                t(`faq.items.${i}.a`, a)
+              ) : (
+                <Interpolate
+                  text={t("faq.badge_answer")}
+                  values={{
+                    discord: (
+                      <a
+                        href={DISCORD_INVITE_URL}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className={LINK_CLASS}>
+                        {t("faq.discord_link")}
+                      </a>
+                    ),
+                    panel: (
+                      <Link href='/supporter' className={LINK_CLASS}>
+                        {t("faq.panel_link")}
+                      </Link>
+                    ),
+                  }}
+                />
+              )}
             </AccordionContent>
           </AccordionItem>
         ))}

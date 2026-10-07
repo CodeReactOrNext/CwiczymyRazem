@@ -21,6 +21,8 @@ import {
   votingChallengeId,
 } from "feature/challenges/utils/challengeMonth";
 import { selectUserAuth, selectUserName } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import { ArrowLeft, History, Swords, Vote } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -46,6 +48,8 @@ const BoardSkeleton = () => (
  * decides next month's, and everything already closed.
  */
 export const ChallengesView = () => {
+  const { t } = useTranslation("challenges");
+  const intlLocale = useIntlLocale();
   const [tab, setTab] = useState<ChallengeTab>("board");
   const [archivedChallenge, setArchivedChallenge] = useState<Challenge | null>(
     null,
@@ -82,22 +86,23 @@ export const ChallengesView = () => {
         />
       ) : (
         <HeroBanner
-          eyebrow={tab === "vote" ? "Community ballot" : "Monthly challenge"}
+          eyebrow={tab === "vote" ? t("view.ballot_eyebrow") : t("view.monthly")}
           title={
             tab === "vote"
-              ? "Pick next month’s board"
+              ? t("view.vote_title")
               : tab === "archive"
-                ? "Challenge archive"
-                : "Monthly challenge"
+                ? t("view.archive_title")
+                : t("view.monthly")
           }
           subtitle={
             tab === "vote"
-              ? `The top ${CHALLENGE_SONG_COUNT} of the ${challengeMonthLabel(
-                  votingChallengeId(),
-                )} ballot become the next board.`
+              ? t("view.vote_subtitle", {
+                  count: CHALLENGE_SONG_COUNT,
+                  month: challengeMonthLabel(votingChallengeId(), intlLocale),
+                })
               : tab === "archive"
-                ? "Every board that has closed — still browsable, still playable."
-                : "Five community-voted songs every month. Record them all to clear it."
+                ? t("view.archive_subtitle")
+                : t("view.board_subtitle")
           }
           backgroundContent={<HeroPattern />}
           className={CHALLENGE_HERO_CLASS}
@@ -119,7 +124,7 @@ export const ChallengesView = () => {
               }}
               className={tabNavItemClass(tab === id)}>
               <Icon size={16} className='shrink-0' />
-              {label}
+              {t(`view.tabs.${id}`, label)}
             </button>
           ))}
         </div>
@@ -141,11 +146,10 @@ export const ChallengesView = () => {
                   <Swords size={26} />
                 </div>
                 <h3 className='mb-1 text-lg font-bold text-white'>
-                  This month’s board isn’t up yet
+                  {t("view.not_up_title")}
                 </h3>
                 <p className='max-w-sm text-sm text-zinc-500'>
-                  It gets drawn from the community ballot. Head to Vote and put
-                  a song forward.
+                  {t("view.not_up_body")}
                 </p>
                 <Button
                   onClick={() => setTab("vote")}
@@ -153,7 +157,7 @@ export const ChallengesView = () => {
                   className='mt-6 h-10 bg-white/5 px-5 font-bold text-zinc-300 hover:bg-white/10 hover:text-white'>
                   <span className='flex items-center gap-2'>
                     <Vote className='h-4 w-4' />
-                    Open the ballot
+                    {t("view.open_ballot")}
                   </span>
                 </Button>
               </div>
@@ -177,7 +181,7 @@ export const ChallengesView = () => {
                   className='bg-white/5 px-4 text-zinc-400 backdrop-blur-md hover:text-white'>
                   <span className='flex items-center gap-2'>
                     <ArrowLeft size={16} />
-                    <span className='text-xs font-bold'>Back to archive</span>
+                    <span className='text-xs font-bold'>{t("view.back_to_archive")}</span>
                   </span>
                 </Button>
                 <ChallengeBoard

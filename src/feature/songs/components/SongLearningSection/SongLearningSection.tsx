@@ -65,7 +65,7 @@ const FilterBar = ({
           <Search className="h-3.5 w-3.5 text-zinc-600 group-focus-within/search:text-cyan-500 transition-colors" />
         </div>
         <Input 
-          placeholder="Search songs..."
+          placeholder={t("search_songs")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="h-9 w-full border-none bg-zinc-950/40 pl-9 text-[12px] text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-950/60 focus:ring-4 focus:ring-cyan-500/5 rounded-lg"
@@ -75,27 +75,30 @@ const FilterBar = ({
   );
 };
 
-const EmptyState = () => (
+const EmptyState = () => {
+  const { t } = useTranslation("songs");
+  return (
   <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-white/5 bg-zinc-900/10 p-12 text-center backdrop-blur-sm animate-in fade-in zoom-in duration-500">
      <div className="relative mb-6">
         <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-800/50 text-zinc-500">
           <Music size={40} />
         </div>
      </div>
-     <h3 className="text-xl font-bold text-white mb-2">Build your practice list</h3>
+     <h3 className="text-xl font-bold text-white mb-2">{t("learning_section.empty_title")}</h3>
      <p className="max-w-md text-sm text-zinc-400 mb-8">
-       Your song board is empty. Add songs from the library to track your progress and manage your learning journey.
+       {t("learning_section.empty_body")}
      </p>
       <Link href="/songs?view=library">
         <button 
           onClick={() => posthog.capture("song_management_action", { action: "browse_library_empty" })}
           className="h-12 rounded-xl bg-cyan-500 hover:bg-cyan-600 px-8 text-black font-bold transition-all active:scale-95 shadow-lg shadow-cyan-500/10"
         >
-          Browse Library
+          {t("learning_section.browse_library")}
         </button>
       </Link>
   </div>
-);
+  );
+};
 
 export const SongLearningSection = ({
   userSongs,
@@ -193,7 +196,7 @@ export const SongLearningSection = ({
           >
             <Ripple />
             <Music size={14} className={!isLibraryActive && !isPlaylistsActive ? "text-white" : ""} />
-            Board
+            {t("learning_section.board")}
           </button>
           <button
             onClick={() => onExploreLibrary?.('explore')}
@@ -206,7 +209,7 @@ export const SongLearningSection = ({
           >
             <Ripple />
             <Search size={14} className={isLibraryActive ? "text-white" : ""} />
-            Explore
+            {t("learning_section.explore")}
           </button>
           <button
             onClick={() => onExploreLibrary?.('playlists')}
@@ -219,13 +222,13 @@ export const SongLearningSection = ({
           >
             <Ripple />
             <ListMusic size={14} className={isPlaylistsActive ? "text-white" : ""} />
-            Playlists
+            {t("learning_section.playlists")}
           </button>
         </div>
       </div>
 
       <div className="px-3 pt-2 pb-3">
-         <h2 className="text-xs font-bold text-zinc-400">Your collection</h2>
+         <h2 className="text-xs font-bold text-zinc-400">{t("learning_section.collection")}</h2>
       </div>
       <FilterBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} t={t} />
 

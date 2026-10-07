@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
+import { useTranslation } from "hooks/useTranslation";
 import { SkipBack } from "lucide-react";
 import React, { memo, useEffect, useRef, useState } from "react";
 
@@ -118,6 +119,7 @@ const TablatureViewerInner = ({
   palette,
   isLightBoard = false,
 }: TablatureViewerProps) => {
+  const { t } = useTranslation("session");
   const canvasRef      = useRef<HTMLCanvasElement>(null);
   const containerRef   = useRef<HTMLDivElement>(null);
   const ambientGlowRef = useRef<HTMLDivElement>(null);
@@ -225,7 +227,7 @@ const TablatureViewerInner = ({
             isLightBoard ? "bg-black/5 text-zinc-600" : "bg-white/8 text-white/50",
           )}>
             <span className="leading-none">𝄽</span>
-            <span className="tracking-wider">pauza</span>
+            <span className="tracking-wider">{t("tab.rest")}</span>
           </div>
         </div>
       )}
@@ -236,7 +238,7 @@ const TablatureViewerInner = ({
           className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 rounded-lg bg-zinc-900/85 px-3 py-1.5 text-[10px] font-semibold text-zinc-400 backdrop-blur-sm hover:bg-zinc-800 hover:text-white transition-colors border border-white/10"
         >
           <SkipBack className="h-3 w-3" />
-          From the start
+          {t("tab.from_start")}
         </button>
       )}
     </div>

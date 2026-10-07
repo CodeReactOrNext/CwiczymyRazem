@@ -7,6 +7,7 @@ import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserAuth,selectUserInfo} from "feature/user/store/userSlice";
 import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
+import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -100,6 +101,7 @@ export const PracticeSession = ({
   forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount,
   examMode, examBpm, onExamComplete, skipExitDialog = false,
 }: PracticeSessionProps) => {
+  const { t } = useTranslation("session");
   const router = useRouter();
 
   const {
@@ -139,18 +141,18 @@ export const PracticeSession = ({
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
         <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500 space-y-6 text-center">
-          <h1 className="text-xl font-semibold text-zinc-100">Update ready</h1>
+          <h1 className="text-xl font-semibold text-zinc-100">{t("update.title")}</h1>
           <p className="text-sm text-zinc-400">
-            A new version of riff.quest has been ready to install for a while. Restart the app to keep practicing.
+            {t("update.body")}
           </p>
           <div className="flex flex-col items-center gap-3">
             <button
               onClick={() => window.electronApp?.installUpdate()}
               className="rounded-lg bg-cyan-500 px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-cyan-400">
-              Restart now
+              {t("update.restart")}
             </button>
             <button onClick={onClose} className="mt-2 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold capitalize tracking-widest text-[10px]">
-              ← Return
+              ← {t("update.return")}
             </button>
           </div>
         </div>
@@ -164,7 +166,7 @@ export const PracticeSession = ({
         <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500">
           <PremiumGate feature="gp-practice" children={<div />} />
           <button onClick={() => router.back()} className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold capitalize tracking-widest text-[10px]">
-            ← Return
+            ← {t("update.return")}
           </button>
         </div>
       </div>

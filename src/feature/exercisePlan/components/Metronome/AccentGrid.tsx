@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 
 interface AccentGridProps {
   /** One entry per click-grid step: 2 accent, 1 plain click, 0 silent. */
@@ -20,12 +21,8 @@ interface AccentGridProps {
 /** Widest row the grid may use. Eight keeps a 12-entry bar inside a 16rem popover. */
 const MAX_COLUMNS = 8;
 
-const levelTitle = (level: number) =>
-  level === 2
-    ? "Accent — click to mute"
-    : level === 1
-      ? "Click — click to accent"
-      : "Muted — click to reset";
+const levelTitleKey = (level: number) =>
+  level === 2 ? "accent.accent" : level === 1 ? "accent.click" : "accent.muted";
 
 export const AccentGrid = ({
   pattern,
@@ -35,6 +32,7 @@ export const AccentGrid = ({
   locked = false,
   onCycle,
 }: AccentGridProps) => {
+  const { t } = useTranslation("metronome");
   const bars = barLengths?.length ? barLengths : [pattern.length];
   const columns = Math.min(MAX_COLUMNS, Math.max(1, ...bars));
 
@@ -58,7 +56,7 @@ export const AccentGrid = ({
           type='button'
           onClick={() => onCycle?.(index)}
           disabled={locked}
-          title={locked ? "This exercise sets its own accents" : levelTitle(level)}
+          title={locked ? t("accent.locked") : t(levelTitleKey(level))}
           className={cn(
             "flex h-8 select-none items-center justify-center rounded-full text-[11px] font-bold tabular-nums transition-colors",
             level === 2 && "bg-cyan-500/20 text-cyan-300",

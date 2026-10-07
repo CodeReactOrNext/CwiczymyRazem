@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Settings2, ZoomIn, ZoomOut } from "lucide-react";
 import React, { memo, useCallback, useMemo, useState } from "react";
 
@@ -62,6 +63,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   isListening,
   resetKey,
 }: MobileTablaturePanelProps) {
+  const { t } = useTranslation("session");
   const { hitNotes, missedNotes, noteTimings } = useNoteMatchingContext();
   const { tuning } = useGuitarTuningContext();
   const {
@@ -138,10 +140,10 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
         <button
           type='button'
           onClick={() => setIsSettingsOpen(true)}
-          aria-label='Tablature settings'
+          aria-label={t("tab.settings")}
           className='flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-zinc-300 transition-colors active:bg-white/10'>
           <Settings2 className='h-4 w-4 shrink-0' />
-          <span className='text-xs font-semibold'>Look</span>
+          <span className='text-xs font-semibold'>{t("tab.look")}</span>
         </button>
 
         <div className='flex items-center gap-0.5'>
@@ -149,14 +151,14 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             type='button'
             onClick={() => handleZoomChange(zoom - ZOOM_STEP)}
             disabled={atMin}
-            aria-label='Zoom out'
+            aria-label={t("tab.zoom_out")}
             className={zoomBtn}>
             <ZoomOut className='h-4 w-4' />
           </button>
           <button
             type='button'
             onClick={() => handleZoomChange(1)}
-            aria-label='Reset zoom'
+            aria-label={t("tab.reset_zoom")}
             className='font-mono min-w-[3.25rem] rounded-lg px-1.5 py-2 text-center text-xs font-semibold tabular-nums text-zinc-300 transition-colors active:bg-white/10'>
             {Math.round(zoom * 100)}%
           </button>
@@ -164,7 +166,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             type='button'
             onClick={() => handleZoomChange(zoom + ZOOM_STEP)}
             disabled={atMax}
-            aria-label='Zoom in'
+            aria-label={t("tab.zoom_in")}
             className={zoomBtn}>
             <ZoomIn className='h-4 w-4' />
           </button>

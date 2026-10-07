@@ -13,6 +13,13 @@ const GREETING_WORDS = new Set([
   "czesc",
   "siema",
   "elo",
+  "willkommen",
+  "hallo",
+  "servus",
+  "bienvenido",
+  "bienvenida",
+  "hola",
+  "buenas",
 ]);
 
 /** A row others greet: a new player's welcome card or a guild's new member. */

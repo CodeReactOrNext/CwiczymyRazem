@@ -1,0 +1,17 @@
+{
+  "subtitlebar_text": "Üben, eintragen, Punkte sammeln!",
+  "back_to_login": "Zurück zur Anmeldung",
+  "title": "Mach mit",
+  "subtitle": "Erstelle ein Konto und starte deine Reise",
+  "value_prop": "Für immer kostenlos, ohne Paywalls. Verfolge echte Übungszeit, Songs und Fortschritt.",
+  "username_label": "Benutzername",
+  "username_placeholder": "Dein Nickname",
+  "email_label": "E-Mail",
+  "email_placeholder": "name@beispiel.de",
+  "email_option": "oder mit E-Mail registrieren",
+  "password_label": "Passwort",
+  "submit_button": "Konto erstellen",
+  "google_button": "Weiter mit Google",
+  "already_have_account": "Du hast schon ein Konto?",
+  "login_link": "Anmelden"
+}

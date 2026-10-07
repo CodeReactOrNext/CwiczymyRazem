@@ -42,7 +42,7 @@ export function ExercisePreviewDialog({
   onStart,
   hidePlanActions = false,
 }: ExercisePreviewDialogProps) {
-  const { t } = useTranslation(["common", "exercises"]);
+  const { t } = useTranslation(["common", "exercises", "plans"]);
   // The player's own look (palette, pills, board) plus the string names, so the
   // preview reads exactly like the tab they get in the session.
   const { settings, palette, isLightBoard, style } = useTablatureStyle();
@@ -116,7 +116,7 @@ export function ExercisePreviewDialog({
           <div className='space-y-10 p-6 pt-2'>
             {exercise.tablature && exercise.tablature.length > 0 && (
               <div className='space-y-3'>
-                <h4 className='text-sm font-medium text-zinc-400'>Tablature</h4>
+                <h4 className='text-sm font-medium text-zinc-400'>{t("plans:tablature")}</h4>
                 <div className='overflow-hidden rounded-lg'>
                   <TablatureViewer
                     measures={exercise.tablature}
@@ -138,7 +138,7 @@ export function ExercisePreviewDialog({
             {exercise.instructions && exercise.instructions.length > 0 && (
               <div className='space-y-3'>
                 <h4 className='text-sm font-medium text-zinc-400'>
-                  Instructions
+                  {t("plans:instructions")}
                 </h4>
                 <ul className='space-y-2.5'>
                   {exercise.instructions.map((inst, i) => (
@@ -157,7 +157,7 @@ export function ExercisePreviewDialog({
 
             {exercise.tips && exercise.tips.length > 0 && (
               <div className='space-y-3 rounded-lg bg-zinc-900/40 p-5'>
-                <h4 className='text-sm font-medium text-zinc-400'>Pro tips</h4>
+                <h4 className='text-sm font-medium text-zinc-400'>{t("plans:pro_tips")}</h4>
                 <ul className='space-y-2'>
                   {exercise.tips.map((tip, i) => (
                     <li
@@ -174,11 +174,11 @@ export function ExercisePreviewDialog({
             {exercise.metronomeSpeed && (
               <div className='space-y-3'>
                 <h4 className='text-sm font-medium text-zinc-400'>
-                  Metronome speeds
+                  {t("plans:metronome_speeds")}
                 </h4>
                 <div className='flex gap-4'>
                   <div className='flex-1 rounded-lg bg-zinc-900/40 p-4 text-center'>
-                    <div className='text-xs text-zinc-500'>Minimum</div>
+                    <div className='text-xs text-zinc-500'>{t("plans:minimum")}</div>
                     <div className='mt-1 text-lg font-semibold text-zinc-200'>
                       {exercise.metronomeSpeed.min}{" "}
                       <span className='text-xs font-normal text-zinc-500'>
@@ -187,7 +187,7 @@ export function ExercisePreviewDialog({
                     </div>
                   </div>
                   <div className='flex-1 rounded-lg bg-cyan-500/10 p-4 text-center'>
-                    <div className='text-xs text-cyan-400/80'>Recommended</div>
+                    <div className='text-xs text-cyan-400/80'>{t("plans:recommended")}</div>
                     <div className='mt-1 text-lg font-semibold text-cyan-400'>
                       {exercise.metronomeSpeed.recommended}{" "}
                       <span className='text-xs font-normal text-cyan-400/60'>
@@ -196,7 +196,7 @@ export function ExercisePreviewDialog({
                     </div>
                   </div>
                   <div className='flex-1 rounded-lg bg-zinc-900/40 p-4 text-center'>
-                    <div className='text-xs text-zinc-500'>Maximum</div>
+                    <div className='text-xs text-zinc-500'>{t("plans:maximum")}</div>
                     <div className='mt-1 text-lg font-semibold text-zinc-200'>
                       {exercise.metronomeSpeed.max}{" "}
                       <span className='text-xs font-normal text-zinc-500'>
@@ -217,14 +217,14 @@ export function ExercisePreviewDialog({
             variant='ghost'
             onClick={onClose}
             className='text-zinc-400 hover:bg-white/5 hover:text-zinc-100'>
-            Close
+            {t("plans:close")}
           </Button>
           {onStart && (
             <Button
               onClick={onStart}
               className='gap-1.5 bg-zinc-100 text-zinc-950 hover:bg-white'>
               <Play className='h-3.5 w-3.5 fill-current' />
-              Start
+              {t("plans:start")}
             </Button>
           )}
         </div>

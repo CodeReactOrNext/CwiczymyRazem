@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { FaArrowRight } from "react-icons/fa";
 import { NOTES } from "utils/audio/noteUtils";
 
@@ -21,6 +22,7 @@ interface ChordHuntPanelProps {
  * but the unit of progress is a chord tone (see useChordHunt).
  */
 export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEnabled, isListening }: ChordHuntPanelProps) {
+  const { t } = useTranslation("session");
   const { chordHunt, noteHuntSecondsLeft, huntTarget, volumeRef, advanceHunt, markChordTone } = useNoteMatchingContext();
 
   // Read the live chord from context (not the prop) so it updates through the
@@ -78,11 +80,10 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
       {/* Detection status */}
       {!isMicEnabled ? (
         <p className="text-center text-xs text-zinc-400">
-          Enable the <span className="font-bold text-emerald-300">mic</span> in the controls below to light up tones, or tap a{" "}
-          <span className="font-bold text-zinc-200">?</span> to reveal it.
+          {t("chord_hunt.enable_mic")}
         </p>
       ) : !isListening ? (
-        <p className="text-sm font-semibold text-zinc-200">Starting microphone…</p>
+        <p className="text-sm font-semibold text-zinc-200">{t("note_hunt.starting_mic")}</p>
       ) : (
         <DetectionWave volumeRef={volumeRef} active={isListening} isMatch={isMatch} />
       )}
@@ -92,7 +93,7 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
       {tones.length > 0 && (
         <div className="flex flex-col items-center gap-1.5">
           {!isMicEnabled && (
-            <span className="text-xs font-semibold tracking-wide text-zinc-400">Tap a tone to reveal it</span>
+            <span className="text-xs font-semibold tracking-wide text-zinc-400">{t("chord_hunt.tap_tone")}</span>
           )}
           <div className="flex flex-wrap items-center justify-center gap-2">
             {tones.map((pc, i) => {

@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { useTranslation } from "hooks/useTranslation";
 import React from "react";
 import { FaMicrophone } from "react-icons/fa";
 
@@ -10,6 +11,7 @@ interface MicErrorScreenProps {
 }
 
 export function MicErrorScreen({ onRetry, onCancel }: MicErrorScreenProps) {
+  const { t } = useTranslation("calibration");
   return (
     <ModalWrapper zIndex="z-[99999999]">
       <div className="flex h-full items-center justify-center px-6 text-white">
@@ -18,14 +20,14 @@ export function MicErrorScreen({ onRetry, onCancel }: MicErrorScreenProps) {
             <FaMicrophone className="h-7 w-7 text-red-400" />
           </div>
           <div className="space-y-1.5">
-            <p className="font-bold">Microphone blocked</p>
+            <p className="font-bold">{t("error.title")}</p>
             <p className="text-sm text-zinc-400">
-              Please allow microphone access in your browser settings, then try again.
+              {t("error.body")}
             </p>
           </div>
           <div className="flex gap-3 justify-center">
-            <Button onClick={onRetry}>Try Again</Button>
-            <Button variant="ghost" onClick={onCancel} className="text-zinc-500 hover:text-zinc-300">Cancel</Button>
+            <Button onClick={onRetry}>{t("error.retry")}</Button>
+            <Button variant="ghost" onClick={onCancel} className="text-zinc-500 hover:text-zinc-300">{t("error.cancel")}</Button>
           </div>
         </div>
       </div>

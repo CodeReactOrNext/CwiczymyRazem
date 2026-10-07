@@ -39,7 +39,7 @@ export const PlanSetup = ({
   setFilter,
   onGenerate,
 }: PlanSetupProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common", "practice_hub"]);
 
   const counts = useMemo(() => countExercises(exercisesAgregat), []);
   const matchingCount = useMemo(
@@ -102,8 +102,7 @@ export const PlanSetup = ({
                   {t("exercises:auto_plan.focus")}
                 </h2>
                 <p className='text-sm text-zinc-400'>
-                  Pick difficulties per category, or leave it empty to draw from
-                  the whole library.
+                  {t("practice_hub:auto.pick_hint")}
                 </p>
               </div>
 
@@ -114,7 +113,7 @@ export const PlanSetup = ({
                   className='text-zinc-400'
                   disabled={everythingSelected}
                   onClick={() => setFilter(selectAllAvailable(counts))}>
-                  Select all
+                  {t("practice_hub:auto.select_all")}
                 </Button>
                 <Button
                   variant='ghost'
@@ -122,7 +121,7 @@ export const PlanSetup = ({
                   className='text-zinc-400'
                   disabled={isFilterEmpty(filter)}
                   onClick={() => setFilter({})}>
-                  Clear all
+                  {t("practice_hub:auto.clear_all")}
                 </Button>
               </div>
             </div>
@@ -140,9 +139,9 @@ export const PlanSetup = ({
                     onClick={() =>
                       setFilter(toggleDifficultyEverywhere(filter, difficulty))
                     }
-                    title={`Toggle ${t(
-                      `exercises:difficulty.${difficulty}`,
-                    )} in every category`}
+                    title={t("practice_hub:auto.toggle_difficulty", {
+                      difficulty: t(`exercises:difficulty.${difficulty}`),
+                    })}
                     className='rounded px-1 py-2 text-center text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800/50 hover:text-zinc-200'>
                     {t(`exercises:difficulty.${difficulty}`)}
                   </button>
@@ -155,9 +154,9 @@ export const PlanSetup = ({
                       onClick={() =>
                         setFilter(toggleCategory(filter, category))
                       }
-                      title={`Toggle every difficulty in ${t(
-                        `exercises:categories.${category}`,
-                      )}`}
+                      title={t("practice_hub:auto.toggle_category", {
+                        category: t(`exercises:categories.${category}`),
+                      })}
                       className='rounded px-2 py-2 text-left text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800/50 hover:text-zinc-100'>
                       {t(`exercises:categories.${category}`)}
                     </button>
@@ -175,7 +174,9 @@ export const PlanSetup = ({
                           aria-label={`${t(
                             `exercises:categories.${category}`,
                           )} ${t(`exercises:difficulty.${difficulty}`)}${
-                            available === 0 ? " (none available)" : ""
+                            available === 0
+                              ? ` ${t("practice_hub:auto.none_available")}`
+                              : ""
                           }`}
                           disabled={available === 0}
                           onClick={() =>

@@ -1,3 +1,5 @@
+import { useTranslation } from "hooks/useTranslation";
+
 import type { FretDiagramData } from "../../types/journey.types";
 
 interface FretDiagramProps {
@@ -23,6 +25,7 @@ const BOT_PAD = 10;
  * verified note name directly on every active cell in the given fret window.
  */
 export function FretDiagram({ data }: FretDiagramProps) {
+  const { t } = useTranslation("journey");
   const { startFret, endFret, strings } = data;
   const fretCount = endFret - startFret + 1;
   const neckH = 6 * CELL_H;
@@ -36,7 +39,7 @@ export function FretDiagram({ data }: FretDiagramProps) {
       <svg
         viewBox={`0 0 ${vw} ${vh}`}
         style={{ width: `min(100%, ${vw}px)`, height: "auto" }}
-        aria-label="Fretboard diagram"
+        aria-label={t("fret_diagram")}
       >
           <rect x={LEFT_PAD} y={TOP_PAD} width={vw - LEFT_PAD - 6} height={neckH} fill="#3f3f46" rx={4} />
 

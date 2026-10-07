@@ -10,6 +10,7 @@ import {
   activeMentionQuery,
   insertMention,
 } from "feature/chat/utils/chatMentions";
+import { useTranslation } from "hooks/useTranslation";
 import { Paperclip, Reply, SendHorizontal, X } from "lucide-react";
 import { type FormEvent, type RefObject, useState } from "react";
 
@@ -90,6 +91,7 @@ export const ChatComposer = ({
   typingText: string | null;
   error: string | null;
 }) => {
+  const { t } = useTranslation("chat");
   const [mentionQuery, setMentionQuery] = useState<{
     start: number;
     query: string;
@@ -152,7 +154,7 @@ export const ChatComposer = ({
           icon={<Reply className='h-4 w-4' />}
           label={
             <>
-              Replying to{" "}
+              {t("composer.replying_to")}{" "}
               <span className='font-semibold text-zinc-200'>
                 {replyTo.username}
               </span>
@@ -160,16 +162,16 @@ export const ChatComposer = ({
           }
           text={replyTo.message}
           onClear={onCancelReply}
-          clearLabel='Cancel reply'
+          clearLabel={t("composer.cancel_reply")}
         />
       )}
       {attachment && (
         <ComposerStrip
           icon={<Paperclip className='h-4 w-4' />}
-          label='Sharing'
+          label={t("composer.sharing")}
           text={attachmentLabel(attachment)}
           onClear={onClearAttachment}
-          clearLabel='Remove attachment'
+          clearLabel={t("composer.remove_attachment")}
         />
       )}
 
@@ -179,7 +181,7 @@ export const ChatComposer = ({
         {showSuggestions && (
           <div
             role='listbox'
-            aria-label='Mention someone'
+            aria-label={t("composer.mention")}
             className='absolute bottom-full left-0 z-20 mb-2 w-64 max-w-full overflow-hidden rounded-lg bg-zinc-800 p-1'>
             {suggestions.map((candidate, index) => (
               <button
@@ -204,7 +206,7 @@ export const ChatComposer = ({
 
         <button
           type='button'
-          aria-label='Share an exercise, song or item'
+          aria-label={t("composer.share")}
           onClick={onOpenPicker}
           className={cn(
             "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-zinc-950/50 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100",
@@ -233,7 +235,7 @@ export const ChatComposer = ({
         <Button
           type='submit'
           size='icon'
-          aria-label='Send'
+          aria-label={t("composer.send")}
           className='h-12 w-12 shrink-0 rounded-lg bg-white font-bold text-black transition-colors hover:bg-zinc-200 active:click-behavior'>
           <SendHorizontal className='h-5 w-5' />
         </Button>

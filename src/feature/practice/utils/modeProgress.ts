@@ -12,6 +12,9 @@ import type {
  */
 export interface ModeProgressSummary {
   label: string;
+  /** Translation key (practice_hub namespace) for `label`, when it is UI copy rather than a title. */
+  labelKey?: string;
+  labelVars?: Record<string, unknown>;
   done?: number;
   total?: number;
 }
@@ -35,10 +38,12 @@ export function summarizeJourney(
   });
 
   const unfinished = counted.filter(({ done, total }) => done < total);
-  if (unfinished.length === 0) return { label: "All modules completed" };
+  if (unfinished.length === 0)
+    return { label: "All modules completed", labelKey: "progress.all_modules" };
 
   const active = unfinished.find(({ done }) => done > 0);
-  if (!active) return { label: "Start with the first lesson" };
+  if (!active)
+    return { label: "Start with the first lesson", labelKey: "progress.first_lesson" };
 
   return { label: active.module.title, done: active.done, total: active.total };
 }
@@ -75,6 +80,7 @@ export function summarizeRoadmaps(
 
   return {
     label: startedAny ? "Choose your next roadmap" : "Choose your first roadmap",
+    labelKey: startedAny ? "progress.next_roadmap" : "progress.first_roadmap",
   };
 }
 
@@ -83,7 +89,12 @@ export function summarizeCount(
   done: number,
   [one, many]: [string, string],
   emptyLabel: string,
+  keys?: { one: string; many: string; empty: string },
 ): ModeProgressSummary {
-  if (done <= 0) return { label: emptyLabel };
-  return { label: `${done} ${done === 1 ? one : many} completed` };
+  if (done <= 0) return { label: emptyLabel, labelKey: keys?.empty };
+  return {
+    label: `${done} ${done === 1 ? one : many} completed`,
+    labelKey: keys ? (done === 1 ? keys.one : keys.many) : undefined,
+    labelVars: { count: done },
+  };
 }

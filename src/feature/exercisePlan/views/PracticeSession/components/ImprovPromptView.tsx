@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { ImprovPrompt, ImprovPromptRiddleConfig } from "../../../types/exercise.types";
@@ -66,6 +67,7 @@ function pickRandomPrompts(prompts: ImprovPrompt[], count: number, exclude: Impr
 }
 
 export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) => {
+  const { t } = useTranslation("session");
   const [activePrompts, setActivePrompts] = useState<ImprovPrompt[]>(() =>
     pickRandomPrompts(config.prompts, config.simultaneousPrompts, [])
   );
@@ -201,7 +203,7 @@ export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) =
 
       {!isRunning && (
         <p className="text-[10px] font-bold text-zinc-600 capitalize">
-          Paused — press play to start prompts
+          {t("improv.paused")}
         </p>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
@@ -22,6 +23,7 @@ interface SessionNoteFormProps {
  * and never touches the points.
  */
 export const SessionNoteForm = ({ reportId }: SessionNoteFormProps) => {
+  const { t } = useTranslation("session_summary");
   const [note, setNote] = useState("");
   const [savedNote, setSavedNote] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -40,7 +42,7 @@ export const SessionNoteForm = ({ reportId }: SessionNoteFormProps) => {
       setSavedNote(trimmed);
     } catch (error) {
       console.error("Failed to save session note:", error);
-      toast.error("Couldn't save your note. Try again.");
+      toast.error(t("note.save_error"));
     } finally {
       setIsSaving(false);
     }
@@ -49,8 +51,7 @@ export const SessionNoteForm = ({ reportId }: SessionNoteFormProps) => {
   return (
     <div className='flex flex-col gap-4'>
       <p className='text-sm leading-relaxed text-zinc-400'>
-        What did you notice, what worked, what to try next time? You&apos;ll
-        find it in your practice log.
+        {t("note.intro")}
       </p>
 
       <Textarea
@@ -58,8 +59,8 @@ export const SessionNoteForm = ({ reportId }: SessionNoteFormProps) => {
         maxLength={MAX_NOTE_LENGTH}
         rows={3}
         onChange={(event) => setNote(event.target.value)}
-        placeholder='e.g. Bridge still messy at 90 BPM — slow it down to 75 tomorrow'
-        aria-label='Session note'
+        placeholder={t("note.placeholder")}
+        aria-label={t("note.aria")}
         className='resize-none border-none bg-zinc-800/40 text-sm text-zinc-100 shadow-none placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0'
       />
 
@@ -79,7 +80,7 @@ export const SessionNoteForm = ({ reportId }: SessionNoteFormProps) => {
               : "bg-zinc-800 text-zinc-100 hover:bg-zinc-700"
           )}>
           {isSaved && <Check className='h-4 w-4' aria-hidden />}
-          {isSaving ? "Saving…" : isSaved ? "Saved" : "Save note"}
+          {isSaving ? t("note.saving") : isSaved ? t("note.saved") : t("note.save")}
         </Button>
       </div>
     </div>

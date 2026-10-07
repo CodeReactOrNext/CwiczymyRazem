@@ -1,3 +1,6 @@
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
+import type { Translate } from "lib/i18n/translate";
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { SubmitRecordingDialog } from "feature/challenges/components/SubmitRecordingDialog";
@@ -20,11 +23,16 @@ import { WidgetHeader, WidgetLink } from "./WidgetHeader";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-const daysLeftLabel = (endsAt: Timestamp | undefined): string | null => {
+const daysLeftLabel = (
+  endsAt: Timestamp | undefined,
+  t: Translate,
+): string | null => {
   if (!endsAt || typeof endsAt.toDate !== "function") return null;
   const days = Math.ceil((endsAt.toDate().getTime() - Date.now()) / DAY_MS);
-  if (!Number.isFinite(days) || days <= 0) return "ends today";
-  return days === 1 ? "1 day left" : `${days} days left`;
+  if (!Number.isFinite(days) || days <= 0) return t("challenge.ends_today");
+  return days === 1
+    ? t("challenge.one_day_left")
+    : t("challenge.days_left", { count: days });
 };
 
 /**
@@ -34,8 +42,9 @@ const daysLeftLabel = (endsAt: Timestamp | undefined): string | null => {
  * so the board can be played through without leaving Home.
  */
 export const MonthlyChallengeWidget = () => {
+  const { t } = useTranslation("dashboard");
   const { userAuth } = useDashboardData();
-  const userName = useAppSelector(selectUserName) ?? "Player";
+  const userName = useAppSelector(selectUserName) ?? t("challenge.player");
   const { data: challenge, isLoading } = useCurrentChallenge();
   const { data: submissions = [] } = useChallengeSubmissions(challenge?.id);
   const [practiceSongId, setPracticeSongId] = useState<string | null>(null);
@@ -47,14 +56,14 @@ export const MonthlyChallengeWidget = () => {
   );
 
   const songs = challenge?.songs ?? [];
-  const daysLeft = daysLeftLabel(challenge?.endsAt);
+  const daysLeft = daysLeftLabel(challenge?.endsAt, t);
 
   return (
     <Card className='flex h-full flex-col p-5 sm:p-6'>
       <WidgetHeader
         icon={Medal}
-        title='Monthly challenge'
-        action={<WidgetLink href='/challenges'>Open challenge</WidgetLink>}
+        title={t("challenge.title")}
+        action={<WidgetLink href='/challenges'>{t("challenge.open")}</WidgetLink>}
       />
 
       {isLoading ? (
@@ -65,8 +74,7 @@ export const MonthlyChallengeWidget = () => {
         </div>
       ) : !challenge ? (
         <p className='text-sm text-zinc-400'>
-          No challenge is running right now. The next board opens with the new
-          month.
+          {t("challenge.none")}
         </p>
       ) : (
         <div className='flex flex-1 flex-col gap-4'>
@@ -89,7 +97,10 @@ export const MonthlyChallengeWidget = () => {
                   <button
                     type='button'
                     onClick={() => setPracticeSongId(song.songId)}
-                    aria-label={`Practice ${song.title} by ${song.artist}`}
+                    aria-label={t("challenge.practice_song", {
+                      title: song.title,
+                      artist: song.artist,
+                    })}
                     className='group -ml-2 flex min-w-0 flex-1 items-center gap-3 rounded-lg px-2 py-1 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-800/50'>
                     <span className='relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded bg-zinc-800'>
                       {song.coverUrl ? (
@@ -126,15 +137,15 @@ export const MonthlyChallengeWidget = () => {
                       <Check
                         size={16}
                         className='text-emerald-400'
-                        aria-label='Recorded'
+                        aria-label={t("challenge.recorded")}
                       />
                     </span>
                   ) : (
                     <button
                       type='button'
                       onClick={() => setSubmitSong(song)}
-                      aria-label={`Submit a recording of ${song.title}`}
-                      title='Submit a recording'
+                      aria-label={t("challenge.submit_song", { title: song.title })}
+                      title={t("challenge.submit")}
                       className='flex h-8 w-8 shrink-0 items-center justify-center rounded text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-800 hover:text-zinc-100'>
                       <Plus size={16} />
                     </button>
@@ -145,10 +156,19 @@ export const MonthlyChallengeWidget = () => {
           </ul>
 
           <p className='mt-auto text-xs text-zinc-500'>
-            <span className='font-semibold text-zinc-300'>
-              {recorded.size} of {songs.length}
-            </span>{" "}
-            recorded
+            <Interpolate
+              text={t("challenge.recorded_count")}
+              values={{
+                count: (
+                  <span className='font-semibold text-zinc-300'>
+                    {t("challenge.x_of_y", {
+                      done: recorded.size,
+                      total: songs.length,
+                    })}
+                  </span>
+                ),
+              }}
+            />
           </p>
 
           <SubmitRecordingDialog

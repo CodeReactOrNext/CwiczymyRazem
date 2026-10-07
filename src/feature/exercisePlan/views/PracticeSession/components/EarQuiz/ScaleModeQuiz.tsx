@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import type { ScaleModeId } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import type { ScaleModeQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
 import { SCALE_MODES } from "feature/exercisePlan/logic/earQuiz/scaleModes";
+import { useTranslation } from "hooks/useTranslation";
 import { Snail } from "lucide-react";
 import { useState } from "react";
 
@@ -36,6 +37,7 @@ export function ScaleModeQuiz({
   onAnswer,
   onNext,
 }: ScaleModeQuizProps) {
+  const { t } = useTranslation("session");
   const { isPlaying, play, stop } = useEarQuizPlayback();
   const [picked, setPicked] = useState<ScaleModeId | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
@@ -80,25 +82,25 @@ export function ScaleModeQuiz({
     <>
       <div className='flex flex-col items-center gap-4 py-2'>
         <p className='text-center text-lg font-semibold text-zinc-100'>
-          Which scale is this?
+          {t("quiz.which_scale")}
         </p>
         <div className='flex flex-wrap items-center justify-center gap-3'>
           <ListenButton
             onClick={toggleScale}
             isPlaying={isPlaying}
-            label='Play scale'
+            label={t("quiz.play_scale")}
             hasPlayed={hasPlayed}
           />
           <QuizSecondaryButton
             onClick={() => playScale(SLOW_NOTE_SECONDS)}
             icon={<Snail className='h-4 w-4' />}>
-            Play it slowly
+            {t("quiz.play_slowly")}
           </QuizSecondaryButton>
         </div>
         <p className='text-center text-xs text-zinc-500'>
           {isAnswered
-            ? `Root: ${question.rootName}`
-            : "The root is held underneath — measure every note against it"}
+            ? t("quiz.root", { root: question.rootName })
+            : t("quiz.root_held")}
         </p>
       </div>
 
@@ -136,13 +138,13 @@ export function ScaleModeQuiz({
           isCorrect={isCorrect}
           answer={`${question.rootName} ${answerScale.name}`}
           explanation={answerScale.character}
-          footnote={`Listen for the ${answerScale.tell} — ${answerScale.formula}`}
+          footnote={t("quiz.listen_for", { tell: answerScale.tell, formula: answerScale.formula })}
           onNext={onNext}
           extraAction={
             <QuizSecondaryButton
               onClick={() => playScale(SLOW_NOTE_SECONDS)}
               icon={<Snail className='h-4 w-4' />}>
-              Hear it again, slowly
+              {t("quiz.hear_again_slowly")}
             </QuizSecondaryButton>
           }
         />

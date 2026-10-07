@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import type { SongArrangement } from "feature/songs/types/songs.type";
 import { ARRANGEMENT_META, ARRANGEMENT_ORDER } from "feature/songs/utils/arrangements.utils";
@@ -22,6 +23,7 @@ export const ArrangementPicker = ({
   size = "md",
   className,
 }: ArrangementPickerProps) => {
+  const { t } = useTranslation("songs");
   const options: (SongArrangement | null)[] = noneLabel
     ? [...ARRANGEMENT_ORDER, null]
     : ARRANGEMENT_ORDER;
@@ -29,7 +31,7 @@ export const ArrangementPicker = ({
   return (
     <div
       role='radiogroup'
-      aria-label='Arrangement'
+      aria-label={t("arrangements.aria")}
       className={cn("flex gap-1 rounded-lg bg-zinc-900/60 p-1", className)}>
       {options.map((option) => {
         const isActive = value === option;
@@ -40,7 +42,9 @@ export const ArrangementPicker = ({
             type='button'
             role='radio'
             aria-checked={isActive}
-            title={meta?.hint}
+            title={
+              option && meta ? t(`arrangements.${option}.hint`, meta.hint) : undefined
+            }
             onClick={() => onChange(option)}
             className={cn(
               "flex flex-1 items-center justify-center gap-2 rounded font-semibold transition-background click-behavior focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
@@ -59,7 +63,7 @@ export const ArrangementPicker = ({
                 )}
               />
             )}
-            {meta ? meta.label : noneLabel}
+            {option && meta ? t(`arrangements.${option}.label`, meta.label) : noneLabel}
           </button>
         );
       })}

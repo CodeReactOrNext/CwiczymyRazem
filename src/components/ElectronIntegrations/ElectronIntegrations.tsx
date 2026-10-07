@@ -16,7 +16,8 @@ import type {
 } from "types/electronApp";
 
 interface ContextMenuItem {
-  label: string;
+  /** Key under `desktop:menu` — translated where the menu renders. */
+  labelKey: string;
   icon: typeof Copy;
   enabled: boolean;
   action: () => void;
@@ -39,25 +40,25 @@ export const buildMenuItems = (
   if (params.isEditable) {
     items.push(
       {
-        label: "Cut",
+        labelKey: "cut",
         icon: Scissors,
         enabled: params.editFlags.canCut,
         action: () => api.editCommand("cut"),
       },
       {
-        label: "Copy",
+        labelKey: "copy",
         icon: Copy,
         enabled: params.editFlags.canCopy,
         action: () => api.editCommand("copy"),
       },
       {
-        label: "Paste",
+        labelKey: "paste",
         icon: ClipboardPaste,
         enabled: params.editFlags.canPaste,
         action: () => api.editCommand("paste"),
       },
       {
-        label: "Select All",
+        labelKey: "select_all",
         icon: TextCursorInput,
         enabled: params.editFlags.canSelectAll,
         action: () => api.editCommand("selectAll"),
@@ -65,7 +66,7 @@ export const buildMenuItems = (
     );
   } else if (params.selectionText.trim()) {
     items.push({
-      label: "Copy",
+      labelKey: "copy",
       icon: Copy,
       enabled: true,
       action: () => api.editCommand("copy"),
@@ -74,7 +75,7 @@ export const buildMenuItems = (
 
   if (params.linkURL) {
     items.push({
-      label: "Copy Link Address",
+      labelKey: "copy_link",
       icon: Link2,
       enabled: true,
       action: () => api.copyText(params.linkURL),
@@ -96,7 +97,7 @@ export const buildMenuItems = (
  */
 export const ElectronIntegrations = () => {
   const router = useRouter();
-  const { t } = useTranslation("toast");
+  const { t } = useTranslation(["toast", "desktop"]);
   const [menu, setMenu] = useState<ContextMenuState | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -216,7 +217,7 @@ export const ElectronIntegrations = () => {
       onContextMenu={(event) => event.preventDefault()}>
       {menu.items.map((item) => (
         <button
-          key={item.label}
+          key={item.labelKey}
           type='button'
           tabIndex={-1}
           disabled={!item.enabled}
@@ -229,7 +230,7 @@ export const ElectronIntegrations = () => {
             item.enabled ? "hover:bg-zinc-800" : "opacity-40"
           )}>
           <item.icon size={14} strokeWidth={1.5} className='text-zinc-400' />
-          {item.label}
+          {t(`desktop:menu.${item.labelKey}`)}
         </button>
       ))}
     </div>

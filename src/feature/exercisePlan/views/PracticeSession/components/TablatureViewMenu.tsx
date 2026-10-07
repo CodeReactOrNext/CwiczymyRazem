@@ -5,6 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import { AlignJustify, Check, ChevronDown, Music } from "lucide-react";
 import { memo } from "react";
@@ -60,6 +61,7 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
   onToggleNotation,
   compact = false,
 }: TablatureViewMenuProps) {
+  const { t } = useTranslation("tab_settings");
   const current: ViewMode = showAlphaTabScore ? "notation" : "tab";
 
   const options: ViewMode[] = [];
@@ -79,7 +81,7 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          title='Change how the exercise is shown'
+          title={t("view_menu.hint")}
           className={cn(
             "flex items-center gap-2 rounded-lg outline-none transition-all active:scale-95",
             "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
@@ -92,7 +94,7 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
           />
           {!compact && (
             <span className='text-[10px] font-semibold tracking-wide'>
-              {label}
+              {t(`views.${current}.label`, label)}
             </span>
           )}
           <ChevronDown
@@ -111,7 +113,7 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
         // otherwise the default z-50 paints underneath it.
         className='z-[99999999] w-56 rounded-lg border-white/10 bg-zinc-900/95 p-1.5 text-white backdrop-blur-md'>
         <div className='px-2 py-1 text-[10px] font-semibold tracking-wide text-zinc-400'>
-          View
+          {t("view_menu.view")}
         </div>
         {options.map((mode) => {
           const { label: itemLabel, desc, Icon, accent } = VIEWS[mode];
@@ -136,9 +138,9 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
                     "flex items-center gap-1.5 text-xs font-semibold",
                     active ? "text-white" : "text-zinc-200",
                   )}>
-                  {itemLabel}
+                  {t(`views.${mode}.label`, itemLabel)}
                 </div>
-                <div className='text-[10px] text-zinc-500'>{desc}</div>
+                <div className='text-[10px] text-zinc-500'>{t(`views.${mode}.desc`, desc)}</div>
               </div>
               {active && <Check className={cn("h-4 w-4 shrink-0", accent)} />}
             </DropdownMenuItem>

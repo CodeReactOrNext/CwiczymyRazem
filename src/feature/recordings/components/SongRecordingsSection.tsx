@@ -3,6 +3,7 @@ import { AddRecordingModal } from "feature/recordings/components/AddRecordingMod
 import { RecordingCard } from "feature/recordings/components/RecordingCard";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { useRecordings } from "feature/recordings/hooks/useRecordings";
+import { useTranslation } from "hooks/useTranslation";
 import { Loader2, Mic2, Plus } from "lucide-react";
 import { useState } from "react";
 
@@ -13,6 +14,7 @@ interface SongRecordingsSectionProps {
 }
 
 export const SongRecordingsSection = ({ songId, songTitle, songArtist }: SongRecordingsSectionProps) => {
+  const { t } = useTranslation("recordings");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
   const { recordings, isLoading, total } = useRecordings(undefined, songId);
@@ -32,7 +34,7 @@ export const SongRecordingsSection = ({ songId, songTitle, songArtist }: SongRec
           className="bg-cyan-600 hover:bg-cyan-500 text-white"
         >
           <Plus className="mr-1.5 h-4 w-4" />
-          Add Recording
+          {t("view.add")}
         </Button>
       </div>
 
@@ -42,7 +44,7 @@ export const SongRecordingsSection = ({ songId, songTitle, songArtist }: SongRec
         </div>
       ) : recordings.length === 0 ? (
         <p className="text-sm text-zinc-500 py-4 text-center">
-          No recordings yet for this song — be the first to share your cover.
+          {t("song_section.empty")}
         </p>
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-1 custom-scrollbar">

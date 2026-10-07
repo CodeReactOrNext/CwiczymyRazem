@@ -24,6 +24,7 @@ import {
 } from "feature/challenges/utils/challengeMonth";
 import type { Song } from "feature/songs/types/songs.type";
 import { addFame, updatePoints } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -75,6 +76,7 @@ export const useNominations = () => {
 };
 
 export const useChallengeMutations = () => {
+  const { t } = useTranslation("challenges");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const ballotId = votingChallengeId();
@@ -113,8 +115,8 @@ export const useChallengeMutations = () => {
       if (!reward.isPaid) {
         toast.success(
           reward.isClear
-            ? "Archive board cleared! Late runs don't pay points or fame."
-            : "Run added to the archive — no points or fame for a closed board.",
+            ? t("toast.archive_cleared")
+            : t("toast.archive_added"),
         );
         return;
       }
@@ -122,23 +124,23 @@ export const useChallengeMutations = () => {
       // earned rather than flashing a "+0 points" that reads like a bug.
       if (reward.points === 0) {
         toast.success(
-          `Recording accepted — +${reward.fame} fame. Points stop after ${CHALLENGE_SONG_COUNT} songs on one board.`,
+          t("toast.accepted_fame_only", { fame: reward.fame, count: CHALLENGE_SONG_COUNT }),
         );
         return;
       }
       toast.success(
         reward.isClear
-          ? `Board cleared! +${reward.points} points and +${reward.fame} fame`
-          : `Recording accepted — +${reward.points} points, +${reward.fame} fame`,
+          ? t("toast.board_cleared", { points: reward.points, fame: reward.fame })
+          : t("toast.accepted", { points: reward.points, fame: reward.fame }),
       );
     },
     onError: (error) => {
       if (error instanceof AlreadySubmittedError) {
-        toast.error("You already have a recording on that song.");
+        toast.error(t("toast.already_submitted"));
         return;
       }
       console.error(error);
-      toast.error("Couldn't submit your recording. Try again.");
+      toast.error(t("toast.submit_failed"));
     },
   });
 
@@ -147,11 +149,11 @@ export const useChallengeMutations = () => {
       nominateSong({ challengeId: ballotId, ...params }),
     onSuccess: () => {
       refreshBallot();
-      toast.success("Nominated — your vote is on it.");
+      toast.success(t("toast.nominated"));
     },
     onError: (error) => {
       console.error(error);
-      toast.error("Couldn't add that nomination.");
+      toast.error(t("toast.nominate_failed"));
     },
   });
 
@@ -164,7 +166,7 @@ export const useChallengeMutations = () => {
     onSuccess: () => refreshBallot(),
     onError: (error) => {
       console.error(error);
-      toast.error("Couldn't register your vote.");
+      toast.error(t("toast.vote_failed"));
       refreshBallot();
     },
   });

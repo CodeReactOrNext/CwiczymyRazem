@@ -1,0 +1,16 @@
+{
+  "subtitlebar_text": "Üben, eintragen, Punkte sammeln!",
+  "title": "Willkommen zurück",
+  "subtitle": "Melde dich an, um deinen Fortschritt fortzusetzen",
+  "email_label": "E-Mail",
+  "password_label": "Passwort",
+  "google_button": "Weiter mit Google",
+  "or_continue_with": "oder weiter mit",
+  "not_have_account": "Noch kein Konto?",
+  "signup_link": "Konto erstellen",
+  "submit_button": "Anmelden",
+  "forgot_password": "Passwort vergessen?",
+  "reset_password_success": "Wir haben dir eine E-Mail zum Zurücksetzen des Passworts geschickt. Sieh in deinem Postfach nach.",
+  "reset_password_error": "Die E-Mail zum Zurücksetzen des Passworts konnte nicht gesendet werden. Prüfe, ob die E-Mail-Adresse stimmt.",
+  "enter_email_error": "Gib zuerst deine E-Mail-Adresse ein."
+}

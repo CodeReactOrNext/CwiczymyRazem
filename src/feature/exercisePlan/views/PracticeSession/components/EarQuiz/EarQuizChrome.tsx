@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowRight,
   Check,
@@ -72,10 +73,11 @@ interface ListenButtonProps {
 export function ListenButton({
   onClick,
   isPlaying,
-  label = "Play",
+  label,
   hasPlayed,
   className,
 }: ListenButtonProps) {
+  const { t } = useTranslation("session");
   return (
     <Button
       size='lg'
@@ -91,7 +93,7 @@ export function ListenButton({
       ) : (
         <Play className='h-4 w-4' />
       )}
-      {isPlaying ? "Stop" : hasPlayed ? "Play again" : label}
+      {isPlaying ? t("quiz.stop") : hasPlayed ? t("quiz.play_again") : (label ?? t("quiz.play"))}
     </Button>
   );
 }
@@ -182,6 +184,7 @@ export function QuizVerdict({
   onNext,
   extraAction,
 }: QuizVerdictProps) {
+  const { t } = useTranslation("session");
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -200,9 +203,9 @@ export function QuizVerdict({
               : "bg-red-500/20 text-red-400",
           )}>
           {isCorrect ? (
-            <Check className='h-4 w-4' aria-label='Correct' />
+            <Check className='h-4 w-4' aria-label={t("quiz.correct")} />
           ) : (
-            <X className='h-4 w-4' aria-label='Wrong' />
+            <X className='h-4 w-4' aria-label={t("quiz.wrong")} />
           )}
         </span>
 
@@ -225,7 +228,7 @@ export function QuizVerdict({
         <Button
           onClick={onNext}
           className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
-          Next
+          {t("quiz.next")}
           <ArrowRight className='h-4 w-4' />
         </Button>
         {extraAction}
@@ -247,10 +250,11 @@ export function EarQuizCard({ children }: { children: ReactNode }) {
 
 /** Nudge to start the session timer — the quiz itself stays fully usable. */
 export function StartTimerHint() {
+  const { t } = useTranslation("session");
   return (
     <p className='flex items-center justify-center gap-2 text-xs text-amber-400'>
       <Play className='h-3 w-3' aria-hidden />
-      Press Play below to start the timer — the quiz already works
+      {t("quiz.start_hint")}
     </p>
   );
 }

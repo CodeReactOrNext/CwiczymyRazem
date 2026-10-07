@@ -2,6 +2,7 @@ import { Checkbox } from "assets/components/ui/checkbox";
 import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
 import { playGuitarNotePreview, preloadGuitarNotePreview } from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
+import { useTranslation } from "hooks/useTranslation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaArrowRight, FaVolumeUp } from "react-icons/fa";
 
@@ -43,6 +44,7 @@ const stripFretRange = (description?: string) =>
  * and a clickable fretboard diagram instead of mic-driven pitch detection.
  */
 export function ClickHuntPanel({ targetNote: targetNoteProp, description, startFret, endFret, strings, isPlaying, isExamMode, onDevPassExam }: ClickHuntPanelProps) {
+  const { t } = useTranslation("session");
   const { clickHunt, huntTarget, noteHuntSecondsLeft, advanceHunt, registerFretClick } = useNoteMatchingContext();
   const mistakeCount = clickHunt?.mistakeCount ?? 0;
 
@@ -67,8 +69,8 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
   useEffect(() => { advanceHuntRef.current = advanceHunt; });
   useEffect(() => {
     if (!complete) return undefined;
-    const t = setTimeout(() => advanceHuntRef.current(), 900);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => advanceHuntRef.current(), 900);
+    return () => clearTimeout(timer);
   }, [complete]);
 
   // ── Reference note audio ───────────────────────────────────────────────────
@@ -175,7 +177,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
               onClick={playReference}
               disabled={referenceMidi === null}
               className="inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-              title="Play the note you are looking for">
+              title={t("click_hunt.play_note")}>
               <FaVolumeUp className="h-3 w-3 text-zinc-400" /> Hear it
             </button>
             <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
@@ -187,7 +189,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
                 onCheckedChange={(checked) => toggleNoteSound(checked === true)}
               />
               <Label htmlFor="click-hunt-note-sound" className="cursor-pointer text-xs font-semibold text-zinc-400">
-                Autoplay
+                {t("interval_click.autoplay")}
               </Label>
             </div>
           </div>

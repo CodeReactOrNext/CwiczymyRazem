@@ -27,6 +27,7 @@ import {
   type ScaleExerciseConfig,
 } from 'feature/exercisePlan/scales/scaleExerciseGenerator';
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
+import { useTranslation } from "hooks/useTranslation";
 import { useEffect,useState } from 'react';
 
 import { FretboardPreview } from './FretboardPreview';
@@ -44,6 +45,7 @@ export function ScaleSelectionDialog({
   onExerciseGenerated,
   initialExercise,
 }: ScaleSelectionDialogProps) {
+  const { t } = useTranslation("session");
   const [config, setConfig] = useState<Partial<ScaleExerciseConfig>>({
     rootNote: 'C',
     scaleType: 'major',
@@ -129,10 +131,9 @@ export function ScaleSelectionDialog({
         className="z-[99999999] !flex flex-col max-h-[100dvh] sm:max-h-[92dvh] sm:max-w-[500px]"
       >
         <DialogHeader className="shrink-0">
-          <DialogTitle>Choose Scale to Practice</DialogTitle>
+          <DialogTitle>{t("scale_dialog.title")}</DialogTitle>
           <DialogDescription>
-            Configure scale practice parameters. The system will generate
-            tablature automatically.
+            {t("scale_dialog.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -140,7 +141,7 @@ export function ScaleSelectionDialog({
         <div className="space-y-6 py-4">
           {/* Root Note Selection */}
           <div className="space-y-2">
-            <Label htmlFor="root-note">Root Note</Label>
+            <Label htmlFor="root-note">{t("scale_dialog.root")}</Label>
             <Select
               value={config.rootNote}
               onValueChange={(value) =>
@@ -148,7 +149,7 @@ export function ScaleSelectionDialog({
               }
             >
               <SelectTrigger id="root-note">
-                <SelectValue placeholder="Select note" />
+                <SelectValue placeholder={t("scale_dialog.select_note")} />
               </SelectTrigger>
               <SelectContent className="z-[100000000]">
                 {rootNotes.map((note) => (
@@ -162,7 +163,7 @@ export function ScaleSelectionDialog({
 
           {/* Scale Type Selection */}
           <div className="space-y-2">
-            <Label htmlFor="scale-type">Scale Type</Label>
+            <Label htmlFor="scale-type">{t("scale_dialog.scale_type")}</Label>
             <Select
               value={config.scaleType}
               onValueChange={(value: any) =>
@@ -170,7 +171,7 @@ export function ScaleSelectionDialog({
               }
             >
               <SelectTrigger id="scale-type">
-                <SelectValue placeholder="Select scale" />
+                <SelectValue placeholder={t("scale_dialog.select_scale")} />
               </SelectTrigger>
               <SelectContent className="z-[100000000]">
                 {scales.map((scale) => (
@@ -189,7 +190,7 @@ export function ScaleSelectionDialog({
 
           {/* Pattern Type Selection */}
           <div className="space-y-2">
-            <Label htmlFor="pattern-type">Practice Pattern</Label>
+            <Label htmlFor="pattern-type">{t("scale_dialog.pattern")}</Label>
             <Select
               value={config.patternType}
               onValueChange={(value: any) =>
@@ -197,7 +198,7 @@ export function ScaleSelectionDialog({
               }
             >
               <SelectTrigger id="pattern-type">
-                <SelectValue placeholder="Select pattern" />
+                <SelectValue placeholder={t("scale_dialog.select_pattern")} />
               </SelectTrigger>
               <SelectContent className="z-[100000000]">
                 {patterns.map((pattern) => (
@@ -211,7 +212,7 @@ export function ScaleSelectionDialog({
 
           {/* Position Selection */}
           <div className="space-y-2">
-            <Label htmlFor="position">Fretboard Position</Label>
+            <Label htmlFor="position">{t("scale_dialog.position")}</Label>
             <Select
               value={config.position?.toString()}
               onValueChange={(value) =>
@@ -219,20 +220,20 @@ export function ScaleSelectionDialog({
               }
             >
               <SelectTrigger id="position">
-                <SelectValue placeholder="Select position" />
+                <SelectValue placeholder={t("scale_dialog.select_position")} />
               </SelectTrigger>
               <SelectContent className="z-[100000000]">
                 {positions.map((pos) => (
                   <SelectItem key={pos.toString()} value={pos.toString()}>
-                    {pos === 'all' ? 'Full Fretboard (All Positions)' : `Position ${pos} (frets ${pos}-${pos + 4})`}
+                    {pos === 'all' ? t('scale_dialog.full_fretboard') : t('scale_dialog.position_frets', { pos, from: pos, to: pos + 4 })}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">
               {config.position === 'all' 
-                ? "This will generate a longer exercise covering all main positions across the neck"
-                : "Position determines where on the fretboard you practice the scale"}
+                ? t("scale_dialog.all_hint")
+                : t("scale_dialog.position_hint")}
             </p>
           </div>
         </div>
@@ -245,8 +246,8 @@ export function ScaleSelectionDialog({
             rootMidi={previewData.rootMidi}
             label={
               config.position === 'all'
-                ? 'All positions — frets 0–15'
-                : `Position ${config.position} — frets ${previewData.startFret}–${previewData.endFret}`
+                ? t('scale_dialog.preview_all')
+                : t('scale_dialog.preview_position', { pos: config.position, from: previewData.startFret, to: previewData.endFret })
             }
           />
         )}
@@ -254,9 +255,9 @@ export function ScaleSelectionDialog({
 
         <div className="flex shrink-0 justify-end gap-3">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t("cancel")}
           </Button>
-          <Button onClick={handleGenerate}>Add to Plan</Button>
+          <Button onClick={handleGenerate}>{t("add_to_plan")}</Button>
         </div>
       </DialogContent>
     </Dialog>

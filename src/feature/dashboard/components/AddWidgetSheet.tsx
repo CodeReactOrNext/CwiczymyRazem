@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import {
   Sheet,
   SheetContent,
@@ -39,13 +40,14 @@ export const AddWidgetSheet = <Id extends string>({
   onOpenChange,
   hidden,
   onAdd,
-  title = "Add to Home",
-  description = "Pick what you want to see first. New cards land at the bottom — drag them where they belong.",
-  emptyText = "Everything is already on your Home.",
+  title,
+  description,
+  emptyText,
   groupOrder = WIDGET_GROUP_ORDER,
   groupLabels = WIDGET_GROUP_LABELS,
   disabledReason,
 }: AddWidgetSheetProps<Id>) => {
+  const { t } = useTranslation("dashboard");
   const renderItems = (items: SheetItem<Id>[]) => (
     <ul className='space-y-1'>
       {items.map((definition) => {
@@ -86,8 +88,10 @@ export const AddWidgetSheet = <Id extends string>({
         side='right'
         className='w-full overflow-y-auto border-0 sm:max-w-md'>
         <SheetHeader className='text-left'>
-          <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
+          <SheetTitle>{title ?? t("add_sheet.title")}</SheetTitle>
+          <SheetDescription>
+            {description ?? t("add_sheet.description")}
+          </SheetDescription>
         </SheetHeader>
 
         {disabledReason && hidden.length > 0 && (
@@ -97,7 +101,9 @@ export const AddWidgetSheet = <Id extends string>({
         )}
 
         {hidden.length === 0 ? (
-          <p className='mt-8 text-sm text-zinc-400'>{emptyText}</p>
+          <p className='mt-8 text-sm text-zinc-400'>
+            {emptyText ?? t("add_sheet.empty")}
+          </p>
         ) : !isGrouped ? (
           <div className='mt-6'>{renderItems(hidden)}</div>
         ) : (

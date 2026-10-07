@@ -1,0 +1,98 @@
+{
+  "skip_calibration": "Skip calibration",
+  "setup": {
+    "title_native": "Audio Setup",
+    "title_interface": "Audio Interface Setup",
+    "title_mic": "Microphone Setup",
+    "connecting": "Connecting…",
+    "start_listening": "Start Listening",
+    "grant": "Grant Microphone Access",
+    "signal_level": "Signal Level",
+    "too_quiet": "Too quiet — strum a string",
+    "good_level": "Good level ✓",
+    "input_sensitivity": "Input Sensitivity",
+    "play_notes": "Play a few notes… {{seconds}}s",
+    "calibrated": "Calibrated ✓",
+    "auto_gain": "Auto-Calibrate Gain",
+    "tune_guitar": "Tune Guitar",
+    "headphones": "Use wired headphones",
+    "headphones_body": "Without headphones the mic picks up the backing track through your speakers and causes false detections.",
+    "quiet": "Find a quiet spot",
+    "quiet_body": "Background noise causes false note detections. Close doors and turn off any music.",
+    "interface": "Interface",
+    "refresh": "Refresh device list",
+    "no_inputs": "No input devices found",
+    "inputs": "{{count}} in",
+    "which_jack": "Which jack is your guitar plugged into?",
+    "channel": "Channel {{n}}",
+    "native_hint": "Native low-latency capture — bypasses the browser entirely. Plug your guitar straight into the interface above.",
+    "output_auto": "Output: {{label}} (auto)",
+    "matched": "matched",
+    "change": "Change",
+    "output": "Output",
+    "no_outputs": "No output devices found",
+    "output_hint": "Should match the interface above so audio and capture use the same device.",
+    "before_start": "Before you start",
+    "before_start_body": "Make sure your interface is selected as the browser's microphone input and your guitar is plugged in. You'll set the gain level on the next screen."
+  },
+  "tuning": {
+    "wrong_string": "Wrong string?",
+    "play_open": "Play the open {{string}} string",
+    "in_tune": "In tune — keep holding…",
+    "sharp": "sharp ↓ tune down",
+    "flat": "flat ↑ tune up",
+    "title": "Tune Your Guitar",
+    "flat_label": "Flat",
+    "sharp_label": "Sharp",
+    "next_string": "Next String",
+    "finish": "Finish Calibration",
+    "skip_string": "Skip String",
+    "redo": "Redo this string"
+  },
+  "source": {
+    "title": "Guitar Calibration",
+    "question": "How is your guitar connected to the computer?",
+    "interface": "Audio Interface",
+    "interface_desc": "USB or Thunderbolt audio interface",
+    "mic": "Microphone",
+    "mic_desc": "Built-in laptop mic or external USB mic"
+  },
+  "summary": {
+    "title": "All Done",
+    "ready": "Everything's ready!",
+    "body": "Your calibration is complete. If you feel the detection is still slightly off, consider re-tuning your guitar or adjusting the input sensitivity.",
+    "good_luck": "Good luck!",
+    "save": "Save & Close",
+    "discard": "Discard"
+  },
+  "permission": {
+    "title": "Microphone Access",
+    "body": "To detect your guitar notes, we need permission to use your audio input. No audio is ever recorded or sent to any server.",
+    "allowing": "Allowing...",
+    "allow": "Allow Microphone Access",
+    "prompt": "A browser prompt will appear",
+    "skip": "Skip for now"
+  },
+  "error": {
+    "title": "Microphone blocked",
+    "body": "Please allow microphone access in your browser settings, then try again.",
+    "retry": "Try Again",
+    "cancel": "Cancel"
+  },
+  "choice": {
+    "title": "Existing Calibration",
+    "body": "You have calibration data from {{date}}.",
+    "old": "This calibration is over 30 days old — consider recalibrating for best accuracy.",
+    "reuse": "Use Existing",
+    "recalibrate": "Recalibrate"
+  },
+  "mic_mode": {
+    "alt": "Mic illustration",
+    "required": "Microphone Required",
+    "tracking": "Mic Tracking",
+    "exam_body": "This module requires microphone setup. Enable your microphone so the system can evaluate your playing during the exam.",
+    "body": "This plan contains tablature exercises. Enable your microphone so the system can listen to your guitar and score your playing in real time.",
+    "enable": "Enable Mic",
+    "skip": "Skip"
+  }
+}

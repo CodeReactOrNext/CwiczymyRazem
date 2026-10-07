@@ -11,6 +11,7 @@ import {
 } from "feature/exercisePlan/views/PracticeSession/components/TablatureSettingsPanel";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import type { TuningGutterString } from "feature/exercisePlan/views/PracticeSession/components/useTablatureWorkerBridge";
+import { useTranslation } from "hooks/useTranslation";
 import { AlignJustify, Music } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -60,6 +61,7 @@ function ModeButton({
  * practice session. The same store drives the real session.
  */
 export const TablatureAppearance = () => {
+  const { t } = useTranslation("settings");
   const [mode, setMode] = useState<PreviewMode>("tab");
   const { settings, palette, isLightBoard, style } = useTablatureStyle();
 
@@ -75,10 +77,9 @@ export const TablatureAppearance = () => {
   return (
     <div className='space-y-6'>
       <div className='px-1'>
-        <h2 className='text-lg font-bold text-foreground'>Tablature</h2>
+        <h2 className='text-lg font-bold text-foreground'>{t("tablature.title")}</h2>
         <p className='text-sm text-muted-foreground'>
-          Change how exercises are drawn. Everything is saved on this device and
-          applies to your next practice session.
+          {t("tablature.description")}
         </p>
       </div>
 
@@ -94,20 +95,20 @@ export const TablatureAppearance = () => {
       <div className='overflow-hidden rounded-lg bg-[#0f0f12] shadow-lg shadow-black/40 ring-1 ring-white/5 md:sticky md:top-16 md:z-20'>
         <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2'>
           <span className='text-[11px] font-semibold tracking-wide text-zinc-500'>
-            Live preview
+            {t("tablature.live_preview")}
           </span>
           <div className='flex flex-wrap items-center gap-1'>
             <ModeButton
               active={mode === "tab"}
               onClick={() => setMode("tab")}
               icon={AlignJustify}
-              label='Tablature'
+              label={t("tablature.mode_tab")}
             />
             <ModeButton
               active={mode === "notation"}
               onClick={() => setMode("notation")}
               icon={Music}
-              label='Notation'
+              label={t("tablature.mode_notation")}
             />
           </div>
         </div>
@@ -141,8 +142,8 @@ export const TablatureAppearance = () => {
 
         <p className='px-4 pb-3 pt-2 text-[11px] text-zinc-500 md:hidden'>
           {mode === "tab"
-            ? "Hit colour and hit animations only show while you are actually playing."
-            : "The same viewer used mid-session — toggle the board below to see it on paper or on black."}
+            ? t("tablature.hint_tab")
+            : t("tablature.hint_notation")}
         </p>
       </div>
 

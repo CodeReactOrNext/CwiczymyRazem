@@ -1,0 +1,43 @@
+{
+  "track": {
+    "target": "Level {{lvl}}, where the page opens",
+    "level": "Level {{lvl}}"
+  },
+  "opens_at": "{{name}} opens at level {{lvl}}",
+  "you_are": "You are level {{lvl}} — {{left}}, or {{points}} points of practice.",
+  "levels_left_one": "{{count}} level to go",
+  "levels_left": "{{count}} levels to go",
+  "practise_now": "Practise now",
+  "how_levels": "How levels work",
+  "what_else": "What else opens up",
+  "lvl": "lvl {{lvl}}",
+  "features": {
+    "summary": {
+      "name": "Milestones",
+      "reason": "Milestones are built out of your own practice history. A few logged sessions are what make the weekly targets fit the way you play instead of guessing at it.",
+      "perks": {
+        "0": "Weekly targets picked from how you actually practise",
+        "1": "Fame to claim every time you clear one",
+        "2": "A read on where the week went, category by category"
+      }
+    },
+    "guilds": {
+      "name": "Guilds",
+      "reason": "A guild runs on people turning up for each other. A few levels in you have a routine of your own — that is the point where joining one does something for the rest of the guild too, not just for you.",
+      "perks": {
+        "0": "A chat with guitarists practising the same week as you",
+        "1": "A weekly challenge the whole guild clears together",
+        "2": "A shared stash and a crest your guild wears"
+      }
+    },
+    "commissions": {
+      "name": "Commissions",
+      "reason": "Commissions are the way round the drop tables, so they wait until you have played the case game for a while. By then the last few models missing from your Dex are the hardest ones to pull — and that is exactly what the bench is for.",
+      "perks": {
+        "0": "Order any guitar or pedal still missing from your Dex",
+        "1": "Paid in Fame and the parts the instrument is made of",
+        "2": "Built stock, with every mod slot free for the mods in your stash"
+      }
+    }
+  }
+}

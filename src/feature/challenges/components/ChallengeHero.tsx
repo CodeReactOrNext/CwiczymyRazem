@@ -21,6 +21,8 @@ import {
   countParticipants,
   getClearedSongIds,
 } from "feature/challenges/utils/challengeProgress";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Swords, Trophy } from "lucide-react";
 import { useMemo } from "react";
 
@@ -68,6 +70,8 @@ export const ChallengeHero = ({
   submissions,
   currentUserId,
 }: ChallengeHeroProps) => {
+  const { t } = useTranslation("challenges");
+  const intlLocale = useIntlLocale();
   const isLive = isChallengeLive(challenge.id);
   const daysLeft = daysLeftInChallenge(challenge.id);
   const songs = challenge.songs;
@@ -86,11 +90,11 @@ export const ChallengeHero = ({
 
   return (
     <HeroBanner
-      title={challengeMonthLabel(challenge.id)}
+      title={challengeMonthLabel(challenge.id, intlLocale)}
       subtitle={
         isLive
-          ? `Voted in by the community — record all ${songs.length} to clear it`
-          : "Closed — runs still land on the board, but pay no points or fame"
+          ? t("hero.live_subtitle", { count: songs.length })
+          : t("hero.closed_subtitle")
       }
       backgroundContent={<HeroPattern />}
       className={CHALLENGE_HERO_CLASS}
@@ -99,15 +103,17 @@ export const ChallengeHero = ({
         <p className='flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold'>
           <span className='flex items-center gap-1.5 text-amber-300'>
             <Swords className='h-3.5 w-3.5' />
-            Monthly challenge
+            {t("view.monthly")}
           </span>
           <span className='h-1 w-1 rounded-full bg-zinc-600' />
           <span className='font-medium text-zinc-500'>
             {isLive
               ? daysLeft === 0
-                ? "closes today"
-                : `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left`
-              : "closed"}
+                ? t("hero.closes_today")
+                : daysLeft === 1
+                  ? t("hero.day_left", { count: daysLeft })
+                  : t("hero.days_left", { count: daysLeft })
+              : t("hero.closed")}
           </span>
         </p>
       }
@@ -117,17 +123,17 @@ export const ChallengeHero = ({
             <RewardChip
               icon={<PointsIcon />}
               amount={POINTS_PER_SUBMISSION}
-              label='points per run'
+              label={t("hero.points_per_run")}
             />
             <RewardChip
               icon={<FameIcon />}
               amount={FAME_PER_SUBMISSION}
-              label='fame per run'
+              label={t("hero.fame_per_run")}
             />
             <RewardChip
               icon={<FameIcon />}
               amount={FAME_CLEAR_BONUS}
-              label='fame for the full board'
+              label={t("hero.fame_full_board")}
               accent
             />
           </div>
@@ -137,7 +143,7 @@ export const ChallengeHero = ({
         <div className='flex flex-col items-start gap-2 md:items-end'>
           {songs.length > 0 && currentUserId && (
             <>
-              <span className='text-xs text-zinc-400'>Your runs</span>
+              <span className='text-xs text-zinc-400'>{t("hero.your_runs")}</span>
               <span className='text-4xl font-black leading-none text-cyan-300'>
                 {clearedCount}
                 <span className='text-xl text-zinc-600'>/{songs.length}</span>
@@ -152,14 +158,14 @@ export const ChallengeHero = ({
           )}
           <p className='flex items-center gap-1.5 text-xs text-zinc-500'>
             <span>
-              {participants} {participants === 1 ? "player" : "players"}
+              {participants === 1 ? t("hero.player", { count: participants }) : t("hero.players", { count: participants })}
             </span>
             {(challenge.finisherCount ?? 0) > 0 && (
               <>
                 <span className='h-1 w-1 rounded-full bg-zinc-700' />
                 <span className='flex items-center gap-1 text-amber-300'>
                   <Trophy className='h-3 w-3' />
-                  {challenge.finisherCount} cleared
+                  {t("hero.cleared", { count: challenge.finisherCount })}
                 </span>
               </>
             )}

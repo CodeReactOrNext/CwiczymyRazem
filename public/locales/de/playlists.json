@@ -1,0 +1,139 @@
+{
+  "practice": "Üben",
+  "remove_from_playlist": "Aus Playlist entfernen",
+  "reorder": "Umsortieren",
+  "up_next": "als Nächstes",
+  "deleted": "Playlist gelöscht",
+  "saved_copy": "In deinen Playlists gespeichert",
+  "from_owner": "von {{name}}",
+  "mastered_of": "{{done}} von {{total}} gemeistert",
+  "add_songs": "Songs hinzufügen",
+  "share": "Teilen",
+  "options": "Playlist-Optionen",
+  "edit_details": "Details bearbeiten",
+  "delete": "Löschen",
+  "save_to_yours": "In deinen Playlists speichern",
+  "like": "Gefällt mir",
+  "path_complete": "Pfad abgeschlossen",
+  "final_stop": "Letzte Station",
+  "every_mastered": "Jeder Song gemeistert – verbeug dich.",
+  "more_to_master_one": "Noch 1 Song zu meistern",
+  "more_to_master": "Noch {{count}} Songs zu meistern",
+  "private": "Privat",
+  "private_hint": "Nur du kannst sie sehen",
+  "public": "Öffentlich",
+  "public_hint": "Für alle in Entdecken gelistet",
+  "private_note": "Nur du kannst sie sehen. Stell auf öffentlich, um sie in Entdecken zu teilen.",
+  "name": "Name",
+  "description": "Beschreibung",
+  "top_full": "Die Top {{count}} ist voll – entferne einen Song aus der Liste, um einen anderen einzufügen.",
+  "delete_title": "„{{name}}“ löschen?",
+  "keep_it": "Behalten",
+  "added_to": "Zu „{{name}}“ hinzugefügt",
+  "add_to_playlist": "Zur Playlist hinzufügen",
+  "loading": "Wird geladen...",
+  "no_playlists": "Noch keine Playlists",
+  "errors": {
+    "save_changes": "Änderungen konnten nicht gespeichert werden. Versuch es noch einmal.",
+    "visibility": "Sichtbarkeit konnte nicht geändert werden.",
+    "save_details": "Details konnten nicht gespeichert werden.",
+    "delete": "Playlist konnte nicht gelöscht werden.",
+    "save_copy": "Diese Playlist konnte nicht gespeichert werden.",
+    "like": "Dein Like konnte nicht aktualisiert werden.",
+    "create": "Playlist konnte nicht erstellt werden. Versuch es noch einmal.",
+    "add_song": "Song konnte nicht hinzugefügt werden. Versuch es noch einmal.",
+    "add_to_library": "Dieser Song konnte nicht zur Bibliothek hinzugefügt werden."
+  },
+  "kinds": {
+    "playlist": {
+      "label": "Playlist",
+      "tagline": "Eine freie Sammlung von Songs",
+      "hint": "Gruppiere Songs, wie du willst – Stimmungen, Bands, Übungssets."
+    },
+    "path": {
+      "label": "Lernpfad",
+      "tagline": "Songs, die in Reihenfolge gelernt werden – eine Roadmap für dein Repertoire",
+      "hint": "Eine Roadmap vom ersten bis zum letzten. Der Fortschritt füllt sich, während du jeden Song meisterst."
+    },
+    "top": {
+      "label": "Top 10",
+      "tagline": "Eine Rangliste, das Beste zuerst",
+      "hint": "Deine Favoriten mit großen Rangnummern. Maximal zehn."
+    }
+  },
+  "empty": {
+    "title": "Hier ist noch nichts",
+    "owner_top": "Wähle deine Top {{count}} – die Reihenfolge ist die Rangliste.",
+    "owner": "Füge Songs aus der Bibliothek oder deiner Sammlung hinzu, um das zu füllen.",
+    "other": "Der Autor hat noch keine Songs hinzugefügt."
+  },
+  "share_title": {
+    "playlist": "Diese Playlist teilen",
+    "path": "Diesen Lernpfad teilen",
+    "top": "Diese Top 10 teilen"
+  },
+  "live_in_discover": {
+    "playlist": "Diese Playlist ist in Entdecken sichtbar – andere Spieler können sie öffnen und eine Kopie in ihrer Bibliothek speichern.",
+    "path": "Dieser Lernpfad ist in Entdecken sichtbar – andere Spieler können ihn öffnen und eine Kopie in ihrer Bibliothek speichern.",
+    "top": "Diese Top 10 ist in Entdecken sichtbar – andere Spieler können sie öffnen und eine Kopie in ihrer Bibliothek speichern."
+  },
+  "delete_body": {
+    "playlist": "Damit wird die Playlist endgültig entfernt. Die Songs selbst bleiben in der Bibliothek und in deiner Sammlung.",
+    "path": "Damit wird der Lernpfad endgültig entfernt. Die Songs selbst bleiben in der Bibliothek und in deiner Sammlung.",
+    "top": "Damit wird die Top 10 endgültig entfernt. Die Songs selbst bleiben in der Bibliothek und in deiner Sammlung."
+  },
+  "created": {
+    "playlist": "Playlist erstellt",
+    "path": "Lernpfad erstellt",
+    "top": "Top 10 erstellt"
+  },
+  "creator": {
+    "what_making": "Was erstellst du?",
+    "new": {
+      "playlist": "Neue Playlist",
+      "path": "Neuer Lernpfad",
+      "top": "Neue Top 10"
+    },
+    "placeholder_top": "z. B. Top 10 Riffs der 90er",
+    "placeholder_path": "z. B. Vom Lagerfeuer zu Hendrix",
+    "placeholder_playlist": "z. B. Langsame Blues-Abende",
+    "optional": "(optional)",
+    "description_placeholder": "Worum geht es in dieser Liste?",
+    "visibility": "Sichtbarkeit",
+    "public_hint": "Jeder kann sie finden und speichern",
+    "next": "Weiter",
+    "picked": "{{count}}/{{max}} gewählt",
+    "added": "{{count}} hinzugefügt",
+    "top_full": "Die Top {{count}} ist voll – entferne einen Song, um einen anderen einzufügen.",
+    "add_later": "Du kannst später weitere Songs hinzufügen.",
+    "create_with_one": "Mit 1 Song erstellen",
+    "create_with": "Mit {{count}} Songs erstellen",
+    "create_empty": "Leer erstellen"
+  },
+  "view": {
+    "not_available": "Playlist nicht verfügbar",
+    "not_available_body": "Sie wurde vielleicht gelöscht oder ist privat, sodass nur der Besitzer sie öffnen kann.",
+    "back": "Zurück zu den Playlists",
+    "title": "Playlists",
+    "yours": "Deine Playlists",
+    "discover": "Entdecken",
+    "new": "Neue Playlist",
+    "first_title": "Erstelle deine erste Playlist",
+    "first_body": "Gruppiere Songs zu allem Möglichen – einer Stimmung, einem Set für die nächste Jam, einem Lernpfad oder einer Top 10, die du im Streit verteidigen würdest.",
+    "create_one": "Erstellen",
+    "nothing_public": "Noch nichts Öffentliches",
+    "nothing_public_body": "Wenn Spieler ihre Playlists teilen, erscheinen sie hier. Mach eine deiner Playlists öffentlich, um es ins Rollen zu bringen.",
+    "kinds_hint": "Playlist, Pfad oder Top 10"
+  },
+  "picker": {
+    "search_create": "Nach Song oder Interpret suchen...",
+    "search_library": "Bibliothek durchsuchen...",
+    "nothing_found": "Nichts gefunden – versuch einen anderen Titel oder Interpreten.",
+    "not_in_library": "Noch nicht in der Bibliothek – wird dort auch hinzugefügt",
+    "add_as_typed": "{{artist}} · wie eingegeben hinzufügen, ohne Cover",
+    "cant_find": "Nicht gefunden? Gib „Interpret - Titel“ ein, um ihn wie eingegeben hinzuzufügen.",
+    "from_collection": "Aus deiner Sammlung",
+    "min_chars_create": "Gib mindestens zwei Zeichen ein, um nach einem Song zu suchen.",
+    "min_chars_library": "Gib mindestens zwei Zeichen ein, um die Song-Bibliothek zu durchsuchen."
+  }
+}

@@ -45,7 +45,7 @@ const EmailChange = () => {
         }}>
         {({ values, errors, handleChange, handleBlur, handleSubmit }) => (
           <form onSubmit={handleSubmit} className='space-y-2'>
-            <Label htmlFor='email'>Email</Label>
+            <Label htmlFor='email'>{t("settings:email_label")}</Label>
             <div className='flex space-x-2'>
               <Input
                 id='email'

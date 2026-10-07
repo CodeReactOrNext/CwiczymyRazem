@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { memo } from "react";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
@@ -16,11 +17,12 @@ export const ExerciseProgress = memo(function ExerciseProgress({
   completedExercises,
   onExerciseSelect,
 }: ExerciseProgressProps) {
+  const { t } = useTranslation("session");
   return (
     <div className='w-full max-w-none py-1 px-1'>
       <div className="flex items-center justify-between mb-1.5 px-1">
           <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
-            Session Progress
+            {t("progress.title")}
           </span>
           <span className="text-[10px] font-semibold tabular-nums tracking-wide text-zinc-400">
             {currentExerciseIndex + 1} <span className="text-zinc-600">/</span> {plan.exercises.length}
@@ -32,15 +34,15 @@ export const ExerciseProgress = memo(function ExerciseProgress({
           const isCompleted = completedExercises.includes(idx);
           const isSong = !!exercise.songData;
           const label = isSong
-            ? `Song: ${exercise.songData!.title}`
-            : `Exercise ${idx + 1}`;
+            ? t("progress.song", { title: exercise.songData!.title })
+            : t("progress.exercise", { n: idx + 1 });
 
           return (
             <button
               key={idx}
               onClick={() => onExerciseSelect(idx)}
               className="group relative flex-1 h-full px-1 focus:outline-none transition-all"
-              aria-label={`Go to ${label}`}
+              aria-label={t("progress.go_to", { label })}
             >
               {/* Background slot highlight on hover */}
               <div className="absolute inset-y-0 inset-x-1 rounded-md bg-white/0 group-hover:bg-white/5 transition-colors" />

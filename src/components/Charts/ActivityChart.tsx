@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { convertMsToHMObject } from "utils/converter";
@@ -39,12 +40,13 @@ interface ActivityChartProps {
 }
 
 export function ActivityChart({ data, showRangeSelect = true, className }: ActivityChartProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "ui"]);
+  const intlLocale = useIntlLocale() ?? "en";
   const [timeRange, setTimeRange] = React.useState("all");
 
   const chartConfig = {
     totalTime: {
-      label: "Activity",
+      label: t("ui:activity"),
     },
   };
 
@@ -178,7 +180,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
               className='font-openSans text-xs font-bold'
               tickFormatter={(value) => {
                 const date = new Date(value);
-                return date.toLocaleDateString("en", {
+                return date.toLocaleDateString(intlLocale, {
                   month: "short",
                   day: "numeric",
                 });
@@ -217,7 +219,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
                     <div className='rounded-lg border border-white/10 bg-zinc-950/90 p-4 text-white shadow-2xl backdrop-blur-xl'>
                       <div className='flex flex-col gap-1'>
                         <span className='text-[0.70rem] uppercase font-bold text-zinc-500 tracking-wider'>
-                          {new Date(label ?? "").toLocaleDateString("en", {
+                          {new Date(label ?? "").toLocaleDateString(intlLocale, {
                             month: "long",
                             day: "numeric",
                             year: "numeric",
@@ -226,7 +228,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
                         <div className="flex items-baseline gap-2">
                            <span className={`font-bold text-xl tracking-tight ${isNegative ? "text-rose-500" : "text-emerald-400"}`}>
                             {Number(hm.hours) > 0 && `${Number(hm.hours)}h `}
-                            {Number(hm.minutes)} min
+                            {t("ui:minutes_short", { minutes: Number(hm.minutes) })}
                           </span>
                         </div>
                       </div>

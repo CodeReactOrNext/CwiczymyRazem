@@ -1,0 +1,60 @@
+{
+  "fetch_error": "Wystąpił błąd podczas pobierania danych. Odśwież stronę.",
+  "points": "Punkty",
+  "exercise_time": "Czas ćwiczeń",
+  "achievements": "Osiągnięcia",
+  "empty": "Pusto",
+  "sort_by_points": "Sortuj po punktach",
+  "sort_by_sessions": "Sortuj po sesjach",
+  "global_leaderboard": "Ogólny",
+  "seasonal_leaderboard": "Sezonowy",
+  "gear_leaderboard": "Sprzęt",
+  "gear_title": "Ranking sprzętu",
+  "gear_subtitle": "Zobacz, czyj zestaw rządzi",
+  "rig_level": "Poziom zestawu",
+  "guitars": "Gitary",
+  "effects": "Efekty",
+  "no_gear_data_found": "Nie znaleziono użytkowników ze sprzętem",
+  "current_season": "Bieżący sezon",
+  "showing": "Wyświetlono",
+  "of": "z",
+  "users": "użytkowników",
+  "no_users_found": "Nie znaleziono użytkowników",
+  "no_seasonal_data": "Brak danych sezonowych",
+  "no_seasonal_data_found": "Brak użytkowników w tym sezonie",
+  "seasons_fetch_error": "Nie udało się wczytać sezonów",
+  "season_change_error": "Nie udało się zmienić sezonu",
+  "view_change_error": "Nie udało się zmienić widoku",
+  "empty_users_title": "Brak graczy",
+  "select_season": "Wybierz sezon",
+  "rank": {
+    "your_position": "Twoja pozycja",
+    "out_of": "na {{total}}",
+    "to_pass": "{{unit}} do wyprzedzenia: {{name}} (#{{place}})",
+    "jump": "Przejdź do mojej pozycji",
+    "level": "poziom",
+    "levels": "poziomy",
+    "point": "punkt",
+    "points": "punkty"
+  },
+  "hero": {
+    "season": "Sezon",
+    "season_subtitle": "Ćwicz, żeby piąć się w rankingu.",
+    "seasonal_eyebrow": "Ranking sezonowy",
+    "rig_eyebrow": "Ranking riga",
+    "title": "Ranking",
+    "subtitle": "Zobacz, jak wypadasz na tle innych graczy",
+    "all_time_eyebrow": "Ranking wszech czasów",
+    "sections": "Sekcje rankingu",
+    "how_points": "Jak działają punkty"
+  },
+  "scope": {
+    "top": "Najlepsi gracze",
+    "around": "Wokół ciebie",
+    "around_error": "Nie udało się wczytać graczy wokół ciebie. Spróbuj za chwilę."
+  },
+  "rig": {
+    "guitar_level": "Poziom gitary",
+    "empty_slot": "Puste miejsce {{n}}"
+  }
+}

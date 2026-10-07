@@ -1,0 +1,105 @@
+{
+  "page": {
+    "empty": "Noch keine Übungssessions",
+    "empty_hint": "Schließ eine Übungssession ab oder füge einen manuellen Eintrag hinzu, damit er hier erscheint.",
+    "empty_filtered": "Nichts entspricht deinen Filtern",
+    "empty_filtered_hint": "Erweitere den Zeitraum oder setze die Filter zurück.",
+    "sessions_heading": "Sessions",
+    "day_sessions": "{{count}} Session(s)"
+  },
+  "pagination": {
+    "label": "Session-Seiten",
+    "previous": "Vorherige Seite",
+    "next": "Nächste Seite",
+    "page_of": "Seite {{page}} von {{total}}"
+  },
+  "timeline": {
+    "heading": "Tagesverlauf"
+  },
+  "calendar": {
+    "prev_month": "Vorheriger Monat",
+    "next_month": "Nächster Monat",
+    "clear_range": "Ausgewählte Tage zurücksetzen",
+    "hint": "Tippe auf zwei Tage für einen Zeitraum",
+    "less": "Weniger",
+    "more": "Mehr"
+  },
+  "filters": {
+    "heading": "Filter",
+    "range_7d": "7 Tage",
+    "range_30d": "30 Tage",
+    "range_90d": "90 Tage",
+    "range_all": "Gesamter Zeitraum",
+    "clear_custom": "Ausgewählte Tage zurücksetzen",
+    "clear_all": "Filter zurücksetzen",
+    "type_label": "Session-Typ",
+    "type_all": "Alle Typen",
+    "type_manual": "Manuelle Einträge",
+    "type_plan": "Plan-Sessions",
+    "type_song": "Song-Übung",
+    "duration_label": "Dauer",
+    "duration_all": "Beliebige Dauer",
+    "duration_short": "Unter 15 Min.",
+    "duration_medium": "15–45 Min.",
+    "duration_long": "Über 45 Min.",
+    "sort_label": "Sortierung",
+    "sort_date_desc": "Neueste zuerst",
+    "sort_date_asc": "Älteste zuerst",
+    "sort_time_desc": "Längste zuerst",
+    "sort_points_desc": "Meiste Punkte"
+  },
+  "summary": {
+    "heading": "Überblick",
+    "time_split": "Zeitaufteilung",
+    "total_time": "Gesamtzeit",
+    "sessions": "Sessions",
+    "points": "Punkte",
+    "active_days": "Aktive Tage",
+    "avg_session": "Ø Session"
+  },
+  "card": {
+    "type_manual": "Manuell",
+    "type_plan": "Plan",
+    "type_song": "Song",
+    "backdated": "Nachgetragen",
+    "duration": "Zeit",
+    "points": "Punkte",
+    "edit": "Eintrag bearbeiten",
+    "delete": "Eintrag löschen",
+    "recorded_tooltip": "Aufgezeichnete Übung – kann nicht bearbeitet werden"
+  },
+  "edit_modal": {
+    "title": "Eintrag bearbeiten",
+    "date_locked": "Datum kann nicht geändert werden",
+    "title_label": "Titel",
+    "description_label": "Beschreibung",
+    "description_placeholder": "Optionale Notizen zu dieser Session",
+    "time_label": "Übungszeit",
+    "hours": "Std.",
+    "minutes": "Min.",
+    "total": "Gesamt",
+    "total_required": "Die Gesamtzeit muss größer als null sein.",
+    "stats_note": "Bearbeiten ändert keine Punkte, kein Level, keine Serie und keine Erfolge.",
+    "cancel": "Abbrechen",
+    "save": "Änderungen speichern",
+    "saving": "Wird gespeichert..."
+  },
+  "delete_dialog": {
+    "title": "Diesen Eintrag löschen?",
+    "description": "„{{title}}“ wird aus deinem Übungsprotokoll entfernt. Bereits verdiente Punkte, Level und Erfolge bleiben unverändert. Das kann nicht rückgängig gemacht werden.",
+    "cancel": "Abbrechen",
+    "confirm": "Löschen",
+    "deleting": "Wird gelöscht..."
+  },
+  "toast": {
+    "edit_success": "Eintrag aktualisiert.",
+    "edit_error": "Eintrag konnte nicht aktualisiert werden. Versuch es noch einmal.",
+    "delete_success": "Eintrag gelöscht.",
+    "delete_error": "Eintrag konnte nicht gelöscht werden. Versuch es noch einmal."
+  },
+  "widget": {
+    "title": "Letzte Sessions",
+    "view_all": "Alle anzeigen",
+    "empty": "Noch keine Sessions – hier erscheinen deine letzten Übungen."
+  }
+}

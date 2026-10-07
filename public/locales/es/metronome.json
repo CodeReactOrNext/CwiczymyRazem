@@ -1,0 +1,53 @@
+{
+  "half_speed": "Media velocidad",
+  "bpm_edit_hint": "Haz clic para editar · Flechas ±1 · Mayús+flecha ±5",
+  "bpm_exam": "BPM · modo examen",
+  "bpm_confirm": "↵ para confirmar",
+  "bpm_click_to_edit": "BPM · haz clic para editar",
+  "decrease": "Bajar BPM en 1",
+  "increase": "Subir BPM en 1",
+  "remove_beat": "Quitar pulso",
+  "add_beat": "Añadir pulso",
+  "subdivisions": {
+    "1": "Negras: sin subdivisión",
+    "2": "Corcheas",
+    "3": "Tresillos de corchea",
+    "4": "Semicorcheas"
+  },
+  "accent": {
+    "accent": "Acento: haz clic para silenciar",
+    "click": "Clic: haz clic para acentuar",
+    "muted": "Silenciado: haz clic para restablecer",
+    "locked": "Este ejercicio fija sus propios acentos",
+    "follows_tab": "El clic cambia de compás con la tablatura",
+    "from_exercise": "Los acentos vienen del compás de este ejercicio",
+    "hint": "Haz clic en un pulso para acentuarlo y otra vez para silenciarlo"
+  },
+  "sounds": {
+    "classic": {
+      "label": "Clásico",
+      "desc": "Pitido sinusoidal limpio, el que traía la app de serie"
+    },
+    "wood": {
+      "label": "Bloque de madera",
+      "desc": "Golpe hueco y cálido, agradable en sesiones largas"
+    },
+    "digital": {
+      "label": "Digital",
+      "desc": "Blip cuadrado y seco, como el clic de un DAW"
+    },
+    "sticks": {
+      "label": "Baquetas",
+      "desc": "Golpe seco de baqueta, se oye por encima de un ampli fuerte"
+    },
+    "hihat": {
+      "label": "Hi-hat",
+      "desc": "Hi-hat cerrado, encaja de forma natural en un groove de batería"
+    },
+    "cowbell": {
+      "label": "Cencerro",
+      "desc": "Dos ondas cuadradas desafinadas: más cencerro"
+    }
+  },
+  "beats_per_bar": "Pulsos por compás"
+}

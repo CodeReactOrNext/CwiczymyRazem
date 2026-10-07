@@ -14,6 +14,8 @@
  * lands on the remainder line, not that the list contradicts the total.
  */
 
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
 import { getStreakFameBonus } from "utils/gameLogic/calculateSessionFame";
 
 /** Which glyph the row gets — resolved in the component, kept out of the data. */
@@ -77,10 +79,21 @@ const fmt = (value: number): string => (value > 0 ? `+${value}` : "—");
  * arithmetic this whole change exists to stop, so an unexplainable pairing falls
  * back to a label that claims nothing.
  */
-const streakLabel = (streakDays: number | undefined, bonus: number): string =>
+const streakLabel = (
+  streakDays: number | undefined,
+  bonus: number,
+  t?: Translate,
+): string =>
   streakDays && streakDays > 1 && getStreakFameBonus(streakDays) === bonus
-    ? `${streakDays}-day streak`
-    : "Daily streak";
+    ? tr(t, "day_streak", "{{days}}-day streak", { days: streakDays })
+    : tr(t, "daily_streak", "Daily streak");
+
+const tr = (
+  t: Translate | undefined,
+  key: string,
+  english: string,
+  vars?: Record<string, unknown>,
+) => translateOr(t, `session_summary:breakdown.${key}`, english, vars);
 
 export const buildFameBreakdown = ({
   fame,
@@ -90,7 +103,7 @@ export const buildFameBreakdown = ({
   chainBonus,
   traitBonus,
   accuracyBonus,
-}: FameBreakdownInput): BreakdownRow[] => {
+}: FameBreakdownInput, t?: Translate): BreakdownRow[] => {
   const streak = whole(streakBonus);
   const level = whole(rigBonus);
   const chain = whole(chainBonus);
@@ -104,13 +117,13 @@ export const buildFameBreakdown = ({
     rows.push({
       key: "practice",
       icon: "time",
-      label: "Practice time",
+      label: tr(t, "practice_time", "Practice time"),
       amount: practice,
       // The multiplier is already baked into the amount above, so it is quoted
       // as a factor rather than as fame — a "+9" here would be a fourth part of
       // the total that the total does not contain.
       subs: accuracyBonus
-        ? [{ key: "accuracy", label: "Clean playing", value: "×1.25" }]
+        ? [{ key: "accuracy", label: tr(t, "clean_playing", "Clean playing"), value: "×1.25" }]
         : [],
     });
   }
@@ -119,7 +132,7 @@ export const buildFameBreakdown = ({
     rows.push({
       key: "streak",
       icon: "streak",
-      label: streakLabel(streakDays, streak),
+      label: streakLabel(streakDays, streak, t),
       amount: streak,
       subs: [],
     });
@@ -129,16 +142,16 @@ export const buildFameBreakdown = ({
     rows.push({
       key: "rig",
       icon: "rig",
-      label: "Your rig",
+      label: tr(t, "your_rig", "Your rig"),
       amount: rig,
       // Same three sources, in the same order, as the Rig Sheet in the Arsenal —
       // this screen is where a player finds out the sheet's rates are real, so
       // the two have to be readable against each other. Empty sources stay on
       // the list: "Signal path —" is how a player learns the wiring pays at all.
       subs: [
-        { key: "level", label: "Rig level", value: fmt(level), muted: level === 0 },
-        { key: "chain", label: "Signal path", value: fmt(chain), muted: chain === 0 },
-        { key: "traits", label: "Traits", value: fmt(traits), muted: traits === 0 },
+        { key: "level", label: tr(t, "rig_level", "Rig level"), value: fmt(level), muted: level === 0 },
+        { key: "chain", label: tr(t, "signal_path", "Signal path"), value: fmt(chain), muted: chain === 0 },
+        { key: "traits", label: tr(t, "traits", "Traits"), value: fmt(traits), muted: traits === 0 },
       ],
     });
   }
@@ -151,7 +164,7 @@ export const buildPointsBreakdown = ({
   timePoints,
   habitPoints,
   streakMultiplier,
-}: PointsBreakdownInput): BreakdownRow[] => {
+}: PointsBreakdownInput, t?: Translate): BreakdownRow[] => {
   const time = whole(timePoints);
   const habits = whole(habitPoints);
   // The streak line is the remainder for the same reason the practice line is
@@ -167,14 +180,20 @@ export const buildPointsBreakdown = ({
   const rows: BreakdownRow[] = [];
 
   if (time > 0) {
-    rows.push({ key: "time", icon: "time", label: "Practice time", amount: time, subs: [] });
+    rows.push({
+      key: "time",
+      icon: "time",
+      label: tr(t, "practice_time", "Practice time"),
+      amount: time,
+      subs: [],
+    });
   }
 
   if (habits > 0) {
     rows.push({
       key: "habits",
       icon: "habits",
-      label: "Healthy habits",
+      label: tr(t, "healthy_habits", "Healthy habits"),
       amount: habits,
       subs: [],
     });
@@ -184,7 +203,7 @@ export const buildPointsBreakdown = ({
     rows.push({
       key: "streak",
       icon: "streak",
-      label: "Streak bonus",
+      label: tr(t, "streak_bonus", "Streak bonus"),
       amount: streak,
       // Unlike fame's flat daily bonus this one is a multiplier on the lines
       // above, and the percentage is the only thing that explains its size.
@@ -193,7 +212,7 @@ export const buildPointsBreakdown = ({
           ? [
               {
                 key: "rate",
-                label: "On everything above",
+                label: tr(t, "on_everything_above", "On everything above"),
                 value: `+${Math.round(streakMultiplier * 100)}%`,
               },
             ]

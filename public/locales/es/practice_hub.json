@@ -1,0 +1,109 @@
+{
+  "continue": "Continuar",
+  "loading": "Cargando...",
+  "any_part": "Cualquier parte",
+  "lock": {
+    "master": "Master",
+    "premium": "Premium"
+  },
+  "modes": {
+    "routine": {
+      "title": "Rutinas de práctica",
+      "description": "Sigue una rutina diaria guiada",
+      "all": "Todas las rutinas",
+      "playalongs": "Playalongs",
+      "my_plans": "Mis planes",
+      "community": "Comunidad"
+    },
+    "log": {
+      "title": "Registro",
+      "description": "Registra una sesión a mano o con cronómetro",
+      "manual": "Registro manual",
+      "free_timer": "Temporizador libre"
+    },
+    "songs": {
+      "title": "Canciones",
+      "description": "Registra el tiempo de práctica de tu repertorio"
+    },
+    "auto": {
+      "title": "Plan automático",
+      "description": "Sesión generada automáticamente"
+    },
+    "gp": {
+      "title": "Archivos Guitar Pro",
+      "description": "Practica las tablaturas de Guitar Pro que hayas importado"
+    },
+    "learning_path": {
+      "title": "Ruta de aprendizaje",
+      "description": "Empieza por lo básico, una lección cada vez"
+    },
+    "roadmaps": {
+      "title": "Mastery Roadmaps",
+      "description": "Elige una habilidad o un estilo en el que centrarte"
+    },
+    "scales": {
+      "title": "Mapa de escalas",
+      "description": "Árbol interactivo de escalas en el mástil"
+    },
+    "skills": {
+      "title": "Habilidades",
+      "description": "Mira tu progreso por técnica"
+    },
+    "exercises": {
+      "title": "Ejercicios",
+      "description": "Encuentra un ejercicio por habilidad, duración o modo"
+    },
+    "community_exercises": {
+      "title": "Ejercicios de la comunidad",
+      "description": "Ejercicios compartidos por la comunidad"
+    }
+  },
+  "progress": {
+    "steps": "pasos",
+    "of_total": "{{done}} de {{total}} {{unit}}",
+    "all_modules": "Todos los módulos completados",
+    "first_lesson": "Empieza por la primera lección",
+    "next_roadmap": "Elige tu próxima roadmap",
+    "first_roadmap": "Elige tu primera roadmap",
+    "scale_one": "1 escala completada",
+    "scale_many": "{{count}} escalas completadas",
+    "first_scale": "Empieza por tu primera escala",
+    "exercise_one": "1 ejercicio completado",
+    "exercise_many": "{{count}} ejercicios completados",
+    "first_technique": "Elige una técnica para empezar"
+  },
+  "plans": {
+    "open_plan": "Abrir plan",
+    "featured": "Destacados",
+    "playalongs": "Playalongs",
+    "playalongs_tooltip": "Toca junto a una canción real a tu propio ritmo",
+    "my_plans": "Mis planes",
+    "community": "Comunidad"
+  },
+  "auto": {
+    "regenerate": "Regenerar",
+    "of_target": "de {{minutes}} min",
+    "exercise_one": "1 ejercicio",
+    "exercise_many": "{{count}} ejercicios",
+    "pick_hint": "Elige dificultades por categoría o déjalo vacío para sacar de toda la biblioteca.",
+    "select_all": "Seleccionar todo",
+    "clear_all": "Quitar todo",
+    "toggle_difficulty": "Activar/desactivar {{difficulty}} en todas las categorías",
+    "toggle_category": "Activar/desactivar todas las dificultades de {{category}}",
+    "none_available": "(no hay disponibles)",
+    "reorder": "Reordenar {{title}}",
+    "drag_to_reorder": "Arrastra para reordenar",
+    "playalong": "Playalong",
+    "video": "Vídeo",
+    "options_for": "Opciones de {{title}}",
+    "options": "Opciones",
+    "swap": "Cambiar por otro",
+    "move_up": "Subir",
+    "move_down": "Bajar"
+  },
+  "back": "Atrás",
+  "no_community_plans": "Aún no hay planes de la comunidad publicados.",
+  "publish_hint": "Ve a Mis planes y publica uno de tus planes para compartirlo aquí.",
+  "time_splitter_practiced": "Practicaste {{song}} durante {{time}}.",
+  "which_part": "¿Qué parte tocaste?"
+}

@@ -1,0 +1,43 @@
+{
+  "track": {
+    "target": "Nivel {{lvl}}, donde se abre la página",
+    "level": "Nivel {{lvl}}"
+  },
+  "opens_at": "{{name}} se abre en el nivel {{lvl}}",
+  "you_are": "Estás en el nivel {{lvl}} — {{left}}, o {{points}} puntos de práctica.",
+  "levels_left_one": "falta {{count}} nivel",
+  "levels_left": "faltan {{count}} niveles",
+  "practise_now": "Practicar ahora",
+  "how_levels": "Cómo funcionan los niveles",
+  "what_else": "Qué más se desbloquea",
+  "lvl": "nv. {{lvl}}",
+  "features": {
+    "summary": {
+      "name": "Hitos",
+      "reason": "Los hitos se construyen con tu propio historial de práctica. Unas cuantas sesiones registradas hacen que los objetivos semanales se ajusten a cómo tocas en vez de adivinar.",
+      "perks": {
+        "0": "Objetivos semanales elegidos según cómo practicas de verdad",
+        "1": "Fama que reclamar cada vez que cumples uno",
+        "2": "Un resumen de en qué se fue la semana, categoría por categoría"
+      }
+    },
+    "guilds": {
+      "name": "Gremios",
+      "reason": "Un gremio funciona porque la gente aparece por los demás. Tras unos niveles ya tienes tu propia rutina — ese es el momento en que unirte aporta algo al resto del gremio, no solo a ti.",
+      "perks": {
+        "0": "Un chat con guitarristas que practican la misma semana que tú",
+        "1": "Un desafío semanal que todo el gremio completa junto",
+        "2": "Un almacén compartido y un escudo que lleva tu gremio"
+      }
+    },
+    "commissions": {
+      "name": "Encargos",
+      "reason": "Los encargos esquivan las tablas de botín, así que esperan a que hayas jugado un tiempo con las cajas. Para entonces, los últimos modelos que faltan en tu Dex son los más difíciles de conseguir — y para eso está el taller.",
+      "perks": {
+        "0": "Encarga cualquier guitarra o pedal que falte en tu Dex",
+        "1": "Se paga con Fama y las piezas de las que está hecho el instrumento",
+        "2": "De serie, con cada ranura de mod libre para los mods de tu almacén"
+      }
+    }
+  }
+}

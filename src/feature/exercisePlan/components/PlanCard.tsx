@@ -118,7 +118,7 @@ export const PlanCard = ({
   isLoading,
   isLocked = false,
 }: PlanCardProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common", "plans"]);
   const { createRipple, ripple } = useRipple("bg-white/15");
 
   const getLocalizedString = (value: string | { en?: string; pl?: string } | undefined): string => {
@@ -234,13 +234,13 @@ export const PlanCard = ({
             {hasPlayalong && !isLocked && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500">
                     <FaYoutube className="h-2.5 w-2.5" />
-                    Playalong
+                    {t("plans:playalong")}
                 </span>
             )}
             {hasVideo && !isLocked && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500">
                     <FaVideo className="h-2.5 w-2.5" />
-                    Video
+                    {t("plans:video")}
                 </span>
             )}
         </div>
@@ -251,7 +251,7 @@ export const PlanCard = ({
                         <TooltipTrigger asChild>
                             <button
                                 type="button"
-                                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                                 aria-pressed={isFavorite}
                                 className={cn(
                                     "flex h-9 w-9 items-center justify-center rounded-[4px] border shadow-lg backdrop-blur-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50 focus-visible:opacity-100",
@@ -267,7 +267,7 @@ export const PlanCard = ({
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            {isFavorite ? "Remove from favorites" : "Add to favorites"}
+                            {isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
@@ -280,7 +280,7 @@ export const PlanCard = ({
                                 <TooltipTrigger asChild>
                                     <button
                                         type="button"
-                                        aria-label={plan.isPublic ? "Unpublish plan" : "Publish plan"}
+                                        aria-label={plan.isPublic ? t("plans:card.unpublish") : t("plans:card.publish")}
                                         className={cn(
                                             "flex h-9 w-9 items-center justify-center rounded-[4px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
                                             plan.isPublic
@@ -293,7 +293,7 @@ export const PlanCard = ({
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    {plan.isPublic ? "Published — click to unpublish" : "Click to publish"}
+                                    {plan.isPublic ? t("plans:card.published_hint") : t("plans:card.publish_hint")}
                                 </TooltipContent>
                             </Tooltip>
                         )}
@@ -302,14 +302,14 @@ export const PlanCard = ({
                                 <TooltipTrigger asChild>
                                     <button
                                         type="button"
-                                        aria-label="Edit plan"
+                                        aria-label={t("plans:card.edit_plan")}
                                         className="flex h-9 w-9 items-center justify-center rounded-[4px] text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
                                         onClick={(e) => { e.stopPropagation(); onEdit(); }}
                                     >
                                         <FaEdit className="h-3.5 w-3.5" />
                                     </button>
                                 </TooltipTrigger>
-                                <TooltipContent>Edit</TooltipContent>
+                                <TooltipContent>{t("plans:edit")}</TooltipContent>
                             </Tooltip>
                         )}
                         {onDelete && (
@@ -317,14 +317,14 @@ export const PlanCard = ({
                                 <TooltipTrigger asChild>
                                     <button
                                         type="button"
-                                        aria-label="Delete plan"
+                                        aria-label={t("plans:card.delete_plan")}
                                         className="flex h-9 w-9 items-center justify-center rounded-[4px] text-zinc-400 transition-colors hover:bg-red-500/15 hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500/50"
                                         onClick={(e) => { e.stopPropagation(); onDelete(); }}
                                     >
                                         <FaTrashAlt className="h-3.5 w-3.5" />
                                     </button>
                                 </TooltipTrigger>
-                                <TooltipContent>Delete</TooltipContent>
+                                <TooltipContent>{t("plans:delete")}</TooltipContent>
                             </Tooltip>
                         )}
                     </div>
@@ -333,7 +333,7 @@ export const PlanCard = ({
             {isLocked && (
               <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/25">
                 <Lock className="h-3 w-3 text-amber-500" />
-                <span className="text-[11px] font-medium text-amber-500">Pro</span>
+                <span className="text-[11px] font-medium text-amber-500">{t("plans:pro")}</span>
               </div>
             )}
         </div>
@@ -416,7 +416,7 @@ export const PlanCard = ({
         {isLocked ? (
           <button
             type="button"
-            aria-label="Upgrade to Pro"
+            aria-label={t("plans:card.upgrade")}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 transition-colors duration-300 group-hover:bg-amber-500 group-hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
             onClick={(e) => { e.stopPropagation(); onUpgrade?.(); }}
           >
@@ -432,7 +432,7 @@ export const PlanCard = ({
                 e.stopPropagation();
                 onPreview();
               }}>
-              Preview
+              {t("plans:details.preview")}
             </button>
           )}
           {/* Labelled pill rather than a bare ↗ — that glyph reads as "opens a

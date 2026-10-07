@@ -1,0 +1,60 @@
+{
+  "toast": {
+    "added": "Aufnahme hinzugefügt!",
+    "add_failed": "Aufnahme konnte nicht hinzugefügt werden.",
+    "comment_added": "Kommentar hinzugefügt!",
+    "comment_failed": "Kommentar konnte nicht hinzugefügt werden.",
+    "logged_out": "Du musst angemeldet sein.",
+    "bad_url": "Bitte gib eine gültige YouTube-URL ein."
+  },
+  "modal": {
+    "edit_title": "Aufnahme bearbeiten",
+    "add_title": "Neue Aufnahme hinzufügen",
+    "which_song": "Welcher Song ist das?",
+    "optional": "(optional)",
+    "artist": "Interpret...",
+    "song_title": "Songtitel...",
+    "search_hint": "Gib einen Interpreten oder Songtitel ein, um deine Bibliothek zu durchsuchen",
+    "not_in_library": "Nicht in der Bibliothek",
+    "saved_as_typed": "Kein Problem — wir speichern es genau so, wie du es eingegeben hast.",
+    "youtube_url": "YouTube-URL *",
+    "title": "Titel *",
+    "title_placeholder": "Mein großartiges Cover",
+    "description": "Beschreibung",
+    "description_placeholder": "Erzähl uns von deiner Aufnahme...",
+    "cancel": "Abbrechen",
+    "save": "Änderungen speichern",
+    "share": "Aufnahme teilen"
+  },
+  "card": {
+    "play": "{{title}} abspielen",
+    "edit": "Aufnahme bearbeiten",
+    "delete_aria": "Aufnahme löschen",
+    "confirm_title": "Bist du sicher?",
+    "confirm_body": "Das lässt sich nicht rückgängig machen. Deine Aufnahme wird dauerhaft gelöscht.",
+    "deleting": "Wird gelöscht...",
+    "delete": "Löschen",
+    "like": "Aufnahme liken",
+    "comments": "Kommentare ansehen"
+  },
+  "grid": {
+    "empty_title": "Keine Aufnahmen gefunden",
+    "empty_body": "Lade als Erster dein Cover hoch!"
+  },
+  "view": {
+    "title": "Aufnahmen",
+    "subtitle": "Hör dir deine Übungssessions an und teile sie",
+    "add": "Aufnahme hinzufügen",
+    "all": "Alle Aufnahmen",
+    "mine": "Meine Aufnahmen"
+  },
+  "viewer": {
+    "not_found": "Aufnahme nicht gefunden",
+    "comments": "Kommentare ({{count}})",
+    "no_comments": "Noch keine Kommentare.",
+    "write_comment": "Schreib einen Kommentar..."
+  },
+  "song_section": {
+    "empty": "Noch keine Aufnahmen zu diesem Song — teile als Erster dein Cover."
+  }
+}

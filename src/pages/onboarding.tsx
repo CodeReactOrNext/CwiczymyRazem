@@ -1,4 +1,5 @@
 import OnboardingView from "feature/onboarding/view";
+import { LocalizedRegion } from "lib/i18n/LocalizedRegion";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { withAuth } from "utils/auth/serverAuth";
@@ -14,7 +15,10 @@ const OnboardingPage: NextPage = () => {
         />
         <meta name='robots' content='noindex' />
       </Head>
-      <OnboardingView />
+      {/* Behind login and noindex, so it follows the player's language like the app. */}
+      <LocalizedRegion>
+        <OnboardingView />
+      </LocalizedRegion>
     </>
   );
 };

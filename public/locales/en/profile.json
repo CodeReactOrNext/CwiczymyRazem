@@ -115,5 +115,350 @@
   "no_songs_description": "Add your first songs to the library to track your progress.",
   "browse_library": "Browse Library",
   "weekly_summary": "Weekly Summary",
-  "sessions_this_week": "sessions this week"
+  "sessions_this_week": "sessions this week",
+  "recordings_hint": "Performance and practice covers",
+  "days_ago": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "days": "{{count}} days ago",
+    "month": "A month ago",
+    "months": "{{count}} months ago",
+    "year": "A year ago",
+    "years": "{{count}} years ago"
+  },
+  "layout": {
+    "sections": {
+      "trophies": {
+        "title": "Trophy case",
+        "description": "Up to five achievements you are proudest of, with how rare they are."
+      },
+      "signature-songs": {
+        "title": "Signature songs",
+        "description": "Up to five learned songs you want to be known for."
+      },
+      "about": {
+        "title": "About me",
+        "description": "A few words about you, your gear or your goals."
+      },
+      "insights": {
+        "title": "Practice insights",
+        "description": "Average session length, points per hour, strongest area."
+      },
+      "activity": {
+        "title": "Activity",
+        "description": "The year-long practice heatmap."
+      },
+      "statistics": {
+        "title": "Statistics",
+        "description": "Total time, points, sessions and skill split."
+      },
+      "repertoire": {
+        "title": "Song repertoire",
+        "description": "Learned songs grouped by difficulty tier."
+      },
+      "learning": {
+        "title": "Currently learning",
+        "description": "Songs you are working on right now."
+      },
+      "skills": {
+        "title": "Skills",
+        "description": "Unlocked skills and their levels."
+      },
+      "rig": {
+        "title": "Rig",
+        "description": "Your guitars and pedalboard."
+      },
+      "recordings": {
+        "title": "Recordings",
+        "description": "Covers and practice videos you uploaded."
+      },
+      "seasonal": {
+        "title": "Seasonal achievements",
+        "description": "Badges from monthly seasons."
+      }
+    },
+    "facts": {
+      "last-practice": "Last practice",
+      "streak": "Streak",
+      "joined": "Joined",
+      "playing-for": "Playing for",
+      "band": "Band",
+      "guild": "Guild",
+      "links": "YouTube / SoundCloud"
+    },
+    "badges": {
+      "level": "Level ring",
+      "song-tier": "Song tier"
+    },
+    "accents": {
+      "cyan": "Cyan",
+      "emerald": "Emerald",
+      "amber": "Amber",
+      "orange": "Orange",
+      "purple": "Purple"
+    },
+    "accent_unlocks": {
+      "cyan": "Free",
+      "emerald": "Free",
+      "orange": "Keep a 15-day streak (Infinity)",
+      "amber": "Earn any very rare achievement",
+      "purple": "Earn any epic achievement"
+    },
+    "banners": {
+      "classic": {
+        "label": "Classic",
+        "requirement": "Free"
+      },
+      "midnight": {
+        "label": "Midnight",
+        "requirement": "Free"
+      },
+      "stage": {
+        "label": "Stage lights",
+        "requirement": "Log a performance session (Stage Debut) or 100 sessions"
+      },
+      "on-air": {
+        "label": "On air",
+        "requirement": "Record your practice (Something was Recorded or Record Idea)"
+      },
+      "ember": {
+        "label": "Ember",
+        "requirement": "Earn 60 points in one report (Guitar Power)"
+      },
+      "golden-hour": {
+        "label": "Golden hour",
+        "requirement": "Practise 100 hours (1% – 10000h rule)"
+      },
+      "deep-water": {
+        "label": "Deep water",
+        "requirement": "Keep a 15-day streak or practise on 100 days"
+      },
+      "amethyst": {
+        "label": "Amethyst",
+        "requirement": "Earn any epic achievement"
+      }
+    },
+    "rarity": {
+      "common": "Common",
+      "rare": "Rare",
+      "veryRare": "Very rare",
+      "epic": "Epic"
+    },
+    "titles": {
+      "time_1": "the Hard Worker",
+      "time_2": "the Unflinching",
+      "time_3": "the Ten-Thousand-Hour Pilgrim",
+      "balance": "of the Golden Mean",
+      "fire": "the Powerhouse",
+      "health_habits": "the Healthy",
+      "points_1": "the Surface Scratcher",
+      "points_2": "the Chord Bird",
+      "points_3": "the Frog King",
+      "doctor": "the Doctor",
+      "tired": "the Exhausted",
+      "diamond": "of the Diamond Guitar",
+      "scientist": "the Scientist",
+      "artist": "the Artist",
+      "book": "the Erudite",
+      "bigear": "the Big Ear",
+      "wizard": "the Wizard",
+      "medal": "the Decorated",
+      "day_1": "the Consistent",
+      "day_2": "of the Full Week",
+      "day_3": "the Relentless",
+      "session_1": "the Clicker",
+      "session_2": "the Traveler",
+      "session_3": "the Cowboy",
+      "ring": "of the String Ring",
+      "headphones": "the Listener",
+      "ninja": "the Technical Warrior",
+      "record": "the Recorder",
+      "vinyl": "the Idea Pressed to Vinyl",
+      "rightway": "the Warmed-Up",
+      "yolo": "the Reckless",
+      "path": "the Planner",
+      "dumbbel": "the Heavy Lifter",
+      "vip": "the Builder of Riff Quest",
+      "short": "the Enduring",
+      "event": "the Eventgoer",
+      "lvl100": "the Legendary Pick",
+      "fireSession": "of the Perfect Session",
+      "batteryHearth": "the Battery Heart",
+      "100days": "of a Hundred Days",
+      "bomb": "the Streak Saver",
+      "wannaLearn1": "the Lone Warrior",
+      "wannaLearn2": "the Double-Minded",
+      "wannaLearn3": "the Notebook Filler",
+      "wannaLearn10": "Lost in Notes",
+      "wannaLearn30": "of the Infinite Wishlist",
+      "learning1": "the First Lift",
+      "learning3": "the Bar Raiser",
+      "learning5": "the Pusher",
+      "learning10": "of the Musical Muscles",
+      "learning20": "the Juggler",
+      "learning30": "of the Musical Aura",
+      "learned1": "the Two of Hearts",
+      "learned3": "the Three of Diamonds",
+      "learned5": "the Four of Diamonds",
+      "learned10": "the Five of Diamonds",
+      "learned20": "the Six of Diamonds",
+      "learned30": "the Jack of Diamonds",
+      "learned50": "the King of Diamonds",
+      "learned100": "the Ace of Diamonds",
+      "performance": "of the Stage Debut",
+      "rig_50": "of the Signal Path",
+      "rig_150": "the Stage Ready",
+      "rig_300": "of the Studio Wall",
+      "rig_500": "the Headliner",
+      "rig_800": "of the Wall of Sound",
+      "rig_1000": "of Four Figures",
+      "first_rare": "the Something Special",
+      "first_epic": "the Collector",
+      "first_legendary": "One of the Greats",
+      "first_mythic": "the Grail Holder",
+      "rarity_full_set": "of the Full Spread",
+      "museum_1": "the Curator",
+      "museum_5": "of the Private Collection",
+      "serial_one": "the Number One",
+      "globetrotter": "the Well Travelled",
+      "vintage_1970": "Older Than the Amp"
+    }
+  },
+  "card_sheet": {
+    "title": "Profile card",
+    "description": "Decide what visitors see first. Changes save automatically.",
+    "tabs": {
+      "card": "Card",
+      "style": "Style",
+      "title": "Title",
+      "trophies": "Trophies",
+      "songs": "Songs"
+    },
+    "tagline": "Tagline",
+    "tagline_placeholder": "Metal rhythm player chasing 200 bpm",
+    "tagline_hint": "Shown under your name.",
+    "about": "About me",
+    "about_placeholder": "What you play, what you are working on, your gear…",
+    "about_hint": "Shown in the About me section.",
+    "facts": "Facts under your name",
+    "facts_settings_hint": "Band, links and the year you started playing are set in",
+    "settings_link": "Settings",
+    "badges": "Badges on the right",
+    "no_achievements": "You have no achievements yet. Every one you earn adds a title and a trophy to pick from here.",
+    "title_hint": "Every achievement comes with a title. Wear one above your name — rarer ones are listed first.",
+    "no_title": "No title",
+    "trophies_hint": "Pin up to {{max}} ({{count}}/{{max}}), in the order you pick them. With nothing pinned, the case shows your rarest ones.",
+    "no_songs": "Mark songs as learned on your song board and they can be pinned here.",
+    "songs_hint": "Pin up to {{max}} ({{count}}/{{max}}) learned songs, in the order you pick them. With nothing pinned, the case shows your hardest ones.",
+    "background": "Background",
+    "background_hint": "Scenes behind your header. Each one is earned by an achievement.",
+    "emblem": "Emblem",
+    "emblem_hint": "One of your achievement icons, stamped large into the header background in its rarity colour.",
+    "no_emblem": "No emblem",
+    "none": "None",
+    "accent": "Accent colour",
+    "accent_hint": "Colours open up as you earn rarer achievements."
+  },
+  "sections": {
+    "slots": "{{count}}/{{max}} slots",
+    "edit_hint": "Drag to reorder, hide what you don't want to show.",
+    "add": "Add section",
+    "reset": "Reset",
+    "done": "Done",
+    "customize": "Customize profile",
+    "empty_owner": "Your profile shows only the card right now.",
+    "empty_visitor": "This player keeps their profile short.",
+    "add_title": "Add to profile",
+    "add_description": "New sections land at the bottom — drag them where they belong.",
+    "add_empty": "Every section is already on your profile.",
+    "full": "Your profile is full — {{max}} of {{max}} slots used. Hide a section to make room."
+  },
+  "tile": {
+    "move": "Move {{title}}",
+    "drag": "Drag to move",
+    "move_up_aria": "Move {{title}} up",
+    "move_up": "Move up",
+    "move_down_aria": "Move {{title}} down",
+    "move_down": "Move down",
+    "make_half": "Make {{title}} half width",
+    "make_full": "Make {{title}} full width",
+    "half": "Half width",
+    "full": "Full width",
+    "hide_aria": "Hide {{title}}",
+    "hide": "Hide from profile"
+  },
+  "header": {
+    "not_yet": "Not yet",
+    "days_one": "{{count}} day",
+    "days": "{{count}} days",
+    "playing_guitar": "Playing guitar",
+    "years_one": "{{count}} year",
+    "years": "{{count}} years",
+    "eyebrow": "Player Profile",
+    "title_from": "Title from an achievement · {{rarity}}"
+  },
+  "cases": {
+    "rarest": "Rarest achievements",
+    "hardest": "Hardest songs learned",
+    "pin_hint": "Pin your own in Customize profile → Profile card.",
+    "players_rate": "{{rate}}% of players",
+    "title": "Title: {{title}}",
+    "time_spent": "Time spent practising this song"
+  },
+  "tier_badge": {
+    "label": "Song tier",
+    "unavailable": "Unavailable",
+    "no_rated": "No rated songs",
+    "more_one": "{{count}} more song",
+    "more": "{{count}} more songs",
+    "loading": "Loading the song tier…",
+    "error": "These songs could not be loaded, so there is no tier to show. Refreshing usually fixes it.",
+    "how_it_works": "A tier is a weighted average of the hardest mastered songs, capped by the difficulty of the hardest one — so a single hard song won't jump anyone to a high tier.",
+    "click_board": "Click to see your song board.",
+    "learn_own_one": "Learn {{count}} more song to unlock your tier.",
+    "learn_own": "Learn {{count}} more songs to unlock your tier.",
+    "learn_other_one": "{{count}} more learned song needed before a tier shows up.",
+    "learn_other": "{{count}} more learned songs needed before a tier shows up.",
+    "none_rated_own": "None of your learned songs are rated yet, so there is no tier to work out.",
+    "none_rated_other": "None of these learned songs are rated yet, so there is no tier to work out."
+  },
+  "score_tooltip": {
+    "streak": "{{count}}-day streak",
+    "no_streak": "No streak yet",
+    "earn_now": "You earn right now",
+    "per_hour": "Per hour of practice",
+    "per_habit": "Per habit ticked",
+    "ladder": {
+      "0": "Day 1",
+      "1": "Day 2",
+      "2": "Day 3",
+      "3": "Day 4",
+      "4": "Day 5+"
+    }
+  },
+  "repertoire": {
+    "empty_owner": "Songs land here once you mark them as learned on your song board.",
+    "empty_owner_learning": "Songs land here once you mark them as learned on your song board, and {{count}} are still in progress.",
+    "empty_visitor": "No songs marked as learned yet.",
+    "empty_visitor_learning": "No songs marked as learned yet, {{count}} in progress.",
+    "learned": "{{count}} songs learned",
+    "in_progress": "{{count}} in progress"
+  },
+  "week_widget": {
+    "this_week": "This week",
+    "total": "Total",
+    "practiced": "{{time}} practiced"
+  },
+  "stats_section": {
+    "skills_hint": "Distribution of exercise time by category"
+  },
+  "rig": {
+    "level": "Rig level",
+    "level_hint": "Total rig level (equipped guitars + pedalboard)",
+    "off_board": "Off the board"
+  },
+  "landing": {
+    "great_job": "Great job today!",
+    "start_today": "Start today's practice"
+  }
 }

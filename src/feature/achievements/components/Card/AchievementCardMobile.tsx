@@ -47,7 +47,7 @@ export const AchievementCardMobile = ({ Icon, rarity, name, description, childre
               {progress && (
                 <div className="mt-4 bg-white/10 rounded-lg p-2 max-w-[200px] mx-auto">
                     <div className="flex justify-center gap-2 text-xs font-bold opacity-80">
-                        <span className="uppercase text-[10px] tracking-wider">Progress</span>
+                        <span className="uppercase text-[10px] tracking-wider">{t("progress", "Progress")}</span>
                         <span className="text-green-400">{progress.current} / {progress.max}</span>
                     </div>
                 </div>

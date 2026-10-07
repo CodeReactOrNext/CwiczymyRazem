@@ -1,0 +1,60 @@
+{
+  "fetch_error": "Beim Laden der Daten ist ein Fehler aufgetreten. Bitte lade die Seite neu.",
+  "points": "Punkte",
+  "exercise_time": "Übungszeit",
+  "achievements": "Erfolge",
+  "empty": "Leer",
+  "sort_by_points": "Nach Punkten sortieren",
+  "sort_by_sessions": "Nach Sessions sortieren",
+  "global_leaderboard": "Gesamt",
+  "seasonal_leaderboard": "Saison",
+  "gear_leaderboard": "Equipment",
+  "gear_title": "Equipment-Rangliste",
+  "gear_subtitle": "Sieh nach, wessen Rig sie alle schlägt",
+  "rig_level": "Rig-Level",
+  "guitars": "Gitarren",
+  "effects": "Effekte",
+  "no_gear_data_found": "Keine Nutzer mit Equipment gefunden",
+  "current_season": "Aktuelle Saison",
+  "showing": "Angezeigt",
+  "of": "von",
+  "users": "Nutzern",
+  "no_users_found": "Keine Nutzer gefunden",
+  "no_seasonal_data": "Keine Saisondaten verfügbar",
+  "no_seasonal_data_found": "In dieser Saison wurden keine Nutzer gefunden",
+  "seasons_fetch_error": "Saisons konnten nicht geladen werden",
+  "season_change_error": "Saison konnte nicht gewechselt werden",
+  "view_change_error": "Ansicht konnte nicht gewechselt werden",
+  "empty_users_title": "Keine Spieler",
+  "select_season": "Saison wählen",
+  "rank": {
+    "your_position": "Deine Position",
+    "out_of": "von {{total}}",
+    "to_pass": "{{unit}}, um {{name}} zu überholen (#{{place}})",
+    "jump": "Zu meinem Rang springen",
+    "level": "Level",
+    "levels": "Level",
+    "point": "Punkt",
+    "points": "Punkte"
+  },
+  "hero": {
+    "season": "Saison",
+    "season_subtitle": "Übe, um in der Rangliste aufzusteigen.",
+    "seasonal_eyebrow": "Saison-Rangliste",
+    "rig_eyebrow": "Rig-Rangliste",
+    "title": "Rangliste",
+    "subtitle": "Sieh, wie du im Vergleich zu anderen Spielern abschneidest",
+    "all_time_eyebrow": "Ewige Rangliste",
+    "sections": "Ranglisten-Bereiche",
+    "how_points": "So funktionieren Punkte"
+  },
+  "scope": {
+    "top": "Top-Spieler",
+    "around": "Um dich herum",
+    "around_error": "Die Spieler um dich herum konnten nicht geladen werden. Versuch es gleich nochmal."
+  },
+  "rig": {
+    "guitar_level": "Gitarrenlevel",
+    "empty_slot": "Leerer Platz {{n}}"
+  }
+}

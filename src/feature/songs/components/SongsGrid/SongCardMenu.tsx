@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,6 +54,7 @@ export const SongCardMenu = ({
   onOpenChange,
   triggerClassName,
 }: SongCardMenuProps) => {
+  const { t } = useTranslation("songs");
   const router = useRouter();
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUserInfo);
@@ -62,7 +64,7 @@ export const SongCardMenu = ({
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <button
-          aria-label="Song actions"
+          aria-label={t("card.actions")}
           className={triggerClassName}
           onClick={(e) => e.stopPropagation()}
         >
@@ -78,14 +80,14 @@ export const SongCardMenu = ({
           className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white"
         >
           <Eye className="h-3.5 w-3.5" />
-          Open in board
+          {t("card.open_in_board")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => (onPlay ? onPlay() : router.push(`/timer/song/${song.id}`))}
           className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white"
         >
           <Play className="h-3 w-3 fill-current" />
-          Practice
+          {t("card.practice")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() =>
@@ -97,7 +99,7 @@ export const SongCardMenu = ({
           )}
         >
           <Heart className={cn("h-3.5 w-3.5", isFavorite && "fill-current")} />
-          {isFavorite ? "Remove from favorites" : "Add to favorites"}
+          {isFavorite ? t("board.remove_favorite") : t("board.add_favorite")}
         </DropdownMenuItem>
         <AddToPlaylistSub song={song} />
 
@@ -118,7 +120,9 @@ export const SongCardMenu = ({
             >
               <Icon className={cn("h-3.5 w-3.5", meta.color)} />
               <span className="flex-1">
-                {isActive ? meta.label : `Move to ${meta.label}`}
+                {isActive
+                  ? t(`status_labels.${status}`, meta.label)
+                  : t("card.move_to", { status: t(`status_labels.${status}`, meta.label) })}
               </span>
               {isActive && <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />}
             </DropdownMenuItem>
@@ -133,7 +137,7 @@ export const SongCardMenu = ({
               className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400/80 hover:bg-red-500/10 hover:text-red-400"
             >
               <Trash2 className="h-3.5 w-3.5" />
-              Remove from collection
+              {t("card.remove_from_collection")}
             </DropdownMenuItem>
           </>
         )}

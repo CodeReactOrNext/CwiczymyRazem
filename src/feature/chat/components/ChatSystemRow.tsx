@@ -3,6 +3,7 @@ import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import type { ChatMessageType } from "feature/chat/types/chat.types";
 import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
+import { useTranslation } from "hooks/useTranslation";
 import { Hand, Shield } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -35,6 +36,7 @@ const NAMED_GREETERS = 2;
 
 /** Their faces, then "Ania and Bob said hi" — names bright enough to read at a glance. */
 const Greeters = ({ greeters }: { greeters: ChatMessageType[] }) => {
+  const { t } = useTranslation("chat");
   const named = greeters.slice(0, NAMED_GREETERS);
   const rest = greeters.length - named.length;
 
@@ -56,13 +58,14 @@ const Greeters = ({ greeters }: { greeters: ChatMessageType[] }) => {
       <p className='min-w-0 text-sm text-zinc-500'>
         {named.map((greeter, index) => (
           <span key={greeter.userId}>
-            {index > 0 && (rest > 0 ? ", " : " and ")}
+            {index > 0 && (rest > 0 ? ", " : ` ${t("system.and")} `)}
             <span className='font-semibold text-zinc-200'>
               {greeter.username}
             </span>
           </span>
         ))}
-        {rest > 0 && ` and ${rest} other${rest === 1 ? "" : "s"}`} said hi
+        {rest > 0 && ` ${t(rest === 1 ? "system.and_other" : "system.and_others", { count: rest })}`}{" "}
+        {t("system.said_hi")}
       </p>
     </div>
   );
@@ -82,7 +85,9 @@ const JoinRow = ({
   text: string;
   onSayHi?: () => void;
   greeters: ChatMessageType[];
-}) => (
+}) => {
+  const { t } = useTranslation("chat");
+  return (
   <div className='flex min-w-0 max-w-[90%] gap-3'>
     <div className='flex w-10 flex-shrink-0 justify-center'>
       <UserTooltip userId={message.userId}>
@@ -116,7 +121,7 @@ const JoinRow = ({
                 FOCUS_RING,
               )}>
               <Hand className='h-4 w-4' />
-              Say hi
+              {t("system.say_hi")}
             </button>
           )}
           {greeters.length > 0 && <Greeters greeters={greeters} />}
@@ -124,7 +129,8 @@ const JoinRow = ({
       )}
     </div>
   </div>
-);
+  );
+};
 
 /** Rows drawn like someone speaking, on the left, rather than as a line across the room. */
 export const isJoinRow = (message: ChatMessageType) =>
@@ -147,16 +153,18 @@ export const ChatSystemRow = ({
   /** Stock greetings answering this row, named in one line instead of a bubble each. */
   greeters?: ChatMessageType[];
 }) => {
+  const { t } = useTranslation("chat");
   if (message.type === "welcome") {
     const phrase = welcomeGoalPhrase(
       message.welcome?.goal,
       message.welcome?.planTitle,
+      t,
     );
 
     return (
       <JoinRow
         message={message}
-        text={phrase ? `Joined Riff Quest, ${phrase}` : "Joined Riff Quest"}
+        text={phrase ? t("system.joined_with", { phrase }) : t("system.joined")}
         onSayHi={onSayHi}
         greeters={greeters}
       />
@@ -171,11 +179,11 @@ export const ChatSystemRow = ({
       return (
         <EventLine icon={<Shield className='h-5 w-5' />} tone='text-amber-400'>
           <span className='font-semibold text-zinc-100'>{event.guildName}</span>{" "}
-          reached level{" "}
+          {t("system.reached_level")}{" "}
           <span className='font-semibold text-amber-300'>{event.level}</span>
           {event.quests.length > 0 && (
             <span className='mt-0.5 block text-xs text-zinc-500'>
-              Cleared: {event.quests.join(", ")}
+              {t("system.cleared", { quests: event.quests.join(", ") })}
             </span>
           )}
         </EventLine>
@@ -184,7 +192,7 @@ export const ChatSystemRow = ({
       return (
         <JoinRow
           message={message}
-          text='Joined the guild'
+          text={t("system.joined_guild")}
           onSayHi={onSayHi}
           greeters={greeters}
         />

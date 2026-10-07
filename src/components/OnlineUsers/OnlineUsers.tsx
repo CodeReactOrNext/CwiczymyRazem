@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
 import { SupportMark } from "feature/supportTeam/components/SupportBadge";
@@ -15,6 +16,7 @@ interface OnlineUsersProps {
 }
 
 export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
+    const { t } = useTranslation("ui");
     const { onlineUsers, isDbEnabled } = useOnlineUsers();
     const { isSupport, getSupportMember } = useSupportTeam();
 
@@ -113,7 +115,7 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
                                         {user.platform === "desktop" && (
                                             <div
                                                 className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-zinc-950 bg-zinc-800"
-                                                title="Using the desktop app">
+                                                title={t("using_desktop_app")}>
                                                 <Monitor className="h-2 w-2 text-zinc-400" strokeWidth={2.5} />
                                             </div>
                                         )}

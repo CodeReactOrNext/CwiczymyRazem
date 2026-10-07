@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { playCompletionSound } from "utils/audioUtils";
@@ -82,6 +83,7 @@ export const SessionDialogs = ({
   showSuccessView,
   isLastExercise,
 }: SessionDialogsProps) => {
+  const { t } = useTranslation("session");
   const { isLeaderboardOpen, closeLeaderboard } = useSessionUI();
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
   const { timeLeft } = useTimerContext();
@@ -169,8 +171,8 @@ export const SessionDialogs = ({
                 <FaCheck className='h-6 w-6 text-black' />
               </div>
               <div>
-                <h4 className='text-lg font-bold tracking-tight text-black leading-none'>Exercise Finished!</h4>
-                <p className='mt-1 text-[10px] font-semibold text-black/60 tracking-wide'>Great job on this one!</p>
+                <h4 className='text-lg font-bold tracking-tight text-black leading-none'>{t("dialogs.finished")}</h4>
+                <p className='mt-1 text-[10px] font-semibold text-black/60 tracking-wide'>{t("dialogs.great_job")}</p>
               </div>
             </div>
           </motion.div>

@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { FaCheck } from "react-icons/fa";
 
 interface BpmProgressGridProps {
@@ -19,6 +20,7 @@ export const BpmProgressGrid = ({
   isLoading = false,
   readOnly = false,
 }: BpmProgressGridProps) => {
+  const { t } = useTranslation("plans");
   if (bpmStages.length === 0) return null;
 
   const completedCount = completedBpms.length;
@@ -28,7 +30,7 @@ export const BpmProgressGrid = ({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-          BPM Progress
+          {t("bpm_progress")}
         </span>
         <span className="text-[10px] font-bold text-white">
           {completedCount}/{totalCount}

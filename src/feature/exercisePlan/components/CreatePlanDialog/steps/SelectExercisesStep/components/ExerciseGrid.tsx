@@ -3,6 +3,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect,useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -25,6 +26,7 @@ export const ExerciseGrid = ({
   onPreviewExercise,
   privateExerciseIds,
 }: ExerciseGridProps) => {
+  const { t } = useTranslation("plans");
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
@@ -95,7 +97,7 @@ export const ExerciseGrid = ({
         })}
         {paginatedExercises.length === 0 && (
           <div className="py-12 text-center text-zinc-500 text-[13px]">
-            No exercises match your criteria.
+            {t("no_match_criteria")}
           </div>
         )}
       </div>

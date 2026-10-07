@@ -87,17 +87,17 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
                     {playerTier.tier}
                   </div>
                   <div className="flex flex-col">
-                     <span className="text-lg font-black text-white/90 leading-none">Tier</span>
+                     <span className="text-lg font-black text-white/90 leading-none">{t("detail.tier")}</span>
                      <span className="text-[10px] font-bold text-zinc-500 mt-1">
-                        Power score: <span className="text-zinc-300">{skillPower.toFixed(1)}</span>
+                        {t("power.score_label")} <span className="text-zinc-300">{skillPower.toFixed(1)}</span>
                      </span>
                   </div>
                </div>
             ) : (
                <div className="flex flex-col">
-                  <h3 className="text-2xl font-black text-zinc-500">Unrated</h3>
+                  <h3 className="text-2xl font-black text-zinc-500">{t("tier.unrated")}</h3>
                   <p className="text-[10px] font-medium text-zinc-600 mt-1 leading-snug">
-                     Master more songs to evaluate your level.
+                     {t("power.master_more")}
                   </p>
                </div>
             )}

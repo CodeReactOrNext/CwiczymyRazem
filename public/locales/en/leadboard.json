@@ -24,5 +24,37 @@
   "no_seasonal_data_found": "No users found in this season",
   "seasons_fetch_error": "Error loading seasons",
   "season_change_error": "Error changing season",
-  "view_change_error": "Error changing view"
+  "view_change_error": "Error changing view",
+  "empty_users_title": "No players",
+  "select_season": "Select a season",
+  "rank": {
+    "your_position": "Your position",
+    "out_of": "out of {{total}}",
+    "to_pass": "{{unit}} to pass {{name}} (#{{place}})",
+    "jump": "Jump to my rank",
+    "level": "level",
+    "levels": "levels",
+    "point": "point",
+    "points": "points"
+  },
+  "hero": {
+    "season": "Season",
+    "season_subtitle": "Practice to climb the leaderboard.",
+    "seasonal_eyebrow": "Seasonal ranking",
+    "rig_eyebrow": "Rig ranking",
+    "title": "Leaderboard",
+    "subtitle": "See how you rank against other players",
+    "all_time_eyebrow": "All-time ranking",
+    "sections": "Leaderboard sections",
+    "how_points": "How points work"
+  },
+  "scope": {
+    "top": "Top players",
+    "around": "Around you",
+    "around_error": "Could not load the players around you. Try again in a moment."
+  },
+  "rig": {
+    "guitar_level": "Guitar level",
+    "empty_slot": "Empty slot {{n}}"
+  }
 }

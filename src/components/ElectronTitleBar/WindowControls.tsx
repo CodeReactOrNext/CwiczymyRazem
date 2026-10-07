@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import { Minus, X } from "lucide-react";
 
@@ -72,18 +73,21 @@ export const WindowControls = ({
   onToggleMaximize,
   onClose,
   className,
-}: WindowControlsProps) => (
+}: WindowControlsProps) => {
+  const { t } = useTranslation("desktop");
+  return (
   <div className={cn("flex items-stretch", className)}>
-    <WindowButton label='Minimalizuj' onClick={onMinimize}>
+    <WindowButton label={t("minimize")} onClick={onMinimize}>
       <Minus size={13} strokeWidth={1.5} />
     </WindowButton>
     <WindowButton
-      label={isMaximized ? "Przywróć" : "Maksymalizuj"}
+      label={isMaximized ? t("restore") : t("maximize")}
       onClick={onToggleMaximize}>
       {isMaximized ? <RestoreIcon /> : <MaximizeIcon />}
     </WindowButton>
-    <WindowButton label='Zamknij' variant='close' onClick={onClose}>
+    <WindowButton label={t("close")} variant='close' onClick={onClose}>
       <X size={14} strokeWidth={1.5} />
     </WindowButton>
   </div>
-);
+  );
+};

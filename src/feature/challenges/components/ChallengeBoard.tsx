@@ -17,6 +17,8 @@ import {
   groupSubmissionsBySong,
 } from "feature/challenges/utils/challengeProgress";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Check, Flag, Music, Play, Upload, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -52,6 +54,7 @@ const ChallengeRow = ({
   onOpenRuns,
   onOpenSong,
 }: ChallengeRowProps) => {
+  const { t } = useTranslation("challenges");
   const tier = getSongTier(
     (song.avgDifficulty ?? 0) === 0
       ? "?"
@@ -114,7 +117,7 @@ const ChallengeRow = ({
           onClick={onOpenSong}
           className='absolute inset-0 rounded-lg'>
           <span className='sr-only'>
-            Listen to {song.title} by {song.artist}
+            {t("board.listen", { title: song.title, artist: song.artist })}
           </span>
         </button>
 
@@ -145,7 +148,7 @@ const ChallengeRow = ({
             {song.artist}
             {song.votes > 0 && (
               <span className='ml-2 text-zinc-600'>
-                {song.votes} {song.votes === 1 ? "vote" : "votes"}
+                {song.votes === 1 ? t("board.vote", { count: song.votes }) : t("board.votes", { count: song.votes })}
               </span>
             )}
           </p>
@@ -183,7 +186,7 @@ const ChallengeRow = ({
         {isCleared ? (
           <span className='flex h-8 w-[92px] shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green-500/10 text-xs font-bold text-green-400'>
             <Check className='h-3.5 w-3.5' strokeWidth={3} />
-            Done
+            {t("board.done")}
           </span>
         ) : (
           <Button
@@ -199,7 +202,7 @@ const ChallengeRow = ({
             )}>
             <span className='flex items-center gap-1.5'>
               <Upload className='h-3.5 w-3.5' />
-              Submit
+              {t("board.submit")}
             </span>
           </Button>
         )}
@@ -214,6 +217,7 @@ export const ChallengeBoard = ({
   currentUserId,
   userName,
 }: ChallengeBoardProps) => {
+  const { t } = useTranslation("challenges");
   const [submitSong, setSubmitSong] = useState<ChallengeSong | null>(null);
   const [runsSong, setRunsSong] = useState<ChallengeSong | null>(null);
   const [previewSong, setPreviewSong] = useState<ChallengeSong | null>(null);
@@ -286,26 +290,32 @@ export const ChallengeBoard = ({
                   "text-sm font-bold",
                   hasClearedBoard ? "text-amber-300" : "text-white",
                 )}>
-                {hasClearedBoard ? "Board cleared" : "Final stop"}
+                {hasClearedBoard ? t("board.cleared") : t("board.final_stop")}
               </p>
               <p className='flex flex-wrap items-center gap-1 text-xs font-medium text-zinc-500'>
                 {hasClearedBoard ? (
                   isLive ? (
-                    <>
-                      Every song recorded — the
-                      <FameIcon className='h-3.5 w-3.5' />
-                      <span className='font-bold text-amber-300'>
-                        +{FAME_CLEAR_BONUS}
-                      </span>
-                      fame bonus is yours.
-                    </>
+                    <Interpolate
+                      text={t("board.bonus_yours")}
+                      values={{
+                        bonus: (
+                          <>
+                            <FameIcon className='h-3.5 w-3.5' />
+                            <span className='font-bold text-amber-300'>
+                              +{FAME_CLEAR_BONUS}
+                            </span>
+                          </>
+                        ),
+                      }}
+                    />
                   ) : (
-                    "Every song recorded — a clean sweep of the archive."
+                    t("board.clean_sweep")
                   )
                 ) : (
-                  `${songs.length - clearedCount} more ${
-                    songs.length - clearedCount === 1 ? "run" : "runs"
-                  } to clear ${isLive ? "the month" : "this board"}`
+                  t(
+                    `board.${songs.length - clearedCount === 1 ? "one_more" : "more"}_${isLive ? "month" : "board"}`,
+                    { count: songs.length - clearedCount },
+                  )
                 )}
               </p>
             </div>

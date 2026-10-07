@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import {
   Tooltip,
   TooltipContent,
@@ -57,6 +58,7 @@ export const SongCard = ({
   parts,
   onPartsChange,
 }: SongCardProps) => {
+  const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
   const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty === 0 ? "?" : (song.tier || avgDifficulty));
@@ -150,12 +152,12 @@ export const SongCard = ({
         >
           {onPlay && (
             <button
-              aria-label="Practice"
+              aria-label={t("card.practice")}
               onClick={(e) => { e.stopPropagation(); onPlay(); }}
               className="flex h-8 w-8 items-center justify-center gap-1.5 rounded-md bg-black text-white shadow-lg transition-colors hover:bg-zinc-900 active:scale-95 lg:w-auto lg:px-2.5"
             >
               <Play className="h-4 w-4 fill-current" />
-              <span className="hidden text-xs font-bold lg:inline">Practice</span>
+              <span className="hidden text-xs font-bold lg:inline">{t("card.practice")}</span>
             </button>
           )}
 
@@ -204,7 +206,7 @@ export const SongCard = ({
                   <span className="text-xs font-semibold">{formatPracticeMs(practiceMs)}</span>
                 </div>
               ) : (
-                <span className="text-xs font-medium text-zinc-500">Not practiced</span>
+                <span className="text-xs font-medium text-zinc-500">{t("card.not_practiced")}</span>
               )
             ) : (
               <>
@@ -234,7 +236,7 @@ export const SongCard = ({
                     <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />
                   </TooltipTrigger>
                   <TooltipContent side="top" className="border-white/10 bg-zinc-900 text-xs font-bold text-zinc-200">
-                    Rated by you
+                    {t("card.rated_by_you")}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

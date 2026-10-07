@@ -5,6 +5,7 @@ import { songExerciseId } from "feature/exercisePlan/utils/songToExercise";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, FileMusic, Library, ListVideo, Loader2, Music, Plus } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -56,7 +57,9 @@ const SongRow = ({
   hasGpFile: boolean;
   isSelected: boolean;
   onClick: () => void;
-}) => (
+}) => {
+  const { t } = useTranslation("plans");
+  return (
   <button
     type='button'
     onClick={onClick}
@@ -78,15 +81,15 @@ const SongRow = ({
     {hasGpFile && (
       <span
         className='hidden shrink-0 items-center gap-1 rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300 sm:inline-flex'
-        title='Guitar Pro file attached'>
+        title={t("song_picker.gp_attached")}>
         <FileMusic className='h-3 w-3 text-zinc-400' />
-        Tab
+        {t("song_modes.gp")}
       </span>
     )}
     {(song.totalSections ?? 0) > 0 && (
       <span
         className='hidden shrink-0 items-center gap-1 rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300 sm:inline-flex'
-        title='Sections marked on the video'>
+        title={t("song_picker.sections_marked")}>
         <ListVideo className='h-3 w-3 text-zinc-400' />
         {song.totalSections}
       </span>
@@ -102,7 +105,8 @@ const SongRow = ({
       {isSelected ? <Check className='h-3.5 w-3.5' /> : <Plus className='h-3.5 w-3.5' />}
     </span>
   </button>
-);
+  );
+};
 
 /**
  * The "Songs" source of the plan wizard: the player's own library (learning /
@@ -117,6 +121,7 @@ export const SongPickerList = ({
   onPickSong,
   onRemoveSong,
 }: SongPickerListProps) => {
+  const { t } = useTranslation("plans");
   const [query, setQuery] = useState("");
 
   const { data: userSongs, isLoading } = useQuery({
@@ -134,9 +139,9 @@ export const SongPickerList = ({
 
   const groups = useMemo(() => {
     const all = [
-      { label: "Learning now", songs: userSongs?.learning ?? [] },
-      { label: "Want to learn", songs: userSongs?.wantToLearn ?? [] },
-      { label: "Learned", songs: userSongs?.learned ?? [] },
+      { label: t("song_picker.learning"), songs: userSongs?.learning ?? [] },
+      { label: t("song_picker.want_to_learn"), songs: userSongs?.wantToLearn ?? [] },
+      { label: t("song_picker.learned"), songs: userSongs?.learned ?? [] },
     ];
     const q = query.trim().toLowerCase();
     if (!q) return all.filter((group) => group.songs.length > 0);
@@ -149,7 +154,7 @@ export const SongPickerList = ({
         ),
       }))
       .filter((group) => group.songs.length > 0);
-  }, [userSongs, query]);
+  }, [userSongs, query, t]);
 
   const hasAnySong =
     (userSongs?.learning.length ?? 0) +
@@ -169,15 +174,14 @@ export const SongPickerList = ({
     return (
       <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 py-12 text-center'>
         <Library className='h-8 w-8 text-zinc-500' />
-        <p className='text-sm font-semibold text-zinc-300'>Your library is empty</p>
+        <p className='text-sm font-semibold text-zinc-300'>{t("song_picker.empty_title")}</p>
         <p className='max-w-xs text-xs leading-relaxed text-zinc-400'>
-          Add the songs you are working on and you will be able to put them into a
-          routine, right between the exercises.
+          {t("song_picker.empty_body")}
         </p>
         <Link
           href='/songs'
           className='mt-1 rounded-lg bg-cyan-500/10 px-4 py-2 text-xs font-bold text-cyan-400 transition-colors hover:bg-cyan-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
-          Browse songs
+          {t("song_picker.browse")}
         </Link>
       </div>
     );
@@ -189,13 +193,13 @@ export const SongPickerList = ({
         type='text'
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder='Search your songs…'
+        placeholder={t("song_picker.search")}
         className='h-10 w-full rounded-lg bg-zinc-900 px-4 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'
       />
 
       {groups.length === 0 ? (
         <p className='py-12 text-center text-[13px] text-zinc-500'>
-          No songs match your search.
+          {t("song_picker.no_match")}
         </p>
       ) : (
         groups.map((group) => (

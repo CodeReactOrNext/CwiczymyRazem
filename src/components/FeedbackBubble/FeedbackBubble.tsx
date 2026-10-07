@@ -1,8 +1,10 @@
 "use client";
 
+import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
 import { selectUserAuth, selectUserName } from "feature/user/store/userSlice";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Bug, HelpCircle,Lightbulb } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -11,32 +13,11 @@ import { useAppSelector } from "store/hooks";
 
 type FeedbackCategory = "bug" | "idea" | "question";
 
-const CATEGORIES: { value: FeedbackCategory; label: string; icon: React.ReactNode; description: string }[] = [
-  {
-    value: "bug",
-    label: "Bug Report",
-    icon: <Bug size={16} />,
-    description: "Something isn't working",
-  },
-  {
-    value: "idea",
-    label: "Feature Idea",
-    icon: <Lightbulb size={16} />,
-    description: "Suggest an improvement",
-  },
-  {
-    value: "question",
-    label: "Question",
-    icon: <HelpCircle size={16} />,
-    description: "Ask us anything",
-  },
+const CATEGORIES: { value: FeedbackCategory; icon: React.ReactNode }[] = [
+  { value: "bug", icon: <Bug size={16} /> },
+  { value: "idea", icon: <Lightbulb size={16} /> },
+  { value: "question", icon: <HelpCircle size={16} /> },
 ];
-
-const PLACEHOLDER: Record<FeedbackCategory, string> = {
-  bug: "Describe what happened and what you expected...",
-  idea: "What would you like to see added or improved?",
-  question: "What would you like to know?",
-};
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -46,6 +27,7 @@ interface FeedbackModalProps {
 }
 
 export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: FeedbackModalProps) => {
+  const { t } = useTranslation("feedback");
   const [message, setMessage] = useState("");
   const [category, setCategory] = useState<FeedbackCategory>("idea");
   const [loading, setLoading] = useState(false);
@@ -71,13 +53,13 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
         }),
       });
       if (!res.ok) throw new Error();
-      toast.success("Thanks for your feedback!");
+      toast.success(t("thanks"));
       setMessage("");
       setCategory("idea");
       onSent?.();
       onClose();
     } catch {
-      toast.error("Something went wrong, please try again.");
+      toast.error(t("error"));
     } finally {
       setLoading(false);
     }
@@ -90,31 +72,39 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
           <>
             <DialogHeader className="border-b border-white/5 pb-4">
               <DialogTitle className="text-xl font-bold text-white">
-                Hey {userName ? `${userName},` : "there,"} got a minute? 👋
+                {userName
+                  ? t("prompt.title_named", { name: userName })
+                  : t("prompt.title")}
               </DialogTitle>
               <p className="text-sm leading-relaxed text-zinc-400">
-                We&apos;re working hard to make Riff Quest the best practice tool for guitarists.
-                To do that, we need to hear from real users — not assumptions.
+                {t("prompt.intro")}
               </p>
             </DialogHeader>
 
             <div className="mt-4 space-y-4">
               <div className="rounded-xl border border-white/5 bg-zinc-800/40 px-4 py-3 text-sm text-zinc-300 leading-relaxed space-y-2">
-                <p>What bothers you about the app? What&apos;s missing? What do you wish worked differently?</p>
+                <p>{t("prompt.questions")}</p>
                 <p className="hidden sm:flex items-center gap-2 text-zinc-500">
-                  <span>💡</span> Got an idea?
-                  <span>🐛</span> Found a bug?
-                  <span>😤</span> Something annoys you?
+                  <span>💡</span> {t("prompt.got_idea")}
+                  <span>🐛</span> {t("prompt.found_bug")}
+                  <span>😤</span> {t("prompt.annoys")}
                 </p>
                 <p className="text-xs text-zinc-600">
-                  You can also share feedback anytime via the <span className="text-zinc-400 font-medium">Send Feedback</span> button in the sidebar.
+                  <Interpolate
+                    text={t("prompt.anytime")}
+                    values={{
+                      button: (
+                        <span className="text-zinc-400 font-medium">{t("send_feedback")}</span>
+                      ),
+                    }}
+                  />
                 </p>
               </div>
 
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Tell us what's on your mind..."
+                placeholder={t("prompt.placeholder")}
                 rows={5}
                 autoFocus
                 className="w-full resize-none rounded-xl border border-white/5 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:border-cyan-500/40 focus:outline-none focus:ring-1 focus:ring-cyan-500/40 transition-colors"
@@ -122,14 +112,14 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
 
               <div className="flex justify-end gap-2">
                 <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white">
-                  Maybe later
+                  {t("prompt.maybe_later")}
                 </Button>
                 <Button
                   onClick={send}
                   disabled={loading || !message.trim()}
                   className="bg-cyan-600 text-white hover:bg-cyan-500 disabled:opacity-50"
                 >
-                  {loading ? "Sending..." : "Share feedback"}
+                  {loading ? t("sending") : t("prompt.share")}
                 </Button>
               </div>
             </div>
@@ -138,10 +128,10 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
           <>
             <DialogHeader className="border-b border-white/5 pb-4">
               <DialogTitle className="text-xl font-bold text-white">
-                Share your feedback
+                {t("title")}
               </DialogTitle>
               <p className="text-sm text-zinc-400">
-                Help us make Riff Quest better — every message is read.
+                {t("subtitle")}
               </p>
             </DialogHeader>
 
@@ -162,8 +152,8 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
                       <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>
                         {cat.icon}
                       </span>
-                      <span className="text-xs font-semibold leading-none">{cat.label}</span>
-                      <span className="text-[10px] leading-tight text-zinc-500">{cat.description}</span>
+                      <span className="text-xs font-semibold leading-none">{t(`categories.${cat.value}.label`)}</span>
+                      <span className="text-[10px] leading-tight text-zinc-500">{t(`categories.${cat.value}.description`)}</span>
                     </button>
                   );
                 })}
@@ -172,25 +162,32 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={PLACEHOLDER[category]}
+                placeholder={t(`categories.${category}.placeholder`)}
                 rows={5}
                 className="w-full resize-none rounded-xl border border-white/5 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:border-cyan-500/40 focus:outline-none focus:ring-1 focus:ring-cyan-500/40 transition-colors"
               />
 
               <div className="flex items-center justify-between">
                 <span className="text-xs text-zinc-600">
-                  Sending as <span className="text-zinc-400 font-medium">{userName ?? "anonymous"}</span>
+                  <Interpolate
+                    text={t("sending_as")}
+                    values={{
+                      name: (
+                        <span className="text-zinc-400 font-medium">{userName ?? t("anonymous")}</span>
+                      ),
+                    }}
+                  />
                 </span>
                 <div className="flex gap-2">
                   <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white">
-                    Cancel
+                    {t("cancel")}
                   </Button>
                   <Button
                     onClick={send}
                     disabled={loading || !message.trim()}
                     className="bg-cyan-600 text-white hover:bg-cyan-500 disabled:opacity-50"
                   >
-                    {loading ? "Sending..." : "Send Feedback"}
+                    {loading ? t("sending") : t("send_feedback")}
                   </Button>
                 </div>
               </div>

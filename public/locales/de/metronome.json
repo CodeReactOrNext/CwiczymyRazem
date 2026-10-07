@@ -1,0 +1,53 @@
+{
+  "half_speed": "Halbes Tempo",
+  "bpm_edit_hint": "Klicken zum Bearbeiten · Pfeiltasten ±1 · Shift+Pfeil ±5",
+  "bpm_exam": "BPM · Prüfungsmodus",
+  "bpm_confirm": "↵ zum Bestätigen",
+  "bpm_click_to_edit": "BPM · zum Bearbeiten klicken",
+  "decrease": "BPM um 1 senken",
+  "increase": "BPM um 1 erhöhen",
+  "remove_beat": "Schlag entfernen",
+  "add_beat": "Schlag hinzufügen",
+  "subdivisions": {
+    "1": "Viertelnoten – keine Unterteilung",
+    "2": "Achtelnoten",
+    "3": "Achteltriolen",
+    "4": "Sechzehntelnoten"
+  },
+  "accent": {
+    "accent": "Akzent – klicken zum Stummschalten",
+    "click": "Klick – klicken zum Akzentuieren",
+    "muted": "Stumm – klicken zum Zurücksetzen",
+    "locked": "Diese Übung legt ihre eigenen Akzente fest",
+    "follows_tab": "Der Klick wechselt die Taktart mit dem Tab",
+    "from_exercise": "Die Akzente kommen aus der Taktart dieser Übung",
+    "hint": "Klick einen Schlag, um ihn zu betonen, noch einmal, um ihn stummzuschalten"
+  },
+  "sounds": {
+    "classic": {
+      "label": "Klassisch",
+      "desc": "Sauberer Sinuston, der Klick der ersten App-Version"
+    },
+    "wood": {
+      "label": "Holzblock",
+      "desc": "Warmes, hohles Klopfen, angenehm bei langen Sessions"
+    },
+    "digital": {
+      "label": "Digital",
+      "desc": "Scharfer Rechteck-Blip wie ein DAW-Klick"
+    },
+    "sticks": {
+      "label": "Sticks",
+      "desc": "Trockener Stick-Schlag, setzt sich gegen einen lauten Amp durch"
+    },
+    "hihat": {
+      "label": "Hi-Hat",
+      "desc": "Geschlossene Hi-Hat, sitzt natürlich in einem Drum-Groove"
+    },
+    "cowbell": {
+      "label": "Kuhglocke",
+      "desc": "Zwei verstimmte Rechtecke – more cowbell"
+    }
+  },
+  "beats_per_bar": "Schläge pro Takt"
+}

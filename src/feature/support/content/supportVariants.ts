@@ -1,3 +1,6 @@
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
+
 /** Every message the Activity feed can show. Source of truth for the union below. */
 export const SUPPORT_VARIANT_IDS = [
   "server_cost",
@@ -79,52 +82,90 @@ export interface SupportVariantCopy {
 export function getSupportVariantCopy(
   variant: SupportVariantId,
   ctx: SupportVariantContext,
+  t?: Translate,
 ): SupportVariantCopy {
   const isCovered = ctx.raisedThisMonth >= ctx.monthlyGoal;
+  const tr = (key: string, english: string, vars?: Record<string, unknown>) =>
+    translateOr(t, `feed:support_ask.${key}`, english, vars);
 
   switch (variant) {
     case "server_cost": {
       return {
-        eyebrow: "Help build Riff Quest",
+        eyebrow: tr("server_cost.eyebrow", "Help build Riff Quest"),
         headline: isCovered
-          ? "Server cost this month is covered"
-          : "Server cost needs your help",
+          ? tr("server_cost.headline_covered", "Server cost this month is covered")
+          : tr("server_cost.headline", "Server cost needs your help"),
         body: isCovered
-          ? "This month's hosting is already funded. Anything extra goes straight to the roadmap below."
-          : `Riff Quest is a one person project, free and built in the open. $${ctx.raisedThisMonth} of $${ctx.monthlyGoal} raised so far this month.`,
+          ? tr(
+              "server_cost.body_covered",
+              "This month's hosting is already funded. Anything extra goes straight to the roadmap below.",
+            )
+          : tr(
+              "server_cost.body",
+              "Riff Quest is a one person project, free and built in the open. ${{raised}} of ${{goal}} raised so far this month.",
+              { raised: ctx.raisedThisMonth, goal: ctx.monthlyGoal },
+            ),
       };
     }
 
     case "one_person": {
       return {
-        eyebrow: "One person project",
-        headline: "Riff Quest is built by one person, in the open",
-        body: "No team, no investors, no growth targets. Support is what decides how much time goes into it and what gets built next.",
+        eyebrow: tr("one_person.eyebrow", "One person project"),
+        headline: tr(
+          "one_person.headline",
+          "Riff Quest is built by one person, in the open",
+        ),
+        body: tr(
+          "one_person.body",
+          "No team, no investors, no growth targets. Support is what decides how much time goes into it and what gets built next.",
+        ),
       };
     }
 
     case "one_off_ok": {
       return {
-        eyebrow: "No subscription needed",
-        headline: "A one-off coffee counts as much as a monthly one",
-        body: "There is nothing to sign up for and nothing to cancel later. One coffee, once, is a completely normal way to support this.",
+        eyebrow: tr("one_off_ok.eyebrow", "No subscription needed"),
+        headline: tr(
+          "one_off_ok.headline",
+          "A one-off coffee counts as much as a monthly one",
+        ),
+        body: tr(
+          "one_off_ok.body",
+          "There is nothing to sign up for and nothing to cancel later. One coffee, once, is a completely normal way to support this.",
+        ),
       };
     }
 
     case "roadmap_tier": {
       if (!ctx.nextTierLabel || ctx.nextTierAmountToGo == null) {
         return {
-          eyebrow: "Roadmap",
-          headline: "Every roadmap goal is funded, thank you",
-          body: "The community has funded everything on the roadmap so far. Whatever comes in next kicks off the next tier.",
+          eyebrow: tr("roadmap.eyebrow", "Roadmap"),
+          headline: tr(
+            "roadmap_tier.headline_done",
+            "Every roadmap goal is funded, thank you",
+          ),
+          body: tr(
+            "roadmap_tier.body_done",
+            "The community has funded everything on the roadmap so far. Whatever comes in next kicks off the next tier.",
+          ),
         };
       }
       return {
-        eyebrow: "Roadmap",
-        headline: `$${ctx.nextTierAmountToGo} to go for "${ctx.nextTierLabel}"`,
+        eyebrow: tr("roadmap.eyebrow", "Roadmap"),
+        headline: tr(
+          "roadmap_tier.headline",
+          '${{amount}} to go for "{{tier}}"',
+          { amount: ctx.nextTierAmountToGo, tier: ctx.nextTierLabel },
+        ),
         body: isCovered
-          ? "This month's hosting is already paid for, so everything from here goes straight into building the next unlock."
-          : "Lifetime support unlocks the roadmap tier by tier. This is the next one in line.",
+          ? tr(
+              "roadmap_tier.body_covered",
+              "This month's hosting is already paid for, so everything from here goes straight into building the next unlock.",
+            )
+          : tr(
+              "roadmap_tier.body",
+              "Lifetime support unlocks the roadmap tier by tier. This is the next one in line.",
+            ),
       };
     }
 
@@ -132,35 +173,65 @@ export function getSupportVariantCopy(
       // Without the tier counts there's nothing to be proud of yet — fall back to the
       // plain "next unlock" framing rather than rendering "0 of 0 goals funded".
       if (!ctx.tiersFunded || !ctx.tiersTotal) {
-        return getSupportVariantCopy("roadmap_tier", ctx);
+        return getSupportVariantCopy("roadmap_tier", ctx, t);
       }
       return {
-        eyebrow: "Roadmap",
-        headline: `${ctx.tiersFunded} of ${ctx.tiersTotal} roadmap goals funded so far`,
+        eyebrow: tr("roadmap.eyebrow", "Roadmap"),
+        headline: tr(
+          "roadmap_momentum.headline",
+          "{{funded}} of {{total}} roadmap goals funded so far",
+          { funded: ctx.tiersFunded, total: ctx.tiersTotal },
+        ),
         body: ctx.nextTierLabel
-          ? `Servers are paid for — support now goes into building. "${ctx.nextTierLabel}" is next in line.`
-          : "Servers are paid for, so support now goes straight into building the roadmap.",
+          ? tr(
+              "roadmap_momentum.body_next",
+              'Servers are paid for — support now goes into building. "{{tier}}" is next in line.',
+              { tier: ctx.nextTierLabel },
+            )
+          : tr(
+              "roadmap_momentum.body",
+              "Servers are paid for, so support now goes straight into building the roadmap.",
+            ),
       };
     }
 
     case "value_received": {
       return {
-        eyebrow: "Stays free",
-        headline: "Riff Quest stays free for every session you practice",
+        eyebrow: tr("value_received.eyebrow", "Stays free"),
+        headline: tr(
+          "value_received.headline",
+          "Riff Quest stays free for every session you practice",
+        ),
         body: isCovered
-          ? "No paywalls on exercises, plans, or tracking. Hosting is covered this month, so a coffee now funds the next thing on the roadmap."
-          : "No paywalls on exercises, plans, or tracking. If it's helped your playing, a coffee keeps it that way.",
+          ? tr(
+              "value_received.body_covered",
+              "No paywalls on exercises, plans, or tracking. Hosting is covered this month, so a coffee now funds the next thing on the roadmap.",
+            )
+          : tr(
+              "value_received.body",
+              "No paywalls on exercises, plans, or tracking. If it's helped your playing, a coffee keeps it that way.",
+            ),
       };
     }
 
     case "social_proof": {
       return {
-        eyebrow: "Community support",
+        eyebrow: tr("social_proof.eyebrow", "Community support"),
         headline:
           ctx.supporters > 0
-            ? `${ctx.supporters} supporters have chipped in $${ctx.raisedThisMonth} this month`
-            : "Riff Quest is funded by the community",
-        body: "It keeps Riff Quest free and funds the roadmap. Tap to see where it goes.",
+            ? tr(
+                "social_proof.headline",
+                "{{supporters}} supporters have chipped in ${{raised}} this month",
+                { supporters: ctx.supporters, raised: ctx.raisedThisMonth },
+              )
+            : tr(
+                "social_proof.headline_none",
+                "Riff Quest is funded by the community",
+              ),
+        body: tr(
+          "social_proof.body",
+          "It keeps Riff Quest free and funds the roadmap. Tap to see where it goes.",
+        ),
       };
     }
 

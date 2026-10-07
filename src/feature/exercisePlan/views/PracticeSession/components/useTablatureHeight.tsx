@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import React, { useCallback, useRef, useState } from "react";
 
 import { TAB_BASE_HEIGHT } from "./useTablatureWorkerBridge";
@@ -74,6 +75,7 @@ interface TablatureResizeHandleProps {
  * underlying seek/drag canvas doesn't also react.
  */
 export function TablatureResizeHandle({ height, onChange, className }: TablatureResizeHandleProps) {
+  const { t } = useTranslation("session");
   const dragRef = useRef<{ startY: number; startH: number } | null>(null);
 
   const handlePointerDown = useCallback(
@@ -109,8 +111,8 @@ export function TablatureResizeHandle({ height, onChange, className }: Tablature
     <div
       role="separator"
       aria-orientation="horizontal"
-      aria-label="Resize viewer height"
-      title="Drag to resize"
+      aria-label={t("tab.resize_height")}
+      title={t("tab.drag_resize")}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={endDrag}

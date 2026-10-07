@@ -25,6 +25,8 @@ import {
 } from "feature/challenges/types/challenge.types";
 import { extractVideoId } from "feature/songs/utils/youtube.utils";
 import { selectUserAvatar } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Music, Video } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -50,6 +52,7 @@ export const SubmitRecordingDialog = ({
   paysReward,
   onClose,
 }: SubmitRecordingDialogProps) => {
+  const { t } = useTranslation("challenges");
   const [videoUrl, setVideoUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -96,7 +99,7 @@ export const SubmitRecordingDialog = ({
       <DialogContent className='max-w-lg border-white/5 bg-zinc-950 p-6'>
         <DialogHeader className='mb-1'>
           <DialogTitle className='font-openSans text-xl font-bold text-white'>
-            Submit your run
+            {t("submit.title")}
           </DialogTitle>
         </DialogHeader>
 
@@ -133,7 +136,7 @@ export const SubmitRecordingDialog = ({
             <Label
               htmlFor='challenge-video'
               className='ml-1 font-bold text-zinc-400'>
-              YouTube link
+              {t("submit.youtube_link")}
             </Label>
             <div className='relative'>
               <Video className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600' />
@@ -147,13 +150,11 @@ export const SubmitRecordingDialog = ({
             </div>
             {videoUrl.trim() && !videoId ? (
               <p className='ml-1 text-xs font-semibold text-amber-400'>
-                That doesn’t look like a YouTube link — use one like
-                youtube.com/watch?v=… or youtu.be/…
+                {t("submit.bad_link")}
               </p>
             ) : (
               <p className='ml-1 text-xs font-medium text-zinc-500'>
-                Like youtube.com/watch?v=… or youtu.be/… — unlisted videos
-                work, private ones won’t play for others.
+                {t("submit.link_hint")}
               </p>
             )}
           </div>
@@ -170,7 +171,7 @@ export const SubmitRecordingDialog = ({
             <Label
               htmlFor='challenge-title'
               className='ml-1 font-bold text-zinc-400'>
-              Title
+              {t("submit.title_label")}
             </Label>
             <Input
               id='challenge-title'
@@ -185,7 +186,7 @@ export const SubmitRecordingDialog = ({
             <Label
               htmlFor='challenge-note'
               className='ml-1 font-bold text-zinc-400'>
-              Notes <span className='font-medium text-zinc-600'>optional</span>
+              {t("submit.notes")} <span className='font-medium text-zinc-600'>{t("submit.optional")}</span>
             </Label>
             <Textarea
               id='challenge-note'
@@ -193,7 +194,7 @@ export const SubmitRecordingDialog = ({
               onChange={(e) => setDescription(e.target.value)}
               maxLength={300}
               rows={3}
-              placeholder='Gear, tempo, what you struggled with…'
+              placeholder={t("submit.notes_placeholder")}
               className='resize-none border-white/5 bg-white/5 font-medium transition-all focus:border-cyan-500/50'
             />
           </div>
@@ -207,14 +208,14 @@ export const SubmitRecordingDialog = ({
                     <span className='font-bold text-white'>
                       +{POINTS_PER_SUBMISSION}
                     </span>
-                    points
+                    {t("submit.points")}
                   </span>
                   <span className='inline-flex items-center gap-1.5'>
                     <FameIcon />
                     <span className='font-bold text-amber-300'>
                       +{FAME_PER_SUBMISSION}
                     </span>
-                    fame
+                    {t("submit.fame")}
                   </span>
                   {isFinalSong && (
                     <span className='inline-flex items-center gap-1.5'>
@@ -222,27 +223,28 @@ export const SubmitRecordingDialog = ({
                       <span className='font-bold text-amber-300'>
                         +{FAME_CLEAR_BONUS}
                       </span>
-                      clear bonus
+                      {t("submit.clear_bonus")}
                     </span>
                   )}
                 </div>
                 {isFinalSong && (
                   <p className='text-xs font-medium text-zinc-500'>
-                    This is your last song on the board.
+                    {t("submit.last_song")}
                   </p>
                 )}
               </>
             ) : (
               <p className='text-xs font-medium text-zinc-500'>
-                This board is closed, so the run earns{" "}
-                <span className='font-bold text-white'>no points or fame</span>{" "}
-                — it just takes its place in the archive.
+                <Interpolate
+                  text={t("submit.closed_board")}
+                  values={{
+                    none: <span className='font-bold text-white'>{t("submit.no_rewards")}</span>,
+                  }}
+                />
               </p>
             )}
             <p className='text-xs font-medium text-zinc-500'>
-              Everyone can watch it in this song’s runs, the activity feed and
-              your Recordings. One run per song, so send the take you’re happy
-              with.
+              {t("submit.visibility")}
             </p>
           </div>
         </div>
@@ -252,7 +254,7 @@ export const SubmitRecordingDialog = ({
             variant='ghost'
             onClick={onClose}
             className='text-zinc-400 hover:bg-white/5 hover:text-white'>
-            Cancel
+            {t("submit.cancel")}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -261,7 +263,7 @@ export const SubmitRecordingDialog = ({
             {isSubmitting ? (
               <span className='loading loading-spinner loading-sm' />
             ) : (
-              "Submit run"
+              t("submit.submit_run")
             )}
           </Button>
         </DialogFooter>

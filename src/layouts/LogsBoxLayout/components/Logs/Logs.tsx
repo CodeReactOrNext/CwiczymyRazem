@@ -99,6 +99,9 @@ import {
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { getSupportVariantCopy } from "feature/support/content/supportVariants";
 import { useTranslation } from "hooks/useTranslation";
+import type { Translate } from "lib/i18n/translate";
+import { useDateFnsLocale } from "lib/i18n/dateLocale";
+import { Interpolate } from "lib/i18n/Interpolate";
 import {
   type ActivityPreview,
   ActivityStartModal,
@@ -170,11 +173,7 @@ export const resolveRolledItem = (
   return { rolledGuitar, rolledEffect, level };
 };
 
-const PLAYLIST_KIND_LABEL: Record<string, string> = {
-  playlist: "playlist",
-  path: "learning path",
-  top: "top 10",
-};
+const PLAYLIST_KINDS = new Set(["playlist", "path", "top"]);
 
 const ItemTooltipCard = ({
   itemType,
@@ -301,6 +300,7 @@ const CardModal = ({
   onClose: () => void;
   children: React.ReactNode;
 }) => {
+  const { t } = useTranslation("feed");
   if (typeof document === "undefined") return null;
   return createPortal(
     <div
@@ -311,7 +311,7 @@ const CardModal = ({
         onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          aria-label='Close'
+          aria-label={t("close")}
           className='absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white'>
           <X size={15} />
         </button>
@@ -341,6 +341,7 @@ export const ItemPill = ({
   rolledGuitar: any;
   rolledEffect: any;
 }) => {
+  const { t } = useTranslation("feed");
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [open, setOpen] = useState(false);
   const color = getRarityColor(itemRarity);
@@ -394,8 +395,8 @@ export const ItemPill = ({
             <Chip
               color='gray'
               className='whitespace-nowrap px-1.5 py-0.5 text-[10px] tabular-nums tracking-wide'
-              title='Item level'>
-              Lv {level}
+              title={t("item_level")}>
+              {t("item_level_short", { level })}
             </Chip>
           )}
         </span>
@@ -556,6 +557,7 @@ const PlayerRow = ({
   player: TopPlayerData;
   index: number;
 }) => {
+  const { t } = useTranslation("feed");
   const isTop3 = index < 3;
 
   return (
@@ -582,7 +584,7 @@ const PlayerRow = ({
       <div className='ml-auto'>
         <div className='flex items-baseline gap-1.5'>
           <span className='text-[10px] font-semibold text-zinc-400 opacity-60 sm:text-xs'>
-            pt:
+            {t("points_short")}
           </span>
           <span
             className={`text-sm font-bold sm:text-base ${isTop3 ? "text-cyan-400" : "text-cyan-600"}`}>
@@ -613,7 +615,7 @@ const NoTopPlayersData = ({
         <FaTrophy className='text-yellow-400' />
         <span>{t("logsBox.top_players")}</span>
       </h3>
-      <p className='text-zinc-400'>No top players data available.</p>
+      <p className='text-zinc-400'>{t("feed:no_top_players")}</p>
     </div>
   </div>
 );
@@ -625,7 +627,7 @@ const FirebaseLogsTopPlayersItem = ({
   log: FirebaseLogsTopPlayersInterface;
   isNew: boolean;
 }) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation(["common", "feed"]);
   const { data, topPlayers, daysLeftInSeason } = log;
   const date = new Date(data);
 
@@ -666,6 +668,7 @@ const FirebaseLogsGuildLevelItem = ({
   log: FirebaseLogsGuildLevelInterface;
   isNew: boolean;
 }) => {
+  const { t } = useTranslation("feed");
   const date = new Date(log.data);
   const accentHex = findCosmetic(log.guildBadge?.accent)?.hex ?? "#fbbf24";
   const unlisted = (log.questsCleared ?? 0) - (log.quests?.length ?? 0);
@@ -681,11 +684,14 @@ const FirebaseLogsGuildLevelItem = ({
         </div>
         <div className='min-w-0 flex-1'>
           <p className='flex items-center gap-2 text-xs font-semibold text-amber-400'>
-            Guild level up
+            {t("guild_level_up")}
             <GuildTagBadge badge={log.guildBadge} />
           </p>
           <h3 className='text-sm font-bold text-white sm:text-base'>
-            {log.guildName} reached level {log.level}
+            {t("guild_reached_level", {
+              guild: log.guildName,
+              level: log.level,
+            })}
           </h3>
         </div>
         <span className='ml-auto shrink-0 text-[11px] text-zinc-400 opacity-60'>
@@ -696,7 +702,7 @@ const FirebaseLogsGuildLevelItem = ({
 
       {log.quests?.length > 0 && (
         <div className='flex flex-wrap items-center gap-2'>
-          <span className='text-sm text-zinc-400'>Cleared</span>
+          <span className='text-sm text-zinc-400'>{t("cleared")}</span>
           {log.quests.map((name) => (
             <Chip
               key={name}
@@ -706,7 +712,9 @@ const FirebaseLogsGuildLevelItem = ({
             </Chip>
           ))}
           {unlisted > 0 && (
-            <span className='text-sm text-zinc-400'>and {unlisted} more</span>
+            <span className='text-sm text-zinc-400'>
+              {t("and_more", { count: unlisted })}
+            </span>
           )}
         </div>
       )}
@@ -721,8 +729,11 @@ const FirebaseLogsSupportAskItem = ({
   log: FirebaseLogsSupportAskInterface;
   isNew: boolean;
 }) => {
+  const { t } = useTranslation("feed");
   const date = new Date(log.data);
-  const copy = getSupportVariantCopy(log.variant, {
+  const copy = getSupportVariantCopy(
+    log.variant,
+    {
     raisedThisMonth: log.raisedThisMonth,
     monthlyGoal: log.monthlyGoal,
     totalRaised: log.totalRaised,
@@ -731,7 +742,9 @@ const FirebaseLogsSupportAskItem = ({
     nextTierAmountToGo: log.nextTierAmountToGo,
     tiersFunded: log.tiersFunded,
     tiersTotal: log.tiersTotal,
-  });
+    },
+    t,
+  );
 
   return (
     <div
@@ -772,7 +785,7 @@ const FirebaseLogsSupportAskItem = ({
           rel='noopener noreferrer'
           className='mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-500 px-3.5 py-2 text-xs font-semibold text-zinc-950 transition-all hover:bg-amber-400 sm:text-sm'>
           <Coffee size={14} />
-          Support Riff Quest
+          {t("support_riff_quest")}
         </a>
       </div>
     </div>
@@ -783,37 +796,47 @@ const FirebaseLogsSupportAskItem = ({
  * Who the card thanks: the player's nick when the donation is matched to an account, otherwise
  * the name Buy Me a Coffee sent — unless that name is just the donor's email, which stays private.
  */
-const getDonationName = (log: FirebaseLogsDonationInterface): string => {
+const getDonationName = (
+  log: FirebaseLogsDonationInterface,
+  t: Translate,
+): string => {
   const userName = log.userName?.trim();
   if (log.uid && userName) return userName;
 
   const supporterName = log.supporterName?.trim();
   if (supporterName && !supporterName.includes("@")) return supporterName;
 
-  return userName || "Someone";
+  return userName || t("someone");
 };
 
 /** The sentence the card leads with — the day's whole support when there was more than one. */
-const getDonationHeadline = (logs: FirebaseLogsDonationInterface[]): string => {
+const getDonationHeadline = (
+  logs: FirebaseLogsDonationInterface[],
+  t: Translate,
+): string => {
   const [newest] = logs;
-  const name = getDonationName(newest);
+  const name = getDonationName(newest, t);
 
-  if (logs.length > 1) return `${name} backed Riff Quest ${logs.length} times`;
+  if (logs.length > 1)
+    return t("donation_backed_times", { name, count: logs.length });
 
   return newest.kind === "recurring"
-    ? `${name} became a monthly supporter`
-    : `${name} bought Riff Quest a $${newest.amount} coffee`;
+    ? t("donation_monthly", { name })
+    : t("donation_coffee", { name, amount: newest.amount });
 };
 
 /** One coffee inside a card that holds several — the day's donations, listed under the headline. */
 const DonationLine = ({ log }: { log: FirebaseLogsDonationInterface }) => {
+  const { t } = useTranslation("feed");
   const date = new Date(log.data);
 
   return (
     <div className='flex items-center gap-2 text-sm text-zinc-400'>
       <Coffee size={14} className='shrink-0 text-orange-400/80' />
       <span className='text-white'>
-        {log.kind === "recurring" ? "Monthly support" : `$${log.amount} coffee`}
+        {log.kind === "recurring"
+          ? t("monthly_support")
+          : t("coffee_amount", { amount: log.amount })}
       </span>
       <span className='text-[11px] opacity-60'>
         {addZeroToTime(date.getHours())}:{addZeroToTime(date.getMinutes())}
@@ -840,6 +863,7 @@ const FirebaseLogsDonationItem = ({
   currentUserId: string;
   showMotivateHint: boolean;
 }) => {
+  const { t } = useTranslation("feed");
   const newest = logs[0];
   const date = new Date(newest.data);
   const { uid, userName, avatarUrl, userAvatarFrame, guildBadge } = newest;
@@ -865,10 +889,10 @@ const FirebaseLogsDonationItem = ({
         </div>
         <div className='min-w-0 flex-1'>
           <p className='text-[10px] font-semibold uppercase tracking-widest text-orange-400'>
-            New supporter
+            {t("new_supporter")}
           </p>
           <h3 className='text-sm font-bold text-white sm:text-base'>
-            {getDonationHeadline(logs)}
+            {getDonationHeadline(logs, t)}
           </h3>
         </div>
         <span className='ml-auto shrink-0 text-[11px] text-zinc-400 opacity-60'>
@@ -890,7 +914,7 @@ const FirebaseLogsDonationItem = ({
           <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-zinc-200'>
             <UserLink
               uid={uid}
-              userName={userName ?? getDonationName(newest)}
+              userName={userName ?? getDonationName(newest, t)}
               avatarUrl={avatarUrl ?? undefined}
               lvl={userAvatarFrame}
               guildBadge={guildBadge}
@@ -906,7 +930,7 @@ const FirebaseLogsDonationItem = ({
                 disabled={uid === currentUserId}
                 fameAmount={fameAmount}
                 awardedFame={awardedFame}
-                recipientName={userName ?? getDonationName(newest)}
+                recipientName={userName ?? getDonationName(newest, t)}
                 showHint={showMotivateHint}
               />
             </div>
@@ -931,11 +955,13 @@ const GroupedLine = ({ children }: { children: React.ReactNode }) => (
  * Rendered identically whether or not the row links through to the exercise's
  * leaderboard, so the two variants below share this one definition.
  */
-const LeaderboardPlace = ({ rank }: { rank: number }) => (
+const LeaderboardPlace = ({ rank }: { rank: number }) => {
+  const { t } = useTranslation("feed");
+  return (
   <>
     <span className='text-zinc-400'>|</span>
     <span
-      title='Place on this exercise leaderboard when the score was set'
+      title={t("leaderboard_place_hint")}
       className={cn(
         "font-semibold tabular-nums",
         rank <= 3 ? "text-amber-300" : "text-white",
@@ -943,16 +969,19 @@ const LeaderboardPlace = ({ rank }: { rank: number }) => (
       #{rank}
     </span>
   </>
-);
+  );
+};
 
 const MicPerformanceStats = ({
   performance,
 }: {
   performance: NonNullable<FirebaseLogsInterface["micPerformance"]>;
-}) => (
+}) => {
+  const { t } = useTranslation("feed");
+  return (
   <>
     <Target className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
-    <span className='text-zinc-400'>Score:</span>
+    <span className='text-zinc-400'>{t("score")}</span>
     <span className='font-semibold tabular-nums text-white'>
       {performance.score}
     </span>
@@ -972,23 +1001,27 @@ const MicPerformanceStats = ({
     )}
     {performance.rank != null && <LeaderboardPlace rank={performance.rank} />}
   </>
-);
+  );
+};
 
 /** The ear-training twin of MicPerformanceStats — no accuracy, no tempo. */
 const EarTrainingStats = ({
   performance,
 }: {
   performance: NonNullable<FirebaseLogsInterface["earTrainingPerformance"]>;
-}) => (
+}) => {
+  const { t } = useTranslation("feed");
+  return (
   <>
     <Ear className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
-    <span className='text-zinc-400'>Score:</span>
+    <span className='text-zinc-400'>{t("score")}</span>
     <span className='font-semibold tabular-nums text-white'>
       {performance.score}
     </span>
     {performance.rank != null && <LeaderboardPlace rank={performance.rank} />}
   </>
-);
+  );
+};
 
 /** Purple "Song" chip shared by every feed row that references a song, so artist/title are always formatted the same way. */
 const SongBadge = ({
@@ -999,11 +1032,12 @@ const SongBadge = ({
   songId?: string;
   songArtist: string;
   songTitle: string;
-}) =>
-  songId ? (
+}) => {
+  const { t } = useTranslation("feed");
+  return songId ? (
     <Link
       href={`/songs?view=management&songId=${songId}`}
-      title='Click to open this song'>
+      title={t("open_song_hint")}>
       <Chip color='purple' className='cursor-pointer'>
         <Music className='h-3.5 w-3.5 shrink-0' />
         <span className='underline-offset-2 hover:underline'>
@@ -1018,6 +1052,7 @@ const SongBadge = ({
       {songArtist} - {songTitle}
     </Chip>
   );
+};
 
 /**
  * The chip naming what a session practiced. It opens that plan, exercise or lesson when the feed
@@ -1066,7 +1101,7 @@ const GroupedLogLine = ({
   onViewRecording: (id: string) => void;
   onOpenLeaderboard: (exerciseId: string, exerciseTitle: string) => void;
 }) => {
-  const { t } = useTranslation(["common", "exercises"]);
+  const { t } = useTranslation(["common", "exercises", "feed"]);
 
   if (type === "song") {
     const songLog = log as FirebaseLogsSongsInterface;
@@ -1099,7 +1134,10 @@ const GroupedLogLine = ({
           <Chip
             color='custom'
             style={getChipCustomStyle(ratingTier.color)}
-            title={`Difficulty rated ${songLog.difficulty_rate}/10 (${ratingTier.label})`}>
+            title={t("feed:difficulty_rated", {
+              rating: songLog.difficulty_rate,
+              tier: ratingTier.label,
+            })}>
             <Star className='h-3 w-3 shrink-0 fill-current' />
             {songLog.difficulty_rate}/10
           </Chip>
@@ -1115,7 +1153,7 @@ const GroupedLogLine = ({
       <GroupedLine>
         <p className='text-sm text-zinc-400'>
           <Video className='mr-1.5 inline-block h-3 w-3 text-cyan-400' />
-          added a new recording:{" "}
+          {t("feed:added_recording")}{" "}
           {recLog.recordingId ? (
             <button
               onClick={() => onViewRecording(recLog.recordingId as string)}
@@ -1149,9 +1187,16 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <span className='text-sm text-zinc-400'>opened</span>
-        <span className='text-sm font-bold text-white'>{caseLog.caseName}</span>
-        <span className='text-sm text-zinc-400'>and got</span>
+        <span className='text-sm text-zinc-400'>
+          <Interpolate
+            text={t("feed:opened_case")}
+            values={{
+              case: (
+                <span className='font-bold text-white'>{caseLog.caseName}</span>
+              ),
+            }}
+          />
+        </span>
         <ItemPill
           itemType={caseLog.itemType}
           itemName={caseLog.itemName}
@@ -1174,7 +1219,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <span className='text-sm text-zinc-400'>listed</span>
+        <span className='text-sm text-zinc-400'>{t("feed:listed")}</span>
         <ItemPill
           itemType={marketLog.itemType}
           itemName={marketLog.itemName}
@@ -1210,7 +1255,7 @@ const GroupedLogLine = ({
       <GroupedLine>
         <span className='text-sm text-zinc-400'>
           <ShoppingCart className='mr-1.5 inline-block h-3.5 w-3.5 text-amber-400' />
-          bought
+          {t("feed:bought")}
         </span>
         <ItemPill
           itemType={purchaseLog.itemType}
@@ -1223,7 +1268,7 @@ const GroupedLogLine = ({
           rolledEffect={rolledEffect}
         />
         <span className='text-sm text-zinc-400'>
-          from{" "}
+          {t("feed:from")}{" "}
           {purchaseLog.sellerId ? (
             <Link
               href={`/user/${purchaseLog.sellerId}`}
@@ -1253,13 +1298,14 @@ const GroupedLogLine = ({
 
   if (type === "playlist") {
     const playlistLog = log as FirebaseLogsPlaylistInterface;
-    const kindLabel =
-      PLAYLIST_KIND_LABEL[playlistLog.playlistKind] ?? "playlist";
+    const kindLabel = t(
+      `feed:playlist_kind.${PLAYLIST_KINDS.has(playlistLog.playlistKind) ? playlistLog.playlistKind : "playlist"}`,
+    );
 
     return (
       <GroupedLine>
         <p className='text-sm text-zinc-400'>
-          created a new {kindLabel}:{" "}
+          {t("feed:created_playlist", { kind: kindLabel })}{" "}
           <Link
             href={`/songs?view=playlists&playlistId=${playlistLog.playlistId}`}
             className='inline-flex items-center gap-1 font-bold text-white transition-colors hover:text-cyan-400 hover:underline'>
@@ -1269,8 +1315,11 @@ const GroupedLogLine = ({
           {playlistLog.songCount > 0 && (
             <span className='text-xs opacity-70'>
               {" "}
-              ({playlistLog.songCount}{" "}
-              {playlistLog.songCount === 1 ? "song" : "songs"})
+              (
+              {playlistLog.songCount === 1
+                ? t("feed:song_count_one")
+                : t("feed:song_count_other", { count: playlistLog.songCount })}
+              )
             </span>
           )}
         </p>
@@ -1285,8 +1334,12 @@ const GroupedLogLine = ({
       <GroupedLine>
         <p className='text-sm text-zinc-400'>
           <GraduationCap className='mr-1.5 inline-block h-3.5 w-3.5 text-emerald-400' />
-          passed the{" "}
-          <span className='font-bold text-white'>{examLog.stepTitle}</span> exam
+          <Interpolate
+            text={t("feed:passed_exam")}
+            values={{
+              step: <span className='font-bold text-white'>{examLog.stepTitle}</span>,
+            }}
+          />
         </p>
         <Chip color='emerald'>
           {Array.from({ length: examLog.stars }).map((_, i) => (
@@ -1305,17 +1358,23 @@ const GroupedLogLine = ({
       <GroupedLine>
         <p className='text-sm text-zinc-400'>
           <MapIcon className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
-          completed{" "}
-          <Link
-            href={`/ai-coach?roadmapId=${stepLog.roadmapId}&step=${stepLog.stepId}`}
-            className='font-bold text-white transition-colors hover:text-cyan-400 hover:underline'>
-            {stepLog.stepTitle}
-          </Link>{" "}
-          on the{" "}
-          <span className='font-semibold text-zinc-200'>
-            {stepLog.roadmapTitle}
-          </span>{" "}
-          roadmap
+          <Interpolate
+            text={t("feed:completed_roadmap_step")}
+            values={{
+              step: (
+                <Link
+                  href={`/ai-coach?roadmapId=${stepLog.roadmapId}&step=${stepLog.stepId}`}
+                  className='font-bold text-white transition-colors hover:text-cyan-400 hover:underline'>
+                  {stepLog.stepTitle}
+                </Link>
+              ),
+              roadmap: (
+                <span className='font-semibold text-zinc-200'>
+                  {stepLog.roadmapTitle}
+                </span>
+              ),
+            }}
+          />
         </p>
         {stepLog.phaseTitle && <Chip color='cyan'>{stepLog.phaseTitle}</Chip>}
       </GroupedLine>
@@ -1328,8 +1387,16 @@ const GroupedLogLine = ({
     return (
       <GroupedLine>
         <p className='text-sm text-zinc-400'>
-          completed all{" "}
-          <span className='font-semibold text-zinc-200'>Daily Quests!</span>
+          <Interpolate
+            text={t("feed:completed_daily_quests")}
+            values={{
+              quests: (
+                <span className='font-semibold text-zinc-200'>
+                  {t("feed:daily_quests")}
+                </span>
+              ),
+            }}
+          />
         </p>
         <Chip color='yellow'>
           <Gift className='h-3.5 w-3.5 shrink-0' />
@@ -1400,7 +1467,7 @@ const GroupedLogLine = ({
       {sessionTimeMs > 0 && (
         <span
           className='inline-flex items-center gap-1.5 text-sm text-zinc-400'
-          title='Practice time logged in this session'>
+          title={t("feed:session_time_hint")}>
           <Clock className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
           <span className='tabular-nums'>
             {formatSessionTime(sessionTimeMs)}
@@ -1412,8 +1479,7 @@ const GroupedLogLine = ({
         <span className='text-sm text-zinc-400'>
           {t("common:logsBox.lvl_up")}
           <span className='ml-1 text-main'>
-            {genericLog.newLevel.level}
-            {" lvl"}
+            {t("feed:level_short", { level: genericLog.newLevel.level })}
           </span>
         </span>
       )}
@@ -1434,7 +1500,7 @@ const GroupedLogLine = ({
           color='cyan'
           icon={ListChecks}
           label={planTitle}
-          hint='Click to see what this plan practices'
+          hint={t("feed:plan_hint")}
           onOpen={
             plan
               ? () => onPreview({ kind: "plan", plan })
@@ -1458,7 +1524,7 @@ const GroupedLogLine = ({
             color='emerald'
             icon={MonitorPlay}
             label={lessonTitle}
-            hint='Click to watch this lesson'
+            hint={t("feed:lesson_hint")}
             onOpen={
               lessonVideoId
                 ? () =>
@@ -1475,7 +1541,7 @@ const GroupedLogLine = ({
             color='emerald'
             icon={Dumbbell}
             label={sessionTitle}
-            hint='Click to preview and start this exercise'
+            hint={t("feed:exercise_hint")}
             onOpen={
               matchedExercise
                 ? () =>
@@ -1493,7 +1559,7 @@ const GroupedLogLine = ({
             onClick={() =>
               onOpenLeaderboard(matchedExercise.id, matchedExercise.title)
             }
-            title='Click to view the ranking for this exercise'
+            title={t("feed:ranking_hint")}
             className='inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60'>
             <MicPerformanceStats performance={genericLog.micPerformance} />
           </button>
@@ -1511,7 +1577,7 @@ const GroupedLogLine = ({
             onClick={() =>
               onOpenLeaderboard(matchedExercise.id, matchedExercise.title)
             }
-            title='Click to view the ranking for this exercise'
+            title={t("feed:ranking_hint")}
             className='inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60'>
             <EarTrainingStats performance={genericLog.earTrainingPerformance} />
           </button>
@@ -1563,6 +1629,8 @@ const GroupedLogItem = ({
   onViewRecording: (id: string) => void;
   onOpenLeaderboard: (exerciseId: string, exerciseTitle: string) => void;
 }) => {
+  const { t } = useTranslation("feed");
+  const dateLocale = useDateFnsLocale();
   const representative = group.logs[0] as FirebaseLogsInterface;
   const date = new Date(getLogTimestampMs(group.logs[0]));
   const fameAmount = calculateGroupFame(group);
@@ -1596,11 +1664,14 @@ const GroupedLogItem = ({
             <span className='hidden shrink-0 items-center gap-1.5 text-[11px] text-zinc-500 sm:flex'>
               {isNew && (
                 <span
-                  aria-label='New since your last visit'
+                  aria-label={t("new_since_last_visit")}
                   className='h-1.5 w-1.5 rounded-full bg-cyan-400'
                 />
               )}
-              {formatLogTime(date)}
+              {formatLogTime(date, new Date(), {
+                locale: dateLocale,
+                justNow: t("just_now"),
+              })}
             </span>
           </div>
         </div>
@@ -1653,6 +1724,7 @@ const Logs = ({
   hasMoreLogs,
   onLoadMoreLogs,
 }: LogsBoxLayoutProps) => {
+  const { t } = useTranslation("feed");
   const { isNewMessage } = useUnreadMessages();
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(
     null,
@@ -1806,7 +1878,7 @@ const Logs = ({
             type='button'
             onClick={onLoadMoreLogs}
             className='rounded-lg bg-zinc-800/60 px-4 py-2 text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white'>
-            Show more
+            {t("show_more")}
           </button>
         </div>
       )}

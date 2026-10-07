@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { mirrorStyle, uprightTransform, useHandednessStore, useIsLeftHanded } from "hooks/useHandedness";
+import { useTranslation } from "hooks/useTranslation";
 import { type CSSProperties, useCallback, useId, useState } from "react";
 
 interface ClickableFretboardProps {
@@ -74,6 +75,7 @@ export function useShowFullNeck() {
 
 /** Zoom-out switch for the neck — same preference as before, as a compact chip. */
 export function FullNeckToggle({ value, onChange }: { value: boolean; onChange: (next: boolean) => void }) {
+  const { t } = useTranslation("session");
   return (
     <button
       type="button"
@@ -83,14 +85,15 @@ export function FullNeckToggle({ value, onChange }: { value: boolean; onChange: 
         "rounded px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
         value ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700/60",
       )}
-      title="Show the whole neck instead of just the search window">
-      Whole neck
+      title={t("fretboard.whole_neck_hint")}>
+      {t("fretboard.whole_neck")}
     </button>
   );
 }
 
 /** Mirrors every neck diagram for left-handed players — nut on the right. */
 export function LeftyToggle() {
+  const { t } = useTranslation("session");
   const leftHanded = useIsLeftHanded();
   const setLeftHanded = useHandednessStore((state) => state.setLeftHanded);
   return (
@@ -102,8 +105,8 @@ export function LeftyToggle() {
         "rounded px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
         leftHanded ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700/60",
       )}
-      title="Mirror the neck the way a left-handed player sees it — nut on the right">
-      Left-handed
+      title={t("fretboard.lefty_hint")}>
+      {t("fretboard.lefty")}
     </button>
   );
 }
@@ -172,6 +175,7 @@ export function ClickableFretboard({
   zoneKeys,
   showFullNeck = false,
 }: ClickableFretboardProps) {
+  const { t } = useTranslation("session");
   const isInScope = (stringNum: number) => !strings || strings.includes(stringNum);
   const found = new Set(foundKeys);
   const marked = new Set(markedKeys);
@@ -232,7 +236,7 @@ export function ClickableFretboard({
             "--fretboard-min-w": `${Math.round(vw * (MIN_COL_PX / CELL_W))}px`,
             transform: mirrorStyle(leftHanded),
           } as CSSProperties}
-          aria-label={leftHanded ? "Clickable fretboard, left-handed" : "Clickable fretboard"}
+          aria-label={leftHanded ? t("fretboard.aria_lefty") : t("fretboard.aria")}
         >
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">

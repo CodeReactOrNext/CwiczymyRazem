@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { useRipple } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import { Home, Menu, Timer } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -16,10 +17,10 @@ type NavIcon = React.ComponentType<{ size?: number; className?: string }>;
 // Icons must stay in sync with the sidebar entries in RockSidebar, otherwise the
 // same destination shows up with two different glyphs.
 const navItems: { label: string; href: string; icon: NavIcon }[] = [
-  { label: "Home", href: "/dashboard", icon: Home },
-  { label: "Practice", href: "/timer", icon: Timer },
-  { label: "Songs", href: "/songs?view=board", icon: PiCassetteTapeLight },
-  { label: "Progress", href: "/profile/activity", icon: FaArrowTrendUp },
+  { label: "home", href: "/dashboard", icon: Home },
+  { label: "practice", href: "/timer", icon: Timer },
+  { label: "songs", href: "/songs?view=board", icon: PiCassetteTapeLight },
+  { label: "progress", href: "/profile/activity", icon: FaArrowTrendUp },
 ];
 
 const itemClass =
@@ -73,6 +74,7 @@ const BottomNavItem = ({
 };
 
 export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
+  const { t } = useTranslation("nav");
   const router = useRouter();
   const { createRipple, ripple } = useRipple("bg-cyan-400/30");
 
@@ -95,7 +97,7 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
         {navItems.map((item) => (
           <BottomNavItem
             key={item.href}
-            label={item.label}
+            label={t(item.label)}
             href={item.href}
             icon={item.icon}
             active={isActive(item.href)}
@@ -107,13 +109,13 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
             createRipple(e);
             onMenuClick();
           }}
-          aria-label="Open menu"
+          aria-label={t("open_menu")}
           className={itemClass}
         >
           <span className={pillClass(false)}>
             {ripple}
             <Menu size={20} className={iconClass(false)} />
-            <span className={labelClass(false)}>More</span>
+            <span className={labelClass(false)}>{t("more")}</span>
           </span>
         </button>
       </div>

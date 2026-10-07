@@ -1,0 +1,526 @@
+{
+  "close": "Close",
+  "start": "Start",
+  "cancel": "Cancel",
+  "media": {
+    "guitar_off": "Guitar off",
+    "guitar_on": "Guitar on",
+    "guitar": "Guitar",
+    "tuning_locked": "Tuning is locked for this exercise",
+    "guitar_tuning": "Guitar tuning",
+    "guitar_tuning_named": "Guitar tuning: {{name}}",
+    "guitar_tuning_change": "Guitar tuning — click to change",
+    "pitch_required": "Pitch Detect required during the exam",
+    "pitch_on": "Pitch Detect on",
+    "pitch_off": "Pitch Detect off",
+    "pitch_detect": "Pitch Detect",
+    "tuner": "Tuner",
+    "recalibrate": "Recalibrate",
+    "playback_off": "Guitar playback off — click to hear the tab",
+    "playback_on": "Guitar playback on — click to mute the tab",
+    "playback": "Guitar playback",
+    "mic_active": "Microphone active — app is listening to your guitar",
+    "mic_enable": "Enable microphone to detect what you're playing",
+    "mic_tools_hint": "Mic tools: recalibrate, tuner, troubleshooting",
+    "mic_tools": "Mic tools",
+    "mic_not_working": "Mic not working?",
+    "boost_hint": "Boost the Guitar Pro playback above 100% if it sounds too quiet."
+  },
+  "mic_help": {
+    "title": "Microphone troubleshooting",
+    "intro": "If the app can't hear your guitar or detects the wrong notes, work through these steps. Most issues come from browser permissions or another app using the mic.",
+    "resetting": "Resetting…",
+    "reset": "Reset mic settings & reload",
+    "reset_hint": "Clears this app's saved calibration and mic preferences, then reloads the page.",
+    "tips": {
+      "0": {
+        "title": "Allow microphone access",
+        "description": "Click the lock / mic icon in your browser's address bar and make sure this site is allowed to use the microphone. If you accidentally blocked it, switch it back to \"Allow\" and reload the page."
+      },
+      "1": {
+        "title": "Pick the right input device",
+        "description": "If you have several mics or an audio interface, set the correct one as the default input in your system sound settings (and in the browser's site permissions), then reload."
+      },
+      "2": {
+        "title": "Free up the microphone",
+        "description": "Close other apps that might be holding the mic — Zoom, Discord, OBS, Teams, or another browser tab. Only one app can capture a low-latency input at a time."
+      },
+      "3": {
+        "title": "Recalibrate",
+        "description": "Use the Recalibrate button to re-run the tuning calibration. This fixes most \"notes not detected\" or \"wrong note\" problems after changing gear or rooms."
+      },
+      "4": {
+        "title": "Check levels & tuning",
+        "description": "Make sure your guitar is in tune and loud enough. Move closer to the mic, raise the input gain, and reduce background noise. Very quiet or distorted signals are hard to detect."
+      },
+      "5": {
+        "title": "Check OS privacy settings",
+        "description": "On Windows: Settings → Privacy & security → Microphone, and allow your browser. On macOS: System Settings → Privacy & Security → Microphone. The browser must be enabled there too."
+      },
+      "6": {
+        "title": "Clear cookies & site data",
+        "description": "Stale permissions or cached data can break capture. Clear cookies and site data for this site in your browser settings, then reload and allow the mic again. (Use the reset button below to clear this app's saved mic setup.)"
+      },
+      "7": {
+        "title": "Try another browser",
+        "description": "Chrome and Edge have the most reliable audio capture. Some browsers throttle or block the mic in background tabs or on insecure connections — keep this tab focused and on https."
+      }
+    }
+  },
+  "timing": {
+    "title": "Calibrate timing",
+    "intro": "Speakers, headphones and audio interfaces each add a delay between the click you hear and the note we pick up. Play along to a few clicks and we'll measure yours, so timing grades match what you hear.",
+    "step1": "Use the speakers or headphones you practice with.",
+    "step2": "Pluck the open low E on every click and let it ring — don't mute between clicks. {{bpm}} BPM, {{countIn}} clicks to get ready, then {{clicks}} counted.",
+    "step3": "Play with the click, not ahead of it.",
+    "now_using": "Now using",
+    "measured_here": "measured in this browser",
+    "estimate": "an estimate, not measured yet",
+    "mic_first": "Turn on the mic first",
+    "forget": "Forget the measurement and go back to the estimate",
+    "get_ready": "Get ready — listen to the pulse",
+    "pluck": "Pluck on every click",
+    "fail": {
+      "too_few": "Not enough clicks heard",
+      "ahead": "The notes came in ahead of the click",
+      "spread": "The hits were too spread out",
+      "too_few_body": "We picked up {{hits}} of {{total}} — it takes at least {{min}}. Pluck a little harder, and check the mic is the one your guitar is on.",
+      "ahead_body": "Sound can't reach us before it's played, so something else was heard. Let the string ring between clicks instead of muting it, and play with the click, not ahead of it.",
+      "spread_body": "They wandered by about ±{{spread}} ms, which says more about the run than about your setup. Try again, playing right on the click and letting the string ring."
+    },
+    "try_again": "Try again",
+    "measured_delay": "Measured delay",
+    "heard": "{{hits}} of {{total}} clicks heard, steady within ±{{spread}} ms",
+    "saved_before": "Saved before",
+    "estimated_before": "Estimated before",
+    "use": "Use {{ms}} ms"
+  },
+  "add_to_plan": "Add to Plan",
+  "saving": "Saving…",
+  "scale_dialog": {
+    "title": "Choose Scale to Practice",
+    "description": "Configure scale practice parameters. The system will generate tablature automatically.",
+    "root": "Root Note",
+    "select_note": "Select note",
+    "scale_type": "Scale Type",
+    "select_scale": "Select scale",
+    "pattern": "Practice Pattern",
+    "select_pattern": "Select pattern",
+    "position": "Fretboard Position",
+    "select_position": "Select position",
+    "full_fretboard": "Full Fretboard (All Positions)",
+    "position_frets": "Position {{pos}} (frets {{from}}-{{to}})",
+    "all_hint": "This will generate a longer exercise covering all main positions across the neck",
+    "position_hint": "Position determines where on the fretboard you practice the scale",
+    "preview_all": "All positions — frets 0–15",
+    "preview_position": "Position {{pos}} — frets {{from}}–{{to}}"
+  },
+  "chord_dialog": {
+    "title": "Chord Practice Setup",
+    "description": "Build your exercise. Sequence up to 8 chords.",
+    "click_to_add": "Click chords below to add...",
+    "beginner": "Beginner",
+    "intermediate": "Inter",
+    "advanced": "Advanced",
+    "frequency": "Changes Frequency",
+    "every_bar": "Every Bar",
+    "every_2_beats": "Every 2 Beats",
+    "every_beat": "Every Beat",
+    "hide_tabs": "Hide Fret Tabs",
+    "by_ear": "Play by ear/memory"
+  },
+  "hunt": {
+    "press_play": "Press Play below to start the timer",
+    "click_now": "you can click right away"
+  },
+  "quick": {
+    "tempo_reset": "Metronome tempo — reset to recommended",
+    "slower_hint": "Slower (Shift: −5 BPM)",
+    "slower": "Slower",
+    "tempo_type": "Tempo in BPM — click to type a value",
+    "edit_bpm": "Edit BPM",
+    "faster_hint": "Faster (Shift: +5 BPM)",
+    "faster": "Faster",
+    "subdivision_hint": "Click subdivision: quarters, eighths, triplets…",
+    "subdivision": "Subdivision",
+    "accents_set": "Accents are set by this exercise",
+    "beats_accents": "Beats per bar & accents",
+    "beats_per_bar": "Beats per bar"
+  },
+  "tab": {
+    "zoom_out_hint": "Zoom out — see more of the exercise",
+    "zoom_out": "Zoom out",
+    "reset_zoom": "Reset zoom",
+    "zoom_in_hint": "Zoom in — enlarge the notes",
+    "zoom_in": "Zoom in",
+    "settings": "Tablature settings",
+    "look": "Look",
+    "remove_loop": "Remove the loop",
+    "clear_loop": "Clear loop",
+    "calibrate_hint": "Measure your audio delay, so timing grades match what you hear",
+    "minimap_hint": "Click a bar to jump · drag across bars to loop",
+    "settings_description": "Personalise how the tab looks. Changes apply straight away and are remembered on this device.",
+    "rest": "rest",
+    "from_start": "From the start",
+    "resize_height": "Resize viewer height",
+    "drag_resize": "Drag to resize"
+  },
+  "note_hunt": {
+    "play_interval": "Play the note the interval lands on",
+    "needs_pitch": "Needs Pitch Detect",
+    "turn_on": "Turn it on in the controls below so the app can hear your answer — without it you can only reveal it.",
+    "enable_mic": "Enable the mic in the controls below to auto-score, or check off octaves by hand.",
+    "starting_mic": "Starting microphone…",
+    "wrong_octave": "Right note, wrong octave — that was {{note}}.",
+    "string_gives": "The {{string}} string gives you {{note}}.",
+    "stay_inside": "Stay inside frets {{from}}–{{to}}.",
+    "correct": "correct",
+    "find_target": "Find the target note",
+    "reveal": "Reveal answer",
+    "strings": {
+      "1": "high e",
+      "2": "B",
+      "3": "G",
+      "4": "D",
+      "5": "A",
+      "6": "low E"
+    },
+    "tap_octaves": "Tap each octave you find",
+    "tap_octaves_region": "Tap each octave you find in the region"
+  },
+  "tools": {
+    "tempo": "Tempo",
+    "sound": "Sound",
+    "info": "Guide",
+    "tempo_settings": "Tempo settings",
+    "guitar_turn_on": "Turn guitar on",
+    "guitar_turn_off": "Turn guitar off",
+    "pitch_turn_off": "Turn pitch detect off",
+    "pitch_turn_on": "Turn pitch detect on",
+    "sound_settings": "Sound and input settings",
+    "sound_input": "Sound & input",
+    "exercise_guide": "Exercise guide",
+    "close_settings": "Close settings"
+  },
+  "success": {
+    "mastered": "Mastered!",
+    "passed": "Exam Passed!",
+    "failed": "Exam Failed",
+    "flawless": "Flawless performance.",
+    "nice_work": "Nice work — a couple more runs and you'll nail every note.",
+    "missed_by": "Missed by {{points}} pts. Give it another shot!",
+    "total_score": "Total score",
+    "grade": "Grade",
+    "accuracy": "Accuracy",
+    "max_combo": "Max combo",
+    "score": "Score",
+    "over_time": "Performance over time",
+    "pass": "Pass",
+    "back_to_menu": "Back to Menu"
+  },
+  "quiz": {
+    "stop": "Stop",
+    "play_again": "Play again",
+    "play": "Play",
+    "correct": "Correct",
+    "wrong": "Wrong",
+    "next": "Next",
+    "start_hint": "Press Play below to start the timer — the quiz already works",
+    "which_progression": "Which progression is this?",
+    "play_progression": "Play progression",
+    "hear_tonic": "Hear the I chord",
+    "slot_filled": "Slot {{n}}: {{chord}}, tap to clear",
+    "slot_empty": "Slot {{n}}: empty",
+    "check": "Check",
+    "clear": "Clear",
+    "heard_in": "Heard in: {{songs}}",
+    "play_it_again": "Play it again",
+    "detune_in_tune": "In tune — {{cents}} cents off, inside the {{window}}-cent window.",
+    "detune_sharp": "{{cents}} cents sharp — the window was {{window}} cents.",
+    "detune_flat": "{{cents}} cents flat — the window was {{window}} cents.",
+    "tune_second": "Tune the second note to the first",
+    "stop_notes": "Stop the notes",
+    "play_both": "Play both notes",
+    "second_pitch": "Pitch of the second note",
+    "flatter": "flatter",
+    "sharper": "sharper",
+    "no_beating": "No audible beating left — that is what in tune sounds like.",
+    "beating": "Two notes that far apart beat about {{beats}} times a second. The slower the wobble, the closer you are.",
+    "detune_footnote": "On a real guitar the same trick works: fret the 5th and compare it with the open string above.",
+    "snap": "Snap it in tune",
+    "which_scale": "Which scale is this?",
+    "play_scale": "Play scale",
+    "play_slowly": "Play it slowly",
+    "root": "Root: {{root}}",
+    "root_held": "The root is held underneath — measure every note against it",
+    "hear_again_slowly": "Hear it again, slowly",
+    "which_chord": "What kind of chord is this?",
+    "play_chord": "Play chord",
+    "one_note": "One note at a time",
+    "root_moves": "The root moves every round — listen to the colour, not the pitch",
+    "formula": "Formula: {{formula}}",
+    "modes": {
+      "chordType": "Chord quality",
+      "progression": "Chord progressions",
+      "detune": "Tuning by ear",
+      "scaleMode": "Scales & modes"
+    },
+    "key_of_build": "Key of {{key}} — build the degrees you hear, in order",
+    "listen_for": "Listen for the {{tell}} — {{formula}}"
+  },
+  "backing": {
+    "required": "This exercise requires a backing track",
+    "find_hint": "Find one on YouTube to play along",
+    "find": "Find Backing Track on YouTube",
+    "searching": "Searching YouTube...",
+    "search_again": "Search again",
+    "change": "Change backing track"
+  },
+  "ear": {
+    "correct": "Correct — point earned",
+    "next_melody": "Next melody is on its way…",
+    "tab_shows": "The tab below shows the melody. Replay it to compare.",
+    "revealed": "Answer revealed",
+    "compare": "Compare with the tab below — did you play it right?",
+    "playing": "Playing melody…",
+    "plays_once": "It plays once and stops on its own — then it's your turn",
+    "listen_repeat": "Listen & repeat",
+    "listen_repeat_caption": "Play the melody, then find it on your guitar",
+    "listening": "Listening for your answer",
+    "listening_caption": "Play the notes you heard — get them all right and it advances on its own",
+    "your_turn": "Your turn",
+    "your_turn_mic": "Play your answer on your guitar, or replay the melody first",
+    "your_turn_memory": "Play it back from memory, then reveal to check yourself",
+    "title": "Ear training",
+    "new_best": "New best",
+    "best": "Best",
+    "replay": "Replay",
+    "stuck_reveal": "Stuck? Reveal",
+    "show_answer": "Show answer",
+    "replay_melody": "Replay melody",
+    "had_it": "I had it"
+  },
+  "volume": {
+    "instruments": "Instruments",
+    "title": "Volume",
+    "hint": "Volume: metronome, guitar playback and tracks",
+    "metronome": "Metronome",
+    "muted": "Muted",
+    "unmute_metronome": "Unmute metronome",
+    "mute_metronome": "Mute metronome",
+    "boost": "Boost volume",
+    "unmute": "Unmute",
+    "mute": "Mute",
+    "main_instrument": "Main Instrument"
+  },
+  "interval_click": {
+    "now_above": "Now the {{interval}} above that root — within reach of it",
+    "click_any": "Click any {{note}}",
+    "on_highlighted": "on the highlighted strings",
+    "root": "Root",
+    "target": "Target",
+    "play_root": "Play the root note the interval is measured from",
+    "hide_distance": "Hide the distance",
+    "how_far": "How far is it?",
+    "autoplay": "Autoplay"
+  },
+  "instructions": {
+    "support_author": "Support Author",
+    "instructions": "Instructions",
+    "why": "Why This Matters",
+    "backing_recommended": "Backing track recommended",
+    "backing_hint": "Use the backing track finder above to play along.",
+    "pro_tips": "Pro Tips",
+    "difficulty": "Difficulty",
+    "reward": "Potential Reward",
+    "skill_labels": {
+      "technique": "Technique",
+      "speed": "Speed",
+      "theory": "Theory",
+      "rhythm": "Rhythm",
+      "earTraining": "Ear Training",
+      "knowledge": "Knowledge"
+    }
+  },
+  "song_panel": {
+    "song": "Song",
+    "body": "Play it the way you rehearse it — from memory, along the record, or with your own tab. The session clock is counting this time towards the song.",
+    "open": "Open song"
+  },
+  "hud": {
+    "idle_hint": "Accuracy appears after your first note",
+    "silent_hint": "Pitch Detect hasn't matched a note yet — check that the mic hears your guitar",
+    "no_notes": "No notes heard",
+    "streak": "Streak",
+    "acc_short": "Acc"
+  },
+  "fretboard": {
+    "whole_neck_hint": "Show the whole neck instead of just the search window",
+    "whole_neck": "Whole neck",
+    "lefty_hint": "Mirror the neck the way a left-handed player sees it — nut on the right",
+    "lefty": "Left-handed",
+    "aria_lefty": "Clickable fretboard, left-handed",
+    "aria": "Clickable fretboard",
+    "diagram": "Fretboard diagram",
+    "diagram_lefty": "Fretboard diagram, left-handed",
+    "scale_note": "Scale note"
+  },
+  "exit": {
+    "title": "Leave the session?",
+    "too_short": "You've practised less than 20 seconds, so there's no time to save yet. Keep playing to log this session, or leave without it.",
+    "not_saved": "Your practice time is saved only when you finish the session. If you exit now, it won't be logged.",
+    "finish_save": "Finish & save time",
+    "exit": "Exit",
+    "exit_no_save": "Exit without saving",
+    "stay": "Stay in session"
+  },
+  "dialogs": {
+    "finished": "Exercise Finished!",
+    "great_job": "Great job on this one!"
+  },
+  "speed": {
+    "active_hint": "Playback speed {{speed}} — the click and backing track run at {{effective}} BPM instead of {{base}}",
+    "hint": "Playback speed — slow the click and backing track down to learn tricky passages",
+    "speed": "Speed",
+    "title": "Playback speed",
+    "subtitle": "Slows the click and backing track below the set BPM"
+  },
+  "update": {
+    "title": "Update ready",
+    "body": "A new version of riff.quest has been ready to install for a while. Restart the app to keep practicing.",
+    "restart": "Restart now",
+    "return": "Return"
+  },
+  "improv": {
+    "paused": "Paused — press play to start prompts"
+  },
+  "loading": "Loading…",
+  "track": "Track:",
+  "loading_track": "Loading track…",
+  "timing_breakdown": {
+    "title": "Timing",
+    "grades": {
+      "1": "Loose",
+      "2": "Close",
+      "3": "On time"
+    }
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "tempo": "Tempo",
+    "backing": "Backing track",
+    "nav": {
+      "0": "Play / pause",
+      "1": "Previous exercise",
+      "2": "Next exercise"
+    },
+    "tempo_rows": {
+      "0": "Tempo +1 BPM",
+      "1": "Tempo -1 BPM",
+      "2": "Tempo +5 BPM",
+      "3": "Tempo -5 BPM",
+      "4": "Reset tempo to recommended"
+    },
+    "backing_rows": {
+      "0": "Backing track 20 ms earlier",
+      "1": "Backing track 20 ms later",
+      "2": "Backing track 100 ms earlier",
+      "3": "Backing track 100 ms later"
+    }
+  },
+  "timer_section": {
+    "session": "Session",
+    "exercise": "Exercise",
+    "total": "Session Total"
+  },
+  "click_hunt": {
+    "play_note": "Play the note you are looking for"
+  },
+  "strum": {
+    "down": "Down",
+    "up": "Up",
+    "muted": "Muted",
+    "accent": "Accent"
+  },
+  "open_exercise": {
+    "title": "Open Exercise",
+    "no_tab": "No tab for this one — it's open-ended.",
+    "body": "Some exercises can't be captured in a tab — this is one of them. It's guided by the steps below, so work through them at your own pace.",
+    "read": "Read the instructions below to get started"
+  },
+  "progress": {
+    "title": "Session Progress",
+    "song": "Song: {{title}}",
+    "exercise": "Exercise {{n}}",
+    "go_to": "Go to {{label}}"
+  },
+  "controls": {
+    "press_start": "Press Start to play",
+    "pause": "Pause",
+    "restart": "Restart Exercise"
+  },
+  "chord_hunt": {
+    "enable_mic": "Enable the mic in the controls below to light up tones, or tap a ? to reveal it.",
+    "tap_tone": "Tap a tone to reveal it"
+  },
+  "tuning_modal": {
+    "description": "Choose how your guitar is tuned — pitch detection and backing audio will be matched to this tuning."
+  },
+  "header": {
+    "close_session": "Close session"
+  },
+  "speeds_mastered": {
+    "hint": "Speeds you've mastered for this exercise",
+    "label": "Speeds mastered"
+  },
+  "rotate": {
+    "title": "Rotate your phone",
+    "body": "Wider tab, bigger controls"
+  },
+  "video": {
+    "player": "YouTube video player",
+    "unavailable": "Video not available",
+    "invalid": "Invalid YouTube URL"
+  },
+  "image": {
+    "enlarge": "Zoom in"
+  },
+  "gap": {
+    "title": "Gap Test",
+    "listen": "Listen — {{bars}} bars, feel the pulse",
+    "get_ready": "Get ready — tap the returning “1”",
+    "counting": "Counting the silence — bar {{bar}} of {{total}}",
+    "nailed": "Nailed it — level up!",
+    "close": "Close — repeat it to lock a PERFECT",
+    "no_hit": "No hit in time — try again",
+    "off_grid": "Off the grid — try again",
+    "intro": "Press Start. Keep the pulse through the silence and tap once, on the very next “1”.",
+    "step_listen": "Listen",
+    "step_listen_sub": "{{bars}} bars of clicks",
+    "step_silence": "Silence",
+    "bar_of": "bar {{bar}} of {{total}}",
+    "bars_keep": "{{bars}} bars · keep the pulse",
+    "step_tap": "Tap",
+    "step_tap_sub": "on the returning “1”",
+    "level_up": "Level up → {{bars}} silent bars",
+    "or_space": "or press Space",
+    "reset": "Reset level",
+    "recent": "Recent",
+    "silent_bars": "silent bars: {{bars}}",
+    "miss": "miss",
+    "no_attempts": "No attempts yet — press Start."
+  },
+  "tuning_lock": {
+    "gp": "This song comes from a Guitar Pro import — the tuning is stored in the file and can't be changed here.",
+    "exam": "Tuning is locked during the exam — tasks are prepared exclusively for standard tuning (E A D G B E)."
+  },
+  "tuner": {
+    "enable_pitch": "Enable Pitch Detect to use the tuner",
+    "play_open": "Play an open string",
+    "in_tune": "In tune — hold it",
+    "sharp": "{{cents}}¢ sharp — tune down",
+    "flat": "{{cents}}¢ flat — tune up",
+    "string": "String {{n}} — {{name}} ({{hz}} Hz)",
+    "all_tuned": "All strings in tune"
+  }
+}

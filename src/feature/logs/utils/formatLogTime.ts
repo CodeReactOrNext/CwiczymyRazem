@@ -1,3 +1,4 @@
+import type { Locale } from "date-fns";
 import { formatDistance } from "date-fns";
 
 /** Younger than this reads as "just now" rather than as a count of seconds. */
@@ -8,8 +9,12 @@ const JUST_NOW_MS = 60 * 1000;
  * the viewer's would otherwise read "in less than a minute" — the future — so anything in the future
  * or under a minute old is simply "just now".
  */
-export const formatLogTime = (date: Date, now: Date = new Date()): string => {
-  if (now.getTime() - date.getTime() < JUST_NOW_MS) return "just now";
+export const formatLogTime = (
+  date: Date,
+  now: Date = new Date(),
+  { locale, justNow = "just now" }: { locale?: Locale; justNow?: string } = {},
+): string => {
+  if (now.getTime() - date.getTime() < JUST_NOW_MS) return justNow;
 
-  return formatDistance(date, now, { addSuffix: true });
+  return formatDistance(date, now, { addSuffix: true, locale });
 };

@@ -1,0 +1,92 @@
+{
+  "language": {
+    "title": "Idioma",
+    "subtitle": "Se aplica a la aplicación en este dispositivo.",
+    "work_in_progress": "Las traducciones están en curso: todo lo que aún no esté traducido se queda en inglés."
+  },
+  "settings_subtilte": "Editar perfil",
+  "edit": "Editar",
+  "save": "Guardar",
+  "back": "Atrás",
+  "nickname": "Apodo:",
+  "new_nickname": "Nuevo apodo",
+  "new_email": "Nuevo correo electrónico",
+  "password": "Contraseña:",
+  "new_password": "Nueva contraseña",
+  "repeat_new_password": "Repite la nueva contraseña",
+  "reset_stats": "Reiniciar estadísticas",
+  "reset_warning": "Atención. Si pulsas este botón, se reiniciarán tus estadísticas.",
+  "reset_approve_info": "¿Seguro que quieres borrar todas tus estadísticas?",
+  "reset": "Reiniciar",
+  "anonimity": "Anonimato:",
+  "anonimity_info": "¿Quieres ocultar tu apodo en la clasificación?",
+  "resolution_info": "Resolución máxima 250 × 250",
+  "logged_in_via_google": "No puedes cambiar la contraseña ni el correo porque iniciaste sesión con Google.",
+  "bands": "Tus bandas",
+  "guitarStartDate": {
+    "title": "¿Cuándo empezaste a tocar la guitarra?",
+    "placeholder": "Elige una fecha",
+    "save": "Guardar",
+    "success": "¡Fecha de inicio actualizada!",
+    "error": "No se pudo actualizar la fecha de inicio",
+    "duration_years": "¡Llevas {{years}} años tocando!"
+  },
+  "profile_settings": "Ajustes del perfil",
+  "manage_your_profile_information": "Gestiona la información de tu perfil",
+  "security": "Seguridad",
+  "manage_your_account_security": "Gestiona la seguridad de tu cuenta",
+  "google_account_notice": "Cuenta de Google: opciones limitadas",
+  "additional_info": "Información adicional",
+  "customize_your_experience": "Personaliza tu experiencia",
+  "danger_zone": "Zona de peligro",
+  "irreversible_actions": "Acciones irreversibles: procede con cuidado",
+  "danger_zone_warning": "Las siguientes acciones no se pueden deshacer. Asegúrate de entender sus consecuencias.",
+  "bands_placeholder": "Tus bandas...",
+  "email_label": "Correo electrónico",
+  "email_notifications": {
+    "title": "Notificaciones por correo",
+    "description": "Elige qué correos quieres recibir de Riff Quest.",
+    "options": {
+      "streakReminders": {
+        "title": "Recordatorios de racha",
+        "description": "Un aviso cuando llevas un día o dos sin practicar, para que no rompas tu racha."
+      },
+      "seasonUpdates": {
+        "title": "Novedades de temporada",
+        "description": "Correos sobre el inicio de nuevas temporadas, temporadas a punto de acabar y tus resultados finales."
+      }
+    },
+    "always_sent": "Los correos de cuenta y seguridad (como los cambios de correo) se envían siempre y no se pueden desactivar.",
+    "saving": "Guardando...",
+    "save": "Guardar cambios"
+  },
+  "tablature": {
+    "title": "Tablatura",
+    "description": "Cambia cómo se dibujan los ejercicios. Todo se guarda en este dispositivo y se aplica en tu próxima sesión de práctica.",
+    "live_preview": "Vista previa en directo",
+    "mode_tab": "Tablatura",
+    "mode_notation": "Partitura",
+    "hint_tab": "El color y las animaciones de acierto solo aparecen mientras tocas de verdad.",
+    "hint_notation": "El mismo visor que en la sesión — cambia el fondo abajo para verlo en papel o en negro."
+  },
+  "profile_basics": {
+    "description": "Gestiona la información pública de tu perfil",
+    "change_avatar": "Cambiar avatar",
+    "display_name": "Nombre visible",
+    "display_name_placeholder": "Escribe tu nombre visible",
+    "display_name_hint": "Este nombre se ve en las clasificaciones y en tu perfil público.",
+    "adjust_image": "Ajustar imagen",
+    "zoom": "Zoom",
+    "cancel": "Cancelar",
+    "set_avatar": "Usar como avatar"
+  },
+  "tabs": {
+    "title": "Ajustes",
+    "profile": "Perfil",
+    "socials": "Redes sociales",
+    "tablature": "Tablatura",
+    "notifications": "Notificaciones",
+    "security": "Seguridad",
+    "google_auth": "Autenticación con Google"
+  }
+}

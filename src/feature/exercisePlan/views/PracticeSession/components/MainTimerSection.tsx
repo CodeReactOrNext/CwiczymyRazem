@@ -1,6 +1,7 @@
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { FaHistory } from "react-icons/fa";
 import { convertMsToHMS } from "utils/converter/timeConverter";
 
@@ -35,6 +36,7 @@ export const MainTimerSection = ({
 
   handleRestart
 }: MainTimerSectionProps) => {
+  const { t } = useTranslation("session");
   const { formattedTimeLeft, progress: timerProgressValue, isFinished } = useTimerContext();
   // Only what this session tracked — Redux `user.timer` also carries time the
   // player has not reported yet, which is not part of "Session".
@@ -58,7 +60,7 @@ export const MainTimerSection = ({
           {/* Session Stats (Left) */}
           <div className="flex items-center gap-4 pr-8 mr-4">
              <div className="flex flex-col items-end gap-1">
-                <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">Session</span>
+                <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">{t("timer_section.session")}</span>
                 <div className="flex items-center gap-2 text-white">
                     <FaHistory className="h-3.5 w-3.5 text-cyan-500/50" />
                     <span className="font-mono text-lg font-black tracking-wide">{formattedTotalSession}</span>
@@ -68,7 +70,7 @@ export const MainTimerSection = ({
 
           {/* Exercise Time Display */}
           <div className="flex flex-col items-start gap-1">
-             <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">Exercise</span>
+             <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">{t("timer_section.exercise")}</span>
              <div className="flex items-center gap-2">
                  <div className={cn(
                    "font-mono text-3xl font-black leading-none tracking-tight transition-colors duration-300",
@@ -152,7 +154,7 @@ export const MainTimerSection = ({
                 <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 w-max">
                     <div className="flex items-center gap-6 bg-zinc-900 px-6 py-3 rounded-2xl shadow-2xl">
                         <div className="flex flex-col items-center px-2">
-                            <span className="text-[9px] font-black capitalize tracking-[0.2em] text-cyan-500/70 mb-1.5">Session Total</span>
+                            <span className="text-[9px] font-black capitalize tracking-[0.2em] text-cyan-500/70 mb-1.5">{t("timer_section.total")}</span>
                             <div className="flex items-center gap-2">
                                 <FaHistory className="h-3 w-3 text-cyan-500/50" />
                                 <span className="text-base font-mono font-black text-cyan-400 tracking-wide">

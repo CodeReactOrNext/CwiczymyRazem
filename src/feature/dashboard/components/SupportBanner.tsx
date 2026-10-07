@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { FundingStatusBlock } from "feature/roadmap/components/FundingStatusBlock";
@@ -7,6 +8,7 @@ import { ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
 
 export const SupportBanner = () => {
+  const { t } = useTranslation("dashboard");
   const {
     totalRaised: rawTotalRaised,
     raisedThisMonth,
@@ -35,11 +37,10 @@ export const SupportBanner = () => {
           <Heart size={18} className='mt-0.5 shrink-0 text-orange-400' />
           <div className='min-w-0'>
             <p className='text-sm font-semibold text-zinc-100 sm:text-base'>
-              Help build Riff Quest
+              {t("support.title")}
             </p>
             <p className='mt-1 text-xs leading-relaxed text-zinc-400 sm:text-sm'>
-              Riff Quest is a one person project, free and built in the open.
-              Your support keeps it that way.
+              {t("support.body")}
             </p>
           </div>
         </div>
@@ -68,7 +69,7 @@ export const SupportBanner = () => {
         )}
 
         <span className='flex w-full shrink-0 items-center justify-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-900 transition-background group-hover:bg-white sm:w-auto sm:text-sm'>
-          <span>Support</span>
+          <span>{t("support.cta")}</span>
           <ArrowRight
             size={16}
             className='transition-transform duration-300 group-hover:translate-x-0.5'

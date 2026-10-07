@@ -9,6 +9,7 @@ import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -49,6 +50,7 @@ export const StatsSection = ({
   isLoadingActivity,
   mode = "review",
 }: StatsSectionProps) => {
+  const { t } = useTranslation("profile");
   const { time } = statistics;
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -206,9 +208,9 @@ export const StatsSection = ({
           {/* Skills Chart - Mobile */}
           <div className='lg:hidden'>
             <div className='relative mb-6'>
-              <h3 className='text-xl font-semibold text-white'>Skills</h3>
+              <h3 className='text-xl font-semibold text-white'>{t("layout.sections.skills.title")}</h3>
               <p className='text-xs text-zinc-400'>
-                Distribution of exercise time by category{" "}
+                {t("stats_section.skills_hint")}
               </p>
             </div>
             <SkillsRadarChart statistics={statistics} />

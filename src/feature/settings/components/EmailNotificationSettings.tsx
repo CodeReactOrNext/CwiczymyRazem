@@ -3,6 +3,7 @@ import { Card, CardContent } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { updateEmailNotifications } from "feature/user/store/userSlice.asyncThunk";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Flame, Loader2, Mail, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -68,6 +69,7 @@ const Toggle = ({
 );
 
 const EmailNotificationSettings = () => {
+  const { t } = useTranslation("settings");
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUserInfo);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
@@ -99,10 +101,10 @@ const EmailNotificationSettings = () => {
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground">
-                Email notifications
+                {t("email_notifications.title")}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Choose which emails you want to receive from Riff Quest.
+                {t("email_notifications.description")}
               </p>
             </div>
           </div>
@@ -121,9 +123,9 @@ const EmailNotificationSettings = () => {
                       <Icon className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="font-bold text-zinc-200">{opt.title}</p>
+                      <p className="font-bold text-zinc-200">{t(`email_notifications.options.${opt.key}.title`, opt.title)}</p>
                       <p className="text-sm text-muted-foreground">
-                        {opt.description}
+                        {t(`email_notifications.options.${opt.key}.description`, opt.description)}
                       </p>
                     </div>
                   </div>
@@ -143,8 +145,7 @@ const EmailNotificationSettings = () => {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Account and security emails (like email changes) are always sent and
-            can't be turned off.
+            {t("email_notifications.always_sent")}
           </p>
 
           <Button
@@ -157,7 +158,7 @@ const EmailNotificationSettings = () => {
             ) : (
               <Check className="mr-2 h-4 w-4" />
             )}
-            {isFetching ? "Saving..." : "Save changes"}
+            {isFetching ? t("email_notifications.saving") : t("email_notifications.save")}
           </Button>
         </div>
       </CardContent>

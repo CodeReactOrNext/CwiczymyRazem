@@ -1,0 +1,18 @@
+{
+  "select_practice_mode": "Wybierz tryb ćwiczenia",
+  "select": "Wybierz",
+  "modes": {
+    "timer": {
+      "title": "Zwykłe ćwiczenie",
+      "description": "Ćwicz dowolnie wybrane umiejętności i śledź swoje postępy"
+    },
+    "plan": {
+      "title": "Plan ćwiczeń",
+      "description": "Wybierz gotowy plan ćwiczeń i podążaj za nim"
+    },
+    "auto": {
+      "title": "Plan automatyczny",
+      "description": "Pozwól nam ułożyć plan dopasowany do Twojego czasu"
+    }
+  }
+}

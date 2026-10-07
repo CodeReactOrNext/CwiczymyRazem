@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { postChatWelcome } from "feature/chat/services/chatService";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowLeft, ArrowRight, Library, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,7 +49,9 @@ const StepHeading = ({
   title: string;
   description: string;
   onBack?: () => void;
-}) => (
+}) => {
+  const { t } = useTranslation("onboarding");
+  return (
   <div className='mx-auto mb-10 max-w-xl space-y-3 text-center'>
     <h1 className='text-3xl font-semibold tracking-tight text-zinc-100 sm:text-4xl'>
       {title}
@@ -63,11 +66,12 @@ const StepHeading = ({
           FOCUS_RING,
         )}>
         <ArrowLeft className='h-4 w-4' />
-        Back
+        {t("back")}
       </button>
     )}
   </div>
-);
+  );
+};
 
 /** Fades each step in as it replaces the previous one. */
 const StepBody = ({ children }: { children: ReactNode }) => (
@@ -90,6 +94,7 @@ const GoalTile = ({
   onClick: () => void;
 }) => {
   const Icon = option.icon;
+  const { t } = useTranslation("onboarding");
 
   return (
     <button
@@ -134,10 +139,10 @@ const GoalTile = ({
         <span className='min-w-0 flex-1'>
           <span className='flex items-center gap-2 text-base font-medium text-zinc-100'>
             <Icon className='h-4 w-4 shrink-0 text-zinc-400' />
-            {option.label}
+            {t(`goals.${option.goal}.label`, option.label)}
           </span>
           <span className='mt-1 block text-sm leading-relaxed text-zinc-400'>
-            {option.description}
+            {t(`goals.${option.goal}.description`, option.description)}
           </span>
         </span>
         <ArrowRight className='h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-200' />
@@ -154,6 +159,7 @@ const GoalTile = ({
  */
 const OnboardingView = () => {
   const router = useRouter();
+  const { t } = useTranslation("onboarding");
   const [step, setStep] = useState<Step>("level");
   const [level, setLevel] = useState<OnboardingLevel>("new");
   const [pending, setPending] = useState<string | null>(null);
@@ -286,14 +292,14 @@ const OnboardingView = () => {
             "rounded-lg px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-200",
             FOCUS_RING,
           )}>
-          Skip for now
+          {t("skip")}
         </Link>
       </header>
 
       <div
         className='mx-auto flex w-full max-w-4xl gap-2 px-4 sm:px-6'
         role='progressbar'
-        aria-label='Setup progress'
+        aria-label={t("progress")}
         aria-valuemin={1}
         aria-valuemax={STEPS.length}
         aria-valuenow={stepIndex + 1}>
@@ -312,8 +318,8 @@ const OnboardingView = () => {
         {step === "level" && (
           <StepBody key='level'>
             <StepHeading
-              title='How long have you been playing?'
-              description='So we only show you what fits where you are.'
+              title={t("level_step.title")}
+              description={t("level_step.description")}
             />
             <div className='grid gap-4 sm:grid-cols-3'>
               {LEVEL_OPTIONS.map((option, index) => (
@@ -329,14 +335,14 @@ const OnboardingView = () => {
                     <span className='font-teko text-6xl font-medium tabular-nums leading-none text-zinc-100 transition-colors duration-300 group-hover:text-cyan-400 sm:text-8xl'>
                       {option.years}
                     </span>
-                    <span className='text-sm text-zinc-500'>{option.unit}</span>
+                    <span className='text-sm text-zinc-500'>{t(`levels.${option.level}.unit`, option.unit)}</span>
                   </span>
                   <span className='min-w-0'>
                     <span className='block text-base font-medium text-zinc-100'>
-                      {option.label}
+                      {t(`levels.${option.level}.label`, option.label)}
                     </span>
                     <span className='mt-1 block text-sm leading-relaxed text-zinc-400'>
-                      {option.description}
+                      {t(`levels.${option.level}.description`, option.description)}
                     </span>
                   </span>
                 </button>
@@ -348,8 +354,8 @@ const OnboardingView = () => {
         {step === "goal" && (
           <StepBody key='goal'>
             <StepHeading
-              title='What brings you to Riff Quest?'
-              description='Pick where to start. Everything else stays one click away.'
+              title={t("goal_step.title")}
+              description={t("goal_step.description")}
               onBack={pending ? undefined : () => goTo("level")}
             />
             <div className='grid gap-4 sm:grid-cols-2'>
@@ -372,8 +378,8 @@ const OnboardingView = () => {
         {step === "plan" && (
           <StepBody key='plan'>
             <StepHeading
-              title='Pick a plan to start with'
-              description='Short routines where the timer walks you through each exercise. Nothing starts until you press Play — with the mic for live feedback, or without it.'
+              title={t("plan_step.title")}
+              description={t("plan_step.description")}
               onBack={pending ? undefined : () => goTo("goal")}
             />
             <div className='grid gap-4 sm:grid-cols-2'>
@@ -383,7 +389,7 @@ const OnboardingView = () => {
                   plan={plan}
                   onSelect={() => handlePlan(plan, index + 1)}
                   onStart={() => handlePlan(plan, index + 1)}
-                  startButtonText='Open plan'
+                  startButtonText={t("plan_step.open")}
                   isLoading={pending === plan.id}
                 />
               ))}
@@ -401,7 +407,7 @@ const OnboardingView = () => {
               ) : (
                 <Library className='h-4 w-4 text-zinc-400' />
               )}
-              Browse all {ALL_PLANS_COUNT} plans
+              {t("plan_step.browse_all", { count: ALL_PLANS_COUNT })}
             </button>
           </StepBody>
         )}

@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { Minus, Plus } from "lucide-react";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
@@ -20,6 +21,7 @@ export const ExerciseImage = ({
   title,
   isMobileView,
 }: ExerciseImageProps) => {
+  const { t } = useTranslation("session");
   const containerRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const {
@@ -52,7 +54,7 @@ export const ExerciseImage = ({
                 variant='secondary'
                 size='sm'
                 className='pointer-events-none opacity-90 shadow-lg'>
-                <span className='mr-2'>Powiększ</span>
+                <span className='mr-2'>{t("image.enlarge")}</span>
                 <FaExpand className='h-4 w-4' />
               </Button>
             </div>

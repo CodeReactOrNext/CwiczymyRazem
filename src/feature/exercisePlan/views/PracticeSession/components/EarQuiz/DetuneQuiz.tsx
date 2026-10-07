@@ -8,6 +8,7 @@ import {
   isDetuneSolved,
   remainingDetuneCents,
 } from "feature/exercisePlan/logic/earQuiz/questions";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Pause, Play } from "lucide-react";
 import { useState } from "react";
 import { midiToFrequency } from "utils/audio/noteUtils";
@@ -33,6 +34,7 @@ export function DetuneQuiz({
   onAnswer,
   onNext,
 }: DetuneQuizProps) {
+  const { t } = useTranslation("session");
   const [sliderCents, setSliderCents] = useState(0);
   // Where the slider stood when Check was pressed — the verdict has to keep
   // reporting that, even after "Snap it in tune" moves the drone afterwards.
@@ -58,14 +60,20 @@ export function DetuneQuiz({
 
   const direction = remaining > 0 ? "sharp" : "flat";
   const verdictLine = solved
-    ? `In tune — ${Math.abs(Math.round(remaining))} cents off, inside the ${question.toleranceCents}-cent window.`
-    : `${Math.abs(Math.round(remaining))} cents ${direction} — the window was ${question.toleranceCents} cents.`;
+    ? t("quiz.detune_in_tune", {
+        cents: Math.abs(Math.round(remaining)),
+        window: question.toleranceCents,
+      })
+    : t(direction === "sharp" ? "quiz.detune_sharp" : "quiz.detune_flat", {
+        cents: Math.abs(Math.round(remaining)),
+        window: question.toleranceCents,
+      });
 
   return (
     <>
       <div className='flex flex-col items-center gap-4 py-2'>
         <p className='text-center text-lg font-semibold text-zinc-100'>
-          Tune the second note to the first
+          {t("quiz.tune_second")}
         </p>
         <Button
           size='lg'
@@ -81,7 +89,7 @@ export function DetuneQuiz({
           ) : (
             <Play className='h-4 w-4' />
           )}
-          {drone.isPlaying ? "Stop the notes" : "Play both notes"}
+          {drone.isPlaying ? t("quiz.stop_notes") : t("quiz.play_both")}
         </Button>
         <p className='text-center text-xs text-zinc-500'>
           Reference: {question.referenceName} — listen for the wobble and slide
@@ -97,11 +105,11 @@ export function DetuneQuiz({
           max={SLIDER_RANGE_CENTS}
           step={1}
           disabled={isAnswered}
-          aria-label='Pitch of the second note'
+          aria-label={t("quiz.second_pitch")}
           className='py-3'
         />
         <div className='flex items-center justify-between text-xs text-zinc-500'>
-          <span>flatter</span>
+          <span>{t("quiz.flatter")}</span>
           <span
             className={cn(
               isAnswered && (solved ? "text-emerald-400" : "text-red-400"),
@@ -110,7 +118,7 @@ export function DetuneQuiz({
               ? `${remaining > 0 ? "+" : ""}${Math.round(remaining)} cents`
               : "no numbers — trust your ears"}
           </span>
-          <span>sharper</span>
+          <span>{t("quiz.sharper")}</span>
         </div>
       </div>
 
@@ -131,10 +139,10 @@ export function DetuneQuiz({
           answer={verdictLine}
           explanation={
             beats < 0.15
-              ? "No audible beating left — that is what in tune sounds like."
-              : `Two notes that far apart beat about ${beats.toFixed(1)} times a second. The slower the wobble, the closer you are.`
+              ? t("quiz.no_beating")
+              : t("quiz.beating", { beats: beats.toFixed(1) })
           }
-          footnote='On a real guitar the same trick works: fret the 5th and compare it with the open string above.'
+          footnote={t("quiz.detune_footnote")}
           onNext={onNext}
           extraAction={
             <Button
@@ -142,7 +150,7 @@ export function DetuneQuiz({
               onClick={snapToPitch}
               className='h-10 gap-2 bg-zinc-800/40 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'>
               <Play className='h-4 w-4' />
-              Snap it in tune
+              {t("quiz.snap")}
             </Button>
           }
         />

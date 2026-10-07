@@ -73,29 +73,30 @@ const EmptyRoom = ({
 }: {
   isGuild: boolean;
   onSayHi: () => void;
-}) => (
+}) => {
+  const { t } = useTranslation("chat");
+  return (
   <div className='flex h-full flex-col items-center justify-center gap-4 px-6 py-16 text-center'>
     <span className='flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900'>
       <MessageCircle className='h-6 w-6 text-zinc-500' />
     </span>
     <div className='space-y-1'>
       <p className='text-sm font-semibold text-zinc-200'>
-        Nobody has said anything yet
+        {t("empty_room.title")}
       </p>
       <p className='text-sm text-zinc-500'>
-        {isGuild
-          ? "Be the first — say hi to your guild."
-          : "Be the first — say hi to everyone."}
+        {isGuild ? t("empty_room.guild") : t("empty_room.everyone")}
       </p>
     </div>
     <button
       type='button'
       onClick={onSayHi}
       className='rounded-lg bg-cyan-500/15 px-4 py-2 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 active:click-behavior'>
-      Say hi 👋
+      {t("empty_room.say_hi")}
     </button>
   </div>
-);
+  );
+};
 
 /** `chatPath` picks the room; omitted, it is the global one. */
 const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
@@ -234,7 +235,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   const greet = (message: ChatMessageType) => {
     startReply(message);
     addMention({ id: message.userId, username: message.username });
-    setNewMessage(`@${message.username} Welcome! 👋 `);
+    setNewMessage(`@${message.username} ${t("greetings.welcome")} `);
     focusInput();
   };
 
@@ -257,7 +258,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
               isGuild={isGuild}
               onSayHi={() => {
                 setNewMessage(
-                  isGuild ? "Hi guild! 👋 " : "Hi everyone! 👋 ",
+                  `${isGuild ? t("greetings.hi_guild") : t("greetings.hi_everyone")} `,
                 );
                 focusInput();
               }}

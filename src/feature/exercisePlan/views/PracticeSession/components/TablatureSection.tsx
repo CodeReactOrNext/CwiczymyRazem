@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Settings2, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
 import React, {
   memo,
@@ -96,6 +97,7 @@ interface TablatureZoomControlProps {
 
 /** Floating zoom control over the tablature — compress the score to see more at once, or enlarge it. */
 function TablatureZoomControl({ zoom, onChange }: TablatureZoomControlProps) {
+  const { t } = useTranslation("session");
   const atMin = zoom <= NOTE_SPACING_MIN + 1e-6;
   const atMax = zoom >= NOTE_SPACING_MAX - 1e-6;
   const btn =
@@ -107,16 +109,16 @@ function TablatureZoomControl({ zoom, onChange }: TablatureZoomControlProps) {
         type='button'
         onClick={() => onChange(zoom - ZOOM_STEP)}
         disabled={atMin}
-        title='Zoom out — see more of the exercise'
-        aria-label='Zoom out'
+        title={t("tab.zoom_out_hint")}
+        aria-label={t("tab.zoom_out")}
         className={btn}>
         <ZoomOut className='h-3.5 w-3.5' />
       </button>
       <button
         type='button'
         onClick={() => onChange(1)}
-        title='Reset zoom'
-        aria-label='Reset zoom'
+        title={t("tab.reset_zoom")}
+        aria-label={t("tab.reset_zoom")}
         className='font-mono min-w-[3rem] rounded-md px-1.5 text-center text-[11px] font-semibold tabular-nums text-zinc-300 transition-colors hover:bg-white/10 hover:text-white'>
         {Math.round(zoom * 100)}%
       </button>
@@ -124,8 +126,8 @@ function TablatureZoomControl({ zoom, onChange }: TablatureZoomControlProps) {
         type='button'
         onClick={() => onChange(zoom + ZOOM_STEP)}
         disabled={atMax}
-        title='Zoom in — enlarge the notes'
-        aria-label='Zoom in'
+        title={t("tab.zoom_in_hint")}
+        aria-label={t("tab.zoom_in")}
         className={btn}>
         <ZoomIn className='h-3.5 w-3.5' />
       </button>
@@ -135,15 +137,16 @@ function TablatureZoomControl({ zoom, onChange }: TablatureZoomControlProps) {
 
 /** Opens the full tablature personalisation dialog. */
 function TablatureSettingsButton({ onOpen }: { onOpen: () => void }) {
+  const { t } = useTranslation("session");
   return (
     <button
       type='button'
       onClick={onOpen}
-      title='Tablature settings'
-      aria-label='Tablature settings'
+      title={t("tab.settings")}
+      aria-label={t("tab.settings")}
       className='flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900/85 px-2.5 text-zinc-300 outline-none backdrop-blur-sm transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50 hover:bg-zinc-800 hover:text-white'>
       <Settings2 className='h-3.5 w-3.5 shrink-0' />
-      <span className='text-[11px] font-semibold'>Look</span>
+      <span className='text-[11px] font-semibold'>{t("tab.look")}</span>
     </button>
   );
 }
@@ -179,6 +182,7 @@ export const TablatureSection = memo(function TablatureSection({
   isMicEnabled = false,
   obscured = false,
 }: TablatureSectionProps) {
+  const { t } = useTranslation("session");
   const { hitNotes, missedNotes, noteTimings } = useNoteMatchingContext();
   const { canCalibrateTiming, openTimingCalibration } = useSessionUI();
   const { tuning } = useGuitarTuningContext();
@@ -421,10 +425,10 @@ export const TablatureSection = memo(function TablatureSection({
               setLoopStart(null);
               setLoopEnd(null);
             }}
-            title='Remove the loop'
+            title={t("tab.remove_loop")}
             className='flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-zinc-100'>
             <X className='h-3.5 w-3.5' />
-            <span>Clear loop</span>
+            <span>{t("tab.clear_loop")}</span>
           </button>
         )}
       </div>
@@ -432,10 +436,10 @@ export const TablatureSection = memo(function TablatureSection({
         <button
           type='button'
           onClick={openTimingCalibration}
-          title='Measure your audio delay, so timing grades match what you hear'
+          title={t("tab.calibrate_hint")}
           className='flex shrink-0 items-center gap-1.5 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50 hover:bg-white/10 hover:text-zinc-100'>
           <Timer className='h-3.5 w-3.5' />
-          <span>Calibrate timing</span>
+          <span>{t("timing.title")}</span>
         </button>
       )}
       {isMicEnabled && <MicHud className='mr-1' />}

@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { SongArrangement } from "feature/songs/types/songs.type";
@@ -36,10 +37,11 @@ export const ArrangementStrip = ({
   selected,
   onSelect,
 }: ArrangementStripProps) => {
+  const { t } = useTranslation("songs");
   const cards: CardData[] = [
     {
       key: null,
-      label: "Whole song",
+      label: t("arrangements.whole_song"),
       playMs: progress?.totalPracticeMs ?? 0,
       sessions: progress?.sessionCount ?? 0,
       masteryPct: getSectionsMasteryPct(sections, null),
@@ -48,7 +50,7 @@ export const ArrangementStrip = ({
       const slice = progress?.arrangements[arrangement];
       return {
         key: arrangement,
-        label: ARRANGEMENT_META[arrangement].label,
+        label: t(`arrangements.${arrangement}.label`, ARRANGEMENT_META[arrangement].label),
         dot: ARRANGEMENT_META[arrangement].dot,
         playMs: slice?.totalPracticeMs ?? 0,
         sessions: slice?.sessionCount ?? 0,
@@ -60,15 +62,15 @@ export const ArrangementStrip = ({
   return (
     <div className='mb-6 space-y-3'>
       <div className='flex flex-wrap items-baseline justify-between gap-2 px-1'>
-        <span className='text-sm font-semibold text-zinc-300'>Arrangements</span>
+        <span className='text-sm font-semibold text-zinc-300'>{t("arrangements.title")}</span>
         <span className='text-xs text-zinc-500'>
-          Each part keeps its own time and mastery
+          {t("arrangements.subtitle")}
         </span>
       </div>
 
       <div
         role='radiogroup'
-        aria-label='Arrangement'
+        aria-label={t("arrangements.aria")}
         className='grid grid-cols-2 gap-2 lg:grid-cols-4'>
         {cards.map((card) => {
           const isActive = selected === card.key;
@@ -114,7 +116,9 @@ export const ArrangementStrip = ({
                     {hasTime ? formatPlayTime(card.playMs) : "—"}
                   </span>
                   <span className='text-xs text-zinc-400'>
-                    {card.sessions} session{card.sessions === 1 ? "" : "s"}
+                    {card.sessions === 1
+  ? t("arrangements.session_one")
+  : t("arrangements.sessions", { count: card.sessions })}
                   </span>
                 </span>
                 {card.masteryPct !== null && (

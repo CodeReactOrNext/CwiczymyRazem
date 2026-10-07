@@ -9,6 +9,7 @@ import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import { TunerDialog } from "feature/tuner/components/TunerDialog";
 import { TuningForkIcon } from "feature/tuner/components/TuningForkIcon";
 import { RippleButton } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import { Bug, ChevronDown, Lock } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { memo, useState } from "react";
@@ -102,6 +103,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   examMode = false,
   showBackingInExam = false,
 }: MediaControlsToolbarProps) {
+  const { t } = useTranslation("session");
   const [isTunerOpen, setIsTunerOpen] = useState(false);
   const [isTroubleshootOpen, setIsTroubleshootOpen] = useState(false);
   const {
@@ -168,7 +170,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               <RippleButton
                 onClick={onAudioToggle}
                 disabled={isRiddleMode}
-                title={isAudioMuted ? "Guitar off" : "Guitar on"}
+                title={isAudioMuted ? t("media.guitar_off") : t("media.guitar_on")}
                 className={cn(
                   gridBtn,
                   !showSpeedBtn && "col-span-2",
@@ -179,7 +181,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 )}>
                 <GiGuitar className='shrink-0 text-lg' />
                 <span className='truncate text-[10px] font-semibold tracking-wide'>
-                  Guitar
+                  {t("media.guitar")}
                 </span>
               </RippleButton>
             )}
@@ -200,8 +202,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               onClick={openTuningSettings}
               title={
                 isTuningLocked
-                  ? "Tuning is locked for this exercise"
-                  : "Guitar tuning"
+                  ? t("media.tuning_locked")
+                  : t("media.guitar_tuning")
               }
               className={cn(
                 gridBtn,
@@ -245,10 +247,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               disabled={examMode && isMicEnabled}
               title={
                 examMode && isMicEnabled
-                  ? "Pitch Detect required during exam"
+                  ? t("media.pitch_required")
                   : isMicEnabled
-                    ? "Pitch Detect on"
-                    : "Pitch Detect off"
+                    ? t("media.pitch_on")
+                    : t("media.pitch_off")
               }
               className={cn(
                 gridBtn,
@@ -261,14 +263,14 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               )}>
               <FaMicrophone className='h-3.5 w-3.5 shrink-0' />
               <span className='truncate text-[10px] font-semibold tracking-wide'>
-                Pitch Detect
+                {t("media.pitch_detect")}
               </span>
             </RippleButton>
 
             {hasTuner && (
               <RippleButton
                 onClick={() => setIsTunerOpen(true)}
-                title='Tuner'
+                title={t("media.tuner")}
                 className={cn(
                   gridBtn,
                   isTunerOpen
@@ -277,7 +279,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 )}>
                 <TuningForkIcon className='h-4 w-4 shrink-0' />
                 <span className='truncate text-[10px] font-semibold tracking-wide'>
-                  Tuner
+                  {t("media.tuner")}
                 </span>
               </RippleButton>
             )}
@@ -285,11 +287,11 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             {isMicEnabled && (
               <RippleButton
                 onClick={onRecalibrate}
-                title='Recalibrate'
+                title={t("media.recalibrate")}
                 className={cn(gridBtn, "bg-zinc-800 text-zinc-400")}>
                 <FaSync className='h-3.5 w-3.5 shrink-0' />
                 <span className='truncate text-[10px] font-semibold tracking-wide'>
-                  Recalibrate
+                  {t("media.recalibrate")}
                 </span>
               </RippleButton>
             )}
@@ -340,7 +342,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             <RippleButton
               onClick={onAudioToggle}
               disabled={isRiddleMode}
-              title={isAudioMuted ? "Guitar off" : "Guitar on"}
+              title={isAudioMuted ? t("media.guitar_off") : t("media.guitar_on")}
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90",
                 isAudioMuted
@@ -374,8 +376,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               onClick={openTuningSettings}
               title={
                 isTuningLocked
-                  ? "Tuning is locked for this exercise"
-                  : `Guitar tuning: ${preferredTuning.name}`
+                  ? t("media.tuning_locked")
+                  : t("media.guitar_tuning_named", { name: preferredTuning.name })
               }
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90",
@@ -405,10 +407,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 disabled={examMode && isMicEnabled}
                 title={
                   examMode && isMicEnabled
-                    ? "Pitch Detect required during exam"
+                    ? t("media.pitch_required")
                     : isMicEnabled
-                      ? "Pitch Detect on"
-                      : "Pitch Detect off"
+                      ? t("media.pitch_on")
+                      : t("media.pitch_off")
                 }
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90",
@@ -425,7 +427,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               {isMicEnabled && (
                 <RippleButton
                   onClick={onRecalibrate}
-                  title='Recalibrate'
+                  title={t("media.recalibrate")}
                   className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-all hover:text-white active:scale-90'>
                   <FaSync className='h-3 w-3' />
                 </RippleButton>
@@ -437,7 +439,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               {hasTuner && (
                 <RippleButton
                   onClick={() => setIsTunerOpen(true)}
-                  title='Tuner'
+                  title={t("media.tuner")}
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90",
                     isTunerOpen
@@ -490,13 +492,13 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             <SessionTooltip
               label={
                 isAudioMuted
-                  ? "Guitar playback off — click to hear the tab"
-                  : "Guitar playback on — click to mute the tab"
+                  ? t("media.playback_off")
+                  : t("media.playback_on")
               }>
               <RippleButton
                 onClick={onAudioToggle}
                 disabled={isRiddleMode}
-                aria-label='Guitar playback'
+                aria-label={t("media.playback")}
                 className={cn(
                   "flex w-12 items-center justify-center rounded-lg transition-all active:scale-95",
                   h,
@@ -531,8 +533,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
             <SessionTooltip
               label={
                 isTuningLocked
-                  ? "Tuning is locked for this exercise"
-                  : "Guitar tuning — click to change"
+                  ? t("media.tuning_locked")
+                  : t("media.guitar_tuning_change")
               }>
               <RippleButton
                 onClick={openTuningSettings}
@@ -563,10 +565,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           <SessionTooltip
             label={
               examMode && isMicEnabled
-                ? "Pitch Detect required during the exam"
+                ? t("media.pitch_required")
                 : isMicEnabled
-                  ? "Microphone active — app is listening to your guitar"
-                  : "Enable microphone to detect what you're playing"
+                  ? t("media.mic_active")
+                  : t("media.mic_enable")
             }>
             <RippleButton
               onClick={examMode && isMicEnabled ? undefined : onMicToggle}
@@ -583,7 +585,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               )}>
               <FaMicrophone className='h-4 w-4 shrink-0' />
               <span className='text-[10px] font-semibold tracking-wide'>
-                Pitch Detect
+                {t("media.pitch_detect")}
               </span>
             </RippleButton>
           </SessionTooltip>
@@ -591,10 +593,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           {/* Rarely-used mic tools live behind one chevron, so toggling the mic
               never adds/removes buttons and the row keeps a constant width. */}
           <DropdownMenu>
-            <SessionTooltip label='Mic tools: recalibrate, tuner, troubleshooting'>
+            <SessionTooltip label={t("media.mic_tools_hint")}>
               <DropdownMenuTrigger asChild>
                 <RippleButton
-                  aria-label='Mic tools'
+                  aria-label={t("media.mic_tools")}
                   className={cn(
                     "flex w-8 items-center justify-center rounded-lg outline-none transition-all focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
                     h,
@@ -615,21 +617,21 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 onSelect={onRecalibrate}
                 className='flex cursor-pointer items-center gap-3 rounded px-2 py-2 text-xs font-semibold text-zinc-200 focus:bg-zinc-800 focus:text-white'>
                 <FaSync className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
-                Recalibrate
+                {t("media.recalibrate")}
               </DropdownMenuItem>
               {hasTuner && (
                 <DropdownMenuItem
                   onSelect={() => setIsTunerOpen(true)}
                   className='flex cursor-pointer items-center gap-3 rounded px-2 py-2 text-xs font-semibold text-zinc-200 focus:bg-zinc-800 focus:text-white'>
                   <TuningForkIcon className='h-4 w-4 shrink-0 text-zinc-400' />
-                  Tuner
+                  {t("media.tuner")}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem
                 onSelect={() => setIsTroubleshootOpen(true)}
                 className='flex cursor-pointer items-center gap-3 rounded px-2 py-2 text-xs font-semibold text-zinc-200 focus:bg-zinc-800 focus:text-white'>
                 <Bug className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
-                Mic not working?
+                {t("media.mic_not_working")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

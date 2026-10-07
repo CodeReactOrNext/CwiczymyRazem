@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   firebaseGetDashboardLayout,
@@ -22,6 +23,7 @@ const STALE_TIME = 10 * 60 * 1000;
  */
 export const useDashboardLayout = (userAuth: string | null) => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation("dashboard");
   const queryKey = dashboardLayoutQueryKey(userAuth);
 
   const query = useQuery({
@@ -44,7 +46,7 @@ export const useDashboardLayout = (userAuth: string | null) => {
       if (context?.previous)
         queryClient.setQueryData(queryKey, context.previous);
       console.error("[dashboard layout]", error);
-      toast.error("Couldn't save your Home layout");
+      toast.error(t("errors.layout_save"));
     },
   });
 

@@ -1,3 +1,4 @@
+import { useTranslation } from "hooks/useTranslation";
 import {
   closestCenter,
   DndContext,
@@ -142,6 +143,7 @@ const TrackRow = ({
   onPractice,
   onRemove,
 }: TrackRowProps) => {
+  const { t } = useTranslation("playlists");
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: entry.songId, disabled: !isOwner });
 
@@ -188,7 +190,7 @@ const TrackRow = ({
     >
       {kind !== "playlist" && (
         <button
-          aria-label="Practice"
+          aria-label={t("practice")}
           onClick={onPractice}
           className="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
         >
@@ -198,14 +200,14 @@ const TrackRow = ({
       {isOwner && (
         <>
           <button
-            aria-label="Remove from playlist"
+            aria-label={t("remove_from_playlist")}
             onClick={onRemove}
             className="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/10 hover:text-red-400"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
           <button
-            aria-label="Reorder"
+            aria-label={t("reorder")}
             {...attributes}
             {...listeners}
             className="hidden h-8 w-8 cursor-grab touch-none items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-white/10 hover:text-zinc-300 active:cursor-grabbing sm:flex"
@@ -276,7 +278,7 @@ const TrackRow = ({
           {info}
           {isNextUp && (
             <span className="hidden shrink-0 rounded-full bg-cyan-400/10 px-2 py-0.5 text-[10px] font-bold text-cyan-300 sm:inline">
-              up next
+              {t("up_next")}
             </span>
           )}
           {tierChip}
@@ -312,7 +314,7 @@ const TrackRow = ({
             {index + 1}
           </span>
           <button
-            aria-label="Practice"
+            aria-label={t("practice")}
             onClick={(e) => {
               e.stopPropagation();
               onPractice();
@@ -344,6 +346,7 @@ export const PlaylistDetailView = ({
   onPracticeSong,
   onOpenSong,
 }: PlaylistDetailViewProps) => {
+  const { t } = useTranslation("playlists");
   const userAuth = useAppSelector(selectUserAuth);
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
@@ -389,7 +392,7 @@ export const PlaylistDetailView = ({
     } catch (error) {
       console.error("Failed to update playlist songs:", error);
       onChanged(prev);
-      toast.error("Couldn't save changes. Try again.");
+      toast.error(t("errors.save_changes"));
     }
   };
 
@@ -426,7 +429,7 @@ export const PlaylistDetailView = ({
     } catch (error) {
       console.error("Failed to toggle visibility:", error);
       onChanged(prev);
-      toast.error("Couldn't change visibility.");
+      toast.error(t("errors.visibility"));
     }
   };
 
@@ -449,7 +452,7 @@ export const PlaylistDetailView = ({
     } catch (error) {
       console.error("Failed to update playlist meta:", error);
       onChanged(prev);
-      toast.error("Couldn't save details.");
+      toast.error(t("errors.save_details"));
     } finally {
       setIsSavingMeta(false);
     }
@@ -459,11 +462,11 @@ export const PlaylistDetailView = ({
     try {
       await deletePlaylist(playlist.id);
       posthog.capture("playlist_action", { action: "delete", playlist_id: playlist.id });
-      toast.success("Playlist deleted");
+      toast.success(t("deleted"));
       onDeleted();
     } catch (error) {
       console.error("Failed to delete playlist:", error);
-      toast.error("Couldn't delete the playlist.");
+      toast.error(t("errors.delete"));
     }
   };
 
@@ -473,11 +476,11 @@ export const PlaylistDetailView = ({
     try {
       const newId = await importPlaylist(playlist, userAuth, userName, userAvatar);
       posthog.capture("playlist_action", { action: "import", playlist_id: playlist.id });
-      toast.success("Saved to your playlists");
+      toast.success(t("saved_copy"));
       onImported(newId);
     } catch (error) {
       console.error("Failed to import playlist:", error);
-      toast.error("Couldn't save this playlist.");
+      toast.error(t("errors.save_copy"));
     } finally {
       setIsImporting(false);
     }
@@ -507,7 +510,7 @@ export const PlaylistDetailView = ({
     } catch (error) {
       console.error("Failed to toggle like:", error);
       onChanged(playlist); // revert to the pre-click snapshot
-      toast.error("Couldn't update your like.");
+      toast.error(t("errors.like"));
     } finally {
       setIsLiking(false);
     }
@@ -556,7 +559,7 @@ export const PlaylistDetailView = ({
                 )}
               >
                 <meta.icon className="h-3.5 w-3.5" />
-                {meta.label}
+                {t(`kinds.${playlist.kind}.label`, meta.label)}
               </span>
               {playlist.isPublic ? (
                 <span className="flex items-center gap-1 font-medium text-zinc-500">
@@ -571,7 +574,7 @@ export const PlaylistDetailView = ({
                 <>
                   <span className="hidden h-1 w-1 rounded-full bg-zinc-600 sm:block" />
                   <span className="w-full font-medium text-zinc-500 sm:w-auto">
-                    {meta.tagline}
+                    {t(`kinds.${playlist.kind}.tagline`, meta.tagline)}
                   </span>
                 </>
               )}
@@ -666,7 +669,7 @@ export const PlaylistDetailView = ({
                           {playlist.importedFrom.ownerName.charAt(0).toUpperCase()}
                         </span>
                       )}
-                      from {playlist.importedFrom.ownerName}
+                      {t("from_owner", { name: playlist.importedFrom.ownerName })}
                     </Link>
                   </UserTooltip>
                 </>
@@ -695,7 +698,7 @@ export const PlaylistDetailView = ({
               <div className="max-w-sm space-y-1.5 pt-1">
                 <div className="flex items-baseline justify-between text-xs font-semibold">
                   <span className="text-zinc-400">
-                    {learnedCount} of {songs.length} mastered
+                    {t("mastered_of", { done: learnedCount, total: songs.length })}
                   </span>
                   <span className="tabular-nums text-zinc-500">
                     {Math.round((learnedCount / songs.length) * 100)}%
@@ -722,7 +725,7 @@ export const PlaylistDetailView = ({
               >
                 <span className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
-                  Add songs
+                  {t("add_songs")}
                 </span>
               </Button>
               <Button
@@ -732,13 +735,13 @@ export const PlaylistDetailView = ({
               >
                 <span className="flex items-center gap-2">
                   <Share2 className="h-4 w-4" />
-                  Share
+                  {t("share")}
                 </span>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    aria-label="Playlist options"
+                    aria-label={t("options")}
                     className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
                   >
                     <MoreHorizontal className="h-4 w-4" />
@@ -757,7 +760,7 @@ export const PlaylistDetailView = ({
                     className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-zinc-800 hover:text-white"
                   >
                     <Pencil className="h-3.5 w-3.5" />
-                    Edit details
+                    {t("edit_details")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => handleToggleVisibility(!playlist.isPublic)}
@@ -779,7 +782,7 @@ export const PlaylistDetailView = ({
                     className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400/80 hover:bg-red-500/10 hover:text-red-400"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    Delete
+                    {t("delete")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -797,7 +800,7 @@ export const PlaylistDetailView = ({
                   ) : (
                     <ArrowDownToLine className="h-4 w-4" />
                   )}
-                  Save to your playlists
+                  {t("save_to_yours")}
                 </span>
               </Button>
               <button
@@ -813,7 +816,7 @@ export const PlaylistDetailView = ({
                 )}
               >
                 <Heart className={cn("h-4 w-4", hasLiked && "fill-current")} />
-                {likeCount > 0 ? likeCount : "Like"}
+                {likeCount > 0 ? likeCount : t("like")}
               </button>
             </>
           )}
@@ -825,13 +828,13 @@ export const PlaylistDetailView = ({
             <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500">
               <Music size={26} />
             </div>
-            <h3 className="mb-1 text-lg font-bold text-white">Nothing here yet</h3>
+            <h3 className="mb-1 text-lg font-bold text-white">{t("empty.title")}</h3>
             <p className="max-w-xs text-sm text-zinc-500">
               {isOwner
                 ? isTop
-                  ? `Pick your top ${TOP_LIST_LIMIT} — the order is the ranking.`
-                  : "Add songs from the library or your collection to fill this in."
-                : "The author hasn't added any songs yet."}
+                  ? t("empty.owner_top", { count: TOP_LIST_LIMIT })
+                  : t("empty.owner")
+                : t("empty.other")}
             </p>
             {isOwner && (
               <Button
@@ -841,7 +844,7 @@ export const PlaylistDetailView = ({
               >
                 <span className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
-                  Add songs
+                  {t("add_songs")}
                 </span>
               </Button>
             )}
@@ -906,14 +909,14 @@ export const PlaylistDetailView = ({
                           learnedCount === songs.length ? "text-amber-300" : "text-white"
                         )}
                       >
-                        {learnedCount === songs.length ? "Path complete" : "Final stop"}
+                        {learnedCount === songs.length ? t("path_complete") : t("final_stop")}
                       </p>
                       <p className="text-xs font-medium text-zinc-500">
                         {learnedCount === songs.length
-                          ? "Every song mastered — take a bow."
-                          : `${songs.length - learnedCount} more ${
-                              songs.length - learnedCount === 1 ? "song" : "songs"
-                            } to master`}
+                          ? t("every_mastered")
+                          : songs.length - learnedCount === 1
+                            ? t("more_to_master_one")
+                            : t("more_to_master", { count: songs.length - learnedCount })}
                       </p>
                     </div>
                   </div>
@@ -929,7 +932,7 @@ export const PlaylistDetailView = ({
         <DialogContent className="max-w-md border-white/5 bg-zinc-950 p-6">
           <DialogHeader className="mb-2">
             <DialogTitle className="font-openSans text-xl font-bold text-white">
-              Share this {meta.label.toLowerCase()}
+              {t(`share_title.${playlist.kind}`)}
             </DialogTitle>
           </DialogHeader>
 
@@ -946,9 +949,9 @@ export const PlaylistDetailView = ({
                 <Lock className={cn("h-4 w-4 shrink-0", !playlist.isPublic ? "text-white" : "text-zinc-500")} />
                 <div>
                   <p className={cn("text-sm font-bold", !playlist.isPublic ? "text-white" : "text-zinc-400")}>
-                    Private
+                    {t("private")}
                   </p>
-                  <p className="text-[11px] font-medium text-zinc-500">Only you can see it</p>
+                  <p className="text-[11px] font-medium text-zinc-500">{t("private_hint")}</p>
                 </div>
               </button>
               <button
@@ -962,10 +965,10 @@ export const PlaylistDetailView = ({
                 <Globe className={cn("h-4 w-4 shrink-0", playlist.isPublic ? "text-white" : "text-zinc-500")} />
                 <div>
                   <p className={cn("text-sm font-bold", playlist.isPublic ? "text-white" : "text-zinc-400")}>
-                    Public
+                    {t("public")}
                   </p>
                   <p className="text-[11px] font-medium text-zinc-500">
-                    Listed in Discover for everyone
+                    {t("public_hint")}
                   </p>
                 </div>
               </button>
@@ -973,12 +976,11 @@ export const PlaylistDetailView = ({
 
             {playlist.isPublic ? (
               <p className="rounded-lg bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-zinc-500">
-                This {meta.label.toLowerCase()} is live in Discover — other players can
-                open it and save a copy to their library.
+                {t(`live_in_discover.${playlist.kind}`)}
               </p>
             ) : (
               <p className="rounded-lg bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-zinc-500">
-                Only you can see it. Switch to public to share it in Discover.
+                {t("private_note")}
               </p>
             )}
           </div>
@@ -990,13 +992,13 @@ export const PlaylistDetailView = ({
         <DialogContent className="max-w-md border-white/5 bg-zinc-950 p-6">
           <DialogHeader className="mb-2">
             <DialogTitle className="font-openSans text-xl font-bold text-white">
-              Edit details
+              {t("edit_details")}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="edit-name" className="ml-1 font-bold text-zinc-400">
-                Name
+                {t("name")}
               </Label>
               <Input
                 id="edit-name"
@@ -1008,7 +1010,7 @@ export const PlaylistDetailView = ({
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-desc" className="ml-1 font-bold text-zinc-400">
-                Description
+                {t("description")}
               </Label>
               <Textarea
                 id="edit-desc"
@@ -1040,7 +1042,7 @@ export const PlaylistDetailView = ({
         <DialogContent className="flex h-full max-w-none flex-col border-white/5 bg-zinc-950 p-6 sm:h-[560px] sm:max-w-lg sm:rounded-2xl">
           <DialogHeader className="mb-2">
             <DialogTitle className="font-openSans text-xl font-bold text-white">
-              Add songs
+              {t("add_songs")}
               {isTop && (
                 <span className="ml-2 text-sm font-semibold text-zinc-500">
                   {songs.length}/{TOP_LIST_LIMIT}
@@ -1050,7 +1052,7 @@ export const PlaylistDetailView = ({
           </DialogHeader>
           {atCapacity && (
             <p className="mb-2 rounded-lg bg-amber-400/10 px-3 py-2.5 text-xs font-semibold text-amber-300">
-              That’s the full top {TOP_LIST_LIMIT} — remove a song from the list to swap one in.
+              {t("top_full", { count: TOP_LIST_LIMIT })}
             </p>
           )}
           <SongPickerPanel
@@ -1069,22 +1071,21 @@ export const PlaylistDetailView = ({
         <AlertDialogContent className="border-white/5 bg-zinc-950">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">
-              Delete “{playlist.name}”?
+              {t("delete_title", { name: playlist.name })}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-zinc-400">
-              This removes the {meta.label.toLowerCase()} for good. Songs themselves stay in the
-              library and your collection.
+              {t(`delete_body.${playlist.kind}`)}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="border-none bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white">
-              Keep it
+              {t("keep_it")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-red-500/90 text-white hover:bg-red-500"
             >
-              Delete
+              {t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

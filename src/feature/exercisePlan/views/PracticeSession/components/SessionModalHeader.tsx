@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { X } from "lucide-react";
 
 import { useTimerContext } from "../contexts/TimerContext";
@@ -28,6 +29,7 @@ export const SessionModalHeader = ({
   onClose,
   isPlaying,
 }: SessionModalHeaderProps) => {
+  const { t } = useTranslation("session");
   const { formattedTimeLeft } = useTimerContext();
   const progress = totalExercises
     ? ((currentExerciseIndex + 1) / totalExercises) * 100
@@ -40,7 +42,7 @@ export const SessionModalHeader = ({
           variant='ghost'
           size='icon'
           onClick={onClose}
-          aria-label='Close session'
+          aria-label={t("header.close_session")}
           className='shrink-0 text-zinc-400 hover:text-white'>
           <X className='h-5 w-5' />
         </Button>

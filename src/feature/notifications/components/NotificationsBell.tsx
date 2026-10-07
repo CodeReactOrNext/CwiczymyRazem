@@ -15,6 +15,10 @@ import {
 } from "feature/notifications/services/notification.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
+import { useDateFnsLocale } from "lib/i18n/dateLocale";
+import { Interpolate } from "lib/i18n/Interpolate";
+import type { Translate } from "lib/i18n/translate";
 import {
   ArrowRight,
   AtSign,
@@ -37,12 +41,11 @@ import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-const chatLabel = (verb: string) =>
-  function ChatNotificationLabel(n: any) {
+const chatLabel = (verb: "mentioned" | "replied") =>
+  function ChatNotificationLabel(n: any, t: Translate) {
     return (
       <span>
-    {verb}
-    {n.chatPath?.startsWith("guilds/") ? " in guild chat" : " in chat"}
+    {t(`bell.chat.${verb}_${n.chatPath?.startsWith("guilds/") ? "guild" : "chat"}`)}
     {n.messageSnippet && (
       <span className='mt-1 block truncate text-xs italic text-zinc-500'>
         &ldquo;{n.messageSnippet}&rdquo;
@@ -56,22 +59,22 @@ const typeConfig = {
   chat_mention: {
     icon: <AtSign className='h-3 w-3 text-white' />,
     bg: "bg-cyan-500",
-    label: chatLabel("mentioned you"),
+    label: chatLabel("mentioned"),
   },
   chat_reply: {
     icon: <Reply className='h-3 w-3 text-white' />,
     bg: "bg-cyan-500",
-    label: chatLabel("replied to you"),
+    label: chatLabel("replied"),
   },
   like: {
     icon: <Heart className='h-3 w-3 fill-current text-white' />,
     bg: "bg-red-500",
-    label: (_n: any) => "liked your recording",
+    label: (_n: any, t: Translate) => t("bell.like"),
   },
   comment: {
     icon: <MessageSquare className='h-3 w-3 fill-current text-white' />,
     bg: "bg-cyan-500",
-    label: (_n: any) => "commented on your recording",
+    label: (_n: any, t: Translate) => t("bell.comment"),
   },
   reaction: {
     icon: (
@@ -84,10 +87,10 @@ const typeConfig = {
     bg: "bg-amber-500/20",
     // Reactions recorded before the amount was stored have no number to show, so they just say
     // what happened instead of quoting one that was never actually awarded.
-    label: (n: any) =>
+    label: (n: any, t: Translate) =>
       n.fameAwarded ? (
         <span className='inline-flex items-center gap-1'>
-          motivated you and gave you +{n.fameAwarded}
+          {t("bell.reaction_fame", { fame: n.fameAwarded })}
           <img
             src='/images/coin.png'
             alt='coin'
@@ -95,32 +98,35 @@ const typeConfig = {
           />
         </span>
       ) : (
-        "motivated you"
+        t("bell.reaction")
       ),
   },
   season_reward: {
     icon: <Trophy className='h-3 w-3 fill-current text-white' />,
     bg: "bg-amber-500",
-    label: (n: any) =>
-      `You earned ${n.fameAwarded} fame for ${n.place}${placeSuffix(n.place)} place!`,
+    label: (n: any, t: Translate) =>
+      t("bell.season_reward", {
+        fame: n.fameAwarded,
+        place: t("bell.ordinal", { place: n.place, suffix: placeSuffix(n.place) }),
+      }),
   },
   season_start: {
     icon: <Zap className='h-3 w-3 fill-current text-white' />,
     bg: "bg-green-500",
-    label: (_n: any) => "A new season has started!",
+    label: (_n: any, t: Translate) => t("bell.season_start"),
   },
   marketplace_sold: {
     icon: <Store className='h-3 w-3 text-white' />,
     bg: "bg-amber-500",
-    label: (n: any) => (
+    label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
-        bought your{" "}
-        {n.itemName ? (
-          <span className='font-semibold text-white'>{n.itemName}</span>
-        ) : (
-          "item"
-        )}{" "}
-        for +{n.fameAwarded}
+        <Interpolate
+          text={t("bell.sold")}
+          values={{
+            item: n.itemName ? <span className='font-semibold text-white'>{n.itemName}</span> : t("bell.item"),
+            fame: `+${n.fameAwarded}`,
+          }}
+        />
         <img
           src='/images/coin.png'
           alt='coin'
@@ -132,15 +138,13 @@ const typeConfig = {
   playlist_saved: {
     icon: <ListMusic className='h-3 w-3 text-white' />,
     bg: "bg-emerald-500",
-    label: (n: any) => (
+    label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
-        saved your playlist{" "}
-        {n.playlistName ? (
-          <span className='font-semibold text-white'>{n.playlistName}</span>
-        ) : (
-          ""
-        )}{" "}
-        — you got +{n.fameAwarded}
+        <Interpolate
+          text={t("bell.playlist_saved")}
+          values={{ name: n.playlistName ? <span className='font-semibold text-white'>{n.playlistName}</span> : "" }}
+        />{" "}
+        {t("bell.you_got", { fame: n.fameAwarded })}
         <img
           src='/images/coin.png'
           alt='coin'
@@ -152,15 +156,13 @@ const typeConfig = {
   playlist_liked: {
     icon: <Heart className='h-3 w-3 fill-current text-white' />,
     bg: "bg-rose-500",
-    label: (n: any) => (
+    label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
-        liked your playlist{" "}
-        {n.playlistName ? (
-          <span className='font-semibold text-white'>{n.playlistName}</span>
-        ) : (
-          ""
-        )}{" "}
-        — you got +{n.fameAwarded}
+        <Interpolate
+          text={t("bell.playlist_liked")}
+          values={{ name: n.playlistName ? <span className='font-semibold text-white'>{n.playlistName}</span> : "" }}
+        />{" "}
+        {t("bell.you_got", { fame: n.fameAwarded })}
         <img
           src='/images/coin.png'
           alt='coin'
@@ -172,15 +174,13 @@ const typeConfig = {
   exercise_thanked: {
     icon: <HeartHandshake className='h-3 w-3 text-white' />,
     bg: "bg-amber-500",
-    label: (n: any) => (
+    label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
-        thanked you for{" "}
-        {n.exerciseTitle ? (
-          <span className='font-semibold text-white'>{n.exerciseTitle}</span>
-        ) : (
-          "your exercise"
-        )}{" "}
-        — you got +{n.fameAwarded}
+        <Interpolate
+          text={t("bell.exercise_thanked")}
+          values={{ name: n.exerciseTitle ? <span className='font-semibold text-white'>{n.exerciseTitle}</span> : t("bell.exercise_thanked_fallback") }}
+        />{" "}
+        {t("bell.you_got", { fame: n.fameAwarded })}
         <img
           src='/images/coin.png'
           alt='coin'
@@ -192,15 +192,13 @@ const typeConfig = {
   exercise_completed: {
     icon: <Dumbbell className='h-3 w-3 text-white' />,
     bg: "bg-emerald-500",
-    label: (n: any) => (
+    label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
-        practiced your exercise{" "}
-        {n.exerciseTitle ? (
-          <span className='font-semibold text-white'>{n.exerciseTitle}</span>
-        ) : (
-          ""
-        )}{" "}
-        — you got +{n.fameAwarded}
+        <Interpolate
+          text={t("bell.exercise_completed")}
+          values={{ name: n.exerciseTitle ? <span className='font-semibold text-white'>{n.exerciseTitle}</span> : "" }}
+        />{" "}
+        {t("bell.you_got", { fame: n.fameAwarded })}
         <img
           src='/images/coin.png'
           alt='coin'
@@ -212,25 +210,26 @@ const typeConfig = {
   daily_exercise_win: {
     icon: <Trophy className='h-3 w-3 fill-current text-white' />,
     bg: "bg-amber-500",
-    label: (n: any) => (
+    label: (n: any, t: Translate) => (
       <span>
-        You won the exercise of the day —{" "}
-        <span className='font-semibold text-white'>{n.prizeName ?? "your prize"}</span>{" "}
-        is in your Arsenal
+        <Interpolate
+          text={t("bell.daily_win")}
+          values={{ prize: <span className='font-semibold text-white'>{n.prizeName ?? t("bell.your_prize")}</span> }}
+        />
       </span>
     ),
   },
   daily_exercise_place: {
     icon: <Medal className='h-3 w-3 text-white' />,
     bg: "bg-cyan-500",
-    label: (n: any) => (
+    label: (n: any, t: Translate) => (
       <span>
-        You finished{" "}
-        <span className='font-semibold text-white'>
-          {n.place}
-          {placeSuffix(n.place)}
-        </span>{" "}
-        in the exercise of the day
+        <Interpolate
+          text={t("bell.daily_place")}
+          values={{
+            place: <span className='font-semibold text-white'>{t("bell.ordinal", { place: n.place, suffix: placeSuffix(n.place) })}</span>,
+          }}
+        />
         {n.exerciseTitle && (
           <span className='mt-1 block truncate text-xs text-zinc-500'>
             {n.exerciseTitle}
@@ -242,9 +241,9 @@ const typeConfig = {
   roadmap_ready: {
     icon: <MapIcon className='h-3 w-3 text-white' />,
     bg: "bg-cyan-500",
-    label: (n: any) => (
+    label: (n: any, t: Translate) => (
       <span>
-        Your roadmap is ready
+        {t("bell.roadmap_ready")}
         {n.roadmapGoal ? (
           <>
             {": "}
@@ -257,6 +256,8 @@ const typeConfig = {
 };
 
 export const NotificationsBell = () => {
+  const { t } = useTranslation("notifications");
+  const dateFnsLocale = useDateFnsLocale();
   const userId = useAppSelector(selectUserAuth);
   const { notifications, unreadCount, markAsRead, markAllAsRead, isLoading } =
     useAppNotifications(userId);
@@ -302,7 +303,7 @@ export const NotificationsBell = () => {
           onPointerDown={spawnRipple}
           whileTap={{ scale: 0.88 }}
           transition={{ type: "spring", stiffness: 500, damping: 25 }}
-          aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
+          aria-label={unreadCount > 0 ? t("bell.aria_unread", { count: unreadCount }) : t("bell.aria")}
           className='group relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-[8px] bg-white/5 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 data-[state=open]:bg-white/10 data-[state=open]:ring-1 data-[state=open]:ring-white/15 hover:bg-white/10'>
           <AnimatePresence>
             {ripples.map((r) => (
@@ -344,7 +345,7 @@ export const NotificationsBell = () => {
             </div>
             <div>
               <h3 className='text-sm font-bold leading-none text-white'>
-                Notifications
+                {t("bell.title")}
               </h3>
               {unreadCount > 0 && (
                 <p className='mt-1.5 text-[11px] font-medium text-zinc-500'>
@@ -360,7 +361,7 @@ export const NotificationsBell = () => {
                 markAllAsRead();
               }}
               className='shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-cyan-400 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300'>
-              Mark all read
+              {t("bell.mark_all_read")}
             </button>
           )}
         </div>
@@ -386,10 +387,10 @@ export const NotificationsBell = () => {
               </div>
               <div>
                 <p className='text-sm font-medium text-zinc-400'>
-                  No notifications yet
+                  {t("bell.empty_title")}
                 </p>
                 <p className='mt-1 text-xs text-zinc-600'>
-                  Activity from friends will appear here
+                  {t("bell.empty_body")}
                 </p>
               </div>
             </div>
@@ -461,7 +462,7 @@ export const NotificationsBell = () => {
                             </span>{" "}
                           </>
                         )}
-                        {config.label(n)}
+                        {config.label(n, t)}
                       </p>
                       {n.recordingTitle && n.type !== "reaction" && (
                         <p className='mt-1 truncate text-xs italic text-zinc-500'>
@@ -471,19 +472,19 @@ export const NotificationsBell = () => {
                       {n.type === "season_reward" && (
                         <p className='mt-1 flex items-center gap-1 text-xs text-amber-400/70'>
                           <Gem className='h-3 w-3' />
-                          Season {n.seasonId}
+                          {t("bell.season", { id: n.seasonId })}
                         </p>
                       )}
                       {(n.type === "like" || n.type === "comment") &&
                         n.recordingId && (
                           <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
-                            Open recording
+                            {t("bell.open_recording")}
                             <ArrowRight className='h-3 w-3' />
                           </p>
                         )}
                       {n.type === "marketplace_sold" && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-amber-400/80'>
-                          Open Market
+                          {t("bell.open_market")}
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}
@@ -491,32 +492,32 @@ export const NotificationsBell = () => {
                         n.type === "playlist_liked") &&
                         n.playlistId && (
                           <p className='mt-1 flex items-center gap-1 text-xs font-medium text-emerald-400/80'>
-                            Open playlist
+                            {t("bell.open_playlist")}
                             <ArrowRight className='h-3 w-3' />
                           </p>
                         )}
                       {(n.type === "exercise_thanked" ||
                         n.type === "exercise_completed") && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
-                          Open Community library
+                          {t("bell.open_library")}
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}
                       {n.type === "roadmap_ready" && n.roadmapId && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
-                          Open roadmap
+                          {t("bell.open_roadmap")}
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}
                       {n.type === "daily_exercise_win" && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-amber-400/80'>
-                          Open Arsenal
+                          {t("bell.open_arsenal")}
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}
                       {n.type === "daily_exercise_place" && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
-                          Play today&apos;s exercise
+                          {t("bell.play_today")}
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}
@@ -526,8 +527,9 @@ export const NotificationsBell = () => {
                           {n.timestamp?.toDate
                             ? formatDistanceToNow(n.timestamp.toDate(), {
                                 addSuffix: true,
+                                locale: dateFnsLocale,
                               })
-                            : "just now"}
+                            : t("bell.just_now")}
                         </span>
                       </div>
                     </div>

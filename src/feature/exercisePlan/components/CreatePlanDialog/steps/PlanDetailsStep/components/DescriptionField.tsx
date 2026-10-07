@@ -10,13 +10,13 @@ interface DescriptionFieldProps {
 }
 
 export const DescriptionField = ({ register }: DescriptionFieldProps) => {
-  const { t } = useTranslation("exercises");
+  const { t } = useTranslation(["exercises", "plans"]);
 
   return (
     <div className='space-y-2'>
       <Label htmlFor='description'>
         {t("plan.description")}{" "}
-        <span className='font-normal text-zinc-500'>(optional)</span>
+        <span className='font-normal text-zinc-500'>{t("plans:optional")}</span>
       </Label>
       <Textarea
         id='description'

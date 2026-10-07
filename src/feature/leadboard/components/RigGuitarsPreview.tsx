@@ -15,6 +15,7 @@ import type {
   InventoryItem,
 } from "feature/arsenal/types/arsenal.types";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { useTranslation } from "hooks/useTranslation";
 import { Guitar } from "lucide-react";
 import { useState } from "react";
 import { useResponsiveStore } from "store/useResponsiveStore";
@@ -30,6 +31,7 @@ const RigGuitarTile = ({
   item: InventoryItem;
   guitar: GuitarDefinition;
 }) => {
+  const { t } = useTranslation("leadboard");
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [open, setOpen] = useState(false);
   // The workshop can promote a guitar past its mint rarity — show what it is now.
@@ -66,7 +68,7 @@ const RigGuitarTile = ({
           background: "#0d0d10",
           border: `1px solid ${rs.baseColor}`,
         }}
-        title='Guitar level'>
+        title={t("rig.guitar_level")}>
         {level}
       </div>
     </div>
@@ -109,6 +111,7 @@ const RigGuitarTile = ({
 
 /** Compact strip of the three rig guitar slots for gear-leaderboard rows. */
 export const RigGuitarsPreview = ({ arsenal }: RigGuitarsPreviewProps) => {
+  const { t } = useTranslation("leadboard");
   const slotItems = [0, 1, 2].map((i) => {
     const slotId = arsenal?.rig?.guitarSlots?.[i] ?? null;
     return slotId
@@ -126,7 +129,7 @@ export const RigGuitarsPreview = ({ arsenal }: RigGuitarsPreviewProps) => {
             <div
               key={i}
               className='flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-white/10 bg-zinc-900/30'
-              title={`Empty slot ${i + 1}`}>
+              title={t("rig.empty_slot", { n: i + 1 })}>
               <Guitar className='h-4 w-4 text-zinc-700' />
             </div>
           );

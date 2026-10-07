@@ -1,3 +1,6 @@
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
+
 import type { ReportFormikInterface } from "../ReportView.types";
 
 const CATEGORIES = [
@@ -18,10 +21,10 @@ const formatMinutes = (total: number) => {
   return `${hours}h ${minutes} min`;
 };
 
-const formatDay = (countBackDays: number) => {
-  if (countBackDays <= 0) return "Today";
-  if (countBackDays === 1) return "Yesterday";
-  return `${countBackDays} days ago`;
+const formatDay = (countBackDays: number, t?: Translate) => {
+  if (countBackDays <= 0) return translateOr(t, "report:form.today", "Today");
+  if (countBackDays === 1) return translateOr(t, "report:form.yesterday", "Yesterday");
+  return translateOr(t, "report:form.days_ago", "{{count}} days ago", { count: countBackDays });
 };
 
 /**
@@ -37,9 +40,10 @@ export const buildSaveSummary = (
     | "creativityHours" | "creativityMinutes"
     | "countBackDays"
   >,
+  t?: Translate,
 ): string => {
   const parts = CATEGORIES.map(({ key, label }) => ({
-    label,
+    label: translateOr(t, `report:${key}`, label),
     minutes: toMinutes(values[`${key}Hours`], values[`${key}Minutes`]),
   })).filter((part) => part.minutes > 0);
 
@@ -49,7 +53,7 @@ export const buildSaveSummary = (
       ? parts[0].label
       : parts.map((part) => `${part.label} ${formatMinutes(part.minutes)}`).join(", ");
 
-  return [formatMinutes(total), categories, formatDay(Number(values.countBackDays) || 0)]
+  return [formatMinutes(total), categories, formatDay(Number(values.countBackDays) || 0, t)]
     .filter(Boolean)
     .join(" · ");
 };

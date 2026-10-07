@@ -1,0 +1,16 @@
+{
+  "valid_email": "Gib eine gültige E-Mail-Adresse ein",
+  "stronger_password": "Gib ein stärkeres Passwort ein",
+  "password_char_number": "Das Passwort muss mindestens 8 Zeichen lang sein",
+  "username_char_number": "Der Benutzername muss mindestens 3 Zeichen lang sein",
+  "username_char_max_number": "Der Benutzername darf höchstens 28 Zeichen lang sein",
+  "required": "Pflichtfeld",
+  "same_passwords": "Die Passwörter müssen übereinstimmen",
+  "no_ends_whitespace": "Der Benutzername darf nicht mit einem Leerzeichen beginnen oder enden",
+  "allowed_signs": "Erlaubt sind nur Buchstaben, Ziffern und die Zeichen - _",
+  "not_yt_link": "Das ist kein gültiger Link zu einem YouTube-Kanal",
+  "not_sc_link": "Das ist kein gültiger SoundCloud-Link",
+  "empty": "Darf nicht leer sein",
+  "max_bands": "Darf nicht länger als 60 Zeichen sein",
+  "min_bands": "Darf nicht kürzer als 2 Zeichen sein"
+}

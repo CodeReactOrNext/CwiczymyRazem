@@ -7,6 +7,7 @@ import {
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { RippleButton } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Lock, Minus, Plus } from "lucide-react";
 import { memo, useRef, useState } from "react";
 import { GiMetronome } from "react-icons/gi";
@@ -48,6 +49,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   speedMultiplier,
   onSpeedMultiplierChange,
 }: ExerciseQuickActionsBarProps) {
+  const { t } = useTranslation(["session", "metronome"]);
   const [isEditing, setIsEditing] = useState(false);
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,19 +101,19 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           !compact && (showSpeed ? "max-w-2xl" : "max-w-md"),
         )}>
         {!compact && (
-          <SessionTooltip label='Metronome tempo — reset to recommended' keys={["Enter"]}>
+          <SessionTooltip label={t("quick.tempo_reset")} keys={["Enter"]}>
             <span className='shrink-0'>
               <GiMetronome className='h-5 w-5 text-zinc-400' />
             </span>
           </SessionTooltip>
         )}
 
-        <SessionTooltip label='Slower (Shift: −5 BPM)' keys={["↓"]}>
+        <SessionTooltip label={t("quick.slower_hint")} keys={["↓"]}>
           <RippleButton
             className={stepBtn}
             onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
             disabled={bpm <= minBpm}
-            aria-label='Slower'>
+            aria-label={t("quick.slower")}>
             <Minus
               className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
               strokeWidth={2.5}
@@ -138,10 +140,10 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
             )}
           />
         ) : (
-          <SessionTooltip label='Tempo in BPM — click to type a value'>
+          <SessionTooltip label={t("quick.tempo_type")}>
             <button
               onClick={startEdit}
-              aria-label='Edit BPM'
+              aria-label={t("quick.edit_bpm")}
               className={cn(
                 "font-mono shrink-0 font-black tabular-nums tracking-tight transition-transform active:scale-95",
                 compact ? "text-lg" : "text-2xl",
@@ -163,12 +165,12 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           />
         )}
 
-        <SessionTooltip label='Faster (Shift: +5 BPM)' keys={["↑"]}>
+        <SessionTooltip label={t("quick.faster_hint")} keys={["↑"]}>
           <RippleButton
             className={stepBtn}
             onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
             disabled={bpm >= maxBpm}
-            aria-label='Faster'>
+            aria-label={t("quick.faster")}>
             <Plus
               className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
               strokeWidth={2.5}
@@ -178,11 +180,11 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
 
         {metronome.setSubdivision && (
           <DropdownMenu>
-            <SessionTooltip label='Click subdivision: quarters, eighths, triplets…'>
+            <SessionTooltip label={t("quick.subdivision_hint")}>
               <DropdownMenuTrigger asChild>
                 <button
                   type='button'
-                  aria-label='Subdivision'
+                  aria-label={t("quick.subdivision")}
                   className={cn(
                     stepBtn,
                     metronome.subdivision !== 1 &&
@@ -214,7 +216,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
                       value={value}
                       className='h-4 w-4 shrink-0'
                     />
-                    <span>{title}</span>
+                    <span>{t(`metronome:subdivisions.${value}`, title)}</span>
                     {active && (
                       <Check className='ml-auto h-3.5 w-3.5 text-cyan-300' />
                     )}
@@ -230,13 +232,13 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
             <SessionTooltip
               label={
                 accentLocked
-                  ? `Accents are set by this exercise${gridLabel ? ` (${gridLabel})` : ""}`
-                  : "Beats per bar & accents"
+                  ? `${t("quick.accents_set")}${gridLabel ? ` (${gridLabel})` : ""}`
+                  : t("quick.beats_accents")
               }>
               <DropdownMenuTrigger asChild>
                 <button
                   type='button'
-                  aria-label='Beats per bar'
+                  aria-label={t("quick.beats_per_bar")}
                   className={cn(
                     stepBtn,
                     "font-mono text-xs font-bold",
@@ -253,7 +255,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               className='z-[99999999] w-64 border border-white/10 bg-zinc-900 p-3 text-white'>
               <div className='flex items-center justify-between px-0.5'>
                 <span className='select-none text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500'>
-                  {accentLocked && gridLabel ? gridLabel : "Beats per bar"}
+                  {accentLocked && gridLabel ? gridLabel : t("quick.beats_per_bar")}
                 </span>
                 {accentLocked ? (
                   <span className='flex select-none items-center gap-1 text-[10px] font-bold text-amber-400'>
@@ -266,7 +268,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
                       type='button'
                       onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length - 1)}
                       disabled={metronome.accentPattern.length <= MIN_BEATS_PER_BAR}
-                      aria-label='Remove beat'
+                      aria-label={t("metronome:remove_beat")}
                       className='flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-200 transition-colors hover:bg-zinc-700 disabled:opacity-40'>
                       <Minus className='h-3 w-3' strokeWidth={2.5} />
                     </button>
@@ -277,7 +279,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
                       type='button'
                       onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length + 1)}
                       disabled={metronome.accentPattern.length >= MAX_BEATS_PER_BAR}
-                      aria-label='Add beat'
+                      aria-label={t("metronome:add_beat")}
                       className='flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-200 transition-colors hover:bg-zinc-700 disabled:opacity-40'>
                       <Plus className='h-3 w-3' strokeWidth={2.5} />
                     </button>
@@ -299,9 +301,9 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               <p className='mt-2 select-none text-[10px] text-zinc-600'>
                 {accentLocked
                   ? gridLabel?.includes("↔")
-                    ? "The click changes meter with the tab"
-                    : "Accents come from this exercise's meter"
-                  : "Click a beat to accent, click again to mute"}
+                    ? t("metronome:accent.follows_tab")
+                    : t("metronome:accent.from_exercise")
+                  : t("metronome:accent.hint")}
               </p>
             </DropdownMenuContent>
           </DropdownMenu>
