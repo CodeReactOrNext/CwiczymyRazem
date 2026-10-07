@@ -3,6 +3,7 @@ import { RewardSummary } from "components/Rewards/RewardSummary";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { useClaimRoadmapReward, useRewardLedger } from "hooks/useRewardLedger";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Lock } from "lucide-react";
 
 import {
@@ -36,6 +37,7 @@ export const RoadmapFinishCard = ({
   total,
   checkpointsLeft,
 }: RoadmapFinishCardProps) => {
+  const { t } = useTranslation("ai_coach");
   const reward = getRoadmapReward(roadmapId);
   const { data: ledger } = useRewardLedger();
   const { mutate: claim, isPending } = useClaimRoadmapReward();
@@ -93,12 +95,17 @@ export const RoadmapFinishCard = ({
           </p>
           <p className='mt-1.5 text-xs text-zinc-400'>
             {isClaimed
-              ? "In your Arsenal, with a serial nobody else has."
+              ? t("finish_card.claimed")
               : canClaim
-                ? "Roadmap complete — the guitar is yours."
+                ? t("finish_card.complete")
                 : done >= total
-                  ? `${checkpointsLeft} ${checkpointsLeft === 1 ? "checkpoint" : "checkpoints"} left to earn it.`
-                  : `${total - done} of ${total} steps left to earn it.`}
+                  ? t("finish_card.checkpoints_left", {
+                      count: checkpointsLeft,
+                    })
+                  : t("finish_card.steps_left", {
+                      left: total - done,
+                      total,
+                    })}
           </p>
         </div>
       </div>
@@ -119,7 +126,7 @@ export const RoadmapFinishCard = ({
             "relative rounded-lg bg-zinc-100 px-6 py-2.5 text-xs font-bold capitalize tracking-wide text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white",
             isPending && "cursor-wait opacity-70",
           )}>
-          {isPending ? "Collecting..." : "Collect the guitar"}
+          {isPending ? t("finish_card.collecting") : t("finish_card.collect")}
         </button>
       ) : (
         <span
@@ -130,14 +137,14 @@ export const RoadmapFinishCard = ({
           {isClaimed ? (
             <>
               <Check size={14} strokeWidth={3} />
-              Collected
+              {t("finish_card.collected")}
             </>
           ) : (
             <>
               <Lock size={14} strokeWidth={2.5} />
               {done >= total
-                ? `${checkpointsLeft} to pass`
-                : `${done}/${total} steps`}
+                ? t("finish_card.to_pass", { count: checkpointsLeft })
+                : t("steps_of", { done, total })}
             </>
           )}
         </span>

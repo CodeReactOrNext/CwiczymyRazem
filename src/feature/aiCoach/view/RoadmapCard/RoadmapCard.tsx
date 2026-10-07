@@ -6,6 +6,7 @@ import {
 } from "feature/aiCoach/utils/roadmapSteps";
 import { getStepStatus } from "feature/aiCoach/utils/stepStatus";
 import { shortRoadmapTitle } from "feature/practice/utils/modeProgress";
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Check, Guitar } from "lucide-react";
 import Image from "next/image";
 
@@ -22,6 +23,7 @@ const LEVEL_THEME: Record<string, string> = {
 };
 
 const RoadmapCard = ({ roadmap, onOpen }: RoadmapCardProps) => {
+  const { t } = useTranslation("ai_coach");
   const steps = flattenRoadmapSteps(roadmap.phases);
   const done = steps.filter(
     ({ step }) => getStepStatus(step) === "done",
@@ -34,10 +36,10 @@ const RoadmapCard = ({ roadmap, onOpen }: RoadmapCardProps) => {
   const shortTitle = shortRoadmapTitle(roadmap.title);
   const artistRoadmap = shortTitle !== roadmap.title;
   const action = complete
-    ? "Review roadmap"
+    ? t("card.review")
     : started
-      ? "Continue"
-      : "Start learning";
+      ? t("card.continue")
+      : t("card.start");
 
   return (
     <article className='group relative isolate flex min-w-0 flex-col overflow-hidden rounded-lg bg-zinc-900 transition-colors focus-within:ring-2 focus-within:ring-cyan-400 hover:bg-zinc-800/80 sm:flex-row'>
@@ -63,7 +65,7 @@ const RoadmapCard = ({ roadmap, onOpen }: RoadmapCardProps) => {
       <div className='flex flex-1 flex-col gap-5 p-5 sm:p-6'>
         <div>
           <p className='text-sm text-zinc-400'>
-            {artistRoadmap ? "Play in the style of" : "Mastery roadmap"}
+            {artistRoadmap ? t("card.in_style_of") : t("mastery_roadmap")}
           </p>
           <h2 className='mt-1 break-words text-2xl font-bold leading-tight tracking-tight text-zinc-100'>
             {shortTitle}
@@ -78,15 +80,18 @@ const RoadmapCard = ({ roadmap, onOpen }: RoadmapCardProps) => {
                 aria-hidden='true'
                 className='h-1.5 w-1.5 rounded-full bg-current'
               />
-              {roadmap.level}
+              {t(`levels.${roadmap.level}`, roadmap.level)}
             </span>
             <span className='tabular-nums text-zinc-400'>
-              {roadmap.phases.length} phases · {total} steps
+              {t("phases_steps", {
+                phases: roadmap.phases.length,
+                steps: total,
+              })}
             </span>
             {complete && (
               <span className='inline-flex items-center gap-1.5 font-medium text-emerald-300'>
                 <Check aria-hidden='true' className='h-4 w-4' />
-                Completed
+                {t("card.completed")}
               </span>
             )}
           </div>
@@ -102,11 +107,11 @@ const RoadmapCard = ({ roadmap, onOpen }: RoadmapCardProps) => {
           <div className='flex items-center gap-3'>
             <div
               role='progressbar'
-              aria-label={`${shortTitle} progress`}
+              aria-label={t("card.progress", { title: shortTitle })}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={progress}
-              aria-valuetext={`${done} of ${total} steps completed`}
+              aria-valuetext={t("card.steps_done", { done, total })}
               className='h-1 flex-1 overflow-hidden rounded-full bg-zinc-700/60'>
               <div
                 className={cn(
@@ -130,16 +135,14 @@ const RoadmapCard = ({ roadmap, onOpen }: RoadmapCardProps) => {
           <div className='min-w-0 flex-1 basis-48'>
             <p className='mb-1 text-sm text-zinc-400'>
               {complete
-                ? "All steps completed"
+                ? t("card.all_done")
                 : started
-                  ? "Up next"
-                  : "Your first step"}
+                  ? t("card.up_next")
+                  : t("card.first_step")}
             </p>
             <p className='line-clamp-2 text-sm font-medium leading-relaxed text-zinc-200'>
               {nextStep?.step.title ??
-                (complete
-                  ? "Revisit a favourite lesson or keep practising."
-                  : "Explore the roadmap.")}
+                (complete ? t("card.revisit") : t("card.explore"))}
             </p>
           </div>
           <button

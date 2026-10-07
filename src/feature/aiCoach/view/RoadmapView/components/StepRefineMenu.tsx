@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Coins,
   Dumbbell,
@@ -74,37 +75,40 @@ const ActionItem = ({
   disabled,
   keepOpen,
   onSelect,
-}: ActionItemProps) => (
-  <DropdownMenuItem
-    disabled={disabled || busy}
-    onSelect={(event) => {
-      if (keepOpen) event.preventDefault();
-      onSelect();
-    }}
-    className='flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2 text-xs text-zinc-300 focus:bg-zinc-800 focus:text-zinc-100 data-[disabled]:opacity-40'>
-    <span className='flex h-4 w-4 shrink-0 items-center justify-center text-zinc-400'>
-      {busy ? <Loader2 className='h-3.5 w-3.5 animate-spin' /> : icon}
-    </span>
-    <span className='min-w-0 flex-1'>
-      <span className='block font-semibold'>{label}</span>
-      {hint && <span className='block truncate text-zinc-500'>{hint}</span>}
-    </span>
-    <span
-      className={cn(
-        "flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold tabular-nums",
-        cost > 0 ? "bg-amber-500/15 text-amber-300" : "text-zinc-500",
-      )}>
-      {cost > 0 ? (
-        <>
-          {cost}
-          <Coins className='h-3 w-3' />
-        </>
-      ) : (
-        "free"
-      )}
-    </span>
-  </DropdownMenuItem>
-);
+}: ActionItemProps) => {
+  const { t } = useTranslation("ai_coach");
+  return (
+    <DropdownMenuItem
+      disabled={disabled || busy}
+      onSelect={(event) => {
+        if (keepOpen) event.preventDefault();
+        onSelect();
+      }}
+      className='flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2 text-xs text-zinc-300 focus:bg-zinc-800 focus:text-zinc-100 data-[disabled]:opacity-40'>
+      <span className='flex h-4 w-4 shrink-0 items-center justify-center text-zinc-400'>
+        {busy ? <Loader2 className='h-3.5 w-3.5 animate-spin' /> : icon}
+      </span>
+      <span className='min-w-0 flex-1'>
+        <span className='block font-semibold'>{label}</span>
+        {hint && <span className='block truncate text-zinc-500'>{hint}</span>}
+      </span>
+      <span
+        className={cn(
+          "flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold tabular-nums",
+          cost > 0 ? "bg-amber-500/15 text-amber-300" : "text-zinc-500",
+        )}>
+        {cost > 0 ? (
+          <>
+            {cost}
+            <Coins className='h-3 w-3' />
+          </>
+        ) : (
+          t("refine.free")
+        )}
+      </span>
+    </DropdownMenuItem>
+  );
+};
 
 /**
  * The owner's paid changes, on the step's node of the map: a small wand next
@@ -129,6 +133,7 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
   onAddStep,
   onRemoveStep,
 }) => {
+  const { t } = useTranslation(["ai_coach", "common"]);
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [confirmRemove, setConfirmRemove] = useState(false);
@@ -155,8 +160,8 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
       <DropdownMenuTrigger asChild>
         <button
           type='button'
-          aria-label={`Refine "${step.title}"`}
-          title='Refine this step'
+          aria-label={t("refine.aria", { title: step.title })}
+          title={t("refine.title_hint")}
           className={cn(
             "flex h-7 w-7 shrink-0 items-center justify-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-zinc-800",
             hasOptions
@@ -182,7 +187,7 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
         <div className='flex items-start justify-between gap-3 px-2.5 pb-2 pt-1.5'>
           <span className='min-w-0'>
             <span className='block text-[10px] font-bold text-amber-300'>
-              Refine step
+              {t("refine.heading")}
             </span>
             <span className='block truncate text-sm font-semibold text-zinc-100'>
               {step.title}
@@ -200,8 +205,8 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
           <div className='flex flex-col gap-1.5 px-1 pb-1'>
             <p className='px-1.5 text-xs font-semibold text-zinc-400'>
               {exerciseOptions.length
-                ? "Pick the exercise for this step"
-                : "Nothing in the library fits this step better."}
+                ? t("refine.pick_exercise")
+                : t("refine.nothing_better")}
             </p>
             {exerciseOptions.map((id) => {
               const candidate = exercisesAgregat.find((e) => e.id === id);
@@ -223,8 +228,16 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
                       {candidate.title}
                     </span>
                     <span className='block truncate capitalize text-zinc-500'>
-                      {candidate.difficulty} · {candidate.category}
-                      {isCurrent && " · current"}
+                      {t(
+                        `common:difficulty.${candidate.difficulty}`,
+                        candidate.difficulty,
+                      )}{" "}
+                      ·{" "}
+                      {t(
+                        `common:categories.${candidate.category}`,
+                        candidate.category,
+                      )}
+                      {isCurrent && ` · ${t("refine.current")}`}
                     </span>
                   </span>
                 </DropdownMenuItem>
@@ -233,7 +246,7 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
             <DropdownMenuItem
               onSelect={() => onDismissExerciseOptions(stepRef)}
               className='cursor-pointer justify-center rounded-md px-2.5 py-1.5 text-xs text-zinc-500 focus:bg-zinc-800 focus:text-zinc-300'>
-              Keep the current one
+              {t("refine.keep_current")}
             </DropdownMenuItem>
           </div>
         ) : (
@@ -245,15 +258,15 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
                 onKeyDown={(event) => event.stopPropagation()}
-                placeholder='What should change? (optional)'
+                placeholder={t("refine.note_placeholder")}
                 className='w-full resize-none rounded-md bg-zinc-800/60 px-2.5 py-2 text-xs leading-relaxed text-zinc-200 outline-none placeholder:text-zinc-600 focus:bg-zinc-800'
               />
             </div>
 
             <ActionItem
               icon={<RefreshCw className='h-3.5 w-3.5' />}
-              label='Rewrite this step'
-              hint={`${step.sessionsRequired} sessions`}
+              label={t("refine.rewrite")}
+              hint={t("refine.sessions", { count: step.sessionsRequired })}
               cost={costs.rewriteStep}
               busy={busy.rewriteStep}
               disabled={anyBusy || !canAfford(costs.rewriteStep)}
@@ -261,8 +274,8 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
             />
             <ActionItem
               icon={<Dumbbell className='h-3.5 w-3.5' />}
-              label='Swap the exercise'
-              hint={exercise?.title ?? "No exercise linked"}
+              label={t("refine.swap")}
+              hint={exercise?.title ?? t("refine.no_exercise")}
               cost={costs.swapExercise}
               busy={busy.swapExercise}
               disabled={anyBusy || !canAfford(costs.swapExercise)}
@@ -271,11 +284,13 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
             />
             <ActionItem
               icon={<FaYoutube className='h-3.5 w-3.5' />}
-              label='Find lessons again'
+              label={t("refine.find_lessons")}
               hint={
                 step.suggestedLessonIds?.length
-                  ? `${step.suggestedLessonIds.length} linked`
-                  : "No lessons linked"
+                  ? t("refine.linked", {
+                      count: step.suggestedLessonIds.length,
+                    })
+                  : t("refine.no_lessons")
               }
               cost={costs.refreshLessons}
               busy={busy.refreshLessons}
@@ -285,7 +300,9 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
             <ActionItem
               icon={<Music className='h-3.5 w-3.5' />}
               label={
-                step.suggestedSong ? "Find the song again" : "Find the song"
+                step.suggestedSong
+                  ? t("refine.find_song_again")
+                  : t("refine.find_song")
               }
               hint={step.suggestedSong?.title}
               cost={costs.findSong}
@@ -295,7 +312,7 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
             />
             <ActionItem
               icon={<Plus className='h-3.5 w-3.5' />}
-              label='Add a step after this one'
+              label={t("refine.add_step")}
               cost={costs.addStep}
               busy={busy.addSteps}
               disabled={anyBusy || !canAfford(costs.addStep)}
@@ -306,12 +323,12 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
               {confirmRemove ? (
                 <div className='flex items-center gap-2 px-2.5 py-1.5'>
                   <span className='flex-1 text-xs font-semibold text-rose-200'>
-                    Remove this step?
+                    {t("refine.remove_confirm")}
                   </span>
                   <DropdownMenuItem
                     onSelect={() => onRemoveStep(stepRef)}
                     className='cursor-pointer rounded-md bg-rose-500/20 px-2.5 py-1 text-xs font-bold text-rose-200 focus:bg-rose-500/30 focus:text-rose-100'>
-                    Remove
+                    {t("refine.remove")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={(event) => {
@@ -319,16 +336,14 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
                       setConfirmRemove(false);
                     }}
                     className='cursor-pointer rounded-md px-2 py-1 text-xs text-zinc-400 focus:bg-zinc-800 focus:text-zinc-200'>
-                    Keep
+                    {t("refine.keep")}
                   </DropdownMenuItem>
                 </div>
               ) : (
                 <ActionItem
                   icon={<Trash2 className='h-3.5 w-3.5' />}
-                  label='Remove this step'
-                  hint={
-                    lastStep ? "A phase keeps at least one step" : undefined
-                  }
+                  label={t("refine.remove_step")}
+                  hint={lastStep ? t("refine.phase_min") : undefined}
                   cost={0}
                   disabled={anyBusy || lastStep}
                   keepOpen
@@ -339,7 +354,7 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
 
             {broke && (
               <p className='px-2.5 pb-1 pt-2 text-[11px] text-amber-300/80'>
-                Not enough tokens for a paid change.
+                {t("refine.broke")}
               </p>
             )}
           </>

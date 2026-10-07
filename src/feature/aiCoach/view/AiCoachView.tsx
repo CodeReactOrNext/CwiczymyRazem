@@ -19,6 +19,7 @@ import { UserRoadmapsTab } from "feature/supporterPanel/components/UserRoadmapsT
 import { useSupporterRoadmap } from "feature/supporterPanel/hooks/useSupporterRoadmap";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowLeft,
   Compass,
@@ -89,6 +90,7 @@ function mergeWithProgress(
 }
 
 const AiCoachView = () => {
+  const { t } = useTranslation("ai_coach");
   const userAuth = useAppSelector(selectUserAuth);
   const userId = typeof userAuth === "string" ? userAuth : null;
   const router = useRouter();
@@ -249,8 +251,8 @@ const AiCoachView = () => {
       <div className='flex w-full flex-col'>
         <HeroBanner
           title={mergedRoadmap.title}
-          subtitle={`Goal: ${mergedRoadmap.goal}`}
-          eyebrow='Mastery Roadmap'
+          subtitle={t("goal", { goal: mergedRoadmap.goal })}
+          eyebrow={t("mastery_roadmap")}
           backgroundContent={<HeroPattern variant='ai' />}
           className='min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
           rightContent={
@@ -258,7 +260,7 @@ const AiCoachView = () => {
               onClick={handleBack}
               className='flex w-fit items-center gap-2 rounded-lg bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-200'>
               <ArrowLeft className='h-4 w-4' />
-              Back
+              {t("back")}
             </button>
           }
         />
@@ -292,17 +294,15 @@ const AiCoachView = () => {
           <header className='space-y-3'>
             <Breadcrumbs
               items={[
-                { label: "Practice", href: "/timer" },
-                { label: "Mastery Roadmaps" },
+                { label: t("practice"), href: "/timer" },
+                { label: t("mastery_roadmaps") },
               ]}
             />
             <div>
               <h1 className='text-2xl font-bold leading-tight text-white md:text-3xl'>
-                Mastery Roadmaps
+                {t("mastery_roadmaps")}
               </h1>
-              <p className='mt-1 text-sm text-zinc-400'>
-                Guided practice paths for guitar skills and playing styles.
-              </p>
+              <p className='mt-1 text-sm text-zinc-400'>{t("intro")}</p>
             </div>
           </header>
         )}
@@ -314,7 +314,7 @@ const AiCoachView = () => {
               aria-pressed={tab === "mastery"}
               className={tabNavItemClass(tab === "mastery")}>
               <Map size={16} className='shrink-0' />
-              Mastery Roadmaps
+              {t("mastery_roadmaps")}
             </button>
             <button
               type='button'
@@ -322,7 +322,7 @@ const AiCoachView = () => {
               aria-pressed={tab === "players"}
               className={tabNavItemClass(tab === "players")}>
               <Compass size={16} className='shrink-0' />
-              Player Roadmaps
+              {t("player_roadmaps")}
               {!isRosterLoading && !isSupporter && (
                 <Lock size={13} className='shrink-0 text-amber-400/80' />
               )}
@@ -354,9 +354,7 @@ const AiCoachView = () => {
             ) : roadmaps.length === 0 ? (
               <div className='flex flex-col items-center justify-center gap-3 py-20 text-zinc-500'>
                 <Map className='h-10 w-10 opacity-30' />
-                <span className='text-sm'>
-                  No mastery roadmaps available yet.
-                </span>
+                <span className='text-sm'>{t("empty")}</span>
               </div>
             ) : (
               <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
@@ -386,11 +384,9 @@ const AiCoachView = () => {
               </div>
               <div>
                 <p className='text-sm font-semibold text-zinc-300'>
-                  Suggest a roadmap
+                  {t("suggest.title")}
                 </p>
-                <p className='text-xs text-zinc-500'>
-                  Missing a topic? Let us know what you&apos;d like to see next.
-                </p>
+                <p className='text-xs text-zinc-500'>{t("suggest.body")}</p>
               </div>
             </button>
 

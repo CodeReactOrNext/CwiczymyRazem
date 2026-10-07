@@ -8,6 +8,7 @@ import {
 } from "assets/components/ui/drawer";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronLeft, ChevronRight, RefreshCw, Target, X } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 
@@ -26,9 +27,17 @@ const STATUS_CHIP: Record<
   StepStatus,
   { label: string; color: "gray" | "amber" | "emerald"; dot: string }
 > = {
-  "not-started": { label: "Not started", color: "gray", dot: "bg-zinc-500" },
-  "in-progress": { label: "In progress", color: "amber", dot: "bg-amber-400" },
-  done: { label: "Done", color: "emerald", dot: "bg-emerald-400" },
+  "not-started": {
+    label: "drawer.not_started",
+    color: "gray",
+    dot: "bg-zinc-500",
+  },
+  "in-progress": {
+    label: "status.in_progress",
+    color: "amber",
+    dot: "bg-amber-400",
+  },
+  done: { label: "status.done", color: "emerald", dot: "bg-emerald-400" },
 };
 
 const SEGMENT_CLS: Record<StepStatus, string> = {
@@ -84,6 +93,7 @@ interface NavButtonProps {
 }
 
 const NavButton = ({ direction, target, onClick }: NavButtonProps) => {
+  const { t } = useTranslation("ai_coach");
   const isNext = direction === "next";
   const Icon = isNext ? ChevronRight : ChevronLeft;
   return (
@@ -98,14 +108,14 @@ const NavButton = ({ direction, target, onClick }: NavButtonProps) => {
       <Icon className='h-4 w-4 shrink-0 text-zinc-400' />
       <span className='min-w-0 flex-1'>
         <span className='block text-[11px] font-semibold text-zinc-500'>
-          {isNext ? "Next" : "Previous"}
+          {isNext ? t("drawer.next") : t("drawer.previous")}
         </span>
         <span className='block truncate text-sm font-semibold text-zinc-200'>
           {target
             ? target.step.title
             : isNext
-              ? "End of roadmap"
-              : "Start of roadmap"}
+              ? t("drawer.end")
+              : t("drawer.start")}
         </span>
       </span>
     </button>
@@ -134,6 +144,7 @@ const StepDrawerBody = ({
   onPracticeLesson,
   admin,
 }: StepDrawerBodyProps) => {
+  const { t } = useTranslation("ai_coach");
   const {
     current,
     prev,
@@ -168,16 +179,14 @@ const StepDrawerBody = ({
     body = (
       <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 px-6 py-12 text-center'>
         <p className='text-sm font-semibold text-zinc-200'>
-          The details didn&apos;t come through
+          {t("drawer.failed_title")}
         </p>
-        <p className='text-xs text-zinc-400'>
-          The coach couldn&apos;t write this step just now.
-        </p>
+        <p className='text-xs text-zinc-400'>{t("drawer.failed_body")}</p>
         <button
           type='button'
           onClick={onRetryDetail}
           className='mt-2 flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-xs font-semibold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700'>
-          <RefreshCw className='h-3.5 w-3.5' /> Try again
+          <RefreshCw className='h-3.5 w-3.5' /> {t("drawer.try_again")}
         </button>
       </div>
     );
@@ -189,7 +198,7 @@ const StepDrawerBody = ({
         {step.successCriteria && (
           <section className='rounded-lg bg-cyan-500/10 p-5'>
             <h3 className='flex items-center gap-2 text-xs font-semibold tracking-wide text-cyan-400'>
-              <Target className='h-3.5 w-3.5' /> You&apos;ve got it when
+              <Target className='h-3.5 w-3.5' /> {t("drawer.got_it_when")}
             </h3>
             <p className='mt-3 text-sm leading-relaxed text-zinc-200'>
               {step.successCriteria}
@@ -223,7 +232,7 @@ const StepDrawerBody = ({
       <header className='flex flex-col gap-4 px-5 pb-5 pt-5 sm:px-7 sm:pt-6'>
         <div className='flex items-center justify-between gap-3'>
           <p className='truncate text-xs font-semibold text-zinc-400'>
-            Phase {phaseIdx + 1} · {phase.title}
+            {t("phase_n", { n: phaseIdx + 1 })} · {phase.title}
           </p>
           <div className='flex shrink-0 items-center gap-1'>
             {admin && step.description && !isGenerating && (
@@ -237,7 +246,7 @@ const StepDrawerBody = ({
             <DrawerClose asChild>
               <button
                 type='button'
-                aria-label='Close'
+                aria-label={t("drawer.close")}
                 className='flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
                 <X className='h-4 w-4' />
               </button>
@@ -250,20 +259,30 @@ const StepDrawerBody = ({
             {step.title}
           </DrawerTitle>
           <DrawerDescription className='sr-only'>
-            Step {stepIdx + 1} of {phase.steps.length} in phase {phaseIdx + 1},{" "}
-            {phase.title}.
+            {t("drawer.sr_position", {
+              step: stepIdx + 1,
+              total: phase.steps.length,
+              phase: phaseIdx + 1,
+              title: phase.title,
+            })}
           </DrawerDescription>
           <div className='flex flex-wrap items-center gap-x-3 gap-y-2'>
             <Chip color={chip.color}>
               <span className={cn("h-1.5 w-1.5 rounded-full", chip.dot)} />
-              {chip.label}
+              {t(chip.label)}
             </Chip>
             <span className='text-xs text-zinc-400'>
-              Step {stepIdx + 1} of {phase.steps.length}
+              {t("drawer.step_of", {
+                step: stepIdx + 1,
+                total: phase.steps.length,
+              })}
             </span>
             {resources.total > 0 && (
               <span className='text-xs tabular-nums text-zinc-400'>
-                {resources.completed}/{resources.total} resources
+                {t("drawer.resources", {
+                  done: resources.completed,
+                  total: resources.total,
+                })}
               </span>
             )}
           </div>

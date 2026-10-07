@@ -1,19 +1,15 @@
+import { useTranslation } from "hooks/useTranslation";
 import { Map as MapIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-const AI_MESSAGES = [
-  "Analyzing your learning goal...",
-  "Identifying key techniques...",
-  "Writing practice exercises...",
-  "Calibrating difficulty to your level...",
-  "Setting success criteria...",
-  "Almost there...",
-];
+/** Keys in `ai_coach:loader.messages`, shown in turn. */
+const AI_MESSAGES = [0, 1, 2, 3, 4, 5];
 
 /** What the drawer shows while the coach writes a step's details for the first time. */
 export const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({
   stepTitle,
 }) => {
+  const { t } = useTranslation("ai_coach");
   const [msgIdx, setMsgIdx] = useState(0);
   const [fade, setFade] = useState(true);
 
@@ -41,12 +37,12 @@ export const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({
 
         <div className='flex flex-col items-center gap-1.5'>
           <p className='text-[11px] font-semibold tracking-widest text-cyan-400/80'>
-            Coach is thinking
+            {t("loader.thinking")}
           </p>
           <p
             className='text-sm text-zinc-400 transition-opacity duration-300'
             style={{ opacity: fade ? 1 : 0 }}>
-            {AI_MESSAGES[msgIdx]}
+            {t(`loader.messages.${AI_MESSAGES[msgIdx]}`)}
           </p>
         </div>
 
@@ -65,7 +61,7 @@ export const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({
 
       <div className='rounded-lg bg-zinc-900/50 px-4 py-3'>
         <p className='mb-1 text-[10px] font-semibold tracking-widest text-zinc-500'>
-          Generating details for
+          {t("loader.generating_for")}
         </p>
         <p className='text-sm font-medium text-zinc-300'>{stepTitle}</p>
       </div>
