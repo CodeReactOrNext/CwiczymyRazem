@@ -2,6 +2,8 @@ import { cn } from "assets/lib/utils";
 import { useWorkBoard } from "feature/workBoard/hooks/useWorkBoard";
 import type { WorkItem } from "feature/workBoard/types/workBoard.types";
 import { splitWorkTitle } from "feature/workBoard/utils/workBoard.utils";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import {
   Check,
   Hammer,
@@ -11,36 +13,19 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+/** Title and blurb are `supporter:panel.work.columns.<key>`. */
 const COLUMNS = [
-  {
-    key: "queue" as const,
-    title: "Queue",
-    blurb: "Up next, in order",
-    icon: ListOrdered,
-    tone: "text-cyan-400",
-  },
-  {
-    key: "in_progress" as const,
-    title: "In progress",
-    blurb: "Being built now",
-    icon: Hammer,
-    tone: "text-amber-400",
-  },
-  {
-    key: "done" as const,
-    title: "Done",
-    blurb: "Shipped, newest first",
-    icon: Check,
-    tone: "text-emerald-400",
-  },
+  { key: "queue" as const, icon: ListOrdered, tone: "text-cyan-400" },
+  { key: "in_progress" as const, icon: Hammer, tone: "text-amber-400" },
+  { key: "done" as const, icon: Check, tone: "text-emerald-400" },
 ];
 
 /** How many shipped items show before the rest fold away. */
 const DONE_VISIBLE = 8;
 
-const shortDate = (iso: string | null) =>
+const shortDate = (iso: string | null, locale?: string) =>
   iso
-    ? new Date(iso).toLocaleDateString(undefined, {
+    ? new Date(iso).toLocaleDateString(locale, {
         day: "numeric",
         month: "short",
       })
@@ -56,9 +41,11 @@ const Row = ({
   /** 1-based place in the queue; only the queue is numbered. */
   position?: number;
 }) => {
+  const { t } = useTranslation("supporter");
+  const intl = useIntlLocale();
   const { title, isRoadmap } = splitWorkTitle(item.title);
   const done = column === "done";
-  const shipped = done ? shortDate(item.completedAt) : null;
+  const shipped = done ? shortDate(item.completedAt, intl) : null;
 
   return (
     <li className='flex gap-3 rounded-lg bg-zinc-800/40 px-4 py-3'>
@@ -88,15 +75,15 @@ const Row = ({
             {isRoadmap && (
               <span className='inline-flex items-center gap-1 rounded bg-zinc-900/60 px-1.5 py-0.5 text-xs text-zinc-400'>
                 <MapIcon size={11} />
-                Roadmap
+                {t("panel.tabs.roadmap")}
               </span>
             )}
             {item.ideaId && (
               <span
-                title='Came from a supporter idea'
+                title={t("panel.work.from_idea")}
                 className='inline-flex items-center gap-1 rounded bg-cyan-500/10 px-1.5 py-0.5 text-xs text-cyan-300'>
                 <Lightbulb size={11} />
-                Supporter idea
+                {t("panel.work.idea")}
               </span>
             )}
             {shipped && (
@@ -116,8 +103,9 @@ const Column = ({
   column: (typeof COLUMNS)[number];
   items: WorkItem[];
 }) => {
+  const { t } = useTranslation(["supporter", "common"]);
   const [showAll, setShowAll] = useState(false);
-  const { key, title, blurb, icon: Icon, tone } = column;
+  const { key, icon: Icon, tone } = column;
   const folds = key === "done" && items.length > DONE_VISIBLE;
   const shown = folds && !showAll ? items.slice(0, DONE_VISIBLE) : items;
 
@@ -126,17 +114,19 @@ const Column = ({
       <header className='px-1'>
         <h3 className='flex items-center gap-2 text-base font-bold text-white'>
           <Icon size={16} className={tone} />
-          {title}
+          {t(`panel.work.columns.${key}.title`)}
           <span className='rounded bg-zinc-800/60 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
             {items.length}
           </span>
         </h3>
-        <p className='mt-0.5 text-xs text-zinc-500'>{blurb}</p>
+        <p className='mt-0.5 text-xs text-zinc-500'>
+          {t(`panel.work.columns.${key}.blurb`)}
+        </p>
       </header>
 
       {items.length === 0 ? (
         <p className='px-1 py-6 text-center text-sm text-zinc-600'>
-          Nothing here
+          {t("panel.work.nothing_here")}
         </p>
       ) : (
         <ol className='space-y-2'>
@@ -156,7 +146,9 @@ const Column = ({
           type='button'
           onClick={() => setShowAll((all) => !all)}
           className='w-full rounded-lg py-2 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
-          {showAll ? "Show less" : `Show all ${items.length}`}
+          {showAll
+            ? t("panel.show_less")
+            : t("panel.work.show_all", { count: items.length })}
         </button>
       )}
     </section>
@@ -169,6 +161,7 @@ const Column = ({
  * the honest answer to "so what is happening with it".
  */
 export const WorkBoardTab = ({ enabled }: { enabled: boolean }) => {
+  const { t } = useTranslation("supporter");
   const { board, isLoading } = useWorkBoard(enabled);
 
   if (isLoading) {
@@ -193,10 +186,10 @@ export const WorkBoardTab = ({ enabled }: { enabled: boolean }) => {
           <Hammer size={26} />
         </span>
         <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-          Nothing on the board yet
+          {t("panel.board.empty_title")}
         </h3>
         <p className='max-w-sm text-sm text-zinc-400'>
-          This is where the queue shows up once there is something in it.
+          {t("panel.work.empty_body")}
         </p>
       </div>
     );

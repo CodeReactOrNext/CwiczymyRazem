@@ -14,6 +14,9 @@ import { EN_CATALOG, TRANSLATION_NAMESPACES } from "./namespaces";
  */
 const LOCALES_DIR = join(__dirname, "../../../public/locales");
 
+/** The plural forms `resolve` looks for after a key. */
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/;
+
 const filePath = (locale: string, namespace: string) =>
   join(LOCALES_DIR, locale, `${namespace}.json`);
 
@@ -68,7 +71,18 @@ describe("translation files", () => {
     ).flatMap(({ code }) =>
       TRANSLATION_NAMESPACES.flatMap((namespace) =>
         keyPaths(read(code, namespace))
-          .filter((path) => !english.get(namespace)?.has(path))
+          .filter((path) => {
+            const known = english.get(namespace);
+            // A plural form English does without ("_few" in Polish) belongs to
+            // the key English has bare or in its own forms.
+            const base = path.replace(PLURAL_SUFFIX, "");
+            return !(
+              known?.has(path) ||
+              known?.has(base) ||
+              known?.has(`${base}_one`) ||
+              known?.has(`${base}_other`)
+            );
+          })
           .map((path) => `${code}/${namespace}.json → ${path}`),
       ),
     );

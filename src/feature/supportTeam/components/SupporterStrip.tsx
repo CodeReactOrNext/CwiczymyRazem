@@ -1,6 +1,8 @@
 import { cn } from "assets/lib/utils";
 import { UserLink } from "components/UserLink/UserLink";
 import { useSupporterWall } from "feature/supportTeam/hooks/useSupporterWall";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 
 interface SupporterStripProps {
   className?: string;
@@ -21,6 +23,7 @@ interface SupporterStripProps {
  * cost one request between them.
  */
 export const SupporterStrip = ({ className }: SupporterStripProps) => {
+  const { t } = useTranslation("supporter");
   const { members, isLoading } = useSupporterWall();
 
   if (isLoading) {
@@ -45,10 +48,16 @@ export const SupporterStrip = ({ className }: SupporterStripProps) => {
       {/* A label, not a link: the faces below are the way in, and the one page
           still carrying the full wall is a supporters-only tab. */}
       <p className='text-xs text-zinc-500'>
-        Funded by{" "}
-        <span className='font-semibold text-zinc-300'>
-          {members.length} {members.length === 1 ? "player" : "players"}
-        </span>
+        <Interpolate
+          text={t("wall.funded_by")}
+          values={{
+            players: (
+              <span className='font-semibold text-zinc-300'>
+                {t("wall.players", { count: members.length })}
+              </span>
+            ),
+          }}
+        />
       </p>
 
       {/* Spaced rather than stacked: the rotating rims lose their shape once

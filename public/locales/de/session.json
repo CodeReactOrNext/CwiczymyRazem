@@ -521,6 +521,7 @@
     "sharp": "{{cents}}¢ zu hoch — runterstimmen",
     "flat": "{{cents}}¢ zu tief — hochstimmen",
     "string": "Saite {{n}} — {{name}} ({{hz}} Hz)",
-    "all_tuned": "Alle Saiten gestimmt"
+    "all_tuned": "Alle Saiten gestimmt",
+    "title": "Stimmgerät"
   }
 }

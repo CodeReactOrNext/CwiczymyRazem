@@ -10,7 +10,7 @@ import {
   splitByMentions,
 } from "./chatMentions";
 import { findOwnReaction, groupReactions, reactionEmoji } from "./chatReactions";
-import { systemEventText, welcomeText } from "./systemMessages";
+import { systemEventText, welcomeGoalPhrase } from "./systemMessages";
 
 describe("chat reactions", () => {
   const reactions: ChatReaction[] = [
@@ -111,13 +111,11 @@ describe("chat mentions", () => {
 
 describe("system messages", () => {
   it("describes what a new player came for", () => {
-    expect(welcomeText("Ania", "plans", "Beginner")).toBe(
-      "Ania just joined, starting with the Beginner plan",
+    expect(welcomeGoalPhrase("plans", "Beginner")).toBe(
+      "starting with the Beginner plan",
     );
-    expect(welcomeText("Ania", "songs", null)).toBe(
-      "Ania just joined, here to learn songs",
-    );
-    expect(welcomeText("Ania", null, null)).toBe("Ania just joined Riff Quest");
+    expect(welcomeGoalPhrase("songs", null)).toBe("here to learn songs");
+    expect(welcomeGoalPhrase(null, null)).toBeNull();
   });
 
   it("writes guild events as one line", () => {

@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { Backer } from "feature/supporterPanel/types/supporterPanel.types";
+import { useTranslation } from "hooks/useTranslation";
 import { useState } from "react";
 
 /**
@@ -52,6 +53,7 @@ export const BackerRow = ({
   muted = false,
   className,
 }: BackerRowProps) => {
+  const { t } = useTranslation("supporter");
   const [expanded, setExpanded] = useState(false);
 
   if (total <= 0 && backers.length === 0) return null;
@@ -61,7 +63,7 @@ export const BackerRow = ({
   if (backers.length === 0) {
     return (
       <p className={cn("text-xs text-zinc-500", className)}>
-        Backed by {total} {total === 1 ? "supporter" : "supporters"}
+        {t("panel.backers.count", { count: total })}
       </p>
     );
   }
@@ -72,7 +74,9 @@ export const BackerRow = ({
 
   return (
     <div className={cn("flex flex-wrap items-center gap-1.5", className)}>
-      <span className='mr-0.5 text-xs text-zinc-500'>Backed by</span>
+      <span className='mr-0.5 text-xs text-zinc-500'>
+        {t("panel.backers.by")}
+      </span>
 
       {shown.map((backer) => {
         const isMe = backer.uid === myUid;
@@ -80,7 +84,10 @@ export const BackerRow = ({
         return (
           <span
             key={backer.uid}
-            title={`${backer.name} put ${backer.weight} in`}
+            title={t("panel.backers.put_in", {
+              name: backer.name,
+              count: backer.weight,
+            })}
             className={cn(
               CHIP,
               isMe
@@ -91,7 +98,7 @@ export const BackerRow = ({
             )}>
             <Bubble backer={backer} />
             <span className='max-w-[10rem] truncate font-medium'>
-              {isMe ? "You" : backer.name}
+              {isMe ? t("panel.backers.you") : backer.name}
             </span>
             {backer.weight > 1 && (
               <span
@@ -116,7 +123,7 @@ export const BackerRow = ({
             "bg-zinc-800/50 hover:bg-zinc-800 hover:text-zinc-200",
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
           )}>
-          +{held + unlisted} more
+          {t("panel.backers.more", { count: held + unlisted })}
         </button>
       )}
 

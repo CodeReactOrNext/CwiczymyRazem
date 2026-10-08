@@ -37,12 +37,14 @@ import type {
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
+import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { findCosmetic } from "feature/guilds/data/guildCosmetics";
+import { DiscordPromoCard } from "feature/logs/components/DiscordPromoCard";
 import { LogReaction } from "feature/logs/components/LogReaction";
 import {
   markMotivateHintDone,
@@ -52,12 +54,14 @@ import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDailyQuestInterface,
+  FirebaseLogsDiscordPromoInterface,
   FirebaseLogsDonationInterface,
   FirebaseLogsExamPassedInterface,
   FirebaseLogsGuildLevelInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsMarketplacePurchaseInterface,
+  FirebaseLogsPlayerJoinedInterface,
   FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsRoadmapStepInterface,
@@ -113,6 +117,7 @@ import {
   Ear,
   ExternalLink,
   Gift,
+  Hand,
   GraduationCap,
   Heart,
   ListChecks,
@@ -1386,6 +1391,22 @@ const GroupedLogLine = ({
     );
   }
 
+  if (type === "playerJoined") {
+    const joinedLog = log as FirebaseLogsPlayerJoinedInterface;
+    const phrase = welcomeGoalPhrase(joinedLog.goal, joinedLog.planTitle, t);
+
+    return (
+      <GroupedLine>
+        <p className='text-sm text-zinc-400'>
+          <Hand className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
+          {phrase
+            ? t("feed:joined_with", { phrase })
+            : t("feed:joined")}
+        </p>
+      </GroupedLine>
+    );
+  }
+
   if (type === "dailyQuest") {
     const questLog = log as FirebaseLogsDailyQuestInterface;
 
@@ -1850,6 +1871,11 @@ const Logs = ({
             ) : group.type === "supportAsk" ? (
               <FirebaseLogsSupportAskItem
                 log={representative as FirebaseLogsSupportAskInterface}
+                isNew={isNew}
+              />
+            ) : group.type === "discordPromo" ? (
+              <DiscordPromoCard
+                log={representative as FirebaseLogsDiscordPromoInterface}
                 isNew={isNew}
               />
             ) : group.type === "donationReceived" ? (

@@ -1,5 +1,8 @@
 import not_found from "../../../public/locales/en/404.json";
 import achievements from "../../../public/locales/en/achievements.json";
+import ai_coach from "../../../public/locales/en/ai_coach.json";
+import arsenal from "../../../public/locales/en/arsenal.json";
+import backing_track from "../../../public/locales/en/backing_track.json";
 import calibration from "../../../public/locales/en/calibration.json";
 import challenges from "../../../public/locales/en/challenges.json";
 import chat from "../../../public/locales/en/chat.json";
@@ -12,6 +15,7 @@ import faq from "../../../public/locales/en/faq.json";
 import feed from "../../../public/locales/en/feed.json";
 import feedback from "../../../public/locales/en/feedback.json";
 import footer from "../../../public/locales/en/footer.json";
+import guilds from "../../../public/locales/en/guilds.json";
 import journey from "../../../public/locales/en/journey.json";
 import leadboard from "../../../public/locales/en/leadboard.json";
 import level_gate from "../../../public/locales/en/level_gate.json";
@@ -29,6 +33,7 @@ import practice_log from "../../../public/locales/en/practice_log.json";
 import profile from "../../../public/locales/en/profile.json";
 import recordings from "../../../public/locales/en/recordings.json";
 import report from "../../../public/locales/en/report.json";
+import scale_tree from "../../../public/locales/en/scale_tree.json";
 import session from "../../../public/locales/en/session.json";
 import session_summary from "../../../public/locales/en/session_summary.json";
 import settings from "../../../public/locales/en/settings.json";
@@ -46,6 +51,9 @@ import yup_errors from "../../../public/locales/en/yup_errors.json";
 export const TRANSLATION_NAMESPACES = [
   "404",
   "achievements",
+  "ai_coach",
+  "arsenal",
+  "backing_track",
   "calibration",
   "challenges",
   "chat",
@@ -58,6 +66,7 @@ export const TRANSLATION_NAMESPACES = [
   "feed",
   "feedback",
   "footer",
+  "guilds",
   "journey",
   "leadboard",
   "level_gate",
@@ -75,6 +84,7 @@ export const TRANSLATION_NAMESPACES = [
   "profile",
   "recordings",
   "report",
+  "scale_tree",
   "session",
   "session_summary",
   "settings",
@@ -97,7 +107,9 @@ export const DEFAULT_NAMESPACE: TranslationNamespace = "common";
 /** A parsed namespace file: nested objects of strings, addressed with dot paths. */
 export type TranslationDict = Record<string, unknown>;
 
-export type LocaleCatalog = Partial<Record<TranslationNamespace, TranslationDict>>;
+export type LocaleCatalog = Partial<
+  Record<TranslationNamespace, TranslationDict>
+>;
 
 /**
  * English, bundled rather than fetched.
@@ -108,6 +120,9 @@ export type LocaleCatalog = Partial<Record<TranslationNamespace, TranslationDict
 export const EN_CATALOG: LocaleCatalog = {
   "404": not_found,
   achievements,
+  ai_coach,
+  arsenal,
+  backing_track,
   calibration,
   challenges,
   chat,
@@ -120,6 +135,7 @@ export const EN_CATALOG: LocaleCatalog = {
   feed,
   feedback,
   footer,
+  guilds,
   journey,
   leadboard,
   level_gate,
@@ -137,6 +153,7 @@ export const EN_CATALOG: LocaleCatalog = {
   profile,
   recordings,
   report,
+  scale_tree,
   session,
   session_summary,
   settings,

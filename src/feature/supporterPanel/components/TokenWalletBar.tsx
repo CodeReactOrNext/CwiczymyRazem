@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import type { SupporterWallet } from "feature/supporterPanel/types/supporterPanel.types";
+import { useTranslation } from "hooks/useTranslation";
 
 interface TokenWalletBarProps {
   wallet: SupporterWallet;
@@ -15,16 +16,21 @@ interface TokenWalletBarProps {
  * which is not what this is — tokens arrive with the badge and with donations,
  * and the pile is however big it happens to be.
  */
-export const TokenWalletBar = ({ wallet, className }: TokenWalletBarProps) => (
-  <div
-    className={cn(
-      "flex items-center gap-2.5 rounded-lg bg-cyan-500/10 px-4 py-2.5",
-      className,
-    )}>
-    <SupportToken size={26} />
-    <span className='text-xl font-bold tabular-nums leading-none text-cyan-300'>
-      {wallet.left}
-    </span>
-    <span className='text-xs text-zinc-400'>tokens to spend</span>
-  </div>
-);
+export const TokenWalletBar = ({ wallet, className }: TokenWalletBarProps) => {
+  const { t } = useTranslation("supporter");
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-2.5 rounded-lg bg-cyan-500/10 px-4 py-2.5",
+        className,
+      )}>
+      <SupportToken size={26} />
+      <span className='text-xl font-bold tabular-nums leading-none text-cyan-300'>
+        {wallet.left}
+      </span>
+      <span className='text-xs text-zinc-400'>
+        {t("panel.wallet", { count: wallet.left })}
+      </span>
+    </div>
+  );
+};

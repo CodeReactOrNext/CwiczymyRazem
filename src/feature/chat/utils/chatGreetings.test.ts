@@ -5,11 +5,12 @@ import { foldGreetings, isStockGreeting } from "./chatGreetings";
 
 const welcome: ChatMessageType = {
   id: "w1",
-  type: "welcome",
+  type: "system",
   userId: "ann",
   username: "Ann",
-  message: "Ann just joined Riff Quest",
+  message: "Ann joined the guild",
   timestamp: new Date(),
+  system: { kind: "member_joined" },
 };
 
 const reply = (

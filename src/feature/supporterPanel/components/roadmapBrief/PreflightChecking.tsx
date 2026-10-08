@@ -1,13 +1,11 @@
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const LINES = [
-  "Reading your goal",
-  "Checking the song library",
-  "Choosing what to ask you",
-];
+/** Keys in `supporter:panel.preflight.lines`. */
+const LINES = [0, 1, 2];
 
 /** How long each line shows as the running one before the next takes over. */
 const LINE_MS = 1400;
@@ -18,6 +16,7 @@ const LINE_MS = 1400;
  * own clock: the last one stays running until the answer lands.
  */
 export const PreflightChecking = () => {
+  const { t } = useTranslation("supporter");
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -64,15 +63,13 @@ export const PreflightChecking = () => {
                   <span className='h-2 w-2 animate-pulse rounded-full bg-amber-400' />
                 ) : null}
               </span>
-              {line}
+              {t(`panel.preflight.lines.${line}`)}
             </motion.li>
           );
         })}
       </ol>
 
-      <p className='text-xs text-zinc-500'>
-        Nothing is charged for this — tokens leave only when you generate.
-      </p>
+      <p className='text-xs text-zinc-500'>{t("panel.preflight.free")}</p>
     </div>
   );
 };

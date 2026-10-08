@@ -9,6 +9,7 @@ import type {
   RoadmapIdeaStatus,
 } from "feature/supporterPanel/types/supporterPanel.types";
 import { groupIdeas } from "feature/supporterPanel/utils/ideaGroups";
+import { useTranslation } from "hooks/useTranslation";
 import { Lightbulb, Plus } from "lucide-react";
 import { useState } from "react";
 
@@ -32,26 +33,28 @@ const SectionHeading = ({ title, count }: { title: string; count: number }) => (
   </h2>
 );
 
-const EmptyBoard = ({ onPost }: { onPost: () => void }) => (
-  <div className='flex flex-col items-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-    <span className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-400'>
-      <Lightbulb size={26} />
-    </span>
-    <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-      Nothing on the board yet
-    </h3>
-    <p className='max-w-sm text-sm text-zinc-400'>
-      Whatever lands here first sets the agenda. Post the thing you keep wishing
-      the app did.
-    </p>
-    <Button onClick={onPost} className='mt-7'>
-      <span className='flex items-center gap-2'>
-        <Plus size={16} />
-        Post an idea
+const EmptyBoard = ({ onPost }: { onPost: () => void }) => {
+  const { t } = useTranslation("supporter");
+  return (
+    <div className='flex flex-col items-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
+      <span className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-400'>
+        <Lightbulb size={26} />
       </span>
-    </Button>
-  </div>
-);
+      <h3 className='mb-2 text-lg font-bold text-zinc-100'>
+        {t("panel.board.empty_title")}
+      </h3>
+      <p className='max-w-sm text-sm text-zinc-400'>
+        {t("panel.board.empty_body")}
+      </p>
+      <Button onClick={onPost} className='mt-7'>
+        <span className='flex items-center gap-2'>
+          <Plus size={16} />
+          {t("panel.board.post")}
+        </span>
+      </Button>
+    </div>
+  );
+};
 
 /**
  * The board itself: what supporters want built, ranked by how much of their
@@ -64,6 +67,7 @@ export const RoadmapBoardTab = ({
   board: RoadmapBoard | undefined;
   isLoading: boolean;
 }) => {
+  const { t } = useTranslation("supporter");
   const [isPosting, setIsPosting] = useState(false);
   const { back, postIdea, changeStatus } = useRoadmapMutations();
 
@@ -75,17 +79,16 @@ export const RoadmapBoardTab = ({
   return (
     <div className='space-y-8'>
       <div className='flex flex-wrap items-center justify-between gap-4'>
-        <p className='text-sm text-zinc-400'>
-          The most-backed ideas get built first. Spent tokens don&apos;t come
-          back.
-        </p>
+        <p className='text-sm text-zinc-400'>{t("panel.board.intro")}</p>
         <Button
           onClick={() => setIsPosting(true)}
           disabled={tokensLeft < IDEA_COST}
-          title={tokensLeft < IDEA_COST ? "Not enough tokens left" : undefined}>
+          title={
+            tokensLeft < IDEA_COST ? t("panel.not_enough_left") : undefined
+          }>
           <span className='flex items-center gap-2'>
             <Plus size={16} />
-            Post an idea
+            {t("panel.board.post")}
             <span className='ml-1 inline-flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 text-sm font-bold tabular-nums'>
               <SupportToken size={16} />
               {IDEA_COST}
@@ -100,7 +103,10 @@ export const RoadmapBoardTab = ({
         <div className='space-y-12'>
           {groupIdeas(board.ideas).map((group) => (
             <section key={group.key} className='space-y-4'>
-              <SectionHeading title={group.title} count={group.ideas.length} />
+              <SectionHeading
+                title={t(`panel.board.groups.${group.key}`, group.title)}
+                count={group.ideas.length}
+              />
               <div className='space-y-3'>
                 {group.ideas.map((idea, index) => (
                   <RoadmapIdeaCard

@@ -17,6 +17,8 @@ import {
 } from "feature/supporterPanel/constants/supporterPanel.constants";
 import { useAccountEmail } from "feature/supporterPanel/hooks/useAccountEmail";
 import { tokensEarned } from "feature/supporterPanel/utils/supporterTokens";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import {
   AtSign,
   Guitar,
@@ -41,79 +43,48 @@ import { FaDiscord } from "react-icons/fa6";
  * rebalance is a constant to change rather than a page to rewrite.
  */
 
-/** The other tabs, in the order the panel shows them. */
-const SURFACES: { icon: typeof Map; title: string; body: string }[] = [
-  {
-    icon: Map,
-    title: "Roadmap",
-    body: "Put up what the app is missing and push the ideas you want built. What the board carries most is what gets picked up next.",
-  },
-  {
-    icon: Hammer,
-    title: "In the works",
-    body: "The actual build order — what is in progress, what is queued, what shipped. You stop guessing what happened to your idea.",
-  },
-  {
-    icon: Guitar,
-    title: "Gear",
-    body: "Put a guitar, an amp or a pedal up for the Arsenal and push the ones you want drawn. What rises here is what gets made.",
-  },
-  {
-    icon: Package,
-    title: "Supporter case",
-    body: "Six seats in the next case, and you pick what sits in each one before it ever opens. Only the winner's tokens are spent. Everything backing the rest stays on the board for the next case.",
-  },
-  {
-    icon: Heart,
-    title: "Supporters",
-    body: "Everyone funding the app, listed with the level they play at. The badge puts you on that wall the day it lands.",
-  },
-  {
-    icon: Shield,
-    title: "Guild",
-    body: "Claim a name and a tag nobody else can take, then widen the room and the shelf as members turn up.",
-  },
+/** The other tabs, in the order the panel shows them; copy in `supporter:panel.info.surfaces`. */
+const SURFACES: { id: string; icon: typeof Map }[] = [
+  { id: "roadmap", icon: Map },
+  { id: "work", icon: Hammer },
+  { id: "gear", icon: Guitar },
+  { id: "case", icon: Package },
+  { id: "wall", icon: Heart },
+  { id: "guild", icon: Shield },
 ];
 
 /** Dollar figures for the ladder — the token counts beside them are computed. */
 const LADDER_DOLLARS = [3, 5, 10, 25];
 
+/** Titles and row labels are keys in `supporter:panel.info.costs`. */
 const COST_GROUPS: {
-  title: string;
-  rows: { label: string; cost: number }[];
+  id: string;
+  rows: { id: string; cost: number }[];
 }[] = [
   {
-    title: "Roadmap",
+    id: "roadmap",
     rows: [
-      { label: "Post an idea", cost: IDEA_COST },
-      {
-        label: `Back an idea (max ${MAX_BACKING_PER_IDEA})`,
-        cost: IDEA_BACK_COST,
-      },
+      { id: "post_idea", cost: IDEA_COST },
+      { id: "back_idea", cost: IDEA_BACK_COST },
     ],
   },
   {
-    title: "Gear",
+    id: "gear",
     rows: [
-      { label: "Propose gear", cost: GEAR_PROPOSAL_COST },
-      { label: "Back a proposal", cost: GEAR_BACK_COST },
+      { id: "propose_gear", cost: GEAR_PROPOSAL_COST },
+      { id: "back_proposal", cost: GEAR_BACK_COST },
     ],
   },
   {
-    title: "Votes",
-    rows: [
-      { label: "Supporter case item", cost: SLATE_VOTE_COST },
-    ],
+    id: "votes",
+    rows: [{ id: "case_item", cost: SLATE_VOTE_COST }],
   },
   {
-    title: "Guild",
+    id: "guild",
     rows: [
-      { label: "Found a guild", cost: GUILD_FOUNDING_COST },
-      {
-        label: `+${GUILD_SEATS_PER_UPGRADE} seats`,
-        cost: GUILD_SEAT_UPGRADE_COST,
-      },
-      { label: "+1 stash row", cost: GUILD_STASH_ROW_COST },
+      { id: "found_guild", cost: GUILD_FOUNDING_COST },
+      { id: "seats", cost: GUILD_SEAT_UPGRADE_COST },
+      { id: "stash_row", cost: GUILD_STASH_ROW_COST },
     ],
   },
 ];
@@ -126,23 +97,30 @@ const Tokens = ({ value }: { value: number }) => (
 );
 
 export const SupporterInfo = () => {
+  const { t } = useTranslation("supporter");
   const email = useAccountEmail();
 
   return (
     <div className='space-y-10'>
       <section className='space-y-5'>
-        <h2 className='text-base font-bold text-zinc-100'>What you do here</h2>
+        <h2 className='text-base font-bold text-zinc-100'>
+          {t("panel.info.what_you_do")}
+        </h2>
 
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-          {SURFACES.map(({ icon: Icon, title, body }) => (
+          {SURFACES.map(({ id, icon: Icon }) => (
             <div
-              key={title}
+              key={id}
               className='space-y-3 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
               <span className='flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800/60 text-cyan-400'>
                 <Icon size={18} />
               </span>
-              <h3 className='text-sm font-bold text-zinc-100'>{title}</h3>
-              <p className='text-sm leading-relaxed text-zinc-400'>{body}</p>
+              <h3 className='text-sm font-bold text-zinc-100'>
+                {t(`panel.info.surfaces.${id}.title`)}
+              </h3>
+              <p className='text-sm leading-relaxed text-zinc-400'>
+                {t(`panel.info.surfaces.${id}.body`)}
+              </p>
             </div>
           ))}
         </div>
@@ -150,16 +128,20 @@ export const SupporterInfo = () => {
 
       <section className='space-y-5 rounded-lg bg-zinc-900/40 p-6 sm:p-8'>
         <h2 className='text-base font-bold text-zinc-100'>
-          How you get tokens
+          {t("panel.info.how_tokens")}
         </h2>
 
         <div className='space-y-3'>
           <div className='flex items-baseline justify-between gap-4'>
-            <span className='text-sm text-zinc-400'>Supporter badge, once</span>
+            <span className='text-sm text-zinc-400'>
+              {t("panel.info.badge_once")}
+            </span>
             <Tokens value={SUPPORTER_WELCOME_TOKENS} />
           </div>
           <div className='flex items-baseline justify-between gap-4'>
-            <span className='text-sm text-zinc-400'>Every $1 donated</span>
+            <span className='text-sm text-zinc-400'>
+              {t("panel.info.per_dollar")}
+            </span>
             <Tokens value={TOKENS_PER_DOLLAR} />
           </div>
         </div>
@@ -169,32 +151,42 @@ export const SupporterInfo = () => {
             <div
               key={usd}
               className='flex items-baseline justify-between gap-4'>
-              <span className='text-sm text-zinc-400'>${usd} in total</span>
+              <span className='text-sm text-zinc-400'>
+                {t("panel.info.in_total", { usd })}
+              </span>
               <Tokens value={tokensEarned(usd, null, true)} />
             </div>
           ))}
         </div>
 
         <p className='max-w-2xl text-sm leading-relaxed text-zinc-500'>
-          A membership pays again on every renewal. Tokens never expire and
-          never refill on their own — spent ones are gone.
+          {t("panel.info.membership")}
         </p>
       </section>
 
       <section className='space-y-5'>
-        <h2 className='text-base font-bold text-zinc-100'>What they cost</h2>
+        <h2 className='text-base font-bold text-zinc-100'>
+          {t("panel.info.what_cost")}
+        </h2>
 
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-          {COST_GROUPS.map(({ title, rows }) => (
+          {COST_GROUPS.map(({ id, rows }) => (
             <div
-              key={title}
+              key={id}
               className='space-y-3 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-              <h3 className='text-sm font-bold text-zinc-100'>{title}</h3>
-              {rows.map(({ label, cost }) => (
+              <h3 className='text-sm font-bold text-zinc-100'>
+                {t(`panel.info.costs.${id}.title`)}
+              </h3>
+              {rows.map(({ id: rowId, cost }) => (
                 <div
-                  key={label}
+                  key={rowId}
                   className='flex items-baseline justify-between gap-3'>
-                  <span className='text-sm text-zinc-400'>{label}</span>
+                  <span className='text-sm text-zinc-400'>
+                    {t(`panel.info.costs.${id}.${rowId}`, {
+                      max: MAX_BACKING_PER_IDEA,
+                      seats: GUILD_SEATS_PER_UPGRADE,
+                    })}
+                  </span>
                   <Tokens value={cost} />
                 </div>
               ))}
@@ -206,27 +198,27 @@ export const SupporterInfo = () => {
       <section className='space-y-4 rounded-lg bg-amber-500/5 p-6 sm:p-8'>
         <h2 className='flex items-center gap-2.5 text-base font-bold text-zinc-100'>
           <AtSign size={18} className='text-amber-400' />
-          Donate with your account email
+          {t("panel.info.donate_email")}
         </h2>
 
         <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
-          Every donation is matched to an account by the email it carries
           {email ? (
-            <>
-              {" — yours is "}
-              <span className='font-bold text-zinc-100'>{email}</span>
-            </>
-          ) : null}
-          , so one paid from another address adds no tokens to this wallet.
-          Happened already? Nothing is lost — write to me on Discord and
-          I&apos;ll attach it by hand.
+            <Interpolate
+              text={t("panel.info.email_known")}
+              values={{
+                email: <span className='font-bold text-zinc-100'>{email}</span>,
+              }}
+            />
+          ) : (
+            t("panel.info.email")
+          )}
         </p>
 
         <Button asChild variant='secondary' className='self-start'>
           <a href={DISCORD_INVITE_URL} target='_blank' rel='noreferrer'>
             <span className='flex items-center gap-2'>
               <FaDiscord size={16} />
-              Message me on Discord
+              {t("panel.info.message_discord")}
             </span>
           </a>
         </Button>

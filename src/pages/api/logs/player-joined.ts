@@ -1,15 +1,18 @@
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import { postWelcomeMessage } from "lib/chat/chatSystemMessages";
+import type { FirebaseLogsPlayerJoinedInterface } from "feature/logs/types/logs.type";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
-/** Only a new account gets a welcome card — an old one finishing onboarding late is no news. */
+/** Only a new account gets a welcome row — an old one finishing onboarding late is no news. */
 const WELCOME_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
+/** Firestore's gRPC code for a document that already exists. */
+const ALREADY_EXISTS = 6;
+
 /**
- * Posts the new player's welcome card to the global room, called when they
- * finish onboarding. Everything on the card comes from their own user document;
- * the request carries nothing but the token. The card's document id is the
+ * Puts the new player's "joined" row in the activity feed, called when they
+ * finish onboarding. Everything on the row comes from their own user document;
+ * the request carries nothing but the token. The row's document id is the
  * player's, so a second call — a double click, a retry — posts nothing.
  */
 export default async function handler(
@@ -49,11 +52,33 @@ export default async function handler(
       ? (defaultPlans.find((plan) => plan.id === planId)?.title ?? null)
       : null;
 
-    await postWelcomeMessage(uid, data, { goal, planTitle });
+    const now = new Date().toISOString();
+    const row: FirebaseLogsPlayerJoinedInterface = {
+      type: "player_joined",
+      uid,
+      userName: data.displayName || "Player",
+      avatarUrl: data.avatar ?? null,
+      userAvatarFrame: data.statistics?.lvl ?? 0,
+      guildBadge: data.guildBadge ?? null,
+      goal,
+      planTitle,
+      // Plain ISO strings, like every other `logs` writer — the feed orders by `timestamp`.
+      data: now,
+      timestamp: now,
+    };
+
+    try {
+      await firestore.collection("logs").doc(`welcome-${uid}`).create(row);
+    } catch (error) {
+      if ((error as { code?: unknown })?.code === ALREADY_EXISTS) {
+        return res.status(200).json({ posted: false });
+      }
+      throw error;
+    }
 
     return res.status(200).json({ posted: true });
   } catch (error) {
-    console.error("[chat/welcome]", error);
+    console.error("[logs/player-joined]", error);
     return res.status(500).json({ error: "Could not post the welcome" });
   }
 }

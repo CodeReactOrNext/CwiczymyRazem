@@ -9,6 +9,7 @@ import {
   motifIconLevel,
   motifId,
 } from "feature/guilds/data/guildCosmetics";
+import { useGuildText } from "feature/guilds/hooks/useGuildText";
 import { Lock } from "lucide-react";
 import { useState } from "react";
 
@@ -52,6 +53,7 @@ export const GuildMotifPicker = ({
   busy,
   onWear,
 }: GuildMotifPickerProps) => {
+  const { t, motifGroup, motifIcon } = useGuildText();
   const [draft, setDraft] = useState<MotifIconKey[]>([...worn]);
   const [lit, setLit] = useState(0);
 
@@ -84,7 +86,11 @@ export const GuildMotifPicker = ({
             <button
               key={index}
               type='button'
-              aria-label={`Slot ${index + 1}: ${key}${isLit ? " — picking for this one" : ""}`}
+              aria-label={
+                isLit
+                  ? t("kit.slot_lit", { index: index + 1, icon: key })
+                  : t("kit.slot", { index: index + 1, icon: key })
+              }
               aria-pressed={isLit}
               onClick={() => setLit(index)}
               className={cn(
@@ -100,7 +106,7 @@ export const GuildMotifPicker = ({
         })}
 
         <p className='ml-1 text-xs text-zinc-500'>
-          Pick for slot {lit + 1} — or click a slot to change just that one.
+          {t("kit.pick_for", { index: lit + 1 })}
         </p>
       </div>
 
@@ -120,15 +126,19 @@ export const GuildMotifPicker = ({
           return (
             <div key={group.id} className='space-y-2'>
               <p className='flex items-baseline justify-between gap-3 text-xs font-semibold text-zinc-500'>
-                <span>{group.label}</span>
+                <span>{motifGroup(group.id, group.label)}</span>
                 {unlockedHere < iconsHere.length && (
                   <span className='font-normal tabular-nums text-zinc-600'>
-                    {unlockedHere} of {iconsHere.length} unlocked
+                    {t("kit.unlocked_of", {
+                      done: unlockedHere,
+                      total: iconsHere.length,
+                    })}
                   </span>
                 )}
               </p>
               <div className='grid grid-cols-6 gap-2 sm:grid-cols-8 lg:grid-cols-12'>
-                {iconsHere.map(({ key, label }) => {
+                {iconsHere.map(({ key, label: englishLabel }) => {
+                  const label = motifIcon(key, englishLabel);
                   const Icon = MOTIF_ICON_COMPONENTS[key];
                   const inUse = draft.includes(key);
                   const requires = motifIconLevel(key);
@@ -139,11 +149,13 @@ export const GuildMotifPicker = ({
                       key={key}
                       type='button'
                       title={
-                        locked ? `Unlocks at guild level ${requires}` : label
+                        locked
+                          ? t("kit.unlocks_at", { level: requires })
+                          : label
                       }
                       aria-label={
                         locked
-                          ? `${label} — unlocks at guild level ${requires}`
+                          ? `${label} — ${t("kit.unlocks_at", { level: requires })}`
                           : label
                       }
                       disabled={locked}
@@ -174,21 +186,21 @@ export const GuildMotifPicker = ({
               disabled={busy}
               onClick={() => onWear(motifId(draft))}
               className='flex h-9 items-center justify-center rounded-lg bg-white/5 px-4 text-xs font-bold text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-white/10'>
-              Wear these four
+              {t("kit.wear_four")}
             </button>
             <button
               type='button'
               disabled={busy}
               onClick={() => setDraft([...worn])}
               className='h-9 rounded-lg px-3 text-xs font-semibold text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-zinc-200'>
-              Back to what is worn
+              {t("kit.back_to_worn")}
             </button>
           </>
         ) : (
           <p
             className='flex h-9 items-center text-xs font-bold'
             style={{ color: hex }}>
-            Worn now
+            {t("kit.worn_now")}
           </p>
         )}
       </div>

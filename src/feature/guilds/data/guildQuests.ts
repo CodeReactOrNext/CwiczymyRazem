@@ -1,3 +1,6 @@
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
+
 /**
  * The guild's quests: fifty milestones in ten chapters of five — and then the
  * same fifty again with the numbers doubled, then tripled, for as long as a
@@ -772,12 +775,25 @@ const plural: Record<QuestUnit, string> = {
   points: "points",
 };
 
-/** An amount with its unit stuck on: "4 sessions", "2.5h", "300 Fame". */
-export const formatQuestAmount = (unit: QuestUnit, amount: number): string => {
+/**
+ * An amount with its unit stuck on: "4 sessions", "2.5h", "300 Fame". With a
+ * translator the unit is said in the player's language (`guilds:units.*`);
+ * without one — the server, tests — it stays English.
+ */
+export const formatQuestAmount = (
+  unit: QuestUnit,
+  amount: number,
+  t?: Translate,
+): string => {
   const value = Math.round((Number.isFinite(amount) ? amount : 0) * 10) / 10;
-  if (unit === "hours") return `${value}h`;
-  const word = value === 1 ? singular[unit] : plural[unit];
-  return `${value.toLocaleString()} ${word}`;
+  const english =
+    unit === "hours"
+      ? `${value}h`
+      : `${value.toLocaleString()} ${value === 1 ? singular[unit] : plural[unit]}`;
+  return translateOr(t, `guilds:units.${unit}`, english, {
+    count: value,
+    value: value.toLocaleString(),
+  });
 };
 
 /**
@@ -785,16 +801,26 @@ export const formatQuestAmount = (unit: QuestUnit, amount: number): string => {
  * "5 sessions", "a 7-day streak", "level 20" — or null on a quest that only
  * counts the guild.
  */
-export const questAskOfEach = (quest: GuildQuest): string | null => {
+export const questAskOfEach = (
+  quest: GuildQuest,
+  t?: Translate,
+): string | null => {
   const { measure } = quest;
   switch (measure.kind) {
     case "reports":
       if (measure.scope !== "each") return null;
-      return formatQuestAmount(reportFieldUnit(measure.field), measure.each);
+      return formatQuestAmount(reportFieldUnit(measure.field), measure.each, t);
     case "allCategoriesEach":
-      return `${formatQuestAmount("hours", measure.hoursEach)} in all four categories`;
+      return translateOr(
+        t,
+        "guilds:asks.all_categories",
+        "{{amount}} in all four categories",
+        { amount: formatQuestAmount("hours", measure.hoursEach, t) },
+      );
     case "streak":
-      return `a ${measure.days}-day streak`;
+      return translateOr(t, "guilds:asks.streak", "a {{days}}-day streak", {
+        days: measure.days,
+      });
     default:
       return null;
   }
@@ -855,8 +881,13 @@ const scaleMeasure = (measure: QuestMeasure, times: number): QuestMeasure => {
   }
 };
 
-const memberCount = (count: number): string =>
-  count === 1 ? "One member" : `${count} members`;
+const memberCount = (count: number, t?: Translate): string =>
+  translateOr(
+    t,
+    "guilds:describe.members",
+    count === 1 ? "One member" : "{{count}} members",
+    { count },
+  );
 
 /**
  * A quest's ask as a sentence, from its numbers alone. The first lap has a
@@ -865,47 +896,85 @@ const memberCount = (count: number): string =>
 export const describeQuest = (
   measure: QuestMeasure,
   target: number,
+  t?: Translate,
 ): string => {
+  const say = (key: string, english: string, vars: Record<string, unknown>) =>
+    translateOr(t, `guilds:describe.${key}`, english, vars);
+
   switch (measure.kind) {
     case "reports": {
       const unit = reportFieldUnit(measure.field);
       if (measure.scope === "each") {
-        return `${memberCount(target)} with ${formatQuestAmount(unit, measure.each)} each.`;
+        return say("each", "{{members}} with {{amount}} each.", {
+          members: memberCount(target, t),
+          amount: formatQuestAmount(unit, measure.each, t),
+        });
       }
-      const amount = formatQuestAmount(unit, target);
+      const amount = formatQuestAmount(unit, target, t);
       switch (measure.field) {
         case "sessions":
-          return `${amount} between you.`;
+          return say("sessions", "{{amount}} between you.", { amount });
         case "time":
-          return `${amount} of practice, all told.`;
+          return say("time", "{{amount}} of practice, all told.", { amount });
         case "technique":
-          return `${amount} on technique.`;
+          return say("technique", "{{amount}} on technique.", { amount });
         case "theory":
-          return `${amount} of theory.`;
+          return say("theory", "{{amount}} of theory.", { amount });
         case "hearing":
-          return `${amount} of ear training.`;
+          return say("hearing", "{{amount}} of ear training.", { amount });
         case "creativity":
-          return `${amount} of creative playing.`;
+          return say("creativity", "{{amount}} of creative playing.", {
+            amount,
+          });
         default:
-          return `${target.toLocaleString()} practice points scored between you.`;
+          return say(
+            "points",
+            "{{count}} practice points scored between you.",
+            {
+              count: target,
+            },
+          );
       }
     }
     case "allCategoriesEach":
-      return `${memberCount(target)} with ${formatQuestAmount("hours", measure.hoursEach)} in each of the four categories.`;
+      return say(
+        "all_categories",
+        "{{members}} with {{amount}} in each of the four categories.",
+        {
+          members: memberCount(target, t),
+          amount: formatQuestAmount("hours", measure.hoursEach, t),
+        },
+      );
     case "treasury":
-      return `${formatQuestAmount("fame", target)} put into the guild's own.`;
+      return say("treasury", "{{amount}} put into the guild's own.", {
+        amount: formatQuestAmount("fame", target, t),
+      });
     case "streak":
-      return `${memberCount(target)} on a ${measure.days}-day streak at the same time.`;
+      return say(
+        "streak",
+        "{{members}} on a {{days}}-day streak at the same time.",
+        { members: memberCount(target, t), days: measure.days },
+      );
     case "songsLearned":
-      return `${formatQuestAmount("songs", target)} marked learned.`;
+      return say("songs", "{{amount}} marked learned.", {
+        amount: formatQuestAmount("songs", target, t),
+      });
     case "recordings":
-      return `${formatQuestAmount("recordings", target)} published.`;
+      return say("recordings", "{{amount}} published.", {
+        amount: formatQuestAmount("recordings", target, t),
+      });
     case "logs":
       return measure.type === "journey_exam_passed"
-        ? `${target.toLocaleString()} journey exams passed.`
-        : `${target.toLocaleString()} daily quests completed.`;
+        ? say("exams", "{{count}} journey exams passed.", {
+            count: target,
+          })
+        : say("daily_quests", "{{count}} daily quests completed.", {
+            count: target,
+          });
     default:
-      return `${formatQuestAmount("entries", target)} into the monthly challenge.`;
+      return say("submissions", "{{amount}} into the monthly challenge.", {
+        amount: formatQuestAmount("entries", target, t),
+      });
   }
 };
 

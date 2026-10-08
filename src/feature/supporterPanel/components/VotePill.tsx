@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, ChevronUp, Lock } from "lucide-react";
 
 /**
@@ -60,23 +61,24 @@ export const VotePill = ({
   wide = false,
   onBack,
 }: VotePillProps) => {
+  const { t } = useTranslation("supporter");
   const backed = mine > 0;
   const maxed = max !== undefined && mine >= max;
   const broke = tokensLeft <= 0;
   const blocked = closed || busy || maxed || broke;
 
-  const target = name ?? `this ${what}`;
+  const target = name ?? t(`panel.vote.this.${what}`, `this ${what}`);
   const label = closed
     ? backed
-      ? `Voting is closed — you put ${mine} in`
-      : "Voting is closed"
+      ? t("panel.vote.closed_mine", { mine })
+      : t("panel.vote.closed")
     : maxed
-      ? `You have put ${mine} in — the most one person can`
+      ? t("panel.vote.maxed_label", { mine })
       : broke
-        ? "Nothing left in your wallet to spend"
+        ? t("panel.vote.broke")
         : backed
-          ? `Spend another token on ${target} — you have put ${mine} in`
-          : `Spend a token on ${target}`;
+          ? t("panel.vote.spend_another", { target, mine })
+          : t("panel.vote.spend", { target });
 
   return (
     <button
@@ -124,10 +126,12 @@ export const VotePill = ({
               {total}
             </span>
             <span className='text-xs text-zinc-500'>
-              {total === 1 ? "token" : "tokens"}
+              {t("panel.vote.tokens_word", { count: total })}
             </span>
             {backed && (
-              <span className='ml-1 text-xs font-semibold'>you {mine}</span>
+              <span className='ml-1 text-xs font-semibold'>
+                {t("panel.vote.you", { mine })}
+              </span>
             )}
           </span>
 
@@ -136,17 +140,17 @@ export const VotePill = ({
           {closed ? (
             <span className='flex items-center gap-1.5 px-2 text-xs font-medium text-zinc-500'>
               <Lock size={13} />
-              Closed
+              {t("panel.vote.closed_short")}
             </span>
           ) : maxed ? (
             <span className='flex items-center gap-1.5 px-2 text-xs font-medium'>
               <Check size={14} />
-              Maxed
+              {t("panel.vote.maxed")}
             </span>
           ) : (
             <span className='flex items-center gap-1.5 rounded bg-zinc-100 px-2.5 py-1.5 text-sm font-semibold text-zinc-900 transition-colors group-hover:bg-white'>
               <ChevronUp size={15} strokeWidth={2.5} />
-              Back
+              {t("panel.vote.back")}
               {cost !== undefined && (
                 <span className='ml-0.5 flex items-center gap-1 tabular-nums'>
                   <SupportToken size={14} />
@@ -173,7 +177,7 @@ export const VotePill = ({
 
       {!wide && backed && (
         <span className='text-[11px] font-semibold leading-none opacity-75'>
-          you {mine}
+          {t("panel.vote.you", { mine })}
         </span>
       )}
     </button>

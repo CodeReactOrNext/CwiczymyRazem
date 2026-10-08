@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { findCosmetic } from "feature/guilds/data/guildCosmetics";
 import type { GuildBadge } from "feature/guilds/types/guild.types";
 import { frameStyle } from "feature/guilds/utils/guildCosmetics.style";
+import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
 import { TOUCH_TARGET } from "utils/touchTarget";
 
@@ -36,6 +37,7 @@ export const GuildTagBadge = ({
   tone = "dark",
   className,
 }: GuildTagBadgeProps) => {
+  const { t } = useTranslation("guilds");
   if (!badge?.tag) return null;
 
   const accent = findCosmetic(badge.accent);
@@ -46,8 +48,8 @@ export const GuildTagBadge = ({
       translate='no'
       title={
         typeof badge.level === "number"
-          ? `Guild: ${badge.tag} · level ${badge.level}`
-          : `Guild: ${badge.tag}`
+          ? t("badge.with_level", { tag: badge.tag, level: badge.level })
+          : t("badge.plain", { tag: badge.tag })
       }
       style={frameStyle(badge.frame, hex, tone)}
       className={cn(
@@ -67,7 +69,10 @@ export const GuildTagBadge = ({
   return (
     <Link
       href='/guilds'
-      className={cn(TOUCH_TARGET, "inline-flex transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:opacity-80")}>
+      className={cn(
+        TOUCH_TARGET,
+        "inline-flex transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:opacity-80",
+      )}>
       {body}
     </Link>
   );

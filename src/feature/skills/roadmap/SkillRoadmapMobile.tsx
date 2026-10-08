@@ -5,6 +5,7 @@ import type { BpmProgressData } from "feature/exercisePlan/services/bpmProgressS
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, ChevronDown, Crosshair, Lock, Play } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -16,6 +17,7 @@ import {
   computeRoadmapProgress,
   findCurrentPlacement,
 } from "./skillRoadmapStates";
+import { useSkillRoadmapLabels } from "./useSkillRoadmapLabels";
 
 interface SkillRoadmapMobileProps {
   progressMap: Map<string, BpmProgressData>;
@@ -113,10 +115,16 @@ const StateMark = ({ state }: { state: RoadmapNodeState }) => {
 };
 
 const STATE_WORD: Record<RoadmapNodeState, string> = {
-  completed: "completed",
-  current: "up next",
-  available: "not started",
-  locked: "Pro exercise",
+  completed: "roadmap.state.completed",
+  current: "roadmap.state.current",
+  available: "roadmap.state.available",
+  locked: "roadmap.state.locked",
+};
+
+/** Difficulty as the exercise library names it, in the player's language. */
+const useDifficultyLabel = () => {
+  const { t } = useTranslation("common");
+  return (difficulty: string) => t(`difficulty.${difficulty}`, difficulty);
 };
 
 /** One branch: a row that opens to its exercises without leaving the page. */
@@ -135,6 +143,8 @@ const BranchRow = ({
   onToggle: () => void;
   onPickExercise: (exercise: Exercise) => void;
 }) => {
+  const { t, branchLabel } = useSkillRoadmapLabels();
+  const difficultyLabel = useDifficultyLabel();
   const total = branch.exercises.length;
   const done = countCompleted(branch, states);
   const holdsCurrent = branch.exercises.some(
@@ -159,7 +169,7 @@ const BranchRow = ({
         className='flex w-full items-center gap-3 px-4 py-3.5 text-left'>
         <span className='min-w-0 flex-1'>
           <span className='block truncate text-sm font-semibold text-zinc-100'>
-            {branch.label}
+            {branchLabel(branch)}
           </span>
           <span className='mt-2 flex items-center gap-2.5'>
             <ProgressBar
@@ -167,16 +177,16 @@ const BranchRow = ({
               className='w-16'
             />
             <span className='text-[11px] tabular-nums text-zinc-500'>
-              {done} of {total}
+              {t("roadmap.done_of", { done, total })}
             </span>
             {!!level && (
               <span className='text-[11px] tabular-nums text-zinc-600'>
-                Lvl {level}
+                {t("roadmap.lvl", { level })}
               </span>
             )}
             {holdsCurrent && (
               <span className='text-[11px] font-semibold text-cyan-400'>
-                Up next
+                {t("roadmap.up_next")}
               </span>
             )}
           </span>
@@ -211,12 +221,12 @@ const BranchRow = ({
                       )}>
                       {exercise.title}
                     </span>
-                    <span className='sr-only'>{STATE_WORD[state]}</span>
+                    <span className='sr-only'>{t(STATE_WORD[state])}</span>
                   </span>
                   <span
                     className='flex-shrink-0 text-[11px] font-medium capitalize'
                     style={{ color: DIFFICULTY_HEX[exercise.difficulty] }}>
-                    {exercise.difficulty}
+                    {difficultyLabel(exercise.difficulty)}
                   </span>
                 </button>
               </li>
@@ -246,6 +256,7 @@ const TierSection = ({
   onToggleBranch: (branchId: string) => void;
   onPickExercise: (exercise: Exercise) => void;
 }) => {
+  const { tierTitle, tierSubtitle } = useSkillRoadmapLabels();
   const stats = progress.byTier.get(tier.id) ?? { completed: 0, total: 0 };
   const share = stats.total > 0 ? stats.completed / stats.total : 0;
 
@@ -261,7 +272,7 @@ const TierSection = ({
             {TIER_NUMBER(index)}
           </span>
           <span className='min-w-0 flex-1 truncate text-base font-bold text-zinc-100'>
-            {tier.title}
+            {tierTitle(tier)}
           </span>
           <span className='text-xs tabular-nums text-zinc-500'>
             {stats.completed}/{stats.total}
@@ -271,7 +282,7 @@ const TierSection = ({
       </header>
 
       <p className='px-4 pb-3 pt-3 text-xs leading-relaxed text-zinc-500'>
-        {tier.subtitle}
+        {tierSubtitle(tier)}
       </p>
 
       <div className='space-y-2 px-4 pb-6'>
@@ -298,6 +309,8 @@ export const SkillRoadmapMobile = ({
   onStartExercise,
   onShowUpgrade,
 }: SkillRoadmapMobileProps) => {
+  const { t, tierTitle, branchLabel } = useSkillRoadmapLabels();
+  const difficultyLabel = useDifficultyLabel();
   const tiers = useMemo(() => buildSkillRoadmap(exercisesAgregat), []);
   const progress = useMemo(
     () =>
@@ -354,18 +367,20 @@ export const SkillRoadmapMobile = ({
       <div className='px-4 pt-4'>
         {current && (
           <div className='rounded-xl bg-zinc-900/60 p-4'>
-            <p className='text-[11px] font-bold text-cyan-400'>Up next</p>
+            <p className='text-[11px] font-bold text-cyan-400'>
+              {t("roadmap.up_next")}
+            </p>
             <p className='mt-1.5 text-lg font-bold leading-snug text-zinc-100'>
               {current.exercise.title}
             </p>
             <p className='mt-1 flex items-baseline gap-2 text-xs text-zinc-500'>
               <span className='min-w-0 truncate'>
-                {current.tier.title} · {current.branch.label}
+                {tierTitle(current.tier)} · {branchLabel(current.branch)}
               </span>
               <span
                 className='flex-shrink-0 font-medium capitalize'
                 style={{ color: DIFFICULTY_HEX[current.exercise.difficulty] }}>
-                {current.exercise.difficulty}
+                {difficultyLabel(current.exercise.difficulty)}
               </span>
             </p>
             <div className='mt-4 flex items-center gap-2'>
@@ -374,12 +389,12 @@ export const SkillRoadmapMobile = ({
                 onClick={() => startExercise(current.exercise)}
                 className='flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-100 text-sm font-bold text-zinc-950 transition-background active:bg-white'>
                 <Play className='h-4 w-4' fill='currentColor' />
-                Start
+                {t("roadmap.start")}
               </button>
               <button
                 type='button'
                 onClick={showCurrentInPath}
-                aria-label='Show this exercise in the path'
+                aria-label={t("roadmap.show_in_path")}
                 className='flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-background active:bg-zinc-700'>
                 <Crosshair className='h-4 w-4' />
               </button>
@@ -402,7 +417,7 @@ export const SkillRoadmapMobile = ({
         {/* Seven tiers is more than a thumb wants to scroll past, so each one
             is also one tap away from the top of the page. */}
         <nav
-          aria-label='Jump to a tier'
+          aria-label={t("roadmap.jump_tier")}
           className='-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
           {tiers.map((tier, index) => {
             const stats = progress.byTier.get(tier.id) ?? {
@@ -419,7 +434,7 @@ export const SkillRoadmapMobile = ({
                   {TIER_NUMBER(index)}
                 </span>
                 <span className='text-xs font-semibold text-zinc-300'>
-                  {tier.title}
+                  {tierTitle(tier)}
                 </span>
                 <span className='text-[11px] tabular-nums text-zinc-600'>
                   {stats.completed}/{stats.total}
@@ -445,8 +460,10 @@ export const SkillRoadmapMobile = ({
 
       <p className='px-4 pb-8 text-center text-xs text-zinc-600'>
         {progress.completed === progress.total
-          ? "Mastery — every exercise on the path is done."
-          : `Mastery · ${progress.total - progress.completed} exercises to go`}
+          ? t("roadmap.mastery_done")
+          : t("roadmap.mastery_left", {
+              count: progress.total - progress.completed,
+            })}
       </p>
 
       <ExercisePreviewDialog

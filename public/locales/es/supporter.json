@@ -171,5 +171,576 @@
     "why": "¿Por qué apoyar Riff Quest?",
     "body": "Riff Quest es un proyecto de una sola persona, gratis y construido en abierto. Tu apoyo cubre primero el dominio, el alojamiento y la base de datos. Todo lo que se recauda por encima financia la hoja de ruta: nuevos ejercicios, equipo y funciones, desbloqueados nivel a nivel a medida que la comunidad los financia.",
     "later": "Quizá más tarde"
+  },
+  "badge": {
+    "label": "Supporter",
+    "tooltip": "{{label}} — apoya Riff Quest con una donación"
+  },
+  "wall": {
+    "funded_by": "Financiado por {{players}}",
+    "players": "{{count}} jugadores",
+    "players_one": "1 jugador",
+    "lvl": "Nv. {{lvl}}",
+    "title": "La gente que financia riff.quest",
+    "body": "{{count}} jugadores hacen que esta app siga construyéndose. Cada guitarra, cada ejercicio y cada semana que juega la app se pagaron aquí.",
+    "body_one": "1 jugador hace que esta app siga construyéndose. Cada guitarra, cada ejercicio y cada semana que juega la app se pagaron aquí.",
+    "body_empty": "Aquí aparece todo el que apoya el proyecto, con el nivel al que toca.",
+    "empty": "Todavía no hay nadie en el muro — el primer nombre sigue libre."
+  },
+  "panel": {
+    "title": "Panel de supporters",
+    "subtitle": "Mira lo que se está construyendo, elige lo que viene después y decide la semana que juega toda la app.",
+    "eyebrow": "Supporters",
+    "tabs": {
+      "roadmap": "Hoja de ruta",
+      "gear": "Equipo",
+      "case": "Caja de supporters",
+      "guild": "Fundar un gremio",
+      "work": "En marcha",
+      "wall": "Supporters",
+      "players": "Rutas de jugadores",
+      "info": "Info"
+    },
+    "wallet": "tokens para gastar",
+    "wallet_one": "token para gastar",
+    "show_less": "Mostrar menos",
+    "show_more": "Mostrar más",
+    "rank": "Puesto {{rank}}",
+    "by": "de {{name}}",
+    "optional": "opcional",
+    "cancel": "Cancelar",
+    "not_enough": "No tienes suficientes tokens",
+    "not_enough_left": "No te quedan suficientes tokens",
+    "close": "Cerrar",
+    "try_again": "Reintentar",
+    "info": {
+      "what_you_do": "Qué haces aquí",
+      "surfaces": {
+        "roadmap": {
+          "title": "Hoja de ruta",
+          "body": "Propón lo que le falta a la app e impulsa las ideas que quieres ver construidas. Lo que más apoya el tablero es lo siguiente que se hace."
+        },
+        "work": {
+          "title": "En marcha",
+          "body": "El orden real de trabajo — qué está en curso, qué está en cola, qué ya salió. Dejas de adivinar qué pasó con tu idea."
+        },
+        "gear": {
+          "title": "Equipo",
+          "body": "Propón una guitarra, un ampli o un pedal para el Arsenal e impulsa los que quieres ver dibujados. Lo que sube aquí es lo que se hace."
+        },
+        "case": {
+          "title": "Caja de supporters",
+          "body": "Seis huecos en la próxima caja, y tú eliges qué va en cada uno antes de que se abra. Solo se gastan los tokens del ganador. Todo lo que apoya al resto se queda en el tablero para la próxima caja."
+        },
+        "wall": {
+          "title": "Supporters",
+          "body": "Todos los que financian la app, con el nivel al que tocan. La insignia te pone en ese muro el día que llega."
+        },
+        "guild": {
+          "title": "Gremio",
+          "body": "Reserva un nombre y una etiqueta que nadie más puede usar, y amplía la sala y el estante a medida que llegan miembros."
+        }
+      },
+      "how_tokens": "Cómo consigues tokens",
+      "badge_once": "Insignia de supporter, una vez",
+      "per_dollar": "Por cada $1 donado",
+      "in_total": "${{usd}} en total",
+      "membership": "Una membresía vuelve a pagar en cada renovación. Los tokens nunca caducan ni se recargan solos — los gastados ya no vuelven.",
+      "what_cost": "Lo que cuestan",
+      "costs": {
+        "roadmap": {
+          "title": "Hoja de ruta",
+          "post_idea": "Publicar una idea",
+          "back_idea": "Apoyar una idea (máx. {{max}})"
+        },
+        "gear": {
+          "title": "Equipo",
+          "propose_gear": "Proponer equipo",
+          "back_proposal": "Apoyar una propuesta"
+        },
+        "votes": {
+          "title": "Votos",
+          "case_item": "Objeto de la caja de supporters"
+        },
+        "guild": {
+          "title": "Gremio",
+          "found_guild": "Fundar un gremio",
+          "seats": "+{{seats}} plazas",
+          "stash_row": "+1 fila de almacén"
+        }
+      },
+      "donate_email": "Dona con el correo de tu cuenta",
+      "email": "Cada donación se asocia a una cuenta por el correo con el que llega, así que una pagada desde otra dirección no añade tokens a esta cartera. ¿Ya te pasó? No se pierde nada — escríbeme por Discord y la vincularé a mano.",
+      "email_known": "Cada donación se asocia a una cuenta por el correo con el que llega — el tuyo es {{email}} —, así que una pagada desde otra dirección no añade tokens a esta cartera. ¿Ya te pasó? No se pierde nada — escríbeme por Discord y la vincularé a mano.",
+      "message_discord": "Escríbeme por Discord"
+    },
+    "pitch": {
+      "title": "Una donación abre el panel de supporters",
+      "intro": "Detrás de la insignia está la sala donde riff.quest se decide en voz alta:",
+      "perks": {
+        "0": "Mira lo que se construye ahora y vota lo que viene después",
+        "1": "Elige el equipo que entra en el Arsenal y en las cajas",
+        "2": "Decide el reto que juega toda la app esa semana"
+      },
+      "email": "Usa el correo de esta cuenta para desbloquear Supporter.",
+      "email_known": "Usa el correo de esta cuenta para desbloquear Supporter: {{email}}.",
+      "other_email": "¿Usas otro correo? {{discord}} y lo vincularé a mano.",
+      "write_discord": "Escríbeme por Discord",
+      "support": "Apoya el proyecto"
+    },
+    "backers": {
+      "count": "Apoyado por {{count}} supporters",
+      "count_one": "Apoyado por 1 supporter",
+      "by": "Apoyado por",
+      "put_in": "{{name}} puso {{count}}",
+      "you": "Tú",
+      "more": "+{{count}} más"
+    },
+    "vote": {
+      "this": {
+        "idea": "esta idea",
+        "piece of gear": "este equipo",
+        "item": "este objeto"
+      },
+      "closed_mine": "Votación cerrada — pusiste {{mine}}",
+      "closed": "Votación cerrada",
+      "maxed_label": "Ya pusiste {{mine}} — lo máximo que puede una persona",
+      "broke": "No te queda nada en la cartera",
+      "spend_another": "Gasta otro token en {{target}} — ya pusiste {{mine}}",
+      "spend": "Gasta un token en {{target}}",
+      "tokens_word": "tokens",
+      "tokens_word_one": "token",
+      "you": "tú {{mine}}",
+      "closed_short": "Cerrada",
+      "maxed": "Al máximo",
+      "back": "Apoyar"
+    },
+    "board": {
+      "empty_title": "Todavía no hay nada en el tablero",
+      "empty_body": "Lo primero que llegue aquí marca el rumbo. Publica eso que siempre echas en falta en la app.",
+      "post": "Publicar una idea",
+      "intro": "Las ideas más apoyadas se construyen primero. Los tokens gastados no vuelven.",
+      "groups": {
+        "open": "Abiertas",
+        "shipped": "Lanzadas",
+        "declined": "No se hará"
+      },
+      "status": {
+        "open": "Abierta",
+        "planned": "Planeada",
+        "in_progress": "En curso",
+        "shipped": "Lanzada",
+        "declined": "No se hará"
+      },
+      "status_label": "Estado de la idea"
+    },
+    "icons": {
+      "idea": "Idea general",
+      "guitar": "Guitarra y diapasón",
+      "song": "Canciones y tabs",
+      "practice": "Práctica y temporizador",
+      "tone": "Sonido y audio",
+      "recording": "Grabación",
+      "gear": "Arsenal y equipo",
+      "ranking": "Clasificaciones y temporadas",
+      "stats": "Estadísticas y progreso",
+      "mobile": "App móvil y de escritorio",
+      "bug": "Algo no funciona",
+      "polish": "Pulido y arreglos pequeños"
+    },
+    "new_idea": {
+      "title": "Pon una idea en la hoja de ruta",
+      "description": "Va directa al tablero para que cualquier supporter la apoye. Cuesta {{cost}} — te quedan {{left}}.",
+      "idea": "Idea",
+      "idea_placeholder": "Un metrónomo que siga el mapa de tempo del tab",
+      "icon": "Icono",
+      "why": "Por qué importa",
+      "why_placeholder": "Qué intentas hacer hoy y dónde se te interpone la app.",
+      "post_for": "Publicar por"
+    },
+    "stepper": {
+      "blocks": {
+        "draft": {
+          "title": "Borrador",
+          "doing": "Esbozando el plan"
+        },
+        "review": {
+          "title": "Revisión",
+          "doing": "Revisando el plan"
+        },
+        "phases": {
+          "title": "Fases",
+          "doing": "Escribiendo cada paso"
+        },
+        "lessons": {
+          "title": "Lecciones",
+          "doing": "Buscando lecciones"
+        },
+        "ready": {
+          "title": "Lista",
+          "doing": "Guardando tu ruta"
+        }
+      },
+      "revising": "Reescribiendo tras las notas",
+      "written": "{{done}} de {{total}} escritas",
+      "steps": "{{done}} de {{total}} pasos",
+      "done": "hecho",
+      "up_next": "a continuación",
+      "step_of": "Paso {{n}} de {{total}}"
+    },
+    "generate": {
+      "examples": {
+        "0": {
+          "title": "Blues como Stevie Ray Vaughan",
+          "goal": "Tocar blues texano como Stevie Ray Vaughan: el ritmo shuffle, bendings grandes y vibrato amplio, y sus licks característicos sobre un blues de 12 compases."
+        },
+        "1": {
+          "title": "Volver tras un parón",
+          "goal": "Recuperar mi nivel tras unos meses sin tocar: callos y resistencia sin lesiones, cambios de acordes limpios, tempo y las canciones que solía tocar."
+        },
+        "2": {
+          "title": "Cantar y tocar",
+          "goal": "Cantar y tocar a la vez: un rasgueo que funcione en piloto automático mientras manda la voz, empezando por canciones fáciles."
+        },
+        "3": {
+          "title": "Ritmo metal preciso",
+          "goal": "Guitarra rítmica de metal precisa: resistencia en el downpicking, palm muting y galopes, clavados al metrónomo."
+        }
+      },
+      "visibility": {
+        "public": {
+          "label": "Pública",
+          "hint": "Aparece en Rutas de jugadores, para que otros también aprendan de ella."
+        },
+        "private": {
+          "label": "Privada",
+          "hint": "Solo la ves tú. Cuesta más, porque nadie más aprende de ella."
+        }
+      },
+      "more": {
+        "title": "Cuéntale más al coach",
+        "answered": "{{count}} de 2 respondidas",
+        "body": "Artistas y canciones favoritas, lo que ya sabes tocar.",
+        "favourites": "Artistas o canciones que te encantan",
+        "favourites_placeholder": "p. ej. John Mayer, Slow Dancing in a Burning Room",
+        "can_play": "Lo que ya sabes tocar",
+        "can_play_placeholder": "p. ej. acordes abiertos, la caja de la pentatónica menor"
+      },
+      "not_guitar": "Esta ruta trata de tocar la guitarra — describe lo que quieres tocar.",
+      "title": "Crea una ruta en torno a tu objetivo",
+      "folded_body": "Describe lo que quieres tocar — el coach organiza las fases, los ejercicios y las canciones.",
+      "create": "Crear una ruta",
+      "writing": "Escribiendo tu ruta",
+      "running_body": "Tarda unos minutos y se hace en nuestro lado — puedes salir de la página o cerrar la pestaña y te llegará una notificación cuando esté lista. Si te quedas aquí, se abre sola.",
+      "brief_body": "Unas preguntas que el coach quiere responder antes de escribir — cada una cambia la forma del plan, y todas se pueden saltar.",
+      "goal_body": "Describe lo que quieres llegar a tocar. El coach organiza las fases, ejercicios, lecciones y canciones para llevarte hasta ahí.",
+      "tokens_left": "tokens restantes",
+      "tokens_left_one": "token restante",
+      "close_builder": "Cerrar el creador de rutas",
+      "title_label": "Título",
+      "title_placeholder": "p. ej. Tocar como Mark Knopfler",
+      "goal_label": "¿Qué quieres llegar a tocar?",
+      "description": "Descripción",
+      "goal_placeholder": "p. ej. Quiero improvisar blues en cualquier tono y dejar de perderme en el solo…",
+      "level": "Tu nivel",
+      "who_sees": "Quién la ve",
+      "needs": "Esta necesita {{cost}} tokens y tienes {{left}}.",
+      "donation_adds": "Cada donación añade tokens",
+      "next_free": "Después, el coach revisa el objetivo y hace unas preguntas — gratis. Generarla cuesta {{cost}}.",
+      "continue": "Continuar"
+    },
+    "brief": {
+      "told_coach": "Lo que le dijiste al coach",
+      "edit_goal": "Editar el objetivo",
+      "back": "Volver",
+      "progress": "Progreso",
+      "summary": "Resumen",
+      "obscure_title": "El coach no conoce bien esto",
+      "obscure_body": "Nombra dos o tres canciones o técnicas que quieras de ello, y el plan se construye sobre eso en lugar de sobre suposiciones.",
+      "notes_placeholder": "p. ej. el riff de la intro de la canción A, cómo usa las cuerdas al aire en la canción B, la estrofa en fingerpicking de la canción C",
+      "how_read": "Cómo entendió el coach tu objetivo",
+      "as_written": "Una ruta construida en torno al objetivo tal como lo escribiste.",
+      "songs_in_it": "Canciones incluidas:",
+      "change_songs": "Cambiar las canciones",
+      "change": "Cambiar: {{question}}",
+      "nothing_to_add": "Nada que añadir — el coach sigue desde aquí.",
+      "takes_minutes": "Tarda unos minutos. Puedes irte mientras se escribe — te avisaremos.",
+      "n_of": "{{n}} de {{total}} — todas se pueden saltar.",
+      "skip": "Saltar",
+      "generate": "Generar ruta",
+      "next": "Siguiente",
+      "bank": {
+        "focus": {
+          "question": "El objetivo es amplio — ¿qué exactamente?",
+          "hint": "El coach construirá la ruta en torno a lo que elijas."
+        },
+        "useFor": {
+          "question": "¿Para qué lo quieres?",
+          "hint": "La misma técnica es otra ruta en otro estilo."
+        },
+        "sides": {
+          "question": "¿Qué facetas de este estilo quieres cubrir?",
+          "hint": "Desmarca una faceta y sus fases se quedan fuera."
+        },
+        "songs": {
+          "question": "¿Qué canciones deben estar en la ruta?",
+          "hint": "Las canciones de la biblioteca se abren con tab y pista de acompañamiento. Las demás se convierten en pasos sin ellos."
+        },
+        "repertoireDepth": {
+          "question": "¿Menos canciones a fondo o más canciones por encima?",
+          "options": {
+            "deep": {
+              "label": "2–3 canciones, sección a sección",
+              "hint": "Cada canción tiene varios pasos: secciones, tempo reducido, tempo del disco, una toma grabada."
+            },
+            "wide": {
+              "label": "5–6 canciones, un paso cada una",
+              "hint": "Cada canción es un paso — la parte entera a un tempo tocable."
+            }
+          }
+        },
+        "startingPoint": {
+          "question": "¿Cómo vas con esto ahora mismo?",
+          "hint": "La fase 1 empieza desde aquí — no se enseña nada por debajo."
+        },
+        "target": {
+          "question": "¿Qué contaría como terminado?",
+          "hint": "Los criterios de éxito de la última fase se escriben para esto."
+        },
+        "weakSpot": {
+          "question": "¿Qué te cuesta más de este estilo?",
+          "hint": "Tendrá su propia fase antes, con más sesiones."
+        },
+        "replicateOrCreate": {
+          "question": "¿Tocarlo como en el disco o crear lo tuyo en este estilo?",
+          "options": {
+            "replicate": {
+              "label": "Como en el disco",
+              "hint": "Canciones sección a sección hasta el tempo del disco. Sin pasos de improvisación."
+            },
+            "create": {
+              "label": "Lo mío en este estilo",
+              "hint": "Un paso creativo en cada fase: improvisar, fills propios, partes propias."
+            }
+          }
+        },
+        "entry": {
+          "question": "¿Por dónde empezar?",
+          "options": {
+            "song": {
+              "label": "Un trozo de canción desde la primera fase",
+              "hint": "Un fragmento simplificado del objetivo desde el principio, con la técnica construida a su alrededor."
+            },
+            "foundation": {
+              "label": "Primero la base, las canciones después",
+              "hint": "Las primeras fases son técnica; las canciones esperan hasta que se asiente."
+            }
+          }
+        },
+        "includes": {
+          "question": "¿Qué debería incluir?",
+          "hint": "Por defecto está todo — desmarca lo que no quieras.",
+          "options": {
+            "tone": {
+              "label": "Una fase sobre el sonido",
+              "hint": "Equipo, igualar el sonido de oído, el equipo del artista."
+            },
+            "theory": {
+              "label": "Teoría más allá de lo mínimo",
+              "hint": "Por qué funcionan las notas, no solo cuáles."
+            },
+            "ear": {
+              "label": "Trabajo de oído",
+              "hint": "Transcribir frases, aprender partes de oído."
+            }
+          }
+        },
+        "ending": {
+          "question": "¿Cómo debería terminar?",
+          "options": {
+            "set": {
+              "label": "Un set grabado",
+              "hint": "Una fase final: las canciones seguidas, grabadas, como un pequeño concierto."
+            },
+            "none": {
+              "label": "Sin fase final",
+              "hint": "La ruta termina con la última canción o habilidad."
+            }
+          }
+        },
+        "practiceStyle": {
+          "question": "¿Cómo te gusta practicar?",
+          "hint": "El coach elige ejercicios de estos tipos. Desmarca lo que nunca abres.",
+          "options": {
+            "drill": {
+              "label": "Ejercicios con metrónomo"
+            },
+            "backing": {
+              "label": "Tocar sobre una pista de acompañamiento"
+            },
+            "hunt": {
+              "label": "Juegos del diapasón",
+              "hint": "Cazas con clic, sin micrófono."
+            }
+          }
+        }
+      }
+    },
+    "preflight": {
+      "lines": {
+        "0": "Leyendo tu objetivo",
+        "1": "Revisando la biblioteca de canciones",
+        "2": "Eligiendo qué preguntarte"
+      },
+      "free": "Esto no se cobra — los tokens solo salen cuando generas."
+    },
+    "songs": {
+      "add_failed": "No se pudo añadir esa canción a la biblioteca.",
+      "missing_body": "Todavía no están en la biblioteca. Añádelas y cada una tendrá un paso real con tab y pista de acompañamiento — o déjalas como referencia para el coach.",
+      "add_tag": "añadir a la biblioteca",
+      "remove": "Quitar {{title}}",
+      "none": "Aún no hay canciones elegidas — las elegirá el coach.",
+      "full": "Ya son {{max}} — lo máximo que admite una ruta",
+      "search": "Busca por título o artista — lo que falte se puede añadir",
+      "spotify_hint": "Todavía no está en la biblioteca — un clic la añade",
+      "reference": "Canciones que no tenemos, como referencia para el coach",
+      "reference_placeholder": "p. ej. Romeo and Juliet, Brothers in Arms"
+    },
+    "players": {
+      "started": "Ruta empezada — tu progreso en ella es solo tuyo.",
+      "start_failed": "No se pudo empezar esta ruta. Inténtalo de nuevo.",
+      "starting": "Empezando…",
+      "start": "Empezar esta ruta",
+      "done_refining": "Terminar ajustes",
+      "refine": "Ajustar",
+      "unknown": "Jugador desconocido",
+      "another": "otro jugador",
+      "gone": "De esta ruta solo quedan los contadores de progreso.",
+      "someone_else": "La ruta de otra persona. Pulsa «Empezar esta ruta» para hacerla tú, gratis, con tu propio progreso.",
+      "following_note": "Estás haciendo la ruta de {{name}}. El progreso del mapa es tuyo; el suyo sigue siendo suyo.",
+      "refine_note": "Modo de ajuste. Usa la varita junto a un paso del mapa para que el coach lo reescriba, cambie su ejercicio, vuelva a buscar sus lecciones o su canción, o añada un paso después — cada cambio por uno o dos tokens, guardado al instante en tu ruta. Quitar un paso es gratis.",
+      "exercises": "Ejercicios",
+      "songs": "Canciones",
+      "lessons": "Lecciones en vídeo",
+      "following_count": "{{count}} jugadores la siguen",
+      "following_count_one": "1 jugador la sigue",
+      "following_none": "La sigues, sin sesiones todavía",
+      "not_started": "Sin empezar",
+      "started_on": "empezada el {{date}}",
+      "created_on": "creada el {{date}}",
+      "last_practised": "Practicada por última vez el {{date}}",
+      "not_on_board": "Esa ruta ya no está en el tablero.",
+      "back_to_list": "Volver a Rutas de jugadores",
+      "empty_title": "Todavía no hay rutas",
+      "empty_body": "Aquí aparecen las rutas que los jugadores generan para sí mismos.",
+      "count": "{{total}} rutas de {{players}} jugadores",
+      "count_one": "{{total}} rutas de {{players}} jugador",
+      "filter": "Filtrar por objetivo o jugador…",
+      "all_levels": "Todos los niveles",
+      "sort_by": "Ordenar por",
+      "sorts": {
+        "recent": "Activas recientemente",
+        "newest": "Más nuevas",
+        "practised": "Más practicadas",
+        "followed": "Más seguidas"
+      },
+      "yours": "Tus rutas",
+      "others": "De otros jugadores",
+      "no_match": "Nada coincide con este filtro."
+    },
+    "gear": {
+      "propose_title": "Proponer un equipo",
+      "propose_subtitle": "Ponle nombre, elige su rareza, di en qué se desmonta — y deja tu frase en él.",
+      "propose": "Proponer equipo",
+      "not_enough": "No te quedan tokens suficientes para proponer equipo",
+      "intro": "El equipo más apoyado es el siguiente que se dibuja para el Arsenal.",
+      "empty": "Todavía no se ha propuesto ningún equipo",
+      "voting": "En votación",
+      "status": {
+        "open": "Abierta",
+        "accepted": "Aceptada",
+        "in_game": "En el juego",
+        "declined": "No se hará"
+      },
+      "status_label": "Estado de la propuesta",
+      "unnamed": "Todavía sin nombre",
+      "breaks_down": "Se desmonta en",
+      "bench_decides": "Nada elegido — decide el taller.",
+      "propose_for": "Proponer por",
+      "more_tokens": "{{count}} tokens más y podrás presentarla.",
+      "more_tokens_one": "1 token más y podrás presentarla.",
+      "give_name": "Ponle nombre y podrá ir al tablero.",
+      "tokens_left": "Te quedan {{count}} tokens.",
+      "tokens_left_one": "Te queda 1 token.",
+      "back_to_board": "Volver al tablero",
+      "scraps_into": "Se desmonta en",
+      "how_many_part": "Cuántas de esta pieza — ahora {{count}}",
+      "take_out": "Quitar {{part}} del desmontaje",
+      "form": {
+        "what_title": "Qué es",
+        "what_hint": "Una guitarra o un pedal, cómo se llamaría en el Arsenal y lo rara que debería ser.",
+        "name": "Nombre",
+        "brand": "Marca",
+        "brand_placeholder": "Marca — opcional",
+        "image": "Enlace de imagen",
+        "image_placeholder": "https://… enlace de imagen, opcional",
+        "bad_link": "Solo se muestran enlaces https — este se descartará.",
+        "rarity": "Rareza",
+        "what_it_does": "Qué hace",
+        "origin_title": "De dónde viene",
+        "origin_hint": "Cómo suena y por qué encaja en el juego — más la frase que quieres que lleve cada copia.",
+        "description_placeholder": "De dónde viene, cómo suena, por qué encaja en el juego.",
+        "engraving": "Grabado",
+        "engraving_placeholder": "Una frase, tuya, en cada copia",
+        "engraving_hint": "Si se construye, tu frase va en el objeto — quedan {{count}} caracteres.",
+        "scrap_hint": "Lo que recibe el taller cuando alguien lo desmonta, en orden de recuperación y con qué grado. Hasta {{max}} piezas — déjalo vacío y decide el taller."
+      }
+    },
+    "case": {
+      "mine_on_seat": "{{count}} de tus tokens están en este hueco",
+      "mine_on_seat_one": "1 de tus tokens está en este hueco",
+      "empty": "vacío",
+      "up_next": "A continuación",
+      "winning": "{{name}} va ganando este hueco",
+      "no_votes": "Sin votos todavía",
+      "back_another": "Apoyar otro objeto: {{rarity}} ({{count}})",
+      "search": "Buscar objetos: {{rarity}}…",
+      "no_match": "Nada coincide con «{{search}}»",
+      "back_item": "Apoyar {{name}}",
+      "seat": "Hueco: {{rarity}}",
+      "replaces": "Vota qué sustituye a {{item}} cuando cambie la caja.",
+      "fills": "Vota qué lo ocupa cuando cambie la caja.",
+      "title": "En la caja ahora mismo",
+      "intro": "Un objeto por rareza. Elige un hueco y vota qué entra a continuación.",
+      "changes_tomorrow": "cambia mañana",
+      "changes_in": "cambia en {{count}} días",
+      "chosen_by": "Elegido por los supporters",
+      "slate_tomorrow": "nueva selección mañana",
+      "slate_in": "nueva selección en {{count}} días",
+      "open_for": "Abrir por {{cost}} Fame",
+      "needs": "Necesita {{cost}} Fame",
+      "supporters_pick": "Los supporters eligen lo que entra aquí →"
+    },
+    "work": {
+      "columns": {
+        "queue": {
+          "title": "Cola",
+          "blurb": "Lo siguiente, en orden"
+        },
+        "in_progress": {
+          "title": "En curso",
+          "blurb": "En construcción ahora"
+        },
+        "done": {
+          "title": "Hecho",
+          "blurb": "Lanzado, lo más nuevo primero"
+        }
+      },
+      "from_idea": "Viene de una idea de un supporter",
+      "idea": "Idea de supporter",
+      "nothing_here": "Aquí no hay nada",
+      "show_all": "Mostrar las {{count}}",
+      "empty_body": "Aquí aparecerá la cola cuando haya algo en ella."
+    }
   }
 }

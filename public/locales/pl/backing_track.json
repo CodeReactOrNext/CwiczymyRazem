@@ -1,0 +1,261 @@
+{
+  "sources": {
+    "off": {"label": "Nic", "description": "Sama tabulatura. Wybierz nagranie, żeby słyszeć pod nią prawdziwy utwór — reaguje na start, pauzę i każdy kliknięty takt."},
+    "file": {"label": "Pliki audio", "description": "Nagrania z twojego komputera — jeden podkład albo osobne ścieżki (perkusja, bas, wokal) grane jako warstwy."},
+    "youtube": {"label": "Film z YouTube", "description": "Wklej link do utworu. Film gra pod tabulaturą, a jego dźwięk jest tym, co słyszysz."}
+  },
+  "bar": {
+    "use_video": "Użyj filmu",
+    "bad_link": "To nie jest link do YouTube — spróbuj youtube.com/watch?v=… albo youtu.be/…",
+    "locks_at": "Synchronizuje się przy",
+    "leave_cinema": "Wyjdź z kina",
+    "cinema": "Kino",
+    "files": "Pliki: {{count}}",
+    "files_one": "1 plik",
+    "files_few": "{{count}} pliki",
+    "files_many": "{{count}} plików",
+    "title": "Podkład",
+    "title_empty": "Graj do prawdziwego utworu",
+    "hint_empty": "Dodaj film z YouTube albo plik audio z tym utworem. Gra pod tabulaturą i reaguje na start, pauzę i każdy kliknięty takt.",
+    "hint_unaligned": "Jeszcze niezsynchronizowany z tabulaturą, więc może wyprzedzać albo się spóźniać. To zajmie minutę: ustaw takt 1 na pierwszym uderzeniu.",
+    "hint_aligned": "Zsynchronizowany z tabulaturą. Rozjeżdża się podczas gry? Przesuń go klawiszami [ i ].",
+    "add_recording": "Dodaj nagranie",
+    "line_up": "Zsynchronizuj z tabulaturą",
+    "sync_mix": "Synchronizacja i miks",
+    "leave_cinema_esc": "Wyjdź z kina — Esc"
+  },
+  "sound": {
+    "title": "Dźwięk",
+    "body": "Zaznacz pliki, które należą do tego utworu. Kilka zaznaczonych naraz gra jako warstwy jednego nagrania.",
+    "importing": "Importowanie…",
+    "add_files": "Dodaj pliki",
+    "loading": "Wczytywanie ścieżek…",
+    "empty": "Nie ma jeszcze plików — dodaj je albo upuść pliki audio w dowolnym miejscu ekranu.",
+    "remove_from_song": "Usuń {{name}} z tego utworu",
+    "add_to_song": "Dodaj {{name}} do tego utworu",
+    "layer": "Warstwa {{n}}",
+    "delete": "Usuń {{name}} z biblioteki",
+    "recording_tempo": "Tempo nagrania",
+    "tempo_aria": "Tempo, w jakim nagrano pliki",
+    "match_session": "Jak w sesji",
+    "plays_at": "gra w {{rate}}×",
+    "stretched": "mocno rozciągnięte",
+    "volume": "Głośność",
+    "unmute": "Włącz dźwięk podkładu",
+    "mute": "Wycisz podkład",
+    "desktop_only": "Pliki podkładów są na twoim komputerze, więc to źródło działa w aplikacji desktopowej. W przeglądarce użyj filmu z YouTube."
+  },
+  "video": {
+    "title": "Film na wierzchu",
+    "optional": "opcjonalnie",
+    "body": "Tylko obraz — film jest wyciszony, a dźwiękiem zostają twoje pliki. Każde ma własną synchronizację.",
+    "hide": "Ukryj film",
+    "show": "Pokaż film",
+    "no_speed": "YouTube nie ma prędkości dla {{bpm}} BPM, więc obraz leci swobodnie. To, co słyszysz, i tak zostaje zsynchronizowane.",
+    "sync": "Synchronizacja filmu",
+    "nudge_earlier": "Przesuń film wcześniej",
+    "nudge_later": "Przesuń film później",
+    "change": "Zmień film"
+  },
+  "nudge": {
+    "earlier": "Wcześniej — przytrzymaj Shift dla {{ms}} ms",
+    "later": "Później — przytrzymaj Shift dla {{ms}} ms"
+  },
+  "youtube": {
+    "locked": "Zsynchronizowany z tabulaturą przy {{rate}}× — film trzyma to tempo dokładnie.",
+    "runs_free": "YouTube gra tylko w swoich stałych prędkościach, a {{bpm}} BPM do nich nie należy, więc film leci swobodnie zamiast być szarpany z powrotem na miejsce.",
+    "paste": "Wklej link do utworu na YouTube"
+  },
+  "align": {
+    "mute": "Wycisz: {{what}}",
+    "unmute": "Włącz dźwięk: {{what}}",
+    "missing_file": "Brakujący plik",
+    "steps": {
+      "choose": "Wybierz nagranie",
+      "choose_detail": "film z YouTube albo pliki audio",
+      "layers": "Plików jako warstwy: {{count}}",
+      "bar1": "Ustaw takt 1 na pierwszym uderzeniu",
+      "starts_at": "start w {{ms}} ms",
+      "bar1_detail": "żeby tabulatura i utwór zaczynały razem",
+      "listen": "Słuchaj i dopracuj",
+      "listen_detail": "popraw każdy takt, który dalej się rozjeżdża"
+    },
+    "hints": {
+      "choose": "Wybierz poniżej, skąd pochodzi dźwięk. Będzie grał pod tabulaturą i reagował na start, pauzę i każdy kliknięty takt.",
+      "bar1": "Naciśnij Spację, żeby grać. Przeciągnij żółtą flagę START w rzędzie Takty na pierwsze uderzenie, które słyszysz — albo przesuń całe nagranie klawiszami [ i ].",
+      "listen": "Graj i słuchaj. Jeśli dalej w utworze tabulatura wyprzedza albo się spóźnia, przeciągnij linię tego taktu na jego uderzenie. Naciśnij Gotowe, gdy brzmi dobrze — zapisze się dla tego utworu."
+    },
+    "zoom": {
+      "one_bar": "1 takt",
+      "one_bar_title": "Przybliż tak, by jeden takt wypełnił ekran",
+      "four_bars": "4 takty",
+      "four_bars_title": "Przybliż tak, by cztery takty wypełniły ekran",
+      "whole": "Cały utwór",
+      "whole_title": "Całe nagranie od początku do końca",
+      "label": "Powiększenie",
+      "hint": "albo przewiń nad osią czasu",
+      "out": "Oddal",
+      "out_title": "Zobacz więcej nagrania naraz",
+      "window_title": "Ile nagrania mieści się na szerokość ekranu",
+      "in": "Przybliż",
+      "in_title": "Zobacz mniej, ale dokładniej"
+    },
+    "reading": "Odczytywanie nagrania…",
+    "no_waveform": "Brak przebiegu fali do pokazania.",
+    "unsupported": "Ta przeglądarka nie udostępnia dźwięku karty, więc nie ma przebiegu fali do narysowania. Chrome i Edge to potrafią; Firefox i Safari nie. Synchronizuj poniżej ze słuchu.",
+    "no_waveform_yet": "Nie ma jeszcze przebiegu fali — przechwyć poniżej fragment filmu, żeby zobaczyć jego kształt. Synchronizacja ze słuchu działa i bez tego.",
+    "capture": {
+      "whole": "Przechwycono cały film.",
+      "percent": "Przechwycono {{percent}}% filmu",
+      "none": "Nie przechwycono jeszcze przebiegu fali",
+      "nothing_left": "Nie ma już nic do przechwycenia.",
+      "on_its_own": "Przechwytywane osobno, nigdy podczas twojej gry.",
+      "more": "Przechwyć więcej",
+      "start": "Przechwyć przebieg fali",
+      "delay": "opóźnienie przechwytywania {{ms}} ms, skorygowane"
+    },
+    "drop": {
+      "add": "Upuść, aby dodać jako ścieżkę",
+      "needs_desktop": "Dodawanie plików wymaga aplikacji desktopowej",
+      "adding": "Dodawanie plików…",
+      "hint": "Upuść pliki audio w dowolnym miejscu, aby dodać ścieżkę"
+    },
+    "stems": "Ścieżki: {{count}}",
+    "stems_one": "1 ścieżka",
+    "stems_few": "{{count}} ścieżki",
+    "stems_many": "{{count}} ścieżek",
+    "subtitle": "Graj prawdziwy utwór pod tabulaturą, zsynchronizowany tak, by oba trafiały w takt 1 razem.",
+    "done": "Gotowe",
+    "pick_first": "Najpierw wybierz podkład, a potem wróć tutaj.",
+    "tools": {
+      "drag_to": "Przeciągnięcie pasa",
+      "move_view": "Przesuwa widok",
+      "move_view_title": "Spójrz w inne miejsce. Nagranie zostaje dokładnie tam, gdzie jest.",
+      "move_audio": "Przesuwa dźwięk",
+      "move_audio_title": "Przesuń nagranie względem tabulatury. Środkowy przycisk dalej przesuwa widok.",
+      "playhead": "Głowica",
+      "follow_title": "Utrzymuj widok wyśrodkowany na głowicy, gdy się przesuwa",
+      "follow": "Podążaj za odtwarzaniem",
+      "jump": "Pokaż głowicę",
+      "jump_title": "Pokaż głowicę i zostań w miejscu"
+    },
+    "tempo": {
+      "label": "Siatka tempa",
+      "hint": "ustawia też sesję",
+      "aria": "Własne tempo nagrania",
+      "title": "W jakim tempie idzie utwór. Ustawia też tempo sesji, żeby nagranie brzmiało tak, jak je nagrano — zwalniaj w sesji, nie tutaj.",
+      "even_title": "Jedno tempo dla całego nagrania. Przeciągnij linię taktu, żeby przypiąć takt, który się rozjeżdża.",
+      "pinned_title": "Takty przypięte do własnego tempa, żeby siatka podążała za zespołem, który pływa.",
+      "even": "równe w całości",
+      "pinned": "Przypięte takty: {{count}}",
+      "pinned_one": "1 przypięty takt",
+      "reset_title": "Wróć do jednego tempa dla całego nagrania",
+      "reset": "Resetuj"
+    },
+    "shortcuts": {
+      "aria": "Skróty klawiszowe",
+      "title": "Skróty klawiszowe — ?",
+      "label": "Skróty",
+      "close": "Zamknij listę skrótów",
+      "keys": {
+        "scroll": "Kółko", "shift_scroll": "Shift + kółko", "space": "Spacja", "middle_drag": "Przeciąganie środkowym",
+        "drag_line": "Przeciągnij linię taktu", "shift_drag": "Shift + przeciąganie", "alt_drag": "Alt + przeciąganie",
+        "click_line": "Kliknij linię taktu", "double_click": "Dwuklik"
+      },
+      "what": {
+        "scroll": "Przybliżenie w miejscu kursora",
+        "shift_scroll": "Przesuwanie wzdłuż nagrania",
+        "space": "Start lub stop, bez odliczania",
+        "middle_drag": "Przesuwanie widoku",
+        "brackets": "Przesuń całe nagranie o {{ms}} ms",
+        "shift_brackets": "Przesuń je o {{ms}} ms",
+        "drag_line": "Zmień tempo tego taktu, {{bpm}} BPM na piksel",
+        "shift_drag": "Piąta część tego, na ostatnie setne",
+        "alt_drag": "Ignoruj przyciąganie do transjentów",
+        "click_line": "Wpisz jego tempo dokładnie",
+        "double_click": "Odepnij ten takt",
+        "esc": "Zamknij"
+      }
+    },
+    "lanes": {
+      "overview": "Podgląd",
+      "follows": "podąża za odtwarzaniem",
+      "click_jump": "kliknij, aby przeskoczyć",
+      "bars": "Takty",
+      "bars_hint": "przeciągnij linię na uderzenie",
+      "tab": "Tabulatura",
+      "the_tab": "tabulaturę",
+      "tab_mute_hint": "wycisza każdy instrument w pliku",
+      "muted": "wyciszone",
+      "what_you_play": "to, co grasz",
+      "the_video": "film",
+      "video_mute_hint": "przebieg fali wypełnia się tylko wtedy, gdy film słychać",
+      "tap_to_align": "stuknij, aby zsynchronizować"
+    },
+    "bar_n": "Takt {{n}}",
+    "bpm": {
+      "slower": "Wolniej o setną",
+      "slower_title": "Wolniej — Shift o dziesiątą",
+      "selected": "Tempo wybranego taktu",
+      "faster": "Szybciej o setną",
+      "faster_title": "Szybciej — Shift o dziesiątą",
+      "stop": "Zakończ edycję tego taktu"
+    },
+    "transport": {
+      "stop_aria": "Zatrzymaj odtwarzanie",
+      "play_aria": "Rozpocznij odtwarzanie",
+      "stop": "Stop",
+      "play": "Graj",
+      "drift": "Rozjazd",
+      "start": "Start",
+      "earlier": "Przesuń podkład wcześniej",
+      "earlier_title": "Wcześniej o {{ms}} ms — Shift o {{coarse}}",
+      "later": "Przesuń podkład później",
+      "later_title": "Później o {{ms}} ms — Shift o {{coarse}}",
+      "moves_whole": "przesuwa całe nagranie · Shift o {{ms}} ms",
+      "footer": "Spacja gra bez odliczania · przeciąganie środkowym przesuwa widok · naciśnij ? po wszystkie skróty"
+    }
+  },
+  "stem": {
+    "solo_aria": "Solo: {{name}}",
+    "solo": "Solo",
+    "mute": "Wycisz",
+    "remove": "Usuń",
+    "on_grid": "Na siatce",
+    "resize": "Zmień wysokość pasa {{name}}"
+  },
+  "lanes_aria": {
+    "tab_seek": "Dźwięki tabulatury na osi synchronizacji — kliknij, aby grać od tego miejsca",
+    "tab": "Dźwięki tabulatury na osi synchronizacji",
+    "grid_pan": "Siatka synchronizacji podkładu — przeciągnij, aby przesunąć widok",
+    "grid_shift": "Siatka synchronizacji podkładu — przeciągnij, aby przesunąć nagranie",
+    "overview": "Podgląd podkładu — kliknij, aby przeskoczyć do fragmentu nagrania"
+  },
+  "mixer": {
+    "levels": "Poziomy instrumentów",
+    "levels_title": "Poziomy instrumentów — to, co słyszysz",
+    "main": "Główny instrument",
+    "instrument": "Instrument",
+    "volume": "Głośność: {{name}}"
+  },
+  "clock": {"position": "Pozycja w nagraniu"},
+  "ruler": {
+    "start": "START",
+    "on_beat": "na uderzeniu",
+    "was": "było {{bpm}}",
+    "aria": "Linijka taktów — przeciągnij linię taktu na uderzenie, które słyszysz, Shift dla precyzji, dwuklik odpina"
+  },
+  "capture": {
+    "lengths": {"s15": "15 s", "s30": "30 s", "m1": "1 min", "m2": "2 min", "until_stop": "Do zatrzymania"},
+    "title": "Przechwyć przebieg fali",
+    "body": "Dźwięk filmu da się zmierzyć tylko słuchając, jak gra, więc to go odtwarza i słucha — osobno, przy zatrzymanej sesji, żeby nic nie musiało dzielić z nim wątku.",
+    "close": "Zamknij",
+    "unsupported": "Ta przeglądarka nie udostępnia dźwięku karty, więc nie ma przebiegu fali do przechwycenia. Chrome i Edge to potrafią; Firefox i Safari nie — albo użyj aplikacji desktopowej.",
+    "for": "Przechwytuj przez",
+    "start": "Zacznij przechwytywanie",
+    "heard": "Usłyszano {{percent}}% filmu",
+    "nothing_heard": "Jeszcze nic nie usłyszano",
+    "saved": "Zapisano",
+    "tip": "Przed startem przewiń do fragmentu, który synchronizujesz — przechwytywanie rysuje tylko to, co słyszy. Słychać wszystko, co gra karta, więc zostaw resztę aplikacji w ciszy, dopóki trwa."
+  }
+}

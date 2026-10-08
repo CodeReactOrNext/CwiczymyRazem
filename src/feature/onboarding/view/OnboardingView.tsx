@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
-import { postChatWelcome } from "feature/chat/services/chatService";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
+import { addPlayerJoinedLog } from "feature/logs/services/addPlayerJoinedLog.service";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowLeft, ArrowRight, Library, Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -199,8 +199,8 @@ const OnboardingView = () => {
       source,
     });
     await firebaseSaveOnboarding({ level, ...result }).catch(() => null);
-    // After the save: the welcome card reads the goal and plan off the user document.
-    void postChatWelcome();
+    // After the save: the feed's welcome row reads the goal and plan off the user document.
+    void addPlayerJoinedLog();
     await router.push(href);
   };
 
@@ -267,8 +267,8 @@ const OnboardingView = () => {
       durationMs: clock.total(),
       source,
     });
-    // Skipping is still a new player arriving — they get a card, just without a goal on it.
-    void postChatWelcome();
+    // Skipping is still a new player arriving — they get a feed row, just without a goal on it.
+    void addPlayerJoinedLog();
   };
 
   const goals = getGoalOptions(level);

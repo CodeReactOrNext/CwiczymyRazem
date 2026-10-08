@@ -15,6 +15,7 @@ import { SupporterPitch } from "feature/supporterPanel/components/SupporterPitch
 import { TokenWalletBar } from "feature/supporterPanel/components/TokenWalletBar";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import type { GearProposalInput } from "lib/gear/gearBoard";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -56,6 +57,7 @@ const FormSkeleton = () => (
  * a supporter can come back to.
  */
 export const ProposeGearView = () => {
+  const { t } = useTranslation("supporter");
   const router = useRouter();
   const [draft, setDraft] = useState<GearDraft>(EMPTY_GEAR_DRAFT);
 
@@ -82,13 +84,13 @@ export const ProposeGearView = () => {
   return (
     <div className='font-openSans flex w-full flex-col'>
       <HeroBanner
-        title='Propose a piece of gear'
-        subtitle='Name it, pick its rarity, say what it breaks down into — and leave your line on it.'
+        title={t("panel.gear.propose_title")}
+        subtitle={t("panel.gear.propose_subtitle")}
         eyebrowContent={
           <Breadcrumbs
             items={[
-              { label: "Supporter panel", href: GEAR_BOARD_HREF },
-              { label: "Propose gear" },
+              { label: t("panel.title"), href: GEAR_BOARD_HREF },
+              { label: t("panel.gear.propose") },
             ]}
             currentClassName='text-amber-400/80'
           />

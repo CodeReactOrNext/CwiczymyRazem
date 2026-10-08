@@ -1,0 +1,817 @@
+{
+  "tabs": {
+    "browse": "Gremios",
+    "members": "Miembros",
+    "chat": "Chat",
+    "stash": "Almacén",
+    "quests": "Misiones",
+    "upgrades": "Mejoras",
+    "kit": "Estilo"
+  },
+  "tab_locked": "{{label}} — únete primero a un gremio",
+  "seats_taken": "{{count}} de {{limit}} plazas ocupadas",
+  "lvl": "nv.",
+  "level_ring": "Nivel de gremio {{level}} · {{done}} de {{lap}} misiones en esta vuelta",
+  "needs_guild": {
+    "title": "Únete primero a un gremio",
+    "browse": "Ver los gremios",
+    "members": "La plantilla son las personas con las que compartes gremio, y todavía no estás en ninguno.",
+    "chat": "El chat es para la gente con la que tocas.",
+    "stash": "El estante pertenece a un gremio, y no estás en ninguno.",
+    "quests": "Las misiones las completa un gremio, y todavía no estás en ninguno.",
+    "upgrades": "Las mejoras las paga un gremio, y todavía no estás en ninguno."
+  },
+  "header": {
+    "founded_by": "Fundado por {{name}}.",
+    "intro": "Encuentra gente con la que practicar. Unirse es gratis."
+  },
+  "browser": {
+    "rank": "Puesto {{rank}}",
+    "yours": "El tuyo",
+    "by": "de {{name}}",
+    "level": "Nivel {{level}}",
+    "leave": "Salir",
+    "waiting": "En espera",
+    "turned_down": "Rechazada",
+    "withdraw": "Retirar",
+    "clear": "Quitar",
+    "no_seats": "No hay plazas libres",
+    "leave_first": "Sal de tu gremio antes de pedir entrar en otro",
+    "full": "Lleno",
+    "join": "Unirse",
+    "asking": "Piden unirse",
+    "already_turned_down": "Ya rechazada — aún puede retirar la solicitud.",
+    "accept": "Aceptar",
+    "intro": "Los gremios suben completando misiones juntos. Unirse es gratis.",
+    "leave_before_founding": "Sal de tu gremio antes de fundar uno",
+    "not_enough_tokens": "No te quedan suficientes tokens",
+    "name_yours": "El nombre es tuyo para siempre",
+    "found": "Fundar un gremio",
+    "search": "Busca gremios por nombre, etiqueta o descripción…",
+    "empty_title": "Todavía no hay gremios",
+    "empty_body": "Nadie ha reservado un nombre. El primero sigue libre.",
+    "no_match": "Ningún gremio coincide con «{{search}}»",
+    "ranking": "Clasificación de gremios"
+  },
+  "members": {
+    "sessions_one": "1 sesión",
+    "sessions": "{{count}} sesiones",
+    "hours": "{{hours}} h de práctica",
+    "honor_title": "{{earned}} de honor ganado · {{balance}} para gastar en el estante",
+    "founder": "Fundador",
+    "you": "Eres tú",
+    "roster": "La plantilla",
+    "room_for": "sitio para {{count}} más",
+    "room_full": "no quedan plazas; se compran más en la pestaña Mejoras",
+    "together": "{{sessions}} sesiones y {{hours}} juntos",
+    "together_since": "{{sessions}} sesiones y {{hours}} juntos desde el {{since}}",
+    "honor_explainer": "El honor es la moneda propia del gremio: se gana aportando Fame, tokens o equipo al gremio, y se gasta al sacar equipo del estante."
+  },
+  "upgrades": {
+    "intro": "Todos aportan, y una mejora se compra sola en cuanto se llena su bote. Todo lo que aportes te da {{honor}} para gastar en el estante.",
+    "honor": "honor",
+    "seats_title": "Más plazas",
+    "all_seats": "Las {{count}} plazas ocupadas",
+    "seats_buys": "{{count}} plazas más",
+    "seats_max": "un gremio tiene como máximo {{count}} plazas",
+    "rows_title": "Otra fila de estante",
+    "rows_one": "El almacén tiene 1 fila",
+    "rows": "El almacén tiene {{count}} filas",
+    "rows_buys": "una fila más",
+    "rows_max": "un estante tiene como máximo {{count}} filas"
+  },
+  "founding": {
+    "seats": "{{count}} de {{limit}} plazas",
+    "yours": "tuyo",
+    "open": "Abrir",
+    "founder_note": "Fundaste este gremio, y cada persona pertenece a un solo gremio a la vez. Quien funda solo puede irse cuando se hayan ido todos los demás.",
+    "member_note": "Estás en un gremio, y cada persona pertenece a uno solo a la vez. Sal de él desde la página de Gremios antes de fundar el tuyo.",
+    "seats_note": "Las plazas se compran con tokens, de {{count}} en {{count}}, y cualquiera de dentro puede comprarlas — el botón está en la tarjeta del gremio en /guilds.",
+    "title": "Funda un gremio por",
+    "body": "Lo más caro del panel, porque es lo único que se lleva algo que después nadie más puede tener: un nombre y una etiqueta, para siempre. Luego cualquiera puede pedir unirse, y tú decides quién entra.",
+    "cta": "Fundarlo por",
+    "not_enough": "No tienes suficientes tokens",
+    "see_existing": "Ver los gremios que ya existen →"
+  },
+  "fund": {
+    "member_left": "un miembro que se fue",
+    "paid_by": "Pagado por",
+    "and_more": "y {{count}} más",
+    "maxed": "Al máximo — {{maxed}}.",
+    "next_step": "El siguiente paso añade {{buys}}",
+    "wallet_empty": "Esta vez no te queda nada en la cartera.",
+    "you_have": "Tienes {{count}} tokens",
+    "chip_in": "Aportar"
+  },
+  "treasury": {
+    "filled_by": "Aportado por",
+    "title": "La Fame del gremio",
+    "counting_towards": "Cuenta para {{goal}}.",
+    "counts": "Cuenta para las misiones del gremio y nunca se gasta.",
+    "empty": "Esta vez no tienes Fame propia.",
+    "you_have": "Tienes {{count}} Fame",
+    "put_in": "Aportar",
+    "bank": "Ahora mismo hay {{fame}} Fame en el tesoro.",
+    "bank_spent": "Ahora mismo hay {{fame}} Fame en el tesoro; {{spent}} se gastaron cuando aún se podía."
+  },
+  "honor": {
+    "left_by": "dejado por {{name}}",
+    "a_member": "un miembro",
+    "costs": "Cuesta",
+    "yours": "Tu honor",
+    "take_for": "Llévatelo por {{cost}} de honor",
+    "short": "Te faltan {{count}} de honor",
+    "how_to_earn": "El honor se gana aportando al gremio: Fame al tesoro, tokens a un bote o equipo a este estante.",
+    "take_label": "Llévatelo por",
+    "amount": "{{count}} de honor"
+  },
+  "deposit": {
+    "title": "Dejar {{name}} en el almacén del gremio",
+    "into_stash": "al almacén del gremio",
+    "earns": "Te da",
+    "from_then_on": "Desde entonces es del gremio — cualquier miembro puede llevárselo.",
+    "leaving": "Dejándolo…",
+    "confirm": "Dejarlo en el almacén"
+  },
+  "badge": {
+    "with_level": "Gremio: {{tag}} · nivel {{level}}",
+    "plain": "Gremio: {{tag}}"
+  },
+  "cover": {
+    "your_honor": "Tu honor: {{earned}} ganado · {{balance}} para gastar en el estante"
+  },
+  "units": {
+    "sessions": "{{value}} sesiones",
+    "sessions_one": "{{value}} sesión",
+    "hours": "{{value}} h",
+    "fame": "{{value}} Fame",
+    "members": "{{value}} miembros",
+    "members_one": "{{value}} miembro",
+    "songs": "{{value}} canciones",
+    "songs_one": "{{value}} canción",
+    "recordings": "{{value}} grabaciones",
+    "recordings_one": "{{value}} grabación",
+    "quests": "{{value}} misiones",
+    "quests_one": "{{value}} misión",
+    "exams": "{{value}} exámenes",
+    "exams_one": "{{value}} examen",
+    "entries": "{{value}} participaciones",
+    "entries_one": "{{value}} participación",
+    "points": "{{value}} puntos",
+    "points_one": "{{value}} punto"
+  },
+  "asks": {
+    "all_categories": "{{amount}} en las cuatro categorías",
+    "streak": "una racha de {{days}} días"
+  },
+  "describe": {
+    "members": "{{count}} miembros",
+    "members_one": "Un miembro",
+    "each": "{{members}} con {{amount}} cada uno.",
+    "sessions": "{{amount}} entre todos.",
+    "time": "{{amount}} de práctica en total.",
+    "technique": "{{amount}} de técnica.",
+    "theory": "{{amount}} de teoría.",
+    "hearing": "{{amount}} de entrenamiento auditivo.",
+    "creativity": "{{amount}} de práctica creativa.",
+    "points": "{{count}} puntos de práctica entre todos.",
+    "all_categories": "{{members}} con {{amount}} en cada una de las cuatro categorías.",
+    "treasury": "{{amount}} aportada al tesoro del gremio.",
+    "streak": "{{members}} con una racha de {{days}} días a la vez.",
+    "songs": "{{amount}} marcadas como aprendidas.",
+    "recordings": "{{amount}} publicadas.",
+    "exams": "{{count}} exámenes del recorrido aprobados.",
+    "daily_quests": "{{count}} misiones diarias completadas.",
+    "submissions": "{{amount}} en el reto mensual."
+  },
+  "quests": {
+    "waiting": "Fame que te espera",
+    "fame": "{{amount}} Fame",
+    "plus_fame": "+{{amount}} Fame",
+    "claim": "Reclamar {{amount}} Fame",
+    "cleared_while_here": "{{count}} misiones completadas mientras estabas en la plantilla.",
+    "cleared_while_here_one": "Una misión completada mientras estabas en la plantilla.",
+    "all_taken": "Ya recogiste todo de las misiones en las que estuviste. La próxima recompensa aparecerá aquí.",
+    "guild_level": "Nivel de gremio {{level}}",
+    "level": "nivel",
+    "lap": "vuelta {{lap}}",
+    "level_up": "Cada misión completada es un nivel más y {{reward}}.",
+    "lap_cleared": "{{done}} de {{total}} misiones completadas",
+    "lap_cleared_on": "{{done}} de {{total}} misiones completadas en la vuelta {{lap}}",
+    "chapter_of": "capítulo {{index}} de {{total}}",
+    "chapter_of_cap": "Capítulo {{index}} de {{total}}",
+    "chapter": "Capítulo {{index}}",
+    "road_ahead": "El camino que queda",
+    "ladder": "Diez capítulos de cinco misiones, que se abren de uno en uno. Los últimos piden más y pagan más.",
+    "ladder_lap": "Tras el décimo, la escalera vuelve a empezar — esta es la vuelta {{lap}}, con cada objetivo y cada recompensa ×{{times}}.",
+    "ladder_first": "Tras el décimo, la escalera vuelve a empezar con cada número duplicado, luego triplicado — nunca se acaba.",
+    "you_are_here": "estáis aquí",
+    "n_quests": "{{count}} misiones",
+    "n_cleared": "{{done}} de {{total}} completadas",
+    "per_member": "por miembro y misión",
+    "chapter_cleared": "Capítulo completado",
+    "to_clear": "{{count}} misiones por completar",
+    "to_clear_one": "Una misión por completar",
+    "clear_all_five": "Completa las cinco y se abrirá el siguiente capítulo.",
+    "cleared_of": "{{done}} de {{total}} completadas",
+    "cleared_in_chapter": "Completadas en este capítulo",
+    "counted": "Se cuenta sobre toda la plantilla. Una misión que cuenta miembros se completa cuando llegan suficientes; el resto se suma en todo el gremio.",
+    "counted_since": "Se cuenta sobre toda la plantilla desde el {{since}}. Una misión que cuenta miembros se completa cuando llegan suficientes; el resto se suma en todo el gremio.",
+    "chapters": {
+      "0": {
+        "name": "Calentamiento",
+        "blurb": "Aparecer juntos y empezar a contar."
+      },
+      "1": {
+        "name": "Ensayo",
+        "blurb": "Las horas empiezan a sumar, y el oído se une."
+      },
+      "2": {
+        "name": "Repertorio",
+        "blurb": "Canciones aprendidas, tocadas y grabadas."
+      },
+      "3": {
+        "name": "Disciplina",
+        "blurb": "Todos tirando, todos los días."
+      },
+      "4": {
+        "name": "Equilibrio",
+        "blurb": "Cada faceta de tocar, de cada miembro."
+      },
+      "5": {
+        "name": "Tempo",
+        "blurb": "Examinados, mil sesiones a la espalda, con la teoría a la altura."
+      },
+      "6": {
+        "name": "Escenario",
+        "blurb": "Delante del público, con el nombre del gremio en el cartel."
+      },
+      "7": {
+        "name": "Máquina",
+        "blurb": "El gremio funciona solo. Mil horas detrás."
+      },
+      "8": {
+        "name": "Eruditos",
+        "blurb": "Las categorías difíciles, en cantidades serias."
+      },
+      "9": {
+        "name": "Leyendas",
+        "blurb": "Cifras que la mayoría de gremios nunca verá."
+      }
+    },
+    "items": {
+      "sessions-100": {
+        "name": "Las primeras cien",
+        "blurb": "Cien sesiones de práctica entre todos."
+      },
+      "hours-50": {
+        "name": "Cincuenta horas",
+        "blurb": "Cincuenta horas de práctica en total."
+      },
+      "members-sessions-5-x3": {
+        "name": "Tres habituales",
+        "blurb": "Tres miembros con cinco sesiones cada uno."
+      },
+      "technique-10": {
+        "name": "Manos a la obra",
+        "blurb": "Diez horas de técnica."
+      },
+      "treasury-300": {
+        "name": "Capital inicial",
+        "blurb": "Trescientos de Fame aportados al tesoro del gremio."
+      },
+      "sessions-250": {
+        "name": "Un cuarto de mil",
+        "blurb": "Doscientas cincuenta sesiones."
+      },
+      "hours-150": {
+        "name": "Larga distancia",
+        "blurb": "Ciento cincuenta horas de práctica."
+      },
+      "theory-25": {
+        "name": "Ratones de biblioteca",
+        "blurb": "Veinticinco horas de teoría."
+      },
+      "hearing-25": {
+        "name": "Oídos abiertos",
+        "blurb": "Veinticinco horas de entrenamiento auditivo."
+      },
+      "streak-7-x3": {
+        "name": "Tres llamas",
+        "blurb": "Tres miembros con una racha de siete días a la vez."
+      },
+      "songs-learned-25": {
+        "name": "Setlist",
+        "blurb": "Veinticinco canciones marcadas como aprendidas en el gremio."
+      },
+      "points-2000": {
+        "name": "Dos mil puntos",
+        "blurb": "Dos mil puntos de práctica entre todos."
+      },
+      "recordings-5": {
+        "name": "En cinta",
+        "blurb": "Cinco grabaciones publicadas por miembros."
+      },
+      "technique-50": {
+        "name": "Cincuenta de técnica",
+        "blurb": "Cincuenta horas de técnica."
+      },
+      "creativity-25": {
+        "name": "Local de ensayo",
+        "blurb": "Veinticinco horas de práctica creativa."
+      },
+      "sessions-500": {
+        "name": "Quinientas",
+        "blurb": "Quinientas sesiones."
+      },
+      "hours-300": {
+        "name": "Trescientas horas",
+        "blurb": "Trescientas horas de práctica."
+      },
+      "members-sessions-20-x4": {
+        "name": "Cuatro habituales",
+        "blurb": "Cuatro miembros con veinte sesiones cada uno."
+      },
+      "daily-quests-30": {
+        "name": "Diario de misiones",
+        "blurb": "Treinta misiones diarias completadas entre todos."
+      },
+      "streak-30-x1": {
+        "name": "El mes",
+        "blurb": "Un miembro con una racha de treinta días."
+      },
+      "technique-100": {
+        "name": "Cien de técnica",
+        "blurb": "Cien horas de técnica."
+      },
+      "theory-50": {
+        "name": "Teoría cincuenta",
+        "blurb": "Cincuenta horas de teoría."
+      },
+      "hearing-50": {
+        "name": "Oído cincuenta",
+        "blurb": "Cincuenta horas de entrenamiento auditivo."
+      },
+      "creativity-50": {
+        "name": "Creatividad cincuenta",
+        "blurb": "Cincuenta horas de práctica creativa."
+      },
+      "members-all-categories-x4": {
+        "name": "Todoterreno",
+        "blurb": "Cuatro miembros con una hora en cada una de las cuatro categorías."
+      },
+      "theory-100": {
+        "name": "Teoría cien",
+        "blurb": "Cien horas de teoría."
+      },
+      "exams-10": {
+        "name": "Examinados",
+        "blurb": "Diez exámenes del recorrido aprobados."
+      },
+      "sessions-1000": {
+        "name": "Mil",
+        "blurb": "Mil sesiones."
+      },
+      "hours-600": {
+        "name": "Seiscientas horas",
+        "blurb": "Seiscientas horas de práctica."
+      },
+      "hearing-100": {
+        "name": "Oído cien",
+        "blurb": "Cien horas de entrenamiento auditivo."
+      },
+      "recordings-20": {
+        "name": "Veinte cintas",
+        "blurb": "Veinte grabaciones publicadas."
+      },
+      "submissions-5": {
+        "name": "Aspirantes",
+        "blurb": "Cinco participaciones en el reto mensual."
+      },
+      "songs-learned-50": {
+        "name": "Cincuenta canciones",
+        "blurb": "Cincuenta canciones marcadas como aprendidas."
+      },
+      "points-20000": {
+        "name": "Veinte mil puntos",
+        "blurb": "Veinte mil puntos de práctica entre todos."
+      },
+      "treasury-3000": {
+        "name": "Cofre de guerra",
+        "blurb": "Tres mil de Fame aportados al tesoro del gremio."
+      },
+      "sessions-2000": {
+        "name": "Dos mil",
+        "blurb": "Dos mil sesiones."
+      },
+      "hours-1000": {
+        "name": "Mil horas",
+        "blurb": "Mil horas de práctica."
+      },
+      "technique-250": {
+        "name": "Técnica 250",
+        "blurb": "Doscientas cincuenta horas de técnica."
+      },
+      "members-sessions-50-x5": {
+        "name": "Cinco habituales",
+        "blurb": "Cinco miembros con cincuenta sesiones cada uno."
+      },
+      "streak-14-x5": {
+        "name": "Cinco llamas",
+        "blurb": "Cinco miembros con una racha de catorce días a la vez."
+      },
+      "theory-150": {
+        "name": "Teoría 150",
+        "blurb": "Ciento cincuenta horas de teoría."
+      },
+      "hearing-150": {
+        "name": "Oído 150",
+        "blurb": "Ciento cincuenta horas de entrenamiento auditivo."
+      },
+      "creativity-150": {
+        "name": "Creatividad 150",
+        "blurb": "Ciento cincuenta horas de práctica creativa."
+      },
+      "daily-quests-100": {
+        "name": "Cien misiones",
+        "blurb": "Cien misiones diarias completadas."
+      },
+      "exams-50": {
+        "name": "Cincuenta exámenes",
+        "blurb": "Cincuenta exámenes del recorrido aprobados."
+      },
+      "sessions-5000": {
+        "name": "Cinco mil",
+        "blurb": "Cinco mil sesiones."
+      },
+      "hours-2500": {
+        "name": "2500 horas",
+        "blurb": "Dos mil quinientas horas de práctica."
+      },
+      "songs-learned-100": {
+        "name": "Cien canciones",
+        "blurb": "Cien canciones marcadas como aprendidas."
+      },
+      "recordings-50": {
+        "name": "Cincuenta cintas",
+        "blurb": "Cincuenta grabaciones publicadas."
+      },
+      "streak-100-x1": {
+        "name": "Cien días",
+        "blurb": "Un miembro con una racha de cien días."
+      }
+    }
+  },
+  "card": {
+    "you_of": "tú: {{mine}} / {{target}}",
+    "you_categories": "tú: {{mine}} / {{count}} categorías",
+    "your_streak": "tu racha: {{mine}} / {{count}} días",
+    "members_need": "{{count}} miembros más necesitan {{ask}}",
+    "members_need_one": "1 miembro más necesita {{ask}}",
+    "to_go": "faltan {{amount}}",
+    "you": "tú: {{amount}}",
+    "cleared_on": "Completada el {{date}}"
+  },
+  "spend": {
+    "token_amount": "{{amount}} tokens",
+    "token_amount_one": "{{amount}} token",
+    "fame_amount": "{{amount}} Fame",
+    "in_bank": "en el tesoro",
+    "covered": "cubierto",
+    "have_of": "{{have}} de {{need}}",
+    "finish": "complétalo"
+  },
+  "parts": {
+    "tier_part": "Pieza {{tier}}",
+    "of": "de {{count}}",
+    "how_many_leave": "Cuántas dejar",
+    "how_many_take": "Cuántas llevarte",
+    "earns_honor": "da {{honor}} de honor",
+    "costs_honor": "cuesta {{honor}} de honor",
+    "you_have": "tienes {{count}}",
+    "leave": "Dejar {{count}}",
+    "take": "Llevar {{count}}",
+    "leave_all": "Dejar las {{count}}",
+    "take_all": "Llevar las {{count}}"
+  },
+  "kit": {
+    "slot": "Hueco {{index}}: {{icon}}",
+    "slot_lit": "Hueco {{index}}: {{icon}} — eligiendo para este",
+    "pick_for": "Elige para el hueco {{index}} — o haz clic en un hueco para cambiar solo ese.",
+    "unlocked_of": "{{done}} de {{total}} desbloqueados",
+    "unlocks_at": "se desbloquea en el nivel de gremio {{level}}",
+    "unlocks_at_cap": "Se desbloquea en el nivel de gremio {{level}}",
+    "wear_four": "Llevar estos cuatro",
+    "back_to_worn": "Volver a lo actual",
+    "worn_now": "Puesto ahora",
+    "wear_it": "Ponérselo",
+    "lvl": "nv. {{level}}",
+    "intro": "La tarjeta de la izquierda es el aspecto del gremio en todas partes. Cada color, estandarte, icono y etiqueta de abajo es gratis, y eliges tú porque fundaste el gremio. Los más sencillos están disponibles desde el principio; el resto se desbloquea al subir de nivel, y cada casilla dice en cuál. Elige uno y, un momento después, toda la plantilla lo lleva.",
+    "unlocked_at_level": "{{done}} de {{total}} desbloqueados en el nivel de gremio {{level}}"
+  },
+  "new": {
+    "logo_types": "Solo PNG, JPG o WebP",
+    "logo_size": "Ese archivo pesa más de {{mb}} MB",
+    "logo_unreadable": "No se pudo leer esa imagen",
+    "description": "Cuesta {{cost}} — te quedan {{left}}. El nombre y la etiqueta serán solo tuyos una vez elegidos.",
+    "name": "Nombre",
+    "name_problems": {
+      "too-short": "El nombre de un gremio tiene al menos {{min}} caracteres",
+      "too-long": "El nombre de un gremio tiene como máximo {{max}} caracteres",
+      "no-letters": "El nombre de un gremio necesita letras o números"
+    },
+    "tag": "Etiqueta",
+    "tag_hint": "aparece junto a tu nombre",
+    "tag_problems": {
+      "too-short": "Una etiqueta tiene al menos {{min}} caracteres",
+      "too-long": "Una etiqueta tiene como máximo {{max}} caracteres"
+    },
+    "picture": "Imagen",
+    "picture_hint": "opcional, mejor cuadrada",
+    "change": "Cambiar",
+    "add_image": "Añadir imagen",
+    "remove": "Quitar",
+    "what_for": "Para qué es",
+    "optional": "opcional",
+    "what_for_placeholder": "Para quién es, qué practicáis, cuándo os conectáis.",
+    "cancel": "Cancelar"
+  },
+  "stash": {
+    "on_shelf": "En el estante",
+    "rows_of": "{{done}} de {{count}} filas",
+    "honor_title": "{{earned}} de honor ganado, {{spent}} gastado",
+    "guild_stash": "Almacén del gremio",
+    "empty": "Aquí no hay nada todavía. Arrastra algo de tu equipo y alguien lo usará.",
+    "full": "El estante está lleno — saca algo o aporta unos tokens para otra fila en la pestaña Mejoras.",
+    "how": "Arrastra una casilla a tu propio armario para llevártela, o haz clic en ella. Dejar algo da honor según su rareza; sacar cualquier cosa del estante cuesta {{cost}} fijos, hasta {{limit}} veces al día. Quién dejó qué está en el registro de abajo.",
+    "your_gear": "Tu equipo",
+    "no_gear": "No tienes equipo de sobra para dar.",
+    "your_stash": "Tu almacén",
+    "gear_how": "Guitarras, pedales, piezas recuperadas y mods rescatados van todos al estante — arrastra uno hacia arriba o haz clic. Arrastrar dentro de este tablero solo lo reordena, y ese es el orden que muestra tu Arsenal. Lo que tengas equipado se quita solo; un pedal primero tiene que salir del pedalboard.",
+    "ledger_title": "Quién da, quién toma",
+    "ledger_body": "Cada aportación y cada retirada, contadas por miembro.",
+    "recent": "Movimientos recientes",
+    "log_left": "{{name}} dejó {{item}}",
+    "log_took": "{{name}} se llevó {{item}}",
+    "take_it": "Llevártelo",
+    "how_many": "Cuántas"
+  },
+  "cosmetics": {
+    "slots": {
+      "accent": {
+        "label": "Color",
+        "blurb": "De él sale el resto del estilo — cámbialo y el estandarte, los iconos y el marco lo siguen."
+      },
+      "banner": {
+        "label": "Estandarte",
+        "blurb": "La franja de arriba de tu tarjeta, en la lista de gremios y en esta página."
+      },
+      "motif": {
+        "label": "Iconos",
+        "blurb": "Los cuatro iconos repetidos por el estandarte. Los cuatro que quieras."
+      },
+      "frame": {
+        "label": "Etiqueta",
+        "blurb": "Cómo se dibuja tu etiqueta junto al nombre de cada miembro en la clasificación."
+      }
+    },
+    "items": {
+      "accent_steel": {
+        "name": "Acero",
+        "blurb": "El sencillo con el que empieza todo gremio."
+      },
+      "accent_ivory": {
+        "name": "Marfil",
+        "blurb": "Casi blanco. Destaca antes que nada en la clasificación."
+      },
+      "accent_bone": {
+        "name": "Hueso",
+        "blurb": "Gris cálido, como un golpeador viejo."
+      },
+      "accent_signal": {
+        "name": "Señal",
+        "blurb": "El cian de la propia app."
+      },
+      "accent_sky": {
+        "name": "Cielo",
+        "blurb": "Más claro y más frío que Cobalto."
+      },
+      "accent_cobalt": {
+        "name": "Cobalto",
+        "blurb": "Azul profundo, frío como un local de ensayo en febrero."
+      },
+      "accent_indigo": {
+        "name": "Índigo",
+        "blurb": "Azul que tira a violeta."
+      },
+      "accent_nightshade": {
+        "name": "Belladona",
+        "blurb": "Violeta — el color del nivel raro."
+      },
+      "accent_neon": {
+        "name": "Neón",
+        "blurb": "Fucsia. Nada más en la clasificación se le parece."
+      },
+      "accent_bubblegum": {
+        "name": "Chicle",
+        "blurb": "Rosa, y sin pedir perdón."
+      },
+      "accent_crimson": {
+        "name": "Carmesí",
+        "blurb": "Ruidoso, y nadie más en la clasificación lo lleva."
+      },
+      "accent_ember": {
+        "name": "Brasa",
+        "blurb": "Naranja de racha, para un gremio que nunca falla."
+      },
+      "accent_brass": {
+        "name": "Latón",
+        "blurb": "El oro de la propia Fame."
+      },
+      "accent_sulphur": {
+        "name": "Azufre",
+        "blurb": "Amarillo, un tono más vivo que Latón."
+      },
+      "accent_acid": {
+        "name": "Ácido",
+        "blurb": "Lima. Ruidoso de otra manera que Carmesí."
+      },
+      "accent_verdant": {
+        "name": "Verde",
+        "blurb": "Verde, el color de una semana completada."
+      },
+      "accent_lagoon": {
+        "name": "Laguna",
+        "blurb": "Turquesa, entre el cian de la app y una semana completada."
+      },
+      "banner_none": {
+        "name": "Desnudo",
+        "blurb": "Sin color — solo tus iconos sobre la franja lisa."
+      },
+      "banner_wash": {
+        "name": "Aguada",
+        "blurb": "En diagonal: el color entra por arriba a la izquierda y se aclara hacia abajo a la derecha."
+      },
+      "banner_aurora": {
+        "name": "Aurora",
+        "blurb": "De izquierda a derecha por los dos vecinos del color."
+      },
+      "banner_sunburst": {
+        "name": "Amanecer",
+        "blurb": "Oscuro arriba, el color se concentra hacia el borde inferior."
+      },
+      "banner_stage": {
+        "name": "Atardecer",
+        "blurb": "Del color arriba a la derecha a su vecino más frío abajo a la izquierda."
+      },
+      "banner_halo": {
+        "name": "Fundido",
+        "blurb": "De la oscuridad a la izquierda al color a la derecha."
+      },
+      "frame_plain": {
+        "name": "Sencillo",
+        "blurb": "Etiqueta en el color del gremio, nada alrededor."
+      },
+      "frame_ring": {
+        "name": "Aro",
+        "blurb": "Un aro fino en el color del gremio."
+      },
+      "frame_double": {
+        "name": "Doble",
+        "blurb": "Dos aros finos con un hilo de oscuridad entre ellos."
+      },
+      "frame_plate": {
+        "name": "Placa",
+        "blurb": "Relleno, para que la etiqueta se lea primero en una fila llena."
+      },
+      "frame_heavy": {
+        "name": "Pesado",
+        "blurb": "Relleno y con aro. Lo más ruidosa que puede ser una etiqueta."
+      },
+      "frame_solid": {
+        "name": "Sólido",
+        "blurb": "Un bloque de color con la etiqueta recortada en negro."
+      },
+      "frame_pill": {
+        "name": "Píldora",
+        "blurb": "Relleno y totalmente redondeado, como un botón que nunca hace nada."
+      },
+      "frame_sunken": {
+        "name": "Hundido",
+        "blurb": "Tallado en la fila: una ranura oscura con la etiqueta en color."
+      },
+      "frame_brackets": {
+        "name": "Corchetes",
+        "blurb": "Una barra de color a cada lado de la etiqueta."
+      },
+      "frame_dot": {
+        "name": "Punto",
+        "blurb": "Un punto de color delante de la etiqueta, como un piloto de estado delante de un nombre."
+      }
+    },
+    "motif_groups": {
+      "instruments": "Instrumentos",
+      "beasts": "Bestias",
+      "arms": "Armas y blasones",
+      "elements": "Elementos",
+      "things": "Todo lo demás"
+    },
+    "motif_icons": {
+      "guitar": "Guitarra",
+      "bass": "Pala de bajo",
+      "headstock": "Pala",
+      "notes": "Notas",
+      "score": "Partitura",
+      "mic": "Micrófono",
+      "oldmic": "Micrófono antiguo",
+      "speaker": "Altavoz",
+      "headphones": "Auriculares",
+      "drum": "Tambor",
+      "drumkit": "Batería",
+      "piano": "Teclas de piano",
+      "keyboard": "Teclado",
+      "trombone": "Trombón",
+      "cassette": "Casete",
+      "vinyl": "Vinilo",
+      "horn": "Cuerno",
+      "metalhand": "Cuernos arriba",
+      "skull": "Calavera",
+      "crossbones": "Calavera y tibias",
+      "bones": "Huesos cruzados",
+      "pirate": "Calavera pirata",
+      "burning": "Calavera en llamas",
+      "dragon": "Dragón",
+      "wolf": "Lobo",
+      "howl": "Lobo aullando",
+      "werewolf": "Hombre lobo",
+      "raven": "Cuervo",
+      "eagle": "Águila",
+      "lion": "León",
+      "tiger": "Tigre",
+      "bear": "Oso",
+      "bull": "Toro",
+      "snake": "Serpiente",
+      "spider": "Araña",
+      "web": "Telaraña",
+      "bat": "Murciélago",
+      "owl": "Búho",
+      "cat": "Gato",
+      "shark": "Tiburón",
+      "octopus": "Pulpo",
+      "scorpion": "Escorpión",
+      "reaper": "Parca",
+      "ghost": "Fantasma",
+      "devil": "Diablo",
+      "robot": "Robot",
+      "crown": "Corona",
+      "imperial": "Corona imperial",
+      "laurel": "Corona de laurel",
+      "swords": "Espadas cruzadas",
+      "sword": "Espada",
+      "axes": "Hachas cruzadas",
+      "battleaxe": "Hacha de batalla",
+      "hammer": "Martillo",
+      "warhammer": "Martillo de guerra",
+      "shield": "Escudo",
+      "spartan": "Casco espartano",
+      "viking": "Casco vikingo",
+      "knight": "Yelmo de caballero",
+      "samurai": "Casco samurái",
+      "hornedhelm": "Yelmo con cuernos",
+      "castle": "Castillo",
+      "banner": "Estandarte",
+      "pirateflag": "Bandera pirata",
+      "fist": "Puño",
+      "anarchy": "Anarquía",
+      "wings": "Alas",
+      "angelwings": "Alas de ángel",
+      "bullseye": "Diana",
+      "bomb": "Bomba",
+      "key": "Ganzúa",
+      "flame": "Llama",
+      "candle": "Vela",
+      "campfire": "Hoguera",
+      "lightning": "Rayo",
+      "storm": "Tormenta",
+      "sun": "Sol",
+      "moon": "Luna",
+      "star": "Estrella",
+      "shuriken": "Shuriken",
+      "comet": "Cometa",
+      "crystal": "Bola de cristal",
+      "potion": "Poción",
+      "heart": "Corazón alado",
+      "rose": "Rosa y daga",
+      "beer": "Cerveza",
+      "drinkinghorn": "Cuerno para beber",
+      "coffee": "Café",
+      "anvil": "Yunque",
+      "gears": "Engranajes",
+      "dice": "Dados",
+      "trophy": "Trofeo",
+      "rocket": "Cohete",
+      "compass": "Brújula",
+      "anchor": "Ancla"
+    }
+  }
+}

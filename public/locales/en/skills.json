@@ -251,5 +251,89 @@
       "name": "Composition",
       "description": "Learn to write and arrange your own music"
     }
+  },
+  "roadmap": {
+    "aria": "Skill roadmap",
+    "drag_aria": "Skill roadmap, drag to pan",
+    "zoom_in": "Zoom in",
+    "zoom_out": "Zoom out",
+    "fit": "Fit the map to the screen",
+    "bpm_stages": "{{done}} / {{total}} BPM stages",
+    "click_preview": "Click to preview",
+    "lvl": "Lvl {{level}}",
+    "done_of": "{{done}} of {{total}}",
+    "up_next": "Up next",
+    "start": "Start",
+    "show_in_path": "Show this exercise in the path",
+    "jump_tier": "Jump to a tier",
+    "mastery": "Mastery",
+    "mastery_done": "Mastery — every exercise on the path is done.",
+    "mastery_left": "Mastery · {{count}} exercises to go",
+    "state": {
+      "completed": "Completed",
+      "current": "Up next",
+      "available": "Not started",
+      "locked": "Pro exercise"
+    },
+    "tiers": {
+      "foundations": {
+        "title": "Foundations",
+        "subtitle": "Pick up the guitar. Build the basics."
+      },
+      "technique": {
+        "title": "Technique",
+        "subtitle": "Precision, speed and control."
+      },
+      "theory": {
+        "title": "Theory & Fretboard",
+        "subtitle": "Know the neck. Name what you play."
+      },
+      "rhythm": {
+        "title": "Rhythm & Groove",
+        "subtitle": "Lock in with the beat."
+      },
+      "expression": {
+        "title": "Expression & Style",
+        "subtitle": "Make every note sing."
+      },
+      "hearing": {
+        "title": "Ear Training",
+        "subtitle": "Hear it before you play it."
+      },
+      "creativity": {
+        "title": "Creativity",
+        "subtitle": "Find your own voice."
+      }
+    },
+    "branches": {
+      "getting_started": "Getting Started",
+      "clean_tone": "Clean Tone & Muting",
+      "first_scales": "First Scales",
+      "play_alongs": "Play-alongs",
+      "alternate_picking": "Alternate Picking",
+      "finger_independence": "Finger Independence",
+      "legato": "Legato",
+      "string_skipping": "String Skipping",
+      "spider_permutations": "Spider Permutations",
+      "sweep_picking": "Sweep Picking",
+      "tapping": "Tapping",
+      "hybrid_picking": "Hybrid Picking",
+      "note_hunts": "Note Hunts",
+      "click_hunts": "Click Hunts",
+      "interval_clicks": "Interval Clicks",
+      "chords": "Chords",
+      "harmony": "Harmony",
+      "strumming_styles": "Strumming",
+      "strumming_patterns": "Strumming Patterns",
+      "timing_meter": "Timing & Meter",
+      "bending": "String Bending",
+      "vibrato": "Vibrato",
+      "phrasing": "Phrasing",
+      "tone": "Tone",
+      "play_by_ear": "Play by Ear",
+      "ear_quizzes": "Ear Quizzes",
+      "improvisation": "Improvisation",
+      "composition": "Composition"
+    }
   }
 }

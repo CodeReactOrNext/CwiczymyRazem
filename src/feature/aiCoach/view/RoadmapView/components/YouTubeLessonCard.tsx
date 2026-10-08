@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
+import { useTranslation } from "hooks/useTranslation";
 import { Clock } from "lucide-react";
 import { FaYoutube } from "react-icons/fa6";
 
@@ -33,6 +34,7 @@ const YouTubeLessonCard = ({
   className,
   onClick,
 }: YouTubeLessonCardProps) => {
+  const { t } = useTranslation("ai_coach");
   const handleClick = () => {
     if (onClick) {
       onClick();
@@ -86,7 +88,7 @@ const YouTubeLessonCard = ({
                 "rounded px-2 py-0.5 text-[11px] font-semibold capitalize",
                 levelStyle,
               )}>
-              {lesson.level}
+              {t(`lesson_levels.${levelKey}`, lesson.level)}
             </span>
           )}
           {!!lesson.duration && (

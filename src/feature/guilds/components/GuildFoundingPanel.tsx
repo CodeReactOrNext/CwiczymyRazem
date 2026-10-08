@@ -6,6 +6,7 @@ import { useGuildMutations, useGuilds } from "feature/guilds/hooks/useGuilds";
 import { GUILD_SEATS_PER_UPGRADE } from "feature/supporterPanel/constants/supporterPanel.constants";
 import type { SupporterWallet } from "feature/supporterPanel/types/supporterPanel.types";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Plus, Shield, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -26,6 +27,7 @@ export const GuildFoundingPanel = ({
   wallet: SupporterWallet | undefined;
   enabled: boolean;
 }) => {
+  const { t } = useTranslation("guilds");
   const [isFounding, setIsFounding] = useState(false);
   const uid = useAppSelector(selectUserAuth);
   const { data, isLoading } = useGuilds(enabled);
@@ -61,8 +63,11 @@ export const GuildFoundingPanel = ({
                 </h3>
                 <p className='mt-0.5 inline-flex items-center gap-1.5 text-xs text-zinc-500'>
                   <Users size={12} />
-                  {myGuild.memberCount} of {myGuild.memberLimit} seats
-                  {myGuild.founderUid === uid && " · yours"}
+                  {t("founding.seats", {
+                    count: myGuild.memberCount,
+                    limit: myGuild.memberLimit,
+                  })}
+                  {myGuild.founderUid === uid && ` · ${t("founding.yours")}`}
                 </p>
               </div>
             </div>
@@ -70,7 +75,7 @@ export const GuildFoundingPanel = ({
             <Button asChild variant='ghost' className='h-9 text-zinc-300'>
               <Link href='/guilds'>
                 <span className='flex items-center gap-2'>
-                  Open it
+                  {t("founding.open")}
                   <ArrowRight size={14} />
                 </span>
               </Link>
@@ -79,11 +84,9 @@ export const GuildFoundingPanel = ({
 
           <p className='text-sm text-zinc-400'>
             {myGuild.founderUid === uid
-              ? "You founded this one, and a person belongs to one guild at a time. A founder can only leave once everyone else has."
-              : "You are in a guild, and a person belongs to one at a time. Leave it from the Guilds page before founding your own."}{" "}
-            Seats come {GUILD_SEATS_PER_UPGRADE} at a time for tokens, and
-            anybody inside can buy them — the button sits on the guild&apos;s
-            own card at /guilds.
+              ? t("founding.founder_note")
+              : t("founding.member_note")}{" "}
+            {t("founding.seats_note", { count: GUILD_SEATS_PER_UPGRADE })}
           </p>
         </section>
       ) : (
@@ -94,15 +97,12 @@ export const GuildFoundingPanel = ({
             </span>
             <div>
               <h3 className='flex items-center gap-1.5 text-base font-bold text-zinc-100'>
-                Found a guild for
+                {t("founding.title")}
                 <SupportToken size={22} />
                 {data.foundingCost}
               </h3>
               <p className='mt-1 max-w-xl text-sm leading-relaxed text-zinc-400'>
-                The dearest thing in the panel, because it is the only one that
-                takes something nobody else can have afterwards: a name and a
-                tag, permanently. Anyone can then ask to join, and you decide
-                who gets in.
+                {t("founding.body")}
               </p>
             </div>
           </div>
@@ -113,12 +113,12 @@ export const GuildFoundingPanel = ({
                 <Plus size={16} />
                 {canAfford ? (
                   <span className='flex items-center gap-1.5'>
-                    Found it for
+                    {t("founding.cta")}
                     <SupportToken size={20} />
                     {data.foundingCost}
                   </span>
                 ) : (
-                  "Not enough tokens"
+                  t("founding.not_enough")
                 )}
               </span>
             </Button>
@@ -126,7 +126,7 @@ export const GuildFoundingPanel = ({
             <Link
               href='/guilds'
               className='text-xs text-zinc-500 transition-colors hover:text-zinc-300'>
-              See the guilds that already exist →
+              {t("founding.see_existing")}
             </Link>
           </div>
         </section>

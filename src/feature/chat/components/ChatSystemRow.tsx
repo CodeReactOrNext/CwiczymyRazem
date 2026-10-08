@@ -2,7 +2,6 @@ import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import type { ChatMessageType } from "feature/chat/types/chat.types";
-import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
 import { useTranslation } from "hooks/useTranslation";
 import { Hand, Shield } from "lucide-react";
 import type { ReactNode } from "react";
@@ -134,12 +133,10 @@ const JoinRow = ({
 
 /** Rows drawn like someone speaking, on the left, rather than as a line across the room. */
 export const isJoinRow = (message: ChatMessageType) =>
-  message.type === "welcome" ||
-  (message.type === "system" && message.system?.kind === "member_joined");
+  message.type === "system" && message.system?.kind === "member_joined";
 
 /**
- * Rows the room writes itself: a new player arriving, and in a guild the
- * level-ups and new members. They keep a room from looking
+ * Rows a guild room writes itself: its level-ups and new members. They keep a room from looking
  * empty when nobody is typing — and each one is something to answer.
  */
 export const ChatSystemRow = ({
@@ -154,23 +151,6 @@ export const ChatSystemRow = ({
   greeters?: ChatMessageType[];
 }) => {
   const { t } = useTranslation("chat");
-  if (message.type === "welcome") {
-    const phrase = welcomeGoalPhrase(
-      message.welcome?.goal,
-      message.welcome?.planTitle,
-      t,
-    );
-
-    return (
-      <JoinRow
-        message={message}
-        text={phrase ? t("system.joined_with", { phrase }) : t("system.joined")}
-        onSayHi={onSayHi}
-        greeters={greeters}
-      />
-    );
-  }
-
   const event = message.system;
   if (!event) return null;
 

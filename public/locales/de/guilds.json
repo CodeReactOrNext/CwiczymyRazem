@@ -1,0 +1,817 @@
+{
+  "tabs": {
+    "browse": "Gilden",
+    "members": "Mitglieder",
+    "chat": "Chat",
+    "stash": "Lager",
+    "quests": "Quests",
+    "upgrades": "Upgrades",
+    "kit": "Look"
+  },
+  "tab_locked": "{{label}} — tritt zuerst einer Gilde bei",
+  "seats_taken": "{{count}} von {{limit}} Plätzen belegt",
+  "lvl": "Lvl",
+  "level_ring": "Gildenlevel {{level}} · {{done}} von {{lap}} Quests in dieser Runde",
+  "needs_guild": {
+    "title": "Tritt zuerst einer Gilde bei",
+    "browse": "Gilden ansehen",
+    "members": "Die Mitgliederliste sind die Leute, mit denen du in einer Gilde bist — und du bist noch in keiner.",
+    "chat": "Der Chat ist für die Leute, mit denen du spielst.",
+    "stash": "Das Regal gehört einer Gilde, und du bist in keiner.",
+    "quests": "Quests werden von einer Gilde geschafft, und du bist noch in keiner.",
+    "upgrades": "Upgrades bezahlt eine Gilde, und du bist noch in keiner."
+  },
+  "header": {
+    "founded_by": "Gegründet von {{name}}.",
+    "intro": "Finde Leute, mit denen du üben kannst. Beitreten ist kostenlos."
+  },
+  "browser": {
+    "rank": "Platz {{rank}}",
+    "yours": "Deine",
+    "by": "von {{name}}",
+    "level": "Level {{level}}",
+    "leave": "Verlassen",
+    "waiting": "Wartet",
+    "turned_down": "Abgelehnt",
+    "withdraw": "Zurückziehen",
+    "clear": "Entfernen",
+    "no_seats": "Keine freien Plätze",
+    "leave_first": "Verlass deine Gilde, bevor du einer anderen beitreten willst",
+    "full": "Voll",
+    "join": "Beitreten",
+    "asking": "Beitrittsanfragen",
+    "already_turned_down": "Bereits abgelehnt — die Person kann die Anfrage noch zurückziehen.",
+    "accept": "Annehmen",
+    "intro": "Gilden steigen auf, indem sie gemeinsam Quests schaffen. Beitreten ist kostenlos.",
+    "leave_before_founding": "Verlass deine Gilde, bevor du eine gründest",
+    "not_enough_tokens": "Nicht genug Tokens übrig",
+    "name_yours": "Der Name gehört dir für immer",
+    "found": "Gilde gründen",
+    "search": "Gilden nach Name, Tag oder Beschreibung suchen…",
+    "empty_title": "Noch keine Gilden",
+    "empty_body": "Noch niemand hat sich einen Namen gesichert. Der erste ist noch frei.",
+    "no_match": "Keine Gilde passt zu „{{search}}“",
+    "ranking": "Gildenrangliste"
+  },
+  "members": {
+    "sessions_one": "1 Session",
+    "sessions": "{{count}} Sessions",
+    "hours": "{{hours}} Std. Übung",
+    "honor_title": "{{earned}} Ehre verdient · {{balance}} übrig für das Regal",
+    "founder": "Gründer",
+    "you": "Das bist du",
+    "roster": "Mitgliederliste",
+    "room_for": "Platz für {{count}} weitere",
+    "room_full": "alle Plätze belegt — weitere gibt es im Tab Upgrades",
+    "together": "{{sessions}} Sessions und {{hours}} gemeinsam",
+    "together_since": "{{sessions}} Sessions und {{hours}} gemeinsam seit {{since}}",
+    "honor_explainer": "Ehre ist die eigene Währung der Gilde: Du verdienst sie, indem du Fame, Tokens oder Equipment in die Gilde steckst, und gibst sie aus, wenn du Equipment aus dem Regal nimmst."
+  },
+  "upgrades": {
+    "intro": "Alle legen zusammen, und ein Upgrade kauft sich selbst, sobald sein Topf voll ist. Alles, was du einzahlst, bringt dir {{honor}} für das Regal.",
+    "honor": "Ehre",
+    "seats_title": "Mehr Plätze",
+    "all_seats": "Alle {{count}} Plätze belegt",
+    "seats_buys": "{{count}} weitere Plätze",
+    "seats_max": "eine Gilde hat höchstens {{count}} Plätze",
+    "rows_title": "Noch eine Regalreihe",
+    "rows_one": "Das Lager hat 1 Reihe",
+    "rows": "Das Lager hat {{count}} Reihen",
+    "rows_buys": "eine Reihe mehr",
+    "rows_max": "ein Regal hat höchstens {{count}} Reihen"
+  },
+  "founding": {
+    "seats": "{{count}} von {{limit}} Plätzen",
+    "yours": "deine",
+    "open": "Öffnen",
+    "founder_note": "Du hast diese Gilde gegründet, und jede Person gehört immer nur zu einer Gilde. Gründer können erst gehen, wenn alle anderen gegangen sind.",
+    "member_note": "Du bist in einer Gilde, und jede Person gehört immer nur zu einer. Verlass sie auf der Gilden-Seite, bevor du deine eigene gründest.",
+    "seats_note": "Plätze gibt es für Tokens, jeweils {{count}} auf einmal, und jedes Mitglied kann sie kaufen — der Button sitzt auf der Karte der Gilde unter /guilds.",
+    "title": "Gilde gründen für",
+    "body": "Das Teuerste im Panel, weil es als Einziges etwas nimmt, das danach niemand sonst haben kann: einen Namen und einen Tag, dauerhaft. Danach kann jeder um Beitritt bitten, und du entscheidest, wer reinkommt.",
+    "cta": "Gründen für",
+    "not_enough": "Nicht genug Tokens",
+    "see_existing": "Bestehende Gilden ansehen →"
+  },
+  "fund": {
+    "member_left": "ein ehemaliges Mitglied",
+    "paid_by": "Bezahlt von",
+    "and_more": "und {{count}} weiteren",
+    "maxed": "Ausgereizt — {{maxed}}.",
+    "next_step": "Der nächste Schritt bringt {{buys}}",
+    "wallet_empty": "Diesmal ist nichts mehr in deiner Wallet.",
+    "you_have": "Du hast {{count}} Tokens",
+    "chip_in": "Beisteuern"
+  },
+  "treasury": {
+    "filled_by": "Eingezahlt von",
+    "title": "Fame der Gilde",
+    "counting_towards": "Zählt für {{goal}}.",
+    "counts": "Zählt für die Quests der Gilde und wird nie ausgegeben.",
+    "empty": "Diesmal hast du selbst kein Fame.",
+    "you_have": "Du hast {{count}} Fame",
+    "put_in": "Einzahlen",
+    "bank": "Gerade liegen {{fame}} Fame in der Kasse.",
+    "bank_spent": "Gerade liegen {{fame}} Fame in der Kasse, {{spent}} wurden ausgegeben, als das noch ging."
+  },
+  "honor": {
+    "left_by": "abgelegt von {{name}}",
+    "a_member": "einem Mitglied",
+    "costs": "Kostet",
+    "yours": "Deine Ehre",
+    "take_for": "Für {{cost}} Ehre nehmen",
+    "short": "Dir fehlen {{count}} Ehre",
+    "how_to_earn": "Ehre verdienst du, indem du etwas in die Gilde steckst: Fame in die Kasse, Tokens in einen Topf oder Equipment in dieses Regal.",
+    "take_label": "Nehmen für",
+    "amount": "{{count}} Ehre"
+  },
+  "deposit": {
+    "title": "{{name}} im Gildenlager ablegen",
+    "into_stash": "ins Gildenlager",
+    "earns": "Bringt dir",
+    "from_then_on": "Ab dann gehört es der Gilde — jedes Mitglied kann es nehmen.",
+    "leaving": "Wird abgelegt…",
+    "confirm": "Im Lager ablegen"
+  },
+  "badge": {
+    "with_level": "Gilde: {{tag}} · Level {{level}}",
+    "plain": "Gilde: {{tag}}"
+  },
+  "cover": {
+    "your_honor": "Deine Ehre: {{earned}} verdient · {{balance}} für das Regal"
+  },
+  "units": {
+    "sessions": "{{value}} Sessions",
+    "sessions_one": "{{value}} Session",
+    "hours": "{{value}} Std.",
+    "fame": "{{value}} Fame",
+    "members": "{{value}} Mitglieder",
+    "members_one": "{{value}} Mitglied",
+    "songs": "{{value}} Songs",
+    "songs_one": "{{value}} Song",
+    "recordings": "{{value}} Aufnahmen",
+    "recordings_one": "{{value}} Aufnahme",
+    "quests": "{{value}} Quests",
+    "quests_one": "{{value}} Quest",
+    "exams": "{{value}} Prüfungen",
+    "exams_one": "{{value}} Prüfung",
+    "entries": "{{value}} Einsendungen",
+    "entries_one": "{{value}} Einsendung",
+    "points": "{{value}} Punkte",
+    "points_one": "{{value}} Punkt"
+  },
+  "asks": {
+    "all_categories": "{{amount}} in allen vier Kategorien",
+    "streak": "eine Serie von {{days}} Tagen"
+  },
+  "describe": {
+    "members": "{{count}} Mitglieder",
+    "members_one": "Ein Mitglied",
+    "each": "{{members}} mit je {{amount}}.",
+    "sessions": "{{amount}} zusammen.",
+    "time": "{{amount}} Übung insgesamt.",
+    "technique": "{{amount}} Technik.",
+    "theory": "{{amount}} Theorie.",
+    "hearing": "{{amount}} Gehörbildung.",
+    "creativity": "{{amount}} kreatives Spielen.",
+    "points": "{{count}} Übungspunkte zusammen.",
+    "all_categories": "{{members}} mit {{amount}} in jeder der vier Kategorien.",
+    "treasury": "{{amount}} in die Kasse der Gilde eingezahlt.",
+    "streak": "{{members}} gleichzeitig mit einer Serie von {{days}} Tagen.",
+    "songs": "{{amount}} als gelernt markiert.",
+    "recordings": "{{amount}} veröffentlicht.",
+    "exams": "{{count}} bestandene Journey-Prüfungen.",
+    "daily_quests": "{{count}} erledigte tägliche Quests.",
+    "submissions": "{{amount}} zur monatlichen Challenge."
+  },
+  "quests": {
+    "waiting": "Fame, das auf dich wartet",
+    "fame": "{{amount}} Fame",
+    "plus_fame": "+{{amount}} Fame",
+    "claim": "{{amount}} Fame abholen",
+    "cleared_while_here": "{{count}} Quests geschafft, während du in der Gilde warst.",
+    "cleared_while_here_one": "Eine Quest geschafft, während du in der Gilde warst.",
+    "all_taken": "Alles aus den Quests, bei denen du dabei warst, ist abgeholt. Die nächste Belohnung landet hier.",
+    "guild_level": "Gildenlevel {{level}}",
+    "level": "Level",
+    "lap": "Runde {{lap}}",
+    "level_up": "Jede geschaffte Quest bringt ein Level und {{reward}}.",
+    "lap_cleared": "{{done}} von {{total}} Quests geschafft",
+    "lap_cleared_on": "{{done}} von {{total}} Quests in Runde {{lap}} geschafft",
+    "chapter_of": "Kapitel {{index}} von {{total}}",
+    "chapter_of_cap": "Kapitel {{index}} von {{total}}",
+    "chapter": "Kapitel {{index}}",
+    "road_ahead": "Der Weg vor euch",
+    "ladder": "Zehn Kapitel mit je fünf Quests, eins nach dem anderen freigeschaltet. Spätere Kapitel verlangen mehr und zahlen mehr.",
+    "ladder_lap": "Nach dem zehnten beginnt die Leiter von vorn — das ist Runde {{lap}}, jedes Ziel und jede Belohnung ×{{times}}.",
+    "ladder_first": "Nach dem zehnten beginnt die Leiter von vorn, alle Zahlen verdoppelt, dann verdreifacht — sie endet nie.",
+    "you_are_here": "ihr seid hier",
+    "n_quests": "{{count}} Quests",
+    "n_cleared": "{{done}} von {{total}} geschafft",
+    "per_member": "pro Mitglied und Quest",
+    "chapter_cleared": "Kapitel geschafft",
+    "to_clear": "{{count}} Quests offen",
+    "to_clear_one": "Eine Quest offen",
+    "clear_all_five": "Schafft alle fünf, dann öffnet sich das nächste Kapitel.",
+    "cleared_of": "{{done}} von {{total}} geschafft",
+    "cleared_in_chapter": "In diesem Kapitel geschafft",
+    "counted": "Gezählt über alle in der Mitgliederliste. Eine Quest, die Mitglieder zählt, ist geschafft, wenn genug von ihnen das Ziel erreichen; alles andere summiert sich über die ganze Gilde.",
+    "counted_since": "Gezählt über alle in der Mitgliederliste seit {{since}}. Eine Quest, die Mitglieder zählt, ist geschafft, wenn genug von ihnen das Ziel erreichen; alles andere summiert sich über die ganze Gilde.",
+    "chapters": {
+      "0": {
+        "name": "Aufwärmen",
+        "blurb": "Gemeinsam auftauchen und anfangen zu zählen."
+      },
+      "1": {
+        "name": "Probe",
+        "blurb": "Die Stunden summieren sich, und die Ohren steigen mit ein."
+      },
+      "2": {
+        "name": "Repertoire",
+        "blurb": "Songs gelernt, Songs gespielt, Songs aufgenommen."
+      },
+      "3": {
+        "name": "Disziplin",
+        "blurb": "Alle ziehen mit, jeden Tag."
+      },
+      "4": {
+        "name": "Balance",
+        "blurb": "Jede Seite des Spielens, von jedem Mitglied."
+      },
+      "5": {
+        "name": "Tempo",
+        "blurb": "Geprüft, tausend Sessions tief, mit der passenden Theorie."
+      },
+      "6": {
+        "name": "Bühne",
+        "blurb": "Vor Publikum, mit dem Namen der Gilde drauf."
+      },
+      "7": {
+        "name": "Maschine",
+        "blurb": "Die Gilde läuft von selbst. Tausend Stunden im Rücken."
+      },
+      "8": {
+        "name": "Gelehrte",
+        "blurb": "Die schweren Kategorien, in ernsthaften Mengen."
+      },
+      "9": {
+        "name": "Legenden",
+        "blurb": "Zahlen, die die meisten Gilden nie sehen."
+      }
+    },
+    "items": {
+      "sessions-100": {
+        "name": "Die ersten Hundert",
+        "blurb": "Hundert Übungssessions zusammen."
+      },
+      "hours-50": {
+        "name": "Fünfzig Stunden",
+        "blurb": "Fünfzig Stunden Übung insgesamt."
+      },
+      "members-sessions-5-x3": {
+        "name": "Drei Stammgäste",
+        "blurb": "Drei Mitglieder mit je fünf Sessions."
+      },
+      "technique-10": {
+        "name": "Hand anlegen",
+        "blurb": "Zehn Stunden Technik."
+      },
+      "treasury-300": {
+        "name": "Startkapital",
+        "blurb": "Dreihundert Fame in die Kasse der Gilde eingezahlt."
+      },
+      "sessions-250": {
+        "name": "Ein Viertel Tausend",
+        "blurb": "Zweihundertfünfzig Sessions."
+      },
+      "hours-150": {
+        "name": "Langstrecke",
+        "blurb": "Hundertfünfzig Stunden Übung."
+      },
+      "theory-25": {
+        "name": "Bücherwürmer",
+        "blurb": "Fünfundzwanzig Stunden Theorie."
+      },
+      "hearing-25": {
+        "name": "Offene Ohren",
+        "blurb": "Fünfundzwanzig Stunden Gehörbildung."
+      },
+      "streak-7-x3": {
+        "name": "Drei Flammen",
+        "blurb": "Drei Mitglieder gleichzeitig mit einer Sieben-Tage-Serie."
+      },
+      "songs-learned-25": {
+        "name": "Setlist",
+        "blurb": "Fünfundzwanzig Songs in der ganzen Gilde als gelernt markiert."
+      },
+      "points-2000": {
+        "name": "Zweitausend Punkte",
+        "blurb": "Zweitausend Übungspunkte zusammen."
+      },
+      "recordings-5": {
+        "name": "Auf Band",
+        "blurb": "Fünf von Mitgliedern veröffentlichte Aufnahmen."
+      },
+      "technique-50": {
+        "name": "Fünfzig Technik",
+        "blurb": "Fünfzig Stunden Technik."
+      },
+      "creativity-25": {
+        "name": "Proberaum",
+        "blurb": "Fünfundzwanzig Stunden kreatives Spielen."
+      },
+      "sessions-500": {
+        "name": "Fünfhundert",
+        "blurb": "Fünfhundert Sessions."
+      },
+      "hours-300": {
+        "name": "Dreihundert Stunden",
+        "blurb": "Dreihundert Stunden Übung."
+      },
+      "members-sessions-20-x4": {
+        "name": "Vier Stammgäste",
+        "blurb": "Vier Mitglieder mit je zwanzig Sessions."
+      },
+      "daily-quests-30": {
+        "name": "Questlog",
+        "blurb": "Dreißig tägliche Quests zusammen erledigt."
+      },
+      "streak-30-x1": {
+        "name": "Der Monat",
+        "blurb": "Ein Mitglied mit einer Dreißig-Tage-Serie."
+      },
+      "technique-100": {
+        "name": "Hundert Technik",
+        "blurb": "Hundert Stunden Technik."
+      },
+      "theory-50": {
+        "name": "Theorie fünfzig",
+        "blurb": "Fünfzig Stunden Theorie."
+      },
+      "hearing-50": {
+        "name": "Gehör fünfzig",
+        "blurb": "Fünfzig Stunden Gehörbildung."
+      },
+      "creativity-50": {
+        "name": "Kreativ fünfzig",
+        "blurb": "Fünfzig Stunden kreatives Spielen."
+      },
+      "members-all-categories-x4": {
+        "name": "Allrounder",
+        "blurb": "Vier Mitglieder mit je einer Stunde in allen vier Kategorien."
+      },
+      "theory-100": {
+        "name": "Theorie hundert",
+        "blurb": "Hundert Stunden Theorie."
+      },
+      "exams-10": {
+        "name": "Geprüft",
+        "blurb": "Zehn bestandene Journey-Prüfungen."
+      },
+      "sessions-1000": {
+        "name": "Eintausend",
+        "blurb": "Tausend Sessions."
+      },
+      "hours-600": {
+        "name": "Sechshundert Stunden",
+        "blurb": "Sechshundert Stunden Übung."
+      },
+      "hearing-100": {
+        "name": "Gehör hundert",
+        "blurb": "Hundert Stunden Gehörbildung."
+      },
+      "recordings-20": {
+        "name": "Zwanzig Bänder",
+        "blurb": "Zwanzig veröffentlichte Aufnahmen."
+      },
+      "submissions-5": {
+        "name": "Herausforderer",
+        "blurb": "Fünf Einsendungen zur monatlichen Challenge."
+      },
+      "songs-learned-50": {
+        "name": "Fünfzig Songs",
+        "blurb": "Fünfzig Songs als gelernt markiert."
+      },
+      "points-20000": {
+        "name": "Zwanzigtausend Punkte",
+        "blurb": "Zwanzigtausend Übungspunkte zusammen."
+      },
+      "treasury-3000": {
+        "name": "Kriegskasse",
+        "blurb": "Dreitausend Fame in die Kasse der Gilde eingezahlt."
+      },
+      "sessions-2000": {
+        "name": "Zweitausend",
+        "blurb": "Zweitausend Sessions."
+      },
+      "hours-1000": {
+        "name": "Tausend Stunden",
+        "blurb": "Tausend Stunden Übung."
+      },
+      "technique-250": {
+        "name": "Technik 250",
+        "blurb": "Zweihundertfünfzig Stunden Technik."
+      },
+      "members-sessions-50-x5": {
+        "name": "Fünf Stammgäste",
+        "blurb": "Fünf Mitglieder mit je fünfzig Sessions."
+      },
+      "streak-14-x5": {
+        "name": "Fünf Flammen",
+        "blurb": "Fünf Mitglieder gleichzeitig mit einer Vierzehn-Tage-Serie."
+      },
+      "theory-150": {
+        "name": "Theorie 150",
+        "blurb": "Hundertfünfzig Stunden Theorie."
+      },
+      "hearing-150": {
+        "name": "Gehör 150",
+        "blurb": "Hundertfünfzig Stunden Gehörbildung."
+      },
+      "creativity-150": {
+        "name": "Kreativ 150",
+        "blurb": "Hundertfünfzig Stunden kreatives Spielen."
+      },
+      "daily-quests-100": {
+        "name": "Hundert Quests",
+        "blurb": "Hundert erledigte tägliche Quests."
+      },
+      "exams-50": {
+        "name": "Fünfzig Prüfungen",
+        "blurb": "Fünfzig bestandene Journey-Prüfungen."
+      },
+      "sessions-5000": {
+        "name": "Fünftausend",
+        "blurb": "Fünftausend Sessions."
+      },
+      "hours-2500": {
+        "name": "2500 Stunden",
+        "blurb": "Zweieinhalbtausend Stunden Übung."
+      },
+      "songs-learned-100": {
+        "name": "Hundert Songs",
+        "blurb": "Hundert Songs als gelernt markiert."
+      },
+      "recordings-50": {
+        "name": "Fünfzig Bänder",
+        "blurb": "Fünfzig veröffentlichte Aufnahmen."
+      },
+      "streak-100-x1": {
+        "name": "Hundert Tage",
+        "blurb": "Ein Mitglied mit einer Hundert-Tage-Serie."
+      }
+    }
+  },
+  "card": {
+    "you_of": "du: {{mine}} / {{target}}",
+    "you_categories": "du: {{mine}} / {{count}} Kategorien",
+    "your_streak": "deine Serie: {{mine}} / {{count}} Tage",
+    "members_need": "{{count}} weitere Mitglieder brauchen {{ask}}",
+    "members_need_one": "1 weiteres Mitglied braucht {{ask}}",
+    "to_go": "noch {{amount}}",
+    "you": "du: {{amount}}",
+    "cleared_on": "Geschafft am {{date}}"
+  },
+  "spend": {
+    "token_amount": "{{amount}} Tokens",
+    "token_amount_one": "{{amount}} Token",
+    "fame_amount": "{{amount}} Fame",
+    "in_bank": "in der Kasse",
+    "covered": "gedeckt",
+    "have_of": "{{have}} von {{need}}",
+    "finish": "vollmachen"
+  },
+  "parts": {
+    "tier_part": "{{tier}}-Teil",
+    "of": "von {{count}}",
+    "how_many_leave": "Wie viele ablegen",
+    "how_many_take": "Wie viele nehmen",
+    "earns_honor": "bringt {{honor}} Ehre",
+    "costs_honor": "kostet {{honor}} Ehre",
+    "you_have": "du hast {{count}}",
+    "leave": "{{count}} ablegen",
+    "take": "{{count}} nehmen",
+    "leave_all": "Alle {{count}} ablegen",
+    "take_all": "Alle {{count}} nehmen"
+  },
+  "kit": {
+    "slot": "Platz {{index}}: {{icon}}",
+    "slot_lit": "Platz {{index}}: {{icon}} — du wählst gerade dafür",
+    "pick_for": "Wähle für Platz {{index}} — oder klick einen Platz an, um nur ihn zu ändern.",
+    "unlocked_of": "{{done}} von {{total}} freigeschaltet",
+    "unlocks_at": "wird auf Gildenlevel {{level}} freigeschaltet",
+    "unlocks_at_cap": "Wird auf Gildenlevel {{level}} freigeschaltet",
+    "wear_four": "Diese vier tragen",
+    "back_to_worn": "Zurück zur aktuellen Auswahl",
+    "worn_now": "Aktuell getragen",
+    "wear_it": "Tragen",
+    "lvl": "Lvl {{level}}",
+    "intro": "Die Karte links ist das, wie die Gilde überall sonst aussieht. Jede Farbe, jedes Banner, jedes Icon und jeder Tag unten ist kostenlos, und du wählst, weil du die Gilde gegründet hast. Die schlichteren gibt es von Anfang an; der Rest wird mit dem Gildenlevel freigeschaltet, und jede Kachel sagt, ab welchem. Wähl etwas aus, und kurz darauf trägt es die ganze Gilde.",
+    "unlocked_at_level": "{{done}} von {{total}} auf Gildenlevel {{level}} freigeschaltet"
+  },
+  "new": {
+    "logo_types": "Nur PNG, JPG oder WebP",
+    "logo_size": "Die Datei ist größer als {{mb}} MB",
+    "logo_unreadable": "Das Bild konnte nicht gelesen werden",
+    "description": "Kostet {{cost}} — du hast noch {{left}}. Name und Tag gehören nur dir, sobald du sie nimmst.",
+    "name": "Name",
+    "name_problems": {
+      "too-short": "Ein Gildenname hat mindestens {{min}} Zeichen",
+      "too-long": "Ein Gildenname hat höchstens {{max}} Zeichen",
+      "no-letters": "Ein Gildenname braucht Buchstaben oder Zahlen"
+    },
+    "tag": "Tag",
+    "tag_hint": "wird neben deinem Namen angezeigt",
+    "tag_problems": {
+      "too-short": "Ein Tag hat mindestens {{min}} Zeichen",
+      "too-long": "Ein Tag hat höchstens {{max}} Zeichen"
+    },
+    "picture": "Bild",
+    "picture_hint": "optional, quadratisch funktioniert am besten",
+    "change": "Ändern",
+    "add_image": "Bild hinzufügen",
+    "remove": "Entfernen",
+    "what_for": "Wofür ist sie",
+    "optional": "optional",
+    "what_for_placeholder": "Für wen sie ist, was ihr übt, wann ihr da seid.",
+    "cancel": "Abbrechen"
+  },
+  "stash": {
+    "on_shelf": "Im Regal",
+    "rows_of": "{{done}} von {{count}} Reihen",
+    "honor_title": "{{earned}} Ehre verdient, {{spent}} ausgegeben",
+    "guild_stash": "Gildenlager",
+    "empty": "Noch nichts hier. Zieh etwas aus deinem Equipment herunter, irgendjemand wird es brauchen.",
+    "full": "Das Regal ist voll — nimm etwas heraus oder steck ein paar Tokens in eine weitere Reihe im Tab Upgrades.",
+    "how": "Zieh einen Platz in dein eigenes Fach, um ihn zu nehmen, oder klick ihn an. Etwas abzulegen bringt Ehre je nach Seltenheit; etwas aus dem Regal zu nehmen kostet pauschal {{cost}}, bis zu {{limit}}-mal am Tag. Wer was abgelegt hat, steht unten in der Übersicht.",
+    "your_gear": "Dein Equipment",
+    "no_gear": "Du hast kein übriges Equipment zum Abgeben.",
+    "your_stash": "Dein Lager",
+    "gear_how": "Gitarren, Pedale, geborgene Teile und gerettete Mods kommen alle ins Regal — zieh sie nach oben oder klick sie an. Innerhalb dieses Boards ziehen ordnet nur um, und genau diese Anordnung zeigt dein Arsenal. Ausgerüstetes wird für dich abgelegt; ein Pedal muss zuerst vom Board.",
+    "ledger_title": "Wer gibt, wer nimmt",
+    "ledger_body": "Jede Einlage und jede Entnahme, pro Mitglied gezählt.",
+    "recent": "Letzte Bewegungen",
+    "log_left": "{{name}} hat {{item}} abgelegt",
+    "log_took": "{{name}} hat {{item}} genommen",
+    "take_it": "Nehmen",
+    "how_many": "Wie viele"
+  },
+  "cosmetics": {
+    "slots": {
+      "accent": {
+        "label": "Farbe",
+        "blurb": "Aus ihr wird der Rest des Looks abgeleitet — ändere sie, und Banner, Icons und Rahmen folgen."
+      },
+      "banner": {
+        "label": "Banner",
+        "blurb": "Der Streifen oben auf deiner Karte, in der Gildenliste und auf dieser Seite."
+      },
+      "motif": {
+        "label": "Icons",
+        "blurb": "Die vier Icons, die sich über das Banner ziehen. Vier beliebige."
+      },
+      "frame": {
+        "label": "Tag",
+        "blurb": "Wie dein Tag neben dem Namen jedes Mitglieds in der Rangliste aussieht."
+      }
+    },
+    "items": {
+      "accent_steel": {
+        "name": "Stahl",
+        "blurb": "Die schlichte, mit der jede Gilde startet."
+      },
+      "accent_ivory": {
+        "name": "Elfenbein",
+        "blurb": "Fast weiß. Fällt in der Rangliste vor allem anderen auf."
+      },
+      "accent_bone": {
+        "name": "Knochen",
+        "blurb": "Warmes Grau, wie ein altes Schlagbrett."
+      },
+      "accent_signal": {
+        "name": "Signal",
+        "blurb": "Das Cyan der App selbst."
+      },
+      "accent_sky": {
+        "name": "Himmel",
+        "blurb": "Heller und kühler als Kobalt."
+      },
+      "accent_cobalt": {
+        "name": "Kobalt",
+        "blurb": "Tiefes Blau, kalt wie ein Proberaum im Februar."
+      },
+      "accent_indigo": {
+        "name": "Indigo",
+        "blurb": "Blau mit einem Hang zu Violett."
+      },
+      "accent_nightshade": {
+        "name": "Nachtschatten",
+        "blurb": "Violett — die Farbe der seltenen Stufe."
+      },
+      "accent_neon": {
+        "name": "Neon",
+        "blurb": "Fuchsia. Nichts sonst in der Rangliste sieht so aus."
+      },
+      "accent_bubblegum": {
+        "name": "Kaugummi",
+        "blurb": "Pink, und ohne Entschuldigung."
+      },
+      "accent_crimson": {
+        "name": "Karmesin",
+        "blurb": "Laut, und niemand sonst in der Rangliste trägt es."
+      },
+      "accent_ember": {
+        "name": "Glut",
+        "blurb": "Serien-Orange, für eine Gilde, die nie aussetzt."
+      },
+      "accent_brass": {
+        "name": "Messing",
+        "blurb": "Das Gold von Fame selbst."
+      },
+      "accent_sulphur": {
+        "name": "Schwefel",
+        "blurb": "Gelb, eine Spur schärfer als Messing."
+      },
+      "accent_acid": {
+        "name": "Säure",
+        "blurb": "Limette. Auf andere Art laut als Karmesin."
+      },
+      "accent_verdant": {
+        "name": "Grün",
+        "blurb": "Grün, die Farbe einer geschafften Woche."
+      },
+      "accent_lagoon": {
+        "name": "Lagune",
+        "blurb": "Petrol, zwischen dem Cyan der App und einer geschafften Woche."
+      },
+      "banner_none": {
+        "name": "Schlicht",
+        "blurb": "Gar keine Farbe — nur deine Icons auf dem schlichten Streifen."
+      },
+      "banner_wash": {
+        "name": "Lasur",
+        "blurb": "Diagonal: die Farbe setzt oben links an und läuft nach unten rechts aus."
+      },
+      "banner_aurora": {
+        "name": "Aurora",
+        "blurb": "Von links nach rechts durch die beiden Nachbarn der Farbe."
+      },
+      "banner_sunburst": {
+        "name": "Sonnenaufgang",
+        "blurb": "Oben dunkel, die Farbe sammelt sich zur Unterkante hin."
+      },
+      "banner_stage": {
+        "name": "Dämmerung",
+        "blurb": "Von der Farbe oben rechts in ihren kühleren Nachbarn unten links."
+      },
+      "banner_halo": {
+        "name": "Verlauf",
+        "blurb": "Aus dem Dunkel links in die Farbe rechts."
+      },
+      "frame_plain": {
+        "name": "Schlicht",
+        "blurb": "Tag in der Gildenfarbe, nichts drumherum."
+      },
+      "frame_ring": {
+        "name": "Ring",
+        "blurb": "Ein dünner Ring in der Gildenfarbe."
+      },
+      "frame_double": {
+        "name": "Doppelt",
+        "blurb": "Zwei dünne Ringe mit einem Hauch Dunkel dazwischen."
+      },
+      "frame_plate": {
+        "name": "Plakette",
+        "blurb": "Gefüllt, damit der Tag in einer vollen Zeile zuerst auffällt."
+      },
+      "frame_heavy": {
+        "name": "Schwer",
+        "blurb": "Gefüllt und umrandet. Lauter wird ein Tag nicht."
+      },
+      "frame_solid": {
+        "name": "Massiv",
+        "blurb": "Ein Farbblock mit dem Tag schwarz ausgeschnitten."
+      },
+      "frame_pill": {
+        "name": "Pille",
+        "blurb": "Gefüllt und ganz abgerundet, wie ein Button, der nie etwas tut."
+      },
+      "frame_sunken": {
+        "name": "Vertieft",
+        "blurb": "In die Zeile geschnitten: ein dunkler Schlitz mit dem Tag in Farbe."
+      },
+      "frame_brackets": {
+        "name": "Klammern",
+        "blurb": "Ein Farbbalken auf jeder Seite des Tags."
+      },
+      "frame_dot": {
+        "name": "Punkt",
+        "blurb": "Ein Farbpunkt vor dem Tag, wie eine Statusleuchte vor einem Namen."
+      }
+    },
+    "motif_groups": {
+      "instruments": "Instrumente",
+      "beasts": "Bestien",
+      "arms": "Waffen & Wappen",
+      "elements": "Elemente",
+      "things": "Alles andere"
+    },
+    "motif_icons": {
+      "guitar": "Gitarre",
+      "bass": "Bass-Kopfplatte",
+      "headstock": "Kopfplatte",
+      "notes": "Noten",
+      "score": "Partitur",
+      "mic": "Mikrofon",
+      "oldmic": "Altes Mikrofon",
+      "speaker": "Lautsprecher",
+      "headphones": "Kopfhörer",
+      "drum": "Trommel",
+      "drumkit": "Schlagzeug",
+      "piano": "Klaviertasten",
+      "keyboard": "Keyboard",
+      "trombone": "Posaune",
+      "cassette": "Kassette",
+      "vinyl": "Schallplatte",
+      "horn": "Horn",
+      "metalhand": "Pommesgabel",
+      "skull": "Totenkopf",
+      "crossbones": "Totenkopf mit Knochen",
+      "bones": "Gekreuzte Knochen",
+      "pirate": "Piratenschädel",
+      "burning": "Brennender Schädel",
+      "dragon": "Drache",
+      "wolf": "Wolf",
+      "howl": "Heulender Wolf",
+      "werewolf": "Werwolf",
+      "raven": "Rabe",
+      "eagle": "Adler",
+      "lion": "Löwe",
+      "tiger": "Tiger",
+      "bear": "Bär",
+      "bull": "Stier",
+      "snake": "Schlange",
+      "spider": "Spinne",
+      "web": "Spinnennetz",
+      "bat": "Fledermaus",
+      "owl": "Eule",
+      "cat": "Katze",
+      "shark": "Hai",
+      "octopus": "Krake",
+      "scorpion": "Skorpion",
+      "reaper": "Sensenmann",
+      "ghost": "Geist",
+      "devil": "Teufel",
+      "robot": "Roboter",
+      "crown": "Krone",
+      "imperial": "Kaiserkrone",
+      "laurel": "Lorbeerkranz",
+      "swords": "Gekreuzte Schwerter",
+      "sword": "Schwert",
+      "axes": "Gekreuzte Äxte",
+      "battleaxe": "Streitaxt",
+      "hammer": "Hammer",
+      "warhammer": "Kriegshammer",
+      "shield": "Schild",
+      "spartan": "Spartanerhelm",
+      "viking": "Wikingerhelm",
+      "knight": "Ritterhelm",
+      "samurai": "Samuraihelm",
+      "hornedhelm": "Hörnerhelm",
+      "castle": "Burg",
+      "banner": "Banner",
+      "pirateflag": "Piratenflagge",
+      "fist": "Faust",
+      "anarchy": "Anarchie",
+      "wings": "Flügel",
+      "angelwings": "Engelsflügel",
+      "bullseye": "Zielscheibe",
+      "bomb": "Bombe",
+      "key": "Dietrich",
+      "flame": "Flamme",
+      "candle": "Kerze",
+      "campfire": "Lagerfeuer",
+      "lightning": "Blitz",
+      "storm": "Sturm",
+      "sun": "Sonne",
+      "moon": "Mond",
+      "star": "Stern",
+      "shuriken": "Shuriken",
+      "comet": "Komet",
+      "crystal": "Kristallkugel",
+      "potion": "Trank",
+      "heart": "Geflügeltes Herz",
+      "rose": "Rose und Dolch",
+      "beer": "Bier",
+      "drinkinghorn": "Trinkhorn",
+      "coffee": "Kaffee",
+      "anvil": "Amboss",
+      "gears": "Zahnräder",
+      "dice": "Würfel",
+      "trophy": "Pokal",
+      "rocket": "Rakete",
+      "compass": "Kompass",
+      "anchor": "Anker"
+    }
+  }
+}

@@ -2,8 +2,10 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { SlateItemArt } from "feature/supporterCase/components/SlateItemArt";
 import { useSupporterCase } from "feature/supporterCase/hooks/useSupporterCase";
+import { useTranslation } from "hooks/useTranslation";
 import { CalendarClock, Heart, Package } from "lucide-react";
 import Link from "next/link";
 
@@ -26,6 +28,8 @@ export const SupporterCaseCard = ({
   onOpen,
   isOpening,
 }: SupporterCaseCardProps) => {
+  const { t } = useTranslation(["supporter", "arsenal"]);
+  const labels = useArsenalLabels();
   const { data: state } = useSupporterCase();
   const caseDef = CASE_DEFINITIONS.supporter;
 
@@ -42,16 +46,16 @@ export const SupporterCaseCard = ({
           </span>
           <div>
             <h3 className='flex items-center gap-2 text-lg font-bold text-zinc-100'>
-              {caseDef.name}
+              {t("arsenal:cases.supporter.name", caseDef.name)}
               <Heart
                 size={13}
                 fill='currentColor'
                 className='text-amber-400'
-                aria-label='Chosen by supporters'
+                aria-label={t("panel.case.chosen_by")}
               />
             </h3>
             <p className='mt-0.5 text-sm text-zinc-400'>
-              {caseDef.description}
+              {t("arsenal:cases.supporter.description", caseDef.description)}
             </p>
           </div>
         </div>
@@ -60,8 +64,8 @@ export const SupporterCaseCard = ({
           <span className='inline-flex items-center gap-1.5 text-xs text-zinc-500'>
             <CalendarClock size={13} />
             {state.daysLeft === 1
-              ? "new slate tomorrow"
-              : `new slate in ${state.daysLeft} days`}
+              ? t("panel.case.slate_tomorrow")
+              : t("panel.case.slate_in", { count: state.daysLeft })}
           </span>
         )}
       </div>
@@ -91,7 +95,7 @@ export const SupporterCaseCard = ({
                       "block text-[10px] font-black tracking-widest",
                       styles.text,
                     )}>
-                    {slot.rarity}
+                    {labels.rarity(slot.rarity)}
                   </span>
                   <span className='block truncate text-sm font-bold text-zinc-100'>
                     {slot.current?.name ?? "—"}
@@ -108,14 +112,14 @@ export const SupporterCaseCard = ({
           onClick={() => onOpen("supporter")}
           disabled={!canAfford || isOpening}>
           {canAfford
-            ? `Open for ${caseDef.fameCost} Fame`
-            : `Needs ${caseDef.fameCost} Fame`}
+            ? t("panel.case.open_for", { cost: caseDef.fameCost })
+            : t("panel.case.needs", { cost: caseDef.fameCost })}
         </Button>
 
         <Link
           href='/supporter'
           className='text-xs text-zinc-500 transition-colors hover:text-zinc-300'>
-          Supporters pick what goes in here →
+          {t("panel.case.supporters_pick")}
         </Link>
       </div>
     </section>

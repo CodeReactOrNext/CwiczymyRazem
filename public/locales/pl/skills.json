@@ -251,5 +251,89 @@
       "name": "Kompozycja",
       "description": "Naucz się pisać i aranżować własną muzykę"
     }
+  },
+  "roadmap": {
+    "aria": "Drzewo umiejętności",
+    "drag_aria": "Drzewo umiejętności, przeciągnij, aby przesunąć",
+    "zoom_in": "Przybliż",
+    "zoom_out": "Oddal",
+    "fit": "Dopasuj mapę do ekranu",
+    "bpm_stages": "Etapy BPM: {{done}} / {{total}}",
+    "click_preview": "Kliknij, aby podejrzeć",
+    "lvl": "Poz. {{level}}",
+    "done_of": "{{done}} z {{total}}",
+    "up_next": "Następne",
+    "start": "Start",
+    "show_in_path": "Pokaż to ćwiczenie na ścieżce",
+    "jump_tier": "Przejdź do etapu",
+    "mastery": "Mistrzostwo",
+    "mastery_done": "Mistrzostwo — każde ćwiczenie na ścieżce ukończone.",
+    "mastery_left": "Mistrzostwo · pozostało ćwiczeń: {{count}}",
+    "state": {
+      "completed": "Ukończone",
+      "current": "Następne",
+      "available": "Nierozpoczęte",
+      "locked": "Ćwiczenie Pro"
+    },
+    "tiers": {
+      "foundations": {
+        "title": "Podstawy",
+        "subtitle": "Weź gitarę do ręki. Zbuduj fundamenty."
+      },
+      "technique": {
+        "title": "Technika",
+        "subtitle": "Precyzja, szybkość i kontrola."
+      },
+      "theory": {
+        "title": "Teoria i gryf",
+        "subtitle": "Poznaj gryf. Nazwij to, co grasz."
+      },
+      "rhythm": {
+        "title": "Rytm i groove",
+        "subtitle": "Złap puls."
+      },
+      "expression": {
+        "title": "Ekspresja i styl",
+        "subtitle": "Niech każda nuta śpiewa."
+      },
+      "hearing": {
+        "title": "Kształcenie słuchu",
+        "subtitle": "Usłysz, zanim zagrasz."
+      },
+      "creativity": {
+        "title": "Kreatywność",
+        "subtitle": "Znajdź własny głos."
+      }
+    },
+    "branches": {
+      "getting_started": "Pierwsze kroki",
+      "clean_tone": "Czysty dźwięk i tłumienie",
+      "first_scales": "Pierwsze skale",
+      "play_alongs": "Granie z podkładem",
+      "alternate_picking": "Kostkowanie naprzemienne",
+      "finger_independence": "Niezależność palców",
+      "legato": "Legato",
+      "string_skipping": "Przeskoki po strunach",
+      "spider_permutations": "Permutacje pająka",
+      "sweep_picking": "Sweep picking",
+      "tapping": "Tapping",
+      "hybrid_picking": "Hybrid picking",
+      "note_hunts": "Polowania na dźwięki",
+      "click_hunts": "Polowania kliknięciem",
+      "interval_clicks": "Interwały kliknięciem",
+      "chords": "Akordy",
+      "harmony": "Harmonia",
+      "strumming_styles": "Bicie",
+      "strumming_patterns": "Wzory bicia",
+      "timing_meter": "Timing i metrum",
+      "bending": "Podciąganie strun",
+      "vibrato": "Wibrato",
+      "phrasing": "Frazowanie",
+      "tone": "Brzmienie",
+      "play_by_ear": "Granie ze słuchu",
+      "ear_quizzes": "Quizy słuchowe",
+      "improvisation": "Improwizacja",
+      "composition": "Kompozycja"
+    }
   }
 }

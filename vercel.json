@@ -38,6 +38,10 @@
       "schedule": "0 17 * * *"
     },
     {
+      "path": "/api/discord-promo-update",
+      "schedule": "0 9 * * *"
+    },
+    {
       "path": "/api/cron/daily-exercise",
       "schedule": "5 1 * * *"
     }

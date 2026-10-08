@@ -8,6 +8,7 @@ import {
 } from "assets/components/ui/drawer";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Check,
   CheckCircle2,
@@ -124,6 +125,7 @@ const PhaseCheckBody = ({
   readOnly,
   onResult,
 }: PhaseCheckBodyProps) => {
+  const { t } = useTranslation("ai_coach");
   const [stage, setStage] = useState<Stage>({ name: "intro" });
   const quizRef = useRef<PhaseQuiz | null>(null);
 
@@ -151,9 +153,7 @@ const PhaseCheckBody = ({
       setStage({
         name: "error",
         message:
-          error instanceof Error
-            ? error.message
-            : "Could not load the checkpoint.",
+          error instanceof Error ? error.message : t("check.load_failed"),
       });
     }
   };
@@ -185,10 +185,22 @@ const PhaseCheckBody = ({
 
   const chip =
     state === "passed"
-      ? { color: "emerald" as const, label: "Passed", dot: "bg-emerald-400" }
+      ? {
+          color: "emerald" as const,
+          label: t("check.passed"),
+          dot: "bg-emerald-400",
+        }
       : state === "ready"
-        ? { color: "amber" as const, label: "Ready", dot: "bg-amber-400" }
-        : { color: "gray" as const, label: "Locked", dot: "bg-zinc-500" };
+        ? {
+            color: "amber" as const,
+            label: t("check.ready"),
+            dot: "bg-amber-400",
+          }
+        : {
+            color: "gray" as const,
+            label: t("check.locked"),
+            dot: "bg-zinc-500",
+          };
 
   let body: React.ReactNode;
 
@@ -198,11 +210,10 @@ const PhaseCheckBody = ({
         <Loader2 className='h-6 w-6 animate-spin text-cyan-400' />
         <div>
           <p className='text-sm font-semibold text-zinc-200'>
-            Writing your checkpoint
+            {t("check.writing")}
           </p>
           <p className='mt-1 text-xs text-zinc-400'>
-            The first time a phase is checked, the coach writes its questions
-            from the steps you practised. Takes a moment.
+            {t("check.writing_body")}
           </p>
         </div>
       </div>
@@ -211,11 +222,11 @@ const PhaseCheckBody = ({
     body = (
       <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 px-6 py-12 text-center'>
         <p className='text-sm font-semibold text-zinc-200'>
-          The checkpoint didn&apos;t come through
+          {t("check.failed")}
         </p>
         <p className='text-xs text-zinc-400'>{stage.message}</p>
         <ActionButton onClick={start} tone='quiet'>
-          <RefreshCw className='h-3.5 w-3.5' /> Try again
+          <RefreshCw className='h-3.5 w-3.5' /> {t("drawer.try_again")}
         </ActionButton>
       </div>
     );
@@ -240,7 +251,10 @@ const PhaseCheckBody = ({
 
         <div>
           <p className='text-[11px] font-semibold text-zinc-500'>
-            Question {stage.index + 1} of {stage.questions.length}
+            {t("check.question_of", {
+              n: stage.index + 1,
+              total: stage.questions.length,
+            })}
           </p>
           <p className='mt-2 text-base font-semibold leading-relaxed text-zinc-100'>
             {question.prompt}
@@ -306,8 +320,8 @@ const PhaseCheckBody = ({
               <div className='rounded-lg bg-cyan-500/10 px-5 py-4'>
                 <p className='text-xs font-semibold text-cyan-400'>
                   {stage.picked === question.answerIndex
-                    ? "Right"
-                    : "Not quite"}
+                    ? t("check.right")
+                    : t("check.not_quite")}
                 </p>
                 <p className='mt-2 text-sm leading-relaxed text-zinc-200'>
                   {question.explanation}
@@ -317,8 +331,8 @@ const PhaseCheckBody = ({
             <div className='flex justify-end'>
               <ActionButton onClick={next}>
                 {stage.index === stage.questions.length - 1
-                  ? "See the result"
-                  : "Next question"}
+                  ? t("check.see_result")
+                  : t("check.next_question")}
                 <ChevronRight className='h-4 w-4' />
               </ActionButton>
             </div>
@@ -349,27 +363,30 @@ const PhaseCheckBody = ({
               "text-sm font-semibold",
               passed ? "text-emerald-300" : "text-zinc-200",
             )}>
-            {passed ? "Checkpoint passed" : "Not there yet"}
+            {passed ? t("check.passed_title") : t("check.not_yet")}
           </p>
           <p className='max-w-xs text-xs leading-relaxed text-zinc-400'>
             {passed
               ? phaseIdx === 0
-                ? "Phase 1 is yours. On to the next one."
-                : `Phase ${phaseIdx + 1} is behind you.`
-              : `You need ${Math.min(total, PHASE_CHECK_PASS_MARK)} of ${total}. Reread the steps that tripped you up — the answers are in them — and come back.`}
+                ? t("check.first_phase_done")
+                : t("check.phase_done", { n: phaseIdx + 1 })
+              : t("check.need", {
+                  need: Math.min(total, PHASE_CHECK_PASS_MARK),
+                  total,
+                })}
           </p>
         </div>
 
         <div className='flex flex-wrap items-center justify-end gap-2'>
           <ActionButton onClick={start} tone='quiet'>
             <RefreshCw className='h-3.5 w-3.5' />
-            {passed ? "Take it again" : "Try again"}
+            {passed ? t("check.take_again") : t("drawer.try_again")}
           </ActionButton>
           <DrawerClose asChild>
             <button
               type='button'
               className='flex items-center justify-center gap-2 rounded-lg bg-zinc-100 px-5 py-2.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
-              Back to the map
+              {t("check.back_to_map")}
             </button>
           </DrawerClose>
         </div>
@@ -381,28 +398,25 @@ const PhaseCheckBody = ({
       <div className='flex flex-col gap-6'>
         <div className='rounded-lg bg-zinc-900/40 px-5 py-5'>
           <p className='text-sm leading-relaxed text-zinc-300'>
-            {PHASE_CHECK_QUESTIONS} quick questions about what you practised in
-            this phase — the chords, the counts, the motions, the why. Get{" "}
-            {PHASE_CHECK_PASS_MARK} right to clear the phase. You can retake it
-            as many times as you like; only your best run counts.
+            {t("check.intro", {
+              questions: PHASE_CHECK_QUESTIONS,
+              pass: PHASE_CHECK_PASS_MARK,
+            })}
           </p>
         </div>
 
         {phase.check && phase.check.attempts > 0 && (
           <div className='flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-zinc-400'>
             <span>
-              Best run{" "}
+              {t("check.best_run")}{" "}
               <span className='font-semibold tabular-nums text-zinc-200'>
                 {phase.check.bestScore}/{phase.check.total}
               </span>
             </span>
-            <span>
-              {phase.check.attempts}{" "}
-              {phase.check.attempts === 1 ? "attempt" : "attempts"}
-            </span>
+            <span>{t("check.attempts", { count: phase.check.attempts })}</span>
             {phase.check.passedAt && (
               <span className='flex items-center gap-1.5 text-emerald-400'>
-                <Check className='h-3.5 w-3.5' /> Passed
+                <Check className='h-3.5 w-3.5' /> {t("check.passed")}
               </span>
             )}
           </div>
@@ -412,7 +426,7 @@ const PhaseCheckBody = ({
           <div className='flex flex-col gap-3'>
             <p className='flex items-center gap-2 text-sm font-semibold text-zinc-200'>
               <Lock className='h-4 w-4 text-zinc-500' />
-              Finish the phase first
+              {t("check.finish_first")}
             </p>
             <ul className='flex flex-col gap-1.5'>
               {openSteps.map((step) => (
@@ -433,14 +447,12 @@ const PhaseCheckBody = ({
             </ul>
           </div>
         ) : readOnly ? (
-          <p className='text-sm text-zinc-500'>
-            Only the player whose roadmap this is can sit its checkpoints.
-          </p>
+          <p className='text-sm text-zinc-500'>{t("check.read_only")}</p>
         ) : (
           <div className='flex justify-end'>
             <ActionButton onClick={start}>
               <ClipboardCheck className='h-4 w-4' />
-              {state === "passed" ? "Take it again" : "Start the checkpoint"}
+              {state === "passed" ? t("check.take_again") : t("check.start")}
             </ActionButton>
           </div>
         )}
@@ -453,12 +465,12 @@ const PhaseCheckBody = ({
       <header className='flex flex-col gap-4 px-5 pb-5 pt-5 sm:px-7 sm:pt-6'>
         <div className='flex items-center justify-between gap-3'>
           <p className='truncate text-xs font-semibold text-zinc-400'>
-            Phase {phaseIdx + 1} · {phase.title}
+            {t("phase_n", { n: phaseIdx + 1 })} · {phase.title}
           </p>
           <DrawerClose asChild>
             <button
               type='button'
-              aria-label='Close'
+              aria-label={t("drawer.close")}
               className='flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
               <X className='h-4 w-4' />
             </button>
@@ -467,10 +479,10 @@ const PhaseCheckBody = ({
 
         <div className='flex flex-col gap-3'>
           <DrawerTitle className='font-display text-xl font-bold leading-snug tracking-normal text-zinc-100 sm:text-2xl'>
-            Checkpoint
+            {t("checkpoint.locked")}
           </DrawerTitle>
           <DrawerDescription className='sr-only'>
-            The checkpoint quiz of phase {phaseIdx + 1}, {phase.title}.
+            {t("check.sr_description", { n: phaseIdx + 1, title: phase.title })}
           </DrawerDescription>
           <div className='flex flex-wrap items-center gap-x-3 gap-y-2'>
             <Chip color={chip.color}>
@@ -478,8 +490,10 @@ const PhaseCheckBody = ({
               {chip.label}
             </Chip>
             <span className='text-xs text-zinc-400'>
-              {phase.steps.length - openSteps.length}/{phase.steps.length} steps
-              done
+              {t("check.steps_done", {
+                done: phase.steps.length - openSteps.length,
+                total: phase.steps.length,
+              })}
             </span>
           </div>
         </div>

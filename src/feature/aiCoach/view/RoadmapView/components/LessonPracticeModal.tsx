@@ -19,6 +19,7 @@ import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import useTimer from "hooks/useTimer";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Loader2, Pause, Play, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IconType } from "react-icons/lib";
@@ -36,7 +37,11 @@ const SKILL_OPTIONS: {
   { id: "technique", label: "Technique", Icon: SKILL_CATEGORY_ICONS.technique },
   { id: "theory", label: "Theory", Icon: SKILL_CATEGORY_ICONS.theory },
   { id: "hearing", label: "Hearing", Icon: SKILL_CATEGORY_ICONS.hearing },
-  { id: "creativity", label: "Creativity", Icon: SKILL_CATEGORY_ICONS.creativity },
+  {
+    id: "creativity",
+    label: "Creativity",
+    Icon: SKILL_CATEGORY_ICONS.creativity,
+  },
 ];
 
 const SKILL_TIME_QUEST: Record<SkillsType, DailyQuestTaskType> = {
@@ -78,6 +83,7 @@ const LessonPracticeModal = ({
   onFinish,
   onClose,
 }: LessonPracticeModalProps) => {
+  const { t } = useTranslation(["ai_coach", "common"]);
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
   const userAvatar = useAppSelector(selectUserAvatar);
@@ -168,10 +174,10 @@ const LessonPracticeModal = ({
       dispatch(
         updateQuestProgress({ type: SKILL_TIME_QUEST[skill], amount: minutes }),
       );
-      toast.success(`Logged ${minutes} min of practice.`);
+      toast.success(t("lesson_modal.logged", { minutes }));
       onFinish();
     } catch {
-      toast.error("Failed to log practice time.");
+      toast.error(t("lesson_modal.log_failed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -191,20 +197,19 @@ const LessonPracticeModal = ({
         <div className='flex items-start justify-between gap-4 px-5 pb-4 pt-5'>
           <div className='min-w-0'>
             <p className='mb-1 text-[11px] font-semibold tracking-wide text-cyan-400'>
-              Practice session
+              {t("lesson_modal.session")}
             </p>
             <DialogTitle className='truncate text-sm font-bold leading-snug tracking-normal text-zinc-100'>
               {lesson.title}
             </DialogTitle>
             <DialogDescription className='sr-only'>
-              The lesson plays here while a stopwatch tracks your practice.
-              Finishing logs the time.
+              {t("lesson_modal.description")}
             </DialogDescription>
           </div>
           <DialogClose asChild>
             <button
               type='button'
-              aria-label='Close'
+              aria-label={t("drawer.close")}
               className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
               <X className='h-4 w-4' />
             </button>
@@ -242,11 +247,11 @@ const LessonPracticeModal = ({
               className='flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-xs font-semibold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700'>
               {isRunning ? (
                 <>
-                  <Pause className='h-3.5 w-3.5' /> Pause
+                  <Pause className='h-3.5 w-3.5' /> {t("lesson_modal.pause")}
                 </>
               ) : (
                 <>
-                  <Play className='h-3.5 w-3.5' /> Resume
+                  <Play className='h-3.5 w-3.5' /> {t("lesson_modal.resume")}
                 </>
               )}
             </button>
@@ -254,7 +259,9 @@ const LessonPracticeModal = ({
 
           {/* Skill category — where this time is logged */}
           <div className='flex flex-col gap-2'>
-            <p className='text-xs font-semibold text-zinc-400'>Log time as</p>
+            <p className='text-xs font-semibold text-zinc-400'>
+              {t("lesson_modal.log_as")}
+            </p>
             <div role='radiogroup' className='grid grid-cols-4 gap-2'>
               {SKILL_OPTIONS.map(({ id, label, Icon }) => {
                 const active = skill === id;
@@ -272,7 +279,7 @@ const LessonPracticeModal = ({
                         : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
                     )}>
                     <Icon className='h-4 w-4' />
-                    {label}
+                    {t(`common:categories.${id}`, label)}
                   </button>
                 );
               })}
@@ -289,7 +296,9 @@ const LessonPracticeModal = ({
             ) : (
               <Check className='h-4 w-4' />
             )}
-            {isSubmitting ? "Logging time…" : "Finish & log time"}
+            {isSubmitting
+              ? t("lesson_modal.logging")
+              : t("lesson_modal.finish")}
           </button>
         </div>
       </DialogContent>

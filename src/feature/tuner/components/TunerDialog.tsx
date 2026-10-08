@@ -87,7 +87,7 @@ export function TunerDialog({
         </RippleButton>
 
         <p className='text-center text-[10px] font-semibold tracking-wide text-zinc-500'>
-          Tuner
+          {t("tuner.title")}
         </p>
         <p className='mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-zinc-300'>
           {isTuningLocked && (

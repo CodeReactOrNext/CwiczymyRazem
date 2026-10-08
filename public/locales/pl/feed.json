@@ -42,6 +42,8 @@
   "song_count_other": "utwory: {{count}}",
   "passed_exam": "zdał egzamin {{step}}",
   "completed_roadmap_step": "ukończył {{step}} w roadmapie {{roadmap}}",
+  "joined": "dołączył(a) do Riff Quest",
+  "joined_with": "dołączył(a) do Riff Quest, {{phrase}}",
   "completed_daily_quests": "ukończył wszystkie {{quests}}",
   "daily_quests": "dzienne zadania!",
   "session_time_hint": "Czas ćwiczeń zapisany w tej sesji",
@@ -113,5 +115,29 @@
     "online": "online: {{count}}",
     "practicing": "ćwiczy: {{count}}",
     "sheet_title": "Społeczność"
+  },
+  "discord_promo": {
+    "eyebrow": "Discord Riff Quest",
+    "join": "Wbijaj na serwer",
+    "v1": {
+      "headline": "Twój wzmacniacz ma wyłącznik. Nasz Discord nie.",
+      "body": "Gracze gadają o sprzęcie, wrzucają riffy i przegrywają kłótnie o brzmienie o każdej porze. Wpadnij się przywitać."
+    },
+    "v2": {
+      "headline": "Ćwiczyć w samotności — spoko. Narzekać w samotności — już nie.",
+      "body": "Chwal się postępami, pytaj o technikę, znajdź kogoś na swoim poziomie, kto cię przypilnuje."
+    },
+    "v3": {
+      "headline": "Mamy kanał o sprzęcie. On nigdy nie śpi.",
+      "body": "Efekty, struny, gitara, na którą na pewno cię nie stać. Przynieś opinie."
+    },
+    "v4": {
+      "headline": "Nagrałeś riff? Daj go posłuchać prawdziwym uszom.",
+      "body": "Wrzuć nagranie i zbierz feedback od ludzi, którzy wiedzą, jak boli ten bend."
+    },
+    "v5": {
+      "headline": "Twoja gitara chce mieć znajomych. Ty pewnie też.",
+      "body": "Gildie, wyzwania i ludzie ćwiczący to samo co ty. Dołącz do Discorda Riff Quest."
+    }
   }
 }

@@ -26,17 +26,6 @@ export const welcomeGoalPhrase = (
   }
 };
 
-export const welcomeText = (
-  username: string,
-  goal: string | null | undefined,
-  planTitle: string | null | undefined,
-): string => {
-  const phrase = welcomeGoalPhrase(goal, planTitle);
-  return phrase
-    ? `${username} just joined, ${phrase}`
-    : `${username} just joined Riff Quest`;
-};
-
 /**
  * The event as one line of text. Stored as the message body too, so anything
  * that reads the room without knowing about events still has something to show.

@@ -276,6 +276,28 @@ export interface FirebaseLogsRoadmapStepInterface {
 }
 
 /**
+ * A new player finishing onboarding — the feed's "say hi" row, answered with Motivate. One per
+ * account: the document id is `welcome-{uid}`. Written only by `/api/logs/player-joined`.
+ */
+export interface FirebaseLogsPlayerJoinedInterface {
+  type: "player_joined";
+  uid: string;
+  userName: string;
+  timestamp: string | number | Date;
+  data: string;
+  /** What they said they came for in onboarding (`plans`, `songs`, …), when they picked one. */
+  goal: string | null;
+  /** Title of the plan they started with, when the goal was a plan. */
+  planTitle: string | null;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
+  id?: string;
+  reactions?: string[];
+  reactionFame?: LogReactionFame;
+}
+
+/**
  * A guild moving up a level — a quest cleared. Guild-wide, so no `uid`: nobody
  * owns the row, it never groups with anything and has nothing to motivate.
  * Written only by the server when a quest is banked (see lib/guild/guildLevelLog).
@@ -357,6 +379,21 @@ export interface FirebaseLogsSupportAskInterface {
   /** Absent on logs written before the roadmap-momentum variant existed. */
   tiersFunded?: number | null;
   tiersTotal?: number | null;
+  id?: string;
+  reactions?: string[];
+  reactionFame?: LogReactionFame;
+  timestamp: string | number | Date;
+}
+
+/**
+ * The occasional "come hang out on Discord" card. Nobody owns it, so it never groups and has
+ * nothing to motivate. Written only by `/api/discord-promo-update` (cron).
+ */
+export interface FirebaseLogsDiscordPromoInterface {
+  type: "discord_promo";
+  data: string;
+  /** Which joke the card tells — an index into `discordPromoVariants`. */
+  variant: number;
   id?: string;
   reactions?: string[];
   reactionFame?: LogReactionFame;

@@ -1,6 +1,7 @@
 import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { useTranslation } from "hooks/useTranslation";
 import {
   CheckCircle2,
   ChevronRight,
@@ -82,6 +83,7 @@ export const StepResources: React.FC<StepResourcesProps> = ({
   onToggleLesson,
   onPracticeLesson,
 }) => {
+  const { t } = useTranslation(["ai_coach", "common"]);
   const exercise =
     step.suggestedExerciseId && !step.noExercise
       ? exercisesAgregat.find((e) => e.id === step.suggestedExerciseId)
@@ -96,10 +98,11 @@ export const StepResources: React.FC<StepResourcesProps> = ({
     <section className='flex flex-col gap-4'>
       <div className='flex items-start justify-between gap-4'>
         <div>
-          <h3 className='text-sm font-semibold text-zinc-100'>Practice kit</h3>
+          <h3 className='text-sm font-semibold text-zinc-100'>
+            {t("kit.title")}
+          </h3>
           <p className='mt-1 text-xs leading-relaxed text-zinc-400'>
-            Open a resource to work with it, then tick it off. Ticking
-            everything completes the step.
+            {t("kit.body")}
           </p>
         </div>
         {total > 0 && (
@@ -140,7 +143,15 @@ export const StepResources: React.FC<StepResourcesProps> = ({
                 </span>
                 {exercise.difficulty && (
                   <span className='mt-0.5 block truncate text-xs capitalize text-zinc-400'>
-                    {exercise.difficulty} · {exercise.category}
+                    {t(
+                      `common:difficulty.${exercise.difficulty}`,
+                      exercise.difficulty,
+                    )}{" "}
+                    ·{" "}
+                    {t(
+                      `common:categories.${exercise.category}`,
+                      exercise.category,
+                    )}
                   </span>
                 )}
               </span>
@@ -149,7 +160,7 @@ export const StepResources: React.FC<StepResourcesProps> = ({
             <ResourceToggle
               checked={exerciseDone}
               label={
-                exerciseDone ? "Practiced. Tap to undo" : "Mark as practiced"
+                exerciseDone ? t("kit.practiced_undo") : t("kit.mark_practiced")
               }
               onClick={onToggleExercise}
             />
@@ -193,14 +204,14 @@ export const StepResources: React.FC<StepResourcesProps> = ({
                   {song.title}
                 </span>
                 <span className='mt-0.5 block truncate text-xs text-zinc-400'>
-                  {song.artist} · from the song library
+                  {song.artist} · {t("kit.from_library")}
                 </span>
               </span>
               <ChevronRight className='h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-200' />
             </button>
             <ResourceToggle
               checked={songDone}
-              label={songDone ? "Played. Tap to undo" : "Mark as played"}
+              label={songDone ? t("kit.played_undo") : t("kit.mark_played")}
               onClick={onToggleSong}
             />
           </div>
@@ -229,7 +240,9 @@ export const StepResources: React.FC<StepResourcesProps> = ({
                 />
                 <ResourceToggle
                   checked={watched}
-                  label={watched ? "Watched. Tap to undo" : "Mark as watched"}
+                  label={
+                    watched ? t("kit.watched_undo") : t("kit.mark_watched")
+                  }
                   onClick={() => onToggleLesson(lesson.videoId)}
                 />
               </div>

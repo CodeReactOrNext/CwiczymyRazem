@@ -171,5 +171,586 @@
     "why": "Dlaczego wspierać Riff Quest?",
     "body": "Riff Quest to projekt jednej osoby, darmowy i budowany otwarcie. Twoje wsparcie najpierw pokrywa domenę, hosting i bazę danych. Wszystko ponad to finansuje roadmapę: nowe ćwiczenia, sprzęt i funkcje, odblokowywane próg po progu, w miarę jak społeczność je finansuje.",
     "later": "Może później"
+  },
+  "badge": {
+    "label": "Wspierający",
+    "tooltip": "{{label}} — wspiera Riff Quest darowizną"
+  },
+  "wall": {
+    "funded_by": "Finansowane przez {{players}}",
+    "players": "{{count}} graczy",
+    "players_one": "1 gracza",
+    "players_few": "{{count}} graczy",
+    "players_many": "{{count}} graczy",
+    "lvl": "Poz. {{lvl}}",
+    "title": "Ludzie, którzy finansują riff.quest",
+    "body": "Gracze, dzięki którym aplikacja wciąż powstaje: {{count}}. Każda gitara, każde ćwiczenie i każdy tydzień w aplikacji zostały opłacone tutaj.",
+    "body_one": "1 gracz sprawia, że ta aplikacja wciąż powstaje. Każda gitara, każde ćwiczenie i każdy tydzień w aplikacji zostały opłacone tutaj.",
+    "body_empty": "Tu znajdziesz każdego, kto wspiera projekt, razem z poziomem, na którym gra.",
+    "empty": "Nikogo jeszcze nie ma na ścianie — pierwsze miejsce wciąż jest wolne."
+  },
+  "panel": {
+    "title": "Panel wspierających",
+    "subtitle": "Zobacz, co powstaje, wybierz, co będzie dalej, i ustal tydzień, w który gra cała aplikacja.",
+    "eyebrow": "Wspierający",
+    "tabs": {
+      "roadmap": "Plan rozwoju",
+      "gear": "Sprzęt",
+      "case": "Skrzynka wspierających",
+      "guild": "Załóż gildię",
+      "work": "W budowie",
+      "wall": "Wspierający",
+      "players": "Ścieżki graczy",
+      "info": "Info"
+    },
+    "wallet": "tokenów do wydania",
+    "wallet_one": "token do wydania",
+    "wallet_few": "tokeny do wydania",
+    "wallet_many": "tokenów do wydania",
+    "show_less": "Pokaż mniej",
+    "show_more": "Pokaż więcej",
+    "rank": "Miejsce {{rank}}",
+    "by": "od {{name}}",
+    "optional": "opcjonalne",
+    "cancel": "Anuluj",
+    "not_enough": "Za mało tokenów",
+    "not_enough_left": "Za mało tokenów",
+    "close": "Zamknij",
+    "try_again": "Spróbuj ponownie",
+    "info": {
+      "what_you_do": "Co tu robisz",
+      "surfaces": {
+        "roadmap": {
+          "title": "Plan rozwoju",
+          "body": "Zgłoś, czego brakuje w aplikacji, i popchnij pomysły, które chcesz zobaczyć. To, co tablica wspiera najmocniej, trafia do budowy jako następne."
+        },
+        "work": {
+          "title": "W budowie",
+          "body": "Prawdziwa kolejność prac — co jest w trakcie, co w kolejce, co już wyszło. Nie musisz zgadywać, co się stało z twoim pomysłem."
+        },
+        "gear": {
+          "title": "Sprzęt",
+          "body": "Zgłoś gitarę, wzmacniacz albo efekt do Arsenału i popchnij te, które chcesz zobaczyć narysowane. To, co tu urośnie, powstaje."
+        },
+        "case": {
+          "title": "Skrzynka wspierających",
+          "body": "Sześć miejsc w następnej skrzynce i ty wybierasz, co trafi do każdego, zanim ktokolwiek ją otworzy. Wydawane są tylko tokeny zwycięzcy. Wszystko, co wspiera resztę, zostaje na tablicy do następnej skrzynki."
+        },
+        "wall": {
+          "title": "Wspierający",
+          "body": "Każdy, kto finansuje aplikację, razem z poziomem, na którym gra. Odznaka umieszcza cię na tej ścianie w dniu, w którym ją dostaniesz."
+        },
+        "guild": {
+          "title": "Gildia",
+          "body": "Zajmij nazwę i tag, których nikt inny nie weźmie, a potem poszerzaj salę i półkę, gdy przybywa członków."
+        }
+      },
+      "how_tokens": "Skąd biorą się tokeny",
+      "badge_once": "Odznaka wspierającego, jednorazowo",
+      "per_dollar": "Za każdego wpłaconego $1",
+      "in_total": "Łącznie ${{usd}}",
+      "membership": "Członkostwo płaci ponownie przy każdym odnowieniu. Tokeny nigdy nie wygasają i same się nie odnawiają — wydane znikają.",
+      "what_cost": "Ile kosztują",
+      "costs": {
+        "roadmap": {
+          "title": "Plan rozwoju",
+          "post_idea": "Zgłoszenie pomysłu",
+          "back_idea": "Wsparcie pomysłu (maks. {{max}})"
+        },
+        "gear": {
+          "title": "Sprzęt",
+          "propose_gear": "Propozycja sprzętu",
+          "back_proposal": "Wsparcie propozycji"
+        },
+        "votes": {
+          "title": "Głosy",
+          "case_item": "Przedmiot w skrzynce wspierających"
+        },
+        "guild": {
+          "title": "Gildia",
+          "found_guild": "Założenie gildii",
+          "seats": "+{{seats}} miejsca",
+          "stash_row": "+1 rząd schowka"
+        }
+      },
+      "donate_email": "Wpłacaj z adresu e-mail konta",
+      "email": "Każda darowizna jest przypisywana do konta po adresie e-mail, z którego przyszła, więc wpłata z innego adresu nie doda tokenów do tego portfela. Już się zdarzyło? Nic nie przepadło — napisz do mnie na Discordzie, a podepnę ją ręcznie.",
+      "email_known": "Każda darowizna jest przypisywana do konta po adresie e-mail, z którego przyszła — twój to {{email}} — więc wpłata z innego adresu nie doda tokenów do tego portfela. Już się zdarzyło? Nic nie przepadło — napisz do mnie na Discordzie, a podepnę ją ręcznie.",
+      "message_discord": "Napisz do mnie na Discordzie"
+    },
+    "pitch": {
+      "title": "Darowizna otwiera panel wspierających",
+      "intro": "Za odznaką jest pokój, w którym riff.quest decyduje się na głos:",
+      "perks": {
+        "0": "Obserwuj, co powstaje teraz, i głosuj, co będzie dalej",
+        "1": "Wybieraj sprzęt, który trafi do Arsenału i do skrzynek",
+        "2": "Ustal wyzwanie, w które cała aplikacja gra w danym tygodniu"
+      },
+      "email": "Użyj adresu e-mail tego konta, żeby odblokować Wspierającego.",
+      "email_known": "Użyj adresu e-mail tego konta, żeby odblokować Wspierającego: {{email}}.",
+      "other_email": "Używasz innego adresu? {{discord}}, a podepnę to ręcznie.",
+      "write_discord": "Napisz do mnie na Discordzie",
+      "support": "Wesprzyj projekt"
+    },
+    "backers": {
+      "count": "Wspierający: {{count}}",
+      "count_one": "Wspiera 1 osoba",
+      "by": "Wspierają:",
+      "put_in": "{{name}} dał(a) {{count}}",
+      "you": "Ty",
+      "more": "+{{count}} więcej"
+    },
+    "vote": {
+      "this": {
+        "idea": "ten pomysł",
+        "piece of gear": "ten sprzęt",
+        "item": "ten przedmiot"
+      },
+      "closed_mine": "Głosowanie zamknięte — dałeś {{mine}}",
+      "closed": "Głosowanie zamknięte",
+      "maxed_label": "Dałeś już {{mine}} — tyle, ile może jedna osoba",
+      "broke": "Nie masz już nic w portfelu",
+      "spend_another": "Wydaj kolejny token na {{target}} — dałeś już {{mine}}",
+      "spend": "Wydaj token na {{target}}",
+      "tokens_word": "tokenów",
+      "tokens_word_one": "token",
+      "tokens_word_few": "tokeny",
+      "tokens_word_many": "tokenów",
+      "you": "ty {{mine}}",
+      "closed_short": "Zamknięte",
+      "maxed": "Maksimum",
+      "back": "Wesprzyj"
+    },
+    "board": {
+      "empty_title": "Na tablicy jeszcze nic nie ma",
+      "empty_body": "Co trafi tu pierwsze, ustawi kierunek. Zgłoś to, czego wciąż brakuje ci w aplikacji.",
+      "post": "Zgłoś pomysł",
+      "intro": "Najmocniej wspierane pomysły powstają jako pierwsze. Wydane tokeny nie wracają.",
+      "groups": {
+        "open": "Otwarte",
+        "shipped": "Wydane",
+        "declined": "Nie będzie"
+      },
+      "status": {
+        "open": "Otwarte",
+        "planned": "Zaplanowane",
+        "in_progress": "W trakcie",
+        "shipped": "Wydane",
+        "declined": "Nie będzie"
+      },
+      "status_label": "Status pomysłu"
+    },
+    "icons": {
+      "idea": "Ogólny pomysł",
+      "guitar": "Gitara i gryf",
+      "song": "Utwory i tabulatury",
+      "practice": "Ćwiczenia i timer",
+      "tone": "Brzmienie i audio",
+      "recording": "Nagrywanie",
+      "gear": "Arsenał i sprzęt",
+      "ranking": "Rankingi i sezony",
+      "stats": "Statystyki i postęp",
+      "mobile": "Aplikacja mobilna i desktopowa",
+      "bug": "Coś nie działa",
+      "polish": "Szlify i drobne poprawki"
+    },
+    "new_idea": {
+      "title": "Dodaj pomysł do planu rozwoju",
+      "description": "Trafia prosto na tablicę, żeby każdy wspierający mógł go poprzeć. Koszt: {{cost}} — zostało ci {{left}}.",
+      "idea": "Pomysł",
+      "idea_placeholder": "Metronom, który podąża za mapą tempa tabulatury",
+      "icon": "Ikona",
+      "why": "Dlaczego to ważne",
+      "why_placeholder": "Co próbujesz dziś zrobić i w którym miejscu aplikacja ci przeszkadza.",
+      "post_for": "Zgłoś za"
+    },
+    "stepper": {
+      "blocks": {
+        "draft": {
+          "title": "Szkic",
+          "doing": "Szkicuję plan"
+        },
+        "review": {
+          "title": "Recenzja",
+          "doing": "Plan jest recenzowany"
+        },
+        "phases": {
+          "title": "Fazy",
+          "doing": "Piszę każdy krok"
+        },
+        "lessons": {
+          "title": "Lekcje",
+          "doing": "Szukam lekcji"
+        },
+        "ready": {
+          "title": "Gotowe",
+          "doing": "Zapisuję twoją ścieżkę"
+        }
+      },
+      "revising": "Poprawiam po uwagach",
+      "written": "Napisane: {{done}} z {{total}}",
+      "steps": "Kroki: {{done}} z {{total}}",
+      "done": "gotowe",
+      "up_next": "następne",
+      "step_of": "Etap {{n}} z {{total}}"
+    },
+    "generate": {
+      "examples": {
+        "0": {
+          "title": "Blues jak Stevie Ray Vaughan",
+          "goal": "Grać teksański blues jak Stevie Ray Vaughan: shuffle, mocne podciągnięcia i szerokie wibrato oraz jego charakterystyczne zagrywki na 12-taktowym bluesie."
+        },
+        "1": {
+          "title": "Powrót po przerwie",
+          "goal": "Wrócić do formy po kilku miesiącach przerwy: odciski i wytrzymałość bez kontuzji, czyste zmiany akordów, timing i utwory, które kiedyś grałem."
+        },
+        "2": {
+          "title": "Śpiew i gra",
+          "goal": "Śpiewać i grać jednocześnie: bicie, które idzie na autopilocie, gdy prowadzi głos, zaczynając od łatwych utworów."
+        },
+        "3": {
+          "title": "Zwarty metalowy rytm",
+          "goal": "Zwarta metalowa gitara rytmiczna: wytrzymałość kostkowania w dół, tłumienie dłonią i galopy, równo z metronomem."
+        }
+      },
+      "visibility": {
+        "public": {
+          "label": "Publiczna",
+          "hint": "Pojawia się w Ścieżkach graczy, więc inni też mogą z niej korzystać."
+        },
+        "private": {
+          "label": "Prywatna",
+          "hint": "Widzisz ją tylko ty. Kosztuje więcej, bo nikt inny z niej nie skorzysta."
+        }
+      },
+      "more": {
+        "title": "Powiedz coachowi więcej",
+        "answered": "Odpowiedzi: {{count}} z 2",
+        "body": "Ulubieni artyści i utwory, co już umiesz zagrać.",
+        "favourites": "Artyści lub utwory, które kochasz",
+        "favourites_placeholder": "np. John Mayer, Slow Dancing in a Burning Room",
+        "can_play": "Co już umiesz zagrać",
+        "can_play_placeholder": "np. akordy otwarte, pudełko pentatoniki molowej"
+      },
+      "not_guitar": "Ta ścieżka dotyczy gry na gitarze — opisz, co chcesz grać.",
+      "title": "Zbuduj ścieżkę wokół swojego celu",
+      "folded_body": "Opisz, co chcesz grać — coach rozpisze fazy, ćwiczenia i utwory.",
+      "create": "Utwórz ścieżkę",
+      "writing": "Piszę twoją ścieżkę",
+      "running_body": "To potrwa kilka minut i dzieje się po naszej stronie — możesz opuścić stronę albo zamknąć kartę, a dostaniesz powiadomienie, gdy będzie gotowa. Zostań tutaj, a otworzy się sama.",
+      "brief_body": "Kilka pytań, na które coach chce znać odpowiedź przed pisaniem — każde zmienia kształt planu i każde można pominąć.",
+      "goal_body": "Opisz, co chcesz umieć zagrać. Coach rozpisze fazy, ćwiczenia, lekcje i utwory, które cię tam doprowadzą.",
+      "tokens_left": "tokenów zostało",
+      "tokens_left_one": "token został",
+      "tokens_left_few": "tokeny zostały",
+      "tokens_left_many": "tokenów zostało",
+      "close_builder": "Zamknij kreator ścieżki",
+      "title_label": "Tytuł",
+      "title_placeholder": "np. Graj jak Mark Knopfler",
+      "goal_label": "Co chcesz umieć zagrać?",
+      "description": "Opis",
+      "goal_placeholder": "np. Chcę improwizować bluesa w każdej tonacji i przestać gubić się w solówce…",
+      "level": "Twój poziom",
+      "who_sees": "Kto ją widzi",
+      "needs": "Ta potrzebuje {{cost}} tokenów, a masz {{left}}.",
+      "donation_adds": "Każda darowizna dodaje tokeny",
+      "next_free": "Dalej coach sprawdzi cel i zada kilka pytań — za darmo. Generowanie kosztuje {{cost}}.",
+      "continue": "Dalej"
+    },
+    "brief": {
+      "told_coach": "Co powiedziałeś coachowi",
+      "edit_goal": "Edytuj cel",
+      "back": "Wróć",
+      "progress": "Postęp",
+      "summary": "Podsumowanie",
+      "obscure_title": "Coach słabo zna ten temat",
+      "obscure_body": "Wymień dwa lub trzy utwory albo techniki, których od tego chcesz, a plan zostanie zbudowany na nich, a nie na domysłach.",
+      "notes_placeholder": "np. riff z intro utworu A, sposób użycia pustych strun w utworze B, palcowana zwrotka utworu C",
+      "how_read": "Jak coach zrozumiał twój cel",
+      "as_written": "Ścieżka zbudowana wokół celu tak, jak go zapisałeś.",
+      "songs_in_it": "Utwory w ścieżce:",
+      "change_songs": "Zmień utwory",
+      "change": "Zmień: {{question}}",
+      "nothing_to_add": "Nic do dodania — coach przejmuje od tego miejsca.",
+      "takes_minutes": "Potrwa kilka minut. Możesz wyjść, gdy pisze — powiadomimy cię.",
+      "n_of": "{{n}} z {{total}} — każde można pominąć.",
+      "skip": "Pomiń",
+      "generate": "Generuj ścieżkę",
+      "next": "Dalej",
+      "bank": {
+        "focus": {
+          "question": "Cel jest szeroki — co dokładnie?",
+          "hint": "Coach zbuduje ścieżkę wokół tego, co wybierzesz."
+        },
+        "useFor": {
+          "question": "Do czego chcesz tego używać?",
+          "hint": "Ta sama technika to inna ścieżka w innym stylu."
+        },
+        "sides": {
+          "question": "Które strony tego stylu chcesz objąć?",
+          "hint": "Odznacz stronę, a jej fazy zostaną pominięte."
+        },
+        "songs": {
+          "question": "Jakie utwory mają znaleźć się w ścieżce?",
+          "hint": "Utwory z biblioteki otwierają się z tabulaturą i podkładem. Pozostałe stają się krokami bez nich."
+        },
+        "repertoireDepth": {
+          "question": "Mniej utworów dogłębnie czy więcej pobieżnie?",
+          "options": {
+            "deep": {
+              "label": "2–3 utwory, fragment po fragmencie",
+              "hint": "Każdy utwór dostaje kilka kroków: fragmenty, wolniejsze tempo, tempo z płyty, nagrane podejście."
+            },
+            "wide": {
+              "label": "5–6 utworów, po jednym kroku",
+              "hint": "Każdy utwór to jeden krok — cała partia w grywalnym tempie."
+            }
+          }
+        },
+        "startingPoint": {
+          "question": "Na jakim jesteś teraz etapie?",
+          "hint": "Faza 1 zaczyna się od tego miejsca — niczego poniżej nie będzie uczyć."
+        },
+        "target": {
+          "question": "Co uznasz za ukończenie?",
+          "hint": "Pod to zostaną napisane kryteria sukcesu ostatniej fazy."
+        },
+        "weakSpot": {
+          "question": "Co w tym stylu sprawia ci najwięcej trudności?",
+          "hint": "Dostanie własną fazę wcześniej, z większą liczbą sesji."
+        },
+        "replicateOrCreate": {
+          "question": "Grać jak na płycie czy tworzyć własne granie w tym stylu?",
+          "options": {
+            "replicate": {
+              "label": "Jak na płycie",
+              "hint": "Utwory fragment po fragmencie aż do tempa z płyty. Bez kroków improwizacji."
+            },
+            "create": {
+              "label": "Własne granie w tym stylu",
+              "hint": "Krok twórczy w każdej fazie: improwizacja, własne przejścia, własne partie."
+            }
+          }
+        },
+        "entry": {
+          "question": "Od czego zacząć?",
+          "options": {
+            "song": {
+              "label": "Kawałek utworu od pierwszej fazy",
+              "hint": "Uproszczony fragment celu od razu, a technika budowana wokół niego."
+            },
+            "foundation": {
+              "label": "Najpierw podstawy, utwory później",
+              "hint": "Pierwsze fazy to technika; utwory czekają, aż się utrwali."
+            }
+          }
+        },
+        "includes": {
+          "question": "Co ma się w niej znaleźć?",
+          "hint": "Domyślnie wszystko jest zaznaczone — odznacz to, czego nie chcesz.",
+          "options": {
+            "tone": {
+              "label": "Faza o brzmieniu",
+              "hint": "Sprzęt, dobieranie brzmienia ze słuchu, gear artysty."
+            },
+            "theory": {
+              "label": "Teoria ponad minimum",
+              "hint": "Dlaczego te dźwięki działają, a nie tylko które."
+            },
+            "ear": {
+              "label": "Praca ze słuchem",
+              "hint": "Transkrypcja fraz, uczenie się partii ze słuchu."
+            }
+          }
+        },
+        "ending": {
+          "question": "Jak ma się kończyć?",
+          "options": {
+            "set": {
+              "label": "Nagrany set",
+              "hint": "Faza końcowa: utwory jeden po drugim, nagrane, jak mały koncert."
+            },
+            "none": {
+              "label": "Bez fazy końcowej",
+              "hint": "Ścieżka kończy się ostatnim utworem lub umiejętnością."
+            }
+          }
+        },
+        "practiceStyle": {
+          "question": "Jak lubisz ćwiczyć?",
+          "hint": "Coach wybiera ćwiczenia tego rodzaju. Odznacz to, czego nigdy nie otwierasz.",
+          "options": {
+            "drill": {
+              "label": "Ćwiczenia z metronomem"
+            },
+            "backing": {
+              "label": "Granie do podkładu"
+            },
+            "hunt": {
+              "label": "Gry na gryfie",
+              "hint": "Polowania kliknięciem, bez mikrofonu."
+            }
+          }
+        }
+      }
+    },
+    "preflight": {
+      "lines": {
+        "0": "Czytam twój cel",
+        "1": "Sprawdzam bibliotekę utworów",
+        "2": "Wybieram, o co cię zapytać"
+      },
+      "free": "Nic za to nie płacisz — tokeny schodzą dopiero przy generowaniu."
+    },
+    "songs": {
+      "add_failed": "Nie udało się dodać tego utworu do biblioteki.",
+      "missing_body": "Jeszcze nie ma ich w bibliotece. Dodaj je, a każdy dostanie prawdziwy krok z tabulaturą i podkładem — albo zostaw je jako wskazówkę dla coacha.",
+      "add_tag": "dodaj do biblioteki",
+      "remove": "Usuń {{title}}",
+      "none": "Nie wybrano jeszcze utworów — wybierze je coach.",
+      "full": "To już {{max}} — najwięcej, ile mieści jedna ścieżka",
+      "search": "Szukaj po tytule lub wykonawcy — brakujące można dodać",
+      "spotify_hint": "Jeszcze nie ma w bibliotece — jedno kliknięcie dodaje",
+      "reference": "Utwory, których nie mamy, jako wskazówka dla coacha",
+      "reference_placeholder": "np. Romeo and Juliet, Brothers in Arms"
+    },
+    "players": {
+      "started": "Ścieżka rozpoczęta — postęp na niej należy do ciebie.",
+      "start_failed": "Nie udało się rozpocząć tej ścieżki. Spróbuj ponownie.",
+      "starting": "Rozpoczynanie…",
+      "start": "Rozpocznij tę ścieżkę",
+      "done_refining": "Zakończ poprawki",
+      "refine": "Poprawiaj",
+      "unknown": "Nieznany gracz",
+      "another": "innego gracza",
+      "gone": "Z tej ścieżki zostały tylko liczniki postępu.",
+      "someone_else": "Ścieżka kogoś innego. Kliknij „Rozpocznij tę ścieżkę”, żeby przejść ją samemu, za darmo, z własnym postępem.",
+      "following_note": "Przechodzisz ścieżkę gracza {{name}}. Postęp na mapie jest twój; jego postęp zostaje jego.",
+      "refine_note": "Tryb poprawek. Użyj różdżki przy kroku na mapie, żeby coach go przepisał, zamienił ćwiczenie, ponownie poszukał lekcji lub utworu albo dodał krok po nim — każda zmiana za token lub dwa, od razu zapisana w twojej ścieżce. Usunięcie kroku jest darmowe.",
+      "exercises": "Ćwiczenia",
+      "songs": "Utwory",
+      "lessons": "Lekcje wideo",
+      "following_count": "Obserwujący: {{count}}",
+      "following_count_one": "1 gracz obserwuje",
+      "following_none": "Obserwujesz, bez sesji",
+      "not_started": "Jeszcze nierozpoczęta",
+      "started_on": "rozpoczęta {{date}}",
+      "created_on": "utworzona {{date}}",
+      "last_practised": "Ostatnio ćwiczona {{date}}",
+      "not_on_board": "Tej ścieżki nie ma już na tablicy.",
+      "back_to_list": "Wróć do Ścieżek graczy",
+      "empty_title": "Nie ma jeszcze ścieżek",
+      "empty_body": "Tu pojawiają się ścieżki, które gracze generują dla siebie.",
+      "count": "Ścieżki: {{total}}, gracze: {{players}}",
+      "count_one": "Ścieżki: {{total}}, gracze: {{players}}",
+      "filter": "Filtruj po celu lub graczu…",
+      "all_levels": "Wszystkie poziomy",
+      "sort_by": "Sortuj według",
+      "sorts": {
+        "recent": "Ostatnio aktywne",
+        "newest": "Najnowsze",
+        "practised": "Najczęściej ćwiczone",
+        "followed": "Najczęściej obserwowane"
+      },
+      "yours": "Twoje ścieżki",
+      "others": "Od innych graczy",
+      "no_match": "Nic nie pasuje do tego filtra."
+    },
+    "gear": {
+      "propose_title": "Zaproponuj sprzęt",
+      "propose_subtitle": "Nazwij go, wybierz rzadkość, określ, na co się rozkłada — i zostaw na nim swoją linijkę.",
+      "propose": "Zaproponuj sprzęt",
+      "not_enough": "Za mało tokenów, żeby zaproponować sprzęt",
+      "intro": "Najmocniej wspierany sprzęt trafia do Arsenału jako następny.",
+      "empty": "Nikt jeszcze nie zaproponował sprzętu",
+      "voting": "Do głosowania",
+      "status": {
+        "open": "Otwarta",
+        "accepted": "Przyjęta",
+        "in_game": "W grze",
+        "declined": "Nie będzie"
+      },
+      "status_label": "Status propozycji",
+      "unnamed": "Jeszcze bez nazwy",
+      "breaks_down": "Rozkłada się na",
+      "bench_decides": "Nic nie wybrano — zdecyduje warsztat.",
+      "propose_for": "Zaproponuj za",
+      "more_tokens": "Jeszcze {{count}} tokenów i możesz to zgłosić.",
+      "more_tokens_one": "Jeszcze 1 token i możesz to zgłosić.",
+      "more_tokens_few": "Jeszcze {{count}} tokeny i możesz to zgłosić.",
+      "more_tokens_many": "Jeszcze {{count}} tokenów i możesz to zgłosić.",
+      "give_name": "Nadaj nazwę, a trafi na tablicę.",
+      "tokens_left": "Zostało ci tokenów: {{count}}.",
+      "tokens_left_one": "Został ci 1 token.",
+      "back_to_board": "Wróć do tablicy",
+      "scraps_into": "Rozkłada się na",
+      "how_many_part": "Ile sztuk tej części — teraz {{count}}",
+      "take_out": "Usuń {{part}} z demontażu",
+      "form": {
+        "what_title": "Co to jest",
+        "what_hint": "Gitara czy efekt, jak by się nazywał w Arsenale i jak rzadki ma być.",
+        "name": "Nazwa",
+        "brand": "Marka",
+        "brand_placeholder": "Marka — opcjonalnie",
+        "image": "Link do obrazka",
+        "image_placeholder": "https://… link do obrazka, opcjonalnie",
+        "bad_link": "Wyświetlane są tylko linki https — ten zostanie pominięty.",
+        "rarity": "Rzadkość",
+        "what_it_does": "Co robi",
+        "origin_title": "Skąd się wziął",
+        "origin_hint": "Jak brzmi i dlaczego pasuje do gry — plus jedna linijka, którą ma nosić każdy egzemplarz.",
+        "description_placeholder": "Skąd się wziął, jak brzmi, dlaczego pasuje do gry.",
+        "engraving": "Grawer",
+        "engraving_placeholder": "Jedna linijka, twoja, na każdym egzemplarzu",
+        "engraving_hint": "Jeśli powstanie, twoja linijka trafi na przedmiot — zostało znaków: {{count}}.",
+        "scrap_hint": "Co dostaje warsztat, gdy ktoś go rozbierze, w kolejności odzysku i jakiej klasy. Do {{max}} części — zostaw puste, a zdecyduje warsztat."
+      }
+    },
+    "case": {
+      "mine_on_seat": "Twoje tokeny na tym miejscu: {{count}}",
+      "mine_on_seat_one": "1 twój token jest na tym miejscu",
+      "empty": "puste",
+      "up_next": "Następny",
+      "winning": "{{name}} wygrywa to miejsce",
+      "no_votes": "Brak głosów",
+      "back_another": "Wesprzyj inny przedmiot: {{rarity}} ({{count}})",
+      "search": "Szukaj przedmiotów: {{rarity}}…",
+      "no_match": "Nic nie pasuje do „{{search}}”",
+      "back_item": "Wesprzyj {{name}}",
+      "seat": "Miejsce: {{rarity}}",
+      "replaces": "Głosuj, co zastąpi {{item}} przy zmianie skrzynki.",
+      "fills": "Głosuj, co je zajmie przy zmianie skrzynki.",
+      "title": "Teraz w skrzynce",
+      "intro": "Jeden przedmiot na rzadkość. Wybierz miejsce, a potem głosuj, co trafi tam następne.",
+      "changes_tomorrow": "zmiana jutro",
+      "changes_in": "zmiana za {{count}} dni",
+      "chosen_by": "Wybrane przez wspierających",
+      "slate_tomorrow": "nowy zestaw jutro",
+      "slate_in": "nowy zestaw za {{count}} dni",
+      "open_for": "Otwórz za {{cost}} Fame",
+      "needs": "Potrzeba {{cost}} Fame",
+      "supporters_pick": "Wspierający wybierają, co tu trafia →"
+    },
+    "work": {
+      "columns": {
+        "queue": {
+          "title": "Kolejka",
+          "blurb": "Następne, po kolei"
+        },
+        "in_progress": {
+          "title": "W trakcie",
+          "blurb": "Budowane teraz"
+        },
+        "done": {
+          "title": "Zrobione",
+          "blurb": "Wydane, od najnowszych"
+        }
+      },
+      "from_idea": "Pochodzi z pomysłu wspierającego",
+      "idea": "Pomysł wspierającego",
+      "nothing_here": "Nic tu nie ma",
+      "show_all": "Pokaż wszystkie ({{count}})",
+      "empty_body": "Tu pojawi się kolejka, gdy coś w niej będzie."
+    }
   }
 }

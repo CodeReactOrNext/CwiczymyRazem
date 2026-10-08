@@ -5,12 +5,11 @@ import {
   PLATE_NOISE_BG,
   TierPlate,
 } from "feature/arsenal/components/TierPlate";
-import {
-  getPartLabel,
-  PART_TIER_COLORS,
-} from "feature/arsenal/data/partDefinitions";
+import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { renderKindIcon } from "feature/gearProposals/constants/gearIcons";
 import type { GearProposal } from "feature/gearProposals/types/gearProposal.types";
+import { useTranslation } from "hooks/useTranslation";
 import { ImageOff, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -43,11 +42,17 @@ export const ProposedItemCard = ({
   /** The rest of the proposal — pitch, backers, the vote — inside the frame. */
   children?: ReactNode;
 }) => {
+  const { t } = useTranslation("supporter");
+  const labels = useArsenalLabels();
   const [failed, setFailed] = useState(false);
   const rs = RARITY_STYLES[proposal.rarity];
   const showArt = proposal.imageUrl && !failed;
   const typeLabel =
-    proposal.kind === "guitar" ? "Guitar" : (proposal.effectType ?? "Pedal");
+    proposal.kind === "guitar"
+      ? labels.kind("guitar")
+      : proposal.effectType
+        ? labels.effectType(proposal.effectType)
+        : labels.kind("effect");
 
   return (
     <div
@@ -105,8 +110,11 @@ export const ProposedItemCard = ({
           {proposal.name}
         </p>
         <p className='mt-1 text-xs font-medium' style={{ color: rs.baseColor }}>
-          {proposal.rarity} · {typeLabel}
-          <span className='text-zinc-500'> · by {proposal.authorName}</span>
+          {labels.rarity(proposal.rarity)} · {typeLabel}
+          <span className='text-zinc-500'>
+            {" "}
+            · {t("panel.by", { name: proposal.authorName })}
+          </span>
         </p>
       </div>
 
@@ -186,14 +194,14 @@ export const ProposedItemCard = ({
         <div className='relative z-10 flex flex-wrap items-center gap-2 px-4 pb-1 pt-3'>
           <Wrench
             size={13}
-            aria-label='Scraps into'
+            aria-label={t("panel.gear.scraps_into")}
             className='mr-0.5 text-zinc-500'>
-            <title>Scraps into</title>
+            <title>{t("panel.gear.scraps_into")}</title>
           </Wrench>
           {proposal.scrapBom.map((slot) => (
             <span
               key={slot.partId}
-              title={`${slot.tier} ${getPartLabel(slot.partId)} ×${slot.qty}`}>
+              title={`${labels.partTier(slot.tier)} ${labels.part(slot.partId)} ×${slot.qty}`}>
               <TierPlate
                 color={PART_TIER_COLORS[slot.tier]}
                 size={32}

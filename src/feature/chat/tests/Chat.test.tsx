@@ -234,17 +234,18 @@ describe("Chat Component", () => {
     expect(mockSetNewMessage).toHaveBeenCalledWith("@Ann Welcome! 👋 ");
   });
 
-  it("folds stock greetings into the welcome line and drops Say hi once greeted", () => {
+  it("folds stock greetings into the join line and drops Say hi once greeted", () => {
     (useChat as any).mockReturnValue(
       chatState({
         messages: [
           {
             id: "w1",
-            type: "welcome",
+            type: "system",
             userId: "ann",
             username: "Ann",
-            message: "Ann just joined Riff Quest",
+            message: "Ann joined the guild",
             timestamp: new Date(),
+            system: { kind: "member_joined" },
           },
           {
             id: "g1",
@@ -252,13 +253,13 @@ describe("Chat Component", () => {
             username: "Test User",
             message: "@Ann Welcome! 👋",
             timestamp: new Date(),
-            replyTo: { id: "w1", userId: "ann", username: "Ann", message: "Ann just joined Riff Quest" },
+            replyTo: { id: "w1", userId: "ann", username: "Ann", message: "Ann joined the guild" },
           },
         ],
       })
     );
 
-    renderChat();
+    renderChat("guilds/g1/chat");
 
     expect(screen.getByText("Test User")).toBeDefined();
     expect(screen.getByText(/said hi/)).toBeDefined();

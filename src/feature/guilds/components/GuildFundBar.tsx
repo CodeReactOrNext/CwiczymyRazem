@@ -3,6 +3,8 @@ import {
   PledgeButton,
 } from "feature/guilds/components/GuildSpendPanel";
 import type { GuildFund, GuildMember } from "feature/guilds/types/guild.types";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -55,6 +57,7 @@ const Patrons = ({
   pledges: Record<string, number>;
   members: GuildMember[];
 }) => {
+  const { t } = useTranslation("guilds");
   const paid = Object.entries(pledges)
     .filter(([, tokens]) => tokens > 0)
     .sort((a, b) => b[1] - a[1]);
@@ -63,11 +66,11 @@ const Patrons = ({
 
   const named = (uid: string) =>
     members.find((member) => member.uid === uid)?.displayName ??
-    "a member who left";
+    t("fund.member_left");
 
   return (
     <p className='text-sm text-zinc-500'>
-      Paid for by{" "}
+      {t("fund.paid_by")}{" "}
       {paid.slice(0, 6).map(([uid, tokens], index) => (
         <span key={uid}>
           {index > 0 && ", "}
@@ -75,7 +78,7 @@ const Patrons = ({
           {tokens}
         </span>
       ))}
-      {paid.length > 6 && ` and ${paid.length - 6} more`}
+      {paid.length > 6 && ` ${t("fund.and_more", { count: paid.length - 6 })}`}
     </p>
   );
 };
@@ -93,6 +96,7 @@ export const GuildFundBar = ({
   onPledge,
   className,
 }: GuildFundBarProps) => {
+  const { t } = useTranslation("guilds");
   if (fund.cost === null) {
     return (
       <GuildSpendPanel
@@ -102,7 +106,7 @@ export const GuildFundBar = ({
         blurb={
           <>
             <p className='text-zinc-200'>{standing}</p>
-            <p>Maxed out — {maxed}.</p>
+            <p>{t("fund.maxed", { maxed })}</p>
           </>
         }
         have={fund.pot}
@@ -125,7 +129,10 @@ export const GuildFundBar = ({
         <>
           <p className='text-zinc-200'>{standing}</p>
           <p>
-            Next step adds <span className='text-zinc-200'>{buys}</span>
+            <Interpolate
+              text={t("fund.next_step")}
+              values={{ buys: <span className='text-zinc-200'>{buys}</span> }}
+            />
           </p>
         </>
       }
@@ -139,14 +146,14 @@ export const GuildFundBar = ({
 
       <div className='flex flex-wrap items-center gap-3'>
         {amounts.length === 0 ? (
-          <p className='text-sm text-zinc-500'>
-            Nothing left in your wallet this time.
-          </p>
+          <p className='text-sm text-zinc-500'>{t("fund.wallet_empty")}</p>
         ) : (
           <div
-            title={`You have ${tokensLeft.toLocaleString()} tokens`}
+            title={t("fund.you_have", { count: tokensLeft.toLocaleString() })}
             className='flex flex-wrap items-center gap-2'>
-            <span className='mr-1 text-sm text-zinc-400'>Chip in</span>
+            <span className='mr-1 text-sm text-zinc-400'>
+              {t("fund.chip_in")}
+            </span>
             {amounts.map((amount) => (
               <PledgeButton
                 key={amount}

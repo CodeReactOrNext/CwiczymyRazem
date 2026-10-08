@@ -1,0 +1,101 @@
+{
+  "view": {
+    "close_sidebar": "Close sidebar",
+    "open_selector": "Open scale selector",
+    "scales": "Scales",
+    "back_to_practice": "Back to Practice",
+    "practice": "Practice"
+  },
+  "scales": {
+    "minor_pentatonic": "Minor Pentatonic",
+    "major_pentatonic": "Major Pentatonic",
+    "minor": "Natural Minor",
+    "major": "Major Scale",
+    "dorian": "Dorian Mode",
+    "phrygian": "Phrygian Mode",
+    "mixolydian": "Mixolydian Mode",
+    "lydian": "Lydian Mode",
+    "locrian": "Locrian Mode"
+  },
+  "families": {
+    "pentatonic": {
+      "tree": "Pentatonic tree",
+      "label": "Pentatonic",
+      "group": "Pentatonic"
+    },
+    "diatonic": {
+      "tree": "Diatonic tree",
+      "label": "Diatonic Scale",
+      "group": "Diatonic"
+    },
+    "mode": {
+      "tree": "Mode tree",
+      "label": "Modal Mode",
+      "group": "Modal Modes"
+    }
+  },
+  "grid": {
+    "title": "{{root}} {{scale}}",
+    "done": "done",
+    "key": "Key"
+  },
+  "shape": {
+    "box": "Box {{n}}",
+    "fret": "Fret {{n}}",
+    "fret_lc": "fret {{n}}"
+  },
+  "patterns": {
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "ascending_descending": "Ascending + Descending",
+    "intervals_thirds": "Thirds",
+    "intervals_fourths": "Fourths",
+    "sequence_3_notes": "Sequence 3",
+    "sequence_4_notes": "Sequence 4"
+  },
+  "patterns_short": {
+    "ascending": "ascending",
+    "descending": "descending",
+    "ascending_descending": "ascending descending",
+    "intervals_thirds": "thirds",
+    "intervals_fourths": "fourths",
+    "sequence_3_notes": "seq 3 notes",
+    "sequence_4_notes": "seq 4 notes"
+  },
+  "node": {
+    "record": "Record: {{bpm}} BPM",
+    "reward": "Reward",
+    "single_string": "Single string",
+    "single_string_cap": "Single String"
+  },
+  "reward": {
+    "collected": "Box reward collected",
+    "collect": "Box cleared — collect it",
+    "left_final": "{{count}} shapes left — this box finishes the tree",
+    "left_final_one": "1 shape left — this box finishes the tree",
+    "left": "{{count}} shapes left in this box",
+    "left_one": "1 shape left in this box"
+  },
+  "modal": {
+    "close": "Close",
+    "string": "String {{n}}",
+    "frets": "Frets {{low}}–{{high}}",
+    "key_of": "Key of {{root}}",
+    "locked": "Complete the required exercises to unlock",
+    "practice": "Practice",
+    "retake": "Retake",
+    "exam": "Exam",
+    "record_run": "Record run",
+    "no_record": "No record yet",
+    "lower_tempo": "Lower target tempo",
+    "raise_tempo": "Raise target tempo",
+    "beat_it": "Beat it",
+    "set_record": "Set record",
+    "clean_run": "Only a clean run counts — hold the tempo to the end and the fastest one is kept.",
+    "pass_exam": "Pass the exam to open record runs above {{bpm}} BPM."
+  },
+  "sidebar": {
+    "title": "Scale selector",
+    "body": "Pick a scale to see its tree and shapes."
+  }
+}

@@ -3,6 +3,7 @@ import { cn } from 'assets/lib/utils';
 import { SCALE_TREE_KEYS, transposeFret } from 'feature/scaleTree/data/scaleTreeKeys';
 import { SCALE_TREE_POSITIONS, usesBoxNames } from 'feature/scaleTree/data/scaleTreeNodes';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'hooks/useTranslation';
 import { useEffect, useMemo,useRef, useState } from 'react';
 
 import { BoxRewardBlock } from './BoxRewardBlock';
@@ -32,18 +33,6 @@ const FAMILY_TEXT: Record<string, string> = {
   mode: 'text-violet-400',
 };
 
-const SCALE_LABEL: Record<string, string> = {
-  minor_pentatonic: 'Minor Pentatonic',
-  major_pentatonic: 'Major Pentatonic',
-  minor: 'Natural Minor',
-  major: 'Major Scale',
-  dorian: 'Dorian Mode',
-  phrygian: 'Phrygian Mode',
-  mixolydian: 'Mixolydian Mode',
-  lydian: 'Lydian Mode',
-  locrian: 'Locrian Mode',
-};
-
 const SCALE_TO_PREFIX: Record<string, string> = {
   minor_pentatonic: 'min_pent',
   major_pentatonic: 'maj_pent',
@@ -65,6 +54,7 @@ export function ScaleTreeGrid({
   selectedNodeId,
   onNodeClick,
 }: ScaleTreeGridProps) {
+  const { t } = useTranslation('scale_tree');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<Record<string, { x: number; y: number }>>({});
   const [scrollHeight, setScrollHeight] = useState(0);
@@ -191,19 +181,22 @@ export function ScaleTreeGrid({
       className="relative flex-1 flex flex-col h-full bg-zinc-950 overflow-hidden p-3 sm:p-6 pt-14 sm:pt-6 select-none"
     >
       <div className="mb-4 flex flex-col sm:mb-6">
-        <span className={`text-xs font-semibold capitalize tracking-wide ${accentText}`}>
-          {family} tree
+        <span className={`text-xs font-semibold tracking-wide ${accentText}`}>
+          {t(`families.${family}.tree`, family)}
         </span>
         <div className="mt-1.5 flex flex-wrap items-center gap-3">
-          <h1 className="font-display text-xl font-bold capitalize text-zinc-100 sm:text-2xl">
-            {rootNote} {SCALE_LABEL[scaleType] || scaleType}
+          <h1 className="font-display text-xl font-bold text-zinc-100 sm:text-2xl">
+            {t('grid.title', {
+              root: rootNote,
+              scale: t(`scales.${scaleType}`, scaleType),
+            })}
           </h1>
           {scaleNodes.length > 0 && (
             <Chip color='gray' className='py-1 text-[11px]'>
               <span className={`font-semibold tabular-nums ${accentText}`}>
                 {completedCount}/{scaleNodes.length}
               </span>
-              done
+              {t('grid.done')}
             </Chip>
           )}
         </div>
@@ -211,7 +204,9 @@ export function ScaleTreeGrid({
         {/* Key picker — the tree itself never changes, only the fret its shapes
             sit on and the notes under your fingers. */}
         <div className="mt-4 flex items-center gap-3">
-          <span className="hidden shrink-0 text-xs font-semibold text-zinc-500 sm:block">Key</span>
+          <span className="hidden shrink-0 text-xs font-semibold text-zinc-500 sm:block">
+            {t('grid.key')}
+          </span>
           <div className="flex gap-1.5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent">
             {SCALE_TREE_KEYS.map((key) => (
               <button
@@ -297,11 +292,13 @@ export function ScaleTreeGrid({
                       box convention, so the fret is the name. */}
                   <div className="w-10 sm:w-16 flex-shrink-0 text-right">
                     <span className="block text-xs font-semibold tabular-nums text-zinc-300">
-                      {showBoxNames ? `Box ${idx + 1}` : `Fret ${fret}`}
+                      {showBoxNames
+                        ? t('shape.box', { n: idx + 1 })
+                        : t('shape.fret', { n: fret })}
                     </span>
                     {showBoxNames && (
                       <span className="mt-0.5 hidden text-[10px] tabular-nums text-zinc-500 sm:block">
-                        fret {fret}
+                        {t('shape.fret_lc', { n: fret })}
                       </span>
                     )}
                   </div>

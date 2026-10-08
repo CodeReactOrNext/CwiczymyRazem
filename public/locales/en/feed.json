@@ -42,6 +42,8 @@
   "song_count_other": "{{count}} songs",
   "passed_exam": "passed the {{step}} exam",
   "completed_roadmap_step": "completed {{step}} on the {{roadmap}} roadmap",
+  "joined": "joined Riff Quest",
+  "joined_with": "joined Riff Quest, {{phrase}}",
   "completed_daily_quests": "completed all {{quests}}",
   "daily_quests": "Daily Quests!",
   "session_time_hint": "Practice time logged in this session",
@@ -113,5 +115,29 @@
     "online": "{{count}} online",
     "practicing": "{{count}} practicing",
     "sheet_title": "Community"
+  },
+  "discord_promo": {
+    "eyebrow": "Riff Quest Discord",
+    "join": "Join the server",
+    "v1": {
+      "headline": "Your amp has an off switch. Our Discord doesn't.",
+      "body": "Players talking gear, posting riffs and losing arguments about tone at every hour. Come say hi."
+    },
+    "v2": {
+      "headline": "Practising alone is fine. Complaining alone isn't.",
+      "body": "Share your wins, ask about technique, find someone at your level to keep you honest."
+    },
+    "v3": {
+      "headline": "There's a gear channel. It never sleeps.",
+      "body": "Pedals, strings, the guitar you definitely can't afford. Bring opinions."
+    },
+    "v4": {
+      "headline": "Recorded a riff? Get real ears on it.",
+      "body": "Drop a clip and get feedback from players who know exactly how that bend feels."
+    },
+    "v5": {
+      "headline": "Your guitar wants friends. You might too.",
+      "body": "Guilds, challenges and people practising the same thing you are. Join the Riff Quest Discord."
+    }
   }
 }

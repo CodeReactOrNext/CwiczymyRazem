@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'hooks/useTranslation';
 import { Lock, Music4,Trophy } from 'lucide-react';
 
 import { BASE_ROOT_NOTE, transposeFret } from '../data/scaleTreeKeys';
@@ -88,6 +89,7 @@ export function ScaleTreeGridNode({
   onMouseEnter,
   onMouseLeave,
 }: ScaleTreeGridNodeProps) {
+  const { t } = useTranslation('scale_tree');
   const isReward = node.type === 'rewardNode';
   const isSingleString = node.id.includes('single_string');
   const family = node.data?.scaleFamily || 'diatonic';
@@ -470,7 +472,7 @@ export function ScaleTreeGridNode({
         {/* Record tempo rides on the node itself, so the map reads as a scoreboard */}
         {recordBpm && !isLocked && !isReward && (
           <span
-            title={`Record: ${recordBpm} BPM`}
+            title={t('node.record', { bpm: recordBpm })}
             className="pointer-events-none absolute -right-1.5 -top-1.5 z-20 rounded-full bg-orange-500 px-1.5 py-[1px] text-[9px] font-bold leading-tight tabular-nums text-zinc-950"
           >
             {recordBpm}
@@ -480,18 +482,15 @@ export function ScaleTreeGridNode({
 
       {node.data?.subtitle && (isReward || isSingleString || isSubnode) && (
         <span
-          className={`mt-2.5 text-[10px] font-medium capitalize transition-colors text-center max-w-[84px] truncate ${
+          className={`mt-2.5 text-[10px] font-medium transition-colors text-center max-w-[84px] truncate ${
             isLocked ? 'text-zinc-600' : 'text-zinc-400 group-hover:text-zinc-200'
           }`}
         >
           {isReward
-            ? 'Reward'
+            ? t('node.reward')
             : isSingleString
-              ? 'Single string'
-              : req.patternType
-                  .replace('intervals_', '')
-                  .replace('sequence_', 'seq ')
-                  .replace(/_/g, ' ')}
+              ? t('node.single_string')
+              : t(`patterns_short.${req.patternType}`, req.patternType)}
         </span>
       )}
     </div>

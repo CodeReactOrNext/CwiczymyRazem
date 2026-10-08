@@ -45,5 +45,72 @@
     "claim": "+{{reward}} abholen",
     "claimed": "Abgeholt",
     "reward": "+{{reward}} Fame"
+  },
+  "page": {
+    "title": "Meilensteine",
+    "subtitle": "Wöchentliche Belohnungen für erreichte Übungsziele — {{date}}",
+    "eyebrow": "Üben",
+    "prev_level": "Vorheriges Level",
+    "next_level": "Nächstes Level",
+    "reached_lc": "erreicht",
+    "locked_lc": "gesperrt",
+    "in_progress_lc": "in Arbeit",
+    "reward_ready": "Belohnung bereit zum Abholen",
+    "reward_claimed": "Belohnung abgeholt",
+    "reached": "Erreicht",
+    "current_goal": "Aktuelles Ziel",
+    "locked": "Gesperrt",
+    "reached_of": "{{done}}/{{total}} erreicht",
+    "all_unlocked": "Alle Level freigeschaltet — du bist ein Virtuose!",
+    "unlocks_at": "Wird auf Level {{lvl}} freigeschaltet",
+    "you_are_level": "Du bist Level {{lvl}}. Üben bringt dich höher.",
+    "you_are_level_cost": "Du bist Level {{lvl}}. Üben bringt dich höher — dann kostet das Freischalten {{cost}} Fame.",
+    "unlock_once": "Einmalig freischalten für",
+    "need_more": "(noch {{count}} nötig)",
+    "claim_reward": "Belohnung abholen",
+    "claimed_line": "{{reward}} abgeholt — dieses Level zahlt nächste Woche wieder.",
+    "reward_line": "Belohnung: {{reward}} — hol sie ab, sobald das Ziel erreicht ist.",
+    "goal_complete": "Ziel erreicht",
+    "goal_this_week": "Dein Ziel diese Woche",
+    "claim": "Abholen",
+    "cost_once": "{{cost}} einmalig",
+    "per_week": "/Wo.",
+    "percent_done": "{{percent}} % geschafft",
+    "min_goal": "Ziel: {{min}} Min.",
+    "min_plus": "{{min}}+ Min.",
+    "bars_hint": "Jeder Tag mit {{min}} Übung zählt — grüne Balken sind geschaffte Tage.",
+    "streak_hint": "Übe {{rule}} — ein ausgelassener Tag setzt die Serie zurück.",
+    "streak_rule": "jeden Tag 15+ Min., ohne Unterbrechung",
+    "cats_hint": "Ein Tag zählt nur, wenn {{rule}}.",
+    "cats_rule": "alle 4 Kategorien 15+ Min. erreichen",
+    "streak_cats_hint": "Jeder Balken ist eine Kategorie — füll {{rule}}.",
+    "streak_cats_rule": "alle 4 auf 15+ Min., jeden Tag ohne Unterbrechung",
+    "investment": "Einmalige Investition. Sie hat sich nach {{weeks}} bezahlt gemacht, danach bekommst du {{reward}}, in der du das Ziel erreichst — für immer.",
+    "weeks": "{{count}} Wochen",
+    "weeks_one": "1 Woche",
+    "reward_weekly": "+{{reward}} Fame in jeder Woche",
+    "dismiss": "Schließen",
+    "how_it_works": "So funktioniert's",
+    "rules": {
+      "0": {
+        "title": "Erreichen, dann einmal freischalten",
+        "desc": "jedes Level öffnet sich ab einem bestimmten Kontolevel und kostet dann einmalig Fame — danach gehört es dir für immer. Das erste ist kostenlos."
+      },
+      "1": {
+        "title": "Üben",
+        "desc": "erreiche das Wochenziel dieses Levels."
+      },
+      "2": {
+        "title": "Abholen",
+        "desc": "hol dir die Fame-Belohnung — jede Woche wieder, in der du das Ziel erreichst."
+      }
+    },
+    "example": "Beispiel: Groove kostet einmalig 40 Fame und zahlt +30 pro Woche, hat sich also in Woche zwei bezahlt gemacht. Ziele und Abholungen setzen sich jede Woche zurück — eine Abholung pro Level und Woche, höhere Level zahlen mehr.",
+    "toast_locked": "{{name}} wird auf Level {{lvl}} freigeschaltet — du bist Level {{player}}",
+    "toast_no_fame": "Nicht genug Fame (nötig: {{cost}}, vorhanden: {{fame}})",
+    "toast_unlocked": "{{name}} freigeschaltet!",
+    "toast_purchase_failed": "Kauf fehlgeschlagen",
+    "toast_claimed": "+{{reward}} Fame von {{name}}",
+    "toast_claim_failed": "Abholen fehlgeschlagen"
   }
 }

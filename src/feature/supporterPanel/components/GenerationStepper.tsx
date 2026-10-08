@@ -1,35 +1,25 @@
 import { cn } from "assets/lib/utils";
 import type { GenerationStage } from "feature/supporterPanel/types/roadmapJob.types";
+import { useTranslation } from "hooks/useTranslation";
+import type { Translate } from "lib/i18n/translate";
 import { Check, ClipboardCheck, FileText, Flag, Layers } from "lucide-react";
 import React from "react";
 import { FaYoutube } from "react-icons/fa6";
 
 type BlockId = "draft" | "review" | "phases" | "lessons" | "ready";
 
+/** Title and "doing" line are `supporter:panel.stepper.blocks.<id>`. */
 interface Block {
   id: BlockId;
   Icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  /** What the block does, for the one that is running. */
-  doing: string;
 }
 
 const BLOCKS: Block[] = [
-  { id: "draft", Icon: FileText, title: "Draft", doing: "Sketching the plan" },
-  {
-    id: "review",
-    Icon: ClipboardCheck,
-    title: "Review",
-    doing: "Getting it reviewed",
-  },
-  { id: "phases", Icon: Layers, title: "Phases", doing: "Writing every step" },
-  {
-    id: "lessons",
-    Icon: FaYoutube,
-    title: "Lessons",
-    doing: "Finding lessons",
-  },
-  { id: "ready", Icon: Flag, title: "Ready", doing: "Saving your roadmap" },
+  { id: "draft", Icon: FileText },
+  { id: "review", Icon: ClipboardCheck },
+  { id: "phases", Icon: Layers },
+  { id: "lessons", Icon: FaYoutube },
+  { id: "ready", Icon: Flag },
 ];
 
 const blockOf = (stage: GenerationStage | null): number => {
@@ -47,18 +37,23 @@ const blockOf = (stage: GenerationStage | null): number => {
 };
 
 /** The line under the running block: a count where there is one, a verb otherwise. */
-const detailOf = (stage: GenerationStage | null, block: Block): string => {
-  if (!stage) return block.doing;
+const detailOf = (
+  t: Translate,
+  stage: GenerationStage | null,
+  block: Block,
+): string => {
+  const doing = t(`panel.stepper.blocks.${block.id}.doing`);
+  if (!stage) return doing;
   if (stage.name === "structure" && block.id === "review") {
-    return stage.step === "revise" ? "Rewriting after notes" : block.doing;
+    return stage.step === "revise" ? t("panel.stepper.revising") : doing;
   }
   if (stage.name === "phase" && block.id === "phases") {
-    return `${stage.done} of ${stage.total} written`;
+    return t("panel.stepper.written", { done: stage.done, total: stage.total });
   }
   if (stage.name === "lessons" && block.id === "lessons") {
-    return `${stage.done} of ${stage.total} steps`;
+    return t("panel.stepper.steps", { done: stage.done, total: stage.total });
   }
-  return block.doing;
+  return doing;
 };
 
 interface GenerationStepperProps {
@@ -80,6 +75,7 @@ export const GenerationStepper: React.FC<GenerationStepperProps> = ({
   progress,
   className,
 }) => {
+  const { t } = useTranslation("supporter");
   const current = blockOf(stage);
 
   return (
@@ -120,7 +116,7 @@ export const GenerationStepper: React.FC<GenerationStepperProps> = ({
               </span>
               <span className='flex min-w-0 flex-col items-center gap-0.5'>
                 <span className='text-xs font-bold sm:text-sm'>
-                  {block.title}
+                  {t(`panel.stepper.blocks.${block.id}.title`)}
                 </span>
                 <span
                   className={cn(
@@ -128,10 +124,10 @@ export const GenerationStepper: React.FC<GenerationStepperProps> = ({
                     state === "running" ? "text-amber-200/80" : "text-zinc-500",
                   )}>
                   {state === "done"
-                    ? "done"
+                    ? t("panel.stepper.done")
                     : state === "running"
-                      ? detailOf(stage, block)
-                      : "up next"}
+                      ? detailOf(t, stage, block)
+                      : t("panel.stepper.up_next")}
                 </span>
               </span>
             </li>
@@ -142,9 +138,13 @@ export const GenerationStepper: React.FC<GenerationStepperProps> = ({
       <div className='flex flex-col gap-2'>
         <div className='flex items-center justify-between gap-3 text-xs'>
           <span className='font-semibold text-zinc-300'>
-            Step {current + 1} of {BLOCKS.length} ·{" "}
+            {t("panel.stepper.step_of", {
+              n: current + 1,
+              total: BLOCKS.length,
+            })}{" "}
+            ·{" "}
             <span className='text-amber-200/90'>
-              {detailOf(stage, BLOCKS[current])}
+              {detailOf(t, stage, BLOCKS[current])}
             </span>
           </span>
           <span className='tabular-nums text-zinc-500'>

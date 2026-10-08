@@ -1,5 +1,6 @@
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Volume2, VolumeX } from "lucide-react";
 import { GiDrumKit, GiGuitarBassHead, GiGuitarHead, GiMicrophone } from "react-icons/gi";
 
@@ -50,6 +51,7 @@ const ACCENTS = {
  * keeping the two separate is what makes "quieter" an unambiguous instruction.
  */
 export function TrackMixer({ tracks, onChange, className }: TrackMixerProps) {
+  const { t } = useTranslation("backing_track");
   if (!tracks.length) return null;
 
   return (
@@ -62,14 +64,21 @@ export function TrackMixer({ tracks, onChange, className }: TrackMixerProps) {
         const type = track.trackType ?? "guitar";
         const Icon = ICONS[type] ?? GiGuitarHead;
         const percent = Math.round(track.volume * 100);
-        const label = track.id === "main" ? "Main instrument" : track.name || "Instrument";
+        const label =
+          track.id === "main"
+            ? t("mixer.main")
+            : track.name || t("mixer.instrument");
 
         return (
           <div key={track.id} className='flex min-w-0 items-center gap-2.5'>
             <button
               type='button'
               onClick={() => onChange(track.id, { isMuted: !track.isMuted })}
-              title={track.isMuted ? `Unmute ${label}` : `Mute ${label}`}
+              title={
+                track.isMuted
+                  ? t("align.unmute", { what: label })
+                  : t("align.mute", { what: label })
+              }
               aria-pressed={track.isMuted}
               className={cn(
                 "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors",
@@ -102,7 +111,7 @@ export function TrackMixer({ tracks, onChange, className }: TrackMixerProps) {
                 value={[track.isMuted ? 0 : percent]}
                 max={100}
                 step={1}
-                aria-label={`${label} volume`}
+                aria-label={t("mixer.volume", { name: label })}
                 className='mt-1.5 cursor-pointer'
                 // Dragging to zero is how a mute is asked for; dragging back up is
                 // how it is taken back, so the two controls never disagree.

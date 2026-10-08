@@ -3,6 +3,7 @@ import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { SlateItemArt } from "feature/supporterCase/components/SlateItemArt";
 import {
   useSlateVote,
@@ -19,6 +20,8 @@ import { eligibleItems } from "feature/supporterCase/utils/slate";
 import { VotePill } from "feature/supporterPanel/components/VotePill";
 import { SLATE_VOTE_COST } from "feature/supporterPanel/constants/supporterPanel.constants";
 import type { SupporterWallet } from "feature/supporterPanel/types/supporterPanel.types";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import {
   CalendarClock,
   ChevronUp,
@@ -29,17 +32,20 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const ItemLine = ({ item }: { item: SlateItem }) => (
-  <span className='block min-w-0'>
-    <span className='block truncate text-base font-semibold leading-snug text-zinc-50'>
-      {item.name}
+const ItemLine = ({ item }: { item: SlateItem }) => {
+  const labels = useArsenalLabels();
+  return (
+    <span className='block min-w-0'>
+      <span className='block truncate text-base font-semibold leading-snug text-zinc-50'>
+        {item.name}
+      </span>
+      <span className='mt-0.5 block truncate text-sm text-zinc-400'>
+        {item.brand}
+        {item.effectType && ` · ${labels.effectType(item.effectType)}`}
+      </span>
     </span>
-    <span className='mt-0.5 block truncate text-sm text-zinc-400'>
-      {item.brand}
-      {item.effectType && ` · ${item.effectType}`}
-    </span>
-  </span>
-);
+  );
+};
 
 /**
  * One seat of the case: what is in it now, and what is about to take it.
@@ -58,6 +64,8 @@ const SeatCard = ({
   selected: boolean;
   onSelect: () => void;
 }) => {
+  const { t } = useTranslation("supporter");
+  const labels = useArsenalLabels();
   const styles = RARITY_STYLES[slot.rarity];
   const leader = slot.candidates[0];
   const mine = slot.candidates.reduce(
@@ -86,11 +94,11 @@ const SeatCard = ({
           that grows with it left the six artworks sitting at two heights. */}
       <span className='flex h-5 items-center justify-between gap-2'>
         <span className={cn("text-sm font-semibold", styles.text)}>
-          {slot.rarity}
+          {labels.rarity(slot.rarity)}
         </span>
         {mine > 0 && (
           <span
-            title={`${mine} of your tokens are on this seat`}
+            title={t("panel.case.mine_on_seat", { count: mine })}
             className='flex shrink-0 items-center gap-1 text-xs font-bold tabular-nums text-cyan-300'>
             <SupportToken size={14} />
             {mine}
@@ -107,7 +115,7 @@ const SeatCard = ({
         />
       ) : (
         <span className='flex h-[104px] w-full items-center justify-center rounded-lg bg-zinc-950/40 text-xs text-zinc-500'>
-          empty
+          {t("panel.case.empty")}
         </span>
       )}
 
@@ -116,10 +124,12 @@ const SeatCard = ({
       {/* Pinned to the bottom so the six footers line up however long the
           names above them run. */}
       <span className='mt-auto block min-w-0 rounded bg-zinc-950/40 px-2.5 py-2'>
-        <span className='block text-xs text-zinc-500'>Up next</span>
+        <span className='block text-xs text-zinc-500'>
+          {t("panel.case.up_next")}
+        </span>
         {leader ? (
           <span
-            title={`${leader.name} is winning this seat`}
+            title={t("panel.case.winning", { name: leader.name })}
             className='mt-0.5 flex min-w-0 items-center gap-1 text-sm font-semibold text-zinc-200'>
             <ChevronUp
               size={14}
@@ -130,7 +140,7 @@ const SeatCard = ({
           </span>
         ) : (
           <span className='mt-0.5 block text-sm text-zinc-500'>
-            No votes yet
+            {t("panel.case.no_votes")}
           </span>
         )}
       </span>
@@ -231,6 +241,8 @@ const ItemPicker = ({
   canVote: boolean;
   onVote: (key: string) => void;
 }) => {
+  const { t } = useTranslation("supporter");
+  const labels = useArsenalLabels();
   const empty = slot.candidates.length === 0;
   const [isOpen, setIsOpen] = useState(empty);
   const [search, setSearch] = useState("");
@@ -264,8 +276,11 @@ const ItemPicker = ({
           className='flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-white/[0.06] text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/[0.12] hover:text-zinc-100'>
           {isOpen ? <X size={14} /> : <Plus size={14} />}
           {isOpen
-            ? "Close"
-            : `Back another ${slot.rarity} item (${rest.length})`}
+            ? t("panel.close")
+            : t("panel.case.back_another", {
+                rarity: labels.rarity(slot.rarity),
+                count: rest.length,
+              })}
         </button>
       )}
 
@@ -274,14 +289,16 @@ const ItemPicker = ({
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder={`Search ${slot.rarity} items…`}
+            placeholder={t("panel.case.search", {
+              rarity: labels.rarity(slot.rarity),
+            })}
             startIcon={<Search size={14} className='ml-1.5 text-zinc-400' />}
             className='h-9 border-none bg-white/5 text-sm'
           />
 
           {matches.length === 0 ? (
             <p className='py-4 text-center text-sm text-zinc-400'>
-              Nothing matches “{search}”
+              {t("panel.case.no_match", { search })}
             </p>
           ) : (
             // Scrolls inside itself so the seats above stay on screen while
@@ -295,8 +312,8 @@ const ItemPicker = ({
                   onClick={() => onVote(item.key)}
                   title={
                     canVote
-                      ? `Back ${item.name}`
-                      : "Nothing left in your wallet to spend"
+                      ? t("panel.case.back_item", { name: item.name })
+                      : t("panel.vote.broke")
                   }
                   // Dimmed rather than deaf: an empty wallet still gets to
                   // read the pool, and the tooltip says why the tile will
@@ -313,7 +330,9 @@ const ItemPicker = ({
                       {item.name}
                     </span>
                     <span className='mt-0.5 block truncate text-xs text-zinc-400'>
-                      {item.effectType ?? item.brand}
+                      {item.effectType
+                        ? labels.effectType(item.effectType)
+                        : item.brand}
                     </span>
                   </span>
                   {/* Not a nested button — the tile itself is the control; this
@@ -347,25 +366,39 @@ const SeatBallot = ({
   busy: boolean;
   onVote: (key: string) => void;
 }) => {
+  const { t } = useTranslation("supporter");
+  const labels = useArsenalLabels();
   const styles = RARITY_STYLES[slot.rarity];
 
   return (
     <section className='space-y-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
       <div className='space-y-1'>
         <h2 className='text-xl font-bold text-white'>
-          <span className={styles.text}>{slot.rarity}</span> seat
+          <Interpolate
+            text={t("panel.case.seat")}
+            values={{
+              rarity: (
+                <span className={styles.text}>
+                  {labels.rarity(slot.rarity)}
+                </span>
+              ),
+            }}
+          />
         </h2>
         <p className='text-sm text-zinc-400'>
           {slot.current ? (
-            <>
-              Vote for what replaces{" "}
-              <span className='font-semibold text-zinc-200'>
-                {slot.current.name}
-              </span>{" "}
-              when the case changes.
-            </>
+            <Interpolate
+              text={t("panel.case.replaces")}
+              values={{
+                item: (
+                  <span className='font-semibold text-zinc-200'>
+                    {slot.current.name}
+                  </span>
+                ),
+              }}
+            />
           ) : (
-            "Vote for what fills it when the case changes."
+            t("panel.case.fills")
           )}
         </p>
       </div>
@@ -398,6 +431,7 @@ export const SupporterCaseTab = ({
   wallet: SupporterWallet | undefined;
   enabled: boolean;
 }) => {
+  const { t } = useTranslation("supporter");
   const { data: state, isLoading } = useSupporterCase(enabled);
   const vote = useSlateVote();
   const [seat, setSeat] = useState<SlateRarity | null>(null);
@@ -430,18 +464,18 @@ export const SupporterCaseTab = ({
           <div className='space-y-1'>
             <h2 className='flex items-center gap-2 text-xl font-bold text-white'>
               <Package size={18} className='text-amber-400' />
-              In the case right now
+              {t("panel.case.title")}
             </h2>
             <p className='max-w-xl text-sm text-zinc-400'>
-              One item per rarity. Pick a seat, then vote for what goes in next.
+              {t("panel.case.intro")}
             </p>
           </div>
 
           <Chip color='gray' className='shrink-0'>
             <CalendarClock size={13} className='text-zinc-400' />
             {state.daysLeft === 1
-              ? "changes tomorrow"
-              : `changes in ${state.daysLeft} days`}
+              ? t("panel.case.changes_tomorrow")
+              : t("panel.case.changes_in", { count: state.daysLeft })}
           </Chip>
         </div>
 

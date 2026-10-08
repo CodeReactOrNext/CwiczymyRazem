@@ -16,9 +16,9 @@ import {
   checkGuildTag,
   GUILD_DESCRIPTION_MAX,
   GUILD_NAME_MAX,
-  GUILD_NAME_MESSAGES,
+  GUILD_NAME_MIN,
   GUILD_TAG_MAX,
-  GUILD_TAG_MESSAGES,
+  GUILD_TAG_MIN,
   guildSlug,
   normaliseTag,
 } from "feature/guilds/utils/guild.utils";
@@ -27,6 +27,8 @@ import {
   GUILD_LOGO_SIZE,
   GUILD_LOGO_TYPES,
 } from "feature/guilds/utils/guildLogo";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { ImagePlus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { getSquareImg } from "utils/canvasUtils";
@@ -54,6 +56,7 @@ export const NewGuildDialog = ({
   busy,
   onSubmit,
 }: NewGuildDialogProps) => {
+  const { t } = useTranslation("guilds");
   const [name, setName] = useState("");
   const [tag, setTag] = useState("");
   const [description, setDescription] = useState("");
@@ -83,12 +86,14 @@ export const NewGuildDialog = ({
     if (!file) return;
 
     if (!GUILD_LOGO_TYPES.includes(file.type)) {
-      setLogoProblem("PNG, JPG or WebP only");
+      setLogoProblem(t("new.logo_types"));
       return;
     }
     if (file.size > GUILD_LOGO_MAX_BYTES) {
       setLogoProblem(
-        `That file is over ${Math.round(GUILD_LOGO_MAX_BYTES / (1024 * 1024))}MB`,
+        t("new.logo_size", {
+          mb: Math.round(GUILD_LOGO_MAX_BYTES / (1024 * 1024)),
+        }),
       );
       return;
     }
@@ -98,7 +103,7 @@ export const NewGuildDialog = ({
     // to nothing throws rather than returning, so both endings land here.
     const square = await getSquareImg(file, GUILD_LOGO_SIZE).catch(() => null);
     if (!square) {
-      setLogoProblem("That image could not be read");
+      setLogoProblem(t("new.logo_unreadable"));
       return;
     }
 
@@ -137,13 +142,31 @@ export const NewGuildDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
-          <DialogTitle>Found a guild</DialogTitle>
+          <DialogTitle>{t("browser.found")}</DialogTitle>
           <DialogDescription>
-            Costs{" "}
-            <SupportToken size={18} className='inline-block align-middle' />{" "}
-            {cost} — you have{" "}
-            <SupportToken size={18} className='inline-block align-middle' />{" "}
-            {tokensLeft} left. The name and the tag are yours alone once taken.
+            <Interpolate
+              text={t("new.description")}
+              values={{
+                cost: (
+                  <>
+                    <SupportToken
+                      size={18}
+                      className='inline-block align-middle'
+                    />{" "}
+                    {cost}
+                  </>
+                ),
+                left: (
+                  <>
+                    <SupportToken
+                      size={18}
+                      className='inline-block align-middle'
+                    />{" "}
+                    {tokensLeft}
+                  </>
+                ),
+              }}
+            />
           </DialogDescription>
         </DialogHeader>
 
@@ -152,7 +175,7 @@ export const NewGuildDialog = ({
             <Label
               htmlFor='guild-name'
               className='ml-1 font-bold text-zinc-400'>
-              Name
+              {t("new.name")}
             </Label>
             <Input
               id='guild-name'
@@ -164,7 +187,10 @@ export const NewGuildDialog = ({
             />
             {nameProblem ? (
               <p className='ml-1 text-xs text-amber-400/80'>
-                {GUILD_NAME_MESSAGES[nameProblem]}
+                {t(`new.name_problems.${nameProblem}`, {
+                  min: GUILD_NAME_MIN,
+                  max: GUILD_NAME_MAX,
+                })}
               </p>
             ) : (
               slug && (
@@ -177,9 +203,9 @@ export const NewGuildDialog = ({
 
           <div className='space-y-2'>
             <Label htmlFor='guild-tag' className='ml-1 font-bold text-zinc-400'>
-              Tag{" "}
+              {t("new.tag")}{" "}
               <span className='font-medium text-zinc-500'>
-                worn next to your name
+                {t("new.tag_hint")}
               </span>
             </Label>
             <Input
@@ -192,16 +218,19 @@ export const NewGuildDialog = ({
             />
             {tagProblem && (
               <p className='ml-1 text-xs text-amber-400/80'>
-                {GUILD_TAG_MESSAGES[tagProblem]}
+                {t(`new.tag_problems.${tagProblem}`, {
+                  min: GUILD_TAG_MIN,
+                  max: GUILD_TAG_MAX,
+                })}
               </p>
             )}
           </div>
 
           <div className='space-y-2'>
             <Label className='ml-1 font-bold text-zinc-400'>
-              Picture{" "}
+              {t("new.picture")}{" "}
               <span className='font-medium text-zinc-500'>
-                optional, square works best
+                {t("new.picture_hint")}
               </span>
             </Label>
 
@@ -220,7 +249,7 @@ export const NewGuildDialog = ({
                   className='h-9 bg-white/5 text-zinc-300 hover:text-zinc-100'>
                   <span className='flex items-center gap-2'>
                     <ImagePlus size={15} />
-                    {preview ? "Change" : "Add an image"}
+                    {preview ? t("new.change") : t("new.add_image")}
                   </span>
                 </Button>
 
@@ -232,7 +261,7 @@ export const NewGuildDialog = ({
                     className='h-9 text-zinc-500 hover:text-red-400'>
                     <span className='flex items-center gap-1.5'>
                       <X size={14} />
-                      Remove
+                      {t("new.remove")}
                     </span>
                   </Button>
                 )}
@@ -256,8 +285,10 @@ export const NewGuildDialog = ({
             <Label
               htmlFor='guild-desc'
               className='ml-1 font-bold text-zinc-400'>
-              What is it for{" "}
-              <span className='font-medium text-zinc-500'>optional</span>
+              {t("new.what_for")}{" "}
+              <span className='font-medium text-zinc-500'>
+                {t("new.optional")}
+              </span>
             </Label>
             <Textarea
               id='guild-desc'
@@ -265,7 +296,7 @@ export const NewGuildDialog = ({
               onChange={(event) => setDescription(event.target.value)}
               maxLength={GUILD_DESCRIPTION_MAX}
               rows={3}
-              placeholder='Who it is for, what you practise, when you show up.'
+              placeholder={t("new.what_for_placeholder")}
               className='resize-none bg-white/5 font-medium'
             />
           </div>
@@ -276,17 +307,17 @@ export const NewGuildDialog = ({
             variant='ghost'
             onClick={() => onOpenChange(false)}
             className='text-zinc-400 hover:text-zinc-200'>
-            Cancel
+            {t("new.cancel")}
           </Button>
           <Button onClick={submit} disabled={!canSubmit}>
             {tokensLeft >= cost ? (
               <span className='flex items-center gap-1.5'>
-                Found it for
+                {t("founding.cta")}
                 <SupportToken size={20} />
                 {cost}
               </span>
             ) : (
-              "Not enough tokens"
+              t("founding.not_enough")
             )}
           </Button>
         </div>

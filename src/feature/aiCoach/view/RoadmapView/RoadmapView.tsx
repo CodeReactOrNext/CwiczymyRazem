@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import {
   Check,
   CheckCircle2,
@@ -94,10 +96,11 @@ const PHASE_BADGE = [
   "bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30",
 ];
 
+/** Labels are keys in the `ai_coach` namespace. */
 const LEGEND: { status: StepStatus; label: string }[] = [
-  { status: "not-started", label: "To do" },
-  { status: "in-progress", label: "In progress" },
-  { status: "done", label: "Done" },
+  { status: "not-started", label: "status.not_started" },
+  { status: "in-progress", label: "status.in_progress" },
+  { status: "done", label: "status.done" },
 ];
 
 // ─── Small pieces of the map ─────────────────────────────────────────────────
@@ -153,10 +156,11 @@ const CHECK_CLS: Record<PhaseCheckState, string> = {
   passed: "bg-emerald-950/30 text-emerald-400/80 hover:bg-emerald-950/50",
 };
 
+/** Keys in the `ai_coach` namespace. */
 const CHECK_LABEL: Record<PhaseCheckState, string> = {
-  locked: "Checkpoint",
-  ready: "Checkpoint · ready",
-  passed: "Checkpoint · passed",
+  locked: "checkpoint.locked",
+  ready: "checkpoint.ready",
+  passed: "checkpoint.passed",
 };
 
 interface CheckpointMapButtonProps {
@@ -178,6 +182,7 @@ const CheckpointMapButton = ({
   connector = false,
   onClick,
 }: CheckpointMapButtonProps) => {
+  const { t } = useTranslation("ai_coach");
   const state = getPhaseCheckState(phase);
   const Icon =
     state === "locked" ? Lock : state === "passed" ? Check : ClipboardCheck;
@@ -196,7 +201,7 @@ const CheckpointMapButton = ({
       )}>
       <Icon className='h-3.5 w-3.5 shrink-0' />
       <span>
-        {CHECK_LABEL[state]}
+        {t(CHECK_LABEL[state])}
         {state === "passed" && phase.check && (
           <span className='ml-1.5 tabular-nums opacity-70'>
             {phase.check.bestScore}/{phase.check.total}
@@ -418,6 +423,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   refine,
   onContentChange,
 }) => {
+  const { t } = useTranslation("ai_coach");
   const router = useRouter();
 
   const persist = useCallback(
@@ -606,8 +612,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   }, [phases]);
 
   useEffect(() => {
-    const t = setTimeout(recalcPaths, 60);
-    return () => clearTimeout(t);
+    const timer = setTimeout(recalcPaths, 60);
+    return () => clearTimeout(timer);
   }, [recalcPaths]);
 
   useEffect(() => {
@@ -652,10 +658,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       patch: (step: RoadmapStep) => RoadmapStep,
     ) => {
       persist(patchStep(phaseId, stepId, patch)).catch(() =>
-        toast.error("Failed to save."),
+        toast.error(t("toasts.save_failed")),
       );
     },
-    [patchStep, persist],
+    [patchStep, persist, t],
   );
 
   /** Mirrors the open step into the URL so a refresh or a return trip lands on it again. */
@@ -716,9 +722,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         phases: next,
         updatedAt: new Date().toISOString(),
       });
-      persist(next).catch(() => toast.error("Failed to save."));
+      persist(next).catch(() => toast.error(t("toasts.save_failed")));
     },
-    [onUpdate, persist, roadmap],
+    [onUpdate, persist, roadmap, t],
   );
 
   const navigateStep = useCallback(
@@ -759,6 +765,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     fetchStepDetail(roadmap, activeStep, phasesRef.current, adminPassword)
       .then((data) => {
         const saved = patchStep(phase.id, step.id, (s) => enrichStep(s, data));
+        // The editor is admin-only, so this one stays in English.
         return persist(saved).catch(() => toast.error("Failed to save."));
       })
       .catch((err) => {
@@ -1025,7 +1032,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   /** The server refunds a failed call before it answers, so the message is all there is to show. */
   const refineFailed = (error: unknown) =>
     toast.error(
-      error instanceof Error ? error.message : "The change did not go through.",
+      error instanceof Error ? error.message : t("toasts.change_failed"),
     );
 
   const refineRewrite = async (ref: RoadmapStepRef, note: string) => {
@@ -1052,7 +1059,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         sessionsRequired: written.sessionsRequired,
       }));
       await saveContent(next);
-      toast.success("Step rewritten.");
+      toast.success(t("toasts.step_rewritten"));
     } catch (error) {
       refineFailed(error);
     } finally {
@@ -1121,8 +1128,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       await Promise.all([saveContent(next), persist(next)]);
       toast.success(
         lessons.length
-          ? `Found ${lessons.length} ${lessons.length === 1 ? "lesson" : "lessons"}.`
-          : "No lesson in the index fits this step.",
+          ? t("toasts.lessons_found", { count: lessons.length })
+          : t("toasts.no_lesson"),
       );
     } catch (error) {
       refineFailed(error);
@@ -1153,13 +1160,18 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
           songCompleted: false,
         }));
         await Promise.all([saveContent(next), persist(next)]);
-        toast.success(`Linked to "${song.title}" by ${song.artist}.`);
+        toast.success(
+          t("toasts.song_linked", { title: song.title, artist: song.artist }),
+        );
       } else if (data.requested) {
         toast.info(
-          `"${data.requested.title}" by ${data.requested.artist} is not in the song library.`,
+          t("toasts.song_missing", {
+            title: data.requested.title,
+            artist: data.requested.artist,
+          }),
         );
       } else {
-        toast.info("This step is not about one particular song.");
+        toast.info(t("toasts.no_song"));
       }
     } catch (error) {
       refineFailed(error);
@@ -1187,7 +1199,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       });
       const next = replacePhase(phase.id, () => data.phase);
       await saveContent(next);
-      toast.success("Step added.");
+      toast.success(t("toasts.step_added"));
       const [addedId] = data.addedStepIds ?? [];
       if (addedId) {
         setActiveStepId(addedId);
@@ -1205,7 +1217,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   const refineRemoveStep = (ref: RoadmapStepRef) => {
     const { step, phase, index } = ref;
     if (phase.steps.length <= 1) {
-      toast.error("A phase keeps at least one step.");
+      toast.error(t("toasts.phase_min"));
       return;
     }
     const neighbour =
@@ -1224,7 +1236,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     } else {
       closeStep();
     }
-    toast.success("Step removed.");
+    toast.success(t("toasts.step_removed"));
   };
 
   const handleRemoveLesson = (
@@ -1552,13 +1564,13 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
               <div className='mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400'>
                 {roadmap.level && (
                   <span className='rounded bg-zinc-800/80 px-2 py-0.5 backdrop-blur-sm'>
-                    {roadmap.level}
+                    {t(`levels.${roadmap.level}`, roadmap.level)}
                   </span>
                 )}
                 <span className='text-zinc-600'>·</span>
-                <span>{totalSteps} steps</span>
+                <span>{t("n_steps", { count: totalSteps })}</span>
                 <span className='text-zinc-600'>·</span>
-                <span>{phases.length} phases</span>
+                <span>{t("n_phases", { count: phases.length })}</span>
               </div>
               <h2 className='font-display text-xl font-bold text-zinc-100 md:text-2xl'>
                 {roadmap.title}
@@ -1574,7 +1586,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                   {doneCount}/{totalSteps}
                   {inProgressCount > 0 && (
                     <span className='ml-1.5 text-amber-400'>
-                      · {inProgressCount} in progress
+                      · {t("in_progress_count", { count: inProgressCount })}
                     </span>
                   )}
                 </span>
@@ -1596,13 +1608,13 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                 </span>
                 <span className='text-zinc-700'>·</span>
                 <span>
-                  {doneCount}/{totalSteps} steps
+                  {t("steps_of", { done: doneCount, total: totalSteps })}
                 </span>
                 {inProgressCount > 0 && (
                   <>
                     <span className='text-zinc-700'>·</span>
                     <span className='text-amber-400'>
-                      {inProgressCount} in progress
+                      {t("in_progress_count", { count: inProgressCount })}
                     </span>
                   </>
                 )}
@@ -1610,7 +1622,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                   <>
                     <span className='text-zinc-700'>·</span>
                     <span className='rounded bg-zinc-800 px-2 py-0.5 text-xs'>
-                      {roadmap.level}
+                      {t(`levels.${roadmap.level}`, roadmap.level)}
                     </span>
                   </>
                 )}
@@ -1716,14 +1728,16 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                   </span>
                   <span className='min-w-0 flex-1'>
                     <span className='block text-[11px] font-semibold text-amber-400'>
-                      Checkpoint
+                      {t("checkpoint.locked")}
                     </span>
                     <span className='block truncate text-sm font-semibold text-zinc-100'>
-                      Show what you learned in phase{" "}
-                      {checkpointUpNext.phaseIdx + 1}
+                      {t("checkpoint.show_what", {
+                        phase: checkpointUpNext.phaseIdx + 1,
+                      })}
                     </span>
                     <span className='block truncate text-xs text-zinc-400'>
-                      {checkpointUpNext.phase.title} · every step done
+                      {checkpointUpNext.phase.title} ·{" "}
+                      {t("checkpoint.every_step_done")}
                     </span>
                   </span>
                   <ChevronRight className='h-4 w-4 shrink-0 text-amber-500 transition-colors group-hover:text-amber-300' />
@@ -1738,13 +1752,14 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                   </span>
                   <span className='min-w-0 flex-1'>
                     <span className='block text-[11px] font-semibold text-cyan-400'>
-                      {hasStarted ? "Continue" : "Start here"}
+                      {hasStarted ? t("card.continue") : t("start_here")}
                     </span>
                     <span className='block truncate text-sm font-semibold text-zinc-100'>
                       {upNext.step.title}
                     </span>
                     <span className='block truncate text-xs text-zinc-400'>
-                      Phase {upNext.phaseIdx + 1} · {upNext.phase.title}
+                      {t("phase_n", { n: upNext.phaseIdx + 1 })} ·{" "}
+                      {upNext.phase.title}
                     </span>
                   </span>
                   <ChevronRight className='h-4 w-4 shrink-0 text-cyan-500 transition-colors group-hover:text-cyan-300' />
@@ -1752,8 +1767,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
               ) : (
                 <div className='flex flex-1 items-center gap-3 rounded-lg bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-400'>
                   <CheckCircle2 className='h-4 w-4 shrink-0' />
-                  Every step done and every checkpoint passed. Your reward is
-                  waiting at the finish line.
+                  {t("all_done_banner")}
                 </div>
               )}
 
@@ -1766,21 +1780,25 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                         STATUS_DOT[status],
                       )}
                     />
-                    {label}
+                    {t(label)}
                   </span>
                 ))}
                 {refine && (
                   <span className='flex items-center gap-1.5 text-zinc-300'>
                     <Coins className='h-3.5 w-3.5 text-amber-300' />
                     {refine.tokensLeft === null ? (
-                      "tokens"
+                      t("tokens")
                     ) : (
-                      <>
-                        <span className='font-bold tabular-nums'>
-                          {refine.tokensLeft}
-                        </span>{" "}
-                        tokens
-                      </>
+                      <Interpolate
+                        text={t("tokens_count", { count: refine.tokensLeft })}
+                        values={{
+                          count: (
+                            <span className='font-bold tabular-nums'>
+                              {refine.tokensLeft}
+                            </span>
+                          ),
+                        }}
+                      />
                     )}
                   </span>
                 )}
@@ -1952,7 +1970,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                           ? "bg-emerald-500/10 text-emerald-400"
                           : "bg-zinc-900/30 text-zinc-500 opacity-40",
                       )}>
-                      {isFinished ? "🏆 Goal achieved!" : "🏆 Finish"}
+                      {isFinished
+                        ? `🏆 ${t("goal_achieved")}`
+                        : `🏆 ${t("finish")}`}
                     </div>
                   ))}
               </div>

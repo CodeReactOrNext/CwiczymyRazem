@@ -10,6 +10,8 @@ import { preflightRoadmap } from "feature/supporterPanel/services/roadmapJob.ser
 import type { RoadmapGoalContext } from "feature/supporterPanel/types/roadmapJob.types";
 import type { SupporterWallet } from "feature/supporterPanel/types/supporterPanel.types";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import type { RoadmapBrief } from "lib/roadmaps/generation/brief";
 import {
   goalHint,
@@ -46,39 +48,16 @@ type ComposerPhase = "goal" | "checking" | "brief";
 const MAX_GOAL_LENGTH = 500;
 const MIN_GOAL_LENGTH = 5;
 
-/** Starting points for an empty form — a click fills both fields, nothing more. */
-const GOAL_EXAMPLES = [
-  {
-    title: "Blues like Stevie Ray Vaughan",
-    goal: "Play Texas blues like Stevie Ray Vaughan: the shuffle rhythm, big bends and wide vibrato, and his signature licks over a 12-bar blues.",
-  },
-  {
-    title: "Back after a break",
-    goal: "Get my playing back after a few months off: calluses and stamina without injury, clean chord changes, timing, and the songs I used to play.",
-  },
-  {
-    title: "Sing and play",
-    goal: "Sing and play at the same time: strumming that runs on autopilot while the voice leads, starting with easy songs.",
-  },
-  {
-    title: "Tight metal rhythm",
-    goal: "Tight metal rhythm guitar: downpicking endurance, palm muting and gallops, locked to a metronome.",
-  },
-];
+/**
+ * Starting points for an empty form — a click fills both fields, nothing more.
+ * Title and goal live in `supporter:panel.generate.examples.<i>`.
+ */
+const GOAL_EXAMPLES = [0, 1, 2, 3];
 
+/** Label and hint are `supporter:panel.generate.visibility.<value>`. */
 const VISIBILITY_OPTIONS = [
-  {
-    value: "public",
-    Icon: Globe,
-    label: "Public",
-    hint: "Shows up in Player Roadmaps, so other players can learn from it too.",
-  },
-  {
-    value: "private",
-    Icon: Lock,
-    label: "Private",
-    hint: "Only you see it. Costs more, because nobody else gets to learn from it.",
-  },
+  { value: "public", Icon: Globe },
+  { value: "private", Icon: Lock },
 ] as const;
 
 const Field = ({ label, children }: { label: string; children: ReactNode }) => (
@@ -113,6 +92,7 @@ const GoalContextFields = ({
   context: RoadmapGoalContext;
   onChange: (next: RoadmapGoalContext) => void;
 }) => {
+  const { t } = useTranslation("supporter");
   const [open, setOpen] = useState(false);
   const filled = [context.favourites.trim(), context.canPlay.trim()].filter(
     Boolean,
@@ -127,13 +107,15 @@ const GoalContextFields = ({
         className='flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 hover:bg-zinc-800/40'>
         <span className='min-w-0 flex-1'>
           <span className='block text-sm font-semibold text-zinc-200'>
-            Tell the coach more
+            {t("panel.generate.more.title")}
             <span className='ml-2 font-normal text-zinc-500'>
-              {filled ? `${filled} of 2 answered` : "optional"}
+              {filled
+                ? t("panel.generate.more.answered", { count: filled })
+                : t("panel.optional")}
             </span>
           </span>
           <span className='block text-xs text-zinc-500'>
-            Favourite artists and songs, what you can already play.
+            {t("panel.generate.more.body")}
           </span>
         </span>
         <ChevronDown
@@ -148,7 +130,7 @@ const GoalContextFields = ({
       {open && (
         <div className='space-y-5 px-4 pb-5 pt-2'>
           <div className='grid gap-5 md:grid-cols-2'>
-            <Field label='Artists or songs you love'>
+            <Field label={t("panel.generate.more.favourites")}>
               <input
                 type='text'
                 value={context.favourites}
@@ -156,11 +138,11 @@ const GoalContextFields = ({
                 onChange={(event) =>
                   onChange({ ...context, favourites: event.target.value })
                 }
-                placeholder='e.g. John Mayer, Slow Dancing in a Burning Room'
+                placeholder={t("panel.generate.more.favourites_placeholder")}
                 className={contextInputClass}
               />
             </Field>
-            <Field label='What you can already play'>
+            <Field label={t("panel.generate.more.can_play")}>
               <input
                 type='text'
                 value={context.canPlay}
@@ -168,7 +150,7 @@ const GoalContextFields = ({
                 onChange={(event) =>
                   onChange({ ...context, canPlay: event.target.value })
                 }
-                placeholder='e.g. open chords, the minor pentatonic box'
+                placeholder={t("panel.generate.more.can_play_placeholder")}
                 className={contextInputClass}
               />
             </Field>
@@ -220,6 +202,7 @@ export const GenerateRoadmapCard = ({
   onGenerated: (roadmapId: string) => void;
   wallet?: SupporterWallet;
 }) => {
+  const { t } = useTranslation(["supporter", "ai_coach"]);
   const [title, setTitle] = useState("");
   const [goal, setGoal] = useState("");
   const [level, setLevel] = useState<RoadmapLevel>("Intermediate");
@@ -283,10 +266,7 @@ export const GenerateRoadmapCard = ({
         songsMissing: result.songsMissing.length,
       });
       if (result.verdict === "not_guitar") {
-        setGoalNotice(
-          result.reason ||
-            "This roadmap is about playing guitar — describe what you want to play.",
-        );
+        setGoalNotice(result.reason || t("panel.generate.not_guitar"));
         setPhase("goal");
         return;
       }
@@ -335,11 +315,10 @@ export const GenerateRoadmapCard = ({
           </span>
           <div>
             <h2 className='text-base font-bold text-white'>
-              Build a roadmap around your goal
+              {t("panel.generate.title")}
             </h2>
             <p className='mt-0.5 text-sm text-zinc-400'>
-              Describe what you want to play — the coach lays out the phases,
-              exercises and songs.
+              {t("panel.generate.folded_body")}
             </p>
           </div>
         </div>
@@ -349,7 +328,7 @@ export const GenerateRoadmapCard = ({
           onClick={() => setExpanded(true)}
           className='flex shrink-0 items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
           <Sparkles size={15} />
-          Create a roadmap
+          {t("panel.generate.create")}
           <span className='ml-0.5 flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 tabular-nums'>
             <SupportToken size={14} />
             {roadmapGenerationCost("public")}
@@ -364,16 +343,14 @@ export const GenerateRoadmapCard = ({
       <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div className='space-y-1.5'>
           <h2 className='text-lg font-bold text-zinc-100'>
-            {running
-              ? "Writing your roadmap"
-              : "Build a roadmap around your goal"}
+            {running ? t("panel.generate.writing") : t("panel.generate.title")}
           </h2>
           <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
             {running
-              ? "It takes a few minutes and runs on our side — you can leave this page or close the tab, and you will get a notification when it is ready. Stay here and it opens on its own."
+              ? t("panel.generate.running_body")
               : phase === "brief"
-                ? "A few questions the coach wants answered before writing — each one changes the shape of the plan, and each one can be skipped."
-                : "Describe what you want to be able to play. The coach lays out the phases, exercises, lessons and songs to get you there."}
+                ? t("panel.generate.brief_body")
+                : t("panel.generate.goal_body")}
           </p>
         </div>
 
@@ -384,7 +361,7 @@ export const GenerateRoadmapCard = ({
               <span className='font-bold tabular-nums text-zinc-100'>
                 {tokensLeft}
               </span>
-              {tokensLeft === 1 ? "token" : "tokens"} left
+              {t("panel.generate.tokens_left", { count: tokensLeft })}
             </span>
           )}
           {status === "idle" && (
@@ -394,8 +371,8 @@ export const GenerateRoadmapCard = ({
                 setExpanded(false);
                 backToGoal();
               }}
-              aria-label='Close the roadmap builder'
-              title='Close'
+              aria-label={t("panel.generate.close_builder")}
+              title={t("panel.close")}
               className='flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
               <X size={18} />
             </button>
@@ -442,26 +419,26 @@ export const GenerateRoadmapCard = ({
             )}
           </AnimatePresence>
 
-          <Field label='Title'>
+          <Field label={t("panel.generate.title_label")}>
             <input
               type='text'
               value={title}
               maxLength={MAX_TITLE_LENGTH}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder='e.g. Play like Mark Knopfler'
+              placeholder={t("panel.generate.title_placeholder")}
               className='w-full rounded-lg bg-zinc-800/50 px-4 py-3 text-base font-semibold text-zinc-100 outline-none placeholder:font-normal placeholder:text-zinc-500 focus:ring-1 focus:ring-zinc-600'
             />
           </Field>
 
-          <Field label='What do you want to be able to play?'>
+          <Field label={t("panel.generate.goal_label")}>
             <div className='rounded-lg bg-zinc-800/50 focus-within:ring-1 focus-within:ring-zinc-600'>
               <textarea
                 rows={3}
                 maxLength={MAX_GOAL_LENGTH}
                 value={goal}
                 onChange={(event) => setGoal(event.target.value)}
-                aria-label='Description'
-                placeholder='e.g. I want to improvise over blues in any key and stop getting lost in the solo…'
+                aria-label={t("panel.generate.description")}
+                placeholder={t("panel.generate.goal_placeholder")}
                 className='block w-full resize-none bg-transparent px-4 pb-2 pt-4 text-base leading-relaxed text-zinc-100 outline-none placeholder:text-zinc-500'
               />
               <div className='flex items-end justify-between gap-4 px-4 pb-3'>
@@ -479,16 +456,16 @@ export const GenerateRoadmapCard = ({
                   )
                 ) : (
                   <div className='flex flex-wrap gap-2'>
-                    {GOAL_EXAMPLES.map((example) => (
+                    {GOAL_EXAMPLES.map((i) => (
                       <button
-                        key={example.title}
+                        key={i}
                         type='button'
                         onClick={() => {
-                          setTitle(example.title);
-                          setGoal(example.goal);
+                          setTitle(t(`panel.generate.examples.${i}.title`));
+                          setGoal(t(`panel.generate.examples.${i}.goal`));
                         }}
                         className='rounded-md bg-zinc-800 px-2.5 py-1 text-xs text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 hover:bg-zinc-700 hover:text-zinc-200'>
-                        {example.title}
+                        {t(`panel.generate.examples.${i}.title`)}
                       </button>
                     ))}
                   </div>
@@ -503,7 +480,7 @@ export const GenerateRoadmapCard = ({
           <GoalContextFields context={context} onChange={setContext} />
 
           <div className='grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]'>
-            <Field label='Your level'>
+            <Field label={t("panel.generate.level")}>
               <div className='grid grid-cols-2 gap-1 rounded-lg bg-zinc-800/40 p-1 sm:grid-cols-4'>
                 {ROADMAP_LEVELS.map((candidate) => (
                   <button
@@ -512,7 +489,7 @@ export const GenerateRoadmapCard = ({
                     onClick={() => setLevel(candidate)}
                     aria-pressed={level === candidate}
                     className={segmentClass(level === candidate)}>
-                    {candidate}
+                    {t(`ai_coach:levels.${candidate}`, candidate)}
                   </button>
                 ))}
               </div>
@@ -520,9 +497,9 @@ export const GenerateRoadmapCard = ({
 
             {/* A public roadmap gives the community something back for the
                 compute, so it is the cheaper one. */}
-            <Field label='Who can see it'>
+            <Field label={t("panel.generate.who_sees")}>
               <div className='grid grid-cols-2 gap-1 rounded-lg bg-zinc-800/40 p-1'>
-                {VISIBILITY_OPTIONS.map(({ value, Icon, label }) => (
+                {VISIBILITY_OPTIONS.map(({ value, Icon }) => (
                   <button
                     key={value}
                     type='button'
@@ -530,14 +507,17 @@ export const GenerateRoadmapCard = ({
                     aria-pressed={visibility === value}
                     className={segmentClass(visibility === value)}>
                     <Icon size={14} className='shrink-0' />
-                    {label}
+                    {t(`panel.generate.visibility.${value}.label`)}
                     <span className='text-zinc-500'>·</span>
                     <TokenAmount value={roadmapGenerationCost(value)} />
                   </button>
                 ))}
               </div>
               <p className='text-sm text-zinc-500'>
-                {selectedVisibility?.hint}
+                {selectedVisibility &&
+                  t(
+                    `panel.generate.visibility.${selectedVisibility.value}.hint`,
+                  )}
               </p>
             </Field>
           </div>
@@ -546,23 +526,32 @@ export const GenerateRoadmapCard = ({
             <p className='text-sm leading-relaxed text-zinc-500'>
               {!canAfford ? (
                 <>
-                  This one needs{" "}
-                  <span className='font-bold text-zinc-200'>{cost}</span> tokens
-                  and you have{" "}
-                  <span className='font-bold text-zinc-200'>{tokensLeft}</span>.{" "}
+                  <Interpolate
+                    text={t("panel.generate.needs")}
+                    values={{
+                      cost: (
+                        <span className='font-bold text-zinc-200'>{cost}</span>
+                      ),
+                      left: (
+                        <span className='font-bold text-zinc-200'>
+                          {tokensLeft}
+                        </span>
+                      ),
+                    }}
+                  />{" "}
                   <a
                     href={BMC_URL}
                     target='_blank'
                     rel='noreferrer'
                     className='font-semibold text-amber-300 underline-offset-2 hover:underline'>
-                    Every donation adds tokens
+                    {t("panel.generate.donation_adds")}
                   </a>
                 </>
               ) : (
-                <>
-                  Next, the coach checks the goal and asks a few questions —
-                  free. Generating costs <TokenAmountInline value={cost} />.
-                </>
+                <Interpolate
+                  text={t("panel.generate.next_free")}
+                  values={{ cost: <TokenAmountInline value={cost} /> }}
+                />
               )}
             </p>
 
@@ -571,7 +560,7 @@ export const GenerateRoadmapCard = ({
               onClick={() => void handleContinue()}
               disabled={!goalReady}
               className='flex min-h-11 shrink-0 items-center justify-center gap-2.5 rounded-lg bg-zinc-100 px-5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-white'>
-              Continue
+              {t("panel.generate.continue")}
               <ArrowRight size={16} />
             </button>
           </div>
@@ -592,7 +581,7 @@ export const GenerateRoadmapCard = ({
             type='button'
             onClick={reset}
             className='ml-auto shrink-0 rounded-lg bg-zinc-800 px-3 py-1.5 text-sm font-bold text-zinc-200 hover:bg-zinc-700'>
-            Try again
+            {t("panel.try_again")}
           </button>
         </div>
       )}

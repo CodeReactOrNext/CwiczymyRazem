@@ -2,6 +2,8 @@ import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { FameCoin } from "feature/arsenal/components/Workshop/FameCoin";
+import { useTranslation } from "hooks/useTranslation";
+import type { Translate } from "lib/i18n/translate";
 import type { LucideIcon } from "lucide-react";
 import { Coins, HandCoins, PiggyBank, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
@@ -55,8 +57,15 @@ const LOOK: Record<
 };
 
 /** "1 token" vs "12 tokens" — Fame stays Fame either way, same as "money". */
-const unitWord = (currency: SpendCurrency, amount: number): string =>
-  currency === "fame" ? "Fame" : amount === 1 ? "token" : "tokens";
+const amountOf = (
+  t: Translate,
+  currency: SpendCurrency,
+  amount: number,
+): string =>
+  t(currency === "fame" ? "spend.fame_amount" : "spend.token_amount", {
+    count: amount,
+    amount: amount.toLocaleString(),
+  });
 
 /** The same coins the header and the shop draw, so the currency is recognised. */
 export const CurrencyIcon = ({
@@ -101,6 +110,7 @@ export const GuildSpendPanel = ({
   children,
   className,
 }: GuildSpendPanelProps) => {
+  const { t } = useTranslation("guilds");
   const look = LOOK[currency];
   const owed = need === null ? 0 : Math.max(0, need - have);
   const covered = need !== null && owed === 0;
@@ -166,10 +176,10 @@ export const GuildSpendPanel = ({
               </p>
               <p className='mt-1.5 text-xs text-zinc-500'>
                 {need === null
-                  ? `${unitWord(currency, have)} in the bank`
+                  ? t("spend.in_bank")
                   : covered
-                    ? "covered"
-                    : `${owed.toLocaleString()} ${unitWord(currency, owed)} to go`}
+                    ? t("spend.covered")
+                    : t("card.to_go", { amount: amountOf(t, currency, owed) })}
               </p>
             </div>
           )}
@@ -181,7 +191,10 @@ export const GuildSpendPanel = ({
             aria-valuenow={Math.min(have, need)}
             aria-valuemin={0}
             aria-valuemax={need}
-            aria-label={`${have} of ${need} ${unitWord(currency, need)}`}
+            aria-label={t("spend.have_of", {
+              have,
+              need: amountOf(t, currency, need),
+            })}
             className='h-2.5 overflow-hidden rounded-full bg-zinc-950/60'>
             <div
               className={cn(
@@ -219,6 +232,7 @@ export const PledgeButton = ({
   disabled?: boolean;
   onClick: () => void;
 }) => {
+  const { t } = useTranslation("guilds");
   const look = LOOK[currency];
 
   return (
@@ -234,7 +248,9 @@ export const PledgeButton = ({
       <CurrencyIcon currency={currency} size={18} />
       {amount.toLocaleString()}
       {finishes && (
-        <span className='text-xs font-semibold opacity-80'>· finish it</span>
+        <span className='text-xs font-semibold opacity-80'>
+          · {t("spend.finish")}
+        </span>
       )}
     </button>
   );

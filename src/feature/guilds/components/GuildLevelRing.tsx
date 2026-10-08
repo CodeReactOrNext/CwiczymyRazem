@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { GUILD_LAP_SIZE } from "feature/guilds/data/guildQuests";
+import { useTranslation } from "hooks/useTranslation";
 
 /**
  * The guild's level as a ring: the number in the middle, and around it how far
@@ -22,6 +23,7 @@ export const GuildLevelRing = ({
   size?: number;
   className?: string;
 }) => {
+  const { t } = useTranslation("guilds");
   const safe = Math.max(0, Math.floor(Number(level) || 0));
   const onLap = safe % GUILD_LAP_SIZE;
   const fraction = onLap / GUILD_LAP_SIZE;
@@ -34,8 +36,12 @@ export const GuildLevelRing = ({
   return (
     <div
       role='img'
-      aria-label={`Guild level ${safe}, ${onLap} of ${GUILD_LAP_SIZE} quests cleared on this lap`}
-      title={`Guild level ${safe} · ${onLap} of ${GUILD_LAP_SIZE} quests on this lap`}
+      aria-label={t("level_ring", {
+        level: safe,
+        done: onLap,
+        lap: GUILD_LAP_SIZE,
+      })}
+      title={t("level_ring", { level: safe, done: onLap, lap: GUILD_LAP_SIZE })}
       style={{ width: size, height: size }}
       className={cn(
         "relative flex shrink-0 items-center justify-center rounded-full bg-zinc-950/75",
@@ -71,7 +77,9 @@ export const GuildLevelRing = ({
 
       <span className='relative flex flex-col items-center leading-none'>
         {roomy && (
-          <span className='text-[8px] font-semibold text-cyan-300/80'>lvl</span>
+          <span className='text-[8px] font-semibold text-cyan-300/80'>
+            {t("lvl")}
+          </span>
         )}
         <span
           className={cn(

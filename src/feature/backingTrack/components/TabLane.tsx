@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useMemo, useRef } from "react";
 
 import { useCanvasSize, useTimelineFrame } from "../hooks/useTimelineFrame";
@@ -87,6 +88,7 @@ export function TabLane({
   onSeekToBeat,
   className,
 }: TabLaneProps) {
+  const { t } = useTranslation("backing_track");
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const sizeRef = useCanvasSize(canvasRef, heightPx);
@@ -296,8 +298,8 @@ export function TabLane({
       ref={canvasRef}
       aria-label={
         onSeekToBeat
-          ? "Tablature notes on the alignment timeline — click to play from there"
-          : "Tablature notes on the alignment timeline"
+          ? t("lanes_aria.tab_seek")
+          : t("lanes_aria.tab")
       }
       onPointerDown={
         onSeekToBeat

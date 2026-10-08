@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { CheckCircle2, CircleDashed, Zap } from "lucide-react";
 import React from "react";
 
@@ -12,19 +13,19 @@ const OPTIONS: {
 }[] = [
   {
     status: "not-started",
-    label: "Not yet",
+    label: "status_control.not_yet",
     Icon: CircleDashed,
     active: "bg-zinc-800 text-zinc-100",
   },
   {
     status: "in-progress",
-    label: "Practicing",
+    label: "status_control.practicing",
     Icon: Zap,
     active: "bg-amber-500/10 text-amber-400",
   },
   {
     status: "done",
-    label: "Got it",
+    label: "status_control.got_it",
     Icon: CheckCircle2,
     active: "bg-emerald-500/10 text-emerald-400",
   },
@@ -39,40 +40,42 @@ interface StepStatusControlProps {
 export const StepStatusControl: React.FC<StepStatusControlProps> = ({
   value,
   onChange,
-}) => (
-  <section className='flex flex-col gap-3'>
-    <div>
-      <h3 className='text-sm font-semibold text-zinc-100'>
-        Where are you with this?
-      </h3>
-      <p className='mt-1 text-xs leading-relaxed text-zinc-400'>
-        This step has no exercise or lesson to tick off, so you set the status
-        yourself.
-      </p>
-    </div>
-    <div
-      role='radiogroup'
-      className='grid grid-cols-3 gap-1.5 rounded-lg bg-zinc-900/40 p-1.5'>
-      {OPTIONS.map(({ status, label, Icon, active }) => {
-        const isActive = value === status;
-        return (
-          <button
-            key={status}
-            type='button'
-            role='radio'
-            aria-checked={isActive}
-            onClick={() => onChange(status)}
-            className={cn(
-              "flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-              isActive
-                ? active
-                : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200",
-            )}>
-            <Icon className='h-4 w-4' />
-            {label}
-          </button>
-        );
-      })}
-    </div>
-  </section>
-);
+}) => {
+  const { t } = useTranslation("ai_coach");
+  return (
+    <section className='flex flex-col gap-3'>
+      <div>
+        <h3 className='text-sm font-semibold text-zinc-100'>
+          {t("status_control.title")}
+        </h3>
+        <p className='mt-1 text-xs leading-relaxed text-zinc-400'>
+          {t("status_control.body")}
+        </p>
+      </div>
+      <div
+        role='radiogroup'
+        className='grid grid-cols-3 gap-1.5 rounded-lg bg-zinc-900/40 p-1.5'>
+        {OPTIONS.map(({ status, label, Icon, active }) => {
+          const isActive = value === status;
+          return (
+            <button
+              key={status}
+              type='button'
+              role='radio'
+              aria-checked={isActive}
+              onClick={() => onChange(status)}
+              className={cn(
+                "flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                isActive
+                  ? active
+                  : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200",
+              )}>
+              <Icon className='h-4 w-4' />
+              {t(label)}
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+};

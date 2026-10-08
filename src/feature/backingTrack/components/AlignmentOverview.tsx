@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import type { MutableRefObject } from "react";
 import { useEffect, useRef } from "react";
 
@@ -78,6 +79,7 @@ export function AlignmentOverview({
   heightPx = 56,
   className,
 }: AlignmentOverviewProps) {
+  const { t } = useTranslation("backing_track");
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const sizeRef = useCanvasSize(canvasRef, heightPx);
@@ -281,7 +283,7 @@ export function AlignmentOverview({
   return (
     <canvas
       ref={canvasRef}
-      aria-label='Backing track overview — click to jump to a part of the recording'
+      aria-label={t("lanes_aria.overview")}
       style={{ height: heightPx }}
       className={cn(
         "w-full cursor-pointer touch-none rounded-lg bg-zinc-950/70",

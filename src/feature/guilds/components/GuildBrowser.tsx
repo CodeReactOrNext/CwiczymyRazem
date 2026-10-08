@@ -16,6 +16,7 @@ import {
   equippedItem,
   motifIcons,
 } from "feature/guilds/utils/guildCosmetics.utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Clock, Plus, Search, Shield, Users, X } from "lucide-react";
 import { useState } from "react";
 
@@ -72,6 +73,7 @@ const GuildRankRow = ({
   onWithdraw: () => void;
   onLeave: () => void;
 }) => {
+  const { t } = useTranslation("guilds");
   const hex = accentHex(guild.cosmetics);
   const full = guild.memberCount >= guild.memberLimit;
 
@@ -98,7 +100,7 @@ const GuildRankRow = ({
       </div>
 
       <span
-        aria-label={`Rank ${rank}`}
+        aria-label={t("browser.rank", { rank })}
         className={cn(
           "relative w-8 shrink-0 text-center text-3xl font-bold tabular-nums",
           rank <= 3 ? "text-zinc-200" : "text-zinc-600",
@@ -133,7 +135,7 @@ const GuildRankRow = ({
           )}
           {isMine && (
             <span className='shrink-0 rounded bg-cyan-500/15 px-1.5 py-0.5 text-xs font-semibold text-cyan-300'>
-              Yours
+              {t("browser.yours")}
             </span>
           )}
         </p>
@@ -146,7 +148,9 @@ const GuildRankRow = ({
             <Users size={13} />
             {guild.memberCount}/{guild.memberLimit}
           </span>
-          <span className='truncate text-zinc-500'>by {guild.founderName}</span>
+          <span className='truncate text-zinc-500'>
+            {t("browser.by", { name: guild.founderName })}
+          </span>
         </p>
         {guild.description && (
           <p className='mt-1.5 line-clamp-2 max-w-2xl text-sm leading-relaxed text-zinc-400'>
@@ -160,7 +164,9 @@ const GuildRankRow = ({
         )}
       </div>
 
-      <div className='relative shrink-0' title={`Level ${guild.level}`}>
+      <div
+        className='relative shrink-0'
+        title={t("browser.level", { level: guild.level })}>
         <GuildLevelRing level={guild.level} size={56} />
       </div>
 
@@ -171,7 +177,7 @@ const GuildRankRow = ({
             disabled={busy}
             onClick={onLeave}
             className='h-9 text-zinc-400 hover:text-red-400'>
-            Leave
+            {t("browser.leave")}
           </Button>
         ) : application ? (
           <div className='flex flex-col items-end gap-0.5'>
@@ -181,14 +187,18 @@ const GuildRankRow = ({
                 application === "pending" ? "text-cyan-400" : "text-zinc-500",
               )}>
               <Clock size={12} />
-              {application === "pending" ? "Waiting" : "Turned down"}
+              {application === "pending"
+                ? t("browser.waiting")
+                : t("browser.turned_down")}
             </span>
             <button
               type='button'
               disabled={busy}
               onClick={onWithdraw}
               className='text-xs text-zinc-500 transition-colors hover:text-zinc-200'>
-              {application === "pending" ? "Withdraw" : "Clear"}
+              {application === "pending"
+                ? t("browser.withdraw")
+                : t("browser.clear")}
             </button>
           </div>
         ) : (
@@ -197,13 +207,13 @@ const GuildRankRow = ({
             onClick={onApply}
             title={
               full
-                ? "No free seats"
+                ? t("browser.no_seats")
                 : blocked
-                  ? "Leave your guild before asking to join another"
+                  ? t("browser.leave_first")
                   : undefined
             }
             className='h-9'>
-            {full ? "Full" : "Join"}
+            {full ? t("browser.full") : t("browser.join")}
           </Button>
         )}
       </div>
@@ -223,63 +233,68 @@ const ApplicationQueue = ({
   applications: GuildsState["applications"];
   busy: boolean;
   onDecide: (applicantUid: string, accept: boolean) => void;
-}) => (
-  <section className='space-y-3'>
-    <h2 className='text-sm font-bold text-zinc-200'>
-      Asking to join{" "}
-      <span className='font-medium text-zinc-500'>{applications.length}</span>
-    </h2>
+}) => {
+  const { t } = useTranslation("guilds");
+  return (
+    <section className='space-y-3'>
+      <h2 className='text-sm font-bold text-zinc-200'>
+        {t("browser.asking")}{" "}
+        <span className='font-medium text-zinc-500'>{applications.length}</span>
+      </h2>
 
-    {applications.map((application) => (
-      <div
-        key={application.uid}
-        className='flex flex-wrap items-center gap-3 rounded-lg bg-zinc-900/40 p-4'>
-        <Avatar
-          name={application.displayName}
-          avatarURL={application.avatar ?? undefined}
-          size='sm'
-          className='shrink-0'
-        />
+      {applications.map((application) => (
+        <div
+          key={application.uid}
+          className='flex flex-wrap items-center gap-3 rounded-lg bg-zinc-900/40 p-4'>
+          <Avatar
+            name={application.displayName}
+            avatarURL={application.avatar ?? undefined}
+            size='sm'
+            className='shrink-0'
+          />
 
-        <div className='min-w-0 flex-1'>
-          <p className='truncate text-sm font-bold text-zinc-100'>
-            {application.displayName}
-          </p>
-          {application.message && (
-            <p className='mt-1 text-sm text-zinc-400'>{application.message}</p>
-          )}
-          {application.status === "rejected" && (
-            <p className='mt-1 text-xs text-zinc-500'>
-              Already turned down — they can still withdraw it.
+          <div className='min-w-0 flex-1'>
+            <p className='truncate text-sm font-bold text-zinc-100'>
+              {application.displayName}
             </p>
+            {application.message && (
+              <p className='mt-1 text-sm text-zinc-400'>
+                {application.message}
+              </p>
+            )}
+            {application.status === "rejected" && (
+              <p className='mt-1 text-xs text-zinc-500'>
+                {t("browser.already_turned_down")}
+              </p>
+            )}
+          </div>
+
+          {application.status === "pending" && (
+            <div className='flex shrink-0 items-center gap-2'>
+              <Button
+                size='sm'
+                disabled={busy}
+                onClick={() => onDecide(application.uid, true)}>
+                <span className='flex items-center gap-1.5'>
+                  <Check size={14} />
+                  {t("browser.accept")}
+                </span>
+              </Button>
+              <Button
+                size='sm'
+                variant='ghost'
+                disabled={busy}
+                onClick={() => onDecide(application.uid, false)}
+                className='text-zinc-400 hover:text-red-400'>
+                <X size={14} />
+              </Button>
+            </div>
           )}
         </div>
-
-        {application.status === "pending" && (
-          <div className='flex shrink-0 items-center gap-2'>
-            <Button
-              size='sm'
-              disabled={busy}
-              onClick={() => onDecide(application.uid, true)}>
-              <span className='flex items-center gap-1.5'>
-                <Check size={14} />
-                Accept
-              </span>
-            </Button>
-            <Button
-              size='sm'
-              variant='ghost'
-              disabled={busy}
-              onClick={() => onDecide(application.uid, false)}
-              className='text-zinc-400 hover:text-red-400'>
-              <X size={14} />
-            </Button>
-          </div>
-        )}
-      </div>
-    ))}
-  </section>
-);
+      ))}
+    </section>
+  );
+};
 
 /**
  * The list: every guild, whether the caller is in one, and the way in or out.
@@ -292,6 +307,7 @@ export const GuildBrowser = ({
   data: GuildsState | undefined;
   isLoading: boolean;
 }) => {
+  const { t } = useTranslation("guilds");
   const [isFounding, setIsFounding] = useState(false);
   const [search, setSearch] = useState("");
   const { found, applyTo, withdraw, decide, leave } = useGuildMutations();
@@ -334,22 +350,20 @@ export const GuildBrowser = ({
   return (
     <div className='space-y-8'>
       <section className='flex flex-wrap items-center justify-between gap-4'>
-        <p className='text-sm text-zinc-400'>
-          Guilds climb by clearing quests together. Joining one is free.
-        </p>
+        <p className='text-sm text-zinc-400'>{t("browser.intro")}</p>
         <Button
           onClick={() => setIsFounding(true)}
           disabled={tokensLeft < data.foundingCost || !!data.myGuildId}
           title={
             data.myGuildId
-              ? "Leave your guild before founding one"
+              ? t("browser.leave_before_founding")
               : tokensLeft < data.foundingCost
-                ? "Not enough tokens left"
-                : "The name is yours for good"
+                ? t("browser.not_enough_tokens")
+                : t("browser.name_yours")
           }>
           <span className='flex items-center gap-2'>
             <Plus size={16} />
-            Found a guild
+            {t("browser.found")}
             <span className='ml-1 inline-flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 text-sm font-bold tabular-nums'>
               <SupportToken size={16} />
               {data.foundingCost}
@@ -381,7 +395,7 @@ export const GuildBrowser = ({
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder='Search guilds by name, tag or description…'
+            placeholder={t("browser.search")}
             className='h-11 bg-white/5 pl-10 font-medium'
           />
         </div>
@@ -393,20 +407,20 @@ export const GuildBrowser = ({
             <Shield size={26} />
           </span>
           <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-            No guilds yet
+            {t("browser.empty_title")}
           </h3>
           <p className='max-w-sm text-sm text-zinc-400'>
-            Nobody has taken a name. The first one is still there.
+            {t("browser.empty_body")}
           </p>
         </div>
       ) : matches.length === 0 ? (
         <p className='rounded-lg bg-zinc-900/40 px-6 py-14 text-center text-sm text-zinc-500'>
-          No guild matches “{search}”
+          {t("browser.no_match", { search })}
         </p>
       ) : (
         <section className='space-y-4'>
           <h2 className='flex items-center gap-2.5 text-lg font-bold text-white'>
-            Guild ranking
+            {t("browser.ranking")}
             <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
               {data.guilds.length}
             </span>

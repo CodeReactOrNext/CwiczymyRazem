@@ -7,6 +7,8 @@ import { useAccountEmail } from "feature/supporterPanel/hooks/useAccountEmail";
 import { fetchRoadmapTeaser } from "feature/supporterPanel/services/roadmapTeaser.service";
 import type { RoadmapTeaserItem } from "feature/supporterPanel/types/userRoadmaps.types";
 import { levelTone } from "feature/supporterPanel/utils/roadmapGoal";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Heart, Lock, Users } from "lucide-react";
 
 /** Tiles past this many are drawn out of focus — enough to read the board, not to browse it. */
@@ -18,43 +20,49 @@ const TeaserTile = ({
 }: {
   item: RoadmapTeaserItem;
   blurred: boolean;
-}) => (
-  <div
-    aria-hidden={blurred || undefined}
-    className={cn(
-      "flex h-full flex-col gap-4 rounded-lg bg-zinc-900/40 p-5",
-      blurred && "pointer-events-none select-none blur-[3px]",
-    )}>
-    <span className='flex items-center justify-between gap-3'>
-      {item.level ? (
-        <span
-          className={cn(
-            "rounded-md px-2 py-0.5 text-[11px] font-bold",
-            levelTone(item.level),
-          )}>
-          {item.level}
-        </span>
-      ) : (
-        <span />
-      )}
-      <Lock size={14} className='shrink-0 text-zinc-600' />
-    </span>
-    <span className='line-clamp-3 text-base font-bold leading-snug text-zinc-100'>
-      {item.goal}
-    </span>
-    <span className='mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500'>
-      <span>
-        {item.phaseCount} phases · {item.stepCount} steps
+}) => {
+  const { t } = useTranslation("ai_coach");
+  return (
+    <div
+      aria-hidden={blurred || undefined}
+      className={cn(
+        "flex h-full flex-col gap-4 rounded-lg bg-zinc-900/40 p-5",
+        blurred && "pointer-events-none select-none blur-[3px]",
+      )}>
+      <span className='flex items-center justify-between gap-3'>
+        {item.level ? (
+          <span
+            className={cn(
+              "rounded-md px-2 py-0.5 text-[11px] font-bold",
+              levelTone(item.level),
+            )}>
+            {t(`levels.${item.level}`, item.level)}
+          </span>
+        ) : (
+          <span />
+        )}
+        <Lock size={14} className='shrink-0 text-zinc-600' />
       </span>
-      {item.followerCount > 0 && (
-        <span className='flex items-center gap-1.5'>
-          <Users size={13} />
-          {item.followerCount} following
+      <span className='line-clamp-3 text-base font-bold leading-snug text-zinc-100'>
+        {item.goal}
+      </span>
+      <span className='mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500'>
+        <span>
+          {t("phases_steps", {
+            phases: item.phaseCount,
+            steps: item.stepCount,
+          })}
         </span>
-      )}
-    </span>
-  </div>
-);
+        {item.followerCount > 0 && (
+          <span className='flex items-center gap-1.5'>
+            <Users size={13} />
+            {t("following", { count: item.followerCount })}
+          </span>
+        )}
+      </span>
+    </div>
+  );
+};
 
 /**
  * The board seen through the window: real goals other players are working on,
@@ -62,6 +70,7 @@ const TeaserTile = ({
  * nothing opens.
  */
 const BoardPreview = () => {
+  const { t } = useTranslation("ai_coach");
   const { data, isLoading } = useQuery({
     queryKey: ["roadmap-teaser"],
     queryFn: fetchRoadmapTeaser,
@@ -86,18 +95,24 @@ const BoardPreview = () => {
     <section className='space-y-4'>
       <div className='space-y-1'>
         <h2 className='text-sm font-bold text-zinc-200'>
-          On the board right now
+          {t("locked.board_title")}
         </h2>
         <p className='text-sm text-zinc-500'>
-          <span className='font-semibold tabular-nums text-zinc-300'>
-            {data.total}
-          </span>{" "}
-          roadmaps from{" "}
-          <span className='font-semibold tabular-nums text-zinc-300'>
-            {data.players}
-          </span>{" "}
-          {data.players === 1 ? "player" : "players"}. As a supporter you can
-          open any of them and start it for free.
+          <Interpolate
+            text={t("locked.board_body", { count: data.players })}
+            values={{
+              total: (
+                <span className='font-semibold tabular-nums text-zinc-300'>
+                  {data.total}
+                </span>
+              ),
+              players: (
+                <span className='font-semibold tabular-nums text-zinc-300'>
+                  {data.players}
+                </span>
+              ),
+            }}
+          />
         </p>
       </div>
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3'>
@@ -121,6 +136,7 @@ const BoardPreview = () => {
  * the copy says so plainly instead of pretending it is a premium perk.
  */
 export const PlayerRoadmapsLocked = () => {
+  const { t } = useTranslation("ai_coach");
   const email = useAccountEmail();
 
   return (
@@ -139,23 +155,16 @@ export const PlayerRoadmapsLocked = () => {
 
         <div className='relative space-y-3'>
           <h2 className='text-xl font-bold text-zinc-100'>
-            Build a roadmap around your own goal
+            {t("locked.title")}
           </h2>
           <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
-            Player Roadmaps are made to measure: you describe what you want to
-            play, and the coach lays out the phases, exercises, lessons and
-            songs that get you there. Other players&apos; roadmaps show up here
-            too, so you can see what they are working towards.
+            {t("locked.body1")}
           </p>
           <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
-            Every one of these roadmaps is generated by an AI model, and every
-            generation costs real money. riff.quest runs on donations, so this
-            tab sits behind the supporter badge. The Mastery Roadmaps tab stays
-            free for everyone.
+            {t("locked.body2")}
           </p>
           <p className='max-w-2xl text-sm font-semibold leading-relaxed text-amber-200'>
-            Any donation, even the smallest one, unlocks Player Roadmaps for
-            life. No subscription.
+            {t("locked.body3")}
           </p>
         </div>
 
@@ -163,20 +172,22 @@ export const PlayerRoadmapsLocked = () => {
           <a href={BMC_URL} target='_blank' rel='noreferrer'>
             <span className='flex items-center gap-2'>
               <Heart size={16} fill='currentColor' />
-              Support the project
+              {t("locked.support")}
             </span>
           </a>
         </Button>
 
         <p className='relative max-w-2xl text-sm leading-relaxed text-zinc-500'>
-          Pay with the email this account is on
           {email ? (
-            <>
-              {" — "}
-              <span className='font-bold text-zinc-300'>{email}</span>
-            </>
-          ) : null}
-          , so the donation lands on the right account.
+            <Interpolate
+              text={t("locked.email_known")}
+              values={{
+                email: <span className='font-bold text-zinc-300'>{email}</span>,
+              }}
+            />
+          ) : (
+            t("locked.email")
+          )}
         </p>
       </section>
 

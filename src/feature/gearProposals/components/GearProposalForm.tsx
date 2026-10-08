@@ -5,10 +5,8 @@ import { cn } from "assets/lib/utils";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { TierPlate } from "feature/arsenal/components/TierPlate";
-import {
-  getPartLabel,
-  PART_TIER_COLORS,
-} from "feature/arsenal/data/partDefinitions";
+import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type {
   EffectType,
   GuitarRarity,
@@ -37,6 +35,7 @@ import {
   safeImageUrl,
   tiersForPart,
 } from "feature/gearProposals/utils/gearProposal.utils";
+import { useTranslation } from "hooks/useTranslation";
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -75,33 +74,36 @@ const RarityPicker = ({
 }: {
   value: GuitarRarity;
   onChange: (rarity: GuitarRarity) => void;
-}) => (
-  <div className='flex flex-wrap gap-2'>
-    {PROPOSABLE_RARITIES.map((rarity) => {
-      const styles = RARITY_STYLES[rarity];
-      const isActive = rarity === value;
+}) => {
+  const labels = useArsenalLabels();
+  return (
+    <div className='flex flex-wrap gap-2'>
+      {PROPOSABLE_RARITIES.map((rarity) => {
+        const styles = RARITY_STYLES[rarity];
+        const isActive = rarity === value;
 
-      return (
-        <button
-          key={rarity}
-          type='button'
-          onClick={() => onChange(rarity)}
-          className={cn(
-            "rounded px-3 py-1.5 text-[11px] font-black tracking-widest transition-colors",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            isActive ? styles.text : "text-zinc-500 hover:text-zinc-300",
-          )}
-          style={{
-            backgroundColor: isActive
-              ? `${styles.baseColor}1f`
-              : "rgba(255,255,255,0.04)",
-          }}>
-          {rarity}
-        </button>
-      );
-    })}
-  </div>
-);
+        return (
+          <button
+            key={rarity}
+            type='button'
+            onClick={() => onChange(rarity)}
+            className={cn(
+              "rounded px-3 py-1.5 text-[11px] font-black tracking-widest transition-colors",
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+              isActive ? styles.text : "text-zinc-500 hover:text-zinc-300",
+            )}
+            style={{
+              backgroundColor: isActive
+                ? `${styles.baseColor}1f`
+                : "rgba(255,255,255,0.04)",
+            }}>
+            {labels.rarity(rarity)}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 const EffectPicker = ({
   value,
@@ -109,30 +111,33 @@ const EffectPicker = ({
 }: {
   value: EffectType;
   onChange: (effectType: EffectType) => void;
-}) => (
-  <div className='flex flex-wrap gap-2'>
-    {EFFECT_TYPES.map((effectType) => {
-      const isActive = effectType === value;
+}) => {
+  const labels = useArsenalLabels();
+  return (
+    <div className='flex flex-wrap gap-2'>
+      {EFFECT_TYPES.map((effectType) => {
+        const isActive = effectType === value;
 
-      return (
-        <button
-          key={effectType}
-          type='button'
-          onClick={() => onChange(effectType)}
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold transition-colors",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            isActive
-              ? "bg-cyan-500/10 text-cyan-400"
-              : "bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-zinc-200",
-          )}>
-          {renderEffectIcon(effectType, 12)}
-          {effectType}
-        </button>
-      );
-    })}
-  </div>
-);
+        return (
+          <button
+            key={effectType}
+            type='button'
+            onClick={() => onChange(effectType)}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold transition-colors",
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+              isActive
+                ? "bg-cyan-500/10 text-cyan-400"
+                : "bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-zinc-200",
+            )}>
+            {renderEffectIcon(effectType, 12)}
+            {labels.effectType(effectType)}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 /**
  * The parts this kind of gear could yield, drawn as the plates they are in the
@@ -152,6 +157,7 @@ const ScrapPicker = ({
   bom: ProposedScrapSlot[];
   onChange: (bom: ProposedScrapSlot[]) => void;
 }) => {
+  const labels = useArsenalLabels();
   const toggle = (partId: PartId) => {
     if (bom.some((slot) => slot.partId === partId)) {
       onChange(bom.filter((slot) => slot.partId !== partId));
@@ -174,7 +180,7 @@ const ScrapPicker = ({
             onClick={() => toggle(part.id)}
             disabled={full}
             aria-pressed={Boolean(slot)}
-            title={part.label}
+            title={labels.part(part.id)}
             className={cn(
               "flex flex-col items-center gap-2 rounded-lg px-1 py-3 transition-colors",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
@@ -196,7 +202,7 @@ const ScrapPicker = ({
                 "max-w-full truncate text-[10px] font-semibold",
                 slot ? "text-cyan-400" : "text-zinc-500",
               )}>
-              {part.label}
+              {labels.part(part.id)}
             </span>
           </button>
         );
@@ -221,6 +227,7 @@ const TierChips = ({
   value: PartTier;
   onChange: (tier: PartTier) => void;
 }) => {
+  const labels = useArsenalLabels();
   const tiers = tiersForPart(partId);
 
   // A part with one possible grade has nothing to ask — it says what it is.
@@ -229,7 +236,7 @@ const TierChips = ({
       <span
         className='text-[10px] font-black tracking-widest'
         style={{ color: PART_TIER_COLORS[tiers[0]] }}>
-        {tiers[0]}
+        {labels.partTier(tiers[0])}
       </span>
     );
   }
@@ -256,7 +263,7 @@ const TierChips = ({
                 : "rgba(255,255,255,0.04)",
               color: isActive ? color : undefined,
             }}>
-            {tier}
+            {labels.partTier(tier)}
           </button>
         );
       })}
@@ -276,6 +283,8 @@ const ScrapOrder = ({
   bom: ProposedScrapSlot[];
   onChange: (bom: ProposedScrapSlot[]) => void;
 }) => {
+  const { t } = useTranslation("supporter");
+  const labels = useArsenalLabels();
   if (bom.length === 0) return null;
 
   const patch = (partId: PartId, change: Partial<ProposedScrapSlot>) =>
@@ -288,7 +297,7 @@ const ScrapOrder = ({
   return (
     <div className='space-y-2'>
       {bom.map((slot, index) => {
-        const label = getPartLabel(slot.partId);
+        const label = labels.part(slot.partId);
 
         return (
           <div
@@ -318,7 +327,7 @@ const ScrapOrder = ({
             <div className='ml-auto flex items-center gap-1'>
               <button
                 type='button'
-                aria-label={`How many of this part — now ${slot.qty}`}
+                aria-label={t("panel.gear.how_many_part", { count: slot.qty })}
                 onClick={() =>
                   patch(slot.partId, { qty: (slot.qty % MAX_SCRAP_QTY) + 1 })
                 }
@@ -332,7 +341,7 @@ const ScrapOrder = ({
 
               <button
                 type='button'
-                aria-label={`Take ${label} out of the teardown`}
+                aria-label={t("panel.gear.take_out", { part: label })}
                 onClick={() =>
                   onChange(
                     bom.filter((candidate) => candidate.partId !== slot.partId),
@@ -368,6 +377,8 @@ export const GearProposalForm = ({
   draft,
   onChange,
 }: GearProposalFormProps) => {
+  const { t } = useTranslation("supporter");
+  const labels = useArsenalLabels();
   const badLink =
     draft.imageUrl.trim().length > 0 && !safeImageUrl(draft.imageUrl);
 
@@ -377,8 +388,8 @@ export const GearProposalForm = ({
   return (
     <div className='space-y-5'>
       <Section
-        title='What is it'
-        hint='A guitar or a pedal, what it would be called in the Arsenal, and how rare it should be.'>
+        title={t("panel.gear.form.what_title")}
+        hint={t("panel.gear.form.what_hint")}>
         <div className='flex gap-2'>
           {(["guitar", "effect"] as GearKind[]).map((option) => (
             <button
@@ -394,14 +405,14 @@ export const GearProposalForm = ({
                   : "bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-zinc-200",
               )}>
               {renderKindIcon(option, 16)}
-              {option === "guitar" ? "Guitar" : "Pedal"}
+              {labels.kind(option)}
             </button>
           ))}
         </div>
 
         <div className='space-y-3'>
           <Input
-            aria-label='Name'
+            aria-label={t("panel.gear.form.name")}
             value={draft.name}
             onChange={(event) => onChange({ name: event.target.value })}
             maxLength={GEAR_NAME_MAX}
@@ -411,30 +422,32 @@ export const GearProposalForm = ({
 
           <div className='grid gap-3 sm:grid-cols-2'>
             <Input
-              aria-label='Brand'
+              aria-label={t("panel.gear.form.brand")}
               value={draft.brand}
               onChange={(event) => onChange({ brand: event.target.value })}
-              placeholder='Brand — optional'
+              placeholder={t("panel.gear.form.brand_placeholder")}
               className='h-10 bg-white/5 text-sm font-medium'
             />
             <Input
-              aria-label='Image link'
+              aria-label={t("panel.gear.form.image")}
               value={draft.imageUrl}
               onChange={(event) => onChange({ imageUrl: event.target.value })}
-              placeholder='https://… image link, optional'
+              placeholder={t("panel.gear.form.image_placeholder")}
               className='h-10 bg-white/5 text-sm font-medium'
             />
           </div>
 
           {badLink && (
             <p className='text-xs text-amber-400/80'>
-              Only https links are rendered — this one will be dropped.
+              {t("panel.gear.form.bad_link")}
             </p>
           )}
         </div>
 
         <div className='space-y-3'>
-          <Label className='ml-1 font-bold text-zinc-400'>Rarity</Label>
+          <Label className='ml-1 font-bold text-zinc-400'>
+            {t("panel.gear.form.rarity")}
+          </Label>
           <RarityPicker
             value={draft.rarity}
             onChange={(rarity) => onChange({ rarity })}
@@ -443,7 +456,9 @@ export const GearProposalForm = ({
 
         {draft.kind === "effect" && (
           <div className='space-y-3'>
-            <Label className='ml-1 font-bold text-zinc-400'>What it does</Label>
+            <Label className='ml-1 font-bold text-zinc-400'>
+              {t("panel.gear.form.what_it_does")}
+            </Label>
             <EffectPicker
               value={draft.effectType}
               onChange={(effectType) => onChange({ effectType })}
@@ -453,12 +468,14 @@ export const GearProposalForm = ({
       </Section>
 
       <Section
-        title='Where it came from'
-        hint='What it sounds like and why it belongs in the game — plus the one line you want carried by every copy of it.'>
+        title={t("panel.gear.form.origin_title")}
+        hint={t("panel.gear.form.origin_hint")}>
         <div className='space-y-2'>
           <Label htmlFor='gear-desc' className='ml-1 font-bold text-zinc-400'>
-            What is it{" "}
-            <span className='font-medium text-zinc-500'>optional</span>
+            {t("panel.gear.form.what_title")}{" "}
+            <span className='font-medium text-zinc-500'>
+              {t("panel.optional")}
+            </span>
           </Label>
           <Textarea
             id='gear-desc'
@@ -466,7 +483,7 @@ export const GearProposalForm = ({
             onChange={(event) => onChange({ description: event.target.value })}
             maxLength={GEAR_DESCRIPTION_MAX}
             rows={4}
-            placeholder='Where it came from, what it sounds like, why it belongs in the game.'
+            placeholder={t("panel.gear.form.description_placeholder")}
             className='resize-none bg-white/5 font-medium'
           />
         </div>
@@ -475,8 +492,10 @@ export const GearProposalForm = ({
           <Label
             htmlFor='gear-inscription'
             className='ml-1 font-bold text-zinc-400'>
-            Engraving{" "}
-            <span className='font-medium text-zinc-500'>optional</span>
+            {t("panel.gear.form.engraving")}{" "}
+            <span className='font-medium text-zinc-500'>
+              {t("panel.optional")}
+            </span>
           </Label>
           <div
             className='rounded-lg bg-zinc-950/60 px-3 py-2'
@@ -491,20 +510,21 @@ export const GearProposalForm = ({
                 onChange({ inscription: event.target.value })
               }
               maxLength={GEAR_INSCRIPTION_MAX}
-              placeholder='One line, yours, carried by every copy of it'
+              placeholder={t("panel.gear.form.engraving_placeholder")}
               className='h-9 border-0 bg-transparent px-1 italic text-amber-300/90 placeholder:text-zinc-700 focus-visible:ring-0'
             />
           </div>
           <p className='ml-1 text-xs text-zinc-500'>
-            If this gets built, your line ships on the item —{" "}
-            {GEAR_INSCRIPTION_MAX - draft.inscription.length} characters left.
+            {t("panel.gear.form.engraving_hint", {
+              count: GEAR_INSCRIPTION_MAX - draft.inscription.length,
+            })}
           </p>
         </div>
       </Section>
 
       <Section
-        title='Breaks down into'
-        hint={`What the bench gets when somebody scraps it, in salvage order and at what grade. Up to ${MAX_SCRAP_SLOTS} parts — leave it empty and the bench decides.`}>
+        title={t("panel.gear.breaks_down")}
+        hint={t("panel.gear.form.scrap_hint", { max: MAX_SCRAP_SLOTS })}>
         <ScrapPicker
           kind={draft.kind}
           bom={draft.scrapBom}

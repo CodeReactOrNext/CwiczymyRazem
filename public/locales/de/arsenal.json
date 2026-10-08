@@ -1,0 +1,51 @@
+{
+  "labels": {
+    "rarity": {
+      "Common": "Gewöhnlich",
+      "Uncommon": "Ungewöhnlich",
+      "Rare": "Selten",
+      "Epic": "Episch",
+      "Legendary": "Legendär",
+      "Mythic": "Mythisch",
+      "Custom Shop": "Custom Shop"
+    },
+    "effect_type": {
+      "Overdrive": "Overdrive",
+      "Distortion": "Distortion",
+      "Delay": "Delay",
+      "Reverb": "Hall",
+      "Chorus": "Chorus",
+      "Wah": "Wah",
+      "Compressor": "Kompressor",
+      "EQ": "EQ",
+      "Fuzz": "Fuzz",
+      "Phaser": "Phaser",
+      "Flanger": "Flanger",
+      "Boost": "Booster",
+      "Vibrato": "Vibrato",
+      "Tuner": "Stimmgerät"
+    },
+    "part": {
+      "body": "Korpus",
+      "neck": "Hals",
+      "bridge": "Brücke",
+      "pickup": "Tonabnehmer",
+      "tuners": "Mechanik",
+      "enclosure": "Gehäuse",
+      "opamp": "Op-Amp",
+      "diode": "Diode",
+      "pot": "Potentiometer",
+      "screws": "Schraube"
+    },
+    "part_tier": {
+      "Standard": "Standard",
+      "Epic": "Episch",
+      "Legendary": "Legendär",
+      "Unique": "Einzigartig"
+    },
+    "kind": {
+      "guitar": "Gitarre",
+      "effect": "Pedal"
+    }
+  }
+}

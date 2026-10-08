@@ -1,12 +1,14 @@
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDailyQuestInterface,
+  FirebaseLogsDiscordPromoInterface,
   FirebaseLogsDonationInterface,
   FirebaseLogsExamPassedInterface,
   FirebaseLogsGuildLevelInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsMarketplacePurchaseInterface,
+  FirebaseLogsPlayerJoinedInterface,
   FirebaseLogsPlaylistInterface,
   FirebaseLogsRecordingsInterface,
   FirebaseLogsRoadmapStepInterface,
@@ -29,7 +31,9 @@ export type AnyFirebaseLog =
   | FirebaseLogsRoadmapStepInterface
   | FirebaseLogsSupportAskInterface
   | FirebaseLogsDonationInterface
-  | FirebaseLogsGuildLevelInterface;
+  | FirebaseLogsGuildLevelInterface
+  | FirebaseLogsPlayerJoinedInterface
+  | FirebaseLogsDiscordPromoInterface;
 
 export const isFirebaseLogsSongs = (
   log: AnyFirebaseLog
@@ -109,6 +113,18 @@ export const isFirebaseLogsDonation = (
   return (log as FirebaseLogsDonationInterface).type === "donation_received";
 };
 
+export const isFirebaseLogsPlayerJoined = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsPlayerJoinedInterface => {
+  return (log as FirebaseLogsPlayerJoinedInterface).type === "player_joined";
+};
+
+export const isFirebaseLogsDiscordPromo = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsDiscordPromoInterface => {
+  return (log as FirebaseLogsDiscordPromoInterface).type === "discord_promo";
+};
+
 export type LogActivityType =
   | "song"
   | "recording"
@@ -123,6 +139,8 @@ export type LogActivityType =
   | "supportAsk"
   | "donationReceived"
   | "guildLevel"
+  | "playerJoined"
+  | "discordPromo"
   | "exercisePlan"
   | "exercise";
 
@@ -141,6 +159,8 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   if (isFirebaseLogsSupportAsk(log)) return "supportAsk";
   if (isFirebaseLogsDonation(log)) return "donationReceived";
   if (isFirebaseLogsGuildLevel(log)) return "guildLevel";
+  if (isFirebaseLogsPlayerJoined(log)) return "playerJoined";
+  if (isFirebaseLogsDiscordPromo(log)) return "discordPromo";
   return (log as FirebaseLogsInterface).planId ? "exercisePlan" : "exercise";
 };
 

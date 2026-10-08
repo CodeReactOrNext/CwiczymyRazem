@@ -1,5 +1,6 @@
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Headphones, Trash2, VolumeX } from "lucide-react";
 
 import { PEAKS_PER_SECOND, useWaveformPeaks } from "../hooks/useWaveformPeaks";
@@ -71,6 +72,7 @@ export function StemLane({
 }: StemLaneProps) {
   const { peaks, isLoading } = useWaveformPeaks(src);
 
+  const { t } = useTranslation("backing_track");
   return (
     // Same row shape as every other lane on the timeline (see AlignmentScreen's
     // laneRow): a ruled header column, then the lane. Keeping them identical is
@@ -102,24 +104,28 @@ export function StemLane({
           <button
             type='button'
             onClick={onSolo}
-            aria-label={`Solo ${name}`}
-            title='Solo'
+            aria-label={t("stem.solo_aria", { name })}
+            title={t("stem.solo")}
             className={mixerButton}>
             <Headphones className='h-3.5 w-3.5' />
           </button>
           <button
             type='button'
             onClick={onToggleMute}
-            aria-label={stem.muted ? `Unmute ${name}` : `Mute ${name}`}
-            title='Mute'
+            aria-label={
+              stem.muted
+                ? t("align.unmute", { what: name })
+                : t("align.mute", { what: name })
+            }
+            title={t("stem.mute")}
             className={cn(mixerButton, stem.muted && "bg-amber-500/10 text-amber-400")}>
             <VolumeX className='h-3.5 w-3.5' />
           </button>
           <button
             type='button'
             onClick={onRemove}
-            aria-label={`Remove ${name} from this song`}
-            title='Remove'
+            aria-label={t("sound.remove_from_song", { name })}
+            title={t("stem.remove")}
             className={mixerButton}>
             <Trash2 className='h-3.5 w-3.5' />
           </button>
@@ -130,7 +136,7 @@ export function StemLane({
               stem.offsetMs === 0 ? "text-zinc-400" : "text-amber-400",
             )}>
             {stem.offsetMs === 0
-              ? "On the grid"
+              ? t("stem.on_grid")
               : `${stem.offsetMs > 0 ? "+" : ""}${Math.round(stem.offsetMs)} ms`}
           </span>
         </div>
@@ -186,7 +192,7 @@ export function StemLane({
           // A grab strip along the bottom edge, the way a DAW resizes a track.
           <div
             role='separator'
-            aria-label={`Resize the ${name} lane`}
+            aria-label={t("stem.resize", { name })}
             onPointerDown={(event) => {
               event.preventDefault();
               const startY = event.clientY;

@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
+import { useTranslation } from "hooks/useTranslation";
 import {
   AudioLines,
   Check,
@@ -148,7 +149,10 @@ function LaneMuteButton({
   /** Anything about this particular mute worth knowing before pressing it. */
   hint?: string;
 }) {
-  const action = muted ? `Unmute ${label}` : `Mute ${label}`;
+  const { t } = useTranslation("backing_track");
+  const action = muted
+    ? t("align.unmute", { what: label })
+    : t("align.mute", { what: label });
   return (
     <button
       type='button'
@@ -180,7 +184,7 @@ const keyCap =
   "rounded bg-zinc-950/70 px-1.5 text-xs font-semibold leading-5 text-zinc-300";
 
 /** Kept in step with BPM_PER_PX in TimelineRuler, purely for the hint text. */
-const BPM_PER_PX_LABEL = "0.05 BPM";
+const BPM_PER_PX = 0.05;
 
 /** 4 → "4s", 0.5 → "0.5s". Whole numbers stay whole. */
 const formatWindow = (sec: number) =>
@@ -250,6 +254,7 @@ export function AlignmentScreen({
   setup,
   onClose,
 }: AlignmentScreenProps) {
+  const { t } = useTranslation("backing_track");
   // The desktop title bar is fixed at the very top with the maximum z-index, so
   // it sits over this screen however high it stacks. Content has to start below
   // it or the heading is cut in half — the same allowance every full-screen view
@@ -546,7 +551,8 @@ export function AlignmentScreen({
   };
 
   const nameOf = (trackId: string) =>
-    library.find((track) => track.id === trackId)?.name ?? "Missing file";
+    library.find((track) => track.id === trackId)?.name ??
+    t("align.missing_file");
   const hasSomethingToAlign =
     (source === "file" && stems.length > 0) ||
     (source === "youtube" && !!youtubeVideoId);
@@ -570,37 +576,39 @@ export function AlignmentScreen({
   const steps: { n: 1 | 2 | 3; title: string; detail?: string; done: boolean }[] = [
     {
       n: 1,
-      title: "Choose the recording",
+      title: t("align.steps.choose"),
       detail: !hasSomethingToAlign
-        ? "a YouTube video or audio files"
+        ? t("align.steps.choose_detail")
         : source === "file"
           ? stems.length === 1
             ? nameOf(stems[0].trackId)
-            : `${stems.length} files as layers`
-          : "YouTube video",
+            : t("align.steps.layers", { count: stems.length })
+          : t("sources.youtube.label"),
       done: hasSomethingToAlign,
     },
     {
       n: 2,
-      title: "Put bar 1 on the first beat",
+      title: t("align.steps.bar1"),
       detail: hasSomethingToAlign && !needsFirstStep
-        ? `starts at ${alignment.offsetMs > 0 ? "+" : ""}${Math.round(alignment.offsetMs)} ms`
-        : "so the tab and the song start together",
+        ? t("align.steps.starts_at", {
+            ms: `${alignment.offsetMs > 0 ? "+" : ""}${Math.round(alignment.offsetMs)}`,
+          })
+        : t("align.steps.bar1_detail"),
       done: hasSomethingToAlign && !needsFirstStep,
     },
     {
       n: 3,
-      title: "Listen and fine-tune",
-      detail: "fix any bar that drifts later on",
+      title: t("align.steps.listen"),
+      detail: t("align.steps.listen_detail"),
       done: false,
     },
   ];
   const stepHint =
     currentStep === 1
-      ? "Pick where the sound comes from below. It will play under the tab and follow play, pause and every bar you click."
+      ? t("align.hints.choose")
       : currentStep === 2
-        ? "Press Space to play. Drag the yellow START flag on the Bars row onto the first beat you hear — or nudge the whole recording with [ and ]."
-        : "Play along and listen. If the tab runs ahead or behind later in the song, drag that bar's line onto its beat. Press Done when it sounds right — it is saved for this song.";
+        ? t("align.hints.bar1")
+        : t("align.hints.listen");
 
   const timeline = {
     startTime,
@@ -647,19 +655,19 @@ export function AlignmentScreen({
 
   const zoomPresets: { label: string; windowSec: number; title: string }[] = [
     {
-      label: "1 bar",
+      label: t("align.zoom.one_bar"),
       windowSec: barSec,
-      title: "Zoom so one bar fills the screen",
+      title: t("align.zoom.one_bar_title"),
     },
     {
-      label: "4 bars",
+      label: t("align.zoom.four_bars"),
       windowSec: barSec * 4,
-      title: "Zoom so four bars fill the screen",
+      title: t("align.zoom.four_bars_title"),
     },
     {
-      label: "Whole song",
+      label: t("align.zoom.whole"),
       windowSec: durationSec || barSec * 32,
-      title: "The whole recording end to end",
+      title: t("align.zoom.whole_title"),
     },
   ];
 
@@ -718,18 +726,15 @@ export function AlignmentScreen({
     <div className='flex h-[52px] items-center gap-3 rounded-lg bg-zinc-900/40 px-4 text-xs text-zinc-400'>
       {isFile ? (
         <span>
-          {isLoading ? "Reading the recording…" : "No waveform to map."}
+          {isLoading ? t("align.reading") : t("align.no_waveform")}
         </span>
       ) : ytWaveform.status === "unsupported" ? (
         <span>
-          This browser can&apos;t share tab audio, so there is no waveform to
-          draw. Chrome or Edge can; Firefox and Safari cannot. Align by ear
-          below.
+          {t("align.unsupported")}
         </span>
       ) : (
         <span>
-          No waveform yet — capture a stretch of the video below to see its
-          shape. Aligning by ear works without one.
+          {t("align.no_waveform_yet")}
         </span>
       )}
     </div>
@@ -764,20 +769,24 @@ export function AlignmentScreen({
       <div className='flex items-center gap-3 px-4 pb-1 pt-2 text-xs text-zinc-400'>
         <span className='tabular-nums'>
           {ytWaveform.isComplete
-            ? "Whole video captured."
+            ? t("align.capture.whole")
             : ytWaveform.coverage > 0
-              ? `${Math.round(ytWaveform.coverage * 100)}% of the video captured`
-              : "No waveform captured yet"}
+              ? t("align.capture.percent", {
+                  percent: Math.round(ytWaveform.coverage * 100),
+                })
+              : t("align.capture.none")}
         </span>
         <span className='text-zinc-500'>
           {ytWaveform.isComplete
-            ? "Nothing left to capture."
-            : "Captured on its own, never while you are playing."}
+            ? t("align.capture.nothing_left")
+            : t("align.capture.on_its_own")}
         </span>
         {youtubeVideoId && !ytWaveform.isComplete && (
           <button type='button' onClick={openCapture} className={button}>
             <AudioLines className='h-3.5 w-3.5' />
-            {ytWaveform.coverage > 0 ? "Capture more" : "Capture waveform"}
+            {ytWaveform.coverage > 0
+              ? t("align.capture.more")
+              : t("align.capture.start")}
           </button>
         )}
         {/* The correction that decides whether the picture sits where the song
@@ -786,7 +795,9 @@ export function AlignmentScreen({
             broken one. Only the pass that measured it can report it. */}
         {ytWaveform.latencyMs !== null && (
           <span className='ml-auto text-zinc-500 tabular-nums'>
-            capture delay {Math.round(ytWaveform.latencyMs)} ms, corrected
+            {t("align.capture.delay", {
+              ms: Math.round(ytWaveform.latencyMs),
+            })}
           </span>
         )}
       </div>
@@ -828,8 +839,8 @@ export function AlignmentScreen({
             <Upload className='h-6 w-6 text-cyan-400' />
             <span className='text-sm font-semibold text-cyan-400'>
               {desktopAvailable
-                ? "Drop to add as a stem"
-                : "Adding files needs the desktop app"}
+                ? t("align.drop.add")
+                : t("align.drop.needs_desktop")}
             </span>
           </div>
         </div>
@@ -845,19 +856,18 @@ export function AlignmentScreen({
           <div className='flex min-w-0 flex-col gap-0.5'>
             <div className='flex items-center gap-3'>
               <h2 className='text-base font-semibold text-zinc-100'>
-                Backing track
+                {t("bar.title")}
               </h2>
               {hasSomethingToAlign && (
                 <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-medium text-zinc-300'>
                   {source === "file"
-                    ? `${stems.length} ${stems.length === 1 ? "stem" : "stems"}`
+                    ? t("align.stems", { count: stems.length })
                     : "YouTube"}
                 </span>
               )}
             </div>
             <p className='text-xs text-zinc-400'>
-              Play the real song under the tab, lined up so both hit bar 1
-              together.
+              {t("align.subtitle")}
             </p>
           </div>
         </div>
@@ -868,9 +878,7 @@ export function AlignmentScreen({
             // drop target you cannot see is a drop target nobody uses.
             <span className='flex items-center gap-2 text-xs text-zinc-400'>
               <Upload className='h-3.5 w-3.5 text-zinc-400' />
-              {isImporting
-                ? "Adding files…"
-                : "Drop audio files anywhere to add a stem"}
+              {isImporting ? t("align.drop.adding") : t("align.drop.hint")}
             </span>
           )}
 
@@ -881,7 +889,7 @@ export function AlignmentScreen({
             onClick={onClose}
             className='flex items-center gap-2 rounded-lg bg-cyan-500/15 px-4 py-2 text-xs font-semibold text-cyan-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-cyan-500/25'>
             <Check className='h-3.5 w-3.5' />
-            Done
+            {t("align.done")}
             <kbd className='font-mono rounded bg-zinc-950/50 px-1.5 text-xs leading-5 text-cyan-400/80'>
               Esc
             </kbd>
@@ -981,7 +989,7 @@ export function AlignmentScreen({
           <div className='flex-1' />
         ) : (
           <p className='p-6 text-sm text-zinc-400'>
-            Pick a backing track first, then come back here.
+            {t("align.pick_first")}
           </p>
         )
       ) : (
@@ -995,23 +1003,21 @@ export function AlignmentScreen({
               "flex shrink-0 flex-wrap items-stretch gap-x-5 gap-y-2 border-b bg-zinc-950 px-6 py-3",
               RULE,
             )}>
-            <ToolGroup label='Drag a lane to'>
+            <ToolGroup label={t("align.tools.drag_to")}>
               <div className={segment}>
                 {(
                   [
                     {
                       mode: "pan",
                       icon: Hand,
-                      label: "Move view",
-                      title:
-                        "Look somewhere else. The recording stays exactly where it is.",
+                      label: t("align.tools.move_view"),
+                      title: t("align.tools.move_view_title"),
                     },
                     {
                       mode: "stems",
                       icon: MoveHorizontal,
-                      label: "Move audio",
-                      title:
-                        "Slide the recording against the tab. The middle button still moves the view.",
+                      label: t("align.tools.move_audio"),
+                      title: t("align.tools.move_audio_title"),
                     },
                   ] as const
                 ).map(({ mode, icon: Icon, label, title }) => (
@@ -1035,7 +1041,7 @@ export function AlignmentScreen({
             {/* Where the playhead is, and whether the view is chasing it. The
                 follow toggle used to sit among the zoom presets, which is the
                 one place it has nothing to do with. */}
-            <ToolGroup label='Playhead'>
+            <ToolGroup label={t("align.tools.playhead")}>
               <TimelineClock
                 getPlayheadSec={getPlayheadSec}
                 durationSec={durationSec}
@@ -1048,20 +1054,20 @@ export function AlignmentScreen({
                   type='button'
                   onClick={() => setFollowing(!isFollowing)}
                   aria-pressed={isFollowing}
-                  title='Keep the view centred on the playhead as it moves'
+                  title={t("align.tools.follow_title")}
                   className={cn(
                     segmentButton,
                     isFollowing ? segmentOn : segmentOff,
                   )}>
                   <LocateFixed className='h-3.5 w-3.5' />
-                  Follow playback
+                  {t("align.tools.follow")}
                 </button>
                 {!isFollowing && (
                   <button
                     type='button'
                     onClick={jumpToPlayhead}
-                    aria-label='Bring the playhead into view'
-                    title='Bring the playhead into view, and stay put'
+                    aria-label={t("align.tools.jump")}
+                    title={t("align.tools.jump_title")}
                     className={cn(segmentButton, segmentOff)}>
                     <Target className='h-3.5 w-3.5' />
                   </button>
@@ -1069,39 +1075,41 @@ export function AlignmentScreen({
               </div>
             </ToolGroup>
 
-            <ToolGroup label='Zoom' hint='or scroll over the timeline'>
+            <ToolGroup
+              label={t("align.zoom.label")}
+              hint={t("align.zoom.hint")}>
               <div className='flex items-center gap-1'>
                 <button
                   type='button'
                   onClick={zoomOut}
-                  aria-label='Zoom out'
-                  title='See more of the recording at once'
+                  aria-label={t("align.zoom.out")}
+                  title={t("align.zoom.out_title")}
                   className={iconButton}>
                   <ZoomOut className='h-3.5 w-3.5' />
                 </button>
                 <span
                   className={cn(readout, "w-14 text-center")}
-                  title='How much of the recording fits across the screen'>
+                  title={t("align.zoom.window_title")}>
                   {formatWindow(windowSec)}
                 </span>
                 <button
                   type='button'
                   onClick={zoomIn}
-                  aria-label='Zoom in'
-                  title='See less of it, in more detail'
+                  aria-label={t("align.zoom.in")}
+                  title={t("align.zoom.in_title")}
                   className={iconButton}>
                   <ZoomIn className='h-3.5 w-3.5' />
                 </button>
               </div>
               <div className={segment}>
-                {zoomPresets.map((preset) => (
+                {zoomPresets.map((preset, presetIndex) => (
                   <button
                     key={preset.label}
                     type='button'
                     onClick={() => zoomTo(preset.windowSec)}
                     title={preset.title}
                     className={cn(segmentButton, segmentOff)}>
-                    {preset.label === "Whole song" ? (
+                    {presetIndex === zoomPresets.length - 1 ? (
                       <Maximize2 className='h-3.5 w-3.5' />
                     ) : null}
                     {preset.label}
@@ -1116,14 +1124,14 @@ export function AlignmentScreen({
                 "sets the session too" used to trail the input like a fourth
                 control. It explains the whole group, so it sits with the name. */}
             <ToolGroup
-              label='Tempo grid'
-              hint={onSessionBpmChange ? "sets the session too" : undefined}>
+              label={t("align.tempo.label")}
+              hint={onSessionBpmChange ? t("align.tempo.hint") : undefined}>
               <div className='flex items-center gap-1.5'>
                 <input
                   type='text'
                   inputMode='decimal'
-                  aria-label="The recording's own tempo"
-                  title='What the song runs at. Sets the session tempo to match, so the recording keeps sounding as recorded — slow down in the session, not here.'
+                  aria-label={t("align.tempo.aria")}
+                  title={t("align.tempo.title")}
                   value={sourceBpmDraft ?? alignment.sourceBpm.toFixed(2)}
                   onChange={(event) => setSourceBpmDraft(event.target.value)}
                   onBlur={commitSourceBpm}
@@ -1138,8 +1146,8 @@ export function AlignmentScreen({
               <span
                 title={
                   anchorCount === 0
-                    ? "One tempo for the whole recording. Drag a bar line to pin a bar that drifts."
-                    : "Bars pinned to a tempo of their own, so the grid follows a band that drifts."
+                    ? t("align.tempo.even_title")
+                    : t("align.tempo.pinned_title")
                 }
                 className={cn(
                   chip,
@@ -1148,8 +1156,8 @@ export function AlignmentScreen({
                     : "bg-zinc-800/60 text-zinc-400",
                 )}>
                 {anchorCount === 0
-                  ? "even throughout"
-                  : `${anchorCount} ${anchorCount === 1 ? "bar" : "bars"} pinned`}
+                  ? t("align.tempo.even")
+                  : t("align.tempo.pinned", { count: anchorCount })}
               </span>
               {anchorCount > 0 && (
                 <button
@@ -1157,9 +1165,9 @@ export function AlignmentScreen({
                   onClick={() =>
                     setAlignment({ tempoAnchors: [] }, { realign: true })
                   }
-                  title='Back to one tempo for the whole recording'
+                  title={t("align.tempo.reset_title")}
                   className={cn(button, "px-2.5 py-1")}>
-                  Reset
+                  {t("align.tempo.reset")}
                 </button>
               )}
             </ToolGroup>
@@ -1169,11 +1177,11 @@ export function AlignmentScreen({
             <button
               type='button'
               onClick={() => setShowShortcuts((open) => !open)}
-              aria-label='Keyboard shortcuts'
-              title='Keyboard shortcuts — ?'
+              aria-label={t("align.shortcuts.aria")}
+              title={t("align.shortcuts.title")}
               className={cn(button, "ml-auto self-center")}>
               <Keyboard className='h-3.5 w-3.5' />
-              Shortcuts
+              {t("align.shortcuts.label")}
               <kbd className={keyCap}>?</kbd>
             </button>
           </div>
@@ -1185,12 +1193,12 @@ export function AlignmentScreen({
             {laneRow(
               <>
                 <span className='text-sm font-semibold text-zinc-100'>
-                  Overview
+                  {t("align.lanes.overview")}
                 </span>
                 <span className='text-xs text-zinc-400'>
                   {centreSecOverride === null
-                    ? "follows playback"
-                    : "click to jump"}
+                    ? t("align.lanes.follows")
+                    : t("align.lanes.click_jump")}
                 </span>
               </>,
               overviewLane,
@@ -1209,10 +1217,10 @@ export function AlignmentScreen({
             {laneRow(
               <>
                 <span className='text-sm font-semibold text-zinc-100'>
-                  Bars
+                  {t("align.lanes.bars")}
                 </span>
                 <span className='text-xs text-zinc-400'>
-                  drag a line onto the beat
+                  {t("align.lanes.bars_hint")}
                 </span>
               </>,
               <div ref={attachLaneViewport} className='relative py-1'>
@@ -1223,25 +1231,27 @@ export function AlignmentScreen({
                   centreSecOverride={centreSecOverride}
                   getPlayheadSec={getPlayheadSec}>
                   <span className='shrink-0 text-xs font-medium text-cyan-400'>
-                    Bar{" "}
-                    {Math.floor(
-                      (selectedBeat ?? 0) / Math.max(1, beatsPerBar),
-                    ) + 1}
+                    {t("align.bar_n", {
+                      n:
+                        Math.floor(
+                          (selectedBeat ?? 0) / Math.max(1, beatsPerBar),
+                        ) + 1,
+                    })}
                   </span>
                   <button
                     type='button'
                     onClick={(e) =>
                       stepBarBpm(-(e.shiftKey ? BPM_STEP_COARSE : BPM_STEP))
                     }
-                    aria-label='Slower by a hundredth'
-                    title='Slower — Shift for a tenth'
+                    aria-label={t("align.bpm.slower")}
+                    title={t("align.bpm.slower_title")}
                     className={cn(iconButton, "h-7 w-7 shrink-0")}>
                     <Minus className='h-3.5 w-3.5' />
                   </button>
                   <input
                     type='text'
                     inputMode='decimal'
-                    aria-label='Tempo of the selected bar'
+                    aria-label={t("align.bpm.selected")}
                     value={bpmDraft ?? (selectedBpm ?? 0).toFixed(2)}
                     onChange={(e) => setBpmDraft(e.target.value)}
                     onBlur={commitBpmDraft}
@@ -1256,8 +1266,8 @@ export function AlignmentScreen({
                     onClick={(e) =>
                       stepBarBpm(e.shiftKey ? BPM_STEP_COARSE : BPM_STEP)
                     }
-                    aria-label='Faster by a hundredth'
-                    title='Faster — Shift for a tenth'
+                    aria-label={t("align.bpm.faster")}
+                    title={t("align.bpm.faster_title")}
                     className={cn(iconButton, "h-7 w-7 shrink-0")}>
                     <Plus className='h-3.5 w-3.5' />
                   </button>
@@ -1267,7 +1277,7 @@ export function AlignmentScreen({
                       setBpmDraft(null);
                       setSelectedBeat(null);
                     }}
-                    aria-label='Stop editing this bar'
+                    aria-label={t("align.bpm.stop")}
                     className={cn(iconButton, "h-7 w-7 shrink-0")}>
                     <X className='h-3.5 w-3.5' />
                   </button>
@@ -1302,22 +1312,22 @@ export function AlignmentScreen({
               <>
                 <div className='flex items-center gap-2'>
                   <span className='text-sm font-semibold text-cyan-400'>
-                    Tablature
+                    {t("align.lanes.tab")}
                   </span>
                   {canMix && onMixerChange && (
                     <div className='ml-auto flex items-center gap-1.5'>
                       <LaneMuteButton
                         muted={isTabMuted}
                         onToggle={toggleTabMute}
-                        label='the tablature'
-                        hint='silences every instrument in the file'
+                        label={t("align.lanes.the_tab")}
+                        hint={t("align.lanes.tab_mute_hint")}
                       />
                       <MixerMenu tracks={mixTracks} onChange={onMixerChange} />
                     </div>
                   )}
                 </div>
                 <span className='text-xs text-zinc-400'>
-                  {isTabMuted ? "muted" : "what you play"}
+                  {isTabMuted ? t("align.lanes.muted") : t("align.lanes.what_you_play")}
                 </span>
               </>,
               <TabLane
@@ -1371,13 +1381,15 @@ export function AlignmentScreen({
                           onToggle={() =>
                             setAlignment({ muted: !alignment.muted })
                           }
-                          label='the video'
-                          hint='the waveform only fills in while it can be heard'
+                          label={t("align.lanes.the_video")}
+                          hint={t("align.lanes.video_mute_hint")}
                         />
                       </div>
                     </div>
                     <span className='text-xs text-zinc-400'>
-                      {alignment.muted ? "muted" : "tap to align"}
+                      {alignment.muted
+                        ? t("align.lanes.muted")
+                        : t("align.lanes.tap_to_align")}
                     </span>
                   </>,
                   <AlignmentGrid
@@ -1415,7 +1427,9 @@ export function AlignmentScreen({
                 <button
                   type='button'
                   onClick={onTogglePlay}
-                  aria-label={isPlaying ? "Stop playback" : "Start playback"}
+                  aria-label={
+                    isPlaying ? t("align.transport.stop_aria") : t("align.transport.play_aria")
+                  }
                   className={cn(
                     button,
                     "px-4",
@@ -1428,12 +1442,12 @@ export function AlignmentScreen({
                   ) : (
                     <Play className='h-3.5 w-3.5' />
                   )}
-                  {isPlaying ? "Stop" : "Play"}
+                  {isPlaying ? t("align.transport.stop") : t("align.transport.play")}
                 </button>
               )}
 
               <div className='flex items-center gap-2'>
-                <span className={panelLabel}>Drift</span>
+                <span className={panelLabel}>{t("align.transport.drift")}</span>
                 <SyncDriftReadout
                   driftMsRef={driftMsRef}
                   active={!!isPlaying}
@@ -1442,12 +1456,15 @@ export function AlignmentScreen({
               </div>
 
               <div className='flex items-center gap-2'>
-                <span className={panelLabel}>Start</span>
+                <span className={panelLabel}>{t("align.transport.start")}</span>
                 <button
                   type='button'
                   onClick={(e) => nudge(e.shiftKey ? -NUDGE_COARSE_FACTOR : -1)}
-                  aria-label='Nudge the backing track earlier'
-                  title={`Earlier by ${NUDGE_MS} ms — Shift for ${NUDGE_MS * NUDGE_COARSE_FACTOR}`}
+                  aria-label={t("align.transport.earlier")}
+                  title={t("align.transport.earlier_title", {
+                    ms: NUDGE_MS,
+                    coarse: NUDGE_MS * NUDGE_COARSE_FACTOR,
+                  })}
                   className={cn(iconButton, "w-auto gap-2 px-2.5")}>
                   <ChevronLeft className='h-4 w-4' />
                   <kbd className={keyCap}>[</kbd>
@@ -1463,22 +1480,25 @@ export function AlignmentScreen({
                 <button
                   type='button'
                   onClick={(e) => nudge(e.shiftKey ? NUDGE_COARSE_FACTOR : 1)}
-                  aria-label='Nudge the backing track later'
-                  title={`Later by ${NUDGE_MS} ms — Shift for ${NUDGE_MS * NUDGE_COARSE_FACTOR}`}
+                  aria-label={t("align.transport.later")}
+                  title={t("align.transport.later_title", {
+                    ms: NUDGE_MS,
+                    coarse: NUDGE_MS * NUDGE_COARSE_FACTOR,
+                  })}
                   className={cn(iconButton, "w-auto gap-2 px-2.5")}>
                   <kbd className={keyCap}>]</kbd>
                   <ChevronRight className='h-4 w-4' />
                 </button>
                 <span className='text-xs text-zinc-400'>
-                  moves the whole recording · Shift for{" "}
-                  {NUDGE_MS * NUDGE_COARSE_FACTOR} ms
+                  {t("align.transport.moves_whole", {
+                    ms: NUDGE_MS * NUDGE_COARSE_FACTOR,
+                  })}
                 </span>
               </div>
             </div>
 
             <p className='text-xs text-zinc-400'>
-              Space plays without a count-in · middle-drag moves the view ·
-              press ? for every shortcut
+              {t("align.transport.footer")}
             </p>
           </div>
         </>
@@ -1498,40 +1518,42 @@ export function AlignmentScreen({
       {showShortcuts && (
         <div
           role='dialog'
-          aria-label='Keyboard shortcuts'
+          aria-label={t("align.shortcuts.aria")}
           className='absolute right-6 top-20 z-30 w-80 rounded-lg bg-zinc-800 p-4'>
           <div className='mb-3 flex items-center justify-between'>
             <span className='text-sm font-semibold text-zinc-100'>
-              Shortcuts
+              {t("align.shortcuts.label")}
             </span>
             <button
               type='button'
               onClick={() => setShowShortcuts(false)}
-              aria-label='Close the shortcut list'
+              aria-label={t("align.shortcuts.close")}
               className={cn(iconButton, "h-7 w-7")}>
               <X className='h-3.5 w-3.5' />
             </button>
           </div>
           <dl className='flex flex-col gap-2 text-xs'>
             {[
-              ["Scroll", "Zoom where the pointer is"],
-              ["Shift + scroll", "Move along the recording"],
-              ["Space", "Play or stop, with no count-in"],
-              ["Middle-drag", "Drag the view"],
-              ["[  ]", `Move the whole recording by ${NUDGE_MS} ms`],
+              [t("align.shortcuts.keys.scroll"), t("align.shortcuts.what.scroll")],
+              [t("align.shortcuts.keys.shift_scroll"), t("align.shortcuts.what.shift_scroll")],
+              [t("align.shortcuts.keys.space"), t("align.shortcuts.what.space")],
+              [t("align.shortcuts.keys.middle_drag"), t("align.shortcuts.what.middle_drag")],
+              ["[  ]", t("align.shortcuts.what.brackets", { ms: NUDGE_MS })],
               [
                 "Shift + [  ]",
-                `Move it by ${NUDGE_MS * NUDGE_COARSE_FACTOR} ms`,
+                t("align.shortcuts.what.shift_brackets", {
+                  ms: NUDGE_MS * NUDGE_COARSE_FACTOR,
+                }),
               ],
               [
-                "Drag a bar line",
-                `Change that bar's tempo, ${BPM_PER_PX_LABEL} a pixel`,
+                t("align.shortcuts.keys.drag_line"),
+                t("align.shortcuts.what.drag_line", { bpm: BPM_PER_PX }),
               ],
-              ["Shift + drag", "A fifth of that, for the last hundredths"],
-              ["Alt + drag", "Ignore the transient snap"],
-              ["Click a bar line", "Type its tempo exactly"],
-              ["Double-click", "Unpin that bar"],
-              ["Esc", "Close"],
+              [t("align.shortcuts.keys.shift_drag"), t("align.shortcuts.what.shift_drag")],
+              [t("align.shortcuts.keys.alt_drag"), t("align.shortcuts.what.alt_drag")],
+              [t("align.shortcuts.keys.click_line"), t("align.shortcuts.what.click_line")],
+              [t("align.shortcuts.keys.double_click"), t("align.shortcuts.what.double_click")],
+              ["Esc", t("align.shortcuts.what.esc")],
             ].map(([keys, what]) => (
               <div
                 key={keys}

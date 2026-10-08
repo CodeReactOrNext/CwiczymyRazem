@@ -1,0 +1,280 @@
+{
+  "sources": {
+    "off": {
+      "label": "Nothing",
+      "description": "Just the tab. Pick a recording to hear the real song underneath it — it follows play, pause and every bar you click."
+    },
+    "file": {
+      "label": "Audio files",
+      "description": "Recordings on your computer — one backing track, or separate stems (drums, bass, vocals) played as layers."
+    },
+    "youtube": {
+      "label": "YouTube video",
+      "description": "Paste a link to the song. The video plays under the tab and its sound is what you hear."
+    }
+  },
+  "bar": {
+    "use_video": "Use video",
+    "bad_link": "That isn't a YouTube link — try youtube.com/watch?v=… or youtu.be/…",
+    "locks_at": "Locks at",
+    "leave_cinema": "Leave cinema",
+    "cinema": "Cinema",
+    "files": "{{count}} files",
+    "files_one": "1 file",
+    "title": "Backing track",
+    "title_empty": "Play along with the real song",
+    "hint_empty": "Add a YouTube video or an audio file of this song. It plays under the tab and follows play, pause and every bar you click.",
+    "hint_unaligned": "Not lined up with the tab yet, so it may play ahead or behind. It takes a minute: put bar 1 on the first beat.",
+    "hint_aligned": "Lined up with the tab. Drifting while you play? Nudge it with [ and ].",
+    "add_recording": "Add a recording",
+    "line_up": "Line up with tab",
+    "sync_mix": "Sync & mix",
+    "leave_cinema_esc": "Leave cinema — Esc"
+  },
+  "sound": {
+    "title": "Sound",
+    "body": "Tick the files that belong to this song. Several ticked at once play as layers of one recording.",
+    "importing": "Importing…",
+    "add_files": "Add files",
+    "loading": "Loading stems…",
+    "empty": "No files yet — add some, or drop audio files anywhere on this screen.",
+    "remove_from_song": "Remove {{name}} from this song",
+    "add_to_song": "Add {{name}} to this song",
+    "layer": "Layer {{n}}",
+    "delete": "Delete {{name}} from the library",
+    "recording_tempo": "Recording tempo",
+    "tempo_aria": "Tempo the files were recorded at",
+    "match_session": "Match session",
+    "plays_at": "plays at {{rate}}×",
+    "stretched": "stretched hard",
+    "volume": "Volume",
+    "unmute": "Unmute the backing track",
+    "mute": "Mute the backing track",
+    "desktop_only": "Backing-track files live on your computer, so this source is part of the desktop app. In the browser, use a YouTube video instead."
+  },
+  "video": {
+    "title": "Video on top",
+    "optional": "optional",
+    "body": "Picture only — the video is muted and your files stay the sound. Each keeps its own sync.",
+    "hide": "Hide video",
+    "show": "Show video",
+    "no_speed": "YouTube has no speed for {{bpm}} BPM, so the picture runs free. What you hear stays locked either way.",
+    "sync": "Video sync",
+    "nudge_earlier": "Nudge the video earlier",
+    "nudge_later": "Nudge the video later",
+    "change": "Change video"
+  },
+  "nudge": {
+    "earlier": "Earlier — hold Shift for {{ms}} ms",
+    "later": "Later — hold Shift for {{ms}} ms"
+  },
+  "youtube": {
+    "locked": "Locked to the tab at {{rate}}× — the video holds this tempo exactly.",
+    "runs_free": "YouTube only plays at its own fixed speeds and {{bpm}} BPM isn't one of them, so the video runs free instead of being yanked back into place.",
+    "paste": "Paste the song's YouTube link"
+  },
+  "align": {
+    "mute": "Mute {{what}}",
+    "unmute": "Unmute {{what}}",
+    "missing_file": "Missing file",
+    "steps": {
+      "choose": "Choose the recording",
+      "choose_detail": "a YouTube video or audio files",
+      "layers": "{{count}} files as layers",
+      "bar1": "Put bar 1 on the first beat",
+      "starts_at": "starts at {{ms}} ms",
+      "bar1_detail": "so the tab and the song start together",
+      "listen": "Listen and fine-tune",
+      "listen_detail": "fix any bar that drifts later on"
+    },
+    "hints": {
+      "choose": "Pick where the sound comes from below. It will play under the tab and follow play, pause and every bar you click.",
+      "bar1": "Press Space to play. Drag the yellow START flag on the Bars row onto the first beat you hear — or nudge the whole recording with [ and ].",
+      "listen": "Play along and listen. If the tab runs ahead or behind later in the song, drag that bar's line onto its beat. Press Done when it sounds right — it is saved for this song."
+    },
+    "zoom": {
+      "one_bar": "1 bar",
+      "one_bar_title": "Zoom so one bar fills the screen",
+      "four_bars": "4 bars",
+      "four_bars_title": "Zoom so four bars fill the screen",
+      "whole": "Whole song",
+      "whole_title": "The whole recording end to end",
+      "label": "Zoom",
+      "hint": "or scroll over the timeline",
+      "out": "Zoom out",
+      "out_title": "See more of the recording at once",
+      "window_title": "How much of the recording fits across the screen",
+      "in": "Zoom in",
+      "in_title": "See less of it, in more detail"
+    },
+    "reading": "Reading the recording…",
+    "no_waveform": "No waveform to map.",
+    "unsupported": "This browser can't share tab audio, so there is no waveform to draw. Chrome or Edge can; Firefox and Safari cannot. Align by ear below.",
+    "no_waveform_yet": "No waveform yet — capture a stretch of the video below to see its shape. Aligning by ear works without one.",
+    "capture": {
+      "whole": "Whole video captured.",
+      "percent": "{{percent}}% of the video captured",
+      "none": "No waveform captured yet",
+      "nothing_left": "Nothing left to capture.",
+      "on_its_own": "Captured on its own, never while you are playing.",
+      "more": "Capture more",
+      "start": "Capture waveform",
+      "delay": "capture delay {{ms}} ms, corrected"
+    },
+    "drop": {
+      "add": "Drop to add as a stem",
+      "needs_desktop": "Adding files needs the desktop app",
+      "adding": "Adding files…",
+      "hint": "Drop audio files anywhere to add a stem"
+    },
+    "stems": "{{count}} stems",
+    "stems_one": "1 stem",
+    "subtitle": "Play the real song under the tab, lined up so both hit bar 1 together.",
+    "done": "Done",
+    "pick_first": "Pick a backing track first, then come back here.",
+    "tools": {
+      "drag_to": "Drag a lane to",
+      "move_view": "Move view",
+      "move_view_title": "Look somewhere else. The recording stays exactly where it is.",
+      "move_audio": "Move audio",
+      "move_audio_title": "Slide the recording against the tab. The middle button still moves the view.",
+      "playhead": "Playhead",
+      "follow_title": "Keep the view centred on the playhead as it moves",
+      "follow": "Follow playback",
+      "jump": "Bring the playhead into view",
+      "jump_title": "Bring the playhead into view, and stay put"
+    },
+    "tempo": {
+      "label": "Tempo grid",
+      "hint": "sets the session too",
+      "aria": "The recording's own tempo",
+      "title": "What the song runs at. Sets the session tempo to match, so the recording keeps sounding as recorded — slow down in the session, not here.",
+      "even_title": "One tempo for the whole recording. Drag a bar line to pin a bar that drifts.",
+      "pinned_title": "Bars pinned to a tempo of their own, so the grid follows a band that drifts.",
+      "even": "even throughout",
+      "pinned": "{{count}} bars pinned",
+      "pinned_one": "1 bar pinned",
+      "reset_title": "Back to one tempo for the whole recording",
+      "reset": "Reset"
+    },
+    "shortcuts": {
+      "aria": "Keyboard shortcuts",
+      "title": "Keyboard shortcuts — ?",
+      "label": "Shortcuts",
+      "close": "Close the shortcut list",
+      "keys": {
+        "scroll": "Scroll",
+        "shift_scroll": "Shift + scroll",
+        "space": "Space",
+        "middle_drag": "Middle-drag",
+        "drag_line": "Drag a bar line",
+        "shift_drag": "Shift + drag",
+        "alt_drag": "Alt + drag",
+        "click_line": "Click a bar line",
+        "double_click": "Double-click"
+      },
+      "what": {
+        "scroll": "Zoom where the pointer is",
+        "shift_scroll": "Move along the recording",
+        "space": "Play or stop, with no count-in",
+        "middle_drag": "Drag the view",
+        "brackets": "Move the whole recording by {{ms}} ms",
+        "shift_brackets": "Move it by {{ms}} ms",
+        "drag_line": "Change that bar's tempo, {{bpm}} BPM a pixel",
+        "shift_drag": "A fifth of that, for the last hundredths",
+        "alt_drag": "Ignore the transient snap",
+        "click_line": "Type its tempo exactly",
+        "double_click": "Unpin that bar",
+        "esc": "Close"
+      }
+    },
+    "lanes": {
+      "overview": "Overview",
+      "follows": "follows playback",
+      "click_jump": "click to jump",
+      "bars": "Bars",
+      "bars_hint": "drag a line onto the beat",
+      "tab": "Tablature",
+      "the_tab": "the tablature",
+      "tab_mute_hint": "silences every instrument in the file",
+      "muted": "muted",
+      "what_you_play": "what you play",
+      "the_video": "the video",
+      "video_mute_hint": "the waveform only fills in while it can be heard",
+      "tap_to_align": "tap to align"
+    },
+    "bar_n": "Bar {{n}}",
+    "bpm": {
+      "slower": "Slower by a hundredth",
+      "slower_title": "Slower — Shift for a tenth",
+      "selected": "Tempo of the selected bar",
+      "faster": "Faster by a hundredth",
+      "faster_title": "Faster — Shift for a tenth",
+      "stop": "Stop editing this bar"
+    },
+    "transport": {
+      "stop_aria": "Stop playback",
+      "play_aria": "Start playback",
+      "stop": "Stop",
+      "play": "Play",
+      "drift": "Drift",
+      "start": "Start",
+      "earlier": "Nudge the backing track earlier",
+      "earlier_title": "Earlier by {{ms}} ms — Shift for {{coarse}}",
+      "later": "Nudge the backing track later",
+      "later_title": "Later by {{ms}} ms — Shift for {{coarse}}",
+      "moves_whole": "moves the whole recording · Shift for {{ms}} ms",
+      "footer": "Space plays without a count-in · middle-drag moves the view · press ? for every shortcut"
+    }
+  },
+  "stem": {
+    "solo_aria": "Solo {{name}}",
+    "solo": "Solo",
+    "mute": "Mute",
+    "remove": "Remove",
+    "on_grid": "On the grid",
+    "resize": "Resize the {{name}} lane"
+  },
+  "lanes_aria": {
+    "tab_seek": "Tablature notes on the alignment timeline — click to play from there",
+    "tab": "Tablature notes on the alignment timeline",
+    "grid_pan": "Backing track alignment grid — drag to move the view",
+    "grid_shift": "Backing track alignment grid — drag to shift the recording",
+    "overview": "Backing track overview — click to jump to a part of the recording"
+  },
+  "mixer": {
+    "levels": "Instrument levels",
+    "levels_title": "Instrument levels — what you hear",
+    "main": "Main instrument",
+    "instrument": "Instrument",
+    "volume": "{{name}} volume"
+  },
+  "clock": {
+    "position": "Position in the recording"
+  },
+  "ruler": {
+    "start": "START",
+    "on_beat": "on beat",
+    "was": "was {{bpm}}",
+    "aria": "Bar ruler — drag a bar line onto the beat you hear, Shift for fine, double-click to unpin it"
+  },
+  "capture": {
+    "lengths": {
+      "s15": "15 s",
+      "s30": "30 s",
+      "m1": "1 min",
+      "m2": "2 min",
+      "until_stop": "Until I stop"
+    },
+    "title": "Capture the waveform",
+    "body": "The video's audio can only be measured by hearing it play, so this plays it and listens — on its own, with the session stopped, so nothing has to share a thread with it.",
+    "close": "Close",
+    "unsupported": "This browser can't hand over tab audio, so there is no waveform to capture. Chrome and Edge can; Firefox and Safari cannot — or use the desktop app.",
+    "for": "Capture for",
+    "start": "Start capture",
+    "heard": "{{percent}}% of the video heard",
+    "nothing_heard": "Nothing heard yet",
+    "saved": "Saved",
+    "tip": "Scrub to the part you are aligning before starting — a capture only draws what it hears. Everything the tab plays is heard, so leave the rest of the app quiet while it runs."
+  }
+}

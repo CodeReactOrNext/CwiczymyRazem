@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
+import { useTranslation } from "hooks/useTranslation";
 import { AudioLines, Check, Square, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { YouTubeProps } from "react-youtube";
@@ -20,12 +21,13 @@ const YT_PLAYING = 1;
  * minutes — and every second of it is a second of capture running. So the
  * choice is made up front and the pass stops itself.
  */
-const LENGTHS: { label: string; seconds: number | null }[] = [
-  { label: "15 s", seconds: 15 },
-  { label: "30 s", seconds: 30 },
-  { label: "1 min", seconds: 60 },
-  { label: "2 min", seconds: 120 },
-  { label: "Until I stop", seconds: null },
+/** Labels are `backing_track:capture.lengths.<key>`. */
+const LENGTHS: { key: string; seconds: number | null }[] = [
+  { key: "s15", seconds: 15 },
+  { key: "s30", seconds: 30 },
+  { key: "m1", seconds: 60 },
+  { key: "m2", seconds: 120 },
+  { key: "until_stop", seconds: null },
 ];
 
 const button =
@@ -69,6 +71,7 @@ export function WaveformCaptureDialog({
   onCaptured,
   onClose,
 }: WaveformCaptureDialogProps) {
+  const { t } = useTranslation("backing_track");
   const playerRef = useRef<{
     playVideo: () => void;
     pauseVideo: () => void;
@@ -209,18 +212,16 @@ export function WaveformCaptureDialog({
         <div className='flex items-start gap-4'>
           <div className='flex flex-col gap-1'>
             <h3 className='text-base font-semibold text-zinc-100'>
-              Capture the waveform
+              {t("capture.title")}
             </h3>
             <p className='text-xs leading-relaxed text-zinc-400'>
-              The video&apos;s audio can only be measured by hearing it play, so
-              this plays it and listens — on its own, with the session stopped,
-              so nothing has to share a thread with it.
+              {t("capture.body")}
             </p>
           </div>
           <button
             type='button'
             onClick={close}
-            aria-label='Close'
+            aria-label={t("capture.close")}
             className='ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-zinc-100'>
             <X className='h-4 w-4' />
           </button>
@@ -240,20 +241,18 @@ export function WaveformCaptureDialog({
 
         {unsupported ? (
           <p className='text-xs leading-relaxed text-amber-400'>
-            This browser can&apos;t hand over tab audio, so there is no waveform
-            to capture. Chrome and Edge can; Firefox and Safari cannot — or use
-            the desktop app.
+            {t("capture.unsupported")}
           </p>
         ) : (
           <>
             <div className='flex flex-wrap items-center gap-x-6 gap-y-3'>
               <span className='text-xs font-semibold text-zinc-400'>
-                Capture for
+                {t("capture.for")}
               </span>
               <div className='flex flex-wrap items-center gap-1 rounded-lg bg-zinc-950/60 p-1'>
-                {LENGTHS.map(({ label, seconds }) => (
+                {LENGTHS.map(({ key, seconds }) => (
                   <button
-                    key={label}
+                    key={key}
                     type='button'
                     disabled={isCapturing}
                     onClick={() => setLengthSec(seconds)}
@@ -265,7 +264,7 @@ export function WaveformCaptureDialog({
                         ? "bg-cyan-500/10 text-cyan-400"
                         : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
                     )}>
-                    {label}
+                    {t(`capture.lengths.${key}`)}
                   </button>
                 ))}
               </div>
@@ -278,7 +277,7 @@ export function WaveformCaptureDialog({
                   onClick={() => void finish()}
                   className={cn(button, "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20")}>
                   <Square className='h-3.5 w-3.5' />
-                  Stop
+                  {t("align.transport.stop")}
                   {lengthSec !== null && (
                     <span className='tabular-nums'>{remainingSec}s</span>
                   )}
@@ -290,7 +289,7 @@ export function WaveformCaptureDialog({
                   onClick={begin}
                   className={cn(button, "disabled:opacity-40")}>
                   <AudioLines className='h-3.5 w-3.5' />
-                  {phase === "done" ? "Capture more" : "Start capture"}
+                  {phase === "done" ? t("align.capture.more") : t("capture.start")}
                 </button>
               )}
 
@@ -302,13 +301,15 @@ export function WaveformCaptureDialog({
               )}
 
               <span className='text-xs tabular-nums text-zinc-400'>
-                {heard > 0 ? `${heard}% of the video heard` : "Nothing heard yet"}
+                {heard > 0
+                  ? t("capture.heard", { percent: heard })
+                  : t("capture.nothing_heard")}
               </span>
 
               {phase === "done" && (
                 <span className='flex items-center gap-1.5 text-xs font-medium text-emerald-400'>
                   <Check className='h-3.5 w-3.5' />
-                  Saved
+                  {t("capture.saved")}
                 </span>
               )}
 
@@ -317,7 +318,7 @@ export function WaveformCaptureDialog({
                   type='button'
                   onClick={close}
                   className={cn(button, "ml-auto")}>
-                  Done
+                  {t("align.done")}
                 </button>
               )}
             </div>
@@ -326,9 +327,7 @@ export function WaveformCaptureDialog({
               <p className='text-xs text-amber-400'>{waveform.error}</p>
             ) : (
               <p className='text-xs leading-relaxed text-zinc-500'>
-                Scrub to the part you are aligning before starting — a capture
-                only draws what it hears. Everything the tab plays is heard, so
-                leave the rest of the app quiet while it runs.
+                {t("capture.tip")}
               </p>
             )}
           </>
