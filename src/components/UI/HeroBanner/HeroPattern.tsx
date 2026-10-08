@@ -13,6 +13,8 @@ import {
   Heart,
   type LucideIcon,
   Map,
+  MessagesSquare,
+  Mic,
   Music,
   Music4,
   NotebookPen,
@@ -26,7 +28,7 @@ import {
 import { useId } from "react";
 import { TbGuitarPick } from "react-icons/tb";
 
-type PatternVariant = "guitar" | "heart" | "shuffle" | "timer" | "log" | "tabs" | "ai";
+type PatternVariant = "guitar" | "heart" | "shuffle" | "timer" | "log" | "tabs" | "ai" | "community";
 
 const ICON_SETS: Record<PatternVariant, [LucideIcon, LucideIcon, LucideIcon | typeof TbGuitarPick, LucideIcon]> = {
   guitar: [Guitar, Music, TbGuitarPick, Headphones],
@@ -36,6 +38,7 @@ const ICON_SETS: Record<PatternVariant, [LucideIcon, LucideIcon, LucideIcon | ty
   log: [NotebookPen, ClipboardList, CheckCircle2, Music],
   tabs: [FileMusic, FolderOpen, Music4, UploadCloud],
   ai: [Bot, Brain, Map, Compass],
+  community: [MessagesSquare, Guitar, TbGuitarPick, Mic],
 };
 
 interface HeroPatternProps {

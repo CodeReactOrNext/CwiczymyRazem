@@ -6,6 +6,7 @@ import type {
   ChatReaction,
   ChatReplyTo,
 } from "feature/chat/types/chat.types";
+import { isStockGreeting } from "feature/chat/utils/chatGreetings";
 import type { GuildBadge } from "feature/guilds/types/guild.types";
 import {
   addDoc,
@@ -32,6 +33,17 @@ export const GLOBAL_CHAT_PATH = "chats";
 export const guildChatPath = (guildId: string): `guilds/${string}/chat` =>
   `guilds/${guildId}/chat`;
 
+/**
+ * New players used to be welcomed in the global room; they are greeted in the
+ * activity feed now. The old cards are still stored, and so are the bare
+ * "@Ania Welcome! 👋" replies to them — without the card, those would read as
+ * stray lines.
+ */
+const isRetiredWelcome = (message: ChatMessageType) =>
+  message.type === "welcome" ||
+  (Boolean(message.replyTo?.id?.startsWith("welcome-")) &&
+    isStockGreeting(message));
+
 export const fetchChatMessages = (
   callback: (messages: ChatMessageType[]) => void,
   chatPath: string = GLOBAL_CHAT_PATH
@@ -49,7 +61,8 @@ export const fetchChatMessages = (
       .map(
         (docSnapshot) =>
           ({ id: docSnapshot.id, ...docSnapshot.data() } as ChatMessageType)
-      );
+      )
+      .filter((message) => !isRetiredWelcome(message));
     callback(messages.reverse());
   }, (error) => {
     console.error("Chat messages listener failed:", error);
@@ -127,10 +140,4 @@ const postWithToken = async (url: string, body: object) => {
 export const notifyChatMentions = (chatPath: string, messageId: string) =>
   postWithToken("/api/chat/mentions", { chatPath, messageId }).catch(
     (error) => console.error("Chat mention notify failed:", error)
-  );
-
-/** Posts the new player's welcome card to the global room — once per account, the server makes sure. */
-export const postChatWelcome = () =>
-  postWithToken("/api/chat/welcome", {}).catch((error) =>
-    console.error("Chat welcome failed:", error)
   );

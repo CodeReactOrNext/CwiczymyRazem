@@ -1,8 +1,5 @@
-import type {
-  ChatSystemEvent,
-  ChatWelcome,
-} from "feature/chat/types/chat.types";
-import { systemEventText, welcomeText } from "feature/chat/utils/systemMessages";
+import type { ChatSystemEvent } from "feature/chat/types/chat.types";
+import { systemEventText } from "feature/chat/utils/systemMessages";
 import type { GuildBadge } from "feature/guilds/types/guild.types";
 import type { CollectionReference } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
@@ -116,28 +113,4 @@ export async function postGuildMemberJoinedMessage(
   } catch (error) {
     console.error("[chatSystemMessages] member joined", guildId, error);
   }
-}
-
-/** The new player's card in the global room. Once per account: the document id is theirs. */
-export async function postWelcomeMessage(
-  uid: string,
-  data: Record<string, any>,
-  welcome: ChatWelcome,
-): Promise<void> {
-  const author = authorOf(uid, data);
-
-  await writeRow(
-    firestore.collection("chats"),
-    {
-      type: "welcome",
-      userId: author.uid,
-      username: author.name,
-      userPhotoURL: author.avatar,
-      lvl: author.lvl,
-      guildBadge: author.guildBadge,
-      message: welcomeText(author.name, welcome.goal, welcome.planTitle),
-      welcome,
-    },
-    `welcome-${uid}`,
-  );
 }

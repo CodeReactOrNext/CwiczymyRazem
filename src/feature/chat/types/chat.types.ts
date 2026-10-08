@@ -71,17 +71,12 @@ export type ChatSystemEvent =
     }
   | { kind: "member_joined" };
 
-/** What a player who just finished onboarding came for, shown on their welcome card. */
-export interface ChatWelcome {
-  goal: string | null;
-  planTitle: string | null;
-}
-
 export interface ChatMessageType {
   id?: string;
   /**
    * Absent on everything older than the typed messages, which were all plain.
-   * `system` and `welcome` rows are written by the server only.
+   * `system` rows are written by the server only. `welcome` rows are retired — new players are
+   * greeted in the activity feed now — and the old ones are dropped when the room is read.
    */
   type?: "message" | "system" | "welcome";
   /** The author, or the player a system event is about. `"system"` for guild-wide events. */
@@ -103,7 +98,6 @@ export interface ChatMessageType {
   mentions?: ChatMention[];
   attachment?: ChatAttachment | null;
   system?: ChatSystemEvent | null;
-  welcome?: ChatWelcome | null;
   /** Set by `/api/chat/mentions` once the tagged players were notified, so it never runs twice. */
   mentionsNotified?: boolean;
 }

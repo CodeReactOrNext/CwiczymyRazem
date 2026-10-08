@@ -42,6 +42,8 @@
   "song_count_other": "{{count}} Songs",
   "passed_exam": "hat die Prüfung {{step}} bestanden",
   "completed_roadmap_step": "hat {{step}} in der Roadmap {{roadmap}} abgeschlossen",
+  "joined": "ist Riff Quest beigetreten",
+  "joined_with": "ist Riff Quest beigetreten, {{phrase}}",
   "completed_daily_quests": "hat alle {{quests}} abgeschlossen",
   "daily_quests": "Tagesquests!",
   "session_time_hint": "In dieser Session erfasste Übungszeit",
@@ -113,5 +115,29 @@
     "online": "{{count}} online",
     "practicing": "{{count}} üben gerade",
     "sheet_title": "Community"
+  },
+  "discord_promo": {
+    "eyebrow": "Riff Quest Discord",
+    "join": "Dem Server beitreten",
+    "v1": {
+      "headline": "Dein Amp hat einen Ausschalter. Unser Discord nicht.",
+      "body": "Leute reden über Gear, posten Riffs und verlieren rund um die Uhr Diskussionen über Sound. Sag Hallo."
+    },
+    "v2": {
+      "headline": "Allein üben ist okay. Allein jammern nicht.",
+      "body": "Teile deine Erfolge, frag nach Technik, finde jemanden auf deinem Level, der dich auf Kurs hält."
+    },
+    "v3": {
+      "headline": "Es gibt einen Gear-Channel. Er schläft nie.",
+      "body": "Pedale, Saiten, die Gitarre, die du dir garantiert nicht leisten kannst. Bring Meinungen mit."
+    },
+    "v4": {
+      "headline": "Riff aufgenommen? Hol dir echte Ohren dafür.",
+      "body": "Lade einen Clip hoch und hol dir Feedback von Leuten, die genau wissen, wie sich dieses Bending anfühlt."
+    },
+    "v5": {
+      "headline": "Deine Gitarre will Freunde. Du vielleicht auch.",
+      "body": "Gilden, Challenges und Leute, die dasselbe üben wie du. Komm in den Riff Quest Discord."
+    }
   }
 }

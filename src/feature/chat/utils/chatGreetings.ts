@@ -22,10 +22,9 @@ const GREETING_WORDS = new Set([
   "buenas",
 ]);
 
-/** A row others greet: a new player's welcome card or a guild's new member. */
+/** A row others greet: a guild's new member. */
 const isGreetable = (message: ChatMessageType) =>
-  message.type === "welcome" ||
-  (message.type === "system" && message.system?.kind === "member_joined");
+  message.type === "system" && message.system?.kind === "member_joined";
 
 /**
  * Whether a reply is only "@Ania Welcome! 👋" — the text the Say hi button
