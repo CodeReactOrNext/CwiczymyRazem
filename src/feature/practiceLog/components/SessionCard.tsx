@@ -76,7 +76,7 @@ export const SessionCard = ({
   const { t } = useTranslation(["practice_log", "common"]);
   const config = SESSION_TYPE_CONFIG[session.type];
   const TypeIcon = config.icon;
-  const isManual = session.type === "manual";
+  const { isManual } = session;
   const isBackdated =
     !!session.isDateBackReport && session.isDateBackReport !== "0";
 

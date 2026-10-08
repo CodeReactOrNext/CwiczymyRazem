@@ -146,6 +146,38 @@ describe("PATCH /api/user/report/manage — full edit", () => {
     expect(res.statusCode).toBe(403);
   });
 
+  it("edits a manual report logged against songs", async () => {
+    reportData = {
+      ...reportData,
+      songId: "song-1",
+      songs: [{ songId: "song-1", practiceMs: 60000 }],
+    };
+    const res = await call("PATCH", {
+      idToken: "good-token",
+      reportId: REPORT_ID,
+      updates: fullEdit,
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(updateMock).toHaveBeenCalled();
+  });
+
+  it("still refuses to edit a plan report that carries songs", async () => {
+    reportData = {
+      ...reportData,
+      planId: "plan-1",
+      songId: "song-1",
+      songs: [{ songId: "song-1", practiceMs: 60000 }],
+    };
+    const res = await call("PATCH", {
+      idToken: "good-token",
+      reportId: REPORT_ID,
+      updates: fullEdit,
+    });
+
+    expect(res.statusCode).toBe(403);
+  });
+
   it("edits a manual report", async () => {
     const res = await call("PATCH", {
       idToken: "good-token",

@@ -52,7 +52,7 @@ import { createTempoRulerFromMeasures } from "./hooks/tempoBeatClock";
 import { useCalibration } from "./hooks/useCalibration";
 import { useDesktopSessionIntegration } from "./hooks/useDesktopSessionIntegration";
 import { useEarTraining } from "./hooks/useEarTraining";
-import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
+import { useGeneratedExercise, willHaveTablature } from "./hooks/useGeneratedExercise";
 import { useGpFileLoader } from "./hooks/useGpFileLoader";
 import { useGuitarTuning } from "./hooks/useGuitarTuning";
 import { useNoteHuntRotation } from "./hooks/useNoteHuntRotation";
@@ -359,7 +359,7 @@ export const PracticeSession = ({
       const pref = loadGuitarPlaybackPreference();
       nextAudioMuted = pref !== null
         ? !pref
-        : !(hasStrumSynth || (currentExercise.tablature && currentExercise.tablature.length > 0));
+        : !(hasStrumSynth || willHaveTablature(currentExercise));
     }
 
     // In exam mode with a backing track, the backing guides the tempo, so the
@@ -462,7 +462,7 @@ export const PracticeSession = ({
     return activeExercise.backingTracks;
   }, [parsedGpTracks, selectedGpTrackIdx, activeExercise.backingTracks]);
 
-  const planHasTablature = useMemo(() => plan.exercises.some(ex => (ex.tablature && ex.tablature.length > 0) || ex.riddleConfig?.mode === "sequenceRepeat"), [plan.exercises]);
+  const planHasTablature = useMemo(() => plan.exercises.some(ex => willHaveTablature(ex) || ex.riddleConfig?.mode === "sequenceRepeat"), [plan.exercises]);
   const planHasStrumming = useMemo(() => plan.exercises.some(ex => ex.strummingPatterns && ex.strummingPatterns.length > 0), [plan.exercises]);
 
   // ── Audio subsystem ───────────────────────────────────────────────────────

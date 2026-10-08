@@ -15,6 +15,7 @@ const session = (
   date: new Date(isoLocal),
   title: "Session",
   type: "manual",
+  isManual: true,
   points: 10,
   timeMs: 20 * 60 * 1000,
   ...overrides,

@@ -164,11 +164,15 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   }, []);
 
   const hasMetronome  = !!p.currentExercise.metronomeSpeed;
+  // activeTablature, not just the plan's own exercises: configurable scale/chord
+  // practice has no tab of its own — it's generated after the dialog — and reading
+  // only the plan left those sessions without playback, volume and mic controls.
+  const hasActiveTablature = !!p.activeTablature?.length;
   const hasAudioTrack =
-    !!((p.currentExercise.tablature && p.currentExercise.tablature.length > 0) || p.planHasTablature || p.planHasGpFile || p.planHasStrumming) &&
+    !!(hasActiveTablature || p.planHasTablature || p.planHasGpFile || p.planHasStrumming) &&
     !p.currentExercise.disableBackingTrack;
   const hasMicControls =
-    (p.planHasTablature || p.planHasGpFile || p.planHasStrumming || !!p.currentExercise.customGoal) && !p.currentExercise.disableMic;
+    (hasActiveTablature || p.planHasTablature || p.planHasGpFile || p.planHasStrumming || !!p.currentExercise.customGoal) && !p.currentExercise.disableMic;
   const hasPlaybackControls = hasMetronome || hasAudioTrack || hasMicControls;
 
   const playbackControls = hasPlaybackControls ? (

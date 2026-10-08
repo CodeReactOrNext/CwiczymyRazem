@@ -11,6 +11,7 @@ import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { type BpmProgressData,getAllBpmProgress } from "feature/exercisePlan/services/bpmProgressService";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
+import { hasLeaderboard as hasExerciseLeaderboard } from "feature/exercisePlan/utils/hasLeaderboard";
 import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
@@ -413,7 +414,7 @@ export const SkillDashboard = ({
                     const earTrainingHighScore = progress?.earTrainingHighScore;
                     const clickHighScore = progress?.clickHighScore;
                     const clickAccuracy = progress?.clickHighScoreAccuracy;
-                    const hasLeaderboard = bpmStages.length > 0 || !!exerciseDef?.riddleConfig || isClickAnsweredMode(exerciseDef?.noteHuntConfig?.mode) || (exerciseDef?.tablature && exerciseDef.tablature.length > 0);
+                    const hasLeaderboard = hasExerciseLeaderboard(challenge) && (bpmStages.length > 0 || !!exerciseDef?.riddleConfig || isClickAnsweredMode(exerciseDef?.noteHuntConfig?.mode) || (exerciseDef?.tablature && exerciseDef.tablature.length > 0));
                     const sp = currentDifficulty === 'beginner' ? 0 : currentDifficulty === 'easy' ? 1 : currentDifficulty === 'medium' ? 2 : 3;
                     const hasBeenAttempted = hasExerciseProgress(progress);
                     const diffColor = currentDifficulty === 'beginner'

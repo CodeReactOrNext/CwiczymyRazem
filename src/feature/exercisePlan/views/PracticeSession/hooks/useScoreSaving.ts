@@ -8,6 +8,7 @@ import { useAppSelector } from "store/hooks";
 
 import { markExerciseCompleted, saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise, ScoredRun } from "../../../types/exercise.types";
+import { hasLeaderboard } from "../../../utils/hasLeaderboard";
 import { isClickAnsweredMode } from "../../../utils/huntModes";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
 
@@ -65,6 +66,8 @@ export function useScoreSaving({
   const [scoredRuns, setScoredRuns] = useState<ScoredRun[]>([]);
 
   const recordScoredRun = (run: ScoredRun) => {
+    // The summary card places each run on its board — skip exercises without one.
+    if (!hasLeaderboard(activeExercise)) return;
     setScoredRuns((tracked) => {
       // Keyed by exercise, not by score type: one exercise has one leaderboard,
       // and a click hunt with the mic on saves under both types, same score.
@@ -104,6 +107,7 @@ export function useScoreSaving({
      * and the player's own entry is never one of them.
      */
     const placeOnLeaderboard = async (uid: string, score: number, previousBest: number): Promise<RunStanding> => {
+      if (!hasLeaderboard(activeExercise)) return {};
       saveLeaderboardEntry(uid, exId, score, userName || "Anonymous", userAvatar || "", runBpm);
       const rank = await getExerciseUserRank(exId, Math.max(score, previousBest));
       return { ...(runBpm ? { bpm: runBpm } : {}), ...(rank ? { rank } : {}) };

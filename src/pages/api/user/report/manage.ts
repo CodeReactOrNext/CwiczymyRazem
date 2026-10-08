@@ -1,4 +1,5 @@
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
+import { isManualReport } from "feature/practiceLog/utils/isManualReport";
 import { FieldValue } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
@@ -103,7 +104,7 @@ export default async function handler(
     return res.status(200).json({ success: true });
   }
 
-  if (data.planId || data.songId) {
+  if (!isManualReport(data)) {
     return res
       .status(403)
       .json({ error: "Only manual reports can be modified" });

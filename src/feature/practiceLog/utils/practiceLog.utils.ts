@@ -9,6 +9,7 @@ import type {
   PracticeLogSummaryData,
   SessionType,
 } from "../types/practiceLog.types";
+import { isManualReport } from "./isManualReport";
 
 const DURATION_BOUNDS_MS = {
   short: { min: 0, max: 15 * 60 * 1000 },
@@ -66,6 +67,7 @@ export const mapLogToSession = (
     date: new Date(log.reportDate.seconds * 1000),
     title: resolveTitle(log, type),
     type,
+    isManual: isManualReport(log),
     points: log.totalPoints ?? 0,
     timeMs: log.bonusPoints?.time ?? log.timeSumary?.sumTime ?? 0,
     timeSumary: log.timeSumary,

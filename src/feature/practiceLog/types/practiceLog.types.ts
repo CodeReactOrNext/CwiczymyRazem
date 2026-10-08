@@ -22,6 +22,8 @@ export interface PracticeLogSession {
   date: Date;
   title: string;
   type: SessionType;
+  /** Typed in by hand (incl. a manual log attributed to songs) — edit/delete allowed. */
+  isManual: boolean;
   points: number;
   /** Session duration in ms (bonusPoints.time). */
   timeMs: number;

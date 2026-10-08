@@ -630,6 +630,21 @@ export const useMetronome = ({
     }
   }, [bpm]); // Intentionally not including others to avoid restarts on other prop changes
 
+  // The paused position is held as elapsed milliseconds, but it means a beat.
+  // A tempo change while paused (the usual "pause, bump the speed, play") has to
+  // rescale it, or the resume lands at a different beat — past the end of the
+  // tab when sped up enough, which played back as silence.
+  const pausedSecondsPerBeatRef = useRef(60.0 / (bpm * (speedMultiplier || 1)));
+  useEffect(() => {
+    const secondsPerBeat = 60.0 / (bpm * (speedMultiplier || 1));
+    const previous = pausedSecondsPerBeatRef.current;
+    pausedSecondsPerBeatRef.current = secondsPerBeat;
+    if (isPlayingRef.current || !(previous > 0) || !(secondsPerBeat > 0)) return;
+    const ratio = secondsPerBeat / previous;
+    pausedElapsedTimeRef.current  *= ratio;
+    pausedAudioElapsedRef.current *= ratio;
+  }, [bpm, speedMultiplier]);
+
   const handleSetRecommendedBpm = useCallback(() => {
     setBpm(recommendedBpm);
   }, [recommendedBpm]);

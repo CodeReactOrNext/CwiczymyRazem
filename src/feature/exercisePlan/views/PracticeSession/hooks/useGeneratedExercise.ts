@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 
 import type { Exercise } from "../../../types/exercise.types";
 
+/**
+ * Configurable scale/chord practice ships without a tab — the setup dialog
+ * generates one — so anything deciding up front whether a session has a tab
+ * (default guitar playback, the mic prompt) has to count these as having one.
+ */
+export const willHaveTablature = (exercise: Exercise): boolean =>
+  exercise.id === "scale_practice_configurable" ||
+  exercise.id === "chord_practice_configurable" ||
+  !!exercise.tablature?.length;
+
 interface UseGeneratedExerciseOptions {
   currentExercise: Exercise;
 }

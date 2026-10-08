@@ -9,6 +9,17 @@ import { applyAlphaTabOutputDevice } from 'utils/applyAudioSinkId';
 // so a RQ beat position maps to an AlphaTab tick with beat * 960.
 const TICKS_PER_QUARTER = 960;
 
+/**
+ * Fold a resume position measured on the session clock back into the song.
+ * The clock keeps running across loops while AlphaTab restarts at tick 0 on
+ * each one, so past the first pass the raw tick lies beyond the last note.
+ * An end tick of 0 (not reported yet) leaves the position as it is.
+ */
+export const wrapResumeTick = (tick: number, endTick: number): number => {
+  const clamped = Math.max(0, tick);
+  return endTick > 0 ? clamped % endTick : clamped;
+};
+
 interface AlphaTabTrackConfig {
   isMuted: boolean;
   volume: number;
@@ -101,6 +112,10 @@ export const useAlphaTabPlayer = ({
   const wasPausedRef     = useRef(false);
   // Tracks the previous isPlaying value to detect actual transitions vs startTime-only changes.
   const prevIsPlayingRef = useRef(false);
+  // Last tick of the song as AlphaTab plays it (repeats included), from its own
+  // position events. The session clock keeps counting across loops, so a resume
+  // position has to be wrapped back into the song by this.
+  const endTickRef       = useRef(0);
   // isReadyRef mirrored into React state: the settings effects below (metronome click,
   // master volume) carry values that usually never change after mount, so without a
   // state dependency they fire exactly once — while apiRef is still null, because the
@@ -196,6 +211,10 @@ export const useAlphaTabPlayer = ({
       }
     });
 
+    api.playerPositionChanged.on((e: any) => {
+      if (e?.endTick > 0) endTickRef.current = e.endTick;
+    });
+
     api.playerFinished.on(() => {
       onLoopCompleteRef.current?.();
       if (isPlayingRef.current) {
@@ -219,6 +238,7 @@ export const useAlphaTabPlayer = ({
       hasStartedRef.current  = false;
       wasPausedRef.current   = false;
       currentFileRef.current = null;
+      endTickRef.current     = 0;
       div.remove();
       playRef.current  = null;
       apiRef.current   = null;
@@ -308,7 +328,11 @@ export const useAlphaTabPlayer = ({
           if (startTime && pendingSeekBeatRef?.current == null) {
             const beats = ((Date.now() - startTime) / 1000) * (bpmRef.current / 60);
             if (beats > 0.1) {
-              try { api.tickPosition = Math.max(0, Math.round(beats * TICKS_PER_QUARTER)); } catch { /* ignore */ }
+              // startTime counts every loop played so far, not the current pass.
+              // Unwrapped, a resume after the first loop seeked past the end of
+              // the song — and the player came back with no guitar and no click.
+              const tick = wrapResumeTick(Math.round(beats * TICKS_PER_QUARTER), endTickRef.current);
+              try { api.tickPosition = tick; } catch { /* ignore */ }
             }
           }
           applyPendingSeek();

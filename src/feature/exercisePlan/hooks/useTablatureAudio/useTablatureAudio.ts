@@ -348,8 +348,12 @@ export const useTablatureAudio = ({
         const beat         = data.flattened[localIdx];
         const beatDuration = Math.max(0.05, data.warpedDurations[localIdx] * secondsPerBeat);
         const t = Math.max(ctx.currentTime + 0.001, beatAudioTime);
+        // The start-up skip above only walks the first pass. Resuming after it
+        // (the anchor counts every loop played) left whole passes in the past,
+        // and they all sounded at once — walk through them silently instead.
+        const isLate = beatAudioTime < ctx.currentTime - 0.1;
 
-        if (!track.isMuted) {
+        if (!track.isMuted && !isLate) {
           beat.notes.forEach((n: TablatureNote) => {
             playNote(n, t, track.id, beatDuration, track.trackType ?? "guitar");
           });
@@ -357,7 +361,8 @@ export const useTablatureAudio = ({
 
         const isLastLoop   = rc > 0 && loopCount === rc - 1;
         const loopBoundary = isLastLoop ? N - 1 : loopEndIdx - 1;
-        if (localIdx === loopBoundary && track.id === refTrackId) {
+        // A pass that ended before the pause was already reported back then.
+        if (localIdx === loopBoundary && track.id === refTrackId && !isLate) {
           const delayMs = (beatAudioTime + beatDuration - ctx.currentTime) * 1000;
           const tid = window.setTimeout(() => {
             pendingLoopCompleteTimeoutsRef.current.delete(tid);

@@ -3,6 +3,7 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { addDays, isSameDay, startOfWeek } from "date-fns";
 import { ScoreBreakdownTooltip } from "feature/profile/components/ScoreBreakdownTooltip";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { useRemoteSessionRefresh } from "hooks/useRemoteSessionRefresh";
 import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
 import { FaFire } from "react-icons/fa";
@@ -14,7 +15,16 @@ export const StreakBox = () => {
   const router = useRouter();
   const userAuth = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
-  const { reportList } = useActivityLog(userAuth || "");
+  // The header stays mounted across navigation, so the log is fetched once.
+  // Refetch whenever a new report bumps the session counter — here or on
+  // another device — otherwise today stays unticked until a full page reload.
+  // Both counters only grow, so their sum changes whenever either does.
+  const localSessionCount = userStats?.sessionCount ?? 0;
+  const remoteNonce = useRemoteSessionRefresh(userAuth, localSessionCount);
+  const { reportList } = useActivityLog(
+    userAuth || "",
+    localSessionCount + remoteNonce
+  );
 
   const lastReportDate = userStats?.lastReportDate || "";
   const actualDayWithoutBreak = userStats?.actualDayWithoutBreak || 0;

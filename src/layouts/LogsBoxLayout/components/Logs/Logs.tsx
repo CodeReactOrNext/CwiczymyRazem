@@ -42,6 +42,7 @@ import type { TopPlayerData } from "feature/discordBot/services/topPlayersServic
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import { hasLeaderboard } from "feature/exercisePlan/utils/hasLeaderboard";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { findCosmetic } from "feature/guilds/data/guildCosmetics";
 import { DiscordPromoCard } from "feature/logs/components/DiscordPromoCard";
@@ -1447,6 +1448,8 @@ const GroupedLogLine = ({
   const matchedExercise: Exercise | null = genericLog.exerciseTitle
     ? findExerciseByTitle(genericLog.exerciseTitle)
     : null;
+  const rankedExercise =
+    matchedExercise && hasLeaderboard(matchedExercise) ? matchedExercise : null;
   // A plan that isn't in the catalog — someone's own, an auto plan — can only be opened through
   // the exercises its log lists. Logs written before those were recorded stay plain labels.
   const loggedExercises = resolveLoggedExercises(
@@ -1579,11 +1582,11 @@ const GroupedLogLine = ({
 
       {genericLog.micPerformance &&
         genericLog.micPerformance.score !== 0 &&
-        (matchedExercise ? (
+        (rankedExercise ? (
           <button
             type='button'
             onClick={() =>
-              onOpenLeaderboard(matchedExercise.id, matchedExercise.title)
+              onOpenLeaderboard(rankedExercise.id, rankedExercise.title)
             }
             title={t("feed:ranking_hint")}
             className={cn(TOUCH_TARGET, "inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
@@ -1597,11 +1600,11 @@ const GroupedLogLine = ({
 
       {genericLog.earTrainingPerformance &&
         genericLog.earTrainingPerformance.score !== 0 &&
-        (matchedExercise ? (
+        (rankedExercise ? (
           <button
             type='button'
             onClick={() =>
-              onOpenLeaderboard(matchedExercise.id, matchedExercise.title)
+              onOpenLeaderboard(rankedExercise.id, rankedExercise.title)
             }
             title={t("feed:ranking_hint")}
             className={cn(TOUCH_TARGET, "inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
