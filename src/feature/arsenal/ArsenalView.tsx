@@ -3,6 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/t
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { tabNavFadeClass } from "components/PageTabs/tabNav";
+import { useRailEdges } from "components/PageTabs/useRailEdges";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LevelGate } from "feature/levelGate/components/LevelGate";
 import { PlayerLvlProvider } from "feature/progression/hooks/usePlayerLvl";
@@ -71,7 +73,10 @@ import { CommissionsView } from "./components/Commissions/CommissionsView";
 import { DexView } from "./components/Dex/DexView";
 import { MarketplaceView } from "./components/Marketplace/MarketplaceView";
 import { RigView } from "./components/Rig/RigView";
-import { arsenalTabTriggerClass } from "./components/tabTrigger";
+import {
+  arsenalTabListClass,
+  arsenalTabTriggerClass,
+} from "./components/tabTrigger";
 import { TraderView } from "./components/Trader/TraderView";
 import { WorkshopSkeleton } from "./components/Workshop/WorkshopSkeleton";
 import { WorkshopTab } from "./components/Workshop/WorkshopTab";
@@ -82,6 +87,7 @@ import type { CaseType, OpenCaseResult } from "./types/arsenal.types";
 
 const ArsenalTabs = () => {
   const { data, isLoading } = useArsenalData();
+  const { ref: railRef, edges: tabEdges } = useRailEdges<HTMLDivElement>();
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
   // Free cases earned from achievements. Spendable on any case on the shelf,
@@ -200,7 +206,9 @@ const ArsenalTabs = () => {
       <div className="p-4">
         <div className="flex flex-col gap-6">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="h-auto max-w-full justify-start gap-1 rounded-none border-b border-arsenal-border bg-transparent p-0 overflow-x-auto no-scrollbar">
+            <TabsList
+              ref={railRef}
+              className={cn(arsenalTabListClass, tabNavFadeClass(tabEdges))}>
               {ARSENAL_TABS.filter(isTabVisible).map((tab) => {
                 const { label, icon: Icon } = TAB_META[tab];
                 const hasNewDrop =
@@ -211,15 +219,15 @@ const ArsenalTabs = () => {
 
                 return (
                   <TabsTrigger key={tab} value={tab} className={arsenalTabTriggerClass}>
-                    <Icon size={16} />
-                    {/* On mobile only the active tab shows its label, so all tabs
-                        stay visible at once; from sm up every label is shown. */}
-                    <span className={activeTab === tab ? "inline" : "hidden sm:inline"}>
-                      {label}
+                    {/* The new-drop dot rides on the icon, where it reads the same whether
+                        the label sits under it (phones) or beside it. */}
+                    <span className="relative shrink-0">
+                      <Icon size={16} />
+                      {hasNewDrop && (
+                        <span className="absolute -right-1.5 -top-1 h-2 w-2 rounded-full bg-arsenal-accent shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+                      )}
                     </span>
-                    {hasNewDrop && (
-                      <span className="ml-1 h-2 w-2 rounded-full bg-arsenal-accent shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
-                    )}
+                    <span className="max-w-full truncate">{label}</span>
                   </TabsTrigger>
                 );
               })}

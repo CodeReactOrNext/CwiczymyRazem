@@ -20,6 +20,40 @@ export function mirrorBoardStyle(
 }
 
 /**
+ * The board turned a quarter clockwise — on an upright phone, so the tab only reads once the
+ * phone is turned sideways. Its music then runs down the screen instead of across it.
+ */
+export const QUARTER_TURN_STYLE = {
+  transform: "rotate(90deg) translateY(-100%)",
+  transformOrigin: "top left",
+} as const;
+
+/**
+ * Which page coordinate runs along the music: a turned board's runs down the screen, so a drag
+ * along it moves the pointer in y. The turn is CSS, like the mirror, so the browser still hands
+ * the pointer over in page space.
+ */
+export function pointerAlongBoard(
+  pointer: { clientX: number; clientY: number },
+  quarterTurned: boolean,
+): number {
+  return quarterTurned ? pointer.clientY : pointer.clientX;
+}
+
+/**
+ * The board's extent along the music, in page space — for a turned board, its box's top and
+ * bottom. Pair it with `pointerAlongBoard` before handing both to `boardOffsetX`.
+ */
+export function boardSpan(
+  rect: { left: number; right: number; top: number; bottom: number },
+  quarterTurned: boolean,
+): { left: number; right: number } {
+  return quarterTurned
+    ? { left: rect.top, right: rect.bottom }
+    : { left: rect.left, right: rect.right };
+}
+
+/**
  * How far into the board a pointer landed, measured from the edge the music
  * starts at — the right one when the board is mirrored. Everything downstream
  * (the gutter inset, the beat the click snaps to) is written against that edge,

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { boardOffsetX, mirrorBoardStyle, scrollAfterDrag } from "./tablatureDirection";
+import {
+  boardOffsetX,
+  boardSpan,
+  mirrorBoardStyle,
+  pointerAlongBoard,
+  scrollAfterDrag,
+} from "./tablatureDirection";
 
 const rect = { left: 100, right: 500 };
 
@@ -28,5 +34,25 @@ describe("tablature direction", () => {
   it("never scrolls back past the start", () => {
     expect(scrollAfterDrag(50, 200, false)).toBe(0);
     expect(scrollAfterDrag(50, -200, true)).toBe(0);
+  });
+});
+
+describe("quarter-turned board", () => {
+  // A 400px-long board turned onto its side: its music runs from y=50 down to y=450.
+  const turned = { left: 20, right: 320, top: 50, bottom: 450 };
+
+  it("reads the pointer along the music from y once turned", () => {
+    expect(pointerAlongBoard({ clientX: 7, clientY: 90 }, true)).toBe(90);
+    expect(pointerAlongBoard({ clientX: 7, clientY: 90 }, false)).toBe(7);
+  });
+
+  it("measures from the top of a turned board, and from its bottom when also mirrored", () => {
+    const span = boardSpan(turned, true);
+    expect(boardOffsetX(90, span, false)).toBe(40);
+    expect(boardOffsetX(90, span, true)).toBe(360);
+  });
+
+  it("leaves an upright board's span alone", () => {
+    expect(boardSpan(turned, false)).toEqual({ left: 20, right: 320 });
   });
 });

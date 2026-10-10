@@ -1,6 +1,14 @@
+import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Settings2, ZoomIn, ZoomOut } from "lucide-react";
-import React, { memo, useCallback, useMemo, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
@@ -28,10 +36,20 @@ import type { TuningGutterString } from "./useTablatureWorkerBridge";
 const MOBILE_FIT = 0.75;
 const ZOOM_STEP = 0.25;
 
-/** Own height slot — a 600px desktop viewer would swallow a whole phone screen. */
-const MOBILE_HEIGHT_KEY = "practice-tab-height-mobile";
+/**
+ * Own height slot — a 600px desktop viewer would swallow a whole phone screen. Not the old
+ * "practice-tab-height-mobile": the board sizes itself to the screen now, and a height dragged
+ * in the old fixed layout mustn't switch that off.
+ */
+const PHONE_HEIGHT_KEY = "practice-tab-height-phone";
 const MOBILE_HEIGHT_MIN = 180;
+/**
+ * Tallest the board gets, dragged or filling the screen. The drawing scales with its height, so
+ * past this a taller board shows fewer beats ahead rather than more tab.
+ */
 const MOBILE_HEIGHT_MAX = 460;
+/** The Look / zoom row under the board: h-9 buttons + py-1.5. */
+const CONTROLS_BAR_H = 48;
 
 const clampZoom = (z: number) =>
   Math.round(Math.min(NOTE_SPACING_MAX, Math.max(NOTE_SPACING_MIN, z)) * 100) /
@@ -46,12 +64,22 @@ interface MobileTablaturePanelProps {
   frequencyRef?: React.MutableRefObject<number>;
   isListening?: boolean;
   resetKey: number;
+  /**
+   * The session screen around it is laid on its side (`QUARTER_TURN_STYLE`) — the upright phone.
+   * The board then reads the finger along y, and loses its resize handle: dragging it would
+   * move the height along the screen's other axis.
+   */
+  quarterTurned?: boolean;
 }
 
 /**
  * Tablature card for the phone session view. Same personalisation store as the
  * desktop TablatureSection — board colours, pill shape, palette, lanes — plus
  * touch-sized zoom steps and a drag handle for the viewer height.
+ *
+ * The board grows into the room its flex-column parent leaves free rather than sitting at a
+ * fixed height — at 300px it filled a third of an upright phone and left the rest black. A
+ * height the player drags still wins; double-tapping the handle hands it back to the screen.
  */
 export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   measures,
@@ -62,6 +90,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   frequencyRef,
   isListening,
   resetKey,
+  quarterTurned = false,
 }: MobileTablaturePanelProps) {
   const { t } = useTranslation("session");
   const { hitNotes, missedNotes, noteTimings } = useNoteMatchingContext();
@@ -74,12 +103,33 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
     style,
   } = useTablatureStyle();
   const setSetting = useTablatureSettings((s) => s.set);
-  const { height, setHeight } = useTablatureHeight({
-    storageKey: MOBILE_HEIGHT_KEY,
+  const { height, setHeight, isCustom, clearHeight } = useTablatureHeight({
+    storageKey: PHONE_HEIGHT_KEY,
     min: MOBILE_HEIGHT_MIN,
     max: MOBILE_HEIGHT_MAX,
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Turned, there's no handle to drag a height of one's own with, so the board always fills.
+  const fills = quarterTurned || !isCustom;
+
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [fitHeight, setFitHeight] = useState<number | null>(null);
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!fills || !board || typeof ResizeObserver === "undefined") return undefined;
+    // Observing fires once straight away, which takes the first measurement.
+    const observer = new ResizeObserver(([entry]) => {
+      setFitHeight(Math.round(entry.contentRect.height));
+    });
+    observer.observe(board);
+    return () => observer.disconnect();
+  }, [fills]);
+
+  const viewerHeight =
+    fills && fitHeight
+      ? Math.min(MOBILE_HEIGHT_MAX, Math.max(MOBILE_HEIGHT_MIN, fitHeight))
+      : height;
 
   const zoom = settings.noteSpacing;
   const handleZoomChange = useCallback(
@@ -106,37 +156,62 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
 
   return (
     <div
-      className='w-full overflow-hidden rounded-2xl shadow-lg'
-      style={{ backgroundColor: background }}>
-      <div className='relative'>
-        <TablatureViewer
-          measures={measures}
-          bpm={bpm}
-          isPlaying={isPlaying}
-          startTime={startTime}
-          countInRemaining={countInRemaining}
-          className='w-full'
-          frequencyRef={frequencyRef}
-          isListening={isListening}
-          hitNotes={hitNotes}
-          missedNotes={missedNotes}
-          noteTimings={noteTimings}
-          currentBeatsElapsed={0}
-          resetKey={resetKey}
-          zoom={zoom * MOBILE_FIT}
-          heightPx={height}
-          tuningStrings={tuningStrings}
-          style={style}
-          ambientGlow={settings.ambientGlow}
-          palette={palette}
-          isLightBoard={isLightBoard}
-        />
-        <TablatureResizeHandle height={height} onChange={setHeight} />
+      className={cn(
+        "flex w-full flex-col overflow-hidden rounded-2xl shadow-lg",
+        fills && "flex-1",
+      )}
+      style={{
+        backgroundColor: background,
+        ...(fills && {
+          minHeight: MOBILE_HEIGHT_MIN + CONTROLS_BAR_H,
+          maxHeight: MOBILE_HEIGHT_MAX + CONTROLS_BAR_H,
+        }),
+      }}>
+      {/* The viewer sits out of flow, so the board's height is the one the layout gives it —
+          a viewer in flow would hold the board at its last height and never let it shrink
+          when something (the mic score) needs the room. */}
+      <div
+        ref={boardRef}
+        className={cn("relative", fills && "min-h-0 flex-1")}
+        style={fills ? undefined : { height }}>
+        <div className='absolute inset-x-0 top-0'>
+          <TablatureViewer
+            measures={measures}
+            bpm={bpm}
+            isPlaying={isPlaying}
+            startTime={startTime}
+            countInRemaining={countInRemaining}
+            className='w-full'
+            frequencyRef={frequencyRef}
+            isListening={isListening}
+            hitNotes={hitNotes}
+            missedNotes={missedNotes}
+            noteTimings={noteTimings}
+            currentBeatsElapsed={0}
+            resetKey={resetKey}
+            zoom={zoom * MOBILE_FIT}
+            heightPx={viewerHeight}
+            tuningStrings={tuningStrings}
+            style={style}
+            ambientGlow={settings.ambientGlow}
+            palette={palette}
+            isLightBoard={isLightBoard}
+            quarterTurned={quarterTurned}
+          />
+        </div>
+        {/* Turned, the board's height is the screen's width — nothing to drag. */}
+        {!quarterTurned && (
+          <TablatureResizeHandle
+            height={viewerHeight}
+            onChange={setHeight}
+            onReset={clearHeight}
+          />
+        )}
       </div>
 
       {/* Controls sit under the board rather than floating over it — on a phone
           there is no spare canvas to cover without hiding notes. */}
-      <div className='flex items-center justify-between gap-2 bg-black/40 px-2 py-1.5'>
+      <div className='flex shrink-0 items-center justify-between gap-2 bg-black/40 px-2 py-1.5'>
         <button
           type='button'
           onClick={() => setIsSettingsOpen(true)}

@@ -200,7 +200,9 @@
     "sound_settings": "Ajustes de sonido y entrada",
     "sound_input": "Sonido y entrada",
     "exercise_guide": "Guía del ejercicio",
-    "close_settings": "Cerrar ajustes"
+    "close_settings": "Cerrar ajustes",
+    "open_panel": "Mostrar herramientas del ejercicio",
+    "close_panel": "Ocultar herramientas del ejercicio"
   },
   "success": {
     "mastered": "¡Dominado!",
@@ -472,10 +474,6 @@
   "speeds_mastered": {
     "hint": "Velocidades que dominas en este ejercicio",
     "label": "Velocidades dominadas"
-  },
-  "rotate": {
-    "title": "Gira tu teléfono",
-    "body": "Tablatura más ancha, controles más grandes"
   },
   "video": {
     "player": "Reproductor de YouTube",

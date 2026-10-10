@@ -4,7 +4,7 @@ import type { SlotResult } from "../../hooks/useStrummingMatcher";
 import { drawChordHeader, drawCursor, drawDownArrow, drawRepDots, drawUpArrow, makeLabels, slotScale } from "./strumming.canvas";
 import {
   ACCENT_DOT, ARROW_AREA_H, BAR_LINE, BEAT_LINE, BG_COLOR,
-  DOWN_COLOR, HEADER_H, LABEL_BEAT, LABEL_H, LABEL_SUB,
+  DOWN_COLOR, HEADER_H, HEADER_ROW_H, LABEL_BEAT, LABEL_H, LABEL_SUB,
   MISS_COLOR, MUTED_COLOR, PAD, UP_COLOR,
 } from "./strumming.constants";
 
@@ -133,7 +133,7 @@ export function drawFrame(
   ctx.save();
   ctx.font = `bold 12px ui-sans-serif, system-ui, sans-serif`; ctx.fillStyle = "rgba(255,255,255,0.38)";
   ctx.textAlign = "right"; ctx.textBaseline = "middle";
-  ctx.fillText(repLabel, W - PAD, PAD + HEADER_H / 2);
+  ctx.fillText(repLabel, W - PAD, PAD + HEADER_ROW_H / 2);
   ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
   ctx.restore();
 

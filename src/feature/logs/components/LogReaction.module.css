@@ -149,10 +149,46 @@
   }
 }
 
+/*
+ * The motivator's "+1 for you" rises a few pixels into place, holds, then drifts on up as it
+ * fades: a quiet receipt beside the celebration, not a second one competing with it.
+ */
+.receipt[data-state="delayed-open"],
+.receipt[data-state="instant-open"] {
+  animation: receipt-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.receipt[data-state="closed"] {
+  animation: receipt-out 280ms cubic-bezier(0.4, 0, 0.7, 0.2) both;
+}
+
+@keyframes receipt-in {
+  from {
+    transform: translateY(6px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes receipt-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .toss,
   .pop,
-  .hint {
+  .hint,
+  .receipt[data-state] {
     animation: none;
   }
 

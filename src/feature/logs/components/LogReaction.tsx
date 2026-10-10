@@ -1,3 +1,4 @@
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import {
   Tooltip,
   TooltipContent,
@@ -38,7 +39,7 @@ const LANDING_MS = 440;
  * top of them, then stays up long enough to be read.
  */
 const RECEIPT_AFTER_MS = 900;
-const RECEIPT_MS = 2200;
+const RECEIPT_MS = 1000;
 
 /**
  * Coins the landing knocks loose, flying out of the tossed coin: sideways drift, peak height,
@@ -275,16 +276,20 @@ export const LogReaction = ({
             </span>
           </button>
         </TooltipTrigger>
-        <TooltipContent
-          side='top'
-          sideOffset={8}
-          className='translate-y-0 rounded-full border-0 bg-amber-400 px-4 py-1.5 text-sm font-bold text-zinc-950 shadow-none'>
-          <div className='flex items-center gap-2'>
-            <span className='text-base tabular-nums'>+1</span>
-            <Coin className='h-5 w-5' />
+        {/* Straight from the primitive, so the shared tooltip's zoom-in stays out of it: this one
+            runs its own rise-and-fade. Still portalled, so the donation card's overflow can't clip it. */}
+        <TooltipPrimitive.Portal>
+          <TooltipPrimitive.Content
+            side='top'
+            sideOffset={6}
+            className={cn(
+              "z-[130] flex items-center gap-1 rounded-full bg-zinc-800 px-2.5 py-1 font-sans text-xs font-semibold text-zinc-400",
+              styles.receipt,
+            )}>
+            <span className='tabular-nums text-amber-300'>+1</span>
             <span>for you</span>
-          </div>
-        </TooltipContent>
+          </TooltipPrimitive.Content>
+        </TooltipPrimitive.Portal>
       </Tooltip>
       {/* The receipt bubble is visual only — say the same thing to screen readers. */}
       <span role='status' className='sr-only'>

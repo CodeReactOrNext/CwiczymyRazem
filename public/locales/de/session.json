@@ -200,7 +200,9 @@
     "sound_settings": "Sound- und Eingangseinstellungen",
     "sound_input": "Sound & Eingang",
     "exercise_guide": "Übungsanleitung",
-    "close_settings": "Einstellungen schließen"
+    "close_settings": "Einstellungen schließen",
+    "open_panel": "Übungswerkzeuge anzeigen",
+    "close_panel": "Übungswerkzeuge ausblenden"
   },
   "success": {
     "mastered": "Gemeistert!",
@@ -472,10 +474,6 @@
   "speeds_mastered": {
     "hint": "Tempi, die du in dieser Übung gemeistert hast",
     "label": "Gemeisterte Tempi"
-  },
-  "rotate": {
-    "title": "Dreh dein Handy",
-    "body": "Breitere Tabulatur, größere Bedienelemente"
   },
   "video": {
     "player": "YouTube-Videoplayer",

@@ -16,9 +16,14 @@ const MOBILE_PANEL_HEIGHT = "h-[85dvh]";
 /** The box the tall tabs have always had on wider screens. */
 const DESKTOP_PANEL_HEIGHT = "sm:h-[650px] lg:h-[800px]";
 
-/** Fills its box and scrolls in it, with the panel's scrollbar. */
+/**
+ * Fills its box and scrolls in it, with the panel's scrollbar. `relative` makes it the containing
+ * block of everything absolute inside — without it each row's `sr-only` status sat at its spot in
+ * the full-length list, positioned off the card instead of the scroller, so the overflow didn't
+ * clip it and the phone page grew ~1900px of empty scroll under the feed.
+ */
 export const PANEL_SCROLL_CLASS =
-  "min-h-0 flex-1 overflow-y-auto scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600";
+  "relative min-h-0 flex-1 overflow-y-auto scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-600";
 
 /**
  * Scrolls inside the panel on phones and grows the page from `sm` up — the feed's shape

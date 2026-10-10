@@ -41,6 +41,11 @@ describe("feedScrollClass", () => {
     expect(feedScrollClass(true)).toBe(PANEL_SCROLL_CLASS);
   });
 
+  it("contains its absolute descendants, so they can't stretch the page past the panel", () => {
+    expect(PANEL_SCROLL_CLASS.split(" ")).toContain("relative");
+    expect(MOBILE_PANEL_SCROLL_CLASS.split(" ")).toContain("relative");
+  });
+
   it("scrolls only on phones on a page, where the panel is bounded", () => {
     expect(feedScrollClass(false)).toBe(MOBILE_PANEL_SCROLL_CLASS);
     expect(feedScrollClass(false)).toContain("sm:overflow-visible");

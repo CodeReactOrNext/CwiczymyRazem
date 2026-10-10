@@ -51,6 +51,8 @@ interface MobileExerciseContentProps {
   /** A song item practised over its section map — one instance, built in
    *  PracticeSession and given to whichever view is on screen. */
   songSectionMapSlot?: React.ReactNode;
+  /** The session screen is laid on its side around the tab — see MobileTablaturePanel. */
+  turnTab?: boolean;
 }
 
 export function MobileExerciseContent({
@@ -81,6 +83,7 @@ export function MobileExerciseContent({
   isExamMode,
   strumVolume = 1,
   songSectionMapSlot,
+  turnTab = false,
 }: MobileExerciseContentProps) {
   const { t } = useTranslation("session");
   const { openLeaderboard } = useSessionUI();
@@ -177,6 +180,7 @@ export function MobileExerciseContent({
           frequencyRef={frequencyRef}
           isListening={isListening}
           resetKey={tabResetKey}
+          quarterTurned={turnTab}
         />
       ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
         <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">

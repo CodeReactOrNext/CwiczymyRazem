@@ -3,7 +3,7 @@ import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/util
 import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import { boardOffsetX, scrollAfterDrag } from "./tablatureDirection";
+import { boardOffsetX, boardSpan, scrollAfterDrag } from "./tablatureDirection";
 import type { TablatureRenderData } from "./useTablatureRenderData";
 
 const REST_VOLUME_THRESHOLD = 0.05;
@@ -71,6 +71,11 @@ interface WorkerBridgeOptions {
    * audio clock says it should be.
    */
   obscured?:       boolean;
+  /**
+   * The board is turned a quarter clockwise (see `QUARTER_TURN_STYLE`): pointer positions arrive
+   * along y, and the board's box is measured top to bottom.
+   */
+  quarterTurned?:  boolean;
 }
 
 /**
@@ -120,7 +125,7 @@ export function useTablatureWorkerBridge({
   hitNotes, missedNotes, noteTimings, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
   loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style, selection,
-  obscured = false,
+  obscured = false, quarterTurned = false,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
   const transferredRef      = useRef(false);
@@ -319,7 +324,7 @@ export function useTablatureWorkerBridge({
     ) {
       const rect = containerRef.current.getBoundingClientRect();
       const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
-      const worldX = boardOffsetX(clientX, rect, rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
+      const worldX = boardOffsetX(clientX, boardSpan(rect, quarterTurned), rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
       let beatPos = Math.max(0, worldX / dynBW);
 
       // Snap to start of the measure that was clicked
@@ -349,7 +354,7 @@ export function useTablatureWorkerBridge({
     if (isPlaying || isDraggingRef.current || !containerRef?.current || !onSeek) return;
     const rect = containerRef.current.getBoundingClientRect();
     const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
-    const worldX = boardOffsetX(clientX, rect, rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
+    const worldX = boardOffsetX(clientX, boardSpan(rect, quarterTurned), rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
     const beatPos = Math.max(0, worldX / dynBW);
 
     // Find which measure start this position snaps to

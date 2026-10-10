@@ -200,7 +200,9 @@
     "sound_settings": "Ustawienia dźwięku i wejścia",
     "sound_input": "Dźwięk i wejście",
     "exercise_guide": "Przewodnik ćwiczenia",
-    "close_settings": "Zamknij ustawienia"
+    "close_settings": "Zamknij ustawienia",
+    "open_panel": "Pokaż narzędzia ćwiczenia",
+    "close_panel": "Ukryj narzędzia ćwiczenia"
   },
   "success": {
     "mastered": "Opanowane!",
@@ -472,10 +474,6 @@
   "speeds_mastered": {
     "hint": "Tempa opanowane w tym ćwiczeniu",
     "label": "Opanowane tempa"
-  },
-  "rotate": {
-    "title": "Obróć telefon",
-    "body": "Szersza tabulatura, większe kontrolki"
   },
   "video": {
     "player": "Odtwarzacz YouTube",

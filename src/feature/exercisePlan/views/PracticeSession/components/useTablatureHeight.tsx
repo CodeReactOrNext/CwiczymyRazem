@@ -8,20 +8,25 @@ export const TAB_HEIGHT_MIN = 200;
 export const TAB_HEIGHT_MAX = 700;
 const HEIGHT_STORAGE_KEY = "practice-tab-height";
 
-const loadHeight = (
+/** The height the player dragged the viewer to, or null when they never did. */
+const loadStoredHeight = (
   storageKey: string,
   clamp: (h: number) => number
-): number => {
-  if (typeof window === "undefined") return TAB_BASE_HEIGHT;
+): number | null => {
+  if (typeof window === "undefined") return null;
   const raw = window.localStorage.getItem(storageKey);
   const parsed = raw ? parseInt(raw, 10) : NaN;
-  return clamp(isNaN(parsed) ? TAB_BASE_HEIGHT : parsed);
+  return isNaN(parsed) ? null : clamp(parsed);
 };
 
 export interface TablatureHeightControls {
   height: number;
   /** persist=false during a live drag (skips a localStorage write per frame). */
   setHeight: (next: number, persist?: boolean) => void;
+  /** The player has dragged the viewer to a height of their own. */
+  isCustom: boolean;
+  /** Forgets the dragged height, so a viewer that sizes itself takes over again. */
+  clearHeight: () => void;
 }
 
 export interface TablatureHeightOptions {
@@ -45,14 +50,14 @@ export function useTablatureHeight({
     (h: number) => Math.round(Math.min(max, Math.max(min, h))),
     [min, max]
   );
-  const [height, setHeightState] = useState<number>(() =>
-    loadHeight(storageKey, clamp)
+  const [storedHeight, setStoredHeight] = useState<number | null>(() =>
+    loadStoredHeight(storageKey, clamp)
   );
 
   const setHeight = useCallback(
     (next: number, persist = true) => {
       const clamped = clamp(next);
-      setHeightState(clamped);
+      setStoredHeight(clamped);
       if (persist && typeof window !== "undefined") {
         window.localStorage.setItem(storageKey, String(clamped));
       }
@@ -60,12 +65,24 @@ export function useTablatureHeight({
     [clamp, storageKey]
   );
 
-  return { height, setHeight };
+  const clearHeight = useCallback(() => {
+    setStoredHeight(null);
+    if (typeof window !== "undefined") window.localStorage.removeItem(storageKey);
+  }, [storageKey]);
+
+  return {
+    height: storedHeight ?? clamp(TAB_BASE_HEIGHT),
+    setHeight,
+    isCustom: storedHeight !== null,
+    clearHeight,
+  };
 }
 
 interface TablatureResizeHandleProps {
   height: number;
   onChange: (next: number, persist?: boolean) => void;
+  /** Double-click action — by default it drags the viewer back to the base height. */
+  onReset?: () => void;
   className?: string;
 }
 
@@ -74,7 +91,7 @@ interface TablatureResizeHandleProps {
  * Double-click resets to the default. Stops pointer propagation so an
  * underlying seek/drag canvas doesn't also react.
  */
-export function TablatureResizeHandle({ height, onChange, className }: TablatureResizeHandleProps) {
+export function TablatureResizeHandle({ height, onChange, onReset, className }: TablatureResizeHandleProps) {
   const { t } = useTranslation("session");
   const dragRef = useRef<{ startY: number; startH: number } | null>(null);
 
@@ -117,7 +134,7 @@ export function TablatureResizeHandle({ height, onChange, className }: Tablature
       onPointerMove={handlePointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-      onDoubleClick={() => onChange(TAB_BASE_HEIGHT)}
+      onDoubleClick={() => (onReset ? onReset() : onChange(TAB_BASE_HEIGHT))}
       className={cn(
         "group absolute inset-x-0 bottom-0 z-20 flex h-4 cursor-ns-resize touch-none select-none items-end justify-center",
         className,

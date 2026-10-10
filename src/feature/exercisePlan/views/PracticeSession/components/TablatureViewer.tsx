@@ -6,7 +6,7 @@ import { SkipBack } from "lucide-react";
 import React, { memo, useEffect, useRef, useState } from "react";
 
 import { CountInOverlay } from "./CountInOverlay";
-import { mirrorBoardStyle } from "./tablatureDirection";
+import { mirrorBoardStyle, pointerAlongBoard } from "./tablatureDirection";
 import { useAmbientMicGlow } from "./useAmbientMicGlow";
 import { useTablatureRenderData } from "./useTablatureRenderData";
 import type { TablatureSelection, TablatureStylePatch, TuningGutterString } from "./useTablatureWorkerBridge";
@@ -82,6 +82,9 @@ interface TablatureViewerProps {
   ambientGlow?: boolean;
   /** Light board — flips the HTML chips drawn over the canvas so they stay readable. */
   isLightBoard?: boolean;
+  /** Turned a quarter clockwise by its parent (`QUARTER_TURN_STYLE`) — the pointer then runs
+   *  along the music in y. */
+  quarterTurned?: boolean;
 }
 
 const TablatureViewerInner = ({
@@ -118,6 +121,7 @@ const TablatureViewerInner = ({
   ambientGlow = true,
   palette,
   isLightBoard = false,
+  quarterTurned = false,
 }: TablatureViewerProps) => {
   const { t } = useTranslation("session");
   const canvasRef      = useRef<HTMLCanvasElement>(null);
@@ -137,7 +141,10 @@ const TablatureViewerInner = ({
     hitNotes, missedNotes, noteTimings, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
     loopStartBeat, loopEndBeat, zoom, tuningStrings, style, selection, obscured,
+    quarterTurned,
   });
+  const along = (pointer: { clientX: number; clientY: number }) =>
+    pointerAlongBoard(pointer, quarterTurned);
 
   // Expose seekWorker so parent (TablatureSection minimap) can drive the canvas cursor
   useEffect(() => {
@@ -190,13 +197,13 @@ const TablatureViewerInner = ({
         backgroundColor: cinema ? CINEMA_BOARD_WASH : style?.background ?? "#09090b",
       }}
       ref={containerRef}
-      onMouseDown={(e)  => handleDragStart(e.clientX)}
-      onMouseMove={(e)  => { handleDragMove(e.clientX); handleHover(e.clientX); }}
-      onMouseUp={(e)    => handleDragEnd(e.clientX)}
-      onMouseLeave={(e) => { handleDragEnd(e.clientX); handleHoverEnd(); }}
-      onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
-      onTouchMove={(e)  => handleDragMove(e.touches[0].clientX)}
-      onTouchEnd={(e)   => handleDragEnd(e.changedTouches[0]?.clientX)}
+      onMouseDown={(e)  => handleDragStart(along(e))}
+      onMouseMove={(e)  => { handleDragMove(along(e)); handleHover(along(e)); }}
+      onMouseUp={(e)    => handleDragEnd(along(e))}
+      onMouseLeave={(e) => { handleDragEnd(along(e)); handleHoverEnd(); }}
+      onTouchStart={(e) => handleDragStart(along(e.touches[0]))}
+      onTouchMove={(e)  => handleDragMove(along(e.touches[0]))}
+      onTouchEnd={(e)   => { const touch = e.changedTouches[0]; handleDragEnd(touch ? along(touch) : undefined); }}
     >
       {/* The right-to-left board is this one flip: the renderer keeps drawing
           left to right in its own coordinates, and the gutter, the cursor and
@@ -270,5 +277,6 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.selection        === next.selection          &&
   prev.ambientGlow      === next.ambientGlow        &&
   prev.palette          === next.palette            &&
-  prev.isLightBoard     === next.isLightBoard
+  prev.isLightBoard     === next.isLightBoard        &&
+  prev.quarterTurned    === next.quarterTurned
 );

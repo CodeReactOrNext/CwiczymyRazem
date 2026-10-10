@@ -1,21 +1,12 @@
 import { getCountInDurationMs } from "feature/exercisePlan/components/Metronome/utils/countInDuration";
-import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { useIsLandscape } from "hooks/useIsLandscape";
-import { useTranslation } from "hooks/useTranslation";
 import type { Dispatch, SetStateAction } from "react";
 import React, { useState } from "react";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { FinishSessionDialog } from "../components/FinishSessionDialog";
-import { MobileExerciseContent } from "../components/MobileExerciseContent";
-import { MobileMicGameHud } from "../components/MobileMicGameHud";
-import { MobileToolsIsland } from "../components/MobileToolsIsland";
-import { RotateDeviceHint } from "../components/RotateDeviceHint";
-import { SessionModalControls } from "../components/SessionModalControls";
-import { SessionModalHeader } from "../components/SessionModalHeader";
-import { strumSynthVolume } from "../helpers/strumSynthVolume";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
-import { LandscapeSessionModal } from "./LandscapeSessionModal";
+import { PhoneSessionModal } from "./PhoneSessionModal";
 
 interface SessionModalProps {
   isOpen: boolean;
@@ -100,7 +91,6 @@ const SessionModal = ({
   examMode,
   songSectionMapSlot,
 }: SessionModalProps) => {
-  const { t } = useTranslation("session");
   const [tabResetKey, setTabResetKey] = useState(0);
   const [showFinishEarlyDialog, setShowFinishEarlyDialog] = useState(false);
   const isLandscape = useIsLandscape();
@@ -149,15 +139,6 @@ const SessionModal = ({
     }, 100);
   };
 
-  // activeTablature (not currentExercise.tablature) so generated exercises
-  // (configurable chord/scale practice) get mic + backing controls too.
-  const hasMicControls = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.customGoal || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableMic;
-  // Strumming exercises carry their own guitar (the pattern synth), so they get the
-  // playback toggle too — without it there is no way to silence the strum.
-  const hasAudioTrack  = !!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableBackingTrack;
-  const isRiddleMode   = currentExercise.riddleConfig?.mode === "sequenceRepeat";
-  const strumVolume    = strumSynthVolume(isAudioMuted, audioTracks?.find(track => track.id === "main"));
-
   const finishEarlyDialog = (
     <FinishSessionDialog
       open={showFinishEarlyDialog}
@@ -172,10 +153,12 @@ const SessionModal = ({
     />
   );
 
-  if (isLandscape) {
-    return (
-      <>
-      <LandscapeSessionModal
+  // One screen for both ways of holding the phone: turning it only re-lays the controls strip,
+  // so the exercise stays mounted — a tab keeps its place instead of restarting.
+  return (
+    <>
+      <PhoneSessionModal
+        orientation={isLandscape ? "landscape" : "portrait"}
         isOpen={isOpen} onClose={onClose} onFinish={handleFinishRequest}
         currentExercise={currentExercise}
         currentExerciseIndex={currentExerciseIndex} totalExercises={totalExercises}
@@ -207,129 +190,7 @@ const SessionModal = ({
         songSectionMapSlot={songSectionMapSlot}
       />
       {finishEarlyDialog}
-      </>
-    );
-  }
-
-  return (
-    // Plain black behind the whole session: the tablature and the note
-    // markers are the only colour that should read here.
-    <div className='fixed inset-0 z-[9999999] flex h-full flex-col overflow-hidden bg-black'>
-      <SessionModalHeader
-        exerciseTitle={currentExercise.title}
-        exerciseId={currentExercise.id}
-        currentExerciseIndex={currentExerciseIndex}
-        totalExercises={totalExercises}
-        onClose={onClose}
-        isPlaying={isPlaying}
-      />
-
-      <div className="flex-1 overflow-y-auto overscroll-contain">
-        <div className="space-y-4 p-4">
-
-          <MobileExerciseContent
-            currentExercise={currentExercise}
-            activeTablature={activeTablature}
-            effectiveBpm={effectiveBpm}
-            metronome={metronome}
-            isRiddleRevealed={isRiddleRevealed}
-            isRiddleGuessed={isRiddleGuessed}
-            hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-            isPlaying={isPlaying}
-            isListening={isListening}
-            isMicEnabled={isMicEnabled}
-            frequencyRef={frequencyRef}
-            tabResetKey={tabResetKey}
-            setVideoDuration={setVideoDuration}
-            setTimerTime={setTimerTime}
-            startTimer={startTimer}
-            stopTimer={stopTimer}
-            onVideoEnd={handleNextExerciseClick}
-            earTrainingScore={earTrainingScore}
-            earTrainingHighScore={earTrainingHighScore}
-            handleRevealRiddle={handleRevealRiddle}
-            handleNextRiddle={handleNextRiddle}
-            onEarTrainingGuessed={onEarTrainingGuessed}
-            riddleProgress={riddleProgress}
-            onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
-            isExamMode={examMode}
-            strumVolume={strumVolume}
-            songSectionMapSlot={songSectionMapSlot}
-          />
-
-          {activeTablature && activeTablature.length > 0 && <RotateDeviceHint />}
-
-          {currentExercise.spotifyId && (
-            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-              <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
-            </div>
-          )}
-
-          {isMicEnabled && !currentExercise.customGoal && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && <MobileMicGameHud />}
-
-          {currentExercise.links && currentExercise.links.length > 0 && (
-            <div className="rounded-lg bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-5 space-y-4">
-              <div className="flex items-center gap-2 text-red-400 font-bold text-xs tracking-widest">
-                <span>{t("instructions.support_author")}</span>
-              </div>
-              <div className="flex flex-col gap-2">
-                {currentExercise.links.map((link: any, idx: number) => (
-                  <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center justify-between group px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all text-sm"
-                  >
-                    <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Every tool that isn't the exercise itself lives here — one icon row
-          docked above the transport, the rest a tap away in its sheet. */}
-      <MobileToolsIsland
-        exercise={currentExercise}
-        metronome={metronome}
-        examMode={examMode}
-        hasMetronome={!!currentExercise.metronomeSpeed}
-        hasAudioTrack={hasAudioTrack}
-        hasMicControls={hasMicControls}
-        isRiddleMode={isRiddleMode}
-        speedMultiplier={speedMultiplier ?? 1}
-        onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
-        isAudioMuted={isAudioMuted}
-        onAudioToggle={() => setIsAudioMuted(!isAudioMuted)}
-        isMicEnabled={isMicEnabled}
-        onMicToggle={toggleMic}
-        onRecalibrate={onRecalibrate ?? (() => {})}
-        isMetronomeMuted={isMetronomeMuted}
-        setIsMetronomeMuted={setIsMetronomeMuted}
-        audioTracks={audioTracks}
-        setTrackConfigs={setTrackConfigs}
-        masterVolume={currentExercise.gpFileUrl ? masterVolume : undefined}
-        onMasterVolumeChange={currentExercise.gpFileUrl ? setMasterVolume : undefined}
-        frequencyRef={frequencyRef}
-        volumeRef={volumeRef}
-        disableTuner={currentExercise.disableTuner}
-      />
-
-      <SessionModalControls
-        examMode={examMode}
-        isPlaying={isPlaying}
-        isLastExercise={isLastExercise}
-        onFinish={handleFinishRequest}
-        toggleTimer={handleToggleTimer}
-        handleNextExercise={handleNextExerciseClick}
-        handleBackExercise={handleBackExerciseClick}
-        currentExerciseIndex={currentExerciseIndex}
-        isFinishing={isFinishing}
-        isSubmittingReport={isSubmittingReport}
-        onRestart={activeTablature && activeTablature.length > 0 ? handleRestart : undefined}
-      />
-
-      {finishEarlyDialog}
-    </div>
+    </>
   );
 };
 

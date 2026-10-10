@@ -200,7 +200,9 @@
     "sound_settings": "Sound and input settings",
     "sound_input": "Sound & input",
     "exercise_guide": "Exercise guide",
-    "close_settings": "Close settings"
+    "close_settings": "Close settings",
+    "open_panel": "Show exercise tools",
+    "close_panel": "Hide exercise tools"
   },
   "success": {
     "mastered": "Mastered!",
@@ -472,10 +474,6 @@
   "speeds_mastered": {
     "hint": "Speeds you've mastered for this exercise",
     "label": "Speeds mastered"
-  },
-  "rotate": {
-    "title": "Rotate your phone",
-    "body": "Wider tab, bigger controls"
   },
   "video": {
     "player": "YouTube video player",

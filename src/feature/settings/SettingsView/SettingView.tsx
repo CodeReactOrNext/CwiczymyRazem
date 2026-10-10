@@ -4,7 +4,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
-import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
+import { cn } from "assets/lib/utils";
+import {
+  tabNavFadeClass,
+  tabNavListClass,
+  tabNavTriggerClass,
+} from "components/PageTabs/tabNav";
+import { useRailEdges } from "components/PageTabs/useRailEdges";
 import EmailChange from "feature/settings/components/EmailChange";
 import EmailNotificationSettings from "feature/settings/components/EmailNotificationSettings";
 import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
@@ -33,6 +39,7 @@ const SettingsView = () => {
   const { t } = useTranslation(["common", "settings", "toast"]);
   const [userProviderData, setUserProviderData] = useState<UserInfo>();
   const dispatch = useAppDispatch();
+  const { ref: railRef, edges } = useRailEdges<HTMLDivElement>();
 
   const isViaGoogle = userProviderData?.providerId === "google.com";
 
@@ -49,7 +56,9 @@ const SettingsView = () => {
             full width instead of sharing it with a column of category cards. */}
         <div className="space-y-6">
           <h1 className="px-1 text-2xl font-bold text-zinc-100">{t("settings:tabs.title")}</h1>
-          <TabsList className={tabNavListClass}>
+          <TabsList
+            ref={railRef}
+            className={cn(tabNavListClass, tabNavFadeClass(edges))}>
             {SETTINGS_TABS.map(({ value, label, Icon }) => (
               <TabsTrigger key={value} value={value} className={tabNavTriggerClass}>
                 <Icon className="h-4 w-4" />

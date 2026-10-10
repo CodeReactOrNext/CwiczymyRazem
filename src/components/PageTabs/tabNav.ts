@@ -33,6 +33,42 @@ export const tabNavTriggerClass = cn(
   "data-[state=active]:border-white data-[state=active]:bg-transparent data-[state=active]:text-zinc-50 data-[state=active]:shadow-none",
 );
 
+/** Which ends of a scrolling rail still have tabs past the edge of the screen. */
+export interface RailEdges {
+  start: boolean;
+  end: boolean;
+}
+
+/** A pixel of slack, so a rail scrolled to a subpixel short of its end still counts as there. */
+export const railEdges = ({
+  scrollLeft,
+  scrollWidth,
+  clientWidth,
+}: {
+  scrollLeft: number;
+  scrollWidth: number;
+  clientWidth: number;
+}): RailEdges => ({
+  start: scrollLeft > 1,
+  end: scrollLeft + clientWidth < scrollWidth - 1,
+});
+
+/**
+ * Fades whichever end of the rail has tabs past it. The rail hides its scrollbar, so on a phone
+ * a tab cut cleanly at the screen's edge — or one entirely past it — looked like the end of the
+ * row: Settings showed three of its five tabs with nothing to say there were two more.
+ */
+export const tabNavFadeClass = ({ start, end }: RailEdges): string => {
+  if (start && end) {
+    return "[mask-image:linear-gradient(to_right,transparent,#000_2.5rem,#000_calc(100%_-_2.5rem),transparent)]";
+  }
+  if (start)
+    return "[mask-image:linear-gradient(to_right,transparent,#000_2.5rem)]";
+  if (end)
+    return "[mask-image:linear-gradient(to_left,transparent,#000_2.5rem)]";
+  return "";
+};
+
 /** A plain `<button>` or `<Link>` — the call site knows which one is active. */
 export const tabNavItemClass = (isActive: boolean, isDisabled = false) =>
   cn(

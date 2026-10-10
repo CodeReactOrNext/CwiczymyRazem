@@ -5,7 +5,12 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
+import {
+  tabNavFadeClass,
+  tabNavItemClass,
+  tabNavListClass,
+} from "components/PageTabs/tabNav";
+import { useRailEdges } from "components/PageTabs/useRailEdges";
 import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -37,8 +42,12 @@ export const PageTabs = ({
   className,
 }: PageTabsProps) => {
   const { t } = useTranslation("nav");
+  const { ref, edges } = useRailEdges<HTMLElement>();
   return (
-  <nav aria-label={ariaLabel} className={cn(tabNavListClass, className)}>
+  <nav
+    ref={ref}
+    aria-label={ariaLabel}
+    className={cn(tabNavListClass, tabNavFadeClass(edges), className)}>
     {tabs.map(({ label, href, tooltip, badge, icon: Icon }) => {
       const isActive = href === activeHref;
       // Tabs are defined in English next to their routes; the route is the key.
