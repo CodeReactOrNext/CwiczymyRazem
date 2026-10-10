@@ -1,0 +1,112 @@
+{
+  "page": {
+    "title": "Goals",
+    "subtitle": "Set a tempo for an exercise and play it clean three times",
+    "eyebrow": "Your goals",
+    "new_goal": "New goal"
+  },
+  "empty": {
+    "title": "No goals yet",
+    "body": "Pick an exercise and the tempo you want to reach. Then play it in goal mode until three runs come out clean.",
+    "cta": "Set your first goal"
+  },
+  "active_title": "Active",
+  "history_title": "Reached",
+  "no_active": "No open goals right now. Set a new one, or raise the bar on one you've reached.",
+  "card": {
+    "rules": "{{accuracy}}% accuracy · {{counting}}",
+    "delete": "Delete goal",
+    "progress": "{{count}} of {{total}} clean runs",
+    "start": "Start goal run",
+    "best_so_far": "Fastest run so far",
+    "no_tempo": "No scored run yet. Play the exercise with the mic on to set your starting tempo.",
+    "at_tempo": "You've reached the goal's tempo. Now make three runs clean.",
+    "to_go": "{{bpm}} BPM to go"
+  },
+  "counting": {
+    "streak": "in a row",
+    "total": "in total"
+  },
+  "strictness": {
+    "relaxed": "Relaxed",
+    "standard": "Standard",
+    "strict": "Strict"
+  },
+  "chart": {
+    "target": "Goal {{bpm}} BPM",
+    "practice_run": "Practice",
+    "goal_run": "Goal run",
+    "clean_goal_run": "Clean goal run",
+    "accuracy": "{{accuracy}}% accuracy",
+    "missed_goal_run": "Goal run, not clean",
+    "empty": "Your scored runs will show up here, with the goal's tempo as the line to reach.",
+    "metric_label": "What the chart shows",
+    "metric_tempo": "Tempo",
+    "metric_timing": "Timing"
+  },
+  "create": {
+    "title": "New goal",
+    "description": "Choose an exercise and the tempo to reach. A goal is reached after three clean runs in goal mode.",
+    "exercise_label": "Exercise",
+    "search": "Search exercises",
+    "no_results": "No exercises match.",
+    "has_goal": "Has a goal",
+    "bpm_range": "Exercise range {{min}}–{{max}} BPM",
+    "change_exercise": "Change",
+    "bpm_label": "Target tempo",
+    "bpm_invalid": "Pick a tempo between {{min}} and {{max}} BPM.",
+    "strictness_label": "How clean",
+    "strictness_hint": "The lowest accuracy a run may have to count.",
+    "counting_label": "Three clean runs",
+    "counting_hint_streak": "A run that isn't clean starts the count over.",
+    "counting_hint_total": "Clean runs add up, whatever happens in between.",
+    "cancel": "Not now",
+    "save": "Set goal",
+    "reached_title": "Goal reached! Raise the bar?",
+    "raise_title": "Raise the bar",
+    "raise_description": "You played {{exercise}} clean at {{bpm}} BPM. Set the next tempo to chase.",
+    "counting_option": {
+      "streak": "In a row",
+      "total": "In total"
+    },
+    "bpm_down": "Slower by 5 BPM",
+    "bpm_up": "Faster by 5 BPM"
+  },
+  "history": {
+    "reached_on": "Reached {{date}}",
+    "raise": "Raise the bar"
+  },
+  "delete_confirm": {
+    "title": "Delete this goal?",
+    "body": "Its runs stay on the exercise's chart.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "toast": {
+    "created": "Goal set",
+    "deleted": "Goal deleted",
+    "error": "Something went wrong. Try again."
+  },
+  "verdict": {
+    "saving": "Saving the run…",
+    "not_scored": "The mic wasn't scoring this run, so it doesn't count toward the goal.",
+    "error": "The run couldn't be saved. Try again.",
+    "completed": "Goal reached! {{bpm}} BPM, three clean runs.",
+    "closed": "This goal is already reached.",
+    "clean": "Clean run",
+    "not_clean": "Not clean yet",
+    "too_slow": "Played at {{bpm}} BPM — the goal is {{target}} BPM.",
+    "accuracy": "{{accuracy}}% accuracy — this goal needs {{required}}%.",
+    "streak_reset": "The count starts over: this goal needs its clean runs in a row.",
+    "eyebrow": "Goal run · {{bpm}} BPM"
+  },
+  "timing": {
+    "offset": "{{ms}} ms off the beat",
+    "centered": "Centred on the beat",
+    "ahead": "Tends to land {{ms}} ms ahead of the beat",
+    "behind": "Tends to land {{ms}} ms behind the beat",
+    "tight_zone": "Dead on (within {{ms}} ms)",
+    "explainer": "How far your notes typically land from the beat in each run — higher on the chart is tighter. Timing depends on latency calibration, so calibrate once if every run leans the same way.",
+    "empty": "Timing shows up after runs scored with the mic on. Older sessions didn't record it."
+  }
+}

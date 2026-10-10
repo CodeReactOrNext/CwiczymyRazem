@@ -647,7 +647,8 @@ export const getItemLevel = (
   item: Pick<
     InventoryItem,
     "id" | "condition" | "year" | "country" | "stats" | "buildLevel"
-  >,
+  > &
+    Partial<Pick<InventoryItem, "custom">>,
   guitar: Pick<GuitarDefinition, "rarity" | "yearFrom" | "yearTo">,
 ): number => {
   const s = item.stats;
@@ -655,6 +656,14 @@ export const getItemLevel = (
   // per-build gain — which is what makes the third promotion worth the grind.
   const rarity = getEffectiveRarity(guitar.rarity, item.buildLevel);
   const featurePoints = s ? s.pickups + s.sustain + s.playFeeling : 0;
+  // A Guitar Builder build is its parts, plus whatever the workshop has done
+  // to it since: mods and build levels count, mint traits (rarity, origin,
+  // age, condition) don't — the parts already priced those in.
+  if (item.custom) {
+    return (
+      item.custom.level + featurePoints + getBuildLevelPoints(item.buildLevel, rarity)
+    );
+  }
   const rarityPoints = RARITY_LEVEL_BONUS[rarity] ?? 0;
   const conditionPoints = getConditionPoints(getItemCondition(item));
   const vintagePoints = Math.round(

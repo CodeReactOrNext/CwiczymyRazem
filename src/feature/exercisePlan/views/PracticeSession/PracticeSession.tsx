@@ -12,6 +12,7 @@ import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
+import type { ReactNode } from "react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
@@ -48,11 +49,13 @@ import {
   savePracticeSessionSettings,
 } from "./helpers/practiceSessionSettings";
 import type { TempoRuler } from "./hooks/tempoBeatClock";
+import type { TimingPrecision } from "./utils/timingPrecision";
 import { createTempoRulerFromMeasures } from "./hooks/tempoBeatClock";
 import { useCalibration } from "./hooks/useCalibration";
 import { useDesktopSessionIntegration } from "./hooks/useDesktopSessionIntegration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise, willHaveTablature } from "./hooks/useGeneratedExercise";
+import { useGoalRunVerdict } from "./hooks/useGoalRunVerdict";
 import { useGpFileLoader } from "./hooks/useGpFileLoader";
 import { useGuitarTuning } from "./hooks/useGuitarTuning";
 import { useNoteHuntRotation } from "./hooks/useNoteHuntRotation";
@@ -72,6 +75,32 @@ const RIDDLE_AUTO_ADVANCE_MS = 1500;
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
+/** What a goal-mode run hands back once it has been played to the end. */
+export interface GoalRunResult {
+  /** The slowest tempo a note was scored at — the tempo the run earned. Null
+   *  when nothing was scored (mic off, or not a note landed). */
+  bpm: number | null;
+  accuracy: number;
+  /** How tightly the run sat on the beat; null when too few notes were timed. */
+  timing: TimingPrecision | null;
+}
+
+/**
+ * Goal mode: a single exercise, every run played to the end judged against a
+ * goal the player set. The tempo is not locked — the metronome only starts at
+ * the goal's — because a run counts at whatever tempo it was really played.
+ */
+export interface GoalRunConfig {
+  targetBpm: number;
+  /** Called once per run played to the end; resolves to what the run summary
+   *  shows about the goal. */
+  onRunComplete: (run: GoalRunResult) => Promise<ReactNode>;
+  /** Shown in the summary while onRunComplete is still saving. */
+  pendingContent?: ReactNode;
+  /** Names the run above the summary's title, in place of "Congratulations!". */
+  summaryEyebrow?: string;
+}
+
 interface PracticeSessionProps {
   plan:                ExercisePlan;
   rawGpFile?:          File;
@@ -87,6 +116,7 @@ interface PracticeSessionProps {
   examBpm?:            number;
   onExamComplete?:     (accuracy: number) => void;
   skipExitDialog?:     boolean;
+  goalRun?:            GoalRunConfig;
 }
 
 const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
@@ -99,7 +129,7 @@ const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
 export const PracticeSession = ({
   plan, rawGpFile, onFinish, onClose, isFinishing, autoReport,
   forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount,
-  examMode, examBpm, onExamComplete, skipExitDialog = false,
+  examMode, examBpm, onExamComplete, skipExitDialog = false, goalRun,
 }: PracticeSessionProps) => {
   const { t } = useTranslation("session");
   const router = useRouter();
@@ -118,6 +148,7 @@ export const PracticeSession = ({
 
   const isPlaying = timer.timerEnabled;
   const isExamMode = typeof examMode === 'boolean' ? examMode : !!examMode;
+  const isGoalMode = !!goalRun;
   const examModeObject = typeof examMode === 'object' ? examMode : undefined;
   // In exam mode the metronome tempo is fixed: lock min === max === bpm so it
   // can't be changed (slider/±/edit all clamp to this single value).
@@ -197,9 +228,10 @@ export const PracticeSession = ({
 
   useEffect(() => {
     posthog.capture("practice_session_started", { plan_title: plan.title, exercise_count: plan.exercises.length });
-    // Feed the "Last Session" shortcuts (dashboard + practice hub). Exams are
-    // deliberately excluded — re-entering an exam is not "practicing again".
-    if (!isExamMode) {
+    // Feed the "Last Session" shortcuts (dashboard + practice hub). Exams and
+    // goal runs are deliberately excluded — re-entering either is not
+    // "practicing again", and a reached goal's link would lead nowhere.
+    if (!isExamMode && !isGoalMode) {
       saveLastSession({ title: planTitleString, href: router.asPath });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -244,10 +276,15 @@ export const PracticeSession = ({
    */
   const tempoRulerRef = useRef<TempoRuler | null>(null);
 
+  // A goal may sit outside the exercise's own range, so goal mode widens the
+  // range to reach it instead of clamping the starting tempo back inside.
+  const goalBpm = goalRun?.targetBpm;
+  const exerciseMinBpm = activeExercise.metronomeSpeed?.min;
+  const exerciseMaxBpm = activeExercise.metronomeSpeed?.max;
   const metronome = useDeviceMetronome({
-    initialBpm:     lockedExamBpm ?? (activeExercise.metronomeSpeed?.recommended || 60),
-    minBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.min,
-    maxBpm:         lockedExamBpm ?? activeExercise.metronomeSpeed?.max,
+    initialBpm:     lockedExamBpm ?? goalBpm ?? (activeExercise.metronomeSpeed?.recommended || 60),
+    minBpm:         lockedExamBpm ?? (goalBpm && exerciseMinBpm !== undefined ? Math.min(exerciseMinBpm, goalBpm) : exerciseMinBpm),
+    maxBpm:         lockedExamBpm ?? (goalBpm && exerciseMaxBpm !== undefined ? Math.max(exerciseMaxBpm, goalBpm) : exerciseMaxBpm),
     recommendedBpm: lockedExamBpm ?? activeExercise.metronomeSpeed?.recommended,
     isMuted:        isMetronomeMuted || audioSystem.isActive,
     // While notation is shown, AlphaTab's own built-in metronome click takes over as the
@@ -377,8 +414,12 @@ export const PracticeSession = ({
       // everyone. The global guitar-playback preference (same toggle) still applies.
       if (persisted?.isAudioMuted !== undefined && !hasStrumSynth) nextAudioMuted = persisted.isAudioMuted;
       if (persisted?.isMetronomeMuted !== undefined) nextMetronomeMuted = persisted.isMetronomeMuted;
-      if (persisted?.speedMultiplier !== undefined) nextSpeedMultiplier = persisted.speedMultiplier;
-      if (persisted?.metronomeBpm !== undefined) metronome.setBpm(persisted.metronomeBpm);
+      // Goal mode starts on the goal's tempo at full speed — a slower tempo left
+      // over from regular practice would quietly fail every run.
+      if (!isGoalMode) {
+        if (persisted?.speedMultiplier !== undefined) nextSpeedMultiplier = persisted.speedMultiplier;
+        if (persisted?.metronomeBpm !== undefined) metronome.setBpm(persisted.metronomeBpm);
+      }
     }
 
     skipNextSettingsSaveRef.current = true;
@@ -536,7 +577,7 @@ export const PracticeSession = ({
   // has a snapshot worth submitting when the mic was actually listening.
   const hasTrackedPerformance = isMicEnabled || isClickAnsweredMode(currentExercise.noteHuntConfig?.mode);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { if (isExamMode && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
+  useEffect(() => { if ((isExamMode || isGoalMode) && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
   // No cleanup here used to mean React StrictMode's dev-only double-invoke
   // (mount → cleanup → mount, meant to catch exactly this class of bug) had
   // nothing to undo between its two invocations — both ran initAudio() with
@@ -623,14 +664,16 @@ export const PracticeSession = ({
   // Persist Practice Session settings per exercise, so reopening the same
   // exercise restores its own metronome/playback/mic preferences.
   useEffect(() => {
-    if (isExamMode) return;
+    // Goal mode's tempo is the goal's, not a preference worth carrying back
+    // into regular practice of the same exercise.
+    if (isExamMode || isGoalMode) return;
     if (skipNextSettingsSaveRef.current) { skipNextSettingsSaveRef.current = false; return; }
     savePracticeSessionSettings(currentExercise.id, {
       isAudioMuted, isMetronomeMuted, speedMultiplier,
       metronomeBpm: metronome.bpm,
       isMicEnabled: _isMicEnabled,
     });
-  }, [currentExercise.id, isExamMode, isAudioMuted, isMetronomeMuted, speedMultiplier, metronome.bpm, _isMicEnabled]);
+  }, [currentExercise.id, isExamMode, isGoalMode, isAudioMuted, isMetronomeMuted, speedMultiplier, metronome.bpm, _isMicEnabled]);
 
   // Metronome volume is a device-wide preference — persist it independently of the exercise.
   useEffect(() => {
@@ -678,6 +721,11 @@ export const PracticeSession = ({
   const { saveCurrentScores, exerciseRecordsRef, scoredRuns, micStandingRef, earTrainingStandingRef } = useScoreSaving({
     activeExercise, currentExercise, isMicEnabled, earTrainingScore, noteMatchingHandle,
     sessionBpm: effectiveBpm,
+    recordGoalChartRuns: !isGoalMode,
+  });
+
+  const { verdict: goalVerdict, rearm: rearmGoalVerdict } = useGoalRunVerdict({
+    goalRun, showSuccessView, isMicEnabled, noteMatchingHandle,
   });
 
   /**
@@ -945,6 +993,9 @@ export const PracticeSession = ({
           timeline={successSnapshot.noteTimeline}
           timing={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.timing : null}
           failMessage={examMistakeFailed ? `${CLICK_EXAM_MISTAKE_LIMIT} wrong clicks — exam failed.` : undefined}
+          eyebrow={goalRun?.summaryEyebrow}
+          extraContent={goalVerdict}
+          offerRestart={isGoalMode}
           onFinish={async () => {
             metronome.stopMetronome(); await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,
@@ -958,6 +1009,7 @@ export const PracticeSession = ({
           }}
           onRestart={examMistakeFailed ? undefined : () => {
             examAutoFinishedRef.current = false;
+            rearmGoalVerdict();
             const usesMetronome = !!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat";
             resetSuccessView(); resetTimer(); metronome.restartMetronome();
             noteMatchingHandle.current?.resetGame(); setEarTrainingScore(0);

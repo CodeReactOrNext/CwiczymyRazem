@@ -5,6 +5,7 @@ import { computeChromagram, correctOctaveForLowStrings, freqToPitchClass, getAda
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { tempoScoreFactor } from "../utils/tempoScoreFactor";
 import { gradeTiming, isPerfectTiming, TIMING_GRADE_POINTS } from "../utils/timingGrade";
+import { MAX_TIMED_NOTES } from "../utils/timingPrecision";
 import type { ExpectedAttack } from "./noteEventGrader";
 import { assignAttacks } from "./noteEventGrader";
 import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
@@ -52,7 +53,7 @@ export function useNoteMatching({
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
     maxComboRef, needsFlushRef, minScoredBpmRef,
-    noteTimingsRef, timingCountsRef,
+    noteTimingsRef, timingCountsRef, timingOffsetsRef,
     flushToReact, reset: resetGame,
   } = useGameState(currentExerciseIndex, onReset);
 
@@ -444,6 +445,9 @@ export function useNoteMatching({
                 offsetBeats: attackDeltaMs === null ? null : attackDeltaMs / beatDurationMs,
               };
               timingCountsRef.current[timingGrade]++;
+              if (attackDeltaMs !== null && timingOffsetsRef.current.length < MAX_TIMED_NOTES) {
+                timingOffsetsRef.current.push(attackDeltaMs);
+              }
 
               hitNotesRef.current[noteKey] = loopedBeatsElapsed;
               needsFlushRef.current = true;
@@ -471,5 +475,5 @@ export function useNoteMatching({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, startTime, audioContext, audioStartTime, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm, calibratedLatencyMs]);
 
-  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, resetGame };
+  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, timingOffsetsRef, resetGame };
 }

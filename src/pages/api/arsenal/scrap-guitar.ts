@@ -68,6 +68,12 @@ export default async function handler(
     if (!guitarDef) {
       return res.status(404).json({ error: "Guitar definition not found" });
     }
+    // A build has no model BOM to tear down — its parts live in the Builder.
+    if (item.custom) {
+      return res
+        .status(400)
+        .json({ error: "Built guitars can't be scrapped — swap their parts in the Builder" });
+    }
 
     const gained = getGuitarScrapYield(item, guitarDef);
     const wallet: ScrapPart[] = data.arsenal?.parts ?? [];

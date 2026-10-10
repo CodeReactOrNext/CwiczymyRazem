@@ -69,6 +69,7 @@ import {
   SlidersHorizontal,
   Star,
   Swords,
+  Target,
   Timer,
   Trophy,
   Users,
@@ -485,6 +486,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
+    if (pathname.startsWith("/goals")) return "progress";
     if (pathname === "/summary") return "progress";
     if (pathname.startsWith("/challenges")) return "community";
     if (pathname.startsWith("/leaderboard")) return "community";
@@ -588,6 +590,12 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           name: t("activity"),
           href: "/profile/activity",
           icon: <Activity size={16} />,
+        },
+        {
+          id: "progress-goals",
+          name: t("goals"),
+          href: "/goals",
+          icon: <Target size={16} />,
         },
         {
           id: "progress-milestones",

@@ -18,6 +18,8 @@ import type {
   SalvagedMod,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
+import type { OwnedComponent } from "feature/guitarBuilder/types/guitarBuilder.types";
+import { getComponent } from "feature/guitarBuilder/utils/components";
 
 import { groupWalletByPart } from "./scrap";
 
@@ -49,6 +51,13 @@ export type BoardPiece =
       tall: false;
       kind: "mod";
       mod: SalvagedMod;
+      name: string;
+    }
+  | {
+      id: string;
+      tall: false;
+      kind: "component";
+      component: OwnedComponent;
       name: string;
     };
 
@@ -102,3 +111,15 @@ export const modPiece = (mod: SalvagedMod): BoardPiece => ({
 
 export const modPieces = (mods: SalvagedMod[]): BoardPiece[] =>
   mods.map(modPiece);
+
+/** A Guitar Builder part: one socket per copy, each with its own level. */
+export const componentPiece = (component: OwnedComponent): BoardPiece => ({
+  id: component.uid,
+  tall: false,
+  kind: "component",
+  component,
+  name: getComponent(component.defId)?.name ?? "Part",
+});
+
+export const componentPieces = (components: OwnedComponent[]): BoardPiece[] =>
+  components.filter((c) => getComponent(c.defId)).map(componentPiece);

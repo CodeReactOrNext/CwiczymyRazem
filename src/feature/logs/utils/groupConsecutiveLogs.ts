@@ -4,6 +4,7 @@ import type {
   FirebaseLogsDiscordPromoInterface,
   FirebaseLogsDonationInterface,
   FirebaseLogsExamPassedInterface,
+  FirebaseLogsGoalCompletedInterface,
   FirebaseLogsGuildLevelInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
@@ -29,6 +30,7 @@ export type AnyFirebaseLog =
   | FirebaseLogsPlaylistInterface
   | FirebaseLogsExamPassedInterface
   | FirebaseLogsRoadmapStepInterface
+  | FirebaseLogsGoalCompletedInterface
   | FirebaseLogsSupportAskInterface
   | FirebaseLogsDonationInterface
   | FirebaseLogsGuildLevelInterface
@@ -95,6 +97,12 @@ export const isFirebaseLogsRoadmapStep = (
   return (log as FirebaseLogsRoadmapStepInterface).type === "roadmap_step_completed";
 };
 
+export const isFirebaseLogsGoalCompleted = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsGoalCompletedInterface => {
+  return (log as FirebaseLogsGoalCompletedInterface).type === "exercise_goal_completed";
+};
+
 export const isFirebaseLogsGuildLevel = (
   log: AnyFirebaseLog
 ): log is FirebaseLogsGuildLevelInterface => {
@@ -136,6 +144,7 @@ export type LogActivityType =
   | "topPlayers"
   | "examPassed"
   | "roadmapStep"
+  | "goalCompleted"
   | "supportAsk"
   | "donationReceived"
   | "guildLevel"
@@ -156,6 +165,7 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   if (isFirebaseLogsPlaylist(log)) return "playlist";
   if (isFirebaseLogsExamPassed(log)) return "examPassed";
   if (isFirebaseLogsRoadmapStep(log)) return "roadmapStep";
+  if (isFirebaseLogsGoalCompleted(log)) return "goalCompleted";
   if (isFirebaseLogsSupportAsk(log)) return "supportAsk";
   if (isFirebaseLogsDonation(log)) return "donationReceived";
   if (isFirebaseLogsGuildLevel(log)) return "guildLevel";
@@ -169,14 +179,14 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
  * differently. An exam pass is likewise bucketed with the practice-session log the exam
  * auto-submits right before it — same user, same moment — so they land in one card instead of two. */
 export type LogGroupType =
-  | Exclude<LogActivityType, "caseOpen" | "marketplace" | "marketplacePurchase" | "examPassed" | "roadmapStep">
+  | Exclude<LogActivityType, "caseOpen" | "marketplace" | "marketplacePurchase" | "examPassed" | "roadmapStep" | "goalCompleted">
   | "arsenal";
 
 export const getLogGroupType = (log: AnyFirebaseLog): LogGroupType => {
   const type = getLogActivityType(log);
   if (type === "caseOpen" || type === "marketplace" || type === "marketplacePurchase") return "arsenal";
   // A finished roadmap step lands in the same card as the practice that finished it.
-  if (type === "examPassed" || type === "roadmapStep") return "exercisePlan";
+  if (type === "examPassed" || type === "roadmapStep" || type === "goalCompleted") return "exercisePlan";
   return type;
 };
 

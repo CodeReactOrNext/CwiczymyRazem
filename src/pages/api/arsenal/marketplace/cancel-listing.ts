@@ -48,6 +48,15 @@ export default async function handler(
       if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
       const data = userDoc.data()!;
 
+      if (listing.itemType === "component") {
+        // Back into the stash under its own uid; the escrow `id` goes.
+        const { id: _escrowId, ...part } = listing.item;
+        const stash: any[] = data.arsenal?.components || [];
+        t.update(userRef, { "arsenal.components": [...stash, part] });
+        t.update(listingRef, { status: "cancelled" });
+        return;
+      }
+
       if (listing.itemType === "mod") {
         // Straight back into the stash under the id it left with — nothing could
         // have claimed that id while the listing was up. Nothing else moves: a

@@ -124,6 +124,10 @@ export default async function handler(
       ...(Array.isArray(data.arsenal.salvagedMods)
         ? { salvagedMods: data.arsenal.salvagedMods }
         : {}),
+      // Guitar Builder parts. Absent until the first one drops from a case.
+      components: Array.isArray(data.arsenal.components)
+        ? data.arsenal.components
+        : [],
     };
 
     // Reconcile the denormalized rig level (backfills old accounts, self-heals

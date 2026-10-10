@@ -29,6 +29,7 @@
     "postinstall": "node patch-aubio.js",
     "backfill-rig-level": "vitest run --mode backfill scripts/backfillRigLevel.test.ts",
     "grant-scrap-parts": "vitest run --mode grantparts scripts/grantScrapParts.test.ts",
+    "grant-components": "vitest run --mode grantcomponents scripts/grantComponents.test.ts",
     "grant-fame": "vitest run --mode grantfame scripts/grantFame.test.ts",
     "roadmap-preflight-probe": "vitest run --mode preflightprobe scripts/roadmapPreflightProbe.test.ts",
     "reset-pedalboard": "vitest run --mode reset-pedalboard scripts/resetPedalboard.test.ts",

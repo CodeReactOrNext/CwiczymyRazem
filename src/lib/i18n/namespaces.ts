@@ -15,6 +15,7 @@ import faq from "../../../public/locales/en/faq.json";
 import feed from "../../../public/locales/en/feed.json";
 import feedback from "../../../public/locales/en/feedback.json";
 import footer from "../../../public/locales/en/footer.json";
+import goals from "../../../public/locales/en/goals.json";
 import guilds from "../../../public/locales/en/guilds.json";
 import journey from "../../../public/locales/en/journey.json";
 import leadboard from "../../../public/locales/en/leadboard.json";
@@ -66,6 +67,7 @@ export const TRANSLATION_NAMESPACES = [
   "feed",
   "feedback",
   "footer",
+  "goals",
   "guilds",
   "journey",
   "leadboard",
@@ -135,6 +137,7 @@ export const EN_CATALOG: LocaleCatalog = {
   feed,
   feedback,
   footer,
+  goals,
   guilds,
   journey,
   leadboard,

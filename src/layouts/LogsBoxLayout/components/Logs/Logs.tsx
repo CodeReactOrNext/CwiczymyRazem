@@ -26,7 +26,7 @@ import {
 } from "feature/arsenal/data/effectDefinitions";
 import { getEffectLevel } from "feature/arsenal/data/effectStats";
 import {
-  GUITAR_DEFINITIONS,
+  guitarDefinitionByImageId,
   GUITARS_BY_ID,
 } from "feature/arsenal/data/guitarDefinitions";
 import { getItemLevel } from "feature/arsenal/data/itemStats";
@@ -58,6 +58,7 @@ import type {
   FirebaseLogsDiscordPromoInterface,
   FirebaseLogsDonationInterface,
   FirebaseLogsExamPassedInterface,
+  FirebaseLogsGoalCompletedInterface,
   FirebaseLogsGuildLevelInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
@@ -203,7 +204,7 @@ const ItemTooltipCard = ({
 
   const guitarDef =
     itemType === "guitar"
-      ? GUITAR_DEFINITIONS.find((g) => g.imageId === itemImageId)
+      ? guitarDefinitionByImageId(itemImageId)
       : null;
   const effectDef =
     itemType === "effect"
@@ -1388,6 +1389,33 @@ const GroupedLogLine = ({
           />
         </p>
         {stepLog.phaseTitle && <Chip color='cyan'>{stepLog.phaseTitle}</Chip>}
+      </GroupedLine>
+    );
+  }
+
+  if (type === "goalCompleted") {
+    const goalLog = log as FirebaseLogsGoalCompletedInterface;
+
+    return (
+      <GroupedLine>
+        <p className='text-sm text-zinc-400'>
+          <Target className='mr-1.5 inline-block h-3.5 w-3.5 text-emerald-400' />
+          <Interpolate
+            text={t("feed:reached_exercise_goal")}
+            values={{
+              exercise: (
+                <Link
+                  href={`/profile/skills?exerciseId=${goalLog.exerciseId}`}
+                  className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
+                  {goalLog.exerciseTitle}
+                </Link>
+              ),
+            }}
+          />
+        </p>
+        <Chip color='emerald'>
+          <span className='tabular-nums'>{goalLog.targetBpm} BPM</span>
+        </Chip>
       </GroupedLine>
     );
   }

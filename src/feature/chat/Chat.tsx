@@ -532,7 +532,10 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className='h-full overflow-y-auto py-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:px-6 sm:py-4'>
+          // overflow-x-hidden: a vertical scroller scrolls sideways too unless told not to, and
+          // the hover actions over a bubble (invisible until hovered, but laid out) reach past
+          // a phone-width column — which gave the room a second, sideways scrollbar.
+          className='h-full overflow-y-auto overflow-x-hidden py-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:px-6 sm:py-4'>
           {!isLoading && messages.length === 0 ? (
             <EmptyRoom
               isGuild={isGuild}
@@ -583,16 +586,19 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
                         on screen, so a run cut off by the edge still says whose it is. */}
                     <header
                       className={cn(
-                        "sticky top-0 z-[5] mb-1 flex",
+                        "sticky top-0 z-[5] mb-1 flex max-w-full",
                         isMe ? AVATAR_INSET_END : AVATAR_INSET,
                       )}>
+                      {/* One line, whatever the width: on a phone the name, tag, badge and time
+                          used to wrap inside the pill ("11:10 / PM"). The name is the one
+                          part that gives way — it truncates, the rest keep their size. */}
                       <div
                         className={cn(
-                          "flex items-center gap-1.5 rounded-md bg-zinc-950/80 px-1.5 py-0.5",
+                          "flex min-w-0 max-w-full items-center gap-1.5 whitespace-nowrap rounded-md bg-zinc-950/80 px-1.5 py-0.5",
                           isMe && "flex-row-reverse",
                         )}>
                         <UserTooltip userId={first.userId}>
-                          <span className='text-xs font-semibold text-zinc-300'>
+                          <span className='min-w-0 truncate text-xs font-semibold text-zinc-300'>
                             {first.username}
                           </span>
                         </UserTooltip>
@@ -603,7 +609,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
                         {supportMember && <SupportBadge member={supportMember} />}
                         <time
                           dateTime={entry.sentAt.toISOString()}
-                          className='text-xs tabular-nums text-zinc-400'>
+                          className='shrink-0 text-xs tabular-nums text-zinc-400'>
                           {format(entry.sentAt, "p", { locale: dateLocale })}
                         </time>
                       </div>

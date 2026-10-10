@@ -36,6 +36,14 @@ interface ExerciseSuccessViewProps {
    *  used when the fail wasn't a score shortfall (e.g. the click-hunt mistake
    *  limit), where that message would be misleading. */
   failMessage?: ReactNode;
+  /** Replaces "Congratulations!" above the title — goal mode names the run
+   *  instead, since a run that missed the goal is nothing to congratulate. */
+  eyebrow?: string;
+  /** Shown under the stats — goal mode puts the run's verdict on the goal here. */
+  extraContent?: ReactNode;
+  /** Offer "Try again" after any run, not only a failed exam — goal mode is
+   *  played run after run. */
+  offerRestart?: boolean;
 }
 
 type TierKey = 'S' | 'A' | 'B' | 'C' | 'D';
@@ -93,6 +101,9 @@ export const ExerciseSuccessView = ({
   timeline,
   timing,
   failMessage,
+  eyebrow,
+  extraContent,
+  offerRestart = false,
 }: ExerciseSuccessViewProps) => {
   const { t } = useTranslation(["common", "session"]);
   const [isVisible, setIsVisible] = useState(false);
@@ -249,7 +260,7 @@ export const ExerciseSuccessView = ({
                   <Trophy className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold text-zinc-500 tracking-wide">{t("practice.congratulations")}</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 tracking-wide">{eyebrow ?? t("practice.congratulations")}</p>
                   <h2 className="text-lg font-bold text-zinc-100 leading-tight">{planTitle}</h2>
                 </div>
               </motion.div>
@@ -292,6 +303,14 @@ export const ExerciseSuccessView = ({
                   {timing && <TimingBreakdown timing={timing} className="mt-6" />}
                 </div>
               )}
+            </motion.div>
+          )}
+
+          {extraContent && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
+              className="relative px-7 py-2">
+              {extraContent}
             </motion.div>
           )}
 
@@ -359,7 +378,7 @@ export const ExerciseSuccessView = ({
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: hasTimeline ? 1.3 : 1 }}
             className="relative px-7 py-5 flex gap-2.5">
-            {isExam && !isPassed && onRestart && (
+            {((isExam && !isPassed) || offerRestart) && onRestart && (
               <Button
                 onClick={onRestart}
                 disabled={isLoading}

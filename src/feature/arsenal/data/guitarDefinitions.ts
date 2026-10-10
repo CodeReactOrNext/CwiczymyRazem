@@ -1,3 +1,8 @@
+import {
+  customDefinitionFromImageId,
+  customGuitarDefinition,
+} from "feature/guitarBuilder/utils/customGuitar";
+
 import type { GuitarDefinition } from "../types/arsenal.types";
 import {
   HEADLESS,
@@ -903,7 +908,26 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   },
 ];
 
-export const GUITARS_BY_ID = new Map<number | string, GuitarDefinition>(
+/**
+ * Model lookup. A guitar built in the Guitar Builder has no entry of its own:
+ * its id carries rarity, body and image token, and `get` turns that into a
+ * stand-in definition — so the rig, the profile wall, cards and logs all show
+ * a build without each of them knowing builds exist.
+ */
+class GuitarDefinitionMap extends Map<number | string, GuitarDefinition> {
+  get(id: number | string): GuitarDefinition | undefined {
+    return super.get(id) ?? customGuitarDefinition(id);
+  }
+}
+
+/** The guitar behind an image id (`selectedGuitar`, a log's `itemImageId`). */
+export const guitarDefinitionByImageId = (
+  imageId: unknown,
+): GuitarDefinition | undefined =>
+  GUITAR_DEFINITIONS.find((g) => g.imageId === imageId) ??
+  customDefinitionFromImageId(imageId);
+
+export const GUITARS_BY_ID = new GuitarDefinitionMap(
   GUITAR_DEFINITIONS.map((g) => [g.id, g]),
 );
 

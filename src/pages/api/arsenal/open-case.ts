@@ -17,6 +17,11 @@ import type {
 import { pickCuratedDrop } from "feature/arsenal/utils/curatedDraw";
 import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import { drawOpenRarity, drawRarity, pickBiased } from "feature/arsenal/utils/openDraw";
+import {
+  COMPONENT_CASE_CHANCE,
+  getComponent,
+  rollCaseComponent,
+} from "feature/guitarBuilder/utils/components";
 import type { DocumentReference,Transaction } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
 import { readRewardLedger } from "lib/rewards/rewardLedger";
@@ -148,6 +153,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
       }
 
+      // A Guitar Builder part instead of the case's usual drop. Rolled on the
+      // case's own rarity table, so better cases drop better parts.
+      const componentChance = dailyPick ? 0 : (COMPONENT_CASE_CHANCE[caseType] ?? 0);
+      if (componentChance > 0 && Math.random() < componentChance) {
+        const componentItem = rollCaseComponent(caseDef.probabilities, Math.random);
+        const component = getComponent(componentItem.defId)!;
+        t.update(userRef, {
+          ...tokenSpend,
+          "statistics.fame": newFame,
+          "arsenal.components": [...(data.arsenal?.components || []), componentItem],
+        });
+        return {
+          type: "component" as const,
+          component,
+          componentItem,
+          newFame,
+          isNewToDex: false,
+          caseTokens,
+          usedToken: payWithToken,
+        };
+      }
+
       const isGuitarDrop = dailyPick
         ? dailyPick.kind === "guitar"
         : caseDef.dropKind
@@ -271,7 +298,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // Write activity log (panel only, no Discord)
-    if (LOG_CASE_OPENS) try {
+    // Parts stay out of the public feed: it shows gear, and a stream of
+    // "got a neck" would drown the pulls people actually react to.
+    if (LOG_CASE_OPENS && result.type !== "component") try {
       const item = result.type === "guitar" ? result.guitar : result.effect;
       await firestore.collection("logs").add({
         type: "case_open",

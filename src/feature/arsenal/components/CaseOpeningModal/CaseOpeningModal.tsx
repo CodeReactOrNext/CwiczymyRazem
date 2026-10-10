@@ -13,7 +13,12 @@ import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb";
+import { COMPONENT_DEFS, SLOT_LABELS } from "feature/guitarBuilder/data/components";
+import type { ComponentDef } from "feature/guitarBuilder/types/guitarBuilder.types";
+import { COMPONENT_CASE_CHANCE } from "feature/guitarBuilder/utils/components";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -22,13 +27,38 @@ import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { RARITY_STYLES } from "../RarityBadge";
 
+/** The reveal for a Guitar Builder part: the part, its slot and level. */
+const ComponentRevealCard = ({ def, level }: { def: ComponentDef; level: number }) => {
+  const color = RARITY_STYLES[def.rarity].baseColor;
+  return (
+    <div className="flex flex-col items-center gap-4 rounded-lg bg-zinc-900/80 px-6 py-8">
+      <ComponentThumb def={def} className="h-32 w-56" />
+      <div className="text-center">
+        <p className="font-display text-xl font-semibold text-zinc-50">{def.name}</p>
+        <p className="mt-1 text-sm text-zinc-400">
+          {SLOT_LABELS[def.slot]} · <span style={{ color }}>{def.rarity}</span> · Lvl {level}
+        </p>
+      </div>
+    </div>
+  );
+};
+
 const ITEM_WIDTH = 250;
 const VISIBLE_ITEMS = 60;
 const WIN_INDEX = 45;
 
 type StripItem =
   | { kind: "guitar"; def: GuitarDefinition }
-  | { kind: "effect"; def: EffectDefinition };
+  | { kind: "effect"; def: EffectDefinition }
+  | { kind: "component"; def: ComponentDef };
+
+/** A random Guitar Builder part of a rarity, for the reel's fillers. */
+function randomComponent(rarity: GuitarRarity): StripItem | null {
+  const pool = COMPONENT_DEFS.filter((def) => def.rarity === rarity);
+  return pool.length
+    ? { kind: "component", def: pool[Math.floor(Math.random() * pool.length)] }
+    : null;
+}
 
 function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripItem[] {
   const rarities = Object.entries(caseDef.probabilities) as [GuitarRarity, number][];
@@ -49,6 +79,16 @@ function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripI
     for (const [rarity, prob] of rarities) {
       roll -= prob;
       if (roll <= 0) { chosen = rarity; break; }
+    }
+
+    // Cases that can drop builder parts show them on the reel at the same rate.
+    const partChance = COMPONENT_CASE_CHANCE[caseDef.id] ?? 0;
+    if (partChance > 0 && Math.random() < partChance) {
+      const part = randomComponent(chosen);
+      if (part) {
+        strip.push(part);
+        continue;
+      }
     }
 
     if (dailyPool) {
@@ -115,6 +155,7 @@ export const CaseOpeningModal = ({
   const isSelling = isSellingGuitar || isSellingEffect;
   const isBusy = isEquipping || isSelling || isOpeningAgain;
   const isOpen = result !== null;
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
 
@@ -123,13 +164,17 @@ export const CaseOpeningModal = ({
   const guitar = result?.type === "guitar" && result.guitar ? GUITARS_BY_ID.get(result.guitar.id) ?? null : null;
   const effect = result?.type === "effect" && result.effect ? EFFECTS_BY_ID.get(result.effect.id) ?? null : null;
 
+  const component = result?.type === "component" ? (result.component ?? null) : null;
+
   const winDef: StripItem | null = guitar
     ? { kind: "guitar", def: guitar }
     : effect
     ? { kind: "effect", def: effect }
+    : component
+    ? { kind: "component", def: component }
     : null;
 
-  const revealRarity = guitar?.rarity ?? effect?.rarity ?? null;
+  const revealRarity = guitar?.rarity ?? effect?.rarity ?? component?.rarity ?? null;
   const rarityStyles = revealRarity ? RARITY_STYLES[revealRarity] : null;
 
   // The same functions /api/arsenal/sell-guitar and sell-effect pay out with:
@@ -140,7 +185,9 @@ export const CaseOpeningModal = ({
       ? result?.newItem
         ? getItemValue(result.newItem, winDef.def)
         : 0
-      : getEffectValue(winDef.def)
+      : winDef.kind === "effect"
+        ? getEffectValue(winDef.def)
+        : 0
     : 0;
 
   const handleSell = () => {
@@ -240,7 +287,7 @@ export const CaseOpeningModal = ({
                   x: 0 — otherwise it already sits at the target offset and the
                   second spin would not move at all. */}
               <motion.div
-                key={result?.newItem?.id ?? result?.effectItem?.id ?? "strip"}
+                key={result?.newItem?.id ?? result?.effectItem?.id ?? result?.componentItem?.uid ?? "strip"}
                 ref={stripRef}
                 className="flex items-center h-full"
                 initial={{ x: 0 }}
@@ -272,6 +319,8 @@ export const CaseOpeningModal = ({
                             alt={item.def.name}
                             className="relative z-10 h-[440px] w-[440px] -rotate-45 object-contain"
                           />
+                        ) : item.kind === "component" ? (
+                          <ComponentThumb def={item.def} className="relative z-10 h-28 w-48" />
                         ) : (
                           <img
                             src={getEffectImageSrc(item.def.imageId, "medium")}
@@ -287,7 +336,11 @@ export const CaseOpeningModal = ({
                       </div>
                       <div className={cn("flex flex-col items-center transition-opacity duration-500", isWinner ? "opacity-100" : "opacity-70")}>
                         <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-500 mb-0.5">
-                          {item.kind === "guitar" ? item.def.brand : item.def.type}
+                          {item.kind === "guitar"
+                            ? item.def.brand
+                            : item.kind === "effect"
+                              ? item.def.type
+                              : `${SLOT_LABELS[item.def.slot]} · part`}
                         </span>
                         <span className="text-[11px] font-bold capitalize tracking-wide text-center leading-tight truncate w-full" style={{ color: rs.baseColor }}>
                           {item.def.name}
@@ -328,10 +381,14 @@ export const CaseOpeningModal = ({
                     transition={{ delay: 0.3 }}
                     className={cn(
                       "text-[10px] font-bold uppercase tracking-[0.2em]",
-                      result?.isNewToDex ? "text-amber-300" : "text-zinc-500"
+                      result?.isNewToDex || component ? "text-amber-300" : "text-zinc-500"
                     )}
                   >
-                    {result?.isNewToDex ? "New — First Pull" : "Duplicate — Already in Dex"}
+                    {component
+                      ? "Guitar Builder part"
+                      : result?.isNewToDex
+                        ? "New — First Pull"
+                        : "Duplicate — Already in Dex"}
                   </motion.p>
 
                   <div className="relative flex items-center justify-center">
@@ -387,6 +444,8 @@ export const CaseOpeningModal = ({
                         <GuitarCard item={result.newItem} readOnly />
                       ) : winDef.kind === "effect" && result?.effectItem ? (
                         <EffectCard item={result.effectItem} readOnly />
+                      ) : winDef.kind === "component" && result?.componentItem ? (
+                        <ComponentRevealCard def={winDef.def} level={result.componentItem.level} />
                       ) : null}
                     </div>
                   </div>
@@ -402,6 +461,28 @@ export const CaseOpeningModal = ({
                   animate={{ opacity: 1, y: 0 }}
                   className="flex w-full flex-col gap-2 sm:gap-3"
                 >
+                  {winDef.kind === "component" ? (
+                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-3">
+                    <Button
+                      onClick={() => {
+                        onClose();
+                        router.replace({ query: { ...router.query, tab: "builder" } }, undefined, { shallow: true });
+                      }}
+                      disabled={isBusy}
+                      className="h-12 w-full bg-white text-sm font-medium tracking-widest text-zinc-900 hover:bg-zinc-200 disabled:opacity-50"
+                    >
+                      Open in Builder
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={onClose}
+                      disabled={isBusy}
+                      className="h-12 w-full border-zinc-700 bg-zinc-900 text-sm font-medium tracking-widest text-white hover:bg-zinc-800 disabled:opacity-50"
+                    >
+                      Keep
+                    </Button>
+                  </div>
+                  ) : (
                   <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-3">
                   {winDef.kind === "guitar" && guitar && (
                     <Button
@@ -439,6 +520,7 @@ export const CaseOpeningModal = ({
                     )}
                   </Button>
                   </div>
+                  )}
 
                   {onOpenAgain && caseDef && (
                     <Button

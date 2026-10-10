@@ -8,6 +8,7 @@ import {
   ListChecks,
   Medal,
   ScrollText,
+  Target,
   Trophy,
 } from "lucide-react";
 
@@ -20,6 +21,7 @@ export const LIBRARY_TABS: PageTab[] = [
 export const PROGRESS_TABS: PageTab[] = [
   { label: "Activity", href: "/profile/activity", icon: Activity },
   { label: "Practice Log", href: "/practice-log", icon: ScrollText },
+  { label: "Goals", href: "/goals", icon: Target },
   { label: "Achievements", href: "/profile/achievements", icon: Medal },
 ];
 

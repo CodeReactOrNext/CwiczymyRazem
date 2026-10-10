@@ -20,6 +20,7 @@ import {
   Swords,
   Ticket,
   Users,
+  Wrench,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -40,6 +41,7 @@ const ARSENAL_TABS = [
   "cases",
   "collection",
   "rig",
+  "builder",
   "workshop",
   "commissions",
   "trader",
@@ -58,12 +60,15 @@ const TAB_META: Record<ArsenalTab, { label: string; icon: LucideIcon }> = {
   cases: { label: "Cases", icon: PackageOpen },
   collection: { label: "Collection", icon: Swords },
   rig: { label: "Rig", icon: Guitar },
+  builder: { label: "Builder", icon: Wrench },
   workshop: { label: "Workshop", icon: Hammer },
   commissions: { label: "Commissions", icon: DraftingCompass },
   trader: { label: "Trader", icon: Store },
   market: { label: "Market", icon: Users },
   dex: { label: "Dex", icon: BookMarked },
 };
+
+import { GuitarBuilderTab } from "feature/guitarBuilder/components/GuitarBuilderTab";
 
 import type { OpenAgainPayment } from "./components/CaseOpeningModal/CaseOpeningModal";
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
@@ -287,6 +292,14 @@ const ArsenalTabs = () => {
                 </div>
               ) : data ? (
                 <DexView data={data} />
+              ) : null}
+            </TabsContent>
+
+            <TabsContent value="builder" className="mt-4">
+              {isLoading ? (
+                <Skeleton className="h-[40rem] rounded-lg bg-zinc-800/50" />
+              ) : data ? (
+                <GuitarBuilderTab data={data} fame={fame} />
               ) : null}
             </TabsContent>
 

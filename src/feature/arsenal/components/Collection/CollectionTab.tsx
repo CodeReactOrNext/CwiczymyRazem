@@ -12,6 +12,7 @@ import {
   isStashOnlySort,
 } from "feature/arsenal/utils/collectionFilter";
 import { hasSavedArrangement } from "feature/arsenal/utils/stashLayout";
+import { BuilderPartsShelf } from "feature/guitarBuilder/components/BuilderPartsShelf";
 import { useEffect, useState } from "react";
 import { useResponsiveStore } from "store/useResponsiveStore";
 
@@ -69,7 +70,9 @@ export const CollectionTab = ({ data }: CollectionTabProps) => {
   const parts = data.parts ?? [];
   // A player who scrapped everything owns no gear but still has a full bin, and
   // the stash is the only view that shows parts as something you own.
-  const hasStash = hasAnything || parts.length > 0;
+  const components = data.components ?? [];
+  // Builder parts are owned items too: a stash of nothing but parts is a stash.
+  const hasStash = hasAnything || parts.length > 0 || components.length > 0;
 
   // What is actually drawn. A phone never gets the board — it is too dense to
   // read at that width and its sockets are dragged, which fights the scroll — so
@@ -140,6 +143,12 @@ export const CollectionTab = ({ data }: CollectionTabProps) => {
               scope === "pedals" && <CollectionEmptyResult query={query} />
             ))}
         </>
+      )}
+
+      {/* The board hangs Builder parts in sockets; the card view has none, so
+          they get a shelf of their own there — same as parts and mods above. */}
+      {activeView === "cards" && components.length > 0 && scope === "all" && (
+        <BuilderPartsShelf components={components} />
       )}
     </div>
   );

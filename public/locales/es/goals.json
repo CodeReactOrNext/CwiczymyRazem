@@ -1,0 +1,112 @@
+{
+  "page": {
+    "title": "Objetivos",
+    "subtitle": "Fija un tempo para un ejercicio y tócalo limpio tres veces",
+    "eyebrow": "Tus objetivos",
+    "new_goal": "Nuevo objetivo"
+  },
+  "empty": {
+    "title": "Aún no tienes objetivos",
+    "body": "Elige un ejercicio y el tempo que quieres alcanzar. Luego tócalo en modo objetivo hasta que tres pasadas salgan limpias.",
+    "cta": "Fija tu primer objetivo"
+  },
+  "active_title": "Activos",
+  "history_title": "Alcanzados",
+  "no_active": "Ahora no tienes objetivos abiertos. Fija uno nuevo o sube el listón en uno alcanzado.",
+  "card": {
+    "rules": "{{accuracy}}% de precisión · {{counting}}",
+    "delete": "Eliminar objetivo",
+    "progress": "{{count}} de {{total}} pasadas limpias",
+    "start": "Empezar intento",
+    "best_so_far": "Pasada más rápida",
+    "no_tempo": "Aún no hay pasadas puntuadas. Toca el ejercicio con el micrófono para fijar tu tempo inicial.",
+    "at_tempo": "Ya alcanzaste el tempo del objetivo. Ahora tres pasadas limpias.",
+    "to_go": "Faltan {{bpm}} BPM"
+  },
+  "counting": {
+    "streak": "seguidas",
+    "total": "en total"
+  },
+  "strictness": {
+    "relaxed": "Relajado",
+    "standard": "Estándar",
+    "strict": "Estricto"
+  },
+  "chart": {
+    "target": "Objetivo {{bpm}} BPM",
+    "practice_run": "Práctica",
+    "goal_run": "Intento",
+    "clean_goal_run": "Intento limpio",
+    "accuracy": "{{accuracy}}% de precisión",
+    "missed_goal_run": "Intento, no limpio",
+    "empty": "Aquí aparecerán tus pasadas puntuadas; la línea marca el tempo del objetivo.",
+    "metric_label": "Qué muestra la gráfica",
+    "metric_tempo": "Tempo",
+    "metric_timing": "Timing"
+  },
+  "create": {
+    "title": "Nuevo objetivo",
+    "description": "Elige un ejercicio y el tempo a alcanzar. El objetivo se cumple tras tres pasadas limpias en modo objetivo.",
+    "exercise_label": "Ejercicio",
+    "search": "Buscar ejercicios",
+    "no_results": "Ningún ejercicio coincide.",
+    "has_goal": "Ya tiene objetivo",
+    "bpm_range": "Rango del ejercicio {{min}}–{{max}} BPM",
+    "change_exercise": "Cambiar",
+    "bpm_label": "Tempo objetivo",
+    "bpm_invalid": "Elige un tempo entre {{min}} y {{max}} BPM.",
+    "strictness_label": "Qué tan limpio",
+    "strictness_hint": "La precisión mínima para que una pasada cuente.",
+    "counting_label": "Tres pasadas limpias",
+    "counting_hint_streak": "Una pasada que no sale limpia reinicia la cuenta.",
+    "counting_hint_total": "Las pasadas limpias se suman, pase lo que pase entre ellas.",
+    "cancel": "Ahora no",
+    "save": "Fijar objetivo",
+    "reached_title": "¡Objetivo alcanzado! ¿Subes el listón?",
+    "raise_title": "Subir el listón",
+    "raise_description": "Tocaste {{exercise}} limpio a {{bpm}} BPM. Fija el siguiente tempo.",
+    "counting_option": {
+      "streak": "Seguidas",
+      "total": "En total"
+    },
+    "bpm_down": "5 BPM más lento",
+    "bpm_up": "5 BPM más rápido"
+  },
+  "history": {
+    "reached_on": "Alcanzado el {{date}}",
+    "raise": "Subir el listón"
+  },
+  "delete_confirm": {
+    "title": "¿Eliminar este objetivo?",
+    "body": "Sus pasadas se quedan en la gráfica del ejercicio.",
+    "cancel": "Cancelar",
+    "confirm": "Eliminar"
+  },
+  "toast": {
+    "created": "Objetivo fijado",
+    "deleted": "Objetivo eliminado",
+    "error": "Algo salió mal. Inténtalo de nuevo."
+  },
+  "verdict": {
+    "saving": "Guardando la pasada…",
+    "not_scored": "El micrófono no puntuó esta pasada, así que no cuenta para el objetivo.",
+    "error": "No se pudo guardar la pasada. Inténtalo de nuevo.",
+    "completed": "¡Objetivo alcanzado! {{bpm}} BPM, tres pasadas limpias.",
+    "closed": "Este objetivo ya está alcanzado.",
+    "clean": "Pasada limpia",
+    "not_clean": "Aún no está limpio",
+    "too_slow": "Tocado a {{bpm}} BPM — el objetivo es {{target}} BPM.",
+    "accuracy": "{{accuracy}}% de precisión — este objetivo necesita {{required}}%.",
+    "streak_reset": "La cuenta empieza de nuevo: este objetivo necesita pasadas limpias seguidas.",
+    "eyebrow": "Intento · {{bpm}} BPM"
+  },
+  "timing": {
+    "offset": "{{ms}} ms fuera del pulso",
+    "centered": "Centrado en el pulso",
+    "ahead": "Suele caer {{ms}} ms antes del pulso",
+    "behind": "Suele caer {{ms}} ms después del pulso",
+    "tight_zone": "Exacto (hasta {{ms}} ms)",
+    "explainer": "Lo lejos del pulso que suelen caer tus notas en cada pasada — más arriba es más preciso. El timing depende de la calibración de latencia: si todas las pasadas se desvían hacia el mismo lado, calibra una vez.",
+    "empty": "El timing aparece tras pasadas puntuadas con el micrófono. Las sesiones antiguas no lo guardaban."
+  }
+}

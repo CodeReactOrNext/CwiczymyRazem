@@ -1,0 +1,112 @@
+{
+  "page": {
+    "title": "Cele",
+    "subtitle": "Ustaw tempo dla ćwiczenia i zagraj je czysto trzy razy",
+    "eyebrow": "Twoje cele",
+    "new_goal": "Nowy cel"
+  },
+  "empty": {
+    "title": "Nie masz jeszcze celów",
+    "body": "Wybierz ćwiczenie i tempo, które chcesz osiągnąć. Potem graj je w trybie celu, aż trzy przebiegi wyjdą czysto.",
+    "cta": "Ustaw pierwszy cel"
+  },
+  "active_title": "Aktywne",
+  "history_title": "Osiągnięte",
+  "no_active": "Nie masz teraz otwartych celów. Ustaw nowy albo podnieś poprzeczkę w osiągniętym.",
+  "card": {
+    "rules": "{{accuracy}}% celności · {{counting}}",
+    "delete": "Usuń cel",
+    "progress": "{{count}} z {{total}} czystych przebiegów",
+    "start": "Zacznij podejście",
+    "best_so_far": "Najszybszy przebieg",
+    "no_tempo": "Brak ocenionych przebiegów. Zagraj ćwiczenie z mikrofonem, żeby ustalić tempo startowe.",
+    "at_tempo": "Tempo celu osiągnięte. Teraz trzy czyste przebiegi.",
+    "to_go": "Jeszcze {{bpm}} BPM"
+  },
+  "counting": {
+    "streak": "pod rząd",
+    "total": "łącznie"
+  },
+  "strictness": {
+    "relaxed": "Luźny",
+    "standard": "Standard",
+    "strict": "Ostry"
+  },
+  "chart": {
+    "target": "Cel {{bpm}} BPM",
+    "practice_run": "Praktyka",
+    "goal_run": "Podejście do celu",
+    "clean_goal_run": "Czyste podejście",
+    "accuracy": "{{accuracy}}% celności",
+    "missed_goal_run": "Podejście, nie czysto",
+    "empty": "Tu pojawią się Twoje ocenione przebiegi, a linia pokazuje tempo celu.",
+    "metric_label": "Co pokazuje wykres",
+    "metric_tempo": "Tempo",
+    "metric_timing": "Timing"
+  },
+  "create": {
+    "title": "Nowy cel",
+    "description": "Wybierz ćwiczenie i tempo do osiągnięcia. Cel zalicza się po trzech czystych przebiegach w trybie celu.",
+    "exercise_label": "Ćwiczenie",
+    "search": "Szukaj ćwiczeń",
+    "no_results": "Brak pasujących ćwiczeń.",
+    "has_goal": "Ma już cel",
+    "bpm_range": "Zakres ćwiczenia {{min}}–{{max}} BPM",
+    "change_exercise": "Zmień",
+    "bpm_label": "Docelowe tempo",
+    "bpm_invalid": "Wybierz tempo od {{min}} do {{max}} BPM.",
+    "strictness_label": "Jak czysto",
+    "strictness_hint": "Najniższa celność, przy której przebieg się liczy.",
+    "counting_label": "Trzy czyste przebiegi",
+    "counting_hint_streak": "Przebieg, który nie jest czysty, zeruje licznik.",
+    "counting_hint_total": "Czyste przebiegi sumują się, cokolwiek wydarzy się pomiędzy.",
+    "cancel": "Nie teraz",
+    "save": "Ustaw cel",
+    "reached_title": "Cel osiągnięty! Podnosisz poprzeczkę?",
+    "raise_title": "Podnieś poprzeczkę",
+    "raise_description": "{{exercise}} zagrane czysto w {{bpm}} BPM. Ustaw kolejne tempo.",
+    "counting_option": {
+      "streak": "Pod rząd",
+      "total": "Łącznie"
+    },
+    "bpm_down": "Wolniej o 5 BPM",
+    "bpm_up": "Szybciej o 5 BPM"
+  },
+  "history": {
+    "reached_on": "Osiągnięty {{date}}",
+    "raise": "Podnieś poprzeczkę"
+  },
+  "delete_confirm": {
+    "title": "Usunąć ten cel?",
+    "body": "Jego przebiegi zostaną na wykresie ćwiczenia.",
+    "cancel": "Anuluj",
+    "confirm": "Usuń"
+  },
+  "toast": {
+    "created": "Cel ustawiony",
+    "deleted": "Cel usunięty",
+    "error": "Coś poszło nie tak. Spróbuj ponownie."
+  },
+  "verdict": {
+    "saving": "Zapisuję przebieg…",
+    "not_scored": "Mikrofon nie oceniał tego przebiegu, więc nie liczy się do celu.",
+    "error": "Nie udało się zapisać przebiegu. Spróbuj ponownie.",
+    "completed": "Cel osiągnięty! {{bpm}} BPM, trzy czyste przebiegi.",
+    "closed": "Ten cel jest już osiągnięty.",
+    "clean": "Czysty przebieg",
+    "not_clean": "Jeszcze nie czysto",
+    "too_slow": "Zagrane w {{bpm}} BPM — cel to {{target}} BPM.",
+    "accuracy": "{{accuracy}}% celności — ten cel wymaga {{required}}%.",
+    "streak_reset": "Licznik od nowa: ten cel wymaga czystych przebiegów pod rząd.",
+    "eyebrow": "Podejście do celu · {{bpm}} BPM"
+  },
+  "timing": {
+    "offset": "{{ms}} ms od bitu",
+    "centered": "Równo na bicie",
+    "ahead": "Zwykle {{ms}} ms przed bitem",
+    "behind": "Zwykle {{ms}} ms za bitem",
+    "tight_zone": "Idealnie (do {{ms}} ms)",
+    "explainer": "Jak daleko od bitu typowo lądują Twoje nuty w każdym przebiegu — wyżej na wykresie znaczy dokładniej. Timing zależy od kalibracji opóźnienia, więc jeśli każdy przebieg przesuwa się w tę samą stronę, skalibruj raz.",
+    "empty": "Timing pojawi się po przebiegach ocenionych mikrofonem. Starsze sesje go nie zapisywały."
+  }
+}

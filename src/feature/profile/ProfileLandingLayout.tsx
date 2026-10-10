@@ -4,9 +4,9 @@ import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { guitarDefinitionByImageId } from "feature/arsenal/data/guitarDefinitions";
 import { useEquippedGuitar } from "feature/arsenal/hooks/useUserArsenal";
-import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { getRankBadgeSrc, isGuitarImageId } from "feature/arsenal/utils/guitarImage";
 import { DashboardWidgets } from "feature/dashboard/components/DashboardWidgets";
 import type { DashboardDataContextValue } from "feature/dashboard/context/DashboardContext";
 import { DashboardDataProvider } from "feature/dashboard/context/DashboardContext";
@@ -110,10 +110,9 @@ const ProfileLandingLayout = ({
   const imgPath =
     userInfo?.selectedGuitar ??
     (userStats?.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : userStats?.lvl);
-  const isSpecialGuitar =
-    typeof imgPath === "string" && imgPath.includes("special/");
+  const isSpecialGuitar = isGuitarImageId(imgPath);
   const specialGuitarDef = isSpecialGuitar
-    ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath)
+    ? guitarDefinitionByImageId(imgPath)
     : null;
   // Lit by what the guitar is now: the workshop can promote it past its mint
   // rarity, and that promotion only exists on the owner's inventory item.

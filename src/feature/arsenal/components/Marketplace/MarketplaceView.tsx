@@ -67,7 +67,7 @@ export const MarketplaceView = () => {
           // Mods are not part of the collection — every one of them would
           // otherwise wear a "new for your collection" badge forever.
           dexStatus={
-            listing.itemType === "mod"
+            listing.itemType === "mod" || listing.itemType === "component"
               ? undefined
               : dexStatusOf(listing.itemType, listing.defId)
           }

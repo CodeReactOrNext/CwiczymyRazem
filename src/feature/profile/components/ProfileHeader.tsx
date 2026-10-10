@@ -5,9 +5,9 @@ import { achievementsMap } from "feature/achievements/data/achievementsData";
 import { achievementsRarity } from "feature/achievements/data/achievementsRarity";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { guitarDefinitionByImageId } from "feature/arsenal/data/guitarDefinitions";
 import { useEquippedGuitar } from "feature/arsenal/hooks/useUserArsenal";
-import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { getRankBadgeSrc, isGuitarImageId } from "feature/arsenal/utils/guitarImage";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { getProfileBanner } from "feature/profile/data/profileBanners";
 import { PROFILE_ACCENT_COLORS } from "feature/profile/data/profileSectionCatalog";
@@ -111,10 +111,9 @@ export const ProfileHeader = ({
   const imgPath =
     selectedGuitar ??
     (statistics.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : statistics.lvl);
-  const isSpecialGuitar =
-    typeof imgPath === "string" && imgPath.includes("special/");
+  const isSpecialGuitar = isGuitarImageId(imgPath);
   const specialGuitarDef = isSpecialGuitar
-    ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath)
+    ? guitarDefinitionByImageId(imgPath)
     : null;
   // The banner is lit by what the guitar is now, not by what it was at mint —
   // the workshop can promote it, and the promotion only exists on the item.

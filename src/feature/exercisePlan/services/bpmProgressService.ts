@@ -146,6 +146,47 @@ export const addBpmStage = async (
 };
 
 /**
+ * `addBpmStage` for several tempos at once — one read and one write instead of
+ * one of each per tempo. Used when a reached goal ticks every stage up to it.
+ */
+export const addBpmStages = async (
+  userId: string,
+  exerciseId: string,
+  bpms: number[],
+  exerciseTitle: string,
+  exerciseCategory: string
+): Promise<number[]> => {
+  try {
+    const docRef = doc(
+      db,
+      "users",
+      userId,
+      BPM_PROGRESS_SUBCOLLECTION,
+      exerciseId
+    );
+    const snapshot = await trackedGetDoc(docRef);
+
+    const existing = snapshot.exists() ? snapshot.data() : {};
+    const previous: number[] = existing.completedBpms || [];
+    const completedBpms = [...new Set([...previous, ...bpms])].sort((a, b) => a - b);
+    if (completedBpms.length === previous.length) return previous;
+
+    await trackedSetDoc(docRef, {
+      ...existing,
+      completedBpms,
+      exerciseTitle,
+      exerciseCategory,
+      lastUpdated: Timestamp.now(),
+    });
+
+    return completedBpms;
+  } catch (error) {
+    logger.error(error, { context: "addBpmStages" });
+    throw error;
+  }
+};
+
+/**
  * Records that the exercise was played through, independent of any score.
  *
  * Roughly a fifth of the catalogue can't be scored at all — improvisation
