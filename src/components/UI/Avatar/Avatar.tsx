@@ -65,10 +65,14 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, userId 
     />
   );
 
+  // The light fill is only for the initial: behind a photo it leaks through the
+  // anti-aliased edge of the clip and draws a pale, ragged hairline round it.
+  const fillClass = avatarURL ? "" : "bg-tertiary-400";
+
   return (
     <div className={`relative inline-block ${className || ""}`}>
       <div
-        className={`relative z-10 flex items-center justify-center overflow-hidden bg-tertiary-400 ${containerSizeClass}`}>
+        className={`relative z-10 flex items-center justify-center overflow-hidden ${fillClass} ${containerSizeClass}`}>
         {avatarURL ? (
           <img
             referrerPolicy='no-referrer'

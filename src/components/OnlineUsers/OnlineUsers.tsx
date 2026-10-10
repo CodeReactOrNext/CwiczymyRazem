@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
 import { SupportMark } from "feature/supportTeam/components/SupportBadge";
@@ -6,6 +5,7 @@ import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { sortSupportFirst } from "feature/supportTeam/utils/supportTeam.utils";
 import { motion } from "framer-motion";
 import { useOnlineUsers } from "hooks/useOnlineUsers";
+import { useTranslation } from "hooks/useTranslation";
 import type { ActivityPreview } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { Monitor } from "lucide-react";
 import Link from "next/link";
@@ -95,11 +95,13 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
                                         )}
 
                                         {/* Bottom-right: heart mark for supporters, plain state dot for
-                                        everyone else — the rotating ring already says "online" for them. */}
+                                        everyone else — the rotating ring already says "online" for them.
+                                        Both marks carry a z-index: mobile browsers lift the spinning rim
+                                        over anything that only relies on DOM order. */}
                                         {supportMember ? (
                                             <SupportMark
                                                 member={supportMember}
-                                                className="absolute -bottom-0.5 -right-0.5"
+                                                className="absolute -bottom-0.5 -right-0.5 z-10"
                                             />
                                         ) : (
                                             <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-zinc-950 ${isPracticing ? 'bg-cyan-500' : 'bg-emerald-500'}`}>
@@ -114,7 +116,7 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
                                         neighbor in the stack, so bottom-left gets hidden there. */}
                                         {user.platform === "desktop" && (
                                             <div
-                                                className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-zinc-950 bg-zinc-800"
+                                                className="absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-zinc-950 bg-zinc-800"
                                                 title={t("using_desktop_app")}>
                                                 <Monitor className="h-2 w-2 text-zinc-400" strokeWidth={2.5} />
                                             </div>

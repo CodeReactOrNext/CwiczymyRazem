@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 
 import { cleanup, render, screen } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { SupportAvatarRing } from "./SupportAvatarRing";
+import { getRimMask, SupportAvatarRing } from "./SupportAvatarRing";
 
 afterEach(cleanup);
 
@@ -36,6 +37,20 @@ describe("SupportAvatarRing", () => {
     expect(rim.style.background).toContain("conic-gradient");
     expect(rim.className).toContain("animate-spin-slow");
     expect(rim.className).toContain("rounded-full");
+  });
+
+  it("masks the rim down to a ring, so a mis-layered rim cannot cover the avatar", () => {
+    // jsdom drops mask-image from inline styles, so read the server markup.
+    const markup = renderToStaticMarkup(
+      <SupportAvatarRing>
+        <div />
+      </SupportAvatarRing>,
+    );
+
+    expect(markup).toContain(`mask-image:${getRimMask(2)}`);
+    expect(getRimMask(2)).toBe(
+      "radial-gradient(circle closest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))",
+    );
   });
 
   it("stays square in a cramped flex row, so the rings cannot go elliptical", () => {
