@@ -255,6 +255,25 @@ export interface FirebaseLogsExamPassedInterface {
   reactionFame?: LogReactionFame;
 }
 
+/** An exercise goal reached — the target tempo played clean enough times in goal mode. */
+export interface FirebaseLogsGoalCompletedInterface {
+  uid: string;
+  userName: string;
+  timestamp: string | number | Date;
+  type: "exercise_goal_completed";
+  data: string;
+  goalId: string;
+  exerciseId: string;
+  exerciseTitle: string;
+  targetBpm: number;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
+  id?: string;
+  reactions?: string[];
+  reactionFame?: LogReactionFame;
+}
+
 /** A step of a Mastery Roadmap crossing into "done". */
 export interface FirebaseLogsRoadmapStepInterface {
   uid: string;

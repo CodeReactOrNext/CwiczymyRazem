@@ -42,6 +42,7 @@
   "song_count_other": "utwory: {{count}}",
   "passed_exam": "zdał egzamin {{step}}",
   "completed_roadmap_step": "ukończył {{step}} w roadmapie {{roadmap}}",
+  "reached_exercise_goal": "osiągnął cel tempa w {{exercise}}",
   "joined": "dołączył(a) do Riff Quest",
   "joined_with": "dołączył(a) do Riff Quest, {{phrase}}",
   "completed_daily_quests": "ukończył wszystkie {{quests}}",

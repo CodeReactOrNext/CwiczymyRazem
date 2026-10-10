@@ -9,6 +9,12 @@ import type { SalvagedMod } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { MarketplaceItemType } from "feature/arsenal/types/marketplace.types";
 import { MARKETPLACE_LISTING_FEE } from "feature/arsenal/types/marketplace.types";
+import { SLOT_LABELS } from "feature/guitarBuilder/data/components";
+import type { OwnedComponent } from "feature/guitarBuilder/types/guitarBuilder.types";
+import {
+  getComponent,
+  getComponentResaleValue,
+} from "feature/guitarBuilder/utils/components";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
@@ -29,7 +35,12 @@ export default async function handler(
   };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
-  if (itemType !== "guitar" && itemType !== "effect" && itemType !== "mod") {
+  if (
+    itemType !== "guitar" &&
+    itemType !== "effect" &&
+    itemType !== "mod" &&
+    itemType !== "component"
+  ) {
     return res.status(400).json({ error: "Invalid itemType" });
   }
   if (!inventoryItemId)
@@ -75,7 +86,24 @@ export default async function handler(
       let itemRarity: string;
       let itemImageId: number | string;
 
-      if (itemType === "mod") {
+      if (itemType === "component") {
+        const components: OwnedComponent[] = data.arsenal?.components || [];
+        const index = components.findIndex((c) => c.uid === inventoryItemId);
+        if (index === -1) throw new Error("ITEM_NOT_FOUND");
+        const part = components[index];
+        const def = getComponent(part.defId);
+        if (!def) throw new Error("DEF_NOT_FOUND");
+
+        minPrice = getComponentResaleValue(part);
+        escrowed = { ...part, id: part.uid, isNew: false };
+        defId = part.defId;
+        itemName = def.name;
+        itemBrand = `${SLOT_LABELS[def.slot]} · Builder part`;
+        itemRarity = def.rarity;
+        itemImageId = part.defId;
+
+        userUpdate["arsenal.components"] = components.filter((_, i) => i !== index);
+      } else if (itemType === "mod") {
         const salvagedMods: SalvagedMod[] = data.arsenal?.salvagedMods || [];
         const modIndex = salvagedMods.findIndex(
           (m) => m.id === inventoryItemId,
@@ -218,8 +246,9 @@ export default async function handler(
       };
     });
 
-    // Public activity log (panel only).
-    try {
+    // Public activity log (panel only). Builder parts stay out of the feed —
+    // it only knows how to draw gear and mods.
+    if (itemType !== "component") try {
       await firestore.collection("logs").add({
         type: "marketplace_listing",
         uid: userId,

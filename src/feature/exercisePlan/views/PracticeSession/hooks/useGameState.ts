@@ -32,6 +32,9 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   const noteTimingsRef       = useRef<Record<string, NoteTiming>>({});
   /** Hits per timing grade over the whole run, loops included — like the score. */
   const timingCountsRef      = useRef<TimingCounts>(emptyTimingCounts());
+  /** Signed attack offsets (ms, + = late) of every timed hit this run, loops
+   *  included — what the run's timing precision is read from. */
+  const timingOffsetsRef     = useRef<number[]>([]);
 
   const reset = useCallback(() => {
     setHitNotes({});    hitNotesRef.current          = {};
@@ -46,6 +49,7 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     minScoredBpmRef.current      = null;
     setNoteTimings({}); noteTimingsRef.current = {};
     timingCountsRef.current      = emptyTimingCounts();
+    timingOffsetsRef.current     = [];
   }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -76,7 +80,7 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
     maxComboRef, needsFlushRef, minScoredBpmRef,
-    noteTimingsRef, timingCountsRef,
+    noteTimingsRef, timingCountsRef, timingOffsetsRef,
     flushToReact, reset,
   };
 }

@@ -1,7 +1,7 @@
 interface SellConfirmDialogProps {
   isOpen: boolean;
   /** What is being sold. Stash clutter — mods and loose parts — sells here too. */
-  itemType: "Guitar" | "Effect" | "Mod" | "Parts";
+  itemType: "Guitar" | "Effect" | "Mod" | "Parts" | "Part";
   itemName: string;
   fameReward: number;
   onConfirm: () => void;

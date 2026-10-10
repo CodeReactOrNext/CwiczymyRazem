@@ -66,6 +66,16 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
+      // Exercise goals (target tempo + clean-run count) and the scored runs the
+      // goals panel charts — owner only. Goals carry no reward (the only side
+      // effect of reaching one is a feed log), so the client writes them directly.
+      match /exerciseGoals/{goalId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      match /exerciseRuns/{exerciseId}/runs/{runId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
       // Daily submission counters (e.g. community section-map sharing) — the
       // owner may read their own counter, but only the backend (Admin SDK)
       // may write it, otherwise a client could reset its own rate limit.

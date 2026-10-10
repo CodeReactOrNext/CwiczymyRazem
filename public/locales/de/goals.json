@@ -1,0 +1,112 @@
+{
+  "page": {
+    "title": "Ziele",
+    "subtitle": "Setze ein Tempo für eine Übung und spiele sie dreimal sauber",
+    "eyebrow": "Deine Ziele",
+    "new_goal": "Neues Ziel"
+  },
+  "empty": {
+    "title": "Noch keine Ziele",
+    "body": "Wähle eine Übung und das Tempo, das du erreichen willst. Spiele sie dann im Zielmodus, bis drei Durchgänge sauber sind.",
+    "cta": "Erstes Ziel setzen"
+  },
+  "active_title": "Aktiv",
+  "history_title": "Erreicht",
+  "no_active": "Gerade keine offenen Ziele. Setze ein neues oder lege bei einem erreichten die Latte höher.",
+  "card": {
+    "rules": "{{accuracy}}% Genauigkeit · {{counting}}",
+    "delete": "Ziel löschen",
+    "progress": "{{count}} von {{total}} sauberen Durchgängen",
+    "start": "Zielversuch starten",
+    "best_so_far": "Schnellster Durchgang",
+    "no_tempo": "Noch kein bewerteter Durchgang. Spiele die Übung mit Mikrofon, um dein Starttempo festzulegen.",
+    "at_tempo": "Das Zieltempo ist erreicht. Jetzt drei saubere Durchgänge.",
+    "to_go": "Noch {{bpm}} BPM"
+  },
+  "counting": {
+    "streak": "in Folge",
+    "total": "insgesamt"
+  },
+  "strictness": {
+    "relaxed": "Locker",
+    "standard": "Standard",
+    "strict": "Streng"
+  },
+  "chart": {
+    "target": "Ziel {{bpm}} BPM",
+    "practice_run": "Übung",
+    "goal_run": "Zielversuch",
+    "clean_goal_run": "Sauberer Zielversuch",
+    "accuracy": "{{accuracy}}% Genauigkeit",
+    "missed_goal_run": "Zielversuch, nicht sauber",
+    "empty": "Hier erscheinen deine bewerteten Durchgänge, die Linie zeigt das Zieltempo.",
+    "metric_label": "Was das Diagramm zeigt",
+    "metric_tempo": "Tempo",
+    "metric_timing": "Timing"
+  },
+  "create": {
+    "title": "Neues Ziel",
+    "description": "Wähle eine Übung und das Zieltempo. Ein Ziel ist nach drei sauberen Durchgängen im Zielmodus erreicht.",
+    "exercise_label": "Übung",
+    "search": "Übungen suchen",
+    "no_results": "Keine passenden Übungen.",
+    "has_goal": "Hat ein Ziel",
+    "bpm_range": "Bereich der Übung {{min}}–{{max}} BPM",
+    "change_exercise": "Ändern",
+    "bpm_label": "Zieltempo",
+    "bpm_invalid": "Wähle ein Tempo zwischen {{min}} und {{max}} BPM.",
+    "strictness_label": "Wie sauber",
+    "strictness_hint": "Die geringste Genauigkeit, mit der ein Durchgang zählt.",
+    "counting_label": "Drei saubere Durchgänge",
+    "counting_hint_streak": "Ein nicht sauberer Durchgang setzt die Zählung zurück.",
+    "counting_hint_total": "Saubere Durchgänge summieren sich, egal was dazwischen passiert.",
+    "cancel": "Nicht jetzt",
+    "save": "Ziel setzen",
+    "reached_title": "Ziel erreicht! Latte höher legen?",
+    "raise_title": "Latte höher legen",
+    "raise_description": "Du hast {{exercise}} sauber mit {{bpm}} BPM gespielt. Setze das nächste Tempo.",
+    "counting_option": {
+      "streak": "In Folge",
+      "total": "Insgesamt"
+    },
+    "bpm_down": "5 BPM langsamer",
+    "bpm_up": "5 BPM schneller"
+  },
+  "history": {
+    "reached_on": "Erreicht am {{date}}",
+    "raise": "Latte höher legen"
+  },
+  "delete_confirm": {
+    "title": "Dieses Ziel löschen?",
+    "body": "Seine Durchgänge bleiben im Diagramm der Übung.",
+    "cancel": "Abbrechen",
+    "confirm": "Löschen"
+  },
+  "toast": {
+    "created": "Ziel gesetzt",
+    "deleted": "Ziel gelöscht",
+    "error": "Etwas ist schiefgelaufen. Versuche es erneut."
+  },
+  "verdict": {
+    "saving": "Durchgang wird gespeichert…",
+    "not_scored": "Das Mikrofon hat diesen Durchgang nicht bewertet, er zählt also nicht für das Ziel.",
+    "error": "Der Durchgang konnte nicht gespeichert werden. Versuche es erneut.",
+    "completed": "Ziel erreicht! {{bpm}} BPM, drei saubere Durchgänge.",
+    "closed": "Dieses Ziel ist bereits erreicht.",
+    "clean": "Sauberer Durchgang",
+    "not_clean": "Noch nicht sauber",
+    "too_slow": "Gespielt mit {{bpm}} BPM — das Ziel ist {{target}} BPM.",
+    "accuracy": "{{accuracy}}% Genauigkeit — dieses Ziel braucht {{required}}%.",
+    "streak_reset": "Die Zählung beginnt von vorn: Dieses Ziel braucht saubere Durchgänge in Folge.",
+    "eyebrow": "Zielversuch · {{bpm}} BPM"
+  },
+  "timing": {
+    "offset": "{{ms}} ms neben dem Schlag",
+    "centered": "Mittig auf dem Schlag",
+    "ahead": "Meist {{ms}} ms vor dem Schlag",
+    "behind": "Meist {{ms}} ms hinter dem Schlag",
+    "tight_zone": "Genau (bis {{ms}} ms)",
+    "explainer": "Wie weit deine Noten in jedem Durchgang typischerweise vom Schlag entfernt landen — weiter oben ist genauer. Das Timing hängt von der Latenzkalibrierung ab: Wenn jeder Durchgang in dieselbe Richtung zieht, kalibriere einmal.",
+    "empty": "Das Timing erscheint nach Durchgängen, die mit Mikrofon bewertet wurden. Ältere Sitzungen haben es nicht gespeichert."
+  }
+}

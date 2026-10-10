@@ -9,7 +9,7 @@ import { IconBox } from "components/IconBox/IconBox";
 import { resolveLiveActivity } from "components/OnlineUsers/liveActivity";
 import Avatar from "components/UI/Avatar";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
-import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { getRankBadgeSrc, isGuitarImageId } from "feature/arsenal/utils/guitarImage";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
@@ -275,7 +275,7 @@ export const UserTooltip = ({
               {(() => {
                 const lvl = userData.statistics.level ?? 0;
                 const imgPath = userData.selectedGuitar ?? (lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : lvl);
-                const isSpecial = typeof imgPath === "string" && imgPath.includes("special/");
+                const isSpecial = isGuitarImageId(imgPath);
 
                 if (isSpecial) {
                   return (

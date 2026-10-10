@@ -18,6 +18,8 @@ import { useNoteMatching } from "../hooks/useNoteMatching";
 import type { SlotResult } from "../hooks/useStrummingMatcher";
 import { useStrummingMatcher } from "../hooks/useStrummingMatcher";
 import type { NoteTiming, TimingCounts } from "../utils/timingGrade";
+import type { TimingPrecision } from "../utils/timingPrecision";
+import { summarizeTimingOffsets } from "../utils/timingPrecision";
 
 // ── Context value (what subscribing components read) ─────────────────────────
 
@@ -95,6 +97,9 @@ export interface NoteMatchingSnapshot {
   /** Hits per timing grade over the run; null where timing isn't graded
    *  (hunts, strumming). */
   timing?: TimingCounts | null;
+  /** How tightly the run's timed notes sat on the beat; null where timing
+   *  isn't graded, or too few notes could be timed. */
+  timingPrecision?: TimingPrecision | null;
 }
 
 export interface NoteMatchingHandle {
@@ -246,6 +251,7 @@ export function NoteMatchingProvider({
     minScoredBpmRef,
     noteTimings,
     timingCountsRef,
+    timingOffsetsRef,
     resetGame,
   } = useNoteMatching({
     isPlaying,
@@ -490,6 +496,7 @@ export function NoteMatchingProvider({
       ...latestRef.current,
       minScoredBpm: isHunt || isStrummingExercise ? null : minScoredBpmRef.current,
       timing: isHunt || isStrummingExercise ? null : { ...timingCountsRef.current },
+      timingPrecision: isHunt || isStrummingExercise ? null : summarizeTimingOffsets(timingOffsetsRef.current),
     }),
   };
 

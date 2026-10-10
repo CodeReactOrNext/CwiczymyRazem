@@ -13,6 +13,7 @@ import {
   getEffectScrapYield,
   getGuitarScrapYield,
 } from "feature/arsenal/utils/scrap";
+import { ComponentPreviewCard } from "feature/guitarBuilder/components/ComponentPreviewCard";
 import { Unplug, X } from "lucide-react";
 import Link from "next/link";
 
@@ -22,7 +23,10 @@ import type {
   SalvagedMod,
   ScrapPart,
 } from "../../types/arsenal.types";
-import type { MarketplaceListing } from "../../types/marketplace.types";
+import type {
+  ListedComponent,
+  MarketplaceListing,
+} from "../../types/marketplace.types";
 import { BuyButton } from "../BuyButton";
 import { SalvagedModCard } from "../Collection/SalvagedModCard";
 import { DexMarks } from "../DexMarks";
@@ -52,8 +56,8 @@ interface MarketListingCardProps {
  * a duplicate, so it belongs next to the price rather than behind a purchase.
  */
 const getListingScrapYield = (listing: MarketplaceListing): ScrapPart[] => {
-  // A mod is already the component — there is nothing to break it down into.
-  if (listing.itemType === "mod") return [];
+  // A mod or a Builder part is already the component — nothing to break down.
+  if (listing.itemType === "mod" || listing.itemType === "component") return [];
 
   if (listing.itemType === "guitar") {
     const item = listing.item as InventoryItem;
@@ -83,7 +87,7 @@ export const MarketListingCard = ({
   // item's own id, so the buyer gets exactly the one advertised here — nothing
   // is rolled at purchase.
   const salvaged =
-    listing.itemType === "mod"
+    listing.itemType === "mod" || listing.itemType === "component"
       ? null
       : getSalvageableMod(
           listing.item as InventoryItem | EffectInventoryItem,
@@ -189,6 +193,18 @@ export const MarketListingCard = ({
   if (listing.itemType === "mod") {
     return (
       <SalvagedModCard mod={listing.item as SalvagedMod} footer={footer} />
+    );
+  }
+
+  if (listing.itemType === "component") {
+    return (
+      <div className='flex flex-col overflow-hidden rounded-lg bg-zinc-900'>
+        <ComponentPreviewCard
+          component={listing.item as ListedComponent}
+          className='w-full'
+        />
+        {footer}
+      </div>
     );
   }
 
