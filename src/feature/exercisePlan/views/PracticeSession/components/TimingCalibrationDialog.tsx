@@ -6,7 +6,7 @@ import { useTranslation } from "hooks/useTranslation";
 import { Mic, Timer } from "lucide-react";
 
 import { useSessionUI } from "../contexts/SessionUIContext";
-import { useTimingCalibration } from "../hooks/useTimingCalibration";
+import { timingInputPath, useCalibratedLatencyMs, useTimingCalibration } from "../hooks/useTimingCalibration";
 import type { CalibrationRunState } from "../hooks/useTimingCalibrationRun";
 import { useTimingCalibrationRun } from "../hooks/useTimingCalibrationRun";
 import type { CalibrationResult } from "../utils/timingCalibration";
@@ -17,6 +17,8 @@ interface TimingCalibrationDialogProps {
   /** The session metronome's context, so the clicks take the session's output path. */
   audioContext: AudioContext | null;
   isListening: boolean;
+  /** Desktop app native capture — its measurement is kept apart from the browser's. */
+  isNative: boolean;
   /** The formula-based latency used while uncalibrated, shown for comparison. */
   estimateLatencyMs: () => number;
   onEnableMic: () => void;
@@ -37,9 +39,10 @@ const Step = ({ n, children }: { n: number; children: React.ReactNode }) => (
 );
 
 const IdleStep = ({
-  isListening, savedLatencyMs, estimateLatencyMs, onStart, onEnableMic, onUseEstimate,
+  isListening, isNative, savedLatencyMs, estimateLatencyMs, onStart, onEnableMic, onUseEstimate,
 }: {
   isListening: boolean;
+  isNative: boolean;
   savedLatencyMs: number | null;
   estimateLatencyMs: () => number;
   onStart: () => void;
@@ -70,7 +73,7 @@ const IdleStep = ({
       {savedLatencyMs !== null ? (
         <>
           <span className='font-semibold tabular-nums text-zinc-100'>{savedLatencyMs} ms</span>
-          <span className='text-zinc-400'> — {t("timing.measured_here")}</span>
+          <span className='text-zinc-400'> — {t(isNative ? "timing.measured_here_desktop" : "timing.measured_here")}</span>
         </>
       ) : (
         <>
@@ -215,11 +218,11 @@ const ResultStep = ({
  * so tab-note timing grades line up with what the player actually hears.
  */
 export const TimingCalibrationDialog = ({
-  audioRefs, audioContext, isListening, estimateLatencyMs, onEnableMic, onBeforeStart,
+  audioRefs, audioContext, isListening, isNative, estimateLatencyMs, onEnableMic, onBeforeStart,
 }: TimingCalibrationDialogProps) => {
   const { t } = useTranslation("session");
   const { isTimingCalibrationOpen, closeTimingCalibration } = useSessionUI();
-  const savedLatencyMs = useTimingCalibration((s) => s.latencyMs);
+  const savedLatencyMs = useCalibratedLatencyMs(isNative);
   const setLatency = useTimingCalibration((s) => s.setLatency);
   const { state, start, reset } = useTimingCalibrationRun({ audioRefs, audioContext });
 
@@ -234,7 +237,7 @@ export const TimingCalibrationDialog = ({
   };
 
   const handleSave = (latencyMs: number) => {
-    setLatency(latencyMs);
+    setLatency(timingInputPath(isNative), latencyMs);
     close();
   };
 
@@ -250,11 +253,12 @@ export const TimingCalibrationDialog = ({
           {state.phase === "idle" && (
             <IdleStep
               isListening={isListening}
+              isNative={isNative}
               savedLatencyMs={savedLatencyMs}
               estimateLatencyMs={estimateLatencyMs}
               onStart={handleStart}
               onEnableMic={onEnableMic}
-              onUseEstimate={() => setLatency(null)}
+              onUseEstimate={() => setLatency(timingInputPath(isNative), null)}
             />
           )}
 

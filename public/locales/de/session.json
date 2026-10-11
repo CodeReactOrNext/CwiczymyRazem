@@ -75,6 +75,7 @@
     "step3": "Spiel mit dem Klick, nicht davor.",
     "now_using": "Aktuell",
     "measured_here": "in diesem Browser gemessen",
+    "measured_here_desktop": "in der Desktop-App gemessen",
     "estimate": "geschätzt, noch nicht gemessen",
     "mic_first": "Erst das Mikrofon einschalten",
     "forget": "Messung verwerfen und zur Schätzung zurückkehren",

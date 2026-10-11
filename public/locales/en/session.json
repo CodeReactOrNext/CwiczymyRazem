@@ -75,6 +75,7 @@
     "step3": "Play with the click, not ahead of it.",
     "now_using": "Now using",
     "measured_here": "measured in this browser",
+    "measured_here_desktop": "measured in the desktop app",
     "estimate": "an estimate, not measured yet",
     "mic_first": "Turn on the mic first",
     "forget": "Forget the measurement and go back to the estimate",

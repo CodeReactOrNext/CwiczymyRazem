@@ -66,7 +66,7 @@ import { useScoreSaving } from "./hooks/useScoreSaving";
 import { useSessionAudio } from "./hooks/useSessionAudio";
 import { useSessionControls } from "./hooks/useSessionControls";
 import { useSongExerciseGpFile } from "./hooks/useSongExerciseGpFile";
-import { useTimingCalibration } from "./hooks/useTimingCalibration";
+import { timingInputPath, useTimingCalibration } from "./hooks/useTimingCalibration";
 import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
 
@@ -166,7 +166,7 @@ export const PracticeSession = ({
   // useUpdateRequiredGate). Checked once at session start, never mid-session.
   const updateRequired = useUpdateRequiredGate();
   // Read up here, above the early returns; picked per input path once it is known.
-  const measuredLatencyMs = useTimingCalibration((s) => s.latencyMs);
+  const timingByPath = useTimingCalibration((s) => s.byPath);
 
   if (updateRequired) {
     return (
@@ -555,9 +555,9 @@ export const PracticeSession = ({
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
   const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel } = useGuitarAudioInput();
-  // The player's measured latency — browser path only. The desktop app's native
-  // capture works its own latency out from the driver and IPC, and it holds up.
-  const calibratedLatencyMs = isNative ? null : measuredLatencyMs;
+  // The player's measured latency for the input path in use — the browser and the
+  // desktop app keep separate measurements (different capture chains).
+  const calibratedLatencyMs = timingByPath[timingInputPath(isNative)].latencyMs;
 
   const {
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
@@ -956,7 +956,7 @@ export const PracticeSession = ({
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>
-    <SessionUIProvider canCalibrateTiming={!isNative}>
+    <SessionUIProvider>
     <>
       {/* Intro splash that always plays on session mount, then parts open
           (door-reveal) to show the session beneath. */}
@@ -1156,7 +1156,7 @@ export const PracticeSession = ({
 
       <TimingCalibrationDialog
         audioRefs={audioRefs} audioContext={metronome.audioContext}
-        isListening={isListening} estimateLatencyMs={getLatencyMs}
+        isListening={isListening} isNative={isNative} estimateLatencyMs={getLatencyMs}
         onEnableMic={() => { if (isMicEnabled) void initAudio(); else updateMicPersistence(true); }}
         onBeforeStart={() => { stopTimer(); metronome.stopMetronome(); }}
       />
