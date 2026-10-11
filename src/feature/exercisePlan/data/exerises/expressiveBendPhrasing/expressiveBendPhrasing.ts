@@ -7,6 +7,8 @@ export const expressiveBendPhrasingExercise: Exercise = {
   whyItMatters: "Bending is one of the most expressive techniques on the guitar, mimicking the human voice. Proper bending technique involves using the strength of multiple fingers and rotating the wrist to achieve perfect intonation and prevent string slippage.",
   difficulty: "medium",
   category: "technique",
+  // A bending drill: scored on how close each bend gets to its pitch.
+  scoringFocus: "pitch",
   timeInMinutes: 4,
   instructions: [
     "Support the bending finger with your adjacent fingers to maximize control and stability.",

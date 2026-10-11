@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { LivePitch } from "feature/exercisePlan/views/PracticeSession/utils/pitchScoring";
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import { useTranslation } from "hooks/useTranslation";
 import { SkipBack } from "lucide-react";
@@ -31,6 +32,8 @@ interface TablatureViewerProps {
   missedNotes?: Record<string, boolean>;
   /** noteKey -> how the hit was timed; an off-beat hit marks where it was played. */
   noteTimings?: Record<string, NoteTiming>;
+  /** The bend under the cursor, read every frame to animate how far it has gone. */
+  livePitchRef?: React.MutableRefObject<LivePitch | null>;
   currentBeatsElapsed?: number;
   hideNotes?: boolean;
   audioContext?: AudioContext | null;
@@ -98,6 +101,7 @@ const TablatureViewerInner = ({
   hitNotes = {},
   missedNotes = {},
   noteTimings = NO_TIMINGS,
+  livePitchRef,
   hideNotes = false,
   audioContext,
   audioStartTime,
@@ -138,7 +142,7 @@ const TablatureViewerInner = ({
   const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat } = useTablatureWorkerBridge({
     canvasRef, containerRef, containerSize, renderData,
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,
-    hitNotes, missedNotes, noteTimings, hideNotes, hideDynamicsLane,
+    hitNotes, missedNotes, noteTimings, livePitchRef, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
     loopStartBeat, loopEndBeat, zoom, tuningStrings, style, selection, obscured,
     quarterTurned,
@@ -265,6 +269,7 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.hitNotes         === next.hitNotes           &&
   prev.missedNotes      === next.missedNotes        &&
   prev.noteTimings      === next.noteTimings        &&
+  prev.livePitchRef      === next.livePitchRef        &&
   prev.hideDynamicsLane === next.hideDynamicsLane   &&
   prev.currentBeat      === next.currentBeat        &&
   prev.obscured         === next.obscured           &&

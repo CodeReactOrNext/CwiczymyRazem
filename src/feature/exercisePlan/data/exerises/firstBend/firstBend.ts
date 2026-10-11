@@ -11,6 +11,8 @@ export const firstBendExercise: Exercise = {
   whyItMatters: "This exercise teaches you to target bent pitches by ear rather than guessing. It trains your muscle memory to hit the exact whole-step pitch perfectly every time, preventing flat or out-of-tune bends.",
   difficulty: "easy",
   category: "technique",
+  // A bending drill: scored on how close each bend gets to its pitch.
+  scoringFocus: "pitch",
   timeInMinutes: 1.49,
   instructions: [
     "Play the reference note first to lock the target pitch in your ear.",

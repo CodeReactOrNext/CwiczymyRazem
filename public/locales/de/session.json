@@ -219,7 +219,19 @@
     "score": "Score",
     "over_time": "Leistung im Verlauf",
     "pass": "Bestanden",
-    "back_to_menu": "Zurück zum Menü"
+    "back_to_menu": "Zurück zum Menü",
+    "intonation_over_time": "Intonation, Ton für Ton",
+    "timing_over_time": "Timing, Ton für Ton",
+    "chart_sharp": "zu hoch",
+    "chart_flat": "zu tief",
+    "chart_late_axis": "zu spät",
+    "chart_early_axis": "zu früh",
+    "chart_note": "Ton {{n}}",
+    "chart_on_beat": "auf dem Beat",
+    "chart_early": "{{ms}} ms zu früh",
+    "chart_late": "{{ms}} ms zu spät",
+    "chart_notes_one": "{{count}} Ton",
+    "chart_notes_other": "{{count}} Töne"
   },
   "quiz": {
     "stop": "Stopp",
@@ -406,7 +418,23 @@
       "1": "Locker",
       "2": "Knapp",
       "3": "Pünktlich"
-    }
+    },
+    "share": "{{pct}}% pünktlich",
+    "note": "Ein Ton neben dem Beat zählt trotzdem, aber weniger: eine 2 behält zwei Drittel der Punkte, eine 1 ein Drittel.",
+    "lean_early": "Meist zu früh — etwa {{ms}} ms vor dem Beat",
+    "lean_late": "Meist zu spät — etwa {{ms}} ms hinter dem Beat"
+  },
+  "intonation_breakdown": {
+    "title": "Intonation",
+    "share": "{{pct}}% sauber",
+    "grades": {
+      "1": "Daneben",
+      "2": "Knapp",
+      "3": "Sauber"
+    },
+    "note": "Ein Ton oder Bend neben der Tonhöhe zählt trotzdem, aber weniger: innerhalb von 40 Cent zwei Drittel der Punkte, weiter daneben ein Drittel.",
+    "lean_flat": "Meist zu tief — deine Töne liegen etwa {{cents}} Cent unter der Tonhöhe",
+    "lean_sharp": "Meist zu hoch — deine Töne liegen etwa {{cents}} Cent über der Tonhöhe"
   },
   "shortcuts": {
     "title": "Tastenkürzel",

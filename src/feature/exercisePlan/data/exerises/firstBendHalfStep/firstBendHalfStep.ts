@@ -12,7 +12,9 @@ export const firstBendHalfStepExercise: Exercise = {
   whyItMatters: "Developing accurate bending mechanics early prevents the development of weak finger-only bending habits. Precise half-step bends are critical for smooth blues and rock phrasing, helping you hit the target pitch perfectly every time.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  // A bending drill: scored on how close each bend gets to its pitch.
+  scoringFocus: "pitch",
+  timeInMinutes: 2,
   instructions: [
     "Use your middle and index fingers to support the ring finger during the push.",
     "Push the string upward perpendicular to the neck to achieve the target half-step pitch."

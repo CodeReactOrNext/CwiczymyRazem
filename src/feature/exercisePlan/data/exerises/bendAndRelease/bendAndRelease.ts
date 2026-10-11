@@ -23,6 +23,9 @@ export const bendAndReleaseExercise: Exercise = {
     "Rotate your wrist from the forearm to drive the bend, rather than pushing from the finger joints.",
   ],
   metronomeSpeed: { min: 40, max: 65, recommended: 48 },
+  // The drill is about where the string ends up, not about when the next note
+  // is picked — scored on intonation, timing only shown.
+  scoringFocus: "pitch",
   relatedSkills: ["bending"],
   tablature: [
     // M1: G string — bend (half note), release (half note)

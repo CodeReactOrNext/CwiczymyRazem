@@ -219,7 +219,21 @@
     "score": "Wynik",
     "over_time": "Wynik w czasie",
     "pass": "Zaliczenie",
-    "back_to_menu": "Wróć do menu"
+    "back_to_menu": "Wróć do menu",
+    "intonation_over_time": "Intonacja, nuta po nucie",
+    "timing_over_time": "Timing, nuta po nucie",
+    "chart_sharp": "za wysoko",
+    "chart_flat": "za nisko",
+    "chart_late_axis": "za późno",
+    "chart_early_axis": "za wcześnie",
+    "chart_note": "Nuta {{n}}",
+    "chart_on_beat": "na beat",
+    "chart_early": "{{ms}} ms za wcześnie",
+    "chart_late": "{{ms}} ms za późno",
+    "chart_notes_one": "{{count}} nuta",
+    "chart_notes_few": "{{count}} nuty",
+    "chart_notes_many": "{{count}} nut",
+    "chart_notes_other": "{{count}} nuty"
   },
   "quiz": {
     "stop": "Stop",
@@ -406,7 +420,23 @@
       "1": "Luźno",
       "2": "Blisko",
       "3": "Na czas"
-    }
+    },
+    "share": "{{pct}}% na czas",
+    "note": "Nuta obok beatu nadal się liczy, ale za mniej: 2 zachowuje dwie trzecie punktów, 1 — jedną trzecią.",
+    "lean_early": "Głównie za wcześnie — około {{ms}} ms przed beatem",
+    "lean_late": "Głównie za późno — około {{ms}} ms za beatem"
+  },
+  "intonation_breakdown": {
+    "title": "Intonacja",
+    "share": "{{pct}}% czysto",
+    "grades": {
+      "1": "Obok",
+      "2": "Blisko",
+      "3": "Czysto"
+    },
+    "note": "Nuta albo bend obok wysokości nadal się liczy, ale za mniej: do 40 centów zachowuje dwie trzecie punktów, dalej — jedną trzecią.",
+    "lean_flat": "Głównie za nisko — Twoje nuty wychodzą około {{cents}} centów pod wysokością",
+    "lean_sharp": "Głównie za wysoko — Twoje nuty wychodzą około {{cents}} centów ponad wysokość"
   },
   "shortcuts": {
     "title": "Skróty klawiszowe",

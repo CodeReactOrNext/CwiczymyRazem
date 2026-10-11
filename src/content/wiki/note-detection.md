@@ -28,13 +28,27 @@ All the app does is measure pitch. It has no opinion on whether you sounded good
 
 It's also fooled in both directions:
 
-<Checklist items="It gives you notes you didn't play::A ringing open string, a harmonic, or the tail of the previous note can land on the pitch it was waiting for and tick the box for you|It misses notes you played cleanly::Fast passages, heavy distortion, a room mic, a low B — all genuinely hard to read, and none of it is your fault|It can't hear the things that matter most::Timing, dynamics, tone, whether the phrase breathed. None of it is measured, so none of it shows up in the score" />
+<Checklist items="It gives you notes you didn't play::A ringing open string, a harmonic, or the tail of the previous note can land on the pitch it was waiting for and tick the box for you|It misses notes you played cleanly::Fast passages, heavy distortion, a room mic, a low B — all genuinely hard to read, and none of it is your fault|It can't hear most of what matters::It times your attacks, and on bend drills it checks how close each bend gets to pitch. Dynamics, tone and whether the phrase breathed aren't measured at all, so none of that shows up in the score" />
 
 So treat the score the way you'd treat a metronome: a useful second opinion on one narrow question, not a verdict on your playing. If your ear says a run was sloppy and the screen says 98%, **your ear is right**. If the screen says you missed a note you know you nailed, play it again and listen — if it sounded good, it was good, and the software was wrong.
 
 <BlogAlert type="important">
 Detection is a tool for catching wrong notes when you're learning something new and can't yet hear your own mistakes. It is not a replacement for learning to hear them. The goal is to need it less over time, not to chase a higher percentage.
 </BlogAlert>
+
+## What an exercise score grades
+
+Every note the app hears is a hit. What a hit is worth depends on what the exercise is about.
+
+**On most exercises, timing.** A note on the beat keeps all its points, one a little off keeps two thirds, and one clearly off the beat keeps a third. A small arrow under the note shows which way you missed it: pointing left if you were early, right if you were late. The summary after the run tells you which way you lean overall.
+
+**On bend drills, pitch.** Every note is judged by how in tune it is. A bend or release counts by how close it gets to the note it's aimed at, and a held note counts by where it sits while it rings, so pressing too hard and going sharp shows. Right on the pitch keeps everything, a little off keeps two thirds, and further off keeps a third. Timing costs nothing there. The arrows under the notes still show it, but the summary after the run is about pitch, and it tells you whether your notes tend to land flat or sharp.
+
+While a note rings, a small tuner over it shows where the string is: the dot sits in the green band when you're in tune, and the note itself fills green, amber or orange to match. A note that ended up off keeps its reading, for example +28¢ with an arrow up for sharp. While you bend, a curve next to the note fills as the string rises and turns green when you reach the pitch.
+
+The chart under the summary shows every note of the run in order: how far each one landed from the beat, or from its pitch on bend drills, with the green band marking the top grade. A run that starts tight and drifts as your hand tires shows up there straight away.
+
+If every note leans the same way by about the same amount, that's usually audio delay rather than your hands. With the mic on, press **Calibrate timing** next to the score above the tab and play along to a few clicks. The app measures the delay of your speakers or interface and grades against it from then on.
 
 ## Setting it up
 

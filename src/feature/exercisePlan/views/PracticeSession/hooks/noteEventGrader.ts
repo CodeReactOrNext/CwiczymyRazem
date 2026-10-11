@@ -30,6 +30,10 @@ export interface ExpectedAttack {
   toleranceCents: number;
   /** Minimum peak volume for an attack to count as this note being played. */
   volumeGate: number;
+  /** Earliest signed Δt (ms, negative = early) an attack may have and still be
+   *  this note's — for a note whose pitch is already ringing before it is due,
+   *  where an early attack of that pitch was the previous note's. */
+  earliestDeltaMs?: number;
 }
 
 export interface AttackAssignment {
@@ -43,6 +47,7 @@ export interface AttackAssignment {
 /** True when `event` could plausibly be an attempt at `expected`. */
 function isCandidate(event: DetectedNoteEvent, expected: ExpectedAttack, maxDeltaMs: number): boolean {
   if (Math.abs(event.onsetMs - expected.timeMs) > maxDeltaMs) return false;
+  if (expected.earliestDeltaMs !== undefined && event.onsetMs - expected.timeMs < expected.earliestDeltaMs) return false;
   if (event.peakVolume < expected.volumeGate) return false;
   if (event.pitchHz <= 20) return false; // never resolved — no pitch to compare
   // Same low-string 2nd-harmonic correction the live path applies; it only ever

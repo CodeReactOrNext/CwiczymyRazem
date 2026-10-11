@@ -16,6 +16,24 @@ export interface NoteTiming {
   /** How far the attack landed from the note's start, in beats (positive =
    *  late); null when the attack couldn't be measured. */
   offsetBeats: number | null;
+  /** Pitch-focused exercises only (see pitchScoring.ts): how close a bend,
+   *  pre-bend or release got to its written pitch. Absent until the note has
+   *  played out, since a bend is judged on where it got to. */
+  intonation?: { grade: TimingGrade; cents: number | null };
+}
+
+/**
+ * One note of a run, in the order the run graded it — loops included, unlike
+ * the tab's hit marks, which start over every pass. What the summary's chart
+ * is drawn from.
+ */
+export interface RunNote {
+  hit: boolean;
+  /** Signed attack offset (ms, + = late); null for a miss or an untimed hit. */
+  timingMs: number | null;
+  /** Signed cents off the pitch (+ = sharp), on runs that score intonation;
+   *  null until the note is graded, or where it couldn't be read. */
+  cents: number | null;
 }
 
 /** How many hits of a run landed on each grade. */

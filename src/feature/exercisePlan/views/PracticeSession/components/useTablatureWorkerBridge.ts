@@ -1,4 +1,5 @@
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { LivePitch } from "feature/exercisePlan/views/PracticeSession/utils/pitchScoring";
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -46,6 +47,8 @@ interface WorkerBridgeOptions {
   hitNotes:        Record<string, boolean | number>;
   missedNotes:     Record<string, boolean>;
   noteTimings:     Record<string, NoteTiming>;
+  /** The note under the cursor's live pitch — rides along with every TICK. */
+  livePitchRef?:    MutableRefObject<LivePitch | null>;
   hideNotes:       boolean;
   hideDynamicsLane: boolean;
   measures:        TablatureMeasure[] | undefined;
@@ -122,7 +125,7 @@ export interface TablatureStylePatch {
 export function useTablatureWorkerBridge({
   canvasRef, containerRef, containerSize, renderData,
   isPlaying, startTime, audioStartTime, bpm, countInRemaining,
-  hitNotes, missedNotes, noteTimings, hideNotes, hideDynamicsLane,
+  hitNotes, missedNotes, noteTimings, livePitchRef, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
   loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style, selection,
   obscured = false, quarterTurned = false,
@@ -215,14 +218,14 @@ export function useTablatureWorkerBridge({
     let lastTick = 0;
     const tick = (ts: number) => {
       if (ts - lastTick >= 33) {
-        workerRef.current?.postMessage({ type: 'TICK', audioCurrentSec: audioContext.currentTime });
+        workerRef.current?.postMessage({ type: 'TICK', audioCurrentSec: audioContext.currentTime, pitch: livePitchRef?.current ?? null });
         lastTick = ts;
       }
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [isPlaying, audioContext, countInRemaining, obscured]);
+  }, [isPlaying, audioContext, countInRemaining, obscured, livePitchRef]);
 
   // Clear rest state when stopped
   useEffect(() => {

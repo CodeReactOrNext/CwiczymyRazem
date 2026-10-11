@@ -219,7 +219,19 @@
     "score": "Score",
     "over_time": "Performance over time",
     "pass": "Pass",
-    "back_to_menu": "Back to Menu"
+    "back_to_menu": "Back to Menu",
+    "intonation_over_time": "Intonation, note by note",
+    "timing_over_time": "Timing, note by note",
+    "chart_sharp": "sharp",
+    "chart_flat": "flat",
+    "chart_late_axis": "late",
+    "chart_early_axis": "early",
+    "chart_note": "Note {{n}}",
+    "chart_on_beat": "on the beat",
+    "chart_early": "{{ms}} ms early",
+    "chart_late": "{{ms}} ms late",
+    "chart_notes_one": "{{count}} note",
+    "chart_notes_other": "{{count}} notes"
   },
   "quiz": {
     "stop": "Stop",
@@ -406,7 +418,23 @@
       "1": "Loose",
       "2": "Close",
       "3": "On time"
-    }
+    },
+    "share": "{{pct}}% on time",
+    "note": "A note off the beat still counts, but for less: a 2 keeps two thirds of its points, a 1 keeps a third.",
+    "lean_early": "Mostly early — about {{ms}} ms ahead of the beat",
+    "lean_late": "Mostly late — about {{ms}} ms behind the beat"
+  },
+  "intonation_breakdown": {
+    "title": "Intonation",
+    "share": "{{pct}}% in tune",
+    "grades": {
+      "1": "Off",
+      "2": "Close",
+      "3": "In tune"
+    },
+    "note": "A note or bend off its pitch still counts, but for less: within 40 cents keeps two thirds of its points, further off a third.",
+    "lean_flat": "Mostly flat — your notes land about {{cents}} cents under the pitch",
+    "lean_sharp": "Mostly sharp — your notes land about {{cents}} cents over the pitch"
   },
   "shortcuts": {
     "title": "Keyboard shortcuts",

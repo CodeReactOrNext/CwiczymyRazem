@@ -89,6 +89,16 @@ describe("assignAttacks", () => {
     expect(assignAttacks([ev(0, 164.82)], expected, 130)).toHaveLength(1);
   });
 
+  it("keeps an attack earlier than a note's floor for the note before it", () => {
+    // A note whose pitch is already ringing: an attack 300 ms ahead was the
+    // previous note settling, not this one being picked early.
+    const expected: ExpectedAttack[] = [{ ...exp_("n0", 1000, E4), earliestDeltaMs: -200 }];
+    expect(assignAttacks([ev(700, E4)], expected, 420)).toHaveLength(0);
+    expect(assignAttacks([ev(850, E4)], expected, 420)).toEqual([{ key: "n0", eventIndex: 0, deltaMs: -150 }]);
+    // Late attacks aren't affected by the floor.
+    expect(assignAttacks([ev(1300, E4)], expected, 420)).toHaveLength(1);
+  });
+
   it("does not invent matches from an empty side", () => {
     expect(assignAttacks([], [exp_("n0", 0, E4)], 130)).toHaveLength(0);
     expect(assignAttacks([ev(0, E4)], [], 130)).toHaveLength(0);

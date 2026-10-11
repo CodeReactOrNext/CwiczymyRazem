@@ -93,7 +93,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   quarterTurned = false,
 }: MobileTablaturePanelProps) {
   const { t } = useTranslation("session");
-  const { hitNotes, missedNotes, noteTimings } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, noteTimings, livePitchRef } = useNoteMatchingContext();
   const { tuning } = useGuitarTuningContext();
   const {
     settings,
@@ -187,6 +187,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             hitNotes={hitNotes}
             missedNotes={missedNotes}
             noteTimings={noteTimings}
+            livePitchRef={livePitchRef}
             currentBeatsElapsed={0}
             resetKey={resetKey}
             zoom={zoom * MOBILE_FIT}

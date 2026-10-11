@@ -161,6 +161,9 @@ export interface BackingTrack {
 /** The two ways a song from the library can be practised inside a routine. */
 export type SongPracticeMode = "gp" | "sections";
 
+/** What a mic-scored run rewards on top of hitting the notes — see Exercise.scoringFocus. */
+export type ScoringFocus = "timing" | "pitch";
+
 export interface Exercise {
   id: string;
   premium?: boolean;
@@ -289,6 +292,11 @@ export interface Exercise {
    *  with the spacebar. See feature/exercisePlan/utils/isNoGuitarExercise. */
   noGuitarNeeded?: boolean;
   disableMic?: boolean;
+  /** What the mic score rewards beyond hitting the notes. "timing" (default)
+   *  grades every hit by how close to the beat it landed; "pitch" grades
+   *  bends, pre-bends and releases by how close to the written pitch they got
+   *  and doesn't charge for timing — for drills that are about intonation. */
+  scoringFocus?: ScoringFocus;
   disableBackingTrack?: boolean;
   disableTuner?: boolean;
   isHiddenFromLibrary?: boolean;

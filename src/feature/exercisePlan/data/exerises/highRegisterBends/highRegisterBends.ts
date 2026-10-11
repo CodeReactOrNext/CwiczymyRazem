@@ -12,6 +12,8 @@ export const highRegisterBendsExercise: Exercise = {
   whyItMatters: "String tension feels significantly different in the high register compared to the middle of the neck. Practicing bends at the 15th fret and above builds the mechanical strength and fine motor skills necessary for soaring, pitch-perfect solos.",
   difficulty: "easy",
   category: "technique",
+  // A bending drill: scored on how close each bend gets to its pitch.
+  scoringFocus: "pitch",
   timeInMinutes: 5,
   instructions: [
     "Brace your bending finger with your middle and index fingers for maximum leverage.",

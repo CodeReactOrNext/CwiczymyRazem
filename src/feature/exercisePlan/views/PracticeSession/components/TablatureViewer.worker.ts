@@ -217,8 +217,50 @@ const visual = createNoteHitVisualState();
 /** noteKey -> timing of its hit (NOTE_TIMINGS, see timingGrade.ts). Kept apart
  *  from the hit maps: it isn't frozen per pass, a re-hit note just overwrites
  *  its own entry. */
-let noteTimings: Record<string, { grade: number; perfect: boolean; offsetBeats: number | null }> = {};
+let noteTimings: Record<string, {
+  grade: number; perfect: boolean; offsetBeats: number | null;
+  intonation?: { grade: number; cents: number | null };
+}> = {};
 type TimingLabelKind = "early" | "late" | "perfect";
+
+// ── Live pitch: bend gauge & note tuner ────────────────────────────────────
+/** The note under the matching cursor (TICK.pitch — LivePitch in
+ *  pitchScoring.ts): for a bend or release how far the move has gone, 0 → 1;
+ *  for any note the cents from the pitch it is written to end on. A held
+ *  note only arrives here when the exercise scores intonation. */
+let livePitch: { noteKey: string; kind: "bend" | "release" | "note"; amount: number | null; cents: number | null } | null = null;
+/** What the gauge of a bend currently draws. Eased toward the live reading so a
+ *  ~30 fps feed glides instead of stepping, and held where the string got to
+ *  once the note is over. `tile` pins it to the pass it was played in. */
+const bendGauges = new Map<string, { tile: number; amount: number; locked: boolean; lockAt: number }>();
+/** A bend inside this many cents of its pitch, and most of the way there, locks in. */
+const BEND_LOCK_CENTS = 20;
+const BEND_LOCK_PULSE_MS = 450;
+/** Past this the string has gone sharp of the target. */
+const BEND_OVERSHOOT = 1.08;
+const BEND_SHARP_COLOR = "#f59e0b";
+
+/** What the tuner over a held note currently shows, eased like the bend gauge. */
+const noteTuners = new Map<string, { tile: number; cents: number; lockAt: number | null }>();
+/** The tuner's arc spans ±TUNER_RANGE_CENTS over ±TUNER_SWEEP radians. */
+const TUNER_RANGE_CENTS = 50;
+const TUNER_SWEEP = Math.PI / 3;
+/** Cents bands of the intonation grades (pitchScoring.ts IN_TUNE / CLOSE). */
+const IN_TUNE_CENTS = 20;
+const CLOSE_CENTS = 40;
+/** Steadily inside this, the tuner locks with a pulse. */
+const TUNER_LOCK_CENTS = 8;
+const INTONATION_CLOSE_COLOR = "#f59e0b";
+const INTONATION_OFF_COLOR = "#f97316";
+
+/** Colour of an intonation grade: the hit green, then amber, then orange. */
+function intonationColor(grade: number): string {
+  return grade >= 3 ? hitFill : grade === 2 ? INTONATION_CLOSE_COLOR : INTONATION_OFF_COLOR;
+}
+function intonationColorForCents(cents: number): string {
+  const off = Math.abs(cents);
+  return off <= IN_TUNE_CENTS ? hitFill : off <= CLOSE_CENTS ? INTONATION_CLOSE_COLOR : INTONATION_OFF_COLOR;
+}
 /** noteKey -> the timing label it shows and when it went up. Emptied as labels expire. */
 const timingLabels = new Map<string, { kind: TimingLabelKind; at: number }>();
 let hideNotes = false;
@@ -420,6 +462,208 @@ function drawBendBadge(
     ctx.moveTo(bx, ley); ctx.lineTo(bx - 3, ley - 6); ctx.lineTo(bx + 3, ley - 6);
     ctx.closePath(); ctx.fill();
   }
+}
+
+/**
+ * The bend gauge: the curved arrow tab notation draws for a bend, run off the
+ * note's head — level along the string, then up to the target pitch (a release
+ * mirrors it, down from the target back to the string). The curve fills, and a
+ * dot rides it, as far as the string has actually been bent, so the player
+ * watches their bend climb toward the line it has to reach.
+ *
+ * `amount` is how far the move has gone (0 → 1, past 1 = sharp). `verdict`
+ * is the intonation result once the note has been graded, drawn as a label at
+ * the top; null while it plays or where pitch isn't scored.
+ */
+function drawBendGauge(
+  kind: "bend" | "release",
+  x0: number, baseY: number, w: number, h: number,
+  amount: number, color: string,
+  lockAge: number | null,
+  verdict: { grade: number; cents: number | null } | null,
+) {
+  if (!ctx) return;
+  const topY = baseY - h;
+  const x1 = x0 + w;
+  const startY = kind === "bend" ? baseY : topY;
+  const endY = kind === "bend" ? topY : baseY;
+  const cx = x0 + w * 0.8;
+  const pointAt = (t: number): [number, number] => {
+    const u = 1 - t;
+    return [u * u * x0 + 2 * u * t * cx + t * t * x1, u * u * startY + 2 * u * t * startY + t * t * endY];
+  };
+  const sharp = amount > BEND_OVERSHOOT;
+  const t = Math.max(0, Math.min(1, amount));
+
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  // The pitch the bend has to reach, as a faint guide line.
+  if (kind === "bend") {
+    ctx.strokeStyle = withAlpha(inkColor, 0.22);
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath(); ctx.moveTo(x0, topY); ctx.lineTo(x1 + 6, topY); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // The whole move, ghosted…
+  ctx.strokeStyle = withAlpha(inkColor, 0.16);
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(x0, startY); ctx.quadraticCurveTo(cx, startY, x1, endY); ctx.stroke();
+
+  // …and the part of it the string has covered.
+  const fillColor = sharp ? BEND_SHARP_COLOR : color;
+  if (t > 0.01) {
+    ctx.strokeStyle = fillColor;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x0, startY);
+    const steps = Math.max(2, Math.ceil(t * 16));
+    for (let i = 1; i <= steps; i++) {
+      const [px, py] = pointAt((t * i) / steps);
+      ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+
+  // Target: an open ring the dot has to fill.
+  ctx.strokeStyle = withAlpha(inkColor, 0.45);
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(x1, endY, 5, 0, Math.PI * 2); ctx.stroke();
+
+  // Lock-in: a ring that flies off the target the moment the bend lands.
+  if (lockAge !== null && lockAge < 1) {
+    const eased = 1 - (1 - lockAge) * (1 - lockAge);
+    ctx.strokeStyle = withAlpha(hitGlow, 0.85 * (1 - lockAge));
+    ctx.lineWidth = 2.5 * (1 - lockAge) + 0.5;
+    ctx.beginPath(); ctx.arc(x1, endY, 5 + eased * 12, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  // The string, right now.
+  const [dx, dy] = pointAt(t);
+  ctx.fillStyle = fillColor;
+  ctx.beginPath(); ctx.arc(dx, dy, 4.5, 0, Math.PI * 2); ctx.fill();
+
+  if (verdict) {
+    const inTune = verdict.grade >= 3;
+    const label = verdict.cents === null
+      ? "—"
+      : inTune ? "in tune" : `${verdict.cents > 0 ? "+" : "−"}${Math.abs(verdict.cents)}¢`;
+    ctx.font = "600 11px Inter, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = inTune ? hitGlow : intonationColor(verdict.grade);
+    drawText(label, x1 + 10, endY);
+  }
+  ctx.restore();
+}
+
+/**
+ * The tuner over a held note, for exercises that score intonation: an arc
+ * across the top of the note's head — flat on the left, sharp on the right,
+ * the in-tune band lit in the hit green — and a dot riding it at the pitch
+ * the string is sounding right now. The dot, and the note's fill, go green
+ * inside the band, amber a little out, orange further. Settle into the middle
+ * and the tuner locks with a pulse.
+ */
+function drawNoteTuner(cx: number, cy: number, cents: number, lockAge: number | null) {
+  if (!ctx) return;
+  const r = 15;
+  const angleFor = (c: number) => -Math.PI / 2 + (Math.max(-TUNER_RANGE_CENTS, Math.min(TUNER_RANGE_CENTS, c)) / TUNER_RANGE_CENTS) * TUNER_SWEEP;
+  const color = intonationColorForCents(cents);
+  ctx.save();
+  ctx.lineCap = "round";
+
+  // Scale: the whole range, then the in-tune band on top of it.
+  ctx.strokeStyle = withAlpha(inkColor, 0.18);
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(cx, cy, r, angleFor(-TUNER_RANGE_CENTS), angleFor(TUNER_RANGE_CENTS)); ctx.stroke();
+  ctx.strokeStyle = withAlpha(hitFill, 0.55);
+  ctx.beginPath(); ctx.arc(cx, cy, r, angleFor(-IN_TUNE_CENTS), angleFor(IN_TUNE_CENTS)); ctx.stroke();
+
+  // Centre mark — the written pitch.
+  ctx.strokeStyle = withAlpha(inkColor, 0.6);
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(cx, cy - r - 4); ctx.lineTo(cx, cy - r + 3); ctx.stroke();
+
+  const a = angleFor(cents);
+  const dx = cx + Math.cos(a) * r;
+  const dy = cy + Math.sin(a) * r;
+  if (lockAge !== null && lockAge < 1) {
+    const eased = 1 - (1 - lockAge) * (1 - lockAge);
+    ctx.strokeStyle = withAlpha(hitGlow, 0.85 * (1 - lockAge));
+    ctx.lineWidth = 2.5 * (1 - lockAge) + 0.5;
+    ctx.beginPath(); ctx.arc(dx, dy, 4 + eased * 10, 0, Math.PI * 2); ctx.stroke();
+  }
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(dx, dy, 4.5, 0, Math.PI * 2); ctx.fill();
+
+  // Out of the band, say by how much — that's what tells you which way to go.
+  if (Math.abs(cents) > IN_TUNE_CENTS) {
+    ctx.font = "700 11px Inter, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillStyle = color;
+    drawText(`${cents > 0 ? "+" : "−"}${Math.round(Math.abs(cents))}`, cx, cy - r - 6);
+  }
+  ctx.restore();
+}
+
+/**
+ * What a held note's intonation came out as, once it has played out — only
+ * for notes that missed the band: the cents, and an arrow saying which way the
+ * string was off (up = sharp). The note's fill carries the grade's colour.
+ */
+function drawIntonationVerdict(cx: number, y: number, grade: number, cents: number) {
+  if (!ctx) return;
+  const color = intonationColor(grade);
+  const sharp = cents > 0;
+  const label = `${sharp ? "+" : "−"}${Math.abs(cents)}¢`;
+  ctx.save();
+  ctx.font = "700 11px Inter, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillStyle = color;
+  const w = ctx.measureText(label).width;
+  drawText(label, cx - 4, y);
+  // Little caret after the number: up for sharp, down for flat.
+  const ax = cx - 4 + w / 2 + 6;
+  const ay = y - 6;
+  ctx.beginPath();
+  if (sharp) { ctx.moveTo(ax - 3.5, ay + 2); ctx.lineTo(ax, ay - 2.5); ctx.lineTo(ax + 3.5, ay + 2); }
+  else { ctx.moveTo(ax - 3.5, ay - 2); ctx.lineTo(ax, ay + 2.5); ctx.lineTo(ax + 3.5, ay - 2); }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.75;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke();
+  ctx.restore();
+}
+
+/**
+ * Where an off-beat hit was played, kept under its note for the rest of the
+ * pass: a short arrow pointing left for early (ahead of the beat, which on the
+ * board is to the left) and right for late. The "Early"/"Late" word over the
+ * note fades right away; the arrow is what's left to read back afterwards.
+ */
+function drawTimingArrow(cx: number, y: number, early: boolean, strong: boolean) {
+  if (!ctx) return;
+  const half = 7;
+  const tipX = early ? cx - half : cx + half;
+  const tailX = early ? cx + half : cx - half;
+  const back = early ? 4 : -4;
+  ctx.save();
+  ctx.strokeStyle = withAlpha(inkColor, strong ? 0.9 : 0.6);
+  ctx.lineWidth = 1.75;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.moveTo(tailX, y); ctx.lineTo(tipX, y);
+  ctx.moveTo(tipX + back, y - 3.5); ctx.lineTo(tipX, y); ctx.lineTo(tipX + back, y + 3.5);
+  ctx.stroke();
+  ctx.restore();
 }
 
 // ── Rounded rectangle (pill) helper ──────────────────────────────────────────
@@ -993,7 +1237,29 @@ function render() {
 
         // ── Choose fill color ────────────────────────────────────────────
         let fillColor = note.color;
-        const finalHitColor = hitFill;
+
+        // Intonation (exercises that score it): a held note's tuner follows
+        // the live pitch while it rings, and its fill takes the colour of how
+        // in tune it is — live first, then the grade it settled on.
+        const isHeldNote = !note.isBend && !note.isRelease && !isDead;
+        const liveTune = isHeldNote && livePitch?.kind === "note" && livePitch.noteKey === note.noteKey && reached && !isOutgoing
+          ? livePitch
+          : null;
+        let tuner = noteTuners.get(note.noteKey);
+        if (liveTune) {
+          if (!tuner || tuner.tile !== tile) {
+            tuner = { tile, cents: liveTune.cents ?? 0, lockAt: null };
+            noteTuners.set(note.noteKey, tuner);
+          }
+          if (liveTune.cents !== null) {
+            tuner.cents += (liveTune.cents - tuner.cents) * 0.3;
+            if (tuner.lockAt === null && Math.abs(tuner.cents) <= TUNER_LOCK_CENTS) tuner.lockAt = frameNow;
+          }
+        }
+        const intonationVerdict = isHit && isHeldNote ? noteTimings[note.noteKey]?.intonation : undefined;
+        const finalHitColor = intonationVerdict
+          ? intonationColor(intonationVerdict.grade)
+          : liveTune && tuner ? intonationColorForCents(tuner.cents) : hitFill;
         const isAnimatingHit = isHit && visual.hitTimestamps[note.noteKey] !== undefined;
 
         // Palm-muted notes keep their string colour — the P.M. lane under the
@@ -1174,6 +1440,53 @@ function render() {
             blockY - 4 - age * 6,
           );
           ctx.restore();
+        }
+
+        // ── Early / late arrow under the note, for the rest of the pass ─────
+        if (offBeatPx !== 0 && note.noteY === beat.topNoteY) {
+          drawTimingArrow(blockX + headW / 2, blockY + BLOCK_H + 7, offBeatPx < 0, timing!.grade <= 1);
+        }
+
+        // ── Note tuner while it rings, then the verdict if it was off ───────
+        if (liveTune && tuner && !intonationVerdict) {
+          const lockAge = tuner.lockAt !== null ? (frameNow - tuner.lockAt) / BEND_LOCK_PULSE_MS : null;
+          drawNoteTuner(blockX + headW / 2, blockY - 4, tuner.cents, lockAge);
+        } else if (intonationVerdict && intonationVerdict.grade < 3 && intonationVerdict.cents !== null) {
+          drawIntonationVerdict(blockX + headW / 2, blockY - 5, intonationVerdict.grade, intonationVerdict.cents);
+        }
+
+        // ── Bend gauge: how far the string has been bent, live ──────────────
+        if ((note.isBend && !note.isPreBend) || note.isRelease) {
+          const kind = note.isRelease ? "release" : "bend";
+          const live = livePitch && livePitch.noteKey === note.noteKey && reached && !isOutgoing ? livePitch : null;
+          let gauge = bendGauges.get(note.noteKey);
+          if (live) {
+            // A note played again in a new pass starts its gauge over.
+            if (!gauge || gauge.tile !== tile) {
+              gauge = { tile, amount: 0, locked: false, lockAt: 0 };
+              bendGauges.set(note.noteKey, gauge);
+            }
+            if (live.amount !== null) {
+              gauge.amount += (live.amount - gauge.amount) * 0.35;
+              if (!gauge.locked && live.amount >= 0.85 && live.cents !== null && Math.abs(live.cents) <= BEND_LOCK_CENTS) {
+                gauge.locked = true;
+                gauge.lockAt = frameNow;
+              }
+            }
+          }
+          if (gauge && gauge.tile === tile && reached && !isOutgoing) {
+            const x0 = blockX + headW + 3;
+            const w = Math.max(26, Math.min(56, blockW - headW - 10));
+            const verdict = isHit ? noteTimings[note.noteKey]?.intonation ?? null : null;
+            const lockAge = gauge.locked ? (frameNow - gauge.lockAt) / BEND_LOCK_PULSE_MS : null;
+            // Locked in or graded in tune → the hit green; graded off → the
+            // board's ink; still on its way → the string's own colour.
+            const color = verdict
+              ? intonationColor(verdict.grade)
+              : gauge.locked ? hitFill : note.color;
+            drawBendGauge(kind, x0, blockY + 2, w, 26, gauge.amount, color, lockAge, verdict);
+            if (lockAge !== null && lockAge < 1) needsRedraw = true;
+          }
         }
 
         // ── Hit animation (Block Shockwave + Sweet Flash) ───────────────────────
@@ -1701,7 +2014,7 @@ self.onmessage = (e: MessageEvent) => {
       bpm = msg.bpm;
       countInRemaining = msg.countInRemaining;
       audioStartSec = msg.audioStartSec ?? null;
-      if (!isPlaying) { audioCurrentSec = null; audioCurrentReceivedAt = null; }
+      if (!isPlaying) { audioCurrentSec = null; audioCurrentReceivedAt = null; livePitch = null; }
       if (isPlaying) hoverStartX = null; // clear hover when playback starts
       recomputeLoopSeconds();
       break;
@@ -1721,6 +2034,7 @@ self.onmessage = (e: MessageEvent) => {
     }
     case 'TICK': {
       audioCurrentSec = msg.audioCurrentSec;
+      livePitch = msg.pitch ?? null;
       audioCurrentReceivedAt = Date.now();
       break;
     }
@@ -1827,6 +2141,9 @@ self.onmessage = (e: MessageEvent) => {
       resetNoteHitVisualState(visual);
       noteTimings = {};
       timingLabels.clear();
+      bendGauges.clear();
+      noteTuners.clear();
+      livePitch = null;
       // loop range is intentionally NOT cleared here so it survives loop restarts
       break;
     }

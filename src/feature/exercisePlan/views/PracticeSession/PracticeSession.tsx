@@ -938,6 +938,7 @@ export const PracticeSession = ({
       activeTablature={isEarTrainingRiddle ? undefined : activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
       speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} calibratedLatencyMs={calibratedLatencyMs} audioRefs={audioRefs}
+      scoringFocus={currentExercise.scoringFocus}
       getAdjustedTargetFreq={getAdjustedTargetFreq} tuningOffsets={guitarTuning.tuning.offsets}
       activeStrumPattern={activeStrumPattern}
       customGoal={huntTarget ? huntTarget.goal : currentExercise.customGoal}
@@ -992,6 +993,10 @@ export const PracticeSession = ({
           }
           timeline={successSnapshot.noteTimeline}
           timing={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.timing : null}
+          timingPrecision={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.timingPrecision : null}
+          intonation={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.intonation : null}
+          intonationBiasCents={successSnapshot.intonationBiasCents ?? null}
+          noteLog={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.noteLog : null}
           failMessage={examMistakeFailed ? `${CLICK_EXAM_MISTAKE_LIMIT} wrong clicks — exam failed.` : undefined}
           eyebrow={goalRun?.summaryEyebrow}
           extraContent={goalVerdict}

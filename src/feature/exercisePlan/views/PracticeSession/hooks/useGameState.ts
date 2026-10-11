@@ -1,6 +1,6 @@
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 
-import type { NoteTiming, TimingCounts } from "../utils/timingGrade";
+import type { NoteTiming, RunNote, TimingCounts } from "../utils/timingGrade";
 import { emptyTimingCounts } from "../utils/timingGrade";
 import type { GameState } from "./noteMatchingFeedback";
 
@@ -35,6 +35,12 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   /** Signed attack offsets (ms, + = late) of every timed hit this run, loops
    *  included — what the run's timing precision is read from. */
   const timingOffsetsRef     = useRef<number[]>([]);
+  /** Pitch-graded notes per intonation grade over the run (pitch-focused exercises). */
+  const intonationCountsRef  = useRef<TimingCounts>(emptyTimingCounts());
+  /** Signed cents (+ = sharp) of every pitch-graded note that came near its pitch. */
+  const intonationOffsetsRef = useRef<number[]>([]);
+  /** Every graded note of the run, in order — see RunNote. */
+  const runLogRef            = useRef<RunNote[]>([]);
 
   const reset = useCallback(() => {
     setHitNotes({});    hitNotesRef.current          = {};
@@ -50,6 +56,9 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     setNoteTimings({}); noteTimingsRef.current = {};
     timingCountsRef.current      = emptyTimingCounts();
     timingOffsetsRef.current     = [];
+    intonationCountsRef.current  = emptyTimingCounts();
+    intonationOffsetsRef.current = [];
+    runLogRef.current            = [];
   }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,7 +89,7 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
     maxComboRef, needsFlushRef, minScoredBpmRef,
-    noteTimingsRef, timingCountsRef, timingOffsetsRef,
+    noteTimingsRef, timingCountsRef, timingOffsetsRef, intonationCountsRef, intonationOffsetsRef, runLogRef,
     flushToReact, reset,
   };
 }

@@ -219,7 +219,19 @@
     "score": "Puntuación",
     "over_time": "Rendimiento a lo largo del tiempo",
     "pass": "Aprobado",
-    "back_to_menu": "Volver al menú"
+    "back_to_menu": "Volver al menú",
+    "intonation_over_time": "Afinación, nota a nota",
+    "timing_over_time": "Tempo, nota a nota",
+    "chart_sharp": "alto",
+    "chart_flat": "bajo",
+    "chart_late_axis": "tarde",
+    "chart_early_axis": "pronto",
+    "chart_note": "Nota {{n}}",
+    "chart_on_beat": "en el pulso",
+    "chart_early": "{{ms}} ms antes",
+    "chart_late": "{{ms}} ms tarde",
+    "chart_notes_one": "{{count}} nota",
+    "chart_notes_other": "{{count}} notas"
   },
   "quiz": {
     "stop": "Parar",
@@ -406,7 +418,23 @@
       "1": "Suelto",
       "2": "Cerca",
       "3": "A tiempo"
-    }
+    },
+    "share": "{{pct}}% a tiempo",
+    "note": "Una nota fuera del pulso sigue contando, pero menos: un 2 conserva dos tercios de sus puntos, un 1, un tercio.",
+    "lean_early": "Sobre todo adelantado — unos {{ms}} ms antes del pulso",
+    "lean_late": "Sobre todo atrasado — unos {{ms}} ms detrás del pulso"
+  },
+  "intonation_breakdown": {
+    "title": "Afinación",
+    "share": "{{pct}}% afinado",
+    "grades": {
+      "1": "Desafinado",
+      "2": "Cerca",
+      "3": "Afinado"
+    },
+    "note": "Una nota o un bend fuera de su altura sigue contando, pero menos: dentro de 40 cents conserva dos tercios de sus puntos; más lejos, un tercio.",
+    "lean_flat": "Sobre todo bajo — tus notas quedan unos {{cents}} cents por debajo de la altura",
+    "lean_sharp": "Sobre todo alto — tus notas quedan unos {{cents}} cents por encima de la altura"
   },
   "shortcuts": {
     "title": "Atajos de teclado",

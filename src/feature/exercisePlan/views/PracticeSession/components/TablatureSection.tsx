@@ -183,7 +183,7 @@ export const TablatureSection = memo(function TablatureSection({
   obscured = false,
 }: TablatureSectionProps) {
   const { t } = useTranslation("session");
-  const { hitNotes, missedNotes, noteTimings } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, noteTimings, livePitchRef } = useNoteMatchingContext();
   const { openTimingCalibration } = useSessionUI();
   const { tuning } = useGuitarTuningContext();
   const {
@@ -508,6 +508,7 @@ export const TablatureSection = memo(function TablatureSection({
               hitNotes={hitNotes}
               missedNotes={missedNotes}
               noteTimings={noteTimings}
+              livePitchRef={livePitchRef}
               currentBeatsElapsed={0}
               hideNotes={hideNotes}
               audioContext={audioContext}

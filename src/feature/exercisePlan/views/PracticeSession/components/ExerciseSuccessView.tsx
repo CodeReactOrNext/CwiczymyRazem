@@ -10,7 +10,9 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 
-import type { TimingCounts } from "../utils/timingGrade";
+import type { RunNote, TimingCounts } from "../utils/timingGrade";
+import type { TimingPrecision } from "../utils/timingPrecision";
+import { chartValues, MIN_CHART_POINTS, NoteDeviationChart } from "./NoteDeviationChart";
 import { TimingBreakdown } from "./TimingBreakdown";
 
 interface ExerciseStats {
@@ -32,6 +34,17 @@ interface ExerciseSuccessViewProps {
   timeline?: ('hit' | 'miss' | 'perfect' | 'early' | 'late')[];
   /** Hits per timing grade — shown under the stats when the run was timed. */
   timing?: TimingCounts | null;
+  /** Where the run's timed notes leaned — adds an "early / late" line under the timing. */
+  timingPrecision?: TimingPrecision | null;
+  /** Hits per intonation grade, for exercises scored on pitch. When set the
+   *  score came from these, so the summary is about intonation — timing
+   *  stays on the tab's arrows but isn't summed up here. */
+  intonation?: TimingCounts | null;
+  /** Where the run's bends landed, median signed cents (+ = sharp). */
+  intonationBiasCents?: number | null;
+  /** Every graded note of the run, in order — charted note by note when the
+   *  run was graded on intonation or timing. */
+  noteLog?: RunNote[] | null;
   /** Overrides the default "Missed by X pts…" subtitle for a failed exam —
    *  used when the fail wasn't a score shortfall (e.g. the click-hunt mistake
    *  limit), where that message would be misleading. */
@@ -100,6 +113,10 @@ export const ExerciseSuccessView = ({
   stats,
   timeline,
   timing,
+  timingPrecision,
+  intonation,
+  intonationBiasCents,
+  noteLog,
   failMessage,
   eyebrow,
   extraContent,
@@ -138,6 +155,16 @@ export const ExerciseSuccessView = ({
   }
 
   const hasTimeline = !!timeline && timeline.length > 0;
+  // Graded runs chart what they were graded on, note by note; exams keep the
+  // accuracy curve with its pass line.
+  const deviationChart: "intonation" | "timing" | null = isExam || !noteLog
+    ? null
+    : intonation && chartValues(noteLog, "intonation").length >= MIN_CHART_POINTS
+      ? "intonation"
+      : timing && chartValues(noteLog, "timing").length >= MIN_CHART_POINTS
+        ? "timing"
+        : null;
+  const hasChart = !!deviationChart || hasTimeline;
 
   const chartData = useMemo(
     () => (hasTimeline ? buildChartData(timeline!) : []),
@@ -300,7 +327,11 @@ export const ExerciseSuccessView = ({
                       <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label={t("session:success.score")} />
                     )}
                   </div>
-                  {timing && <TimingBreakdown timing={timing} className="mt-6" />}
+                  {intonation ? (
+                    <TimingBreakdown timing={intonation} variant="intonation" biasCents={intonationBiasCents} className="mt-6" />
+                  ) : (
+                    timing && <TimingBreakdown timing={timing} precision={timingPrecision} className="mt-6" />
+                  )}
                 </div>
               )}
             </motion.div>
@@ -315,7 +346,14 @@ export const ExerciseSuccessView = ({
           )}
 
           {/* Performance Chart */}
-          {hasTimeline && (
+          {deviationChart && noteLog && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
+              className="relative px-7 py-5">
+              <NoteDeviationChart variant={deviationChart} notes={noteLog} />
+            </motion.div>
+          )}
+          {!deviationChart && hasTimeline && (
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
               className="relative px-7 py-5">
@@ -376,7 +414,7 @@ export const ExerciseSuccessView = ({
 
           {/* Actions */}
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: hasTimeline ? 1.3 : 1 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: hasChart ? 1.3 : 1 }}
             className="relative px-7 py-5 flex gap-2.5">
             {((isExam && !isPassed) || offerRestart) && onRestart && (
               <Button

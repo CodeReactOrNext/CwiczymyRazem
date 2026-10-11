@@ -17,7 +17,9 @@ import { useNoteHunt } from "../hooks/useNoteHunt";
 import { useNoteMatching } from "../hooks/useNoteMatching";
 import type { SlotResult } from "../hooks/useStrummingMatcher";
 import { useStrummingMatcher } from "../hooks/useStrummingMatcher";
-import type { NoteTiming, TimingCounts } from "../utils/timingGrade";
+import type { LivePitch, ScoringFocus } from "../utils/pitchScoring";
+import { summarizeIntonation } from "../utils/pitchScoring";
+import type { NoteTiming, RunNote, TimingCounts } from "../utils/timingGrade";
 import type { TimingPrecision } from "../utils/timingPrecision";
 import { summarizeTimingOffsets } from "../utils/timingPrecision";
 
@@ -28,6 +30,11 @@ interface NoteMatchingContextValue {
   missedNotes: Record<string, boolean>;
   /** noteKey -> how the hit was timed: grade and where the attack landed. */
   noteTimings: Record<string, NoteTiming>;
+  /** The bend or release under the cursor, refreshed every matching tick —
+   *  read it from a frame loop, it never re-renders anything. */
+  livePitchRef: MutableRefObject<LivePitch | null>;
+  /** What the run's score rewards (see pitchScoring.ts). */
+  scoringFocus: ScoringFocus;
   currentBeatsElapsedRef: MutableRefObject<number>;
   strumSlotFeedback: Map<number, SlotResult> | undefined;
   gameState: GameState;
@@ -100,6 +107,15 @@ export interface NoteMatchingSnapshot {
   /** How tightly the run's timed notes sat on the beat; null where timing
    *  isn't graded, or too few notes could be timed. */
   timingPrecision?: TimingPrecision | null;
+  /** Pitch-graded notes per intonation grade; null unless the exercise
+   *  scores intonation (scoringFocus "pitch"). */
+  intonation?: TimingCounts | null;
+  /** Every graded tab note of the run in order, loops included — what the
+   *  summary charts. null for hunts and strumming. */
+  noteLog?: RunNote[] | null;
+  /** Where the run's graded bends tended to land (median signed cents, + =
+   *  sharp); null unless intonation is scored and enough bends came near. */
+  intonationBiasCents?: number | null;
 }
 
 export interface NoteMatchingHandle {
@@ -116,12 +132,15 @@ const defaultGameState: GameState = { score: 0, combo: 0, multiplier: 1 };
 export const CLICK_EXAM_MISTAKE_LIMIT = 3;
 
 const _fallbackRef = { current: 0 } as MutableRefObject<number>;
+const _noPitchRef = { current: null } as MutableRefObject<LivePitch | null>;
 const EMPTY_TIMINGS: Record<string, NoteTiming> = {};
 
 const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   hitNotes: {},
   missedNotes: {},
   noteTimings: {},
+  livePitchRef: _noPitchRef,
+  scoringFocus: "timing",
   currentBeatsElapsedRef: _fallbackRef,
   strumSlotFeedback: undefined,
   gameState: defaultGameState,
@@ -171,6 +190,8 @@ interface NoteMatchingProviderProps {
   getLatencyMs: () => number;
   /** Measured latency from the timing calibration — tab note matching only. */
   calibratedLatencyMs?: number | null;
+  /** What the score rewards beyond hitting the notes — tab exercises only. */
+  scoringFocus?: ScoringFocus;
   audioRefs: AudioRefs;
   getAdjustedTargetFreq: (string: number, baseFreq: number) => number;
   // per-string semitone offset from standard tuning, for notes without a real midiNote
@@ -221,6 +242,7 @@ export function NoteMatchingProvider({
   speedMultiplier,
   getLatencyMs,
   calibratedLatencyMs,
+  scoringFocus = "timing",
   audioRefs,
   getAdjustedTargetFreq,
   tuningOffsets,
@@ -252,6 +274,11 @@ export function NoteMatchingProvider({
     noteTimings,
     timingCountsRef,
     timingOffsetsRef,
+    intonationCountsRef,
+    intonationOffsetsRef,
+    runLogRef,
+    livePitchRef,
+    settlePendingIntonation,
     resetGame,
   } = useNoteMatching({
     isPlaying,
@@ -270,6 +297,7 @@ export function NoteMatchingProvider({
     tuningOffsets,
     onReset,
     calibratedLatencyMs,
+    scoringFocus,
   });
 
   const {
@@ -424,19 +452,6 @@ export function NoteMatchingProvider({
   const effectiveMaxPossibleScore = isHunt ? huntMaxScore : maxPossibleScore;
   const effectiveMaxCombo = isHunt ? huntMaxCombo : maxCombo;
 
-  // noteTimeline is only needed for the end-of-session snapshot
-  const tabNoteTimeline = useMemo((): ("hit" | "miss")[] => {
-    const keys = new Set([...Object.keys(hitNotes), ...Object.keys(missedNotes)]);
-    return Array.from(keys)
-      .sort((a, b) => {
-        const [ma, ba, na] = a.split("-").map(Number);
-        const [mb, bb, nb] = b.split("-").map(Number);
-        if (ma !== mb) return ma - mb;
-        if (ba !== bb) return ba - bb;
-        return na - nb;
-      })
-      .map(key => (hitNotes[key] ? "hit" : "miss"));
-  }, [hitNotes, missedNotes]);
 
   // Prompt drills count rounds, not octaves; read out here so the memo below can
   // depend on the number rather than on a fresh object every tick.
@@ -444,6 +459,7 @@ export function NoteMatchingProvider({
 
   // For the hunts, the timeline is one "hit" per unit found (octave / chord tone)
   // plus a "miss" for each still missing — so the success screen shows real progress.
+  // Tab exercises read theirs off the run log when the snapshot is taken.
   const noteTimeline = useMemo((): ("hit" | "miss")[] => {
     if (isChordHunt) {
       const total = chordHunt.tones.length;
@@ -470,13 +486,12 @@ export function NoteMatchingProvider({
       const found = noteHunt.maxCombo;
       return Array.from({ length: total }, (_, i) => (i < found ? "hit" : "miss"));
     }
-    return tabNoteTimeline;
+    return [];
   }, [
     isChordHunt, chordHunt.tones.length, chordHunt.maxCombo,
     isClickHunt, clickHunt.targetPositions.length, clickHunt.maxCombo,
     isIntervalClickHunt, intervalClickHunt.correctClicks, intervalClickHunt.mistakeCount,
     isNoteHunt, noteHunt.octaves.length, noteHunt.maxCombo, promptRoundsPresented,
-    tabNoteTimeline,
   ]);
 
   // Always-current ref so snapshot() never reads stale closure values
@@ -492,18 +507,37 @@ export function NoteMatchingProvider({
   handleRef.current = {
     resetGame: resetGameAndProgress,
     // The tempo ref is read live: hits land in the RAF loop between renders.
-    snapshot: () => ({
-      ...latestRef.current,
-      minScoredBpm: isHunt || isStrummingExercise ? null : minScoredBpmRef.current,
-      timing: isHunt || isStrummingExercise ? null : { ...timingCountsRef.current },
-      timingPrecision: isHunt || isStrummingExercise ? null : summarizeTimingOffsets(timingOffsetsRef.current),
-    }),
+    snapshot: () => {
+      // A run summed up while its last note still rings: bank that note now,
+      // or a pitch-scored run would end short of it.
+      const scoresIntonation = scoringFocus === "pitch" && !isHunt && !isStrummingExercise;
+      const liveScore = scoresIntonation ? settlePendingIntonation() : null;
+      const intonationCounts = { ...intonationCountsRef.current };
+      const hasIntonation = intonationCounts[1] + intonationCounts[2] + intonationCounts[3] > 0;
+      // The whole run, loops included — the tab's own hit marks only ever
+      // hold the pass being played.
+      const noteLog = isHunt ? null : runLogRef.current.map((note) => ({ ...note }));
+      return {
+        ...latestRef.current,
+        ...(liveScore !== null && { score: liveScore }),
+        ...(noteLog && { noteTimeline: noteLog.map((note): "hit" | "miss" => (note.hit ? "hit" : "miss")), noteLog }),
+        minScoredBpm: isHunt || isStrummingExercise ? null : minScoredBpmRef.current,
+        timing: isHunt || isStrummingExercise ? null : { ...timingCountsRef.current },
+        timingPrecision: isHunt || isStrummingExercise ? null : summarizeTimingOffsets(timingOffsetsRef.current),
+        intonation: isHunt || isStrummingExercise || scoringFocus !== "pitch" || !hasIntonation ? null : intonationCounts,
+        intonationBiasCents: isHunt || isStrummingExercise || scoringFocus !== "pitch"
+          ? null
+          : summarizeIntonation(intonationOffsetsRef.current)?.biasCents ?? null,
+      };
+    },
   };
 
   const value = useMemo<NoteMatchingContextValue>(
     () => ({
       hitNotes, missedNotes, currentBeatsElapsedRef, strumSlotFeedback, gameState,
       noteTimings: isHunt || isStrummingExercise ? EMPTY_TIMINGS : noteTimings,
+      livePitchRef,
+      scoringFocus,
       maxPossibleScore: effectiveMaxPossibleScore, sessionAccuracy, sessionStats,
       noteHunt: isNoteHunt ? noteHunt : null,
       chordHunt: isChordHunt ? chordHunt : null,
@@ -527,7 +561,7 @@ export function NoteMatchingProvider({
       registerIntervalClick,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, noteTimings, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
+    [hitNotes, missedNotes, noteTimings, livePitchRef, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
   );
 
   return (
