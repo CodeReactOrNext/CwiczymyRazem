@@ -1,0 +1,119 @@
+{
+  "page": {
+    "title": "Rotation",
+    "subtitle": "Songs, exercises and skills you want to keep in your hands",
+    "eyebrow": "Library"
+  },
+  "add": "Add",
+  "list_title": "Your rotation",
+  "spotlight": {
+    "label": "Up next",
+    "rusty": "to refresh",
+    "all_fresh_title": "Everything is fresh",
+    "all_fresh_body": "You've played all of it within the last week. Draw a card if you still feel like playing.",
+    "play_stalest_one": "Play the stalest one",
+    "play_stalest_other": "Play the {{count}} stalest",
+    "minutes": "about {{count}} min",
+    "draw": "Draw a card"
+  },
+  "levels": {
+    "rusty": "Getting rusty",
+    "cooling": "Cooling down",
+    "fresh": "Fresh"
+  },
+  "days": {
+    "never": "Not played yet",
+    "today": "Played today",
+    "yesterday": "Yesterday",
+    "ago_one": "{{count}} day ago",
+    "ago_other": "{{count}} days ago"
+  },
+  "types": {
+    "song": "Song",
+    "exercise": "Exercise",
+    "skill": "Skill",
+    "custom": "Own"
+  },
+  "row": {
+    "play": "Play {{title}}",
+    "remove": "Remove {{title}} from rotation",
+    "skill_hint": "Plays one of its exercises",
+    "done": "Tick off {{title}}",
+    "open_link": "Open {{site}}"
+  },
+  "empty": {
+    "title": "Keep what you've learned in your hands",
+    "body": "Add the songs, exercises and skills you don't want to lose. Whatever you haven't played for the longest comes up first, and one tap starts a short session with it.",
+    "cta": "Add your first item"
+  },
+  "picker": {
+    "title": "Add to rotation",
+    "description": "Pick what you want to keep coming back to.",
+    "tabs": {
+      "song": "Songs",
+      "exercise": "Exercises",
+      "skill": "Skills",
+      "custom": "Own"
+    },
+    "search": "Search",
+    "no_results": "Nothing matches",
+    "no_songs": "Your song library is empty.",
+    "find_songs": "Find songs",
+    "add_item": "Add {{title}}",
+    "remove_item": "Remove {{title}}",
+    "full": "Your rotation is full ({{count}} items). Remove something first.",
+    "done": "Done"
+  },
+  "draw": {
+    "title": "Draw a card",
+    "description": "A random pick that leans towards what you haven't played for a while.",
+    "play": "Play it",
+    "again": "Draw another",
+    "done": "Tick it off"
+  },
+  "toast": {
+    "error": "Couldn't save that. Try again.",
+    "nothing_to_play": "There's nothing here to play right now.",
+    "removed": "Removed {{title}}",
+    "undo": "Undo",
+    "done": "Ticked off: {{title}}"
+  },
+  "custom": {
+    "examples_label": "Start from an example",
+    "examples": {
+      "course": {
+        "title": "Blues course: next lesson",
+        "note": "Watch it, then play along until it sits"
+      },
+      "chord": {
+        "title": "One new chord a day",
+        "note": "Learn it, then use it in a progression"
+      },
+      "transcribe": {
+        "title": "Transcribe one lick",
+        "note": "By ear first, check the tab after"
+      },
+      "jam": {
+        "title": "Jam over a backing track",
+        "note": "Pick a key and improvise for one track"
+      }
+    },
+    "name_label": "Name",
+    "name_placeholder": "e.g. Blues course: lesson 4",
+    "note_label": "Note (optional)",
+    "note_placeholder": "e.g. Practice the turnaround at 80 BPM",
+    "link_label": "Link (optional)",
+    "link_placeholder": "e.g. a course page or a video",
+    "link_invalid": "That doesn't look like a web link.",
+    "timer_label": "Track time with the free timer",
+    "timer_on": "Play opens the Free Timer with this item, and the time is logged like any other session.",
+    "timer_off": "No timer: you tick it off when it's done. Nothing is logged.",
+    "category_label": "Log time as",
+    "add": "Add to rotation",
+    "yours": "Your own items"
+  },
+  "timer": {
+    "from_rotation": "From your rotation",
+    "open_link": "Open {{site}}"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "page": {
+    "title": "Rotation",
+    "subtitle": "Songs, Übungen und Fähigkeiten, die du in den Fingern behalten willst",
+    "eyebrow": "Bibliothek"
+  },
+  "add": "Hinzufügen",
+  "list_title": "Deine Rotation",
+  "spotlight": {
+    "label": "Als Nächstes",
+    "rusty": "zum Auffrischen",
+    "all_fresh_title": "Alles ist frisch",
+    "all_fresh_body": "Du hast alles davon in der letzten Woche gespielt. Zieh eine Karte, wenn du trotzdem Lust zu spielen hast.",
+    "play_stalest_one": "Das Älteste spielen",
+    "play_stalest_other": "Die {{count}} ältesten spielen",
+    "minutes": "etwa {{count}} Min.",
+    "draw": "Karte ziehen"
+  },
+  "levels": {
+    "rusty": "Rostet ein",
+    "cooling": "Kühlt ab",
+    "fresh": "Frisch"
+  },
+  "days": {
+    "never": "Noch nicht gespielt",
+    "today": "Heute gespielt",
+    "yesterday": "Gestern",
+    "ago_one": "vor {{count}} Tag",
+    "ago_other": "vor {{count}} Tagen"
+  },
+  "types": {
+    "song": "Song",
+    "exercise": "Übung",
+    "skill": "Fähigkeit",
+    "custom": "Eigenes"
+  },
+  "row": {
+    "play": "{{title}} spielen",
+    "remove": "{{title}} aus der Rotation entfernen",
+    "skill_hint": "Spielt eine ihrer Übungen",
+    "done": "{{title}} abhaken",
+    "open_link": "{{site}} öffnen"
+  },
+  "empty": {
+    "title": "Behalte, was du gelernt hast, in den Fingern",
+    "body": "Füge Songs, Übungen und Fähigkeiten hinzu, die du nicht verlieren willst. Was du am längsten nicht gespielt hast, kommt zuerst, und ein Tippen startet damit eine kurze Session.",
+    "cta": "Erstes Element hinzufügen"
+  },
+  "picker": {
+    "title": "Zur Rotation hinzufügen",
+    "description": "Wähle, worauf du immer wieder zurückkommen willst.",
+    "tabs": {
+      "song": "Songs",
+      "exercise": "Übungen",
+      "skill": "Fähigkeiten",
+      "custom": "Eigenes"
+    },
+    "search": "Suchen",
+    "no_results": "Keine Treffer",
+    "no_songs": "Deine Song-Bibliothek ist leer.",
+    "find_songs": "Songs finden",
+    "add_item": "{{title}} hinzufügen",
+    "remove_item": "{{title}} entfernen",
+    "full": "Deine Rotation ist voll ({{count}} Elemente). Entferne zuerst etwas.",
+    "done": "Fertig"
+  },
+  "draw": {
+    "title": "Karte ziehen",
+    "description": "Eine zufällige Wahl, die eher trifft, was du lange nicht gespielt hast.",
+    "play": "Spielen",
+    "again": "Noch eine ziehen",
+    "done": "Abhaken"
+  },
+  "toast": {
+    "error": "Speichern fehlgeschlagen. Versuch es noch einmal.",
+    "nothing_to_play": "Hier gibt es gerade nichts zu spielen.",
+    "removed": "{{title}} entfernt",
+    "undo": "Rückgängig",
+    "done": "Abgehakt: {{title}}"
+  },
+  "custom": {
+    "examples_label": "Mit einem Beispiel starten",
+    "examples": {
+      "course": {
+        "title": "Blues-Kurs: nächste Lektion",
+        "note": "Anschauen, dann mitspielen, bis es sitzt"
+      },
+      "chord": {
+        "title": "Ein neuer Akkord pro Tag",
+        "note": "Lernen und in einer Progression verwenden"
+      },
+      "transcribe": {
+        "title": "Ein Lick heraushören",
+        "note": "Erst nach Gehör, dann mit der Tab vergleichen"
+      },
+      "jam": {
+        "title": "Jam über einen Backing Track",
+        "note": "Tonart wählen und einen Track lang improvisieren"
+      }
+    },
+    "name_label": "Name",
+    "name_placeholder": "z. B. Blues-Kurs: Lektion 4",
+    "note_label": "Notiz (optional)",
+    "note_placeholder": "z. B. Turnaround bei 80 BPM üben",
+    "link_label": "Link (optional)",
+    "link_placeholder": "z. B. eine Kursseite oder ein Video",
+    "link_invalid": "Das sieht nicht nach einem Weblink aus.",
+    "timer_label": "Zeit mit dem Free Timer messen",
+    "timer_on": "Spielen öffnet den Free Timer mit diesem Eintrag, und die Zeit wird wie jede Session erfasst.",
+    "timer_off": "Ohne Timer: Du hakst es ab, wenn es erledigt ist. Es wird nichts erfasst.",
+    "category_label": "Zeit erfassen als",
+    "add": "Zur Rotation hinzufügen",
+    "yours": "Deine eigenen Einträge"
+  },
+  "timer": {
+    "from_rotation": "Aus deiner Rotation",
+    "open_link": "{{site}} öffnen"
+  }
+}

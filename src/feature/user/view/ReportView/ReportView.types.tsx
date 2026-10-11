@@ -46,6 +46,9 @@ export interface ReportFormikInterface {
   songs?: ReportSongEntry[];
   /** Ids of the exercises a timed session ran — lets the activity feed open what was practiced. */
   exerciseIds?: string[];
+  /** Exercises the session actually played (20 s or more) and the skills they train —
+   *  stamps "last played" for the Rotation panel. Unlike `exerciseIds`, skipped ones are out. */
+  practiced?: { exerciseIds: string[]; skillIds: string[]; customIds?: string[] };
   /** YouTube id of the lesson a lesson session played along to. */
   lessonVideoId?: string;
   skillPointsGained?: Record<string, number>;

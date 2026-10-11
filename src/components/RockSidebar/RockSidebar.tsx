@@ -62,6 +62,7 @@ import {
   Music2,
   NotebookPen,
   PlusCircle,
+  Repeat,
   Route,
   Search,
   Settings,
@@ -297,6 +298,12 @@ const LIBRARY_SUB_NAV: SidebarSubLink[] = [
     icon: <Star size={16} />,
   },
   {
+    id: "library-rotation",
+    name: "rotation",
+    href: "/rotation",
+    icon: <Repeat size={16} />,
+  },
+  {
     id: "library-plans",
     name: "my_plans",
     href: "/plans",
@@ -498,6 +505,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/my-exercises")) return "library";
     if (pathname.startsWith("/tab-editor")) return "library";
     if (pathname.startsWith("/favorites")) return "library";
+    if (pathname.startsWith("/rotation")) return "library";
     if (pathname.startsWith("/recordings")) return "community";
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/roadmap")) return "roadmap";

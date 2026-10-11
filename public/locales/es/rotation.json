@@ -1,0 +1,119 @@
+{
+  "page": {
+    "title": "Rotación",
+    "subtitle": "Canciones, ejercicios y habilidades que quieres mantener en tus manos",
+    "eyebrow": "Biblioteca"
+  },
+  "add": "Añadir",
+  "list_title": "Tu rotación",
+  "spotlight": {
+    "label": "Ahora toca",
+    "rusty": "por repasar",
+    "all_fresh_title": "Todo está fresco",
+    "all_fresh_body": "Lo has tocado todo en la última semana. Saca una carta si aun así te apetece tocar.",
+    "play_stalest_one": "Tocar lo más olvidado",
+    "play_stalest_other": "Tocar los {{count}} más olvidados",
+    "minutes": "unos {{count}} min",
+    "draw": "Sacar una carta"
+  },
+  "levels": {
+    "rusty": "Oxidándose",
+    "cooling": "Enfriándose",
+    "fresh": "Fresco"
+  },
+  "days": {
+    "never": "Aún sin tocar",
+    "today": "Tocado hoy",
+    "yesterday": "Ayer",
+    "ago_one": "hace {{count}} día",
+    "ago_other": "hace {{count}} días"
+  },
+  "types": {
+    "song": "Canción",
+    "exercise": "Ejercicio",
+    "skill": "Habilidad",
+    "custom": "Propio"
+  },
+  "row": {
+    "play": "Tocar {{title}}",
+    "remove": "Quitar {{title}} de la rotación",
+    "skill_hint": "Toca uno de sus ejercicios",
+    "done": "Marcar {{title}} como hecho",
+    "open_link": "Abrir {{site}}"
+  },
+  "empty": {
+    "title": "Mantén en tus manos lo que has aprendido",
+    "body": "Añade las canciones, ejercicios y habilidades que no quieres perder. Lo que llevas más tiempo sin tocar sale primero, y un toque empieza una sesión corta con ello.",
+    "cta": "Añadir lo primero"
+  },
+  "picker": {
+    "title": "Añadir a la rotación",
+    "description": "Elige aquello a lo que quieres volver una y otra vez.",
+    "tabs": {
+      "song": "Canciones",
+      "exercise": "Ejercicios",
+      "skill": "Habilidades",
+      "custom": "Propios"
+    },
+    "search": "Buscar",
+    "no_results": "No hay coincidencias",
+    "no_songs": "Tu biblioteca de canciones está vacía.",
+    "find_songs": "Buscar canciones",
+    "add_item": "Añadir {{title}}",
+    "remove_item": "Quitar {{title}}",
+    "full": "Tu rotación está llena ({{count}} elementos). Quita algo primero.",
+    "done": "Listo"
+  },
+  "draw": {
+    "title": "Sacar una carta",
+    "description": "Una elección al azar que se inclina por lo que llevas tiempo sin tocar.",
+    "play": "Tocar",
+    "again": "Sacar otra",
+    "done": "Marcar como hecho"
+  },
+  "toast": {
+    "error": "No se pudo guardar. Inténtalo de nuevo.",
+    "nothing_to_play": "Ahora mismo no hay nada que tocar aquí.",
+    "removed": "Quitado: {{title}}",
+    "undo": "Deshacer",
+    "done": "Hecho: {{title}}"
+  },
+  "custom": {
+    "examples_label": "Empieza con un ejemplo",
+    "examples": {
+      "course": {
+        "title": "Curso de blues: siguiente lección",
+        "note": "Mírala y luego toca encima hasta que salga"
+      },
+      "chord": {
+        "title": "Un acorde nuevo al día",
+        "note": "Apréndelo y úsalo en una progresión"
+      },
+      "transcribe": {
+        "title": "Sacar un lick de oído",
+        "note": "Primero de oído, la tablatura al final"
+      },
+      "jam": {
+        "title": "Improvisar sobre una base",
+        "note": "Elige una tonalidad e improvisa una pista entera"
+      }
+    },
+    "name_label": "Nombre",
+    "name_placeholder": "p. ej. Curso de blues: lección 4",
+    "note_label": "Nota (opcional)",
+    "note_placeholder": "p. ej. Practica el turnaround a 80 BPM",
+    "link_label": "Enlace (opcional)",
+    "link_placeholder": "p. ej. la página de un curso o un vídeo",
+    "link_invalid": "Eso no parece un enlace web.",
+    "timer_label": "Medir el tiempo con el temporizador libre",
+    "timer_on": "Tocar abre el temporizador libre con este elemento y el tiempo se registra como cualquier sesión.",
+    "timer_off": "Sin temporizador: lo marcas cuando esté hecho. No se registra nada.",
+    "category_label": "Registrar el tiempo como",
+    "add": "Añadir a la rotación",
+    "yours": "Tus elementos propios"
+  },
+  "timer": {
+    "from_rotation": "De tu rotación",
+    "open_link": "Abrir {{site}}"
+  }
+}

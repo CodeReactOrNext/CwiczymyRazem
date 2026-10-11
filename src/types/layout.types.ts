@@ -26,6 +26,7 @@ export type NavPagesTypes =
   | "scoring"
   | "my-exercises"
   | "favorites"
+  | "rotation"
   | "roadmap"
   | "practice-log"
   | "goals"

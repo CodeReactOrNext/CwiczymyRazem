@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "Rotacja",
+    "subtitle": "Utwory, ćwiczenia i umiejętności, które chcesz mieć w rękach",
+    "eyebrow": "Biblioteka"
+  },
+  "add": "Dodaj",
+  "list_title": "Twoja rotacja",
+  "spotlight": {
+    "label": "Na teraz",
+    "rusty": "do odświeżenia",
+    "all_fresh_title": "Wszystko jest świeże",
+    "all_fresh_body": "Grałeś to wszystko w ostatnim tygodniu. Wylosuj kartę, jeśli i tak masz ochotę pograć.",
+    "play_stalest_one": "Zagraj najdawniej grane",
+    "play_stalest_few": "Zagraj {{count}} najdawniej grane",
+    "play_stalest_many": "Zagraj {{count}} najdawniej granych",
+    "play_stalest_other": "Zagraj {{count}} najdawniej grane",
+    "minutes": "ok. {{count}} min",
+    "draw": "Wylosuj kartę"
+  },
+  "levels": {
+    "rusty": "Rdzewieje",
+    "cooling": "Stygnie",
+    "fresh": "Świeże"
+  },
+  "days": {
+    "never": "Jeszcze nie grane",
+    "today": "Grane dziś",
+    "yesterday": "Wczoraj",
+    "ago_one": "{{count}} dzień temu",
+    "ago_few": "{{count}} dni temu",
+    "ago_many": "{{count}} dni temu",
+    "ago_other": "{{count}} dnia temu"
+  },
+  "types": {
+    "song": "Utwór",
+    "exercise": "Ćwiczenie",
+    "skill": "Umiejętność",
+    "custom": "Własne"
+  },
+  "row": {
+    "play": "Zagraj: {{title}}",
+    "remove": "Usuń {{title}} z rotacji",
+    "skill_hint": "Gra jedno z jej ćwiczeń",
+    "done": "Odhacz: {{title}}",
+    "open_link": "Otwórz {{site}}"
+  },
+  "empty": {
+    "title": "Utrzymaj w rękach to, czego się nauczyłeś",
+    "body": "Dodaj utwory, ćwiczenia i umiejętności, których nie chcesz stracić. Najdłużej nieruszane wyskakują na górę, a jedno kliknięcie odpala z nimi krótką sesję.",
+    "cta": "Dodaj pierwszą rzecz"
+  },
+  "picker": {
+    "title": "Dodaj do rotacji",
+    "description": "Wybierz to, do czego chcesz wracać.",
+    "tabs": {
+      "song": "Utwory",
+      "exercise": "Ćwiczenia",
+      "skill": "Umiejętności",
+      "custom": "Własne"
+    },
+    "search": "Szukaj",
+    "no_results": "Nic nie pasuje",
+    "no_songs": "Twoja biblioteka utworów jest pusta.",
+    "find_songs": "Znajdź utwory",
+    "add_item": "Dodaj {{title}}",
+    "remove_item": "Usuń {{title}}",
+    "full": "Rotacja jest pełna ({{count}} pozycji). Najpierw coś usuń.",
+    "done": "Gotowe"
+  },
+  "draw": {
+    "title": "Wylosuj kartę",
+    "description": "Losowy wybór, który częściej trafia na to, czego dawno nie grałeś.",
+    "play": "Graj",
+    "again": "Losuj dalej",
+    "done": "Odhacz"
+  },
+  "toast": {
+    "error": "Nie udało się zapisać. Spróbuj jeszcze raz.",
+    "nothing_to_play": "Nie ma tu teraz nic do zagrania.",
+    "removed": "Usunięto: {{title}}",
+    "undo": "Cofnij",
+    "done": "Odhaczone: {{title}}"
+  },
+  "custom": {
+    "examples_label": "Zacznij od przykładu",
+    "examples": {
+      "course": {
+        "title": "Kurs bluesa: kolejna lekcja",
+        "note": "Obejrzyj, potem graj razem, aż siądzie"
+      },
+      "chord": {
+        "title": "Jeden nowy akord dziennie",
+        "note": "Naucz się go i użyj w progresji"
+      },
+      "transcribe": {
+        "title": "Rozpisz jedną zagrywkę",
+        "note": "Najpierw ze słuchu, taby sprawdź na końcu"
+      },
+      "jam": {
+        "title": "Jam do podkładu",
+        "note": "Wybierz tonację i improwizuj przez jeden utwór"
+      }
+    },
+    "name_label": "Nazwa",
+    "name_placeholder": "np. Kurs bluesa: lekcja 4",
+    "note_label": "Notatka (opcjonalnie)",
+    "note_placeholder": "np. Ćwicz turnaround na 80 BPM",
+    "link_label": "Link (opcjonalnie)",
+    "link_placeholder": "np. strona kursu albo film",
+    "link_invalid": "To nie wygląda na link do strony.",
+    "timer_label": "Mierz czas free timerem",
+    "timer_on": "Graj otwiera Free Timer z tą pozycją, a czas zapisuje się jak każda sesja.",
+    "timer_off": "Bez timera: odhaczasz, gdy zrobione. Nic się nie loguje.",
+    "category_label": "Zapisz czas jako",
+    "add": "Dodaj do rotacji",
+    "yours": "Twoje własne pozycje"
+  },
+  "timer": {
+    "from_rotation": "Z Twojej rotacji",
+    "open_link": "Otwórz {{site}}"
+  }
+}

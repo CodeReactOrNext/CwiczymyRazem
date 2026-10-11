@@ -44,6 +44,7 @@
   "favorites": "Favoritos",
   "my_plans": "Mis planes",
   "my_exercises": "Mis ejercicios",
+  "rotation": "Rotación",
   "create_plan": "Crear plan",
   "create_exercise": "Crear ejercicio",
   "locked_until_level": "Bloqueado hasta el nivel {{level}}",
@@ -120,6 +121,9 @@
     },
     "plans": {
       "label": "Mis planes"
+    },
+    "rotation": {
+      "label": "Rotación"
     },
     "my_exercises": {
       "label": "Mis ejercicios"

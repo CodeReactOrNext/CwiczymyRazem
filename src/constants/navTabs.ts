@@ -7,6 +7,7 @@ import {
   Heart,
   ListChecks,
   Medal,
+  Repeat,
   ScrollText,
   Target,
   Trophy,
@@ -14,6 +15,7 @@ import {
 
 export const LIBRARY_TABS: PageTab[] = [
   { label: "Favorites", href: "/favorites", icon: Heart },
+  { label: "Rotation", href: "/rotation", icon: Repeat },
   { label: "My Plans", href: "/plans", icon: ListChecks },
   { label: "My Exercises", href: "/my-exercises", icon: Dumbbell },
 ];

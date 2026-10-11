@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
 import { isAutoPlanId, isRecognizedPracticePlan } from 'feature/exercisePlan/utils/isRecognizedPracticePlan';
 import { collectPlanSongPractice, pickPrimaryPlanSong } from 'feature/exercisePlan/utils/planSongPractice';
+import { collectPracticed } from 'feature/rotation/utils/lastPracticed';
 import { selectUserAuth } from 'feature/user/store/userSlice';
 import { updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
 import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
@@ -107,6 +108,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           // What lets another player open this routine from the activity feed when it's one only
           // this player has (their own plan, an auto plan). A song wrapper has its song for that.
           ...(!plan.song && { exerciseIds: plan.exercises.map((exercise) => exercise.id) }),
+          ...(!plan.song && collectPracticed(plan.exercises, completedExercises)),
           skillPointsGained: options?.skipSkillPoints
             ? {}
             : computeSkillPointsGained(plan.exercises, completedExercises),

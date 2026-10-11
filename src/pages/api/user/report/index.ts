@@ -17,6 +17,7 @@ import {
   firebaseSetUserExerciseRaprot,
 } from "feature/report/services/setUserExerciseRaport";
 import { firebaseUpdateUserStats } from "feature/report/services/updateUserStats";
+import { buildLastPracticedUpdate } from "feature/rotation/utils/lastPracticed";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { FieldValue } from "firebase-admin/firestore";
 import { ACHIEVEMENT_STATS_PATH, countsAsPlayer } from "lib/achievements/achievementStats";
@@ -317,6 +318,35 @@ export default async function handler(
       inputData.planId ?? null,
       songDetails
     ));
+
+    // "Last played" stamps for the Rotation panel. Back-dated logs are skipped:
+    // they describe a day already gone and would make an item look fresher
+    // than it is.
+    const lastPracticedUpdate = report.isDateBackReport
+      ? null
+      : buildLastPracticedUpdate(
+          {
+            songId: inputData.songId,
+            songs: reportSongs,
+            practiced: inputData.practiced,
+          },
+          Date.now()
+        );
+
+    if (lastPracticedUpdate) {
+      writePromises.push(
+        firestore
+          .collection("users")
+          .doc(userUid)
+          .collection("settings")
+          .doc("rotation")
+          .set(lastPracticedUpdate, { merge: true })
+          .catch((error: unknown) => {
+            // A missed stamp only makes an item look older than it is.
+            console.error("rotation lastPracticed write failed:", error);
+          })
+      );
+    }
 
     if (!report.isDateBackReport) {
       // `streakDays` is the activity-log-derived streak the client sent — the same

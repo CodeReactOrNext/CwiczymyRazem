@@ -81,7 +81,7 @@ const tagKey = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, "_"
 
 const ReportView = () => {
   const router = useRouter();
-  const { songId, songTitle, songArtist, planId, planTitle, applyTimer, returnTo } = router.query;
+  const { songId, songTitle, songArtist, planId, planTitle, applyTimer, returnTo, rotation } = router.query;
   const [view, setView] = useState<'form' | 'success'>('form');
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
@@ -392,6 +392,12 @@ const ReportView = () => {
       songId: primarySong?.songId,
       songTitle: primarySong?.songTitle,
       songArtist: primarySong?.songArtist,
+      // Free Timer opened for a custom Rotation item (`?rotation=<id>`): the
+      // report stamps that item as played.
+      ...(typeof rotation === "string" &&
+        rotation && {
+          practiced: { exerciseIds: [], skillIds: [], customIds: [rotation] },
+        }),
       ...getClientReportContext(
         (reportList ?? []).map((report: { date: Date | string }) => report.date)
       ),

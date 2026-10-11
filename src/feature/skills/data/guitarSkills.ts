@@ -1,39 +1,41 @@
-import type { GuitarSkill, } from "feature/skills/skills.types";
 import {
-  GiBrain,
+  AlternatePickingIcon,
+  ArticulationIcon,
+  BendingIcon,
+  ChordsIcon,
+  EarTrainingIcon,
+  HarmonyIcon,
+  HybridPickingIcon,
+  LegatoIcon,
+  PhrasingIcon,
+  ScalesIcon,
+  SweepPickingIcon,
+  TappingIcon,
+  VibratoIcon,
+} from "feature/skills/icons/skillIcons";
+import type { GuitarSkill } from "feature/skills/skills.types";
+import {
   GiCompactDisc,
-  GiGClef,
-  GiGuitarHead,
   GiHand,
   GiHeadphones,
   GiJumpAcross,
   GiLightBulb,
   GiMetronome,
-  GiMicrophone,
-  GiMusicalNotes,
-  GiMusicalScore,
   GiOpenBook,
-  GiPaintBrush,
-  GiPickOfDestiny,
   GiQuillInk,
-  GiRadarSweep,
   GiSoundOn,
-  GiSoundWaves,
-  GiStairsGoal,
-  GiSteelClaws,
-  GiVibratingBall
 } from "react-icons/gi";
 
 export const guitarSkills: GuitarSkill[] = [
   {
     id: "alternate_picking",
     category: "technique",
-    icon: GiGuitarHead,
+    icon: AlternatePickingIcon,
   },
   {
     id: "phrasing",
     category: "creativity",
-    icon: GiPaintBrush,
+    icon: PhrasingIcon,
   },
   {
     id: "finger_independence",
@@ -43,22 +45,22 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "legato",
     category: "technique",
-    icon: GiMusicalNotes,
+    icon: LegatoIcon,
   },
   {
     id: "sweep_picking",
     category: "technique",
-    icon: GiRadarSweep,
+    icon: SweepPickingIcon,
   },
   {
     id: "chords",
     category: "theory",
-    icon: GiMusicalScore,
+    icon: ChordsIcon,
   },
   {
     id: "scales",
     category: "theory",
-    icon: GiStairsGoal,
+    icon: ScalesIcon,
   },
   {
     id: "rhythm",
@@ -68,12 +70,12 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "bending",
     category: "technique",
-    icon: GiSoundWaves,
+    icon: BendingIcon,
   },
   {
     id: "tapping",
     category: "technique",
-    icon: GiSteelClaws,
+    icon: TappingIcon,
   },
   {
     id: "improvisation",
@@ -83,7 +85,7 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "ear_training",
     category: "hearing",
-    icon: GiBrain,
+    icon: EarTrainingIcon,
   },
   {
     id: "composition",
@@ -93,7 +95,7 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "articulation",
     category: "technique",
-    icon: GiMicrophone,
+    icon: ArticulationIcon,
   }, {
     id: "harmony-ear",
     category: "hearing",
@@ -107,12 +109,12 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "harmony",
     category: "theory",
-    icon: GiGClef,
+    icon: HarmonyIcon,
   },
   {
     id: "vibrato",
     category: "technique",
-    icon: GiVibratingBall,
+    icon: VibratoIcon,
   },
   {
     id: "music_theory",
@@ -127,7 +129,7 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "hybrid_picking",
     category: "technique",
-    icon: GiPickOfDestiny,
+    icon: HybridPickingIcon,
   },
   {
     id: "string_skipping",

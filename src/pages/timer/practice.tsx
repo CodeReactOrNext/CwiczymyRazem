@@ -1,5 +1,7 @@
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { RotationTimerBanner } from "feature/rotation/components/RotationTimerBanner";
+import { useCustomRotationItem } from "feature/rotation/hooks/useCustomRotationItem";
 import { selectTimerData, updateLocalTimer, updateTimerTime } from "feature/user/store/userSlice";
 import useTimer from "hooks/useTimer";
 import AppLayout from "layouts/AppLayout";
@@ -24,6 +26,11 @@ const TimerPractice: NextPageWithLayout = () => {
   const timer = useTimer();
   const timerData = useAppSelector(selectTimerData);
   const router = useRouter();
+  // Opened for a custom Rotation item (`?rotation=<id>`): the item rides along
+  // to the report, which stamps it as played, and "Continue" leads back to Rotation.
+  const rotationId =
+    typeof router.query.rotation === "string" ? router.query.rotation : null;
+  const rotationItem = useCustomRotationItem(rotationId);
 
   const choseSkillHandler = (newSkill: SkillsType) => {
     if (chosenSkillRef.current) {
@@ -62,8 +69,14 @@ const TimerPractice: NextPageWithLayout = () => {
         time: timer.getTime(),
       }));
     }
-    router.push("/report?applyTimer=true");
-  }, [timer, chosenSkill, dispatch, router]);
+    const query = new URLSearchParams({ applyTimer: "true" });
+    if (rotationItem) {
+      query.set("rotation", rotationItem.id);
+      query.set("planTitle", rotationItem.title ?? "");
+      query.set("returnTo", "/rotation");
+    }
+    router.push(`/report?${query.toString()}`);
+  }, [timer, chosenSkill, dispatch, router, rotationItem]);
 
   const resetTimerHandler = useCallback(() => {
     timer.restartTime();
@@ -88,6 +101,7 @@ const TimerPractice: NextPageWithLayout = () => {
         backgroundContent={<HeroPattern variant="timer" />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
+      {rotationItem && <RotationTimerBanner item={rotationItem} />}
       <TimerLayout
         timer={timer}
         timerData={timerData}
