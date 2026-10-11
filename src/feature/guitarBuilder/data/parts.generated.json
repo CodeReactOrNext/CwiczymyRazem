@@ -1,0 +1,671 @@
+{
+  "neckWidth": 88,
+  "bodies": [
+    {
+      "key": "t-style",
+      "name": "T-Style",
+      "src": "/images/guitar-builder/bodies/t-style.webp",
+      "maps": "/images/guitar-builder/bodies/t-style.maps.webp",
+      "surface": "/images/guitar-builder/bodies/t-style.surface.webp",
+      "width": 684,
+      "height": 539,
+      "jointX": 683,
+      "axisY": 265.4,
+      "fretStartX": 537,
+      "finishHue": 186.2,
+      "finishL": 0.226,
+      "pickguardL": 0.973,
+      "pickupTone": {
+        "lo": 0.102,
+        "mid": 0.251,
+        "hi": 0.665
+      },
+      "stickerSpot": {
+        "x": 163,
+        "y": 114
+      },
+      "singleCoils": [
+        {
+          "cx": 319,
+          "cy": 268.5,
+          "w": 37,
+          "h": 128,
+          "lean": 17,
+          "r": 18,
+          "strings": [221.6, 239.4, 257.1, 274.9, 292.6, 310.4]
+        },
+        {
+          "cx": 506,
+          "cy": 267.5,
+          "w": 27,
+          "h": 115,
+          "lean": 0,
+          "r": 13,
+          "strings": [225.9, 242.1, 258.4, 274.6, 290.9, 307.1]
+        }
+      ]
+    },
+    {
+      "key": "t-style-coral",
+      "name": "T-Style Coral",
+      "src": "/images/guitar-builder/bodies/t-style-coral.webp",
+      "maps": "/images/guitar-builder/bodies/t-style-coral.maps.webp",
+      "surface": "/images/guitar-builder/bodies/t-style-coral.surface.webp",
+      "width": 683,
+      "height": 536,
+      "jointX": 682,
+      "axisY": 263.3,
+      "fretStartX": 534,
+      "finishHue": 4.1,
+      "finishL": 0.636,
+      "pickguardL": 0.974,
+      "pickupTone": {
+        "lo": 0.051,
+        "mid": 0.273,
+        "hi": 0.659
+      },
+      "stickerSpot": {
+        "x": 162,
+        "y": 114
+      },
+      "singleCoils": [
+        {
+          "cx": 317.5,
+          "cy": 266,
+          "w": 37,
+          "h": 127,
+          "lean": 15,
+          "r": 18,
+          "strings": [220.8, 238.3, 255.8, 273.3, 290.8, 308.3]
+        },
+        {
+          "cx": 504,
+          "cy": 270,
+          "w": 27,
+          "h": 114,
+          "lean": 0,
+          "r": 13,
+          "strings": [223.9, 240.1, 256.4, 272.6, 288.9, 305.1]
+        }
+      ]
+    },
+    {
+      "key": "s-style",
+      "name": "S-Style Burst",
+      "src": "/images/guitar-builder/bodies/s-style.webp",
+      "maps": "/images/guitar-builder/bodies/s-style.maps.webp",
+      "surface": "/images/guitar-builder/bodies/s-style.surface.webp",
+      "width": 749,
+      "height": 528,
+      "jointX": 748,
+      "axisY": 259.7,
+      "fretStartX": 516,
+      "finishHue": 32.5,
+      "finishL": 0.28,
+      "pickguardL": 0.939,
+      "pickupTone": {
+        "lo": 0.261,
+        "mid": 0.576,
+        "hi": 0.822
+      },
+      "stickerSpot": {
+        "x": 172,
+        "y": 118
+      },
+      "singleCoils": [
+        {
+          "cx": 306,
+          "cy": 262.5,
+          "w": 30,
+          "h": 126,
+          "lean": 9,
+          "r": 15,
+          "strings": [217.5, 234.5, 251.5, 268.5, 285.5, 302.5]
+        },
+        {
+          "cx": 396,
+          "cy": 261,
+          "w": 30,
+          "h": 118,
+          "lean": 0,
+          "r": 15,
+          "strings": [218.1, 234.9, 251.6, 268.4, 285.1, 301.9]
+        },
+        {
+          "cx": 488,
+          "cy": 261,
+          "w": 30,
+          "h": 118,
+          "lean": 0,
+          "r": 15,
+          "strings": [219.4, 235.6, 251.9, 268.1, 284.4, 300.6]
+        }
+      ]
+    },
+    {
+      "key": "s-style-green",
+      "name": "S-Style",
+      "src": "/images/guitar-builder/bodies/s-style-green.webp",
+      "maps": "/images/guitar-builder/bodies/s-style-green.maps.webp",
+      "surface": "/images/guitar-builder/bodies/s-style-green.surface.webp",
+      "width": 803,
+      "height": 558,
+      "jointX": 802,
+      "axisY": 275.9,
+      "fretStartX": 568,
+      "finishHue": 162.7,
+      "finishL": 0.206,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.025,
+        "mid": 0.165,
+        "hi": 0.594
+      },
+      "stickerSpot": {
+        "x": 178,
+        "y": 116
+      },
+      "singleCoils": [
+        {
+          "cx": 338,
+          "cy": 281,
+          "w": 31,
+          "h": 118,
+          "lean": 11,
+          "r": 15,
+          "strings": [230.5, 248.5, 266.5, 284.5, 302.5, 320.5]
+        },
+        {
+          "cx": 432,
+          "cy": 281,
+          "w": 31,
+          "h": 118,
+          "lean": 0,
+          "r": 15,
+          "strings": [232.4, 249.6, 266.9, 284.1, 301.4, 318.6]
+        },
+        {
+          "cx": 532,
+          "cy": 281,
+          "w": 31,
+          "h": 118,
+          "lean": 0,
+          "r": 15,
+          "strings": [234.1, 250.9, 267.6, 284.4, 301.1, 317.9]
+        }
+      ]
+    },
+    {
+      "key": "superstrat",
+      "name": "Superstrat",
+      "src": "/images/guitar-builder/bodies/superstrat.webp",
+      "maps": "/images/guitar-builder/bodies/superstrat.maps.webp",
+      "surface": "/images/guitar-builder/bodies/superstrat.surface.webp",
+      "width": 778,
+      "height": 540,
+      "jointX": 777,
+      "axisY": 262.1,
+      "fretStartX": 520,
+      "finishHue": 1.4,
+      "finishL": 0.22,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.22,
+        "mid": 0.584,
+        "hi": 0.776
+      },
+      "stickerSpot": {
+        "x": 136,
+        "y": 410
+      },
+      "singleCoils": [
+        {
+          "cx": 412,
+          "cy": 265,
+          "w": 27.5,
+          "h": 135,
+          "lean": 0,
+          "r": 13,
+          "strings": [224.4, 240.6, 256.9, 273.1, 289.4, 305.6]
+        }
+      ]
+    },
+    {
+      "key": "superstrat-flame",
+      "name": "Superstrat Flame",
+      "src": "/images/guitar-builder/bodies/superstrat-flame.webp",
+      "maps": "/images/guitar-builder/bodies/superstrat-flame.maps.webp",
+      "surface": "/images/guitar-builder/bodies/superstrat-flame.surface.webp",
+      "width": 777,
+      "height": 534,
+      "jointX": 776,
+      "axisY": 258.3,
+      "fretStartX": 520,
+      "finishHue": 29.1,
+      "finishL": 0.304,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.049,
+        "mid": 0.253,
+        "hi": 0.476
+      },
+      "stickerSpot": {
+        "x": 163,
+        "y": 107
+      },
+      "singleCoils": [
+        {
+          "cx": 412,
+          "cy": 266,
+          "w": 27.5,
+          "h": 133,
+          "lean": 0,
+          "r": 13,
+          "strings": [217.3, 235.8, 254.3, 272.8, 291.3, 309.8]
+        }
+      ]
+    },
+    {
+      "key": "single-cut",
+      "name": "Single-Cut",
+      "src": "/images/guitar-builder/bodies/single-cut.webp",
+      "maps": "/images/guitar-builder/bodies/single-cut.maps.webp",
+      "surface": "/images/guitar-builder/bodies/single-cut.surface.webp",
+      "width": 687,
+      "height": 528,
+      "jointX": 686,
+      "axisY": 260.7,
+      "fretStartX": 551,
+      "finishHue": 343.5,
+      "finishL": 0.191,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.233,
+        "mid": 0.612,
+        "hi": 0.725
+      },
+      "stickerSpot": {
+        "x": 117,
+        "y": 273
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "double-cut",
+      "name": "Double-Cut",
+      "src": "/images/guitar-builder/bodies/double-cut.webp",
+      "maps": "/images/guitar-builder/bodies/double-cut.maps.webp",
+      "surface": "/images/guitar-builder/bodies/double-cut.surface.webp",
+      "width": 604,
+      "height": 473,
+      "jointX": 603,
+      "axisY": 233.2,
+      "fretStartX": 515,
+      "finishHue": 0.3,
+      "finishL": 0.252,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.008,
+        "mid": 0.067,
+        "hi": 0.727
+      },
+      "stickerSpot": {
+        "x": 112,
+        "y": 134
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "carved-double-cut",
+      "name": "Carved Double-Cut",
+      "src": "/images/guitar-builder/bodies/carved-double-cut.webp",
+      "maps": "/images/guitar-builder/bodies/carved-double-cut.maps.webp",
+      "surface": "/images/guitar-builder/bodies/carved-double-cut.surface.webp",
+      "width": 671,
+      "height": 527,
+      "jointX": 670,
+      "axisY": 259,
+      "fretStartX": 482,
+      "finishHue": 212,
+      "finishL": 0.159,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.433,
+        "mid": 0.539,
+        "hi": 0.722
+      },
+      "stickerSpot": {
+        "x": 213,
+        "y": 120
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "offset",
+      "name": "Offset",
+      "src": "/images/guitar-builder/bodies/offset.webp",
+      "maps": "/images/guitar-builder/bodies/offset.maps.webp",
+      "surface": "/images/guitar-builder/bodies/offset.surface.webp",
+      "width": 793,
+      "height": 577,
+      "jointX": 792,
+      "axisY": 287.9,
+      "fretStartX": 582,
+      "finishHue": 196.4,
+      "finishL": 0.413,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.31,
+        "mid": 0.439,
+        "hi": 0.6
+      },
+      "stickerSpot": {
+        "x": 255,
+        "y": 113
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "offset-seafoam",
+      "name": "Offset Relic",
+      "src": "/images/guitar-builder/bodies/offset-seafoam.webp",
+      "maps": "/images/guitar-builder/bodies/offset-seafoam.maps.webp",
+      "surface": "/images/guitar-builder/bodies/offset-seafoam.surface.webp",
+      "width": 730,
+      "height": 538,
+      "jointX": 729,
+      "axisY": 268.9,
+      "fretStartX": 541,
+      "finishHue": 146.2,
+      "finishL": 0.655,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.249,
+        "mid": 0.8,
+        "hi": 0.835
+      },
+      "stickerSpot": {
+        "x": 209,
+        "y": 103
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "semi-hollow",
+      "name": "Semi-Hollow",
+      "src": "/images/guitar-builder/bodies/semi-hollow.webp",
+      "maps": "/images/guitar-builder/bodies/semi-hollow.maps.webp",
+      "surface": "/images/guitar-builder/bodies/semi-hollow.surface.webp",
+      "width": 709,
+      "height": 603,
+      "jointX": 708,
+      "axisY": 300.3,
+      "fretStartX": 588,
+      "finishHue": 1,
+      "finishL": 0.23,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.255,
+        "mid": 0.692,
+        "hi": 0.775
+      },
+      "stickerSpot": {
+        "x": 139,
+        "y": 150
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "x-style",
+      "name": "X-Style",
+      "src": "/images/guitar-builder/bodies/x-style.webp",
+      "maps": "/images/guitar-builder/bodies/x-style.maps.webp",
+      "surface": "/images/guitar-builder/bodies/x-style.surface.webp",
+      "width": 790,
+      "height": 573,
+      "jointX": 789,
+      "axisY": 290.5,
+      "fretStartX": 606,
+      "finishHue": 358.9,
+      "finishL": 0.337,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.012,
+        "mid": 0.184,
+        "hi": 0.565
+      },
+      "stickerSpot": {
+        "x": 165,
+        "y": 181
+      },
+      "singleCoils": []
+    }
+  ],
+  "necks": [
+    {
+      "key": "maple-dots",
+      "name": "Maple · dots",
+      "src": "/images/guitar-builder/necks/maple-dots.webp",
+      "width": 739,
+      "height": 104,
+      "jointX": 242,
+      "axisY": 52.7,
+      "nutX": 738,
+      "nutWidth": 70.7
+    },
+    {
+      "key": "maple-vines",
+      "name": "Maple · vine inlays",
+      "src": "/images/guitar-builder/necks/maple-vines.webp",
+      "width": 732,
+      "height": 104,
+      "jointX": 146,
+      "axisY": 52.4,
+      "nutX": 731,
+      "nutWidth": 70.1
+    },
+    {
+      "key": "maple-blocks",
+      "name": "Maple · blocks",
+      "src": "/images/guitar-builder/necks/maple-blocks.webp",
+      "width": 761,
+      "height": 104,
+      "jointX": 196,
+      "axisY": 52.8,
+      "nutX": 760,
+      "nutWidth": 72.3
+    },
+    {
+      "key": "rosewood-dots",
+      "name": "Rosewood · dots",
+      "src": "/images/guitar-builder/necks/rosewood-dots.webp",
+      "width": 756,
+      "height": 104,
+      "jointX": 234,
+      "axisY": 52.9,
+      "nutX": 755,
+      "nutWidth": 70.9
+    },
+    {
+      "key": "rosewood-trapezoid",
+      "name": "Rosewood · trapezoids",
+      "src": "/images/guitar-builder/necks/rosewood-trapezoid.webp",
+      "width": 700,
+      "height": 104,
+      "jointX": 135,
+      "axisY": 52.7,
+      "nutX": 699,
+      "nutWidth": 69.3
+    },
+    {
+      "key": "ebony-blocks",
+      "name": "Ebony · blocks",
+      "src": "/images/guitar-builder/necks/ebony-blocks.webp",
+      "width": 660,
+      "height": 104,
+      "jointX": 128,
+      "axisY": 52.5,
+      "nutX": 659,
+      "nutWidth": 75.2
+    },
+    {
+      "key": "ebony-birds",
+      "name": "Ebony · birds",
+      "src": "/images/guitar-builder/necks/ebony-birds.webp",
+      "width": 749,
+      "height": 104,
+      "jointX": 198,
+      "axisY": 52.5,
+      "nutX": 748,
+      "nutWidth": 72.9
+    },
+    {
+      "key": "ebony-sharks",
+      "name": "Ebony · abalone",
+      "src": "/images/guitar-builder/necks/ebony-sharks.webp",
+      "width": 746,
+      "height": 104,
+      "jointX": 256,
+      "axisY": 52.3,
+      "nutX": 745,
+      "nutWidth": 73.2
+    }
+  ],
+  "heads": [
+    {
+      "key": "six-inline",
+      "name": "Six in line",
+      "src": "/images/guitar-builder/heads/six-inline.webp",
+      "width": 285,
+      "height": 164,
+      "nutX": 3,
+      "axisY": 80.8,
+      "nutWidth": 70.7
+    },
+    {
+      "key": "three-three",
+      "name": "Three a side",
+      "src": "/images/guitar-builder/heads/three-three.webp",
+      "width": 259,
+      "height": 189,
+      "nutX": 3,
+      "axisY": 92.6,
+      "nutWidth": 69.3
+    },
+    {
+      "key": "three-three-black",
+      "name": "Three a side · black",
+      "src": "/images/guitar-builder/heads/three-three-black.webp",
+      "width": 238,
+      "height": 206,
+      "nutX": 3,
+      "axisY": 99.2,
+      "nutWidth": 75.2
+    },
+    {
+      "key": "pointy",
+      "name": "Pointy",
+      "src": "/images/guitar-builder/heads/pointy.webp",
+      "width": 271,
+      "height": 244,
+      "nutX": 3,
+      "axisY": 155.5,
+      "nutWidth": 73.2
+    },
+    {
+      "key": "pointy-reverse",
+      "name": "Pointy · maple",
+      "src": "/images/guitar-builder/heads/pointy-reverse.webp",
+      "width": 269,
+      "height": 243,
+      "nutX": 3,
+      "axisY": 154.3,
+      "nutWidth": 73.3
+    },
+    {
+      "key": "carved",
+      "name": "Carved",
+      "src": "/images/guitar-builder/heads/carved.webp",
+      "width": 240,
+      "height": 193,
+      "nutX": 3,
+      "axisY": 93,
+      "nutWidth": 70.8
+    },
+    {
+      "key": "offset",
+      "name": "Offset",
+      "src": "/images/guitar-builder/heads/offset.webp",
+      "width": 250,
+      "height": 171,
+      "nutX": 3,
+      "axisY": 83.1,
+      "nutWidth": 68
+    }
+  ],
+  "tops": [
+    {
+      "key": "flame",
+      "name": "Flame",
+      "src": "/images/guitar-builder/tops/flame.webp",
+      "size": 320,
+      "depth": 0.13
+    },
+    {
+      "key": "quilt",
+      "name": "Quilt",
+      "src": "/images/guitar-builder/tops/quilt.webp",
+      "size": 320,
+      "depth": 0.13
+    },
+    {
+      "key": "birdseye",
+      "name": "Birdseye",
+      "src": "/images/guitar-builder/tops/birdseye.webp",
+      "size": 320,
+      "depth": 0.11
+    },
+    {
+      "key": "koa",
+      "name": "Koa",
+      "src": "/images/guitar-builder/tops/koa.webp",
+      "size": 512,
+      "depth": 0.14
+    },
+    {
+      "key": "ash",
+      "name": "Ash",
+      "src": "/images/guitar-builder/tops/ash.webp",
+      "size": 512,
+      "depth": 0.17
+    },
+    {
+      "key": "mahogany",
+      "name": "Mahogany",
+      "src": "/images/guitar-builder/tops/mahogany.webp",
+      "size": 512,
+      "depth": 0.09
+    },
+    {
+      "key": "walnut",
+      "name": "Walnut",
+      "src": "/images/guitar-builder/tops/walnut.webp",
+      "size": 512,
+      "depth": 0.15
+    },
+    {
+      "key": "burl",
+      "name": "Burl",
+      "src": "/images/guitar-builder/tops/burl.webp",
+      "size": 320,
+      "depth": 0.17
+    },
+    {
+      "key": "spalted",
+      "name": "Spalted",
+      "src": "/images/guitar-builder/tops/spalted.webp",
+      "size": 512,
+      "depth": 0.22
+    }
+  ]
+}

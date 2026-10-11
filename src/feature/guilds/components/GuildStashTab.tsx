@@ -227,6 +227,9 @@ export const GuildStashTab = ({
         tier: piece.part.tier,
         qty: qty ?? piece.part.qty,
       });
+    } else if (piece.kind === "component") {
+      // Builder parts aren't offered to the guild shelf.
+      return;
     } else if (piece.kind === "mod") {
       deposit.mutate({ kind: "mod", modId: piece.mod.id });
     } else {

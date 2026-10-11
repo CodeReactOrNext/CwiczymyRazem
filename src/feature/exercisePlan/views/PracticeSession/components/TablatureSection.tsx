@@ -184,7 +184,7 @@ export const TablatureSection = memo(function TablatureSection({
 }: TablatureSectionProps) {
   const { t } = useTranslation("session");
   const { hitNotes, missedNotes, noteTimings } = useNoteMatchingContext();
-  const { canCalibrateTiming, openTimingCalibration } = useSessionUI();
+  const { openTimingCalibration } = useSessionUI();
   const { tuning } = useGuitarTuningContext();
   const {
     settings,
@@ -432,7 +432,7 @@ export const TablatureSection = memo(function TablatureSection({
           </button>
         )}
       </div>
-      {isMicEnabled && canCalibrateTiming && (
+      {isMicEnabled && (
         <button
           type='button'
           onClick={openTimingCalibration}

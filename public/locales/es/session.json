@@ -75,6 +75,7 @@
     "step3": "Toca con el clic, no antes.",
     "now_using": "Ahora se usa",
     "measured_here": "medido en este navegador",
+    "measured_here_desktop": "medido en la app de escritorio",
     "estimate": "una estimación, aún sin medir",
     "mic_first": "Activa primero el micrófono",
     "forget": "Olvidar la medición y volver a la estimación",

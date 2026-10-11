@@ -76,6 +76,7 @@ export default async function handler(
       if (!idsToScrap.has(item.id) || protectedIds.has(item.id)) return true;
       const guitarDef = GUITARS_BY_ID.get(item.guitarId);
       if (!guitarDef) return true; // keep items we cannot value
+      if (item.custom) return true; // builds come apart in the Builder
 
       yields.push(getGuitarScrapYield(item, guitarDef));
       scrappedCount += 1;

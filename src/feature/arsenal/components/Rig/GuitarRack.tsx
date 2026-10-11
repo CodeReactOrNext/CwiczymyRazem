@@ -25,7 +25,11 @@ import {
 import { ArrowLeftRight, CirclePlus, MoreVertical, Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-import type { InventoryItem, RigSetup } from "../../types/arsenal.types";
+import type {
+  GuitarRarity,
+  InventoryItem,
+  RigSetup,
+} from "../../types/arsenal.types";
 import { ConditionMeter } from "../ConditionMeter";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { LevelEmblem } from "../LevelEmblem";
@@ -672,6 +676,71 @@ export const GuitarRack = ({
             </div>,
           ];
         })}
+      </div>
+    </div>
+  );
+};
+
+interface DisplayBayProps {
+  /** Lamp colour (`#rrggbb`); absent leaves the bay on its dim empty lamp. */
+  color?: string;
+  /** Level and rarity for the emblem; absent hides it. */
+  level?: number;
+  rarity?: GuitarRarity;
+  className?: string;
+  /** The art to hang, drawn horizontally; the bay stands it up on the hook. */
+  children: React.ReactNode;
+}
+
+/**
+ * One lit bay of the rack around any guitar art — the Guitar Builder hangs its
+ * live preview here so a build shows the way it will on the wall.
+ */
+export const DisplayBay = ({
+  color,
+  level,
+  rarity,
+  className,
+  children,
+}: DisplayBayProps) => {
+  const light = useLampLevel(color ? 1 : EMPTY_LAMP);
+  return (
+    <div
+      className={cn(
+        "relative flex h-[26rem] flex-col items-center overflow-hidden md:h-[36rem]",
+        className,
+      )}
+      style={{ background: WALL }}>
+      <Lamp color={color ?? "#ffffff"} level={light} />
+      <Hook lit={Boolean(color)} />
+      {level !== undefined && rarity && (
+        <div className='absolute right-5 top-[4rem] z-20'>
+          <LevelEmblem
+            level={level}
+            rarity={rarity}
+            size={40}
+            title='Guitar level'
+          />
+        </div>
+      )}
+      <div
+        className={cn(
+          "absolute inset-x-0 flex items-center justify-center",
+          GUITAR_TOP,
+          GUITAR_BOTTOM,
+        )}>
+        <div
+          className='pointer-events-none absolute -bottom-[2%] left-1/2 h-[3.6%] w-[48%] -translate-x-1/2 rounded-[100%] blur-[3px]'
+          style={{
+            background:
+              "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 55%, rgba(0,0,0,0.5) 100%)",
+          }}
+        />
+        <div
+          className='relative z-10 aspect-square h-full -rotate-90'
+          style={{ filter: "drop-shadow(0 18px 22px rgba(0,0,0,0.85))" }}>
+          {children}
+        </div>
       </div>
     </div>
   );

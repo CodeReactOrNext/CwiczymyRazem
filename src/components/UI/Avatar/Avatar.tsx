@@ -2,8 +2,8 @@
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { EquippedGuitarTooltip } from "feature/arsenal/components/EquippedGuitarTooltip";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
-import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { guitarDefinitionByImageId } from "feature/arsenal/data/guitarDefinitions";
+import { getRankBadgeSrc, isGuitarImageId } from "feature/arsenal/utils/guitarImage";
 import { useState } from "react";
 
 interface AvatarProps {
@@ -44,8 +44,8 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, userId 
     ? { bottom: "28px", left: "58px" }
     : { bottom: "18px", left: "35px" };
 
-  const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
-  const specialGuitarDef = isSpecialGuitar ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath) : null;
+  const isSpecialGuitar = isGuitarImageId(imgPath);
+  const specialGuitarDef = isSpecialGuitar ? guitarDefinitionByImageId(imgPath) : null;
   // Mint rarity, on purpose: this is a 25%-alpha drop shadow, and the promoted
   // rarity lives on the owner's inventory item — a document read per avatar,
   // which a leaderboard cannot afford. The card on hover reads the real one.

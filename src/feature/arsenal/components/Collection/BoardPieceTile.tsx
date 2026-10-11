@@ -1,11 +1,16 @@
 import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
 import type { DexStatus } from "feature/arsenal/utils/dex";
+import { ComponentPreviewCard } from "feature/guitarBuilder/components/ComponentPreviewCard";
+import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb";
+import { PartPlate } from "feature/guitarBuilder/components/PartPlate";
+import { getComponent } from "feature/guitarBuilder/utils/components";
 import type { ReactNode } from "react";
 
 import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
 import { GuitarStashTile } from "../GuitarInventory/GuitarStashTile";
 import { PartIcon } from "../Parts/PartIcon";
+import { getRarityColor } from "../RarityBadge";
 import { ModArt } from "../Workshop/ModArt";
 import { SalvagedModCard } from "./SalvagedModCard";
 import { ScrapPartCard } from "./ScrapPartCard";
@@ -90,6 +95,28 @@ export const BoardPieceTile = ({
         onClick={onClick}
       />
     );
+
+  if (piece.kind === "component") {
+    const def = getComponent(piece.component.defId);
+    return (
+      <StashTile
+        {...placement}
+        color={getRarityColor(def?.rarity)}
+        art={
+          def ? (
+            <PartPlate fills>
+              <ComponentThumb def={def} className='h-full p-[12%]' />
+            </PartPlate>
+          ) : null
+        }
+        label={piece.name}
+        level={piece.component.level}
+        preview={<ComponentPreviewCard component={piece.component} />}
+        previewFooter={previewFooter}
+        onClick={onClick}
+      />
+    );
+  }
 
   return (
     <StashTile

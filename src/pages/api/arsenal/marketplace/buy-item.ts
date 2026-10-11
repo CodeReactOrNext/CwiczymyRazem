@@ -70,7 +70,19 @@ export default async function handler(
         "statistics.fame": buyerFame - price,
       };
 
-      if (itemType === "mod") {
+      if (itemType === "component") {
+        // Re-keyed like a mod: the seller's uid only had to be unique in
+        // their stash. The escrow `id` is dropped — stashed parts key on uid.
+        const { id: _escrowId, ...part } = listing.item;
+        transferredItem = {
+          ...part,
+          uid: `market:${listingId}`,
+          isNew: true,
+          acquiredAt: Date.now(),
+        };
+        const stash: any[] = buyerData.arsenal?.components || [];
+        buyerUpdate["arsenal.components"] = [...stash, transferredItem];
+      } else if (itemType === "mod") {
         // Re-keyed on the way in. A stash id only has to be unique inside one
         // player's stash, and a trader mod's is `trader:<window>-mod` — the same
         // string for everyone who bought that day — so handing one over untouched
@@ -158,8 +170,9 @@ export default async function handler(
     }
 
     // Public activity log (panel only) — mirrors the listing log so purchases are visible
-    // in the feed and can be motivated like any other activity.
-    try {
+    // in the feed and can be motivated like any other activity. Builder parts
+    // are left out, as they are from the listing log.
+    if (result.itemType !== "component") try {
       await firestore.collection("logs").add({
         type: "marketplace_purchase",
         uid: buyerId,

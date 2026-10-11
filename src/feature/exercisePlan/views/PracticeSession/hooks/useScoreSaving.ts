@@ -1,5 +1,6 @@
 import { submitDailyExerciseScore } from "feature/dailyExercise/services/dailyExercise.service";
 import { findDailyDayKeyFor } from "feature/dailyExercise/utils/dailyExercise";
+import { recordPracticeRun } from "feature/exerciseGoals/services/exerciseGoals.service";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import type { RefObject } from "react";
@@ -20,6 +21,11 @@ interface UseScoreSavingOptions {
   noteMatchingHandle:   RefObject<NoteMatchingHandle | null>;
   /** Tempo the run is actually being played at — metronome BPM × speed multiplier. */
   sessionBpm:           number;
+  /**
+   * Put each scored run on its exercise's goal chart (when the exercise has an
+   * open goal). Off in goal mode, which saves its runs itself — as goal runs.
+   */
+  recordGoalChartRuns?: boolean;
 }
 
 /**
@@ -45,7 +51,7 @@ export interface ScoreRecords {
 
 export function useScoreSaving({
   activeExercise, currentExercise, isMicEnabled,
-  earTrainingScore, noteMatchingHandle, sessionBpm,
+  earTrainingScore, noteMatchingHandle, sessionBpm, recordGoalChartRuns = true,
 }: UseScoreSavingOptions) {
   const userAuth   = useAppSelector(selectUserAuth);
   const userName   = useAppSelector(selectUserName);
@@ -123,6 +129,11 @@ export function useScoreSaving({
       if (dailyDayKey) {
         submitDailyExerciseScore({ dayKey: dailyDayKey, exerciseId: exId, score: snap.score, accuracy: snap.accuracy, bpm: runBpm })
           .catch((error) => console.error("Daily exercise score was not saved", error));
+      }
+      // Practice runs draw the climb on the goal chart. Not awaited, and the
+      // service swallows its own errors — the chart is never worth a stalled finish.
+      if (recordGoalChartRuns && runBpm) {
+        void recordPracticeRun(userAuth, exId, { bpm: runBpm, accuracy: snap.accuracy }, snap.timingPrecision ?? null);
       }
       if (result.isNewRecord) {
         exerciseRecordsRef.current = {

@@ -50,6 +50,7 @@ import { useUpdateStashLayout } from "feature/arsenal/hooks/useUpdateStashLayout
 import { useWorkshopMod } from "feature/arsenal/hooks/useWorkshopMod";
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
 import {
+  componentPieces,
   guitarPiece,
   modPieces,
   partPieces,
@@ -85,6 +86,12 @@ import {
 } from "feature/arsenal/utils/stashLayout";
 import { ShelfDepositDialog } from "feature/guilds/components/ShelfDepositDialog";
 import { useShelfDeposit } from "feature/guilds/hooks/useShelfDeposit";
+import { useSellComponent } from "feature/guitarBuilder/hooks/useSellComponent";
+import type { OwnedComponent } from "feature/guitarBuilder/types/guitarBuilder.types";
+import {
+  getComponent,
+  getComponentResaleValue,
+} from "feature/guitarBuilder/utils/components";
 import { rarityLockLabel } from "feature/progression/components/RarityLock";
 import {
   rarityLockLvl,
@@ -103,6 +110,7 @@ import {
   Unplug,
   Wrench,
 } from "lucide-react";
+import { useRouter } from "next/router";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -151,6 +159,7 @@ type Pending = {
 /** A sale of something that is not gear, waiting on the same confirm dialog. */
 type ResalePending =
   | { kind: "mod"; mod: SalvagedMod }
+  | { kind: "component"; component: OwnedComponent }
   | { kind: "part"; partId: PartId; tier: PartTier; qty: number }
   | null;
 
@@ -198,6 +207,7 @@ export const StashInventory = ({
   scope,
   onManualArrange,
 }: StashInventoryProps) => {
+  const router = useRouter();
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
   const { mutate: unequip } = useUnequipGuitar();
   const { mutate: sellGuitar, isPending: isSellingGuitar } = useSellGuitar();
@@ -274,6 +284,12 @@ export const StashInventory = ({
    * mod itself rather than an id.
    */
   const [listMod, setListMod] = useState<SalvagedMod | null>(null);
+  /** A Builder part on its way to the market — same reasoning as `listMod`. */
+  const [listComponent, setListComponent] = useState<OwnedComponent | null>(
+    null,
+  );
+  const { mutate: sellComponent, isPending: isSellingComponent } =
+    useSellComponent();
   /** A rescued mod dropped onto an instrument, waiting on the bill. */
   const [fitPending, setFitPending] = useState<{
     mod: SalvagedMod;
@@ -378,12 +394,20 @@ export const StashInventory = ({
           byHand || (within === "all" && matchesQuery(piece.name, search)),
       );
 
+      // Guitar Builder parts are owned copies like mods — one socket each,
+      // gone from the board once a build uses them.
+      const components = componentPieces(data.components ?? []).filter(
+        (piece) =>
+          byHand || (within === "all" && matchesQuery(piece.name, search)),
+      );
+
       // Hand-arranged: the saved layout decides where everything hangs, so the
       // order the pieces are listed in only settles what was never placed.
       if (byHand)
         return [
           ...parts,
           ...mods,
+          ...components,
           ...data.inventory.map(guitarPiece),
           ...effectInventory.map(pedalPiece),
         ];
@@ -424,11 +448,12 @@ export const StashInventory = ({
       // The gear leads and the loose stuff trails: mods are a shelf of
       // blueprints waiting for a build, parts are a currency, and neither is
       // what the player came to the stash to look at.
-      return [...gear, ...mods, ...parts];
+      return [...gear, ...components, ...mods, ...parts];
     },
     [
       data.inventory,
       data.parts,
+      data.components,
       effectInventory,
       inUseGuitarIds,
       pedalboardItemIds,
@@ -515,6 +540,11 @@ export const StashInventory = ({
   );
 
   const closeDetail = () => setDetail(null);
+  /** Builder parts have no sheet of their own — they're used on the bench. */
+  const openBuilder = () =>
+    router.replace({ query: { ...router.query, tab: "builder" } }, undefined, {
+      shallow: true,
+    });
   /** A socket opened from the board — every kind has somewhere to open into. */
   const openPiece = (piece: BoardPiece) => {
     if (consumeClick()) return;
@@ -522,6 +552,8 @@ export const StashInventory = ({
       setDetail({ kind: piece.kind, itemId: piece.id });
     } else if (piece.kind === "mod") {
       setModDetail(piece.mod);
+    } else if (piece.kind === "component") {
+      openBuilder();
     } else {
       setPartDetail(piece.part);
     }
@@ -653,7 +685,7 @@ export const StashInventory = ({
     if (fitTargets) return !fitTargets.has(piece.id) && piece.id !== ghost?.id;
     if (!manual) return false;
     const inScope =
-      piece.kind === "part" || piece.kind === "mod"
+      piece.kind === "part" || piece.kind === "mod" || piece.kind === "component"
         ? scope === "all"
         : isScopeVisible(scope, piece.kind === "guitar" ? "guitars" : "pedals");
     return !inScope || !matchesQuery(piece.name, query);
@@ -846,6 +878,32 @@ export const StashInventory = ({
           danger: true,
           disabled: isSellingMod,
           onSelect: () => setResale({ kind: "mod", mod: piece.mod }),
+        },
+      ];
+
+    if (piece.kind === "component")
+      return [
+        {
+          id: "builder",
+          label: "Open in Builder",
+          icon: Wrench,
+          onSelect: openBuilder,
+        },
+        {
+          id: "list",
+          label: "Market",
+          icon: Store,
+          disabled: isListing,
+          onSelect: () => setListComponent(piece.component),
+        },
+        {
+          id: "sell",
+          label: `Sell · ${getComponentResaleValue(piece.component)}`,
+          icon: Trash2,
+          danger: true,
+          disabled: isSellingComponent,
+          onSelect: () =>
+            setResale({ kind: "component", component: piece.component }),
         },
       ];
 
@@ -1176,11 +1234,19 @@ export const StashInventory = ({
       {resale && (
         <SellConfirmDialog
           isOpen
-          itemType={resale.kind === "mod" ? "Mod" : "Parts"}
+          itemType={
+            resale.kind === "mod"
+              ? "Mod"
+              : resale.kind === "component"
+                ? "Part"
+                : "Parts"
+          }
           itemName={
             resale.kind === "mod"
               ? `${getModDef(resale.mod.kind, resale.mod.featureId)?.label ?? resale.mod.featureId} +${resale.mod.points}`
-              : `${resale.tier} ${getPartLabel(resale.partId)} ×${resale.qty}`
+              : resale.kind === "component"
+                ? `${getComponent(resale.component.defId)?.name ?? "Part"} · Lvl ${resale.component.level}`
+                : `${resale.tier} ${getPartLabel(resale.partId)} ×${resale.qty}`
           }
           fameReward={
             resale.kind === "mod"
@@ -1189,9 +1255,17 @@ export const StashInventory = ({
                   resale.mod.featureId,
                   resale.mod.points,
                 )
-              : getPartResaleValue(resale.partId, resale.tier, resale.qty)
+              : resale.kind === "component"
+                ? getComponentResaleValue(resale.component)
+                : getPartResaleValue(resale.partId, resale.tier, resale.qty)
           }
           onConfirm={() => {
+            if (resale.kind === "component") {
+              sellComponent(resale.component.uid, {
+                onSuccess: () => setResale(null),
+              });
+              return;
+            }
             if (resale.kind === "mod") {
               sellMod(resale.mod.id, { onSuccess: () => setResale(null) });
               return;
@@ -1202,7 +1276,7 @@ export const StashInventory = ({
             );
           }}
           onCancel={() => setResale(null)}
-          isLoading={isSellingMod || isSellingPart}
+          isLoading={isSellingMod || isSellingPart || isSellingComponent}
         />
       )}
 
@@ -1212,6 +1286,28 @@ export const StashInventory = ({
         it is worth — so this is the one listing where the asking price is the
         whole point rather than a formality.
       */}
+      {listComponent && (
+        <ListItemDialog
+          isOpen
+          itemType='Part'
+          itemName={`${getComponent(listComponent.defId)?.name ?? "Part"} · Lvl ${listComponent.level}`}
+          minPrice={getComponentResaleValue(listComponent)}
+          currentFame={currentFame}
+          onConfirm={(price) =>
+            listOnMarket(
+              {
+                itemType: "component",
+                inventoryItemId: listComponent.uid,
+                price,
+              },
+              { onSuccess: () => setListComponent(null) },
+            )
+          }
+          onCancel={() => setListComponent(null)}
+          isLoading={isListing}
+        />
+      )}
+
       {listMod && (
         <ListItemDialog
           isOpen

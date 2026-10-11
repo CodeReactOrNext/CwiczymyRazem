@@ -1,3 +1,9 @@
+import type {
+  ComponentDef,
+  CustomGuitarRecord,
+  OwnedComponent,
+} from "feature/guitarBuilder/types/guitarBuilder.types";
+
 import type { TraderState } from "./trader.types";
 
 export type EffectType =
@@ -364,6 +370,8 @@ export interface InventoryItem {
   restored?: boolean;
   /** Bench work done in the workshop, newest last. Trimmed to the last 10. */
   buildLog?: BuildLogLine[];
+  /** Set on a guitar built in the Guitar Builder — see `customGuitar.ts`. */
+  custom?: CustomGuitarRecord;
 }
 
 export interface PedalboardPlacement {
@@ -462,6 +470,8 @@ export interface ArsenalUserData {
   dexGuitars?: (number | string)[];
   /** Same, for pedals. See `dexGuitars`. */
   dexEffects?: (number | string)[];
+  /** Guitar Builder parts: bodies, necks, pickups, finishes… from cases. */
+  components?: OwnedComponent[];
 }
 
 export interface ScrapResult {
@@ -499,7 +509,10 @@ export interface BulkScrapResult {
 }
 
 export interface OpenCaseResult {
-  type: "guitar" | "effect";
+  type: "guitar" | "effect" | "component";
+  /** A Guitar Builder part, when the case dropped one instead of gear. */
+  component?: ComponentDef;
+  componentItem?: OwnedComponent;
   guitar?: GuitarDefinition;
   newItem?: InventoryItem;
   newInventory?: InventoryItem[];
