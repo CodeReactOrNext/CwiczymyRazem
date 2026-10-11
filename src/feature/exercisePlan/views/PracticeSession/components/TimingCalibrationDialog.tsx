@@ -240,7 +240,11 @@ export const TimingCalibrationDialog = ({
 
   return (
     <Dialog open={isTimingCalibrationOpen} onOpenChange={(open) => !open && close()}>
-      <DialogContent className='max-w-md border-0 bg-zinc-950 p-0 shadow-none sm:rounded-lg'>
+      {/* Above the session's full-screen layer (z-[999999] desktop, z-[9999999]
+          mobile) — at the default z-50 it opens behind it, invisible. */}
+      <DialogContent
+        className='z-[99999999] max-w-md border-0 bg-zinc-950 p-0 shadow-none sm:rounded-lg'
+        overlayClassName='z-[99999998]'>
         <div className='px-7 pb-7 pt-7'>
           <div className='flex items-center gap-2.5 pr-10'>
             <Timer className='h-4 w-4 text-zinc-400' />
