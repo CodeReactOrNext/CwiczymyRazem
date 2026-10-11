@@ -6,8 +6,6 @@ interface SessionUIContextType {
   closeLeaderboard: () => void;
   backingVideoId: string | null;
   setBackingVideoId: (id: string | null) => void;
-  /** Browser only — the desktop app's native capture needs no calibration. */
-  canCalibrateTiming: boolean;
   isTimingCalibrationOpen: boolean;
   openTimingCalibration: () => void;
   closeTimingCalibration: () => void;
@@ -15,9 +13,8 @@ interface SessionUIContextType {
 
 const SessionUIContext = createContext<SessionUIContextType | undefined>(undefined);
 
-export const SessionUIProvider: React.FC<{ children: React.ReactNode; canCalibrateTiming?: boolean }> = ({
+export const SessionUIProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
-  canCalibrateTiming = true,
 }) => {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [backingVideoId, setBackingVideoId] = useState<string | null>(null);
@@ -31,7 +28,7 @@ export const SessionUIProvider: React.FC<{ children: React.ReactNode; canCalibra
   return (
     <SessionUIContext.Provider value={{
       isLeaderboardOpen, openLeaderboard, closeLeaderboard, backingVideoId, setBackingVideoId,
-      canCalibrateTiming, isTimingCalibrationOpen, openTimingCalibration, closeTimingCalibration,
+      isTimingCalibrationOpen, openTimingCalibration, closeTimingCalibration,
     }}>
       {children}
     </SessionUIContext.Provider>
