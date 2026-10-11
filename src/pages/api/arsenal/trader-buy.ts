@@ -16,6 +16,8 @@ import type {
 } from "feature/arsenal/types/trader.types";
 import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import { addPartsToWallet } from "feature/arsenal/utils/scrap";
+import type { OwnedComponent } from "feature/guitarBuilder/types/guitarBuilder.types";
+import { getComponent } from "feature/guitarBuilder/utils/components";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -77,7 +79,9 @@ export default async function handler(
   }
 
   try {
-    const userRef = firestore.collection("users").doc(userId) as DocumentReference;
+    const userRef = firestore
+      .collection("users")
+      .doc(userId) as DocumentReference;
 
     const result = await firestore.runTransaction(
       async (t: Transaction): Promise<TraderBuyResult> => {
@@ -158,6 +162,35 @@ export default async function handler(
           return { ...base, mod };
         }
 
+        // A Guitar Builder part lands in the builder stash the way a case drop
+        // does, with the level the counter advertised.
+        if (offer.kind === "component") {
+          if (!getComponent(offer.roll.defId)) {
+            throw new Error("DEFINITION_NOT_FOUND");
+          }
+
+          // Scoped to the window's offer, like the mod: one per player per
+          // window, so it can never collide with a case drop's uid.
+          const component: OwnedComponent = {
+            uid: `${offer.roll.defId}#trader-${offer.id}`,
+            defId: offer.roll.defId,
+            level: offer.roll.level,
+            acquiredAt: Date.now(),
+            isNew: true,
+          };
+
+          t.update(userRef, {
+            "statistics.fame": newFame,
+            "arsenal.components": [
+              ...(data.arsenal?.components || []),
+              component,
+            ],
+            "arsenal.trader": trader,
+          });
+
+          return { ...base, component };
+        }
+
         if (offer.kind === "guitar") {
           const def = GUITARS_BY_ID.get(offer.roll.guitarId);
           if (!def) throw new Error("DEFINITION_NOT_FOUND");
@@ -182,7 +215,7 @@ export default async function handler(
           const isNewToDex = !buildDiscoveredSet(
             data.arsenal?.dexGuitars,
             inventory,
-            (i) => i.guitarId
+            (i) => i.guitarId,
           ).has(def.id);
 
           t.update(userRef, {
@@ -218,7 +251,7 @@ export default async function handler(
         const isNewToDex = !buildDiscoveredSet(
           data.arsenal?.dexEffects,
           effectInventory,
-          (i) => i.effectId
+          (i) => i.effectId,
         ).has(def.id);
 
         t.update(userRef, {

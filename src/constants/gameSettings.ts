@@ -1,6 +1,3 @@
-// Number of images in the ranks folder
-export const IMG_RANKS_NUMBER = 28; 
-
 // Base experience points for each level
 export const BASE_EXP = 35; 
 

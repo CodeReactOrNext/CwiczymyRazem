@@ -508,7 +508,6 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
         size='sm'
         name={msg.username}
         avatarURL={msg.userPhotoURL}
-        lvl={msg.lvl}
       />
     );
     return (

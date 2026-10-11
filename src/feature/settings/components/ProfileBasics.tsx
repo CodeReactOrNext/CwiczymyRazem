@@ -142,7 +142,6 @@ const ProfileBasics = () => {
                 avatarURL={avatarPreview || currentUserAvatar}
                 name={displayName || "User"}
                 size="2xl"
-                lvl={userStats?.lvl}
               />
               <div className="flex flex-col items-center">
                 <Label

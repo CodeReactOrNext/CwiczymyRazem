@@ -103,7 +103,6 @@ export const LeadboardLayout = ({
       userAvatar={user.avatar}
       statistics={user.statistics}
       currentUserId={currentUserId}
-      selectedGuitar={user.selectedGuitar}
       variant={isGearView ? "gear" : "default"}
       rigLevel={user.rigLevel ?? 0}
       guitarsOwned={user.arsenal?.inventory?.length ?? 0}

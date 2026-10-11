@@ -1,7 +1,13 @@
+import {
+  getComponent,
+  getComponentResaleValue,
+  levelRange,
+} from "feature/guitarBuilder/utils/components";
 import { describe, expect, it } from "vitest";
 
 import type { GuitarRarity, PartTier } from "../types/arsenal.types";
 import type {
+  TraderComponentOffer,
   TraderEffectOffer,
   TraderGuitarOffer,
   TraderModOffer,
@@ -16,6 +22,7 @@ import { getItemValue, RARITY_BASE_VALUE } from "./itemStats";
 import { getModResaleValue } from "./resale";
 import { getScrapYield } from "./scrapYield";
 import {
+  getComponentOfferPrice,
   getModBillValue,
   getTraderOffers,
   getTraderRestockAt,
@@ -24,6 +31,7 @@ import {
   ITEM_PRICE_MULTIPLIER,
   MOD_PRICE_MULTIPLIER,
   MOD_ROLL_PREMIUM,
+  TRADER_COMPONENT_SLOTS,
   TRADER_WINDOW_MS,
 } from "./traderShop";
 import { getModDef, MOD_ROLL_BONUS } from "./workshop";
@@ -105,7 +113,7 @@ describe("trader stock", () => {
     expect(tomorrow).not.toEqual(morning);
   });
 
-  it("always stocks screws, pots, five Standard and two Epic slots", () => {
+  it("always stocks screws, pots, three Standard and two Epic slots", () => {
     for (const offers of windows(120)) {
       const parts = partOffers(offers);
       expect(parts.some((p) => p.partId === "screws")).toBe(true);
@@ -114,7 +122,7 @@ describe("trader stock", () => {
       const structural = parts.filter(
         (p) => p.partId !== "screws" && p.partId !== "pot",
       );
-      expect(structural.filter((p) => p.tier === "Standard")).toHaveLength(5);
+      expect(structural.filter((p) => p.tier === "Standard")).toHaveLength(3);
       expect(structural.filter((p) => p.tier === "Epic")).toHaveLength(2);
     }
   });
@@ -142,7 +150,7 @@ describe("trader stock", () => {
     }
   });
 
-  it("stocks two featured guitars and two featured effects", () => {
+  it("stocks two featured guitars, two effects and two Builder parts", () => {
     for (const offers of windows(120)) {
       const guitars = offers.filter(
         (o): o is TraderGuitarOffer => o.kind === "guitar",
@@ -150,11 +158,48 @@ describe("trader stock", () => {
       const effects = offers.filter(
         (o): o is TraderEffectOffer => o.kind === "effect",
       );
+      const components = offers.filter(
+        (o): o is TraderComponentOffer => o.kind === "component",
+      );
       expect(guitars).toHaveLength(2);
       expect(effects).toHaveLength(2);
+      expect(components).toHaveLength(2);
       // Four slots showing the same model twice is not four slots.
       expect(new Set(guitars.map((o) => o.roll.guitarId)).size).toBe(2);
       expect(new Set(effects.map((o) => o.roll.effectId)).size).toBe(2);
+    }
+  });
+
+  it("stocks Builder parts a build needs, in two different slots", () => {
+    for (const offers of windows(200)) {
+      const defs = offers
+        .filter((o): o is TraderComponentOffer => o.kind === "component")
+        .map((o) => getComponent(o.roll.defId)!);
+      expect(defs.every(Boolean)).toBe(true);
+      expect(
+        defs.every((def) => TRADER_COMPONENT_SLOTS.includes(def.slot)),
+      ).toBe(true);
+      expect(new Set(defs.map((def) => def.slot)).size).toBe(2);
+      expect(defs.some((def) => def.rarity === "Common")).toBe(false);
+    }
+  });
+
+  it("prices Builder parts off the exact copy, always above resale", () => {
+    for (const offers of windows(200)) {
+      for (const offer of offers) {
+        if (offer.kind !== "component") continue;
+        const def = getComponent(offer.roll.defId)!;
+        const [min, max] = levelRange(def);
+        expect(offer.roll.level).toBeGreaterThanOrEqual(min);
+        expect(offer.roll.level).toBeLessThanOrEqual(max);
+        expect(offer.unitPrice).toBe(
+          getComponentOfferPrice(offer.roll, def.rarity),
+        );
+        // Buying and selling straight back must always lose Fame.
+        expect(offer.unitPrice).toBeGreaterThan(
+          getComponentResaleValue({ uid: "", ...offer.roll }),
+        );
+      }
     }
   });
 

@@ -1,3 +1,4 @@
+import { cn } from "assets/lib/utils";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -6,14 +7,17 @@ import { useArsenalData } from "../../hooks/useArsenalData";
 import { useBuyTraderOffer } from "../../hooks/useBuyTraderOffer";
 import { getRemainingStock, useTraderShop } from "../../hooks/useTraderShop";
 import type {
+  TraderComponentOffer,
   TraderItemOffer,
   TraderModOffer,
   TraderPartOffer,
 } from "../../types/trader.types";
 import { buildDexLookup } from "../../utils/dex";
+import { ComponentOfferRow } from "./ComponentOfferRow";
 import { ItemOfferCard } from "./ItemOfferCard";
 import { ModOfferCard } from "./ModOfferCard";
-import { PartOfferCard } from "./PartOfferCard";
+import { PART_ROW_COLS } from "./offerRow";
+import { PartOfferRow } from "./PartOfferRow";
 import { RestockTimer } from "./RestockTimer";
 
 /**
@@ -55,6 +59,9 @@ export const TraderView = () => {
   const items = shop.offers.filter(
     (o): o is TraderItemOffer => o.kind === "guitar" || o.kind === "effect",
   );
+  const components = shop.offers.filter(
+    (o): o is TraderComponentOffer => o.kind === "component",
+  );
   const mod = shop.offers.find((o): o is TraderModOffer => o.kind === "mod");
 
   const remainingOf = (offerId: string) => {
@@ -62,7 +69,21 @@ export const TraderView = () => {
     return getRemainingStock(offer, shop.window, arsenal?.trader);
   };
 
-  const partsTaken = parts.filter((p) => remainingOf(p.id) === 0).length;
+  // Parts stack by (partId, tier), so a Premium screw on the counter counts
+  // only the Premium screws in the pile.
+  const ownedOf = (offer: TraderPartOffer) =>
+    arsenal?.parts.find(
+      (p) => p.partId === offer.partId && p.tier === offer.tier,
+    )?.qty ?? 0;
+
+  // A Builder part is counted by model — two levels of the same neck are
+  // still two of that neck.
+  const ownedComponentsOf = (offer: TraderComponentOffer) =>
+    arsenal?.components?.filter((c) => c.defId === offer.roll.defId).length ??
+    0;
+
+  const listed = [...parts, ...components];
+  const partsTaken = listed.filter((o) => remainingOf(o.id) === 0).length;
   const modTaken = mod ? remainingOf(mod.id) === 0 : false;
 
   return (
@@ -86,33 +107,54 @@ export const TraderView = () => {
           <p className='text-xs text-zinc-500'>
             {partsTaken + (modTaken ? 1 : 0) === 0
               ? "Nothing taken yet today."
-              : `${partsTaken + (modTaken ? 1 : 0)} of ${parts.length + (mod ? 1 : 0)} slots cleared today.`}
+              : `${partsTaken + (modTaken ? 1 : 0)} of ${listed.length + (mod ? 1 : 0)} slots cleared today.`}
           </p>
         </div>
 
-        <div className='grid grid-cols-1 gap-4 xsm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4'>
-          {/* The day's mod is another loose component sold by the piece, so it
-              sits on the same shelf as the parts rather than in a feature panel
-              of its own — first, and on a double card, because there is one a
-              day and it is gone once taken. */}
-          {mod && (
-            <ModOfferCard
-              offer={mod}
-              available={!modTaken}
-              currentFame={fame}
-              onBuy={() => handleBuy(mod.id, 1)}
-              isBuying={isPending && pendingOfferId === mod.id}
-              className='xsm:col-span-2'
-            />
-          )}
+        {/* The day's mod is a loose component sold like the parts, so it sits
+            on the same shelf — first, and on a wide row of its own, because
+            there is one a day and it is gone once taken. */}
+        {mod && (
+          <ModOfferCard
+            offer={mod}
+            available={!modTaken}
+            currentFame={fame}
+            onBuy={() => handleBuy(mod.id, 1)}
+            isBuying={isPending && pendingOfferId === mod.id}
+          />
+        )}
 
+        <div className='flex flex-col gap-1.5'>
+          <div
+            className={cn(
+              "hidden gap-x-6 px-4 pb-1 text-xs text-zinc-500 xl:grid",
+              PART_ROW_COLS,
+            )}>
+            <span>Part</span>
+            <span>In stash</span>
+            <span>Left today</span>
+            <span>Price each</span>
+            <span className='w-[20.5rem]' />
+          </div>
           {parts.map((offer) => (
-            <PartOfferCard
+            <PartOfferRow
               key={offer.id}
               offer={offer}
               remaining={remainingOf(offer.id)}
+              owned={ownedOf(offer)}
               currentFame={fame}
               onBuy={(qty) => handleBuy(offer.id, qty)}
+              isBuying={isPending && pendingOfferId === offer.id}
+            />
+          ))}
+          {components.map((offer) => (
+            <ComponentOfferRow
+              key={offer.id}
+              offer={offer}
+              available={remainingOf(offer.id) > 0}
+              owned={ownedComponentsOf(offer)}
+              currentFame={fame}
+              onBuy={() => handleBuy(offer.id, 1)}
               isBuying={isPending && pendingOfferId === offer.id}
             />
           ))}

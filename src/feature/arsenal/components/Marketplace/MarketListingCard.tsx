@@ -107,7 +107,6 @@ export const MarketListingCard = ({
               size='sm'
               name={listing.sellerName}
               avatarURL={listing.sellerAvatarUrl || undefined}
-              lvl={listing.sellerFrame}
             />
           </div>
           <span className='truncate text-xs font-medium'>

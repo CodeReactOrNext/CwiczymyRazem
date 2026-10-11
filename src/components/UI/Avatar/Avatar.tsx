@@ -1,69 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
-import { EquippedGuitarTooltip } from "feature/arsenal/components/EquippedGuitarTooltip";
-import { getRarityColor } from "feature/arsenal/components/RarityBadge";
-import { guitarDefinitionByImageId } from "feature/arsenal/data/guitarDefinitions";
-import { getRankBadgeSrc, isGuitarImageId } from "feature/arsenal/utils/guitarImage";
-import { useState } from "react";
 
 interface AvatarProps {
   name: string;
-  lvl?: number;
   avatarURL?: string;
-  size?: "xs" | "sm" | "2xl";
+  size?: "xs" | "sm" | "md" | "2xl";
   className?: string;
-  selectedGuitar?: number | string;
-  /**
-   * Who the avatar belongs to. Given one, the equipped guitar carries the same
-   * card the arsenal shows — the only place its real stats live.
-   */
-  userId?: string | null;
 }
 
-const getRankImgPath = (lvl: number) => {
-  if (lvl >= IMG_RANKS_NUMBER) {
-    return IMG_RANKS_NUMBER;
-  }
-  return lvl;
-};
-
-const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, userId }: AvatarProps) => {
-  const [guitarError, setGuitarError] = useState(false);
-  const imgPath = selectedGuitar ?? getRankImgPath(lvl ?? 0);
-
-  // The rank/guitar badge only has room to hang off the large avatars, so the
-  // compact sizes render the circle on its own.
-  const isCompact = size === "xs" || size === "sm";
+const Avatar = ({ name, avatarURL, size, className }: AvatarProps) => {
+  const isCompact = size === "xs" || size === "sm" || size === "md";
 
   let containerSizeClass = "h-20 w-20 rounded-xl";
   if (size === "xs") containerSizeClass = "h-8 w-8 rounded-full";
   if (size === "sm") containerSizeClass = "h-10 w-10 rounded-full";
+  if (size === "md") containerSizeClass = "h-12 w-12 rounded-lg";
   if (size === "2xl") containerSizeClass = "h-32 w-32 rounded-2xl";
-
-  const badgePosition = size === "2xl"
-    ? { bottom: "28px", left: "58px" }
-    : { bottom: "18px", left: "35px" };
-
-  const isSpecialGuitar = isGuitarImageId(imgPath);
-  const specialGuitarDef = isSpecialGuitar ? guitarDefinitionByImageId(imgPath) : null;
-  // Mint rarity, on purpose: this is a 25%-alpha drop shadow, and the promoted
-  // rarity lives on the owner's inventory item — a document read per avatar,
-  // which a leaderboard cannot afford. The card on hover reads the real one.
-  const specialGuitarColor = getRarityColor(specialGuitarDef?.rarity);
-  const guitarGlow = `drop-shadow(0 0 4px ${specialGuitarColor}40) drop-shadow(0 8px 20px rgba(0,0,0,0.95))`;
-  const specialGuitarImgStyle = size === "2xl"
-    ? { bottom: "-40px", right: "-40px", width: 160, height: 160, transform: "rotate(-90deg)", filter: guitarGlow }
-    : { bottom: "-28px", right: "-28px", width: 110, height: 110, transform: "rotate(-90deg)", filter: guitarGlow };
-
-  const specialGuitarImg = (
-    <img
-      className={`absolute z-20 object-contain ${userId ? "cursor-pointer" : ""}`}
-      style={specialGuitarImgStyle}
-      src={getRankBadgeSrc(imgPath, "small")}
-      alt=''
-      onError={() => setGuitarError(true)}
-    />
-  );
 
   // The light fill is only for the initial: behind a photo it leaks through the
   // anti-aliased edge of the clip and draws a pale, ragged hairline round it.
@@ -89,22 +40,6 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedGuitar, userId 
           </p>
         )}
       </div>
-      {imgPath !== 0 && isSpecialGuitar && !isCompact && !guitarError && (
-        userId ? (
-          <EquippedGuitarTooltip userId={userId}>{specialGuitarImg}</EquippedGuitarTooltip>
-        ) : (
-          specialGuitarImg
-        )
-      )}
-      {imgPath !== 0 && !isSpecialGuitar && !guitarError && (
-        <img 
-          className='absolute -rotate-90 z-20' 
-          style={isCompact ? { display: "none" } : { ...badgePosition }} 
-          src={getRankBadgeSrc(imgPath, "small")} 
-          alt='' 
-          onError={() => setGuitarError(true)}
-        />
-      )}
     </div>
   );
 };

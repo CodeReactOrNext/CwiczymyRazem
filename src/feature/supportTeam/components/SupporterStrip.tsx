@@ -69,7 +69,6 @@ export const SupporterStrip = ({ className }: SupporterStripProps) => {
             uid={member.uid}
             userName={member.displayName}
             avatarUrl={member.avatar}
-            lvl={member.lvl ?? 0}
             size='xs'
             showName={false}
             className='transition-transform duration-300 hover:-translate-y-0.5'

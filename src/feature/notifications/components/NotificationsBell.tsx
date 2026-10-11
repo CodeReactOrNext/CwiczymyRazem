@@ -435,7 +435,6 @@ export const NotificationsBell = () => {
                             <Avatar
                               name={n.senderName ?? ""}
                               avatarURL={n.senderAvatarUrl || undefined}
-                              lvl={n.senderFrame}
                               size='sm'
                             />
                           </div>

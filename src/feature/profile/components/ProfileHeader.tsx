@@ -1,6 +1,5 @@
 import Avatar from "components/UI/Avatar";
 import { HeroBanner } from "components/UI/HeroBanner";
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { achievementsMap } from "feature/achievements/data/achievementsData";
 import { achievementsRarity } from "feature/achievements/data/achievementsRarity";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
@@ -108,9 +107,7 @@ export const ProfileHeader = ({
   const arcOffset = arcC * (1 - xpPercent / 100);
 
   const { item: equippedGuitar } = useEquippedGuitar(userAuth);
-  const imgPath =
-    selectedGuitar ??
-    (statistics.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : statistics.lvl);
+  const imgPath = selectedGuitar;
   const isSpecialGuitar = isGuitarImageId(imgPath);
   const specialGuitarDef = isSpecialGuitar
     ? guitarDefinitionByImageId(imgPath)
@@ -341,9 +338,6 @@ export const ProfileHeader = ({
             <Avatar
               name={displayName}
               avatarURL={avatar}
-              lvl={statistics.lvl}
-              selectedGuitar={selectedGuitar}
-              userId={userAuth}
             />
           </div>
 

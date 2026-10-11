@@ -21,7 +21,6 @@ const SupporterCard = ({ member }: { member: SupportTeamMember }) => {
         uid={member.uid}
         userName={member.displayName}
         avatarUrl={member.avatar}
-        lvl={member.lvl ?? 0}
         showName={false}
       />
 

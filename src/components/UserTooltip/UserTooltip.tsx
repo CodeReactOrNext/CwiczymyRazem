@@ -8,8 +8,6 @@ import { cn } from "assets/lib/utils";
 import { IconBox } from "components/IconBox/IconBox";
 import { resolveLiveActivity } from "components/OnlineUsers/liveActivity";
 import Avatar from "components/UI/Avatar";
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
-import { getRankBadgeSrc, isGuitarImageId } from "feature/arsenal/utils/guitarImage";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
@@ -203,8 +201,6 @@ export const UserTooltip = ({
                     name={userData.displayName}
                     avatarURL={userData.avatar}
                     size='sm'
-                    lvl={userData.statistics.level}
-                    selectedGuitar={userData.selectedGuitar}
                   />
                 ) : (
                   <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-900'>
@@ -270,24 +266,6 @@ export const UserTooltip = ({
                 {t("tooltip.viewProfile")}
                 <FaExternalLinkAlt className='text-[10px]' />
               </Link>
-
-              {/* Guitar Absolute */}
-              {(() => {
-                const lvl = userData.statistics.level ?? 0;
-                const imgPath = userData.selectedGuitar ?? (lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : lvl);
-                const isSpecial = isGuitarImageId(imgPath);
-
-                if (isSpecial) {
-                  return (
-                    <img
-                      className='absolute top-1/2 -right-[143px] -translate-y-1/2 w-64 h-64 object-contain -rotate-90 drop-shadow-2xl z-20 pointer-events-none'
-                      src={getRankBadgeSrc(imgPath, "small")}
-                      alt='equipped guitar'
-                    />
-                  );
-                }
-                return null;
-              })()}
             </div>
           ) : (
             <div className='flex items-center gap-2 text-gray-500'>

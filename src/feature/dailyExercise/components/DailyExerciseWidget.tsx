@@ -52,7 +52,6 @@ const BoardRow = ({
     <Avatar
       avatarURL={entry.avatar || undefined}
       name={entry.displayName}
-      lvl={entry.lvl}
       size='xs'
     />
     <span

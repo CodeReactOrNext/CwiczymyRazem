@@ -785,9 +785,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           <Avatar
             avatarURL={userAvatar}
             name={userName}
-            lvl={userStats.lvl}
-            selectedGuitar={userInfo?.selectedGuitar as number}
-            userId={userAuth}
+            size='md'
           />
           <div className='flex min-w-0 flex-1 flex-col justify-center'>
             <span className='truncate text-[15px] font-bold tracking-wide text-white'>
@@ -897,9 +895,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           <Avatar
             avatarURL={userAvatar}
             name={userName}
-            lvl={userStats.lvl}
-            selectedGuitar={userInfo?.selectedGuitar}
-            userId={userAuth}
             size='sm'
           />
           <span className='truncate text-[15px] font-bold tracking-wide text-white'>

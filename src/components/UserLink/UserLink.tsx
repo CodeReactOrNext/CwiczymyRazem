@@ -11,7 +11,6 @@ interface UserLinkProps {
   uid: string | undefined;
   userName: string;
   avatarUrl?: string | null;
-  lvl?: number;
   /**
    * The guild kit this player wears, where the surface already has it — rows
    * that denormalise the author (recordings, chat) pass it, the rest leave it
@@ -37,7 +36,6 @@ export const UserLink = ({
   uid,
   userName,
   avatarUrl,
-  lvl,
   guildBadge,
   size = "sm",
   showName = true,
@@ -56,7 +54,6 @@ export const UserLink = ({
       size={size}
       name={userName}
       avatarURL={avatarUrl || undefined}
-      lvl={lvl}
     />
   );
 

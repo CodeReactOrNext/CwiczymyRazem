@@ -15,9 +15,4 @@ describe("getRankBadgeSrc", () => {
   it("defaults to the small variant", () => {
     expect(getRankBadgeSrc("special/22")).toBe("/static/images/rank/special/22-small.webp");
   });
-
-  it("never suffixes plain (non-special) rank badges", () => {
-    expect(getRankBadgeSrc(5, "small")).toBe("/static/images/rank/5.webp");
-    expect(getRankBadgeSrc(5, "large")).toBe("/static/images/rank/5.webp");
-  });
 });

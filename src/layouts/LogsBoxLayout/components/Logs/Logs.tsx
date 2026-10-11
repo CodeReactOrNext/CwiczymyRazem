@@ -564,7 +564,6 @@ const PlayerAvatar = ({ player }: { player: TopPlayerData }) => (
         size='sm'
         name={player.displayName}
         avatarURL={player.avatar ?? undefined}
-        lvl={(player as any).lvl ?? (player as any).level}
       />
     </div>
   </div>
@@ -936,7 +935,7 @@ const FirebaseLogsDonationItem = ({
   const { t } = useTranslation("feed");
   const newest = logs[0];
   const date = new Date(newest.data);
-  const { uid, userName, avatarUrl, userAvatarFrame, guildBadge } = newest;
+  const { uid, userName, avatarUrl, guildBadge } = newest;
 
   const fameAmount = calculateGroupFame({ logs });
   const reactionLogId = getGroupReactionAnchor({ logs })?.id;
@@ -986,7 +985,6 @@ const FirebaseLogsDonationItem = ({
               uid={uid}
               userName={userName ?? getDonationName(newest, t)}
               avatarUrl={avatarUrl ?? undefined}
-              lvl={userAvatarFrame}
               guildBadge={guildBadge}
               avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
             />
@@ -1786,7 +1784,7 @@ const GroupedLogItem = ({
   const representative = group.logs[0] as FirebaseLogsInterface;
   const date = new Date(getLogTimestampMs(group.logs[0]));
   const fameAmount = calculateGroupFame(group);
-  const { uid, userName, avatarUrl, userAvatarFrame, guildBadge } =
+  const { uid, userName, avatarUrl, guildBadge } =
     representative;
 
   // The reaction lives on the oldest log in the group, not the newest one shown at the top: the
@@ -1808,7 +1806,6 @@ const GroupedLogItem = ({
                 uid={uid}
                 userName={userName}
                 avatarUrl={avatarUrl ?? undefined}
-                lvl={userAvatarFrame}
                 guildBadge={guildBadge}
                 avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
               />

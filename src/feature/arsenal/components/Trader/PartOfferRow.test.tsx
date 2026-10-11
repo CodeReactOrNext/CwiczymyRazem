@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { TraderPartOffer } from "feature/arsenal/types/trader.types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { PartOfferCard } from "./PartOfferCard";
+import { PartOfferRow } from "./PartOfferRow";
 
 const screws: TraderPartOffer = {
   id: "100-0",
@@ -18,9 +18,10 @@ const screws: TraderPartOffer = {
 
 const renderCard = (onBuy = vi.fn(), currentFame = 1000) => {
   render(
-    <PartOfferCard
+    <PartOfferRow
       offer={screws}
       remaining={40}
+      owned={12}
       currentFame={currentFame}
       onBuy={onBuy}
       isBuying={false}
@@ -28,12 +29,12 @@ const renderCard = (onBuy = vi.fn(), currentFame = 1000) => {
   );
   return {
     field: screen.getByLabelText("Quantity") as HTMLInputElement,
-    buy: screen.getByRole("button", { name: /buy/i }),
+    buy: screen.getByRole("button", { name: /^buy/i }),
     onBuy,
   };
 };
 
-describe("PartOfferCard quantity", () => {
+describe("PartOfferRow quantity", () => {
   afterEach(cleanup);
 
   it("buys the number typed into the field", () => {
@@ -89,5 +90,45 @@ describe("PartOfferCard quantity", () => {
     fireEvent.keyDown(field, { key: "ArrowDown" });
 
     expect(field.value).toBe("2");
+  });
+});
+
+describe("PartOfferRow owned and all", () => {
+  afterEach(cleanup);
+
+  it("shows how many of the part the player already owns", () => {
+    renderCard();
+
+    expect(screen.getByText("in stash").parentElement?.textContent).toBe(
+      "12 in stash",
+    );
+  });
+
+  it("fills the picker with the whole slot, priced on the buy button", () => {
+    const { field, buy, onBuy } = renderCard();
+
+    fireEvent.click(screen.getByRole("button", { name: "All 40" }));
+    expect(field.value).toBe("40");
+    expect(buy.textContent).toContain("80");
+
+    fireEvent.click(buy);
+    expect(onBuy).toHaveBeenCalledWith(40);
+  });
+
+  it("caps at what the player can afford when Fame runs out first", () => {
+    const { field } = renderCard(vi.fn(), 50);
+
+    fireEvent.click(screen.getByRole("button", { name: "Max 25" }));
+
+    expect(field.value).toBe("25");
+  });
+
+  it("brings an unaffordable pick back down to the max", () => {
+    const { field } = renderCard(vi.fn(), 50);
+    fireEvent.change(field, { target: { value: "30" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Max 25" }));
+
+    expect(field.value).toBe("25");
   });
 });

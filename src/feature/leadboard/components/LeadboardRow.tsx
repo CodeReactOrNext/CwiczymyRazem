@@ -19,7 +19,6 @@ interface LeadboardColumnProps {
   userAvatar?: string;
   profileId?: string;
   currentUserId: string | null;
-  selectedGuitar?: number | string;
   variant?: "default" | "gear";
   rigLevel?: number;
   guitarsOwned?: number;
@@ -36,7 +35,6 @@ export const LeadboardRow = ({
   userAvatar,
   profileId,
   currentUserId,
-  selectedGuitar,
   variant = "default",
   rigLevel = 0,
   guitarsOwned = 0,
@@ -95,9 +93,7 @@ export const LeadboardRow = ({
                 <Avatar
                   avatarURL={userAvatar}
                   name={nick}
-                  lvl={lvl}
                   size='sm'
-                  selectedGuitar={selectedGuitar}
                 />
               </Link>
 
@@ -267,9 +263,6 @@ export const LeadboardRow = ({
               <Avatar
                 avatarURL={userAvatar}
                 name={nick}
-                lvl={lvl}
-                selectedGuitar={selectedGuitar}
-                userId={profileId}
               />
             </div>
           </Link>

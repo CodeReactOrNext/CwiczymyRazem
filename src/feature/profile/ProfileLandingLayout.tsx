@@ -1,7 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { HeroBanner } from "components/UI/HeroBanner";
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
 import { guitarDefinitionByImageId } from "feature/arsenal/data/guitarDefinitions";
@@ -107,9 +106,7 @@ const ProfileLandingLayout = ({
     ],
   );
 
-  const imgPath =
-    userInfo?.selectedGuitar ??
-    (userStats?.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : userStats?.lvl);
+  const imgPath = userInfo?.selectedGuitar;
   const isSpecialGuitar = isGuitarImageId(imgPath);
   const specialGuitarDef = isSpecialGuitar
     ? guitarDefinitionByImageId(imgPath)

@@ -1,3 +1,5 @@
+import type { OwnedComponent } from "feature/guitarBuilder/types/guitarBuilder.types";
+
 import type {
   EffectInventoryItem,
   InventoryItem,
@@ -8,7 +10,12 @@ import type {
   WorkshopKind,
 } from "./arsenal.types";
 
-export type TraderOfferKind = "part" | "guitar" | "effect" | "mod";
+export type TraderOfferKind =
+  | "part"
+  | "guitar"
+  | "effect"
+  | "mod"
+  | "component";
 
 interface TraderOfferBase {
   /** Stable within a window: `${window}-${slot}`. Also the key in `TraderState.bought`. */
@@ -76,8 +83,22 @@ export interface TraderModOffer extends TraderOfferBase {
   maxPoints: number;
 }
 
+/**
+ * A Guitar Builder part — one of the slots a build cannot do without. The
+ * model and its level are both rolled from the window seed, so the card shows
+ * the exact copy the purchase hands over.
+ */
+export interface TraderComponentOffer extends TraderOfferBase {
+  kind: "component";
+  roll: Pick<OwnedComponent, "defId" | "level">;
+}
+
 export type TraderItemOffer = TraderGuitarOffer | TraderEffectOffer;
-export type TraderOffer = TraderPartOffer | TraderItemOffer | TraderModOffer;
+export type TraderOffer =
+  | TraderPartOffer
+  | TraderItemOffer
+  | TraderModOffer
+  | TraderComponentOffer;
 
 export interface TraderShop {
   /** The window the offers belong to — sent with every purchase. */
@@ -111,4 +132,6 @@ export interface TraderBuyResult {
   isNewToDex?: boolean;
   /** Mod purchases only — the stash entry the counter handed over. */
   mod?: SalvagedMod;
+  /** Guitar Builder part purchases only — the copy added to the stash. */
+  component?: OwnedComponent;
 }

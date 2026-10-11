@@ -626,7 +626,6 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                                        <Avatar
                                          name={profile?.displayName || t("detail.musician")}
                                          avatarURL={profile?.avatar}
-                                         lvl={profile?.lvl || 0}
                                          size="sm"
                                          className="transition-transform group-hover/avatar:scale-110 shadow-lg"
                                        />

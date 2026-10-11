@@ -95,7 +95,6 @@ const JoinRow = ({
             size='sm'
             name={message.username}
             avatarURL={message.userPhotoURL}
-            lvl={message.lvl}
           />
         </div>
       </UserTooltip>

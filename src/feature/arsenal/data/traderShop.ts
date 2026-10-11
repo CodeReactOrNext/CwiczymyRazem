@@ -1,3 +1,16 @@
+import { COMPONENT_DEFS } from "feature/guitarBuilder/data/components";
+import type {
+  ComponentDef,
+  ComponentRarity,
+  ComponentSlot,
+  OwnedComponent,
+} from "feature/guitarBuilder/types/guitarBuilder.types";
+import {
+  getComponentResaleValue,
+  RARITY_ORDER,
+  rollLevel,
+} from "feature/guitarBuilder/utils/components";
+
 import type {
   GuitarRarity,
   InventoryItem,
@@ -5,6 +18,7 @@ import type {
   PartTier,
 } from "../types/arsenal.types";
 import type {
+  TraderComponentOffer,
   TraderEffectOffer,
   TraderGuitarOffer,
   TraderModOffer,
@@ -163,20 +177,19 @@ export const MOD_ROLL_PREMIUM = 0.6;
  */
 const SCREW_STOCK = 40;
 /**
- * Five Standard slots against two Epic ones.
+ * Three Standard slots against two Epic ones.
  *
  * Standard is the tier every bill opens with and the tier `fusion.ts` eats five
  * at a time, and two draws out of eight stockable parts left the shelf silent on
  * most of the roster on most days — a player one Standard neck short of a build
- * could go a week without the counter ever offering necks. Five still leaves
- * three parts undrawn, so the stock turns over instead of becoming the same
- * shelf every morning.
+ * could go a week without the counter ever offering necks. There were five
+ * until the last two went to Guitar Builder parts (`COMPONENT_OFFER_COUNT`);
+ * three still turns the roster over faster than the original two.
  *
- * The stocks taper because the slots do: the first two are the day's headline
- * pieces, the three behind them are there to widen the roster rather than to
- * deepen the pile.
+ * The stocks taper because the slots do: the first one is the day's headline
+ * piece, the two behind it widen the roster rather than deepen the pile.
  */
-const STANDARD_STOCKS = [8, 6, 6, 5, 5];
+const STANDARD_STOCKS = [8, 6, 6];
 const EPIC_STOCKS = [4, 3];
 /**
  * One piece, not a stack. The slot exists to unstick a build the drop tables have
@@ -214,6 +227,54 @@ export const TRADER_ITEM_RARITY_WEIGHTS: Record<string, number> = {
   Legendary: 4,
   Mythic: 1,
 };
+
+/**
+ * Guitar Builder parts on the counter each day, sold from the parts list in
+ * the two slots that used to be its last two Standard parts.
+ */
+export const COMPONENT_OFFER_COUNT = 2;
+
+/**
+ * The slots a build cannot do without. Pickguards and stickers are looks, and
+ * cases hand those out freely enough; the counter is for the part that stands
+ * between a player and a finished guitar.
+ */
+export const TRADER_COMPONENT_SLOTS: ComponentSlot[] = [
+  "body",
+  "neck",
+  "head",
+  "pickups",
+  "finish",
+];
+
+/**
+ * Skewed well past the case tables, with no Commons at all: cases are the cheap
+ * route to a part, and the counter is where a builder goes for a good one.
+ */
+export const TRADER_COMPONENT_RARITY_WEIGHTS: Record<ComponentRarity, number> =
+  {
+    Common: 0,
+    Uncommon: 20,
+    Rare: 35,
+    Epic: 28,
+    Legendary: 13,
+    Mythic: 4,
+  };
+
+/**
+ * On top of the rarity's item multiplier, applied to the part's own resale
+ * value. At 1 a Rare part costs about one case and an Epic about two — dearer
+ * than a case's odds per Fame, which is the premium for picking the exact part,
+ * but not so dear that finishing a build means saving for a week. It was 3 at
+ * first and read as a price wall.
+ */
+export const COMPONENT_PRICE_MULTIPLIER = 1;
+
+/**
+ * The parts draw from a stream of their own, so adding them did not move a
+ * single roll of the parts, items or mod above.
+ */
+const COMPONENT_SEED_SALT = 0x85ebca6b;
 
 // ─── Scarcity ────────────────────────────────────────────────────────────────
 
@@ -481,6 +542,75 @@ const drawModOffer = (
   };
 };
 
+/** Fame for a Builder part on the counter — priced off this exact copy's level. */
+export const getComponentOfferPrice = (
+  roll: Pick<OwnedComponent, "defId" | "level">,
+  rarity: ComponentRarity,
+): number =>
+  roundItemPrice(
+    getComponentResaleValue({ uid: "", ...roll }) *
+      ITEM_PRICE_MULTIPLIER[rarity] *
+      COMPONENT_PRICE_MULTIPLIER,
+  );
+
+/**
+ * A build part at this rarity, in a slot not already on the counter today. A
+ * rarity no build part comes in steps down one tier until one does.
+ */
+const pickBuildComponent = (
+  rarity: ComponentRarity,
+  usedSlots: Set<ComponentSlot>,
+  random: () => number,
+): ComponentDef | undefined => {
+  for (const allowRepeat of [false, true]) {
+    for (let i = RARITY_ORDER.indexOf(rarity); i >= 0; i--) {
+      const pool = COMPONENT_DEFS.filter(
+        (def) =>
+          def.rarity === RARITY_ORDER[i] &&
+          TRADER_COMPONENT_SLOTS.includes(def.slot) &&
+          (allowRepeat || !usedSlots.has(def.slot)),
+      );
+      if (pool.length > 0) return seededPick(pool, random);
+    }
+  }
+  return undefined;
+};
+
+const drawComponentOffers = (
+  window: number,
+  id: (slot: string) => string,
+): TraderComponentOffer[] => {
+  const random = mulberry32(window ^ COMPONENT_SEED_SALT);
+  const usedSlots = new Set<ComponentSlot>();
+  const offers: TraderComponentOffer[] = [];
+
+  for (let i = 0; i < COMPONENT_OFFER_COUNT; i++) {
+    const rarity =
+      weightedPick(
+        RARITY_ORDER,
+        (r) => TRADER_COMPONENT_RARITY_WEIGHTS[r],
+        random,
+      ) ?? "Rare";
+    const def = pickBuildComponent(rarity, usedSlots, random);
+    if (!def) continue;
+    usedSlots.add(def.slot);
+
+    const roll = { defId: def.id, level: rollLevel(def, random) };
+    const price = getComponentOfferPrice(roll, def.rarity);
+    offers.push({
+      id: id(`comp-${i}`),
+      kind: "component",
+      roll,
+      stock: 1,
+      unitPrice: price,
+      basePrice: price,
+      discountPct: 0,
+    });
+  }
+
+  return offers;
+};
+
 const discounted = (offer: TraderPartOffer): TraderPartOffer => ({
   ...offer,
   unitPrice: Math.max(
@@ -551,7 +681,9 @@ export const getTraderOffers = (date: Date = new Date()): TraderOffer[] => {
   // price and every rolled instance — exactly as it was.
   const mod = drawModOffer(id("mod"), random);
 
-  return [...priced, ...items, ...(mod ? [mod] : [])];
+  const components = drawComponentOffers(window, id);
+
+  return [...priced, ...items, ...components, ...(mod ? [mod] : [])];
 };
 
 export const getTraderShop = (date: Date = new Date()): TraderShop => ({

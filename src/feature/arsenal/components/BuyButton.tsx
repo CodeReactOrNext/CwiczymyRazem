@@ -14,6 +14,11 @@ interface BuyButtonProps {
   variant?: "solid" | "soft";
   /** `sm` for the narrow footer of a trading card. */
   size?: "default" | "sm";
+  /**
+   * What the button says when the player cannot pay. A narrow price-list row
+   * has no room for "Not enough Fame" — greyed out, "Buy" says it already.
+   */
+  unaffordableLabel?: string;
   className?: string;
 }
 
@@ -33,6 +38,7 @@ export const BuyButton = ({
   onClick,
   variant = "soft",
   size = "default",
+  unaffordableLabel = "Not enough Fame",
   className,
 }: BuyButtonProps) => {
   const solid = variant === "solid";
@@ -56,7 +62,7 @@ export const BuyButton = ({
       )}>
       <span className='flex items-center gap-2'>
         <ShoppingCart size={size === "sm" ? 13 : 15} strokeWidth={2.5} />
-        {isBuying ? "Buying…" : canAfford ? "Buy" : "Not enough Fame"}
+        {isBuying ? "Buying…" : canAfford ? "Buy" : unaffordableLabel}
       </span>
       {/* Fame keeps its gold on the soft (card-grid) button — on the solid
           turquoise CTA, amber-on-turquoise is nearly unreadable, so the price
@@ -74,7 +80,8 @@ export const BuyButton = ({
           src='/images/coin.png'
           alt=''
           className={cn(
-            "h-4 w-4 object-contain",
+            "object-contain",
+            size === "sm" ? "h-5 w-5" : "h-6 w-6",
             !canAfford && "opacity-50 grayscale",
           )}
         />
