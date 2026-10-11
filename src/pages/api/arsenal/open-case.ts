@@ -298,11 +298,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // Write activity log (panel only, no Discord)
-    // Parts stay out of the public feed: it shows gear, and a stream of
-    // "got a neck" would drown the pulls people actually react to.
-    if (LOG_CASE_OPENS && result.type !== "component") try {
-      const item = result.type === "guitar" ? result.guitar : result.effect;
-      await firestore.collection("logs").add({
+    if (LOG_CASE_OPENS) try {
+      const base = {
         type: "case_open",
         uid: userId,
         userName: capturedUserData?.displayName || "Unknown",
@@ -313,14 +310,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         data: new Date().toISOString(),
         caseType,
         caseName: caseDef.name,
-        itemType: result.type,
-        itemName: item.name,
-        itemBrand: item.brand,
-        itemRarity: item.rarity,
-        itemImageId: item.imageId,
-        // Full rolled instance (condition/year/country/serial/stats/features) for the feed card + level.
-        rolledItem: result.type === "guitar" ? result.newItem : result.effectItem,
-      });
+      };
+      if (result.type === "component") {
+        // A Guitar Builder part: the feed draws it from its def id + rolled level.
+        await firestore.collection("logs").add({
+          ...base,
+          itemType: "component",
+          itemName: result.component.name,
+          itemBrand: "",
+          itemRarity: result.component.rarity,
+          itemImageId: result.component.id,
+          component: {
+            uid: result.componentItem.uid,
+            defId: result.componentItem.defId,
+            level: result.componentItem.level,
+          },
+        });
+      } else {
+        const item = result.type === "guitar" ? result.guitar : result.effect;
+        await firestore.collection("logs").add({
+          ...base,
+          itemType: result.type,
+          itemName: item.name,
+          itemBrand: item.brand,
+          itemRarity: item.rarity,
+          itemImageId: item.imageId,
+          // Full rolled instance (condition/year/country/serial/stats/features) for the feed card + level.
+          rolledItem: result.type === "guitar" ? result.newItem : result.effectItem,
+        });
+      }
     } catch (logError) {
       console.error("[open-case] log write failed:", logError);
     }

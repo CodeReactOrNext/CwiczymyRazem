@@ -2,7 +2,10 @@ import { addBpmStages } from "feature/exercisePlan/services/bpmProgressService";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { logger } from "feature/logger/Logger";
-import { firebaseAddGoalCompletedLog } from "feature/logs/services/addGoalCompletedLog.service";
+import {
+  firebaseAddGoalCompletedLog,
+  firebaseAddGoalCreatedLog,
+} from "feature/logs/services/addGoalCompletedLog.service";
 import type {
   DocumentData,
   DocumentSnapshot,
@@ -158,6 +161,14 @@ export const createExerciseGoal = async (
     createdAt: now,
     completedAt: null,
     updatedAt: now,
+  });
+  // the feed row isn't worth holding up the dialog — it swallows its own errors
+  void firebaseAddGoalCreatedLog(uid, {
+    goalId: ref.id,
+    exerciseId: goal.exerciseId,
+    exerciseTitle: goal.exerciseTitle,
+    targetBpm: goal.targetBpm,
+    startBpm: goal.startBpm,
   });
   return {
     ...goal,

@@ -45,6 +45,11 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { hasLeaderboard } from "feature/exercisePlan/utils/hasLeaderboard";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { findCosmetic } from "feature/guilds/data/guildCosmetics";
+import { ComponentPreviewCard } from "feature/guitarBuilder/components/ComponentPreviewCard";
+import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb";
+import { SLOT_LABELS } from "feature/guitarBuilder/data/components";
+import type { OwnedComponent } from "feature/guitarBuilder/types/guitarBuilder.types";
+import { getComponent } from "feature/guitarBuilder/utils/components";
 import { DiscordPromoCard } from "feature/logs/components/DiscordPromoCard";
 import { LogReaction } from "feature/logs/components/LogReaction";
 import {
@@ -59,6 +64,7 @@ import type {
   FirebaseLogsDonationInterface,
   FirebaseLogsExamPassedInterface,
   FirebaseLogsGoalCompletedInterface,
+  FirebaseLogsGoalCreatedInterface,
   FirebaseLogsGuildLevelInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
@@ -105,13 +111,13 @@ import {
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { getSupportVariantCopy } from "feature/support/content/supportVariants";
 import { useTranslation } from "hooks/useTranslation";
-import type { Translate } from "lib/i18n/translate";
-import { useDateFnsLocale } from "lib/i18n/dateLocale";
-import { Interpolate } from "lib/i18n/Interpolate";
 import {
   type ActivityPreview,
   ActivityStartModal,
 } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
+import { useDateFnsLocale } from "lib/i18n/dateLocale";
+import { Interpolate } from "lib/i18n/Interpolate";
+import type { Translate } from "lib/i18n/translate";
 import {
   Clock,
   Coffee,
@@ -119,8 +125,8 @@ import {
   Ear,
   ExternalLink,
   Gift,
-  Hand,
   GraduationCap,
+  Hand,
   Heart,
   ListChecks,
   type LucideIcon,
@@ -330,6 +336,43 @@ const CardModal = ({
   );
 };
 
+/** An item pill with its card: hover tooltip on desktop, tap-to-open modal on touch. */
+const PillCard = ({
+  pill,
+  card,
+}: {
+  pill: React.ReactNode;
+  card: React.ReactNode;
+}) => {
+  const isMobile = useResponsiveStore((state) => state.isMobile);
+  const [open, setOpen] = useState(false);
+
+  // Touch devices: tap opens the card in a centered modal (hover tooltips don't fire).
+  if (isMobile) {
+    return (
+      <>
+        <span onClick={() => setOpen(true)}>{pill}</span>
+        {open && (
+          <CardModal onClose={() => setOpen(false)}>{card}</CardModal>
+        )}
+      </>
+    );
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={150}>
+        <TooltipTrigger asChild>{pill}</TooltipTrigger>
+        <TooltipContent
+          className='border-0 bg-transparent p-0 shadow-2xl'
+          side='top'>
+          {card}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 export const ItemPill = ({
   itemType,
   itemName,
@@ -350,8 +393,6 @@ export const ItemPill = ({
   rolledEffect: any;
 }) => {
   const { t } = useTranslation("feed");
-  const isMobile = useResponsiveStore((state) => state.isMobile);
-  const [open, setOpen] = useState(false);
   const color = getRarityColor(itemRarity);
   const imgSrc =
     itemType === "guitar"
@@ -412,29 +453,50 @@ export const ItemPill = ({
     </span>
   );
 
-  // Touch devices: tap opens the card in a centered modal (hover tooltips don't fire).
-  if (isMobile) {
-    return (
-      <>
-        <span onClick={() => setOpen(true)}>{pill}</span>
-        {open && (
-          <CardModal onClose={() => setOpen(false)}>{cardContent}</CardModal>
-        )}
-      </>
-    );
-  }
+  return <PillCard pill={pill} card={cardContent} />;
+};
+
+/** A Guitar Builder part dropped from a case: its stash art, slot, rarity and rolled level. */
+const ComponentPill = ({ component }: { component: OwnedComponent }) => {
+  const { t } = useTranslation("feed");
+  const def = getComponent(component.defId);
+  if (!def) return null;
+  const color = getRarityColor(def.rarity);
+
+  const pill = (
+    <span className='inline-flex w-full cursor-pointer items-center gap-2.5 rounded-lg bg-white/5 p-2 sm:w-auto sm:gap-1.5 sm:rounded-none sm:bg-transparent sm:p-0'>
+      {/* stash art squeezed into the pill's slot, whatever size the thumb draws it at */}
+      <ComponentThumb
+        def={def}
+        className='h-10 w-10 shrink-0 opacity-90 sm:order-last sm:h-7 sm:w-7 [&_img]:!h-full [&_img]:!w-full [&_span]:!h-full [&_span]:!w-full'
+      />
+      <span className='flex min-w-0 flex-1 flex-col gap-1 sm:flex-initial sm:flex-row sm:items-center sm:gap-1.5'>
+        <span className='order-1 min-w-0 break-words text-sm font-bold sm:order-2'>
+          <span style={{ color }}>{def.name}</span>{" "}
+          <span className='font-normal text-zinc-400'>
+            {SLOT_LABELS[def.slot]}
+          </span>
+        </span>
+        <span className='order-2 flex shrink-0 items-center gap-1.5 sm:order-1'>
+          <Chip
+            color='custom'
+            className='whitespace-nowrap px-1.5 py-0.5 text-xs tracking-wide'
+            style={getChipCustomStyle(color)}>
+            {def.rarity}
+          </Chip>
+          <Chip
+            color='gray'
+            className='whitespace-nowrap px-1.5 py-0.5 text-xs tabular-nums tracking-wide'
+            title={t("item_level")}>
+            {t("item_level_short", { level: component.level })}
+          </Chip>
+        </span>
+      </span>
+    </span>
+  );
 
   return (
-    <TooltipProvider>
-      <Tooltip delayDuration={150}>
-        <TooltipTrigger asChild>{pill}</TooltipTrigger>
-        <TooltipContent
-          className='border-0 bg-transparent p-0 shadow-2xl'
-          side='top'>
-          {cardContent}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <PillCard pill={pill} card={<ComponentPreviewCard component={component} />} />
   );
 };
 
@@ -1209,16 +1271,20 @@ const GroupedLogLine = ({
             }}
           />
         </span>
-        <ItemPill
-          itemType={caseLog.itemType}
-          itemName={caseLog.itemName}
-          itemBrand={caseLog.itemBrand}
-          itemRarity={caseLog.itemRarity}
-          itemImageId={caseLog.itemImageId}
-          level={level}
-          rolledGuitar={rolledGuitar}
-          rolledEffect={rolledEffect}
-        />
+        {caseLog.itemType === "component" ? (
+          caseLog.component && <ComponentPill component={caseLog.component} />
+        ) : (
+          <ItemPill
+            itemType={caseLog.itemType}
+            itemName={caseLog.itemName}
+            itemBrand={caseLog.itemBrand}
+            itemRarity={caseLog.itemRarity}
+            itemImageId={caseLog.itemImageId}
+            level={level}
+            rolledGuitar={rolledGuitar}
+            rolledEffect={rolledEffect}
+          />
+        )}
       </GroupedLine>
     );
   }
@@ -1415,6 +1481,35 @@ const GroupedLogLine = ({
         </p>
         <Chip color='emerald'>
           <span className='tabular-nums'>{goalLog.targetBpm} BPM</span>
+        </Chip>
+      </GroupedLine>
+    );
+  }
+
+  if (type === "goalCreated") {
+    const goalLog = log as FirebaseLogsGoalCreatedInterface;
+
+    return (
+      <GroupedLine>
+        <p className='text-sm text-zinc-400'>
+          <Target className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
+          <Interpolate
+            text={t("feed:set_exercise_goal")}
+            values={{
+              exercise: (
+                <Link
+                  href={`/profile/skills?exerciseId=${goalLog.exerciseId}`}
+                  className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
+                  {goalLog.exerciseTitle}
+                </Link>
+              ),
+            }}
+          />
+        </p>
+        <Chip color='cyan'>
+          <span className='tabular-nums'>
+            {goalLog.startBpm} → {goalLog.targetBpm} BPM
+          </span>
         </Chip>
       </GroupedLine>
     );

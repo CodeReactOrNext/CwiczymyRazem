@@ -1,6 +1,7 @@
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDonationInterface,
+  FirebaseLogsGoalCreatedInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsMarketplacePurchaseInterface,
   FirebaseLogsSongsInterface,
@@ -99,6 +100,38 @@ const donationLog = (
 });
 
 describe("groupConsecutiveLogs", () => {
+  it("keeps a Builder part drop in the arsenal group with the gear pulls", () => {
+    const part = caseOpenLog({
+      itemType: "component",
+      itemImageId: "finish:black",
+      component: { uid: "finish:black#1", defId: "finish:black", level: 3 },
+    });
+    const groups = groupConsecutiveLogs([caseOpenLog(), part, marketplaceLog()]);
+
+    expect(getLogActivityType(part)).toBe("caseOpen");
+    expect(groups).toHaveLength(1);
+    expect(groups[0].logs).toHaveLength(3);
+  });
+
+  it("classifies a set exercise goal as its own activity", () => {
+    const goal: FirebaseLogsGoalCreatedInterface = {
+      type: "exercise_goal_created",
+      uid: "user-1",
+      userName: "Cookie",
+      avatarUrl: null,
+      timestamp: "2026-07-09T21:20:00.000Z",
+      data: "Set a goal",
+      goalId: "g1",
+      exerciseId: "alternate-picking",
+      exerciseTitle: "Alternate Picking",
+      startBpm: 80,
+      targetBpm: 140,
+    };
+
+    expect(getLogActivityType(goal)).toBe("goalCreated");
+    expect(groupConsecutiveLogs([goal, caseOpenLog()])).toHaveLength(2);
+  });
+
   it("groups consecutive case-open and marketplace logs from the same user as one arsenal group", () => {
     const logs = [marketplaceLog(), caseOpenLog(), marketplaceLog(), marketplaceLog()];
 

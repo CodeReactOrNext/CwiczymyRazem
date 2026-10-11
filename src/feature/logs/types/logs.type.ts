@@ -2,6 +2,7 @@ import type { AchievementList } from "feature/achievements/types";
 import type { EffectInventoryItem, InventoryItem } from "feature/arsenal/types/arsenal.types";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import type { GuildBadge } from "feature/guilds/types/guild.types";
+import type { OwnedComponent } from "feature/guitarBuilder/types/guitarBuilder.types";
 import type { SupportVariantId } from "feature/support/content/supportVariants";
 import type { ReportSongEntry } from "feature/user/view/ReportView/ReportView.types";
 
@@ -274,6 +275,26 @@ export interface FirebaseLogsGoalCompletedInterface {
   reactionFame?: LogReactionFame;
 }
 
+/** An exercise goal set: the tempo the player starts the ladder at and the one they're after. */
+export interface FirebaseLogsGoalCreatedInterface {
+  uid: string;
+  userName: string;
+  timestamp: string | number | Date;
+  type: "exercise_goal_created";
+  data: string;
+  goalId: string;
+  exerciseId: string;
+  exerciseTitle: string;
+  startBpm: number;
+  targetBpm: number;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  guildBadge?: GuildBadge | null;
+  id?: string;
+  reactions?: string[];
+  reactionFame?: LogReactionFame;
+}
+
 /** A step of a Mastery Roadmap crossing into "done". */
 export interface FirebaseLogsRoadmapStepInterface {
   uid: string;
@@ -452,13 +473,16 @@ export interface FirebaseLogsCaseOpenInterface {
   data: string;
   caseType: string;
   caseName: string;
-  itemType: "guitar" | "effect";
+  /** "component" = a Guitar Builder part; then `itemImageId` is its def id and `component` is set. */
+  itemType: "guitar" | "effect" | "component";
   itemName: string;
   itemBrand: string;
   itemRarity: string;
   itemImageId: number | string;
   /** Full rolled instance — drives the proper card tooltip + level. Optional on legacy logs. */
   rolledItem?: InventoryItem | EffectInventoryItem;
+  /** The dropped Builder part, level included. Only on `itemType: "component"`. */
+  component?: OwnedComponent;
   id?: string;
   reactions?: string[];
   reactionFame?: LogReactionFame;

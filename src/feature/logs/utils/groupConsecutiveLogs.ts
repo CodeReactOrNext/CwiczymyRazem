@@ -5,6 +5,7 @@ import type {
   FirebaseLogsDonationInterface,
   FirebaseLogsExamPassedInterface,
   FirebaseLogsGoalCompletedInterface,
+  FirebaseLogsGoalCreatedInterface,
   FirebaseLogsGuildLevelInterface,
   FirebaseLogsInterface,
   FirebaseLogsMarketplaceInterface,
@@ -31,6 +32,7 @@ export type AnyFirebaseLog =
   | FirebaseLogsExamPassedInterface
   | FirebaseLogsRoadmapStepInterface
   | FirebaseLogsGoalCompletedInterface
+  | FirebaseLogsGoalCreatedInterface
   | FirebaseLogsSupportAskInterface
   | FirebaseLogsDonationInterface
   | FirebaseLogsGuildLevelInterface
@@ -103,6 +105,12 @@ export const isFirebaseLogsGoalCompleted = (
   return (log as FirebaseLogsGoalCompletedInterface).type === "exercise_goal_completed";
 };
 
+export const isFirebaseLogsGoalCreated = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsGoalCreatedInterface => {
+  return (log as FirebaseLogsGoalCreatedInterface).type === "exercise_goal_created";
+};
+
 export const isFirebaseLogsGuildLevel = (
   log: AnyFirebaseLog
 ): log is FirebaseLogsGuildLevelInterface => {
@@ -145,6 +153,7 @@ export type LogActivityType =
   | "examPassed"
   | "roadmapStep"
   | "goalCompleted"
+  | "goalCreated"
   | "supportAsk"
   | "donationReceived"
   | "guildLevel"
@@ -166,6 +175,7 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   if (isFirebaseLogsExamPassed(log)) return "examPassed";
   if (isFirebaseLogsRoadmapStep(log)) return "roadmapStep";
   if (isFirebaseLogsGoalCompleted(log)) return "goalCompleted";
+  if (isFirebaseLogsGoalCreated(log)) return "goalCreated";
   if (isFirebaseLogsSupportAsk(log)) return "supportAsk";
   if (isFirebaseLogsDonation(log)) return "donationReceived";
   if (isFirebaseLogsGuildLevel(log)) return "guildLevel";
