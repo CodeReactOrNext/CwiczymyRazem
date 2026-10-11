@@ -36,6 +36,8 @@
     "repair-follower-roadmap-progress": "vitest run --mode repair-follower-progress scripts/repairFollowerRoadmapProgress.test.ts",
     "grant-tokens": "vitest run --mode granttokens scripts/grantSupporterTokens.test.ts",
     "grant-all-tokens": "vitest run --mode grant-all-tokens scripts/grantAllSupportersTokens.test.ts",
+    "cleanup-exercise-scores": "vitest run --mode cleanup-scores-dry scripts/cleanupImpossibleExerciseScores.test.ts",
+    "cleanup-exercise-scores:apply": "vitest run --mode cleanup-scores-apply scripts/cleanupImpossibleExerciseScores.test.ts",
     "clear-boards": "vitest run --mode clear-boards scripts/clearSupporterBoards.test.ts",
     "delete-guilds": "vitest run --mode delete-guilds scripts/deleteAllGuilds.test.ts",
     "delete-recording": "vitest run --mode delete-recording scripts/deleteRecording.test.ts",

@@ -116,6 +116,9 @@ export interface NoteMatchingSnapshot {
   /** Where the run's graded bends tended to land (median signed cents, + =
    *  sharp); null unless intonation is scored and enough bends came near. */
   intonationBiasCents?: number | null;
+  /** Practice time the run has been scoring over, in ms — the exercise clock
+   *  since the score last went to zero. Absent without an exercise clock. */
+  runMs?: number;
 }
 
 export interface NoteMatchingHandle {
@@ -220,6 +223,9 @@ interface NoteMatchingProviderProps {
   onEnableMic: () => void;
   // callback
   onReset: () => void;
+  // the exercise clock (practice time, pauses and count-ins excluded) — what a
+  // run's length is measured on
+  getSessionTimeMs?: () => number;
   // whether the session is running as a journey exam (gates the click-hunt mistake limit)
   isExamMode?: boolean;
   // fired once when a click-hunt exam hits the mistake limit — PracticeSession
@@ -258,6 +264,7 @@ export function NoteMatchingProvider({
   canAdvanceHunt = false,
   onEnableMic,
   onReset,
+  getSessionTimeMs,
   isExamMode = false,
   onExamFail,
 }: NoteMatchingProviderProps) {
@@ -498,10 +505,23 @@ export function NoteMatchingProvider({
   const latestRef = useRef<NoteMatchingSnapshot>({ score: 0, accuracy: 100, maxCombo: 0, maxPossibleScore: 0, noteTimeline: [] });
   latestRef.current = { score: gameState.score, accuracy: sessionAccuracy, maxCombo: effectiveMaxCombo, maxPossibleScore: effectiveMaxPossibleScore, noteTimeline };
 
+  // Where the exercise clock stood when the score last went to zero. The clock
+  // only runs while the session plays — scoring needs it running — so the gap to
+  // it is the stretch of play the score was earned over.
+  const getSessionTimeRef = useRef(getSessionTimeMs);
+  useEffect(() => { getSessionTimeRef.current = getSessionTimeMs; }, [getSessionTimeMs]);
+  const runStartMsRef = useRef(0);
+  const markRunStart = useCallback(() => {
+    runStartMsRef.current = getSessionTimeRef.current?.() ?? 0;
+  }, []);
+  // A new exercise starts its own run, on whatever time its clock resumes from.
+  useEffect(markRunStart, [currentExerciseIndex, markRunStart]);
+
   const resetGameAndProgress = useCallback(() => {
     resetGame();
     setAccumulatedNotes(new Set());
-  }, [resetGame]);
+    markRunStart();
+  }, [resetGame, markRunStart]);
 
   // Populate the imperative handle on every render — safe, it's just a ref assignment
   handleRef.current = {
@@ -517,6 +537,7 @@ export function NoteMatchingProvider({
       // The whole run, loops included — the tab's own hit marks only ever
       // hold the pass being played.
       const noteLog = isHunt ? null : runLogRef.current.map((note) => ({ ...note }));
+      const sessionMs = getSessionTimeRef.current?.();
       return {
         ...latestRef.current,
         ...(liveScore !== null && { score: liveScore }),
@@ -528,6 +549,11 @@ export function NoteMatchingProvider({
         intonationBiasCents: isHunt || isStrummingExercise || scoringFocus !== "pitch"
           ? null
           : summarizeIntonation(intonationOffsetsRef.current)?.biasCents ?? null,
+        // A clock that reads below the mark was restarted under the run, so
+        // everything on it belongs to this run.
+        ...(sessionMs !== undefined && {
+          runMs: sessionMs >= runStartMsRef.current ? sessionMs - runStartMsRef.current : sessionMs,
+        }),
       };
     },
   };

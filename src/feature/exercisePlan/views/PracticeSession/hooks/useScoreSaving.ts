@@ -9,6 +9,7 @@ import { useAppSelector } from "store/hooks";
 
 import { markExerciseCompleted, saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise, ScoredRun } from "../../../types/exercise.types";
+import { isRunWithinExerciseTime } from "../../../utils/exerciseTimeLimit";
 import { hasLeaderboard } from "../../../utils/hasLeaderboard";
 import { isClickAnsweredMode } from "../../../utils/huntModes";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
@@ -26,6 +27,8 @@ interface UseScoreSavingOptions {
    * open goal). Off in goal mode, which saves its runs itself — as goal runs.
    */
   recordGoalChartRuns?: boolean;
+  /** Length of the play-along video the exercise runs to, when it has one. */
+  videoDurationSeconds?: number | null;
 }
 
 /**
@@ -52,6 +55,7 @@ export interface ScoreRecords {
 export function useScoreSaving({
   activeExercise, currentExercise, isMicEnabled,
   earTrainingScore, noteMatchingHandle, sessionBpm, recordGoalChartRuns = true,
+  videoDurationSeconds = null,
 }: UseScoreSavingOptions) {
   const userAuth   = useAppSelector(selectUserAuth);
   const userName   = useAppSelector(selectUserName);
@@ -71,9 +75,9 @@ export function useScoreSaving({
   // summary reads this while rendering.
   const [scoredRuns, setScoredRuns] = useState<ScoredRun[]>([]);
 
-  const recordScoredRun = (run: ScoredRun) => {
-    // The summary card places each run on its board — skip exercises without one.
-    if (!hasLeaderboard(activeExercise)) return;
+  const recordScoredRun = (run: ScoredRun, isRanked: boolean) => {
+    // The summary card places each run on its board — skip runs that stay off it.
+    if (!isRanked) return;
     setScoredRuns((tracked) => {
       // Keyed by exercise, not by score type: one exercise has one leaderboard,
       // and a click hunt with the mic on saves under both types, same score.
@@ -106,6 +110,11 @@ export function useScoreSaving({
     // exercise's standing as if it belonged to this one.
     micStandingRef.current = {};
     earTrainingStandingRef.current = {};
+    // A run that kept scoring past the exercise's own time is no attempt at the
+    // exercise, so it stays off every board. It still counts as the player's own
+    // practice: their record, goal chart and completion take it like any other.
+    const isRanked = hasLeaderboard(activeExercise)
+      && isRunWithinExerciseTime(activeExercise, snap?.runMs ?? 0, videoDurationSeconds);
 
     /**
      * Puts a score on the board and reads back the place it lands in. The write
@@ -113,7 +122,8 @@ export function useScoreSaving({
      * and the player's own entry is never one of them.
      */
     const placeOnLeaderboard = async (uid: string, score: number, previousBest: number): Promise<RunStanding> => {
-      if (!hasLeaderboard(activeExercise)) return {};
+      // An overtime run still reports the tempo it was played at, just no place.
+      if (!isRanked) return hasLeaderboard(activeExercise) && runBpm ? { bpm: runBpm } : {};
       saveLeaderboardEntry(uid, exId, score, userName || "Anonymous", userAvatar || "", runBpm);
       const rank = await getExerciseUserRank(exId, Math.max(score, previousBest));
       return { ...(runBpm ? { bpm: runBpm } : {}), ...(rank ? { rank } : {}) };
@@ -121,12 +131,12 @@ export function useScoreSaving({
 
     if (userAuth && isMicEnabled && snap && snap.score > 0) {
       const result = await updateMicHighScore(userAuth, exId, snap.score, snap.accuracy, exTitle, exCategory);
-      recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: snap.score, scoreType: "mic", previousBest: result.previousScore, bpm: runBpm });
+      recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: snap.score, scoreType: "mic", previousBest: result.previousScore, bpm: runBpm }, isRanked);
       micStandingRef.current = await placeOnLeaderboard(userAuth, snap.score, result.previousScore);
       // The exercise of the day keeps its own board on top of the all-time one.
       // Not awaited — a failed daily write must never hold up the report.
       const dailyDayKey = findDailyDayKeyFor(exId);
-      if (dailyDayKey) {
+      if (dailyDayKey && isRanked) {
         submitDailyExerciseScore({ dayKey: dailyDayKey, exerciseId: exId, score: snap.score, accuracy: snap.accuracy, bpm: runBpm })
           .catch((error) => console.error("Daily exercise score was not saved", error));
       }
@@ -145,7 +155,7 @@ export function useScoreSaving({
 
     if (userAuth && currentExercise.riddleConfig?.mode === "sequenceRepeat" && earTrainingScore > 0) {
       const result = await updateEarTrainingHighScore(userAuth, exId, earTrainingScore, exTitle, exCategory);
-      recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: earTrainingScore, scoreType: "earTraining", previousBest: result.previousScore, bpm: runBpm });
+      recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: earTrainingScore, scoreType: "earTraining", previousBest: result.previousScore, bpm: runBpm }, isRanked);
       earTrainingStandingRef.current = await placeOnLeaderboard(userAuth, earTrainingScore, result.previousScore);
       if (result.isNewRecord) {
         exerciseRecordsRef.current = {
@@ -157,7 +167,7 @@ export function useScoreSaving({
 
     if (userAuth && isClickAnsweredMode(currentExercise.noteHuntConfig?.mode) && snap && snap.score > 0) {
       const result = await updateClickHighScore(userAuth, exId, snap.score, snap.accuracy, exTitle, exCategory);
-      recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: snap.score, scoreType: "click", previousBest: result.previousScore, bpm: runBpm });
+      recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: snap.score, scoreType: "click", previousBest: result.previousScore, bpm: runBpm }, isRanked);
       micStandingRef.current = await placeOnLeaderboard(userAuth, snap.score, result.previousScore);
       if (result.isNewRecord) {
         exerciseRecordsRef.current = {

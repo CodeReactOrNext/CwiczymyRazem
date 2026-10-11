@@ -1600,6 +1600,27 @@ const GroupedLogLine = ({
   // `songTitle` only ever holds the song that got the most time, so on a routine
   // that ran a whole setlist it named one of ten. The plan's name says it all.
   const hidesPrimarySong = !!planTitle && (genericLog.songs?.length ?? 0) > 1;
+  // A manual report can name several songs; listing only `songTitle` hid all
+  // but the first one. Older logs carry no `songs`, so they fall back to it.
+  const practicedSongs = (() => {
+    const seen = new Set<string>();
+    const fromSongs = (genericLog.songs ?? []).filter((song) => {
+      const key = song.songId || `${song.songArtist} - ${song.songTitle}`;
+      if (!song.songTitle || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    if (fromSongs.length > 0) return fromSongs;
+    return genericLog.songTitle && genericLog.songArtist
+      ? [
+          {
+            songId: genericLog.songId,
+            songTitle: genericLog.songTitle,
+            songArtist: genericLog.songArtist,
+          },
+        ]
+      : [];
+  })();
   const sessionTimeMs = genericLog.timeSumary?.sumTime ?? 0;
 
   return (
@@ -1737,23 +1758,30 @@ const GroupedLogLine = ({
           </span>
         ))}
 
-      {genericLog.songTitle && genericLog.songArtist && !hidesPrimarySong && (
+      {practicedSongs.length > 0 && !hidesPrimarySong && (
         <p className='flex flex-wrap items-center gap-1.5 text-sm text-zinc-400'>
           {t("common:song_status.practiced")}
-          {genericLog.songId && (
-            <SongTierChip info={songTiers[genericLog.songId]} />
-          )}
-          {genericLog.songId ? (
-            <Link
-              href={`/songs?view=management&songId=${genericLog.songId}`}
-              className={cn(TOUCH_TARGET, "text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
-              {genericLog.songArtist} - {genericLog.songTitle}
-            </Link>
-          ) : (
-            <span className='text-white'>
-              {genericLog.songArtist} - {genericLog.songTitle}
+          {practicedSongs.map((song, index) => (
+            <span
+              key={song.songId || `${song.songArtist}-${song.songTitle}`}
+              className='inline-flex items-center gap-1.5'>
+              {song.songId && <SongTierChip info={songTiers[song.songId]} />}
+              {song.songId ? (
+                <Link
+                  href={`/songs?view=management&songId=${song.songId}`}
+                  className={cn(TOUCH_TARGET, "text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
+                  {song.songArtist} - {song.songTitle}
+                </Link>
+              ) : (
+                <span className='text-white'>
+                  {song.songArtist} - {song.songTitle}
+                </span>
+              )}
+              {index < practicedSongs.length - 1 && (
+                <span className='text-zinc-500'>,</span>
+              )}
             </span>
-          )}
+          ))}
         </p>
       )}
     </GroupedLine>
@@ -1933,7 +1961,13 @@ const Logs = ({
   const songIds = useMemo(
     () =>
       logs
-        .map((log) => (log as { songId?: string }).songId)
+        .flatMap((log) => {
+          const { songId, songs } = log as {
+            songId?: string;
+            songs?: { songId?: string }[];
+          };
+          return [songId, ...(songs ?? []).map((song) => song.songId)];
+        })
         .filter((id): id is string => Boolean(id)),
     [logs],
   );

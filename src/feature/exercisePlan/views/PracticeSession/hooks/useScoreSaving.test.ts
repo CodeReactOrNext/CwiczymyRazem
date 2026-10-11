@@ -52,8 +52,8 @@ const exercise = {
 /** An exercise the player can't set a tempo on, so no tempo is worth reporting. */
 const untimedExercise = { ...exercise, metronomeSpeed: undefined } as unknown as Exercise;
 
-const handleFor = (score: number, minScoredBpm?: number | null) =>
-  ({ current: { snapshot: () => ({ score, accuracy: 99, minScoredBpm }) } }) as unknown as {
+const handleFor = (score: number, minScoredBpm?: number | null, runMs?: number) =>
+  ({ current: { snapshot: () => ({ score, accuracy: 99, minScoredBpm, runMs }) } }) as unknown as {
     current: NoteMatchingHandle | null;
   };
 
@@ -63,12 +63,14 @@ const saveRun = async ({
   activeExercise = exercise,
   sessionBpm = 90,
   minScoredBpm,
+  runMs,
 }: {
   score: number;
   previousBest: number;
   activeExercise?: Exercise;
   sessionBpm?: number;
   minScoredBpm?: number | null;
+  runMs?: number;
 }) => {
   vi.mocked(updateMicHighScore).mockResolvedValue({
     isNewRecord: score > previousBest,
@@ -81,7 +83,7 @@ const saveRun = async ({
       currentExercise: activeExercise,
       isMicEnabled: true,
       earTrainingScore: 0,
-      noteMatchingHandle: handleFor(score, minScoredBpm),
+      noteMatchingHandle: handleFor(score, minScoredBpm, runMs),
       sessionBpm,
     })
   );
@@ -203,5 +205,43 @@ describe("useScoreSaving daily board", () => {
     await saveRun({ score: 21_375, previousBest: 0 });
 
     expect(submitDailyExerciseScore).not.toHaveBeenCalled();
+  });
+});
+
+describe("useScoreSaving overtime runs", () => {
+  /** A two-minute drill: one attempt may run 2:15 with the slack. */
+  const twoMinuteExercise = { ...exercise, timeInMinutes: 2 } as unknown as Exercise;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getExerciseUserRank).mockResolvedValue(2);
+    vi.mocked(submitDailyExerciseScore).mockResolvedValue({ isNewBest: true });
+    vi.mocked(findDailyDayKeyFor).mockReturnValue("2026-09-30");
+  });
+
+  it("ranks a run that fits the exercise's time", async () => {
+    const result = await saveRun({ score: 21_375, previousBest: 0, activeExercise: twoMinuteExercise, runMs: 130_000 });
+
+    expect(saveLeaderboardEntry).toHaveBeenCalled();
+    expect(submitDailyExerciseScore).toHaveBeenCalled();
+    expect(result.current.scoredRuns).toHaveLength(1);
+  });
+
+  it("keeps a run that outlasted the exercise off every board", async () => {
+    const result = await saveRun({ score: 90_000, previousBest: 0, activeExercise: twoMinuteExercise, runMs: 10 * 60_000 });
+
+    expect(saveLeaderboardEntry).not.toHaveBeenCalled();
+    expect(getExerciseUserRank).not.toHaveBeenCalled();
+    expect(submitDailyExerciseScore).not.toHaveBeenCalled();
+    expect(result.current.scoredRuns).toEqual([]);
+    // No place to report, but the tempo it was played at still stands.
+    expect(result.current.micStandingRef.current).toEqual({ bpm: 90 });
+  });
+
+  it("still keeps an overtime run as the player's own record", async () => {
+    await saveRun({ score: 90_000, previousBest: 0, activeExercise: twoMinuteExercise, runMs: 10 * 60_000 });
+
+    expect(updateMicHighScore).toHaveBeenCalledWith("me", "ex1", 90_000, 99, "C Minor Pentatonic", "technique");
+    expect(markExerciseCompleted).toHaveBeenCalled();
   });
 });

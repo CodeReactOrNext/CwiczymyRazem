@@ -724,6 +724,7 @@ export const PracticeSession = ({
     activeExercise, currentExercise, isMicEnabled, earTrainingScore, noteMatchingHandle,
     sessionBpm: effectiveBpm,
     recordGoalChartRuns: !isGoalMode,
+    videoDurationSeconds: videoDuration,
   });
 
   const { verdict: goalVerdict, rearm: rearmGoalVerdict } = useGoalRunVerdict({
@@ -954,6 +955,7 @@ export const PracticeSession = ({
       canAdvanceHunt={huntTarget !== null}
       onEnableMic={handleMicToggle}
       onReset={handleNoteMatchingReset}
+      getSessionTimeMs={timer.getTime}
       isExamMode={isExamMode}
       onExamFail={handleExamMistakeFail}
     >
