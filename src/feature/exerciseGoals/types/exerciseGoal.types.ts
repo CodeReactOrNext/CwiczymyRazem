@@ -13,16 +13,26 @@ export type GoalCounting = "streak" | "total";
 
 export type GoalStatus = "active" | "completed";
 
-/** A tempo the player set for one exercise, and how far they are toward it. */
+/**
+ * A tempo the player set for one exercise, and how far they are toward it. The
+ * way there is a path of milestones from startBpm up to targetBpm, stepBpm
+ * apart (see goalPath) — each one cleared by its own clean runs in goal mode.
+ */
 export interface ExerciseGoal {
   id: string;
   exerciseId: string;
   /** Kept on the goal so the feed and the history read without the exercise bundle. */
   exerciseTitle: string;
   targetBpm: number;
+  /** The first milestone. Goals set before paths existed start at their target. */
+  startBpm: number;
+  /** The distance between milestones, picked when the goal is set. */
+  stepBpm: number;
+  /** The milestone being played for now; targetBpm once on the last one. */
+  stageBpm: number;
   strictness: GoalStrictness;
   counting: GoalCounting;
-  /** Clean runs counted toward the goal so far, 0 to GOAL_CLEAN_RUNS_REQUIRED. */
+  /** Clean runs counted at the current milestone, 0 to GOAL_CLEAN_RUNS_REQUIRED. */
   cleanRuns: number;
   status: GoalStatus;
   /** Epoch ms. */
@@ -35,6 +45,8 @@ export interface NewExerciseGoal {
   exerciseId: string;
   exerciseTitle: string;
   targetBpm: number;
+  startBpm: number;
+  stepBpm: number;
   strictness: GoalStrictness;
   counting: GoalCounting;
 }
@@ -89,8 +101,14 @@ export type GoalRunVerdictReason =
 export interface GoalRunOutcome {
   clean: boolean;
   reason: GoalRunVerdictReason;
-  /** The goal's count after this run. */
+  /** The milestone the run was judged at. */
+  stageBpm: number;
+  /** The count at that milestone after this run — full when it was cleared. */
   cleanRuns: number;
+  /** This run cleared its milestone. */
+  stageCleared: boolean;
+  /** The milestone played for from now on; null once the goal is finished. */
+  nextStageBpm: number | null;
   /** The goal was finished by this very run. */
   justCompleted: boolean;
   /** A streak goal lost its count to this run. */

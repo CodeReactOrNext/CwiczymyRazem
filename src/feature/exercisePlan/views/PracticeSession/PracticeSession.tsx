@@ -91,6 +91,8 @@ export interface GoalRunResult {
  * the goal's — because a run counts at whatever tempo it was really played.
  */
 export interface GoalRunConfig {
+  /** The tempo of the milestone being played for. When it changes (a milestone
+   *  was cleared) the metronome moves to it for the next run. */
   targetBpm: number;
   /** Called once per run played to the end; resolves to what the run summary
    *  shows about the goal. */

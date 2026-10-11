@@ -22,6 +22,7 @@ const COLORS = {
   clean: "rgb(52, 211, 153)", // emerald-400
   notClean: "rgb(113, 113, 122)", // zinc-500
   target: "rgba(52, 211, 153, 0.5)",
+  stage: "rgba(212, 212, 216, 0.35)", // zinc-300
   tightZone: "rgba(52, 211, 153, 0.07)",
   grid: "rgba(255, 255, 255, 0.04)",
   axis: "rgb(113, 113, 122)",
@@ -133,6 +134,8 @@ const RunTooltip = ({ active, payload, metric }: RunTooltipProps) => {
 interface GoalRunsChartProps {
   runs: ExerciseRun[];
   targetBpm: number;
+  /** The milestone being played for — drawn as its own line while it is below the goal. */
+  stageBpm?: number;
   /** Where the axis may start when there are no runs to set it — the exercise's own floor. */
   floorBpm?: number;
   metric?: GoalChartMetric;
@@ -193,6 +196,7 @@ const LegendDot = ({ className }: { className: string }) => (
 export const GoalRunsChart = ({
   runs,
   targetBpm,
+  stageBpm,
   floorBpm,
   metric = "tempo",
 }: GoalRunsChartProps) => {
@@ -218,12 +222,16 @@ export const GoalRunsChart = ({
     ? emptySpan(isTiming ? PERFECT_TIMING_MS : targetBpm)
     : data.map((point) => ({ ...point }));
 
+  const showStage = stageBpm !== undefined && stageBpm < targetBpm;
   const axis = isTiming
     ? timingAxis(shown.map((run) => run.timingOffsetMs ?? 0))
     : bpmAxis(
-        isEmpty && floorBpm !== undefined
-          ? [floorBpm]
-          : shown.map((run) => run.bpm),
+        [
+          ...(isEmpty && floorBpm !== undefined
+            ? [floorBpm]
+            : shown.map((run) => run.bpm)),
+          ...(showStage ? [stageBpm] : []),
+        ],
         targetBpm,
       );
   const dataKey = isTiming ? "timingOffsetMs" : "bpm";
@@ -264,6 +272,13 @@ export const GoalRunsChart = ({
                 strokeDasharray='5 4'
               />
             )}
+            {!isTiming && showStage && (
+              <ReferenceLine
+                y={stageBpm}
+                stroke={COLORS.stage}
+                strokeDasharray='2 4'
+              />
+            )}
             {!isEmpty && (
               <Tooltip
                 cursor={{ stroke: "rgba(255,255,255,0.08)" }}
@@ -299,6 +314,12 @@ export const GoalRunsChart = ({
           <span className='flex items-center gap-2'>
             <LegendDot className='w-4 border-t-2 border-dashed border-emerald-400/60' />
             {t("chart.target", { bpm: targetBpm })}
+          </span>
+        )}
+        {!isTiming && showStage && (
+          <span className='flex items-center gap-2'>
+            <LegendDot className='w-4 border-t-2 border-dotted border-zinc-300/50' />
+            {t("chart.stage", { bpm: stageBpm })}
           </span>
         )}
         <span className='flex items-center gap-2'>

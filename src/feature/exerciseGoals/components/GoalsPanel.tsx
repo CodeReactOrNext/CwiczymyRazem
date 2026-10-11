@@ -174,6 +174,12 @@ export const GoalsPanel = ({
           {...(raiseFrom
             ? {
                 initialExerciseId: raiseFrom.exerciseId,
+                // The old goal is already played clean — the path picks up
+                // one step past it.
+                initialStartBpm: Math.min(
+                  raiseFrom.targetBpm + 5,
+                  raisedTargetBpm(raiseFrom.targetBpm),
+                ),
                 initialBpm: raisedTargetBpm(raiseFrom.targetBpm),
                 initialStrictness: raiseFrom.strictness,
                 initialCounting: raiseFrom.counting,

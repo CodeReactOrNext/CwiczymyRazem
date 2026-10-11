@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Loader2, MicOff, Target, X } from "lucide-react";
+import { Check, Flag, Loader2, MicOff, Target, X } from "lucide-react";
 
 import type {
   ExerciseGoal,
@@ -53,31 +53,38 @@ export const GoalRunVerdict = ({ state }: { state: GoalRunVerdictState }) => {
 
   const { goal, run, outcome } = state;
   const reached = outcome.justCompleted;
+  // A milestone cleared on the way, with more of the path still to play.
+  const cleared = outcome.stageCleared && !reached;
+  const highlighted = reached || cleared;
 
   const headline = reached
     ? t("verdict.completed", { bpm: goal.targetBpm })
-    : outcome.reason === "goal_closed"
-      ? t("verdict.closed")
-      : outcome.clean
-        ? t("verdict.clean")
-        : t("verdict.not_clean");
+    : cleared
+      ? t("verdict.stage_cleared", { bpm: outcome.stageBpm })
+      : outcome.reason === "goal_closed"
+        ? t("verdict.closed")
+        : outcome.clean
+          ? t("verdict.clean")
+          : t("verdict.not_clean");
 
   const detail = reached
     ? null
-    : outcome.reason === "too_slow"
-      ? t("verdict.too_slow", { bpm: run.bpm, target: goal.targetBpm })
-      : outcome.reason === "accuracy"
-        ? t("verdict.accuracy", {
-            accuracy: run.accuracy,
-            required: STRICTNESS_ACCURACY[goal.strictness],
-          })
-        : null;
+    : cleared && outcome.nextStageBpm !== null
+      ? t("verdict.next_stage", { bpm: outcome.nextStageBpm })
+      : outcome.reason === "too_slow"
+        ? t("verdict.too_slow", { bpm: run.bpm, target: outcome.stageBpm })
+        : outcome.reason === "accuracy"
+          ? t("verdict.accuracy", {
+              accuracy: run.accuracy,
+              required: STRICTNESS_ACCURACY[goal.strictness],
+            })
+          : null;
 
   return (
     <div
       className={cn(
         "rounded-lg px-4 py-4",
-        reached ? "bg-emerald-500/10" : "bg-zinc-800/40",
+        highlighted ? "bg-emerald-500/10" : "bg-zinc-800/40",
       )}>
       <div
         className={cn(
@@ -93,6 +100,8 @@ export const GoalRunVerdict = ({ state }: { state: GoalRunVerdictState }) => {
           )}>
           {reached ? (
             <Target className='h-4 w-4' />
+          ) : cleared ? (
+            <Flag className='h-4 w-4' />
           ) : outcome.clean ? (
             <Check className='h-4 w-4' />
           ) : (
@@ -103,7 +112,7 @@ export const GoalRunVerdict = ({ state }: { state: GoalRunVerdictState }) => {
           <p
             className={cn(
               "text-sm font-semibold",
-              reached ? "text-emerald-300" : "text-zinc-100",
+              highlighted ? "text-emerald-300" : "text-zinc-100",
             )}>
             {headline}
           </p>
@@ -117,9 +126,10 @@ export const GoalRunVerdict = ({ state }: { state: GoalRunVerdictState }) => {
         <div className='mt-4 flex items-center gap-3'>
           <GoalProgressDots cleanRuns={outcome.cleanRuns} />
           <span className='text-xs text-zinc-400'>
-            {t("card.progress", {
+            {t("card.progress_at", {
               count: outcome.cleanRuns,
               total: GOAL_CLEAN_RUNS_REQUIRED,
+              bpm: outcome.stageBpm,
             })}
           </span>
         </div>

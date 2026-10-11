@@ -1,13 +1,13 @@
 {
   "page": {
     "title": "Goals",
-    "subtitle": "Set a tempo for an exercise and play it clean three times",
+    "subtitle": "Set a tempo for an exercise and climb to it, milestone by milestone",
     "eyebrow": "Your goals",
     "new_goal": "New goal"
   },
   "empty": {
     "title": "No goals yet",
-    "body": "Pick an exercise and the tempo you want to reach. Then play it in goal mode until three runs come out clean.",
+    "body": "Pick an exercise, where to start and the tempo you want to reach. The way up is split into milestones, and each one takes three clean runs in goal mode.",
     "cta": "Set your first goal"
   },
   "active_title": "Active",
@@ -16,12 +16,12 @@
   "card": {
     "rules": "{{accuracy}}% accuracy · {{counting}}",
     "delete": "Delete goal",
-    "progress": "{{count}} of {{total}} clean runs",
-    "start": "Start goal run",
-    "best_so_far": "Fastest run so far",
-    "no_tempo": "No scored run yet. Play the exercise with the mic on to set your starting tempo.",
-    "at_tempo": "You've reached the goal's tempo. Now make three runs clean.",
-    "to_go": "{{bpm}} BPM to go"
+    "stage_of": "Milestone {{index}} of {{total}}",
+    "path_label": "Milestones on the way to the goal",
+    "stage_done": "{{bpm}} BPM, cleared",
+    "stage_current": "{{bpm}} BPM, playing now",
+    "progress_at": "{{count}} of {{total}} clean runs at {{bpm}} BPM",
+    "start_at": "Play at {{bpm}} BPM"
   },
   "counting": {
     "streak": "in a row",
@@ -42,22 +42,23 @@
     "empty": "Your scored runs will show up here, with the goal's tempo as the line to reach.",
     "metric_label": "What the chart shows",
     "metric_tempo": "Tempo",
-    "metric_timing": "Timing"
+    "metric_timing": "Timing",
+    "stage": "Milestone {{bpm}} BPM"
   },
   "create": {
     "title": "New goal",
-    "description": "Choose an exercise and the tempo to reach. A goal is reached after three clean runs in goal mode.",
+    "description": "Choose an exercise, where to start and the tempo to reach. The way up is split into milestones, and each one takes three clean runs in goal mode.",
     "exercise_label": "Exercise",
     "search": "Search exercises",
     "no_results": "No exercises match.",
     "has_goal": "Has a goal",
     "bpm_range": "Exercise range {{min}}–{{max}} BPM",
     "change_exercise": "Change",
-    "bpm_label": "Target tempo",
+    "bpm_label": "Goal tempo",
     "bpm_invalid": "Pick a tempo between {{min}} and {{max}} BPM.",
     "strictness_label": "How clean",
     "strictness_hint": "The lowest accuracy a run may have to count.",
-    "counting_label": "Three clean runs",
+    "counting_label": "Three clean runs per milestone",
     "counting_hint_streak": "A run that isn't clean starts the count over.",
     "counting_hint_total": "Clean runs add up, whatever happens in between.",
     "cancel": "Not now",
@@ -70,7 +71,11 @@
       "total": "In total"
     },
     "bpm_down": "Slower by 5 BPM",
-    "bpm_up": "Faster by 5 BPM"
+    "bpm_up": "Faster by 5 BPM",
+    "start_label": "Start tempo",
+    "start_above_target": "The start tempo has to be at or below the goal.",
+    "path_summary": "{{count}} milestones, {{runs}} clean runs each",
+    "path_summary_one": "1 milestone, {{runs}} clean runs"
   },
   "history": {
     "reached_on": "Reached {{date}}",
@@ -91,14 +96,16 @@
     "saving": "Saving the run…",
     "not_scored": "The mic wasn't scoring this run, so it doesn't count toward the goal.",
     "error": "The run couldn't be saved. Try again.",
-    "completed": "Goal reached! {{bpm}} BPM, three clean runs.",
+    "completed": "Goal reached! {{bpm}} BPM, every milestone cleared.",
     "closed": "This goal is already reached.",
     "clean": "Clean run",
     "not_clean": "Not clean yet",
-    "too_slow": "Played at {{bpm}} BPM — the goal is {{target}} BPM.",
+    "too_slow": "Played at {{bpm}} BPM. This milestone is {{target}} BPM.",
     "accuracy": "{{accuracy}}% accuracy — this goal needs {{required}}%.",
     "streak_reset": "The count starts over: this goal needs its clean runs in a row.",
-    "eyebrow": "Goal run · {{bpm}} BPM"
+    "eyebrow": "Goal {{bpm}} BPM",
+    "stage_cleared": "Milestone {{bpm}} BPM cleared!",
+    "next_stage": "Next up: {{bpm}} BPM. The metronome is already set for it."
   },
   "timing": {
     "offset": "{{ms}} ms off the beat",

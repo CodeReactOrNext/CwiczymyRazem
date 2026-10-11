@@ -5,10 +5,14 @@ import { describe, expect, it } from "vitest";
 import type { ExerciseGoal } from "../types/exerciseGoal.types";
 import {
   applyGoalRun,
+  autoStepBpm,
   clampGoalBpm,
   GOAL_CLEAN_RUNS_REQUIRED,
+  goalPath,
   isGoalEligibleExercise,
   isRunClean,
+  MAX_GOAL_STAGES,
+  nextStageBpm,
   raisedTargetBpm,
   STRICTNESS_ACCURACY,
 } from "./goalRules";
@@ -18,6 +22,9 @@ const goal = (overrides: Partial<ExerciseGoal> = {}): ExerciseGoal => ({
   exerciseId: "ex",
   exerciseTitle: "Exercise",
   targetBpm: 115,
+  startBpm: 115,
+  stepBpm: 5,
+  stageBpm: 115,
   strictness: "standard",
   counting: "streak",
   cleanRuns: 0,
@@ -119,6 +126,107 @@ describe("applyGoalRun", () => {
       cleanRuns: 3,
       justCompleted: false,
     });
+  });
+});
+
+describe("goalPath", () => {
+  it("climbs in even steps from start to target", () => {
+    expect(goalPath(80, 120, 5)).toEqual([
+      80, 85, 90, 95, 100, 105, 110, 115, 120,
+    ]);
+  });
+
+  it("is a single milestone when start and target meet", () => {
+    expect(goalPath(120, 120, 5)).toEqual([120]);
+    expect(goalPath(130, 120, 5)).toEqual([120]);
+  });
+
+  it("snaps the milestones between the ends to round numbers", () => {
+    expect(goalPath(82, 100, 5)).toEqual([82, 85, 90, 95, 100]);
+  });
+
+  it("drops a round number that would sit right next to an end", () => {
+    expect(goalPath(84, 100, 5)).toEqual([84, 90, 95, 100]);
+    expect(goalPath(80, 122, 5)).toEqual([
+      80, 85, 90, 95, 100, 105, 110, 115, 122,
+    ]);
+  });
+});
+
+describe("autoStepBpm", () => {
+  it("steps by five while the path stays short", () => {
+    expect(autoStepBpm(80, 120)).toBe(5);
+  });
+
+  it("takes bigger steps over a long climb", () => {
+    const step = autoStepBpm(60, 240);
+    expect(step).toBeGreaterThan(5);
+    expect(goalPath(60, 240, step).length).toBeLessThanOrEqual(MAX_GOAL_STAGES);
+  });
+});
+
+describe("nextStageBpm", () => {
+  const path = { startBpm: 80, targetBpm: 100, stepBpm: 10 };
+
+  it("walks the path one milestone at a time", () => {
+    expect(nextStageBpm(path, 80)).toBe(90);
+    expect(nextStageBpm(path, 90)).toBe(100);
+  });
+
+  it("ends at the target", () => {
+    expect(nextStageBpm(path, 100)).toBeNull();
+  });
+});
+
+describe("applyGoalRun on a path", () => {
+  const onPath = (overrides: Partial<ExerciseGoal> = {}) =>
+    goal({
+      startBpm: 80,
+      stepBpm: 5,
+      targetBpm: 90,
+      stageBpm: 80,
+      ...overrides,
+    });
+
+  it("judges a run at the current milestone, not the target", () => {
+    expect(applyGoalRun(onPath(), { bpm: 82, accuracy: 95 })).toMatchObject({
+      clean: true,
+      stageBpm: 80,
+      cleanRuns: 1,
+      stageCleared: false,
+      nextStageBpm: 80,
+    });
+  });
+
+  it("moves on to the next milestone after its clean runs", () => {
+    const outcome = applyGoalRun(
+      onPath({ cleanRuns: GOAL_CLEAN_RUNS_REQUIRED - 1 }),
+      { bpm: 80, accuracy: 95 },
+    );
+    expect(outcome).toMatchObject({
+      stageCleared: true,
+      cleanRuns: GOAL_CLEAN_RUNS_REQUIRED,
+      nextStageBpm: 85,
+      justCompleted: false,
+    });
+  });
+
+  it("finishes the goal on the last milestone", () => {
+    const outcome = applyGoalRun(
+      onPath({ stageBpm: 90, cleanRuns: GOAL_CLEAN_RUNS_REQUIRED - 1 }),
+      { bpm: 90, accuracy: 95 },
+    );
+    expect(outcome).toMatchObject({
+      stageCleared: true,
+      nextStageBpm: null,
+      justCompleted: true,
+    });
+  });
+
+  it("calls a run under the milestone too slow", () => {
+    expect(
+      applyGoalRun(onPath({ stageBpm: 85 }), { bpm: 82, accuracy: 99 }),
+    ).toMatchObject({ clean: false, reason: "too_slow", stageBpm: 85 });
   });
 });
 

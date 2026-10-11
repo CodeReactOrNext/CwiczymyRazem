@@ -16,14 +16,19 @@ import { useAppSelector } from "store/hooks";
 
 /**
  * Goal mode: the goal's exercise, played run after run, each run that reaches
- * the end judged against the goal. The only place a goal can be reached.
+ * the end judged against the goal's current milestone. A cleared milestone
+ * sets the metronome to the next one for the following run. The only place a
+ * goal can be reached.
  */
 export default function GoalPracticePage() {
   const { t } = useTranslation("goals");
   const router = useRouter();
   const userAuth = useAppSelector(selectUserAuth);
   const goalId = typeof router.query.goalId === "string" ? router.query.goalId : null;
-  const [loaded, setLoaded] = useState<{ goal: ExerciseGoal; exercise: Exercise } | null>(null);
+  const [exercise, setExercise] = useState<Exercise | null>(null);
+  // Kept apart from the exercise: the goal moves on as milestones are cleared,
+  // and the plan built from the exercise must not be rebuilt when it does.
+  const [goal, setGoal] = useState<ExerciseGoal | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
   // A goal reached in this sitting opens the raise-the-bar offer on the way back.
   const [isReached, setIsReached] = useState(false);
@@ -37,14 +42,15 @@ export default function GoalPracticePage() {
     if (!goalId) return undefined;
     let cancelled = false;
     getExerciseGoal(userAuth, goalId)
-      .then((goal) => {
+      .then((fetched) => {
         if (cancelled) return;
-        const exercise = goal && exercisesAgregat.find((candidate) => candidate.id === goal.exerciseId);
-        if (!goal || goal.status !== "active" || !exercise) {
+        const found = fetched && exercisesAgregat.find((candidate) => candidate.id === fetched.exerciseId);
+        if (!fetched || fetched.status !== "active" || !found) {
           router.replace("/goals");
           return;
         }
-        setLoaded({ goal, exercise });
+        setExercise(found);
+        setGoal(fetched);
       })
       .catch((error) => {
         logger.error(error, { context: "GoalPracticePage" });
@@ -56,10 +62,9 @@ export default function GoalPracticePage() {
   }, [router, router.isReady, userAuth, goalId]);
 
   const plan = useMemo<ExercisePlan | null>(() => {
-    if (!loaded || !userAuth) return null;
-    const { exercise } = loaded;
+    if (!exercise || !goalId || !userAuth) return null;
     return {
-      id: `goal-${loaded.goal.id}`,
+      id: `goal-${goalId}`,
       title: exercise.title,
       description: exercise.description,
       category: exercise.category,
@@ -70,13 +75,12 @@ export default function GoalPracticePage() {
       userId: userAuth,
       image: null,
     };
-  }, [loaded, userAuth]);
+  }, [exercise, goalId, userAuth]);
 
   const goalRun = useMemo<GoalRunConfig | undefined>(() => {
-    if (!loaded || !userAuth) return undefined;
-    const { goal, exercise } = loaded;
+    if (!goal || !exercise || !userAuth) return undefined;
     return {
-      targetBpm: goal.targetBpm,
+      targetBpm: goal.stageBpm,
       summaryEyebrow: t("verdict.eyebrow", { bpm: goal.targetBpm }),
       pendingContent: <GoalRunVerdict state={{ kind: "saving" }} />,
       onRunComplete: async (run) => {
@@ -85,6 +89,7 @@ export default function GoalPracticePage() {
         try {
           const result = await recordGoalRun(userAuth, goal.id, exercise, scored, run.timing);
           if (result.outcome.justCompleted) setIsReached(true);
+          setGoal(result.goal);
           return <GoalRunVerdict state={{ kind: "judged", goal: result.goal, run: scored, outcome: result.outcome }} />;
         } catch (error) {
           logger.error(error, { context: "recordGoalRun" });
@@ -92,10 +97,10 @@ export default function GoalPracticePage() {
         }
       },
     };
-  }, [loaded, userAuth, t]);
+  }, [goal, exercise, userAuth, t]);
 
   const backToGoals = () => {
-    router.push(isReached && loaded ?`/goals?completed=${loaded.goal.id}` : "/goals");
+    router.push(isReached && goalId ? `/goals?completed=${goalId}` : "/goals");
   };
 
   // The in-app player, not a landing page — keep it out of the index.

@@ -1,13 +1,13 @@
 {
   "page": {
     "title": "Objetivos",
-    "subtitle": "Fija un tempo para un ejercicio y tócalo limpio tres veces",
+    "subtitle": "Fija un tempo para un ejercicio y llega a él etapa a etapa",
     "eyebrow": "Tus objetivos",
     "new_goal": "Nuevo objetivo"
   },
   "empty": {
     "title": "Aún no tienes objetivos",
-    "body": "Elige un ejercicio y el tempo que quieres alcanzar. Luego tócalo en modo objetivo hasta que tres pasadas salgan limpias.",
+    "body": "Elige un ejercicio, el tempo de inicio y el que quieres alcanzar. El camino se divide en etapas, y cada una pide tres pasadas limpias en modo objetivo.",
     "cta": "Fija tu primer objetivo"
   },
   "active_title": "Activos",
@@ -16,12 +16,12 @@
   "card": {
     "rules": "{{accuracy}}% de precisión · {{counting}}",
     "delete": "Eliminar objetivo",
-    "progress": "{{count}} de {{total}} pasadas limpias",
-    "start": "Empezar intento",
-    "best_so_far": "Pasada más rápida",
-    "no_tempo": "Aún no hay pasadas puntuadas. Toca el ejercicio con el micrófono para fijar tu tempo inicial.",
-    "at_tempo": "Ya alcanzaste el tempo del objetivo. Ahora tres pasadas limpias.",
-    "to_go": "Faltan {{bpm}} BPM"
+    "stage_of": "Etapa {{index}} de {{total}}",
+    "path_label": "Etapas hasta el objetivo",
+    "stage_done": "{{bpm}} BPM, superada",
+    "stage_current": "{{bpm}} BPM, en curso",
+    "progress_at": "{{count}} de {{total}} pasadas limpias a {{bpm}} BPM",
+    "start_at": "Tocar a {{bpm}} BPM"
   },
   "counting": {
     "streak": "seguidas",
@@ -42,11 +42,12 @@
     "empty": "Aquí aparecerán tus pasadas puntuadas; la línea marca el tempo del objetivo.",
     "metric_label": "Qué muestra la gráfica",
     "metric_tempo": "Tempo",
-    "metric_timing": "Timing"
+    "metric_timing": "Timing",
+    "stage": "Etapa {{bpm}} BPM"
   },
   "create": {
     "title": "Nuevo objetivo",
-    "description": "Elige un ejercicio y el tempo a alcanzar. El objetivo se cumple tras tres pasadas limpias en modo objetivo.",
+    "description": "Elige un ejercicio, el tempo de inicio y el que quieres alcanzar. El camino se divide en etapas, y cada una pide tres pasadas limpias en modo objetivo.",
     "exercise_label": "Ejercicio",
     "search": "Buscar ejercicios",
     "no_results": "Ningún ejercicio coincide.",
@@ -57,7 +58,7 @@
     "bpm_invalid": "Elige un tempo entre {{min}} y {{max}} BPM.",
     "strictness_label": "Qué tan limpio",
     "strictness_hint": "La precisión mínima para que una pasada cuente.",
-    "counting_label": "Tres pasadas limpias",
+    "counting_label": "Tres pasadas limpias por etapa",
     "counting_hint_streak": "Una pasada que no sale limpia reinicia la cuenta.",
     "counting_hint_total": "Las pasadas limpias se suman, pase lo que pase entre ellas.",
     "cancel": "Ahora no",
@@ -70,7 +71,11 @@
       "total": "En total"
     },
     "bpm_down": "5 BPM más lento",
-    "bpm_up": "5 BPM más rápido"
+    "bpm_up": "5 BPM más rápido",
+    "start_label": "Tempo inicial",
+    "start_above_target": "El tempo inicial no puede superar el objetivo.",
+    "path_summary": "{{count}} etapas, {{runs}} pasadas limpias cada una",
+    "path_summary_one": "1 etapa, {{runs}} pasadas limpias"
   },
   "history": {
     "reached_on": "Alcanzado el {{date}}",
@@ -91,14 +96,16 @@
     "saving": "Guardando la pasada…",
     "not_scored": "El micrófono no puntuó esta pasada, así que no cuenta para el objetivo.",
     "error": "No se pudo guardar la pasada. Inténtalo de nuevo.",
-    "completed": "¡Objetivo alcanzado! {{bpm}} BPM, tres pasadas limpias.",
+    "completed": "¡Objetivo alcanzado! {{bpm}} BPM, todas las etapas superadas.",
     "closed": "Este objetivo ya está alcanzado.",
     "clean": "Pasada limpia",
     "not_clean": "Aún no está limpio",
-    "too_slow": "Tocado a {{bpm}} BPM — el objetivo es {{target}} BPM.",
+    "too_slow": "Tocado a {{bpm}} BPM. Esta etapa es de {{target}} BPM.",
     "accuracy": "{{accuracy}}% de precisión — este objetivo necesita {{required}}%.",
     "streak_reset": "La cuenta empieza de nuevo: este objetivo necesita pasadas limpias seguidas.",
-    "eyebrow": "Intento · {{bpm}} BPM"
+    "eyebrow": "Objetivo {{bpm}} BPM",
+    "stage_cleared": "¡Etapa de {{bpm}} BPM superada!",
+    "next_stage": "Siguiente: {{bpm}} BPM. El metrónomo ya está ajustado."
   },
   "timing": {
     "offset": "{{ms}} ms fuera del pulso",

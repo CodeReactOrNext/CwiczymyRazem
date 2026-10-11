@@ -1,13 +1,13 @@
 {
   "page": {
     "title": "Ziele",
-    "subtitle": "Setze ein Tempo für eine Übung und spiele sie dreimal sauber",
+    "subtitle": "Setz dir ein Tempo für eine Übung und arbeite dich Etappe für Etappe hin",
     "eyebrow": "Deine Ziele",
     "new_goal": "Neues Ziel"
   },
   "empty": {
     "title": "Noch keine Ziele",
-    "body": "Wähle eine Übung und das Tempo, das du erreichen willst. Spiele sie dann im Zielmodus, bis drei Durchgänge sauber sind.",
+    "body": "Wähle eine Übung, ein Starttempo und das Tempo, das du erreichen willst. Der Weg dorthin ist in Etappen geteilt, und jede braucht drei saubere Durchläufe im Zielmodus.",
     "cta": "Erstes Ziel setzen"
   },
   "active_title": "Aktiv",
@@ -16,12 +16,12 @@
   "card": {
     "rules": "{{accuracy}}% Genauigkeit · {{counting}}",
     "delete": "Ziel löschen",
-    "progress": "{{count}} von {{total}} sauberen Durchgängen",
-    "start": "Zielversuch starten",
-    "best_so_far": "Schnellster Durchgang",
-    "no_tempo": "Noch kein bewerteter Durchgang. Spiele die Übung mit Mikrofon, um dein Starttempo festzulegen.",
-    "at_tempo": "Das Zieltempo ist erreicht. Jetzt drei saubere Durchgänge.",
-    "to_go": "Noch {{bpm}} BPM"
+    "stage_of": "Etappe {{index}} von {{total}}",
+    "path_label": "Etappen auf dem Weg zum Ziel",
+    "stage_done": "{{bpm}} BPM, geschafft",
+    "stage_current": "{{bpm}} BPM, aktuell",
+    "progress_at": "{{count}} von {{total}} sauberen Durchläufen bei {{bpm}} BPM",
+    "start_at": "Bei {{bpm}} BPM spielen"
   },
   "counting": {
     "streak": "in Folge",
@@ -42,11 +42,12 @@
     "empty": "Hier erscheinen deine bewerteten Durchgänge, die Linie zeigt das Zieltempo.",
     "metric_label": "Was das Diagramm zeigt",
     "metric_tempo": "Tempo",
-    "metric_timing": "Timing"
+    "metric_timing": "Timing",
+    "stage": "Etappe {{bpm}} BPM"
   },
   "create": {
     "title": "Neues Ziel",
-    "description": "Wähle eine Übung und das Zieltempo. Ein Ziel ist nach drei sauberen Durchgängen im Zielmodus erreicht.",
+    "description": "Wähle eine Übung, ein Starttempo und das Zieltempo. Der Weg dorthin ist in Etappen geteilt, und jede braucht drei saubere Durchläufe im Zielmodus.",
     "exercise_label": "Übung",
     "search": "Übungen suchen",
     "no_results": "Keine passenden Übungen.",
@@ -57,7 +58,7 @@
     "bpm_invalid": "Wähle ein Tempo zwischen {{min}} und {{max}} BPM.",
     "strictness_label": "Wie sauber",
     "strictness_hint": "Die geringste Genauigkeit, mit der ein Durchgang zählt.",
-    "counting_label": "Drei saubere Durchgänge",
+    "counting_label": "Drei saubere Durchläufe pro Etappe",
     "counting_hint_streak": "Ein nicht sauberer Durchgang setzt die Zählung zurück.",
     "counting_hint_total": "Saubere Durchgänge summieren sich, egal was dazwischen passiert.",
     "cancel": "Nicht jetzt",
@@ -70,7 +71,11 @@
       "total": "Insgesamt"
     },
     "bpm_down": "5 BPM langsamer",
-    "bpm_up": "5 BPM schneller"
+    "bpm_up": "5 BPM schneller",
+    "start_label": "Starttempo",
+    "start_above_target": "Das Starttempo darf nicht über dem Ziel liegen.",
+    "path_summary": "{{count}} Etappen, je {{runs}} saubere Durchläufe",
+    "path_summary_one": "1 Etappe, {{runs}} saubere Durchläufe"
   },
   "history": {
     "reached_on": "Erreicht am {{date}}",
@@ -91,14 +96,16 @@
     "saving": "Durchgang wird gespeichert…",
     "not_scored": "Das Mikrofon hat diesen Durchgang nicht bewertet, er zählt also nicht für das Ziel.",
     "error": "Der Durchgang konnte nicht gespeichert werden. Versuche es erneut.",
-    "completed": "Ziel erreicht! {{bpm}} BPM, drei saubere Durchgänge.",
+    "completed": "Ziel erreicht! {{bpm}} BPM, alle Etappen geschafft.",
     "closed": "Dieses Ziel ist bereits erreicht.",
     "clean": "Sauberer Durchgang",
     "not_clean": "Noch nicht sauber",
-    "too_slow": "Gespielt mit {{bpm}} BPM — das Ziel ist {{target}} BPM.",
+    "too_slow": "Gespielt bei {{bpm}} BPM. Diese Etappe liegt bei {{target}} BPM.",
     "accuracy": "{{accuracy}}% Genauigkeit — dieses Ziel braucht {{required}}%.",
     "streak_reset": "Die Zählung beginnt von vorn: Dieses Ziel braucht saubere Durchgänge in Folge.",
-    "eyebrow": "Zielversuch · {{bpm}} BPM"
+    "eyebrow": "Ziel {{bpm}} BPM",
+    "stage_cleared": "Etappe {{bpm}} BPM geschafft!",
+    "next_stage": "Als Nächstes: {{bpm}} BPM. Das Metronom ist schon eingestellt."
   },
   "timing": {
     "offset": "{{ms}} ms neben dem Schlag",

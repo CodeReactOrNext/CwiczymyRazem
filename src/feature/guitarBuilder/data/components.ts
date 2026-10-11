@@ -428,7 +428,7 @@ export const COMPONENT_DEFS: ComponentDef[] = [
 export const pickupIconSrc = (id: string) =>
   `/images/guitar-builder/pickups/${id.replace("pickups:", "")}.webp`;
 
-/** Stash icon of a finish — the same script, a whole body painted with it. */
+/** Stash icon of a finish — the same script, a spray can painted with it. */
 export const finishIconSrc = (id: string) =>
   `/images/guitar-builder/finishes/${id.replace("finish:", "")}.webp`;
 

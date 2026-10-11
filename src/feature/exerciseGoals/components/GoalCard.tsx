@@ -9,7 +9,6 @@ import {
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
 import { cn } from "assets/lib/utils";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { useTranslation } from "hooks/useTranslation";
 import { Play, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -19,6 +18,7 @@ import { useExerciseProgress } from "../hooks/useExerciseGoals";
 import type { ExerciseGoal } from "../types/exerciseGoal.types";
 import {
   GOAL_CLEAN_RUNS_REQUIRED,
+  goalStages,
   STRICTNESS_ACCURACY,
 } from "../utils/goalRules";
 import { GoalProgressDots } from "./GoalProgressDots";
@@ -34,8 +34,9 @@ interface GoalCardProps {
 }
 
 /**
- * An open goal: the fastest tempo played so far against the goal's, the clean
- * runs counted, the runs that led here, and the way into goal mode.
+ * An open goal: the path of milestones up to its tempo with the current one
+ * marked, the clean runs counted there, the runs that led here, and the way
+ * into goal mode.
  */
 export const GoalCard = ({ uid, goal, onDelete }: GoalCardProps) => {
   const { t } = useTranslation("goals");
@@ -48,25 +49,13 @@ export const GoalCard = ({ uid, goal, onDelete }: GoalCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [metric, setMetric] = useState<GoalChartMetric>("tempo");
 
-  const bestBpm = runs.length ? Math.max(...runs.map((run) => run.bpm)) : null;
-  // The bar runs from the bottom of the exercise's own range to the goal, so a
-  // first run near the range's floor reads as a start, not as nothing.
-  const exerciseFloor =
-    exercisesAgregat.find((exercise) => exercise.id === goal.exerciseId)
-      ?.metronomeSpeed?.min ?? 0;
-  const floorBpm = Math.min(
-    exerciseFloor,
-    bestBpm ?? exerciseFloor,
-    goal.targetBpm - 1,
+  const stages = goalStages(goal);
+  const stageIndex = Math.max(
+    0,
+    stages.findIndex((bpm) => bpm >= goal.stageBpm),
   );
-  const tempoShare =
-    bestBpm === null
-      ? 0
-      : Math.min(
-          1,
-          Math.max(0, (bestBpm - floorBpm) / (goal.targetBpm - floorBpm)),
-        );
-  const atTempo = bestBpm !== null && bestBpm >= goal.targetBpm;
+  // The chart starts at the path's first milestone when nothing has been played.
+  const floorBpm = Math.min(goal.startBpm, goal.targetBpm - 1);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -102,50 +91,61 @@ export const GoalCard = ({ uid, goal, onDelete }: GoalCardProps) => {
           </button>
         </div>
 
-        <div className='space-y-3'>
-          <p className='text-xs text-zinc-500'>{t("card.best_so_far")}</p>
+        <div className='space-y-4'>
+          <p className='text-xs text-zinc-500'>
+            {t("card.stage_of", {
+              index: stageIndex + 1,
+              total: stages.length,
+            })}
+          </p>
           <p className='flex items-baseline gap-2 font-teko leading-none'>
-            <span
-              className={cn(
-                "text-5xl font-bold tabular-nums",
-                bestBpm === null ? "text-zinc-600" : "text-zinc-100",
-              )}>
-              {bestBpm ?? "—"}
+            <span className='text-5xl font-bold tabular-nums text-zinc-100'>
+              {goal.stageBpm}
             </span>
             <span className='text-2xl tabular-nums text-zinc-500'>
               / {goal.targetBpm} BPM
             </span>
           </p>
-          <div
-            className='h-2 overflow-hidden rounded-full bg-zinc-800'
-            role='progressbar'
-            aria-label={t("card.best_so_far")}
-            aria-valuemin={floorBpm}
-            aria-valuemax={goal.targetBpm}
-            aria-valuenow={bestBpm ?? floorBpm}>
-            <div
-              className={cn(
-                "h-full rounded-full",
-                atTempo ? "bg-emerald-400" : "bg-zinc-300",
-              )}
-              style={{ width: `${Math.round(tempoShare * 100)}%` }}
-            />
-          </div>
-          <p className='text-sm text-zinc-400'>
-            {bestBpm === null
-              ? t("card.no_tempo")
-              : atTempo
-                ? t("card.at_tempo")
-                : t("card.to_go", { bpm: goal.targetBpm - bestBpm })}
-          </p>
+          {stages.length > 1 && (
+            <div>
+              <ol className='flex gap-1' aria-label={t("card.path_label")}>
+                {stages.map((bpm, index) => (
+                  <li
+                    key={bpm}
+                    title={`${bpm} BPM`}
+                    className={cn(
+                      "h-2 flex-1 rounded-full",
+                      index < stageIndex
+                        ? "bg-emerald-400"
+                        : index === stageIndex
+                          ? "bg-zinc-300"
+                          : "bg-zinc-800",
+                    )}>
+                    <span className='sr-only'>
+                      {index < stageIndex
+                        ? t("card.stage_done", { bpm })
+                        : index === stageIndex
+                          ? t("card.stage_current", { bpm })
+                          : `${bpm} BPM`}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <div className='mt-2 flex justify-between text-xs tabular-nums text-zinc-500'>
+                <span>{goal.startBpm}</span>
+                <span>{goal.targetBpm}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className='flex items-center gap-3'>
           <GoalProgressDots cleanRuns={goal.cleanRuns} />
           <p className='text-sm text-zinc-300'>
-            {t("card.progress", {
+            {t("card.progress_at", {
               count: goal.cleanRuns,
               total: GOAL_CLEAN_RUNS_REQUIRED,
+              bpm: goal.stageBpm,
             })}
           </p>
         </div>
@@ -154,7 +154,7 @@ export const GoalCard = ({ uid, goal, onDelete }: GoalCardProps) => {
           href={`/practice/goal/${goal.id}`}
           className='mt-auto flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 hover:bg-zinc-200 sm:w-auto sm:self-start'>
           <Play className='h-4 w-4 fill-current' />
-          {t("card.start")}
+          {t("card.start_at", { bpm: goal.stageBpm })}
         </Link>
       </div>
 
@@ -194,6 +194,7 @@ export const GoalCard = ({ uid, goal, onDelete }: GoalCardProps) => {
           <GoalRunsChart
             runs={runs}
             targetBpm={goal.targetBpm}
+            stageBpm={goal.stageBpm}
             floorBpm={floorBpm}
             metric={metric}
           />

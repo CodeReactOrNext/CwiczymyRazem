@@ -1,13 +1,13 @@
 {
   "page": {
     "title": "Cele",
-    "subtitle": "Ustaw tempo dla ćwiczenia i zagraj je czysto trzy razy",
+    "subtitle": "Ustaw tempo dla ćwiczenia i dojdź do niego krok po kroku",
     "eyebrow": "Twoje cele",
     "new_goal": "Nowy cel"
   },
   "empty": {
     "title": "Nie masz jeszcze celów",
-    "body": "Wybierz ćwiczenie i tempo, które chcesz osiągnąć. Potem graj je w trybie celu, aż trzy przebiegi wyjdą czysto.",
+    "body": "Wybierz ćwiczenie, tempo startowe i tempo, które chcesz osiągnąć. Droga dzieli się na kamienie milowe, a każdy wymaga trzech czystych przebiegów w trybie celu.",
     "cta": "Ustaw pierwszy cel"
   },
   "active_title": "Aktywne",
@@ -16,12 +16,12 @@
   "card": {
     "rules": "{{accuracy}}% celności · {{counting}}",
     "delete": "Usuń cel",
-    "progress": "{{count}} z {{total}} czystych przebiegów",
-    "start": "Zacznij podejście",
-    "best_so_far": "Najszybszy przebieg",
-    "no_tempo": "Brak ocenionych przebiegów. Zagraj ćwiczenie z mikrofonem, żeby ustalić tempo startowe.",
-    "at_tempo": "Tempo celu osiągnięte. Teraz trzy czyste przebiegi.",
-    "to_go": "Jeszcze {{bpm}} BPM"
+    "stage_of": "Kamień milowy {{index}} z {{total}}",
+    "path_label": "Kamienie milowe w drodze do celu",
+    "stage_done": "{{bpm}} BPM, zaliczone",
+    "stage_current": "{{bpm}} BPM, grasz teraz",
+    "progress_at": "{{count}} z {{total}} czystych przebiegów na {{bpm}} BPM",
+    "start_at": "Graj na {{bpm}} BPM"
   },
   "counting": {
     "streak": "pod rząd",
@@ -42,22 +42,23 @@
     "empty": "Tu pojawią się Twoje ocenione przebiegi, a linia pokazuje tempo celu.",
     "metric_label": "Co pokazuje wykres",
     "metric_tempo": "Tempo",
-    "metric_timing": "Timing"
+    "metric_timing": "Timing",
+    "stage": "Kamień milowy {{bpm}} BPM"
   },
   "create": {
     "title": "Nowy cel",
-    "description": "Wybierz ćwiczenie i tempo do osiągnięcia. Cel zalicza się po trzech czystych przebiegach w trybie celu.",
+    "description": "Wybierz ćwiczenie, tempo startowe i tempo do osiągnięcia. Droga dzieli się na kamienie milowe, a każdy wymaga trzech czystych przebiegów w trybie celu.",
     "exercise_label": "Ćwiczenie",
     "search": "Szukaj ćwiczeń",
     "no_results": "Brak pasujących ćwiczeń.",
     "has_goal": "Ma już cel",
     "bpm_range": "Zakres ćwiczenia {{min}}–{{max}} BPM",
     "change_exercise": "Zmień",
-    "bpm_label": "Docelowe tempo",
+    "bpm_label": "Tempo celu",
     "bpm_invalid": "Wybierz tempo od {{min}} do {{max}} BPM.",
     "strictness_label": "Jak czysto",
     "strictness_hint": "Najniższa celność, przy której przebieg się liczy.",
-    "counting_label": "Trzy czyste przebiegi",
+    "counting_label": "Trzy czyste przebiegi na kamień milowy",
     "counting_hint_streak": "Przebieg, który nie jest czysty, zeruje licznik.",
     "counting_hint_total": "Czyste przebiegi sumują się, cokolwiek wydarzy się pomiędzy.",
     "cancel": "Nie teraz",
@@ -70,7 +71,13 @@
       "total": "Łącznie"
     },
     "bpm_down": "Wolniej o 5 BPM",
-    "bpm_up": "Szybciej o 5 BPM"
+    "bpm_up": "Szybciej o 5 BPM",
+    "start_label": "Tempo startowe",
+    "start_above_target": "Tempo startowe nie może być wyższe niż cel.",
+    "path_summary": "{{count}} kamieni milowych, po {{runs}} czyste przebiegi",
+    "path_summary_one": "1 kamień milowy, {{runs}} czyste przebiegi",
+    "path_summary_few": "{{count}} kamienie milowe, po {{runs}} czyste przebiegi",
+    "path_summary_many": "{{count}} kamieni milowych, po {{runs}} czyste przebiegi"
   },
   "history": {
     "reached_on": "Osiągnięty {{date}}",
@@ -91,14 +98,16 @@
     "saving": "Zapisuję przebieg…",
     "not_scored": "Mikrofon nie oceniał tego przebiegu, więc nie liczy się do celu.",
     "error": "Nie udało się zapisać przebiegu. Spróbuj ponownie.",
-    "completed": "Cel osiągnięty! {{bpm}} BPM, trzy czyste przebiegi.",
+    "completed": "Cel osiągnięty! {{bpm}} BPM, wszystkie kamienie milowe zaliczone.",
     "closed": "Ten cel jest już osiągnięty.",
     "clean": "Czysty przebieg",
     "not_clean": "Jeszcze nie czysto",
-    "too_slow": "Zagrane w {{bpm}} BPM — cel to {{target}} BPM.",
+    "too_slow": "Zagrane na {{bpm}} BPM. Ten kamień milowy to {{target}} BPM.",
     "accuracy": "{{accuracy}}% celności — ten cel wymaga {{required}}%.",
     "streak_reset": "Licznik od nowa: ten cel wymaga czystych przebiegów pod rząd.",
-    "eyebrow": "Podejście do celu · {{bpm}} BPM"
+    "eyebrow": "Cel {{bpm}} BPM",
+    "stage_cleared": "Kamień milowy {{bpm}} BPM zaliczony!",
+    "next_stage": "Następny: {{bpm}} BPM. Metronom jest już ustawiony."
   },
   "timing": {
     "offset": "{{ms}} ms od bitu",

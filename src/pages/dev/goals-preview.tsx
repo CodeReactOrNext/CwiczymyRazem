@@ -41,6 +41,9 @@ const goal = (
     Pick<ExerciseGoal, "id" | "exerciseId" | "exerciseTitle">,
 ): ExerciseGoal => ({
   targetBpm: 115,
+  startBpm: 115,
+  stepBpm: 5,
+  stageBpm: 115,
   strictness: "standard",
   counting: "streak",
   cleanRuns: 0,
@@ -56,6 +59,8 @@ const FIXTURE_GOALS: ExerciseGoal[] = [
     exerciseId: first.id,
     exerciseTitle: first.title,
     targetBpm: 115,
+    startBpm: 90,
+    stageBpm: 105,
     cleanRuns: 2,
   }),
   goal({
@@ -63,6 +68,9 @@ const FIXTURE_GOALS: ExerciseGoal[] = [
     exerciseId: second.id,
     exerciseTitle: second.title,
     targetBpm: 140,
+    startBpm: 80,
+    stepBpm: 10,
+    stageBpm: 80,
     strictness: "strict",
     counting: "total",
   }),
@@ -71,6 +79,8 @@ const FIXTURE_GOALS: ExerciseGoal[] = [
     exerciseId: third.id,
     exerciseTitle: third.title,
     targetBpm: 100,
+    startBpm: 85,
+    stageBpm: 100,
     cleanRuns: 3,
     status: "completed",
     completedAt: NOW - 2 * DAY,
@@ -148,7 +158,10 @@ const VerdictGallery = () => {
           outcome: {
             clean: true,
             reason: "clean",
+            stageBpm: 105,
             cleanRuns: 2,
+            stageCleared: false,
+            nextStageBpm: 105,
             justCompleted: false,
             streakReset: false,
           },
@@ -162,6 +175,9 @@ const VerdictGallery = () => {
           outcome: {
             clean: false,
             reason: "accuracy",
+            stageBpm: 105,
+            stageCleared: false,
+            nextStageBpm: 105,
             cleanRuns: 0,
             justCompleted: false,
             streakReset: true,
@@ -176,7 +192,27 @@ const VerdictGallery = () => {
           outcome: {
             clean: false,
             reason: "too_slow",
+            stageBpm: 105,
+            stageCleared: false,
+            nextStageBpm: 105,
             cleanRuns: 1,
+            justCompleted: false,
+            streakReset: false,
+          },
+        }}
+      />
+      <GoalRunVerdict
+        state={{
+          kind: "judged",
+          goal: { ...active, stageBpm: 110, cleanRuns: 0 },
+          run: { bpm: 106, accuracy: 95 },
+          outcome: {
+            clean: true,
+            reason: "clean",
+            stageBpm: 105,
+            cleanRuns: 3,
+            stageCleared: true,
+            nextStageBpm: 110,
             justCompleted: false,
             streakReset: false,
           },
@@ -190,6 +226,9 @@ const VerdictGallery = () => {
           outcome: {
             clean: true,
             reason: "clean",
+            stageBpm: 115,
+            stageCleared: true,
+            nextStageBpm: null,
             cleanRuns: 3,
             justCompleted: true,
             streakReset: false,
@@ -208,7 +247,7 @@ const SummaryPreview = () => {
       maxScore={21000}
       stats={{ accuracy: 94, maxStreak: 41 }}
       timing={{ 3: 52, 2: 9, 1: 3 }}
-      eyebrow='Goal run · 115 BPM'
+      eyebrow='Goal 115 BPM'
       offerRestart
       onRestart={() => undefined}
       onFinish={() => undefined}
@@ -221,6 +260,9 @@ const SummaryPreview = () => {
             outcome: {
               clean: true,
               reason: "clean",
+              stageBpm: 105,
+              stageCleared: false,
+              nextStageBpm: 105,
               cleanRuns: 2,
               justCompleted: false,
               streakReset: false,
@@ -247,6 +289,7 @@ const PanelPreview = () => {
       {
         ...created,
         id: `g-${current.length + 1}`,
+        stageBpm: created.startBpm,
         cleanRuns: 0,
         status: "active",
         createdAt: NOW,

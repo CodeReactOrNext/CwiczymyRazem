@@ -20,12 +20,16 @@ import type {
   NewExerciseGoal,
 } from "../types/exerciseGoal.types";
 import {
+  autoStepBpm,
   clampGoalBpm,
+  GOAL_CLEAN_RUNS_REQUIRED,
   GOAL_STRICTNESS_OPTIONS,
+  goalPath,
   isGoalEligibleExercise,
   MAX_GOAL_BPM,
   MIN_GOAL_BPM,
   STRICTNESS_ACCURACY,
+  suggestStartBpm,
   suggestTargetBpm,
 } from "../utils/goalRules";
 
@@ -68,6 +72,65 @@ const Segmented = <T extends string>({
   </div>
 );
 
+const isValidBpm = (bpm: number) =>
+  Number.isFinite(bpm) && bpm >= MIN_GOAL_BPM && bpm <= MAX_GOAL_BPM;
+
+const STEP_BUTTON =
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700 hover:text-zinc-100";
+
+interface BpmFieldProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  /** Where the ± buttons step from while the field is empty. */
+  fallback: number;
+}
+
+/** A tempo typed in, or stepped in fives with the buttons either side. */
+const BpmField = ({ id, label, value, onChange, fallback }: BpmFieldProps) => {
+  const { t } = useTranslation("goals");
+  const step = (delta: number) => {
+    const current = Number(value);
+    const base = value !== "" && Number.isFinite(current) ? current : fallback;
+    onChange(String(clampGoalBpm(Math.round((base + delta) / 5) * 5)));
+  };
+
+  return (
+    <div className='space-y-3'>
+      <label htmlFor={id} className='block text-sm font-medium text-zinc-200'>
+        {label}
+      </label>
+      <div className='flex items-center gap-2'>
+        <button
+          type='button'
+          onClick={() => step(-5)}
+          aria-label={t("create.bpm_down")}
+          className={STEP_BUTTON}>
+          <Minus className='h-4 w-4' />
+        </button>
+        <Input
+          id={id}
+          type='number'
+          inputMode='numeric'
+          min={MIN_GOAL_BPM}
+          max={MAX_GOAL_BPM}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className='h-11 w-20 border-0 bg-zinc-800/60 text-center text-lg font-semibold tabular-nums text-zinc-100 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+        />
+        <button
+          type='button'
+          onClick={() => step(5)}
+          aria-label={t("create.bpm_up")}
+          className={STEP_BUTTON}>
+          <Plus className='h-4 w-4' />
+        </button>
+      </div>
+    </div>
+  );
+};
+
 interface CreateGoalDialogProps {
   onClose: () => void;
   onCreate: (goal: NewExerciseGoal) => Promise<unknown>;
@@ -76,6 +139,7 @@ interface CreateGoalDialogProps {
   isSaving: boolean;
   /** Raising the bar: the exercise is fixed and the tempo starts higher. */
   initialExerciseId?: string;
+  initialStartBpm?: number;
   initialBpm?: number;
   initialStrictness?: GoalStrictness;
   initialCounting?: GoalCounting;
@@ -84,8 +148,9 @@ interface CreateGoalDialogProps {
 }
 
 /**
- * Sets a goal: an exercise, the tempo to reach on it, how clean a run must be
- * and whether the three clean runs need to come in a row. Mounted only while
+ * Sets a goal: an exercise, the tempo to start from and the one to reach — the
+ * milestones between them are laid out from the two — how clean a run must be
+ * and whether each milestone's three clean runs need to come in a row. Mounted only while
  * open, so every opening starts from a fresh form.
  */
 export const CreateGoalDialog = ({
@@ -94,6 +159,7 @@ export const CreateGoalDialog = ({
   busyExerciseIds,
   isSaving,
   initialExerciseId,
+  initialStartBpm,
   initialBpm,
   initialStrictness = "standard",
   initialCounting = "streak",
@@ -107,6 +173,13 @@ export const CreateGoalDialog = ({
       null,
   );
   const [search, setSearch] = useState("");
+  const [startInput, setStartInput] = useState(() =>
+    initialStartBpm
+      ? String(initialStartBpm)
+      : exercise
+        ? String(suggestStartBpm(exercise))
+        : "",
+  );
   const [bpmInput, setBpmInput] = useState(() =>
     initialBpm
       ? String(initialBpm)
@@ -128,32 +201,37 @@ export const CreateGoalDialog = ({
   }, [search]);
 
   const bpm = Number(bpmInput);
-  const isBpmValid =
-    Number.isFinite(bpm) && bpm >= MIN_GOAL_BPM && bpm <= MAX_GOAL_BPM;
+  const startBpm = Number(startInput);
+  const areBpmsValid =
+    startInput !== "" &&
+    bpmInput !== "" &&
+    isValidBpm(startBpm) &&
+    isValidBpm(bpm);
+  const isOrderValid = !areBpmsValid || startBpm <= bpm;
+  const path = useMemo(() => {
+    if (!areBpmsValid || !isOrderValid) return null;
+    const start = clampGoalBpm(startBpm);
+    const target = clampGoalBpm(bpm);
+    const step = autoStepBpm(start, target);
+    return { start, target, step, stages: goalPath(start, target, step) };
+  }, [areBpmsValid, isOrderValid, startBpm, bpm]);
   const canSave =
-    !!exercise && isBpmValid && !busyExerciseIds.has(exercise.id) && !isSaving;
-
-  const stepBpm = (delta: number) => {
-    const base =
-      Number.isFinite(bpm) && bpmInput !== ""
-        ? bpm
-        : exercise
-          ? suggestTargetBpm(exercise)
-          : 100;
-    setBpmInput(String(clampGoalBpm(Math.round((base + delta) / 5) * 5)));
-  };
+    !!exercise && !!path && !busyExerciseIds.has(exercise.id) && !isSaving;
 
   const pickExercise = (picked: Exercise) => {
     setExercise(picked);
+    setStartInput(String(suggestStartBpm(picked)));
     setBpmInput(String(suggestTargetBpm(picked)));
   };
 
   const handleSave = async () => {
-    if (!exercise || !canSave) return;
+    if (!exercise || !path || !canSave) return;
     await onCreate({
       exerciseId: exercise.id,
       exerciseTitle: exercise.title,
-      targetBpm: clampGoalBpm(bpm),
+      targetBpm: path.target,
+      startBpm: path.start,
+      stepBpm: path.step,
       strictness,
       counting,
     });
@@ -242,48 +320,48 @@ export const CreateGoalDialog = ({
 
         {exercise && (
           <>
-            <div className='space-y-3'>
-              <label
-                htmlFor='goal-bpm'
-                className='block text-sm font-medium text-zinc-200'>
-                {t("create.bpm_label")}
-              </label>
-              <div className='flex items-center gap-2'>
-                <button
-                  type='button'
-                  onClick={() => stepBpm(-5)}
-                  aria-label={t("create.bpm_down")}
-                  className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700 hover:text-zinc-100'>
-                  <Minus className='h-4 w-4' />
-                </button>
-                <div className='w-24'>
-                  <Input
-                    id='goal-bpm'
-                    type='number'
-                    inputMode='numeric'
-                    min={MIN_GOAL_BPM}
-                    max={MAX_GOAL_BPM}
-                    value={bpmInput}
-                    onChange={(event) => setBpmInput(event.target.value)}
-                    className='h-11 border-0 bg-zinc-800/60 text-center text-lg font-semibold tabular-nums text-zinc-100 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
-                  />
-                </div>
-                <button
-                  type='button'
-                  onClick={() => stepBpm(5)}
-                  aria-label={t("create.bpm_up")}
-                  className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700 hover:text-zinc-100'>
-                  <Plus className='h-4 w-4' />
-                </button>
-                <span className='ml-1 text-sm text-zinc-400'>BPM</span>
+            <div className='space-y-4'>
+              <div className='grid gap-6 sm:grid-cols-2'>
+                <BpmField
+                  id='goal-start-bpm'
+                  label={t("create.start_label")}
+                  value={startInput}
+                  onChange={setStartInput}
+                  fallback={suggestStartBpm(exercise)}
+                />
+                <BpmField
+                  id='goal-bpm'
+                  label={t("create.bpm_label")}
+                  value={bpmInput}
+                  onChange={setBpmInput}
+                  fallback={suggestTargetBpm(exercise)}
+                />
               </div>
-              {!isBpmValid && bpmInput !== "" && (
+              {!areBpmsValid ? (
+                (startInput !== "" || bpmInput !== "") && (
+                  <p className='text-xs text-zinc-400'>
+                    {t("create.bpm_invalid", {
+                      min: MIN_GOAL_BPM,
+                      max: MAX_GOAL_BPM,
+                    })}
+                  </p>
+                )
+              ) : !path ? (
                 <p className='text-xs text-zinc-400'>
-                  {t("create.bpm_invalid", {
-                    min: MIN_GOAL_BPM,
-                    max: MAX_GOAL_BPM,
-                  })}
+                  {t("create.start_above_target")}
                 </p>
+              ) : (
+                <div className='space-y-2 rounded-lg bg-zinc-800/40 px-4 py-3'>
+                  <p className='text-xs text-zinc-400'>
+                    {t("create.path_summary", {
+                      count: path.stages.length,
+                      runs: GOAL_CLEAN_RUNS_REQUIRED,
+                    })}
+                  </p>
+                  <p className='text-sm tabular-nums leading-relaxed text-zinc-200'>
+                    {path.stages.join(" → ")}
+                  </p>
+                </div>
               )}
             </div>
 

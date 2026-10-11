@@ -54,6 +54,11 @@ export const suggestTargetBpm = (
   exercise: Pick<Exercise, "metronomeSpeed">,
 ): number => exercise.metronomeSpeed?.max ?? 100;
 
+/** Where the path starts by default: the bottom of the exercise's own range. */
+export const suggestStartBpm = (
+  exercise: Pick<Exercise, "metronomeSpeed">,
+): number => exercise.metronomeSpeed?.min ?? 60;
+
 /** The next goal offered once one is reached: about 10% faster, on a multiple of 5. */
 export const raisedTargetBpm = (targetBpm: number): number =>
   Math.min(
@@ -64,59 +69,128 @@ export const raisedTargetBpm = (targetBpm: number): number =>
 export const clampGoalBpm = (bpm: number): number =>
   Math.min(MAX_GOAL_BPM, Math.max(MIN_GOAL_BPM, Math.round(bpm)));
 
-/** Whether a run met the goal: at the goal's tempo or faster, with few enough misses. */
+/**
+ * The milestones from start to target: the start, then every multiple of the
+ * step on the way up, then the target. A multiple within half a step of either
+ * end is left out, so no milestone sits a couple of BPM from the next one.
+ */
+export const goalPath = (
+  startBpm: number,
+  targetBpm: number,
+  stepBpm: number,
+): number[] => {
+  if (startBpm >= targetBpm || stepBpm <= 0) return [targetBpm];
+  const path = [startBpm];
+  let next = (Math.floor(startBpm / stepBpm) + 1) * stepBpm;
+  if (next - startBpm < stepBpm / 2) next += stepBpm;
+  for (; targetBpm - next >= stepBpm / 2; next += stepBpm) path.push(next);
+  path.push(targetBpm);
+  return path;
+};
+
+/** The step of goals set before the step was stored. */
+export const DEFAULT_STEP_BPM = 5;
+
+/** Steps a path may take — round numbers, so the milestones read 80 · 85 · 90. */
+const PATH_STEPS = [5, 10, 20, 25, 50];
+/** Past this many milestones the climb takes a bigger step instead. */
+export const MAX_GOAL_STAGES = 16;
+
+/** The smallest round step that keeps the path within MAX_GOAL_STAGES. */
+export const autoStepBpm = (startBpm: number, targetBpm: number): number =>
+  PATH_STEPS.find(
+    (step) => goalPath(startBpm, targetBpm, step).length <= MAX_GOAL_STAGES,
+  ) ?? PATH_STEPS[PATH_STEPS.length - 1];
+
+/** The goal's milestones. */
+export const goalStages = (
+  goal: Pick<ExerciseGoal, "startBpm" | "targetBpm" | "stepBpm">,
+): number[] => goalPath(goal.startBpm, goal.targetBpm, goal.stepBpm);
+
+/** The milestone after the given one, or null when it was the last. */
+export const nextStageBpm = (
+  goal: Pick<ExerciseGoal, "startBpm" | "targetBpm" | "stepBpm">,
+  stageBpm: number,
+): number | null =>
+  stageBpm >= goal.targetBpm
+    ? null
+    : (goalStages(goal).find((bpm) => bpm > stageBpm) ?? goal.targetBpm);
+
+/** Whether a run met its milestone: at the milestone's tempo or faster, with few enough misses. */
 export const isRunClean = (
   run: GoalRunInput,
-  goal: Pick<ExerciseGoal, "targetBpm" | "strictness">,
+  goal: Pick<ExerciseGoal, "stageBpm" | "strictness">,
 ): boolean =>
-  run.bpm >= goal.targetBpm &&
+  run.bpm >= goal.stageBpm &&
   run.accuracy >= STRICTNESS_ACCURACY[goal.strictness];
 
+type JudgedGoal = Pick<
+  ExerciseGoal,
+  | "startBpm"
+  | "targetBpm"
+  | "stepBpm"
+  | "stageBpm"
+  | "strictness"
+  | "counting"
+  | "cleanRuns"
+  | "status"
+>;
+
 /**
- * What a goal-mode run does to its goal. A finished goal stays finished — a
- * run played on it afterwards is judged but changes nothing.
+ * What a goal-mode run does to its goal. A run is judged at the current
+ * milestone; the clean runs that fill it move the goal on to the next one, and
+ * the ones that fill the last finish the goal. A finished goal stays finished —
+ * a run played on it afterwards is judged but changes nothing.
  */
 export const applyGoalRun = (
-  goal: Pick<
-    ExerciseGoal,
-    "targetBpm" | "strictness" | "counting" | "cleanRuns" | "status"
-  >,
+  goal: JudgedGoal,
   run: GoalRunInput,
 ): GoalRunOutcome => {
   const clean = isRunClean(run, goal);
   const reason = clean
     ? "clean"
-    : run.bpm < goal.targetBpm
+    : run.bpm < goal.stageBpm
       ? "too_slow"
       : "accuracy";
+  const unchanged = {
+    stageBpm: goal.stageBpm,
+    stageCleared: false,
+    nextStageBpm: goal.status === "active" ? goal.stageBpm : null,
+    justCompleted: false,
+    streakReset: false,
+  };
 
   if (goal.status !== "active") {
     return {
+      ...unchanged,
       clean,
       reason: "goal_closed",
       cleanRuns: goal.cleanRuns,
-      justCompleted: false,
-      streakReset: false,
     };
   }
 
   if (clean) {
     const cleanRuns = Math.min(GOAL_CLEAN_RUNS_REQUIRED, goal.cleanRuns + 1);
+    if (cleanRuns < GOAL_CLEAN_RUNS_REQUIRED) {
+      return { ...unchanged, clean, reason, cleanRuns };
+    }
+    const next = nextStageBpm(goal, goal.stageBpm);
     return {
+      ...unchanged,
       clean,
       reason,
       cleanRuns,
-      justCompleted: cleanRuns >= GOAL_CLEAN_RUNS_REQUIRED,
-      streakReset: false,
+      stageCleared: true,
+      nextStageBpm: next,
+      justCompleted: next === null,
     };
   }
 
-  const streakReset = goal.counting === "streak" && goal.cleanRuns > 0;
   return {
+    ...unchanged,
     clean,
     reason,
     cleanRuns: goal.counting === "streak" ? 0 : goal.cleanRuns,
-    justCompleted: false,
-    streakReset,
+    streakReset: goal.counting === "streak" && goal.cleanRuns > 0,
   };
 };

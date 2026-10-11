@@ -34,7 +34,7 @@ import type {
   NewExerciseGoal,
   RunTiming,
 } from "../types/exerciseGoal.types";
-import { applyGoalRun } from "../utils/goalRules";
+import { applyGoalRun, DEFAULT_STEP_BPM } from "../utils/goalRules";
 
 /**
  * users/{uid}/exerciseGoals/{goalId} — one doc per goal, finished ones kept as
@@ -68,11 +68,16 @@ const toGoal = (
     | QueryDocumentSnapshot<DocumentData>,
 ): ExerciseGoal => {
   const data = snapshot.data() ?? {};
+  // Goals set before paths existed are a single milestone: the target.
+  const startBpm: number = data.startBpm ?? data.targetBpm;
   return {
     id: snapshot.id,
     exerciseId: data.exerciseId,
     exerciseTitle: data.exerciseTitle ?? "",
     targetBpm: data.targetBpm,
+    startBpm,
+    stepBpm: data.stepBpm ?? DEFAULT_STEP_BPM,
+    stageBpm: data.stageBpm ?? startBpm,
     strictness: data.strictness ?? "standard",
     counting: data.counting ?? "streak",
     cleanRuns: data.cleanRuns ?? 0,
@@ -147,6 +152,7 @@ export const createExerciseGoal = async (
   const now = Timestamp.now();
   await trackedSetDoc(ref, {
     ...goal,
+    stageBpm: goal.startBpm,
     cleanRuns: 0,
     status: "active",
     createdAt: now,
@@ -156,6 +162,7 @@ export const createExerciseGoal = async (
   return {
     ...goal,
     id: ref.id,
+    stageBpm: goal.startBpm,
     cleanRuns: 0,
     status: "active",
     createdAt: now.toMillis(),
@@ -285,40 +292,51 @@ export const recordPracticeRun = async (
   }
 };
 
+/** Ticks the exercise's "Speeds mastered" ladder up to a tempo played clean. */
+const tickBpmLadder = async (
+  uid: string,
+  exercise: Exercise,
+  upToBpm: number,
+) => {
+  const stages = generateBpmStages(exercise.metronomeSpeed).filter(
+    (bpm) => bpm <= upToBpm,
+  );
+  if (!stages.length) return;
+  await addBpmStages(
+    uid,
+    exercise.id,
+    stages,
+    exercise.title,
+    exercise.category,
+  ).catch(() => undefined);
+};
+
 /**
- * What finishing a goal sets off: the feed entry, and the exercise's tempo
- * ladder ticked up to the goal. Neither is worth failing the run over.
+ * What clearing a milestone sets off: the tempo ladder ticked up to it, and,
+ * for the last one, the feed entry. Neither is worth failing the run over.
  */
-const onGoalCompleted = async (
+const onStageCleared = async (
   uid: string,
   goal: ExerciseGoal,
   exercise: Exercise,
+  outcome: GoalRunOutcome,
 ) => {
-  const stages = generateBpmStages(exercise.metronomeSpeed).filter(
-    (bpm) => bpm <= goal.targetBpm,
-  );
   await Promise.all([
-    firebaseAddGoalCompletedLog(uid, {
-      goalId: goal.id,
-      exerciseId: goal.exerciseId,
-      exerciseTitle: goal.exerciseTitle,
-      targetBpm: goal.targetBpm,
-    }),
-    stages.length
-      ? addBpmStages(
-          uid,
-          exercise.id,
-          stages,
-          exercise.title,
-          exercise.category,
-        ).catch(() => undefined)
+    tickBpmLadder(uid, exercise, outcome.stageBpm),
+    outcome.justCompleted
+      ? firebaseAddGoalCompletedLog(uid, {
+          goalId: goal.id,
+          exerciseId: goal.exerciseId,
+          exerciseTitle: goal.exerciseTitle,
+          targetBpm: goal.targetBpm,
+        })
       : Promise.resolve(),
   ]);
 };
 
 /**
  * Judges a goal-mode run and saves it: the run goes on the chart and the goal's
- * count moves in the same transaction, so two runs finishing close together
+ * count — or its milestone, when the run cleared one — moves in the same transaction, so two runs finishing close together
  * can't both read the count the other one is about to change.
  */
 export const recordGoalRun = async (
@@ -350,8 +368,15 @@ export const recordGoalRun = async (
 
     if (goal.status !== "active") return { goal, outcome };
 
+    // A cleared milestone opens the next one with an empty count; the last
+    // one keeps its full count on the finished goal.
+    const moved = outcome.stageCleared && !outcome.justCompleted;
+    const progress = {
+      stageBpm: outcome.nextStageBpm ?? goal.stageBpm,
+      cleanRuns: moved ? 0 : outcome.cleanRuns,
+    };
     transaction.update(goalRef, {
-      cleanRuns: outcome.cleanRuns,
+      ...progress,
       updatedAt: now,
       ...(outcome.justCompleted
         ? { status: "completed", completedAt: now }
@@ -360,7 +385,7 @@ export const recordGoalRun = async (
 
     const updated: ExerciseGoal = {
       ...goal,
-      cleanRuns: outcome.cleanRuns,
+      ...progress,
       ...(outcome.justCompleted
         ? { status: "completed" as const, completedAt: now.toMillis() }
         : {}),
@@ -368,9 +393,9 @@ export const recordGoalRun = async (
     return { goal: updated, outcome };
   });
 
-  if (result.outcome.justCompleted) {
-    await onGoalCompleted(uid, result.goal, exercise).catch((error) =>
-      logger.error(error, { context: "onGoalCompleted" }),
+  if (result.outcome.stageCleared) {
+    await onStageCleared(uid, result.goal, exercise, result.outcome).catch(
+      (error) => logger.error(error, { context: "onStageCleared" }),
     );
   }
 
