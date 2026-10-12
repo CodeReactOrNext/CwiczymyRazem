@@ -1,5 +1,6 @@
 import type { ConditionGrade } from "feature/arsenal/data/itemStats";
 import { getConditionGrade } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { ArrowRight, Check, Lock } from "lucide-react";
 
 import { ConditionPath } from "./ConditionPath";
@@ -26,14 +27,19 @@ export const GateRow = ({
   condition,
   required,
   onRestore,
-}: GateRowProps) =>
-  ok ? (
+}: GateRowProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
+
+  return ok ? (
     <div className='flex items-center gap-2.5 rounded-lg bg-zinc-900/40 px-5 py-3'>
       <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15'>
         <Check size={12} strokeWidth={3} className='text-emerald-400' />
       </span>
       <span className='text-sm text-zinc-400'>
-        Condition is good enough — {getConditionGrade(condition).label}
+        {t("workshop.condition_ok", {
+          grade: labels.condition(getConditionGrade(condition)),
+        })}
       </span>
     </div>
   ) : (
@@ -44,10 +50,10 @@ export const GateRow = ({
       <div className='flex min-w-0 flex-1 flex-col gap-3'>
         <div className='flex flex-col gap-0.5'>
           <span className='text-base font-semibold text-amber-300'>
-            Restore to {required.label} first
+            {t("workshop.restore_first", { grade: labels.condition(required) })}
           </span>
           <span className='text-sm text-zinc-400'>
-            This upgrade requires {required.label} condition or better.
+            {t("workshop.requires_condition", { grade: labels.condition(required) })}
           </span>
         </div>
         <ConditionPath condition={condition} target={required.key} />
@@ -57,9 +63,10 @@ export const GateRow = ({
           type='button'
           onClick={onRestore}
           className='flex shrink-0 items-center gap-2 self-start rounded-lg bg-amber-500/15 px-4 py-2.5 text-sm font-bold text-amber-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 hover:bg-amber-500/25 sm:self-center'>
-          Go to restoration
+          {t("workshop.go_to_restoration")}
           <ArrowRight size={15} />
         </button>
       )}
     </div>
   );
+};

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deductFame, setFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -15,6 +16,7 @@ export interface OpenCaseInput {
 }
 
 export const useOpenCase = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
@@ -42,7 +44,7 @@ export const useOpenCase = () => {
         dispatch(deductFame(-context.cost));
       }
       const message =
-        error?.response?.data?.error || "Failed to open case";
+        error?.response?.data?.error || t("toasts.err.open_case");
       toast.error(message);
     },
   });

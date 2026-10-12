@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { FittedMod, ModSlots } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { WorkshopKind } from "feature/arsenal/types/arsenal.types";
 import type {
   ModSocketLayout,
@@ -83,6 +84,8 @@ export const InstalledMods = ({
   locked,
   onOpenSlot,
 }: InstalledModsProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const [wires, setWires] = useState<Wire[]>([]);
   // The picture's natural size is what tells us where the visible part ends
   // inside its box, and it is only known once the file has loaded — so the
@@ -242,8 +245,10 @@ export const InstalledMods = ({
                 type='button'
                 data-mod-socket={mod.id}
                 onClick={() => onOpenSlot({ kind: "fitted", index, mod })}
-                title={`${mod.label} · +${mod.points}`}
-                aria-label={`${mod.label}, installed`}
+                title={`${labels.mod(mod.id, mod.label)} · +${mod.points}`}
+                aria-label={t("mods.installed_aria", {
+                  name: labels.mod(mod.id, mod.label),
+                })}
                 className={cn(
                   size,
                   "relative block overflow-hidden rounded-lg bg-zinc-950/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-300/60",
@@ -264,8 +269,10 @@ export const InstalledMods = ({
                   onClick={() =>
                     onOpenSlot({ kind: "fitted", index, mod, intent: "reroll" })
                   }
-                  title={`Re-roll ${mod.label}`}
-                  aria-label={`Re-roll ${mod.label}`}
+                  title={t("mods.reroll_name", { name: labels.mod(mod.id, mod.label) })}
+                  aria-label={t("mods.reroll_name", {
+                    name: labels.mod(mod.id, mod.label),
+                  })}
                   className={cn(
                     "absolute -top-3 flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-zinc-300 opacity-0 transition-opacity focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-300/60 group-hover:opacity-100 hover:bg-zinc-700 hover:text-white",
                     // Outer corner, away from the wire leaving the inner edge.
@@ -290,8 +297,8 @@ export const InstalledMods = ({
                   fitted.length + (side === "left" ? 0 : columns.left.free) + i,
               })
             }
-            title='Empty slot · Install mod'
-            aria-label='Empty slot, install mod'
+            title={t("mods.empty_slot_title")}
+            aria-label={t("mods.empty_slot_aria")}
             className={cn(
               size,
               "flex items-center justify-center rounded-lg bg-zinc-100/[0.04] text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-100/[0.08] hover:text-zinc-300",
@@ -304,7 +311,7 @@ export const InstalledMods = ({
         {Array.from({ length: column.locked }).map((_, i) => (
           <span
             key={`locked-${i}`}
-            title='Unlocks with the next promotion'
+            title={t("workshop.unlocked_next_promotion")}
             className={cn(
               size,
               "flex items-center justify-center rounded-lg bg-zinc-100/[0.02] text-zinc-700",

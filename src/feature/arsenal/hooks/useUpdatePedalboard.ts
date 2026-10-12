@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { memoryCache } from "utils/cache/memoryCache";
 
@@ -17,6 +18,7 @@ export interface PedalboardUpdate {
 }
 
 export const useUpdatePedalboard = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -40,7 +42,7 @@ export const useUpdatePedalboard = () => {
     },
     onError: (error: any) => {
       const message =
-        error?.response?.data?.error || "Failed to update pedalboard";
+        error?.response?.data?.error || t("toasts.err.pedalboard");
       toast.error(message);
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
     },

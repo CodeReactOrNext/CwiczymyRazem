@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deductFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -9,6 +10,7 @@ import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 
 /** Buys one build level. The bill is recomputed server-side from the stored item. */
 export const useWorkshopBuild = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
@@ -20,13 +22,13 @@ export const useWorkshopBuild = () => {
       // mirror both the header counter and the build's own Fame gate keep
       // quoting the pre-build balance until the page is reloaded.
       dispatch(deductFame(data.fameSpent ?? 0));
-      toast.success(`Build ${data.buildLevel} — +${data.levelGain} level`);
+      toast.success(t("toasts.build_done", { build: data.buildLevel, gain: data.levelGain }));
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
     },
     onError: (error: unknown) => {
       const message =
         (error as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error || "Failed to build";
+          ?.error || t("toasts.err.build");
       toast.error(message);
     },
   });

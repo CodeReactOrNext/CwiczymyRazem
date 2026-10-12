@@ -1,7 +1,7 @@
 import {
-  getPartLabel,
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 
 import { PartIcon } from "../Parts/PartIcon";
@@ -20,6 +20,7 @@ interface PartsBillProps {
  * same tier colours — never as an abstract total.
  */
 export const PartsBill = ({ parts, title }: PartsBillProps) => {
+  const labels = useArsenalLabels();
   if (parts.length === 0) return null;
 
   return (
@@ -33,7 +34,7 @@ export const PartsBill = ({ parts, title }: PartsBillProps) => {
           <div
             key={`${part.partId}:${part.tier}`}
             className='flex items-center gap-2.5 rounded-lg bg-zinc-800/50 py-2 pl-2 pr-3'
-            title={`${part.qty}× ${getPartLabel(part.partId)} (${part.tier})`}>
+            title={`${part.qty}× ${labels.partName(part.tier, part.partId)}`}>
             <span className='relative flex h-9 w-9 items-center justify-center'>
               <PartIcon partId={part.partId} size={34} />
             </span>
@@ -41,12 +42,12 @@ export const PartsBill = ({ parts, title }: PartsBillProps) => {
             <span className='flex flex-col gap-0.5'>
               <span className='text-xs font-bold text-zinc-100'>
                 <span className='tabular-nums'>{part.qty}×</span>{" "}
-                {getPartLabel(part.partId)}
+                {labels.part(part.partId)}
               </span>
               <span
                 className='text-[10px] font-semibold'
                 style={{ color: PART_TIER_COLORS[part.tier] }}>
-                {part.tier}
+                {labels.partTier(part.tier)}
               </span>
             </span>
           </div>

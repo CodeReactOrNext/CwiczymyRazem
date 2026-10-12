@@ -12,6 +12,7 @@ import {
   getModQuote,
   getRepairQuote,
 } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type {
   SalvagedMod,
   ScrapPart,
@@ -69,6 +70,8 @@ export const WorkshopBench = ({
   );
 
   const [job, setJob] = useState<WorkshopJob | null>(null);
+  const labels = useArsenalLabels();
+  const { t } = labels;
   /** The socket on the bench the player has opened, if any. */
   const [slot, setSlot] = useState<ModSlotTarget | null>(null);
 
@@ -131,7 +134,7 @@ export const WorkshopBench = ({
           <span
             className='text-[11px] font-semibold tracking-[0.18em]'
             style={{ color: rs.baseColor }}>
-            {entry.brand} · {entry.rarity}
+            {entry.brand} · {labels.rarity(entry.rarity)}
           </span>
           <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
             <span className='truncate text-3xl font-black text-white sm:text-4xl'>
@@ -164,10 +167,12 @@ export const WorkshopBench = ({
         <div className='relative mx-auto flex w-full max-w-md items-center gap-4 rounded-lg bg-zinc-950/70 px-4 py-2.5'>
           <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
             <span className='flex items-baseline gap-2 text-sm font-bold'>
-              <span style={{ color: grade.color }}>{grade.label}</span>
+              <span style={{ color: grade.color }}>
+                {labels.condition(grade)}
+              </span>
               {entry.restored && (
                 <span className='text-xs font-semibold text-zinc-400'>
-                  — fully restored
+                  — {t("workshop.fully_restored")}
                 </span>
               )}
             </span>
@@ -180,7 +185,7 @@ export const WorkshopBench = ({
           </div>
           <div className='flex shrink-0 items-center gap-2'>
             <span className='text-[10px] font-semibold tracking-widest text-zinc-500'>
-              Level
+              {t("workshop.level")}
             </span>
             <LevelEmblem level={entry.level} rarity={entry.rarity} size={44} />
           </div>
@@ -194,7 +199,7 @@ export const WorkshopBench = ({
       {repairQuote.target ? (
         <JobCard
           icon={Wrench}
-          title='Restore condition'
+          title={t("workshop.restore_condition")}
           summary={
             <ConditionPath
               condition={entry.condition}
@@ -203,7 +208,7 @@ export const WorkshopBench = ({
           }
           gain={repairQuote.gain}
           ready={repairQuote.canRepair}
-          blockedNote={describeBlocker(repairQuote.recipe)}
+          blockedNote={describeBlocker(repairQuote.recipe, [], t)}
           accent='emerald'
           onClick={() => setJob("repair")}
         />
@@ -211,10 +216,10 @@ export const WorkshopBench = ({
         <div className='flex items-center gap-2.5 rounded-lg bg-zinc-900/40 px-4 py-3 text-sm'>
           <Wrench size={15} className='shrink-0 text-emerald-400/60' />
           <span className='font-bold text-zinc-300'>
-            {getConditionGrade(entry.condition).label}
+            {labels.condition(getConditionGrade(entry.condition))}
           </span>
           <span className='text-zinc-600'>·</span>
-          <span className='text-zinc-500'>fully restored</span>
+          <span className='text-zinc-500'>{t("workshop.fully_restored")}</span>
         </div>
       )}
 
@@ -222,8 +227,12 @@ export const WorkshopBench = ({
         icon={Hammer}
         title={
           buildQuote.requirement.promotesTo
-            ? `Promote to ${buildQuote.requirement.promotesTo}`
-            : `Upgrade to build ${buildQuote.requirement.level}`
+            ? t("workshop.promote_to", {
+                rarity: labels.rarity(buildQuote.requirement.promotesTo),
+              })
+            : t("workshop.upgrade_to_build", {
+                build: buildQuote.requirement.level,
+              })
         }
         summary={
           <RarityPath
@@ -233,7 +242,7 @@ export const WorkshopBench = ({
         }
         gain={buildQuote.gain}
         ready={buildQuote.canBuild}
-        blockedNote={describeBlocker(buildQuote.recipe, buildQuote.checks)}
+        blockedNote={describeBlocker(buildQuote.recipe, buildQuote.checks, t)}
         accent='cyan'
         onClick={() => setJob("build")}
       />

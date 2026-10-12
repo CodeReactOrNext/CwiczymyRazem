@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -20,6 +21,7 @@ interface FusePartsInput {
  * `data/fusion.ts`; the server recomputes both before anything is spent.
  */
 export const useFuseParts = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
@@ -30,14 +32,21 @@ export const useFuseParts = () => {
       // Negative: the fee left the player's balance.
       dispatch(addFame(-data.fameSpent));
       toast.success(
-        `Reworked into ${data.produced.qty}× ${data.produced.tier} ${getPartLabel(
-          data.produced.partId,
-        )}!`,
+        t("toasts.reworked", {
+          qty: data.produced.qty,
+          part: t("labels.part_name", {
+            tier: t(`labels.part_tier.${data.produced.tier}`, data.produced.tier),
+            part: t(
+              `labels.part.${data.produced.partId}`,
+              getPartLabel(data.produced.partId),
+            ),
+          }),
+        }),
       );
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.error || "Failed to rework parts";
+      const message = error?.response?.data?.error || t("toasts.err.rework");
       toast.error(message);
     },
   });

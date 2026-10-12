@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 
 import { getModDef } from "../data/workshop";
@@ -7,6 +8,7 @@ import { countScrapParts } from "../utils/scrap";
 import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 
 export const useScrapEffect = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -17,10 +19,13 @@ export const useScrapEffect = () => {
         ? getModDef("effect", data.salvaged.featureId)
         : null;
       toast.success(
-        `Scrapped for ${total} ${total === 1 ? "part" : "parts"}!`,
+        t("toasts.scrapped", { count: total }),
         salvaged
           ? {
-              description: `${salvaged.label} +${data.salvaged!.points} pulled out and stashed`,
+              description: t("toasts.mod_pulled", {
+                name: t(`labels.mod.${data.salvaged!.featureId}`, salvaged.label),
+                points: data.salvaged!.points,
+              }),
             }
           : undefined,
       );
@@ -29,7 +34,7 @@ export const useScrapEffect = () => {
     onError: (error: unknown) => {
       const message =
         (error as { response?: { data?: { error?: string } } })?.response?.data?.error ||
-        "Failed to scrap effect";
+        t("toasts.err.scrap_effect");
       toast.error(message);
     },
   });

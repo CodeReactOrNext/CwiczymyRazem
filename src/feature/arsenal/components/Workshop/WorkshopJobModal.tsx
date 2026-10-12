@@ -16,6 +16,7 @@ import {
   getGradeByRank,
   MOD_REMOVE_FAME_COST,
 } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useWorkshopBuild } from "feature/arsenal/hooks/useWorkshopBuild";
 import { useWorkshopMod } from "feature/arsenal/hooks/useWorkshopMod";
 import { useWorkshopRepair } from "feature/arsenal/hooks/useWorkshopRepair";
@@ -57,10 +58,15 @@ interface WorkshopJobModalProps {
 }
 
 /** The build's own name for itself. "Fit" belongs to mods and nothing else. */
-const buildLabel = (quote: BuildQuote): string =>
+const buildLabel = (
+  quote: BuildQuote,
+  labels: ReturnType<typeof useArsenalLabels>,
+): string =>
   quote.requirement.promotesTo
-    ? `Promote to ${quote.requirement.promotesTo}`
-    : `Build ${quote.requirement.level}`;
+    ? labels.t("workshop.promote_to", {
+        rarity: labels.rarity(quote.requirement.promotesTo),
+      })
+    : labels.t("workshop.build_n", { build: quote.requirement.level });
 
 /**
  * Everything about one job, on demand.
@@ -89,6 +95,9 @@ export const WorkshopJobModal = ({
   const repair = useWorkshopRepair();
   const mod = useWorkshopMod();
   const [result, setResult] = useState<WorkshopResult | null>(null);
+  const labels = useArsenalLabels();
+  const { t } = labels;
+  const conditionName = (key: string) => t(`labels.condition.${key}`, key);
   /** The mod the player has asked to strip off, waiting on the confirm. */
   const [removing, setRemoving] = useState<FittedMod | null>(null);
 
@@ -156,6 +165,7 @@ export const WorkshopJobModal = ({
       {
         onSuccess: (data) => {
           setRemoving(null);
+          const name = labels.mod(data.featureId, data.label);
           setResult({
             kind: entry.kind,
             rarity: entry.rarity,
@@ -167,10 +177,13 @@ export const WorkshopJobModal = ({
             item: data.item,
             headline:
               data.action === "reroll"
-                ? `${data.label} +${data.pointsBefore} → +${data.points}`
+                ? `${name} +${data.pointsBefore} → +${data.points}`
                 : data.action === "remove"
-                  ? `${data.label} +${data.pointsBefore} taken off`
-                  : `${data.label} +${data.points}`,
+                  ? t("workshop.mod_taken_off", {
+                      name,
+                      points: data.pointsBefore,
+                    })
+                  : `${name} +${data.points}`,
           });
         },
       },
@@ -183,38 +196,50 @@ export const WorkshopJobModal = ({
   const fameCheck = buildQuote.checks.find((c) => c.kind === "fame")!;
 
   const title = result
-    ? "Done"
+    ? t("mods.done")
     : job === "repair"
-      ? `Restore ${entry.name}`
+      ? t("workshop.restore_name", { name: entry.name })
       : job === "mod"
-        ? "Install mod"
-        : `Upgrade ${entry.name}`;
+        ? t("mods.install_mod")
+        : t("workshop.upgrade_name", { name: entry.name });
 
   // The restoration and the upgrade read as a line about the job — what it
   // does, or where it goes — because the item is already in their titles.
   const caption = result
     ? entry.name
     : job === "repair"
-      ? `Improve condition and gain ${repairQuote.gain} ${repairQuote.gain === 1 ? "level" : "levels"}.`
+      ? t("workshop.improve_condition", { count: repairQuote.gain })
       : job === "mod"
         ? entry.name
-        : `Build ${entry.buildLevel} → Build ${buildQuote.requirement.level}`;
+        : t("workshop.build_arrow", {
+            from: entry.buildLevel,
+            to: buildQuote.requirement.level,
+          });
   const captionIsSentence = !result && job !== "mod";
 
   // The quotes behind these were already recomputed by the refetch the job
   // triggered, so what is offered here is what the player can actually afford now.
   const nextJobs: { job: WorkshopJob; label: string }[] = [
     ...(repairQuote.canRepair
-      ? [{ job: "repair" as const, label: `Restore to ${repairQuote.target}` }]
+      ? [
+          {
+            job: "repair" as const,
+            label: t("workshop.restore_to", {
+              grade: conditionName(repairQuote.target ?? ""),
+            }),
+          },
+        ]
       : []),
     ...(buildQuote.canBuild
-      ? [{ job: "build" as const, label: buildLabel(buildQuote) }]
+      ? [{ job: "build" as const, label: buildLabel(buildQuote, labels) }]
       : []),
     ...(canRefit || modQuote.canReroll
       ? [
           {
             job: "mod" as const,
-            label: canRefit ? "Install another mod" : "Re-roll a mod",
+            label: canRefit
+              ? t("workshop.install_another_mod")
+              : t("workshop.reroll_a_mod"),
           },
         ]
       : []),
@@ -282,7 +307,7 @@ export const WorkshopJobModal = ({
           <button
             onClick={close}
             disabled={isPending}
-            aria-label='Close'
+            aria-label={t("common.close")}
             className='rounded-lg p-2 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 disabled:opacity-40 hover:bg-zinc-800 hover:text-zinc-200'>
             <X size={16} />
           </button>
@@ -295,7 +320,7 @@ export const WorkshopJobModal = ({
               <button
                 onClick={close}
                 className='rounded-lg bg-zinc-100 px-5 py-3.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-white sm:flex-1'>
-                Done
+                {t("mods.done")}
               </button>
               {nextJobs.map((next) => (
                 <button
@@ -318,8 +343,8 @@ export const WorkshopJobModal = ({
 
             <MaterialsBill
               recipe={repairQuote.recipe}
-              job='restoration'
-              readyLabel='Ready to restore'
+              job={t("workshop.restoration")}
+              readyLabel={t("workshop.ready_to_restore")}
             />
 
             <div className='flex flex-col gap-3 sm:flex-row'>
@@ -327,7 +352,7 @@ export const WorkshopJobModal = ({
                 onClick={close}
                 disabled={isPending}
                 className='rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44'>
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 onClick={runRepair}
@@ -342,15 +367,17 @@ export const WorkshopJobModal = ({
                 )}>
                 <Wrench size={16} />
                 {repair.isPending
-                  ? "Restoring…"
-                  : `Restore to ${repairQuote.target}`}
+                  ? t("workshop.restoring")
+                  : t("workshop.restore_to", {
+                      grade: conditionName(repairQuote.target ?? ""),
+                    })}
               </button>
             </div>
           </>
         ) : job === "mod" ? (
           <>
             <div className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-5'>
-              <SectionLabel>Mod slots</SectionLabel>
+              <SectionLabel>{t("workshop.mod_slots")}</SectionLabel>
               <div className='flex flex-wrap items-baseline gap-x-4 gap-y-1'>
                 <span className='text-3xl font-black tabular-nums text-white'>
                   {modQuote.slots.used}
@@ -358,10 +385,14 @@ export const WorkshopJobModal = ({
                 </span>
                 <span className='text-sm text-zinc-400'>
                   {modQuote.slots.free === 0
-                    ? `${entry.rarity} holds no more — a promotion buys the room`
+                    ? t("workshop.slots_no_more", {
+                        rarity: labels.rarity(entry.rarity),
+                      })
                     : salvagedOptions.length > 0
-                      ? `${salvagedOptions.length} you own ${salvagedOptions.length === 1 ? "fits" : "fit"} this build`
-                      : "nothing you own fits this build yet"}
+                      ? t("workshop.you_own_fit", {
+                          count: salvagedOptions.length,
+                        })
+                      : t("workshop.nothing_fits_yet")}
                 </span>
               </div>
             </div>
@@ -405,7 +436,7 @@ export const WorkshopJobModal = ({
             />
 
             <CostTable
-              title='Upgrade cost'
+              title={t("workshop.upgrade_cost")}
               recipe={buildQuote.recipe}
               fame={{
                 need: fameCheck.required,
@@ -420,7 +451,7 @@ export const WorkshopJobModal = ({
                 onClick={close}
                 disabled={isPending}
                 className='rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44'>
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 onClick={runBuild}
@@ -435,10 +466,12 @@ export const WorkshopJobModal = ({
                 )}>
                 {!conditionCheck.ok && <Lock size={16} />}
                 {build.isPending
-                  ? "Building…"
+                  ? t("workshop.building")
                   : buildQuote.requirement.promotesTo
-                    ? buildLabel(buildQuote)
-                    : `Upgrade to Build ${buildQuote.requirement.level}`}
+                    ? buildLabel(buildQuote, labels)
+                    : t("workshop.upgrade_to_build", {
+                        build: buildQuote.requirement.level,
+                      })}
               </button>
             </div>
           </>

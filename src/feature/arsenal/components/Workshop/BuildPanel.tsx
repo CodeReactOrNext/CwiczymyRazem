@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { GuitarRarity } from "feature/arsenal/types/arsenal.types";
 import { ArrowRight } from "lucide-react";
 
@@ -24,7 +25,11 @@ const Side = ({
   next = false,
   gain,
   promotesTo,
-}: SideProps) => (
+}: SideProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
+
+  return (
   <div className='flex flex-col gap-3 p-5 sm:p-6'>
     <SectionLabel>{caption}</SectionLabel>
     <div className='flex flex-wrap items-center gap-3'>
@@ -33,7 +38,7 @@ const Side = ({
           "text-2xl font-black leading-none",
           next ? "text-white" : "text-zinc-200",
         )}>
-        Build {build}
+        {t("workshop.build_n", { build })}
       </span>
       {next && promotesTo && (
         <span
@@ -42,13 +47,13 @@ const Side = ({
             backgroundColor: `${RARITY_STYLES[promotesTo].baseColor}1f`,
             color: RARITY_STYLES[promotesTo].baseColor,
           }}>
-          {promotesTo}
+          {labels.rarity(promotesTo)}
         </span>
       )}
     </div>
     <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
       <span className='text-sm text-zinc-400'>
-        Level{" "}
+        {t("workshop.level")}{" "}
         <span
           className={cn(
             "text-xl font-black tabular-nums",
@@ -60,13 +65,16 @@ const Side = ({
       {next && gain != null && gain !== 0 && (
         <span className='text-sm font-bold tabular-nums text-cyan-400'>
           <span className='mr-3 text-zinc-700'>|</span>
-          {gain > 0 ? `+${gain}` : gain}{" "}
-          {Math.abs(gain) === 1 ? "level" : "levels"}
+          {t("workshop.levels_gain", {
+            count: Math.abs(gain),
+            gain: gain > 0 ? `+${gain}` : gain,
+          })}
         </span>
       )}
     </div>
   </div>
-);
+  );
+};
 
 interface BuildPanelProps {
   fromBuild: number;
@@ -87,14 +95,17 @@ export const BuildPanel = ({
   fromLevel,
   toLevel,
   promotesTo,
-}: BuildPanelProps) => (
+}: BuildPanelProps) => {
+  const { t } = useArsenalLabels();
+
+  return (
   <div className='grid grid-cols-1 rounded-lg bg-zinc-950/40 sm:grid-cols-[1fr_auto_1fr]'>
-    <Side caption='Current' build={fromBuild} level={fromLevel} />
+    <Side caption={t("workshop.current")} build={fromBuild} level={fromLevel} />
     <div className='flex items-center justify-center px-1 py-1 sm:px-2'>
       <ArrowRight size={18} className='rotate-90 text-zinc-500 sm:rotate-0' />
     </div>
     <Side
-      caption='Next build'
+      caption={t("workshop.next_build")}
       build={toBuild}
       level={toLevel}
       gain={toLevel - fromLevel}
@@ -102,4 +113,5 @@ export const BuildPanel = ({
       next
     />
   </div>
-);
+  );
+};

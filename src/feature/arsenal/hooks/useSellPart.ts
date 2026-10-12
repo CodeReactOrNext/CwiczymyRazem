@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -16,6 +17,7 @@ interface SellPartInput {
 
 /** Sells loose parts out of the stash. See `data/resale.ts` for the price. */
 export const useSellPart = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
@@ -24,11 +26,11 @@ export const useSellPart = () => {
       sellPart(partId, tier, qty),
     onSuccess: (data) => {
       dispatch(addFame(data.fameReward));
-      toast.success(`Sold for ${data.fameReward} Fame Points!`);
+      toast.success(t("toasts.sold_for", { fame: data.fameReward }));
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.error || "Failed to sell parts";
+      const message = error?.response?.data?.error || t("toasts.err.sell_parts");
       toast.error(message);
     },
   });

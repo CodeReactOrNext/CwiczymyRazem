@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 
 import { updateStashLayout } from "../services/arsenal.service";
@@ -20,6 +21,7 @@ import { ARSENAL_QUERY_KEY } from "./useArsenalData";
  * an arrangement the player already moved on from.
  */
 export const useUpdateStashLayout = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -33,7 +35,7 @@ export const useUpdateStashLayout = () => {
     },
     onError: (error: any) => {
       const message =
-        error?.response?.data?.error || "Failed to save your stash layout";
+        error?.response?.data?.error || t("toasts.err.stash_layout");
       toast.error(message);
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
     },

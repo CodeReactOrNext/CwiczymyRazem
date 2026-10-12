@@ -1,3 +1,6 @@
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
+
 import { getPartLabel } from "../data/partDefinitions";
 import type {
   ModOption,
@@ -15,10 +18,23 @@ const pluralPart = (partId: PartId, count: number): string => {
   return label.endsWith("y") ? `${label.slice(0, -1)}ies` : `${label}s`;
 };
 
-/** "3 more Legendary necks" — the whole point of a fixed recipe. */
-const describeLine = (line: RecipeLine): string => {
+/**
+ * "3 more Legendary necks" — the whole point of a fixed recipe.
+ *
+ * English bends the noun ("necks"), which no template can do for every
+ * language, so the plural form rides along as `parts` and other languages
+ * name the part with `part` in whatever construction suits them.
+ */
+const describeLine = (line: RecipeLine, t?: Translate): string => {
   const short = line.need - line.have;
-  return `${short} more ${line.tier} ${pluralPart(line.partId, short)}`;
+  return translateOr(t, "arsenal:blockers.more_parts", "{{count}} more {{tier}} {{parts}}", {
+    count: short,
+    tier: t ? t(`arsenal:labels.part_tier.${line.tier}`, line.tier) : line.tier,
+    parts: pluralPart(line.partId, short),
+    part: t
+      ? t(`arsenal:labels.part.${line.partId}`, getPartLabel(line.partId))
+      : getPartLabel(line.partId),
+  });
 };
 
 /**
@@ -36,10 +52,14 @@ const describeLine = (line: RecipeLine): string => {
 export const describeBlocker = (
   recipe: RecipeLine[],
   checks: WorkshopCheck[] = [],
+  t?: Translate,
 ): string | undefined => {
   const condition = checks.find((c) => c.kind === "condition" && !c.ok);
   if (condition) {
-    return `restore it to ${getGradeByRank(condition.required).label} first`;
+    const grade = getGradeByRank(condition.required);
+    return translateOr(t, "arsenal:blockers.restore_first", "restore it to {{grade}} first", {
+      grade: t ? t(`arsenal:labels.condition.${grade.key}`, grade.label) : grade.label,
+    });
   }
 
   // Biggest shortfall first: it is the one that decides when the job unblocks.
@@ -47,14 +67,23 @@ export const describeBlocker = (
     .filter((line) => !line.ok)
     .sort((a, b) => b.need - b.have - (a.need - a.have));
 
-  if (missing.length === 1) return describeLine(missing[0]);
+  if (missing.length === 1) return describeLine(missing[0], t);
   if (missing.length > 1) {
     const rest = missing.length - 1;
-    return `${describeLine(missing[0])}, plus ${rest} other part${rest === 1 ? "" : "s"}`;
+    return translateOr(
+      t,
+      "arsenal:blockers.plus_others",
+      rest === 1 ? "{{first}}, plus {{count}} other part" : "{{first}}, plus {{count}} other parts",
+      { first: describeLine(missing[0], t), count: rest },
+    );
   }
 
   const fame = checks.find((c) => c.kind === "fame" && !c.ok);
-  if (fame) return `needs ${fame.required - fame.current} more fame`;
+  if (fame) {
+    return translateOr(t, "arsenal:blockers.more_fame", "needs {{count}} more fame", {
+      count: fame.required - fame.current,
+    });
+  }
 
   return undefined;
 };
