@@ -11,6 +11,7 @@ import {
   getEffectScrapYield,
   getGuitarScrapYield,
 } from "feature/arsenal/utils/scrap";
+import { useTranslation } from "hooks/useTranslation";
 import { Check } from "lucide-react";
 
 import { BuyButton } from "../BuyButton";
@@ -67,6 +68,7 @@ export const ItemOfferCard = ({
   onBuy,
   isBuying,
 }: ItemOfferCardProps) => {
+  const { t } = useTranslation("arsenal");
   const canAfford = currentFame >= offer.unitPrice;
   const scrapParts = getOfferScrapYield(offer);
 
@@ -87,7 +89,7 @@ export const ItemOfferCard = ({
       ) : (
         <div className='flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-800 text-xs font-semibold text-zinc-400'>
           <Check size={13} strokeWidth={3} />
-          Bought today
+          {t("trader.bought_today")}
         </div>
       )}
     </div>
