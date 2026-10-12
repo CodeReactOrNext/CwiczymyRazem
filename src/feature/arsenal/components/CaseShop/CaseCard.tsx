@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { Interpolate } from "lib/i18n/Interpolate";
 
 import type { CaseDefinition } from "../../types/arsenal.types";
 import { DropRates } from "./DropRates";
@@ -68,9 +70,16 @@ export const CaseCard = ({
     ? EFFECT_CASE_IMAGE[tier] || meta.image
     : meta.image;
   const canAfford = currentFame >= caseDef.fameCost;
+  const labels = useArsenalLabels();
+  const { t } = labels;
 
-  // "Premium Guitar Case" -> the tier word takes the accent, the rest stays neutral.
+  // "Premium Guitar Case" -> the tier word takes the accent, the rest stays
+  // neutral. Translations move the slot, so the title is a template around it.
   const [tierWord, ...restOfName] = caseDef.name.split(" ");
+  const title = t(
+    `cases.defs.${caseDef.id}.title`,
+    `{{tier}} ${restOfName.join(" ")}`,
+  );
 
   return (
     <article
@@ -117,7 +126,7 @@ export const CaseCard = ({
         />
         <img
           src={image}
-          alt={caseDef.name}
+          alt={labels.caseName(caseDef)}
           className='relative z-10 max-h-[92%] w-[90%] object-contain object-bottom transition-transform duration-300 group-hover:-translate-y-1'
           draggable={false}
           loading='lazy'
@@ -126,11 +135,19 @@ export const CaseCard = ({
 
       <div className='relative min-w-0'>
         <h3 className='font-display text-lg font-bold text-zinc-100'>
-          <span style={{ color: meta.color }}>{tierWord}</span>{" "}
-          {restOfName.join(" ")}
+          <Interpolate
+            text={title}
+            values={{
+              tier: (
+                <span style={{ color: meta.color }}>
+                  {t(`cases.tier_word.${tier}`, tierWord)}
+                </span>
+              ),
+            }}
+          />
         </h3>
         <p className='mt-1 text-xs leading-relaxed text-zinc-500'>
-          {caseDef.description}
+          {labels.caseDescription(caseDef)}
         </p>
       </div>
 
@@ -148,7 +165,9 @@ export const CaseCard = ({
             <span className={canAfford ? "text-amber-400" : "text-red-400"}>
               {caseDef.fameCost}
             </span>
-            <span className='text-xs font-medium text-zinc-500'>Fame</span>
+            <span className='text-xs font-medium text-zinc-500'>
+              {t("common.fame")}
+            </span>
           </span>
           <OpenCaseButton
             canAfford={canAfford}

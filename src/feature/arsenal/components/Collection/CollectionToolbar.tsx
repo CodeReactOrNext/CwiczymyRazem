@@ -13,6 +13,7 @@ import type {
   CollectionView,
 } from "feature/arsenal/utils/collectionFilter";
 import { isStashOnlySort } from "feature/arsenal/utils/collectionFilter";
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowUpDown, LayoutGrid, Rows3, Search } from "lucide-react";
 
 interface CollectionToolbarProps {
@@ -108,6 +109,9 @@ export const CollectionToolbar = ({
   guitarCount,
   pedalCount,
 }: CollectionToolbarProps) => {
+  const { t } = useTranslation("arsenal");
+  const sortLabel = (id: CollectionSort, fallback: string) =>
+    t(`collection.sort.${id}`, fallback);
   const counts: Record<CollectionScope, number> = {
     all: guitarCount + pedalCount,
     guitars: guitarCount,
@@ -128,7 +132,7 @@ export const CollectionToolbar = ({
             onClick={() => onScopeChange(s.id)}
             aria-pressed={scope === s.id}
             className={cn(segmentClass(scope === s.id), "flex-1 sm:flex-none")}>
-            {s.label}
+            {t(`collection.scope.${s.id}`, s.label)}
             <span className='tabular-nums opacity-60'>{counts[s.id]}</span>
           </button>
         ))}
@@ -144,8 +148,8 @@ export const CollectionToolbar = ({
         <Input
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          placeholder='Search your collection'
-          aria-label='Search your collection'
+          placeholder={t("collection.search")}
+          aria-label={t("collection.search")}
           className='h-9 border-0 bg-arsenal-bg pl-9 text-sm text-arsenal-text-primary placeholder:text-arsenal-text-tertiary'
         />
       </div>
@@ -157,24 +161,27 @@ export const CollectionToolbar = ({
         value={sort}
         onValueChange={(value) => onSortChange(value as CollectionSort)}>
         <SelectTrigger
-          aria-label='Sort by'
+          aria-label={t("collection.sort_by")}
           className='h-9 w-full shrink-0 gap-2 border-0 bg-arsenal-bg px-3 text-xs font-semibold text-arsenal-text-primary sm:w-[9.5rem]'>
           <span className='flex items-center gap-1.5 text-arsenal-text-tertiary'>
             <ArrowUpDown size={13} aria-hidden />
-            Sort:
+            {t("collection.sort_prefix")}
           </span>
           {/* Explicit children rather than the auto-detected label — Radix only
               knows an item's label once it has mounted inside the (closed by
               default) content portal, so the trigger would show blank until
               the menu had been opened once. */}
           <SelectValue>
-            {visibleSorts.find((s) => s.id === sort)?.label}
+            {sortLabel(sort, visibleSorts.find((s) => s.id === sort)?.label ?? "")}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {visibleSorts.map((s) => (
-            <SelectItem key={s.id} value={s.id} title={s.hint}>
-              {s.label}
+            <SelectItem
+              key={s.id}
+              value={s.id}
+              title={t(`collection.sort_hint.${s.id}`, s.hint)}>
+              {sortLabel(s.id, s.label)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -182,18 +189,21 @@ export const CollectionToolbar = ({
 
       {showViewSwitch && (
         <div className='flex h-9 shrink-0 gap-1 rounded-lg bg-arsenal-bg p-1'>
-          {VIEWS.map(({ id, label, Icon }) => (
+          {VIEWS.map(({ id, label: english, Icon }) => {
+            const label = t(`collection.view.${id}`, english);
+            return (
             <button
               key={id}
               onClick={() => onViewChange(id)}
               aria-pressed={view === id}
-              aria-label={`${label} view`}
-              title={`${label} view`}
+              aria-label={t(`collection.view_title.${id}`)}
+              title={t(`collection.view_title.${id}`)}
               className={cn(segmentClass(view === id), "flex-1 sm:flex-none")}>
               <Icon size={14} />
               <span className='sm:hidden'>{label}</span>
             </button>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

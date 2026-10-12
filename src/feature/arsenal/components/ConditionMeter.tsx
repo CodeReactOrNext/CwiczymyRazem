@@ -4,6 +4,7 @@ import {
   getConditionGrade,
   getConditionTier,
 } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
 interface ConditionMeterProps {
   condition: number;
@@ -36,6 +37,9 @@ export const ConditionMeter = ({
   className,
 }: ConditionMeterProps) => {
   const grade = getConditionGrade(condition);
+  const labels = useArsenalLabels();
+  const { t } = labels;
+  const gradeLabel = labels.condition(grade);
   const tier = getConditionTier(condition);
 
   return (
@@ -43,18 +47,18 @@ export const ConditionMeter = ({
       className={cn("flex flex-col gap-1", className)}
       title={
         restored
-          ? `Condition: ${grade.label} — restored in the workshop`
-          : `Condition: ${grade.label}`
+          ? t("condition.title_restored", { grade: gradeLabel })
+          : t("condition.title", { grade: gradeLabel })
       }>
       {showLabel && (
         <div className='flex items-center justify-between gap-3'>
           <span className='text-[9px] font-medium tracking-widest text-zinc-500'>
-            Condition
+            {t("condition.label")}
           </span>
           <span className='flex items-baseline gap-1.5'>
             {restored && (
               <span className='rounded bg-zinc-800/80 px-1.5 py-0.5 text-[9px] font-bold text-zinc-400'>
-                Restored
+                {t("condition.restored")}
               </span>
             )}
             <span
@@ -63,7 +67,7 @@ export const ConditionMeter = ({
                 color: dimmed ? "#a1a1aa" : grade.color,
                 textShadow: dimmed ? undefined : `0 0 8px ${grade.color}55`,
               }}>
-              {grade.label}
+              {gradeLabel}
             </span>
           </span>
         </div>

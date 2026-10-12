@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 
 interface OpenCaseButtonProps {
   canAfford: boolean;
@@ -26,7 +27,8 @@ export const OpenCaseButton = ({
 }: OpenCaseButtonProps) => {
   const isFeatured = variant === "featured";
   const isSolid = variant === "solid";
-  const label = isOpening ? "Opening..." : "Open case";
+  const { t } = useTranslation("arsenal");
+  const label = isOpening ? t("cases.opening") : t("cases.open_case");
 
   if (isFeatured) {
     return (

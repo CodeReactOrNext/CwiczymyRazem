@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
+import type { Translate } from "lib/i18n/translate";
 
 import type { ItemUse } from "../utils/inUse";
 
@@ -8,19 +10,21 @@ import type { ItemUse } from "../utils/inUse";
  * cards have always used for this, so the mark means the same thing wherever it
  * turns up.
  */
-const USE_STYLES = {
-  profile: { label: "equipped", color: "#fbbf24" },
-  rig: { label: "rig slot", color: "#22d3ee" },
-  board: { label: "pedalboard", color: "#22d3ee" },
+const USE_COLORS = {
+  profile: "#fbbf24",
+  rig: "#22d3ee",
+  board: "#22d3ee",
 } as const;
 
-const describe = (use: ItemUse) => {
-  const style = USE_STYLES[use.where];
-  return {
-    color: style.color,
-    label: use.where === "rig" ? `${style.label} ${use.slot + 1}` : style.label,
-  };
-};
+const describe = (use: ItemUse, t: Translate) => ({
+  color: USE_COLORS[use.where],
+  label:
+    use.where === "rig"
+      ? t("card.guitar.rig_slot", { slot: use.slot + 1 })
+      : use.where === "profile"
+        ? t("card.guitar.equipped")
+        : t("in_service.pedalboard"),
+});
 
 interface InServiceTagsProps {
   uses: ItemUse[];
@@ -35,13 +39,14 @@ interface InServiceTagsProps {
  * the bench never used to say which of the two you had in front of you.
  */
 export const InServiceTags = ({ uses, className }: InServiceTagsProps) => {
+  const { t } = useTranslation("arsenal");
   if (uses.length === 0) return null;
 
   return (
     <span
       className={cn("flex flex-wrap items-center gap-x-3 gap-y-1", className)}>
       {uses.map((use) => {
-        const { label, color } = describe(use);
+        const { label, color } = describe(use, t);
         return (
           <span key={label} className='flex items-center gap-1.5'>
             <span

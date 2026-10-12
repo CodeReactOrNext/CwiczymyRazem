@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { DexStatus } from "feature/arsenal/utils/dex";
+import { useTranslation } from "hooks/useTranslation";
 import { Archive, CheckCircle2, Tag } from "lucide-react";
 import type { CSSProperties } from "react";
 
@@ -24,28 +25,32 @@ export const DexMarks = ({
 }: {
   status: DexStatus;
   className?: string;
-}) => (
+}) => {
+  const { t } = useTranslation("arsenal");
+
+  return (
   <div className={cn("flex items-center gap-2 text-[10px]", className)}>
     {status.isOwned && (
       <span className='flex items-center gap-1 text-cyan-400'>
         <CheckCircle2 size={10} />
-        Owned
+        {t("dex_marks.owned")}
       </span>
     )}
     {status.inDex && (
       <span className='flex items-center gap-1 text-zinc-400'>
         <Archive size={10} />
-        Dex
+        {t("view.tabs.dex")}
       </span>
     )}
     {!status.isOwned && !status.inDex && (
       <span className='flex items-center gap-1 font-semibold text-amber-400'>
         <Tag size={10} strokeWidth={2.5} className='shrink-0' />
-        New for your collection
+        {t("dex_marks.new")}
       </span>
     )}
   </div>
-);
+  );
+};
 
 /**
  * The same fact as one glyph, for a corner that has no room for words. Owned
@@ -64,11 +69,12 @@ export const DexCornerMark = ({
   className?: string;
   style?: CSSProperties;
 }) => {
+  const { t } = useTranslation("arsenal");
   if (status.isOwned)
     return (
       <CheckCircle2
         size={size}
-        aria-label='Owned'
+        aria-label={t("dex_marks.owned")}
         className={cn("text-cyan-400", className)}
         style={style}
       />
@@ -77,7 +83,7 @@ export const DexCornerMark = ({
     return (
       <Archive
         size={size - 1}
-        aria-label='In Dex'
+        aria-label={t("dex_marks.in_dex")}
         className={cn("text-zinc-400", className)}
         style={style}
       />
@@ -86,7 +92,7 @@ export const DexCornerMark = ({
     <Tag
       size={size - 2}
       strokeWidth={2.5}
-      aria-label='New for your collection'
+      aria-label={t("dex_marks.new")}
       className={cn("text-amber-400", className)}
       style={style}
     />

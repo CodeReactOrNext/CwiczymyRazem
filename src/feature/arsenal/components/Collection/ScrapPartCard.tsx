@@ -1,8 +1,9 @@
 import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { FUSION_FAME_COST, getFusionQuote, getMaxFusionCrafts } from "feature/arsenal/data/fusion";
-import { getPartLabel, PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
+import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import { getPartResaleValue } from "feature/arsenal/data/resale";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { PartId, PartTier } from "feature/arsenal/types/arsenal.types";
 import { ArrowRight } from "lucide-react";
 
@@ -66,6 +67,8 @@ export const ScrapPartCard = ({
   fame = 0,
 }: ScrapPartCardProps) => {
   const color = PART_TIER_COLORS[tier];
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const one = getPartResaleValue(partId, tier, 1);
   const all = getPartResaleValue(partId, tier, qty);
 
@@ -83,13 +86,13 @@ export const ScrapPartCard = ({
         </TierPlate>
         <div className='flex min-w-0 flex-col gap-1.5'>
           <span className='text-[11px] font-semibold tracking-wide' style={{ color }}>
-            {tier} part
+            {t("parts.tier_part", { tier: labels.partTier(tier) })}
           </span>
           {/* The holding is a count, not a headline — it used to be set larger
               than the part's own name, which read as the name of the thing. */}
           <div className='flex min-w-0 items-center gap-2'>
             <span className='truncate text-xl font-black text-zinc-100'>
-              {getPartLabel(partId)}
+              {labels.part(partId)}
             </span>
             <Chip className='shrink-0 px-2 py-0.5 tabular-nums'>×{qty}</Chip>
           </div>
@@ -97,8 +100,7 @@ export const ScrapPartCard = ({
       </div>
 
       <p className='text-sm leading-relaxed text-zinc-400'>
-        Spent on the workshop bench — builds, repairs and mods all bill in parts. Selling is for
-        what the bench will never ask for.
+        {t("parts.card_body")}
       </p>
 
       {/* The bench. Hidden outright for a part with nowhere to climb — screws,
@@ -110,7 +112,7 @@ export const ScrapPartCard = ({
           section that is four lines long. */}
       {quote && (
         <div className='flex flex-col gap-5'>
-          <SectionLabel>Rework</SectionLabel>
+          <SectionLabel>{t("parts.rework")}</SectionLabel>
 
           {/*
             The trade reads down the card, not across it. Laid out in a row the
@@ -134,10 +136,14 @@ export const ScrapPartCard = ({
               <span
                 className='text-sm font-black'
                 style={{ color: PART_TIER_COLORS[quote.outputTier] }}>
-                {quote.outputTier} {getPartLabel(partId)}
+                {labels.partName(quote.outputTier, partId)}
               </span>
               <span className='text-[11px] text-zinc-500'>
-                {quote.ratio} {tier.toLowerCase()} pieces + {FUSION_FAME_COST} Fame
+                {t("parts.rework_cost", {
+                  count: quote.ratio,
+                  tier: labels.partTier(tier),
+                  fame: FUSION_FAME_COST,
+                })}
               </span>
             </div>
           </div>
@@ -150,7 +156,7 @@ export const ScrapPartCard = ({
           */}
           {shortOfParts > 0 && (
             <span className='text-center text-[11px] font-semibold text-amber-400/90'>
-              You have {qty} of {quote.ratio}
+              {t("parts.you_have", { qty, needed: quote.ratio })}
             </span>
           )}
 
@@ -164,7 +170,11 @@ export const ScrapPartCard = ({
                     billButtonClass,
                     "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25"
                   )}>
-                  <span>Rework {maxCrafts > 1 ? `×${maxCrafts}` : "one"}</span>
+                  <span>
+                    {maxCrafts > 1
+                      ? t("parts.rework_times", { count: maxCrafts })
+                      : t("parts.rework_one")}
+                  </span>
                   <Price amount={quote.fame * maxCrafts} />
                 </button>
 
@@ -174,13 +184,13 @@ export const ScrapPartCard = ({
                 {maxCrafts > 1 && (
                   <>
                     <span className='text-center text-[11px] text-zinc-500'>
-                      Uses {quote.ratio * maxCrafts} of your {qty}
+                      {t("parts.uses_of", { used: quote.ratio * maxCrafts, qty })}
                     </span>
                     <button
                       onClick={() => onFuseClick(1)}
                       disabled={isFusing}
                       className={minorButtonClass}>
-                      Rework just one for {quote.fame} Fame
+                      {t("parts.rework_just_one", { fame: quote.fame })}
                     </button>
                   </>
                 )}
@@ -188,7 +198,7 @@ export const ScrapPartCard = ({
             ) : (
               shortOfParts === 0 && (
                 <span className='text-center text-[11px] font-semibold text-amber-400/90'>
-                  Not enough Fame — this costs {quote.fame}
+                  {t("parts.not_enough_fame", { fame: quote.fame })}
                 </span>
               )
             ))}
@@ -204,14 +214,16 @@ export const ScrapPartCard = ({
               billButtonClass,
               "bg-zinc-800/60 text-zinc-200 hover:bg-red-500/15 hover:text-red-300"
             )}>
-            <span>Sell {qty > 1 ? `all ${qty}` : "it"}</span>
+            <span>
+              {qty > 1 ? t("parts.sell_all", { count: qty }) : t("parts.sell_it")}
+            </span>
             <Price amount={all} />
           </button>
 
           {/* Trimming a stack is the common case: the bench wants some of it. */}
           {qty > 1 && (
             <button onClick={() => onSellClick(1)} disabled={isSelling} className={minorButtonClass}>
-              Sell one for {one} Fame
+              {t("parts.sell_one", { fame: one })}
             </button>
           )}
         </div>

@@ -46,6 +46,746 @@
     "kind": {
       "guitar": "Guitarra",
       "effect": "Pedal"
+    },
+    "part_name": "{{part}} · {{tier}}",
+    "mod": {
+      "coil-split": "Coil-split",
+      "hand-wound": "Pastillas bobinadas a mano",
+      "push-pull": "Potenciómetro push-pull",
+      "phase-switch": "Interruptor de fase",
+      "treble-bleed": "Treble bleed",
+      "cts-pots": "Potenciómetros CTS",
+      "pio-caps": "Condensadores paper-in-oil",
+      "active-preamp": "Preamp activo",
+      "copper-shielding": "Blindaje de cobre",
+      "bone-nut": "Cejuela de hueso",
+      "brass-trem-block": "Bloque de trémolo de latón",
+      "steel-saddles": "Selletas de acero",
+      "locking-tuners": "Clavijas autoblocantes",
+      "torrefied-wood": "Madera torrefactada",
+      "chambered-body": "Cuerpo con cámaras",
+      "plek": "Ajuste Plek",
+      "stainless-frets": "Trastes de acero inoxidable",
+      "rolled-edges": "Bordes redondeados",
+      "scalloped-frets": "Diapasón festoneado",
+      "compound-radius": "Radio compuesto",
+      "graphite-neck": "Mástil reforzado con grafito",
+      "satin-neck": "Mástil satinado",
+      "low-action": "Acción baja profesional",
+      "truss-wheel": "Rueda del alma",
+      "fret-level": "Nivelado y coronado de trastes",
+      "nos-opamp": "Op-amp NOS (JRC4558)",
+      "germanium-diodes": "Diodos de germanio",
+      "matched-transistors": "Transistores emparejados",
+      "asym-clipping": "Recorte asimétrico",
+      "led-clipping": "Recorte con LED",
+      "mosfet-clipping": "Recorte MOSFET",
+      "carbon-comp": "Resistencias de carbón",
+      "film-caps": "Condensadores de película",
+      "charge-pump-18v": "Raíl de 18 V",
+      "true-bypass": "True bypass",
+      "premium-buffer": "Buffer premium",
+      "shielding": "Blindaje de bajo ruido",
+      "star-grounding": "Masa en estrella",
+      "gold-jacks": "Jacks chapados en oro",
+      "filtered-power": "Alimentación filtrada",
+      "midi": "Control MIDI",
+      "tap-tempo": "Tap tempo",
+      "stereo-io": "E/S estéreo",
+      "presets": "Presets",
+      "expression-in": "Entrada de expresión",
+      "trim-pots": "Trimmers internos",
+      "dip-switches": "Interruptores DIP",
+      "relay-switch": "Conmutador de relé",
+      "kill-dry": "Kill-dry / colas"
+    },
+    "condition": {
+      "Museum": "Calidad de museo",
+      "Mint": "Impecable",
+      "Good": "Bueno",
+      "Worn": "Desgastado",
+      "Relic": "Relic"
     }
+  },
+  "common": {
+    "fame": "Fame",
+    "lvl": "Nv. {{level}}",
+    "sell": "Vender",
+    "selling": "Vendiendo…",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "sell_for": "Vender por {{fame}} Fame"
+  },
+  "view": {
+    "title": "Arsenal de guitarras",
+    "subtitle": "Abre cajas, monta tu rig y mantén tu equipo en forma",
+    "eyebrow": "Colecciona y equipa",
+    "free_cases_one": "Caja gratis",
+    "free_cases": "Cajas gratis",
+    "free_cases_hint": "Se ganan con logros épicos. Una abre cualquier caja de la estantería — Elite incluida — sin gastar Fame.",
+    "tabs": {
+      "cases": "Cajas",
+      "collection": "Colección",
+      "rig": "Rig",
+      "builder": "Constructor",
+      "workshop": "Taller",
+      "commissions": "Encargos",
+      "trader": "Comerciante",
+      "market": "Mercado",
+      "dex": "Dex"
+    }
+  },
+  "cases": {
+    "shelf_title": "Elige tu caja",
+    "shelf_subtitle": "Encuentra la próxima pieza de tu sonido.",
+    "open_free": "Abrir gratis",
+    "opening": "Abriendo...",
+    "open_case": "Abrir caja",
+    "view_drop_rates": "Ver probabilidades",
+    "drop_rates": "Probabilidades",
+    "featured_pool": "{{count}} objetos. Una nueva posibilidad.",
+    "refreshes_in": "Se renueva en",
+    "inside_drop": "Qué hay dentro",
+    "chance_from_case": "de probabilidad en esta caja",
+    "tier_word": {
+      "standard": "Estándar",
+      "premium": "Premium",
+      "elite": "Élite",
+      "supporter": "supporters"
+    },
+    "defs": {
+      "standard": {
+        "name": "Caja Estándar",
+        "title": "Caja {{tier}}",
+        "description": "Una caja clásica para todo aspirante a rockero."
+      },
+      "premium-guitar": {
+        "name": "Caja de guitarras Premium",
+        "title": "Caja de guitarras {{tier}}",
+        "description": "Más probabilidades de lo raro y codiciado."
+      },
+      "premium-effect": {
+        "name": "Caja de efectos Premium",
+        "title": "Caja de efectos {{tier}}",
+        "description": "Más probabilidades de lo raro y codiciado."
+      },
+      "daily": {
+        "name": "Caja destacada",
+        "description": "Un pool rotativo de 10 objetos."
+      },
+      "supporter": {
+        "name": "Caja de supporters",
+        "title": "Caja de {{tier}}",
+        "description": "Seis objetos elegidos por los supporters. Nueva selección cada quince días."
+      },
+      "elite-guitar": {
+        "name": "Caja de guitarras Élite",
+        "title": "Caja de guitarras {{tier}}",
+        "description": "Reservada para los jugadores más dedicados."
+      },
+      "elite-effect": {
+        "name": "Caja de efectos Élite",
+        "title": "Caja de efectos {{tier}}",
+        "description": "Reservada para los jugadores más dedicados."
+      }
+    }
+  },
+  "opening": {
+    "title": "Abriendo caja",
+    "part_of_slot": "{{slot}} · pieza",
+    "builder_part": "Pieza del Constructor de guitarras",
+    "first_pull": "Nuevo — primera vez",
+    "duplicate": "Duplicado — ya en el Dex",
+    "open_in_builder": "Abrir en el Constructor",
+    "keep": "Quedármelo",
+    "equip_now": "Equipar ahora",
+    "keep_in_arsenal": "Guardar en el Arsenal",
+    "add_to_collection": "Añadir a la colección",
+    "open_another": "Abrir otra: {{name}}",
+    "cost_needed": "Faltan {{cost}}"
+  },
+  "builder": {
+    "slots": {
+      "body": "Cuerpo",
+      "neck": "Mástil",
+      "head": "Pala",
+      "pickups": "Pastillas",
+      "finish": "Acabado",
+      "pickguard": "Golpeador",
+      "sticker": "Pegatinas"
+    },
+    "pickup_types": {
+      "S": "Single-coil",
+      "H": "Humbucker",
+      "P90": "P90"
+    }
+  },
+  "lock": {
+    "unlocks_at": "Se desbloquea en el nivel {{lvl}}",
+    "reason": "El equipo {{rarity}} entra en tu rig en el nivel {{lvl}}. Hasta entonces puedes guardarlo, venderlo y mejorarlo — solo que aún no tocarlo."
+  },
+  "collection": {
+    "scope": {
+      "all": "Todo",
+      "guitars": "Guitarras",
+      "pedals": "Pedales"
+    },
+    "search": "Buscar en tu colección",
+    "sort_by": "Ordenar por",
+    "sort_prefix": "Orden:",
+    "sort": {
+      "manual": "Manual",
+      "equipped": "Equipado",
+      "rarity": "Rareza",
+      "level": "Nivel",
+      "newest": "Más nuevo",
+      "type": "Tipo"
+    },
+    "sort_hint": {
+      "manual": "Tu propia disposición — arrastra las piezas a donde quieras",
+      "equipped": "Primero lo que tocas: guitarra del perfil, ranuras del rig y pedalera",
+      "rarity": "Lo más raro primero, las copias juntas",
+      "level": "Nivel más alto primero",
+      "newest": "Los drops más recientes primero",
+      "type": "Primero guitarras, luego pedales, luego mods y piezas"
+    },
+    "view": {
+      "stash": "Almacén",
+      "cards": "Tarjetas"
+    },
+    "view_title": {
+      "stash": "Vista de almacén",
+      "cards": "Vista de tarjetas"
+    },
+    "no_match": "Nada coincide con «{{query}}».",
+    "nothing_yet": "Aún no hay nada aquí.",
+    "empty": "Tu colección está vacía. ¡Abre una caja para empezar!",
+    "guitars_eyebrow": "Instrumentos",
+    "guitars_collected": "guitarras coleccionadas",
+    "pedals_eyebrow": "Efectos",
+    "pedals_collected": "pedales coleccionados",
+    "clear_dupes": "Eliminar duplicados ({{count}})"
+  },
+  "salvage": {
+    "title": "Rescate",
+    "salvaged_mod": "Mod rescatado",
+    "salvaged_mod_caps": "MOD RESCATADO",
+    "fit_title": "¿Instalar {{name}}?",
+    "fit_body": "En {{target}}, con el valor con el que se rescató. No se vuelve a tirar nada.",
+    "off_source": "de {{source}}",
+    "fit_note": "No cuesta nada — ya lo pagaste con {{source}}. Quitarlo otra vez significa desguazar lo que lo lleve.",
+    "installing": "Instalando...",
+    "install": "Instalar",
+    "mod_listing_body": {
+      "guitar": "Encaja en cualquier guitarra con una ranura de mod libre y entra con +{{points}} sin volver a tirar. El taller no puede fabricarlo — un mod solo cambia de manos.",
+      "effect": "Encaja en cualquier pedal con una ranura de mod libre y entra con +{{points}} sin volver a tirar. El taller no puede fabricarlo — un mod solo cambia de manos."
+    },
+    "mod_owned_body": {
+      "guitar": "Arrástralo a cualquier guitarra que se ilumine y se instala con el valor que lleva: sin pagar nada y sin volver a tirar. También te espera en el banco del taller.",
+      "effect": "Arrástralo a cualquier pedal que se ilumine y se instala con el valor que lleva: sin pagar nada y sin volver a tirar. También te espera en el banco del taller."
+    }
+  },
+  "sell": {
+    "title": {
+      "Guitar": "¿Vender la guitarra?",
+      "Effect": "¿Vender el efecto?",
+      "Mod": "¿Vender el mod?",
+      "Parts": "¿Vender las piezas?",
+      "Part": "¿Vender la pieza?"
+    },
+    "you_receive": "Recibirás",
+    "fame_points": "Fame"
+  },
+  "market": {
+    "listing": "Publicando…",
+    "sell_on_market": "Vender en el mercado",
+    "list_title": {
+      "Guitar": "Publicar guitarra en el mercado",
+      "Effect": "Publicar efecto en el mercado",
+      "Mod": "Publicar mod en el mercado",
+      "Part": "Publicar pieza en el mercado"
+    },
+    "your_price": "Tu precio",
+    "minimum": "Mínimo: {{price}} Fame (el valor normal de venta)",
+    "mod_price_hint": "El mínimo es solo lo que paga el desguace. Nadie puede fabricar un mod, así que ponle precio según lo que cobra el Comerciante.",
+    "listing_fee": "Tarifa de publicación",
+    "fee_short": "No tienes Fame suficiente para la tarifa de publicación de {{fee}}.",
+    "list_item": "Publicar"
+  },
+  "parts": {
+    "tier_part": "Pieza {{tier}}",
+    "card_body": "Se gastan en el banco del taller — montajes, reparaciones y mods se pagan en piezas. Vende solo lo que el banco nunca pedirá.",
+    "rework": "Mejorar",
+    "rework_cost": "{{count}} piezas ({{tier}}) + {{fame}} Fame",
+    "you_have": "Tienes {{qty}} de {{needed}}",
+    "rework_times": "Mejorar ×{{count}}",
+    "rework_one": "Mejorar una",
+    "uses_of": "Usa {{used}} de tus {{qty}}",
+    "rework_just_one": "Mejorar solo una por {{fame}} Fame",
+    "not_enough_fame": "No tienes Fame suficiente — cuesta {{fame}}",
+    "sell_all": "Vender las {{count}}",
+    "sell_it": "Venderla",
+    "sell_one": "Vender una por {{fame}} Fame",
+    "salvaged_parts": "Piezas rescatadas",
+    "wallet_empty": "Desguaza una guitarra o un pedal de tu colección para rescatar tus primeras piezas."
+  },
+  "stash": {
+    "part": "Pieza",
+    "component_name": "{{name}} · Nv. {{level}}",
+    "reason_unequip_profile": "Primero quítala de tu perfil",
+    "reason_remove_rig": "Primero sácala de la ranura {{slot}} del rig",
+    "reason_off_board": "Primero quítalo de la pedalera",
+    "menu": {
+      "details": "Detalles",
+      "equip": "Equipar…",
+      "unequip_profile": "Quitar del perfil",
+      "take_out_rig": "Sacar de la ranura {{slot}} del rig",
+      "remove_from_board": "Quitar de la pedalera",
+      "market": "Mercado",
+      "guild_stash": "Almacén del gremio",
+      "scrap": "Desguazar",
+      "sell_for": "Vender · {{fame}}",
+      "sell_all": "Vender todas ×{{qty}}"
+    },
+    "eyebrow": "Arsenal",
+    "title": "Almacén",
+    "items_collected": "objetos coleccionados",
+    "tidy_hint": "Reordena todo el almacén de una vez — después sigue siendo tu disposición",
+    "tidy_up": "Ordenar",
+    "arrange": {
+      "equipped": "Lo que toco primero",
+      "type": "Guitarras, luego pedales",
+      "rarity": "Lo más raro primero",
+      "level": "Nivel más alto primero",
+      "newest": "Lo más nuevo primero"
+    },
+    "dupes_guitars_hint": "Vende o desguaza cada guitarra duplicada de menor nivel y quédate con la mejor copia",
+    "dupes_guitars": "Guitarras duplicadas ({{count}})",
+    "dupes_pedals_hint": "Vende o desguaza cada pedal duplicado de menor nivel y quédate con la mejor copia",
+    "dupes_pedals": "Pedales duplicados ({{count}})",
+    "board_label": "Almacén del Arsenal",
+    "pedals_protected": "Los pedales de tu pedalera nunca se tocan."
+  },
+  "card": {
+    "new": "Nuevo",
+    "locked": "Bloqueado",
+    "equip": "Equipar",
+    "guild": "Gremio",
+    "list_on_market": "Publicar en el mercado",
+    "sell_for_fame": "Vender por Fame",
+    "guild_hint": "Déjalo en el almacén de tu gremio, por honor",
+    "needs_level": "requiere nivel {{lvl}}",
+    "scraps_into_one": "Al desguazar da {{count}} pieza",
+    "scraps_into": "Al desguazar da {{count}} piezas",
+    "mod_comes_off": "{{name}} +{{points}} sale entero",
+    "mods_go_with_it_one": "{{names}} se pierde con él",
+    "mods_go_with_it": "{{names}} se pierden con él",
+    "guitar": {
+      "level": "Nivel de la guitarra",
+      "equipped": "equipada",
+      "rig_slot": "ranura {{slot}} del rig",
+      "market_unequip": "Quítala de tu perfil antes de publicarla en el mercado",
+      "market_unrig": "Sácala de la ranura {{slot}} del rig antes de publicarla en el mercado",
+      "sell_unequip": "Quítala de tu perfil antes de venderla",
+      "guild_unequip": "Quítala de tu perfil antes de dársela al gremio",
+      "guild_unrig": "Sácala de la ranura {{slot}} del rig antes de dársela al gremio",
+      "scrap_unequip": "Quítala de tu perfil antes de desguazarla",
+      "scrap_unrig": "Sácala de la ranura {{slot}} del rig antes de desguazarla"
+    },
+    "effect": {
+      "level": "Nivel del efecto",
+      "on_board": "en la pedalera",
+      "remove_hint": "Quitar este pedal de la pedalera",
+      "market_unboard": "Quítalo de la pedalera antes de publicarlo",
+      "guild_unboard": "Quítalo de la pedalera antes de dárselo al gremio",
+      "scrap_unboard": "Quítalo de la pedalera antes de desguazarlo",
+      "sell_unboard": "No se puede vender un efecto que está en la pedalera"
+    }
+  },
+  "bulk": {
+    "title": "¿Eliminar duplicados?",
+    "body_one": "Esto se lleva {{n}} duplicado de menor nivel y conserva la mejor copia de cada uno.",
+    "body": "Esto se lleva {{n}} duplicados de menor nivel y conserva la mejor copia de cada uno.",
+    "protected_guitars": "Las guitarras equipadas y las del rig nunca se tocan.",
+    "no_undo": "No se puede deshacer.",
+    "paid_into_fame": "Se paga directamente en Fame",
+    "scrapping": "Desguazando...",
+    "scrap_all": "Desguazar las {{count}}",
+    "mods_pulled_one": "{{count}} mod extraído y guardado",
+    "mods_pulled": "{{count}} mods extraídos y guardados"
+  },
+  "equip": {
+    "profile": "Perfil",
+    "rig_slot": "Ranura {{slot}} del rig",
+    "where": "¿Dónde la pones?",
+    "already_here": "Ya está aquí",
+    "gets_replaced": "Se reemplaza",
+    "empty": "Vacío",
+    "take_out_of": "Sacar de {{target}}"
+  },
+  "traits": {
+    "workhorse": {
+      "label": "Mula de carga",
+      "description": "Fame/h en cualquier práctica, toques lo que toques."
+    },
+    "long-take": {
+      "label": "Toma larga",
+      "description": "Fame/h en cualquier práctica, toques lo que toques."
+    },
+    "reliable": {
+      "label": "Fiable",
+      "description": "Fame/h en cualquier práctica. Sin condiciones ni sorpresas."
+    },
+    "shred-machine": {
+      "label": "Máquina de shred",
+      "description": "Fame/h en la práctica de técnica."
+    },
+    "jazz-box": {
+      "label": "Caja de jazz",
+      "description": "Fame/h en la práctica de teoría. Hecha para acordes, no para velocidad."
+    },
+    "songbook": {
+      "label": "Cancionero",
+      "description": "Fame/h en la práctica de creatividad."
+    },
+    "intonation-monster": {
+      "label": "Monstruo de la afinación",
+      "description": "Fame/h en el entrenamiento auditivo. Mantiene la afinación hasta lo más alto del mástil."
+    },
+    "ear-trainer": {
+      "label": "Entrenador de oído",
+      "description": "Fame/h en el entrenamiento auditivo. Fija una repetición y persíguela."
+    },
+    "timing-trainer": {
+      "label": "Entrenador de tiempo",
+      "description": "Fame/h en la práctica de técnica. Cuadra las repeticiones con tu tempo."
+    },
+    "frequency-work": {
+      "label": "Trabajo de frecuencias",
+      "description": "Fame/h en el entrenamiento auditivo. Aprende dónde están las bandas."
+    },
+    "harmony-bench": {
+      "label": "Banco de armonía",
+      "description": "Fame/h en la práctica de teoría."
+    },
+    "texture-lab": {
+      "label": "Laboratorio de texturas",
+      "description": "Fame/h en la práctica de creatividad."
+    },
+    "noise-session": {
+      "label": "Sesión de ruido",
+      "description": "Fame/h en la práctica de creatividad."
+    },
+    "pitch-reference": {
+      "label": "Referencia de afinación",
+      "description": "Fame/h en el entrenamiento auditivo."
+    },
+    "picking-bench": {
+      "label": "Banco de púa",
+      "description": "Fame/h mientras la sesión entrena púa alterna."
+    },
+    "legato-neck": {
+      "label": "Mástil de legato",
+      "description": "Fame/h mientras la sesión entrena legato."
+    },
+    "bender": {
+      "label": "Bender",
+      "description": "Fame/h mientras la sesión entrena bending."
+    },
+    "vibrato-arm": {
+      "label": "Brazo de vibrato",
+      "description": "Fame/h mientras la sesión entrena vibrato."
+    },
+    "chord-shop": {
+      "label": "Tienda de acordes",
+      "description": "Fame/h mientras la sesión entrena acordes."
+    },
+    "scale-runner": {
+      "label": "Corredor de escalas",
+      "description": "Fame/h mientras la sesión entrena escalas."
+    },
+    "metronome": {
+      "label": "Metrónomo",
+      "description": "Fame/h mientras la sesión entrena ritmo."
+    },
+    "phrase-repeat": {
+      "label": "Eco de frase",
+      "description": "Fame/h mientras la sesión entrena fraseo. Un delay te devuelve tu propia frase."
+    },
+    "harmony-ear": {
+      "label": "Oído armónico",
+      "description": "Fame/h mientras la sesión entrena armonía de oído."
+    },
+    "interval-trainer": {
+      "label": "Entrenador de intervalos",
+      "description": "Fame/h mientras la sesión entrena el oído."
+    },
+    "improv-pedal": {
+      "label": "Pedal de improvisación",
+      "description": "Fame/h mientras la sesión entrena improvisación."
+    },
+    "phrase-machine": {
+      "label": "Máquina de frases",
+      "description": "Fame/h mientras la sesión entrena fraseo."
+    },
+    "improv-room": {
+      "label": "Sala de improvisación",
+      "description": "Fame/h mientras la sesión entrena improvisación."
+    },
+    "theory-board": {
+      "label": "Pizarra de teoría",
+      "description": "Fame/h mientras la sesión entrena teoría musical."
+    },
+    "brand-endorsement": {
+      "label": "Endorsement de {{brand}}",
+      "description": "Fame/h por cada objeto {{brand}} en uso. Cuentan hasta tres."
+    },
+    "pedal-platform": {
+      "label": "Plataforma de pedales",
+      "description": "Fame/h por cada pedal de tu pedalera. Cuentan hasta seis. No pelea con lo que le pongas delante."
+    },
+    "backline": {
+      "label": "Backline",
+      "description": "Fame/h por cada otra guitarra en tus ranuras."
+    },
+    "vintage-row": {
+      "label": "Fila vintage",
+      "description": "Fame/h por cada objeto en uso fabricado antes de 1985. Cuentan hasta cuatro."
+    },
+    "boutique-row": {
+      "label": "Fila boutique",
+      "description": "Fame/h por cada pedal épico o mejor de tu pedalera. Cuentan hasta cuatro."
+    },
+    "bench-boss": {
+      "label": "Jefe del taller",
+      "description": "Fame/h por cada nivel de construcción de los demás objetos de tu rig. Cuentan hasta veinte."
+    },
+    "well-equipped": {
+      "label": "Bien equipado",
+      "description": "Fame/h por cada otro rasgo de tu rig. Cuentan hasta ocho."
+    },
+    "wants-dirt": {
+      "label": "Pide suciedad",
+      "description": "Fame/h mientras haya un Overdrive, Distortion o Fuzz en tu pedalera. Las humbuckers pasivas necesitan algo que las empuje."
+    },
+    "clean-machine": {
+      "label": "Máquina limpia",
+      "description": "Fame/h mientras tu pedalera no lleve ningún pedal de saturación. Se oye todo lo que hacen tus manos."
+    },
+    "solo-act": {
+      "label": "Acto en solitario",
+      "description": "Fame/h mientras esta sea la única guitarra que tienes equipada."
+    },
+    "straight-to-amp": {
+      "label": "Directo al ampli",
+      "description": "Fame/h mientras tu pedalera esté completamente vacía."
+    },
+    "cable-and-amp": {
+      "label": "Cable y ampli",
+      "description": "Fame/h mientras tu pedalera esté completamente vacía. Nada entre las cuerdas y el altavoz."
+    },
+    "nothing-but-the-guitar": {
+      "label": "Solo la guitarra",
+      "description": "Fame/h mientras tu pedalera esté completamente vacía. No necesita ayuda y nunca la necesitó."
+    },
+    "matched-set": {
+      "label": "Juego a juego",
+      "description": "Fame/h mientras haya en uso otro objeto de la misma marca."
+    },
+    "ambient-pair": {
+      "label": "Pareja ambiental",
+      "description": "Fame/h mientras un delay y una reverb estén ambos en la pedalera. Por separado hacen la mitad del trabajo."
+    },
+    "gain-stack": {
+      "label": "Pila de ganancia",
+      "description": "Fame/h mientras un segundo pedal de saturación comparta la pedalera. Apilar saturaciones es un método, no un accidente."
+    },
+    "front-of-chain": {
+      "label": "Inicio de la cadena",
+      "description": "Fame/h mientras este pedal esté antes de cualquier saturación de la pedalera. El fuzz y la compresión quieren la pastilla en crudo."
+    },
+    "tail-of-chain": {
+      "label": "Final de la cadena",
+      "description": "Fame/h mientras este pedal esté después de cualquier saturación de la pedalera. Los efectos de tiempo van al final o todo se embarra."
+    },
+    "purist": {
+      "label": "Purista",
+      "description": "Fame/h mientras tu pedalera tenga dos pedales o menos."
+    },
+    "full-board": {
+      "label": "Pedalera llena",
+      "description": "Fame/h mientras tu pedalera tenga seis pedales o más."
+    },
+    "metal-rig": {
+      "label": "Rig metalero",
+      "description": "Fame/h cuando hay dos o más pedales de saturación en la pedalera y la sesión tiene al menos 45 minutos de técnica."
+    },
+    "ambient-study": {
+      "label": "Estudio ambiental",
+      "description": "Fame/h cuando hay una reverb en la pedalera y la sesión tiene al menos 30 minutos de entrenamiento auditivo."
+    },
+    "writing-room": {
+      "label": "Sala de composición",
+      "description": "Fame/h cuando tu pedalera tiene dos pedales o menos y la sesión tiene al menos 45 minutos de creatividad."
+    },
+    "practice-room": {
+      "label": "Local de ensayo",
+      "description": "Fame/h cuando esta es tu única guitarra equipada y la sesión dura 60 minutos o más."
+    },
+    "theory-desk": {
+      "label": "Escritorio de teoría",
+      "description": "Fame/h cuando hay un afinador en la pedalera y la sesión tiene al menos 30 minutos de teoría."
+    },
+    "session-rig": {
+      "label": "Rig de sesión",
+      "description": "Fame/h cuando las tres ranuras de guitarra están ocupadas y la sesión tiene al menos 15 minutos en tres categorías distintas."
+    },
+    "fuzz-workout": {
+      "label": "Entrenamiento con fuzz",
+      "description": "Fame/h cuando este pedal va antes de cualquier otra saturación y la sesión tiene al menos 45 minutos de técnica."
+    },
+    "modulation-study": {
+      "label": "Estudio de modulación",
+      "description": "Fame/h cuando hay un delay en la pedalera y la sesión entrena fraseo."
+    },
+    "vintage-session": {
+      "label": "Sesión vintage",
+      "description": "Fame/h cuando tres objetos en uso se fabricaron antes de 1985 y la sesión dura 45 minutos o más."
+    },
+    "stack-study": {
+      "label": "Estudio de apilado",
+      "description": "Fame/h cuando un segundo pedal de saturación comparte la pedalera y la sesión entrena púa alterna."
+    },
+    "tone-lab": {
+      "label": "Laboratorio de tono",
+      "description": "Fame/h cuando hay cuatro o más pedales en la pedalera y la sesión tiene al menos 30 minutos de creatividad."
+    },
+    "quiet-room": {
+      "label": "Sala silenciosa",
+      "description": "Fame/h cuando tu pedalera está vacía y la sesión tiene al menos 45 minutos de entrenamiento auditivo."
+    },
+    "monk": {
+      "label": "Monje",
+      "description": "Fame/h cuando tu pedalera está vacía, esta es tu única guitarra equipada y la sesión es de una sola categoría."
+    },
+    "virtuoso": {
+      "label": "Virtuoso",
+      "description": "Fame/h cuando la sesión entrena púa alterna, legato y sweep picking, y tiene al menos 60 minutos de técnica."
+    },
+    "conservatory": {
+      "label": "Conservatorio",
+      "description": "Fame/h cuando la sesión entrena teoría musical, armonía y acordes, y dura 60 minutos o más."
+    },
+    "total-recall": {
+      "label": "Desafío total",
+      "description": "Fame/h cuando la sesión entrena el oído y la armonía de oído, y hay una reverb y un afinador en la pedalera."
+    },
+    "brand-artist": {
+      "label": "Artista {{brand}}",
+      "description": "Fame/h cuando todas las guitarras de tus ranuras son {{brand}} y la sesión dura 45 minutos o más."
+    },
+    "wall-of-sound": {
+      "label": "Muro de sonido",
+      "description": "Fame/h cuando hay seis o más pedales en la pedalera, tres de ellos épicos o mejores, y la sesión dura 60 minutos o más."
+    },
+    "time-capsule": {
+      "label": "Cápsula del tiempo",
+      "description": "Fame/h cuando todos los objetos en uso se fabricaron antes de 1985 y la sesión dura 45 minutos o más."
+    },
+    "one-man-band": {
+      "label": "Hombre orquesta",
+      "description": "Fame/h cuando la sesión tiene al menos 15 minutos en las cuatro categorías y tu pedalera tiene cuatro pedales o más."
+    },
+    "arranger": {
+      "label": "Arreglista",
+      "description": "Fame/h cuando la sesión entrena improvisación, fraseo y armonía, y dura 60 minutos o más."
+    },
+    "signal-booster": {
+      "label": "Potenciador de señal",
+      "description": "Cada otro pedal de tu pedalera paga esta cantidad más de Fame/h en cada uno de sus rasgos."
+    },
+    "master-class": {
+      "label": "Clase magistral",
+      "description": "Cada rasgo de oído y teoría de tu rig paga esta cantidad más de Fame/h."
+    },
+    "drive-trainer": {
+      "label": "Entrenador de técnica",
+      "description": "Cada rasgo de técnica de tu rig paga esta cantidad más de Fame/h."
+    },
+    "skill-coach": {
+      "label": "Entrenador de habilidades",
+      "description": "Cada rasgo basado en habilidades de tu rig paga esta cantidad más de Fame/h."
+    },
+    "patchbay": {
+      "label": "Patchbay",
+      "description": "Cada pedal más adelante en la cadena que este paga esta cantidad más de Fame/h en cada uno de sus rasgos."
+    },
+    "house-band": {
+      "label": "Banda de la casa",
+      "description": "Cada rasgo de los objetos de la misma marca que esta guitarra paga esta cantidad más de Fame/h."
+    },
+    "session-leader": {
+      "label": "Líder de sesión",
+      "description": "Tu rasgo mejor pagado paga esta cantidad más de Fame/h."
+    },
+    "temperamental": {
+      "label": "Temperamental",
+      "description": "Fame/h, pero no paga nada si la sesión dura menos de 30 minutos."
+    },
+    "diva": {
+      "label": "Diva",
+      "description": "Fame/h, pero cada rasgo de tus otros objetos equipados paga 9,0 Fame/h menos."
+    },
+    "prima-donna": {
+      "label": "Prima donna",
+      "description": "Fame/h, pero ningún otro rasgo de tu rig paga nada."
+    }
+  },
+  "condition": {
+    "label": "Estado",
+    "title": "Estado: {{grade}}",
+    "title_restored": "Estado: {{grade}} — restaurado en el taller",
+    "restored": "Restaurado"
+  },
+  "traits_ui": {
+    "more": "+{{count}} más"
+  },
+  "in_service": {
+    "pedalboard": "pedalera"
+  },
+  "dex_marks": {
+    "owned": "En tu poder",
+    "in_dex": "En el Dex",
+    "new": "Nuevo para tu colección"
+  },
+  "buy": {
+    "buy": "Comprar",
+    "buying": "Comprando…",
+    "not_enough_fame": "Fame insuficiente",
+    "not_enough_fame_points": "Fame insuficiente"
+  },
+  "part_row": {
+    "title": "{{name}} — tienes {{have}}, hacen falta {{need}}",
+    "required": "necesarias",
+    "owned": "en tu poder",
+    "after_left": "Tras {{job}}: quedan {{left}}",
+    "short": "Faltan {{count}}",
+    "you_have": "tienes {{have}}",
+    "you_have_short": "tienes {{have}} — faltan {{short}}"
+  },
+  "scrap": {
+    "title": {
+      "Guitar": "¿Desguazar la guitarra?",
+      "Effect": "¿Desguazar el efecto?"
+    },
+    "body": {
+      "Guitar": "{{name}} — es permanente, la guitarra desaparece para siempre.",
+      "Effect": "{{name}} — es permanente, el efecto desaparece para siempre."
+    },
+    "will_salvage_one": "Rescatarás {{count}} pieza",
+    "will_salvage": "Rescatarás {{count}} piezas",
+    "blueprint": "Plano",
+    "mods_go_one": "Este mod se pierde con él",
+    "mods_go": "Estos {{count}} mods se pierden con él"
   }
 }

@@ -8,6 +8,7 @@ import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDef
 import { getEffectValue } from "feature/arsenal/data/effectStats";
 import { DROPPABLE_GUITARS_BY_RARITY, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemValue } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
@@ -29,6 +30,7 @@ import { RARITY_STYLES } from "../RarityBadge";
 
 /** The reveal for a Guitar Builder part: the part, its slot and level. */
 const ComponentRevealCard = ({ def, level }: { def: ComponentDef; level: number }) => {
+  const labels = useArsenalLabels();
   const color = RARITY_STYLES[def.rarity].baseColor;
   return (
     <div className="flex flex-col items-center gap-4 rounded-lg bg-zinc-900/80 px-6 py-8">
@@ -36,7 +38,9 @@ const ComponentRevealCard = ({ def, level }: { def: ComponentDef; level: number 
       <div className="text-center">
         <p className="font-display text-xl font-semibold text-zinc-50">{def.name}</p>
         <p className="mt-1 text-sm text-zinc-400">
-          {SLOT_LABELS[def.slot]} · <span style={{ color }}>{def.rarity}</span> · Lvl {level}
+          {labels.t(`builder.slots.${def.slot}`, SLOT_LABELS[def.slot])} ·{" "}
+          <span style={{ color }}>{labels.rarity(def.rarity)}</span> ·{" "}
+          {labels.t("common.lvl", { level })}
         </p>
       </div>
     </div>
@@ -149,6 +153,8 @@ export const CaseOpeningModal = ({
 }: CaseOpeningModalProps) => {
   const [phase, setPhase] = useState<"idle" | "spinning" | "reveal" | "done">("idle");
   const [mounted, setMounted] = useState(false);
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
   const { mutate: sellGuitar, isPending: isSellingGuitar } = useSellGuitar();
   const { mutate: sellEffect, isPending: isSellingEffect } = useSellEffect();
@@ -264,7 +270,7 @@ export const CaseOpeningModal = ({
               animate={{ opacity: 1, y: 0 }}
               className="text-2xl font-black capitalize tracking-[0.3em] text-zinc-300 drop-shadow-lg"
             >
-              {caseDef?.name ?? "Opening Case"}
+              {caseDef ? labels.caseName(caseDef) : t("opening.title")}
             </motion.h2>
 
             {/* Roulette */}
@@ -339,8 +345,10 @@ export const CaseOpeningModal = ({
                           {item.kind === "guitar"
                             ? item.def.brand
                             : item.kind === "effect"
-                              ? item.def.type
-                              : `${SLOT_LABELS[item.def.slot]} · part`}
+                              ? labels.effectType(item.def.type)
+                              : t("opening.part_of_slot", {
+                                  slot: t(`builder.slots.${item.def.slot}`, SLOT_LABELS[item.def.slot]),
+                                })}
                         </span>
                         <span className="text-[11px] font-bold capitalize tracking-wide text-center leading-tight truncate w-full" style={{ color: rs.baseColor }}>
                           {item.def.name}
@@ -372,7 +380,7 @@ export const CaseOpeningModal = ({
                       textShadow: `0 0 32px ${rarityStyles.baseColor}88`,
                     }}
                   >
-                    {revealRarity}
+                    {revealRarity && labels.rarity(revealRarity)}
                   </motion.p>
 
                   <motion.p
@@ -385,10 +393,10 @@ export const CaseOpeningModal = ({
                     )}
                   >
                     {component
-                      ? "Guitar Builder part"
+                      ? t("opening.builder_part")
                       : result?.isNewToDex
-                        ? "New — First Pull"
-                        : "Duplicate — Already in Dex"}
+                        ? t("opening.first_pull")
+                        : t("opening.duplicate")}
                   </motion.p>
 
                   <div className="relative flex items-center justify-center">
@@ -471,7 +479,7 @@ export const CaseOpeningModal = ({
                       disabled={isBusy}
                       className="h-12 w-full bg-white text-sm font-medium tracking-widest text-zinc-900 hover:bg-zinc-200 disabled:opacity-50"
                     >
-                      Open in Builder
+                      {t("opening.open_in_builder")}
                     </Button>
                     <Button
                       variant="outline"
@@ -479,7 +487,7 @@ export const CaseOpeningModal = ({
                       disabled={isBusy}
                       className="h-12 w-full border-zinc-700 bg-zinc-900 text-sm font-medium tracking-widest text-white hover:bg-zinc-800 disabled:opacity-50"
                     >
-                      Keep
+                      {t("opening.keep")}
                     </Button>
                   </div>
                   ) : (
@@ -490,7 +498,7 @@ export const CaseOpeningModal = ({
                       disabled={isBusy}
                       className="w-full bg-white hover:bg-zinc-200 text-zinc-900 font-medium capitalize tracking-widest h-12 text-sm disabled:opacity-50"
                     >
-                      Equip Now
+                      {t("opening.equip_now")}
                     </Button>
                   )}
                   <Button
@@ -499,7 +507,7 @@ export const CaseOpeningModal = ({
                     disabled={isBusy}
                     className="w-full border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-white font-medium capitalize tracking-widest h-12 text-sm disabled:opacity-50"
                   >
-                    {winDef.kind === "guitar" ? "Keep in Arsenal" : "Add to Collection"}
+                    {winDef.kind === "guitar" ? t("opening.keep_in_arsenal") : t("opening.add_to_collection")}
                   </Button>
                   <Button
                     variant="outline"
@@ -508,10 +516,10 @@ export const CaseOpeningModal = ({
                     className="w-full border-amber-600/40 bg-amber-950/30 hover:bg-amber-900/40 text-amber-300 font-medium capitalize tracking-widest h-12 text-sm disabled:opacity-50"
                   >
                     {isSelling ? (
-                      "Selling…"
+                      t("common.selling")
                     ) : (
                       <span className="flex items-center gap-3">
-                        <span>Sell</span>
+                        <span>{t("common.sell")}</span>
                         <span className="flex items-center gap-1.5 text-amber-400">
                           <img src="/images/coin.png" alt="" className="h-5 w-5 object-contain" />
                           {sellValue}
@@ -530,21 +538,21 @@ export const CaseOpeningModal = ({
                       className="h-12 w-full border-zinc-700 bg-zinc-900 text-sm font-medium tracking-widest text-white hover:bg-zinc-800 disabled:opacity-50"
                     >
                       {isOpeningAgain ? (
-                        "Opening…"
+                        t("cases.opening")
                       ) : (
                         <span className="flex items-center gap-3">
-                          <span>Open another {caseDef.name}</span>
+                          <span>{t("opening.open_another", { name: labels.caseName(caseDef) })}</span>
                           {openAgainPayment?.kind === "fame" ? (
                             <span className="flex items-center gap-1.5 text-amber-400">
                               <img src="/images/coin.png" alt="" className="h-5 w-5 object-contain" />
                               {openAgainPayment.cost}
                             </span>
                           ) : openAgainPayment?.kind === "token" ? (
-                            <span className="text-emerald-400">Free case</span>
+                            <span className="text-emerald-400">{t("view.free_cases", { count: 1 })}</span>
                           ) : (
                             <span className="flex items-center gap-1.5 text-zinc-500">
                               <img src="/images/coin.png" alt="" className="h-5 w-5 object-contain opacity-50" />
-                              {caseDef.fameCost} needed
+                              {t("opening.cost_needed", { cost: caseDef.fameCost })}
                             </span>
                           )}
                         </span>

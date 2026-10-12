@@ -1,6 +1,12 @@
+import type { ConditionGrade } from "feature/arsenal/data/itemStats";
 import { getPartLabel } from "feature/arsenal/data/partDefinitions";
-import type { PartId } from "feature/arsenal/types/arsenal.types";
+import type { ResolvedTrait } from "feature/arsenal/data/traits";
+import type {
+  CaseDefinition,
+  PartId,
+} from "feature/arsenal/types/arsenal.types";
 import { useTranslation } from "hooks/useTranslation";
+import { translateOr } from "lib/i18n/translate";
 import { useMemo } from "react";
 
 /**
@@ -23,7 +29,33 @@ export const useArsenalLabels = () => {
       part: (partId: PartId) =>
         t(`labels.part.${partId}`, getPartLabel(partId)),
       partTier: (tier: string) => t(`labels.part_tier.${tier}`, tier),
+      /** "Legendary Neck" — the order is the language's, not English's. */
+      partName: (tier: string, partId: PartId) =>
+        t("labels.part_name", {
+          tier: t(`labels.part_tier.${tier}`, tier),
+          part: t(`labels.part.${partId}`, getPartLabel(partId)),
+        }),
       kind: (kind: "guitar" | "effect") => t(`labels.kind.${kind}`),
+      /** A workshop mod by id; `english` is the label its definition carries. */
+      mod: (featureId: string, english: string) =>
+        t(`labels.mod.${featureId}`, english),
+      /** "Mint", "Museum Grade"… keyed by the grade, not its English label. */
+      condition: (grade: Pick<ConditionGrade, "key" | "label">) =>
+        t(`labels.condition.${grade.key}`, grade.label),
+      /** A trait's card title, with any rolled `{brand}` filled back in. */
+      traitLabel: (trait: ResolvedTrait) =>
+        translateOr(t, `traits.${trait.def.id}.label`, trait.label, trait.params),
+      traitDescription: (trait: ResolvedTrait) =>
+        translateOr(
+          t,
+          `traits.${trait.def.id}.description`,
+          trait.description,
+          trait.params,
+        ),
+      caseName: (def: Pick<CaseDefinition, "id" | "name">) =>
+        t(`cases.defs.${def.id}.name`, def.name),
+      caseDescription: (def: Pick<CaseDefinition, "id" | "description">) =>
+        t(`cases.defs.${def.id}.description`, def.description),
     }),
     [t],
   );

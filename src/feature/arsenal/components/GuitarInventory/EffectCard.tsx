@@ -19,6 +19,7 @@ import {
   getScrappedMods,
 } from "feature/arsenal/data/salvage";
 import { getItemTraits } from "feature/arsenal/data/traits";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import {
   countScrapParts,
@@ -104,6 +105,8 @@ export const EffectCard = ({
   const traitStates = useItemTraitStates(item.id, traits);
   // Read here, above the guard, for the same reason the trait hooks are.
   const playerLvl = usePlayerLvl();
+  const labels = useArsenalLabels();
+  const { t } = labels;
 
   const effect = EFFECTS_BY_ID.get(item.effectId);
   if (!effect) return null;
@@ -192,7 +195,7 @@ export const EffectCard = ({
           <p
             className='mt-0.5 text-[9px] font-medium capitalize tracking-[0.15em]'
             style={{ color: rs.baseColor, opacity: 0.7 }}>
-            {rarity} · {effect.type}
+            {labels.rarity(rarity)} · {labels.effectType(effect.type)}
           </p>
           {effect.description && (
             <p className='mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-400'>
@@ -244,13 +247,13 @@ export const EffectCard = ({
         {/* Level emblem + New flag */}
         <div className='absolute left-2 top-2 z-20 flex flex-col items-start gap-1.5'>
           {level > 0 && (
-            <LevelEmblem level={level} rarity={rarity} title='Effect level' />
+            <LevelEmblem level={level} rarity={rarity} title={t("card.effect.level")} />
           )}
           {item.isNew && (
             <div
               className='px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black'
               style={{ backgroundColor: rs.baseColor, borderRadius: 3 }}>
-              New
+              {t("card.new")}
             </div>
           )}
         </div>
@@ -311,7 +314,7 @@ export const EffectCard = ({
             <span
               className='text-[8px] font-medium tracking-wide'
               style={{ color: `${rs.baseColor}B3` }}>
-              on board
+              {t("card.effect.on_board")}
             </span>
           </div>
         )}
@@ -340,8 +343,8 @@ export const EffectCard = ({
             icon={Unplug}
             onClick={() => onRemoveFromBoard(item.id)}
             disabled={isRemovingFromBoard}
-            title='Take this pedal off the pedalboard'>
-            Remove from board
+            title={t("card.effect.remove_hint")}>
+            {t("stash.menu.remove_from_board")}
           </CardAction>
         </CardActionRow>
       )}
@@ -357,10 +360,10 @@ export const EffectCard = ({
               disabled={isListing || isOnPedalboard}
               title={
                 isOnPedalboard
-                  ? "Remove from pedalboard before listing"
-                  : "List on the market"
+                  ? t("card.effect.market_unboard")
+                  : t("card.list_on_market")
               }>
-              Market
+              {t("stash.menu.market")}
             </CardAction>
           )}
 
@@ -372,10 +375,10 @@ export const EffectCard = ({
               disabled={isStashing || isOnPedalboard}
               title={
                 isOnPedalboard
-                  ? "Remove from pedalboard before giving it to the guild"
-                  : "Leave it in your guild's stash, for honor"
+                  ? t("card.effect.guild_unboard")
+                  : t("card.guild_hint")
               }>
-              Guild
+              {t("card.guild")}
             </CardAction>
           )}
 
@@ -390,7 +393,7 @@ export const EffectCard = ({
                       icon={Wrench}
                       onClick={() => onScrapClick(item.id, item.effectId)}
                       disabled={isScrapping || isOnPedalboard}>
-                      Scrap
+                      {t("stash.menu.scrap")}
                     </CardAction>
                   </span>
                 </TooltipTrigger>
@@ -399,18 +402,20 @@ export const EffectCard = ({
                   className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
                   {isOnPedalboard ? (
                     <span className='text-xs'>
-                      Remove from the pedalboard before scrapping
+                      {t("card.effect.scrap_unboard")}
                     </span>
                   ) : (
                     <div className='flex flex-col gap-1.5'>
                       <span className='text-[10px] font-bold capitalize tracking-wider text-zinc-400'>
-                        Scraps into {scrapTotal} parts
+                        {t("card.scraps_into", { count: scrapTotal })}
                       </span>
                       <ScrapYieldList parts={scrapParts} compact />
                       {salvagedMod && (
                         <span className='text-[11px] text-purple-300'>
-                          {salvagedMod.label} +{salvagedMod.points} comes off
-                          whole
+                          {t("card.mod_comes_off", {
+                            name: labels.mod(salvagedMod.featureId, salvagedMod.label),
+                            points: salvagedMod.points,
+                          })}
                         </span>
                       )}
                       {/* Plates, not names — see `GuitarCard`. The list runs
@@ -419,8 +424,12 @@ export const EffectCard = ({
                       {scrappedMods.length > 0 && (
                         <div className='flex flex-wrap items-center gap-1.5'>
                           <span className='sr-only'>
-                            {scrappedMods.map((m) => m.label).join(", ")}{" "}
-                            {scrappedMods.length === 1 ? "goes" : "go"} with it
+                            {t("card.mods_go_with_it", {
+                              count: scrappedMods.length,
+                              names: scrappedMods
+                                .map((m) => labels.mod(m.featureId, m.label))
+                                .join(", "),
+                            })}
                           </span>
                           {scrappedMods.map((mod) => (
                             <ModArt
@@ -445,9 +454,9 @@ export const EffectCard = ({
             onClick={() => onSellClick?.(item.id, item.effectId)}
             disabled={isSelling || isOnPedalboard}
             title={
-              isOnPedalboard ? "Cannot sell effect on pedalboard" : undefined
+              isOnPedalboard ? t("card.effect.sell_unboard") : undefined
             }>
-            Sell
+            {t("common.sell")}
           </CardAction>
         </CardActionRow>
       )}

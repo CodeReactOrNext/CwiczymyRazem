@@ -1,5 +1,4 @@
 import {
-  getPartLabel,
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
 import {
@@ -7,6 +6,7 @@ import {
   getPartResaleValue,
 } from "feature/arsenal/data/resale";
 import { getModDef } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useFuseParts } from "feature/arsenal/hooks/useFuseParts";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useSellPart } from "feature/arsenal/hooks/useSellPart";
@@ -66,6 +66,13 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
   const { mutate: sellMod, isPending: isSellingMod } = useSellSalvagedMod();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
   const currentFame = useAppSelector(selectCurrentUserStats)?.fame || 0;
+  const labels = useArsenalLabels();
+  const { t } = labels;
+  const modName = (mod: SalvagedMod) =>
+    labels.mod(
+      mod.featureId,
+      getModDef(mod.kind, mod.featureId)?.label ?? mod.featureId,
+    );
   const [detail, setDetail] = useState<Detail>(null);
   const [pending, setPending] = useState<Pending>(null);
   /** A mod on its way to the market rather than the bin. */
@@ -85,7 +92,7 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
 
   return (
     <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-4'>
-      <SectionLabel>Salvage</SectionLabel>
+      <SectionLabel>{t("salvage.title")}</SectionLabel>
 
       <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3'>
         {stacks.map((stack) => {
@@ -100,10 +107,10 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
               </TierPlate>
               <span className='flex min-w-0 flex-1 flex-col gap-0.5'>
                 <span className='truncate text-sm font-bold text-zinc-100'>
-                  {getPartLabel(stack.partId)}
+                  {labels.part(stack.partId)}
                 </span>
                 <span className='text-xs font-semibold' style={{ color }}>
-                  {stack.tier}
+                  {labels.partTier(stack.tier)}
                 </span>
               </span>
               <span className='text-lg font-black tabular-nums text-zinc-300'>
@@ -121,10 +128,10 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
             <ModArt modId={mod.featureId} size={44} />
             <span className='flex min-w-0 flex-1 flex-col gap-0.5'>
               <span className='truncate text-sm font-bold text-zinc-100'>
-                {getModDef(mod.kind, mod.featureId)?.label ?? mod.featureId}
+                {modName(mod)}
               </span>
               <span className='text-xs font-semibold text-purple-300/70'>
-                Salvaged mod
+                {t("salvage.salvaged_mod")}
               </span>
             </span>
             <span className='text-lg font-black tabular-nums text-purple-300'>
@@ -141,9 +148,8 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
           detail === null
             ? ""
             : detail.kind === "part"
-              ? `${detail.tier} ${getPartLabel(detail.partId)}`
-              : (getModDef(detail.mod.kind, detail.mod.featureId)?.label ??
-                detail.mod.featureId)
+              ? labels.partName(detail.tier, detail.partId)
+              : modName(detail.mod)
         }>
         {detail?.kind === "part" && (
           <ScrapPartCard
@@ -191,8 +197,8 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
           itemType={pending.kind === "mod" ? "Mod" : "Parts"}
           itemName={
             pending.kind === "mod"
-              ? `${getModDef(pending.mod.kind, pending.mod.featureId)?.label ?? pending.mod.featureId} +${pending.mod.points}`
-              : `${pending.tier} ${getPartLabel(pending.partId)} ×${pending.qty}`
+              ? `${modName(pending.mod)} +${pending.mod.points}`
+              : `${labels.partName(pending.tier, pending.partId)} ×${pending.qty}`
           }
           fameReward={
             pending.kind === "mod"
@@ -224,7 +230,7 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
         <ListItemDialog
           isOpen
           itemType='Mod'
-          itemName={`${getModDef(listMod.kind, listMod.featureId)?.label ?? listMod.featureId} +${listMod.points}`}
+          itemName={`${modName(listMod)} +${listMod.points}`}
           minPrice={getModResaleValue(
             listMod.kind,
             listMod.featureId,

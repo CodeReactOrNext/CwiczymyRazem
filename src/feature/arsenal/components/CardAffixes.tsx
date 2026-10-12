@@ -1,3 +1,5 @@
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+
 interface Affix {
   id: string;
   label: string;
@@ -21,8 +23,8 @@ const SIGNATURE_POINTS = 3;
  * taller card than a plain one, and that is the honest shape of it.
  */
 export const CardAffixes = ({ features }: CardAffixesProps) => {
+  const labels = useArsenalLabels();
   if (features.length === 0) return null;
-
   const sorted = [...features].sort((a, b) => b.points - a.points);
   const signature =
     sorted[0] && sorted[0].points >= SIGNATURE_POINTS ? sorted[0] : null;
@@ -50,7 +52,7 @@ export const CardAffixes = ({ features }: CardAffixesProps) => {
                 style={{ color: isSignature ? "#fbbf24" : "#7dd3fc" }}>
                 +{f.points}
               </span>{" "}
-              {f.label}
+              {labels.mod(f.id, f.label)}
             </span>
           </div>
         );

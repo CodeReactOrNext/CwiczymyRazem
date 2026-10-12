@@ -46,6 +46,745 @@
     "kind": {
       "guitar": "Guitar",
       "effect": "Pedal"
+    },
+    "part_name": "{{tier}} {{part}}",
+    "mod": {
+      "coil-split": "Coil-split",
+      "hand-wound": "Hand-wound pickups",
+      "push-pull": "Push-pull pot",
+      "phase-switch": "Phase switch",
+      "treble-bleed": "Treble bleed",
+      "cts-pots": "CTS pots",
+      "pio-caps": "Paper-in-oil caps",
+      "active-preamp": "Active preamp",
+      "copper-shielding": "Copper shielding",
+      "bone-nut": "Bone nut",
+      "brass-trem-block": "Brass trem block",
+      "steel-saddles": "Steel saddles",
+      "locking-tuners": "Locking tuners",
+      "torrefied-wood": "Torrefied wood",
+      "chambered-body": "Chambered body",
+      "plek": "Plek'd setup",
+      "stainless-frets": "Stainless frets",
+      "rolled-edges": "Rolled edges",
+      "scalloped-frets": "Scalloped fretboard",
+      "compound-radius": "Compound radius",
+      "graphite-neck": "Graphite-reinforced neck",
+      "satin-neck": "Satin neck",
+      "low-action": "Pro low action",
+      "truss-wheel": "Truss-rod wheel",
+      "fret-level": "Fret level & crown",
+      "nos-opamp": "NOS op-amp (JRC4558)",
+      "germanium-diodes": "Germanium diodes",
+      "matched-transistors": "Matched transistors",
+      "asym-clipping": "Asymmetric clipping",
+      "led-clipping": "LED clipping",
+      "mosfet-clipping": "MOSFET clipping",
+      "carbon-comp": "Carbon comp resistors",
+      "film-caps": "Film capacitors",
+      "charge-pump-18v": "18V rail",
+      "true-bypass": "True bypass",
+      "premium-buffer": "Premium buffer",
+      "shielding": "Low-noise shielding",
+      "star-grounding": "Star grounding",
+      "gold-jacks": "Gold-plated jacks",
+      "filtered-power": "Filtered power",
+      "midi": "MIDI control",
+      "tap-tempo": "Tap tempo",
+      "stereo-io": "Stereo I/O",
+      "presets": "Presets",
+      "expression-in": "Expression input",
+      "trim-pots": "Internal trim pots",
+      "dip-switches": "DIP switches",
+      "relay-switch": "Relay soft-switch",
+      "kill-dry": "Kill-dry / trails"
+    },
+    "condition": {
+      "Museum": "Museum Grade",
+      "Mint": "Mint",
+      "Good": "Good",
+      "Worn": "Worn",
+      "Relic": "Relic"
     }
+  },
+  "common": {
+    "fame": "Fame",
+    "lvl": "Lvl {{level}}",
+    "sell": "Sell",
+    "selling": "Selling…",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "sell_for": "Sell for {{fame}} Fame"
+  },
+  "view": {
+    "title": "Guitar Arsenal",
+    "subtitle": "Open cases, build your rig, keep your gear in shape",
+    "eyebrow": "Collect & equip",
+    "free_cases_one": "Free case",
+    "free_cases": "Free cases",
+    "free_cases_hint": "Earned from epic achievements. One opens any case on the shelf — Elite included — without spending Fame.",
+    "tabs": {
+      "cases": "Cases",
+      "collection": "Collection",
+      "rig": "Rig",
+      "builder": "Builder",
+      "workshop": "Workshop",
+      "commissions": "Commissions",
+      "trader": "Trader",
+      "market": "Market",
+      "dex": "Dex"
+    }
+  },
+  "cases": {
+    "shelf_title": "Choose your case",
+    "shelf_subtitle": "Find the next piece of your sound.",
+    "open_free": "Open free",
+    "opening": "Opening...",
+    "open_case": "Open case",
+    "view_drop_rates": "View drop rates",
+    "drop_rates": "Drop Rates",
+    "featured_pool": "{{count}} items. One new possibility.",
+    "refreshes_in": "Refreshes in",
+    "inside_drop": "Inside this drop",
+    "chance_from_case": "chance from this case",
+    "tier_word": {
+      "standard": "Standard",
+      "premium": "Premium",
+      "elite": "Elite",
+      "supporter": "Supporter"
+    },
+    "defs": {
+      "standard": {
+        "name": "Standard Case",
+        "title": "{{tier}} Case",
+        "description": "A classic case for every aspiring rocker."
+      },
+      "premium-guitar": {
+        "name": "Premium Guitar Case",
+        "title": "{{tier}} Guitar Case",
+        "description": "Higher odds for the rare and sought-after."
+      },
+      "premium-effect": {
+        "name": "Premium Effects Case",
+        "title": "{{tier}} Effects Case",
+        "description": "Higher odds for the rare and sought-after."
+      },
+      "daily": {
+        "name": "Featured Case",
+        "description": "A rotating pool of 10 items."
+      },
+      "supporter": {
+        "name": "Supporter Case",
+        "title": "{{tier}} Case",
+        "description": "Six items, chosen by the supporters. New slate every fortnight."
+      },
+      "elite-guitar": {
+        "name": "Elite Guitar Case",
+        "title": "{{tier}} Guitar Case",
+        "description": "Reserved for the most dedicated players."
+      },
+      "elite-effect": {
+        "name": "Elite Effects Case",
+        "title": "{{tier}} Effects Case",
+        "description": "Reserved for the most dedicated players."
+      }
+    }
+  },
+  "opening": {
+    "title": "Opening Case",
+    "part_of_slot": "{{slot}} · part",
+    "builder_part": "Guitar Builder part",
+    "first_pull": "New — First Pull",
+    "duplicate": "Duplicate — Already in Dex",
+    "open_in_builder": "Open in Builder",
+    "keep": "Keep",
+    "equip_now": "Equip Now",
+    "keep_in_arsenal": "Keep in Arsenal",
+    "add_to_collection": "Add to Collection",
+    "open_another": "Open another {{name}}",
+    "cost_needed": "{{cost}} needed"
+  },
+  "builder": {
+    "slots": {
+      "body": "Body",
+      "neck": "Neck",
+      "head": "Headstock",
+      "pickups": "Pickups",
+      "finish": "Finish",
+      "pickguard": "Pickguard",
+      "sticker": "Stickers"
+    },
+    "pickup_types": {
+      "S": "Single-coil",
+      "H": "Humbucker",
+      "P90": "P90"
+    }
+  },
+  "lock": {
+    "unlocks_at": "Unlocks at level {{lvl}}",
+    "reason": "{{rarity}} gear goes in your rig at level {{lvl}}. Until then it is yours to keep, sell and work on — just not to play."
+  },
+  "collection": {
+    "scope": {
+      "all": "All",
+      "guitars": "Guitars",
+      "pedals": "Pedals"
+    },
+    "search": "Search your collection",
+    "sort_by": "Sort by",
+    "sort_prefix": "Sort:",
+    "sort": {
+      "manual": "Manual",
+      "equipped": "Equipped",
+      "rarity": "Rarity",
+      "level": "Level",
+      "newest": "Newest",
+      "type": "Type"
+    },
+    "sort_hint": {
+      "manual": "Your own arrangement — drag pieces wherever you want them",
+      "equipped": "What you are playing first: profile guitar, rig slots and pedalboard",
+      "rarity": "Rarest first, copies side by side",
+      "level": "Highest level first",
+      "newest": "Most recent drops first",
+      "type": "Guitars first, then pedals, then mods and parts"
+    },
+    "view": {
+      "stash": "Stash",
+      "cards": "Cards"
+    },
+    "view_title": {
+      "stash": "Stash view",
+      "cards": "Cards view"
+    },
+    "no_match": "Nothing here matches “{{query}}”.",
+    "nothing_yet": "Nothing here yet.",
+    "empty": "Your collection is empty. Open a case to start!",
+    "guitars_eyebrow": "Instruments",
+    "guitars_collected": "guitars collected",
+    "pedals_eyebrow": "Effects",
+    "pedals_collected": "pedals collected",
+    "clear_dupes": "Clear duplicates ({{count}})"
+  },
+  "salvage": {
+    "title": "Salvage",
+    "salvaged_mod": "Salvaged mod",
+    "salvaged_mod_caps": "SALVAGED MOD",
+    "fit_title": "Fit {{name}}?",
+    "fit_body": "Onto {{target}}, at the value it was salvaged with. Nothing is re-rolled.",
+    "off_source": "off {{source}}",
+    "fit_note": "Costs nothing — you already paid {{source}} for it. Taking it off again means scrapping whatever it goes into.",
+    "installing": "Installing...",
+    "install": "Install",
+    "mod_listing_body": {
+      "guitar": "Fits any guitar with a mod slot free, and goes on at +{{points}} with nothing re-rolled. The workshop cannot build one of these — a mod only ever changes hands.",
+      "effect": "Fits any pedal with a mod slot free, and goes on at +{{points}} with nothing re-rolled. The workshop cannot build one of these — a mod only ever changes hands."
+    },
+    "mod_owned_body": {
+      "guitar": "Drag it onto any guitar that lights up and it goes on at the value it carries: nothing to pay, nothing re-rolled. It is also waiting on the workshop bench.",
+      "effect": "Drag it onto any pedal that lights up and it goes on at the value it carries: nothing to pay, nothing re-rolled. It is also waiting on the workshop bench."
+    }
+  },
+  "sell": {
+    "title": {
+      "Guitar": "Sell Guitar?",
+      "Effect": "Sell Effect?",
+      "Mod": "Sell Mod?",
+      "Parts": "Sell Parts?",
+      "Part": "Sell Part?"
+    },
+    "you_receive": "You will receive",
+    "fame_points": "Fame Points"
+  },
+  "market": {
+    "listing": "Listing…",
+    "sell_on_market": "Sell on the market",
+    "list_title": {
+      "Guitar": "List Guitar on Market",
+      "Effect": "List Effect on Market",
+      "Mod": "List Mod on Market",
+      "Part": "List Part on Market"
+    },
+    "your_price": "Your price",
+    "minimum": "Minimum: {{price}} Fame (the normal sell value)",
+    "mod_price_hint": "The minimum is only what the bin pays. Nobody can build a mod, so price it against what the Trader charges for one.",
+    "listing_fee": "Listing fee",
+    "fee_short": "Not enough Fame for the {{fee}} listing fee.",
+    "list_item": "List item"
+  },
+  "parts": {
+    "tier_part": "{{tier}} part",
+    "card_body": "Spent on the workshop bench — builds, repairs and mods all bill in parts. Selling is for what the bench will never ask for.",
+    "rework": "Rework",
+    "rework_cost": "{{count}} {{tier}} pieces + {{fame}} Fame",
+    "you_have": "You have {{qty}} of {{needed}}",
+    "rework_times": "Rework ×{{count}}",
+    "rework_one": "Rework one",
+    "uses_of": "Uses {{used}} of your {{qty}}",
+    "rework_just_one": "Rework just one for {{fame}} Fame",
+    "not_enough_fame": "Not enough Fame — this costs {{fame}}",
+    "sell_all": "Sell all {{count}}",
+    "sell_it": "Sell it",
+    "sell_one": "Sell one for {{fame}} Fame",
+    "salvaged_parts": "Salvaged parts",
+    "wallet_empty": "Scrap a guitar or pedal from your collection to salvage your first parts."
+  },
+  "stash": {
+    "part": "Part",
+    "component_name": "{{name}} · Lvl {{level}}",
+    "reason_unequip_profile": "Unequip from your profile first",
+    "reason_remove_rig": "Remove from rig slot {{slot}} first",
+    "reason_off_board": "Take it off the pedalboard first",
+    "menu": {
+      "details": "Details",
+      "equip": "Equip…",
+      "unequip_profile": "Unequip from profile",
+      "take_out_rig": "Take out of rig slot {{slot}}",
+      "remove_from_board": "Remove from board",
+      "market": "Market",
+      "guild_stash": "Guild stash",
+      "scrap": "Scrap",
+      "sell_for": "Sell · {{fame}}",
+      "sell_all": "Sell all ×{{qty}}"
+    },
+    "eyebrow": "Arsenal",
+    "title": "Stash",
+    "items_collected": "items collected",
+    "tidy_hint": "Lay the whole stash out again in one go — it stays your arrangement afterwards",
+    "tidy_up": "Tidy up",
+    "arrange": {
+      "equipped": "What I'm playing first",
+      "type": "Guitars, then pedals",
+      "rarity": "Rarest first",
+      "level": "Highest level first",
+      "newest": "Newest first"
+    },
+    "dupes_guitars_hint": "Sell or scrap every lower-level duplicate guitar, keeping the best copy of each",
+    "dupes_guitars": "Duplicate guitars ({{count}})",
+    "dupes_pedals_hint": "Sell or scrap every lower-level duplicate pedal, keeping the best copy of each",
+    "dupes_pedals": "Duplicate pedals ({{count}})",
+    "board_label": "Arsenal stash",
+    "pedals_protected": "Pedals on your pedalboard are never touched."
+  },
+  "card": {
+    "new": "New",
+    "locked": "Locked",
+    "equip": "Equip",
+    "guild": "Guild",
+    "list_on_market": "List on the market",
+    "sell_for_fame": "Sell for fame",
+    "guild_hint": "Leave it in your guild's stash, for honor",
+    "needs_level": "needs level {{lvl}}",
+    "scraps_into": "Scraps into {{count}} parts",
+    "mod_comes_off": "{{name}} +{{points}} comes off whole",
+    "mods_go_with_it_one": "{{names}} goes with it",
+    "mods_go_with_it": "{{names}} go with it",
+    "guitar": {
+      "level": "Guitar level",
+      "equipped": "equipped",
+      "rig_slot": "rig slot {{slot}}",
+      "market_unequip": "Unequip from your profile before listing on the market",
+      "market_unrig": "Remove from rig slot {{slot}} before listing on the market",
+      "sell_unequip": "Unequip from your profile before selling",
+      "guild_unequip": "Unequip from your profile before giving it to the guild",
+      "guild_unrig": "Remove from rig slot {{slot}} before giving it to the guild",
+      "scrap_unequip": "Unequip from your profile before scrapping",
+      "scrap_unrig": "Remove from rig slot {{slot}} before scrapping"
+    },
+    "effect": {
+      "level": "Effect level",
+      "on_board": "on board",
+      "remove_hint": "Take this pedal off the pedalboard",
+      "market_unboard": "Remove from pedalboard before listing",
+      "guild_unboard": "Remove from pedalboard before giving it to the guild",
+      "scrap_unboard": "Remove from the pedalboard before scrapping",
+      "sell_unboard": "Cannot sell effect on pedalboard"
+    }
+  },
+  "bulk": {
+    "title": "Clear duplicates?",
+    "body_one": "This takes {{n}} lower-level duplicate, keeping the best copy of each.",
+    "body": "This takes {{n}} lower-level duplicates, keeping the best copy of each.",
+    "protected_guitars": "Equipped and rig guitars are never touched.",
+    "no_undo": "This can't be undone.",
+    "paid_into_fame": "Paid straight into Fame Points",
+    "scrapping": "Scrapping...",
+    "scrap_all": "Scrap all {{count}}",
+    "mods_pulled_one": "{{count}} mod pulled out and stashed",
+    "mods_pulled": "{{count}} mods pulled out and stashed"
+  },
+  "equip": {
+    "profile": "Profile",
+    "rig_slot": "Rig slot {{slot}}",
+    "where": "Where should it go?",
+    "already_here": "Already here",
+    "gets_replaced": "Gets replaced",
+    "empty": "Empty",
+    "take_out_of": "Take out of {{target}}"
+  },
+  "traits": {
+    "workhorse": {
+      "label": "Workhorse",
+      "description": "Fame/h on any practice, whatever you play."
+    },
+    "long-take": {
+      "label": "Long Take",
+      "description": "Fame/h on any practice, whatever you play."
+    },
+    "reliable": {
+      "label": "Reliable",
+      "description": "Fame/h on any practice. No conditions, no surprises."
+    },
+    "shred-machine": {
+      "label": "Shred Machine",
+      "description": "Fame/h on technique practice."
+    },
+    "jazz-box": {
+      "label": "Jazz Box",
+      "description": "Fame/h on theory practice. Built for chords, not for speed."
+    },
+    "songbook": {
+      "label": "Songbook",
+      "description": "Fame/h on creativity practice."
+    },
+    "intonation-monster": {
+      "label": "Intonation Monster",
+      "description": "Fame/h on ear training. It holds pitch all the way up the neck."
+    },
+    "ear-trainer": {
+      "label": "Ear Trainer",
+      "description": "Fame/h on ear training. Set a repeat and chase it."
+    },
+    "timing-trainer": {
+      "label": "Timing Trainer",
+      "description": "Fame/h on technique practice. Lock the repeats to your tempo."
+    },
+    "frequency-work": {
+      "label": "Frequency Work",
+      "description": "Fame/h on ear training. Learn where the bands sit."
+    },
+    "harmony-bench": {
+      "label": "Harmony Bench",
+      "description": "Fame/h on theory practice."
+    },
+    "texture-lab": {
+      "label": "Texture Lab",
+      "description": "Fame/h on creativity practice."
+    },
+    "noise-session": {
+      "label": "Noise Session",
+      "description": "Fame/h on creativity practice."
+    },
+    "pitch-reference": {
+      "label": "Pitch Reference",
+      "description": "Fame/h on ear training."
+    },
+    "picking-bench": {
+      "label": "Picking Bench",
+      "description": "Fame/h while the session trains Alternate Picking."
+    },
+    "legato-neck": {
+      "label": "Legato Neck",
+      "description": "Fame/h while the session trains Legato."
+    },
+    "bender": {
+      "label": "Bender",
+      "description": "Fame/h while the session trains Bending."
+    },
+    "vibrato-arm": {
+      "label": "Vibrato Arm",
+      "description": "Fame/h while the session trains Vibrato."
+    },
+    "chord-shop": {
+      "label": "Chord Shop",
+      "description": "Fame/h while the session trains Chords."
+    },
+    "scale-runner": {
+      "label": "Scale Runner",
+      "description": "Fame/h while the session trains Scales."
+    },
+    "metronome": {
+      "label": "Metronome",
+      "description": "Fame/h while the session trains Rhythm."
+    },
+    "phrase-repeat": {
+      "label": "Phrase Repeat",
+      "description": "Fame/h while the session trains Phrasing. A delay hands your own phrase back to you."
+    },
+    "harmony-ear": {
+      "label": "Harmony Ear",
+      "description": "Fame/h while the session trains Harmony Ear."
+    },
+    "interval-trainer": {
+      "label": "Interval Trainer",
+      "description": "Fame/h while the session trains Ear Training."
+    },
+    "improv-pedal": {
+      "label": "Improv Pedal",
+      "description": "Fame/h while the session trains Improvisation."
+    },
+    "phrase-machine": {
+      "label": "Phrase Machine",
+      "description": "Fame/h while the session trains Phrasing."
+    },
+    "improv-room": {
+      "label": "Improv Room",
+      "description": "Fame/h while the session trains Improvisation."
+    },
+    "theory-board": {
+      "label": "Theory Board",
+      "description": "Fame/h while the session trains Music Theory."
+    },
+    "brand-endorsement": {
+      "label": "{{brand}} Endorsement",
+      "description": "Fame/h for every {{brand}} item you have in service. Up to three count."
+    },
+    "pedal-platform": {
+      "label": "Pedal Platform",
+      "description": "Fame/h for every pedal on your board. Up to six count. It does not fight what you put in front of it."
+    },
+    "backline": {
+      "label": "Backline",
+      "description": "Fame/h for every other guitar in your slots."
+    },
+    "vintage-row": {
+      "label": "Vintage Row",
+      "description": "Fame/h for every item in service built before 1985. Up to four count."
+    },
+    "boutique-row": {
+      "label": "Boutique Row",
+      "description": "Fame/h for every Epic-or-better pedal on your board. Up to four count."
+    },
+    "bench-boss": {
+      "label": "Bench Boss",
+      "description": "Fame/h for every build level on the other items in your rig. Up to twenty count."
+    },
+    "well-equipped": {
+      "label": "Well Equipped",
+      "description": "Fame/h for every other trait in your rig. Up to eight count."
+    },
+    "wants-dirt": {
+      "label": "Wants Dirt",
+      "description": "Fame/h while any Overdrive, Distortion or Fuzz sits on your board. Passive humbuckers need something to push them."
+    },
+    "clean-machine": {
+      "label": "Clean Machine",
+      "description": "Fame/h while your board carries no drive pedal at all. Everything your hands do is audible."
+    },
+    "solo-act": {
+      "label": "Solo Act",
+      "description": "Fame/h while this is the only guitar you have equipped."
+    },
+    "straight-to-amp": {
+      "label": "Straight to Amp",
+      "description": "Fame/h while your pedalboard is completely empty."
+    },
+    "cable-and-amp": {
+      "label": "Cable and Amp",
+      "description": "Fame/h while your pedalboard is completely empty. Nothing between the strings and the speaker."
+    },
+    "nothing-but-the-guitar": {
+      "label": "Nothing But the Guitar",
+      "description": "Fame/h while your pedalboard is completely empty. It does not need help and it never did."
+    },
+    "matched-set": {
+      "label": "Matched Set",
+      "description": "Fame/h while another item of the same brand is in service."
+    },
+    "ambient-pair": {
+      "label": "Ambient Pair",
+      "description": "Fame/h while a Delay and a Reverb are both on the board. Apart they do half the job."
+    },
+    "gain-stack": {
+      "label": "Gain Stack",
+      "description": "Fame/h while a second drive pedal shares the board. Stacking drives is a method, not an accident."
+    },
+    "front-of-chain": {
+      "label": "Front of Chain",
+      "description": "Fame/h while this pedal sits ahead of every drive on the board. Fuzz and compression want the raw pickup."
+    },
+    "tail-of-chain": {
+      "label": "Tail of Chain",
+      "description": "Fame/h while this pedal sits behind every drive on the board. Time effects go last or it turns to mud."
+    },
+    "purist": {
+      "label": "Purist",
+      "description": "Fame/h while your board holds two pedals or fewer."
+    },
+    "full-board": {
+      "label": "Full Board",
+      "description": "Fame/h while your board holds six pedals or more."
+    },
+    "metal-rig": {
+      "label": "Metal Rig",
+      "description": "Fame/h when two or more drive pedals are on the board and the session has at least 45 minutes of technique."
+    },
+    "ambient-study": {
+      "label": "Ambient Study",
+      "description": "Fame/h when a Reverb shares the board and the session has at least 30 minutes of ear training."
+    },
+    "writing-room": {
+      "label": "Writing Room",
+      "description": "Fame/h when your board holds two pedals or fewer and the session has at least 45 minutes of creativity."
+    },
+    "practice-room": {
+      "label": "Practice Room",
+      "description": "Fame/h when this is your only equipped guitar and the session runs 60 minutes or longer."
+    },
+    "theory-desk": {
+      "label": "Theory Desk",
+      "description": "Fame/h when a Tuner shares the board and the session has at least 30 minutes of theory."
+    },
+    "session-rig": {
+      "label": "Session Rig",
+      "description": "Fame/h when all three guitar slots are filled and the session has at least 15 minutes in three different categories."
+    },
+    "fuzz-workout": {
+      "label": "Fuzz Workout",
+      "description": "Fame/h when this pedal sits before every other drive and the session has at least 45 minutes of technique."
+    },
+    "modulation-study": {
+      "label": "Modulation Study",
+      "description": "Fame/h when a Delay shares the board and the session trains Phrasing."
+    },
+    "vintage-session": {
+      "label": "Vintage Session",
+      "description": "Fame/h when three items in service were built before 1985 and the session runs 45 minutes or longer."
+    },
+    "stack-study": {
+      "label": "Stack Study",
+      "description": "Fame/h when a second drive pedal shares the board and the session trains Alternate Picking."
+    },
+    "tone-lab": {
+      "label": "Tone Lab",
+      "description": "Fame/h when four or more pedals are on the board and the session has at least 30 minutes of creativity."
+    },
+    "quiet-room": {
+      "label": "Quiet Room",
+      "description": "Fame/h when your board is empty and the session has at least 45 minutes of ear training."
+    },
+    "monk": {
+      "label": "Monk",
+      "description": "Fame/h when your pedalboard is empty, this is your only equipped guitar, and the session is a single category."
+    },
+    "virtuoso": {
+      "label": "Virtuoso",
+      "description": "Fame/h when the session trains Alternate Picking, Legato and Sweep Picking, and has at least 60 minutes of technique."
+    },
+    "conservatory": {
+      "label": "Conservatory",
+      "description": "Fame/h when the session trains Music Theory, Harmony and Chords, and runs 60 minutes or longer."
+    },
+    "total-recall": {
+      "label": "Total Recall",
+      "description": "Fame/h when the session trains Ear Training and Harmony Ear, and a Reverb and a Tuner are both on the board."
+    },
+    "brand-artist": {
+      "label": "{{brand}} Artist",
+      "description": "Fame/h when every guitar in your slots is {{brand}} and the session runs 45 minutes or longer."
+    },
+    "wall-of-sound": {
+      "label": "Wall of Sound",
+      "description": "Fame/h when six or more pedals are on the board, three of them Epic or better, and the session runs 60 minutes or longer."
+    },
+    "time-capsule": {
+      "label": "Time Capsule",
+      "description": "Fame/h when every item in service was built before 1985 and the session runs 45 minutes or longer."
+    },
+    "one-man-band": {
+      "label": "One Man Band",
+      "description": "Fame/h when the session has at least 15 minutes in all four categories and your board holds four pedals or more."
+    },
+    "arranger": {
+      "label": "Arranger",
+      "description": "Fame/h when the session trains Improvisation, Phrasing and Harmony, and runs 60 minutes or longer."
+    },
+    "signal-booster": {
+      "label": "Signal Booster",
+      "description": "Every other pedal on your board pays this much more Fame/h on each of its traits."
+    },
+    "master-class": {
+      "label": "Master Class",
+      "description": "Every ear-training and theory trait in your rig pays this much more Fame/h."
+    },
+    "drive-trainer": {
+      "label": "Drive Trainer",
+      "description": "Every technique trait in your rig pays this much more Fame/h."
+    },
+    "skill-coach": {
+      "label": "Skill Coach",
+      "description": "Every skill-based trait in your rig pays this much more Fame/h."
+    },
+    "patchbay": {
+      "label": "Patchbay",
+      "description": "Every pedal further down the chain than this one pays this much more Fame/h on each of its traits."
+    },
+    "house-band": {
+      "label": "House Band",
+      "description": "Every trait on items sharing this guitar's brand pays this much more Fame/h."
+    },
+    "session-leader": {
+      "label": "Session Leader",
+      "description": "Your single highest-paying trait pays this much more Fame/h."
+    },
+    "temperamental": {
+      "label": "Temperamental",
+      "description": "Fame/h, but pays nothing when the session runs under 30 minutes."
+    },
+    "diva": {
+      "label": "Diva",
+      "description": "Fame/h, but every trait on your other equipped items pays 9.0 Fame/h less."
+    },
+    "prima-donna": {
+      "label": "Prima Donna",
+      "description": "Fame/h, but every other trait in your rig pays nothing."
+    }
+  },
+  "condition": {
+    "label": "Condition",
+    "title": "Condition: {{grade}}",
+    "title_restored": "Condition: {{grade}} — restored in the workshop",
+    "restored": "Restored"
+  },
+  "traits_ui": {
+    "more": "+{{count}} more"
+  },
+  "in_service": {
+    "pedalboard": "pedalboard"
+  },
+  "dex_marks": {
+    "owned": "Owned",
+    "in_dex": "In Dex",
+    "new": "New for your collection"
+  },
+  "buy": {
+    "buy": "Buy",
+    "buying": "Buying…",
+    "not_enough_fame": "Not enough Fame",
+    "not_enough_fame_points": "Not enough Fame Points"
+  },
+  "part_row": {
+    "title": "{{name}} — you hold {{have}}, this needs {{need}}",
+    "required": "required",
+    "owned": "owned",
+    "after_left": "After {{job}}: {{left}} left",
+    "short": "{{count}} short",
+    "you_have": "you have {{have}}",
+    "you_have_short": "you have {{have}} — {{short}} short"
+  },
+  "scrap": {
+    "title": {
+      "Guitar": "Scrap Guitar?",
+      "Effect": "Scrap Effect?"
+    },
+    "body": {
+      "Guitar": "{{name}} — this is permanent, the guitar is gone for good.",
+      "Effect": "{{name}} — this is permanent, the effect is gone for good."
+    },
+    "will_salvage_one": "You will salvage {{count}} part",
+    "will_salvage": "You will salvage {{count}} parts",
+    "blueprint": "Blueprint",
+    "mods_go_one": "This mod goes with it",
+    "mods_go": "These {{count}} mods go with it"
   }
 }

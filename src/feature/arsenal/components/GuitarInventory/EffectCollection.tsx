@@ -21,6 +21,7 @@ import { getEffectScrapYield } from "feature/arsenal/utils/scrap";
 import { ShelfDepositDialog } from "feature/guilds/components/ShelfDepositDialog";
 import { useShelfDeposit } from "feature/guilds/hooks/useShelfDeposit";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { Layers } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -46,6 +47,7 @@ export const EffectCollection = ({
   query = "",
   sort = "rarity",
 }: EffectCollectionProps) => {
+  const { t } = useTranslation("arsenal");
   const { mutate: sellEffect, isPending: isSelling } = useSellEffect();
   const { mutate: sellBulk, isPending: isSellingBulk } = useSellEffectsBulk();
   const { mutate: listOnMarket, isPending: isListing } = useListItem();
@@ -197,20 +199,20 @@ export const EffectCollection = ({
     <>
       <div className='flex flex-col gap-3'>
         <CollectionSectionHeader
-          eyebrow='Effects'
-          title='Pedals'
+          eyebrow={t("collection.pedals_eyebrow")}
+          title={t("collection.scope.pedals")}
           owned={uniqueOwnedCount}
           total={totalEffectsCount}
-          unit='pedals collected'
+          unit={t("collection.pedals_collected")}
           action={
             duplicates.ids.length > 0 ? (
               <button
                 onClick={() => setIsBulkSellOpen(true)}
                 disabled={isSellingBulk || isScrappingBulk}
                 className='flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
-                title='Sell or scrap every lower-level duplicate, keeping the best copy of each pedal'>
+                title={t("stash.dupes_pedals_hint")}>
                 <Layers size={14} />
-                Clear duplicates ({duplicates.ids.length})
+                {t("collection.clear_dupes", { count: duplicates.ids.length })}
               </button>
             ) : null
           }
@@ -271,7 +273,7 @@ export const EffectCollection = ({
         fameReward={duplicates.fame}
         scrapParts={duplicates.parts}
         salvagedCount={duplicates.salvagedCount}
-        protectedNote='Pedals on your pedalboard are never touched.'
+        protectedNote={t("stash.pedals_protected")}
         onSell={handleConfirmBulkSell}
         onScrap={handleConfirmBulkScrap}
         onCancel={() => setIsBulkSellOpen(false)}

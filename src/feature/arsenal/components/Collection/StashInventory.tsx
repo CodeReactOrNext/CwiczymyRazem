@@ -14,7 +14,6 @@ import {
   GUITARS_BY_ID,
 } from "feature/arsenal/data/guitarDefinitions";
 import { getItemValue } from "feature/arsenal/data/itemStats";
-import { getPartLabel } from "feature/arsenal/data/partDefinitions";
 import {
   getModResaleValue,
   getPartResaleValue,
@@ -30,6 +29,7 @@ import {
   getGuitarSubject,
   getModDef,
 } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useFuseParts } from "feature/arsenal/hooks/useFuseParts";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
@@ -183,12 +183,12 @@ const arrangeButtonClass =
  * rather than as the name of a sort — this writes their arrangement, so it is
  * worth being plain about what is about to happen to it.
  */
-const ARRANGE_ORDERS: { id: CollectionSort; label: string }[] = [
-  { id: "equipped", label: "What I'm playing first" },
-  { id: "type", label: "Guitars, then pedals" },
-  { id: "rarity", label: "Rarest first" },
-  { id: "level", label: "Highest level first" },
-  { id: "newest", label: "Newest first" },
+const ARRANGE_ORDERS: CollectionSort[] = [
+  "equipped",
+  "type",
+  "rarity",
+  "level",
+  "newest",
 ];
 
 /**
@@ -237,6 +237,25 @@ export const StashInventory = ({
   const currentFame = useAppSelector(selectCurrentUserStats)?.fame || 0;
   const playerLvl = usePlayerLvl();
   const isMobile = useResponsiveStore((state) => state.isMobile);
+  const labels = useArsenalLabels();
+  const { t } = labels;
+  const modName = (mod: Pick<SalvagedMod, "kind" | "featureId">) =>
+    labels.mod(
+      mod.featureId,
+      getModDef(mod.kind, mod.featureId)?.label ?? mod.featureId,
+    );
+  const componentName = (component: OwnedComponent) =>
+    t("stash.component_name", {
+      name: getComponent(component.defId)?.name ?? t("stash.part"),
+      level: component.level,
+    });
+  /** What a piece is called on screen; `piece.name` stays English for search. */
+  const pieceTitle = (piece: BoardPiece) =>
+    piece.kind === "part"
+      ? labels.partName(piece.part.tier, piece.part.partId)
+      : piece.kind === "mod"
+        ? modName(piece.mod)
+        : piece.name;
 
   const rig: RigSetup = data.rig ?? DEFAULT_RIG;
   // Stable identity: the pieces and the arrangement are both memoised on it.
@@ -705,9 +724,9 @@ export const StashInventory = ({
       const slot = rigSlotOf(piece.id);
       const inUse = equipped || slot != null;
       const reason = equipped
-        ? "Unequip from your profile first"
+        ? t("stash.reason_unequip_profile")
         : slot != null
-          ? `Remove from rig slot ${slot + 1} first`
+          ? t("stash.reason_remove_rig", { slot: slot + 1 })
           : undefined;
       // The equip cap, said in the row that would trip it rather than in a
       // toast after the click. A copy already in use is grandfathered in.
@@ -720,23 +739,23 @@ export const StashInventory = ({
       return [
         {
           id: "details",
-          label: "Details",
+          label: t("stash.menu.details"),
           icon: Info,
           onSelect: () => setDetail({ kind: "guitar", itemId: piece.id }),
         },
         {
           id: "equip",
-          label: "Equip…",
+          label: t("stash.menu.equip"),
           icon: Guitar,
           disabled: isEquipping || lockedLvl != null,
-          reason: lockedLvl != null ? rarityLockLabel(lockedLvl) : undefined,
+          reason: lockedLvl != null ? rarityLockLabel(lockedLvl, t) : undefined,
           onSelect: () => setEquipItemId(piece.id),
         },
         ...(equipped
           ? [
               {
                 id: "unequip",
-                label: "Unequip from profile",
+                label: t("stash.menu.unequip_profile"),
                 icon: Unplug,
                 onSelect: () => handleRemoveFrom(piece.id, "profile"),
               },
@@ -746,7 +765,7 @@ export const StashInventory = ({
           ? [
               {
                 id: "unrig",
-                label: `Take out of rig slot ${slot + 1}`,
+                label: t("stash.menu.take_out_rig", { slot: slot + 1 }),
                 icon: Unplug,
                 onSelect: () => handleRemoveFrom(piece.id, slot as EquipTarget),
               },
@@ -754,7 +773,7 @@ export const StashInventory = ({
           : []),
         {
           id: "list",
-          label: "Market",
+          label: t("stash.menu.market"),
           icon: Store,
           disabled: isListing || inUse,
           reason,
@@ -764,7 +783,7 @@ export const StashInventory = ({
           ? [
               {
                 id: "guild",
-                label: "Guild stash",
+                label: t("stash.menu.guild_stash"),
                 icon: Boxes,
                 disabled: shelf.isDepositing || inUse,
                 reason,
@@ -774,7 +793,7 @@ export const StashInventory = ({
           : []),
         {
           id: "scrap",
-          label: "Scrap",
+          label: t("stash.menu.scrap"),
           icon: Wrench,
           danger: true,
           disabled: isScrappingGuitar || inUse,
@@ -783,11 +802,11 @@ export const StashInventory = ({
         },
         {
           id: "sell",
-          label: "Sell",
+          label: t("common.sell"),
           icon: Trash2,
           danger: true,
           disabled: isSellingGuitar || equipped,
-          reason: equipped ? "Unequip from your profile first" : undefined,
+          reason: equipped ? t("stash.reason_unequip_profile") : undefined,
           onSelect: () => open("sell", "guitar", piece.id),
         },
       ];
@@ -795,12 +814,12 @@ export const StashInventory = ({
 
     if (piece.kind === "effect") {
       const onBoard = pedalboardItemIds.has(piece.id);
-      const reason = onBoard ? "Take it off the pedalboard first" : undefined;
+      const reason = onBoard ? t("stash.reason_off_board") : undefined;
 
       return [
         {
           id: "details",
-          label: "Details",
+          label: t("stash.menu.details"),
           icon: Info,
           onSelect: () => setDetail({ kind: "effect", itemId: piece.id }),
         },
@@ -808,7 +827,7 @@ export const StashInventory = ({
           ? [
               {
                 id: "unboard",
-                label: "Remove from board",
+                label: t("stash.menu.remove_from_board"),
                 icon: Unplug,
                 disabled: isRemovingFromBoard,
                 onSelect: () => handleRemoveFromBoard(piece.id),
@@ -817,7 +836,7 @@ export const StashInventory = ({
           : []),
         {
           id: "list",
-          label: "Market",
+          label: t("stash.menu.market"),
           icon: Store,
           disabled: isListing || onBoard,
           reason,
@@ -827,7 +846,7 @@ export const StashInventory = ({
           ? [
               {
                 id: "guild",
-                label: "Guild stash",
+                label: t("stash.menu.guild_stash"),
                 icon: Boxes,
                 disabled: shelf.isDepositing || onBoard,
                 reason,
@@ -837,7 +856,7 @@ export const StashInventory = ({
           : []),
         {
           id: "scrap",
-          label: "Scrap",
+          label: t("stash.menu.scrap"),
           icon: Wrench,
           danger: true,
           disabled: isScrappingEffect || onBoard,
@@ -846,7 +865,7 @@ export const StashInventory = ({
         },
         {
           id: "sell",
-          label: "Sell",
+          label: t("common.sell"),
           icon: Trash2,
           danger: true,
           disabled: isSellingEffect || onBoard,
@@ -860,20 +879,20 @@ export const StashInventory = ({
       return [
         {
           id: "details",
-          label: "Details",
+          label: t("stash.menu.details"),
           icon: Info,
           onSelect: () => setModDetail(piece.mod),
         },
         {
           id: "list",
-          label: "Market",
+          label: t("stash.menu.market"),
           icon: Store,
           disabled: isListing,
           onSelect: () => setListMod(piece.mod),
         },
         {
           id: "sell",
-          label: "Sell",
+          label: t("common.sell"),
           icon: Trash2,
           danger: true,
           disabled: isSellingMod,
@@ -885,20 +904,22 @@ export const StashInventory = ({
       return [
         {
           id: "builder",
-          label: "Open in Builder",
+          label: t("opening.open_in_builder"),
           icon: Wrench,
           onSelect: openBuilder,
         },
         {
           id: "list",
-          label: "Market",
+          label: t("stash.menu.market"),
           icon: Store,
           disabled: isListing,
           onSelect: () => setListComponent(piece.component),
         },
         {
           id: "sell",
-          label: `Sell · ${getComponentResaleValue(piece.component)}`,
+          label: t("stash.menu.sell_for", {
+            fame: getComponentResaleValue(piece.component),
+          }),
           icon: Trash2,
           danger: true,
           disabled: isSellingComponent,
@@ -912,13 +933,13 @@ export const StashInventory = ({
     return [
       {
         id: "details",
-        label: "Details",
+        label: t("stash.menu.details"),
         icon: Info,
         onSelect: () => setPartDetail(piece.part),
       },
       {
         id: "sell",
-        label: `Sell all ×${piece.part.qty}`,
+        label: t("stash.menu.sell_all", { qty: piece.part.qty }),
         icon: Trash2,
         danger: true,
         disabled: isSellingPart,
@@ -971,30 +992,30 @@ export const StashInventory = ({
   return (
     <div className='flex flex-col gap-3'>
       <CollectionSectionHeader
-        eyebrow='Arsenal'
-        title='Stash'
+        eyebrow={t("stash.eyebrow")}
+        title={t("stash.title")}
         owned={uniqueOwned}
         total={GUITAR_DEFINITIONS.length + EFFECT_DEFINITIONS.length}
-        unit='items collected'
+        unit={t("stash.items_collected")}
         action={
           <div className='flex flex-wrap gap-2'>
             {canArrange && (
               <DropdownMenu>
                 <DropdownMenuTrigger
                   className={arrangeButtonClass}
-                  title='Lay the whole stash out again in one go — it stays your arrangement afterwards'>
+                  title={t("stash.tidy_hint")}>
                   <ArrowDownWideNarrow size={14} />
-                  Tidy up
+                  {t("stash.tidy_up")}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align='end'
                   className='border-0 bg-zinc-900 p-1'>
                   {ARRANGE_ORDERS.map((order) => (
                     <DropdownMenuItem
-                      key={order.id}
-                      onSelect={() => arrangeBy(order.id)}
+                      key={order}
+                      onSelect={() => arrangeBy(order)}
                       className='cursor-pointer rounded px-3 py-2 text-xs font-semibold text-zinc-300 focus:bg-zinc-800 focus:text-white'>
-                      {order.label}
+                      {t(`stash.arrange.${order}`)}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -1005,9 +1026,9 @@ export const StashInventory = ({
                 onClick={() => setBulk("guitar")}
                 disabled={isSellingGuitarsBulk || isScrappingGuitarsBulk}
                 className={bulkButtonClass}
-                title='Sell or scrap every lower-level duplicate guitar, keeping the best copy of each'>
+                title={t("stash.dupes_guitars_hint")}>
                 <Layers size={14} />
-                Duplicate guitars ({guitarDuplicates.ids.length})
+                {t("stash.dupes_guitars", { count: guitarDuplicates.ids.length })}
               </button>
             )}
             {effectDuplicates.ids.length > 0 && (
@@ -1015,9 +1036,9 @@ export const StashInventory = ({
                 onClick={() => setBulk("effect")}
                 disabled={isSellingEffectsBulk || isScrappingEffectsBulk}
                 className={bulkButtonClass}
-                title='Sell or scrap every lower-level duplicate pedal, keeping the best copy of each'>
+                title={t("stash.dupes_pedals_hint")}>
                 <Layers size={14} />
-                Duplicate pedals ({effectDuplicates.ids.length})
+                {t("stash.dupes_pedals", { count: effectDuplicates.ids.length })}
               </button>
             )}
           </div>
@@ -1031,7 +1052,7 @@ export const StashInventory = ({
           rows={rows}
           gridRef={gridRef}
           drop={drop}
-          label='Arsenal stash'>
+          label={t("stash.board_label")}>
           {pieces.map((piece) => renderPiece(piece))}
         </StashBoard>
       )}
@@ -1059,7 +1080,7 @@ export const StashInventory = ({
       {/* Right-click: the same actions, without opening the card first. */}
       <StashContextMenu
         anchor={menu}
-        title={menu?.piece.name ?? ""}
+        title={menu ? pieceTitle(menu.piece) : ""}
         items={menu ? menuItemsFor(menu.piece) : []}
         onClose={() => setMenu(null)}
       />
@@ -1171,8 +1192,7 @@ export const StashInventory = ({
         onClose={() => setModDetail(null)}
         title={
           modDetail
-            ? (getModDef(modDetail.kind, modDetail.featureId)?.label ??
-              modDetail.featureId)
+            ? modName(modDetail)
             : ""
         }>
         {modDetail && (
@@ -1198,7 +1218,7 @@ export const StashInventory = ({
         onClose={() => setPartDetail(null)}
         title={
           partDetail
-            ? `${partDetail.tier} ${getPartLabel(partDetail.partId)}`
+            ? labels.partName(partDetail.tier, partDetail.partId)
             : ""
         }>
         {partDetail && (
@@ -1243,10 +1263,10 @@ export const StashInventory = ({
           }
           itemName={
             resale.kind === "mod"
-              ? `${getModDef(resale.mod.kind, resale.mod.featureId)?.label ?? resale.mod.featureId} +${resale.mod.points}`
+              ? `${modName(resale.mod)} +${resale.mod.points}`
               : resale.kind === "component"
-                ? `${getComponent(resale.component.defId)?.name ?? "Part"} · Lvl ${resale.component.level}`
-                : `${resale.tier} ${getPartLabel(resale.partId)} ×${resale.qty}`
+                ? componentName(resale.component)
+                : `${labels.partName(resale.tier, resale.partId)} ×${resale.qty}`
           }
           fameReward={
             resale.kind === "mod"
@@ -1290,7 +1310,7 @@ export const StashInventory = ({
         <ListItemDialog
           isOpen
           itemType='Part'
-          itemName={`${getComponent(listComponent.defId)?.name ?? "Part"} · Lvl ${listComponent.level}`}
+          itemName={componentName(listComponent)}
           minPrice={getComponentResaleValue(listComponent)}
           currentFame={currentFame}
           onConfirm={(price) =>
@@ -1312,7 +1332,7 @@ export const StashInventory = ({
         <ListItemDialog
           isOpen
           itemType='Mod'
-          itemName={`${getModDef(listMod.kind, listMod.featureId)?.label ?? listMod.featureId} +${listMod.points}`}
+          itemName={`${modName(listMod)} +${listMod.points}`}
           minPrice={getModResaleValue(
             listMod.kind,
             listMod.featureId,
@@ -1420,7 +1440,7 @@ export const StashInventory = ({
         }
         protectedNote={
           bulk === "effect"
-            ? "Pedals on your pedalboard are never touched."
+            ? t("stash.pedals_protected")
             : undefined
         }
         onSell={confirmBulkSell}

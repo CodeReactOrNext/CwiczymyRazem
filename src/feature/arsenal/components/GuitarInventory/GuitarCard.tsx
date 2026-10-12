@@ -17,6 +17,7 @@ import {
   getScrappedMods,
 } from "feature/arsenal/data/salvage";
 import { getItemTraits } from "feature/arsenal/data/traits";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import {
   countScrapParts,
@@ -109,6 +110,8 @@ export const GuitarCard = ({
   const traitStates = useItemTraitStates(item.id, traits);
   // Read here, above the guard, for the same reason the trait hooks are.
   const playerLvl = usePlayerLvl();
+  const labels = useArsenalLabels();
+  const { t } = labels;
 
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
@@ -134,19 +137,20 @@ export const GuitarCard = ({
   );
 
   // Reasons the Market / Sell actions are blocked — surfaced in a tooltip.
+  const slotVars = { slot: (rigSlot ?? 0) + 1 };
   const marketTooltip = isEquipped
-    ? "Unequip from your profile before listing on the market"
+    ? t("card.guitar.market_unequip")
     : rigSlot != null
-      ? `Remove from rig slot ${rigSlot + 1} before listing on the market`
-      : "List on the market";
+      ? t("card.guitar.market_unrig", slotVars)
+      : t("card.list_on_market");
   const sellTooltip = isEquipped
-    ? "Unequip from your profile before selling"
-    : "Sell for fame";
+    ? t("card.guitar.sell_unequip")
+    : t("card.sell_for_fame");
   const stashTooltip = isEquipped
-    ? "Unequip from your profile before giving it to the guild"
+    ? t("card.guitar.guild_unequip")
     : rigSlot != null
-      ? `Remove from rig slot ${rigSlot + 1} before giving it to the guild`
-      : "Leave it in your guild's stash, for honor";
+      ? t("card.guitar.guild_unrig", slotVars)
+      : t("card.guild_hint");
 
   // Scrap potential is deterministic, so the exact payout can be shown up front.
   const scrapParts = getGuitarScrapYield(item, guitar);
@@ -220,7 +224,7 @@ export const GuitarCard = ({
           <p
             className='mt-0.5 text-[9px] font-medium capitalize tracking-[0.15em]'
             style={{ color: rs.baseColor, opacity: 0.7 }}>
-            {rarity}
+            {labels.rarity(rarity)}
           </p>
         </div>
 
@@ -269,13 +273,13 @@ export const GuitarCard = ({
         {/* Level emblem (every guitar has a level) + New flag */}
         <div className='absolute left-2 top-2 z-20 flex flex-col items-start gap-1.5'>
           {level > 0 && (
-            <LevelEmblem level={level} rarity={rarity} title='Guitar level' />
+            <LevelEmblem level={level} rarity={rarity} title={t("card.guitar.level")} />
           )}
           {item.isNew && (
             <div
               className='px-1.5 py-0.5 text-[8px] font-black tracking-widest text-black'
               style={{ backgroundColor: rs.baseColor, borderRadius: 3 }}>
-              New
+              {t("card.new")}
             </div>
           )}
         </div>
@@ -317,7 +321,7 @@ export const GuitarCard = ({
                   style={{ boxShadow: "0 0 8px rgba(251,191,36,1)" }}
                 />
                 <span className='text-[8px] font-medium tracking-wide text-amber-400/70'>
-                  equipped
+                  {t("card.guitar.equipped")}
                 </span>
               </div>
             )}
@@ -328,7 +332,7 @@ export const GuitarCard = ({
                   style={{ boxShadow: "0 0 8px rgba(34,211,238,0.9)" }}
                 />
                 <span className='text-[8px] font-medium tracking-wide text-cyan-400/70'>
-                  rig slot {rigSlot + 1}
+                  {t("card.guitar.rig_slot", { slot: rigSlot + 1 })}
                 </span>
               </div>
             )}
@@ -369,14 +373,14 @@ export const GuitarCard = ({
                       icon={Lock}
                       disabled
                       className='text-zinc-500 disabled:opacity-100'>
-                      Locked
+                      {t("card.locked")}
                     </CardAction>
                   </span>
                 </TooltipTrigger>
                 <TooltipContent
                   side='top'
                   className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-xs text-white'>
-                  {rarityLockReason(rarity, lockedLvl)}
+                  {rarityLockReason(rarity, lockedLvl, t, labels.rarity(rarity))}
                 </TooltipContent>
               </Tooltip>
             ) : (
@@ -385,7 +389,7 @@ export const GuitarCard = ({
                 icon={isEquipped ? Check : undefined}
                 onClick={() => onEquipClick?.()}
                 disabled={isEquipping}>
-                Equip
+                {t("card.equip")}
               </CardAction>
             )}
 
@@ -399,7 +403,7 @@ export const GuitarCard = ({
                       icon={Store}
                       onClick={() => onListClick(item.id, guitar.id)}
                       disabled={isListing || isEquipped || rigSlot != null}>
-                      Market
+                      {t("stash.menu.market")}
                     </CardAction>
                   </span>
                 </TooltipTrigger>
@@ -421,7 +425,7 @@ export const GuitarCard = ({
                       icon={Boxes}
                       onClick={() => onStashClick(item.id)}
                       disabled={isStashing || isEquipped || rigSlot != null}>
-                      Guild
+                      {t("card.guild")}
                     </CardAction>
                   </span>
                 </TooltipTrigger>
@@ -442,7 +446,7 @@ export const GuitarCard = ({
                       icon={Wrench}
                       onClick={() => onScrapClick(item.id, guitar.id)}
                       disabled={isScrapping || isEquipped || rigSlot != null}>
-                      Scrap
+                      {t("stash.menu.scrap")}
                     </CardAction>
                   </span>
                 </TooltipTrigger>
@@ -451,22 +455,24 @@ export const GuitarCard = ({
                   className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
                   {isEquipped ? (
                     <span className='text-xs'>
-                      Unequip from your profile before scrapping
+                      {t("card.guitar.scrap_unequip")}
                     </span>
                   ) : rigSlot != null ? (
                     <span className='text-xs'>
-                      Remove from rig slot {rigSlot + 1} before scrapping
+                      {t("card.guitar.scrap_unrig", { slot: rigSlot + 1 })}
                     </span>
                   ) : (
                     <div className='flex flex-col gap-1.5'>
                       <span className='text-[10px] font-bold capitalize tracking-wider text-zinc-400'>
-                        Scraps into {scrapTotal} parts
+                        {t("card.scraps_into", { count: scrapTotal })}
                       </span>
                       <ScrapYieldList parts={scrapParts} compact />
                       {salvagedMod && (
                         <span className='text-[11px] text-purple-300'>
-                          {salvagedMod.label} +{salvagedMod.points} comes off
-                          whole
+                          {t("card.mod_comes_off", {
+                            name: labels.mod(salvagedMod.featureId, salvagedMod.label),
+                            points: salvagedMod.points,
+                          })}
                         </span>
                       )}
                       {/* Named, this ran to eleven mods on a loaded guitar and
@@ -476,8 +482,12 @@ export const GuitarCard = ({
                       {scrappedMods.length > 0 && (
                         <div className='flex flex-wrap items-center gap-1.5'>
                           <span className='sr-only'>
-                            {scrappedMods.map((m) => m.label).join(", ")}{" "}
-                            {scrappedMods.length === 1 ? "goes" : "go"} with it
+                            {t("card.mods_go_with_it", {
+                              count: scrappedMods.length,
+                              names: scrappedMods
+                                .map((m) => labels.mod(m.featureId, m.label))
+                                .join(", "),
+                            })}
                           </span>
                           {scrappedMods.map((mod) => (
                             <ModArt
@@ -504,7 +514,7 @@ export const GuitarCard = ({
                     icon={Trash2}
                     onClick={() => onSellClick?.(item.id, guitar.id)}
                     disabled={isSelling || isEquipped}>
-                    Sell
+                    {t("common.sell")}
                   </CardAction>
                 </span>
               </TooltipTrigger>

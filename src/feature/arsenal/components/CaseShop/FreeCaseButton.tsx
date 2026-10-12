@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Ticket } from "lucide-react";
 
 interface FreeCaseButtonProps {
@@ -23,7 +24,10 @@ export const FreeCaseButton = ({
   onClick,
   tokens,
   className,
-}: FreeCaseButtonProps) => (
+}: FreeCaseButtonProps) => {
+  const { t } = useTranslation("arsenal");
+
+  return (
   <button
     onClick={onClick}
     disabled={isOpening}
@@ -34,8 +38,9 @@ export const FreeCaseButton = ({
     )}>
     <span className='flex items-center gap-2'>
       <Ticket size={14} strokeWidth={2.5} />
-      Open free
+      {t("cases.open_free")}
     </span>
     <span className='text-sm tabular-nums text-cyan-200'>{tokens}</span>
   </button>
-);
+  );
+};
