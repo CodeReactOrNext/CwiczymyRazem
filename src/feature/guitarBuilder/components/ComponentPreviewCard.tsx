@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
-import { SLOT_LABELS } from "../data/components";
 import type { OwnedComponent } from "../types/guitarBuilder.types";
 import { getComponent } from "../utils/components";
 import { ComponentThumb } from "./ComponentThumb";
@@ -15,6 +15,7 @@ export const ComponentPreviewCard = ({
   component: OwnedComponent;
   className?: string;
 }) => {
+  const labels = useArsenalLabels();
   const def = getComponent(component.defId);
   if (!def) return null;
   return (
@@ -31,11 +32,11 @@ export const ComponentPreviewCard = ({
           {def.name}
         </p>
         <p className='mt-1 text-xs text-zinc-400'>
-          {SLOT_LABELS[def.slot]} ·{" "}
+          {labels.slot(def.slot)} ·{" "}
           <span style={{ color: getRarityColor(def.rarity) }}>
-            {def.rarity}
+            {labels.rarity(def.rarity)}
           </span>{" "}
-          · Lvl {component.level}
+          · {labels.t("common.lvl", { level: component.level })}
         </p>
       </div>
     </div>

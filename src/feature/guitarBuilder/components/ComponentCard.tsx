@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
 import type { Owned } from "../utils/components";
 import { ComponentThumb } from "./ComponentThumb";
@@ -22,11 +23,12 @@ export const ComponentCard = ({
   onClick,
 }: ComponentCardProps) => {
   const color = getRarityColor(owned.def.rarity);
+  const labels = useArsenalLabels();
   return (
     <button
       type='button'
       aria-pressed={active}
-      title={problem ?? undefined}
+      title={problem ? labels.builderError(problem) : undefined}
       onClick={onClick}
       className={cn(
         "relative flex flex-col gap-2 rounded-lg p-3 text-left transition-colors click-behavior focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
@@ -50,8 +52,10 @@ export const ComponentCard = ({
           {owned.def.name}
         </span>
         <span className='flex items-center justify-between gap-2 text-xs'>
-          <span style={{ color }}>{owned.def.rarity}</span>
-          <span className='tabular-nums text-zinc-400'>Lvl {owned.level}</span>
+          <span style={{ color }}>{labels.rarity(owned.def.rarity)}</span>
+          <span className='tabular-nums text-zinc-400'>
+            {labels.t("common.lvl", { level: owned.level })}
+          </span>
         </span>
       </span>
     </button>
