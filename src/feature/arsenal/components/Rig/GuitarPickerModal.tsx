@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getGuitarEntries } from "feature/arsenal/utils/collectionEntries";
 import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
 import { rarityLockLabel } from "feature/progression/components/RarityLock";
@@ -36,6 +37,7 @@ export const GuitarPickerModal = ({
   // the way the stash orders itself — rarest first, copies together, best first.
   const items = filterAndSortEntries(getGuitarEntries(inventory), "", "rarity");
   const playerLvl = usePlayerLvl();
+  const { t } = useArsenalLabels();
 
   return (
     <div
@@ -47,15 +49,15 @@ export const GuitarPickerModal = ({
         <div className='mb-6 flex items-start justify-between gap-4'>
           <div className='flex flex-col gap-0.5'>
             <p className='text-[10px] font-bold capitalize tracking-widest text-zinc-500'>
-              Guitar Slot {slotIndex + 1}
+              {t("picker.guitar_slot", { slot: slotIndex + 1 })}
             </p>
             <p className='text-base font-black capitalize tracking-wide text-white'>
-              Choose a guitar
+              {t("picker.choose_guitar")}
             </p>
           </div>
           <button
             onClick={onClose}
-            aria-label='Close'
+            aria-label={t("common.close")}
             className='rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white'>
             <X size={18} />
           </button>
@@ -68,7 +70,7 @@ export const GuitarPickerModal = ({
               onClose();
             }}
             className='mb-6 w-full rounded-lg bg-zinc-800/40 py-3 text-xs font-bold capitalize tracking-widest text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white'>
-            Remove from slot
+            {t("picker.remove_from_slot")}
           </button>
         )}
 
@@ -125,13 +127,13 @@ export const GuitarPickerModal = ({
                   </span>
                   {isOccupied && (
                     <span className='text-[10px] font-semibold text-zinc-500'>
-                      In another slot
+                      {t("picker.in_another_slot")}
                     </span>
                   )}
                   {lockedLvl != null && !isOccupied && (
                     <span className='flex items-center gap-1 text-[10px] font-semibold text-zinc-400'>
                       <Lock size={9} aria-hidden />
-                      {rarityLockLabel(lockedLvl)}
+                      {rarityLockLabel(lockedLvl, t)}
                     </span>
                   )}
                 </div>

@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import {
   AlertTriangle,
   Expand,
@@ -92,9 +93,6 @@ import { SignalOrderStrip } from "./SignalOrderStrip";
 /** How long a "no room left" message stays up next to the board controls. */
 const NOTICE_MS = 8000;
 
-const BOARD_FULL =
-  "The board is full — take a pedal off before adding another.";
-
 /** One key of the zoom control that floats over the case on a touch screen.
     Thumb-sized, unlit, and out of the way until it is aimed at. */
 const ZOOM_KEY =
@@ -167,6 +165,7 @@ export const PedalboardView = ({
   // A screen with no cursor: every control that hides behind a hover has to
   // stand on its own here, and a card is read by tapping rather than pointing.
   const isTouch = Boolean(onShowCard);
+  const { t } = useArsenalLabels();
   const boardRef = useRef<HTMLDivElement>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [dragging, setDraggingState] = useState<DragState | null>(null);
@@ -414,14 +413,12 @@ export const PedalboardView = ({
       const short = layout.placed.length - patched.length;
       if (short > 0) {
         announce(
-          `The ${supply.name} has no output for ${short} pedal${
-            short > 1 ? "s" : ""
-          } — unpowered, so out of the signal chain and out of the rig.`,
+          t("board.no_output", { supply: supply.name, count: short }),
           setNotice,
         );
       }
     },
-    [applyLayout, geo, rail, savePower, supply, widthOf],
+    [applyLayout, geo, rail, savePower, supply, t, widthOf],
   );
 
   /**
@@ -593,7 +590,7 @@ export const PedalboardView = ({
       // on a screen with no cursor: the brick stays armed for the pedal to come.
       if (!current.moved) {
         setPatch({ ...current, armed: true });
-        setNotice("Now tap the pedal this cable goes to.");
+        setNotice(t("board.tap_target"));
         return;
       }
       setPatch(null);
@@ -607,7 +604,7 @@ export const PedalboardView = ({
       window.removeEventListener("pointerup", up);
       window.removeEventListener("pointercancel", up);
     };
-  }, [patching]);
+  }, [patching, t]);
 
   useEffect(() => {
     if (!patch) return;
@@ -627,7 +624,7 @@ export const PedalboardView = ({
     }
     if (powerState.outputsFree === 0) {
       announce(
-        `Every output on the ${supply.name} is taken — pull a cable out first.`,
+        t("board.outputs_taken", { supply: supply.name }),
         setNotice,
       );
       return;
@@ -810,7 +807,7 @@ export const PedalboardView = ({
             setOverflowIds((ids) =>
               ids.includes(itemId) ? ids : [...ids, itemId],
             );
-            announce(BOARD_FULL, setNotice);
+            announce(t("board.full"), setNotice);
           }
         }
       }
@@ -818,7 +815,7 @@ export const PedalboardView = ({
       setLocalItems(next);
       debouncedSave(next);
     },
-    [debouncedSave, boardBoxes, geo, isTouch],
+    [debouncedSave, boardBoxes, geo, isTouch, t],
   );
 
   useEffect(() => {
@@ -1096,7 +1093,7 @@ export const PedalboardView = ({
       heightPctFor(geo, widthOf, inventoryItemId),
     );
     if (!spot) {
-      announce(BOARD_FULL, setNotice);
+      announce(t("board.full"), setNotice);
       return;
     }
     const placement = { itemId: inventoryItemId, ...spot };
@@ -1152,7 +1149,7 @@ export const PedalboardView = ({
     setNotice(null);
     if (layout.overflow.length > 0) {
       announce(
-        `No room for ${layout.overflow.length} pedal${layout.overflow.length > 1 ? "s" : ""} — the rest is wired in order.`,
+        t("board.no_room_wired", { count: layout.overflow.length }),
         setNotice,
       );
     }
@@ -1171,7 +1168,7 @@ export const PedalboardView = ({
     if (layout.overflow.length > 0) {
       const count = layout.overflow.length;
       announce(
-        `No room for ${count} pedal${count > 1 ? "s" : ""} — ${count > 1 ? "they are" : "it is"} parked below the board.`,
+        t("board.no_room_parked", { count }),
         setNotice,
       );
     } else {
@@ -1217,7 +1214,7 @@ export const PedalboardView = ({
                   else plugIn(itemId);
                   close();
                 }}>
-                {powered ? "Unplug" : "Plug in"}
+                {powered ? t("board.unplug") : t("board.plug_in")}
               </CardAction>
             )}
             <CardAction
@@ -1226,7 +1223,7 @@ export const PedalboardView = ({
                 takeOffBoard(itemId);
                 close();
               }}>
-              Off the board
+              {t("board.off_the_board")}
             </CardAction>
           </CardActionRow>
         }
@@ -1360,10 +1357,10 @@ export const PedalboardView = ({
     if (previous === null || previous === verdict.tier) return;
     if (verdict.tier === "book" && verdict.rate > 0) {
       toast.success(
-        `By the book — the board pays +${verdict.rate.toFixed(1)} Fame/h`,
+        t("board.by_the_book", { rate: verdict.rate.toFixed(1) }),
       );
     }
-  }, [dragging, verdict.tier, verdict.rate]);
+  }, [dragging, verdict.tier, verdict.rate, t]);
 
   // Lets the picker grey out pedals the board has no space for, so a full
   // board is visible before anything is clicked.
@@ -1413,16 +1410,16 @@ export const PedalboardView = ({
         <button
           onClick={handleTidy}
           className={RIG_BUTTON}
-          title='Line every pedal up in rows'>
+          title={t("board.tidy_hint")}>
           <LayoutGrid size={12} strokeWidth={2.5} />
-          Tidy up
+          {t("stash.tidy_up")}
         </button>
       )}
       <button
         onClick={() => setShowPicker(true)}
         className={RIG_BUTTON_PRIMARY}>
         <Plus size={12} strokeWidth={2.5} />
-        Add pedal
+        {t("board.add_pedal")}
       </button>
     </>
   );
@@ -1481,7 +1478,7 @@ export const PedalboardView = ({
                   and dropped on the pedal it feeds. */}
               <div
                 onPointerDown={handleBrickPointerDown}
-                title={`${supply.name} — drag a cable onto a pedal to power it`}
+                title={t("board.brick_hint", { supply: supply.name })}
                 className='absolute'
                 style={{
                   left: `${(rail.brick.x / geo.viewW) * 100}%`,
@@ -1676,8 +1673,8 @@ export const PedalboardView = ({
                           e.preventDefault();
                           unplug(placement.itemId);
                         }}
-                        aria-label={`Unplug ${effect.name}`}
-                        title={`Unplug ${effect.name}`}
+                        aria-label={t("board.unplug_name", { name: effect.name })}
+                        title={t("board.unplug_name", { name: effect.name })}
                         className='absolute z-10 flex h-[30px] w-[30px] -translate-x-1/2 items-center justify-center rounded-full bg-black/85 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-amber-300'
                         style={{
                           left: `${dcOf(placement.itemId).x * 100}%`,
@@ -1695,7 +1692,7 @@ export const PedalboardView = ({
                       onMouseDown={(e) => e.stopPropagation()}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => handleRemove(placement.itemId, e)}
-                      aria-label={`Take ${effect.name} off the board`}
+                      aria-label={t("board.take_off_name", { name: effect.name })}
                       className='absolute -right-1.5 -top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded border border-zinc-500 bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:border-zinc-300 hover:text-white'>
                       <X size={8} />
                     </button>
@@ -1718,21 +1715,21 @@ export const PedalboardView = ({
           <button
             onClick={() => stepZoom(ZOOM_STEP)}
             disabled={view.zoom >= MAX_ZOOM}
-            aria-label='Zoom in'
+            aria-label={t("board.zoom_in")}
             className={ZOOM_KEY}>
             <ZoomIn size={17} strokeWidth={2.5} />
           </button>
           <button
             onClick={() => stepZoom(-ZOOM_STEP)}
             disabled={view.zoom <= zoomFloor}
-            aria-label='Zoom out'
+            aria-label={t("board.zoom_out")}
             className={ZOOM_KEY}>
             <ZoomOut size={17} strokeWidth={2.5} />
           </button>
           {view.zoom !== MIN_ZOOM && (
             <button
               onClick={() => setView(AT_REST)}
-              aria-label='Fit the whole board'
+              aria-label={t("board.fit_board")}
               className={ZOOM_KEY}>
               <Minimize2 size={16} strokeWidth={2.5} />
             </button>
@@ -1743,7 +1740,7 @@ export const PedalboardView = ({
           {!fullscreen && (
             <button
               onClick={openFullscreen}
-              aria-label='Open the board full screen'
+              aria-label={t("board.open_fullscreen")}
               className={ZOOM_KEY}>
               <Expand size={17} strokeWidth={2.5} />
             </button>
@@ -1766,25 +1763,25 @@ export const PedalboardView = ({
             <button
               onClick={handleWireUp}
               className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
-              title='Lay the whole board out in the order the craft asks for'>
+              title={t("signal.wire_it_up_hint")}>
               <Zap size={12} strokeWidth={2.5} />
-              Wire it up
+              {t("signal.wire_it_up")}
             </button>
           )}
           {canPatch && (
             <button
               onClick={handlePatch}
               className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
-              title='Plug in everything the brick still has a hole for'>
+              title={t("power.patch_hint")}>
               <Plug size={12} strokeWidth={2.5} />
-              Patch power
+              {t("power.patch")}
             </button>
           )}
           {boardActions}
         </div>
         <button
           onClick={closeFullscreen}
-          aria-label='Leave full screen'
+          aria-label={t("board.leave_fullscreen")}
           className={cn(ZOOM_KEY, "pointer-events-auto shrink-0")}>
           <Shrink size={17} strokeWidth={2.5} />
         </button>
@@ -1808,7 +1805,7 @@ export const PedalboardView = ({
           answer. */}
       <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-3'>
         <p className='font-display text-2xl font-black text-arsenal-text-primary'>
-          Pedalboard
+          {t("board.title")}
         </p>
         <div className='flex flex-wrap items-center gap-2'>
           <RigHardwarePanel rig={data.rig} fame={fame} />
@@ -1826,11 +1823,7 @@ export const PedalboardView = ({
           finger can do to it — but only while there is something to do it to. */}
       {isTouch && boardItems.length > 0 && (
         <p className='text-[11px] leading-relaxed text-zinc-500'>
-          Open the board full screen and turn the phone sideways for the most
-          room. Pinch the deck to zoom, push it around with one finger, and drag
-          a pedal to move it or swap it with a neighbour. Tap one for its card,
-          where you can unplug it or take it off the board — and tap the power
-          supply, then a pedal, to run a cable to it.
+          {t("board.touch_help")}
         </p>
       )}
 
@@ -1872,13 +1865,10 @@ export const PedalboardView = ({
         <div className='mt-4 flex flex-col gap-3 rounded bg-zinc-900/40 p-4'>
           <div className='flex flex-col gap-0.5'>
             <p className='text-[9px] font-bold capitalize tracking-[0.2em] text-amber-500/90'>
-              Off the board
+              {t("board.off_the_board")}
             </p>
             <p className='text-xs text-zinc-400'>
-              No room left for{" "}
-              {overflowItems.length === 1 ? "this pedal" : "these pedals"} —
-              take something off the board, then tidy up to put{" "}
-              {overflowItems.length === 1 ? "it" : "them"} back.
+              {t("board.overflow_hint", { count: overflowItems.length })}
             </p>
           </div>
           <div className='flex flex-wrap gap-5'>
@@ -1914,7 +1904,7 @@ export const PedalboardView = ({
                   {!isTouch && (
                     <button
                       onClick={(e) => handleRemove(placement.itemId, e)}
-                      aria-label={`Remove ${effect.name}`}
+                      aria-label={t("board.remove_name", { name: effect.name })}
                       className='absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white'>
                       <X size={8} />
                     </button>

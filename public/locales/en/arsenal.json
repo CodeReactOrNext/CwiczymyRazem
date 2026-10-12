@@ -982,5 +982,188 @@
       "mod": "Failed to fit the mod",
       "repair": "Failed to repair"
     }
+  },
+  "categories": {
+    "technique": "Technique",
+    "theory": "Theory",
+    "hearing": "Hearing",
+    "creativity": "Creativity"
+  },
+  "signal": {
+    "path": "Signal path",
+    "backwards": "{{wrong}} of {{cables}} backwards",
+    "all_in_order": "All {{count}} in order",
+    "wire_it_up": "Wire it up",
+    "wire_it_up_hint": "Lay the whole board out in the order the craft asks for",
+    "cables_in_order_one": "{{ok}} of {{count}} cable in order",
+    "cables_in_order": "{{ok}} of {{count}} cables in order",
+    "stage_empty": "Nothing of this kind is in service.",
+    "stage_lost": " ({{count}} lost to a duplicate copy)",
+    "stage_level_one": "1 pedal in service, worth Lv {{level}} of your Rig Level{{lost}}.",
+    "stage_level": "{{count}} pedals in service, worth Lv {{level}} of your Rig Level{{lost}}.",
+    "order": "Signal order",
+    "amber_backwards": "Amber pedals sit on a backwards cable",
+    "full_chain_done": "Every stage is in service. The board pays {{fame}} Fame an hour on top of its cables.",
+    "full_chain_hint": "Cover every stage at once and the board pays {{fame}} Fame an hour on top of its cables.",
+    "full_chain": "Full chain",
+    "to_go": "{{count}} to go",
+    "stages": {
+      "tuner": {
+        "label": "Tuner",
+        "why": "Reads the bare string, so nothing may colour the signal ahead of it."
+      },
+      "filter": {
+        "label": "Filter",
+        "why": "Sweeps a clean signal. Behind the dirt it sweeps the fizz instead."
+      },
+      "compressor": {
+        "label": "Compressor",
+        "why": "Evens out the pick attack before anything downstream amplifies it."
+      },
+      "fuzz": {
+        "label": "Fuzz",
+        "why": "Wants the pickups almost first-hand — buffers ahead of it choke it."
+      },
+      "overdrive": {
+        "label": "Overdrive",
+        "why": "Grit on a clean signal, and the pedal a distortion is stacked onto."
+      },
+      "distortion": {
+        "label": "Distortion",
+        "why": "The hardest clipping sits at the end of the dirt section."
+      },
+      "boost": {
+        "label": "Boost",
+        "why": "Pushes a tone that is already dirty. In front, it only adds volume."
+      },
+      "eq": {
+        "label": "EQ",
+        "why": "Shapes the finished dirt before the time effects ever hear it."
+      },
+      "modulation": {
+        "label": "Modulation",
+        "why": "Moves a settled tone around. Order within the family is taste."
+      },
+      "delay": {
+        "label": "Delay",
+        "why": "Repeats the finished sound. Ahead of the dirt it repeats mush."
+      },
+      "reverb": {
+        "label": "Reverb",
+        "why": "The room the whole rig is played in, so it is always last."
+      }
+    },
+    "tiers": {
+      "empty": {
+        "label": "Nothing Wired",
+        "note": "Put a pedal on the board and the order you put it in starts paying."
+      },
+      "single": {
+        "label": "One Pedal",
+        "note": "A chain needs somewhere for the signal to go next. Add a second pedal."
+      },
+      "book": {
+        "label": "By The Book",
+        "note": "Every cable runs into the pedal that belongs next. This is the order the craft asks for."
+      },
+      "one-off": {
+        "label": "One Cable Off",
+        "note": "One pedal is standing in the wrong place. Everything else is right."
+      },
+      "rough": {
+        "label": "Rough Wiring",
+        "note": "Two cables run backwards through the chain."
+      },
+      "spaghetti": {
+        "label": "Spaghetti",
+        "note": "The signal crosses itself all over the board."
+      }
+    }
+  },
+  "power": {
+    "label": "Power",
+    "one_unpowered": "{{name}} has no power",
+    "many_unpowered": "{{count}} pedals have no power",
+    "nothing_plugged": "Nothing plugged in yet",
+    "all_running": "Every pedal is running",
+    "patch": "Patch power",
+    "patch_hint": "Plug in everything the brick still has a hole for",
+    "outputs": "{{used}} / {{total}} outputs",
+    "outputs_total": "{{total}} outputs",
+    "no_power_for": "No power for {{names}}",
+    "dead_pedal_note": "A pedal with no power adds no rig level and earns no Fame."
+  },
+  "duplicates": {
+    "title": "Duplicates",
+    "copy_line": "{{name}} Lv {{level}} → counts {{counted}}",
+    "rule": "The best copy counts in full, the second half, any more nothing.",
+    "keeper": "{{total}} copies of {{name}} are powered on the board. This is the best of them, so it counts in full (Lv {{level}}) — the marks on the others are what they are counted at.",
+    "copy": "The {{ordinal}} {{name}} on the board — it {{worth}} (Lv {{level}} → {{counted}}). Swap it for a different pedal and every level counts.",
+    "worth_none": "adds nothing to your Rig Level",
+    "worth_half": "adds half its level to your Rig Level",
+    "worth_pct": "adds {{pct}}% of its level to your Rig Level"
+  },
+  "picker": {
+    "pedal_slot": "Pedalboard · Slot {{slot}}",
+    "choose_effect": "Choose an effect",
+    "board_full": "The board is full — take a pedal off it before adding another one.",
+    "remove_from_slot": "Remove from slot",
+    "no_effects": "No effects in your collection yet.",
+    "no_effects_hint": "Draw an effect pack to get started!",
+    "on_another_slot": "On another slot",
+    "no_room": "No room on the board",
+    "guitar_slot": "Guitar Slot {{slot}}",
+    "choose_guitar": "Choose a guitar",
+    "in_another_slot": "In another slot"
+  },
+  "rig": {
+    "rig_level": "Rig level",
+    "fame_per_hour": "Fame / hour",
+    "base": "Base",
+    "traits": "Traits",
+    "category_bonus": "{{category}} bonus",
+    "hardware_costs": "{{name}} costs {{fame}} Fame — {{missing}} more needed",
+    "upgrade_label": "Upgrade {{label}}",
+    "pedalboard_hw": "Pedalboard",
+    "power_supply_hw": "Power supply"
+  },
+  "rack": {
+    "fit_slot": "Fit a guitar in slot {{slot}}",
+    "equip_guitar": "Equip guitar",
+    "slot": "Slot {{slot}}",
+    "change": "Change",
+    "more_for_slot": "More for slot {{slot}}",
+    "take_off": "Take off the rack",
+    "condition_word": "condition"
+  },
+  "board": {
+    "title": "Pedalboard",
+    "full": "The board is full — take a pedal off before adding another.",
+    "no_output_one": "The {{supply}} has no output for {{count}} pedal — unpowered, so out of the signal chain and out of the rig.",
+    "no_output": "The {{supply}} has no output for {{count}} pedals — unpowered, so out of the signal chain and out of the rig.",
+    "tap_target": "Now tap the pedal this cable goes to.",
+    "outputs_taken": "Every output on the {{supply}} is taken — pull a cable out first.",
+    "no_room_wired_one": "No room for {{count}} pedal — the rest is wired in order.",
+    "no_room_wired": "No room for {{count}} pedals — the rest is wired in order.",
+    "no_room_parked_one": "No room for {{count}} pedal — it is parked below the board.",
+    "no_room_parked": "No room for {{count}} pedals — they are parked below the board.",
+    "unplug": "Unplug",
+    "plug_in": "Plug in",
+    "off_the_board": "Off the board",
+    "by_the_book": "By the book — the board pays +{{rate}} Fame/h",
+    "tidy_hint": "Line every pedal up in rows",
+    "add_pedal": "Add pedal",
+    "brick_hint": "{{supply}} — drag a cable onto a pedal to power it",
+    "unplug_name": "Unplug {{name}}",
+    "take_off_name": "Take {{name}} off the board",
+    "remove_name": "Remove {{name}}",
+    "zoom_in": "Zoom in",
+    "zoom_out": "Zoom out",
+    "fit_board": "Fit the whole board",
+    "open_fullscreen": "Open the board full screen",
+    "leave_fullscreen": "Leave full screen",
+    "touch_help": "Open the board full screen and turn the phone sideways for the most room. Pinch the deck to zoom, push it around with one finger, and drag a pedal to move it or swap it with a neighbour. Tap one for its card, where you can unplug it or take it off the board — and tap the power supply, then a pedal, to run a cable to it.",
+    "overflow_hint_one": "No room left for this pedal — take something off the board, then tidy up to put it back.",
+    "overflow_hint": "No room left for these pedals — take something off the board, then tidy up to put them back."
   }
 }

@@ -1007,5 +1007,190 @@
       "mod": "Nie udało się zamontować moda",
       "repair": "Naprawa się nie udała"
     }
+  },
+  "categories": {
+    "technique": "Technika",
+    "theory": "Teoria",
+    "hearing": "Słuch",
+    "creativity": "Kreatywność"
+  },
+  "signal": {
+    "path": "Ścieżka sygnału",
+    "backwards": "Odwrotnie: {{wrong}} z {{cables}}",
+    "all_in_order": "Wszystkie w kolejności ({{count}})",
+    "wire_it_up": "Okabluj",
+    "wire_it_up_hint": "Ułóż cały pedalboard w kolejności, jakiej wymaga rzemiosło",
+    "cables_in_order_one": "{{ok}} z {{count}} kabla w kolejności",
+    "cables_in_order": "{{ok}} z {{count}} kabli w kolejności",
+    "stage_empty": "Nic tego rodzaju nie jest w użyciu.",
+    "stage_lost": " (duplikat zabiera {{count}})",
+    "stage_level_one": "1 efekt w użyciu, wart Poz. {{level}} Twojego Rig Level{{lost}}.",
+    "stage_level_few": "{{count}} efekty w użyciu, warte Poz. {{level}} Twojego Rig Level{{lost}}.",
+    "stage_level_many": "{{count}} efektów w użyciu, wartych Poz. {{level}} Twojego Rig Level{{lost}}.",
+    "stage_level": "Efekty w użyciu: {{count}}, warte Poz. {{level}} Twojego Rig Level{{lost}}.",
+    "order": "Kolejność sygnału",
+    "amber_backwards": "Bursztynowe efekty siedzą na odwróconym kablu",
+    "full_chain_done": "Każdy etap jest w użyciu. Pedalboard płaci {{fame}} Fame na godzinę ponad to, co dają kable.",
+    "full_chain_hint": "Obsadź naraz każdy etap, a pedalboard zapłaci {{fame}} Fame na godzinę ponad to, co dają kable.",
+    "full_chain": "Pełny łańcuch",
+    "to_go": "zostało {{count}}",
+    "stages": {
+      "tuner": {
+        "label": "Tuner",
+        "why": "Czyta gołą strunę, więc nic nie może barwić sygnału przed nim."
+      },
+      "filter": {
+        "label": "Filtr",
+        "why": "Przemiata czysty sygnał. Za przesterem przemiata już tylko szum."
+      },
+      "compressor": {
+        "label": "Kompresor",
+        "why": "Wyrównuje atak kostki, zanim cokolwiek dalej go wzmocni."
+      },
+      "fuzz": {
+        "label": "Fuzz",
+        "why": "Chce sygnału prawie prosto z przetworników — bufory przed nim go duszą."
+      },
+      "overdrive": {
+        "label": "Overdrive",
+        "why": "Brud na czystym sygnale i efekt, na który nakłada się distortion."
+      },
+      "distortion": {
+        "label": "Distortion",
+        "why": "Najmocniejsze obcinanie stoi na końcu sekcji przesterów."
+      },
+      "boost": {
+        "label": "Boost",
+        "why": "Popycha brzmienie, które już jest przesterowane. Postawiony z przodu tylko podgłaśnia."
+      },
+      "eq": {
+        "label": "Korektor",
+        "why": "Kształtuje gotowy przester, zanim usłyszą go efekty czasowe."
+      },
+      "modulation": {
+        "label": "Modulacja",
+        "why": "Porusza ustalonym brzmieniem. Kolejność w tej rodzinie to kwestia gustu."
+      },
+      "delay": {
+        "label": "Delay",
+        "why": "Powtarza gotowe brzmienie. Przed przesterem powtarza papkę."
+      },
+      "reverb": {
+        "label": "Pogłos",
+        "why": "Pomieszczenie, w którym gra cały rig, więc zawsze jest ostatni."
+      }
+    },
+    "tiers": {
+      "empty": {
+        "label": "Nic nie podłączono",
+        "note": "Postaw efekt na pedalboardzie, a kolejność, w jakiej go ustawisz, zacznie się opłacać."
+      },
+      "single": {
+        "label": "Jeden efekt",
+        "note": "Łańcuch potrzebuje miejsca, dokąd sygnał pójdzie dalej. Dodaj drugi efekt."
+      },
+      "book": {
+        "label": "Podręcznikowo",
+        "note": "Każdy kabel prowadzi do efektu, który powinien być następny. Taką kolejność narzuca rzemiosło."
+      },
+      "one-off": {
+        "label": "Jeden kabel źle",
+        "note": "Jeden efekt stoi w złym miejscu. Cała reszta jest dobrze."
+      },
+      "rough": {
+        "label": "Bałagan w kablach",
+        "note": "Dwa kable biegną w łańcuchu pod prąd."
+      },
+      "spaghetti": {
+        "label": "Spaghetti",
+        "note": "Sygnał krzyżuje się po całym pedalboardzie."
+      }
+    }
+  },
+  "power": {
+    "label": "Zasilanie",
+    "one_unpowered": "{{name}} nie ma zasilania",
+    "many_unpowered": "Efekty bez zasilania: {{count}}",
+    "nothing_plugged": "Jeszcze nic nie podłączono",
+    "all_running": "Każdy efekt działa",
+    "patch": "Podłącz zasilanie",
+    "patch_hint": "Podłącz wszystko, na co zasilacz ma jeszcze wolne gniazdo",
+    "outputs": "Wyjścia: {{used}} / {{total}}",
+    "outputs_total": "{{total}} wyjść",
+    "no_power_for": "Brak zasilania: {{names}}",
+    "dead_pedal_note": "Efekt bez zasilania nie dodaje poziomu riga i nie zarabia Fame."
+  },
+  "duplicates": {
+    "title": "Duplikaty",
+    "copy_line": "{{name}} Poz. {{level}} → liczy się {{counted}}",
+    "rule": "Najlepsza kopia liczy się w całości, druga w połowie, kolejne wcale.",
+    "keeper": "Na pedalboardzie zasilanych jest {{total}} kopii {{name}}. Ta jest najlepsza, więc liczy się w całości (Poz. {{level}}) — oznaczenia na pozostałych mówią, ile są warte.",
+    "copy": "Kopia nr {{n}} {{name}} na pedalboardzie — {{worth}} (Poz. {{level}} → {{counted}}). Zamień ją na inny efekt, a każdy poziom się policzy.",
+    "worth_none": "nic nie dodaje do Twojego Rig Level",
+    "worth_half": "dodaje połowę swojego poziomu do Twojego Rig Level",
+    "worth_pct": "dodaje {{pct}}% swojego poziomu do Twojego Rig Level"
+  },
+  "picker": {
+    "pedal_slot": "Pedalboard · Slot {{slot}}",
+    "choose_effect": "Wybierz efekt",
+    "board_full": "Pedalboard jest pełny — zdejmij jakiś efekt, zanim dodasz kolejny.",
+    "remove_from_slot": "Usuń ze slotu",
+    "no_effects": "Nie masz jeszcze efektów w kolekcji.",
+    "no_effects_hint": "Otwórz skrzynkę z efektami, żeby zacząć!",
+    "on_another_slot": "W innym slocie",
+    "no_room": "Brak miejsca na pedalboardzie",
+    "guitar_slot": "Slot na gitarę {{slot}}",
+    "choose_guitar": "Wybierz gitarę",
+    "in_another_slot": "W innym slocie"
+  },
+  "rig": {
+    "rig_level": "Poziom riga",
+    "fame_per_hour": "Fame / godz.",
+    "base": "Bazowo",
+    "traits": "Cechy",
+    "category_bonus": "Premia: {{category}}",
+    "hardware_costs": "{{name}} kosztuje {{fame}} Fame — brakuje {{missing}}",
+    "upgrade_label": "Ulepsz: {{label}}",
+    "pedalboard_hw": "Pedalboard",
+    "power_supply_hw": "Zasilacz"
+  },
+  "rack": {
+    "fit_slot": "Wstaw gitarę do slotu {{slot}}",
+    "equip_guitar": "Załóż gitarę",
+    "slot": "Slot {{slot}}",
+    "change": "Zmień",
+    "more_for_slot": "Więcej dla slotu {{slot}}",
+    "take_off": "Zdejmij ze stojaka",
+    "condition_word": "stan"
+  },
+  "board": {
+    "title": "Pedalboard",
+    "full": "Pedalboard jest pełny — zdejmij efekt, zanim dodasz kolejny.",
+    "no_output_one": "{{supply}} nie ma wyjścia dla {{count}} efektu — bez zasilania, więc poza łańcuchem sygnału i poza rigiem.",
+    "no_output": "{{supply}} nie ma wyjść dla {{count}} efektów — bez zasilania, więc poza łańcuchem sygnału i poza rigiem.",
+    "tap_target": "Teraz stuknij efekt, do którego ma iść ten kabel.",
+    "outputs_taken": "Wszystkie wyjścia {{supply}} są zajęte — najpierw wyciągnij jakiś kabel.",
+    "no_room_wired_one": "Brak miejsca dla {{count}} efektu — reszta jest okablowana w kolejności.",
+    "no_room_wired": "Brak miejsca dla {{count}} efektów — reszta jest okablowana w kolejności.",
+    "no_room_parked_one": "Brak miejsca dla {{count}} efektu — stoi pod pedalboardem.",
+    "no_room_parked": "Brak miejsca dla {{count}} efektów — stoją pod pedalboardem.",
+    "unplug": "Odłącz",
+    "plug_in": "Podłącz",
+    "off_the_board": "Poza pedalboardem",
+    "by_the_book": "Podręcznikowo — pedalboard płaci +{{rate}} Fame/h",
+    "tidy_hint": "Ustaw wszystkie efekty w rzędach",
+    "add_pedal": "Dodaj efekt",
+    "brick_hint": "{{supply}} — przeciągnij kabel na efekt, żeby go zasilić",
+    "unplug_name": "Odłącz {{name}}",
+    "take_off_name": "Zdejmij {{name}} z pedalboardu",
+    "remove_name": "Usuń {{name}}",
+    "zoom_in": "Przybliż",
+    "zoom_out": "Oddal",
+    "fit_board": "Pokaż cały pedalboard",
+    "open_fullscreen": "Otwórz pedalboard na pełnym ekranie",
+    "leave_fullscreen": "Wyjdź z pełnego ekranu",
+    "touch_help": "Otwórz pedalboard na pełnym ekranie i obróć telefon poziomo, żeby mieć najwięcej miejsca. Zsuń palce, żeby przybliżyć, przesuwaj płytę jednym palcem i przeciągnij efekt, żeby go przenieść albo zamienić z sąsiadem. Stuknij efekt, żeby zobaczyć jego kartę, gdzie możesz go odłączyć albo zdjąć — a żeby poprowadzić kabel, stuknij zasilacz, a potem efekt.",
+    "overflow_hint_one": "Brak miejsca dla tego efektu — zdejmij coś z pedalboardu, a potem uporządkuj, żeby go odstawić.",
+    "overflow_hint": "Brak miejsca dla tych efektów — zdejmij coś z pedalboardu, a potem uporządkuj, żeby je odstawić."
   }
 }

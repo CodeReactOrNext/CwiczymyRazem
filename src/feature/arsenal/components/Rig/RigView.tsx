@@ -1,4 +1,5 @@
 import { CursorTooltip } from "components/UI/CursorTooltip/CursorTooltip";
+import { useTranslation } from "hooks/useTranslation";
 import { X } from "lucide-react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -27,6 +28,7 @@ export interface RigHoverState {
 
 export const RigView = ({ data, fame }: RigViewProps) => {
   const { mutate: saveRig } = useUpdateRig();
+  const { t } = useTranslation("arsenal");
   const { mutate: savePedalboard } = useUpdatePedalboard();
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [pickerSlot, setPickerSlot] = useState<number | null>(null);
@@ -146,7 +148,7 @@ export const RigView = ({ data, fame }: RigViewProps) => {
               onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => setPinnedCard(null)}
-                aria-label='Close'
+                aria-label={t("common.close")}
                 className='absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white'>
                 <X size={15} />
               </button>

@@ -983,5 +983,188 @@
       "mod": "No se pudo instalar el mod",
       "repair": "La reparación falló"
     }
+  },
+  "categories": {
+    "technique": "Técnica",
+    "theory": "Teoría",
+    "hearing": "Oído",
+    "creativity": "Creatividad"
+  },
+  "signal": {
+    "path": "Ruta de la señal",
+    "backwards": "{{wrong}} de {{cables}} al revés",
+    "all_in_order": "Los {{count}} en orden",
+    "wire_it_up": "Cablear",
+    "wire_it_up_hint": "Coloca toda la pedalera en el orden que pide el oficio",
+    "cables_in_order_one": "{{ok}} de {{count}} cable en orden",
+    "cables_in_order": "{{ok}} de {{count}} cables en orden",
+    "stage_empty": "No hay nada de este tipo en uso.",
+    "stage_lost": " ({{count}} perdidos por una copia duplicada)",
+    "stage_level_one": "1 pedal en uso, vale Nv. {{level}} de tu nivel de rig{{lost}}.",
+    "stage_level": "{{count}} pedales en uso, valen Nv. {{level}} de tu nivel de rig{{lost}}.",
+    "order": "Orden de la señal",
+    "amber_backwards": "Los pedales ámbar están en un cable al revés",
+    "full_chain_done": "Todas las etapas están en uso. La pedalera paga {{fame}} Fame por hora además de sus cables.",
+    "full_chain_hint": "Cubre todas las etapas a la vez y la pedalera pagará {{fame}} Fame por hora además de sus cables.",
+    "full_chain": "Cadena completa",
+    "to_go": "faltan {{count}}",
+    "stages": {
+      "tuner": {
+        "label": "Afinador",
+        "why": "Lee la cuerda desnuda, así que nada puede colorear la señal antes que él."
+      },
+      "filter": {
+        "label": "Filtro",
+        "why": "Barre una señal limpia. Detrás de la saturación solo barre el zumbido."
+      },
+      "compressor": {
+        "label": "Compresor",
+        "why": "Iguala el ataque de la púa antes de que algo posterior lo amplifique."
+      },
+      "fuzz": {
+        "label": "Fuzz",
+        "why": "Quiere las pastillas casi de primera mano — los buffers delante lo ahogan."
+      },
+      "overdrive": {
+        "label": "Overdrive",
+        "why": "Arenilla sobre una señal limpia, y el pedal sobre el que se apila una distorsión."
+      },
+      "distortion": {
+        "label": "Distorsión",
+        "why": "El recorte más duro va al final de la sección de saturación."
+      },
+      "boost": {
+        "label": "Boost",
+        "why": "Empuja un tono que ya está saturado. Delante solo sube el volumen."
+      },
+      "eq": {
+        "label": "EQ",
+        "why": "Da forma a la saturación terminada antes de que la oigan los efectos de tiempo."
+      },
+      "modulation": {
+        "label": "Modulación",
+        "why": "Mueve un tono ya asentado. El orden dentro de la familia es cuestión de gusto."
+      },
+      "delay": {
+        "label": "Delay",
+        "why": "Repite el sonido terminado. Antes de la saturación repite papilla."
+      },
+      "reverb": {
+        "label": "Reverb",
+        "why": "La sala en la que suena todo el rig, así que siempre va al final."
+      }
+    },
+    "tiers": {
+      "empty": {
+        "label": "Nada cableado",
+        "note": "Pon un pedal en la pedalera y el orden en que lo coloques empezará a pagar."
+      },
+      "single": {
+        "label": "Un pedal",
+        "note": "Una cadena necesita un sitio al que la señal vaya después. Añade un segundo pedal."
+      },
+      "book": {
+        "label": "De manual",
+        "note": "Cada cable va al pedal que toca a continuación. Este es el orden que pide el oficio."
+      },
+      "one-off": {
+        "label": "Un cable mal",
+        "note": "Un pedal está en el sitio equivocado. Todo lo demás está bien."
+      },
+      "rough": {
+        "label": "Cableado caótico",
+        "note": "Dos cables van al revés por la cadena."
+      },
+      "spaghetti": {
+        "label": "Espaguetis",
+        "note": "La señal se cruza por toda la pedalera."
+      }
+    }
+  },
+  "power": {
+    "label": "Alimentación",
+    "one_unpowered": "{{name}} no tiene alimentación",
+    "many_unpowered": "{{count}} pedales no tienen alimentación",
+    "nothing_plugged": "Aún no hay nada enchufado",
+    "all_running": "Todos los pedales funcionan",
+    "patch": "Conectar alimentación",
+    "patch_hint": "Enchufa todo para lo que la fuente aún tenga una toma libre",
+    "outputs": "{{used}} / {{total}} salidas",
+    "outputs_total": "{{total}} salidas",
+    "no_power_for": "Sin alimentación: {{names}}",
+    "dead_pedal_note": "Un pedal sin alimentación no suma nivel de rig ni gana Fame."
+  },
+  "duplicates": {
+    "title": "Duplicados",
+    "copy_line": "{{name}} Nv. {{level}} → cuenta {{counted}}",
+    "rule": "La mejor copia cuenta entera, la segunda la mitad, las demás nada.",
+    "keeper": "Hay {{total}} copias de {{name}} alimentadas en la pedalera. Esta es la mejor, así que cuenta entera (Nv. {{level}}) — las marcas en las otras son lo que cuentan.",
+    "copy": "La copia n.º {{n}} de {{name}} en la pedalera — {{worth}} (Nv. {{level}} → {{counted}}). Cámbiala por otro pedal y cada nivel contará.",
+    "worth_none": "no suma nada a tu nivel de rig",
+    "worth_half": "suma la mitad de su nivel a tu nivel de rig",
+    "worth_pct": "suma el {{pct}} % de su nivel a tu nivel de rig"
+  },
+  "picker": {
+    "pedal_slot": "Pedalera · Ranura {{slot}}",
+    "choose_effect": "Elige un efecto",
+    "board_full": "La pedalera está llena — quita un pedal antes de añadir otro.",
+    "remove_from_slot": "Quitar de la ranura",
+    "no_effects": "Aún no tienes efectos en tu colección.",
+    "no_effects_hint": "¡Abre una caja de efectos para empezar!",
+    "on_another_slot": "En otra ranura",
+    "no_room": "No hay sitio en la pedalera",
+    "guitar_slot": "Ranura de guitarra {{slot}}",
+    "choose_guitar": "Elige una guitarra",
+    "in_another_slot": "En otra ranura"
+  },
+  "rig": {
+    "rig_level": "Nivel de rig",
+    "fame_per_hour": "Fame / hora",
+    "base": "Base",
+    "traits": "Rasgos",
+    "category_bonus": "Bonus de {{category}}",
+    "hardware_costs": "{{name}} cuesta {{fame}} Fame — faltan {{missing}}",
+    "upgrade_label": "Mejorar: {{label}}",
+    "pedalboard_hw": "Pedalera",
+    "power_supply_hw": "Fuente de alimentación"
+  },
+  "rack": {
+    "fit_slot": "Colocar una guitarra en la ranura {{slot}}",
+    "equip_guitar": "Equipar guitarra",
+    "slot": "Ranura {{slot}}",
+    "change": "Cambiar",
+    "more_for_slot": "Más para la ranura {{slot}}",
+    "take_off": "Quitar del rack",
+    "condition_word": "estado"
+  },
+  "board": {
+    "title": "Pedalera",
+    "full": "La pedalera está llena — quita un pedal antes de añadir otro.",
+    "no_output_one": "{{supply}} no tiene salida para {{count}} pedal — sin alimentación, queda fuera de la cadena de señal y del rig.",
+    "no_output": "{{supply}} no tiene salidas para {{count}} pedales — sin alimentación, quedan fuera de la cadena de señal y del rig.",
+    "tap_target": "Ahora toca el pedal al que va este cable.",
+    "outputs_taken": "Todas las salidas de {{supply}} están ocupadas — primero quita un cable.",
+    "no_room_wired_one": "No hay sitio para {{count}} pedal — el resto queda cableado en orden.",
+    "no_room_wired": "No hay sitio para {{count}} pedales — el resto queda cableado en orden.",
+    "no_room_parked_one": "No hay sitio para {{count}} pedal — queda aparcado debajo de la pedalera.",
+    "no_room_parked": "No hay sitio para {{count}} pedales — quedan aparcados debajo de la pedalera.",
+    "unplug": "Desenchufar",
+    "plug_in": "Enchufar",
+    "off_the_board": "Fuera de la pedalera",
+    "by_the_book": "De manual — la pedalera paga +{{rate}} Fame/h",
+    "tidy_hint": "Alinea todos los pedales en filas",
+    "add_pedal": "Añadir pedal",
+    "brick_hint": "{{supply}} — arrastra un cable a un pedal para alimentarlo",
+    "unplug_name": "Desenchufar {{name}}",
+    "take_off_name": "Quitar {{name}} de la pedalera",
+    "remove_name": "Quitar {{name}}",
+    "zoom_in": "Acercar",
+    "zoom_out": "Alejar",
+    "fit_board": "Ver toda la pedalera",
+    "open_fullscreen": "Abrir la pedalera a pantalla completa",
+    "leave_fullscreen": "Salir de pantalla completa",
+    "touch_help": "Abre la pedalera a pantalla completa y gira el móvil para tener más espacio. Pellizca para hacer zoom, muévela con un dedo y arrastra un pedal para moverlo o cambiarlo por su vecino. Toca uno para ver su tarjeta, donde puedes desenchufarlo o quitarlo de la pedalera — y toca la fuente de alimentación y luego un pedal para tender un cable.",
+    "overflow_hint_one": "No queda sitio para este pedal — quita algo de la pedalera y luego ordena para volver a colocarlo.",
+    "overflow_hint": "No queda sitio para estos pedales — quita algo de la pedalera y luego ordena para volver a colocarlos."
   }
 }

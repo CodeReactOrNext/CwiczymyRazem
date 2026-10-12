@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getEffectEntries } from "feature/arsenal/utils/collectionEntries";
 import { filterAndSortEntries } from "feature/arsenal/utils/collectionFilter";
 import { rarityLockLabel } from "feature/progression/components/RarityLock";
@@ -44,6 +45,8 @@ export const EffectPickerModal = ({
     "rarity",
   );
   const playerLvl = usePlayerLvl();
+  const labels = useArsenalLabels();
+  const { t } = labels;
 
   const boardFull =
     !!canFit &&
@@ -62,15 +65,15 @@ export const EffectPickerModal = ({
         <div className='mb-6 flex items-start justify-between gap-4'>
           <div className='flex flex-col gap-0.5'>
             <p className='text-[10px] font-bold capitalize tracking-widest text-zinc-500'>
-              Pedalboard · Slot {slotIndex + 1}
+              {t("picker.pedal_slot", { slot: slotIndex + 1 })}
             </p>
             <p className='text-base font-black capitalize tracking-wide text-white'>
-              Choose an effect
+              {t("picker.choose_effect")}
             </p>
           </div>
           <button
             onClick={onClose}
-            aria-label='Close'
+            aria-label={t("common.close")}
             className='rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white'>
             <X size={18} />
           </button>
@@ -78,7 +81,7 @@ export const EffectPickerModal = ({
 
         {boardFull && (
           <p className='mb-6 rounded-lg bg-amber-500/10 px-4 py-3 text-xs font-semibold text-amber-400'>
-            The board is full — take a pedal off it before adding another one.
+            {t("picker.board_full")}
           </p>
         )}
 
@@ -89,15 +92,15 @@ export const EffectPickerModal = ({
               onClose();
             }}
             className='mb-6 w-full rounded-lg bg-zinc-800/40 py-3 text-xs font-bold capitalize tracking-widest text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white'>
-            Remove from slot
+            {t("picker.remove_from_slot")}
           </button>
         )}
 
         {items.length === 0 && (
           <p className='py-8 text-center text-sm text-zinc-500'>
-            No effects in your collection yet.
+            {t("picker.no_effects")}
             <br />
-            Draw an effect pack to get started!
+            {t("picker.no_effects_hint")}
           </p>
         )}
 
@@ -142,25 +145,25 @@ export const EffectPickerModal = ({
                   <span
                     className='truncate text-[10px] font-bold capitalize'
                     style={{ color: RARITY_STYLES[rarity].baseColor }}>
-                    {effect.type}
+                    {labels.effectType(effect.type)}
                   </span>
                   <span className='truncate text-xs font-black capitalize leading-snug text-white'>
                     {effect.name}
                   </span>
                   {isOccupied && (
                     <span className='text-[10px] font-semibold text-zinc-500'>
-                      On another slot
+                      {t("picker.on_another_slot")}
                     </span>
                   )}
                   {noRoom && (
                     <span className='text-[10px] font-semibold text-amber-500/90'>
-                      No room on the board
+                      {t("picker.no_room")}
                     </span>
                   )}
                   {lockedLvl != null && !isOccupied && !noRoom && (
                     <span className='flex items-center gap-1 text-[10px] font-semibold text-zinc-400'>
                       <Lock size={9} aria-hidden />
-                      {rarityLockLabel(lockedLvl)}
+                      {rarityLockLabel(lockedLvl, t)}
                     </span>
                   )}
                 </div>

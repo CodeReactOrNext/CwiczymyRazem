@@ -1,5 +1,7 @@
 import type { ConditionGrade } from "feature/arsenal/data/itemStats";
 import { getPartLabel } from "feature/arsenal/data/partDefinitions";
+import type { ChainTier, SignalStage } from "feature/arsenal/data/signalChain";
+import { CHAIN_TIERS } from "feature/arsenal/data/signalChain";
 import type { ResolvedTrait } from "feature/arsenal/data/traits";
 import type {
   CaseDefinition,
@@ -52,6 +54,15 @@ export const useArsenalLabels = () => {
           trait.description,
           trait.params,
         ),
+      /** A pedalboard stage ("Tuner", "Modulation") and why it sits where it does. */
+      stageLabel: (stage: Pick<SignalStage, "id" | "label">) =>
+        t(`signal.stages.${stage.id}.label`, stage.label),
+      stageWhy: (stage: Pick<SignalStage, "id" | "why">) =>
+        t(`signal.stages.${stage.id}.why`, stage.why),
+      chainTierLabel: (tier: ChainTier) =>
+        t(`signal.tiers.${tier}.label`, CHAIN_TIERS[tier].label),
+      chainTierNote: (tier: ChainTier) =>
+        t(`signal.tiers.${tier}.note`, CHAIN_TIERS[tier].note),
       caseName: (def: Pick<CaseDefinition, "id" | "name">) =>
         t(`cases.defs.${def.id}.name`, def.name),
       caseDescription: (def: Pick<CaseDefinition, "id" | "description">) =>
