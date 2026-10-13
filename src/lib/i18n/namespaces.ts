@@ -10,6 +10,7 @@ import common from "../../../public/locales/en/common.json";
 import community from "../../../public/locales/en/community.json";
 import dashboard from "../../../public/locales/en/dashboard.json";
 import desktop from "../../../public/locales/en/desktop.json";
+import exercise_content from "../../../public/locales/en/exercise_content.json";
 import exercises from "../../../public/locales/en/exercises.json";
 import faq from "../../../public/locales/en/faq.json";
 import feed from "../../../public/locales/en/feed.json";
@@ -65,6 +66,7 @@ export const TRANSLATION_NAMESPACES = [
   "community",
   "dashboard",
   "desktop",
+  "exercise_content",
   "exercises",
   "faq",
   "feed",
@@ -138,6 +140,7 @@ export const EN_CATALOG: LocaleCatalog = {
   community,
   dashboard,
   desktop,
+  exercise_content,
   exercises,
   faq,
   feed,

@@ -17,6 +17,13 @@ const LOCALES_DIR = join(__dirname, "../../../public/locales");
 /** The plural forms `resolve` looks for after a key. */
 const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/;
 
+/**
+ * Namespaces whose English lives in code rather than in a catalog: the exercise
+ * and plan catalogue is written inline next to its tablature, and only the
+ * other languages carry a translation of it. English has no file to compare to.
+ */
+const CODE_ENGLISH = new Set(["exercise_content"]);
+
 const filePath = (locale: string, namespace: string) =>
   join(LOCALES_DIR, locale, `${namespace}.json`);
 
@@ -69,7 +76,9 @@ describe("translation files", () => {
     const orphans = SUPPORTED_LOCALES.filter(
       ({ code }) => code !== DEFAULT_LOCALE,
     ).flatMap(({ code }) =>
-      TRANSLATION_NAMESPACES.flatMap((namespace) =>
+      TRANSLATION_NAMESPACES.filter(
+        (namespace) => !CODE_ENGLISH.has(namespace),
+      ).flatMap((namespace) =>
         keyPaths(read(code, namespace))
           .filter((path) => {
             const known = english.get(namespace);

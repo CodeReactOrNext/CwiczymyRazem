@@ -1,4 +1,5 @@
 import { ArrowRight, Lock } from 'lucide-react';
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import Link from 'next/link';
 import { formatMinutesDuration } from "utils/converter";
 
@@ -31,6 +32,7 @@ const difficultyColors: Record<string, string> = {
 };
 
 export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, href }) => {
+  const localizeExercise = useLocalizeExercise();
   const categoryInfo = categoryColors[exercise.category] || categoryColors.mixed;
   const difficultyColor = difficultyColors[exercise.difficulty] || '';
 
@@ -55,12 +57,12 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, href }) =>
 
         {/* Title */}
         <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors line-clamp-2">
-          {exercise.title}
+          {localizeExercise(exercise).title}
         </h3>
 
         {/* Description */}
         <p className="text-sm text-zinc-400 mb-4 line-clamp-2">
-          {exercise.description}
+          {localizeExercise(exercise).description}
         </p>
 
         {/* Metadata */}

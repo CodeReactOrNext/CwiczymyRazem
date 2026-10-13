@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from 'assets/components/ui/button';
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ function AddExerciseTimeForm({
   onCancel: () => void;
 }) {
   const { t } = useTranslation("plans");
+  const localizeExercise = useLocalizeExercise();
   const [time, setTime] = useState(String(exercise.timeInMinutes));
   const minutes = parseExerciseMinutes(time);
 
@@ -41,7 +43,7 @@ function AddExerciseTimeForm({
       <DialogHeader>
         <DialogTitle className="text-[16px] font-bold leading-tight pr-6 text-zinc-100 flex items-start gap-2">
           <span className="w-1.5 h-1.5 rounded-[8px] bg-cyan-500 mt-1.5 shrink-0" />
-          {exercise.title}
+          {localizeExercise(exercise).title}
         </DialogTitle>
       </DialogHeader>
 

@@ -7,6 +7,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import {
   arrayMove,
   SortableContext,
@@ -49,6 +50,7 @@ const SortableItem = ({
   onEditTimeRequest,
   t,
 }: SortableItemProps) => {
+  const localizeExercise = useLocalizeExercise();
   const {
     attributes,
     listeners,
@@ -88,8 +90,8 @@ const SortableItem = ({
       </button>
 
       <div className="flex-1 min-w-0 pl-1">
-        <h4 className="font-semibold text-zinc-200 text-[13px] sm:text-[14px] leading-tight break-words group-hover:text-white transition-colors" title={exercise.title}>
-          {exercise.title}
+        <h4 className="font-semibold text-zinc-200 text-[13px] sm:text-[14px] leading-tight break-words group-hover:text-white transition-colors" title={localizeExercise(exercise).title}>
+          {localizeExercise(exercise).title}
         </h4>
         <div className="flex items-center gap-3 mt-1.5">
           <button
