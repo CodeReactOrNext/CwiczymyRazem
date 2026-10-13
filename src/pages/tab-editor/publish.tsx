@@ -21,7 +21,9 @@ import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/comp
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
+import { Interpolate } from "lib/i18n/Interpolate";
 import {
   AlertCircle,
   Check,
@@ -116,6 +118,7 @@ function FormSection({
 
 const PublishExercisePage: NextPageWithLayout = () => {
   const router = useRouter();
+  const { t } = useTranslation("library");
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
 
@@ -183,14 +186,14 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-    if (!title.trim()) newErrors.title = "Title is required.";
-    if (!description.trim()) newErrors.description = "Description is required.";
+    if (!title.trim()) newErrors.title = t("publish.err_title");
+    if (!description.trim()) newErrors.description = t("publish.err_description");
     if (instructions.filter((i) => i.trim()).length === 0)
-      newErrors.instructions = "At least one instruction is required.";
+      newErrors.instructions = t("publish.err_instructions");
     if (bpmMin < 20 || bpmMax > 300 || bpmMin >= bpmMax)
-      newErrors.bpm = "BPM range is invalid. Min must be lower than Max.";
+      newErrors.bpm = t("publish.err_bpm_range");
     if (bpmRecommended < bpmMin || bpmRecommended > bpmMax)
-      newErrors.bpm = "Recommended BPM must be between Min and Max.";
+      newErrors.bpm = t("publish.err_bpm_recommended");
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -198,7 +201,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
   const handleSubmit = async () => {
     if (!validate()) return;
     if (!userAuth || !userInfo) {
-      setErrors({ auth: "You must be logged in to publish an exercise." });
+      setErrors({ auth: t("publish.err_auth") });
       return;
     }
 
@@ -232,7 +235,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
       clearTabEditorDraft();
       setSubmitted(true);
     } else {
-      setErrors({ submit: "Something went wrong. Please try again." });
+      setErrors({ submit: t("publish.err_submit") });
     }
   };
 
@@ -278,19 +281,21 @@ const PublishExercisePage: NextPageWithLayout = () => {
   // Live readiness checklist for the summary rail — mirrors validate() so the
   // user sees what's missing before hitting Publish instead of after.
   const checklist: { label: string; done: boolean }[] = [
-    { label: "Title", done: !!title.trim() },
-    { label: "Description", done: !!description.trim() },
+    { label: t("publish.title_label"), done: !!title.trim() },
+    { label: t("publish.description_label"), done: !!description.trim() },
     {
-      label: "At least one instruction",
+      label: t("publish.check_instruction"),
       done: instructions.some((i) => i.trim()),
     },
-    { label: "Valid BPM range", done: bpmValid },
+    { label: t("publish.check_bpm"), done: bpmValid },
   ];
   const readyCount = checklist.filter((c) => c.done).length;
   const isReady = readyCount === checklist.length;
 
   const activeDifficulty = DIFFICULTIES.find((d) => d.value === difficulty);
   const activeCategory = CATEGORIES.find((c) => c.value === category);
+  const categoryName = (value: string) => t(`common:categories.${value}`, value);
+  const difficultyName = (value: string) => t(`common:difficulty.${value}`, value);
 
   if (submitted) {
     return (
@@ -310,17 +315,17 @@ const PublishExercisePage: NextPageWithLayout = () => {
           <div className='space-y-2'>
             <h2 className='text-2xl font-black tracking-tight text-zinc-100'>
               {isEditing
-                ? "Changes Saved!"
+                ? t("publish.done_saved")
                 : isPublic
-                  ? "Exercise Published!"
-                  : "Exercise Saved Privately!"}
+                  ? t("publish.done_published")
+                  : t("publish.done_private")}
             </h2>
             <p className='text-sm leading-relaxed text-zinc-400'>
               {isEditing
-                ? "Your exercise has been updated."
+                ? t("publish.done_saved_body")
                 : isPublic
-                  ? "Your exercise is now live in the Community library. Other users can discover, practice, and rate it."
-                  : "Your exercise is saved privately. Only you can see and practice it. You can make it public at any time."}
+                  ? t("publish.done_published_body")
+                  : t("publish.done_private_body")}
             </p>
           </div>
           <div className='flex justify-center gap-3'>
@@ -337,13 +342,13 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   : "bg-cyan-500 text-black hover:bg-cyan-400",
               )}>
               {isEditing
-                ? "Back to My Exercises"
+                ? t("my_exercises.back")
                 : isPublic
-                  ? "View in Library"
-                  : "View My Exercises"}
+                  ? t("publish.view_library")
+                  : t("publish.view_mine")}
             </Button>
             <Button variant='secondary' onClick={() => router.push(editorHref)}>
-              Back to Editor
+              {t("publish.back_editor")}
             </Button>
           </div>
         </div>
@@ -354,23 +359,21 @@ const PublishExercisePage: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Publish Exercise | Riff Quest</title>
+        <title>{`${t("publish.title")} | Riff Quest`}</title>
       </Head>
       <div className='mx-auto w-full max-w-6xl space-y-8 px-4 py-8'>
         {/* Header */}
         <div className='space-y-4'>
           <BackLink
-            label='Back to Editor'
+            label={t("publish.back_editor")}
             onClick={() => router.push(editorHref)}
           />
           <div>
             <h1 className='text-3xl font-black tracking-tight text-zinc-100'>
-              {isEditing ? "Edit Exercise" : "Publish Exercise"}
+              {isEditing ? t("publish.edit_title") : t("publish.title")}
             </h1>
             <p className='mt-1 text-sm leading-relaxed text-zinc-400'>
-              {isEditing
-                ? "Update the details of your exercise below. Changes are saved immediately."
-                : "Share your exercise with the community. Fill in the details below so others know how to practice it."}
+              {isEditing ? t("publish.edit_subtitle") : t("publish.subtitle")}
             </p>
           </div>
         </div>
@@ -378,7 +381,8 @@ const PublishExercisePage: NextPageWithLayout = () => {
         <div className='grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start'>
           <div className='min-w-0 space-y-8'>
             {/* Tablature preview */}
-            <FormSection title={hasTab ? "Tablature Preview" : "No Tablature"}>
+            <FormSection
+              title={hasTab ? t("publish.tab_preview") : t("publish.no_tab")}>
               {hasTab ? (
                 <div className='space-y-2'>
                   <div className='overflow-hidden rounded-lg'>
@@ -391,8 +395,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                     />
                   </div>
                   <p className='text-xs text-zinc-600'>
-                    {tablature.length} measure
-                    {tablature.length !== 1 ? "s" : ""} · loaded from Tab Editor
+                    {t("publish.measures_loaded", { count: tablature.length })}
                   </p>
                 </div>
               ) : (
@@ -400,12 +403,10 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   <Compass size={16} className='mt-0.5 shrink-0 text-indigo-400' />
                   <div className='space-y-1'>
                     <p className='text-sm text-zinc-300'>
-                      This will be published as an open exercise.
+                      {t("publish.open_exercise")}
                     </p>
                     <p className='text-xs leading-relaxed text-zinc-500'>
-                      Nothing was written in the Tab Editor, so players get the
-                      steps below instead of a tab. Go back and add notes if you
-                      wanted one.
+                      {t("publish.open_exercise_hint")}
                     </p>
                   </div>
                 </div>
@@ -413,11 +414,12 @@ const PublishExercisePage: NextPageWithLayout = () => {
             </FormSection>
 
             {/* Title & Description */}
-            <FormSection title='Basics'>
+            <FormSection title={t("publish.basics")}>
               <div className='space-y-2'>
                 <div className='flex items-baseline justify-between'>
                   <label className={labelClass}>
-                    Title <span className='text-rose-500'>*</span>
+                    {t("publish.title_label")}{" "}
+                    <span className='text-rose-500'>*</span>
                   </label>
                   <span className='text-[10px] tabular-nums text-zinc-600'>
                     {title.length}/100
@@ -426,7 +428,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder='e.g. Finger Permutations — 1-2-3-4'
+                  placeholder={t("publish.title_placeholder")}
                   maxLength={100}
                   className={fieldClass(!!errors.title)}
                 />
@@ -438,7 +440,8 @@ const PublishExercisePage: NextPageWithLayout = () => {
               <div className='space-y-2'>
                 <div className='flex items-baseline justify-between'>
                   <label className={labelClass}>
-                    Description <span className='text-rose-500'>*</span>
+                    {t("publish.description_label")}{" "}
+                    <span className='text-rose-500'>*</span>
                   </label>
                   <span className='text-[10px] tabular-nums text-zinc-600'>
                     {description.length}/500
@@ -447,7 +450,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Briefly explain what this exercise trains and who it's for."
+                  placeholder={t("publish.description_placeholder")}
                   rows={3}
                   maxLength={500}
                   className={cn(
@@ -462,7 +465,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
               <div className='grid grid-cols-2 gap-6'>
                 <div className='space-y-2'>
-                  <label className={labelClass}>Category</label>
+                  <label className={labelClass}>{t("publish.category")}</label>
                   <div className='relative'>
                     <select
                       value={category}
@@ -472,7 +475,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                       className={cn(fieldClass(), "appearance-none")}>
                       {CATEGORIES.map((c) => (
                         <option key={c.value} value={c.value}>
-                          {c.label}
+                          {categoryName(c.value)}
                         </option>
                       ))}
                     </select>
@@ -484,7 +487,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 </div>
 
                 <div className='space-y-2'>
-                  <label className={labelClass}>Difficulty</label>
+                  <label className={labelClass}>{t("publish.difficulty")}</label>
                   <div className='flex gap-2'>
                     {DIFFICULTIES.map((d) => (
                       <button
@@ -502,7 +505,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                             difficulty === d.value ? d.dot : "bg-zinc-700",
                           )}
                         />
-                        {d.label}
+                        {difficultyName(d.value)}
                       </button>
                     ))}
                   </div>
@@ -512,12 +515,12 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
             {/* Time & tempo */}
             <FormSection
-              title='Timing'
-              description='Set the tempo range users should practice this exercise at.'
+              title={t("publish.timing")}
+              description={t("publish.timing_hint")}
               error={errors.bpm}>
               <div className='space-y-2'>
                 <label className={labelClass}>
-                  Estimated Practice Time (minutes)
+                  {t("publish.time_label")}
                 </label>
                 <input
                   type='number'
@@ -533,18 +536,19 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
               <div className='space-y-2'>
                 <label className={labelClass}>
-                  BPM Range <span className='text-rose-500'>*</span>
+                  {t("publish.bpm_range")}{" "}
+                  <span className='text-rose-500'>*</span>
                 </label>
                 <div className='grid grid-cols-3 gap-4'>
                   {(
                     [
-                      { label: "Min BPM", value: bpmMin, set: setBpmMin },
+                      { label: t("publish.min_bpm"), value: bpmMin, set: setBpmMin },
                       {
-                        label: "Recommended",
+                        label: t("publish.recommended"),
                         value: bpmRecommended,
                         set: setBpmRecommended,
                       },
-                      { label: "Max BPM", value: bpmMax, set: setBpmMax },
+                      { label: t("publish.max_bpm"), value: bpmMax, set: setBpmMax },
                     ] as const
                   ).map((f) => (
                     <div key={f.label} className='space-y-1'>
@@ -567,11 +571,11 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
             {/* Related skills */}
             <FormSection
-              title='Related Skills'
+              title={t("publish.skills")}
               description={
                 selectedSkills.length > 0
-                  ? `${selectedSkills.length} selected — used to surface your exercise to players training these skills.`
-                  : "Pick the skills this exercise trains — it helps others find it."
+                  ? t("publish.skills_selected", { count: selectedSkills.length })
+                  : t("publish.skills_pick")
               }>
               <div className='space-y-4'>
                 {SKILL_GROUPS.map((group) => {
@@ -582,7 +586,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   return (
                     <div key={group.category} className='space-y-2'>
                       <span className='text-[11px] font-semibold text-zinc-600'>
-                        {group.label}
+                        {categoryName(group.category)}
                       </span>
                       <div className='flex flex-wrap gap-2'>
                         {groupSkills.map((skill) => {
@@ -597,7 +601,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                                   ? "bg-cyan-500/15 text-cyan-300"
                                   : "bg-zinc-950/60 text-zinc-400 hover:text-zinc-200",
                               )}>
-                              {skill.id.replace(/_/g, " ")}
+                              {t(`common:skills.${skill.id}`, skill.id.replace(/_/g, " "))}
                             </button>
                           );
                         })}
@@ -610,8 +614,8 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
             {/* Instructions */}
             <FormSection
-              title='Step-by-step Instructions'
-              description='Tell the user exactly how to perform this exercise.'
+              title={t("publish.steps")}
+              description={t("publish.steps_hint")}
               error={errors.instructions}>
               <div className='space-y-3'>
                 {instructions.map((inst, idx) => (
@@ -629,14 +633,14 @@ const PublishExercisePage: NextPageWithLayout = () => {
                           e.target.value,
                         )
                       }
-                      placeholder={`Step ${idx + 1}…`}
+                      placeholder={t("publish.step_n", { n: idx + 1 })}
                       className={cn(fieldClass(), "flex-1 py-2.5")}
                     />
                     <button
                       onClick={() =>
                         removeListItem(instructions, setInstructions, idx)
                       }
-                      aria-label='Remove step'
+                      aria-label={t("publish.remove_step")}
                       className='mt-2 p-1.5 text-zinc-600 transition-colors hover:text-rose-400'
                       disabled={instructions.length === 1}>
                       <Trash2 size={14} />
@@ -648,14 +652,14 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 onClick={() => addListItem(instructions, setInstructions)}
                 className='flex items-center gap-2 text-xs font-semibold text-zinc-500 transition-colors hover:text-cyan-400'>
                 <Plus size={14} />
-                Add step
+                {t("publish.add_step")}
               </button>
             </FormSection>
 
             {/* Tips */}
             <FormSection
-              title='Practice Tips (optional)'
-              description='Share helpful hints, common mistakes to avoid, or variations to try.'>
+              title={t("publish.tips")}
+              description={t("publish.tips_hint")}>
               <div className='space-y-3'>
                 {tips.map((tip, idx) => (
                   <div key={idx} className='flex items-start gap-2'>
@@ -667,12 +671,12 @@ const PublishExercisePage: NextPageWithLayout = () => {
                       onChange={(e) =>
                         updateListItem(tips, setTips, idx, e.target.value)
                       }
-                      placeholder={`Tip ${idx + 1}…`}
+                      placeholder={t("publish.tip_n", { n: idx + 1 })}
                       className={cn(fieldClass(), "flex-1 py-2.5")}
                     />
                     <button
                       onClick={() => removeListItem(tips, setTips, idx)}
-                      aria-label='Remove tip'
+                      aria-label={t("publish.remove_tip")}
                       className='mt-2 p-1.5 text-zinc-600 transition-colors hover:text-rose-400'
                       disabled={tips.length === 1}>
                       <Trash2 size={14} />
@@ -684,12 +688,12 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 onClick={() => addListItem(tips, setTips)}
                 className='flex items-center gap-2 text-xs font-semibold text-zinc-500 transition-colors hover:text-cyan-400'>
                 <Plus size={14} />
-                Add tip
+                {t("publish.add_tip")}
               </button>
             </FormSection>
 
             {/* Visibility picker */}
-            <FormSection title='Visibility'>
+            <FormSection title={t("publish.visibility")}>
               <div className='grid grid-cols-2 gap-3'>
                 <button
                   type='button'
@@ -712,15 +716,14 @@ const PublishExercisePage: NextPageWithLayout = () => {
                         "text-sm font-bold",
                         isPublic ? "text-zinc-100" : "text-zinc-400",
                       )}>
-                      Public
+                      {t("my_exercises.public")}
                     </span>
                     {isPublic && (
                       <Check size={12} className='ml-auto text-emerald-400' />
                     )}
                   </div>
                   <p className='text-xs leading-relaxed text-zinc-500'>
-                    Visible to all users in the Community library. Others can
-                    practice and rate it.
+                    {t("publish.public_hint")}
                   </p>
                 </button>
                 <button
@@ -742,27 +745,29 @@ const PublishExercisePage: NextPageWithLayout = () => {
                         "text-sm font-bold",
                         !isPublic ? "text-zinc-100" : "text-zinc-400",
                       )}>
-                      Private
+                      {t("my_exercises.private")}
                     </span>
                     {!isPublic && (
                       <Check size={12} className='ml-auto text-cyan-400' />
                     )}
                   </div>
                   <p className='text-xs leading-relaxed text-zinc-500'>
-                    Only visible to you. Saved to your personal library. You can
-                    make it public later.
+                    {t("publish.private_hint")}
                   </p>
                 </button>
               </div>
               {isPublic && (
                 <p className='text-xs leading-relaxed text-zinc-500'>
-                  By publishing publicly, you agree that this exercise will be
-                  visible to all users under your username{" "}
-                  <span className='font-semibold text-cyan-400'>
-                    {userInfo?.displayName || "your account"}
-                  </span>
-                  . The community may rate it. Moderators may remove exercises
-                  that violate community guidelines.
+                  <Interpolate
+                    text={t("publish.public_terms")}
+                    values={{
+                      name: (
+                        <span className='font-semibold text-cyan-400'>
+                          {userInfo?.displayName || t("publish.your_account")}
+                        </span>
+                      ),
+                    }}
+                  />
                 </p>
               )}
             </FormSection>
@@ -773,17 +778,19 @@ const PublishExercisePage: NextPageWithLayout = () => {
           <aside className='space-y-4 pb-16 lg:sticky lg:top-24'>
             <div className='space-y-5 rounded-lg bg-zinc-900/40 p-5'>
               <div className='space-y-3'>
-                <h2 className='text-sm font-bold text-zinc-100'>Summary</h2>
+                <h2 className='text-sm font-bold text-zinc-100'>
+                  {t("publish.summary")}
+                </h2>
                 <p className='min-h-[20px] text-sm font-semibold text-zinc-200'>
                   {title.trim() || (
                     <span className='font-normal text-zinc-600'>
-                      Untitled exercise
+                      {t("publish.untitled")}
                     </span>
                   )}
                 </p>
                 <div className='flex flex-wrap items-center gap-2'>
                   <span className='rounded bg-zinc-800 px-2 py-0.5 text-[11px] font-semibold text-zinc-300'>
-                    {activeCategory?.label}
+                    {activeCategory && categoryName(activeCategory.value)}
                   </span>
                   <span
                     className={cn(
@@ -796,27 +803,29 @@ const PublishExercisePage: NextPageWithLayout = () => {
                         activeDifficulty?.dot,
                       )}
                     />
-                    {activeDifficulty?.label}
+                    {activeDifficulty && difficultyName(activeDifficulty.value)}
                   </span>
                 </div>
                 <p className='text-xs leading-relaxed text-zinc-500'>
-                  {tablature.length} measure{tablature.length !== 1 ? "s" : ""}{" "}
-                  · {timeInMinutes} min · {bpmRecommended} BPM
+                  {t("publish.summary_line", {
+                    count: tablature.length,
+                    measures: tablature.length,
+                    minutes: timeInMinutes,
+                    bpm: bpmRecommended,
+                  })}
                   {selectedSkills.length > 0 &&
-                    ` · ${selectedSkills.length} skill${
-                      selectedSkills.length !== 1 ? "s" : ""
-                    }`}
+                    ` · ${t("publish.skills_count", { count: selectedSkills.length })}`}
                 </p>
                 <p className='flex items-center gap-1.5 text-xs font-semibold'>
                   {isPublic ? (
                     <>
                       <Globe size={12} className='text-emerald-400' />
-                      <span className='text-emerald-400'>Public</span>
+                      <span className='text-emerald-400'>{t("my_exercises.public")}</span>
                     </>
                   ) : (
                     <>
                       <Lock size={12} className='text-cyan-400' />
-                      <span className='text-cyan-400'>Private</span>
+                      <span className='text-cyan-400'>{t("my_exercises.private")}</span>
                     </>
                   )}
                 </p>
@@ -824,7 +833,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
 
               <div className='space-y-2.5'>
                 <div className='flex items-baseline justify-between'>
-                  <span className={labelClass}>Ready to publish</span>
+                  <span className={labelClass}>{t("publish.ready")}</span>
                   <span className='text-[10px] tabular-nums text-zinc-600'>
                     {readyCount}/{checklist.length}
                   </span>
@@ -886,21 +895,21 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   )}>
                   {isSubmitting
                     ? isEditing
-                      ? "Saving…"
+                      ? t("publish.saving")
                       : isPublic
-                        ? "Publishing…"
-                        : "Saving…"
+                        ? t("publish.publishing")
+                        : t("publish.saving")
                     : isEditing
-                      ? "Save Changes"
+                      ? t("publish.save_changes")
                       : isPublic
-                        ? "Publish Exercise"
-                        : "Save Privately"}
+                        ? t("publish.title")
+                        : t("publish.save_private")}
                 </Button>
                 <Button
                   variant='secondary'
                   onClick={() => router.push(editorHref)}
                   className='w-full'>
-                  Cancel
+                  {t("cancel")}
                 </Button>
               </div>
             </div>

@@ -20,6 +20,7 @@ import guilds from "../../../public/locales/en/guilds.json";
 import journey from "../../../public/locales/en/journey.json";
 import leadboard from "../../../public/locales/en/leadboard.json";
 import level_gate from "../../../public/locales/en/level_gate.json";
+import library from "../../../public/locales/en/library.json";
 import login from "../../../public/locales/en/login.json";
 import metronome from "../../../public/locales/en/metronome.json";
 import milestones from "../../../public/locales/en/milestones.json";
@@ -74,6 +75,7 @@ export const TRANSLATION_NAMESPACES = [
   "journey",
   "leadboard",
   "level_gate",
+  "library",
   "login",
   "metronome",
   "milestones",
@@ -146,6 +148,7 @@ export const EN_CATALOG: LocaleCatalog = {
   journey,
   leadboard,
   level_gate,
+  library,
   login,
   metronome,
   milestones,
