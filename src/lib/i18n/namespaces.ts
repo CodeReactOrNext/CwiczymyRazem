@@ -50,6 +50,7 @@ import timer from "../../../public/locales/en/timer.json";
 import toast from "../../../public/locales/en/toast.json";
 import tone_studio from "../../../public/locales/en/tone_studio.json";
 import ui from "../../../public/locales/en/ui.json";
+import wiki from "../../../public/locales/en/wiki.json";
 import yup_errors from "../../../public/locales/en/yup_errors.json";
 
 /** One file per namespace, per locale. The names match the JSON filenames. */
@@ -106,6 +107,7 @@ export const TRANSLATION_NAMESPACES = [
   "toast",
   "tone_studio",
   "ui",
+  "wiki",
   "yup_errors",
 ] as const;
 
@@ -180,6 +182,7 @@ export const EN_CATALOG: LocaleCatalog = {
   toast,
   tone_studio,
   ui,
+  wiki,
   yup_errors,
 };
 

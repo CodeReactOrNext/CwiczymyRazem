@@ -1,0 +1,40 @@
+{
+  "sidebar_subtitle": "Jak działa riff.quest",
+  "hero_subtitle": "Wszystko, co robi riff.quest, wyjaśnione prostym językiem",
+  "hero_eyebrow": "Poradniki",
+  "intro": "Jak działa każda część riff.quest — napisane dla osoby, która gra na gitarze.",
+  "search_placeholder": "Przeszukaj Wiki — seria, Fame, mikrofon, playlisty…",
+  "search_label": "Przeszukaj Wiki",
+  "no_articles": "Brak artykułów w Wiki.",
+  "no_match": "Żaden artykuł nie pasuje do „{{query}}”.",
+  "start_here": "Zacznij tutaj",
+  "then": "Potem:",
+  "not_finding_title": "Nie możesz tego znaleźć?",
+  "not_finding_body": "Krótkie pytania o ceny, konta, sprzęt i działanie punktacji znajdziesz na stronie z najczęściej zadawanymi pytaniami. Porady dotyczące ćwiczenia, które nie mają nic wspólnego z tą aplikacją, takie jak jak długo ćwiczyć albo jak szlifować skalę, żeby przetrwała spotkanie z prawdziwym utworem, są na blogu. Jeśli coś wygląda na błąd albo masz pytanie, na które nie odpowiada żadna strona, najszybciej dotrzesz do człowieka przez serwer Discord.",
+  "link_faq": "Najczęściej zadawane pytania",
+  "link_blog": "Poradniki ćwiczeniowe",
+  "link_contact": "Kontakt",
+  "read_next": "Czytaj dalej",
+  "log_a_session": "Zapisz sesję",
+  "healthy_habits": "Zdrowe nawyki",
+  "session_worth": "Sesja jest warta",
+  "completed": "Ukończone",
+  "sections": {
+    "start_here": "Zacznij tutaj",
+    "scoring_progress": "Punktacja i postępy",
+    "practice": "Ćwiczenia",
+    "songs_library": "Utwory i biblioteka",
+    "skill_development": "Rozwój umiejętności",
+    "community": "Społeczność",
+    "competition": "Rywalizacja"
+  },
+  "section_intros": {
+    "scoring_progress": "Skąd biorą się punkty i dlaczego nigdy nie możesz ich wydać, jak mnożnik serii zwiększa wszystko, co zapisujesz, co kupuje Fame i dlaczego nigdy nie dotyka twojego poziomu oraz dlaczego technika, teoria, słuch i praca twórcza są warte dokładnie tyle samo za minutę.",
+    "practice": "Każdy sposób ćwiczenia, od wolnego stopera i ręcznego wpisu przez rutyny, plan automatyczny i własne pliki Guitar Pro, a także jak wykrywanie nut słucha twojego grania i co dodaje aplikacja na komputer, gdy podłączysz gitarę do interfejsu.",
+    "songs_library": "Tablica utworów, po której przeciągasz utwór w miarę jak staje się grywalny, co oznaczają poziomy trudności, ile płaci ukończenie utworu oraz jak buduje się i udostępnia playlisty.",
+    "skill_development": "Prowadzone ścieżki przez aplikację: Ścieżka nauki i Mapa skal, które odblokowują się krok po kroku, poszczególne umiejętności gitarowe wyrastające z tego, czym oznaczasz swoje sesje, oraz osobista Mastery Roadmap, którą aplikacja może dla ciebie napisać.",
+    "community": "Części aplikacji, w których są inni ludzie: pięć utworów wybranych głosami społeczności w każdym miesięcznym wyzwaniu, ściana nagrań i każdy inny sposób, w jaki inni gracze płacą ci Fame.",
+    "competition": "Trzy rankingi i to, co każdy z nich mierzy, jak miesięczny sezon się resetuje, by nowy gracz nigdy nie był na stałe w tyle, oraz Arsenał, gra kolekcjonerska, która jest jedynym przeznaczeniem Fame."
+  },
+  "daily_quests": "Zadania dzienne"
+}

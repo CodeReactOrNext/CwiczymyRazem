@@ -1,0 +1,40 @@
+{
+  "sidebar_subtitle": "How riff.quest works",
+  "hero_subtitle": "Everything riff.quest does, explained in plain language",
+  "hero_eyebrow": "Guides",
+  "intro": "How every part of riff.quest works, written for the person playing the guitar.",
+  "search_placeholder": "Search the Wiki — streak, Fame, mic, playlists…",
+  "search_label": "Search the Wiki",
+  "no_articles": "No wiki articles yet.",
+  "no_match": "No article matches “{{query}}”.",
+  "start_here": "Start here",
+  "then": "Then:",
+  "not_finding_title": "Not finding it here?",
+  "not_finding_body": "Short questions about pricing, accounts, equipment and how the scoring behaves are answered on the frequently asked questions page. Practice advice that has nothing to do with this app in particular, such as how long to practise or how to drill a scale so it survives contact with a real song, lives on the blog. For anything that looks like a bug, or a question no page answers, the Discord server is the fastest way to reach a human.",
+  "link_faq": "Frequently asked questions",
+  "link_blog": "Practice guides",
+  "link_contact": "Contact",
+  "read_next": "Read next",
+  "log_a_session": "Log a session",
+  "healthy_habits": "Healthy habits",
+  "session_worth": "Session is worth",
+  "completed": "Completed",
+  "sections": {
+    "start_here": "Start Here",
+    "scoring_progress": "Scoring & Progress",
+    "practice": "Practice",
+    "songs_library": "Songs & Library",
+    "skill_development": "Skill Development",
+    "community": "Community",
+    "competition": "Competition"
+  },
+  "section_intros": {
+    "scoring_progress": "Where points come from and why you can never spend them, how the streak multiplier grows everything you log, what Fame buys and why it never touches your level, and why technique, theory, hearing and creative work are all worth exactly the same per minute.",
+    "practice": "Every way of practising, from the free timer and the manual log through routines, Auto Plan and your own Guitar Pro files, plus how note detection listens to your playing and what the desktop app adds once you plug a guitar into an interface.",
+    "songs_library": "The song board you drag a piece along as it becomes playable, what the difficulty tiers mean, what finishing a song pays, and how playlists get built and shared.",
+    "skill_development": "The guided routes through the app: the Learning Path and the Scale Map that unlock step by step, the individual guitar skills that grow out of whatever you tag your sessions with, and the personal Mastery Roadmap the app can write for you.",
+    "community": "The parts of the app with other people in them: the five community-voted songs of each monthly challenge, the recordings wall, and every other way other players end up paying you Fame.",
+    "competition": "The three rankings and what each one measures, how the monthly season resets so a new player is never permanently behind, and the Arsenal, the collecting game that is the only thing Fame is for."
+  },
+  "daily_quests": "Daily Quests"
+}

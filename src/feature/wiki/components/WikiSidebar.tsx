@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { wikiSectionLabel } from "feature/wiki/sectionLabel";
+import { useTranslation } from "hooks/useTranslation";
 import type { WikiSection } from "lib/wiki";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +13,7 @@ interface WikiSidebarProps {
 
 export const WikiSidebar = ({ sections }: WikiSidebarProps) => {
   const router = useRouter();
+  const { t } = useTranslation("wiki");
   const activeSlug =
     router.pathname === "/wiki/[slug]" ? router.query.slug : undefined;
 
@@ -32,7 +35,7 @@ export const WikiSidebar = ({ sections }: WikiSidebarProps) => {
           Wiki
         </h2>
         <p className='text-sm font-medium text-muted-foreground'>
-          How riff.quest works
+          {t("sidebar_subtitle")}
         </p>
       </Link>
       <nav className='flex flex-col gap-2'>
@@ -47,7 +50,7 @@ export const WikiSidebar = ({ sections }: WikiSidebarProps) => {
                   setToggled((prev) => ({ ...prev, [section.section]: !open }))
                 }
                 className='flex items-center justify-between rounded-lg px-5 py-2 text-left text-xs font-bold tracking-wide text-zinc-500 transition-colors hover:bg-zinc-900/50 hover:text-zinc-300'>
-                {section.section}
+                {wikiSectionLabel(t, section.section)}
                 <ChevronDown
                   size={14}
                   className={cn("transition-transform", open && "rotate-180")}

@@ -1,8 +1,12 @@
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { Footer } from "feature/landing/components/Footer";
 import { WikiPublicNav } from "feature/wiki/components/WikiPublicNav";
+import { wikiSectionIntro, wikiSectionLabel } from "feature/wiki/sectionLabel";
 import WikiLayout from "feature/wiki/WikiLayout";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
+import { type AppLocale, SUPPORTED_LOCALES } from "lib/i18n/locales";
+import { useActiveLocale } from "lib/i18n/LocalizedRegion";
 import { getWikiSections, type WikiSection } from "lib/wiki";
 import { ArrowRight, Search } from "lucide-react";
 import type { GetStaticProps } from "next";
@@ -18,29 +22,19 @@ const OG_IMAGE = `${SITE_URL}/images/og-image.png`;
 const DESCRIPTION =
   "The Riff Quest Knowledge Base: how practice logging, points, Fame, streaks, songs, skills and the rest of the app actually work, explained in plain language.";
 
-/** One line of context per section, so the index reads as a guide rather than a list of links. */
-const SECTION_INTROS: Record<string, string> = {
-  "Scoring & Progress":
-    "Where points come from and why you can never spend them, how the streak multiplier grows everything you log, what Fame buys and why it never touches your level, and why technique, theory, hearing and creative work are all worth exactly the same per minute.",
-  Practice:
-    "Every way of practising, from the free timer and the manual log through routines, Auto Plan and your own Guitar Pro files, plus how note detection listens to your playing and what the desktop app adds once you plug a guitar into an interface.",
-  "Songs & Library":
-    "The song board you drag a piece along as it becomes playable, what the difficulty tiers mean, what finishing a song pays, and how playlists get built and shared.",
-  "Skill Development":
-    "The guided routes through the app: the Learning Path and the Scale Map that unlock step by step, the individual guitar skills that grow out of whatever you tag your sessions with, and the personal Mastery Roadmap the app can write for you.",
-  Community:
-    "The parts of the app with other people in them: the five community-voted songs of each monthly challenge, the recordings wall, and every other way other players end up paying you Fame.",
-  Competition:
-    "The three rankings and what each one measures, how the monthly season resets so a new player is never permanently behind, and the Arsenal, the collecting game that is the only thing Fame is for.",
-};
-
 interface WikiIndexProps {
-  sections: WikiSection[];
+  /** The index in every language — the one shown follows the player's choice inside the app. */
+  sections: Record<AppLocale, WikiSection[]>;
 }
 
-const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
+const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({
+  sections: sectionsByLocale,
+}) => {
   const { status } = useSession();
   const isLogged = status === "authenticated";
+  const locale = useActiveLocale();
+  const sections = sectionsByLocale[locale];
+  const { t } = useTranslation("wiki");
 
   const [query, setQuery] = useState("");
 
@@ -56,7 +50,7 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
     ? sections.flatMap((s) =>
         s.pages
           .filter((p) =>
-            `${p.title} ${p.description} ${s.section}`
+            `${p.title} ${p.description} ${wikiSectionLabel(t, s.section)}`
               .toLowerCase()
               .includes(q),
           )
@@ -91,8 +85,8 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
       <div className='flex min-h-screen flex-col overflow-visible rounded-xl border-none bg-second-600 shadow-sm'>
         <HeroBanner
           title='Wiki'
-          subtitle='Everything riff.quest does, explained in plain language'
-          eyebrow='Guides'
+          subtitle={t("hero_subtitle")}
+          eyebrow={t("hero_eyebrow")}
           backgroundContent={<HeroPattern />}
           compact
           className='w-full !rounded-none !shadow-none'
@@ -100,13 +94,12 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
         <WikiLayout sections={sections}>
           <div className='flex flex-col gap-10 p-4 sm:p-6'>
             {sections.length === 0 && (
-              <p className='text-sm text-zinc-500'>No wiki articles yet.</p>
+              <p className='text-sm text-zinc-500'>{t("no_articles")}</p>
             )}
 
             <div className='flex flex-col gap-4'>
               <p className='max-w-3xl text-base leading-relaxed text-zinc-300'>
-                How every part of riff.quest works, written for the person
-                playing the guitar.
+                {t("intro")}
               </p>
               <div className='relative max-w-xl'>
                 <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500' />
@@ -114,8 +107,8 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
                   type='search'
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder='Search the Wiki — streak, Fame, mic, playlists…'
-                  aria-label='Search the Wiki'
+                  placeholder={t("search_placeholder")}
+                  aria-label={t("search_label")}
                   className='h-11 w-full rounded-lg bg-zinc-900/60 pl-10 pr-4 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/40'
                 />
               </div>
@@ -124,7 +117,7 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
             {q ? (
               results.length === 0 ? (
                 <p className='text-sm text-zinc-500'>
-                  No article matches “{query.trim()}”.
+                  {t("no_match", { query: query.trim() })}
                 </p>
               ) : (
                 <div className='grid gap-4 md:grid-cols-2'>
@@ -134,7 +127,7 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
                       href={`/wiki/${page.slug}`}
                       className='rounded-lg bg-zinc-900/40 p-5 transition-background hover:bg-zinc-800/60'>
                       <div className='text-xs font-semibold text-zinc-500'>
-                        {page.section}
+                        {wikiSectionLabel(t, page.section)}
                       </div>
                       <div className='mt-1 font-bold text-white'>
                         {page.title}
@@ -154,7 +147,7 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
                       href={`/wiki/${firstPage.slug}`}
                       className='flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-6 transition-background hover:bg-zinc-800/60'>
                       <span className='text-xs font-bold text-cyan-400'>
-                        Start here
+                        {t("start_here")}
                       </span>
                       <span className='text-lg font-bold text-white'>
                         {firstPage.title}
@@ -167,7 +160,7 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
                       <Link
                         href={`/wiki/${nextPage.slug}`}
                         className='flex items-center gap-2 px-1 text-sm text-zinc-400 transition-colors hover:text-cyan-400'>
-                        <span className='text-zinc-500'>Then:</span>
+                        <span className='text-zinc-500'>{t("then")}</span>
                         <span className='font-semibold'>{nextPage.title}</span>
                         <ArrowRight size={14} />
                       </Link>
@@ -177,11 +170,11 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
                 {topicSections.map((section) => (
                   <div key={section.section}>
                     <h2 className='mb-2 text-base font-bold tracking-wide text-white'>
-                      {section.section}
+                      {wikiSectionLabel(t, section.section)}
                     </h2>
-                    {SECTION_INTROS[section.section] && (
+                    {wikiSectionIntro(t, section.section) && (
                       <p className='mb-5 max-w-3xl text-sm leading-relaxed text-zinc-400'>
-                        {SECTION_INTROS[section.section]}
+                        {wikiSectionIntro(t, section.section)}
                       </p>
                     )}
                     <div className='grid gap-4 md:grid-cols-2'>
@@ -206,32 +199,26 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({ sections }) => {
 
             <div className='rounded-lg bg-zinc-900/40 p-6 sm:p-8'>
               <h2 className='text-base font-bold tracking-wide text-white'>
-                Not finding it here?
+                {t("not_finding_title")}
               </h2>
               <p className='mt-4 max-w-3xl text-sm leading-relaxed text-zinc-400'>
-                Short questions about pricing, accounts, equipment and how the
-                scoring behaves are answered on the frequently asked questions
-                page. Practice advice that has nothing to do with this app in
-                particular, such as how long to practise or how to drill a scale
-                so it survives contact with a real song, lives on the blog. For
-                anything that looks like a bug, or a question no page answers,
-                the Discord server is the fastest way to reach a human.
+                {t("not_finding_body")}
               </p>
               <div className='mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm'>
                 <Link
                   href='/faq'
                   className='text-cyan-400 transition-colors hover:text-cyan-300'>
-                  Frequently asked questions
+                  {t("link_faq")}
                 </Link>
                 <Link
                   href='/blog'
                   className='text-cyan-400 transition-colors hover:text-cyan-300'>
-                  Practice guides
+                  {t("link_blog")}
                 </Link>
                 <Link
                   href='/contact'
                   className='text-cyan-400 transition-colors hover:text-cyan-300'>
-                  Contact
+                  {t("link_contact")}
                 </Link>
               </div>
             </div>
@@ -256,7 +243,9 @@ export default WikiIndexPage;
 export const getStaticProps: GetStaticProps<WikiIndexProps> = async () => {
   return {
     props: {
-      sections: getWikiSections(),
+      sections: Object.fromEntries(
+        SUPPORTED_LOCALES.map(({ code }) => [code, getWikiSections(code)]),
+      ) as Record<AppLocale, WikiSection[]>,
     },
   };
 };
