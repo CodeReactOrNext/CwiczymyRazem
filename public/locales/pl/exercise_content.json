@@ -3656,5 +3656,227 @@
         "2": "Licz podziały na głos („1 i 2 i 3 i 4 i”), aby zablokować ruch ciała w wewnętrznym rytmie."
       }
     }
+  },
+  "plan": {
+    "mega_beginner_first_steps": {
+      "title": "Zupełny początkujący: pierwsze kroki",
+      "description": "Próbka wszystkiego: puste struny, wolna melodia, równy strumming i twoje pierwsze akordy. Wybierz to, jeśli nigdy wcześniej nie grałeś."
+    },
+    "beginner_daily_exercises": {
+      "title": "Początkujący: codzienne ćwiczenia",
+      "description": "Tylko pojedyncze nuty, bez akordów: utrzymuj rytm na pustych strunach, szukaj nut na gryfie i ćwicz pająka. Codzienny nawyk dla kontroli palców."
+    },
+    "strumming_foundations": {
+      "title": "Podstawy strummingu",
+      "description": "Zbuduj pewną rękę strummującą od podstaw — równe uderzenia w dół, płynne wahadło w dół i w górę, niezbędne wzory i twój pierwszy rockowy groove."
+    },
+    "gp_music_theory_essential": {
+      "title": "Najważniejsza część teorii muzyki — samouczek z graniem z podkładem",
+      "description": "Samouczek z graniem z podkładem obejmujący podstawowy element teorii muzyki dla gitarzystów."
+    },
+    "gp_pentatonic_tutorial": {
+      "title": "Czy używasz tej pentatoniki? — granie z podkładem",
+      "description": "Samouczek z graniem z podkładem skupiony na pentatonice. Poznaj pomysł na pentatonikę, którego może ci brakować."
+    },
+    "ear_rhythm_fundamentals": {
+      "title": "Podstawy słuchu i rytmu",
+      "description": "Zbuduj solidny fundament muzykalności, trenując jednocześnie ucho i poczucie rytmu."
+    },
+    "daily_dexterity_starter": {
+      "title": "Codzienny start zręczności",
+      "description": "Zbuduj podstawową koordynację lewej i prawej ręki bez nadmiernego obciążania."
+    },
+    "soloing_explorer": {
+      "title": "Odkrywca solowania",
+      "description": "Pierwsze kroki w improwizacji, frazowaniu i graniu ze słuchu w bardzo przystępnej formie."
+    },
+    "musician_fitness_lvl1_s1": {
+      "title": "Poziom #1 Sesja #1 - MusicianFitness",
+      "description": "Spider Crawls, strumming, akordowe kopnięcia, power chordy, riffy!"
+    },
+    "musician_fitness_lvl1_s2": {
+      "title": "Poziom #1 Sesja #2 - MusicianFitness",
+      "description": "Przyspieszanie i zmiany akordów"
+    },
+    "musician_fitness_lvl1_s3": {
+      "title": "Poziom #1 Sesja #3 - MusicianFitness",
+      "description": "Akordy otwarte, power chordy, strumming i cały utwór"
+    },
+    "musician_fitness_lvl1_s4": {
+      "title": "Poziom #1 Sesja #4 - MusicianFitness",
+      "description": "Kontrola małego palca, płynne zmiany akordów"
+    },
+    "musician_fitness_lvl1_s5": {
+      "title": "Poziom #1 Sesja #5 - MusicianFitness",
+      "description": "Naucz się Smoke on the Water!"
+    },
+    "musician_fitness_lvl1_s6": {
+      "title": "Poziom #1 Sesja #6 - MusicianFitness",
+      "description": "Riffy, zmiany akordów, Spider Crawls i WIĘCEJ!"
+    },
+    "musician_fitness_lvl1_s7": {
+      "title": "Poziom #1 Sesja #7 - MusicianFitness",
+      "description": "Spider Crawls, popularne zmiany akordów, ŁATWE utwory!"
+    },
+    "musician_fitness_lvl1_s8": {
+      "title": "Poziom #1 Sesja #8 - MusicianFitness",
+      "description": "Pełna sesja ćwiczeniowa Musician Fitness!"
+    },
+    "musician_fitness_lvl2_s9": {
+      "title": "[Poziom 2] Trening gitarowy dla początkujących #9 - MusicianFitness",
+      "description": "Akordy septymowe, synkopowany strumming"
+    },
+    "musician_fitness_lvl2_s10": {
+      "title": "[Poziom 2] Trening gitarowy dla początkujących #10 - MusicianFitness",
+      "description": "Progresje akordów, skala pentatoniczna"
+    },
+    "musician_fitness_lvl2_s11": {
+      "title": "[Poziom 2] Trening gitarowy dla początkujących #11 - MusicianFitness",
+      "description": "Progresje akordów, skala pentatoniczna"
+    },
+    "musician_fitness_lvl2_s12": {
+      "title": "[Poziom 2] Sesja ćwiczeniowa dla początkujących, tydzień #12 - MusicianFitness",
+      "description": "Sesja ćwiczeniowa poziomu 2, tydzień 12"
+    },
+    "musician_fitness_lvl2_s13": {
+      "title": "[Poziom 2] Trening gitarowy, tydzień 13 - MusicianFitness",
+      "description": "Power chordy, dominanty septymowe i synkopowany strumming"
+    },
+    "musician_fitness_lvl2_s14": {
+      "title": "[Poziom 2] Trening gitarowy, tydzień 14 - MusicianFitness",
+      "description": "Triole w pentatonice, płynne zmiany akordów"
+    },
+    "musician_fitness_lvl2_s15": {
+      "title": "[Poziom 2] Trening gitarowy, tydzień 15 - MusicianFitness",
+      "description": "Zmiany rytmu, płynny strumming"
+    },
+    "musician_fitness_lvl2_s16": {
+      "title": "KOMPLETNY 20-minutowy trening gitarowy | Tydzień 16 - MusicianFitness",
+      "description": "20-minutowy trening gitarowy - tydzień 16"
+    },
+    "musician_fitness_lvl2_s17": {
+      "title": "KOMPLETNY 20-minutowy trening gitarowy | Tydzień 17 - MusicianFitness",
+      "description": "20-minutowy trening gitarowy - tydzień 17"
+    },
+    "musician_fitness_lvl2_s18": {
+      "title": "20-minutowy trening gitarowy - tydzień 18 - MusicianFitness",
+      "description": "Opanuj podstawy w 20 tygodni!"
+    },
+    "musician_fitness_lvl2_s19": {
+      "title": "20-minutowy trening gitarowy - tydzień 19 - MusicianFitness",
+      "description": "Opanuj podstawy w 20 tygodni!"
+    },
+    "musician_fitness_lvl2_s20": {
+      "title": "Podstawy gitary opanowane? - MusicianFitness",
+      "description": "Tydzień 20 - spróbuj nadążyć!"
+    },
+    "spider_master_plan": {
+      "title": "Mistrzowski trening pająka",
+      "description": "Najlepszy chromatyczny program rozwoju technicznego. Obejmuje podstawowe permutacje, schodki, przeskoki, wzory X i warianty rytmiczne."
+    },
+    "spider_permutation_part1_index": {
+      "title": "[Część 1] Permutacje pająka — zaczynane palcem wskazującym",
+      "description": "Permutacje pająka zaczynane palcem wskazującym (1). Najłagodniejszy punkt wejścia do budowania niezależności palców."
+    },
+    "spider_permutation_part2_middle": {
+      "title": "[Część 2] Permutacje pająka — zaczynane palcem środkowym",
+      "description": "Permutacje pająka zaczynane palcem środkowym (2). Trenuje kontrolę przy prowadzeniu drugim palcem."
+    },
+    "spider_permutation_part3_ring": {
+      "title": "[Część 3] Permutacje pająka — zaczynane palcem serdecznym",
+      "description": "Permutacje pająka zaczynane palcem serdecznym (3). Zmusza słabszy trzeci palec do prowadzenia każdego wzoru."
+    },
+    "spider_permutation_part4_pinky": {
+      "title": "[Część 4] Permutacje pająka — zaczynane małym palcem",
+      "description": "Permutacje pająka zaczynane małym palcem (4). Najtrudniejszy zestaw — buduje siłę i niezależność najsłabszego palca."
+    },
+    "basic_improvisation_practice": {
+      "title": "Podstawowe ćwiczenia rozwijające improwizację",
+      "description": "Zestaw podstawowych ćwiczeń rozwijających umiejętności improwizacji"
+    },
+    "warm_up_15_minutes": {
+      "title": "Rozgrzewka — 10 minut",
+      "description": "Podstawowa 10-minutowa rozgrzewka przed główną sesją ćwiczeniową"
+    },
+    "warm_up_30_minutes": {
+      "title": "Rozgrzewka — 20 minut",
+      "description": "Podstawowa 20-minutowa rozgrzewka przed główną sesją ćwiczeniową"
+    },
+    "pentatonic_playalong_best_of_plan": {
+      "title": "Pentatonika — wybór najlepszych podkładów",
+      "description": "Popraw swoje skale pentatoniczne dzięki tej obszernej sesji grania z wideo."
+    },
+    "gp_pentatonic_10min_workout": {
+      "title": "10-minutowe granie z podkładem — trening skali pentatonicznej",
+      "description": "10-minutowy trening skali pentatonicznej z tabulaturą. Graj razem i buduj płynność w kształtach boksów."
+    },
+    "gp_speed_builder_part1": {
+      "title": "Budowanie szybkości gry, część 1 — trening skali pentatonicznej",
+      "description": "Granie z podkładem budujące szybkość w skali pentatonicznej. Stopniowo zwiększaj szybkość uderzeń razem z podkładem."
+    },
+    "gp_stamina_picking_workout": {
+      "title": "Trening wytrzymałości pickingu — granie z podkładem w naprzemiennym uderzaniu",
+      "description": "Trening wytrzymałości naprzemiennego uderzania z tabulaturą. Buduj wytrzymałość prawej ręki."
+    },
+    "gp_gallop_picking_10_levels": {
+      "title": "10 poziomów galopu — granie z podkładem w gallop pickingu",
+      "description": "Granie z podkładem w gallop pickingu, przechodzące przez 10 poziomów trudności."
+    },
+    "gp_alternate_picking_speed_builder": {
+      "title": "Jak grać szybciej naprzemiennym uderzaniem — budowanie szybkości",
+      "description": "Granie z podkładem i samouczek budujący szybkość naprzemiennego uderzania. Rozwijaj szybsze, czystsze granie."
+    },
+    "gp_rock_metal_riffs": {
+      "title": "Rockowe i metalowe riffy na gitarę — granie z podkładem",
+      "description": "Graj razem z zestawem rockowych i metalowych riffów. Buduj rytmiczną sprawność i słownik riffów."
+    },
+    "gp_drop2_chords_arpeggios": {
+      "title": "Akordy i arpeggia dla gitary prowadzącej — Drop 2",
+      "description": "Granie z podkładem na akordach drop 2 i arpeggiach dla gitarzystów prowadzących."
+    },
+    "fretboard_awareness": {
+      "title": "Świadomość gryfu",
+      "description": "Systematyczne mapowanie i opanowanie gryfu gitary dzięki ćwiczeniom znajdowania nut w różnych pozycjach i regionach gryfu."
+    },
+    "creative_phrasing": {
+      "title": "Kreatywne frazowanie",
+      "description": "Popraw wykorzystanie przestrzeni, rytmiczne umiejscowienie i muzyczny dialog w swoich solówkach."
+    },
+    "ear_training_lab": {
+      "title": "Laboratorium treningu słuchu",
+      "description": "Jedna sesja przez wszystkie cztery ćwiczenia słuchowe: rodzaj akordu, progresje, strojenie ze słuchu i skale. Gitara niepotrzebna — wystarczą słuchawki."
+    },
+    "hand_health_strength": {
+      "title": "Zdrowie i siła dłoni",
+      "description": "Rutyna skupiona na rozciąganiu, niezależności palców i wzmacnianiu małego palca, aby zapewnić długoterminowe zdrowie podczas grania."
+    },
+    "rhythm_timing_foundations": {
+      "title": "Rytm i timing",
+      "description": "Rozwiń niezawodny wewnętrzny zegar — zacznij od pulsu ćwierćnutowego, przejdź przez podziały ósemkowe i szesnastkowe, opanuj zmiany podziałów i sprawdź swój timing przez ciszę."
+    },
+    "complete_daily_practice": {
+      "title": "Kompletna codzienna praktyka",
+      "description": "Zrównoważona, pełna codzienna rutyna obejmująca wszystkie kluczowe obszary: rozgrzewkę, technikę, trening słuchu, rytm, ekspresję i kreatywność. Wszechstronne ćwiczenie, które buduje każdy podstawowy aspekt gry na gitarze."
+    },
+    "gp_sweep_picking_15min": {
+      "title": "15-minutowe ćwiczenie sweep pickingu — granie z podkładem i tabulaturą",
+      "description": "15-minutowe granie sweep pickingu z tabulaturą. Przechodź arpeggia sweepem w równym tempie."
+    },
+    "harmonic_voice_leading": {
+      "title": "Prowadzenie głosów harmonicznych",
+      "description": "Zaawansowane ćwiczenie skupione na dźwiękach przewodnich, płynnych przejściach akordów i minimalnym ruchu melodycznym."
+    },
+    "advanced_improvisation": {
+      "title": "Zaawansowana improwizacja",
+      "description": "Celowane ćwiczenie harmonicznej precyzji z użyciem dźwięków akordu i improwizacji opartej na trójdźwiękach."
+    },
+    "speed_building_progressive": {
+      "title": "Progresywne budowanie szybkości",
+      "description": "Krok po kroku program rozwoju szybkości. Stopniowo buduje szybkość uderzania i koordynację — od podstawowych wzorów chromatycznych przez naprzemienne uderzanie między strunami po efektywność economy pickingu."
+    },
+    "legato_master_plan": {
+      "title": "Plan mistrza legato",
+      "description": "Kompletny trening techniki legato. Rozwija płynne wykonywanie hammer-onów i pull-offów, wytrzymałość tryli, ciągły przepływ legato i zaawansowane wzory sekstoli na całym gryfie."
+    }
   }
 }

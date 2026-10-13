@@ -3656,5 +3656,227 @@
         "2": "Cuenta las subdivisiones en voz alta («1 y 2 y 3 y 4 y») para fijar tu movimiento físico al ritmo interno."
       }
     }
+  },
+  "plan": {
+    "mega_beginner_first_steps": {
+      "title": "Principiante absoluto: primeros pasos",
+      "description": "Un poco de todo: cuerdas al aire, una melodía lenta, rasgueo constante y tus primeros acordes. Elige esto si nunca has tocado."
+    },
+    "beginner_daily_exercises": {
+      "title": "Principiante: ejercicios diarios",
+      "description": "Solo notas sueltas, sin acordes: mantén el tiempo con cuerdas al aire, encuentra notas en el mástil y practica la araña. Un hábito diario para el control de los dedos."
+    },
+    "strumming_foundations": {
+      "title": "Fundamentos del rasgueo",
+      "description": "Construye una mano de rasgueo segura desde cero: golpes hacia abajo constantes, un péndulo fluido abajo-arriba, patrones esenciales y tu primer groove de rock."
+    },
+    "gp_music_theory_essential": {
+      "title": "La parte más importante de la teoría musical — tutorial con playalong",
+      "description": "Un tutorial con playalong que cubre una pieza esencial de la teoría musical para guitarristas."
+    },
+    "gp_pentatonic_tutorial": {
+      "title": "¿Usas esta pentatónica? — playalong de guitarra",
+      "description": "Un tutorial con playalong centrado en la pentatónica. Explora una idea de pentatónica que quizá te estés perdiendo."
+    },
+    "ear_rhythm_fundamentals": {
+      "title": "Fundamentos de oído y ritmo",
+      "description": "Construye una base sólida de musicalidad entrenando a la vez el oído y el sentido del ritmo."
+    },
+    "daily_dexterity_starter": {
+      "title": "Inicio diario de destreza",
+      "description": "Construye la coordinación básica entre la mano izquierda y la derecha sin forzar de más."
+    },
+    "soloing_explorer": {
+      "title": "Explorador del solo",
+      "description": "Primeros pasos en la improvisación, el fraseo y tocar de oído en un formato muy accesible."
+    },
+    "musician_fitness_lvl1_s1": {
+      "title": "Nivel #1 Sesión #1 - MusicianFitness",
+      "description": "¡Spider Crawls, rasgueo, chord kicks, power chords, riffs!"
+    },
+    "musician_fitness_lvl1_s2": {
+      "title": "Nivel #1 Sesión #2 - MusicianFitness",
+      "description": "Acelerar y cambiar de acorde"
+    },
+    "musician_fitness_lvl1_s3": {
+      "title": "Nivel #1 Sesión #3 - MusicianFitness",
+      "description": "Acordes abiertos, power chords, rasgueo y una canción completa"
+    },
+    "musician_fitness_lvl1_s4": {
+      "title": "Nivel #1 Sesión #4 - MusicianFitness",
+      "description": "Control del meñique, cambios de acorde suaves"
+    },
+    "musician_fitness_lvl1_s5": {
+      "title": "Nivel #1 Sesión #5 - MusicianFitness",
+      "description": "¡Aprende Smoke on the Water!"
+    },
+    "musician_fitness_lvl1_s6": {
+      "title": "Nivel #1 Sesión #6 - MusicianFitness",
+      "description": "¡Riffs, cambios de acorde, Spider Crawls y MÁS!"
+    },
+    "musician_fitness_lvl1_s7": {
+      "title": "Nivel #1 Sesión #7 - MusicianFitness",
+      "description": "¡Spider Crawls, cambios de acorde comunes, canciones FÁCILES!"
+    },
+    "musician_fitness_lvl1_s8": {
+      "title": "Nivel #1 Sesión #8 - MusicianFitness",
+      "description": "¡Sesión de práctica completa de Musician Fitness!"
+    },
+    "musician_fitness_lvl2_s9": {
+      "title": "[Nivel 2] Entrenamiento de guitarra para principiantes #9 - MusicianFitness",
+      "description": "Acordes de séptima, rasgueo sincopado"
+    },
+    "musician_fitness_lvl2_s10": {
+      "title": "[Nivel 2] Entrenamiento de guitarra para principiantes #10 - MusicianFitness",
+      "description": "Progresiones de acordes, escala pentatónica"
+    },
+    "musician_fitness_lvl2_s11": {
+      "title": "[Nivel 2] Entrenamiento de guitarra para principiantes #11 - MusicianFitness",
+      "description": "Progresiones de acordes, escala pentatónica"
+    },
+    "musician_fitness_lvl2_s12": {
+      "title": "[Nivel 2] Sesión de práctica para principiantes, semana #12 - MusicianFitness",
+      "description": "Sesión de práctica de nivel 2, semana 12"
+    },
+    "musician_fitness_lvl2_s13": {
+      "title": "[Nivel 2] Entrenamiento de guitarra, semana 13 - MusicianFitness",
+      "description": "Power chords, dominantes séptimas y rasgueo sincopado"
+    },
+    "musician_fitness_lvl2_s14": {
+      "title": "[Nivel 2] Entrenamiento de guitarra, semana 14 - MusicianFitness",
+      "description": "Tresillos de pentatónica, cambios de acorde suaves"
+    },
+    "musician_fitness_lvl2_s15": {
+      "title": "[Nivel 2] Entrenamiento de guitarra, semana 15 - MusicianFitness",
+      "description": "Cambios de ritmo, rasgueo suave"
+    },
+    "musician_fitness_lvl2_s16": {
+      "title": "Entrenamiento de guitarra COMPLETO de 20 min | Semana 16 - MusicianFitness",
+      "description": "Entrenamiento de guitarra de 20 min - semana 16"
+    },
+    "musician_fitness_lvl2_s17": {
+      "title": "Entrenamiento de guitarra COMPLETO de 20 min | Semana 17 - MusicianFitness",
+      "description": "Entrenamiento de guitarra de 20 min - semana 17"
+    },
+    "musician_fitness_lvl2_s18": {
+      "title": "Entrenamiento de guitarra de 20 min - semana 18 - MusicianFitness",
+      "description": "¡Domina los fundamentos en 20 semanas!"
+    },
+    "musician_fitness_lvl2_s19": {
+      "title": "Entrenamiento de guitarra de 20 min - semana 19 - MusicianFitness",
+      "description": "¡Domina los fundamentos en 20 semanas!"
+    },
+    "musician_fitness_lvl2_s20": {
+      "title": "¿Dominas los fundamentos de la guitarra? - MusicianFitness",
+      "description": "Semana 20 - ¡intenta seguir el ritmo!"
+    },
+    "spider_master_plan": {
+      "title": "Entrenamiento maestro de araña",
+      "description": "El programa definitivo de desarrollo técnico cromático. Cubre permutaciones básicas, escaleras, saltos, patrones en X y variaciones rítmicas."
+    },
+    "spider_permutation_part1_index": {
+      "title": "[Parte 1] Permutaciones de araña – empezando por el índice",
+      "description": "Permutaciones de araña que empiezan con el dedo índice (1). El punto de entrada más suave para construir independencia de dedos."
+    },
+    "spider_permutation_part2_middle": {
+      "title": "[Parte 2] Permutaciones de araña – empezando por el corazón",
+      "description": "Permutaciones de araña que empiezan con el dedo corazón (2). Entrena el control al guiar con el segundo dedo."
+    },
+    "spider_permutation_part3_ring": {
+      "title": "[Parte 3] Permutaciones de araña – empezando por el anular",
+      "description": "Permutaciones de araña que empiezan con el dedo anular (3). Desafía al tercer dedo, más débil, a liderar cada patrón."
+    },
+    "spider_permutation_part4_pinky": {
+      "title": "[Parte 4] Permutaciones de araña – empezando por el meñique",
+      "description": "Permutaciones de araña que empiezan con el meñique (4). El conjunto más duro: construye fuerza e independencia en el dedo más débil."
+    },
+    "basic_improvisation_practice": {
+      "title": "Ejercicio básico de desarrollo de la improvisación",
+      "description": "Un conjunto de ejercicios básicos para desarrollar las habilidades de improvisación"
+    },
+    "warm_up_15_minutes": {
+      "title": "Calentamiento — 10 minutos",
+      "description": "Calentamiento básico de 10 minutos antes de tu sesión de práctica principal"
+    },
+    "warm_up_30_minutes": {
+      "title": "Calentamiento — 20 minutos",
+      "description": "Calentamiento básico de 20 minutos antes de tu sesión de práctica principal"
+    },
+    "pentatonic_playalong_best_of_plan": {
+      "title": "Lo mejor de la pentatónica — playalong",
+      "description": "Mejora tus escalas pentatónicas con esta completa sesión de playalong en vídeo."
+    },
+    "gp_pentatonic_10min_workout": {
+      "title": "Playalong de guitarra de 10 min — entrenamiento de escala pentatónica",
+      "description": "Un entrenamiento de 10 minutos de escala pentatónica con tablaturas. Toca junto a la base y gana fluidez en las formas de caja."
+    },
+    "gp_speed_builder_part1": {
+      "title": "Constructor de velocidad para guitarra, parte 1 — entrenamiento de escala pentatónica",
+      "description": "Playalong de escala pentatónica para ganar velocidad. Aumenta gradualmente tu velocidad de púa junto con la base."
+    },
+    "gp_stamina_picking_workout": {
+      "title": "Entrenamiento de resistencia de púa — playalong de púa alterna",
+      "description": "Un entrenamiento de resistencia de púa alterna con tablaturas. Construye aguante en la mano de la púa."
+    },
+    "gp_gallop_picking_10_levels": {
+      "title": "10 niveles de galope — playalong de gallop picking",
+      "description": "Un playalong de gallop picking que avanza por 10 niveles de dificultad."
+    },
+    "gp_alternate_picking_speed_builder": {
+      "title": "Cómo ser más rápido con la púa alterna — constructor de velocidad",
+      "description": "Un playalong y tutorial constructor de velocidad de púa alterna. Desarrolla una púa más rápida y limpia."
+    },
+    "gp_rock_metal_riffs": {
+      "title": "Riffs de rock y metal para guitarra — playalong",
+      "description": "Toca junto a una serie de riffs de rock y metal. Construye tu destreza rítmica y tu vocabulario de riffs."
+    },
+    "gp_drop2_chords_arpeggios": {
+      "title": "Acordes y arpegios para guitarra solista — Drop 2",
+      "description": "Un playalong sobre acordes y arpegios drop 2 para guitarristas solistas."
+    },
+    "fretboard_awareness": {
+      "title": "Conciencia del mástil",
+      "description": "Mapeo sistemático y dominio del mástil de la guitarra mediante ejercicios de búsqueda de notas en distintas posiciones y regiones."
+    },
+    "creative_phrasing": {
+      "title": "Fraseo creativo",
+      "description": "Mejora el espacio, la ubicación rítmica y el diálogo musical en tus solos."
+    },
+    "ear_training_lab": {
+      "title": "Laboratorio de entrenamiento auditivo",
+      "description": "Una sesión por los cuatro ejercicios de escucha: cualidad del acorde, progresiones, afinar de oído y modos. No hace falta guitarra, solo auriculares."
+    },
+    "hand_health_strength": {
+      "title": "Salud y fuerza de la mano",
+      "description": "Una rutina centrada en el estiramiento, la independencia de los dedos y el fortalecimiento del meñique para asegurar la salud a largo plazo al tocar."
+    },
+    "rhythm_timing_foundations": {
+      "title": "Ritmo y tiempo",
+      "description": "Desarrolla un reloj interno a prueba de bombas: empieza con pulsos de negra, avanza por subdivisiones de corcheas y semicorcheas, domina el cambio de subdivisiones y pon a prueba tu tiempo mediante el silencio."
+    },
+    "complete_daily_practice": {
+      "title": "Práctica diaria completa",
+      "description": "Una rutina diaria completa y equilibrada que cubre todas las áreas clave: calentamiento, técnica, entrenamiento auditivo, ritmo, expresión y creatividad. Una práctica redonda que construye todos los aspectos fundamentales de tocar la guitarra."
+    },
+    "gp_sweep_picking_15min": {
+      "title": "15 minutos de práctica de sweep picking — playalong con tablaturas",
+      "description": "Un playalong de sweep picking de 15 minutos con tablaturas. Recorre barridos de arpegio a un ritmo constante."
+    },
+    "harmonic_voice_leading": {
+      "title": "Conducción armónica de voces",
+      "description": "Ejercicio avanzado centrado en las notas guía, las transiciones suaves de acordes y el movimiento melódico mínimo."
+    },
+    "advanced_improvisation": {
+      "title": "Improvisación avanzada",
+      "description": "Práctica dirigida a la precisión armónica usando notas del acorde e improvisación basada en tríadas."
+    },
+    "speed_building_progressive": {
+      "title": "Construcción progresiva de velocidad",
+      "description": "Un programa paso a paso de desarrollo de velocidad. Construye de forma progresiva la velocidad de púa y la coordinación: de patrones cromáticos básicos, pasando por púa alterna entre cuerdas, hasta la eficiencia del economy picking."
+    },
+    "legato_master_plan": {
+      "title": "Plan maestro de legato",
+      "description": "Entrenamiento completo de la técnica de legato. Desarrolla una ejecución suave de hammer-ons y pull-offs, resistencia en los trinos, flujo de legato continuo y patrones avanzados de seisillos por el mástil."
+    }
   }
 }

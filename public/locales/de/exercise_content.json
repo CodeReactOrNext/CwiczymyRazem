@@ -3656,5 +3656,227 @@
         "2": "Zähle die Unterteilungen laut („1 und 2 und 3 und 4 und“), um deine körperliche Bewegung im inneren Rhythmus zu verankern."
       }
     }
+  },
+  "plan": {
+    "mega_beginner_first_steps": {
+      "title": "Absoluter Anfänger: erste Schritte",
+      "description": "Ein Vorgeschmack auf alles: Leersaiten, eine langsame Melodie, gleichmäßiges Strumming und deine ersten Akkorde. Wähle das, wenn du noch nie gespielt hast."
+    },
+    "beginner_daily_exercises": {
+      "title": "Anfänger: tägliche Übungen",
+      "description": "Nur Einzelnoten, keine Akkorde: Halte den Takt auf Leersaiten, finde Noten auf dem Hals und spiel die Spider-Übung. Eine tägliche Gewohnheit für Fingerkontrolle."
+    },
+    "strumming_foundations": {
+      "title": "Strumming-Grundlagen",
+      "description": "Baue eine sichere Strumming-Hand von Grund auf auf — gleichmäßige Abschläge, ein fließendes Ab-Auf-Pendel, wesentliche Muster und dein erster Rock-Groove."
+    },
+    "gp_music_theory_essential": {
+      "title": "Der wichtigste Teil der Musiktheorie — Playalong-Tutorial",
+      "description": "Ein Playalong-Tutorial zu einem grundlegenden Stück Musiktheorie für Gitarristen."
+    },
+    "gp_pentatonic_tutorial": {
+      "title": "Nutzt du diese Pentatonik? — Gitarren-Playalong",
+      "description": "Ein Playalong-Tutorial mit Pentatonik-Schwerpunkt. Entdecke eine Pentatonik-Idee, die dir vielleicht fehlt."
+    },
+    "ear_rhythm_fundamentals": {
+      "title": "Gehör- und Rhythmus-Grundlagen",
+      "description": "Baue ein solides Fundament der Musikalität auf, indem du Gehör und Rhythmusgefühl gleichzeitig trainierst."
+    },
+    "daily_dexterity_starter": {
+      "title": "Täglicher Geschicklichkeits-Einstieg",
+      "description": "Baue grundlegende Koordination zwischen linker und rechter Hand auf, ohne dich zu überanstrengen."
+    },
+    "soloing_explorer": {
+      "title": "Soloing-Entdecker",
+      "description": "Erste Schritte in Improvisation, Phrasierung und Spielen nach Gehör in sehr zugänglicher Form."
+    },
+    "musician_fitness_lvl1_s1": {
+      "title": "Level #1 Session #1 - MusicianFitness",
+      "description": "Spider Crawls, Strumming, Chord Kicks, Powerchords, Riffs!"
+    },
+    "musician_fitness_lvl1_s2": {
+      "title": "Level #1 Session #2 - MusicianFitness",
+      "description": "Schneller werden und Akkordwechsel"
+    },
+    "musician_fitness_lvl1_s3": {
+      "title": "Level #1 Session #3 - MusicianFitness",
+      "description": "Offene Akkorde, Powerchords, Strumming und ein ganzer Song"
+    },
+    "musician_fitness_lvl1_s4": {
+      "title": "Level #1 Session #4 - MusicianFitness",
+      "description": "Kontrolle des kleinen Fingers, weiche Akkordwechsel"
+    },
+    "musician_fitness_lvl1_s5": {
+      "title": "Level #1 Session #5 - MusicianFitness",
+      "description": "Lerne Smoke on the Water!"
+    },
+    "musician_fitness_lvl1_s6": {
+      "title": "Level #1 Session #6 - MusicianFitness",
+      "description": "Riffs, Akkordwechsel, Spider Crawls und MEHR!"
+    },
+    "musician_fitness_lvl1_s7": {
+      "title": "Level #1 Session #7 - MusicianFitness",
+      "description": "Spider Crawls, gängige Akkordwechsel, LEICHTE Songs!"
+    },
+    "musician_fitness_lvl1_s8": {
+      "title": "Level #1 Session #8 - MusicianFitness",
+      "description": "Komplette Musician-Fitness-Übungssession!"
+    },
+    "musician_fitness_lvl2_s9": {
+      "title": "[Level 2] Gitarren-Workout für Anfänger #9 - MusicianFitness",
+      "description": "Septakkorde, synkopiertes Strumming"
+    },
+    "musician_fitness_lvl2_s10": {
+      "title": "[Level 2] Gitarren-Workout für Anfänger #10 - MusicianFitness",
+      "description": "Akkordfolgen, Pentatonik-Tonleiter"
+    },
+    "musician_fitness_lvl2_s11": {
+      "title": "[Level 2] Gitarren-Workout für Anfänger #11 - MusicianFitness",
+      "description": "Akkordfolgen, Pentatonik-Tonleiter"
+    },
+    "musician_fitness_lvl2_s12": {
+      "title": "[Level 2] Übungssession für Anfänger, Woche #12 - MusicianFitness",
+      "description": "Level-2-Übungssession, Woche 12"
+    },
+    "musician_fitness_lvl2_s13": {
+      "title": "[Level 2] Gitarren-Workout, Woche 13 - MusicianFitness",
+      "description": "Powerchords, Dominantseptakkorde und synkopiertes Strumming"
+    },
+    "musician_fitness_lvl2_s14": {
+      "title": "[Level 2] Gitarren-Workout, Woche 14 - MusicianFitness",
+      "description": "Pentatonik-Triolen, weiche Akkordwechsel"
+    },
+    "musician_fitness_lvl2_s15": {
+      "title": "[Level 2] Gitarren-Workout, Woche 15 - MusicianFitness",
+      "description": "Rhythmuswechsel, geschmeidiges Strumming"
+    },
+    "musician_fitness_lvl2_s16": {
+      "title": "KOMPLETTES 20-Minuten-Gitarren-Workout | Woche 16 - MusicianFitness",
+      "description": "20-Minuten-Gitarren-Workout - Woche 16"
+    },
+    "musician_fitness_lvl2_s17": {
+      "title": "KOMPLETTES 20-Minuten-Gitarren-Workout | Woche 17 - MusicianFitness",
+      "description": "20-Minuten-Gitarren-Workout - Woche 17"
+    },
+    "musician_fitness_lvl2_s18": {
+      "title": "20-Minuten-Gitarren-Workout - Woche 18 - MusicianFitness",
+      "description": "Meistere die Grundlagen in 20 Wochen!"
+    },
+    "musician_fitness_lvl2_s19": {
+      "title": "20-Minuten-Gitarren-Workout - Woche 19 - MusicianFitness",
+      "description": "Meistere die Grundlagen in 20 Wochen!"
+    },
+    "musician_fitness_lvl2_s20": {
+      "title": "Gitarren-Grundlagen gemeistert? - MusicianFitness",
+      "description": "Woche 20 - versuch mitzuhalten!"
+    },
+    "spider_master_plan": {
+      "title": "Meister-Spider-Training",
+      "description": "Das ultimative chromatische technische Entwicklungsprogramm. Umfasst grundlegende Permutationen, Treppen, Sprünge, X-Muster und rhythmische Variationen."
+    },
+    "spider_permutation_part1_index": {
+      "title": "[Teil 1] Spider-Permutationen – mit dem Zeigefinger beginnend",
+      "description": "Spider-Permutationen, die mit dem Zeigefinger (1) beginnen. Der sanfteste Einstieg zum Aufbau von Fingerunabhängigkeit."
+    },
+    "spider_permutation_part2_middle": {
+      "title": "[Teil 2] Spider-Permutationen – mit dem Mittelfinger beginnend",
+      "description": "Spider-Permutationen, die mit dem Mittelfinger (2) beginnen. Trainiert die Kontrolle beim Führen mit dem zweiten Finger."
+    },
+    "spider_permutation_part3_ring": {
+      "title": "[Teil 3] Spider-Permutationen – mit dem Ringfinger beginnend",
+      "description": "Spider-Permutationen, die mit dem Ringfinger (3) beginnen. Fordert den schwächeren dritten Finger heraus, jedes Muster anzuführen."
+    },
+    "spider_permutation_part4_pinky": {
+      "title": "[Teil 4] Spider-Permutationen – mit dem kleinen Finger beginnend",
+      "description": "Spider-Permutationen, die mit dem kleinen Finger (4) beginnen. Das schwerste Set — baut Kraft und Unabhängigkeit im schwächsten Finger auf."
+    },
+    "basic_improvisation_practice": {
+      "title": "Grundlegende Übung zur Improvisationsentwicklung",
+      "description": "Eine Reihe grundlegender Übungen zur Entwicklung der Improvisationsfähigkeiten"
+    },
+    "warm_up_15_minutes": {
+      "title": "Aufwärmen — 10 Minuten",
+      "description": "Grundlegendes 10-minütiges Aufwärmen vor deiner Hauptübungssession"
+    },
+    "warm_up_30_minutes": {
+      "title": "Aufwärmen — 20 Minuten",
+      "description": "Grundlegendes 20-minütiges Aufwärmen vor deiner Hauptübungssession"
+    },
+    "pentatonic_playalong_best_of_plan": {
+      "title": "Pentatonik — das Beste als Playalong",
+      "description": "Verbessere deine Pentatonik-Tonleitern mit dieser umfassenden Video-Playalong-Session."
+    },
+    "gp_pentatonic_10min_workout": {
+      "title": "10-Minuten-Gitarren-Playalong — Pentatonik-Workout",
+      "description": "Ein 10-minütiges Pentatonik-Workout mit Tabs. Spiel mit und baue Geläufigkeit über die Boxformen auf."
+    },
+    "gp_speed_builder_part1": {
+      "title": "Gitarren-Speed-Builder Teil 1 — Pentatonik-Workout",
+      "description": "Pentatonik-Playalong zum Aufbau von Geschwindigkeit. Steigere dein Anschlagtempo schrittweise mit dem Track."
+    },
+    "gp_stamina_picking_workout": {
+      "title": "Ausdauer-Picking-Workout — Wechselschlag-Playalong",
+      "description": "Ein Wechselschlag-Ausdauer-Workout mit Tabs. Baue Ausdauer in deiner Anschlaghand auf."
+    },
+    "gp_gallop_picking_10_levels": {
+      "title": "10 Galopp-Level — Gallop-Picking-Playalong",
+      "description": "Ein Gallop-Picking-Playalong, der 10 Schwierigkeitsstufen durchläuft."
+    },
+    "gp_alternate_picking_speed_builder": {
+      "title": "So wirst du schneller im Wechselschlag — Speed Builder",
+      "description": "Ein Wechselschlag-Speed-Builder als Playalong und Tutorial. Entwickle schnelleres, saubereres Picking."
+    },
+    "gp_rock_metal_riffs": {
+      "title": "Rock- und Metal-Riffs für Gitarre — Playalong",
+      "description": "Spiel eine Reihe von Rock- und Metal-Riffs mit. Baue deine Rhythmus-Skills und dein Riff-Vokabular auf."
+    },
+    "gp_drop2_chords_arpeggios": {
+      "title": "Akkorde und Arpeggien für Leadgitarre — Drop 2",
+      "description": "Ein Playalong zu Drop-2-Akkorden und Arpeggien für Leadgitarristen."
+    },
+    "fretboard_awareness": {
+      "title": "Griffbrett-Bewusstsein",
+      "description": "Systematisches Kartieren und Beherrschen des Gitarrenhalses durch Notenfinde-Übungen über Lagen und Griffbrettbereiche."
+    },
+    "creative_phrasing": {
+      "title": "Kreative Phrasierung",
+      "description": "Verbessere Raum, rhythmische Platzierung und musikalischen Dialog in deinen Soli."
+    },
+    "ear_training_lab": {
+      "title": "Gehörtraining-Labor",
+      "description": "Eine Session durch alle vier Hörübungen: Akkordqualität, Progressionen, Stimmen nach Gehör und Modi. Keine Gitarre nötig — nur Kopfhörer."
+    },
+    "hand_health_strength": {
+      "title": "Handgesundheit & Kraft",
+      "description": "Eine Routine mit Fokus auf Dehnung, Fingerunabhängigkeit und Kräftigung des kleinen Fingers für langfristige Spielgesundheit."
+    },
+    "rhythm_timing_foundations": {
+      "title": "Rhythmus & Timing",
+      "description": "Entwickle eine felsenfeste innere Uhr — beginne mit Viertelpulsen, geh über Achtel- und Sechzehntelunterteilungen, meistere den Wechsel der Unterteilungen und teste dein Timing durch Stille."
+    },
+    "complete_daily_practice": {
+      "title": "Komplettes tägliches Üben",
+      "description": "Eine ausgewogene tägliche Komplett-Routine über alle Schlüsselbereiche: Aufwärmen, Technik, Gehörtraining, Rhythmus, Ausdruck und Kreativität. Ein rundes Üben, das jeden grundlegenden Aspekt des Gitarrenspiels aufbaut."
+    },
+    "gp_sweep_picking_15min": {
+      "title": "15 Minuten Sweep-Picking-Übung — Playalong mit Tabs",
+      "description": "Ein 15-minütiger Sweep-Picking-Playalong mit Tabs. Arbeite Arpeggio-Sweeps in gleichmäßigem Tempo durch."
+    },
+    "harmonic_voice_leading": {
+      "title": "Harmonische Stimmführung",
+      "description": "Fortgeschrittene Übung mit Fokus auf Leittöne, geschmeidige Akkordübergänge und minimale melodische Bewegung."
+    },
+    "advanced_improvisation": {
+      "title": "Fortgeschrittene Improvisation",
+      "description": "Gezieltes Üben harmonischer Präzision mit Akkordtönen und dreiklangsbasierter Improvisation."
+    },
+    "speed_building_progressive": {
+      "title": "Progressiver Geschwindigkeitsaufbau",
+      "description": "Ein schrittweises Programm zur Geschwindigkeitsentwicklung. Baut Anschlaggeschwindigkeit und Koordination schrittweise auf — von grundlegenden chromatischen Mustern über Wechselschlag über Saiten bis zur Effizienz des Economy Pickings."
+    },
+    "legato_master_plan": {
+      "title": "Legato-Meisterplan",
+      "description": "Komplettes Legato-Techniktraining. Entwickelt geschmeidige Hammer-on- und Pull-off-Ausführung, Triller-Ausdauer, kontinuierlichen Legato-Fluss und fortgeschrittene Sextolenmuster über das Griffbrett."
+    }
   }
 }
