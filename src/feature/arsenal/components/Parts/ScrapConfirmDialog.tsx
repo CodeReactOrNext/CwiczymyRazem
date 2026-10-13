@@ -12,6 +12,7 @@ import type {
   SalvageableMod,
   ScrappedMod,
 } from "feature/arsenal/data/salvage";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { countScrapParts } from "feature/arsenal/utils/scrap";
 
@@ -48,6 +49,8 @@ export const ScrapConfirmDialog = ({
   onCancel,
   isLoading,
 }: ScrapConfirmDialogProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const total = countScrapParts(parts);
 
   return (
@@ -59,17 +62,16 @@ export const ScrapConfirmDialog = ({
       <AlertDialogContent className='max-w-sm gap-6 border-0 bg-zinc-900 p-6'>
         <AlertDialogHeader className='space-y-2'>
           <AlertDialogTitle className='text-lg font-bold text-white'>
-            Scrap {itemType}?
+            {t(`scrap.title.${itemType}`)}
           </AlertDialogTitle>
           <AlertDialogDescription className='text-sm text-zinc-400'>
-            {itemName} — this is permanent, the {itemType.toLowerCase()} is gone
-            for good.
+            {t(`scrap.body.${itemType}`, { name: itemName })}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <div className='flex flex-col gap-4 rounded-lg bg-zinc-800/50 p-4'>
           <p className='text-xs text-zinc-400'>
-            You will salvage {total} {total === 1 ? "part" : "parts"}
+            {t("scrap.will_salvage", { count: total })}
           </p>
           <ScrapYieldList parts={parts} />
         </div>
@@ -82,10 +84,10 @@ export const ScrapConfirmDialog = ({
             <ModArt modId={salvaged.featureId} size={52} />
             <div className='flex min-w-0 flex-col gap-1'>
               <span className='text-xs font-semibold text-purple-300/80'>
-                Blueprint
+                {t("scrap.blueprint")}
               </span>
               <span className='truncate text-sm font-bold text-zinc-100'>
-                {salvaged.label}{" "}
+                {labels.mod(salvaged.featureId, salvaged.label)}{" "}
                 <span className='tabular-nums text-purple-300'>
                   +{salvaged.points}
                 </span>
@@ -101,16 +103,14 @@ export const ScrapConfirmDialog = ({
         {scrapped.length > 0 && (
           <div className='flex flex-col gap-3 rounded-lg bg-zinc-800/50 p-4'>
             <p className='text-xs text-zinc-400'>
-              {scrapped.length === 1
-                ? "This mod goes with it"
-                : `These ${scrapped.length} mods go with it`}
+              {t("scrap.mods_go", { count: scrapped.length })}
             </p>
             <div className='flex flex-col gap-2.5'>
               {scrapped.map((mod) => (
                 <div key={mod.featureId} className='flex items-center gap-3'>
                   <ModArt modId={mod.featureId} size={32} dimmed />
                   <span className='min-w-0 flex-1 truncate text-sm text-zinc-400'>
-                    {mod.label}
+                    {labels.mod(mod.featureId, mod.label)}
                   </span>
                   <span className='shrink-0 text-sm font-bold tabular-nums text-zinc-500'>
                     +{mod.points}
@@ -125,7 +125,7 @@ export const ScrapConfirmDialog = ({
           <AlertDialogCancel
             disabled={isLoading}
             className='mt-0 border-0 bg-zinc-700 text-white hover:bg-zinc-600 hover:text-white sm:flex-1'>
-            Cancel
+            {t("common.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
@@ -136,7 +136,7 @@ export const ScrapConfirmDialog = ({
             }}
             disabled={isLoading}
             className='bg-orange-600 text-white hover:bg-orange-700 sm:flex-1'>
-            {isLoading ? "Scrapping..." : "Confirm"}
+            {isLoading ? t("bulk.scrapping") : t("common.confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

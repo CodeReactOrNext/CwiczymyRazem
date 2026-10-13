@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { CollectionSectionHeader } from "feature/arsenal/components/Collection/CollectionSectionHeader";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { Wrench } from "lucide-react";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -26,6 +27,7 @@ interface BuilderPartsShelfProps {
 export const BuilderPartsShelf = ({ components }: BuilderPartsShelfProps) => {
   const router = useRouter();
   const [slot, setSlot] = useState<ComponentSlot>("body");
+  const { t } = useArsenalLabels();
 
   const owned = useMemo(
     () =>
@@ -58,15 +60,15 @@ export const BuilderPartsShelf = ({ components }: BuilderPartsShelfProps) => {
   return (
     <section className='flex flex-col gap-5'>
       <CollectionSectionHeader
-        eyebrow='Guitar Builder'
-        title='Parts'
+        eyebrow={t("builder.title")}
+        title={t("workshop.parts")}
         owned={distinct}
         total={COMPONENT_DEFS.length}
-        unit='parts collected'
+        unit={t("builder.parts_collected")}
         action={
           <Button variant='secondary' size='sm' onClick={openBuilder}>
             <Wrench className='mr-2' />
-            Open Builder
+            {t("builder.open_builder")}
           </Button>
         }
       />
@@ -90,8 +92,7 @@ export const BuilderPartsShelf = ({ components }: BuilderPartsShelfProps) => {
         </div>
       ) : (
         <p className='rounded-lg bg-zinc-900/40 px-5 py-8 text-center text-sm text-zinc-400'>
-          None yet — parts drop from the Standard, Premium Guitar and Elite
-          Guitar cases.
+          {t("builder.none_yet")}
         </p>
       )}
     </section>

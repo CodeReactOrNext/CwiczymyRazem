@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { CurrencyIcon } from "components/CurrencyIcons/withCurrencyIcons";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { Boxes, Plug } from "lucide-react";
 
 import type { HardwareKind } from "../../data/rigHardware";
@@ -47,6 +48,7 @@ const HardwareButton = ({
   pending,
   onBuy,
 }: HardwareButtonProps) => {
+  const { t } = useArsenalLabels();
   if (next === null) return null;
   const affordable = fame >= next.fame;
 
@@ -57,14 +59,18 @@ const HardwareButton = ({
       title={
         affordable
           ? `${owned} → ${next.name}`
-          : `${next.name} costs ${next.fame} Fame — ${next.fame - fame} more needed`
+          : t("rig.hardware_costs", {
+              name: next.name,
+              fame: next.fame,
+              missing: next.fame - fame,
+            })
       }
       className={cn(
         RIG_BUTTON,
         affordable && !pending && "text-arsenal-accent",
       )}>
       {icon}
-      {pending ? "Buying…" : `Upgrade ${label.toLowerCase()}`}
+      {pending ? t("buy.buying") : t("rig.upgrade_label", { label })}
       <span className='flex items-center gap-1 tabular-nums'>
         <CurrencyIcon currency='fame' className='mr-0 h-3.5 w-3.5' />
         {next.fame}
@@ -85,12 +91,13 @@ export const RigHardwarePanel = ({ rig, fame }: RigHardwarePanelProps) => {
   const board = boardTierOf(rig.boardTier);
   const supply = supplyTierOf(rig.supplyTier);
   const pendingFor = (kind: HardwareKind) => isPending && variables === kind;
+  const { t } = useArsenalLabels();
 
   return (
     <>
       <HardwareButton
         icon={<Boxes size={12} strokeWidth={2.5} />}
-        label='Pedalboard'
+        label={t("rig.pedalboard_hw")}
         owned={board.name}
         next={nextTier("board", board.id)}
         fame={fame}
@@ -99,7 +106,7 @@ export const RigHardwarePanel = ({ rig, fame }: RigHardwarePanelProps) => {
       />
       <HardwareButton
         icon={<Plug size={12} strokeWidth={2.5} />}
-        label='Power supply'
+        label={t("rig.power_supply_hw")}
         owned={supply.name}
         next={nextTier("supply", supply.id)}
         fame={fame}

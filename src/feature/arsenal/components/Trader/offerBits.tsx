@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 
 interface MeterProps {
   /** 0–1 of the bar that is lit. */
@@ -46,6 +47,7 @@ export const RollMeter = ({
   className,
 }: RollMeterProps) => {
   const span = Math.max(1, maxPoints - minPoints);
+  const { t } = useTranslation("arsenal");
   return (
     <span className={cn("flex flex-col gap-1.5", className)}>
       <span className='flex items-baseline gap-1.5'>
@@ -55,7 +57,7 @@ export const RollMeter = ({
           +{points}
         </span>
         <span className='text-xs tabular-nums text-zinc-400'>
-          of +{maxPoints} max
+          {t("trader.of_max", { max: maxPoints })}
         </span>
       </span>
       <Meter share={(points - minPoints) / span} color={color} />

@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import type { Translate } from "lib/i18n/translate";
 import { ChevronRight } from "lucide-react";
 
 import type { BoardLevel } from "../../data/boardDuplicates";
@@ -29,12 +31,14 @@ import {
  */
 
 /** The one line the tooltip adds under the stage's reason for being here. */
-const describeStageLevel = (at: StageLevel | undefined): string => {
-  if (!at) return "Nothing of this kind is in service.";
-  const pedals = at.count === 1 ? "1 pedal" : `${at.count} pedals`;
+const describeStageLevel = (
+  at: StageLevel | undefined,
+  t: Translate,
+): string => {
+  if (!at) return t("signal.stage_empty");
   const lost =
-    at.penalty > 0 ? ` (${at.penalty} lost to a duplicate copy)` : "";
-  return `${pedals} in service, worth Lv ${at.level} of your Rig Level${lost}.`;
+    at.penalty > 0 ? t("signal.stage_lost", { count: at.penalty }) : "";
+  return t("signal.stage_level", { count: at.count, level: at.level, lost });
 };
 
 interface SignalOrderStripProps {
@@ -44,6 +48,8 @@ interface SignalOrderStripProps {
 }
 
 export const SignalOrderStrip = ({ verdict, board }: SignalOrderStripProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const filled = new Set(verdict.filledStages);
   const levels = readStageLevels(verdict, board);
   const stagesLeft = PLAYABLE_SIGNAL_STAGES.length - filled.size;
@@ -62,11 +68,11 @@ export const SignalOrderStrip = ({ verdict, board }: SignalOrderStripProps) => {
       <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2'>
         <span className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
           <span className='text-sm font-semibold text-arsenal-text-primary'>
-            Signal order
+            {t("signal.order")}
           </span>
           {faulted.size > 0 && (
             <span className='text-xs text-amber-400/80'>
-              Amber pedals sit on a backwards cable
+              {t("signal.amber_backwards")}
             </span>
           )}
         </span>
@@ -79,8 +85,8 @@ export const SignalOrderStrip = ({ verdict, board }: SignalOrderStripProps) => {
         <span
           title={
             verdict.complete
-              ? `Every stage is in service. The board pays ${CHAIN_COMPLETE_FAME} Fame an hour on top of its cables.`
-              : `Cover every stage at once and the board pays ${CHAIN_COMPLETE_FAME} Fame an hour on top of its cables.`
+              ? t("signal.full_chain_done", { fame: CHAIN_COMPLETE_FAME })
+              : t("signal.full_chain_hint", { fame: CHAIN_COMPLETE_FAME })
           }
           className={cn(
             "flex shrink-0 cursor-default items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold",
@@ -88,13 +94,13 @@ export const SignalOrderStrip = ({ verdict, board }: SignalOrderStripProps) => {
               ? "bg-emerald-400/10 text-emerald-300"
               : "bg-arsenal-card text-arsenal-text-tertiary",
           )}>
-          Full chain
+          {t("signal.full_chain")}
           <span className='tabular-nums text-amber-300'>
             +{CHAIN_COMPLETE_FAME}/h
           </span>
           {!verdict.complete && (
             <span className='font-medium text-arsenal-text-tertiary'>
-              · {stagesLeft} to go
+              · {t("signal.to_go", { count: stagesLeft })}
             </span>
           )}
         </span>
@@ -118,7 +124,7 @@ export const SignalOrderStrip = ({ verdict, board }: SignalOrderStripProps) => {
                 />
               )}
               <span
-                title={`${stage.why}\n\n${describeStageLevel(at)}`}
+                title={`${labels.stageWhy(stage)}\n\n${describeStageLevel(at, t)}`}
                 className={cn(
                   "flex cursor-default items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
                   wrong
@@ -127,7 +133,7 @@ export const SignalOrderStrip = ({ verdict, board }: SignalOrderStripProps) => {
                       ? "bg-arsenal-card text-arsenal-text-secondary"
                       : "text-arsenal-text-tertiary",
                 )}>
-                {stage.label}
+                {labels.stageLabel(stage)}
               </span>
             </span>
           );

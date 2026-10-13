@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { useLocalizePlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +31,9 @@ export const PlanPreviewDialog = ({
   isLoading,
 }: PlanPreviewDialogProps) => {
   const { t } = useTranslation(["exercises", "common", "plans"]);
+  const localizePlan = useLocalizePlan();
 
+  const shown = plan ? localizePlan(plan) : null;
   const totalDuration = plan
     ? Math.round(plan.exercises.reduce((acc, ex) => acc + ex.timeInMinutes, 0))
     : 0;
@@ -47,10 +50,10 @@ export const PlanPreviewDialog = ({
                 {t(`exercises:difficulty.${plan.difficulty}` as any)}
               </p>
               <DialogTitle className='text-xl font-bold leading-tight text-zinc-50'>
-                {plan.title}
+                {shown?.title}
               </DialogTitle>
               <DialogDescription className='text-sm leading-relaxed text-zinc-400'>
-                {plan.description}
+                {shown?.description}
               </DialogDescription>
               <div className='flex items-center gap-4 pt-1 text-xs font-medium text-zinc-400'>
                 <span className='flex items-center gap-1.5'>
@@ -66,7 +69,7 @@ export const PlanPreviewDialog = ({
             </DialogHeader>
 
             <ol className='space-y-1.5'>
-              {plan.exercises.map((exercise, index) => (
+              {(shown ?? plan).exercises.map((exercise, index) => (
                 <li
                   key={`${exercise.id}-${index}`}
                   className='flex items-center gap-3 rounded-lg bg-zinc-900/60 px-3 py-2.5'>

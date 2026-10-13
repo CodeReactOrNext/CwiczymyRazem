@@ -36,6 +36,9 @@
  * `rigLevel` and every panel that previews one agree by construction.
  */
 
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
+
 import type {
   EffectDefinition,
   EffectInventoryItem,
@@ -212,16 +215,36 @@ const ordinalOf = (index: number) => ORDINALS[index] ?? `${index + 1}th`;
 export const describeDuplicateCopy = (
   copy: BoardCopy,
   modelName: string,
+  t?: Translate,
 ): string => {
   if (copy.index === 0)
-    return `${copy.total} copies of ${modelName} are powered on the board. This is the best of them, so it counts in full (Lv ${copy.level}) — the marks on the others are what they are counted at.`;
+    return translateOr(
+      t,
+      "arsenal:duplicates.keeper",
+      "{{total}} copies of {{name}} are powered on the board. This is the best of them, so it counts in full (Lv {{level}}) — the marks on the others are what they are counted at.",
+      { total: copy.total, name: modelName, level: copy.level },
+    );
+  const pct = Math.round(copy.share * 100);
   const worth =
     copy.share === 0
-      ? "adds nothing to your Rig Level"
+      ? translateOr(t, "arsenal:duplicates.worth_none", "adds nothing to your Rig Level")
       : copy.share === 0.5
-        ? "adds half its level to your Rig Level"
-        : `adds ${Math.round(copy.share * 100)}% of its level to your Rig Level`;
-  return `The ${ordinalOf(copy.index)} ${modelName} on the board — it ${worth} (Lv ${copy.level} → ${copy.counted}). Swap it for a different pedal and every level counts.`;
+        ? translateOr(t, "arsenal:duplicates.worth_half", "adds half its level to your Rig Level")
+        : translateOr(t, "arsenal:duplicates.worth_pct", "adds {{pct}}% of its level to your Rig Level", { pct });
+  // English says "the second"; other languages take the plain copy number.
+  return translateOr(
+    t,
+    "arsenal:duplicates.copy",
+    "The {{ordinal}} {{name}} on the board — it {{worth}} (Lv {{level}} → {{counted}}). Swap it for a different pedal and every level counts.",
+    {
+      ordinal: ordinalOf(copy.index),
+      n: copy.index + 1,
+      name: modelName,
+      worth,
+      level: copy.level,
+      counted: copy.counted,
+    },
+  );
 };
 
 const shareWord = (share: number): string => {
@@ -236,7 +259,17 @@ const shareWord = (share: number): string => {
  * from the numbers: "The best copy counts in full, the second half, any more
  * nothing."
  */
-export const describeDuplicateRule = (): string => {
+export const describeDuplicateRule = (t?: Translate): string => {
+  // The translated sentence is written for today's table; any other table
+  // falls back to the English one built from the numbers below.
+  const isDefaultTable =
+    DUPLICATE_LEVEL_SHARES.length === 3 &&
+    DUPLICATE_LEVEL_SHARES[1] === 0.5 &&
+    DUPLICATE_LEVEL_SHARES[2] === 0;
+  if (t && isDefaultTable) {
+    const rule = t("arsenal:duplicates.rule");
+    if (rule !== "arsenal:duplicates.rule") return rule;
+  }
   const last = DUPLICATE_LEVEL_SHARES.length - 1;
   const parts = DUPLICATE_LEVEL_SHARES.slice(1).map((share, offset) => {
     const index = offset + 1;

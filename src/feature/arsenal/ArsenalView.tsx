@@ -9,6 +9,7 @@ import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LevelGate } from "feature/levelGate/components/LevelGate";
 import { PlayerLvlProvider } from "feature/progression/hooks/usePlayerLvl";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import {
   BookMarked,
@@ -56,16 +57,16 @@ const WORKSHOP_ENABLED: boolean = true;
 /** Hidden tabs are also unreachable by URL, so `?tab=workshop` falls back to Cases. */
 const isTabVisible = (tab: ArsenalTab): boolean => tab !== "workshop" || WORKSHOP_ENABLED;
 
-const TAB_META: Record<ArsenalTab, { label: string; icon: LucideIcon }> = {
-  cases: { label: "Cases", icon: PackageOpen },
-  collection: { label: "Collection", icon: Swords },
-  rig: { label: "Rig", icon: Guitar },
-  builder: { label: "Builder", icon: Wrench },
-  workshop: { label: "Workshop", icon: Hammer },
-  commissions: { label: "Commissions", icon: DraftingCompass },
-  trader: { label: "Trader", icon: Store },
-  market: { label: "Market", icon: Users },
-  dex: { label: "Dex", icon: BookMarked },
+const TAB_ICON: Record<ArsenalTab, LucideIcon> = {
+  cases: PackageOpen,
+  collection: Swords,
+  rig: Guitar,
+  builder: Wrench,
+  workshop: Hammer,
+  commissions: DraftingCompass,
+  trader: Store,
+  market: Users,
+  dex: BookMarked,
 };
 
 import { GuitarBuilderTab } from "feature/guitarBuilder/components/GuitarBuilderTab";
@@ -91,6 +92,7 @@ import { useOpenCase } from "./hooks/useOpenCase";
 import type { CaseType, OpenCaseResult } from "./types/arsenal.types";
 
 const ArsenalTabs = () => {
+  const { t } = useTranslation("arsenal");
   const { data, isLoading } = useArsenalData();
   const { ref: railRef, edges: tabEdges } = useRailEdges<HTMLDivElement>();
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -145,9 +147,9 @@ const ArsenalTabs = () => {
       {/* The banner sits above every tab, so its subtitle describes the whole
           module — it used to describe only the case shop. */}
       <HeroBanner
-        title="Guitar Arsenal"
-        subtitle="Open cases, build your rig, keep your gear in shape"
-        eyebrow="Collect & equip"
+        title={t("view.title")}
+        subtitle={t("view.subtitle")}
+        eyebrow={t("view.eyebrow")}
         compact
         className="w-full !rounded-none !shadow-none !p-6 min-h-[120px] md:min-h-[132px] lg:min-h-[144px]"
         backgroundContent={<HeroPattern />}
@@ -160,7 +162,7 @@ const ArsenalTabs = () => {
             <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-1.5">
               <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
               <span className="text-sm font-black text-amber-400">{fame.toLocaleString()}</span>
-              <span className="text-[11px] text-zinc-400">Fame</span>
+              <span className="text-[11px] text-zinc-400">{t("common.fame")}</span>
             </div>
             {/*
               Shown even at zero, unlike most counters. A currency nobody knows
@@ -195,13 +197,12 @@ const ArsenalTabs = () => {
                     {freeCases}
                   </span>
                   <span className="text-[11px] text-arsenal-text-secondary">
-                    Free {freeCases === 1 ? "case" : "cases"}
+                    {t("view.free_cases", { count: freeCases })}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="max-w-[15rem] font-normal">
-                Earned from epic achievements. One opens any case on the shelf —
-                Elite included — without spending Fame.
+                {t("view.free_cases_hint")}
               </TooltipContent>
             </Tooltip>
           </div>
@@ -215,7 +216,7 @@ const ArsenalTabs = () => {
               ref={railRef}
               className={cn(arsenalTabListClass, tabNavFadeClass(tabEdges))}>
               {ARSENAL_TABS.filter(isTabVisible).map((tab) => {
-                const { label, icon: Icon } = TAB_META[tab];
+                const Icon = TAB_ICON[tab];
                 const hasNewDrop =
                   tab === "collection" &&
                   !!data &&
@@ -232,7 +233,7 @@ const ArsenalTabs = () => {
                         <span className="absolute -right-1.5 -top-1 h-2 w-2 rounded-full bg-arsenal-accent shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
                       )}
                     </span>
-                    <span className="max-w-full truncate">{label}</span>
+                    <span className="max-w-full truncate">{t(`view.tabs.${tab}`)}</span>
                   </TabsTrigger>
                 );
               })}

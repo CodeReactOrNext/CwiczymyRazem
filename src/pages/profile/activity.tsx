@@ -20,6 +20,7 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import { Download } from "lucide-react";
 import type { ReactElement } from "react";
@@ -39,6 +40,7 @@ const ExportButton = ({ label, onClick }: { label: string; onClick: () => void }
 );
 
 const ProfileActivityPage = () => {
+  const { t } = useTranslation("library");
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
   const [refreshKey] = useState(0);
@@ -75,12 +77,12 @@ const ProfileActivityPage = () => {
 
   const handleExportSessions = () => {
     if (!reportList || reportList.length === 0) {
-      toast.error("No sessions to export yet");
+      toast.error(t("activity.no_sessions"));
       return;
     }
 
     downloadActivityLogCsv(reportList);
-    toast.success("Sessions exported to CSV");
+    toast.success(t("activity.sessions_exported"));
   };
 
   const handleExportSongs = () => {
@@ -88,30 +90,30 @@ const ProfileActivityPage = () => {
       ? songs.wantToLearn.length + songs.learning.length + songs.learned.length
       : 0;
     if (!songs || songCount === 0) {
-      toast.error("No songs to export yet");
+      toast.error(t("activity.no_songs"));
       return;
     }
 
     downloadSongProgressCsv(songs);
-    toast.success("Song progress exported to CSV");
+    toast.success(t("activity.songs_exported"));
   };
 
   const handleExportSummary = () => {
     if (!userStats) {
-      toast.error("No profile stats to export yet");
+      toast.error(t("activity.no_stats"));
       return;
     }
 
     downloadProfileSummaryCsv(userStats);
-    toast.success("Profile summary exported to CSV");
+    toast.success(t("activity.summary_exported"));
   };
 
   return (
     <MainContainer noBorder>
       <HeroBanner
-        title="Your Activity"
-        subtitle="Track your practice history and progress over time"
-        eyebrow="Practice stats"
+        title={t("activity.title")}
+        subtitle={t("activity.subtitle")}
+        eyebrow={t("activity.eyebrow")}
         backgroundContent={<HeroPattern />}
         rightContent={
           <div className="w-full h-full flex items-center md:justify-end">
@@ -133,15 +135,15 @@ const ProfileActivityPage = () => {
           <PageTabs
             tabs={tabs}
             activeHref='/profile/activity'
-            ariaLabel='Progress sections'
+            ariaLabel={t("activity.sections")}
             className='border-b-0'
           />
           {/* Exports are desktop-only — three CSV buttons wrap onto their own
               row on a phone and push the actual content down for little gain. */}
           <div className='ml-auto hidden shrink-0 items-center gap-1 md:flex'>
-            <ExportButton label='Export sessions' onClick={handleExportSessions} />
-            <ExportButton label='Export songs' onClick={handleExportSongs} />
-            <ExportButton label='Export summary' onClick={handleExportSummary} />
+            <ExportButton label={t("activity.export_sessions")} onClick={handleExportSessions} />
+            <ExportButton label={t("activity.export_songs")} onClick={handleExportSongs} />
+            <ExportButton label={t("activity.export_summary")} onClick={handleExportSummary} />
           </div>
         </div>
         <div className='font-openSans flex flex-col gap-6'>

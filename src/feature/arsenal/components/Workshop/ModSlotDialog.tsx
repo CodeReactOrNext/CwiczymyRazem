@@ -7,12 +7,12 @@ import {
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import {
-  getPartLabel,
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
 import type { SalvagedModOption } from "feature/arsenal/data/salvage";
 import type { FittedMod, ModQuote } from "feature/arsenal/data/workshop";
 import { MOD_REMOVE_FAME_COST } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useWorkshopMod } from "feature/arsenal/hooks/useWorkshopMod";
 import {
   formatModSlot,
@@ -92,12 +92,13 @@ const RollScale = ({
   /** The value before the last roll, when it changed — marked so the jump reads. */
   was: number | null;
 }) => {
+  const { t } = useArsenalLabels();
   const values = Array.from({ length: max - min + 1 }, (_, i) => min + i);
   return (
     <div
       className='flex gap-1.5'
       role='img'
-      aria-label={`Rolls +${min} to +${max}, currently +${current}`}>
+      aria-label={t("mods.rolls_aria", { min, max, current })}>
       {values.map((v) => (
         <div key={v} className='flex min-w-0 flex-1 flex-col items-center'>
           {/* The pointer is what marks the current value — a label and an
@@ -120,7 +121,7 @@ const RollScale = ({
             +{v}
           </span>
           <span className='mt-1.5 h-4 text-[11px] font-semibold text-zinc-500'>
-            {v === was ? "was" : ""}
+            {v === was ? t("mods.was") : ""}
           </span>
         </div>
       ))}
@@ -151,6 +152,8 @@ const RerollStep = ({
   onBack: () => void;
   onDone: () => void;
 }) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const delta = lastRoll ? lastRoll.after - lastRoll.before : 0;
 
   return (
@@ -159,7 +162,7 @@ const RerollStep = ({
         <div className='flex items-center gap-4'>
           <ModArt modId={mod.id} size={56} />
           <p className='min-w-0 truncate text-base font-bold text-zinc-100'>
-            {mod.label}
+            {labels.mod(mod.id, mod.label)}
           </p>
         </div>
         <RollScale
@@ -173,7 +176,9 @@ const RerollStep = ({
       {/* The cost is the headline ("2× Neck"), the stock a whisper under it —
           the compact bill's "40 / 2" read backwards here. */}
       <div className='flex flex-col gap-2.5'>
-        <span className='text-sm font-semibold text-zinc-400'>Cost</span>
+        <span className='text-sm font-semibold text-zinc-400'>
+          {t("mods.cost")}
+        </span>
         <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
           {mod.recipe.map((line) => {
             const ok = line.have >= line.need;
@@ -194,7 +199,7 @@ const RerollStep = ({
                       )}>
                       {line.need}×
                     </span>{" "}
-                    {getPartLabel(line.partId)}
+                    {labels.part(line.partId)}
                   </p>
                   <p className='mt-0.5 truncate text-xs'>
                     <span style={{ color: tierColor }}>{line.tier}</span>
@@ -205,8 +210,8 @@ const RerollStep = ({
                       )}>
                       {" · "}
                       {ok
-                        ? `you have ${line.have}`
-                        : `${line.need - line.have} short`}
+                        ? t("part_row.you_have", { have: line.have })
+                        : t("part_row.short", { count: line.need - line.have })}
                     </span>
                   </p>
                 </div>
@@ -219,7 +224,7 @@ const RerollStep = ({
       {mod.points > mod.min && (
         <p className='flex items-center gap-2 text-sm text-amber-300'>
           <AlertTriangle size={16} className='shrink-0' />
-          Can roll lower than your current +{mod.points}.
+          {t("mods.can_roll_lower", { points: mod.points })}
         </p>
       )}
 
@@ -263,10 +268,10 @@ const RerollStep = ({
                     : "text-zinc-400",
               )}>
               {delta > 0
-                ? `${delta} better`
+                ? t("mods.better", { count: delta })
                 : delta < 0
-                  ? `${-delta} worse`
-                  : "same value"}
+                  ? t("mods.worse", { count: -delta })
+                  : t("mods.same_value")}
             </span>
           </motion.div>
         )}
@@ -278,7 +283,7 @@ const RerollStep = ({
           onClick={lastRoll ? onDone : onBack}
           disabled={isPending}
           className={SECONDARY}>
-          {lastRoll ? "Done" : "Back"}
+          {lastRoll ? t("mods.done") : t("mods.back")}
         </button>
         <button
           type='button'
@@ -287,12 +292,12 @@ const RerollStep = ({
           className={cn(PRIMARY, "flex items-center gap-2")}>
           <Dices size={16} />
           {isPending
-            ? "Rolling…"
+            ? t("mods.rolling")
             : !mod.affordable
-              ? "Not enough parts"
+              ? t("mods.not_enough_parts")
               : lastRoll
-                ? "Roll again"
-                : "Re-roll"}
+                ? t("mods.roll_again")
+                : t("mods.reroll")}
         </button>
       </div>
     </>
@@ -319,6 +324,8 @@ export const ModSlotDialog = ({
   onClose,
 }: ModSlotDialogProps) => {
   const mod = useWorkshopMod();
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
@@ -398,7 +405,9 @@ export const ModSlotDialog = ({
     );
   };
 
-  const slotLabel = slot ? `Slot ${formatModSlot(slot.index)}` : "";
+  const slotLabel = slot
+    ? t("mods.slot", { slot: formatModSlot(slot.index) })
+    : "";
 
   return (
     <Dialog
@@ -427,10 +436,10 @@ export const ModSlotDialog = ({
           <div>
             <DialogTitle className='text-xl font-bold text-zinc-100'>
               {slot?.kind !== "fitted"
-                ? "Install mod"
+                ? t("mods.install_mod")
                 : fittedStep === "reroll"
-                  ? "Re-roll mod"
-                  : "Manage mod"}
+                  ? t("mods.reroll_mod")
+                  : t("mods.manage_mod")}
             </DialogTitle>
             {/* Screen readers only: the item and slot are already obvious from
                 the socket the player just clicked. */}
@@ -442,7 +451,7 @@ export const ModSlotDialog = ({
             type='button'
             onClick={close}
             disabled={mod.isPending}
-            aria-label='Close'
+            aria-label={t("common.close")}
             className='rounded-md p-1.5 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
             <X size={18} />
           </button>
@@ -456,11 +465,10 @@ export const ModSlotDialog = ({
               </span>
               <div className='min-w-0'>
                 <p className='text-sm font-semibold text-zinc-100'>
-                  Choose a compatible mod
+                  {t("mods.choose_compatible")}
                 </p>
                 <p className='mt-0.5 text-xs text-zinc-400'>
-                  Pick a mod from your stash to fit in this slot. It goes on at
-                  the value it carries — nothing is re-rolled.
+                  {t("mods.choose_hint")}
                 </p>
               </div>
             </div>
@@ -469,8 +477,8 @@ export const ModSlotDialog = ({
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder='Search compatible mods...'
-                aria-label='Search compatible mods'
+                placeholder={t("mods.search_placeholder")}
+                aria-label={t("mods.search")}
                 startIcon={<Search size={14} className='ml-1 text-zinc-500' />}
                 className='h-10 border-0 bg-zinc-800/60 text-sm text-zinc-100 placeholder:text-zinc-500'
               />
@@ -479,20 +487,21 @@ export const ModSlotDialog = ({
             {salvagedOptions.length === 0 ? (
               <div className='rounded-lg bg-zinc-800/40 p-4 text-sm text-zinc-400'>
                 <p className='font-semibold text-zinc-200'>
-                  Nothing in your stash fits this build.
+                  {t("mods.nothing_in_stash")}
                 </p>
                 <p className='mt-1 text-xs'>
-                  Mods come off other instruments at the bench and from the
-                  Trader. This one would take:{" "}
+                  {t("mods.would_take")}{" "}
                   <span className='text-zinc-300'>
-                    {modQuote.compatible.map((c) => c.label).join(", ")}
+                    {modQuote.compatible
+                      .map((c) => labels.mod(c.id, c.label))
+                      .join(", ")}
                   </span>
                   .
                 </p>
               </div>
             ) : choices.length === 0 ? (
               <p className='py-6 text-center text-sm text-zinc-500'>
-                No compatible mod matches that name.
+                {t("mods.no_match")}
               </p>
             ) : (
               <div className='flex max-h-72 flex-col gap-2 overflow-y-auto pr-1'>
@@ -513,17 +522,17 @@ export const ModSlotDialog = ({
                       <ModArt modId={choice.featureId} size={56} />
                       <span className='min-w-0 flex-1'>
                         <span className='block truncate text-sm font-semibold text-zinc-100'>
-                          {choice.label}
+                          {labels.mod(choice.featureId, choice.label)}
                         </span>
                         <span className='mt-0.5 block text-xs text-purple-300'>
-                          +{choice.points} bonus
+                          {t("mods.bonus", { points: choice.points })}
                         </span>
                       </span>
                       <span className='shrink-0 text-right text-xs leading-tight text-zinc-400'>
                         <span className='block text-sm font-bold tabular-nums text-zinc-200'>
                           ×{choice.owned}
                         </span>
-                        owned
+                        {t("part_row.owned")}
                       </span>
                     </button>
                   );
@@ -536,14 +545,14 @@ export const ModSlotDialog = ({
                 <ModArt modId={chosen.featureId} size={64} />
                 <div className='min-w-0'>
                   <p className='flex flex-wrap items-baseline gap-x-3 text-sm font-semibold text-zinc-100'>
-                    {chosen.label}
+                    {labels.mod(chosen.featureId, chosen.label)}
                     <span className='text-xs font-medium text-purple-300'>
-                      +{chosen.points} bonus
+                      {t("mods.bonus", { points: chosen.points })}
                     </span>
                   </p>
                   <p className='mt-1.5 flex items-center gap-1.5 text-xs font-medium text-emerald-400'>
                     <CheckCircle2 size={14} />
-                    Compatible with this slot
+                    {t("mods.compatible_slot")}
                   </p>
                 </div>
               </div>
@@ -555,14 +564,14 @@ export const ModSlotDialog = ({
                 onClick={close}
                 disabled={mod.isPending}
                 className={SECONDARY}>
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type='button'
                 onClick={install}
                 disabled={!chosen || mod.isPending || modQuote.slots.free === 0}
                 className={PRIMARY}>
-                {mod.isPending ? "Installing..." : "Install mod"}
+                {mod.isPending ? t("salvage.installing") : t("mods.install_mod")}
               </button>
             </div>
           </>
@@ -587,12 +596,14 @@ export const ModSlotDialog = ({
             <div className='flex items-center gap-5 rounded-lg bg-zinc-800/40 p-4'>
               <ModArt modId={live.id} size={96} />
               <div className='min-w-0'>
-                <p className='text-lg font-bold text-zinc-100'>{live.label}</p>
+                <p className='text-lg font-bold text-zinc-100'>
+                  {labels.mod(live.id, live.label)}
+                </p>
                 <p className='mt-1 text-sm text-zinc-400'>
                   <span className='font-semibold text-purple-300'>
                     +{live.points}
                   </span>{" "}
-                  bonus
+                  {t("mods.bonus_word")}
                 </p>
               </div>
             </div>
@@ -608,7 +619,7 @@ export const ModSlotDialog = ({
                 </span>
                 <span className='min-w-0 flex-1'>
                   <span className='block text-sm font-semibold text-zinc-100'>
-                    Re-roll mod
+                    {t("mods.reroll_mod")}
                   </span>
                 </span>
                 <ChevronRight size={18} className='shrink-0 text-zinc-500' />
@@ -624,7 +635,7 @@ export const ModSlotDialog = ({
                 </span>
                 <span className='min-w-0 flex-1'>
                   <span className='block text-sm font-semibold text-zinc-100'>
-                    Remove mod
+                    {t("mods.remove_mod")}
                   </span>
                 </span>
                 <ChevronRight size={18} className='shrink-0 text-zinc-500' />
@@ -636,7 +647,7 @@ export const ModSlotDialog = ({
               onClick={close}
               disabled={mod.isPending}
               className={cn(SECONDARY, "w-full")}>
-              Close
+              {t("common.close")}
             </button>
           </>
         )}

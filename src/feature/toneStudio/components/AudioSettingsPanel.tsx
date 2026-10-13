@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
 import { plateButtonClass } from "feature/toneStudio/components/PluginChrome";
+import { useTranslation } from "hooks/useTranslation";
 import { RefreshCw } from "lucide-react";
 import type { NativeAudioDevice } from "types/nativeAudio";
 
@@ -50,6 +51,7 @@ export const AudioSettingsPanel = ({
   onSelectOutputChannel,
   onBufferSizeChange,
 }: AudioSettingsPanelProps) => {
+  const { t } = useTranslation("tone_studio");
   // ASIO is a single-device driver — the engine always routes output to the same
   // device as input on ASIO (see nativeAudioEngine.js), so output selection only
   // has an effect on WASAPI/other APIs.
@@ -66,38 +68,40 @@ export const AudioSettingsPanel = ({
     <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/50 p-5'>
       <div className='flex items-center justify-between'>
         <span className='text-sm font-medium text-zinc-200'>
-          Audio interface
+          {t("settings.audio_interface")}
         </span>
         <button
           type='button'
           onClick={onRefresh}
-          title='Refresh device list'
+          title={t("settings.refresh_hint")}
           className={cn(plateButtonClass(), "px-2.5 py-1.5 text-xs")}>
           <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
-          Refresh
+          {t("settings.refresh")}
         </button>
       </div>
 
       <div className='flex flex-col gap-4 sm:flex-row sm:items-start'>
         <AudioSelect
           className='flex-1'
-          label={`Input${api ? ` (${api})` : ""}`}
+          label={`${t("settings.input")}${api ? ` (${api})` : ""}`}
           value={selectedId !== null ? String(selectedId) : ""}
           onValueChange={(v) => onSelectDevice(Number(v))}
           placeholder={
-            devices.length ? "Select an input" : "No input devices found"
+            devices.length
+              ? t("settings.select_input")
+              : t("settings.no_inputs")
           }
           options={devices.map((d) => ({
             value: String(d.id),
             label: d.name,
-            hint: `${d.inputChannels} in${d.isDefaultInput ? " · default" : ""}`,
+            hint: `${t("settings.channels_in", { count: d.inputChannels })}${d.isDefaultInput ? ` · ${t("settings.default")}` : ""}`,
           }))}
         />
         {(selectedInputDevice?.inputChannels || 0) > 1 && (
           <AudioSelect
             className='sm:w-28'
-            label='Channel'
-            title='Which input channel to capture from — e.g. the guitar jack on a multi-channel interface'
+            label={t("settings.channel")}
+            title={t("settings.input_channel_hint")}
             value={String(selectedChannel)}
             onValueChange={(v) => onSelectChannel(Number(v))}
             options={Array.from(
@@ -111,12 +115,12 @@ export const AudioSettingsPanel = ({
       <div className='flex flex-col gap-4 sm:flex-row sm:items-start'>
         <AudioSelect
           className='flex-1'
-          label='Output'
+          label={t("settings.output")}
           disabled={isAsio}
           title={
             isAsio
-              ? "ASIO uses the same device for input and output"
-              : "Output device for amp monitoring"
+              ? t("settings.asio_same_device")
+              : t("settings.output_hint")
           }
           value={
             selectedOutputId !== null
@@ -129,20 +133,22 @@ export const AudioSettingsPanel = ({
           options={[
             {
               value: ENGINE_PICKED_OUTPUT,
-              label: isAsio ? "Same as input (ASIO)" : "System default output",
+              label: isAsio
+                ? t("settings.same_as_input")
+                : t("settings.system_default_output"),
             },
             ...outputDevices.map((d) => ({
               value: String(d.id),
               label: d.name,
-              hint: `${d.outputChannels} out${d.isDefaultOutput ? " · default" : ""}`,
+              hint: `${t("settings.channels_out", { count: d.outputChannels })}${d.isDefaultOutput ? ` · ${t("settings.default")}` : ""}`,
             })),
           ]}
         />
         {outputChannelCount > 1 && (
           <AudioSelect
             className='sm:w-28'
-            label='Channel'
-            title='First output channel to monitor through — e.g. outputs 3/4 instead of 1/2 on a multi-channel interface'
+            label={t("settings.channel")}
+            title={t("settings.output_channel_hint")}
             value={String(selectedOutputChannel)}
             onValueChange={(v) => onSelectOutputChannel(Number(v))}
             options={Array.from({ length: outputChannelCount }, (_, i) => ({
@@ -155,9 +161,9 @@ export const AudioSettingsPanel = ({
 
       <AudioSelect
         className='sm:w-64'
-        label='Buffer'
-        title='ASIO/WASAPI buffer size — smaller = lower latency but more prone to crackling'
-        hint='Smaller buffers cut latency; too small and the audio starts crackling.'
+        label={t("status.buffer")}
+        title={t("settings.buffer_title")}
+        hint={t("settings.buffer_hint")}
         value={String(bufferSize)}
         onValueChange={(v) => onBufferSizeChange(Number(v))}
         options={BUFFER_SIZES.map((size) => ({

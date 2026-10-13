@@ -1,3 +1,4 @@
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { TraderComponentOffer } from "feature/arsenal/types/trader.types";
 import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb";
 import { PartPlate } from "feature/guitarBuilder/components/PartPlate";
@@ -46,6 +47,8 @@ export const ComponentOfferRow = ({
   onBuy,
   isBuying,
 }: ComponentOfferRowProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const def = getComponent(offer.roll.defId);
   if (!def) return null;
 
@@ -63,11 +66,12 @@ export const ComponentOfferRow = ({
         detail={
           <>
             <span style={{ color: getRarityColor(def.rarity) }}>
-              {def.rarity}
+              {labels.rarity(def.rarity)}
             </span>
             <span className='text-zinc-400'>
               {" "}
-              · {SLOT_LABELS[def.slot]} · Lvl {offer.roll.level}/{maxLevel}
+              · {t(`builder.slots.${def.slot}`, SLOT_LABELS[def.slot])} ·{" "}
+              {t("common.lvl", { level: `${offer.roll.level}/${maxLevel}` })}
             </span>
           </>
         }
@@ -91,7 +95,7 @@ export const ComponentOfferRow = ({
               isBuying={isBuying}
               onClick={onBuy}
               size='sm'
-              unaffordableLabel='Buy'
+              unaffordableLabel={t("buy.buy")}
               className='min-w-0 flex-1 sm:w-40 sm:flex-none'
             />
           </>

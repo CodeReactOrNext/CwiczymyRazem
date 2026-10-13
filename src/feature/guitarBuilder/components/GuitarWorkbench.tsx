@@ -1,5 +1,6 @@
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { DisplayBay } from "feature/arsenal/components/Rig/GuitarRack";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { motion, useAnimationControls, useReducedMotion } from "framer-motion";
 import { type ReactNode, useMemo, useState } from "react";
 
@@ -109,6 +110,7 @@ export const GuitarWorkbench = ({
   emptySlot,
   name,
 }: GuitarWorkbenchProps) => {
+  const labels = useArsenalLabels();
   const [loadout, setLoadout] = useState<Loadout>(initialLoadout);
   const [stickers, setStickers] = useState<PlacedSticker[]>(initialStickers);
   const [selectedStickerId, setSelectedStickerId] = useState<string | null>(
@@ -233,7 +235,7 @@ export const GuitarWorkbench = ({
       return stickers.length ? `${stickers.length}` : "–";
     }
     const fitted = resolveOwned(stash, loadout[target], target);
-    return fitted ? `Lvl ${fitted.level}` : "–";
+    return fitted ? labels.t("common.lvl", { level: fitted.level }) : "–";
   };
 
   return (
@@ -274,7 +276,10 @@ export const GuitarWorkbench = ({
             <div className='space-y-5 bg-arsenal-section px-6 py-5'>
               <BuildPlate
                 name={
-                  name || (body ? `Custom ${body.def.name}` : "Custom build")
+                  name ||
+                  (body
+                    ? labels.t("builder.custom_name", { name: body.def.name })
+                    : labels.t("builder.custom_build"))
                 }
                 summary={summary}
                 pulse={pulse}

@@ -16,6 +16,7 @@ import { CHASSIS_WASH, RAIL_WASH } from "feature/toneStudio/utils/chassis";
 import { useAmpSim } from "hooks/useAmpSim";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
 import { useTonePresets } from "hooks/useTonePresets";
+import { useTranslation } from "hooks/useTranslation";
 import { Settings2 } from "lucide-react";
 import { useState } from "react";
 import type { AmpParams } from "types/nativeAudio";
@@ -71,6 +72,7 @@ export const ToneStudioView = () => {
   } = useTonePresets();
 
   const [selectedBlock, setSelectedBlock] = useState<ChainKey>("amp");
+  const { t } = useTranslation("tone_studio");
   const [showSettings, setShowSettings] = useState(false);
 
   const { activePresetId, setActivePresetId } = amp;
@@ -194,7 +196,7 @@ export const ToneStudioView = () => {
           <button
             type='button'
             onClick={() => setShowSettings((open) => !open)}
-            title='Audio interface, channels and buffer size'
+            title={t("view.audio_hint")}
             className={cn(
               "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
               showSettings
@@ -202,7 +204,7 @@ export const ToneStudioView = () => {
                 : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700/60 hover:text-white",
             )}>
             <Settings2 size={16} />
-            <span className='hidden sm:inline'>Audio</span>
+            <span className='hidden sm:inline'>{t("view.audio")}</span>
             {api && (
               <span className='font-mono hidden rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] text-zinc-400 md:inline'>
                 {api}
@@ -216,9 +218,9 @@ export const ToneStudioView = () => {
             onToggle={() => amp.toggle()}
             disabledReason={
               !amp.available
-                ? "Needs the desktop app"
+                ? t("view.needs_desktop")
                 : amp.isBusy
-                  ? "Opening the audio stream…"
+                  ? t("view.opening_stream")
                   : undefined
             }
           />
@@ -229,8 +231,7 @@ export const ToneStudioView = () => {
           <div className='relative flex flex-col gap-2 px-4 pt-3'>
             {!amp.available && (
               <p className='rounded-md bg-amber-500/10 px-3 py-2 text-xs text-amber-400'>
-                No connection to the desktop app — this is a visual preview
-                only, audio control is inactive.
+                {t("view.no_connection")}
               </p>
             )}
             {amp.error && (
@@ -240,11 +241,10 @@ export const ToneStudioView = () => {
             )}
             {amp.overload && (
               <p className='rounded-md bg-amber-500/10 px-3 py-2 text-xs text-amber-400'>
-                The DSP chain fell behind real time and had to reset (~
-                {Math.round(amp.overload.driftMs)}ms drift) — you probably just
-                heard a click.
-                {amp.overload.namEnabled &&
-                  " Try a bigger buffer or a lighter capture."}
+                {t("view.overload", {
+                  drift: Math.round(amp.overload.driftMs),
+                })}
+                {amp.overload.namEnabled && ` ${t("view.overload_nam_hint")}`}
               </p>
             )}
           </div>

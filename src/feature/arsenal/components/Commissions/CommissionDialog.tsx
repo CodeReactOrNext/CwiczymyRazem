@@ -12,6 +12,7 @@ import {
   getCommissionQuote,
   getTargetSubject,
 } from "feature/arsenal/data/commission";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useWorkshopCommission } from "feature/arsenal/hooks/useWorkshopCommission";
 import type {
   EffectInventoryItem,
@@ -56,6 +57,8 @@ export const CommissionDialog = ({
   onClose,
 }: CommissionDialogProps) => {
   const commission = useWorkshopCommission();
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const delivered = commission.data?.item;
 
   const quote = useMemo(
@@ -136,12 +139,14 @@ export const CommissionDialog = ({
             </span>
             <div className='flex min-w-0 flex-col gap-1'>
               <DialogTitle className='text-2xl font-black text-white'>
-                {delivered ? "Delivered" : `Commission ${def.name}`}
+                {delivered
+                  ? t("commissions.delivered")
+                  : t("commissions.commission_name", { name: def.name })}
               </DialogTitle>
               <DialogDescription className={sectionLabelClass}>
                 {def.brand} ·{" "}
                 <span style={{ color: RARITY_STYLES[def.rarity].baseColor }}>
-                  {def.rarity}
+                  {labels.rarity(def.rarity)}
                 </span>
               </DialogDescription>
             </div>
@@ -150,7 +155,7 @@ export const CommissionDialog = ({
           <button
             onClick={close}
             disabled={commission.isPending}
-            aria-label='Close'
+            aria-label={t("common.close")}
             className='rounded-lg p-2 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 disabled:opacity-40 hover:bg-zinc-800 hover:text-zinc-200'>
             <X size={16} />
           </button>
@@ -161,15 +166,15 @@ export const CommissionDialog = ({
 
           {delivered ? (
             <p className='text-sm text-zinc-400 sm:pt-2'>
-              In your stash and recorded in the Dex. Every mod slot is free.
+              {t("commissions.delivered_body")}
             </p>
           ) : (
             <div className='flex min-w-0 flex-1 flex-col gap-4'>
               <p className='text-sm text-zinc-400'>
-                Built stock: Mint, no mods, no traits.
+                {t("commissions.built_stock")}
               </p>
               <CostTable
-                title='Commission cost'
+                title={t("commissions.cost")}
                 recipe={quote.recipe}
                 fame={{ need: quote.fame, have: fame }}
               />
@@ -181,7 +186,7 @@ export const CommissionDialog = ({
           <button
             onClick={close}
             className='rounded-lg bg-zinc-100 px-5 py-3.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-white'>
-            Done
+            {t("mods.done")}
           </button>
         ) : (
           <div className='flex flex-col gap-3 sm:flex-row'>
@@ -189,7 +194,7 @@ export const CommissionDialog = ({
               onClick={close}
               disabled={commission.isPending}
               className='rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44'>
-              Cancel
+              {t("common.cancel")}
             </button>
             <button
               onClick={() =>
@@ -205,7 +210,7 @@ export const CommissionDialog = ({
                   : "bg-zinc-800/60 text-zinc-500",
               )}>
               <Hammer size={16} />
-              {commission.isPending ? "Building…" : "Commission"}
+              {commission.isPending ? t("workshop.building") : t("commissions.commission")}
             </button>
           </div>
         )}

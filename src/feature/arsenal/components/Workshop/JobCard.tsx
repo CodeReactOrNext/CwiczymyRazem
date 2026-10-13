@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
@@ -71,6 +72,7 @@ export const JobCard = ({
   disabled = false,
   onClick,
 }: JobCardProps) => {
+  const { t } = useTranslation("arsenal");
   const showsGain = ready && gain != null;
   // The note is the whole answer to "why is this button grey?", so on a phone —
   // where there is no room for a right-hand column — it moves under the summary
@@ -138,7 +140,7 @@ export const JobCard = ({
               )}
             />
             <span className='text-sm text-arsenal-text-tertiary'>
-              level{gain === 1 ? "" : "s"}
+              {t("workshop.levels_word", { count: gain })}
             </span>
           </span>
         ) : (

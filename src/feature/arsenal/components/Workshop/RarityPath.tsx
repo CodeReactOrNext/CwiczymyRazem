@@ -5,6 +5,7 @@ import {
   getPromotionsAvailable,
   RARITY_LADDER,
 } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { GuitarRarity } from "feature/arsenal/types/arsenal.types";
 import { motion } from "framer-motion";
 
@@ -25,6 +26,7 @@ interface RarityPathProps {
  * the next tier fills with build progress, so the countdown needs no number.
  */
 export const RarityPath = ({ mintRarity, buildLevel }: RarityPathProps) => {
+  const labels = useArsenalLabels();
   const start = RARITY_LADDER.indexOf(mintRarity);
   if (start === -1) return null;
 
@@ -40,7 +42,7 @@ export const RarityPath = ({ mintRarity, buildLevel }: RarityPathProps) => {
       : 1;
 
   return (
-    <div className='flex items-center gap-1.5' aria-label='Promotion path'>
+    <div className='flex items-center gap-1.5' aria-label={labels.t("workshop.promotion_path")}>
       {steps.map((rarity, i) => {
         const color = RARITY_STYLES[rarity].baseColor;
         const reached = i <= done;
@@ -52,9 +54,9 @@ export const RarityPath = ({ mintRarity, buildLevel }: RarityPathProps) => {
               title={
                 reached
                   ? isCurrent
-                    ? `${rarity} — where it is now`
-                    : rarity
-                  : `${rarity} — not yet`
+                    ? labels.t("workshop.path_now", { name: labels.rarity(rarity) })
+                    : labels.rarity(rarity)
+                  : labels.t("workshop.path_not_yet", { name: labels.rarity(rarity) })
               }
               className={cn(
                 "block shrink-0 rounded-full transition-all",

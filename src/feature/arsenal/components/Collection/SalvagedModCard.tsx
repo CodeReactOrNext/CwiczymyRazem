@@ -1,5 +1,6 @@
 import { getModResaleValue } from "feature/arsenal/data/resale";
 import { getModDef } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { SalvagedMod } from "feature/arsenal/types/arsenal.types";
 import { Store } from "lucide-react";
 import type { ReactNode } from "react";
@@ -42,7 +43,8 @@ export const SalvagedModCard = ({
 }: SalvagedModCardProps) => {
   const def = getModDef(mod.kind, mod.featureId);
   const resale = getModResaleValue(mod.kind, mod.featureId, mod.points);
-  const noun = mod.kind === "guitar" ? "guitar" : "pedal";
+  const labels = useArsenalLabels();
+  const { t } = labels;
 
   return (
     <div className='flex flex-col gap-6 rounded-lg bg-zinc-900 p-6'>
@@ -50,13 +52,13 @@ export const SalvagedModCard = ({
         <ModArt modId={mod.featureId} size={72} />
         <div className='flex min-w-0 flex-col gap-1'>
           <span className='text-[10px] font-semibold tracking-[0.18em] text-purple-300/70'>
-            SALVAGED MOD
+            {t("salvage.salvaged_mod_caps")}
           </span>
           {/* Wraps rather than truncates: mod labels run from "18V rail" to
               "Carbon comp resistors", and a clipped name tells the player
               nothing about what they are holding. */}
           <span className='text-lg font-black leading-tight text-white'>
-            {def?.label ?? mod.featureId}
+            {labels.mod(mod.featureId, def?.label ?? mod.featureId)}
           </span>
           <span className='text-2xl font-black tabular-nums text-purple-300'>
             +{mod.points}
@@ -66,8 +68,8 @@ export const SalvagedModCard = ({
 
       <p className='text-sm leading-relaxed text-zinc-400'>
         {footer
-          ? `Fits any ${noun} with a mod slot free, and goes on at +${mod.points} with nothing re-rolled. The workshop cannot build one of these — a mod only ever changes hands.`
-          : `Drag it onto any ${noun} that lights up and it goes on at the value it carries: nothing to pay, nothing re-rolled. It is also waiting on the workshop bench.`}
+          ? t(`salvage.mod_listing_body.${mod.kind}`, { points: mod.points })
+          : t(`salvage.mod_owned_body.${mod.kind}`)}
       </p>
 
       {footer ?? (
@@ -81,7 +83,7 @@ export const SalvagedModCard = ({
               disabled={isListing}
               className='flex items-center justify-center gap-2 rounded-lg bg-amber-500/15 px-4 py-3 text-sm font-bold text-amber-300 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-amber-500/25'>
               <Store size={16} />
-              {isListing ? "Listing…" : "Sell on the market"}
+              {isListing ? t("market.listing") : t("market.sell_on_market")}
             </button>
           )}
 
@@ -91,7 +93,7 @@ export const SalvagedModCard = ({
               disabled={isSelling}
               className='flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-4 py-3 text-sm font-bold text-zinc-200 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-red-500/15 hover:text-red-300'>
               <FameCoin size={16} />
-              Sell for {resale} Fame
+              {t("common.sell_for", { fame: resale })}
             </button>
           )}
         </div>

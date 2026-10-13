@@ -8,6 +8,7 @@ import {
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
 import { Minus, Plus, Search } from "lucide-react";
@@ -167,6 +168,7 @@ export const CreateGoalDialog = ({
   description,
 }: CreateGoalDialogProps) => {
   const { t } = useTranslation("goals");
+  const localizeExercise = useLocalizeExercise();
   const [exercise, setExercise] = useState<Exercise | null>(
     () =>
       GOAL_EXERCISES.find((candidate) => candidate.id === initialExerciseId) ??
@@ -194,11 +196,13 @@ export const CreateGoalDialog = ({
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase();
     return needle
-      ? GOAL_EXERCISES.filter((candidate) =>
-          candidate.title.toLowerCase().includes(needle),
+      ? GOAL_EXERCISES.filter(
+          (candidate) =>
+            candidate.title.toLowerCase().includes(needle) ||
+            localizeExercise(candidate).title.toLowerCase().includes(needle),
         )
       : GOAL_EXERCISES;
-  }, [search]);
+  }, [search, localizeExercise]);
 
   const bpm = Number(bpmInput);
   const startBpm = Number(startInput);
@@ -257,7 +261,7 @@ export const CreateGoalDialog = ({
             <div className='flex items-center justify-between gap-3 rounded-lg bg-zinc-800/50 px-4 py-3'>
               <div className='min-w-0'>
                 <p className='truncate text-sm font-semibold text-zinc-100'>
-                  {exercise.title}
+                  {localizeExercise(exercise).title}
                 </p>
                 {exercise.metronomeSpeed && (
                   <p className='mt-0.5 text-xs text-zinc-400'>
@@ -303,7 +307,7 @@ export const CreateGoalDialog = ({
                       onClick={() => pickExercise(candidate)}
                       className='flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-zinc-800/70'>
                       <span className='min-w-0 text-sm leading-snug text-zinc-200'>
-                        {candidate.title}
+                        {localizeExercise(candidate).title}
                       </span>
                       <span className='shrink-0 text-xs tabular-nums text-zinc-500'>
                         {isBusy

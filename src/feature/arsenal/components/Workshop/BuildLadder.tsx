@@ -6,6 +6,7 @@ import {
   getBuildRequirement,
   priceRecipe,
 } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { BarChart3, Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -32,6 +33,8 @@ const LADDER_LENGTH = 9;
  */
 export const BuildLadder = ({ subject, wallet }: BuildLadderProps) => {
   const [open, setOpen] = useState(false);
+  const labels = useArsenalLabels();
+  const { t } = labels;
 
   const levels = Array.from({ length: LADDER_LENGTH }, (_, i) => i + 1).map(
     (level) => {
@@ -63,10 +66,10 @@ export const BuildLadder = ({ subject, wallet }: BuildLadderProps) => {
           <BarChart3 size={20} className='shrink-0 text-zinc-500' />
           <span className='flex flex-col gap-0.5'>
             <span className='text-base font-semibold text-zinc-100'>
-              Build progression
+              {t("workshop.build_progression")}
             </span>
             <span className='text-sm text-zinc-400'>
-              View all {LADDER_LENGTH} builds and where they promote
+              {t("workshop.view_all_builds", { count: LADDER_LENGTH })}
             </span>
           </span>
         </span>
@@ -103,11 +106,11 @@ export const BuildLadder = ({ subject, wallet }: BuildLadderProps) => {
                     <span className='h-1.5 w-1.5 rounded-full bg-zinc-600' />
                   )}
                   <span className='text-base font-bold text-zinc-200'>
-                    Build {level}
+                    {t("workshop.build_n", { build: level })}
                   </span>
                   {next && (
                     <span className='text-xs font-semibold text-cyan-400'>
-                      next
+                      {t("workshop.next")}
                     </span>
                   )}
                 </span>
@@ -120,11 +123,11 @@ export const BuildLadder = ({ subject, wallet }: BuildLadderProps) => {
                         backgroundColor: `${RARITY_STYLES[requirement.promotesTo].baseColor}1f`,
                         color: RARITY_STYLES[requirement.promotesTo].baseColor,
                       }}>
-                      → {requirement.promotesTo}
+                      → {labels.rarity(requirement.promotesTo)}
                     </span>
                   )}
                   <span className='text-xs text-zinc-500'>
-                    {requirement.condition}
+                    {t(`labels.condition.${requirement.condition}`, requirement.condition)}
                   </span>
                 </span>
               </div>
@@ -147,8 +150,7 @@ export const BuildLadder = ({ subject, wallet }: BuildLadderProps) => {
 
           {subject.buildLevel >= LADDER_LENGTH && (
             <p className='px-1 text-xs text-zinc-500'>
-              Past build {LADDER_LENGTH} the recipe keeps scaling up, but there
-              are no promotions left to earn.
+              {t("workshop.past_last_build", { count: LADDER_LENGTH })}
             </p>
           )}
         </div>

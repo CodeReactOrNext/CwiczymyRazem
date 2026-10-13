@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 
 import { scrapGuitarsBulk } from "../services/arsenal.service";
@@ -6,6 +7,7 @@ import { countScrapParts } from "../utils/scrap";
 import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 
 export const useScrapGuitarsBulk = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -14,12 +16,10 @@ export const useScrapGuitarsBulk = () => {
     onSuccess: (data) => {
       const total = countScrapParts(data.parts);
       toast.success(
-        `Scrapped ${data.scrappedCount} guitars for ${total} ${total === 1 ? "part" : "parts"}!`,
+        t("toasts.scrapped_guitars", { count: data.scrappedCount, parts: total }),
         data.salvagedCount > 0
           ? {
-              description: `${data.salvagedCount} ${
-                data.salvagedCount === 1 ? "mod" : "mods"
-              } pulled out and stashed`,
+              description: t("bulk.mods_pulled", { count: data.salvagedCount }),
             }
           : undefined,
       );
@@ -28,7 +28,7 @@ export const useScrapGuitarsBulk = () => {
     onError: (error: unknown) => {
       const message =
         (error as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error || "Failed to scrap guitars";
+          ?.error || t("toasts.err.scrap_guitars");
       toast.error(message);
     },
   });

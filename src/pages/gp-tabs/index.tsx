@@ -49,7 +49,11 @@ import {
 import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { doc, getDoc } from "firebase/firestore";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
+import { useIntlLocale } from "lib/i18n/dateLocale";
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
 import { Gauge, Music } from "lucide-react";
 import {
   ChevronRight,
@@ -116,8 +120,8 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("pl-PL", {
+function formatDate(date: Date, locale?: string): string {
+  return date.toLocaleDateString(locale, {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -130,19 +134,38 @@ function TrackTypeIcon({ type }: { type: string }) {
   return <Music className="h-3 w-3" />;
 }
 
-function buildExercise(fileName: string, tempo: number, trackName: string): Exercise {
+function buildExercise(
+  fileName: string,
+  tempo: number,
+  trackName: string,
+  t?: Translate,
+): Exercise {
   const title = trackName
     ? `${fileName.replace(/\.gp\w*$/i, "")} - ${trackName}`
     : fileName.replace(/\.gp\w*$/i, "");
   return {
     id: `custom-${Date.now()}`,
     title,
-    description: `Custom practice session imported at ${tempo} BPM`,
+    description: translateOr(
+      t,
+      "library:gp.exercise_description",
+      "Custom practice session imported at {{tempo}} BPM",
+      { tempo },
+    ),
     difficulty: "medium",
     category: "mixed",
     timeInMinutes: 10,
-    instructions: ["Practice this imported tablature at your own pace."],
-    tips: ["Slow down if you make mistakes.", "Focus on clean notes."],
+    instructions: [
+      translateOr(
+        t,
+        "library:gp.exercise_instruction",
+        "Practice this imported tablature at your own pace.",
+      ),
+    ],
+    tips: [
+      translateOr(t, "library:gp.exercise_tip_slow", "Slow down if you make mistakes."),
+      translateOr(t, "library:gp.exercise_tip_clean", "Focus on clean notes."),
+    ],
     metronomeSpeed: { min: 40, max: 240, recommended: tempo },
     relatedSkills: [],
   };
@@ -163,6 +186,8 @@ function flattenFoldersForMove(folders: GpFolder[]): { folder: GpFolder; depth: 
 
 const GpTabsPage: NextPageWithLayout = () => {
   const userId = useAppSelector(selectUserAuth);
+  const { t } = useTranslation("library");
+  const intlLocale = useIntlLocale();
   const userInfo = useAppSelector(selectUserInfo);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const router = useRouter();
@@ -260,7 +285,7 @@ const GpTabsPage: NextPageWithLayout = () => {
   const openFilePicker = () => {
     if (atFileCap) {
       toast.error(
-        `You've reached the limit of ${MAX_USER_GP_FILES} GP files (total, across all folders). Delete some to upload more.`
+        t("gp.limit_reached", { max: MAX_USER_GP_FILES }),
       );
       return;
     }
@@ -276,7 +301,7 @@ const GpTabsPage: NextPageWithLayout = () => {
       setStaged({ gpFile: file, rawFile, parsed, selectedTrackIndex: 0 });
       setShowConfigModal(true);
     } catch {
-      toast.error("Nie udało się załadować pliku. Może być uszkodzony.");
+      toast.error(t("gp.load_failed"));
     } finally {
       setLoadingFileId(null);
     }
@@ -294,13 +319,13 @@ const GpTabsPage: NextPageWithLayout = () => {
     setTimeout(() => {
       const { parsed, rawFile, gpFile, selectedTrackIndex } = staged;
       const trackName = parsed.tracks[selectedTrackIndex].name;
-      const exercise = buildExercise(gpFile.name, parsed.tempo, trackName);
+      const exercise = buildExercise(gpFile.name, parsed.tempo, trackName, t);
       exercise.timeInMinutes = config.freeMode ? 999 : config.timeInMinutes;
       const plan: ExercisePlan = {
         id: "quick_session_" + Date.now(),
-        title: "Quick Practice: " + exercise.title,
+        title: t("gp.quick_practice", { title: exercise.title }),
         difficulty: "medium",
-        description: "Temporary practice plan from imported file",
+        description: t("gp.temp_plan"),
         category: "mixed",
         exercises: [exercise],
         userId: "system",
@@ -332,12 +357,18 @@ const GpTabsPage: NextPageWithLayout = () => {
 
     if (invalidNames.length > 0) {
       toast.error(
-        `Unsupported format: ${invalidNames.join(", ")}. Supported: ${GP_EXTENSIONS.join(", ")}`
+        t("gp.unsupported", {
+          names: invalidNames.join(", "),
+          supported: GP_EXTENSIONS.join(", "),
+        }),
       );
     }
     if (oversizedNames.length > 0) {
       toast.error(
-        `File too large (max ${formatSize(MAX_GP_FILE_SIZE_BYTES)}): ${oversizedNames.join(", ")}`
+        t("gp.too_large", {
+          max: formatSize(MAX_GP_FILE_SIZE_BYTES),
+          names: oversizedNames.join(", "),
+        }),
       );
     }
     if (validFiles.length === 0) return;
@@ -345,7 +376,7 @@ const GpTabsPage: NextPageWithLayout = () => {
     const remainingSlots = MAX_USER_GP_FILES - files.length;
     if (remainingSlots <= 0) {
       toast.error(
-        `You've reached the limit of ${MAX_USER_GP_FILES} GP files (total, across all folders). Delete some to upload more.`
+        t("gp.limit_reached", { max: MAX_USER_GP_FILES }),
       );
       return;
     }
@@ -353,7 +384,11 @@ const GpTabsPage: NextPageWithLayout = () => {
     const toUpload = validFiles.slice(0, remainingSlots);
     if (validFiles.length > toUpload.length) {
       toast.warning(
-        `Only ${toUpload.length} of ${validFiles.length} files will be uploaded — the ${MAX_USER_GP_FILES}-file limit was reached.`
+        t("gp.partial_upload", {
+          uploaded: toUpload.length,
+          total: validFiles.length,
+          max: MAX_USER_GP_FILES,
+        }),
       );
     }
 
@@ -395,11 +430,13 @@ const GpTabsPage: NextPageWithLayout = () => {
     if (uploaded.length > 0) {
       setFiles((prev) => [...uploaded, ...prev]);
       toast.success(
-        uploaded.length === 1 ? `"${uploaded[0].name}" uploaded!` : `${uploaded.length} files uploaded!`
+        uploaded.length === 1
+          ? t("gp.uploaded_one", { name: uploaded[0].name })
+          : t("gp.uploaded_many", { count: uploaded.length }),
       );
     }
     if (uploaded.length < toUpload.length) {
-      toast.error("Some files failed to upload.");
+      toast.error(t("gp.upload_failed"));
     }
 
     setIsUploading(false);
@@ -428,9 +465,9 @@ const GpTabsPage: NextPageWithLayout = () => {
     try {
       await deleteUserGpFile(userId, file.id, file.storagePath);
       setFiles((prev) => prev.filter((f) => f.id !== file.id));
-      toast.success(`"${file.name}" deleted`);
+      toast.success(t("gp.deleted", { name: file.name }));
     } catch {
-      toast.error("Failed to delete file");
+      toast.error(t("gp.delete_failed"));
     } finally {
       setDeletingId(null);
     }
@@ -441,9 +478,9 @@ const GpTabsPage: NextPageWithLayout = () => {
     try {
       await moveUserGpFile(userId, file.id, folderId);
       setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, folderId } : f)));
-      toast.success(`"${file.name}" moved`);
+      toast.success(t("gp.moved", { name: file.name }));
     } catch {
-      toast.error("Failed to move file");
+      toast.error(t("gp.move_failed"));
     }
   };
 
@@ -481,11 +518,11 @@ const GpTabsPage: NextPageWithLayout = () => {
     try {
       const folder = await createGpFolder(userId, name, currentFolderId);
       setFolders((prev) => [...prev, folder]);
-      toast.success(`Folder "${name}" created`);
+      toast.success(t("gp.folder_created", { name }));
       setShowNewFolderDialog(false);
       setNewFolderName("");
     } catch {
-      toast.error("Failed to create folder");
+      toast.error(t("gp.folder_create_failed"));
     } finally {
       setIsCreatingFolder(false);
     }
@@ -497,16 +534,16 @@ const GpTabsPage: NextPageWithLayout = () => {
       folders.some((f) => f.parentId === folder.id) ||
       files.some((f) => f.folderId === folder.id);
     if (hasChildren) {
-      toast.error("Move or delete the folder's contents first");
+      toast.error(t("gp.folder_not_empty"));
       return;
     }
     setDeletingFolderId(folder.id);
     try {
       await deleteGpFolder(userId, folder.id);
       setFolders((prev) => prev.filter((f) => f.id !== folder.id));
-      toast.success(`Folder "${folder.name}" deleted`);
+      toast.success(t("gp.folder_deleted", { name: folder.name }));
     } catch {
-      toast.error("Failed to delete folder");
+      toast.error(t("gp.folder_delete_failed"));
     } finally {
       setDeletingFolderId(null);
     }
@@ -570,19 +607,19 @@ const GpTabsPage: NextPageWithLayout = () => {
   return (
     <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none shadow-sm min-h-screen">
       <HeroBanner
-        title="Guitar Pro Files"
-        subtitle="Your Guitar Pro file library"
+        title={t("gp.title")}
+        subtitle={t("gp.subtitle")}
         eyebrowContent={
           <Breadcrumbs
             items={[
-              { label: "Practice", href: "/timer" },
-              { label: "Guitar Pro Files" },
+              { label: t("gp.practice"), href: "/timer" },
+              { label: t("gp.title") },
             ]}
           />
         }
         backgroundContent={<HeroPattern variant="tabs" />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
-        buttonText="Upload Files"
+        buttonText={t("gp.upload")}
         onClick={openFilePicker}
       />
 
@@ -624,7 +661,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                 dragOverRoot && "bg-cyan-500/10 text-cyan-400"
               )}
             >
-              All files
+              {t("gp.all_files")}
             </button>
             {breadcrumbTrail.map((folder) => (
               <span key={folder.id} className="flex items-center gap-2">
@@ -651,8 +688,11 @@ const GpTabsPage: NextPageWithLayout = () => {
                 atFileCap ? "text-amber-400" : "text-zinc-400"
               )}
             >
-              {files.length}/{MAX_USER_GP_FILES} files · max{" "}
-              {formatSize(MAX_GP_FILE_SIZE_BYTES)} per file
+              {t("gp.quota", {
+                used: files.length,
+                max: MAX_USER_GP_FILES,
+                size: formatSize(MAX_GP_FILE_SIZE_BYTES),
+              })}
             </span>
             {canCreateFolderHere && (
               <Button
@@ -661,7 +701,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                 className="h-9 px-4 rounded-lg text-xs font-bold bg-zinc-800/60 text-zinc-200 hover:bg-zinc-700/60 hover:text-white"
               >
                 <FolderPlus className="h-4 w-4 mr-2" />
-                New folder
+                {t("gp.new_folder")}
               </Button>
             )}
           </div>
@@ -672,7 +712,7 @@ const GpTabsPage: NextPageWithLayout = () => {
           <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm">
             <div className="flex flex-col items-center gap-3 rounded-lg border border-cyan-500/30 bg-zinc-900 px-10 py-8">
               <Upload className="h-8 w-8 text-cyan-400" />
-              <p className="text-sm font-bold text-cyan-400">Drop your GP files here</p>
+              <p className="text-sm font-bold text-cyan-400">{t("gp.drop_here")}</p>
             </div>
           </div>
         )}
@@ -683,7 +723,10 @@ const GpTabsPage: NextPageWithLayout = () => {
             <div className="flex items-center gap-3">
               <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
               <span className="text-sm font-bold text-cyan-400">
-                Uploading {uploadQueue.filter((i) => i.status === "done").length}/{uploadQueue.length} files...
+                {t("gp.uploading", {
+                  done: uploadQueue.filter((i) => i.status === "done").length,
+                  total: uploadQueue.length,
+                })}
               </span>
             </div>
             <div className="space-y-2">
@@ -712,7 +755,7 @@ const GpTabsPage: NextPageWithLayout = () => {
           <div className="flex flex-col items-center justify-center gap-3 py-24 text-zinc-600">
             <Loader2 className="h-6 w-6 animate-spin" />
             <span className="text-xs font-bold capitalize tracking-widest">
-              Loading your files...
+              {t("gp.loading")}
             </span>
           </div>
         ) : visibleFolders.length === 0 && visibleFiles.length === 0 ? (
@@ -720,12 +763,12 @@ const GpTabsPage: NextPageWithLayout = () => {
             <FolderOpen className="h-12 w-12 text-zinc-600 opacity-40" />
             <div className="text-center space-y-1">
               <p className="text-sm font-bold capitalize tracking-widest text-zinc-500">
-                {currentFolder ? "This folder is empty" : "No GP files yet"}
+                {currentFolder ? t("gp.folder_empty") : t("gp.no_files")}
               </p>
               <p className="text-xs text-zinc-600">
                 {atFileCap
-                  ? `You've reached the ${MAX_USER_GP_FILES}-file limit. Delete some to upload more.`
-                  : "Upload Guitar Pro files or drag & drop them here to get started"}
+                  ? t("gp.limit_short", { max: MAX_USER_GP_FILES })
+                  : t("gp.empty_hint")}
               </p>
             </div>
             <Button
@@ -734,7 +777,7 @@ const GpTabsPage: NextPageWithLayout = () => {
               className="mt-2 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 h-10 px-6 rounded-lg text-xs font-bold capitalize tracking-widest"
             >
               <Upload className="h-3.5 w-3.5 mr-2" />
-              Upload GP files
+              {t("gp.upload_gp")}
             </Button>
           </div>
         ) : (
@@ -776,8 +819,9 @@ const GpTabsPage: NextPageWithLayout = () => {
                       </div>
                       <p className="text-sm font-bold text-white truncate">{folder.name}</p>
                       <p className="text-xs text-zinc-400">
-                        {childFolderCount > 0 && `${childFolderCount} folder${childFolderCount > 1 ? "s" : ""} · `}
-                        {childFileCount} file{childFileCount === 1 ? "" : "s"}
+                        {childFolderCount > 0 &&
+                          `${t("gp.folders_count", { count: childFolderCount })} · `}
+                        {t("gp.files_count", { count: childFileCount })}
                       </p>
                     </div>
                   );
@@ -831,7 +875,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                       </p>
                       <p className="text-xs text-zinc-400">
                         {ext.replace(".", "").toUpperCase()} · {formatSize(file.size)} ·{" "}
-                        {formatDate(file.uploadedAt)}
+                        {formatDate(file.uploadedAt, intlLocale)}
                       </p>
                     </div>
 
@@ -844,7 +888,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                             variant="ghost"
                             disabled={folders.length === 0}
                             className="h-9 w-9 p-0 rounded-lg text-zinc-600 hover:text-cyan-400 hover:bg-cyan-400/10"
-                            aria-label="Move to folder"
+                            aria-label={t("gp.move_to_folder")}
                           >
                             <FolderOpen className="h-3.5 w-3.5" />
                           </Button>
@@ -852,7 +896,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                         <DropdownMenuContent align="end">
                           {file.folderId !== null && (
                             <DropdownMenuItem onClick={() => handleMoveFile(file, null)}>
-                              All files (no folder)
+                              {t("gp.all_files_no_folder")}
                             </DropdownMenuItem>
                           )}
                           {moveTargets
@@ -882,7 +926,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                       </Button>
                       <button
                         type="button"
-                        aria-label={`Practice ${file.name}`}
+                        aria-label={t("gp.practice_file", { name: file.name })}
                         onClick={() => handleLoadForPractice(file)}
                         disabled={!!loadingFileId}
                         className="click-behavior flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 text-zinc-200 transition-background hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
@@ -933,12 +977,12 @@ const GpTabsPage: NextPageWithLayout = () => {
       <Dialog open={showNewFolderDialog} onOpenChange={setShowNewFolderDialog}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>New folder</DialogTitle>
+            <DialogTitle>{t("gp.new_folder")}</DialogTitle>
           </DialogHeader>
           <Input
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
-            placeholder="Folder name"
+            placeholder={t("gp.folder_name")}
             maxLength={60}
             autoFocus
             onKeyDown={(e) => {
@@ -952,7 +996,7 @@ const GpTabsPage: NextPageWithLayout = () => {
               disabled={!newFolderName.trim()}
               className="bg-cyan-500 text-black font-bold hover:bg-cyan-400"
             >
-              Create
+              {t("gp.create")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -973,7 +1017,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             <div className="flex items-start justify-between">
               <div className="space-y-1">
                 <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
-                  Session Setup
+                  {t("gp.session_setup")}
                 </p>
                 <h2 className="text-lg font-bold text-white leading-tight truncate max-w-[280px]">
                   {staged.gpFile.name.replace(/\.gp\w*$/i, "")}
@@ -994,7 +1038,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             {staged.parsed.tracks.length > 1 && (
               <div className="space-y-3">
                 <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
-                  Track
+                  {t("gp.track")}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {staged.parsed.tracks.map((track, idx) => (
@@ -1019,7 +1063,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             {/* Time mode toggle */}
             <div className="space-y-3">
               <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
-                Time mode
+                {t("gp.time_mode")}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -1032,7 +1076,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                   )}
                 >
                   <Clock className="h-5 w-5" />
-                  Time Limit
+                  {t("gp.time_limit")}
                 </button>
                 <button
                   onClick={() => setConfigFreeMode(true)}
@@ -1044,7 +1088,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                   )}
                 >
                   <Infinity className="h-5 w-5" />
-                  No Limit
+                  {t("gp.no_limit")}
                 </button>
               </div>
             </div>
@@ -1053,7 +1097,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             {!configFreeMode && (
               <div className="space-y-3 animate-in fade-in duration-200">
                 <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
-                  Duration
+                  {t("gp.duration")}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {TIME_PRESETS.map((min) => (
@@ -1067,7 +1111,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                           : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
                       )}
                     >
-                      {min} min
+                      {t("gp.minutes", { count: min })}
                     </button>
                   ))}
                 </div>
@@ -1082,7 +1126,7 @@ const GpTabsPage: NextPageWithLayout = () => {
               loading={isStarting}
               className="w-full h-12 rounded-lg bg-white text-zinc-950 font-bold hover:bg-zinc-100 transition-colors"
             >
-              <span>Start Practice</span>
+              <span>{t("gp.start")}</span>
               <Zap className={cn("h-4 w-4 ml-2 fill-current", isStarting && "hidden")} />
             </Button>
           </div>

@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { ShoppingCart } from "lucide-react";
 
 interface BuyButtonProps {
@@ -38,16 +39,17 @@ export const BuyButton = ({
   onClick,
   variant = "soft",
   size = "default",
-  unaffordableLabel = "Not enough Fame",
+  unaffordableLabel,
   className,
 }: BuyButtonProps) => {
+  const { t } = useTranslation("arsenal");
   const solid = variant === "solid";
 
   return (
     <button
       onClick={onClick}
       disabled={isBuying || !canAfford}
-      title={!canAfford ? "Not enough Fame Points" : undefined}
+      title={!canAfford ? t("buy.not_enough_fame_points") : undefined}
       className={cn(
         "flex items-center justify-between gap-3 rounded-lg font-bold transition-colors duration-150 click-behavior",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
@@ -62,7 +64,11 @@ export const BuyButton = ({
       )}>
       <span className='flex items-center gap-2'>
         <ShoppingCart size={size === "sm" ? 13 : 15} strokeWidth={2.5} />
-        {isBuying ? "Buying…" : canAfford ? "Buy" : unaffordableLabel}
+        {isBuying
+          ? t("buy.buying")
+          : canAfford
+            ? t("buy.buy")
+            : (unaffordableLabel ?? t("buy.not_enough_fame"))}
       </span>
       {/* Fame keeps its gold on the soft (card-grid) button — on the solid
           turquoise CTA, amber-on-turquoise is nearly unreadable, so the price

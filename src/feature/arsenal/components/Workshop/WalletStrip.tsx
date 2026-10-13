@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { getWalletTierTotals } from "feature/arsenal/utils/scrap";
 import { ChevronDown, Wrench } from "lucide-react";
@@ -26,6 +27,7 @@ interface WalletStripProps {
  */
 export const WalletStrip = ({ parts }: WalletStripProps) => {
   const [open, setOpen] = useState(false);
+  const labels = useArsenalLabels();
   const tierTotals = useMemo(() => getWalletTierTotals(parts), [parts]);
 
   return (
@@ -39,13 +41,13 @@ export const WalletStrip = ({ parts }: WalletStripProps) => {
         )}>
         <span className='flex items-center gap-2.5'>
           <Wrench size={16} className='text-zinc-500' />
-          <span className='text-sm font-bold text-zinc-200'>Parts</span>
+          <span className='text-sm font-bold text-zinc-200'>{labels.t("workshop.parts")}</span>
         </span>
 
         <span className='flex min-w-0 flex-1 flex-wrap items-baseline gap-x-5 gap-y-1'>
           {tierTotals.length === 0 ? (
             <span className='text-xs text-zinc-500'>
-              Nothing salvaged yet — scrap something from your collection.
+              {labels.t("workshop.nothing_salvaged")}
             </span>
           ) : (
             tierTotals.map(({ tier, qty }) => (
@@ -56,7 +58,7 @@ export const WalletStrip = ({ parts }: WalletStripProps) => {
                 <span
                   className='text-[11px] font-semibold'
                   style={{ color: PART_TIER_COLORS[tier] }}>
-                  {tier}
+                  {labels.partTier(tier)}
                 </span>
               </span>
             ))

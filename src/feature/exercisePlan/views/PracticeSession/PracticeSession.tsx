@@ -1,4 +1,5 @@
 import "react-circular-progressbar/dist/styles.css";
+import { useLocalizedPlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 
 import { BackingTrackBar } from "feature/backingTrack/components/BackingTrackBar";
 import { useBackingTrackSession } from "feature/backingTrack/hooks/useBackingTrackSession";
@@ -128,7 +129,7 @@ const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export const PracticeSession = ({
+const PracticeSessionInner = ({
   plan, rawGpFile, onFinish, onClose, isFinishing, autoReport,
   forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount,
   examMode, examBpm, onExamComplete, skipExitDialog = false, goalRun,
@@ -1195,3 +1196,12 @@ export const PracticeSession = ({
   );
 };
 
+/**
+ * The session reads its plan once, so the words are swapped in front of it: a
+ * localized copy of the plan goes in, and everything below — the header, the
+ * instructions, the tips — shows the player's language without knowing it.
+ */
+export const PracticeSession = (props: PracticeSessionProps) => {
+  const plan = useLocalizedPlan(props.plan);
+  return <PracticeSessionInner {...props} plan={plan} />;
+};

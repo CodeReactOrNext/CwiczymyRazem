@@ -1,4 +1,5 @@
 import { withCurrencyIcons } from "components/CurrencyIcons/withCurrencyIcons";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Square } from "lucide-react";
 
 import { AppScreen } from "./AppScreen";
@@ -24,11 +25,12 @@ export const SessionLogPreview = ({
   total,
   caption,
 }: SessionLogPreviewProps) => {
+  const { t } = useTranslation("wiki");
   const rows = parsePairs(categories);
   const habitLabels = habits ? parseList(habits) : [];
 
   return (
-    <AppScreen title='Log a session' caption={caption}>
+    <AppScreen title={t("log_a_session")} caption={caption}>
       <div className='grid gap-2 sm:grid-cols-2'>
         {rows.map((row) => (
           <div
@@ -44,7 +46,7 @@ export const SessionLogPreview = ({
 
       {habitLabels.length > 0 && (
         <div className='mt-5'>
-          <p className='mb-3 text-xs font-bold text-zinc-400'>Healthy habits</p>
+          <p className='mb-3 text-xs font-bold text-zinc-400'>{t("healthy_habits")}</p>
           <div className='flex flex-wrap gap-2'>
             {habitLabels.map((habit) => {
               const isChecked = habit.startsWith("*");
@@ -73,7 +75,7 @@ export const SessionLogPreview = ({
 
       {total && (
         <div className='mt-5 flex items-center justify-between gap-4 rounded bg-zinc-800/40 px-4 py-3'>
-          <span className='text-sm text-zinc-400'>Session is worth</span>
+          <span className='text-sm text-zinc-400'>{t("session_worth")}</span>
           <span className='text-sm font-bold text-cyan-400'>
             {withCurrencyIcons(total)}
           </span>

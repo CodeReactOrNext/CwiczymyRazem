@@ -1,6 +1,7 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectLevel } from "feature/arsenal/data/effectStats";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { DexStatus } from "feature/arsenal/utils/dex";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import {
@@ -35,6 +36,7 @@ export const EffectStashTile = ({
   ...placement
 }: EffectStashTileProps) => {
   const playerLvl = usePlayerLvl();
+  const labels = useArsenalLabels();
 
   const effect = EFFECTS_BY_ID.get(item.effectId);
   if (!effect) return null;
@@ -49,8 +51,10 @@ export const EffectStashTile = ({
       imageSrc={getEffectImageSrc(effect.imageId, "small")}
       // The cap goes in the label as well as the corner: the padlock is the
       // only part of a socket a screen reader cannot see.
-      label={`${effect.brand} ${effect.name} — ${rarity}${
-        lockedLvl != null ? ` — needs level ${lockedLvl}` : ""
+      label={`${effect.brand} ${effect.name} — ${labels.rarity(rarity)}${
+        lockedLvl != null
+          ? ` — ${labels.t("card.needs_level", { lvl: lockedLvl })}`
+          : ""
       }`}
       level={getEffectLevel(item, effect)}
       isNew={item.isNew}

@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { getConditionGrade } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { GuitarRarity } from "feature/arsenal/types/arsenal.types";
 import { ArrowRight } from "lucide-react";
 
@@ -20,6 +21,7 @@ interface LevelDeltaProps {
 }
 
 export const LevelDelta = ({ from, to, rarity }: LevelDeltaProps) => {
+  const { t } = useArsenalLabels();
   // Not every job on the bench adds level: a re-roll can land under what the mod
   // was worth, and taking a mod off always costs its whole value. Printing those
   // as `+-4` reads as a rendering fault rather than as the loss the player chose.
@@ -32,14 +34,14 @@ export const LevelDelta = ({ from, to, rarity }: LevelDeltaProps) => {
         rarity={rarity}
         dimmed
         size={36}
-        title='Level now'
+        title={t("workshop.level_now")}
       />
       <ArrowRight size={14} className='text-zinc-600' />
       <LevelEmblem
         level={to}
         rarity={rarity}
         size={44}
-        title='Level after this job'
+        title={t("workshop.level_after")}
       />
       <span
         className={cn(
@@ -58,7 +60,10 @@ interface RarityDeltaProps {
 }
 
 /** The headline of a promotion level — the tier the item is about to become. */
-export const RarityDelta = ({ from, to }: RarityDeltaProps) => (
+export const RarityDelta = ({ from, to }: RarityDeltaProps) => {
+  const labels = useArsenalLabels();
+
+  return (
   <div className='flex flex-wrap items-center gap-3'>
     <span
       className='rounded px-3 py-1.5 text-sm font-bold'
@@ -67,7 +72,7 @@ export const RarityDelta = ({ from, to }: RarityDeltaProps) => (
         color: RARITY_STYLES[from].baseColor,
         opacity: 0.6,
       }}>
-      {from}
+      {labels.rarity(from)}
     </span>
 
     <ArrowRight size={16} className='text-zinc-600' />
@@ -78,10 +83,11 @@ export const RarityDelta = ({ from, to }: RarityDeltaProps) => (
         backgroundColor: `${RARITY_STYLES[to].baseColor}1f`,
         color: RARITY_STYLES[to].baseColor,
       }}>
-      {to}
+      {labels.rarity(to)}
     </span>
   </div>
-);
+  );
+};
 
 interface ConditionDeltaProps {
   from: number;
@@ -91,12 +97,13 @@ interface ConditionDeltaProps {
 export const ConditionDelta = ({ from, to }: ConditionDeltaProps) => {
   const fromGrade = getConditionGrade(from);
   const toGrade = getConditionGrade(to);
+  const labels = useArsenalLabels();
 
   return (
     <div className='flex items-center gap-3'>
       <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
         <span className='text-[10px] font-semibold text-zinc-500'>
-          {fromGrade.label}
+          {labels.condition(fromGrade)}
         </span>
         <ConditionMeter condition={from} showLabel={false} dimmed />
       </div>
@@ -107,7 +114,7 @@ export const ConditionDelta = ({ from, to }: ConditionDeltaProps) => {
         <span
           className='text-[10px] font-bold'
           style={{ color: toGrade.color }}>
-          {toGrade.label}
+          {labels.condition(toGrade)}
         </span>
         <ConditionMeter condition={to} showLabel={false} />
       </div>

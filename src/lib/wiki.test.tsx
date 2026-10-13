@@ -21,7 +21,12 @@ import {
   TierScale,
 } from "components/Wiki";
 import fs from "fs";
-import { getAllWikiPages, getWikiPageBySlug } from "lib/wiki";
+import type { AppLocale } from "lib/i18n/locales";
+import {
+  getAllWikiPages,
+  getWikiPageBySlug,
+  hasWikiTranslation,
+} from "lib/wiki";
 import path from "path";
 import * as jsxRuntime from "react/jsx-runtime";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -111,5 +116,57 @@ describe("wiki content", () => {
         );
       }
     }
+  });
+
+  /**
+   * A translation only carries words. Anything that is not a word (the order of
+   * components, their props, the links and the item counts inside a pipe-separated
+   * prop) has to match the English article, or the translated page renders
+   * differently from the one it translates.
+   */
+  describe("translations", () => {
+    const LOCALES: AppLocale[] = ["pl", "de", "es"];
+    const cases = pages.flatMap((page) =>
+      LOCALES.map((locale) => [page.slug, locale] as const),
+    );
+
+    const shape = (content: string) => ({
+      tags: content.match(/<\/?[A-Z][A-Za-z]*/g),
+      links: content.match(/\]\((?:\/|https?:)[^)\s]*\)/g),
+      images: content.match(/\/images\/[^\s"')]+/g),
+      // How many entries each pipe-separated prop holds, and how many of them
+      // have a `Title::detail` split.
+      propShape: [...content.matchAll(/\b([a-z]+)="([^"]*)"/g)].map(
+        ([, name, value]) =>
+          `${name}:${(value.match(/\|/g) ?? []).length}/${(value.match(/::/g) ?? []).length}`,
+      ),
+      headings: (content.match(/^#{2,3} /gm) ?? []).length,
+    });
+
+    it.each(cases)("%s is translated into %s", async (slug, locale) => {
+      expect(
+        hasWikiTranslation(slug, locale),
+        `${slug} has no ${locale} file`,
+      ).toBe(true);
+
+      const english = await getWikiPageBySlug(slug);
+      const translated = await getWikiPageBySlug(slug, locale);
+
+      expect(translated.frontmatter.slug).toBe(english.frontmatter.slug);
+      expect(translated.frontmatter.section).toBe(english.frontmatter.section);
+      expect(translated.frontmatter.order).toBe(english.frontmatter.order);
+      expect(translated.frontmatter.description).not.toBe(
+        english.frontmatter.description,
+      );
+      expect(shape(translated.content)).toEqual(shape(english.content));
+
+      const { default: MDXContent } = await evaluate(translated.content, {
+        ...jsxRuntime,
+        remarkPlugins: [remarkGfm],
+      });
+      expect(
+        renderToStaticMarkup(<MDXContent components={components} />),
+      ).not.toBe("");
+    });
   });
 });

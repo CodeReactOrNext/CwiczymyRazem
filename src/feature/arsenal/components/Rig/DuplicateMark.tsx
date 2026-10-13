@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { Copy } from "lucide-react";
 
 import type { BoardCopy } from "../../data/boardDuplicates";
@@ -68,6 +69,7 @@ interface DuplicateMarkProps {
 }
 
 export const DuplicateMark = ({ copy, name, active }: DuplicateMarkProps) => {
+  const { t } = useArsenalLabels();
   if (copy.total < 2) return null;
 
   const isKeeper = copy.index === 0;
@@ -77,8 +79,8 @@ export const DuplicateMark = ({ copy, name, active }: DuplicateMarkProps) => {
 
   return (
     <span
-      title={describeDuplicateCopy(copy, name)}
-      aria-label={describeDuplicateCopy(copy, name)}
+      title={describeDuplicateCopy(copy, name, t)}
+      aria-label={describeDuplicateCopy(copy, name, t)}
       className={cn(
         "absolute bottom-1 right-1 z-10 flex items-center gap-1 rounded px-1.5 py-[3px]",
         "text-[11px] font-bold tabular-nums leading-none transition-colors",

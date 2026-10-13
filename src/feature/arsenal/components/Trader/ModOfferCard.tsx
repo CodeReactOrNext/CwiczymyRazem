@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { TraderModOffer } from "feature/arsenal/types/trader.types";
 
 import { BuyButton } from "../BuyButton";
@@ -37,6 +38,8 @@ export const ModOfferCard = ({
   isBuying,
   className,
 }: ModOfferCardProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const canAfford = currentFame >= offer.unitPrice;
   const isTopRoll = offer.points >= offer.maxPoints;
 
@@ -65,17 +68,17 @@ export const ModOfferCard = ({
         <div className='flex min-w-0 flex-1 flex-col gap-2'>
           <span className='flex flex-wrap items-center gap-x-2 gap-y-1 text-xs'>
             <span className='font-semibold text-purple-300'>
-              Mod of the day
+              {t("trader.mod_of_day")}
             </span>
             <span className='text-zinc-400'>
-              {offer.modKind === "guitar" ? "Guitar mod" : "Pedal mod"}
+              {offer.modKind === "guitar" ? t("trader.guitar_mod") : t("trader.pedal_mod")}
             </span>
             {isTopRoll && (
-              <span className='font-semibold text-amber-400'>Top roll</span>
+              <span className='font-semibold text-amber-400'>{t("trader.top_roll")}</span>
             )}
           </span>
           <span className='truncate text-lg font-bold leading-tight text-zinc-100'>
-            {offer.label}
+            {labels.mod(offer.featureId, offer.label)}
           </span>
           <RollMeter
             points={offer.points}
@@ -95,7 +98,7 @@ export const ModOfferCard = ({
             isBuying={isBuying}
             onClick={onBuy}
             size='sm'
-            unaffordableLabel='Buy'
+            unaffordableLabel={t("buy.buy")}
             className='w-full sm:w-40'
           />
         ) : (

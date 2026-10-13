@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
@@ -145,6 +146,7 @@ const BranchRow = ({
 }) => {
   const { t, branchLabel } = useSkillRoadmapLabels();
   const difficultyLabel = useDifficultyLabel();
+  const localizeExercise = useLocalizeExercise();
   const total = branch.exercises.length;
   const done = countCompleted(branch, states);
   const holdsCurrent = branch.exercises.some(
@@ -219,7 +221,7 @@ const BranchRow = ({
                           ? "text-zinc-400"
                           : "text-zinc-100",
                       )}>
-                      {exercise.title}
+                      {localizeExercise(exercise).title}
                     </span>
                     <span className='sr-only'>{t(STATE_WORD[state])}</span>
                   </span>
@@ -311,6 +313,7 @@ export const SkillRoadmapMobile = ({
 }: SkillRoadmapMobileProps) => {
   const { t, tierTitle, branchLabel } = useSkillRoadmapLabels();
   const difficultyLabel = useDifficultyLabel();
+  const localizeExercise = useLocalizeExercise();
   const tiers = useMemo(() => buildSkillRoadmap(exercisesAgregat), []);
   const progress = useMemo(
     () =>
@@ -371,7 +374,7 @@ export const SkillRoadmapMobile = ({
               {t("roadmap.up_next")}
             </p>
             <p className='mt-1.5 text-lg font-bold leading-snug text-zinc-100'>
-              {current.exercise.title}
+              {localizeExercise(current.exercise).title}
             </p>
             <p className='mt-1 flex items-baseline gap-2 text-xs text-zinc-500'>
               <span className='min-w-0 truncate'>

@@ -1,4 +1,5 @@
 import { Badge } from "assets/components/ui/badge";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { Button } from "assets/components/ui/button";
 import {
   Dialog,
@@ -43,6 +44,7 @@ export function ExercisePreviewDialog({
   hidePlanActions = false,
 }: ExercisePreviewDialogProps) {
   const { t } = useTranslation(["common", "exercises", "plans"]);
+  const localizeExercise = useLocalizeExercise();
   // The player's own look (palette, pills, board) plus the string names, so the
   // preview reads exactly like the tab they get in the session.
   const { settings, palette, isLightBoard, style } = useTablatureStyle();
@@ -74,10 +76,10 @@ export function ExercisePreviewDialog({
           <div className='p-6 pt-8'>
             <DialogHeader>
               <DialogTitle className='text-2xl font-semibold leading-tight text-zinc-100'>
-                {exercise.title}
+                {localizeExercise(exercise).title}
               </DialogTitle>
               <p className='mt-2 max-w-xl text-sm leading-relaxed text-zinc-400'>
-                {exercise.description}
+                {localizeExercise(exercise).description}
               </p>
 
               <div className='mt-5 hidden flex-wrap items-center gap-2 sm:flex'>
@@ -141,7 +143,7 @@ export function ExercisePreviewDialog({
                   {t("plans:instructions")}
                 </h4>
                 <ul className='space-y-2.5'>
-                  {exercise.instructions.map((inst, i) => (
+                  {localizeExercise(exercise).instructions.map((inst, i) => (
                     <li
                       key={i}
                       className='flex items-start gap-3 text-sm text-zinc-200'>
@@ -159,7 +161,7 @@ export function ExercisePreviewDialog({
               <div className='space-y-3 rounded-lg bg-zinc-900/40 p-5'>
                 <h4 className='text-sm font-medium text-zinc-400'>{t("plans:pro_tips")}</h4>
                 <ul className='space-y-2'>
-                  {exercise.tips.map((tip, i) => (
+                  {localizeExercise(exercise).tips.map((tip, i) => (
                     <li
                       key={i}
                       className='flex items-start gap-2.5 text-sm leading-relaxed text-zinc-300'>

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addFame, deductFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -32,6 +33,7 @@ const useInvalidateMarketplace = () => {
 };
 
 export const useListItem = () => {
+  const { t } = useTranslation("arsenal");
   const dispatch = useAppDispatch();
   const invalidate = useInvalidateMarketplace();
 
@@ -51,16 +53,17 @@ export const useListItem = () => {
     },
     onSuccess: () => {
       invalidate();
-      toast.success("Item listed on the market");
+      toast.success(t("toasts.listed"));
     },
     onError: (error: any, _vars, context: any) => {
       if (context?.fee) dispatch(addFame(context.fee));
-      toast.error(error?.response?.data?.error || "Failed to list item");
+      toast.error(error?.response?.data?.error || t("toasts.err.list"));
     },
   });
 };
 
 export const useBuyItem = () => {
+  const { t } = useTranslation("arsenal");
   const dispatch = useAppDispatch();
   const invalidate = useInvalidateMarketplace();
 
@@ -72,27 +75,28 @@ export const useBuyItem = () => {
     },
     onSuccess: () => {
       invalidate();
-      toast.success("Purchase complete!");
+      toast.success(t("toasts.purchase_complete"));
     },
     onError: (error: any, _vars, context: any) => {
       if (context?.price) dispatch(addFame(context.price));
       invalidate();
-      toast.error(error?.response?.data?.error || "Failed to buy item");
+      toast.error(error?.response?.data?.error || t("toasts.err.buy"));
     },
   });
 };
 
 export const useCancelListing = () => {
+  const { t } = useTranslation("arsenal");
   const invalidate = useInvalidateMarketplace();
 
   return useMutation({
     mutationFn: ({ listingId }: { listingId: string }) => cancelListing(listingId),
     onSuccess: () => {
       invalidate();
-      toast.success("Listing cancelled");
+      toast.success(t("toasts.listing_cancelled"));
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.error || "Failed to cancel listing");
+      toast.error(error?.response?.data?.error || t("toasts.err.cancel_listing"));
     },
   });
 };

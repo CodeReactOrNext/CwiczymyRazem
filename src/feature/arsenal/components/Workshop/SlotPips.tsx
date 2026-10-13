@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { motion } from "framer-motion";
 
 interface SlotPipsProps {
@@ -15,10 +16,13 @@ interface SlotPipsProps {
  * filled does not. Ghost pips past the cap show what a promotion would open up,
  * which is the one thing the sentence could never say without getting longer.
  */
-export const SlotPips = ({ used, max, locked = 0 }: SlotPipsProps) => (
+export const SlotPips = ({ used, max, locked = 0 }: SlotPipsProps) => {
+  const { t } = useArsenalLabels();
+
+  return (
   <span
     className='flex flex-wrap items-center gap-1.5'
-    aria-label={`${used} of ${max} mod slots used`}>
+    aria-label={t("workshop.slots_used", { used, max })}>
     {Array.from({ length: max }).map((_, i) => (
       <motion.span
         key={i}
@@ -41,11 +45,12 @@ export const SlotPips = ({ used, max, locked = 0 }: SlotPipsProps) => (
         {Array.from({ length: locked }).map((_, i) => (
           <span
             key={`locked-${i}`}
-            title='Unlocked by the next promotion'
+            title={t("workshop.unlocked_next_promotion")}
             className='block h-2.5 w-4 rounded border border-dashed border-zinc-700'
           />
         ))}
       </>
     )}
   </span>
-);
+  );
+};

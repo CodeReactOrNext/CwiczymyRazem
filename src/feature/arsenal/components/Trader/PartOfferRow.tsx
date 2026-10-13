@@ -1,7 +1,7 @@
 import {
-  getPartLabel,
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { TraderPartOffer } from "feature/arsenal/types/trader.types";
 import { useHoldRepeat } from "hooks/useHoldRepeat";
 import type { LucideIcon } from "lucide-react";
@@ -77,6 +77,8 @@ export const PartOfferRow = ({
   isBuying,
 }: PartOfferRowProps) => {
   const [picked, setQty] = useState(1);
+  const labels = useArsenalLabels();
+  const { t } = labels;
   // What is in the field while the player is typing into it — only ever
   // differs from `qty` while they have cleared it to type a new number.
   const [draft, setDraft] = useState<string | null>(null);
@@ -108,8 +110,10 @@ export const PartOfferRow = ({
             <PartIcon partId={offer.partId} size={28} />
           </TierPlate>
         }
-        name={getPartLabel(offer.partId)}
-        detail={<span style={{ color: tierColor }}>{offer.tier}</span>}
+        name={labels.part(offer.partId)}
+        detail={
+          <span style={{ color: tierColor }}>{labels.partTier(offer.tier)}</span>
+        }
       />
 
       <OfferRowStats owned={owned} remaining={remaining} stock={offer.stock} />
@@ -133,7 +137,7 @@ export const PartOfferRow = ({
                 <span className='flex shrink-0 items-center rounded-lg bg-zinc-900/60 p-0.5'>
                   <PickerButton
                     icon={Minus}
-                    label='One fewer'
+                    label={t("trader.one_fewer")}
                     disabled={qty <= 1}
                     onStep={() => step(-1)}
                   />
@@ -142,7 +146,7 @@ export const PartOfferRow = ({
                   <input
                     type='text'
                     inputMode='numeric'
-                    aria-label='Quantity'
+                    aria-label={t("trader.quantity")}
                     value={draft ?? String(qty)}
                     onFocus={(e) => e.currentTarget.select()}
                     onChange={(e) => {
@@ -168,7 +172,7 @@ export const PartOfferRow = ({
                   />
                   <PickerButton
                     icon={Plus}
-                    label='One more'
+                    label={t("trader.one_more")}
                     disabled={qty >= remaining}
                     onStep={() => step(1)}
                   />
@@ -181,9 +185,9 @@ export const PartOfferRow = ({
                     setQty(fillTo);
                   }}
                   disabled={maxQty < 1 || qty === fillTo}
-                  aria-label={`${fameBound ? "Max" : "All"} ${fillTo}`}
+                  aria-label={`${fameBound ? t("trader.max") : t("trader.all")} ${fillTo}`}
                   className='h-8 w-11 shrink-0 rounded-md text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white'>
-                  {fameBound ? "Max" : "All"}
+                  {fameBound ? t("trader.max") : t("trader.all")}
                 </button>
               </>
             ) : (
@@ -195,7 +199,7 @@ export const PartOfferRow = ({
               isBuying={isBuying}
               onClick={() => onBuy(qty)}
               size='sm'
-              unaffordableLabel='Buy'
+              unaffordableLabel={t("buy.buy")}
               className='min-w-0 flex-1 sm:w-40 sm:flex-none'
             />
           </>

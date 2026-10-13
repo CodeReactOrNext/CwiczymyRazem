@@ -14,6 +14,7 @@ import {
 } from "feature/arsenal/data/traitEval";
 import type { ResolvedTrait } from "feature/arsenal/data/traits";
 import { formatTraitValue } from "feature/arsenal/data/traits";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useMemo } from "react";
 
 import { ARSENAL_QUERY_KEY } from "../hooks/useArsenalData";
@@ -102,6 +103,7 @@ interface CardTraitsProps {
  * they practise — a promise, not a failure, and it must not look like one.
  */
 export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
+  const labels = useArsenalLabels();
   if (traits.length === 0) return null;
 
   const indexed = traits.map((trait, i) => ({ trait, i }));
@@ -146,7 +148,7 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
                   "truncate text-[12px] font-bold capitalize tracking-wide",
                 )}
                 style={{ color: unmet ? "#71717a" : EMERALD }}>
-                {trait.label}
+                {labels.traitLabel(trait)}
               </span>
               <span className='font-mono ml-auto flex flex-shrink-0 items-baseline gap-1.5 text-[12px] font-bold tabular-nums'>
                 {units != null && (
@@ -162,7 +164,7 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
             <p
               className='pl-[19px] text-[10px] leading-snug'
               style={{ color: unmet ? "#52525b" : "#a1a1aa" }}>
-              {trait.description}
+              {labels.traitDescription(trait)}
             </p>
           </div>
         );
@@ -172,7 +174,7 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
           <Tooltip delayDuration={150}>
             <TooltipTrigger asChild>
               <div className='flex cursor-help items-center gap-1.5 pl-[19px] text-[11px] font-bold text-emerald-300/60 transition-colors hover:text-emerald-300'>
-                +{hidden.length} more
+                {labels.t("traits_ui.more", { count: hidden.length })}
               </div>
             </TooltipTrigger>
             <TooltipContent
@@ -184,7 +186,7 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
                     key={trait.def.id}
                     className='flex items-baseline justify-between gap-3 text-[11px]'>
                     <span className='truncate font-semibold text-emerald-300'>
-                      {trait.label}
+                      {labels.traitLabel(trait)}
                     </span>
                     <span className='font-mono shrink-0 text-emerald-200'>
                       {formatTraitValue(trait.value)} Fame/h

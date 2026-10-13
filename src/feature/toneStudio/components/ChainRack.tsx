@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { Grain, Led } from "feature/toneStudio/components/PluginChrome";
 import type { ChainBlock } from "feature/toneStudio/utils/chain";
-import { CHAIN_BLOCKS } from "feature/toneStudio/utils/chain";
+import { CHAIN_BLOCKS,chainBlockLabel } from "feature/toneStudio/utils/chain";
 import {
   ACCENT_HEX,
   accentWash,
@@ -14,6 +14,8 @@ import {
   GATE_PEDAL_SRC,
   OVERDRIVE_PEDAL_SRC,
 } from "feature/toneStudio/utils/gearArt";
+import { useTranslation } from "hooks/useTranslation";
+import type { Translate } from "lib/i18n/translate";
 import type { AmpParams } from "types/nativeAudio";
 
 export type ChainKey = ChainBlock["key"];
@@ -47,17 +49,22 @@ interface ChainRackProps {
  *  without giving it one. */
 const SUMMARY: Record<
   ChainKey,
-  (params: AmpParams, namModelName?: string, irName?: string) => string
+  (
+    params: AmpParams,
+    t: Translate,
+    namModelName?: string,
+    irName?: string,
+  ) => string
 > = {
-  gate: (p) => (p.gate ? "Hum and hiss cut" : "Open"),
+  gate: (p, t) => (p.gate ? t("rack.gate_on") : t("rack.gate_open")),
   overdrive: (p) => `Drive ${(p.overdriveDrive * 10).toFixed(1)}`,
   // The slot's own label already says Classic vs NAM, so the line under it
   // says which capture, or how hard the classic channel is being pushed.
-  amp: (p, namModelName) =>
+  amp: (p, t, namModelName) =>
     p.namEnabled
-      ? (namModelName ?? "No capture")
+      ? (namModelName ?? t("rack.no_capture"))
       : `Drive ${(p.drive * 10).toFixed(1)}`,
-  cab: (_p, _namModelName, irName) => irName ?? "Built-in",
+  cab: (_p, t, _namModelName, irName) => irName ?? t("rack.built_in"),
   delay: (p) => `${Math.round(p.delayMs)}ms · ${Math.round(p.delayMix * 100)}%`,
 };
 
@@ -107,7 +114,10 @@ export const ChainRack = ({
   onToggle,
   namModelName,
   irName,
-}: ChainRackProps) => (
+}: ChainRackProps) => {
+  const { t } = useTranslation("tone_studio");
+
+  return (
   <div className='flex items-stretch gap-1.5 overflow-x-auto px-1 pb-1'>
     {CHAIN_BLOCKS.map((block, index) => {
       const active = block.isActive(params);
@@ -153,7 +163,9 @@ export const ChainRack = ({
               <span
                 role='switch'
                 aria-checked={active}
-                aria-label={`Bypass ${block.label(params)}`}
+                aria-label={t("rack.bypass", {
+                  name: chainBlockLabel(block, params, t),
+                })}
                 tabIndex={block.toggle ? 0 : -1}
                 onClick={(e) => {
                   if (!block.toggle) return;
@@ -176,15 +188,16 @@ export const ChainRack = ({
               <span
                 className='truncate text-xs font-medium'
                 style={{ color: isSelected ? hex : "#a1a1aa" }}>
-                {block.label(params)}
+                {chainBlockLabel(block, params, t)}
               </span>
             </span>
             <span className='font-mono relative truncate text-[10px] text-zinc-500'>
-              {SUMMARY[block.key](params, namModelName, irName)}
+              {SUMMARY[block.key](params, t, namModelName, irName)}
             </span>
           </button>
         </div>
       );
     })}
   </div>
-);
+  );
+};

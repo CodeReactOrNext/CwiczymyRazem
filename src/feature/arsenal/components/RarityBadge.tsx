@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
 import type { GuitarRarity } from "../types/arsenal.types";
 
@@ -102,6 +103,7 @@ interface RarityBadgeProps {
 }
 
 export const RarityBadge = ({ rarity, size = "sm" }: RarityBadgeProps) => {
+  const labels = useArsenalLabels();
   const styles = RARITY_STYLES[rarity];
   return (
     <span
@@ -123,7 +125,7 @@ export const RarityBadge = ({ rarity, size = "sm" }: RarityBadgeProps) => {
         textShadow: "0 2px 4px rgba(0,0,0,0.8)",
       }}>
       <div className='absolute inset-0 bg-white/10 opacity-0 transition-opacity hover:opacity-100' />
-      {rarity}
+      {labels.rarity(rarity)}
     </span>
   );
 };

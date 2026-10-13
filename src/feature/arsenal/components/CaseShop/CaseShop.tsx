@@ -1,4 +1,5 @@
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
+import { useTranslation } from "hooks/useTranslation";
 
 import type { CaseType, OpenCaseResult } from "../../types/arsenal.types";
 import { CaseCard } from "./CaseCard";
@@ -31,6 +32,7 @@ export const CaseShop = ({
   isOpening,
   freeTokens = 0,
 }: CaseShopProps) => {
+  const { t } = useTranslation("arsenal");
   const openCard = (id: string, useToken?: boolean) =>
     onOpenCase(id as CaseType, useToken);
 
@@ -46,10 +48,10 @@ export const CaseShop = ({
       <section className='flex flex-col gap-5'>
         <div>
           <h2 className='font-display text-2xl font-black text-zinc-100'>
-            Choose your case
+            {t("cases.shelf_title")}
           </h2>
           <p className='mt-1 text-sm text-zinc-500'>
-            Find the next piece of your sound.
+            {t("cases.shelf_subtitle")}
           </p>
         </div>
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>

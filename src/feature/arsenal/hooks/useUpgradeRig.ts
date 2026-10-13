@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deductFame, setFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 import { memoryCache } from "utils/cache/memoryCache";
@@ -19,6 +20,7 @@ import { ARSENAL_QUERY_KEY } from "./useArsenalData";
  * charged — never by the price the card happened to be showing.
  */
 export const useUpgradeRig = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
@@ -51,12 +53,12 @@ export const useUpgradeRig = () => {
 
       toast.success(
         result.kind === "board"
-          ? `${result.name} bolted in — ${result.spent} Fame`
-          : `${result.name} racked up — ${result.spent} Fame`,
+          ? t("toasts.bolted_in", { name: result.name, fame: result.spent })
+          : t("toasts.racked_up", { name: result.name, fame: result.spent }),
       );
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.error || "Could not buy the upgrade");
+      toast.error(error?.response?.data?.error || t("toasts.err.upgrade"));
 
       // A refusal for want of Fame comes back with the wallet the server
       // actually holds. Taking it is what stops the card offering the same

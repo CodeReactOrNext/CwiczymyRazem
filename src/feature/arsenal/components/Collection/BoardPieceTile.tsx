@@ -1,4 +1,5 @@
 import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
 import type { DexStatus } from "feature/arsenal/utils/dex";
 import { ComponentPreviewCard } from "feature/guitarBuilder/components/ComponentPreviewCard";
@@ -56,6 +57,8 @@ export const BoardPieceTile = ({
   onClick,
   ...placement
 }: BoardPieceTileProps) => {
+  const labels = useArsenalLabels();
+
   if (piece.kind === "guitar")
     return (
       <GuitarStashTile
@@ -87,7 +90,7 @@ export const BoardPieceTile = ({
         {...placement}
         color={MOD_TILE_COLOR}
         art={<ModArt modId={piece.mod.featureId} />}
-        label={`${piece.name} +${piece.mod.points}`}
+        label={`${labels.mod(piece.mod.featureId, piece.name)} +${piece.mod.points}`}
         level={piece.mod.points}
         levelPrefix='+'
         preview={<SalvagedModCard mod={piece.mod} />}
@@ -125,7 +128,7 @@ export const BoardPieceTile = ({
       // Sized off the socket rather than in px: the board's cells grow with
       // the viewport, and a fixed box left a part swimming in a wide one.
       art={<PartIcon partId={piece.part.partId} className='p-[14%]' />}
-      label={`${piece.name} ×${piece.part.qty}`}
+      label={`${labels.partName(piece.part.tier, piece.part.partId)} ×${piece.part.qty}`}
       count={piece.part.qty}
       preview={
         <ScrapPartCard

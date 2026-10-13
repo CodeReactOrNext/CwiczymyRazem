@@ -1,4 +1,5 @@
 import { Chip, chipVariants } from "assets/components/ui/chip";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
@@ -171,7 +172,27 @@ export const ExerciseBrowseTab = ({
   onShowUpgrade,
   onShowLeaderboard,
 }: ExerciseBrowseTabProps) => {
-  const { t } = useTranslation(["common", "skills"]);
+  const { t } = useTranslation(["common", "skills", "exercise_content"]);
+  const localizeExercise = useLocalizeExercise();
+  // The sets and filters are built from the English catalogue; only what is
+  // drawn on screen is swapped for the player's language.
+  const localized = useMemo(
+    () => new Map(LIBRARY_EXERCISES.map(ex => [ex.id, localizeExercise(ex)])),
+    [localizeExercise]
+  );
+  const titleOf = (ex: Exercise): string => exTitle(localized.get(ex.id) ?? ex);
+  const variantOf = (ex: Exercise): string => {
+    const key = `exercise_content:variant.${ex.id}`;
+    const hit = t(key);
+    return hit === key ? getVariantLabel(localized.get(ex.id) ?? ex) : hit;
+  };
+  const setTitleOf = (set: ExerciseSet): string => {
+    const key = `exercise_content:family.${set.id}`;
+    const hit = t(key);
+    if (hit !== key) return hit;
+    const first = set.exercises[0];
+    return first ? getExerciseFamily(localized.get(first.id) ?? first).title : set.title;
+  };
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUserInfo);
   const userAuth = useAppSelector(selectUserAuth);
@@ -239,8 +260,10 @@ export const ExerciseBrowseTab = ({
       const modes = EXERCISE_MODES.get(ex.id) ?? [];
       const parts = [
         exTitle(ex),
+        titleOf(ex),
         getExerciseFamily(ex).title,
         typeof ex.description === "string" ? ex.description : "",
+        (localized.get(ex.id)?.description ?? "") as string,
         ex.whyItMatters ?? "",
         ...ex.relatedSkills.map(skill => String(t(`skills:skills.${skill}.name` as never))),
         ...ex.relatedSkills.map(skill => SEARCH_ALIASES[skill] ?? ""),
@@ -250,7 +273,8 @@ export const ExerciseBrowseTab = ({
       index.set(ex.id, parts.join(" ").toLowerCase());
     });
     return index;
-  }, [t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t, localized]);
 
   const searchWords = useMemo(
     () => searchQuery.toLowerCase().split(/\s+/).filter(Boolean),
@@ -523,8 +547,8 @@ export const ExerciseBrowseTab = ({
       skillData?.category || (exercise.category !== "mixed" ? exercise.category : "technique");
     return {
       id: exercise.id,
-      title: exTitle(exercise),
-      description: typeof exercise.description === "string" ? exercise.description : "",
+      title: titleOf(exercise),
+      description: localized.get(exercise.id)?.description ?? "",
       category,
       requiredSkillId: skillId,
       requiredLevel: exercise.difficulty === "hard" ? 2 : exercise.difficulty === "medium" ? 1 : 0,
@@ -758,10 +782,10 @@ export const ExerciseBrowseTab = ({
           // on the child ignored the button's `hover:text-white`, so the name
           // never actually reacted to the pointer.
           className="flex min-w-0 flex-1 items-baseline gap-2.5 truncate text-left text-zinc-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
-          title={exTitle(exercise)}
+          title={titleOf(exercise)}
         >
           <span className="truncate text-[14px]">
-            {showVariantLabel ? getVariantLabel(exercise) : exTitle(exercise)}
+            {showVariantLabel ? variantOf(exercise) : titleOf(exercise)}
           </span>
           <span
             className="hidden shrink-0 text-[12px] font-semibold capitalize lg:inline"
@@ -844,7 +868,7 @@ export const ExerciseBrowseTab = ({
           </button>
           {hasLeaderboard && (
             <button
-              onClick={() => onShowLeaderboard(exercise.id, exTitle(exercise))}
+              onClick={() => onShowLeaderboard(exercise.id, titleOf(exercise))}
               className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-amber-500/20 hover:text-amber-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
               title="Leaderboard"
               aria-label="Leaderboard"
@@ -902,7 +926,7 @@ export const ExerciseBrowseTab = ({
           aria-expanded={isExpanded}
           className="group flex w-full items-center gap-2.5 px-3.5 py-3 text-left transition-colors duration-200 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 sm:px-4"
         >
-          <span className="truncate text-[15px] font-semibold text-zinc-100">{set.title}</span>
+          <span className="truncate text-[15px] font-semibold text-zinc-100">{setTitleOf(set)}</span>
 
           {!isSingle && (
             <span className="shrink-0 text-[12px] tabular-nums text-zinc-600">
@@ -1191,7 +1215,7 @@ export const ExerciseBrowseTab = ({
         </div>
 
         <ExercisePreviewDialog
-          exercise={previewExercise}
+          exercise={previewExercise ? localizeExercise(previewExercise) : null}
           onClose={() => setPreviewExercise(null)}
           onStart={handleStartPreview}
         />

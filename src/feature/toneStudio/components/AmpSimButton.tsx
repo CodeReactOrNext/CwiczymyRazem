@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
 import { InputMeter } from "feature/toneStudio/components/InputMeter";
 import { Knob } from "feature/toneStudio/components/Knob";
+import { chainBlockLabel } from "feature/toneStudio/utils/chain";
 import { CHAIN_BLOCKS, type ToneAccent } from "feature/toneStudio/utils/chain";
 import { AMP_HEAD_SRC } from "feature/toneStudio/utils/gearArt";
 import { isPresetModified } from "feature/toneStudio/utils/presetDiff";
@@ -9,6 +10,7 @@ import { useAmpSim } from "hooks/useAmpSim";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
 import { RippleButton } from "hooks/useRipple";
 import { useTonePresets } from "hooks/useTonePresets";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ChevronRight,
   Power,
@@ -78,6 +80,7 @@ export const AmpSimButton = ({
     useNativeAudioDevices();
   const { presets, savePreset, updatePreset } = useTonePresets();
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation("tone_studio");
   // Interface/latency are "set once" settings — folded away so the things
   // touched every session (power, preset, level) stay on top.
   const [interfaceOpen, setInterfaceOpen] = useState(false);
@@ -155,6 +158,8 @@ export const AmpSimButton = ({
   const latencyChoices = LATENCY_PRESETS.some((p) => p.size === amp.bufferSize)
     ? LATENCY_PRESETS
     : [...LATENCY_PRESETS, { label: "Custom", size: amp.bufferSize }];
+  const latencyLabel = (label: string) =>
+    t(`amp_button.latency_preset.${label.toLowerCase()}`, label);
 
   const reconnecting =
     amp.connectionIssue?.status === "lost" ||
@@ -181,13 +186,16 @@ export const AmpSimButton = ({
               ? "glitchy"
               : "ok";
   const latency = amp.info ? `~${amp.info.roundTripMs.toFixed(0)} ms` : null;
+  const live = latency
+    ? t("amp_button.live_with", { latency })
+    : t("amp_button.live");
   const statusLine = {
-    starting: "Starting…",
-    off: "Monitoring off",
-    reconnecting: "Interface disconnected — reconnecting…",
-    bad: `Live${latency ? ` · ${latency}` : ""} · DSP overloaded`,
-    glitchy: `Live${latency ? ` · ${latency}` : ""} · ${dropouts} dropout${dropouts === 1 ? "" : "s"}`,
-    ok: `Live${latency ? ` · ${latency} latency` : ""}`,
+    starting: t("amp_button.starting"),
+    off: t("amp_button.monitoring_off"),
+    reconnecting: t("amp_button.reconnecting"),
+    bad: `${live} · ${t("amp_button.dsp_overloaded")}`,
+    glitchy: `${live} · ${t("amp_button.dropouts", { count: dropouts })}`,
+    ok: latency ? t("amp_button.live_latency", { latency }) : live,
   }[health];
   const dotClass = {
     starting: "animate-pulse bg-zinc-500",
@@ -221,14 +229,14 @@ export const AmpSimButton = ({
     variant === "titlebar" ? (
       <RippleButton
         onClick={() => setOpen((o) => !o)}
-        title={needsAttention ? statusLine : "Amp simulator (ASIO, live)"}
+        title={needsAttention ? statusLine : t("amp_button.title")}
         className={cn(
           "flex items-center gap-1.5 rounded-full pl-2.5 pr-3 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
           h,
           pillColor,
         )}>
         <Speaker className='h-3.5 w-3.5 shrink-0' />
-        <span>{amp.isOn ? "Amp on" : "Amp"}</span>
+        <span>{amp.isOn ? t("amp_button.amp_on") : t("amp_button.amp")}</span>
         {(amp.isOn || needsAttention) && (
           <span
             aria-hidden
@@ -242,7 +250,7 @@ export const AmpSimButton = ({
     ) : (
       <RippleButton
         onClick={() => setOpen((o) => !o)}
-        title={needsAttention ? statusLine : "Amp simulator (ASIO, live)"}
+        title={needsAttention ? statusLine : t("amp_button.title")}
         className={cn(
           "flex items-center rounded-lg outline-none transition-all focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
           compact
@@ -258,7 +266,11 @@ export const AmpSimButton = ({
         />
         {!compact && (
           <span className='text-[10px] font-semibold tracking-wide'>
-            {needsAttention ? "AMP !" : amp.isOn ? "AMP ON" : "AMP"}
+            {needsAttention
+                ? t("amp_button.amp_alert")
+                : amp.isOn
+                  ? t("amp_button.amp_on_caps")
+                  : t("amp_button.amp_caps")}
           </span>
         )}
       </RippleButton>
@@ -285,7 +297,9 @@ export const AmpSimButton = ({
               )}
             />
             <div className='min-w-0 flex-1'>
-              <div className='text-sm font-semibold leading-tight'>Amp</div>
+              <div className='text-sm font-semibold leading-tight'>
+                {t("amp_button.amp")}
+              </div>
               <div className='mt-1 flex items-center gap-1.5 text-[11px] text-zinc-400'>
                 <span
                   className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dotClass)}
@@ -307,7 +321,7 @@ export const AmpSimButton = ({
                 : "bg-cyan-500 text-zinc-950 hover:bg-cyan-400",
             )}>
             <Power size={15} />
-            {amp.isOn ? "Turn off" : "Turn on"}
+            {amp.isOn ? t("power.turn_off") : t("power.turn_on")}
           </button>
 
           {amp.isOn && <InputMeter />}
@@ -317,19 +331,25 @@ export const AmpSimButton = ({
             <AudioSelect
               className='flex-1'
               size='sm'
-              label='Preset'
+              label={t("amp_button.preset")}
               labelRight={
                 modified ? (
-                  <span className='text-[11px] text-amber-400'>Modified</span>
+                  <span className='text-[11px] text-amber-400'>
+                    {t("amp_button.modified")}
+                  </span>
                 ) : undefined
               }
               value={amp.activePresetId ?? ""}
               onValueChange={handleSelectPreset}
-              placeholder={presets.length ? "Select preset…" : "No presets yet"}
+              placeholder={
+                presets.length
+                  ? t("amp_button.select_preset")
+                  : t("amp_button.no_presets")
+              }
               options={presets.map((p) => ({
                 value: p.id,
                 label: p.name,
-                hint: p.builtIn ? "Built-in" : undefined,
+                hint: p.builtIn ? t("rack.built_in") : undefined,
               }))}
             />
             <Knob
@@ -359,7 +379,7 @@ export const AmpSimButton = ({
                       setNaming(false);
                     }
                   }}
-                  placeholder='New preset name'
+                  placeholder={t("amp_button.new_preset_name")}
                   className='h-8 min-w-0 flex-1 rounded-lg bg-zinc-800/70 px-3 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/40'
                 />
                 <button
@@ -371,12 +391,12 @@ export const AmpSimButton = ({
                     "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25",
                   )}>
                   <Save size={13} />
-                  Save
+                  {t("presets.save")}
                 </button>
                 <button
                   type='button'
                   onClick={() => setNaming(false)}
-                  title='Cancel'
+                  title={t("common.cancel")}
                   className={cn(
                     smallButton,
                     "px-2 text-zinc-400 hover:bg-zinc-800 hover:text-white",
@@ -389,28 +409,28 @@ export const AmpSimButton = ({
                 <button
                   type='button'
                   onClick={handleRevert}
-                  title={`Back to "${activePreset.name}" as saved`}
+                  title={t("amp_button.revert_hint", { name: activePreset.name })}
                   className={cn(smallButton, secondaryButton)}>
                   <RotateCcw size={13} />
-                  Revert
+                  {t("amp_button.revert")}
                 </button>
                 {activePreset.builtIn ? (
                   <button
                     type='button'
                     onClick={() => setNaming(true)}
-                    title='Built-in presets are read-only — save your changes as a new one'
+                    title={t("amp_button.builtin_readonly")}
                     className={cn(smallButton, secondaryButton)}>
                     <Save size={13} />
-                    Save as…
+                    {t("amp_button.save_as")}
                   </button>
                 ) : (
                   <button
                     type='button'
                     onClick={handleUpdatePreset}
-                    title={`Overwrite "${activePreset.name}" with the current settings`}
+                    title={t("presets.overwrite_hint", { name: activePreset.name })}
                     className={cn(smallButton, secondaryButton)}>
                     <Save size={13} />
-                    Update preset
+                    {t("amp_button.update_preset")}
                   </button>
                 )}
               </div>
@@ -418,11 +438,13 @@ export const AmpSimButton = ({
 
           {/* ── Chain: bypass a block without touching the preset ──────────── */}
           <div className='flex flex-col gap-1.5'>
-            <span className='text-xs text-zinc-400'>Chain</span>
+            <span className='text-xs text-zinc-400'>
+              {t("amp_button.chain")}
+            </span>
             <div className='flex flex-wrap gap-1.5'>
               {CHAIN_BLOCKS.map((block) => {
                 const active = block.isActive(amp.params);
-                const label = block.label(amp.params);
+                const label = chainBlockLabel(block, amp.params, t);
                 const chip = cn(
                   "rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors",
                   active
@@ -442,7 +464,11 @@ export const AmpSimButton = ({
                     key={block.key}
                     type='button'
                     onClick={() => amp.setParams(toggle(amp.params))}
-                    title={active ? `Bypass ${label}` : `Enable ${label}`}
+                    title={
+                      active
+                        ? t("rack.bypass", { name: label })
+                        : t("amp_button.enable", { name: label })
+                    }
                     className={cn(chip, !active && "hover:text-zinc-300")}>
                     {label}
                   </button>
@@ -465,12 +491,14 @@ export const AmpSimButton = ({
                   interfaceOpen && "rotate-90",
                 )}
               />
-              <span className='text-xs text-zinc-400'>Interface</span>
+              <span className='text-xs text-zinc-400'>
+                {t("amp_button.interface")}
+              </span>
               {!interfaceOpen && (
                 <span className='min-w-0 flex-1 truncate text-right text-[11px] text-zinc-500'>
                   {selectedDevice
                     ? `${selectedDevice.name} · ${amp.bufferSize} smp`
-                    : "Not set up"}
+                    : t("amp_button.not_set_up")}
                 </span>
               )}
             </button>
@@ -479,11 +507,11 @@ export const AmpSimButton = ({
               <>
                 <AudioSelect
                   size='sm'
-                  label={`Input${api ? ` (${api})` : ""}`}
+                  label={`${t("settings.input")}${api ? ` (${api})` : ""}`}
                   labelRight={
                     <RippleButton
                       onClick={() => refresh()}
-                      title='Refresh device list'
+                      title={t("settings.refresh_hint")}
                       className='rounded p-0.5 text-zinc-500 transition-colors hover:text-white'>
                       <RefreshCw
                         size={12}
@@ -494,17 +522,21 @@ export const AmpSimButton = ({
                   value={selectedId !== null ? String(selectedId) : ""}
                   onValueChange={(v) => handleSelectDevice(Number(v))}
                   placeholder={
-                    devices.length ? "Select an interface" : "No input devices"
+                    devices.length
+                      ? t("amp_button.select_interface")
+                      : t("amp_button.no_input_devices")
                   }
                   options={devices.map((d) => ({
                     value: String(d.id),
                     label: d.name,
-                    hint: `${d.inputChannels} in`,
+                    hint: t("settings.channels_in", { count: d.inputChannels }),
                   }))}
                 />
 
                 <div className='flex flex-col gap-1.5'>
-                  <span className='text-xs text-zinc-400'>Latency</span>
+                  <span className='text-xs text-zinc-400'>
+                    {t("status.latency")}
+                  </span>
                   <div className='grid grid-cols-3 gap-1.5'>
                     {latencyChoices.map((choice) => {
                       const active = choice.size === amp.bufferSize;
@@ -514,7 +546,7 @@ export const AmpSimButton = ({
                           type='button'
                           onClick={() => amp.setBufferSize(choice.size)}
                           disabled={amp.isBusy}
-                          title={`${choice.size} samples`}
+                          title={t("amp_button.samples", { count: choice.size })}
                           className={cn(
                             "flex flex-col items-center rounded-lg py-1.5 transition-colors disabled:opacity-50",
                             active
@@ -522,7 +554,7 @@ export const AmpSimButton = ({
                               : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
                           )}>
                           <span className='text-[11px] font-medium'>
-                            {choice.label}
+                            {latencyLabel(choice.label)}
                           </span>
                           <span className='text-[10px] opacity-70'>
                             ~{bufferMs(choice.size)} ms
@@ -532,7 +564,7 @@ export const AmpSimButton = ({
                     })}
                   </div>
                   <span className='text-[11px] text-zinc-500'>
-                    Crackling? Go one step safer.
+                    {t("amp_button.crackling")}
                   </span>
                 </div>
               </>
@@ -551,11 +583,11 @@ export const AmpSimButton = ({
               )}
               {amp.overload && (
                 <p className='rounded-lg bg-amber-500/10 px-3 py-2 text-[11px] text-amber-400'>
-                  DSP fell behind and reset (~
-                  {Math.round(amp.overload.driftMs)}ms) — you may have heard a
-                  click.
+                  {t("amp_button.overload", {
+                    drift: Math.round(amp.overload.driftMs),
+                  })}
                   {amp.overload.namEnabled &&
-                    " A lighter NAM model or a safer latency setting helps."}
+                    ` ${t("amp_button.overload_nam_hint")}`}
                 </p>
               )}
               {health === "glitchy" && !interfaceOpen && (
@@ -563,12 +595,12 @@ export const AmpSimButton = ({
                   type='button'
                   onClick={() => setInterfaceOpen(true)}
                   className='rounded-lg bg-amber-500/10 px-3 py-2 text-left text-[11px] text-amber-400 transition-colors hover:bg-amber-500/15'>
-                  Dropouts detected — try a safer latency setting.
+                  {t("amp_button.dropouts_detected")}
                 </button>
               )}
               {amp.connectionIssue?.status === "recovered" && (
                 <p className='rounded-lg bg-emerald-500/10 px-3 py-2 text-[11px] text-emerald-400'>
-                  Audio interface reconnected.
+                  {t("amp_button.reconnected")}
                 </p>
               )}
             </div>
@@ -578,7 +610,7 @@ export const AmpSimButton = ({
             href='/tone-studio'
             className='flex items-center justify-center gap-2 rounded-lg bg-zinc-800/50 px-3 py-2 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white'>
             <SlidersHorizontal size={13} />
-            Open Tone Studio
+            {t("amp_button.open_tone_studio")}
           </Link>
         </div>
       )}

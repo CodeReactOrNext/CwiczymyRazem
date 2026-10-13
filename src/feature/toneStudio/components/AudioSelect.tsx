@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import type { ReactNode } from "react";
 
 export interface AudioSelectOption {
@@ -45,13 +46,16 @@ export const AudioSelect = ({
   value,
   onValueChange,
   options,
-  placeholder = "Select…",
+  placeholder,
   hint,
   disabled,
   title,
   size = "md",
   className,
-}: AudioSelectProps) => (
+}: AudioSelectProps) => {
+  const { t } = useTranslation("tone_studio");
+
+  return (
   <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
     {(label || labelRight) && (
       <div className='flex min-h-[1rem] items-center justify-between gap-2 text-xs text-zinc-400'>
@@ -69,7 +73,7 @@ export const AudioSelect = ({
           "w-full border-0 bg-zinc-800/70 text-zinc-100 shadow-none transition-colors focus:ring-1 focus:ring-cyan-500/40 disabled:opacity-40 data-[placeholder]:text-zinc-500 hover:bg-zinc-800",
           size === "sm" ? "h-8 px-2.5 text-xs" : "h-10 px-3 text-sm",
         )}>
-        <SelectValue placeholder={placeholder} />
+        <SelectValue placeholder={placeholder ?? t("common.select")} />
       </SelectTrigger>
       {/* Above the in-session toolbar popover, which sits on a very high z-index. */}
       <SelectContent className='z-[999999999] max-h-72 border-0 bg-zinc-900 text-zinc-200'>
@@ -93,4 +97,5 @@ export const AudioSelect = ({
     </Select>
     {hint && <span className='text-[11px] text-zinc-500'>{hint}</span>}
   </div>
-);
+  );
+};

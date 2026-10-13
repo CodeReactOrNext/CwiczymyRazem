@@ -3,6 +3,7 @@ import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type {
   ArsenalUserData,
   InventoryItem,
@@ -13,7 +14,6 @@ import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import { SLOT_LABELS } from "../data/components";
 import { MAX_STICKERS } from "../data/guitarParts";
 import { useBuildGuitar, useRenameGuitar } from "../hooks/useBuildGuitar";
 import type { ComponentSlot } from "../types/guitarBuilder.types";
@@ -46,6 +46,7 @@ const BuildTile = ({
   active: boolean;
   onSelect: () => void;
 }) => {
+  const labels = useArsenalLabels();
   const def = GUITARS_BY_ID.get(item.guitarId);
   if (!def || !item.custom) return null;
   return (
@@ -74,10 +75,10 @@ const BuildTile = ({
         </span>
         <span className='flex justify-between text-xs'>
           <span style={{ color: getRarityColor(def.rarity) }}>
-            {def.rarity}
+            {labels.rarity(def.rarity)}
           </span>
           <span className='tabular-nums text-zinc-400'>
-            Lvl {item.custom.level}
+            {labels.t("common.lvl", { level: item.custom.level })}
           </span>
         </span>
       </span>
@@ -92,6 +93,8 @@ const BuildTile = ({
  */
 export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
   const router = useRouter();
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const { mutate: build, isPending } = useBuildGuitar();
   const { mutate: rename, isPending: isRenaming } = useRenameGuitar();
   const [name, setName] = useState("");
@@ -134,7 +137,11 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
       ? rebuildFameCost(editing.custom.level, summary.total)
       : buildFameCost(summary.total);
     const short = fame < cost;
-    const reason = !check.ok ? check.error : short ? "Not enough Fame" : null;
+    const reason = !check.ok
+      ? labels.builderError(check.error)
+      : short
+        ? t("buy.not_enough_fame")
+        : null;
     return (
       <div className='space-y-2'>
         <div className='flex gap-2'>
@@ -143,9 +150,9 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
             onChange={(event) => setName(event.target.value)}
             maxLength={GUITAR_NAME_MAX}
             placeholder={
-              editing ? "Name your guitar" : "Name your guitar (optional)"
+              editing ? t("builder.name_guitar") : t("builder.name_guitar_optional")
             }
-            aria-label='Guitar name'
+            aria-label={t("builder.guitar_name")}
             className='h-10 bg-zinc-900/60'
           />
           {editing && renamed && (
@@ -155,7 +162,7 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
               disabled={isRenaming}
               loading={isRenaming}
               onClick={() => rename({ itemId: editing.id, name: cleanName })}>
-              Save name
+              {t("builder.save_name")}
             </Button>
           )}
         </div>
@@ -176,8 +183,8 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
                   const built = GUITARS_BY_ID.get(result.item.guitarId)?.name;
                   toast.success(
                     editing
-                      ? `${built} rebuilt`
-                      : `${built} built — hang it on your Rig`,
+                      ? t("builder.rebuilt", { name: built })
+                      : t("builder.built", { name: built }),
                   );
                   select(editing ? result.item.id : null);
                 },
@@ -185,7 +192,7 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
             )
           }>
           <span className='flex items-center gap-2'>
-            {editing ? "Rebuild guitar" : "Build guitar"}
+            {editing ? t("builder.rebuild_guitar") : t("builder.build_guitar")}
             <span className='flex items-center gap-1 text-amber-600'>
               <img src='/images/coin.png' alt='' className='h-4 w-4' />
               {cost}
@@ -203,8 +210,7 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
     <div className='flex flex-col items-center gap-4 rounded-lg bg-zinc-900/40 px-6 py-12 text-center'>
       <PackageOpen className='size-8 text-zinc-400' aria-hidden />
       <p className='max-w-sm text-sm text-zinc-400'>
-        No {SLOT_LABELS[slot].toLowerCase()} yet. Parts drop from the Standard,
-        Premium Guitar and Elite Guitar cases.
+        {t("builder.no_slot_yet", { slot: labels.slot(slot).toLowerCase() })}
       </p>
       <Button
         variant='secondary'
@@ -218,7 +224,7 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
             },
           )
         }>
-        Open cases
+        {t("builder.open_cases")}
       </Button>
     </div>
   );
@@ -238,7 +244,7 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
                 : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
             )}>
             <Plus className='size-6' aria-hidden />
-            New guitar
+            {t("builder.new_guitar")}
           </button>
           {builds.map((item) => (
             <BuildTile

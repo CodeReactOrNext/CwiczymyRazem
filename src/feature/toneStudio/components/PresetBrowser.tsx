@@ -8,6 +8,7 @@ import { cn } from "assets/lib/utils";
 import { plateButtonClass } from "feature/toneStudio/components/PluginChrome";
 import { ACCENT_HEX } from "feature/toneStudio/utils/chassis";
 import { isPresetModified } from "feature/toneStudio/utils/presetDiff";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Check,
   ChevronLeft,
@@ -46,6 +47,7 @@ export const PresetBrowser = ({
   onDelete,
 }: PresetBrowserProps) => {
   const [naming, setNaming] = useState(false);
+  const { t } = useTranslation("tone_studio");
   const [name, setName] = useState("");
 
   const activeIndex = presets.findIndex((p) => p.id === activePresetId);
@@ -84,7 +86,7 @@ export const PresetBrowser = ({
             if (e.key === "Enter") commitName();
             if (e.key === "Escape") setNaming(false);
           }}
-          placeholder='Name this tone'
+          placeholder={t("presets.name_this")}
           className='h-9 min-w-0 flex-1 rounded-md bg-zinc-900 px-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-purple-500/50'
         />
         <button
@@ -93,12 +95,12 @@ export const PresetBrowser = ({
           disabled={!name.trim()}
           className={plateButtonClass()}>
           <Save size={14} />
-          Save
+          {t("presets.save")}
         </button>
         <button
           type='button'
           onClick={() => setNaming(false)}
-          title='Cancel'
+          title={t("common.cancel")}
           className={cn(plateButtonClass(), "px-2")}>
           <X size={14} />
         </button>
@@ -112,7 +114,7 @@ export const PresetBrowser = ({
         type='button'
         onClick={() => step(-1)}
         disabled={presets.length === 0}
-        title='Previous preset'
+        title={t("presets.previous")}
         className={cn(plateButtonClass(), "px-2 py-1.5")}>
         <ChevronLeft size={15} />
       </button>
@@ -124,10 +126,10 @@ export const PresetBrowser = ({
             background: "#0b0b0d",
             boxShadow: "inset 0 1px 3px rgba(0,0,0,0.8)",
           }}>
-          <span className='truncate'>{active?.name ?? "No preset loaded"}</span>
+          <span className='truncate'>{active?.name ?? t("presets.none_loaded")}</span>
           {modified && (
             <span
-              aria-label='Edited since loading'
+              aria-label={t("presets.edited")}
               className='h-1.5 w-1.5 shrink-0 rounded-full'
               style={{ background: ACCENT_HEX.amber }}
             />
@@ -138,7 +140,7 @@ export const PresetBrowser = ({
           className='z-[999999999] max-h-80 w-64 overflow-y-auto border-0 bg-zinc-900 text-zinc-200'>
           {presets.length === 0 && (
             <div className='px-2 py-3 text-center text-xs text-zinc-500'>
-              No presets saved yet
+              {t("presets.none_saved")}
             </div>
           )}
           {presets.map((preset) => (
@@ -162,7 +164,7 @@ export const PresetBrowser = ({
                 <span
                   role='button'
                   tabIndex={0}
-                  title='Delete preset'
+                  title={t("presets.delete")}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -186,7 +188,7 @@ export const PresetBrowser = ({
         type='button'
         onClick={() => step(1)}
         disabled={presets.length === 0}
-        title='Next preset'
+        title={t("presets.next")}
         className={cn(plateButtonClass(), "px-2 py-1.5")}>
         <ChevronRight size={15} />
       </button>
@@ -195,19 +197,19 @@ export const PresetBrowser = ({
         <button
           type='button'
           onClick={() => onOverwrite(active)}
-          title={`Overwrite "${active.name}" with the current settings`}
+          title={t("presets.overwrite_hint", { name: active.name })}
           className={cn(plateButtonClass(), "px-2 py-1.5 text-[11px]")}>
           <Save size={13} />
-          Update
+          {t("presets.update")}
         </button>
       )}
       <button
         type='button'
         onClick={() => setNaming(true)}
-        title='Save the current settings as a new preset'
+        title={t("presets.save_as_hint")}
         className={cn(plateButtonClass(), "px-2 py-1.5 text-[11px]")}>
         <Save size={13} />
-        Save as
+        {t("presets.save_as")}
       </button>
     </div>
   );

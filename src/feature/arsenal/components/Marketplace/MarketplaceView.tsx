@@ -3,6 +3,7 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { Store } from "lucide-react";
 import { useMemo } from "react";
 import { useAppSelector } from "store/hooks";
@@ -18,6 +19,7 @@ import { MarketListingCard } from "./MarketListingCard";
 
 export const MarketplaceView = () => {
   const { data: listings, isLoading } = useMarketplace();
+  const { t } = useTranslation("arsenal");
   const { data: arsenal } = useArsenalData();
   const userId = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -49,7 +51,7 @@ export const MarketplaceView = () => {
       <div className='flex flex-col items-center justify-center gap-4 py-20 text-zinc-500'>
         <Store size={48} className='opacity-30' />
         <p className='text-sm font-medium'>
-          No items on the market yet. List one from your collection!
+          {t("market.empty")}
         </p>
       </div>
     );

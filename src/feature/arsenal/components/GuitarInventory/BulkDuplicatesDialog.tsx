@@ -8,7 +8,9 @@ import {
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
 import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getWalletTierTotals } from "feature/arsenal/utils/scrap";
+import { Interpolate } from "lib/i18n/Interpolate";
 import { Coins, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -139,8 +141,10 @@ export const BulkDuplicatesDialog = ({
   onCancel,
   isSelling,
   isScrapping = false,
-  protectedNote = "Equipped and rig guitars are never touched.",
+  protectedNote,
 }: BulkDuplicatesDialogProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const count = items.length;
   const busy = isSelling || isScrapping;
   const partCount = (scrapParts ?? []).reduce((sum, p) => sum + p.qty, 0);
@@ -156,13 +160,16 @@ export const BulkDuplicatesDialog = ({
       <AlertDialogContent className='flex max-h-[85vh] max-w-md flex-col gap-6 border-0 bg-zinc-900 p-6'>
         <AlertDialogHeader className='space-y-2'>
           <AlertDialogTitle className='text-lg font-bold text-white'>
-            Clear duplicates?
+            {t("bulk.title")}
           </AlertDialogTitle>
           <AlertDialogDescription className='text-sm text-zinc-400'>
-            This takes <span className='font-semibold text-white'>{count}</span>{" "}
-            lower-level duplicate
-            {count === 1 ? "" : "s"}, keeping the best copy of each.{" "}
-            {protectedNote} This can&apos;t be undone.
+            <Interpolate
+              text={t("bulk.body", { count })}
+              values={{
+                n: <span className='font-semibold text-white'>{count}</span>,
+              }}
+            />{" "}
+            {protectedNote ?? t("bulk.protected_guitars")} {t("bulk.no_undo")}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -180,7 +187,7 @@ export const BulkDuplicatesDialog = ({
                       border: `1.5px solid ${color}`,
                       boxShadow: `0 0 6px ${color}55`,
                     }}
-                    title='Guitar level'>
+                    title={t("card.guitar.level")}>
                     {item.level}
                   </span>
                   <div className='min-w-0 flex-1'>
@@ -190,7 +197,7 @@ export const BulkDuplicatesDialog = ({
                     <p
                       className='text-[10px] font-medium tracking-wider'
                       style={{ color }}>
-                      {item.rarity}
+                      {labels.rarity(item.rarity)}
                     </p>
                   </div>
                   <span className='flex flex-shrink-0 items-center gap-1 text-xs font-bold text-amber-400'>
@@ -212,10 +219,10 @@ export const BulkDuplicatesDialog = ({
           <PayoutOption
             color={SELL_COLOR}
             glyph={<Coins size={104} strokeWidth={1.25} />}
-            title={isSelling ? "Selling..." : `Sell all ${count}`}
+            title={isSelling ? t("common.selling") : t("parts.sell_all", { count })}
             detail={
               <span className='text-xs text-zinc-400'>
-                Paid straight into Fame Points
+                {t("bulk.paid_into_fame")}
               </span>
             }
             amount={fameReward}
@@ -234,7 +241,7 @@ export const BulkDuplicatesDialog = ({
             <PayoutOption
               color={SCRAP_COLOR}
               glyph={<Wrench size={104} strokeWidth={1.25} />}
-              title={isScrapping ? "Scrapping..." : `Scrap all ${count}`}
+              title={isScrapping ? t("bulk.scrapping") : t("bulk.scrap_all", { count })}
               detail={
                 <>
                   {/* Split by tier — a bare total says nothing about what the
@@ -248,15 +255,14 @@ export const BulkDuplicatesDialog = ({
                         <span
                           className='text-[10px] font-semibold'
                           style={{ color: PART_TIER_COLORS[tier] }}>
-                          {tier}
+                          {labels.partTier(tier)}
                         </span>
                       </span>
                     ))}
                   </span>
                   {salvagedCount > 0 && (
                     <span className='text-xs text-purple-300/90'>
-                      {salvagedCount} mod{salvagedCount === 1 ? "" : "s"} pulled
-                      out and stashed
+                      {t("bulk.mods_pulled", { count: salvagedCount })}
                     </span>
                   )}
                 </>
@@ -273,7 +279,7 @@ export const BulkDuplicatesDialog = ({
           <AlertDialogCancel
             disabled={busy}
             className='mt-0 w-full border-0 bg-zinc-700 text-white hover:bg-zinc-600 hover:text-white'>
-            Cancel
+            {t("common.cancel")}
           </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>

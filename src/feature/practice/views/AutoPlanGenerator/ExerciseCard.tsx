@@ -1,4 +1,5 @@
 import { useSortable } from "@dnd-kit/sortable";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "assets/components/ui/badge";
 import {
@@ -53,6 +54,7 @@ export const ExerciseCard = ({
   onPreview,
 }: ExerciseCardProps) => {
   const { t } = useTranslation(["exercises", "common", "practice_hub"]);
+  const localizeExercise = useLocalizeExercise();
   const {
     attributes,
     listeners,
@@ -104,7 +106,7 @@ export const ExerciseCard = ({
           type="button"
           {...attributes}
           {...listeners}
-          aria-label={t("practice_hub:auto.reorder", { title: exercise.title })}
+          aria-label={t("practice_hub:auto.reorder", { title: localizeExercise(exercise).title })}
           title={t("practice_hub:auto.drag_to_reorder")}
           className="flex shrink-0 cursor-grab touch-none items-center pl-2 pr-1 text-zinc-600 transition-colors hover:text-zinc-300 focus-visible:text-zinc-200 focus-visible:outline-none active:cursor-grabbing sm:pl-3"
         >
@@ -115,10 +117,10 @@ export const ExerciseCard = ({
         <div className="flex-1 min-w-0 py-4 pr-2 pl-1 sm:py-5 flex flex-col justify-center">
           <div>
             <h3 className="font-semibold text-[15px] sm:text-[16px] leading-tight tracking-tight text-zinc-100 group-hover:text-white transition-colors duration-300">
-              {exercise.title}
+              {localizeExercise(exercise).title}
             </h3>
             <p className="mt-1.5 hidden text-[13px] sm:block sm:text-[14px] sm:line-clamp-2 leading-relaxed text-zinc-500 group-hover:text-zinc-300 transition-colors duration-300 pr-2">
-              {exercise.description}
+              {localizeExercise(exercise).description}
             </p>
           </div>
 
@@ -182,7 +184,7 @@ export const ExerciseCard = ({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                aria-label={t("practice_hub:auto.options_for", { title: exercise.title })}
+                aria-label={t("practice_hub:auto.options_for", { title: localizeExercise(exercise).title })}
                 title={t("practice_hub:auto.options")}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-white/10 data-[state=open]:text-zinc-100"
               >

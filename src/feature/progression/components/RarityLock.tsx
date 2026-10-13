@@ -1,5 +1,8 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { GuitarRarity } from "feature/arsenal/types/arsenal.types";
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
 import { Lock } from "lucide-react";
 
 import { unlocksAtLevelLabel } from "../data/levelLock";
@@ -32,8 +35,18 @@ export const lockedArtFilter = (base: string, locked: boolean): string =>
 export const rarityLockLabel = unlocksAtLevelLabel;
 
 /** The long form, for tooltips and anywhere there is room to say why. */
-export const rarityLockReason = (rarity: GuitarRarity, lvl: number): string =>
-  `${rarity} gear goes in your rig at level ${lvl}. Until then it is yours to keep, sell and work on — just not to play.`;
+export const rarityLockReason = (
+  rarity: GuitarRarity,
+  lvl: number,
+  t?: Translate,
+  rarityLabel: string = rarity,
+): string =>
+  translateOr(
+    t,
+    "arsenal:lock.reason",
+    "{{rarity}} gear goes in your rig at level {{lvl}}. Until then it is yours to keep, sell and work on — just not to play.",
+    { rarity: rarityLabel, lvl },
+  );
 
 interface RarityLockNoteProps {
   rarity: GuitarRarity;
@@ -57,13 +70,16 @@ export const RarityLockNote = ({
   lvl,
   color,
   className,
-}: RarityLockNoteProps) => (
+}: RarityLockNoteProps) => {
+  const labels = useArsenalLabels();
+
+  return (
   <div
     className={cn(
       "absolute bottom-2 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap",
       className,
     )}
-    title={rarityLockReason(rarity, lvl)}>
+    title={rarityLockReason(rarity, lvl, labels.t, labels.rarity(rarity))}>
     {/* The note lies straight on the artwork rather than on a plate — a chip
         here would be the fourth boxed thing on the card. A shadow buys the
         contrast a box would have, over a pale guitar body as well as a dark
@@ -76,7 +92,8 @@ export const RarityLockNote = ({
     <span
       className='text-[12px] font-bold tracking-wide'
       style={{ color, textShadow: "0 1px 3px rgba(0,0,0,0.95)" }}>
-      {rarityLockLabel(lvl)}
+      {rarityLockLabel(lvl, labels.t)}
     </span>
   </div>
-);
+  );
+};

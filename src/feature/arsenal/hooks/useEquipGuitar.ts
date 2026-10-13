@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { setSelectedGuitar } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -15,6 +16,7 @@ interface EquipGuitarPayload {
 }
 
 export const useEquipGuitar = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
@@ -26,7 +28,7 @@ export const useEquipGuitar = () => {
       dispatch(setSelectedGuitar({ imageId, year, country }));
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.error || "Failed to equip guitar";
+      const message = error?.response?.data?.error || t("toasts.err.equip");
       toast.error(message);
     },
   });

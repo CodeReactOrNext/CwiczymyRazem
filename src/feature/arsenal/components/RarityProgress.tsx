@@ -1,3 +1,5 @@
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+
 import type { GuitarRarity } from "../types/arsenal.types";
 import { RARITY_STYLES } from "./RarityBadge";
 
@@ -19,6 +21,7 @@ interface RaritySectionHeaderProps {
 
 /** Heading + progress bar shown above each rarity's group of cards. */
 export const RaritySectionHeader = ({ rarity, owned, total }: RaritySectionHeaderProps) => {
+  const labels = useArsenalLabels();
   const color = RARITY_STYLES[rarity].baseColor;
   const pct = total === 0 ? 0 : Math.round((owned / total) * 100);
 
@@ -28,7 +31,7 @@ export const RaritySectionHeader = ({ rarity, owned, total }: RaritySectionHeade
         className="text-sm font-black capitalize tracking-wider"
         style={{ color }}
       >
-        {rarity}
+        {labels.rarity(rarity)}
       </span>
       <div className="h-1 w-24 overflow-hidden rounded-full bg-zinc-800">
         <div

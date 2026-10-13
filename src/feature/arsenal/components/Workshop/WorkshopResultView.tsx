@@ -5,6 +5,7 @@ import type {
   ScrapPart,
   WorkshopKind,
 } from "feature/arsenal/types/arsenal.types";
+import { useTranslation } from "hooks/useTranslation";
 
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
@@ -43,7 +44,10 @@ interface WorkshopResultViewProps {
  * Showing the real card rather than a summary line is the point — the work the
  * player just paid for should be something they can look at.
  */
-export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => (
+export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => {
+  const { t } = useTranslation("arsenal");
+
+  return (
   <div className='grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,250px)_minmax(0,1fr)]'>
     <Pop trigger={result.levelAfter} className='mx-auto w-full max-w-[250px]'>
       {result.kind === "guitar" ? (
@@ -57,7 +61,7 @@ export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => (
       {result.headline && (
         <div className='flex flex-col gap-2 rounded-lg bg-zinc-800/40 p-4'>
           <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
-            Done
+            {t("mods.done")}
           </span>
           <span className='text-lg font-black text-purple-300'>
             {result.headline}
@@ -68,7 +72,7 @@ export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => (
       {result.rarityBefore && result.rarityAfter && (
         <Reveal className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-5'>
           <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
-            Promoted
+            {t("workshop.promoted")}
           </span>
           <RarityDelta from={result.rarityBefore} to={result.rarityAfter} />
         </Reveal>
@@ -76,7 +80,7 @@ export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => (
 
       <div className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-4'>
         <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
-          Level
+          {t("workshop.level")}
         </span>
         <LevelDelta
           from={result.levelBefore}
@@ -88,7 +92,7 @@ export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => (
       {result.conditionAfter !== result.conditionBefore && (
         <div className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-4'>
           <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
-            Condition
+            {t("condition.label")}
           </span>
           <ConditionDelta
             from={result.conditionBefore}
@@ -97,7 +101,8 @@ export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => (
         </div>
       )}
 
-      <PartsBill parts={result.spent} title='Parts used' />
+      <PartsBill parts={result.spent} title={t("workshop.parts_used")} />
     </div>
   </div>
-);
+  );
+};

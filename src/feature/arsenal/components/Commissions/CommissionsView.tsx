@@ -3,6 +3,7 @@ import {
   getCommissionQuote,
   getTargetSubject,
 } from "feature/arsenal/data/commission";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type {
   ArsenalUserData,
   WorkshopKind,
@@ -34,6 +35,8 @@ interface CommissionsViewProps {
  */
 export const CommissionsView = ({ data, fame }: CommissionsViewProps) => {
   const [kind, setKind] = useState<WorkshopKind>("guitar");
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const [rarity, setRarity] = useState<DexRarityFilter>("all");
   const [ordering, setOrdering] = useState<CommissionTarget | null>(null);
 
@@ -71,18 +74,18 @@ export const CommissionsView = ({ data, fame }: CommissionsViewProps) => {
           <div className='flex items-center gap-3'>
             <span className='h-6 w-0.5 rounded-full bg-cyan-400' aria-hidden />
             <h2 className='font-display text-2xl font-black text-zinc-100'>
-              Commissions
+              {t("view.tabs.commissions")}
             </h2>
           </div>
           <p className='text-sm text-zinc-500'>
-            Any model missing from your Dex, built stock to order — once each.
+            {t("commissions.subtitle")}
           </p>
         </div>
         <p className='text-sm text-zinc-400'>
           <span className='font-bold tabular-nums text-zinc-100'>
             {catalog.length}
           </span>{" "}
-          left to build
+          {t("commissions.left_to_build")}
         </p>
       </div>
 
@@ -90,19 +93,19 @@ export const CommissionsView = ({ data, fame }: CommissionsViewProps) => {
         <SegmentGroup>
           <Segment active={kind === "guitar"} onClick={() => setKind("guitar")}>
             <Guitar size={14} />
-            Guitars
+            {t("collection.scope.guitars")}
             <span className='text-zinc-500'>{counts.guitar}</span>
           </Segment>
           <Segment active={kind === "effect"} onClick={() => setKind("effect")}>
             <Layers size={14} />
-            Pedals
+            {t("collection.scope.pedals")}
             <span className='text-zinc-500'>{counts.effect}</span>
           </Segment>
         </SegmentGroup>
 
         <SegmentGroup>
           <Segment active={rarity === "all"} onClick={() => setRarity("all")}>
-            All
+            {t("collection.scope.all")}
           </Segment>
           {DEX_RARITY_CHIPS.map((r) => (
             <Segment key={r} active={rarity === r} onClick={() => setRarity(r)}>
@@ -110,7 +113,7 @@ export const CommissionsView = ({ data, fame }: CommissionsViewProps) => {
                 className='h-1.5 w-1.5 rounded-full'
                 style={{ backgroundColor: RARITY_STYLES[r].baseColor }}
               />
-              {r}
+              {labels.rarity(r)}
             </Segment>
           ))}
         </SegmentGroup>
@@ -120,8 +123,8 @@ export const CommissionsView = ({ data, fame }: CommissionsViewProps) => {
         {visible.length === 0 ? (
           <p className='py-16 text-center text-sm text-zinc-500'>
             {catalog.length === 0
-              ? "Your Dex is complete — there is nothing left for the bench to build."
-              : "Nothing left to build here. Try another rarity or kind."}
+              ? t("commissions.dex_complete")
+              : t("commissions.nothing_here")}
           </p>
         ) : (
           <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>

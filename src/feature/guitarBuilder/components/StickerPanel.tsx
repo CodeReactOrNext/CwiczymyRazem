@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { Slider } from "assets/components/ui/slider";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { Trash2 } from "lucide-react";
 
 import { STICKER_SIZE } from "../data/guitarParts";
@@ -47,20 +48,21 @@ export const StickerPanel = ({
   onRemove,
   onClear,
 }: StickerPanelProps) => {
+  const { t } = useArsenalLabels();
   if (!hasStickers) return null;
   return (
     <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 sm:flex-row sm:items-center sm:gap-8'>
       {selected ? (
         <div className='grid min-w-0 flex-1 gap-4 sm:grid-cols-2 sm:gap-6'>
           <SliderRow
-            label='Size'
+            label={t("builder.size")}
             value={selected.size}
             min={STICKER_SIZE.min}
             max={STICKER_SIZE.max}
             onChange={(size) => onChange(selected.id, { size })}
           />
           <SliderRow
-            label='Rotate'
+            label={t("builder.rotate")}
             value={selected.rotation}
             min={-180}
             max={180}
@@ -69,7 +71,7 @@ export const StickerPanel = ({
         </div>
       ) : (
         <p className='flex-1 text-sm text-zinc-400'>
-          Pick a sticker on the guitar to size or turn it.
+          {t("builder.sticker_hint")}
         </p>
       )}
       <div className='flex gap-2'>
@@ -79,11 +81,11 @@ export const StickerPanel = ({
             size='sm'
             onClick={() => onRemove(selected.id)}>
             <Trash2 className='mr-2' />
-            Peel off
+            {t("builder.peel_off")}
           </Button>
         )}
         <Button variant='ghost' size='sm' onClick={onClear}>
-          Peel off all
+          {t("builder.peel_off_all")}
         </Button>
       </div>
     </div>

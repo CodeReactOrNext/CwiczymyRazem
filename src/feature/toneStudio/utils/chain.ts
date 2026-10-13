@@ -1,3 +1,4 @@
+import type { Translate } from "lib/i18n/translate";
 import type { AmpParams } from "types/nativeAudio";
 
 export type ToneAccent = "cyan" | "amber" | "emerald" | "purple" | "orange";
@@ -18,6 +19,16 @@ export interface ChainBlock {
  * delay. Single source for both Tone Studio's rack of units and the
  * in-session quick toggles, so the two never disagree on order or state.
  */
+/** A block's slot name in the player's language; `label` stays the English one. */
+export const chainBlockLabel = (
+  block: ChainBlock,
+  params: AmpParams,
+  t: Translate,
+): string =>
+  block.key === "amp"
+    ? t(params.namEnabled ? "chain.amp_nam" : "chain.amp_classic", block.label(params))
+    : t(`chain.${block.key}`, block.label(params));
+
 export const CHAIN_BLOCKS: ChainBlock[] = [
   {
     key: "gate",

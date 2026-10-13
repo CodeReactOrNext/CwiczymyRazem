@@ -10,6 +10,7 @@ import {
   GUITARS_BY_ID,
 } from "feature/arsenal/data/guitarDefinitions";
 import { getItemLevel } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import {
   buildDiscoveredSet,
   buildOwnershipMap,
@@ -58,6 +59,8 @@ interface DexViewProps {
 
 export const DexView = ({ data }: DexViewProps) => {
   const [kind, setKind] = useState<DexKind>("guitar");
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const [rarity, setRarity] = useState<DexRarityFilter>("all");
   const [status, setStatus] = useState<DexStatusFilter>("all");
   const [query, setQuery] = useState("");
@@ -194,7 +197,10 @@ export const DexView = ({ data }: DexViewProps) => {
     );
   }, [kind, guitarEntries, effectEntries, rarity, status, query, page]);
 
-  const kindLabel = kind === "guitar" ? "Guitars" : "Pedals";
+  const kindLabel =
+    kind === "guitar"
+      ? t("collection.scope.guitars")
+      : t("collection.scope.pedals");
 
   return (
     <div className='flex flex-col gap-5'>
@@ -203,7 +209,7 @@ export const DexView = ({ data }: DexViewProps) => {
         <div className='flex items-center gap-3'>
           <span className='h-6 w-0.5 rounded-full bg-cyan-400' aria-hidden />
           <h2 className='font-display text-2xl font-black text-zinc-100'>
-            Discoveries
+            {t("dex.title")}
           </h2>
         </div>
         <div className='min-w-[14rem] flex-1 sm:max-w-xs'>
@@ -211,7 +217,7 @@ export const DexView = ({ data }: DexViewProps) => {
             <span className='font-bold tabular-nums text-zinc-100'>
               {totalOwned}
             </span>{" "}
-            / {totalAll} discovered ·{" "}
+            / {t("dex.discovered_count", { total: totalAll })} ·{" "}
             <span className='font-semibold tabular-nums text-zinc-200'>
               {totalPct}%
             </span>
@@ -233,7 +239,7 @@ export const DexView = ({ data }: DexViewProps) => {
             onClick={() => changeKind("guitar")}
             className={cn(kind === "guitar" && "text-cyan-300")}>
             <Guitar size={14} />
-            Guitars
+            {t("collection.scope.guitars")}
             <span className='text-zinc-500'>
               {guitarProgress.owned} / {guitarProgress.total}
             </span>
@@ -243,7 +249,7 @@ export const DexView = ({ data }: DexViewProps) => {
             onClick={() => changeKind("effect")}
             className={cn(kind === "effect" && "text-cyan-300")}>
             <Layers size={14} />
-            Pedals
+            {t("collection.scope.pedals")}
             <span className='text-zinc-500'>
               {effectProgress.owned} / {effectProgress.total}
             </span>
@@ -254,7 +260,7 @@ export const DexView = ({ data }: DexViewProps) => {
           <Segment
             active={rarity === "all"}
             onClick={() => changeRarity("all")}>
-            All
+            {t("collection.scope.all")}
           </Segment>
           {DEX_RARITY_CHIPS.map((r) => (
             <Segment
@@ -265,7 +271,7 @@ export const DexView = ({ data }: DexViewProps) => {
                 className='h-1.5 w-1.5 rounded-full'
                 style={{ backgroundColor: RARITY_STYLES[r].baseColor }}
               />
-              {r}
+              {labels.rarity(r)}
             </Segment>
           ))}
         </SegmentGroup>
@@ -274,18 +280,18 @@ export const DexView = ({ data }: DexViewProps) => {
           <Segment
             active={status === "all"}
             onClick={() => changeStatus("all")}>
-            All
+            {t("collection.scope.all")}
           </Segment>
           <Segment
             active={status === "discovered"}
             onClick={() => changeStatus("discovered")}
             className={cn(status === "discovered" && "text-cyan-300")}>
-            Discovered
+            {t("dex.discovered")}
           </Segment>
           <Segment
             active={status === "missing"}
             onClick={() => changeStatus("missing")}>
-            Missing
+            {t("dex.missing")}
           </Segment>
         </SegmentGroup>
 
@@ -293,8 +299,8 @@ export const DexView = ({ data }: DexViewProps) => {
           <Input
             value={query}
             onChange={(e) => changeQuery(e.target.value)}
-            placeholder='Search...'
-            aria-label='Search discoveries'
+            placeholder={t("dex.search_placeholder")}
+            aria-label={t("dex.search")}
             startIcon={<Search size={14} className='ml-1 text-zinc-500' />}
             className='h-9 border-0 bg-arsenal-section text-sm text-zinc-100 placeholder:text-zinc-500'
           />
@@ -305,7 +311,7 @@ export const DexView = ({ data }: DexViewProps) => {
       <div className='rounded-lg bg-arsenal-bg p-3 sm:p-4'>
         {wall.items.length === 0 ? (
           <p className='py-16 text-center text-sm text-zinc-500'>
-            Nothing on this wall matches. Clear a filter or two.
+            {t("dex.no_match")}
           </p>
         ) : (
           <div className='grid grid-cols-2 gap-3 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-6'>
@@ -321,7 +327,7 @@ export const DexView = ({ data }: DexViewProps) => {
               type='button'
               onClick={() => setPage(wall.page - 1)}
               disabled={wall.page === 0}
-              aria-label='Previous wall'
+              aria-label={t("dex.prev_wall")}
               className='rounded-md p-1.5 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:text-zinc-700 hover:bg-zinc-100/10 hover:text-zinc-100 disabled:hover:bg-transparent'>
               <ChevronLeft size={18} />
             </button>
@@ -335,7 +341,7 @@ export const DexView = ({ data }: DexViewProps) => {
               type='button'
               onClick={() => setPage(wall.page + 1)}
               disabled={wall.page >= wall.pageCount - 1}
-              aria-label='Next wall'
+              aria-label={t("dex.next_wall")}
               className='rounded-md p-1.5 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:text-zinc-700 hover:bg-zinc-100/10 hover:text-zinc-100 disabled:hover:bg-transparent'>
               <ChevronRight size={18} />
             </button>
@@ -347,7 +353,7 @@ export const DexView = ({ data }: DexViewProps) => {
                   key={i}
                   type='button'
                   onClick={() => setPage(i)}
-                  aria-label={`Wall ${i + 1}`}
+                  aria-label={t("dex.wall_n", { n: i + 1 })}
                   aria-current={i === wall.page ? "page" : undefined}
                   className={cn(
                     "h-1.5 rounded-full transition-all",

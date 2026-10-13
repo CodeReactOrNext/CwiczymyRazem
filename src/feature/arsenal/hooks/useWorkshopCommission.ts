@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deductFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -12,6 +13,7 @@ import { ARSENAL_QUERY_KEY } from "./useArsenalData";
  * recomputed server-side from the stored account.
  */
 export const useWorkshopCommission = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
@@ -32,7 +34,7 @@ export const useWorkshopCommission = () => {
     onError: (error: unknown) => {
       const message =
         (error as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error || "Failed to commission";
+          ?.error || t("toasts.err.commission");
       toast.error(message);
     },
   });

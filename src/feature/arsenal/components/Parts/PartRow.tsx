@@ -1,9 +1,9 @@
 import { cn } from "assets/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import {
-  getPartLabel,
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { PartId, PartTier } from "feature/arsenal/types/arsenal.types";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
@@ -101,9 +101,12 @@ export const PartRow = ({
   index = 0,
   ledger,
 }: PartRowProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const isBill = need != null && have != null;
   const ok = isBill ? have >= need : true;
-  const name = label ?? (partId ? getPartLabel(partId) : "");
+  const name = label ?? (partId ? labels.part(partId) : "");
+  const tierName = tier ? labels.partTier(tier) : undefined;
   const size = ICON_SIZE[variant];
   const tierColor = tier ? PART_TIER_COLORS[tier] : undefined;
 
@@ -114,7 +117,11 @@ export const PartRow = ({
       transition={{ delay: Math.min(index * 0.04, 0.25), duration: 0.25 }}
       title={
         isBill
-          ? `${name}${tier ? ` (${tier})` : ""} — you hold ${have}, this needs ${need}`
+          ? t("part_row.title", {
+              name: tierName ? `${name} (${tierName})` : name,
+              have,
+              need,
+            })
           : undefined
       }
       className={partRow({ variant, ok })}>
@@ -152,7 +159,7 @@ export const PartRow = ({
             <span
               className='text-xs font-semibold'
               style={{ color: tierColor }}>
-              {tier}
+              {tierName}
             </span>
           )}
         </span>
@@ -173,7 +180,7 @@ export const PartRow = ({
                   dense ? "text-[10px]" : "text-sm",
                 )}
                 style={{ color: tierColor }}>
-                {tier}
+                {tierName}
               </span>
             )}
           </span>
@@ -190,8 +197,9 @@ export const PartRow = ({
                       )}>
                       {need}
                     </span>{" "}
-                    required <span className='text-zinc-600'>/</span> {have}{" "}
-                    owned
+                    {t("part_row.required")}{" "}
+                    <span className='text-zinc-600'>/</span> {have}{" "}
+                    {t("part_row.owned")}
                   </span>
                   <span
                     className={cn(
@@ -199,8 +207,8 @@ export const PartRow = ({
                       ok ? "text-zinc-500" : "text-amber-400/80",
                     )}>
                     {ok
-                      ? `After ${ledger}: ${have! - need!} left`
-                      : `${need! - have!} short`}
+                      ? t("part_row.after_left", { job: ledger, left: have! - need! })
+                      : t("part_row.short", { count: need! - have! })}
                   </span>
                 </span>
               ) : (
@@ -218,8 +226,8 @@ export const PartRow = ({
                       ok ? "text-zinc-500" : "text-amber-400/80",
                     )}>
                     {ok
-                      ? `you have ${have}`
-                      : `you have ${have} — ${need! - have!} short`}
+                      ? t("part_row.you_have", { have })
+                      : t("part_row.you_have_short", { have, short: need! - have! })}
                   </span>
                 </span>
               )}

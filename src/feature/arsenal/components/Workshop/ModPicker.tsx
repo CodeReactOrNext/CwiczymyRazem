@@ -11,6 +11,7 @@ import type {
   ModFeatureDef,
   ModOption,
 } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { motion } from "framer-motion";
 import { Dices, Trash2 } from "lucide-react";
 
@@ -114,14 +115,18 @@ const RemoveButton = ({
   fame: number;
   disabled: boolean;
   onRemove: () => void;
-}) => (
+}) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
+
+  return (
   <TooltipProvider delayDuration={100}>
     <Tooltip>
       <TooltipTrigger asChild>
         <button
           onClick={onRemove}
           disabled={disabled}
-          aria-label={`Take this mod off for ${fame} Fame`}
+          aria-label={t("mods.remove_aria", { fame })}
           className={cn(
             "flex shrink-0 items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-4 py-3.5 text-sm font-bold text-zinc-400 transition-colors click-behavior",
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400/60",
@@ -134,13 +139,12 @@ const RemoveButton = ({
         </button>
       </TooltipTrigger>
       <TooltipContent className='max-w-[280px] leading-relaxed'>
-        Takes the mod off the instrument for {fame} Fame and frees its slot. The
-        mod is destroyed on the way out — it is not put in your stash and cannot
-        be fitted again.
+        {t("mods.remove_hint", { fame })}
       </TooltipContent>
     </Tooltip>
   </TooltipProvider>
-);
+  );
+};
 
 interface ModRowProps {
   mod: ModOption;
@@ -169,7 +173,11 @@ const ModRow = ({
   removeFame = 0,
   removeDisabled = false,
   index = 0,
-}: ModRowProps) => (
+}: ModRowProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
+
+  return (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
@@ -197,10 +205,12 @@ const ModRow = ({
             "min-w-0 truncate text-base font-bold",
             mod.affordable ? "text-zinc-100" : "text-zinc-400",
           )}>
-          {mod.label}
+          {labels.mod(mod.id, mod.label)}
         </span>
         <span className='shrink-0 text-sm tabular-nums text-zinc-500'>
-          {points != null ? "re-rolls" : "rolls"} +{mod.min} to +{mod.max}
+          {points != null
+            ? t("mods.rerolls_range", { min: mod.min, max: mod.max })
+            : t("mods.rolls_range", { min: mod.min, max: mod.max })}
         </span>
       </div>
 
@@ -224,7 +234,8 @@ const ModRow = ({
       )}
     </div>
   </motion.div>
-);
+  );
+};
 
 /**
  * A mod the player already owns, offered to this instrument.
@@ -247,7 +258,11 @@ const SalvagedRow = ({
   busy: boolean;
   onFit: () => void;
   index: number;
-}) => (
+}) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
+
+  return (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
@@ -265,11 +280,11 @@ const SalvagedRow = ({
           +{mod.points}
         </span>
         <span className='min-w-0 truncate text-base font-bold text-zinc-100'>
-          {mod.label}
+          {labels.mod(mod.featureId, mod.label)}
         </span>
       </div>
       <span className='text-sm text-zinc-500'>
-        From {mod.sourceName} — goes on as it is, nothing re-rolled
+        {t("mods.from_source", { source: mod.sourceName })}
       </span>
     </div>
 
@@ -282,10 +297,11 @@ const SalvagedRow = ({
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400",
         "disabled:pointer-events-none disabled:opacity-40",
       )}>
-      Install
+      {t("salvage.install")}
     </button>
   </motion.div>
-);
+  );
+};
 
 interface ModPickerProps {
   /** Mods the player owns that this instrument could take — the only way one goes on. */
@@ -324,34 +340,33 @@ export const ModPicker = ({
   onReroll,
   onFitSalvaged,
   onRemove,
-}: ModPickerProps) => (
+}: ModPickerProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
+
+  return (
   <div className='flex flex-col gap-7'>
     <div className='flex flex-col gap-3'>
       <div className='flex flex-col gap-1.5'>
-        <SectionLabel>From your stash</SectionLabel>
+        <SectionLabel>{t("mods.from_stash")}</SectionLabel>
         {/*
           The one rule of this bench, written where the player is standing when
           it matters. It is the thing that changed, and the thing every empty
           list below is explained by.
         */}
         <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
-          A mod is a component, and the bench fits the one you hand it — it
-          cannot make one. Mods come off gear you scrap and off the
-          Trader&apos;s counter, and they go on at the value they already carry:
-          nothing is re-rolled and nothing is charged.
+          {t("mods.stash_intro")}
         </p>
         {slotsFull && salvaged.length > 0 && (
           <p className='max-w-xl text-sm leading-relaxed text-amber-400/80'>
-            Every mod slot at this rarity is filled — a promotion buys the room
-            for these.
+            {t("mods.slots_full")}
           </p>
         )}
       </div>
 
       {salvaged.length === 0 ? (
         <div className='rounded-lg bg-zinc-800/20 p-6 text-base leading-relaxed text-zinc-400'>
-          Nothing you own fits this instrument. Scrap something carrying a mod —
-          one always survives a teardown — or see what the Trader has today.
+          {t("mods.nothing_fits")}
         </div>
       ) : (
         <div className='flex flex-col gap-2'>
@@ -372,22 +387,17 @@ export const ModPicker = ({
     {fitted.length > 0 && (
       <div className='flex flex-col gap-3'>
         <div className='flex flex-col gap-1.5'>
-          <SectionLabel>Installed</SectionLabel>
+          <SectionLabel>{t("mods.installed")}</SectionLabel>
           {/*
             The tooltips carry each row's own numbers, but a tooltip is nothing on
             a phone — so the rule that costs a player levels is written once here,
             where it cannot be missed.
           */}
           <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
-            A re-roll is the one job here that spends parts. It buys a brand-new
-            value from the mod&apos;s range, and whatever comes up replaces what
-            the mod is worth now — there is no keeping the better of the two.
+            {t("mods.reroll_intro")}
           </p>
           <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
-            Taking one off costs {removeFame} Fame and frees its slot. The mod
-            comes off the instrument for good: it is not put back in your stash,
-            it cannot be fitted anywhere else, and the level it was worth goes
-            with it.
+            {t("mods.remove_intro", { fame: removeFame })}
           </p>
         </div>
         <div className='flex flex-col gap-2'>
@@ -397,12 +407,19 @@ export const ModPicker = ({
               mod={mod}
               index={i}
               points={mod.points}
-              actionLabel='Re-roll'
-              actionHint={`Pays this bill again for one fresh roll between +${mod.min} and +${mod.max}. It replaces +${mod.points} either way — ${
-                mod.points > mod.min
-                  ? `${mod.points - mod.min} of the ${mod.max - mod.min + 1} results are worse than what it carries now`
-                  : "the only way from here is up or sideways"
-              }.`}
+              actionLabel={t("mods.reroll")}
+              actionHint={t("mods.reroll_hint", {
+                min: mod.min,
+                max: mod.max,
+                points: mod.points,
+                odds:
+                  mod.points > mod.min
+                    ? t("mods.reroll_worse", {
+                        worse: mod.points - mod.min,
+                        total: mod.max - mod.min + 1,
+                      })
+                    : t("mods.reroll_only_up"),
+              })}
               disabled={!mod.affordable || busy}
               onAction={() => onReroll(mod.id)}
               onRemove={() => onRemove(mod.id)}
@@ -417,10 +434,9 @@ export const ModPicker = ({
     {compatible.length > 0 && (
       <div className='flex flex-col gap-3'>
         <div className='flex flex-col gap-1.5'>
-          <SectionLabel>Would fit this build</SectionLabel>
+          <SectionLabel>{t("mods.would_fit")}</SectionLabel>
           <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
-            What to keep an eye out for. Any of these would go onto this
-            instrument the day one reaches your stash.
+            {t("mods.would_fit_hint")}
           </p>
         </div>
         {/*
@@ -435,10 +451,10 @@ export const ModPicker = ({
               className='flex items-center gap-2.5 rounded-lg bg-zinc-800/40 py-2 pl-2 pr-4'>
               <ModArt modId={mod.id} size={32} />
               <span className='text-sm font-semibold text-zinc-300'>
-                {mod.label}
+                {labels.mod(mod.id, mod.label)}
               </span>
               <span className='text-xs tabular-nums text-zinc-500'>
-                +{mod.min} to +{mod.max}
+                {t("mods.range", { min: mod.min, max: mod.max })}
               </span>
             </span>
           ))}
@@ -446,4 +462,5 @@ export const ModPicker = ({
       </div>
     )}
   </div>
-);
+  );
+};

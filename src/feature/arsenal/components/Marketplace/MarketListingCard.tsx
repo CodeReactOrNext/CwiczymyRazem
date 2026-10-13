@@ -8,6 +8,7 @@ import Avatar from "components/UI/Avatar";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getSalvageableMod } from "feature/arsenal/data/salvage";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { DexStatus } from "feature/arsenal/utils/dex";
 import {
   getEffectScrapYield,
@@ -82,6 +83,8 @@ export const MarketListingCard = ({
 }: MarketListingCardProps) => {
   const canAfford = currentFame >= listing.price;
 
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const scrapParts = getListingScrapYield(listing);
   // The mod a teardown of this instance would hand over. Picked by hashing the
   // item's own id, so the buyer gets exactly the one advertised here — nothing
@@ -141,7 +144,7 @@ export const MarketListingCard = ({
                 <Unplug size={13} strokeWidth={2.5} className='shrink-0' />
                 <ModArt modId={salvaged.featureId} size={24} />
                 <span className='min-w-0 truncate text-[11px] font-semibold'>
-                  {salvaged.label}
+                  {labels.mod(salvaged.featureId, salvaged.label)}
                 </span>
                 <span className='shrink-0 text-[11px] font-bold tabular-nums'>
                   +{salvaged.points}
@@ -152,10 +155,16 @@ export const MarketListingCard = ({
               side='top'
               className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
               <span className='text-[11px] text-zinc-300'>
-                Scrap this and {salvaged.label} comes off whole, worn down to +
-                {salvaged.points} from +{salvaged.pointsBefore}. It goes to the
-                stash and fits onto another{" "}
-                {listing.itemType === "guitar" ? "guitar" : "pedal"} for free.
+                {t(
+                  listing.itemType === "guitar"
+                    ? "market.salvage_hint_guitar"
+                    : "market.salvage_hint_effect",
+                  {
+                    name: labels.mod(salvaged.featureId, salvaged.label),
+                    points: salvaged.points,
+                    before: salvaged.pointsBefore,
+                  },
+                )}
               </span>
             </TooltipContent>
           </Tooltip>
@@ -173,7 +182,7 @@ export const MarketListingCard = ({
           disabled={isCancelling}
           className='flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-800 text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 hover:bg-zinc-700 hover:text-white'>
           <X size={13} strokeWidth={2.5} />
-          {isCancelling ? "Cancelling..." : "Cancel listing"}
+          {isCancelling ? t("market.cancelling") : t("market.cancel_listing")}
         </button>
       ) : (
         <BuyButton

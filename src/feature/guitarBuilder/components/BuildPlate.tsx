@@ -1,4 +1,5 @@
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import {
   animate,
   motion,
@@ -8,7 +9,6 @@ import {
 } from "framer-motion";
 import { useEffect } from "react";
 
-import { SLOT_LABELS } from "../data/components";
 import type { buildLevel } from "../utils/components";
 
 type Summary = ReturnType<typeof buildLevel>;
@@ -48,6 +48,15 @@ const CountingLevel = ({ value }: { value: number }) => {
  */
 export const BuildPlate = ({ name, summary, pulse }: BuildPlateProps) => {
   const color = getRarityColor(summary.rarity);
+  const labels = useArsenalLabels();
+  const { t } = labels;
+  // The sticker line's name is built in the util as "Best 2 of 3".
+  const lineName = (line: { slot: string; name: string }) => {
+    const best = line.slot === "sticker" && /^Best (\d+) of (\d+)$/.exec(line.name);
+    return best
+      ? t("builder.best_of", { best: best[1], total: best[2] })
+      : line.name;
+  };
   return (
     <div className='space-y-5'>
       <div className='flex items-end justify-between gap-4'>
@@ -57,15 +66,15 @@ export const BuildPlate = ({ name, summary, pulse }: BuildPlateProps) => {
           </p>
           {summary.complete ? (
             <p className='mt-0.5 text-sm' style={{ color }}>
-              {summary.rarity}
+              {labels.rarity(summary.rarity)}
             </p>
           ) : (
-            <p className='mt-0.5 text-sm text-zinc-400'>Missing parts</p>
+            <p className='mt-0.5 text-sm text-zinc-400'>{t("builder.missing_parts")}</p>
           )}
         </div>
         <p
           className='relative font-teko text-5xl leading-none text-zinc-100'
-          title='Guitar level'>
+          title={t("card.guitar.level")}>
           <CountingLevel value={summary.total} />
           {pulse && (
             <motion.span
@@ -85,10 +94,10 @@ export const BuildPlate = ({ name, summary, pulse }: BuildPlateProps) => {
         {summary.lines.map((line) => (
           <div key={line.slot} className='flex items-baseline gap-3'>
             <dt className='w-20 shrink-0 text-zinc-400'>
-              {SLOT_LABELS[line.slot]}
+              {labels.slot(line.slot)}
             </dt>
             <dd className='min-w-0 flex-1 truncate text-zinc-300'>
-              {line.name}
+              {lineName(line)}
             </dd>
             <dd className='tabular-nums text-zinc-100'>+{line.level}</dd>
           </div>

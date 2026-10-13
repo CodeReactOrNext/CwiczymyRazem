@@ -2,7 +2,29 @@ import fs from "fs";
 import matter from "gray-matter";
 import path from "path";
 
+import type { AppLocale } from "./i18n/locales";
+import { DEFAULT_LOCALE } from "./i18n/locales";
+
 const WIKI_DIR = path.join(process.cwd(), "src/content/wiki");
+
+/**
+ * Articles are written in English at the top of the folder. A translation of one
+ * lives in a folder named for the language (`wiki/pl/<slug>.md`) and only has to
+ * carry the words: the slug, section and order always come from the English file,
+ * so a translation can never move an article or break a link. An article with no
+ * translation yet is served in English.
+ */
+const translatedFile = (
+  slug: string,
+  locale: AppLocale,
+): string | undefined => {
+  if (locale === DEFAULT_LOCALE) return undefined;
+  const file = path.join(WIKI_DIR, locale, `${slug}.md`);
+  return fs.existsSync(file) ? file : undefined;
+};
+
+export const hasWikiTranslation = (slug: string, locale: AppLocale): boolean =>
+  Boolean(translatedFile(slug, locale));
 
 const cssToJs = (cssString: string): string => {
   const styles: Record<string, string> = {};
@@ -49,7 +71,8 @@ const SECTION_ORDER = [
   "Competition",
 ];
 
-export const getAllWikiPages = (): WikiFrontmatter[] => {
+/** The English articles — the source of every slug, section and order. */
+const getEnglishPages = (): WikiFrontmatter[] => {
   if (!fs.existsSync(WIKI_DIR)) {
     return [];
   }
@@ -73,8 +96,25 @@ export const getAllWikiPages = (): WikiFrontmatter[] => {
   );
 };
 
-export const getWikiSections = (): WikiSection[] => {
-  const pages = getAllWikiPages();
+export const getAllWikiPages = (
+  locale: AppLocale = DEFAULT_LOCALE,
+): WikiFrontmatter[] =>
+  getEnglishPages().map((page) => {
+    const file = translatedFile(page.slug, locale);
+    if (!file) return page;
+
+    const { data } = matter(fs.readFileSync(file, "utf-8"));
+    return {
+      ...page,
+      title: (data.title as string) || page.title,
+      description: (data.description as string) || page.description,
+    };
+  });
+
+export const getWikiSections = (
+  locale: AppLocale = DEFAULT_LOCALE,
+): WikiSection[] => {
+  const pages = getAllWikiPages(locale);
   const sections: WikiSection[] = [];
 
   pages.forEach((page) => {
@@ -97,10 +137,25 @@ export const getWikiSections = (): WikiSection[] => {
   });
 };
 
-export const getWikiPageBySlug = async (slug: string) => {
-  const filePath = path.join(WIKI_DIR, `${slug}.md`);
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = matter(fileContent);
+export const getWikiPageBySlug = async (
+  slug: string,
+  locale: AppLocale = DEFAULT_LOCALE,
+) => {
+  const english = matter(
+    fs.readFileSync(path.join(WIKI_DIR, `${slug}.md`), "utf-8"),
+  );
+  const file = translatedFile(slug, locale);
+  const translated = file ? matter(fs.readFileSync(file, "utf-8")) : undefined;
+  const data = {
+    ...english.data,
+    ...(translated
+      ? {
+          title: translated.data.title || english.data.title,
+          description: translated.data.description || english.data.description,
+        }
+      : {}),
+  };
+  const content = (translated ?? english).content;
   const transformedContent = transformStyleAttributes(content);
 
   return {

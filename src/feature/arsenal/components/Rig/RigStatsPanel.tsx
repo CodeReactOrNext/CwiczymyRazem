@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import { Star } from "lucide-react";
 import { useMemo } from "react";
@@ -145,6 +146,7 @@ interface RigStatsPanelProps {
  */
 export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
   const rigLevel = getRigLevel(data);
+  const { t } = useArsenalLabels();
   // What the board gave up to duplicates on the way to that level — the one
   // deduction in the sum, so it is the one figure the level carries with it.
   const duplicatePenalty = readBoardLevel(
@@ -178,10 +180,10 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
 
   return (
     <div className='flex flex-wrap items-end gap-x-7 gap-y-5 rounded-lg bg-zinc-900/40 px-5 py-4 sm:px-6'>
-      <RigHeadline caption='Rig level' value={rigLevel} tone='level' />
+      <RigHeadline caption={t("rig.rig_level")} value={rigLevel} tone='level' />
       <Figure
-        label='Duplicates'
-        title={describeDuplicateRule()}
+        label={t("duplicates.title")}
+        title={describeDuplicateRule(t)}
         value={duplicatePenalty > 0 ? `−${duplicatePenalty}` : "—"}
         muted={duplicatePenalty === 0}
       />
@@ -189,7 +191,7 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
       <Divider />
 
       <RigHeadline
-        caption='Fame / hour'
+        caption={t("rig.fame_per_hour")}
         value={totalRate}
         decimals={1}
         tone='fame'
@@ -199,14 +201,14 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
       <Divider />
 
       <div className='flex items-end gap-7'>
-        <Figure label='Base' value={`+${formatRigFameRate(rigLevel)}`} />
+        <Figure label={t("rig.base")} value={`+${formatRigFameRate(rigLevel)}`} />
         <Figure
-          label='Signal path'
+          label={t("signal.path")}
           value={formatTraitValue(chainRate)}
           muted={chainRate === 0}
         />
         <Figure
-          label='Traits'
+          label={t("rig.traits")}
           value={formatTraitValue(traitRate)}
           muted={traitRate === 0}
         />
@@ -221,8 +223,10 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
           return (
             <Figure
               key={category}
-              label={category.charAt(0).toUpperCase() + category.slice(1)}
-              title={`${category} bonus`}
+              label={t(`categories.${category}`)}
+              title={t("rig.category_bonus", {
+                category: t(`categories.${category}`),
+              })}
               value={rate > 0 ? formatTraitValue(rate) : "—"}
               muted={rate === 0}
               icon={<Icon size='medium' className='shrink-0 text-zinc-500' />}

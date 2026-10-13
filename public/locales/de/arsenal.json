@@ -46,6 +46,1225 @@
     "kind": {
       "guitar": "Gitarre",
       "effect": "Pedal"
+    },
+    "part_name": "{{part}} · {{tier}}",
+    "mod": {
+      "coil-split": "Coil-Split",
+      "hand-wound": "Handgewickelte Tonabnehmer",
+      "push-pull": "Push-Pull-Poti",
+      "phase-switch": "Phasenschalter",
+      "treble-bleed": "Treble-Bleed",
+      "cts-pots": "CTS-Potis",
+      "pio-caps": "Paper-in-Oil-Kondensatoren",
+      "active-preamp": "Aktiver Preamp",
+      "copper-shielding": "Kupferabschirmung",
+      "bone-nut": "Knochensattel",
+      "brass-trem-block": "Messing-Tremoloblock",
+      "steel-saddles": "Stahlreiter",
+      "locking-tuners": "Klemmmechaniken",
+      "torrefied-wood": "Thermisch behandeltes Holz",
+      "chambered-body": "Gekammerter Korpus",
+      "plek": "Plek-Setup",
+      "stainless-frets": "Edelstahlbünde",
+      "rolled-edges": "Abgerundete Griffbrettkanten",
+      "scalloped-frets": "Gescalloptes Griffbrett",
+      "compound-radius": "Compound-Radius",
+      "graphite-neck": "Graphitverstärkter Hals",
+      "satin-neck": "Seidenmatter Hals",
+      "low-action": "Profi-Saitenlage",
+      "truss-wheel": "Halsstab-Rad",
+      "fret-level": "Bünde abrichten & bekronen",
+      "nos-opamp": "NOS-OpAmp (JRC4558)",
+      "germanium-diodes": "Germaniumdioden",
+      "matched-transistors": "Selektierte Transistoren",
+      "asym-clipping": "Asymmetrisches Clipping",
+      "led-clipping": "LED-Clipping",
+      "mosfet-clipping": "MOSFET-Clipping",
+      "carbon-comp": "Kohleschichtwiderstände",
+      "film-caps": "Folienkondensatoren",
+      "charge-pump-18v": "18-V-Schiene",
+      "true-bypass": "True Bypass",
+      "premium-buffer": "Premium-Buffer",
+      "shielding": "Rauscharme Abschirmung",
+      "star-grounding": "Sternmasse",
+      "gold-jacks": "Vergoldete Buchsen",
+      "filtered-power": "Gefilterte Stromversorgung",
+      "midi": "MIDI-Steuerung",
+      "tap-tempo": "Tap-Tempo",
+      "stereo-io": "Stereo-I/O",
+      "presets": "Presets",
+      "expression-in": "Expression-Eingang",
+      "trim-pots": "Interne Trimmpotis",
+      "dip-switches": "DIP-Schalter",
+      "relay-switch": "Relais-Softswitch",
+      "kill-dry": "Kill-Dry / Trails"
+    },
+    "condition": {
+      "Museum": "Museumszustand",
+      "Mint": "Neuwertig",
+      "Good": "Gut",
+      "Worn": "Abgenutzt",
+      "Relic": "Relic"
     }
+  },
+  "common": {
+    "fame": "Fame",
+    "lvl": "Lvl {{level}}",
+    "sell": "Verkaufen",
+    "selling": "Wird verkauft…",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "sell_for": "Für {{fame}} Fame verkaufen",
+    "close": "Schließen",
+    "fame_amount": "{{fame}} Fame"
+  },
+  "view": {
+    "title": "Gitarren-Arsenal",
+    "subtitle": "Öffne Kisten, bau dein Rig, halte deine Ausrüstung in Schuss",
+    "eyebrow": "Sammeln & ausrüsten",
+    "free_cases_one": "Gratis-Kiste",
+    "free_cases": "Gratis-Kisten",
+    "free_cases_hint": "Verdient mit epischen Erfolgen. Eine öffnet jede Kiste im Regal — auch Elite — ohne Fame auszugeben.",
+    "tabs": {
+      "cases": "Kisten",
+      "collection": "Sammlung",
+      "rig": "Rig",
+      "builder": "Builder",
+      "workshop": "Werkstatt",
+      "commissions": "Aufträge",
+      "trader": "Händler",
+      "market": "Markt",
+      "dex": "Dex"
+    }
+  },
+  "cases": {
+    "shelf_title": "Wähle deine Kiste",
+    "shelf_subtitle": "Finde das nächste Stück deines Sounds.",
+    "open_free": "Gratis öffnen",
+    "opening": "Wird geöffnet...",
+    "open_case": "Kiste öffnen",
+    "view_drop_rates": "Drop-Chancen ansehen",
+    "drop_rates": "Drop-Chancen",
+    "featured_pool": "{{count}} Gegenstände. Eine neue Chance.",
+    "refreshes_in": "Neu in",
+    "inside_drop": "Das steckt drin",
+    "chance_from_case": "Chance aus dieser Kiste",
+    "tier_word": {
+      "standard": "Standard",
+      "premium": "Premium",
+      "elite": "Elite",
+      "supporter": "Supporter"
+    },
+    "defs": {
+      "standard": {
+        "name": "Standard-Kiste",
+        "title": "{{tier}}-Kiste",
+        "description": "Eine klassische Kiste für jeden angehenden Rocker."
+      },
+      "premium-guitar": {
+        "name": "Premium-Gitarrenkiste",
+        "title": "{{tier}}-Gitarrenkiste",
+        "description": "Bessere Chancen auf Seltenes und Begehrtes."
+      },
+      "premium-effect": {
+        "name": "Premium-Effektkiste",
+        "title": "{{tier}}-Effektkiste",
+        "description": "Bessere Chancen auf Seltenes und Begehrtes."
+      },
+      "daily": {
+        "name": "Featured-Kiste",
+        "description": "Ein wechselnder Pool aus 10 Gegenständen."
+      },
+      "supporter": {
+        "name": "Supporter-Kiste",
+        "title": "{{tier}}-Kiste",
+        "description": "Sechs Gegenstände, ausgewählt von den Supportern. Alle zwei Wochen eine neue Auswahl."
+      },
+      "elite-guitar": {
+        "name": "Elite-Gitarrenkiste",
+        "title": "{{tier}}-Gitarrenkiste",
+        "description": "Den engagiertesten Spielern vorbehalten."
+      },
+      "elite-effect": {
+        "name": "Elite-Effektkiste",
+        "title": "{{tier}}-Effektkiste",
+        "description": "Den engagiertesten Spielern vorbehalten."
+      }
+    }
+  },
+  "opening": {
+    "title": "Kiste wird geöffnet",
+    "part_of_slot": "{{slot}} · Teil",
+    "builder_part": "Teil für den Gitarren-Builder",
+    "first_pull": "Neu — erster Fund",
+    "duplicate": "Duplikat — schon im Dex",
+    "open_in_builder": "Im Builder öffnen",
+    "keep": "Behalten",
+    "equip_now": "Jetzt ausrüsten",
+    "keep_in_arsenal": "Im Arsenal behalten",
+    "add_to_collection": "Zur Sammlung hinzufügen",
+    "open_another": "Noch eine öffnen: {{name}}",
+    "cost_needed": "{{cost}} benötigt"
+  },
+  "builder": {
+    "slots": {
+      "body": "Korpus",
+      "neck": "Hals",
+      "head": "Kopfplatte",
+      "pickups": "Tonabnehmer",
+      "finish": "Finish",
+      "pickguard": "Schlagbrett",
+      "sticker": "Sticker"
+    },
+    "pickup_types": {
+      "S": "Single-Coil",
+      "H": "Humbucker",
+      "P90": "P90"
+    },
+    "title": "Gitarren-Builder",
+    "parts_collected": "Teile gesammelt",
+    "open_builder": "Builder öffnen",
+    "none_yet": "Noch keine — Teile droppen aus der Standard-, der Premium-Gitarren- und der Elite-Gitarrenkiste.",
+    "name_guitar": "Gib deiner Gitarre einen Namen",
+    "name_guitar_optional": "Gib deiner Gitarre einen Namen (optional)",
+    "guitar_name": "Gitarrenname",
+    "save_name": "Namen speichern",
+    "rebuilt": "{{name}} umgebaut",
+    "built": "{{name}} gebaut — häng sie in dein Rig",
+    "rebuild_guitar": "Gitarre umbauen",
+    "build_guitar": "Gitarre bauen",
+    "no_slot_yet": "Noch kein Teil: {{slot}}. Teile droppen aus der Standard-, der Premium-Gitarren- und der Elite-Gitarrenkiste.",
+    "open_cases": "Kisten öffnen",
+    "new_guitar": "Neue Gitarre",
+    "custom_name": "Custom {{name}}",
+    "custom_build": "Eigenbau",
+    "best_of": "Beste {{best}} von {{total}}",
+    "missing_parts": "Teile fehlen",
+    "size": "Größe",
+    "rotate": "Drehen",
+    "sticker_hint": "Wähle einen Sticker auf der Gitarre, um ihn zu skalieren oder zu drehen.",
+    "peel_off": "Abziehen",
+    "peel_off_all": "Alle abziehen",
+    "renamed": "Umbenannt",
+    "err_build": "Die Gitarre konnte nicht gebaut werden",
+    "err_rename": "Die Gitarre konnte nicht umbenannt werden",
+    "errors": {
+      "part_once": "Ein Teil kann nur einmal eingebaut werden",
+      "too_many_stickers": "Zu viele Sticker",
+      "not_owned": "Dieses Teil gehört dir nicht",
+      "wrong_slot": "Ein Teil steckt im falschen Slot",
+      "unknown_sticker": "Unbekannter Sticker",
+      "missing_core": "Korpus, Hals, Kopfplatte, Tonabnehmer und Finish werden alle benötigt",
+      "wrong_routing": "Passt nicht zur Fräsung dieses Korpus",
+      "no_pickguard": "Dieser Korpus hat kein Schlagbrett zum Tauschen",
+      "not_enough_fame": "Nicht genug Fame"
+    }
+  },
+  "lock": {
+    "unlocks_at": "Freigeschaltet ab Level {{lvl}}",
+    "reason": "{{rarity}}-Ausrüstung kommt ab Level {{lvl}} in dein Rig. Bis dahin kannst du sie behalten, verkaufen und bearbeiten — nur noch nicht spielen."
+  },
+  "collection": {
+    "scope": {
+      "all": "Alle",
+      "guitars": "Gitarren",
+      "pedals": "Pedale"
+    },
+    "search": "Sammlung durchsuchen",
+    "sort_by": "Sortieren nach",
+    "sort_prefix": "Sortierung:",
+    "sort": {
+      "manual": "Manuell",
+      "equipped": "Ausgerüstet",
+      "rarity": "Seltenheit",
+      "level": "Level",
+      "newest": "Neueste",
+      "type": "Typ"
+    },
+    "sort_hint": {
+      "manual": "Deine eigene Anordnung — zieh die Teile, wohin du willst",
+      "equipped": "Zuerst, was du spielst: Profilgitarre, Rig-Slots und Pedalboard",
+      "rarity": "Seltenste zuerst, Kopien nebeneinander",
+      "level": "Höchstes Level zuerst",
+      "newest": "Neueste Drops zuerst",
+      "type": "Zuerst Gitarren, dann Pedale, dann Mods und Teile"
+    },
+    "view": {
+      "stash": "Lager",
+      "cards": "Karten"
+    },
+    "view_title": {
+      "stash": "Lageransicht",
+      "cards": "Kartenansicht"
+    },
+    "no_match": "Nichts hier passt zu „{{query}}“.",
+    "nothing_yet": "Hier ist noch nichts.",
+    "empty": "Deine Sammlung ist leer. Öffne eine Kiste, um loszulegen!",
+    "guitars_eyebrow": "Instrumente",
+    "guitars_collected": "Gitarren gesammelt",
+    "pedals_eyebrow": "Effekte",
+    "pedals_collected": "Pedale gesammelt",
+    "clear_dupes": "Duplikate entfernen ({{count}})"
+  },
+  "salvage": {
+    "title": "Bergung",
+    "salvaged_mod": "Geborgener Mod",
+    "salvaged_mod_caps": "GEBORGENER MOD",
+    "fit_title": "{{name}} einbauen?",
+    "fit_body": "In {{target}}, mit dem Wert, mit dem er geborgen wurde. Nichts wird neu ausgewürfelt.",
+    "off_source": "aus {{source}}",
+    "fit_note": "Kostet nichts — bezahlt hast du ihn schon mit {{source}}. Ihn wieder auszubauen heißt, das Instrument zu zerlegen, in dem er steckt.",
+    "installing": "Wird eingebaut...",
+    "install": "Einbauen",
+    "mod_listing_body": {
+      "guitar": "Passt in jede Gitarre mit freiem Mod-Slot und kommt mit +{{points}} hinein, ohne Neuwürfeln. Die Werkstatt kann so etwas nicht bauen — ein Mod wechselt nur den Besitzer.",
+      "effect": "Passt in jedes Pedal mit freiem Mod-Slot und kommt mit +{{points}} hinein, ohne Neuwürfeln. Die Werkstatt kann so etwas nicht bauen — ein Mod wechselt nur den Besitzer."
+    },
+    "mod_owned_body": {
+      "guitar": "Zieh ihn auf eine aufleuchtende Gitarre, und er wird mit seinem Wert eingebaut: nichts zu zahlen, nichts neu gewürfelt. Er wartet auch auf der Werkbank.",
+      "effect": "Zieh ihn auf ein aufleuchtendes Pedal, und er wird mit seinem Wert eingebaut: nichts zu zahlen, nichts neu gewürfelt. Er wartet auch auf der Werkbank."
+    }
+  },
+  "sell": {
+    "title": {
+      "Guitar": "Gitarre verkaufen?",
+      "Effect": "Effekt verkaufen?",
+      "Mod": "Mod verkaufen?",
+      "Parts": "Teile verkaufen?",
+      "Part": "Teil verkaufen?"
+    },
+    "you_receive": "Du erhältst",
+    "fame_points": "Fame"
+  },
+  "market": {
+    "listing": "Wird eingestellt…",
+    "sell_on_market": "Auf dem Markt verkaufen",
+    "list_title": {
+      "Guitar": "Gitarre auf dem Markt anbieten",
+      "Effect": "Effekt auf dem Markt anbieten",
+      "Mod": "Mod auf dem Markt anbieten",
+      "Part": "Teil auf dem Markt anbieten"
+    },
+    "your_price": "Dein Preis",
+    "minimum": "Minimum: {{price}} Fame (der normale Verkaufswert)",
+    "mod_price_hint": "Das Minimum ist nur, was der Schrott bringt. Niemand kann einen Mod bauen, also orientier dich am Preis des Händlers.",
+    "listing_fee": "Einstellgebühr",
+    "fee_short": "Nicht genug Fame für die Einstellgebühr von {{fee}}.",
+    "list_item": "Anbieten",
+    "empty": "Noch keine Gegenstände auf dem Markt. Biete etwas aus deiner Sammlung an!",
+    "salvage_hint_guitar": "Zerlege das hier, und {{name}} kommt unversehrt heraus, abgenutzt auf +{{points}} von +{{before}}. Er landet im Lager und passt kostenlos in eine andere Gitarre.",
+    "salvage_hint_effect": "Zerlege das hier, und {{name}} kommt unversehrt heraus, abgenutzt auf +{{points}} von +{{before}}. Er landet im Lager und passt kostenlos in ein anderes Pedal.",
+    "cancelling": "Wird zurückgezogen...",
+    "cancel_listing": "Angebot zurückziehen"
+  },
+  "parts": {
+    "tier_part": "{{tier}}-Teil",
+    "card_body": "Wird auf der Werkbank verbraucht — Bauten, Reparaturen und Mods werden in Teilen bezahlt. Verkaufe nur, was die Werkbank nie verlangen wird.",
+    "rework": "Aufwerten",
+    "rework_cost": "{{count}} Stück ({{tier}}) + {{fame}} Fame",
+    "you_have": "Du hast {{qty}} von {{needed}}",
+    "rework_times": "Aufwerten ×{{count}}",
+    "rework_one": "Eins aufwerten",
+    "uses_of": "Verbraucht {{used}} von deinen {{qty}}",
+    "rework_just_one": "Nur eins für {{fame}} Fame aufwerten",
+    "not_enough_fame": "Nicht genug Fame — das kostet {{fame}}",
+    "sell_all": "Alle {{count}} verkaufen",
+    "sell_it": "Verkaufen",
+    "sell_one": "Eins für {{fame}} Fame verkaufen",
+    "salvaged_parts": "Geborgene Teile",
+    "wallet_empty": "Zerlege eine Gitarre oder ein Pedal aus deiner Sammlung, um deine ersten Teile zu bergen."
+  },
+  "stash": {
+    "part": "Teil",
+    "component_name": "{{name}} · Lvl {{level}}",
+    "reason_unequip_profile": "Nimm sie zuerst vom Profil",
+    "reason_remove_rig": "Nimm sie zuerst aus Rig-Slot {{slot}}",
+    "reason_off_board": "Nimm es zuerst vom Pedalboard",
+    "menu": {
+      "details": "Details",
+      "equip": "Ausrüsten…",
+      "unequip_profile": "Vom Profil nehmen",
+      "take_out_rig": "Aus Rig-Slot {{slot}} nehmen",
+      "remove_from_board": "Vom Board nehmen",
+      "market": "Markt",
+      "guild_stash": "Gildenlager",
+      "scrap": "Zerlegen",
+      "sell_for": "Verkaufen · {{fame}}",
+      "sell_all": "Alle verkaufen ×{{qty}}"
+    },
+    "eyebrow": "Arsenal",
+    "title": "Lager",
+    "items_collected": "Gegenstände gesammelt",
+    "tidy_hint": "Das ganze Lager auf einmal neu anordnen — danach bleibt es deine Anordnung",
+    "tidy_up": "Aufräumen",
+    "arrange": {
+      "equipped": "Was ich spiele, zuerst",
+      "type": "Gitarren, dann Pedale",
+      "rarity": "Seltenste zuerst",
+      "level": "Höchstes Level zuerst",
+      "newest": "Neueste zuerst"
+    },
+    "dupes_guitars_hint": "Jede doppelte Gitarre mit niedrigerem Level verkaufen oder zerlegen, die beste Kopie bleibt",
+    "dupes_guitars": "Doppelte Gitarren ({{count}})",
+    "dupes_pedals_hint": "Jedes doppelte Pedal mit niedrigerem Level verkaufen oder zerlegen, die beste Kopie bleibt",
+    "dupes_pedals": "Doppelte Pedale ({{count}})",
+    "board_label": "Arsenal-Lager",
+    "pedals_protected": "Pedale auf deinem Pedalboard werden nie angerührt."
+  },
+  "card": {
+    "new": "Neu",
+    "locked": "Gesperrt",
+    "equip": "Ausrüsten",
+    "guild": "Gilde",
+    "list_on_market": "Auf dem Markt anbieten",
+    "sell_for_fame": "Für Fame verkaufen",
+    "guild_hint": "Im Gildenlager ablegen, für Ehre",
+    "needs_level": "benötigt Level {{lvl}}",
+    "scraps_into_one": "Zerlegen ergibt {{count}} Teil",
+    "scraps_into": "Zerlegen ergibt {{count}} Teile",
+    "mod_comes_off": "{{name}} +{{points}} wird unversehrt ausgebaut",
+    "mods_go_with_it_one": "{{names}} geht dabei verloren",
+    "mods_go_with_it": "{{names}} gehen dabei verloren",
+    "guitar": {
+      "level": "Gitarren-Level",
+      "equipped": "ausgerüstet",
+      "rig_slot": "Rig-Slot {{slot}}",
+      "market_unequip": "Nimm sie vom Profil, bevor du sie auf dem Markt anbietest",
+      "market_unrig": "Nimm sie aus Rig-Slot {{slot}}, bevor du sie auf dem Markt anbietest",
+      "sell_unequip": "Nimm sie vor dem Verkauf vom Profil",
+      "guild_unequip": "Nimm sie vom Profil, bevor du sie der Gilde gibst",
+      "guild_unrig": "Nimm sie aus Rig-Slot {{slot}}, bevor du sie der Gilde gibst",
+      "scrap_unequip": "Nimm sie vor dem Zerlegen vom Profil",
+      "scrap_unrig": "Nimm sie vor dem Zerlegen aus Rig-Slot {{slot}}"
+    },
+    "effect": {
+      "level": "Effekt-Level",
+      "on_board": "auf dem Board",
+      "remove_hint": "Dieses Pedal vom Pedalboard nehmen",
+      "market_unboard": "Vor dem Anbieten vom Pedalboard nehmen",
+      "guild_unboard": "Vom Pedalboard nehmen, bevor du es der Gilde gibst",
+      "scrap_unboard": "Vor dem Zerlegen vom Pedalboard nehmen",
+      "sell_unboard": "Ein Effekt auf dem Pedalboard kann nicht verkauft werden"
+    }
+  },
+  "bulk": {
+    "title": "Duplikate entfernen?",
+    "body_one": "Das nimmt {{n}} Duplikat mit niedrigerem Level und behält jeweils die beste Kopie.",
+    "body": "Das nimmt {{n}} Duplikate mit niedrigerem Level und behält jeweils die beste Kopie.",
+    "protected_guitars": "Ausgerüstete Gitarren und Rig-Gitarren werden nie angerührt.",
+    "no_undo": "Das lässt sich nicht rückgängig machen.",
+    "paid_into_fame": "Wird direkt als Fame ausgezahlt",
+    "scrapping": "Wird zerlegt...",
+    "scrap_all": "Alle {{count}} zerlegen",
+    "mods_pulled_one": "{{count}} Mod ausgebaut und eingelagert",
+    "mods_pulled": "{{count}} Mods ausgebaut und eingelagert"
+  },
+  "equip": {
+    "profile": "Profil",
+    "rig_slot": "Rig-Slot {{slot}}",
+    "where": "Wohin soll sie?",
+    "already_here": "Schon hier",
+    "gets_replaced": "Wird ersetzt",
+    "empty": "Leer",
+    "take_out_of": "Aus {{target}} nehmen"
+  },
+  "traits": {
+    "workhorse": {
+      "label": "Arbeitstier",
+      "description": "Fame/h bei jedem Üben, egal was du spielst."
+    },
+    "long-take": {
+      "label": "Langer Take",
+      "description": "Fame/h bei jedem Üben, egal was du spielst."
+    },
+    "reliable": {
+      "label": "Zuverlässig",
+      "description": "Fame/h bei jedem Üben. Keine Bedingungen, keine Überraschungen."
+    },
+    "shred-machine": {
+      "label": "Shred-Maschine",
+      "description": "Fame/h beim Techniküben."
+    },
+    "jazz-box": {
+      "label": "Jazz-Box",
+      "description": "Fame/h beim Theorieüben. Gebaut für Akkorde, nicht für Tempo."
+    },
+    "songbook": {
+      "label": "Songbook",
+      "description": "Fame/h beim Kreativitätsüben."
+    },
+    "intonation-monster": {
+      "label": "Intonationsmonster",
+      "description": "Fame/h beim Gehörtraining. Sie hält die Stimmung bis ganz oben am Hals."
+    },
+    "ear-trainer": {
+      "label": "Gehörtrainer",
+      "description": "Fame/h beim Gehörtraining. Stell eine Wiederholung ein und jag ihr nach."
+    },
+    "timing-trainer": {
+      "label": "Timing-Trainer",
+      "description": "Fame/h beim Techniküben. Rast die Wiederholungen auf dein Tempo ein."
+    },
+    "frequency-work": {
+      "label": "Frequenzarbeit",
+      "description": "Fame/h beim Gehörtraining. Lerne, wo die Bänder liegen."
+    },
+    "harmony-bench": {
+      "label": "Harmoniebank",
+      "description": "Fame/h beim Theorieüben."
+    },
+    "texture-lab": {
+      "label": "Texturlabor",
+      "description": "Fame/h beim Kreativitätsüben."
+    },
+    "noise-session": {
+      "label": "Noise-Session",
+      "description": "Fame/h beim Kreativitätsüben."
+    },
+    "pitch-reference": {
+      "label": "Tonhöhenreferenz",
+      "description": "Fame/h beim Gehörtraining."
+    },
+    "picking-bench": {
+      "label": "Anschlagsbank",
+      "description": "Fame/h, während die Session Wechselschlag trainiert."
+    },
+    "legato-neck": {
+      "label": "Legato-Hals",
+      "description": "Fame/h, während die Session Legato trainiert."
+    },
+    "bender": {
+      "label": "Bender",
+      "description": "Fame/h, während die Session Bendings trainiert."
+    },
+    "vibrato-arm": {
+      "label": "Vibratoarm",
+      "description": "Fame/h, während die Session Vibrato trainiert."
+    },
+    "chord-shop": {
+      "label": "Akkordladen",
+      "description": "Fame/h, während die Session Akkorde trainiert."
+    },
+    "scale-runner": {
+      "label": "Tonleiterläufer",
+      "description": "Fame/h, während die Session Tonleitern trainiert."
+    },
+    "metronome": {
+      "label": "Metronom",
+      "description": "Fame/h, während die Session Rhythmus trainiert."
+    },
+    "phrase-repeat": {
+      "label": "Phrasen-Echo",
+      "description": "Fame/h, während die Session Phrasierung trainiert. Ein Delay gibt dir deine eigene Phrase zurück."
+    },
+    "harmony-ear": {
+      "label": "Harmonie-Ohr",
+      "description": "Fame/h, während die Session Harmonien nach Gehör trainiert."
+    },
+    "interval-trainer": {
+      "label": "Intervalltrainer",
+      "description": "Fame/h, während die Session Gehörbildung trainiert."
+    },
+    "improv-pedal": {
+      "label": "Impro-Pedal",
+      "description": "Fame/h, während die Session Improvisation trainiert."
+    },
+    "phrase-machine": {
+      "label": "Phrasenmaschine",
+      "description": "Fame/h, während die Session Phrasierung trainiert."
+    },
+    "improv-room": {
+      "label": "Impro-Raum",
+      "description": "Fame/h, während die Session Improvisation trainiert."
+    },
+    "theory-board": {
+      "label": "Theorietafel",
+      "description": "Fame/h, während die Session Musiktheorie trainiert."
+    },
+    "brand-endorsement": {
+      "label": "{{brand}}-Endorsement",
+      "description": "Fame/h für jeden {{brand}}-Gegenstand im Einsatz. Bis zu drei zählen."
+    },
+    "pedal-platform": {
+      "label": "Pedal-Plattform",
+      "description": "Fame/h für jedes Pedal auf deinem Board. Bis zu sechs zählen. Sie kämpft nicht gegen das, was du davorschaltest."
+    },
+    "backline": {
+      "label": "Backline",
+      "description": "Fame/h für jede andere Gitarre in deinen Slots."
+    },
+    "vintage-row": {
+      "label": "Vintage-Reihe",
+      "description": "Fame/h für jeden Gegenstand im Einsatz, der vor 1985 gebaut wurde. Bis zu vier zählen."
+    },
+    "boutique-row": {
+      "label": "Boutique-Reihe",
+      "description": "Fame/h für jedes epische oder bessere Pedal auf deinem Board. Bis zu vier zählen."
+    },
+    "bench-boss": {
+      "label": "Werkbank-Chef",
+      "description": "Fame/h für jedes Baulevel der anderen Gegenstände in deinem Rig. Bis zu zwanzig zählen."
+    },
+    "well-equipped": {
+      "label": "Gut ausgestattet",
+      "description": "Fame/h für jede andere Eigenschaft in deinem Rig. Bis zu acht zählen."
+    },
+    "wants-dirt": {
+      "label": "Will Dreck",
+      "description": "Fame/h, solange ein Overdrive, Distortion oder Fuzz auf deinem Board liegt. Passive Humbucker brauchen etwas, das sie anschiebt."
+    },
+    "clean-machine": {
+      "label": "Clean-Maschine",
+      "description": "Fame/h, solange dein Board überhaupt kein Zerrpedal trägt. Alles, was deine Hände tun, ist hörbar."
+    },
+    "solo-act": {
+      "label": "Soloauftritt",
+      "description": "Fame/h, solange dies deine einzige ausgerüstete Gitarre ist."
+    },
+    "straight-to-amp": {
+      "label": "Direkt in den Amp",
+      "description": "Fame/h, solange dein Pedalboard völlig leer ist."
+    },
+    "cable-and-amp": {
+      "label": "Kabel und Amp",
+      "description": "Fame/h, solange dein Pedalboard völlig leer ist. Nichts zwischen Saiten und Lautsprecher."
+    },
+    "nothing-but-the-guitar": {
+      "label": "Nur die Gitarre",
+      "description": "Fame/h, solange dein Pedalboard völlig leer ist. Sie braucht keine Hilfe und hat sie nie gebraucht."
+    },
+    "matched-set": {
+      "label": "Passendes Set",
+      "description": "Fame/h, solange ein anderer Gegenstand derselben Marke im Einsatz ist."
+    },
+    "ambient-pair": {
+      "label": "Ambient-Paar",
+      "description": "Fame/h, solange ein Delay und ein Hall beide auf dem Board sind. Getrennt machen sie nur die halbe Arbeit."
+    },
+    "gain-stack": {
+      "label": "Gain-Stack",
+      "description": "Fame/h, solange ein zweites Zerrpedal auf dem Board ist. Zerren zu stapeln ist Methode, kein Zufall."
+    },
+    "front-of-chain": {
+      "label": "Kettenanfang",
+      "description": "Fame/h, solange dieses Pedal vor jeder Zerre auf dem Board sitzt. Fuzz und Kompression wollen das rohe Tonabnehmersignal."
+    },
+    "tail-of-chain": {
+      "label": "Kettenende",
+      "description": "Fame/h, solange dieses Pedal hinter jeder Zerre auf dem Board sitzt. Zeiteffekte kommen zuletzt, sonst wird es Matsch."
+    },
+    "purist": {
+      "label": "Purist",
+      "description": "Fame/h, solange dein Board höchstens zwei Pedale trägt."
+    },
+    "full-board": {
+      "label": "Volles Board",
+      "description": "Fame/h, solange dein Board sechs oder mehr Pedale trägt."
+    },
+    "metal-rig": {
+      "label": "Metal-Rig",
+      "description": "Fame/h, wenn zwei oder mehr Zerrpedale auf dem Board sind und die Session mindestens 45 Minuten Technik enthält."
+    },
+    "ambient-study": {
+      "label": "Ambient-Studie",
+      "description": "Fame/h, wenn ein Hall auf dem Board ist und die Session mindestens 30 Minuten Gehörtraining enthält."
+    },
+    "writing-room": {
+      "label": "Schreibzimmer",
+      "description": "Fame/h, wenn dein Board höchstens zwei Pedale trägt und die Session mindestens 45 Minuten Kreativität enthält."
+    },
+    "practice-room": {
+      "label": "Proberaum",
+      "description": "Fame/h, wenn dies deine einzige ausgerüstete Gitarre ist und die Session 60 Minuten oder länger dauert."
+    },
+    "theory-desk": {
+      "label": "Theorie-Schreibtisch",
+      "description": "Fame/h, wenn ein Stimmgerät auf dem Board ist und die Session mindestens 30 Minuten Theorie enthält."
+    },
+    "session-rig": {
+      "label": "Session-Rig",
+      "description": "Fame/h, wenn alle drei Gitarrenslots belegt sind und die Session mindestens 15 Minuten in drei verschiedenen Kategorien enthält."
+    },
+    "fuzz-workout": {
+      "label": "Fuzz-Workout",
+      "description": "Fame/h, wenn dieses Pedal vor jeder anderen Zerre sitzt und die Session mindestens 45 Minuten Technik enthält."
+    },
+    "modulation-study": {
+      "label": "Modulationsstudie",
+      "description": "Fame/h, wenn ein Delay auf dem Board ist und die Session Phrasierung trainiert."
+    },
+    "vintage-session": {
+      "label": "Vintage-Session",
+      "description": "Fame/h, wenn drei Gegenstände im Einsatz vor 1985 gebaut wurden und die Session 45 Minuten oder länger dauert."
+    },
+    "stack-study": {
+      "label": "Stack-Studie",
+      "description": "Fame/h, wenn ein zweites Zerrpedal auf dem Board ist und die Session Wechselschlag trainiert."
+    },
+    "tone-lab": {
+      "label": "Soundlabor",
+      "description": "Fame/h, wenn vier oder mehr Pedale auf dem Board sind und die Session mindestens 30 Minuten Kreativität enthält."
+    },
+    "quiet-room": {
+      "label": "Stiller Raum",
+      "description": "Fame/h, wenn dein Board leer ist und die Session mindestens 45 Minuten Gehörtraining enthält."
+    },
+    "monk": {
+      "label": "Mönch",
+      "description": "Fame/h, wenn dein Pedalboard leer ist, dies deine einzige ausgerüstete Gitarre ist und die Session nur eine Kategorie umfasst."
+    },
+    "virtuoso": {
+      "label": "Virtuose",
+      "description": "Fame/h, wenn die Session Wechselschlag, Legato und Sweep Picking trainiert und mindestens 60 Minuten Technik enthält."
+    },
+    "conservatory": {
+      "label": "Konservatorium",
+      "description": "Fame/h, wenn die Session Musiktheorie, Harmonielehre und Akkorde trainiert und 60 Minuten oder länger dauert."
+    },
+    "total-recall": {
+      "label": "Totale Erinnerung",
+      "description": "Fame/h, wenn die Session Gehörbildung und Harmonien nach Gehör trainiert und ein Hall und ein Stimmgerät beide auf dem Board sind."
+    },
+    "brand-artist": {
+      "label": "{{brand}}-Artist",
+      "description": "Fame/h, wenn jede Gitarre in deinen Slots eine {{brand}} ist und die Session 45 Minuten oder länger dauert."
+    },
+    "wall-of-sound": {
+      "label": "Wall of Sound",
+      "description": "Fame/h, wenn sechs oder mehr Pedale auf dem Board sind, drei davon episch oder besser, und die Session 60 Minuten oder länger dauert."
+    },
+    "time-capsule": {
+      "label": "Zeitkapsel",
+      "description": "Fame/h, wenn jeder Gegenstand im Einsatz vor 1985 gebaut wurde und die Session 45 Minuten oder länger dauert."
+    },
+    "one-man-band": {
+      "label": "Ein-Mann-Band",
+      "description": "Fame/h, wenn die Session mindestens 15 Minuten in allen vier Kategorien enthält und dein Board vier oder mehr Pedale trägt."
+    },
+    "arranger": {
+      "label": "Arrangeur",
+      "description": "Fame/h, wenn die Session Improvisation, Phrasierung und Harmonielehre trainiert und 60 Minuten oder länger dauert."
+    },
+    "signal-booster": {
+      "label": "Signal-Booster",
+      "description": "Jedes andere Pedal auf deinem Board zahlt für jede seiner Eigenschaften so viel mehr Fame/h."
+    },
+    "master-class": {
+      "label": "Meisterkurs",
+      "description": "Jede Gehör- und Theorie-Eigenschaft in deinem Rig zahlt so viel mehr Fame/h."
+    },
+    "drive-trainer": {
+      "label": "Drive-Trainer",
+      "description": "Jede Technik-Eigenschaft in deinem Rig zahlt so viel mehr Fame/h."
+    },
+    "skill-coach": {
+      "label": "Skill-Coach",
+      "description": "Jede skillbasierte Eigenschaft in deinem Rig zahlt so viel mehr Fame/h."
+    },
+    "patchbay": {
+      "label": "Patchbay",
+      "description": "Jedes Pedal, das weiter hinten in der Kette sitzt als dieses, zahlt für jede seiner Eigenschaften so viel mehr Fame/h."
+    },
+    "house-band": {
+      "label": "Hausband",
+      "description": "Jede Eigenschaft auf Gegenständen derselben Marke wie diese Gitarre zahlt so viel mehr Fame/h."
+    },
+    "session-leader": {
+      "label": "Session-Leader",
+      "description": "Deine einzelne bestbezahlte Eigenschaft zahlt so viel mehr Fame/h."
+    },
+    "temperamental": {
+      "label": "Launisch",
+      "description": "Fame/h, zahlt aber nichts, wenn die Session kürzer als 30 Minuten ist."
+    },
+    "diva": {
+      "label": "Diva",
+      "description": "Fame/h, aber jede Eigenschaft auf deinen anderen ausgerüsteten Gegenständen zahlt 9,0 Fame/h weniger."
+    },
+    "prima-donna": {
+      "label": "Primadonna",
+      "description": "Fame/h, aber jede andere Eigenschaft in deinem Rig zahlt nichts."
+    }
+  },
+  "condition": {
+    "label": "Zustand",
+    "title": "Zustand: {{grade}}",
+    "title_restored": "Zustand: {{grade}} — in der Werkstatt restauriert",
+    "restored": "Restauriert"
+  },
+  "traits_ui": {
+    "more": "+{{count}} weitere"
+  },
+  "in_service": {
+    "pedalboard": "Pedalboard"
+  },
+  "dex_marks": {
+    "owned": "Im Besitz",
+    "in_dex": "Im Dex",
+    "new": "Neu für deine Sammlung"
+  },
+  "buy": {
+    "buy": "Kaufen",
+    "buying": "Wird gekauft…",
+    "not_enough_fame": "Nicht genug Fame",
+    "not_enough_fame_points": "Nicht genug Fame"
+  },
+  "part_row": {
+    "title": "{{name}} — du hast {{have}}, benötigt werden {{need}}",
+    "required": "benötigt",
+    "owned": "vorhanden",
+    "after_left": "Nach {{job}}: {{left}} übrig",
+    "short": "{{count}} fehlen",
+    "you_have": "du hast {{have}}",
+    "you_have_short": "du hast {{have}} — {{short}} fehlen"
+  },
+  "scrap": {
+    "title": {
+      "Guitar": "Gitarre zerlegen?",
+      "Effect": "Effekt zerlegen?"
+    },
+    "body": {
+      "Guitar": "{{name}} — das ist endgültig, die Gitarre ist für immer weg.",
+      "Effect": "{{name}} — das ist endgültig, der Effekt ist für immer weg."
+    },
+    "will_salvage_one": "Du birgst {{count}} Teil",
+    "will_salvage": "Du birgst {{count}} Teile",
+    "blueprint": "Bauplan",
+    "mods_go_one": "Dieser Mod geht dabei verloren",
+    "mods_go": "Diese {{count}} Mods gehen dabei verloren"
+  },
+  "blockers": {
+    "more_parts": "noch {{count}} × {{part}} ({{tier}})",
+    "restore_first": "erst auf {{grade}} restaurieren",
+    "plus_others_one": "{{first}}, plus {{count}} weiteres Teil",
+    "plus_others": "{{first}}, plus {{count}} weitere Teile",
+    "more_fame": "braucht noch {{count}} Fame"
+  },
+  "workshop": {
+    "level_now": "Level jetzt",
+    "level_after": "Level nach diesem Auftrag",
+    "build_log": "Bauprotokoll",
+    "build_log_hint": "Werkbankarbeit an diesem Stück, neueste zuerst",
+    "build_n": "Bau {{build}}",
+    "level": "Level",
+    "levels_gain_one": "{{gain}} Level",
+    "levels_gain": "{{gain}} Level",
+    "current": "Aktuell",
+    "next_build": "Nächster Bau",
+    "you_pay": "Du zahlst",
+    "have_it_all": "du hast alles",
+    "still_short": "{{count}} fehlen noch",
+    "materials_required": "Benötigte Materialien",
+    "parts_short_one": "{{count}} Teil fehlt",
+    "parts_short": "{{count}} Teile fehlen",
+    "build_progression": "Baufortschritt",
+    "view_all_builds": "Alle {{count}} Bauten ansehen und wo sie aufsteigen",
+    "next": "nächster",
+    "past_last_build": "Nach Bau {{count}} wird das Rezept weiter teurer, aber es gibt keine Aufstiege mehr.",
+    "path_now": "{{name}} — hier steht es jetzt",
+    "path_target": "{{name}} — Ziel dieses Auftrags",
+    "path_not_yet": "{{name}} — noch nicht",
+    "promotion_path": "Aufstiegspfad",
+    "resources_available": "Ressourcen vorhanden",
+    "required": "Benötigt",
+    "owned": "Vorhanden",
+    "have_n": "{{have}} vorhanden",
+    "short_n": "{{short}} fehlen",
+    "needs_n": "benötigt {{need}}",
+    "after_restoration": "Nach der Restaurierung",
+    "condition_ok": "Zustand ist gut genug — {{grade}}",
+    "restore_first": "Erst auf {{grade}} restaurieren",
+    "requires_condition": "Diese Aufwertung erfordert Zustand {{grade}} oder besser.",
+    "go_to_restoration": "Zur Restaurierung",
+    "slots_used": "{{used}} von {{max}} Mod-Slots belegt",
+    "unlocked_next_promotion": "Wird mit dem nächsten Aufstieg freigeschaltet",
+    "parts": "Teile",
+    "nothing_salvaged": "Noch nichts geborgen — zerlege etwas aus deiner Sammlung.",
+    "fully_restored": "vollständig restauriert",
+    "restore_condition": "Zustand restaurieren",
+    "promote_to": "Aufstieg zu {{rarity}}",
+    "upgrade_to_build": "Aufwerten auf Bau {{build}}",
+    "mod_taken_off": "{{name}} +{{points}} ausgebaut",
+    "restore_name": "{{name}} restaurieren",
+    "upgrade_name": "{{name}} aufwerten",
+    "improve_condition_one": "Verbessere den Zustand und gewinne {{count}} Level.",
+    "improve_condition": "Verbessere den Zustand und gewinne {{count}} Level.",
+    "build_arrow": "Bau {{from}} → Bau {{to}}",
+    "restore_to": "Auf {{grade}} restaurieren",
+    "install_another_mod": "Noch einen Mod einbauen",
+    "reroll_a_mod": "Einen Mod neu würfeln",
+    "restoration": "der Restaurierung",
+    "ready_to_restore": "Bereit zur Restaurierung",
+    "restoring": "Wird restauriert…",
+    "mod_slots": "Mod-Slots",
+    "slots_no_more": "{{rarity}} fasst nicht mehr — ein Aufstieg schafft Platz",
+    "you_own_fit_one": "{{count}} deiner Mods passt zu diesem Bau",
+    "you_own_fit": "{{count}} deiner Mods passen zu diesem Bau",
+    "nothing_fits_yet": "noch passt nichts von deinen Sachen zu diesem Bau",
+    "upgrade_cost": "Aufwertungskosten",
+    "building": "Wird gebaut…",
+    "your_gear": "Deine Ausrüstung",
+    "search_rack": "Rack durchsuchen",
+    "nothing_matches": "Nichts passt dazu.",
+    "rack_filter": {
+      "all": "Alle",
+      "guitar": "Gitarren",
+      "effect": "Pedale"
+    },
+    "promoted": "Aufgestiegen",
+    "parts_used": "Verbrauchte Teile",
+    "levels_word_one": "Level",
+    "levels_word": "Level",
+    "empty": "Öffne zuerst eine Kiste. Sobald du eine Gitarre oder ein Pedal besitzt, kannst du es restaurieren und mit geborgenen Teilen weiter ausbauen.",
+    "change_instrument": "Instrument wechseln · {{count}} im Rack",
+    "pick_instrument": "Instrument wählen"
+  },
+  "mods": {
+    "remove_aria": "Diesen Mod für {{fame}} Fame ausbauen",
+    "remove_hint": "Baut den Mod für {{fame}} Fame aus dem Instrument aus und gibt den Slot frei. Der Mod wird dabei zerstört — er landet nicht in deinem Lager und kann nicht wieder eingebaut werden.",
+    "rerolls_range": "würfelt neu +{{min}} bis +{{max}}",
+    "rolls_range": "würfelt +{{min}} bis +{{max}}",
+    "range": "+{{min}} bis +{{max}}",
+    "from_source": "Aus {{source}} — kommt unverändert hinein, nichts wird neu gewürfelt",
+    "from_stash": "Aus deinem Lager",
+    "stash_intro": "Ein Mod ist ein Bauteil, und die Werkbank baut den ein, den du ihr gibst — herstellen kann sie keinen. Mods stammen aus zerlegter Ausrüstung und von der Theke des Händlers und kommen mit ihrem bisherigen Wert hinein: Nichts wird neu gewürfelt, nichts kostet etwas.",
+    "slots_full": "Alle Mod-Slots dieser Seltenheit sind belegt — ein Aufstieg schafft Platz dafür.",
+    "nothing_fits": "Nichts von deinen Sachen passt in dieses Instrument. Zerlege etwas mit einem Mod — einer überlebt jedes Zerlegen — oder schau, was der Händler heute hat.",
+    "installed": "Eingebaut",
+    "reroll_intro": "Neu würfeln ist der einzige Auftrag hier, der Teile kostet. Er kauft einen ganz neuen Wert aus dem Bereich des Mods, und das Ergebnis ersetzt den jetzigen Wert — den besseren von beiden behalten geht nicht.",
+    "remove_intro": "Einen auszubauen kostet {{fame}} Fame und gibt seinen Slot frei. Der Mod verlässt das Instrument endgültig: Er kommt nicht ins Lager zurück, kann nirgends sonst eingebaut werden, und das Level, das er wert war, geht mit.",
+    "reroll": "Neu würfeln",
+    "reroll_hint": "Zahlt diese Rechnung noch einmal für einen neuen Wurf zwischen +{{min}} und +{{max}}. Er ersetzt +{{points}} in jedem Fall — {{odds}}.",
+    "reroll_worse": "{{worse}} der {{total}} Ergebnisse sind schlechter als der jetzige Wert",
+    "reroll_only_up": "von hier geht es nur nach oben oder seitwärts",
+    "would_fit": "Würde zu diesem Bau passen",
+    "would_fit_hint": "Danach lohnt es sich Ausschau zu halten. Jeder davon käme in dieses Instrument, sobald er in deinem Lager landet.",
+    "remove_title": "{{name}} ausbauen?",
+    "remove_body": "Er kommt aus {{item}} heraus und wird dabei zerstört — der Mod landet nicht im Lager, passt in nichts anderes, und nichts bringt ihn zurück.",
+    "remove_effect": "+{{points}} Level geht mit · ein Slot wird frei",
+    "keep_it": "Behalten",
+    "taking_off": "Wird ausgebaut…",
+    "take_off": "Ausbauen",
+    "installed_aria": "{{name}}, eingebaut",
+    "reroll_name": "{{name}} neu würfeln",
+    "empty_slot_title": "Leerer Slot · Mod einbauen",
+    "empty_slot_aria": "Leerer Slot, Mod einbauen",
+    "rolls_aria": "Würfelt +{{min}} bis +{{max}}, aktuell +{{current}}",
+    "was": "vorher",
+    "cost": "Kosten",
+    "can_roll_lower": "Kann niedriger ausfallen als deine aktuellen +{{points}}.",
+    "better": "{{count}} besser",
+    "worse": "{{count}} schlechter",
+    "same_value": "gleicher Wert",
+    "done": "Fertig",
+    "back": "Zurück",
+    "rolling": "Wird gewürfelt…",
+    "not_enough_parts": "Nicht genug Teile",
+    "roll_again": "Nochmal würfeln",
+    "slot": "Slot {{slot}}",
+    "install_mod": "Mod einbauen",
+    "reroll_mod": "Mod neu würfeln",
+    "manage_mod": "Mod verwalten",
+    "remove_mod": "Mod ausbauen",
+    "choose_compatible": "Passenden Mod wählen",
+    "choose_hint": "Wähle einen Mod aus deinem Lager für diesen Slot. Er kommt mit seinem Wert hinein — nichts wird neu gewürfelt.",
+    "search_placeholder": "Passende Mods suchen...",
+    "search": "Passende Mods suchen",
+    "nothing_in_stash": "Nichts in deinem Lager passt zu diesem Bau.",
+    "would_take": "Mods stammen aus anderen Instrumenten an der Werkbank und vom Händler. Dieses nimmt:",
+    "no_match": "Kein passender Mod trägt diesen Namen.",
+    "bonus": "+{{points}} Bonus",
+    "bonus_word": "Bonus",
+    "compatible_slot": "Passt in diesen Slot"
+  },
+  "toasts": {
+    "mod_added": "Mod liegt in deinem Lager — bau ihn über die Sammlung oder an der Werkbank ein",
+    "reworked": "Aufgewertet zu {{qty}}× {{part}}!",
+    "listed": "Gegenstand auf dem Markt angeboten",
+    "purchase_complete": "Kauf abgeschlossen!",
+    "listing_cancelled": "Angebot zurückgezogen",
+    "scrapped_one": "Zerlegt — {{count}} Teil!",
+    "scrapped": "Zerlegt — {{count}} Teile!",
+    "mod_pulled": "{{name}} +{{points}} ausgebaut und eingelagert",
+    "scrapped_pedals": "{{count}} Pedale zerlegt — {{parts}} Teile!",
+    "scrapped_guitars": "{{count}} Gitarren zerlegt — {{parts}} Teile!",
+    "sold_for": "Für {{fame}} Fame verkauft!",
+    "sold_pedals": "{{count}} Pedale für {{fame}} Fame verkauft!",
+    "sold_guitars": "{{count}} Gitarren für {{fame}} Fame verkauft!",
+    "bolted_in": "{{name}} eingebaut — {{fame}} Fame",
+    "racked_up": "{{name}} montiert — {{fame}} Fame",
+    "build_done": "Bau {{build}} — +{{gain}} Level",
+    "restored": "Auf {{grade}} restauriert — +{{gain}} Level",
+    "mod_fitted": "{{name}} eingebaut — +{{points}} Level",
+    "mod_removed": "{{name}} ausgebaut — der Mod ist weg, der Slot ist frei",
+    "mod_respec": "{{name}} neu gewürfelt — +{{before}} → +{{after}}",
+    "err": {
+      "purchase": "Kauf fehlgeschlagen",
+      "equip": "Gitarre konnte nicht ausgerüstet werden",
+      "rework": "Teile konnten nicht aufgewertet werden",
+      "list": "Gegenstand konnte nicht angeboten werden",
+      "buy": "Gegenstand konnte nicht gekauft werden",
+      "cancel_listing": "Angebot konnte nicht zurückgezogen werden",
+      "open_case": "Kiste konnte nicht geöffnet werden",
+      "scrap_effect": "Effekt konnte nicht zerlegt werden",
+      "scrap_pedals": "Pedale konnten nicht zerlegt werden",
+      "scrap_guitar": "Gitarre konnte nicht zerlegt werden",
+      "scrap_guitars": "Gitarren konnten nicht zerlegt werden",
+      "sell_effect": "Effekt konnte nicht verkauft werden",
+      "sell_pedals": "Pedale konnten nicht verkauft werden",
+      "sell_guitar": "Gitarre konnte nicht verkauft werden",
+      "sell_guitars": "Gitarren konnten nicht verkauft werden",
+      "sell_parts": "Teile konnten nicht verkauft werden",
+      "sell_mod": "Mod konnte nicht verkauft werden",
+      "unequip": "Gitarre konnte nicht abgelegt werden",
+      "pedalboard": "Pedalboard konnte nicht aktualisiert werden",
+      "rig": "Rig konnte nicht aktualisiert werden",
+      "stash_layout": "Lageranordnung konnte nicht gespeichert werden",
+      "upgrade": "Upgrade konnte nicht gekauft werden",
+      "build": "Bau fehlgeschlagen",
+      "commission": "Auftrag fehlgeschlagen",
+      "mod": "Mod konnte nicht eingebaut werden",
+      "repair": "Reparatur fehlgeschlagen"
+    }
+  },
+  "categories": {
+    "technique": "Technik",
+    "theory": "Theorie",
+    "hearing": "Gehör",
+    "creativity": "Kreativität"
+  },
+  "signal": {
+    "path": "Signalweg",
+    "backwards": "{{wrong}} von {{cables}} verkehrt herum",
+    "all_in_order": "Alle {{count}} in Reihenfolge",
+    "wire_it_up": "Verkabeln",
+    "wire_it_up_hint": "Das ganze Board in der Reihenfolge auslegen, die das Handwerk verlangt",
+    "cables_in_order_one": "{{ok}} von {{count}} Kabel in Reihenfolge",
+    "cables_in_order": "{{ok}} von {{count}} Kabeln in Reihenfolge",
+    "stage_empty": "Nichts dieser Art ist im Einsatz.",
+    "stage_lost": " ({{count}} gehen an eine doppelte Kopie verloren)",
+    "stage_level_one": "1 Pedal im Einsatz, wert Lvl {{level}} deines Rig-Levels{{lost}}.",
+    "stage_level": "{{count}} Pedale im Einsatz, wert Lvl {{level}} deines Rig-Levels{{lost}}.",
+    "order": "Signalreihenfolge",
+    "amber_backwards": "Bernsteinfarbene Pedale hängen an einem verkehrten Kabel",
+    "full_chain_done": "Jede Stufe ist im Einsatz. Das Board zahlt {{fame}} Fame pro Stunde zusätzlich zu seinen Kabeln.",
+    "full_chain_hint": "Besetze jede Stufe gleichzeitig, und das Board zahlt {{fame}} Fame pro Stunde zusätzlich zu seinen Kabeln.",
+    "full_chain": "Volle Kette",
+    "to_go": "noch {{count}}",
+    "stages": {
+      "tuner": {
+        "label": "Stimmgerät",
+        "why": "Liest die blanke Saite, also darf nichts das Signal davor färben."
+      },
+      "filter": {
+        "label": "Filter",
+        "why": "Fegt über ein cleanes Signal. Hinter der Zerre fegt es nur noch das Britzeln."
+      },
+      "compressor": {
+        "label": "Kompressor",
+        "why": "Gleicht den Anschlag aus, bevor irgendetwas dahinter ihn verstärkt."
+      },
+      "fuzz": {
+        "label": "Fuzz",
+        "why": "Will die Tonabnehmer fast aus erster Hand — Buffer davor würgen ihn ab."
+      },
+      "overdrive": {
+        "label": "Overdrive",
+        "why": "Biss auf einem cleanen Signal, und das Pedal, auf das eine Distortion gestapelt wird."
+      },
+      "distortion": {
+        "label": "Distortion",
+        "why": "Das härteste Clipping sitzt am Ende der Zerrsektion."
+      },
+      "boost": {
+        "label": "Boost",
+        "why": "Schiebt einen Ton an, der schon verzerrt ist. Davor macht er nur lauter."
+      },
+      "eq": {
+        "label": "EQ",
+        "why": "Formt die fertige Zerre, bevor die Zeiteffekte sie überhaupt hören."
+      },
+      "modulation": {
+        "label": "Modulation",
+        "why": "Bewegt einen fertigen Ton. Die Reihenfolge innerhalb der Familie ist Geschmackssache."
+      },
+      "delay": {
+        "label": "Delay",
+        "why": "Wiederholt den fertigen Sound. Vor der Zerre wiederholt es Brei."
+      },
+      "reverb": {
+        "label": "Hall",
+        "why": "Der Raum, in dem das ganze Rig gespielt wird, also immer zuletzt."
+      }
+    },
+    "tiers": {
+      "empty": {
+        "label": "Nichts verkabelt",
+        "note": "Stell ein Pedal aufs Board, und die Reihenfolge, in der du es stellst, beginnt sich zu lohnen."
+      },
+      "single": {
+        "label": "Ein Pedal",
+        "note": "Eine Kette braucht einen Ort, wohin das Signal als Nächstes geht. Füge ein zweites Pedal hinzu."
+      },
+      "book": {
+        "label": "Wie im Lehrbuch",
+        "note": "Jedes Kabel führt in das Pedal, das als Nächstes kommt. Das ist die Reihenfolge, die das Handwerk verlangt."
+      },
+      "one-off": {
+        "label": "Ein Kabel falsch",
+        "note": "Ein Pedal steht an der falschen Stelle. Alles andere stimmt."
+      },
+      "rough": {
+        "label": "Wilde Verkabelung",
+        "note": "Zwei Kabel laufen rückwärts durch die Kette."
+      },
+      "spaghetti": {
+        "label": "Spaghetti",
+        "note": "Das Signal kreuzt sich über das ganze Board."
+      }
+    }
+  },
+  "power": {
+    "label": "Strom",
+    "one_unpowered": "{{name}} hat keinen Strom",
+    "many_unpowered": "{{count}} Pedale haben keinen Strom",
+    "nothing_plugged": "Noch nichts angeschlossen",
+    "all_running": "Jedes Pedal läuft",
+    "patch": "Strom anschließen",
+    "patch_hint": "Alles einstecken, wofür das Netzteil noch eine Buchse frei hat",
+    "outputs": "{{used}} / {{total}} Ausgänge",
+    "outputs_total": "{{total}} Ausgänge",
+    "no_power_for": "Kein Strom für {{names}}",
+    "dead_pedal_note": "Ein Pedal ohne Strom bringt kein Rig-Level und verdient kein Fame."
+  },
+  "duplicates": {
+    "title": "Duplikate",
+    "copy_line": "{{name}} Lvl {{level}} → zählt {{counted}}",
+    "rule": "Die beste Kopie zählt voll, die zweite halb, jede weitere gar nicht.",
+    "keeper": "{{total}} Kopien von {{name}} sind auf dem Board mit Strom versorgt. Dies ist die beste davon, also zählt sie voll (Lvl {{level}}) — die Marken auf den anderen zeigen, wie viel sie zählen.",
+    "copy": "Kopie Nr. {{n}} von {{name}} auf dem Board — sie {{worth}} (Lvl {{level}} → {{counted}}). Tausch sie gegen ein anderes Pedal, und jedes Level zählt.",
+    "worth_none": "fügt deinem Rig-Level nichts hinzu",
+    "worth_half": "fügt deinem Rig-Level die Hälfte ihres Levels hinzu",
+    "worth_pct": "fügt deinem Rig-Level {{pct}} % ihres Levels hinzu"
+  },
+  "picker": {
+    "pedal_slot": "Pedalboard · Slot {{slot}}",
+    "choose_effect": "Effekt wählen",
+    "board_full": "Das Board ist voll — nimm ein Pedal herunter, bevor du ein weiteres hinzufügst.",
+    "remove_from_slot": "Aus dem Slot entfernen",
+    "no_effects": "Noch keine Effekte in deiner Sammlung.",
+    "no_effects_hint": "Öffne eine Effektkiste, um loszulegen!",
+    "on_another_slot": "In einem anderen Slot",
+    "no_room": "Kein Platz auf dem Board",
+    "guitar_slot": "Gitarren-Slot {{slot}}",
+    "choose_guitar": "Gitarre wählen",
+    "in_another_slot": "In einem anderen Slot"
+  },
+  "rig": {
+    "rig_level": "Rig-Level",
+    "fame_per_hour": "Fame / Stunde",
+    "base": "Basis",
+    "traits": "Eigenschaften",
+    "category_bonus": "Bonus: {{category}}",
+    "hardware_costs": "{{name}} kostet {{fame}} Fame — es fehlen {{missing}}",
+    "upgrade_label": "{{label}} aufrüsten",
+    "pedalboard_hw": "Pedalboard",
+    "power_supply_hw": "Netzteil"
+  },
+  "rack": {
+    "fit_slot": "Gitarre in Slot {{slot}} einsetzen",
+    "equip_guitar": "Gitarre ausrüsten",
+    "slot": "Slot {{slot}}",
+    "change": "Wechseln",
+    "more_for_slot": "Mehr zu Slot {{slot}}",
+    "take_off": "Vom Rack nehmen",
+    "condition_word": "Zustand"
+  },
+  "board": {
+    "title": "Pedalboard",
+    "full": "Das Board ist voll — nimm ein Pedal herunter, bevor du ein weiteres hinzufügst.",
+    "no_output_one": "{{supply}} hat keinen Ausgang für {{count}} Pedal — ohne Strom, also raus aus der Signalkette und raus aus dem Rig.",
+    "no_output": "{{supply}} hat keine Ausgänge für {{count}} Pedale — ohne Strom, also raus aus der Signalkette und raus aus dem Rig.",
+    "tap_target": "Tippe jetzt auf das Pedal, zu dem dieses Kabel führt.",
+    "outputs_taken": "Jeder Ausgang an {{supply}} ist belegt — zieh zuerst ein Kabel heraus.",
+    "no_room_wired_one": "Kein Platz für {{count}} Pedal — der Rest ist der Reihe nach verkabelt.",
+    "no_room_wired": "Kein Platz für {{count}} Pedale — der Rest ist der Reihe nach verkabelt.",
+    "no_room_parked_one": "Kein Platz für {{count}} Pedal — es steht unter dem Board.",
+    "no_room_parked": "Kein Platz für {{count}} Pedale — sie stehen unter dem Board.",
+    "unplug": "Ausstecken",
+    "plug_in": "Einstecken",
+    "off_the_board": "Vom Board",
+    "by_the_book": "Wie im Lehrbuch — das Board zahlt +{{rate}} Fame/h",
+    "tidy_hint": "Alle Pedale in Reihen aufstellen",
+    "add_pedal": "Pedal hinzufügen",
+    "brick_hint": "{{supply}} — zieh ein Kabel auf ein Pedal, um es mit Strom zu versorgen",
+    "unplug_name": "{{name}} ausstecken",
+    "take_off_name": "{{name}} vom Board nehmen",
+    "remove_name": "{{name}} entfernen",
+    "zoom_in": "Vergrößern",
+    "zoom_out": "Verkleinern",
+    "fit_board": "Ganzes Board zeigen",
+    "open_fullscreen": "Board im Vollbild öffnen",
+    "leave_fullscreen": "Vollbild verlassen",
+    "touch_help": "Öffne das Board im Vollbild und dreh das Handy quer, um am meisten Platz zu haben. Zieh die Finger auseinander zum Zoomen, schieb das Board mit einem Finger herum und zieh ein Pedal, um es zu verschieben oder mit einem Nachbarn zu tauschen. Tippe auf eines für seine Karte, wo du es ausstecken oder vom Board nehmen kannst — und tippe auf das Netzteil, dann auf ein Pedal, um ein Kabel zu ziehen.",
+    "overflow_hint_one": "Kein Platz mehr für dieses Pedal — nimm etwas vom Board und räum dann auf, um es zurückzustellen.",
+    "overflow_hint": "Kein Platz mehr für diese Pedale — nimm etwas vom Board und räum dann auf, um sie zurückzustellen."
+  },
+  "trader": {
+    "subtitle": "Teile einzeln, ein Mod und ein paar Instrumente — jeden Tag frische Ware.",
+    "parts_mods": "Teile & Mods",
+    "nothing_taken": "Heute wurde noch nichts gekauft.",
+    "slots_cleared": "{{taken}} von {{total}} Plätzen heute leer.",
+    "col_part": "Teil",
+    "col_in_stash": "Im Lager",
+    "col_left_today": "Heute übrig",
+    "col_price_each": "Preis pro Stück",
+    "featured_gear": "Ausgewählte Ausrüstung",
+    "featured_hint": "Aus dem heutigen Seed gewürfelt — die Karte ist genau das Instrument, das du bekommst.",
+    "in_stash": "im Lager",
+    "left": "übrig",
+    "taken_for_today": "Für heute vergriffen",
+    "of_max": "von max. +{{max}}",
+    "restocks_in": "Nachschub in",
+    "mod_of_day": "Mod des Tages",
+    "guitar_mod": "Gitarren-Mod",
+    "pedal_mod": "Pedal-Mod",
+    "top_roll": "Bester Wurf",
+    "bought_today": "Heute gekauft",
+    "one_fewer": "Eins weniger",
+    "one_more": "Eins mehr",
+    "quantity": "Menge",
+    "max": "Max",
+    "all": "Alle"
+  },
+  "dex": {
+    "close_preview": "Vorschau schließen",
+    "silhouette": "Silhouette eines unentdeckten Gegenstands",
+    "in_stash": "In deinem Lager",
+    "discovered_not_stash": "Entdeckt, nicht im Lager",
+    "discovered_hint": "Entdeckt · dauerhaft verzeichnet. Gerade keine Kopie in deinem Lager.",
+    "undiscovered_hint": "Noch nicht entdeckt — öffne Kisten, um es zu finden.",
+    "title": "Entdeckungen",
+    "discovered_count": "{{total}} entdeckt",
+    "discovered": "Entdeckt",
+    "missing": "Fehlend",
+    "search_placeholder": "Suchen...",
+    "search": "Entdeckungen durchsuchen",
+    "no_match": "Nichts an dieser Wand passt. Lösche einen oder zwei Filter.",
+    "prev_wall": "Vorherige Wand",
+    "next_wall": "Nächste Wand",
+    "wall_n": "Wand {{n}}"
+  },
+  "commissions": {
+    "commission_name": "{{name}} in Auftrag geben",
+    "delivered": "Geliefert",
+    "delivered_body": "In deinem Lager und im Dex verzeichnet. Jeder Mod-Slot ist frei.",
+    "built_stock": "Serienmäßig gebaut: neuwertig, keine Mods, keine Eigenschaften.",
+    "cost": "Auftragskosten",
+    "commission": "In Auftrag geben",
+    "subtitle": "Jedes Modell, das in deinem Dex fehlt, serienmäßig auf Bestellung gebaut — je einmal.",
+    "left_to_build": "noch zu bauen",
+    "dex_complete": "Dein Dex ist vollständig — für die Werkbank gibt es nichts mehr zu bauen.",
+    "nothing_here": "Hier gibt es nichts mehr zu bauen. Versuch eine andere Seltenheit oder Art."
   }
 }

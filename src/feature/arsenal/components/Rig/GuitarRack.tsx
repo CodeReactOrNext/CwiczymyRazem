@@ -12,6 +12,7 @@ import {
   getItemCondition,
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import type { MotionValue } from "framer-motion";
 import {
@@ -380,6 +381,7 @@ const Bay = ({
       `${s < 1 ? `brightness(${0.12 + 0.88 * s}) ` : ""}drop-shadow(0 18px 22px rgba(0,0,0,0.85))`,
   );
   const emblemOpacity = useTransform(light, [0, 1], [0, 1]);
+  const { t } = useArsenalLabels();
 
   if (!item || !guitar) {
     return (
@@ -403,13 +405,13 @@ const Bay = ({
             <button
               type='button'
               onClick={() => onOpenPicker(index)}
-              aria-label={`Fit a guitar in slot ${index + 1}`}
+              aria-label={t("rack.fit_slot", { slot: index + 1 })}
               className='group absolute inset-0 flex flex-col items-center justify-end gap-3 pb-[18%] focus-visible:outline-none'>
               <span className='flex h-12 w-12 items-center justify-center rounded-full text-zinc-300 transition-colors group-hover:bg-zinc-100/10 group-hover:text-white group-focus-visible:ring-1 group-focus-visible:ring-ring'>
                 <CirclePlus size={44} strokeWidth={1.1} />
               </span>
               <span className='text-base font-medium text-zinc-300 transition-colors group-hover:text-white'>
-                Equip guitar
+                {t("rack.equip_guitar")}
               </span>
             </button>
           </div>
@@ -451,7 +453,7 @@ const Bay = ({
           level={level}
           rarity={rarity}
           size={40}
-          title='Guitar level'
+          title={t("card.guitar.level")}
         />
       </motion.div>
 
@@ -497,6 +499,8 @@ interface PlateProps {
 
 /** The label under each bay: what hangs there, its condition, and the way out. */
 const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
   const numeral = BAY_NUMERALS[index] ?? String(index + 1);
 
@@ -508,14 +512,15 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
           BAY_COLUMN[index],
         )}>
         <span className='text-base text-zinc-400'>
-          Slot {numeral} <span className='text-zinc-600'>·</span> Empty
+          {t("rack.slot", { slot: numeral })}{" "}
+          <span className='text-zinc-600'>·</span> {t("equip.empty")}
         </span>
         <button
           type='button'
           onClick={() => onOpenPicker(index)}
           className='flex items-center gap-2.5 rounded px-3 py-1.5 text-base font-medium text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-100/10 hover:text-white'>
           <CirclePlus size={22} strokeWidth={1.4} className='text-zinc-300' />
-          Equip
+          {t("card.equip")}
         </button>
       </div>
     );
@@ -540,7 +545,7 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
           <p className='mt-0.5 truncate text-sm text-zinc-300'>
             {guitar.brand} <span className='text-zinc-600'>·</span>{" "}
             <span className='font-medium' style={{ color: rs.baseColor }}>
-              {rarity}
+              {labels.rarity(rarity)}
             </span>{" "}
             <span className='text-zinc-600'>·</span>{" "}
             <span className='text-zinc-500'>
@@ -555,13 +560,13 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
             onClick={() => onOpenPicker(index)}
             className='flex items-center gap-2 rounded px-2.5 py-1.5 text-sm font-medium text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-100/10 hover:text-white'>
             <ArrowLeftRight size={16} className='text-zinc-300' />
-            Change
+            {t("rack.change")}
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type='button'
-                aria-label={`More for slot ${numeral}`}
+                aria-label={t("rack.more_for_slot", { slot: numeral })}
                 className='rounded p-1.5 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-100/10 hover:text-white'>
                 <MoreVertical size={18} />
               </button>
@@ -571,7 +576,7 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
                 onSelect={() => onRemove(index)}
                 className='gap-2 text-red-300 focus:text-red-200'>
                 <Trash2 size={14} />
-                Take off the rack
+                {t("rack.take_off")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -588,9 +593,9 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
         />
         <p className='text-sm'>
           <span className='font-medium' style={{ color: grade.color }}>
-            {grade.label}
+            {labels.condition(grade)}
           </span>{" "}
-          <span className='text-zinc-500'>condition</span>
+          <span className='text-zinc-500'>{t("rack.condition_word")}</span>
         </p>
       </div>
     </div>
@@ -704,6 +709,7 @@ export const DisplayBay = ({
   children,
 }: DisplayBayProps) => {
   const light = useLampLevel(color ? 1 : EMPTY_LAMP);
+  const { t } = useArsenalLabels();
   return (
     <div
       className={cn(
@@ -719,7 +725,7 @@ export const DisplayBay = ({
             level={level}
             rarity={rarity}
             size={40}
-            title='Guitar level'
+            title={t("card.guitar.level")}
           />
         </div>
       )}
