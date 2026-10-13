@@ -11,6 +11,7 @@ import community from "../../../public/locales/en/community.json";
 import dashboard from "../../../public/locales/en/dashboard.json";
 import desktop from "../../../public/locales/en/desktop.json";
 import duels from "../../../public/locales/en/duels.json";
+import exercise_content from "../../../public/locales/en/exercise_content.json";
 import exercises from "../../../public/locales/en/exercises.json";
 import faq from "../../../public/locales/en/faq.json";
 import feed from "../../../public/locales/en/feed.json";
@@ -21,6 +22,7 @@ import guilds from "../../../public/locales/en/guilds.json";
 import journey from "../../../public/locales/en/journey.json";
 import leadboard from "../../../public/locales/en/leadboard.json";
 import level_gate from "../../../public/locales/en/level_gate.json";
+import library from "../../../public/locales/en/library.json";
 import login from "../../../public/locales/en/login.json";
 import metronome from "../../../public/locales/en/metronome.json";
 import milestones from "../../../public/locales/en/milestones.json";
@@ -47,7 +49,9 @@ import supporter from "../../../public/locales/en/supporter.json";
 import tab_settings from "../../../public/locales/en/tab_settings.json";
 import timer from "../../../public/locales/en/timer.json";
 import toast from "../../../public/locales/en/toast.json";
+import tone_studio from "../../../public/locales/en/tone_studio.json";
 import ui from "../../../public/locales/en/ui.json";
+import wiki from "../../../public/locales/en/wiki.json";
 import yup_errors from "../../../public/locales/en/yup_errors.json";
 
 /** One file per namespace, per locale. The names match the JSON filenames. */
@@ -65,6 +69,7 @@ export const TRANSLATION_NAMESPACES = [
   "dashboard",
   "desktop",
   "duels",
+  "exercise_content",
   "exercises",
   "faq",
   "feed",
@@ -75,6 +80,7 @@ export const TRANSLATION_NAMESPACES = [
   "journey",
   "leadboard",
   "level_gate",
+  "library",
   "login",
   "metronome",
   "milestones",
@@ -101,7 +107,9 @@ export const TRANSLATION_NAMESPACES = [
   "tab_settings",
   "timer",
   "toast",
+  "tone_studio",
   "ui",
+  "wiki",
   "yup_errors",
 ] as const;
 
@@ -137,6 +145,7 @@ export const EN_CATALOG: LocaleCatalog = {
   dashboard,
   desktop,
   duels,
+  exercise_content,
   exercises,
   faq,
   feed,
@@ -147,6 +156,7 @@ export const EN_CATALOG: LocaleCatalog = {
   journey,
   leadboard,
   level_gate,
+  library,
   login,
   metronome,
   milestones,
@@ -173,7 +183,9 @@ export const EN_CATALOG: LocaleCatalog = {
   tab_settings,
   timer,
   toast,
+  tone_studio,
   ui,
+  wiki,
   yup_errors,
 };
 

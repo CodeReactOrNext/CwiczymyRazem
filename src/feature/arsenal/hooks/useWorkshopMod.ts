@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deductFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -16,6 +17,7 @@ import { ARSENAL_QUERY_KEY } from "./useArsenalData";
  * that trade and should see it land.
  */
 export const useWorkshopMod = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
@@ -40,17 +42,18 @@ export const useWorkshopMod = () => {
       // page is reloaded. Only a removal charges any.
       dispatch(deductFame(data.fameSpent ?? 0));
 
+      const name = t(`labels.mod.${data.featureId}`, data.label);
       if (data.action === "fit-salvaged") {
-        toast.success(`${data.label} fitted — +${data.points} level`);
+        toast.success(t("toasts.mod_fitted", { name, points: data.points }));
       } else if (data.action === "remove") {
-        toast(`${data.label} taken off — the mod is gone, the slot is free`);
+        toast(t("toasts.mod_removed", { name }));
       } else if (data.levelGain > 0) {
         toast.success(
-          `${data.label} re-spec — +${data.pointsBefore} → +${data.points}`,
+          t("toasts.mod_respec", { name, before: data.pointsBefore, after: data.points }),
         );
       } else {
         toast(
-          `${data.label} re-spec — +${data.pointsBefore} → +${data.points}`,
+          t("toasts.mod_respec", { name, before: data.pointsBefore, after: data.points }),
         );
       }
       queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
@@ -58,7 +61,7 @@ export const useWorkshopMod = () => {
     onError: (error: unknown) => {
       const message =
         (error as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error || "Failed to fit the mod";
+          ?.error || t("toasts.err.mod");
       toast.error(message);
     },
   });

@@ -6,6 +6,7 @@ import { LIBRARY_TABS } from "constants/navTabs";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { SongBoardRow } from "feature/songs/components/SongBoard/SongBoardRow";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
@@ -53,7 +54,8 @@ const localizedTitle = (value: unknown): string => {
 };
 
 const FavoritesPage: NextPageWithLayout = () => {
-  const { t } = useTranslation(["common", "skills"]);
+  const { t } = useTranslation(["common", "skills", "library"]);
+  const localizeExercise = useLocalizeExercise();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
@@ -129,9 +131,9 @@ const FavoritesPage: NextPageWithLayout = () => {
   return (
     <div className="bg-second-600 flex min-h-screen flex-col overflow-visible rounded-xl border-none shadow-sm">
       <HeroBanner
-        title="Favorites"
-        subtitle="Saved plans, exercises and songs"
-        eyebrow="Favorites"
+        title={t("library:favorites.title")}
+        subtitle={t("library:favorites.subtitle")}
+        eyebrow={t("library:favorites.title")}
         eyebrowClassName="text-rose-400/80"
         backgroundContent={<HeroPattern withHeart />}
         className="mb-6 min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]"
@@ -141,7 +143,7 @@ const FavoritesPage: NextPageWithLayout = () => {
         <PageTabs
           tabs={LIBRARY_TABS}
           activeHref="/favorites"
-          ariaLabel="Library sections"
+          ariaLabel={t("library:sections")}
         />
       </div>
 
@@ -152,20 +154,22 @@ const FavoritesPage: NextPageWithLayout = () => {
               <Heart className="h-5 w-5 text-rose-400" />
             </div>
             <p className="text-base font-semibold text-zinc-100">
-              Nothing saved yet
+              {t("library:favorites.empty_title")}
             </p>
             <p className="mt-2 max-w-sm text-sm text-zinc-400">
-              Tap the heart on a plan, exercise or song to keep it here.
+              {t("library:favorites.empty_body")}
             </p>
             <Button asChild className="mt-8 h-11 rounded-lg bg-white px-6 font-bold text-black hover:bg-zinc-200">
-              <Link href="/profile/skills?tab=browse">Browse exercises</Link>
+              <Link href="/profile/skills?tab=browse">
+                {t("library:favorites.browse_exercises")}
+              </Link>
             </Button>
             <div className="mt-4 flex items-center gap-6 text-sm">
               <Link href="/timer/plans" className="font-medium text-zinc-300 transition-colors hover:text-white">
-                Browse plans
+                {t("library:favorites.browse_plans")}
               </Link>
               <Link href="/songs?view=explore" className="font-medium text-zinc-300 transition-colors hover:text-white">
-                Browse songs
+                {t("library:favorites.browse_songs")}
               </Link>
             </div>
           </div>
@@ -256,7 +260,7 @@ const FavoritesPage: NextPageWithLayout = () => {
                       </span>
 
                       <span className="flex-1 truncate font-medium text-zinc-100">
-                        {localizedTitle(exercise.title)}
+                        {localizedTitle(localizeExercise(exercise).title)}
                       </span>
 
                       {skillId && (
@@ -284,7 +288,7 @@ const FavoritesPage: NextPageWithLayout = () => {
                             DIFFICULTY_COLORS.easy
                         )}
                       >
-                        {exercise.difficulty}
+                        {t(`common:difficulty.${exercise.difficulty}`, exercise.difficulty)}
                       </span>
 
                       <span className="hidden w-16 shrink-0 items-center justify-end gap-1 text-[11px] text-zinc-500 sm:flex">
@@ -297,7 +301,7 @@ const FavoritesPage: NextPageWithLayout = () => {
                       <span
                         role="button"
                         tabIndex={0}
-                        aria-label="Remove from favorites"
+                        aria-label={t("library:favorites.remove")}
                         onClick={(e) => {
                           e.stopPropagation();
                           dispatch(

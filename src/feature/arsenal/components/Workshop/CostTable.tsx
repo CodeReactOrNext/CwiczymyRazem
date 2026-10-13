@@ -1,9 +1,9 @@
 import { cn } from "assets/lib/utils";
 import {
-  getPartLabel,
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
 import type { RecipeLine } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { Check, CircleAlert, CircleCheck } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -90,6 +90,8 @@ interface CostTableProps {
  * or four costs the eye wants to scan down, not read across.
  */
 export const CostTable = ({ title, recipe, fame }: CostTableProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const short =
     recipe.filter((line) => !line.ok).length +
     (fame && fame.have < fame.need ? 1 : 0);
@@ -105,15 +107,15 @@ export const CostTable = ({ title, recipe, fame }: CostTableProps) => {
             ready ? "text-emerald-400" : "text-amber-400",
           )}>
           {ready ? <CircleCheck size={18} /> : <CircleAlert size={18} />}
-          {ready ? "Resources available" : `${short} still short`}
+          {ready ? t("workshop.resources_available") : t("workshop.still_short", { count: short })}
         </span>
       </div>
 
       <div className='grid grid-cols-[auto_1fr_5rem_5rem_2rem] gap-x-3 px-3 text-xs text-zinc-500'>
         <span className='w-10' />
         <span />
-        <span className='text-right'>Required</span>
-        <span className='text-right'>Owned</span>
+        <span className='text-right'>{t("workshop.required")}</span>
+        <span className='text-right'>{t("workshop.owned")}</span>
         <span />
       </div>
 
@@ -121,7 +123,7 @@ export const CostTable = ({ title, recipe, fame }: CostTableProps) => {
         {fame && (
           <Row
             icon={<FameCoin size={30} />}
-            label='Fame'
+            label={t("common.fame")}
             need={fame.need}
             have={fame.have}
           />
@@ -137,8 +139,11 @@ export const CostTable = ({ title, recipe, fame }: CostTableProps) => {
                 <PartIcon partId={line.partId} size={30} />
               </TierPlate>
             }
-            label={getPartLabel(line.partId)}
-            tier={{ label: line.tier, color: PART_TIER_COLORS[line.tier] }}
+            label={labels.part(line.partId)}
+            tier={{
+              label: labels.partTier(line.tier),
+              color: PART_TIER_COLORS[line.tier],
+            }}
             need={line.need}
             have={line.have}
           />

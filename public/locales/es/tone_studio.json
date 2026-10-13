@@ -1,0 +1,173 @@
+{
+  "common": {
+    "loading": "Cargando…",
+    "cancel": "Cancelar",
+    "select": "Seleccionar…"
+  },
+  "chain": {
+    "gate": "Puerta",
+    "overdrive": "Overdrive",
+    "amp": "Ampli",
+    "amp_nam": "Ampli · NAM",
+    "amp_classic": "Ampli · Clásico",
+    "cab": "Pantalla",
+    "delay": "Delay"
+  },
+  "gate": {
+    "title": "Puerta de ruido",
+    "subtitle": "Elimina el zumbido y el siseo antes de que algo posterior los amplifique",
+    "input_hint": "Nivel de entrada. Toca tu acorde más fuerte y baja la ganancia de la interfaz hasta que la barra deje de ponerse roja.",
+    "body": "Con la puerta activada, todo lo que suene más bajo que la propia guitarra se corta entre notas: el zumbido de las single-coil, el siseo del ampli, la nevera. Los sonidos con mucha ganancia la quieren puesta; los limpios normalmente no."
+  },
+  "cab": {
+    "title": "Pantalla",
+    "subtitle": "Altavoz y micrófono — lo último que da forma al tono",
+    "builtin": "Modelo 4x12 integrado",
+    "replaced": "Sustituida por la respuesta de impulso cargada",
+    "builtin_cabinet": "Pantalla integrada",
+    "delete_ir": "Eliminar IR",
+    "truncated": "recortada",
+    "load_ir": "Cargar respuesta de impulso (.wav)"
+  },
+  "amp": {
+    "no_capture_loaded": "No hay captura cargada",
+    "subtitle_nam": "Captura neuronal de un cabezal real, en lugar del previo y el control de tono",
+    "subtitle_classic": "Previo en cascada, control de tono pasivo y etapa de potencia",
+    "classic": "Clásico",
+    "neural": "Captura neuronal",
+    "browse_tone3000": "Explorar capturas en Tone3000",
+    "load_capture": "Cargar captura (.nam)",
+    "no_captures": "Aún no hay capturas cargadas — en su lugar funciona el canal clásico.",
+    "delete_capture": "Eliminar captura",
+    "classic_hint": "El previo es la primera etapa de ganancia, antes del control de tono. Drive empuja la etapa de potencia que va después — las dos van en cascada, así que un poco de cada una suena distinto a todo de una sola."
+  },
+  "rack": {
+    "gate_on": "Zumbido y siseo eliminados",
+    "gate_open": "Abierta",
+    "no_capture": "Sin captura",
+    "built_in": "Integrada",
+    "bypass": "Puentear {{name}}"
+  },
+  "meter": {
+    "input": "Entrada"
+  },
+  "pedal": {
+    "bypass": "Puentear este pedal",
+    "engage": "Activar este pedal"
+  },
+  "block": {
+    "bypass": "Puentear este bloque",
+    "engage": "Activar este bloque",
+    "on": "Activo",
+    "bypassed": "Puenteado"
+  },
+  "power": {
+    "turn_amp_off": "Apagar el ampli",
+    "turn_amp_on": "Encender el ampli",
+    "turn_off": "Apagar",
+    "turn_on": "Encender"
+  },
+  "presets": {
+    "name_this": "Ponle nombre a este tono",
+    "save": "Guardar",
+    "previous": "Preset anterior",
+    "next": "Preset siguiente",
+    "none_loaded": "No hay preset cargado",
+    "edited": "Editado desde que se cargó",
+    "none_saved": "Aún no hay presets guardados",
+    "delete": "Eliminar preset",
+    "overwrite_hint": "Sobrescribir «{{name}}» con los ajustes actuales",
+    "update": "Actualizar",
+    "save_as_hint": "Guardar los ajustes actuales como un preset nuevo",
+    "save_as": "Guardar como"
+  },
+  "status": {
+    "no_device": "Sin dispositivo",
+    "choose_hint": "Elige la interfaz de audio, los canales y el tamaño del búfer",
+    "choose_interface": "Elige una interfaz de audio",
+    "rate": "Frecuencia",
+    "buffer": "Búfer",
+    "buffer_hint": "Frames por callback de audio — más pequeño es más ajustado pero más frágil",
+    "latency": "Latencia",
+    "dropouts": "Cortes",
+    "dropped": "{{underruns}} ({{drops}} descartados)",
+    "dropouts_hint": "Callbacks del hardware que no encontraron nada que reproducir desde que se abrió el flujo — cada uno fue un hueco audible. Los bloques descartados son el motor deshaciéndose del retraso para que la latencia no crezca.",
+    "dsp_hint": "Parte de cada bloque de audio que se pasa dentro de la cadena"
+  },
+  "settings": {
+    "audio_interface": "Interfaz de audio",
+    "refresh_hint": "Actualizar la lista de dispositivos",
+    "refresh": "Actualizar",
+    "input": "Entrada",
+    "select_input": "Elige una entrada",
+    "no_inputs": "No se encontraron dispositivos de entrada",
+    "channels_in": "{{count}} ent.",
+    "channels_out": "{{count}} sal.",
+    "default": "predeterminado",
+    "channel": "Canal",
+    "input_channel_hint": "De qué canal de entrada capturar — p. ej. la toma de guitarra en una interfaz multicanal",
+    "output": "Salida",
+    "asio_same_device": "ASIO usa el mismo dispositivo para entrada y salida",
+    "output_hint": "Dispositivo de salida para la monitorización del ampli",
+    "same_as_input": "Igual que la entrada (ASIO)",
+    "system_default_output": "Salida predeterminada del sistema",
+    "output_channel_hint": "Primer canal de salida para monitorizar — p. ej. salidas 3/4 en vez de 1/2 en una interfaz multicanal",
+    "buffer_title": "Tamaño del búfer ASIO/WASAPI — más pequeño = menos latencia pero más propenso a chasquidos",
+    "buffer_hint": "Los búferes pequeños reducen la latencia; si es demasiado pequeño, el audio empieza a crujir."
+  },
+  "view": {
+    "audio_hint": "Interfaz de audio, canales y tamaño del búfer",
+    "audio": "Audio",
+    "needs_desktop": "Requiere la app de escritorio",
+    "opening_stream": "Abriendo el flujo de audio…",
+    "no_connection": "Sin conexión con la app de escritorio — esto es solo una vista previa, el control de audio está inactivo.",
+    "overload": "La cadena DSP se quedó por detrás del tiempo real y tuvo que reiniciarse (~{{drift}} ms de deriva) — probablemente acabas de oír un chasquido.",
+    "overload_nam_hint": "Prueba con un búfer mayor o una captura más ligera."
+  },
+  "amp_button": {
+    "live": "En vivo",
+    "live_with": "En vivo · {{latency}}",
+    "live_latency": "En vivo · latencia {{latency}}",
+    "starting": "Iniciando…",
+    "monitoring_off": "Monitorización apagada",
+    "reconnecting": "Interfaz desconectada — reconectando…",
+    "dsp_overloaded": "DSP sobrecargado",
+    "dropouts_one": "{{count}} corte",
+    "dropouts": "{{count}} cortes",
+    "title": "Simulador de ampli (ASIO, en vivo)",
+    "amp": "Ampli",
+    "amp_on": "Ampli encendido",
+    "amp_alert": "AMP !",
+    "amp_on_caps": "AMP ON",
+    "amp_caps": "AMP",
+    "preset": "Preset",
+    "modified": "Modificado",
+    "select_preset": "Elige un preset…",
+    "no_presets": "Aún no hay presets",
+    "new_preset_name": "Nombre del preset nuevo",
+    "revert_hint": "Volver a «{{name}}» tal como se guardó",
+    "revert": "Revertir",
+    "builtin_readonly": "Los presets integrados son de solo lectura — guarda tus cambios como uno nuevo",
+    "save_as": "Guardar como…",
+    "update_preset": "Actualizar preset",
+    "chain": "Cadena",
+    "enable": "Activar {{name}}",
+    "interface": "Interfaz",
+    "not_set_up": "Sin configurar",
+    "select_interface": "Elige una interfaz",
+    "no_input_devices": "Sin dispositivos de entrada",
+    "samples": "{{count}} muestras",
+    "latency_preset": {
+      "low": "Baja",
+      "balanced": "Equilibrada",
+      "safe": "Segura",
+      "custom": "Personalizada"
+    },
+    "crackling": "¿Cruje? Sube un paso hacia lo seguro.",
+    "overload": "El DSP se quedó atrás y se reinició (~{{drift}} ms) — puede que hayas oído un chasquido.",
+    "overload_nam_hint": "Ayuda un modelo NAM más ligero o un ajuste de latencia más seguro.",
+    "dropouts_detected": "Se detectaron cortes — prueba un ajuste de latencia más seguro.",
+    "reconnected": "Interfaz de audio reconectada.",
+    "open_tone_studio": "Abrir Tone Studio"
+  }
+}

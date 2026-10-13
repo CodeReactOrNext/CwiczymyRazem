@@ -1,0 +1,40 @@
+{
+  "sidebar_subtitle": "Cómo funciona riff.quest",
+  "hero_subtitle": "Todo lo que hace riff.quest, explicado en lenguaje sencillo",
+  "hero_eyebrow": "Guías",
+  "intro": "Cómo funciona cada parte de riff.quest, escrito para la persona que toca la guitarra.",
+  "search_placeholder": "Busca en la Wiki — racha, Fame, micro, playlists…",
+  "search_label": "Buscar en la Wiki",
+  "no_articles": "Aún no hay artículos en la Wiki.",
+  "no_match": "Ningún artículo coincide con «{{query}}».",
+  "start_here": "Empieza aquí",
+  "then": "Después:",
+  "not_finding_title": "¿No lo encuentras aquí?",
+  "not_finding_body": "Las preguntas cortas sobre precios, cuentas, equipo y cómo se comporta la puntuación se responden en la página de preguntas frecuentes. Los consejos de práctica que no tienen que ver con esta app en particular, como cuánto tiempo practicar o cómo trabajar una escala para que sobreviva al contacto con una canción real, están en el blog. Para cualquier cosa que parezca un fallo, o una duda que ninguna página responde, el servidor de Discord es la forma más rápida de hablar con una persona.",
+  "link_faq": "Preguntas frecuentes",
+  "link_blog": "Guías de práctica",
+  "link_contact": "Contacto",
+  "read_next": "Sigue leyendo",
+  "log_a_session": "Registrar una sesión",
+  "healthy_habits": "Hábitos saludables",
+  "session_worth": "La sesión vale",
+  "completed": "Completado",
+  "sections": {
+    "start_here": "Empieza aquí",
+    "scoring_progress": "Puntuación y progreso",
+    "practice": "Práctica",
+    "songs_library": "Canciones y biblioteca",
+    "skill_development": "Desarrollo de habilidades",
+    "community": "Comunidad",
+    "competition": "Competición"
+  },
+  "section_intros": {
+    "scoring_progress": "De dónde vienen los puntos y por qué nunca puedes gastarlos, cómo el multiplicador de racha hace crecer todo lo que registras, qué compra la Fame y por qué nunca toca tu nivel, y por qué la técnica, la teoría, el oído y el trabajo creativo valen exactamente lo mismo por minuto.",
+    "practice": "Todas las formas de practicar, desde el temporizador libre y el registro manual hasta las rutinas, el Plan automático y tus propios archivos de Guitar Pro, además de cómo escucha la detección de notas tu forma de tocar y qué añade la app de escritorio cuando conectas una guitarra a una interfaz.",
+    "songs_library": "El tablero de canciones por el que arrastras una pieza a medida que se vuelve tocable, qué significan los niveles de dificultad, cuánto paga terminar una canción y cómo se crean y comparten las playlists.",
+    "skill_development": "Las rutas guiadas por la app: la Ruta de aprendizaje y el Mapa de escalas que se desbloquean paso a paso, las habilidades de guitarra individuales que crecen con lo que etiquetas en tus sesiones y la Mastery Roadmap personal que la app puede escribir para ti.",
+    "community": "Las partes de la app donde hay otras personas: las cinco canciones votadas por la comunidad de cada reto mensual, el muro de grabaciones y cualquier otra forma en que otros jugadores acaban pagándote Fame.",
+    "competition": "Las tres clasificaciones y lo que mide cada una, cómo se reinicia la temporada mensual para que un jugador nuevo nunca se quede atrás para siempre, y el Arsenal, el juego de coleccionismo que es lo único para lo que sirve la Fame."
+  },
+  "daily_quests": "Misiones diarias"
+}

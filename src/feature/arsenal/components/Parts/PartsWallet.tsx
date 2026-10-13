@@ -1,8 +1,8 @@
 import { cn } from "assets/lib/utils";
 import {
-  getPartLabel,
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import {
   getWalletTierTotals,
@@ -23,6 +23,7 @@ interface PartsWalletProps {
 
 /** Everything the player has torn down so far, stacked by part and tier. */
 export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
+  const labels = useArsenalLabels();
   const rows = useMemo(() => groupWalletByPart(parts), [parts]);
   const tierTotals = useMemo(() => getWalletTierTotals(parts), [parts]);
 
@@ -33,7 +34,7 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
         className,
       )}>
       <div className='flex flex-wrap items-end justify-between gap-x-8 gap-y-3'>
-        <SectionLabel>Salvaged parts</SectionLabel>
+        <SectionLabel>{labels.t("parts.salvaged_parts")}</SectionLabel>
 
         {/* Split by tier — a grand total tells the player nothing. */}
         <div className='flex flex-wrap items-baseline gap-x-6 gap-y-2'>
@@ -45,7 +46,7 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
               <span
                 className='text-[11px] font-semibold'
                 style={{ color: PART_TIER_COLORS[tier] }}>
-                {tier}
+                {labels.partTier(tier)}
               </span>
             </span>
           ))}
@@ -56,8 +57,7 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
         <div className='flex items-center gap-3 py-6 text-zinc-500'>
           <Wrench size={18} className='opacity-40' />
           <p className='text-sm'>
-            Scrap a guitar or pedal from your collection to salvage your first
-            parts.
+            {labels.t("parts.wallet_empty")}
           </p>
         </div>
       ) : (
@@ -67,7 +67,7 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
               key={row.partId}
               className='flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-4'>
               <span className='truncate text-xs font-semibold text-zinc-300'>
-                {getPartLabel(row.partId)}
+                {labels.part(row.partId)}
               </span>
 
               {/*
@@ -82,7 +82,7 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
                   <span
                     key={t.tier}
                     className='flex flex-col items-center gap-1'
-                    title={`${t.qty}× ${t.tier} ${getPartLabel(row.partId)}`}>
+                    title={`${t.qty}× ${labels.partName(t.tier, row.partId)}`}>
                     <TierPlate
                       color={PART_TIER_COLORS[t.tier]}
                       size={52}
@@ -92,7 +92,7 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
                     <span
                       className='text-[9px] font-bold'
                       style={{ color: PART_TIER_COLORS[t.tier] }}>
-                      {t.tier}
+                      {labels.partTier(t.tier)}
                     </span>
                   </span>
                 ))}

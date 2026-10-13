@@ -1,6 +1,7 @@
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { getWorkshopEntries } from "feature/arsenal/utils/workshopEntries";
+import { useTranslation } from "hooks/useTranslation";
 import { Guitar, Hammer } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -21,6 +22,7 @@ interface WorkshopTabProps {
  */
 export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
   const entries = useMemo(() => getWorkshopEntries(data), [data]);
+  const { t } = useTranslation("arsenal");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [rackOpen, setRackOpen] = useState(false);
 
@@ -39,8 +41,7 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
             Workshop
           </h2>
           <p className='max-w-sm text-sm text-zinc-400'>
-            Open a case first. Once you own a guitar or a pedal you can restore
-            it and keep building it up with salvaged parts.
+            {t("workshop.empty")}
           </p>
         </div>
       </div>
@@ -70,7 +71,7 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
             </span>
             {selected && <InServiceTags uses={selected.uses} />}
             <span className='text-xs text-zinc-500'>
-              Change instrument · {entries.length} in the rack
+              {t("workshop.change_instrument", { count: entries.length })}
             </span>
           </span>
         </button>
@@ -99,7 +100,9 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
         <SheetContent
           side='bottom'
           className='max-h-[85vh] overflow-y-auto p-4 lg:hidden'>
-          <SheetTitle className='sr-only'>Pick an instrument</SheetTitle>
+          <SheetTitle className='sr-only'>
+            {t("workshop.pick_instrument")}
+          </SheetTitle>
           <WorkshopRack
             bare
             entries={entries}

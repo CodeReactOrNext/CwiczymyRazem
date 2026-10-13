@@ -1,0 +1,173 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "select": "Select…"
+  },
+  "chain": {
+    "gate": "Gate",
+    "overdrive": "Overdrive",
+    "amp": "Amp",
+    "amp_nam": "Amp · NAM",
+    "amp_classic": "Amp · Classic",
+    "cab": "Cabinet",
+    "delay": "Delay"
+  },
+  "gate": {
+    "title": "Noise Gate",
+    "subtitle": "Kills hum and hiss before anything downstream amplifies it",
+    "input_hint": "Input level. Play your loudest chord and back the interface gain off until the bar stops turning red.",
+    "body": "With the gate engaged, everything quieter than the guitar itself gets shut out between notes: single-coil hum, amp hiss, the fridge. High-gain tones want it in; clean tones usually do not."
+  },
+  "cab": {
+    "title": "Cabinet",
+    "subtitle": "Speaker and microphone — the last thing that shapes the tone",
+    "builtin": "Built-in 4x12 model",
+    "replaced": "Replaced by the loaded impulse response",
+    "builtin_cabinet": "Built-in cabinet",
+    "delete_ir": "Delete IR",
+    "truncated": "truncated",
+    "load_ir": "Load impulse response (.wav)"
+  },
+  "amp": {
+    "no_capture_loaded": "No capture loaded",
+    "subtitle_nam": "Neural capture of a real head, in place of the preamp and tone stack",
+    "subtitle_classic": "Cascading preamp, passive tone stack and power section",
+    "classic": "Classic",
+    "neural": "Neural capture",
+    "browse_tone3000": "Browse captures on Tone3000",
+    "load_capture": "Load capture (.nam)",
+    "no_captures": "No captures loaded yet — the classic channel is running instead.",
+    "delete_capture": "Delete capture",
+    "classic_hint": "Preamp is the first gain stage, ahead of the tone stack. Drive pushes the power section after it — the two cascade, so a little of each sounds different from all of one."
+  },
+  "rack": {
+    "gate_on": "Hum and hiss cut",
+    "gate_open": "Open",
+    "no_capture": "No capture",
+    "built_in": "Built-in",
+    "bypass": "Bypass {{name}}"
+  },
+  "meter": {
+    "input": "Input"
+  },
+  "pedal": {
+    "bypass": "Bypass this pedal",
+    "engage": "Engage this pedal"
+  },
+  "block": {
+    "bypass": "Bypass this block",
+    "engage": "Engage this block",
+    "on": "On",
+    "bypassed": "Bypassed"
+  },
+  "power": {
+    "turn_amp_off": "Turn the amp off",
+    "turn_amp_on": "Turn the amp on",
+    "turn_off": "Turn off",
+    "turn_on": "Turn on"
+  },
+  "presets": {
+    "name_this": "Name this tone",
+    "save": "Save",
+    "previous": "Previous preset",
+    "next": "Next preset",
+    "none_loaded": "No preset loaded",
+    "edited": "Edited since loading",
+    "none_saved": "No presets saved yet",
+    "delete": "Delete preset",
+    "overwrite_hint": "Overwrite \"{{name}}\" with the current settings",
+    "update": "Update",
+    "save_as_hint": "Save the current settings as a new preset",
+    "save_as": "Save as"
+  },
+  "status": {
+    "no_device": "No device",
+    "choose_hint": "Choose the audio interface, channels and buffer size",
+    "choose_interface": "Choose an audio interface",
+    "rate": "Rate",
+    "buffer": "Buffer",
+    "buffer_hint": "Frames per audio callback — smaller is tighter but more fragile",
+    "latency": "Latency",
+    "dropouts": "Dropouts",
+    "dropped": "{{underruns}} ({{drops}} dropped)",
+    "dropouts_hint": "Hardware callbacks that found nothing to play since the stream opened — each one was an audible gap. Dropped blocks are the engine shedding backlog to keep latency from creeping up.",
+    "dsp_hint": "Share of each audio block spent inside the chain"
+  },
+  "settings": {
+    "audio_interface": "Audio interface",
+    "refresh_hint": "Refresh device list",
+    "refresh": "Refresh",
+    "input": "Input",
+    "select_input": "Select an input",
+    "no_inputs": "No input devices found",
+    "channels_in": "{{count}} in",
+    "channels_out": "{{count}} out",
+    "default": "default",
+    "channel": "Channel",
+    "input_channel_hint": "Which input channel to capture from — e.g. the guitar jack on a multi-channel interface",
+    "output": "Output",
+    "asio_same_device": "ASIO uses the same device for input and output",
+    "output_hint": "Output device for amp monitoring",
+    "same_as_input": "Same as input (ASIO)",
+    "system_default_output": "System default output",
+    "output_channel_hint": "First output channel to monitor through — e.g. outputs 3/4 instead of 1/2 on a multi-channel interface",
+    "buffer_title": "ASIO/WASAPI buffer size — smaller = lower latency but more prone to crackling",
+    "buffer_hint": "Smaller buffers cut latency; too small and the audio starts crackling."
+  },
+  "view": {
+    "audio_hint": "Audio interface, channels and buffer size",
+    "audio": "Audio",
+    "needs_desktop": "Needs the desktop app",
+    "opening_stream": "Opening the audio stream…",
+    "no_connection": "No connection to the desktop app — this is a visual preview only, audio control is inactive.",
+    "overload": "The DSP chain fell behind real time and had to reset (~{{drift}}ms drift) — you probably just heard a click.",
+    "overload_nam_hint": "Try a bigger buffer or a lighter capture."
+  },
+  "amp_button": {
+    "live": "Live",
+    "live_with": "Live · {{latency}}",
+    "live_latency": "Live · {{latency}} latency",
+    "starting": "Starting…",
+    "monitoring_off": "Monitoring off",
+    "reconnecting": "Interface disconnected — reconnecting…",
+    "dsp_overloaded": "DSP overloaded",
+    "dropouts_one": "{{count}} dropout",
+    "dropouts": "{{count}} dropouts",
+    "title": "Amp simulator (ASIO, live)",
+    "amp": "Amp",
+    "amp_on": "Amp on",
+    "amp_alert": "AMP !",
+    "amp_on_caps": "AMP ON",
+    "amp_caps": "AMP",
+    "preset": "Preset",
+    "modified": "Modified",
+    "select_preset": "Select preset…",
+    "no_presets": "No presets yet",
+    "new_preset_name": "New preset name",
+    "revert_hint": "Back to \"{{name}}\" as saved",
+    "revert": "Revert",
+    "builtin_readonly": "Built-in presets are read-only — save your changes as a new one",
+    "save_as": "Save as…",
+    "update_preset": "Update preset",
+    "chain": "Chain",
+    "enable": "Enable {{name}}",
+    "interface": "Interface",
+    "not_set_up": "Not set up",
+    "select_interface": "Select an interface",
+    "no_input_devices": "No input devices",
+    "samples": "{{count}} samples",
+    "latency_preset": {
+      "low": "Low",
+      "balanced": "Balanced",
+      "safe": "Safe",
+      "custom": "Custom"
+    },
+    "crackling": "Crackling? Go one step safer.",
+    "overload": "DSP fell behind and reset (~{{drift}}ms) — you may have heard a click.",
+    "overload_nam_hint": "A lighter NAM model or a safer latency setting helps.",
+    "dropouts_detected": "Dropouts detected — try a safer latency setting.",
+    "reconnected": "Audio interface reconnected.",
+    "open_tone_studio": "Open Tone Studio"
+  }
+}

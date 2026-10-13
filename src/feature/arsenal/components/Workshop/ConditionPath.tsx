@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { CONDITION_GRADES } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { motion } from "framer-motion";
 
 /** Low → high. `CONDITION_GRADES` is authored high → low for grade lookup. */
@@ -24,6 +25,7 @@ interface ConditionPathProps {
  * the number the meter cannot: how far into the current grade the item sits.
  */
 export const ConditionPath = ({ condition, target }: ConditionPathProps) => {
+  const labels = useArsenalLabels();
   const currentIndex = Math.max(
     0,
     LADDER.findIndex((g, i) => {
@@ -43,7 +45,7 @@ export const ConditionPath = ({ condition, target }: ConditionPathProps) => {
     : 1;
 
   return (
-    <div className='flex items-center gap-1.5' aria-label='Condition'>
+    <div className='flex items-center gap-1.5' aria-label={labels.t("condition.label")}>
       {LADDER.map((grade, i) => {
         const reached = i <= currentIndex;
         const isCurrent = i === currentIndex;
@@ -54,10 +56,10 @@ export const ConditionPath = ({ condition, target }: ConditionPathProps) => {
             <span
               title={
                 isCurrent
-                  ? `${grade.label} — where it is now`
+                  ? labels.t("workshop.path_now", { name: labels.condition(grade) })
                   : isTarget
-                    ? `${grade.label} — this job's target`
-                    : grade.label
+                    ? labels.t("workshop.path_target", { name: labels.condition(grade) })
+                    : labels.condition(grade)
               }
               className={cn(
                 "block shrink-0 rounded-full transition-all",

@@ -1,4 +1,5 @@
 import { withCurrencyIcons } from "components/CurrencyIcons/withCurrencyIcons";
+import { useTranslation } from "hooks/useTranslation";
 import { Check } from "lucide-react";
 
 import { AppScreen } from "./AppScreen";
@@ -17,10 +18,11 @@ interface QuestPreviewProps {
  * you claim once they're all ticked.
  */
 export const QuestPreview = ({ tasks, reward, caption }: QuestPreviewProps) => {
+  const { t } = useTranslation("wiki");
   const rows = parsePairs(tasks);
 
   return (
-    <AppScreen title='Daily Quests' caption={caption}>
+    <AppScreen title={t("daily_quests")} caption={caption}>
       <div className='flex flex-col gap-2'>
         {rows.map((row) => {
           const isDone = row.description === "done";
@@ -35,7 +37,7 @@ export const QuestPreview = ({ tasks, reward, caption }: QuestPreviewProps) => {
               {isDone ? (
                 <Check
                   className='h-4 w-4 shrink-0 text-emerald-400'
-                  aria-label='Completed'
+                  aria-label={t("completed")}
                 />
               ) : (
                 <span className='shrink-0 text-xs font-bold text-zinc-500'>

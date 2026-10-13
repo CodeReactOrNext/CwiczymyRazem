@@ -1,0 +1,173 @@
+{
+  "common": {
+    "loading": "Wird geladen…",
+    "cancel": "Abbrechen",
+    "select": "Auswählen…"
+  },
+  "chain": {
+    "gate": "Gate",
+    "overdrive": "Overdrive",
+    "amp": "Amp",
+    "amp_nam": "Amp · NAM",
+    "amp_classic": "Amp · Klassisch",
+    "cab": "Box",
+    "delay": "Delay"
+  },
+  "gate": {
+    "title": "Noise Gate",
+    "subtitle": "Unterdrückt Brummen und Rauschen, bevor irgendetwas dahinter es verstärkt",
+    "input_hint": "Eingangspegel. Spiel deinen lautesten Akkord und nimm den Gain am Interface zurück, bis der Balken nicht mehr rot wird.",
+    "body": "Mit eingeschaltetem Gate wird zwischen den Tönen alles ausgeblendet, was leiser ist als die Gitarre selbst: Single-Coil-Brummen, Amp-Rauschen, der Kühlschrank. High-Gain-Sounds brauchen es; cleane meist nicht."
+  },
+  "cab": {
+    "title": "Box",
+    "subtitle": "Lautsprecher und Mikrofon — das Letzte, was den Ton formt",
+    "builtin": "Eingebautes 4x12-Modell",
+    "replaced": "Durch die geladene Impulsantwort ersetzt",
+    "builtin_cabinet": "Eingebaute Box",
+    "delete_ir": "IR löschen",
+    "truncated": "gekürzt",
+    "load_ir": "Impulsantwort laden (.wav)"
+  },
+  "amp": {
+    "no_capture_loaded": "Kein Capture geladen",
+    "subtitle_nam": "Neuronaler Capture eines echten Topteils anstelle von Vorstufe und Klangregelung",
+    "subtitle_classic": "Kaskadierte Vorstufe, passive Klangregelung und Endstufe",
+    "classic": "Klassisch",
+    "neural": "Neuronaler Capture",
+    "browse_tone3000": "Captures auf Tone3000 durchsuchen",
+    "load_capture": "Capture laden (.nam)",
+    "no_captures": "Noch keine Captures geladen — stattdessen läuft der klassische Kanal.",
+    "delete_capture": "Capture löschen",
+    "classic_hint": "Die Vorstufe ist die erste Gain-Stufe, vor der Klangregelung. Drive treibt die Endstufe dahinter an — beide arbeiten kaskadiert, also klingt ein bisschen von beidem anders als alles von einem."
+  },
+  "rack": {
+    "gate_on": "Brummen und Rauschen weg",
+    "gate_open": "Offen",
+    "no_capture": "Kein Capture",
+    "built_in": "Eingebaut",
+    "bypass": "{{name}} umgehen"
+  },
+  "meter": {
+    "input": "Eingang"
+  },
+  "pedal": {
+    "bypass": "Dieses Pedal umgehen",
+    "engage": "Dieses Pedal einschalten"
+  },
+  "block": {
+    "bypass": "Diesen Block umgehen",
+    "engage": "Diesen Block einschalten",
+    "on": "An",
+    "bypassed": "Umgangen"
+  },
+  "power": {
+    "turn_amp_off": "Amp ausschalten",
+    "turn_amp_on": "Amp einschalten",
+    "turn_off": "Ausschalten",
+    "turn_on": "Einschalten"
+  },
+  "presets": {
+    "name_this": "Diesen Sound benennen",
+    "save": "Speichern",
+    "previous": "Vorheriges Preset",
+    "next": "Nächstes Preset",
+    "none_loaded": "Kein Preset geladen",
+    "edited": "Seit dem Laden geändert",
+    "none_saved": "Noch keine Presets gespeichert",
+    "delete": "Preset löschen",
+    "overwrite_hint": "„{{name}}“ mit den aktuellen Einstellungen überschreiben",
+    "update": "Aktualisieren",
+    "save_as_hint": "Aktuelle Einstellungen als neues Preset speichern",
+    "save_as": "Speichern unter"
+  },
+  "status": {
+    "no_device": "Kein Gerät",
+    "choose_hint": "Audio-Interface, Kanäle und Puffergröße wählen",
+    "choose_interface": "Audio-Interface wählen",
+    "rate": "Rate",
+    "buffer": "Puffer",
+    "buffer_hint": "Frames pro Audio-Callback — kleiner ist straffer, aber anfälliger",
+    "latency": "Latenz",
+    "dropouts": "Aussetzer",
+    "dropped": "{{underruns}} ({{drops}} verworfen)",
+    "dropouts_hint": "Hardware-Callbacks, die seit dem Öffnen des Streams nichts zum Abspielen hatten — jeder war eine hörbare Lücke. Verworfene Blöcke sind die Engine, die Rückstau abbaut, damit die Latenz nicht wächst.",
+    "dsp_hint": "Anteil jedes Audioblocks, der in der Kette verbracht wird"
+  },
+  "settings": {
+    "audio_interface": "Audio-Interface",
+    "refresh_hint": "Geräteliste aktualisieren",
+    "refresh": "Aktualisieren",
+    "input": "Eingang",
+    "select_input": "Eingang wählen",
+    "no_inputs": "Keine Eingabegeräte gefunden",
+    "channels_in": "{{count}} ein",
+    "channels_out": "{{count}} aus",
+    "default": "Standard",
+    "channel": "Kanal",
+    "input_channel_hint": "Von welchem Eingangskanal aufgenommen wird — z. B. die Gitarrenbuchse an einem Mehrkanal-Interface",
+    "output": "Ausgang",
+    "asio_same_device": "ASIO nutzt dasselbe Gerät für Ein- und Ausgang",
+    "output_hint": "Ausgabegerät für das Amp-Monitoring",
+    "same_as_input": "Wie Eingang (ASIO)",
+    "system_default_output": "Standardausgabe des Systems",
+    "output_channel_hint": "Erster Ausgangskanal fürs Monitoring — z. B. Ausgänge 3/4 statt 1/2 an einem Mehrkanal-Interface",
+    "buffer_title": "ASIO/WASAPI-Puffergröße — kleiner = weniger Latenz, aber anfälliger für Knistern",
+    "buffer_hint": "Kleinere Puffer senken die Latenz; zu klein, und das Audio fängt an zu knistern."
+  },
+  "view": {
+    "audio_hint": "Audio-Interface, Kanäle und Puffergröße",
+    "audio": "Audio",
+    "needs_desktop": "Benötigt die Desktop-App",
+    "opening_stream": "Audiostream wird geöffnet…",
+    "no_connection": "Keine Verbindung zur Desktop-App — das ist nur eine Vorschau, die Audiosteuerung ist inaktiv.",
+    "overload": "Die DSP-Kette ist hinter die Echtzeit zurückgefallen und musste zurückgesetzt werden (~{{drift}} ms Drift) — du hast wahrscheinlich gerade ein Knacken gehört.",
+    "overload_nam_hint": "Versuch einen größeren Puffer oder einen leichteren Capture."
+  },
+  "amp_button": {
+    "live": "Live",
+    "live_with": "Live · {{latency}}",
+    "live_latency": "Live · {{latency}} Latenz",
+    "starting": "Wird gestartet…",
+    "monitoring_off": "Monitoring aus",
+    "reconnecting": "Interface getrennt — verbinde neu…",
+    "dsp_overloaded": "DSP überlastet",
+    "dropouts_one": "{{count}} Aussetzer",
+    "dropouts": "{{count}} Aussetzer",
+    "title": "Amp-Simulator (ASIO, live)",
+    "amp": "Amp",
+    "amp_on": "Amp an",
+    "amp_alert": "AMP !",
+    "amp_on_caps": "AMP AN",
+    "amp_caps": "AMP",
+    "preset": "Preset",
+    "modified": "Geändert",
+    "select_preset": "Preset wählen…",
+    "no_presets": "Noch keine Presets",
+    "new_preset_name": "Name des neuen Presets",
+    "revert_hint": "Zurück zu „{{name}}“ wie gespeichert",
+    "revert": "Zurücksetzen",
+    "builtin_readonly": "Eingebaute Presets sind schreibgeschützt — speichere deine Änderungen als neues",
+    "save_as": "Speichern unter…",
+    "update_preset": "Preset aktualisieren",
+    "chain": "Kette",
+    "enable": "{{name}} einschalten",
+    "interface": "Interface",
+    "not_set_up": "Nicht eingerichtet",
+    "select_interface": "Interface wählen",
+    "no_input_devices": "Keine Eingabegeräte",
+    "samples": "{{count}} Samples",
+    "latency_preset": {
+      "low": "Niedrig",
+      "balanced": "Ausgewogen",
+      "safe": "Sicher",
+      "custom": "Eigene"
+    },
+    "crackling": "Knistert es? Eine Stufe sicherer gehen.",
+    "overload": "DSP kam nicht hinterher und wurde zurückgesetzt (~{{drift}} ms) — vielleicht war ein Knacken zu hören.",
+    "overload_nam_hint": "Ein leichteres NAM-Modell oder eine sicherere Latenzeinstellung hilft.",
+    "dropouts_detected": "Aussetzer erkannt — versuch eine sicherere Latenzeinstellung.",
+    "reconnected": "Audio-Interface wieder verbunden.",
+    "open_tone_studio": "Tone Studio öffnen"
+  }
+}

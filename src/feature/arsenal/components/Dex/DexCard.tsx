@@ -5,6 +5,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { Archive, CheckCircle2, Lock, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -40,6 +41,7 @@ const PreviewModal = ({
   onClose: () => void;
   children: ReactNode;
 }) => {
+  const { t } = useArsenalLabels();
   if (typeof document === "undefined") return null;
   return createPortal(
     <div
@@ -54,7 +56,7 @@ const PreviewModal = ({
         onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          aria-label='Close preview'
+          aria-label={t("dex.close_preview")}
           className='absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-white'>
           <X size={15} />
         </button>
@@ -106,6 +108,8 @@ export const DexCard = ({
 }: DexCardProps) => {
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const rs = RARITY_STYLES[rarity];
   // Discovery is the record; the stash is what the player holds today. An entry
   // can be one without the other — a sold guitar stays revealed, just faded.
@@ -182,7 +186,7 @@ export const DexCard = ({
           <img
             src={imageSrc}
             alt={
-              discovered ? `${brand} ${name}` : "Undiscovered item silhouette"
+              discovered ? `${brand} ${name}` : t("dex.silhouette")
             }
             className={cn(
               "relative z-10 aspect-square h-full shrink-0 object-contain transition-transform duration-300 group-hover:scale-[1.03]",
@@ -227,7 +231,7 @@ export const DexCard = ({
                 color: rs.baseColor,
                 opacity: discovered ? 0.95 : 0.55,
               }}>
-              {rarity}
+              {labels.rarity(rarity)}
             </span>
           </p>
         </div>
@@ -244,13 +248,13 @@ export const DexCard = ({
               <CheckCircle2
                 size={16}
                 className='text-cyan-400'
-                aria-label='In your stash'
+                aria-label={t("dex.in_stash")}
               />
             ) : (
               <Archive
                 size={14}
                 className='text-zinc-500'
-                aria-label='Discovered, not in stash'
+                aria-label={t("dex.discovered_not_stash")}
               />
             )}
           </span>
@@ -294,17 +298,16 @@ export const DexCard = ({
                   {brand} {name}
                 </p>
                 <p className='mt-1 text-[11px] text-zinc-400'>
-                  Discovered · permanently recorded. No copy in your stash right
-                  now.
+                  {t("dex.discovered_hint")}
                 </p>
               </>
             ) : (
               <>
                 <p className='text-xs font-bold text-zinc-100'>
-                  Slot {formatSlotNumber(number)}
+                  {t("rack.slot", { slot: formatSlotNumber(number) })}
                 </p>
                 <p className='mt-1 text-[11px] text-zinc-400'>
-                  Not discovered yet — open cases to find it.
+                  {t("dex.undiscovered_hint")}
                 </p>
               </>
             )}

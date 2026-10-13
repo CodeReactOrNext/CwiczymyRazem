@@ -9,6 +9,7 @@ import {
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
 import { FameCoin } from "./FameCoin";
 import { ModArt } from "./ModArt";
@@ -44,7 +45,10 @@ export const ModRemoveDialog = ({
   onConfirm,
   onCancel,
 }: ModRemoveDialogProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   if (!mod) return null;
+  const name = labels.mod(mod.id, mod.label);
 
   const affordable = fame >= fameCost;
 
@@ -57,12 +61,10 @@ export const ModRemoveDialog = ({
       <AlertDialogContent className='max-w-sm gap-6 border-0 bg-zinc-900 p-6'>
         <AlertDialogHeader className='space-y-2'>
           <AlertDialogTitle className='text-lg font-bold text-white'>
-            Take {mod.label} off?
+            {t("mods.remove_title", { name })}
           </AlertDialogTitle>
           <AlertDialogDescription className='text-sm leading-relaxed text-zinc-400'>
-            It comes off {itemName} and is destroyed on the way out — the mod is
-            not put in your stash, it cannot be fitted to anything else, and
-            nothing brings it back.
+            {t("mods.remove_body", { item: itemName })}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -73,11 +75,10 @@ export const ModRemoveDialog = ({
           <ModArt modId={mod.id} size={52} dimmed />
           <div className='flex min-w-0 flex-col gap-1'>
             <span className='truncate text-sm font-bold text-zinc-300'>
-              {mod.label}
+              {name}
             </span>
             <span className='text-xs text-zinc-500'>
-              <span className='tabular-nums'>+{mod.points}</span> level goes
-              with it · one slot comes back
+              {t("mods.remove_effect", { points: mod.points })}
             </span>
           </div>
         </div>
@@ -86,7 +87,7 @@ export const ModRemoveDialog = ({
           <span className='flex items-center gap-2.5'>
             <FameCoin size={22} />
             <span className='text-sm font-bold tabular-nums text-zinc-100'>
-              {fameCost} Fame
+              {t("common.fame_amount", { fame: fameCost })}
             </span>
           </span>
           <span
@@ -94,7 +95,7 @@ export const ModRemoveDialog = ({
               "text-xs tabular-nums",
               affordable ? "text-zinc-500" : "text-amber-400",
             )}>
-            you have {fame}
+            {t("part_row.you_have", { have: fame })}
           </span>
         </div>
 
@@ -102,7 +103,7 @@ export const ModRemoveDialog = ({
           <AlertDialogCancel
             disabled={isLoading}
             className='mt-0 border-0 bg-zinc-700 text-white hover:bg-zinc-600 hover:text-white sm:flex-1'>
-            Keep it
+            {t("mods.keep_it")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
@@ -113,7 +114,7 @@ export const ModRemoveDialog = ({
             }}
             disabled={isLoading || !affordable}
             className='bg-orange-600 text-white hover:bg-orange-700 sm:flex-1'>
-            {isLoading ? "Taking it off…" : "Take it off"}
+            {isLoading ? t("mods.taking_off") : t("mods.take_off")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

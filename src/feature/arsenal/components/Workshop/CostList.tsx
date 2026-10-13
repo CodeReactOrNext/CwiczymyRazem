@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { RecipeLine } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
 import { PartRow } from "../Parts/PartRow";
 import { SectionLabel } from "../SectionLabel";
@@ -19,6 +20,7 @@ interface CostListProps {
  * out which half of the trade you are looking at.
  */
 export const CostList = ({ recipe, fame }: CostListProps) => {
+  const { t } = useArsenalLabels();
   const short =
     recipe.filter((line) => !line.ok).length +
     (fame && fame.have < fame.need ? 1 : 0);
@@ -26,13 +28,13 @@ export const CostList = ({ recipe, fame }: CostListProps) => {
   return (
     <div className='flex flex-col gap-4 rounded-lg bg-zinc-950/50 p-6'>
       <div className='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
-        <SectionLabel>You pay</SectionLabel>
+        <SectionLabel>{t("workshop.you_pay")}</SectionLabel>
         <span
           className={cn(
             "text-sm font-bold",
             short === 0 ? "text-emerald-400" : "text-amber-400",
           )}>
-          {short === 0 ? "you have it all" : `${short} still short`}
+          {short === 0 ? t("workshop.have_it_all") : t("workshop.still_short", { count: short })}
         </span>
       </div>
 
@@ -40,7 +42,7 @@ export const CostList = ({ recipe, fame }: CostListProps) => {
         {fame && (
           <PartRow
             icon={<FameCoin size={30} />}
-            label='Fame'
+            label={t("common.fame")}
             need={fame.need}
             have={fame.have}
             index={0}

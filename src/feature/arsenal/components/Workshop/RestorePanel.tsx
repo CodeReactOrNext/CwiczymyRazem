@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { getConditionGrade } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { ArrowRight } from "lucide-react";
 
 import { ConditionMeter } from "../ConditionMeter";
@@ -23,6 +24,7 @@ const Side = ({
   gain,
 }: SideProps) => {
   const grade = getConditionGrade(condition);
+  const labels = useArsenalLabels();
   return (
     <div
       className={cn(
@@ -39,7 +41,7 @@ const Side = ({
             color: grade.color,
             opacity: after ? 1 : 0.7,
           }}>
-          {grade.label}
+          {labels.condition(grade)}
         </span>
         <ConditionMeter
           condition={condition}
@@ -49,7 +51,9 @@ const Side = ({
       </div>
 
       <div className='flex items-center gap-3'>
-        <span className='text-sm text-zinc-400'>Level</span>
+        <span className='text-sm text-zinc-400'>
+          {labels.t("workshop.level")}
+        </span>
         <span
           className={cn(
             "text-2xl font-black tabular-nums leading-none",
@@ -87,18 +91,22 @@ export const RestorePanel = ({
   toCondition,
   fromLevel,
   toLevel,
-}: RestorePanelProps) => (
+}: RestorePanelProps) => {
+  const { t } = useArsenalLabels();
+
+  return (
   <div className='grid grid-cols-1 overflow-hidden rounded-lg sm:grid-cols-[1fr_auto_1fr]'>
-    <Side caption='Current' condition={fromCondition} level={fromLevel} />
+    <Side caption={t("workshop.current")} condition={fromCondition} level={fromLevel} />
     <div className='flex items-center justify-center bg-zinc-950/40 px-1 py-2 sm:px-2'>
       <ArrowRight size={18} className='rotate-90 text-zinc-500 sm:rotate-0' />
     </div>
     <Side
-      caption='After restoration'
+      caption={t("workshop.after_restoration")}
       condition={toCondition}
       level={toLevel}
       gain={toLevel - fromLevel}
       after
     />
   </div>
-);
+  );
+};

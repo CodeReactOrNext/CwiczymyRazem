@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { Check } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -33,6 +34,7 @@ export const RequirementRow = ({
   valueOverride,
   children,
 }: RequirementRowProps) => {
+  const { t } = useArsenalLabels();
   const satisfied = ok ?? have >= need;
   const short = Math.max(0, need - have);
 
@@ -68,8 +70,8 @@ export const RequirementRow = ({
           )}>
           {valueOverride ??
             (satisfied
-              ? `have ${have.toLocaleString()}`
-              : `${short.toLocaleString()} short`)}
+              ? t("workshop.have_n", { have: have.toLocaleString() })
+              : t("workshop.short_n", { short: short.toLocaleString() }))}
         </span>
       </div>
 
@@ -77,8 +79,9 @@ export const RequirementRow = ({
 
       {!valueOverride && (
         <span className='text-xs text-zinc-500'>
-          needs {need.toLocaleString()}
-          {!satisfied && ` · you have ${have.toLocaleString()}`}
+          {t("workshop.needs_n", { need: need.toLocaleString() })}
+          {!satisfied &&
+            ` · ${t("part_row.you_have", { have: have.toLocaleString() })}`}
         </span>
       )}
     </div>

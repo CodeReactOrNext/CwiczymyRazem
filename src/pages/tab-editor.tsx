@@ -68,6 +68,8 @@ import {
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
+import type { Translate } from "lib/i18n/translate";
 import {
   LucideChevronsRight,
   LucideCopy,
@@ -235,13 +237,21 @@ function isDotted(duration: number): boolean {
 }
 
 /** Reads a duration back as the note value it's drawn with. */
-function durationLabel(duration: number): string {
+function durationLabel(duration: number, t?: Translate): string {
   const base = isDotted(duration) ? duration / DOT_FACTOR : duration;
   const match = DURATIONS.find((d) => Math.abs(d.value - base) < 1e-6);
-  if (!match) return `${formatQuarters(duration)} quarter notes`;
-  return isDotted(duration)
-    ? `Dotted ${match.label.toLowerCase()}`
+  if (!match)
+    return t
+      ? t("tab_editor.n_quarters", { n: formatQuarters(duration) })
+      : `${formatQuarters(duration)} quarter notes`;
+  const name = t
+    ? t(`tab_editor.durations.d${String(match.value).replace(".", "_")}`, match.label)
     : match.label;
+  return isDotted(duration)
+    ? t
+      ? t("tab_editor.dotted_name", { name: name.toLowerCase() })
+      : `Dotted ${name.toLowerCase()}`
+    : name;
 }
 
 const STEP_OPTIONS: { value: number; title: string }[] = [
@@ -538,6 +548,7 @@ const EMPTY_HISTORY: HistoryState = {
 
 export default function TabEditor() {
   const router = useRouter();
+  const { t } = useTranslation("library");
   const [measures, setMeasures] = useState<TablatureMeasure[]>([
     createMeasure(),
   ]);
@@ -854,16 +865,16 @@ export default function TabEditor() {
       trackName: string,
     ) => {
       if (!importedMeasures || importedMeasures.length === 0) {
-        showToast("This track has no tablature notes.", "error");
+        showToast(t("tab_editor.no_track_notes"), "error");
         return;
       }
       commit(importedMeasures);
       if (tempo > 0) setBpm(Math.round(tempo));
       setSelectedCell(null);
       setActiveSelection(null);
-      showToast(`Loaded "${trackName}" from ${fileName}`, "success");
+      showToast(t("tab_editor.loaded", { track: trackName, file: fileName }), "success");
     },
-    [commit, showToast],
+    [commit, showToast, t],
   );
 
   const stopPlayback = () => {
@@ -901,7 +912,7 @@ export default function TabEditor() {
 
   const updateMeasureSteps = (mIdx: number, steps: number) => {
     regridAt(mIdx, measures[mIdx].timeSignature, steps);
-    showToast(`Measure #${mIdx + 1}: ${steps} steps`, "info");
+    showToast(t("tab_editor.measure_steps", { n: mIdx + 1, steps }), "info");
   };
 
   const updateTimeSignature = (
@@ -913,7 +924,10 @@ export default function TabEditor() {
       return;
     regridAt(mIdx, timeSignature, measures[mIdx].beats.length);
     showToast(
-      `Measure #${mIdx + 1}: ${timeSignature[0]}/${timeSignature[1]}`,
+      t("tab_editor.measure_ts", {
+        n: mIdx + 1,
+        ts: `${timeSignature[0]}/${timeSignature[1]}`,
+      }),
       "info",
     );
   };
@@ -927,7 +941,7 @@ export default function TabEditor() {
   };
 
   const clearAll = () => {
-    if (confirm("Clear all measures?")) {
+    if (confirm(t("tab_editor.confirm_clear"))) {
       commit([createMeasure()]);
       setSelectedCell(null);
       setActiveSelection(null);
@@ -963,7 +977,7 @@ export default function TabEditor() {
     );
 
     if (cleanMeasures.length === 0) {
-      showToast("Nothing to export — the tab is empty.", "error");
+      showToast(t("tab_editor.nothing_export"), "error");
       return;
     }
 
@@ -976,8 +990,8 @@ export default function TabEditor() {
 
     navigator.clipboard
       .writeText(formattedCode)
-      .then(() => showToast("Tablature code copied to clipboard!", "success"))
-      .catch(() => showToast("Couldn't copy — try again.", "error"));
+      .then(() => showToast(t("tab_editor.copied_code"), "success"))
+      .catch(() => showToast(t("tab_editor.copy_failed"), "error"));
   };
 
   /**
@@ -1079,13 +1093,13 @@ export default function TabEditor() {
     );
     if (!isMeasureComplete(next[mIdx])) {
       showToast(
-        `Measure #${mIdx + 1} runs past its time signature — shorten a note first.`,
+        t("tab_editor.measure_overflow", { n: mIdx + 1 }),
         "error",
       );
       return;
     }
     commit(next);
-    showToast(`Measure #${mIdx + 1} now fills its time signature`, "success");
+    showToast(t("tab_editor.measure_filled", { n: mIdx + 1 }), "success");
   };
 
   /** The same repair across the whole tab — what an older tab usually needs,
@@ -1098,7 +1112,7 @@ export default function TabEditor() {
 
     if (fixed === 0) {
       showToast(
-        `${broken} measure${broken !== 1 ? "s" : ""} run past their time signature — shorten a note first.`,
+        t("tab_editor.measures_overflow", { count: broken }),
         "error",
       );
       return;
@@ -1106,9 +1120,9 @@ export default function TabEditor() {
 
     commit(next);
     showToast(
-      `Padded ${fixed} measure${fixed !== 1 ? "s" : ""} with rests${
-        fixed < broken ? `, ${broken - fixed} still overflow` : ""
-      }`,
+      fixed < broken
+        ? t("tab_editor.padded_some", { count: fixed, fixed, left: broken - fixed })
+        : t("tab_editor.padded", { count: fixed }),
       "success",
     );
   };
@@ -1399,9 +1413,9 @@ export default function TabEditor() {
       }
 
       commit(next);
-      showToast("Pattern applied!", "success");
+      showToast(t("tab_editor.pattern_applied"), "success");
     },
-    [clipboard, selectedCell, commit, showToast],
+    [clipboard, selectedCell, commit, showToast, t],
   );
 
   const handleCopySelection = useCallback(() => {
@@ -1427,18 +1441,18 @@ export default function TabEditor() {
       baseStringIdx: firstString,
     });
     showToast(
-      beats.length === 1 ? "Copied beat" : `Copied ${beats.length} beats`,
+      t("tab_editor.copied_beats", { count: beats.length }),
       "success",
     );
     setContextMenu(null);
-  }, [selection, measures, showToast, setClipboard, setContextMenu]);
+  }, [selection, measures, showToast, setClipboard, setContextMenu, t]);
 
   const handleDeleteSelection = useCallback(() => {
     if (!selection) return;
     commit(clearSelectedNotes(measuresRef.current, selection));
-    showToast("Selection cleared", "info");
+    showToast(t("tab_editor.selection_cleared"), "info");
     setContextMenu(null);
-  }, [selection, commit, showToast, setContextMenu]);
+  }, [selection, commit, showToast, setContextMenu, t]);
 
   /**
    * What a picking command applies to: every beat the selection covers, which
@@ -1507,11 +1521,11 @@ export default function TabEditor() {
     commit(alternatePickStrokes(current, refs));
     showToast(
       singleBeat
-        ? `Measure #${measureIdx + 1}: alternate picking`
-        : "Alternate picking across the selection",
+        ? t("tab_editor.alt_measure", { n: measureIdx + 1 })
+        : t("tab_editor.alt_selection"),
       "info",
     );
-  }, [commit, selection, pickStrokeRefs, showToast]);
+  }, [commit, selection, pickStrokeRefs, showToast, t]);
 
   /**
    * Grows (or shrinks) the block by `delta` beats from its far end, walking
@@ -1765,10 +1779,10 @@ export default function TabEditor() {
               }
             });
             commit(newMeasures);
-            showToast("Snippet imported to cursor", "success");
+            showToast(t("tab_editor.snippet_imported"), "success");
           } else {
             commit(processed);
-            showToast("Full Tab imported", "success");
+            showToast(t("tab_editor.tab_imported"), "success");
           }
         }
       }
@@ -1780,6 +1794,7 @@ export default function TabEditor() {
       measures,
       showToast,
       processImportText,
+      t,
     ],
   );
 
@@ -2016,30 +2031,31 @@ export default function TabEditor() {
         </div>
         <div className='space-y-3'>
           <h2 className='text-xl font-black tracking-tight text-zinc-100'>
-            Desktop Only
+            {t("tab_editor.desktop_only")}
           </h2>
           <p className='max-w-xs text-sm leading-relaxed text-zinc-500'>
-            Tab Editor requires a keyboard and larger screen. Please open it on
-            a desktop or laptop computer.
+            {t("tab_editor.desktop_hint")}
           </p>
         </div>
       </div>
 
       <div className='min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30'>
         <Head>
-          <title>Tablature Editor | Riff Quest</title>
+          <title>{`${t("tab_editor.title")} | Riff Quest`}</title>
         </Head>
 
         {/* Fixed Header/Toolbar */}
         <div className='fixed left-0 right-0 top-0 z-[60] border-b border-zinc-800 bg-zinc-950/85 p-4 backdrop-blur-2xl md:px-8'>
           <div className='mx-auto flex max-w-[1700px] flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
             <div className='flex items-center gap-4'>
-              <BackLink label='Back' onClick={() => router.back()} />
+              <BackLink label={t("tab_editor.back")} onClick={() => router.back()} />
               <div>
-                <h1 className='text-xl font-bold text-zinc-100'>Tab Editor</h1>
+                <h1 className='text-xl font-bold text-zinc-100'>
+                  {t("tab_editor.title")}
+                </h1>
                 <p className='text-[11px] font-bold text-zinc-500'>
-                  {measures.length} measure{measures.length !== 1 ? "s" : ""} ·{" "}
-                  {editId ? "Editing exercise" : "New exercise"}
+                  {t("tab_editor.measures", { count: measures.length })} ·{" "}
+                  {editId ? t("tab_editor.editing") : t("tab_editor.new")}
                 </p>
               </div>
             </div>
@@ -2050,31 +2066,31 @@ export default function TabEditor() {
                   onClick={() => setIsGpModalOpen(true)}
                   className='flex items-center gap-2 rounded px-3 py-1.5 text-[11px] font-bold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
                   <LucideFileMusic size={13} className='text-zinc-400' />
-                  <span>Import GP</span>
+                  <span>{t("tab_editor.import_gp")}</span>
                 </button>
                 <button
                   onClick={copyCode}
                   className='flex items-center gap-2 rounded px-3 py-1.5 text-[11px] font-bold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
                   <LucideCopy size={13} className='text-zinc-400' />
-                  <span>Copy code</span>
+                  <span>{t("tab_editor.copy_code")}</span>
                 </button>
                 <div className='mx-1 h-5 w-px bg-zinc-800' />
                 <ToolbarIconButton
                   icon={LucideUndo2}
-                  label='Undo'
+                  label={t("tab_editor.undo")}
                   onClick={undo}
                   disabled={!canUndo}
                 />
                 <ToolbarIconButton
                   icon={LucideRedo2}
-                  label='Redo'
+                  label={t("tab_editor.redo")}
                   onClick={redo}
                   disabled={!canRedo}
                 />
                 <div className='mx-1 h-5 w-px bg-zinc-800' />
                 <ToolbarIconButton
                   icon={LucideEraser}
-                  label='Clear all measures'
+                  label={t("tab_editor.clear_all")}
                   onClick={clearAll}
                   hoverClass='hover:bg-red-500/10 hover:text-red-400'
                 />
@@ -2083,7 +2099,7 @@ export default function TabEditor() {
               <div className='flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/60 p-1'>
                 <button
                   onClick={() => (isPlaying ? stopPlayback() : startPlayback())}
-                  aria-label={isPlaying ? "Stop playback" : "Start playback"}
+                  aria-label={isPlaying ? t("tab_editor.stop") : t("tab_editor.play")}
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                     isPlaying
@@ -2102,7 +2118,7 @@ export default function TabEditor() {
                 </button>
                 <ToolbarIconButton
                   icon={isMuted ? LucideVolumeX : LucideVolume2}
-                  label={isMuted ? "Unmute" : "Mute"}
+                  label={isMuted ? t("tab_editor.unmute") : t("tab_editor.mute")}
                   onClick={() => setIsMuted(!isMuted)}
                   active={isMuted}
                   hoverClass={
@@ -2112,18 +2128,18 @@ export default function TabEditor() {
                 <div className='mx-1 h-5 w-px bg-zinc-800' />
                 <ToolbarIconButton
                   icon={LucideMinus}
-                  label='Decrease tempo'
+                  label={t("tab_editor.tempo_down")}
                   onClick={() => nudgeBpm(-1)}
                   disabled={bpm <= BPM_MIN}
                 />
                 <label
                   className='flex items-baseline gap-1 px-1'
-                  title={`Tempo in beats per minute (${BPM_MIN}–${BPM_MAX})`}>
+                  title={t("tab_editor.tempo_title", { min: BPM_MIN, max: BPM_MAX })}>
                   <input
                     type='text'
                     inputMode='numeric'
                     value={bpmDraft ?? String(bpm)}
-                    aria-label='Tempo in beats per minute'
+                    aria-label={t("tab_editor.tempo_aria")}
                     onChange={(e) =>
                       setBpmDraft(e.target.value.replace(/\D/g, "").slice(0, 3))
                     }
@@ -2144,7 +2160,7 @@ export default function TabEditor() {
                 </label>
                 <ToolbarIconButton
                   icon={LucidePlus}
-                  label='Increase tempo'
+                  label={t("tab_editor.tempo_up")}
                   onClick={() => nudgeBpm(1)}
                   disabled={bpm >= BPM_MAX}
                 />
@@ -2155,8 +2171,13 @@ export default function TabEditor() {
                   <button
                     key={d.value}
                     onClick={() => applyGridResolution(d.value)}
-                    title={`Grid resolution: ${d.short} (${d.label.toLowerCase()}) — re-grids every measure and replaces the current rhythm`}
-                    aria-label={`Set grid resolution to ${d.label}`}
+                    title={t("tab_editor.grid_title", {
+                      short: d.short,
+                      name: t(`tab_editor.durations.d${String(d.value).replace(".", "_")}`, d.label).toLowerCase(),
+                    })}
+                    aria-label={t("tab_editor.grid_aria", {
+                      name: t(`tab_editor.durations.d${String(d.value).replace(".", "_")}`, d.label),
+                    })}
                     className={cn(
                       "flex h-8 w-8 items-center justify-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                       uniformDuration === d.value
@@ -2186,23 +2207,20 @@ export default function TabEditor() {
                             : "bg-zinc-600",
                         )}
                       />
-                      Auto next
+                      {t("tab_editor.auto_next")}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side='bottom' className='max-w-[260px]'>
                     <p className='font-bold'>
-                      Auto next — {autoAdvance ? "on" : "off"}
+                      {autoAdvance
+                        ? t("tab_editor.auto_next_on")
+                        : t("tab_editor.auto_next_off")}
                     </p>
                     <p className='mt-1 font-normal leading-relaxed'>
-                      Type a fret and the cursor jumps to the next beat on the
-                      same string, so you can enter a run without arrowing
-                      across. It wraps into the following measure and stops at
-                      the end of the tab.
+                      {t("tab_editor.auto_next_hint")}
                     </p>
                     <p className='mt-1.5 font-normal leading-relaxed'>
-                      Turn it off to type frets above 9: two-digit frets need
-                      both digits in the same cell (1 then 2 → 12), and
-                      auto-advance moves the cursor after the first one.
+                      {t("tab_editor.auto_next_hint2")}
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -2220,10 +2238,10 @@ export default function TabEditor() {
                 className='gap-2 bg-zinc-100 text-zinc-900 shadow-none hover:bg-zinc-200'>
                 <span>
                   {editId
-                    ? "Save changes"
+                    ? t("tab_editor.save_changes")
                     : hasNotes
-                      ? "Publish exercise"
-                      : "Add exercise without tab"}
+                      ? t("tab_editor.publish")
+                      : t("tab_editor.add_without_tab")}
                 </span>
                 <LucideChevronsRight size={14} />
               </Button>
@@ -2248,11 +2266,10 @@ export default function TabEditor() {
                   <div className='flex items-start justify-between gap-4'>
                     <div className='space-y-2'>
                       <h3 className='text-xl font-black italic tracking-tighter text-zinc-100'>
-                        Import Guitar Pro
+                        {t("tab_editor.import_gp_title")}
                       </h3>
                       <p className='text-sm font-medium text-zinc-500'>
-                        Drop a GP3/GP4/GP5/GPX/GP file, then pick a track to
-                        load it into the editor.
+                        {t("tab_editor.import_gp_hint")}
                       </p>
                     </div>
                     <button
@@ -2286,7 +2303,9 @@ export default function TabEditor() {
           <section className='overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/40'>
             <div className='flex items-center gap-2 border-b border-zinc-800 bg-zinc-900/60 px-4 py-2.5'>
               <div className='h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-500' />
-              <h2 className='text-xs font-bold text-zinc-300'>Live preview</h2>
+              <h2 className='text-xs font-bold text-zinc-300'>
+                {t("tab_editor.live_preview")}
+              </h2>
             </div>
             <div className='relative p-4'>
               <TablatureViewer
@@ -2304,23 +2323,23 @@ export default function TabEditor() {
           {/* Editor Grid — all measures side by side in one continuous tab strip */}
           <section className='overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/40'>
             <div className='flex items-center gap-3 border-b border-zinc-800 bg-zinc-900/60 px-4 py-2.5'>
-              <h2 className='text-xs font-bold text-zinc-300'>Tablature</h2>
+              <h2 className='text-xs font-bold text-zinc-300'>
+                {t("tab_editor.tablature")}
+              </h2>
               <span className='text-[11px] font-semibold text-zinc-500'>
-                {measures.length} measure{measures.length !== 1 ? "s" : ""}
+                {t("tab_editor.measures", { count: measures.length })}
               </span>
               {incompleteCount > 0 && (
                 <>
                   <span className='flex items-center gap-1.5 rounded bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-400'>
                     <LucideTriangleAlert size={11} />
-                    {incompleteCount} measure{incompleteCount !== 1 ? "s" : ""}{" "}
-                    {incompleteCount !== 1 ? "don't" : "doesn't"} fill{" "}
-                    {incompleteCount !== 1 ? "their" : "its"} time signature
+                    {t("tab_editor.incomplete", { count: incompleteCount })}
                   </span>
                   <button
                     onClick={fixAllMeasureLengths}
-                    title='Pad every short bar with rests until it fills its time signature — the notes stay where they are'
+                    title={t("tab_editor.fix_all_hint")}
                     className='rounded bg-rose-500/20 px-2 py-0.5 text-[11px] font-bold text-rose-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-rose-500/30'>
-                    Fix all
+                    {t("tab_editor.fix_all")}
                   </button>
                 </>
               )}
@@ -2332,7 +2351,7 @@ export default function TabEditor() {
                   {/* Lane legend — lines up with the picking row above the strings. */}
                   <span
                     className='flex h-6 w-5 items-center justify-end pr-1 text-zinc-600'
-                    title='Picking direction'>
+                    title={t("tab_editor.picking_direction")}>
                     <PickStrokeIcon stroke='down' size={10} />
                   </span>
                   {STRING_LABELS.map((label, sIdx) => (
@@ -2345,7 +2364,7 @@ export default function TabEditor() {
                   {/* …and the rhythm row under them. */}
                   <span
                     className='flex h-7 w-5 items-center justify-end pr-1 text-zinc-600'
-                    title='Note and rest values'>
+                    title={t("tab_editor.note_values")}>
                     <NoteDurationIcon duration={1} size={11} />
                   </span>
                 </div>
@@ -2408,7 +2427,10 @@ export default function TabEditor() {
                                 <LucideTriangleAlert
                                   size={10}
                                   className='text-rose-400'
-                                  aria-label={`Measure ${mIdx + 1} does not fill ${measure.timeSignature[0]}/${measure.timeSignature[1]}`}
+                                  aria-label={t("tab_editor.not_filled", {
+                                    n: mIdx + 1,
+                                    ts: `${measure.timeSignature[0]}/${measure.timeSignature[1]}`,
+                                  })}
                                 />
                               )}
                             </div>
@@ -2439,14 +2461,19 @@ export default function TabEditor() {
                                     onClick={() =>
                                       cycleBeatPickStroke(mIdx, bIdx)
                                     }
-                                    title={`Picking on beat ${bIdx + 1}: ${
-                                      beat.pickStroke === "down"
-                                        ? "downstroke"
-                                        : beat.pickStroke === "up"
-                                          ? "upstroke"
-                                          : "not marked"
-                                    } — click to cycle down → up → none`}
-                                    aria-label={`Picking direction on measure ${mIdx + 1}, beat ${bIdx + 1}`}
+                                    title={t("tab_editor.pick_beat_title", {
+                                      beat: bIdx + 1,
+                                      state:
+                                        beat.pickStroke === "down"
+                                          ? t("tab_editor.downstroke")
+                                          : beat.pickStroke === "up"
+                                            ? t("tab_editor.upstroke")
+                                            : t("tab_editor.not_marked"),
+                                    })}
+                                    aria-label={t("tab_editor.pick_beat_aria", {
+                                      measure: mIdx + 1,
+                                      beat: bIdx + 1,
+                                    })}
                                     className={cn(
                                       "group flex h-6 items-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                                       beatCellAlign(widths[bIdx]),
@@ -2733,10 +2760,22 @@ export default function TabEditor() {
                                         endString: 5,
                                       });
                                     }}
-                                    title={`${durationLabel(beat.duration)}${
-                                      isRest ? " rest" : ""
-                                    } — click to select the whole beat, shift-click to extend`}
-                                    aria-label={`Beat ${bIdx + 1} of measure ${mIdx + 1}: ${durationLabel(beat.duration)}${isRest ? " rest" : ""}`}
+                                    title={t(
+                                      isRest
+                                        ? "tab_editor.beat_title_rest"
+                                        : "tab_editor.beat_title",
+                                      { name: durationLabel(beat.duration, t) },
+                                    )}
+                                    aria-label={t(
+                                      isRest
+                                        ? "tab_editor.beat_aria_rest"
+                                        : "tab_editor.beat_aria",
+                                      {
+                                        beat: bIdx + 1,
+                                        measure: mIdx + 1,
+                                        name: durationLabel(beat.duration, t),
+                                      },
+                                    )}
                                     className={cn(
                                       "flex h-7 items-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                                       beatCellAlign(widths[bIdx]),
@@ -2762,8 +2801,8 @@ export default function TabEditor() {
 
                     <button
                       onClick={addMeasure}
-                      title='Add measure'
-                      aria-label='Add measure'
+                      title={t("tab_editor.add_measure")}
+                      aria-label={t("tab_editor.add_measure")}
                       className='ml-3 mt-[49px] flex h-48 w-10 items-center justify-center rounded border border-dashed border-zinc-700 bg-zinc-800/40 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-200'>
                       <LucidePlus size={16} />
                     </button>
@@ -2780,21 +2819,23 @@ export default function TabEditor() {
             <>
               <div className='space-y-1'>
                 <span className='text-xs font-bold text-zinc-200'>
-                  {isBlockSelection ? "Selection" : "Note Editor"}
+                  {isBlockSelection ? t("tab_editor.selection") : t("tab_editor.note_editor")}
                 </span>
                 <p className='text-[11px] font-semibold text-zinc-500'>
                   {isBlockSelection ? (
                     <>
-                      {selectedBeatCount} beat
-                      {selectedBeatCount !== 1 ? "s" : ""} · {selectedNoteCount}{" "}
-                      note{selectedNoteCount !== 1 ? "s" : ""} — every edit
-                      below applies to all of them
+                      {t("tab_editor.selection_summary", {
+                        beats: selectedBeatCount,
+                        notes: selectedNoteCount,
+                      })}
                     </>
                   ) : (
                     <>
-                      Measure {selectedCell.measureIdx + 1} · Beat{" "}
-                      {selectedCell.beatIdx + 1} · String{" "}
-                      {STRING_LABELS[selectedCell.stringIdx]}
+                      {t("tab_editor.cell_summary", {
+                        measure: selectedCell.measureIdx + 1,
+                        beat: selectedCell.beatIdx + 1,
+                        string: STRING_LABELS[selectedCell.stringIdx],
+                      })}
                     </>
                   )}
                 </p>
@@ -2802,7 +2843,7 @@ export default function TabEditor() {
 
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
-                  {isBlockSelection ? "Frets" : "Fret"}
+                  {isBlockSelection ? t("tab_editor.frets") : t("tab_editor.fret")}
                 </span>
                 <div className='flex items-center gap-2'>
                   <button
@@ -2812,8 +2853,8 @@ export default function TabEditor() {
                     }
                     aria-label={
                       isBlockSelection
-                        ? "Transpose the selection down a fret"
-                        : "Decrease fret"
+                        ? t("tab_editor.transpose_down")
+                        : t("tab_editor.fret_down")
                     }
                     className='flex h-10 w-10 items-center justify-center rounded border border-zinc-800 bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-zinc-700'>
                     <LucideMinus size={16} />
@@ -2823,7 +2864,7 @@ export default function TabEditor() {
                     min={0}
                     max={FRET_MAX}
                     value={isBlockSelection ? "" : (selectedNote?.fret ?? "")}
-                    placeholder={isBlockSelection ? "all" : "—"}
+                    placeholder={isBlockSelection ? t("tab_editor.all") : "—"}
                     onChange={(e) =>
                       setSelectedFret(clampFret(parseInt(e.target.value) || 0))
                     }
@@ -2834,8 +2875,8 @@ export default function TabEditor() {
                     disabled={isBlockSelection && selectedNoteCount === 0}
                     aria-label={
                       isBlockSelection
-                        ? "Transpose the selection up a fret"
-                        : "Increase fret"
+                        ? t("tab_editor.transpose_up")
+                        : t("tab_editor.fret_up")
                     }
                     className='flex h-10 w-10 items-center justify-center rounded border border-zinc-800 bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-zinc-700'>
                     <LucidePlus size={16} />
@@ -2861,12 +2902,12 @@ export default function TabEditor() {
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
                 <div className='flex items-baseline justify-between gap-2'>
                   <span className='text-[11px] font-semibold text-zinc-500'>
-                    Note value
+                    {t("tab_editor.note_value")}
                   </span>
                   <span className='text-[10px] font-semibold text-zinc-400'>
                     {selectedDuration === null
-                      ? "mixed"
-                      : durationLabel(selectedDuration)}
+                      ? t("tab_editor.mixed")
+                      : durationLabel(selectedDuration, t)}
                   </span>
                 </div>
                 <div className='grid grid-cols-6 gap-1'>
@@ -2874,8 +2915,11 @@ export default function TabEditor() {
                     <button
                       key={d.value}
                       onClick={() => applyDurationToSelection(d.value)}
-                      title={`${d.label} (${d.short}) — a longer note takes over the beats after it, a shorter one leaves a rest`}
-                      aria-label={d.label}
+                      title={t("tab_editor.duration_title", {
+                        name: t(`tab_editor.durations.d${String(d.value).replace(".", "_")}`, d.label),
+                        short: d.short,
+                      })}
+                      aria-label={t(`tab_editor.durations.d${String(d.value).replace(".", "_")}`, d.label)}
                       className={cn(
                         "flex h-9 items-center justify-center rounded border transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                         selectedDuration === d.value
@@ -2889,7 +2933,7 @@ export default function TabEditor() {
                 <div className='flex gap-1.5'>
                   <button
                     onClick={toggleDotOnSelection}
-                    title='Dotted note — half again as long'
+                    title={t("tab_editor.dotted_title")}
                     className={cn(
                       "flex h-8 flex-1 items-center justify-center gap-2 rounded text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                       selectedDuration !== null && isDotted(selectedDuration)
@@ -2897,23 +2941,25 @@ export default function TabEditor() {
                         : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
                     )}>
                     <span className='text-sm font-black leading-none'>·</span>
-                    Dotted
+                    {t("tab_editor.dotted")}
                   </button>
                   <button
                     onClick={restSelection}
-                    title={`Rest — clears the ${
-                      isBlockSelection ? "selected beats" : "beat"
-                    }, keeping the timing`}
+                    title={t(
+                      isBlockSelection
+                        ? "tab_editor.rest_title_block"
+                        : "tab_editor.rest_title",
+                    )}
                     className='flex h-8 flex-1 items-center justify-center gap-2 rounded bg-zinc-800/40 text-[11px] font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-zinc-200'>
                     <RestIcon duration={selectedDuration ?? 1} size={13} />
-                    Rest
+                    {t("tab_editor.rest")}
                   </button>
                 </div>
               </div>
 
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
-                  Articulation
+                  {t("tab_editor.articulation")}
                 </span>
                 <div className='grid grid-cols-2 gap-1.5'>
                   {ARTICULATIONS.map((a) => (
@@ -2921,9 +2967,10 @@ export default function TabEditor() {
                       key={a.type}
                       onClick={() => toggleArticulationOnSelection(a.type)}
                       disabled={selectedNotes.length === 0}
-                      title={`${a.label}${
-                        isBlockSelection ? " — on every selected note" : ""
-                      }`}
+                      title={
+                        t(`tab_editor.articulations.${a.type}`, a.label) +
+                        (isBlockSelection ? ` — ${t("tab_editor.on_every_note")}` : "")
+                      }
                       className={cn(
                         "flex items-center gap-2 rounded px-2 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30",
                         hasArticulation(a.type)
@@ -2933,7 +2980,7 @@ export default function TabEditor() {
                       <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded bg-zinc-950/60 text-[10px] font-black'>
                         {a.letter}
                       </span>
-                      {a.label}
+                      {t(`tab_editor.articulations.${a.type}`, a.label)}
                     </button>
                   ))}
                 </div>
@@ -2948,7 +2995,7 @@ export default function TabEditor() {
                         {BEND_AMOUNTS.map((b) => (
                           <button
                             key={b.value}
-                            title={b.label}
+                            title={t(`tab_editor.bends.b${String(b.value).replace(".", "_")}`, b.label)}
                             onClick={() => setSelectedBendAmount(b.value)}
                             className={cn(
                               "flex h-7 flex-1 items-center justify-center rounded text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
@@ -2970,7 +3017,7 @@ export default function TabEditor() {
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
                 <div className='flex items-baseline justify-between gap-2'>
                   <span className='text-[11px] font-semibold text-zinc-500'>
-                    Picking
+                    {t("tab_editor.picking")}
                   </span>
                   <span className='text-[10px] font-semibold text-zinc-500'>
                     Shift + ↓ / ↑
@@ -2981,11 +3028,16 @@ export default function TabEditor() {
                     <button
                       key={p.value}
                       onClick={() => applyPickStroke(p.value)}
-                      title={`${p.label} — marks ${
+                      title={
                         isBlockSelection
-                          ? `all ${selectedBeatCount} selected beats`
-                          : "this beat"
-                      }`}
+                          ? t("tab_editor.pick_marks_block", {
+                              name: t(`tab_editor.pick.${p.value}`, p.label),
+                              count: selectedBeatCount,
+                            })
+                          : t("tab_editor.pick_marks_beat", {
+                              name: t(`tab_editor.pick.${p.value}`, p.label),
+                            })
+                      }
                       className={cn(
                         "flex h-9 flex-1 items-center justify-center gap-2 rounded text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                         selectedPickStroke === p.value
@@ -2993,14 +3045,14 @@ export default function TabEditor() {
                           : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
                       )}>
                       <PickStrokeIcon stroke={p.value} size={13} />
-                      {p.label}
+                      {t(`tab_editor.pick.${p.value}`, p.label)}
                     </button>
                   ))}
                   <button
                     onClick={removePickStroke}
                     disabled={!selectedPickStroke}
-                    title='Remove the picking marker'
-                    aria-label='Remove the picking marker'
+                    title={t("tab_editor.remove_pick")}
+                    aria-label={t("tab_editor.remove_pick")}
                     className='flex h-9 w-9 items-center justify-center rounded bg-zinc-800/40 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-zinc-700 hover:text-zinc-200'>
                     <LucideEraser size={13} />
                   </button>
@@ -3010,13 +3062,15 @@ export default function TabEditor() {
                   className='flex w-full items-center justify-center gap-2 rounded bg-zinc-800/40 py-2 text-[11px] font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-zinc-200'>
                   <PickStrokeIcon stroke='down' size={13} />
                   <PickStrokeIcon stroke='up' size={13} />
-                  Alternate {isBlockSelection ? "selection" : "measure"}
+                  {isBlockSelection
+                    ? t("tab_editor.alternate_selection")
+                    : t("tab_editor.alternate_measure")}
                 </button>
               </div>
 
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
-                  Time signature
+                  {t("tab_editor.time_signature")}
                 </span>
                 <div className='grid grid-cols-6 gap-1'>
                   {TIME_SIGNATURES.map((ts) => (
@@ -3025,7 +3079,10 @@ export default function TabEditor() {
                       onClick={() =>
                         updateTimeSignature(selectedCell.measureIdx, ts)
                       }
-                      title={`${ts[0]}/${ts[1]} — re-grids measure #${selectedCell.measureIdx + 1}`}
+                      title={t("tab_editor.ts_title", {
+                        ts: `${ts[0]}/${ts[1]}`,
+                        n: selectedCell.measureIdx + 1,
+                      })}
                       className={cn(
                         "flex h-7 items-center justify-center rounded text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                         selectedMeasure?.timeSignature[0] === ts[0] &&
@@ -3041,7 +3098,7 @@ export default function TabEditor() {
 
               <div className='space-y-2 border-t border-zinc-800 pt-4'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
-                  Measure steps
+                  {t("tab_editor.measure_steps_label")}
                 </span>
                 <div className='flex gap-1'>
                   {STEP_OPTIONS.map((s) => (
@@ -3050,7 +3107,7 @@ export default function TabEditor() {
                       onClick={() =>
                         updateMeasureSteps(selectedCell.measureIdx, s.value)
                       }
-                      title={s.title}
+                      title={t(`tab_editor.steps.${s.value}`, s.title)}
                       className={cn(
                         "flex h-7 flex-1 items-center justify-center rounded border text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                         measures[selectedCell.measureIdx]?.beats.length ===
@@ -3070,25 +3127,24 @@ export default function TabEditor() {
                         className='mt-px shrink-0'
                       />
                       <span>
-                        Beats add up to{" "}
-                        {formatQuarters(
-                          beatsDurationInQuarters(selectedMeasure.beats),
-                        )}{" "}
-                        of the{" "}
-                        {formatQuarters(
-                          measureDurationInQuarters(
-                            selectedMeasure.timeSignature,
+                        {t("tab_editor.beats_add_up", {
+                          sum: formatQuarters(
+                            beatsDurationInQuarters(selectedMeasure.beats),
                           ),
-                        )}{" "}
-                        quarter notes in {selectedMeasure.timeSignature[0]}/
-                        {selectedMeasure.timeSignature[1]}.
+                          total: formatQuarters(
+                            measureDurationInQuarters(
+                              selectedMeasure.timeSignature,
+                            ),
+                          ),
+                          ts: `${selectedMeasure.timeSignature[0]}/${selectedMeasure.timeSignature[1]}`,
+                        })}
                       </span>
                     </p>
                     <button
                       onClick={() => fixMeasureLength(selectedCell.measureIdx)}
-                      title='Pad the bar with rests until it fills its time signature — the notes stay where they are'
+                      title={t("tab_editor.fill_hint")}
                       className='w-full rounded bg-rose-500/20 py-1.5 text-[11px] font-bold text-rose-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-rose-500/30'>
-                      Fill with rests
+                      {t("tab_editor.fill_with_rests")}
                     </button>
                   </div>
                 )}
@@ -3100,14 +3156,14 @@ export default function TabEditor() {
                   disabled={selectedNoteCount === 0}
                   className='flex flex-1 items-center justify-center gap-2 rounded border border-red-500/20 bg-red-500/10 py-2 text-[11px] font-bold text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-red-500/20'>
                   <LucideEraser size={13} />
-                  Clear note{selectedNoteCount > 1 ? "s" : ""}
+                  {t("tab_editor.clear_notes", { count: selectedNoteCount })}
                 </button>
                 <button
                   onClick={() => removeMeasure(selectedCell.measureIdx)}
                   disabled={measures.length === 1}
                   className='flex flex-1 items-center justify-center gap-2 rounded border border-red-500/20 bg-red-500/10 py-2 text-[11px] font-bold text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-red-500/20'>
                   <LucideTrash2 size={13} />
-                  Delete measure
+                  {t("tab_editor.delete_measure")}
                 </button>
               </div>
             </>
@@ -3115,57 +3171,55 @@ export default function TabEditor() {
             <>
               <div className='space-y-1'>
                 <span className='text-xs font-bold text-zinc-200'>
-                  Note Editor
+                  {t("tab_editor.note_editor")}
                 </span>
                 <p className='text-[11px] font-semibold leading-relaxed text-zinc-500'>
-                  Click a cell in the grid to set its fret, note value and
-                  articulations here. Drag across cells — bar lines included —
-                  to edit a whole run at once.
+                  {t("tab_editor.empty_hint")}
                 </p>
               </div>
               <div className='space-y-3 text-[11px] font-semibold text-zinc-500'>
                 <div className='flex items-center justify-between'>
-                  <span>Navigate</span>
+                  <span>{t("tab_editor.keys.navigate")}</span>
                   <span className='text-zinc-300'>↑ ↓ ← →</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Set fret</span>
+                  <span>{t("tab_editor.keys.set_fret")}</span>
                   <span className='text-zinc-300'>0–9</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Fret +/-</span>
-                  <span className='text-zinc-300'>Scroll</span>
+                  <span>{t("tab_editor.keys.fret_step")}</span>
+                  <span className='text-zinc-300'>{t("tab_editor.keys.scroll")}</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Articulations</span>
+                  <span>{t("tab_editor.keys.articulations")}</span>
                   <span className='text-zinc-300'>H P A D V T M</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Rest</span>
+                  <span>{t("tab_editor.keys.rest")}</span>
                   <span className='text-zinc-300'>R</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Select a run</span>
+                  <span>{t("tab_editor.keys.select_run")}</span>
                   <span className='text-zinc-300'>Shift + ← / →</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Picking ⊓ / ⋁</span>
+                  <span>{t("tab_editor.keys.picking_keys")}</span>
                   <span className='text-zinc-300'>Shift + ↓ / ↑</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Alternate picking</span>
+                  <span>{t("tab_editor.keys.alt_picking")}</span>
                   <span className='text-zinc-300'>Shift + A</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Clear notes</span>
-                  <span className='text-zinc-300'>Del</span>
+                  <span>{t("tab_editor.keys.clear_keys")}</span>
+                  <span className='text-zinc-300'>{t("tab_editor.keys.del")}</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Copy / Paste</span>
+                  <span>{t("tab_editor.keys.copy_paste")}</span>
                   <span className='text-zinc-300'>Ctrl+C / Ctrl+V</span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span>Undo / Redo</span>
+                  <span>{t("tab_editor.keys.undo_redo")}</span>
                   <span className='text-zinc-300'>Ctrl+Z / Ctrl+Y</span>
                 </div>
               </div>
@@ -3204,7 +3258,7 @@ export default function TabEditor() {
               <button
                 onClick={handleCopySelection}
                 className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
-                <span>Copy</span>
+                <span>{t("tab_editor.copy")}</span>
                 <span className='text-[10px] text-zinc-500'>Ctrl+C</span>
               </button>
               <button
@@ -3213,7 +3267,7 @@ export default function TabEditor() {
                   setContextMenu(null);
                 }}
                 className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
-                <span>Paste</span>
+                <span>{t("tab_editor.paste")}</span>
                 <span className='text-[10px] text-zinc-500'>Ctrl+V</span>
               </button>
               <button
@@ -3222,13 +3276,13 @@ export default function TabEditor() {
                   handleDeleteSelection();
                 }}
                 className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
-                <span>Cut</span>
+                <span>{t("tab_editor.cut")}</span>
                 <span className='text-[10px] text-zinc-500'>Ctrl+X</span>
               </button>
               <button
                 onClick={handleDeleteSelection}
                 className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-semibold text-red-400 transition-colors hover:bg-red-500/10'>
-                <span>Clear Area</span>
+                <span>{t("tab_editor.clear_area")}</span>
                 <span className='text-[10px] opacity-60'>Del</span>
               </button>
             </motion.div>

@@ -2,6 +2,7 @@ import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
+import { useTranslation } from "hooks/useTranslation";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -36,6 +37,7 @@ export const WorkshopRack = ({
   bare = false,
 }: WorkshopRackProps) => {
   const [filter, setFilter] = useState<RackFilter>("all");
+  const { t } = useTranslation("arsenal");
   const [search, setSearch] = useState("");
 
   const visible = useMemo(() => {
@@ -62,7 +64,7 @@ export const WorkshopRack = ({
         "flex flex-col gap-5",
         !bare && "rounded-lg bg-arsenal-section p-5",
       )}>
-      <SectionLabel>Your gear</SectionLabel>
+      <SectionLabel>{t("workshop.your_gear")}</SectionLabel>
 
       <div className='flex gap-1 rounded-lg bg-arsenal-bg p-1'>
         {FILTERS.map((f) => (
@@ -76,7 +78,7 @@ export const WorkshopRack = ({
                 ? "bg-arsenal-accent/15 text-arsenal-accent"
                 : "text-arsenal-text-tertiary hover:bg-white/[0.06] hover:text-arsenal-text-primary",
             )}>
-            {f.label}
+            {t(`workshop.rack_filter.${f.id}`, f.label)}
             <span className='tabular-nums opacity-60'>{counts[f.id]}</span>
           </button>
         ))}
@@ -90,7 +92,7 @@ export const WorkshopRack = ({
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder='Search the rack'
+          placeholder={t("workshop.search_rack")}
           className='h-9 border-0 bg-arsenal-bg pl-9 text-sm text-arsenal-text-primary placeholder:text-arsenal-text-tertiary'
         />
       </div>
@@ -102,7 +104,7 @@ export const WorkshopRack = ({
         )}>
         {visible.length === 0 ? (
           <p className='py-10 text-center text-xs text-arsenal-text-tertiary'>
-            Nothing matches that.
+            {t("workshop.nothing_matches")}
           </p>
         ) : (
           visible.map((entry) => {

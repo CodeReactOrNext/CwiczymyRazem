@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { setSelectedGuitar } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { memoryCache } from "utils/cache/memoryCache";
@@ -16,6 +17,7 @@ interface UpdateRigPayload {
 }
 
 export const useUpdateRig = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
 
@@ -33,7 +35,7 @@ export const useUpdateRig = () => {
       }
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.error || "Failed to update rig";
+      const message = error?.response?.data?.error || t("toasts.err.rig");
       toast.error(message);
     },
   });

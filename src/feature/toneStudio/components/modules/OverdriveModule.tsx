@@ -2,6 +2,7 @@ import { Faceplate } from "feature/toneStudio/components/Faceplate";
 import { PedalFace } from "feature/toneStudio/components/PedalFace";
 import { BypassSwitch } from "feature/toneStudio/components/PluginChrome";
 import { OVERDRIVE_PEDAL_SRC } from "feature/toneStudio/utils/gearArt";
+import { useTranslation } from "hooks/useTranslation";
 import type { AmpParams } from "types/nativeAudio";
 
 interface OverdriveModuleProps {
@@ -10,10 +11,13 @@ interface OverdriveModuleProps {
 }
 
 /** The stompbox in front of the amp — three knobs, no menus, like the real thing. */
-export const OverdriveModule = ({ params, set }: OverdriveModuleProps) => (
+export const OverdriveModule = ({ params, set }: OverdriveModuleProps) => {
+  const { t } = useTranslation("tone_studio");
+
+  return (
   <Faceplate
     accent='orange'
-    title='Overdrive'
+    title={t("chain.overdrive")}
     bypassed={!params.overdriveEnabled}
     headerRight={
       <BypassSwitch
@@ -54,4 +58,5 @@ export const OverdriveModule = ({ params, set }: OverdriveModuleProps) => (
       ]}
     />
   </Faceplate>
-);
+  );
+};

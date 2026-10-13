@@ -1,3 +1,4 @@
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import { Bookmark, Dumbbell, Music, Target } from "lucide-react";
@@ -18,6 +19,7 @@ export interface RotationItemDisplay {
 /** Names, icons and "last played" wording for rotation items, in the player's language. */
 export const useRotationDisplay = () => {
   const { t } = useTranslation(["rotation", "skills", "common"]);
+  const localizeExercise = useLocalizeExercise();
 
   const skillName = useCallback(
     (skillId: string) => t(`skills:skills.${skillId}.name`),
@@ -55,12 +57,12 @@ export const useRotationDisplay = () => {
       const exercise = EXERCISES_BY_ID.get(item.id);
       const skillId = exercise?.relatedSkills[0];
       return {
-        title: exercise?.title ?? item.id,
+        title: exercise ? localizeExercise(exercise).title : item.id,
         subtitle: skillId ? skillName(skillId) : t("types.exercise"),
         Icon: (skillId && SKILLS_BY_ID.get(skillId)?.icon) || Dumbbell,
       };
     },
-    [skillName, t],
+    [localizeExercise, skillName, t],
   );
 
   const playedLabel = useCallback(

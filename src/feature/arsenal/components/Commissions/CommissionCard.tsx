@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { CommissionTarget } from "feature/arsenal/data/commission";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 
@@ -29,6 +30,7 @@ export const CommissionCard = ({
   onClick,
 }: CommissionCardProps) => {
   const { def } = target;
+  const labels = useArsenalLabels();
   const imageSrc =
     target.kind === "guitar"
       ? getRankBadgeSrc(target.def.imageId, "medium")
@@ -39,7 +41,9 @@ export const CommissionCard = ({
     <button
       type='button'
       onClick={onClick}
-      aria-label={`Commission ${def.brand} ${def.name}`}
+      aria-label={labels.t("commissions.commission_name", {
+        name: `${def.brand} ${def.name}`,
+      })}
       className='flex flex-col gap-3 rounded-lg bg-arsenal-section p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-zinc-800/60'>
       <span className='flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md bg-arsenal-bg'>
         <img
@@ -66,7 +70,7 @@ export const CommissionCard = ({
             className='h-1.5 w-1.5 rounded-full'
             style={{ backgroundColor: rarityColor }}
           />
-          {def.rarity}
+          {labels.rarity(def.rarity)}
         </span>
         <span
           className={cn(

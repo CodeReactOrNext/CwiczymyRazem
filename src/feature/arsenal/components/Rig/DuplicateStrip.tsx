@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
 import type { BoardLevel } from "../../data/boardDuplicates";
 import {
@@ -38,19 +39,22 @@ export const DuplicateStrip = ({
   activeModel,
   onHoverModel,
 }: DuplicateStripProps) => {
+  const { t } = useArsenalLabels();
   if (board.duplicates.length === 0) return null;
 
   return (
     <div className='flex flex-wrap items-center gap-x-5 gap-y-2 rounded-lg bg-arsenal-section px-5 py-3'>
       <span className='text-sm font-semibold text-arsenal-text-primary'>
-        Duplicates
+        {t("duplicates.title")}
       </span>
 
       <div className='flex items-center gap-2.5'>
         <Lamp tone='idle' />
         <span className='flex items-baseline gap-1 text-sm font-bold tabular-nums text-zinc-200'>
           <CountUp value={board.penalty} prefix='−' />
-          <span className='text-xs font-semibold text-zinc-500'>levels</span>
+          <span className='text-xs font-semibold text-zinc-500'>
+            {t("workshop.levels_word", { count: board.penalty })}
+          </span>
         </span>
       </div>
 
@@ -63,7 +67,11 @@ export const DuplicateStrip = ({
             title={group.copies
               .map(
                 (copy) =>
-                  `${copy.name} Lv ${copy.level} → counts ${copy.counted}`,
+                  t("duplicates.copy_line", {
+                    name: copy.name,
+                    level: copy.level,
+                    counted: copy.counted,
+                  }),
               )
               .join("\n")}
             className={cn(
@@ -81,7 +89,7 @@ export const DuplicateStrip = ({
       </div>
 
       <span className='text-xs text-arsenal-text-tertiary sm:ml-auto'>
-        {describeDuplicateRule()}
+        {describeDuplicateRule(t)}
       </span>
     </div>
   );

@@ -5,6 +5,8 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { useTranslation } from "hooks/useTranslation";
 import { Info } from "lucide-react";
 
 import type { CaseDefinition, GuitarRarity } from "../../types/arsenal.types";
@@ -29,6 +31,7 @@ export const RarityOddsTable = ({
 }: {
   probabilities: CaseDefinition["probabilities"];
 }) => {
+  const labels = useArsenalLabels();
   const probs = (
     Object.entries(probabilities) as [GuitarRarity, number][]
   ).filter(([, prob]) => prob > 0);
@@ -42,7 +45,7 @@ export const RarityOddsTable = ({
             <span
               className='w-16 flex-shrink-0 text-[10px] font-semibold capitalize tracking-wider'
               style={{ color: rs.baseColor }}>
-              {rarity}
+              {labels.rarity(rarity)}
             </span>
             <div className='h-1 flex-1 overflow-hidden rounded bg-black/40'>
               <div
@@ -83,7 +86,10 @@ export const DropRates = ({
   probabilities: CaseDefinition["probabilities"];
   variant?: "link" | "inline";
   className?: string;
-}) => (
+}) => {
+  const { t } = useTranslation("arsenal");
+
+  return (
   <TooltipProvider>
     <Tooltip delayDuration={150}>
       <TooltipTrigger asChild>
@@ -97,7 +103,7 @@ export const DropRates = ({
             className,
           )}>
           <Info size={variant === "inline" ? 14 : 12} />
-          {variant === "inline" ? "View drop rates" : "Drop Rates"}
+          {variant === "inline" ? t("cases.view_drop_rates") : t("cases.drop_rates")}
         </button>
       </TooltipTrigger>
       <TooltipContent side='top' className={oddsTooltipClass}>
@@ -105,4 +111,5 @@ export const DropRates = ({
       </TooltipContent>
     </Tooltip>
   </TooltipProvider>
-);
+  );
+};

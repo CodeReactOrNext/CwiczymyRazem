@@ -1,4 +1,5 @@
 import type { DraggableProvided } from "@hello-pangea/dnd";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
@@ -33,6 +34,7 @@ export const ExerciseItem = ({
   onMoveDown,
 }: ExerciseItemProps) => {
   const { t } = useTranslation(["exercises", "common", "plans"]);
+  const localizeExercise = useLocalizeExercise();
   /* Removed currentLang logic */
 
   const handleMoveUp = () => onMoveUp(index);
@@ -89,7 +91,7 @@ export const ExerciseItem = ({
         <div className='flex-1'>
           <div className='flex flex-col items-start justify-between gap-2 md:flex-row md:items-center'>
             <h3 className='font-medium' translate={isSong ? 'no' : undefined}>
-              {isSong ? exercise.songData?.title : exercise.title}
+              {isSong ? exercise.songData?.title : localizeExercise(exercise).title}
             </h3>
             <div className='flex items-center gap-2'>
               <div className='flex items-center gap-1 text-sm text-muted-foreground'>
@@ -109,7 +111,7 @@ export const ExerciseItem = ({
             </div>
           </div>
           <p className='mt-4 text-sm text-muted-foreground md:mt-1'>
-            {isSong ? exercise.songData?.artist : exercise.description}
+            {isSong ? exercise.songData?.artist : localizeExercise(exercise).description}
           </p>
         </div>
       </div>

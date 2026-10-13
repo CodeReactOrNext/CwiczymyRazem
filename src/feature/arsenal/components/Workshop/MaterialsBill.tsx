@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { RecipeLine } from "feature/arsenal/data/workshop";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { CircleAlert, CircleCheck } from "lucide-react";
 
 import { PartRow } from "../Parts/PartRow";
@@ -24,6 +25,7 @@ export const MaterialsBill = ({
   job,
   readyLabel,
 }: MaterialsBillProps) => {
+  const { t } = useArsenalLabels();
   const short = recipe.filter((line) => !line.ok).length;
   const ready = short === 0;
 
@@ -31,7 +33,7 @@ export const MaterialsBill = ({
     <div className='flex flex-col gap-4'>
       <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1'>
         <span className='text-base font-semibold text-zinc-100'>
-          Materials required
+          {t("workshop.materials_required")}
         </span>
         <span
           className={cn(
@@ -41,7 +43,7 @@ export const MaterialsBill = ({
           {ready ? <CircleCheck size={18} /> : <CircleAlert size={18} />}
           {ready
             ? readyLabel
-            : `${short} ${short === 1 ? "part" : "parts"} short`}
+            : t("workshop.parts_short", { count: short })}
         </span>
       </div>
 

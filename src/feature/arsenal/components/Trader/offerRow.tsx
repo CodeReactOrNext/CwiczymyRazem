@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import type { ReactNode } from "react";
 
 /**
@@ -55,13 +56,16 @@ export const OfferRowStats = ({
   owned,
   remaining,
   stock,
-}: OfferRowStatsProps) => (
+}: OfferRowStatsProps) => {
+  const { t } = useTranslation("arsenal");
+
+  return (
   <div className='order-3 col-span-2 flex gap-4 text-xs tabular-nums text-zinc-400 sm:col-span-1 xl:contents'>
     <span className='xl:text-sm'>
       <span className='font-semibold text-zinc-200'>
         {owned.toLocaleString()}
       </span>
-      <span className='xl:hidden'> in stash</span>
+      <span className='xl:hidden'> {t("trader.in_stash")}</span>
     </span>
     <span className='xl:text-sm'>
       <span
@@ -72,10 +76,11 @@ export const OfferRowStats = ({
         {remaining}
       </span>
       <span className='text-zinc-500'>/{stock}</span>
-      <span className='xl:hidden'> left</span>
+      <span className='xl:hidden'> {t("trader.left")}</span>
     </span>
   </div>
-);
+  );
+};
 
 interface OfferRowPriceProps {
   unitPrice: number;
@@ -119,11 +124,15 @@ export const OfferRowActions = ({ children }: { children: ReactNode }) => (
 );
 
 /** Same width as picker + All + Buy, so the line sits where the controls were. */
-export const TakenForToday = () => (
+export const TakenForToday = () => {
+  const { t } = useTranslation("arsenal");
+
+  return (
   <span className='text-xs text-zinc-500 sm:w-[20.5rem] sm:text-center'>
-    Taken for today
+    {t("trader.taken_for_today")}
   </span>
-);
+  );
+};
 
 /** Holds the picker's place on a one-piece slot, so the Buy buttons line up. */
 export const PickerSpacer = () => (

@@ -11,6 +11,7 @@ import {
   getNextDailyReset,
 } from "feature/arsenal/data/dailyCase";
 import { useArsenalData } from "feature/arsenal/hooks/useArsenalData";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { buildDexLookup } from "feature/arsenal/utils/dex";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
@@ -48,6 +49,8 @@ export const DailyCaseCard = ({
   freeTokens = 0,
 }: DailyCaseCardProps) => {
   const caseDef = CASE_DEFINITIONS.daily;
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const canAfford = currentFame >= caseDef.fameCost;
 
   // Ticking clock drives both the countdown and the automatic pool rollover
@@ -93,16 +96,16 @@ export const DailyCaseCard = ({
         <div className='relative flex min-h-[22rem] flex-col justify-center gap-5 p-6 sm:p-8 lg:max-w-[46%]'>
           <div>
             <h2 className='font-display text-3xl font-black tracking-tight text-zinc-100 sm:text-4xl'>
-              {caseDef.name}
+              {labels.caseName(caseDef)}
             </h2>
             <p className='mt-1.5 text-sm text-zinc-300'>
-              {pool.length} items. One new possibility.
+              {t("cases.featured_pool", { count: pool.length })}
             </p>
           </div>
 
           <div className='flex w-fit items-center gap-2 rounded-lg bg-zinc-100/10 px-3.5 py-2 text-xs text-zinc-300'>
             <Clock3 size={14} className='text-zinc-400' />
-            Refreshes in
+            {t("cases.refreshes_in")}
             <span className='font-bold tabular-nums text-zinc-100'>
               {formatCountdown(msLeft)}
             </span>
@@ -134,7 +137,7 @@ export const DailyCaseCard = ({
           Each one carries the odds for its own rarity on hover: standing in
           front of a Mythic, the question is what the chance of *that* is. */}
       <div className='relative p-5 sm:p-6'>
-        <p className='text-sm font-semibold text-zinc-300'>Inside this drop</p>
+        <p className='text-sm font-semibold text-zinc-300'>{t("cases.inside_drop")}</p>
 
         <TooltipProvider>
           <div className='mt-4 grid grid-cols-2 gap-3.5 xsm:grid-cols-3 sm:grid-cols-5 xl:grid-cols-10'>
@@ -213,7 +216,7 @@ export const DailyCaseCard = ({
                         <p
                           className='mt-1 pl-4 text-[13px] font-medium'
                           style={{ color: rs.baseColor }}>
-                          {entry.def.rarity}
+                          {labels.rarity(entry.def.rarity)}
                         </p>
                       </div>
                     </div>
@@ -226,7 +229,7 @@ export const DailyCaseCard = ({
                       <span
                         className='text-[11px] font-semibold'
                         style={{ color: rs.baseColor }}>
-                        {entry.def.rarity}
+                        {labels.rarity(entry.def.rarity)}
                       </span>
                       <span
                         className='text-lg font-black tabular-nums'
@@ -238,7 +241,7 @@ export const DailyCaseCard = ({
                     </div>
                     <DexMarks status={dexStatus} className='mt-2' />
                     <p className='mt-0.5 text-[10px] text-zinc-500'>
-                      chance from this case
+                      {t("cases.chance_from_case")}
                     </p>
                   </TooltipContent>
                 </Tooltip>

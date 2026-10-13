@@ -24,6 +24,7 @@ import { getGuitarScrapYield } from "feature/arsenal/utils/scrap";
 import { ShelfDepositDialog } from "feature/guilds/components/ShelfDepositDialog";
 import { useShelfDeposit } from "feature/guilds/hooks/useShelfDeposit";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { Layers } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -65,6 +66,7 @@ export const GuitarInventory = ({
   query = "",
   sort = "rarity",
 }: GuitarInventoryProps) => {
+  const { t } = useTranslation("arsenal");
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
   const { mutate: unequip } = useUnequipGuitar();
   const { mutate: sell, isPending: isSelling } = useSellGuitar();
@@ -237,20 +239,20 @@ export const GuitarInventory = ({
     <>
       <div className='flex flex-col gap-3'>
         <CollectionSectionHeader
-          eyebrow='Instruments'
-          title='Guitars'
+          eyebrow={t("collection.guitars_eyebrow")}
+          title={t("collection.scope.guitars")}
           owned={uniqueOwnedCount}
           total={totalGuitarsCount}
-          unit='guitars collected'
+          unit={t("collection.guitars_collected")}
           action={
             duplicates.ids.length > 0 ? (
               <button
                 onClick={() => setIsBulkSellOpen(true)}
                 disabled={isSellingBulk || isScrappingBulk}
                 className='flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
-                title='Sell or scrap every lower-level duplicate, keeping the best copy of each guitar'>
+                title={t("stash.dupes_guitars_hint")}>
                 <Layers size={14} />
-                Clear duplicates ({duplicates.ids.length})
+                {t("collection.clear_dupes", { count: duplicates.ids.length })}
               </button>
             ) : null
           }

@@ -2,6 +2,7 @@ import { Faceplate } from "feature/toneStudio/components/Faceplate";
 import { PedalFace } from "feature/toneStudio/components/PedalFace";
 import { BypassSwitch } from "feature/toneStudio/components/PluginChrome";
 import { DELAY_PEDAL_SRC } from "feature/toneStudio/utils/gearArt";
+import { useTranslation } from "hooks/useTranslation";
 import type { AmpParams } from "types/nativeAudio";
 
 /** Full-scale delay time in ms — the knob's 0..1 maps onto this range. */
@@ -13,10 +14,13 @@ interface DelayModuleProps {
 }
 
 /** Post-cabinet delay — the last box in the chain. */
-export const DelayModule = ({ params, set }: DelayModuleProps) => (
+export const DelayModule = ({ params, set }: DelayModuleProps) => {
+  const { t } = useTranslation("tone_studio");
+
+  return (
   <Faceplate
     accent='amber'
-    title='Delay'
+    title={t("chain.delay")}
     bypassed={!params.delayEnabled}
     headerRight={
       <BypassSwitch
@@ -58,4 +62,5 @@ export const DelayModule = ({ params, set }: DelayModuleProps) => (
       ]}
     />
   </Faceplate>
-);
+  );
+};

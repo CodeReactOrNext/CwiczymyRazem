@@ -6,6 +6,7 @@ import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserInfo } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import { CheckCircle,Clock, Settings, Zap } from "lucide-react";
 import { useRouter } from "next/router";
@@ -16,6 +17,7 @@ import type { NextPageWithLayout } from "types/page";
 
 const MyPlansPage: NextPageWithLayout = () => {
   const router = useRouter();
+  const { t } = useTranslation("library");
   const userInfo = useAppSelector(selectUserInfo);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
@@ -76,19 +78,19 @@ const MyPlansPage: NextPageWithLayout = () => {
     <PremiumGate feature="plans">
       <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
         <HeroBanner
-          title="My Plans"
-          subtitle="Your custom practice routines"
-          eyebrow="Practice Plans"
+          title={t("plans.title")}
+          subtitle={t("plans.subtitle")}
+          eyebrow={t("plans.eyebrow")}
           backgroundContent={<HeroPattern />}
           className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
-          buttonText={planCount ? "Create Plan" : undefined}
+          buttonText={planCount ? t("plans.create") : undefined}
           onClick={() => router.push('/plans/create')}
         />
         <div className="mb-6 px-4 md:px-6">
           <PageTabs
             tabs={LIBRARY_TABS}
             activeHref="/plans"
-            ariaLabel="Library sections"
+            ariaLabel={t("sections")}
           />
         </div>
         <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["routines", "playalongs"]} hideLayout hideSectionHeader onPlansLoaded={setPlanCount} />

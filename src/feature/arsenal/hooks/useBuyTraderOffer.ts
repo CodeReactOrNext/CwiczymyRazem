@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deductFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -8,6 +9,7 @@ import { buyTraderOffer } from "../services/trader.service";
 import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 
 export const useBuyTraderOffer = () => {
+  const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
@@ -22,13 +24,11 @@ export const useBuyTraderOffer = () => {
       // Parts and instruments land where the player can see them; a mod lands in
       // the stash, a tab away, so it is the one purchase that has to say so.
       if (result.kind === "mod") {
-        toast.success(
-          "Mod added to your stash — fit it from Collection or the bench",
-        );
+        toast.success(t("toasts.mod_added"));
       }
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.error || "Purchase failed");
+      toast.error(error?.response?.data?.error || t("toasts.err.purchase"));
     },
   });
 };

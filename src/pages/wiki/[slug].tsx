@@ -20,12 +20,17 @@ import {
 } from "components/Wiki";
 import { Footer } from "feature/landing/components/Footer";
 import { WikiPublicNav } from "feature/wiki/components/WikiPublicNav";
+import { wikiSectionLabel } from "feature/wiki/sectionLabel";
 import WikiLayout from "feature/wiki/WikiLayout";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
+import { type AppLocale, SUPPORTED_LOCALES } from "lib/i18n/locales";
+import { useActiveLocale } from "lib/i18n/LocalizedRegion";
 import {
   getAllWikiPages,
   getWikiPageBySlug,
   getWikiSections,
+  hasWikiTranslation,
   type WikiFrontmatter,
   type WikiSection,
 } from "lib/wiki";
@@ -61,19 +66,32 @@ const components = {
 const SITE_URL = "https://riff.quest";
 const OG_IMAGE = `${SITE_URL}/images/og-image.png`;
 
-interface WikiArticleProps {
+interface WikiArticle {
   frontmatter: WikiFrontmatter;
   contentHtml: string;
-  sections: WikiSection[];
+}
+
+/**
+ * Every language the article exists in. The page is built once, so the reader's
+ * language can only be picked on the client — and only inside the app: a visitor
+ * who is not signed in always gets the English article that search engines index.
+ */
+interface WikiArticleProps {
+  articles: Partial<Record<AppLocale, WikiArticle>> & { en: WikiArticle };
+  /** The sidebar in every language, so it reads in the player's language even beside an article not translated yet. */
+  sections: Record<AppLocale, WikiSection[]>;
 }
 
 const WikiArticlePage: NextPageWithLayout<WikiArticleProps> = ({
-  frontmatter,
-  contentHtml,
-  sections,
+  articles,
+  sections: sectionsByLocale,
 }) => {
   const { status } = useSession();
   const isLogged = status === "authenticated";
+  const locale = useActiveLocale();
+  const { t } = useTranslation("wiki");
+  const { frontmatter, contentHtml } = articles[locale] ?? articles.en;
+  const sections = sectionsByLocale[locale];
 
   const url = `${SITE_URL}/wiki/${frontmatter.slug}`;
   // Google truncates around 60 chars, so only append the brand when it fits.
@@ -100,13 +118,14 @@ const WikiArticlePage: NextPageWithLayout<WikiArticleProps> = ({
         <meta name='twitter:image' content={OG_IMAGE} />
       </Head>
 
-      <div className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
+      <div
+        className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
         {!isLogged && <WikiPublicNav />}
 
         <WikiLayout sections={sections}>
           <div className='p-4 sm:p-6'>
             <p className='mb-2 text-xs font-bold text-cyan-400'>
-              {frontmatter.section}
+              {wikiSectionLabel(t, frontmatter.section)}
             </p>
             <h1 className='text-2xl font-black tracking-tight text-white'>
               {frontmatter.title}
@@ -147,30 +166,41 @@ export const getStaticProps: GetStaticProps<WikiArticleProps> = async (
 ) => {
   const slug = context.params?.slug as string;
 
-  let frontmatter: WikiFrontmatter;
-  let content: string;
+  const render = async (locale: AppLocale): Promise<WikiArticle> => {
+    const { frontmatter, content } = await getWikiPageBySlug(slug, locale);
+
+    // Compiled and rendered to static HTML at build time instead of shipping
+    // compiled MDX for the client to `new Function()`-eval on hydration — the
+    // browser's script-src CSP has no 'unsafe-eval' and blocks that. See blog/[slug].tsx.
+    const { default: MDXContent } = await evaluate(content, {
+      ...jsxRuntime,
+      remarkPlugins: [remarkGfm],
+    });
+    const contentHtml = renderToStaticMarkup(
+      <MDXContent components={components} />,
+    );
+
+    return { frontmatter, contentHtml };
+  };
+
   try {
-    ({ frontmatter, content } = await getWikiPageBySlug(slug));
+    const english = await render("en");
+    const articles: WikiArticleProps["articles"] = { en: english };
+
+    // A language only ships when its article has been translated, so a page
+    // that is still English-only does not carry the same HTML again.
+    for (const { code } of SUPPORTED_LOCALES) {
+      if (code !== "en" && hasWikiTranslation(slug, code)) {
+        articles[code] = await render(code);
+      }
+    }
+
+    const sections = Object.fromEntries(
+      SUPPORTED_LOCALES.map(({ code }) => [code, getWikiSections(code)]),
+    ) as Record<AppLocale, WikiSection[]>;
+
+    return { props: { articles, sections } };
   } catch {
     return { notFound: true };
   }
-
-  // Compiled and rendered to static HTML at build time instead of shipping
-  // compiled MDX for the client to `new Function()`-eval on hydration — the
-  // browser's script-src CSP has no 'unsafe-eval' and blocks that. See blog/[slug].tsx.
-  const { default: MDXContent } = await evaluate(content, {
-    ...jsxRuntime,
-    remarkPlugins: [remarkGfm],
-  });
-  const contentHtml = renderToStaticMarkup(
-    <MDXContent components={components} />,
-  );
-
-  return {
-    props: {
-      frontmatter,
-      contentHtml,
-      sections: getWikiSections(),
-    },
-  };
 };

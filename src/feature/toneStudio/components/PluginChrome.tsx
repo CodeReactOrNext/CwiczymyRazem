@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { PLATE_NOISE_BG } from "feature/arsenal/components/TierPlate";
 import type { ToneAccent } from "feature/toneStudio/utils/chain";
 import { ACCENT_HEX, ledGlow } from "feature/toneStudio/utils/chassis";
+import { useTranslation } from "hooks/useTranslation";
 import type { ReactNode } from "react";
 
 /**
@@ -111,11 +112,14 @@ export const BypassSwitch = ({
   accent,
   onToggle,
   label,
-}: BypassSwitchProps) => (
+}: BypassSwitchProps) => {
+  const { t } = useTranslation("tone_studio");
+
+  return (
   <button
     type='button'
     onClick={onToggle}
-    title={active ? "Bypass this block" : "Engage this block"}
+    title={active ? t("block.bypass") : t("block.engage")}
     className='flex items-center gap-2.5 rounded-md px-3 py-2 text-[13px] font-medium transition-colors hover:bg-zinc-800/60'>
     <Led on={active} accent={accent} size={9} />
     <span
@@ -132,10 +136,11 @@ export const BypassSwitch = ({
       />
     </span>
     <span style={{ color: active ? ACCENT_HEX[accent] : "#71717a" }}>
-      {label ?? (active ? "On" : "Bypassed")}
+      {label ?? (active ? t("block.on") : t("block.bypassed"))}
     </span>
   </button>
-);
+  );
+};
 
 interface PowerRockerProps {
   on: boolean;
@@ -159,12 +164,15 @@ export const PowerRocker = ({
   disabled,
   onToggle,
   disabledReason,
-}: PowerRockerProps) => (
+}: PowerRockerProps) => {
+  const { t } = useTranslation("tone_studio");
+
+  return (
   <button
     type='button'
     onClick={onToggle}
     disabled={disabled}
-    title={disabledReason ?? (on ? "Turn the amp off" : "Turn the amp on")}
+    title={disabledReason ?? (on ? t("power.turn_amp_off") : t("power.turn_amp_on"))}
     className='group flex shrink-0 items-center gap-2.5 rounded-md px-1.5 py-1 transition-opacity disabled:opacity-40'>
     <span
       className='relative block h-9 w-[26px] rounded'
@@ -198,7 +206,7 @@ export const PowerRocker = ({
 
     <span className='flex flex-col items-start leading-tight'>
       <span className='text-sm font-medium text-zinc-200'>
-        {on ? "Turn off" : "Turn on"}
+        {on ? t("power.turn_off") : t("power.turn_on")}
       </span>
       <span
         className='font-mono text-[10px]'
@@ -207,7 +215,8 @@ export const PowerRocker = ({
       </span>
     </span>
   </button>
-);
+  );
+};
 
 interface PickerRowProps {
   selected: boolean;

@@ -12,6 +12,7 @@ import {
   AMP_HEAD_SRC,
   AMP_PANEL,
 } from "feature/toneStudio/utils/gearArt";
+import { useTranslation } from "hooks/useTranslation";
 import { ExternalLink, Trash2, Upload } from "lucide-react";
 import type { ReactNode } from "react";
 import type { AmpParams } from "types/nativeAudio";
@@ -122,6 +123,7 @@ export const AmpModule = ({
   live = false,
 }: AmpModuleProps) => {
   const [artRef, measuredWidth] = useElementWidth<HTMLDivElement>();
+  const { t } = useTranslation("tone_studio");
   const artWidth = measuredWidth || NOMINAL_ART_WIDTH;
   const panelHeight = (artWidth / AMP_HEAD_ASPECT) * AMP_PANEL.height;
   const knobSize = Math.min(
@@ -157,7 +159,7 @@ export const AmpModule = ({
               color: "rgba(0,0,0,0.5)",
               textShadow: "0 1px 0 rgba(255,255,255,0.16)",
             }}>
-            {activeCapture?.name ?? "No capture loaded"}
+            {activeCapture?.name ?? t("amp.no_capture_loaded")}
           </span>
         </Panel>
       ) : (
@@ -209,19 +211,19 @@ export const AmpModule = ({
   return (
     <Faceplate
       accent='cyan'
-      title='Amp'
+      title={t("chain.amp")}
       subtitle={
         params.namEnabled
-          ? "Neural capture of a real head, in place of the preamp and tone stack"
-          : "Cascading preamp, passive tone stack and power section"
+          ? t("amp.subtitle_nam")
+          : t("amp.subtitle_classic")
       }
       headerRight={
         <SegmentedControl
           value={params.namEnabled ? "nam" : "classic"}
           onChange={(v) => set({ namEnabled: v === "nam" })}
           options={[
-            { value: "classic", label: "Classic" },
-            { value: "nam", label: "Neural capture" },
+            { value: "classic", label: t("amp.classic") },
+            { value: "nam", label: t("amp.neural") },
           ]}
         />
       }
@@ -242,7 +244,7 @@ export const AmpModule = ({
               target='_blank'
               rel='noopener noreferrer'
               className='flex items-center gap-1.5 text-[11px] text-cyan-400 hover:text-cyan-300'>
-              Browse captures on Tone3000
+              {t("amp.browse_tone3000")}
               <ExternalLink size={11} />
             </a>
             <button
@@ -251,7 +253,7 @@ export const AmpModule = ({
               disabled={importingNamModel}
               className={plateButtonClass()}>
               <Upload size={14} />
-              {importingNamModel ? "Loading…" : "Load capture (.nam)"}
+              {importingNamModel ? t("common.loading") : t("amp.load_capture")}
             </button>
           </div>
 
@@ -268,8 +270,7 @@ export const AmpModule = ({
                   className='pointer-events-none absolute -bottom-4 left-1/2 w-[115%] max-w-none -translate-x-1/2 select-none opacity-[0.07]'
                 />
                 <p className='relative text-center text-sm text-zinc-400'>
-                  No captures loaded yet — the classic channel is running
-                  instead.
+                  {t("amp.no_captures")}
                 </p>
               </div>
             )}
@@ -283,7 +284,7 @@ export const AmpModule = ({
                   <button
                     type='button'
                     onClick={() => onDeleteNamModel(model.id)}
-                    title='Delete capture'
+                    title={t("amp.delete_capture")}
                     className='p-1 text-zinc-500 hover:text-red-400'>
                     <Trash2 size={13} />
                   </button>
@@ -308,9 +309,7 @@ export const AmpModule = ({
               height. Any wider and the module would outgrow the window. */}
           <div className='mx-auto w-full max-w-[1100px]'>{head}</div>
           <p className='mx-auto max-w-lg text-center text-[11px] leading-relaxed text-zinc-500'>
-            Preamp is the first gain stage, ahead of the tone stack. Drive
-            pushes the power section after it — the two cascade, so a little of
-            each sounds different from all of one.
+            {t("amp.classic_hint")}
           </p>
         </>
       )}

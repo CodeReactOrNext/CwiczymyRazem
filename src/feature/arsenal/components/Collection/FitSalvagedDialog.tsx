@@ -9,6 +9,7 @@ import {
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
 import type { SalvagedModOption } from "feature/arsenal/data/salvage";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
 import { ModArt } from "../Workshop/ModArt";
 
@@ -37,7 +38,12 @@ export const FitSalvagedDialog = ({
   onConfirm,
   onCancel,
   isLoading,
-}: FitSalvagedDialogProps) => (
+}: FitSalvagedDialogProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
+  const modName = labels.mod(option.featureId, option.label);
+
+  return (
   <AlertDialog
     open={isOpen}
     onOpenChange={(open) => {
@@ -46,11 +52,10 @@ export const FitSalvagedDialog = ({
     <AlertDialogContent className='max-w-sm gap-6 border-0 bg-zinc-900 p-6'>
       <AlertDialogHeader className='space-y-2'>
         <AlertDialogTitle className='text-lg font-bold text-white'>
-          Fit {option.label}?
+          {t("salvage.fit_title", { name: modName })}
         </AlertDialogTitle>
         <AlertDialogDescription className='text-sm text-zinc-400'>
-          Onto {targetName}, at the value it was salvaged with. Nothing is
-          re-rolled.
+          {t("salvage.fit_body", { target: targetName })}
         </AlertDialogDescription>
       </AlertDialogHeader>
 
@@ -61,21 +66,20 @@ export const FitSalvagedDialog = ({
             +{option.points}
           </span>
           <span className='truncate text-xs text-zinc-400'>
-            off {option.sourceName}
+            {t("salvage.off_source", { source: option.sourceName })}
           </span>
         </div>
       </div>
 
       <p className='text-xs text-zinc-500'>
-        Costs nothing — you already paid {option.sourceName} for it. Taking it
-        off again means scrapping whatever it goes into.
+        {t("salvage.fit_note", { source: option.sourceName })}
       </p>
 
       <AlertDialogFooter className='gap-2 sm:space-x-0'>
         <AlertDialogCancel
           disabled={isLoading}
           className='mt-0 border-0 bg-zinc-700 text-white hover:bg-zinc-600 hover:text-white sm:flex-1'>
-          Cancel
+          {t("common.cancel")}
         </AlertDialogCancel>
         <AlertDialogAction
           onClick={(e) => {
@@ -86,9 +90,10 @@ export const FitSalvagedDialog = ({
           }}
           disabled={isLoading}
           className='bg-purple-600 text-white hover:bg-purple-700 sm:flex-1'>
-          {isLoading ? "Installing..." : "Install"}
+          {isLoading ? t("salvage.installing") : t("salvage.install")}
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
-);
+  );
+};

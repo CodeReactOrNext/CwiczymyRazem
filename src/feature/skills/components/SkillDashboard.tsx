@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { useLocalizedExercises } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
@@ -136,8 +137,9 @@ export const SkillDashboard = ({
 
   const totalXP = Object.values(userSkills.unlockedSkills).reduce((sum: number, val: number) => sum + val, 0);
 
+  const localizedExercises = useLocalizedExercises(exercisesAgregat);
   const exercisesByCategory = useMemo(() => {
-    return exercisesAgregat.reduce((acc, exercise) => {
+    return localizedExercises.reduce((acc, exercise) => {
       const skillId = exercise.relatedSkills[0] || 'general';
       const skillData = guitarSkills.find(s => s.id === skillId);
       const category = skillData?.category || (exercise.category !== 'mixed' ? exercise.category : 'technique');
@@ -167,7 +169,7 @@ export const SkillDashboard = ({
       acc[category][skillId].push(challengeLike);
       return acc;
     }, {} as Record<string, Record<string, DashboardExercise[]>>);
-  }, []);
+  }, [localizedExercises]);
 
   const { filteredTree, uniqueDifficulties } = useMemo(() => {
     if (!selectedSkillId) return { filteredTree: {}, uniqueDifficulties: [] };

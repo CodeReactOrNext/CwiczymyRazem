@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import { useLocalizePlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import {
   Tooltip,
   TooltipContent,
@@ -127,8 +128,10 @@ export const PlanCard = ({
     return value.pl || value.en || '';
   };
 
-  const title = getLocalizedString(plan.title as any);
-  const description = getLocalizedString(plan.description as any);
+  const localizePlan = useLocalizePlan();
+  const shown = localizePlan(plan);
+  const title = getLocalizedString(shown.title as any);
+  const description = getLocalizedString(shown.description as any);
 
   const totalDuration = Math.round(
     plan.exercises.reduce((acc, exercise) => acc + exercise.timeInMinutes, 0)

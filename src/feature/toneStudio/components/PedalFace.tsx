@@ -9,6 +9,7 @@ import {
   PEDAL_KNOBS,
   PEDAL_LED,
 } from "feature/toneStudio/utils/gearArt";
+import { useTranslation } from "hooks/useTranslation";
 
 /** Width the pedal is drawn at before anything has measured it — the size it
  *  settles on in a full-width window, so the first paint is already right. */
@@ -59,6 +60,7 @@ export const PedalFace = ({
   className,
 }: PedalFaceProps) => {
   const [ref, measuredWidth] = useElementWidth<HTMLDivElement>();
+  const { t } = useTranslation("tone_studio");
   const width = measuredWidth || NOMINAL_WIDTH;
   const knobSize = Math.round(width * PEDAL_KNOBS.diameter);
 
@@ -96,7 +98,7 @@ export const PedalFace = ({
       <button
         type='button'
         onClick={onToggle}
-        title={engaged ? "Bypass this pedal" : "Engage this pedal"}
+        title={engaged ? t("pedal.bypass") : t("pedal.engage")}
         className='group absolute rounded-full transition-transform active:scale-90'
         style={{
           left: `${PEDAL_FOOTSWITCH.left * 100}%`,

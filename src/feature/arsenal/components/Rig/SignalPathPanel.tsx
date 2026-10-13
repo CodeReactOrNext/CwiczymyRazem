@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { CurrencyIcon } from "components/CurrencyIcons/withCurrencyIcons";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
 import {
   CHAIN_TIERS,
@@ -60,13 +61,16 @@ interface SignalPathPanelProps {
 export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
   const tier = CHAIN_TIERS[verdict.tier];
   const tone = TONES[tier.tone];
+  const labels = useArsenalLabels();
+  const { t } = labels;
+  const tierLabel = labels.chainTierLabel(verdict.tier);
   const filled = new Set(verdict.filledStages);
 
   return (
     <div className='flex flex-col gap-3 rounded-lg bg-arsenal-section p-5'>
       <div className='flex items-center justify-between gap-4'>
         <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
-          Signal path
+          {t("signal.path")}
         </p>
         <div className='flex items-baseline gap-1'>
           <CurrencyIcon currency='fame' className='mr-0 h-5 w-5 self-center' />
@@ -82,13 +86,13 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
         </div>
       </div>
 
-      <Pop trigger={tier.label}>
+      <Pop trigger={tierLabel}>
         <p
           className={cn(
             "text-xl font-black capitalize tracking-wide",
             tone.text,
           )}>
-          {tier.label}
+          {tierLabel}
         </p>
       </Pop>
 
@@ -106,8 +110,10 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
             ))}
           </div>
           <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
-            {verdict.okLinks} of {verdict.links.length}{" "}
-            {verdict.links.length === 1 ? "cable" : "cables"} in order
+            {t("signal.cables_in_order", {
+              ok: verdict.okLinks,
+              count: verdict.links.length,
+            })}
           </p>
         </div>
       )}
@@ -119,8 +125,8 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
               <span className='text-[11px] text-arsenal-text-tertiary'>→</span>
             )}
             <StageChip
-              label={stage.label}
-              why={stage.why}
+              label={labels.stageLabel(stage)}
+              why={labels.stageWhy(stage)}
               filled={filled.has(SIGNAL_STAGES.indexOf(stage))}
             />
           </div>

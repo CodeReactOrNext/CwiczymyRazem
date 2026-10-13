@@ -3,6 +3,7 @@ import {
   getEffectiveRarity,
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { DexStatus } from "feature/arsenal/utils/dex";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import {
@@ -40,6 +41,7 @@ export const GuitarStashTile = ({
   ...placement
 }: GuitarStashTileProps) => {
   const playerLvl = usePlayerLvl();
+  const labels = useArsenalLabels();
 
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
@@ -57,8 +59,10 @@ export const GuitarStashTile = ({
       tall
       // The cap goes in the label as well as the corner: the padlock is the
       // only part of a socket a screen reader cannot see.
-      label={`${guitar.brand} ${guitar.name} — ${rarity}${
-        lockedLvl != null ? ` — needs level ${lockedLvl}` : ""
+      label={`${guitar.brand} ${guitar.name} — ${labels.rarity(rarity)}${
+        lockedLvl != null
+          ? ` — ${labels.t("card.needs_level", { lvl: lockedLvl })}`
+          : ""
       }`}
       level={getItemLevel(item, guitar)}
       isNew={item.isNew}

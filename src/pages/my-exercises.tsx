@@ -9,6 +9,7 @@ import { clearTabEditorDraft, saveTabEditorDraft } from "feature/exercisePlan/ut
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import { FileText, Globe, Lock, Music2, Pencil, Play, Plus, Star, Trash2 } from "lucide-react";
 import { useRouter } from "next/router";
@@ -71,6 +72,7 @@ const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
 
 const MyExercisesPage: NextPageWithLayout = () => {
   const router = useRouter();
+  const { t } = useTranslation("library");
   const userAuth = useAppSelector(selectUserAuth);
   const [exercises, setExercises] = useState<CommunityExercise[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -107,9 +109,9 @@ const MyExercisesPage: NextPageWithLayout = () => {
     const ok = await deleteCommunityExercise(id);
     if (ok) {
       setExercises(prev => prev.filter(e => e.id !== id));
-      toast.success("Exercise deleted.");
+      toast.success(t("my_exercises.deleted"));
     } else {
-      toast.error("Failed to delete. Try again.");
+      toast.error(t("my_exercises.delete_failed"));
     }
     setDeletingId(null);
   };
@@ -118,7 +120,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
     return (
       <div className="bg-second-600 rounded-lg overflow-visible flex flex-col min-h-screen ">
         <div className="px-4 pt-6 pb-2">
-          <BackLink label="Back to My Exercises" onClick={() => setActiveExercise(null)} />
+          <BackLink label={t("my_exercises.back")} onClick={() => setActiveExercise(null)} />
         </div>
         <div className="flex-1 overflow-hidden rounded-lg mx-4 mb-4">
           <PracticeSession
@@ -135,12 +137,12 @@ const MyExercisesPage: NextPageWithLayout = () => {
   return (
     <div className="bg-second-600 rounded-lg overflow-visible flex flex-col min-h-screen ">
       <HeroBanner
-        title="My Exercises"
-        subtitle="Create your own guitar exercises — keep them private or share them with the community"
-        eyebrow="Custom Exercises"
+        title={t("my_exercises.title")}
+        subtitle={t("my_exercises.subtitle")}
+        eyebrow={t("my_exercises.eyebrow")}
         backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
-        buttonText="Create Exercise"
+        buttonText={t("my_exercises.create")}
         onClick={handleCreate}
       />
 
@@ -148,7 +150,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
         <PageTabs
           tabs={LIBRARY_TABS}
           activeHref="/my-exercises"
-          ariaLabel="Library sections"
+          ariaLabel={t("sections")}
         />
       </div>
 
@@ -165,10 +167,9 @@ const MyExercisesPage: NextPageWithLayout = () => {
               <Music2 className="text-zinc-500" size={28} />
             </div>
             <div className="space-y-2">
-              <p className="text-zinc-100 font-semibold">No exercises yet</p>
+              <p className="text-zinc-100 font-semibold">{t("my_exercises.empty_title")}</p>
               <p className="text-zinc-400 text-sm max-w-sm">
-                Create an exercise with tablature or with written instructions only. On the last step you
-                choose whether it stays private or goes to the community.
+                {t("my_exercises.empty_body")}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -177,14 +178,14 @@ const MyExercisesPage: NextPageWithLayout = () => {
                 className="flex items-center gap-2 px-5 py-2.5 bg-zinc-100 hover:bg-white text-zinc-950 text-sm font-semibold rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <Music2 size={16} />
-                With tablature
+                {t("my_exercises.with_tab")}
               </button>
               <button
                 onClick={handleCreateWithoutTab}
                 className="flex items-center gap-2 px-5 py-2.5 bg-zinc-800/60 hover:bg-zinc-800 text-zinc-200 text-sm font-semibold rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <FileText size={16} />
-                Instructions only
+                {t("my_exercises.instructions_only")}
               </button>
             </div>
           </div>
@@ -202,12 +203,12 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     {ex.isPublic ? (
                       <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
                         <Globe size={9} />
-                        Public
+                        {t("my_exercises.public")}
                       </span>
                     ) : (
                       <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
                         <Lock size={9} />
-                        Private
+                        {t("my_exercises.private")}
                       </span>
                     )}
                   </div>
@@ -216,10 +217,10 @@ const MyExercisesPage: NextPageWithLayout = () => {
                   )}
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", CATEGORY_COLORS[ex.category] ?? CATEGORY_COLORS.mixed)}>
-                      {ex.category}
+                      {t(`common:categories.${ex.category}`, ex.category)}
                     </span>
                     <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", DIFFICULTY_COLORS[ex.difficulty])}>
-                      {ex.difficulty}
+                      {t(`common:difficulty.${ex.difficulty}`, ex.difficulty)}
                     </span>
                     {ex.metronomeSpeed && (
                       <span className="text-[10px] text-zinc-500 font-mono">
@@ -237,10 +238,10 @@ const MyExercisesPage: NextPageWithLayout = () => {
                         <Star size={12} className="text-amber-400" fill="currentColor" />
                         <span className="text-sm font-bold text-zinc-200">{ex.averageRating.toFixed(1)}</span>
                       </div>
-                      <span className="text-[10px] text-zinc-500">{ex.ratingCount} rating{ex.ratingCount !== 1 ? "s" : ""}</span>
+                      <span className="text-[10px] text-zinc-500">{t("my_exercises.ratings", { count: ex.ratingCount })}</span>
                     </>
                   ) : ex.isPublic ? (
-                    <span className="text-[10px] text-zinc-500">No ratings yet</span>
+                    <span className="text-[10px] text-zinc-500">{t("my_exercises.no_ratings")}</span>
                   ) : null}
                 </div>
 
@@ -250,7 +251,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                   className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 text-xs font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <Play size={12} fill="currentColor" />
-                  Practice
+                  {t("my_exercises.practice")}
                 </button>
 
                 {/* View in community — only for public */}
@@ -259,7 +260,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     onClick={() => router.push("/profile/skills?tab=community")}
                     className="shrink-0 px-3 py-1.5 rounded bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 text-xs font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   >
-                    View
+                    {t("my_exercises.view")}
                   </button>
                 )}
 
@@ -267,8 +268,8 @@ const MyExercisesPage: NextPageWithLayout = () => {
                 <button
                   onClick={() => handleEdit(ex)}
                   className="shrink-0 p-2 rounded bg-zinc-800/60 text-zinc-400 hover:text-cyan-400 hover:bg-zinc-800 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  title="Edit exercise"
-                  aria-label="Edit exercise"
+                  title={t("my_exercises.edit")}
+                  aria-label={t("my_exercises.edit")}
                 >
                   <Pencil size={14} />
                 </button>
@@ -278,8 +279,8 @@ const MyExercisesPage: NextPageWithLayout = () => {
                   onClick={() => handleDelete(ex.id)}
                   disabled={deletingId === ex.id}
                   className="shrink-0 p-2 rounded bg-zinc-800/60 text-zinc-400 hover:text-rose-400 hover:bg-zinc-800 disabled:opacity-40 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  title="Delete exercise"
-                  aria-label="Delete exercise"
+                  title={t("my_exercises.delete")}
+                  aria-label={t("my_exercises.delete")}
                 >
                   <Trash2 size={14} />
                 </button>
@@ -291,7 +292,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
               className="w-full mt-4 py-4 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-lg flex items-center justify-center gap-2 text-zinc-500 hover:text-cyan-400 text-sm font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <Plus size={16} />
-              Create another exercise
+              {t("my_exercises.create_another")}
             </button>
           </div>
         )}

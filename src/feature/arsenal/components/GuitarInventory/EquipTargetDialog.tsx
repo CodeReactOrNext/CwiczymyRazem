@@ -10,6 +10,7 @@ import {
   getEffectiveRarity,
   getItemLevel,
 } from "feature/arsenal/data/itemStats";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import type { LucideIcon } from "lucide-react";
 import { Guitar, User, X } from "lucide-react";
@@ -109,6 +110,8 @@ export const EquipTargetDialog = ({
   onRemove,
   onClose,
 }: EquipTargetDialogProps) => {
+  const labels = useArsenalLabels();
+  const { t } = labels;
   const viewOf = (id: string | null | undefined): GuitarView | null => {
     if (!id) return null;
     const item = inventory.find((i) => i.id === id);
@@ -136,25 +139,25 @@ export const EquipTargetDialog = ({
   }[] = [
     {
       target: "profile",
-      label: "Profile",
+      label: t("equip.profile"),
       icon: User,
       occupantId: equippedItemId,
     },
     {
       target: 0,
-      label: "Rig slot 1",
+      label: t("equip.rig_slot", { slot: 1 }),
       icon: Guitar,
       occupantId: rigSlots[0] ?? null,
     },
     {
       target: 1,
-      label: "Rig slot 2",
+      label: t("equip.rig_slot", { slot: 2 }),
       icon: Guitar,
       occupantId: rigSlots[1] ?? null,
     },
     {
       target: 2,
-      label: "Rig slot 3",
+      label: t("equip.rig_slot", { slot: 3 }),
       icon: Guitar,
       occupantId: rigSlots[2] ?? null,
     },
@@ -178,10 +181,10 @@ export const EquipTargetDialog = ({
                 color='custom'
                 style={getChipCustomStyle(subject.color)}
                 className='px-2 py-1'>
-                {subject.rarity}
+                {labels.rarity(subject.rarity)}
               </Chip>
               <Chip color='gray' className='px-2 py-1'>
-                Lvl {subject.level}
+                {t("common.lvl", { level: subject.level })}
               </Chip>
             </div>
           </div>
@@ -189,7 +192,7 @@ export const EquipTargetDialog = ({
 
         {/* Where it can go */}
         <div className='flex flex-col gap-4'>
-          <p className='text-sm text-zinc-400'>Where should it go?</p>
+          <p className='text-sm text-zinc-400'>{t("equip.where")}</p>
 
           <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
             {targets.map(({ target, label, icon: Icon, occupantId }) => {
@@ -245,11 +248,11 @@ export const EquipTargetDialog = ({
                             {holder.name}
                           </span>
                           <span className='text-[11px] text-zinc-500'>
-                            {active ? "Already here" : "Gets replaced"}
+                            {active ? t("equip.already_here") : t("equip.gets_replaced")}
                           </span>
                         </>
                       ) : (
-                        <span className='text-[11px] text-zinc-500'>Empty</span>
+                        <span className='text-[11px] text-zinc-500'>{t("equip.empty")}</span>
                       )}
                     </span>
                   </button>
@@ -258,8 +261,8 @@ export const EquipTargetDialog = ({
                     <button
                       type='button'
                       onClick={() => onRemove(target)}
-                      aria-label={`Take out of ${label}`}
-                      title={`Take out of ${label}`}
+                      aria-label={t("equip.take_out_of", { target: label })}
+                      title={t("equip.take_out_of", { target: label })}
                       className='absolute right-2 top-2 rounded p-1.5 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-red-500/10 hover:text-red-400'>
                       <X size={14} strokeWidth={2.5} />
                     </button>

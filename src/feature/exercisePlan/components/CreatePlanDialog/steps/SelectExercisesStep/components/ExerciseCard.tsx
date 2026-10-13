@@ -1,4 +1,5 @@
 import { Badge } from "assets/components/ui/badge";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
@@ -33,6 +34,7 @@ export const ExerciseCard = ({
   isPrivate = false,
 }: ExerciseCardProps) => {
   const { t } = useTranslation(["common", "exercises", "plans"]);
+  const localizeExercise = useLocalizeExercise();
 
   const skills = exercise.relatedSkills
     .map((skillId) => guitarSkills.find((s) => s.id === skillId))
@@ -86,13 +88,13 @@ export const ExerciseCard = ({
               "font-semibold text-[15px] sm:text-[16px] leading-tight tracking-tight transition-colors duration-300",
               isLocked ? "text-zinc-500" : isSelected ? "text-cyan-300" : "text-zinc-100 group-hover:text-white"
             )}>
-              {exercise.title}
+              {localizeExercise(exercise).title}
             </h3>
             <p className={cn(
               "mt-1.5 text-[13px] sm:text-[14px] line-clamp-1 sm:line-clamp-2 leading-relaxed transition-colors duration-300 pr-2",
               isLocked ? "text-zinc-600" : "text-zinc-500 group-hover:text-zinc-300"
             )}>
-              {exercise.description}
+              {localizeExercise(exercise).description}
             </p>
           </div>
 

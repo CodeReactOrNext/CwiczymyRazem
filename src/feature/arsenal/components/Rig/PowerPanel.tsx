@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
 import { type PowerState } from "../../data/powerSupply";
 import type { SupplyTier } from "../../data/rigHardware";
@@ -24,6 +25,7 @@ interface PowerPanelProps {
 }
 
 export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
+  const { t } = useArsenalLabels();
   const share = Math.min(1, state.outputsUsed / supply.outputs);
   // Capacity only — amber at the last output. Whether a boarded pedal is
   // actually fed is a separate question, answered by the note below.
@@ -36,7 +38,7 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
     <div className='flex flex-col gap-3 rounded-lg bg-arsenal-section p-5'>
       <div className='flex items-center justify-between gap-4'>
         <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
-          Power
+          {t("power.label")}
         </p>
         <p className='text-[11px] tracking-wide text-arsenal-text-secondary'>
           {supply.name}
@@ -52,7 +54,7 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
           {state.outputsUsed}
         </span>
         <span className='font-teko text-base leading-none text-arsenal-text-tertiary'>
-          / {supply.outputs} outputs
+          / {t("power.outputs_total", { total: supply.outputs })}
         </span>
       </p>
 
@@ -68,10 +70,10 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
         </div>
         <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
           {unpowered.length === 0 ? (
-            <>Every pedal is running</>
+            <>{t("power.all_running")}</>
           ) : (
             <span className='text-red-400'>
-              No power for {unpowered.join(", ")}
+              {t("power.no_power_for", { names: unpowered.join(", ") })}
             </span>
           )}
         </p>
@@ -80,7 +82,7 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
             pedal is off the board as far as the game is concerned. */}
         {unpowered.length > 0 && (
           <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
-            A pedal with no power adds no rig level and earns no Fame.
+            {t("power.dead_pedal_note")}
           </p>
         )}
       </div>

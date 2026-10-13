@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 
-import { SLOT_LABELS } from "../data/components";
 import type { ComponentSlot } from "../types/guitarBuilder.types";
 
 interface SlotTabsProps {
@@ -12,7 +12,10 @@ interface SlotTabsProps {
 }
 
 /** One row of slot tabs; scrolls sideways rather than wrapping. */
-export const SlotTabs = ({ slots, active, onSelect, hint }: SlotTabsProps) => (
+export const SlotTabs = ({ slots, active, onSelect, hint }: SlotTabsProps) => {
+  const labels = useArsenalLabels();
+
+  return (
   <div className='no-scrollbar flex gap-1 overflow-x-auto rounded-lg bg-zinc-900/60 p-1'>
     {slots.map((slot) => (
       <button
@@ -26,7 +29,7 @@ export const SlotTabs = ({ slots, active, onSelect, hint }: SlotTabsProps) => (
             ? "bg-zinc-800 text-zinc-50"
             : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200",
         )}>
-        <span className='text-sm'>{SLOT_LABELS[slot]}</span>
+        <span className='text-sm'>{labels.slot(slot)}</span>
         <span
           className={cn(
             "text-xs tabular-nums",
@@ -37,4 +40,5 @@ export const SlotTabs = ({ slots, active, onSelect, hint }: SlotTabsProps) => (
       </button>
     ))}
   </div>
-);
+  );
+};

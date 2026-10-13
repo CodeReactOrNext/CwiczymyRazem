@@ -1,3 +1,6 @@
+import type { Translate } from "lib/i18n/translate";
+import { translateOr } from "lib/i18n/translate";
+
 /**
  * The words the game uses for "you cannot have this yet, but you will".
  *
@@ -6,8 +9,8 @@
  * milestone tier on the Milestones page. Two screens wording the same rule two
  * ways is how a player ends up believing they are two different rules.
  */
-export const unlocksAtLevelLabel = (lvl: number): string =>
-  `Unlocks at level ${lvl}`;
+export const unlocksAtLevelLabel = (lvl: number, t?: Translate): string =>
+  translateOr(t, "arsenal:lock.unlocks_at", "Unlocks at level {{lvl}}", { lvl });
 
 /**
  * The level `requiredLvl` is still waiting for, or null once it has been

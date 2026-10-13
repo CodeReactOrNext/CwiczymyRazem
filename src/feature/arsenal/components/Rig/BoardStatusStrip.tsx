@@ -1,9 +1,10 @@
 import { cn } from "assets/lib/utils";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { AlertTriangle, Plug, Zap } from "lucide-react";
 
 import type { PowerState } from "../../data/powerSupply";
 import type { SupplyTier } from "../../data/rigHardware";
-import { CHAIN_TIERS, type ChainVerdict } from "../../data/signalChain";
+import { type ChainVerdict } from "../../data/signalChain";
 import { CountUp, Pop } from "../Workshop/workshopMotion";
 import { RIG_BUTTON, RIG_BUTTON_FIX } from "./RigSection";
 
@@ -104,42 +105,44 @@ export const BoardStatusStrip = ({
   onWireUp,
   onPatch,
 }: BoardStatusStripProps) => {
-  const tier = CHAIN_TIERS[verdict.tier];
   const cables = verdict.links.length;
+  const labels = useArsenalLabels();
+  const { t } = labels;
+  const tierLabel = labels.chainTierLabel(verdict.tier);
 
   return (
     <div className='grid grid-cols-1 gap-3 lg:grid-cols-2'>
       <Panel
-        label='Signal path'
+        label={t("signal.path")}
         aside={
           <>
             {cables === 0 ? (
-              <span className='text-arsenal-text-tertiary'>{tier.note}</span>
+              <span className='text-arsenal-text-tertiary'>{labels.chainTierNote(verdict.tier)}</span>
             ) : verdict.wrongLinks > 0 ? (
               // One sentence, not a tally beside a warning: how many are wrong
               // is the only half of the count anybody acts on.
               <span className='flex items-center gap-1.5 font-semibold tabular-nums text-amber-400'>
                 <AlertTriangle size={13} strokeWidth={2.5} />
-                {verdict.wrongLinks} of {cables} backwards
+                {t("signal.backwards", { wrong: verdict.wrongLinks, cables })}
               </span>
             ) : (
               <span className='tabular-nums text-arsenal-text-tertiary'>
-                All {cables} in order
+                {t("signal.all_in_order", { count: cables })}
               </span>
             )}
             {onWireUp && (
               <FixButton
                 icon={<Zap size={12} strokeWidth={2.5} />}
-                label='Wire it up'
-                title='Lay the whole board out in the order the craft asks for'
+                label={t("signal.wire_it_up")}
+                title={t("signal.wire_it_up_hint")}
                 onClick={onWireUp}
               />
             )}
           </>
         }>
-        <Pop trigger={tier.label}>
+        <Pop trigger={tierLabel}>
           <span className='text-sm font-semibold capitalize text-arsenal-text-primary'>
-            {tier.label}
+            {tierLabel}
           </span>
         </Pop>
         <span className='flex items-baseline gap-0.5 text-sm font-bold tabular-nums text-amber-300'>
@@ -149,7 +152,7 @@ export const BoardStatusStrip = ({
       </Panel>
 
       <Panel
-        label='Power'
+        label={t("power.label")}
         aside={
           <>
             {unpowered.length > 0 ? (
@@ -160,21 +163,21 @@ export const BoardStatusStrip = ({
                 className='flex items-center gap-1.5 font-semibold text-red-400'>
                 <AlertTriangle size={13} strokeWidth={2.5} />
                 {unpowered.length === 1
-                  ? `${unpowered[0]} has no power`
-                  : `${unpowered.length} pedals have no power`}
+                  ? t("power.one_unpowered", { name: unpowered[0] })
+                  : t("power.many_unpowered", { count: unpowered.length })}
               </span>
             ) : (
               <span className='text-arsenal-text-tertiary'>
                 {power.outputsUsed === 0
-                  ? "Nothing plugged in yet"
-                  : "Every pedal is running"}
+                  ? t("power.nothing_plugged")
+                  : t("power.all_running")}
               </span>
             )}
             {onPatch && (
               <FixButton
                 icon={<Plug size={12} strokeWidth={2.5} />}
-                label='Patch power'
-                title='Plug in everything the brick still has a hole for'
+                label={t("power.patch")}
+                title={t("power.patch_hint")}
                 onClick={onPatch}
               />
             )}
@@ -183,7 +186,7 @@ export const BoardStatusStrip = ({
         <span
           title={supply.name}
           className='text-sm font-semibold tabular-nums text-arsenal-text-primary'>
-          {power.outputsUsed} / {supply.outputs} outputs
+          {t("power.outputs", { used: power.outputsUsed, total: supply.outputs })}
         </span>
       </Panel>
     </div>

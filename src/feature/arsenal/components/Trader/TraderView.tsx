@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -34,6 +35,7 @@ import { RestockTimer } from "./RestockTimer";
  */
 export const TraderView = () => {
   const shop = useTraderShop();
+  const { t } = useTranslation("arsenal");
   const { data: arsenal } = useArsenalData();
   const fame = useAppSelector(selectCurrentUserStats)?.fame || 0;
 
@@ -91,11 +93,10 @@ export const TraderView = () => {
       <div className='flex flex-wrap items-end justify-between gap-x-8 gap-y-4'>
         <div>
           <h2 className='font-display text-2xl font-black text-zinc-100'>
-            Trader
+            {t("view.tabs.trader")}
           </h2>
           <p className='mt-1 text-sm text-zinc-500'>
-            Parts by the piece, one mod, and a few instruments — a fresh stock
-            every day.
+            {t("trader.subtitle")}
           </p>
         </div>
         <RestockTimer restockAt={shop.restockAt} />
@@ -103,11 +104,14 @@ export const TraderView = () => {
 
       <section className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
         <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1'>
-          <h3 className='text-lg font-bold text-zinc-100'>Parts &amp; mods</h3>
+          <h3 className='text-lg font-bold text-zinc-100'>{t("trader.parts_mods")}</h3>
           <p className='text-xs text-zinc-500'>
             {partsTaken + (modTaken ? 1 : 0) === 0
-              ? "Nothing taken yet today."
-              : `${partsTaken + (modTaken ? 1 : 0)} of ${listed.length + (mod ? 1 : 0)} slots cleared today.`}
+              ? t("trader.nothing_taken")
+              : t("trader.slots_cleared", {
+                  taken: partsTaken + (modTaken ? 1 : 0),
+                  total: listed.length + (mod ? 1 : 0),
+                })}
           </p>
         </div>
 
@@ -130,10 +134,10 @@ export const TraderView = () => {
               "hidden gap-x-6 px-4 pb-1 text-xs text-zinc-500 xl:grid",
               PART_ROW_COLS,
             )}>
-            <span>Part</span>
-            <span>In stash</span>
-            <span>Left today</span>
-            <span>Price each</span>
+            <span>{t("trader.col_part")}</span>
+            <span>{t("trader.col_in_stash")}</span>
+            <span>{t("trader.col_left_today")}</span>
+            <span>{t("trader.col_price_each")}</span>
             <span className='w-[20.5rem]' />
           </div>
           {parts.map((offer) => (
@@ -164,10 +168,9 @@ export const TraderView = () => {
       {items.length > 0 && (
         <section className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
           <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1'>
-            <h3 className='text-lg font-bold text-zinc-100'>Featured gear</h3>
+            <h3 className='text-lg font-bold text-zinc-100'>{t("trader.featured_gear")}</h3>
             <p className='text-xs text-zinc-500'>
-              Rolled from today&apos;s seed — the card is the exact instrument
-              you get.
+              {t("trader.featured_hint")}
             </p>
           </div>
 
