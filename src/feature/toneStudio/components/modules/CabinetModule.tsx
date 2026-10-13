@@ -6,6 +6,7 @@ import {
   plateButtonClass,
 } from "feature/toneStudio/components/PluginChrome";
 import { CABINET_ASPECT, CABINET_SRC } from "feature/toneStudio/utils/gearArt";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Trash2, Upload } from "lucide-react";
 import type { AmpParams } from "types/nativeAudio";
 import type { ImportedIR } from "types/toneStudio";
@@ -37,11 +38,14 @@ export const CabinetModule = ({
   irError,
   onImportIR,
   onDeleteIR,
-}: CabinetModuleProps) => (
+}: CabinetModuleProps) => {
+  const { t } = useTranslation("tone_studio");
+
+  return (
   <Faceplate
     accent='emerald'
-    title='Cabinet'
-    subtitle='Speaker and microphone — the last thing that shapes the tone'
+    title={t("cab.title")}
+    subtitle={t("cab.subtitle")}
     bypassed={!params.cab}
     headerRight={
       <BypassSwitch
@@ -66,8 +70,8 @@ export const CabinetModule = ({
       />
       <p className='mt-2 text-center text-[11px] text-zinc-500'>
         {params.irId === null
-          ? "Built-in 4x12 model"
-          : "Replaced by the loaded impulse response"}
+          ? t("cab.builtin")
+          : t("cab.replaced")}
       </p>
     </div>
 
@@ -78,7 +82,7 @@ export const CabinetModule = ({
           selected={params.irId === null}
           disabled={!params.cab}
           onSelect={() => set({ irId: null })}>
-          <span className='flex-1'>Built-in cabinet</span>
+          <span className='flex-1'>{t("cab.builtin_cabinet")}</span>
           {params.irId === null && <Check size={14} className='shrink-0' />}
         </PickerRow>
 
@@ -93,7 +97,7 @@ export const CabinetModule = ({
               <button
                 type='button'
                 onClick={() => onDeleteIR(ir.id)}
-                title='Delete IR'
+                title={t("cab.delete_ir")}
                 className='p-1 text-zinc-500 hover:text-red-400'>
                 <Trash2 size={13} />
               </button>
@@ -101,7 +105,7 @@ export const CabinetModule = ({
             <span className='truncate'>{ir.name}</span>
             {ir.truncated && (
               <span className='shrink-0 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-400'>
-                truncated
+                {t("cab.truncated")}
               </span>
             )}
             {params.irId === ir.id && <Check size={14} className='shrink-0' />}
@@ -115,9 +119,10 @@ export const CabinetModule = ({
         disabled={importing}
         className={cn(plateButtonClass(), "mt-auto")}>
         <Upload size={14} />
-        {importing ? "Loading…" : "Load impulse response (.wav)"}
+        {importing ? t("common.loading") : t("cab.load_ir")}
       </button>
       {irError && <p className='text-xs text-red-400'>{irError}</p>}
     </div>
   </Faceplate>
-);
+  );
+};

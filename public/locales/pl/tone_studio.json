@@ -1,0 +1,175 @@
+{
+  "common": {
+    "loading": "Ładowanie…",
+    "cancel": "Anuluj",
+    "select": "Wybierz…"
+  },
+  "chain": {
+    "gate": "Bramka",
+    "overdrive": "Overdrive",
+    "amp": "Wzmacniacz",
+    "amp_nam": "Wzmacniacz · NAM",
+    "amp_classic": "Wzmacniacz · Klasyczny",
+    "cab": "Kolumna",
+    "delay": "Delay"
+  },
+  "gate": {
+    "title": "Bramka szumów",
+    "subtitle": "Wycina brum i szum, zanim cokolwiek dalej je wzmocni",
+    "input_hint": "Poziom wejścia. Zagraj swój najgłośniejszy akord i zmniejszaj gain w interfejsie, aż pasek przestanie się robić czerwony.",
+    "body": "Przy włączonej bramce wszystko, co cichsze od samej gitary, jest wycinane między dźwiękami: brum single-coili, szum wzmacniacza, lodówka. Brzmienia z dużym gainem jej potrzebują; czyste zwykle nie."
+  },
+  "cab": {
+    "title": "Kolumna",
+    "subtitle": "Głośnik i mikrofon — ostatnie, co kształtuje brzmienie",
+    "builtin": "Wbudowany model 4x12",
+    "replaced": "Zastąpiona wczytaną odpowiedzią impulsową",
+    "builtin_cabinet": "Wbudowana kolumna",
+    "delete_ir": "Usuń IR",
+    "truncated": "przycięta",
+    "load_ir": "Wczytaj odpowiedź impulsową (.wav)"
+  },
+  "amp": {
+    "no_capture_loaded": "Nie wczytano capture'a",
+    "subtitle_nam": "Neuronowy capture prawdziwego heada zamiast preampu i korekcji",
+    "subtitle_classic": "Kaskadowy preamp, pasywna korekcja i sekcja mocy",
+    "classic": "Klasyczny",
+    "neural": "Capture neuronowy",
+    "browse_tone3000": "Przeglądaj capture'y na Tone3000",
+    "load_capture": "Wczytaj capture (.nam)",
+    "no_captures": "Nie wczytano jeszcze capture'ów — zamiast tego działa kanał klasyczny.",
+    "delete_capture": "Usuń capture",
+    "classic_hint": "Preamp to pierwszy stopień wzmocnienia, przed korekcją. Drive popycha sekcję mocy za nim — oba działają kaskadowo, więc trochę jednego i trochę drugiego brzmi inaczej niż samo jedno."
+  },
+  "rack": {
+    "gate_on": "Brum i szum wycięte",
+    "gate_open": "Otwarta",
+    "no_capture": "Brak capture'a",
+    "built_in": "Wbudowana",
+    "bypass": "Pomiń: {{name}}"
+  },
+  "meter": {
+    "input": "Wejście"
+  },
+  "pedal": {
+    "bypass": "Wyłącz ten efekt",
+    "engage": "Włącz ten efekt"
+  },
+  "block": {
+    "bypass": "Pomiń ten blok",
+    "engage": "Włącz ten blok",
+    "on": "Wł.",
+    "bypassed": "Pominięty"
+  },
+  "power": {
+    "turn_amp_off": "Wyłącz wzmacniacz",
+    "turn_amp_on": "Włącz wzmacniacz",
+    "turn_off": "Wyłącz",
+    "turn_on": "Włącz"
+  },
+  "presets": {
+    "name_this": "Nazwij to brzmienie",
+    "save": "Zapisz",
+    "previous": "Poprzedni preset",
+    "next": "Następny preset",
+    "none_loaded": "Nie wczytano presetu",
+    "edited": "Zmieniony od wczytania",
+    "none_saved": "Nie zapisano jeszcze presetów",
+    "delete": "Usuń preset",
+    "overwrite_hint": "Nadpisz „{{name}}” obecnymi ustawieniami",
+    "update": "Aktualizuj",
+    "save_as_hint": "Zapisz obecne ustawienia jako nowy preset",
+    "save_as": "Zapisz jako"
+  },
+  "status": {
+    "no_device": "Brak urządzenia",
+    "choose_hint": "Wybierz interfejs audio, kanały i rozmiar bufora",
+    "choose_interface": "Wybierz interfejs audio",
+    "rate": "Próbkowanie",
+    "buffer": "Bufor",
+    "buffer_hint": "Ramki na wywołanie audio — mniej to ciaśniej, ale bardziej krucho",
+    "latency": "Opóźnienie",
+    "dropouts": "Przerwy",
+    "dropped": "{{underruns}} (odrzucone: {{drops}})",
+    "dropouts_hint": "Wywołania sprzętu, które od otwarcia strumienia nie miały nic do odtworzenia — każde było słyszalną dziurą. Odrzucone bloki to silnik pozbywający się zaległości, żeby opóźnienie nie rosło.",
+    "dsp_hint": "Jaka część każdego bloku audio przypada na łańcuch"
+  },
+  "settings": {
+    "audio_interface": "Interfejs audio",
+    "refresh_hint": "Odśwież listę urządzeń",
+    "refresh": "Odśwież",
+    "input": "Wejście",
+    "select_input": "Wybierz wejście",
+    "no_inputs": "Nie znaleziono urządzeń wejściowych",
+    "channels_in": "wej.: {{count}}",
+    "channels_out": "wyj.: {{count}}",
+    "default": "domyślne",
+    "channel": "Kanał",
+    "input_channel_hint": "Z którego kanału wejściowego nagrywać — np. gniazdo gitarowe w interfejsie wielokanałowym",
+    "output": "Wyjście",
+    "asio_same_device": "ASIO używa tego samego urządzenia na wejściu i wyjściu",
+    "output_hint": "Urządzenie wyjściowe do odsłuchu wzmacniacza",
+    "same_as_input": "Takie jak wejście (ASIO)",
+    "system_default_output": "Domyślne wyjście systemu",
+    "output_channel_hint": "Pierwszy kanał wyjściowy do odsłuchu — np. wyjścia 3/4 zamiast 1/2 w interfejsie wielokanałowym",
+    "buffer_title": "Rozmiar bufora ASIO/WASAPI — mniejszy to mniejsze opóźnienie, ale większa skłonność do trzasków",
+    "buffer_hint": "Mniejszy bufor skraca opóźnienie; za mały i dźwięk zaczyna trzeszczeć."
+  },
+  "view": {
+    "audio_hint": "Interfejs audio, kanały i rozmiar bufora",
+    "audio": "Audio",
+    "needs_desktop": "Wymaga aplikacji desktopowej",
+    "opening_stream": "Otwieranie strumienia audio…",
+    "no_connection": "Brak połączenia z aplikacją desktopową — to tylko podgląd, sterowanie dźwiękiem nie działa.",
+    "overload": "Łańcuch DSP nie nadążył za czasem rzeczywistym i musiał się zresetować (~{{drift}} ms dryfu) — pewnie właśnie słychać było trzask.",
+    "overload_nam_hint": "Spróbuj większego bufora albo lżejszego capture'a."
+  },
+  "amp_button": {
+    "live": "Na żywo",
+    "live_with": "Na żywo · {{latency}}",
+    "live_latency": "Na żywo · opóźnienie {{latency}}",
+    "starting": "Uruchamianie…",
+    "monitoring_off": "Odsłuch wyłączony",
+    "reconnecting": "Interfejs odłączony — ponowne łączenie…",
+    "dsp_overloaded": "DSP przeciążone",
+    "dropouts_one": "{{count}} przerwa",
+    "dropouts_few": "{{count}} przerwy",
+    "dropouts_many": "{{count}} przerw",
+    "dropouts": "przerwy: {{count}}",
+    "title": "Symulator wzmacniacza (ASIO, na żywo)",
+    "amp": "Wzmacniacz",
+    "amp_on": "Wzmacniacz wł.",
+    "amp_alert": "AMP !",
+    "amp_on_caps": "AMP WŁ.",
+    "amp_caps": "AMP",
+    "preset": "Preset",
+    "modified": "Zmieniony",
+    "select_preset": "Wybierz preset…",
+    "no_presets": "Brak presetów",
+    "new_preset_name": "Nazwa nowego presetu",
+    "revert_hint": "Wróć do zapisanego „{{name}}”",
+    "revert": "Przywróć",
+    "builtin_readonly": "Wbudowane presety są tylko do odczytu — zapisz zmiany jako nowy",
+    "save_as": "Zapisz jako…",
+    "update_preset": "Aktualizuj preset",
+    "chain": "Łańcuch",
+    "enable": "Włącz: {{name}}",
+    "interface": "Interfejs",
+    "not_set_up": "Nieskonfigurowany",
+    "select_interface": "Wybierz interfejs",
+    "no_input_devices": "Brak urządzeń wejściowych",
+    "samples": "Próbki: {{count}}",
+    "latency_preset": {
+      "low": "Niskie",
+      "balanced": "Zrównoważone",
+      "safe": "Bezpieczne",
+      "custom": "Własne"
+    },
+    "crackling": "Trzeszczy? Przejdź o krok bezpieczniej.",
+    "overload": "DSP nie nadążyło i się zresetowało (~{{drift}} ms) — mogło być słychać trzask.",
+    "overload_nam_hint": "Pomoże lżejszy model NAM albo bezpieczniejsze ustawienie opóźnienia.",
+    "dropouts_detected": "Wykryto przerwy — spróbuj bezpieczniejszego ustawienia opóźnienia.",
+    "reconnected": "Interfejs audio połączony ponownie.",
+    "open_tone_studio": "Otwórz Tone Studio"
+  }
+}

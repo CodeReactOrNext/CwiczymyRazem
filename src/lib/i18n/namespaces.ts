@@ -46,6 +46,7 @@ import supporter from "../../../public/locales/en/supporter.json";
 import tab_settings from "../../../public/locales/en/tab_settings.json";
 import timer from "../../../public/locales/en/timer.json";
 import toast from "../../../public/locales/en/toast.json";
+import tone_studio from "../../../public/locales/en/tone_studio.json";
 import ui from "../../../public/locales/en/ui.json";
 import yup_errors from "../../../public/locales/en/yup_errors.json";
 
@@ -99,6 +100,7 @@ export const TRANSLATION_NAMESPACES = [
   "tab_settings",
   "timer",
   "toast",
+  "tone_studio",
   "ui",
   "yup_errors",
 ] as const;
@@ -170,6 +172,7 @@ export const EN_CATALOG: LocaleCatalog = {
   tab_settings,
   timer,
   toast,
+  tone_studio,
   ui,
   yup_errors,
 };

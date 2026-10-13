@@ -5,6 +5,7 @@ import {
   peakToDb,
   peakToMeterFraction,
 } from "feature/toneStudio/utils/meter";
+import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useRef } from "react";
 
 const ZONE_HEX = {
@@ -41,6 +42,7 @@ export const InputMeter = ({
   showLabel = true,
 }: InputMeterProps) => {
   const fillRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation("tone_studio");
   const labelRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -88,7 +90,7 @@ export const InputMeter = ({
   return (
     <div className={cn("flex items-center gap-3", className)}>
       {showLabel && (
-        <span className='w-10 shrink-0 text-[11px] text-zinc-400'>Input</span>
+        <span className='w-10 shrink-0 text-[11px] text-zinc-400'>{t("meter.input")}</span>
       )}
       <div
         className={cn(

@@ -3,6 +3,7 @@ import { InputMeter } from "feature/toneStudio/components/InputMeter";
 import { PedalFace } from "feature/toneStudio/components/PedalFace";
 import { BypassSwitch } from "feature/toneStudio/components/PluginChrome";
 import { GATE_PEDAL_SRC } from "feature/toneStudio/utils/gearArt";
+import { useTranslation } from "hooks/useTranslation";
 import type { AmpParams } from "types/nativeAudio";
 
 interface GateModuleProps {
@@ -16,11 +17,14 @@ interface GateModuleProps {
  * meter instead, which is what you actually look at while deciding whether the
  * gate needs to be in at all.
  */
-export const GateModule = ({ params, set }: GateModuleProps) => (
+export const GateModule = ({ params, set }: GateModuleProps) => {
+  const { t } = useTranslation("tone_studio");
+
+  return (
   <Faceplate
     accent='cyan'
-    title='Noise Gate'
-    subtitle='Kills hum and hiss before anything downstream amplifies it'
+    title={t("gate.title")}
+    subtitle={t("gate.subtitle")}
     bypassed={!params.gate}
     headerRight={
       <BypassSwitch
@@ -42,15 +46,13 @@ export const GateModule = ({ params, set }: GateModuleProps) => (
       <div>
         <InputMeter size='lg' showLabel={false} />
         <p className='mt-2 text-[11px] text-zinc-500'>
-          Input level. Play your loudest chord and back the interface gain off
-          until the bar stops turning red.
+          {t("gate.input_hint")}
         </p>
       </div>
       <p className='text-sm leading-relaxed text-zinc-400'>
-        With the gate engaged, everything quieter than the guitar itself gets
-        shut out between notes: single-coil hum, amp hiss, the fridge. High-gain
-        tones want it in; clean tones usually do not.
+        {t("gate.body")}
       </p>
     </div>
   </Faceplate>
-);
+  );
+};

@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useTranslation } from "hooks/useTranslation";
 import { SlidersHorizontal } from "lucide-react";
 import type { AmpDiagnostics, AmpStreamInfo } from "types/nativeAudio";
 
@@ -54,8 +55,9 @@ export const StatusBar = ({
   selectedDeviceName,
   onOpenSettings,
 }: StatusBarProps) => {
+  const { t } = useTranslation("tone_studio");
   const hasDevice = !!(info?.deviceName ?? selectedDeviceName);
-  const deviceName = info?.deviceName ?? selectedDeviceName ?? "No device";
+  const deviceName = info?.deviceName ?? selectedDeviceName ?? t("status.no_device");
   const routedOut =
     info?.outDeviceName && info.outDeviceName !== info.deviceName
       ? info.outDeviceName
@@ -75,7 +77,7 @@ export const StatusBar = ({
         type='button'
         onClick={onOpenSettings}
         disabled={!onOpenSettings}
-        title='Choose the audio interface, channels and buffer size'
+        title={t("status.choose_hint")}
         className='group -mx-2 flex min-w-0 items-center gap-2 rounded px-2 py-1 transition-colors enabled:hover:bg-zinc-800/60'>
         <span
           aria-hidden
@@ -101,7 +103,7 @@ export const StatusBar = ({
         ) : (
           // Nothing picked yet: the strip stops reporting and starts asking.
           <span className='truncate text-[11px] text-amber-400'>
-            Choose an audio interface
+            {t("status.choose_interface")}
           </span>
         )}
         {onOpenSettings && (
@@ -114,28 +116,31 @@ export const StatusBar = ({
 
       <span className='flex flex-wrap items-center gap-x-4 gap-y-1'>
         <Cell
-          label='Rate'
+          label={t("status.rate")}
           value={info ? `${info.sampleRate / 1000}kHz` : "—"}
         />
         <Cell
-          label='Buffer'
+          label={t("status.buffer")}
           value={`${bufferSize}`}
-          title='Frames per audio callback — smaller is tighter but more fragile'
+          title={t("status.buffer_hint")}
         />
         <Cell
-          label='Latency'
+          label={t("status.latency")}
           value={info ? `${info.roundTripMs.toFixed(0)}ms` : "—"}
         />
         {diagnostics && (
           <Cell
-            label='Dropouts'
+            label={t("status.dropouts")}
             value={
               diagnostics.drops > 0
-                ? `${diagnostics.underruns} (${diagnostics.drops} dropped)`
+                ? t("status.dropped", {
+                    underruns: diagnostics.underruns,
+                    drops: diagnostics.drops,
+                  })
                 : `${diagnostics.underruns}`
             }
             tone={diagnostics.underruns > 0 ? "warn" : undefined}
-            title='Hardware callbacks that found nothing to play since the stream opened — each one was an audible gap. Dropped blocks are the engine shedding backlog to keep latency from creeping up.'
+            title={t("status.dropouts_hint")}
           />
         )}
         {dspLoad !== null && (
@@ -143,7 +148,7 @@ export const StatusBar = ({
             label='DSP'
             value={`${dspLoad}%`}
             tone={dspLoad > 70 ? "warn" : undefined}
-            title='Share of each audio block spent inside the chain'
+            title={t("status.dsp_hint")}
           />
         )}
       </span>
