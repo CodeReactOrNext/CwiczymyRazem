@@ -3,6 +3,7 @@ import type { EarQuizQuestion } from "feature/exercisePlan/logic/earQuiz/questio
 import { generateEarQuizQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useEarQuizRunStore } from "../helpers/earQuizRunStore";
 import {
   loadEarQuizBestStreak,
   saveEarQuizBestStreak,
@@ -22,7 +23,17 @@ export interface EarQuizStats {
  * answer, show the verdict, roll the next one. Every quiz scores the same way —
  * a streak plus a hit rate — so none of them has to reimplement it.
  */
-export function useEarQuizGame(config: EarQuizConfig, exerciseId: string) {
+export function useEarQuizGame(
+  config: EarQuizConfig,
+  exerciseId: string,
+  /** Answers only count towards the run (a duel score) while the clock runs. */
+  isSessionRunning = false,
+) {
+  const isSessionRunningRef = useRef(isSessionRunning);
+  useEffect(() => {
+    isSessionRunningRef.current = isSessionRunning;
+  }, [isSessionRunning]);
+
   const [question, setQuestion] = useState<EarQuizQuestion>(() =>
     generateEarQuizQuestion(config),
   );
@@ -57,6 +68,8 @@ export function useEarQuizGame(config: EarQuizConfig, exerciseId: string) {
   const answer = useCallback((correct: boolean) => {
     if (answeredRef.current) return; // one verdict per round
     answeredRef.current = true;
+    // Answered with the clock stopped is free practice — it never reaches a score.
+    if (isSessionRunningRef.current) useEarQuizRunStore.getState().record(correct);
 
     setStats((prev) => {
       const streak = correct ? prev.streak + 1 : 0;

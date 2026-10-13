@@ -1,109 +1,111 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
 
 /**
- * The exercises a duel can draw — about a fifth of the catalogue, hand-picked
+ * The exercises a duel can draw — the owner's pick (2026-10-13), hand-listed
  * rather than filtered, so a new exercise never slips into ranked play by
- * accident. All medium or hard, and every one is scored by the microphone:
+ * accident. Every one produces a score both players can be compared on:
  *
- * - technique: tab drills graded note by note against the written part;
- * - theory: the mic note hunts (find the note / degree / chord tone by ear on
- *   the neck before the clock rotates it);
- * - hearing: Play by Ear — the app plays a phrase, you play it back.
- *
- * Left out on purpose: the click-to-answer quizzes and click hunts (no mic, and
- * the quizzes keep no score on the server at all), play-alongs and untracked
- * drills (nothing to compare), and bend drills scored on pitch (the detector
- * reads low strings sharp, which a ranked match should not hinge on).
+ * - technique: tab drills graded by the mic, note by note against the part —
+ *   the spider family, every finger permutation, and the Riff Vault riffs;
+ * - theory: the mic note hunts, plus the whole-neck click hunt;
+ * - hearing: the listening quizzes, scored per answer (see earQuizRunStore).
  *
  * Ids only: they are keys in Firestore and never change (renames touch the
  * title), so a duel stored months ago still resolves its exercise.
  */
 export const DUEL_EXERCISE_IDS = [
-  // Technique — hard
+  // Technique — spider, chromatic and box drills
   "speed_burst_chromatic_blitz",
-  "spider_stairs_hard",
-  "chicken_pickin",
-  "hybrid_picking_independence",
-  "legato_continuous_flow",
-  "string_skipping_basic",
-  "string_skipping_melodic",
-  "metal_tremolo_picking",
-  "economy_picking_angular",
-  "string_skipping_arpeggios",
-  "legato_hammer_pull_run",
-  "tapping_triadic_cascade",
-  "jazz_chord_melody",
-  "rhythm_training_hard",
-  "meter_switch_12_8_to_4_4",
-  "meter_switch_4_4_to_6_8_pulse",
-  "sweep_neoclassical",
-  "sweep_picking_3_string",
-  "tapping_melodic_lines",
-  "legato_trill_sprint",
-  "vibrato_finger_isolation",
-  "fret_stretch_drill",
-  "sweep_5_string_cascade",
-  // Technique — medium, the demanding end of it
-  "sweet_child_o_mine_riff_preview",
-  "crazy_train_riff_preview",
-  "thunderstruck_riff_preview",
-  "master_of_puppets_riff_preview",
-  "metal_gallop",
-  "legato_sextuplets_4_5_7",
-  "alternate_picking_cross_string",
-  "meter_regroup_7_8",
-  "meter_switch_4_4_to_7_8",
+  "spider_x",
   "spider_x_extended",
-  "pinky_power_drill",
-  "chromatic_accents",
-  // Theory — mic hunts
-  "string_sweep_low_e",
-  "string_sweep_a",
-  "string_sweep_d",
-  "string_sweep_g",
-  "string_sweep_b",
-  "whole_neck_sweep",
-  "fretboard_region_hunt",
+  "spider_basic",
+  "spider_string_skipping",
+  "economy_picking_angular",
+  "string_skipping_basic",
+  "high_register_bends",
+  // Technique — every finger permutation
+  "spider_permutation_1234",
+  "spider_permutation_1243",
+  "spider_permutation_1324",
+  "spider_permutation_1342",
+  "spider_permutation_1423",
+  "spider_permutation_1432",
+  "spider_permutation_2134",
+  "spider_permutation_2143",
+  "spider_permutation_2314",
+  "spider_permutation_2341",
+  "spider_permutation_2413",
+  "spider_permutation_2431",
+  "spider_permutation_3124",
+  "spider_permutation_3142",
+  "spider_permutation_3214",
+  "spider_permutation_3241",
+  "spider_permutation_3412",
+  "spider_permutation_3421",
+  "spider_permutation_4123",
+  "spider_permutation_4132",
+  "spider_permutation_4213",
+  "spider_permutation_4231",
+  "spider_permutation_4312",
+  "spider_permutation_4321",
+  // Technique — Riff Vault
+  "crazy_train_riff_preview",
+  "master_of_puppets_riff_preview",
+  "sweet_child_o_mine_riff_preview",
+  "thunderstruck_riff_preview",
+  // Theory — find it on the neck
+  "fret_click_whole_chromatic",
+  "chromatic_note_hunt",
   "interval_hunt",
-  "build_the_chord",
-  "chord_degree_hunt_sevenths",
-  "chord_degree_hunt_tensions",
-  "chord_degree_hunt_changes",
-  // Hearing — played back on the guitar, heard by the mic
-  "earTrainingMedium",
-  "earTrainingHard",
+  "fretboard_region_hunt",
+  // Hearing — listening quizzes
+  "ear_chord_quality_advanced",
+  "ear_progression_basics",
+  "ear_progression_advanced",
 ] as const;
 
-const byId = new Map(
-  exercisesAgregat.map((exercise) => [exercise.id, exercise]),
-);
+const byId = new Map(exercisesAgregat.map((exercise) => [exercise.id, exercise]));
 
 /** The pool as exercises, in the order above. Ids that no longer resolve drop out. */
-export const DUEL_POOL: Exercise[] = DUEL_EXERCISE_IDS.map((id) =>
-  byId.get(id),
-).filter((exercise): exercise is Exercise => !!exercise);
+export const DUEL_POOL: Exercise[] = DUEL_EXERCISE_IDS.map((id) => byId.get(id)).filter(
+  (exercise): exercise is Exercise => !!exercise,
+);
 
 const POOL_IDS = new Set<string>(DUEL_EXERCISE_IDS);
 
-export const isDuelExercise = (exerciseId: string): boolean =>
-  POOL_IDS.has(exerciseId);
+export const isDuelExercise = (exerciseId: string): boolean => POOL_IDS.has(exerciseId);
 
 export const getDuelExercise = (exerciseId: string): Exercise | null =>
   (isDuelExercise(exerciseId) && byId.get(exerciseId)) || null;
 
 /**
- * Which score a duel run is judged on. Play by Ear keeps its own score (notes
- * found by ear); everything else is the mic score of the note matcher.
+ * Which score a duel run is judged on:
+ * - "quiz": the listening quizzes — right answers minus wrong ones, clicked;
+ * - "click": click hunts — the hunt's own score, clicked on the neck;
+ * - "earTraining": Play by Ear — notes found by ear, heard by the mic;
+ * - "mic": everything else — the mic score of the note matcher.
  */
+export type DuelScoreKind = "mic" | "earTraining" | "click" | "quiz";
+
 export const duelScoreKind = (
-  exercise: Pick<Exercise, "riddleConfig">,
-): "mic" | "earTraining" =>
-  exercise.riddleConfig?.mode === "sequenceRepeat" ? "earTraining" : "mic";
+  exercise: Pick<Exercise, "riddleConfig" | "earQuizConfig" | "noteHuntConfig">,
+): DuelScoreKind => {
+  if (exercise.earQuizConfig) return "quiz";
+  if (isClickAnsweredMode(exercise.noteHuntConfig?.mode)) return "click";
+  if (exercise.riddleConfig?.mode === "sequenceRepeat") return "earTraining";
+  return "mic";
+};
+
+/** Whether a run of this exercise needs the microphone on to score at all. */
+export const duelNeedsMic = (
+  exercise: Pick<Exercise, "riddleConfig" | "earQuizConfig" | "noteHuntConfig">,
+): boolean => {
+  const kind = duelScoreKind(exercise);
+  return kind === "mic" || kind === "earTraining";
+};
 
 /** A uniformly random exercise from the pool — each duel draws its own. */
-export const drawDuelExercise = (
-  random: () => number = Math.random,
-  pool: Exercise[] = DUEL_POOL,
-): Exercise =>
+export const drawDuelExercise = (random: () => number = Math.random, pool: Exercise[] = DUEL_POOL): Exercise =>
   pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))];

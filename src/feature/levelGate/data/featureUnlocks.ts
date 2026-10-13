@@ -51,9 +51,9 @@ export const FEATURE_UNLOCKS: Record<LockedFeatureId, FeatureUnlock> = {
     href: "/duels",
     requiredLvl: 4,
     reason:
-      "A duel is ranked: you and a stranger get the same hard exercise and the microphone decides. A few sessions in you know how the scoring hears you — that is when a match against somebody else is a fair one.",
+      "A duel is ranked: you and a stranger get the same exercise and the app's scoring decides. A few sessions in you know how the scoring hears you — that is when a match against somebody else is a fair one.",
     perks: [
-      "Anonymous 1-on-1 matches on hard technique, theory and ear drills",
+      "Anonymous 1-on-1 matches on technique, fretboard and ear drills",
       "24 hours to set your best run, as many tries as you like",
       "An ELO rating and a ranking to climb",
     ],

@@ -5,6 +5,7 @@ import { getUniformTuningShift } from "utils/audio/tunings";
 
 import { getChordTones } from "../../../chords/chordTones";
 import type { HuntPrompt, StrumPattern, TablatureMeasure } from "../../../types/exercise.types";
+import { useEarQuizRunStore } from "../helpers/earQuizRunStore";
 import type { GameState } from "../hooks/noteMatchingFeedback";
 import type { ChordHuntState } from "../hooks/useChordHunt";
 import { useChordHunt } from "../hooks/useChordHunt";
@@ -513,6 +514,8 @@ export function NoteMatchingProvider({
   const runStartMsRef = useRef(0);
   const markRunStart = useCallback(() => {
     runStartMsRef.current = getSessionTimeRef.current?.() ?? 0;
+    // The listening quizzes keep their run outside this context; it starts over with ours.
+    useEarQuizRunStore.getState().reset();
   }, []);
   // A new exercise starts its own run, on whatever time its clock resumes from.
   useEffect(markRunStart, [currentExerciseIndex, markRunStart]);

@@ -95,9 +95,8 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
                                         )}
 
                                         {/* Bottom-right: heart mark for supporters, plain state dot for
-                                        everyone else — the rotating ring already says "online" for them.
-                                        Both marks carry a z-index: mobile browsers lift the spinning rim
-                                        over anything that only relies on DOM order. */}
+                                        everyone else — the gold ring already says "online" for them.
+                                        Both marks carry a z-index so they sit above the ring layers. */}
                                         {supportMember ? (
                                             <SupportMark
                                                 member={supportMember}

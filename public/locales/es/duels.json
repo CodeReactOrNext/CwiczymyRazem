@@ -16,7 +16,7 @@
     "slots": "{{free}} de {{max}} huecos libres",
     "waiting_one": "{{count}} jugador esperando — os emparejamos al instante",
     "waiting_other": "{{count}} jugadores esperando — os emparejamos al instante",
-    "mic": "Micrófono obligatorio — para el duelo solo cuentan los intentos puntuados por tu micrófono.",
+    "mic": "Activa el micrófono — los ejercicios tocados los puntúa tu micrófono. Los quizzes y los Click Hunts se responden haciendo clic.",
     "join": "Buscar duelo",
     "joining": "Buscando…",
     "full": "Todos los huecos ocupados",
@@ -87,8 +87,8 @@
     "empty": "Todavía no hay nadie clasificado. El primer duelo resuelto abre el ranking."
   },
   "rules": {
-    "0": "Ambos jugadores reciben el mismo ejercicio al azar — técnica, teoría u oído, de los difíciles.",
-    "1": "Activa el micrófono: solo cuentan los intentos puntuados por tu micrófono.",
+    "0": "Ambos jugadores reciben el mismo ejercicio al azar — técnica, teoría del mástil o un quiz de oído.",
+    "1": "Los ejercicios tocados necesitan el micrófono: solo cuentan los intentos puntuados por él. En los quizzes, +100 por respuesta correcta y −100 por incorrecta.",
     "2": "24 horas y tantos intentos como quieras. Tu mejor intento es tu puntuación.",
     "3": "Ves cuántos intentos ha hecho tu rival — nunca su nombre ni su puntuación hasta el final.",
     "4": "Si ganas a alguien más fuerte, ganas más ELO. ¿No tocaste? Cuenta como derrota.",

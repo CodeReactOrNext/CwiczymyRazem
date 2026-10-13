@@ -1,6 +1,11 @@
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import {
+  AVATAR_COLUMN,
+  AVATAR_GAP,
+  AVATAR_SHRINK,
+} from "feature/chat/chatLayout";
 import type { ChatMessageType } from "feature/chat/types/chat.types";
 import { useTranslation } from "hooks/useTranslation";
 import { Hand, Shield } from "lucide-react";
@@ -87,14 +92,15 @@ const JoinRow = ({
 }) => {
   const { t } = useTranslation("chat");
   return (
-  <div className='flex min-w-0 max-w-[90%] gap-3'>
-    <div className='flex w-10 flex-shrink-0 justify-center'>
+  <div className={cn("flex min-w-0 max-w-[90%]", AVATAR_GAP)}>
+    <div className={cn("flex flex-shrink-0 justify-center", AVATAR_COLUMN)}>
       <UserTooltip userId={message.userId}>
         <div className='mt-0.5 cursor-pointer'>
           <Avatar
             size='sm'
             name={message.username}
             avatarURL={message.userPhotoURL}
+            className={AVATAR_SHRINK}
           />
         </div>
       </UserTooltip>

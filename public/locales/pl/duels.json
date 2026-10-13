@@ -18,7 +18,7 @@
     "waiting_few": "{{count}} graczy czeka — dobierzemy was od razu",
     "waiting_many": "{{count}} graczy czeka — dobierzemy was od razu",
     "waiting_other": "{{count}} graczy czeka — dobierzemy was od razu",
-    "mic": "Wymagany mikrofon — do duelu liczą się tylko podejścia ocenione przez mikrofon.",
+    "mic": "Włącz mikrofon — ćwiczenia grane ocenia mikrofon. Quizy i Click Hunty rozwiązujesz klikając.",
     "join": "Znajdź duel",
     "joining": "Szukam…",
     "full": "Wszystkie miejsca zajęte",
@@ -93,8 +93,8 @@
     "empty": "Nikt nie jest jeszcze w rankingu. Pierwszy rozliczony duel go otworzy."
   },
   "rules": {
-    "0": "Obaj gracze dostają to samo losowe ćwiczenie — trudne techniczne, teoretyczne albo słuchowe.",
-    "1": "Włącz mikrofon: liczą się tylko podejścia ocenione przez mikrofon.",
+    "0": "Obaj gracze dostają to samo losowe ćwiczenie — technika, teoria na gryfie albo quiz słuchowy.",
+    "1": "Ćwiczenia grane wymagają mikrofonu: liczą się tylko podejścia ocenione przez mikrofon. W quizach +100 za dobrą odpowiedź, −100 za złą.",
     "2": "24 godziny i dowolna liczba podejść. Twój najlepszy wynik to twój rezultat.",
     "3": "Widzisz, ile prób zrobił rywal — ale nie jego nazwę ani wynik, aż do końca.",
     "4": "Wygrana z mocniejszym daje więcej ELO. Nie zagrałeś wcale? To porażka.",

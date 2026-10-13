@@ -16,7 +16,7 @@
     "slots": "{{free}} of {{max}} slots free",
     "waiting_one": "{{count}} player waiting — you'll be paired instantly",
     "waiting_other": "{{count}} players waiting — you'll be paired instantly",
-    "mic": "Microphone required — only runs scored by your mic count towards the duel.",
+    "mic": "Have your mic on — playing drills are scored by your microphone. Quizzes and click hunts are answered by clicking.",
     "join": "Find a duel",
     "joining": "Searching…",
     "full": "All slots taken",
@@ -87,8 +87,8 @@
     "empty": "Nobody is ranked yet. The first settled duel opens the ladder."
   },
   "rules": {
-    "0": "Both players get the same random exercise — hard technique, theory or ear training.",
-    "1": "Turn the mic on: only runs scored by your microphone count.",
+    "0": "Both players get the same random exercise — technique, fretboard theory or an ear quiz.",
+    "1": "Playing drills need the mic on: only mic-scored runs count. Quizzes give +100 for a right answer and −100 for a wrong one.",
     "2": "24 hours, as many runs as you like. Your best run is your score.",
     "3": "You see how many attempts your opponent made — never their name or score until it ends.",
     "4": "Beat a stronger player and you gain more ELO. Didn't play at all? That's a loss.",

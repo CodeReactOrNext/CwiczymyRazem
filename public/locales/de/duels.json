@@ -16,7 +16,7 @@
     "slots": "{{free}} von {{max}} Plätzen frei",
     "waiting_one": "{{count}} Spieler wartet — ihr werdet sofort gepaart",
     "waiting_other": "{{count}} Spieler warten — ihr werdet sofort gepaart",
-    "mic": "Mikrofon erforderlich — für das Duell zählen nur Durchgänge, die dein Mikrofon bewertet hat.",
+    "mic": "Schalte dein Mikrofon ein — gespielte Übungen bewertet das Mikrofon. Quizze und Click Hunts beantwortest du per Klick.",
     "join": "Duell suchen",
     "joining": "Suche…",
     "full": "Alle Plätze belegt",
@@ -87,8 +87,8 @@
     "empty": "Noch niemand ist gewertet. Das erste abgerechnete Duell öffnet die Rangliste."
   },
   "rules": {
-    "0": "Beide Spieler bekommen dieselbe zufällige Übung — schwere Technik, Theorie oder Gehörbildung.",
-    "1": "Schalte das Mikrofon ein: Es zählen nur Durchgänge, die dein Mikrofon bewertet hat.",
+    "0": "Beide Spieler bekommen dieselbe zufällige Übung — Technik, Griffbrett-Theorie oder ein Gehörquiz.",
+    "1": "Gespielte Übungen brauchen das Mikrofon: Es zählen nur Durchgänge, die das Mikrofon bewertet hat. Im Quiz gibt es +100 pro richtiger und −100 pro falscher Antwort.",
     "2": "24 Stunden, so viele Durchgänge du willst. Dein bester Durchgang ist deine Wertung.",
     "3": "Du siehst, wie viele Versuche dein Gegner gemacht hat — Name und Wertung erst am Ende.",
     "4": "Schlägst du einen Stärkeren, bekommst du mehr ELO. Gar nicht gespielt? Das ist eine Niederlage.",

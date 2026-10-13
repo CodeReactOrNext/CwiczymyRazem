@@ -36,7 +36,7 @@ export const ChatReactionChips = ({
   return (
     <div
       className={cn(
-        "mt-1.5 flex flex-wrap gap-2",
+        "mt-2 flex flex-wrap gap-2",
         alignEnd && "justify-end",
       )}>
       {groups.map((group) => (

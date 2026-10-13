@@ -39,7 +39,7 @@ export function EarQuizPanel({
 }: EarQuizPanelProps) {
   const { t } = useTranslation("session");
   const { question, round, isAnswered, isCorrect, stats, answer, next } =
-    useEarQuizGame(config, exerciseId);
+    useEarQuizGame(config, exerciseId, isSessionRunning);
 
   // Every quiz body is keyed on the round (below), so a new question remounts it
   // and its per-round state resets by construction.

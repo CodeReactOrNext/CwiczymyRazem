@@ -15,6 +15,7 @@ import { isRunWithinExerciseTime } from "../../../utils/exerciseTimeLimit";
 import { hasLeaderboard } from "../../../utils/hasLeaderboard";
 import { isClickAnsweredMode } from "../../../utils/huntModes";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
+import { earQuizRunScore, useEarQuizRunStore } from "../helpers/earQuizRunStore";
 
 interface UseScoreSavingOptions {
   activeExercise:       Exercise;
@@ -188,11 +189,21 @@ export function useScoreSaving({
       const result = await updateClickHighScore(userAuth, exId, snap.score, snap.accuracy, exTitle, exCategory);
       recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: snap.score, scoreType: "click", previousBest: result.previousScore, bpm: runBpm }, isRanked);
       micStandingRef.current = await placeOnLeaderboard(userAuth, snap.score, result.previousScore);
+      if (duelScoreKind(activeExercise) === "click") await sendDuelRun(snap.score, snap.accuracy);
       if (result.isNewRecord) {
         exerciseRecordsRef.current = {
           ...exerciseRecordsRef.current,
           clickHighScore: { exerciseTitle: exTitle, score: snap.score, accuracy: snap.accuracy },
         };
+      }
+    }
+
+    // The listening quizzes keep no score of their own anywhere but here: a duel
+    // reads the run's answers (only those given with the clock running).
+    if (userAuth && duelId && duelScoreKind(activeExercise) === "quiz") {
+      const { correct, answered } = useEarQuizRunStore.getState();
+      if (answered > 0) {
+        await sendDuelRun(earQuizRunScore(correct, answered), Math.round((correct / answered) * 100));
       }
     }
 

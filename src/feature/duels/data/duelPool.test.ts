@@ -7,17 +7,12 @@ import {
   drawDuelExercise,
   DUEL_EXERCISE_IDS,
   DUEL_POOL,
+  duelNeedsMic,
   duelScoreKind,
   getDuelExercise,
 } from "./duelPool";
 
-const MIC_HUNT_MODES = new Set([
-  "octaves",
-  "region",
-  "interval",
-  "chord",
-  "accumulate",
-]);
+const MIC_HUNT_MODES = new Set(["octaves", "region", "interval", "chord", "accumulate"]);
 
 describe("DUEL_POOL", () => {
   it("resolves every id to a catalogue exercise, once", () => {
@@ -31,30 +26,26 @@ describe("DUEL_POOL", () => {
     expect(share).toBeLessThan(0.25);
   });
 
-  it("holds only medium and hard exercises a player can find in the library", () => {
+  it("holds only exercises a player can find in the library", () => {
     for (const exercise of DUEL_POOL) {
-      expect(["medium", "hard"], exercise.id).toContain(exercise.difficulty);
       expect(exercise.isHiddenFromLibrary, exercise.id).toBeFalsy();
+      expect(exercise.isPlayalong, exercise.id).toBeFalsy();
+      expect(exercise.difficulty, exercise.id).not.toBe("beginner");
       expect(hasLeaderboard(exercise), exercise.id).toBe(true);
     }
   });
 
-  it("only draws exercises the microphone scores", () => {
+  it("only draws exercises that end in a score both players can be compared on", () => {
     for (const exercise of DUEL_POOL) {
+      const kind = duelScoreKind(exercise);
+      if (kind === "quiz" || kind === "click") continue;
       expect(exercise.disableMic, exercise.id).toBeFalsy();
-      expect(exercise.isPlayalong, exercise.id).toBeFalsy();
-      expect(exercise.earQuizConfig, exercise.id).toBeUndefined();
-      expect(exercise.scoringFocus, exercise.id).not.toBe("pitch");
-
-      const huntMode =
-        exercise.noteHuntConfig?.mode ??
-        (exercise.noteHuntConfig ? "octaves" : null);
+      if (kind === "earTraining") continue;
+      const huntMode = exercise.noteHuntConfig?.mode ?? (exercise.noteHuntConfig ? "octaves" : null);
       const isMicTab =
-        (hasTablatureNotes(exercise.tablature) || !!exercise.gpFileUrl) &&
-        !!exercise.metronomeSpeed;
+        (hasTablatureNotes(exercise.tablature) || !!exercise.gpFileUrl) && !!exercise.metronomeSpeed;
       const isMicHunt = !!huntMode && MIC_HUNT_MODES.has(huntMode);
-      const isPlayByEar = exercise.riddleConfig?.mode === "sequenceRepeat";
-      expect(isMicTab || isMicHunt || isPlayByEar, exercise.id).toBe(true);
+      expect(isMicTab || isMicHunt, exercise.id).toBe(true);
     }
   });
 
@@ -65,18 +56,26 @@ describe("DUEL_POOL", () => {
 });
 
 describe("duelScoreKind", () => {
-  it("judges Play by Ear on its own score and the rest on the mic score", () => {
-    expect(duelScoreKind(getDuelExercise("earTrainingHard")!)).toBe(
+  it("tells the four ways a duel run is scored apart", () => {
+    expect(duelScoreKind(getDuelExercise("spider_x")!)).toBe("mic");
+    expect(duelScoreKind(getDuelExercise("chromatic_note_hunt")!)).toBe("mic");
+    expect(duelScoreKind(getDuelExercise("fret_click_whole_chromatic")!)).toBe("click");
+    expect(duelScoreKind(getDuelExercise("ear_chord_quality_advanced")!)).toBe("quiz");
+    expect(duelScoreKind({ riddleConfig: { mode: "sequenceRepeat", difficulty: "hard", noteCount: 5 } })).toBe(
       "earTraining",
     );
-    expect(duelScoreKind(getDuelExercise("chicken_pickin")!)).toBe("mic");
-    expect(duelScoreKind(getDuelExercise("whole_neck_sweep")!)).toBe("mic");
+  });
+
+  it("asks for the mic only where the mic does the scoring", () => {
+    expect(duelNeedsMic(getDuelExercise("crazy_train_riff_preview")!)).toBe(true);
+    expect(duelNeedsMic(getDuelExercise("fret_click_whole_chromatic")!)).toBe(false);
+    expect(duelNeedsMic(getDuelExercise("ear_progression_basics")!)).toBe(false);
   });
 });
 
 describe("getDuelExercise", () => {
   it("refuses an exercise outside the pool", () => {
-    expect(getDuelExercise("spider_basic")).toBeNull();
+    expect(getDuelExercise("sweep_neoclassical")).toBeNull();
     expect(getDuelExercise("nope")).toBeNull();
   });
 });
@@ -84,8 +83,6 @@ describe("getDuelExercise", () => {
 describe("drawDuelExercise", () => {
   it("stays inside the pool at both ends of the random range", () => {
     expect(drawDuelExercise(() => 0)).toBe(DUEL_POOL[0]);
-    expect(drawDuelExercise(() => 0.999999)).toBe(
-      DUEL_POOL[DUEL_POOL.length - 1],
-    );
+    expect(drawDuelExercise(() => 0.999999)).toBe(DUEL_POOL[DUEL_POOL.length - 1]);
   });
 });

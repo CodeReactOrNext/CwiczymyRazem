@@ -30,13 +30,15 @@ describe("SupportAvatarRing", () => {
     expect(layers.some((layer) => layer.className.includes("blur"))).toBe(false);
   });
 
-  it("spins the gold rim", () => {
+  it("draws a still gold rim — no layer animates", () => {
     const { layers } = renderRing();
     const rim = layers[0];
 
-    expect(rim.style.background).toContain("conic-gradient");
-    expect(rim.className).toContain("animate-spin-slow");
+    expect(rim.style.background).toContain("linear-gradient");
     expect(rim.className).toContain("rounded-full");
+    expect(layers.some((layer) => layer.className.includes("animate-"))).toBe(
+      false,
+    );
   });
 
   it("masks the rim down to a ring, so a mis-layered rim cannot cover the avatar", () => {

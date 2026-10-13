@@ -23,9 +23,9 @@
     },
     "duels": {
       "name": "Duelle",
-      "reason": "Ein Duell zählt für die Rangliste: Du und ein Fremder bekommt dieselbe schwere Übung, und das Mikrofon entscheidet. Nach ein paar Sessions weißt du, wie die Wertung dich hört — dann ist ein Match gegen jemand anderen fair.",
+      "reason": "Ein Duell zählt für die Rangliste: Du und ein Fremder bekommt dieselbe Übung, und die Wertung der App entscheidet. Nach ein paar Sessions weißt du, wie die Wertung dich hört — dann ist ein Match gegen jemand anderen fair.",
       "perks": {
-        "0": "Anonyme 1-gegen-1-Matches auf schweren Technik-, Theorie- und Gehörübungen",
+        "0": "Anonyme 1-gegen-1-Matches auf Technik-, Griffbrett- und Gehörübungen",
         "1": "24 Stunden für deinen besten Durchgang, so viele Versuche du willst",
         "2": "Eine ELO-Wertung und eine Rangliste zum Aufsteigen"
       }

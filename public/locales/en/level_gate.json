@@ -23,9 +23,9 @@
     },
     "duels": {
       "name": "Duels",
-      "reason": "A duel is ranked: you and a stranger get the same hard exercise and the microphone decides. A few sessions in you know how the scoring hears you — that is when a match against somebody else is a fair one.",
+      "reason": "A duel is ranked: you and a stranger get the same exercise and the app's scoring decides. A few sessions in you know how the scoring hears you — that is when a match against somebody else is a fair one.",
       "perks": {
-        "0": "Anonymous 1-on-1 matches on hard technique, theory and ear drills",
+        "0": "Anonymous 1-on-1 matches on technique, fretboard and ear drills",
         "1": "24 hours to set your best run, as many tries as you like",
         "2": "An ELO rating and a ranking to climb"
       }

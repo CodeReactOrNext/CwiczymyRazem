@@ -2,6 +2,13 @@ import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { format } from "date-fns";
+import {
+  AVATAR_COLUMN,
+  AVATAR_GAP,
+  AVATAR_INSET,
+  AVATAR_INSET_END,
+  AVATAR_SHRINK,
+} from "feature/chat/chatLayout";
 import { ChatAttachmentCard } from "feature/chat/components/ChatAttachmentCard";
 import { ChatAttachmentPicker } from "feature/chat/components/ChatAttachmentPicker";
 import { ChatComposer } from "feature/chat/components/ChatComposer";
@@ -46,10 +53,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 /** Within this many pixels of the bottom still counts as "at the bottom". */
 const BOTTOM_SLACK_PX = 80;
-
-/** Avatar column (w-10) plus the gap beside it — where a group's text starts. */
-const AVATAR_INSET = "pl-[52px]";
-const AVATAR_INSET_END = "pr-[52px]";
 
 /**
  * Keeps iOS from selecting a held message's text and raising its callout over
@@ -135,7 +138,7 @@ const DayDivider = ({ date }: { date: Date }) => {
           );
 
   return (
-    <div className='mt-6 flex justify-center first:mt-2'>
+    <div className='mt-10 flex justify-center first:mt-0'>
       <time
         dateTime={format(date, "yyyy-MM-dd")}
         className='rounded-full bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300'>
@@ -196,15 +199,16 @@ const MessageRow = ({
       className={cn(
         "group/msg flex w-full",
         isMe ? "justify-end" : "justify-start",
-        !isFirst && "mt-0.5",
+        !isFirst && "mt-1.5",
       )}>
       <div
         className={cn(
-          "flex min-w-0 max-w-[90%] gap-3",
+          "flex min-w-0 max-w-[90%]",
+          AVATAR_GAP,
           isMe ? "flex-row-reverse" : "flex-row",
         )}>
         {/* Avatar only on the first of a run */}
-        <div className='flex w-10 flex-shrink-0 justify-center'>
+        <div className={cn("flex flex-shrink-0 justify-center", AVATAR_COLUMN)}>
           {isFirst && avatar}
         </div>
 
@@ -231,7 +235,7 @@ const MessageRow = ({
               />
               <div
                 className={cn(
-                  "flex flex-col gap-2 rounded-lg px-3 py-2 text-sm transition-colors [overflow-wrap:anywhere] sm:px-4",
+                  "flex flex-col gap-2.5 rounded-lg px-3.5 py-2.5 text-sm leading-relaxed transition-colors [overflow-wrap:anywhere] sm:px-4",
                   isMe
                     ? "bg-cyan-500/20 text-cyan-50"
                     : tagsMe
@@ -244,11 +248,11 @@ const MessageRow = ({
                   <button
                     type='button'
                     onClick={() => handlers.onJumpTo(msg.replyTo!.id)}
-                    className='flex min-w-0 max-w-full flex-col rounded bg-black/20 px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-black/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
-                    <span className='font-semibold text-zinc-300'>
+                    className='flex min-w-0 max-w-full flex-col gap-0.5 rounded bg-white/5 px-3 py-2 text-left text-sm leading-snug transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
+                    <span className='font-semibold text-zinc-200'>
                       ↪ {msg.replyTo.username}
                     </span>
-                    <span className='truncate text-zinc-300'>
+                    <span className='truncate text-zinc-400'>
                       {msg.replyTo.message}
                     </span>
                   </button>
@@ -303,7 +307,7 @@ const EventRow = ({
     <div
       data-message-id={msg.id}
       className={cn(
-        "group/msg relative mt-4 flex flex-col",
+        "group/msg relative mt-8 flex flex-col first:mt-0",
         isJoin ? "items-start" : "items-center",
       )}>
       <ChatMessageActions
@@ -508,6 +512,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
         size='sm'
         name={msg.username}
         avatarURL={msg.userPhotoURL}
+        className={AVATAR_SHRINK}
       />
     );
     return (
@@ -534,7 +539,7 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
           // overflow-x-hidden: a vertical scroller scrolls sideways too unless told not to, and
           // the hover actions over a bubble (invisible until hovered, but laid out) reach past
           // a phone-width column — which gave the room a second, sideways scrollbar.
-          className='h-full overflow-y-auto overflow-x-hidden py-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:px-6 sm:py-4'>
+          className='h-full overflow-y-auto overflow-x-hidden py-4 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:px-6 sm:py-6'>
           {!isLoading && messages.length === 0 ? (
             <EmptyRoom
               isGuild={isGuild}
@@ -578,40 +583,38 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
                   <section
                     key={entry.key}
                     className={cn(
-                      "mt-4 flex flex-col",
+                      "mt-8 flex flex-col first:mt-0",
                       isMe ? "items-end" : "items-start",
                     )}>
-                    {/* Sticks to the top of the list for as long as any of the group is
-                        on screen, so a run cut off by the edge still says whose it is. */}
+                    {/* One line, whatever the width: on a phone the name, tag, badge and time
+                        used to wrap ("11:10 / PM"). The name is the one part that gives
+                        way — it truncates, the rest keep their size. */}
                     <header
                       className={cn(
-                        "sticky top-0 z-[5] mb-1 flex max-w-full",
-                        isMe ? AVATAR_INSET_END : AVATAR_INSET,
+                        "mb-2 flex min-w-0 max-w-full items-center gap-2 whitespace-nowrap",
+                        isMe
+                          ? cn(AVATAR_INSET_END, "flex-row-reverse")
+                          : AVATAR_INSET,
                       )}>
-                      {/* One line, whatever the width: on a phone the name, tag, badge and time
-                          used to wrap inside the pill ("11:10 / PM"). The name is the one
-                          part that gives way — it truncates, the rest keep their size. */}
-                      <div
-                        className={cn(
-                          "flex min-w-0 max-w-full items-center gap-1.5 whitespace-nowrap rounded-md bg-zinc-950/80 px-1.5 py-0.5",
-                          isMe && "flex-row-reverse",
-                        )}>
-                        <UserTooltip userId={first.userId}>
-                          <span className='min-w-0 truncate text-xs font-semibold text-zinc-300'>
-                            {first.username}
-                          </span>
-                        </UserTooltip>
-                        {/* Outside the tooltip on purpose — its trigger takes a
-                            single child, and the tag belongs beside the name
-                            rather than inside what opens the card. */}
+                      <UserTooltip userId={first.userId}>
+                        <span className='min-w-0 truncate text-sm font-semibold text-zinc-100'>
+                          {first.username}
+                        </span>
+                      </UserTooltip>
+                      {/* Outside the tooltip on purpose — its trigger takes a
+                          single child, and the tag belongs beside the name
+                          rather than inside what opens the card. Not on a
+                          phone: there the line is for the name, and a
+                          supporter still shows by the ring round the avatar. */}
+                      <span className='hidden sm:contents'>
                         <GuildTagBadge badge={first.guildBadge} />
                         {supportMember && <SupportBadge member={supportMember} />}
-                        <time
-                          dateTime={entry.sentAt.toISOString()}
-                          className='shrink-0 text-xs tabular-nums text-zinc-400'>
-                          {format(entry.sentAt, "p", { locale: dateLocale })}
-                        </time>
-                      </div>
+                      </span>
+                      <time
+                        dateTime={entry.sentAt.toISOString()}
+                        className='shrink-0 text-[11px] tabular-nums text-zinc-400 sm:text-xs'>
+                        {format(entry.sentAt, "p", { locale: dateLocale })}
+                      </time>
                     </header>
 
                     {entry.messages.map((msg, index) => (

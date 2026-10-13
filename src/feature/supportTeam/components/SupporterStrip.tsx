@@ -60,7 +60,7 @@ export const SupporterStrip = ({ className }: SupporterStripProps) => {
         />
       </p>
 
-      {/* Spaced rather than stacked: the rotating rims lose their shape once
+      {/* Spaced rather than stacked: the gold rims lose their shape once
           they overlap, and the ring is the whole point of showing faces here. */}
       <div className='mt-2.5 flex flex-wrap items-center gap-2'>
         {members.map((member) => (
