@@ -1,5 +1,7 @@
 import { submitDailyExerciseScore } from "feature/dailyExercise/services/dailyExercise.service";
 import { findDailyDayKeyFor } from "feature/dailyExercise/utils/dailyExercise";
+import { duelScoreKind } from "feature/duels/data/duelPool";
+import { submitDuelRun } from "feature/duels/services/duels.service";
 import { recordPracticeRun } from "feature/exerciseGoals/services/exerciseGoals.service";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
@@ -29,6 +31,12 @@ interface UseScoreSavingOptions {
   recordGoalChartRuns?: boolean;
   /** Length of the play-along video the exercise runs to, when it has one. */
   videoDurationSeconds?: number | null;
+  /**
+   * The duel this session plays, if any. Its scored runs are sent to the duel
+   * and kept off every public board, which would otherwise show the opponent
+   * who is playing what.
+   */
+  duelId?: string | null;
 }
 
 /**
@@ -55,7 +63,7 @@ export interface ScoreRecords {
 export function useScoreSaving({
   activeExercise, currentExercise, isMicEnabled,
   earTrainingScore, noteMatchingHandle, sessionBpm, recordGoalChartRuns = true,
-  videoDurationSeconds = null,
+  videoDurationSeconds = null, duelId = null,
 }: UseScoreSavingOptions) {
   const userAuth   = useAppSelector(selectUserAuth);
   const userName   = useAppSelector(selectUserName);
@@ -113,8 +121,16 @@ export function useScoreSaving({
     // A run that kept scoring past the exercise's own time is no attempt at the
     // exercise, so it stays off every board. It still counts as the player's own
     // practice: their record, goal chart and completion take it like any other.
-    const isRanked = hasLeaderboard(activeExercise)
-      && isRunWithinExerciseTime(activeExercise, snap?.runMs ?? 0, videoDurationSeconds);
+    const isWithinTime = isRunWithinExerciseTime(activeExercise, snap?.runMs ?? 0, videoDurationSeconds);
+    const isRanked = !duelId && hasLeaderboard(activeExercise) && isWithinTime;
+    // A duel judges the same way the boards do: a run past the exercise time is
+    // no attempt at it. Awaited, so the duel page shows the run on the way back;
+    // a failure is logged and never holds up the finish.
+    const sendDuelRun = async (score: number, accuracy: number) => {
+      if (!duelId || !isWithinTime) return;
+      await submitDuelRun({ duelId, score, accuracy, ...(runBpm ? { bpm: runBpm } : {}) })
+        .catch((error) => console.error("Duel run was not saved", error));
+    };
 
     /**
      * Puts a score on the board and reads back the place it lands in. The write
@@ -133,6 +149,7 @@ export function useScoreSaving({
       const result = await updateMicHighScore(userAuth, exId, snap.score, snap.accuracy, exTitle, exCategory);
       recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: snap.score, scoreType: "mic", previousBest: result.previousScore, bpm: runBpm }, isRanked);
       micStandingRef.current = await placeOnLeaderboard(userAuth, snap.score, result.previousScore);
+      if (duelScoreKind(activeExercise) === "mic") await sendDuelRun(snap.score, snap.accuracy);
       // The exercise of the day keeps its own board on top of the all-time one.
       // Not awaited — a failed daily write must never hold up the report.
       const dailyDayKey = findDailyDayKeyFor(exId);
@@ -157,6 +174,8 @@ export function useScoreSaving({
       const result = await updateEarTrainingHighScore(userAuth, exId, earTrainingScore, exTitle, exCategory);
       recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: earTrainingScore, scoreType: "earTraining", previousBest: result.previousScore, bpm: runBpm }, isRanked);
       earTrainingStandingRef.current = await placeOnLeaderboard(userAuth, earTrainingScore, result.previousScore);
+      // Play by Ear has no accuracy of its own — 0 tells the duel page not to show one.
+      if (duelScoreKind(activeExercise) === "earTraining") await sendDuelRun(earTrainingScore, 0);
       if (result.isNewRecord) {
         exerciseRecordsRef.current = {
           ...exerciseRecordsRef.current,

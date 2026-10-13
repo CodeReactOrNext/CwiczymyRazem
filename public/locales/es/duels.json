@@ -1,0 +1,98 @@
+{
+  "hero": {
+    "eyebrow": "Clasificatorio, 1 contra 1",
+    "title": "Duelos",
+    "subtitle": "Tú y un desconocido recibís el mismo ejercicio. 24 horas, tantos intentos como quieras — gana el mejor resultado y el ELO se mueve."
+  },
+  "rating": {
+    "label": "ELO",
+    "rank": "#{{rank}} de {{total}}",
+    "record": "{{wins}}V · {{losses}}D · {{draws}}E",
+    "unrated": "Sin clasificar — tu primer duelo resuelto te pone en el ranking"
+  },
+  "queue": {
+    "title": "Buscar rival",
+    "subtitle": "Te emparejamos con quien lleva más tiempo esperando. ¿No hay nadie? Tu ticket espera hasta 24 horas.",
+    "slots": "{{free}} de {{max}} huecos libres",
+    "waiting_one": "{{count}} jugador esperando — os emparejamos al instante",
+    "waiting_other": "{{count}} jugadores esperando — os emparejamos al instante",
+    "mic": "Micrófono obligatorio — para el duelo solo cuentan los intentos puntuados por tu micrófono.",
+    "join": "Buscar duelo",
+    "joining": "Buscando…",
+    "full": "Todos los huecos ocupados",
+    "matched": "Rival encontrado — tu duelo está abajo.",
+    "queued": "Estás en la cola. Te avisaremos cuando alguien se una.",
+    "error_limit": "Ya tienes {{max}} duelos abiertos.",
+    "error_locked": "Los duelos se abren en el nivel 4.",
+    "error": "No se pudo entrar ahora. Inténtalo de nuevo en un momento.",
+    "ticket": "Buscando rival",
+    "ticket_expires": "Caduca en {{time}}",
+    "cancel": "Salir de la cola"
+  },
+  "category": {
+    "technique": "Técnica",
+    "theory": "Teoría",
+    "hearing": "Oído",
+    "creativity": "Creatividad",
+    "mixed": "Mixto"
+  },
+  "active": {
+    "title": "En curso",
+    "settling": "Se acabó el tiempo",
+    "settling_short": "Resultados en unos minutos",
+    "you": "Tú",
+    "anonymous": "Anónimo",
+    "no_run": "Aún sin intentos",
+    "hidden": "Puntuación oculta",
+    "attempts_one": "{{count}} intento",
+    "attempts_other": "{{count}} intentos",
+    "not_played": "Aún no ha tocado",
+    "play": "Tocar",
+    "beat_best": "Supera tu mejor marca",
+    "new": "Nuevo duelo",
+    "left": "restantes"
+  },
+  "form": {
+    "won": "V",
+    "lost": "D",
+    "draw": "E",
+    "aria": "Últimos resultados, del más antiguo al más reciente",
+    "trend_aria": "Tu puntuación en los últimos duelos"
+  },
+  "empty": {
+    "searching": "Buscando rival. Te avisaremos en cuanto empiece tu duelo.",
+    "steps": {
+      "0": "Busca un rival — o espera a que se una el siguiente",
+      "1": "El mismo ejercicio para los dos, 24 horas para tocarlo",
+      "2": "Gana el mejor intento y el ELO se mueve"
+    }
+  },
+  "recent": {
+    "title": "Duelos recientes",
+    "empty": "Aquí aparecen los duelos resueltos — con el nombre y la puntuación de tu rival.",
+    "won": "Victoria",
+    "lost": "Derrota",
+    "draw": "Empate",
+    "void": "Caducado",
+    "vs": "vs",
+    "no_show_me": "No tocaste",
+    "no_show_them": "Tu rival no tocó",
+    "nobody_played": "Nadie tocó"
+  },
+  "ranking": {
+    "title": "Ranking",
+    "players_one": "{{count}} clasificado",
+    "players_other": "{{count}} clasificados",
+    "record": "{{wins}}V · {{losses}}D",
+    "empty": "Todavía no hay nadie clasificado. El primer duelo resuelto abre el ranking."
+  },
+  "rules": {
+    "0": "Ambos jugadores reciben el mismo ejercicio al azar — técnica, teoría u oído, de los difíciles.",
+    "1": "Activa el micrófono: solo cuentan los intentos puntuados por tu micrófono.",
+    "2": "24 horas y tantos intentos como quieras. Tu mejor intento es tu puntuación.",
+    "3": "Ves cuántos intentos ha hecho tu rival — nunca su nombre ni su puntuación hasta el final.",
+    "4": "Si ganas a alguien más fuerte, ganas más ELO. ¿No tocaste? Cuenta como derrota.",
+    "title": "Cómo funciona"
+  },
+  "error": "No se pudieron cargar tus duelos. Recarga la página."
+}

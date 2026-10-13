@@ -1,0 +1,98 @@
+{
+  "hero": {
+    "eyebrow": "Ranked 1 vs 1",
+    "title": "Duels",
+    "subtitle": "You and a stranger get the same exercise. 24 hours, as many runs as you like — the better best run wins and the ELO moves."
+  },
+  "rating": {
+    "label": "ELO",
+    "rank": "#{{rank}} of {{total}}",
+    "record": "{{wins}}W · {{losses}}L · {{draws}}D",
+    "unrated": "Unranked — your first settled duel puts you on the ladder"
+  },
+  "queue": {
+    "title": "Find an opponent",
+    "subtitle": "You're paired with whoever has waited longest. Nobody there yet? Your ticket waits up to 24 hours.",
+    "slots": "{{free}} of {{max}} slots free",
+    "waiting_one": "{{count}} player waiting — you'll be paired instantly",
+    "waiting_other": "{{count}} players waiting — you'll be paired instantly",
+    "mic": "Microphone required — only runs scored by your mic count towards the duel.",
+    "join": "Find a duel",
+    "joining": "Searching…",
+    "full": "All slots taken",
+    "matched": "Opponent found — your duel is below.",
+    "queued": "You're in the queue. We'll let you know when someone joins.",
+    "error_limit": "You already have {{max}} duels open.",
+    "error_locked": "Duels open at level 4.",
+    "error": "Couldn't join right now. Try again in a moment.",
+    "ticket": "Looking for an opponent",
+    "ticket_expires": "Expires in {{time}}",
+    "cancel": "Leave the queue"
+  },
+  "category": {
+    "technique": "Technique",
+    "theory": "Theory",
+    "hearing": "Ear training",
+    "creativity": "Creativity",
+    "mixed": "Mixed"
+  },
+  "active": {
+    "title": "In progress",
+    "settling": "Time's up",
+    "settling_short": "Results in a few minutes",
+    "you": "You",
+    "anonymous": "Anonymous",
+    "no_run": "No run yet",
+    "hidden": "Score hidden",
+    "attempts_one": "{{count}} attempt",
+    "attempts_other": "{{count}} attempts",
+    "not_played": "Hasn't played yet",
+    "play": "Play",
+    "beat_best": "Beat your best",
+    "new": "New duel",
+    "left": "left"
+  },
+  "form": {
+    "won": "W",
+    "lost": "L",
+    "draw": "D",
+    "aria": "Last results, oldest first",
+    "trend_aria": "Your rating over the last duels"
+  },
+  "empty": {
+    "searching": "Looking for an opponent. You'll get a notification the moment your duel starts.",
+    "steps": {
+      "0": "Find an opponent — or wait for the next one to join",
+      "1": "Same exercise for both of you, 24 hours to play it",
+      "2": "Best run wins and the ELO moves"
+    }
+  },
+  "recent": {
+    "title": "Recent duels",
+    "empty": "Settled duels show up here — with your opponent's name and score.",
+    "won": "Won",
+    "lost": "Lost",
+    "draw": "Draw",
+    "void": "Expired",
+    "vs": "vs",
+    "no_show_me": "You didn't play",
+    "no_show_them": "Opponent didn't play",
+    "nobody_played": "Nobody played"
+  },
+  "ranking": {
+    "title": "Ranking",
+    "players_one": "{{count}} ranked",
+    "players_other": "{{count}} ranked",
+    "record": "{{wins}}W · {{losses}}L",
+    "empty": "Nobody is ranked yet. The first settled duel opens the ladder."
+  },
+  "rules": {
+    "0": "Both players get the same random exercise — hard technique, theory or ear training.",
+    "1": "Turn the mic on: only runs scored by your microphone count.",
+    "2": "24 hours, as many runs as you like. Your best run is your score.",
+    "3": "You see how many attempts your opponent made — never their name or score until it ends.",
+    "4": "Beat a stronger player and you gain more ELO. Didn't play at all? That's a loss.",
+    "title": "How it works"
+  },
+  "error": "Couldn't load your duels. Refresh to try again."
+}

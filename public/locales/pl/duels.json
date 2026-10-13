@@ -1,0 +1,104 @@
+{
+  "hero": {
+    "eyebrow": "Rankingowe 1 na 1",
+    "title": "Duele",
+    "subtitle": "Ty i nieznajomy dostajecie to samo ćwiczenie. 24 godziny, ile chcesz podejść — wygrywa lepszy najlepszy wynik, a ELO idzie w górę albo w dół."
+  },
+  "rating": {
+    "label": "ELO",
+    "rank": "#{{rank}} z {{total}}",
+    "record": "{{wins}}W · {{losses}}P · {{draws}}R",
+    "unrated": "Bez rankingu — pierwszy rozliczony duel wpisze cię na listę"
+  },
+  "queue": {
+    "title": "Znajdź rywala",
+    "subtitle": "Trafisz na osobę, która czeka najdłużej. Nikt nie czeka? Twoje zgłoszenie poczeka do 24 godzin.",
+    "slots": "Wolne miejsca: {{free}} z {{max}}",
+    "waiting_one": "{{count}} gracz czeka — dobierzemy was od razu",
+    "waiting_few": "{{count}} graczy czeka — dobierzemy was od razu",
+    "waiting_many": "{{count}} graczy czeka — dobierzemy was od razu",
+    "waiting_other": "{{count}} graczy czeka — dobierzemy was od razu",
+    "mic": "Wymagany mikrofon — do duelu liczą się tylko podejścia ocenione przez mikrofon.",
+    "join": "Znajdź duel",
+    "joining": "Szukam…",
+    "full": "Wszystkie miejsca zajęte",
+    "matched": "Znaleziono rywala — twój duel jest poniżej.",
+    "queued": "Jesteś w kolejce. Damy znać, gdy ktoś dołączy.",
+    "error_limit": "Masz już otwarte {{max}} duele.",
+    "error_locked": "Duele odblokowują się na 4 levelu.",
+    "error": "Nie udało się dołączyć. Spróbuj za chwilę.",
+    "ticket": "Szukam rywala",
+    "ticket_expires": "Wygasa za {{time}}",
+    "cancel": "Opuść kolejkę"
+  },
+  "category": {
+    "technique": "Technika",
+    "theory": "Teoria",
+    "hearing": "Słuch",
+    "creativity": "Kreatywność",
+    "mixed": "Mieszane"
+  },
+  "active": {
+    "title": "W trakcie",
+    "settling": "Czas minął",
+    "settling_short": "Wyniki za kilka minut",
+    "you": "Ty",
+    "anonymous": "Anonim",
+    "no_run": "Jeszcze nie grałeś",
+    "hidden": "Wynik ukryty",
+    "attempts_one": "{{count}} podejście",
+    "attempts_few": "{{count}} podejścia",
+    "attempts_many": "{{count}} podejść",
+    "attempts_other": "{{count}} podejścia",
+    "not_played": "Jeszcze nie grał",
+    "play": "Graj",
+    "beat_best": "Pobij swój wynik",
+    "new": "Nowy duel",
+    "left": "do końca"
+  },
+  "form": {
+    "won": "W",
+    "lost": "P",
+    "draw": "R",
+    "aria": "Ostatnie wyniki, od najstarszego",
+    "trend_aria": "Twoje ELO w ostatnich duelach"
+  },
+  "empty": {
+    "searching": "Szukamy rywala. Dostaniesz powiadomienie, gdy tylko duel się zacznie.",
+    "steps": {
+      "0": "Znajdź rywala — albo poczekaj, aż ktoś dołączy",
+      "1": "To samo ćwiczenie dla obu, 24 godziny na grę",
+      "2": "Wygrywa najlepszy wynik, ELO idzie w górę albo w dół"
+    }
+  },
+  "recent": {
+    "title": "Ostatnie duele",
+    "empty": "Tu pojawią się rozliczone duele — z nazwą i wynikiem rywala.",
+    "won": "Wygrana",
+    "lost": "Porażka",
+    "draw": "Remis",
+    "void": "Wygasł",
+    "vs": "vs",
+    "no_show_me": "Nie zagrałeś",
+    "no_show_them": "Rywal nie zagrał",
+    "nobody_played": "Nikt nie zagrał"
+  },
+  "ranking": {
+    "title": "Ranking",
+    "players_one": "{{count}} w rankingu",
+    "players_few": "{{count}} w rankingu",
+    "players_many": "{{count}} w rankingu",
+    "players_other": "{{count}} w rankingu",
+    "record": "{{wins}}W · {{losses}}P",
+    "empty": "Nikt nie jest jeszcze w rankingu. Pierwszy rozliczony duel go otworzy."
+  },
+  "rules": {
+    "0": "Obaj gracze dostają to samo losowe ćwiczenie — trudne techniczne, teoretyczne albo słuchowe.",
+    "1": "Włącz mikrofon: liczą się tylko podejścia ocenione przez mikrofon.",
+    "2": "24 godziny i dowolna liczba podejść. Twój najlepszy wynik to twój rezultat.",
+    "3": "Widzisz, ile prób zrobił rywal — ale nie jego nazwę ani wynik, aż do końca.",
+    "4": "Wygrana z mocniejszym daje więcej ELO. Nie zagrałeś wcale? To porażka.",
+    "title": "Jak to działa"
+  },
+  "error": "Nie udało się wczytać duelów. Odśwież stronę."
+}

@@ -44,6 +44,10 @@
     {
       "path": "/api/cron/daily-exercise",
       "schedule": "5 1 * * *"
+    },
+    {
+      "path": "/api/cron/duels",
+      "schedule": "*/10 * * * *"
     }
   ]
 }

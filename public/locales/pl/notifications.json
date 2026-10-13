@@ -39,6 +39,13 @@
     "open_library": "Otwórz bibliotekę społeczności",
     "open_roadmap": "Otwórz roadmapę",
     "open_arsenal": "Otwórz Arsenał",
-    "play_today": "Zagraj dzisiejsze ćwiczenie"
+    "play_today": "Zagraj dzisiejsze ćwiczenie",
+    "duel_matched": "Znaleziono rywala — duel trwa",
+    "duel_reminder": "Twój duel kończy się za kilka godzin, a jeszcze nie zagrałeś",
+    "duel_won": "Wygrałeś duel z {{name}}",
+    "duel_lost": "Przegrałeś duel z {{name}}",
+    "duel_draw": "Twój duel z {{name}} zakończył się remisem",
+    "duel_void": "Duel wygasł — nikt nie zagrał, ranking bez zmian",
+    "open_duel": "Otwórz duel"
   }
 }

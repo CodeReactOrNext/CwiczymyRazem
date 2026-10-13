@@ -27,7 +27,10 @@ type NotificationType =
   | "chat_mention"
   | "chat_reply"
   | "daily_exercise_win"
-  | "daily_exercise_place";
+  | "daily_exercise_place"
+  | "duel_matched"
+  | "duel_reminder"
+  | "duel_result";
 
 export interface AppNotification {
   id: string;
@@ -65,6 +68,12 @@ export interface AppNotification {
   // (places 2–5 reuse `place` and `exerciseTitle`)
   dayKey?: string;
   prizeName?: string;
+  // Duels: which one, and once settled how it went for the recipient. The
+  // opponent is only named on the result — before that the duel is anonymous.
+  duelId?: string;
+  duelResult?: "won" | "lost" | "draw" | "void";
+  ratingDelta?: number;
+  opponentName?: string;
   timestamp: any;
   isRead: boolean;
 }
@@ -108,6 +117,8 @@ export const notificationHref = (n: AppNotification): string | null => {
   if (n.type === "daily_exercise_win") return "/arsenal";
   // The board it reports on is closed — send them to today's, on the dashboard.
   if (n.type === "daily_exercise_place") return "/dashboard";
+  if (n.type === "duel_matched" || n.type === "duel_reminder" || n.type === "duel_result")
+    return n.duelId ? `/duels?duel=${n.duelId}` : "/duels";
   return null;
 };
 
@@ -205,6 +216,32 @@ export const notificationText = (
         title: "Exercise of the day results",
         body: `You finished ${n.place}${placeSuffix(n.place ?? 0)}${n.exerciseTitle ? ` on ${n.exerciseTitle}` : ""}.`,
       };
+    case "duel_matched":
+      return {
+        title: "Opponent found!",
+        body: `Your duel is on${n.exerciseTitle ? ` — ${n.exerciseTitle}` : ""}. You have 24 hours to set your best run.`,
+      };
+    case "duel_reminder":
+      return {
+        title: "Your duel is ending",
+        body: `You haven't played your duel${n.exerciseTitle ? ` on ${n.exerciseTitle}` : ""} yet — a few hours left.`,
+      };
+    case "duel_result": {
+      const delta = n.ratingDelta ? ` (${n.ratingDelta > 0 ? "+" : ""}${n.ratingDelta} ELO)` : "";
+      const against = n.opponentName ? ` against ${n.opponentName}` : "";
+      const title =
+        n.duelResult === "won"
+          ? "You won the duel!"
+          : n.duelResult === "lost"
+            ? "You lost the duel"
+            : n.duelResult === "draw"
+              ? "Your duel ended in a draw"
+              : "Your duel expired";
+      return {
+        title,
+        body: n.duelResult === "void" ? "Nobody played it — no rating changed." : `Duel${against}${delta}.`,
+      };
+    }
     default:
       return {
         title: "Riff Quest",

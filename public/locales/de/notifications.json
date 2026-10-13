@@ -39,6 +39,13 @@
     "open_library": "Community-Bibliothek öffnen",
     "open_roadmap": "Roadmap öffnen",
     "open_arsenal": "Arsenal öffnen",
-    "play_today": "Heutige Übung spielen"
+    "play_today": "Heutige Übung spielen",
+    "duel_matched": "Gegner gefunden — dein Duell läuft",
+    "duel_reminder": "Dein Duell endet in ein paar Stunden und du hast noch nicht gespielt",
+    "duel_won": "Du hast das Duell gegen {{name}} gewonnen",
+    "duel_lost": "Du hast das Duell gegen {{name}} verloren",
+    "duel_draw": "Dein Duell gegen {{name}} endete unentschieden",
+    "duel_void": "Dein Duell ist abgelaufen — niemand hat gespielt, keine Wertung geändert",
+    "open_duel": "Duell öffnen"
   }
 }

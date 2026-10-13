@@ -12,6 +12,8 @@
   "rankings": "Clasificaciones",
   "challenges": "Retos",
   "challenges_tooltip": "Cinco canciones votadas por la comunidad para grabar cada mes",
+  "duels": "Duelos",
+  "duels_tooltip": "Duelos anónimos 1 contra 1 en el mismo ejercicio — ranking ELO",
   "recordings": "Grabaciones",
   "recordings_tooltip": "Comparte tus covers y escucha lo que graban los demás",
   "guilds": "Gremios",

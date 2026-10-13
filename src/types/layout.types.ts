@@ -33,6 +33,7 @@ export type NavPagesTypes =
   | "tone-studio"
   | "recordings"
   | "challenges"
+  | "duels"
   | "supporter"
   | "guilds"
   | "wiki"

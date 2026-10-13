@@ -107,14 +107,17 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           ...(planSongs.length > 0 && { songs: planSongs }),
           // What lets another player open this routine from the activity feed when it's one only
           // this player has (their own plan, an auto plan). A song wrapper has its song for that.
-          ...(!plan.song && { exerciseIds: plan.exercises.map((exercise) => exercise.id) }),
+          // A duel leaves it out: the feed would name the exercise the opponent is on.
+          ...(!plan.song && !plan.duel && { exerciseIds: plan.exercises.map((exercise) => exercise.id) }),
           ...(!plan.song && collectPracticed(plan.exercises, completedExercises)),
           skillPointsGained: options?.skipSkillPoints
             ? {}
             : computeSkillPointsGained(plan.exercises, completedExercises),
-          ...(exerciseRecords && { exerciseRecords }),
-          ...(micPerformance && { micPerformance }),
-          ...(earTrainingPerformance && { earTrainingPerformance }),
+          // Records and scores land in the feed next to the session's title — for a
+          // duel that would hand the opponent the exercise and the score to beat.
+          ...(!plan.duel && exerciseRecords && { exerciseRecords }),
+          ...(!plan.duel && micPerformance && { micPerformance }),
+          ...(!plan.duel && earTrainingPerformance && { earTrainingPerformance }),
           ...getClientReportContext(
             ((reportList as any[]) ?? []).map((report) => report.date)
           ),

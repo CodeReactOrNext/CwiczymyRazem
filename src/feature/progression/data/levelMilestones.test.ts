@@ -67,7 +67,9 @@ describe("the ladder", () => {
 describe("getNextMilestone", () => {
   it("looks strictly upward", () => {
     expect(getNextMilestone(1)?.lvl).toBe(3);
-    expect(getNextMilestone(3)?.lvl).toBe(5);
+    // Level 4 pays nothing, but it opens Duels — that makes it a rung.
+    expect(getNextMilestone(3)?.lvl).toBe(4);
+    expect(getNextMilestone(4)?.lvl).toBe(5);
   });
 
   it("runs out once the account is past the top rung", () => {

@@ -1,0 +1,98 @@
+{
+  "hero": {
+    "eyebrow": "Gewertet, 1 gegen 1",
+    "title": "Duelle",
+    "subtitle": "Du und ein Fremder bekommt dieselbe Übung. 24 Stunden, so viele Durchgänge du willst — der bessere Bestwert gewinnt, und die ELO bewegt sich."
+  },
+  "rating": {
+    "label": "ELO",
+    "rank": "#{{rank}} von {{total}}",
+    "record": "{{wins}}S · {{losses}}N · {{draws}}U",
+    "unrated": "Ohne Wertung — dein erstes abgerechnetes Duell bringt dich in die Rangliste"
+  },
+  "queue": {
+    "title": "Gegner finden",
+    "subtitle": "Du wirst mit der Person gepaart, die am längsten wartet. Noch niemand da? Dein Ticket wartet bis zu 24 Stunden.",
+    "slots": "{{free}} von {{max}} Plätzen frei",
+    "waiting_one": "{{count}} Spieler wartet — ihr werdet sofort gepaart",
+    "waiting_other": "{{count}} Spieler warten — ihr werdet sofort gepaart",
+    "mic": "Mikrofon erforderlich — für das Duell zählen nur Durchgänge, die dein Mikrofon bewertet hat.",
+    "join": "Duell suchen",
+    "joining": "Suche…",
+    "full": "Alle Plätze belegt",
+    "matched": "Gegner gefunden — dein Duell steht unten.",
+    "queued": "Du bist in der Warteschlange. Wir melden uns, sobald jemand beitritt.",
+    "error_limit": "Du hast bereits {{max}} offene Duelle.",
+    "error_locked": "Duelle öffnen sich ab Level 4.",
+    "error": "Beitritt gerade nicht möglich. Versuch es gleich noch einmal.",
+    "ticket": "Suche nach einem Gegner",
+    "ticket_expires": "Läuft ab in {{time}}",
+    "cancel": "Warteschlange verlassen"
+  },
+  "category": {
+    "technique": "Technik",
+    "theory": "Theorie",
+    "hearing": "Gehörbildung",
+    "creativity": "Kreativität",
+    "mixed": "Gemischt"
+  },
+  "active": {
+    "title": "Laufend",
+    "settling": "Zeit abgelaufen",
+    "settling_short": "Ergebnis in ein paar Minuten",
+    "you": "Du",
+    "anonymous": "Anonym",
+    "no_run": "Noch kein Durchgang",
+    "hidden": "Wertung verborgen",
+    "attempts_one": "{{count}} Versuch",
+    "attempts_other": "{{count}} Versuche",
+    "not_played": "Hat noch nicht gespielt",
+    "play": "Spielen",
+    "beat_best": "Bestwert schlagen",
+    "new": "Neues Duell",
+    "left": "übrig"
+  },
+  "form": {
+    "won": "S",
+    "lost": "N",
+    "draw": "U",
+    "aria": "Letzte Ergebnisse, älteste zuerst",
+    "trend_aria": "Deine Wertung über die letzten Duelle"
+  },
+  "empty": {
+    "searching": "Wir suchen einen Gegner. Du bekommst eine Benachrichtigung, sobald dein Duell beginnt.",
+    "steps": {
+      "0": "Such einen Gegner — oder warte, bis der nächste beitritt",
+      "1": "Dieselbe Übung für euch beide, 24 Stunden Zeit",
+      "2": "Der beste Durchgang gewinnt, und die ELO bewegt sich"
+    }
+  },
+  "recent": {
+    "title": "Letzte Duelle",
+    "empty": "Abgerechnete Duelle erscheinen hier — mit Name und Wertung deines Gegners.",
+    "won": "Sieg",
+    "lost": "Niederlage",
+    "draw": "Unentschieden",
+    "void": "Abgelaufen",
+    "vs": "gegen",
+    "no_show_me": "Du hast nicht gespielt",
+    "no_show_them": "Gegner hat nicht gespielt",
+    "nobody_played": "Niemand hat gespielt"
+  },
+  "ranking": {
+    "title": "Rangliste",
+    "players_one": "{{count}} gewertet",
+    "players_other": "{{count}} gewertet",
+    "record": "{{wins}}S · {{losses}}N",
+    "empty": "Noch niemand ist gewertet. Das erste abgerechnete Duell öffnet die Rangliste."
+  },
+  "rules": {
+    "0": "Beide Spieler bekommen dieselbe zufällige Übung — schwere Technik, Theorie oder Gehörbildung.",
+    "1": "Schalte das Mikrofon ein: Es zählen nur Durchgänge, die dein Mikrofon bewertet hat.",
+    "2": "24 Stunden, so viele Durchgänge du willst. Dein bester Durchgang ist deine Wertung.",
+    "3": "Du siehst, wie viele Versuche dein Gegner gemacht hat — Name und Wertung erst am Ende.",
+    "4": "Schlägst du einen Stärkeren, bekommst du mehr ELO. Gar nicht gespielt? Das ist eine Niederlage.",
+    "title": "So funktioniert's"
+  },
+  "error": "Deine Duelle konnten nicht geladen werden. Lade die Seite neu."
+}

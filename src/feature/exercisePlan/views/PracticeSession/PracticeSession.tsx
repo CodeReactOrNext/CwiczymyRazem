@@ -578,8 +578,9 @@ export const PracticeSession = ({
   // (useScoreSaving persists them on its own click branch). Everything else only
   // has a snapshot worth submitting when the mic was actually listening.
   const hasTrackedPerformance = isMicEnabled || isClickAnsweredMode(currentExercise.noteHuntConfig?.mode);
+  // Exams, goals and duels only count mic-scored runs, so they open on the mic prompt.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { if ((isExamMode || isGoalMode) && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
+  useEffect(() => { if ((isExamMode || isGoalMode || !!plan.duel) && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
   // No cleanup here used to mean React StrictMode's dev-only double-invoke
   // (mount → cleanup → mount, meant to catch exactly this class of bug) had
   // nothing to undo between its two invocations — both ran initAudio() with
@@ -725,6 +726,7 @@ export const PracticeSession = ({
     sessionBpm: effectiveBpm,
     recordGoalChartRuns: !isGoalMode,
     videoDurationSeconds: videoDuration,
+    duelId: plan.duel?.id ?? null,
   });
 
   const { verdict: goalVerdict, rearm: rearmGoalVerdict } = useGoalRunVerdict({

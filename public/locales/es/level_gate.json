@@ -21,6 +21,15 @@
         "2": "Un resumen de en qué se fue la semana, categoría por categoría"
       }
     },
+    "duels": {
+      "name": "Duelos",
+      "reason": "Un duelo es de ranking: tú y un desconocido recibís el mismo ejercicio difícil y decide el micrófono. Tras unas cuantas sesiones ya sabes cómo te escucha la puntuación — ahí es cuando un enfrentamiento contra otra persona es justo.",
+      "perks": {
+        "0": "Enfrentamientos anónimos 1 contra 1 en ejercicios difíciles de técnica, teoría y oído",
+        "1": "24 horas para lograr tu mejor intento, con tantos intentos como quieras",
+        "2": "Una puntuación ELO y un ranking por el que subir"
+      }
+    },
     "guilds": {
       "name": "Gremios",
       "reason": "Un gremio funciona porque la gente aparece por los demás. Tras unos niveles ya tienes tu propia rutina — ese es el momento en que unirte aporta algo al resto del gremio, no solo a ti.",

@@ -362,6 +362,13 @@ export interface ExercisePlan {
     /** Arrangement (lead / rhythm / bass) the session's time is booked on. */
     arrangement?: SongArrangement;
   };
+  /** Set when the session plays a duel (see feature/duels). Its scored runs go
+   *  to the duel, and nothing public — Live now, the activity feed, the
+   *  exercise leaderboards — learns which exercise it was, so the opponent
+   *  stays anonymous until the duel is settled. */
+  duel?: {
+    id: string;
+  };
 }
 
 /** Which high score a run competes against — one per scored exercise kind. */

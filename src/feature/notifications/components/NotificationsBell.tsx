@@ -28,12 +28,14 @@ import {
   Gem,
   Heart,
   HeartHandshake,
+  Hourglass,
   ListMusic,
   Map as MapIcon,
   Medal,
   MessageSquare,
   Reply,
   Store,
+  Swords,
   Trophy,
   Zap,
 } from "lucide-react";
@@ -238,6 +240,56 @@ const typeConfig = {
       </span>
     ),
   },
+  duel_matched: {
+    icon: <Swords className='h-3 w-3 text-white' />,
+    bg: "bg-cyan-500",
+    label: (n: any, t: Translate) => (
+      <span>
+        {t("bell.duel_matched")}
+        {n.exerciseTitle && (
+          <span className='mt-1 block truncate text-xs text-zinc-500'>
+            {n.exerciseTitle}
+          </span>
+        )}
+      </span>
+    ),
+  },
+  duel_reminder: {
+    icon: <Hourglass className='h-3 w-3 text-white' />,
+    bg: "bg-orange-500",
+    label: (n: any, t: Translate) => (
+      <span>
+        {t("bell.duel_reminder")}
+        {n.exerciseTitle && (
+          <span className='mt-1 block truncate text-xs text-zinc-500'>
+            {n.exerciseTitle}
+          </span>
+        )}
+      </span>
+    ),
+  },
+  duel_result: {
+    icon: <Swords className='h-3 w-3 text-white' />,
+    bg: "bg-zinc-600",
+    label: (n: any, t: Translate) => (
+      <span>
+        <Interpolate
+          text={t(`bell.duel_${n.duelResult ?? "void"}`)}
+          values={{ name: <span className='font-semibold text-white'>{n.opponentName ?? "?"}</span> }}
+        />
+        {!!n.ratingDelta && (
+          <span
+            className={cn(
+              "ml-1.5 font-semibold tabular-nums",
+              n.ratingDelta > 0 ? "text-emerald-400" : "text-zinc-400",
+            )}>
+            {n.ratingDelta > 0 ? "+" : ""}
+            {n.ratingDelta} ELO
+          </span>
+        )}
+      </span>
+    ),
+  },
   roadmap_ready: {
     icon: <MapIcon className='h-3 w-3 text-white' />,
     bg: "bg-cyan-500",
@@ -406,6 +458,9 @@ export const NotificationsBell = () => {
                   n.type === "roadmap_ready" ||
                   n.type === "daily_exercise_win" ||
                   n.type === "daily_exercise_place" ||
+                  n.type === "duel_matched" ||
+                  n.type === "duel_reminder" ||
+                  n.type === "duel_result" ||
                   // Legacy marketplace sales stored without a buyer fall back to
                   // the system (Store) icon; new ones show the buyer's avatar.
                   (n.type === "marketplace_sold" && !n.senderName);
@@ -517,6 +572,14 @@ export const NotificationsBell = () => {
                       {n.type === "daily_exercise_place" && (
                         <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
                           {t("bell.play_today")}
+                          <ArrowRight className='h-3 w-3' />
+                        </p>
+                      )}
+                      {(n.type === "duel_matched" ||
+                        n.type === "duel_reminder" ||
+                        n.type === "duel_result") && (
+                        <p className='mt-1 flex items-center gap-1 text-xs font-medium text-cyan-400/80'>
+                          {t("bell.open_duel")}
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}

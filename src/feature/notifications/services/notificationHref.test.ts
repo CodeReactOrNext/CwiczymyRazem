@@ -74,6 +74,15 @@ describe("notificationHref", () => {
     ).toBe("/dashboard");
   });
 
+  it("opens the duel a duel notification is about", () => {
+    for (const type of ["duel_matched", "duel_reminder", "duel_result"] as const) {
+      expect(notificationHref(notification({ type, duelId: "d42" }))).toBe(
+        "/duels?duel=d42",
+      );
+    }
+    expect(notificationHref(notification({ type: "duel_result" }))).toBe("/duels");
+  });
+
   it("leaves system notifications without a target", () => {
     expect(notificationHref(notification({ type: "season_start" }))).toBeNull();
     expect(

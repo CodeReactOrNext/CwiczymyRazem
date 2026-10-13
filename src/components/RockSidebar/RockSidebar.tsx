@@ -473,7 +473,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   // Undefined until the stats land, so a low-level lock never flashes on a
   // sidebar that is still loading somebody's real level.
-  const lockedAtLvl = (feature: "summary" | "guilds") =>
+  const lockedAtLvl = (feature: "summary" | "duels" | "guilds") =>
     userStats ? getLockedAtLvl(feature, userStats.lvl) : undefined;
 
   // The panel is a perk, so the entry only exists for people who funded it.
@@ -496,6 +496,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/goals")) return "progress";
     if (pathname === "/summary") return "progress";
     if (pathname.startsWith("/challenges")) return "community";
+    if (pathname.startsWith("/duels")) return "community";
     if (pathname.startsWith("/leaderboard")) return "community";
     if (pathname.startsWith("/seasons")) return "community";
     if (pathname.startsWith("/guilds")) return "community";
@@ -634,6 +635,14 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           href: "/challenges",
           icon: <Flame size={16} />,
           tooltip: t("challenges_tooltip"),
+        },
+        {
+          id: "community-duels",
+          name: t("duels"),
+          href: "/duels",
+          icon: <Swords size={16} />,
+          tooltip: t("duels_tooltip"),
+          lockedLvl: lockedAtLvl("duels"),
         },
         {
           id: "community-recordings",

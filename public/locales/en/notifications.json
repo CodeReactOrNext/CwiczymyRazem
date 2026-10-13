@@ -39,6 +39,13 @@
     "open_library": "Open Community library",
     "open_roadmap": "Open roadmap",
     "open_arsenal": "Open Arsenal",
-    "play_today": "Play today's exercise"
+    "play_today": "Play today's exercise",
+    "duel_matched": "Opponent found — your duel is on",
+    "duel_reminder": "Your duel ends in a few hours and you haven't played yet",
+    "duel_won": "You won the duel against {{name}}",
+    "duel_lost": "You lost the duel against {{name}}",
+    "duel_draw": "Your duel against {{name}} ended in a draw",
+    "duel_void": "Your duel expired — nobody played, no rating changed",
+    "open_duel": "Open duel"
   }
 }

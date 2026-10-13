@@ -39,6 +39,13 @@
     "open_library": "Abrir biblioteca de la comunidad",
     "open_roadmap": "Abrir hoja de ruta",
     "open_arsenal": "Abrir Arsenal",
-    "play_today": "Tocar el ejercicio de hoy"
+    "play_today": "Tocar el ejercicio de hoy",
+    "duel_matched": "Rival encontrado — tu duelo está en marcha",
+    "duel_reminder": "Tu duelo termina en unas horas y aún no has tocado",
+    "duel_won": "Ganaste el duelo contra {{name}}",
+    "duel_lost": "Perdiste el duelo contra {{name}}",
+    "duel_draw": "Tu duelo contra {{name}} terminó en empate",
+    "duel_void": "Tu duelo expiró — nadie tocó, la puntuación no cambió",
+    "open_duel": "Abrir duelo"
   }
 }

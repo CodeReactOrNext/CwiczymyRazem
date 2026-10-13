@@ -15,7 +15,18 @@ export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivity
 
 
   useEffect(() => {
-    if (userAuth) {
+    if (userAuth && plan.duel) {
+      // A duel is anonymous until it is settled: Live now says a duel is on,
+      // never which exercise (not even its category), and carries no ids to
+      // open it by.
+      dispatch(
+        setActivity({
+          planTitle: plan.title,
+          exerciseTitle: plan.title,
+          timestamp: Date.now(),
+        })
+      );
+    } else if (userAuth) {
       dispatch(
         setActivity({
           planTitle: typeof plan.title === 'string' ? plan.title : plan.title,
