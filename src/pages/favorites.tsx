@@ -6,6 +6,7 @@ import { LIBRARY_TABS } from "constants/navTabs";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { SongBoardRow } from "feature/songs/components/SongBoard/SongBoardRow";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
@@ -54,6 +55,7 @@ const localizedTitle = (value: unknown): string => {
 
 const FavoritesPage: NextPageWithLayout = () => {
   const { t } = useTranslation(["common", "skills", "library"]);
+  const localizeExercise = useLocalizeExercise();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
@@ -258,7 +260,7 @@ const FavoritesPage: NextPageWithLayout = () => {
                       </span>
 
                       <span className="flex-1 truncate font-medium text-zinc-100">
-                        {localizedTitle(exercise.title)}
+                        {localizedTitle(localizeExercise(exercise).title)}
                       </span>
 
                       {skillId && (

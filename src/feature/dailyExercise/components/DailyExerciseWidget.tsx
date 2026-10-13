@@ -6,6 +6,7 @@ import { useDailyExercise } from "feature/dailyExercise/hooks/useDailyExercise";
 import type { DailyExerciseEntry } from "feature/dailyExercise/types/dailyExercise.types";
 import { DAILY_LEADERBOARD_SIZE } from "feature/dailyExercise/utils/dailyExercise";
 import { WidgetHeader } from "feature/dashboard/components/widgets/WidgetHeader";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { TabPreviewGlyph } from "feature/landing/components/TabPreviewGlyph";
 import { getTabPreview } from "feature/landing/lib/tabPreview";
 import { selectUserAuth } from "feature/user/store/userSlice";
@@ -115,6 +116,7 @@ const BoardSkeleton = () => (
  */
 export const DailyExerciseWidget = () => {
   const { t } = useTranslation("dashboard");
+  const localizeExercise = useLocalizeExercise();
   const uid = useAppSelector(selectUserAuth) ?? null;
   const { exercise, msLeft, leaderboard } = useDailyExercise(uid);
   const board = leaderboard.data;
@@ -149,7 +151,7 @@ export const DailyExerciseWidget = () => {
         <div className='flex flex-1 flex-wrap gap-x-12 gap-y-8'>
           <div className='flex min-w-0 flex-[1_1_20rem] flex-col'>
             <h4 className='text-lg font-semibold text-zinc-100 sm:text-xl'>
-              {exercise.title}
+              {localizeExercise(exercise).title}
             </h4>
 
             {tabPreview.length > 0 && (

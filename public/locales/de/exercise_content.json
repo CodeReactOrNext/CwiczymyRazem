@@ -3878,5 +3878,14 @@
       "title": "Legato-Meisterplan",
       "description": "Komplettes Legato-Techniktraining. Entwickelt geschmeidige Hammer-on- und Pull-off-Ausführung, Triller-Ausdauer, kontinuierlichen Legato-Fluss und fortgeschrittene Sextolenmuster über das Griffbrett."
     }
+  },
+  "family": {
+    "pentatonic": "Pentatonik",
+    "chords": "Akkorde",
+    "move-the-melody": "Die Melodie verschieben"
+  },
+  "variant": {
+    "pentatonic_box1_up_down": "Box 1 — rauf und runter",
+    "build_the_chord": "Akkord bauen"
   }
 }

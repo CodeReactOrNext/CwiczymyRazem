@@ -3878,5 +3878,14 @@
       "title": "Plan mistrza legato",
       "description": "Kompletny trening techniki legato. Rozwija płynne wykonywanie hammer-onów i pull-offów, wytrzymałość tryli, ciągły przepływ legato i zaawansowane wzory sekstoli na całym gryfie."
     }
+  },
+  "family": {
+    "pentatonic": "Pentatonika",
+    "chords": "Akordy",
+    "move-the-melody": "Przesuń melodię"
+  },
+  "variant": {
+    "pentatonic_box1_up_down": "Boks 1 — w górę i w dół",
+    "build_the_chord": "Zbuduj akord"
   }
 }

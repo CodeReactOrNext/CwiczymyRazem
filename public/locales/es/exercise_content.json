@@ -3878,5 +3878,14 @@
       "title": "Plan maestro de legato",
       "description": "Entrenamiento completo de la técnica de legato. Desarrolla una ejecución suave de hammer-ons y pull-offs, resistencia en los trinos, flujo de legato continuo y patrones avanzados de seisillos por el mástil."
     }
+  },
+  "family": {
+    "pentatonic": "Pentatónica",
+    "chords": "Acordes",
+    "move-the-melody": "Mueve la melodía"
+  },
+  "variant": {
+    "pentatonic_box1_up_down": "Caja 1 — subir y bajar",
+    "build_the_chord": "Construye el acorde"
   }
 }

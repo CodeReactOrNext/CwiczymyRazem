@@ -2,6 +2,7 @@ import { Chip, getChipCustomStyle } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
@@ -88,6 +89,7 @@ export const SkillRoadmapView = ({
   onSkillClick,
 }: SkillRoadmapViewProps) => {
   const { t } = useTranslation(["skills", "common"]);
+  const localizeExercise = useLocalizeExercise();
   const tiers = useMemo(() => buildSkillRoadmap(exercisesAgregat), []);
   const layout = useMemo(() => layoutSkillRoadmap(tiers), [tiers]);
   const exerciseById = useMemo(
@@ -449,7 +451,7 @@ export const SkillRoadmapView = ({
             top: tooltipBelow ? hovered.screenY + 18 : hovered.screenY - 18,
           }}>
           <p className='text-[13px] font-bold leading-snug text-zinc-100'>
-            {hoveredExercise.title}
+            {localizeExercise(hoveredExercise).title}
           </p>
           <div className='mt-2 flex flex-wrap items-center gap-2'>
             <Chip
