@@ -16,6 +16,7 @@ import posthog from "posthog-js";
 import type { ReactNode } from "react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
@@ -23,6 +24,7 @@ import { DEFAULT_ACCENT_PATTERN, stepsPerBeat } from "../../components/Metronome
 import { getCountInDurationMs } from "../../components/Metronome/utils/countInDuration";
 import { deriveMetronomeGrid } from "../../components/Metronome/utils/meterGrid";
 import type { ExercisePlan } from "../../types/exercise.types";
+import { hasLeaderboard } from "../../utils/hasLeaderboard";
 import { isClickAnsweredMode } from "../../utils/huntModes";
 import { DesktopSessionView } from "./components/DesktopSessionView";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
@@ -49,6 +51,7 @@ import {
   saveGlobalMetronomeVolume,
   savePracticeSessionSettings,
 } from "./helpers/practiceSessionSettings";
+import { strumSynthVolume } from "./helpers/strumSynthVolume";
 import type { TempoRuler } from "./hooks/tempoBeatClock";
 import type { TimingPrecision } from "./utils/timingPrecision";
 import { createTempoRulerFromMeasures } from "./hooks/tempoBeatClock";
@@ -60,6 +63,7 @@ import { useGoalRunVerdict } from "./hooks/useGoalRunVerdict";
 import { useGpFileLoader } from "./hooks/useGpFileLoader";
 import { useGuitarTuning } from "./hooks/useGuitarTuning";
 import { useNoteHuntRotation } from "./hooks/useNoteHuntRotation";
+import { usePlaybackLeakGuard } from "./hooks/usePlaybackLeakGuard";
 import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
 import { useRiddleSequenceMatcher } from "./hooks/useRiddleSequenceMatcher";
@@ -730,6 +734,36 @@ const PracticeSessionInner = ({
     duelId: plan.duel?.id ?? null,
   });
 
+  // ── Playback leak guard ───────────────────────────────────────────────────
+
+  // The tab's own guitar out of speakers would score as if the player had
+  // played it. While it sounds on a run that could land on a board or in a duel,
+  // the guard listens for it in the mic, and a run it hears is kept off them.
+  // Riddles are left out: their phrase has to be heard, and the mic only judges
+  // the answer once the phrase has finished.
+  const tabSoundLevel = strumSynthVolume(isAudioMuted, trackConfigs.main) * masterVolume;
+  const hasTabSound = !!activeTablature?.length || !!effectiveRawGpFile || !!currentExercise.strummingPatterns?.length;
+  const handlePlaybackLeak = useCallback(() => {
+    noteMatchingHandle.current?.markPlaybackLeak?.();
+    toast.warning(t("playback_leak.title", "Your mic can hear the guitar playback"), {
+      id: "playback-leak",
+      description: t(
+        "playback_leak.body",
+        "This run won't go on the leaderboards. Put on headphones or turn the guitar sound off, then start the run over.",
+      ),
+      duration: 12000,
+      action: { label: t("playback_leak.mute", "Turn guitar off"), onClick: () => setIsAudioMuted(true) },
+    });
+  }, [t, setIsAudioMuted]);
+  const playbackLeakingRef = usePlaybackLeakGuard({
+    enabled: isMicEnabled && isListening && !isEarTrainingRiddle && (hasLeaderboard(activeExercise) || !!plan.duel),
+    isTabAudible: isAudioPlaying && hasTabSound && tabSoundLevel > 0,
+    tabLevel: tabSoundLevel,
+    audioContext: metronome.audioContext,
+    inputTapRef: audioRefs.inputTapRef,
+    onLeak: handlePlaybackLeak,
+  });
+
   const { verdict: goalVerdict, rearm: rearmGoalVerdict } = useGoalRunVerdict({
     goalRun, showSuccessView, isMicEnabled, noteMatchingHandle,
   });
@@ -961,6 +995,7 @@ const PracticeSessionInner = ({
       getSessionTimeMs={timer.getTime}
       isExamMode={isExamMode}
       onExamFail={handleExamMistakeFail}
+      playbackLeakingRef={playbackLeakingRef}
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>

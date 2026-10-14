@@ -83,6 +83,22 @@ describe("getSupportVariantCopy", () => {
     }
   });
 
+  it("never puts the month's takings into the copy", () => {
+    for (const variant of SUPPORT_VARIANT_IDS) {
+      for (const ctx of [covered, short]) {
+        const copy = getSupportVariantCopy(variant, {
+          ...ctx,
+          raisedThisMonth: ctx === covered ? 215 : 13,
+          monthlyGoal: 20,
+        });
+
+        for (const line of [copy.eyebrow, copy.headline, copy.body]) {
+          expect(line).not.toMatch(/\$(215|13|20)\b/);
+        }
+      }
+    }
+  });
+
   it("survives a log written before the tier fields existed", () => {
     const legacy: SupportVariantContext = {
       raisedThisMonth: 8,

@@ -100,35 +100,6 @@ export function freqToPitchClass(freq: number): number {
 }
 
 /**
- * Computes a 12-element chromagram from a Web Audio AnalyserNode.
- * Returns a Float32Array[12] with values 0–1 (normalized to the max bin energy).
- * Returns null when the analyser has no data or the signal is silent.
- */
-export function computeChromagram(analyser: AnalyserNode): Float32Array | null {
-  const fftSize = analyser.fftSize;
-  const buf = new Float32Array(fftSize / 2);
-  analyser.getFloatFrequencyData(buf); // dB values (typically -100 to 0)
-
-  const sampleRate = analyser.context.sampleRate;
-  const binHz = sampleRate / fftSize;
-  const chroma = new Float32Array(12);
-
-  for (let i = 1; i < buf.length; i++) {
-    const freq = i * binHz;
-    if (freq < 60 || freq > 1400) continue; // guitar fundamental range
-    const amplitude = Math.pow(10, buf[i] / 20); // dB → linear
-    chroma[freqToPitchClass(freq)] += amplitude;
-  }
-
-  let max = 0;
-  for (let i = 0; i < 12; i++) if (chroma[i] > max) max = chroma[i];
-  if (max < 1e-6) return null; // silence
-
-  for (let i = 0; i < 12; i++) chroma[i] /= max;
-  return chroma;
-}
-
-/**
  * Converts a MIDI note number to its frequency in Hz.
  * Frequency = A4 * 2^((midi - 69) / 12)
  */
@@ -166,9 +137,9 @@ export const getFrequencyFromTab = (string: number, fret: number, tuningOffsets?
 // Two refinements adapted from the native (Unity) detector to the browser pitch
 // path. Both only ever *relax* a gate, so they cut false negatives without ever
 // grading a wrong fret as correct:
-//   • High-string split — the thin high strings (≥ E4) are quieter, decay faster
-//     and carry weaker chroma energy, so the fixed volume/chroma gates reject
-//     legitimately-played high notes. Relax those gates above the split.
+//   • High-string split — the thin high strings (≥ E4) are quieter and decay
+//     faster, so the fixed volume gate rejects legitimately-played high notes.
+//     Relax it above the split.
 //   • Expectation bias — for a note the player is already aiming at, widen the
 //     cents tolerance slightly, but only when the detector is highly confident.
 //     Anchored on the expected note, so tuning drift is forgiven while the widen
@@ -180,16 +151,6 @@ export const HIGH_STRING_MIN_MIDI = 64;
 export const HIGH_STRING_MIN_FREQ = midiToFrequency(HIGH_STRING_MIN_MIDI);
 /** Volume-gate multiplier applied to high strings (they ring quieter). */
 export const HIGH_STRING_VOLUME_MULTIPLIER = 0.5;
-/** Chroma-threshold multiplier applied to high chord tones (weaker chroma energy). */
-export const HIGH_STRING_CHROMA_MULTIPLIER = 0.8;
-/** Chroma-threshold multiplier applied when checking whether an already-hit
- *  chord is still sounding (sustain), vs. the stricter threshold required to
- *  register the initial hit. Hysteresis — easier to stay "open" than to open —
- *  because a real chord naturally decays, and requiring the same threshold to
- *  keep crediting sustain as was needed to attack it cuts the visual fill the
- *  moment any one note's chroma energy dips slightly, even while the chord is
- *  still audibly ringing. Never relaxes the *initial* hit requirement. */
-export const CHORD_SUSTAIN_CHROMA_MULTIPLIER = 0.7;
 /** Pitch confidence (0–1) at/above which the expectation tolerance bonus is fully applied. */
 export const EXPECT_NEAR_CONFIDENCE = 0.9;
 /** Confidence (0–1) at which the bonus ramp starts (0 bonus at/below this). Between
@@ -205,33 +166,19 @@ export interface DetectionGates {
   isHighString: boolean;
   /** Minimum raw volume for the note to be considered "played". */
   volumeGate: number;
-  /** Chroma-bin energy threshold for a chord tone to count as rung (initial hit). */
-  chordChromaThreshold: number;
-  /** Lower chroma threshold for whether an already-hit chord tone is still
-   *  sounding (sustain fill) — see CHORD_SUSTAIN_CHROMA_MULTIPLIER. */
-  sustainChromaThreshold: number;
 }
 
 /**
  * Register-adaptive detection gates for an expected note. Notes at/above the
- * high-string split get relaxed volume and chroma gates; everything below keeps
- * the base gates unchanged. A `targetFreq` of 0 (dead/muted notes with no pitch)
+ * high-string split get a relaxed volume gate; everything below keeps the base
+ * gate unchanged. A `targetFreq` of 0 (dead/muted notes with no pitch)
  * is treated as a low string, so those keep the base gates.
  */
-export function getDetectionGates(
-  targetFreq: number,
-  baseVolumeGate: number,
-  baseChordChromaThreshold: number,
-): DetectionGates {
+export function getDetectionGates(targetFreq: number, baseVolumeGate: number): DetectionGates {
   const isHighString = targetFreq >= HIGH_STRING_MIN_FREQ - 1;
-  const chordChromaThreshold = isHighString
-    ? baseChordChromaThreshold * HIGH_STRING_CHROMA_MULTIPLIER
-    : baseChordChromaThreshold;
   return {
     isHighString,
     volumeGate: isHighString ? baseVolumeGate * HIGH_STRING_VOLUME_MULTIPLIER : baseVolumeGate,
-    chordChromaThreshold,
-    sustainChromaThreshold: chordChromaThreshold * CHORD_SUSTAIN_CHROMA_MULTIPLIER,
   };
 }
 

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { ConnectionIssueInfo, NativeAudioDevice, NativeAudioStreamInfo } from "types/nativeAudio";
+import type { PcmSpectrum } from "utils/audio/pcmSpectrum";
+import { createPcmSpectrum } from "utils/audio/pcmSpectrum";
 
-import type { DetectedNoteEvent } from "./guitarBufferProcessor";
+import type { DetectedNoteEvent, InputTap } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
 import type { AudioRefs } from "./useAudioAnalyzer";
 import { readPersistedChannel } from "./useNativeAudioDevices";
@@ -80,8 +82,11 @@ export const useNativeAudioAnalyzer = () => {
   const lastTickTimeRef = useRef<number>(0);
   const noteEventsRef = useRef<DetectedNoteEvent[]>([]);
   const lastAttackMsRef = useRef<number>(0);
-  const onsetChromaRef = useRef<Float32Array | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null); // always null here (no Web Audio graph)
+  // No Web Audio graph here, so no AnalyserNode: chords are graded on a
+  // spectrum computed from the PCM itself (see pcmSpectrum.ts). Built per
+  // stream, for its negotiated sample rate.
+  const spectrumRef = useRef<PcmSpectrum | null>(null);
+  const inputTapRef = useRef<InputTap | null>(null);
 
   // Accumulator: native blocks (e.g. 256 frames) → 2048-sample analysis windows
   const windowBufRef = useRef<Float32Array>(new Float32Array(WINDOW_SIZE));
@@ -144,6 +149,7 @@ export const useNativeAudioAnalyzer = () => {
       windowBufRef.current = new Float32Array(WINDOW_SIZE);
       windowPosRef.current = 0;
       processRef.current = null;
+      spectrumRef.current = null;
 
       // Subscribe to PCM blocks: reinterpret raw bytes as FLOAT32, fill 2048
       // windows, then run the shared DSP on each full window. Registered before
@@ -252,15 +258,17 @@ export const useNativeAudioAnalyzer = () => {
       const aubio = await Aubio();
       if (myGeneration !== generationRef.current) return; // superseded while aubio (wasm) loaded
       const detectors = createGuitarDetectors(aubio, info.sampleRate);
+      const spectrum = createPcmSpectrum(info.sampleRate);
+      spectrumRef.current = spectrum;
 
       processRef.current = createGuitarBufferProcessor({
         detectors,
         getGain: () => inputGainRef.current,
         sampleRate: info.sampleRate,
-        analyser: null, // no AnalyserNode in the native path → no chroma snapshots
+        spectrum,
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef, noteEventsRef, lastAttackMsRef,
+          lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, inputTapRef,
         },
         onActive: () => {
           setState(prev =>
@@ -327,6 +335,7 @@ export const useNativeAudioAnalyzer = () => {
     window.nativeAudio?.stop().catch(() => { /* ignore */ });
 
     processRef.current = null;
+    spectrumRef.current = null;
     windowPosRef.current = 0;
     streamInfoRef.current = null;
     frequencyRef.current = 0;
@@ -336,7 +345,6 @@ export const useNativeAudioAnalyzer = () => {
     confidenceRef.current = 0;
     lastOnsetTimeRef.current = 0;
     lastTickTimeRef.current = 0;
-    onsetChromaRef.current = null;
     noteEventsRef.current = [];
     lastAttackMsRef.current = 0;
     ipcDelayEmaRef.current = 0;
@@ -402,9 +410,11 @@ export const useNativeAudioAnalyzer = () => {
     return captureMs + windowMs + ipcMs;
   }, []);
 
+  const readSpectrum = useCallback(() => spectrumRef.current?.read() ?? null, []);
+
   const audioRefs: AudioRefs = {
     frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef,
-    lastTickTimeRef, confidenceRef, analyserRef, onsetChromaRef, noteEventsRef, lastAttackMsRef,
+    lastTickTimeRef, confidenceRef, readSpectrum, noteEventsRef, lastAttackMsRef, inputTapRef,
   };
 
   return useMemo(() => ({

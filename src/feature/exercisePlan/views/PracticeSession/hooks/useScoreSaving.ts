@@ -123,12 +123,16 @@ export function useScoreSaving({
     // exercise, so it stays off every board. It still counts as the player's own
     // practice: their record, goal chart and completion take it like any other.
     const isWithinTime = isRunWithinExerciseTime(activeExercise, snap?.runMs ?? 0, videoDurationSeconds);
-    const isRanked = !duelId && hasLeaderboard(activeExercise) && isWithinTime;
-    // A duel judges the same way the boards do: a run past the exercise time is
-    // no attempt at it. Awaited, so the duel page shows the run on the way back;
-    // a failure is logged and never holds up the finish.
+    // A run the mic heard the tab's own guitar through speakers for may have
+    // scored the playback rather than the player. It is kept off the boards the
+    // same way, and counts as practice the same way.
+    const isPlaybackAssisted = !!snap?.playbackLeak;
+    const isRanked = !duelId && hasLeaderboard(activeExercise) && isWithinTime && !isPlaybackAssisted;
+    // A duel judges the same way the boards do: a run past the exercise time, or
+    // one the speakers played along to, is no attempt at it. Awaited, so the duel
+    // page shows the run on the way back; a failure is logged and never holds up the finish.
     const sendDuelRun = async (score: number, accuracy: number) => {
-      if (!duelId || !isWithinTime) return;
+      if (!duelId || !isWithinTime || isPlaybackAssisted) return;
       await submitDuelRun({ duelId, score, accuracy, ...(runBpm ? { bpm: runBpm } : {}) })
         .catch((error) => console.error("Duel run was not saved", error));
     };

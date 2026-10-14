@@ -3,6 +3,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { submitDailyExerciseScore } from "feature/dailyExercise/services/dailyExercise.service";
 import { findDailyDayKeyFor } from "feature/dailyExercise/utils/dailyExercise";
+import { submitDuelRun } from "feature/duels/services/duels.service";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -25,6 +26,10 @@ vi.mock("feature/dailyExercise/services/dailyExercise.service", () => ({
 
 vi.mock("feature/dailyExercise/utils/dailyExercise", () => ({
   findDailyDayKeyFor: vi.fn(),
+}));
+
+vi.mock("feature/duels/services/duels.service", () => ({
+  submitDuelRun: vi.fn(),
 }));
 
 vi.mock("feature/leadboard/services/getExerciseUserRank", () => ({
@@ -52,8 +57,8 @@ const exercise = {
 /** An exercise the player can't set a tempo on, so no tempo is worth reporting. */
 const untimedExercise = { ...exercise, metronomeSpeed: undefined } as unknown as Exercise;
 
-const handleFor = (score: number, minScoredBpm?: number | null, runMs?: number) =>
-  ({ current: { snapshot: () => ({ score, accuracy: 99, minScoredBpm, runMs }) } }) as unknown as {
+const handleFor = (score: number, minScoredBpm?: number | null, runMs?: number, playbackLeak?: boolean) =>
+  ({ current: { snapshot: () => ({ score, accuracy: 99, minScoredBpm, runMs, playbackLeak }) } }) as unknown as {
     current: NoteMatchingHandle | null;
   };
 
@@ -64,6 +69,8 @@ const saveRun = async ({
   sessionBpm = 90,
   minScoredBpm,
   runMs,
+  playbackLeak,
+  duelId,
 }: {
   score: number;
   previousBest: number;
@@ -71,6 +78,8 @@ const saveRun = async ({
   sessionBpm?: number;
   minScoredBpm?: number | null;
   runMs?: number;
+  playbackLeak?: boolean;
+  duelId?: string;
 }) => {
   vi.mocked(updateMicHighScore).mockResolvedValue({
     isNewRecord: score > previousBest,
@@ -83,8 +92,9 @@ const saveRun = async ({
       currentExercise: activeExercise,
       isMicEnabled: true,
       earTrainingScore: 0,
-      noteMatchingHandle: handleFor(score, minScoredBpm, runMs),
+      noteMatchingHandle: handleFor(score, minScoredBpm, runMs, playbackLeak),
       sessionBpm,
+      duelId,
     })
   );
 
@@ -240,6 +250,40 @@ describe("useScoreSaving overtime runs", () => {
 
   it("still keeps an overtime run as the player's own record", async () => {
     await saveRun({ score: 90_000, previousBest: 0, activeExercise: twoMinuteExercise, runMs: 10 * 60_000 });
+
+    expect(updateMicHighScore).toHaveBeenCalledWith("me", "ex1", 90_000, 99, "C Minor Pentatonic", "technique");
+    expect(markExerciseCompleted).toHaveBeenCalled();
+  });
+});
+
+describe("useScoreSaving runs the mic heard the playback in", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getExerciseUserRank).mockResolvedValue(2);
+    vi.mocked(submitDailyExerciseScore).mockResolvedValue({ isNewBest: true });
+    vi.mocked(submitDuelRun).mockResolvedValue(undefined as never);
+    vi.mocked(findDailyDayKeyFor).mockReturnValue("2026-09-30");
+  });
+
+  it("keeps the run off every board", async () => {
+    const result = await saveRun({ score: 90_000, previousBest: 0, playbackLeak: true });
+
+    expect(saveLeaderboardEntry).not.toHaveBeenCalled();
+    expect(submitDailyExerciseScore).not.toHaveBeenCalled();
+    expect(result.current.scoredRuns).toEqual([]);
+    expect(result.current.micStandingRef.current).toEqual({ bpm: 90 });
+  });
+
+  it("doesn't send it to a duel", async () => {
+    await saveRun({ score: 90_000, previousBest: 0, playbackLeak: true, duelId: "duel1" });
+    expect(submitDuelRun).not.toHaveBeenCalled();
+
+    await saveRun({ score: 90_000, previousBest: 0, duelId: "duel1" });
+    expect(submitDuelRun).toHaveBeenCalledWith({ duelId: "duel1", score: 90_000, accuracy: 99, bpm: 90 });
+  });
+
+  it("still keeps it as the player's own practice", async () => {
+    await saveRun({ score: 90_000, previousBest: 0, playbackLeak: true });
 
     expect(updateMicHighScore).toHaveBeenCalledWith("me", "ex1", 90_000, 99, "C Minor Pentatonic", "technique");
     expect(markExerciseCompleted).toHaveBeenCalled();

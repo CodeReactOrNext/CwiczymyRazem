@@ -550,5 +550,10 @@
     "string": "Cuerda {{n}} — {{name}} ({{hz}} Hz)",
     "all_tuned": "Todas las cuerdas afinadas",
     "title": "Afinador"
+  },
+  "playback_leak": {
+    "title": "Tu micrófono oye la guitarra que suena",
+    "body": "Esta ronda no entrará en las clasificaciones. Ponte auriculares o apaga el sonido de la guitarra y vuelve a empezar la ronda.",
+    "mute": "Apagar guitarra"
   }
 }

@@ -87,11 +87,6 @@ export function SupportModal({ isOpen, onClose, onDonate }: SupportModalProps) {
                   {isCovered ? t("funding.covered") : t("funding.needs_help")}
                 </span>
               </span>
-              {!isCovered && (
-                <span className='shrink-0 font-semibold text-zinc-100'>
-                  ${covered} / ${MONTHLY_RUNNING_COST}
-                </span>
-              )}
             </div>
 
             <div className='mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800'>

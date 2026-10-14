@@ -1,7 +1,9 @@
 
 import { useCallback,useEffect, useMemo, useRef, useState } from "react";
+import type { Spectrum } from "utils/audio/chordTones";
+import { spectrumFromAnalyser } from "utils/audio/chordTones";
 
-import type { DetectedNoteEvent } from "./guitarBufferProcessor";
+import type { DetectedNoteEvent, InputTap } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
 
 interface AudioAnalyzerState {
@@ -21,9 +23,10 @@ export interface AudioRefs {
    *  fires on broadband transients like tick/thud even when pitch is absent). */
   lastTickTimeRef: React.MutableRefObject<number>;
   confidenceRef: React.MutableRefObject<number>;
-  analyserRef: React.MutableRefObject<AnalyserNode | null>;
-  /** Chromagram snapshot taken at the most recent onset — cleaner than live FFT */
-  onsetChromaRef: React.MutableRefObject<Float32Array | null>;
+  /** The input's live magnitude spectrum (~170 ms), or null with nothing to
+   *  read — what chords are graded on (utils/audio/chordTones.ts). The web path
+   *  reads its AnalyserNode, the native one computes it from its own PCM. */
+  readSpectrum?: () => Spectrum | null;
   /** Measured ambient noise floor (see guitarBufferProcessor.ts), same 0–1 scale
    *  as rawVolumeRef. 0 means "not measured yet this session". */
   noiseFloorRef: React.MutableRefObject<number>;
@@ -35,6 +38,9 @@ export interface AudioRefs {
   /** Precise time of the most recent attack (see guitarBufferProcessor) — what
    *  note timing is graded against. 0 until the first attack. */
   lastAttackMsRef?: React.MutableRefObject<number>;
+  /** Set by whoever wants the raw input itself (see InputTap) — today the
+   *  check for the app's own playback leaking into the mic. */
+  inputTapRef?: React.MutableRefObject<InputTap | null>;
 }
 
 const GAIN_STORAGE_KEY = "audio_input_gain";
@@ -86,7 +92,6 @@ export const useAudioAnalyzer = () => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const workletNodeRef = useRef<AudioWorkletNode | null>(null);
   const analyserNodeRef = useRef<AnalyserNode | null>(null);
-  const onsetChromaRef = useRef<Float32Array | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const inputGainRef = useRef<number>(loadPersistedGain());
   const pitchDetectorRef = useRef<any>(null);
@@ -106,6 +111,7 @@ export const useAudioAnalyzer = () => {
   const lastTickTimeRef = useRef<number>(0);
   const noteEventsRef = useRef<DetectedNoteEvent[]>([]);
   const lastAttackMsRef = useRef<number>(0);
+  const inputTapRef = useRef<InputTap | null>(null);
 
   const init = useCallback(async () => {
     try {
@@ -149,7 +155,7 @@ export const useAudioAnalyzer = () => {
 
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 8192;
-      analyser.smoothingTimeConstant = 0.1; // fast decay → cleaner onset snapshots
+      analyser.smoothingTimeConstant = 0.1; // fast decay → a fresh chord reads as itself
       source.connect(analyser);
       analyserNodeRef.current = analyser;
 
@@ -177,10 +183,9 @@ export const useAudioAnalyzer = () => {
         detectors,
         getGain: () => inputGainRef.current,
         sampleRate: audioContext.sampleRate,
-        analyser: analyserNodeRef, // chromagram-at-onset snapshots (web path)
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, onsetChromaRef, noteEventsRef, lastAttackMsRef,
+          lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, inputTapRef,
         },
         onActive: () => {
           setState(prev =>
@@ -256,7 +261,6 @@ export const useAudioAnalyzer = () => {
     pitchDetectorRef.current = null;
     onsetDetectorRef.current = null;
     tickDetectorRef.current = null;
-    onsetChromaRef.current = null;
     frequencyRef.current = 0;
     volumeRef.current = 0;
     rawVolumeRef.current = 0;
@@ -294,7 +298,12 @@ export const useAudioAnalyzer = () => {
     return baseLatency + outputLatency + bufferLatency + 30;
   }, []);
 
-  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef, noteEventsRef, lastAttackMsRef };
+  const readSpectrum = useCallback(
+    () => (analyserNodeRef.current ? spectrumFromAnalyser(analyserNodeRef.current) : null),
+    [],
+  );
+
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, readSpectrum, noteEventsRef, lastAttackMsRef, inputTapRef };
 
   return useMemo(() => ({
     ...state,

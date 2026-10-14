@@ -60,7 +60,7 @@ function drive(focus: ScoringFocus, tablature: TablatureMeasure[], pitchOf: (ms:
   const audioRefs = {
     frequencyRef: { current: 0 }, volumeRef: { current: 0 }, rawVolumeRef: { current: 0 },
     lastOnsetTimeRef: { current: 0 }, lastTickTimeRef: { current: 0 }, confidenceRef: { current: 0.9 },
-    analyserRef: { current: null }, onsetChromaRef: { current: null }, noiseFloorRef: { current: 0 },
+    noiseFloorRef: { current: 0 },
     noteEventsRef: { current: [] }, lastAttackMsRef: { current: 0 },
   } as unknown as AudioRefs;
 

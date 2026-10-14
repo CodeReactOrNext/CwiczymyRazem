@@ -107,7 +107,7 @@ async function runProcessor(signal: Float32Array, highRes: boolean) {
   const targets = {
     frequencyRef: { current: 0 }, volumeRef: { current: 0 }, rawVolumeRef: { current: 0 },
     confidenceRef: { current: 0 }, lastOnsetTimeRef: { current: 0 }, lastTickTimeRef: { current: 0 },
-    onsetChromaRef: { current: null }, noiseFloorRef: { current: 0 },
+    noiseFloorRef: { current: 0 },
     noteEventsRef: { current: [] as DetectedNoteEvent[] },
   } as any;
 
@@ -116,7 +116,7 @@ async function runProcessor(signal: Float32Array, highRes: boolean) {
   const nowSpy = vi.spyOn(Date, "now").mockImplementation(() => virtualMs);
 
   const process = createGuitarBufferProcessor({
-    detectors, targets, getGain: () => 3.0, analyser: null, sampleRate: SR,
+    detectors, targets, getGain: () => 3.0, sampleRate: SR,
   });
 
   const samples: Sample[] = [];

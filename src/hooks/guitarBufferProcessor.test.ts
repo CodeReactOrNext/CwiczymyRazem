@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { isChordToneSounding } from "utils/audio/chordTones";
+import { createPcmSpectrum } from "utils/audio/pcmSpectrum";
+import { describe, expect, it, vi } from "vitest";
 
 import type { GuitarDetectors } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor } from "./guitarBufferProcessor";
@@ -41,7 +43,6 @@ function makeTargets() {
     confidenceRef: { current: 0 },
     lastOnsetTimeRef: { current: 0 },
     lastTickTimeRef: { current: 0 },
-    onsetChromaRef: { current: null as Float32Array | null },
   };
 }
 
@@ -188,5 +189,48 @@ describe("createGuitarBufferProcessor attack-phase pitch handling", () => {
     });
     process(loudWindow());
     expect(targets.frequencyRef.current).toBe(0);
+  });
+});
+
+describe("createGuitarBufferProcessor input tap", () => {
+  it("hands every window to the tap raw, silent ones included", () => {
+    const tap = vi.fn();
+    const process = createGuitarBufferProcessor({
+      detectors: makeDetectors([110]),
+      targets: { ...makeTargets(), inputTapRef: { current: tap } },
+      getGain: () => 3,
+      sampleRate: 44100,
+    });
+    const loud = loudWindow();
+    process(loud);
+    process(new Float32Array(2048));
+    process(new Float32Array(2048)); // confirmed silence returns early — after the tap
+    expect(tap).toHaveBeenCalledTimes(3);
+    expect(tap.mock.calls[0][0]).toBe(loud); // ungained
+    expect(tap.mock.calls[0][1]).toBe(44100);
+  });
+});
+
+describe("createGuitarBufferProcessor spectrum without an AnalyserNode (native path)", () => {
+  /** 2048 samples of A4, continuing from `windowIndex` windows in. */
+  const a4Window = (windowIndex: number) => {
+    const buf = new Float32Array(2048);
+    for (let n = 0; n < buf.length; n++) buf[n] = 0.1 * Math.sin((2 * Math.PI * 440 * (windowIndex * 2048 + n)) / 48000);
+    return buf;
+  };
+
+  it("feeds every window into the PCM spectrum the chords are graded on", () => {
+    const spectrum = createPcmSpectrum(48000);
+    const process = createGuitarBufferProcessor({
+      detectors: makeDetectors([440]),
+      targets: makeTargets(),
+      getGain: () => 3,
+      spectrum,
+    });
+    expect(spectrum.read()).toBeNull();
+    for (let w = 0; w < 4; w++) process(a4Window(w));
+    const heard = spectrum.read()!;
+    expect(isChordToneSounding(heard, 440, { ratio: 0.6, floor: 0.05 })).toBe(true);
+    expect(isChordToneSounding(heard, 466.16, { ratio: 0.6, floor: 0.05 })).toBe(false); // A#4
   });
 });
