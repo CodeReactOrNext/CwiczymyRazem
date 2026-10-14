@@ -1,6 +1,8 @@
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { computeChromagram, correctOctaveForLowStrings, freqToPitchClass, getAdaptiveVolumeGate, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
+import type { Spectrum } from "utils/audio/chordTones";
+import { CHORD_TONE_HIT, CHORD_TONE_SUSTAIN, createChordToneEvidence, isChordToneSounding, spectrumPeak } from "utils/audio/chordTones";
+import { correctOctaveForLowStrings, getAdaptiveVolumeGate, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import type { IntonationKind, LivePitch, ScoringFocus } from "../utils/pitchScoring";
@@ -15,7 +17,6 @@ import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
 import { useGameState } from "./useGameState";
 
 const CENTS_TOLERANCE      = 45;
-const CHORD_CHROMA_THRESHOLD = 0.55;
 const VOLUME_GATE          = 0.005;
 
 interface UseNoteMatchingOptions {
@@ -91,9 +92,12 @@ export function useNoteMatching({
   /** The bend or release under the cursor right now, for the tab to animate.
    *  Written every matching tick, read by the tab's own frame loop. */
   const livePitchRef = useRef<LivePitch | null>(null);
+  /** When each chord tone was first heard after its attack (chordTones.ts). */
+  const chordEvidenceRef = useRef(createChordToneEvidence());
 
   const resetGame = useCallback(() => {
     pendingIntonationRef.current.clear();
+    chordEvidenceRef.current.clear();
     livePitchRef.current = null;
     resetGameState();
   }, [resetGameState]);
@@ -101,6 +105,7 @@ export function useNoteMatching({
   // A new exercise starts its own run; useGameState resets the rest.
   useEffect(() => {
     pendingIntonationRef.current.clear();
+    chordEvidenceRef.current.clear();
   }, [currentExerciseIndex]);
 
   /** Banks a pitch-graded note once it has played out: its points, at the
@@ -288,11 +293,15 @@ export function useNoteMatching({
         ? getAdaptiveVolumeGate(audioRefs.noiseFloorRef.current)
         : VOLUME_GATE;
 
-      // Lazy chromagram — computed at most once per tick, only for chord beats
-      let chromagram: Float32Array | null | undefined = undefined;
-      const getChromagram = (): Float32Array | null => {
-        if (chromagram === undefined) chromagram = audioRefs.analyserRef.current ? computeChromagram(audioRefs.analyserRef.current) : null;
-        return chromagram;
+      // Lazy spectrum — read at most once per tick, only for chord beats, with
+      // its loudest peak (what every chord tone's level is held against).
+      let spectrum: { heard: Spectrum; peak: number } | null | undefined = undefined;
+      const getSpectrum = () => {
+        if (spectrum === undefined) {
+          const heard = audioRefs.readSpectrum?.() ?? null;
+          spectrum = heard ? { heard, peak: spectrumPeak(heard) } : null;
+        }
+        return spectrum;
       };
 
       const beatsPerSec      = effectiveBpm / 60;
@@ -323,6 +332,7 @@ export function useNoteMatching({
         missedNotesRef.current = {};
         processedNotesRef.current.clear();
         consumedAttacksRef.current.clear();
+        chordEvidenceRef.current.clear();
         needsFlushRef.current = true;
       }
       lastLoopedBeatsRef.current = loopedBeatsElapsed;
@@ -373,7 +383,7 @@ export function useNoteMatching({
         for (let i = startIdx; i < flatBeats.length; i++) {
           const { beat, beatStart, beatEnd, notes } = flatBeats[i];
           if (beatStart > loopedBeatsElapsed + earlyWindowBeats + 1) break;
-          // Chords are graded on the chromagram, not on a single pitch.
+          // Chords are graded on the spectrum, not on a single pitch.
           if (beat.notes.length !== 1) continue;
           const inWindow = loopedBeatsElapsed >= beatStart - earlyWindowBeats
             && loopedBeatsElapsed <= beatEnd + windowBeats;
@@ -393,7 +403,7 @@ export function useNoteMatching({
               timeMs: now + (beatStart - loopedBeatsElapsed) * msPerBeat,
               targetFreq,
               toleranceCents: baseToleranceFor(targetFreq),
-              volumeGate: getDetectionGates(targetFreq, volumeGateBase, CHORD_CHROMA_THRESHOLD).volumeGate,
+              volumeGate: getDetectionGates(targetFreq, volumeGateBase).volumeGate,
               ...(isContinuation[i] && { earliestDeltaMs: continuationAttackFloorMs((beatEnd - beatStart) * msPerBeat) }),
             });
           }
@@ -439,24 +449,21 @@ export function useNoteMatching({
           // pre-bent, bend — see the bend branch below. 0 for every other note.)
           const { targetFreq, preBendTargetFreq } = targetFreqsFor(note);
 
-          // High strings (≥ E4) ring quieter and carry weaker chroma energy, so
-          // relax the volume/chroma gates there to cut false negatives.
-          const gates = getDetectionGates(targetFreq, volumeGateBase, CHORD_CHROMA_THRESHOLD);
+          // High strings (≥ E4) ring quieter, so relax the volume gate there to
+          // cut false negatives.
+          const gates = getDetectionGates(targetFreq, volumeGateBase);
 
           // Is this note's correct pitch sounding *right now*? Shared by the initial
-          // grade and the sustain tracking below. `liveChroma` forces the live FFT
-          // (used while holding) over the onset snapshot (used at the attack).
-          const pitchIsSounding = (liveChroma: boolean): boolean => {
+          // grade and the sustain tracking below (`sustaining`).
+          const pitchIsSounding = (sustaining: boolean): boolean => {
             if (note.isDead) return hasRecentTick || hasRecentOnset;
             if (beat.notes.length > 1) {
-              const chroma = (liveChroma || !requiresOnset) ? getChromagram() : audioRefs.onsetChromaRef.current;
-              // liveChroma is only ever true from the sustain-tracking call below
-              // (never the initial-hit grade) — use the lower hysteresis threshold
-              // there so a naturally decaying chord's fill doesn't cut off the
-              // instant one note's energy dips slightly below the (stricter)
-              // threshold that was needed to register the hit in the first place.
-              const threshold = liveChroma ? gates.sustainChromaThreshold : gates.chordChromaThreshold;
-              return !!chroma && chroma[freqToPitchClass(targetFreq)] >= threshold;
+              // A chord tone is looked for at its own frequency in the live
+              // spectrum (chordTones.ts). A tone already hit only has to stay
+              // there, which a decaying string does more faintly — an easier bar,
+              // so the fill doesn't cut off the moment one string fades a little.
+              const live = getSpectrum();
+              return !!live && isChordToneSounding(live.heard, targetFreq, sustaining ? CHORD_TONE_SUSTAIN : CHORD_TONE_HIT, live.peak);
             }
             // Thicker strings (like E6) often drift sharp on attack and are harder to tune…
             const baseTolerance = baseToleranceFor(targetFreq);
@@ -539,9 +546,14 @@ export function useNoteMatching({
             const hasOwnRecentAttack = isContinuation[i]
               ? Math.max(lastOnsetTime, lastTickTime) - dueMs >= attackFloorMs
               : hasRecentOnset || hasRecentTick;
-            const liveHit = currentVolume > gates.volumeGate
-              && (hasOwnRecentAttack || !requiresOnset)
-              && pitchIsSounding(false);
+            const mayHit = currentVolume > gates.volumeGate && (hasOwnRecentAttack || !requiresOnset);
+            // A chord tone is read in every frame after the strum, not just at
+            // the attack — the strum's last string lands tens of ms after its
+            // first — and counts once it has held for a moment, so a pick's
+            // transient can't pass for it.
+            const liveHit = mayHit && (beat.notes.length > 1
+              ? chordEvidenceRef.current.observe(noteKey, lastOnsetTime, now, pitchIsSounding(false))
+              : pitchIsSounding(false));
 
             if (liveHit || eventHits.has(noteKey)) {
               // First (and only) grade of this note — the guards above guarantee

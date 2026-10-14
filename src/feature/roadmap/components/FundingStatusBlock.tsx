@@ -3,7 +3,6 @@ import { tierLabel } from "feature/roadmap/utils/tierText";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, TriangleAlert } from "lucide-react";
 
-import { MONTHLY_RUNNING_COST } from "../data/roadmap.data";
 import { getFundingStatus } from "../utils/fundingStatus";
 
 interface FundingStatusBlockProps {
@@ -29,7 +28,7 @@ export const FundingStatusBlock = ({
   className,
 }: FundingStatusBlockProps) => {
   const { t } = useTranslation("supporter");
-  const { covered, isCovered, costPct, nextTier, toGo, tierPct, showsTier } =
+  const { isCovered, costPct, nextTier, toGo, tierPct, showsTier } =
     getFundingStatus(totalRaised, raisedThisMonth);
   const NextTierIcon = nextTier?.icon;
 
@@ -69,11 +68,6 @@ export const FundingStatusBlock = ({
                 {isCovered ? t("funding.covered") : t("funding.needs_help")}
               </span>
             </span>
-            {!isCovered && (
-              <span className='shrink-0 font-semibold text-zinc-100'>
-                ${covered} / ${MONTHLY_RUNNING_COST}
-              </span>
-            )}
           </>
         )}
       </div>

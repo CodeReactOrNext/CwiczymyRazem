@@ -1,5 +1,5 @@
 // Shared guitar DSP: turns a window of mono Float32 PCM into the realtime refs
-// (frequency / volume / onset / tick / chroma) consumed by PracticeSession.
+// (frequency / volume / onset / tick) consumed by PracticeSession.
 //
 // Used by BOTH input paths so they stay byte-for-byte identical:
 //   • useAudioAnalyzer       — browser getUserMedia → AudioWorklet (web build)
@@ -7,7 +7,8 @@
 //
 // The only difference between paths is *where the buffer comes from*; the math
 // below is the single source of truth.
-import { computeChromagram, HIGH_STRING_MIN_FREQ } from "utils/audio/noteUtils";
+import { HIGH_STRING_MIN_FREQ } from "utils/audio/noteUtils";
+import type { PcmSpectrum } from "utils/audio/pcmSpectrum";
 
 export interface GuitarDetectors {
   /** aubio Pitch ("yinfft", 2048, 512, sampleRate), tolerance 0.7 */
@@ -44,6 +45,13 @@ export interface DetectedNoteEvent {
   peakVolume: number;
 }
 
+/**
+ * Hears every captured window, raw (ungained), at the capture rate — for a
+ * listener after something other than the guitar (usePlaybackLeakGuard). The
+ * buffer is reused, so copy whatever is kept past the call.
+ */
+export type InputTap = (samples: Float32Array, sampleRate: number) => void;
+
 export interface ProcessorTargets {
   frequencyRef: React.MutableRefObject<number>;
   volumeRef: React.MutableRefObject<number>;
@@ -51,7 +59,6 @@ export interface ProcessorTargets {
   confidenceRef: React.MutableRefObject<number>;
   lastOnsetTimeRef: React.MutableRefObject<number>;
   lastTickTimeRef: React.MutableRefObject<number>;
-  onsetChromaRef: React.MutableRefObject<Float32Array | null>;
   /** Measured ambient noise floor, same 0–1 scale as rawVolumeRef. Updated only
    *  during confirmed-silent windows (see below); 0 means "not measured yet" —
    *  consumers (useNoteMatching) should fall back to a fixed gate until then.
@@ -67,6 +74,8 @@ export interface ProcessorTargets {
    *  of the block instead — good enough for "was there an attack lately", too
    *  coarse to grade timing by. */
   lastAttackMsRef?: React.MutableRefObject<number>;
+  /** Optional: whoever is listening in on the raw input (see InputTap). */
+  inputTapRef?: React.MutableRefObject<InputTap | null>;
 }
 
 export interface BufferProcessorOptions {
@@ -76,8 +85,9 @@ export interface BufferProcessorOptions {
   getGain: () => number;
   /** Capture sample rate — only used to time onsets within a block. */
   sampleRate?: number;
-  /** Optional AnalyserNode for chromagram snapshots (web path only). */
-  analyser?: React.MutableRefObject<AnalyserNode | null> | null;
+  /** Spectrum computed from the captured PCM itself, for a path with no
+   *  AnalyserNode (native) — fed every window, read by the chord grading. */
+  spectrum?: PcmSpectrum | null;
   /** Called (already throttled to ~10Hz) the first time signal is flowing. */
   onActive?: () => void;
 }
@@ -88,7 +98,7 @@ export interface BufferProcessorOptions {
  * state persists across calls.
  */
 export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
-  const { detectors, targets, getGain, analyser, onActive, sampleRate = 48000 } = opts;
+  const { detectors, targets, getGain, spectrum, onActive, sampleRate = 48000 } = opts;
   const { pitch: pitchDetector, onset: onsetDetector, tick: tickDetector, pitchHigh: pitchHighDetector } = detectors;
 
   let lastFrequencies: number[] = [];
@@ -208,6 +218,10 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     const len = inputBuffer.length;
     const gain = getGain();
     if (!normalizedBuf || normalizedBuf.length !== len) normalizedBuf = new Float32Array(len);
+    // Ungained, like the web path's analyser, which taps the source directly.
+    // Before the silence gate, so a chord read after a pause isn't stale audio.
+    spectrum?.push(inputBuffer);
+    targets.inputTapRef?.current?.(inputBuffer, sampleRate);
 
     // 1. Apply gain and calculate RMS volume + peak from gained signal
     let sum = 0;
@@ -320,12 +334,6 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
 
     if (isOnset) {
       targets.lastOnsetTimeRef.current = nowMs;
-      // Snapshot chromagram at onset (web path only — native has no AnalyserNode).
-      const node = analyser?.current;
-      if (node) {
-        const snap = computeChromagram(node);
-        if (snap) targets.onsetChromaRef.current = snap;
-      }
     }
 
     // 4. Threshold & median stabilization

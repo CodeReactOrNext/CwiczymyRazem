@@ -72,7 +72,7 @@
       "headline_covered": "Server cost this month is covered",
       "headline": "Server cost needs your help",
       "body_covered": "This month's hosting is already funded. Anything extra goes straight to the roadmap below.",
-      "body": "Riff Quest is a one person project, free and built in the open. ${{raised}} of ${{goal}} raised so far this month."
+      "body": "Riff Quest is a one person project, free and built in the open. This month's hosting isn't covered yet."
     },
     "one_person": {
       "eyebrow": "One person project",
@@ -104,7 +104,7 @@
     },
     "social_proof": {
       "eyebrow": "Community support",
-      "headline": "{{supporters}} supporters have chipped in ${{raised}} this month",
+      "headline": "{{supporters}} players have supported Riff Quest so far",
       "headline_none": "Riff Quest is funded by the community",
       "body": "It keeps Riff Quest free and funds the roadmap. Tap to see where it goes."
     }

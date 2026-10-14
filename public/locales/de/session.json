@@ -550,5 +550,10 @@
     "string": "Saite {{n}} — {{name}} ({{hz}} Hz)",
     "all_tuned": "Alle Saiten gestimmt",
     "title": "Stimmgerät"
+  },
+  "playback_leak": {
+    "title": "Dein Mikrofon hört die Gitarrenwiedergabe",
+    "body": "Dieser Durchgang kommt nicht in die Ranglisten. Setz Kopfhörer auf oder schalte den Gitarrenklang aus und starte den Durchgang neu.",
+    "mute": "Gitarre aus"
   }
 }

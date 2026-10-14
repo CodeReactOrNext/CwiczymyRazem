@@ -120,11 +120,16 @@ export interface NoteMatchingSnapshot {
   /** Practice time the run has been scoring over, in ms — the exercise clock
    *  since the score last went to zero. Absent without an exercise clock. */
   runMs?: number;
+  /** The mic heard the tab's own playback at some point of the run (see
+   *  usePlaybackLeakGuard), so its notes may have scored off the speakers. */
+  playbackLeak?: boolean;
 }
 
 export interface NoteMatchingHandle {
   resetGame: () => void;
   snapshot: () => NoteMatchingSnapshot;
+  /** The mic heard the tab's own playback — the run carries it to the end. */
+  markPlaybackLeak?: () => void;
 }
 
 // ── Context ───────────────────────────────────────────────────────────────────
@@ -232,6 +237,9 @@ interface NoteMatchingProviderProps {
   // fired once when a click-hunt exam hits the mistake limit — PracticeSession
   // uses this to abort the exam immediately as a failure
   onExamFail?: () => void;
+  // true while the mic is known to hear the tab's own playback — a run that
+  // starts over while it still does starts out marked (usePlaybackLeakGuard)
+  playbackLeakingRef?: React.MutableRefObject<boolean>;
 }
 
 export function NoteMatchingProvider({
@@ -268,6 +276,7 @@ export function NoteMatchingProvider({
   getSessionTimeMs,
   isExamMode = false,
   onExamFail,
+  playbackLeakingRef,
 }: NoteMatchingProviderProps) {
   const {
     hitNotes,
@@ -512,11 +521,15 @@ export function NoteMatchingProvider({
   const getSessionTimeRef = useRef(getSessionTimeMs);
   useEffect(() => { getSessionTimeRef.current = getSessionTimeMs; }, [getSessionTimeMs]);
   const runStartMsRef = useRef(0);
+  // Whether the mic heard the tab's own playback during this run.
+  const runPlaybackLeakRef = useRef(false);
   const markRunStart = useCallback(() => {
     runStartMsRef.current = getSessionTimeRef.current?.() ?? 0;
+    // Starting over doesn't take the speakers away: still heard, still marked.
+    runPlaybackLeakRef.current = playbackLeakingRef?.current ?? false;
     // The listening quizzes keep their run outside this context; it starts over with ours.
     useEarQuizRunStore.getState().reset();
-  }, []);
+  }, [playbackLeakingRef]);
   // A new exercise starts its own run, on whatever time its clock resumes from.
   useEffect(markRunStart, [currentExerciseIndex, markRunStart]);
 
@@ -529,6 +542,9 @@ export function NoteMatchingProvider({
   // Populate the imperative handle on every render — safe, it's just a ref assignment
   handleRef.current = {
     resetGame: resetGameAndProgress,
+    markPlaybackLeak: () => {
+      runPlaybackLeakRef.current = true;
+    },
     // The tempo ref is read live: hits land in the RAF loop between renders.
     snapshot: () => {
       // A run summed up while its last note still rings: bank that note now,
@@ -557,6 +573,7 @@ export function NoteMatchingProvider({
         ...(sessionMs !== undefined && {
           runMs: sessionMs >= runStartMsRef.current ? sessionMs - runStartMsRef.current : sessionMs,
         }),
+        playbackLeak: runPlaybackLeakRef.current,
       };
     },
   };

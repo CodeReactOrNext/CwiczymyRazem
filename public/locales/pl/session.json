@@ -552,5 +552,10 @@
     "string": "Struna {{n}} — {{name}} ({{hz}} Hz)",
     "all_tuned": "Wszystkie struny nastrojone",
     "title": "Stroik"
+  },
+  "playback_leak": {
+    "title": "Mikrofon słyszy odtwarzaną gitarę",
+    "body": "Ten przebieg nie trafi do rankingów. Załóż słuchawki albo wyłącz dźwięk gitary i zacznij przebieg od nowa.",
+    "mute": "Wyłącz gitarę"
   }
 }

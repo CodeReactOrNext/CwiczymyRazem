@@ -72,7 +72,7 @@
       "headline_covered": "El coste del servidor de este mes está cubierto",
       "headline": "El coste del servidor necesita tu ayuda",
       "body_covered": "El hosting de este mes ya está financiado. Todo lo extra va directo a la roadmap de abajo.",
-      "body": "Riff Quest es un proyecto de una sola persona, gratuito y hecho a la vista de todos. Este mes se han reunido ${{raised}} de ${{goal}}."
+      "body": "Riff Quest es un proyecto de una sola persona, gratuito y hecho a la vista de todos. El alojamiento de este mes aún no está cubierto."
     },
     "one_person": {
       "eyebrow": "Proyecto de una persona",
@@ -104,7 +104,7 @@
     },
     "social_proof": {
       "eyebrow": "Apoyo de la comunidad",
-      "headline": "{{supporters}} mecenas han aportado ${{raised}} este mes",
+      "headline": "{{supporters}} jugadores ya han apoyado Riff Quest",
       "headline_none": "Riff Quest lo financia la comunidad",
       "body": "Mantiene Riff Quest gratis y financia la roadmap. Toca para ver a dónde va."
     }

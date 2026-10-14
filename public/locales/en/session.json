@@ -550,5 +550,10 @@
     "string": "String {{n}} — {{name}} ({{hz}} Hz)",
     "all_tuned": "All strings in tune",
     "title": "Tuner"
+  },
+  "playback_leak": {
+    "title": "Your mic can hear the guitar playback",
+    "body": "This run won't go on the leaderboards. Put on headphones or turn the guitar sound off, then start the run over.",
+    "mute": "Turn guitar off"
   }
 }

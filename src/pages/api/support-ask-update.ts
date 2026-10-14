@@ -65,7 +65,10 @@ export default async function handler(
       type: "support_ask_update",
       data: new Date().toISOString(),
       variant,
-      raisedThisMonth: funding.raisedThisMonth,
+      // Every client reading the feed can see this document, and the month's takings stay
+      // private. Capped at the running cost it still answers "is hosting covered?", which
+      // is all the card needs, without revealing how far past it the month went.
+      raisedThisMonth: Math.min(funding.raisedThisMonth, MONTHLY_RUNNING_COST),
       monthlyGoal: MONTHLY_RUNNING_COST,
       totalRaised,
       supporters: funding.supporters,

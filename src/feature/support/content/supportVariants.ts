@@ -102,8 +102,7 @@ export function getSupportVariantCopy(
             )
           : tr(
               "server_cost.body",
-              "Riff Quest is a one person project, free and built in the open. ${{raised}} of ${{goal}} raised so far this month.",
-              { raised: ctx.raisedThisMonth, goal: ctx.monthlyGoal },
+              "Riff Quest is a one person project, free and built in the open. This month's hosting isn't covered yet.",
             ),
       };
     }
@@ -215,14 +214,16 @@ export function getSupportVariantCopy(
     }
 
     case "social_proof": {
+      // The month's takings stay private — the card counts people, never dollars.
+      // `supporters` is the lifetime count, so the copy doesn't pin it to this month.
       return {
         eyebrow: tr("social_proof.eyebrow", "Community support"),
         headline:
           ctx.supporters > 0
             ? tr(
                 "social_proof.headline",
-                "{{supporters}} supporters have chipped in ${{raised}} this month",
-                { supporters: ctx.supporters, raised: ctx.raisedThisMonth },
+                "{{supporters}} players have supported Riff Quest so far",
+                { supporters: ctx.supporters },
               )
             : tr(
                 "social_proof.headline_none",
