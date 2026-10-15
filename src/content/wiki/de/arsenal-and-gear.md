@@ -28,7 +28,7 @@ Zeig auf einen Sockel, um die volle Karte zu lesen, ohne das Board zu verlassen,
 
 ## Kisten öffnen
 
-<StatRow stats="80 Fame:Teile-Kiste (nur Teile für den Gitarren-Builder)|180 Fame:Standard-Kiste (alles kann fallen)|260 Fame:Featured-Kiste (ein rotierender Pool aus 10 Gegenständen)|350 Fame:Premium-Kiste (Gitarren oder Effekte, bessere Chancen)|500 Fame:Elite-Kiste (Gitarren oder Effekte, Selten oder besser garantiert)|1200 Fame:Vault-Kiste (Gitarren oder Effekte, Episch oder besser garantiert)" caption="Der Featured-Pool rotiert nach festem Plan alle paar Tage, und alle sehen dieselbe Rotation." />
+<StatRow stats="180 Fame:Standard-Kiste (alles kann fallen)|260 Fame:Featured-Kiste (ein rotierender Pool aus 10 Gegenständen)|300 Fame:Teile-Kiste (nur Teile für den Gitarren-Builder)|350 Fame:Premium-Kiste (Gitarren oder Effekte, bessere Chancen)|500 Fame:Elite-Kiste (Gitarren oder Effekte, Selten oder besser garantiert)|1200 Fame:Vault-Kiste (Gitarren oder Effekte, Episch oder besser garantiert)" caption="Der Featured-Pool rotiert nach festem Plan alle paar Tage, und alle sehen dieselbe Rotation." />
 
 Eine Gear-Kiste liefert immer Equipment. Teile für den Gitarren-Builder kommen aus der Teile-Kiste und von nirgendwo sonst, also ist jede Zahl in den Drop-Raten einer Kiste die Zahl, die deinen Zug entscheidet.
 

@@ -28,7 +28,7 @@ Apunta a un hueco para leer la tarjeta completa sin salir del tablero, y haz cli
 
 ## Abrir cajas
 
-<StatRow stats="80 Fame:Caja de piezas (solo piezas del Constructor de guitarras)|180 Fame:Caja Estándar (puede caer cualquier cosa)|260 Fame:Caja destacada (un conjunto rotatorio de 10 objetos)|350 Fame:Caja Premium (guitarras o efectos, mejores probabilidades)|500 Fame:Caja Elite (guitarras o efectos, Rara o mejor garantizada)|1200 Fame:Caja Vault (guitarras o efectos, Épica o mejor garantizada)" caption="El conjunto de la Destacada rota según un horario fijo cada pocos días, y todo el mundo ve la misma rotación." />
+<StatRow stats="180 Fame:Caja Estándar (puede caer cualquier cosa)|260 Fame:Caja destacada (un conjunto rotatorio de 10 objetos)|300 Fame:Caja de piezas (solo piezas del Constructor de guitarras)|350 Fame:Caja Premium (guitarras o efectos, mejores probabilidades)|500 Fame:Caja Elite (guitarras o efectos, Rara o mejor garantizada)|1200 Fame:Caja Vault (guitarras o efectos, Épica o mejor garantizada)" caption="El conjunto de la Destacada rota según un horario fijo cada pocos días, y todo el mundo ve la misma rotación." />
 
 Una caja de equipo siempre suelta equipo. Las piezas del Constructor de guitarras salen de la Caja de piezas y de ningún otro sitio, así que cada número de las probabilidades de una caja es el número que decide tu tirada.
 

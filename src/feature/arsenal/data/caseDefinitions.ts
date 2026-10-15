@@ -11,9 +11,9 @@ import type { CaseDefinition } from "../types/arsenal.types";
  * cheap cases made "open another" the default move, and the top of the shelf was
  * only 2.6 times the bottom, so there was no case worth saving for.
  *
- *   Parts Crate     80   Guitar Builder parts, nothing else
  *   Standard       180   anything can drop
  *   Featured       260   a rotating pool of 10
+ *   Parts Crate    300   Guitar Builder parts, nothing else
  *   Premium        350   guitars *or* pedals, Rare and better is the main course
  *   Supporter      420   six items the supporters voted onto the slate
  *   Elite          500   Rare or better, guaranteed
@@ -77,15 +77,17 @@ export const CASE_PACK_SIZES = [5, 10] as const;
 
 export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
   /**
-   * Guitar Builder parts, rolled on the old Standard table. Cheap, because a part
-   * is a currency rather than a chase: what it is worth is the level it adds to
-   * a build, and that is what the price is for.
+   * Guitar Builder parts, rolled on the old Standard table. A part is a currency
+   * rather than a chase — what it is worth is the level it adds to a build — but
+   * the crate is a purchase for someone building a guitar, not something to click
+   * through, so it is priced between the Featured and the Premium case instead of
+   * under everything on the shelf.
    */
   parts: {
     id: "parts",
     name: "Parts Crate",
     description: "Guitar Builder parts only. Never gear.",
-    fameCost: 80,
+    fameCost: 300,
     dropKind: "component",
     yearFrom: 2020,
     yearTo: 2023,

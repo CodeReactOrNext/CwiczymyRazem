@@ -84,11 +84,11 @@ describe("case probability tables", () => {
 describe("the shelf's price ladder", () => {
   const cost = (id: string) => CASE_DEFINITIONS[id].fameCost;
 
-  it("climbs from the crate to the vault without a tie", () => {
+  it("climbs from Standard to the vault without a tie, the crate among them", () => {
     const ladder = [
-      "parts",
       "standard",
       "daily",
+      "parts",
       "premium-guitar",
       "supporter",
       "elite-guitar",

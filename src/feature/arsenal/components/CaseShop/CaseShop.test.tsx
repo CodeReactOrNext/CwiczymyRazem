@@ -225,7 +225,7 @@ describe("CaseShop", () => {
     const parts = card("Parts Crate");
     expect(parts.textContent).not.toContain("New model");
     expect(parts.textContent).not.toContain("or better in");
-    expect(parts.textContent).toContain("80");
+    expect(parts.textContent).toContain("300");
   });
 
   it("marks a case the player cannot afford", () => {

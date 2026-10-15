@@ -28,7 +28,7 @@ Point at a socket to read the full card without leaving the board, and click it 
 
 ## Opening cases
 
-<StatRow stats="80 Fame:Parts Crate (Guitar Builder parts only)|180 Fame:Standard Case (anything can drop)|260 Fame:Featured Case (a rotating pool of 10 items)|350 Fame:Premium Case (guitars or effects, better odds)|500 Fame:Elite Case (guitars or effects, Rare or better guaranteed)|1200 Fame:Vault Case (guitars or effects, Epic or better guaranteed)" caption="The Featured pool rotates on a fixed schedule every few days, and everyone sees the same rotation." />
+<StatRow stats="180 Fame:Standard Case (anything can drop)|260 Fame:Featured Case (a rotating pool of 10 items)|300 Fame:Parts Crate (Guitar Builder parts only)|350 Fame:Premium Case (guitars or effects, better odds)|500 Fame:Elite Case (guitars or effects, Rare or better guaranteed)|1200 Fame:Vault Case (guitars or effects, Epic or better guaranteed)" caption="The Featured pool rotates on a fixed schedule every few days, and everyone sees the same rotation." />
 
 A gear case always drops gear. Guitar Builder parts come from the Parts Crate and nowhere else, so every number on a case's drop rates is the number that decides your pull.
 

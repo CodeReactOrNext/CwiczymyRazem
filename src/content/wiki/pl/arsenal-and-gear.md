@@ -28,7 +28,7 @@ Najedź na gniazdo, żeby przeczytać pełną kartę bez opuszczania tablicy, i 
 
 ## Otwieranie skrzynek
 
-<StatRow stats="80 Fame:Skrzynka z częściami (tylko części do Kreatora gitar)|180 Fame:Skrzynka Standard (może wypaść cokolwiek)|260 Fame:Wyróżniona skrzynka (rotująca pula 10 przedmiotów)|350 Fame:Skrzynka Premium (gitary lub efekty, lepsze szanse)|500 Fame:Skrzynka Elite (gitary lub efekty, gwarantowana Rzadka lub lepsza)|1200 Fame:Skrzynka Vault (gitary lub efekty, gwarantowana Epicka lub lepsza)" caption="Pula Wyróżnionej rotuje według stałego harmonogramu co kilka dni i wszyscy widzą tę samą rotację." />
+<StatRow stats="180 Fame:Skrzynka Standard (może wypaść cokolwiek)|260 Fame:Wyróżniona skrzynka (rotująca pula 10 przedmiotów)|300 Fame:Skrzynka z częściami (tylko części do Kreatora gitar)|350 Fame:Skrzynka Premium (gitary lub efekty, lepsze szanse)|500 Fame:Skrzynka Elite (gitary lub efekty, gwarantowana Rzadka lub lepsza)|1200 Fame:Skrzynka Vault (gitary lub efekty, gwarantowana Epicka lub lepsza)" caption="Pula Wyróżnionej rotuje według stałego harmonogramu co kilka dni i wszyscy widzą tę samą rotację." />
 
 Skrzynka ze sprzętem zawsze daje sprzęt. Części do Kreatora gitar wypadają ze Skrzynki z częściami i znikąd indziej, więc każda liczba w szansach skrzynki to liczba, która decyduje o twoim losowaniu.
 
