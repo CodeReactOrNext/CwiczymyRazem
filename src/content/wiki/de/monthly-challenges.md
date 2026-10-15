@@ -31,7 +31,7 @@ Du kennst eine Nominierung nicht? Klick sie an. Der Song öffnet sich mit einem 
 Alte Boards verschwinden nicht. Du kannst weiterhin Songs aus einem abgeschlossenen Monat aufnehmen, und die Aufnahme landet auf diesem Board; sie zahlt nur keine Punkte und kein Fame. Ein Jahr Challenges nachzuholen war nie als Abkürzung in den Ranglisten gedacht, aber einen verpassten Song nachzuholen ist in Ordnung.
 
 <BlogAlert type="tip">
-Das Challenge-Board ist das schnellste legitime Fame in der App. Wenn du auf eine Elite-Kiste sparst, ist ein aufgenommener Song mehr als der doppelte Preis einer Standard-Kiste.
+Das Challenge-Board ist das schnellste legitime Fame in der App. Wenn du auf eine Vault-Kiste sparst, bezahlt ein aufgenommener Song eine Standard-Kiste, und ein volles Board mit 1500 Fame ist mehr, als eine Vault-Kiste kostet.
 </BlogAlert>
 
 ## Fragen, die Leute stellen

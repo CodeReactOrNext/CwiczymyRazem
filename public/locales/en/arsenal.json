@@ -153,7 +153,9 @@
       "standard": "Standard",
       "premium": "Premium",
       "elite": "Elite",
-      "supporter": "Supporter"
+      "supporter": "Supporter",
+      "vault": "Vault",
+      "parts": "Parts"
     },
     "defs": {
       "standard": {
@@ -189,7 +191,29 @@
         "name": "Elite Effects Case",
         "title": "{{tier}} Effects Case",
         "description": "Reserved for the most dedicated players."
+      },
+      "vault-guitar": {
+        "name": "Vault Guitar Case",
+        "title": "{{tier}} Guitar Case",
+        "description": "Epic or better, every time."
+      },
+      "vault-effect": {
+        "name": "Vault Effects Case",
+        "title": "{{tier}} Effects Case",
+        "description": "Epic or better, every time."
+      },
+      "parts": {
+        "name": "Parts Crate",
+        "title": "{{tier}} Crate",
+        "description": "Guitar Builder parts only. Never gear."
       }
+    },
+    "open_pack": "Open {{count}} at once",
+    "pity": {
+      "new": "New model in {{count}}",
+      "new_next": "New model on your next open",
+      "top": "{{rarity}} or better in {{count}}",
+      "top_next": "{{rarity}} or better on your next open"
     }
   },
   "opening": {
@@ -204,7 +228,10 @@
     "keep_in_arsenal": "Keep in Arsenal",
     "add_to_collection": "Add to Collection",
     "open_another": "Open another {{name}}",
-    "cost_needed": "{{cost}} needed"
+    "cost_needed": "{{cost}} needed",
+    "pity_new": "Guarantee kept — a model you hadn't found yet",
+    "pity_top": "Guarantee kept — {{rarity}} or better",
+    "merge": "Merge into your best copy · +{{gain}} lvl ({{before}} → {{after}})"
   },
   "builder": {
     "slots": {
@@ -390,7 +417,9 @@
       "guild_stash": "Guild stash",
       "scrap": "Scrap",
       "sell_for": "Sell · {{fame}}",
-      "sell_all": "Sell all ×{{qty}}"
+      "sell_all": "Sell all ×{{qty}}",
+      "merge": "Merge · +{{gain}} lvl",
+      "merge_plain": "Merge into best copy"
     },
     "eyebrow": "Arsenal",
     "title": "Stash",
@@ -409,7 +438,9 @@
     "dupes_pedals_hint": "Sell or scrap every lower-level duplicate pedal, keeping the best copy of each",
     "dupes_pedals": "Duplicate pedals ({{count}})",
     "board_label": "Arsenal stash",
-    "pedals_protected": "Pedals on your pedalboard are never touched."
+    "pedals_protected": "Pedals on your pedalboard are never touched.",
+    "reason_merge_built": "Built-up or already merged copies can't be folded away",
+    "reason_merge_best": "This is your best copy — merge the others into it"
   },
   "card": {
     "new": "New",
@@ -444,7 +475,10 @@
       "guild_unboard": "Remove from pedalboard before giving it to the guild",
       "scrap_unboard": "Remove from the pedalboard before scrapping",
       "sell_unboard": "Cannot sell effect on pedalboard"
-    }
+    },
+    "merge": "Merge +{{gain}}",
+    "merge_plain": "Merge",
+    "merge_hint": "Fold into your best copy for +{{gain}} Item Level"
   },
   "bulk": {
     "title": "Clear duplicates?",
@@ -456,7 +490,9 @@
     "scrapping": "Scrapping...",
     "scrap_all": "Scrap all {{count}}",
     "mods_pulled_one": "{{count}} mod pulled out and stashed",
-    "mods_pulled": "{{count}} mods pulled out and stashed"
+    "mods_pulled": "{{count}} mods pulled out and stashed",
+    "merge_all": "Merge {{count}} into your best copies",
+    "merge_detail": "Item Levels added to the copies you keep. No Fame, no parts."
   },
   "equip": {
     "profile": "Profile",
@@ -1023,8 +1059,10 @@
       "build": "Failed to build",
       "commission": "Failed to commission",
       "mod": "Failed to fit the mod",
-      "repair": "Failed to repair"
-    }
+      "repair": "Failed to repair",
+      "merge": "Failed to merge duplicates"
+    },
+    "merged": "Merged — +{{gain}} lvl"
   },
   "categories": {
     "technique": "Technique",
@@ -1265,5 +1303,30 @@
     "left_to_build": "left to build",
     "dex_complete": "Your Dex is complete — there is nothing left for the bench to build.",
     "nothing_here": "Nothing left to build here. Try another rarity or kind."
+  },
+  "pack": {
+    "title": "{{name}} ×{{count}}",
+    "new": "New: {{count}}",
+    "dupes": "Duplicates: {{count}}",
+    "parts": "Parts: {{count}}",
+    "stopped": "Fame ran out — {{done}} of {{asked}} opened",
+    "merge": "Merge duplicates · +{{gain}} lvl",
+    "merging": "Merging...",
+    "merged": "Merged",
+    "again": "Open ×{{count}} again",
+    "close": "Close",
+    "dup_gain": "Duplicate · +{{gain}} lvl",
+    "dup_tag": "Duplicate",
+    "new_tag": "New",
+    "merged_total": "Merged — +{{gain}} lvl",
+    "opening": "Opening ×{{count}}...",
+    "skip": "Skip"
+  },
+  "merge_anim": {
+    "caption": "Folding the duplicate into your best {{name}}",
+    "done": "Merged",
+    "level": "Item Level",
+    "continue": "Continue",
+    "sr": "{{name}} merged. Item Level {{before}} to {{after}}."
   }
 }

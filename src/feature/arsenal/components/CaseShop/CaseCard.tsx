@@ -1,11 +1,18 @@
 import { cn } from "assets/lib/utils";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { hasPity } from "feature/arsenal/utils/pity";
 import { Interpolate } from "lib/i18n/Interpolate";
+import type { ReactNode } from "react";
 
-import type { CaseDefinition } from "../../types/arsenal.types";
+import type {
+  CaseDefinition,
+  CasePityCounters,
+} from "../../types/arsenal.types";
 import { DropRates } from "./DropRates";
 import { FreeCaseButton } from "./FreeCaseButton";
 import { OpenCaseButton } from "./OpenCaseButton";
+import { PackButtons } from "./PackButtons";
+import { PityMeter } from "./PityMeter";
 
 /** Per-tier identity: the tier word in the name, one tinted wash behind the
     art and the tier's own case render. Structure, typography and the button stay
@@ -37,12 +44,44 @@ const CASE_TIER: Record<
     image: "/images/case-supporter.webp",
     wash: "rgba(245,158,11,0.07)",
   },
+  // The top of the ladder takes the one colour the shelf has not used: violet is
+  // the app's "rare / special", and nothing above Elite should look like Elite.
+  // Elite's render with its gold turned to the same violet, so the case on the
+  // card is the colour of its name instead of a second Elite.
+  vault: {
+    color: "#c084fc",
+    image: "/images/case-guitar-vault.webp",
+    wash: "rgba(192,132,252,0.10)",
+  },
+  // Parts are a currency, not a chase, so the crate stays neutral.
+  parts: {
+    color: "#d4d4d8",
+    image: "/images/case-parts.webp",
+    wash: "rgba(212,212,216,0.05)",
+  },
 };
 
 /** Effect-pool cases get dedicated pedal-case art instead of the shared guitar case. */
 const EFFECT_CASE_IMAGE: Record<string, string> = {
   premium: "/images/case-effects-premium.webp",
   elite: "/images/case-effects-elite.webp",
+  vault: "/images/case-effects-vault.webp",
+};
+
+/**
+ * A case's render and its tier colour, for anything besides the shelf that has
+ * to show the case — the pack screen puts it on the back of every card.
+ */
+export const getCaseArt = (
+  caseDef: Pick<CaseDefinition, "id" | "dropKind">,
+): { image: string; color: string } => {
+  const tier = caseDef.id.split("-")[0];
+  const meta = CASE_TIER[tier] || CASE_TIER.standard;
+  const image =
+    caseDef.dropKind === "effect"
+      ? EFFECT_CASE_IMAGE[tier] || meta.image
+      : meta.image;
+  return { image, color: meta.color };
 };
 
 interface CaseCardProps {
@@ -52,6 +91,14 @@ interface CaseCardProps {
   isOpening: boolean;
   /** Free cases the player is holding. Zero hides the second button entirely. */
   freeTokens?: number;
+  /** Opens a pack of this many. Omitted, the card has no pack buttons. */
+  onOpenPack?: (caseType: string, count: number) => void;
+  /** This case's pity counters. Absent reads as a fresh counter. */
+  pity?: CasePityCounters;
+  /** Whether a never-held model is still within reach — see `canDiscoverNew`. */
+  canDiscoverNew?: boolean;
+  /** The guitar/pedal switch of a case that comes in both, shown in the card's corner. */
+  toggle?: ReactNode;
   className?: string;
 }
 
@@ -61,14 +108,16 @@ export const CaseCard = ({
   onOpen,
   isOpening,
   freeTokens = 0,
+  onOpenPack,
+  pity,
+  canDiscoverNew = true,
+  toggle,
   className,
 }: CaseCardProps) => {
   const tier = caseDef.id.split("-")[0];
   const meta = CASE_TIER[tier] || CASE_TIER.standard;
   const isEffectCase = caseDef.dropKind === "effect";
-  const image = isEffectCase
-    ? EFFECT_CASE_IMAGE[tier] || meta.image
-    : meta.image;
+  const { image } = getCaseArt(caseDef);
   const canAfford = currentFame >= caseDef.fameCost;
   const labels = useArsenalLabels();
   const { t } = labels;
@@ -95,7 +144,8 @@ export const CaseCard = ({
         }}
       />
 
-      <div className='relative flex items-center justify-end'>
+      <div className='relative flex items-center justify-between gap-3'>
+        {toggle ?? <span />}
         <DropRates probabilities={caseDef.probabilities} />
       </div>
 
@@ -151,6 +201,15 @@ export const CaseCard = ({
         </p>
       </div>
 
+      {hasPity(caseDef) && (
+        <PityMeter
+          caseDef={caseDef}
+          counters={pity ?? { sinceNew: 0, sinceTop: 0 }}
+          showNew={canDiscoverNew}
+          className='relative'
+        />
+      )}
+
       <div className='relative mt-auto flex flex-col gap-2 pt-1'>
         <div className='flex items-center justify-between gap-4'>
           <span className='flex items-center gap-2 text-sm font-bold tabular-nums'>
@@ -177,7 +236,15 @@ export const CaseCard = ({
             className='px-5'
           />
         </div>
-        {freeTokens > 0 && (
+        {onOpenPack && (
+          <PackButtons
+            fameCost={caseDef.fameCost}
+            currentFame={currentFame}
+            isOpening={isOpening}
+            onOpen={(count) => onOpenPack(caseDef.id, count)}
+          />
+        )}
+        {freeTokens > 0 && !caseDef.noFreeCase && (
           <FreeCaseButton
             isOpening={isOpening}
             tokens={freeTokens}

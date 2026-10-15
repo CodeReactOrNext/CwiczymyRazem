@@ -51,7 +51,7 @@ export default async function handler(
         parts: [],
       };
       await userRef.update({ arsenal, rigLevel: 0 });
-      return res.status(200).json({ ...arsenal, fame, caseTokens });
+      return res.status(200).json({ ...arsenal, fame, caseTokens, casePity: {} });
     }
 
     const storedRig = data.arsenal.rig;
@@ -150,7 +150,11 @@ export default async function handler(
       await userRef.update(updates);
     }
 
-    return res.status(200).json({ ...arsenal, fame, caseTokens });
+    // The pity counters ride along for the same reason: the shelf prints them on
+    // each card. Stored outside `arsenal` so the client cannot write them.
+    return res
+      .status(200)
+      .json({ ...arsenal, fame, caseTokens, casePity: data.casePity ?? {} });
   } catch (error) {
     console.error("[inventory]", error);
     return res.status(500).json({ error: "Internal server error" });

@@ -31,7 +31,7 @@ Mientras un tablero está activo, se decide el siguiente. Tú nominas las cancio
 Los tableros antiguos no desaparecen. Aún puedes grabar canciones de un mes cerrado y la grabación queda en ese tablero; simplemente no paga puntos ni Fame. Recuperar un año de retos nunca pretendió ser un atajo en las clasificaciones, pero ponerte al día con una canción que se te pasó es totalmente legítimo.
 
 <BlogAlert type="tip">
-El tablero de retos es la Fame legítima más rápida de la app. Si estás ahorrando para una caja Elite, una canción grabada es más del doble del precio de una Standard.
+El tablero de retos es la Fame legítima más rápida de la app. Si estás ahorrando para una caja Vault, una canción grabada paga una Standard, y un tablero completo de 1500 Fame es más de lo que cuesta una caja Vault.
 </BlogAlert>
 
 ## Preguntas que la gente hace

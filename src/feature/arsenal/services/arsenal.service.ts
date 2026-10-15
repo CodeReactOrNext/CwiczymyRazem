@@ -2,14 +2,14 @@ import axios from "axios";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 import type { HardwareKind, UpgradeRigResult } from "../data/rigHardware";
-
 import type {
-  ArsenalUserData,
+  ArsenalInventoryResponse,
   BulkScrapResult,
   CaseType,
   FusePartsResult,
+  MergeDuplicatesResult,
+  OpenCasePackResult,
   OpenCaseResult,
-  OpenEffectPackResult,
   PartId,
   PartTier,
   PedalboardPlacement,
@@ -42,13 +42,38 @@ export const openCase = async (
   return data;
 };
 
-export const fetchInventory = async (): Promise<
-  ArsenalUserData & { fame: number; caseTokens: number }
-> => {
+/** Several opens of one case, paid in Fame one by one. See `/api/arsenal/open-case`. */
+export const openCasePack = async (
+  caseType: CaseType,
+  count: number,
+): Promise<OpenCasePackResult> => {
   const idToken = await getIdToken();
-  const { data } = await axios.post<
-    ArsenalUserData & { fame: number; caseTokens: number }
-  >("/api/arsenal/inventory", { idToken });
+  const { data } = await axios.post<OpenCasePackResult>(
+    "/api/arsenal/open-case",
+    { idToken, caseType, count },
+  );
+  return data;
+};
+
+/** Folds duplicates into the best copy of their model. See `/api/arsenal/merge-duplicates`. */
+export const mergeDuplicates = async (
+  kind: WorkshopKind,
+  itemIds: string[],
+): Promise<MergeDuplicatesResult> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<MergeDuplicatesResult & { success: boolean }>(
+    "/api/arsenal/merge-duplicates",
+    { idToken, kind, itemIds },
+  );
+  return data;
+};
+
+export const fetchInventory = async (): Promise<ArsenalInventoryResponse> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<ArsenalInventoryResponse>(
+    "/api/arsenal/inventory",
+    { idToken },
+  );
   return data;
 };
 
@@ -84,15 +109,6 @@ export const updateRig = async (
     selectedGuitarYear,
     selectedGuitarCountry,
   });
-};
-
-const openEffectPack = async (): Promise<OpenEffectPackResult> => {
-  const idToken = await getIdToken();
-  const { data } = await axios.post<OpenEffectPackResult>(
-    "/api/arsenal/open-effect-pack",
-    { idToken },
-  );
-  return data;
 };
 
 export const updateStashLayout = async (

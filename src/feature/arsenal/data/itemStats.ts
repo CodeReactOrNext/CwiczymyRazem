@@ -640,15 +640,16 @@ export const getBuildLevelPoints = (
 
 /**
  * Item level = rolled feature points + rarity + condition (0–10) +
- * vintage age (0–8) + origin prestige + workshop build. Every guitar has a level;
- * features boost it and the workshop keeps boosting it without a ceiling.
+ * vintage age (0–8) + origin prestige + workshop build + merged duplicates.
+ * Every guitar has a level; features boost it and the workshop and the
+ * duplicate merge keep boosting it without a ceiling.
  */
 export const getItemLevel = (
   item: Pick<
     InventoryItem,
     "id" | "condition" | "year" | "country" | "stats" | "buildLevel"
   > &
-    Partial<Pick<InventoryItem, "custom">>,
+    Partial<Pick<InventoryItem, "custom" | "mergeBonus">>,
   guitar: Pick<GuitarDefinition, "rarity" | "yearFrom" | "yearTo">,
 ): number => {
   const s = item.stats;
@@ -661,7 +662,10 @@ export const getItemLevel = (
   // age, condition) don't — the parts already priced those in.
   if (item.custom) {
     return (
-      item.custom.level + featurePoints + getBuildLevelPoints(item.buildLevel, rarity)
+      item.custom.level +
+      featurePoints +
+      getBuildLevelPoints(item.buildLevel, rarity) +
+      (item.mergeBonus ?? 0)
     );
   }
   const rarityPoints = RARITY_LEVEL_BONUS[rarity] ?? 0;
@@ -685,7 +689,8 @@ export const getItemLevel = (
     conditionPoints +
     vintagePoints +
     originPoints +
-    buildPoints
+    buildPoints +
+    (item.mergeBonus ?? 0)
   );
 };
 

@@ -31,7 +31,7 @@ Nie znasz jakiejś nominacji? Kliknij ją. Utwór otwiera się z odtwarzaczem, w
 Stare tablice nie znikają. Nadal możesz nagrywać utwory z zamkniętego miesiąca, a nagranie ląduje na tej tablicy; po prostu nie płaci punktów ani Fame. Nadrabianie roku wyzwań nigdy nie miało być drogą na skróty w rankingach, ale nadrobienie utworu, który ci umknął, jest w porządku.
 
 <BlogAlert type="tip">
-Tablica wyzwań to najszybsze uczciwe Fame w aplikacji. Jeśli oszczędzasz na skrzynkę Elite, jeden nagrany utwór to ponad dwukrotność ceny skrzynki Standard.
+Tablica wyzwań to najszybsze uczciwe Fame w aplikacji. Jeśli oszczędzasz na skrzynkę Vault, jeden nagrany utwór wystarcza na skrzynkę Standard, a pełna tablica, czyli 1500 Fame, to więcej, niż kosztuje skrzynka Vault.
 </BlogAlert>
 
 ## Pytania, które ludzie zadają

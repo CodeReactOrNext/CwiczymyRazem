@@ -11,7 +11,7 @@ import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getWalletTierTotals } from "feature/arsenal/utils/scrap";
 import { Interpolate } from "lib/i18n/Interpolate";
-import { Coins, Wrench } from "lucide-react";
+import { Coins, Merge, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 
 import type { GuitarRarity, ScrapPart } from "../../types/arsenal.types";
@@ -21,6 +21,8 @@ import { PLATE_NOISE_BG } from "../TierPlate";
 /** Fame is the arsenal's amber everywhere; a teardown is the workshop's orange. */
 const SELL_COLOR = "#fbbf24";
 const SCRAP_COLOR = "#fb923c";
+/** A merge pays in progress, which is the app's emerald. */
+const MERGE_COLOR = "#34d399";
 
 interface PayoutOptionProps {
   /** What the option pays in, which is also what lights the surface. */
@@ -113,11 +115,20 @@ interface BulkDuplicatesDialogProps {
   scrapParts?: ScrapPart[];
   /** How many fitted mods the teardown would pull out whole into the stash. */
   salvagedCount?: number;
+  /**
+   * What folding the batch into the copies being kept would add, and for how many
+   * of them: copies carrying workshop levels or an earlier merge are skipped, so
+   * this can be fewer than `items`. Omitting `onMerge` hides the option.
+   */
+  mergeGain?: number;
+  mergeCount?: number;
   onSell: () => void;
   onScrap?: () => void;
+  onMerge?: () => void;
   onCancel: () => void;
   isSelling: boolean;
   isScrapping?: boolean;
+  isMerging?: boolean;
   /** Which owned copies are excluded from the sweep (shown in the warning line). */
   protectedNote?: string;
 }
@@ -136,17 +147,22 @@ export const BulkDuplicatesDialog = ({
   fameReward,
   scrapParts,
   salvagedCount = 0,
+  mergeGain = 0,
+  mergeCount = 0,
   onSell,
   onScrap,
+  onMerge,
   onCancel,
   isSelling,
   isScrapping = false,
+  isMerging = false,
   protectedNote,
 }: BulkDuplicatesDialogProps) => {
   const labels = useArsenalLabels();
   const { t } = labels;
   const count = items.length;
-  const busy = isSelling || isScrapping;
+  const busy = isSelling || isScrapping || isMerging;
+  const canMerge = Boolean(onMerge) && mergeGain > 0;
   const partCount = (scrapParts ?? []).reduce((sum, p) => sum + p.qty, 0);
   const canScrap = Boolean(onScrap) && partCount > 0;
   const tierTotals = canScrap ? getWalletTierTotals(scrapParts ?? []) : [];
@@ -214,7 +230,7 @@ export const BulkDuplicatesDialog = ({
           </ul>
         </div>
 
-        {/* The two payouts, each on the button that takes it. */}
+        {/* The ways out, each on the button that takes it. */}
         <div className='flex flex-shrink-0 flex-col gap-2'>
           <PayoutOption
             color={SELL_COLOR}
@@ -271,6 +287,29 @@ export const BulkDuplicatesDialog = ({
               mark={<Wrench size={16} style={{ color: SCRAP_COLOR }} />}
               disabled={busy}
               onClick={onScrap}
+            />
+          )}
+
+          {/* Not a payout: nothing is paid out, the copy you keep gets stronger.
+              The number is the Item Levels it gains. */}
+          {canMerge && (
+            <PayoutOption
+              color={MERGE_COLOR}
+              glyph={<Merge size={104} strokeWidth={1.25} />}
+              title={
+                isMerging
+                  ? t("pack.merging")
+                  : t("bulk.merge_all", { count: mergeCount })
+              }
+              detail={
+                <span className='text-xs text-zinc-400'>
+                  {t("bulk.merge_detail")}
+                </span>
+              }
+              amount={mergeGain}
+              mark={<Merge size={16} style={{ color: MERGE_COLOR }} />}
+              disabled={busy}
+              onClick={onMerge}
             />
           )}
         </div>

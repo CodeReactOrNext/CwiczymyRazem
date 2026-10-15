@@ -73,6 +73,7 @@ import { GuitarBuilderTab } from "feature/guitarBuilder/components/GuitarBuilder
 
 import type { OpenAgainPayment } from "./components/CaseOpeningModal/CaseOpeningModal";
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
+import { CasePackModal } from "./components/CaseOpeningModal/CasePackModal";
 import { CaseShop } from "./components/CaseShop/CaseShop";
 import { CollectionTab } from "./components/Collection/CollectionTab";
 import { CommissionsView } from "./components/Commissions/CommissionsView";
@@ -89,7 +90,12 @@ import { WorkshopTab } from "./components/Workshop/WorkshopTab";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
 import { useArsenalData } from "./hooks/useArsenalData";
 import { useOpenCase } from "./hooks/useOpenCase";
-import type { CaseType, OpenCaseResult } from "./types/arsenal.types";
+import { useOpenCasePack } from "./hooks/useOpenCasePack";
+import type {
+  CaseType,
+  OpenCasePackResult,
+  OpenCaseResult,
+} from "./types/arsenal.types";
 
 const ArsenalTabs = () => {
   const { t } = useTranslation("arsenal");
@@ -117,7 +123,26 @@ const ArsenalTabs = () => {
 
   const [openResult, setOpenResult] = useState<OpenCaseResult | null>(null);
   const [openedCaseType, setOpenedCaseType] = useState<CaseType | null>(null);
-  const { mutate: openCase, isPending: isOpening } = useOpenCase();
+  const { mutate: openCase, isPending: isOpeningSingle } = useOpenCase();
+
+  // A pack shares the shelf's "busy" state with the single open: two requests
+  // for the same wallet in flight at once is how a balance goes negative.
+  const [pack, setPack] = useState<OpenCasePackResult | null>(null);
+  const [packCase, setPackCase] = useState<CaseType | null>(null);
+  const { mutate: openPack, isPending: isOpeningPack } = useOpenCasePack();
+  const isOpening = isOpeningSingle || isOpeningPack;
+
+  const [packCount, setPackCount] = useState(0);
+
+  const handleOpenPack = (caseType: CaseType, count: number) => {
+    setPackCase(caseType);
+    setPackCount(count);
+    // Whatever pack was on screen goes, so the wait is shown as the wait — the
+    // case rattling — rather than the last pack sitting there until the new one
+    // lands on top of it.
+    setPack(null);
+    openPack({ caseType, count }, { onSuccess: setPack });
+  };
 
   const handleOpenCase = (caseType: CaseType, useToken?: boolean) => {
     setOpenedCaseType(caseType);
@@ -138,7 +163,7 @@ const ArsenalTabs = () => {
     ? null
     : fame >= openAgainCost
       ? { kind: "fame", cost: openAgainCost }
-      : freeCases > 0
+      : freeCases > 0 && !CASE_DEFINITIONS[openedCaseType].noFreeCase
         ? { kind: "token" }
         : null;
 
@@ -243,9 +268,13 @@ const ArsenalTabs = () => {
               <CaseShop
                 currentFame={fame}
                 onOpenCase={handleOpenCase}
+                onOpenPack={handleOpenPack}
                 isOpening={isOpening}
                 lastResult={openResult}
                 freeTokens={freeCases}
+                casePity={data?.casePity}
+                dexGuitarIds={data?.dexGuitars}
+                dexEffectIds={data?.dexEffects}
               />
             </TabsContent>
 
@@ -328,6 +357,26 @@ const ArsenalTabs = () => {
         }}
         openAgainPayment={openAgainPayment}
         isOpeningAgain={isOpening}
+      />
+
+      <CasePackModal
+        pack={pack}
+        opening={isOpeningPack}
+        count={packCount}
+        caseDef={packCase ? CASE_DEFINITIONS[packCase] : undefined}
+        onClose={() => {
+          setPack(null);
+          setPackCase(null);
+        }}
+        onOpenAgain={() => {
+          if (packCase && pack) handleOpenPack(packCase, pack.requested);
+        }}
+        canOpenAgain={
+          !!packCase &&
+          !!pack &&
+          fame >= CASE_DEFINITIONS[packCase].fameCost * pack.requested
+        }
+        isOpeningAgain={isOpeningPack}
       />
     </MainContainer>
   );
