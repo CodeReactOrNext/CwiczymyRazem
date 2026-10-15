@@ -11,6 +11,10 @@ import {
   getUserCommunityExercises,
 } from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
+import {
+  communityExerciseId,
+  communityToExercise,
+} from "feature/communityExercises/utils/communityToExercise";
 import type { Exercise, SongPracticeMode } from "feature/exercisePlan/types/exercise.types";
 import { songToExercise } from "feature/exercisePlan/utils/songToExercise";
 import { ChordSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ChordSelectionDialog";
@@ -51,29 +55,6 @@ const SOURCE_TABS: { id: SourceTab; label: string; icon: LucideIcon }[] = [
   { id: "mine", label: "My Exercises", icon: User },
   { id: "songs", label: "Songs", icon: Music },
 ];
-
-/** Prefix keeps ids from the community collection apart from the built-in
- *  library ones — and makes the same exercise resolve to the same id whether it
- *  was picked from the Community tab or from My Exercises. */
-const communityExerciseId = (id: string) => `community-${id}`;
-
-const communityToExercise = (ce: CommunityExercise): Exercise => ({
-  id: communityExerciseId(ce.id),
-  title: ce.title,
-  description: ce.description,
-  category: ce.category,
-  difficulty: ce.difficulty,
-  timeInMinutes: ce.timeInMinutes,
-  instructions: ce.instructions,
-  tips: ce.tips,
-  metronomeSpeed: ce.metronomeSpeed,
-  relatedSkills: ce.relatedSkills,
-  tablature: ce.tablature,
-  videoUrl: ce.videoUrl,
-  imageUrl: ce.imageUrl,
-  gpFileUrl: ce.gpFileUrl,
-  backingTracks: ce.backingTracks,
-});
 
 const matchesSearch = (exercise: Exercise, search: string) =>
   search === "" ||

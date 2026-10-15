@@ -20,7 +20,11 @@ export const formatRatingDelta = (delta: number): string =>
 
 type DecidedResult = "won" | "lost" | "draw";
 
-/** Settled duels that moved the rating, oldest first — what a form guide and a trend are drawn from. */
+/**
+ * Settled duels that moved the rating, in the order they were settled — what a
+ * form guide and a trend are drawn from. Not by deadline: a duel both players
+ * finished early settles ahead of an older one still running.
+ */
 const decided = (recent: readonly DuelView[]): DuelView[] =>
   recent
     .filter(
@@ -29,7 +33,7 @@ const decided = (recent: readonly DuelView[]): DuelView[] =>
         duel.result !== null &&
         duel.result !== "void",
     )
-    .sort((a, b) => a.endsAt - b.endsAt);
+    .sort((a, b) => (a.settledAt ?? a.endsAt) - (b.settledAt ?? b.endsAt));
 
 /** The last `count` results, oldest first, newest on the right — the way a form guide reads. */
 export const recentForm = (

@@ -22,7 +22,13 @@
     "view": "Ver",
     "edit": "Editar ejercicio",
     "delete": "Eliminar ejercicio",
-    "create_another": "Crear otro ejercicio"
+    "create_another": "Crear otro ejercicio",
+    "make_public": "Publicar",
+    "make_private": "Hacer privado",
+    "published": "Ejercicio publicado en la biblioteca de la comunidad.",
+    "made_private": "El ejercicio vuelve a ser privado.",
+    "visibility_failed": "No se pudo cambiar la visibilidad. Inténtalo de nuevo.",
+    "publish_incomplete": "Añade una descripción y al menos un paso antes de publicar."
   },
   "plans": {
     "title": "Mis planes",
@@ -86,6 +92,10 @@
     "measures_loaded": "{{count}} compases · cargados desde el Editor de tablaturas",
     "open_exercise": "Esto se publicará como un ejercicio abierto.",
     "open_exercise_hint": "No se escribió nada en el Editor de tablaturas, así que los jugadores recibirán los pasos de abajo en vez de una tablatura. Vuelve y añade notas si querías una.",
+    "gp_tab": "Tablatura de Guitar Pro",
+    "gp_tab_body": "Este ejercicio reproduce el archivo de Guitar Pro que subiste.",
+    "gp_tab_hint": "El Editor de tablaturas aún no abre archivos de Guitar Pro, así que las notas se quedan como están. Puedes cambiar los detalles y la visibilidad abajo.",
+    "summary_line_gp": "Tablatura de Guitar Pro · {{minutes}} min · {{bpm}} BPM",
     "basics": "Lo básico",
     "title_placeholder": "p. ej. Permutaciones de dedos — 1-2-3-4",
     "description_placeholder": "Explica brevemente qué entrena este ejercicio y para quién es.",

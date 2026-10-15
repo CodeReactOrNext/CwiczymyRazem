@@ -230,6 +230,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
         ),
         left: (item.xPct / 100) * geo.viewW,
         right: ((item.xPct + wPct) / 100) * geo.viewW,
+        top: (item.yPct / 100) * geo.viewH,
       },
     ];
   });
@@ -267,7 +268,9 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
       {/* The level as the owner reads it on their own Rig tab: a figure, not
           a chip — set against the title, on the same bottom line. */}
       <div className='mb-6 flex items-end justify-between gap-6'>
-        <h2 className='text-2xl font-bold text-white'>{t("layout.sections.rig.title")}</h2>
+        <h2 className='text-2xl font-bold text-white'>
+          {t("layout.sections.rig.title")}
+        </h2>
         <RigHeadline
           caption={t("rig.level")}
           value={getRigLevel(arsenal)}

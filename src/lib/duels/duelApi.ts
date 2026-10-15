@@ -36,6 +36,7 @@ const STATUS: Record<DuelErrorCode, number> = {
   NOT_FOUND: 404,
   LIMIT: 409,
   CLOSED: 409,
+  NO_RUN: 409,
 };
 
 /** Maps a DuelError to its status (the code goes back as `error`); anything else is a 500. */

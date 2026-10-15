@@ -24,7 +24,13 @@
     "view": "Zobacz",
     "edit": "Edytuj ćwiczenie",
     "delete": "Usuń ćwiczenie",
-    "create_another": "Utwórz kolejne ćwiczenie"
+    "create_another": "Utwórz kolejne ćwiczenie",
+    "make_public": "Opublikuj",
+    "make_private": "Ustaw jako prywatne",
+    "published": "Ćwiczenie opublikowane w bibliotece społeczności.",
+    "made_private": "Ćwiczenie znów jest prywatne.",
+    "visibility_failed": "Nie udało się zmienić widoczności. Spróbuj ponownie.",
+    "publish_incomplete": "Przed publikacją dodaj opis i co najmniej jeden krok."
   },
   "plans": {
     "title": "Moje plany",
@@ -90,6 +96,10 @@
     "measures_loaded": "Takty: {{count}} · wczytano z Edytora tabulatur",
     "open_exercise": "To ćwiczenie zostanie opublikowane jako otwarte.",
     "open_exercise_hint": "W Edytorze tabulatur nic nie zapisano, więc gracze dostaną kroki poniżej zamiast tabulatury. Wróć i dodaj nuty, jeśli chciałeś je mieć.",
+    "gp_tab": "Tabulatura Guitar Pro",
+    "gp_tab_body": "To ćwiczenie odtwarza wgrany przez Ciebie plik Guitar Pro.",
+    "gp_tab_hint": "Edytor tabulatur nie otwiera jeszcze plików Guitar Pro, więc nuty zostają bez zmian. Szczegóły i widoczność możesz zmienić poniżej.",
+    "summary_line_gp": "Tabulatura Guitar Pro · {{minutes}} min · {{bpm}} BPM",
     "basics": "Podstawy",
     "title_placeholder": "np. Permutacje palców — 1-2-3-4",
     "description_placeholder": "Krótko wyjaśnij, co to ćwiczenie trenuje i dla kogo jest.",

@@ -167,6 +167,7 @@ export const GoalsPanel = ({
       {isDialogOpen && (
         <CreateGoalDialog
           key={raiseFrom?.id ?? "new"}
+          uid={uid}
           onClose={closeDialog}
           onCreate={handleCreate}
           busyExerciseIds={busyExerciseIds}

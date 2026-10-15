@@ -7,6 +7,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   canOpenDuel,
+  canPlayerRun,
+  DUEL_DURATION_MS,
   DUEL_MAX_OPEN,
   DUEL_MIN_LVL,
   DUEL_MIN_RATING,
@@ -15,11 +17,13 @@ import {
   DUEL_SUBMIT_GRACE_MS,
   expectedScore,
   isDuelOpenForRuns,
+  isEveryoneReady,
   kFactor,
   nextRating,
   openDuelCount,
   pickOpponentTicket,
   pushRecent,
+  readyRefusal,
   resolveDuelOutcome,
   settledProfileUpdate,
   settleDuel,
@@ -283,7 +287,11 @@ describe("toDuelView", () => {
       duel({ attempts: 1, bestScore: 300 }, { attempts: 4, bestScore: 999 }),
       "a",
     )!;
-    expect(view.opponent).toEqual({ revealed: false, attempts: 4 });
+    expect(view.opponent).toEqual({
+      revealed: false,
+      attempts: 4,
+      isReady: false,
+    });
     expect(view.me.bestScore).toBe(300);
     expect(view.result).toBeNull();
     expect(JSON.stringify(view)).not.toContain("999");
@@ -309,6 +317,30 @@ describe("toDuelView", () => {
     });
   });
 
+  it("says who pressed Ready, and when a settled duel was settled", () => {
+    const running = toDuelView(
+      duel({ attempts: 2, readyAt: 500 }, { attempts: 1 }),
+      "b",
+    )!;
+    expect(running.me.isReady).toBe(false);
+    expect(running.opponent).toMatchObject({ revealed: false, isReady: true });
+    expect(running.settledAt).toBeNull();
+
+    const settled = toDuelView(
+      duel(
+        { attempts: 2, readyAt: 500 },
+        { attempts: 1, readyAt: 600 },
+        {
+          status: "finished",
+          outcome: { kind: "win", winnerId: "a", settledAt: 600 },
+        },
+      ),
+      "a",
+    )!;
+    expect(settled.me.isReady).toBe(true);
+    expect(settled.settledAt).toBe(600);
+  });
+
   it("returns nothing to somebody outside the duel", () => {
     expect(toDuelView(duel({}, {}), "zz")).toBeNull();
   });
@@ -323,6 +355,46 @@ describe("isDuelOpenForRuns", () => {
     expect(isDuelOpenForRuns({ status: "finished", endsAt: 1000 }, 0)).toBe(
       false,
     );
+  });
+});
+
+describe("canPlayerRun", () => {
+  it("stops taking a player's runs once they pressed Ready", () => {
+    const d = duel({ attempts: 1, readyAt: 500 }, { attempts: 1 });
+    expect(canPlayerRun(d, "a", 600)).toBe(false);
+    expect(canPlayerRun(d, "b", 600)).toBe(true);
+  });
+
+  it("follows the deadline like any run", () => {
+    const d = duel({}, {});
+    expect(canPlayerRun(d, "a", 1000 + DUEL_SUBMIT_GRACE_MS)).toBe(false);
+  });
+});
+
+describe("readyRefusal", () => {
+  it("needs a run to lock in", () => {
+    expect(readyRefusal(duel({ attempts: 0 }, {}), "a", 500)).toBe("NO_RUN");
+    expect(readyRefusal(duel({ attempts: 1 }, {}), "a", 500)).toBeNull();
+  });
+
+  it("is closed past the deadline and on a settled duel", () => {
+    expect(readyRefusal(duel({ attempts: 1 }, {}), "a", 1000)).toBe("CLOSED");
+    expect(
+      readyRefusal(duel({ attempts: 1 }, {}, { status: "finished" }), "a", 500),
+    ).toBe("CLOSED");
+  });
+});
+
+describe("isEveryoneReady", () => {
+  it("is true only once both sides pressed Ready", () => {
+    expect(isEveryoneReady(duel({ readyAt: 1 }, {}))).toBe(false);
+    expect(isEveryoneReady(duel({ readyAt: 1 }, { readyAt: 2 }))).toBe(true);
+  });
+});
+
+describe("DUEL_DURATION_MS", () => {
+  it("gives the two of them 48 hours", () => {
+    expect(DUEL_DURATION_MS).toBe(48 * 60 * 60 * 1000);
   });
 });
 

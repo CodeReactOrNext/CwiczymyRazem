@@ -22,7 +22,13 @@
     "view": "Ansehen",
     "edit": "Übung bearbeiten",
     "delete": "Übung löschen",
-    "create_another": "Weitere Übung erstellen"
+    "create_another": "Weitere Übung erstellen",
+    "make_public": "Veröffentlichen",
+    "make_private": "Privat machen",
+    "published": "Übung in der Community-Bibliothek veröffentlicht.",
+    "made_private": "Die Übung ist wieder privat.",
+    "visibility_failed": "Sichtbarkeit konnte nicht geändert werden. Versuch es erneut.",
+    "publish_incomplete": "Füge vor dem Veröffentlichen eine Beschreibung und mindestens einen Schritt hinzu."
   },
   "plans": {
     "title": "Meine Pläne",
@@ -86,6 +92,10 @@
     "measures_loaded": "{{count}} Takte · aus dem Tab-Editor geladen",
     "open_exercise": "Das wird als offene Übung veröffentlicht.",
     "open_exercise_hint": "Im Tab-Editor wurde nichts geschrieben, also bekommen Spieler statt einer Tabulatur die Schritte unten. Geh zurück und füge Noten hinzu, wenn du welche wolltest.",
+    "gp_tab": "Guitar-Pro-Tabulatur",
+    "gp_tab_body": "Diese Übung spielt die Guitar-Pro-Datei ab, die du hochgeladen hast.",
+    "gp_tab_hint": "Der Tab-Editor kann Guitar-Pro-Dateien noch nicht öffnen, die Noten bleiben also unverändert. Details und Sichtbarkeit kannst du unten trotzdem ändern.",
+    "summary_line_gp": "Guitar-Pro-Tab · {{minutes}} Min. · {{bpm}} BPM",
     "basics": "Grundlagen",
     "title_placeholder": "z. B. Fingerpermutationen — 1-2-3-4",
     "description_placeholder": "Erkläre kurz, was diese Übung trainiert und für wen sie gedacht ist.",

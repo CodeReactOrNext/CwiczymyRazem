@@ -156,7 +156,11 @@
     "resume": "Fortsetzen",
     "log_as": "Zeit eintragen als",
     "logging": "Zeit wird eingetragen…",
-    "finish": "Beenden & Zeit eintragen"
+    "finish": "Beenden & Zeit eintragen",
+    "leave_title": "Lektion verlassen?",
+    "leave_body": "Du hast {{time}} geübt, und die Zeit ist noch nicht eingetragen. Stoppuhr und Stelle im Video bleiben gespeichert, du kannst die Lektion also erneut öffnen und weitermachen.",
+    "leave": "Verlassen",
+    "keep_practicing": "Weiter üben"
   },
   "check": {
     "load_failed": "Der Checkpoint konnte nicht geladen werden.",

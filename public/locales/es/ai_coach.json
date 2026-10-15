@@ -156,7 +156,11 @@
     "resume": "Reanudar",
     "log_as": "Registrar el tiempo como",
     "logging": "Registrando tiempo…",
-    "finish": "Terminar y registrar tiempo"
+    "finish": "Terminar y registrar tiempo",
+    "leave_title": "¿Salir de la lección?",
+    "leave_body": "Llevas {{time}} de práctica y aún no se ha registrado. El cronómetro y tu punto del vídeo quedan guardados, así que puedes volver a abrir la lección y seguir.",
+    "leave": "Salir",
+    "keep_practicing": "Seguir practicando"
   },
   "check": {
     "load_failed": "No se pudo cargar el control.",

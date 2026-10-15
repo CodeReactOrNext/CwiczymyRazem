@@ -31,8 +31,8 @@ const count = (slot: ComponentSlot) =>
   COMPONENT_DEFS.filter((def) => def.slot === slot).length;
 
 describe("component catalog", () => {
-  it("has the 104 items, per slot", () => {
-    expect(COMPONENT_DEFS).toHaveLength(104);
+  it("has the 112 items, per slot", () => {
+    expect(COMPONENT_DEFS).toHaveLength(112);
     expect([
       count("body"),
       count("pickups"),
@@ -41,7 +41,7 @@ describe("component catalog", () => {
       count("finish"),
       count("pickguard"),
       count("sticker"),
-    ]).toEqual([13, 14, 8, 7, 49, 5, 8]);
+    ]).toEqual([18, 14, 10, 8, 49, 5, 8]);
   });
 
   it("has unique ids and a level range for every item", () => {

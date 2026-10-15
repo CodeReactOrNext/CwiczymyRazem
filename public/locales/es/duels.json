@@ -2,7 +2,7 @@
   "hero": {
     "eyebrow": "Clasificatorio, 1 contra 1",
     "title": "Duelos",
-    "subtitle": "Tú y un desconocido recibís el mismo ejercicio. 24 horas, tantos intentos como quieras — gana el mejor resultado y el ELO se mueve."
+    "subtitle": "Tú y un desconocido recibís el mismo ejercicio. 48 horas, tantos intentos como quieras — gana el mejor resultado y el ELO se mueve."
   },
   "rating": {
     "label": "ELO",
@@ -27,7 +27,9 @@
     "error": "No se pudo entrar ahora. Inténtalo de nuevo en un momento.",
     "ticket": "Buscando rival",
     "ticket_expires": "Caduca en {{time}}",
-    "cancel": "Salir de la cola"
+    "cancel": "Salir de la cola",
+    "live_one": "{{count}} duelo en curso ahora mismo",
+    "live_other": "{{count}} duelos en curso ahora mismo"
   },
   "category": {
     "technique": "Técnica",
@@ -52,6 +54,20 @@
     "new": "Nuevo duelo",
     "left": "restantes"
   },
+  "ready": {
+    "badge": "Listo",
+    "button": "Listo",
+    "confirm_title": "¿Fijar {{score}}?",
+    "confirm_body": "Será tu resultado final: ya no podrás volver a jugar este duelo. Cuando tu rival también esté listo, el duelo termina antes.",
+    "confirm_body_last": "Tu rival ya está listo, así que el duelo termina en el acto. Ya no podrás volver a jugarlo.",
+    "confirm": "Fijarlo",
+    "cancel": "Seguir jugando",
+    "locked": "Tu resultado está fijado. El duelo termina en cuanto tu rival también esté listo, o cuando se acabe el tiempo.",
+    "settled": "Los dos estáis listos: el duelo está resuelto.",
+    "error_no_run": "Primero juega al menos un intento.",
+    "error_closed": "Este duelo ya no acepta intentos.",
+    "error": "No se pudo fijar tu resultado. Inténtalo de nuevo en un momento."
+  },
   "form": {
     "won": "V",
     "lost": "D",
@@ -63,7 +79,7 @@
     "searching": "Buscando rival. Te avisaremos en cuanto empiece tu duelo.",
     "steps": {
       "0": "Busca un rival — o espera a que se una el siguiente",
-      "1": "El mismo ejercicio para los dos, 24 horas para tocarlo",
+      "1": "El mismo ejercicio para los dos, 48 horas para tocarlo",
       "2": "Gana el mejor intento y el ELO se mueve"
     }
   },
@@ -89,9 +105,10 @@
   "rules": {
     "0": "Ambos jugadores reciben el mismo ejercicio al azar — técnica, teoría del mástil o un quiz de oído.",
     "1": "Los ejercicios tocados necesitan el micrófono: solo cuentan los intentos puntuados por él. En los quizzes, +100 por respuesta correcta y −100 por incorrecta.",
-    "2": "24 horas y tantos intentos como quieras. Tu mejor intento es tu puntuación.",
-    "3": "Ves cuántos intentos ha hecho tu rival — nunca su nombre ni su puntuación hasta el final.",
-    "4": "Si ganas a alguien más fuerte, ganas más ELO. ¿No tocaste? Cuenta como derrota.",
+    "2": "48 horas y tantos intentos como quieras. Tu mejor intento es tu puntuación.",
+    "3": "¿Has terminado antes de tiempo? Pulsa Listo para fijar tu mejor resultado; después ya no hay más intentos. Cuando los dos estáis listos, el duelo termina en el acto.",
+    "4": "Ves cuántos intentos ha hecho tu rival — nunca su nombre ni su puntuación hasta el final.",
+    "5": "Si ganas a alguien más fuerte, ganas más ELO. ¿No tocaste? Cuenta como derrota.",
     "title": "Cómo funciona"
   },
   "error": "No se pudieron cargar tus duelos. Recarga la página."

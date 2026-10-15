@@ -77,7 +77,18 @@
     "path_summary": "{{count}} kamieni milowych, po {{runs}} czyste przebiegi",
     "path_summary_one": "1 kamień milowy, {{runs}} czyste przebiegi",
     "path_summary_few": "{{count}} kamienie milowe, po {{runs}} czyste przebiegi",
-    "path_summary_many": "{{count}} kamieni milowych, po {{runs}} czyste przebiegi"
+    "path_summary_many": "{{count}} kamieni milowych, po {{runs}} czyste przebiegi",
+    "source_label": "Skąd ćwiczenia",
+    "source": {
+      "library": "Biblioteka",
+      "mine": "Moje ćwiczenia"
+    },
+    "mine_empty": "Nie masz jeszcze własnych ćwiczeń. Te, które napiszesz w Tab Editorze, pojawią się tutaj, prywatne też.",
+    "mine_none_eligible": "Żadne z twoich ćwiczeń nie może jeszcze dostać celu. Cel wymaga tabulatury i zakresu tempa w ćwiczeniu.",
+    "mine_left_out_one": "Jeszcze 1 twoje ćwiczenie potrzebuje tabulatury i zakresu tempa, żeby dostać cel.",
+    "mine_left_out_few": "Jeszcze {{count}} twoje ćwiczenia potrzebują tabulatury i zakresu tempa, żeby dostać cel.",
+    "mine_left_out_many": "Jeszcze {{count}} twoich ćwiczeń potrzebuje tabulatury i zakresu tempa, żeby dostać cel.",
+    "mine_left_out": "Jeszcze {{count}} twoich ćwiczeń potrzebuje tabulatury i zakresu tempa, żeby dostać cel."
   },
   "history": {
     "reached_on": "Osiągnięty {{date}}",

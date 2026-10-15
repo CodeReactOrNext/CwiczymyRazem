@@ -65,6 +65,8 @@ const TOP_JACKS = {
   },
 } satisfies Record<string, EffectJackLayout>;
 
+// Board scale follows enclosure size, not the diameter of illustrated sockets.
+// 1 = standard single pedal; 0.8 = mini; 1.55 = full-length expression treadle.
 export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   {
     id: 1,
@@ -388,7 +390,7 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   {
     id: 34,
     name: "Octave Drift",
-    boardScale: 1.2,
+    boardScale: 1.55,
     brand: "Astra-Path",
     type: "Vibrato",
     description:
@@ -409,6 +411,349 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
     },
     draw: 300,
     levelBonus: 3,
+  },
+  {
+    id: 35,
+    imageId: 36,
+    name: "Desert Cry",
+    brand: "Ronin",
+    type: "Wah",
+    rarity: "Common",
+    draw: 8,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1.55,
+    jacks: {
+      edge: "side",
+      in: { x: 0.994, y: 0.4506 },
+      out: { x: 0.003, y: 0.45 },
+      nut: 0.059,
+      dc: { x: 0.5, y: 0.0275 },
+    },
+  },
+  {
+    id: 36,
+    imageId: 37,
+    name: "Tidal Sweep",
+    brand: "Aqua-Fab",
+    type: "Wah",
+    rarity: "Rare",
+    draw: 12,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1.55,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9942, y: 0.46 },
+      out: { x: 0.0029, y: 0.4594 },
+      nut: 0.061,
+      dc: { x: 0.496, y: 0.048 },
+    },
+  },
+  {
+    id: 37,
+    imageId: 38,
+    name: "Astral Voice",
+    brand: "Gravinix",
+    type: "Wah",
+    rarity: "Epic",
+    draw: 20,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1.55,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9942, y: 0.4288 },
+      out: { x: 0.0029, y: 0.4288 },
+      nut: 0.045,
+      dc: { x: 0.5, y: 0.06 },
+    },
+  },
+  {
+    id: 38,
+    imageId: 39,
+    name: "Silk Press",
+    brand: "Ronin",
+    type: "Compressor",
+    rarity: "Uncommon",
+    draw: 25,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9978, y: 0.5319 },
+      out: { x: 0, y: 0.5313 },
+      nut: 0.059,
+    },
+  },
+  {
+    id: 39,
+    imageId: 40,
+    name: "Velvet Clamp",
+    brand: "VelcroLab",
+    type: "Compressor",
+    rarity: "Epic",
+    draw: 80,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1.05,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9958, y: 0.5006 },
+      out: { x: 0.0021, y: 0.5006 },
+      nut: 0.059,
+    },
+  },
+  {
+    id: 40,
+    imageId: 41,
+    name: "Iron Bite",
+    brand: "Forge",
+    type: "Distortion",
+    rarity: "Uncommon",
+    draw: 15,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9958, y: 0.5019 },
+      out: { x: 0.0021, y: 0.5019 },
+      nut: 0.071,
+    },
+  },
+  {
+    id: 41,
+    imageId: 42,
+    name: "Crimson Siege",
+    brand: "Ronin",
+    type: "Distortion",
+    rarity: "Rare",
+    draw: 25,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9954, y: 0.4387 },
+      out: { x: 0.0023, y: 0.4381 },
+      nut: 0.058,
+    },
+  },
+  {
+    id: 42,
+    imageId: 43,
+    name: "Jetstream",
+    brand: "Aqua-Fab",
+    type: "Flanger",
+    rarity: "Uncommon",
+    draw: 40,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.996, y: 0.5144 },
+      out: { x: 0.002, y: 0.5144 },
+      nut: 0.065,
+    },
+  },
+  {
+    id: 43,
+    imageId: 44,
+    name: "Mercury Orbit",
+    brand: "Gravinix",
+    type: "Flanger",
+    rarity: "Epic",
+    draw: 65,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.995, y: 0.4831 },
+      out: { x: 0.0025, y: 0.4831 },
+      nut: 0.063,
+    },
+  },
+  {
+    id: 44,
+    imageId: 45,
+    name: "Dune Phase",
+    brand: "Forge",
+    type: "Phaser",
+    rarity: "Common",
+    draw: 12,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 0.95,
+    jacks: {
+      edge: "side",
+      in: { x: 0.998, y: 0.5031 },
+      out: { x: 0.002, y: 0.5025 },
+      nut: 0.061,
+    },
+  },
+  {
+    id: 45,
+    imageId: 46,
+    name: "Lunar Wheel",
+    brand: "Astra-Path",
+    type: "Phaser",
+    rarity: "Rare",
+    draw: 25,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9959, y: 0.4806 },
+      out: { x: 0, y: 0.4813 },
+      nut: 0.06,
+    },
+  },
+  {
+    id: 46,
+    imageId: 47,
+    name: "Spark Lift",
+    brand: "Forge",
+    type: "Boost",
+    rarity: "Common",
+    draw: 5,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 0.8,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9976, y: 0.4831 },
+      out: { x: 0.0024, y: 0.4825 },
+      nut: 0.094,
+    },
+  },
+  {
+    id: 47,
+    imageId: 48,
+    name: "Beacon Preamp",
+    brand: "AstraTone",
+    type: "Boost",
+    rarity: "Epic",
+    draw: 30,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9955, y: 0.4969 },
+      out: { x: 0.0023, y: 0.4963 },
+      nut: 0.068,
+    },
+  },
+  {
+    id: 48,
+    imageId: 49,
+    name: "Contour Six",
+    brand: "Ronin",
+    type: "EQ",
+    rarity: "Common",
+    draw: 20,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9963, y: 0.5288 },
+      out: { x: 0.0018, y: 0.5288 },
+      nut: 0.059,
+    },
+  },
+  {
+    id: 49,
+    imageId: 50,
+    name: "Spectrum Ten",
+    brand: "AstraTone",
+    type: "EQ",
+    rarity: "Rare",
+    draw: 45,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1.1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9964, y: 0.5194 },
+      out: { x: 0.0018, y: 0.5188 },
+      nut: 0.052,
+    },
+  },
+  {
+    id: 50,
+    imageId: 51,
+    name: "Pitch Lantern",
+    brand: "Ronin",
+    type: "Tuner",
+    rarity: "Uncommon",
+    draw: 40,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 0.95,
+    jacks: {
+      edge: "side",
+      in: { x: 0.995, y: 0.4931 },
+      out: { x: 0, y: 0.4931 },
+      nut: 0.056,
+    },
+  },
+  {
+    id: 51,
+    imageId: 52,
+    name: "Polaris Tune",
+    brand: "Astra-Path",
+    type: "Tuner",
+    rarity: "Epic",
+    draw: 65,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 0.95,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9956, y: 0.5019 },
+      out: { x: 0.0022, y: 0.5019 },
+      nut: 0.081,
+    },
+  },
+  {
+    id: 52,
+    imageId: 53,
+    name: "Lagoon Choir",
+    brand: "Aqua-Fab",
+    type: "Chorus",
+    rarity: "Uncommon",
+    draw: 30,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9958, y: 0.4863 },
+      out: { x: 0.0021, y: 0.4869 },
+      nut: 0.064,
+    },
+  },
+  {
+    id: 53,
+    imageId: 54,
+    name: "Willow Sway",
+    brand: "Gravinix",
+    type: "Vibrato",
+    rarity: "Uncommon",
+    draw: 35,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9956, y: 0.52 },
+      out: { x: 0.0022, y: 0.52 },
+      nut: 0.06,
+    },
+  },
+  {
+    id: 54,
+    imageId: 55,
+    name: "Chapel Mist",
+    brand: "ChronosEcho",
+    type: "Reverb",
+    rarity: "Rare",
+    draw: 100,
+    // Socket centres and nut depth measured from the shipped transparent art.
+    boardScale: 1.1,
+    jacks: {
+      edge: "side",
+      in: { x: 0.9954, y: 0.525 },
+      out: { x: 0.0023, y: 0.5306 },
+      nut: 0.059,
+    },
   },
 ];
 

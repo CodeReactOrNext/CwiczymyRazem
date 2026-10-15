@@ -11,6 +11,17 @@ import { DUEL_MAX_OPEN } from "feature/duels/utils/duelRules";
 import { useTranslation } from "hooks/useTranslation";
 import { Loader2, Mic, Swords, X } from "lucide-react";
 
+/** "N duels in progress" — the whole app's, a sign of life rather than a call to act. */
+const LiveDuels = ({ count }: { count: number }) => {
+  const { t } = useTranslation("duels");
+  return (
+    <span className='flex items-center gap-2 text-sm tabular-nums text-zinc-400'>
+      <Swords size={14} className='shrink-0 text-zinc-500' />
+      {t("queue.live", { count })}
+    </span>
+  );
+};
+
 interface DuelQueueCardProps {
   uid: string | null;
   overview: DuelOverview | undefined;
@@ -73,6 +84,7 @@ export const DuelQueueCard = ({
   const free = Math.max(0, DUEL_MAX_OPEN - used);
   const isFull = !!overview && free === 0;
   const waiting = overview?.waitingOthers ?? 0;
+  const liveDuels = overview?.liveDuels ?? 0;
   const slots: SlotState[] = Array.from({ length: DUEL_MAX_OPEN }, (_, i) =>
     i < activeCount ? "active" : i < used ? "waiting" : "free",
   );
@@ -113,6 +125,7 @@ export const DuelQueueCard = ({
                 {t("queue.waiting", { count: waiting })}
               </span>
             )}
+            {liveDuels > 0 && <LiveDuels count={liveDuels} />}
           </div>
         </div>
 

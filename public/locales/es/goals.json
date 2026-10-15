@@ -75,7 +75,16 @@
     "start_label": "Tempo inicial",
     "start_above_target": "El tempo inicial no puede superar el objetivo.",
     "path_summary": "{{count}} etapas, {{runs}} pasadas limpias cada una",
-    "path_summary_one": "1 etapa, {{runs}} pasadas limpias"
+    "path_summary_one": "1 etapa, {{runs}} pasadas limpias",
+    "source_label": "Ejercicios de",
+    "source": {
+      "library": "Biblioteca",
+      "mine": "Mis ejercicios"
+    },
+    "mine_empty": "Aún no has creado ejercicios. Los que escribas en el Tab Editor aparecen aquí, también los privados.",
+    "mine_none_eligible": "Ninguno de tus ejercicios puede tener un objetivo todavía. Un objetivo necesita una tablatura y un rango de tempo en el ejercicio.",
+    "mine_left_out_one": "1 ejercicio tuyo más necesita una tablatura y un rango de tempo para tener un objetivo.",
+    "mine_left_out": "{{count}} ejercicios tuyos más necesitan una tablatura y un rango de tempo para tener un objetivo."
   },
   "history": {
     "reached_on": "Alcanzado el {{date}}",

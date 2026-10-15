@@ -22,7 +22,13 @@
     "view": "View",
     "edit": "Edit exercise",
     "delete": "Delete exercise",
-    "create_another": "Create another exercise"
+    "create_another": "Create another exercise",
+    "make_public": "Publish",
+    "make_private": "Make private",
+    "published": "Exercise published to the Community library.",
+    "made_private": "Exercise is private again.",
+    "visibility_failed": "Couldn't change visibility. Try again.",
+    "publish_incomplete": "Add a description and at least one step before publishing."
   },
   "plans": {
     "title": "My Plans",
@@ -86,6 +92,10 @@
     "measures_loaded": "{{count}} measures · loaded from Tab Editor",
     "open_exercise": "This will be published as an open exercise.",
     "open_exercise_hint": "Nothing was written in the Tab Editor, so players get the steps below instead of a tab. Go back and add notes if you wanted one.",
+    "gp_tab": "Guitar Pro Tab",
+    "gp_tab_body": "This exercise plays from the Guitar Pro file you uploaded.",
+    "gp_tab_hint": "The Tab Editor can't open Guitar Pro files yet, so the notes stay as they are. You can still change the details and visibility below.",
+    "summary_line_gp": "Guitar Pro tab · {{minutes}} min · {{bpm}} BPM",
     "basics": "Basics",
     "title_placeholder": "e.g. Finger Permutations — 1-2-3-4",
     "description_placeholder": "Briefly explain what this exercise trains and who it's for.",

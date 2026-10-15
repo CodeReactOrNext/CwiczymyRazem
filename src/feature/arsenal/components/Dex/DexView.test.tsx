@@ -46,7 +46,9 @@ describe("DexView", () => {
     expect(slotNumbers()[0]).toBe("19");
 
     fireEvent.click(screen.getByRole("button", { name: /Pedals/ }));
-    expect(screen.getByText("1 / 2")).toBeTruthy();
+    expect(
+      screen.getByText(`1 / ${Math.ceil(EFFECT_DEFINITIONS.length / 18)}`),
+    ).toBeTruthy();
     expect(slotNumbers()[0]).toBe("01");
   });
 

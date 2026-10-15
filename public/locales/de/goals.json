@@ -75,7 +75,16 @@
     "start_label": "Starttempo",
     "start_above_target": "Das Starttempo darf nicht über dem Ziel liegen.",
     "path_summary": "{{count}} Etappen, je {{runs}} saubere Durchläufe",
-    "path_summary_one": "1 Etappe, {{runs}} saubere Durchläufe"
+    "path_summary_one": "1 Etappe, {{runs}} saubere Durchläufe",
+    "source_label": "Übungen aus",
+    "source": {
+      "library": "Bibliothek",
+      "mine": "Meine Übungen"
+    },
+    "mine_empty": "Du hast noch keine eigenen Übungen. Die, die du im Tab Editor schreibst, erscheinen hier, auch private.",
+    "mine_none_eligible": "Keine deiner Übungen kann bisher ein Ziel bekommen. Ein Ziel braucht eine Tabulatur und einen Tempobereich in der Übung.",
+    "mine_left_out_one": "1 weitere Übung von dir braucht eine Tabulatur und einen Tempobereich für ein Ziel.",
+    "mine_left_out": "{{count}} weitere Übungen von dir brauchen eine Tabulatur und einen Tempobereich für ein Ziel."
   },
   "history": {
     "reached_on": "Erreicht am {{date}}",

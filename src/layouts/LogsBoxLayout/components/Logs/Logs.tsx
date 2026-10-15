@@ -38,6 +38,7 @@ import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
 import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
+import { communityDocId } from "feature/communityExercises/utils/communityToExercise";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
@@ -143,7 +144,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { FaTrophy } from "react-icons/fa";
@@ -549,11 +550,39 @@ const SongTierChip = ({ info }: { info?: SongTierInfo }) => {
   if (tier.tier === "?") return null;
 
   return (
-    <span title={tier.label} className='inline-flex shrink-0'>
+    <span title={tier.label} className='mr-1.5 inline-flex shrink-0 align-middle'>
       <TierBadge song={info} className='h-5 w-auto min-w-5 rounded px-1 text-xs' />
     </span>
   );
 };
+
+/**
+ * A song named inside a feed sentence — the `{{song}}` slot of a `song_status`
+ * line. The sentence places it, since German wants it before the closing verb
+ * ("hat den Song … bewertet"), not tacked on after the sentence ends.
+ */
+const SongReference = ({
+  song,
+  info,
+}: {
+  song: { songId?: string; songTitle: string; songArtist: string };
+  info?: SongTierInfo;
+}) => (
+  <>
+    {song.songId && <SongTierChip info={info} />}
+    {song.songId ? (
+      <Link
+        href={`/songs?view=management&songId=${song.songId}`}
+        className={cn(TOUCH_TARGET, "text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
+        {song.songArtist} - {song.songTitle}
+      </Link>
+    ) : (
+      <span className='text-white'>
+        {song.songArtist} - {song.songTitle}
+      </span>
+    )}
+  </>
+);
 
 // Podkomponenty dla FirebaseLogsTopPlayersItem
 
@@ -1019,6 +1048,22 @@ const GroupedLine = ({ children }: { children: React.ReactNode }) => (
 );
 
 /**
+ * The exercise a goal row names. A library exercise links to where it's
+ * played; one the player wrote has nowhere to open it — it may be private — so
+ * it's just its title.
+ */
+const GoalExerciseName = ({ exerciseId, title }: { exerciseId: string; title: string }) =>
+  communityDocId(exerciseId) ? (
+    <span className='font-bold text-white'>{title}</span>
+  ) : (
+    <Link
+      href={`/profile/skills?exerciseId=${exerciseId}`}
+      className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
+      {title}
+    </Link>
+  );
+
+/**
  * What a scored run is worth: points, accuracy, and the tempo it was played at.
  * Rendered identically whether or not the row links through to the exercise's
  * leaderboard, so the two variants below share this one definition.
@@ -1187,20 +1232,18 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='flex flex-wrap items-center gap-1.5 text-sm text-zinc-400'>
-          {message}
-          {songLog.songId && <SongTierChip info={songTiers[songLog.songId]} />}
-          {songLog.songId ? (
-            <Link
-              href={`/songs?view=management&songId=${songLog.songId}`}
-              className={cn(TOUCH_TARGET, "text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
-              {songLog.songArtist} - {songLog.songTitle}
-            </Link>
-          ) : (
-            <span className='text-white'>
-              {songLog.songArtist} - {songLog.songTitle}
-            </span>
-          )}
+        <p className='text-sm text-zinc-400'>
+          <Interpolate
+            text={message}
+            values={{
+              song: (
+                <SongReference
+                  song={songLog}
+                  info={songLog.songId ? songTiers[songLog.songId] : undefined}
+                />
+              ),
+            }}
+          />
         </p>
         {showRating && ratingTier && (
           <Chip
@@ -1467,13 +1510,7 @@ const GroupedLogLine = ({
           <Interpolate
             text={t("feed:reached_exercise_goal")}
             values={{
-              exercise: (
-                <Link
-                  href={`/profile/skills?exerciseId=${goalLog.exerciseId}`}
-                  className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
-                  {goalLog.exerciseTitle}
-                </Link>
-              ),
+              exercise: <GoalExerciseName exerciseId={goalLog.exerciseId} title={goalLog.exerciseTitle} />,
             }}
           />
         </p>
@@ -1494,13 +1531,7 @@ const GroupedLogLine = ({
           <Interpolate
             text={t("feed:set_exercise_goal")}
             values={{
-              exercise: (
-                <Link
-                  href={`/profile/skills?exerciseId=${goalLog.exerciseId}`}
-                  className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
-                  {goalLog.exerciseTitle}
-                </Link>
-              ),
+              exercise: <GoalExerciseName exerciseId={goalLog.exerciseId} title={goalLog.exerciseTitle} />,
             }}
           />
         </p>
@@ -1625,13 +1656,23 @@ const GroupedLogLine = ({
 
   return (
     <GroupedLine>
-      <span className='text-sm text-zinc-400'>{t("common:logsBox.get")}</span>
-      <span className='flex items-center gap-1 text-sm text-cyan-500'>
-        +{genericLog.points}
-        <img
-          src='/images/points.png'
-          alt='points'
-          className='h-5 w-5 object-contain'
+      {/* One sentence around the points, so German can close it with
+          "erhalten" right after them instead of after the time and the rest. */}
+      <span className='inline-flex items-center gap-1.5 text-sm text-zinc-400'>
+        <Interpolate
+          text={t("common:logsBox.got_points")}
+          values={{
+            points: (
+              <span className='flex items-center gap-1 text-cyan-500'>
+                +{genericLog.points}
+                <img
+                  src='/images/points.png'
+                  alt='points'
+                  className='h-5 w-5 object-contain'
+                />
+              </span>
+            ),
+          }}
         />
       </span>
 
@@ -1759,29 +1800,24 @@ const GroupedLogLine = ({
         ))}
 
       {practicedSongs.length > 0 && !hidesPrimarySong && (
-        <p className='flex flex-wrap items-center gap-1.5 text-sm text-zinc-400'>
-          {t("common:song_status.practiced")}
-          {practicedSongs.map((song, index) => (
-            <span
-              key={song.songId || `${song.songArtist}-${song.songTitle}`}
-              className='inline-flex items-center gap-1.5'>
-              {song.songId && <SongTierChip info={songTiers[song.songId]} />}
-              {song.songId ? (
-                <Link
-                  href={`/songs?view=management&songId=${song.songId}`}
-                  className={cn(TOUCH_TARGET, "text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
-                  {song.songArtist} - {song.songTitle}
-                </Link>
-              ) : (
-                <span className='text-white'>
-                  {song.songArtist} - {song.songTitle}
-                </span>
-              )}
-              {index < practicedSongs.length - 1 && (
-                <span className='text-zinc-500'>,</span>
-              )}
-            </span>
-          ))}
+        <p className='text-sm text-zinc-400'>
+          <Interpolate
+            text={t("common:song_status.practiced", {
+              count: practicedSongs.length,
+            })}
+            values={{
+              song: practicedSongs.map((song, index) => (
+                <Fragment
+                  key={song.songId || `${song.songArtist}-${song.songTitle}`}>
+                  {index > 0 && <span className='text-zinc-500'>, </span>}
+                  <SongReference
+                    song={song}
+                    info={song.songId ? songTiers[song.songId] : undefined}
+                  />
+                </Fragment>
+              )),
+            }}
+          />
         </p>
       )}
     </GroupedLine>

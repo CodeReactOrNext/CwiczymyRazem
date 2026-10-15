@@ -3,8 +3,9 @@ import { BackLink } from "components/BackLink/BackLink";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LIBRARY_TABS } from "constants/navTabs";
-import { deleteCommunityExercise, getUserCommunityExercises } from "feature/communityExercises/services/communityExerciseService";
+import { deleteCommunityExercise, getUserCommunityExercises, setCommunityExerciseVisibility } from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
+import { isReadyToPublish } from "feature/communityExercises/utils/isReadyToPublish";
 import { clearTabEditorDraft, saveTabEditorDraft } from "feature/exercisePlan/utils/tabEditorDraft";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
@@ -77,6 +78,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
   const [exercises, setExercises] = useState<CommunityExercise[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const [activeExercise, setActiveExercise] = useState<DashboardExercise | null>(null);
 
   useEffect(() => {
@@ -99,9 +101,41 @@ const MyExercisesPage: NextPageWithLayout = () => {
     router.push("/tab-editor/publish");
   };
 
-  const handleEdit =(ex: CommunityExercise) => {
+  // Straight to the details form. The draft is re-seeded from the exercise's own
+  // saved tab so a leftover draft can't overwrite it on save.
+  const openDetailsForm = (ex: CommunityExercise, publish = false) => {
+    saveTabEditorDraft(ex.id, ex.tablature ?? []);
+    router.push(`/tab-editor/publish?edit=${ex.id}${publish ? "&publish=1" : ""}`);
+  };
+
+  const handleEdit = (ex: CommunityExercise) => {
+    // A Guitar Pro file uploaded from the plan creator lives in Storage, not in
+    // `tablature`, so the Tab Editor would open on an empty grid — skip it.
+    if (ex.gpFileUrl) {
+      openDetailsForm(ex);
+      return;
+    }
     saveTabEditorDraft(ex.id, ex.tablature ?? []);
     router.push(`/tab-editor?edit=${ex.id}`);
+  };
+
+  const handleToggleVisibility = async (ex: CommunityExercise) => {
+    const isPublic = !ex.isPublic;
+    if (isPublic && !isReadyToPublish(ex)) {
+      toast.info(t("my_exercises.publish_incomplete"));
+      openDetailsForm(ex, true);
+      return;
+    }
+
+    setTogglingId(ex.id);
+    const ok = await setCommunityExerciseVisibility(ex.id, isPublic);
+    if (ok) {
+      setExercises(prev => prev.map(e => (e.id === ex.id ? { ...e, isPublic } : e)));
+      toast.success(t(isPublic ? "my_exercises.published" : "my_exercises.made_private"));
+    } else {
+      toast.error(t("my_exercises.visibility_failed"));
+    }
+    setTogglingId(null);
   };
 
   const handleDelete = async (id: string) => {
@@ -261,6 +295,28 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     className="shrink-0 px-3 py-1.5 rounded bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 text-xs font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   >
                     {t("my_exercises.view")}
+                  </button>
+                )}
+
+                {/* Visibility */}
+                {ex.isPublic ? (
+                  <button
+                    onClick={() => handleToggleVisibility(ex)}
+                    disabled={togglingId === ex.id}
+                    className="shrink-0 p-2 rounded bg-zinc-800/60 text-zinc-400 hover:text-cyan-400 hover:bg-zinc-800 disabled:opacity-40 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    title={t("my_exercises.make_private")}
+                    aria-label={t("my_exercises.make_private")}
+                  >
+                    <Lock size={14} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleToggleVisibility(ex)}
+                    disabled={togglingId === ex.id}
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800 hover:text-emerald-400 disabled:opacity-40 text-xs font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    <Globe size={12} />
+                    {t("my_exercises.make_public")}
                   </button>
                 )}
 

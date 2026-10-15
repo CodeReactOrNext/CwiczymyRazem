@@ -237,6 +237,35 @@ export const COMPONENT_DEFS: ComponentDef[] = [
     "RPS Monarch Private Stock Aviary",
   ),
   body("x-style", "X-Style", "Mythic", "H", "Grayson Warhead Crimson"),
+  body(
+    "junior-honey",
+    "Junior Honey",
+    "Uncommon",
+    "P90",
+    "Grayson Junior Honey",
+  ),
+  body("osprey-tobacco", "Osprey Tobacco", "Rare", "P90", "RPS Osprey Tobacco"),
+  body(
+    "aurelis-walnut",
+    "Aurelis Walnut",
+    "Uncommon",
+    "H",
+    "Velmora Aurelis Walnut",
+  ),
+  body(
+    "aurelis-pearl",
+    "Aurelis Pearl",
+    "Legendary",
+    "H",
+    "Velmora Aurelis Pearl",
+  ),
+  body(
+    "jazzcaster-coral",
+    "Jazzcaster Coral",
+    "Uncommon",
+    "S",
+    "Fairmont Jazzcaster Coral",
+  ),
 
   // ─── Pickups — the cover colour shows on the guitar; type must fit the routing
   pickups("stock-singles", "Stock Ceramic Singles", "Common", "S", "#f1efe8"),
@@ -289,6 +318,8 @@ export const COMPONENT_DEFS: ComponentDef[] = [
   neck("maple-vines", "Maple · vine inlays", "Epic"),
   neck("ebony-sharks", "Ebony · abalone", "Legendary"),
   neck("ebony-birds", "Ebony · birds", "Mythic"),
+  neck("junior-dots", "Junior · dots", "Uncommon"),
+  neck("aurelis-blocks", "Aurelis · blocks", "Rare"),
 
   // ─── Headstocks
   head("three-three", "Three a side", "Common"),
@@ -298,6 +329,7 @@ export const COMPONENT_DEFS: ComponentDef[] = [
   head("carved", "Carved", "Epic"),
   head("three-three-black", "Three a side · black", "Legendary"),
   head("pointy", "Pointy · flame", "Mythic"),
+  head("aurelis-gold", "Aurelis · gold tuners", "Legendary"),
 
   // ─── Finishes — colour, figure and burst roll together as one item
   finish("black", "Black", "Common", "#151517"),

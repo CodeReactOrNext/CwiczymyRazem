@@ -182,6 +182,45 @@ export const GUITAR_BOMS: Record<number, ScrapBom> = {
   // Jaguar — bolt-on offset. Two pickups on a switch-plate harness, so it pays
   // the pot rather than a third pickup.
   74: TWIN,
+  75: TWIN,
+  76: [
+    { partId: "body", qty: 1 },
+    { partId: "bridge", qty: 1 },
+    { partId: "tuners", qty: 1 },
+  ],
+  77: SINGLECUT,
+  78: HEADLESS,
+  79: TWIN,
+  // Expansion: explicit salvage layouts for the new hardware families.
+  80: [
+    { partId: "pickup", qty: 1 },
+    { partId: "bridge", qty: 1 },
+    { partId: "body", qty: 1 },
+    { partId: "pot", qty: 1 },
+  ],
+  81: [
+    { partId: "pickup", qty: 2 },
+    { partId: "neck", qty: 1 },
+    { partId: "pot", qty: 1 },
+    { partId: "bridge", qty: 1 },
+  ],
+  82: SINGLECUT,
+  83: SINGLECUT,
+  84: HEADLESS,
+  85: HEADLESS,
+  86: TWIN,
+  87: TWIN,
+  88: [
+    { partId: "body", qty: 1 },
+    { partId: "bridge", qty: 1 },
+    { partId: "tuners", qty: 1 },
+  ],
+  89: [
+    { partId: "pickup", qty: 2 },
+    { partId: "neck", qty: 1 },
+    { partId: "pot", qty: 1 },
+    { partId: "bridge", qty: 1 },
+  ],
 };
 
 /** Fallback for any guitar id added before its BOM is authored. */

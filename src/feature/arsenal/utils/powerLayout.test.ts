@@ -4,6 +4,7 @@ import { BOARD_TIERS, SUPPLY_TIERS } from "../data/rigHardware";
 import { geometryFor } from "./pedalboardLayout";
 import {
   dcJackAt,
+  powerRun,
   RAIL_H,
   railFor,
   railOf,
@@ -97,6 +98,38 @@ describe("dcJackAt", () => {
     const left = dcJackAt(geo, 0, 0, 10, { x: 0.5, y: 0 });
     const right = dcJackAt(geo, 50, 0, 10, { x: 0.5, y: 0 });
     expect(right.x).toBeGreaterThan(left.x);
+  });
+});
+
+describe("powerRun for freely placed pedals", () => {
+  it("reaches a tall pedal from above when its nearest row's channel lies below its inlet", () => {
+    const board = geometryFor(BOARD_TIERS[2]);
+    const rail = railFor(board, SUPPLY_TIERS[4]);
+    const top = board.viewH * 0.559724;
+    const jack = { x: board.viewW * 0.48, y: top + 2 };
+    const path = powerRun(
+      rail,
+      rail.sockets[22],
+      {
+        itemId: "astral-voice",
+        row: 2,
+        top,
+        jack,
+        left: jack.x - 7,
+        right: jack.x + 7,
+      },
+      [30, 60],
+    );
+    const points = (path.match(/-?\d+(?:\.\d+)?\s-?\d+(?:\.\d+)?/g) ?? []).map(
+      (pair) => pair.split(/\s+/).map(Number),
+    );
+    expect(Math.max(...points.map((point) => point[1]))).toBeLessThanOrEqual(
+      jack.y + 0.01,
+    );
+    expect(path.endsWith(`${jack.x.toFixed(2)} ${jack.y.toFixed(2)}`)).toBe(
+      true,
+    );
+    expect(points.at(-2)![1]).toBeLessThan(top);
   });
 });
 

@@ -2,7 +2,7 @@
   "hero": {
     "eyebrow": "Gewertet, 1 gegen 1",
     "title": "Duelle",
-    "subtitle": "Du und ein Fremder bekommt dieselbe Übung. 24 Stunden, so viele Durchgänge du willst — der bessere Bestwert gewinnt, und die ELO bewegt sich."
+    "subtitle": "Du und ein Fremder bekommt dieselbe Übung. 48 Stunden, so viele Durchgänge du willst — der bessere Bestwert gewinnt, und die ELO bewegt sich."
   },
   "rating": {
     "label": "ELO",
@@ -27,7 +27,9 @@
     "error": "Beitritt gerade nicht möglich. Versuch es gleich noch einmal.",
     "ticket": "Suche nach einem Gegner",
     "ticket_expires": "Läuft ab in {{time}}",
-    "cancel": "Warteschlange verlassen"
+    "cancel": "Warteschlange verlassen",
+    "live_one": "{{count}} Duell läuft gerade",
+    "live_other": "{{count}} Duelle laufen gerade"
   },
   "category": {
     "technique": "Technik",
@@ -52,6 +54,20 @@
     "new": "Neues Duell",
     "left": "übrig"
   },
+  "ready": {
+    "badge": "Bereit",
+    "button": "Bereit",
+    "confirm_title": "{{score}} festlegen?",
+    "confirm_body": "Das wird dein endgültiges Ergebnis — du kannst dieses Duell danach nicht mehr spielen. Ist dein Gegner auch bereit, endet das Duell früher.",
+    "confirm_body_last": "Dein Gegner ist schon bereit, also endet das Duell sofort. Du kannst es danach nicht mehr spielen.",
+    "confirm": "Festlegen",
+    "cancel": "Weiterspielen",
+    "locked": "Dein Ergebnis steht fest. Das Duell endet, sobald dein Gegner auch bereit ist — oder wenn die Zeit abläuft.",
+    "settled": "Ihr seid beide bereit — das Duell ist abgerechnet.",
+    "error_no_run": "Spiel zuerst mindestens einen Durchgang.",
+    "error_closed": "Dieses Duell nimmt keine Durchgänge mehr an.",
+    "error": "Dein Ergebnis konnte nicht festgelegt werden. Versuch es gleich noch einmal."
+  },
   "form": {
     "won": "S",
     "lost": "N",
@@ -63,7 +79,7 @@
     "searching": "Wir suchen einen Gegner. Du bekommst eine Benachrichtigung, sobald dein Duell beginnt.",
     "steps": {
       "0": "Such einen Gegner — oder warte, bis der nächste beitritt",
-      "1": "Dieselbe Übung für euch beide, 24 Stunden Zeit",
+      "1": "Dieselbe Übung für euch beide, 48 Stunden Zeit",
       "2": "Der beste Durchgang gewinnt, und die ELO bewegt sich"
     }
   },
@@ -89,9 +105,10 @@
   "rules": {
     "0": "Beide Spieler bekommen dieselbe zufällige Übung — Technik, Griffbrett-Theorie oder ein Gehörquiz.",
     "1": "Gespielte Übungen brauchen das Mikrofon: Es zählen nur Durchgänge, die das Mikrofon bewertet hat. Im Quiz gibt es +100 pro richtiger und −100 pro falscher Antwort.",
-    "2": "24 Stunden, so viele Durchgänge du willst. Dein bester Durchgang ist deine Wertung.",
-    "3": "Du siehst, wie viele Versuche dein Gegner gemacht hat — Name und Wertung erst am Ende.",
-    "4": "Schlägst du einen Stärkeren, bekommst du mehr ELO. Gar nicht gespielt? Das ist eine Niederlage.",
+    "2": "48 Stunden, so viele Durchgänge du willst. Dein bester Durchgang ist deine Wertung.",
+    "3": "Schon vor Ablauf fertig? Mit Bereit legst du deinen Bestwert fest — danach keine Durchgänge mehr. Sind beide bereit, endet das Duell sofort.",
+    "4": "Du siehst, wie viele Versuche dein Gegner gemacht hat — Name und Wertung erst am Ende.",
+    "5": "Schlägst du einen Stärkeren, bekommst du mehr ELO. Gar nicht gespielt? Das ist eine Niederlage.",
     "title": "So funktioniert's"
   },
   "error": "Deine Duelle konnten nicht geladen werden. Lade die Seite neu."

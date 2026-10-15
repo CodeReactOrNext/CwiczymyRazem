@@ -2,6 +2,7 @@ import axios from "axios";
 import type {
   DuelJoinResult,
   DuelOverview,
+  DuelReadyResult,
   DuelRunResult,
   DuelRunSubmission,
   DuelView,
@@ -30,6 +31,9 @@ export const joinDuel = () => post<DuelJoinResult>("/api/duels/join");
 
 export const cancelDuelTicket = (ticketId: string) =>
   post<{ cancelled: boolean }>("/api/duels/cancel", { ticketId });
+
+export const markDuelReady = (duelId: string) =>
+  post<DuelReadyResult>("/api/duels/ready", { duelId });
 
 export const submitDuelRun = (run: DuelRunSubmission) =>
   post<DuelRunResult>("/api/duels/submit", { ...run });
