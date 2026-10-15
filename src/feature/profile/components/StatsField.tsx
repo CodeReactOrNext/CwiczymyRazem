@@ -74,7 +74,7 @@ export const StatsField = ({
       {footerLink && (
         <Link
           href={footerLink.href}
-          className="group/link mt-3 flex items-center gap-2 text-xs font-bold text-zinc-300 transition-all duration-300 hover:text-white hover:gap-3 w-fit"
+          className="group/link mt-3 flex items-center gap-2 text-xs font-bold text-zinc-300 transition-all duration-base hover:text-white hover:gap-3 w-fit"
         >
           {footerLink.label}
           <ArrowRight className="h-4 w-4" strokeWidth={2.5} />

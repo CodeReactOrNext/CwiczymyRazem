@@ -36,7 +36,7 @@ export const OpenCaseButton = ({
         onClick={onClick}
         disabled={!canAfford || isOpening}
         className={cn(
-          "flex items-center justify-center gap-2.5 rounded-lg px-5 py-3 text-sm font-bold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-300/60",
+          "flex items-center justify-center gap-2.5 rounded-lg px-5 py-3 text-sm font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-300/60",
           canAfford
             ? "bg-amber-400 text-zinc-950 hover:bg-amber-300"
             : "cursor-not-allowed bg-arsenal-card text-arsenal-text-tertiary",
@@ -64,7 +64,7 @@ export const OpenCaseButton = ({
       onClick={onClick}
       disabled={!canAfford || isOpening}
       className={cn(
-        "flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold capitalize tracking-wide transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
+        "flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold capitalize tracking-wide transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         fameCost !== undefined && "justify-between",
         isSolid
           ? canAfford

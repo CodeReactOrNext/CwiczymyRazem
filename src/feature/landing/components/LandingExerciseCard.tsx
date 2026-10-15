@@ -68,13 +68,13 @@ export const LandingExerciseCard: React.FC<LandingExerciseCardProps> = ({
   return (
     <Link href={href} className='group block h-full'>
       <div className='relative flex h-full flex-col justify-between overflow-hidden rounded-lg p-6 transition-background glass-card hover:glass-card-hover'>
-        <div className='pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-cyan-500/[0.08] blur-2xl transition-opacity duration-300 group-hover:opacity-100' />
+        <div className='pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-cyan-500/[0.08] blur-2xl transition-opacity duration-base group-hover:opacity-100' />
 
         <div className='relative'>
           <div className='mb-6 flex items-center justify-between gap-6'>
             <TabPreviewGlyph
               notes={exercise.tabPreview ?? []}
-              className='h-auto w-40 max-w-[60%] opacity-80 transition-opacity duration-300 group-hover:opacity-100'
+              className='h-auto w-40 max-w-[60%] opacity-80 transition-opacity duration-base group-hover:opacity-100'
             />
             <div
               className='flex items-center gap-1'
@@ -106,7 +106,7 @@ export const LandingExerciseCard: React.FC<LandingExerciseCardProps> = ({
             <span className='mx-1.5'>·</span>
             {category}
           </span>
-          <span className='flex items-center gap-1 text-xs font-bold text-cyan-400 transition-transform duration-300 group-hover:translate-x-1'>
+          <span className='flex items-center gap-1 text-xs font-bold text-cyan-400 transition-transform duration-base group-hover:translate-x-1'>
             {guideLabel}
             <ArrowRight className='h-3 w-3' />
           </span>

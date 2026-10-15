@@ -20,8 +20,7 @@ import {
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "hooks/useTranslation";
-import { FaPlus } from "react-icons/fa";
-import { BookOpen, Flame, Music, Zap } from "lucide-react";
+import { BookOpen, Flame, Music, Zap, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
@@ -62,7 +61,7 @@ const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) => (
     <div className="flex items-center gap-3">
       <div className="h-8 w-[3px] rounded-full bg-gradient-to-b from-cyan-400 to-cyan-400/0" />
       <div>
-        <h2 className="text-base font-black uppercase tracking-widest text-white">{title}</h2>
+        <h2 className="text-base font-black text-white">{title}</h2>
         {subtitle && <p className="mt-0.5 text-[11px] text-zinc-500">{subtitle}</p>}
       </div>
     </div>
@@ -265,7 +264,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
         <div key={difficulty} className="space-y-6">
           <div className="flex items-center gap-3">
             <div className={`h-1.5 w-1.5 rounded-full bg-current ${difficultyLabel.color}`} />
-            <h3 className={`text-xs font-black uppercase tracking-[0.2em] ${difficultyLabel.color}`}>
+            <h3 className={`text-xs font-black ${difficultyLabel.color}`}>
               {t(`common:difficulty.${difficulty}`)}
             </h3>
             <div className="h-px flex-1 bg-white/5" />
@@ -299,7 +298,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
             {!hideTabs.includes("routines") && (
               <TabsTrigger
                 value="routines"
-                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold uppercase tracking-widest text-[9px] md:text-[13px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
+                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold text-xs md:text-[13px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
               >
                 <Music size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
                 <span>{t("plans:my.routines")}</span>
@@ -308,7 +307,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
             {!hideTabs.includes("playalongs") && (
               <TabsTrigger
                 value="playalongs"
-                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold uppercase tracking-widest text-[9px] md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
+                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold text-xs md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
               >
                 <Zap size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
                 <span>{t("plans:my.playalongs")}</span>
@@ -317,7 +316,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
             {!hideTabs.includes("my_plans") && (
               <TabsTrigger
                 value="my_plans"
-                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold uppercase tracking-widest text-[9px] md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
+                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold text-xs md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
               >
                 <Flame size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
                 <span>{t("plans:my.my_plans")}</span>
@@ -342,9 +341,9 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
               action={
                 <Button
                   onClick={() => isPremium ? router.push('/plans/create') : setShowUpgradeModal(true)}
-                  className="bg-white hover:bg-zinc-100 text-black font-bold uppercase tracking-widest text-[11px] h-9 px-5 rounded-lg transition-all"
+                  className="bg-white hover:bg-zinc-100 text-black font-bold text-xs h-9 px-5 rounded-lg transition-all"
                 >
-                  <FaPlus className="mr-2 h-3 w-3" />
+                  <Plus size='1em' className="mr-2 h-3 w-3" />
                   {t("exercises:my_plans.create_plan")}
                 </Button>
               }

@@ -84,7 +84,7 @@ export const SongStatusCard = ({
             <ChevronDown
               size={12}
               className={cn(
-                "shrink-0 text-zinc-500 transition-transform duration-300",
+                "shrink-0 text-zinc-500 transition-transform duration-base",
                 isCollapsed ? "-rotate-90" : "rotate-0"
               )}
             />
@@ -109,7 +109,7 @@ export const SongStatusCard = ({
             <div 
               ref={setNodeRef}
               className={cn(
-                "group relative flex flex-col overflow-hidden rounded-lg bg-zinc-900/10 transition-all duration-300",
+                "group relative flex flex-col overflow-hidden rounded-lg bg-zinc-900/10 transition-all duration-base",
                 isLibraryDropTarget && "bg-cyan-500/5 shadow-[0_0_20px_rgba(6,182,212,0.15)]",
                 isDropTarget && "scale-[1.02] bg-cyan-500/5"
               )}

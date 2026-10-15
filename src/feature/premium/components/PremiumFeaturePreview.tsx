@@ -44,7 +44,7 @@ export function PremiumFeaturePreview({
                 : "bg-orange-500/10 border-orange-500/20 text-orange-500"
             }`}>
               {availableIn === "master" ? <Crown size={12} fill="currentColor" /> : <Zap size={12} fill="currentColor" />}
-              <span className="text-[10px] font-semibold uppercase tracking-widest">
+              <span className="text-xs font-semibold">
                 {availableIn === "master" ? "Practice Master" : availableIn === "pro" ? "Practice Pro" : "Pro & Master"}
               </span>
             </div>
@@ -61,7 +61,7 @@ export function PremiumFeaturePreview({
         {/* Preview Image with Glow */}
         {previewImagePath && (
           <div className="mb-24 relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-orange-500/20 to-cyan-500/20 rounded-md blur-2xl opacity-50 group-hover:opacity-75 transition duration-1000 group-hover:duration-200" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-orange-500/20 to-cyan-500/20 rounded-md blur-2xl opacity-50 group-hover:opacity-75 transition duration-1000 group-hover:duration-base" />
             <div className="relative rounded-md overflow-hidden bg-zinc-900 shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/40 to-transparent pointer-events-none z-10" />
               <div className="relative w-full aspect-[16/9]">
@@ -69,7 +69,7 @@ export function PremiumFeaturePreview({
                   src={previewImagePath}
                   alt={previewImageAlt || "Feature preview"}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                  className="object-cover transition-transform duration-slow"
                   priority
                 />
               </div>
@@ -82,9 +82,9 @@ export function PremiumFeaturePreview({
           {features.map((feature, idx) => (
             <div 
               key={idx} 
-              className="group p-6 rounded-md bg-white/5 hover:bg-white/[0.08] transition-all duration-300 backdrop-blur-sm"
+              className="group p-6 rounded-md bg-white/5 hover:bg-white/[0.08] transition-all duration-base backdrop-blur-sm"
             >
-              <div className="mb-6 h-12 w-12 rounded-md bg-cyan-500/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform duration-300">
+              <div className="mb-6 h-12 w-12 rounded-md bg-cyan-500/10 flex items-center justify-center text-cyan-400 transition-transform duration-base">
                 <span className="flex items-center justify-center">
                   {feature.icon}
                 </span>

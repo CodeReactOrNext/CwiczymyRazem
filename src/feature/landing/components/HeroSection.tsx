@@ -21,10 +21,10 @@ import { useEffect, useRef } from "react";
 const StaticCTA = () => (
   <div className='flex flex-col items-center gap-2'>
     <Link href='/signup' onClick={() => trackSignupCtaClicked("landing_hero")}>
-      <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98]'>
+      <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-base hover:bg-zinc-50 active:scale-[0.98]'>
         <span className='flex items-center gap-3 whitespace-nowrap'>
           Start tracking
-          <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-1.5' />
+          <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-base group-hover/btn:translate-x-1.5' />
         </span>
       </Button>
     </Link>

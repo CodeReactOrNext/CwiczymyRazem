@@ -95,6 +95,15 @@
     "no_show_them": "Gegner hat nicht gespielt",
     "nobody_played": "Niemand hat gespielt"
   },
+  "feed": {
+    "title": "Alle Duelle",
+    "latest": "die letzten {{count}}",
+    "empty": "Noch hat niemand ein Duell abgeschlossen. Jedes beendete Duell der App erscheint hier.",
+    "win": "{{winner}} schlägt {{loser}}",
+    "walkover": "{{winner}} schlägt {{loser}} — kampflos",
+    "draw": "{{winner}} unentschieden gegen {{loser}}",
+    "void": "{{winner}} gegen {{loser}} — niemand hat gespielt"
+  },
   "ranking": {
     "title": "Rangliste",
     "players_one": "{{count}} gewertet",

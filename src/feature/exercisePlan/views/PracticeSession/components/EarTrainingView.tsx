@@ -71,7 +71,7 @@ export const EarTrainingView = ({
         <div className="mb-3 flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", difficultyDot[difficulty])} />
-            <span className="truncate text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            <span className="truncate text-xs font-semibold text-zinc-500">
               {t("ear.title")}
             </span>
           </div>
@@ -140,7 +140,7 @@ export const EarTrainingView = ({
                   <span
                     key={i}
                     className={cn(
-                      "h-2.5 w-2.5 rounded-full transition-all duration-200",
+                      "h-2.5 w-2.5 rounded-full transition-all duration-base",
                       i < riddleProgress.matched
                         ? "bg-emerald-400"
                         : i === riddleProgress.matched && listening

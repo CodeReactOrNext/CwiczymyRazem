@@ -3,6 +3,7 @@ import { CommunityDrawer } from "feature/logsBox/components/CommunityDrawer";
 import { m, useReducedMotion } from "framer-motion";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { LocalizedRegion } from "lib/i18n/LocalizedRegion";
+import { transitions } from "lib/motion/motion";
 import { useRouter } from "next/router";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
@@ -42,7 +43,7 @@ const MainLoggedLayout = ({
   const pageEnter = {
     initial: reduceMotion ? false : { opacity: 0 },
     animate: { opacity: 1 },
-    transition: { duration: 0.16, ease: "easeOut" },
+    transition: transitions.fast,
   } as const;
 
   return (

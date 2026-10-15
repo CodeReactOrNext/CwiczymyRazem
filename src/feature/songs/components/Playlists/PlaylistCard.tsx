@@ -42,7 +42,7 @@ export const PlaylistCard = ({
       onClick={onOpen}
       className={cn(
         "group relative flex cursor-pointer flex-col overflow-hidden rounded-md p-3",
-        "transition-all duration-300 ease-out hover:bg-zinc-800/40"
+        "transition-all duration-base ease-out hover:bg-zinc-800/40"
       )}
     >
       <Ripple />
@@ -153,7 +153,7 @@ export const PlaylistCard = ({
           <div className="mt-2.5 flex items-center gap-2">
             <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
               <div
-                className="h-full rounded-full bg-green-500 transition-all duration-500"
+                className="h-full rounded-full bg-green-500 transition-all duration-slow"
                 style={{ width: `${(learnedCount / songCount) * 100}%` }}
               />
             </div>

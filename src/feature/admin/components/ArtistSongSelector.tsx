@@ -205,7 +205,7 @@ export const ArtistSongSelector = ({
 
   return (
     <div className={cn(
-        "z-[10] flex items-center justify-center duration-300 animate-in fade-in",
+        "z-[10] flex items-center justify-center duration-base animate-in fade-in",
         isEmbedded ? "w-full h-full" : "modal-backdrop fixed inset-0 bg-black/80 px-4 py-6 backdrop-blur-xl"
     )}>
       <div className={cn(
@@ -304,7 +304,7 @@ export const ArtistSongSelector = ({
                                 <div
                                     key={index}
                                     onClick={() => toggleSongSelection(song.title)}
-                                    className={`group relative flex cursor-pointer items-center gap-5 rounded-[1.8rem] border p-4 transition-all duration-300 ${
+                                    className={`group relative flex cursor-pointer items-center gap-5 rounded-[1.8rem] border p-4 transition-all duration-base ${
                                         selectedSongs.has(song.title)
                                         ? "border-purple-500/40 bg-purple-500/10 shadow-[0_15px_40px_-15px_rgba(168,85,247,0.2)] scale-[1.02] z-10"
                                         : "border-white/[0.03] bg-zinc-900/60 hover:bg-zinc-800/80 hover:border-white/10"
@@ -316,7 +316,7 @@ export const ArtistSongSelector = ({
                                             <img 
                                                 src={song.coverUrl} 
                                                 alt={song.title} 
-                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                                className="h-full w-full object-cover transition-transform duration-slow group-hover:scale-110" 
                                             />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center text-zinc-600 uppercase text-[8px] font-black">
@@ -324,7 +324,7 @@ export const ArtistSongSelector = ({
                                             </div>
                                         )}
                                         <div className={cn(
-                                            "absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity duration-300",
+                                            "absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity duration-base",
                                             selectedSongs.has(song.title) ? "opacity-100" : "opacity-0"
                                         )}>
                                             <Check className="h-8 w-8 text-white stroke-[3px]" />
@@ -412,11 +412,11 @@ export const ArtistSongSelector = ({
                             className="flex items-center gap-5 cursor-pointer group px-6 py-3 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-purple-500/20 transition-all shadow-sm"
                         >
                             <div className={cn(
-                                "w-11 h-5 rounded-full p-1 transition-all duration-500",
+                                "w-11 h-5 rounded-full p-1 transition-all duration-slow",
                                 autoEnrich ? "bg-purple-600 shadow-lg shadow-purple-500/40" : "bg-zinc-800"
                             )}>
                                 <div className={cn(
-                                    "w-3 h-3 rounded-full bg-white transition-all duration-500 shadow-lg",
+                                    "w-3 h-3 rounded-full bg-white transition-all duration-slow shadow-lg",
                                     autoEnrich ? "translate-x-6" : "translate-x-0"
                                 )} />
                             </div>

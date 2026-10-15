@@ -1,11 +1,10 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
-import { Minus, Plus } from "lucide-react";
+import { Minimize2,Minus, Plus } from "lucide-react";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { FaCompress } from "react-icons/fa";
 
 import { useImageHandling } from "../hooks/useImageHandling";
 
@@ -73,7 +72,7 @@ const ImageModal = ({
             size='sm'
             className='rounded-lg bg-background/40 backdrop-blur-sm'
             onClick={onClose}>
-            <FaCompress className='h-4 w-4' />
+            <Minimize2 size='1em' className='h-4 w-4' />
           </Button>
         </div>
 
@@ -83,7 +82,7 @@ const ImageModal = ({
             "touch-none"
           )}>
           <div
-            className='flex h-full w-full items-center justify-center transition-all duration-100 ease-out'
+            className='flex h-full w-full items-center justify-center transition-all duration-fast ease-out'
             style={{
               transform: `translate(${position.x}px, ${position.y}px) scale(${imageScale})`,
               transformOrigin: "center center",
@@ -133,7 +132,7 @@ const ImageModal = ({
               setPosition({ x: 0, y: 0 });
             }}
             className='h-12 w-12 rounded-lg bg-background/40 backdrop-blur-sm'>
-            <FaCompress className='h-5 w-5' />
+            <Minimize2 size='1em' className='h-5 w-5' />
           </Button>
         </div>
       </div>

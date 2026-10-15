@@ -107,7 +107,7 @@ export const ExerciseGrid = ({
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="flex items-center justify-center w-[34px] h-[34px] rounded-[8px] border border-white/5 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-all duration-300 backdrop-blur-md active:scale-95"
+            className="flex items-center justify-center w-[34px] h-[34px] rounded-[8px] border border-white/5 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-all duration-base backdrop-blur-md active:scale-95"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -126,7 +126,7 @@ export const ExerciseGrid = ({
                   key={`page-${page}`}
                   onClick={() => setCurrentPage(page as number)}
                   className={cn(
-                    "flex items-center justify-center w-[34px] h-[34px] rounded-[8px] text-[12px] font-bold transition-all duration-300 backdrop-blur-md active:scale-95",
+                    "flex items-center justify-center w-[34px] h-[34px] rounded-[8px] text-[12px] font-bold transition-all duration-base backdrop-blur-md active:scale-95",
                     currentPage === page
                       ? "bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 shadow-[0_0_10px_-2px_rgba(6,182,212,0.2)]"
                       : "border border-white/5 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/10"
@@ -141,7 +141,7 @@ export const ExerciseGrid = ({
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="flex items-center justify-center w-[34px] h-[34px] rounded-[8px] border border-white/5 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-all duration-300 backdrop-blur-md active:scale-95"
+            className="flex items-center justify-center w-[34px] h-[34px] rounded-[8px] border border-white/5 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-all duration-base backdrop-blur-md active:scale-95"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

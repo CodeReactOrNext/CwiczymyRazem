@@ -116,7 +116,7 @@ export const LeadboardLayout = ({
     <Skeleton className="h-20 w-40" />
   ) : userRank ? (
     <div className="flex flex-col items-end gap-2">
-      <span className="text-xs uppercase tracking-widest text-zinc-400">{t("rank.your_position")}</span>
+      <span className="text-xs text-zinc-400">{t("rank.your_position")}</span>
       <div className="flex items-baseline gap-1">
         <span className="text-5xl font-black text-cyan-300">#{userRank}</span>
       </div>

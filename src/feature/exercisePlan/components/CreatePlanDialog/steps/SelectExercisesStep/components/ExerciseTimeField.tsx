@@ -83,7 +83,7 @@ export function ExerciseTimeField({
             type='button'
             onClick={() => onChange(String(t))}
             className={cn(
-              'min-w-[50px] flex-1 rounded-[8px] py-2 text-[12px] font-bold transition-colors duration-300',
+              'min-w-[50px] flex-1 rounded-[8px] py-2 text-[12px] font-bold transition-colors duration-base',
               value === String(t)
                 ? 'bg-cyan-500/15 text-cyan-300'
                 : 'bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white'

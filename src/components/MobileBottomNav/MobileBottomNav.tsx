@@ -2,11 +2,9 @@ import { cn } from "assets/lib/utils";
 import { MOBILE_BOTTOM_NAV_ATTR } from "components/RockSidebar/MobileMoreSheet";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { Home, Menu, Timer } from "lucide-react";
+import { CassetteTape,Home, Menu, Timer, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FaArrowTrendUp } from "react-icons/fa6";
-import { PiCassetteTapeLight } from "react-icons/pi";
 
 interface MobileBottomNavProps {
   onMenuClick: () => void;
@@ -24,26 +22,26 @@ type NavIcon = React.ComponentType<{ size?: number; className?: string }>;
 const navItems: { label: string; href: string; icon: NavIcon }[] = [
   { label: "home", href: "/dashboard", icon: Home },
   { label: "practice", href: "/timer", icon: Timer },
-  { label: "songs", href: "/songs?view=board", icon: PiCassetteTapeLight },
-  { label: "progress", href: "/profile/activity", icon: FaArrowTrendUp },
+  { label: "songs", href: "/songs?view=board", icon: CassetteTape },
+  { label: "progress", href: "/profile/activity", icon: TrendingUp },
 ];
 
 const itemClass =
-  "relative flex min-h-[52px] min-w-0 flex-1 flex-col items-center justify-center py-1 active:scale-95 transition-transform duration-150";
+  "relative flex min-h-[52px] min-w-0 flex-1 flex-col items-center justify-center py-1 active:scale-95 transition-transform duration-fast";
 
 // A pill highlight wraps both the icon and the label of the active item.
 const pillClass = (active: boolean) =>
   cn(
-    "relative flex w-full max-w-20 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg px-1 py-1.5 transition-colors duration-300",
+    "relative flex w-full max-w-20 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg px-1 py-1.5 transition-colors duration-base",
     active ? "bg-white/10" : "bg-transparent"
   );
 
 const iconClass = (active: boolean) =>
-  cn("transition-colors duration-300", active ? "text-white" : "text-zinc-400");
+  cn("transition-colors duration-base", active ? "text-white" : "text-zinc-400");
 
 const labelClass = (active: boolean) =>
   cn(
-    "whitespace-nowrap text-xs capitalize tracking-tight transition-colors duration-200",
+    "whitespace-nowrap text-xs capitalize tracking-tight transition-colors duration-base",
     active ? "font-medium text-white" : "font-normal text-zinc-400"
   );
 
@@ -75,7 +73,7 @@ const BottomNavItem = ({
         {ripple}
         <Icon
           size={20}
-          className={cn(iconClass(active), "transition-transform duration-300", active && "scale-110")}
+          className={cn(iconClass(active), "transition-transform duration-base", active && "scale-110")}
         />
         <span className={labelClass(active)}>{label}</span>
       </span>

@@ -22,12 +22,12 @@ export function NextMilestone({ currentUserStats }: NextMilestoneProps) {
         <div className='p-6 flex flex-col justify-center h-full'>
           <div className='mb-4 flex items-center gap-2'>
             <Flame className='h-4 w-4 text-orange-500' />
-            <h3 className='text-[11px] font-semibold text-zinc-500 uppercase tracking-widest'>Streak</h3>
+            <h3 className='text-xs font-semibold text-zinc-500'>Streak</h3>
           </div>
 
           <div className="flex items-baseline gap-2 mb-2">
             <span className="text-4xl font-bold text-white tracking-tight">{currentStreakCount}</span>
-            <span className="text-[11px] font-semibold text-zinc-500 tracking-widest uppercase">days</span>
+            <span className="text-xs font-semibold text-zinc-500">days</span>
           </div>
 
           {multiplier > 0 && (
@@ -36,7 +36,7 @@ export function NextMilestone({ currentUserStats }: NextMilestoneProps) {
                 +{Math.round(multiplier * 100)}% 
                 <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
               </span>
-              <span className="text-[10px] font-bold text-zinc-600 uppercase">bonus</span>
+              <span className="text-xs font-bold text-zinc-600">bonus</span>
             </div>
           )}
         </div>

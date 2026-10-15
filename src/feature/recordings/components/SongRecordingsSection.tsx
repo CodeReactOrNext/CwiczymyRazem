@@ -23,7 +23,7 @@ export const SongRecordingsSection = ({ songId, songTitle, songArtist }: SongRec
     <div className="bg-zinc-800/40 rounded-lg p-6 space-y-4 shadow-sm backdrop-blur-sm mt-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Mic2 size={18} className="transition-all duration-500 text-zinc-700" />
+          <Mic2 size={18} className="transition-all duration-slow text-zinc-700" />
           <span className="text-sm font-semibold text-zinc-300">
             Recordings{total > 0 ? ` (${total})` : ""}
           </span>

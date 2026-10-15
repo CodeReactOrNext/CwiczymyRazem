@@ -58,7 +58,7 @@ export const Calendar = ({
       month_grid: "w-full border-collapse",
       weekdays: "flex",
       weekday:
-        "flex-1 pb-1 text-center text-[10px] font-medium uppercase tracking-wide text-zinc-600",
+        "flex-1 pb-1 text-center text-xs font-medium text-zinc-600",
       weeks: "flex flex-col gap-1",
       week: "flex w-full gap-1",
       day: "h-9 flex-1 rounded-lg text-[13px] tabular-nums transition-colors",

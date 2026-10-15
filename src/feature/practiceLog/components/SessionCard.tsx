@@ -100,7 +100,7 @@ export const SessionCard = ({
     >
       <div
         className={cn(
-          "relative flex flex-shrink-0 items-center justify-center rounded-lg shadow-lg transition-all duration-300 group-hover:scale-105",
+          "relative flex flex-shrink-0 items-center justify-center rounded-lg shadow-lg transition-all duration-base",
           config.iconBg,
           config.iconBorder,
           compact ? "h-10 w-10" : "h-12 w-12"
@@ -109,7 +109,7 @@ export const SessionCard = ({
         <TypeIcon
           className={cn(
             config.iconText,
-            "transition-colors duration-300",
+            "transition-colors duration-base",
             compact ? "h-5 w-5" : "h-6 w-6"
           )}
           aria-label={t(config.labelKey)}

@@ -1,5 +1,9 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
+// Motion tokens shared with framer-motion (src/lib/motion) — one motion language.
+const motion = require("./src/lib/motion/tokens.json");
+const ms = (n) => `${n}ms`;
+const bezier = (p) => `cubic-bezier(${p.join(", ")})`;
 /** @type {import('tailwindcss').Config} */
 
 const rotateX = plugin(function ({ addUtilities }) {
@@ -63,16 +67,16 @@ const defaultClick = plugin(function ({ addUtilities }) {
     ".click-behavior": {
       transform: "scale(98%)",
       transitionProperty: "transform",
-      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-      transitionDuration: "100ms",
+      transitionTimingFunction: bezier(motion.easeOut),
+      transitionDuration: ms(motion.duration.fast),
     },
     ".click-behavior-second": {
       transform: "scale(96%)",
     },
     ".transition-background": {
       transitionProperty: "background-color, border-color, box-shadow",
-      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-      transitionDuration: "150ms",
+      transitionTimingFunction: bezier(motion.easeOut),
+      transitionDuration: ms(motion.duration.fast),
     },
   });
 });
@@ -134,6 +138,19 @@ module.exports = {
       shortwide: { raw: "(max-height: 600px) and (orientation: landscape)" },
     },
     extend: {
+      // duration-fast/base/slow + the default curve and ease-out/ease-in-out all come
+      // from the motion tokens; tailwindcss-animate inherits them for animate-in/out.
+      transitionDuration: {
+        DEFAULT: ms(motion.duration.fast),
+        fast: ms(motion.duration.fast),
+        base: ms(motion.duration.base),
+        slow: ms(motion.duration.slow),
+      },
+      transitionTimingFunction: {
+        DEFAULT: bezier(motion.easeOut),
+        out: bezier(motion.easeOut),
+        "in-out": bezier(motion.easeInOut),
+      },
       display: ["group-hover"],
       dropShadow: {
         "3xl": "0 1px 3px rgba(0, 0, 0, 0.45)",

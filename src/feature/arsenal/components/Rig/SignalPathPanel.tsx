@@ -103,7 +103,7 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
               <div
                 key={index}
                 className={cn(
-                  "h-1.5 flex-1 rounded transition-colors duration-300",
+                  "h-1.5 flex-1 rounded transition-colors duration-base",
                   link.ok ? TONES.good.bar : TONES.bad.bar,
                 )}
               />

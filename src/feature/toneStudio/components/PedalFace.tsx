@@ -81,7 +81,7 @@ export const PedalFace = ({
           it. Off, the jewel stays as painted — dark glass. */}
       <span
         aria-hidden
-        className='pointer-events-none absolute rounded-full transition-opacity duration-200'
+        className='pointer-events-none absolute rounded-full transition-opacity duration-base'
         style={{
           left: `${PEDAL_LED.cx * 100}%`,
           top: `${PEDAL_LED.cy * 100}%`,

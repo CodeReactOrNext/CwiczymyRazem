@@ -10,7 +10,7 @@ import {
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { FaRedo, FaTrophy } from "react-icons/fa";
+import { RotateCw, Trophy } from "lucide-react";
 
 interface ExerciseCompleteDialogProps {
   isOpen: boolean;
@@ -49,7 +49,7 @@ export const ExerciseCompleteDialog = ({
                 transition={{ type: "spring", duration: 0.5 }}
                 onAnimationComplete={handleConfetti}>
                 <div className='rounded-full bg-primary/10 p-3'>
-                  <FaTrophy className='h-6 w-6 text-primary' />
+                  <Trophy size='1em' className='h-6 w-6 text-primary' />
                 </div>
               </motion.div>
               <span>{t("exercise_complete.title")}</span>
@@ -64,7 +64,7 @@ export const ExerciseCompleteDialog = ({
         </DialogHeader>
         <DialogFooter className='flex-row gap-2 sm:justify-center'>
           <Button variant='outline' onClick={onRestart}>
-            <FaRedo className='mr-2 h-4 w-4' />
+            <RotateCw size='1em' className='mr-2 h-4 w-4' />
             {t("exercise_complete.repeat")}
           </Button>
           <Button onClick={onClose}>{t("exercise_complete.continue")}</Button>

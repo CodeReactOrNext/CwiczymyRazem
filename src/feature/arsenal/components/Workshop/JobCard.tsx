@@ -87,7 +87,7 @@ export const JobCard = ({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "group relative flex items-center gap-5 overflow-hidden rounded-lg border border-arsenal-border bg-arsenal-section p-6 text-left transition-colors duration-150 click-behavior",
+        "group relative flex items-center gap-5 overflow-hidden rounded-lg border border-arsenal-border bg-arsenal-section p-6 text-left transition-colors duration-fast click-behavior",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         "disabled:pointer-events-none disabled:opacity-50",
         "hover:border-arsenal-accent/30 hover:bg-arsenal-card",

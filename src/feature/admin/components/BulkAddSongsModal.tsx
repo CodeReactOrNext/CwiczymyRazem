@@ -50,7 +50,7 @@ export const BulkAddSongsModal = ({ isOpen, onClose, onConfirm, isLoading }: Bul
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-black/60 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-black/60 animate-in fade-in duration-base">
       <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-zinc-900 p-8 shadow-2xl shadow-black/50">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">

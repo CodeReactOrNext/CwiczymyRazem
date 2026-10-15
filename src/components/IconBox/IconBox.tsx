@@ -1,7 +1,9 @@
+import type { LucideIcon } from "lucide-react";
 import type { IconType } from "react-icons/lib";
 
 interface IconBoxProps {
-  Icon: IconType;
+  /** lucide for UI glyphs; react-icons still serves brand logos and game icons. */
+  Icon: LucideIcon | IconType;
   small?: boolean;
   medium?: boolean;
 }
@@ -17,7 +19,8 @@ export const IconBox = ({ Icon, small, medium }: IconBoxProps) => {
           : "m-2 h-7 w-7 sm:h-10 sm:w-10 sm:text-lg"
       }
        flex shrink-0 items-center justify-center   text-mainText rounded-xl `}>
-      <Icon />
+      {/* 1em: the glyph follows the box's text size, whichever library drew it. */}
+      <Icon size='1em' />
     </div>
   );
 };

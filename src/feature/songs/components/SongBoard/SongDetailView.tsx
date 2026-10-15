@@ -36,6 +36,7 @@ import {
   setSectionMastery,
 } from "feature/songs/utils/arrangements.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { rateSong } from "feature/user/store/userSlice.asyncThunk";
 import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
@@ -43,6 +44,8 @@ import { collection, documentId, getDocs, query, where } from "firebase/firestor
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
+import { transitions } from "lib/motion/motion";
+import { useSharedElement } from "lib/motion/useSharedElement";
 import {
   ArrowLeft,
   Check,
@@ -102,7 +105,7 @@ const StarRatingDisplay = ({ rating, color, size = 12, onRate }: { rating: numbe
             onMouseLeave={() => onRate && setHoverRating(null)}
             className={cn(
               "transition-all",
-              onRate ? "cursor-pointer hover:scale-125 active:scale-90" : "",
+              onRate ? "cursor-pointer active:scale-90" : "",
               isActive ? "opacity-100 fill-current" : "opacity-20 text-zinc-600"
             )}
             style={isActive ? { color } : {}}
@@ -126,6 +129,7 @@ const InfoRow = ({ label, value, icon: Icon }: any) => (
 export const SongDetailView = ({ song, progress, status, onPractice, onRemove, onStatusChange, onPartsChange, onBack, backLabel, showBackOnDesktop = false }: SongDetailViewProps) => {
   const { t } = useTranslation("songs");
   const intlLocale = useIntlLocale();
+  const { layoutDependency, runAfterSnapshot } = useSharedElement();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
@@ -319,7 +323,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onBack}
+                onClick={() => runAfterSnapshot(onBack)}
                 className="gap-2 text-zinc-400 hover:text-white bg-white/5 backdrop-blur-md rounded-full px-4"
               >
                 <ArrowLeft size={16} />
@@ -329,10 +333,14 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
          )}
 
          <div className="relative flex flex-row items-center p-6 md:p-8 gap-5 md:gap-8">
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="h-20 w-20 sm:h-32 sm:w-32 md:h-40 md:w-40 shrink-0 rounded-lg overflow-hidden shadow-2xl bg-zinc-900"
+            {/* Shares its layoutId with the cover in the row/card that opened it:
+                the small cover grows into this one, and shrinks back on close. */}
+            <motion.div
+              layoutId={songCoverLayoutId(song.id)}
+              layoutDependency={layoutDependency}
+              transition={transitions.move}
+              style={SONG_COVER_STYLE}
+              className="h-20 w-20 sm:h-32 sm:w-32 md:h-40 md:w-40 shrink-0 overflow-hidden shadow-2xl bg-zinc-900"
             >
               {song.coverUrl ? (
                 <img src={song.coverUrl} className="h-full w-full object-cover" />
@@ -499,7 +507,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
 
          {/* Spotify Preview */}
          {song.spotifyId && (
-           <div className="animate-in fade-in slide-in-from-top-4 duration-500 mb-6 max-w-md">
+           <div className="animate-in fade-in slide-in-from-top-4 duration-slow mb-6 max-w-md">
              <div className="bg-zinc-800/40 rounded-lg p-1 backdrop-blur-sm shadow-sm">
                 <SpotifyPlayer trackId={song.spotifyId} height={80} />
              </div>
@@ -514,7 +522,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             {/* Column 1: Your Progress */}
             <div className="bg-zinc-800/40 rounded-lg p-6 space-y-6 shadow-sm backdrop-blur-sm">
                <div className="flex items-center gap-2">
-                  <TrendingUp size={18} className="transition-all duration-500 text-zinc-700" />
+                  <TrendingUp size={18} className="transition-all duration-slow text-zinc-700" />
                   <span className="text-sm font-semibold text-zinc-300">{t("your_progress")}</span>
                </div>
                
@@ -579,7 +587,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             {/* Column 2: Song Info */}
             <div className="bg-zinc-800/40 rounded-lg p-6 space-y-6 shadow-sm backdrop-blur-sm">
                <div className="flex items-center gap-2">
-                  <Music size={18} className="transition-all duration-500 text-zinc-700" />
+                  <Music size={18} className="transition-all duration-slow text-zinc-700" />
                   <span className="text-sm font-semibold text-zinc-300">{t("detail.song_data")}</span>
                </div>
 
@@ -595,7 +603,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             {/* Column 3: Community & Ratings */}
             <div className="bg-zinc-800/40 rounded-lg p-6 flex flex-col gap-6 shadow-sm backdrop-blur-sm">
                <div className="flex items-center gap-2">
-                  <Star size={18} className="transition-all duration-500 text-zinc-700" />
+                  <Star size={18} className="transition-all duration-slow text-zinc-700" />
                   <span className="text-sm font-semibold text-zinc-300">{t("detail.community_ratings")}</span>
                </div>
 
@@ -668,7 +676,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
          <SongRecordingsSection songId={song.id} songTitle={song.title} songArtist={song.artist} />
 
          {/* Full Width Bottom: Integrated Mastery Timeline Box */}
-         <div className="bg-zinc-800/40 rounded-lg p-8 shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-500 mt-6">
+         <div className="bg-zinc-800/40 rounded-lg p-8 shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-slow mt-6">
            <div className="flex flex-col items-center gap-8">
              {/* Mastery Summary (Timeline) */}
              <div className="w-full space-y-4">
@@ -794,7 +802,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
            <div className="lg:col-span-3 bg-zinc-800/40 rounded-lg p-6 space-y-4 shadow-sm backdrop-blur-sm relative group/notes mt-8">
               <div className="flex items-center justify-between">
                  <div className="flex items-center gap-2">
-                    <MessageSquare size={18} className="transition-all duration-500 text-zinc-700" />
+                    <MessageSquare size={18} className="transition-all duration-slow text-zinc-700" />
                     <span className="text-sm font-semibold text-zinc-300">{t("detail.practice_notes")}</span>
                  </div>
                  <div className="flex items-center gap-3">

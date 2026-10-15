@@ -104,7 +104,7 @@ export const InputMeter = ({
         }>
         <div
           ref={fillRef}
-          className='h-full w-0 rounded-full transition-[background-color] duration-150'
+          className='h-full w-0 rounded-full transition-[background-color] duration-fast'
         />
       </div>
       <span

@@ -185,7 +185,7 @@ export const DailyCaseCard = ({
                               the instrument's base, as if it stood on the
                               tile — no shadow on the silhouette itself. */}
                           <div className='pointer-events-none absolute bottom-[4%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[100%] bg-black/85 blur-[5px]' />
-                          <div className='relative z-10 flex h-[86%] w-[86%] items-center justify-center transition-transform duration-300 group-hover:scale-[1.04]'>
+                          <div className='relative z-10 flex h-[86%] w-[86%] items-center justify-center transition-transform duration-base'>
                             <img
                               src={imageSrc}
                               alt={`${entry.def.brand} ${entry.def.name}`}

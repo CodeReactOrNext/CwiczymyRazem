@@ -1,8 +1,8 @@
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import { RefreshCw } from "lucide-react";
 import React, { useEffect } from "react";
-import { FaSync } from "react-icons/fa";
 
 interface SuccessRewardCardProps {
   displayedPoints: number;
@@ -94,7 +94,7 @@ export const SuccessRewardCard = ({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-sm font-semibold text-zinc-400 uppercase tracking-widest mb-2"
+                className="text-sm font-semibold text-zinc-400 mb-2"
               >
                   Great Progress!
               </motion.h1>
@@ -186,7 +186,7 @@ export const SuccessRewardCard = ({
                     onClick={onRestart}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#1c1c1c] border border-white/5 text-zinc-300 font-medium text-xs tracking-wide transition-all shadow-sm"
                   >
-                    <FaSync className="h-3 w-3 text-zinc-400" />
+                    <RefreshCw size='1em' className="h-3 w-3 text-zinc-400" />
                     Repeat Session
                   </motion.button>
                 )}

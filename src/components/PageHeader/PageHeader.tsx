@@ -24,7 +24,7 @@ export const PageHeader = ({ title, subtitle, actions, icon }: PageHeaderProps) 
             </div>
           )}
           <div>
-            <h1 className="text-lg font-black uppercase tracking-widest text-white sm:text-xl">
+            <h1 className="text-lg font-black text-white sm:text-xl">
               {title}
             </h1>
             {subtitle && (

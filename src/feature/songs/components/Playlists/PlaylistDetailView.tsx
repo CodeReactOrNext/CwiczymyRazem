@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import {
   closestCenter,
   DndContext,
@@ -65,6 +64,7 @@ import {
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowDownToLine,
   ArrowLeft,
@@ -706,7 +706,7 @@ export const PlaylistDetailView = ({
                 </div>
                 <div className="h-1 overflow-hidden rounded-full bg-white/10">
                   <div
-                    className="h-full rounded-full bg-green-500 transition-all duration-700"
+                    className="h-full rounded-full bg-green-500 transition-all duration-slow"
                     style={{ width: `${(learnedCount / songs.length) * 100}%` }}
                   />
                 </div>

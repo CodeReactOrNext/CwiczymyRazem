@@ -40,7 +40,7 @@ const RigGuitarTile = ({
 
   const tile = (
     <div
-      className='group/tile relative flex h-16 w-16 cursor-pointer items-center justify-center overflow-hidden rounded-xl transition-transform duration-200 hover:scale-105'
+      className='group/tile relative flex h-16 w-16 cursor-pointer items-center justify-center overflow-hidden rounded-xl transition-transform duration-base'
       style={{
         background: `linear-gradient(175deg, ${rs.baseColor}22 0%, #0c0c10 45%, #0c0c10 100%)`,
         boxShadow: `inset 0 0 0 1px ${rs.baseColor}55, 0 2px 8px rgba(0,0,0,0.5)`,

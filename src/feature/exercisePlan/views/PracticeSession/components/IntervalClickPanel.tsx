@@ -5,8 +5,8 @@ import { playGuitarNotePreview, preloadGuitarNotePreview } from "feature/exercis
 import { intervalBySemitones, semitonesBetween } from "feature/exercisePlan/intervals/intervalDefinitions";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import { ArrowRight, Volume2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FaArrowRight, FaVolumeUp } from "react-icons/fa";
 
 import { CLICK_EXAM_MISTAKE_LIMIT, useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import {
@@ -72,7 +72,7 @@ function StepTile({ step, caption, value, state, progress, burst }: StepTileProp
           animate={state === "done" ? { scale: [1, 1.12, 1] } : { scale: 1 }}
           transition={{ duration: 0.4 }}
           className={cn(
-            "flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-lg transition-colors duration-500 sm:h-20 sm:w-20",
+            "flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-lg transition-colors duration-slow sm:h-20 sm:w-20",
             STEP_TILE_STYLES[state],
           )}>
           <AnimatePresence mode="popLayout">
@@ -307,7 +307,7 @@ export function IntervalClickPanel({
                   {interval.degree}
                 </span>
               )}
-              <FaArrowRight className="h-4 w-4 text-zinc-500" aria-hidden />
+              <ArrowRight size='1em' className="h-4 w-4 text-zinc-500" aria-hidden />
               <span className="max-w-[6rem] text-center text-xs font-bold leading-tight text-zinc-200">
                 {intervalLabel}
               </span>
@@ -354,7 +354,7 @@ export function IntervalClickPanel({
               type="button"
               onClick={advanceHunt}
               className="inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-              Next <FaArrowRight className="h-3.5 w-3.5 text-zinc-400" />
+              Next <ArrowRight size='1em' className="h-3.5 w-3.5 text-zinc-400" />
             </button>
           )}
 
@@ -367,7 +367,7 @@ export function IntervalClickPanel({
               disabled={heardRootMidi === null}
               className="inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               title={t("interval_click.play_root")}>
-              <FaVolumeUp className="h-3 w-3 text-zinc-400" /> Hear the root
+              <Volume2 size='1em' className="h-3 w-3 text-zinc-400" /> Hear the root
             </button>
             <button
               type="button"

@@ -185,7 +185,7 @@ function PromptTile({ value, caption, tone, valueClassName, animationKey, grow, 
           animate={bump ? { scale: [1, 1.12, 1] } : { scale: 1 }}
           transition={{ duration: 0.4 }}
           className={cn(
-            "relative flex h-20 items-center justify-center rounded-lg text-center transition-colors duration-500 sm:h-24 shortwide:h-14",
+            "relative flex h-20 items-center justify-center rounded-lg text-center transition-colors duration-slow sm:h-24 shortwide:h-14",
             grow
               ? "min-w-[5rem] px-4 sm:min-w-[6rem] shortwide:min-w-[3.5rem] shortwide:px-2"
               : "w-20 overflow-hidden px-1.5 sm:w-24 shortwide:w-14",
@@ -273,7 +273,7 @@ export function HuntPromptCard({ title, subjectCaption, label, answerCaption, an
     <div className="relative flex items-start justify-center gap-2 sm:gap-3">
       <div
         className={cn(
-          "pointer-events-none absolute inset-x-2 top-0 h-20 rounded-lg blur-[18px] transition-opacity duration-500 sm:h-24 shortwide:h-14",
+          "pointer-events-none absolute inset-x-2 top-0 h-20 rounded-lg blur-[18px] transition-opacity duration-slow sm:h-24 shortwide:h-14",
           complete ? "bg-emerald-500/40 opacity-100" : "bg-cyan-500/10 opacity-60",
         )}
       />
@@ -317,7 +317,7 @@ export function HuntSteps({ labels, activeIndex }: { labels: string[]; activeInd
         <span
           key={`${label}-${index}`}
           className={cn(
-            "rounded px-2 py-0.5 text-xs font-bold transition-colors duration-300",
+            "rounded px-2 py-0.5 text-xs font-bold transition-colors duration-base",
             index === activeIndex
               ? "bg-cyan-500/15 text-cyan-300"
               : index === nextIndex
@@ -347,7 +347,7 @@ export function HuntTargetCard({ value, complete, foundCount, animationKey }: Hu
     <div className="relative">
       <div
         className={cn(
-          "absolute -inset-2 rounded-lg blur-[16px] transition-opacity duration-500",
+          "absolute -inset-2 rounded-lg blur-[16px] transition-opacity duration-slow",
           complete ? "bg-emerald-500/40 opacity-100" : "bg-cyan-500/10 opacity-60",
         )}
       />
@@ -356,7 +356,7 @@ export function HuntTargetCard({ value, complete, foundCount, animationKey }: Hu
         animate={complete ? { scale: [1, 1.15, 1] } : { scale: 1 }}
         transition={{ duration: 0.4 }}
         className={cn(
-          "relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg px-1.5 transition-colors duration-500 sm:h-24 sm:w-24 shortwide:h-14 shortwide:w-14",
+          "relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg px-1.5 transition-colors duration-slow sm:h-24 sm:w-24 shortwide:h-14 shortwide:w-14",
           complete ? "bg-emerald-900/80" : "bg-zinc-900/90",
         )}>
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />

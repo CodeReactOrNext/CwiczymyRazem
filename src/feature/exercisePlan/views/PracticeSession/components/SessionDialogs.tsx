@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FaCheck } from "react-icons/fa";
 import { playCompletionSound } from "utils/audioUtils";
 
 import { EarTrainingLeaderboardDialog } from "../../../components/EarTrainingLeaderboardDialog";
@@ -168,7 +168,7 @@ export const SessionDialogs = ({
             className='fixed left-1/2 top-0 z-[99999] rounded-xl border border-white/20 bg-cyan-500 px-8 py-4 shadow-[0_0_30px_rgba(34,211,238,0.5)]'>
             <div className='flex items-center gap-4'>
               <div className='rounded-lg bg-white/20 p-2'>
-                <FaCheck className='h-6 w-6 text-black' />
+                <Check size='1em' className='h-6 w-6 text-black' />
               </div>
               <div>
                 <h4 className='text-lg font-bold tracking-tight text-black leading-none'>{t("dialogs.finished")}</h4>

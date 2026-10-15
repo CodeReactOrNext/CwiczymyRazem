@@ -176,6 +176,33 @@ export interface DuelRankingEntry {
   draws: number;
 }
 
+// ── What everyone may see ────────────────────────────────────────────────────
+
+/** One side of a settled duel, as the whole app sees it. */
+export interface DuelFeedPlayer {
+  userId: string;
+  displayName: string;
+  avatar: string;
+  lvl: number;
+  attempts: number;
+  bestScore: number;
+  ratingBefore: number;
+  ratingAfter: number;
+}
+
+/**
+ * A settled duel in the public feed: both names, both scores, who won. Only
+ * settled duels get here — a running one stays between its two players.
+ */
+export interface DuelFeedEntry {
+  id: string;
+  exerciseId: string;
+  settledAt: number;
+  kind: DuelOutcomeKind;
+  /** The winner first; on a draw or a void duel, in the order they were paired. */
+  players: [DuelFeedPlayer, DuelFeedPlayer];
+}
+
 export interface DuelOverview {
   /** The viewer's rating — the starting one until a duel has been settled. */
   rating: number;
@@ -191,6 +218,8 @@ export interface DuelOverview {
   recent: DuelView[];
   ranking: DuelRankingEntry[];
   rankedPlayers: number;
+  /** The latest settled duels of every player, newest first. */
+  feed: DuelFeedEntry[];
   /** Players waiting in the queue right now, the viewer's own tickets excluded. */
   waitingOthers: number;
   /** Duels running across the whole app right now, the viewer's own included. */

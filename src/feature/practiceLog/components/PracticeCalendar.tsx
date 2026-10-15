@@ -167,7 +167,7 @@ export const PracticeCalendar = ({
             {t("calendar.clear_range")}
           </button>
         ) : (
-          <span className='text-[10px] uppercase tracking-wide text-zinc-600'>
+          <span className='text-xs text-zinc-600'>
             {t("calendar.hint")}
           </span>
         )}

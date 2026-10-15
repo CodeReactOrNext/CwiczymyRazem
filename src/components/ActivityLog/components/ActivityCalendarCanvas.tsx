@@ -207,7 +207,7 @@ const ActivityCalendarCanvas = ({
       {/* Hardware accelerated highlight overlay */}
       <div 
         ref={highlightRef}
-        className="pointer-events-none absolute left-0 top-0 rounded-[3px] border-2 border-white/90 shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-opacity duration-150"
+        className="pointer-events-none absolute left-0 top-0 rounded-[3px] border-2 border-white/90 shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-opacity duration-fast"
         style={{
           width: SQUARE_SIZE,
           height: SQUARE_SIZE,

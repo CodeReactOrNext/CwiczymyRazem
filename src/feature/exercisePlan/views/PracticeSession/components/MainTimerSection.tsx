@@ -2,7 +2,7 @@ import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { FaHistory } from "react-icons/fa";
+import { HistoryIcon } from "lucide-react";
 import { convertMsToHMS } from "utils/converter/timeConverter";
 
 import { ExerciseDescription } from "../../../components/ExerciseDescription";
@@ -51,7 +51,7 @@ export const MainTimerSection = ({
           {currentExercise.isPlayalong && (
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-[300px] h-1 bg-zinc-800 rounded-full overflow-hidden">
                 <div 
-                    className="h-full bg-red-500 transition-all duration-300" 
+                    className="h-full bg-red-500 transition-all duration-base" 
                     style={{ width: `${timerProgressValue}%` }}
                 />
             </div>
@@ -62,7 +62,7 @@ export const MainTimerSection = ({
              <div className="flex flex-col items-end gap-1">
                 <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">{t("timer_section.session")}</span>
                 <div className="flex items-center gap-2 text-white">
-                    <FaHistory className="h-3.5 w-3.5 text-cyan-500/50" />
+                    <HistoryIcon size='1em' className="h-3.5 w-3.5 text-cyan-500/50" />
                     <span className="font-mono text-lg font-black tracking-wide">{formattedTotalSession}</span>
                 </div>
              </div>
@@ -73,7 +73,7 @@ export const MainTimerSection = ({
              <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">{t("timer_section.exercise")}</span>
              <div className="flex items-center gap-2">
                  <div className={cn(
-                   "font-mono text-3xl font-black leading-none tracking-tight transition-colors duration-300",
+                   "font-mono text-3xl font-black leading-none tracking-tight transition-colors duration-base",
                    isFinished ? "text-emerald-400" : isPlaying ? "text-cyan-400" : "text-white"
                  )}>
                      {formattedTimeLeft}
@@ -125,7 +125,7 @@ export const MainTimerSection = ({
             {currentExercise.isPlayalong && (
                <div className="absolute top-0 left-0 w-full h-1.5 bg-zinc-800">
                   <div 
-                      className="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] transition-all duration-300" 
+                      className="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] transition-all duration-base" 
                       style={{ width: `${timerProgressValue}%` }}
                   />
                </div>
@@ -156,7 +156,7 @@ export const MainTimerSection = ({
                         <div className="flex flex-col items-center px-2">
                             <span className="text-[9px] font-black capitalize tracking-[0.2em] text-cyan-500/70 mb-1.5">{t("timer_section.total")}</span>
                             <div className="flex items-center gap-2">
-                                <FaHistory className="h-3 w-3 text-cyan-500/50" />
+                                <HistoryIcon size='1em' className="h-3 w-3 text-cyan-500/50" />
                                 <span className="text-base font-mono font-black text-cyan-400 tracking-wide">
                                     {convertMsToHMS(totalSessionMs)}
                                 </span>

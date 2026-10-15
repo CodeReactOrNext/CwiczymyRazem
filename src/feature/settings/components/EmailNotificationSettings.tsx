@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { Card, CardContent } from "assets/components/ui/card";
+import { Switch } from "assets/components/ui/switch";
 import { cn } from "assets/lib/utils";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { updateEmailNotifications } from "feature/user/store/userSlice.asyncThunk";
@@ -38,35 +39,6 @@ const OPTIONS: {
     iconClass: "bg-cyan-500/10 text-cyan-500",
   },
 ];
-
-const Toggle = ({
-  checked,
-  onChange,
-  disabled,
-}: {
-  checked: boolean;
-  onChange: () => void;
-  disabled?: boolean;
-}) => (
-  <button
-    type="button"
-    role="switch"
-    aria-checked={checked}
-    disabled={disabled}
-    onClick={onChange}
-    className={cn(
-      "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:cursor-not-allowed disabled:opacity-50",
-      checked ? "bg-cyan-500" : "bg-zinc-700"
-    )}
-  >
-    <span
-      className={cn(
-        "inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-200",
-        checked ? "translate-x-[22px]" : "translate-x-0.5"
-      )}
-    />
-  </button>
-);
 
 const EmailNotificationSettings = () => {
   const { t } = useTranslation("settings");
@@ -129,7 +101,7 @@ const EmailNotificationSettings = () => {
                       </p>
                     </div>
                   </div>
-                  <Toggle
+                  <Switch
                     checked={prefs[opt.key]}
                     disabled={isFetching}
                     onChange={() =>

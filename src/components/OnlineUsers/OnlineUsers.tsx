@@ -45,7 +45,7 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
 
                     const avatar = (
                         <div className={`
-                            relative h-10 w-10 rounded-full bg-zinc-800 overflow-hidden shadow-xl transition-all duration-300
+                            relative h-10 w-10 rounded-full bg-zinc-800 overflow-hidden shadow-xl transition-all duration-base
                             ${supportMember ? "" : `ring-2 ${isPracticing ? "ring-cyan-500" : "ring-zinc-900"}`}
                         `}>
                              {user.avatar ? (
@@ -61,7 +61,7 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
                     return (
                         <div
                             key={user.uid}
-                            className="relative -ml-3 first:ml-0 hover:z-20 transition-all duration-300"
+                            className="relative -ml-3 first:ml-0 hover:z-20 transition-all duration-base"
                             style={{ zIndex: displayUsers.length - i }}
                         >
                             <UserTooltip
@@ -70,7 +70,7 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
                                 onOpenActivity={onOpenActivity}
                             >
                                 <Link href={`/user/${user.uid}`}>
-                                    <div className="cursor-pointer relative transition-transform duration-300 hover:scale-110 hover:-translate-y-1">
+                                    <div className="cursor-pointer relative transition-transform duration-base hover:-translate-y-1">
                                         {/* Practicing Animation */}
                                         {isPracticing && (
                                             <motion.div

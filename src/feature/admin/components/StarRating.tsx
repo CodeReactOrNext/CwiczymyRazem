@@ -30,7 +30,7 @@ export const StarRating = ({ rating, onRate, max = 10 }: StarRatingProps) => {
           >
             <Star 
               className={cn(
-                "h-3.5 w-3.5 transition-all duration-200",
+                "h-3.5 w-3.5 transition-all duration-base",
                 isFilled 
                   ? "fill-cyan-400 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]" 
                   : "text-zinc-700 hover:text-zinc-500"

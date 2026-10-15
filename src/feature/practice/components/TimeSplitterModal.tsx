@@ -71,7 +71,7 @@ export const TimeSplitterModal = ({
                 </div>
             )}
 
-            <div className="flex justify-between items-center text-sm font-bold uppercase tracking-wider">
+            <div className="flex justify-between items-center text-sm font-bold">
                 <span className={splitRatio < 50 ? "text-cyan-400" : "text-zinc-500"}>{t("time_splitter.hearing")}</span>
                 <span className={splitRatio > 50 ? "text-amber-400" : "text-zinc-500"}>{t("time_splitter.technique")}</span>
             </div>
@@ -86,12 +86,12 @@ export const TimeSplitterModal = ({
             
             <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
-                    <p className="text-xs text-zinc-500 uppercase mb-1">{t("time_splitter.hearing")}</p>
+                    <p className="text-xs text-zinc-500 mb-1">{t("time_splitter.hearing")}</p>
                     <p className="text-xl font-bold text-cyan-400">{convertMsToHMS(hearingTime)}</p>
                     <p className="text-[10px] text-zinc-600">{100 - splitRatio}%</p>
                 </div>
                 <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
-                    <p className="text-xs text-zinc-500 uppercase mb-1">{t("time_splitter.technique")}</p>
+                    <p className="text-xs text-zinc-500 mb-1">{t("time_splitter.technique")}</p>
                     <p className="text-xl font-bold text-amber-400">{convertMsToHMS(techniqueTime)}</p>
                     <p className="text-[10px] text-zinc-600">{splitRatio}%</p>
                 </div>

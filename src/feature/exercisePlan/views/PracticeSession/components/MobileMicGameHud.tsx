@@ -11,7 +11,7 @@ export function MobileMicGameHud() {
   const accuracy = getAccuracyDisplay(sessionAccuracy, sessionStats);
 
   return (
-    <div className="mb-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+    <div className="mb-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-slow">
       <div className="flex items-center justify-between gap-4">
 
         {/* Score */}

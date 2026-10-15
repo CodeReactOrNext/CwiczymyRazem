@@ -153,7 +153,7 @@ export const GenerationStepper: React.FC<GenerationStepperProps> = ({
         </div>
         <div className='h-1.5 w-full overflow-hidden rounded-full bg-zinc-800'>
           <div
-            className='h-full rounded-full bg-amber-400/80 transition-all duration-500'
+            className='h-full rounded-full bg-amber-400/80 transition-all duration-slow'
             style={{ width: `${progress}%` }}
           />
         </div>

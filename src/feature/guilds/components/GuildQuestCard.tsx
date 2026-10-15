@@ -216,7 +216,7 @@ export const GuildQuestCard = ({ quest }: { quest: GuildQuestProgress }) => {
               className='h-2.5 overflow-hidden rounded-full bg-zinc-800/60'>
               <div
                 className={cn(
-                  "h-full rounded-full transition-[width] duration-500",
+                  "h-full rounded-full transition-[width] duration-slow",
                   done ? "bg-emerald-400" : "bg-cyan-400",
                 )}
                 style={{ width: `${percent}%` }}

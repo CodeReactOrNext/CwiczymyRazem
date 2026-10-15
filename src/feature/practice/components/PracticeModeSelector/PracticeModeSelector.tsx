@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Ripple } from "components/Ripple/Ripple";
 import { HeroPattern } from "components/UI/HeroBanner";
 import type { ModeProgressSummary } from "feature/practice/hooks/usePracticeModeProgress";
@@ -8,25 +7,24 @@ import { loadLastSessions } from "feature/practice/utils/lastSession";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useRipple } from "hooks/useRipple";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowRight,
   Brain,
+  CassetteTape,
   ClipboardList,
   Dumbbell,
   History,
   ListChecks,
+  ListTree,
   Lock,
   NotebookPen,
   Route,
   Users,
+  WandSparkles,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import {
-  PiCassetteTapeLight,
-  PiMagicWandDuotone,
-  PiTreeView,
-} from "react-icons/pi";
 import { SiGuitarpro } from "react-icons/si";
 import { useAppSelector } from "store/hooks";
 
@@ -106,7 +104,7 @@ const ModeCard = ({
 
   return (
     <div
-      className={`group relative flex items-start gap-3 overflow-hidden rounded-xl transition-background duration-300 ${
+      className={`group relative flex items-start gap-3 overflow-hidden rounded-xl transition-background duration-base ${
         hero
           ? `${c.cardBg} bg-gradient-to-br from-white/[0.03] to-transparent p-[18px] backdrop-blur-md`
           : `${c.cardBg} bg-gradient-to-br from-white/[0.02] to-transparent p-3.5 backdrop-blur-sm`
@@ -144,7 +142,7 @@ const ModeCard = ({
           <Icon
             className={`${hero ? "h-8 w-8" : "h-7 w-7"} ${
               c.iconText
-            } transition-colors duration-300`}
+            } transition-colors duration-base`}
           />
         )}
       </div>
@@ -192,7 +190,7 @@ const ModeCard = ({
                 progress?.total ? "" : "invisible"
               }`}>
               <div
-                className='h-full rounded-full bg-cyan-400 transition-all duration-500'
+                className='h-full rounded-full bg-cyan-400 transition-all duration-slow'
                 style={{
                   width:
                     progress?.total && progress.done !== undefined
@@ -225,7 +223,7 @@ const ModeCard = ({
                   e.stopPropagation();
                   link.onClick();
                 }}
-                className='group/link relative flex min-h-[42px] items-center justify-between overflow-hidden rounded-lg bg-white/[0.05] px-3 py-2 text-left text-[13px] font-semibold text-zinc-100 transition-background duration-200 hover:bg-white/[0.12] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:scale-[0.98]'>
+                className='group/link relative flex min-h-[42px] items-center justify-between overflow-hidden rounded-lg bg-white/[0.05] px-3 py-2 text-left text-[13px] font-semibold text-zinc-100 transition-background duration-base hover:bg-white/[0.12] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:scale-[0.98]'>
                 <Ripple className='bg-white/20' />
                 <span>{link.label}</span>
                 <ArrowRight className='h-4 w-4 shrink-0 text-zinc-400 transition-all group-hover/link:translate-x-0.5 group-hover/link:text-white' />
@@ -323,7 +321,7 @@ export const PracticeModeSelector = () => {
                       key={session.at}
                       type='button'
                       onClick={() => nav(session.href, `resume-${session.at}`)}
-                      className='group relative flex shrink-0 items-center gap-2 overflow-hidden rounded-full bg-zinc-800/60 py-2 pl-3.5 pr-3 text-left transition-background duration-200 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                      className='group relative flex shrink-0 items-center gap-2 overflow-hidden rounded-full bg-zinc-800/60 py-2 pl-3.5 pr-3 text-left transition-background duration-base hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
                       <Ripple className='bg-white/15' />
                       {loadingMode === `resume-${session.at}` && (
                         <div className='h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-[2px] border-white border-t-transparent' />
@@ -379,7 +377,7 @@ export const PracticeModeSelector = () => {
               <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
                 {modeItem(
                   "song",
-                  PiCassetteTapeLight,
+                  CassetteTape,
                   t("modes.songs.title"),
                   t("modes.songs.description"),
                   "/songs?view=board",
@@ -387,7 +385,7 @@ export const PracticeModeSelector = () => {
                 )}
                 {modeItem(
                   "smart",
-                  PiMagicWandDuotone,
+                  WandSparkles,
                   t("modes.auto.title"),
                   t("modes.auto.description"),
                   "/timer/auto",
@@ -428,7 +426,7 @@ export const PracticeModeSelector = () => {
                 )}
                 {modeItem(
                   "scales",
-                  PiTreeView,
+                  ListTree,
                   t("modes.scales.title"),
                   t("modes.scales.description"),
                   "/scale-tree",

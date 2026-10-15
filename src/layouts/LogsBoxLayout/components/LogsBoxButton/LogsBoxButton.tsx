@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { tabNavItemClass } from "components/PageTabs/tabNav";
-import type { IconType } from "react-icons/lib";
+import type { LucideIcon } from "lucide-react";
 
 interface LogsBoxButtonProps {
   title: string;
@@ -9,7 +9,7 @@ interface LogsBoxButtonProps {
   notificationCount?: number;
   hasNewMessages?: boolean;
   hasNewDot?: boolean;
-  Icon: IconType;
+  Icon: LucideIcon;
 }
 
 /** One tab of the feed panel, drawn with the app's shared tab bar (see `tabNav`). */
@@ -28,7 +28,7 @@ const LogsBoxButton = ({
     aria-pressed={active}
     aria-label={title}
     className={cn(tabNavItemClass(active), "relative px-3 sm:px-4")}>
-    <Icon className='shrink-0 text-base' />
+    <Icon size='1em' className='shrink-0 text-base' />
     {/* Phones get the icons alone, so four tabs still fit on one rail. */}
     <span className='hidden sm:inline'>{title}</span>
     {hasNewMessages && (

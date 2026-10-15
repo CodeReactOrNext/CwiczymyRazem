@@ -15,18 +15,10 @@ import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { useTranslation } from "hooks/useTranslation";
 import type { ActivityPreview } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
-import { X } from "lucide-react";
+import { Clock, ExternalLink, Flame, Leaf, Music, Trophy,X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  FaClock,
-  FaExternalLinkAlt,
-  FaFire,
-  FaLeaf,
-  FaMusic,
-  FaTrophy,
-} from "react-icons/fa";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import type { CurrentActivityInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
@@ -153,7 +145,7 @@ export const UserTooltip = ({
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-md bg-cyan-100 text-cyan-600">
-                      <FaMusic className="h-3 w-3" />
+                      <Music size='1em' className="h-3 w-3" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-[10px] text-gray-500 font-medium">Practicing:</p>
@@ -221,7 +213,7 @@ export const UserTooltip = ({
               </div>
               <div className='relative z-10 grid grid-cols-2 gap-2'>
                 <StatsBox
-                  Icon={FaClock}
+                  Icon={Clock}
                   label={t("tooltip.totalTime")}
                   value={convertMsToHM(
                     userData.statistics.totalPracticeTime
@@ -233,7 +225,7 @@ export const UserTooltip = ({
                   value={userData.statistics.totalPoints}
                 />
                 <StatsBox
-                  Icon={FaTrophy}
+                  Icon={Trophy}
                   label={"Lvl"}
                   value={userData.statistics.level}
                 />
@@ -243,17 +235,17 @@ export const UserTooltip = ({
                   value={userData.statistics.fame}
                 />
                 <StatsBox
-                  Icon={FaFire}
+                  Icon={Flame}
                   label={t("tooltip.actual_streak")}
                   value={reconciledStreak ?? userData.statistics.actualDayWithoutBreak}
                 />
                 <StatsBox
-                  Icon={FaMusic}
+                  Icon={Music}
                   label={t("tooltip.sessions")}
                   value={userData.statistics.sessionCount}
                 />
                 <StatsBox
-                  Icon={FaLeaf}
+                  Icon={Leaf}
                   label={t("tooltip.habits")}
                   value={userData.statistics.habitCount}
                 />
@@ -264,7 +256,7 @@ export const UserTooltip = ({
                 className='relative z-10 flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-gray-700'
               >
                 {t("tooltip.viewProfile")}
-                <FaExternalLinkAlt className='text-[10px]' />
+                <ExternalLink size='1em' className='text-[10px]' />
               </Link>
             </div>
           ) : (

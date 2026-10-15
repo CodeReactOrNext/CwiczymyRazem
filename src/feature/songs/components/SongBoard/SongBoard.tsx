@@ -77,7 +77,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
 
                 <div className="flex-1 pb-4">
                    <div className="flex items-center gap-3 mb-2">
-                      <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-black uppercase tracking-widest text-cyan-400">
+                      <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-xs font-black text-cyan-400">
                         {song.genres?.[0] || "Guitar Track"}
                       </span>
                       <TierBadge song={song} className="h-6 w-6 text-[10px]" />
@@ -89,7 +89,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
                 <div className="pb-4">
                    <Button 
                     onClick={() => onPractice(song)}
-                    className="h-16 px-8 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-black uppercase tracking-widest gap-3 shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 active:scale-95"
+                    className="h-16 px-8 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-black gap-3 shadow-lg shadow-cyan-500/20 transition-all active:scale-95"
                    >
                      <Play className="h-6 w-6 fill-current" />
                      Start Practice
@@ -140,7 +140,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
                       </div>
                       <div className="flex gap-2">
                          <div className="h-2 w-2 rounded-full bg-cyan-500" />
-                         <span className="text-[10px] font-bold text-zinc-500 uppercase">Last 10 sessions</span>
+                         <span className="text-xs font-bold text-zinc-500">Last 10 sessions</span>
                       </div>
                    </div>
                    
@@ -164,7 +164,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
                 {/* Mastery Breakdown */}
                 <div className="grid grid-cols-2 gap-8">
                    <div className="space-y-4">
-                      <h4 className="text-sm font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                      <h4 className="text-sm font-black text-zinc-500 flex items-center gap-2">
                         <BarChart3 className="h-4 w-4" />
                         Technique mastery
                       </h4>
@@ -175,7 +175,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
                       </div>
                    </div>
                    <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-6 flex flex-col items-center justify-center text-center">
-                      <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-4">Current Status</p>
+                      <p className="text-xs font-black text-zinc-600 mb-4">Current Status</p>
                       <div className="h-20 w-20 rounded-full border-4 border-cyan-500/20 flex items-center justify-center mb-4">
                          <TierBadge song={song} className="h-16 w-16 text-xl" />
                       </div>
@@ -189,7 +189,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
              <div className="space-y-8">
                 <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-6 space-y-6">
                    <div>
-                      <h4 className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-3">About Track</h4>
+                      <h4 className="text-xs font-black text-zinc-600 mb-3">About Track</h4>
                       <div className="space-y-3">
                          <InfoRow label="Difficulty" value={`${avgDifficulty.toFixed(1)} / 10`} icon={Star} iconColor="text-amber-500" />
                          <InfoRow label="Tempo" value="120 BPM" icon={TrendingUp} iconColor="text-cyan-500" />
@@ -198,7 +198,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
                    </div>
 
                    <div className="pt-6 border-t border-white/5">
-                      <h4 className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-3">Song Resources</h4>
+                      <h4 className="text-xs font-black text-zinc-600 mb-3">Song Resources</h4>
                       <div className="space-y-2">
                         <Button variant="outline" className="w-full justify-start gap-3 rounded-xl border-white/5 bg-white/5 hover:bg-white/10 text-zinc-300">
                            <Music className="h-4 w-4" />
@@ -214,7 +214,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
 
                 {/* Social/Practitioners */}
                 <div className="space-y-4">
-                   <h4 className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em]">Others Practicing</h4>
+                   <h4 className="text-xs font-black text-zinc-600">Others Practicing</h4>
                    <div className="flex -space-x-3">
                       {[1,2,3,4].map(i => (
                         <div key={i} className="h-10 w-10 rounded-full border-2 border-[#0a0a0c] bg-zinc-800 overflow-hidden">
@@ -241,7 +241,7 @@ const StatCard = ({ icon: Icon, label, value, color, bg }: any) => (
         <Icon className={cn("h-6 w-6", color)} />
      </div>
      <div>
-        <p className="text-[11px] font-black text-zinc-500 uppercase tracking-widest">{label}</p>
+        <p className="text-xs font-black text-zinc-500">{label}</p>
         <p className="text-2xl font-black text-white">{value}</p>
      </div>
   </div>
@@ -249,7 +249,7 @@ const StatCard = ({ icon: Icon, label, value, color, bg }: any) => (
 
 const ProgressRow = ({ label, val, color }: any) => (
   <div className="space-y-2">
-    <div className="flex justify-between text-[11px] font-bold uppercase tracking-wider">
+    <div className="flex justify-between text-xs font-bold">
       <span className="text-zinc-500">{label}</span>
       <span className="text-white">{val}%</span>
     </div>

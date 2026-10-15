@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import {
   Select,
@@ -17,6 +16,7 @@ import {
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowUpDown, Check, Music, X } from "lucide-react";
 import React from "react";
 
@@ -177,7 +177,7 @@ const FilterSheet = ({
                     {localGenres.map(g => (
                       <span 
                         key={g} 
-                        className="flex items-center gap-1.5 rounded-[4px] bg-cyan-500/10 px-3 py-1 text-[10px] font-bold text-cyan-400 animate-in zoom-in-95 duration-200"
+                        className="flex items-center gap-1.5 rounded-[4px] bg-cyan-500/10 px-3 py-1 text-[10px] font-bold text-cyan-400 animate-in zoom-in-95 duration-base"
                       >
                         {g}
                         <X 

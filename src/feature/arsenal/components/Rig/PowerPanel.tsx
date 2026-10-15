@@ -62,7 +62,7 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
         <div className='h-1.5 w-full overflow-hidden rounded bg-arsenal-bg'>
           <div
             className={cn(
-              "h-full rounded transition-all duration-300",
+              "h-full rounded transition-all duration-base",
               tone.bar,
             )}
             style={{ width: `${share * 100}%` }}

@@ -11,7 +11,7 @@ interface AdminLoginProps {
 const AdminLogin = ({ password, setPassword, onLogin }: AdminLoginProps) => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#050505] p-4 text-center">
-      <div className="w-full max-w-md space-y-8 rounded-[2.5rem] border border-white/5 bg-zinc-950/50 p-12 backdrop-blur-3xl shadow-2xl animate-in zoom-in-95 duration-500">
+      <div className="w-full max-w-md space-y-8 rounded-[2.5rem] border border-white/5 bg-zinc-950/50 p-12 backdrop-blur-3xl shadow-2xl animate-in zoom-in-95 duration-slow">
         <div className="flex h-16 w-16 items-center justify-center mx-auto rounded-2xl bg-cyan-500/10 text-cyan-500 shadow-inner">
           <ShieldCheck className="h-8 w-8" />
         </div>

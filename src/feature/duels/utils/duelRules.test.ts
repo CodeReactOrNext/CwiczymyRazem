@@ -27,6 +27,7 @@ import {
   resolveDuelOutcome,
   settledProfileUpdate,
   settleDuel,
+  toDuelFeedEntry,
   toDuelView,
 } from "./duelRules";
 
@@ -343,6 +344,52 @@ describe("toDuelView", () => {
 
   it("returns nothing to somebody outside the duel", () => {
     expect(toDuelView(duel({}, {}), "zz")).toBeNull();
+  });
+});
+
+describe("toDuelFeedEntry", () => {
+  it("keeps a running duel out of the feed", () => {
+    expect(toDuelFeedEntry(duel({ attempts: 2 }, { attempts: 1 }))).toBeNull();
+  });
+
+  it("puts the winner first with both scores and rating moves", () => {
+    const entry = toDuelFeedEntry(
+      duel(
+        { attempts: 1, bestScore: 300, ratingAfter: 984 },
+        { attempts: 4, bestScore: 999, ratingAfter: 1016 },
+        {
+          status: "finished",
+          outcome: { kind: "win", winnerId: "b", settledAt: 2000 },
+        },
+      ),
+    )!;
+    expect(entry.kind).toBe("win");
+    expect(entry.settledAt).toBe(2000);
+    expect(entry.players.map((side) => side.userId)).toEqual(["b", "a"]);
+    expect(entry.players[0]).toMatchObject({
+      displayName: "B",
+      bestScore: 999,
+      ratingBefore: DUEL_START_RATING,
+      ratingAfter: 1016,
+    });
+    expect(entry.players[1].ratingAfter).toBe(984);
+  });
+
+  it("keeps the pairing order when nobody won", () => {
+    const entry = toDuelFeedEntry(
+      duel(
+        {},
+        {},
+        {
+          status: "finished",
+          outcome: { kind: "void", winnerId: null, settledAt: 2000 },
+        },
+      ),
+    )!;
+    expect(entry.kind).toBe("void");
+    expect(entry.players.map((side) => side.userId)).toEqual(["a", "b"]);
+    // A void duel moves nobody — the rating after is the rating before.
+    expect(entry.players[0].ratingAfter).toBe(DUEL_START_RATING);
   });
 });
 

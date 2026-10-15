@@ -1,5 +1,4 @@
 import { Card } from "assets/components/ui/card";
-import { useLocalizePlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import {
   Tooltip,
   TooltipContent,
@@ -9,23 +8,14 @@ import {
 import { cn } from "assets/lib/utils";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { getPlanColor, getPlanIcon } from "feature/exercisePlan/data/planAppearance";
+import { useLocalizePlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, Globe, Heart, Lock, Music } from "lucide-react";
+import { ArrowRight, Brain, Clock, Globe, Guitar, Heart, LayersIcon, ListIcon, Lock, Music, Pencil, Trash2, VideoIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
-import {
-  FaBrain,
-  FaClock,
-  FaEdit,
-  FaGuitar,
-  FaLayerGroup,
-  FaListUl,
-  FaMusic,
-  FaTrashAlt,
-  FaVideo,
-  FaYoutube} from "react-icons/fa";
+import { FaYoutube } from "react-icons/fa";
 
 import type { DifficultyLevel, ExercisePlan } from "../types/exercise.types";
 
@@ -50,7 +40,7 @@ interface PlanCardProps {
 const categoryStyles = {
   technique: {
     gradient: "from-blue-500/15 via-zinc-900/60 to-zinc-950",
-    icon: FaGuitar,
+    icon: Guitar,
     text: "text-blue-400",
     iconTile: "bg-blue-500/10 text-blue-400",
     badge: "bg-blue-500/10 text-blue-400 border-blue-500/20",
@@ -59,7 +49,7 @@ const categoryStyles = {
   },
   theory: {
     gradient: "from-emerald-500/15 via-zinc-900/60 to-zinc-950",
-    icon: FaBrain,
+    icon: Brain,
     text: "text-emerald-400",
     iconTile: "bg-emerald-500/10 text-emerald-400",
     badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -68,7 +58,7 @@ const categoryStyles = {
   },
   creativity: {
     gradient: "from-purple-500/15 via-zinc-900/60 to-zinc-950",
-    icon: FaMusic,
+    icon: Music,
     text: "text-purple-400",
     iconTile: "bg-purple-500/10 text-purple-400",
     badge: "bg-purple-500/10 text-purple-400 border-purple-500/20",
@@ -77,7 +67,7 @@ const categoryStyles = {
   },
   hearing: {
     gradient: "from-amber-500/15 via-zinc-900/60 to-zinc-950",
-    icon: FaMusic,
+    icon: Music,
     text: "text-amber-400",
     iconTile: "bg-amber-500/10 text-amber-400",
     badge: "bg-amber-500/10 text-amber-400 border-amber-500/20",
@@ -86,7 +76,7 @@ const categoryStyles = {
   },
   mixed: {
     gradient: "from-red-500/15 via-zinc-900/60 to-zinc-950",
-    icon: FaLayerGroup,
+    icon: LayersIcon,
     text: "text-red-400",
     iconTile: "bg-red-500/10 text-red-400",
     badge: "bg-red-500/10 text-red-400 border-red-500/20",
@@ -203,7 +193,7 @@ export const PlanCard = ({
       <div
         aria-hidden
         className={cn(
-          "pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full blur-3xl opacity-40 transition-opacity duration-500 group-hover:opacity-75",
+          "pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full blur-3xl opacity-40 transition-opacity duration-slow group-hover:opacity-75",
           isLocked ? "bg-zinc-500/15" : style.glow
         )}
       />
@@ -211,7 +201,7 @@ export const PlanCard = ({
       <Icon
         aria-hidden
         className={cn(
-          "pointer-events-none absolute -right-6 -top-6 h-28 w-28 opacity-[0.12] transition-opacity duration-500 group-hover:opacity-[0.18]",
+          "pointer-events-none absolute -right-6 -top-6 h-28 w-28 opacity-[0.12] transition-opacity duration-slow group-hover:opacity-[0.18]",
           isLocked ? "text-zinc-500" : style.text
         )}
       />
@@ -242,7 +232,7 @@ export const PlanCard = ({
             )}
             {hasVideo && !isLocked && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500">
-                    <FaVideo className="h-2.5 w-2.5" />
+                    <VideoIcon size='1em' className="h-2.5 w-2.5" />
                     {t("plans:video")}
                 </span>
             )}
@@ -257,7 +247,7 @@ export const PlanCard = ({
                                 aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                                 aria-pressed={isFavorite}
                                 className={cn(
-                                    "flex h-9 w-9 items-center justify-center rounded-[4px] border shadow-lg backdrop-blur-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50 focus-visible:opacity-100",
+                                    "flex h-9 w-9 items-center justify-center rounded-[4px] border shadow-lg backdrop-blur-sm transition-all duration-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50 focus-visible:opacity-100",
                                     isFavorite
                                         // Already favorited — always visible so the state is recognizable at a glance.
                                         ? "border-rose-500/30 bg-rose-500/15 text-rose-400 opacity-100 hover:bg-rose-500/25 hover:text-rose-300"
@@ -309,7 +299,7 @@ export const PlanCard = ({
                                         className="flex h-9 w-9 items-center justify-center rounded-[4px] text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
                                         onClick={(e) => { e.stopPropagation(); onEdit(); }}
                                     >
-                                        <FaEdit className="h-3.5 w-3.5" />
+                                        <Pencil size='1em' className="h-3.5 w-3.5" />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>{t("plans:edit")}</TooltipContent>
@@ -324,7 +314,7 @@ export const PlanCard = ({
                                         className="flex h-9 w-9 items-center justify-center rounded-[4px] text-zinc-400 transition-colors hover:bg-red-500/15 hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500/50"
                                         onClick={(e) => { e.stopPropagation(); onDelete(); }}
                                     >
-                                        <FaTrashAlt className="h-3.5 w-3.5" />
+                                        <Trash2 size='1em' className="h-3.5 w-3.5" />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>{t("plans:delete")}</TooltipContent>
@@ -399,11 +389,11 @@ export const PlanCard = ({
       <div className="relative mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         <div className="flex items-center gap-4">
             <div className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-zinc-400")}>
-                <FaClock className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-600" : "text-zinc-500")} />
+                <Clock size='1em' className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-600" : "text-zinc-500")} />
                 <span>{totalDuration} min</span>
             </div>
             <div className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-zinc-400")}>
-                <FaListUl className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-600" : "text-zinc-500")} />
+                <ListIcon size='1em' className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-600" : "text-zinc-500")} />
                 <span>{plan.exercises.length}</span>
             </div>
             {songCount > 0 && (
@@ -420,7 +410,7 @@ export const PlanCard = ({
           <button
             type="button"
             aria-label={t("plans:card.upgrade")}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 transition-colors duration-300 group-hover:bg-amber-500 group-hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 transition-colors duration-base group-hover:bg-amber-500 group-hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
             onClick={(e) => { e.stopPropagation(); onUpgrade?.(); }}
           >
             <Lock className="h-4 w-4" />
@@ -444,7 +434,7 @@ export const PlanCard = ({
           <button
             type="button"
             className={cn(
-              "flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-white/10 px-4 text-xs font-semibold text-zinc-100 transition-colors duration-300",
+              "flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-white/10 px-4 text-xs font-semibold text-zinc-100 transition-colors duration-base",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60",
               style.cta
             )}

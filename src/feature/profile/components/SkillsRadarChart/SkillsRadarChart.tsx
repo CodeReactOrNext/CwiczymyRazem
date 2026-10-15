@@ -95,7 +95,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
             <div key={skill.name} className='group/item space-y-3'>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-4'>
-                  <span className='text-base font-semibold text-white transition-colors duration-300'>
+                  <span className='text-base font-semibold text-white transition-colors duration-base'>
                     {skill.name}
                   </span>
                 </div>

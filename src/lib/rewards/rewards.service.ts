@@ -6,6 +6,7 @@ import type {
   SalvagedMod,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
+import { playUiSound } from "lib/uiSounds/uiSounds";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 import type { RewardPayout } from "./rewardPayout";
@@ -119,6 +120,7 @@ export const claimAchievementRewards = async (
     "/api/rewards/claim-achievements",
     { idToken, ...(achievementIds ? { achievementIds } : {}) },
   );
+  if (data.claimed.length > 0) playUiSound("reward");
   return data;
 };
 
@@ -132,6 +134,7 @@ export const claimScaleReward = async (
     "/api/rewards/claim-scale",
     { idToken, scaleType, position },
   );
+  playUiSound("reward");
   return data;
 };
 
@@ -144,6 +147,7 @@ export const claimJourneyReward = async (
     "/api/rewards/claim-journey",
     { idToken, moduleId },
   );
+  playUiSound("reward");
   return data;
 };
 
@@ -161,6 +165,8 @@ export const claimLevelRewards = async (): Promise<ClaimLevelsResult> => {
     "/api/rewards/claim-levels",
     { idToken },
   );
+  // Runs on its own after sessions too — a chime only when a rung was actually paid.
+  if (data.levels.length > 0) playUiSound("reward");
   return data;
 };
 
@@ -173,5 +179,6 @@ export const claimRoadmapReward = async (
     "/api/rewards/claim-roadmap",
     { idToken, roadmapId },
   );
+  playUiSound("reward");
   return data;
 };

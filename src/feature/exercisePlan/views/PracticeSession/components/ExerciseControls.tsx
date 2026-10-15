@@ -1,8 +1,8 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
+import { Pause, Play, SkipForward } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FaPause, FaPlay, FaStepForward } from "react-icons/fa";
 
 // The "Press Start to play" nudge is for a first session only — once someone
 // has started an exercise it just covers the Pro Tips underneath the button.
@@ -90,7 +90,7 @@ const ExerciseControls = ({
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 whitespace-nowrap z-[60] pointer-events-none">
                 <div className="animate-bounce flex flex-col items-center">
                   <div className="bg-white  px-4 py-1.5 rounded-lg  text-[13px]  tracking-wider shadow-2xl shadow-white/20 flex items-center gap-1.5">
-                    <FaPlay className="h-2.5 w-2.5" /> 
+                    <Play size='1em' className="h-2.5 w-2.5" /> 
                     <span>{t("controls.press_start")}</span>
                   </div>
                   <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white -mt-[1px]"></div>
@@ -100,12 +100,12 @@ const ExerciseControls = ({
             {isPlaying ? (
               <div className="flex items-center gap-2">
                 <span>{t("controls.pause")}</span>
-                <FaPause className={iconSizes[size]} />
+                <Pause size='1em' className={iconSizes[size]} />
               </div>
             ) : (
                <div className="flex items-center gap-2">
                 <span>{t("start")}</span>
-                <FaPlay className={cn(iconSizes[size], "ml-0.5")} />
+                <Play size='1em' className={cn(iconSizes[size], "ml-0.5")} />
               </div>
             )}
            </Button>
@@ -147,7 +147,7 @@ const ExerciseControls = ({
           className={cn(
             "flex-1 rounded-lg transition-background click-behavior",
           )}>
-          <FaStepForward className={iconSizes[size]} />
+          <SkipForward size='1em' className={iconSizes[size]} />
         </Button>
       )}
     </div>

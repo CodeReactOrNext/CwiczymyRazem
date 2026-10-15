@@ -101,6 +101,15 @@
     "no_show_them": "Rywal nie zagrał",
     "nobody_played": "Nikt nie zagrał"
   },
+  "feed": {
+    "title": "Wszystkie duele",
+    "latest": "ostatnie {{count}}",
+    "empty": "Nikt jeszcze nie rozliczył duelu. Tu pojawia się każdy zakończony duel w aplikacji.",
+    "win": "{{winner}} pokonuje {{loser}}",
+    "walkover": "{{winner}} pokonuje {{loser}} — walkower",
+    "draw": "{{winner}} remisuje z {{loser}}",
+    "void": "{{winner}} vs {{loser}} — nikt nie zagrał"
+  },
   "ranking": {
     "title": "Ranking",
     "players_one": "{{count}} w rankingu",

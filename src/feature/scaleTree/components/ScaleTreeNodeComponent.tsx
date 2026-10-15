@@ -281,7 +281,7 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
       <div style={{ width: containerSize, height: containerSize, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
         {/* Main shape container for scaling */}
         <div
-          className={`relative flex items-center justify-center ${isLocked ? "" : "hover:scale-110 active:scale-90"}`}
+          className={`relative flex items-center justify-center ${isLocked ? "" : "active:scale-90"}`}
           style={{
             width: circleSize,
             height: circleSize,

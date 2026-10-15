@@ -198,7 +198,7 @@ export const GuildSpendPanel = ({
             className='h-2.5 overflow-hidden rounded-full bg-zinc-950/60'>
             <div
               className={cn(
-                "h-full rounded-full transition-[width] duration-500",
+                "h-full rounded-full transition-[width] duration-slow",
                 covered ? "bg-emerald-400" : look.bar,
               )}
               style={{ width: `${percent}%` }}

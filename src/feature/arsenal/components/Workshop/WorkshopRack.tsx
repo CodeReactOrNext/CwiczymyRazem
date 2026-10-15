@@ -116,7 +116,7 @@ export const WorkshopRack = ({
                 key={entry.id}
                 onClick={() => onSelect(entry)}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg border p-3 text-left transition-colors duration-150",
+                  "flex items-center gap-3 rounded-lg border p-3 text-left transition-colors duration-fast",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
                   isSelected
                     ? "border-arsenal-accent/40 bg-arsenal-card"

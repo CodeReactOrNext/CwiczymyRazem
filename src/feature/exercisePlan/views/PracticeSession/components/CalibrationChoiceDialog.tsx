@@ -9,7 +9,7 @@ import {
 } from "assets/components/ui/dialog";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
-import { FaGuitar } from "react-icons/fa";
+import { Guitar } from "lucide-react";
 
 interface CalibrationChoiceDialogProps {
   isOpen: boolean;
@@ -44,7 +44,7 @@ export const CalibrationChoiceDialog = ({
       <DialogContent className="sm:max-w-md z-[99999999]">
         <DialogHeader>
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
-            <FaGuitar className="h-6 w-6 text-emerald-400" />
+            <Guitar size='1em' className="h-6 w-6 text-emerald-400" />
           </div>
           <DialogTitle className="text-center text-xl">{t("choice.title")}</DialogTitle>
           <DialogDescription className="text-center text-zinc-400 leading-relaxed pt-2">

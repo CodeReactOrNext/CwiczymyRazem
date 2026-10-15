@@ -5,9 +5,8 @@ import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
 import { useNativeOutputDevice } from "hooks/useNativeOutputDevice";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronLeft, RefreshCw, Speaker, Wand2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Headphones, Mic, Plug, RefreshCw, Speaker, VolumeX,Wand2, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import { FaChevronRight, FaHeadphones, FaMicrophone, FaPlug, FaTimes, FaVolumeOff } from "react-icons/fa";
 
 import { useAutoGain } from "../hooks/useAutoGain";
 import type { InputSource } from "./SourceStep";
@@ -75,7 +74,7 @@ export const SetupStep = React.memo(function SetupStep({
           </h2>
         </div>
         <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
-          <FaTimes className="h-4 w-4" />
+          <X size='1em' className="h-4 w-4" />
         </button>
       </div>
 
@@ -101,9 +100,9 @@ export const SetupStep = React.memo(function SetupStep({
             className="w-full bg-cyan-500 text-black hover:bg-cyan-400 font-bold h-11"
           >
             {isNative ? (
-              <FaPlug className="mr-2 h-4 w-4" />
+              <Plug size='1em' className="mr-2 h-4 w-4" />
             ) : (
-              <FaMicrophone className="mr-2 h-4 w-4" />
+              <Mic size='1em' className="mr-2 h-4 w-4" />
             )}
             {isLoading
               ? t("setup.connecting")
@@ -121,7 +120,7 @@ export const SetupStep = React.memo(function SetupStep({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <FaMicrophone className={cn("h-3 w-3 transition-colors", signalGood ? "text-emerald-400 animate-pulse" : "text-zinc-500")} />
+                    <Mic size='1em' className={cn("h-3 w-3 transition-colors", signalGood ? "text-emerald-400 animate-pulse" : "text-zinc-500")} />
                     <span className="text-[10px] font-bold tracking-widest text-zinc-500">{t("setup.signal_level")}</span>
                   </div>
                   <span className={cn("text-[10px] font-bold transition-colors",
@@ -134,7 +133,7 @@ export const SetupStep = React.memo(function SetupStep({
                   <div className="absolute inset-y-0 left-[8%] w-px bg-white/10" />
                   <div
                     className={cn(
-                      "h-full rounded-lg transition-all duration-75",
+                      "h-full rounded-lg transition-all duration-fast",
                       tooQuiet ? "bg-amber-500" : "bg-emerald-500 shadow-[0_0_8px_#10b981]"
                     )}
                     style={{ width: `${fillPct}%` }}
@@ -181,7 +180,7 @@ export const SetupStep = React.memo(function SetupStep({
               onClick={onNext}
               className="w-full h-12 mt-4"
             >
-              {t("setup.tune_guitar")} <FaChevronRight className="ml-1.5 h-3 w-3" />
+              {t("setup.tune_guitar")} <ChevronRight size='1em' className="ml-1.5 h-3 w-3" />
             </Button>
           </>
         )}
@@ -200,7 +199,7 @@ function MicrophoneTips() {
     <div className="space-y-3">
       <div className="rounded-lg bg-amber-500/10 p-4 flex items-start gap-4">
         <div className="shrink-0 w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
-          <FaHeadphones className="text-lg text-amber-400" />
+          <Headphones size='1em' className="text-lg text-amber-400" />
         </div>
         <div>
           <p className="text-sm font-bold text-amber-300 mb-1">{t("setup.headphones")}</p>
@@ -212,7 +211,7 @@ function MicrophoneTips() {
 
       <div className="rounded-lg bg-amber-500/10 p-4 flex items-start gap-4">
         <div className="shrink-0 w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
-          <FaVolumeOff className="text-lg text-amber-400" />
+          <VolumeX size='1em' className="text-lg text-amber-400" />
         </div>
         <div>
           <p className="text-sm font-bold text-amber-300 mb-1">{t("setup.quiet")}</p>
@@ -261,7 +260,7 @@ function NativeInterfaceSelector({
     <div className="rounded-lg bg-zinc-900/70 p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FaPlug className="h-3 w-3 text-cyan-400" />
+          <Plug size='1em' className="h-3 w-3 text-cyan-400" />
           <span className="text-[10px] font-bold tracking-widest text-zinc-500">
             {t("setup.interface")}{api ? ` · ${api}` : ""}
           </span>
@@ -358,7 +357,7 @@ function InterfaceTips() {
   return (
     <div className="rounded-lg bg-zinc-900/70 p-4 flex items-start gap-4">
       <div className="shrink-0 w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
-        <FaPlug className="text-lg text-zinc-400" />
+        <Plug size='1em' className="text-lg text-zinc-400" />
       </div>
       <div>
         <p className="text-sm font-bold text-zinc-200 mb-1">{t("setup.before_start")}</p>

@@ -18,6 +18,7 @@ import { LanguageSettings } from "feature/settings/components/LanguageSettings";
 import MediaLinks from "feature/settings/components/MediaLinks";
 import PasswordChange from "feature/settings/components/PasswordChange";
 import ProfileBasics from "feature/settings/components/ProfileBasics";
+import { SoundSettings } from "feature/settings/components/SoundSettings";
 import { TablatureAppearance } from "feature/settings/components/TablatureAppearance";
 import SettingsLayout from "feature/settings/SettingsLayout";
 import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
@@ -73,6 +74,7 @@ const SettingsView = () => {
               <ProfileBasics />
               <GuitarStartDate />
               <LanguageSettings />
+              <SoundSettings />
             </TabsContent>
 
             <TabsContent value="socials" className="mt-0">

@@ -199,7 +199,7 @@ export const LogReaction = ({
                 : `Motivate ${recipient} and give them ${fameAmount} Fame`
             }
             className={cn(
-              "group relative flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-[color,background-color,transform] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:gap-2 sm:px-3 sm:text-[13px]",
+              "group relative flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-[color,background-color,transform] duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:gap-2 sm:px-3 sm:text-[13px]",
               // A motivated row lights up amber; one still waiting for you stays neutral.
               isReacted
                 ? "cursor-default bg-amber-500/15 text-amber-300"
@@ -229,7 +229,7 @@ export const LogReaction = ({
               <span className='relative flex [perspective:240px]'>
                 <Coin
                   className={cn(
-                    "h-5 w-5 transition-opacity duration-200 sm:h-[22px] sm:w-[22px]",
+                    "h-5 w-5 transition-opacity duration-base sm:h-[22px] sm:w-[22px]",
                     !isReacted && "opacity-50 group-hover:opacity-80",
                     celebration !== 0 && styles.toss,
                   )}

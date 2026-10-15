@@ -2,10 +2,9 @@ import { Button } from "assets/components/ui/button";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { Link2, User } from "lucide-react";
+import { Check,Link2, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { MdCheck } from "react-icons/md";
 import { useAppSelector } from "store/hooks";
 
 export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon" }) => {
@@ -60,7 +59,7 @@ export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon
               stiffness: 300,
               damping: 15,
             }}>
-            <MdCheck className="text-green-500 text-sm" />
+            <Check size='1em' className="text-green-500 text-sm" />
           </motion.div>
         ) : (
           <motion.div

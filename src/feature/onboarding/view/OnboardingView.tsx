@@ -75,7 +75,7 @@ const StepHeading = ({
 
 /** Fades each step in as it replaces the previous one. */
 const StepBody = ({ children }: { children: ReactNode }) => (
-  <div className='duration-300 animate-in fade-in slide-in-from-bottom-2'>
+  <div className='duration-base animate-in fade-in slide-in-from-bottom-2'>
     {children}
   </div>
 );
@@ -118,7 +118,7 @@ const GoalTile = ({
           fill
           sizes='(min-width: 640px) 440px, 112px'
           className={cn(
-            "object-cover opacity-60 transition-opacity duration-300 group-hover:opacity-90",
+            "object-cover opacity-60 transition-opacity duration-base group-hover:opacity-90",
             option.imagePosition,
           )}
         />
@@ -307,7 +307,7 @@ const OnboardingView = () => {
           <span
             key={s}
             className={cn(
-              "h-1 flex-1 rounded-full transition-colors duration-300",
+              "h-1 flex-1 rounded-full transition-colors duration-base",
               i <= stepIndex ? "bg-cyan-400" : "bg-zinc-800",
             )}
           />
@@ -332,7 +332,7 @@ const OnboardingView = () => {
                     FOCUS_RING,
                   )}>
                   <span className='flex w-24 shrink-0 flex-col sm:w-auto'>
-                    <span className='font-teko text-6xl font-medium tabular-nums leading-none text-zinc-100 transition-colors duration-300 group-hover:text-cyan-400 sm:text-8xl'>
+                    <span className='font-teko text-6xl font-medium tabular-nums leading-none text-zinc-100 transition-colors duration-base group-hover:text-cyan-400 sm:text-8xl'>
                       {option.years}
                     </span>
                     <span className='text-sm text-zinc-500'>{t(`levels.${option.level}.unit`, option.unit)}</span>

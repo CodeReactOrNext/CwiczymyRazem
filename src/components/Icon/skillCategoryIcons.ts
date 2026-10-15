@@ -1,5 +1,4 @@
-import { FaBrain, FaHandPaper, FaLightbulb } from "react-icons/fa";
-import { IoEarOutline } from "react-icons/io5";
+import { Brain, Ear,Hand, Lightbulb } from "lucide-react";
 import type { IconType } from "react-icons/lib";
 import type { SkillsType } from "types/skillsTypes";
 
@@ -10,8 +9,8 @@ import type { SkillsType } from "types/skillsTypes";
  * looked like two different things.
  */
 export const SKILL_CATEGORY_ICONS: Record<SkillsType, IconType> = {
-  technique: FaHandPaper,
-  theory: FaBrain,
-  hearing: IoEarOutline,
-  creativity: FaLightbulb,
+  technique: Hand,
+  theory: Brain,
+  hearing: Ear,
+  creativity: Lightbulb,
 };

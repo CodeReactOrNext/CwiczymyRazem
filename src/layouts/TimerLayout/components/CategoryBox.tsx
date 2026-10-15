@@ -4,8 +4,8 @@ import HearingIcon from "components/Icon/HearingIcon";
 import TechniqueIcon from "components/Icon/TechniqueIcon";
 import TheoryIcon from "components/Icon/TheoryIcon";
 import { useTranslation } from "hooks/useTranslation";
+import { Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
-import { VscDebugPause, VscDebugStart } from "react-icons/vsc";
 
 interface CategoryBox {
   title: string;
@@ -152,7 +152,7 @@ const CategoryBox = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border-[0.5px] bg-[#171717] p-5 text-white transition-all duration-300 ${
+      className={`relative overflow-hidden rounded-xl border-[0.5px] bg-[#171717] p-5 text-white transition-all duration-base ${
         isActive ? "z-10" : ""
       } ${showControls ? "cursor-pointer" : ""}`}
       style={{
@@ -178,7 +178,7 @@ const CategoryBox = ({
         <div
           className={`flex h-10 w-10 items-center justify-center rounded-full ${
             isActive ? "opacity-100" : "opacity-80"
-          } transition-all duration-300 hover:opacity-100`}
+          } transition-all duration-base hover:opacity-100`}
           style={{
             backgroundColor: chosen
               ? `${skillColor}${isActive ? "30" : "20"}`
@@ -236,7 +236,7 @@ const CategoryBox = ({
         <Button
           variant={isActive ? "default" : "outline"}
           size='sm'
-          className={`relative z-10 w-full transition-all duration-300 ${
+          className={`relative z-10 w-full transition-all duration-base ${
             isActive
               ? "border-none shadow-md hover:shadow-lg"
               : "border-gray-700 bg-black/40 text-white hover:border-gray-600 hover:bg-black/60"
@@ -247,12 +247,12 @@ const CategoryBox = ({
           }}>
           {isActive ? (
             <span translate='no' className='flex items-center'>
-              <VscDebugPause className='mr-2 h-4 w-4' />
+              <Pause size='1em' className='mr-2 h-4 w-4' />
               {t("pause")}
             </span>
           ) : (
             <span translate='no' className='flex items-center'>
-              <VscDebugStart className='mr-2 h-4 w-4' />
+              <Play size='1em' className='mr-2 h-4 w-4' />
               {t("start")}
             </span>
           )}

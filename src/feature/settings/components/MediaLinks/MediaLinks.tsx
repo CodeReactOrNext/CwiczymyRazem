@@ -4,9 +4,9 @@ import { Label } from "assets/components/ui/label";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { uploadUserSocialData } from "feature/user/store/userSlice.asyncThunk";
 import { useTranslation } from "hooks/useTranslation";
-import { Loader2 } from "lucide-react";
+import { Guitar,Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { FaSoundcloud, FaYoutube } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const MediaLinks = () => {
@@ -94,7 +94,7 @@ const MediaLinks = () => {
 
       <div className="space-y-2">
         <Label className="flex items-center gap-2">
-          <FaGuitar className="h-4 w-4" />
+          <Guitar size='1em' className="h-4 w-4" />
           {t("settings:bands")}
         </Label>
         <Input

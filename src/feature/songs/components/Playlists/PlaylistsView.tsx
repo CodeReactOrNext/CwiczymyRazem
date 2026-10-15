@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
@@ -10,6 +9,7 @@ import {
 import type { Playlist } from "feature/songs/types/playlist.types";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { Compass, ListMusic, Plus } from "lucide-react";
 import posthog from "posthog-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -214,7 +214,7 @@ export const PlaylistsView = ({
     tab === "discover" || (hasMine && myPlaylists.length >= FEW_PLAYLISTS);
 
   return (
-    <div className="space-y-8 p-4 sm:p-6 md:p-10 animate-in fade-in-50 duration-300">
+    <div className="space-y-8 p-4 sm:p-6 md:p-10 animate-in fade-in-50 duration-base">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="space-y-3">
           <h1 className="text-2xl font-bold text-white">{t("view.title")}</h1>
@@ -322,7 +322,7 @@ export const PlaylistsView = ({
             <button
               type="button"
               onClick={() => setIsCreatorOpen(true)}
-              className="group relative flex flex-col rounded-md p-3 text-left transition-all duration-300 hover:bg-zinc-800/40"
+              className="group relative flex flex-col rounded-md p-3 text-left transition-all duration-base hover:bg-zinc-800/40"
             >
               <Ripple />
               <div className="flex aspect-square w-full items-center justify-center rounded-md bg-white/[0.04] text-zinc-500 transition-colors group-hover:text-white">

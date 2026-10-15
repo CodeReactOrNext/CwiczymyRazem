@@ -1,7 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { X } from "lucide-react";
-import { FaMicrophone, FaPlug } from "react-icons/fa";
+import { Mic, Plug,X } from "lucide-react";
 
 export type InputSource = "interface" | "microphone";
 
@@ -28,7 +27,7 @@ export const SourceStep = ({ onSelect, onCancel }: SourceStepProps) => {
 
       <div className="grid grid-cols-2 gap-3">
         <SourceCard
-          icon={<FaPlug className="text-4xl" />}
+          icon={<Plug size='1em' className="text-4xl" />}
           title={t("source.interface")}
           description={t("source.interface_desc")}
           accentClass="hover:bg-cyan-500/5 group-hover:text-cyan-400"
@@ -37,7 +36,7 @@ export const SourceStep = ({ onSelect, onCancel }: SourceStepProps) => {
           onClick={() => onSelect("interface")}
         />
         <SourceCard
-          icon={<FaMicrophone className="text-4xl" />}
+          icon={<Mic size='1em' className="text-4xl" />}
           title={t("source.mic")}
           description={t("source.mic_desc")}
           accentClass="hover:bg-emerald-500/5"

@@ -2,6 +2,7 @@ import { Skeleton } from "assets/components/ui/skeleton";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { ActiveDuelCard } from "feature/duels/components/ActiveDuelCard";
 import { DuelEmptyState } from "feature/duels/components/DuelEmptyState";
+import { DuelFeed } from "feature/duels/components/DuelFeed";
 import { DuelQueueCard } from "feature/duels/components/DuelQueueCard";
 import { DuelRanking } from "feature/duels/components/DuelRanking";
 import { DuelRatingSummary } from "feature/duels/components/DuelRatingSummary";
@@ -21,8 +22,8 @@ import { useAppSelector } from "store/hooks";
 
 /**
  * The duels page: your rating up top; then what you have running (the thing
- * to do here), where a new duel starts, and how the last ones ended; the
- * ladder and the rules on the side.
+ * to do here), where a new duel starts, how your last ones ended, and how
+ * everybody else's went; the ladder and the rules on the side.
  */
 export const DuelsView = () => {
   const { t } = useTranslation("duels");
@@ -138,6 +139,8 @@ export const DuelsView = () => {
           {recent.length > 0 && (
             <RecentDuels duels={recent} highlightedId={highlightedId} />
           )}
+
+          {overview && <DuelFeed feed={overview.feed} uid={uid} now={now} />}
         </div>
 
         <aside className='flex min-w-0 flex-col gap-6'>

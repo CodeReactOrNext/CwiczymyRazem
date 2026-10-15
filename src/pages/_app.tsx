@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import ErrorBoundary from "components/ErrorBoundary/ErrorBoundary";
-import { domAnimation,LazyMotion } from "framer-motion";
+import { domAnimation, LazyMotion, MotionConfig } from "framer-motion";
 import { Inter, Teko } from "next/font/google";
 import Head from "next/head";
 import { SessionProvider } from "next-auth/react";
@@ -31,13 +31,14 @@ import Analytics from "components/Analytics/Analytics";
 import { DesktopUpdateRequired } from "components/DesktopUpdateRequired";
 import { ElectronIntegrations } from "components/ElectronIntegrations";
 import { ElectronTitleBar } from "components/ElectronTitleBar";
-import { LocalizedChrome } from "lib/i18n/LocalizedRegion";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 import { RouteProgress } from "components/RouteProgress/RouteProgress";
 import { DesktopNotifications } from "feature/notifications/components/DesktopNotifications";
 import useAuthSync from "hooks/useAuthSync";
 import useDailyQuestSync from "hooks/useDailyQuestSync";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
+import { LocalizedChrome } from "lib/i18n/LocalizedRegion";
+import { transitions } from "lib/motion/motion";
 import dynamic from "next/dynamic";
 import type { AppPropsWithLayout } from "types/page";
 
@@ -129,8 +130,13 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                     }} />
                     <div id='overlays'></div>
                     <LazyMotion features={domAnimation}>
-                      <RouteProgress />
-                      {page}
+                      {/* App-wide motion defaults (src/lib/motion): anything animated
+                          without its own transition moves on the shared curve, and
+                          "reduce motion" in the OS turns transforms off everywhere. */}
+                      <MotionConfig transition={transitions.base} reducedMotion='user'>
+                        <RouteProgress />
+                        {page}
+                      </MotionConfig>
                     </LazyMotion>
                   </div>
                 </TooltipProvider>

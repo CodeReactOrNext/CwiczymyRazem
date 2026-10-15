@@ -5,16 +5,14 @@ import { getUserSeasonalAchievements } from "feature/profile/services/seasonalAc
 import { useTranslation } from "hooks/useTranslation";
 import { 
   Award as AwardIcon,
+  Crown,
+  ExternalLink,
   Medal as MedalIcon,
-  Trophy as TrophyIcon, 
+  Star,
+  Trophy as TrophyIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  FaCrown,
-  FaExternalLinkAlt,
-  FaRegStar as FaStar,
-} from "react-icons/fa";
 
 interface SeasonalAchievementProps {
   userId?: string;
@@ -103,7 +101,7 @@ const SeasonalAchievements = ({
       case 4:
         return <AwardIcon size={24} strokeWidth={1.2} />;
       default:
-        return <FaStar size={18} />;
+        return <Star size={18} />;
     }
   };
 
@@ -158,7 +156,7 @@ const SeasonalAchievements = ({
              >
             <Link href='/seasons' className='flex items-center gap-2'>
               Check Seasons
-              <FaExternalLinkAlt size={12} />
+              <ExternalLink size={12} />
             </Link>
           </Button>
         </div>
@@ -174,7 +172,7 @@ const SeasonalAchievements = ({
           {String(t("seasonal_achievements.title", "Seasonal Achievements"))}
         </h4>
         <div className='py-8 text-left text-sm text-white/50'>
-          <span className='tracking-widest uppercase font-bold text-[10px]'>Synchronizing...</span>
+          <span className='font-bold text-xs'>Synchronizing...</span>
         </div>
       </Card>
     );
@@ -202,7 +200,7 @@ const SeasonalAchievements = ({
               className='relative flex min-w-[110px] flex-col items-center'>
               
               {/* The Trophy Container */}
-              <div className='relative flex h-[100px] w-full flex-col items-center justify-center transition-transform hover:-translate-y-1 duration-300'>
+              <div className='relative flex h-[100px] w-full flex-col items-center justify-center transition-transform hover:-translate-y-1 duration-base'>
                 
                 {/* Body with Shape and Background */}
                 <div className='absolute inset-0 rounded-[1.2rem] border border-white/10 bg-zinc-900/60 shadow-lg backdrop-blur-md overflow-hidden'>
@@ -226,7 +224,7 @@ const SeasonalAchievements = ({
                   <div className={`${styles.iconColor} drop-shadow-[0_0_12px_rgba(0,0,0,0.5)]`}>
                     {getAchievementIcon(achievement.place)}
                     {styles.crown && (
-                      <FaCrown
+                      <Crown
                         className='absolute -right-2.5 -top-2.5 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]'
                         size={12}
                       />

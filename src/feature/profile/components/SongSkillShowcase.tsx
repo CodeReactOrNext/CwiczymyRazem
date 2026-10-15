@@ -145,7 +145,7 @@ export const SongSkillShowcase = ({
                 {tier.tier}
               </div>
               <span
-                className='text-[11px] font-black uppercase tracking-widest'
+                className='text-xs font-black'
                 style={{ color: tier.color }}>
                 {tier.label}
               </span>

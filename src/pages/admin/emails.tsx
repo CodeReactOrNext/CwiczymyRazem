@@ -133,7 +133,7 @@ const AdminEmailsPage = () => {
 
   return (
     <AdminLayout onLogout={handleLogout}>
-      <div className="space-y-8 p-8 animate-in fade-in duration-700">
+      <div className="space-y-8 p-8 animate-in fade-in duration-slow">
         <header className="flex flex-col gap-2">
           <h2 className="text-3xl font-black italic uppercase tracking-tight text-white">
             Email Center

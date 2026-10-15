@@ -7,7 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { AnimatePresence, m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import { fade } from "lib/motion/motion";
 import Image from "next/image";
 
 interface MicModeDialogProps {
@@ -21,9 +23,19 @@ export const MicModeDialog = ({ isOpen, examMode, onEnableMic, onSkipMic }: MicM
   const { t } = useTranslation("calibration");
   return (
     <>
-      {examMode && isOpen && (
-        <div className="fixed inset-0 z-[99999998] bg-black/60 backdrop-blur-sm" />
-      )}
+      {/* Leaves with the dialog instead of vanishing a frame before it. */}
+      <AnimatePresence>
+        {examMode && isOpen && (
+          <m.div
+            key='mic-exam-backdrop'
+            initial='hidden'
+            animate='visible'
+            exit='hidden'
+            variants={fade}
+            className="fixed inset-0 z-[99999998] bg-black/60 backdrop-blur-sm"
+          />
+        )}
+      </AnimatePresence>
       <Dialog
         open={isOpen}
         onOpenChange={(open) => { if (!open && !examMode) onSkipMic(); }}

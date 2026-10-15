@@ -129,7 +129,7 @@ export const ActivityLogView = ({
           in place, dimmed, instead of a blurred overlay with a spinner. */}
       <div
         aria-busy={isLoading}
-        className={`transition-opacity duration-300 ${isLoading ? "pointer-events-none animate-pulse opacity-50" : "opacity-100"}`}>
+        className={`transition-opacity duration-base ${isLoading ? "pointer-events-none animate-pulse opacity-50" : "opacity-100"}`}>
          <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
           <h3 className='text-xl font-semibold text-white mr-2'>Activity</h3>
 

@@ -5,8 +5,8 @@ import { ScoreBreakdownTooltip } from "feature/profile/components/ScoreBreakdown
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { useRemoteSessionRefresh } from "hooks/useRemoteSessionRefresh";
 import { useTranslation } from "hooks/useTranslation";
+import { Flame } from "lucide-react";
 import { useRouter } from "next/router";
-import { FaFire } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 import { getReconciledStreak } from "utils/gameLogic";
 
@@ -45,8 +45,8 @@ export const StreakBox = () => {
       onClick={() => router.push("/practice-log")}
       className='flex h-11 cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-zinc-800/70'>
       <div className="flex items-center gap-1.5 shrink-0 px-1">
-        <FaFire className={cn(
-          "text-xl transition-all duration-500",
+        <Flame size='1em' className={cn(
+          "text-xl transition-all duration-slow",
           dayWithoutBreak > 0
             ? "text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]"
             : "text-zinc-700 opacity-50"
@@ -75,7 +75,7 @@ export const StreakBox = () => {
             <div
               key={index}
               className={cn(
-                "flex h-6 w-6 items-center justify-center rounded-[4px] text-xs font-bold transition-all duration-300",
+                "flex h-6 w-6 items-center justify-center rounded-[4px] text-xs font-bold transition-all duration-base",
                 isActive
                   ? "bg-white text-zinc-900 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
                   : "bg-zinc-800 text-zinc-300"

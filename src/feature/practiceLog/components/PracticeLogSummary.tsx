@@ -32,7 +32,7 @@ export const PracticeLogSummary = ({ summary }: PracticeLogSummaryProps) => {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+        <p className="text-xs font-semibold text-zinc-500">
           {t("summary.heading")}
         </p>
         <dl className="flex flex-row flex-wrap gap-x-8 gap-y-5 lg:flex-col lg:gap-5">
@@ -41,7 +41,7 @@ export const PracticeLogSummary = ({ summary }: PracticeLogSummaryProps) => {
               <dd className="font-display text-2xl font-semibold leading-none tracking-tight text-zinc-50 tabular-nums">
                 {stat.value}
               </dd>
-              <dt className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-zinc-500">
+              <dt className="mt-1.5 text-xs font-medium text-zinc-500">
                 {stat.label}
               </dt>
             </div>
@@ -50,7 +50,7 @@ export const PracticeLogSummary = ({ summary }: PracticeLogSummaryProps) => {
       </div>
 
       <div className="flex flex-col gap-3.5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+        <p className="text-xs font-semibold text-zinc-500">
           {t("summary.time_split")}
         </p>
         <ul className="flex flex-row flex-wrap gap-x-7 gap-y-2.5 lg:flex-col lg:gap-3">

@@ -4,7 +4,11 @@ import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMa
 import { SongCardMenu, STATUS_META } from "feature/songs/components/SongsGrid/SongCardMenu";
 import type { Song, SongPart, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { m } from "framer-motion";
+import { transitions } from "lib/motion/motion";
+import { useSharedElement } from "lib/motion/useSharedElement";
 import { Music, Star } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -42,10 +46,11 @@ export const SongCardRow = ({
   const tier = getSongTier(avgDifficulty === 0 ? "?" : song.tier || avgDifficulty);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { layoutDependency, runAfterSnapshot } = useSharedElement();
 
   return (
     <div
-      onClick={onOpenDetails}
+      onClick={() => runAfterSnapshot(onOpenDetails)}
       onContextMenu={(e) => {
         e.preventDefault();
         setIsMenuOpen(true);
@@ -55,7 +60,12 @@ export const SongCardRow = ({
       <Ripple />
 
       {/* Thumbnail */}
-      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
+      <m.div
+        layoutId={songCoverLayoutId(song.id)}
+        layoutDependency={layoutDependency}
+        transition={transitions.move}
+        style={SONG_COVER_STYLE}
+        className="relative h-14 w-14 shrink-0 overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
         {song.coverUrl ? (
           <img
             src={song.coverUrl}
@@ -79,7 +89,7 @@ export const SongCardRow = ({
             <StatusIcon className={cn("h-3.5 w-3.5 drop-shadow", statusMeta.color)} />
           </div>
         )}
-      </div>
+      </m.div>
 
       {/* Title / artist */}
       <div className="min-w-0 flex-1">

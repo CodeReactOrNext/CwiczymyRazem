@@ -165,7 +165,7 @@ function StepSection({
       {/* Divider line */}
       <div className='mb-16 flex items-center gap-4'>
         <div className={`h-px flex-1 ${step.line} opacity-20`} />
-        <span className='text-[11px] font-black uppercase tracking-[0.3em] text-zinc-600'>
+        <span className='text-xs font-black text-zinc-600'>
           Step {step.number}
         </span>
         <div className='h-px w-8 bg-white/5' />
@@ -287,7 +287,7 @@ export const HowItWorksPage = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className='flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between'>
             <div>
-              <p className='mb-4 text-xs font-black uppercase tracking-[0.35em] text-zinc-600'>
+              <p className='mb-4 text-xs font-black text-zinc-600'>
                 How it works
               </p>
               <h1 className='text-[clamp(2rem,5vw,3.75rem)] font-bold leading-[1.0] tracking-tight text-white'>
@@ -333,7 +333,7 @@ export const HowItWorksPage = () => {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className='flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between'>
             <div>
-              <p className='mb-6 text-xs font-black uppercase tracking-[0.35em] text-zinc-600'>
+              <p className='mb-6 text-xs font-black text-zinc-600'>
                 Ready?
               </p>
               <h2 className='text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[0.95] tracking-tight text-white'>

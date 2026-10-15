@@ -95,6 +95,15 @@
     "no_show_them": "Opponent didn't play",
     "nobody_played": "Nobody played"
   },
+  "feed": {
+    "title": "All duels",
+    "latest": "latest {{count}}",
+    "empty": "Nobody has settled a duel yet. Every finished duel in the app shows up here.",
+    "win": "{{winner}} beat {{loser}}",
+    "walkover": "{{winner}} beat {{loser}} — walkover",
+    "draw": "{{winner}} drew with {{loser}}",
+    "void": "{{winner}} vs {{loser}} — nobody played"
+  },
   "ranking": {
     "title": "Ranking",
     "players_one": "{{count}} ranked",

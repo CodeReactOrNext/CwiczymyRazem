@@ -34,7 +34,7 @@ export const GuideProgressBar = () => {
       aria-valuemin={0}
       aria-valuemax={100}>
       <div
-        className='h-full bg-cyan-400 transition-[width] duration-100'
+        className='h-full bg-cyan-400 transition-[width] duration-fast'
         style={{ width: `${progress}%` }}
       />
     </div>

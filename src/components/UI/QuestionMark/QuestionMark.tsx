@@ -5,7 +5,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { RiQuestionLine } from "react-icons/ri";
+import { CircleQuestionMark } from "lucide-react";
 
 export interface QuestionMarkProps {
   description?: string;
@@ -19,7 +19,7 @@ const QuestionMark = ({ description, className }: QuestionMarkProps) => {
         <Tooltip>
           <TooltipTrigger>
             <div>
-              <RiQuestionLine className={cn('cursor-help fill-secondText text-[22px] hover:fill-mainText transition-all', className)} />
+              <CircleQuestionMark size='1em' className={cn('cursor-help fill-secondText text-[22px] hover:fill-mainText transition-all', className)} />
             </div>
           </TooltipTrigger>
           {description && (

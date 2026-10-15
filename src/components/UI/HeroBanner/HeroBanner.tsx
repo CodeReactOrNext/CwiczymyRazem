@@ -122,7 +122,7 @@ export const HeroBanner = ({
             <div>{eyebrowContent}</div>
           ) : (
             eyebrow && (
-              <p className={`text-xs font-semibold tracking-[0.2em] uppercase md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none ${eyebrowClassName}`}>
+              <p className={`text-xs font-semibold md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none ${eyebrowClassName}`}>
                 {eyebrow ?? t("daily_practice")}
               </p>
             )
@@ -150,10 +150,10 @@ export const HeroBanner = ({
             {!rightContent && buttonText && (
               <button
                 onClick={onClick}
-                className="group/btn rounded-md bg-white text-zinc-950 px-5 py-2.5 text-sm font-medium shadow-lg transition-all duration-300 flex items-center gap-2 active:scale-95 shrink-0"
+                className="group/btn rounded-md bg-white text-zinc-950 px-5 py-2.5 text-sm font-medium shadow-lg transition-all duration-base flex items-center gap-2 active:scale-95 shrink-0"
               >
                 {buttonText}
-                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
+                <ArrowRight className="h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1" />
               </button>
             )}
             {children && <div className="w-full md:w-auto md:mb-1">{children}</div>}

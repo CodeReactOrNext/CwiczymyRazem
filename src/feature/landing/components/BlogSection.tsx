@@ -43,7 +43,7 @@ export const BlogSection = ({ blogs }: BlogSectionProps) => {
                     src={article.image}
                     alt={article.title}
                     fill
-                    className='object-cover opacity-90 transition-opacity duration-500 group-hover:opacity-100'
+                    className='object-cover opacity-90 transition-opacity duration-slow group-hover:opacity-100'
                   />
                 </div>
                 <div className='space-y-2'>

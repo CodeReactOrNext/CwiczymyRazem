@@ -40,7 +40,7 @@ export const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({
             {t("loader.thinking")}
           </p>
           <p
-            className='text-sm text-zinc-400 transition-opacity duration-300'
+            className='text-sm text-zinc-400 transition-opacity duration-base'
             style={{ opacity: fade ? 1 : 0 }}>
             {t(`loader.messages.${AI_MESSAGES[msgIdx]}`)}
           </p>

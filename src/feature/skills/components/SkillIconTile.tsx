@@ -54,7 +54,7 @@ export const SkillIconTile = ({
     <div
       aria-hidden="true"
       className={cn(
-        "flex flex-shrink-0 items-center justify-center rounded-lg shadow-lg transition-all duration-300",
+        "flex flex-shrink-0 items-center justify-center rounded-lg shadow-lg transition-all duration-base",
         size === "md" ? "h-12 w-12" : "h-11 w-11",
         colors.bg,
         colors.edge,

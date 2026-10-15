@@ -1,6 +1,6 @@
 import { useTranslation } from "hooks/useTranslation";
+import { Brain, Clock, Trophy } from "lucide-react";
 import { useMemo } from "react";
-import { FaBrain, FaClock, FaTrophy } from "react-icons/fa";
 import { convertMsToHM } from "utils/converter";
 
 import { calculateMetrics } from "./calculateMetrics";
@@ -33,19 +33,19 @@ export const PracticeInsights = ({ statistics }: PracticeInsightsProps) => {
 
   const insights: InsightItem[] = [
     {
-      icon: <FaClock className='h-5 w-5' />,
+      icon: <Clock size='1em' className='h-5 w-5' />,
       label: t("insights.avg_session"),
       value: convertMsToHM(avgSessionLength),
       description: t("insights.avg_session_desc"),
     },
     {
-      icon: <FaTrophy className='h-5 w-5' />,
+      icon: <Trophy size='1em' className='h-5 w-5' />,
       label: t("insights.points_per_hour"),
       value: Math.round(avgPointsPerHour),
       description: t("insights.points_per_hour_desc"),
     },
     {
-      icon: <FaBrain className='h-5 w-5' />,
+      icon: <Brain size='1em' className='h-5 w-5' />,
       label: t("insights.strongest_area"),
       value: t(`${strongestArea.name}` as any),
       description: t("insights.strongest_area_desc"),

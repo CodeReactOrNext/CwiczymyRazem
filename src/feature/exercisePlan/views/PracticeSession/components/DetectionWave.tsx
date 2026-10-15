@@ -52,7 +52,7 @@ export function DetectionWave({ volumeRef, active, isMatch }: DetectionWaveProps
         <div
           key={i}
           ref={(el) => { barsRef.current[i] = el; }}
-          className={cn("w-[3px] rounded-full transition-colors duration-300", isMatch ? "bg-emerald-400" : "bg-cyan-400/70")}
+          className={cn("w-[3px] rounded-full transition-colors duration-base", isMatch ? "bg-emerald-400" : "bg-cyan-400/70")}
           style={{ height: MIN_H }}
         />
       ))}

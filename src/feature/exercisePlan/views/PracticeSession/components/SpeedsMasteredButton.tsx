@@ -1,10 +1,9 @@
 import { cn } from "assets/lib/utils";
 import { RippleButton } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { X } from "lucide-react";
+import { Check,X } from "lucide-react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
-import { FaCheck } from "react-icons/fa";
 
 import { BpmProgressGrid } from "../../../components/BpmProgressGrid";
 import type { Exercise } from "../../../types/exercise.types";
@@ -47,7 +46,7 @@ export const SpeedsMasteredButton = memo(function SpeedsMasteredButton({
         )}
         title={t("speeds_mastered.hint")}
       >
-        <FaCheck className={cn("shrink-0", compact ? "h-3 w-3" : "h-3.5 w-3.5")} />
+        <Check size='1em' className={cn("shrink-0", compact ? "h-3 w-3" : "h-3.5 w-3.5")} />
         {!compact && <span className="text-[10px] font-semibold tracking-wide">{t("speeds_mastered.label")}</span>}
         <span
           className={cn(

@@ -150,7 +150,7 @@ export const ChallengeHero = ({
               </span>
               <div className='h-1 w-28 overflow-hidden rounded-full bg-white/10'>
                 <div
-                  className='h-full rounded-full bg-green-500 transition-all duration-700'
+                  className='h-full rounded-full bg-green-500 transition-all duration-slow'
                   style={{ width: `${progress}%` }}
                 />
               </div>

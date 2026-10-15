@@ -34,7 +34,7 @@ export const FreshnessMeter = ({
         <span
           key={index}
           className={cn(
-            "h-1.5 w-3 rounded-full transition-colors duration-500",
+            "h-1.5 w-3 rounded-full transition-colors duration-slow",
             index < filled ? LEVEL_FILL[freshness.level] : "bg-zinc-800",
           )}
         />

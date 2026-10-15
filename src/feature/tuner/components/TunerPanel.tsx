@@ -123,7 +123,7 @@ export const TunerPanel = ({
         <div className='flex shrink-0 flex-col items-center gap-1'>
           <span
             className={cn(
-              "font-mono text-7xl font-bold leading-none tracking-tight transition-colors duration-200",
+              "font-mono text-7xl font-bold leading-none tracking-tight transition-colors duration-base",
               noteColor,
             )}>
             {targetNote}
@@ -131,7 +131,7 @@ export const TunerPanel = ({
           <span className='font-mono text-base text-zinc-600'>{targetOctave}</span>
           <span
             className={cn(
-              "font-mono mt-2 text-lg tabular-nums transition-colors duration-200",
+              "font-mono mt-2 text-lg tabular-nums transition-colors duration-base",
               noteColor,
             )}>
             {live ? `${cents > 0 ? "+" : ""}${Math.round(cents)}¢` : "—"}
@@ -145,7 +145,7 @@ export const TunerPanel = ({
       <p
         aria-live='polite'
         className={cn(
-          "mt-6 text-center text-sm font-medium transition-colors duration-200",
+          "mt-6 text-center text-sm font-medium transition-colors duration-base",
           allTuned && isListening ? "text-emerald-400" : "text-zinc-400",
         )}>
         {status}

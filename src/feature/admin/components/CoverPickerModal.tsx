@@ -92,7 +92,7 @@ const CoverPickerModal = ({ isOpen, onClose, song, password, onSelect }: CoverPi
                   key={idx}
                   onClick={() => setSelectedUrl(candidate.coverUrl)}
                   className={cn(
-                    "group relative cursor-pointer rounded-2xl overflow-hidden border-2 transition-all duration-300",
+                    "group relative cursor-pointer rounded-2xl overflow-hidden border-2 transition-all duration-base",
                     selectedUrl === candidate.coverUrl 
                       ? "border-cyan-500 ring-4 ring-cyan-500/20" 
                       : "border-transparent hover:border-white/10"
@@ -102,7 +102,7 @@ const CoverPickerModal = ({ isOpen, onClose, song, password, onSelect }: CoverPi
                     <img 
                       src={candidate.coverUrl} 
                       alt={candidate.albumName}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="h-full w-full object-cover transition-transform duration-slow group-hover:scale-110"
                     />
                   </div>
                   <div className="p-3 bg-zinc-900/50 backdrop-blur-md">

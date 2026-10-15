@@ -291,7 +291,7 @@ const SingupView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder='name@example.com'
-                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
+                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-base text-white placeholder:text-zinc-500'
                           />
                         </div>
                         {errors.email && touched.email && (
@@ -318,7 +318,7 @@ const SingupView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder={t("signup:username_placeholder")}
-                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
+                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-base text-white placeholder:text-zinc-500'
                           />
                         </div>
                         {errors.login && touched.login && (
@@ -347,7 +347,7 @@ const SingupView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='••••••••'
-                        className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
+                        className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-base text-white placeholder:text-zinc-500'
                       />
                       <button
                         type='button'
@@ -378,7 +378,7 @@ const SingupView = () => {
                                 <div 
                                     style={{ width: `${strength}%` }}
                                     className={cn(
-                                        "h-full transition-all duration-500",
+                                        "h-full transition-all duration-slow",
                                         strength < 50 ? "bg-red-500" : strength < 75 ? "bg-amber-500" : "bg-emerald-500"
                                     )}
                                 />

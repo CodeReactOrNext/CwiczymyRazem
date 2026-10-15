@@ -213,7 +213,7 @@ const AdminWorkPage = () => {
 
   return (
     <AdminLayout onLogout={handleLogout}>
-      <div className='space-y-10 p-8 duration-700 animate-in fade-in'>
+      <div className='space-y-10 p-8 duration-slow animate-in fade-in'>
         <header className='flex flex-col gap-2'>
           <h2 className='text-3xl font-black italic tracking-tight text-white'>
             Work board

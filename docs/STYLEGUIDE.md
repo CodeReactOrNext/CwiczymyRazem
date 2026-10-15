@@ -35,7 +35,7 @@
 - **Radix UI** — prymitywy pod komponenty (dialog, select, tabs, tooltip, dropdown...).
 - **CVA** (`class-variance-authority`) — warianty komponentów.
 - **framer-motion** — animacje (używane w ~70 plikach).
-- Ikony: **`lucide-react`** (domyślne, zgodne z shadcn) + `react-icons` (legacy).
+- Ikony: **`lucide-react`** dla wszystkich ikon interfejsu. `react-icons` **tylko** dla logo marek (YouTube, Discord, Google, Guitar Pro, sociale), ikon domenowych, których lucide nie ma (kostka `TbGuitarPick`, `GiMetronome`, główki gitar), oraz ikon-treści (emblematy gildii `gi/*`, ikony osiągnięć). Ikona przekazywana jako komponent, renderowana bez `h-*/w-*`, dostaje `size='1em'` — react-icons skalują się z tekstem, lucide domyślnie ma 24px.
 - Formatowanie: `prettier-plugin-tailwindcss` **automatycznie sortuje klasy** — nie układaj klas ręcznie "na siłę".
 
 ---
@@ -193,7 +193,25 @@ Często stosowane (kolejność popularności): `bg-gradient-to-br` > `bg-gradien
 
 - **Hover = minimalistyczny** (zasada #7): tylko zmiana tła/koloru/opacity przez **`transition-background`** lub `transition-colors`. ❌ Bez `hover:scale-*` i transformacji rozmiaru.
 - **Buttony: zawsze micro-interaction** na hover i focus (zasada #6) — np. `hover:bg-...` + `focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring`. Żaden przycisk nie może być "martwy".
-- Klik (skala): `click-behavior` (scale 98%, 100ms) / `click-behavior-second` (96%) — świadomy efekt naciśnięcia, nie hover.
+- Klik (skala): `click-behavior` (scale 98%, `fast`) / `click-behavior-second` (96%) — świadomy efekt naciśnięcia, nie hover.
+
+### Ruch — jeden język dla całej aplikacji
+
+Tokeny w **`src/lib/motion/tokens.json`** — czyta je i Tailwind, i framer-motion (`src/lib/motion/motion.ts`). Nie wpisuj czasów ani krzywych z ręki.
+
+| Token | Czas | Kiedy | Tailwind | framer-motion |
+|---|---|---|---|---|
+| `fast` | 150ms | odpowiedź na hover/klik: kolor, tło, opacity, wciśnięcie | `duration-fast` (też domyślny `transition`) | `transitions.fast` |
+| `base` | 220ms | coś wchodzi/wychodzi: menu, toast, treść strony, modal | `duration-base` | `transitions.base` |
+| `slow` | 400ms | duże powierzchnie i momenty: sheet, panel, nagroda | `duration-slow` | `transitions.slow` |
+
+- **Krzywa:** jedna — `ease-out` (expo-out, `cubic-bezier(0.22, 1, 0.36, 1)`) jest domyślna dla `transition-*` i `ease-out`. `ease-in-out` (`transitions.move`) tylko gdy coś **przemieszcza się** między dwoma miejscami.
+- **Fizyczne rzeczy** (karty, chipy, wartość, która „osiada”) → `transitions.spring` (sprężyna bez bujania).
+- **Wejście/wyjście** → gotowe warianty `fade` / `fadeUp` / `popIn` z `lib/motion/motion` (`initial="hidden" animate="visible" exit="hidden"`). Małe przesunięcia (≤ 8px), nic nie wlatuje zza ekranu.
+- **Każdy modal znika z animacją.** Radix (`Dialog`, `Sheet`, `DropdownMenu`) robi to sam; ręczny overlay `fixed inset-0` → `AnimatePresence` + `m.div variants={fade}` na **samym** elemencie `fixed` (nie na wrapperze — opacity rodzica zamyka `z-index` modala w jego kontekście).
+- **Przejście element → widok** (np. okładka utworu → szczegóły): wspólny `layoutId` + `useSharedElement` z `lib/motion` (świeży pomiar w chwili kliknięcia; zob. `feature/songs/utils/songCoverLayout.ts`). Dla obu końców ten sam kształt (proporcje), promień przez `style`, nie klasę.
+- `MotionConfig` w `_app` daje domyślną tranzycję (`base`) każdemu `motion.*`/`m.*` bez własnej i włącza `reducedMotion="user"` — „ogranicz ruch” w systemie wyłącza transformacje. Animacje tylko z `opacity` są wtedy dalej OK.
+- Czasy ≥ 1000ms (wypełnianie paska XP, odliczanie liczb) są świadome — to choreografia, nie tranzycja.
 - Animacje keyframe z configu: `accordion-down/up`, `ping-slow`, `skill-upgraded`, `gradient`, `glow-float-1/2`. Z globals: `shimmer`, `animate-shimmer`, `hover-animation`, `shake-animation`, `music-pulse`.
 - Złożone/sekwencyjne animacje i wejścia → **framer-motion** (`motion.*`, `AnimatePresence`).
 - Focus (z shadcn): `focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring`.
@@ -281,7 +299,7 @@ Aliasy importów (z `components.json`): `components` → `assets/components`, `u
 10. **Buttony:** widoczny micro-interaction na `hover` i `focus-visible` (ring) — żadnego "martwego" przycisku.
 11. Warianty komponentu → CVA + `forwardRef` + `displayName`.
 12. Fonty → `font-sans`/`font-display`/`font-teko`. **Nie** dodawaj `font-openSans` (nie istnieje w configu).
-13. Złożone animacje → framer-motion; proste → klasy `animate-*` z configu.
+13. Złożone animacje → framer-motion; proste → klasy `animate-*` z configu. **Czasy i krzywe tylko z tokenów ruchu** (`duration-fast/base/slow`, `transitions.*` — sekcja 9 „Ruch”).
 14. Mobile-first, pamiętaj o `xxs/xs/xsm`. Na mobile: **wszystko w karcie** i **tylko jeden poziom karty** — nigdy karta w karcie.
 15. **Nigdy `uppercase`.**
 16. Wartości gamifikacji (gemy, Fame, level, streak) zawsze w przypisanym kolorze + ikona.

@@ -1,4 +1,5 @@
 import { m } from "framer-motion";
+import { EASE } from "lib/motion/motion";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -67,7 +68,7 @@ export const RouteProgress = () => {
           phase === "loading"
             ? // Crawls towards 80 % and waits there for the page.
               { scaleX: 0.8, transition: { duration: 6, ease: [0.1, 0.6, 0.3, 1] } }
-            : { scaleX: 1, opacity: 0, transition: { duration: FINISH_MS / 1000 } }
+            : { scaleX: 1, opacity: 0, transition: { duration: FINISH_MS / 1000, ease: EASE.out } }
         }
       />
     </div>

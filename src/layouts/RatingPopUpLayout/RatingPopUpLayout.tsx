@@ -1,5 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
-import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
@@ -11,9 +9,12 @@ import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
 import { NextUpCard } from "feature/progression/components/NextUpCard";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
+import { playUiSound } from "lib/uiSounds/uiSounds";
 import { ArrowRight, Brain, Ear, Flame, Hand, Music, NotebookPen, RotateCcw, Sparkles, Timer, Trophy } from "lucide-react";
 import Router from "next/router";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Area, AreaChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ReferenceLine, ResponsiveContainer, XAxis,
 } from "recharts";
@@ -124,6 +125,14 @@ const RatingPopUpLayout = ({
     currProgressPercent,
     sessionBreakdown,
   } = useRatingPopUp({ ratingData, currentUserStats, previousUserStats, activityData });
+
+  // One cue as the summary lands — the biggest thing that happened wins.
+  const summaryCue = isGetNewLevel ? "levelUp" : newAchievements.length > 0 ? "reward" : "sessionComplete";
+  useEffect(() => {
+    playUiSound(summaryCue);
+    // Once per summary, not again when the cue would read differently later.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Every component of it is *inside* this number, never on top of it — which is
   // the whole reason the breakdown exists. See `utils/rewardBreakdown`.

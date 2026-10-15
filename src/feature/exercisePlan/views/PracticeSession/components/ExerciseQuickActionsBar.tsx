@@ -254,7 +254,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               // (mobile modal) — the dropdown's default z-50 would paint underneath it.
               className='z-[99999999] w-64 border border-white/10 bg-zinc-900 p-3 text-white'>
               <div className='flex items-center justify-between px-0.5'>
-                <span className='select-none text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500'>
+                <span className='select-none text-xs font-bold text-zinc-500'>
                   {accentLocked && gridLabel ? gridLabel : t("quick.beats_per_bar")}
                 </span>
                 {accentLocked ? (

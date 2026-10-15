@@ -18,11 +18,10 @@ import MainContainer from "components/MainContainer";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, ArrowRight, Loader2, Play, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock,Loader2, Play, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
-import { MdAccessTime } from "react-icons/md";
 import type { TimerInterface } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
 import { calculatePercent, convertMsToHMS } from "utils/converter";
@@ -135,7 +134,7 @@ const AnimatedTimerDisplay = ({
       {/* Efekt blasku pod tarczą */}
       <div
         className={cn(
-          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[30px] transition-all duration-700",
+          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[30px] transition-all duration-slow",
           sizeClasses[size]
         )}
         style={{
@@ -410,7 +409,7 @@ const TimerLayout = ({
               <div className='space-y-2'>
                 <p className='text-sm text-zinc-500'>{t("total_time")}</p>
                 <div className='flex items-center gap-2'>
-                  <MdAccessTime className='h-5 w-5 text-zinc-500' />
+                  <Clock size='1em' className='h-5 w-5 text-zinc-500' />
                   <span translate="no" className='font-medium text-white sm:text-lg'>
                     {convertMsToHMS(sumTime)}
                   </span>

@@ -100,7 +100,7 @@ export const FaqSection = ({
                       </span>
                       <Plus
                         aria-hidden='true'
-                        className='mt-1 h-4 w-4 shrink-0 text-zinc-500 transition-transform duration-200 group-open:rotate-45'
+                        className='mt-1 h-4 w-4 shrink-0 text-zinc-500 transition-transform duration-base group-open:rotate-45'
                       />
                     </summary>
                     <p className='max-w-prose pb-6 pl-12 text-base leading-relaxed text-zinc-400'>

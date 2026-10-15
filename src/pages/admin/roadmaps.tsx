@@ -487,7 +487,7 @@ const QueueView = ({ password }: { password: string }) => {
                   {(isRunning || isDone) && (
                     <div className="h-0.5 w-full overflow-hidden rounded-full bg-zinc-800">
                       <div
-                        className={`h-full rounded-full transition-all duration-500 ${isDone ? "bg-emerald-500" : barColor}`}
+                        className={`h-full rounded-full transition-all duration-slow ${isDone ? "bg-emerald-500" : barColor}`}
                         style={{ width: `${item.progress}%` }}
                       />
                     </div>
@@ -628,7 +628,7 @@ const AdminRoadmapsPage = () => {
 
   return (
     <AdminLayout onLogout={handleLogout}>
-      <div className="space-y-8 p-6 lg:p-12 animate-in fade-in duration-700">
+      <div className="space-y-8 p-6 lg:p-12 animate-in fade-in duration-slow">
         <header className="flex flex-col gap-1">
           <h2 className="text-3xl font-black italic tracking-tight text-white uppercase">
             AI Roadmaps

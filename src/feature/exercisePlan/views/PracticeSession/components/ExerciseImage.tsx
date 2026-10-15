@@ -1,11 +1,10 @@
 import { Button } from "assets/components/ui/button";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { Minus, Plus } from "lucide-react";
+import { Maximize2,Minimize2, Minus, Plus } from "lucide-react";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { FaCompress, FaExpand } from "react-icons/fa";
 
 import { useImageHandling } from "../hooks/useImageHandling";
 import ImageModal from "../modals/ImageModal";
@@ -38,7 +37,7 @@ export const ExerciseImage = ({
     return (
       <>
         <div
-          className='relative mb-4 w-full cursor-pointer overflow-hidden rounded-xl border border-muted/30 bg-white/10 shadow-md transition-all duration-200 hover:shadow-lg'
+          className='relative mb-4 w-full cursor-pointer overflow-hidden rounded-xl border border-muted/30 bg-white/10 shadow-md transition-all duration-base hover:shadow-lg'
           onClick={() => setIsModalOpen(true)}>
           <div className='relative aspect-[3.5/1] w-full'>
             <Image
@@ -55,7 +54,7 @@ export const ExerciseImage = ({
                 size='sm'
                 className='pointer-events-none opacity-90 shadow-lg'>
                 <span className='mr-2'>{t("image.enlarge")}</span>
-                <FaExpand className='h-4 w-4' />
+                <Maximize2 size='1em' className='h-4 w-4' />
               </Button>
             </div>
           </div>
@@ -71,7 +70,7 @@ export const ExerciseImage = ({
   }
 
   return (
-    <div className='relative mb-2 w-full overflow-hidden rounded-xl bg-white/5 p-2 shadow-md backdrop-blur-[1px] transition-all duration-200 hover:shadow-lg'>
+    <div className='relative mb-2 w-full overflow-hidden rounded-xl bg-white/5 p-2 shadow-md backdrop-blur-[1px] transition-all duration-base hover:shadow-lg'>
       <div
         ref={containerRef}
         className='relative min-h-[200px] w-full select-none overflow-hidden rounded-lg py-4 md:mx-auto md:max-w-[900px] md:py-8'
@@ -118,7 +117,7 @@ export const ExerciseImage = ({
           size='icon'
           onClick={handleZoomOut}
           disabled={imageScale <= 0.5}
-          className='bg-background/80 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-background/90 hover:shadow-lg'>
+          className='bg-background/80 shadow-md backdrop-blur-sm transition-all duration-base hover:bg-background/90 hover:shadow-lg'>
           <Minus className='h-4 w-4' />
         </Button>
         <Button
@@ -126,15 +125,15 @@ export const ExerciseImage = ({
           size='icon'
           onClick={handleZoomIn}
           disabled={imageScale >= 5}
-          className='bg-background/80 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-background/90 hover:shadow-lg'>
+          className='bg-background/80 shadow-md backdrop-blur-sm transition-all duration-base hover:bg-background/90 hover:shadow-lg'>
           <Plus className='h-4 w-4' />
         </Button>
         <Button
           variant='secondary'
           size='icon'
           onClick={resetImagePosition}
-          className='bg-background/80 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-background/90 hover:shadow-lg'>
-          <FaCompress className='h-4 w-4' />
+          className='bg-background/80 shadow-md backdrop-blur-sm transition-all duration-base hover:bg-background/90 hover:shadow-lg'>
+          <Minimize2 size='1em' className='h-4 w-4' />
         </Button>
       </div>
     </div>

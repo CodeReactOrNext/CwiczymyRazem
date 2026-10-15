@@ -133,7 +133,7 @@ export const YouTubePlayalong = ({
 
   return (
     <div className="w-full relative group">
-      <div className="aspect-video w-full rounded-lg overflow-hidden bg-zinc-900 shadow-2xl border-2 border-red-500/30 relative ring-2 ring-red-500/10 transition-all duration-300 hover:border-red-500/50 hover:ring-red-500/20">
+      <div className="aspect-video w-full rounded-lg overflow-hidden bg-zinc-900 shadow-2xl border-2 border-red-500/30 relative ring-2 ring-red-500/10 transition-all duration-base hover:border-red-500/50 hover:ring-red-500/20">
         <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none z-10" />
         
         <YouTube

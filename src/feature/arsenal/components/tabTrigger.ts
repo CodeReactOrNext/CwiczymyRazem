@@ -18,7 +18,7 @@
  * and Dex off past the edge. From `sm` up they're the rail again, label beside the icon.
  */
 export const arsenalTabTriggerClass =
-  "min-w-0 flex-col gap-1 rounded-none border-b-2 border-transparent bg-transparent px-1 py-2 text-xs font-semibold text-arsenal-text-tertiary shadow-none transition-colors duration-150 hover:text-arsenal-text-primary data-[state=active]:border-arsenal-accent data-[state=active]:bg-transparent data-[state=active]:text-arsenal-text-primary data-[state=active]:shadow-none sm:shrink-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-3 sm:text-sm";
+  "min-w-0 flex-col gap-1 rounded-none border-b-2 border-transparent bg-transparent px-1 py-2 text-xs font-semibold text-arsenal-text-tertiary shadow-none transition-colors duration-fast hover:text-arsenal-text-primary data-[state=active]:border-arsenal-accent data-[state=active]:bg-transparent data-[state=active]:text-arsenal-text-primary data-[state=active]:shadow-none sm:shrink-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-3 sm:text-sm";
 
 /** The grid on phones, the scrolling rail from `sm` up — see `arsenalTabTriggerClass`. */
 export const arsenalTabListClass =

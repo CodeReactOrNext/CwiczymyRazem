@@ -33,10 +33,10 @@ const Avatar = ({ name, avatarURL, size, className }: AvatarProps) => {
           />
         ) : (
           <p
-            className={`font-openSans font-bold uppercase text-zinc-800 ${
+            className={`font-openSans font-bold text-zinc-800 ${
               isCompact ? "text-base" : "text-4xl"
             }`}>
-            {name?.[0]}
+            {name?.[0]?.toUpperCase()}
           </p>
         )}
       </div>

@@ -1,7 +1,7 @@
-import { useTranslation } from "hooks/useTranslation";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import type { FormikErrors } from "formik";
-import { FaTimesCircle } from "react-icons/fa";
+import { useTranslation } from "hooks/useTranslation";
+import { CircleX } from "lucide-react";
 
 interface ErrorBoxProps {
   errors: FormikErrors<ReportFormikInterface>;
@@ -17,7 +17,7 @@ const ErrorBox = ({ errors }: ErrorBoxProps) => {
   return (
     <div className='flex flex-col items-center gap-2'>
       <div className='flex flex-row items-center gap-3 text-red-400'>
-        <FaTimesCircle className='text-xl' />
+        <CircleX size='1em' className='text-xl' />
       </div>
       <div className="flex flex-col items-center gap-1 text-xs text-red-400/80">
         {hasTimeError && <p>{t("errors.invalid_time")}</p>}

@@ -21,7 +21,7 @@ export const ExerciseProgress = memo(function ExerciseProgress({
   return (
     <div className='w-full max-w-none py-1 px-1'>
       <div className="flex items-center justify-between mb-1.5 px-1">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <span className="text-xs font-semibold text-zinc-500">
             {t("progress.title")}
           </span>
           <span className="text-[10px] font-semibold tabular-nums tracking-wide text-zinc-400">
@@ -49,7 +49,7 @@ export const ExerciseProgress = memo(function ExerciseProgress({
 
               {/* The Visual Bar */}
               <div className={cn(
-                "relative h-1.5 w-full rounded-full transition-all duration-300",
+                "relative h-1.5 w-full rounded-full transition-all duration-base",
                 isActive
                   ? isSong
                     ? "bg-amber-500/90 shadow-[0_0_5px_rgba(245,158,11,0.3)]"

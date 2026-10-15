@@ -51,7 +51,7 @@ const MoreSheetRow = ({
       aria-current={item.isActive ? "page" : undefined}
       onClick={onNavigate}
       className={cn(
-        "flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-150",
+        "flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-fast",
         item.isActive
           ? "bg-cyan-500/10 text-cyan-300"
           : "text-zinc-200 hover:bg-white/5 active:bg-white/10",

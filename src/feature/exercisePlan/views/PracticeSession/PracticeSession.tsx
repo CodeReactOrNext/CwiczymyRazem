@@ -1,15 +1,16 @@
 import "react-circular-progressbar/dist/styles.css";
-import { useLocalizedPlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 
 import { BackingTrackBar } from "feature/backingTrack/components/BackingTrackBar";
 import { useBackingTrackSession } from "feature/backingTrack/hooks/useBackingTrackSession";
 import { barBeatsOf } from "feature/backingTrack/utils/alignment";
+import { useLocalizedPlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserAuth,selectUserInfo} from "feature/user/store/userSlice";
 import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
+import { useSuppressUiSounds } from "lib/uiSounds/uiSounds";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
@@ -53,7 +54,6 @@ import {
 } from "./helpers/practiceSessionSettings";
 import { strumSynthVolume } from "./helpers/strumSynthVolume";
 import type { TempoRuler } from "./hooks/tempoBeatClock";
-import type { TimingPrecision } from "./utils/timingPrecision";
 import { createTempoRulerFromMeasures } from "./hooks/tempoBeatClock";
 import { useCalibration } from "./hooks/useCalibration";
 import { useDesktopSessionIntegration } from "./hooks/useDesktopSessionIntegration";
@@ -74,6 +74,7 @@ import { useSongExerciseGpFile } from "./hooks/useSongExerciseGpFile";
 import { timingInputPath, useTimingCalibration } from "./hooks/useTimingCalibration";
 import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
+import type { TimingPrecision } from "./utils/timingPrecision";
 
 /** How long a solved ear-training riddle stays on screen before the next one is dealt. */
 const RIDDLE_AUTO_ADVANCE_MS = 1500;
@@ -152,6 +153,9 @@ const PracticeSessionInner = ({
     jumpToExercise,  canFinishSession, hasLoggedPractice,
     completedExercises, restartFullSession,
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
+  // UI chimes stay silent for as long as the session can be listening to the
+  // guitar; the summary (reportResult) is the first moment they may play.
+  useSuppressUiSounds(!reportResult);
 
   const isPlaying = timer.timerEnabled;
   const isExamMode = typeof examMode === 'boolean' ? examMode : !!examMode;
@@ -178,7 +182,7 @@ const PracticeSessionInner = ({
   if (updateRequired) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
-        <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500 space-y-6 text-center">
+        <div className="w-full max-w-lg animate-in fade-in zoom-in duration-slow space-y-6 text-center">
           <h1 className="text-xl font-semibold text-zinc-100">{t("update.title")}</h1>
           <p className="text-sm text-zinc-400">
             {t("update.body")}
@@ -201,7 +205,7 @@ const PracticeSessionInner = ({
   if (planHasGpFile && !isPremium) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
-        <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500">
+        <div className="w-full max-w-lg animate-in fade-in zoom-in duration-slow">
           <PremiumGate feature="gp-practice" children={<div />} />
           <button onClick={() => router.back()} className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold capitalize tracking-widest text-[10px]">
             ← {t("update.return")}

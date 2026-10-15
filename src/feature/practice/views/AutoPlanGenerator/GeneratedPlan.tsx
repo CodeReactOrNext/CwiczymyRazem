@@ -20,9 +20,8 @@ import type {
   ExercisePlan,
 } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
-import { RefreshCw } from "lucide-react";
+import { Play,RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { FaPlay } from "react-icons/fa";
 import { formatMinutesDuration } from "utils/converter";
 
 import { ExerciseCard } from "./ExerciseCard";
@@ -110,7 +109,7 @@ export const GeneratedPlan = ({
                   </>
               ) : (
                   <>
-                    <FaPlay className='mr-2 h-3.5 w-3.5' />
+                    <Play size='1em' className='mr-2 h-3.5 w-3.5' />
                     <span>{t("common:start")}</span>
                   </>
               )}
@@ -175,7 +174,7 @@ export const GeneratedPlan = ({
                   </>
               ) : (
                   <>
-                    <FaPlay className='mr-2 h-4 w-4' />
+                    <Play size='1em' className='mr-2 h-4 w-4' />
                     <span>{t("common:start")}</span>
                   </>
               )}

@@ -95,6 +95,15 @@
     "no_show_them": "Tu rival no tocó",
     "nobody_played": "Nadie tocó"
   },
+  "feed": {
+    "title": "Todos los duelos",
+    "latest": "últimos {{count}}",
+    "empty": "Nadie ha resuelto un duelo todavía. Aquí aparece cada duelo terminado en la app.",
+    "win": "{{winner}} vence a {{loser}}",
+    "walkover": "{{winner}} vence a {{loser}} — por incomparecencia",
+    "draw": "{{winner}} empata con {{loser}}",
+    "void": "{{winner}} vs {{loser}} — nadie tocó"
+  },
   "ranking": {
     "title": "Ranking",
     "players_one": "{{count}} clasificado",

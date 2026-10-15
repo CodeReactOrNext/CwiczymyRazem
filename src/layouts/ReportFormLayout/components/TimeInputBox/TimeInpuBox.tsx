@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Card } from "assets/components/ui/card";
 import type {
   WheelPickerOption} from "assets/components/wheel-picker";
@@ -11,6 +10,7 @@ import QuestionMark from "components/UI/QuestionMark";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import type { FormikErrors } from "formik";
 import { useFormikContext } from "formik";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons/lib";
@@ -140,11 +140,11 @@ const TimeInputBox = ({
   return (
     <Card
       className={cn(
-        "overflow-hidden p-0 transition-colors duration-300",
+        "overflow-hidden p-0 transition-colors duration-base",
         error && "ring-1 ring-red-500/40"
       )}>
       <div
-        className={`relative flex h-full flex-col bg-gradient-to-br p-5 transition-colors duration-300 ${getGradientStyle()}`}>
+        className={`relative flex h-full flex-col bg-gradient-to-br p-5 transition-colors duration-base ${getGradientStyle()}`}>
         {/* Apple-style glass gradient bar at top - only show when has value */}
         {hasValue && (
           <div
@@ -201,7 +201,7 @@ const TimeInputBox = ({
               </span>
             )}
             <ChevronDown
-              className={`h-4 w-4 text-zinc-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+              className={`h-4 w-4 text-zinc-400 transition-transform duration-base ${isOpen ? 'rotate-180' : ''}`}
             />
           </div>
         </div>

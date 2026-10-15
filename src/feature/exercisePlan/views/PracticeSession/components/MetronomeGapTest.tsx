@@ -126,7 +126,7 @@ function TapAffordance({ active, compact }: { active: boolean; compact?: boolean
         }
         transition={{ duration: cue ? 1.1 : 0.2, ease: "easeInOut" }}
         className={cn(
-          "select-none rounded-md border px-9 py-2.5 text-[10px] font-bold uppercase tracking-[0.3em]",
+          "select-none rounded-md border px-9 py-2.5 text-xs font-bold",
           active ? "border-cyan-400/70 bg-cyan-400/15 text-cyan-100" : "border-white/15 bg-white/5 text-zinc-500",
         )}>
         space
@@ -134,7 +134,7 @@ function TapAffordance({ active, compact }: { active: boolean; compact?: boolean
 
       <span
         className={cn(
-          "text-[11px] font-semibold uppercase tracking-wider",
+          "text-xs font-semibold",
           active ? "text-cyan-300/70" : "text-zinc-600",
         )}>
         or
@@ -150,7 +150,7 @@ function Step({ icon, title, sub, active }: { icon: ReactNode; title: string; su
   return (
     <div
       className={cn(
-        "flex min-w-[104px] flex-col items-center gap-1 rounded-lg border px-3 py-2.5 text-center transition-all duration-200",
+        "flex min-w-[104px] flex-col items-center gap-1 rounded-lg border px-3 py-2.5 text-center transition-all duration-base",
         active
           ? "border-cyan-400/60 bg-cyan-400/[0.10] shadow-[0_0_18px_rgba(34,211,238,0.12)]"
           : "border-white/10 bg-white/[0.03]",
@@ -231,7 +231,7 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
       <div className="relative flex flex-col gap-5">
         {/* Header */}
         <div className="flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-cyan-500/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+          <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-cyan-500/15 px-2.5 py-1 text-xs font-bold text-cyan-300">
             <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
             {t("gap.title")}
           </span>
@@ -278,7 +278,7 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
                 <div
                   key={i}
                   className={cn(
-                    "relative grid place-items-center rounded-full border transition-all duration-75",
+                    "relative grid place-items-center rounded-full border transition-all duration-fast",
                     compact ? "h-7 w-7" : "h-9 w-9",
                     on
                       ? "border-cyan-400 bg-cyan-400 shadow-[0_0_16px_rgba(34,211,238,0.7)]"
@@ -361,12 +361,12 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
                 <>
                   {/* fill from center to where you landed */}
                   <div
-                    className={cn("absolute top-1/2 h-1 -translate-y-1/2 rounded-full transition-all duration-500", VERDICT[res.verdict].fill)}
+                    className={cn("absolute top-1/2 h-1 -translate-y-1/2 rounded-full transition-all duration-slow", VERDICT[res.verdict].fill)}
                     style={{ left: `${fillLeftPct}%`, width: `${fillWidthPct}%` }}
                   />
                   {/* the tap marker */}
                   <div
-                    className={cn("absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-black/40 transition-all duration-500", VERDICT[res.verdict].dot)}
+                    className={cn("absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-black/40 transition-all duration-slow", VERDICT[res.verdict].dot)}
                     style={{ left: `${markerPct}%` }}
                   />
                 </>
@@ -405,7 +405,7 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
             </div>
 
             <div className="flex flex-1 flex-col rounded-xl border border-white/5 bg-black/20 p-3">
-              <div className="mb-2.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500">{t("gap.recent")}</div>
+              <div className="mb-2.5 text-xs font-bold text-zinc-500">{t("gap.recent")}</div>
               {s.history.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                   {s.history.slice(0, 12).map((a, i) => (

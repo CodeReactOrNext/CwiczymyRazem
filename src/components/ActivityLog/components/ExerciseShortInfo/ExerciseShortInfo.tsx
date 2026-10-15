@@ -1,6 +1,6 @@
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "hooks/useTranslation";
-import { FaClock, FaRegCalendarAlt, FaStar } from "react-icons/fa";
+import { CalendarIcon, Clock, Star } from "lucide-react";
 import { convertMsToHM } from "utils/converter";
 
 import type { ReportListInterfaceWithTimeSumary } from "../../activityLog.types";
@@ -33,7 +33,7 @@ const ExerciseShortInfo = ({
       {/* Header section with Date, Stars, and Time */}
       <div className='flex flex-row items-center justify-between gap-3 border-b border-[#e8e4db] pb-3'>
         <div className='flex flex-row items-center gap-2'>
-          <FaRegCalendarAlt className="text-stone-500" size={14} />
+          <CalendarIcon className="text-stone-500" size={14} />
           <p className="text-sm font-semibold tracking-wide text-stone-900">
             {date.toLocaleDateString(currentLang, {
               day: '2-digit',
@@ -46,14 +46,14 @@ const ExerciseShortInfo = ({
           <div className="flex flex-col items-end">
             <span className="text-[10px] font-bold tracking-wider text-stone-500 mb-0.5">Points</span>
             <div className="flex flex-row items-center gap-1.5">
-              <FaStar className="text-yellow-500" size={12} />
+              <Star className="text-yellow-500" size={12} />
               <p className='text-[13px] font-bold text-stone-900'>{report.points}</p>
             </div>
           </div>
           <div className="flex flex-col items-end">
             <span className="text-[10px] font-bold tracking-wider text-stone-500 mb-0.5">Total</span>
             <div className="flex flex-row items-center gap-1.5">
-              <FaClock className="text-cyan-600" size={12} />
+              <Clock className="text-cyan-600" size={12} />
               <p className="text-[13px] font-bold text-stone-900">{convertMsToHM(report.totalTime)}</p>
             </div>
           </div>
@@ -79,10 +79,10 @@ const ExerciseShortInfo = ({
                   </div>
                   <div className="mt-2 flex items-center gap-3 text-xs font-medium">
                       <span className="flex items-center gap-1.5 text-stone-600">
-                        <FaStar className="text-yellow-500" size={12} /> {activity.points}
+                        <Star className="text-yellow-500" size={12} /> {activity.points}
                       </span>
                       <span className="flex items-center gap-1.5 text-stone-600">
-                        <FaClock className="text-cyan-600" size={12} /> {convertMsToHM(activity.time)}
+                        <Clock className="text-cyan-600" size={12} /> {convertMsToHM(activity.time)}
                       </span>
                   </div>
                </div>

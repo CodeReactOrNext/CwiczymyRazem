@@ -736,7 +736,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                   <div className="h-1.5 w-24 overflow-hidden rounded-full bg-zinc-800">
                     <div
                       className={cn(
-                        "h-full transition-all duration-300",
+                        "h-full transition-all duration-base",
                         item.status === "error"
                           ? "bg-red-500"
                           : "bg-gradient-to-r from-cyan-600 to-cyan-400"
@@ -1012,7 +1012,7 @@ const GpTabsPage: NextPageWithLayout = () => {
           />
 
           {/* Card */}
-          <div className="relative z-10 w-full max-w-md rounded-lg bg-zinc-900 p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="relative z-10 w-full max-w-md rounded-lg bg-zinc-900 p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-base">
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="space-y-1">
@@ -1095,7 +1095,7 @@ const GpTabsPage: NextPageWithLayout = () => {
 
             {/* Time presets — only when time limit mode */}
             {!configFreeMode && (
-              <div className="space-y-3 animate-in fade-in duration-200">
+              <div className="space-y-3 animate-in fade-in duration-base">
                 <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
                   {t("gp.duration")}
                 </p>

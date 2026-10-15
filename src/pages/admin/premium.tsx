@@ -287,7 +287,7 @@ const AdminPremiumPage = () => {
 
   return (
     <AdminLayout onLogout={handleLogout}>
-      <div className="space-y-8 p-8 animate-in fade-in duration-700">
+      <div className="space-y-8 p-8 animate-in fade-in duration-slow">
 
         {/* Header */}
         <header className="flex flex-col gap-2">

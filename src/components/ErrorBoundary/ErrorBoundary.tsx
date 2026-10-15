@@ -49,49 +49,50 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen w-full bg-zinc-950 flex items-center justify-center p-6 text-zinc-100 font-sans">
-          <div className="max-w-md w-full text-center space-y-8 animate-in fade-in zoom-in duration-300">
-            <div className="flex justify-center">
-              <div className="p-4 rounded-3xl bg-red-500/10 border border-red-500/20 shadow-2xl shadow-red-500/5">
-                <AlertTriangle className="h-12 w-12 text-red-500" />
+          <div className="max-w-md w-full space-y-8 animate-in fade-in duration-base">
+            <div className="space-y-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-500/10">
+                <AlertTriangle className="h-6 w-6 text-red-400" />
               </div>
-            </div>
-            
-            <div className="space-y-3">
-              <h1 className="text-3xl font-bold tracking-tight">Something went wrong</h1>
+              <h1 className="text-2xl font-bold tracking-tight">This screen crashed</h1>
               <p className="text-zinc-400">
-                An unexpected error occurred in our application. We've been notified and are looking into it.
+                The error was reported to us automatically. Reloading brings the
+                screen back in most cases.
               </p>
             </div>
 
-            {this.state.error && (
-              <div className="p-4 rounded-xl bg-zinc-900 border border-white/5 text-left overflow-auto max-h-60 space-y-2">
-                <p className="text-xs font-mono text-red-400">{this.state.error.toString()}</p>
-                {this.state.componentStack && (
-                  <pre className="text-xs font-mono text-zinc-400 whitespace-pre-wrap">{this.state.componentStack}</pre>
-                )}
-              </div>
-            )}
-
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button 
+              <Button
                 onClick={this.handleReset}
-                className="flex-1 bg-white hover:bg-zinc-200 text-black font-bold h-12 rounded-xl transition-all active:scale-95"
-              >
+                className="flex-1 h-10 rounded-lg bg-white font-bold text-black hover:bg-zinc-200">
                 <RefreshCcw className="mr-2 h-4 w-4" />
-                Try Again
+                Reload
               </Button>
-              <Link href="/" className="flex-1">
-                <Button 
-                  variant="outline"
-                  className="w-full border-white/10 bg-zinc-900/50 hover:bg-zinc-800 text-white font-bold h-12 rounded-xl transition-all active:scale-95"
-                >
+              <Button
+                asChild
+                variant="ghost"
+                className="flex-1 h-10 rounded-lg bg-zinc-900/60 font-bold text-zinc-200 hover:bg-zinc-800 hover:text-white">
+                <Link href="/dashboard">
                   <Home className="mr-2 h-4 w-4" />
-                  Go Home
-                </Button>
-              </Link>
+                  Back to dashboard
+                </Link>
+              </Button>
             </div>
-            
-          
+
+            {/* For a bug report — out of the way unless someone asks for it. */}
+            {this.state.error && (
+              <details className="group rounded-lg bg-zinc-900/40 p-4 text-left">
+                <summary className="cursor-pointer text-xs font-medium text-zinc-500 hover:text-zinc-300">
+                  Technical details
+                </summary>
+                <div className="mt-3 max-h-60 space-y-2 overflow-auto">
+                  <p className="font-mono text-xs text-red-400">{this.state.error.toString()}</p>
+                  {this.state.componentStack && (
+                    <pre className="whitespace-pre-wrap font-mono text-xs text-zinc-500">{this.state.componentStack}</pre>
+                  )}
+                </div>
+              </details>
+            )}
           </div>
         </div>
       );

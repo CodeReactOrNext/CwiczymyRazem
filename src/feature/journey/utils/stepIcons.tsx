@@ -1,17 +1,20 @@
 import {
   AlertCircle, ArrowDownLeft, ArrowUpDown, AudioWaveform,
-  ChevronDown, ClipboardCheck, Compass, Copy, Dot, Drum,
-  Ear, Eye, Footprints, GitMerge, GraduationCap, Grid3x3, Guitar,
+  BookIcon,
+  ChevronDown, ClipboardCheck, Compass, Copy,   CrownIcon,
+Dot, Drum,
+  Ear, Eye, Footprints, GitMerge,   GlobeIcon,
+GraduationCap, Grid3x3, Guitar,
   Hammer, Hand, Hash, Info, Layers, Lightbulb,
-  ListMusic, MessageSquare, Mic2, Milestone, Minimize2, MousePointerClick,
+  ListMusic,   MapPin,
+MessageSquare, Mic2, Milestone, Minimize2, MousePointerClick,
 Move,   Music, Music2, Repeat, Shuffle, SkipForward, SlidersHorizontal,
+  SparklesIcon,
   TableProperties, Timer, TrendingUp, Trophy, Users, Volume2,
   Waves, Zap,
 } from "lucide-react";
 import React from "react";
-import {
-  TbBook2, TbCopy, TbCrown, TbGlobe, TbGrid3X3, TbGuitarPick, TbMapPin, TbSparkles, TbTrophy,
-} from "react-icons/tb";
+import { TbGuitarPick } from "react-icons/tb";
 
 const STEP_ICON_COMPONENTS: Record<string, React.ComponentType<{ size?: number }>> = {
   // Fundamentals-only
@@ -28,15 +31,15 @@ const STEP_ICON_COMPONENTS: Record<string, React.ComponentType<{ size?: number }
   TrendingUp,
   ListMusic,
   // Shared / Fretboard Mastery
-  LayoutGrid: TbGrid3X3,
-  BookOpen:   TbBook2,
-  Target:     TbMapPin,   // fret 5/7/9 landmarks — a signpost you navigate by, not a bullseye
-  Copy:       TbCopy,
-  Globe:      TbGlobe,
-  Sparkles:   TbSparkles,
-  Trophy:     TbTrophy,
+  LayoutGrid: Grid3x3,
+  BookOpen:   BookIcon,
+  Target:     MapPin,   // fret 5/7/9 landmarks — a signpost you navigate by, not a bullseye
+  Copy:       Copy,
+  Globe:      GlobeIcon,
+  Sparkles:   SparklesIcon,
+  Trophy:     Trophy,
   Guitar:     TbGuitarPick, // matches the guitar-pick motif used elsewhere in the app
-  Crown:      TbCrown,      // reserved for the whole-neck capstone exam
+  Crown:      CrownIcon,      // reserved for the whole-neck capstone exam
 };
 
 export function getStepIcon(name: string, size = 22): React.ReactNode {

@@ -534,9 +534,9 @@ export const CreateCustomExerciseDialog = ({
                 </div>
 
                 {useMetronome && (
-                    <div className="grid grid-cols-3 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-3 gap-4 animate-in fade-in slide-in-from-top-2 duration-base">
                         <div className="space-y-2">
-                            <Label htmlFor="minBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">{t("plans:custom.min_bpm")}</Label>
+                            <Label htmlFor="minBpm" className="text-zinc-400 text-xs font-bold">{t("plans:custom.min_bpm")}</Label>
                             <Input
                                 id="minBpm"
                                 type="number"
@@ -546,7 +546,7 @@ export const CreateCustomExerciseDialog = ({
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="maxBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">{t("plans:custom.max_bpm")}</Label>
+                            <Label htmlFor="maxBpm" className="text-zinc-400 text-xs font-bold">{t("plans:custom.max_bpm")}</Label>
                             <Input
                                 id="maxBpm"
                                 type="number"
@@ -556,7 +556,7 @@ export const CreateCustomExerciseDialog = ({
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="recBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">{t("plans:custom.rec_bpm")}</Label>
+                            <Label htmlFor="recBpm" className="text-zinc-400 text-xs font-bold">{t("plans:custom.rec_bpm")}</Label>
                             <Input
                                 id="recBpm"
                                 type="number"

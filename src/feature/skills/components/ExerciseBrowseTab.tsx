@@ -1,10 +1,10 @@
 import { Chip, chipVariants } from "assets/components/ui/chip";
-import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
@@ -759,7 +759,7 @@ export const ExerciseBrowseTab = ({
         // The row is the unit you act on, so it marks itself under the pointer.
         // Its hover step stays below the icon buttons' own, which sit on top of
         // it — otherwise hovering an icon would look like hovering the row.
-        className="flex items-center gap-2.5 rounded px-2 py-3 transition-colors duration-150 hover:bg-zinc-800/60 active:bg-zinc-800/40 sm:gap-3 sm:bg-zinc-800/30 sm:px-3"
+        className="flex items-center gap-2.5 rounded px-2 py-3 transition-colors duration-fast hover:bg-zinc-800/60 active:bg-zinc-800/40 sm:gap-3 sm:bg-zinc-800/30 sm:px-3"
       >
         {/* Only a finished or started exercise gets a mark. An empty circle on
             every untouched row said nothing and was most of what the eye saw.
@@ -924,7 +924,7 @@ export const ExerciseBrowseTab = ({
         <button
           onClick={() => setExpandedSets(prev => toggle(prev, set.id))}
           aria-expanded={isExpanded}
-          className="group flex w-full items-center gap-2.5 px-3.5 py-3 text-left transition-colors duration-200 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 sm:px-4"
+          className="group flex w-full items-center gap-2.5 px-3.5 py-3 text-left transition-colors duration-base hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600 sm:px-4"
         >
           <span className="truncate text-[15px] font-semibold text-zinc-100">{setTitleOf(set)}</span>
 
@@ -955,7 +955,7 @@ export const ExerciseBrowseTab = ({
 
           <ChevronRight
             className={cn(
-              "ml-auto h-4 w-4 shrink-0 text-zinc-700 transition-all duration-300 group-hover:text-zinc-200",
+              "ml-auto h-4 w-4 shrink-0 text-zinc-700 transition-all duration-base group-hover:text-zinc-200",
               isExpanded ? "rotate-90" : "group-hover:translate-x-1"
             )}
           />

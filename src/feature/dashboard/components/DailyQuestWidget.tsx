@@ -169,7 +169,7 @@ export const DailyQuestWidget = () => {
                 </div>
                 <div className='mt-2 h-1 overflow-hidden rounded-full bg-zinc-900/80'>
                   <div
-                    className='h-full rounded-full bg-cyan-400 transition-[width] duration-500'
+                    className='h-full rounded-full bg-cyan-400 transition-[width] duration-slow'
                     style={{ width: `${progressPercent(task)}%` }}
                   />
                 </div>
@@ -186,7 +186,7 @@ export const DailyQuestWidget = () => {
       {allCompleted && !isClaimed && (
         <Button
           onClick={handleClaim}
-          className='h-10 w-full rounded-sm bg-gradient-to-r from-orange-500 to-amber-500 text-xs font-bold tracking-wide text-white shadow-md shadow-orange-500/20 transition-all hover:scale-105'>
+          className='h-10 w-full rounded-sm bg-gradient-to-r from-orange-500 to-amber-500 text-xs font-bold tracking-wide text-white shadow-md shadow-orange-500/20 transition-all'>
           <span className='flex items-center gap-2'>
             <Gift size={14} className='animate-bounce' />
             {t("daily_quests.claim", {
@@ -208,7 +208,7 @@ export const DailyQuestWidget = () => {
       )}
 
       {isClaimed && (
-        <div className='flex h-10 w-full items-center justify-center gap-2 rounded-sm border border-white/5 bg-zinc-800/40 text-xs font-black uppercase tracking-widest text-zinc-400'>
+        <div className='flex h-10 w-full items-center justify-center gap-2 rounded-sm border border-white/5 bg-zinc-800/40 text-xs font-black text-zinc-400'>
           <CheckCircle2 size={14} className='text-emerald-500' />
           {t("daily_quests.claimed")}
         </div>

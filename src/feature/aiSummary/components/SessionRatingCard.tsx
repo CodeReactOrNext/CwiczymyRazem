@@ -137,7 +137,7 @@ export function RatingSkeleton({ messages = SESSION_LOADING_MESSAGES }: { messag
             <span
               key={i}
               className={cn(
-                "w-1 h-1 rounded-full transition-colors duration-500",
+                "w-1 h-1 rounded-full transition-colors duration-slow",
                 i === phase ? "bg-main" : "bg-zinc-700"
               )}
             />
@@ -311,7 +311,7 @@ function SessionRatingCard({ log }: SessionRatingCardProps) {
 
   return (
     <div className={cn(
-      "mt-2 rounded-lg border-none p-5 space-y-5 transition-all duration-500",
+      "mt-2 rounded-lg border-none p-5 space-y-5 transition-all duration-slow",
       "bg-zinc-900"
     )}>
       {loading && <RatingSkeleton />}
@@ -419,7 +419,7 @@ export function DailyAssessmentCard({
 
   return (
     <div className={cn(
-      "rounded-lg border-none overflow-hidden transition-all duration-500",
+      "rounded-lg border-none overflow-hidden transition-all duration-slow",
       "bg-zinc-900"
     )}>
 
@@ -538,7 +538,7 @@ export function PeriodRatingCard({
 
   return (
     <div className={cn(
-      "rounded-lg border-none p-5 space-y-5 transition-all duration-500",
+      "rounded-lg border-none p-5 space-y-5 transition-all duration-slow",
       "bg-zinc-900"
     )}>
       {loading && <RatingSkeleton />}

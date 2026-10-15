@@ -8,6 +8,7 @@ import {
   runTransaction,
   updateDoc,
 } from "firebase/firestore";
+import { playUiSound } from "lib/uiSounds/uiSounds";
 import posthog from "posthog-js";
 import type { RootState } from "store/store";
 import type { DailyQuest, DailyQuestTaskType } from "types/api.types";
@@ -284,6 +285,7 @@ export const claimQuestRewardAction = createAsyncThunk(
       }
 
       dispatch(claimQuestReward());
+      playUiSound("reward");
       dispatch(syncDailyQuestAction());
 
       const state = getState() as RootState;

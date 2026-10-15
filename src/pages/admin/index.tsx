@@ -94,7 +94,7 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout onLogout={handleLogout}>
-      <div className="space-y-10 p-6 lg:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-10 p-6 lg:p-12 animate-in fade-in slide-in-from-bottom-4 duration-slow">
         <div className="flex flex-col gap-1">
           <h2 className="text-3xl font-[900] tracking-tight text-white">Song Catalog</h2>
           <p className="text-sm font-medium text-zinc-500">Manage library metadata and enrichment verification</p>

@@ -1,5 +1,4 @@
 import { useSortable } from "@dnd-kit/sortable";
-import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "assets/components/ui/badge";
 import {
@@ -10,6 +9,7 @@ import {
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
@@ -82,14 +82,14 @@ export const ExerciseCard = ({
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn(
-        "group relative flex flex-col rounded-lg border border-transparent transition-all duration-500 overflow-hidden",
+        "group relative flex flex-col rounded-lg border border-transparent transition-all duration-slow overflow-hidden",
         "bg-zinc-900/20 ring-1 ring-inset ring-white/5 hover:ring-white/15 hover:bg-zinc-800/40",
         isDragging && "z-20 bg-zinc-800/60 opacity-90"
       )}
     >
       {/* Top Colorful Line effect */}
       <div className={cn(
-        "absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r opacity-40 group-hover:opacity-100 transition-opacity duration-500",
+        "absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r opacity-40 group-hover:opacity-100 transition-opacity duration-slow",
         exercise.category === "technique" ? "from-emerald-500/0 via-emerald-500 to-emerald-500/0" :
           exercise.category === "theory" ? "from-blue-500/0 via-blue-500 to-blue-500/0" :
           exercise.category === "creativity" ? "from-purple-500/0 via-purple-500 to-purple-500/0" :
@@ -97,7 +97,7 @@ export const ExerciseCard = ({
       )} />
 
       {/* Subtle radial glow in background */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(255,255,255,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(255,255,255,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-slow pointer-events-none" />
 
       <div className="relative flex items-stretch sm:min-h-[90px]">
         {/* Drag handle — the whole left strip, so it's an easy target on touch */}
@@ -116,23 +116,23 @@ export const ExerciseCard = ({
         {/* Texts & Badges */}
         <div className="flex-1 min-w-0 py-4 pr-2 pl-1 sm:py-5 flex flex-col justify-center">
           <div>
-            <h3 className="font-semibold text-[15px] sm:text-[16px] leading-tight tracking-tight text-zinc-100 group-hover:text-white transition-colors duration-300">
+            <h3 className="font-semibold text-[15px] sm:text-[16px] leading-tight tracking-tight text-zinc-100 group-hover:text-white transition-colors duration-base">
               {localizeExercise(exercise).title}
             </h3>
-            <p className="mt-1.5 hidden text-[13px] sm:block sm:text-[14px] sm:line-clamp-2 leading-relaxed text-zinc-500 group-hover:text-zinc-300 transition-colors duration-300 pr-2">
+            <p className="mt-1.5 hidden text-[13px] sm:block sm:text-[14px] sm:line-clamp-2 leading-relaxed text-zinc-500 group-hover:text-zinc-300 transition-colors duration-base pr-2">
               {localizeExercise(exercise).description}
             </p>
           </div>
 
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-2.5 sm:mt-4">
-            <Badge variant="outline" className="px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none text-zinc-300 transition-colors duration-300">
+            <Badge variant="outline" className="px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none text-zinc-300 transition-colors duration-base">
               <Clock className="mr-1 h-3 w-3" />
               {formattedTime}
             </Badge>
 
             <Badge variant="outline" className={cn(
-              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-300",
+              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-base",
               exercise.category === "technique"  && "text-emerald-400 group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10",
               exercise.category === "theory"     && "text-blue-400 group-hover:border-blue-500/30 group-hover:bg-blue-500/10",
               exercise.category === "creativity" && "text-purple-400 group-hover:border-purple-500/30 group-hover:bg-purple-500/10",
@@ -142,7 +142,7 @@ export const ExerciseCard = ({
             </Badge>
 
             <Badge variant="outline" className={cn(
-              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-300",
+              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-base",
               exercise.difficulty === "beginner" && "text-sky-400 group-hover:border-sky-500/30 group-hover:bg-sky-500/10",
               exercise.difficulty === "easy"   && "text-green-400 group-hover:border-green-500/30 group-hover:bg-green-500/10",
               exercise.difficulty === "medium" && "text-yellow-400 group-hover:border-yellow-500/30 group-hover:bg-yellow-500/10",
@@ -242,7 +242,7 @@ export const ExerciseCard = ({
           </DropdownMenu>
 
           {exercise.tablature && exercise.tablature.length > 0 && (
-            <div className="relative hidden w-[220px] shrink-0 items-center justify-end opacity-40 transition-opacity duration-500 group-hover:opacity-90 sm:flex">
+            <div className="relative hidden w-[220px] shrink-0 items-center justify-end opacity-40 transition-opacity duration-slow group-hover:opacity-90 sm:flex">
               <TablaturePreview measures={exercise.tablature} />
             </div>
           )}

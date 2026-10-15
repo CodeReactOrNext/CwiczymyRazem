@@ -1,6 +1,7 @@
 import { useTranslation } from "hooks/useTranslation";
+import { Music, Play, SearchIcon } from "lucide-react";
 import { useRef, useState } from "react";
-import { FaMusic,FaPlay, FaSearch, FaYoutube } from "react-icons/fa";
+import { FaYoutube } from "react-icons/fa";
 
 import { useSessionUI } from "../contexts/SessionUIContext";
 
@@ -70,7 +71,7 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrac
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-8 gap-8 min-h-[260px]">
       <div className="flex flex-col items-center gap-2 text-center">
-        <FaMusic size={28} className="text-amber-500/70" />
+        <Music size={28} className="text-amber-500/70" />
         <p className="text-zinc-300 font-semibold text-base">{t("backing.required")}</p>
         <p className="text-zinc-500 text-sm">{t("backing.find_hint")}</p>
       </div>
@@ -87,7 +88,7 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrac
 
       {state === "loading" && (
         <div className="flex items-center gap-2.5 text-zinc-500 text-sm font-medium animate-pulse">
-          <FaSearch size={14} />
+          <SearchIcon size={14} />
           {t("backing.searching")}
         </div>
       )}
@@ -108,7 +109,7 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrac
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="bg-amber-500 rounded-full p-3 shadow-lg">
-                    <FaPlay size={14} className="text-white translate-x-0.5" />
+                    <Play size={14} className="text-white translate-x-0.5" />
                   </div>
                 </div>
               </div>
@@ -139,7 +140,7 @@ export function BackingVideoPlayer({ videoId, onChangeClick }: BackingVideoPlaye
   const { t } = useTranslation("session");
   return (
     <div className="w-full relative group p-4 flex flex-col items-center gap-2">
-      <div className="aspect-video w-full max-w-sm rounded-lg overflow-hidden bg-zinc-900 shadow-2xl border-2 border-amber-500/30 relative ring-2 ring-amber-500/10 transition-all duration-300 hover:border-amber-500/50 hover:ring-amber-500/20">
+      <div className="aspect-video w-full max-w-sm rounded-lg overflow-hidden bg-zinc-900 shadow-2xl border-2 border-amber-500/30 relative ring-2 ring-amber-500/10 transition-all duration-base hover:border-amber-500/50 hover:ring-amber-500/20">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none z-10" />
         {/* loop=1 + playlist=<id> makes a single video repeat, so a backing track
             shorter than the exercise keeps playing for the whole session. */}

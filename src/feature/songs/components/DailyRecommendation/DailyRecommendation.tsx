@@ -1,8 +1,8 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronRight, Info,Music, Plus, Star, Users } from "lucide-react";
 import { useRouter } from "next/router";
 import React from "react";
@@ -55,7 +55,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
             {/* Song Cover / Icon */}
             <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-2xl">
               {song.coverUrl ? (
-                <img src={song.coverUrl} alt={song.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <img src={song.coverUrl} alt={song.title} className="h-full w-full object-cover transition-transform duration-slow" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
                    <Music className="h-10 w-10 text-zinc-700" />
@@ -131,7 +131,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
             )}
             
             {isLearned && (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest leading-none h-9 flex-1 sm:flex-none">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-black leading-none h-9 flex-1 sm:flex-none">
                 Mastered
               </div>
             )}

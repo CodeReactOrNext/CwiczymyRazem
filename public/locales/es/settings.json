@@ -4,6 +4,12 @@
     "subtitle": "Se aplica a la aplicación en este dispositivo.",
     "work_in_progress": "Las traducciones están en curso: todo lo que aún no esté traducido se queda en inglés."
   },
+  "sounds": {
+    "title": "Sonidos",
+    "subtitle": "Se aplica a la aplicación en este dispositivo.",
+    "label": "Sonidos de la interfaz",
+    "description": "Un breve sonido al reclamar una recompensa, subir de nivel y terminar una sesión. Nunca mientras tocas."
+  },
   "settings_subtilte": "Editar perfil",
   "edit": "Editar",
   "save": "Guardar",

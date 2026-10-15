@@ -33,7 +33,7 @@ export const PublicSongCard = ({ song, guideSlug }: PublicSongCardProps) => {
           <img
             src={song.coverUrl}
             alt=""
-            className="h-full w-full object-cover blur-premium saturate-[1.1] scale-[1.2] transition-transform duration-1000 group-hover:scale-[1.4]"
+            className="h-full w-full object-cover blur-premium saturate-[1.1] scale-[1.2] transition-transform duration-1000"
           />
           <div className="absolute inset-0 bg-zinc-950/30" />
         </div>
@@ -50,7 +50,7 @@ export const PublicSongCard = ({ song, guideSlug }: PublicSongCardProps) => {
                 alt={`${song.title} cover`}
                 width={80}
                 height={80}
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="h-full w-full object-cover transition-transform duration-slow"
               />
             </div>
           ) : (

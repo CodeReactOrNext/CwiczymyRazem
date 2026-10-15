@@ -87,7 +87,7 @@ export const MilestoneNode = ({
               strokeLinecap='round'
               strokeDasharray={CIRC}
               strokeDashoffset={CIRC - percent * CIRC}
-              className='transition-[stroke-dashoffset] duration-700 ease-out'
+              className='transition-[stroke-dashoffset] duration-slow ease-out'
             />
           )}
         </svg>

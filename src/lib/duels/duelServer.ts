@@ -1,6 +1,7 @@
 import { drawDuelExercise, getDuelExercise } from "feature/duels/data/duelPool";
 import type {
   DuelDoc,
+  DuelFeedEntry,
   DuelJoinResult,
   DuelOverview,
   DuelPlayer,
@@ -16,6 +17,7 @@ import {
   canOpenDuel,
   canPlayerRun,
   DUEL_DURATION_MS,
+  DUEL_FEED_SIZE,
   DUEL_MIN_LVL,
   DUEL_RANKING_SIZE,
   DUEL_REMIND_BEFORE_MS,
@@ -28,6 +30,7 @@ import {
   readyRefusal,
   settledProfileUpdate,
   settleDuel,
+  toDuelFeedEntry,
   toDuelView,
 } from "feature/duels/utils/duelRules";
 import type {
@@ -628,6 +631,7 @@ export async function getDuelOverview(
     waitingCount,
     liveCount,
     aboveCount,
+    feedSnap,
   ] = await Promise.all([
     duelRefs.length
       ? (firestore.getAll(...duelRefs) as Promise<DocumentSnapshot[]>)
@@ -639,6 +643,9 @@ export async function getDuelOverview(
     profile?.rating !== undefined
       ? profiles().where("rating", ">", profile.rating).count().get()
       : Promise.resolve(null),
+    // Only settled duels carry `outcome`, so ordering by it leaves the running
+    // ones out — no status filter, no composite index.
+    duels().orderBy("outcome.settledAt", "desc").limit(DUEL_FEED_SIZE).get(),
   ]);
 
   const views = new Map<string, DuelView>();
@@ -666,6 +673,11 @@ export async function getDuelOverview(
       toRankingEntry(doc.data() as DuelProfile),
     ),
     rankedPlayers: rankedCount.data().count,
+    feed: feedSnap.docs
+      .map((doc: QueryDocumentSnapshot) =>
+        toDuelFeedEntry(doc.data() as DuelDoc),
+      )
+      .filter((entry): entry is DuelFeedEntry => !!entry),
     waitingOthers: Math.max(
       0,
       waitingCount.data().count - myLiveTickets.length,

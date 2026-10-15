@@ -1,5 +1,4 @@
 import { Button } from "assets/components/ui/button";
-import { useLocalizePlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import {
   Dialog,
   DialogContent,
@@ -8,10 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { useLocalizePlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
-import { Music, Play } from "lucide-react";
-import { FaClock, FaListUl } from "react-icons/fa";
+import { Clock, ListIcon,Music, Play } from "lucide-react";
 
 interface PlanPreviewDialogProps {
   plan: ExercisePlan | null;
@@ -57,11 +56,11 @@ export const PlanPreviewDialog = ({
               </DialogDescription>
               <div className='flex items-center gap-4 pt-1 text-xs font-medium text-zinc-400'>
                 <span className='flex items-center gap-1.5'>
-                  <FaClock className='h-3.5 w-3.5 text-zinc-500' />
+                  <Clock size='1em' className='h-3.5 w-3.5 text-zinc-500' />
                   {totalDuration} {t("plans:min")}
                 </span>
                 <span className='flex items-center gap-1.5'>
-                  <FaListUl className='h-3.5 w-3.5 text-zinc-500' />
+                  <ListIcon size='1em' className='h-3.5 w-3.5 text-zinc-500' />
                   {plan.exercises.length}{" "}
                   {plan.exercises.length === 1 ? "exercise" : "exercises"}
                 </span>

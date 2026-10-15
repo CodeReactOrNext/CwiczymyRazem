@@ -310,7 +310,7 @@ export const CaseOpeningModal = ({
                       style={{ width: ITEM_WIDTH }}
                     >
                       <div
-                        className="relative flex items-center justify-center rounded-md w-[230px] h-[150px] overflow-hidden bg-zinc-900/60 transition-all duration-500"
+                        className="relative flex items-center justify-center rounded-md w-[230px] h-[150px] overflow-hidden bg-zinc-900/60 transition-all duration-slow"
                         style={{
                           border: `1px solid ${rs.baseColor}55`,
                           background: `radial-gradient(circle at center, ${rs.baseColor}26 0%, ${rs.baseColor}0d 45%, rgba(24,24,27,0.85) 85%)`,
@@ -340,8 +340,8 @@ export const CaseOpeningModal = ({
                           style={{ background: rs.baseColor, opacity: isWinner ? 1 : 0.75 }}
                         />
                       </div>
-                      <div className={cn("flex flex-col items-center transition-opacity duration-500", isWinner ? "opacity-100" : "opacity-70")}>
-                        <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-500 mb-0.5">
+                      <div className={cn("flex flex-col items-center transition-opacity duration-slow", isWinner ? "opacity-100" : "opacity-70")}>
+                        <span className="text-xs font-bold text-zinc-500 mb-0.5">
                           {item.kind === "guitar"
                             ? item.def.brand
                             : item.kind === "effect"
@@ -388,7 +388,7 @@ export const CaseOpeningModal = ({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                     className={cn(
-                      "text-[10px] font-bold uppercase tracking-[0.2em]",
+                      "text-xs font-bold",
                       result?.isNewToDex || component ? "text-amber-300" : "text-zinc-500"
                     )}
                   >

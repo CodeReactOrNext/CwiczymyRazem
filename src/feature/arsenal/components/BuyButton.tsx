@@ -51,7 +51,7 @@ export const BuyButton = ({
       disabled={isBuying || !canAfford}
       title={!canAfford ? t("buy.not_enough_fame_points") : undefined}
       className={cn(
-        "flex items-center justify-between gap-3 rounded-lg font-bold transition-colors duration-150 click-behavior",
+        "flex items-center justify-between gap-3 rounded-lg font-bold transition-colors duration-fast click-behavior",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         size === "sm" ? "h-9 px-3 text-xs" : "h-10 px-4 text-sm",
         canAfford

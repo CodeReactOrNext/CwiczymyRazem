@@ -238,7 +238,7 @@ const YouTubeScraper = () => {
 
   return (
     <AdminLayout onLogout={handleLogout}>
-      <div className="space-y-8 p-6 lg:p-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8 p-6 lg:p-10 animate-in fade-in slide-in-from-bottom-4 duration-slow">
         {/* Header */}
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10">

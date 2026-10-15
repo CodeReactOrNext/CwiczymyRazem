@@ -4,8 +4,8 @@ import { ArcTuner } from "feature/tuner/components/ArcTuner";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
+import { X } from "lucide-react";
 import React from "react";
-import { FaTimes } from "react-icons/fa";
 
 import type { CalibrationOffsets } from "../../../hooks/useCalibration";
 import type { GuitarString } from "../calibration.constants";
@@ -63,7 +63,7 @@ export const TuningStep = React.memo(function TuningStep({
           </p>
         </div>
         <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
-          <FaTimes className="h-4 w-4" />
+          <X size='1em' className="h-4 w-4" />
         </button>
       </div>
 
@@ -96,13 +96,13 @@ export const TuningStep = React.memo(function TuningStep({
           </div>
 
           <div className="text-center space-y-0.5 mb-3">
-            <div className={cn("text-5xl font-black tracking-tighter tabular-nums transition-colors duration-200",
+            <div className={cn("text-5xl font-black tracking-tighter tabular-nums transition-colors duration-base",
               !hasNote && "text-zinc-700",
               hasNote && !isInTune && !isClose && "text-red-400",
               isClose && !isInTune && "text-amber-400",
               isInTune && "text-emerald-400"
             )}>{str.name}</div>
-            <div className={cn("text-sm font-mono font-bold tabular-nums transition-colors duration-200",
+            <div className={cn("text-sm font-mono font-bold tabular-nums transition-colors duration-base",
               !hasNote && "text-zinc-700",
               hasNote && !isInTune && !isClose && "text-red-400/70",
               isClose && !isInTune && "text-amber-400/70",
@@ -115,7 +115,7 @@ export const TuningStep = React.memo(function TuningStep({
           <AnimatePresence mode="wait">
 
               <div key="status" className="w-full">
-                <p className={cn("text-sm font-medium text-center min-h-[1.25rem] transition-colors duration-200", statusColor)}>
+                <p className={cn("text-sm font-medium text-center min-h-[1.25rem] transition-colors duration-base", statusColor)}>
                   {statusText}
                 </p>
                 <div className="w-full mt-6 space-y-2">
@@ -155,7 +155,7 @@ export const TuningStep = React.memo(function TuningStep({
               onClick={onAdvance}
               variant={stringState === "done" ? "default" : "secondary"}
               className={cn(
-                "w-full h-12 transition-all duration-300",
+                "w-full h-12 transition-all duration-base",
                 stringState === "done" && "ring-2 ring-emerald-500/50 ring-offset-2 ring-offset-zinc-950 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
               )}
             >

@@ -100,7 +100,7 @@ export const LibrarySongGrid = ({
 
           {/* Tier filter */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="text-xs font-bold text-zinc-600 uppercase tracking-widest mr-1">
+            <span className="text-xs font-bold text-zinc-600 mr-1">
               Tier:
             </span>
             {ALL_TIERS.map((t) => {
@@ -138,7 +138,7 @@ export const LibrarySongGrid = ({
           {/* Genre filter */}
           {genres.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-zinc-600 uppercase tracking-widest mr-1">
+              <span className="text-xs font-bold text-zinc-600 mr-1">
                 Genre:
               </span>
               {visibleGenres.map((g) => {

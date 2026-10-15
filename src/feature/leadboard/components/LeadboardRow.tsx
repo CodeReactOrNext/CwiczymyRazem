@@ -7,8 +7,8 @@ import type { GuildBadge } from "feature/guilds/types/guild.types";
 import { AchievementsCarousel } from "feature/leadboard/components/AchievementsCarousel";
 import { RigGuitarsPreview } from "feature/leadboard/components/RigGuitarsPreview";
 import { useTranslation } from "hooks/useTranslation";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { FaExternalLinkAlt } from "react-icons/fa";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 
@@ -108,7 +108,7 @@ export const LeadboardRow = ({
                         : "text-white",
                     )}>
                     {nick}
-                    <FaExternalLinkAlt className='h-3 w-3 opacity-50' />
+                    <ExternalLink size='1em' className='h-3 w-3 opacity-50' />
                   </span>
                 </Link>
 
@@ -116,7 +116,7 @@ export const LeadboardRow = ({
                   <div
                     translate='no'
                     className={cn(
-                      "flex items-center rounded-sm px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+                      "flex items-center rounded-sm px-1 py-0.5 text-xs font-bold",
                       profileId === currentUserId
                         ? "bg-cyan-500/10 text-cyan-400"
                         : "bg-zinc-800 text-zinc-400",
@@ -149,7 +149,7 @@ export const LeadboardRow = ({
                   )}>
                   {rigLevel.toLocaleString()}
                 </span>
-                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                <span className='text-xs font-bold text-zinc-600'>
                   {t("rig_level")}
                 </span>
               </div>
@@ -164,7 +164,7 @@ export const LeadboardRow = ({
                   )}>
                   {guitarsOwned}
                 </span>
-                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                <span className='text-xs font-bold text-zinc-600'>
                   {t("guitars")}
                 </span>
               </div>
@@ -179,7 +179,7 @@ export const LeadboardRow = ({
                   )}>
                   {effectsOwned}
                 </span>
-                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                <span className='text-xs font-bold text-zinc-600'>
                   {t("effects")}
                 </span>
               </div>
@@ -196,7 +196,7 @@ export const LeadboardRow = ({
                   )}>
                   {statistics.points.toLocaleString()}
                 </span>
-                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                <span className='text-xs font-bold text-zinc-600'>
                   {t("points")}
                 </span>
               </div>
@@ -216,7 +216,7 @@ export const LeadboardRow = ({
                       time.theory,
                   )}
                 </span>
-                <span className='text-[9px] font-bold uppercase tracking-wider text-zinc-600'>
+                <span className='text-xs font-bold text-zinc-600'>
                   {t("exercise_time")}
                 </span>
               </div>
@@ -259,7 +259,7 @@ export const LeadboardRow = ({
 
           {/* Avatar */}
           <Link href={`/user/${profileId}`} className='flex-shrink-0'>
-            <div className='relative transition-transform duration-300 group-hover:scale-105'>
+            <div className='relative transition-transform duration-base'>
               <Avatar
                 avatarURL={userAvatar}
                 name={nick}
@@ -282,7 +282,7 @@ export const LeadboardRow = ({
                   }`}>
                   {shortenNick(nick)}
                 </h3>
-                <FaExternalLinkAlt className='flex-shrink-0 text-xs opacity-30 transition-all duration-300 group-hover/link:opacity-100 sm:text-sm' />
+                <ExternalLink size='1em' className='flex-shrink-0 text-xs opacity-30 transition-all duration-base group-hover/link:opacity-100 sm:text-sm' />
               </Link>
 
               <div
@@ -292,7 +292,7 @@ export const LeadboardRow = ({
                     ? "bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-500/30"
                     : "bg-zinc-800 text-zinc-400 ring-1 ring-white/5"
                 }`}>
-                <span className='text-[10px] font-bold uppercase tracking-wider opacity-70'>
+                <span className='text-xs font-bold opacity-70'>
                   LVL
                 </span>
                 <span className='text-base font-bold'>{statistics.lvl}</span>
@@ -314,7 +314,7 @@ export const LeadboardRow = ({
                   className={`text-xl font-black tracking-tight lg:text-2xl ${
                     profileId === currentUserId
                       ? "text-cyan-300"
-                      : "text-white transition-transform duration-300 group-hover:scale-105"
+                      : "text-white transition-transform duration-base"
                   }`}>
                   {rigLevel.toLocaleString()}
                 </div>
@@ -358,7 +358,7 @@ export const LeadboardRow = ({
                   className={`text-xl font-black tracking-tight lg:text-2xl ${
                     profileId === currentUserId
                       ? "text-cyan-300"
-                      : "text-white transition-transform duration-300 group-hover:scale-105"
+                      : "text-white transition-transform duration-base"
                   }`}>
                   {statistics.points.toLocaleString()}
                 </div>
@@ -390,11 +390,11 @@ export const LeadboardRow = ({
 
           {/* Rig Guitars / Achievements - Desktop */}
           {variant === "gear" ? (
-            <div className='hidden flex-shrink-0 opacity-90 transition-opacity duration-300 group-hover:opacity-100 xl:block'>
+            <div className='hidden flex-shrink-0 opacity-90 transition-opacity duration-base group-hover:opacity-100 xl:block'>
               <RigGuitarsPreview arsenal={arsenal} />
             </div>
           ) : (
-            <div className='hidden flex-shrink-0 opacity-80 transition-opacity duration-300 group-hover:opacity-100 xl:block'>
+            <div className='hidden flex-shrink-0 opacity-80 transition-opacity duration-base group-hover:opacity-100 xl:block'>
               <AchievementsCarousel achievements={statistics.achievements} />
             </div>
           )}

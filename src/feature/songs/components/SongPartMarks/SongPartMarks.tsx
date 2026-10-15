@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import {
   Tooltip,
   TooltipContent,
@@ -13,6 +12,7 @@ import {
   toggleSongPart,
 } from "feature/songs/utils/songParts.utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import { AudioWaveform, Disc3, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -125,7 +125,7 @@ export const SongPartMarks = ({
                     handleToggle(part);
                   }}
                   className={cn(
-                    "relative flex items-center justify-center rounded-[4px] transition-colors duration-300",
+                    "relative flex items-center justify-center rounded-[4px] transition-colors duration-base",
                     isSm ? "h-6 w-6" : "h-10 gap-2 whitespace-nowrap px-3.5",
                     isCovered
                       ? "bg-zinc-700/40 text-zinc-500"

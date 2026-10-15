@@ -2,7 +2,17 @@ import { cn } from "assets/lib/utils";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
-import { FaCheck, FaExternalLinkAlt, FaFacebook, FaGraduationCap, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaSignal, FaTwitter } from "react-icons/fa";
+import {
+  Check,
+  ExternalLink,
+  GraduationCap,
+  Heart,
+  InfoIcon,
+  Lightbulb,
+  SignalIcon,
+} from "lucide-react";
+import type { ComponentType } from "react";
+import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 
 import type { Exercise } from "../../../types/exercise.types";
 
@@ -64,16 +74,16 @@ export const ExerciseInstructionsInline = ({
   const supportAuthorBlock = hasLinks ? (
     <div className="space-y-3">
       <div className="flex items-center gap-2.5 text-red-400">
-        <FaHeart size={14} className="animate-pulse" />
+        <Heart size={14} className="animate-pulse" />
         <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.support_author")}</h4>
       </div>
       <div className="flex flex-col gap-2">
         {exercise.links!.map((link, idx) => {
-          let Icon = FaExternalLinkAlt;
+          let Icon: ComponentType<{ className?: string }> = ExternalLink;
           if (link.url.includes("facebook"))                              Icon = FaFacebook;
           if (link.url.includes("instagram"))                             Icon = FaInstagram;
           if (link.url.includes("twitter") || link.url.includes("x.com")) Icon = FaTwitter;
-          if (link.url.includes("patreon"))                               Icon = FaHeart;
+          if (link.url.includes("patreon"))                               Icon = Heart;
           return (
             <a
               key={idx}
@@ -89,7 +99,7 @@ export const ExerciseInstructionsInline = ({
                 )} />
                 <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
               </div>
-              <FaExternalLinkAlt className="h-3 w-3 text-zinc-600 group-hover:text-zinc-400" />
+              <ExternalLink size='1em' className="h-3 w-3 text-zinc-600 group-hover:text-zinc-400" />
             </a>
           );
         })}
@@ -105,7 +115,7 @@ export const ExerciseInstructionsInline = ({
                   {exercise.instructions && exercise.instructions.length > 0 && (
                     <div className="space-y-4">
                       <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
-                        <FaInfoCircle size={14} />
+                        <InfoIcon size={14} />
                         <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.instructions")}</h4>
                       </div>
                       <div className="space-y-3">
@@ -121,7 +131,7 @@ export const ExerciseInstructionsInline = ({
                   {exercise.whyItMatters && (
                     <div className="space-y-4">
                       <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
-                        <FaGraduationCap size={14} />
+                        <GraduationCap size={14} />
                         <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.why")}</h4>
                       </div>
                       <p className="text-zinc-400 text-sm leading-relaxed font-normal">
@@ -137,7 +147,7 @@ export const ExerciseInstructionsInline = ({
                   <div className="space-y-6">
                     {exercise.requiresBackingTrack && (
                       <div className="p-3.5 bg-amber-500/10 rounded-lg flex items-start gap-3 text-amber-400 text-sm leading-relaxed font-semibold">
-                        <FaInfoCircle size={16} className="shrink-0 text-amber-500 mt-0.5" />
+                        <InfoIcon size={16} className="shrink-0 text-amber-500 mt-0.5" />
                         <div>
                           <div className="text-[11px] font-semibold capitalize tracking-wider text-amber-500/80 mb-1">{t("session:instructions.backing_recommended")}</div>
                           {t("session:instructions.backing_hint")}
@@ -148,7 +158,7 @@ export const ExerciseInstructionsInline = ({
                     {exercise.tips && exercise.tips.length > 0 && (
                       <div className="space-y-4">
                         <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
-                          <FaLightbulb size={14} />
+                          <Lightbulb size={14} />
                           <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.pro_tips")}</h4>
                         </div>
                         <div className="flex flex-col gap-3">
@@ -171,7 +181,7 @@ export const ExerciseInstructionsInline = ({
                     {/* Difficulty Section */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2.5 text-zinc-200">
-                        <FaSignal size={14} className={cn(
+                        <SignalIcon size={14} className={cn(
                           exercise.difficulty === 'beginner' ? 'text-sky-500/80' :
                           exercise.difficulty === 'easy' ? 'text-emerald-500/80' :
                           exercise.difficulty === 'medium' ? 'text-amber-500/80' : 'text-rose-500/80'
@@ -190,13 +200,13 @@ export const ExerciseInstructionsInline = ({
 
                     <div className="space-y-2">
                       <div className="flex items-center gap-2.5 text-zinc-200">
-                        <FaCheck size={14} className="text-emerald-500/80" />
+                        <Check size={14} className="text-emerald-500/80" />
                         <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.reward")}</h4>
                       </div>
                       <div className="space-y-1.5 pl-6">
                         {displaySkillIds.map(skillId => {
                           const specificSkill = guitarSkills.find(s => s.id === skillId);
-                          const Icon = ((specificSkill && specificSkill.icon) || SKILL_CATEGORY_ICONS[skillId as keyof typeof SKILL_CATEGORY_ICONS] || FaCheck) as any;
+                          const Icon = ((specificSkill && specificSkill.icon) || SKILL_CATEGORY_ICONS[skillId as keyof typeof SKILL_CATEGORY_ICONS] || Check) as any;
                           return (
                             <div key={skillId} className="flex items-center gap-2 text-zinc-400 text-sm font-normal">
                               <Icon size={12} className="text-emerald-500/70 shrink-0" />

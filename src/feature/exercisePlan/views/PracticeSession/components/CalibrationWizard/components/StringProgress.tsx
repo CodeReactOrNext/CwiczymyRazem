@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { Check } from "lucide-react";
 import React from "react";
-import { FaCheck } from "react-icons/fa";
 
 import type { CalibrationOffsets } from "../../../hooks/useCalibration";
 import type { GuitarString } from "../calibration.constants";
@@ -22,13 +22,13 @@ export const StringProgress = React.memo(function StringProgress({
         return (
           <div key={s.id} className="flex flex-col items-center gap-1.5">
             <div className={cn(
-              "flex items-center justify-center rounded-lg transition-all duration-300",
+              "flex items-center justify-center rounded-lg transition-all duration-base",
               isDone    ? "h-7 w-7 bg-emerald-500/15" :
               isCurrent ? "h-8 w-8 bg-cyan-400/10" :
                           "h-6 w-6 bg-zinc-900/60"
             )}>
               {isDone
-                ? <FaCheck className="h-2.5 w-2.5 text-emerald-400" />
+                ? <Check size='1em' className="h-2.5 w-2.5 text-emerald-400" />
                 : isCurrent
                 ? <div className="h-2 w-2 rounded-lg bg-cyan-400 animate-pulse" />
                 : null}

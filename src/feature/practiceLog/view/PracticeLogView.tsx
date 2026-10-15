@@ -189,7 +189,7 @@ export const PracticeLogView = () => {
 
                 <section ref={listRef} className='flex flex-col gap-4'>
                   <div className='flex items-baseline justify-between gap-3 px-3'>
-                    <h2 className='text-[11px] font-semibold uppercase tracking-[0.15em] text-zinc-500'>
+                    <h2 className='text-xs font-semibold text-zinc-500'>
                       {t("page.sessions_heading")} · {filteredSessions.length}
                     </h2>
                     {totalPages > 1 && (

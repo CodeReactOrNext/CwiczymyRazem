@@ -6,10 +6,9 @@ import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMediaQuery } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
-import { X } from "lucide-react";
+import { Check, Pause, PlayIcon, RotateCcw,SkipBack, SkipForward, X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import React, { useEffect, useRef, useState } from "react";
-import { FaCheck, FaPause, FaPlay, FaStepBackward, FaStepForward, FaUndo } from "react-icons/fa";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
@@ -382,7 +381,7 @@ export function PhoneSessionModal({
                     )}
 
                     {!isSideways && currentExercise.spotifyId && (
-                      <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="animate-in fade-in slide-in-from-top-2 duration-base">
                         <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
                       </div>
                     )}
@@ -431,7 +430,7 @@ export function PhoneSessionModal({
                       transition={{ duration: 0.2 }}
                       className="flex items-center justify-center"
                     >
-                      <FaStepForward className='h-4 w-4' />
+                      <SkipForward size='1em' className='h-4 w-4' />
                     </motion.span>
                   </Button>
 
@@ -440,13 +439,13 @@ export function PhoneSessionModal({
                   {currentExerciseIndex > 0 && (
                     <Button onClick={handleBackExerciseClick} variant="ghost" size="icon"
                       className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white">
-                      <FaStepBackward className="h-4 w-4" />
+                      <SkipBack size='1em' className="h-4 w-4" />
                     </Button>
                   )}
                   {hasTablature && (
                     <Button onClick={handleRestart} variant="ghost" size="icon"
                       className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-amber-400 hover:text-amber-300">
-                      <FaUndo className="h-4 w-4" />
+                      <RotateCcw size='1em' className="h-4 w-4" />
                     </Button>
                   )}
 
@@ -456,7 +455,7 @@ export function PhoneSessionModal({
                     size="icon"
                     className="h-12 w-12 shrink-0 rounded-lg bg-white text-black transition-colors click-behavior hover:bg-zinc-200"
                   >
-                    {isPlaying ? <FaPause className='h-4 w-4' /> : <FaPlay className='h-4 w-4' />}
+                    {isPlaying ? <Pause size='1em' className='h-4 w-4' /> : <PlayIcon size='1em' className='h-4 w-4' />}
                   </Button>
 
                   {!examMode && (
@@ -468,7 +467,7 @@ export function PhoneSessionModal({
                     >
                       {isFinishing || isSubmittingReport
                         ? <div className="h-3 w-3 animate-spin rounded-lg border-2 border-zinc-500/20 border-t-zinc-500" />
-                        : isLastExercise ? <FaCheck className="h-4 w-4" /> : <FaStepForward className="h-4 w-4" />
+                        : isLastExercise ? <Check size='1em' className="h-4 w-4" /> : <SkipForward size='1em' className="h-4 w-4" />
                       }
                     </Button>
                   )}

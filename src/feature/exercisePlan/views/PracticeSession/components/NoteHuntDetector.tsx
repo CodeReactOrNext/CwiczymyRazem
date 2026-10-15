@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
+import { ArrowRight, Mic } from "lucide-react";
 import { useMemo } from "react";
-import { FaArrowRight, FaMicrophone } from "react-icons/fa";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { huntPositions } from "../hooks/useNoteHunt";
@@ -175,7 +175,7 @@ export function NoteHuntDetector({
           // hint the way the octave hunts can afford to.
           <div className="flex max-w-xs flex-col items-center gap-1 rounded-lg bg-amber-500/10 px-4 py-3 text-center">
             <span className="flex items-center gap-2 text-sm font-bold text-amber-300">
-              <FaMicrophone className="h-3.5 w-3.5" aria-hidden /> {t("note_hunt.needs_pitch")}
+              <Mic size='1em' className="h-3.5 w-3.5" aria-hidden /> {t("note_hunt.needs_pitch")}
             </span>
             <span className="text-xs font-semibold text-amber-200/70">
               {t("note_hunt.turn_on")}
@@ -294,7 +294,7 @@ export function NoteHuntDetector({
           type="button"
           onClick={advanceHunt}
           className="inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-          Next <FaArrowRight className="h-3.5 w-3.5 text-zinc-400" />
+          Next <ArrowRight size='1em' className="h-3.5 w-3.5 text-zinc-400" />
         </button>
       )}
       {onDevPassExam && (

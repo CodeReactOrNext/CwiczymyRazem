@@ -1,9 +1,9 @@
 "use client";
 
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
 import { selectUserAuth, selectUserName } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
 import { Bug, HelpCircle,Lightbulb } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -143,7 +143,7 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
                     <button
                       key={cat.value}
                       onClick={() => setCategory(cat.value)}
-                      className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-all duration-150 ${
+                      className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-all duration-fast ${
                         isActive
                           ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
                           : "border-white/5 bg-zinc-800/50 text-zinc-400 hover:border-white/10 hover:bg-zinc-800 hover:text-zinc-300"

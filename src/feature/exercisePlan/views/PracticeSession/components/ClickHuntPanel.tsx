@@ -3,8 +3,8 @@ import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
 import { playGuitarNotePreview, preloadGuitarNotePreview } from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
 import { useTranslation } from "hooks/useTranslation";
+import { ArrowRight, Volume2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FaArrowRight, FaVolumeUp } from "react-icons/fa";
 
 import { CLICK_EXAM_MISTAKE_LIMIT, useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import {
@@ -165,7 +165,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
               type="button"
               onClick={advanceHunt}
               className="inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-              Next <FaArrowRight className="h-3.5 w-3.5 text-zinc-400" />
+              Next <ArrowRight size='1em' className="h-3.5 w-3.5 text-zinc-400" />
             </button>
           )}
 
@@ -178,7 +178,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
               disabled={referenceMidi === null}
               className="inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               title={t("click_hunt.play_note")}>
-              <FaVolumeUp className="h-3 w-3 text-zinc-400" /> Hear it
+              <Volume2 size='1em' className="h-3 w-3 text-zinc-400" /> Hear it
             </button>
             <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
             <LeftyToggle />

@@ -139,7 +139,7 @@ const ForgotPasswordView = () => {
                                 onChange={handleChange}
                                 onBlur={handleBlur}
                                 placeholder='name@example.com'
-                                className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
+                                className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-base text-white placeholder:text-zinc-500'
                               />
                             </div>
                             {errors.email && touched.email && (

@@ -449,7 +449,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                 />
               </div>
             ) : view === 'board' ? (
-              <div className="space-y-10 animate-in fade-in-50 slide-in-from-bottom-4 duration-700">
+              <div className="space-y-10 animate-in fade-in-50 slide-in-from-bottom-4 duration-slow">
                 <SkillPowerHero
                   skillPower={skillPower}
                   playerTier={playerTier}
@@ -631,7 +631,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                 onOpenSong={openSongFromPlaylist}
               />
             ) : (
-              <div className="space-y-6 animate-in fade-in-50 duration-300">
+              <div className="space-y-6 animate-in fade-in-50 duration-base">
                 {/* Tier Selection Grid */}
                 <div className="space-y-4">
                   <div className="flex flex-col gap-1">

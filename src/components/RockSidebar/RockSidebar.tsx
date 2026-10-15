@@ -43,6 +43,7 @@ import {
   Activity,
   BookOpen,
   Brain,
+  CassetteTape,
   ChevronDown,
   ClipboardList,
   Clock,
@@ -57,6 +58,7 @@ import {
   Library,
   ListChecks,
   ListMusic,
+  ListTree,
   Lock,
   LogOut,
   Mic2,
@@ -74,19 +76,16 @@ import {
   Swords,
   Target,
   Timer,
+  TrendingUp,
   Trophy,
   Users,
+  WandSparkles,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { FaArrowTrendUp, FaDiscord } from "react-icons/fa6";
-import {
-  PiCassetteTapeLight,
-  PiMagicWandDuotone,
-  PiTreeView,
-} from "react-icons/pi";
+import { FaDiscord } from "react-icons/fa6";
 import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
@@ -143,7 +142,7 @@ const SidebarNavLink = ({
         createRipple(e);
         onClick?.();
       }}
-      className={`relative flex min-h-11 items-center gap-3 overflow-hidden rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 active:scale-[0.98] ${
+      className={`relative flex min-h-11 items-center gap-3 overflow-hidden rounded-lg px-3 py-2 text-sm font-medium transition-all duration-base active:scale-[0.98] ${
         isActive
           ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
           : muted
@@ -218,7 +217,7 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
     id: "practice-auto",
     name: "auto_plan",
     href: "/timer/auto",
-    icon: <PiMagicWandDuotone size={16} />,
+    icon: <WandSparkles size={16} />,
   },
   {
     id: "practice-free-timer",
@@ -266,7 +265,7 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
     id: "practice-scale-map",
     name: "scale_map",
     href: "/scale-tree",
-    icon: <PiTreeView size={16} />,
+    icon: <ListTree size={16} />,
     tooltip: "scale_map_tooltip",
   },
 ];
@@ -366,7 +365,7 @@ const SidebarExpandableNavLink = ({
   return (
     <div>
       <div
-        className={`relative flex items-center overflow-hidden rounded-lg text-sm font-medium transition-all duration-200 ${
+        className={`relative flex items-center overflow-hidden rounded-lg text-sm font-medium transition-all duration-base ${
           isActive
             ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
             : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
@@ -405,11 +404,11 @@ const SidebarExpandableNavLink = ({
             e.preventDefault();
             onToggle();
           }}
-          className='flex min-h-11 min-w-11 items-center justify-center px-3 text-zinc-400 transition-colors duration-200 hover:text-zinc-200'>
+          className='flex min-h-11 min-w-11 items-center justify-center px-3 text-zinc-400 transition-colors duration-base hover:text-zinc-200'>
           <span className={NAV_INDICATOR_SLOT}>
             <ChevronDown
               size={16}
-              className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+              className={`transition-transform duration-base ${isExpanded ? "rotate-180" : ""}`}
             />
           </span>
         </button>
@@ -586,7 +585,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       id: "songs",
       name: t("songs"),
       href: "/songs",
-      icon: <PiCassetteTapeLight size={18} />,
+      icon: <CassetteTape size={18} />,
       children: SONGS_SUB_NAV,
     },
     {
@@ -600,7 +599,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       id: "progress",
       name: t("progress"),
       href: "/profile/activity",
-      icon: <FaArrowTrendUp size={18} />,
+      icon: <TrendingUp size={18} />,
       showBadge: hasUnclaimedMilestone,
       children: [
         {
@@ -800,7 +799,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         href={`/user/${userAuth}`}
         onMouseEnter={prefetchOwnProfile}
         onFocus={prefetchOwnProfile}
-        className='block rounded-lg p-4 transition-colors duration-200 hover:bg-white/5'>
+        className='block rounded-lg p-4 transition-colors duration-base hover:bg-white/5'>
         <div className='flex items-center gap-3'>
           <Avatar
             avatarURL={userAvatar}
@@ -839,7 +838,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           href={DESKTOP_APP_RELEASES_URL}
           target='_blank'
           rel='noreferrer'
-          className='relative -mx-4 -mb-4 mt-10 flex items-center gap-3 overflow-hidden bg-orange-500/10 px-7 py-4 transition-all duration-200 hover:bg-orange-500/15 active:scale-[0.98]'>
+          className='relative -mx-4 -mb-4 mt-10 flex items-center gap-3 overflow-hidden bg-orange-500/10 px-7 py-4 transition-all duration-base hover:bg-orange-500/15 active:scale-[0.98]'>
           <GuitarPatternBackground opacity={0.14} scale={0.5} color='#fb923c' />
           <span className='relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500/20 text-orange-400'>
             <Download size={18} />
@@ -912,7 +911,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           href={`/user/${userAuth}`}
           onClick={handleLinkClick}
           onTouchStart={prefetchOwnProfile}
-          className='flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg pr-2 transition-colors duration-200 hover:bg-white/5'>
+          className='flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg pr-2 transition-colors duration-base hover:bg-white/5'>
           <Avatar
             avatarURL={userAvatar}
             name={userName}
@@ -939,7 +938,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           handleLinkClick();
           dispatch(logUserOff());
         }}
-        className='flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-400 transition-colors duration-200 hover:bg-red-500/10 hover:text-red-400'>
+        className='flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-400 transition-colors duration-base hover:bg-red-500/10 hover:text-red-400'>
         <span className={NAV_ICON_SLOT}>
           <LogOut size={16} />
         </span>

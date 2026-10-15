@@ -125,7 +125,7 @@ const AdminSectionMapsPage = () => {
 
   return (
     <AdminLayout onLogout={handleLogout}>
-      <div className="space-y-8 p-6 lg:p-12 animate-in fade-in duration-700">
+      <div className="space-y-8 p-6 lg:p-12 animate-in fade-in duration-slow">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-col gap-1">
             <h2 className="text-3xl font-black italic tracking-tight text-white uppercase">

@@ -127,7 +127,7 @@ export const CaseCard = ({
         <img
           src={image}
           alt={labels.caseName(caseDef)}
-          className='relative z-10 max-h-[92%] w-[90%] object-contain object-bottom transition-transform duration-300 group-hover:-translate-y-1'
+          className='relative z-10 max-h-[92%] w-[90%] object-contain object-bottom transition-transform duration-base group-hover:-translate-y-1'
           draggable={false}
           loading='lazy'
         />

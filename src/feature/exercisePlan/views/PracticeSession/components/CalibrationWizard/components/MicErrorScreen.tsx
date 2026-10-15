@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
+import { Mic } from "lucide-react";
 import React from "react";
-import { FaMicrophone } from "react-icons/fa";
 
 import { ModalWrapper } from "../../ModalWrapper";
 
@@ -17,7 +17,7 @@ export function MicErrorScreen({ onRetry, onCancel }: MicErrorScreenProps) {
       <div className="flex h-full items-center justify-center px-6 text-white">
         <div className="max-w-xs w-full text-center space-y-5">
           <div className="mx-auto h-16 w-16 rounded-lg bg-red-500/10 flex items-center justify-center">
-            <FaMicrophone className="h-7 w-7 text-red-400" />
+            <Mic size='1em' className="h-7 w-7 text-red-400" />
           </div>
           <div className="space-y-1.5">
             <p className="font-bold">{t("error.title")}</p>

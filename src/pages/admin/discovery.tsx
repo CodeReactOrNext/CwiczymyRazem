@@ -29,7 +29,7 @@ const AdminDiscoveryPage = () => {
 
   return (
     <AdminLayout onLogout={handleLogout}>
-      <div className="min-h-[calc(100vh-80px)] p-6 lg:p-10 animate-in fade-in duration-700 max-w-5xl mx-auto">
+      <div className="min-h-[calc(100vh-80px)] p-6 lg:p-10 animate-in fade-in duration-slow max-w-5xl mx-auto">
          <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-2">
                 <div className="flex items-center gap-2 text-purple-400">

@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import {
   Sheet,
@@ -16,6 +15,7 @@ import { RATE_SONG_FAME_REWARD } from "feature/songs/constants/rating.constants"
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { collection, documentId, getDocs, query, where } from "firebase/firestore";
+import { useTranslation } from "hooks/useTranslation";
 import {
   BookOpen,
   CheckCircle,
@@ -207,7 +207,7 @@ const SongSheet = ({
           <div className="p-6 space-y-8">
             {/* Spotify Player */}
             {song.spotifyId && (
-              <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="animate-in fade-in slide-in-from-top-4 duration-slow">
                 <p className="text-xs font-bold text-zinc-400 mb-3">{t("sheet.spotify")}</p>
                 <div className="rounded-lg overflow-hidden">
                    <SpotifyPlayer trackId={song.spotifyId} height={80} />

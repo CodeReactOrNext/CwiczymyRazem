@@ -1578,7 +1578,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
               <div className='mt-3 flex items-center gap-3'>
                 <div className='h-1 flex-1 overflow-hidden rounded-full bg-zinc-800/80'>
                   <div
-                    className='h-full rounded-full bg-emerald-500 transition-all duration-700'
+                    className='h-full rounded-full bg-emerald-500 transition-all duration-slow'
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -1630,7 +1630,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
             </div>
             <div className='h-1 w-full overflow-hidden rounded-full bg-zinc-800'>
               <div
-                className='h-full rounded-full bg-emerald-500 transition-all duration-700'
+                className='h-full rounded-full bg-emerald-500 transition-all duration-slow'
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -1651,7 +1651,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                     <div className='ml-auto h-1 w-32 overflow-hidden rounded-full bg-zinc-800'>
                       <div
                         className={cn(
-                          "h-full rounded-full transition-all duration-300",
+                          "h-full rounded-full transition-all duration-base",
                           batch.color,
                         )}
                         style={{
@@ -1856,7 +1856,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                 <div className='relative w-full'>
                   <div className='absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-zinc-800 sm:block' />
                   <div
-                    className='absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-emerald-600/50 transition-all duration-700 sm:block'
+                    className='absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-emerald-600/50 transition-all duration-slow sm:block'
                     style={{ height: `${progress}%` }}
                   />
 
@@ -1965,7 +1965,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                   ) : (
                     <div
                       className={cn(
-                        "rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-700",
+                        "rounded-lg px-8 py-4 text-center text-sm font-semibold transition-all duration-slow",
                         isFinished
                           ? "bg-emerald-500/10 text-emerald-400"
                           : "bg-zinc-900/30 text-zinc-500 opacity-40",

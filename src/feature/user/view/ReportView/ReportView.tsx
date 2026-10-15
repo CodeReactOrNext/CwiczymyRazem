@@ -645,7 +645,7 @@ const ReportView = () => {
                     <div className='mb-8 flex flex-col gap-2'>
                         <div className='flex items-center gap-3'>
                           <div className={cn(
-                            'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-500',
+                            'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-slow',
                             isStep1Done ? "bg-emerald-500 text-black" : "bg-cyan-500/10 text-cyan-400"
                           )}>
                             {isStep1Done ? <Check className="h-5 w-5 stroke-[3]" /> : "1"}
@@ -657,7 +657,7 @@ const ReportView = () => {
                           </div>
                         </div>
                         <p className={cn(
-                          "ml-12 text-sm font-medium transition-colors duration-500",
+                          "ml-12 text-sm font-medium transition-colors duration-slow",
                           isStep1Done ? "text-emerald-400" : "text-zinc-400"
                         )}>
                           {isStep1Done
@@ -764,7 +764,7 @@ const ReportView = () => {
                           </p>
                         )}
                         {isStep1Done ? (
-                          <div className="mt-2 flex items-center gap-3 pr-4 duration-700 animate-in fade-in slide-in-from-top-2">
+                          <div className="mt-2 flex items-center gap-3 pr-4 duration-slow animate-in fade-in slide-in-from-top-2">
                              <p className="text-[10px] font-semibold tracking-wide text-emerald-400">
                                 {t("form.more_details")}
                              </p>
@@ -778,10 +778,10 @@ const ReportView = () => {
                   </div>
 
                   {/* STEP 2: FOCUS & DETAILS (OPTIONAL) */}
-                  <div className={cn('mb-12 transition-all duration-500', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
+                  <div className={cn('mb-12 transition-all duration-slow', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
                     <div className='mb-6 flex items-center gap-3 pt-8'>
                       <div className={cn(
-                        'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-500',
+                        'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-slow',
                         isStep2Completed
                           ? "bg-emerald-500 text-black"
                           : isStep1Done
@@ -893,7 +893,7 @@ const ReportView = () => {
                                           });
                                         }}
                                         className={cn(
-                                          "group flex items-center gap-1.5 rounded border border-transparent px-3 py-1.5 text-[10px] font-bold tracking-wide transition-[background-color,color,transform] duration-150 active:click-behavior-second focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
+                                          "group flex items-center gap-1.5 rounded border border-transparent px-3 py-1.5 text-[10px] font-bold tracking-wide transition-[background-color,color,transform] duration-fast active:click-behavior-second focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
                                           isActive
                                             ? "border-cyan-500/30 bg-cyan-500/10 text-zinc-100"
                                             : "bg-zinc-800/60 text-zinc-400 hover:bg-cyan-500/10 hover:text-cyan-400"
@@ -954,11 +954,11 @@ const ReportView = () => {
                   </div>
 
                   {/* STEP 3: LOGGING (OPTIONAL DETAILS) */}
-                  <div className={cn('scroll-mt-24 transition-all duration-500', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
+                  <div className={cn('scroll-mt-24 transition-all duration-slow', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
                     <div className="mb-8 pt-8">
                       <div className='mb-6 flex items-center gap-3'>
                         <div className={cn(
-                          'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-500',
+                          'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-slow',
                           isStep1Done
                             ? "bg-cyan-500/10 text-cyan-400"
                             : "bg-zinc-800 text-zinc-500"

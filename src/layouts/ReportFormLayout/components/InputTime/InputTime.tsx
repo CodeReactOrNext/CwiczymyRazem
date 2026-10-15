@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import { motion } from "framer-motion";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { addZeroToTime } from "utils/converter";
 
 interface InputTimeProps {
@@ -63,7 +63,7 @@ const InputTime = ({
         whileTap={{ scale: 0.9 }}
         transition={{ type: "spring", stiffness: 400, damping: 15 }}
         className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#1c1c22]/80 to-[#15151a]/80 text-white shadow-sm transition-all hover:from-[#25252a]/80 hover:to-[#1a1a1f]/80 hover:shadow'>
-        <FaChevronUp className='text-xs text-[#4a7edd]/80' />
+        <ChevronUp size='1em' className='text-xs text-[#4a7edd]/80' />
       </motion.button>
 
       <div className='relative my-2'>
@@ -103,7 +103,7 @@ const InputTime = ({
         whileTap={{ scale: 0.9 }}
         transition={{ type: "spring", stiffness: 400, damping: 15 }}
         className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#1c1c22]/80 to-[#15151a]/80 text-white shadow-sm transition-all hover:from-[#25252a]/80 hover:to-[#1a1a1f]/80 hover:shadow'>
-        <FaChevronDown className='text-xs text-[#4a7edd]/80' />
+        <ChevronDown size='1em' className='text-xs text-[#4a7edd]/80' />
       </motion.button>
     </div>
   );

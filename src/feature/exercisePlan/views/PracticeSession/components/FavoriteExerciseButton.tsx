@@ -47,7 +47,7 @@ export const FavoriteExerciseButton = ({
       aria-pressed={isFavorite}
       title={isFavorite ? t("remove_favorite") : t("add_favorite")}
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-lg ring-1 transition-colors duration-300",
+        "flex shrink-0 items-center justify-center rounded-lg ring-1 transition-colors duration-base",
         compact ? "h-6 w-6" : "h-9 w-9",
         isFavorite
           ? "bg-rose-500/15 text-rose-400 ring-rose-500/30 hover:bg-rose-500/25 hover:text-rose-300"

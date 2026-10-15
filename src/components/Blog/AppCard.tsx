@@ -63,7 +63,7 @@ export const AppCard = ({
         <div className="min-w-0 flex-1">
           <div className="text-lg font-bold tracking-tight text-white">{name}</div>
           {badge && (
-            <span className="mt-1 inline-block rounded-full bg-cyan-500/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-cyan-400">
+            <span className="mt-1 inline-block rounded-full bg-cyan-500/10 px-2.5 py-0.5 text-xs font-bold text-cyan-400">
               {badge}
             </span>
           )}
@@ -74,7 +74,7 @@ export const AppCard = ({
               <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
               <span className="text-xl font-bold text-white">{rating}</span>
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-zinc-500">
+            <div className="text-xs text-zinc-500">
               App Store{ratingCount ? ` · ${ratingCount} ratings` : ''}
             </div>
           </div>
@@ -89,7 +89,7 @@ export const AppCard = ({
           ['Platforms', platforms],
         ].map(([label, value]) => (
           <div key={label} className="px-5 py-3">
-            <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{label}</div>
+            <div className="text-xs font-black text-zinc-500">{label}</div>
             <div className="mt-0.5 text-sm font-medium text-zinc-200">{value}</div>
           </div>
         ))}

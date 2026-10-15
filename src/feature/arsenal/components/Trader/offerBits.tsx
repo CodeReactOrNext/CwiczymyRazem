@@ -16,7 +16,7 @@ const Meter = ({ share, color = "#e4e4e7", className }: MeterProps) => (
       className,
     )}>
     <span
-      className='block h-full rounded-full transition-all duration-300'
+      className='block h-full rounded-full transition-all duration-base'
       style={{
         width: `${Math.max(0, Math.min(1, share)) * 100}%`,
         backgroundColor: color,

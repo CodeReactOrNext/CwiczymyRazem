@@ -46,7 +46,7 @@ export const DuplicateSongsModal = ({ isOpen, onClose, duplicates, onDelete, onM
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-black/60 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-black/60 animate-in fade-in duration-base">
       <div className="w-full max-w-4xl max-h-[85vh] flex flex-col rounded-3xl border border-white/10 bg-zinc-900 font-sans shadow-2xl shadow-black/50">
         
         {/* Header */}

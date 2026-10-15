@@ -1,8 +1,7 @@
 import { cn } from "assets/lib/utils";
-import { X } from "lucide-react";
+import { InfoIcon, Lightbulb,X } from "lucide-react";
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
-import { FaInfoCircle, FaLightbulb } from "react-icons/fa";
 
 import type { Exercise } from "../../../types/exercise.types";
 
@@ -20,10 +19,10 @@ export const ExerciseInstructionsTrigger = ({ exercise }: ExerciseInstructionsTr
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-zinc-900/50 border border-white/5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95 shadow-lg backdrop-blur-md"
+        className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-zinc-900/50 border border-white/5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all active:scale-95 shadow-lg backdrop-blur-md"
         title="About Exercise"
       >
-        <FaInfoCircle size={18} />
+        <InfoIcon size={18} />
         <div className="absolute top-0 right-0 h-2 w-2 rounded-full bg-cyan-500 animate-pulse border-2 border-zinc-900" />
       </button>
 
@@ -33,7 +32,7 @@ export const ExerciseInstructionsTrigger = ({ exercise }: ExerciseInstructionsTr
           onClick={() => setIsOpen(false)}
         >
           <div
-            className="relative w-full max-w-xl bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200"
+            className="relative w-full max-w-xl bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-base"
             onClick={e => e.stopPropagation()}
           >
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-emerald-500 to-cyan-500" />
@@ -55,7 +54,7 @@ export const ExerciseInstructionsTrigger = ({ exercise }: ExerciseInstructionsTr
                 <div className={cn(exercise.tips?.length ? "mb-10" : "")}>
                   <div className="flex items-center gap-3 mb-5">
                     <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                      <FaInfoCircle size={18} />
+                      <InfoIcon size={18} />
                     </div>
                     <h3 className="font-bold text-white text-lg tracking-tight">Instructions</h3>
                   </div>
@@ -71,7 +70,7 @@ export const ExerciseInstructionsTrigger = ({ exercise }: ExerciseInstructionsTr
                 <div>
                   <div className="flex items-center gap-3 mb-5">
                     <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                      <FaLightbulb size={18} />
+                      <Lightbulb size={18} />
                     </div>
                     <h3 className="font-bold text-white text-lg tracking-tight">Pro Tips</h3>
                   </div>

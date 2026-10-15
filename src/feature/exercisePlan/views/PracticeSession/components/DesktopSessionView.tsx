@@ -240,7 +240,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         <div>
           <div className={cn("mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10", p.reportResult && "max-w-7xl px-4 pt-8", isElectron && (p.reportResult ? "pt-[72px]" : "pt-[56px]"))}>
             {p.reportResult && p.currentUserStats && p.previousUserStats ? (
-              <div className="animate-in fade-in duration-700 slide-in-from-bottom-4">
+              <div className="animate-in fade-in duration-slow slide-in-from-bottom-4">
                 <RatingPopUp
                   ratingData={p.reportResult} currentUserStats={p.currentUserStats}
                   previousUserStats={p.previousUserStats} onClick={p.onClose}

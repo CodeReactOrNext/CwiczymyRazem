@@ -115,7 +115,7 @@ const LoginView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder='name@example.com'
-                            className='h-11 rounded-lg border-white/10 bg-black/40 pl-10 text-white transition-all duration-300 placeholder:text-zinc-500 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10'
+                            className='h-11 rounded-lg border-white/10 bg-black/40 pl-10 text-white transition-all duration-base placeholder:text-zinc-500 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10'
                           />
                         </div>
                         {errors.email && touched.email && (
@@ -150,7 +150,7 @@ const LoginView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder='••••••••'
-                            className='h-11 rounded-lg border-white/10 bg-black/40 pl-10 pr-10 text-white transition-all duration-300 placeholder:text-zinc-500 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10'
+                            className='h-11 rounded-lg border-white/10 bg-black/40 pl-10 pr-10 text-white transition-all duration-base placeholder:text-zinc-500 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10'
                           />
                           <button
                             type='button'

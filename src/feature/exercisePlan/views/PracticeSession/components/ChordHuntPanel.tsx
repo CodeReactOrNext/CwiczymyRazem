@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { FaArrowRight } from "react-icons/fa";
+import { ArrowRight } from "lucide-react";
 import { NOTES } from "utils/audio/noteUtils";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
@@ -53,7 +53,7 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
       <div className="relative group">
         <div
           className={cn(
-            "absolute -inset-2 blur-[16px] rounded-lg transition-opacity duration-500",
+            "absolute -inset-2 blur-[16px] rounded-lg transition-opacity duration-slow",
             allFound ? "bg-emerald-500/40 opacity-100" : "bg-cyan-500/10 opacity-60",
           )}
         />
@@ -62,7 +62,7 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
           animate={allFound ? { scale: [1, 1.18, 1] } : { scale: 1 }}
           transition={{ duration: 0.4 }}
           className={cn(
-            "relative flex h-28 min-w-[8rem] items-center justify-center overflow-hidden rounded-lg px-6 transition-colors duration-500",
+            "relative flex h-28 min-w-[8rem] items-center justify-center overflow-hidden rounded-lg px-6 transition-colors duration-slow",
             allFound ? "bg-emerald-900/80" : "bg-zinc-900/90",
           )}
         >
@@ -141,7 +141,7 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
           onClick={advanceHunt}
           className="mt-1 inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
-          Next <FaArrowRight className="h-3.5 w-3.5 text-zinc-400" />
+          Next <ArrowRight size='1em' className="h-3.5 w-3.5 text-zinc-400" />
         </button>
       )}
     </div>

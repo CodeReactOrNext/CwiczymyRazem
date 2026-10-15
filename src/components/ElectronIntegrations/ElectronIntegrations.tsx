@@ -210,7 +210,7 @@ export const ElectronIntegrations = () => {
     <div
       ref={menuRef}
       style={{ left: menu.x, top: menu.y }}
-      className='fixed z-[100] min-w-[11rem] rounded-lg bg-zinc-900 p-1 shadow-xl shadow-black/50 duration-100 animate-in fade-in-0 zoom-in-95'
+      className='fixed z-[100] min-w-[11rem] rounded-lg bg-zinc-900 p-1 shadow-xl shadow-black/50 duration-fast animate-in fade-in-0 zoom-in-95'
       // preventDefault keeps focus on the right-clicked element, so paste/cut
       // still target it after clicking a menu item.
       onMouseDown={(event) => event.preventDefault()}

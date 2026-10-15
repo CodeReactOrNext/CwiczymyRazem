@@ -1,18 +1,12 @@
 import type { DraggableProvided } from "@hello-pangea/dnd";
-import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { SONG_PRACTICE_MODE_LABELS } from "feature/exercisePlan/utils/songToExercise";
 import { useTranslation } from "hooks/useTranslation";
-import { Music } from "lucide-react";
-import {
-  FaArrowDown,
-  FaArrowUp,
-  FaClock,
-  FaGripVertical,
-} from "react-icons/fa";
+import { ArrowDown, ArrowUp, Clock, GripVertical,Music } from "lucide-react";
 
 interface ExerciseItemProps {
   exercise: Exercise;
@@ -50,7 +44,7 @@ export const ExerciseItem = ({
         <div
           {...provided.dragHandleProps}
           className='hidden text-muted-foreground md:block'>
-          <FaGripVertical />
+          <GripVertical size='1em' />
         </div>
 
         <div className='flex flex-col gap-6 text-muted-foreground md:hidden'>
@@ -61,7 +55,7 @@ export const ExerciseItem = ({
             onClick={handleMoveUp}
             disabled={isFirst}
             aria-label={t("plans:create.move_up")}>
-            <FaArrowUp />
+            <ArrowUp size='1em' />
           </Button>
           <Button
             variant='ghost'
@@ -70,7 +64,7 @@ export const ExerciseItem = ({
             onClick={handleMoveDown}
             disabled={isLast}
             aria-label={t("plans:create.move_down")}>
-            <FaArrowDown />
+            <ArrowDown size='1em' />
           </Button>
         </div>
 
@@ -95,7 +89,7 @@ export const ExerciseItem = ({
             </h3>
             <div className='flex items-center gap-2'>
               <div className='flex items-center gap-1 text-sm text-muted-foreground'>
-                <FaClock className='h-3 w-3' />
+                <Clock size='1em' className='h-3 w-3' />
                 <span>{exercise.timeInMinutes} min</span>
               </div>
               {isSong ? (

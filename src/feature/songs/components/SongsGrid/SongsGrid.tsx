@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { SongCardRow, SongRowSkeleton } from "feature/songs/components/SongsGrid/SongCardRow";
@@ -8,6 +7,7 @@ import { ITEMS_PER_PAGE } from "feature/songs/hooks/useSongs";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongPart, SongStatus } from "feature/songs/types/songs.type";
+import { useTranslation } from "hooks/useTranslation";
 import posthog from "posthog-js";
 
 interface SongsGridProps {
@@ -103,7 +103,7 @@ export const SongsGrid = ({
   };
 
   return (
-    <div className='space-y-8 min-h-[400px] flex flex-col justify-between pb-12 transition-all duration-300'>
+    <div className='space-y-8 min-h-[400px] flex flex-col justify-between pb-12 transition-all duration-base'>
       {isLoading ? (
         <>
           {/* Phones: Spotify-style list */}
@@ -126,7 +126,7 @@ export const SongsGrid = ({
       ) : (
         <>
           {/* Phones: Spotify-style list — the 2-col card grid is too cramped to read. */}
-          <div className='space-y-1 sm:hidden animate-in fade-in duration-500'>
+          <div className='space-y-1 sm:hidden animate-in fade-in duration-slow'>
             {songs.map((song) => {
               const userStatus = getUserStatus(song);
               return (
@@ -147,7 +147,7 @@ export const SongsGrid = ({
           </div>
 
           {/* Tablet / desktop: card grid */}
-          <div className='hidden gap-x-5 gap-y-7 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 animate-in fade-in duration-500'>
+          <div className='hidden gap-x-5 gap-y-7 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 animate-in fade-in duration-slow'>
             {songs.map((song) => {
               const userStatus = getUserStatus(song);
               return (

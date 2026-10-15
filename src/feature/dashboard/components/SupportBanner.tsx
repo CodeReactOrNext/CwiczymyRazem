@@ -1,9 +1,9 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { FundingStatusBlock } from "feature/roadmap/components/FundingStatusBlock";
 import { ROADMAP_RAISED_OFFSET } from "feature/roadmap/data/roadmap.data";
 import { useBuyMeACoffeeFunding } from "feature/roadmap/hooks/useBuyMeACoffeeFunding";
+import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
 
@@ -72,7 +72,7 @@ export const SupportBanner = () => {
           <span>{t("support.cta")}</span>
           <ArrowRight
             size={16}
-            className='transition-transform duration-300 group-hover:translate-x-0.5'
+            className='transition-transform duration-base group-hover:translate-x-0.5'
           />
         </span>
       </div>

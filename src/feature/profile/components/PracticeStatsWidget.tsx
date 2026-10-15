@@ -3,7 +3,7 @@ import { cn } from "assets/lib/utils";
 import { addDays, format, isSameDay, startOfWeek } from "date-fns";
 import { useTranslation } from "hooks/useTranslation";
 import { useDateFnsLocale, useIntlLocale } from "lib/i18n/dateLocale";
-import { FaFire } from "react-icons/fa";
+import { Flame } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -169,9 +169,9 @@ export const PracticeStatsWidget = ({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FaFire
+            <Flame size='1em'
               className={cn(
-                "text-lg transition-all duration-500",
+                "text-lg transition-all duration-slow",
                 dayWithoutBreak > 0
                   ? "text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.6)]"
                   : "text-zinc-700"

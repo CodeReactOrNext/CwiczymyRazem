@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Dialog, DialogContent } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
@@ -11,8 +10,10 @@ import {
 } from "feature/songs/services/userGpFiles.service";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongArrangement } from "feature/songs/types/songs.type";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowLeft,
+  CassetteTape,
   ChevronRight,
   Crown,
   FileMusic,
@@ -25,7 +26,6 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { PiCassetteTapeLight } from "react-icons/pi";
 import { SiGuitarpro } from "react-icons/si";
 import { toast } from "sonner";
 
@@ -129,7 +129,7 @@ export function SongPracticePickerModal({
             </button>
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+            <p className="text-xs font-bold text-zinc-500">
               {phase === "pick" ? t("picker.choose_mode") : t("picker.attach_gp")}
             </p>
             <p className="truncate text-sm font-bold text-white">
@@ -156,8 +156,8 @@ export function SongPracticePickerModal({
               onClick={handleFreePractice}
               className="group flex w-full items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 text-left transition-all hover:border-white/10 hover:bg-white/[0.06] active:scale-[0.99]"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 border border-white/5 border-t-indigo-500/40 border-l-indigo-500/20 shadow-lg transition-all duration-300 group-hover:scale-105">
-                <PiCassetteTapeLight className="h-5 w-5 text-indigo-400" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 border border-white/5 border-t-indigo-500/40 border-l-indigo-500/20 shadow-lg transition-all duration-base">
+                <CassetteTape size='1em' className="h-5 w-5 text-indigo-400" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-white">{t("picker.free_practice")}</p>
@@ -172,7 +172,7 @@ export function SongPracticePickerModal({
                 onClick={handleGp5Practice}
                 className="group flex w-full items-center gap-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 text-left transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 active:scale-[0.99]"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-white/5 border-t-cyan-500/40 border-l-cyan-500/20 shadow-lg transition-all duration-300 group-hover:scale-105">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-white/5 border-t-cyan-500/40 border-l-cyan-500/20 shadow-lg transition-all duration-base">
                   <SiGuitarpro className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -198,7 +198,7 @@ export function SongPracticePickerModal({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-bold text-zinc-400">{t("picker.gp_practice")}</p>
-                      <span className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                      <span className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-400">
                         <Crown className="h-2.5 w-2.5" />
                         {t("picker.premium")}
                       </span>
@@ -209,7 +209,7 @@ export function SongPracticePickerModal({
                 <Link
                   href="/supporter"
                   onClick={onClose}
-                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-500/5 py-2 text-[11px] font-bold uppercase tracking-wider text-amber-400 transition-colors hover:border-amber-500/30 hover:bg-amber-500/10"
+                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-500/5 py-2 text-xs font-bold text-amber-400 transition-colors hover:border-amber-500/30 hover:bg-amber-500/10"
                 >
                   <Crown className="h-3 w-3" />
                   {t("picker.upgrade")}
@@ -222,14 +222,14 @@ export function SongPracticePickerModal({
               <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={() => setPhase("attach")}
-                  className="flex-1 rounded-lg border border-white/5 px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500 transition-colors hover:border-white/10 hover:text-zinc-300"
+                  className="flex-1 rounded-lg border border-white/5 px-3 py-2 text-xs font-bold text-zinc-500 transition-colors hover:border-white/10 hover:text-zinc-300"
                 >
                   {t("picker.change_gp")}
                 </button>
                 <button
                   onClick={handleDetach}
                   disabled={isDetaching}
-                  className="flex items-center gap-1.5 rounded-lg border border-red-500/20 px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-red-500/70 transition-colors hover:border-red-500/30 hover:text-red-400 disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-lg border border-red-500/20 px-3 py-2 text-xs font-bold text-red-500/70 transition-colors hover:border-red-500/30 hover:text-red-400 disabled:opacity-50"
                 >
                   {isDetaching ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -246,7 +246,7 @@ export function SongPracticePickerModal({
               onClick={handleManualLog}
               className="group mt-2 flex w-full items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 text-left transition-all hover:border-white/10 hover:bg-white/[0.06] active:scale-[0.99]"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20 shadow-lg transition-all duration-300 group-hover:scale-105">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20 shadow-lg transition-all duration-base">
                 <NotebookPen className="h-5 w-5 text-emerald-400" />
               </div>
               <div className="min-w-0 flex-1">
@@ -268,7 +268,7 @@ export function SongPracticePickerModal({
                   key={tab}
                   onClick={() => setAttachTab(tab)}
                   className={cn(
-                    "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-[11px] font-bold uppercase tracking-widest transition-all",
+                    "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-all",
                     attachTab === tab
                       ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-400"
                       : "text-zinc-500 hover:text-zinc-300"
@@ -330,7 +330,7 @@ function GpFileLibraryPicker({
     return (
       <div className="flex flex-col items-center gap-3 py-8 text-zinc-600">
         <FolderOpen className="h-8 w-8 opacity-40" />
-        <p className="text-xs font-bold uppercase tracking-widest">{t("picker.no_files")}</p>
+        <p className="text-xs font-bold">{t("picker.no_files")}</p>
         <p className="text-[10px] text-zinc-700">{t("picker.no_files_hint")}</p>
       </div>
     );
@@ -403,7 +403,7 @@ function GpFileImporter({
         <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-zinc-950/80 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-2 text-zinc-400">
             <Loader2 className="h-5 w-5 animate-spin text-cyan-500" />
-            <span className="text-[11px] font-bold uppercase tracking-widest">{t("detail.saving")}</span>
+            <span className="text-xs font-bold">{t("detail.saving")}</span>
           </div>
         </div>
       )}

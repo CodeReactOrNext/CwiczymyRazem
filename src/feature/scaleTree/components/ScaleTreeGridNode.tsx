@@ -136,7 +136,7 @@ export function ScaleTreeGridNode({
         />
         <polygon
           points={points}
-          className="transition-all duration-300"
+          className="transition-all duration-base"
           fill={isLocked ? 'none' : `url(#${fillGradId})`}
           stroke={isSelected ? colors.accent : `url(#${strokeGradId})`}
           strokeWidth={isSelected ? 2.4 : 1.4}

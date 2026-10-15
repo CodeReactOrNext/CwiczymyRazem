@@ -39,7 +39,7 @@ export const AchievementCardMobile = ({ Icon, rarity, name, description, childre
           <div className='text-center'>
             <DialogTitle className='mb-1 text-xl font-bold'>{t(name as any)}</DialogTitle>
             <DialogDescription className='text-main-100 text-sm'>
-              <span className='mb-2 block text-[10px] uppercase tracking-widest opacity-70 font-bold'>
+              <span className='mb-2 block text-xs opacity-70 font-bold'>
                 {t(rarity as any)}
               </span>
               {t(description as any)}
@@ -47,7 +47,7 @@ export const AchievementCardMobile = ({ Icon, rarity, name, description, childre
               {progress && (
                 <div className="mt-4 bg-white/10 rounded-lg p-2 max-w-[200px] mx-auto">
                     <div className="flex justify-center gap-2 text-xs font-bold opacity-80">
-                        <span className="uppercase text-[10px] tracking-wider">{t("progress", "Progress")}</span>
+                        <span className="text-xs">{t("progress", "Progress")}</span>
                         <span className="text-green-400">{progress.current} / {progress.max}</span>
                     </div>
                 </div>

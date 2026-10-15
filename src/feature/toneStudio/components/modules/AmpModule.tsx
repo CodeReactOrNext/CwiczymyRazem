@@ -66,7 +66,7 @@ const VALVE_POSITIONS = [0.38, 0.62];
 const ValveGlow = ({ intensity }: { intensity: number }) => (
   <div
     aria-hidden
-    className='pointer-events-none absolute overflow-hidden transition-opacity duration-700'
+    className='pointer-events-none absolute overflow-hidden transition-opacity duration-slow'
     style={{
       left: `${AMP_GRILLE.left * 100}%`,
       top: `${AMP_GRILLE.top * 100}%`,

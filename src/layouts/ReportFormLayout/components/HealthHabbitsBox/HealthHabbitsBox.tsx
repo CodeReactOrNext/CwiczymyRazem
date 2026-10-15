@@ -4,14 +4,7 @@ import QuestionMark from "components/UI/QuestionMark";
 import { HABBITS_POINTS_VALUE } from "constants/ratingValue";
 import { useField } from "formik";
 import { motion } from "framer-motion";
-import {
-  FaCheck,
-  FaDumbbell,
-  FaFire,
-  FaLightbulb,
-  FaMusic,
-  FaRecordVinyl,
-} from "react-icons/fa";
+import { Check, Disc3,Dumbbell, Flame, Lightbulb, Music } from "lucide-react";
 
 export interface HealthHabbitsBoxProps {
   title?: string;
@@ -23,17 +16,17 @@ export interface HealthHabbitsBoxProps {
 const getHabitIcon = (name: string) => {
   switch (name) {
     case "exercise_plan":
-      return <FaDumbbell className='text-base' />;
+      return <Dumbbell size='1em' className='text-base' />;
     case "recording":
-      return <FaRecordVinyl className='text-base' />;
+      return <Disc3 size='1em' className='text-base' />;
     case "warmup":
-      return <FaFire className='text-base' />;
+      return <Flame size='1em' className='text-base' />;
     case "metronome":
-      return <FaMusic className='text-base' />;
+      return <Music size='1em' className='text-base' />;
     case "new_things":
-      return <FaLightbulb className='text-base' />;
+      return <Lightbulb size='1em' className='text-base' />;
     default:
-      return <FaLightbulb className='text-base' />;
+      return <Lightbulb size='1em' className='text-base' />;
   }
 };
 
@@ -60,7 +53,7 @@ const HealthHabbitsBox = ({
       transition={{ type: "spring", stiffness: 400, damping: 25 }}>
       <Card
         onClick={handleCheckboxClick}
-        className={`group relative cursor-pointer overflow-hidden rounded-lg p-0 transition-colors duration-300 ${
+        className={`group relative cursor-pointer overflow-hidden rounded-lg p-0 transition-colors duration-base ${
           isActive
             ? "bg-emerald-500/10 ring-1 ring-emerald-500/20 backdrop-blur-sm"
             : "bg-zinc-900/30 hover:bg-zinc-900/50"
@@ -73,15 +66,15 @@ const HealthHabbitsBox = ({
               <div
                 className={`
                   flex h-5 w-5 items-center justify-center rounded border
-                  transition-colors duration-300
+                  transition-colors duration-base
                   ${
                     isActive
                       ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-400"
                       : "border-zinc-700 bg-zinc-800/40 text-transparent"
                   }
                 `}>
-                <FaCheck
-                  className={`h-2.5 w-2.5 transition-all duration-300 ${
+                <Check size='1em'
+                  className={`h-2.5 w-2.5 transition-all duration-base ${
                     isActive ? "scale-100 opacity-100" : "scale-50 opacity-0"
                   }`}
                 />
@@ -89,7 +82,7 @@ const HealthHabbitsBox = ({
 
               <div className='flex flex-grow items-center gap-2'>
                 <span
-                  className={`transition-colors duration-300 ${
+                  className={`transition-colors duration-base ${
                     isActive
                       ? "text-emerald-400"
                       : "text-zinc-500 group-hover:text-zinc-400"
@@ -110,7 +103,7 @@ const HealthHabbitsBox = ({
               {isActive && (
                 <span
                   key={name + "-points"}
-                  className='flex shrink-0 items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-bold text-emerald-400 duration-300 animate-in fade-in zoom-in-95 slide-in-from-right-1'>
+                  className='flex shrink-0 items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-bold text-emerald-400 duration-base animate-in fade-in zoom-in-95 slide-in-from-right-1'>
                   +{HABBITS_POINTS_VALUE}
                   <img
                     src='/images/points.png'

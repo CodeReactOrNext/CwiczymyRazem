@@ -24,7 +24,7 @@ export const tabNavListClass =
 
 /** Shared by every item; the active/inactive half is added by the two below. */
 const tabNavItemBase =
-  "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-none border-b-2 bg-transparent px-4 py-3 text-sm font-semibold shadow-none transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-zinc-600";
+  "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-none border-b-2 bg-transparent px-4 py-3 text-sm font-semibold shadow-none transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-zinc-600";
 
 /** A Radix `TabsTrigger` — active state comes from `data-state`. */
 export const tabNavTriggerClass = cn(

@@ -1,5 +1,5 @@
-import { ArrowRight, Lock } from 'lucide-react';
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
+import { ArrowRight, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { formatMinutesDuration } from "utils/converter";
 
@@ -38,7 +38,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, href }) =>
 
   return (
     <Link href={href}>
-      <div className="group rounded-lg bg-zinc-900/40 hover:bg-zinc-900/60 transition-all duration-200 p-6 cursor-pointer">
+      <div className="group rounded-lg bg-zinc-900/40 hover:bg-zinc-900/60 transition-all duration-base p-6 cursor-pointer">
         {/* Badges */}
         <div className="flex gap-2 mb-4">
           <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-semibold ${categoryInfo.badge}`}>

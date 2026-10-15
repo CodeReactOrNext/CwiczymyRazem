@@ -14,8 +14,8 @@ import {
   TWO_DAY_MULTIPLER,
 } from "constants/ratingValue";
 import { useTranslation } from "hooks/useTranslation";
+import { Flame } from "lucide-react";
 import type { ReactNode } from "react";
-import { FaFire } from "react-icons/fa";
 import { getDailyStreakMultiplier } from "utils/gameLogic";
 
 // Everything below is derived from the live scoring constants, so the tooltip
@@ -63,7 +63,7 @@ export const ScoreBreakdownTooltip = ({
             {/* Header: streak + current multiplier */}
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-1.5'>
-                <FaFire
+                <Flame size='1em'
                   className={cn(
                     streak > 0
                       ? "text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]"

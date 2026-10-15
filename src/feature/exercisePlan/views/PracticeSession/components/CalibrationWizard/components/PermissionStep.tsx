@@ -1,7 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronLeft } from "lucide-react";
-import { FaMicrophone, FaTimes } from "react-icons/fa";
+import { ChevronLeft, Mic, X } from "lucide-react";
 
 interface PermissionStepProps {
   isLoading: boolean;
@@ -22,13 +21,13 @@ export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: Permiss
           <ChevronLeft size={20} />
         </button>
         <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
-          <FaTimes className="h-4 w-4" />
+          <X size='1em' className="h-4 w-4" />
         </button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
         <div className="relative w-40 h-40 rounded-lg overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.15)] bg-zinc-900/60 flex items-center justify-center">
-          <FaMicrophone className="text-6xl text-emerald-400/80" />
+          <Mic size='1em' className="text-6xl text-emerald-400/80" />
         </div>
 
         <div className="space-y-3 max-w-[280px]">

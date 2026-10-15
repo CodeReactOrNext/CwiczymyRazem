@@ -557,7 +557,7 @@ export const SeoLandingPage = ({
                   <a
                     key={heading.id}
                     href={`#${heading.id}`}
-                    className={`py-1 pl-4 text-sm transition-all duration-200 hover:text-cyan-400 ${
+                    className={`py-1 pl-4 text-sm transition-all duration-base hover:text-cyan-400 ${
                       activeId === heading.id
                         ? "font-medium text-cyan-400"
                         : "text-zinc-500"

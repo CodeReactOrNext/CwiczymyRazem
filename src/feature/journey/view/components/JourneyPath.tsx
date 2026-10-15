@@ -1,9 +1,8 @@
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, ChevronLeft, Guitar } from "lucide-react";
+import { Check, ChevronLeft, Guitar, Star } from "lucide-react";
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { FaStar } from "react-icons/fa";
 
 import type { JourneyModuleWithStatus, JourneyStepWithStatus } from "../../types/journey.types";
 import { getStepIcon } from "../../utils/stepIcons";
@@ -44,7 +43,7 @@ function PathNode({
           disabled={isLocked}
           aria-label={step.title}
           className={cn(
-            "relative flex h-20 w-20 items-center justify-center rounded-full transition-[transform,box-shadow,background-color] duration-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed",
+            "relative flex h-20 w-20 items-center justify-center rounded-full transition-[transform,box-shadow,background-color] duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed",
             isLocked &&
               "bg-zinc-700 text-zinc-500 shadow-[0_4px_0_0_rgb(24,24,27)]",
             isCompleted &&
@@ -101,7 +100,7 @@ function PathNode({
         {isCompleted && step.stars && (
           <div className="mt-1 flex items-center gap-0.5">
             {[1, 2, 3].map((i) => (
-              <FaStar key={i} size={9} className={i <= step.stars! ? "text-amber-400" : "text-zinc-700"} />
+              <Star key={i} size={9} className={i <= step.stars! ? "text-amber-400" : "text-zinc-700"} />
             ))}
           </div>
         )}

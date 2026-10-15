@@ -1,14 +1,14 @@
 import { achievementsData } from "feature/achievements/data/achievementsData";
 import {
-  FaCalendarDay,
-  FaClock,
-  FaDumbbell,
-  FaGem,
-  FaGuitar,
-  FaHeart,
-  FaMedal,
-  FaStarHalf,
-} from "react-icons/fa";
+  CalendarDays,
+  Clock,
+  Dumbbell,
+  Gem,
+  Guitar,
+  Heart,
+  Medal,
+  StarHalf,
+} from "lucide-react";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 import { i18n } from "utils/translation";
@@ -32,13 +32,13 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
   return [
     {
       id: "fame",
-      Icon: FaGem,
+      Icon: Gem,
       description: "Fame",
       value: fame || 0,
     },
     {
       id: "total-time",
-      Icon: FaClock,
+      Icon: Clock,
       description: i18n?.t("profile:stats.spent_time"),
       value: convertMsToHM(
         time.technique + time.theory + time.creativity + time.hearing
@@ -46,19 +46,19 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
     },
     {
       id: "longest-session",
-      Icon: FaDumbbell,
+      Icon: Dumbbell,
       description: i18n?.t("profile:stats.longest_session"),
       value: convertMsToHM(time.longestSession),
     },
     {
       id: "consecutive-days",
-      Icon: FaCalendarDay,
+      Icon: CalendarDays,
       description: i18n?.t("profile:stats.consecutive days"),
       value: dayWithoutBreak,
     },
     {
       id: "session-count",
-      Icon: FaGuitar,
+      Icon: Guitar,
       description: i18n?.t("profile:stats.num_sessions"),
       value: sessionCount,
     },
@@ -70,19 +70,19 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
     },
     {
       id: "max-points",
-      Icon: FaStarHalf,
+      Icon: StarHalf,
       description: i18n?.t("profile:stats.max_points"),
       value: maxPoints,
     },
     {
       id: "habits-count",
-      Icon: FaHeart,
+      Icon: Heart,
       description: i18n?.t("profile:stats.num_habbits"),
       value: habitsCount,
     },
     {
       id: "achievements-count",
-      Icon: FaMedal,
+      Icon: Medal,
       description: i18n?.t("profile:stats.num_achievements"),
       value: achievements.length + "/" + achievementsData.length,
     },

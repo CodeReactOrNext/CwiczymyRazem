@@ -71,7 +71,7 @@ export const GuildLevelRing = ({
           strokeLinecap='round'
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - fraction)}
-          className='transition-[stroke-dashoffset] duration-500'
+          className='transition-[stroke-dashoffset] duration-slow'
         />
       </svg>
 

@@ -1,5 +1,4 @@
 import { Button } from "assets/components/ui/button";
-import { useLocalizedExercises } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
@@ -9,6 +8,7 @@ import { recordExerciseCompletion } from "feature/communityExercises/services/co
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { useLocalizedExercises } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { type BpmProgressData,getAllBpmProgress } from "feature/exercisePlan/services/bpmProgressService";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { hasExerciseProgress } from "feature/exercisePlan/utils/hasExerciseProgress";
@@ -23,10 +23,9 @@ import type { UserSkills } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useIsCompactViewport } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, ChevronRight, Ear, Lock,Mic, MousePointerClick, Network, Search, Star, Trophy, Users } from "lucide-react";
+import { ArrowLeft, Check,ChevronRight, Ear, Lock,Mic, MousePointerClick, Network, Search, Star, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect,useMemo, useRef,useState } from "react";
-import { FaCheck } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
 import { ExerciseBrowseTab } from "./ExerciseBrowseTab";
@@ -490,7 +489,7 @@ export const SkillDashboard = ({
                             <div className="flex flex-wrap items-center gap-5 pt-4 mt-3">
                               {hasBpmProgress && (
                                 <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-zinc-300">
-                                  <FaCheck className="h-3.5 w-3.5 text-emerald-400" />
+                                  <Check size='1em' className="h-3.5 w-3.5 text-emerald-400" />
                                   {completedBpms.length}/{bpmStages.length} BPM
                                 </div>
                               )}

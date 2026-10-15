@@ -36,7 +36,7 @@ export const FaqLayout = ({ groups }: FaqLayoutProps) => {
               <details key={faq.title} className='group'>
                 <summary className='flex cursor-pointer list-none items-center justify-between gap-4 rounded py-2 text-base font-medium text-zinc-100 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 [&::-webkit-details-marker]:hidden'>
                   {faq.title}
-                  <ChevronDown className='h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 group-open:rotate-180' />
+                  <ChevronDown className='h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-base group-open:rotate-180' />
                 </summary>
                 <p className='max-w-2xl pb-4 pt-1 text-sm leading-relaxed text-zinc-400'>
                   {faq.message}

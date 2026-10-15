@@ -138,7 +138,7 @@ export function RewardNodeComponent({ data, selected }: NodeProps<RewardNodeRFNo
       >
         <div
           onClick={handleClaim}
-          className={`relative flex items-center justify-center ${!isClaimed && !isClaiming ? "hover:scale-110 active:scale-90 cursor-pointer" : isClaimed ? "cursor-default" : "cursor-not-allowed"}`}
+          className={`relative flex items-center justify-center ${!isClaimed && !isClaiming ? "active:scale-90 cursor-pointer" : isClaimed ? "cursor-default" : "cursor-not-allowed"}`}
           style={{
             width: size,
             height: size,

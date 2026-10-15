@@ -41,6 +41,12 @@
     "subtitle": "Applies to the app on this device.",
     "work_in_progress": "Translations are still being written — anything not translated yet stays in English."
   },
+  "sounds": {
+    "title": "Sounds",
+    "subtitle": "Applies to the app on this device.",
+    "label": "Interface sounds",
+    "description": "A short chime for a claimed reward, a new level and a finished session. Never while you play."
+  },
   "bands_placeholder": "Your bands...",
   "email_label": "Email",
   "email_notifications": {

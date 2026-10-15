@@ -1,9 +1,8 @@
 import { Button } from "assets/components/ui/button";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { CheckCircle2 } from "lucide-react";
+import { Check, CheckCircle2, X } from "lucide-react";
 import React from "react";
-import { FaCheck, FaTimes } from "react-icons/fa";
 
 import type { CalibrationOffsets } from "../../../hooks/useCalibration";
 
@@ -20,7 +19,7 @@ export const SummaryStep = React.memo(function SummaryStep({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold tracking-tight">{t("summary.title")}</h2>
         <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
-          <FaTimes className="h-4 w-4" />
+          <X size='1em' className="h-4 w-4" />
         </button>
       </div>
 
@@ -48,7 +47,7 @@ export const SummaryStep = React.memo(function SummaryStep({
 
         <div className="flex w-full gap-3 pt-1 pb-2">
           <Button onClick={onConfirm} className="flex-1 h-11">
-            <FaCheck className="mr-2 h-3.5 w-3.5" /> {t("summary.save")}
+            <Check size='1em' className="mr-2 h-3.5 w-3.5" /> {t("summary.save")}
           </Button>
           <Button variant="ghost" onClick={onCancel} className="text-zinc-500 hover:text-zinc-300">{t("summary.discard")}</Button>
         </div>

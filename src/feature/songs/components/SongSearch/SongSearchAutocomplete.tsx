@@ -111,7 +111,7 @@ export const SongSearchAutocomplete = ({
       />
 
       {showDropdown && (
-        <div className='absolute left-0 right-0 top-[calc(100%+0.5rem)] z-40 max-h-80 space-y-1 overflow-y-auto rounded-lg bg-zinc-900 p-2 duration-150 animate-in fade-in-0 slide-in-from-top-1'>
+        <div className='absolute left-0 right-0 top-[calc(100%+0.5rem)] z-40 max-h-80 space-y-1 overflow-y-auto rounded-lg bg-zinc-900 p-2 duration-fast animate-in fade-in-0 slide-in-from-top-1'>
           {isLoading && suggestions.length === 0 ? (
             <div className='flex items-center justify-center gap-2 px-3 py-4 text-sm text-zinc-500'>
               <Loader2 className='h-4 w-4 animate-spin' />

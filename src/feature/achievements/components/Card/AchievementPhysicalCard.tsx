@@ -23,7 +23,7 @@ const getEpicCardStyle = (rarity: string) => {
   };
 };
 
-const baseCardClasses = "relative overflow-hidden border p-2 shadow-inset-cool flex items-center justify-center aspect-square transition-colors duration-200";
+const baseCardClasses = "relative overflow-hidden border p-2 shadow-inset-cool flex items-center justify-center aspect-square transition-colors duration-base";
 
 export const AchievementPhysicalCard = forwardRef<HTMLDivElement, AchievementPhysicalCardProps>(
   (

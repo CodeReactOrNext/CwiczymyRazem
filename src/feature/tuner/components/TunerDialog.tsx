@@ -111,7 +111,7 @@ export function TunerDialog({
                 key={str.string}
                 title={t("tuner.string", { n: str.string, name: str.name, hz: str.hz.toFixed(1) })}
                 className={cn(
-                  "font-mono rounded-md px-2 py-1.5 text-[11px] font-bold tabular-nums transition-colors duration-200",
+                  "font-mono rounded-md px-2 py-1.5 text-[11px] font-bold tabular-nums transition-colors duration-base",
                   isDone
                     ? "bg-emerald-500/15 text-emerald-400"
                     : isActive
@@ -131,7 +131,7 @@ export function TunerDialog({
         <div className='mt-2 flex flex-col items-center gap-0.5'>
           <span
             className={cn(
-              "font-mono text-5xl font-bold tracking-tight transition-colors duration-200 short:text-3xl",
+              "font-mono text-5xl font-bold tracking-tight transition-colors duration-base short:text-3xl",
               noteColor,
             )}>
             {targetNote}
@@ -141,7 +141,7 @@ export function TunerDialog({
           </span>
           <span
             className={cn(
-              "font-mono mt-1 text-sm transition-colors duration-200",
+              "font-mono mt-1 text-sm transition-colors duration-base",
               noteColor,
             )}>
             {hasNote
@@ -154,7 +154,7 @@ export function TunerDialog({
 
         <p
           className={cn(
-            "mt-4 text-center text-xs font-medium transition-colors duration-200 short:mt-2",
+            "mt-4 text-center text-xs font-medium transition-colors duration-base short:mt-2",
             allTuned ? "text-emerald-400" : "text-zinc-500",
           )}>
           {allTuned ? t("tuner.all_tuned") : statusText}

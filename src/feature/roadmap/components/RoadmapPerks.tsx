@@ -102,7 +102,7 @@ export const RoadmapPerks = () => {
           {t("perks.open_panel")}
           <ArrowRight
             size={16}
-            className='transition-transform duration-300 group-hover:translate-x-0.5'
+            className='transition-transform duration-base group-hover:translate-x-0.5'
           />
         </Link>
       </div>

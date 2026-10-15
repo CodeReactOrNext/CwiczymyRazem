@@ -56,7 +56,7 @@ export const MicHud = ({
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center duration-700 animate-in fade-in slide-in-from-right-4",
+        "flex shrink-0 items-center duration-slow animate-in fade-in slide-in-from-right-4",
         full
           ? "gap-7 rounded-xl bg-zinc-900/50 px-6 py-4 backdrop-blur-sm"
           : "w-[340px] justify-between gap-6 rounded-lg bg-zinc-900/50 px-7 py-3",
@@ -181,7 +181,7 @@ export const MicHud = ({
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 15 }}
             className={cn(
-              "font-bold tabular-nums tracking-tighter transition-colors duration-300",
+              "font-bold tabular-nums tracking-tighter transition-colors duration-base",
               full ? "text-3xl" : "text-2xl",
               multiplier > 1 ? tier.text : "text-zinc-300",
             )}>

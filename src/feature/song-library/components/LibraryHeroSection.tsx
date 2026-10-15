@@ -32,7 +32,7 @@ export const LibraryHeroSection = ({ totalSongs }: LibraryHeroSectionProps) => {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="max-w-3xl"
         >
-          <span className="text-sm font-black uppercase tracking-[0.3em] text-cyan-400 mb-6 block">
+          <span className="text-sm font-black text-cyan-400 mb-6 block">
             Guitar Song Library
           </span>
 

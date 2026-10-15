@@ -85,7 +85,7 @@ export const LevelBar = ({
         {/* Continuous Progress Bar */}
         <div className={cn("relative overflow-hidden rounded-md border border-white/5 bg-zinc-900/60 shadow-inner", isMini ? "h-1.5" : "h-2")}>
           <div
-            className='absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-600 via-cyan-400 to-cyan-500 transition-all duration-700 ease-out shadow-[0_0_15px_rgba(34,211,238,0.5)]'
+            className='absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-600 via-cyan-400 to-cyan-500 transition-all duration-slow ease-out shadow-[0_0_15px_rgba(34,211,238,0.5)]'
             style={{ width: `${progressPercent}%` }}>
             <div className='absolute inset-0 bg-gradient-to-b from-white/20 to-transparent'></div>
             {progressPercent > 0 && progressPercent < 100 && (

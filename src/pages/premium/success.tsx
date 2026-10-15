@@ -98,7 +98,7 @@ export default function PremiumSuccessPage() {
             <>
               {/* Features unlocked */}
               <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6 text-left space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-400">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
                   <Sparkles className="h-3.5 w-3.5" />
                   Unlocked features
                 </div>

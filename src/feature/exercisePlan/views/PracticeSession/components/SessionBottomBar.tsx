@@ -6,8 +6,8 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
+import { Check, FlagIcon, LogOut, SkipBack, SkipForward } from "lucide-react";
 import { memo, useRef, useState } from "react";
-import { FaCheck, FaFlagCheckered, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons/fa";
 
 import type { Exercise } from "../../../types/exercise.types";
 import { sumSessionTime, useSessionTimeStore } from "../hooks/sessionTimeStore";
@@ -102,7 +102,7 @@ const SessionBottomBarComponent = ({
             onClick={handleExitClick}
             className="rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
           >
-            <FaSignOutAlt />
+            <LogOut size='1em' />
             {t("common:practice.exit")}
           </Button>
           <ShortcutsLegend hasTempoControl={hasTempoControl} hasBackingTrack={hasBackingTrack} />
@@ -132,7 +132,7 @@ const SessionBottomBarComponent = ({
               className="rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
               onClick={onGoToPreviousExercise}
             >
-              <FaStepBackward /> {t("common:back") || "Back"}
+              <SkipBack size='1em' /> {t("common:back") || "Back"}
             </Button>
           )}
           {canFinishEarly && (
@@ -150,7 +150,7 @@ const SessionBottomBarComponent = ({
                     disabled={finishDisabled}
                     onClick={() => setShowFinishEarlyDialog(true)}
                   >
-                    <FaFlagCheckered className="mr-2" /> {t("common:practice.finish_plan_early")}
+                    <FlagIcon size='1em' className="mr-2" /> {t("common:practice.finish_plan_early")}
                   </Button>
                 </span>
               </TooltipTrigger>
@@ -188,11 +188,11 @@ const SessionBottomBarComponent = ({
                   <span>{t("session:saving")}</span>
                 ) : isLastExercise ? (
                   <>
-                    <span className="flex items-center gap-2">{t("common:finish_session")}</span> <FaCheck />
+                    <span className="flex items-center gap-2">{t("common:finish_session")}</span> <Check size='1em' />
                   </>
                 ) : (
                   <>
-                    <span className="flex items-center gap-2">{t("next") || "Next"}</span> <FaStepForward />
+                    <span className="flex items-center gap-2">{t("next") || "Next"}</span> <SkipForward size='1em' />
                   </>
                 )}
               </Button>
@@ -235,7 +235,7 @@ const SessionBottomBarComponent = ({
                 className='h-10 w-full rounded-lg bg-white text-sm font-bold text-black shadow-none transition-background hover:bg-zinc-200'
                 loading={isFinishing || isSubmittingReport}
                 onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}>
-                <FaCheck className='mr-2' />
+                <Check size='1em' className='mr-2' />
                 {t("session:exit.finish_save")}
               </Button>
               {isEarlyFinish && (
@@ -251,7 +251,7 @@ const SessionBottomBarComponent = ({
               variant='ghost'
               className='flex-1 rounded-lg bg-white/5 text-sm font-semibold text-zinc-400 transition-background hover:bg-red-500/10 hover:text-red-400'
               onClick={() => { setShowExitDialog(false); onClose?.(); }}>
-              <FaSignOutAlt className='mr-2' />
+              <LogOut size='1em' className='mr-2' />
               {finishDisabled ? t("session:exit.exit") : t("session:exit.exit_no_save")}
             </Button>
             <Button

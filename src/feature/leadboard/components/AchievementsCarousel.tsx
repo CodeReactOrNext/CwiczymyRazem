@@ -2,8 +2,8 @@ import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import { achievementsData } from "feature/achievements/data/achievementsData";
 import type { AchievementList } from "feature/achievements/types";
 import { useTranslation } from "hooks/useTranslation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import React, { useState } from "react";
-import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
 export const AchievementsCarousel = ({
   achievements,
@@ -41,7 +41,7 @@ export const AchievementsCarousel = ({
     <div className='flex flex-col items-center justify-center bg-opacity-80 w-fit'>
       <div className='flex rounded-lg p-2 text-base backdrop-blur-sm xxs:text-2xl lg:text-xl xl:text-2xl'>
         <button onClick={handlePrev}>
-          <FaAngleLeft
+          <ChevronLeft size='1em'
             className={`${
               leftMax
                 ? "cursor-default text-gray-600"
@@ -58,7 +58,7 @@ export const AchievementsCarousel = ({
               })}
         </div>
         <button onClick={handleNext}>
-          <FaAngleRight
+          <ChevronRight size='1em'
             className={`${
               rightMax
                 ? "cursor-default text-gray-600"

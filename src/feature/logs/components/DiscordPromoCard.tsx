@@ -26,7 +26,7 @@ export const DiscordPromoCard = ({
   return (
     <div
       className={cn(
-        "relative my-3 overflow-hidden rounded-xl transition-colors duration-300",
+        "relative my-3 overflow-hidden rounded-xl transition-colors duration-base",
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60",
       )}>
       <HeroPattern

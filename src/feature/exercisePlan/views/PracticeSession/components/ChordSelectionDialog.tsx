@@ -120,7 +120,7 @@ export function ChordSelectionDialog({
             </Label>
             <div className="flex flex-wrap gap-2 p-4 bg-white/[0.03] rounded-xl border border-white/5 min-h-[72px] items-center">
               {selectedChords.map((chord, idx) => (
-                <div key={idx} className="flex items-center animate-in fade-in zoom-in duration-200">
+                <div key={idx} className="flex items-center animate-in fade-in zoom-in duration-base">
                     <Badge variant="secondary" className="px-3 py-1.5 text-base font-black bg-cyan-500/10 text-cyan-400 border-cyan-500/20 gap-2">
                     {chord}
                     <button onClick={() => handleRemoveChord(idx)} className="hover:text-white transition-colors">

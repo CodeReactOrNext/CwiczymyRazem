@@ -1,5 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
-import { useDateFnsLocale } from "lib/i18n/dateLocale";
 import { Badge } from "assets/components/ui/badge";
 import { cn } from "assets/lib/utils";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -12,6 +10,12 @@ import {
   formatPlayTime,
   getPracticedArrangements,
 } from "feature/songs/utils/arrangements.utils";
+import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
+import { m } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
+import { useDateFnsLocale } from "lib/i18n/dateLocale";
+import { transitions } from "lib/motion/motion";
+import { useSharedElement } from "lib/motion/useSharedElement";
 import { Heart, ListMusic, Music, Play } from "lucide-react";
 
 const StatCell = ({
@@ -72,6 +76,7 @@ export const SongBoardRow = ({
   const bestAccuracy = progress?.bestAccuracy ?? null;
   const hasPracticed = sessionCount > 0 || totalPracticeMs > 0;
   const practicedArrangements = getPracticedArrangements(progress?.arrangements);
+  const { layoutDependency, runAfterSnapshot } = useSharedElement();
 
   const lastPracticeLabel = lastPracticedAt
     ? formatDistanceToNowStrict(lastPracticedAt, {
@@ -82,10 +87,15 @@ export const SongBoardRow = ({
 
   return (
     <div
-      onClick={onOpenDetails}
+      onClick={() => runAfterSnapshot(onOpenDetails)}
       className='group flex cursor-pointer items-center gap-3 rounded-lg bg-zinc-900/40 p-3 transition-background hover:bg-zinc-800/40 md:gap-4 md:px-4'>
-      {/* Cover */}
-      <div className='h-12 w-12 shrink-0 overflow-hidden rounded-lg md:h-14 md:w-14'>
+      {/* Cover — morphs into the detail view's cover (see songCoverLayout) */}
+      <m.div
+        layoutId={songCoverLayoutId(song.id)}
+        layoutDependency={layoutDependency}
+        transition={transitions.move}
+        style={SONG_COVER_STYLE}
+        className='h-12 w-12 shrink-0 overflow-hidden md:h-14 md:w-14'>
         {song.coverUrl ? (
           <img
             src={song.coverUrl}
@@ -97,7 +107,7 @@ export const SongBoardRow = ({
             <Music className='h-5 w-5 text-zinc-600' />
           </div>
         )}
-      </div>
+      </m.div>
 
       {/* Title / artist (+ compact stats below lg) */}
       <div className='min-w-0 flex-1'>

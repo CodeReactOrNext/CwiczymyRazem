@@ -51,7 +51,7 @@ export const SupportPulse = ({ className = "" }: { className?: string }) => {
             </div>
             <ArrowUpRight
               size={14}
-              className='shrink-0 text-zinc-600 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-zinc-300'
+              className='shrink-0 text-zinc-600 transition-all duration-base group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-zinc-300'
             />
           </Link>
         </TooltipTrigger>

@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { FaCheck } from "react-icons/fa";
+import { CheckIcon } from "lucide-react";
 
 interface BpmProgressGridProps {
   bpmStages: number[];
@@ -29,7 +29,7 @@ export const BpmProgressGrid = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+        <span className="text-xs font-bold text-zinc-500">
           {t("bpm_progress")}
         </span>
         <span className="text-[10px] font-bold text-white">
@@ -70,7 +70,7 @@ export const BpmProgressGrid = ({
               {/* BPM number — with strikethrough when completed */}
               <span
                 className={cn(
-                  "relative transition-all duration-200",
+                  "relative transition-all duration-base",
                   isCompleted && "line-through decoration-emerald-500/60 decoration-2"
                 )}
               >
@@ -87,7 +87,7 @@ export const BpmProgressGrid = ({
                     transition={{ type: "spring", stiffness: 500, damping: 25 }}
                     className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
                   >
-                    <FaCheck className="h-1.5 w-1.5" />
+                    <CheckIcon size='1em' className="h-1.5 w-1.5" />
                   </motion.span>
                 )}
               </AnimatePresence>

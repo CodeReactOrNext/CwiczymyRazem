@@ -9,7 +9,7 @@ interface MassActionProgressProps {
 
 const MassActionProgress = ({ progress }: MassActionProgressProps) => {
   return (
-    <div className="space-y-4 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-8 animate-in zoom-in-95 duration-500">
+    <div className="space-y-4 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-8 animate-in zoom-in-95 duration-slow">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h3 className="text-base font-black text-white">Cross-platform validation active</h3>

@@ -57,7 +57,7 @@ export const MigrationCenter = ({
             </div>
             <div className='h-1.5 w-full overflow-hidden rounded-full bg-zinc-800'>
               <div
-                className='h-full bg-orange-500 transition-all duration-300'
+                className='h-full bg-orange-500 transition-all duration-base'
                 style={{ width: `${(progress.current / progress.total) * 100}%` }}
               />
             </div>

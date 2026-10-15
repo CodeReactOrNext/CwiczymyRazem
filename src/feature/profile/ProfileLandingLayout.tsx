@@ -198,15 +198,15 @@ const ProfileLandingLayout = ({
               <div className='flex flex-row flex-wrap items-center gap-3'>
                 <button
                   onClick={() => router.push("/timer")}
-                  className='group/btn flex min-h-11 items-center gap-2 rounded-[8px] bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all duration-300 active:scale-95'>
+                  className='group/btn flex min-h-11 items-center gap-2 rounded-[8px] bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all duration-base active:scale-95'>
                   Practice
-                  <ArrowRight className='h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1' />
+                  <ArrowRight className='h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1' />
                 </button>
               </div>
               {lastSession && (
                 <button
                   onClick={() => router.push(lastSession.href)}
-                  className='group/last flex min-h-11 w-fit max-w-full items-center gap-3 rounded-[8px] bg-zinc-800/70 px-4 py-2.5 text-left transition-colors duration-300 hover:bg-zinc-700/70 active:scale-95'>
+                  className='group/last flex min-h-11 w-fit max-w-full items-center gap-3 rounded-[8px] bg-zinc-800/70 px-4 py-2.5 text-left transition-colors duration-base hover:bg-zinc-700/70 active:scale-95'>
                   <History className='h-5 w-5 shrink-0 text-cyan-400' />
                   <span className='flex min-w-0 flex-col'>
                     <span className='text-xs text-zinc-400'>
@@ -216,7 +216,7 @@ const ProfileLandingLayout = ({
                       {t("landing.continue", "Continue")}: {lastSession.title}
                     </span>
                   </span>
-                  <ArrowRight className='h-4 w-4 shrink-0 text-zinc-300 transition-transform duration-300 group-hover/last:translate-x-1' />
+                  <ArrowRight className='h-4 w-4 shrink-0 text-zinc-300 transition-transform duration-base group-hover/last:translate-x-1' />
                 </button>
               )}
             </div>

@@ -7,7 +7,6 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import {
   arrayMove,
   SortableContext,
@@ -18,6 +17,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { SONG_PRACTICE_MODE_LABELS } from "feature/exercisePlan/utils/songToExercise";
 import { useTranslation } from "hooks/useTranslation";
@@ -72,7 +72,7 @@ const SortableItem = ({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg transition-all duration-300 shadow-none min-w-0 pr-1.5",
+        "group relative flex items-center gap-3 rounded-lg transition-all duration-base shadow-none min-w-0 pr-1.5",
         isDragging 
             ? "opacity-50 z-50 bg-cyan-900/20 backdrop-blur-md"
             : "bg-white/[0.04] p-2.5 sm:p-3 hover:bg-white/[0.07]"

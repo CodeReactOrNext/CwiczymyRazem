@@ -283,7 +283,7 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
           >
             {acc != null && (
               <div
-                className="absolute inset-x-0 bottom-0 transition-[height] duration-300 ease-out"
+                className="absolute inset-x-0 bottom-0 transition-[height] duration-base ease-out"
                 style={{ height: `${Math.round(acc * 100)}%`, background: accuracyFillColor(acc) }}
               />
             )}

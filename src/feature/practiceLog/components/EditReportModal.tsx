@@ -45,7 +45,7 @@ const fieldsToMs = (field: { hours: string; minutes: string }) => {
 };
 
 const fieldLabelClass =
-  "text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500";
+  "text-xs font-semibold text-zinc-500";
 const inputClass =
   "border-none bg-white/5 text-sm text-zinc-100 shadow-none placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0";
 

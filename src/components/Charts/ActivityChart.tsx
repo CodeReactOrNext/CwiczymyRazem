@@ -218,7 +218,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
                   return (
                     <div className='rounded-lg border border-white/10 bg-zinc-950/90 p-4 text-white shadow-2xl backdrop-blur-xl'>
                       <div className='flex flex-col gap-1'>
-                        <span className='text-[0.70rem] uppercase font-bold text-zinc-500 tracking-wider'>
+                        <span className='text-[0.70rem] font-bold text-zinc-500'>
                           {new Date(label ?? "").toLocaleDateString(intlLocale, {
                             month: "long",
                             day: "numeric",

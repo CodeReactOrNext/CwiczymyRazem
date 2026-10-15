@@ -28,7 +28,7 @@ const SavedTimeBanner = ({ timerData, onApply, onDismiss }: SavedTimeBannerProps
   ];
 
   return (
-    <div className="mb-6 rounded-lg bg-cyan-500/10 p-4 backdrop-blur-sm duration-500 animate-in fade-in slide-in-from-top-3">
+    <div className="mb-6 rounded-lg bg-cyan-500/10 p-4 backdrop-blur-sm duration-slow animate-in fade-in slide-in-from-top-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1">
           <p className="mb-1.5 text-sm font-bold text-cyan-400">

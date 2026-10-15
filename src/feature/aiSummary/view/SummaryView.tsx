@@ -161,7 +161,7 @@ function PracticeProgressTracker({
 
               {/* node — solid disc, never transparent */}
               <div
-                className="relative z-10 flex items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-105 group-active:scale-95"
+                className="relative z-10 flex items-center justify-center rounded-full transition-transform duration-base group-active:scale-95"
                 style={{ width: NODE, height: NODE }}
               >
                 {isCurrent && (
@@ -196,7 +196,7 @@ function PracticeProgressTracker({
                         strokeLinecap="round"
                         strokeDasharray={CIRC}
                         strokeDashoffset={offset}
-                        className="transition-[stroke-dashoffset] duration-700 ease-out"
+                        className="transition-[stroke-dashoffset] duration-slow ease-out"
                       />
                     )}
                   </svg>

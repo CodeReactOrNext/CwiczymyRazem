@@ -70,7 +70,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <div 
-            className="h-full w-64 bg-zinc-950 p-6 shadow-2xl animate-in slide-in-from-left duration-300"
+            className="h-full w-64 bg-zinc-950 p-6 shadow-2xl animate-in slide-in-from-left duration-base"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-8 flex items-center justify-between">
@@ -112,7 +112,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
       {/* Sidebar (Desktop) */}
       <aside 
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen border-r border-white/5 bg-zinc-950/50 backdrop-blur-3xl transition-all duration-300",
+          "fixed left-0 top-0 z-40 h-screen border-r border-white/5 bg-zinc-950/50 backdrop-blur-3xl transition-all duration-base",
           isCollapsed ? "w-20" : "w-64",
           "hidden lg:block"
         )}
@@ -123,7 +123,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
               <ShieldCheck className="h-6 w-6 text-black" />
             </div>
             {!isCollapsed && (
-              <div className="animate-in fade-in slide-in-from-left-2 duration-300">
+              <div className="animate-in fade-in slide-in-from-left-2 duration-base">
                 <h1 className="text-lg font-black tracking-tight text-white">ADMIN</h1>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-500">Riff Quest</p>
               </div>
@@ -139,7 +139,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
                     "flex flex-col group cursor-pointer"
                   )}>
                     <div className={cn(
-                      "flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200",
+                      "flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-base",
                       isActive 
                         ? "bg-cyan-500/10 text-cyan-500 shadow-inner" 
                         : "hover:bg-white/[0.03] hover:text-white"
@@ -184,7 +184,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
       {/* Main Content Area */}
       <main 
         className={cn(
-          "flex-1 transition-all duration-300",
+          "flex-1 transition-all duration-base",
           isCollapsed ? "lg:pl-20" : "lg:pl-64"
         )}
       >

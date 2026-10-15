@@ -45,7 +45,7 @@ export const TimerDisplay = ({
     <div className='relative'>
       <div
         className={cn(
-          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg blur-[20px] transition-all duration-700",
+          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg blur-[20px] transition-all duration-slow",
           sizeClasses[size]
         )}
         style={{

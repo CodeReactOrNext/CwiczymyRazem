@@ -120,6 +120,7 @@ import { useDateFnsLocale } from "lib/i18n/dateLocale";
 import { Interpolate } from "lib/i18n/Interpolate";
 import type { Translate } from "lib/i18n/translate";
 import {
+  CalendarIcon,
   Clock,
   Coffee,
   Dumbbell,
@@ -140,6 +141,7 @@ import {
   Star,
   Tag,
   Target,
+  Trophy,
   Video,
   X,
 } from "lucide-react";
@@ -147,8 +149,6 @@ import Link from "next/link";
 import { Fragment, useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { FaTrophy } from "react-icons/fa";
-import { IoCalendarOutline } from "react-icons/io5";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import { addZeroToTime } from "utils/converter";
 import { TOUCH_TARGET } from "utils/touchTarget";
@@ -289,7 +289,7 @@ const ItemTooltipCard = ({
               <span className='font-semibold text-gray-300'>
                 {guitarDef.yearFrom}
               </span>
-              <span className='text-xs uppercase tracking-widest text-gray-500'>
+              <span className='text-xs text-gray-500'>
                 {guitarDef.countries[0]}
               </span>
             </>
@@ -529,7 +529,7 @@ const LogItem = ({
   children: React.ReactNode;
 }) => (
   <div
-    className={`my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-4 transition-all duration-300 sm:px-5 lg:flex-row lg:items-center ${
+    className={`my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-4 transition-all duration-base sm:px-5 lg:flex-row lg:items-center ${
       isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
     }`}>
     {children}
@@ -624,7 +624,7 @@ const SeasonHeader = ({
     <div className='ml-auto hidden items-center gap-3 text-xs text-zinc-400 sm:flex'>
       {daysLeftInSeason !== undefined && (
         <Chip color='gray'>
-          <IoCalendarOutline className='h-3.5 w-3.5 shrink-0' />
+          <CalendarIcon size='1em' className='h-3.5 w-3.5 shrink-0' />
           <span className='tabular-nums'>{daysLeftInSeason}</span>
           <span>{t("logsBox.days_left")}</span>
         </Chip>
@@ -639,7 +639,7 @@ const SeasonHeader = ({
     {daysLeftInSeason !== undefined && (
       <div className='mt-2 flex w-full items-center justify-end text-xs text-zinc-400 sm:hidden'>
         <Chip color='gray'>
-          <IoCalendarOutline className='h-3.5 w-3.5 shrink-0' />
+          <CalendarIcon size='1em' className='h-3.5 w-3.5 shrink-0' />
           <span className='tabular-nums'>{daysLeftInSeason}</span>
           <span>{t("logsBox.days_left")}</span>
         </Chip>
@@ -704,13 +704,13 @@ const NoTopPlayersData = ({
   t: (key: string) => string;
 }) => (
   <div
-    className={`my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-5 transition-all duration-300 sm:px-6 lg:flex-row lg:items-center ${
+    className={`my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-5 transition-all duration-base sm:px-6 lg:flex-row lg:items-center ${
       isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
     }`}>
     <TimeStamp date={date} />
     <div className='flex w-full flex-col gap-2 sm:w-[80%]'>
       <h3 className='flex items-center gap-2 text-sm font-bold text-zinc-200'>
-        <FaTrophy className='text-yellow-400' />
+        <Trophy size='1em' className='text-yellow-400' />
         <span>{t("logsBox.top_players")}</span>
       </h3>
       <p className='text-zinc-400'>{t("feed:no_top_players")}</p>
@@ -741,7 +741,7 @@ const FirebaseLogsTopPlayersItem = ({
 
   return (
     <div
-      className={`my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-300 ${
+      className={`my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <SeasonHeader
@@ -773,7 +773,7 @@ const FirebaseLogsGuildLevelItem = ({
 
   return (
     <div
-      className={`my-3 flex flex-col gap-3 rounded-xl px-3 py-3 transition-all duration-300 sm:px-5 sm:py-4 ${
+      className={`my-3 flex flex-col gap-3 rounded-xl px-3 py-3 transition-all duration-base sm:px-5 sm:py-4 ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <div className='flex flex-wrap items-center gap-3'>
@@ -846,7 +846,7 @@ const FirebaseLogsSupportAskItem = ({
 
   return (
     <div
-      className={`relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-300 ${
+      className={`relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       {/* Same tiled icon pattern and warm glow as the "Help build Riff Quest" banner
@@ -862,7 +862,7 @@ const FirebaseLogsSupportAskItem = ({
           <Heart size={16} className='text-orange-400' fill='currentColor' />
         </div>
         <div className='min-w-0 flex-1'>
-          <p className='text-xs font-semibold uppercase tracking-widest text-orange-400/80'>
+          <p className='text-xs font-semibold text-orange-400/80'>
             {copy.eyebrow}
           </p>
           <h3 className='text-sm font-bold text-white sm:text-base'>
@@ -973,7 +973,7 @@ const FirebaseLogsDonationItem = ({
 
   return (
     <div
-      className={`relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-300 ${
+      className={`relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <HeroPattern
@@ -986,7 +986,7 @@ const FirebaseLogsDonationItem = ({
           <PartyPopper size={16} className='text-orange-400' />
         </div>
         <div className='min-w-0 flex-1'>
-          <p className='text-xs font-semibold uppercase tracking-widest text-orange-400'>
+          <p className='text-xs font-semibold text-orange-400'>
             {t("new_supporter")}
           </p>
           <h3 className='text-sm font-bold text-white sm:text-base'>

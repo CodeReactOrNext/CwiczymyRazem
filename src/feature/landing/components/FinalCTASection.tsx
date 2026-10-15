@@ -30,10 +30,10 @@ export const FinalCTASection = () => {
               <Link
                 href='/signup'
                 onClick={() => trackSignupCtaClicked("landing_final")}>
-                <Button className='group/btn h-14 w-full rounded-lg border-none bg-white px-10 text-base font-bold text-black transition-colors duration-300 hover:bg-zinc-50 active:scale-[0.98] sm:w-auto'>
+                <Button className='group/btn h-14 w-full rounded-lg border-none bg-white px-10 text-base font-bold text-black transition-colors duration-base hover:bg-zinc-50 active:scale-[0.98] sm:w-auto'>
                   <span className='flex items-center gap-3'>
                     Start tracking free
-                    <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-300 group-hover/btn:translate-x-2' />
+                    <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-base group-hover/btn:translate-x-2' />
                   </span>
                 </Button>
               </Link>

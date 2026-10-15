@@ -1,7 +1,10 @@
 import type {
   DuelDoc,
+  DuelFeedEntry,
+  DuelFeedPlayer,
   DuelOutcome,
   DuelOutcomeKind,
+  DuelPlayer,
   DuelProfile,
   DuelTicket,
   DuelView,
@@ -35,6 +38,8 @@ export const DUEL_K = 20;
 export const DUEL_RECENT_LIMIT = 10;
 /** How many players the ranking lists. */
 export const DUEL_RANKING_SIZE = 20;
+/** How many settled duels the public feed lists. */
+export const DUEL_FEED_SIZE = 20;
 
 /** The level duels open at — the same number the level gate and the API use. */
 export const DUEL_MIN_LVL = FEATURE_UNLOCKS.duels.requiredLvl;
@@ -280,6 +285,43 @@ export const toDuelView = (
     ratingDelta: isFinished
       ? (me.ratingAfter ?? me.ratingBefore) - me.ratingBefore
       : null,
+  };
+};
+
+// ── What everyone may see ────────────────────────────────────────────────────
+
+const toFeedPlayer = (player: DuelPlayer): DuelFeedPlayer => ({
+  userId: player.userId,
+  displayName: player.displayName,
+  avatar: player.avatar,
+  lvl: player.lvl,
+  attempts: player.attempts,
+  bestScore: player.bestScore,
+  ratingBefore: player.ratingBefore,
+  ratingAfter: player.ratingAfter ?? player.ratingBefore,
+});
+
+/**
+ * A duel as the public feed shows it, the winner first. Null while the duel
+ * runs — nothing about a running duel leaves its two players.
+ */
+export const toDuelFeedEntry = (duel: DuelDoc): DuelFeedEntry | null => {
+  if (duel.status !== "finished" || !duel.outcome) return null;
+  const { kind, winnerId, settledAt } = duel.outcome;
+  const order = winnerId
+    ? [winnerId, ...duel.playerIds.filter((id) => id !== winnerId)]
+    : [...duel.playerIds];
+  const sides = order
+    .map((id) => duel.players[id])
+    .filter((player): player is DuelPlayer => !!player);
+  if (sides.length !== 2) return null;
+
+  return {
+    id: duel.id,
+    exerciseId: duel.exerciseId,
+    settledAt,
+    kind,
+    players: [toFeedPlayer(sides[0]), toFeedPlayer(sides[1])],
   };
 };
 

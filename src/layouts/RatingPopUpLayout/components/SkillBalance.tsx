@@ -57,7 +57,7 @@ export function SkillBalance({ activityData = [] }: SkillBalanceProps) {
       transition={{ duration: 0.5, delay: 1.0 }}>
       <Card className='bg-zinc-900 border border-white/5 rounded-2xl h-full shadow-none'>
         <div className='p-6'>
-          <h3 className='mb-4 text-[11px] font-semibold text-zinc-500 uppercase tracking-widest'>
+          <h3 className='mb-4 text-xs font-semibold text-zinc-500'>
             Skill Balance
           </h3>
           <div className="flex items-center justify-center">

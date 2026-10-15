@@ -89,7 +89,7 @@ export const NotationPreview = ({
       <div
         ref={containerRef}
         className={cn(
-          "transition-opacity duration-300",
+          "transition-opacity duration-base",
           ready ? "opacity-100" : "opacity-0",
         )}
       />

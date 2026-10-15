@@ -10,11 +10,10 @@ import { TunerDialog } from "feature/tuner/components/TunerDialog";
 import { TuningForkIcon } from "feature/tuner/components/TuningForkIcon";
 import { RippleButton } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { Bug, ChevronDown, Lock } from "lucide-react";
+import { Bug, ChevronDown, Lock, Mic, RefreshCw } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
-import { FaMicrophone, FaSync } from "react-icons/fa";
 import { GiGuitar, GiGuitarHead } from "react-icons/gi";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
@@ -261,7 +260,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   isMicEnabled &&
                   "cursor-not-allowed active:scale-100",
               )}>
-              <FaMicrophone className='h-3.5 w-3.5 shrink-0' />
+              <Mic size='1em' className='h-3.5 w-3.5 shrink-0' />
               <span className='truncate text-[10px] font-semibold tracking-wide'>
                 {t("media.pitch_detect")}
               </span>
@@ -289,7 +288,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 onClick={onRecalibrate}
                 title={t("media.recalibrate")}
                 className={cn(gridBtn, "bg-zinc-800 text-zinc-400")}>
-                <FaSync className='h-3.5 w-3.5 shrink-0' />
+                <RefreshCw size='1em' className='h-3.5 w-3.5 shrink-0' />
                 <span className='truncate text-[10px] font-semibold tracking-wide'>
                   {t("media.recalibrate")}
                 </span>
@@ -421,7 +420,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                     isMicEnabled &&
                     "cursor-not-allowed hover:bg-emerald-950 active:scale-100",
                 )}>
-                <FaMicrophone className='h-3 w-3' />
+                <Mic size='1em' className='h-3 w-3' />
               </RippleButton>
 
               {isMicEnabled && (
@@ -429,7 +428,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   onClick={onRecalibrate}
                   title={t("media.recalibrate")}
                   className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-all hover:text-white active:scale-90'>
-                  <FaSync className='h-3 w-3' />
+                  <RefreshCw size='1em' className='h-3 w-3' />
                 </RippleButton>
               )}
 
@@ -583,7 +582,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   isMicEnabled &&
                   "cursor-not-allowed hover:bg-emerald-950 active:scale-100",
               )}>
-              <FaMicrophone className='h-4 w-4 shrink-0' />
+              <Mic size='1em' className='h-4 w-4 shrink-0' />
               <span className='text-[10px] font-semibold tracking-wide'>
                 {t("media.pitch_detect")}
               </span>
@@ -616,7 +615,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 disabled={!isMicEnabled}
                 onSelect={onRecalibrate}
                 className='flex cursor-pointer items-center gap-3 rounded px-2 py-2 text-xs font-semibold text-zinc-200 focus:bg-zinc-800 focus:text-white'>
-                <FaSync className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
+                <RefreshCw size='1em' className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
                 {t("media.recalibrate")}
               </DropdownMenuItem>
               {hasTuner && (

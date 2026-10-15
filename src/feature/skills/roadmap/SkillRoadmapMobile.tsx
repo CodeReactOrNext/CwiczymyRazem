@@ -69,7 +69,7 @@ const ProgressBar = ({
       className,
     )}>
     <span
-      className='block h-full rounded-full bg-emerald-500 transition-[width] duration-500'
+      className='block h-full rounded-full bg-emerald-500 transition-[width] duration-slow'
       style={{ width: `${Math.round(share * 100)}%` }}
     />
   </span>

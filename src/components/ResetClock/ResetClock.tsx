@@ -142,7 +142,7 @@ export const ResetClock = () => {
               <button
                 type='button'
                 aria-label={t("reset.aria")}
-                className='flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-white/5'>
+                className='flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors duration-base hover:bg-white/5'>
                 <Globe2 size={13} className='shrink-0 text-zinc-400' />
                 <span className='text-xs font-semibold tabular-nums text-zinc-300'>
                   {formatServerTime(now)}

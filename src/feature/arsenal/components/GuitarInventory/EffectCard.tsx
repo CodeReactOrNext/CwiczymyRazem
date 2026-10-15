@@ -185,7 +185,7 @@ export const EffectCard = ({
       <div className='flex flex-shrink-0 items-start justify-between gap-2 px-3 pb-1.5 pt-3'>
         <div className='min-w-0'>
           <p
-            className='text-[10px] font-semibold uppercase leading-none tracking-wider'
+            className='text-xs font-semibold leading-none'
             style={{ color: rs.baseColor }}>
             {effect.brand}
           </p>
@@ -251,7 +251,7 @@ export const EffectCard = ({
           )}
           {item.isNew && (
             <div
-              className='px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black'
+              className='px-1.5 py-0.5 text-xs font-black text-black'
               style={{ backgroundColor: rs.baseColor, borderRadius: 3 }}>
               {t("card.new")}
             </div>

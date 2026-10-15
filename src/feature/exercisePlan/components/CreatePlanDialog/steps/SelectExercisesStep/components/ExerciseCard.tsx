@@ -1,6 +1,6 @@
 import { Badge } from "assets/components/ui/badge";
-import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { cn } from "assets/lib/utils";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
@@ -49,7 +49,7 @@ export const ExerciseCard = ({
     <div
       onClick={handleClick}
       className={cn(
-        "group relative flex flex-col rounded-lg border border-transparent transition-all duration-500 cursor-pointer overflow-hidden",
+        "group relative flex flex-col rounded-lg border border-transparent transition-all duration-slow cursor-pointer overflow-hidden",
         "active:scale-[0.98]",
         isLocked
           ? "bg-zinc-950/40 ring-1 ring-inset ring-amber-500/20"
@@ -61,7 +61,7 @@ export const ExerciseCard = ({
       {/* Top Colorful Line effect */}
       {!isLocked && (
         <div className={cn(
-          "absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r opacity-40 group-hover:opacity-100 transition-opacity duration-500",
+          "absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r opacity-40 group-hover:opacity-100 transition-opacity duration-slow",
           isSelected
             ? "from-cyan-500/40 via-cyan-400 to-cyan-500/40"
             : exercise.category === "technique" ? "from-emerald-500/0 via-emerald-500 to-emerald-500/0" :
@@ -73,7 +73,7 @@ export const ExerciseCard = ({
 
       {/* Subtle radial glow in background */}
       {!isLocked && !isSelected && (
-         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(255,255,255,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(255,255,255,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-slow pointer-events-none" />
       )}
       {isSelected && (
          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(6,182,212,0.15),transparent_60%)] pointer-events-none" />
@@ -85,13 +85,13 @@ export const ExerciseCard = ({
         <div className="flex-1 min-w-0 p-4 pb-5 sm:p-5 flex flex-col justify-center">
           <div>
             <h3 className={cn(
-              "font-semibold text-[15px] sm:text-[16px] leading-tight tracking-tight transition-colors duration-300",
+              "font-semibold text-[15px] sm:text-[16px] leading-tight tracking-tight transition-colors duration-base",
               isLocked ? "text-zinc-500" : isSelected ? "text-cyan-300" : "text-zinc-100 group-hover:text-white"
             )}>
               {localizeExercise(exercise).title}
             </h3>
             <p className={cn(
-              "mt-1.5 text-[13px] sm:text-[14px] line-clamp-1 sm:line-clamp-2 leading-relaxed transition-colors duration-300 pr-2",
+              "mt-1.5 text-[13px] sm:text-[14px] line-clamp-1 sm:line-clamp-2 leading-relaxed transition-colors duration-base pr-2",
               isLocked ? "text-zinc-600" : "text-zinc-500 group-hover:text-zinc-300"
             )}>
               {localizeExercise(exercise).description}
@@ -101,7 +101,7 @@ export const ExerciseCard = ({
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-4">
             <Badge variant="outline" className={cn(
-              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-300",
+              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-base",
               exercise.category === "technique"  && "text-emerald-400 group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10",
               exercise.category === "theory"     && "text-blue-400 group-hover:border-blue-500/30 group-hover:bg-blue-500/10",
               exercise.category === "creativity" && "text-purple-400 group-hover:border-purple-500/30 group-hover:bg-purple-500/10",
@@ -111,7 +111,7 @@ export const ExerciseCard = ({
             </Badge>
 
             <Badge variant="outline" className={cn(
-              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-300",
+              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-base",
               exercise.difficulty === "beginner" && "text-sky-400 group-hover:border-sky-500/30 group-hover:bg-sky-500/10",
               exercise.difficulty === "easy"   && "text-green-400 group-hover:border-green-500/30 group-hover:bg-green-500/10",
               exercise.difficulty === "medium" && "text-yellow-400 group-hover:border-yellow-500/30 group-hover:bg-yellow-500/10",
@@ -157,7 +157,7 @@ export const ExerciseCard = ({
         <div className="hidden sm:flex shrink-0 items-center pr-5">
           {/* Tablature Preview Desktop */}
           {exercise.tablature && exercise.tablature.length > 0 && (
-            <div className="relative w-[220px] shrink-0 opacity-40 group-hover:opacity-90 transition-opacity duration-500 flex items-center justify-end pr-5">
+            <div className="relative w-[220px] shrink-0 opacity-40 group-hover:opacity-90 transition-opacity duration-slow flex items-center justify-end pr-5">
                <TablaturePreview measures={exercise.tablature} />
             </div>
           )}
@@ -177,7 +177,7 @@ export const ExerciseCard = ({
                   aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                   aria-pressed={isFavorite}
                   className={cn(
-                    "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden ring-1",
+                    "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden ring-1",
                     isFavorite
                       ? "bg-rose-500/15 text-rose-400 ring-rose-500/30 hover:bg-rose-500/25 hover:text-rose-300"
                       : "bg-white/5 text-zinc-400 ring-white/10 hover:text-rose-300 hover:bg-rose-500/10"
@@ -190,13 +190,13 @@ export const ExerciseCard = ({
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
-                className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10"
+                className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10"
                 title={t("plans:preview_details")}
               >
                 <Info className="h-4 w-4" />
               </button>
               <div className={cn(
-                "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-500 overflow-hidden shrink-0",
+                "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-slow overflow-hidden shrink-0",
                 isSelected
                   ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/30 group-hover:bg-red-500/20 group-hover:text-red-400 group-hover:ring-red-500/30"
                   : "bg-white/5 text-zinc-300 ring-1 ring-white/10 group-hover:bg-cyan-500 group-hover:text-black group-hover:ring-cyan-500"
@@ -207,7 +207,7 @@ export const ExerciseCard = ({
                     <X className="h-4 w-4 hidden group-hover:block transition-transform" strokeWidth={2.5} />
                   </>
                 ) : (
-                  <Plus className="h-4 w-4 transition-transform duration-500 group-hover:rotate-90" strokeWidth={2.5} />
+                  <Plus className="h-4 w-4 transition-transform duration-slow group-hover:rotate-90" strokeWidth={2.5} />
                 )}
               </div>
             </div>
@@ -233,7 +233,7 @@ export const ExerciseCard = ({
                    aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                    aria-pressed={isFavorite}
                    className={cn(
-                     "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden ring-1",
+                     "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden ring-1",
                      isFavorite
                        ? "bg-rose-500/15 text-rose-400 ring-rose-500/30"
                        : "bg-white/5 text-zinc-400 ring-white/10"
@@ -245,12 +245,12 @@ export const ExerciseCard = ({
                <button
                  type="button"
                  onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
-                 className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-300 overflow-hidden bg-white/5 text-zinc-400 ring-1 ring-white/10"
+                 className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden bg-white/5 text-zinc-400 ring-1 ring-white/10"
                >
                  <Info className="h-4 w-4" />
                </button>
                <div className={cn(
-                 "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-500 overflow-hidden",
+                 "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-slow overflow-hidden",
                  isSelected
                    ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/30"
                    : "bg-white/5 text-zinc-300 ring-1 ring-white/10"

@@ -82,7 +82,7 @@ const CornerBrackets = () => (
         key={pos}
         aria-hidden
         className={cn(
-          "pointer-events-none absolute h-4 w-4 border-cyan-400 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100",
+          "pointer-events-none absolute h-4 w-4 border-cyan-400 opacity-0 transition-opacity duration-fast group-hover:opacity-100 group-focus-visible:opacity-100",
           pos,
         )}
       />
@@ -189,7 +189,7 @@ export const DexCard = ({
               discovered ? `${brand} ${name}` : t("dex.silhouette")
             }
             className={cn(
-              "relative z-10 aspect-square h-full shrink-0 object-contain transition-transform duration-300 group-hover:scale-[1.03]",
+              "relative z-10 aspect-square h-full shrink-0 object-contain transition-transform duration-base",
               imageRotated ? "max-w-none -rotate-90" : "max-w-[92%]",
             )}
             style={

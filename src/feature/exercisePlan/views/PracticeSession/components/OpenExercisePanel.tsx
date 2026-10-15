@@ -89,7 +89,7 @@ export const OpenExercisePanel = ({ compact }: OpenExercisePanelProps) => {
 
         <div className="min-w-0 flex-1">
           <div className="mb-1.5 flex items-center gap-2 sm:justify-start" >
-            <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-indigo-500/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
+            <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-indigo-500/15 px-2.5 py-1 text-xs font-bold text-indigo-300">
               <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
               {t("open_exercise.title")}
             </span>

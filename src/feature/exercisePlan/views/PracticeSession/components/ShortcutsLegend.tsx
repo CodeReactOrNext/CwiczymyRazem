@@ -99,7 +99,7 @@ export const ShortcutsLegend = memo(function ShortcutsLegend({
             <ShortcutList rows={localize(NAV_SHORTCUTS, "nav")} />
             {hasTempoControl && (
               <div className="flex flex-col gap-2.5 pt-4">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                <span className="text-xs font-semibold text-zinc-500">
                   {t("shortcuts.tempo")}
                 </span>
                 <ShortcutList rows={localize(TEMPO_SHORTCUTS, "tempo_rows")} />
@@ -107,7 +107,7 @@ export const ShortcutsLegend = memo(function ShortcutsLegend({
             )}
             {hasBackingTrack && (
               <div className="flex flex-col gap-2.5 pt-4">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                <span className="text-xs font-semibold text-zinc-500">
                   {t("shortcuts.backing")}
                 </span>
                 <ShortcutList rows={localize(BACKING_SHORTCUTS, "backing_rows")} />

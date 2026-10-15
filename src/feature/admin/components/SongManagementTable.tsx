@@ -74,7 +74,7 @@ export const SongManagementTable = ({
           ) : (
             paginatedSongs.map((song) => (
               <div key={song.id} className={cn(
-                  "grid grid-cols-12 items-center gap-4 px-6 py-4 transition-all duration-300",
+                  "grid grid-cols-12 items-center gap-4 px-6 py-4 transition-all duration-base",
                   editingId === song.id ? "bg-cyan-500/[0.03] ring-1 ring-inset ring-cyan-500/20" : "hover:bg-white/[0.02]"
               )}>
                 <div className="col-span-1">
@@ -90,7 +90,7 @@ export const SongManagementTable = ({
                 </div>
                 <div className="col-span-4 min-w-0">
                   {editingId === song.id ? (
-                    <div className="space-y-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                    <div className="space-y-2 animate-in fade-in slide-in-from-left-2 duration-base">
                       <Input 
                         value={editForm.title} 
                         onChange={(e) => onFieldChange("title", e.target.value)}
@@ -142,7 +142,7 @@ export const SongManagementTable = ({
                        <span className="text-xs font-black text-cyan-400">{song.avgDifficulty?.toFixed(1) || "0.0"}</span>
                        
                        {/* Quick Rating on Hover/Focus */}
-                       <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 opacity-0 group-hover/rating:opacity-100 pointer-events-none group-hover/rating:pointer-events-auto transition-all duration-300 z-50 w-max">
+                       <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 opacity-0 group-hover/rating:opacity-100 pointer-events-none group-hover/rating:pointer-events-auto transition-all duration-base z-50 w-max">
                           <div className="flex flex-col items-center bg-zinc-900/90 backdrop-blur-md border border-white/10 p-3 rounded-xl shadow-2xl">
                               <p className="mb-2 text-[9px] font-bold uppercase tracking-widest text-zinc-500">Quick Rate</p>
                               <StarRating 
@@ -182,7 +182,7 @@ export const SongManagementTable = ({
                 </div>
                 <div className="col-span-2 flex justify-end gap-1">
                   {editingId === song.id ? (
-                    <div className="flex gap-1 animate-in zoom-in-95 duration-200">
+                    <div className="flex gap-1 animate-in zoom-in-95 duration-base">
                       <Button 
                         onClick={() => onSave(song.id)}
                         size="icon" 

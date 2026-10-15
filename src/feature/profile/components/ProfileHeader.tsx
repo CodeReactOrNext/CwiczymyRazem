@@ -21,8 +21,9 @@ import {
 } from "feature/profile/utils/profileLayout";
 import type { Song } from "feature/songs/types/songs.type";
 import { useIntlLocale } from "lib/i18n/dateLocale";
+import { Flame } from "lucide-react";
 import type { ReactNode } from "react";
-import { FaFire, FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { FaSoundcloud, FaYoutube } from "react-icons/fa";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { getYearsOfPlaying } from "utils/converter";
 import { getPointsToLvlUp } from "utils/gameLogic";
@@ -131,7 +132,7 @@ export const ProfileHeader = ({
   if (facts.has("streak") && streak > 0) {
     factItems.push(
       <Fact key='streak' label={labels.fact("streak")}>
-        <FaFire className='text-orange-500' size={13} />
+        <Flame className='text-orange-500' size={13} />
         <span className='tabular-nums'>
           {t(streak === 1 ? "header.days_one" : "header.days", { count: streak })}
         </span>

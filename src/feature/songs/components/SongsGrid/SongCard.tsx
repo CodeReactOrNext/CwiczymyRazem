@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import {
   Tooltip,
   TooltipContent,
@@ -11,7 +10,12 @@ import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMa
 import { SongCardMenu, STATUS_META } from "feature/songs/components/SongsGrid/SongCardMenu";
 import type { Song, SongPart, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { m } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
+import { transitions } from "lib/motion/motion";
+import { useSharedElement } from "lib/motion/useSharedElement";
 import {
   Clock,
   Music,
@@ -25,9 +29,9 @@ import { useAppSelector } from "store/hooks";
 function formatPracticeMs(ms: number): string {
   const totalSec = Math.floor(ms / 1000);
   const h = Math.floor(totalSec / 3600);
-  const m = Math.floor((totalSec % 3600) / 60);
-  if (h > 0) return `${h}h ${m} min`;
-  if (m > 0) return `${m} min`;
+  const min = Math.floor((totalSec % 3600) / 60);
+  if (h > 0) return `${h}h ${min} min`;
+  if (min > 0) return `${min} min`;
   return `${totalSec}s`;
 }
 
@@ -71,6 +75,7 @@ export const SongCard = ({
 
   // Right-click anywhere on the card opens the same actions menu.
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { layoutDependency, runAfterSnapshot } = useSharedElement();
 
   useEffect(() => {
     const el = titleRef.current;
@@ -84,20 +89,25 @@ export const SongCard = ({
 
   return (
     <div
-      onClick={onOpenDetails}
+      onClick={() => runAfterSnapshot(onOpenDetails)}
       onContextMenu={(e) => {
         e.preventDefault();
         setIsMenuOpen(true);
       }}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-md p-3 transition-all duration-300 ease-out click-behavior cursor-pointer",
+        "group relative flex flex-col overflow-hidden rounded-md p-3 transition-all duration-base ease-out click-behavior cursor-pointer",
         "hover:bg-zinc-800/40"
       )}
     >
       <Ripple />
 
-      {/* Cover */}
-      <div className="relative z-10 aspect-square w-full overflow-hidden rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
+      {/* Cover — morphs into the detail view's cover (see songCoverLayout) */}
+      <m.div
+        layoutId={songCoverLayoutId(song.id)}
+        layoutDependency={layoutDependency}
+        transition={transitions.move}
+        style={SONG_COVER_STYLE}
+        className="relative z-10 aspect-square w-full overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
         {song.coverUrl ? (
           <img
             src={song.coverUrl}
@@ -145,7 +155,7 @@ export const SongCard = ({
         {/* Actions (bottom-right of cover) — shown on hover (always visible on touch) */}
         <div
           className={cn(
-            "absolute bottom-2 right-2 z-20 flex translate-y-1 items-center gap-1.5 opacity-0 transition-all duration-200 ease-out focus-within:translate-y-0 focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100",
+            "absolute bottom-2 right-2 z-20 flex translate-y-1 items-center gap-1.5 opacity-0 transition-all duration-base ease-out focus-within:translate-y-0 focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100",
             isMenuOpen && "translate-y-0 opacity-100"
           )}
           onClick={(e) => e.stopPropagation()}
@@ -171,7 +181,7 @@ export const SongCard = ({
             triggerClassName="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white shadow-lg transition-colors hover:bg-zinc-900 active:scale-95 data-[state=open]:bg-zinc-900"
           />
         </div>
-      </div>
+      </m.div>
 
       {/* Info */}
       <div className="relative z-10 flex flex-1 flex-col pt-3">

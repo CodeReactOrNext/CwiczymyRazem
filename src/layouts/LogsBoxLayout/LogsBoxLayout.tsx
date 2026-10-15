@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import Changelog, {
@@ -17,16 +16,15 @@ import {
 } from "feature/logsBox/hooks/useCommunityDrawer";
 import { selectUserGuildBadge } from "feature/user/store/userSlice";
 import { AnimatePresence, m } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import {
   feedScrollClass,
   PANEL_SCROLL_CLASS,
   panelHeightClass,
 } from "layouts/LogsBoxLayout/logsBoxPanel";
+import { BookIcon, LogsIcon, MessageSquareMore, Shield } from "lucide-react";
 import { useState } from "react";
-import { FiBook } from "react-icons/fi";
-import { IoChatboxEllipses } from "react-icons/io5";
-import { LuLogs, LuShield } from "react-icons/lu";
 import { useAppSelector } from "store/hooks";
 
 import Logs from "./components/Logs";
@@ -130,7 +128,7 @@ const LogsBoxLayout = ({
         title={t("activity")}
         active={activeCategory === "logs"}
         onClick={() => handleCategoryChange("logs")}
-        Icon={LuLogs}
+        Icon={LogsIcon}
         notificationCount={unreadLogs}
         hasNewMessages={hasNewLogs}
       />
@@ -138,7 +136,7 @@ const LogsBoxLayout = ({
         title={t("chat")}
         active={activeCategory === "chat"}
         onClick={() => handleCategoryChange("chat")}
-        Icon={IoChatboxEllipses}
+        Icon={MessageSquareMore}
         notificationCount={unreadChats}
         hasNewMessages={hasNewChats}
       />
@@ -147,7 +145,7 @@ const LogsBoxLayout = ({
           title={t("guild")}
           active={activeCategory === "guild"}
           onClick={() => handleCategoryChange("guild")}
-          Icon={LuShield}
+          Icon={Shield}
           notificationCount={unreadGuild}
           hasNewMessages={hasNewGuild}
         />
@@ -157,7 +155,7 @@ const LogsBoxLayout = ({
           title={t("changelog")}
           active={activeCategory === "changelog"}
           onClick={() => handleCategoryChange("changelog")}
-          Icon={FiBook}
+          Icon={BookIcon}
           hasNewDot={hasNewChangelog}
         />
       )}

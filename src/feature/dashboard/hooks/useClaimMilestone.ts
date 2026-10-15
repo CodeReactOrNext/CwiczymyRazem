@@ -1,10 +1,11 @@
-import { useTranslation } from "hooks/useTranslation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { PracticeLevelsState } from "feature/aiSummary/services/practiceLevels.service";
 import { firebaseClaimLevel } from "feature/aiSummary/services/practiceLevels.service";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { practiceLevelsQueryKey } from "feature/dashboard/hooks/useMilestoneProgress";
 import { addFame } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import { playUiSound } from "lib/uiSounds/uiSounds";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
@@ -35,6 +36,8 @@ export const useClaimMilestone = () => {
       const previous = queryClient.getQueryData<PracticeLevelsState>(queryKey);
 
       dispatch(addFame(reward));
+      // With the optimistic Fame, not after the write: the sound is the click's answer.
+      playUiSound("reward");
       if (previous) {
         queryClient.setQueryData<PracticeLevelsState>(queryKey, {
           ...previous,

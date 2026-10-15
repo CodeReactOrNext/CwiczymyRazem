@@ -182,7 +182,7 @@ export const PowerRocker = ({
         perspective: "110px",
       }}>
       <span
-        className='absolute inset-[2px] flex items-center justify-center rounded-[3px] transition-transform duration-150'
+        className='absolute inset-[2px] flex items-center justify-center rounded-[3px] transition-transform duration-fast'
         style={{
           // Pressed in at the bottom when live, at the top when dead — the way
           // you can tell a rocker's position across a dark stage.

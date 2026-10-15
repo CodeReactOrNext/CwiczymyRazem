@@ -371,7 +371,7 @@ export const InstalledMods = ({
               <g
                 key={w.modId}
                 fill='none'
-                className='transition-opacity duration-200'
+                className='transition-opacity duration-base'
                 opacity={lit ? 1 : dimmed ? 0.35 : 1}>
                 <path
                   d={`M ${w.from.x} ${w.from.y} L ${elbowX} ${w.from.y} L ${w.to.x} ${w.to.y}`}
