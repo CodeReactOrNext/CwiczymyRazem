@@ -3,7 +3,7 @@ import AppLayout from "layouts/AppLayout";
 import Head from "next/head";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const Settings: NextPageWithLayout = () => {
 
@@ -31,12 +31,4 @@ Settings.getLayout = function getLayout(page: ReactElement) {
 
 export default Settings;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: [
-        "common",
-        "settings",
-        "yup_errors",
-        "toast",
-  ],
-});
+Settings.getInitialProps = withAuthInitialProps();

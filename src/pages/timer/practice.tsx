@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { useAppDispatch,useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import type { SkillsType } from "types/skillsTypes";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const TimerPractice: NextPageWithLayout = () => {
   const dispatch = useAppDispatch();
@@ -126,7 +126,4 @@ TimerPractice.getLayout = function getLayout(page: ReactElement) {
 
 export default TimerPractice;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common", "timer", "toast", "exercises",'rating_popup'],
-});
+TimerPractice.getInitialProps = withAuthInitialProps();

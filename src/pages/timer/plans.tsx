@@ -14,7 +14,7 @@ import type { ReactElement } from "react";
 import { useEffect,useRef,useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const TimerPlans: NextPageWithLayout = () => {
   const router = useRouter();
@@ -141,7 +141,4 @@ TimerPlans.getLayout = function getLayout(page: ReactElement) {
 
 export default TimerPlans;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common", "timer", "toast", "exercises", "report", "achievements",'rating_popup'],
-});
+TimerPlans.getInitialProps = withAuthInitialProps();

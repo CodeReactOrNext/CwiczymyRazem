@@ -7,7 +7,7 @@ import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userS
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import { useAppSelector } from "store/hooks";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 /**
  * The collection, on its own tab.
@@ -51,8 +51,6 @@ ProfileAchievementsPage.getLayout = function getLayout(page: ReactElement) {
 
 // Gated like Practice Log, the other tab in this group: the page has nothing
 // to show a signed-out visitor.
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-});
+ProfileAchievementsPage.getInitialProps = withAuthInitialProps();
 
 export default ProfileAchievementsPage;

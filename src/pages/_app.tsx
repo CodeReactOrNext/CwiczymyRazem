@@ -9,7 +9,6 @@ import { domAnimation,LazyMotion } from "framer-motion";
 import { Inter, Teko } from "next/font/google";
 import Head from "next/head";
 import { SessionProvider } from "next-auth/react";
-import NextTopLoader from "nextjs-toploader";
 import { useState } from "react";
 import { Provider } from "react-redux";
 import { Toaster } from "sonner";
@@ -34,6 +33,7 @@ import { ElectronIntegrations } from "components/ElectronIntegrations";
 import { ElectronTitleBar } from "components/ElectronTitleBar";
 import { LocalizedChrome } from "lib/i18n/LocalizedRegion";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
+import { RouteProgress } from "components/RouteProgress/RouteProgress";
 import { DesktopNotifications } from "feature/notifications/components/DesktopNotifications";
 import useAuthSync from "hooks/useAuthSync";
 import useDailyQuestSync from "hooks/useDailyQuestSync";
@@ -101,41 +101,10 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
     },
   }));
 
-  if (Component.minimalLayout) {
-    return (
-      <SessionProvider session={session}>
-        <Provider store={store}>
-          {sharedHead}
-          <ErrorBoundary>
-            <ThemeModeProvider>
-              <AuthSyncWrapper>
-                <PostHogProvider />
-                <Analytics />
-                <ResponsiveInitializer />
-                <TooltipProvider>
-                  <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground ${isElectron ? "pt-10" : ""}`}>
-                    <LocalizedChrome>
-                      <ElectronTitleBar />
-                      <ElectronIntegrations />
-                      <DesktopNotifications />
-                      <DesktopUpdateRequired />
-                    </LocalizedChrome>
-                    <Toaster position='top-right' offset={isElectron ? { top: 52, right: 16 } : undefined} toastOptions={{
-                        className: "bg-zinc-200 text-zinc-950 border border-zinc-300 shadow-xl font-medium"
-                    }} />
-                    <NextTopLoader color='#06b6d4' />
-                    <div id='overlays'></div>
-                    {page}
-                  </div>
-                </TooltipProvider>
-              </AuthSyncWrapper>
-            </ThemeModeProvider>
-          </ErrorBoundary>
-        </Provider>
-      </SessionProvider>
-    );
-  }
-
+  // One provider tree for every page. The landing page used to get a slimmer copy,
+  // so the first in-app page after it (signing in with Google from the hero)
+  // remounted everything — SessionProvider included, which then fetched the session
+  // all over again behind the loading screen.
   return (
     <SessionProvider session={session}>
       <Provider store={store}>
@@ -158,9 +127,9 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                     <Toaster position='top-right' offset={isElectron ? { top: 52, right: 16 } : undefined} toastOptions={{
                         className: "bg-zinc-200 text-zinc-950 border border-zinc-300 shadow-xl font-medium"
                     }} />
-                    <NextTopLoader color='#06b6d4' />
                     <div id='overlays'></div>
                     <LazyMotion features={domAnimation}>
+                      <RouteProgress />
                       {page}
                     </LazyMotion>
                   </div>

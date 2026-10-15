@@ -2,7 +2,7 @@ import OnboardingView from "feature/onboarding/view";
 import { LocalizedRegion } from "lib/i18n/LocalizedRegion";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const OnboardingPage: NextPage = () => {
   return (
@@ -25,7 +25,4 @@ const OnboardingPage: NextPage = () => {
 
 export default OnboardingPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common", "toast"],
-});
+OnboardingPage.getInitialProps = withAuthInitialProps();

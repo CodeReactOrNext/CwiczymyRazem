@@ -4,7 +4,7 @@ import ReportView from "feature/user/view/ReportView";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const ReportPage: NextPageWithLayout = () => {
 
@@ -43,14 +43,4 @@ ReportPage.getLayout = function getLayout(page: ReactElement) {
 
 export default ReportPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: [
-        "common",
-        "report",
-        "profile",
-        "achievements",
-        "toast",
-        "skills"
-  ],
-});
+ReportPage.getInitialProps = withAuthInitialProps();

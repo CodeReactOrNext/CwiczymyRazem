@@ -2,7 +2,7 @@ import { RotationView } from "feature/rotation/components/RotationView";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const RotationPage: NextPageWithLayout = () => <RotationView />;
 
@@ -16,6 +16,4 @@ RotationPage.getLayout = function getLayout(page: ReactElement) {
 
 export default RotationPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-});
+RotationPage.getInitialProps = withAuthInitialProps();

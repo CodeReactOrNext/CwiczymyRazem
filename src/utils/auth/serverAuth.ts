@@ -1,4 +1,4 @@
-import type { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
+import type { GetServerSidePropsContext, GetServerSidePropsResult, NextPageContext } from "next";
 import type { JWT } from "next-auth/jwt";
 import { getToken } from "next-auth/jwt";
 
@@ -29,6 +29,27 @@ const toSession = (token: JWT) => ({
   },
   expires: typeof token.exp === "number" ? new Date(token.exp * 1000).toISOString() : "",
 });
+
+/**
+ * Server half of `withAuthInitialProps` (see `authInitialProps.ts`) — a full page load
+ * of a page inside the app. Same gate as `withAuth({ redirectIfUnauthenticated })`: no
+ * valid cookie → 307 to `redirectTo`, otherwise the props `withAuth` would have returned.
+ */
+export async function authenticatePageLoad(context: NextPageContext, redirectTo: string) {
+  const { req, res } = context;
+  if (!req || !res) return {};
+
+  // Next sets `req.cookies` before any data method runs, `getInitialProps` included.
+  const token = await getToken({ req: req as GetServerSidePropsContext["req"], secret: AUTH_SECRET });
+
+  if (!token) {
+    res.writeHead(307, { Location: redirectTo });
+    res.end();
+    return {};
+  }
+
+  return { isAuthenticated: true, session: toSession(token) };
+}
 
 export function withAuth(options: WithAuthOptions = {}) {
   return async (context: GetServerSidePropsContext): Promise<GetServerSidePropsResult<any>> => {

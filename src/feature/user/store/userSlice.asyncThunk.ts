@@ -8,6 +8,7 @@ import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateEmailNotifi
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { getAdditionalUserInfo, GoogleAuthProvider } from "firebase/auth";
+import Router from "next/router";
 import { signIn, signOut } from "next-auth/react";
 import posthog from "posthog-js";
 import type {
@@ -63,6 +64,22 @@ const getGoogleLanding = (isNewUser: boolean, user: User, method: string) => {
   return onboardingHref("google_signup");
 };
 
+/**
+ * Opens the NextAuth session and moves into the app without a page reload.
+ *
+ * `signIn` with its default redirect sets `window.location`: the whole app booted
+ * again from zero — JS, Firebase auth restore, a second read of the user document
+ * the thunk had just fetched — behind two spinners in a row. With `redirect: false`
+ * the session lands in SessionProvider in place, the thunk puts the user data in
+ * the store, and the client router opens the page with everything already loaded.
+ */
+const enterApp = async (idToken: string, destination: string) => {
+  const result = await signIn("credentials", { idToken, redirect: false });
+  if (!result?.ok) throw new Error(result?.error ?? "session-not-created");
+  // Not awaited: the thunk resolves (and fills the store) while the route loads.
+  void Router.push(destination);
+};
+
 export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
   async () => {
@@ -71,8 +88,8 @@ export const logInViaGoogle = createAsyncThunk(
       const { user } = result;
       const token = await user.getIdToken();
       const callbackUrl = getGoogleLanding(!!getAdditionalUserInfo(result)?.isNewUser, user, "google");
-      await signIn("credentials", { idToken: token, callbackUrl });
       const userData = await fetchUserData(user);
+      await enterApp(token, callbackUrl);
       posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });
       posthog.capture("user_logged_in", { method: "google", email: user.email });
       return userData as UserDataInterface;
@@ -92,8 +109,8 @@ export const logInViaGoogleCredential = createAsyncThunk(
       const { user } = result;
       const token = await user.getIdToken();
       const callbackUrl = getGoogleLanding(!!getAdditionalUserInfo(result)?.isNewUser, user, "google_credential");
-      await signIn("credentials", { idToken: token, callbackUrl });
       const userData = await fetchUserData(user);
+      await enterApp(token, callbackUrl);
       posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });
       posthog.capture("user_logged_in", { method: "google_credential", email: user.email });
       return userData as UserDataInterface;
@@ -110,8 +127,8 @@ export const logInViaEmail = createAsyncThunk(
     try {
       const { user } = await firebaseSignInWithEmail(email, password);
       const token = await user.getIdToken();
-      await signIn("credentials", { idToken: token, callbackUrl: "/dashboard" });
       const userData = await fetchUserData(user);
+      await enterApp(token, "/dashboard");
       posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });
       posthog.capture("user_logged_in", { method: "email", email: user.email });
       return userData as UserDataInterface;

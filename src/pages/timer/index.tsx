@@ -2,7 +2,7 @@ import { PracticeModeSelector } from "feature/practice/components/PracticeModeSe
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const Timer: NextPageWithLayout = () => {
   return (
@@ -22,7 +22,4 @@ Timer.getLayout = function getLayout(page: ReactElement) {
 
 export default Timer;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["timer", "toast", "exercises"],
-});
+Timer.getInitialProps = withAuthInitialProps();

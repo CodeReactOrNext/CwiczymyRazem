@@ -2,7 +2,7 @@ import JourneyView from "feature/journey/view/JourneyView";
 import AppLayout from "layouts/AppLayout/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const JourneyPage: NextPageWithLayout = () => {
   return (
@@ -22,7 +22,4 @@ JourneyPage.getLayout = function getLayout(page: ReactElement) {
 
 export default JourneyPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common", "profile", "footer", "toast"],
-});
+JourneyPage.getInitialProps = withAuthInitialProps();

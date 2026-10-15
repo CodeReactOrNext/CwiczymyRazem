@@ -1,7 +1,9 @@
 import ProfileView from "feature/profile/ProfileView";
-import type { NextPage } from "next";
+import AppLayout from "layouts/AppLayout";
 import Head from "next/head";
-import { withAuth } from "utils/auth/serverAuth";
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 /**
  * Member profiles are an in-app view, not a public page. As SSG with
@@ -14,7 +16,7 @@ import { withAuth } from "utils/auth/serverAuth";
  * Profile links shared outside the app — the Discord bot's general log, the
  * "copy profile link" button — still resolve, they just ask for a login first.
  */
-const Profile: NextPage = () => (
+const Profile: NextPageWithLayout = () => (
   <>
     <Head>
       <meta name='robots' content='noindex, nofollow' />
@@ -23,8 +25,16 @@ const Profile: NextPage = () => (
   </>
 );
 
+// Through getLayout like every other app page, so the shell (sidebar, header,
+// community drawer) stays mounted when a profile is opened or left.
+Profile.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <AppLayout pageId={null} variant='secondary'>
+      {page}
+    </AppLayout>
+  );
+};
+
 export default Profile;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-});
+Profile.getInitialProps = withAuthInitialProps();

@@ -72,6 +72,4 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   };
 };
 
-Home.minimalLayout = true;
-
 export default Home;

@@ -6,7 +6,7 @@ import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const PracticeLogPage: NextPageWithLayout = () => {
   const tabs = useProgressTabs();
@@ -43,8 +43,6 @@ PracticeLogPage.getLayout = function getLayout(page: ReactElement) {
   );
 };
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-});
+PracticeLogPage.getInitialProps = withAuthInitialProps();
 
 export default PracticeLogPage;

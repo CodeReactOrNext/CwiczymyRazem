@@ -1,4 +1,7 @@
-import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
+import {
+  firebaseGetUserRaprotsLogs,
+  peekUserRaprotsLogs,
+} from "feature/logs/services/getUserRaprotsLogs.service";
 import { useEffect, useState } from "react";
 
 import type { ReportListInterfaceWithTimeSumary } from "../activityLog.types";
@@ -9,9 +12,14 @@ export const useActivityLogReports = (
   year: number | "all",
   refreshNonce = 0
 ) => {
+  // Seeded from the service's memory cache: coming back to the dashboard renders
+  // the calendar straight away instead of dimming it while the cache answers.
   const [reportList, setReportList] = useState<
     ReportListInterfaceWithTimeSumary[] | null
-  >(null);
+  >(() => {
+    const cached = userAuth ? peekUserRaprotsLogs(userAuth, year) : null;
+    return cached ? processRawReports(cached) : null;
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -49,5 +57,7 @@ export const useActivityLogReports = (
     };
   }, [userAuth, year, refreshNonce]);
 
-  return { reportList, isLoading };
+  // "Loading" only while there is nothing to show — a refresh after a new report
+  // swaps the data in place rather than greying out what is already on screen.
+  return { reportList, isLoading: isLoading && reportList === null };
 };

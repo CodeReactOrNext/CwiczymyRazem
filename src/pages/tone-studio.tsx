@@ -4,7 +4,7 @@ import { useAmpSim } from "hooks/useAmpSim";
 import AppLayout from "layouts/AppLayout/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 // Electron-only: window.nativeAmp only exists in the desktop build. Gated here
 // (not inside ToneStudioView, which the dev preview harness renders without this
@@ -47,7 +47,4 @@ ToneStudioPage.getLayout = function getLayout(page: ReactElement) {
 
 export default ToneStudioPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common"],
-});
+ToneStudioPage.getInitialProps = withAuthInitialProps();

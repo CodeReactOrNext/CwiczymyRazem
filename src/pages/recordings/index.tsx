@@ -3,7 +3,7 @@ import AppLayout from "layouts/AppLayout"; // Import Layout
 import Head from "next/head";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const RecordingsPage: NextPageWithLayout = () => {
   return (
@@ -30,12 +30,4 @@ RecordingsPage.getLayout = function getLayout(page: ReactElement) {
 
 export default RecordingsPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: [
-        "common",
-        "profile",
-        "achievements",
-        "toast", // Ensure toast translations are available
-  ],
-});
+RecordingsPage.getInitialProps = withAuthInitialProps();

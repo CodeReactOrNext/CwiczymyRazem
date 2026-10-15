@@ -11,7 +11,7 @@ import posthog from "posthog-js";
 import type { ReactElement } from "react";
 import { useEffect,useState } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const TimerAuto: NextPageWithLayout = () => {
   const router = useRouter();
@@ -89,8 +89,5 @@ TimerAuto.getLayout = function getLayout(page: ReactElement) {
 
 export default TimerAuto;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common", "timer", "toast", "exercises",'rating_popup'],
-});
+TimerAuto.getInitialProps = withAuthInitialProps();
   

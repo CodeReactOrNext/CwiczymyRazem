@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 // Every scale-tree exam runs on the same clock — 90 s to hold the required BPM.
 const EXAM_TIME_IN_MINUTES = 1.5;
@@ -167,7 +167,4 @@ export default function PracticeScalePage() {
   );
 }
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common", "timer", "toast", "exercises", "rating_popup"],
-});
+PracticeScalePage.getInitialProps = withAuthInitialProps();

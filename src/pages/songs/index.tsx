@@ -4,7 +4,7 @@ import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const SongsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -32,13 +32,4 @@ SongsPage.getLayout = function getLayout(page: ReactElement) {
 
 export default SongsPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: [
-        "common",
-        "songs",
-        "profile",
-        "achievements",
-        "toast",
-  ],
-});
+SongsPage.getInitialProps = withAuthInitialProps();

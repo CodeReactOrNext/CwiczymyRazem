@@ -1,7 +1,9 @@
 import { RockSidebar } from "components/RockSidebar";
 import { CommunityDrawer } from "feature/logsBox/components/CommunityDrawer";
+import { m, useReducedMotion } from "framer-motion";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { LocalizedRegion } from "lib/i18n/LocalizedRegion";
+import { useRouter } from "next/router";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
 
@@ -29,6 +31,19 @@ const MainLoggedLayout = ({
   wide = false,
 }: LandingLayoutProps) => {
   const { isElectron } = useElectronWindowControls();
+  const router = useRouter();
+  const reduceMotion = useReducedMotion();
+
+  // A short fade as a new page takes over the content area — enter only, so it
+  // never holds the old page back. Opacity alone: a transform would turn this
+  // wrapper into the containing block of every `position: fixed` inside the page.
+  // Keyed by route, which remounts nothing extra: a new route is a new page
+  // component anyway.
+  const pageEnter = {
+    initial: reduceMotion ? false : { opacity: 0 },
+    animate: { opacity: 1 },
+    transition: { duration: 0.16, ease: "easeOut" },
+  } as const;
 
   return (
     // The language picked in Settings applies to everything inside this shell and
@@ -58,15 +73,15 @@ const MainLoggedLayout = ({
 
               {variant === "fullscreen" ? (
                 <div className='z-20 w-full flex-1 h-full'>
-                  <div className='relative w-full h-full'>
+                  <m.div key={router.pathname} className='relative w-full h-full' {...pageEnter}>
                     {children}
-                  </div>
+                  </m.div>
                 </div>
               ) : (
                 <div className={`z-20 mx-auto w-full px-0 pb-24 md:pt-8 md:pb-8 lg:px-8 ${wide ? "max-w-[1800px]" : "max-w-[1490px]"}`}>
-                    <div className='relative'>
+                    <m.div key={router.pathname} className='relative' {...pageEnter}>
                       {children}
-                    </div>
+                    </m.div>
                 </div>
               )}
             </MainLoggedWrapper>

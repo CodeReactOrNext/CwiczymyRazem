@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Tooltip,
   TooltipContent,
@@ -20,6 +21,7 @@ import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaime
 import { getLockedAtLvl } from "feature/levelGate/data/featureUnlocks";
 import { CommunityIconButton } from "feature/logsBox/components/CommunityIconButton";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
+import { userProfileQuery } from "feature/profile/hooks/userProfileQuery";
 import { SupportModal } from "feature/support/components/SupportModal";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import {
@@ -470,6 +472,13 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const userInfo = useAppSelector(selectUserInfo);
   const userAuth = useAppSelector(selectUserAuth);
   const hasUnclaimedMilestone = useHasUnclaimedMilestone();
+  const queryClient = useQueryClient();
+
+  // The profile page reads its document on mount; starting that read on hover
+  // usually has it in the cache by the time the click lands.
+  const prefetchOwnProfile = () => {
+    if (userAuth) void queryClient.prefetchQuery(userProfileQuery(userAuth));
+  };
 
   // Undefined until the stats land, so a low-level lock never flashes on a
   // sidebar that is still loading somebody's real level.
@@ -789,6 +798,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     return (
       <Link
         href={`/user/${userAuth}`}
+        onMouseEnter={prefetchOwnProfile}
+        onFocus={prefetchOwnProfile}
         className='block rounded-lg p-4 transition-colors duration-200 hover:bg-white/5'>
         <div className='flex items-center gap-3'>
           <Avatar
@@ -900,6 +911,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         <Link
           href={`/user/${userAuth}`}
           onClick={handleLinkClick}
+          onTouchStart={prefetchOwnProfile}
           className='flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg pr-2 transition-colors duration-200 hover:bg-white/5'>
           <Avatar
             avatarURL={userAvatar}

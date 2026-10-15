@@ -5,14 +5,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
-import { AnimatePresence,motion } from "framer-motion";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FaSpinner } from "react-icons/fa";
 import { getLocalDateKey } from "utils/converter";
 
 import type { DateWithReport } from "./activityLog.types";
@@ -127,28 +125,11 @@ export const ActivityLogView = ({
 
   return (
     <Card className='relative w-full p-5 sm:p-6 mb-6'>
-      <AnimatePresence mode="wait">
-        {isLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className='absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-[2px]'
-          >
-            <div className='flex flex-col items-center gap-3'>
-              <div className="relative">
-                <FaSpinner className='animate-spin text-4xl text-cyan-500' />
-                <div className="absolute inset-0 animate-pulse blur-xl bg-cyan-500/20" />
-              </div>
-              <span className='text-[10px] font-bold uppercase tracking-widest text-cyan-500/80'>
-                {t("loading.subtitle", { defaultValue: "Synchronizing" })}
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className={`transition-all duration-500 ${isLoading ? 'blur-[1.5px] opacity-40 grayscale-[0.5] pointer-events-none scale-[0.995]' : 'blur-0 opacity-100 grayscale-0'}`}>
+      {/* First load only (cached logs render straight away): the calendar stays
+          in place, dimmed, instead of a blurred overlay with a spinner. */}
+      <div
+        aria-busy={isLoading}
+        className={`transition-opacity duration-300 ${isLoading ? "pointer-events-none animate-pulse opacity-50" : "opacity-100"}`}>
          <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
           <h3 className='text-xl font-semibold text-white mr-2'>Activity</h3>
 

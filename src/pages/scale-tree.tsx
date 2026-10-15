@@ -2,7 +2,7 @@ import AppLayout from "layouts/AppLayout/AppLayout";
 import dynamic from "next/dynamic";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 // React Flow uses browser APIs — must disable SSR
 const ScaleTreeView = dynamic(
@@ -30,7 +30,4 @@ ScaleTreePage.getLayout = function getLayout(page: ReactElement) {
 
 export default ScaleTreePage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common", "profile", "footer", "toast"],
-});
+ScaleTreePage.getInitialProps = withAuthInitialProps();

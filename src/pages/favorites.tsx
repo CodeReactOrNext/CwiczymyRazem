@@ -28,7 +28,7 @@ import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 import { formatMinutesDuration } from "utils/converter";
 
 const DIFFICULTY_COLORS: Record<string, string> = {
@@ -395,7 +395,4 @@ FavoritesPage.getLayout = function getLayout(page: ReactElement) {
 
 export default FavoritesPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common", "exercises", "timer", "skills"],
-});
+FavoritesPage.getInitialProps = withAuthInitialProps();

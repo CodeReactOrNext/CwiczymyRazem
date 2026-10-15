@@ -18,7 +18,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 import { db } from "utils/firebase/client/firebase.utils";
 
 type PageState =
@@ -182,7 +182,4 @@ export default function SongPracticePage() {
   );
 }
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["exercises", "common"],
-});
+SongPracticePage.getInitialProps = withAuthInitialProps();

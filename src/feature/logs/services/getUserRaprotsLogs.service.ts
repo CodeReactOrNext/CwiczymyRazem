@@ -22,15 +22,26 @@ export const invalidateActivityLogsCache = (userAuth: string, year?: number) => 
   }
 };
 
+const getLogsCacheKey = (userAuth: string, year?: number | "all") =>
+  year === "all"
+    ? `activityLogs:${userAuth}:all`
+    : getActivityLogsCacheKey(userAuth, year ?? new Date().getFullYear());
+
+/**
+ * The logs `firebaseGetUserRaprotsLogs` already holds in memory, read synchronously —
+ * lets a view that mounts again render them on its first frame instead of flashing
+ * a loading state while the (instant) cached promise resolves.
+ */
+export const peekUserRaprotsLogs = (userAuth: string, year?: number | "all") =>
+  memoryCache.get(getLogsCacheKey(userAuth, year)) as FirebaseUserExceriseLog[] | null;
+
 export const firebaseGetUserRaprotsLogs = async (
   userAuth: string,
   year?: number | "all"
 ) => {
   const isAllTime = year === "all";
   const targetYear = !isAllTime ? (year ?? new Date().getFullYear()) : null;
-  const cacheKey = isAllTime 
-    ? `activityLogs:${userAuth}:all` 
-    : getActivityLogsCacheKey(userAuth, targetYear!);
+  const cacheKey = getLogsCacheKey(userAuth, year);
 
   const cached = memoryCache.get(cacheKey);
   if (cached) {

@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 import { convertMsToHMS } from "utils/converter";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -302,7 +302,4 @@ SongPracticeTimer.getLayout = function getLayout(page: ReactElement) {
 
 export default SongPracticeTimer;
 
-export const getServerSideProps = withAuth({
-    redirectIfUnauthenticated: "/login",
-    translations: ["common", "timer", "toast", "report"],
-});
+SongPracticeTimer.getInitialProps = withAuthInitialProps();

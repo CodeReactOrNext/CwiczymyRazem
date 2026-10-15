@@ -3,7 +3,7 @@ import { ScoringGuideView } from "feature/scoring/ScoringGuideView";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const ScoringPage: NextPageWithLayout = () => {
   return (
@@ -31,7 +31,4 @@ ScoringPage.getLayout = function getLayout(page: ReactElement) {
 
 export default ScoringPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: ["common", "profile", "toast"],
-});
+ScoringPage.getInitialProps = withAuthInitialProps();

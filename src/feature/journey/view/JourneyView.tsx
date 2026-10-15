@@ -1,6 +1,7 @@
 import { Drawer, DrawerContent } from "assets/components/ui/drawer";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -240,14 +241,7 @@ const JourneyView: React.FC = () => {
   );
 
   if (loading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-zinc-700 border-t-cyan-500" />
-          <p className="text-sm text-zinc-500">Loading progress...</p>
-        </div>
-      </div>
-    );
+    return <PageLoadingLayout />;
   }
 
   if (showModuleSelection) {

@@ -7,7 +7,7 @@ import { Compass, Map, Target, Zap } from "lucide-react";
 import type { ReactElement } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const AiCoachPage: NextPageWithLayout = () => {
   const userInfo = useAppSelector(selectUserInfo);
@@ -70,17 +70,4 @@ AiCoachPage.getLayout = function getLayout(page: ReactElement) {
 
 export default AiCoachPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: [
-    "common",
-    "profile",
-    "footer",
-    "achievements",
-    "toast",
-    "skills",
-    "songs",
-    "my_plans",
-    "exercises",
-  ],
-});
+AiCoachPage.getInitialProps = withAuthInitialProps();

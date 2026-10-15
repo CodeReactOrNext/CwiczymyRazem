@@ -1,7 +1,7 @@
 import { selectAutoLogInFailed, selectCurrentUserStats, selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import { usePresence } from "hooks/usePresence";
+import { AppShellSkeleton } from "layouts/AppLayout/AppShellSkeleton";
 import MainLoggedLayout from "layouts/MainLoggedLayout/MainLoggedLayout";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import React, { useEffect } from "react";
@@ -58,21 +58,8 @@ const AppLayout = ({
     return <>{children}</>;
   }
 
-  if (status === "loading") {
-    return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-             <PageLoadingLayout />
-        </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-
-    return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-             <PageLoadingLayout />
-        </div>
-    );
+  if (status === "loading" || !isAuthenticated) {
+    return <AppShellSkeleton />;
   }
 
   return (

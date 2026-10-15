@@ -8,7 +8,7 @@ import { BarChart3, Target, TrendingUp, Zap } from "lucide-react";
 import type { ReactElement } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 /** Milestones: your own weekly targets, behind the Master plan. */
 const SummaryPage: NextPageWithLayout = () => {
@@ -78,17 +78,4 @@ SummaryPage.getLayout = function getLayout(page: ReactElement) {
 
 export default SummaryPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: [
-    "common",
-    "profile",
-    "footer",
-    "achievements",
-    "toast",
-    "skills",
-    "songs",
-    "my_plans",
-    "exercises",
-  ],
-});
+SummaryPage.getInitialProps = withAuthInitialProps();

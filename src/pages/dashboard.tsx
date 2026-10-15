@@ -2,7 +2,7 @@ import LandingView from "feature/user/view/LandingView";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const Dashboard: NextPageWithLayout = () => {
   return <LandingView />;
@@ -21,18 +21,4 @@ Dashboard.getLayout = function getLayout(page: ReactElement) {
 
 export default Dashboard;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: [
-    "common",
-    "profile",
-    "footer",
-    "achievements",
-    "toast",
-    "skills",
-    "songs",
-    "my_plans",
-    "exercises",
-    "skills",
-  ],
-});
+Dashboard.getInitialProps = withAuthInitialProps();

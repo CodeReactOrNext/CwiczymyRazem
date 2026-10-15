@@ -3,7 +3,7 @@ import AppLayout from "layouts/AppLayout";
 import Head from "next/head";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const GearLeaderboardPage: NextPageWithLayout = () => {
   const siteUrl = "https://riff.quest/leaderboard/gear";
@@ -31,12 +31,4 @@ GearLeaderboardPage.getLayout = function getLayout(page: ReactElement) {
 
 export default GearLeaderboardPage;
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-  translations: [
-    "common",
-    "leadboard",
-    "achievements",
-    "toast",
-  ],
-});
+GearLeaderboardPage.getInitialProps = withAuthInitialProps();

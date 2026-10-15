@@ -6,7 +6,7 @@ import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { withAuth } from "utils/auth/serverAuth";
+import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const GoalsPage: NextPageWithLayout = () => {
   const { t } = useTranslation("goals");
@@ -38,8 +38,6 @@ GoalsPage.getLayout = function getLayout(page: ReactElement) {
   );
 };
 
-export const getServerSideProps = withAuth({
-  redirectIfUnauthenticated: "/login",
-});
+GoalsPage.getInitialProps = withAuthInitialProps();
 
 export default GoalsPage;
