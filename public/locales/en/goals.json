@@ -75,7 +75,16 @@
     "start_label": "Start tempo",
     "start_above_target": "The start tempo has to be at or below the goal.",
     "path_summary": "{{count}} milestones, {{runs}} clean runs each",
-    "path_summary_one": "1 milestone, {{runs}} clean runs"
+    "path_summary_one": "1 milestone, {{runs}} clean runs",
+    "source_label": "Exercises from",
+    "source": {
+      "library": "Library",
+      "mine": "My Exercises"
+    },
+    "mine_empty": "You haven't made any exercises yet. The ones you write in the Tab Editor show up here, private ones too.",
+    "mine_none_eligible": "None of your exercises can take a goal yet. A goal needs a tab and a tempo range on the exercise.",
+    "mine_left_out_one": "1 more of yours needs a tab and a tempo range to take a goal.",
+    "mine_left_out": "{{count}} more of yours need a tab and a tempo range to take a goal."
   },
   "history": {
     "reached_on": "Reached {{date}}",

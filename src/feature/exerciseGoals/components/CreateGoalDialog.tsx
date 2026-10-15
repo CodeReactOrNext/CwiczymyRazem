@@ -15,6 +15,7 @@ import { Minus, Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
+import { useOwnExercises } from "../hooks/useExerciseGoals";
 import type {
   GoalCounting,
   GoalStrictness,
@@ -36,6 +37,10 @@ import {
 
 const GOAL_EXERCISES = exercisesAgregat.filter(isGoalEligibleExercise);
 const COUNTING_OPTIONS: GoalCounting[] = ["streak", "total"];
+
+/** Where the picker lists exercises from: the library, or the player's own. */
+type ExerciseSource = "library" | "mine";
+const SOURCE_OPTIONS: ExerciseSource[] = ["library", "mine"];
 
 interface SegmentedProps<T extends string> {
   value: T;
@@ -133,6 +138,7 @@ const BpmField = ({ id, label, value, onChange, fallback }: BpmFieldProps) => {
 };
 
 interface CreateGoalDialogProps {
+  uid: string;
   onClose: () => void;
   onCreate: (goal: NewExerciseGoal) => Promise<unknown>;
   /** Exercises that already have an open goal — they can't take a second one. */
@@ -155,6 +161,7 @@ interface CreateGoalDialogProps {
  * open, so every opening starts from a fresh form.
  */
 export const CreateGoalDialog = ({
+  uid,
   onClose,
   onCreate,
   busyExerciseIds,
@@ -169,40 +176,52 @@ export const CreateGoalDialog = ({
 }: CreateGoalDialogProps) => {
   const { t } = useTranslation("goals");
   const localizeExercise = useLocalizeExercise();
-  const [exercise, setExercise] = useState<Exercise | null>(
+  const ownQuery = useOwnExercises(uid);
+  const ownExercises = ownQuery.data;
+  const ownGoalExercises = useMemo(
+    () => (ownExercises ?? []).filter(isGoalEligibleExercise),
+    [ownExercises],
+  );
+  // Held by id: the player's own exercises arrive after the dialog opens, and
+  // raising the bar on one of them has to find it once they do.
+  const [exerciseId, setExerciseId] = useState<string | null>(
+    initialExerciseId ?? null,
+  );
+  const exercise = useMemo(
     () =>
-      GOAL_EXERCISES.find((candidate) => candidate.id === initialExerciseId) ??
+      (exerciseId &&
+        (GOAL_EXERCISES.find((candidate) => candidate.id === exerciseId) ??
+          ownGoalExercises.find((candidate) => candidate.id === exerciseId))) ||
       null,
+    [exerciseId, ownGoalExercises],
   );
+  const isResolvingExercise = !!exerciseId && !exercise && ownQuery.isLoading;
+  const [source, setSource] = useState<ExerciseSource>("library");
   const [search, setSearch] = useState("");
-  const [startInput, setStartInput] = useState(() =>
-    initialStartBpm
-      ? String(initialStartBpm)
-      : exercise
-        ? String(suggestStartBpm(exercise))
-        : "",
+  const [startInput, setStartInput] = useState(
+    initialStartBpm ? String(initialStartBpm) : "",
   );
-  const [bpmInput, setBpmInput] = useState(() =>
-    initialBpm
-      ? String(initialBpm)
-      : exercise
-        ? String(suggestTargetBpm(exercise))
-        : "",
+  const [bpmInput, setBpmInput] = useState(
+    initialBpm ? String(initialBpm) : "",
   );
   const [strictness, setStrictness] =
     useState<GoalStrictness>(initialStrictness);
   const [counting, setCounting] = useState<GoalCounting>(initialCounting);
 
+  const candidates = source === "mine" ? ownGoalExercises : GOAL_EXERCISES;
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase();
     return needle
-      ? GOAL_EXERCISES.filter(
+      ? candidates.filter(
           (candidate) =>
             candidate.title.toLowerCase().includes(needle) ||
             localizeExercise(candidate).title.toLowerCase().includes(needle),
         )
-      : GOAL_EXERCISES;
-  }, [search, localizeExercise]);
+      : candidates;
+  }, [candidates, search, localizeExercise]);
+  // Own exercises the mic can't score at a tempo — no tab, or no tempo range —
+  // are left out of the list; the count says so instead of hiding them silently.
+  const ownLeftOut = (ownExercises?.length ?? 0) - ownGoalExercises.length;
 
   const bpm = Number(bpmInput);
   const startBpm = Number(startInput);
@@ -223,7 +242,7 @@ export const CreateGoalDialog = ({
     !!exercise && !!path && !busyExerciseIds.has(exercise.id) && !isSaving;
 
   const pickExercise = (picked: Exercise) => {
-    setExercise(picked);
+    setExerciseId(picked.id);
     setStartInput(String(suggestStartBpm(picked)));
     setBpmInput(String(suggestTargetBpm(picked)));
   };
@@ -257,7 +276,9 @@ export const CreateGoalDialog = ({
           <p className='text-sm font-medium text-zinc-200'>
             {t("create.exercise_label")}
           </p>
-          {exercise ? (
+          {isResolvingExercise ? (
+            <div className='h-[3.75rem] animate-pulse rounded-lg bg-zinc-800/50' />
+          ) : exercise ? (
             <div className='flex items-center justify-between gap-3 rounded-lg bg-zinc-800/50 px-4 py-3'>
               <div className='min-w-0'>
                 <p className='truncate text-sm font-semibold text-zinc-100'>
@@ -275,7 +296,7 @@ export const CreateGoalDialog = ({
               {!initialExerciseId && (
                 <button
                   type='button'
-                  onClick={() => setExercise(null)}
+                  onClick={() => setExerciseId(null)}
                   className='shrink-0 rounded px-2 py-1 text-sm text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700 hover:text-zinc-100'>
                   {t("create.change_exercise")}
                 </button>
@@ -283,6 +304,15 @@ export const CreateGoalDialog = ({
             </div>
           ) : (
             <div className='space-y-2'>
+              <Segmented
+                label={t("create.source_label")}
+                value={source}
+                onChange={setSource}
+                options={SOURCE_OPTIONS.map((option) => ({
+                  value: option,
+                  label: t(`create.source.${option}`),
+                }))}
+              />
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
@@ -292,10 +322,27 @@ export const CreateGoalDialog = ({
                 className='h-11 border-0 bg-zinc-800/60 text-zinc-100'
               />
               <div className='max-h-72 space-y-1 overflow-y-auto pr-1'>
-                {filtered.length === 0 && (
-                  <p className='px-1 py-4 text-sm text-zinc-500'>
-                    {t("create.no_results")}
-                  </p>
+                {source === "mine" && ownQuery.isLoading ? (
+                  <div className='space-y-1'>
+                    {[0, 1, 2].map((row) => (
+                      <div
+                        key={row}
+                        className='h-10 animate-pulse rounded-lg bg-zinc-800/40'
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  filtered.length === 0 && (
+                    <p className='px-1 py-4 text-sm text-zinc-500'>
+                      {source === "mine" && !search.trim()
+                        ? t(
+                            ownExercises?.length
+                              ? "create.mine_none_eligible"
+                              : "create.mine_empty",
+                          )
+                        : t("create.no_results")}
+                    </p>
+                  )
                 )}
                 {filtered.map((candidate) => {
                   const isBusy = busyExerciseIds.has(candidate.id);
@@ -318,6 +365,13 @@ export const CreateGoalDialog = ({
                   );
                 })}
               </div>
+              {source === "mine" &&
+                ownGoalExercises.length > 0 &&
+                ownLeftOut > 0 && (
+                  <p className='px-1 text-xs text-zinc-500'>
+                    {t("create.mine_left_out", { count: ownLeftOut })}
+                  </p>
+                )}
             </div>
           )}
         </div>

@@ -87,6 +87,23 @@ export const updateCommunityExercise = async (
   }
 };
 
+/** Flips an exercise between the Community library and the author's private shelf. */
+export const setCommunityExerciseVisibility = async (
+  exerciseId: string,
+  isPublic: boolean
+): Promise<boolean> => {
+  try {
+    await updateDoc(doc(db, COLLECTION, exerciseId), {
+      isPublic,
+      updatedAt: serverTimestamp(),
+    });
+    return true;
+  } catch (error) {
+    logger.error(error, { context: "setCommunityExerciseVisibility" });
+    return false;
+  }
+};
+
 export const getUserCommunityExercises = async (userId: string): Promise<CommunityExercise[]> => {
   try {
     const q = query(

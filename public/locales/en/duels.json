@@ -2,7 +2,7 @@
   "hero": {
     "eyebrow": "Ranked 1 vs 1",
     "title": "Duels",
-    "subtitle": "You and a stranger get the same exercise. 24 hours, as many runs as you like — the better best run wins and the ELO moves."
+    "subtitle": "You and a stranger get the same exercise. 48 hours, as many runs as you like — the better best run wins and the ELO moves."
   },
   "rating": {
     "label": "ELO",
@@ -27,7 +27,9 @@
     "error": "Couldn't join right now. Try again in a moment.",
     "ticket": "Looking for an opponent",
     "ticket_expires": "Expires in {{time}}",
-    "cancel": "Leave the queue"
+    "cancel": "Leave the queue",
+    "live_one": "{{count}} duel in progress right now",
+    "live_other": "{{count}} duels in progress right now"
   },
   "category": {
     "technique": "Technique",
@@ -52,6 +54,20 @@
     "new": "New duel",
     "left": "left"
   },
+  "ready": {
+    "badge": "Ready",
+    "button": "Ready",
+    "confirm_title": "Lock in {{score}}?",
+    "confirm_body": "This becomes your final result — you won't be able to play this duel again. When your opponent is ready too, the duel ends early.",
+    "confirm_body_last": "Your opponent is ready already, so the duel ends right away. You won't be able to play it again.",
+    "confirm": "Lock it in",
+    "cancel": "Keep playing",
+    "locked": "Your result is locked in. The duel ends as soon as your opponent is ready too — or when the clock runs out.",
+    "settled": "You're both ready — the duel is settled.",
+    "error_no_run": "Play at least one run first.",
+    "error_closed": "This duel no longer takes runs.",
+    "error": "Couldn't lock in your result. Try again in a moment."
+  },
   "form": {
     "won": "W",
     "lost": "L",
@@ -63,7 +79,7 @@
     "searching": "Looking for an opponent. You'll get a notification the moment your duel starts.",
     "steps": {
       "0": "Find an opponent — or wait for the next one to join",
-      "1": "Same exercise for both of you, 24 hours to play it",
+      "1": "Same exercise for both of you, 48 hours to play it",
       "2": "Best run wins and the ELO moves"
     }
   },
@@ -89,9 +105,10 @@
   "rules": {
     "0": "Both players get the same random exercise — technique, fretboard theory or an ear quiz.",
     "1": "Playing drills need the mic on: only mic-scored runs count. Quizzes give +100 for a right answer and −100 for a wrong one.",
-    "2": "24 hours, as many runs as you like. Your best run is your score.",
-    "3": "You see how many attempts your opponent made — never their name or score until it ends.",
-    "4": "Beat a stronger player and you gain more ELO. Didn't play at all? That's a loss.",
+    "2": "48 hours, as many runs as you like. Your best run is your score.",
+    "3": "Done before the time is up? Press Ready to lock in your best — no more runs after that. When both of you are ready, the duel ends right away.",
+    "4": "You see how many attempts your opponent made — never their name or score until it ends.",
+    "5": "Beat a stronger player and you gain more ELO. Didn't play at all? That's a loss.",
     "title": "How it works"
   },
   "error": "Couldn't load your duels. Refresh to try again."

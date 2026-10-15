@@ -623,10 +623,7 @@ export const PedalboardView = ({
       return;
     }
     if (powerState.outputsFree === 0) {
-      announce(
-        t("board.outputs_taken", { supply: supply.name }),
-        setNotice,
-      );
+      announce(t("board.outputs_taken", { supply: supply.name }), setNotice);
       return;
     }
     const to = toBoard(e.clientX, e.clientY);
@@ -1167,10 +1164,7 @@ export const PedalboardView = ({
     );
     if (layout.overflow.length > 0) {
       const count = layout.overflow.length;
-      announce(
-        t("board.no_room_parked", { count }),
-        setNotice,
-      );
+      announce(t("board.no_room_parked", { count }), setNotice);
     } else {
       setNotice(null);
     }
@@ -1300,6 +1294,7 @@ export const PedalboardView = ({
         ),
         left: (item.xPct / 100) * geo.viewW,
         right: ((item.xPct + wPct) / 100) * geo.viewW,
+        top: (item.yPct / 100) * geo.viewH,
       },
     ];
   });
@@ -1356,9 +1351,7 @@ export const PedalboardView = ({
     lastTierRef.current = verdict.tier;
     if (previous === null || previous === verdict.tier) return;
     if (verdict.tier === "book" && verdict.rate > 0) {
-      toast.success(
-        t("board.by_the_book", { rate: verdict.rate.toFixed(1) }),
-      );
+      toast.success(t("board.by_the_book", { rate: verdict.rate.toFixed(1) }));
     }
   }, [dragging, verdict.tier, verdict.rate, t]);
 
@@ -1673,7 +1666,9 @@ export const PedalboardView = ({
                           e.preventDefault();
                           unplug(placement.itemId);
                         }}
-                        aria-label={t("board.unplug_name", { name: effect.name })}
+                        aria-label={t("board.unplug_name", {
+                          name: effect.name,
+                        })}
                         title={t("board.unplug_name", { name: effect.name })}
                         className='absolute z-10 flex h-[30px] w-[30px] -translate-x-1/2 items-center justify-center rounded-full bg-black/85 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-amber-300'
                         style={{
@@ -1692,7 +1687,9 @@ export const PedalboardView = ({
                       onMouseDown={(e) => e.stopPropagation()}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => handleRemove(placement.itemId, e)}
-                      aria-label={t("board.take_off_name", { name: effect.name })}
+                      aria-label={t("board.take_off_name", {
+                        name: effect.name,
+                      })}
                       className='absolute -right-1.5 -top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded border border-zinc-500 bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:border-zinc-300 hover:text-white'>
                       <X size={8} />
                     </button>

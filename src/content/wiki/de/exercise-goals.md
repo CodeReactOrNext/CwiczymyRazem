@@ -12,7 +12,7 @@ Ein Ziel ist eine Übung und das Tempo, in dem du sie spielen willst, in kleinen
 
 <ClickPath steps="Fortschritt|Ziele|Neues Ziel" caption="Wähle eine Übung, das Start- und das Zieltempo, wie sauber ein Durchlauf sein muss und wie sich die sauberen Durchläufe summieren." />
 
-Ziele funktionieren bei Übungen mit Tabulatur und Metronomtempo, denn nur diese kann das Mikrofon Note für Note bewerten. Jagden, Strumming-Muster, Hörquizze und Songs können kein Ziel haben.
+Ziele funktionieren bei Übungen mit Tabulatur und Metronomtempo, denn nur diese kann das Mikrofon Note für Note bewerten. Jagden, Strumming-Muster, Hörquizze und Songs können kein Ziel haben. Übungen, die du selbst im Tab Editor geschrieben hast, gehen auch, private eingeschlossen: Stell die Liste auf **Meine Übungen** um.
 
 Das Starttempo beginnt am unteren Ende des Bereichs der Übung selbst und das Zieltempo am oberen. Ändere beide auf das, was zu dir passt. Darunter siehst du die Etappen, die das Ziel haben wird. Sie steigen in 5-BPM-Schritten, und bei einem sehr langen Aufstieg werden die Schritte größer, damit der Pfad bei 16 Etappen oder weniger bleibt. Jede Übung hält immer ein offenes Ziel. Sobald du speicherst, zeigt der Feed das gesetzte Ziel, vom Starttempo zum Zieltempo.
 

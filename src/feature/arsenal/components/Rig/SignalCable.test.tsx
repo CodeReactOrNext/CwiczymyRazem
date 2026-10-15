@@ -208,6 +208,38 @@ describe("SignalCable", () => {
     expect(draw(tight).parts).toHaveLength(3);
   });
 
+  it("connects adjacent pedals across a nominal row boundary without routing under their bodies", () => {
+    const boundary = (ROW_Y_PCT[0] + ROW_Y_PCT[1]) / 2;
+    const nodes = row(boundary - 0.1, 2, 0.4);
+    nodes[1].yPct = boundary + 0.1;
+    // Visually adjacent, despite being assigned different nearest row indices.
+    expect(draw(nodes).parts).toHaveLength(3);
+    expect(pointsOf(draw(nodes).runs[1])).toHaveLength(2);
+  });
+
+  it("draws a tight coupler above protruding nuts, seated against both enclosures", () => {
+    const nodes = row(ROW_Y_PCT[0], 2, 0.4);
+    const { container } = render(
+      <SignalCable
+        geo={GEO}
+        verdict={verdictOf(nodes)}
+        widthOf={() => W}
+        jacksOf={() => ({ ...SIDE_JACKS, nut: 0.06 })}
+      />,
+    );
+    const raised = Array.from(container.querySelectorAll("svg")).find(
+      (svg) => svg.style.zIndex === "3",
+    );
+    const coupler = Array.from(
+      raised?.querySelectorAll("g[transform]") ?? [],
+    ).find((group) => !group.querySelector('path[d^="M -0.95"]'));
+    expect(coupler).toBeDefined();
+    const seatX = ((nodes[1].xPct + W * 0.94) / 100) * GEO.viewW;
+    expect(coupler!.getAttribute("transform")).toContain(
+      `translate(${seatX.toFixed(2)} `,
+    );
+  });
+
   it("lays a coupler socket to socket when the pair's jacks sit at different heights", () => {
     // Tight enough to couple, with the second pedal wearing its sockets high.
     const nodes = row(ROW_Y_PCT[0], 2, 1.5);

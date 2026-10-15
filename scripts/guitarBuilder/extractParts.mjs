@@ -99,6 +99,107 @@ const BODIES = [
   },
   { key: "semi-hollow", source: 78, name: "Semi-Hollow", pickguard: null },
   { key: "x-style", source: 71, name: "X-Style", pickguard: null },
+  { key: "junior-honey", source: 81, name: "Junior Honey", pickguard: null },
+  {
+    key: "osprey-tobacco",
+    source: 82,
+    name: "Osprey Tobacco",
+    pickguard: null,
+    finish: { hue: 30, hueTol: 45, minComponent: 0.0003 },
+    // Tortoise shares the tobacco hue but must keep its original artwork.
+    finishExcludePolygon: [
+      [285, 190],
+      [315, 145],
+      [375, 150],
+      [437, 169],
+      [525, 172],
+      [590, 145],
+      [599, 175],
+      [565, 217],
+      [541, 235],
+      [539, 321],
+      [574, 347],
+      [575, 386],
+      [525, 412],
+      [380, 447],
+      [224, 500],
+      [200, 480],
+      [204, 443],
+      [239, 390],
+      [279, 345],
+    ],
+  },
+  {
+    key: "aurelis-walnut",
+    source: 83,
+    name: "Aurelis Walnut",
+    pickguard: null,
+    finish: { hue: 25, hueTol: 40, minComponent: 0.0003 },
+    finishExcludeCircles: [
+      [122, 396, 26],
+      [197, 382, 26],
+      [141, 473, 26],
+      [237, 480, 26],
+    ],
+  },
+  {
+    key: "aurelis-pearl",
+    source: 84,
+    name: "Aurelis Pearl",
+    pickguard: null,
+    finish: { neutral: true },
+  },
+  {
+    key: "jazzcaster-coral",
+    source: 90,
+    name: "Jazzcaster Coral",
+    pickguard: "light",
+    // Loose contour: the colour test below supplies the exact cream edge.
+    guardPolygon: [
+      [300, 205],
+      [310, 170],
+      [400, 160],
+      [460, 140],
+      [555, 110],
+      [690, 105],
+      [700, 135],
+      [640, 205],
+      [580, 240],
+      [580, 330],
+      [650, 355],
+      [660, 450],
+      [640, 485],
+      [600, 500],
+      [480, 485],
+      [340, 530],
+      [255, 540],
+      [190, 535],
+      [125, 515],
+      [120, 490],
+      [130, 450],
+      [230, 395],
+      [280, 345],
+      [300, 310],
+    ],
+    guardExclude: [
+      [75, 185, 155, 185],
+      [268, 195, 48, 175],
+    ],
+    guardExcludeCircles: [
+      [208, 440, 23],
+      [273, 416, 23],
+      [352, 408, 23],
+      [581, 438, 22],
+    ],
+    guardExcludePolygon: [
+      [147, 327],
+      [604, 407],
+      [625, 412],
+      [624, 421],
+      [601, 416],
+      [146, 334],
+    ],
+  },
 ];
 
 const NECKS = [
@@ -110,6 +211,8 @@ const NECKS = [
   { key: "ebony-blocks", source: 70, name: "Ebony · blocks" },
   { key: "ebony-birds", source: 41, name: "Ebony · birds" },
   { key: "ebony-sharks", source: 40, name: "Ebony · abalone" },
+  { key: "junior-dots", source: 81, name: "Junior · dots" },
+  { key: "aurelis-blocks", source: 84, name: "Aurelis · blocks" },
 ];
 
 /** Figured tops, generated (the renders' own figure carries glare, strings and
@@ -138,6 +241,7 @@ const HEADS = [
   // 64, not the RPS (41): that one carries a model name and signature
   { key: "carved", source: 64, name: "Carved" },
   { key: "offset", source: 76, name: "Offset" },
+  { key: "aurelis-gold", source: 84, name: "Aurelis · gold tuners" },
 ];
 
 /** Manual fretboard overhang (template px left of the joint), keyed by source,
@@ -168,6 +272,23 @@ const PICKUP_INSET = 0;
  * so every body is placed by hand. Read off `--debug` pickups-*.png.
  */
 const PICKUP_SHAPES = {
+  "junior-honey": [[320, 246, 58, 138, 0, 7]],
+  "osprey-tobacco": [
+    [326, 266, 56, 136, 0, 8],
+    [475, 266, 56, 136, 0, 8],
+  ],
+  "aurelis-walnut": [
+    [393, 275, 58, 110, 0, 5],
+    [548, 276, 58, 110, 0, 5],
+  ],
+  "aurelis-pearl": [
+    [365, 276, 56, 110, 0, 5],
+    [525, 276, 56, 110, 0, 5],
+  ],
+  "jazzcaster-coral": [
+    [367, 284, 57, 145, 0, 10],
+    [536, 284, 57, 145, 0, 10],
+  ],
   superstrat: [
     [333, 265, 59, 115, 0, 8],
     [412, 265, 27.5, 135, 0, 13],
@@ -232,6 +353,8 @@ const debugBodies = [];
  *  that flares gently on one side (six-in-line) leaves the edge lines late, so
  *  the detected nut lands inside the headstock. Check with --debug nut-sheet.png. */
 const NUT_SHIFT = {
+  81: -10,
+  84: -12,
   20: -11,
   41: -22,
   47: -6,
@@ -249,6 +372,21 @@ const NUT_SHIFT = {
 const DEBUG_DIR = process.argv.includes("--debug")
   ? process.argv[process.argv.indexOf("--debug") + 1]
   : null;
+
+/** Limit extraction to selected keys, preserving every other asset and manifest entry. */
+const onlyIndex = process.argv.indexOf("--only");
+const ONLY =
+  onlyIndex < 0
+    ? null
+    : new Set((process.argv[onlyIndex + 1] ?? "").split(","));
+if (ONLY) {
+  const known = new Set(
+    [...BODIES, ...NECKS, ...HEADS, ...TOPS].map((part) => part.key),
+  );
+  for (const key of ONLY)
+    if (!known.has(key)) throw new Error(`Unknown part key: ${key}`);
+}
+const selected = (def) => !ONLY || ONLY.has(def.key);
 
 // ---------------------------------------------------------------- helpers
 
@@ -550,7 +688,13 @@ function dilate(W, H, mask, r) {
  *  (drops knobs and other small hardware that happens to share the hue). */
 function finishMask(
   body,
-  { hueTol = 28, hue: forcedHue, minSat = 0.16, minComponent = 0.01 } = {},
+  {
+    hueTol = 28,
+    hue: forcedHue,
+    minSat = 0.16,
+    minComponent = 0.01,
+    neutral = false,
+  } = {},
 ) {
   const { W, H, data } = body;
   const n = W * H;
@@ -586,8 +730,18 @@ function finishMask(
     const a = data[i * 4 + 3] / 255;
     weight[i] =
       a *
-      smooth(minSat - 0.06, minSat + 0.06, S_[i]) *
-      (1 - smooth(hueTol - 6, hueTol + 6, hueDist(H_[i], hue))) *
+      (neutral
+        ? smooth(0.35, 0.65, L_[i]) *
+          (1 -
+            smooth(
+              0.18,
+              0.3,
+              (Math.max(data[i * 4], data[i * 4 + 1], data[i * 4 + 2]) -
+                Math.min(data[i * 4], data[i * 4 + 1], data[i * 4 + 2])) /
+                255,
+            ))
+        : smooth(minSat - 0.06, minSat + 0.06, S_[i]) *
+          (1 - smooth(hueTol - 6, hueTol + 6, hueDist(H_[i], hue)))) *
       smooth(0.03, 0.07, L_[i]);
     hard[i] = weight[i] > 0.5 ? 1 : 0;
   }
@@ -1004,6 +1158,17 @@ async function writeWebp(img, file, lossless = false) {
 const publicUrl = (file) =>
   "/" + path.relative("public", file).split(path.sep).join("/");
 
+function insidePolygon(points, x, y) {
+  let inside = false;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    const [xi, yi] = points[i];
+    const [xj, yj] = points[j];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi)
+      inside = !inside;
+  }
+  return inside;
+}
+
 async function buildBody(def, src) {
   const { img, neck } = src;
   const J = neck.joint;
@@ -1013,6 +1178,26 @@ async function buildBody(def, src) {
   const body = crop(img, box.x0, box.y0, W, H, (x) => (x <= J ? 1 : 0));
 
   const finish = finishMask(body, def.finish);
+  if (def.finishExcludePolygon) {
+    const points = def.finishExcludePolygon;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        if (insidePolygon(points, x, y)) finish.weight[y * W + x] = 0;
+      }
+    }
+  }
+  for (const [cx, cy, radius] of def.finishExcludeCircles ?? []) {
+    for (let y = Math.max(0, cy - radius); y < Math.min(H, cy + radius); y++) {
+      for (
+        let x = Math.max(0, cx - radius);
+        x < Math.min(W, cx + radius);
+        x++
+      ) {
+        if ((x - cx) ** 2 + (y - cy) ** 2 <= radius ** 2)
+          finish.weight[y * W + x] = 0;
+      }
+    }
+  }
   const guard = def.pickguard ? pickguardMask(body, finish) : null;
   if (guard) {
     // white crumbs of guard cut off from the main sheet (a sliver under a
@@ -1029,6 +1214,50 @@ async function buildBody(def, src) {
         b = body.data[i * 4 + 2];
       const chroma = (Math.max(r, g, b) - Math.min(r, g, b)) / 255;
       if (finish.L[i] > 0.82 && chroma < 0.12) guard.weight[i] = 1;
+    }
+  }
+  if (guard && def.guardPolygon) {
+    let sumL = 0,
+      sumW = 0;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const i = y * W + x;
+        const inside =
+          insidePolygon(def.guardPolygon, x, y) &&
+          !insidePolygon(def.guardExcludePolygon, x, y);
+        const chroma =
+          (Math.max(
+            body.data[i * 4],
+            body.data[i * 4 + 1],
+            body.data[i * 4 + 2],
+          ) -
+            Math.min(
+              body.data[i * 4],
+              body.data[i * 4 + 1],
+              body.data[i * 4 + 2],
+            )) /
+          255;
+        guard.weight[i] = inside
+          ? (body.data[i * 4 + 3] / 255) *
+            smooth(0.55, 0.72, finish.L[i]) *
+            (1 - smooth(0.2, 0.32, chroma))
+          : 0;
+        sumL += finish.L[i] * guard.weight[i];
+        sumW += guard.weight[i];
+      }
+    }
+    guard.meanL = sumL / sumW;
+  }
+  for (const [cx, cy, radius] of def.guardExcludeCircles ?? []) {
+    for (let y = Math.max(0, cy - radius); y < Math.min(H, cy + radius); y++) {
+      for (
+        let x = Math.max(0, cx - radius);
+        x < Math.min(W, cx + radius);
+        x++
+      ) {
+        if ((x - cx) ** 2 + (y - cy) ** 2 <= radius ** 2)
+          guard.weight[y * W + x] = 0;
+      }
     }
   }
   for (const [rx, ry, rw, rh] of def.guardExclude ?? []) {
@@ -1566,7 +1795,9 @@ async function writePickupSheet(dir) {
 /** Debug sheet: around each head source's nut, ticks every 10 px (labels =
  *  px from the detected nut), the nut in green. */
 async function writeNutSheet(dir) {
-  const ids = [...new Set([...HEADS, ...NECKS].map((h) => h.source))];
+  const ids = [...new Set([...HEADS, ...NECKS].map((h) => h.source))].filter(
+    (id) => cache.has(id),
+  );
   const TW = 260;
   const TH = 140;
   const Z = 2;
@@ -1641,16 +1872,23 @@ async function source(id) {
   return cache.get(id);
 }
 
-const manifest = {
-  neckWidth: NECK_WIDTH,
-  bodies: [],
-  necks: [],
-  heads: [],
-  tops: [],
-};
-for (const def of BODIES) {
+const manifest = ONLY
+  ? JSON.parse(fs.readFileSync(MANIFEST, "utf8"))
+  : {
+      neckWidth: NECK_WIDTH,
+      bodies: [],
+      necks: [],
+      heads: [],
+      tops: [],
+    };
+function savePart(group, part) {
+  const index = manifest[group].findIndex((entry) => entry.key === part.key);
+  if (index < 0) manifest[group].push(part);
+  else manifest[group][index] = part;
+}
+for (const def of BODIES.filter(selected)) {
   const s = await source(def.source);
-  manifest.bodies.push(await buildBody(def, s));
+  savePart("bodies", await buildBody(def, s));
   console.log(
     "body",
     def.key,
@@ -1662,9 +1900,9 @@ for (const def of BODIES) {
     s.neck.nut,
   );
 }
-for (const def of NECKS) {
+for (const def of NECKS.filter(selected)) {
   const s = await source(def.source);
-  manifest.necks.push(await buildNeck(def, s));
+  savePart("necks", await buildNeck(def, s));
   console.log(
     "neck",
     def.key,
@@ -1674,17 +1912,18 @@ for (const def of NECKS) {
     s.neck.joint - s.fretStart,
   );
 }
-for (const def of TOPS) {
+for (const def of TOPS.filter(selected)) {
   const t = await buildTop(def);
-  manifest.tops.push(t);
+  savePart("tops", t);
   console.log("top", def.key, "tile", t.size);
 }
-for (const def of HEADS) {
+for (const def of HEADS.filter(selected)) {
   const s = await source(def.source);
-  manifest.heads.push(await buildHead(def, s));
+  savePart("heads", await buildHead(def, s));
   console.log("head", def.key);
 }
 if (DEBUG_DIR) {
+  fs.mkdirSync(DEBUG_DIR, { recursive: true });
   await writeFretSheet([...cache.values()], DEBUG_DIR);
   await writePickupSheet(DEBUG_DIR);
   await writeNutSheet(DEBUG_DIR);

@@ -1,5 +1,5 @@
 /**
- * Duels: two players, one exercise, 24 hours, best run wins, ELO moves.
+ * Duels: two players, one exercise, 48 hours, best run wins, ELO moves.
  *
  * Everything here is written by the server only (firebase-admin) — the client
  * never reads these collections directly, it gets a masked view through
@@ -23,6 +23,11 @@ export interface DuelPlayer {
   /** Every scored run sent from a duel session, best or not. */
   attempts: number;
   lastAttemptAt: number | null;
+  /**
+   * When the player pressed Ready: their best is final and no more runs land.
+   * Once both have, the duel settles at once instead of waiting for the deadline.
+   */
+  readyAt?: number;
   /** Set on settlement. */
   ratingAfter?: number;
 }
@@ -48,14 +53,15 @@ export interface DuelDoc {
   id: string;
   exerciseId: string;
   status: "active" | "finished";
-  /** When the two were paired — the 24 hours start here. */
+  /** When the two were paired — the 48 hours start here. */
   createdAt: number;
   /** The deadline the players see. */
   endsAt: number;
   /**
    * When the cron may settle it: the deadline plus a grace for a run started
-   * just before it. Present only while the duel is active, so the cron finds
-   * open duels with a single-field range query and no composite index.
+   * just before it — or the moment the second player pressed Ready. Present
+   * only while the duel is active, so the cron finds open duels with a
+   * single-field range query and no composite index.
    */
   settleAt?: number;
   /**
@@ -112,6 +118,8 @@ export interface DuelProfile {
 export interface DuelOpponentHidden {
   revealed: false;
   attempts: number;
+  /** They locked in their best — Ready on your side ends the duel. */
+  isReady: boolean;
 }
 
 /** The other side once the duel is settled. */
@@ -131,6 +139,8 @@ export interface DuelOpponentRevealed {
 
 export interface DuelSelfView {
   attempts: number;
+  /** Locked in: no more runs from this side. */
+  isReady: boolean;
   bestScore: number;
   bestAccuracy: number;
   bestBpm: number | null;
@@ -145,6 +155,8 @@ export interface DuelView {
   status: "active" | "finished";
   createdAt: number;
   endsAt: number;
+  /** When it was settled — before `endsAt` when both pressed Ready. Null while active. */
+  settledAt: number | null;
   me: DuelSelfView;
   opponent: DuelOpponentHidden | DuelOpponentRevealed;
   /** From the viewer's side; null while active. */
@@ -181,6 +193,8 @@ export interface DuelOverview {
   rankedPlayers: number;
   /** Players waiting in the queue right now, the viewer's own tickets excluded. */
   waitingOthers: number;
+  /** Duels running across the whole app right now, the viewer's own included. */
+  liveDuels: number;
 }
 
 export type DuelJoinResult =
@@ -192,6 +206,11 @@ export interface DuelRunSubmission {
   score: number;
   accuracy: number;
   bpm?: number;
+}
+
+export interface DuelReadyResult {
+  /** Both sides are ready — the duel was settled on the spot. */
+  isSettled: boolean;
 }
 
 export interface DuelRunResult {

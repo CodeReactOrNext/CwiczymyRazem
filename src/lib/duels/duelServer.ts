@@ -6,6 +6,7 @@ import type {
   DuelPlayer,
   DuelProfile,
   DuelRankingEntry,
+  DuelReadyResult,
   DuelRunResult,
   DuelRunSubmission,
   DuelTicket,
@@ -13,6 +14,7 @@ import type {
 } from "feature/duels/types/duel.types";
 import {
   canOpenDuel,
+  canPlayerRun,
   DUEL_DURATION_MS,
   DUEL_MIN_LVL,
   DUEL_RANKING_SIZE,
@@ -20,9 +22,10 @@ import {
   DUEL_START_RATING,
   DUEL_SUBMIT_GRACE_MS,
   DUEL_TICKET_TTL_MS,
-  isDuelOpenForRuns,
+  isEveryoneReady,
   liveTickets,
   pickOpponentTicket,
+  readyRefusal,
   settledProfileUpdate,
   settleDuel,
   toDuelView,
@@ -52,7 +55,8 @@ export type DuelErrorCode =
   | "LIMIT"
   | "NOT_FOUND"
   | "FORBIDDEN"
-  | "CLOSED";
+  | "CLOSED"
+  | "NO_RUN";
 
 export class DuelError extends Error {
   constructor(public readonly code: DuelErrorCode) {
@@ -308,7 +312,7 @@ export async function cancelDuelTicket(
 
 /**
  * Books one scored run of a duel session: always an attempt, and the new best
- * when it beats the old one.
+ * when it beats the old one. A player who pressed Ready sends no more.
  */
 export async function submitDuelRun(
   userId: string,
@@ -324,7 +328,7 @@ export async function submitDuelRun(
       const me = duel.players[userId];
       if (!me || !duel.playerIds.includes(userId))
         throw new DuelError("FORBIDDEN");
-      if (!isDuelOpenForRuns(duel, now)) throw new DuelError("CLOSED");
+      if (!canPlayerRun(duel, userId, now)) throw new DuelError("CLOSED");
 
       const score = Math.max(0, Math.round(run.score));
       const isNewBest = score > me.bestScore;
@@ -541,6 +545,53 @@ export async function runDuelCron(now: number = Date.now()) {
   };
 }
 
+// ── Ready ────────────────────────────────────────────────────────────────────
+
+/**
+ * Ready: the player's best is final and no more runs land from them. The
+ * second Ready moves `settleAt` to now and settles the duel on the spot — no
+ * run can be in flight, since neither side takes runs any more. Should that
+ * settlement fail, the cron finds the due `settleAt` on its next pass.
+ */
+export async function markDuelReady(
+  userId: string,
+  duelId: string,
+  now: number = Date.now(),
+): Promise<DuelReadyResult> {
+  const duelRef = duels().doc(duelId) as DocumentReference;
+  const isSettleDue = await firestore.runTransaction(
+    async (tx: Transaction): Promise<boolean> => {
+      const snap = await tx.get(duelRef);
+      if (!snap.exists) throw new DuelError("NOT_FOUND");
+      const duel = snap.data() as DuelDoc;
+      const me = duel.players[userId];
+      if (!me || !duel.playerIds.includes(userId))
+        throw new DuelError("FORBIDDEN");
+      if (me.readyAt) return duel.status === "active" && isEveryoneReady(duel);
+      const refusal = readyRefusal(duel, userId, now);
+      if (refusal) throw new DuelError(refusal);
+
+      const isLast = isEveryoneReady({
+        playerIds: duel.playerIds,
+        players: { ...duel.players, [userId]: { ...me, readyAt: now } },
+      });
+      tx.update(duelRef, {
+        [`players.${userId}.readyAt`]: now,
+        ...(isLast ? { settleAt: now } : {}),
+      });
+      return isLast;
+    },
+  );
+  if (!isSettleDue) return { isSettled: false };
+  try {
+    await settleDuelById(duelId, now);
+    return { isSettled: true };
+  } catch (error) {
+    console.error(`[duels] settling ${duelId} on ready failed`, error);
+    return { isSettled: false };
+  }
+}
+
 // ── Overview ─────────────────────────────────────────────────────────────────
 
 const toRankingEntry = (profile: DuelProfile): DuelRankingEntry => ({
@@ -570,18 +621,25 @@ export async function getDuelOverview(
     (id) => duels().doc(id) as DocumentReference,
   );
 
-  const [duelSnaps, rankingSnap, rankedCount, waitingCount, aboveCount] =
-    await Promise.all([
-      duelRefs.length
-        ? (firestore.getAll(...duelRefs) as Promise<DocumentSnapshot[]>)
-        : Promise.resolve([]),
-      profiles().orderBy("rating", "desc").limit(DUEL_RANKING_SIZE).get(),
-      profiles().where("rating", ">=", 0).count().get(),
-      queue().where("expiresAt", ">", now).count().get(),
-      profile?.rating !== undefined
-        ? profiles().where("rating", ">", profile.rating).count().get()
-        : Promise.resolve(null),
-    ]);
+  const [
+    duelSnaps,
+    rankingSnap,
+    rankedCount,
+    waitingCount,
+    liveCount,
+    aboveCount,
+  ] = await Promise.all([
+    duelRefs.length
+      ? (firestore.getAll(...duelRefs) as Promise<DocumentSnapshot[]>)
+      : Promise.resolve([]),
+    profiles().orderBy("rating", "desc").limit(DUEL_RANKING_SIZE).get(),
+    profiles().where("rating", ">=", 0).count().get(),
+    queue().where("expiresAt", ">", now).count().get(),
+    duels().where("status", "==", "active").count().get(),
+    profile?.rating !== undefined
+      ? profiles().where("rating", ">", profile.rating).count().get()
+      : Promise.resolve(null),
+  ]);
 
   const views = new Map<string, DuelView>();
   for (const snap of duelSnaps) {
@@ -612,6 +670,7 @@ export async function getDuelOverview(
       0,
       waitingCount.data().count - myLiveTickets.length,
     ),
+    liveDuels: liveCount.data().count,
   };
 }
 

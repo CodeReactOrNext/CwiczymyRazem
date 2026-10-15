@@ -301,6 +301,7 @@ describe("evaluateChain", () => {
   it("pays the complete bonus once every playable stage is covered", () => {
     const verdict = verdictFor([
       "Tuner",
+      "Wah",
       "Compressor",
       "Fuzz",
       "Overdrive",
@@ -316,7 +317,7 @@ describe("evaluateChain", () => {
     expect(verdict.complete).toBe(true);
     expect(verdict.flawless).toBe(true);
     expect(verdict.rate).toBe(
-      9 * CHAIN_LINK_FAME + CHAIN_FLAWLESS_FAME + CHAIN_COMPLETE_FAME,
+      10 * CHAIN_LINK_FAME + CHAIN_FLAWLESS_FAME + CHAIN_COMPLETE_FAME,
     );
   });
 

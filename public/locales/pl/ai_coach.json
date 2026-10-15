@@ -162,7 +162,11 @@
     "resume": "Wznów",
     "log_as": "Zapisz czas jako",
     "logging": "Zapisywanie czasu…",
-    "finish": "Zakończ i zapisz czas"
+    "finish": "Zakończ i zapisz czas",
+    "leave_title": "Wyjść z lekcji?",
+    "leave_body": "Masz już {{time}} ćwiczeń, a ten czas nie jest jeszcze zapisany. Stoper i miejsce w filmie zostają zapamiętane, więc możesz otworzyć lekcję ponownie i ćwiczyć dalej.",
+    "leave": "Wyjdź",
+    "keep_practicing": "Ćwiczę dalej"
   },
   "check": {
     "load_failed": "Nie udało się wczytać punktu kontrolnego.",

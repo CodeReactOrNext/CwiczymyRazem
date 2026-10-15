@@ -7,6 +7,7 @@ import {
   getExerciseHistory,
   getExerciseRuns,
 } from "../services/exerciseGoals.service";
+import { getOwnExercises } from "../services/goalExercises.service";
 import type {
   ExerciseGoal,
   ExerciseRun,
@@ -19,6 +20,17 @@ export const exerciseRunsKey = (uid: string | null, exerciseId: string) =>
   ["exercise-runs", uid, exerciseId] as const;
 export const exerciseHistoryKey = (uid: string | null, exerciseId: string) =>
   ["exercise-history", uid, exerciseId] as const;
+export const ownExercisesKey = (uid: string | null) =>
+  ["goal-own-exercises", uid] as const;
+
+/** The exercises the player wrote themselves — the create dialog's second list. */
+export const useOwnExercises = (uid: string | null) =>
+  useQuery({
+    queryKey: ownExercisesKey(uid),
+    queryFn: () => getOwnExercises(uid!),
+    enabled: !!uid,
+    staleTime: 5 * 60 * 1000,
+  });
 
 /** The player's goals, open and reached, with create/delete that refresh the list. */
 export const useExerciseGoals = (uid: string | null) => {

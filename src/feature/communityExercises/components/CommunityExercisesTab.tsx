@@ -50,6 +50,12 @@ const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
       metronomeSpeed: ex.metronomeSpeed,
       relatedSkills: ex.relatedSkills,
       tablature: ex.tablature,
+      // Set on exercises saved from the plan creator instead of the Tab Editor —
+      // without the GP file a published one opens as an empty exercise.
+      videoUrl: ex.videoUrl,
+      imageUrl: ex.imageUrl,
+      gpFileUrl: ex.gpFileUrl,
+      backingTracks: ex.backingTracks,
     },
   ],
   unlockDescription: "",

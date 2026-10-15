@@ -12,7 +12,7 @@ Cel to jedno ćwiczenie i tempo, w którym chcesz je grać, osiągane małymi kr
 
 <ClickPath steps="Postępy|Cele|Nowy cel" caption="Wybierz ćwiczenie, tempo startowe i docelowe, jak czysty musi być przebieg i jak sumują się czyste przebiegi." />
 
-Cele działają na ćwiczeniach, które mają tabulaturę i tempo metronomu, bo to te mikrofon może punktować nuta po nucie. Polowania, wzory strummingu, quizy słuchowe i utwory nie mogą mieć celu.
+Cele działają na ćwiczeniach, które mają tabulaturę i tempo metronomu, bo to te mikrofon może punktować nuta po nucie. Polowania, wzory strummingu, quizy słuchowe i utwory nie mogą mieć celu. Ćwiczenia, które sam napiszesz w Tab Editorze, też się nadają, również prywatne: przełącz listę na **Moje ćwiczenia**.
 
 Tempo startowe zaczyna się na dole zakresu własnego ćwiczenia, a docelowe na górze. Zmień oba na to, co ci pasuje. Pod nimi widzisz kamienie milowe, jakie będzie miał cel. Rosną po 5 BPM, a przy bardzo długiej wspinaczce kroki robią się większe, by ścieżka miała 16 kamieni milowych lub mniej. Każde ćwiczenie ma naraz jeden otwarty cel. Po zapisaniu feed pokazuje ustawiony cel, od tempa startowego do docelowego.
 

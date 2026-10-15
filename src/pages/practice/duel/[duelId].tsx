@@ -16,7 +16,8 @@ import { useAppSelector } from "store/hooks";
 /**
  * A duel run: the duel's exercise, played like any single exercise, with its
  * scored runs sent to the duel. Opened only from the duels page, and only
- * while the duel is still taking runs — anything else goes back there.
+ * while the duel is still taking the player's runs — not after the deadline,
+ * not once they pressed Ready. Anything else goes back there.
  */
 export default function DuelPracticePage() {
   const router = useRouter();
@@ -38,7 +39,12 @@ export default function DuelPracticePage() {
       .then((duel) => {
         if (cancelled) return;
         const found = getDuelExercise(duel.exerciseId);
-        if (duel.status !== "active" || Date.now() >= duel.endsAt || !found) {
+        if (
+          duel.status !== "active" ||
+          duel.me.isReady ||
+          Date.now() >= duel.endsAt ||
+          !found
+        ) {
           router.replace({ pathname: "/duels", query: { duel: duelId } });
           return;
         }

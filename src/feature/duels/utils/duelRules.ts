@@ -15,7 +15,7 @@ export const DUEL_MAX_OPEN = 3;
 /** A ticket nobody answered disappears after this long. */
 export const DUEL_TICKET_TTL_MS = 24 * HOUR_MS;
 /** How long the two have, from the moment they are paired, to set their best. */
-export const DUEL_DURATION_MS = 24 * HOUR_MS;
+export const DUEL_DURATION_MS = 48 * HOUR_MS;
 /**
  * A run started just before the deadline is still played out and sent after
  * it — this long past the deadline it still counts. Settlement waits for it.
@@ -247,8 +247,10 @@ export const toDuelView = (
     status: isFinished ? "finished" : "active",
     createdAt: duel.createdAt,
     endsAt: duel.endsAt,
+    settledAt: isFinished ? duel.outcome!.settledAt : null,
     me: {
       attempts: me.attempts,
+      isReady: !!me.readyAt,
       bestScore: me.bestScore,
       bestAccuracy: me.bestAccuracy,
       bestBpm: me.bestBpm,
@@ -269,7 +271,11 @@ export const toDuelView = (
           ratingBefore: opponent.ratingBefore,
           ratingAfter: opponent.ratingAfter ?? opponent.ratingBefore,
         }
-      : { revealed: false, attempts: opponent.attempts },
+      : {
+          revealed: false,
+          attempts: opponent.attempts,
+          isReady: !!opponent.readyAt,
+        },
     result,
     ratingDelta: isFinished
       ? (me.ratingAfter ?? me.ratingBefore) - me.ratingBefore
@@ -283,3 +289,32 @@ export const isDuelOpenForRuns = (
   now: number,
 ): boolean =>
   duel.status === "active" && now < duel.endsAt + DUEL_SUBMIT_GRACE_MS;
+
+/** Whether `userId` may still send a run: the duel takes runs and they haven't pressed Ready. */
+export const canPlayerRun = (
+  duel: Pick<DuelDoc, "status" | "endsAt" | "players">,
+  userId: string,
+  now: number,
+): boolean => isDuelOpenForRuns(duel, now) && !duel.players[userId]?.readyAt;
+
+export type DuelReadyRefusal = "CLOSED" | "NO_RUN";
+
+/**
+ * Why `userId` can't press Ready now, or null when they can. Ready locks in a
+ * best, so there has to be one; and past the deadline it would change nothing.
+ * Pressing it twice is not refused — the second press is a no-op.
+ */
+export const readyRefusal = (
+  duel: Pick<DuelDoc, "status" | "endsAt" | "players">,
+  userId: string,
+  now: number,
+): DuelReadyRefusal | null => {
+  if (duel.status !== "active" || now >= duel.endsAt) return "CLOSED";
+  if ((duel.players[userId]?.attempts ?? 0) === 0) return "NO_RUN";
+  return null;
+};
+
+/** Both players pressed Ready — nothing left to wait for. */
+export const isEveryoneReady = (
+  duel: Pick<DuelDoc, "playerIds" | "players">,
+): boolean => duel.playerIds.every((id) => !!duel.players[id]?.readyAt);

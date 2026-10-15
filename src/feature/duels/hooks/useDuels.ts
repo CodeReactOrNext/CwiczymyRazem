@@ -4,6 +4,7 @@ import {
   duelOverviewQueryKey,
   fetchDuelOverview,
   joinDuel,
+  markDuelReady,
 } from "feature/duels/services/duels.service";
 import { useEffect, useState } from "react";
 
@@ -35,6 +36,26 @@ export const useCancelDuelTicket = (uid: string | null) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: cancelDuelTicket,
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: duelOverviewQueryKey(uid) }),
+  });
+};
+
+/**
+ * Ready on one duel. `onSettledEarly` runs here rather than on the card: the
+ * refetch that follows drops the settled duel's card before a callback passed
+ * to `mutate` would get to run.
+ */
+export const useMarkDuelReady = (
+  uid: string | null,
+  onSettledEarly?: (duelId: string) => void,
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: markDuelReady,
+    onSuccess: (result, duelId) => {
+      if (result.isSettled) onSettledEarly?.(duelId);
+    },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: duelOverviewQueryKey(uid) }),
   });

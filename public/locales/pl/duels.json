@@ -2,7 +2,7 @@
   "hero": {
     "eyebrow": "Rankingowe 1 na 1",
     "title": "Duele",
-    "subtitle": "Ty i nieznajomy dostajecie to samo ćwiczenie. 24 godziny, ile chcesz podejść — wygrywa lepszy najlepszy wynik, a ELO idzie w górę albo w dół."
+    "subtitle": "Ty i nieznajomy dostajecie to samo ćwiczenie. 48 godzin, ile chcesz podejść — wygrywa lepszy najlepszy wynik, a ELO idzie w górę albo w dół."
   },
   "rating": {
     "label": "ELO",
@@ -29,7 +29,11 @@
     "error": "Nie udało się dołączyć. Spróbuj za chwilę.",
     "ticket": "Szukam rywala",
     "ticket_expires": "Wygasa za {{time}}",
-    "cancel": "Opuść kolejkę"
+    "cancel": "Opuść kolejkę",
+    "live_one": "Trwa teraz {{count}} duel",
+    "live_few": "Trwają teraz {{count}} duele",
+    "live_many": "Trwa teraz {{count}} duelów",
+    "live_other": "Trwa teraz {{count}} duelów"
   },
   "category": {
     "technique": "Technika",
@@ -56,6 +60,20 @@
     "new": "Nowy duel",
     "left": "do końca"
   },
+  "ready": {
+    "badge": "Gotowe",
+    "button": "Gotowe",
+    "confirm_title": "Zatwierdzić {{score}}?",
+    "confirm_body": "To będzie twój ostateczny wynik — nie zagrasz już w tym duelu. Gdy rywal też będzie gotowy, duel skończy się wcześniej.",
+    "confirm_body_last": "Rywal jest już gotowy, więc duel skończy się od razu. Nie zagrasz już w nim.",
+    "confirm": "Zatwierdź",
+    "cancel": "Graj dalej",
+    "locked": "Twój wynik jest zatwierdzony. Duel skończy się, gdy rywal też będzie gotowy — albo gdy minie czas.",
+    "settled": "Obie strony gotowe — duel rozliczony.",
+    "error_no_run": "Najpierw zagraj choć jedno podejście.",
+    "error_closed": "Ten duel nie przyjmuje już podejść.",
+    "error": "Nie udało się zatwierdzić wyniku. Spróbuj za chwilę."
+  },
   "form": {
     "won": "W",
     "lost": "P",
@@ -67,7 +85,7 @@
     "searching": "Szukamy rywala. Dostaniesz powiadomienie, gdy tylko duel się zacznie.",
     "steps": {
       "0": "Znajdź rywala — albo poczekaj, aż ktoś dołączy",
-      "1": "To samo ćwiczenie dla obu, 24 godziny na grę",
+      "1": "To samo ćwiczenie dla obu, 48 godzin na grę",
       "2": "Wygrywa najlepszy wynik, ELO idzie w górę albo w dół"
     }
   },
@@ -95,9 +113,10 @@
   "rules": {
     "0": "Obaj gracze dostają to samo losowe ćwiczenie — technika, teoria na gryfie albo quiz słuchowy.",
     "1": "Ćwiczenia grane wymagają mikrofonu: liczą się tylko podejścia ocenione przez mikrofon. W quizach +100 za dobrą odpowiedź, −100 za złą.",
-    "2": "24 godziny i dowolna liczba podejść. Twój najlepszy wynik to twój rezultat.",
-    "3": "Widzisz, ile prób zrobił rywal — ale nie jego nazwę ani wynik, aż do końca.",
-    "4": "Wygrana z mocniejszym daje więcej ELO. Nie zagrałeś wcale? To porażka.",
+    "2": "48 godzin i dowolna liczba podejść. Twój najlepszy wynik to twój rezultat.",
+    "3": "Skończyłeś przed czasem? Kliknij Gotowe, żeby zatwierdzić najlepszy wynik — potem nie ma już podejść. Gdy obie strony są gotowe, duel kończy się od razu.",
+    "4": "Widzisz, ile prób zrobił rywal — ale nie jego nazwę ani wynik, aż do końca.",
+    "5": "Wygrana z mocniejszym daje więcej ELO. Nie zagrałeś wcale? To porażka.",
     "title": "Jak to działa"
   },
   "error": "Nie udało się wczytać duelów. Odśwież stronę."

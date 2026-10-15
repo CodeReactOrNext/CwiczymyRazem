@@ -135,6 +135,16 @@ interface Anchor {
   nut: number;
 }
 
+/** Freely dragged neighbours can straddle a nominal row boundary. */
+const sideBySide = (a: Anchor, b: Anchor) =>
+  !a.fromTop &&
+  !b.fromTop &&
+  a.outer > b.outer &&
+  a.at.y >= b.edgeTop &&
+  a.at.y <= b.edgeBottom &&
+  b.at.y >= a.edgeTop &&
+  b.at.y <= a.edgeBottom;
+
 /** Every run on this loom bends to the same radius: a fat instrument lead's. */
 const routed = (points: Point[]): string => bent(points, BEND);
 
@@ -330,6 +340,7 @@ const linkRun = (
   b: Anchor,
   reach: number,
 ): string => {
+  if (sideBySide(a, b)) return hopRun(a.at, b.at, reach);
   if (a.row !== b.row) {
     return b.row > a.row ? returnRun(geo, a, b) : looseRun(geo, a.at, b.at);
   }
@@ -412,7 +423,6 @@ const Plug = ({ at: point, spin, metal, reach = PLUG_REACH }: PlugProps) => {
 
   return (
     <g transform={`translate(${at(point)})${turn}`}>
-
       {/* The moulded strain-relief boot, tapering onto the cable. Lifted off
           black so it separates from the deck it lies on rather than reading as
           a hole with a handle floating over it. */}
@@ -670,7 +680,7 @@ export const SignalCable = ({
     // The next pedal stands to the left, so the gap opens up the other way.
     const gap = a.outer - b.outer;
 
-    const facing = a.row === b.row && !a.fromTop && !b.fromTop && gap > 0;
+    const facing = sideBySide(a, b);
 
     return {
       a,
@@ -896,15 +906,17 @@ export const SignalCable = ({
           );
         })}
 
-        {couplers.map((link, index) => (
-          <Coupler
-            key={`coupler-${index}`}
-            from={link.a.at}
-            to={link.b.at}
-            tone={toneFor(link.ok)}
-            metal={`url(#${metalDown})`}
-          />
-        ))}
+        {couplers
+          .filter((link) => !link.a.nut && !link.b.nut)
+          .map((link, index) => (
+            <Coupler
+              key={`coupler-${index}`}
+              from={link.a.at}
+              to={link.b.at}
+              tone={toneFor(link.ok)}
+              metal={`url(#${metalDown})`}
+            />
+          ))}
 
         {plugs.map(
           (plug, index) =>
@@ -922,13 +934,25 @@ export const SignalCable = ({
 
       {/* The plugs that cover a nut have to stand over the pedals, not under
           them with the rest of the loom. They borrow its gradients. */}
-      {plugs.some((plug) => plug.raised) && (
+      {(plugs.some((plug) => plug.raised) ||
+        couplers.some((link) => link.a.nut || link.b.nut)) && (
         <svg
           viewBox={`0 0 ${geo.viewW} ${geo.viewH}`}
           preserveAspectRatio='none'
           className='pointer-events-none absolute inset-0 h-full w-full'
           style={{ zIndex: 3 }}
           aria-hidden>
+          {couplers
+            .filter((link) => link.a.nut || link.b.nut)
+            .map((link, index) => (
+              <Coupler
+                key={`raised-coupler-${index}`}
+                from={{ x: link.a.at.x + link.a.nut, y: link.a.at.y }}
+                to={{ x: link.b.at.x - link.b.nut, y: link.b.at.y }}
+                tone={toneFor(link.ok)}
+                metal={`url(#${metalDown})`}
+              />
+            ))}
           {plugs.map(
             (plug, index) =>
               plug.raised && (

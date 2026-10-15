@@ -47,7 +47,7 @@
   "joined": "se unió a Riff Quest",
   "joined_with": "se unió a Riff Quest, {{phrase}}",
   "completed_daily_quests": "ha completado todas las {{quests}}",
-  "daily_quests": "¡misiones diarias!",
+  "daily_quests": "misiones diarias",
   "session_time_hint": "Tiempo de práctica registrado en esta sesión",
   "level_short": "nv. {{level}}",
   "plan_hint": "Haz clic para ver qué practica este plan",

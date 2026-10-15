@@ -439,6 +439,131 @@
         "y": 181
       },
       "singleCoils": []
+    },
+    {
+      "key": "junior-honey",
+      "name": "Junior Honey",
+      "src": "/images/guitar-builder/bodies/junior-honey.webp",
+      "maps": "/images/guitar-builder/bodies/junior-honey.maps.webp",
+      "surface": "/images/guitar-builder/bodies/junior-honey.surface.webp",
+      "width": 620,
+      "height": 490,
+      "jointX": 619,
+      "axisY": 244.1,
+      "fretStartX": 510,
+      "finishHue": 42.2,
+      "finishL": 0.54,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0,
+        "mid": 0.018,
+        "hi": 0.586
+      },
+      "stickerSpot": {
+        "x": 116,
+        "y": 240
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "osprey-tobacco",
+      "name": "Osprey Tobacco",
+      "src": "/images/guitar-builder/bodies/osprey-tobacco.webp",
+      "maps": "/images/guitar-builder/bodies/osprey-tobacco.maps.webp",
+      "surface": "/images/guitar-builder/bodies/osprey-tobacco.surface.webp",
+      "width": 703,
+      "height": 521,
+      "jointX": 702,
+      "axisY": 263.2,
+      "fretStartX": 517,
+      "finishHue": 26.5,
+      "finishL": 0.288,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.578,
+        "mid": 0.759,
+        "hi": 0.788
+      },
+      "stickerSpot": {
+        "x": 178,
+        "y": 105
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "aurelis-walnut",
+      "name": "Aurelis Walnut",
+      "src": "/images/guitar-builder/bodies/aurelis-walnut.webp",
+      "maps": "/images/guitar-builder/bodies/aurelis-walnut.maps.webp",
+      "surface": "/images/guitar-builder/bodies/aurelis-walnut.surface.webp",
+      "width": 675,
+      "height": 547,
+      "jointX": 674,
+      "axisY": 272.5,
+      "fretStartX": 586,
+      "finishHue": 20.2,
+      "finishL": 0.251,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.457,
+        "mid": 0.604,
+        "hi": 0.741
+      },
+      "stickerSpot": {
+        "x": 127,
+        "y": 251
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "aurelis-pearl",
+      "name": "Aurelis Pearl",
+      "src": "/images/guitar-builder/bodies/aurelis-pearl.webp",
+      "maps": "/images/guitar-builder/bodies/aurelis-pearl.maps.webp",
+      "surface": "/images/guitar-builder/bodies/aurelis-pearl.surface.webp",
+      "width": 674,
+      "height": 555,
+      "jointX": 673,
+      "axisY": 275.9,
+      "fretStartX": 555,
+      "finishHue": 36.1,
+      "finishL": 0.861,
+      "pickguardL": null,
+      "pickupTone": {
+        "lo": 0.433,
+        "mid": 0.624,
+        "hi": 0.745
+      },
+      "stickerSpot": {
+        "x": 113,
+        "y": 276
+      },
+      "singleCoils": []
+    },
+    {
+      "key": "jazzcaster-coral",
+      "name": "Jazzcaster Coral",
+      "src": "/images/guitar-builder/bodies/jazzcaster-coral.webp",
+      "maps": "/images/guitar-builder/bodies/jazzcaster-coral.maps.webp",
+      "surface": "/images/guitar-builder/bodies/jazzcaster-coral.surface.webp",
+      "width": 781,
+      "height": 556,
+      "jointX": 780,
+      "axisY": 280.7,
+      "fretStartX": 584,
+      "finishHue": 8.1,
+      "finishL": 0.669,
+      "pickguardL": 0.861,
+      "pickupTone": {
+        "lo": 0.502,
+        "mid": 0.888,
+        "hi": 0.914
+      },
+      "stickerSpot": {
+        "x": 228,
+        "y": 116
+      },
+      "singleCoils": []
     }
   ],
   "necks": [
@@ -529,6 +654,28 @@
       "axisY": 52.3,
       "nutX": 745,
       "nutWidth": 73.2
+    },
+    {
+      "key": "junior-dots",
+      "name": "Junior · dots",
+      "src": "/images/guitar-builder/necks/junior-dots.webp",
+      "width": 711,
+      "height": 104,
+      "jointX": 109,
+      "axisY": 52.1,
+      "nutX": 710,
+      "nutWidth": 68.9
+    },
+    {
+      "key": "aurelis-blocks",
+      "name": "Aurelis · blocks",
+      "src": "/images/guitar-builder/necks/aurelis-blocks.webp",
+      "width": 713,
+      "height": 104,
+      "jointX": 118,
+      "axisY": 52.9,
+      "nutX": 712,
+      "nutWidth": 72.9
     }
   ],
   "heads": [
@@ -601,6 +748,16 @@
       "nutX": 3,
       "axisY": 83.1,
       "nutWidth": 68
+    },
+    {
+      "key": "aurelis-gold",
+      "name": "Aurelis · gold tuners",
+      "src": "/images/guitar-builder/heads/aurelis-gold.webp",
+      "width": 240,
+      "height": 198,
+      "nutX": 3,
+      "axisY": 95,
+      "nutWidth": 72.9
     }
   ],
   "tops": [

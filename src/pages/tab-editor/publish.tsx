@@ -29,6 +29,7 @@ import {
   Check,
   ChevronDown,
   Compass,
+  FileMusic,
   Globe,
   Lock,
   Plus,
@@ -130,8 +131,15 @@ const PublishExercisePage: NextPageWithLayout = () => {
   // changes" came back as "Publish exercise" and the filled-in details were
   // replaced by an empty form.
   const editorHref = editId ? `/tab-editor?edit=${editId}` : "/tab-editor";
+  // Set by the "Publish" button on My Exercises when the exercise still needs
+  // details filled in — the form opens with Public already picked.
+  const publishRequested = router.query.publish === "1";
 
   const [tablature, setTablature] = useState<TablatureMeasure[]>([]);
+  // A Guitar Pro upload from the plan creator. The Tab Editor can't open those,
+  // so the way back leads to My Exercises instead of an empty grid.
+  const [hasGpFile, setHasGpFile] = useState(false);
+  const backHref = hasGpFile ? "/my-exercises" : editorHref;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<ExerciseCategory>("technique");
@@ -172,11 +180,12 @@ const PublishExercisePage: NextPageWithLayout = () => {
       }
       setInstructions(ex.instructions?.length ? ex.instructions : [""]);
       setTips(ex.tips?.length ? ex.tips : [""]);
-      setIsPublic(ex.isPublic);
+      setIsPublic(ex.isPublic || publishRequested);
+      setHasGpFile(!!ex.gpFileUrl);
       // Fall back to the saved tablature if the editor draft was lost.
       setTablature((prev) => (prev.length > 0 ? prev : (ex.tablature ?? [])));
     });
-  }, [editId]);
+  }, [editId, publishRequested]);
 
   // Some exercises genuinely have no tab (they're driven by their steps alone),
   // so an untouched grid from the editor is a valid submission — it's just
@@ -347,9 +356,13 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   ? t("publish.view_library")
                   : t("publish.view_mine")}
             </Button>
-            <Button variant='secondary' onClick={() => router.push(editorHref)}>
-              {t("publish.back_editor")}
-            </Button>
+            {!hasGpFile && (
+              <Button
+                variant='secondary'
+                onClick={() => router.push(editorHref)}>
+                {t("publish.back_editor")}
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -365,8 +378,10 @@ const PublishExercisePage: NextPageWithLayout = () => {
         {/* Header */}
         <div className='space-y-4'>
           <BackLink
-            label={t("publish.back_editor")}
-            onClick={() => router.push(editorHref)}
+            label={
+              hasGpFile ? t("my_exercises.back") : t("publish.back_editor")
+            }
+            onClick={() => router.push(backHref)}
           />
           <div>
             <h1 className='text-3xl font-black tracking-tight text-zinc-100'>
@@ -382,8 +397,26 @@ const PublishExercisePage: NextPageWithLayout = () => {
           <div className='min-w-0 space-y-8'>
             {/* Tablature preview */}
             <FormSection
-              title={hasTab ? t("publish.tab_preview") : t("publish.no_tab")}>
-              {hasTab ? (
+              title={
+                hasGpFile
+                  ? t("publish.gp_tab")
+                  : hasTab
+                    ? t("publish.tab_preview")
+                    : t("publish.no_tab")
+              }>
+              {hasGpFile ? (
+                <div className='flex items-start gap-3 rounded-lg bg-zinc-950/40 p-4'>
+                  <FileMusic size={16} className='mt-0.5 shrink-0 text-cyan-400' />
+                  <div className='space-y-1'>
+                    <p className='text-sm text-zinc-300'>
+                      {t("publish.gp_tab_body")}
+                    </p>
+                    <p className='text-xs leading-relaxed text-zinc-500'>
+                      {t("publish.gp_tab_hint")}
+                    </p>
+                  </div>
+                </div>
+              ) : hasTab ? (
                 <div className='space-y-2'>
                   <div className='overflow-hidden rounded-lg'>
                     <TablatureViewer
@@ -807,12 +840,17 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   </span>
                 </div>
                 <p className='text-xs leading-relaxed text-zinc-500'>
-                  {t("publish.summary_line", {
-                    count: tablature.length,
-                    measures: tablature.length,
-                    minutes: timeInMinutes,
-                    bpm: bpmRecommended,
-                  })}
+                  {hasGpFile
+                    ? t("publish.summary_line_gp", {
+                        minutes: timeInMinutes,
+                        bpm: bpmRecommended,
+                      })
+                    : t("publish.summary_line", {
+                        count: tablature.length,
+                        measures: tablature.length,
+                        minutes: timeInMinutes,
+                        bpm: bpmRecommended,
+                      })}
                   {selectedSkills.length > 0 &&
                     ` · ${t("publish.skills_count", { count: selectedSkills.length })}`}
                 </p>
@@ -907,7 +945,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 </Button>
                 <Button
                   variant='secondary'
-                  onClick={() => router.push(editorHref)}
+                  onClick={() => router.push(backHref)}
                   className='w-full'>
                   {t("cancel")}
                 </Button>

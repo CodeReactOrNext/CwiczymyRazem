@@ -1,9 +1,9 @@
 import { Card } from "assets/components/ui/card";
 import { useTranslation } from "hooks/useTranslation";
 
-const RULE_COUNT = 5;
+const RULE_COUNT = 6;
 
-/** The whole format in five numbered lines — what a first-time player needs before joining. */
+/** The whole format in six numbered lines — what a first-time player needs before joining. */
 export const DuelRules = () => {
   const { t } = useTranslation("duels");
   return (

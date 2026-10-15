@@ -156,7 +156,11 @@
     "resume": "Resume",
     "log_as": "Log time as",
     "logging": "Logging time…",
-    "finish": "Finish & log time"
+    "finish": "Finish & log time",
+    "leave_title": "Leave this lesson?",
+    "leave_body": "You've practiced {{time}} and it isn't logged yet. Your timer and your spot in the video are saved, so you can reopen the lesson and carry on.",
+    "leave": "Leave",
+    "keep_practicing": "Keep practicing"
   },
   "check": {
     "load_failed": "Could not load the checkpoint.",

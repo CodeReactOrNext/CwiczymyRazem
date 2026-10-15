@@ -15,8 +15,12 @@ import {
 
 export type PlaybackLeakSource = "probe" | "pilot";
 
-/** The probe's peak relative to the tab sound's own level — about a note's. */
-const PROBE_LEVEL = 0.3;
+/** The probe's peak relative to the tab sound's own level. A pure sweep at
+ *  1.5–5 kHz, where the ear is keenest, sounds far louder than a guitar note of
+ *  the same peak; at 0.3 it was a shrill whistle on every start. At 0.08 it
+ *  still reads 0.5+ through a quiet speaker in a noisy room, against the 0.3
+ *  threshold. */
+const PROBE_LEVEL = 0.08;
 /** The pilot relative to the tab sound's level: far under it, and near-ultrasonic. */
 const PILOT_LEVEL = 0.02;
 /** The probe goes out this long after the tab sound comes on. */

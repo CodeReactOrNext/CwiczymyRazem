@@ -33,30 +33,37 @@ export const DuelsView = () => {
   const now = useNow();
   const { data: overview, isLoading, isError } = useDuelOverview(uid);
 
-  // A duel opened from a notification (?duel=…), or the one just paired.
+  // A duel opened from a notification (?duel=…), the one just paired, or the
+  // one both players just finished early.
   const [lastJoin, setLastJoin] = useState<DuelJoinResult | null>(null);
+  const [settledId, setSettledId] = useState<string | null>(null);
   const justPairedId = lastJoin?.kind === "matched" ? lastJoin.duelId : null;
   const linkedId =
     typeof router.query.duel === "string" ? router.query.duel : null;
-  const highlightedId = justPairedId ?? linkedId;
+  const highlightedId = settledId ?? justPairedId ?? linkedId;
   const hasOverview = !!overview;
+
+  const active = overview?.active ?? [];
+  const recent = overview?.recent ?? [];
+  // A duel settled early moves from the cards to the recent list — scroll again once it lands there.
+  const isHighlightedRecent = recent.some((duel) => duel.id === highlightedId);
 
   useEffect(() => {
     if (!highlightedId || !hasOverview) return;
     document
       .getElementById(`duel-${highlightedId}`)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [highlightedId, hasOverview]);
-
-  const active = overview?.active ?? [];
-  const recent = overview?.recent ?? [];
+  }, [highlightedId, hasOverview, isHighlightedRecent]);
 
   const queueCard = (
     <DuelQueueCard
       uid={uid}
       overview={overview}
       now={now}
-      onJoined={setLastJoin}
+      onJoined={(result) => {
+        setSettledId(null);
+        setLastJoin(result);
+      }}
     />
   );
 
@@ -72,11 +79,13 @@ export const DuelsView = () => {
 
       {/* Screen readers hear how the button press went; the page shows it as the new card or ticket. */}
       <p className='sr-only' role='status'>
-        {lastJoin
-          ? lastJoin.kind === "matched"
-            ? t("queue.matched")
-            : t("queue.queued")
-          : ""}
+        {settledId
+          ? t("ready.settled")
+          : lastJoin
+            ? lastJoin.kind === "matched"
+              ? t("queue.matched")
+              : t("queue.queued")
+            : ""}
       </p>
 
       <div className='grid grid-cols-1 gap-6 px-4 pb-16 pt-6 md:px-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-8 lg:px-10'>
@@ -102,12 +111,14 @@ export const DuelsView = () => {
                 {active.map((duel) => (
                   <ActiveDuelCard
                     key={duel.id}
+                    uid={uid}
                     duel={duel}
                     now={now}
                     myName={myName}
                     myAvatar={myAvatar}
                     isHighlighted={duel.id === linkedId}
                     isNew={duel.id === justPairedId}
+                    onSettledEarly={setSettledId}
                   />
                 ))}
               </section>

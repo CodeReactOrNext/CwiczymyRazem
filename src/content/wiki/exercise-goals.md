@@ -12,7 +12,7 @@ A goal is one exercise and the tempo you want to play it at, reached in small st
 
 <ClickPath steps="Progress|Goals|New goal" caption="Pick an exercise, the start tempo and the goal tempo, how clean a run must be and how the clean runs add up." />
 
-Goals work on exercises that have a tablature and a metronome tempo, because those are the ones the microphone can score note by note. Hunts, strumming patterns, listening quizzes and songs can't take a goal.
+Goals work on exercises that have a tablature and a metronome tempo, because those are the ones the microphone can score note by note. Hunts, strumming patterns, listening quizzes and songs can't take a goal. Exercises you wrote yourself in the Tab Editor work too, private ones included: switch the list to **My Exercises**.
 
 The start tempo begins at the bottom of the exercise's own range and the goal tempo at the top. Change both to whatever fits you. Under them you see the milestones the goal will have. They go up 5 BPM at a time, and on a very long climb the steps get bigger so the path stays at 16 milestones or fewer. Each exercise holds one open goal at a time. Once you save, the feed shows the goal you set, from the start tempo to the goal tempo.
 

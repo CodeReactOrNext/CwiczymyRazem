@@ -49,21 +49,24 @@ const settled = (
   result: DuelView["result"],
   ratingBefore: number,
   ratingAfter: number,
+  settledAt: number = endsAt,
 ): DuelView => ({
   id: `d${endsAt}`,
   exerciseId: "chicken_pickin",
   status: "finished",
   createdAt: endsAt - 1,
   endsAt,
+  settledAt,
   me: {
     attempts: 1,
+    isReady: false,
     bestScore: 1,
     bestAccuracy: 0,
     bestBpm: null,
     ratingBefore,
     ratingAfter,
   },
-  opponent: { revealed: false, attempts: 1 },
+  opponent: { revealed: false, attempts: 1, isReady: false },
   result,
   ratingDelta: ratingAfter - ratingBefore,
 });
@@ -86,6 +89,14 @@ describe("recentForm", () => {
 describe("ratingTrail", () => {
   it("starts before the first duel and follows every rating after", () => {
     expect(ratingTrail(recent)).toEqual([1000, 1016, 1000, 1020]);
+  });
+
+  it("follows the order duels were settled in, not their deadlines", () => {
+    // The later duel was finished early by both players and settled first.
+    const early = settled(10, "won", 1000, 1016, 1);
+    const late = settled(5, "lost", 1016, 1000, 6);
+    expect(ratingTrail([late, early])).toEqual([1000, 1016, 1000]);
+    expect(recentForm([late, early])).toEqual(["won", "lost"]);
   });
 
   it("is empty without a settled duel", () => {

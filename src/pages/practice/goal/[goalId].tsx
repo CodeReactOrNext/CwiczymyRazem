@@ -1,7 +1,7 @@
 import { GoalRunVerdict } from "feature/exerciseGoals/components/GoalRunVerdict";
 import { getExerciseGoal, recordGoalRun } from "feature/exerciseGoals/services/exerciseGoals.service";
+import { getGoalExercise } from "feature/exerciseGoals/services/goalExercises.service";
 import type { ExerciseGoal } from "feature/exerciseGoals/types/exerciseGoal.types";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import type { GoalRunConfig } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -42,9 +42,9 @@ export default function GoalPracticePage() {
     if (!goalId) return undefined;
     let cancelled = false;
     getExerciseGoal(userAuth, goalId)
-      .then((fetched) => {
+      .then(async (fetched) => {
+        const found = fetched?.status === "active" ? await getGoalExercise(fetched.exerciseId) : null;
         if (cancelled) return;
-        const found = fetched && exercisesAgregat.find((candidate) => candidate.id === fetched.exerciseId);
         if (!fetched || fetched.status !== "active" || !found) {
           router.replace("/goals");
           return;

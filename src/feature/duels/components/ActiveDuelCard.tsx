@@ -3,21 +3,37 @@ import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { AttemptTicks, DuelCountdown } from "feature/duels/components/DuelBits";
 import { getDuelExercise } from "feature/duels/data/duelPool";
+import { useMarkDuelReady } from "feature/duels/hooks/useDuels";
+import { duelErrorCode } from "feature/duels/services/duels.service";
 import type { DuelView } from "feature/duels/types/duel.types";
-import {
-  DUEL_DURATION_MS,
-  DUEL_REMIND_BEFORE_MS,
-} from "feature/duels/utils/duelRules";
+import { DUEL_REMIND_BEFORE_MS } from "feature/duels/utils/duelRules";
 import { TabPreviewGlyph } from "feature/landing/components/TabPreviewGlyph";
 import { getTabPreview } from "feature/landing/lib/tabPreview";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
-import { EyeOff, Play, UserRound } from "lucide-react";
+import { Check, EyeOff, Loader2, Play, UserRound } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+
+/** "Ready" next to an attempt count — that side's best is final. */
+const ReadyMark = () => {
+  const { t } = useTranslation("duels");
+  return (
+    <>
+      <span className='text-zinc-700' aria-hidden='true'>
+        ·
+      </span>
+      <span className='inline-flex items-center gap-1 font-medium text-emerald-400'>
+        <Check size={12} className='shrink-0' />
+        {t("ready.badge")}
+      </span>
+    </>
+  );
+};
 
 interface ActiveDuelCardProps {
+  uid: string | null;
   duel: DuelView;
   now: number;
   myName: string;
@@ -26,22 +42,29 @@ interface ActiveDuelCardProps {
   isHighlighted?: boolean;
   /** Paired a moment ago — slides in and says so. */
   isNew?: boolean;
+  /** Both pressed Ready and the duel settled on the spot. */
+  onSettledEarly?: (duelId: string) => void;
 }
 
 /**
  * One running duel as a face-off: you on the left with your best run, the
  * opponent on the right as nothing but a silhouette and a row of attempts,
- * the clock burning down along the top edge until the 24 hours are up.
+ * the clock burning down along the top edge until the time is up. Ready locks
+ * your best in; when both sides are ready the duel ends early.
  */
 export const ActiveDuelCard = ({
+  uid,
   duel,
   now,
   myName,
   myAvatar,
   isHighlighted,
   isNew,
+  onSettledEarly,
 }: ActiveDuelCardProps) => {
   const { t } = useTranslation("duels");
+  const ready = useMarkDuelReady(uid, onSettledEarly);
+  const [isConfirming, setIsConfirming] = useState(false);
   const intlLocale = useIntlLocale();
   const exercise = getDuelExercise(duel.exerciseId);
   const tabPreview = useMemo(
@@ -52,9 +75,29 @@ export const ActiveDuelCard = ({
   const msLeft = duel.endsAt - now;
   const isOver = msLeft <= 0;
   const isEnding = !isOver && msLeft <= DUEL_REMIND_BEFORE_MS;
-  const share = Math.max(0, Math.min(1, msLeft / DUEL_DURATION_MS));
+  // From the duel's own length, so one paired under an older limit reads right.
+  const share = Math.max(
+    0,
+    Math.min(1, msLeft / Math.max(1, duel.endsAt - duel.createdAt)),
+  );
   const hasPlayed = duel.me.attempts > 0;
+  const isReady = duel.me.isReady;
   const opponentAttempts = duel.opponent.attempts;
+  const isOpponentReady = !duel.opponent.revealed && duel.opponent.isReady;
+
+  const readyErrorCode = ready.isError ? duelErrorCode(ready.error) : null;
+  const readyErrorText =
+    readyErrorCode === "NO_RUN"
+      ? t("ready.error_no_run")
+      : readyErrorCode === "CLOSED"
+        ? t("ready.error_closed")
+        : ready.isError
+          ? t("ready.error")
+          : null;
+
+  // Runs after the refetch, so the card goes straight from the question to "locked in".
+  const lockIn = () =>
+    ready.mutate(duel.id, { onSuccess: () => setIsConfirming(false) });
   const myRunDetails = [
     duel.me.bestAccuracy > 0 ? `${duel.me.bestAccuracy}%` : null,
     duel.me.bestBpm ? `${duel.me.bestBpm} BPM` : null,
@@ -73,7 +116,7 @@ export const ActiveDuelCard = ({
           "scroll-mt-24 overflow-hidden p-0 transition-colors",
           isHighlighted || isNew ? "bg-zinc-800/60" : "bg-zinc-900/60",
         )}>
-        {/* The fuse: what is left of the 24 hours, orange once the reminder is due. */}
+        {/* The fuse: what is left of the duel, orange once the reminder is due. */}
         <div className='h-1 w-full bg-zinc-800/80'>
           <div
             className={cn(
@@ -152,8 +195,9 @@ export const ActiveDuelCard = ({
               <div className='mt-3 flex min-h-2.5 items-center'>
                 <AttemptTicks count={duel.me.attempts} />
               </div>
-              <p className='mt-1.5 text-xs tabular-nums text-zinc-500'>
+              <p className='mt-1.5 flex flex-wrap items-center gap-x-1.5 text-xs tabular-nums text-zinc-500'>
                 {t("active.attempts", { count: duel.me.attempts })}
+                {isReady && <ReadyMark />}
               </p>
             </div>
 
@@ -193,28 +237,88 @@ export const ActiveDuelCard = ({
               </div>
               <p
                 className={cn(
-                  "mt-1.5 text-xs tabular-nums",
+                  "mt-1.5 flex flex-wrap items-center justify-end gap-x-1.5 text-xs tabular-nums",
                   opponentAttempts > 0 ? "text-zinc-400" : "text-zinc-500",
                 )}>
                 {opponentAttempts > 0
                   ? t("active.attempts", { count: opponentAttempts })
                   : t("active.not_played")}
+                {isOpponentReady && <ReadyMark />}
               </p>
             </div>
           </div>
 
           <div className='mt-8'>
-            {isOver ? (
+            {isOver || (isReady && isOpponentReady) ? (
               <span className='inline-flex h-11 items-center rounded-lg bg-zinc-800/60 px-5 text-sm font-semibold text-zinc-400'>
                 {t("active.settling_short")}
               </span>
+            ) : isReady ? (
+              <p className='max-w-lg rounded-lg bg-zinc-800/40 px-4 py-3 text-sm leading-relaxed text-zinc-300'>
+                {t("ready.locked")}
+              </p>
+            ) : isConfirming ? (
+              // Ready can't be taken back, so it asks once — in place, not in a dialog.
+              <div className='rounded-lg bg-zinc-800/40 p-4 sm:p-5'>
+                <p className='text-sm font-semibold text-zinc-100'>
+                  {t("ready.confirm_title", {
+                    score: duel.me.bestScore.toLocaleString(intlLocale),
+                  })}
+                </p>
+                <p className='mt-1.5 max-w-lg text-sm leading-relaxed text-zinc-400'>
+                  {isOpponentReady
+                    ? t("ready.confirm_body_last")
+                    : t("ready.confirm_body")}
+                </p>
+                <div className='mt-4 flex flex-wrap items-center gap-3'>
+                  <button
+                    type='button'
+                    onClick={lockIn}
+                    disabled={ready.isPending}
+                    className='inline-flex h-11 items-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-200'>
+                    {ready.isPending ? (
+                      <Loader2 size={16} className='animate-spin' />
+                    ) : (
+                      <Check size={16} />
+                    )}
+                    {t("ready.confirm")}
+                  </button>
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setIsConfirming(false);
+                      ready.reset();
+                    }}
+                    disabled={ready.isPending}
+                    className='inline-flex h-11 items-center rounded-lg px-4 text-sm font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 disabled:opacity-50 hover:bg-zinc-800 hover:text-zinc-100'>
+                    {t("ready.cancel")}
+                  </button>
+                </div>
+              </div>
             ) : (
-              <Link
-                href={`/practice/duel/${duel.id}`}
-                className='inline-flex h-11 items-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 hover:bg-zinc-200'>
-                <Play size={16} className='fill-current' />
-                {hasPlayed ? t("active.beat_best") : t("active.play")}
-              </Link>
+              <div className='flex flex-wrap items-center gap-3'>
+                <Link
+                  href={`/practice/duel/${duel.id}`}
+                  className='inline-flex h-11 items-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 hover:bg-zinc-200'>
+                  <Play size={16} className='fill-current' />
+                  {hasPlayed ? t("active.beat_best") : t("active.play")}
+                </Link>
+                {/* Only with a run to lock in — Ready with nothing played would just hand over a walkover. */}
+                {hasPlayed && (
+                  <button
+                    type='button'
+                    onClick={() => setIsConfirming(true)}
+                    className='inline-flex h-11 items-center gap-2 rounded-lg bg-zinc-800 px-5 text-sm font-semibold text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 hover:bg-zinc-700'>
+                    <Check size={16} />
+                    {t("ready.button")}
+                  </button>
+                )}
+              </div>
+            )}
+            {readyErrorText && (
+              <p role='alert' className='mt-3 text-sm text-orange-300'>
+                {readyErrorText}
+              </p>
             )}
           </div>
         </div>

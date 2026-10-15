@@ -12,7 +12,7 @@ Un objetivo es un ejercicio y el tempo al que quieres tocarlo, alcanzado en pequ
 
 <ClickPath steps="Progreso|Objetivos|Nuevo objetivo" caption="Elige un ejercicio, el tempo de inicio y el objetivo, lo limpia que debe ser una pasada y cómo se suman las pasadas limpias." />
 
-Los objetivos funcionan con ejercicios que tienen tablatura y tempo de metrónomo, porque son los que el micrófono puede puntuar nota a nota. Las cazas, los patrones de rasgueo, los quizzes auditivos y las canciones no pueden tener un objetivo.
+Los objetivos funcionan con ejercicios que tienen tablatura y tempo de metrónomo, porque son los que el micrófono puede puntuar nota a nota. Las cazas, los patrones de rasgueo, los quizzes auditivos y las canciones no pueden tener un objetivo. Los ejercicios que escribiste tú en el Tab Editor también sirven, incluidos los privados: cambia la lista a **Mis ejercicios**.
 
 El tempo de inicio empieza en el extremo bajo del rango del propio ejercicio y el tempo objetivo en el alto. Cambia ambos a lo que te venga bien. Debajo ves las etapas que tendrá el objetivo. Suben de 5 en 5 BPM, y en una subida muy larga los pasos se hacen mayores para que el camino se quede en 16 etapas o menos. Cada ejercicio mantiene un único objetivo abierto a la vez. Al guardar, el feed muestra el objetivo que fijaste, del tempo de inicio al tempo objetivo.
 

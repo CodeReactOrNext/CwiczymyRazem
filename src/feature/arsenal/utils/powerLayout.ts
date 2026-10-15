@@ -225,6 +225,8 @@ export interface DcTarget {
   row: number;
   /** The DC socket on its top edge. */
   jack: Point;
+  /** Actual enclosure top, independent of the nearest nominal board row. */
+  top?: number;
   /** The pedal's own edges, so its own box can be left out of a gap search. */
   left: number;
   right: number;
@@ -325,10 +327,13 @@ export const powerRun = (
 
   let here: Point = { x: socket.x, y: lane };
   for (let above = 0; above < target.row; above++) {
+    const channel = channelLaneFor(geo, above, socket.index);
+    // Free dragging can put a tall pedal above the channel of its nearest row.
+    // Do not approach its top-mounted inlet from underneath its own artwork.
+    if (channel >= (target.top ?? target.jack.y)) break;
     // A row with no gap at all hands back the pedal's own x, which at least
     // hides the drop under the artwork instead of ruling it across the face.
     const riser = risers[above] ?? target.jack.x;
-    const channel = channelLaneFor(geo, above, socket.index);
     points.push(
       // The one leg long enough to hang under its own weight is the one that
       // gets a sag. A cable crossing a board never lies flat.
