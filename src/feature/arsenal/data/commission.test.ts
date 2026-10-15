@@ -5,6 +5,7 @@ import type {
   ScrapPart,
   WorkshopKind,
 } from "../types/arsenal.types";
+import { GUITAR_CHANCE } from "../utils/caseRoll";
 import { NEW_ITEM_BIAS } from "../utils/openDraw";
 import { CASE_DEFINITIONS } from "./caseDefinitions";
 import {
@@ -94,10 +95,10 @@ const caseLastOne = (kind: WorkshopKind, rarity: SellableRarity): number => {
   );
 };
 
-/** Share of an unlocked case's pulls that land on each kind — `open-case.ts`. */
+/** Share of an unlocked case's pulls that land on each kind — `GUITAR_CHANCE`. */
 const UNLOCKED_KIND_SHARE: Record<WorkshopKind, number> = {
-  guitar: 0.6,
-  effect: 0.4,
+  guitar: GUITAR_CHANCE,
+  effect: 1 - GUITAR_CHANCE,
 };
 
 /** Tiers the re-roll in `drawOpenRarity` may redirect a pull onto. */

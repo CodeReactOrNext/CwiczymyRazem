@@ -153,7 +153,9 @@
       "standard": "Standard",
       "premium": "Premium",
       "elite": "Elite",
-      "supporter": "Supporter"
+      "supporter": "Supporter",
+      "vault": "Vault",
+      "parts": "Teile"
     },
     "defs": {
       "standard": {
@@ -189,7 +191,29 @@
         "name": "Elite-Effektkiste",
         "title": "{{tier}}-Effektkiste",
         "description": "Den engagiertesten Spielern vorbehalten."
+      },
+      "vault-guitar": {
+        "name": "Vault-Gitarrenkiste",
+        "title": "{{tier}}-Gitarrenkiste",
+        "description": "Episch oder besser, jedes Mal."
+      },
+      "vault-effect": {
+        "name": "Vault-Effektkiste",
+        "title": "{{tier}}-Effektkiste",
+        "description": "Episch oder besser, jedes Mal."
+      },
+      "parts": {
+        "name": "Teile-Kiste",
+        "title": "Kiste für {{tier}}",
+        "description": "Nur Teile für den Gitarren-Builder. Nie Equipment."
       }
+    },
+    "open_pack": "{{count}} auf einmal öffnen",
+    "pity": {
+      "new": "Neues Modell in {{count}}",
+      "new_next": "Neues Modell beim nächsten Öffnen",
+      "top": "{{rarity}} oder besser in {{count}}",
+      "top_next": "{{rarity}} oder besser beim nächsten Öffnen"
     }
   },
   "opening": {
@@ -204,7 +228,10 @@
     "keep_in_arsenal": "Im Arsenal behalten",
     "add_to_collection": "Zur Sammlung hinzufügen",
     "open_another": "Noch eine öffnen: {{name}}",
-    "cost_needed": "{{cost}} benötigt"
+    "cost_needed": "{{cost}} benötigt",
+    "pity_new": "Garantie eingelöst — ein Modell, das noch nicht im Dex war",
+    "pity_top": "Garantie eingelöst — {{rarity}} oder besser",
+    "merge": "Mit bester Kopie verschmelzen · +{{gain}} Lvl ({{before}} → {{after}})"
   },
   "builder": {
     "slots": {
@@ -390,7 +417,9 @@
       "guild_stash": "Gildenlager",
       "scrap": "Zerlegen",
       "sell_for": "Verkaufen · {{fame}}",
-      "sell_all": "Alle verkaufen ×{{qty}}"
+      "sell_all": "Alle verkaufen ×{{qty}}",
+      "merge": "Verschmelzen · +{{gain}} Lvl",
+      "merge_plain": "Mit bester Kopie verschmelzen"
     },
     "eyebrow": "Arsenal",
     "title": "Lager",
@@ -409,7 +438,9 @@
     "dupes_pedals_hint": "Jedes doppelte Pedal mit niedrigerem Level verkaufen oder zerlegen, die beste Kopie bleibt",
     "dupes_pedals": "Doppelte Pedale ({{count}})",
     "board_label": "Arsenal-Lager",
-    "pedals_protected": "Pedale auf deinem Pedalboard werden nie angerührt."
+    "pedals_protected": "Pedale auf deinem Pedalboard werden nie angerührt.",
+    "reason_merge_built": "Ausgebaute oder bereits verschmolzene Kopien lassen sich nicht aufgehen",
+    "reason_merge_best": "Das ist deine beste Kopie — verschmilz die anderen damit"
   },
   "card": {
     "new": "Neu",
@@ -445,7 +476,10 @@
       "guild_unboard": "Vom Pedalboard nehmen, bevor du es der Gilde gibst",
       "scrap_unboard": "Vor dem Zerlegen vom Pedalboard nehmen",
       "sell_unboard": "Ein Effekt auf dem Pedalboard kann nicht verkauft werden"
-    }
+    },
+    "merge": "Verschmelzen +{{gain}}",
+    "merge_plain": "Verschmelzen",
+    "merge_hint": "In deine beste Kopie für +{{gain}} Item-Level aufnehmen"
   },
   "bulk": {
     "title": "Duplikate entfernen?",
@@ -457,7 +491,9 @@
     "scrapping": "Wird zerlegt...",
     "scrap_all": "Alle {{count}} zerlegen",
     "mods_pulled_one": "{{count}} Mod ausgebaut und eingelagert",
-    "mods_pulled": "{{count}} Mods ausgebaut und eingelagert"
+    "mods_pulled": "{{count}} Mods ausgebaut und eingelagert",
+    "merge_all": "{{count}} mit den besten Kopien verschmelzen",
+    "merge_detail": "Item-Level für die Kopien, die du behältst. Kein Fame, keine Teile."
   },
   "equip": {
     "profile": "Profil",
@@ -1024,8 +1060,10 @@
       "build": "Bau fehlgeschlagen",
       "commission": "Auftrag fehlgeschlagen",
       "mod": "Mod konnte nicht eingebaut werden",
-      "repair": "Reparatur fehlgeschlagen"
-    }
+      "repair": "Reparatur fehlgeschlagen",
+      "merge": "Duplikate konnten nicht verschmolzen werden"
+    },
+    "merged": "Verschmolzen — +{{gain}} Lvl"
   },
   "categories": {
     "technique": "Technik",
@@ -1266,5 +1304,30 @@
     "left_to_build": "noch zu bauen",
     "dex_complete": "Dein Dex ist vollständig — für die Werkbank gibt es nichts mehr zu bauen.",
     "nothing_here": "Hier gibt es nichts mehr zu bauen. Versuch eine andere Seltenheit oder Art."
+  },
+  "pack": {
+    "title": "{{name}} ×{{count}}",
+    "new": "Neu: {{count}}",
+    "dupes": "Duplikate: {{count}}",
+    "parts": "Teile: {{count}}",
+    "stopped": "Fame aufgebraucht — {{done}} von {{asked}} geöffnet",
+    "merge": "Duplikate verschmelzen · +{{gain}} Lvl",
+    "merging": "Verschmelze...",
+    "merged": "Verschmolzen",
+    "again": "×{{count}} noch einmal öffnen",
+    "close": "Schließen",
+    "dup_gain": "Duplikat · +{{gain}} Lvl",
+    "dup_tag": "Duplikat",
+    "new_tag": "Neu",
+    "merged_total": "Verschmolzen — +{{gain}} Lvl",
+    "opening": "Öffne ×{{count}}...",
+    "skip": "Überspringen"
+  },
+  "merge_anim": {
+    "caption": "Das Duplikat wird in deine beste Kopie verschmolzen: {{name}}",
+    "done": "Verschmolzen",
+    "level": "Item-Level",
+    "continue": "Weiter",
+    "sr": "{{name}} verschmolzen. Item-Level von {{before}} auf {{after}}."
   }
 }

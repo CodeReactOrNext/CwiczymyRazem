@@ -1,3 +1,4 @@
+import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
 import {
   guitarDefinitionByImageId,
   GUITARS_BY_ID,
@@ -13,7 +14,7 @@ import { describe, expect, it } from "vitest";
 import type { OwnedComponent } from "../types/guitarBuilder.types";
 import {
   checkBuild,
-  COMPONENT_CASE_CHANCE,
+  DROP_ODDS,
   getComponentResaleValue,
   rollCaseComponent,
   seededRandom,
@@ -89,11 +90,18 @@ describe("build Fame", () => {
 });
 
 describe("case drops", () => {
-  it("drops parts from the guitar cases, not the effects or curated ones", () => {
-    expect(COMPONENT_CASE_CHANCE.standard).toBeGreaterThan(0.35);
-    expect(COMPONENT_CASE_CHANCE["elite-guitar"]).toBeGreaterThan(0.35);
-    expect(COMPONENT_CASE_CHANCE["elite-effect"]).toBeUndefined();
-    expect(COMPONENT_CASE_CHANCE.daily).toBeUndefined();
+  it("drops parts from the Parts Crate and from no gear case", () => {
+    // A gear case that sometimes handed back a part made the odds printed on its
+    // card describe the minority outcome. Parts have one door.
+    expect(CASE_DEFINITIONS.parts.dropKind).toBe("component");
+    for (const [id, def] of Object.entries(CASE_DEFINITIONS)) {
+      if (id === "parts") continue;
+      expect(def.dropKind, id).not.toBe("component");
+    }
+  });
+
+  it("reads the demo drop odds off the Parts Crate's own table", () => {
+    expect(DROP_ODDS).toBe(CASE_DEFINITIONS.parts.probabilities);
   });
 
   it("rolls parts on the case's rarity table", () => {

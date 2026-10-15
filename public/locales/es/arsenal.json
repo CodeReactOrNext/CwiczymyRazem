@@ -153,7 +153,9 @@
       "standard": "Estándar",
       "premium": "Premium",
       "elite": "Élite",
-      "supporter": "supporters"
+      "supporter": "supporters",
+      "vault": "Vault",
+      "parts": "piezas"
     },
     "defs": {
       "standard": {
@@ -189,7 +191,29 @@
         "name": "Caja de efectos Élite",
         "title": "Caja de efectos {{tier}}",
         "description": "Reservada para los jugadores más dedicados."
+      },
+      "vault-guitar": {
+        "name": "Caja de guitarras Vault",
+        "title": "Caja de guitarras {{tier}}",
+        "description": "Épico o mejor, siempre."
+      },
+      "vault-effect": {
+        "name": "Caja de efectos Vault",
+        "title": "Caja de efectos {{tier}}",
+        "description": "Épico o mejor, siempre."
+      },
+      "parts": {
+        "name": "Caja de piezas",
+        "title": "Caja de {{tier}}",
+        "description": "Solo piezas del Constructor de guitarras. Nunca equipo."
       }
+    },
+    "open_pack": "Abrir {{count}} a la vez",
+    "pity": {
+      "new": "Modelo nuevo en {{count}}",
+      "new_next": "Modelo nuevo en la próxima apertura",
+      "top": "{{rarity}} o mejor en {{count}}",
+      "top_next": "{{rarity}} o mejor en la próxima apertura"
     }
   },
   "opening": {
@@ -204,7 +228,10 @@
     "keep_in_arsenal": "Guardar en el Arsenal",
     "add_to_collection": "Añadir a la colección",
     "open_another": "Abrir otra: {{name}}",
-    "cost_needed": "Faltan {{cost}}"
+    "cost_needed": "Faltan {{cost}}",
+    "pity_new": "Garantía cumplida — un modelo que aún no estaba en el Dex",
+    "pity_top": "Garantía cumplida — {{rarity}} o mejor",
+    "merge": "Fusionar con tu mejor copia · +{{gain}} niv. ({{before}} → {{after}})"
   },
   "builder": {
     "slots": {
@@ -390,7 +417,9 @@
       "guild_stash": "Almacén del gremio",
       "scrap": "Desguazar",
       "sell_for": "Vender · {{fame}}",
-      "sell_all": "Vender todas ×{{qty}}"
+      "sell_all": "Vender todas ×{{qty}}",
+      "merge": "Fusionar · +{{gain}} niv.",
+      "merge_plain": "Fusionar con la mejor copia"
     },
     "eyebrow": "Arsenal",
     "title": "Almacén",
@@ -409,7 +438,9 @@
     "dupes_pedals_hint": "Vende o desguaza cada pedal duplicado de menor nivel y quédate con la mejor copia",
     "dupes_pedals": "Pedales duplicados ({{count}})",
     "board_label": "Almacén del Arsenal",
-    "pedals_protected": "Los pedales de tu pedalera nunca se tocan."
+    "pedals_protected": "Los pedales de tu pedalera nunca se tocan.",
+    "reason_merge_built": "Las copias mejoradas o ya fusionadas no se pueden absorber",
+    "reason_merge_best": "Esta es tu mejor copia — fusiona las demás con ella"
   },
   "card": {
     "new": "Nuevo",
@@ -445,7 +476,10 @@
       "guild_unboard": "Quítalo de la pedalera antes de dárselo al gremio",
       "scrap_unboard": "Quítalo de la pedalera antes de desguazarlo",
       "sell_unboard": "No se puede vender un efecto que está en la pedalera"
-    }
+    },
+    "merge": "Fusionar +{{gain}}",
+    "merge_plain": "Fusionar",
+    "merge_hint": "Absorber en tu mejor copia por +{{gain}} de nivel"
   },
   "bulk": {
     "title": "¿Eliminar duplicados?",
@@ -457,7 +491,9 @@
     "scrapping": "Desguazando...",
     "scrap_all": "Desguazar las {{count}}",
     "mods_pulled_one": "{{count}} mod extraído y guardado",
-    "mods_pulled": "{{count}} mods extraídos y guardados"
+    "mods_pulled": "{{count}} mods extraídos y guardados",
+    "merge_all": "Fusionar {{count}} con las mejores copias",
+    "merge_detail": "Niveles de objeto añadidos a las copias que conservas. Sin Fame, sin piezas."
   },
   "equip": {
     "profile": "Perfil",
@@ -1024,8 +1060,10 @@
       "build": "La construcción falló",
       "commission": "El encargo falló",
       "mod": "No se pudo instalar el mod",
-      "repair": "La reparación falló"
-    }
+      "repair": "La reparación falló",
+      "merge": "No se pudieron fusionar los duplicados"
+    },
+    "merged": "Fusionado — +{{gain}} niv."
   },
   "categories": {
     "technique": "Técnica",
@@ -1266,5 +1304,30 @@
     "left_to_build": "por fabricar",
     "dex_complete": "Tu Dex está completo — el banco ya no tiene nada que fabricar.",
     "nothing_here": "Aquí no queda nada por fabricar. Prueba otra rareza o tipo."
+  },
+  "pack": {
+    "title": "{{name}} ×{{count}}",
+    "new": "Nuevos: {{count}}",
+    "dupes": "Duplicados: {{count}}",
+    "parts": "Piezas: {{count}}",
+    "stopped": "Se acabó la Fame — {{done}} de {{asked}} abiertas",
+    "merge": "Fusionar duplicados · +{{gain}} niv.",
+    "merging": "Fusionando...",
+    "merged": "Fusionado",
+    "again": "Abrir ×{{count}} otra vez",
+    "close": "Cerrar",
+    "dup_gain": "Duplicado · +{{gain}} niv.",
+    "dup_tag": "Duplicado",
+    "new_tag": "Nuevo",
+    "merged_total": "Fusionado — +{{gain}} niv.",
+    "opening": "Abriendo ×{{count}}...",
+    "skip": "Saltar"
+  },
+  "merge_anim": {
+    "caption": "Fusionando el duplicado con tu mejor copia: {{name}}",
+    "done": "Fusionado",
+    "level": "Nivel del objeto",
+    "continue": "Continuar",
+    "sr": "{{name}} fusionado. Nivel del objeto de {{before}} a {{after}}."
   }
 }

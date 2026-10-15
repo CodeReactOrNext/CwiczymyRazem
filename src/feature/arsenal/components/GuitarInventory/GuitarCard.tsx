@@ -32,7 +32,7 @@ import {
   rarityLockLvl,
   usePlayerLvl,
 } from "feature/progression/hooks/usePlayerLvl";
-import { Boxes, Check, Lock, Store, Trash2, Wrench } from "lucide-react";
+import { Boxes, Check, Lock, Merge, Store, Trash2, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 
@@ -40,6 +40,7 @@ import { useMemo } from "react";
 const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 import type { InventoryItem } from "../../types/arsenal.types";
+import type { CardMergeAction } from "../CardActions";
 import { CardAction, CardActionRow } from "../CardActions";
 import { CardAffixes } from "../CardAffixes";
 import { CardTraits, useItemTraitStates } from "../CardTraits";
@@ -65,6 +66,8 @@ interface GuitarCardProps {
   isListing?: boolean;
   onScrapClick?: (inventoryItemId: string, guitarId: number | string) => void;
   isScrapping?: boolean;
+  /** Folds this copy into the best one the player owns. Passed only when there is one to fold into. */
+  merge?: CardMergeAction;
   /** Leaves the guitar in the guild stash. Only passed for a guild member. */
   onStashClick?: (inventoryItemId: string) => void;
   isStashing?: boolean;
@@ -95,6 +98,7 @@ export const GuitarCard = ({
   isListing,
   onScrapClick,
   isScrapping,
+  merge,
   onStashClick,
   isStashing,
   rigSlot,
@@ -435,6 +439,19 @@ export const GuitarCard = ({
                   {stashTooltip}
                 </TooltipContent>
               </Tooltip>
+            )}
+
+            {merge && (
+              <CardAction
+                tone='merge'
+                icon={Merge}
+                onClick={merge.onClick}
+                disabled={merge.disabled}
+                title={merge.reason ?? t("card.merge_hint", { gain: merge.gain })}>
+                {merge.gain > 0
+                      ? t("card.merge", { gain: merge.gain })
+                      : t("card.merge_plain")}
+              </CardAction>
             )}
 
             {onScrapClick && (

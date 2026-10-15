@@ -134,6 +134,10 @@ export interface EffectInventoryItem {
   traits?: ItemTrait[];
   /** Workshop build level — uncapped, each point adds to the level. Absent = 0. */
   buildLevel?: number;
+  /** Item Level points earned by merging duplicates into this pedal. Uncapped. Absent = 0. */
+  mergeBonus?: number;
+  /** How many duplicates have been merged in. Display only — the points are `mergeBonus`. */
+  mergeCount?: number;
   /** Condition at mint. Pins the sell value so restoring cannot be flipped for profit. */
   mintCondition?: number;
   /** Set once the pedal has been through a workshop repair. */
@@ -198,6 +202,9 @@ export type CaseType =
   | "premium-effect"
   | "elite-guitar"
   | "elite-effect"
+  | "vault-guitar"
+  | "vault-effect"
+  | "parts"
   | "daily"
   | "supporter";
 
@@ -312,9 +319,39 @@ export interface CaseDefinition {
   yearFrom: number;
   yearTo: number;
   country: ProductionCountry;
-  /** Locks the drop to one pool. Undefined (standard/daily) rolls from both. */
-  dropKind?: "guitar" | "effect";
+  /**
+   * Locks the drop to one pool. Undefined (standard/daily) rolls from both.
+   * `component` is the Parts Crate: Guitar Builder parts and nothing else.
+   */
+  dropKind?: "guitar" | "effect" | "component";
+  /** Guarantees that kick in after a run of unlucky opens. See `utils/pity`. */
+  pity?: CasePityRules;
+  /** A free case (reward token) cannot open this one — it is priced past what a token is worth. */
+  noFreeCase?: boolean;
 }
+
+/**
+ * What a case promises after a run of bad luck.
+ *
+ * Both numbers read "guaranteed within N opens" from the player's side of the
+ * counter, which is why `within` and not "after N misses" — the card prints the
+ * same number the rule is written in.
+ */
+export interface CasePityRules {
+  /** A model the player has never held is guaranteed within this many opens. */
+  newWithin?: number;
+  /** This rarity or better is guaranteed within this many opens. */
+  top?: { rarity: GuitarRarity; within: number };
+}
+
+/** One case's running counters. Opens since the last hit of each kind. */
+export interface CasePityCounters {
+  sinceNew: number;
+  sinceTop: number;
+}
+
+/** Stored at `casePity` on the user document — top level, because the client must not write it. */
+export type CasePityState = Partial<Record<CaseType, CasePityCounters>>;
 
 /** Per-category stat sums (each a "+N" that adds into the item level). */
 export interface ItemStats {
@@ -364,6 +401,10 @@ export interface InventoryItem {
   traits?: ItemTrait[];
   /** Workshop build level — uncapped, each point adds to the level. Absent = 0. */
   buildLevel?: number;
+  /** Item Level points earned by merging duplicates into this guitar. Uncapped. Absent = 0. */
+  mergeBonus?: number;
+  /** How many duplicates have been merged in. Display only — the points are `mergeBonus`. */
+  mergeCount?: number;
   /** Condition at mint. Pins the sell value so restoring cannot be flipped for profit. */
   mintCondition?: number;
   /** Set once the guitar has been through a workshop repair. */
@@ -515,7 +556,6 @@ export interface OpenCaseResult {
   componentItem?: OwnedComponent;
   guitar?: GuitarDefinition;
   newItem?: InventoryItem;
-  newInventory?: InventoryItem[];
   effect?: EffectDefinition;
   effectItem?: EffectInventoryItem;
   newFame: number;
@@ -525,7 +565,53 @@ export interface OpenCaseResult {
   caseTokens: number;
   /** True when a free case paid for this pull instead of Fame. */
   usedToken: boolean;
+  /**
+   * What merging this pull into the copy the player already owns would do.
+   * Present only on a duplicate that has a copy to merge into.
+   */
+  merge?: MergeOffer;
+  /** Which guarantee decided this pull, when one did — the reveal says so out loud. */
+  pityHit?: "new" | "top";
+  /** The case's counters after this pull, so the shelf updates without a refetch. */
+  pity?: CasePityCounters;
 }
+
+/** A duplicate that can be folded into the best copy of the same model. */
+export interface MergeOffer {
+  /** The item the duplicate would raise. */
+  targetId: string;
+  /** Item Level points the merge adds. */
+  gain: number;
+  levelBefore: number;
+  levelAfter: number;
+}
+
+/** Several opens of one case, paid one by one. */
+export interface OpenCasePackResult {
+  results: OpenCaseResult[];
+  newFame: number;
+  caseTokens: number;
+  /** How many were asked for. Fewer `results` than this means Fame ran out part-way. */
+  requested: number;
+}
+
+export interface MergeDuplicatesResult {
+  kind: WorkshopKind;
+  /** How many duplicates were folded in. */
+  merged: number;
+  /** Item Level points added across the whole job. */
+  gain: number;
+  rigLevel: number;
+  /** The raised items, as stored now. */
+  items: (InventoryItem | EffectInventoryItem)[];
+}
+
+/** What the inventory route returns: the stash plus the wallet the shelf spends. */
+export type ArsenalInventoryResponse = ArsenalUserData & {
+  fame: number;
+  caseTokens: number;
+  casePity?: CasePityState;
+};
 
 /** Which half of the wallet a workshop job draws on. */
 export type WorkshopKind = "guitar" | "effect";
@@ -599,8 +685,3 @@ export interface WorkshopRepairResult {
   rigLevel: number;
 }
 
-export interface OpenEffectPackResult {
-  effect: EffectDefinition;
-  newItem: EffectInventoryItem;
-  newEffectInventory: EffectInventoryItem[];
-}

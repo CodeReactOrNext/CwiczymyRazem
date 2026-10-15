@@ -15,6 +15,12 @@ import {
 } from "feature/arsenal/data/guitarDefinitions";
 import { getItemValue } from "feature/arsenal/data/itemStats";
 import {
+  EFFECT_MERGE,
+  getMergeState,
+  GUITAR_MERGE,
+  planMerge,
+} from "feature/arsenal/data/merge";
+import {
   getModResaleValue,
   getPartResaleValue,
 } from "feature/arsenal/data/resale";
@@ -33,6 +39,8 @@ import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useFuseParts } from "feature/arsenal/hooks/useFuseParts";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
+import { useMergeDuplicates } from "feature/arsenal/hooks/useMergeDuplicates";
+import { useMergeScene } from "feature/arsenal/hooks/useMergeScene";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
 import { useScrapEffectsBulk } from "feature/arsenal/hooks/useScrapEffectsBulk";
 import { useScrapGuitar } from "feature/arsenal/hooks/useScrapGuitar";
@@ -105,6 +113,7 @@ import {
   Guitar,
   Info,
   Layers,
+  Merge,
   Store,
   Trash2,
   Unplug,
@@ -119,12 +128,14 @@ import { useResponsiveStore } from "store/useResponsiveStore";
 
 import type {
   ArsenalUserData,
+  MergeOffer,
   PartId,
   PartTier,
   RigSetup,
   SalvagedMod,
 } from "../../types/arsenal.types";
 import { DEFAULT_RIG } from "../../types/arsenal.types";
+import type { CardMergeAction } from "../CardActions";
 import { BulkDuplicatesDialog } from "../GuitarInventory/BulkDuplicatesDialog";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { EquipTargetDialog } from "../GuitarInventory/EquipTargetDialog";
@@ -233,6 +244,10 @@ export const StashInventory = ({
   const { mutate: sellPart, isPending: isSellingPart } = useSellPart();
   const { mutate: fusePartsStack, isPending: isFusingPart } = useFuseParts();
   const { mutate: fitMod, isPending: isFitting } = useWorkshopMod();
+  // One duplicate at a time plays the merge scene; the sweep over every
+  // duplicate at once just reports what it did, with a toast.
+  const mergeScene = useMergeScene();
+  const { mutate: mergeBulk, isPending: isMergingBulk } = useMergeDuplicates();
   const shelf = useShelfDeposit(data);
   const currentFame = useAppSelector(selectCurrentUserStats)?.fame || 0;
   const playerLvl = usePlayerLvl();
@@ -341,6 +356,78 @@ export const StashInventory = ({
     return index >= 0 ? index : null;
   };
 
+  /**
+   * What merging one copy would do, and when it cannot, why not.
+   *
+   * `null` when the model is held only once: with nothing to fold it into, the
+   * key would only ever be switched off, so it is not shown at all. The reasons
+   * are the ones the server enforces, said before the click instead of after it.
+   */
+  const mergeStateOf = (
+    kind: Kind,
+    itemId: string,
+  ): { offer: MergeOffer | null; reason?: string } | null => {
+    const state =
+      kind === "guitar"
+        ? getMergeState(data.inventory, itemId, GUITAR_MERGE, inUseGuitarIds)
+        : getMergeState(
+            effectInventory,
+            itemId,
+            EFFECT_MERGE,
+            pedalboardItemIds,
+          );
+    if (!state) return null;
+    if (state.offer) return { offer: state.offer };
+
+    if (state.blocked === "built") {
+      return { offer: null, reason: t("stash.reason_merge_built") };
+    }
+    if (state.blocked === "best") {
+      return { offer: null, reason: t("stash.reason_merge_best") };
+    }
+    // In use: say where to take it out of.
+    const slot = rigSlotOf(itemId);
+    return {
+      offer: null,
+      reason:
+        kind === "effect"
+          ? t("stash.reason_off_board")
+          : data.equippedItemId === itemId
+            ? t("stash.reason_unequip_profile")
+            : slot != null
+              ? t("stash.reason_remove_rig", { slot: slot + 1 })
+              : undefined,
+    };
+  };
+
+  /** Plays the scene and sends the merge, for the one copy the player picked. */
+  const startMerge = (kind: Kind, itemId: string) => {
+    const offer = mergeStateOf(kind, itemId)?.offer;
+    const def =
+      kind === "guitar"
+        ? GUITARS_BY_ID.get(
+            data.inventory.find((i) => i.id === itemId)?.guitarId ?? "",
+          )
+        : EFFECTS_BY_ID.get(
+            effectInventory.find((i) => i.id === itemId)?.effectId ?? "",
+          );
+    if (!offer || !def || mergeScene.isActive) return;
+    setDetail(null);
+    mergeScene.start({ kind, itemId, def, offer });
+  };
+
+  /** The merge key of one item's card, or nothing when there is no copy to fold it into. */
+  const mergeActionOf = (kind: Kind, itemId: string): CardMergeAction | undefined => {
+    const state = mergeStateOf(kind, itemId);
+    if (!state) return undefined;
+    return {
+      gain: state.offer?.gain ?? 0,
+      disabled: !state.offer || mergeScene.isActive,
+      reason: state.reason,
+      onClick: () => startMerge(kind, itemId),
+    };
+  };
+
   /** The bench's view of one owned item, built on demand for a drop check. */
   const subjectOf = useCallback(
     (kind: Kind, itemId: string) => {
@@ -381,6 +468,17 @@ export const StashInventory = ({
   const effectDuplicates = useMemo(
     () => getEffectDuplicates(effectInventory, pedalboardItemIds),
     [effectInventory, pedalboardItemIds],
+  );
+  // What folding every duplicate would do, worked out the way the server will.
+  // Copies that carry workshop levels or an earlier merge are skipped there, so
+  // the figure the dialog quotes is the one that will actually be paid.
+  const guitarMergePlan = useMemo(
+    () => planMerge(data.inventory, guitarDuplicates.ids, GUITAR_MERGE),
+    [data.inventory, guitarDuplicates.ids],
+  );
+  const effectMergePlan = useMemo(
+    () => planMerge(effectInventory, effectDuplicates.ids, EFFECT_MERGE),
+    [effectInventory, effectDuplicates.ids],
   );
 
   const manual = sort === "manual";
@@ -659,6 +757,16 @@ export const StashInventory = ({
     if (bulk === "effect") sellEffectsBulk(effectDuplicates.ids, done);
   };
 
+  const confirmBulkMerge = () => {
+    const done = { onSuccess: () => setBulk(null) };
+    if (bulk === "guitar") {
+      mergeBulk({ kind: "guitar", itemIds: guitarDuplicates.ids }, done);
+    }
+    if (bulk === "effect") {
+      mergeBulk({ kind: "effect", itemIds: effectDuplicates.ids }, done);
+    }
+  };
+
   const confirmBulkScrap = () => {
     const done = { onSuccess: () => setBulk(null) };
     if (bulk === "guitar") scrapGuitarsBulk(guitarDuplicates.ids, done);
@@ -791,6 +899,22 @@ export const StashInventory = ({
               },
             ]
           : []),
+        ...(() => {
+          const merge = mergeStateOf("guitar", piece.id);
+          if (!merge) return [];
+          return [
+            {
+              id: "merge",
+              label: merge.offer
+                ? t("stash.menu.merge", { gain: merge.offer.gain })
+                : t("stash.menu.merge_plain"),
+              icon: Merge,
+              disabled: !merge.offer || mergeScene.isActive,
+              reason: merge.reason,
+              onSelect: () => startMerge("guitar", piece.id),
+            },
+          ];
+        })(),
         {
           id: "scrap",
           label: t("stash.menu.scrap"),
@@ -854,6 +978,22 @@ export const StashInventory = ({
               },
             ]
           : []),
+        ...(() => {
+          const merge = mergeStateOf("effect", piece.id);
+          if (!merge) return [];
+          return [
+            {
+              id: "merge",
+              label: merge.offer
+                ? t("stash.menu.merge", { gain: merge.offer.gain })
+                : t("stash.menu.merge_plain"),
+              icon: Merge,
+              disabled: !merge.offer || mergeScene.isActive,
+              reason: merge.reason,
+              onSelect: () => startMerge("effect", piece.id),
+            },
+          ];
+        })(),
         {
           id: "scrap",
           label: t("stash.menu.scrap"),
@@ -1112,6 +1252,7 @@ export const StashInventory = ({
                 isListing={isListing}
                 onScrapClick={(itemId) => open("scrap", "guitar", itemId)}
                 isScrapping={isScrappingGuitar}
+                merge={mergeActionOf("guitar", item.id)}
                 onStashClick={
                   shelf.inGuild
                     ? (itemId) => askShelf("guitar", itemId)
@@ -1139,6 +1280,7 @@ export const StashInventory = ({
               isListing={isListing}
               onScrapClick={(itemId) => open("scrap", "effect", itemId)}
               isScrapping={isScrappingEffect}
+              merge={mergeActionOf("effect", item.id)}
               onStashClick={
                 shelf.inGuild
                   ? (itemId) => askShelf("effect", itemId)
@@ -1443,12 +1585,22 @@ export const StashInventory = ({
             ? t("stash.pedals_protected")
             : undefined
         }
+        mergeGain={
+          bulk === "effect" ? effectMergePlan.gain : guitarMergePlan.gain
+        }
+        mergeCount={
+          bulk === "effect" ? effectMergePlan.merged : guitarMergePlan.merged
+        }
         onSell={confirmBulkSell}
         onScrap={confirmBulkScrap}
+        onMerge={confirmBulkMerge}
         onCancel={() => setBulk(null)}
         isSelling={isSellingGuitarsBulk || isSellingEffectsBulk}
         isScrapping={isScrappingGuitarsBulk || isScrappingEffectsBulk}
+        isMerging={isMergingBulk}
       />
+
+      {mergeScene.element}
 
       {(() => {
         const found = equipItemId ? guitarOf(equipItemId) : null;

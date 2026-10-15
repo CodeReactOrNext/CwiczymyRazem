@@ -1,3 +1,4 @@
+import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
 import { RARITY_BASE_VALUE } from "feature/arsenal/data/itemStats";
 
 import {
@@ -29,15 +30,9 @@ export const RARITY_ORDER: ComponentRarity[] = [
   "Mythic",
 ];
 
-/** Drop odds — the Standard Case table, until parts get their own crates. */
-export const DROP_ODDS: Record<ComponentRarity, number> = {
-  Common: 0.38,
-  Uncommon: 0.28,
-  Rare: 0.2,
-  Epic: 0.11,
-  Legendary: 0.025,
-  Mythic: 0.005,
-};
+/** Drop odds — the Parts Crate's own table, read from the shelf so the two cannot drift. */
+export const DROP_ODDS: Record<ComponentRarity, number> =
+  CASE_DEFINITIONS.parts.probabilities;
 
 /**
  * Lowest guitar level for each rarity, set midway between the average level a
@@ -245,18 +240,6 @@ export function createDemoStash(seed = 7, extraDrops = 40): OwnedComponent[] {
 }
 
 // ─── Case drops ──────────────────────────────────────────────────────────────
-
-/**
- * Cases that can hand out a Guitar Builder part instead of their usual drop,
- * and how often. Parts come almost entirely from cases, so the chance is high;
- * the effects-only cases keep to pedals, and the curated Featured / Supporter
- * cases keep to their slate.
- */
-export const COMPONENT_CASE_CHANCE: Partial<Record<string, number>> = {
-  standard: 0.6,
-  "premium-guitar": 0.6,
-  "elite-guitar": 0.6,
-};
 
 /**
  * A part rolled from a case's own rarity table, so a better case drops better

@@ -155,7 +155,9 @@
       "standard": "Standard",
       "premium": "Premium",
       "elite": "Elite",
-      "supporter": "wspierających"
+      "supporter": "wspierających",
+      "vault": "Vault",
+      "parts": "z częściami"
     },
     "defs": {
       "standard": {
@@ -191,7 +193,29 @@
         "name": "Skrzynka efektów Elite",
         "title": "Skrzynka efektów {{tier}}",
         "description": "Zarezerwowana dla najbardziej oddanych graczy."
+      },
+      "vault-guitar": {
+        "name": "Gitarowa skrzynka Vault",
+        "title": "Gitarowa skrzynka {{tier}}",
+        "description": "Epicka lub lepsza — za każdym razem."
+      },
+      "vault-effect": {
+        "name": "Skrzynka efektów Vault",
+        "title": "Skrzynka efektów {{tier}}",
+        "description": "Epicka lub lepsza — za każdym razem."
+      },
+      "parts": {
+        "name": "Skrzynka z częściami",
+        "title": "Skrzynka {{tier}}",
+        "description": "Tylko części do Kreatora gitar. Nigdy sprzęt."
       }
+    },
+    "open_pack": "Otwórz {{count}} naraz",
+    "pity": {
+      "new": "Nowy model za {{count}}",
+      "new_next": "Nowy model przy następnym otwarciu",
+      "top": "{{rarity}} lub lepsza za {{count}}",
+      "top_next": "{{rarity}} lub lepsza przy następnym otwarciu"
     }
   },
   "opening": {
@@ -206,7 +230,10 @@
     "keep_in_arsenal": "Zatrzymaj w Arsenale",
     "add_to_collection": "Dodaj do kolekcji",
     "open_another": "Otwórz kolejną: {{name}}",
-    "cost_needed": "Potrzeba {{cost}}"
+    "cost_needed": "Potrzeba {{cost}}",
+    "pity_new": "Gwarancja zadziałała — model, którego jeszcze nie ma w Dexie",
+    "pity_top": "Gwarancja zadziałała — {{rarity}} lub lepsza",
+    "merge": "Scal z najlepszą kopią · +{{gain}} lvl ({{before}} → {{after}})"
   },
   "builder": {
     "slots": {
@@ -392,7 +419,9 @@
       "guild_stash": "Schowek gildii",
       "scrap": "Rozbierz",
       "sell_for": "Sprzedaj · {{fame}}",
-      "sell_all": "Sprzedaj wszystkie ×{{qty}}"
+      "sell_all": "Sprzedaj wszystkie ×{{qty}}",
+      "merge": "Scal · +{{gain}} lvl",
+      "merge_plain": "Scal z najlepszą kopią"
     },
     "eyebrow": "Arsenał",
     "title": "Schowek",
@@ -411,7 +440,9 @@
     "dupes_pedals_hint": "Sprzedaj lub rozbierz każdy duplikat efektu o niższym poziomie, zostawiając najlepszą kopię",
     "dupes_pedals": "Zduplikowane efekty ({{count}})",
     "board_label": "Schowek Arsenału",
-    "pedals_protected": "Efekty na pedalboardzie nigdy nie są ruszane."
+    "pedals_protected": "Efekty na pedalboardzie nigdy nie są ruszane.",
+    "reason_merge_built": "Rozbudowanych lub już scalonych kopii nie da się wchłonąć",
+    "reason_merge_best": "To twoja najlepsza kopia — scalaj do niej pozostałe"
   },
   "card": {
     "new": "Nowość",
@@ -449,7 +480,10 @@
       "guild_unboard": "Zdejmij z pedalboardu, zanim oddasz gildii",
       "scrap_unboard": "Zdejmij z pedalboardu przed rozbiórką",
       "sell_unboard": "Nie można sprzedać efektu z pedalboardu"
-    }
+    },
+    "merge": "Scal +{{gain}}",
+    "merge_plain": "Scal",
+    "merge_hint": "Wchłoń do najlepszej kopii za +{{gain}} do Poziomu przedmiotu"
   },
   "bulk": {
     "title": "Usunąć duplikaty?",
@@ -465,7 +499,9 @@
     "mods_pulled_one": "{{count}} mod wyjęty i odłożony do schowka",
     "mods_pulled_few": "{{count}} mody wyjęte i odłożone do schowka",
     "mods_pulled_many": "{{count}} modów wyjętych i odłożonych do schowka",
-    "mods_pulled": "Wyjęte mody: {{count}}, odłożone do schowka"
+    "mods_pulled": "Wyjęte mody: {{count}}, odłożone do schowka",
+    "merge_all": "Scal {{count}} z najlepszymi kopiami",
+    "merge_detail": "Poziomy przedmiotu dodane do kopii, które zostają. Bez Fame, bez części."
   },
   "equip": {
     "profile": "Profil",
@@ -1048,8 +1084,10 @@
       "build": "Budowa się nie udała",
       "commission": "Nie udało się złożyć zamówienia",
       "mod": "Nie udało się zamontować moda",
-      "repair": "Naprawa się nie udała"
-    }
+      "repair": "Naprawa się nie udała",
+      "merge": "Nie udało się scalić duplikatów"
+    },
+    "merged": "Scalono — +{{gain}} lvl"
   },
   "categories": {
     "technique": "Technika",
@@ -1292,5 +1330,30 @@
     "left_to_build": "do zbudowania",
     "dex_complete": "Twój Dex jest kompletny — warsztat nie ma już nic do zbudowania.",
     "nothing_here": "Tu nie ma już nic do zbudowania. Spróbuj innej rzadkości lub rodzaju."
+  },
+  "pack": {
+    "title": "{{name}} ×{{count}}",
+    "new": "Nowe: {{count}}",
+    "dupes": "Duplikaty: {{count}}",
+    "parts": "Części: {{count}}",
+    "stopped": "Skończyło się Fame — otwarto {{done}} z {{asked}}",
+    "merge": "Scal duplikaty · +{{gain}} lvl",
+    "merging": "Scalanie...",
+    "merged": "Scalono",
+    "again": "Otwórz ×{{count}} ponownie",
+    "close": "Zamknij",
+    "dup_gain": "Duplikat · +{{gain}} lvl",
+    "dup_tag": "Duplikat",
+    "new_tag": "Nowość",
+    "merged_total": "Scalono — +{{gain}} lvl",
+    "opening": "Otwieranie ×{{count}}...",
+    "skip": "Pomiń"
+  },
+  "merge_anim": {
+    "caption": "Scalam duplikat z twoją najlepszą kopią: {{name}}",
+    "done": "Scalono",
+    "level": "Poziom przedmiotu",
+    "continue": "Dalej",
+    "sr": "Scalono: {{name}}. Poziom przedmiotu z {{before}} na {{after}}."
   }
 }

@@ -353,14 +353,16 @@ export const rollEffectCountry = (
 
 /**
  * Effect level = rolled feature points + rarity + condition (0–10) +
- * vintage age (0–8) + origin prestige + workshop build. Every effect has a level;
- * features boost it and the workshop keeps boosting it without a ceiling.
+ * vintage age (0–8) + origin prestige + workshop build + merged duplicates.
+ * Every effect has a level; features boost it and the workshop and the
+ * duplicate merge keep boosting it without a ceiling.
  */
 export const getEffectLevel = (
   item: Pick<
     EffectInventoryItem,
     "id" | "condition" | "year" | "country" | "stats" | "buildLevel"
-  >,
+  > &
+    Partial<Pick<EffectInventoryItem, "mergeBonus">>,
   effect: Pick<
     EffectDefinition,
     "rarity" | "yearFrom" | "yearTo" | "levelBonus"
@@ -388,6 +390,7 @@ export const getEffectLevel = (
     vintagePoints +
     originPoints +
     buildPoints +
+    (item.mergeBonus ?? 0) +
     (effect.levelBonus ?? 0)
   );
 };

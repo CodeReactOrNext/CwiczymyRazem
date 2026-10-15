@@ -8,12 +8,16 @@ export type RarityOdds = Partial<Record<GuitarRarity, number>>;
  * How often a pull prefers a model the player does not own yet, once the rarity
  * is settled.
  *
- * Not 100%, because duplicates are load-bearing elsewhere — they are the scrap
- * and build economy's raw material, and a stream that never repeats starves the
- * workshop. This is the lever that keeps a trickle of them coming even while the
- * player still has models to find.
+ * Not 100%, because duplicates are load-bearing elsewhere — they are the scrap,
+ * build and merge economy's raw material, and a stream that never repeats starves
+ * the workshop. This is the lever that keeps a trickle of them coming even while
+ * the player still has models to find.
+ *
+ * Raised from 0.7: with pity counters guaranteeing a new model on a schedule, the
+ * bias is what keeps the stretch *between* guarantees from feeling like a coin
+ * that always lands on the thing already in the stash.
  */
-export const NEW_ITEM_BIAS = 0.7;
+export const NEW_ITEM_BIAS = 0.85;
 
 /**
  * The highest rarity a re-roll is allowed to land on.
@@ -123,6 +127,83 @@ export function drawOpenRarity(
 }
 
 /**
+ * The rarity of a pull that has to be a model the player has never held.
+ *
+ * Same reach as the re-roll — rarities the case really drops, at or below
+ * `REROLL_CEILING`, that still have something undiscovered — and weighted by the
+ * case's own printed odds over them. A guarantee that could reach past the
+ * ceiling would be the re-roll's problem all over again: a Standard case
+ * promising a Mythic because a Mythic was the last thing missing.
+ *
+ * `null` when there is nothing new within reach, so the caller can tell a
+ * guarantee it cannot honour from one it can.
+ */
+export function drawNewRarity(
+  odds: RarityOdds,
+  hasUndiscovered: (rarity: GuitarRarity) => boolean,
+  random: () => number = Math.random,
+): GuitarRarity | null {
+  const live = (Object.entries(odds) as [GuitarRarity, number][]).filter(
+    ([rarity, prob]) =>
+      (prob ?? 0) > 0 && withinCeiling(rarity) && hasUndiscovered(rarity),
+  );
+  if (live.length === 0) return null;
+
+  const total = live.reduce((sum, [, prob]) => sum + prob, 0);
+  let roll = random() * total;
+  for (const [rarity, prob] of live) {
+    roll -= prob;
+    if (roll < 0) return rarity;
+  }
+  return live[live.length - 1][0];
+}
+
+/** Is there a model this case could still hand over that the player has never held? */
+export const hasReachableNew = (
+  odds: RarityOdds,
+  hasUndiscovered: (rarity: GuitarRarity) => boolean,
+): boolean => drawNewRarity(odds, hasUndiscovered, () => 0) !== null;
+
+/**
+ * The rarity of a pull that has to be `floor` or better.
+ *
+ * Weighted by the case's printed odds over the rarities it drops at or above the
+ * floor, so a guarantee shows up in the same proportions the card advertises —
+ * an Elite case owing a Legendary hands over a Mythic one time in 3.5, which is
+ * what its table says. With `preferNew`, rarities that still hold something the
+ * player has not found win outright when there are any, so one pull can pay off
+ * two guarantees at once.
+ */
+export function drawTopRarity(
+  odds: RarityOdds,
+  floor: GuitarRarity,
+  random: () => number = Math.random,
+  preferNew?: (rarity: GuitarRarity) => boolean,
+): GuitarRarity {
+  const floorIndex = POOL_RARITY_ORDER.indexOf(floor);
+  const atOrAbove = (Object.entries(odds) as [GuitarRarity, number][]).filter(
+    ([rarity, prob]) =>
+      (prob ?? 0) > 0 && POOL_RARITY_ORDER.indexOf(rarity) <= floorIndex,
+  );
+  // A table with nothing at or above the floor cannot honour it; fall back to
+  // the plain roll rather than invent odds the card does not print.
+  if (atOrAbove.length === 0) return drawRarity(odds, random);
+
+  const fresh = preferNew
+    ? atOrAbove.filter(([rarity]) => preferNew(rarity))
+    : [];
+  const live = fresh.length > 0 ? fresh : atOrAbove;
+
+  const total = live.reduce((sum, [, prob]) => sum + prob, 0);
+  let roll = random() * total;
+  for (const [rarity, prob] of live) {
+    roll -= prob;
+    if (roll < 0) return rarity;
+  }
+  return live[live.length - 1][0];
+}
+
+/**
  * One item of the drawn rarity, biased toward models the player is missing.
  *
  * Falls back to the full pool whenever the bias does not fire or the player
@@ -132,8 +213,10 @@ export function pickBiased<T>(
   pool: readonly T[],
   isOwned: (item: T) => boolean,
   random: () => number = Math.random,
+  /** 1 for a pull that has to be new — a pity guarantee — otherwise the usual bias. */
+  bias: number = NEW_ITEM_BIAS,
 ): T {
-  if (random() < NEW_ITEM_BIAS) {
+  if (bias >= 1 || random() < bias) {
     const missing = pool.filter((item) => !isOwned(item));
     if (missing.length > 0) {
       return missing[Math.floor(random() * missing.length)];

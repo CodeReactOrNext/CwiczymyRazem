@@ -2,7 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import type { GuitarRarity } from "../types/arsenal.types";
 import type { RarityOdds } from "./openDraw";
-import { drawOpenRarity, drawRarity, pickBiased } from "./openDraw";
+import {
+  drawNewRarity,
+  drawOpenRarity,
+  drawRarity,
+  drawTopRarity,
+  hasReachableNew,
+  NEW_ITEM_BIAS,
+  pickBiased,
+} from "./openDraw";
 
 /** The Standard case's table: two thirds of its weight on the bottom two tiers. */
 const STANDARD: RarityOdds = {
@@ -138,7 +146,7 @@ describe("pickBiased", () => {
   const owned = (ids: string[]) => (item: string) => ids.includes(item);
 
   it("draws from the models the player is missing when the bias fires", () => {
-    // 0 clears the 0.7 gate; the second roll indexes the two-item missing list.
+    // 0 clears the bias gate; the second roll indexes the two-item missing list.
     expect(pickBiased(pool, owned(["a", "b"]), rolls(0, 0))).toBe("c");
     expect(pickBiased(pool, owned(["a", "b"]), rolls(0, 0.99))).toBe("d");
   });
@@ -149,5 +157,100 @@ describe("pickBiased", () => {
 
   it("falls back to the whole pool when the player owns everything at the rarity", () => {
     expect(pickBiased(pool, () => true, rolls(0, 0))).toBe("a");
+  });
+
+  it("never skips the missing list when the bias is 1 — a guarantee", () => {
+    // No gate roll to lose: the first roll is the index into the missing list.
+    expect(pickBiased(pool, owned(["a", "b"]), rolls(0), 1)).toBe("c");
+    expect(pickBiased(pool, owned(["a", "b"]), rolls(0.99), 1)).toBe("d");
+  });
+
+  it("leans harder toward the new than it used to", () => {
+    expect(NEW_ITEM_BIAS).toBeGreaterThan(0.7);
+    expect(NEW_ITEM_BIAS).toBeLessThan(1);
+  });
+});
+
+describe("drawNewRarity", () => {
+  it("only reaches rarities the player is still missing something at", () => {
+    const seen = new Set<GuitarRarity>();
+    for (let roll = 0; roll < 1; roll += 0.001) {
+      const rarity = drawNewRarity(STANDARD, completed("Common", "Rare"), () => roll);
+      if (rarity) seen.add(rarity);
+    }
+    expect(seen.has("Common")).toBe(false);
+    expect(seen.has("Rare")).toBe(false);
+    expect(seen).toEqual(new Set(["Uncommon", "Epic"]));
+  });
+
+  it("stays under the re-roll ceiling, so a guarantee cannot sell a Mythic", () => {
+    // Only the chase tiers are missing: there is nothing the case may promise.
+    const onlyChase = (rarity: GuitarRarity) =>
+      rarity === "Legendary" || rarity === "Mythic";
+    expect(drawNewRarity(STANDARD, onlyChase, () => 0.5)).toBeNull();
+  });
+
+  it("never reaches a rarity the case does not drop", () => {
+    for (let roll = 0; roll < 1; roll += 0.001) {
+      const rarity = drawNewRarity(ELITE, () => true, () => roll);
+      expect(rarity === "Common" || rarity === "Uncommon").toBe(false);
+    }
+  });
+
+  it("weights by the printed odds, not evenly", () => {
+    const counts: Partial<Record<GuitarRarity, number>> = {};
+    const steps = 100_000;
+    for (let i = 0; i < steps; i++) {
+      const rarity = drawNewRarity(ELITE, () => true, () => i / steps)!;
+      counts[rarity] = (counts[rarity] ?? 0) + 1;
+    }
+    // Elite under the ceiling: Rare 0.5 and Epic 0.38.
+    expect((counts.Rare ?? 0) / steps).toBeCloseTo(0.5 / 0.88, 2);
+    expect((counts.Epic ?? 0) / steps).toBeCloseTo(0.38 / 0.88, 2);
+  });
+});
+
+describe("hasReachableNew", () => {
+  it("is true while something new sits under the ceiling", () => {
+    expect(hasReachableNew(STANDARD, completed("Common"))).toBe(true);
+  });
+
+  it("is false when only the chase tiers are left", () => {
+    expect(
+      hasReachableNew(STANDARD, (rarity) => rarity === "Mythic"),
+    ).toBe(false);
+  });
+});
+
+describe("drawTopRarity", () => {
+  it("never lands below the floor", () => {
+    for (let roll = 0; roll < 1; roll += 0.001) {
+      const rarity = drawTopRarity(ELITE, "Legendary", () => roll);
+      expect(["Legendary", "Mythic"]).toContain(rarity);
+    }
+  });
+
+  it("splits the floor's tiers in the case's printed ratio", () => {
+    const counts: Partial<Record<GuitarRarity, number>> = {};
+    const steps = 100_000;
+    for (let i = 0; i < steps; i++) {
+      const rarity = drawTopRarity(ELITE, "Legendary", () => i / steps);
+      counts[rarity] = (counts[rarity] ?? 0) + 1;
+    }
+    expect((counts.Legendary ?? 0) / steps).toBeCloseTo(0.09 / 0.12, 2);
+  });
+
+  it("prefers a tier that still holds something new when asked", () => {
+    const onlyMythicNew = (rarity: GuitarRarity) => rarity === "Mythic";
+    for (let roll = 0; roll < 1; roll += 0.01) {
+      expect(drawTopRarity(ELITE, "Legendary", () => roll, onlyMythicNew)).toBe(
+        "Mythic",
+      );
+    }
+  });
+
+  it("falls back to the plain table when the floor is above everything the case drops", () => {
+    const common = drawTopRarity({ Common: 1 }, "Mythic", () => 0);
+    expect(common).toBe("Common");
   });
 });

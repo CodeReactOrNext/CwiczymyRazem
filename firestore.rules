@@ -24,6 +24,9 @@ service cloud.firestore {
         // client able to write here could re-collect something it has already
         // been paid for, or mint itself free Elite cases outright.
         && !("rewards"              in request.resource.data.diff(resource.data).affectedKeys())
+        // Case pity counters. Written only by /api/arsenal/open-case: a counter
+        // the client could set would be a guaranteed Mythic on demand.
+        && !("casePity"             in request.resource.data.diff(resource.data).affectedKeys())
         && !("guildId"              in request.resource.data.diff(resource.data).affectedKeys())
         // Denormalised copy of the guild's tag and cosmetics, so the leaderboard
         // can draw a member's badge without reading /guilds (which is closed to

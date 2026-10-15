@@ -10,14 +10,15 @@ import { DROPPABLE_GUITARS_BY_RARITY, GUITARS_BY_ID } from "feature/arsenal/data
 import { getItemValue } from "feature/arsenal/data/itemStats";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
+import { useMergeScene } from "feature/arsenal/hooks/useMergeScene";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
+import { GUITAR_CHANCE } from "feature/arsenal/utils/caseRoll";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb";
 import { COMPONENT_DEFS, SLOT_LABELS } from "feature/guitarBuilder/data/components";
 import type { ComponentDef } from "feature/guitarBuilder/types/guitarBuilder.types";
-import { COMPONENT_CASE_CHANCE } from "feature/guitarBuilder/utils/components";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -85,14 +86,12 @@ function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripI
       if (roll <= 0) { chosen = rarity; break; }
     }
 
-    // Cases that can drop builder parts show them on the reel at the same rate.
-    const partChance = COMPONENT_CASE_CHANCE[caseDef.id] ?? 0;
-    if (partChance > 0 && Math.random() < partChance) {
+    // The Parts Crate drops builder parts and nothing else, so its whole reel is
+    // parts; every other case drops gear only and never shows one.
+    if (caseDef.dropKind === "component") {
       const part = randomComponent(chosen);
-      if (part) {
-        strip.push(part);
-        continue;
-      }
+      strip.push(part ?? winItem);
+      continue;
     }
 
     if (dailyPool) {
@@ -104,8 +103,8 @@ function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripI
 
     // Guitar/effect-only cases (e.g. "Elite Guitar Case") must only fill the
     // strip with items they can actually drop — otherwise the reel teases an
-    // impossible pull. Mixed cases keep the 60/40 guitar/effect split.
-    const wantsGuitar = caseDef.dropKind ? caseDef.dropKind === "guitar" : Math.random() < 0.6;
+    // impossible pull. Mixed cases keep the same guitar/effect split they roll.
+    const wantsGuitar = caseDef.dropKind ? caseDef.dropKind === "guitar" : Math.random() < GUITAR_CHANCE;
 
     if (wantsGuitar) {
       const pool = DROPPABLE_GUITARS_BY_RARITY[chosen];
@@ -158,8 +157,12 @@ export const CaseOpeningModal = ({
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
   const { mutate: sellGuitar, isPending: isSellingGuitar } = useSellGuitar();
   const { mutate: sellEffect, isPending: isSellingEffect } = useSellEffect();
+  // The merge scene and the request behind it run together; the modal closes
+  // only when both are finished.
+  const merge = useMergeScene({ onFinished: onClose });
+  const isMerging = merge.isActive;
   const isSelling = isSellingGuitar || isSellingEffect;
-  const isBusy = isEquipping || isSelling || isOpeningAgain;
+  const isBusy = isEquipping || isSelling || isMerging || isOpeningAgain;
   const isOpen = result !== null;
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -196,6 +199,22 @@ export const CaseOpeningModal = ({
         : 0
     : 0;
 
+  // A duplicate with a copy to go into can be folded into it for a few levels.
+  const mergeOffer = result?.merge ?? null;
+  const handleMerge = () => {
+    if (!mergeOffer || isBusy || !winDef || winDef.kind === "component") return;
+    const itemId =
+      winDef.kind === "guitar" ? result?.newItem?.id : result?.effectItem?.id;
+    if (!itemId) return;
+
+    merge.start({
+      kind: winDef.kind,
+      itemId,
+      def: winDef.def,
+      offer: mergeOffer,
+    });
+  };
+
   const handleSell = () => {
     if (!winDef || isBusy) return;
     if (winDef.kind === "guitar" && result?.newItem?.id) {
@@ -227,7 +246,9 @@ export const CaseOpeningModal = ({
 
   if (!mounted) return null;
 
-  return createPortal(
+  return (
+    <>
+    {createPortal(
     <AnimatePresence>
       {isOpen && strip.length > 0 && (
         <motion.div
@@ -399,6 +420,18 @@ export const CaseOpeningModal = ({
                         : t("opening.duplicate")}
                   </motion.p>
 
+                  {result?.pityHit && (
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="text-xs font-medium text-amber-400">
+                      {result.pityHit === "top" && caseDef?.pity?.top
+                        ? t("opening.pity_top", { rarity: labels.rarity(caseDef.pity.top.rarity) })
+                        : t("opening.pity_new")}
+                    </motion.p>
+                  )}
+
                   <div className="relative flex items-center justify-center">
                     {/* Slow-rotating light rays behind the card */}
                     <motion.div
@@ -492,7 +525,22 @@ export const CaseOpeningModal = ({
                   </div>
                   ) : (
                   <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-3">
-                  {winDef.kind === "guitar" && guitar && (
+                  {mergeOffer && (
+                    <Button
+                      onClick={handleMerge}
+                      disabled={isBusy}
+                      className="w-full bg-white hover:bg-zinc-200 text-zinc-900 font-medium capitalize tracking-widest h-12 text-sm disabled:opacity-50"
+                    >
+                      {isMerging
+                        ? t("pack.merging")
+                        : t("opening.merge", {
+                            gain: mergeOffer.gain,
+                            before: mergeOffer.levelBefore,
+                            after: mergeOffer.levelAfter,
+                          })}
+                    </Button>
+                  )}
+                  {winDef.kind === "guitar" && guitar && !mergeOffer && (
                     <Button
                       onClick={() => equip({ guitarId: guitar.id, year: result?.newItem?.year, country: result?.newItem?.country }, { onSuccess: onClose })}
                       disabled={isBusy}
@@ -567,5 +615,8 @@ export const CaseOpeningModal = ({
       )}
     </AnimatePresence>,
     document.body
+    )}
+    {merge.element}
+    </>
   );
 };

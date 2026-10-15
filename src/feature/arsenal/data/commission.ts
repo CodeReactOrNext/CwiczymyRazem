@@ -93,14 +93,21 @@ export const COMMISSION_MIN_LEVEL = FEATURE_UNLOCKS.commissions.requiredLvl;
  * either, so finding a Mythic pedal is exactly as dear as finding a Mythic guitar.
  *
  * `Custom Shop` is absent on purpose — it is a workshop promotion, never a model.
+ *
+ * Rebalanced alongside the case prices: Common and Rare rose with them (an Elite
+ * case at 500 Fame makes an average Rare pull cost about 1040), while Legendary
+ * and Mythic stayed where they were on purpose. They sit just under what the
+ * cases charge for the *last* missing model of the tier — roughly 5100 and
+ * 13 900 — and `commission.test.ts` pins that: a commission that costs more than
+ * finishing the Dex through cases would be a feature nobody uses.
  */
 export const COMMISSION_FAME: Record<
   Exclude<GuitarRarity, "Custom Shop">,
   number
 > = {
-  Common: 500,
+  Common: 600,
   Uncommon: 650,
-  Rare: 900,
+  Rare: 1100,
   Epic: 1600,
   Legendary: 4500,
   Mythic: 13500,

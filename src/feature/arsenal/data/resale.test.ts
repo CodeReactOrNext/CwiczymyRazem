@@ -179,8 +179,12 @@ describe("stripping a chassis is never the richer move", () => {
  * is the number to measure against rather than the chassis.
  */
 describe("liquidating a case pull never pays for the case", () => {
+  // The Parts Crate hands back a part, never an instrument, so there is nothing
+  // of it to tear down: the case that feeds this loop is the cheapest gear one.
   const CHEAPEST_CASE = Math.min(
-    ...Object.values(CASE_DEFINITIONS).map((c) => c.fameCost),
+    ...Object.values(CASE_DEFINITIONS)
+      .filter((c) => c.dropKind !== "component")
+      .map((c) => c.fameCost),
   );
 
   const bestMod = (kind: "guitar" | "effect") =>

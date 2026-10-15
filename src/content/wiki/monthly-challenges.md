@@ -31,7 +31,7 @@ Don't recognise a nomination? Click it. The song opens with a player, so you can
 Old boards don't disappear. You can still record songs from a closed month and the recording lands on that board; it just doesn't pay points or Fame. Back-filling a year of challenges was never meant to be a shortcut up the rankings, but catching up on a song you missed is fair game.
 
 <BlogAlert type="tip">
-The challenge board is the fastest legitimate Fame in the app. If you're saving for an Elite case, one recorded song is more than double the price of a Standard one.
+The challenge board is the fastest legitimate Fame in the app. If you're saving for a Vault case, one recorded song pays for a Standard one, and a full board at 1500 Fame is more than a Vault case costs.
 </BlogAlert>
 
 ## Questions people ask

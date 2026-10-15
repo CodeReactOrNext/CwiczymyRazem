@@ -4,6 +4,20 @@ import type { LucideIcon } from "lucide-react";
 import type { ButtonHTMLAttributes } from "react";
 
 /**
+ * The merge key of an item card: what it would add, and whether it can be pressed.
+ * Absent on a card whose model the player holds only once — there is nothing to
+ * fold it into, so the key would only ever be disabled.
+ */
+export interface CardMergeAction {
+  /** Item Level points the merge adds to the copy it lands on. */
+  gain: number;
+  disabled?: boolean;
+  /** Why it is disabled, said in the key's own tooltip. */
+  reason?: string;
+  onClick: () => void;
+}
+
+/**
  * The strip of actions along the bottom of an item card.
  *
  * A band of darker floor with the actions sitting on it as separate keys —
@@ -43,6 +57,9 @@ const cardAction = cva(
           "text-zinc-400 enabled:hover:bg-purple-500/15 enabled:hover:text-purple-300",
         scrap:
           "text-zinc-400 enabled:hover:bg-orange-500/15 enabled:hover:text-orange-300",
+        /** Folds a duplicate into the copy you keep — progress, so emerald. */
+        merge:
+          "text-zinc-400 enabled:hover:bg-emerald-500/15 enabled:hover:text-emerald-300",
         sell: "text-zinc-400 enabled:hover:bg-red-500/15 enabled:hover:text-red-300",
         /** The state this action already put the item in — equipped, on board. */
         active: "bg-amber-500/15 text-amber-300 enabled:hover:bg-amber-500/25",
