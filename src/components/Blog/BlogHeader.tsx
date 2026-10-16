@@ -54,7 +54,7 @@ export const BlogHeader = ({ title, description, date, updatedAt, image, author,
 
       {/* Content */}
       <div className="relative z-20 flex h-full items-center pt-32 pb-16 md:items-end md:pt-32 md:pb-24">
-        <div className="container mx-auto px-6">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           <motion.div
             style={{ opacity }}
             initial={{ y: 20, opacity: 0 }}
@@ -63,17 +63,17 @@ export const BlogHeader = ({ title, description, date, updatedAt, image, author,
             className="max-w-4xl"
           >
             {/* Title */}
-            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl leading-[1.1]">
+            <h1 className="mb-6 text-balance text-4xl font-bold leading-[1.1] tracking-tight text-white md:text-5xl lg:text-6xl">
               {title}
             </h1>
             
             {/* Description */}
-            <p className="mb-8 max-w-2xl text-lg text-zinc-300/90 md:text-xl font-light leading-relaxed">
+            <p className="mb-8 max-w-2xl text-lg text-zinc-300/90 md:text-xl font-normal leading-relaxed">
               {description}
             </p>
 
             {/* Metadata Footer */}
-            <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400 pt-6">
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-zinc-400 pt-6">
               <div className="flex items-center gap-2">
                 {authorImage ? (
                   <Image
@@ -91,8 +91,6 @@ export const BlogHeader = ({ title, description, date, updatedAt, image, author,
                 <span className="font-medium text-zinc-200">{author || "Riff Quest"}</span>
               </div>
 
-              <div className="h-4 w-px bg-white/10" />
-
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-zinc-500" />
                 <span>
@@ -101,8 +99,6 @@ export const BlogHeader = ({ title, description, date, updatedAt, image, author,
                     : format(new Date(date), 'MMM dd, yyyy')}
                 </span>
               </div>
-
-              <div className="h-4 w-px bg-white/10" />
 
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-zinc-500" />

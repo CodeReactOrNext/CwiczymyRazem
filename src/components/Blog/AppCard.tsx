@@ -48,7 +48,7 @@ export const AppCard = ({
   const shots = splitList(screenshots);
 
   return (
-    <div className="not-prose my-10 overflow-hidden rounded-xl bg-zinc-900/40">
+    <div className="not-prose my-10 overflow-hidden rounded-lg bg-zinc-900/40">
       {/* Header: icon, name, badge, rating */}
       <div className="flex flex-wrap items-center gap-4 p-5">
         <img
@@ -58,7 +58,7 @@ export const AppCard = ({
           height={56}
           loading="lazy"
           decoding="async"
-          className="h-14 w-14 shrink-0 rounded-xl"
+          className="h-14 w-14 shrink-0 rounded-lg"
         />
         <div className="min-w-0 flex-1">
           <div className="text-lg font-bold tracking-tight text-white">{name}</div>
@@ -74,7 +74,7 @@ export const AppCard = ({
               <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
               <span className="text-xl font-bold text-white">{rating}</span>
             </div>
-            <div className="text-xs text-zinc-500">
+            <div className="text-xs text-zinc-400">
               App Store{ratingCount ? ` · ${ratingCount} ratings` : ''}
             </div>
           </div>
@@ -89,7 +89,7 @@ export const AppCard = ({
           ['Platforms', platforms],
         ].map(([label, value]) => (
           <div key={label} className="px-5 py-3">
-            <div className="text-xs font-black text-zinc-500">{label}</div>
+            <div className="text-xs font-black text-zinc-400">{label}</div>
             <div className="mt-0.5 text-sm font-medium text-zinc-200">{value}</div>
           </div>
         ))}

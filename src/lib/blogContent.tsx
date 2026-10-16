@@ -21,7 +21,6 @@ import { StepList } from 'components/Blog/StepList';
 import { TierCards } from 'components/Blog/TierCards';
 import { YouTube } from 'components/Blog/YouTube';
 import { createHeadingIdFactory, headingText } from 'lib/headingId';
-import { CheckCircle2, Clock, Flame, HelpCircle, Sprout, Target, Trophy } from 'lucide-react';
 import * as jsxRuntime from 'react/jsx-runtime';
 import { renderToStaticMarkup } from 'react-dom/server';
 import remarkGfm from 'remark-gfm';
@@ -32,23 +31,6 @@ export interface BlogHeading {
   /** 2 for `##`, 3 for `###` — drives the indent in the table of contents. */
   level: 2 | 3;
 }
-
-// Keyword -> icon for H2 section markers. Falls back to a plain dot when no
-// keyword matches, so existing posts without these headings render unchanged.
-const H2_ICONS: [RegExp, React.ElementType][] = [
-  [/beginner/i, Sprout],
-  [/intermediate/i, Flame],
-  [/advanced/i, Trophy],
-  [/efficien/i, Target],
-  [/faq/i, HelpCircle],
-  [/conclusion/i, CheckCircle2],
-  [/^how long/i, Clock],
-];
-
-const getH2Icon = (text: string): React.ElementType | null => {
-  const match = H2_ICONS.find(([pattern]) => pattern.test(text));
-  return match ? match[1] : null;
-};
 
 /** Flattens rendered children back to plain text so a heading containing a link
  *  or bold run slugs to the same string its markdown source does. */
@@ -88,28 +70,17 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
   SongRanking,
   SongTierTable,
   TierCards,
-  // Mapping h2 to include IDs for ToC, plus an accent marker for section scanning
-  h2: ({ children, ...rest }: any) => {
-    const text = nodeText(children);
-    const Icon = getH2Icon(text);
-    return (
-      <h2 {...rest} id={nextHeadingId(text)} className="scroll-mt-24 flex items-center gap-3.5">
-        {Icon ? (
-          <Icon className="h-6 w-6 shrink-0 text-cyan-400" aria-hidden="true" />
-        ) : (
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true" />
-        )}
-        <span>{children}</span>
-      </h2>
-    );
-  },
-  // h3 gets a small marker to echo h2's language at a subtler scale, so
-  // sub-sections read as part of the same heading system, not plain bold text.
-  // It carries an id too — the ToC links to sub-sections, not just top ones.
+  // Headings carry the ids the table of contents links to. They sit flush with
+  // the paragraphs: the old cyan dot / icon markers pushed some headings 14-38px
+  // right of the body text and spent colour on decoration rather than meaning.
+  h2: ({ children, ...rest }: any) => (
+    <h2 {...rest} id={nextHeadingId(nodeText(children))} className='scroll-mt-24'>
+      {children}
+    </h2>
+  ),
   h3: ({ children, ...rest }: any) => (
-    <h3 {...rest} id={nextHeadingId(nodeText(children))} className="scroll-mt-24 flex items-center gap-3">
-      <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-500/60" aria-hidden="true" />
-      <span>{children}</span>
+    <h3 {...rest} id={nextHeadingId(nodeText(children))} className='scroll-mt-24'>
+      {children}
     </h3>
   ),
   // Content images live below the fold; lazy-load them to cut initial page weight
@@ -119,7 +90,7 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
   // container and a minimum width, so the columns stay readable and swipeable.
   table: ({ children, ...rest }: any) => (
     <div className='my-8 overflow-x-auto' role='region' aria-label='Table, scrolls horizontally' tabIndex={0}>
-      <table {...rest} className='my-0 min-w-[34rem]'>{children}</table>
+      <table {...rest} className='my-0 min-w-[34rem] [&_thead]:border-0 [&_tbody_tr]:border-0 [&_tbody_tr:nth-child(odd)]:bg-zinc-900/40 [&_th:first-child]:pl-4 [&_td:first-child]:pl-4 [&_th:last-child]:pr-4 [&_td:last-child]:pr-4'>{children}</table>
     </div>
   ),
   // Expert-quote blockquotes get the same repeating-icon treatment as BlogAlert,
@@ -137,7 +108,7 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
       />
       <blockquote
         {...rest}
-        className='relative m-0 border-0 text-center text-base italic leading-relaxed text-zinc-200 [&>p]:m-0 [&>p]:before:content-none [&>p]:after:content-none'
+        className='relative m-0 border-0 text-lg italic leading-relaxed text-zinc-200 [&>p]:m-0 [&>p]:before:content-none [&>p]:after:content-none'
       >
         {children}
       </blockquote>
@@ -151,7 +122,7 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
     return (
       <a
         {...rest}
-        className={isCitation ? 'align-super text-[0.65em] text-zinc-500 no-underline hover:text-zinc-300' : undefined}
+        className={isCitation ? 'relative -top-[0.4em] align-baseline text-xs leading-none text-zinc-400 no-underline hover:text-zinc-200' : undefined}
       >
         {children}
       </a>

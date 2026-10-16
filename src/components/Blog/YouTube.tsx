@@ -33,7 +33,7 @@ export const YouTube = ({ id, title, caption, className }: YouTubeProps) => (
       </div>
     </div>
     {caption && (
-      <figcaption className='mt-3 text-xs text-zinc-500'>
+      <figcaption className='mt-3 text-xs text-zinc-400'>
         {withCurrencyIcons(caption)}
       </figcaption>
     )}

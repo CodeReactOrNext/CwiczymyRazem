@@ -31,14 +31,14 @@ const defaultSteps: PracticeStep[] = [
 
 export const PracticeTable = () => {
   return (
-    <div className="my-10 overflow-hidden rounded-xl bg-zinc-900/30">
+    <div className="my-10 overflow-hidden rounded-lg bg-zinc-900/30">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse table-auto sm:table-fixed">
           <thead>
             <tr className="bg-white/5">
-              <th className="px-4 py-3 text-xs font-bold tracking-wider text-cyan-400">Segment</th>
-              <th className="px-4 py-3 text-xs font-bold tracking-wider text-cyan-400">Duration</th>
-              <th className="px-4 py-3 text-xs font-bold tracking-wider text-cyan-400">Focus</th>
+              <th className="px-4 py-3 text-xs font-bold text-cyan-400">Segment</th>
+              <th className="px-4 py-3 text-xs font-bold text-cyan-400">Duration</th>
+              <th className="px-4 py-3 text-xs font-bold text-cyan-400">Focus</th>
             </tr>
           </thead>
           <tbody>

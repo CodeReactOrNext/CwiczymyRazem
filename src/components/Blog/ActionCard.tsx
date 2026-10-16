@@ -31,9 +31,6 @@ export const ActionCard = ({
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
-
-      {/* Decorative background element */}
-      <div className="pointer-events-none absolute -right-12 -top-12 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
     </div>
   );
 };

@@ -165,7 +165,7 @@ export const PracticeBlueprint = ({
           ))}
         </ol>
 
-        <p className='m-0 mt-6 text-xs text-zinc-500'>
+        <p className='m-0 mt-6 text-xs text-zinc-400'>
           {total} minutes total
           {note ? `. ${note}` : ""}
         </p>

@@ -14,6 +14,11 @@ interface BlogIndexProps {
 }
 
 const BlogIndex = ({ blogs }: BlogIndexProps) => {
+  // The newest pillar post leads the grid as a wide card; the others keep their
+  // newest-first order.
+  const featured = blogs.find((blog) => blog.pillar);
+  const ordered = featured ? [featured, ...blogs.filter((blog) => blog !== featured)] : blogs;
+
   return (
     <>
       <Head>
@@ -32,8 +37,8 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
       </Head>
 
       <main className="min-h-screen bg-zinc-950 text-zinc-300 overflow-x-hidden">
-        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-zinc-950/90 backdrop-blur-sm">
-          <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-6">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/90 backdrop-blur-sm">
+          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
             <Link href="/" className="transition-opacity hover:opacity-70">
               <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={32} className='h-6 w-auto' priority />
             </Link>
@@ -44,7 +49,7 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
           </div>
         </nav>
 
-        <div className="pt-32 pb-24 container mx-auto px-4 overflow-x-hidden min-w-0">
+        <div className="pt-32 pb-24 mx-auto max-w-6xl px-4 sm:px-6 overflow-x-hidden min-w-0">
           <div className="mb-16 text-center">
             <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl tracking-tight leading-[1.1]">
               Knowledge and <span className="text-cyan-400">Inspiration</span>
@@ -60,18 +65,18 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
           </div>
 
           {blogs.length > 0 ? (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-              {blogs.map((blog) => (
-                <BlogCard key={blog.slug} blog={blog} />
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {ordered.map((blog) => (
+                <BlogCard key={blog.slug} blog={blog} featured={blog === featured} />
               ))}
             </div>
           ) : (
             <div className="py-20 text-center">
-              <p className="text-xl text-zinc-500">No articles yet. Check back soon!</p>
+              <p className="text-xl text-zinc-400">No articles yet. Check back soon!</p>
             </div>
           )}
 
-          <div className="mx-auto mt-20 grid max-w-6xl gap-6 md:grid-cols-2">
+          <div className="mt-20 grid gap-6 md:grid-cols-2">
             <section className="rounded-lg bg-zinc-900/40 p-6 sm:p-8">
               <h2 className="text-lg font-bold text-white">What these guides cover</h2>
               <p className="mt-4 text-sm leading-relaxed text-zinc-400">

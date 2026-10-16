@@ -352,7 +352,7 @@ a {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
@@ -360,8 +360,7 @@ a {
   content: '\201C';
   position: absolute;
   top: 0.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   font-size: 4.5rem;
   font-weight: 600;
   color: rgb(34 211 238 / 0.25);

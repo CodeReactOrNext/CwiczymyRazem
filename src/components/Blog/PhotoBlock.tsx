@@ -44,7 +44,7 @@ export const PhotoBlock = ({ src, alt, caption, ratio = 'landscape', width, heig
           <Maximize2 className="h-4 w-4" />
         </span>
       </button>
-      {caption && <figcaption className="mt-3 text-sm text-zinc-500">{caption}</figcaption>}
+      {caption && <figcaption className="mt-3 text-sm text-zinc-400">{caption}</figcaption>}
     </figure>
   );
 };

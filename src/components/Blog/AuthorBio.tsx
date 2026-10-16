@@ -13,7 +13,7 @@ interface AuthorBioProps {
 export const AuthorBio = ({ name, image, role, bio }: AuthorBioProps) => {
   return (
     <div className="not-prose my-10 rounded-lg bg-zinc-900/40 p-6 sm:p-8">
-      <p className="text-xs tracking-widest text-white">About the Author</p>
+      <p className="text-sm font-medium text-zinc-400">About the Author</p>
 
       <div className="mt-5 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
         <Image
@@ -25,7 +25,7 @@ export const AuthorBio = ({ name, image, role, bio }: AuthorBioProps) => {
         />
         <div>
           <p className="text-lg font-bold text-white">{name}</p>
-          <p className="text-sm text-zinc-500">{role}</p>
+          <p className="text-sm text-zinc-400">{role}</p>
         </div>
       </div>
 

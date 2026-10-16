@@ -1,3 +1,4 @@
+import { cn } from "assets/lib/utils";
 import { withCurrencyIcons } from "components/CurrencyIcons/withCurrencyIcons";
 import React from "react";
 
@@ -16,7 +17,7 @@ export const StatRow = ({ stats, caption }: StatRowProps) => {
 
   return (
     <div className='not-prose my-10 rounded-lg bg-zinc-900/40 p-6'>
-      <div className='grid gap-6 sm:grid-cols-2'>
+      <div className={cn('grid gap-6', items.length >= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2')}>
         {items.map((item) => (
           <div key={item.label}>
             <p className='text-4xl font-bold text-cyan-400'>
@@ -29,7 +30,7 @@ export const StatRow = ({ stats, caption }: StatRowProps) => {
         ))}
       </div>
       {caption && (
-        <p className='mt-4 text-xs text-zinc-500'>
+        <p className='mt-4 text-sm text-zinc-400'>
           {withCurrencyIcons(caption)}
         </p>
       )}

@@ -205,7 +205,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
         />
 
         <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/90 backdrop-blur-sm">
-          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
             <Link href="/" className="transition-opacity hover:opacity-70">
               <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={32} className='h-6 w-auto' />
             </Link>
@@ -216,13 +216,13 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
           </div>
         </nav>
 
-        <div className="pt-24 px-6 mx-auto max-w-6xl overflow-hidden">
-          <div className="flex items-center gap-2 text-xs text-zinc-500 mb-8 tracking-widest">
-            <Link href="/" className="hover:text-zinc-300 transition-colors">Home</Link>
+        <div className="pt-24 px-4 sm:px-6 mx-auto max-w-6xl overflow-hidden">
+          <div className="flex items-center gap-2 text-xs text-zinc-400 mb-8">
+            <Link href="/" className="hover:text-zinc-200 transition-colors">Home</Link>
             <ChevronRight className="h-3 w-3" />
-            <Link href="/blog" className="hover:text-zinc-300 transition-colors">Blog</Link>
+            <Link href="/blog" className="hover:text-zinc-200 transition-colors">Blog</Link>
             <ChevronRight className="h-3 w-3" />
-            <span className="text-zinc-400 truncate max-w-[200px]">{frontmatter.title}</span>
+            <span className="text-zinc-200 truncate max-w-[200px]">{frontmatter.title}</span>
           </div>
         </div>
 
@@ -238,11 +238,11 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
           lang={lang}
         />
 
-        <article lang={lang} className="container mx-auto px-4 py-12 min-w-0">
-          <div className="mx-auto max-w-6xl flex flex-col lg:flex-row gap-12">
+        <article lang={lang} className="mx-auto max-w-6xl px-4 py-12 min-w-0 sm:px-6">
+          <div className="flex flex-col lg:flex-row gap-12">
             {/* Sidebar ToC */}
             <aside className="hidden lg:block w-64 shrink-0 overflow-y-auto max-h-[calc(100vh-200px)] sticky top-32">
-              <div className="flex items-center gap-2 mb-6 text-white font-bold text-lg tracking-wider">
+              <div className="flex items-center gap-2 mb-6 text-white font-bold text-lg">
                 <List className="h-5 w-5 text-cyan-500" />
                 Table of Contents
               </div>
@@ -252,11 +252,11 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
                     key={heading.id}
                     href={`#${heading.id}`}
                     className={`rounded py-1.5 text-sm transition-background hover:text-cyan-400 ${
-                      heading.level === 3 ? 'pl-8 pr-4 text-[13px]' : 'px-4'
+                      heading.level === 3 ? 'pl-8 pr-4' : 'px-4'
                     } ${
                       activeId === heading.id
                         ? 'bg-cyan-500/10 text-cyan-400 font-medium'
-                        : 'text-zinc-500'
+                        : 'text-zinc-400'
                     }`}
                   >
                     {heading.text}
@@ -265,7 +265,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
               </nav>
             </aside>
 
-            <div className="flex-1 min-w-0 max-w-full lg:max-w-3xl mx-auto lg:mx-0 overflow-hidden">
+            <div className="flex-1 min-w-0 max-w-full lg:max-w-[40rem] mx-auto lg:mx-0 overflow-hidden">
               {/* Phone-sized screens have no sidebar. Collapsed by default so the
                   article itself, not a 25-item list, is what follows the hero. */}
               {headings.length > 0 && (
@@ -279,7 +279,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
                         key={heading.id}
                         href={`#${heading.id}`}
                         className={`text-sm text-zinc-400 transition-colors hover:text-cyan-400 ${
-                          heading.level === 3 ? 'pl-4 text-[13px] text-zinc-500' : ''
+                          heading.level === 3 ? 'pl-4' : ''
                         }`}
                       >
                         {heading.text}
@@ -291,7 +291,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
 
               <ZoomableImages>
                 <div
-                  className="prose prose-invert prose-lg max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-5 prose-h2:text-white prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-li:my-3 prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-table:my-8 prose-th:text-white prose-th:py-3 prose-td:py-3"
+                  className="prose prose-invert prose-lg max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-balance prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-5 prose-h2:text-white prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-li:my-3 prose-li:text-zinc-400 prose-li:leading-relaxed prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-hr:my-12 prose-hr:border-0 prose-table:my-8 prose-th:text-white prose-th:py-3 prose-td:py-3 prose-td:text-zinc-400"
                   dangerouslySetInnerHTML={{ __html: contentHtml }}
                 />
               </ZoomableImages>
@@ -311,8 +311,8 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
         </article>
 
         {practiceLink && (
-          <section className="container mx-auto px-4 py-16">
-            <div className="mx-auto max-w-6xl">
+          <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+            <div>
               <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <h2 className="text-2xl font-bold text-white">Put It Into Practice</h2>
                 <Link
@@ -339,8 +339,8 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
         )}
 
         {relatedBlogs.length > 0 && (
-          <section className="container mx-auto px-4 py-16">
-            <div className="mx-auto max-w-6xl">
+          <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+            <div>
               <h2 className="text-2xl font-bold text-white mb-8">
                 Read Also
               </h2>

@@ -49,10 +49,10 @@ export const SongRanking = ({ songs, caption }: SongRankingProps) => {
   const items = parseSongs(songs);
 
   return (
-    <div className="not-prose my-10 overflow-hidden rounded-xl bg-zinc-900/40">
+    <div className="not-prose my-10 overflow-hidden rounded-lg bg-zinc-900/40">
       <div className="flex items-baseline justify-between gap-4 px-5 pt-5 sm:px-6">
-        <p className="text-xs font-medium text-zinc-500">Community difficulty score, lowest first</p>
-        <p className="hidden text-xs font-medium text-zinc-500 sm:block">0 – 10 scale</p>
+        <p className="text-xs font-medium text-zinc-400">Community difficulty score, lowest first</p>
+        <p className="hidden text-xs font-medium text-zinc-400 sm:block">0 – 10 scale</p>
       </div>
 
       <ol className="mt-2 pb-2">
@@ -66,7 +66,7 @@ export const SongRanking = ({ songs, caption }: SongRankingProps) => {
               key={song.songId}
               className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-zinc-800/40 sm:gap-5 sm:px-6"
             >
-              <span className="w-6 shrink-0 text-right text-sm font-bold tabular-nums text-zinc-500">
+              <span className="w-6 shrink-0 text-right text-sm font-bold tabular-nums text-zinc-400">
                 {song.rank}
               </span>
 
@@ -93,7 +93,7 @@ export const SongRanking = ({ songs, caption }: SongRankingProps) => {
                   {song.title}
                 </Link>
                 <p className="truncate text-sm text-zinc-400">{song.artist}</p>
-                <p className="mt-1 truncate text-xs text-zinc-500">{song.need}</p>
+                <p className="mt-1 truncate text-xs text-zinc-400">{song.need}</p>
                 <div className="mt-2 flex items-center gap-3">
                   <div className="h-1 w-24 overflow-hidden rounded-full bg-zinc-800">
                     <div
@@ -125,7 +125,7 @@ export const SongRanking = ({ songs, caption }: SongRankingProps) => {
                 <p className="text-2xl font-black leading-none tabular-nums" style={{ color: tier.color }}>
                   {song.difficulty.toFixed(1)}
                 </p>
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-1 text-xs text-zinc-400">
                   {song.ratings} {song.ratings === '1' ? 'rating' : 'ratings'}
                 </p>
               </div>
@@ -134,7 +134,7 @@ export const SongRanking = ({ songs, caption }: SongRankingProps) => {
         })}
       </ol>
 
-      {caption && <p className="px-5 pb-5 pt-2 text-xs text-zinc-500 sm:px-6">{caption}</p>}
+      {caption && <p className="px-5 pb-5 pt-2 text-xs text-zinc-400 sm:px-6">{caption}</p>}
     </div>
   );
 };

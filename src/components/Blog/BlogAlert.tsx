@@ -76,10 +76,10 @@ export const BlogAlert = ({ type = 'info', children }: BlogAlertProps) => {
     <div className={`relative my-8 overflow-hidden rounded-lg p-8 ${baseClass}`}>
       <PatternBackground icon={ICONS[type]} strokeClass={strokeClass} />
       <div className='relative'>
-        <div className={`mb-2 text-sm font-bold tracking-wider ${textClass}`}>
+        <div className={`mb-2 text-sm font-bold ${textClass}`}>
           {title}
         </div>
-        <div className='text-sm leading-relaxed'>{children}</div>
+        <div className='text-base leading-relaxed'>{children}</div>
       </div>
     </div>
   );

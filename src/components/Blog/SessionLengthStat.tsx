@@ -30,23 +30,23 @@ export const SessionLengthStat = () => {
         Mean length of a completed practice session.
       </p>
 
-      <dl className="mt-6 space-y-1.5 text-xs text-zinc-500">
+      <dl className="mt-6 space-y-1.5 text-sm text-zinc-400">
         <div className="flex gap-2">
-          <dt className="font-medium text-zinc-400">Sample:</dt>
+          <dt className="font-medium text-zinc-300">Sample:</dt>
           <dd>
             every completed practice report logged by {PLAYERS} players &mdash;{' '}
             {SESSIONS} sessions in total &mdash; measured {MEASURED_ON}.
           </dd>
         </div>
         <div className="flex gap-2">
-          <dt className="font-medium text-zinc-400">Unit:</dt>
+          <dt className="font-medium text-zinc-300">Unit:</dt>
           <dd>
             one logged session, not one person&apos;s day. Someone who practises
             twice on a Tuesday appears twice.
           </dd>
         </div>
         <div className="flex gap-2">
-          <dt className="font-medium text-zinc-400">Duration:</dt>
+          <dt className="font-medium text-zinc-300">Duration:</dt>
           <dd>
             the total time recorded on that session, summed and divided by the
             session count.
@@ -54,7 +54,7 @@ export const SessionLengthStat = () => {
         </div>
       </dl>
 
-      <p className="mt-5 text-xs leading-relaxed text-zinc-500">
+      <p className="mt-5 text-sm leading-relaxed text-zinc-400">
         We publish the mean and nothing else because the mean is all the
         aggregate returns. There is no median here, and no split by skill level,
         because neither is measured &mdash; and a mean of this shape is easily
