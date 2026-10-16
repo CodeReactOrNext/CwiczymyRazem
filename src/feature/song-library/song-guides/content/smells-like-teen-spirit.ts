@@ -11,7 +11,7 @@ export const smellsLikeTeenSpirit: SongGuide = {
   seo: {
     metaTitle: "How to Play Smells Like Teen Spirit on Guitar: Strum & Mutes",
     metaDescription:
-      "How hard is Smells Like Teen Spirit on guitar? Community difficulty data, the syncopated sixteenth-note strum with muted scratches, half-step-down tuning, and the quiet-loud structure.",
+      "How hard is Smells Like Teen Spirit on guitar? Community difficulty data, the syncopated 16th-note strum, half-step-down tuning and quiet-loud dynamics.",
     keywords: [
       "smells like teen spirit guitar difficulty",
       "how to play smells like teen spirit",

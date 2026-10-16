@@ -11,7 +11,7 @@ export const comeAsYouAre: SongGuide = {
   seo: {
     metaTitle: "How to Play Come As You Are on Guitar: Riff & Tuning",
     metaDescription:
-      "How hard is Come As You Are on guitar? Community difficulty data, which tuning to use (the record is a whole step down), the watery chorus tone and Cobain's melodic solo.",
+      "How hard is Come As You Are on guitar? Community difficulty data, which tuning to use (a whole step down), the watery chorus tone and the solo.",
     keywords: [
       "come as you are guitar difficulty",
       "how to play come as you are",

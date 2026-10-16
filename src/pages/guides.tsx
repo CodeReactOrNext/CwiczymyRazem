@@ -20,6 +20,7 @@ const CANONICAL = `${SITE_URL}/guides`;
  * hub is the only place a reader sees them side by side.
  */
 const ORDER = [
+  "guitar-practice-journal",
   "beginner-guitar-exercises",
   "daily-guitar-practice-plan",
   "guitar-scale-practice-routine",
@@ -29,6 +30,7 @@ const ORDER = [
 
 /** Who each guide is written for — the one thing the configs do not carry. */
 const LEVEL: Record<string, string> = {
+  "guitar-practice-journal": "All levels",
   "beginner-guitar-exercises": "Beginner",
   "daily-guitar-practice-plan": "All levels",
   "guitar-scale-practice-routine": "Beginner to intermediate",
@@ -53,7 +55,7 @@ const TITLE = "Guitar Practice Guides: Routines, Drills and Session Plans";
 /** SERP title — kept under 60 chars with the brand appended, like the guides themselves. */
 const META_TITLE = "Guitar Practice Guides: Routines & Drills | Riff Quest";
 const DESCRIPTION =
-  "Five free guitar practice guides — beginner drills, a daily plan, scale and speed routines, and an intermediate session. Every exercise playable in the browser.";
+  "Free guitar practice guides with printable PDFs: a practice journal, daily plans, beginner drills, scale routines and an intermediate schedule.";
 
 const GuidesPage: NextPage<GuidesPageProps> = ({ guides }) => {
   const jsonLd = {
@@ -134,11 +136,11 @@ const GuidesPage: NextPage<GuidesPageProps> = ({ guides }) => {
               Guitar practice guides
             </h1>
             <p className='mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400'>
-              Five routines that cover the whole arc of a practice habit: what to
-              play on day one, how to fill a session, and the drills that move
-              speed, scales and technique. {totalDrills} exercises across the set,
-              every one of them playable in the browser with your guitar plugged
-              in or a microphone open.
+              Five routines that cover the whole arc of a practice habit: what
+              to play on day one, how to fill a session, and the drills that
+              move speed, scales and technique. {totalDrills} exercises across
+              the set, every one of them playable in the browser with your
+              guitar plugged in or a microphone open.
             </p>
           </div>
         </div>

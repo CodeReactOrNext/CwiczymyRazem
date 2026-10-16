@@ -11,7 +11,7 @@ export const enterSandman: SongGuide = {
   seo: {
     metaTitle: "How to Play Enter Sandman on Guitar: Riff, 3+1 Count & Solo",
     metaDescription:
-      "How hard is Enter Sandman on guitar? Community difficulty data, Kirk Hammett's tritone riff and Lars Ulrich's 3+1 bar structure, the wah solo, and where it sits among other Metallica songs.",
+      "How hard is Enter Sandman on guitar? Community difficulty data, Kirk Hammett's tritone riff, the wah solo, and where it sits among Metallica songs.",
     keywords: [
       "enter sandman guitar difficulty",
       "how to play enter sandman",

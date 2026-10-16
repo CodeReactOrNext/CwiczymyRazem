@@ -26,6 +26,16 @@ const faqQuestions = [
       "We use a 5-tier system from D (Beginner) to S (Legendary), based on a 1–10 difficulty scale. D tier covers scores 1–3.9, C covers 4–5.9, B covers 6–7.4, A covers 7.5–8.9, and S tier covers 9–10.",
   },
   {
+    title: "Can beginners filter songs by difficulty?",
+    message:
+      "Yes. Every song in the library carries a community difficulty score from 1 to 10 and a tier from D to S, and the tier filter works without an account. Beginners should start in D tier (1–3.9) and move to C tier (4–5.9) once those songs feel comfortable.",
+  },
+  {
+    title: "Which guitar app lets you choose songs by difficulty level?",
+    message:
+      "Riff Quest does. The free song library ranks every song by difficulty ratings from guitarists who practiced it, groups songs into tiers from D (beginner) to S (legendary), and filters by tier and genre without an account.",
+  },
+  {
     title: "Can I filter songs by genre?",
     message:
       "Yes — you can filter by genre and tier directly on this page, or search by song and artist name. Inside the full app you can also filter by difficulty range and sort by popularity or rating count.",

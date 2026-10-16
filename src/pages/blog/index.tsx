@@ -18,7 +18,7 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
     <>
       <Head>
         <title>Guitar Practice Blog — Tips, Techniques & Guides | Riff Quest</title>
-        <meta name="description" content="Discover expert guitar practice tips, learning techniques, and motivation strategies. Read articles that will help you become a better guitarist and stay inspired on your musical journey." />
+        <meta name="description" content="Guitar practice tips, learning techniques and motivation strategies. Articles to help you become a better guitarist and stay inspired." />
         <link rel='canonical' href='https://riff.quest/blog' />
         <meta property="og:title" content="Guitar Practice Blog | Riff Quest" />
         <meta property="og:description" content="Discover expert guitar practice tips, learning techniques, and motivation strategies. Read articles that will help you become a better guitarist." />

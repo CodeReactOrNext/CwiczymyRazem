@@ -11,7 +11,7 @@ export const everlong: SongGuide = {
   seo: {
     metaTitle: "How to Play Everlong on Guitar: Drop D Shapes & Strumming",
     metaDescription:
-      "How hard is Everlong on guitar? Community difficulty data, why drop D and ringing open strings make the chords easy, the 158 BPM strumming stamina, and a tempo ladder to full speed.",
+      "How hard is Everlong on guitar? Community difficulty data, why drop D and open strings make the chords easy, the 158 BPM stamina, and a tempo ladder.",
     keywords: [
       "everlong guitar difficulty",
       "how to play everlong",

@@ -11,7 +11,7 @@ export const doIWannaKnow: SongGuide = {
   seo: {
     metaTitle: "How to Play Do I Wanna Know? on Guitar: Riff Feel & Slides",
     metaDescription:
-      "How hard is Do I Wanna Know? on guitar? Community difficulty data, why the 85 BPM riff is easy to learn and hard to groove, slides and hammer-ons explained, plus a practice plan.",
+      "How hard is Do I Wanna Know? on guitar? Community difficulty data, why the 85 BPM riff is easy to learn and hard to groove, and a practice plan.",
     keywords: [
       "do i wanna know guitar difficulty",
       "how to play do i wanna know",

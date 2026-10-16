@@ -312,6 +312,33 @@ const nextConfig = {
         destination: '/intermediate-guitar-practice-routine',
         permanent: true,
       },
+      // Search Console export 2026-10-13: the one removed post still holding
+      // impressions, plus four mistyped slugs that someone links to.
+      {
+        source: '/blog/5-steps-to-add-new-skills-to-practice-plans',
+        destination: '/guitar-practice-planner',
+        permanent: true,
+      },
+      {
+        source: '/blog/easy-songs-to-play-on-guitar-for-beginner',
+        destination: '/blog/easy-songs-to-play-on-guitar-for-beginners',
+        permanent: true,
+      },
+      {
+        source: '/blog/guitar-routine-builder',
+        destination: '/blog/guitar-practice-routine-builder',
+        permanent: true,
+      },
+      {
+        source: '/intermediate-practice-routine',
+        destination: '/intermediate-guitar-practice-routine',
+        permanent: true,
+      },
+      {
+        source: '/song-library/master_of-puppets',
+        destination: '/song-library/master-of-puppets',
+        permanent: true,
+      },
       // The AI coach itself sits behind login; the public planner page is the
       // closest thing a searcher can open and use.
       {
@@ -332,12 +359,12 @@ const nextConfig = {
       },
       {
         source: '/blog/guitar-practice-journal-benefits',
-        destination: '/blog/how-to-track-guitar-practice-progress-effectively',
+        destination: '/guitar-practice-journal',
         permanent: true,
       },
       {
         source: '/blog/daily-guitar-practice-log-template',
-        destination: '/blog/how-to-track-guitar-practice-progress-effectively',
+        destination: '/guitar-practice-journal',
         permanent: true,
       },
       {

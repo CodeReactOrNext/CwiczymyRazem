@@ -15,9 +15,9 @@ import { useRouter } from "next/router";
 
 const siteUrl = "https://riff.quest/tools/tuner";
 
-const TITLE = "Online Guitar Tuner — Free Mic Tuner for Guitar, Bass & Ukulele";
+const TITLE = "Online Guitar Tuner: Free Mic Tuner for Guitar & Bass";
 const DESCRIPTION =
-  "Free online guitar tuner that listens through your microphone. Standard, Drop D, Open G, DADGAD and half step down, plus bass, ukulele, mandolin and banjo tunings, with the needle reading in cents.";
+  "Free online guitar tuner that listens through your microphone. Standard, Drop D, Open G, DADGAD, plus bass, ukulele, mandolin and banjo tunings.";
 
 const STEPS = [
   {

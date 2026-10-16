@@ -1,11 +1,11 @@
 /**
- * Builds the two printable practice handouts linked from the SEO landing pages:
+ * Builds the printable practice handouts linked from the SEO landing pages:
  *
  *   public/downloads/guitar-scale-practice-routine.pdf   (/guitar-scale-practice-routine)
  *   public/downloads/beginner-guitar-practice-sheet.pdf  (/beginner-guitar-exercises)
  *
- * Both are two A4 pages, laid out in plain black-on-white so they stay legible
- * printed in grayscale, and both are checked into public/ so the download works
+ * All are two A4 pages, laid out in plain black-on-white so they stay legible
+ * printed in grayscale, and all are checked into public/ so the download works
  * for logged-out readers without a build step.
  *
  * Every tab below is generated from a note array rather than hand-typed ASCII,
@@ -13,6 +13,8 @@
  * matching in-app exercises actually use (see the `source` comments).
  *
  * Run with: node scripts/generatePracticeSheets.mjs
+ * Optional: append PDF filenames to export only those; --browser-channel=chrome
+ * uses an installed Chrome instead of Playwright Chromium.
  * It prints the exported file size — that number is what the page's download
  * block shows, so update the config when you regenerate.
  */
@@ -20,6 +22,12 @@ import { mkdir, stat, writeFile } from "fs/promises";
 import path from "path";
 import { chromium } from "playwright";
 import { fileURLToPath } from "url";
+
+import {
+  journalHtml,
+  dailyRoutineHtml,
+  intermediateRoutineHtml,
+} from "./printablePracticeResources.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = path.join(ROOT, "public", "downloads");
@@ -341,16 +349,33 @@ const beginnerSheetHtml = () => `<!doctype html>
 </body></html>`;
 
 const SHEETS = [
+  { file: "guitar-practice-journal.pdf", html: journalHtml() },
+  { file: "daily-guitar-practice-routine.pdf", html: dailyRoutineHtml() },
+  {
+    file: "intermediate-guitar-practice-routine.pdf",
+    html: intermediateRoutineHtml(),
+  },
   { file: "guitar-scale-practice-routine.pdf", html: scaleRoutineHtml() },
   { file: "beginner-guitar-practice-sheet.pdf", html: beginnerSheetHtml() },
 ];
 
 const main = async () => {
   await mkdir(OUT_DIR, { recursive: true });
-  const browser = await chromium.launch();
+  const browserChannel = process.argv
+    .find((arg) => arg.startsWith("--browser-channel="))
+    ?.split("=")[1];
+  const browser = await chromium.launch(
+    browserChannel ? { channel: browserChannel } : {},
+  );
   const page = await browser.newPage();
 
-  for (const sheet of SHEETS) {
+  const requestedFiles = process.argv
+    .slice(2)
+    .filter((arg) => !arg.startsWith("--"));
+  for (const sheet of SHEETS.filter(
+    (sheet) =>
+      requestedFiles.length === 0 || requestedFiles.includes(sheet.file),
+  )) {
     await page.setContent(sheet.html, { waitUntil: "load" });
     const buffer = await page.pdf({
       format: "A4",

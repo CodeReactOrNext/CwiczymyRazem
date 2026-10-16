@@ -265,6 +265,7 @@ export const guitarScaleRoutineConfig: SeoLandingConfig = {
     },
   ],
   relatedGuideSlugs: [
+    "guitar-practice-journal",
     "guitar-speed-hand-synchronization-exercises",
     "daily-guitar-practice-plan",
     "intermediate-guitar-practice-routine",

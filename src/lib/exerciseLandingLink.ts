@@ -1,12 +1,13 @@
 import { idToSlug } from "feature/exercises/lib/slugUtils";
 
-/** The five keyword-targeted landing pages that replaced /exercises/*. */
+/** The keyword-targeted landing pages that replaced /exercises/*. */
 export const SEO_LANDING_PAGES = {
   beginner: "/beginner-guitar-exercises",
   speed: "/guitar-speed-hand-synchronization-exercises",
   scales: "/guitar-scale-practice-routine",
   intermediate: "/intermediate-guitar-practice-routine",
   daily: "/daily-guitar-practice-plan",
+  journal: "/guitar-practice-journal",
 } as const;
 
 export type SeoLandingPageKey = keyof typeof SEO_LANDING_PAGES;
@@ -18,6 +19,7 @@ export const SEO_LANDING_TITLES: Record<SeoLandingPageKey, string> = {
   scales: "Scale Practice Routine",
   intermediate: "Intermediate Routine",
   daily: "Daily Practice Plan",
+  journal: "Practice Journal",
 };
 
 /**

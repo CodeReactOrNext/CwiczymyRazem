@@ -11,7 +11,7 @@ export const theTrooper: SongGuide = {
   seo: {
     metaTitle: "How to Play The Trooper on Guitar: Gallop Riff & Twin Leads",
     metaDescription:
-      "How hard is The Trooper on guitar? The gallop is the whole exam: one rhythm, palm muted, at ~160 BPM for four minutes. Real tempo, key and technique data inside.",
+      "How hard is The Trooper on guitar? The gallop is the whole exam: one rhythm, palm muted, at ~160 BPM for four minutes. Real tempo, key and technique data.",
     keywords: [
       "the trooper guitar difficulty",
       "how hard is the trooper iron maiden",

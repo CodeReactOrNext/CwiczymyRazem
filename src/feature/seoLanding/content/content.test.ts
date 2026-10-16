@@ -1,8 +1,14 @@
+import { readFileSync, statSync } from "node:fs";
+import nodePath from "node:path";
+
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { idToSlug } from "feature/exercises/lib/slugUtils";
 import { songGuides } from "feature/song-library/song-guides/content";
 import { getAllBlogs } from "lib/blog";
-import { getExerciseLandingHref, SEO_LANDING_PAGES } from "lib/exerciseLandingLink";
+import {
+  getExerciseLandingHref,
+  SEO_LANDING_PAGES,
+} from "lib/exerciseLandingLink";
 import { describe, expect, it } from "vitest";
 
 import { collectExerciseIds } from "../lib/collectExerciseIds";
@@ -23,12 +29,26 @@ const internalLinksOf = (value: unknown): string[] => {
 };
 
 describe("SEO landing content configs", () => {
-  it("covers exactly the five landing URLs", () => {
+  it("serves every advertised PDF as an existing nonempty document", () => {
+    for (const config of seoLandingConfigs) {
+      for (const section of config.sections) {
+        for (const block of section.blocks) {
+          if (block.kind !== "download") continue;
+          expect(block.href).toMatch(/^\/downloads\/[a-z0-9-]+\.pdf$/);
+          const target = nodePath.join(process.cwd(), "public", block.href);
+          expect(statSync(target).size).toBeGreaterThan(1000);
+          expect(readFileSync(target).subarray(0, 5).toString()).toBe("%PDF-");
+        }
+      }
+    }
+  });
+
+  it("covers exactly the registered landing URLs", () => {
     const slugs = seoLandingConfigs.map((config) => config.slug).sort();
     expect(slugs).toEqual(
       Object.values(SEO_LANDING_PAGES)
         .map((path) => path.slice(1))
-        .sort()
+        .sort(),
     );
   });
 
@@ -37,10 +57,13 @@ describe("SEO landing content configs", () => {
     for (const config of seoLandingConfigs) {
       for (const id of collectExerciseIds(config)) {
         const exercise = exercisesAgregat.find((ex) => ex.id === id);
-        expect(exercise, `unknown exercise "${id}" on ${config.slug}`).toBeTruthy();
+        expect(
+          exercise,
+          `unknown exercise "${id}" on ${config.slug}`,
+        ).toBeTruthy();
         expect(
           seen.has(id),
-          `exercise "${id}" embedded on both ${seen.get(id)} and ${config.slug}`
+          `exercise "${id}" embedded on both ${seen.get(id)} and ${config.slug}`,
         ).toBe(false);
         seen.set(id, config.slug);
       }
@@ -51,13 +74,15 @@ describe("SEO landing content configs", () => {
     for (const config of seoLandingConfigs) {
       expect(
         config.metaTitle.length,
-        `metaTitle too long on ${config.slug}`
+        `metaTitle too long on ${config.slug}`,
       ).toBeLessThanOrEqual(60);
       expect(
         config.metaDescription.length,
-        `metaDescription too long on ${config.slug}`
+        `metaDescription too long on ${config.slug}`,
       ).toBeLessThanOrEqual(160);
-      expect(config.faqs.length, `no FAQs on ${config.slug}`).toBeGreaterThan(2);
+      expect(config.faqs.length, `no FAQs on ${config.slug}`).toBeGreaterThan(
+        2,
+      );
       expect(config.intro.length).toBeGreaterThan(0);
       expect(config.sections.length).toBeGreaterThan(2);
     }
@@ -69,27 +94,29 @@ describe("SEO landing content configs", () => {
     const songGuideSlugs = new Set(songGuides.map((guide) => guide.slug));
     for (const config of seoLandingConfigs) {
       for (const slug of config.relatedGuideSlugs) {
-        expect(guideSlugs.has(slug), `unknown guide "${slug}" on ${config.slug}`).toBe(
-          true
-        );
+        expect(
+          guideSlugs.has(slug),
+          `unknown guide "${slug}" on ${config.slug}`,
+        ).toBe(true);
         expect(slug).not.toBe(config.slug);
       }
       for (const slug of config.relatedBlogSlugs) {
-        expect(blogSlugs.has(slug), `unknown blog "${slug}" on ${config.slug}`).toBe(
-          true
-        );
+        expect(
+          blogSlugs.has(slug),
+          `unknown blog "${slug}" on ${config.slug}`,
+        ).toBe(true);
       }
       for (const slug of config.relatedSongGuideSlugs) {
         expect(
           songGuideSlugs.has(slug),
-          `unknown song guide "${slug}" on ${config.slug}`
+          `unknown song guide "${slug}" on ${config.slug}`,
         ).toBe(true);
       }
       for (const link of internalLinksOf(config)) {
         if (link.startsWith("/blog/")) {
           expect(
             blogSlugs.has(link.slice("/blog/".length)),
-            `dead blog link "${link}" on ${config.slug}`
+            `dead blog link "${link}" on ${config.slug}`,
           ).toBe(true);
         }
       }
@@ -106,7 +133,7 @@ describe("SEO landing content configs", () => {
       const expected = allSlugs.filter((slug) => slug !== config.slug).sort();
       expect(
         [...config.relatedGuideSlugs].sort(),
-        `${config.slug} does not cross-link every sibling guide`
+        `${config.slug} does not cross-link every sibling guide`,
       ).toEqual(expected);
     }
   });
@@ -122,7 +149,7 @@ describe("SEO landing content configs", () => {
         if (!link.startsWith("#")) continue;
         expect(
           anchors.has(link.slice(1)),
-          `dead anchor "${link}" on ${config.slug}`
+          `dead anchor "${link}" on ${config.slug}`,
         ).toBe(true);
       }
     }
@@ -130,11 +157,13 @@ describe("SEO landing content configs", () => {
 
   it("points every hero quick pick at a section that exists", () => {
     for (const config of seoLandingConfigs) {
-      const headings = new Set(config.sections.map((section) => section.heading));
+      const headings = new Set(
+        config.sections.map((section) => section.heading),
+      );
       for (const pick of config.quickPicks ?? []) {
         expect(
           headings.has(pick.heading),
-          `quick pick "${pick.label}" on ${config.slug} names no section`
+          `quick pick "${pick.label}" on ${config.slug} names no section`,
         ).toBe(true);
       }
     }
@@ -145,7 +174,7 @@ describe("SEO landing content configs", () => {
       for (const id of collectExerciseIds(config)) {
         expect(
           getExerciseLandingHref(id),
-          `getExerciseLandingHref("${id}") should deep-link into ${config.slug}`
+          `getExerciseLandingHref("${id}") should deep-link into ${config.slug}`,
         ).toBe(`/${config.slug}#${idToSlug(id)}`);
       }
     }

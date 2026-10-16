@@ -11,7 +11,7 @@ export const underTheBridge: SongGuide = {
   seo: {
     metaTitle: "How to Play Under the Bridge on Guitar: Intro & Chord Fills",
     metaDescription:
-      "How hard is Under the Bridge on guitar? Community difficulty data, Frusciante's Hendrix-style chord embellishments, the D and F# intro, the Emaj7 stop, and a realistic learning timeline.",
+      "How hard is Under the Bridge on guitar? Community difficulty data, Frusciante's chord embellishments, the D and F# intro, and a learning timeline.",
     keywords: [
       "under the bridge guitar difficulty",
       "how to play under the bridge",

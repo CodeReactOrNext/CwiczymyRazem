@@ -3,11 +3,11 @@ import type { SeoLandingConfig } from "../types/seoLanding.types";
 export const intermediateRoutineConfig: SeoLandingConfig = {
   slug: "intermediate-guitar-practice-routine",
   title: "Intermediate Guitar Practice Routine: The Complete 45-Minute Plan",
-  metaTitle: "Intermediate Guitar Practice Routine (45 Min)",
+  metaTitle: "Intermediate Guitar Practice Routine + Free PDF",
   metaDescription:
-    "An intermediate guitar practice routine, filled in: a 45-minute session with named drills, a 7-day schedule, plus rhythm, chords, fretboard and ear blocks.",
+    "Download a free intermediate guitar practice routine PDF: a complete 45-minute session, 7-day schedule, short-day option and printable practice log.",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-09-07",
+  updatedAt: "2026-10-16",
   author: "Michael Apfel",
   heroImage: {
     src: "/images/guides/intermediate-practice-setup.webp",
@@ -16,6 +16,7 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
     height: 1024,
   },
   intro: [
+    "Prefer paper? [Download the free intermediate guitar practice routine PDF](#download-the-intermediate-guitar-practice-routine-pdf) and keep the schedule beside your guitar. No signup required.",
     "An intermediate guitar practice routine covers five areas in a fixed order: warm-up, rhythm and chords, fretboard and ear, one technique focus, and repertoire. Forty-five minutes is enough for all five if each block has a named drill and a target you can pass or fail. This page hands you that routine already filled in: tonight's session below, a seven-day schedule, a 20-minute version for short days, and three tracks so the plan matches what you are actually working on.",
     "Every drill named here is playable in the browser with a metronome and note detection that scores what you play. The drills are examples; the structure is the point, and you can rebuild it around your own weak spots inside Riff Quest. If clean barre chords, basic pentatonic improvisation and metronome comfort are still shaky, start with the [beginner exercises](/beginner-guitar-exercises) instead. For where 45 minutes sits against other levels, see [how long to practice guitar daily](/blog/how-long-practice-guitar-daily).",
   ],
@@ -33,6 +34,27 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
     },
   ],
   sections: [
+    {
+      heading: "Download the Intermediate Guitar Practice Routine PDF",
+      blocks: [
+        {
+          kind: "download",
+          href: "/downloads/intermediate-guitar-practice-routine.pdf",
+          label: "Intermediate Guitar Practice Routine (PDF)",
+          description:
+            "Two A4 pages: a 45-minute session, weekly rotation and seven-session log. No account needed.",
+          fileMeta: "PDF, 57 KB, 2 A4 pages",
+        },
+        {
+          kind: "paragraph",
+          text: "Print the intermediate guitar practice routine PDF for the same five-block session used below: 5 minutes warming up, 10 on rhythm and chords, 8 on fretboard and ear, 12 on technique, and 10 on repertoire. Page one includes the daily instructions, a 20-minute fallback and the seven-day rotation. Page two is a blank session log and weekly review. Use your own drills or the named examples in this guide.",
+        },
+        {
+          kind: "paragraph",
+          text: "Print in grayscale at actual size, or fit to printable area if needed. Fill in the log by hand; it does not calculate totals or import notes into the app. For a more detailed session worksheet and a filled-in example, download the [guitar practice journal](/guitar-practice-journal).",
+        },
+      ],
+    },
     {
       heading: "Tonight's Session: 45 Minutes, Filled In",
       blocks: [
@@ -407,6 +429,7 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
     },
   ],
   relatedGuideSlugs: [
+    "guitar-practice-journal",
     "guitar-speed-hand-synchronization-exercises",
     "guitar-scale-practice-routine",
     "daily-guitar-practice-plan",

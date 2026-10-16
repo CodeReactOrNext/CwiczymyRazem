@@ -3,12 +3,13 @@ import type { SeoLandingConfig } from "../types/seoLanding.types";
 export const dailyPracticePlanConfig: SeoLandingConfig = {
   slug: "daily-guitar-practice-plan",
   title: "Daily Guitar Practice Plan: Routines for 15, 30 and 60 Minutes",
-  metaTitle: "Daily Guitar Practice Plan: 15/30/60 Minutes",
+  metaTitle: "Daily Guitar Practice Plan + Free Routine PDF",
   metaDescription:
-    "Ready-made daily guitar practice routines for 15, 30 and 60 minutes — with example exercises, a beginner practice schedule, and a system for staying consistent.",
+    "Free daily guitar practice routine PDF with 15, 30 and 60-minute schedules, a printable session log, and exercises to match each block.",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-09-05",
+  updatedAt: "2026-10-16",
   intro: [
+    "Prefer paper? [Download the free daily guitar practice routine PDF](#download-the-daily-guitar-practice-routine-pdf) and keep the schedule beside your guitar. No signup required.",
     "A daily guitar practice plan needs to answer exactly two questions before you pick up the instrument: *what am I working on today* and *for how long*. Answer them in advance and practice happens; leave them for the moment you sit down and the session dissolves into noodling and YouTube.",
     "Below are three complete daily guitar practice routines — 15, 30 and 60 minutes — each with time blocks, example exercises with interactive tabs, and a clear rule for what to do when life shrinks your day. Pick the plan that matches your *worst* day, not your best one: the schedule you can keep on a bad Tuesday is the one that compounds.",
   ],
@@ -23,6 +24,27 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
     { label: "60 minutes", heading: "The 60-Minute Plan" },
   ],
   sections: [
+    {
+      heading: "Download the Daily Guitar Practice Routine PDF",
+      blocks: [
+        {
+          kind: "download",
+          href: "/downloads/daily-guitar-practice-routine.pdf",
+          label: "Daily Guitar Practice Routine (PDF)",
+          description:
+            "Two A4 pages: 15-, 30- and 60-minute schedules, plus a seven-session log. No account needed.",
+          fileMeta: "PDF, 55 KB, 2 A4 pages",
+        },
+        {
+          kind: "paragraph",
+          text: "Choose the schedule that fits today and print the two-page daily guitar practice routine PDF. Page one has the same timed blocks as this guide: a 15-minute warm-up, main-skill and rhythm session; a 30-minute technique, control and repertoire session; and a 60-minute plan that adds fretboard work, ear training and improvisation. Page two is a blank seven-session log with space for your chosen routine, minutes, result and next step.",
+        },
+        {
+          kind: "paragraph",
+          text: "Print in grayscale at actual size, or fit to printable area if needed. Fill in the log by hand; it does not calculate totals or import notes into the app. For a more detailed session worksheet and a filled-in example, download the [guitar practice journal](/guitar-practice-journal).",
+        },
+      ],
+    },
     {
       heading: "How Long Should You Practice Guitar Every Day?",
       blocks: [
@@ -258,6 +280,7 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
     },
   ],
   relatedGuideSlugs: [
+    "guitar-practice-journal",
     "beginner-guitar-exercises",
     "intermediate-guitar-practice-routine",
     "guitar-scale-practice-routine",

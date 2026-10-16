@@ -1,5 +1,7 @@
 import type { SongGuide } from "../types";
 import { backInBlack } from "./back-in-black";
+import { blackbird } from "./blackbird";
+import { californication } from "./californication";
 import { comeAsYouAre } from "./come-as-you-are";
 import { crazyTrain } from "./crazy-train";
 import { creep } from "./creep";
@@ -8,6 +10,7 @@ import { enterSandman } from "./enter-sandman";
 import { eruption } from "./eruption";
 import { everlong } from "./everlong";
 import { fadeToBlack } from "./fade-to-black";
+import { highwayToHell } from "./highway-to-hell";
 import { hotelCalifornia } from "./hotel-california";
 import { houseOfTheRisingSun } from "./house-of-the-rising-sun";
 import { masterOfPuppets } from "./master-of-puppets";
@@ -53,6 +56,9 @@ export const songGuides: SongGuide[] = [
   underTheBridge,
   everlong,
   fadeToBlack,
+  blackbird,
+  californication,
+  highwayToHell,
 ];
 
 export const getSongGuideBySlug = (slug: string): SongGuide | undefined =>

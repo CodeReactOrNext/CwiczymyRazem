@@ -11,7 +11,7 @@ export const tornadoOfSouls: SongGuide = {
   seo: {
     metaTitle: "How to Play Tornado of Souls on Guitar: Solo Tempo Ladder",
     metaDescription:
-      "How hard is Tornado Of Souls on guitar? The riffs are a picking exam, the Marty Friedman solo is a different sport. Real tempo, tuning and technique data inside.",
+      "How hard is Tornado Of Souls on guitar? The riffs are a picking exam, the Marty Friedman solo is a different sport. Real tempo, tuning and technique data.",
     keywords: [
       "tornado of souls guitar difficulty",
       "how hard is tornado of souls",

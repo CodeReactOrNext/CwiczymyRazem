@@ -11,7 +11,7 @@ export const houseOfTheRisingSun: SongGuide = {
   seo: {
     metaTitle: "How to Play House of the Rising Sun on Guitar: 6/8 Picking",
     metaDescription:
-      "How hard is House of the Rising Sun on guitar? Community difficulty data, the 6/8 arpeggio pattern Hilton Valentine made famous, the F chord problem and a week-by-week plan.",
+      "How hard is House of the Rising Sun on guitar? Community difficulty data, the 6/8 arpeggio pattern, the F chord problem and a week-by-week plan.",
     keywords: [
       "house of the rising sun guitar difficulty",
       "how to play house of the rising sun",

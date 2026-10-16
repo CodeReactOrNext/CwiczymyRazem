@@ -13,7 +13,7 @@ export const thunderstruck: SongGuide = {
   seo: {
     metaTitle: "How to Play Thunderstruck on Guitar: Intro Riff Tab",
     metaDescription:
-      "How hard is Thunderstruck on guitar? The truth about Angus Young's famous one-string riff (it's picked, not tapped), real tempo data, and an honest learning timeline.",
+      "How hard is Thunderstruck on guitar? The truth about Angus Young's one-string riff (picked, not tapped), real tempo data, and a learning timeline.",
     keywords: [
       "thunderstruck guitar difficulty",
       "how hard is thunderstruck",

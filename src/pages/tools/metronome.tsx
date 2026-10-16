@@ -11,9 +11,9 @@ const AUTHOR_URL = "https://github.com/marxd262";
 const SOURCE_URL = `${AUTHOR_URL}/Metronome`;
 
 const TITLE =
-  "Online Metronome for Guitar Practice — Tempo Ramp & Speed Drills";
+  "Online Metronome for Guitar Practice: Tempo Ramp & Drills";
 const DESCRIPTION =
-  "Free online metronome built for guitar practice: tap tempo, accents and subdivisions per beat, a tempo ramp that climbs to your target BPM, and a slow/fast speed drill.";
+  "Free online metronome built for guitar practice: tap tempo, accents and subdivisions, a tempo ramp to your target BPM, and a slow/fast speed drill.";
 
 const MODES = [
   {

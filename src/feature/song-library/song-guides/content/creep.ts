@@ -11,7 +11,7 @@ export const creep: SongGuide = {
   seo: {
     metaTitle: "How to Play Creep on Guitar: 4 Chords, 2 Barres & Mutes",
     metaDescription:
-      "How hard is Creep on guitar? Community difficulty data, the G–B–C–Cm progression and its two barre chords, Jonny Greenwood's dead-note blasts before the chorus, and a practice plan.",
+      "How hard is Creep on guitar? Community difficulty data, the G–B–C–Cm progression and its two barre chords, the dead-note blasts, and a practice plan.",
     keywords: [
       "creep guitar difficulty",
       "how to play creep radiohead",

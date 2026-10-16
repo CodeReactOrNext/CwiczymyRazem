@@ -11,7 +11,7 @@ export const paranoid: SongGuide = {
   seo: {
     metaTitle: "How to Play Paranoid on Guitar: Riff & 163 BPM Stamina Plan",
     metaDescription:
-      "How hard is Paranoid on guitar? Community difficulty data, why the 163 BPM riff is a stamina test rather than a finger test, a tempo ladder to full speed, and Iommi's ring-modulator solo.",
+      "How hard is Paranoid on guitar? Community difficulty data, why the 163 BPM riff tests stamina, not fingers, a tempo ladder, and Iommi's ring-mod solo.",
     keywords: [
       "paranoid guitar difficulty",
       "how to play paranoid black sabbath",

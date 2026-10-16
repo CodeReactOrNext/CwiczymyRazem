@@ -13,7 +13,7 @@ export const crazyTrain: SongGuide = {
   seo: {
     metaTitle: "How to Play Crazy Train on Guitar: Riff Tab & Solo Map",
     metaDescription:
-      "How hard is Crazy Train on guitar? The Randy Rhoads riff is beginner-friendly, but the tapping-and-legato solo is a genuine shred exam — real tempo, key, and technique data inside.",
+      "How hard is Crazy Train on guitar? The Randy Rhoads riff is beginner-friendly, but the tapping-and-legato solo is a shred exam. Real tempo and key data.",
     keywords: [
       "crazy train guitar difficulty",
       "how hard is crazy train",

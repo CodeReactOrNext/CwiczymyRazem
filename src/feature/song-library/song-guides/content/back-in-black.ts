@@ -11,7 +11,7 @@ export const backInBlack: SongGuide = {
   seo: {
     metaTitle: "How to Play Back in Black on Guitar: The Riff in 4 Moves",
     metaDescription:
-      "How hard is Back in Black on guitar? Community difficulty data, why the E-D-A riff is built on silence and muting, the rhythm vs lead guitar jobs, and a plan for Angus Young's solo.",
+      "How hard is Back in Black on guitar? Community difficulty data, why the E-D-A riff is built on silence and muting, rhythm vs lead, and a plan for the solo.",
     keywords: [
       "back in black guitar difficulty",
       "how to play back in black",

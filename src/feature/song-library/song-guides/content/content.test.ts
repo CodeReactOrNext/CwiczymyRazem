@@ -22,6 +22,15 @@ describe("song guides content", () => {
     });
   });
 
+  it("keeps meta descriptions inside the SERP snippet", () => {
+    songGuides.forEach((guide) => {
+      expect(
+        guide.seo.metaDescription.length,
+        `${guide.slug} metaDescription`
+      ).toBeLessThanOrEqual(160);
+    });
+  });
+
   it("has enough FAQ entries for a FAQPage rich result", () => {
     songGuides.forEach((guide) => {
       expect(guide.faq.length).toBeGreaterThanOrEqual(4);

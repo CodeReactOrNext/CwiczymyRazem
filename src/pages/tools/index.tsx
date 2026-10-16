@@ -416,16 +416,16 @@ const ToolsPage = () => {
   return (
     <>
       <Head>
-        <title>{`${totalTools} Guitar Practice Tools: Tabs, Tuners, Metronomes & Ear Training`}</title>
-        <meta name="description" content={`A catalogue of ${totalTools} guitar tools: tabs and notation, online tuners, fretboard and theory drills, ear training, metronomes, backing tracks and slow-downers. Each one marked free, freemium or paid.`} />
+        <title>{`${totalTools} Guitar Practice Tools: Tabs, Tuners, Metronomes & More`}</title>
+        <meta name="description" content={`A catalogue of ${totalTools} guitar tools: tabs, tuners, theory drills, ear training, metronomes, backing tracks and slow-downers, each marked free, freemium or paid.`} />
         <link rel='canonical' href={siteUrl} />
-        <meta property="og:title" content={`${totalTools} Guitar Practice Tools: Tabs, Tuners, Metronomes & Ear Training`} />
+        <meta property="og:title" content={`${totalTools} Guitar Practice Tools: Tabs, Tuners, Metronomes & More`} />
         <meta property="og:description" content={`A catalogue of ${totalTools} guitar tools for tabs, tuning, theory, ear training, rhythm, backing tracks and transcription.`} />
         <meta property="og:url" content={siteUrl} />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://riff.quest/images/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${totalTools} Guitar Practice Tools: Tabs, Tuners, Metronomes & Ear Training`} />
+        <meta name="twitter:title" content={`${totalTools} Guitar Practice Tools: Tabs, Tuners, Metronomes & More`} />
         <meta name="twitter:description" content={`A catalogue of ${totalTools} guitar tools for tabs, tuning, theory, ear training, rhythm, backing tracks and transcription.`} />
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
         <script

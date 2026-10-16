@@ -11,7 +11,7 @@ export const seekAndDestroy: SongGuide = {
   seo: {
     metaTitle: "How to Play Seek & Destroy on Guitar: Riffs & Downpicking",
     metaDescription:
-      "How hard is Seek & Destroy on guitar? Community difficulty data, the downpicked E riffs at about 140 BPM, Kirk Hammett's admitted bum note, and a path from here to Master of Puppets.",
+      "How hard is Seek & Destroy on guitar? Community difficulty data, the downpicked E riffs at about 140 BPM, Kirk's bum note, and a path to Master of Puppets.",
     keywords: [
       "seek and destroy guitar difficulty",
       "how to play seek and destroy",

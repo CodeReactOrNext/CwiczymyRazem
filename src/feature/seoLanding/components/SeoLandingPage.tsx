@@ -519,7 +519,7 @@ export const SeoLandingPage = ({
                     <a
                       href={`#${firstSectionId}`}
                       className='inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-6 py-3 text-sm font-semibold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 hover:bg-zinc-800'>
-                      Jump to the drills
+                      {exerciseIds.length > 0 ? "Jump to the drills" : "Download the PDF"}
                       <ArrowDown className='h-4 w-4' aria-hidden='true' />
                     </a>
                   )}
