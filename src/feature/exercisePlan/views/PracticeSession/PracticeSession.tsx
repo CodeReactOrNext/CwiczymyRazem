@@ -62,6 +62,8 @@ import { useGeneratedExercise, willHaveTablature } from "./hooks/useGeneratedExe
 import { useGoalRunVerdict } from "./hooks/useGoalRunVerdict";
 import { useGpFileLoader } from "./hooks/useGpFileLoader";
 import { useGuitarTuning } from "./hooks/useGuitarTuning";
+import type { LearnModeState } from "./hooks/useLearnModeMatcher";
+import { useLearnModeMatcher } from "./hooks/useLearnModeMatcher";
 import { useNoteHuntRotation } from "./hooks/useNoteHuntRotation";
 import { usePlaybackLeakGuard } from "./hooks/usePlaybackLeakGuard";
 import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
@@ -74,6 +76,7 @@ import { useSongExerciseGpFile } from "./hooks/useSongExerciseGpFile";
 import { timingInputPath, useTimingCalibration } from "./hooks/useTimingCalibration";
 import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
+import { buildLearnSteps } from "./utils/learnSteps";
 import type { TimingPrecision } from "./utils/timingPrecision";
 
 /** How long a solved ear-training riddle stays on screen before the next one is dealt. */
@@ -253,7 +256,7 @@ const PracticeSessionInner = ({
   const {
     isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, selectedGpTrackIdx,
     setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setSelectedGpTrackIdx,
-    toggleAlphaTabScore, resetForExercise
+    setShowAlphaTabScore, toggleAlphaTabScore, resetForExercise
   } = usePlaybackReducer();
   const [tabRepeatCount] = useState(0);
   const loopsCompletedRef = useRef(0);
@@ -582,11 +585,58 @@ const PracticeSessionInner = ({
   // (mic_tracking_enabled in localStorage), so once enabled anywhere it would
   // otherwise open a real getUserMedia stream in every exercise, guitar or not.
   const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong && !currentExercise.disableMic;
+
+  // ── Learn mode ────────────────────────────────────────────────────────────
+  // The tab waits on each note until the player has played it, instead of
+  // following the metronome. It has no clock to score against, so it reports
+  // nothing but practice time. Desktop only for now: the phone's tab panel
+  // doesn't park its cursor on a note.
+  const [learnWanted, setLearnWanted] = useState(false);
+  const learnSteps = useMemo(
+    () => buildLearnSteps(isEarTrainingRiddle ? undefined : activeTablature),
+    [isEarTrainingRiddle, activeTablature],
+  );
+  const learnAvailable = learnSteps.length > 0 && !isMobileView && !isExamMode && !isGoalMode
+    && !plan.duel && !currentExercise.isPlayalong && !currentExercise.disableMic;
+  const learnEnabled = learnWanted && learnAvailable && isMicEnabled;
+  const learnModeRef = useRef(false);
+  useEffect(() => { learnModeRef.current = learnEnabled; }, [learnEnabled]);
+
+  const learnProgress = useLearnModeMatcher({
+    steps: learnSteps,
+    active: learnEnabled && isPlaying && isListening,
+    audioRefs, getAdjustedTargetFreq, tuningOffsets: guitarTuning.tuning.offsets,
+    resetKey: tabResetKey + tabRestartKey,
+  });
+
+  // Learn mode and the metronome are two ways of keeping the exercise moving, so
+  // switching between them stops everything and lets the player press Play again.
+  const handleSetLearnEnabled = useCallback((next: boolean) => {
+    stopTimer();
+    metronome.stopMetronome();
+    setLearnWanted(next);
+    // The notation view is driven by AlphaTab's own clock — it can't wait for a note.
+    if (next) setShowAlphaTabScore(false);
+  }, [stopTimer, metronome, setShowAlphaTabScore]);
+
+  const handleToggleAlphaTabScore = useCallback(() => {
+    if (learnWanted) setLearnWanted(false);
+    toggleAlphaTabScore();
+  }, [learnWanted, toggleAlphaTabScore]);
+
+  const learn = useMemo<LearnModeState | null>(
+    () => (learnAvailable
+      ? { ...learnProgress, available: true, micReady: isMicEnabled, enabled: learnEnabled, setEnabled: handleSetLearnEnabled }
+      : null),
+    [learnAvailable, learnProgress, isMicEnabled, learnEnabled, handleSetLearnEnabled],
+  );
+
   // Click-answered hunts are scored from mouse clicks, so their snapshot is a
   // real performance worth reporting even though the mic never opens
   // (useScoreSaving persists them on its own click branch). Everything else only
-  // has a snapshot worth submitting when the mic was actually listening.
-  const hasTrackedPerformance = isMicEnabled || isClickAnsweredMode(currentExercise.noteHuntConfig?.mode);
+  // has a snapshot worth submitting when the mic was actually listening — and a
+  // lesson is not a run: learn mode has no score, so there is nothing to report.
+  const hasTrackedPerformance = (isMicEnabled && !learnEnabled) || isClickAnsweredMode(currentExercise.noteHuntConfig?.mode);
   // Exams, goals and duels only count mic-scored runs, so they open on the mic prompt.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if ((isExamMode || isGoalMode || !!plan.duel) && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
@@ -736,6 +786,7 @@ const PracticeSessionInner = ({
     recordGoalChartRuns: !isGoalMode,
     videoDurationSeconds: videoDuration,
     duelId: plan.duel?.id ?? null,
+    learnModeRef,
   });
 
   // ── Playback leak guard ───────────────────────────────────────────────────
@@ -872,6 +923,7 @@ const PracticeSessionInner = ({
     setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
     saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
     tabRestartKey, setTabRestartKey,
+    learnMode: learnEnabled,
   });
 
   // ── Ear training: mic answer matching ─────────────────────────────────────
@@ -1000,6 +1052,7 @@ const PracticeSessionInner = ({
       isExamMode={isExamMode}
       onExamFail={handleExamMistakeFail}
       playbackLeakingRef={playbackLeakingRef}
+      learn={learn}
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>
@@ -1131,7 +1184,7 @@ const PracticeSessionInner = ({
         handleExerciseSelect={handleExerciseSelect} isMicEnabled={isMicEnabled}
         allGpTracks={parsedGpTracks} showAlphaTabScore={showAlphaTabScore}
         selectedGpTrackIdx={selectedGpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
-        handleToggleAlphaTabScore={toggleAlphaTabScore}
+        handleToggleAlphaTabScore={handleToggleAlphaTabScore}
         effectiveRawGpFile={effectiveRawGpFile} activeTablature={activeTablature}
         isAudioPlaying={isAudioPlaying} metronomeStartTime={metronome.startTime}
         effectiveBpm={effectiveBpm} isAudioMuted={isAudioMuted}

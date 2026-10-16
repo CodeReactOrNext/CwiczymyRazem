@@ -15,6 +15,7 @@ import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
+import { LearnModeBar } from "./LearnModeBar";
 import { MicHud } from "./MicHud";
 import { TablatureMinimapBar } from "./TablatureMinimapBar";
 import {
@@ -183,7 +184,7 @@ export const TablatureSection = memo(function TablatureSection({
   obscured = false,
 }: TablatureSectionProps) {
   const { t } = useTranslation("session");
-  const { hitNotes, missedNotes, noteTimings, livePitchRef } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, noteTimings, livePitchRef, learn } = useNoteMatchingContext();
   const { openTimingCalibration } = useSessionUI();
   const { tuning } = useGuitarTuningContext();
   const {
@@ -340,6 +341,19 @@ export const TablatureSection = memo(function TablatureSection({
     settleBeat(0);
   }, [tabResetKey, settleBeat]);
 
+  // Learn mode keeps no time, so nothing moves the cursor: park it on the note
+  // the lesson is waiting for. The metronome stays out of it (no onSeek).
+  const learnBeat = learn?.enabled ? learn.cursorBeat : null;
+  useEffect(() => {
+    if (learnBeat === null) return;
+    seekedBeatRef.current = learnBeat;
+    currentBeatRef.current = learnBeat;
+    seekWorkerRef.current?.(learnBeat);
+  }, [learnBeat, tabResetKey, showAlphaTabScore]);
+  // Where the cursor rests, as far as the minimap and the "From the start"
+  // button are concerned: the lesson's note, or wherever the player last left it.
+  const shownBeat = learnBeat ?? restingBeat;
+
   const showMinimap =
     !isExamMode && activeTablature.length > 3 && measureEndXs.length > 0;
   const canShowAlphaTabScore = !!rawGpFile || activeTablature.length > 0;
@@ -403,7 +417,7 @@ export const TablatureSection = memo(function TablatureSection({
             measureEndXs={measureEndXs}
             totalBeats={totalBeats}
             currentBeatRef={currentBeatRef}
-            beatVersion={restingBeat}
+            beatVersion={shownBeat}
             loopStart={loopStart}
             loopEnd={loopEnd}
             isPlaying={isMetronomePlaying && countInRemaining === 0}
@@ -495,6 +509,7 @@ export const TablatureSection = memo(function TablatureSection({
       {!showAlphaTabScore && (
         <div className='px-2 pt-0'>
           {minimapRow}
+          <LearnModeBar />
           <div className='relative'>
             <TablatureViewer
               measures={activeTablature}
@@ -517,7 +532,7 @@ export const TablatureSection = memo(function TablatureSection({
               hideDynamicsLane={hideDynamicsLane}
               volumeRef={volumeRef}
               onSeek={handleSeek}
-              currentBeat={restingBeat}
+              currentBeat={shownBeat}
               obscured={obscured}
               loopStartBeat={loopStart}
               loopEndBeat={loopEnd}

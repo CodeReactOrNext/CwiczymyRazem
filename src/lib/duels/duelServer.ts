@@ -41,12 +41,20 @@ import type {
   Transaction,
 } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
+import { buildDuelResultLog, duelResultLogId } from "lib/duels/duelResultLog";
+import { buildDuelWaitingLog, duelWaitingLogId } from "lib/duels/duelWaitingLog";
 import { firestore } from "utils/firebase/api/firebase.config";
 
-const duels = (): CollectionReference => firestore.collection("duels");
+const duels =(): CollectionReference => firestore.collection("duels");
 const queue = (): CollectionReference => firestore.collection("duelQueue");
 const profiles = (): CollectionReference =>
   firestore.collection("duelProfiles");
+
+/** The feed's "someone is waiting" row for a ticket — lives exactly as long as the ticket. */
+const waitingLog = (ticketId: string): DocumentReference =>
+  firestore
+    .collection("logs")
+    .doc(duelWaitingLogId(ticketId)) as DocumentReference;
 
 /** How far down the queue a join looks for somebody to pair with. */
 const QUEUE_SCAN = 50;
@@ -186,6 +194,7 @@ export async function joinDuelQueue(
           expiresAt: now + DUEL_TICKET_TTL_MS,
         };
         tx.set(ticketRef, newTicket);
+        tx.set(waitingLog(newTicket.id), buildDuelWaitingLog(newTicket));
         tx.set(
           profileRef,
           {
@@ -241,6 +250,7 @@ export async function joinDuelQueue(
 
       tx.set(duelRef, duel);
       tx.delete(queue().doc(ticket.id) as DocumentReference);
+      tx.delete(waitingLog(ticket.id));
       tx.set(
         opponentRef,
         {
@@ -298,7 +308,10 @@ export async function cancelDuelTicket(
     const profile = readProfile(profileSnap);
     const ticket = ticketSnap.exists ? (ticketSnap.data() as DuelTicket) : null;
     if (ticket && ticket.userId !== userId) throw new DuelError("FORBIDDEN");
-    if (ticket) tx.delete(ticketRef);
+    if (ticket) {
+      tx.delete(ticketRef);
+      tx.delete(waitingLog(ticketId));
+    }
     if (profile) {
       tx.update(profileRef, {
         tickets: liveTickets(profile.tickets ?? [], now).filter(
@@ -375,6 +388,7 @@ async function expireTicket(ticketId: string, now: number): Promise<void> {
     const profileRef = profiles().doc(ticket.userId) as DocumentReference;
     const profile = readProfile(await tx.get(profileRef));
     tx.delete(ticketRef);
+    tx.delete(waitingLog(ticketId));
     if (profile) {
       tx.update(profileRef, {
         tickets: liveTickets(profile.tickets ?? [], now).filter(
@@ -468,6 +482,32 @@ export async function settleDuelById(
         ]),
       ),
     });
+
+    // The public row — names, scores, who won. Same transaction as the status
+    // flip, so a duel is settled and announced together or not at all. `set`, not
+    // `create`: the id is the duel's, and a rewrite is harmless where an
+    // ALREADY_EXISTS would abort the settlement.
+    const resultRow = buildDuelResultLog({
+      ...duel,
+      status: "finished",
+      outcome: { ...settlement.outcome, settledAt: now },
+      players: Object.fromEntries(
+        duel.playerIds.map((id) => [
+          id,
+          {
+            ...duel.players[id],
+            ratingBefore: settlement.players[id].ratingBefore,
+            ratingAfter: settlement.players[id].ratingAfter,
+          },
+        ]),
+      ),
+    });
+    if (resultRow) {
+      tx.set(
+        firestore.collection("logs").doc(duelResultLogId(duelId)),
+        resultRow,
+      );
+    }
 
     for (const id of duel.playerIds) {
       const opponentId = id === aId ? bId : aId;

@@ -40,6 +40,9 @@ import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
 import { communityDocId } from "feature/communityExercises/utils/communityToExercise";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
+import { SearchingDots } from "feature/duels/components/DuelQueueCard";
+import { useNow } from "feature/duels/hooks/useDuels";
+import { formatRatingDelta } from "feature/duels/utils/duelFormat";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
@@ -63,6 +66,9 @@ import type {
   FirebaseLogsDailyQuestInterface,
   FirebaseLogsDiscordPromoInterface,
   FirebaseLogsDonationInterface,
+  FirebaseLogsDuelPlayer,
+  FirebaseLogsDuelResultInterface,
+  FirebaseLogsDuelWaitingInterface,
   FirebaseLogsExamPassedInterface,
   FirebaseLogsGoalCompletedInterface,
   FirebaseLogsGoalCreatedInterface,
@@ -85,6 +91,7 @@ import {
   dropIncompleteTailGroup,
   getLogActivityType,
   groupConsecutiveLogs,
+  isExpiredDuelWaiting,
   type LogActivityType,
   type LogGroup,
 } from "feature/logs/utils/groupConsecutiveLogs";
@@ -102,6 +109,7 @@ import {
   EXERCISES_BY_ID,
   findExerciseByTitle,
 } from "feature/logs/utils/practiceCatalog";
+import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
@@ -116,7 +124,7 @@ import {
   type ActivityPreview,
   ActivityStartModal,
 } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
-import { useDateFnsLocale } from "lib/i18n/dateLocale";
+import { useDateFnsLocale, useIntlLocale } from "lib/i18n/dateLocale";
 import { Interpolate } from "lib/i18n/Interpolate";
 import type { Translate } from "lib/i18n/translate";
 import {
@@ -816,6 +824,179 @@ const FirebaseLogsGuildLevelItem = ({
           )}
         </div>
       )}
+    </div>
+  );
+};
+
+const DuelName = ({
+  player,
+  isWinner,
+  isMe,
+}: {
+  player: FirebaseLogsDuelPlayer;
+  isWinner: boolean;
+  isMe: boolean;
+}) => (
+  <Link
+    href={`/user/${player.userId}`}
+    className={cn(
+      TOUCH_TARGET,
+      "font-bold transition-colors hover:underline",
+      isMe ? "text-cyan-300" : isWinner ? "text-white" : "text-zinc-300",
+    )}>
+    {player.displayName}
+  </Link>
+);
+
+/**
+ * A settled duel: who beat whom, on what, by how much. Nobody owns the row, so
+ * there is nothing to motivate — the two names link to the players instead.
+ */
+const FirebaseLogsDuelResultItem = ({
+  log,
+  isNew,
+  currentUserId,
+}: {
+  log: FirebaseLogsDuelResultInterface;
+  isNew: boolean;
+  currentUserId: string;
+}) => {
+  const { t } = useTranslation(["feed", "duels"]);
+  const intlLocale = useIntlLocale();
+  const date = new Date(log.data);
+  const [first, second] = log.players;
+  const isDraw = log.kind === "draw";
+  const delta = first.ratingAfter - first.ratingBefore;
+  const score = (value: number) => value.toLocaleString(intlLocale);
+
+  return (
+    <div
+      className={`my-3 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl px-4 py-4 transition-all duration-base sm:px-5 ${
+        isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
+      }`}>
+      <span className='flex shrink-0 -space-x-2' aria-hidden='true'>
+        <Avatar
+          avatarURL={first.avatar || undefined}
+          name={first.displayName}
+          size='xs'
+          className='relative z-10 rounded-full ring-2 ring-zinc-900'
+        />
+        <Avatar
+          avatarURL={second.avatar || undefined}
+          name={second.displayName}
+          size='xs'
+          className='rounded-full ring-2 ring-zinc-900'
+        />
+      </span>
+
+      <div className='min-w-0 flex-[1_1_14rem]'>
+        <p className='text-xs font-semibold text-zinc-400'>
+          {t("feed:duel_finished")}
+        </p>
+        <h3 className='text-sm text-zinc-400 sm:text-base'>
+          <Interpolate
+            text={t(`duels:feed.${log.kind}`)}
+            values={{
+              winner: (
+                <DuelName
+                  player={first}
+                  isWinner={!isDraw}
+                  isMe={first.userId === currentUserId}
+                />
+              ),
+              loser: (
+                <DuelName
+                  player={second}
+                  isWinner={false}
+                  isMe={second.userId === currentUserId}
+                />
+              ),
+            }}
+          />
+        </h3>
+        <p className='mt-1 truncate text-xs text-zinc-400'>
+          {log.exerciseTitle}
+        </p>
+      </div>
+
+      <p className='shrink-0 text-sm tabular-nums'>
+        <span className='font-semibold text-zinc-50'>
+          {score(first.bestScore)}
+        </span>
+        <span className='text-zinc-600'> : </span>
+        <span
+          className={cn(
+            "font-semibold",
+            isDraw ? "text-zinc-50" : "text-zinc-500",
+          )}>
+          {score(second.bestScore)}
+        </span>
+      </p>
+
+      {!isDraw && (
+        <span
+          className={cn(
+            "w-12 shrink-0 text-right font-teko text-2xl font-semibold tabular-nums leading-none",
+            delta > 0 ? "text-emerald-400" : "text-zinc-500",
+          )}>
+          {formatRatingDelta(delta)}
+        </span>
+      )}
+
+      <span className='ml-auto shrink-0 text-[11px] text-zinc-400'>
+        {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
+        {addZeroToTime(date.getMinutes())}
+      </span>
+    </div>
+  );
+};
+
+/**
+ * Somebody is waiting in the duel queue. Says that, not who — a duel stays
+ * anonymous until it is settled. Joining lives on /duels, where the mic note and
+ * the slot limit are shown before the click; a duel started by a stray tap here
+ * would end as a walkover loss.
+ */
+const FirebaseLogsDuelWaitingItem = ({
+  log,
+  isNew,
+}: {
+  log: FirebaseLogsDuelWaitingInterface;
+  isNew: boolean;
+}) => {
+  const { t } = useTranslation("feed");
+  const date = new Date(log.data);
+
+  return (
+    <div
+      className={`my-3 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl px-4 py-4 transition-all duration-base sm:px-5 ${
+        isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
+      }`}>
+      <span className='flex w-8 shrink-0 justify-center'>
+        <SearchingDots />
+      </span>
+
+      <div className='min-w-0 flex-[1_1_14rem]'>
+        <p className='text-xs font-semibold text-zinc-400'>
+          {t("duel_waiting_label")}
+        </p>
+        <h3 className='text-sm font-bold text-white sm:text-base'>
+          {t("duel_waiting_title")}
+        </h3>
+        <p className='mt-1 text-xs text-zinc-400'>{t("duel_waiting_hint")}</p>
+      </div>
+
+      <Link
+        href='/duels'
+        onClick={() => useCommunityDrawer.getState().setOpen(false)}
+        className='inline-flex h-9 shrink-0 items-center justify-center rounded-lg bg-white px-4 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900'>
+        {t("duel_waiting_join")}
+      </Link>
+
+      <span className='ml-auto shrink-0 text-[11px] text-zinc-400'>
+        {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
+        {addZeroToTime(date.getMinutes())}
+      </span>
     </div>
   );
 };
@@ -1982,8 +2163,11 @@ const Logs = ({
   // Donations from the last 24 hours are lifted to the front before grouping, so they open the
   // feed instead of sinking under the evening's practice reports. Everything else keeps the order
   // it streamed in.
+  const now = useNow();
   const groups = useMemo(() => {
-    const { pinned, rest } = splitPinnedDonations(logs);
+    const { pinned, rest } = splitPinnedDonations(
+      logs.filter((log) => !isExpiredDuelWaiting(log, now)),
+    );
 
     return [
       ...groupConsecutiveLogs(pinned),
@@ -1992,7 +2176,7 @@ const Logs = ({
         Boolean(hasOlderLogs),
       ),
     ];
-  }, [logs, hasOlderLogs]);
+  }, [logs, hasOlderLogs, now]);
 
   const songIds = useMemo(
     () =>
@@ -2059,6 +2243,17 @@ const Logs = ({
             ) : group.type === "guildLevel" ? (
               <FirebaseLogsGuildLevelItem
                 log={representative as FirebaseLogsGuildLevelInterface}
+                isNew={isNew}
+              />
+            ) : group.type === "duelResult" ? (
+              <FirebaseLogsDuelResultItem
+                log={representative as FirebaseLogsDuelResultInterface}
+                isNew={isNew}
+                currentUserId={currentUserId}
+              />
+            ) : group.type === "duelWaiting" ? (
+              <FirebaseLogsDuelWaitingItem
+                log={representative as FirebaseLogsDuelWaitingInterface}
                 isNew={isNew}
               />
             ) : group.type === "supportAsk" ? (

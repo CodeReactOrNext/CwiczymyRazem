@@ -359,6 +359,55 @@ export interface FirebaseLogsGuildLevelInterface {
   reactionFame?: LogReactionFame;
 }
 
+/** One side of a settled duel, as the feed row prints it. */
+export interface FirebaseLogsDuelPlayer {
+  userId: string;
+  displayName: string;
+  avatar: string;
+  bestScore: number;
+  ratingBefore: number;
+  ratingAfter: number;
+}
+
+/**
+ * A duel settling — who beat whom, with both best scores and the rating moves.
+ * Belongs to neither player, so no `uid`: it never groups and has nothing to
+ * motivate. Written only by the server in the transaction that settles the duel
+ * (see lib/duels/duelResultLog); a duel nobody played leaves no row.
+ */
+export interface FirebaseLogsDuelResultInterface {
+  type: "duel_result";
+  data: string;
+  timestamp: string | number | Date;
+  duelId: string;
+  exerciseId: string;
+  exerciseTitle: string;
+  kind: "win" | "walkover" | "draw";
+  /** The winner first; on a draw, in the order they were paired. */
+  players: [FirebaseLogsDuelPlayer, FirebaseLogsDuelPlayer];
+  id?: string;
+  reactions?: string[];
+  reactionFame?: LogReactionFame;
+}
+
+/**
+ * Somebody waiting in the duel queue for an opponent — the feed's "join a duel"
+ * row. Anonymous on purpose: every signed-in player can read `logs`, so the
+ * waiting player's id must never land here. Written when the ticket is queued
+ * and deleted when it is paired, cancelled or expires (see lib/duels/duelWaitingLog).
+ */
+export interface FirebaseLogsDuelWaitingInterface {
+  type: "duel_waiting";
+  data: string;
+  timestamp: string | number | Date;
+  ticketId: string;
+  /** When the ticket lapses (ms) — past it the row is stale even if the cron has not swept it yet. */
+  expiresAt: number;
+  id?: string;
+  reactions?: string[];
+  reactionFame?: LogReactionFame;
+}
+
 export interface FirebaseLogsMarketplaceInterface {
   type: "marketplace_listing";
   uid: string;

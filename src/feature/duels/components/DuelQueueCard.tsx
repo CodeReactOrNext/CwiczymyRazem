@@ -52,7 +52,7 @@ const SlotSegments = ({ slots }: { slots: SlotState[] }) => (
 );
 
 /** Three dots taking turns — "still looking", without a spinner's urgency. */
-const SearchingDots = () => (
+export const SearchingDots = () => (
   <span className='flex items-center gap-1' aria-hidden='true'>
     {[0, 1, 2].map((i) => (
       <span

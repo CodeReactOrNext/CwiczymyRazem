@@ -557,5 +557,21 @@
     "title": "Mikrofon słyszy odtwarzaną gitarę",
     "body": "Ten przebieg nie trafi do rankingów. Załóż słuchawki albo wyłącz dźwięk gitary i zacznij przebieg od nowa.",
     "mute": "Wyłącz gitarę"
+  },
+  "learn": {
+    "button": "Nauka",
+    "hint_off": "Tryb nauki: tabulatura czeka, aż zagrasz każdą nutę",
+    "hint_on": "Tryb nauki włączony. Kliknij, aby wrócić do grania z metronomem",
+    "hint_needs_mic": "Włącz wykrywanie dźwięku, aby uczyć się nuta po nucie",
+    "title": "Tryb nauki",
+    "waiting": "Zagraj podświetloną nutę, aby przejść dalej",
+    "press_play": "Naciśnij play, a potem zagraj podświetloną nutę",
+    "progress": "Nuta {{current}} z {{total}}",
+    "passes_one": "{{count}} przejście ukończone",
+    "passes_few": "{{count}} przejścia ukończone",
+    "passes_many": "{{count}} przejść ukończonych",
+    "passes_other": "{{count}} przejścia ukończone",
+    "skip": "Pomiń nutę",
+    "restart": "Zacznij od nowa"
   }
 }

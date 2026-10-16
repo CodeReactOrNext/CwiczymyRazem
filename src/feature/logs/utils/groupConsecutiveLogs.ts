@@ -3,6 +3,8 @@ import type {
   FirebaseLogsDailyQuestInterface,
   FirebaseLogsDiscordPromoInterface,
   FirebaseLogsDonationInterface,
+  FirebaseLogsDuelResultInterface,
+  FirebaseLogsDuelWaitingInterface,
   FirebaseLogsExamPassedInterface,
   FirebaseLogsGoalCompletedInterface,
   FirebaseLogsGoalCreatedInterface,
@@ -36,6 +38,8 @@ export type AnyFirebaseLog =
   | FirebaseLogsSupportAskInterface
   | FirebaseLogsDonationInterface
   | FirebaseLogsGuildLevelInterface
+  | FirebaseLogsDuelResultInterface
+  | FirebaseLogsDuelWaitingInterface
   | FirebaseLogsPlayerJoinedInterface
   | FirebaseLogsDiscordPromoInterface;
 
@@ -117,6 +121,26 @@ export const isFirebaseLogsGuildLevel = (
   return (log as FirebaseLogsGuildLevelInterface).type === "guild_level_up";
 };
 
+export const isFirebaseLogsDuelResult = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsDuelResultInterface => {
+  return (log as FirebaseLogsDuelResultInterface).type === "duel_result";
+};
+
+export const isFirebaseLogsDuelWaiting = (
+  log: AnyFirebaseLog
+): log is FirebaseLogsDuelWaitingInterface => {
+  return (log as FirebaseLogsDuelWaitingInterface).type === "duel_waiting";
+};
+
+/**
+ * A "someone is waiting" row whose ticket has lapsed. The server deletes the row
+ * when the ticket goes, but the sweep runs every ten minutes — until then the
+ * feed must not offer a duel nobody is waiting for.
+ */
+export const isExpiredDuelWaiting = (log: AnyFirebaseLog, now: number): boolean =>
+  isFirebaseLogsDuelWaiting(log) && log.expiresAt <= now;
+
 export const isFirebaseLogsSupportAsk = (
   log: AnyFirebaseLog
 ): log is FirebaseLogsSupportAskInterface => {
@@ -157,6 +181,8 @@ export type LogActivityType =
   | "supportAsk"
   | "donationReceived"
   | "guildLevel"
+  | "duelResult"
+  | "duelWaiting"
   | "playerJoined"
   | "discordPromo"
   | "exercisePlan"
@@ -179,6 +205,8 @@ export const getLogActivityType = (log: AnyFirebaseLog): LogActivityType => {
   if (isFirebaseLogsSupportAsk(log)) return "supportAsk";
   if (isFirebaseLogsDonation(log)) return "donationReceived";
   if (isFirebaseLogsGuildLevel(log)) return "guildLevel";
+  if (isFirebaseLogsDuelResult(log)) return "duelResult";
+  if (isFirebaseLogsDuelWaiting(log)) return "duelWaiting";
   if (isFirebaseLogsPlayerJoined(log)) return "playerJoined";
   if (isFirebaseLogsDiscordPromo(log)) return "discordPromo";
   return (log as FirebaseLogsInterface).planId ? "exercisePlan" : "exercise";

@@ -52,6 +52,9 @@ interface UseSessionControlsOptions {
   loopsCompletedRef:      { current: number };
   tabRestartKey:          number;
   setTabRestartKey:       Dispatch<SetStateAction<number>>;
+  /** Learn mode waits for the player instead of keeping time: Play runs the
+   *  practice clock but starts no metronome. */
+  learnMode?:             boolean;
 }
 
 export function useSessionControls({
@@ -64,6 +67,7 @@ export function useSessionControls({
   saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
   tabRestartKey, setTabRestartKey,
   shortcutsDisabled = false,
+  learnMode = false,
 }: UseSessionControlsOptions) {
   const isPlayingRef = useRef(isPlaying);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
@@ -71,8 +75,8 @@ export function useSessionControls({
   // ── Handlers ──────────────────────────────────────────────────────────────
 
   // Only these exercises start the metronome on Play, so only they get a count-in.
-  const startsMetronome =
-    !!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat";
+  const startsMetronome = !learnMode &&
+    (!!currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat");
 
   // Practice time starts on the first real beat, not on the Play click — hold the
   // timer for as long as the count-in will take.

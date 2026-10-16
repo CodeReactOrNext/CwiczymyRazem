@@ -17,6 +17,7 @@ import { ExerciseHeroHeader } from "./ExerciseHeroHeader";
 import { ExerciseProgress } from "./ExerciseProgress";
 import { ExerciseQuickActionsBar } from "./ExerciseQuickActionsBar";
 import { GpTrackSelector } from "./GpTrackSelector";
+import { LearnModeButton } from "./LearnModeButton";
 import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { SessionBottomBar } from "./SessionBottomBar";
 import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
@@ -197,6 +198,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         showBackingInExam={p.isScaleExam}
         trailing={
           <>
+            {/* Waits on each note instead of keeping time; absent where the exercise has no tab. */}
+            <LearnModeButton />
             {/* One menu for every tab view: flat tablature, notation.
                 Notation is a practice-only convenience, so it's dropped in exams. */}
             {/* An ear-training riddle keeps its tab hidden until the answer is in, and

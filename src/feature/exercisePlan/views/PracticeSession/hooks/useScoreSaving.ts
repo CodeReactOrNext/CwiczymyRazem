@@ -38,6 +38,12 @@ interface UseScoreSavingOptions {
    * who is playing what.
    */
   duelId?: string | null;
+  /**
+   * True while the session is in learn mode — the tab waited for every note, so
+   * nothing was played at tempo and the exercise is not done yet. Read at save
+   * time, so a lesson never stamps the exercise as completed in the skill tree.
+   */
+  learnModeRef?: RefObject<boolean>;
 }
 
 /**
@@ -64,7 +70,7 @@ export interface ScoreRecords {
 export function useScoreSaving({
   activeExercise, currentExercise, isMicEnabled,
   earTrainingScore, noteMatchingHandle, sessionBpm, recordGoalChartRuns = true,
-  videoDurationSeconds = null, duelId = null,
+  videoDurationSeconds = null, duelId = null, learnModeRef,
 }: UseScoreSavingOptions) {
   const userAuth   = useAppSelector(selectUserAuth);
   const userName   = useAppSelector(selectUserName);
@@ -216,7 +222,7 @@ export function useScoreSaving({
     // Every branch above is conditional on a score, and a good part of the
     // catalogue — improv prompts, play-alongs, ear quizzes, the mic-less drills —
     // has no score to earn, so without this nothing would ever be recorded for them.
-    if (userAuth) await markExerciseCompleted(userAuth, exId, exTitle, exCategory);
+    if (userAuth && !learnModeRef?.current) await markExerciseCompleted(userAuth, exId, exTitle, exCategory);
   };
 
   return { saveCurrentScores, exerciseRecordsRef, scoredRuns, micStandingRef, earTrainingStandingRef };

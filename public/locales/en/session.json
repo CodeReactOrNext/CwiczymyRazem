@@ -555,5 +555,19 @@
     "title": "Your mic can hear the guitar playback",
     "body": "This run won't go on the leaderboards. Put on headphones or turn the guitar sound off, then start the run over.",
     "mute": "Turn guitar off"
+  },
+  "learn": {
+    "button": "Learn",
+    "hint_off": "Learn mode: the tab waits until you play each note",
+    "hint_on": "Learn mode is on. Click to go back to playing with the metronome",
+    "hint_needs_mic": "Turn on pitch detection to learn note by note",
+    "title": "Learn mode",
+    "waiting": "Play the highlighted note to move on",
+    "press_play": "Press play, then play the highlighted note",
+    "progress": "Note {{current}} of {{total}}",
+    "passes_one": "{{count}} pass completed",
+    "passes_other": "{{count}} passes completed",
+    "skip": "Skip note",
+    "restart": "Start over"
   }
 }

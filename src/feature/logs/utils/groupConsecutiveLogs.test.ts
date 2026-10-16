@@ -1,6 +1,8 @@
 import type {
   FirebaseLogsCaseOpenInterface,
   FirebaseLogsDonationInterface,
+  FirebaseLogsDuelResultInterface,
+  FirebaseLogsDuelWaitingInterface,
   FirebaseLogsGoalCreatedInterface,
   FirebaseLogsMarketplaceInterface,
   FirebaseLogsMarketplacePurchaseInterface,
@@ -12,6 +14,7 @@ import {
   dropIncompleteTailGroup,
   getLogActivityType,
   groupConsecutiveLogs,
+  isExpiredDuelWaiting,
 } from "./groupConsecutiveLogs";
 
 const caseOpenLog = (
@@ -97,6 +100,61 @@ const donationLog = (
   uid: "user-1",
   userName: "Cookie",
   ...overrides,
+});
+
+const duelWaitingLog = (
+  overrides: Partial<FirebaseLogsDuelWaitingInterface> = {}
+): FirebaseLogsDuelWaitingInterface => ({
+  type: "duel_waiting",
+  data: "2026-07-09T21:20:00.000Z",
+  timestamp: "2026-07-09T21:20:00.000Z",
+  ticketId: "t1",
+  expiresAt: Date.parse("2026-07-10T21:20:00.000Z"),
+  ...overrides,
+});
+
+const duelResultLog = (): FirebaseLogsDuelResultInterface => ({
+  type: "duel_result",
+  data: "2026-07-09T21:20:00.000Z",
+  timestamp: "2026-07-09T21:20:00.000Z",
+  duelId: "d1",
+  exerciseId: "spider",
+  exerciseTitle: "Spider",
+  kind: "win",
+  players: [
+    { userId: "a", displayName: "A", avatar: "", bestScore: 900, ratingBefore: 1000, ratingAfter: 1016 },
+    { userId: "b", displayName: "B", avatar: "", bestScore: 400, ratingBefore: 1000, ratingAfter: 984 },
+  ],
+});
+
+describe("duel rows", () => {
+  it("classifies a settled duel and a waiting ticket as their own activities", () => {
+    expect(getLogActivityType(duelResultLog())).toBe("duelResult");
+    expect(getLogActivityType(duelWaitingLog())).toBe("duelWaiting");
+  });
+
+  it("never gathers duel rows into a group — nobody owns them", () => {
+    const groups = groupConsecutiveLogs([
+      duelWaitingLog({ ticketId: "t1" }),
+      duelWaitingLog({ ticketId: "t2" }),
+      duelResultLog(),
+      duelResultLog(),
+    ]);
+
+    expect(groups).toHaveLength(4);
+  });
+
+  it("treats a waiting row as stale once its ticket has lapsed", () => {
+    const log = duelWaitingLog({ expiresAt: 1_000 });
+
+    expect(isExpiredDuelWaiting(log, 999)).toBe(false);
+    expect(isExpiredDuelWaiting(log, 1_000)).toBe(true);
+  });
+
+  it("never calls any other row stale", () => {
+    expect(isExpiredDuelWaiting(duelResultLog(), Number.MAX_SAFE_INTEGER)).toBe(false);
+    expect(isExpiredDuelWaiting(caseOpenLog(), Number.MAX_SAFE_INTEGER)).toBe(false);
+  });
 });
 
 describe("groupConsecutiveLogs", () => {

@@ -13,6 +13,7 @@ import type { ClickHuntState } from "../hooks/useClickHunt";
 import { useClickHunt } from "../hooks/useClickHunt";
 import type { IntervalClickState } from "../hooks/useIntervalClickHunt";
 import { useIntervalClickHunt } from "../hooks/useIntervalClickHunt";
+import type { LearnModeState } from "../hooks/useLearnModeMatcher";
 import type { NoteHuntState } from "../hooks/useNoteHunt";
 import { useNoteHunt } from "../hooks/useNoteHunt";
 import { useNoteMatching } from "../hooks/useNoteMatching";
@@ -89,6 +90,10 @@ interface NoteMatchingContextValue {
   registerFretClick: (string: number, fret: number) => void;
   /** Register a click on a fretboard cell for the interval drill (root, then interval). */
   registerIntervalClick: (string: number, fret: number) => void;
+  /** Learn mode — the tab waits for each note to be played. Null where the
+   *  session has no such mode (no tab, mobile, exams). While `enabled`, the hit
+   *  marks above are the lesson's, not a scored run's. */
+  learn: LearnModeState | null;
 }
 
 // ── Imperative handle (what PracticeSession reads in event handlers) ──────────
@@ -143,6 +148,7 @@ export const CLICK_EXAM_MISTAKE_LIMIT = 3;
 const _fallbackRef = { current: 0 } as MutableRefObject<number>;
 const _noPitchRef = { current: null } as MutableRefObject<LivePitch | null>;
 const EMPTY_TIMINGS: Record<string, NoteTiming> = {};
+const EMPTY_MISSED: Record<string, boolean> = {};
 
 const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   hitNotes: {},
@@ -176,6 +182,7 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   markChordTone: () => { /* no-op default */ },
   registerFretClick: () => { /* no-op default */ },
   registerIntervalClick: () => { /* no-op default */ },
+  learn: null,
 });
 
 // ── Provider ──────────────────────────────────────────────────────────────────
@@ -240,6 +247,9 @@ interface NoteMatchingProviderProps {
   // true while the mic is known to hear the tab's own playback — a run that
   // starts over while it still does starts out marked (usePlaybackLeakGuard)
   playbackLeakingRef?: React.MutableRefObject<boolean>;
+  // learn mode (see useLearnModeMatcher) — owned by PracticeSession, which also
+  // switches the metronome off for it
+  learn?: LearnModeState | null;
 }
 
 export function NoteMatchingProvider({
@@ -277,6 +287,7 @@ export function NoteMatchingProvider({
   isExamMode = false,
   onExamFail,
   playbackLeakingRef,
+  learn = null,
 }: NoteMatchingProviderProps) {
   const {
     hitNotes,
@@ -578,10 +589,17 @@ export function NoteMatchingProvider({
     },
   };
 
+  // The clock is off in learn mode, so what the scored run left behind (marks
+  // from before it was switched on) is not the lesson's to show.
+  const isLearning = !!learn?.enabled && !isHunt && !isStrummingExercise;
+
   const value = useMemo<NoteMatchingContextValue>(
     () => ({
-      hitNotes, missedNotes, currentBeatsElapsedRef, strumSlotFeedback, gameState,
-      noteTimings: isHunt || isStrummingExercise ? EMPTY_TIMINGS : noteTimings,
+      hitNotes: isLearning ? learn!.hitNotes : hitNotes,
+      missedNotes: isLearning ? EMPTY_MISSED : missedNotes,
+      learn,
+      currentBeatsElapsedRef, strumSlotFeedback, gameState,
+      noteTimings: isHunt || isStrummingExercise || isLearning ? EMPTY_TIMINGS : noteTimings,
       livePitchRef,
       scoringFocus,
       maxPossibleScore: effectiveMaxPossibleScore, sessionAccuracy, sessionStats,
@@ -607,7 +625,7 @@ export function NoteMatchingProvider({
       registerIntervalClick,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, noteTimings, livePitchRef, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
+    [hitNotes, missedNotes, noteTimings, learn, isLearning, livePitchRef, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
   );
 
   return (
