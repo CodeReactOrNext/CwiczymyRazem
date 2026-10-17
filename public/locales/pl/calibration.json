@@ -32,8 +32,16 @@
     "output": "Wyjście",
     "no_outputs": "Nie znaleziono urządzeń wyjściowych",
     "output_hint": "Powinno pasować do interfejsu powyżej, żeby dźwięk i nagrywanie szły przez to samo urządzenie.",
+    "output_hint_asio4all": "ASIO4ALL blokuje cały interfejs, razem z wyjściami, więc metronom nie zagra przez niego. Wybierz tu inne wyjście (np. głośniki komputera) albo w panelu ASIO4ALL wyłącz wyjście interfejsu i zostaw samo wejście.",
     "before_start": "Zanim zaczniesz",
     "before_start_body": "Upewnij się, że interfejs jest wybrany jako wejście mikrofonowe przeglądarki, a gitara jest podłączona. Wzmocnienie ustawisz na następnym ekranie."
+  },
+  "output_stall": {
+    "title": "Metronom nie może zagrać",
+    "body": "Sterownik audio trzyma wyjście, przez które gra aplikacja, więc metronomu i podkładów nie słychać. Wybierz inne wyjście, np. głośniki komputera albo gniazdo słuchawkowe.",
+    "pick": "Wybierz wyjście…",
+    "asio4all": "Używasz ASIO4ALL? W jego panelu zostaw włączone tylko wejście interfejsu i upewnij się, że żadna inna karta dźwiękowa nie jest tam zaznaczona.",
+    "close": "Zamknij"
   },
   "tuning": {
     "wrong_string": "Zła struna?",

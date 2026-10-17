@@ -3,7 +3,7 @@ import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
-import { useNativeOutputDevice } from "hooks/useNativeOutputDevice";
+import { isExclusiveAsioWrapper, useNativeOutputDevice } from "hooks/useNativeOutputDevice";
 import { useTranslation } from "hooks/useTranslation";
 import { ChevronLeft, ChevronRight, Headphones, Mic, Plug, RefreshCw, Speaker, VolumeX,Wand2, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
@@ -252,9 +252,12 @@ function NativeInterfaceSelector({
   };
 
   const selectedDevice = devices.find((d) => d.id === selectedId);
+  // ASIO4ALL holds the interface's outputs too, so "match the interface" is
+  // exactly the wrong advice — keep the picker open and say so.
+  const isAsio4All = isExclusiveAsioWrapper(selectedDevice?.name);
 
   const selectedOutput = output.devices.find((d) => d.deviceId === output.selectedId);
-  const showOutputPicker = outputExpanded || !output.selectedId;
+  const showOutputPicker = outputExpanded || !output.selectedId || isAsio4All;
 
   return (
     <div className="rounded-lg bg-zinc-900/70 p-4 space-y-3">
@@ -343,8 +346,8 @@ function NativeInterfaceSelector({
               </option>
             ))}
           </select>
-          <p className="text-[11px] text-zinc-500 leading-relaxed">
-            {t("setup.output_hint")}
+          <p className={cn("text-[11px] leading-relaxed", isAsio4All ? "text-amber-400/90" : "text-zinc-500")}>
+            {t(isAsio4All ? "setup.output_hint_asio4all" : "setup.output_hint")}
           </p>
         </div>
       )}

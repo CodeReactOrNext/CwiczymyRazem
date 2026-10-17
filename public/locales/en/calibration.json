@@ -32,8 +32,16 @@
     "output": "Output",
     "no_outputs": "No output devices found",
     "output_hint": "Should match the interface above so audio and capture use the same device.",
+    "output_hint_asio4all": "ASIO4ALL locks your whole interface, outputs included, so the metronome can't play through it. Pick a different output here (e.g. your computer's speakers), or turn off the interface's output in the ASIO4ALL panel and keep only its input.",
     "before_start": "Before you start",
     "before_start_body": "Make sure your interface is selected as the browser's microphone input and your guitar is plugged in. You'll set the gain level on the next screen."
+  },
+  "output_stall": {
+    "title": "The metronome can't play",
+    "body": "Your audio driver is holding the output the app plays through, so the metronome and backing tracks can't be heard. Pick another output, e.g. your computer's speakers or headphone jack.",
+    "pick": "Pick an output…",
+    "asio4all": "Using ASIO4ALL? In its panel, keep only your interface's input switched on, and make sure no other sound card is ticked there.",
+    "close": "Close"
   },
   "tuning": {
     "wrong_string": "Wrong string?",
