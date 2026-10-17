@@ -36,6 +36,8 @@
     "technique": "Technik",
     "learned_title": "Ich habe diesen Song gelernt!",
     "learned_description": "Als „Gelernt“ markieren und zu den abgeschlossenen verschieben",
+    "already_learned_title": "Bereits gelernt",
+    "already_learned_description": "Dieser Song steht schon in deiner Liste „Gelernt“.",
     "resume": "Timer fortsetzen",
     "confirm": "Bestätigen & beenden",
     "saving": "Wird gespeichert..."

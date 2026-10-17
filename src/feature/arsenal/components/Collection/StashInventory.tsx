@@ -417,7 +417,10 @@ export const StashInventory = ({
   };
 
   /** The merge key of one item's card, or nothing when there is no copy to fold it into. */
-  const mergeActionOf = (kind: Kind, itemId: string): CardMergeAction | undefined => {
+  const mergeActionOf = (
+    kind: Kind,
+    itemId: string,
+  ): CardMergeAction | undefined => {
     const state = mergeStateOf(kind, itemId);
     if (!state) return undefined;
     return {
@@ -662,15 +665,33 @@ export const StashInventory = ({
     router.replace({ query: { ...router.query, tab: "builder" } }, undefined, {
       shallow: true,
     });
+  /** Hangs the stash menu off the cursor, or off the socket for a keypress. */
+  const showMenuAt = (
+    piece: BoardPiece,
+    event: ReactMouseEvent<HTMLElement>,
+  ) => {
+    // A keyboard press has no cursor (detail 0, coordinates 0:0).
+    if (event.detail === 0) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setMenu({ piece, x: rect.left, y: rect.bottom });
+      return;
+    }
+    setMenu({ piece, x: event.clientX, y: event.clientY });
+  };
   /** A socket opened from the board — every kind has somewhere to open into. */
-  const openPiece = (piece: BoardPiece) => {
+  const openPiece = (
+    piece: BoardPiece,
+    event: ReactMouseEvent<HTMLElement>,
+  ) => {
     if (consumeClick()) return;
     if (piece.kind === "guitar" || piece.kind === "effect") {
       setDetail({ kind: piece.kind, itemId: piece.id });
     } else if (piece.kind === "mod") {
       setModDetail(piece.mod);
     } else if (piece.kind === "component") {
-      openBuilder();
+      // A Builder part has no sheet, and jumping tabs on a tap read as "you
+      // can't do anything with this". Its menu says what can be done instead.
+      showMenuAt(piece, event);
     } else {
       setPartDetail(piece.part);
     }
@@ -812,7 +833,9 @@ export const StashInventory = ({
     if (fitTargets) return !fitTargets.has(piece.id) && piece.id !== ghost?.id;
     if (!manual) return false;
     const inScope =
-      piece.kind === "part" || piece.kind === "mod" || piece.kind === "component"
+      piece.kind === "part" ||
+      piece.kind === "mod" ||
+      piece.kind === "component"
         ? scope === "all"
         : isScopeVisible(scope, piece.kind === "guitar" ? "guitars" : "pedals");
     return !inScope || !matchesQuery(piece.name, query);
@@ -1098,7 +1121,7 @@ export const StashInventory = ({
     (piece: BoardPiece) => (event: ReactMouseEvent<HTMLElement>) => {
       // The browser's own menu has nothing to say about a socket.
       event.preventDefault();
-      setMenu({ piece, x: event.clientX, y: event.clientY });
+      showMenuAt(piece, event);
     };
 
   const renderPiece = (piece: BoardPiece, carried = false) => {
@@ -1122,7 +1145,7 @@ export const StashInventory = ({
         isEquipped={data.equippedItemId === piece.id}
         rigSlot={rigSlotOf(piece.id)}
         isOnPedalboard={pedalboardItemIds.has(piece.id)}
-        onClick={() => openPiece(piece)}
+        onClick={(event) => openPiece(piece, event)}
       />
     );
   };
@@ -1168,7 +1191,9 @@ export const StashInventory = ({
                 className={bulkButtonClass}
                 title={t("stash.dupes_guitars_hint")}>
                 <Layers size={14} />
-                {t("stash.dupes_guitars", { count: guitarDuplicates.ids.length })}
+                {t("stash.dupes_guitars", {
+                  count: guitarDuplicates.ids.length,
+                })}
               </button>
             )}
             {effectDuplicates.ids.length > 0 && (
@@ -1178,7 +1203,9 @@ export const StashInventory = ({
                 className={bulkButtonClass}
                 title={t("stash.dupes_pedals_hint")}>
                 <Layers size={14} />
-                {t("stash.dupes_pedals", { count: effectDuplicates.ids.length })}
+                {t("stash.dupes_pedals", {
+                  count: effectDuplicates.ids.length,
+                })}
               </button>
             )}
           </div>
@@ -1332,11 +1359,7 @@ export const StashInventory = ({
       <StashItemDialog
         isOpen={modDetail !== null}
         onClose={() => setModDetail(null)}
-        title={
-          modDetail
-            ? modName(modDetail)
-            : ""
-        }>
+        title={modDetail ? modName(modDetail) : ""}>
         {modDetail && (
           <SalvagedModCard
             mod={modDetail}
@@ -1359,9 +1382,7 @@ export const StashInventory = ({
         isOpen={partDetail !== null}
         onClose={() => setPartDetail(null)}
         title={
-          partDetail
-            ? labels.partName(partDetail.tier, partDetail.partId)
-            : ""
+          partDetail ? labels.partName(partDetail.tier, partDetail.partId) : ""
         }>
         {partDetail && (
           <ScrapPartCard
@@ -1581,9 +1602,7 @@ export const StashInventory = ({
             : guitarDuplicates.salvagedCount
         }
         protectedNote={
-          bulk === "effect"
-            ? t("stash.pedals_protected")
-            : undefined
+          bulk === "effect" ? t("stash.pedals_protected") : undefined
         }
         mergeGain={
           bulk === "effect" ? effectMergePlan.gain : guitarMergePlan.gain

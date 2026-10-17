@@ -11,7 +11,7 @@ import {
 import type { ReactNode } from "react";
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
-import type { StashPlacement } from "../Collection/StashTile";
+import type { StashPlacement, StashTileClick } from "../Collection/StashTile";
 import { StashTile } from "../Collection/StashTile";
 import { RARITY_STYLES } from "../RarityBadge";
 import { EffectCard } from "./EffectCard";
@@ -23,7 +23,7 @@ interface EffectStashTileProps extends StashPlacement {
   dexStatus?: DexStatus;
   /** Under the hover card — see `StashTile`. */
   previewFooter?: ReactNode;
-  onClick?: () => void;
+  onClick?: StashTileClick;
 }
 
 /** A pedal as one socket of the stash. Square, unlike the tall guitar sockets. */

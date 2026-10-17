@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { useDashboardLayoutContext } from "feature/dashboard/context/DashboardContext";
@@ -11,9 +10,12 @@ import {
 import {
   isShortcutLimitReached,
   MAX_SHORTCUTS,
+  removeCustomShortcut,
+  shortcutCount,
   toggleShortcut,
 } from "feature/dashboard/utils/dashboardLayout";
-import { Zap } from "lucide-react";
+import { useTranslation } from "hooks/useTranslation";
+import { SlidersHorizontal, X, Zap } from "lucide-react";
 import Link from "next/link";
 
 import { WidgetHeader } from "./WidgetHeader";
@@ -30,6 +32,7 @@ export const ShortcutsWidget = () => {
   const { t } = useTranslation("dashboard");
   const { layout, isEditing, updateLayout } = useDashboardLayoutContext();
   const selected = layout.shortcuts;
+  const custom = layout.customShortcuts;
   const limitReached = isShortcutLimitReached(layout);
 
   if (isEditing) {
@@ -40,7 +43,7 @@ export const ShortcutsWidget = () => {
           title={t("shortcuts.title")}
           action={
             <span className='text-xs tabular-nums text-zinc-400'>
-              {selected.length}/{MAX_SHORTCUTS}
+              {shortcutCount(layout)}/{MAX_SHORTCUTS}
             </span>
           }
         />
@@ -93,6 +96,43 @@ export const ShortcutsWidget = () => {
               </div>
             </div>
           ))}
+
+          <div>
+            <p className='mb-2 text-xs font-semibold text-zinc-400'>
+              {t("shortcuts.custom.title", "Your shortcuts")}
+            </p>
+            {custom.length === 0 ? (
+              <p className='text-sm text-zinc-500'>
+                {t(
+                  "shortcuts.custom.hint",
+                  "Set filters on the Exercises page and pin them here.",
+                )}
+              </p>
+            ) : (
+              <div className='flex flex-wrap gap-2'>
+                {custom.map((shortcut) => (
+                  <button
+                    key={shortcut.id}
+                    type='button'
+                    onClick={() =>
+                      updateLayout(removeCustomShortcut(layout, shortcut.id))
+                    }
+                    aria-label={t("shortcuts.custom.remove", {
+                      label: shortcut.label,
+                      defaultValue: "Remove {{label}}",
+                    })}
+                    className={cn(
+                      chip,
+                      "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20",
+                    )}>
+                    <SlidersHorizontal size={14} className='shrink-0' />
+                    {shortcut.label}
+                    <X size={14} className='shrink-0 opacity-60' />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </Card>
     );
@@ -101,7 +141,7 @@ export const ShortcutsWidget = () => {
   return (
     <Card className='p-5 sm:p-6'>
       <WidgetHeader icon={Zap} title={t("shortcuts.title")} />
-      {selected.length === 0 ? (
+      {selected.length === 0 && custom.length === 0 ? (
         <p className='text-sm text-zinc-400'>
           {t("shortcuts.empty")}
         </p>
@@ -123,6 +163,18 @@ export const ShortcutsWidget = () => {
               </Link>
             );
           })}
+          {custom.map((shortcut) => (
+            <Link
+              key={shortcut.id}
+              href={shortcut.href}
+              className={cn(
+                chip,
+                "bg-zinc-900/40 text-zinc-200 hover:bg-zinc-800/60 hover:text-zinc-100",
+              )}>
+              <SlidersHorizontal size={14} className='shrink-0 text-zinc-500' />
+              {shortcut.label}
+            </Link>
+          ))}
         </div>
       )}
     </Card>

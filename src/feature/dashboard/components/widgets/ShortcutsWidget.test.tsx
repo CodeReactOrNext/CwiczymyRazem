@@ -10,7 +10,7 @@ import { ShortcutsWidget } from "./ShortcutsWidget";
 
 const layoutWith = (
   shortcuts: DashboardLayout["shortcuts"],
-): DashboardLayout => ({ version: 1, widgets: [], shortcuts });
+): DashboardLayout => ({ version: 1, widgets: [], shortcuts, customShortcuts: [] });
 
 const renderWidget = (layout: DashboardLayout, isEditing: boolean) => {
   const updateLayout = vi.fn();

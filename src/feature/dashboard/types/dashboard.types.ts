@@ -45,10 +45,23 @@ export interface WidgetPlacement {
   size: WidgetSize;
 }
 
+/**
+ * A link the player made themselves — e.g. the exercise list with their own
+ * filters pinned from Browse Exercises. Shown after the catalogue shortcuts and
+ * counted against the same limit.
+ */
+export interface CustomShortcut {
+  id: string;
+  label: string;
+  /** In-app path only (starts with a single "/"). */
+  href: string;
+}
+
 export interface DashboardLayout {
   version: 1;
   /** Visible cards, top to bottom. Anything not listed is hidden. */
   widgets: WidgetPlacement[];
   /** Destinations pinned to the Shortcuts card, in the order they were picked. */
   shortcuts: ShortcutId[];
+  customShortcuts: CustomShortcut[];
 }

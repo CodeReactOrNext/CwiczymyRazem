@@ -36,6 +36,8 @@
     "technique": "Técnica",
     "learned_title": "¡Ya me sé esta canción!",
     "learned_description": "Márcala como «Aprendida» y muévela a completadas",
+    "already_learned_title": "Ya aprendida",
+    "already_learned_description": "Esta canción ya está en tu lista de aprendidas.",
     "resume": "Reanudar temporizador",
     "confirm": "Confirmar y terminar",
     "saving": "Guardando..."

@@ -117,6 +117,11 @@
     "limit_reached": "Ya está lleno: quita uno para cambiarlo.",
     "up_to": "Caben hasta {{count}}.",
     "empty": "Aún no has fijado atajos. Personaliza el inicio para añadir algunos.",
+    "custom": {
+      "title": "Tus atajos",
+      "hint": "Elige filtros en la página de ejercicios y fíjalos aquí.",
+      "remove": "Quitar {{label}}"
+    },
     "groups": {
       "practice": "Práctica",
       "songs": "Canciones",

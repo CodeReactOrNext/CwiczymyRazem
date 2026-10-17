@@ -72,6 +72,7 @@ describe("dashboardLayout.service", () => {
       version: 1,
       widgets: [{ id: "streak", size: "half" }],
       shortcuts: ["wiki"],
+      customShortcuts: [],
     });
   });
 
@@ -82,6 +83,7 @@ describe("dashboardLayout.service", () => {
       version: 1,
       widgets: [{ id: "rank", size: "half" }],
       shortcuts: ["settings"],
+      customShortcuts: [{ id: "custom-a", label: "No guitar", href: "/profile/skills?tab=browse" }],
     });
 
     expect(setDoc).toHaveBeenCalledWith(
@@ -90,6 +92,7 @@ describe("dashboardLayout.service", () => {
         version: 1,
         widgets: [{ id: "rank", size: "half" }],
         shortcuts: ["settings"],
+        customShortcuts: [{ id: "custom-a", label: "No guitar", href: "/profile/skills?tab=browse" }],
         updatedAt: { __serverTimestamp: true },
       },
       { merge: true },

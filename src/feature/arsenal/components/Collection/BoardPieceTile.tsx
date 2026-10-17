@@ -15,7 +15,7 @@ import { getRarityColor } from "../RarityBadge";
 import { ModArt } from "../Workshop/ModArt";
 import { SalvagedModCard } from "./SalvagedModCard";
 import { ScrapPartCard } from "./ScrapPartCard";
-import type { StashPlacement } from "./StashTile";
+import type { StashPlacement, StashTileClick } from "./StashTile";
 import { StashTile } from "./StashTile";
 
 /** Mods are purple everywhere in the arsenal — the bench, the picker, the socket. */
@@ -36,7 +36,7 @@ interface BoardPieceTileProps extends StashPlacement {
   dexStatus?: DexStatus;
   /** Under the hover card, whatever the piece — see `StashTile`. */
   previewFooter?: ReactNode;
-  onClick?: () => void;
+  onClick?: StashTileClick;
 }
 
 /**

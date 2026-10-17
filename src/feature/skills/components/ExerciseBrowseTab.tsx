@@ -2,6 +2,7 @@ import { Chip, chipVariants } from "assets/components/ui/chip";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { MAX_CUSTOM_SHORTCUT_LABEL } from "feature/dashboard/utils/dashboardLayout";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
@@ -16,15 +17,24 @@ import { isExerciseNew } from "feature/exercisePlan/utils/isExerciseNew";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { getSkillAccentClass } from "feature/skills/components/SkillIconTile";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { type LengthId, type StatusId, useExerciseBrowseFilters } from "feature/skills/hooks/exerciseBrowseFiltersStore";
 import type { GuitarSkillId } from "feature/skills/skills.types";
+import {
+  buildExerciseFilterHref,
+  EXERCISE_FILTER_QUERY_KEYS,
+  hasExerciseFilterQuery,
+  parseExerciseFilterQuery,
+} from "feature/skills/utils/exerciseFilterQuery";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowUpDown, Check, ChevronRight, Ear, Hand, Heart, Info, LayoutGrid, Lightbulb, Lock, Music, Search, SlidersHorizontal, Timer, Trophy, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { ArrowUpDown, Check, ChevronRight, Ear, Hand, Heart, Info, LayoutGrid, Lightbulb, Lock, Music, Pin, Search, SlidersHorizontal, Timer, Trophy, X } from "lucide-react";
+import { useRouter } from "next/router";
+import { type SetStateAction, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { formatMinutesDuration } from "utils/converter";
 
+import { PinFiltersDialog } from "./PinFiltersDialog";
 import type { DashboardExercise } from "./SkillDashboard";
 
 interface ExerciseBrowseTabProps {
@@ -95,8 +105,6 @@ const EXERCISE_SETS: ExerciseSet[] = (() => {
   return Array.from(byId.values());
 })();
 
-type StatusId = "new" | "untouched" | "inProgress" | "mastered" | "favorite";
-
 const STATUSES: { id: StatusId; label: string }[] = [
   { id: "new", label: "New" },
   { id: "untouched", label: "Not tried" },
@@ -105,7 +113,6 @@ const STATUSES: { id: StatusId; label: string }[] = [
   { id: "favorite", label: "Favorites" },
 ];
 
-type LengthId = "short" | "mid" | "long";
 
 const LENGTHS: { id: LengthId; label: string; test: (minutes: number) => boolean }[] = [
   { id: "short", label: "Under 2 min", test: m => m < 2 },
@@ -201,19 +208,43 @@ export const ExerciseBrowseTab = ({
     [userInfo?.favoriteExerciseIds]
   );
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSkills, setSelectedSkills] = useState<GuitarSkillId[]>([]);
-  const [selectedModes, setSelectedModes] = useState<PracticeMode[]>([]);
-  const [selectedStatuses, setSelectedStatuses] = useState<StatusId[]>([]);
-  const [selectedLength, setSelectedLength] = useState<LengthId | null>(null);
-  const [expandedSets, setExpandedSets] = useState<string[]>([]);
+  // Filters live in a store so they survive starting (and finishing) an
+  // exercise - the session view unmounts this tab.
+  const searchQuery = useExerciseBrowseFilters(s => s.searchQuery);
+  const selectedSkills = useExerciseBrowseFilters(s => s.selectedSkills);
+  const selectedModes = useExerciseBrowseFilters(s => s.selectedModes);
+  const selectedStatuses = useExerciseBrowseFilters(s => s.selectedStatuses);
+  const selectedLength = useExerciseBrowseFilters(s => s.selectedLength);
+  const expandedSets = useExerciseBrowseFilters(s => s.expandedSets);
+  const showMoreFilters = useExerciseBrowseFilters(s => s.showMoreFilters);
+  const setFilter = useExerciseBrowseFilters(s => s.setFilter);
+  const setSearchQuery = (value: SetStateAction<string>) => setFilter("searchQuery", value);
+  const setSelectedSkills = (value: SetStateAction<GuitarSkillId[]>) => setFilter("selectedSkills", value);
+  const setSelectedModes = (value: SetStateAction<PracticeMode[]>) => setFilter("selectedModes", value);
+  const setSelectedStatuses = (value: SetStateAction<StatusId[]>) => setFilter("selectedStatuses", value);
+  const setSelectedLength = (value: SetStateAction<LengthId | null>) => setFilter("selectedLength", value);
+  const setExpandedSets = (value: SetStateAction<string[]>) => setFilter("expandedSets", value);
+  // Desktop only - status, length and the 22 skills open on demand, so the
+  // first exercises show up under the search instead of below the fold.
+  const setShowMoreFilters = (value: SetStateAction<boolean>) => setFilter("showMoreFilters", value);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [leaderboardRanks, setLeaderboardRanks] = useState<Record<string, number>>({});
   // Mobile only - filters live in a bottom sheet so the list keeps the screen.
   const [showFilters, setShowFilters] = useState(false);
-  // Desktop only - status, length and the 22 skills open on demand, so the
-  // first exercises show up under the search instead of below the fold.
-  const [showMoreFilters, setShowMoreFilters] = useState(false);
+
+  const [showPinDialog, setShowPinDialog] = useState(false);
+
+  // Deep link (a shortcut pinned to Home): ?modes=noGuitar&length=short…
+  // opens the list with exactly those filters. The params are dropped right
+  // away so coming back from an exercise keeps whatever the player changed since.
+  const router = useRouter();
+  useEffect(() => {
+    if (!router.isReady || !hasExerciseFilterQuery(router.query)) return;
+    useExerciseBrowseFilters.getState().applyPreset(parseExerciseFilterQuery(router.query));
+    const restQuery = { ...router.query };
+    EXERCISE_FILTER_QUERY_KEYS.forEach(key => delete restQuery[key]);
+    router.replace({ pathname: router.pathname, query: restQuery }, undefined, { shallow: true });
+  }, [router]);
 
   const activeFilterCount =
     selectedSkills.length + selectedModes.length + selectedStatuses.length + (selectedLength ? 1 : 0);
@@ -714,6 +745,24 @@ export const ExerciseBrowseTab = ({
   // Everything but the practice modes, which stay visible on desktop anyway.
   const moreFilterChips = activeFilterChips.filter(chip => !chip.key.startsWith("mode-"));
 
+  // ── Pin the current filters to Home as a shortcut ────────────────────────
+  const trimmedSearch = searchQuery.trim();
+  const canPinFilters = !!userAuth && (activeFilterCount > 0 || !!trimmedSearch);
+  const pinSuggestedLabel =
+    [trimmedSearch && `"${trimmedSearch}"`, ...activeFilterChips.map(chip => chip.label)]
+      .filter(Boolean)
+      .join(" · ")
+      .slice(0, MAX_CUSTOM_SHORTCUT_LABEL) || "Exercises";
+  const pinButton = (
+    <button
+      onClick={() => setShowPinDialog(true)}
+      className="flex items-center gap-1.5 px-2 py-1.5 text-[12px] font-bold text-zinc-400 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+    >
+      <Pin className="h-3.5 w-3.5" />
+      Pin to Home
+    </button>
+  );
+
   // ── One variant row inside an expanded set ──────────────────────────────
   const renderExerciseRow = (exercise: Exercise, showVariantLabel: boolean) => {
     const progress = progressMap.get(exercise.id);
@@ -1021,8 +1070,8 @@ export const ExerciseBrowseTab = ({
           </div>
 
           {/* Applied filters stay visible on mobile while the sheet is closed */}
-          {activeFilterChips.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 sm:hidden">
+          {(activeFilterChips.length > 0 || canPinFilters) && (
+            <div className="flex flex-wrap items-center gap-1.5 sm:hidden">
               {activeFilterChips.map(chip => (
                 <button
                   key={chip.key}
@@ -1033,6 +1082,7 @@ export const ExerciseBrowseTab = ({
                   <X className="h-3 w-3 opacity-60" />
                 </button>
               ))}
+              {canPinFilters && pinButton}
             </div>
           )}
 
@@ -1062,6 +1112,7 @@ export const ExerciseBrowseTab = ({
                   Clear filters
                 </button>
               )}
+              {canPinFilters && <div className="ml-auto">{pinButton}</div>}
             </div>
 
             {!showMoreFilters && moreFilterChips.length > 0 && (
@@ -1219,6 +1270,22 @@ export const ExerciseBrowseTab = ({
           onClose={() => setPreviewExercise(null)}
           onStart={handleStartPreview}
         />
+
+        {showPinDialog && (
+          <PinFiltersDialog
+            open
+            onOpenChange={setShowPinDialog}
+            userAuth={userAuth}
+            href={buildExerciseFilterHref({
+              searchQuery,
+              selectedSkills,
+              selectedModes,
+              selectedStatuses,
+              selectedLength,
+            })}
+            suggestedLabel={pinSuggestedLabel}
+          />
+        )}
       </div>
     </TooltipProvider>
   );

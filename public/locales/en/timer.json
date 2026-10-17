@@ -36,6 +36,8 @@
     "technique": "Technique",
     "learned_title": "I've learned this song!",
     "learned_description": "Mark as 'Learned' and move to completed",
+    "already_learned_title": "Already learned",
+    "already_learned_description": "This song is on your Learned list.",
     "resume": "Resume Timer",
     "confirm": "Confirm & Finish",
     "saving": "Saving..."

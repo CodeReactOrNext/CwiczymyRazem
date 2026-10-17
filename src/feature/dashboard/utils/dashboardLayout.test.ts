@@ -14,6 +14,7 @@ import { WIDGET_IDS } from "feature/dashboard/types/dashboard.types";
 import { describe, expect, it } from "vitest";
 
 import {
+  addCustomShortcut,
   addWidget,
   DEFAULT_LAYOUT,
   hiddenWidgets,
@@ -21,6 +22,7 @@ import {
   MAX_SHORTCUTS,
   moveWidget,
   normalizeLayout,
+  removeCustomShortcut,
   removeWidget,
   setWidgetSize,
   toggleShortcut,
@@ -29,7 +31,7 @@ import {
 const layoutWith = (
   widgets: DashboardLayout["widgets"],
   shortcuts: DashboardLayout["shortcuts"] = [],
-): DashboardLayout => ({ version: 1, widgets, shortcuts });
+): DashboardLayout => ({ version: 1, widgets, shortcuts, customShortcuts: [] });
 
 describe("widget catalog", () => {
   it("lists the fixed cards first, then one card per milestone tier", () => {
@@ -284,5 +286,70 @@ describe("editing", () => {
       isDefaultLayout(setWidgetSize(DEFAULT_LAYOUT, "daily-quests", "full")),
     ).toBe(false);
     expect(isDefaultLayout(toggleShortcut(DEFAULT_LAYOUT, "wiki"))).toBe(false);
+  });
+});
+
+describe("custom shortcuts", () => {
+  const exercises = {
+    label: "No guitar",
+    href: "/profile/skills?tab=browse&modes=noGuitar",
+  };
+
+  it("adds and removes a shortcut of the player's own", () => {
+    const added = addCustomShortcut(DEFAULT_LAYOUT, exercises);
+    expect(added.customShortcuts).toHaveLength(1);
+    expect(added.customShortcuts[0]).toMatchObject(exercises);
+    expect(isDefaultLayout(added)).toBe(false);
+    const removed = removeCustomShortcut(added, added.customShortcuts[0].id);
+    expect(removed.customShortcuts).toEqual([]);
+  });
+
+  it("refuses off-site links and empty names", () => {
+    expect(
+      addCustomShortcut(DEFAULT_LAYOUT, { label: "x", href: "https://evil.example" }),
+    ).toBe(DEFAULT_LAYOUT);
+    expect(
+      addCustomShortcut(DEFAULT_LAYOUT, { label: "x", href: "//evil.example" }),
+    ).toBe(DEFAULT_LAYOUT);
+    expect(
+      addCustomShortcut(DEFAULT_LAYOUT, { label: "  ", href: "/wiki" }),
+    ).toBe(DEFAULT_LAYOUT);
+  });
+
+  it("shares the shortcut limit with catalogue shortcuts", () => {
+    const almostFull = layoutWith(
+      [],
+      SHORTCUTS.slice(0, MAX_SHORTCUTS - 1).map((s) => s.id),
+    );
+    const full = addCustomShortcut(almostFull, exercises);
+    expect(full.customShortcuts).toHaveLength(1);
+    expect(addCustomShortcut(full, exercises)).toBe(full);
+    expect(toggleShortcut(full, "wiki")).toBe(full);
+  });
+
+  it("keeps only valid stored custom shortcuts, within the room left", () => {
+    const layout = normalizeLayout({
+      widgets: [],
+      shortcuts: ["wiki"],
+      customShortcuts: [
+        { id: "custom-a", label: "Ok", href: "/profile/skills?tab=browse" },
+        { id: "custom-a", label: "Duplicate", href: "/x" },
+        { id: "custom-b", label: "Bad", href: "https://evil.example" },
+        { id: "custom-c", label: "", href: "/x" },
+        ...Array.from({ length: 10 }, (_, i) => ({
+          id: "custom-n" + i,
+          label: "N",
+          href: "/n",
+        })),
+      ],
+    });
+    expect(layout.customShortcuts[0]).toEqual({
+      id: "custom-a",
+      label: "Ok",
+      href: "/profile/skills?tab=browse",
+    });
+    expect(layout.shortcuts.length + layout.customShortcuts.length).toBe(
+      MAX_SHORTCUTS,
+    );
   });
 });

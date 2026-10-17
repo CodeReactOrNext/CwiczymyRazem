@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal";
 import { ensureSongIsLearning,updateSongStatus } from "feature/songs/services/udateSongStatus";
@@ -43,12 +44,23 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     const previousUserStats = useAppSelector(selectPreviousUserStats);
     const raitingData = useAppSelector(selectRaitingData);
     const { reportList } = useActivityLog(userId as string);
+    const queryClient = useQueryClient();
     
     const [song, setSong] = useState<Song | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSplitterOpen, setIsSplitterOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    // Lets the summary skip the "I've learned this song" checkbox for songs
+    // that are already on the learned list.
+    const [isAlreadyLearned, setIsAlreadyLearned] = useState(false);
+
+    useEffect(() => {
+        if (!userId || !songId || typeof songId !== "string") return;
+        getDoc(doc(db, "users", userId, "userSongs", songId))
+            .then((snap) => setIsAlreadyLearned(snap.exists() && snap.data().status === "learned"))
+            .catch((error) => console.error("Error fetching song status:", error));
+    }, [userId, songId]);
 
     useEffect(() => {
         const fetchSong = async () => {
@@ -152,7 +164,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 );
             }
 
-            if (markAsLearned && userId) {
+            if (markAsLearned && !isAlreadyLearned && userId) {
                 try {
                     await updateSongStatus(
                         userId,
@@ -162,6 +174,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                         "learned",
                         userAvatar || ""
                     );
+                    setIsAlreadyLearned(true);
                     toast.success("Song marked as learned!");
                 } catch (error) {
                     console.error("Failed to update song status", error);
@@ -175,6 +188,12 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 } catch (error) {
                     console.error("Failed to auto-update song status to learning", error);
                 }
+            }
+
+            // The song board caches the lists for 10 minutes — without this the
+            // song would still show in its old column after the session.
+            if (userId) {
+                queryClient.invalidateQueries({ queryKey: ["user-songs", userId] });
             }
 
             await dispatch(updateUserStats({ inputData })).unwrap();
@@ -282,6 +301,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 onConfirm={handleConfirmSplit}
                 onCancel={() => setIsSplitterOpen(false)}
                 isLoading={isSubmitting}
+                isAlreadyLearned={isAlreadyLearned}
                 arrangement={arrangement}
                 onArrangementChange={setArrangement}
             />

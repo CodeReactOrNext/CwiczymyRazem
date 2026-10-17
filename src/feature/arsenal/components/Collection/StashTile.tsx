@@ -24,6 +24,9 @@ import {
   plateStyle,
 } from "../TierPlate";
 
+/** A tap on a socket; the event says where, for a menu hung off the cursor. */
+export type StashTileClick = (event: ReactMouseEvent<HTMLElement>) => void;
+
 /**
  * Sockets are sized by the board, not by us, so the hollow is drawn for a
  * typical one. Close enough at every column count the grid actually produces.
@@ -130,7 +133,7 @@ interface StashTileProps {
    * shelf puts the piece's price there. Nothing without a `preview`.
    */
   previewFooter?: ReactNode;
-  onClick?: () => void;
+  onClick?: StashTileClick;
 }
 
 /**

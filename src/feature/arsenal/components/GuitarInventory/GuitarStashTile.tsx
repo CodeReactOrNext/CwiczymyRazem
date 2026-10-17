@@ -13,7 +13,7 @@ import {
 import type { ReactNode } from "react";
 
 import type { InventoryItem } from "../../types/arsenal.types";
-import type { StashPlacement } from "../Collection/StashTile";
+import type { StashPlacement, StashTileClick } from "../Collection/StashTile";
 import { StashTile } from "../Collection/StashTile";
 import { RARITY_STYLES } from "../RarityBadge";
 import { GuitarCard } from "./GuitarCard";
@@ -27,7 +27,7 @@ interface GuitarStashTileProps extends StashPlacement {
   dexStatus?: DexStatus;
   /** Under the hover card — see `StashTile`. */
   previewFooter?: ReactNode;
-  onClick?: () => void;
+  onClick?: StashTileClick;
 }
 
 /** A guitar in the stash: two sockets tall, art stood upright, like a big weapon. */

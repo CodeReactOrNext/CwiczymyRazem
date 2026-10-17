@@ -7,6 +7,7 @@ import {
   WIDGET_CATALOG,
 } from "feature/dashboard/data/widgetCatalog";
 import type {
+  CustomShortcut,
   DashboardLayout,
   WidgetId,
   WidgetPlacement,
@@ -15,6 +16,9 @@ import type {
 
 /** How many quick links the Shortcuts card holds before it stops being quick. */
 export const MAX_SHORTCUTS = 8;
+
+/** Long enough for "No guitar · Under 2 min", short enough to stay a chip. */
+export const MAX_CUSTOM_SHORTCUT_LABEL = 40;
 
 /**
  * What the arrangeable part of Home looked like before it could be customised
@@ -36,6 +40,7 @@ export const DEFAULT_LAYOUT: DashboardLayout = {
     "songs-board",
     "practice-report",
   ],
+  customShortcuts: [],
 };
 
 const isWidgetSize = (value: unknown): value is WidgetSize =>
@@ -71,6 +76,29 @@ const normalizeShortcuts = (raw: unknown): ShortcutId[] => {
   return Array.from(seen).slice(0, MAX_SHORTCUTS);
 };
 
+/** Same-origin paths only, so a stored shortcut can never send anyone off-site. */
+export const isInternalHref = (href: unknown): href is string =>
+  typeof href === "string" && href.startsWith("/") && !href.startsWith("//") && !href.includes("\\");
+
+const normalizeCustomShortcuts = (raw: unknown, room: number): CustomShortcut[] => {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const shortcuts: CustomShortcut[] = [];
+  raw.forEach((entry) => {
+    const id = entry?.id;
+    const label = typeof entry?.label === "string" ? entry.label.trim() : "";
+    if (typeof id !== "string" || !id || seen.has(id)) return;
+    if (!label || !isInternalHref(entry?.href)) return;
+    seen.add(id);
+    shortcuts.push({
+      id,
+      label: label.slice(0, MAX_CUSTOM_SHORTCUT_LABEL),
+      href: entry.href,
+    });
+  });
+  return shortcuts.slice(0, Math.max(0, room));
+};
+
 /**
  * Turns whatever is stored into a layout the page can render: unknown cards
  * (removed from the app since) are dropped, duplicates collapse to their first
@@ -83,13 +111,19 @@ export const normalizeLayout = (raw: unknown): DashboardLayout => {
       version: 1,
       widgets: DEFAULT_LAYOUT.widgets.map((w) => ({ ...w })),
       shortcuts: [...DEFAULT_LAYOUT.shortcuts],
+      customShortcuts: [],
     };
   }
   const data = raw as Record<string, unknown>;
+  const shortcuts = normalizeShortcuts(data.shortcuts);
   return {
     version: 1,
     widgets: normalizeWidgets(data.widgets),
-    shortcuts: normalizeShortcuts(data.shortcuts),
+    shortcuts,
+    customShortcuts: normalizeCustomShortcuts(
+      data.customShortcuts,
+      MAX_SHORTCUTS - shortcuts.length,
+    ),
   };
 };
 
@@ -153,8 +187,43 @@ export const setWidgetSize = (
   };
 };
 
+/** Catalogue and custom shortcuts share one limit — they sit on the same card. */
+export const shortcutCount = (layout: DashboardLayout): number =>
+  layout.shortcuts.length + layout.customShortcuts.length;
+
 export const isShortcutLimitReached = (layout: DashboardLayout): boolean =>
-  layout.shortcuts.length >= MAX_SHORTCUTS;
+  shortcutCount(layout) >= MAX_SHORTCUTS;
+
+const newCustomShortcutId = (): string =>
+  `custom-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+
+/**
+ * Pins a link of the player's own. Past the limit, or with an empty label or
+ * an off-site href, the layout comes back unchanged.
+ */
+export const addCustomShortcut = (
+  layout: DashboardLayout,
+  shortcut: { label: string; href: string },
+): DashboardLayout => {
+  const label = shortcut.label.trim().slice(0, MAX_CUSTOM_SHORTCUT_LABEL);
+  if (!label || !isInternalHref(shortcut.href)) return layout;
+  if (isShortcutLimitReached(layout)) return layout;
+  return {
+    ...layout,
+    customShortcuts: [
+      ...layout.customShortcuts,
+      { id: newCustomShortcutId(), label, href: shortcut.href },
+    ],
+  };
+};
+
+export const removeCustomShortcut = (
+  layout: DashboardLayout,
+  id: string,
+): DashboardLayout => ({
+  ...layout,
+  customShortcuts: layout.customShortcuts.filter((s) => s.id !== id),
+});
 
 /**
  * Pins or unpins a destination. Adding past the limit leaves the layout as it
@@ -183,4 +252,5 @@ export const isDefaultLayout = (layout: DashboardLayout): boolean =>
       w.size === DEFAULT_LAYOUT.widgets[i].size,
   ) &&
   layout.shortcuts.length === DEFAULT_LAYOUT.shortcuts.length &&
-  layout.shortcuts.every((s, i) => s === DEFAULT_LAYOUT.shortcuts[i]);
+  layout.shortcuts.every((s, i) => s === DEFAULT_LAYOUT.shortcuts[i]) &&
+  layout.customShortcuts.length === 0;

@@ -36,6 +36,8 @@
     "technique": "Technika",
     "learned_title": "Nauczyłem się tego utworu!",
     "learned_description": "Oznacz jako „Nauczone” i przenieś do ukończonych",
+    "already_learned_title": "Już nauczony",
+    "already_learned_description": "Ten utwór jest na Twojej liście nauczonych.",
     "resume": "Wznów stoper",
     "confirm": "Zatwierdź i zakończ",
     "saving": "Zapisywanie..."

@@ -31,6 +31,11 @@ export const firebaseSaveDashboardLayout = async (
       version: layout.version,
       widgets: layout.widgets.map(({ id, size }) => ({ id, size })),
       shortcuts: [...layout.shortcuts],
+      customShortcuts: layout.customShortcuts.map(({ id, label, href }) => ({
+        id,
+        label,
+        href,
+      })),
       updatedAt: serverTimestamp(),
     },
     { merge: true },
