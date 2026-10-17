@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { createPortal } from "react-dom";
 
 import { WindowControls } from "./WindowControls";
+import { ZoomControls } from "./ZoomControls";
 
 const NavButton = ({
   onClick,
@@ -30,7 +31,7 @@ const NavButton = ({
 /**
  * Persistent, app-wide title bar for the Electron desktop shell — back /
  * forward / home navigation on the left, the tuner, the amp switch and
- * minimize/maximize/close on the right (Spotify-desktop-style single strip).
+ * zoom, minimize/maximize/close on the right (Spotify-desktop-style single strip).
  * Mounted once, globally, in _app.tsx; the app's own content reserves `pt-10`
  * for it there so nothing renders underneath.
  *
@@ -87,6 +88,7 @@ export const ElectronTitleBar = () => {
         <div
           className='flex items-center gap-1.5 px-2 [-webkit-app-region:no-drag]'
           onDoubleClick={(e) => e.stopPropagation()}>
+          <ZoomControls />
           {/* The tuner sits with the amp for the same reason: you tune before
               you open a session, and it uses the same interface. */}
           <TunerButton h='h-7' />

@@ -242,6 +242,17 @@ contextBridge.exposeInMainWorld("electronWindow", {
   toggleMaximize: () => ipcRenderer.invoke("window:toggle-maximize"),
   close: () => ipcRenderer.invoke("window:close"),
   isMaximized: () => ipcRenderer.invoke("window:is-maximized"),
+  /** Page zoom — each resolves to the new factor (1 = 100%). */
+  zoomIn: () => ipcRenderer.invoke("window:zoom-in"),
+  zoomOut: () => ipcRenderer.invoke("window:zoom-out"),
+  resetZoom: () => ipcRenderer.invoke("window:zoom-reset"),
+  getZoom: () => ipcRenderer.invoke("window:get-zoom"),
+  /** Fires on every zoom change — title bar, menu shortcut or Ctrl+wheel. */
+  onZoomChange: (cb) => {
+    const listener = (_event, factor) => cb(factor);
+    ipcRenderer.on("window:zoom-changed", listener);
+    return () => ipcRenderer.removeListener("window:zoom-changed", listener);
+  },
   /** Fires whenever the OS-level maximize state changes (button, snap, double-click, drag). */
   onMaximizedChange: (cb) => {
     const listener = (_event, isMaximized) => cb(isMaximized);

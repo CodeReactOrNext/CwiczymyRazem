@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { resetAmpSimStoreForTests } from "feature/toneStudio/services/ampSimStore";
 import type { ElectronWindowApi } from "types/electronWindow";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -98,6 +98,46 @@ describe("ElectronTitleBar", () => {
     window.electronWindow = buildApi();
     render(<ElectronTitleBar />);
     expect(screen.queryByTitle("Tuner")).toBeNull();
+  });
+
+  it("zooms from the bar, outside its drag region, and shows the real percentage", async () => {
+    let onZoom: (factor: number) => void = () => {};
+    const zoomIn = vi.fn().mockResolvedValue(1.1);
+    const resetZoom = vi.fn().mockResolvedValue(1);
+    window.electronWindow = buildApi({
+      getZoom: vi.fn().mockResolvedValue(1),
+      zoomIn,
+      zoomOut: vi.fn().mockResolvedValue(0.9),
+      resetZoom,
+      onZoomChange: vi.fn((cb) => {
+        onZoom = cb;
+        return () => {};
+      }),
+    });
+    render(<ElectronTitleBar />);
+
+    const zoomInButton = await screen.findByLabelText("Zoom in");
+    expect(zoomInButton.closest(".\\[-webkit-app-region\\:no-drag\\]")).toBeTruthy();
+    expect(screen.getByText("100%")).toBeTruthy();
+
+    await act(async () => fireEvent.click(zoomInButton));
+    expect(zoomIn).toHaveBeenCalledOnce();
+    expect(screen.getByText("110%")).toBeTruthy();
+
+    // A menu shortcut or Ctrl+wheel moves it too.
+    act(() => onZoom(1.5));
+    expect(screen.getByText("150%")).toBeTruthy();
+
+    await act(async () => fireEvent.click(screen.getByLabelText("Reset zoom to 100%")));
+    expect(resetZoom).toHaveBeenCalledOnce();
+    expect(screen.getByText("100%")).toBeTruthy();
+  });
+
+  it("leaves zoom out on a desktop build without the zoom bridge", async () => {
+    window.electronWindow = buildApi();
+    render(<ElectronTitleBar />);
+    await act(async () => {});
+    expect(screen.queryByLabelText("Zoom in")).toBeNull();
   });
 
   it("renders nav but no window buttons on mac (native traffic lights instead)", async () => {

@@ -6,6 +6,9 @@
   "maximize": "Maksymalizuj",
   "restore": "Przywróć",
   "close": "Zamknij",
+  "zoom_in": "Powiększ",
+  "zoom_out": "Pomniejsz",
+  "reset_zoom": "Przywróć 100%",
   "menu": {
     "cut": "Wytnij",
     "copy": "Kopiuj",

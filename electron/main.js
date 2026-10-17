@@ -23,6 +23,7 @@ const ampSim = require("./ampSim");
 const audioEngine = require("./audioEngineHost");
 const buildMenu = require("./menu");
 const windowState = require("./windowState");
+const { createZoom } = require("./zoom");
 const toneStore = require("./toneStore");
 const backingTrackStore = require("./backingTrackStore");
 const { requireMicrophoneAccess } = require("./macPermissions");
@@ -65,6 +66,7 @@ let mainWindow = null;
 let splashWindow = null;
 let retryTimer = null;
 let tray = null;
+let zoom = null; // page zoom (electron/zoom.js) — created once userData is known
 let offlineShown = false; // main window is currently showing electron/offline.html
 let keepAwakeId = null; // powerSaveBlocker id while a practice session runs
 
@@ -193,6 +195,8 @@ function createWindow() {
     if (!mainWindow || mainWindow.isDestroyed()) return;
     const url = mainWindow.webContents.getURL();
     if (!url.startsWith("http")) return;
+    // Chromium forgets zoom between launches — put the saved one back.
+    if (zoom) zoom.apply();
     // The real app is up again — offline page (if any) has been replaced.
     offlineShown = false;
     if (retryTimer) {
@@ -243,6 +247,14 @@ function createWindow() {
         canSelectAll: params.editFlags.canSelectAll,
       },
     });
+  });
+
+  // Ctrl+wheel steps through the same levels as the title bar, so its
+  // percentage stays true.
+  mainWindow.webContents.on("zoom-changed", (_event, direction) => {
+    if (!zoom) return;
+    if (direction === "in") zoom.zoomIn();
+    else zoom.zoomOut();
   });
 
   mainWindow.once("ready-to-show", () => {
@@ -347,6 +359,11 @@ ipcMain.handle("window:close", () => {
 ipcMain.handle("window:is-maximized", () =>
   mainWindow && !mainWindow.isDestroyed() ? mainWindow.isMaximized() : false,
 );
+
+ipcMain.handle("window:zoom-in", () => (zoom ? zoom.zoomIn() : 1));
+ipcMain.handle("window:zoom-out", () => (zoom ? zoom.zoomOut() : 1));
+ipcMain.handle("window:zoom-reset", () => (zoom ? zoom.reset() : 1));
+ipcMain.handle("window:get-zoom", () => (zoom ? zoom.get() : 1));
 
 // ── Desktop integration IPC (offline retry, keep-awake, taskbar progress) ────
 ipcMain.handle("app:retry-connect", () => {
@@ -671,6 +688,10 @@ if (!isPrimaryInstance) {
       }
       callback({ video: request.frame, audio: request.frame, enableLocalEcho: true });
     });
+    zoom = createZoom({
+      getWindow: () => mainWindow,
+      filePath: path.join(app.getPath("userData"), "zoom.json"),
+    });
     Menu.setApplicationMenu(
       buildMenu({
         isDev,
@@ -678,6 +699,7 @@ if (!isPrimaryInstance) {
         dialog,
         getMainWindow: () => mainWindow,
         getUpdater: () => updater,
+        zoom,
       }),
     );
     // Spawn the audio process now so the first "turn on" only pays the ASIO

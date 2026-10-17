@@ -12,6 +12,14 @@ export interface ElectronWindowApi {
   isMaximized: () => Promise<boolean>;
   /** Subscribe to OS-level maximize/restore changes. Returns an unsubscribe fn. */
   onMaximizedChange: (cb: (isMaximized: boolean) => void) => () => void;
+  // Page zoom (factor, 1 = 100%). Optional: desktop builds older than the zoom
+  // controls don't expose it, and the title bar hides them there.
+  zoomIn?: () => Promise<number>;
+  zoomOut?: () => Promise<number>;
+  resetZoom?: () => Promise<number>;
+  getZoom?: () => Promise<number>;
+  /** Subscribe to zoom changes from any source. Returns an unsubscribe fn. */
+  onZoomChange?: (cb: (factor: number) => void) => () => void;
 }
 
 declare global {

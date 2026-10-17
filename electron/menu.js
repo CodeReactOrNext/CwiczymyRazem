@@ -3,7 +3,7 @@
 // Electron's bare default menu.
 const { app, Menu } = require("electron");
 
-function buildMenu({ isDev, shell, dialog, getMainWindow, getUpdater }) {
+function buildMenu({ isDev, shell, dialog, getMainWindow, getUpdater, zoom }) {
   const isMac = process.platform === "darwin";
   // Null in dev — the items stay, they just explain there's nothing to update.
   const checkForUpdates = {
@@ -52,9 +52,11 @@ function buildMenu({ isDev, shell, dialog, getMainWindow, getUpdater }) {
         { role: "forceReload", label: "Force Reload" },
         ...(isDev ? [{ role: "toggleDevTools", label: "Toggle Developer Tools" }] : []),
         { type: "separator" },
-        { role: "resetZoom", label: "Actual Size" },
-        { role: "zoomIn", label: "Zoom In" },
-        { role: "zoomOut", label: "Zoom Out" },
+        // Through electron/zoom.js rather than the built-in roles, so the
+        // shortcuts land on the same steps the title bar shows and are saved.
+        { label: "Actual Size", accelerator: "CmdOrCtrl+0", click: () => zoom.reset() },
+        { label: "Zoom In", accelerator: "CmdOrCtrl+=", click: () => zoom.zoomIn() },
+        { label: "Zoom Out", accelerator: "CmdOrCtrl+-", click: () => zoom.zoomOut() },
         { type: "separator" },
         { role: "togglefullscreen", label: "Toggle Full Screen" },
       ],

@@ -6,6 +6,9 @@
   "maximize": "Maximize",
   "restore": "Restore",
   "close": "Close",
+  "zoom_in": "Zoom in",
+  "zoom_out": "Zoom out",
+  "reset_zoom": "Reset zoom to 100%",
   "menu": {
     "cut": "Cut",
     "copy": "Copy",
