@@ -176,6 +176,21 @@ export const rankDailyBoard = (
   return [...topEntries].sort((a, b) => b.score - a.score || a.updatedAt - b.updatedAt);
 };
 
+/**
+ * The rows a results notification shows: the whole top five, and for a player
+ * who finished below it, a gap and then their own place — so they can see both
+ * the board and where they ended up on it. `null` marks the gap.
+ */
+export const dailyResultRows = <T extends { place: number }>(
+  board: readonly T[],
+  own: T | null,
+): (T | null)[] => {
+  const top = board.slice(0, DAILY_LEADERBOARD_SIZE);
+  if (!own || top.some((row) => row.place === own.place)) return top;
+  const last = top[top.length - 1]?.place ?? 0;
+  return own.place > last + 1 ? [...top, null, own] : [...top, own];
+};
+
 /** The board's winner — its #1 by rankDailyBoard, or none on a board nobody else played. */
 export const pickDailyWinner = (
   topEntries: readonly DailyExerciseEntry[],

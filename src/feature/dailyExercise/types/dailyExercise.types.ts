@@ -13,6 +13,13 @@ export interface DailyExerciseEntry {
   updatedAt: number;
 }
 
+/** One place of a closed board, as the results notification shows it. */
+export interface DailyBoardPlace {
+  place: number;
+  displayName: string;
+  score: number;
+}
+
 export interface DailyExerciseLeaderboard {
   dayKey: string;
   exerciseId: string | null;

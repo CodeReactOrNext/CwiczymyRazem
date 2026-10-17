@@ -1,4 +1,5 @@
 import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
+import type { DailyBoardPlace } from "feature/dailyExercise/types/dailyExercise.types";
 import {
   addDoc,
   collection,
@@ -64,10 +65,14 @@ export interface AppNotification {
   chatPath?: string;
   chatMessageId?: string;
   messageSnippet?: string;
-  // Exercise of the day: the board's day, and for a win the prize in words
-  // (places 2–5 reuse `place` and `exerciseTitle`)
+  // Exercise of the day: the board's day, and for a win the prize in words.
+  // Every result reuses `place` and `exerciseTitle`, plus the recipient's
+  // score, how many played, and the top five (older ones have none of these).
   dayKey?: string;
   prizeName?: string;
+  score?: number;
+  players?: number;
+  board?: DailyBoardPlace[];
   // Duels: which one, and once settled how it went for the recipient. The
   // opponent is only named on the result — before that the duel is anonymous.
   duelId?: string;
@@ -214,7 +219,7 @@ export const notificationText = (
     case "daily_exercise_place":
       return {
         title: "Exercise of the day results",
-        body: `You finished ${n.place}${placeSuffix(n.place ?? 0)}${n.exerciseTitle ? ` on ${n.exerciseTitle}` : ""}.`,
+        body: `You finished ${n.place}${placeSuffix(n.place ?? 0)}${n.players ? ` of ${n.players}` : ""}${n.exerciseTitle ? ` on ${n.exerciseTitle}` : ""}.`,
       };
     case "duel_matched":
       return {

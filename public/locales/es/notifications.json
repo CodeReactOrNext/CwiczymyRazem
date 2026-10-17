@@ -32,6 +32,8 @@
     "daily_win": "Ganaste el ejercicio del día — {{prize}} está en tu Arsenal",
     "your_prize": "tu premio",
     "daily_place": "Terminaste en {{place}} puesto en el ejercicio del día",
+    "daily_place_of": "Terminaste en {{place}} puesto de {{players}} en el ejercicio del día",
+    "daily_you": "Tú",
     "roadmap_ready": "Tu hoja de ruta está lista",
     "open_recording": "Abrir grabación",
     "open_market": "Abrir mercado",

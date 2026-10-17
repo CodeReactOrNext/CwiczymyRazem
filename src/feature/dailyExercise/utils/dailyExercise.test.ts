@@ -5,6 +5,7 @@ import type { DailyExerciseEntry } from "../types/dailyExercise.types";
 import {
   canSettleDailyBoard,
   DAILY_EXERCISE_POOL,
+  dailyResultRows,
   findDailyDayKeyFor,
   getDailyDayKey,
   getDailyExercise,
@@ -159,5 +160,27 @@ describe("rankDailyBoard", () => {
 
   it("places nobody on a board nobody else played", () => {
     expect(rankDailyBoard([entry("alone", 900)], 1)).toEqual([]);
+  });
+});
+
+describe("dailyResultRows", () => {
+  const row = (place: number) => ({ place, displayName: `p${place}`, score: 1000 - place });
+  const top = [1, 2, 3, 4, 5].map(row);
+
+  it("shows just the board when the player is on it", () => {
+    expect(dailyResultRows(top, row(3))).toEqual(top);
+  });
+
+  it("puts a player who finished below the top five under a gap", () => {
+    expect(dailyResultRows(top, row(12))).toEqual([...top, null, row(12)]);
+  });
+
+  it("needs no gap for the place right under the board", () => {
+    expect(dailyResultRows(top, row(6))).toEqual([...top, row(6)]);
+  });
+
+  it("shows a short board as it is", () => {
+    expect(dailyResultRows(top.slice(0, 2), row(2))).toEqual(top.slice(0, 2));
+    expect(dailyResultRows(top.slice(0, 2), null)).toEqual(top.slice(0, 2));
   });
 });

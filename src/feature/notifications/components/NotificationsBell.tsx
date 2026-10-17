@@ -7,6 +7,7 @@ import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { formatDistanceToNow } from "date-fns";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
+import { DailyResultBoard } from "feature/notifications/components/DailyResultBoard";
 import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
 import {
   notificationChatTab,
@@ -227,9 +228,10 @@ const typeConfig = {
     label: (n: any, t: Translate) => (
       <span>
         <Interpolate
-          text={t("bell.daily_place")}
+          text={t(n.players ? "bell.daily_place_of" : "bell.daily_place")}
           values={{
             place: <span className='font-semibold text-white'>{t("bell.ordinal", { place: n.place, suffix: placeSuffix(n.place) })}</span>,
+            players: <span className='font-semibold text-white'>{n.players}</span>,
           }}
         />
         {n.exerciseTitle && (
@@ -523,6 +525,12 @@ export const NotificationsBell = () => {
                           &ldquo;{n.recordingTitle}&rdquo;
                         </p>
                       )}
+                      {(n.type === "daily_exercise_win" ||
+                        n.type === "daily_exercise_place") &&
+                        !!n.board?.length &&
+                        n.place !== undefined && (
+                          <DailyResultBoard board={n.board} place={n.place} score={n.score} t={t} />
+                        )}
                       {n.type === "season_reward" && (
                         <p className='mt-1 flex items-center gap-1 text-xs text-amber-400/70'>
                           <Gem className='h-3 w-3' />

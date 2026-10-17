@@ -45,13 +45,10 @@ function collectionRef(path: string): any {
   return {
     doc: (id?: string) => docRef(`${path}/${id ?? `auto-${++autoId}`}`),
     orderBy: (field: string) => ({
-      limit: (n: number) => ({
-        get: async () => ({
-          docs: docsIn(path)
-            .sort((a, b) => b[field] - a[field])
-            .slice(0, n)
-            .map((data) => ({ data: () => data })),
-        }),
+      get: async () => ({
+        docs: docsIn(path)
+          .sort((a, b) => b[field] - a[field])
+          .map((data) => ({ data: () => data })),
       }),
     }),
     count: () => ({
@@ -69,6 +66,13 @@ const write = (path: string, data: Record<string, any>, merge: boolean) => {
 vi.mock("utils/firebase/api/firebase.config", () => ({
   firestore: {
     collection: (name: string) => collectionRef(name),
+    batch: () => {
+      const pending: [string, Record<string, any>][] = [];
+      return {
+        set: (ref: any, data: Record<string, any>) => pending.push([ref.path, data]),
+        commit: async () => pending.forEach(([path, data]) => write(path, data, false)),
+      };
+    },
     runTransaction: async (fn: (t: any) => Promise<unknown>) =>
       fn({
         get: async (ref: any) => snapshot(ref.path),
@@ -164,7 +168,7 @@ describe("settleDailyBoard", () => {
     ]);
   });
 
-  it("tells the rest of the top five where they finished, and nobody below", async () => {
+  it("tells everyone else where they finished, below the top five too", async () => {
     const exercise = DAILY_EXERCISE_POOL[0];
     store.set(BOARD, { exerciseId: exercise.id });
     ["p1", "p2", "p3", "p4", "p5", "p6"].forEach((uid, i) => {
@@ -183,16 +187,55 @@ describe("settleDailyBoard", () => {
       ["p3", 3],
       ["p4", 4],
       ["p5", 5],
+      ["p6", 6],
     ]);
     expect(notificationsOf("daily_exercise_place")[0]).toMatchObject({
       dayKey: DAY,
       exerciseTitle: exercise.title,
       isRead: false,
     });
-    expect(notifications().some((n) => n.userId === "p6")).toBe(false);
     expect(notifications().filter((n) => n.userId === "p1")).toEqual([
       expect.objectContaining({ type: "daily_exercise_win" }),
     ]);
+  });
+
+  it("sends every result the top five, with the recipient's own score and the field size", async () => {
+    ["p1", "p2", "p3", "p4", "p5", "p6", "p7"].forEach((uid, i) => {
+      store.set(`users/${uid}`, { displayName: uid, arsenal: {} });
+      addEntry(uid, 700 - i * 100);
+    });
+
+    await settleDailyBoard(DAY);
+
+    const top = [1, 2, 3, 4, 5].map((place) => ({
+      place,
+      displayName: `p${place}`,
+      score: 800 - place * 100,
+    }));
+    expect(notifications().find((n) => n.userId === "p7")).toMatchObject({
+      type: "daily_exercise_place",
+      place: 7,
+      score: 100,
+      players: 7,
+      board: top,
+    });
+    expect(notifications().find((n) => n.userId === "p1")).toMatchObject({
+      type: "daily_exercise_win",
+      place: 1,
+      score: 700,
+      board: top,
+    });
+  });
+
+  it("sends a big board's results past one transaction's worth, still once", async () => {
+    for (let i = 0; i < 450; i++) addEntry(`u${i}`, 10_000 - i);
+    store.set("users/u0", { displayName: "u0", arsenal: {} });
+
+    await settleDailyBoard(DAY);
+    await settleDailyBoard(DAY);
+
+    expect(notifications()).toHaveLength(450);
+    expect(new Set(notifications().map((n) => n.userId)).size).toBe(450);
   });
 
   it("places a tie the way it pays it — whoever set the score first", async () => {
