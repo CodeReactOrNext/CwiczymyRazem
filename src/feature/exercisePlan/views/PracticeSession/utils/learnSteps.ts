@@ -36,6 +36,19 @@ export function buildLearnSteps(measures: TablatureMeasure[] | null | undefined)
   return steps;
 }
 
+/** The beat the lesson is waiting on, as the tab needs it to point at it. */
+export interface LearnFocus {
+  noteKeys: string[];
+  beatStart: number;
+  beatEnd: number;
+}
+
+export const learnFocusOf = (step: LearnStep): LearnFocus => ({
+  noteKeys: step.notes.map(({ noteKey }) => noteKey),
+  beatStart: step.beatStart,
+  beatEnd: step.beatEnd,
+});
+
 /** Hit marks for the steps already played: each note filled to its full length. */
 export function learnHitNotes(steps: readonly LearnStep[], playedCount: number): Record<string, number> {
   const hits: Record<string, number> = {};

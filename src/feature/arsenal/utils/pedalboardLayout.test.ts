@@ -22,8 +22,10 @@ import {
   packInOrder,
   PEDAL_H,
   planSwap,
+  replacementSpots,
   SIDE_JACKS,
   slotEstimate,
+  squeezeIn,
   tidyBoard,
   widthPctForAspect,
   type WidthResolver,
@@ -115,6 +117,112 @@ describe("findFreeSpot", () => {
 
   it("refuses a pedal wider than the board", () => {
     expect(findFreeSpot(GEO, [], 99)).toBeNull();
+  });
+
+  /** Row 1 packed solid, so only the top row can answer. */
+  const bottomFull = Array.from({ length: 6 }, (_, i) => ({
+    xPct: 3 + i * 16,
+    yPct: ROW_Y_PCT[1],
+    wPct: W,
+  }));
+
+  it("finds a gap that does not line up with any scanning grid", () => {
+    // A pedal dragged by hand rarely lands on a round number. The room
+    // between these two is a pedal plus its breathing room with 0.2% to spare —
+    // exactly the kind of gap a fixed-step scan used to walk straight past.
+    const occupied = [
+      { xPct: 81.8, yPct: ROW_Y_PCT[0], wPct: W },
+      { xPct: 48.6, yPct: ROW_Y_PCT[0], wPct: W },
+      { xPct: 3, yPct: ROW_Y_PCT[0], wPct: 44 },
+      ...bottomFull,
+    ];
+    const spot = findFreeSpot(GEO, occupied, W, undefined, { snug: false });
+
+    expect(spot?.yPct).toBe(ROW_Y_PCT[0]);
+    expect(spot!.xPct).toBeGreaterThan(63.6);
+    expect(spot!.xPct + W).toBeLessThan(81.8);
+  });
+
+  it("uses room the player cleared by hand, even without breathing room", () => {
+    // 16% between two pedals: one pedal fits, one pedal plus a margin either
+    // side does not. The board used to call that full.
+    const occupied = [
+      { xPct: 82, yPct: ROW_Y_PCT[0], wPct: W },
+      { xPct: 51, yPct: ROW_Y_PCT[0], wPct: W },
+      { xPct: 3, yPct: ROW_Y_PCT[0], wPct: 47 },
+      ...bottomFull,
+    ];
+
+    expect(
+      findFreeSpot(GEO, occupied, W, undefined, { snug: false }),
+    ).toBeNull();
+    const spot = findFreeSpot(GEO, occupied, W);
+    expect(spot?.yPct).toBe(ROW_Y_PCT[0]);
+    expect(collidesWithAny(GEO, { ...spot!, wPct: W }, occupied)).toBe(false);
+  });
+
+  it("still keeps clear of the case walls when snug", () => {
+    expect(findFreeSpot(GEO, [], 100 - GEO.edgePct)).toBeNull();
+  });
+});
+
+describe("squeezeIn", () => {
+  it("makes room by packing the board together, keeping its order", () => {
+    // Five pedals spread loosely across the top row, a sixth below: no single
+    // gap takes another pedal, but pushed together they all fit.
+    const items = [
+      at("a", 80, ROW_Y_PCT[0]),
+      at("b", 59, ROW_Y_PCT[0]),
+      at("c", 38, ROW_Y_PCT[0]),
+      at("d", 17, ROW_Y_PCT[0]),
+      ...Array.from({ length: 6 }, (_, i) =>
+        at(`r${i}`, 3 + i * 16, ROW_Y_PCT[1]),
+      ),
+    ];
+    const occupied = boxesOf(items);
+    expect(findFreeSpot(GEO, occupied, 22)).toBeNull();
+
+    const layout = squeezeIn(GEO, items, "new", wideAt(["new"], 22));
+
+    expect(layout).not.toBeNull();
+    expect(layout!.overflow).toHaveLength(0);
+    expect(layout!.placed.map((item) => item.itemId)).toContain("new");
+    expect(hasOverlap(layout!.placed, wideAt(["new"], 22))).toBe(false);
+    // The chain the player built still reads the same way, the newcomer last.
+    const order = inChainOrder(GEO, layout!.placed).map((item) => item.itemId);
+    expect(order.indexOf("a")).toBeLessThan(order.indexOf("d"));
+    expect(order.at(-1)).toBe("new");
+  });
+
+  it("gives up when not even a snug board has room", () => {
+    const items = ROW_Y_PCT.flatMap((yPct, row) =>
+      Array.from({ length: 6 }, (_, i) => at(`p${row}-${i}`, 3 + i * 16, yPct)),
+    );
+    expect(squeezeIn(GEO, items, "new", widthOf)).toBeNull();
+  });
+});
+
+describe("replacementSpots", () => {
+  const full = ROW_Y_PCT.flatMap((yPct, row) =>
+    Array.from({ length: 6 }, (_, i) => ({
+      itemId: `p${row}-${i}`,
+      xPct: 3 + i * 16,
+      yPct,
+      wPct: W,
+    })),
+  );
+
+  it("lets a pedal take the exact slot of one the same size", () => {
+    const spots = replacementSpots(GEO, full, W);
+
+    expect(spots.size).toBe(full.length);
+    expect(spots.get("p0-2")).toEqual({ xPct: 35, yPct: ROW_Y_PCT[0] });
+  });
+
+  it("offers nothing a wide pedal cannot actually fit into", () => {
+    // A dual enclosure wider than any single neighbour's slot plus the room
+    // either side of it: no one pedal leaving makes enough space.
+    expect(replacementSpots(GEO, full, 30).size).toBe(0);
   });
 });
 

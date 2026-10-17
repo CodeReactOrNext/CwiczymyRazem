@@ -37,6 +37,12 @@
     "like": "Polub nagranie",
     "comments": "Zobacz komentarze"
   },
+  "likers": {
+    "title": "Polubili",
+    "you": "Ty",
+    "loading": "Ładowanie...",
+    "more": "+{{count}} więcej"
+  },
   "grid": {
     "empty_title": "Brak nagrań",
     "empty_body": "Bądź pierwszy i wrzuć swój cover!"

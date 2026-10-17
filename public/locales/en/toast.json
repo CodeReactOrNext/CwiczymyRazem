@@ -20,7 +20,10 @@
     "log_in_again": "To change data you have to log in again.",
     "copy_link": "Copy to clipboard",
     "update_ready": "A new version of riff.quest is ready to install.",
-    "update_ready_action": "Restart now"
+    "update_ready_action": "Restart now",
+    "update_available": "riff.quest {{version}} is available",
+    "update_available_description": "This copy can't update itself. Download the new version and install it over this one — your progress is kept.",
+    "update_available_action": "Download"
   },
   "success": {
     "update_email": "Email updated",

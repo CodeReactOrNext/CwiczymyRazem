@@ -173,13 +173,12 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           dispatch(updateQuestProgress({ type: 'creativity_focus', amount: creatMin }));
         }
 
-        const activeCategories = [techMin, theoryMin, hearMin, creatMin].filter((m) => m > 0).length;
-        if (activeCategories > 0) {
-          dispatch(updateQuestProgress({ type: 'well_rounded', amount: activeCategories }));
-        }
-        const categoriesOverFive = [techMin, theoryMin, hearMin, creatMin].filter((m) => m >= 5).length;
-        if (categoriesOverFive > 0) {
-          dispatch(updateQuestProgress({ type: 'two_categories_min', amount: categoriesOverFive }));
+        // The multi-category quests count distinct categories across the whole
+        // day, so they get the minutes themselves, not a tally for this session.
+        if (totalMin > 0) {
+          const categoryMinutes = { technique: techMin, theory: theoryMin, hearing: hearMin, creativity: creatMin };
+          dispatch(updateQuestProgress({ type: 'well_rounded', categoryMinutes }));
+          dispatch(updateQuestProgress({ type: 'two_categories_min', categoryMinutes }));
         }
         if (techMin > 0 && theoryMin > 0) {
           dispatch(updateQuestProgress({ type: 'balanced_session', amount: 2 }));

@@ -37,6 +37,12 @@
     "like": "Me gusta",
     "comments": "Ver comentarios"
   },
+  "likers": {
+    "title": "Les gusta a",
+    "you": "Tú",
+    "loading": "Cargando...",
+    "more": "+{{count}} más"
+  },
   "grid": {
     "empty_title": "No se encontraron grabaciones",
     "empty_body": "¡Sé el primero en subir tu cover!"

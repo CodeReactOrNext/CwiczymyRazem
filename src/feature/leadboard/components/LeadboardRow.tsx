@@ -10,7 +10,6 @@ import { useTranslation } from "hooks/useTranslation";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import type { StatisticsDataInterface } from "types/api.types";
-import { convertMsToHM } from "utils/converter";
 
 interface LeadboardColumnProps {
   place: number;
@@ -43,7 +42,7 @@ export const LeadboardRow = ({
   guildBadge,
 }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
-  const { lvl, time } = statistics;
+  const { lvl } = statistics;
 
   const shortenNick = (nick: string) => {
     const MAX_SHOW_NICK_LENGTH = 16;
@@ -185,7 +184,7 @@ export const LeadboardRow = ({
               </div>
             </div>
           ) : (
-            <div className='grid grid-cols-2 divide-x divide-white/5 rounded-xl bg-black/20'>
+            <div className='rounded-xl bg-black/20'>
               <div className='flex flex-col items-center justify-center py-3'>
                 <span
                   className={cn(
@@ -198,26 +197,6 @@ export const LeadboardRow = ({
                 </span>
                 <span className='text-xs font-bold text-zinc-600'>
                   {t("points")}
-                </span>
-              </div>
-
-              <div className='flex flex-col items-center justify-center py-3'>
-                <span
-                  className={cn(
-                    "font-mono text-lg font-bold",
-                    profileId === currentUserId
-                      ? "text-cyan-400"
-                      : "text-zinc-300",
-                  )}>
-                  {convertMsToHM(
-                    time.creativity +
-                      time.hearing +
-                      time.technique +
-                      time.theory,
-                  )}
-                </span>
-                <span className='text-xs font-bold text-zinc-600'>
-                  {t("exercise_time")}
                 </span>
               </div>
             </div>
@@ -364,25 +343,6 @@ export const LeadboardRow = ({
                 </div>
                 <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                   {t("points")}
-                </div>
-              </div>
-
-              <div className='text-center'>
-                <div
-                  className={`font-mono text-xl font-bold lg:text-2xl ${
-                    profileId === currentUserId
-                      ? "text-cyan-300"
-                      : "text-zinc-300 group-hover:text-white"
-                  }`}>
-                  {convertMsToHM(
-                    time.creativity +
-                      time.hearing +
-                      time.technique +
-                      time.theory,
-                  )}
-                </div>
-                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
-                  {t("exercise_time")}
                 </div>
               </div>
             </div>

@@ -499,13 +499,17 @@ const ReportView = () => {
         dispatch(updateQuestProgress({ type: 'creativity_focus', amount: creativityMinutes }));
     }
 
-    const activeCategories = [techMinutes, theoryMinutes, hearingMinutes, creativityMinutes].filter((m) => m > 0).length;
-    if (activeCategories > 0) {
-        dispatch(updateQuestProgress({ type: 'well_rounded', amount: activeCategories }));
-    }
-    const categoriesOverFive = [techMinutes, theoryMinutes, hearingMinutes, creativityMinutes].filter((m) => m >= 5).length;
-    if (categoriesOverFive > 0) {
-        dispatch(updateQuestProgress({ type: 'two_categories_min', amount: categoriesOverFive }));
+    // Distinct categories across the whole day, so the quests get the minutes
+    // themselves rather than a tally for this report.
+    const categoryMinutes = {
+        technique: techMinutes,
+        theory: theoryMinutes,
+        hearing: hearingMinutes,
+        creativity: creativityMinutes,
+    };
+    if (Object.values(categoryMinutes).some((m) => m > 0)) {
+        dispatch(updateQuestProgress({ type: 'well_rounded', categoryMinutes }));
+        dispatch(updateQuestProgress({ type: 'two_categories_min', categoryMinutes }));
     }
     if (techMinutes > 0 && theoryMinutes > 0) {
         dispatch(updateQuestProgress({ type: 'balanced_session', amount: 2 }));

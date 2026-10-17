@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { LearnFocus } from "feature/exercisePlan/views/PracticeSession/utils/learnSteps";
 import type { LivePitch } from "feature/exercisePlan/views/PracticeSession/utils/pitchScoring";
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import { useTranslation } from "hooks/useTranslation";
@@ -52,7 +53,7 @@ interface TablatureViewerProps {
   loopStartBeat?: number | null;
   loopEndBeat?: number | null;
   /** Populated by the viewer so callers (e.g. minimap) can drive the canvas cursor without a canvas click */
-  seekWorkerRef?: React.MutableRefObject<((beat: number) => void) | null>;
+  seekWorkerRef?: React.MutableRefObject<((beat: number, smooth?: boolean) => void) | null>;
   /** Populated with a "park the view at this beat" callback — lets a caller mirror
    *  its own horizontal scrollbar (the tab editor's grid) onto the preview,
    *  without moving the playback cursor. The second argument names a beat that
@@ -88,6 +89,9 @@ interface TablatureViewerProps {
   /** Turned a quarter clockwise by its parent (`QUARTER_TURN_STYLE`) — the pointer then runs
    *  along the music in y. */
   quarterTurned?: boolean;
+  /** Learn mode: the beat the player has to play next. Memoize it — a new
+   *  object identity means a new message to the worker. */
+  learnFocus?: LearnFocus | null;
 }
 
 const TablatureViewerInner = ({
@@ -126,6 +130,7 @@ const TablatureViewerInner = ({
   palette,
   isLightBoard = false,
   quarterTurned = false,
+  learnFocus = null,
 }: TablatureViewerProps) => {
   const { t } = useTranslation("session");
   const canvasRef      = useRef<HTMLCanvasElement>(null);
@@ -145,7 +150,7 @@ const TablatureViewerInner = ({
     hitNotes, missedNotes, noteTimings, livePitchRef, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
     loopStartBeat, loopEndBeat, zoom, tuningStrings, style, selection, obscured,
-    quarterTurned,
+    quarterTurned, learnFocus,
   });
   const along = (pointer: { clientX: number; clientY: number }) =>
     pointerAlongBoard(pointer, quarterTurned);
@@ -283,5 +288,6 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.ambientGlow      === next.ambientGlow        &&
   prev.palette          === next.palette            &&
   prev.isLightBoard     === next.isLightBoard        &&
-  prev.quarterTurned    === next.quarterTurned
+  prev.quarterTurned    === next.quarterTurned      &&
+  prev.learnFocus       === next.learnFocus
 );

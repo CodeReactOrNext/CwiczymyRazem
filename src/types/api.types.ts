@@ -34,6 +34,11 @@ export type DailyQuestTaskType =
   | 'improve_skill'
   | 'practice_three_exercises';
 
+export type DailyQuestCategory = 'technique' | 'theory' | 'hearing' | 'creativity';
+
+/** Minutes practiced today per category — only categories actually practiced. */
+export type DailyQuestCategoryMinutes = Partial<Record<DailyQuestCategory, number>>;
+
 export interface DailyQuestTask {
   id: string;
   type: DailyQuestTaskType;
@@ -42,6 +47,12 @@ export interface DailyQuestTask {
   progress: number;
   target: number;
   exerciseId?: string;
+  /**
+   * Only on the multi-category tasks (`well_rounded`, `two_categories_min`).
+   * Their progress counts *distinct* categories, so it cannot be a running sum
+   * of what each session reported — see `dailyQuest.categories`.
+   */
+  categoryMinutes?: DailyQuestCategoryMinutes;
 }
 
 export interface DailyQuest {

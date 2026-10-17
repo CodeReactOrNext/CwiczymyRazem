@@ -9,11 +9,12 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import type {
   ElectronAppApi,
   ElectronContextMenuParams,
 } from "types/electronApp";
+
+import { useDesktopUpdatePrompt } from "./useDesktopUpdatePrompt";
 
 interface ContextMenuItem {
   /** Key under `desktop:menu` — translated where the menu renders. */
@@ -109,44 +110,8 @@ export const ElectronIntegrations = () => {
     });
   }, [router]);
 
-  // The desktop shell only updates on its own cycle (electron-updater) and,
-  // with the app parked in the tray for weeks at a time, a downloaded update
-  // can otherwise sit unapplied far longer than the web bundle it loads
-  // (which redeploys instantly) — the exact mismatch that broke
-  // window.nativeAmp.onOverload for users on a stale shell. Prompt instead
-  // of waiting for a natural quit.
-  useEffect(() => {
-    const api = window.electronApp;
-    if (!api || typeof api.onUpdateReady !== "function") return undefined;
-    let cancelled = false;
-    const showUpdateToast = () => {
-      toast.info(t("info.update_ready"), {
-        id: "desktop-update-ready",
-        duration: Infinity,
-        action: {
-          label: t("info.update_ready_action"),
-          onClick: () => api.installUpdate(),
-        },
-      });
-    };
-    const unsubscribe = api.onUpdateReady(showUpdateToast);
-    // onUpdateReady fires exactly once, when the download finishes. This shell
-    // loads a remote bundle, so any reload or navigation remounts us long after
-    // that — with the toast gone and the event never coming again. The main
-    // process keeps the pending update around precisely so we can re-ask.
-    if (typeof api.getUpdateStatus === "function") {
-      api
-        .getUpdateStatus()
-        .then((status) => {
-          if (!cancelled && status) showUpdateToast();
-        })
-        .catch(() => {});
-    }
-    return () => {
-      cancelled = true;
-      unsubscribe();
-    };
-  }, [t]);
+  // Restart / manual-download prompts for the desktop shell itself.
+  useDesktopUpdatePrompt();
 
   useEffect(() => {
     const api = window.electronApp;

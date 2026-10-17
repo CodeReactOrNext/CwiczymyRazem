@@ -9,7 +9,7 @@ import {
   rarityLockLvl,
   usePlayerLvl,
 } from "feature/progression/hooks/usePlayerLvl";
-import { Lock, X } from "lucide-react";
+import { ArrowLeftRight, Lock, X } from "lucide-react";
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
 import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
@@ -119,8 +119,9 @@ export const EffectPickerModal = ({
             // refuses what a change would newly bring in.
             const lockedLvl = rarityLockLvl(rarity, playerLvl, isSelected);
             // Locked is not dimmed — see `GuitarPickerModal`. It blocks the
-            // pick, but the pedal keeps its light.
-            const unavailable = isOccupied || noRoom;
+            // pick, but the pedal keeps its light. No room is neither: picking
+            // it anyway is how a pedal is swapped in for one on the board.
+            const unavailable = isOccupied;
 
             return (
               <div key={item.id} className='flex flex-col gap-2'>
@@ -155,12 +156,13 @@ export const EffectPickerModal = ({
                       {t("picker.on_another_slot")}
                     </span>
                   )}
-                  {noRoom && (
-                    <span className='text-[10px] font-semibold text-amber-500/90'>
+                  {noRoom && lockedLvl == null && (
+                    <span className='flex items-center gap-1 text-[10px] font-semibold text-amber-500/90'>
+                      <ArrowLeftRight size={9} aria-hidden />
                       {t("picker.no_room")}
                     </span>
                   )}
-                  {lockedLvl != null && !isOccupied && !noRoom && (
+                  {lockedLvl != null && !isOccupied && (
                     <span className='flex items-center gap-1 text-[10px] font-semibold text-zinc-400'>
                       <Lock size={9} aria-hidden />
                       {rarityLockLabel(lockedLvl, t)}

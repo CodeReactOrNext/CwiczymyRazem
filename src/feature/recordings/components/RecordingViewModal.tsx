@@ -4,6 +4,7 @@ import { Dialog, DialogContent } from "assets/components/ui/dialog";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { UserLink } from "components/UserLink";
+import { RecordingLikersTooltip } from "feature/recordings/components/RecordingLikersTooltip";
 import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMutations";
 import { getComments } from "feature/recordings/services/comments.service";
 import { getRecordingById } from "feature/recordings/services/getRecordings";
@@ -131,21 +132,25 @@ export const RecordingViewModal = ({
                       <h2 className='text-xl font-bold text-white sm:text-2xl'>
                         {recording.title}
                       </h2>
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        onClick={handleLike}
-                        className={cn(
-                          "gap-2 hover:bg-red-500/10",
-                          hasLiked ? "text-red-500" : "text-zinc-400",
-                        )}>
-                        <Heart
-                          className={cn("h-5 w-5", hasLiked && "fill-current")}
-                        />
-                        <span className='font-bold'>
-                          {recording.likes?.length || 0}
-                        </span>
-                      </Button>
+                      <RecordingLikersTooltip
+                        likes={recording.likes ?? []}
+                        userId={userId}>
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          onClick={handleLike}
+                          className={cn(
+                            "gap-2 hover:bg-red-500/10",
+                            hasLiked ? "text-red-500" : "text-zinc-400",
+                          )}>
+                          <Heart
+                            className={cn("h-5 w-5", hasLiked && "fill-current")}
+                          />
+                          <span className='font-bold'>
+                            {recording.likes?.length || 0}
+                          </span>
+                        </Button>
+                      </RecordingLikersTooltip>
                     </div>
 
                     {(recording.songTitle || recording.songArtist) && (

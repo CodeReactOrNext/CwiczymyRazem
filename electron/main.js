@@ -15,6 +15,7 @@ const {
   shell,
   dialog,
   Notification,
+  net,
 } = require("electron");
 const path = require("path");
 const audioBridge = require("./audioBridge");
@@ -557,6 +558,14 @@ function createTray() {
         click: () => navigateTo(route),
       })),
       { type: "separator" },
+      // The only menu Windows/Linux users can see — the window is frameless.
+      {
+        label: "Check for Updates…",
+        click: () => {
+          if (updater) updater.checkInteractive();
+        },
+        enabled: !isDev,
+      },
       { label: "Quit", click: () => app.quit() },
     ]),
   );
@@ -564,72 +573,39 @@ function createTray() {
   tray.on("double-click", showMainWindow);
 }
 
-// ── Auto-update (GitHub Releases via electron-updater) ───────────────────────
-// Tracks the currently-downloaded-but-not-yet-installed update, if any. Lives
-// only in this module-level variable (not persisted) — quitAndInstall() ends
-// the process, so a fresh launch always starts with no pending update, which
-// is exactly correct: whatever was pending has either been installed or
-// never happened in this run.
-let pendingUpdate = null; // { version, readyAt } | null
-
-// The OS-level half of the update prompt. The in-app toast (see
-// components/ElectronIntegrations) is the nicer path, but it only exists while
-// a renderer is mounted and showing a <Toaster/> — this one survives the app
-// being minimised to the tray, which is where it spends most of its life.
-// Body text spells out that clicking restarts, because the click DOES restart.
-function notifyUpdateReady(autoUpdater, version) {
-  if (!Notification.isSupported()) return;
-  const notification = new Notification({
-    title: "Update ready",
-    body: `Click to restart riff.quest and install version ${version}.`,
-  });
-  notification.on("click", () => {
-    try {
-      autoUpdater.quitAndInstall();
-    } catch (err) {
-      console.error("quitAndInstall failed:", err);
-    }
-  });
-  notification.show();
-}
+// ── Auto-update (GitHub Releases, see electron/updater.js) ──────────────────
+// Downloads in the background and prompts (OS notification + in-app toast)
+// instead of waiting for a real quit: the tray keeps this app alive for weeks,
+// and the renderer (loaded fresh from the instantly-redeployed web bundle)
+// would drift far ahead of this shell's preload.js. PracticeSession also
+// hard-blocks starting a *new* session once an update has sat unapplied too
+// long (useUpdateRequiredGate). Every failure ends in a "Download" prompt
+// rather than a silent console.error.
+let updater = null;
 
 function setupAutoUpdater() {
+  // The renderer always asks; in dev (or if the module is missing) it just
+  // gets "no update" instead of an unhandled-invoke error.
+  ipcMain.handle("app:get-update-status", () => (updater ? updater.getPending() : null));
+  ipcMain.handle("app:get-updater-state", () => (updater ? updater.getState() : null));
+  ipcMain.handle("app:install-update", () => (updater ? updater.install() : { ok: false, reason: "unavailable" }));
+  ipcMain.handle("app:check-for-updates", () => (updater ? updater.check().then(() => updater.getState()) : null));
+  ipcMain.handle("app:open-update-download", () => (updater ? updater.openManualDownload() : undefined));
+
   if (isDev) return; // dev runs from source — nothing to update
-  let autoUpdater;
   try {
-    ({ autoUpdater } = require("electron-updater"));
+    const { autoUpdater } = require("electron-updater");
+    const { createUpdater } = require("./updater");
+    updater = createUpdater({
+      electron: { app, net, shell, dialog, Notification },
+      autoUpdater,
+      getMainWindow: () => mainWindow,
+    });
   } catch (err) {
-    console.error("electron-updater unavailable:", err);
+    console.error("auto-update unavailable:", err);
     return;
   }
-  autoUpdater.on("error", (err) => console.error("autoUpdater:", err));
-  // Downloads in the background, shows a system notification when ready,
-  // installs on quit. The tray icon (see createTray) means this app can stay
-  // open for weeks without a real quit, so waiting for that alone lets the
-  // renderer (loaded fresh from the instantly-redeployed web bundle) drift
-  // far ahead of this shell's preload.js. Prompt in-app so the user can
-  // apply it right away instead; PracticeSession additionally hard-blocks
-  // starting a *new* session once it's been sitting unapplied too long (see
-  // useUpdateRequiredGate) — never mid-session, only checked at session start.
-  autoUpdater.on("update-downloaded", (info) => {
-    pendingUpdate = { version: info.version, readyAt: Date.now() };
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send("app:update-ready", { version: info.version });
-    }
-    notifyUpdateReady(autoUpdater, info.version);
-  });
-  // NOT checkForUpdatesAndNotify(): that helper shows its own OS notification
-  // built with `new Notification(content).show()` and no click handler at all,
-  // so users got a toast they could click forever with nothing happening. It
-  // also claims the update "will be automatically installed on exit", which is
-  // a lie for an app that lives in the tray for weeks. We show our own
-  // clickable one from the update-downloaded handler above instead.
-  const check = () => autoUpdater.checkForUpdates().catch(() => {});
-  check();
-  setInterval(check, 4 * 60 * 60 * 1000);
-
-  ipcMain.handle("app:install-update", () => autoUpdater.quitAndInstall());
-  ipcMain.handle("app:get-update-status", () => pendingUpdate);
+  updater.start();
 }
 
 // ── Windows jump list (taskbar right-click → quick actions) ──────────────────
@@ -696,7 +672,13 @@ if (!isPrimaryInstance) {
       callback({ video: request.frame, audio: request.frame, enableLocalEcho: true });
     });
     Menu.setApplicationMenu(
-      buildMenu({ isDev, shell, dialog, getMainWindow: () => mainWindow }),
+      buildMenu({
+        isDev,
+        shell,
+        dialog,
+        getMainWindow: () => mainWindow,
+        getUpdater: () => updater,
+      }),
     );
     // Spawn the audio process now so the first "turn on" only pays the ASIO
     // open, not process start + audify/NAM WASM load on top of it.

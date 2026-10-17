@@ -4,6 +4,7 @@ import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import {
   AlertTriangle,
+  ArrowLeftRight,
   Expand,
   LayoutGrid,
   Minimize2,
@@ -69,7 +70,9 @@ import {
   layoutBoard,
   packInOrder,
   planSwap,
+  replacementSpots,
   rowIndexOf,
+  squeezeIn,
   tidyBoard,
 } from "../../utils/pedalboardLayout";
 import { grabOffsetY, hasLeftTheTap } from "../../utils/pedalDrag";
@@ -82,6 +85,7 @@ import { BoardStatusStrip } from "./BoardStatusStrip";
 import { duplicateGlow, DuplicateMark } from "./DuplicateMark";
 import { DuplicateStrip } from "./DuplicateStrip";
 import { EffectPickerModal } from "./EffectPickerModal";
+import { MakeRoomBar } from "./MakeRoomBar";
 import { PedalboardCase } from "./PedalboardCase";
 import type { PoweredPedal } from "./PowerLoom";
 import { PedalDcPlug, PowerLoom, PowerRail } from "./PowerLoom";
@@ -177,6 +181,16 @@ export const PedalboardView = ({
    *  carries are defined, and kept fresh by the effect beside them — the same
    *  arrangement as `patchActionsRef`. */
   const openSheetRef = useRef<(itemId: string) => void>(() => undefined);
+  /** What a tap on a pedal does — open its card, or trade it for the pedal in
+   *  hand while the board is making room. Kept fresh the same way. */
+  const tapPedalRef = useRef<(itemId: string) => void>(() => undefined);
+  /**
+   * A pedal the player has picked up that the board has no room for yet: one
+   * chosen in the picker, or one parked below the case. It stays in hand until
+   * it lands — traded for a pedal on the deck, squeezed in, or dropped into a
+   * gap the player opens — or until the hunt is called off. See `MakeRoomBar`.
+   */
+  const [placing, setPlacing] = useState<string | null>(null);
 
   const setDragging = (next: DragState | null) => {
     draggingRef.current = next;
@@ -761,7 +775,7 @@ export const PedalboardView = ({
       // actions live.
       if (!drag.active) {
         setDragging(null);
-        if (isTouch) openSheetRef.current(drag.itemId);
+        tapPedalRef.current(drag.itemId);
         return;
       }
 
@@ -801,10 +815,12 @@ export const PedalboardView = ({
           if (spot) {
             next = settleAt(spot);
           } else {
+            // Off the deck, but still in hand: the board goes straight to
+            // looking for room for it rather than just saying there is none.
             setOverflowIds((ids) =>
               ids.includes(itemId) ? ids : [...ids, itemId],
             );
-            announce(t("board.full"), setNotice);
+            setPlacing(itemId);
           }
         }
       }
@@ -812,7 +828,7 @@ export const PedalboardView = ({
       setLocalItems(next);
       debouncedSave(next);
     },
-    [debouncedSave, boardBoxes, geo, isTouch, t],
+    [debouncedSave, boardBoxes, geo],
   );
 
   useEffect(() => {
@@ -1077,10 +1093,63 @@ export const PedalboardView = ({
     takeOffBoard(itemId);
   };
 
+  /**
+   * Puts a pedal down on the deck at `spot` — in the place of `replacedId` when
+   * there is one, which goes back to the collection rather than anywhere worse.
+   * A pedal parked below the case is moved up, not added twice.
+   */
+  const landPedal = (
+    incoming: string,
+    spot: { xPct: number; yPct: number },
+    replacedId?: string,
+  ) => {
+    const placement = { itemId: incoming, ...spot };
+    const kept = localItems.filter((i) => i.itemId !== incoming);
+    const next = replacedId
+      ? kept.map((i) => (i.itemId === replacedId ? placement : i))
+      : [...kept, placement];
+    setOverflowIds((ids) =>
+      ids.filter((id) => id !== incoming && id !== replacedId),
+    );
+    setLocalItems(next);
+    setPlacing(null);
+
+    // A pedal that lands on the board gets a cable if the brick has an output
+    // left, because that is what the player meant by adding it — and one taking
+    // another's place takes its cable too, so a swap never costs power. When
+    // there is none, the pedal still goes down: dark, and with the reason said
+    // out loud.
+    const base = powerState.links.filter(
+      (link) => link.itemId !== incoming && link.itemId !== replacedId,
+    );
+    const inherited =
+      powerState.links.find((link) => link.itemId === replacedId)?.out ?? null;
+    const out =
+      inherited ??
+      pickOutput(
+        rail,
+        placement,
+        widthOf(incoming),
+        new Set(base.map((link) => link.out)),
+      );
+    const links = out === null ? base : [...base, { itemId: incoming, out }];
+
+    setLocalPower(links);
+    debouncedSave(next, links);
+    const refusal = out === null ? refusalFor(supply, powerState) : null;
+    if (refusal) announce(refusal, setNotice);
+    else setNotice(null);
+  };
+
+  /**
+   * Adds a pedal from the collection — or brings a parked one back up. Where
+   * there is room it simply lands; where there is none it stays in hand and the
+   * board starts making room for it, instead of just saying it is full.
+   */
   const handlePickerSelect = (inventoryItemId: string | null) => {
     if (
       !inventoryItemId ||
-      localItems.some((i) => i.itemId === inventoryItemId)
+      boardItems.some((i) => i.itemId === inventoryItemId)
     )
       return;
     const spot = findFreeSpot(
@@ -1089,34 +1158,13 @@ export const PedalboardView = ({
       widthOf(inventoryItemId),
       heightPctFor(geo, widthOf, inventoryItemId),
     );
-    if (!spot) {
-      announce(t("board.full"), setNotice);
+    if (spot) {
+      landPedal(inventoryItemId, spot);
       return;
     }
-    const placement = { itemId: inventoryItemId, ...spot };
-    const next = [...localItems, placement];
-    setLocalItems(next);
-
-    // A pedal that lands on the board gets a cable if the brick has an output
-    // left, because that is what the player meant by adding it. When it has
-    // none, the pedal still goes down — dark, and with the reason said out loud.
-    const refusal = refusalFor(supply, powerState);
-    const out = refusal
-      ? null
-      : pickOutput(
-          rail,
-          placement,
-          widthOf(inventoryItemId),
-          new Set(powerState.links.map((link) => link.out)),
-        );
-    const links =
-      out === null
-        ? powerState.links
-        : [...powerState.links, { itemId: inventoryItemId, out }];
-
-    setLocalPower(links);
-    debouncedSave(next, links);
-    if (refusal) announce(refusal, setNotice);
+    setPatch(null);
+    setNotice(null);
+    setPlacing(inventoryItemId);
   };
 
   /**
@@ -1170,6 +1218,104 @@ export const PedalboardView = ({
     }
   };
 
+  /**
+   * The pedal in hand, while it still has nowhere to go. Anything that lands it
+   * — a swap, a squeeze, a tidy that finds it a spot on its own — ends the hunt
+   * by the same token, without a second piece of state to keep in step.
+   */
+  const placingId =
+    placing !== null &&
+    !boardItems.some((i) => i.itemId === placing) &&
+    data.effectInventory.some((e) => e.id === placing)
+      ? placing
+      : null;
+
+  /**
+   * Every way there is of making room for it, read off the board as it stands —
+   * so dragging a neighbour aside to open a gap is answered the moment it is let
+   * go. A gap already there wins outright; otherwise the pedals it could trade
+   * places with, and whether pushing the board together would do instead.
+   */
+  const makeRoom = useMemo(() => {
+    if (!placingId) return null;
+    const wPct = widthOf(placingId);
+    const hPct = heightPctFor(geo, widthOf, placingId);
+    const boxes: BoardBox[] = boardItems.map((i) => ({
+      itemId: i.itemId,
+      xPct: i.xPct,
+      yPct: i.yPct,
+      wPct: widthOf(i.itemId),
+      hPct: heightPctFor(geo, widthOf, i.itemId),
+    }));
+    const spot = findFreeSpot(geo, boxes, wPct, hPct);
+    return {
+      spot,
+      swaps: spot
+        ? new Map<string, { xPct: number; yPct: number }>()
+        : replacementSpots(geo, boxes, wPct, hPct),
+      squeeze: spot ? null : squeezeIn(geo, boardItems, placingId, widthOf),
+    };
+  }, [placingId, boardItems, geo, widthOf]);
+
+  /** Trades the pedal in hand for one on the deck, which goes back to the stash. */
+  const handleSwap = (targetId: string) => {
+    const spot = makeRoom?.swaps.get(targetId);
+    if (!placingId || !spot) return;
+    landPedal(placingId, spot, targetId);
+    toast.success(
+      t("board.swapped", {
+        incoming: nameOf(placingId),
+        outgoing: nameOf(targetId),
+      }),
+    );
+  };
+
+  /** Pushes the board together, same signal order, with the newcomer at the end. */
+  const handleSqueeze = () => {
+    const layout = makeRoom?.squeeze;
+    if (!placingId || !layout) return;
+    const placedById = new Map(layout.placed.map((i) => [i.itemId, i]));
+    const source = localItems.some((i) => i.itemId === placingId)
+      ? localItems
+      : [...localItems, { itemId: placingId, xPct: 0, yPct: 0 }];
+    const next = source.map((i) => placedById.get(i.itemId) ?? i);
+    // Only the pedal in hand comes up: anything else parked stays parked.
+    const parked = overflowIds.filter((id) => id !== placingId);
+    setOverflowIds(parked);
+    setLocalItems(next);
+
+    const links = repatch(next, parked, powerState.links);
+    const landed = placedById.get(placingId);
+    const out = landed
+      ? pickOutput(
+          rail,
+          landed,
+          widthOf(placingId),
+          new Set(links.map((link) => link.out)),
+        )
+      : null;
+    savePower(out === null ? links : [...links, { itemId: placingId, out }]);
+    setPlacing(null);
+    setNotice(null);
+    toast.success(t("board.squeezed", { name: nameOf(placingId) }));
+  };
+
+  const handlePlaceNow = () => {
+    if (placingId && makeRoom?.spot) landPedal(placingId, makeRoom.spot);
+  };
+
+  const cancelMakingRoom = () => setPlacing(null);
+
+  // Escape puts the pedal back down where it came from, like any other pick-up.
+  useEffect(() => {
+    if (!placingId) return undefined;
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPlacing(null);
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [placingId]);
+
   const cardFor = (itemId: string) => {
     const invItem = data.effectInventory.find((e) => e.id === itemId);
     return invItem ? <EffectCard item={invItem} readOnly /> : null;
@@ -1211,6 +1357,16 @@ export const PedalboardView = ({
                 {powered ? t("board.unplug") : t("board.plug_in")}
               </CardAction>
             )}
+            {!onBoard && (
+              <CardAction
+                icon={ArrowLeftRight}
+                onClick={() => {
+                  handlePickerSelect(itemId);
+                  close();
+                }}>
+                {t("board.find_room")}
+              </CardAction>
+            )}
             <CardAction
               icon={X}
               onClick={() => {
@@ -1229,6 +1385,10 @@ export const PedalboardView = ({
   // off the board as it stands right now.
   useEffect(() => {
     openSheetRef.current = (itemId: string) => onShowCard?.(sheetFor(itemId));
+    tapPedalRef.current = (itemId: string) => {
+      if (placingId) handleSwap(itemId);
+      else if (isTouch) openSheetRef.current(itemId);
+    };
   });
 
   const occupiedIds = localItems.map((i) => i.itemId);
@@ -1552,6 +1712,12 @@ export const PedalboardView = ({
             // the brick can carry it, red when the drop would be refused — so
             // the answer arrives before the cable is let go, not after.
             const aimedAt = patchTarget?.itemId === placement.itemId;
+            // While a pedal is in hand with nowhere to go, the deck answers
+            // "which of these could I trade it for?" at a glance: those light
+            // up, the rest go dark.
+            const huntingRoom = makeRoom !== null && makeRoom.spot === null;
+            const swappable =
+              huntingRoom && makeRoom.swaps.has(placement.itemId);
 
             return (
               <div
@@ -1573,7 +1739,11 @@ export const PedalboardView = ({
                   width: `${wPct}%`,
                   height: `${heightPctFor(geo, widthOf, placement.itemId)}%`,
                   zIndex: isDragging ? 50 : 2,
-                  cursor: isDragging ? "grabbing" : "grab",
+                  cursor: isDragging
+                    ? "grabbing"
+                    : swappable
+                      ? "pointer"
+                      : "grab",
                   // The pointer drives the drag, so the browser must not take
                   // the gesture for a scroll — or for a long-press on artwork,
                   // which is what a phone would otherwise offer to save.
@@ -1583,19 +1753,23 @@ export const PedalboardView = ({
                     ? `drop-shadow(0 14px 28px rgba(0,0,0,0.95)) drop-shadow(0 0 16px rgba(220,38,38,0.9))`
                     : isDragging
                       ? `drop-shadow(0 18px 32px rgba(0,0,0,0.98)) drop-shadow(0 0 14px ${rs.baseColor}70)`
-                      : aimedAt
-                        ? `drop-shadow(0 0 14px ${
-                            patchAllowed
-                              ? "rgba(245,158,11,0.85)"
-                              : "rgba(248,113,113,0.85)"
-                          })`
-                        : // An unpowered pedal is off. Not dimmed to say "you
-                          // cannot have this" — dimmed because there is no
-                          // current in it. A powered one may still be lit as
-                          // one of several copies of the same pedal.
-                          powered
-                          ? (dupGlow ?? "none")
-                          : "grayscale(0.7) brightness(0.55)",
+                      : swappable
+                        ? "drop-shadow(0 0 12px rgba(245,158,11,0.8))"
+                        : huntingRoom
+                          ? "grayscale(0.7) brightness(0.45)"
+                          : aimedAt
+                            ? `drop-shadow(0 0 14px ${
+                                patchAllowed
+                                  ? "rgba(245,158,11,0.85)"
+                                  : "rgba(248,113,113,0.85)"
+                              })`
+                            : // An unpowered pedal is off. Not dimmed to say "you
+                              // cannot have this" — dimmed because there is no
+                              // current in it. A powered one may still be lit as
+                              // one of several copies of the same pedal.
+                              powered
+                              ? (dupGlow ?? "none")
+                              : "grayscale(0.7) brightness(0.55)",
                   transform: isDragging
                     ? "scale(1.07) translateY(-6px)"
                     : "scale(1)",
@@ -1651,7 +1825,13 @@ export const PedalboardView = ({
                     under, and leaving them out permanently buries the board
                     under its own buttons — so there they move into the card a
                     tap opens. See `sheetFor`. */}
-                {!isTouch && (
+                {swappable && !isDragging && (
+                  <span className='pointer-events-none absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 whitespace-nowrap rounded-full bg-black/85 px-2.5 py-1 text-xs font-semibold text-amber-300'>
+                    <ArrowLeftRight size={12} strokeWidth={2.5} />
+                    {t("board.swap")}
+                  </span>
+                )}
+                {!isTouch && !huntingRoom && (
                   <>
                     {/* Pull the DC cable out. It stands over the pedal's own
                         inlet, so it reads as the plug it removes rather than as
@@ -1747,6 +1927,29 @@ export const PedalboardView = ({
     </div>
   );
 
+  /** The pedal in hand and the ways of making room for it — over the case,
+   *  where the pedals it could be traded for are lighting up. */
+  const placingItem = placingId
+    ? data.effectInventory.find((e) => e.id === placingId)
+    : undefined;
+  const placingEffect = placingItem
+    ? EFFECTS_BY_ID.get(placingItem.effectId)
+    : null;
+  const makeRoomBar = (floating: boolean) =>
+    placingId && placingEffect && makeRoom ? (
+      <MakeRoomBar
+        name={placingEffect.name}
+        imageSrc={getEffectImageSrc(placingEffect.imageId, "small")}
+        ready={makeRoom.spot !== null}
+        swapCount={makeRoom.swaps.size}
+        canSqueeze={makeRoom.squeeze !== null}
+        onPlace={handlePlaceNow}
+        onSqueeze={handleSqueeze}
+        onCancel={cancelMakingRoom}
+        floating={floating}
+      />
+    ) : null;
+
   /** The same board with the screen to itself, and the controls that belong to
    *  a board nobody can see the page behind. */
   const fullscreenStage = (
@@ -1786,11 +1989,17 @@ export const PedalboardView = ({
 
       <div className='flex min-h-0 flex-1 items-center'>{stage}</div>
 
-      {notice && (
-        <p className='pointer-events-none absolute inset-x-0 bottom-3 z-50 flex items-center justify-center gap-1.5 px-16 text-center text-[11px] font-semibold text-orange-400'>
-          <AlertTriangle size={13} strokeWidth={2.5} className='shrink-0' />
-          {notice}
-        </p>
+      {placingId ? (
+        <div className='absolute inset-x-2 bottom-2 z-50'>
+          {makeRoomBar(true)}
+        </div>
+      ) : (
+        notice && (
+          <p className='pointer-events-none absolute inset-x-0 bottom-3 z-50 flex items-center justify-center gap-1.5 px-16 text-center text-[11px] font-semibold text-orange-400'>
+            <AlertTriangle size={13} strokeWidth={2.5} className='shrink-0' />
+            {notice}
+          </p>
+        )
       )}
     </div>
   );
@@ -1853,6 +2062,8 @@ export const PedalboardView = ({
         </div>
       )}
 
+      {!fullscreen && makeRoomBar(false)}
+
       {fullscreen && typeof document !== "undefined"
         ? createPortal(fullscreenStage, document.body)
         : stage}
@@ -1892,9 +2103,27 @@ export const PedalboardView = ({
                   <img
                     src={getEffectImageSrc(effect.imageId, "small")}
                     alt={effect.name}
-                    className='h-14 w-auto object-contain opacity-60 transition-opacity group-hover:opacity-100'
+                    className={cn(
+                      "h-14 w-auto object-contain transition-opacity group-hover:opacity-100",
+                      placingId === placement.itemId
+                        ? "opacity-100"
+                        : "opacity-60",
+                    )}
                     draggable={false}
                   />
+                  {/* Brings it back up: straight onto the deck where there is
+                      a gap, into the make-room hunt where there is not. */}
+                  {!isTouch && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePickerSelect(placement.itemId);
+                      }}
+                      className={cn(RIG_BUTTON, "mt-2")}>
+                      <ArrowLeftRight size={12} strokeWidth={2.5} />
+                      {t("board.find_room")}
+                    </button>
+                  )}
                   {/* Invisible until hovered, so on a touch screen it is left
                       out altogether rather than left lying there as a corner
                       that quietly removes a pedal. */}

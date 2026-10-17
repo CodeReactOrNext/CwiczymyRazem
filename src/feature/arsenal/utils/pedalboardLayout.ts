@@ -179,8 +179,14 @@ export const EFFECT_IMAGE_ASPECT: Record<number | string, number> = {
   55: 436 / 800,
 };
 
-/** How finely `findFreeSpot` walks a row looking for a gap. */
+/** How finely `packInOrder` walks a row past a tall enclosure above it. */
 const SCAN_STEP_PCT = 0.5;
+
+/**
+ * How far a candidate spot is nudged off the neighbour it was measured from, so
+ * floating-point noise cannot turn "exactly touching" into "overlapping".
+ */
+const NUDGE = 1e-6;
 
 /** Positions that differ by less than this are the same position. */
 const EPSILON = 0.01;
@@ -232,31 +238,130 @@ const isOnBoard = (geo: BoardGeometry, box: LayoutBox) =>
   box.xPct + box.wPct <= 100 + EPSILON &&
   box.yPct + (box.hPct ?? geo.pedalHPct) <= 100 + EPSILON;
 
+/** Drops values that are the same position as one already kept. */
+const distinct = (values: number[]) =>
+  values.filter(
+    (value, i) =>
+      values.findIndex((other) => Math.abs(other - value) < EPSILON) === i,
+  );
+
+/**
+ * Heights a pedal is tried at. The rows first, because that is where the board
+ * would put it; then every height the pedals already standing there suggest —
+ * level with one, just under one, just over one — because the board is free
+ * placement, and a pedal dragged half a row down leaves its room at a height no
+ * row line passes through.
+ */
+const candidateYs = (
+  geo: BoardGeometry,
+  occupied: LayoutBox[],
+  hPct: number,
+) => {
+  const maxY = 100 - hPct;
+  const rows = geo.rowYPct.map((rowY) => Math.min(rowY, maxY));
+  const loose = occupied
+    .flatMap((box) => {
+      const boxH = box.hPct ?? geo.pedalHPct;
+      return [box.yPct, box.yPct + boxH + NUDGE, box.yPct - hPct - NUDGE];
+    })
+    .concat([0, maxY])
+    .filter((yPct) => yPct >= -EPSILON && yPct <= maxY + EPSILON)
+    .map((yPct) => Math.max(0, Math.min(maxY, yPct)))
+    .sort((a, b) => a - b);
+  return { rows: distinct(rows), loose: distinct(loose) };
+};
+
+/**
+ * Every place along one height a pedal could stand flush against something:
+ * the right-hand end of the deck, either side of each pedal it would share the
+ * height with, and the left-hand end. Right to left, the way the signal runs.
+ *
+ * Measured off the neighbours rather than stepped across the deck, so a gap
+ * exactly as wide as the pedal is found — a scan in fixed steps walks straight
+ * past one that does not happen to line up with its grid.
+ */
+const candidateXs = (
+  geo: BoardGeometry,
+  occupied: LayoutBox[],
+  yPct: number,
+  wPct: number,
+  hPct: number,
+  gap: number,
+  edge: number,
+) => {
+  const xs = [100 - edge - wPct, edge];
+  for (const box of occupied) {
+    const boxH = box.hPct ?? geo.pedalHPct;
+    if (box.yPct >= yPct + hPct || box.yPct + boxH <= yPct) continue;
+    xs.push(box.xPct - gap - wPct - NUDGE, box.xPct + box.wPct + gap + NUDGE);
+  }
+  return distinct(
+    xs.filter(
+      (xPct) => xPct >= edge - EPSILON && xPct + wPct <= 100 - edge + EPSILON,
+    ),
+  ).sort((a, b) => b - a);
+};
+
+export interface FreeSpotOptions {
+  /**
+   * Also try the spots the board would never pick by itself — hard against a
+   * neighbour — once the comfortable ones are all gone, so a gap a player can
+   * see is a gap the board will use. The case walls keep their margin: the
+   * input and amp jacks live there.
+   * Default `true`; only the shop's slot count asks for the comfortable fill.
+   */
+  snug?: boolean;
+}
+
 /**
  * First spot in signal order where a `wPct`-wide pedal fits without touching
- * anything already on the board. The signal runs right to left, so the scan
+ * anything already on the board. The signal runs right to left, so the search
  * starts hard against the input jack's own corner and walks towards the amp.
- * `null` means the board is full.
+ *
+ * Tried in rounds, each only once the one before has come up empty: the rows,
+ * with breathing room; any height at all, with breathing room; and then — when
+ * `snug` — the same two again with none. That last round is what stops the
+ * board saying "full" about room the player can see: a gap they cleared by hand
+ * is a gap, even when it is not a whole pedal plus margins wide. `null` means
+ * the board really is full.
  */
 export const findFreeSpot = (
   geo: BoardGeometry,
   occupied: LayoutBox[],
   wPct: number,
   hPct = geo.pedalHPct,
+  { snug = true }: FreeSpotOptions = {},
 ): { xPct: number; yPct: number } | null => {
-  const startX = 100 - geo.edgePct - wPct;
-  if (startX < geo.edgePct || hPct > 100) return null;
+  if (hPct > 100 || wPct > 100) return null;
 
-  for (const rowY of geo.rowYPct) {
-    const yPct = Math.min(rowY, 100 - hPct);
-    for (let step = 0; ; step++) {
-      const xPct = Math.max(startX - step * SCAN_STEP_PCT, geo.edgePct);
-      if (
-        !collidesWithAny(geo, { xPct, yPct, wPct, hPct }, occupied, geo.gapPct)
-      ) {
-        return { xPct, yPct };
+  const { rows, loose } = candidateYs(geo, occupied, hPct);
+  const rounds: { ys: number[]; gap: number; edge: number }[] = [
+    { ys: rows, gap: geo.gapPct, edge: geo.edgePct },
+    { ys: loose, gap: geo.gapPct, edge: geo.edgePct },
+  ];
+  if (snug) {
+    rounds.push(
+      { ys: rows, gap: 0, edge: geo.edgePct },
+      { ys: loose, gap: 0, edge: geo.edgePct },
+    );
+  }
+
+  for (const { ys, gap, edge } of rounds) {
+    for (const yPct of ys) {
+      for (const xPct of candidateXs(
+        geo,
+        occupied,
+        yPct,
+        wPct,
+        hPct,
+        gap,
+        edge,
+      )) {
+        const box = { xPct, yPct, wPct, hPct };
+        if (isOnBoard(geo, box) && !collidesWithAny(geo, box, occupied, gap)) {
+          return { xPct, yPct };
+        }
       }
-      if (xPct <= geo.edgePct) break;
     }
   }
   return null;
@@ -284,7 +389,9 @@ export const slotEstimate = (geo: BoardGeometry): number => {
   const wPct = widthPctForAspect(geo, DEFAULT_ASPECT);
   const occupied: LayoutBox[] = [];
   for (;;) {
-    const spot = findFreeSpot(geo, occupied, wPct);
+    const spot = findFreeSpot(geo, occupied, wPct, geo.pedalHPct, {
+      snug: false,
+    });
     if (!spot) break;
     occupied.push({ ...spot, wPct });
   }
@@ -503,7 +610,11 @@ export const packInOrder = (
   geo: BoardGeometry,
   ordered: PedalboardPlacement[],
   widthOf: WidthResolver,
+  /** Pack with no breathing room between pedals. */
+  { snug = false }: { snug?: boolean } = {},
 ): BoardLayout => {
+  const gap = snug ? 0 : geo.gapPct;
+  const edge = geo.edgePct;
   const placed: PedalboardPlacement[] = [];
   const overflow: PedalboardPlacement[] = [];
   const occupied: LayoutBox[] = [];
@@ -511,26 +622,26 @@ export const packInOrder = (
   // The cursor is the right-hand edge of the next pedal, because the chain
   // starts at the input jack in the top right and each pedal is laid down to
   // the left of the one before it.
-  let cursor = 100 - geo.edgePct;
+  let cursor = 100 - edge;
 
   for (const item of ordered) {
     const wPct = widthOf(item.itemId);
     const hPct = heightPctFor(geo, widthOf, item.itemId);
     let spot: LayoutBox | null = null;
-    if (hPct <= 100 && wPct <= 100 - 2 * geo.edgePct) {
+    if (hPct <= 100 && wPct <= 100 - 2 * edge) {
       while (row < geo.rowYPct.length) {
-        if (cursor - wPct < geo.edgePct) {
+        if (cursor - wPct < edge - EPSILON) {
           row += 1;
-          cursor = 100 - geo.edgePct;
+          cursor = 100 - edge;
           continue;
         }
         const candidate = {
-          xPct: cursor - wPct,
+          xPct: Math.max(edge, cursor - wPct),
           yPct: Math.min(geo.rowYPct[row], 100 - hPct),
           wPct,
           hPct,
         };
-        if (!collidesWithAny(geo, candidate, occupied, geo.gapPct)) {
+        if (!collidesWithAny(geo, candidate, occupied, gap)) {
           spot = candidate;
           break;
         }
@@ -544,7 +655,7 @@ export const packInOrder = (
     }
     occupied.push(spot);
     placed.push({ ...item, xPct: spot.xPct, yPct: spot.yPct });
-    cursor -= wPct + geo.gapPct;
+    cursor = spot.xPct - gap;
   }
 
   return buildLayout(ordered, placed, overflow);
@@ -556,6 +667,61 @@ export const tidyBoard = (
   items: PedalboardPlacement[],
   widthOf: WidthResolver,
 ): BoardLayout => packInOrder(geo, inChainOrder(geo, items), widthOf);
+
+/**
+ * Room for one more pedal made by pushing everything already on the board
+ * together: the same signal order, the newcomer at the amp end, packed first
+ * with the usual breathing room and then without any. What a player would do by
+ * hand with a dozen drags, in one go.
+ *
+ * `null` when not even a snug board has room — that pedal needs something else
+ * to make way for it, or a bigger case.
+ */
+export const squeezeIn = (
+  geo: BoardGeometry,
+  items: PedalboardPlacement[],
+  incomingId: string,
+  widthOf: WidthResolver,
+): BoardLayout | null => {
+  const ordered = [
+    ...inChainOrder(
+      geo,
+      items.filter((item) => item.itemId !== incomingId),
+    ),
+    { itemId: incomingId, xPct: 0, yPct: 0 },
+  ];
+  for (const snug of [false, true]) {
+    const layout = packInOrder(geo, ordered, widthOf, { snug });
+    if (layout.overflow.length === 0) return layout;
+  }
+  return null;
+};
+
+/**
+ * Every pedal on the board a `wPct`-wide newcomer could trade places with, and
+ * where the newcomer would then stand.
+ *
+ * The departing pedal's own slot first — flush left, centred or flush right in
+ * it — so the newcomer inherits its place in the signal chain as well as its
+ * room; anywhere its departure frees up otherwise. A pedal missing from the map
+ * is one whose leaving would not make enough room on its own.
+ */
+export const replacementSpots = (
+  geo: BoardGeometry,
+  board: BoardBox[],
+  wPct: number,
+  hPct = geo.pedalHPct,
+): Map<string, { xPct: number; yPct: number }> => {
+  const spots = new Map<string, { xPct: number; yPct: number }>();
+  for (const box of board) {
+    const others = board.filter((other) => other.itemId !== box.itemId);
+    const spot =
+      fitInSlot(geo, box, wPct, others, hPct) ??
+      findFreeSpot(geo, others, wPct, hPct);
+    if (spot) spots.set(box.itemId, spot);
+  }
+  return spots;
+};
 
 /**
  * Width lookup for a board, in the units `layoutBoard` and friends work in.

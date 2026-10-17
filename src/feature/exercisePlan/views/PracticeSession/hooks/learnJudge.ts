@@ -1,6 +1,6 @@
-import type { Spectrum } from "utils/audio/chordTones";
-import { CHORD_TONE_HIT, createChordToneEvidence, isChordToneSounding, spectrumPeak } from "utils/audio/chordTones";
-import { correctOctaveForLowStrings, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance } from "utils/audio/noteUtils";
+import type { Spectrum, ToneCriteria } from "utils/audio/chordTones";
+import { createChordToneEvidence, isChordToneSounding, spectrumPeak } from "utils/audio/chordTones";
+import { correctOctaveForLowStrings, getCentsDistance, getDetectionGates } from "utils/audio/noteUtils";
 
 import type { LearnTarget } from "../utils/learnSteps";
 import { requiredChordTones } from "../utils/learnSteps";
@@ -17,14 +17,30 @@ export interface LearnFrame {
   volume: number;
   /** The noise-floor gate before the high-string allowance (see getDetectionGates). */
   volumeGateBase: number;
-  confidence: number;
   lastOnsetMs: number;
   lastTickMs: number;
   readSpectrum?: () => Spectrum | null;
 }
 
-// Same allowances the timed matcher gives thick strings, which drift sharp.
-const toleranceFor = (freq: number) => (freq < 100 ? 70 : freq < 165 ? 60 : 45);
+/**
+ * How far off its written pitch the detector's reading may sit (cents).
+ *
+ * Tighter than the timed matcher's 45 / 60 / 70, and with none of its
+ * confidence bonus: a lesson that waits has no clock to be fair against, so it
+ * can ask for a clean note. The low strings keep a wide window only because
+ * the detector reads them sharp (E2 by ~50 cents) — which is also why this
+ * check alone cannot tell E2 from the Eb2 a half step below it (that one reads
+ * ~46 cents under E2). The spectrum below is what does.
+ */
+const toleranceFor = (freq: number) => (freq < 100 ? 65 : freq < 165 ? 50 : 35);
+
+/**
+ * What a note has to show in the live spectrum: a peak of its own, clearly above
+ * the semitones on either side. The timed matcher asks for 0.6 of them; a
+ * lesson asks for more, so a note a half step away — whose neighbour is the
+ * one actually ringing — never passes for the written one.
+ */
+const LEARN_TONE: ToneCriteria = { ratio: 0.75, floor: 0.05 };
 
 /**
  * Decides when the player has played the beat the lesson is waiting on.
@@ -50,9 +66,14 @@ export function createLearnJudge() {
 
   const judgeNote = (target: LearnTarget, f: LearnFrame): boolean => {
     const gate = getDetectionGates(target.freq, f.volumeGateBase).volumeGate;
-    const tolerance = getExpectationBiasedTolerance(toleranceFor(target.freq), f.confidence);
     const heard = correctOctaveForLowStrings(f.freq, target.freq);
-    const isRight = f.volume > gate && heard > 20 && Math.abs(getCentsDistance(heard, target.freq)) <= tolerance;
+    let isRight = f.volume > gate && heard > 20 && Math.abs(getCentsDistance(heard, target.freq)) <= toleranceFor(target.freq);
+    // The pitch detector alone is not trusted with the last word: the spectrum
+    // must show this very note too. Read only once the pitch looks right.
+    if (isRight && f.readSpectrum) {
+      const live = f.readSpectrum();
+      isRight = !!live && isChordToneSounding(live, target.freq, LEARN_TONE, spectrumPeak(live));
+    }
     if (!isRight) {
       rightSince = null;
       return false;
@@ -72,7 +93,7 @@ export function createLearnJudge() {
     const peak = spectrumPeak(heard);
     let ringing = 0;
     for (const tone of tones) {
-      const isSounding = isChordToneSounding(heard, tone.freq, CHORD_TONE_HIT, peak);
+      const isSounding = isChordToneSounding(heard, tone.freq, LEARN_TONE, peak);
       if (chordEvidence.observe(tone.noteKey, f.lastOnsetMs, f.now, isSounding)) ringing++;
     }
     return ringing >= requiredChordTones(tones.length);

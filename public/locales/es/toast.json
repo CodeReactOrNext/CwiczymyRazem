@@ -20,7 +20,10 @@
     "log_in_again": "Para cambiar tus datos tienes que volver a iniciar sesión.",
     "copy_link": "Copiar al portapapeles",
     "update_ready": "Hay una nueva versión de riff.quest lista para instalar.",
-    "update_ready_action": "Reiniciar ahora"
+    "update_ready_action": "Reiniciar ahora",
+    "update_available": "riff.quest {{version}} está disponible",
+    "update_available_description": "Esta copia no puede actualizarse sola. Descarga la nueva versión e instálala sobre la actual: tu progreso se conserva.",
+    "update_available_action": "Descargar"
   },
   "success": {
     "update_email": "Correo electrónico actualizado",

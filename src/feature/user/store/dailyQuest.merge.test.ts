@@ -126,6 +126,56 @@ describe("mergeDailyQuests", () => {
     expect(mergeDailyQuests(ahead, behind, TODAY)).toEqual(ahead);
   });
 
+  it("combines the categories two devices practiced instead of keeping the larger count", () => {
+    // Technique on the laptop, theory on the phone: 1 apiece, 2 together.
+    const laptop = quest(TODAY, [
+      task("well_rounded", { target: 3, progress: 1, categoryMinutes: { technique: 10 } }),
+    ]);
+    const phone = quest(TODAY, [
+      task("well_rounded", { target: 3, progress: 1, categoryMinutes: { theory: 5 } }),
+    ]);
+
+    const merged = mergeDailyQuests(laptop, phone, TODAY)?.tasks[0];
+
+    expect(merged).toMatchObject({
+      progress: 2,
+      categoryMinutes: { technique: 10, theory: 5 },
+    });
+  });
+
+  it("does not double the minutes both copies already contain", () => {
+    const local = quest(TODAY, [
+      task("two_categories_min", { target: 2, progress: 0, categoryMinutes: { technique: 3 } }),
+    ]);
+    const stored = quest(TODAY, [
+      task("two_categories_min", { target: 2, progress: 0, categoryMinutes: { technique: 3 } }),
+    ]);
+
+    expect(mergeDailyQuests(local, stored, TODAY)?.tasks[0]).toMatchObject({
+      progress: 0,
+      categoryMinutes: { technique: 3 },
+    });
+  });
+
+  it("carries minutes over onto a stored task that predates them", () => {
+    const local = quest(TODAY, [
+      task("well_rounded", { target: 3, progress: 1, categoryMinutes: { technique: 10 } }),
+    ]);
+    const stored = quest(TODAY, [task("well_rounded", { target: 3 })]);
+
+    expect(mergeDailyQuests(local, stored, TODAY)?.tasks[0]).toMatchObject({
+      progress: 1,
+      categoryMinutes: { technique: 10 },
+    });
+  });
+
+  it("leaves tasks without category tracking free of the field", () => {
+    const local = quest(TODAY, [task("practice_total_time", { target: 15, progress: 5 })]);
+    const stored = quest(TODAY, [task("practice_total_time", { target: 15 })]);
+
+    expect(mergeDailyQuests(local, stored, TODAY)?.tasks[0]).not.toHaveProperty("categoryMinutes");
+  });
+
   it("falls back to whichever side exists", () => {
     const stored = quest(TODAY, [task("rate_song")]);
 
@@ -152,5 +202,19 @@ describe("isSameQuest", () => {
     expect(isSameQuest(base, quest(YESTERDAY, [task("rate_song")]))).toBe(false);
     expect(isSameQuest(base, null)).toBe(false);
     expect(isSameQuest(null, null)).toBe(true);
+  });
+
+  it("sees new category minutes even when progress did not move", () => {
+    // 10 more technique minutes leave "3 categories" at 1/3 — the minutes still
+    // have to be published or the next device starts from stale ones.
+    const before = quest(TODAY, [
+      task("well_rounded", { target: 3, progress: 1, categoryMinutes: { technique: 10 } }),
+    ]);
+    const after = quest(TODAY, [
+      task("well_rounded", { target: 3, progress: 1, categoryMinutes: { technique: 20 } }),
+    ]);
+
+    expect(isSameQuest(before, after)).toBe(false);
+    expect(isSameQuest(before, before)).toBe(true);
   });
 });

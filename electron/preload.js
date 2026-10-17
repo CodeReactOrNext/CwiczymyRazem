@@ -212,6 +212,24 @@ contextBridge.exposeInMainWorld("electronApp", {
    *  starting a new practice session) — it doesn't rely on having been
    *  mounted when the update-downloaded event originally fired. */
   getUpdateStatus: () => ipcRenderer.invoke("app:get-update-status"),
+
+  /** Full updater state: { status, currentVersion, version, percent, error,
+   *  canAutoInstall, manualDownloadUrl }. Shells before 0.2.0 don't have it —
+   *  the renderer treats its absence as "this updater may be broken". */
+  getUpdaterState: () => ipcRenderer.invoke("app:get-updater-state"),
+
+  /** Fires on every updater state change. Returns an unsubscribe fn. */
+  onUpdaterState: (cb) => {
+    const listener = (_event, state) => cb(state);
+    ipcRenderer.on("app:updater-state", listener);
+    return () => ipcRenderer.removeListener("app:updater-state", listener);
+  },
+
+  /** Runs an update check now; resolves the resulting updater state. */
+  checkForUpdates: () => ipcRenderer.invoke("app:check-for-updates"),
+
+  /** Opens this platform's installer download for the latest version in the browser. */
+  openUpdateDownload: () => ipcRenderer.invoke("app:open-update-download"),
 });
 
 // Frameless window controls: the renderer draws its own title bar (see

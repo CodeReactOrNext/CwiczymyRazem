@@ -103,6 +103,13 @@ describe("useLearnModeMatcher", () => {
     expect(hook.result.current.cursorBeat).toBe(1);
   });
 
+  it("points the tab at the note being waited on, and on to the next once it is played", () => {
+    const { hook, play } = setup();
+    expect(hook.result.current.focus).toEqual({ noteKeys: ["0-0-0"], beatStart: 0, beatEnd: 1 });
+    play(A2);
+    expect(hook.result.current.focus).toEqual({ noteKeys: ["0-1-0"], beatStart: 1, beatEnd: 2 });
+  });
+
   it("stays put on a wrong note", () => {
     const { hook, play } = setup();
     play(E3);

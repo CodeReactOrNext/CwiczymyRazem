@@ -5,6 +5,7 @@ import { RATE_SONG_FAME_REWARD } from "feature/songs/constants/rating.constants"
 import type { RootState } from "store/store";
 import type {
   DailyQuest,
+  DailyQuestCategoryMinutes,
   DailyQuestTask,
   DailyQuestTaskType,
   StatisticsDataInterface,
@@ -16,6 +17,11 @@ import type { SkillsType } from "types/skillsTypes";
 import { getLocalDateKey } from "utils/converter";
 import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
+import {
+  addCategoryMinutes,
+  countQuestCategories,
+  isCategoryQuestType,
+} from "./dailyQuest.categories";
 import { getQuestDayKey, isPreMigrationQuestDay } from "./questDay";
 import { subtractReportedTime } from "./timerReporting";
 import {
@@ -263,7 +269,7 @@ const userSlice = createSlice({
 
       state.currentUserStats.dailyQuest = newQuest;
     },
-    completeQuestTask: (state, { payload }: PayloadAction<{ type: DailyQuestTaskType; amount?: number; exerciseId?: string }>) => {
+    completeQuestTask: (state, { payload }: PayloadAction<{ type: DailyQuestTaskType; amount?: number; exerciseId?: string; categoryMinutes?: DailyQuestCategoryMinutes }>) => {
       if (!state.currentUserStats?.dailyQuest) return;
 
       // Progress only counts against a quest that is still live. Anything
@@ -285,8 +291,21 @@ const userSlice = createSlice({
       });
 
       if (task && !task.isCompleted) {
-        const amount = payload.amount || 1;
-        task.progress = Math.min(task.progress + amount, task.target);
+        if (isCategoryQuestType(task.type)) {
+          // These count distinct categories, so a session cannot just add
+          // its own tally: two technique-only sessions are one category, and
+          // adding them read 2/3 for "Practice 3 different categories". Keep
+          // the day's minutes per category and derive the count from them.
+          // Never lowers progress — the merge only moves it forward as well.
+          if (!payload.categoryMinutes) return;
+
+          task.categoryMinutes = addCategoryMinutes(task.categoryMinutes, payload.categoryMinutes);
+          const counted = countQuestCategories(task.type, task.categoryMinutes);
+          task.progress = Math.min(Math.max(task.progress, counted), task.target);
+        } else {
+          const amount = payload.amount || 1;
+          task.progress = Math.min(task.progress + amount, task.target);
+        }
         if (task.progress >= task.target) {
           task.isCompleted = true;
         }

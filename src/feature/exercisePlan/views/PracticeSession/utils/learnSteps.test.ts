@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
-import { buildLearnSteps, learnHitNotes, requiredChordTones, resolveLearnTargets } from "./learnSteps";
+import { buildLearnSteps, learnFocusOf, learnHitNotes, requiredChordTones, resolveLearnTargets } from "./learnSteps";
 
 const identity = (_string: number, freq: number) => freq;
 
@@ -40,6 +40,13 @@ describe("buildLearnSteps", () => {
   it("has no steps without a tab", () => {
     expect(buildLearnSteps(undefined)).toEqual([]);
     expect(buildLearnSteps([])).toEqual([]);
+  });
+});
+
+describe("learnFocusOf", () => {
+  it("names the notes of a beat and where it sits, for the tab to point at", () => {
+    const steps = buildLearnSteps(measures);
+    expect(learnFocusOf(steps[1])).toEqual({ noteKeys: ["0-2-0", "0-2-1"], beatStart: 2, beatEnd: 2.5 });
   });
 });
 

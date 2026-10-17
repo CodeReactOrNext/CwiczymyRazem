@@ -1,4 +1,5 @@
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { LearnFocus } from "feature/exercisePlan/views/PracticeSession/utils/learnSteps";
 import type { LivePitch } from "feature/exercisePlan/views/PracticeSession/utils/pitchScoring";
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import type { MutableRefObject } from "react";
@@ -79,6 +80,12 @@ interface WorkerBridgeOptions {
    * along y, and the board's box is measured top to bottom.
    */
   quarterTurned?:  boolean;
+  /**
+   * The beat learn mode is waiting for the player to play. The board marks its
+   * notes as the ones to play and lights the beat; null leaves the board as it is.
+   * Pass a stable object — every new identity posts a message.
+   */
+  learnFocus?:     LearnFocus | null;
 }
 
 /**
@@ -128,7 +135,7 @@ export function useTablatureWorkerBridge({
   hitNotes, missedNotes, noteTimings, livePitchRef, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
   loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style, selection,
-  obscured = false, quarterTurned = false,
+  obscured = false, quarterTurned = false, learnFocus = null,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
   const transferredRef      = useRef(false);
@@ -248,6 +255,15 @@ export function useTablatureWorkerBridge({
   useEffect(() => { workerRef.current?.postMessage({ type: 'HIDE_NOTES',   hideNotes });  }, [hideNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'TUNING', strings: tuningStrings ?? [] }); }, [tuningStrings]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'SELECTION', selection: selection ?? null }); }, [selection]);
+  // The worker animates the target itself; it only needs to know whether the
+  // player asked their system for less motion (a worker cannot ask).
+  useEffect(() => {
+    workerRef.current?.postMessage({
+      type: 'LEARN',
+      target: learnFocus,
+      reducedMotion: typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    });
+  }, [learnFocus]);
   useEffect(() => {
     if (!style) return;
     workerRef.current?.postMessage({ type: 'STYLE', ...style });
@@ -390,12 +406,13 @@ export function useTablatureWorkerBridge({
 
   // Seek the worker canvas position without going through the canvas click handler.
   // Called by TablatureSection when the minimap is clicked (to keep both in sync).
-  const seekWorker = (beat: number) => {
+  // `smooth` glides there instead of jumping — how learn mode follows the lesson.
+  const seekWorker = (beat: number, smooth = false) => {
     const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
     const newCursorPos = beat * dynBW;
     const newScrollX   = Math.max(0, newCursorPos - containerSize.width / vscale / 4);
     pausedScrollRef.current = { scrollX: newScrollX, cursorPos: newCursorPos };
-    workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: newCursorPos });
+    workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: newCursorPos, smooth });
     lastHoverMeasureRef.current = -1;
     workerRef.current?.postMessage({ type: 'HOVER', startX: null });
   };

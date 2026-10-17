@@ -308,6 +308,21 @@ let audioCurrentReceivedAt: number | null = null;
 let pausedCursorPos = 0;
 let pausedScrollX = 0;
 
+// ── Learn mode: the beat the lesson is waiting for the player to play ────────
+/** LEARN message. `since` restarts the settle-in whenever the target moves on. */
+let learnTarget: { keys: Set<string>; beatStart: number; beatEnd: number; since: number } | null = null;
+/** The system asked for less motion (the main thread can read that, a worker can't). */
+let reducedMotion = false;
+/** A glide in progress (SCROLL with `smooth`): the paused view easing to its next resting place. */
+let glide: { fromCursor: number; fromScroll: number; toCursor: number; toScroll: number; start: number } | null = null;
+const GLIDE_MS = 320;
+const LEARN_SETTLE_MS = 320;
+const LEARN_PING_MS = 1100;
+const LEARN_COLOR = "#22d3ee";
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+/** Motion is off when the tab's animations are, or the system asks for less. */
+const learnIsCalm = () => !hitAnimations || reducedMotion;
+
 // Hover preview — world-X of the measure start being hovered (null = no hover)
 let hoverStartX: number | null = null;
 
@@ -690,6 +705,43 @@ function drawPill(x: number, y: number, w: number, h: number, r: number) {
   pillPath(x, y, w, h, r);
 }
 
+/**
+ * Marks a note the lesson is waiting for: a glow that breathes behind it, a ring
+ * that closes in on it when it becomes the target, and a ping that keeps going
+ * out from it for as long as it is. With motion off it is the glow and the ring,
+ * standing still.
+ */
+function drawLearnHalo(x: number, y: number, w: number, h: number, now: number) {
+  if (!ctx || !learnTarget) return;
+  const calm = learnIsCalm();
+  const age = now - learnTarget.since;
+  const settle = calm ? 1 : easeOutCubic(Math.min(1, age / LEARN_SETTLE_MS));
+  const breathe = calm ? 0.5 : 0.5 + 0.5 * Math.sin(now / 260);
+
+  ctx.save();
+  ctx.fillStyle = LEARN_COLOR;
+  ctx.globalAlpha = settle * (0.14 + 0.12 * breathe);
+  const glow = 6 + 3 * breathe;
+  drawPill(x - glow, y - glow, w + glow * 2, h + glow * 2, BLOCK_CORNER + glow);
+  ctx.fill();
+
+  const pad = 3 + (1 - settle) * 14;
+  ctx.globalAlpha = settle;
+  ctx.strokeStyle = LEARN_COLOR;
+  ctx.lineWidth = 2;
+  drawPill(x - pad, y - pad, w + pad * 2, h + pad * 2, BLOCK_CORNER + pad);
+  ctx.stroke();
+
+  if (!calm && age > LEARN_SETTLE_MS) {
+    const p = ((age - LEARN_SETTLE_MS) % LEARN_PING_MS) / LEARN_PING_MS;
+    const ping = 3 + 16 * easeOutCubic(p);
+    ctx.globalAlpha = 0.5 * (1 - p);
+    drawPill(x - ping, y - ping, w + ping * 2, h + ping * 2, BLOCK_CORNER + ping);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 // Strings whose notes sit under the cursor or within the look-ahead window —
 // i.e. the ones "about to be played". `curBeat` is the cursor position in beats
 // (tile-0 space). renderBeats are sorted by offsetX, so we binary-search the
@@ -889,7 +941,8 @@ function render() {
   }
 
   // Skip paint when paused and nothing animating
-  if (!isPlaying && !needsRedraw && visual.hitTimestampsCount === 0 && timingLabels.size === 0) {
+  const learnAnimating = learnTarget !== null && !learnIsCalm();
+  if (!isPlaying && !needsRedraw && glide === null && !learnAnimating && visual.hitTimestampsCount === 0 && timingLabels.size === 0) {
     if (lastRestActive) {
       lastRestActive = false;
       self.postMessage({ type: 'REST_ACTIVE', isRest: false });
@@ -897,6 +950,19 @@ function render() {
     return;
   }
   needsRedraw = false;
+
+  // A glide moves the paused view a step closer to where it is going.
+  if (glide) {
+    if (isPlaying) {
+      glide = null;
+    } else {
+      const t = Math.min(1, (frameNow - glide.start) / GLIDE_MS);
+      const eased = easeOutCubic(t);
+      pausedCursorPos = glide.fromCursor + (glide.toCursor - glide.fromCursor) * eased;
+      pausedScrollX = glide.fromScroll + (glide.toScroll - glide.fromScroll) * eased;
+      if (t >= 1) glide = null;
+    }
+  }
 
   const dynBW = Math.max(120, Math.min(200, W / 4)) * zoom;
   const totalW = totalBeats * dynBW;
@@ -1278,6 +1344,11 @@ function render() {
           drawPill(blockX - 3, blockY - 3, headW + 6, BLOCK_H + 6, BLOCK_CORNER + 2);
           ctx.fill();
           ctx.globalAlpha = 1;
+        }
+
+        // ── Learn mode — the note to play next ───────────────────────────
+        if (learnTarget && !isPlaying && !isHit && learnTarget.keys.has(note.noteKey)) {
+          drawLearnHalo(blockX, blockY, headW, BLOCK_H, frameNow);
         }
 
         // ── Draw pill block ──────────────────────────────────────────────
@@ -1914,10 +1985,29 @@ function render() {
     drawText(`M${measureIdx + 1}`, tx + 12, ty + 1);
   }
 
+  // ── Learn mode — the beat to play, lit from top to bottom ────────────────
+  // The column opens out from the cursor when the target moves on, and breathes
+  // with the halo on the note, so the eye is led to what has to be played.
+  const isLearning = learnTarget !== null && !isPlaying;
+  if (learnTarget && isLearning) {
+    const calm = learnIsCalm();
+    const settle = calm ? 1 : easeOutCubic(Math.min(1, (frameNow - learnTarget.since) / LEARN_SETTLE_MS));
+    const breathe = calm ? 0.5 : 0.5 + 0.5 * Math.sin(frameNow / 260);
+    const colW = Math.min(1, learnTarget.beatEnd - learnTarget.beatStart) * dynBW;
+    const wash = ctx.createLinearGradient(0, 0, 0, viewH);
+    wash.addColorStop(0, withAlpha(LEARN_COLOR, 0));
+    wash.addColorStop(0.5, withAlpha(LEARN_COLOR, 0.06 + 0.05 * breathe));
+    wash.addColorStop(1, withAlpha(LEARN_COLOR, 0));
+    ctx.fillStyle = wash;
+    ctx.fillRect(learnTarget.beatStart * dynBW, 0, colW * settle, viewH);
+  }
+
   // ── Cursor line + beat pulse ─────────────────────────────────────────────
   if (dispCursor > 0 || isPlaying) {
-    ctx.strokeStyle = isPlaying ? "#06b6d4" : "#ef4444";
-    ctx.lineWidth = 3;
+    // Learn mode keeps no time, so the stopped-red of a paused cursor would say
+    // something it isn't: it rests on the target instead.
+    ctx.strokeStyle = isPlaying ? "#06b6d4" : isLearning ? withAlpha(LEARN_COLOR, 0.6) : "#ef4444";
+    ctx.lineWidth = isLearning ? 2 : 3;
     ctx.beginPath();
     ctx.moveTo(dispCursor, 0); ctx.lineTo(dispCursor, viewH);
     ctx.stroke();
@@ -2002,6 +2092,7 @@ self.onmessage = (e: MessageEvent) => {
       tempoMap = msg.tempoMap ?? [];
       pausedCursorPos = 0;
       pausedScrollX = 0;
+      glide = null;
       loopStartBeat = null;
       loopEndBeat   = null;
       resetFrozenNoteState(visual);
@@ -2015,7 +2106,7 @@ self.onmessage = (e: MessageEvent) => {
       countInRemaining = msg.countInRemaining;
       audioStartSec = msg.audioStartSec ?? null;
       if (!isPlaying) { audioCurrentSec = null; audioCurrentReceivedAt = null; livePitch = null; }
-      if (isPlaying) hoverStartX = null; // clear hover when playback starts
+      if (isPlaying) { hoverStartX = null; glide = null; } // clear hover when playback starts
       recomputeLoopSeconds();
       break;
     }
@@ -2075,9 +2166,23 @@ self.onmessage = (e: MessageEvent) => {
       tuningStrings = (msg.strings as TuningStringInfo[]) ?? [];
       break;
     }
+    case 'LEARN': {
+      const target = msg.target as { noteKeys: string[]; beatStart: number; beatEnd: number } | null;
+      reducedMotion = !!msg.reducedMotion;
+      learnTarget = target
+        ? { keys: new Set(target.noteKeys), beatStart: target.beatStart, beatEnd: target.beatEnd, since: Date.now() }
+        : null;
+      break;
+    }
     case 'SCROLL': {
-      pausedScrollX = msg.scrollX;
-      pausedCursorPos = msg.cursorPos;
+      if (msg.smooth && !isPlaying && !learnIsCalm()) {
+        // From wherever the view is right now, so a seek mid-glide carries on from there.
+        glide = { fromCursor: pausedCursorPos, fromScroll: pausedScrollX, toCursor: msg.cursorPos, toScroll: msg.scrollX, start: Date.now() };
+      } else {
+        glide = null;
+        pausedScrollX = msg.scrollX;
+        pausedCursorPos = msg.cursorPos;
+      }
       break;
     }
     case 'ZOOM': {
@@ -2088,6 +2193,10 @@ self.onmessage = (e: MessageEvent) => {
         const ratio = next / zoom;
         pausedCursorPos *= ratio;
         pausedScrollX *= ratio;
+        if (glide) {
+          glide.fromCursor *= ratio; glide.toCursor *= ratio;
+          glide.fromScroll *= ratio; glide.toScroll *= ratio;
+        }
       }
       zoom = next;
       break;
@@ -2134,6 +2243,7 @@ self.onmessage = (e: MessageEvent) => {
     case 'RESET': {
       pausedScrollX = 0;
       pausedCursorPos = 0;
+      glide = null;
       showRestWarning = false;
       // Clears hitNotes too (not just missedNotes) — leaving old hits behind
       // made previously-played notes stay lit green after a restart, even

@@ -33,6 +33,26 @@ export interface ElectronUpdateStatus {
   readyAt: number;
 }
 
+export interface ElectronUpdaterState {
+  status: "idle" | "checking" | "downloading" | "ready" | "up-to-date" | "error";
+  currentVersion: string;
+  /** Version being downloaded / ready / that failed; null before a check finds one. */
+  version: string | null;
+  /** Download progress 0..100, null when not downloading. */
+  percent: number | null;
+  error: string | null;
+  /** False when this copy can't replace itself (macOS: run from the DMG, from
+   *  Downloads, or from a folder the user can't write) — only a manual install works. */
+  canAutoInstall: boolean;
+  /** This platform's installer for the latest version (or the releases page). */
+  manualDownloadUrl: string;
+}
+
+export interface ElectronInstallUpdateResult {
+  ok: boolean;
+  reason?: string;
+}
+
 export interface ElectronAppApi {
   isAvailable: true;
   /** Installed desktop app version (electron-builder packages the root package.json version). */
@@ -53,10 +73,20 @@ export interface ElectronAppApi {
   retryConnect: () => Promise<void>;
   /** Subscribe to a downloaded-and-ready-to-install update. Returns an unsubscribe fn. */
   onUpdateReady: (cb: (info: ElectronUpdateReadyInfo) => void) => () => void;
-  /** Quits and installs the already-downloaded update. */
-  installUpdate: () => Promise<void>;
+  /** Quits and installs the already-downloaded update. Shells before 0.2.0
+   *  resolve undefined; newer ones report whether the install could start
+   *  (when it can't, the shell itself offers the manual download). */
+  installUpdate: () => Promise<ElectronInstallUpdateResult | void>;
   /** Poll the current pending-update snapshot; null if none is downloaded yet. */
   getUpdateStatus: () => Promise<ElectronUpdateStatus | null>;
+  /** Full updater state (0.2.0+; absent on older shells). Null in dev. */
+  getUpdaterState?: () => Promise<ElectronUpdaterState | null>;
+  /** Subscribe to updater state changes (0.2.0+). Returns an unsubscribe fn. */
+  onUpdaterState?: (cb: (state: ElectronUpdaterState) => void) => () => void;
+  /** Run an update check now (0.2.0+). */
+  checkForUpdates?: () => Promise<ElectronUpdaterState | null>;
+  /** Open this platform's installer download in the browser (0.2.0+). */
+  openUpdateDownload?: () => Promise<void>;
 }
 
 declare global {

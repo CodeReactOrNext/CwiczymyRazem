@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getAdaptiveVolumeGate } from "utils/audio/noteUtils";
 
 import type { LearnStep } from "../utils/learnSteps";
-import { learnHitNotes, resolveLearnTargets } from "../utils/learnSteps";
+import type { LearnFocus } from "../utils/learnSteps";
+import { learnFocusOf, learnHitNotes, resolveLearnTargets } from "../utils/learnSteps";
 import type { LearnFrame } from "./learnJudge";
 import { createLearnJudge } from "./learnJudge";
 
@@ -21,6 +22,8 @@ export interface LearnProgress {
   hitNotes: Record<string, number>;
   /** Where the tab's cursor rests: the start of the beat being waited on. */
   cursorBeat: number;
+  /** The beat being waited on — what the tab marks as the one to play. */
+  focus: LearnFocus | null;
   /** Move on without playing it — for a note the mic won't pick up. */
   skip: () => void;
   /** Back to the first beat. */
@@ -122,7 +125,6 @@ export function useLearnModeMatcher({
           freq: refs.frequencyRef.current,
           volume: refs.rawVolumeRef.current,
           volumeGateBase: noiseFloor > 0 ? getAdaptiveVolumeGate(noiseFloor) : VOLUME_GATE,
-          confidence: refs.confidenceRef.current,
           lastOnsetMs: refs.lastOnsetTimeRef.current,
           lastTickMs: refs.lastTickTimeRef.current,
           readSpectrum: refs.readSpectrum,
@@ -145,9 +147,10 @@ export function useLearnModeMatcher({
   const { index, passes } = position;
   const hitNotes = useMemo(() => learnHitNotes(steps, index), [steps, index]);
   const cursorBeat = steps[index]?.beatStart ?? 0;
+  const focus = useMemo(() => (steps[index] ? learnFocusOf(steps[index]) : null), [steps, index]);
 
   return useMemo(
-    () => ({ stepIndex: index, totalSteps: steps.length, passes, hitNotes, cursorBeat, skip, restart }),
-    [index, steps.length, passes, hitNotes, cursorBeat, skip, restart],
+    () => ({ stepIndex: index, totalSteps: steps.length, passes, hitNotes, cursorBeat, focus, skip, restart }),
+    [index, steps.length, passes, hitNotes, cursorBeat, focus, skip, restart],
   );
 }

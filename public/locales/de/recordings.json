@@ -37,6 +37,12 @@
     "like": "Aufnahme liken",
     "comments": "Kommentare ansehen"
   },
+  "likers": {
+    "title": "Geliked von",
+    "you": "Du",
+    "loading": "Wird geladen...",
+    "more": "+{{count}} weitere"
+  },
   "grid": {
     "empty_title": "Keine Aufnahmen gefunden",
     "empty_body": "Lade als Erster dein Cover hoch!"

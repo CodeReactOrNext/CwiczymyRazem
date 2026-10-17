@@ -14,6 +14,7 @@ import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { UserLink } from "components/UserLink";
 import { AddRecordingModal } from "feature/recordings/components/AddRecordingModal";
+import { RecordingLikersTooltip } from "feature/recordings/components/RecordingLikersTooltip";
 import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMutations";
 import type { Recording } from "feature/recordings/types/types";
 import { selectUserAuth } from "feature/user/store/userSlice";
@@ -176,18 +177,20 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
       </div>
 
       <div className='flex items-center gap-1 bg-zinc-800/30 px-2 py-1.5'>
-        <Button
-          variant='ghost'
-          size='sm'
-          aria-label={t("card.like")}
-          className={cn(
-            "text-zinc-400 hover:bg-zinc-800/60 hover:text-red-400",
-            hasLiked && "text-red-400 hover:text-red-300",
-          )}
-          onClick={handleLike}>
-          <Heart className={cn("mr-1.5 h-4 w-4", hasLiked && "fill-current")} />
-          <span className='text-xs font-bold'>{recording.likes.length}</span>
-        </Button>
+        <RecordingLikersTooltip likes={recording.likes} userId={userId}>
+          <Button
+            variant='ghost'
+            size='sm'
+            aria-label={t("card.like")}
+            className={cn(
+              "text-zinc-400 hover:bg-zinc-800/60 hover:text-red-400",
+              hasLiked && "text-red-400 hover:text-red-300",
+            )}
+            onClick={handleLike}>
+            <Heart className={cn("mr-1.5 h-4 w-4", hasLiked && "fill-current")} />
+            <span className='text-xs font-bold'>{recording.likes.length}</span>
+          </Button>
+        </RecordingLikersTooltip>
 
         <Button
           variant='ghost'

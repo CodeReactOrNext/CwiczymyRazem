@@ -3,8 +3,17 @@
 // Electron's bare default menu.
 const { app, Menu } = require("electron");
 
-function buildMenu({ isDev, shell, dialog, getMainWindow }) {
+function buildMenu({ isDev, shell, dialog, getMainWindow, getUpdater }) {
   const isMac = process.platform === "darwin";
+  // Null in dev — the items stay, they just explain there's nothing to update.
+  const checkForUpdates = {
+    label: "Check for Updates…",
+    click: () => {
+      const updater = getUpdater();
+      if (updater) updater.checkInteractive();
+      else dialog.showMessageBox({ type: "info", message: "Updates are disabled in development builds." });
+    },
+  };
 
   const template = [
     ...(isMac
@@ -12,6 +21,7 @@ function buildMenu({ isDev, shell, dialog, getMainWindow }) {
           label: "riff.quest",
           submenu: [
             { role: "about" },
+            checkForUpdates,
             { type: "separator" },
             { role: "services" },
             { type: "separator" },
@@ -67,6 +77,15 @@ function buildMenu({ isDev, shell, dialog, getMainWindow }) {
           label: "Report an Issue",
           click: () => shell.openExternal("https://github.com/CodeReactOrNext/CwiczymyRazem/issues"),
         },
+        {
+          // What support asks for when an update misbehaves.
+          label: "Show Update Log",
+          click: () => {
+            const updater = getUpdater();
+            if (updater) shell.showItemInFolder(updater.logPath);
+          },
+        },
+        ...(isMac ? [] : [checkForUpdates]),
         ...(isMac
           ? []
           : [

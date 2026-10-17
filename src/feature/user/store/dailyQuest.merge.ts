@@ -1,5 +1,12 @@
 import type { DailyQuest, DailyQuestTask } from "types/api.types";
 
+import {
+  countQuestCategories,
+  isCategoryQuestType,
+  isSameCategoryMinutes,
+  mergeCategoryMinutes,
+} from "./dailyQuest.categories";
+
 /**
  * Identity of a task inside one day's quest set. Two draws of the same template
  * are the same task, and a "practice a specific exercise" task only matches
@@ -28,7 +35,8 @@ export const isSameQuest = (
       task.target === other.target &&
       task.progress === other.progress &&
       task.isCompleted === other.isCompleted &&
-      (task.exerciseId ?? null) === (other.exerciseId ?? null)
+      (task.exerciseId ?? null) === (other.exerciseId ?? null) &&
+      isSameCategoryMinutes(task.categoryMinutes, other.categoryMinutes)
     );
   });
 };
@@ -77,13 +85,24 @@ export const mergeDailyQuests = (
     const localTask = localByKey.get(taskKey(remoteTask));
     if (!localTask) return remoteTask;
 
+    // Two devices that each practiced a different category hold a progress of 1
+    // apiece, yet together made 2 — so for the distinct-category tasks the
+    // count is rebuilt from the merged minutes rather than picked by max alone.
+    const categoryMinutes = isCategoryQuestType(remoteTask.type)
+      ? mergeCategoryMinutes(remoteTask.categoryMinutes, localTask.categoryMinutes)
+      : undefined;
+    const categoriesCounted = categoryMinutes
+      ? countQuestCategories(remoteTask.type, categoryMinutes)
+      : 0;
+
     const progress = Math.min(
-      Math.max(remoteTask.progress, localTask.progress),
+      Math.max(remoteTask.progress, localTask.progress, categoriesCounted),
       remoteTask.target
     );
 
     return {
       ...remoteTask,
+      ...(categoryMinutes && { categoryMinutes }),
       progress,
       isCompleted:
         remoteTask.isCompleted || localTask.isCompleted || progress >= remoteTask.target,

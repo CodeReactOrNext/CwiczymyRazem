@@ -254,7 +254,7 @@ export const TablatureSection = memo(function TablatureSection({
   const seekedBeatRef = useRef(0);
   const isRestartingRef = useRef(false);
   // Populated by TablatureViewer so minimap clicks can update the canvas cursor
-  const seekWorkerRef = useRef<((beat: number) => void) | null>(null);
+  const seekWorkerRef = useRef<((beat: number, smooth?: boolean) => void) | null>(null);
   // Populated by TablatureViewer with its CSS container width (used by its own auto-scroll)
   const viewerWidthRef = useRef(0);
 
@@ -348,7 +348,7 @@ export const TablatureSection = memo(function TablatureSection({
     if (learnBeat === null) return;
     seekedBeatRef.current = learnBeat;
     currentBeatRef.current = learnBeat;
-    seekWorkerRef.current?.(learnBeat);
+    seekWorkerRef.current?.(learnBeat, true);
   }, [learnBeat, tabResetKey, showAlphaTabScore]);
   // Where the cursor rests, as far as the minimap and the "From the start"
   // button are concerned: the lesson's note, or wherever the player last left it.
@@ -537,6 +537,7 @@ export const TablatureSection = memo(function TablatureSection({
               loopStartBeat={loopStart}
               loopEndBeat={loopEnd}
               seekWorkerRef={seekWorkerRef}
+              learnFocus={learn?.enabled ? learn.focus : null}
               viewerWidthRef={viewerWidthRef}
               zoom={zoom}
               heightPx={height}

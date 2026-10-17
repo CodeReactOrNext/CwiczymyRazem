@@ -1,8 +1,7 @@
-# Builds and publishes the desktop app installers whenever a version tag is
-# pushed. Releases are published to a separate public repo
-# (Michaljapko/riff-quest-releases, see electron-builder.yml `publish`) because
-# this source repo is private and private-repo release assets aren't publicly
-# downloadable — electron-updater on users' machines needs public access.
+# Builds and publishes the desktop app installers. Releases are published to a
+# separate public repo (Michaljapko/riff-quest-releases, see electron-builder.yml
+# `publish`) because this source repo is private and private-repo release assets
+# aren't publicly downloadable — electron-updater on users' machines needs public access.
 #
 # Windows, Linux and macOS build in parallel, each on its native OS
 # (electron-builder native modules — audify's ASIO/WASAPI/ALSA/CoreAudio binary
@@ -13,23 +12,81 @@
 # native module built for one Mac arch can't load in a process of the other.
 # The mac app is unsigned/ad-hoc (no Apple Developer certificate) — see the
 # comments in electron-builder.yml's `mac:` block for the launch/signing and
-# known mic-capture-regression caveats.
+# known mic-capture-regression caveats, and electron/updater.js for why that
+# means macOS installs updates itself instead of through Squirrel.Mac.
 #
-# Release flow: bump the version and tag it locally, then push the tag —
-#   npm version patch   # or minor / major
-#   git push --follow-tags
+# Release flow: bump "version" in package.json and push it to master — that's
+# all. The release runs whenever the version in package.json has no published
+# release yet, and tags v<version> afterwards. (0.2.0 sat bumped-but-unreleased
+# because the old flow also needed a manually pushed tag.) Pushing a v* tag by
+# hand still works, as does "Run workflow" to retry a release that failed
+# half-way. Nothing is ever published twice: `prepare` skips versions whose
+# three update feeds already exist.
 name: Release desktop app
 
 on:
   push:
+    branches:
+      - master
+    # Ignored for tag pushes — those always run.
+    paths:
+      - package.json
     tags:
       - "v*.*.*"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+# A bump pushed with --follow-tags fires twice (branch + tag); run them one
+# after another so the second sees the first one's release and skips.
+concurrency:
+  group: desktop-release
+  cancel-in-progress: false
+
+env:
+  RELEASES_REPO: Michaljapko/riff-quest-releases
+
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      should_release: ${{ steps.feeds.outputs.should_release }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.ref_type }}" = "tag" ] && [ "${{ github.ref_name }}" != "v$VERSION" ]; then
+            echo "::error::Tag ${{ github.ref_name }} doesn't match package.json version $VERSION — electron-builder would publish $VERSION, not the tag."
+            exit 1
+          fi
+
+      - name: Check whether v${{ steps.version.outputs.version }} is already published
+        id: feeds
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          SHOULD=false
+          for FEED in latest.yml latest-mac.yml latest-linux.yml; do
+            URL="https://github.com/$RELEASES_REPO/releases/download/v$VERSION/$FEED"
+            BODY=$(curl -fsSL "$URL" || true)
+            if grep -qx "version: $VERSION" <<< "$BODY"; then
+              echo "$FEED: published"
+            else
+              echo "$FEED: missing"
+              SHOULD=true
+            fi
+          done
+          echo "should_release=$SHOULD" >> "$GITHUB_OUTPUT"
+
   release:
+    needs: prepare
+    if: needs.prepare.outputs.should_release == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -61,4 +118,51 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.RELEASE_REPO_TOKEN }}
 
+  tag:
+    needs: [prepare, release]
+    if: github.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      # Pushed with GITHUB_TOKEN, which by design doesn't trigger this workflow again.
+      - name: Tag v${{ needs.prepare.outputs.version }}
+        run: |
+          TAG="v${{ needs.prepare.outputs.version }}"
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null; then
+            echo "$TAG already exists"
+          else
+            git tag "$TAG" "${{ github.sha }}"
+            git push origin "$TAG"
+          fi
+
+  # What users' updaters actually read: /releases/latest/download/<feed>. Fails
+  # the run (instead of leaving it green) when any platform didn't get the new
+  # version — e.g. one build failed, or a newer release isn't marked latest.
+  verify:
+    needs: [prepare, release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the update feeds
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          FAILED=0
+          for FEED in latest.yml latest-mac.yml latest-linux.yml; do
+            URL="https://github.com/$RELEASES_REPO/releases/latest/download/$FEED"
+            OK=0
+            for ATTEMPT in 1 2 3 4 5; do
+              BODY=$(curl -fsSL "$URL" || true)
+              if grep -qx "version: $VERSION" <<< "$BODY"; then OK=1; break; fi
+              sleep 20
+            done
+            if [ "$OK" = 1 ]; then
+              echo "$FEED: $VERSION"
+            else
+              echo "::error::$FEED doesn't serve $VERSION — that platform's users won't be offered this update."
+              FAILED=1
+            fi
+          done
+          exit $FAILED

@@ -19,6 +19,11 @@ export const useUpdateRequiredGate = () => {
   useEffect(() => {
     const api = window.electronApp;
     if (!api || typeof api.getUpdateStatus !== "function") return undefined;
+    // macOS shells before 0.2.0 report an update as downloaded although
+    // Squirrel.Mac then rejects it, so their restart button can never work —
+    // blocking would lock the player out for good. The manual-download toast
+    // (useDesktopUpdatePrompt) covers them instead.
+    if (!api.getUpdaterState && window.electronWindow?.platform === "darwin") return undefined;
     let cancelled = false;
     api.getUpdateStatus().then((status) => {
       if (!cancelled && status && Date.now() - status.readyAt > GRACE_MS) {

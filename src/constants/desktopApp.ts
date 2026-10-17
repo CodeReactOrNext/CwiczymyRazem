@@ -5,5 +5,8 @@
 // the current web bundle relies on), not on every release.
 export const MIN_DESKTOP_APP_VERSION = "0.1.4";
 
-export const DESKTOP_APP_RELEASES_URL =
-  "https://github.com/Michaljapko/riff-quest-releases/releases/latest";
+// Public repo the desktop installers and electron-updater feeds are published
+// to (electron-builder.yml `publish`, electron/updater.js RELEASES_REPO).
+export const DESKTOP_RELEASES_REPO = "Michaljapko/riff-quest-releases";
+
+export const DESKTOP_APP_RELEASES_URL = `https://github.com/${DESKTOP_RELEASES_REPO}/releases/latest`;

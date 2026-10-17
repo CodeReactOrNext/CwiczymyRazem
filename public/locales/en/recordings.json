@@ -37,6 +37,12 @@
     "like": "Like recording",
     "comments": "View comments"
   },
+  "likers": {
+    "title": "Liked by",
+    "you": "You",
+    "loading": "Loading...",
+    "more": "+{{count}} more"
+  },
   "grid": {
     "empty_title": "No recordings found",
     "empty_body": "Be the first to upload your cover!"

@@ -11,7 +11,7 @@ import {
 import { playUiSound } from "lib/uiSounds/uiSounds";
 import posthog from "posthog-js";
 import type { RootState } from "store/store";
-import type { DailyQuest, DailyQuestTaskType } from "types/api.types";
+import type { DailyQuest, DailyQuestCategoryMinutes, DailyQuestTaskType } from "types/api.types";
 import { auth, db } from "utils/firebase/client/firebase.utils";
 import { getPointsToLvlUp, levelUpUser } from "utils/gameLogic";
 
@@ -254,7 +254,7 @@ export const ensureQuestForToday = createAsyncThunk(
 
 export const updateQuestProgress = createAsyncThunk(
   "user/updateQuestProgress",
-  async (payload: { type: DailyQuestTaskType; amount?: number; exerciseId?: string }, { dispatch, getState }) => {
+  async (payload: { type: DailyQuestTaskType; amount?: number; exerciseId?: string; categoryMinutes?: DailyQuestCategoryMinutes }, { dispatch, getState }) => {
     // A session that started before the server day rolled over reports after
     // it, against a quest the store has not refreshed since. Roll it over here
     // rather than letting the reducer's date guard eat the progress.

@@ -17,7 +17,7 @@ const note = (freq: number, over: Partial<LearnTarget> = {}): LearnTarget => ({
 });
 
 const frame = (now: number, over: Partial<LearnFrame> = {}): LearnFrame => ({
-  now, freq: 0, volume: 0, volumeGateBase: 0.005, confidence: 0, lastOnsetMs: 0, lastTickMs: 0, ...over,
+  now, freq: 0, volume: 0, volumeGateBase: 0.005, lastOnsetMs: 0, lastTickMs: 0, ...over,
 });
 
 /** Plays the same reading twice, a hold apart — the way frames keep arriving — and says what the second one decided. */
@@ -108,6 +108,60 @@ describe("createLearnJudge — a picked note", () => {
     judge.arm(frame(1000));
     const sharpBy30Cents = A3 * Math.pow(2, 30 / 1200);
     expect(heldFor(judge, [note(A3)], 1200, { freq: sharpBy30Cents, volume: 0.1, lastOnsetMs: 1005 })).toBe(true);
+  });
+});
+
+describe("createLearnJudge — a note a half step away", () => {
+  const Eb2 = E2 * Math.pow(2, -1 / 12);
+  /** The detector reads the low strings sharp — E2 by about 50 cents. */
+  const readSharp = (freq: number, cents: number) => freq * Math.pow(2, cents / 1200);
+  const withSpectrum = (tones: number[], freq: number) => ({
+    freq, volume: 0.1, lastOnsetMs: 1005, readSpectrum: () => spectrumOf(tones),
+  });
+
+  it("is not taken for the written low note, even though the biased reading lands inside the window", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000));
+    // Eb2 played, E2 written: 100 cents flat, read 54 cents sharp = 46 cents flat.
+    expect(heldFor(judge, [note(E2)], 1200, withSpectrum([Eb2], readSharp(Eb2, 54)))).toBe(false);
+  });
+
+  it("accepts the written low note on the same biased reading", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000));
+    expect(heldFor(judge, [note(E2)], 1200, withSpectrum([E2], readSharp(E2, 54)))).toBe(true);
+  });
+
+  it("is not taken for the written note higher up the neck either", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000));
+    const Gs3 = A3 * Math.pow(2, -1 / 12);
+    // The pitch reading is dragged to the written note; the spectrum is not.
+    expect(heldFor(judge, [note(A3)], 1200, withSpectrum([Gs3], A3))).toBe(false);
+  });
+
+  it("is not played when the spectrum has nothing to show for the note", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000));
+    const silent = { freq: A3, volume: 0.1, lastOnsetMs: 1005, readSpectrum: () => null };
+    expect(heldFor(judge, [note(A3)], 1200, silent)).toBe(false);
+  });
+
+  it("asks for a pitch within 35 cents on a high string", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000));
+    const sharpBy40 = B4 * Math.pow(2, 40 / 1200);
+    expect(heldFor(judge, [note(B4)], 1200, withSpectrum([B4], sharpBy40))).toBe(false);
+  });
+
+  it("drops a chord tone a half step off the shape", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000));
+    const chord = [note(A3), note(D4), note(FS4)];
+    const F4 = FS4 * Math.pow(2, -1 / 12);
+    const heard = (t: number) => frame(t, { volume: 0.2, lastOnsetMs: 1005, readSpectrum: () => spectrumOf([A3, D4, F4]) });
+    judge.judge(chord, heard(1010));
+    expect(judge.judge(chord, heard(1010 + LEARN_HOLD_MS))).toBe(false);
   });
 });
 
