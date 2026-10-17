@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, renderHook } from "@testing-library/react";
+import { onOutputStalled, useNativeOutputDevice } from "hooks/useNativeOutputDevice";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useMetronome } from "./useMetronome";
@@ -147,5 +148,46 @@ describe("useMetronome count-in", () => {
     act(() => { vi.advanceTimersByTime(700); });
 
     expect(ctx.setSinkId).toHaveBeenCalledWith("");
+  });
+
+  it("tells the player when the default output stays silent too", async () => {
+    frozenClock = true;
+    const stalled = vi.fn();
+    const unsubscribe = onOutputStalled(stalled);
+    const { result } = renderHook(() => useMetronome({ initialBpm: 60 }));
+    createdContexts[0].sinkId = "interface-held-by-asio";
+
+    act(() => { result.current.startMetronome(); });
+    await act(async () => { vi.advanceTimersByTime(700); });
+    expect(stalled).not.toHaveBeenCalled();
+
+    // ASIO4ALL holds the default device as well — the fallback changes nothing.
+    act(() => { vi.advanceTimersByTime(700); });
+    expect(stalled).toHaveBeenCalledTimes(1);
+    unsubscribe();
+  });
+
+  it("moves to an output picked after the stall and carries on counting", async () => {
+    frozenClock = true;
+    const stalled = vi.fn();
+    const unsubscribe = onOutputStalled(stalled);
+    const { result } = renderHook(() => useMetronome({ initialBpm: 60 }));
+    const picker = renderHook(() => useNativeOutputDevice());
+    const ctx = createdContexts[0];
+    ctx.sinkId = "interface-held-by-asio";
+
+    act(() => { result.current.startMetronome(); });
+    await act(async () => { vi.advanceTimersByTime(700); });
+    act(() => { vi.advanceTimersByTime(700); });
+    expect(stalled).toHaveBeenCalledTimes(1);
+
+    frozenClock = false; // the laptop speakers are free
+    await act(async () => { picker.result.current.select("laptop-speakers"); });
+    expect(ctx.setSinkId).toHaveBeenLastCalledWith("laptop-speakers");
+
+    act(() => { vi.advanceTimersByTime(4500); });
+    expect(result.current.countInRemaining).toBe(0);
+    expect(stalled).toHaveBeenCalledTimes(1);
+    unsubscribe();
   });
 });

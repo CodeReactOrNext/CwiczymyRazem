@@ -32,8 +32,16 @@
     "output": "Ausgang",
     "no_outputs": "Keine Ausgabegeräte gefunden",
     "output_hint": "Sollte zum Interface oben passen, damit Wiedergabe und Aufnahme dasselbe Gerät nutzen.",
+    "output_hint_asio4all": "ASIO4ALL belegt dein ganzes Interface, inklusive Ausgänge, deshalb kann das Metronom darüber nicht spielen. Wähle hier einen anderen Ausgang (z. B. die Lautsprecher deines Computers) oder schalte im ASIO4ALL-Panel den Ausgang des Interfaces ab und lass nur den Eingang aktiv.",
     "before_start": "Bevor du startest",
     "before_start_body": "Stell sicher, dass dein Interface als Mikrofoneingang des Browsers gewählt ist und deine Gitarre eingesteckt ist. Den Gain stellst du im nächsten Schritt ein."
+  },
+  "output_stall": {
+    "title": "Das Metronom kann nicht spielen",
+    "body": "Dein Audiotreiber belegt den Ausgang, über den die App spielt, deshalb sind Metronom und Backing Tracks nicht zu hören. Wähle einen anderen Ausgang, z. B. die Lautsprecher oder den Kopfhörerausgang deines Computers.",
+    "pick": "Ausgang wählen…",
+    "asio4all": "Nutzt du ASIO4ALL? Lass in seinem Panel nur den Eingang deines Interfaces aktiv und achte darauf, dass dort keine andere Soundkarte angehakt ist.",
+    "close": "Schließen"
   },
   "tuning": {
     "wrong_string": "Falsche Saite?",

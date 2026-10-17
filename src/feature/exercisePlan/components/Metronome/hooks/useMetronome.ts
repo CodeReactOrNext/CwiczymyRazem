@@ -1,4 +1,4 @@
-import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
+import { notifyOutputStalled, onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import type { MutableRefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applySinkId } from "utils/applyAudioSinkId";
@@ -306,8 +306,12 @@ export const useMetronome = ({
   // Move an already-open, app-owned context to a newly picked output device live
   // (e.g. user changes the interface mid-session in the Setup step). Never touches
   // an adopted/external context — its owner (AlphaTab) applies its own device.
+  // A new pick also earns the dead-clock fallback another go, and a transport
+  // that was frozen on it is re-anchored to the clock that starts moving now.
   useEffect(() => onOutputDeviceChange((id) => {
-    if (ownsContextRef.current && audioContextRef.current) applySinkId(audioContextRef.current, id);
+    if (!ownsContextRef.current || !audioContextRef.current) return;
+    deadClockHandledRef.current = false;
+    applySinkId(audioContextRef.current, id).then(() => armSchedulerRef.current?.());
   }), []);
 
   const playSound = useCallback((time: number, kind: ClickKind = 'beat', muted: boolean = false) => {
@@ -504,6 +508,9 @@ export const useMetronome = ({
         && !!ctx.sinkId && typeof ctx.setSinkId === 'function';
       if (!canRetarget) {
         console.warn('[useMetronome] audio clock is not advancing (state:', ctx.state, ') — playback cannot start');
+        // Nothing left to try on our own — the player has to pick an output
+        // that isn't locked (see OutputStalledNotice).
+        notifyOutputStalled();
         return;
       }
       deadClockHandledRef.current = true;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { fuzzyMatchOutputDevice } from "./useNativeOutputDevice";
+import { fuzzyMatchOutputDevice, isExclusiveAsioWrapper } from "./useNativeOutputDevice";
 
 const device = (deviceId: string, label: string): MediaDeviceInfo =>
   ({ deviceId, label, kind: "audiooutput", groupId: "" }) as MediaDeviceInfo;
@@ -31,5 +31,18 @@ describe("fuzzyMatchOutputDevice", () => {
   it("picks the candidate with the longer overlap when multiple match", () => {
     const candidates = [device("1", "Audient"), device("2", "Audient iD4 USB Audio")];
     expect(fuzzyMatchOutputDevice("Audient iD4", candidates)?.deviceId).toBe("2");
+  });
+});
+
+describe("isExclusiveAsioWrapper", () => {
+  it("recognises ASIO4ALL however the driver spells its name", () => {
+    expect(isExclusiveAsioWrapper("ASIO4ALL v2")).toBe(true);
+    expect(isExclusiveAsioWrapper("asio4all")).toBe(true);
+  });
+
+  it("leaves vendor ASIO drivers and empty names alone", () => {
+    expect(isExclusiveAsioWrapper("Focusrite USB ASIO")).toBe(false);
+    expect(isExclusiveAsioWrapper("UMC ASIO Driver")).toBe(false);
+    expect(isExclusiveAsioWrapper(undefined)).toBe(false);
   });
 });

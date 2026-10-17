@@ -31,6 +31,7 @@ import { DesktopSessionView } from "./components/DesktopSessionView";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
 import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
 import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
+import { OutputStalledNotice } from "./components/OutputStalledNotice";
 import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
 import { SessionDialogs } from "./components/SessionDialogs";
 import { SongSectionMapPanel } from "./components/SongSectionMapPanel";
@@ -1281,6 +1282,7 @@ const PracticeSessionInner = ({
       )}
 
       <TuningSettingsModal />
+      <OutputStalledNotice />
     </>
     </SessionUIProvider>
     </BpmProgressProvider>

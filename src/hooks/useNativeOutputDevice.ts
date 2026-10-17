@@ -27,6 +27,30 @@ export function onOutputDeviceChange(cb: (deviceId: string | null) => void): () 
   return () => window.removeEventListener(OUTPUT_DEVICE_CHANGE_EVENT, listener);
 }
 
+const OUTPUT_STALLED_EVENT = "cr:native-output-stalled";
+
+/** Raised by the metronome once it has given up on the current output: the
+ *  audio clock stayed frozen even after falling back to the system default.
+ *  On the desktop build that almost always means an exclusive ASIO driver
+ *  (ASIO4ALL above all) is holding the only output Web Audio could use. */
+export function notifyOutputStalled(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(OUTPUT_STALLED_EVENT));
+}
+
+export function onOutputStalled(cb: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(OUTPUT_STALLED_EVENT, cb);
+  return () => window.removeEventListener(OUTPUT_STALLED_EVENT, cb);
+}
+
+/** ASIO4ALL opens the hardware in kernel-streaming mode and takes the whole
+ *  device, outputs included, so Windows (and with it the app's metronome) can't
+ *  play through that interface while the native stream is running. */
+export function isExclusiveAsioWrapper(deviceName: string | null | undefined): boolean {
+  return /asio4all/i.test(deviceName || "");
+}
+
 // Generic words that show up in almost every audio device name — matching on these
 // alone would false-positive constantly (e.g. every device says "USB"/"Audio").
 const NOISE_TOKENS = new Set([

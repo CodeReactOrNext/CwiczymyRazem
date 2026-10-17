@@ -32,8 +32,16 @@
     "output": "Salida",
     "no_outputs": "No se encontraron dispositivos de salida",
     "output_hint": "Debería coincidir con la interfaz de arriba para que el audio y la captura usen el mismo dispositivo.",
+    "output_hint_asio4all": "ASIO4ALL bloquea toda tu interfaz, salidas incluidas, así que el metrónomo no puede sonar por ella. Elige aquí otra salida (p. ej. los altavoces del ordenador) o, en el panel de ASIO4ALL, desactiva la salida de la interfaz y deja solo la entrada.",
     "before_start": "Antes de empezar",
     "before_start_body": "Asegúrate de que tu interfaz está seleccionada como entrada de micrófono del navegador y de que la guitarra está conectada. Ajustarás la ganancia en la siguiente pantalla."
+  },
+  "output_stall": {
+    "title": "El metrónomo no puede sonar",
+    "body": "Tu driver de audio está ocupando la salida por la que suena la app, así que el metrónomo y las pistas de acompañamiento no se oyen. Elige otra salida, p. ej. los altavoces o la salida de auriculares del ordenador.",
+    "pick": "Elige una salida…",
+    "asio4all": "¿Usas ASIO4ALL? En su panel deja activada solo la entrada de tu interfaz y comprueba que no haya otra tarjeta de sonido marcada.",
+    "close": "Cerrar"
   },
   "tuning": {
     "wrong_string": "¿Cuerda equivocada?",
