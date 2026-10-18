@@ -1,29 +1,20 @@
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
-import { FormGuide } from "feature/duels/components/DuelBits";
 import { getDuelExercise } from "feature/duels/data/duelPool";
 import type {
   DuelOpponentRevealed,
   DuelView,
 } from "feature/duels/types/duel.types";
-import {
-  formatRatingDelta,
-  recentForm,
-  scoreShare,
-} from "feature/duels/utils/duelFormat";
+import { formatRatingDelta, scoreShare } from "feature/duels/utils/duelFormat";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { History } from "lucide-react";
-import { useMemo } from "react";
 
 interface RecentDuelsProps {
   duels: DuelView[];
   highlightedId?: string | null;
 }
-
-/** How many results the header's form guide covers. */
-const FORM_LENGTH = 10;
 
 const RESULT_STYLE: Record<NonNullable<DuelView["result"]>, string> = {
   won: "bg-emerald-500/10 text-emerald-400",
@@ -177,19 +168,15 @@ const RecentDuelRow = ({
   );
 };
 
-/** Settled duels, newest first — the opponent finally has a name. */
+/** Settled duels, newest first — the opponent finally has a name. The form guide lives in the hero. */
 export const RecentDuels = ({ duels, highlightedId }: RecentDuelsProps) => {
   const { t } = useTranslation("duels");
-  const form = useMemo(() => recentForm(duels, FORM_LENGTH), [duels]);
   return (
     <Card className='p-5 sm:p-7'>
-      <div className='flex flex-wrap items-center justify-between gap-3'>
-        <h2 className='flex items-center gap-2 text-base font-semibold text-zinc-100'>
-          <History size={16} className='text-zinc-400' />
-          {t("recent.title")}
-        </h2>
-        <FormGuide form={form} />
-      </div>
+      <h2 className='flex items-center gap-2 text-base font-semibold text-zinc-100'>
+        <History size={16} className='text-zinc-400' />
+        {t("recent.title")}
+      </h2>
       {duels.length === 0 ? (
         <p className='mt-4 text-sm text-zinc-400'>{t("recent.empty")}</p>
       ) : (

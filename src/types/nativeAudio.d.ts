@@ -114,6 +114,10 @@ export interface AmpParams {
   namEnabled: boolean;
   /** Imported NAM model id (see toneStudio.d.ts), or null. */
   namModelId: string | null;
+  /** Which world the guitar plays through: the built-in chain above, or the
+   *  player's own rack of VST3 plugins (Windows desktop — see vstHost.d.ts),
+   *  which replaces that whole chain; only `level` (Master) still applies. */
+  toneMode: "builtin" | "vst";
 }
 
 export interface AmpStreamInfo {
@@ -154,6 +158,8 @@ export interface AmpOverloadInfo {
   /** How much accumulated drift (ms) triggered the recovery. */
   driftMs: number;
   namEnabled: boolean;
+  /** The VST rack was playing. Absent from older shells. */
+  vstEnabled?: boolean;
 }
 
 /** Peak sample levels of the running amp stream over the last ~50 ms window,

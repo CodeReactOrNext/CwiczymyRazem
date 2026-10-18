@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import type { BackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
 import React, { memo, useEffect } from "react";
 
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
@@ -101,6 +102,9 @@ interface ExerciseContentAreaProps {
   /** Backing-track bar, docked directly above the tablature — the video sits in
    *  the same column as the notation you play along to. */
   backingTrackSlot?: React.ReactNode;
+  /** See TablatureSection — the button under Calibrate timing. */
+  backingTrackStatus?: BackingTrackStatus;
+  onOpenBackingTrack?: () => void;
   /** A song item practised over its section map (video + sections) — built
    *  once in PracticeSession and handed to the view that is on screen, so the
    *  player never mounts twice (see MobileExerciseContent). */
@@ -165,6 +169,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   rewardAmount,
   controlsSlot,
   backingTrackSlot,
+  backingTrackStatus,
+  onOpenBackingTrack,
   songSectionMapSlot,
   cinema = false,
   obscured = false,
@@ -285,6 +291,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         {backingTrackSlot}
         <TablatureSection
           cinema={cinema}
+          backingTrackStatus={backingTrackStatus}
+          onOpenBackingTrack={onOpenBackingTrack}
           activeTablature={activeTablature!}
           rawGpFile={rawGpFile}
           baseTempo={currentExercise.metronomeSpeed?.recommended ?? effectiveBpm}

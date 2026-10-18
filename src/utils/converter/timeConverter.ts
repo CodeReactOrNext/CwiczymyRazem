@@ -13,6 +13,10 @@ export const convertMsToHM = (milliseconds: number) => {
   return `${hours}h ${minutes} min`;
 };
 
+/** Duration as whole hours only ("12h"), the minutes dropped. */
+export const convertMsToWholeHours = (milliseconds: number) =>
+  `${Math.floor(Math.max(0, milliseconds) / 3600000).toLocaleString()}h`;
+
 export const formatMinutesDuration = (minutes: number) =>
   convertMsToHM(minutes * 60000);
 

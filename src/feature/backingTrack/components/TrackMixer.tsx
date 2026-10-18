@@ -76,8 +76,8 @@ export function TrackMixer({ tracks, onChange, className }: TrackMixerProps) {
               onClick={() => onChange(track.id, { isMuted: !track.isMuted })}
               title={
                 track.isMuted
-                  ? t("align.unmute", { what: label })
-                  : t("align.mute", { what: label })
+                  ? t("common.unmute", { what: label })
+                  : t("common.mute", { what: label })
               }
               aria-pressed={track.isMuted}
               className={cn(

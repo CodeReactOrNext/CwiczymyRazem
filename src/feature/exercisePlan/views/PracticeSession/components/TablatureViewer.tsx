@@ -286,6 +286,11 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.style            === next.style              &&
   prev.selection        === next.selection          &&
   prev.ambientGlow      === next.ambientGlow        &&
+  // Cinema swaps the board's background for the see-through wash over the video,
+  // and volumeRef decides whether the mic glow is mounted under the staff —
+  // without these a toggle while paused (nothing else changing) never showed.
+  prev.cinema           === next.cinema             &&
+  prev.volumeRef        === next.volumeRef          &&
   prev.palette          === next.palette            &&
   prev.isLightBoard     === next.isLightBoard        &&
   prev.quarterTurned    === next.quarterTurned      &&

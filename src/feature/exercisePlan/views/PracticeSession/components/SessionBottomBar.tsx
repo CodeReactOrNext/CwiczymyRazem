@@ -187,13 +187,15 @@ const SessionBottomBarComponent = ({
                 {(isFinishing || isSubmittingReport) ? (
                   <span>{t("session:saving")}</span>
                 ) : isLastExercise ? (
-                  <>
-                    <span className="flex items-center gap-2">{t("common:finish_session")}</span> <Check size='1em' />
-                  </>
+                  <span className="flex items-center gap-2">
+                    {t("common:finish_session")}
+                    <Check size='1em' />
+                  </span>
                 ) : (
-                  <>
-                    <span className="flex items-center gap-2">{t("next") || "Next"}</span> <SkipForward size='1em' />
-                  </>
+                  <span className="flex items-center gap-2">
+                    {t("next") || "Next"}
+                    <SkipForward size='1em' />
+                  </span>
                 )}
               </Button>
               {isLastExercise && isEarlyFinish && (

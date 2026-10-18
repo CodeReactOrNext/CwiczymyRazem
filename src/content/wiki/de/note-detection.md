@@ -48,7 +48,7 @@ Solange eine Note klingt, zeigt ein kleines Stimmgerät darüber, wo die Saite s
 
 Das Diagramm unter der Zusammenfassung zeigt jede Note des Durchlaufs der Reihe nach: wie weit jede vom Schlag landete, bei Bending-Übungen von ihrer Tonhöhe, mit dem grünen Band, das die Bestnote markiert. Ein Durchlauf, der straff beginnt und driftet, während deine Hand ermüdet, zeigt sich dort sofort.
 
-Wenn jede Note um etwa denselben Betrag in dieselbe Richtung kippt, ist das meist Audioverzögerung und nicht deine Hände. Drück bei eingeschaltetem Mikro **Timing kalibrieren** neben dem Ergebnis über dem Tab und spiel zu ein paar Klicks mit. Die App misst die Verzögerung deiner Lautsprecher oder deines Interfaces und bewertet von da an dagegen.
+Wenn jede Note um etwa denselben Betrag in dieselbe Richtung kippt, ist das meist Audioverzögerung und nicht deine Hände. Drück bei eingeschaltetem Mikro **Timing kalibrieren** neben dem Ergebnis über dem Tab und spiel zu ein paar Klicks mit. Die App misst die Verzögerung deiner Lautsprecher oder deines Interfaces und bewertet von da an dagegen. Danach zeigt eine Karte, wo jeder Anschlag im Verhältnis zu seinem Klick landete, und du behältst das Ergebnis mit **Passt** oder spielst noch einmal.
 
 ## Einrichten
 

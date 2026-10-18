@@ -2,11 +2,13 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { resetAmpSimStoreForTests } from "feature/toneStudio/services/ampSimStore";
+import { resetVstHostStoreForTests } from "feature/toneStudio/services/vstHostStore";
 import {
   AMP_HEAD_SRC,
   OVERDRIVE_PEDAL_SRC,
 } from "feature/toneStudio/utils/gearArt";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { VstLibrary, VstRackStatus } from "types/vstHost";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ToneStudioView } from "./ToneStudioView";
 
@@ -135,6 +137,75 @@ describe("ToneStudioView", () => {
 
     fireEvent.click(lamp);
     // Toggling a lamp must not drag the stage over to that unit.
+    expect(screen.getByRole("slider", { name: "Preamp" })).toBeTruthy();
+  });
+});
+
+describe("ToneStudioView with VST hosting", () => {
+  beforeEach(() => {
+    resetVstHostStoreForTests();
+    const rack: VstRackStatus = {
+      supported: true,
+      error: null,
+      toneMode: "builtin",
+      slots: [],
+      latencyMs: 0,
+    };
+    const library: VstLibrary = {
+      scannedAt: null,
+      plugins: [],
+      failed: [],
+      sources: { folders: [], files: [] },
+    };
+    window.vstHost = {
+      isAvailable: true,
+      listPlugins: vi.fn().mockResolvedValue(library),
+      scan: vi.fn().mockResolvedValue(library),
+      addFile: vi.fn().mockResolvedValue(null),
+      addFolder: vi.fn().mockResolvedValue(null),
+      removeSource: vi.fn().mockResolvedValue(library),
+      getRack: vi.fn().mockResolvedValue(rack),
+      addToRack: vi.fn().mockResolvedValue(rack),
+      removeFromRack: vi.fn().mockResolvedValue(rack),
+      moveInRack: vi.fn().mockResolvedValue(rack),
+      setBypass: vi.fn().mockResolvedValue(rack),
+      openEditor: vi.fn().mockResolvedValue(rack),
+      closeEditor: vi.fn().mockResolvedValue(rack),
+      onEvent: vi.fn(() => () => {}),
+      onScanProgress: vi.fn(() => () => {}),
+    };
+  });
+
+  afterEach(() => {
+    delete window.vstHost;
+  });
+
+  it("asks built-in vs VST first, then opens the chosen world", async () => {
+    render(<ToneStudioView />);
+    expect(
+      await screen.findByText("How do you want to shape your sound?"),
+    ).toBeTruthy();
+    expect(screen.queryByRole("slider", { name: "Preamp" })).toBeNull();
+
+    fireEvent.click(screen.getByText("Your VST plugins"));
+    expect(screen.getByText("Your rack is empty")).toBeTruthy();
+    // Never scanned: the library offers the scan instead of running it.
+    expect(
+      await screen.findByText("Find the plugins on this computer"),
+    ).toBeTruthy();
+    expect(window.vstHost?.scan).not.toHaveBeenCalled();
+  });
+
+  it("switches between the two worlds from the rail once chosen", async () => {
+    localStorage.setItem("tone_studio_mode_chosen", "1");
+    render(<ToneStudioView />);
+    expect(await screen.findByRole("slider", { name: "Preamp" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("radio", { name: "VST rack" }));
+    expect(screen.getByText("Your rack is empty")).toBeTruthy();
+    expect(screen.queryByRole("slider", { name: "Preamp" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("radio", { name: "Built-in" }));
     expect(screen.getByRole("slider", { name: "Preamp" })).toBeTruthy();
   });
 });

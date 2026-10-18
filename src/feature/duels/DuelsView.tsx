@@ -140,7 +140,7 @@ export const DuelsView = () => {
             <RecentDuels duels={recent} highlightedId={highlightedId} />
           )}
 
-          {overview && <DuelFeed feed={overview.feed} uid={uid} now={now} />}
+          {overview && <DuelFeed feed={overview.feed} now={now} />}
         </div>
 
         <aside className='flex min-w-0 flex-col gap-6'>

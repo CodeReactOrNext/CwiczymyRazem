@@ -23,7 +23,7 @@ export const BUILT_IN_PRESETS: TonePreset[] = [
       preampGain: 0.1, drive: 0.05, bass: 0.5, mid: 0.45, treble: 0.62, level: 0.68, cab: true, gate: true,
       overdriveEnabled: false, overdriveDrive: 0.35, overdriveTone: 0.5, overdriveLevel: 0.5,
       delayEnabled: false, delayMs: 250, delayFeedback: 0.5, delayMix: 0.12,
-      irId: null, namEnabled: false, namModelId: null,
+      irId: null, namEnabled: false, namModelId: null, toneMode: "builtin",
     },
   },
   {
@@ -35,7 +35,7 @@ export const BUILT_IN_PRESETS: TonePreset[] = [
       preampGain: 0.25, drive: 0.18, bass: 0.55, mid: 0.6, treble: 0.55, level: 0.62, cab: true, gate: true,
       overdriveEnabled: false, overdriveDrive: 0.35, overdriveTone: 0.5, overdriveLevel: 0.5,
       delayEnabled: false, delayMs: 200, delayFeedback: 0.55, delayMix: 0.08,
-      irId: null, namEnabled: false, namModelId: null,
+      irId: null, namEnabled: false, namModelId: null, toneMode: "builtin",
     },
   },
   {
@@ -47,7 +47,7 @@ export const BUILT_IN_PRESETS: TonePreset[] = [
       preampGain: 0.55, drive: 0.42, bass: 0.48, mid: 0.68, treble: 0.52, level: 0.55, cab: true, gate: true,
       overdriveEnabled: false, overdriveDrive: 0.35, overdriveTone: 0.5, overdriveLevel: 0.5,
       delayEnabled: true, delayMs: 380, delayFeedback: 0.28, delayMix: 0.22,
-      irId: null, namEnabled: false, namModelId: null,
+      irId: null, namEnabled: false, namModelId: null, toneMode: "builtin",
     },
   },
   {
@@ -59,7 +59,7 @@ export const BUILT_IN_PRESETS: TonePreset[] = [
       preampGain: 0.05, drive: 0.02, bass: 0.5, mid: 0.4, treble: 0.55, level: 0.62, cab: true, gate: false,
       overdriveEnabled: false, overdriveDrive: 0.35, overdriveTone: 0.5, overdriveLevel: 0.5,
       delayEnabled: true, delayMs: 550, delayFeedback: 0.42, delayMix: 0.35,
-      irId: null, namEnabled: false, namModelId: null,
+      irId: null, namEnabled: false, namModelId: null, toneMode: "builtin",
     },
   },
 ];

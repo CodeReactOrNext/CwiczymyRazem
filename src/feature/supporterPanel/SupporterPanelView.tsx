@@ -7,7 +7,6 @@ import { RoadmapBoardTab } from "feature/supporterPanel/components/RoadmapBoardT
 import { SupporterInfo } from "feature/supporterPanel/components/SupporterInfo";
 import { SupporterPitch } from "feature/supporterPanel/components/SupporterPitch";
 import { TokenWalletBar } from "feature/supporterPanel/components/TokenWalletBar";
-import { UserRoadmapsTab } from "feature/supporterPanel/components/UserRoadmapsTab";
 import { useSupporterRoadmap } from "feature/supporterPanel/hooks/useSupporterRoadmap";
 import { SupporterWall } from "feature/supportTeam/components/SupporterWall";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
@@ -15,7 +14,6 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { WorkBoardTab } from "feature/workBoard/components/WorkBoardTab";
 import { useTranslation } from "hooks/useTranslation";
 import {
-  Compass,
   Guitar,
   Hammer,
   Heart,
@@ -25,7 +23,7 @@ import {
   Shield,
 } from "lucide-react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 type SupporterTab =
@@ -35,8 +33,7 @@ type SupporterTab =
   | "guild"
   | "work"
   | "wall"
-  | "info"
-  | "players";
+  | "info";
 
 /** Labels are keys in `supporter:panel.tabs`. */
 const TABS: { id: SupporterTab; icon: typeof Map }[] = [
@@ -46,7 +43,6 @@ const TABS: { id: SupporterTab; icon: typeof Map }[] = [
   { id: "guild", icon: Shield },
   { id: "work", icon: Hammer },
   { id: "wall", icon: Heart },
-  { id: "players", icon: Compass },
   { id: "info", icon: Info },
 ];
 
@@ -75,6 +71,13 @@ export const SupporterPanelView = () => {
    * writing a gear proposal — can send somebody back to the board they left
    * rather than to the roadmap.
    */
+  // Player Roadmaps moved to a page of its own under My Stuff; an old link to
+  // the tab that used to hold them lands there instead of on the roadmap tab.
+  const movedToRoadmaps = router.query.tab === "players";
+  useEffect(() => {
+    if (movedToRoadmaps) void router.replace("/my-roadmaps");
+  }, [movedToRoadmaps, router]);
+
   const openTab = (next: SupporterTab) => {
     setTab(next);
     void router.replace(
@@ -123,7 +126,7 @@ export const SupporterPanelView = () => {
           <SupporterPitch />
         ) : (
           <>
-            {/* Nine tabs, so the rail scrolls sideways on a phone rather than
+            {/* Seven tabs, so the rail scrolls sideways on a phone rather than
                 wrapping into three rows of its own. */}
             <div className={tabNavListClass}>
               {TABS.map(({ id, icon: Icon }) => (
@@ -159,10 +162,6 @@ export const SupporterPanelView = () => {
             {tab === "work" && <WorkBoardTab enabled={isSupporter} />}
 
             {tab === "wall" && <SupporterWall />}
-
-            {tab === "players" && (
-              <UserRoadmapsTab enabled={isSupporter} wallet={board?.wallet} />
-            )}
 
             {tab === "info" && <SupporterInfo />}
           </>

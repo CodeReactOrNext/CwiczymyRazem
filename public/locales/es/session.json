@@ -94,7 +94,12 @@
     "heard": "{{hits}} de {{total}} clics oídos, estable dentro de ±{{spread}} ms",
     "saved_before": "Guardado antes",
     "estimated_before": "Estimado antes",
-    "use": "Usar {{ms}} ms"
+    "use": "Está bien · {{ms}} ms",
+    "map": {
+      "title": "Dónde cayó cada pulsación",
+      "click": "Clic",
+      "aria": "{{hits}} de {{total}} pulsaciones oídas, normalmente {{ms}} ms después del clic"
+    }
   },
   "add_to_plan": "Añadir al plan",
   "saving": "Guardando…",

@@ -36,23 +36,27 @@ import type {
   UserRoadmapSummary,
 } from "feature/supporterPanel/types/userRoadmaps.types";
 import {
+  arrangeOwnRoadmaps,
   arrangeRoadmaps,
+  featuredRoadmap,
+  isViewersRoadmap,
   type LevelFilter,
   ROADMAP_SORTS,
   type RoadmapSort,
+  viewerRun,
 } from "feature/supporterPanel/utils/roadmapBoard";
 import {
   displayDescription,
   displayTitle,
-  levelTone,
+  levelTextTone,
 } from "feature/supporterPanel/utils/roadmapGoal";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
-import { Interpolate } from "lib/i18n/Interpolate";
 import { ROADMAP_LEVELS } from "lib/roadmaps/generation/levels";
 import {
   ArrowLeft,
+  ArrowRight,
   ArrowUpDown,
   Dumbbell,
   Lock,
@@ -114,26 +118,65 @@ const withProgress = (
 /** Nothing a supporter does in the map belongs in somebody else's document. */
 const doNotPersist = async () => {};
 
-const Pill = ({ tone, children }: { tone: string; children: string }) => (
+const PlayerAvatar = ({
+  summary,
+  className,
+}: {
+  summary: UserRoadmapSummary;
+  className?: string;
+}) => (
   <span
     className={cn(
-      "shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold",
-      tone,
+      "h-8 w-8 shrink-0 overflow-hidden rounded-full bg-zinc-800",
+      className,
     )}>
-    {children}
-  </span>
-);
-
-const PlayerAvatar = ({ summary }: { summary: UserRoadmapSummary }) => (
-  <span className='h-8 w-8 shrink-0 overflow-hidden rounded-full bg-zinc-800'>
     {summary.avatar ? (
       // eslint-disable-next-line @next/next/no-img-element
       <img src={summary.avatar} alt='' className='h-full w-full object-cover' />
     ) : (
       <span className='flex h-full w-full items-center justify-center text-zinc-500'>
-        <User size={16} />
+        <User size={14} />
       </span>
     )}
+  </span>
+);
+
+/**
+ * The roadmap's shape: one segment per phase, as wide as its steps, filled
+ * with the steps the run has finished — emerald once a phase is through.
+ * Drawn on every card, started or not: the shape says how the roadmap is
+ * built, which an empty progress bar never did.
+ */
+const PhaseStrip = ({
+  sizes,
+  done,
+  className,
+}: {
+  sizes: number[];
+  done: number[];
+  className?: string;
+}) => (
+  <span aria-hidden className={cn("flex h-1.5 w-full gap-1", className)}>
+    {sizes.map((size, index) => {
+      const finished = Math.min(done[index] ?? 0, size);
+      const complete = size > 0 && finished === size;
+      return (
+        <span
+          key={index}
+          className='relative h-full min-w-1.5 overflow-hidden rounded-full bg-zinc-800'
+          style={{ flex: `${Math.max(size, 1)} 1 0%` }}>
+          {finished > 0 && (
+            <span
+              className={cn(
+                "absolute inset-y-0 left-0 rounded-full",
+                complete ? "bg-emerald-400" : "bg-cyan-400",
+              )}
+              style={{ width: `${(finished / size) * 100}%` }}
+            />
+          )}
+        </span>
+      );
+    })}
   </span>
 );
 
@@ -399,134 +442,188 @@ const RoadmapDetail = ({
 };
 
 /**
- * One roadmap on the board — the player, their goal and how far they got.
- * Most roadmaps on the board were never started, so the progress bar is only
- * drawn once there is progress to draw; an empty bar on every card says
- * nothing and makes the grid look unfinished.
+ * One roadmap on the board, laid out like the curated cards on /ai-coach: the
+ * name, the level and size, the goal, the shape of the phases, and the step a
+ * session would start on — the one thing a card can say about what to do next.
+ *
+ * The author line is only there when it says something: on the viewer's own
+ * roadmaps it would be their own name on every card of the section.
  *
  * The numbers are only ever the viewer's own run: their roadmap, or one they
- * follow. On anybody else's roadmap the owner's progress is not shown at all.
+ * follow. On anybody else's roadmap the owner's progress is not shown at all —
+ * the card offers the first step instead.
  */
 const RoadmapTile = ({
   summary,
   viewerUid,
   onOpen,
+  featured = false,
 }: {
   summary: UserRoadmapSummary;
   viewerUid: string | null;
   onOpen: () => void;
+  /**
+   * The roadmap under way, drawn wide at the head of "Your roadmaps": the
+   * name and goal on one side, the phases and the next step on the other.
+   */
+  featured?: boolean;
 }) => {
   const { t } = useTranslation(["supporter", "ai_coach"]);
   const intl = useIntlLocale();
   const isOwn = viewerUid != null && viewerUid === summary.userId;
-  const run = summary.viewerProgress ?? (isOwn ? summary : null);
+  const run = viewerRun(summary, viewerUid);
   const following = summary.viewerProgress != null;
-  const percent =
-    run && summary.stepCount
-      ? Math.round((run.completedSteps / summary.stepCount) * 100)
-      : 0;
   const started = !!run && run.sessionsCompleted > 0;
+  const complete =
+    !!run && summary.stepCount > 0 && run.completedSteps >= summary.stepCount;
+  const title = displayTitle(summary);
+  const description = displayDescription(summary);
   const created = formatDate(
     following ? (summary.viewerProgress?.startedAt ?? null) : summary.createdAt,
     intl,
   );
   const practised = formatDate(run?.lastPractisedAt ?? null, intl);
+  // A listing from before the per-phase counts: even segments, nothing filled.
+  const phaseSizes = summary.phaseSteps?.length
+    ? summary.phaseSteps
+    : Array.from({ length: summary.phaseCount }, () => 1);
+  const nextStep = run ? run.nextStep : summary.firstStep;
 
-  return (
-    <button
-      type='button'
-      onClick={onOpen}
-      className='group flex h-full w-full flex-col gap-4 rounded-lg bg-zinc-900/40 p-5 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70'>
-      <span className='flex w-full items-center gap-3'>
-        <PlayerAvatar summary={summary} />
-        <span className='min-w-0 flex-1 truncate text-sm text-zinc-400'>
-          {following
-            ? t("panel.by", {
-                name: summary.displayName ?? t("panel.players.unknown"),
-              })
-            : (summary.displayName ?? t("panel.players.unknown"))}
-        </span>
-        {summary.visibility === "private" && (
-          <span className='flex shrink-0 items-center gap-1 rounded-md bg-zinc-800 px-2 py-0.5 text-[11px] font-bold text-zinc-400'>
-            <Lock size={11} />
-            {t("panel.generate.visibility.private.label")}
-          </span>
-        )}
+  const nextLabel = complete
+    ? t("ai_coach:card.all_done")
+    : started
+      ? t("ai_coach:card.up_next")
+      : run
+        ? t("ai_coach:card.first_step")
+        : t("panel.players.first_step");
+  const action = !run
+    ? t("panel.players.view")
+    : complete
+      ? t("ai_coach:card.review")
+      : started
+        ? t("ai_coach:card.continue")
+        : t("ai_coach:card.start");
+
+  const author = !isOwn && (
+    <span className='flex w-full items-center gap-2.5'>
+      <PlayerAvatar summary={summary} className='h-6 w-6' />
+      <span className='min-w-0 flex-1 truncate text-sm text-zinc-400'>
+        {following
+          ? t("panel.by", {
+              name: summary.displayName ?? t("panel.players.unknown"),
+            })
+          : (summary.displayName ?? t("panel.players.unknown"))}
+      </span>
+    </span>
+  );
+
+  const heading = (
+    <span className='flex flex-col gap-2.5'>
+      <span
+        className={cn(
+          "line-clamp-2 break-words font-bold leading-tight tracking-tight text-zinc-100",
+          featured ? "text-2xl md:text-3xl" : "text-xl",
+        )}>
+        {title}
+      </span>
+      <span className='flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-400'>
         {summary.level && (
-          <Pill tone={levelTone(summary.level)}>
+          <span
+            className={cn(
+              "inline-flex items-center gap-2 font-medium",
+              levelTextTone(summary.level),
+            )}>
+            <span aria-hidden className='h-1.5 w-1.5 rounded-full bg-current' />
             {t(`ai_coach:levels.${summary.level}`, summary.level)}
-          </Pill>
+          </span>
         )}
-      </span>
-
-      <span className='flex flex-col gap-1.5'>
-        <span className='line-clamp-2 text-base font-bold leading-snug text-zinc-100'>
-          {displayTitle(summary)}
+        <span className='tabular-nums'>
+          {t("ai_coach:phases_steps", {
+            phases: summary.phaseCount,
+            steps: summary.stepCount,
+          })}
         </span>
-        {displayDescription(summary) && (
-          <span className='line-clamp-2 text-sm leading-relaxed text-zinc-400'>
-            {displayDescription(summary)}
-          </span>
-        )}
-      </span>
-
-      <span className='mt-auto flex w-full flex-col gap-3'>
-        <span className='flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500'>
-          <span>
-            {t("ai_coach:phases_steps", {
-              phases: summary.phaseCount,
-              steps: summary.stepCount,
-            })}
-          </span>
+        <span className='flex items-center gap-3 tabular-nums text-zinc-500'>
           <span
             className='flex items-center gap-1.5'
             title={t("panel.players.exercises")}>
-            <Dumbbell size={13} />
+            <Dumbbell size={13} aria-hidden />
+            <span className='sr-only'>{t("panel.players.exercises")}</span>
             {summary.exerciseSteps}
           </span>
           {summary.songSteps > 0 && (
             <span
               className='flex items-center gap-1.5'
               title={t("panel.players.songs")}>
-              <Music size={13} />
+              <Music size={13} aria-hidden />
+              <span className='sr-only'>{t("panel.players.songs")}</span>
               {summary.songSteps}
             </span>
           )}
           <span
             className='flex items-center gap-1.5'
             title={t("panel.players.lessons")}>
-            <FaYoutube size={13} />
+            <FaYoutube size={13} aria-hidden />
+            <span className='sr-only'>{t("panel.players.lessons")}</span>
             {summary.lessonSteps}
           </span>
-          {summary.followerCount > 0 && (
-            <span className='flex items-center gap-1.5'>
-              <Users size={13} />
-              {t("panel.players.following_count", {
-                count: summary.followerCount,
-              })}
-            </span>
-          )}
         </span>
+        {summary.visibility === "private" && (
+          <span className='flex items-center gap-1.5'>
+            <Lock size={13} aria-hidden />
+            {t("panel.generate.visibility.private.label")}
+          </span>
+        )}
+        {summary.followerCount > 0 && (
+          <span className='flex items-center gap-1.5'>
+            <Users size={13} aria-hidden />
+            {t("panel.players.following_count", {
+              count: summary.followerCount,
+            })}
+          </span>
+        )}
+      </span>
+    </span>
+  );
 
+  const descriptionText = description && (
+    <span
+      className={cn(
+        "text-sm leading-relaxed text-zinc-400",
+        featured ? "line-clamp-3" : "line-clamp-2",
+      )}>
+      {description}
+    </span>
+  );
+
+  const progress = (
+    <span className='flex flex-col gap-2.5'>
+      <PhaseStrip
+        sizes={phaseSizes}
+        done={run?.phaseDone ?? []}
+        className={featured ? "h-2" : undefined}
+      />
+      <span className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm text-zinc-500'>
         {started && run ? (
-          <span className='flex w-full items-center gap-4'>
-            <span className='h-1 flex-1 overflow-hidden rounded-full bg-zinc-800'>
-              <span
-                className='block h-full rounded-full bg-cyan-400'
-                style={{ width: `${percent}%` }}
-              />
-            </span>
-            <span className='shrink-0 text-sm tabular-nums text-zinc-400'>
+          <>
+            <span className='tabular-nums text-zinc-300'>
               {t("ai_coach:steps_of", {
                 done: run.completedSteps,
                 total: summary.stepCount,
               })}{" "}
               ·{" "}
-              {t("ai_coach:refine.sessions", { count: run.sessionsCompleted })}
+              {t("ai_coach:refine.sessions", {
+                count: run.sessionsCompleted,
+              })}
             </span>
-          </span>
+            {practised && (
+              <span>
+                {t("panel.players.last_practised", { date: practised })}
+              </span>
+            )}
+          </>
         ) : (
-          <span className='text-sm text-zinc-500'>
+          <span>
             {following
               ? t("panel.players.following_none")
               : t("panel.players.not_started")}
@@ -535,12 +632,74 @@ const RoadmapTile = ({
               : ""}
           </span>
         )}
-        {started && practised && (
-          <span className='-mt-1 text-sm text-zinc-500'>
-            {t("panel.players.last_practised", { date: practised })}
-          </span>
+      </span>
+    </span>
+  );
+
+  const footer = (
+    <span className='mt-auto flex w-full flex-wrap items-end justify-between gap-4'>
+      <span className='flex min-w-0 flex-1 basis-40 flex-col gap-1'>
+        {nextStep !== undefined && (
+          <>
+            <span
+              className={cn(
+                "text-sm",
+                complete ? "text-emerald-300" : "text-zinc-500",
+              )}>
+              {nextLabel}
+            </span>
+            <span
+              className={cn(
+                "line-clamp-2 font-medium leading-relaxed text-zinc-200",
+                featured ? "text-base" : "text-sm",
+              )}>
+              {nextStep ?? t("ai_coach:card.revisit")}
+            </span>
+          </>
         )}
       </span>
+      {/* The whole card is the button; this only says what pressing it does. */}
+      <span
+        aria-hidden
+        className={cn(
+          "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors",
+          run
+            ? "bg-white text-zinc-950 group-hover:bg-zinc-200"
+            : "bg-zinc-800 text-zinc-200 group-hover:bg-zinc-700",
+        )}>
+        {action}
+        <ArrowRight size={16} />
+      </span>
+    </span>
+  );
+
+  // Wide, it sits a shade lighter than the grid under it — set apart by its
+  // ground, not by a frame.
+  return featured ? (
+    <button
+      type='button'
+      onClick={onOpen}
+      className='group grid w-full gap-8 rounded-lg bg-zinc-800/40 p-6 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800/60 md:p-8 lg:grid-cols-2 lg:gap-12'>
+      <span className='flex min-w-0 flex-col gap-5'>
+        {author}
+        {heading}
+        {descriptionText}
+      </span>
+      <span className='flex min-w-0 flex-col gap-8 lg:justify-center'>
+        {progress}
+        {footer}
+      </span>
+    </button>
+  ) : (
+    <button
+      type='button'
+      onClick={onOpen}
+      className='group flex h-full w-full flex-col gap-5 rounded-lg bg-zinc-900/40 p-5 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70 sm:p-6'>
+      {author}
+      {heading}
+      {descriptionText}
+      {progress}
+      {footer}
     </button>
   );
 };
@@ -567,9 +726,11 @@ const TileGrid = ({
 );
 
 const SectionHeading = ({ title, count }: { title: string; count: number }) => (
-  <h2 className='flex items-baseline gap-2 text-sm font-bold text-zinc-200'>
+  <h2 className='flex items-baseline gap-2.5 text-lg font-bold text-zinc-100'>
     {title}
-    <span className='font-normal tabular-nums text-zinc-500'>{count}</span>
+    <span className='text-sm font-normal tabular-nums text-zinc-500'>
+      {count}
+    </span>
   </h2>
 );
 
@@ -663,8 +824,29 @@ export const UserRoadmapsTab = ({
     setOpenRow(summary);
   };
 
-  const filtered = useMemo(() => {
-    const arranged = arrangeRoadmaps(roadmaps, { level, sort });
+  // The viewer's own roadmaps — the ones they generated and the ones they
+  // started — stand apart from the board, above it: they are what the viewer
+  // came back for, so the board's filters never hide them. The one under way
+  // goes up front, wide.
+  const own = useMemo(
+    () =>
+      arrangeOwnRoadmaps(
+        roadmaps.filter((summary) => isViewersRoadmap(summary, viewerUid)),
+        viewerUid,
+      ),
+    [roadmaps, viewerUid],
+  );
+  const featured = featuredRoadmap(own, viewerUid);
+  const ownRest = featured
+    ? own.filter((summary) => summary !== featured)
+    : own;
+
+  const board = useMemo(
+    () => roadmaps.filter((summary) => !isViewersRoadmap(summary, viewerUid)),
+    [roadmaps, viewerUid],
+  );
+  const others = useMemo(() => {
+    const arranged = arrangeRoadmaps(board, { level, sort });
     const needle = term.trim().toLowerCase();
     if (!needle) return arranged;
     return arranged.filter((roadmap) =>
@@ -678,19 +860,7 @@ export const UserRoadmapsTab = ({
         .filter(Boolean)
         .some((field) => String(field).toLowerCase().includes(needle)),
     );
-  }, [roadmaps, term, level, sort]);
-
-  // The viewer's own roadmaps first — the ones they generated and the ones
-  // they started — because those are what they came back for.
-  const isMine = (summary: UserRoadmapSummary) =>
-    summary.userId === viewerUid || summary.viewerProgress != null;
-  const own = filtered.filter(isMine);
-  const others = filtered.filter((summary) => !isMine(summary));
-
-  const playerCount = useMemo(
-    () => new Set(roadmaps.map((roadmap) => roadmap.userId)).size,
-    [roadmaps],
-  );
+  }, [board, term, level, sort]);
 
   const pendingRow =
     !openRow && pendingId
@@ -731,7 +901,7 @@ export const UserRoadmapsTab = ({
   }
 
   return (
-    <div className='space-y-10'>
+    <div className='space-y-12'>
       <GenerateRoadmapCard onGenerated={openGenerated} wallet={wallet} />
 
       {isLoading ? (
@@ -757,123 +927,116 @@ export const UserRoadmapsTab = ({
         </div>
       ) : (
         <>
-          <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-            <p className='text-sm text-zinc-400'>
-              <Interpolate
-                text={t("panel.players.count", { count: playerCount })}
-                values={{
-                  total: (
-                    <span className='font-semibold tabular-nums text-zinc-200'>
-                      {roadmaps.length}
-                    </span>
-                  ),
-                  players: (
-                    <span className='font-semibold tabular-nums text-zinc-200'>
-                      {playerCount}
-                    </span>
-                  ),
-                }}
-              />
-            </p>
-
-            <div className='relative w-full sm:max-w-xs'>
-              <Search
-                size={15}
-                className='pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500'
-              />
-              <input
-                type='text'
-                value={term}
-                onChange={(event) => setTerm(event.target.value)}
-                placeholder={t("panel.players.filter")}
-                className='w-full rounded-lg bg-zinc-900/60 py-2.5 pl-11 pr-4 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-700'
-              />
-            </div>
-          </div>
-
-          <div className='-mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-            <div
-              role='group'
-              aria-label={t("panel.generate.level")}
-              className='flex flex-wrap gap-1 rounded-lg bg-zinc-900/40 p-1'>
-              {["all", ...ROADMAP_LEVELS].map((candidate) => (
-                <button
-                  key={candidate}
-                  type='button'
-                  onClick={() => setLevel(candidate)}
-                  aria-pressed={level === candidate}
-                  className={cn(
-                    "rounded-md px-3 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-zinc-500",
-                    level === candidate
-                      ? "bg-zinc-700 text-zinc-50"
-                      : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                  )}>
-                  {candidate === "all"
-                    ? t("panel.players.all_levels")
-                    : t(`ai_coach:levels.${candidate}`, candidate)}
-                </button>
-              ))}
-            </div>
-
-            <Select
-              value={sort}
-              onValueChange={(value) => setSort(value as RoadmapSort)}>
-              <SelectTrigger
-                aria-label={t("panel.players.sort_by")}
-                className='h-10 w-full gap-2 border-0 bg-zinc-900/60 px-3 text-sm font-semibold text-zinc-200 md:w-48'>
-                <span className='flex items-center gap-1.5 text-zinc-500'>
-                  <ArrowUpDown size={14} aria-hidden />
-                </span>
-                <SelectValue>
-                  {t(
-                    `panel.players.sorts.${sort}`,
-                    ROADMAP_SORTS.find((option) => option.id === sort)?.label ??
-                      sort,
-                  )}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {ROADMAP_SORTS.map((option) => (
-                  <SelectItem key={option.id} value={option.id}>
-                    {t(`panel.players.sorts.${option.id}`, option.label)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           {own.length > 0 && (
-            <section className='space-y-4'>
+            <section className='space-y-5'>
               <SectionHeading
                 title={t("panel.players.yours")}
                 count={own.length}
               />
-              <TileGrid
-                summaries={own}
-                viewerUid={viewerUid}
-                onOpen={openFromList}
-              />
+              {featured && (
+                <RoadmapTile
+                  featured
+                  summary={featured}
+                  viewerUid={viewerUid}
+                  onOpen={() => openFromList(featured)}
+                />
+              )}
+              {ownRest.length > 0 && (
+                <TileGrid
+                  summaries={ownRest}
+                  viewerUid={viewerUid}
+                  onOpen={openFromList}
+                />
+              )}
             </section>
           )}
 
-          {others.length > 0 && (
-            <section className='space-y-4'>
-              <SectionHeading
-                title={t("panel.players.others")}
-                count={others.length}
-              />
-              <TileGrid
-                summaries={others}
-                viewerUid={viewerUid}
-                onOpen={openFromList}
-              />
-            </section>
-          )}
+          {board.length > 0 && (
+            <section className='space-y-5'>
+              <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+                <SectionHeading
+                  title={t("panel.players.others")}
+                  count={others.length}
+                />
 
-          {!filtered.length && (
-            <p className='py-10 text-center text-sm text-zinc-400'>
-              {t("panel.players.no_match")}
-            </p>
+                <div className='relative w-full sm:max-w-xs'>
+                  <Search
+                    size={15}
+                    className='pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500'
+                  />
+                  <input
+                    type='text'
+                    value={term}
+                    onChange={(event) => setTerm(event.target.value)}
+                    placeholder={t("panel.players.filter")}
+                    className='w-full rounded-lg bg-zinc-900/60 py-2.5 pl-11 pr-4 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-700'
+                  />
+                </div>
+              </div>
+
+              <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
+                <div
+                  role='group'
+                  aria-label={t("panel.generate.level")}
+                  className='flex flex-wrap gap-1 rounded-lg bg-zinc-900/40 p-1'>
+                  {["all", ...ROADMAP_LEVELS].map((candidate) => (
+                    <button
+                      key={candidate}
+                      type='button'
+                      onClick={() => setLevel(candidate)}
+                      aria-pressed={level === candidate}
+                      className={cn(
+                        "rounded-md px-3 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-zinc-500",
+                        level === candidate
+                          ? "bg-zinc-700 text-zinc-50"
+                          : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
+                      )}>
+                      {candidate === "all"
+                        ? t("panel.players.all_levels")
+                        : t(`ai_coach:levels.${candidate}`, candidate)}
+                    </button>
+                  ))}
+                </div>
+
+                <Select
+                  value={sort}
+                  onValueChange={(value) => setSort(value as RoadmapSort)}>
+                  <SelectTrigger
+                    aria-label={t("panel.players.sort_by")}
+                    className='h-10 w-full gap-2 border-0 bg-zinc-900/60 px-3 text-sm font-semibold text-zinc-200 md:w-48'>
+                    <span className='flex items-center gap-1.5 text-zinc-500'>
+                      <ArrowUpDown size={14} aria-hidden />
+                    </span>
+                    <SelectValue>
+                      {t(
+                        `panel.players.sorts.${sort}`,
+                        ROADMAP_SORTS.find((option) => option.id === sort)
+                          ?.label ?? sort,
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROADMAP_SORTS.map((option) => (
+                      <SelectItem key={option.id} value={option.id}>
+                        {t(`panel.players.sorts.${option.id}`, option.label)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {others.length > 0 ? (
+                <TileGrid
+                  summaries={others}
+                  viewerUid={viewerUid}
+                  onOpen={openFromList}
+                />
+              ) : (
+                <p className='py-10 text-center text-sm text-zinc-400'>
+                  {t("panel.players.no_match")}
+                </p>
+              )}
+            </section>
           )}
         </>
       )}

@@ -67,12 +67,18 @@ export const DuelRatingSummary = ({ overview }: DuelRatingSummaryProps) => {
             })}
           </span>
           <span className='text-zinc-600'> · </span>
+          {/* Draws only once there is one — "0D" is noise, and the ladder leaves it out too. */}
           <span className='tabular-nums text-zinc-400'>
-            {t("rating.record", {
-              wins: overview.wins,
-              losses: overview.losses,
-              draws: overview.draws,
-            })}
+            {overview.draws > 0
+              ? t("rating.record", {
+                  wins: overview.wins,
+                  losses: overview.losses,
+                  draws: overview.draws,
+                })
+              : t("ranking.record", {
+                  wins: overview.wins,
+                  losses: overview.losses,
+                })}
           </span>
         </p>
       ) : (

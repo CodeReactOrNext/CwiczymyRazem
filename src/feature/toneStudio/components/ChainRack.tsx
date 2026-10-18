@@ -74,7 +74,7 @@ const SUMMARY: Record<
  * the rule said "these are next to each other", the cable says "this one feeds
  * that one", which is the whole point of the row.
  */
-const PatchCable = () => (
+export const PatchCable = () => (
   <svg
     aria-hidden
     width='26'

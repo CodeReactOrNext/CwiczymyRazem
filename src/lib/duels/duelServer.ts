@@ -24,6 +24,7 @@ import {
   DUEL_START_RATING,
   DUEL_SUBMIT_GRACE_MS,
   DUEL_TICKET_TTL_MS,
+  feedForViewer,
   isEveryoneReady,
   liveTickets,
   pickOpponentTicket,
@@ -713,11 +714,14 @@ export async function getDuelOverview(
       toRankingEntry(doc.data() as DuelProfile),
     ),
     rankedPlayers: rankedCount.data().count,
-    feed: feedSnap.docs
-      .map((doc: QueryDocumentSnapshot) =>
-        toDuelFeedEntry(doc.data() as DuelDoc),
-      )
-      .filter((entry): entry is DuelFeedEntry => !!entry),
+    feed: feedForViewer(
+      feedSnap.docs
+        .map((doc: QueryDocumentSnapshot) =>
+          toDuelFeedEntry(doc.data() as DuelDoc),
+        )
+        .filter((entry): entry is DuelFeedEntry => !!entry),
+      userId,
+    ),
     waitingOthers: Math.max(
       0,
       waitingCount.data().count - myLiveTickets.length,

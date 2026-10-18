@@ -16,6 +16,7 @@ import {
   DUEL_START_RATING,
   DUEL_SUBMIT_GRACE_MS,
   expectedScore,
+  feedForViewer,
   isDuelOpenForRuns,
   isEveryoneReady,
   kFactor,
@@ -347,6 +348,36 @@ describe("toDuelView", () => {
   });
 });
 
+describe("feedForViewer", () => {
+  const settled = (kind: "win" | "void", [x, y]: [string, string]) =>
+    toDuelFeedEntry(
+      duel(
+        {},
+        {},
+        {
+          id: `${kind}-${x}${y}`,
+          playerIds: [x, y],
+          players: { [x]: player(x), [y]: player(y) },
+          status: "finished",
+          outcome: {
+            kind,
+            winnerId: kind === "void" ? null : x,
+            settledAt: 1,
+          },
+        },
+      ),
+    )!;
+
+  it("leaves out the viewer's own duels and the ones nobody played", () => {
+    const mine = settled("win", ["a", "b"]);
+    const theirs = settled("win", ["c", "d"]);
+    const empty = settled("void", ["c", "e"]);
+    expect(feedForViewer([mine, theirs, empty], "a")).toEqual([theirs]);
+    expect(feedForViewer([mine, theirs, empty], "b")).toEqual([theirs]);
+    expect(feedForViewer([mine, theirs, empty], "z")).toEqual([mine, theirs]);
+  });
+});
+
 describe("toDuelFeedEntry", () => {
   it("keeps a running duel out of the feed", () => {
     expect(toDuelFeedEntry(duel({ attempts: 2 }, { attempts: 1 }))).toBeNull();
@@ -446,7 +477,7 @@ describe("DUEL_DURATION_MS", () => {
 });
 
 describe("DUEL_MIN_LVL", () => {
-  it("opens at level 4", () => {
-    expect(DUEL_MIN_LVL).toBe(4);
+  it("opens at level 2", () => {
+    expect(DUEL_MIN_LVL).toBe(2);
   });
 });

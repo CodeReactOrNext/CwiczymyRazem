@@ -1,257 +1,145 @@
 {
-  "sources": {
-    "off": {"label": "Nada", "description": "Solo el tab. Elige una grabación para oír la canción real debajo — sigue al play, la pausa y cada compás que pulses."},
-    "file": {"label": "Archivos de audio", "description": "Grabaciones en tu ordenador — una pista de acompañamiento, o pistas separadas (batería, bajo, voz) que suenan como capas."},
-    "youtube": {"label": "Vídeo de YouTube", "description": "Pega un enlace a la canción. El vídeo suena bajo el tab y su sonido es lo que oyes."}
-  },
   "bar": {
-    "use_video": "Usar vídeo",
-    "bad_link": "Eso no es un enlace de YouTube — prueba youtube.com/watch?v=… o youtu.be/…",
-    "locks_at": "Se sincroniza a",
-    "leave_cinema": "Salir del cine",
-    "cinema": "Cine",
-    "files": "{{count}} archivos",
-    "files_one": "1 archivo",
-    "title": "Pista de acompañamiento",
-    "title_empty": "Toca con la canción real",
-    "hint_empty": "Añade un vídeo de YouTube o un archivo de audio de esta canción. Suena bajo el tab y sigue al play, la pausa y cada compás que pulses.",
-    "hint_unaligned": "Todavía no está alineada con el tab, así que puede ir adelantada o atrasada. Lleva un minuto: pon el compás 1 en el primer tiempo.",
+    "add": "Añadir acompañamiento",
+    "sync": "Sincronizar acompañamiento",
+    "hint_empty": "Añade un archivo de audio de esta canción. Suena bajo el tab y sigue al play, la pausa y cada compás que pulses.",
+    "hint_unaligned": "Todavía no está alineada con el tab, así que puede ir adelantada o atrasada. Arrastra el compás 1 al primer tiempo.",
     "hint_aligned": "Alineada con el tab. ¿Se desfasa mientras tocas? Ajústala con [ y ].",
-    "add_recording": "Añadir una grabación",
-    "line_up": "Alinear con el tab",
-    "sync_mix": "Sincronía y mezcla",
+    "cinema": "Cine",
     "leave_cinema_esc": "Salir del cine — Esc"
   },
-  "sound": {
-    "title": "Sonido",
-    "body": "Marca los archivos que pertenecen a esta canción. Varios marcados a la vez suenan como capas de una misma grabación.",
-    "importing": "Importando…",
-    "add_files": "Añadir archivos",
-    "loading": "Cargando pistas…",
-    "empty": "Aún no hay archivos — añade algunos o suelta archivos de audio en cualquier parte de la pantalla.",
-    "remove_from_song": "Quitar {{name}} de esta canción",
+  "common": {
+    "mute": "Silenciar {{what}}",
+    "unmute": "Activar sonido de {{what}}"
+  },
+  "editor": {
+    "title": "Pista de acompañamiento",
+    "done": "Listo",
+    "drop": "Suelta para añadir como acompañamiento",
+    "drop_desktop_only": "Añadir archivos requiere la app de escritorio",
+    "tab_mix": "Instrumentos del tab",
+    "empty_title": "Añade el acompañamiento de la canción",
+    "empty_body": "Un archivo de audio de la canción — mp3, wav, flac. Añade varios a la vez (batería, bajo, voz) y sonarán juntos como capas. También puedes soltar archivos en cualquier parte de esta pantalla.",
+    "web_title": "Los acompañamientos están en la app de escritorio",
+    "web_body": "Son archivos de audio de tu ordenador, que el navegador no puede reproducir. El vídeo de la izquierda funciona también aquí.",
+    "step": "Paso {{n}} de {{total}}",
+    "step1": "Pulsa «Sincronizar automáticamente» — o arrastra tú la línea amarilla «Compás 1» al primer tiempo. Para mover todos los compases a la vez, arrastra la franja sobre la grabación.",
+    "step2": "Dale a reproducir y escucha. Si un compás posterior se desfasa de su tiempo, arrastra su línea encima — se queda fijada ahí.",
+    "reading": "Leyendo la grabación…",
+    "no_waveform": "No se puede mostrar la forma de onda de este archivo.",
+    "how": "Cómo funciona",
+    "whole_song": "Toda la canción — pulsa para saltar"
+  },
+  "intro": {
+    "title": "Toca con la canción real",
+    "lead": "Un acompañamiento es una grabación de la canción que suena bajo el tab. Arranca, para y salta con él — pulsa cualquier compás y la banda también estará ahí.",
+    "step1_title": "Añade la grabación",
+    "step1_body": "Un archivo de audio de la canción — mp3, wav, flac. ¿Tienes la batería, el bajo o la voz por separado? Añádelos todos y sonarán juntos como capas.",
+    "step1_web": "Un archivo de audio de la canción — mp3, wav, flac. Los archivos están en tu ordenador, así que esta parte funciona en la app de escritorio.",
+    "step2_title": "Alinéala con el tab",
+    "step2_body": "Pulsa «Sincronizar automáticamente» y la app encuentra sola el compás 1 y el tempo, y sigue a una banda que acelera o se frena. ¿No del todo? Arrastra una línea de compás al golpe que ves en la forma de onda.",
+    "step3_title": "Añade un vídeo de YouTube, si quieres",
+    "step3_body": "Pega un enlace y el vídeo — el oficial, un directo, una clase — suena sobre el tab, sincronizado. Es solo imagen: va silenciado y el sonido sale de tu grabación. También funciona en el navegador.",
+    "start": "Empezamos"
+  },
+  "auto": {
+    "run": "Sincronizar automáticamente",
+    "title": "Encuentra el compás 1 y el tempo en la grabación, y fija compases donde la banda se desfasa",
+    "analysing": "Analizando la grabación…",
+    "running": "Buscando el compás 1…",
+    "done": "Sincronizado: compás 1 en {{start}} s, {{bpm}} BPM.",
+    "drift": "Desfase seguido en {{count}} compases.",
+    "drift_one": "Desfase seguido en 1 compás.",
+    "listen": "Dale a reproducir y escucha — si un compás no encaja, arrastra su línea.",
+    "undo": "Deshacer",
+    "unsure": "No estoy seguro de este — la batería, el bajo y las notas de la grabación apuntan a sitios distintos. Compruébalo de oído o coloca tú el compás 1.",
+    "apply_anyway": "Usarlo igualmente",
+    "failed": "No se pudo analizar la grabación.",
+    "partial": "Este tab cubre solo alrededor del {{percent}}% de la grabación, así que como mucho ese tramo podrá encajar."
+  },
+  "recordings": {
+    "title": "Acompañamientos",
+    "add": "Añadir archivos",
+    "importing": "Añadiendo…",
+    "none": "Todavía no hay archivos.",
+    "desktop_only": "Los acompañamientos son archivos de audio de tu ordenador, así que funcionan en la app de escritorio.",
+    "missing": "Falta el archivo",
+    "solo": "Solo {{name}}",
+    "solo_title": "Escucha solo este — pulsa otra vez para todos",
+    "remove": "Quitar {{name}} de esta canción",
+    "remove_title": "Quitar de la canción (sigue en la biblioteca)",
+    "volume": "Volumen de {{name}}",
+    "everything": "todos los acompañamientos",
+    "master": "Todos juntos",
+    "loading": "Cargando archivos…",
+    "library": "Añadidos a otras canciones ({{count}})",
     "add_to_song": "Añadir {{name}} a esta canción",
-    "layer": "Capa {{n}}",
-    "delete": "Borrar {{name}} de la biblioteca",
-    "recording_tempo": "Tempo de grabación",
-    "tempo_aria": "Tempo al que se grabaron los archivos",
-    "match_session": "Igual que la sesión",
-    "plays_at": "suena a {{rate}}×",
-    "stretched": "muy estirada",
-    "volume": "Volumen",
-    "unmute": "Activar el sonido del acompañamiento",
-    "mute": "Silenciar el acompañamiento",
-    "desktop_only": "Los archivos de acompañamiento están en tu ordenador, así que esta fuente es parte de la app de escritorio. En el navegador, usa un vídeo de YouTube."
+    "delete": "Borrar {{name}} de la biblioteca"
   },
   "video": {
-    "title": "Vídeo encima",
-    "optional": "opcional",
-    "body": "Solo imagen — el vídeo va silenciado y tus archivos siguen siendo el sonido. Cada uno tiene su propia sincronía.",
-    "hide": "Ocultar vídeo",
-    "show": "Mostrar vídeo",
-    "no_speed": "YouTube no tiene velocidad para {{bpm}} BPM, así que la imagen va libre. Lo que oyes sigue sincronizado igualmente.",
-    "sync": "Sincronía del vídeo",
-    "nudge_earlier": "Adelantar el vídeo",
-    "nudge_later": "Retrasar el vídeo",
-    "change": "Cambiar vídeo"
+    "title": "Vídeo de YouTube",
+    "show": "Mostrar sobre el tab",
+    "body": "El vídeo oficial, un directo o una clase para ver mientras tocas. Suena sobre el tab, sincronizado y silenciado — el sonido sigue siendo tu acompañamiento.",
+    "link": "Enlace de YouTube",
+    "add": "Añadir vídeo",
+    "bad_link": "Eso no es un enlace de YouTube — prueba youtube.com/watch?v=… o youtu.be/…",
+    "no_speed": "YouTube no tiene velocidad para {{bpm}} BPM, así que la imagen puede desfasarse. El sonido sigue sincronizado.",
+    "offset": "Inicio del vídeo",
+    "same_take": "Igual que el acompañamiento",
+    "same_take_done": "Sincronizado como el acompañamiento",
+    "same_take_title": "El vídeo es la misma grabación que los archivos — dale la misma sincronía",
+    "remove": "Quitar vídeo"
   },
-  "nudge": {
-    "earlier": "Antes — mantén Shift para {{ms}} ms",
-    "later": "Después — mantén Shift para {{ms}} ms"
+  "offset": {
+    "earlier": "{{what}} antes",
+    "later": "{{what}} después",
+    "hint": "{{ms}} ms — con Shift {{coarse}} ms"
   },
-  "youtube": {
-    "locked": "Sincronizado con el tab a {{rate}}× — el vídeo mantiene este tempo exacto.",
-    "runs_free": "YouTube solo reproduce a sus velocidades fijas y {{bpm}} BPM no es una de ellas, así que el vídeo va libre en lugar de recolocarse a tirones.",
-    "paste": "Pega el enlace de YouTube de la canción"
+  "shift": {
+    "label": "Mover todos los compases",
+    "drag": "Arrastra aquí para mover todos los compases",
+    "title": "Mueve el compás 1 y todos los compases fijados a la vez, así el tempo entre ellos no cambia"
   },
-  "align": {
-    "mute": "Silenciar {{what}}",
-    "unmute": "Activar sonido de {{what}}",
-    "missing_file": "Archivo no encontrado",
-    "steps": {
-      "choose": "Elige la grabación",
-      "choose_detail": "un vídeo de YouTube o archivos de audio",
-      "layers": "{{count}} archivos como capas",
-      "bar1": "Pon el compás 1 en el primer tiempo",
-      "starts_at": "empieza en {{ms}} ms",
-      "bar1_detail": "para que el tab y la canción empiecen juntos",
-      "listen": "Escucha y afina",
-      "listen_detail": "corrige cualquier compás que se desfase más adelante"
-    },
-    "hints": {
-      "choose": "Elige abajo de dónde viene el sonido. Sonará bajo el tab y seguirá al play, la pausa y cada compás que pulses.",
-      "bar1": "Pulsa Espacio para reproducir. Arrastra la bandera amarilla START de la fila Compases al primer tiempo que oigas — o mueve toda la grabación con [ y ].",
-      "listen": "Toca y escucha. Si más adelante el tab va adelantado o atrasado, arrastra la línea de ese compás a su tiempo. Pulsa Hecho cuando suene bien — se guarda para esta canción."
-    },
-    "zoom": {
-      "one_bar": "1 compás",
-      "one_bar_title": "Ampliar para que un compás llene la pantalla",
-      "four_bars": "4 compases",
-      "four_bars_title": "Ampliar para que cuatro compases llenen la pantalla",
-      "whole": "Canción entera",
-      "whole_title": "Toda la grabación de principio a fin",
-      "label": "Zoom",
-      "hint": "o desplázate sobre la línea de tiempo",
-      "out": "Alejar",
-      "out_title": "Ver más de la grabación a la vez",
-      "window_title": "Cuánta grabación cabe en el ancho de la pantalla",
-      "in": "Acercar",
-      "in_title": "Ver menos, con más detalle"
-    },
-    "reading": "Leyendo la grabación…",
-    "no_waveform": "No hay forma de onda que mostrar.",
-    "unsupported": "Este navegador no puede compartir el audio de la pestaña, así que no hay forma de onda que dibujar. Chrome o Edge pueden; Firefox y Safari no. Alinea de oído abajo.",
-    "no_waveform_yet": "Aún no hay forma de onda — captura un tramo del vídeo abajo para ver su forma. Alinear de oído funciona sin ella.",
-    "capture": {
-      "whole": "Vídeo completo capturado.",
-      "percent": "{{percent}} % del vídeo capturado",
-      "none": "Aún no se ha capturado ninguna forma de onda",
-      "nothing_left": "No queda nada por capturar.",
-      "on_its_own": "Se captura aparte, nunca mientras tocas.",
-      "more": "Capturar más",
-      "start": "Capturar forma de onda",
-      "delay": "retardo de captura {{ms}} ms, corregido"
-    },
-    "drop": {
-      "add": "Suelta para añadir como pista",
-      "needs_desktop": "Añadir archivos requiere la app de escritorio",
-      "adding": "Añadiendo archivos…",
-      "hint": "Suelta archivos de audio en cualquier sitio para añadir una pista"
-    },
-    "stems": "{{count}} pistas",
-    "stems_one": "1 pista",
-    "subtitle": "Toca la canción real bajo el tab, alineadas para que ambas entren juntas en el compás 1.",
-    "done": "Hecho",
-    "pick_first": "Elige primero una pista de acompañamiento y vuelve aquí.",
-    "tools": {
-      "drag_to": "Arrastrar una pista para",
-      "move_view": "Mover la vista",
-      "move_view_title": "Mira a otro sitio. La grabación se queda exactamente donde está.",
-      "move_audio": "Mover el audio",
-      "move_audio_title": "Desliza la grabación respecto al tab. El botón central sigue moviendo la vista.",
-      "playhead": "Cabezal",
-      "follow_title": "Mantener la vista centrada en el cabezal mientras avanza",
-      "follow": "Seguir la reproducción",
-      "jump": "Traer el cabezal a la vista",
-      "jump_title": "Traer el cabezal a la vista y quedarse ahí"
-    },
-    "tempo": {
-      "label": "Rejilla de tempo",
-      "hint": "también ajusta la sesión",
-      "aria": "El tempo propio de la grabación",
-      "title": "El tempo al que va la canción. Ajusta el tempo de la sesión para que la grabación suene tal como se grabó — reduce la velocidad en la sesión, no aquí.",
-      "even_title": "Un tempo para toda la grabación. Arrastra una línea de compás para fijar un compás que se desfasa.",
-      "pinned_title": "Compases fijados a su propio tempo, para que la rejilla siga a una banda que fluctúa.",
-      "even": "uniforme en toda",
-      "pinned": "{{count}} compases fijados",
-      "pinned_one": "1 compás fijado",
-      "reset_title": "Volver a un solo tempo para toda la grabación",
-      "reset": "Restablecer"
-    },
-    "shortcuts": {
-      "aria": "Atajos de teclado",
-      "title": "Atajos de teclado — ?",
-      "label": "Atajos",
-      "close": "Cerrar la lista de atajos",
-      "keys": {
-        "scroll": "Rueda", "shift_scroll": "Shift + rueda", "space": "Espacio", "middle_drag": "Arrastre con botón central",
-        "drag_line": "Arrastrar una línea de compás", "shift_drag": "Shift + arrastrar", "alt_drag": "Alt + arrastrar",
-        "click_line": "Pulsar una línea de compás", "double_click": "Doble clic"
-      },
-      "what": {
-        "scroll": "Zoom donde está el puntero",
-        "shift_scroll": "Moverse por la grabación",
-        "space": "Reproducir o parar, sin cuenta atrás",
-        "middle_drag": "Arrastrar la vista",
-        "brackets": "Mover toda la grabación {{ms}} ms",
-        "shift_brackets": "Moverla {{ms}} ms",
-        "drag_line": "Cambiar el tempo de ese compás, {{bpm}} BPM por píxel",
-        "shift_drag": "Una quinta parte de eso, para las últimas centésimas",
-        "alt_drag": "Ignorar el ajuste a transitorios",
-        "click_line": "Escribir su tempo exacto",
-        "double_click": "Soltar ese compás",
-        "esc": "Cerrar"
-      }
-    },
-    "lanes": {
-      "overview": "Vista general",
-      "follows": "sigue la reproducción",
-      "click_jump": "pulsa para saltar",
-      "bars": "Compases",
-      "bars_hint": "arrastra una línea al tiempo",
-      "tab": "Tablatura",
-      "the_tab": "la tablatura",
-      "tab_mute_hint": "silencia todos los instrumentos del archivo",
-      "muted": "silenciado",
-      "what_you_play": "lo que tocas",
-      "the_video": "el vídeo",
-      "video_mute_hint": "la forma de onda solo se completa mientras se oye",
-      "tap_to_align": "toca para alinear"
-    },
+  "sync": {
+    "tempo": "Tempo de la grabación",
+    "tempo_title": "A qué tempo va la canción. Cambiarlo ajusta también el tempo de la sesión, para que la grabación siga sonando como la original.",
+    "stretched": "suena a {{rate}}× — muy estirada",
+    "pinned_label": "Compases fijados",
+    "pinned": "{{count}} compases",
+    "pinned_one": "1 compás",
+    "unpin": "Soltar todos",
+    "unpin_title": "Volver a un solo tempo para toda la grabación"
+  },
+  "transport": {
+    "play": "Reproducir",
+    "stop": "Parar",
+    "space": "Espacio",
+    "zoom_in": "Acercar",
+    "zoom_out": "Alejar",
+    "zoom_bar": "1 compás",
+    "zoom_bars": "4 compases",
+    "zoom_all": "Toda la canción",
+    "follow": "Seguir",
+    "follow_title": "Mantener la vista en el cabezal",
+    "keys": "Rueda — zoom · Shift+rueda — desplazar · [ ] — mover todos los compases · Alt — soltar sin imán · doble clic en un compás fijado — soltarlo"
+  },
+  "lane": {
+    "bar1": "Compás 1",
+    "on_beat": "en el tiempo",
     "bar_n": "Compás {{n}}",
-    "bpm": {
-      "slower": "Una centésima más lento",
-      "slower_title": "Más lento — Shift para una décima",
-      "selected": "Tempo del compás seleccionado",
-      "faster": "Una centésima más rápido",
-      "faster_title": "Más rápido — Shift para una décima",
-      "stop": "Dejar de editar este compás"
-    },
-    "transport": {
-      "stop_aria": "Detener la reproducción",
-      "play_aria": "Iniciar la reproducción",
-      "stop": "Parar",
-      "play": "Reproducir",
-      "drift": "Desfase",
-      "start": "Inicio",
-      "earlier": "Adelantar el acompañamiento",
-      "earlier_title": "Antes en {{ms}} ms — Shift para {{coarse}}",
-      "later": "Retrasar el acompañamiento",
-      "later_title": "Después en {{ms}} ms — Shift para {{coarse}}",
-      "moves_whole": "mueve toda la grabación · Shift para {{ms}} ms",
-      "footer": "Espacio reproduce sin cuenta atrás · arrastrar con el botón central mueve la vista · pulsa ? para ver todos los atajos"
-    }
-  },
-  "stem": {
-    "solo_aria": "Solo de {{name}}",
-    "solo": "Solo",
-    "mute": "Silenciar",
-    "remove": "Quitar",
-    "on_grid": "En la rejilla",
-    "resize": "Cambiar la altura de la pista {{name}}"
-  },
-  "lanes_aria": {
-    "tab_seek": "Notas del tab en la línea de alineación — pulsa para reproducir desde ahí",
-    "tab": "Notas del tab en la línea de alineación",
-    "grid_pan": "Rejilla de alineación del acompañamiento — arrastra para mover la vista",
-    "grid_shift": "Rejilla de alineación del acompañamiento — arrastra para desplazar la grabación",
-    "overview": "Vista general del acompañamiento — pulsa para saltar a una parte de la grabación"
+    "aria": "Grabación y líneas de compás — arrastra una línea a su tiempo; fuera de ellas te desplazas"
   },
   "mixer": {
-    "levels": "Niveles de instrumentos",
-    "levels_title": "Niveles de instrumentos — lo que oyes",
     "main": "Instrumento principal",
     "instrument": "Instrumento",
     "volume": "Volumen de {{name}}"
   },
-  "clock": {"position": "Posición en la grabación"},
-  "ruler": {
-    "start": "START",
-    "on_beat": "a tiempo",
-    "was": "antes {{bpm}}",
-    "aria": "Regla de compases — arrastra una línea de compás al tiempo que oyes, Shift para afinar, doble clic para soltarla"
+  "clock": {
+    "position": "Posición en la grabación"
   },
-  "capture": {
-    "lengths": {"s15": "15 s", "s30": "30 s", "m1": "1 min", "m2": "2 min", "until_stop": "Hasta que pare"},
-    "title": "Capturar la forma de onda",
-    "body": "El audio del vídeo solo se puede medir oyéndolo sonar, así que esto lo reproduce y escucha — por su cuenta, con la sesión detenida, para que nada tenga que compartir hilo con él.",
-    "close": "Cerrar",
-    "unsupported": "Este navegador no puede entregar el audio de la pestaña, así que no hay forma de onda que capturar. Chrome y Edge pueden; Firefox y Safari no — o usa la app de escritorio.",
-    "for": "Capturar durante",
-    "start": "Empezar captura",
-    "heard": "{{percent}} % del vídeo escuchado",
-    "nothing_heard": "Aún no se ha escuchado nada",
-    "saved": "Guardado",
-    "tip": "Antes de empezar, ve a la parte que estás alineando — una captura solo dibuja lo que oye. Se oye todo lo que suena en la pestaña, así que deja el resto de la app en silencio mientras dura."
+  "lanes_aria": {
+    "tab_seek": "Notas del tab en la línea de alineación — pulsa para reproducir desde ahí",
+    "tab": "Notas del tab en la línea de alineación",
+    "overview": "Vista general del acompañamiento — pulsa para saltar a una parte de la grabación"
   }
 }

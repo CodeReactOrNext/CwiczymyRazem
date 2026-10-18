@@ -94,7 +94,12 @@
     "heard": "Usłyszano {{hits}} z {{total}} klików, stabilnie w granicach ±{{spread}} ms",
     "saved_before": "Wcześniej zapisane",
     "estimated_before": "Wcześniej szacowane",
-    "use": "Użyj {{ms}} ms"
+    "use": "Jest dobrze · {{ms}} ms",
+    "map": {
+      "title": "Gdzie wylądowało każde szarpnięcie",
+      "click": "Klik",
+      "aria": "Usłyszano {{hits}} z {{total}} szarpnięć, zwykle {{ms}} ms po kliku"
+    }
   },
   "add_to_plan": "Dodaj do planu",
   "saving": "Zapisywanie…",

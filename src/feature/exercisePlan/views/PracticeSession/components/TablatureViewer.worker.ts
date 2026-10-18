@@ -69,13 +69,42 @@ let inkColor = "#ffffff";
 /** Fret-number colour, or "auto" to derive it per pill from that pill's brightness. */
 let fretTextColor = "#000000";
 
+// Colour strings are derived from the same few inputs every frame — a handful of
+// colours at fixed alphas — so each result is kept: a repeat is a Map lookup,
+// with no hex parsing and no new string for the GC. Animated alphas only churn
+// their own colour's entries, and every cache is capped.
+const COLOR_CACHE_MAX = 64;
+const readableInkCache = new Map<string, string>();
+
 /** Black or white, whichever stays readable on `hex`. Rec. 709 luma. */
 function readableInk(hex: string): string {
-  if (hex.length !== 7 || hex[0] !== "#") return "#000000";
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 140 ? "#000000" : "#ffffff";
+  let ink = readableInkCache.get(hex);
+  if (ink !== undefined) return ink;
+  if (hex.length !== 7 || hex[0] !== "#") {
+    ink = "#000000";
+  } else {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    ink = 0.2126 * r + 0.7152 * g + 0.0722 * b > 140 ? "#000000" : "#ffffff";
+  }
+  if (readableInkCache.size >= COLOR_CACHE_MAX) readableInkCache.clear();
+  readableInkCache.set(hex, ink);
+  return ink;
+}
+
+/** The `amount`-keyed results kept for `hex` in `cache`, made (and the whole
+ *  cache emptied if it has grown too big) when there are none yet. */
+function colorEntries(cache: Map<string, Map<number, string>>, hex: string): Map<number, string> {
+  let entries = cache.get(hex);
+  if (!entries) {
+    if (cache.size >= COLOR_CACHE_MAX) cache.clear();
+    entries = new Map();
+    cache.set(hex, entries);
+  } else if (entries.size >= COLOR_CACHE_MAX) {
+    entries.clear();
+  }
+  return entries;
 }
 /** Multiplier on the 13px fret-number base size. */
 let fretFontScale = 1;
@@ -90,13 +119,19 @@ let timingHints = true;
 /** Head + thin sustain tail (true) or the classic one-block bar (false). */
 let noteTails = true;
 
+const withAlphaCache = new Map<string, Map<number, string>>();
+
 /** "#rrggbb" → "rgba(r,g,b,a)". Used where a hit colour needs a live alpha. */
 function withAlpha(hex: string, a: number): string {
+  const kept = withAlphaCache.get(hex)?.get(a);
+  if (kept !== undefined) return kept;
   if (hex.length !== 7 || hex[0] !== "#") return hex;
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r},${g},${b},${a})`;
+  const out = `rgba(${r},${g},${b},${a})`;
+  colorEntries(withAlphaCache, hex).set(a, out);
+  return out;
 }
 
 // Staff lines batched into 3 alpha groups (pairs: 0+5, 1+4, 2+3)
@@ -218,7 +253,7 @@ const visual = createNoteHitVisualState();
  *  from the hit maps: it isn't frozen per pass, a re-hit note just overwrites
  *  its own entry. */
 let noteTimings: Record<string, {
-  grade: number; perfect: boolean; offsetBeats: number | null;
+  grade: number; hint: TimingLabelKind | null; offsetBeats: number | null;
   intonation?: { grade: number; cents: number | null };
 }> = {};
 type TimingLabelKind = "early" | "late" | "perfect";
@@ -349,6 +384,7 @@ let showRestWarning = false;
 // symbol falls back to the drawn shapes below, so the tab never renders blank.
 let bravuraReady = false;
 const RHY_GLYPH_PX = 30; // Bravura rhythm-symbol size, tuned to the ruler height
+const RHY_GLYPH_FONT = `${RHY_GLYPH_PX}px Bravura`;
 // SMuFL codepoints (Bravura is SMuFL-compliant).
 const GLYPH_NOTEHEAD = { whole: "", half: "", black: "" };
 const GLYPH_FLAG_UP: Record<number, string> = { 1: "", 2: "", 3: "" }; // 8th / 16th / 32nd
@@ -370,20 +406,57 @@ const GLYPH_REST = {
 /** Draw a SMuFL glyph from Bravura at (x, y). Colour is inherited from ctx.fillStyle. */
 function drawGlyph(g: string, x: number, y: number, align: CanvasTextAlign = "center", baseline: CanvasTextBaseline = "middle") {
   if (!ctx) return;
-  ctx.font = `${RHY_GLYPH_PX}px Bravura`;
+  ctx.font = RHY_GLYPH_FONT;
   ctx.textAlign = align;
   ctx.textBaseline = baseline;
   drawText(g, x, y);
 }
 
+const lightenCache = new Map<string, Map<number, string>>();
+
 // Lighten a "#rrggbb" colour toward white by `amt` (0..1). Non-hex passes through.
 function lightenHex(hex: string, amt: number): string {
+  const kept = lightenCache.get(hex)?.get(amt);
+  if (kept !== undefined) return kept;
   if (hex.length !== 7 || hex[0] !== "#") return hex;
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
   const mix = (c: number) => Math.round(c + (255 - c) * amt);
-  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+  const out = `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+  colorEntries(lightenCache, hex).set(amt, out);
+  return out;
+}
+
+// Fonts the board sets per note, as fixed strings. The browser skips setting
+// the font it already has (~0.1 µs), but switching between two costs ~10× that
+// — so a string is built once per size, and the small label font goes on only
+// for a note that actually carries one of its labels.
+const fretFonts = new Map<number, string>();
+function fretFont(px: number): string {
+  let font = fretFonts.get(px);
+  if (font === undefined) {
+    font = `bold ${px}px Inter, sans-serif`;
+    fretFonts.set(px, font);
+  }
+  return font;
+}
+const TECHNIQUE_FONT = "bold 9px Inter";
+/** Dynamics-lane bars: cyan-500, faded by how hard the note is played. */
+const DYNAMICS_COLOR = "#06b6d4";
+/** Tuplet number widths — the bracket arms stop short of the number. */
+const tupletLabelWidths = new Map<number, number>();
+
+// Opaque blend of two "#rrggbb" colours, `amt` (0..1) of the way from `from` to
+// `to`. Anything that isn't hex falls back to `to` at that opacity.
+function mixHex(from: string, to: string, amt: number): string {
+  if (from.length !== 7 || from[0] !== "#" || to.length !== 7 || to[0] !== "#") return withAlpha(to, amt);
+  const mix = (i: number) => {
+    const a = parseInt(from.slice(i, i + 2), 16);
+    const b = parseInt(to.slice(i, i + 2), 16);
+    return Math.round(a + (b - a) * amt);
+  };
+  return `rgb(${mix(1)}, ${mix(3)}, ${mix(5)})`;
 }
 
 // ── Pick stroke marker ────────────────────────────────────────────────────────
@@ -684,25 +757,156 @@ function drawTimingArrow(cx: number, y: number, early: boolean, strong: boolean)
 // ── Rounded rectangle (pill) helper ──────────────────────────────────────────
 /** Adds a pill sub-path to the current path without starting a new one, so
  *  several pills (a note's head + tail) can be filled or clipped as one shape. */
-function pillPath(x: number, y: number, w: number, h: number, r: number) {
-  if (!ctx || w <= 0 || h <= 0) return;
+function pillPath(x: number, y: number, w: number, h: number, r: number, target: OffscreenCanvasRenderingContext2D | null = ctx) {
+  if (!target || w <= 0 || h <= 0) return;
   const cr = Math.max(0, Math.min(r, h / 2, w / 2));
-  ctx.moveTo(x + cr, y);
-  ctx.lineTo(x + w - cr, y);
-  ctx.arcTo(x + w, y, x + w, y + cr, cr);
-  ctx.lineTo(x + w, y + h - cr);
-  ctx.arcTo(x + w, y + h, x + w - cr, y + h, cr);
-  ctx.lineTo(x + cr, y + h);
-  ctx.arcTo(x, y + h, x, y + h - cr, cr);
-  ctx.lineTo(x, y + cr);
-  ctx.arcTo(x, y, x + cr, y, cr);
-  ctx.closePath();
+  target.moveTo(x + cr, y);
+  target.lineTo(x + w - cr, y);
+  target.arcTo(x + w, y, x + w, y + cr, cr);
+  target.lineTo(x + w, y + h - cr);
+  target.arcTo(x + w, y + h, x + w - cr, y + h, cr);
+  target.lineTo(x + cr, y + h);
+  target.arcTo(x, y + h, x, y + h - cr, cr);
+  target.lineTo(x, y + cr);
+  target.arcTo(x, y, x + cr, y, cr);
+  target.closePath();
 }
 
 function drawPill(x: number, y: number, w: number, h: number, r: number) {
   if (!ctx) return;
   ctx.beginPath();
   pillPath(x, y, w, h, r);
+}
+
+// ── Hit glow sprites ──────────────────────────────────────────────────────────
+// The glow behind a freshly hit note is a canvas shadow, and a shadow is a blur.
+// Re-running that blur every frame for every note still glowing was the most
+// expensive thing a fast run asked of this renderer, so it is blurred once per
+// head width into a small bitmap, and each frame only draws (and fades) that.
+// The glow now fades out at full size instead of tightening into the pill as the
+// animated blur radius used to — over its ~180 ms the two can't be told apart.
+const HIT_GLOW_BLUR = 20;
+/** Room for the blur to die out in around the pill: σ = blur / 2, and 3σ out. */
+const HIT_GLOW_PAD = Math.ceil(HIT_GLOW_BLUR * 1.5) + 2;
+const HIT_GLOW_SPRITES_MAX = 48;
+const hitGlowSprites = new Map<string, OffscreenCanvas>();
+
+/** The glow alone (no pill) around a `w`-wide note head, in device pixels, or
+ *  null where the worker can't make canvases of its own. */
+function hitGlowSprite(w: number): OffscreenCanvas | null {
+  if (typeof OffscreenCanvas === "undefined") return null;
+  const s = dpr * vscale;
+  const wPx = Math.ceil(w * s);
+  const hPx = Math.ceil(BLOCK_H * s);
+  const key = `${hitGlow}|${wPx}|${hPx}|${BLOCK_CORNER * s}`;
+  const cached = hitGlowSprites.get(key);
+  if (cached) return cached;
+
+  const sprite = new OffscreenCanvas(wPx + HIT_GLOW_PAD * 2, hPx + HIT_GLOW_PAD * 2);
+  const g = sprite.getContext("2d");
+  if (!g) return null;
+  // Device pixels throughout, like the board's own shadow (shadows ignore the
+  // transform). The pill sits a whole sprite-width off to the left and its
+  // shadow is offset straight back in, so only the glow lands on the bitmap.
+  g.shadowColor = hitGlow;
+  g.shadowBlur = HIT_GLOW_BLUR;
+  g.shadowOffsetX = sprite.width;
+  g.fillStyle = "#000";
+  g.beginPath();
+  pillPath(HIT_GLOW_PAD - sprite.width, HIT_GLOW_PAD, w * s, BLOCK_H * s, BLOCK_CORNER * s, g);
+  g.fill();
+
+  if (hitGlowSprites.size >= HIT_GLOW_SPRITES_MAX) hitGlowSprites.clear();
+  hitGlowSprites.set(key, sprite);
+  return sprite;
+}
+
+// ── Chord names ───────────────────────────────────────────────────────────────
+// A chord's name is a small tag on the picking row, just right of the beat's
+// notehead and pick mark and clear of the pills, so the beat's rhythm and
+// picking stay in view and the tag reads as the header of the chord's column.
+// The tag is a solid mix of board and ink — no outline, no glow — which also
+// keeps it readable over the cinema-mode video. Each name is painted once into a
+// bitmap at device resolution and only blitted per frame, at whole device
+// pixels, so the text stays exactly as sharp as text drawn straight on the board.
+const CHORD_FONT = "600 13px Inter, sans-serif";
+const CHORD_TAG_H = 15;
+const CHORD_TAG_PAD_X = 6;
+const CHORD_TAG_RADIUS = 4;
+/** Tag's left edge from the beat start: past the notehead and pick mark. */
+const CHORD_TAG_X = 19;
+/** Room between the tag and the tops of the pills under it — kept small so the
+ *  tag also stays below the rhythm lane's noteheads. */
+const CHORD_TAG_GAP = 2;
+const CHORD_TAG_CACHE_MAX = 64;
+const chordTagWidths = new Map<string, number>();
+const chordTagSprites = new Map<string, OffscreenCanvas>();
+
+/** Paints a `w`-wide chord tag with its top-left corner at the origin of `g`. */
+function paintChordTag(g: OffscreenCanvasRenderingContext2D, label: string, w: number) {
+  g.fillStyle = mixHex(bgColor, inkColor, 0.12);
+  g.beginPath();
+  pillPath(0, 0, w, CHORD_TAG_H, CHORD_TAG_RADIUS, g);
+  g.fill();
+  g.font = CHORD_FONT;
+  g.textAlign = "left";
+  g.textBaseline = "middle";
+  g.fillStyle = inkColor;
+  g.fillText(label, CHORD_TAG_PAD_X, CHORD_TAG_H / 2 + 0.5);
+}
+
+/** A chord tag painted at device resolution, or null where the worker can't
+ *  make canvases of its own. */
+function chordTagSprite(label: string, w: number): OffscreenCanvas | null {
+  if (typeof OffscreenCanvas === "undefined") return null;
+  const s = dpr * vscale;
+  const key = `${label}|${bgColor}|${inkColor}|${s}`;
+  const cached = chordTagSprites.get(key);
+  if (cached) return cached;
+
+  const sprite = new OffscreenCanvas(Math.ceil(w * s), Math.ceil(CHORD_TAG_H * s));
+  const g = sprite.getContext("2d");
+  if (!g) return null;
+  g.setTransform(s, 0, 0, s, 0, 0);
+  paintChordTag(g, label, w);
+
+  if (chordTagSprites.size >= CHORD_TAG_CACHE_MAX) chordTagSprites.clear();
+  chordTagSprites.set(key, sprite);
+  return sprite;
+}
+
+/** Draws the chord tag with its top-left corner at world (x, y) and returns its
+ *  right edge. On a mirrored board the tag is flipped back as a whole, so its
+ *  text reads forwards. */
+function drawChordTag(label: string, x: number, y: number): number {
+  if (!ctx) return x;
+  let w = chordTagWidths.get(label);
+  if (w === undefined) {
+    ctx.font = CHORD_FONT;
+    w = Math.ceil(ctx.measureText(label).width) + CHORD_TAG_PAD_X * 2;
+    if (chordTagWidths.size >= CHORD_TAG_CACHE_MAX) chordTagWidths.clear();
+    chordTagWidths.set(label, w);
+  }
+
+  const sprite = chordTagSprite(label, w);
+  if (!sprite) {
+    ctx.save();
+    ctx.translate(rightToLeft ? x + w : x, y);
+    if (rightToLeft) ctx.scale(-1, 1);
+    paintChordTag(ctx, label, w);
+    ctx.restore();
+    return x + w;
+  }
+  // Snap to whole device pixels: a bitmap drawn between pixels is resampled,
+  // which would soften the text as the board scrolls.
+  const m = ctx.getTransform();
+  const dx = Math.round(m.a * x + m.e);
+  const dy = Math.round(m.d * y + m.f);
+  ctx.save();
+  ctx.setTransform(rightToLeft ? -1 : 1, 0, 0, 1, rightToLeft ? 2 * dx + sprite.width : 0, 0);
+  ctx.drawImage(sprite, dx, dy);
+  ctx.restore();
+  return x + w;
 }
 
 /**
@@ -1091,6 +1295,8 @@ function render() {
 
   // Track last rendered note pos per string for slide lines: string# → { x, y, slideOut }
   stringLastPos.clear();
+  // Right edge of the last chord tag drawn — see the pick marks below.
+  let chordTagEnd = -Infinity;
 
   // Binary search for first visible beat, then scan forward
   let startIdx = 0;
@@ -1121,6 +1327,14 @@ function render() {
     // inherit the current pass's hit state. cursorPos is tile-local, so a future
     // tile has a negative local cursor and is suppressed until the cursor enters it.
     const reached = cursorPos >= beatPx;
+
+    // Chord name first, under everything this beat draws live (timing labels,
+    // hit flashes). A long name can run into the next beats' columns; their pick
+    // marks then give way to it (below) instead of being drawn through its text.
+    const chordTagBefore = chordTagEnd;
+    if (beat.chordName && inView && showChordNames) {
+      chordTagEnd = drawChordTag(beat.chordName, beatPx + CHORD_TAG_X, STAFF_TOP - BLOCK_H / 2 - CHORD_TAG_GAP - CHORD_TAG_H);
+    }
 
     // Rhythm notation
     if (inView && showRhythmLane) {
@@ -1217,7 +1431,7 @@ function render() {
 
     // Picking direction — grouped with the technique markers, since that's what
     // it is: a hint about how to play the beat, not part of the notation itself.
-    if (inView && beat.pickStroke && showTechniqueLabels && !hideNotes) {
+    if (inView && beat.pickStroke && showTechniqueLabels && !hideNotes && beatL - PICK_W / 2 >= chordTagBefore) {
       drawPickStroke(beat.pickStroke, beatL);
     }
 
@@ -1358,12 +1572,13 @@ function render() {
         }
 
         // Timing, shown as words and position rather than as a colour — only
-        // for hits off the beat; an on-time hit looks like any other hit.
-        // Late: the fill starts at the attack, leaving the note's front open.
-        // Both: a short "Early"/"Late" over the note that fades right away —
-        // and now and then a dead-on hit earns a green "+" the same way.
+        // for hits plainly off the beat (timingHintFor); any other hit looks
+        // like any other hit. Late: the fill starts at the attack, leaving the
+        // note's front open. Both: a short "Early"/"Late" over the note that
+        // fades right away — and a hit close to the beat earns a green "+".
         const timing = isHit && timingHints ? noteTimings[note.noteKey] : undefined;
-        const offBeatPx = timing && timing.grade < 3 && timing.offsetBeats !== null
+        const isOffBeat = timing?.hint === "early" || timing?.hint === "late";
+        const offBeatPx = timing && isOffBeat && timing.offsetBeats !== null
           ? timing.offsetBeats * dynBW
           : 0;
         const fillStartW = Math.max(0, Math.min(blockW - 2, offBeatPx));
@@ -1436,8 +1651,16 @@ function render() {
           // Glow behind the head for fresh hits
           if (isAnimatingHit && hitAnimations && hitAge < 0.55) {
             const glowStr = 1 - hitAge / 0.55;
-            ctx.shadowColor = hitGlow;
-            ctx.shadowBlur = glowStr * 20;
+            const glow = hitGlowSprite(headW);
+            if (glow) {
+              const s = dpr * vscale;
+              ctx.globalAlpha = alpha * glowStr;
+              ctx.drawImage(glow, blockX - HIT_GLOW_PAD / s, blockY - HIT_GLOW_PAD / s, glow.width / s, glow.height / s);
+              ctx.globalAlpha = alpha;
+            } else {
+              ctx.shadowColor = hitGlow;
+              ctx.shadowBlur = glowStr * HIT_GLOW_BLUR;
+            }
           }
 
           drawPill(blockX, blockY, headW, BLOCK_H, BLOCK_CORNER);
@@ -1601,7 +1824,7 @@ function render() {
         if (!isDead) {
           // "auto" reads the pill's own colour, so a dark palette gets light digits.
           ctx.fillStyle = fretTextColor === "auto" ? readableInk(note.color) : fretTextColor;
-          ctx.font = `bold ${fs}px Inter, sans-serif`;
+          ctx.font = fretFont(fs);
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
 
@@ -1619,8 +1842,12 @@ function render() {
         }
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.font = "bold 9px Inter";
+        // Set by the first label that needs the small font (or by H/P, whose
+        // larger font the tap "T" has always inherited).
+        let labelFontSet = false;
         if (note.isAccented) {
+          ctx.font = TECHNIQUE_FONT;
+          labelFontSet = true;
           ctx.fillStyle = withAlpha(inkColor, 0.75);
           drawText(">", labelX, blockY - 6);
         }
@@ -1659,8 +1886,10 @@ function render() {
             ctx.textBaseline = "bottom";
             drawText(label, labelX, blockY - 3);
           }
+          labelFontSet = true;
         }
         if (note.isTap) {
+          if (!labelFontSet) ctx.font = TECHNIQUE_FONT;
           ctx.fillStyle = isHit ? "#064e3b" : "#34d399";
           drawText("T", blockRX - 7, blockY - 6);
         }
@@ -1749,60 +1978,6 @@ function render() {
         drawPalmMuteLabel(palmMuteX, beat.duration * dynBW, isActive);
       }
     }
-
-    if (beat.chordName && inView && showChordNames) {
-      const label = beat.chordName;
-      const fSize = 13;
-      const padX  = 9;
-      const padY  = 4;
-      ctx.font         = `bold ${fSize}px Inter, system-ui, sans-serif`;
-      ctx.textAlign    = "left";
-      ctx.textBaseline = "top";
-      const textW  = ctx.measureText(label).width;
-      const pillW  = textW + padX * 2;
-      const pillH  = fSize + padY * 2;   // 21px
-      const arrowH = 5;
-      const pillX  = beatPx;
-      const pillY  = STAFF_TOP - pillH - arrowH - 22;  // leave gap above rhythm area
-      const connX  = pillX + pillW / 2;
-
-      // Glow pass (drawn before the pill so glow stays behind)
-      ctx.shadowColor = withAlpha(inkColor, 0.45);
-      ctx.shadowBlur  = 8;
-
-      // Pill + downward arrow as one path
-      const r = 6;
-      // Chord pill is drawn in ink with the board colour as its text, so it
-      // stays a high-contrast plate on dark and light boards alike.
-      ctx.fillStyle = inkColor;
-      ctx.beginPath();
-      ctx.moveTo(pillX + r, pillY);
-      ctx.lineTo(pillX + pillW - r, pillY);
-      ctx.arcTo(pillX + pillW, pillY,         pillX + pillW, pillY + r,         r);
-      ctx.lineTo(pillX + pillW, pillY + pillH - r);
-      ctx.arcTo(pillX + pillW, pillY + pillH, pillX + pillW - r, pillY + pillH, r);
-      // right half of arrow base → tip → left half
-      ctx.lineTo(connX + 5, pillY + pillH);
-      ctx.lineTo(connX,     pillY + pillH + arrowH);
-      ctx.lineTo(connX - 5, pillY + pillH);
-      ctx.lineTo(pillX + r, pillY + pillH);
-      ctx.arcTo(pillX,      pillY + pillH, pillX, pillY + pillH - r, r);
-      ctx.lineTo(pillX,     pillY + r);
-      ctx.arcTo(pillX,      pillY,         pillX + r, pillY,         r);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.shadowBlur = 0;
-
-      // Chord label — board-coloured text on the ink plate for maximum contrast
-      ctx.fillStyle    = bgColor;
-      ctx.textAlign    = "left";
-      ctx.textBaseline = "top";
-      drawText(label, pillX + padX, pillY + padY);
-
-      // Restore state used by surrounding draw code
-      ctx.textBaseline = "middle";
-    }
   }
 
   // ── Time signature markers ───────────────────────────────────────────────
@@ -1812,9 +1987,16 @@ function render() {
     ctx.font = "bold 14px Inter, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    for (const marker of timeSigMarkers) {
+    // Markers run left to right: find the first in view, stop past the last.
+    let lo = 0, hi = timeSigMarkers.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (timeSigMarkers[mid].x * dynBW + 10 < visL - 40) lo = mid + 1; else hi = mid;
+    }
+    for (let mi = lo; mi < timeSigMarkers.length; mi++) {
+      const marker = timeSigMarkers[mi];
       const mx = marker.x * dynBW + 10;
-      if (mx < visL - 40 || mx > visR) continue;
+      if (mx > visR) break;
       drawText(marker.sig[0].toString(), mx, sigMidY - 10);
       drawText(marker.sig[1].toString(), mx, sigMidY + 10);
     }
@@ -1830,13 +2012,26 @@ function render() {
     ctx.font = "bold 8px Inter, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    for (const group of tupletGroups) {
+    // Groups follow each other without overlapping, so both ends run left to
+    // right: find the first that reaches into view, stop past the last.
+    let lo = 0, hi = tupletGroups.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (tupletGroups[mid].x2 * dynBW - 8 < visL) lo = mid + 1; else hi = mid;
+    }
+    for (let gi = lo; gi < tupletGroups.length; gi++) {
+      const group = tupletGroups[gi];
       const x1 = group.x1 * dynBW + 8;
       const x2 = group.x2 * dynBW - 8;
-      if (x2 < visL || x1 > visR) continue;
+      if (x1 > visR) break;
       const midX = (x1 + x2) / 2;
       const label = group.num.toString();
-      const lw = ctx.measureText(label).width + 6;
+      let numW = tupletLabelWidths.get(group.num);
+      if (numW === undefined) {
+        numW = ctx.measureText(label).width;
+        tupletLabelWidths.set(group.num, numW);
+      }
+      const lw = numW + 6;
       // Left arm
       ctx.beginPath();
       ctx.moveTo(x1, bracketY + tickH);
@@ -1867,15 +2062,21 @@ function render() {
     ctx.lineTo(Math.min(totalW, visR), DYN_BASE);
     ctx.stroke();
 
-    for (const beat of renderBeats) {
-      const x = beat.offsetX * dynBW + BLOCK_PAD + BLOCK_H * 0.65;
+    const barOffset = BLOCK_PAD + BLOCK_H * 0.65;
+    let lo = 0, hi = renderBeats.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (renderBeats[mid].offsetX * dynBW + barOffset < visL) lo = mid + 1; else hi = mid;
+    }
+    for (let bi = lo; bi < renderBeats.length; bi++) {
+      const beat = renderBeats[bi];
+      const x = beat.offsetX * dynBW + barOffset;
       if (x > visR) break;
-      if (x < visL) continue;
       for (const note of beat.notes) {
         if (note.dynamics !== undefined && note.dynamics > 0) {
           const barH = Math.max(2, note.dynamics * DYN_MAX_H);
           const alpha = 0.2 + note.dynamics * 0.8;
-          ctx.fillStyle = `rgba(6,182,212,${alpha})`;
+          ctx.fillStyle = withAlpha(DYNAMICS_COLOR, alpha);
           ctx.fillRect(x - BAR_W / 2, DYN_BASE - barH, BAR_W, barH);
         }
       }
@@ -2035,9 +2236,15 @@ function render() {
 
   // ── Notify main thread when cursor enters/leaves a rest beat ────────────
   if (isPlaying && countInRemaining === 0) {
-    const restActive = renderBeats.some(b =>
-      b.isRest && wrappedCursor >= b.offsetX * dynBW && wrappedCursor < (b.offsetX + b.duration) * dynBW
-    );
+    // Beats follow each other without gaps or overlap, so the cursor is in the
+    // last one that starts at or before it — if it hasn't ended yet.
+    let lo = 0, hi = renderBeats.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (renderBeats[mid].offsetX * dynBW <= wrappedCursor) lo = mid + 1; else hi = mid;
+    }
+    const under = lo > 0 ? renderBeats[lo - 1] : undefined;
+    const restActive = !!under && under.isRest && wrappedCursor < (under.offsetX + under.duration) * dynBW;
     if (restActive !== lastRestActive) {
       lastRestActive = restActive;
       self.postMessage({ type: 'REST_ACTIVE', isRest: restActive });
@@ -2142,13 +2349,9 @@ self.onmessage = (e: MessageEvent) => {
         if (!timingHints) break;
         const t = next[key];
         const prev = noteTimings[key];
-        if (t.offsetBeats === null) continue;
-        if (prev && prev.grade === t.grade && prev.offsetBeats === t.offsetBeats) continue;
-        if (t.grade < 3) {
-          timingLabels.set(key, { kind: t.offsetBeats < 0 ? "early" : "late", at: now });
-        } else if (t.perfect) {
-          timingLabels.set(key, { kind: "perfect", at: now });
-        }
+        if (!t.hint) continue;
+        if (prev && prev.hint === t.hint && prev.offsetBeats === t.offsetBeats) continue;
+        timingLabels.set(key, { kind: t.hint, at: now });
       }
       noteTimings = next;
       break;

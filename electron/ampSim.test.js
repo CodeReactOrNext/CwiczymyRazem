@@ -231,3 +231,78 @@ describe("AmpChain drive stage", () => {
     expect(await measureRms(true)).toBeGreaterThan(await measureRms(false));
   });
 });
+
+describe("AmpChain VST rack mode", () => {
+  const sr = 48000;
+  const N = 128;
+  const sine = () => {
+    const x = new Float32Array(N);
+    for (let i = 0; i < N; i++) x[i] = 0.3 * Math.sin((2 * Math.PI * 220 * i) / sr);
+    return x;
+  };
+  // Rack with a different gain per side, so each side is identifiable.
+  const rack = (active = true) => ({
+    isActive: () => active,
+    processBlock: (left, n, right) => {
+      for (let i = 0; i < n; i++) {
+        right[i] = left[i] * 0.25;
+        left[i] *= 0.5;
+      }
+    },
+  });
+  const chain = (params) => {
+    const amp = new AmpChain(sr);
+    amp.setParams({ drive: 0.8, gate: true, cab: true, delayEnabled: true, ...params });
+    return amp;
+  };
+
+  it("replaces the whole built-in chain: guitar → rack → Master (2 × level) → limiter, in stereo", () => {
+    const inF = sine();
+    const amp = chain({ toneMode: "vst", level: 0.5 });
+    amp.setInsert(rack());
+    const l = new Float32Array(N);
+    const r = new Float32Array(N);
+    amp.processBlockStereo(inF, l, r, N);
+    for (let i = 0; i < N; i++) {
+      expect(l[i]).toBeCloseTo(inF[i] * 0.5, 6); // level 0.5 → unity
+      expect(r[i]).toBeCloseTo(inF[i] * 0.25, 6);
+    }
+  });
+
+  it("folds the rack's two sides for a mono output", () => {
+    const inF = sine();
+    const amp = chain({ toneMode: "vst", level: 0.5 });
+    amp.setInsert(rack());
+    const out = new Float32Array(N);
+    amp.processBlock(inF, out, N);
+    for (let i = 0; i < N; i++) expect(out[i]).toBeCloseTo(inF[i] * 0.375, 6);
+  });
+
+  it("limits each side to full scale", () => {
+    const amp = chain({ toneMode: "vst", level: 1 });
+    amp.setInsert({ isActive: () => true, processBlock: (left, n, right) => { left.fill(3, 0, n); right.fill(-3, 0, n); } });
+    const l = new Float32Array(N);
+    const r = new Float32Array(N);
+    amp.processBlockStereo(sine(), l, r, N);
+    expect(Math.max(...l)).toBe(1);
+    expect(Math.min(...r)).toBe(-1);
+  });
+
+  it("plays the built-in chain (same signal on both sides) in builtin mode or without a rack", () => {
+    const inF = sine();
+    for (const amp of [chain({ toneMode: "builtin" }), chain({ toneMode: "vst" })]) {
+      if (amp.params.toneMode === "builtin") amp.setInsert(rack());
+      else amp.setInsert(rack(false)); // unsupported machine: rack inactive
+      const reference = chain({ toneMode: "builtin" });
+      const l = new Float32Array(N);
+      const r = new Float32Array(N);
+      const ref = new Float32Array(N);
+      amp.processBlockStereo(inF, l, r, N);
+      reference.processBlock(inF, ref, N);
+      for (let i = 0; i < N; i++) {
+        expect(l[i]).toBe(ref[i]);
+        expect(r[i]).toBe(ref[i]);
+      }
+    }
+  });
+});

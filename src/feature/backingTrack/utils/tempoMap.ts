@@ -204,3 +204,23 @@ export function withAnchorAt(
   if (sec === null || !Number.isFinite(sec)) return rest.sort((a, b) => a.beat - b.beat);
   return [...rest, { beat, sec }].sort((a, b) => a.beat - b.beat);
 }
+
+/**
+ * The whole recording moved against the tab by `deltaMs`: bar 1 and every
+ * pinned bar together, so the tempo between them stays exactly as it was.
+ *
+ * Moving bar 1 alone is a different edit — it re-times the stretch up to the
+ * first pinned bar — and was what every nudge used to do, quietly bending the
+ * first bars of any song with a pin in it.
+ */
+export function shiftedBy(
+  alignment: { offsetMs: number; tempoAnchors?: readonly TempoAnchor[] },
+  deltaMs: number,
+): { offsetMs: number; tempoAnchors?: TempoAnchor[] } {
+  const offsetMs = alignment.offsetMs + deltaMs;
+  if (!alignment.tempoAnchors?.length) return { offsetMs };
+  return {
+    offsetMs,
+    tempoAnchors: alignment.tempoAnchors.map((anchor) => ({ beat: anchor.beat, sec: anchor.sec + deltaMs / 1000 })),
+  };
+}

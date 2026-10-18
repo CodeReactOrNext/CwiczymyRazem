@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   CALIBRATION_CLICKS,
   CALIBRATION_GAP_MS,
+  calibrationHitMap,
   matchAttacksToClicks,
   measureTimingLatency,
 } from "./timingCalibration";
@@ -76,5 +77,39 @@ describe("measureTimingLatency", () => {
   it("never stores a negative latency for a player a hair ahead of every click", () => {
     const delays = Array.from({ length: 12 }, () => -20);
     expect(measureTimingLatency(delays)).toMatchObject({ ok: true, latencyMs: 0 });
+  });
+
+  it("still offers the median of a refused run, for a player who keeps it anyway", () => {
+    const delays = [0, 200, 40, 180, 10, 220, 60, 150, 0, 210, 30, 190];
+    expect(measureTimingLatency(delays)).toMatchObject({ ok: false, latencyMs: 105, delays });
+  });
+
+  it("has nothing to offer when no click was heard", () => {
+    const delays = Array.from({ length: 12 }, () => null);
+    expect(measureTimingLatency(delays)).toMatchObject({ ok: false, reason: "tooFewHits", latencyMs: null });
+  });
+});
+
+describe("calibrationHitMap", () => {
+  it("spans the click and every hit, with room either side", () => {
+    const map = calibrationHitMap([90, 120, 260, null]);
+    expect(map.fromMs).toBeLessThan(0);
+    expect(map.toMs).toBeGreaterThanOrEqual(280);
+    expect(map.ticks[0]).toBe(map.fromMs);
+    expect(map.ticks[map.ticks.length - 1]).toBe(map.toMs);
+    expect(map.ticks).toContain(0);
+  });
+
+  it("marks the hits near the median steady and the stragglers not", () => {
+    const map = calibrationHitMap([100, 110, 120, 260, null]);
+    expect(map.centerMs).toBe(115);
+    expect(map.rows.map((r) => r.steady)).toEqual([true, true, true, false, false]);
+  });
+
+  it("draws an empty run around the click alone", () => {
+    const map = calibrationHitMap([null, null]);
+    expect(map.centerMs).toBeNull();
+    expect(map.fromMs).toBeLessThan(0);
+    expect(map.toMs).toBeGreaterThan(0);
   });
 });

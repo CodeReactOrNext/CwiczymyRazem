@@ -35,6 +35,7 @@ let overloadListener = null;
 let meterListener = null;
 let connectionListener = null;
 let devicesChangedListener = null;
+let vstListener = null;
 // Whether a consumer is (as far as the host knows) attached — used to decide
 // if an unexpected process exit should surface to the user as a lost stream.
 let captureAttached = false;
@@ -56,6 +57,7 @@ function handleEvent(name, payload) {
     case "meter": safeCall(meterListener, payload); break;
     case "connection-issue": safeCall(connectionListener, payload); break;
     case "devices-changed": safeCall(devicesChangedListener); break;
+    case "vst": safeCall(vstListener, payload); break;
     case "error": console.error("[audio] engine process error:", payload && payload.message); break;
     default: break;
   }
@@ -82,6 +84,9 @@ function spawn() {
     captureAttached = false;
     ampAttached = false;
     console.warn(`[audio] engine process exited with code ${code}${hadConsumers ? " while a stream was open" : ""}`);
+    // A plugin crash takes the engine (and the plugin) with it — let the UI
+    // drop its "loaded / editor open" state instead of showing a ghost.
+    safeCall(vstListener, { type: "engine-exit", code });
     if (hadConsumers) {
       safeCall(connectionListener, {
         status: "failed",
@@ -180,6 +185,14 @@ function recoverAfterResume() {
   return call("recoverAfterResume").catch(() => {});
 }
 
+/** VST rack (electron/vst/vstRack.js) — lives in the engine process, so these
+ *  spawn it if needed: building a rack works before the amp is ever turned on.
+ *  Each resolves with the rack's new status. */
+function rackCall(method, ...args) {
+  return call(method, ...args);
+}
+function onVstEvent(fn) { vstListener = fn; }
+
 function onOverload(fn) { overloadListener = fn; }
 function onMeter(fn) { meterListener = fn; }
 function onConnectionIssue(fn) { connectionListener = fn; }
@@ -214,4 +227,5 @@ module.exports = {
   attachCapture, detachCapture, getCaptureStatus,
   attachAmp, updateAmpParams, detachAmp, getAmpStatus, getDiagnostics,
   onOverload, onMeter, onConnectionIssue, onDevicesChanged, recoverAfterResume,
+  rackCall, onVstEvent,
 };

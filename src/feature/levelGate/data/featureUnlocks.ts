@@ -49,7 +49,7 @@ export const FEATURE_UNLOCKS: Record<LockedFeatureId, FeatureUnlock> = {
     id: "duels",
     name: "Duels",
     href: "/duels",
-    requiredLvl: 4,
+    requiredLvl: 2,
     reason:
       "A duel is ranked: you and a stranger get the same exercise and the app's scoring decides. A few sessions in you know how the scoring hears you — that is when a match against somebody else is a fair one.",
     perks: [

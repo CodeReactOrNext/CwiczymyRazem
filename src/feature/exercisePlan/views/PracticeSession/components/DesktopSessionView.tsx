@@ -1,5 +1,6 @@
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import type { BackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
 import type { Exercise,ExercisePlan, ScoredRun } from "feature/exercisePlan/types/exercise.types";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
@@ -114,6 +115,9 @@ interface DesktopSessionViewProps {
   /** Backing-track bar — only a song practice session passes one. Rendered above
    *  the tablature, but owned by PracticeSession, since it drives real audio. */
   backingTrackSlot?:        React.ReactNode;
+  /** The button under Calibrate timing that opens the backing-track editor. */
+  backingTrackStatus?:      BackingTrackStatus;
+  onOpenBackingTrack?:      () => void;
   songSectionMapSlot?:      React.ReactNode;
   /** Cinema mode — the backing video fills the session behind the notation. */
   backingCinema?:           boolean;
@@ -324,6 +328,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     rewardAmount={p.skillRewardAmount}
                     controlsSlot={playbackControls}
                     backingTrackSlot={p.backingTrackSlot}
+                    backingTrackStatus={p.backingTrackStatus}
+                    onOpenBackingTrack={p.onOpenBackingTrack}
                     songSectionMapSlot={p.songSectionMapSlot}
                     cinema={p.backingCinema}
                     obscured={p.backingAligning}

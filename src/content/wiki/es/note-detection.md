@@ -48,7 +48,7 @@ Mientras suena una nota, un pequeño afinador encima muestra dónde está la cue
 
 El gráfico bajo el resumen muestra cada nota de la pasada en orden: a qué distancia del pulso cayó cada una, o de su altura en los ejercicios de bending, con la banda verde marcando la nota máxima. Una pasada que empieza ajustada y se desvía a medida que se cansa tu mano se ve ahí de inmediato.
 
-Si todas las notas se inclinan hacia el mismo lado en una cantidad parecida, lo normal es que sea el retardo del audio y no tus manos. Con el micrófono activado, pulsa **Calibrar el tempo** junto a la puntuación sobre la tablatura y toca siguiendo unos cuantos clics. La app mide el retardo de tus altavoces o interfaz y puntúa contra él a partir de entonces.
+Si todas las notas se inclinan hacia el mismo lado en una cantidad parecida, lo normal es que sea el retardo del audio y no tus manos. Con el micrófono activado, pulsa **Calibrar el tempo** junto a la puntuación sobre la tablatura y toca siguiendo unos cuantos clics. La app mide el retardo de tus altavoces o interfaz y puntúa contra él a partir de entonces. Después, un mapa muestra dónde cayó cada pulsación respecto a su clic, y puedes quedarte con el resultado con **Está bien** o tocar otra vez.
 
 ## Configurarlo
 
