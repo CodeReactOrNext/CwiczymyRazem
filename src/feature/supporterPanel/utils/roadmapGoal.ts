@@ -48,3 +48,15 @@ const LEVEL_TONES: Record<string, string> = {
 /** Background and text classes for a roadmap level's pill. */
 export const levelTone = (level: string): string =>
   LEVEL_TONES[level] ?? "bg-zinc-800 text-zinc-400";
+
+// The level as a dot and a word, the way the curated cards print it.
+const LEVEL_TEXT_TONES: Record<string, string> = {
+  "Absolute Beginner": "text-cyan-300",
+  Beginner: "text-emerald-300",
+  Intermediate: "text-amber-300",
+  Advanced: "text-purple-300",
+};
+
+/** Text class for a roadmap level written inline, without a pill. */
+export const levelTextTone = (level: string): string =>
+  LEVEL_TEXT_TONES[level] ?? "text-zinc-300";

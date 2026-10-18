@@ -6,6 +6,7 @@ import {
   setActiveAmpPresetId,
   setAmpBufferSize,
   setAmpParams,
+  setToneMode,
   startAmp,
   stopAmp,
   subscribeAmpSim,
@@ -42,5 +43,6 @@ export const useAmpSim = () => {
     setBufferSize: setAmpBufferSize,
     setActivePresetId: setActiveAmpPresetId,
     loadPreset: loadAmpPreset,
+    setToneMode,
   };
 };

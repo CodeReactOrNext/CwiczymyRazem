@@ -9,6 +9,7 @@ import {
   Medal,
   Repeat,
   ScrollText,
+  Signpost,
   Target,
   Trophy,
 } from "lucide-react";
@@ -18,6 +19,7 @@ export const LIBRARY_TABS: PageTab[] = [
   { label: "Rotation", href: "/rotation", icon: Repeat },
   { label: "My Plans", href: "/plans", icon: ListChecks },
   { label: "My Exercises", href: "/my-exercises", icon: Dumbbell },
+  { label: "Player Roadmaps", href: "/my-roadmaps", icon: Signpost },
 ];
 
 export const PROGRESS_TABS: PageTab[] = [

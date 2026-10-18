@@ -138,6 +138,52 @@ describe("listUserRoadmaps", () => {
     expect(rows[0].id).toBe("gen-1");
   });
 
+  it("draws the roadmap's shape: steps and finished steps per phase", async () => {
+    collections.roadmaps["gen-1"] = generatedRoadmap({
+      phases: [
+        generatedRoadmap().phases[0],
+        {
+          id: "p2",
+          title: "Phase two",
+          order: 1,
+          steps: [
+            {
+              id: "g-s3",
+              title: "Sweeps",
+              description: "",
+              successCriteria: "",
+              sessionsRequired: 1,
+              sessionsCompleted: 0,
+              order: 0,
+            },
+          ],
+        },
+      ],
+    });
+
+    const [row] = await listUserRoadmaps();
+
+    expect(row.phaseSteps).toEqual([2, 1]);
+    expect(row.phaseDone).toEqual([1, 0]);
+    expect(row.firstStep).toBe("Alternate picking");
+    // Under way beats untouched: one session in, not yet the three it needs.
+    expect(row.nextStep).toBe("String skipping");
+  });
+
+  it("has no next step once every step is done", async () => {
+    collections.roadmaps["gen-1"] = generatedRoadmap();
+    collections.userRoadmapProgress["u1_gen-1"] = {
+      roadmapId: "gen-1",
+      userId: "u1",
+      stepProgress: { "g-s2": 3 },
+    };
+
+    const [row] = await listUserRoadmaps();
+
+    expect(row.nextStep).toBeNull();
+    expect(row.phaseDone).toEqual([2]);
+  });
+
   it("sorts the newest activity first", async () => {
     collections.roadmaps["gen-1"] = generatedRoadmap();
     collections.roadmaps["gen-2"] = generatedRoadmap({
@@ -190,6 +236,9 @@ describe("followers", () => {
       sessionsCompleted: 3,
       startedAt: "2026-06-01T00:00:00.000Z",
       lastPractisedAt: "2026-06-02T00:00:00.000Z",
+      phaseDone: [1],
+      // Their own run never touched the first step, so that is still next.
+      nextStep: "Alternate picking",
     });
     // The owner's numbers on the row are untouched.
     expect(row.sessionsCompleted).toBe(3);
@@ -218,7 +267,12 @@ describe("followers", () => {
       phases: [
         {
           ...generatedRoadmap().phases[0],
-          check: { passedAt: "2026-01-05", attempts: 1, bestScore: 5, total: 5 },
+          check: {
+            passedAt: "2026-01-05",
+            attempts: 1,
+            bestScore: 5,
+            total: 5,
+          },
         },
       ],
     });

@@ -94,7 +94,12 @@
     "heard": "{{hits}} von {{total}} Klicks erkannt, stabil innerhalb ±{{spread}} ms",
     "saved_before": "Vorher gespeichert",
     "estimated_before": "Vorher geschätzt",
-    "use": "{{ms}} ms übernehmen"
+    "use": "Passt · {{ms}} ms",
+    "map": {
+      "title": "Wo jeder Anschlag landete",
+      "click": "Klick",
+      "aria": "{{hits}} von {{total}} Anschlägen erkannt, meist {{ms}} ms nach dem Klick"
+    }
   },
   "add_to_plan": "Zum Plan hinzufügen",
   "saving": "Wird gespeichert…",

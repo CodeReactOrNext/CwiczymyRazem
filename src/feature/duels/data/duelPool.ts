@@ -77,8 +77,12 @@ const POOL_IDS = new Set<string>(DUEL_EXERCISE_IDS);
 
 export const isDuelExercise = (exerciseId: string): boolean => POOL_IDS.has(exerciseId);
 
-export const getDuelExercise = (exerciseId: string): Exercise | null =>
-  (isDuelExercise(exerciseId) && byId.get(exerciseId)) || null;
+/**
+ * The exercise a stored duel was drawn with — from the whole catalogue, not
+ * just the pool, so a duel keeps its title (and stays playable) after its
+ * exercise leaves the pool. Drawing stays inside the pool: see `drawDuelExercise`.
+ */
+export const getDuelExercise = (exerciseId: string): Exercise | null => byId.get(exerciseId) ?? null;
 
 /**
  * Which score a duel run is judged on:

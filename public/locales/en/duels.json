@@ -23,7 +23,7 @@
     "matched": "Opponent found — your duel is below.",
     "queued": "You're in the queue. We'll let you know when someone joins.",
     "error_limit": "You already have {{max}} duels open.",
-    "error_locked": "Duels open at level 4.",
+    "error_locked": "Duels open at level 2.",
     "error": "Couldn't join right now. Try again in a moment.",
     "ticket": "Looking for an opponent",
     "ticket_expires": "Expires in {{time}}",
@@ -96,9 +96,8 @@
     "nobody_played": "Nobody played"
   },
   "feed": {
-    "title": "All duels",
+    "title": "Other players' duels",
     "latest": "latest {{count}}",
-    "empty": "Nobody has settled a duel yet. Every finished duel in the app shows up here.",
     "win": "{{winner}} beat {{loser}}",
     "walkover": "{{winner}} beat {{loser}} — walkover",
     "draw": "{{winner}} drew with {{loser}}",

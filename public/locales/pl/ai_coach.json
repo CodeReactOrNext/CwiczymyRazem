@@ -3,6 +3,7 @@
   "mastery_roadmap": "Ścieżka mistrzostwa",
   "mastery_roadmaps": "Ścieżki mistrzostwa",
   "player_roadmaps": "Ścieżki graczy",
+  "players_link": "Zbuduj ścieżkę wokół własnego celu albo idź ścieżką innego gracza",
   "back": "Wróć",
   "practice": "Ćwiczenia",
   "intro": "Prowadzone ścieżki ćwiczeń dla umiejętności gitarowych i stylów gry.",
@@ -24,9 +25,30 @@
     "board_body": "Ścieżki: {{total}}, gracze: {{players}}. Jako wspierający możesz otworzyć każdą z nich i zacząć za darmo.",
     "board_body_one": "Ścieżki: {{total}}, gracze: {{players}}. Jako wspierający możesz otworzyć każdą z nich i zacząć za darmo.",
     "title": "Zbuduj ścieżkę wokół własnego celu",
-    "body1": "Ścieżki graczy są szyte na miarę: opisujesz, co chcesz grać, a coach rozpisuje fazy, ćwiczenia, lekcje i utwory, które cię tam doprowadzą. Pojawiają się tu też ścieżki innych graczy, więc widzisz, do czego dążą.",
-    "body2": "Każdą z tych ścieżek generuje model AI, a każde generowanie kosztuje prawdziwe pieniądze. riff.quest utrzymuje się z darowizn, dlatego ta zakładka jest dostępna z odznaką wspierającego. Zakładka Ścieżki mistrzostwa pozostaje darmowa dla wszystkich.",
-    "body3": "Każda darowizna, nawet najmniejsza, odblokowuje Ścieżki graczy na zawsze. Bez subskrypcji.",
+    "lead": "Opisz, co chcesz grać — coach zamieni to w fazy i kroki.",
+    "steps_title": "Do każdego kroku dostajesz",
+    "step": {
+      "exercise": {
+        "title": "Ćwiczenie",
+        "body": "Gotowe do zagrania w aplikacji"
+      },
+      "description": {
+        "title": "Opis",
+        "body": "Co ćwiczyć i kiedy jest zrobione"
+      },
+      "video": {
+        "title": "Lekcję wideo",
+        "body": "Dobraną do tego konkretnego kroku"
+      }
+    },
+    "why_title": "Dlaczego to jest zablokowane?",
+    "why": {
+      "ai": "Każdą ścieżkę pisze model AI",
+      "cost": "Każda kosztuje prawdziwe pieniądze",
+      "donations": "riff.quest utrzymuje się z darowizn",
+      "unlock": "Dowolna darowizna odblokowuje na zawsze",
+      "unlock_note": "Bez subskrypcji."
+    },
     "support": "Wesprzyj projekt",
     "email": "Zapłać z adresu e-mail przypisanego do tego konta, żeby darowizna trafiła na właściwe konto.",
     "email_known": "Zapłać z adresu e-mail przypisanego do tego konta — {{email}} — żeby darowizna trafiła na właściwe konto."

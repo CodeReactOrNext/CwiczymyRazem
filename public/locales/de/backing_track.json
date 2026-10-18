@@ -1,257 +1,145 @@
 {
-  "sources": {
-    "off": {"label": "Nichts", "description": "Nur die Tab. Wähl eine Aufnahme, um den echten Song darunter zu hören — sie folgt Play, Pause und jedem Takt, den du anklickst."},
-    "file": {"label": "Audiodateien", "description": "Aufnahmen auf deinem Computer — ein Backing Track oder getrennte Spuren (Drums, Bass, Gesang), die als Ebenen spielen."},
-    "youtube": {"label": "YouTube-Video", "description": "Füg einen Link zum Song ein. Das Video läuft unter der Tab, und sein Ton ist das, was du hörst."}
-  },
   "bar": {
-    "use_video": "Video verwenden",
-    "bad_link": "Das ist kein YouTube-Link — versuch youtube.com/watch?v=… oder youtu.be/…",
-    "locks_at": "Synchron bei",
-    "leave_cinema": "Kino verlassen",
-    "cinema": "Kino",
-    "files": "{{count}} Dateien",
-    "files_one": "1 Datei",
-    "title": "Backing Track",
-    "title_empty": "Zum echten Song spielen",
-    "hint_empty": "Füg ein YouTube-Video oder eine Audiodatei dieses Songs hinzu. Sie läuft unter der Tab und folgt Play, Pause und jedem Takt, den du anklickst.",
-    "hint_unaligned": "Noch nicht mit der Tab synchronisiert, kann also vor- oder nachlaufen. Dauert eine Minute: Leg Takt 1 auf den ersten Schlag.",
+    "add": "Backing Track hinzufügen",
+    "sync": "Backing Track synchronisieren",
+    "hint_empty": "Füg eine Audiodatei dieses Songs hinzu. Sie läuft unter der Tab und folgt Play, Pause und jedem Takt, den du anklickst.",
+    "hint_unaligned": "Noch nicht mit der Tab synchronisiert, kann also vor- oder nachlaufen. Zieh Takt 1 auf den ersten Schlag.",
     "hint_aligned": "Mit der Tab synchronisiert. Läuft es beim Spielen auseinander? Mit [ und ] nachjustieren.",
-    "add_recording": "Aufnahme hinzufügen",
-    "line_up": "Mit der Tab synchronisieren",
-    "sync_mix": "Sync & Mix",
+    "cinema": "Kino",
     "leave_cinema_esc": "Kino verlassen — Esc"
   },
-  "sound": {
-    "title": "Ton",
-    "body": "Hak die Dateien an, die zu diesem Song gehören. Mehrere gleichzeitig spielen als Ebenen einer Aufnahme.",
-    "importing": "Wird importiert…",
-    "add_files": "Dateien hinzufügen",
-    "loading": "Spuren werden geladen…",
-    "empty": "Noch keine Dateien — füg welche hinzu oder zieh Audiodateien irgendwo auf diesen Bildschirm.",
-    "remove_from_song": "{{name}} aus diesem Song entfernen",
+  "common": {
+    "mute": "{{what}} stummschalten",
+    "unmute": "{{what}} einschalten"
+  },
+  "editor": {
+    "title": "Backing Track",
+    "done": "Fertig",
+    "drop": "Loslassen, um als Backing Track hinzuzufügen",
+    "drop_desktop_only": "Dateien hinzufügen geht nur in der Desktop-App",
+    "tab_mix": "Instrumente der Tab",
+    "empty_title": "Füg den Backing Track des Songs hinzu",
+    "empty_body": "Eine Audiodatei des Songs — mp3, wav, flac. Füg mehrere auf einmal hinzu (Drums, Bass, Gesang), dann laufen sie als Ebenen zusammen. Du kannst Dateien auch irgendwo auf diesen Bildschirm ziehen.",
+    "web_title": "Backing Tracks gibt es in der Desktop-App",
+    "web_body": "Es sind Audiodateien auf deinem Computer, die der Browser nicht abspielen kann. Das Video links funktioniert auch hier.",
+    "step": "Schritt {{n}} von {{total}}",
+    "step1": "Drück „Automatisch synchronisieren“ — oder zieh die gelbe Linie „Takt 1“ selbst auf den ersten Schlag. Alle Takte auf einmal verschiebst du mit der Leiste über der Aufnahme.",
+    "step2": "Drück Play und hör zu. Läuft ein späterer Takt von seinem Schlag weg, zieh seine Linie darauf — sie bleibt dort angeheftet.",
+    "reading": "Aufnahme wird gelesen…",
+    "no_waveform": "Für diese Datei lässt sich keine Wellenform zeigen.",
+    "how": "So funktioniert's",
+    "whole_song": "Ganzer Song — klicken zum Springen"
+  },
+  "intro": {
+    "title": "Spiel zum echten Song",
+    "lead": "Ein Backing Track ist eine Aufnahme des Songs, die unter der Tab läuft. Sie startet, stoppt und springt mit ihr — klick einen Takt an, und die Band ist auch dort.",
+    "step1_title": "Füg die Aufnahme hinzu",
+    "step1_body": "Eine Audiodatei des Songs — mp3, wav, flac. Hast du Drums, Bass oder Gesang als eigene Dateien? Füg alle hinzu, dann laufen sie als Ebenen zusammen.",
+    "step1_web": "Eine Audiodatei des Songs — mp3, wav, flac. Die Dateien liegen auf deinem Computer, deshalb geht dieser Teil in der Desktop-App.",
+    "step2_title": "Synchronisiere sie mit der Tab",
+    "step2_body": "Drück „Automatisch synchronisieren“, dann findet die App Takt 1 und das Tempo selbst und folgt einer Band, die schneller oder langsamer wird. Nicht ganz richtig? Zieh eine Taktlinie auf den Schlag, den du in der Wellenform siehst.",
+    "step3_title": "Füg ein YouTube-Video hinzu, wenn du magst",
+    "step3_body": "Füg einen Link ein, und das Video — das offizielle, ein Live-Mitschnitt, eine Lektion — läuft synchron über der Tab. Es ist nur Bild: Es bleibt stumm, der Ton kommt aus deiner Aufnahme. Das geht auch im Browser.",
+    "start": "Los geht's"
+  },
+  "auto": {
+    "run": "Automatisch synchronisieren",
+    "title": "Findet Takt 1 und das Tempo in der Aufnahme und heftet Takte an, wo die Band driftet",
+    "analysing": "Aufnahme wird analysiert…",
+    "running": "Suche Takt 1…",
+    "done": "Synchronisiert: Takt 1 bei {{start}} s, {{bpm}} BPM.",
+    "drift": "Drift an {{count}} Takten ausgeglichen.",
+    "drift_one": "Drift an 1 Takt ausgeglichen.",
+    "listen": "Drück Play und hör zu — wenn ein Takt daneben liegt, zieh seine Linie.",
+    "undo": "Rückgängig",
+    "unsure": "Da bin ich mir nicht sicher — Drums, Bass und Töne der Aufnahme zeigen auf verschiedene Stellen. Prüf es mit dem Ohr oder setz Takt 1 selbst.",
+    "apply_anyway": "Trotzdem übernehmen",
+    "failed": "Die Aufnahme ließ sich nicht analysieren.",
+    "partial": "Diese Tab deckt nur etwa {{percent}}% der Aufnahme ab, also kann höchstens dieser Teil synchron laufen."
+  },
+  "recordings": {
+    "title": "Backing Tracks",
+    "add": "Dateien hinzufügen",
+    "importing": "Wird hinzugefügt…",
+    "none": "Noch keine Dateien.",
+    "desktop_only": "Backing Tracks sind Audiodateien auf deinem Computer und funktionieren daher in der Desktop-App.",
+    "missing": "Datei fehlt",
+    "solo": "{{name}} solo",
+    "solo_title": "Nur diese hören — noch mal klicken für alle",
+    "remove": "{{name}} aus diesem Song entfernen",
+    "remove_title": "Aus dem Song entfernen (bleibt in der Bibliothek)",
+    "volume": "Lautstärke: {{name}}",
+    "everything": "alle Backing Tracks",
+    "master": "Alle zusammen",
+    "loading": "Dateien werden geladen…",
+    "library": "Bei anderen Songs ({{count}})",
     "add_to_song": "{{name}} zu diesem Song hinzufügen",
-    "layer": "Ebene {{n}}",
-    "delete": "{{name}} aus der Bibliothek löschen",
-    "recording_tempo": "Aufnahmetempo",
-    "tempo_aria": "Tempo, in dem die Dateien aufgenommen wurden",
-    "match_session": "An Session anpassen",
-    "plays_at": "spielt mit {{rate}}×",
-    "stretched": "stark gedehnt",
-    "volume": "Lautstärke",
-    "unmute": "Backing Track einschalten",
-    "mute": "Backing Track stummschalten",
-    "desktop_only": "Backing-Track-Dateien liegen auf deinem Computer, daher gehört diese Quelle zur Desktop-App. Nutz im Browser stattdessen ein YouTube-Video."
+    "delete": "{{name}} aus der Bibliothek löschen"
   },
   "video": {
-    "title": "Video obendrauf",
-    "optional": "optional",
-    "body": "Nur Bild — das Video ist stumm, und deine Dateien bleiben der Ton. Jedes hat seine eigene Synchronisation.",
-    "hide": "Video ausblenden",
-    "show": "Video einblenden",
-    "no_speed": "YouTube hat keine Geschwindigkeit für {{bpm}} BPM, also läuft das Bild frei. Was du hörst, bleibt trotzdem synchron.",
-    "sync": "Video-Sync",
-    "nudge_earlier": "Video früher schieben",
-    "nudge_later": "Video später schieben",
-    "change": "Video wechseln"
+    "title": "YouTube-Video",
+    "show": "Über der Tab zeigen",
+    "body": "Das offizielle Video, ein Live-Mitschnitt oder eine Lektion zum Mitschauen. Es läuft synchron und stumm über der Tab — der Ton bleibt dein Backing Track.",
+    "link": "YouTube-Link",
+    "add": "Video hinzufügen",
+    "bad_link": "Das ist kein YouTube-Link — versuch youtube.com/watch?v=… oder youtu.be/…",
+    "no_speed": "YouTube hat keine Geschwindigkeit für {{bpm}} BPM, das Bild kann also wegdriften. Der Ton bleibt synchron.",
+    "offset": "Videostart",
+    "same_take": "Wie der Backing Track",
+    "same_take_done": "Wie der Backing Track synchronisiert",
+    "same_take_title": "Das Video ist dieselbe Aufnahme wie die Dateien — gib ihm dieselbe Synchronisation",
+    "remove": "Video entfernen"
   },
-  "nudge": {
-    "earlier": "Früher — Shift halten für {{ms}} ms",
-    "later": "Später — Shift halten für {{ms}} ms"
+  "offset": {
+    "earlier": "{{what}} früher",
+    "later": "{{what}} später",
+    "hint": "{{ms}} ms — mit Shift {{coarse}} ms"
   },
-  "youtube": {
-    "locked": "Mit der Tab synchron bei {{rate}}× — das Video hält dieses Tempo exakt.",
-    "runs_free": "YouTube spielt nur mit festen Geschwindigkeiten, und {{bpm}} BPM gehört nicht dazu, also läuft das Video frei, statt ständig zurückgerissen zu werden.",
-    "paste": "Füg den YouTube-Link des Songs ein"
+  "shift": {
+    "label": "Alle Takte verschieben",
+    "drag": "Hier ziehen, um alle Takte zu verschieben",
+    "title": "Verschiebt Takt 1 und alle angehefteten Takte zusammen, das Tempo dazwischen bleibt gleich"
   },
-  "align": {
-    "mute": "{{what}} stummschalten",
-    "unmute": "{{what}} einschalten",
-    "missing_file": "Fehlende Datei",
-    "steps": {
-      "choose": "Aufnahme wählen",
-      "choose_detail": "ein YouTube-Video oder Audiodateien",
-      "layers": "{{count}} Dateien als Ebenen",
-      "bar1": "Takt 1 auf den ersten Schlag legen",
-      "starts_at": "startet bei {{ms}} ms",
-      "bar1_detail": "damit Tab und Song zusammen anfangen",
-      "listen": "Hören und feinjustieren",
-      "listen_detail": "jeden Takt korrigieren, der später wegdriftet"
-    },
-    "hints": {
-      "choose": "Wähl unten, woher der Ton kommt. Er läuft unter der Tab und folgt Play, Pause und jedem Takt, den du anklickst.",
-      "bar1": "Drück die Leertaste zum Abspielen. Zieh die gelbe START-Flagge in der Takt-Zeile auf den ersten Schlag, den du hörst — oder verschieb die ganze Aufnahme mit [ und ].",
-      "listen": "Spiel mit und hör hin. Läuft die Tab später im Song vor oder nach, zieh die Linie dieses Takts auf seinen Schlag. Drück Fertig, wenn es gut klingt — es wird für diesen Song gespeichert."
-    },
-    "zoom": {
-      "one_bar": "1 Takt",
-      "one_bar_title": "So zoomen, dass ein Takt den Bildschirm füllt",
-      "four_bars": "4 Takte",
-      "four_bars_title": "So zoomen, dass vier Takte den Bildschirm füllen",
-      "whole": "Ganzer Song",
-      "whole_title": "Die ganze Aufnahme von Anfang bis Ende",
-      "label": "Zoom",
-      "hint": "oder über der Zeitleiste scrollen",
-      "out": "Herauszoomen",
-      "out_title": "Mehr von der Aufnahme auf einmal sehen",
-      "window_title": "Wie viel der Aufnahme auf die Bildschirmbreite passt",
-      "in": "Hineinzoomen",
-      "in_title": "Weniger davon sehen, dafür genauer"
-    },
-    "reading": "Aufnahme wird gelesen…",
-    "no_waveform": "Keine Wellenform zum Anzeigen.",
-    "unsupported": "Dieser Browser kann keinen Tab-Ton teilen, daher gibt es keine Wellenform. Chrome oder Edge können es; Firefox und Safari nicht. Synchronisier unten nach Gehör.",
-    "no_waveform_yet": "Noch keine Wellenform — nimm unten einen Abschnitt des Videos auf, um seine Form zu sehen. Synchronisieren nach Gehör geht auch ohne.",
-    "capture": {
-      "whole": "Ganzes Video erfasst.",
-      "percent": "{{percent}} % des Videos erfasst",
-      "none": "Noch keine Wellenform erfasst",
-      "nothing_left": "Nichts mehr zu erfassen.",
-      "on_its_own": "Wird separat erfasst, nie während du spielst.",
-      "more": "Mehr erfassen",
-      "start": "Wellenform erfassen",
-      "delay": "Erfassungsverzögerung {{ms}} ms, korrigiert"
-    },
-    "drop": {
-      "add": "Loslassen, um als Spur hinzuzufügen",
-      "needs_desktop": "Dateien hinzufügen braucht die Desktop-App",
-      "adding": "Dateien werden hinzugefügt…",
-      "hint": "Audiodateien irgendwo hineinziehen, um eine Spur hinzuzufügen"
-    },
-    "stems": "{{count}} Spuren",
-    "stems_one": "1 Spur",
-    "subtitle": "Spiel den echten Song unter der Tab, so synchronisiert, dass beide zusammen Takt 1 treffen.",
-    "done": "Fertig",
-    "pick_first": "Wähl zuerst einen Backing Track und komm dann hierher zurück.",
-    "tools": {
-      "drag_to": "Spur ziehen, um",
-      "move_view": "Ansicht bewegen",
-      "move_view_title": "Woanders hinschauen. Die Aufnahme bleibt genau, wo sie ist.",
-      "move_audio": "Audio bewegen",
-      "move_audio_title": "Die Aufnahme gegen die Tab verschieben. Die mittlere Taste bewegt weiterhin die Ansicht.",
-      "playhead": "Abspielkopf",
-      "follow_title": "Ansicht auf dem Abspielkopf zentriert halten, während er läuft",
-      "follow": "Wiedergabe folgen",
-      "jump": "Abspielkopf ins Bild holen",
-      "jump_title": "Abspielkopf ins Bild holen und dort bleiben"
-    },
-    "tempo": {
-      "label": "Tempo-Raster",
-      "hint": "setzt auch die Session",
-      "aria": "Das eigene Tempo der Aufnahme",
-      "title": "Das Tempo des Songs. Setzt das Session-Tempo passend, damit die Aufnahme klingt wie aufgenommen — langsamer wird in der Session gemacht, nicht hier.",
-      "even_title": "Ein Tempo für die ganze Aufnahme. Zieh eine Taktlinie, um einen Takt festzupinnen, der driftet.",
-      "pinned_title": "Takte mit eigenem Tempo festgepinnt, damit das Raster einer Band folgt, die schwankt.",
-      "even": "durchgehend gleich",
-      "pinned": "{{count}} Takte festgepinnt",
-      "pinned_one": "1 Takt festgepinnt",
-      "reset_title": "Zurück zu einem Tempo für die ganze Aufnahme",
-      "reset": "Zurücksetzen"
-    },
-    "shortcuts": {
-      "aria": "Tastenkürzel",
-      "title": "Tastenkürzel — ?",
-      "label": "Kürzel",
-      "close": "Kürzelliste schließen",
-      "keys": {
-        "scroll": "Scrollen", "shift_scroll": "Shift + Scrollen", "space": "Leertaste", "middle_drag": "Mittlere Taste ziehen",
-        "drag_line": "Taktlinie ziehen", "shift_drag": "Shift + Ziehen", "alt_drag": "Alt + Ziehen",
-        "click_line": "Taktlinie anklicken", "double_click": "Doppelklick"
-      },
-      "what": {
-        "scroll": "Zoomen, wo der Zeiger ist",
-        "shift_scroll": "Entlang der Aufnahme bewegen",
-        "space": "Abspielen oder stoppen, ohne Einzähler",
-        "middle_drag": "Ansicht ziehen",
-        "brackets": "Ganze Aufnahme um {{ms}} ms verschieben",
-        "shift_brackets": "Um {{ms}} ms verschieben",
-        "drag_line": "Tempo dieses Takts ändern, {{bpm}} BPM pro Pixel",
-        "shift_drag": "Ein Fünftel davon, für die letzten Hundertstel",
-        "alt_drag": "Transienten-Einrasten ignorieren",
-        "click_line": "Tempo exakt eintippen",
-        "double_click": "Takt lösen",
-        "esc": "Schließen"
-      }
-    },
-    "lanes": {
-      "overview": "Übersicht",
-      "follows": "folgt der Wiedergabe",
-      "click_jump": "klicken zum Springen",
-      "bars": "Takte",
-      "bars_hint": "Linie auf den Schlag ziehen",
-      "tab": "Tabulatur",
-      "the_tab": "die Tabulatur",
-      "tab_mute_hint": "schaltet jedes Instrument der Datei stumm",
-      "muted": "stumm",
-      "what_you_play": "was du spielst",
-      "the_video": "das Video",
-      "video_mute_hint": "die Wellenform füllt sich nur, solange es zu hören ist",
-      "tap_to_align": "tippen zum Synchronisieren"
-    },
+  "sync": {
+    "tempo": "Tempo der Aufnahme",
+    "tempo_title": "In welchem Tempo der Song läuft. Eine Änderung setzt auch das Session-Tempo, damit die Aufnahme weiter wie das Original klingt.",
+    "stretched": "läuft mit {{rate}}× — stark gedehnt",
+    "pinned_label": "Angeheftete Takte",
+    "pinned": "{{count}} Takte",
+    "pinned_one": "1 Takt",
+    "unpin": "Alle lösen",
+    "unpin_title": "Zurück zu einem Tempo für die ganze Aufnahme"
+  },
+  "transport": {
+    "play": "Play",
+    "stop": "Stopp",
+    "space": "Leertaste",
+    "zoom_in": "Vergrößern",
+    "zoom_out": "Verkleinern",
+    "zoom_bar": "1 Takt",
+    "zoom_bars": "4 Takte",
+    "zoom_all": "Ganzer Song",
+    "follow": "Folgen",
+    "follow_title": "Ansicht beim Abspielkopf halten",
+    "keys": "Mausrad — Zoom · Shift+Mausrad — verschieben · [ ] — alle Takte verschieben · Alt — ohne Einrasten ablegen · Doppelklick auf angehefteten Takt — lösen"
+  },
+  "lane": {
+    "bar1": "Takt 1",
+    "on_beat": "auf dem Schlag",
     "bar_n": "Takt {{n}}",
-    "bpm": {
-      "slower": "Um ein Hundertstel langsamer",
-      "slower_title": "Langsamer — Shift für ein Zehntel",
-      "selected": "Tempo des gewählten Takts",
-      "faster": "Um ein Hundertstel schneller",
-      "faster_title": "Schneller — Shift für ein Zehntel",
-      "stop": "Bearbeitung dieses Takts beenden"
-    },
-    "transport": {
-      "stop_aria": "Wiedergabe stoppen",
-      "play_aria": "Wiedergabe starten",
-      "stop": "Stopp",
-      "play": "Abspielen",
-      "drift": "Drift",
-      "start": "Start",
-      "earlier": "Backing Track früher schieben",
-      "earlier_title": "Früher um {{ms}} ms — Shift für {{coarse}}",
-      "later": "Backing Track später schieben",
-      "later_title": "Später um {{ms}} ms — Shift für {{coarse}}",
-      "moves_whole": "verschiebt die ganze Aufnahme · Shift für {{ms}} ms",
-      "footer": "Leertaste spielt ohne Einzähler · Ziehen mit der mittleren Taste bewegt die Ansicht · ? zeigt alle Kürzel"
-    }
-  },
-  "stem": {
-    "solo_aria": "{{name}} solo",
-    "solo": "Solo",
-    "mute": "Stumm",
-    "remove": "Entfernen",
-    "on_grid": "Im Raster",
-    "resize": "Höhe der Spur {{name}} ändern"
-  },
-  "lanes_aria": {
-    "tab_seek": "Tab-Noten auf der Synchronisations-Zeitleiste — klicken, um von dort zu spielen",
-    "tab": "Tab-Noten auf der Synchronisations-Zeitleiste",
-    "grid_pan": "Synchronisationsraster des Backing Tracks — ziehen, um die Ansicht zu bewegen",
-    "grid_shift": "Synchronisationsraster des Backing Tracks — ziehen, um die Aufnahme zu verschieben",
-    "overview": "Übersicht des Backing Tracks — klicken, um zu einer Stelle der Aufnahme zu springen"
+    "aria": "Aufnahme und Taktlinien — zieh eine Taktlinie auf ihren Schlag, daneben verschiebst du die Ansicht"
   },
   "mixer": {
-    "levels": "Instrumentenpegel",
-    "levels_title": "Instrumentenpegel — was du hörst",
     "main": "Hauptinstrument",
     "instrument": "Instrument",
     "volume": "Lautstärke: {{name}}"
   },
-  "clock": {"position": "Position in der Aufnahme"},
-  "ruler": {
-    "start": "START",
-    "on_beat": "auf dem Schlag",
-    "was": "vorher {{bpm}}",
-    "aria": "Takt-Lineal — zieh eine Taktlinie auf den Schlag, den du hörst, Shift für fein, Doppelklick löst sie"
+  "clock": {
+    "position": "Position in der Aufnahme"
   },
-  "capture": {
-    "lengths": {"s15": "15 s", "s30": "30 s", "m1": "1 Min.", "m2": "2 Min.", "until_stop": "Bis ich stoppe"},
-    "title": "Wellenform erfassen",
-    "body": "Der Ton des Videos lässt sich nur messen, indem man ihn spielen hört. Also spielt es ihn ab und hört zu — für sich, bei gestoppter Session, damit nichts einen Thread mit ihm teilen muss.",
-    "close": "Schließen",
-    "unsupported": "Dieser Browser kann keinen Tab-Ton übergeben, daher gibt es keine Wellenform zu erfassen. Chrome und Edge können es; Firefox und Safari nicht — oder nutz die Desktop-App.",
-    "for": "Erfassen für",
-    "start": "Erfassung starten",
-    "heard": "{{percent}} % des Videos gehört",
-    "nothing_heard": "Noch nichts gehört",
-    "saved": "Gespeichert",
-    "tip": "Spul vor dem Start zu der Stelle, die du synchronisierst — eine Erfassung zeichnet nur, was sie hört. Alles, was der Tab spielt, wird gehört, also lass den Rest der App still, während sie läuft."
+  "lanes_aria": {
+    "tab_seek": "Tab-Noten auf der Synchronisations-Zeitleiste — klicken, um von dort zu spielen",
+    "tab": "Tab-Noten auf der Synchronisations-Zeitleiste",
+    "overview": "Übersicht des Backing Tracks — klicken, um zu einer Stelle der Aufnahme zu springen"
   }
 }

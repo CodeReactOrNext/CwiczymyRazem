@@ -89,13 +89,44 @@ const mergeStepProgress = (
 const roadmapSteps = (roadmap: Roadmap) =>
   (roadmap.phases ?? []).flatMap((phase) => phase.steps ?? []);
 
+type Step = ReturnType<typeof roadmapSteps>[number];
+
+const isStepDone = (step: Step, stepProgress: Record<string, number>) =>
+  (stepProgress[step.id] ?? 0) >= (step.sessionsRequired || 1);
+
 const countCompleted = (
   roadmap: Roadmap,
   stepProgress: Record<string, number>,
 ) =>
-  roadmapSteps(roadmap).filter(
-    (step) => (stepProgress[step.id] ?? 0) >= (step.sessionsRequired || 1),
-  ).length;
+  roadmapSteps(roadmap).filter((step) => isStepDone(step, stepProgress)).length;
+
+/** Finished steps phase by phase, in the order the map draws the phases. */
+const completedByPhase = (
+  roadmap: Roadmap,
+  stepProgress: Record<string, number>,
+) =>
+  (roadmap.phases ?? []).map(
+    (phase) =>
+      (phase.steps ?? []).filter((step) => isStepDone(step, stepProgress))
+        .length,
+  );
+
+/**
+ * Where "Continue" lands, the same rule the map uses: the step already under
+ * way, otherwise the first one not finished. Null once every step is done.
+ */
+const nextStepTitle = (
+  roadmap: Roadmap,
+  stepProgress: Record<string, number>,
+): string | null => {
+  const steps = roadmapSteps(roadmap);
+  const next =
+    steps.find(
+      (step) =>
+        (stepProgress[step.id] ?? 0) > 0 && !isStepDone(step, stepProgress),
+    ) ?? steps.find((step) => !isStepDone(step, stepProgress));
+  return next?.title ?? null;
+};
 
 const sumSessions = (stepProgress: Record<string, number>) =>
   Object.values(stepProgress).reduce((sum, value) => sum + value, 0);
@@ -112,6 +143,8 @@ const runProgress = (
     sessionsCompleted: sessions,
     startedAt: progress.startedAt ?? null,
     lastPractisedAt: sessions > 0 ? (progress.updatedAt ?? null) : null,
+    phaseDone: completedByPhase(roadmap, stepProgress),
+    nextStep: nextStepTitle(roadmap, stepProgress),
   };
 };
 
@@ -143,6 +176,10 @@ const summarise = (
     updatedAt: progress?.updatedAt ?? roadmap.updatedAt ?? createdAt,
     phaseCount: roadmap.phases?.length ?? 0,
     stepCount: steps.length,
+    phaseSteps: (roadmap.phases ?? []).map((phase) => phase.steps?.length ?? 0),
+    phaseDone: completedByPhase(roadmap, stepProgress),
+    firstStep: steps[0]?.title ?? null,
+    nextStep: nextStepTitle(roadmap, stepProgress),
     describedSteps: steps.filter((step) => !!step.description).length,
     exerciseSteps: steps.filter((step) => !!step.suggestedExerciseId).length,
     songSteps: steps.filter((step) => !!step.suggestedSong).length,

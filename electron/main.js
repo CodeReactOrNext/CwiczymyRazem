@@ -25,6 +25,7 @@ const buildMenu = require("./menu");
 const windowState = require("./windowState");
 const { createZoom } = require("./zoom");
 const toneStore = require("./toneStore");
+const vstScanner = require("./vst/vstScanner");
 const backingTrackStore = require("./backingTrackStore");
 const { requireMicrophoneAccess } = require("./macPermissions");
 
@@ -505,6 +506,50 @@ ipcMain.handle("tone:import-nam-model", async () => {
   });
   if (result.canceled || !result.filePaths[0]) return null;
   return toneStore.importNamModel(result.filePaths[0]);
+});
+
+// ── VST plugins IPC (library here, the rack in the engine) ────────────────────
+// The library (what's installed) lives in the main process: scanning loads every
+// plugin file, so it runs in throwaway processes (electron/vst/vstScanner.js).
+// The rack (what the player plays through) lives in the audio engine process
+// next to AmpChain (electron/vst/vstRack.js).
+ipcMain.handle("vst:list-plugins", () => vstScanner.listPlugins());
+ipcMain.handle("vst:scan", () => vstScanner.scan());
+ipcMain.handle("vst:add-file", async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: "Add a VST3 plugin",
+    filters: [{ name: "VST3 plugin", extensions: ["vst3"] }],
+    properties: ["openFile"],
+  });
+  if (result.canceled || !result.filePaths[0]) return null;
+  return vstScanner.addFile(result.filePaths[0]);
+});
+ipcMain.handle("vst:add-folder", async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: "Add a folder with VST3 plugins",
+    properties: ["openDirectory"],
+  });
+  if (result.canceled || !result.filePaths[0]) return null;
+  return vstScanner.addFolder(result.filePaths[0]);
+});
+ipcMain.handle("vst:remove-source", (_e, sourcePath) => vstScanner.removeSource(String(sourcePath || "")));
+ipcMain.handle("vst:rack-get", () => audioEngine.rackCall("rackGet"));
+ipcMain.handle("vst:rack-add", (_e, pluginId, index) => audioEngine.rackCall("rackAdd", pluginId, index));
+ipcMain.handle("vst:rack-remove", (_e, slotId) => audioEngine.rackCall("rackRemove", slotId));
+ipcMain.handle("vst:rack-move", (_e, slotId, toIndex) => audioEngine.rackCall("rackMove", slotId, toIndex));
+ipcMain.handle("vst:rack-bypass", (_e, slotId, bypass) => audioEngine.rackCall("rackSetBypass", slotId, bypass));
+ipcMain.handle("vst:open-editor", (_e, slotId) => audioEngine.rackCall("rackOpenEditor", slotId));
+ipcMain.handle("vst:close-editor", (_e, slotId) => audioEngine.rackCall("rackCloseEditor", slotId));
+
+vstScanner.onProgress((progress) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("vst:scan-progress", progress);
+  }
+});
+audioEngine.onVstEvent((event) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("vst:event", event);
+  }
 });
 
 // ── Backing tracks IPC (local audio library + per-song sync settings) ────────

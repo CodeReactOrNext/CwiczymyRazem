@@ -48,7 +48,7 @@ Gdy nuta dzwoni, mały stroik nad nią pokazuje, gdzie jest struna: kropka leży
 
 Wykres pod podsumowaniem pokazuje każdą nutę przebiegu po kolei: jak daleko od uderzenia wylądowała każda, a w ćwiczeniach z podciąganiem od swojej wysokości, z zielonym pasmem zaznaczającym najwyższą ocenę. Przebieg, który zaczyna się ciasno, a dryfuje w miarę męczenia się ręki, widać tam od razu.
 
-Jeśli każda nuta przechyla się w tę samą stronę o mniej więcej tyle samo, to zwykle jest to opóźnienie audio, a nie twoje ręce. Z włączonym mikrofonem naciśnij **Kalibracja timingu** obok wyniku nad tabulaturą i zagraj razem z kilkoma klikami. Aplikacja zmierzy opóźnienie twoich głośników lub interfejsu i od tej pory będzie oceniać względem niego.
+Jeśli każda nuta przechyla się w tę samą stronę o mniej więcej tyle samo, to zwykle jest to opóźnienie audio, a nie twoje ręce. Z włączonym mikrofonem naciśnij **Kalibracja timingu** obok wyniku nad tabulaturą i zagraj razem z kilkoma klikami. Aplikacja zmierzy opóźnienie twoich głośników lub interfejsu i od tej pory będzie oceniać względem niego. Potem mapa pokazuje, gdzie wylądowało każde szarpnięcie względem kliku, więc możesz zostawić wynik przyciskiem **Jest dobrze** albo zagrać jeszcze raz.
 
 ## Konfiguracja
 

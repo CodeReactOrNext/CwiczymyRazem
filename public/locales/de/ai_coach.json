@@ -3,6 +3,7 @@
   "mastery_roadmap": "Mastery-Roadmap",
   "mastery_roadmaps": "Mastery-Roadmaps",
   "player_roadmaps": "Spieler-Roadmaps",
+  "players_link": "Bau eine Roadmap um dein eigenes Ziel oder folge der eines anderen Spielers",
   "back": "Zurück",
   "practice": "Üben",
   "intro": "Geführte Übungspfade für Gitarrentechniken und Spielstile.",
@@ -24,9 +25,30 @@
     "board_body": "{{total}} Roadmaps von {{players}} Spielern. Als Supporter kannst du jede davon öffnen und kostenlos starten.",
     "board_body_one": "{{total}} Roadmaps von {{players}} Spieler. Als Supporter kannst du jede davon öffnen und kostenlos starten.",
     "title": "Bau dir eine Roadmap um dein eigenes Ziel",
-    "body1": "Spieler-Roadmaps sind maßgeschneidert: Du beschreibst, was du spielen willst, und der Coach legt die Phasen, Übungen, Lektionen und Songs fest, die dich dahin bringen. Auch die Roadmaps anderer Spieler erscheinen hier, damit du siehst, woran sie arbeiten.",
-    "body2": "Jede dieser Roadmaps wird von einem KI-Modell erstellt, und jede Generierung kostet echtes Geld. riff.quest lebt von Spenden, daher ist dieser Tab an das Supporter-Abzeichen gebunden. Der Tab Mastery-Roadmaps bleibt für alle kostenlos.",
-    "body3": "Jede Spende, auch die kleinste, schaltet Spieler-Roadmaps für immer frei. Kein Abo.",
+    "lead": "Beschreib, was du spielen willst — der Coach macht daraus Phasen und Schritte.",
+    "steps_title": "Zu jedem Schritt bekommst du",
+    "step": {
+      "exercise": {
+        "title": "Eine Übung",
+        "body": "Direkt in der App spielbar"
+      },
+      "description": {
+        "title": "Eine Beschreibung",
+        "body": "Was du übst und wann es sitzt"
+      },
+      "video": {
+        "title": "Eine Videolektion",
+        "body": "Passend zu genau diesem Schritt"
+      }
+    },
+    "why_title": "Warum ist das gesperrt?",
+    "why": {
+      "ai": "Jede Roadmap schreibt ein KI-Modell",
+      "cost": "Jede kostet echtes Geld",
+      "donations": "riff.quest lebt von Spenden",
+      "unlock": "Jede Spende schaltet es für immer frei",
+      "unlock_note": "Kein Abo."
+    },
     "support": "Projekt unterstützen",
     "email": "Zahl mit der E-Mail-Adresse dieses Kontos, damit die Spende beim richtigen Konto ankommt.",
     "email_known": "Zahl mit der E-Mail-Adresse dieses Kontos — {{email}} —, damit die Spende beim richtigen Konto ankommt."

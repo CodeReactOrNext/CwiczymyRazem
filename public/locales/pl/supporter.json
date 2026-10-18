@@ -435,6 +435,11 @@
       "not_guitar": "Ta ścieżka dotyczy gry na gitarze — opisz, co chcesz grać.",
       "title": "Zbuduj ścieżkę wokół swojego celu",
       "folded_body": "Opisz, co chcesz grać — coach rozpisze fazy, ćwiczenia i utwory.",
+      "preview": {
+        "goal": "Twój cel",
+        "phases": "Fazy",
+        "steps": "Ćwiczenia, utwory i lekcje"
+      },
       "create": "Utwórz ścieżkę",
       "writing": "Piszę twoją ścieżkę",
       "running_body": "To potrwa kilka minut i dzieje się po naszej stronie — możesz opuścić stronę albo zamknąć kartę, a dostaniesz powiadomienie, gdy będzie gotowa. Zostań tutaj, a otworzy się sama.",
@@ -619,6 +624,7 @@
       "start_failed": "Nie udało się rozpocząć tej ścieżki. Spróbuj ponownie.",
       "starting": "Rozpoczynanie…",
       "start": "Rozpocznij tę ścieżkę",
+      "view": "Zobacz ścieżkę",
       "done_refining": "Zakończ poprawki",
       "refine": "Poprawiaj",
       "unknown": "Nieznany gracz",
@@ -634,6 +640,7 @@
       "following_count_one": "1 gracz obserwuje",
       "following_none": "Obserwujesz, bez sesji",
       "not_started": "Jeszcze nierozpoczęta",
+      "first_step": "Pierwszy krok",
       "started_on": "rozpoczęta {{date}}",
       "created_on": "utworzona {{date}}",
       "last_practised": "Ostatnio ćwiczona {{date}}",
@@ -654,7 +661,12 @@
       },
       "yours": "Twoje ścieżki",
       "others": "Od innych graczy",
-      "no_match": "Nic nie pasuje do tego filtra."
+      "no_match": "Nic nie pasuje do tego filtra.",
+      "page": {
+        "title": "Ścieżki graczy",
+        "subtitle": "Ścieżki, które coach zbudował wokół twoich celów — i te, którymi idą inni gracze",
+        "eyebrow": "Moje rzeczy"
+      }
     },
     "gear": {
       "propose_title": "Zaproponuj sprzęt",

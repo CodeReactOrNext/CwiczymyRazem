@@ -15,26 +15,14 @@ import { Swords } from "lucide-react";
 
 interface DuelFeedProps {
   feed: DuelFeedEntry[];
-  uid: string | null;
   now: number;
 }
 
-const Name = ({ player, isMe }: { player: DuelFeedPlayer; isMe: boolean }) => (
-  <span
-    className={cn("font-semibold", isMe ? "text-cyan-300" : "text-zinc-100")}>
-    {player.displayName}
-  </span>
+const Name = ({ player }: { player: DuelFeedPlayer }) => (
+  <span className='font-semibold text-zinc-100'>{player.displayName}</span>
 );
 
-const FeedRow = ({
-  entry,
-  uid,
-  now,
-}: {
-  entry: DuelFeedEntry;
-  uid: string | null;
-  now: number;
-}) => {
+const FeedRow = ({ entry, now }: { entry: DuelFeedEntry; now: number }) => {
   const { t } = useTranslation("duels");
   const dateLocale = useDateFnsLocale();
   const intlLocale = useIntlLocale();
@@ -67,8 +55,8 @@ const FeedRow = ({
             <Interpolate
               text={t(`feed.${entry.kind}`)}
               values={{
-                winner: <Name player={first} isMe={first.userId === uid} />,
-                loser: <Name player={second} isMe={second.userId === uid} />,
+                winner: <Name player={first} />,
+                loser: <Name player={second} />,
               }}
             />
           </p>
@@ -110,9 +98,13 @@ const FeedRow = ({
   );
 };
 
-/** Every player's settled duels, newest first — who beat whom, and by how much. */
-export const DuelFeed = ({ feed, uid, now }: DuelFeedProps) => {
+/**
+ * Other players' settled duels, newest first — who beat whom, and by how much.
+ * Your own are in Recent duels; with nothing else to show, the section stays out.
+ */
+export const DuelFeed = ({ feed, now }: DuelFeedProps) => {
   const { t } = useTranslation("duels");
+  if (feed.length === 0) return null;
   return (
     <Card className='p-5 sm:p-7'>
       <div className='flex flex-wrap items-center justify-between gap-3'>
@@ -120,21 +112,15 @@ export const DuelFeed = ({ feed, uid, now }: DuelFeedProps) => {
           <Swords size={16} className='text-zinc-400' />
           {t("feed.title")}
         </h2>
-        {feed.length > 0 && (
-          <span className='text-xs tabular-nums text-zinc-400'>
-            {t("feed.latest", { count: feed.length })}
-          </span>
-        )}
+        <span className='text-xs tabular-nums text-zinc-400'>
+          {t("feed.latest", { count: feed.length })}
+        </span>
       </div>
-      {feed.length === 0 ? (
-        <p className='mt-4 text-sm text-zinc-400'>{t("feed.empty")}</p>
-      ) : (
-        <ul className='mt-5 space-y-1'>
-          {feed.map((entry) => (
-            <FeedRow key={entry.id} entry={entry} uid={uid} now={now} />
-          ))}
-        </ul>
-      )}
+      <ul className='mt-5 space-y-1'>
+        {feed.map((entry) => (
+          <FeedRow key={entry.id} entry={entry} now={now} />
+        ))}
+      </ul>
     </Card>
   );
 };

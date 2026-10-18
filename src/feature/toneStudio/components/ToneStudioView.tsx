@@ -12,6 +12,10 @@ import { OverdriveModule } from "feature/toneStudio/components/modules/Overdrive
 import { Grain, PowerRocker } from "feature/toneStudio/components/PluginChrome";
 import { PresetBrowser } from "feature/toneStudio/components/PresetBrowser";
 import { StatusBar } from "feature/toneStudio/components/StatusBar";
+import { ToneModeChooser } from "feature/toneStudio/components/vst/ToneModeChooser";
+import { ToneModeSwitch } from "feature/toneStudio/components/vst/ToneModeSwitch";
+import { VstRackView } from "feature/toneStudio/components/vst/VstRackView";
+import { useVstHost } from "feature/toneStudio/hooks/useVstHost";
 import { CHASSIS_WASH, RAIL_WASH } from "feature/toneStudio/utils/chassis";
 import { useAmpSim } from "hooks/useAmpSim";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
@@ -118,6 +122,11 @@ export const ToneStudioView = () => {
     (m) => m.id === amp.params.namModelId,
   )?.name;
   const irName = irs.find((ir) => ir.id === amp.params.irId)?.name;
+  // Two worlds on a machine that can host plugins: the built-in chain or the
+  // player's VST rack. Asked once, up front; switchable from the rail after.
+  const vst = useVstHost();
+  const isVst = vst.available && amp.params.toneMode === "vst";
+  const showChooser = vst.available && !amp.toneModeChosen;
 
   const modulePanel = {
     gate: <GateModule params={amp.params} set={set} />,
@@ -166,16 +175,27 @@ export const ToneStudioView = () => {
         <div
           className='relative flex flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3'
           style={{ backgroundImage: RAIL_WASH }}>
-          <div className='order-3 w-full min-w-0 sm:order-none sm:w-auto sm:flex-1'>
-            <PresetBrowser
-              presets={presets}
-              activePresetId={activePresetId}
-              params={amp.params}
-              onLoad={amp.loadPreset}
-              onSaveNew={handleSaveNewPreset}
-              onOverwrite={handleOverwritePreset}
-              onDelete={handleDeletePreset}
+          {vst.available && !showChooser && (
+            <ToneModeSwitch
+              value={isVst ? "vst" : "builtin"}
+              onChange={amp.setToneMode}
             />
+          )}
+
+          {/* Presets are built-in-chain sounds; the rack's sounds live in each
+              plugin's own preset browser. */}
+          <div className='order-3 w-full min-w-0 sm:order-none sm:w-auto sm:flex-1'>
+            {!isVst && !showChooser && (
+              <PresetBrowser
+                presets={presets}
+                activePresetId={activePresetId}
+                params={amp.params}
+                onLoad={amp.loadPreset}
+                onSaveNew={handleSaveNewPreset}
+                onOverwrite={handleOverwritePreset}
+                onDelete={handleDeletePreset}
+              />
+            )}
           </div>
 
           <InputMeter className='hidden w-40 shrink-0 lg:flex' />
@@ -244,7 +264,10 @@ export const ToneStudioView = () => {
                 {t("view.overload", {
                   drift: Math.round(amp.overload.driftMs),
                 })}
-                {amp.overload.namEnabled && ` ${t("view.overload_nam_hint")}`}
+                {amp.overload.vstEnabled
+                  ? ` ${t("view.overload_vst_hint")}`
+                  : amp.overload.namEnabled &&
+                    ` ${t("view.overload_nam_hint")}`}
               </p>
             )}
           </div>
@@ -274,20 +297,30 @@ export const ToneStudioView = () => {
           </div>
         )}
 
-        {/* ── The rack: signal order left to right, and the tab bar ───────── */}
-        <div className='relative px-3 pt-3'>
-          <ChainRack
-            params={amp.params}
-            selected={selectedBlock}
-            onSelect={setSelectedBlock}
-            onToggle={set}
-            namModelName={namModelName}
-            irName={irName}
-          />
-        </div>
+        {showChooser ? (
+          <ToneModeChooser onChoose={amp.setToneMode} />
+        ) : isVst ? (
+          <div className='relative'>
+            <VstRackView />
+          </div>
+        ) : (
+          <>
+            {/* ── The rack: signal order left to right, and the tab bar ───── */}
+            <div className='relative px-3 pt-3'>
+              <ChainRack
+                params={amp.params}
+                selected={selectedBlock}
+                onSelect={setSelectedBlock}
+                onToggle={set}
+                namModelName={namModelName}
+                irName={irName}
+              />
+            </div>
 
-        {/* ── The stage: whichever unit the rack has selected ─────────────── */}
-        <div className='relative px-3 pb-3 pt-1.5'>{modulePanel}</div>
+            {/* ── The stage: whichever unit the rack has selected ─────────── */}
+            <div className='relative px-3 pb-3 pt-1.5'>{modulePanel}</div>
+          </>
+        )}
 
         {/* ── Status strip ────────────────────────────────────────────────── */}
         <div className='relative' style={{ backgroundImage: RAIL_WASH }}>

@@ -13,6 +13,23 @@ vi.mock("../services/songBackingSync.service", () => ({
   saveYouTubeBackingConfig: vi.fn().mockResolvedValue(undefined),
 }));
 
+// What the video player is asked to do is the whole question for the video, so
+// the player is replaced by a recorder of its arguments.
+const youtubeCalls = vi.hoisted(() => [] as { videoId: string | null; volume: number; muted: boolean }[]);
+vi.mock("./useYouTubeBackingPlayer", () => ({
+  useYouTubeBackingPlayer: (options: { videoId: string | null; volume: number; muted: boolean }) => {
+    youtubeCalls.push(options);
+    return {
+      handleReady: () => {},
+      driftMsRef: { current: 0 },
+      appliedRate: 1,
+      canFollowTempo: true,
+      availableRates: [1],
+      getPlayerClock: () => null,
+    };
+  },
+}));
+
 const baseOptions = {
   songId: "song-1",
   userId: "user-1",
@@ -21,27 +38,13 @@ const baseOptions = {
   startTime: null,
   scoreClockRef: { current: null },
   effectiveBpm: 96,
-  sessionBpm: 96,
 };
 
 beforeEach(() => {
   localStorage.clear();
+  youtubeCalls.length = 0;
   delete (window as { backingTracks?: unknown }).backingTracks;
 });
-
-/** Enough of the preload bridge for the file source to be on offer at all. */
-const stubDesktopBridge = () => {
-  (window as unknown as { backingTracks: unknown }).backingTracks = {
-    isAvailable: true,
-    listTracks: vi.fn().mockResolvedValue([]),
-    importTracks: vi.fn().mockResolvedValue([]),
-    deleteTrack: vi.fn().mockResolvedValue(undefined),
-    readTrack: vi.fn().mockResolvedValue(null),
-    getAssignment: vi.fn().mockResolvedValue(null),
-    saveAssignment: vi.fn().mockResolvedValue(null),
-    clearAssignment: vi.fn().mockResolvedValue(undefined),
-  };
-};
 
 describe("useBackingTrackSession", () => {
   it("mounts on the web build, where there is no desktop bridge at all", () => {
@@ -49,7 +52,6 @@ describe("useBackingTrackSession", () => {
 
     expect(result.current.enabled).toBe(true);
     expect(result.current.desktopAvailable).toBe(false);
-    expect(result.current.source).toBe("off");
     expect(result.current.stems).toEqual([]);
   });
 
@@ -59,7 +61,6 @@ describe("useBackingTrackSession", () => {
     );
 
     expect(result.current.enabled).toBe(false);
-    expect(result.current.source).toBe("off");
   });
 
   it("seeds the recording tempo from the score rather than a hardcoded default", () => {
@@ -75,60 +76,48 @@ describe("useBackingTrackSession", () => {
 
     expect(result.current.alignment.sourceBpm).toBe(120);
   });
-
-  it("does not offer the file source when a stored choice points at a machine without it", () => {
-    localStorage.setItem("rq_backing_source_song-1", "file");
-
-    const { result } = renderHook(() => useBackingTrackSession(baseOptions));
-
-    expect(result.current.source).toBe("off");
-  });
-
-  it("keeps a stored YouTube choice, which works on any build", () => {
-    localStorage.setItem("rq_backing_source_song-1", "youtube");
-
-    const { result } = renderHook(() => useBackingTrackSession(baseOptions));
-
-    expect(result.current.source).toBe("youtube");
-  });
 });
 
-describe("useBackingTrackSession video over files", () => {
-  it("lets the picture come from YouTube while the sound comes from local files", () => {
-    stubDesktopBridge();
-    localStorage.setItem("rq_backing_source_song-1", "file");
-    localStorage.setItem("rq_backing_video_song-1", "1");
-
-    const { result } = renderHook(() => useBackingTrackSession(baseOptions));
-
-    expect(result.current.source).toBe("file");
+describe("useBackingTrackSession video", () => {
+  it("shows a song's video unless it was hidden for that song", () => {
+    const { result, unmount } = renderHook(() => useBackingTrackSession(baseOptions));
     expect(result.current.videoOverlay).toBe(true);
+    unmount();
+
+    localStorage.setItem("rq_backing_video_song-1", "0");
+    const hidden = renderHook(() => useBackingTrackSession(baseOptions));
+    expect(hidden.result.current.videoOverlay).toBe(false);
   });
 
-  it("has no picture to add while YouTube is already the sound", () => {
-    localStorage.setItem("rq_backing_source_song-1", "youtube");
-    localStorage.setItem("rq_backing_video_song-1", "1");
-
+  it("remembers hiding it, per song", () => {
     const { result } = renderHook(() => useBackingTrackSession(baseOptions));
+    act(() => result.current.setVideoOverlay(false));
 
     expect(result.current.videoOverlay).toBe(false);
+    expect(localStorage.getItem("rq_backing_video_song-1")).toBe("0");
   });
 
-  it("remembers the choice for this song, since it depends on there being a video worth watching", () => {
-    stubDesktopBridge();
-    localStorage.setItem("rq_backing_source_song-1", "file");
-
+  it("brings a newly added video on screen", () => {
+    localStorage.setItem("rq_backing_video_song-1", "0");
     const { result } = renderHook(() => useBackingTrackSession(baseOptions));
-    act(() => result.current.setVideoOverlay(true));
 
+    act(() => result.current.setYouTubeVideoId("abc123"));
+
+    expect(result.current.youtubeVideoId).toBe("abc123");
     expect(result.current.videoOverlay).toBe(true);
-    expect(localStorage.getItem("rq_backing_video_song-1")).toBe("1");
   });
 
-  it("keeps the two layers apart: shifting the picture leaves the sound where it was", () => {
-    stubDesktopBridge();
-    localStorage.setItem("rq_backing_source_song-1", "file");
+  it("never lets the video make a sound — it is only ever a picture", () => {
+    const { result } = renderHook(() => useBackingTrackSession(baseOptions));
+    act(() => result.current.setYouTubeVideoId("abc123"));
 
+    const last = youtubeCalls[youtubeCalls.length - 1];
+    expect(last.videoId).toBe("abc123");
+    expect(last.volume).toBe(0);
+    expect(last.muted).toBe(true);
+  });
+
+  it("keeps the two syncs apart: shifting the picture leaves the sound where it was", () => {
     const { result } = renderHook(() => useBackingTrackSession(baseOptions));
     act(() => result.current.setAlignment({ offsetMs: 120 }));
     act(() => result.current.setVideoAlignment({ offsetMs: -400 }));

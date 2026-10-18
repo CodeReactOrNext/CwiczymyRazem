@@ -30,6 +30,7 @@ import type {
 const BUFFER_SIZE_STORAGE_KEY = "amp_sim_buffer_size";
 const PARAMS_STORAGE_KEY = "amp_sim_params";
 const ACTIVE_PRESET_STORAGE_KEY = "amp_sim_active_preset";
+const TONE_MODE_CHOSEN_STORAGE_KEY = "tone_studio_mode_chosen";
 
 const DEFAULT_BUFFER_SIZE = 256;
 
@@ -53,6 +54,7 @@ export const DEFAULT_PARAMS: AmpParams = {
   irId: null,
   namEnabled: false,
   namModelId: null,
+  toneMode: "builtin",
 };
 
 export interface AmpSimState {
@@ -69,6 +71,8 @@ export interface AmpSimState {
   diagnostics: AmpDiagnostics | null;
   /** Which saved preset the current params came from. */
   activePresetId: string | null;
+  /** The player has picked built-in vs VST at least once. */
+  toneModeChosen: boolean;
 }
 
 /** Snapshot handed to SSR and to the hydration render — a stable identity, so
@@ -85,6 +89,7 @@ const INITIAL_STATE: AmpSimState = {
   connectionIssue: null,
   diagnostics: null,
   activePresetId: null,
+  toneModeChosen: false,
 };
 
 let state: AmpSimState = INITIAL_STATE;
@@ -121,6 +126,14 @@ function readPersistedParams(): AmpParams {
     /* ignore */
   }
   return DEFAULT_PARAMS;
+}
+
+function readPersistedToneModeChosen(): boolean {
+  try {
+    return localStorage.getItem(TONE_MODE_CHOSEN_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
 }
 
 function readPersistedActivePresetId(): string | null {
@@ -255,6 +268,7 @@ const hydrate = () => {
     params: readPersistedParams(),
     bufferSize: readPersistedBufferSize(),
     activePresetId: readPersistedActivePresetId(),
+    toneModeChosen: readPersistedToneModeChosen(),
   });
   if (!window.nativeAmp) return;
   attachBridgeListeners();
@@ -359,10 +373,23 @@ export const setActiveAmpPresetId = (id: string | null) => {
   }
 };
 
-/** Apply a saved preset and remember it as the selected one. */
+/** Apply a saved preset and remember it as the selected one. Presets are
+ *  built-in-chain sounds, so loading one also switches out of the VST rack. */
 export const loadAmpPreset = (id: string, presetParams: AmpParams) => {
-  setAmpParams(presetParams);
+  setAmpParams({ ...presetParams, toneMode: "builtin" });
   setActiveAmpPresetId(id);
+};
+
+/** Switch between the built-in chain and the VST rack, and remember that the
+ *  player has made that choice (Tone Studio asks once, up front). */
+export const setToneMode = (toneMode: AmpParams["toneMode"]) => {
+  setAmpParams({ toneMode });
+  setState({ toneModeChosen: true });
+  try {
+    localStorage.setItem(TONE_MODE_CHOSEN_STORAGE_KEY, "1");
+  } catch {
+    /* ignore */
+  }
 };
 
 /** Test seam: drops every listener, timer and hydration flag so each test file

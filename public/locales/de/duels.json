@@ -23,7 +23,7 @@
     "matched": "Gegner gefunden — dein Duell steht unten.",
     "queued": "Du bist in der Warteschlange. Wir melden uns, sobald jemand beitritt.",
     "error_limit": "Du hast bereits {{max}} offene Duelle.",
-    "error_locked": "Duelle öffnen sich ab Level 4.",
+    "error_locked": "Duelle öffnen sich ab Level 2.",
     "error": "Beitritt gerade nicht möglich. Versuch es gleich noch einmal.",
     "ticket": "Suche nach einem Gegner",
     "ticket_expires": "Läuft ab in {{time}}",
@@ -96,9 +96,8 @@
     "nobody_played": "Niemand hat gespielt"
   },
   "feed": {
-    "title": "Alle Duelle",
+    "title": "Duelle anderer Spieler",
     "latest": "die letzten {{count}}",
-    "empty": "Noch hat niemand ein Duell abgeschlossen. Jedes beendete Duell der App erscheint hier.",
     "win": "{{winner}} schlägt {{loser}}",
     "walkover": "{{winner}} schlägt {{loser}} — kampflos",
     "draw": "{{winner}} unentschieden gegen {{loser}}",

@@ -13,7 +13,6 @@ import {
 } from "../services/songBackingSync.service";
 import type {
   BackingAlignment,
-  BackingSource,
   BackingStem,
   BackingTrackAssignment,
   BackingTrackMeta,
@@ -21,47 +20,32 @@ import type {
 } from "../types/backingTrack.types";
 import { DEFAULT_ALIGNMENT, DEFAULT_STEM } from "../types/backingTrack.types";
 import type { ScoreClock } from "../utils/backingSync";
-import { achievableSessionBpms } from "../utils/backingSync";
 import type { RecordingTempoMap } from "../utils/tempoMap";
 import { createRecordingTempoMap } from "../utils/tempoMap";
 import type { PlayableStem } from "./useFileStemsPlayer";
 import { useFileStemsPlayer } from "./useFileStemsPlayer";
 import { useYouTubeBackingPlayer } from "./useYouTubeBackingPlayer";
-import type { YouTubeWaveform } from "./useYouTubeWaveform";
-import { useYouTubeWaveform } from "./useYouTubeWaveform";
 
 /** Slider drags fire continuously — settle before touching disk or Firestore. */
 const PERSIST_DEBOUNCE_MS = 400;
 
-// Neither the preload bridge nor the stored source ever changes for the life of
+// Neither the preload bridge nor the stored choices ever change for the life of
 // the page, so there is nothing to subscribe to. useSyncExternalStore is here
 // purely for its server snapshot: reading window/localStorage during the first
 // client render would otherwise disagree with the server's HTML.
 const subscribeNever = () => () => {};
 const noDesktopOnServer = () => false;
-const noStoredSourceOnServer = () => null;
 const noCinemaOnServer = () => false;
-const noVideoOverlayOnServer = () => false;
+const noVideoOverlayOnServer = () => null;
 
 /** Stable identity, so deriving "no stems loaded" never looks like a change. */
 const EMPTY_URLS: Record<string, string> = {};
 
-const sourceStorageKey = (songId: string) => `rq_backing_source_${songId}`;
-/** Whether the YouTube video plays over a file-based backing track. Per song,
- *  unlike cinema: it depends on there being a video worth watching for *this*
- *  song, and on the files being the better sound for it. */
+/** Whether the song's video is on screen above the tab. Per song, unlike
+ *  cinema: it depends on there being a video worth watching for *this* song. */
 const videoOverlayStorageKey = (songId: string) => `rq_backing_video_${songId}`;
 /** Cinema is a way of practising, not a property of one song — stored globally. */
 const CINEMA_STORAGE_KEY = "rq_backing_cinema";
-
-const readStoredSource = (songId: string): BackingSource | null => {
-  try {
-    const raw = localStorage.getItem(sourceStorageKey(songId));
-    return raw === "file" || raw === "youtube" || raw === "off" ? raw : null;
-  } catch {
-    return null;
-  }
-};
 
 const readStoredCinema = (): boolean => {
   try {
@@ -71,19 +55,13 @@ const readStoredCinema = (): boolean => {
   }
 };
 
-const readStoredVideoOverlay = (songId: string): boolean => {
+/** Null when never chosen — a video someone added is a video they want to see. */
+const readStoredVideoOverlay = (songId: string): boolean | null => {
   try {
-    return localStorage.getItem(videoOverlayStorageKey(songId)) === "1";
+    const raw = localStorage.getItem(videoOverlayStorageKey(songId));
+    return raw === "1" ? true : raw === "0" ? false : null;
   } catch {
-    return false;
-  }
-};
-
-const writeStoredSource = (songId: string, source: BackingSource) => {
-  try {
-    localStorage.setItem(sourceStorageKey(songId), source);
-  } catch {
-    /* private mode — the choice just won't survive a reload */
+    return null;
   }
 };
 
@@ -116,18 +94,13 @@ interface UseBackingTrackSessionOptions {
    */
   getResumeBeat?: () => number;
   effectiveBpm: number;
-  /** Metronome tempo before the practice speed multiplier — the domain the
-   *  BPM control works in, so tempo suggestions can be handed back in it. */
-  sessionBpm: number;
 }
 
 export interface BackingTrackController {
   enabled: boolean;
-  /** False on the web build: no local files there, YouTube only. */
+  /** False on the web build: no local files there, so no backing audio — the
+   *  video still works, since it is only ever a picture. */
   desktopAvailable: boolean;
-
-  source: BackingSource;
-  setSource: (source: BackingSource) => void;
 
   library: BackingTrackMeta[];
   isImporting: boolean;
@@ -148,34 +121,33 @@ export interface BackingTrackController {
   /** Only this stem audible, or all of them again when it already was. */
   soloStem: (trackId: string) => void;
 
+  /**
+   * The song's video. Picture only, always muted: the sound is the files.
+   * Two takes of one song playing at once is noise, so YouTube is never a
+   * source of audio here.
+   */
   youtubeVideoId: string | null;
   setYouTubeVideoId: (videoId: string | null) => void;
   /** Pass to react-youtube's onReady so the sync loop can drive the iframe. */
   onYouTubePlayerReady: (event: { target: unknown }) => void;
   /** False when the video cannot hold the session tempo, so it free-runs. */
   youtubeCanFollowTempo: boolean;
-  youtubeAppliedRate: number;
-  /** Session tempos this video locks to exactly — what to offer when it can't
-   *  hold the current one. Empty unless YouTube is the active source. */
-  youtubeAchievableBpms: number[];
   /** Cinema mode: the video fills the session behind the notation. */
   isCinema: boolean;
   setCinema: (on: boolean) => void;
 
-  /** Picture from YouTube over sound from local files. The user's choice, not
-   *  its effect: it stays on while a video is still being pasted in. Only ever
-   *  true while the file source is active — when YouTube *is* the source, the
-   *  same video is already on screen with its own audio. */
+  /** Whether the video is on screen. The user's choice, not its effect: it
+   *  stays on while a video is still being pasted in. */
   videoOverlay: boolean;
   setVideoOverlay: (on: boolean) => void;
-  /** The video layer's own alignment, editable while the files are the sound —
-   *  a video and a local recording almost never start at the same point. */
+  /** The video's own alignment — a video and a local recording are usually
+   *  two different takes, so each sits where it sits against the tab. */
   videoAlignment: BackingAlignment;
   setVideoAlignment: (patch: Partial<BackingAlignment>, options?: { realign?: boolean }) => void;
   /** The video layer's own tempo map — see `tempoMap`. */
   videoTempoMap: RecordingTempoMap;
 
-  /** Alignment of whichever source is active. */
+  /** Alignment of the recording — the files, all layers together. */
   alignment: BackingAlignment;
   /** `realign: false` skips the immediate re-seek — for continuous gestures like
    *  dragging the alignment grid, where one seek per pointer event would stutter. */
@@ -194,13 +166,6 @@ export interface BackingTrackController {
   startTime: number | null;
   effectiveBpm: number;
 
-  /**
-   * The video's waveform, learned by listening to it play.
-   *
-   * Lives on the session rather than on the Align screen so it fills in during
-   * ordinary practice — the screen reads it, it does not drive it.
-   */
-  youtubeWaveform: YouTubeWaveform;
   /** Live sync error in ms — polled by the panel, never rendered from the session. */
   driftMsRef: MutableRefObject<number>;
   /** Handed straight back out so the alignment screen's lanes read the same
@@ -239,8 +204,8 @@ function useSongScopedState<T>(
 }
 
 /**
- * One place that owns the session's backing track: which source is active, how
- * it is aligned with the tab, and the players that keep it there.
+ * One place that owns the session's backing track: which recordings play, how
+ * they are aligned with the tab, and the players that keep it there.
  *
  * Mounted once per session (in PracticeSession, never in a view component —
  * the desktop and mobile views both mount at the same time, so anything holding
@@ -255,7 +220,6 @@ export function useBackingTrackSession({
   getResumeBeat,
   startTime,
   effectiveBpm,
-  sessionBpm,
 }: UseBackingTrackSessionOptions): BackingTrackController {
   const enabled = !!songId;
 
@@ -264,14 +228,9 @@ export function useBackingTrackSession({
     isDesktopBackingAvailable,
     noDesktopOnServer,
   );
-  const storedSource = useSyncExternalStore(
-    subscribeNever,
-    () => (songId ? readStoredSource(songId) : null),
-    noStoredSourceOnServer,
-  );
   const storedVideoOverlay = useSyncExternalStore(
     subscribeNever,
-    () => (songId ? readStoredVideoOverlay(songId) : false),
+    () => (songId ? readStoredVideoOverlay(songId) : null),
     noVideoOverlayOnServer,
   );
 
@@ -280,12 +239,6 @@ export function useBackingTrackSession({
   const [assignment, setAssignment] = useSongScopedState<BackingTrackAssignment | null>(songId, null);
   const [youtube, setYouTube] = useSongScopedState<YouTubeBackingConfig | null>(songId, null);
   const [error, setError] = useState<string | null>(null);
-  // Which source the user picked *this* session, if any. Scoped to a song so it
-  // can't leak across an exercise switch.
-  const [sourceOverride, setSourceOverride] = useState<{
-    songId: string;
-    source: BackingSource;
-  } | null>(null);
   // Object URLs for the loaded stems, tagged with the stem list they belong to
   // so a stale set is never shown against a changed one.
   const [loadedUrls, setLoadedUrls] = useState<{
@@ -358,39 +311,18 @@ export function useBackingTrackSession({
     if (enabled && desktopAvailable) refreshLibrary();
   }, [enabled, desktopAvailable, refreshLibrary]);
 
-  // ── Active source ─────────────────────────────────────────────────────────
-  //
-  // Derived rather than initialised in an effect: the stored config arrives
-  // asynchronously, so an "init once" effect would have to guess when to run.
-  // An explicit choice this session always wins over the derivation.
-  const resolvedSource = useMemo<BackingSource>(() => {
-    if (!songId) return "off";
-    // A file was chosen on some other machine — nothing to play here.
-    if (storedSource === "file" && !desktopAvailable) return youtube?.videoId ? "youtube" : "off";
-    if (storedSource) return storedSource;
-    if (assignment?.stems?.length && desktopAvailable) return "file";
-    if (youtube?.videoId) return "youtube";
-    return "off";
-  }, [songId, storedSource, desktopAvailable, assignment, youtube]);
-
-  const source =
-    sourceOverride && sourceOverride.songId === songId ? sourceOverride.source : resolvedSource;
-
+  // ── Video on screen ───────────────────────────────────────────────────────
   const videoOverlay =
-    source === "file" &&
-    (videoOverlayOverride && videoOverlayOverride.songId === songId
+    videoOverlayOverride && videoOverlayOverride.songId === songId
       ? videoOverlayOverride.on
-      : storedVideoOverlay);
+      : (storedVideoOverlay ?? true);
 
   // localStorage can't be read during the first client render without
-  // disagreeing with the server's HTML — same reason as the stored source above.
+  // disagreeing with the server's HTML — same reason as the stored video choice above.
   const storedCinema = useSyncExternalStore(subscribeNever, readStoredCinema, noCinemaOnServer);
   // Only while a video is actually on screen — cinema over sound alone would be
   // a black rectangle.
-  const isCinema =
-    (cinemaOverride ?? storedCinema) &&
-    !!youtube?.videoId &&
-    (source === "youtube" || videoOverlay);
+  const isCinema = (cinemaOverride ?? storedCinema) && !!youtube?.videoId && videoOverlay;
 
   const setCinema = useCallback((on: boolean) => {
     setCinemaOverride(on);
@@ -400,16 +332,6 @@ export function useBackingTrackSession({
       /* private mode — the choice just won't survive a reload */
     }
   }, []);
-
-  const setSource = useCallback(
-    (next: BackingSource) => {
-      if (!songId) return;
-      setSourceOverride({ songId, source: next });
-      setError(null);
-      writeStoredSource(songId, next);
-    },
-    [songId],
-  );
 
   const setVideoOverlay = useCallback(
     (on: boolean) => {
@@ -469,7 +391,7 @@ export function useBackingTrackSession({
     [flushPersist],
   );
 
-  // ── Active alignment (whichever source is selected) ───────────────────────
+  // ── Alignment: the recording's, and the video's own ─────────────────────────
 
   const fileAlignment = useMemo<BackingAlignment>(
     () => ({
@@ -493,7 +415,7 @@ export function useBackingTrackSession({
     [youtube, defaultSourceBpm],
   );
 
-  const alignment = source === "youtube" ? videoAlignment : fileAlignment;
+  const alignment = fileAlignment;
 
   /**
    * Where the tab's bars fall inside whichever recording is playing.
@@ -568,8 +490,8 @@ export function useBackingTrackSession({
 
   const setAlignment = useCallback(
     (patch: Partial<BackingAlignment>, options?: { realign?: boolean }) =>
-      patchAlignment(source === "youtube" ? "youtube" : "file", patch, options),
-    [patchAlignment, source],
+      patchAlignment("file", patch, options),
+    [patchAlignment],
   );
 
   const setVideoAlignment = useCallback(
@@ -580,9 +502,11 @@ export function useBackingTrackSession({
 
   // ── File source ───────────────────────────────────────────────────────────
 
-  const stems = useMemo(() => assignment?.stems ?? [], [assignment]);
-  /** The stems the players should be on right now. */
-  const activeStems = useMemo(() => (source === "file" ? stems : []), [source, stems]);
+  // Off the desktop there is no library to play from, whatever was stored.
+  const stems = useMemo(
+    () => (desktopAvailable ? (assignment?.stems ?? []) : []),
+    [assignment, desktopAvailable],
+  );
 
   /** Writes a new stem list, keeping the alignment that describes it. */
   const commitStems = useCallback(
@@ -617,9 +541,8 @@ export function useBackingTrackSession({
           ? previous
           : [...previous, { trackId, ...DEFAULT_STEM }],
       );
-      setSource("file");
     },
-    [commitStems, setSource],
+    [commitStems],
   );
 
   const removeStem = useCallback(
@@ -681,7 +604,6 @@ export function useBackingTrackSession({
                 .map((track) => ({ trackId: track.id, ...DEFAULT_STEM })),
             ];
           });
-          setSource("file");
         }
 
         // Reported after the good ones are in, so a bad file costs nothing else.
@@ -698,7 +620,7 @@ export function useBackingTrackSession({
         setIsImporting(false);
       }
     },
-    [refreshLibrary, commitStems, setSource],
+    [refreshLibrary, commitStems],
   );
 
   const importTracks = useCallback(() => runImport((api) => api.importTracks()), [runImport]);
@@ -744,7 +666,7 @@ export function useBackingTrackSession({
 
   // Bytes → Blob URL, one per stem. Revoked as stems come and go so a long
   // session doesn't leak a decoded copy of everything ever auditioned.
-  const activeStemKey = activeStems.map((stem) => stem.trackId).join("|");
+  const activeStemKey = stems.map((stem) => stem.trackId).join("|");
   useEffect(() => {
     if (!activeStemKey) return;
     const trackIds = activeStemKey.split("|");
@@ -787,19 +709,19 @@ export function useBackingTrackSession({
 
   const playableStems = useMemo<PlayableStem[]>(
     () =>
-      activeStems.map((stem) => ({
+      stems.map((stem) => ({
         trackId: stem.trackId,
         src: stemUrls[stem.trackId] ?? null,
         volume: stem.volume,
         muted: stem.muted,
         offsetMs: stem.offsetMs,
       })),
-    [activeStems, stemUrls],
+    [stems, stemUrls],
   );
 
   // "Loading" is simply the gap before every stem's bytes have arrived.
   const isTrackLoading =
-    activeStems.length > 0 && playableStems.some((stem) => !stem.src) && !error;
+    stems.length > 0 && playableStems.some((stem) => !stem.src) && !error;
 
   // ── Players ───────────────────────────────────────────────────────────────
 
@@ -818,11 +740,10 @@ export function useBackingTrackSession({
     realignKey,
   });
 
-  // The video runs off its own alignment either way — when YouTube is the
-  // source that alignment *is* the active one, and when it only supplies the
-  // picture this is what keeps the frame where it belongs.
+  // The video runs off its own alignment — that is what keeps the frame where
+  // it belongs against the tab.
   const youtubePlayer = useYouTubeBackingPlayer({
-    videoId: source === "youtube" || videoOverlay ? (youtube?.videoId ?? null) : null,
+    videoId: videoOverlay ? (youtube?.videoId ?? null) : null,
     isPlaying: enabled && isPlaying,
     startTime,
     scoreClockRef,
@@ -830,27 +751,11 @@ export function useBackingTrackSession({
     sourceBpm: videoAlignment.sourceBpm,
     offsetMs: videoAlignment.offsetMs,
     tempoMap: videoTempoMap,
-    // Over a file the video is picture only: two takes of one song playing at
-    // once is noise, and the files are the take the user chose to hear.
-    volume: videoOverlay ? 0 : videoAlignment.volume,
-    muted: videoOverlay || videoAlignment.muted,
+    // Picture only: two takes of one song playing at once is noise, and the
+    // files are the take the user chose to hear.
+    volume: 0,
+    muted: true,
     realignKey: videoRealignKey,
-  });
-
-  /**
-   * The waveform the session *reads*. It never listens.
-   *
-   * Learning it alongside practice was meant to be free — the video is playing
-   * anyway — and it is not: a tab capture, a second audio graph and a buffer
-   * growing at 120 values a second all sit on the thread that has to keep a
-   * metronome, a tab and a microphone in time, and that showed up as a session
-   * that stutters. Capturing is now a job of its own, done deliberately in the
-   * Align screen's capture dialog and stored; this copy just reads the store.
-   */
-  const youtubeWaveform = useYouTubeWaveform({
-    videoId: source === "youtube" || videoOverlay ? (youtube?.videoId ?? null) : null,
-    getClock: youtubePlayer.getPlayerClock,
-    listen: false,
   });
 
   const setYouTubeVideoId = useCallback(
@@ -865,38 +770,18 @@ export function useBackingTrackSession({
       pendingRef.current.yt = { ...pendingRef.current.yt, videoId };
       schedulePersist();
       setError(null);
-      // Choosing a video normally means wanting to hear it — except while local
-      // files are the sound, where the video was asked for as picture only.
-      if (videoId && source !== "file") setSource("youtube");
+      // A video just added is a video someone wants to see.
+      if (videoId) setVideoOverlay(true);
     },
-    [defaultSourceBpm, schedulePersist, setSource, setYouTube, source],
+    [defaultSourceBpm, schedulePersist, setVideoOverlay, setYouTube],
   );
 
-  const playbackRate =
-    source === "youtube" ? youtubePlayer.appliedRate : effectiveBpm / (alignment.sourceBpm || 1);
+  const playbackRate = effectiveBpm / (alignment.sourceBpm || 1);
 
-  // The achievable rates are tempos in the *effective* domain; the BPM control
-  // lives before the speed multiplier, so convert back through the same ratio.
-  const youtubeAchievableBpms = useMemo(() => {
-    if (source !== "youtube" && !videoOverlay) return [];
-    const toSessionDomain = effectiveBpm > 0 ? sessionBpm / effectiveBpm : 1;
-    return achievableSessionBpms(videoAlignment.sourceBpm, youtubePlayer.availableRates).map(
-      (bpm) => Math.round(bpm * toSessionDomain),
-    );
-  }, [
-    source,
-    videoOverlay,
-    videoAlignment.sourceBpm,
-    youtubePlayer.availableRates,
-    sessionBpm,
-    effectiveBpm,
-  ]);
 
   return {
     enabled,
     desktopAvailable,
-    source,
-    setSource,
     library,
     isImporting,
     importTracks,
@@ -912,8 +797,6 @@ export function useBackingTrackSession({
     onYouTubePlayerReady:
       youtubePlayer.handleReady as BackingTrackController["onYouTubePlayerReady"],
     youtubeCanFollowTempo: youtubePlayer.canFollowTempo,
-    youtubeAppliedRate: youtubePlayer.appliedRate,
-    youtubeAchievableBpms,
     isCinema,
     setCinema,
     videoOverlay,
@@ -927,8 +810,7 @@ export function useBackingTrackSession({
     stemUrls,
     startTime,
     effectiveBpm,
-    youtubeWaveform,
-    driftMsRef: source === "youtube" ? youtubePlayer.driftMsRef : filePlayer.driftMsRef,
+    driftMsRef: filePlayer.driftMsRef,
     scoreClockRef,
     getResumeBeat,
     playbackRate,

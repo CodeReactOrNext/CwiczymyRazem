@@ -3,6 +3,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { BackingTrackBar } from "feature/backingTrack/components/BackingTrackBar";
 import { useBackingTrackSession } from "feature/backingTrack/hooks/useBackingTrackSession";
 import { barBeatsOf } from "feature/backingTrack/utils/alignment";
+import { getBackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
 import { useLocalizedPlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
@@ -374,8 +375,14 @@ const PracticeSessionInner = ({
     // instead of throwing it — and the view following it — back to bar 1.
     getResumeBeat: metronome.getResumeBeat,
     effectiveBpm,
-    sessionBpm:   metronome.bpm,
   });
+
+  // A string, so the tab section's memo only re-renders when it actually moves.
+  const backingTrackStatus = getBackingTrackStatus({
+    stemCount: backingTrack.stems.length,
+    alignment: backingTrack.alignment,
+  });
+  const openBackingTrack = useCallback(() => setIsAligningBacking(true), []);
 
   // ── Ear training ──────────────────────────────────────────────────────────
 
@@ -1192,18 +1199,22 @@ const PracticeSessionInner = ({
         backingTrackSlot={backingTrack.enabled ? (
           <BackingTrackBar
             controller={backingTrack}
-            sessionBpm={metronome.bpm}
             isPlaying={metronome.isPlaying}
             onTogglePlay={toggleWithoutCountIn}
             onSeekToBeat={handleAlignSeek}
+            isAligning={isAligningBacking}
             onAligningChange={setIsAligningBacking}
             onSessionBpmChange={isExamMode ? undefined : metronome.setBpm}
+            sessionBpm={metronome.bpm}
             beatsPerBar={barBeatsOf(activeTablature, metronome.accentPattern?.length ?? 4)}
             measures={activeTablature}
+            syncTracks={parsedGpTracks ?? undefined}
             mixerTracks={audioTracks}
             onMixerChange={handleMixerChange}
           />
         ) : undefined}
+        backingTrackStatus={backingTrack.enabled ? backingTrackStatus : undefined}
+        onOpenBackingTrack={openBackingTrack}
         backingCinema={backingTrack.isCinema}
         songSectionMapSlot={isMobileView ? undefined : songSectionMapSlot}
         backingAligning={isAligningBacking}

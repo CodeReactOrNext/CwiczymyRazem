@@ -3,6 +3,7 @@
   "mastery_roadmap": "Ruta de maestría",
   "mastery_roadmaps": "Rutas de maestría",
   "player_roadmaps": "Rutas de jugadores",
+  "players_link": "Crea una ruta en torno a tu propio objetivo o sigue la de otro jugador",
   "back": "Volver",
   "practice": "Práctica",
   "intro": "Rutas de práctica guiadas para habilidades de guitarra y estilos.",
@@ -24,9 +25,30 @@
     "board_body": "{{total}} rutas de {{players}} jugadores. Como supporter puedes abrir cualquiera y empezarla gratis.",
     "board_body_one": "{{total}} rutas de {{players}} jugador. Como supporter puedes abrir cualquiera y empezarla gratis.",
     "title": "Crea una ruta en torno a tu propio objetivo",
-    "body1": "Las rutas de jugadores son a medida: describes lo que quieres tocar y el coach organiza las fases, ejercicios, lecciones y canciones que te llevan hasta ahí. Aquí también aparecen las rutas de otros jugadores, para que veas en qué están trabajando.",
-    "body2": "Cada una de estas rutas la genera un modelo de IA, y cada generación cuesta dinero real. riff.quest vive de donaciones, así que esta pestaña requiere la insignia de supporter. La pestaña Rutas de maestría sigue siendo gratis para todos.",
-    "body3": "Cualquier donación, por pequeña que sea, desbloquea las Rutas de jugadores para siempre. Sin suscripción.",
+    "lead": "Describe lo que quieres tocar — el coach lo convierte en fases y pasos.",
+    "steps_title": "Cada paso incluye",
+    "step": {
+      "exercise": {
+        "title": "Un ejercicio",
+        "body": "Listo para tocar en la app"
+      },
+      "description": {
+        "title": "Una descripción",
+        "body": "Qué practicar y cuándo está hecho"
+      },
+      "video": {
+        "title": "Una lección en vídeo",
+        "body": "Elegida para ese paso concreto"
+      }
+    },
+    "why_title": "¿Por qué está bloqueado?",
+    "why": {
+      "ai": "Un modelo de IA escribe cada ruta",
+      "cost": "Cada una cuesta dinero real",
+      "donations": "riff.quest vive de donaciones",
+      "unlock": "Cualquier donación lo desbloquea para siempre",
+      "unlock_note": "Sin suscripción."
+    },
     "support": "Apoya el proyecto",
     "email": "Paga con el correo de esta cuenta, para que la donación llegue a la cuenta correcta.",
     "email_known": "Paga con el correo de esta cuenta — {{email}} — para que la donación llegue a la cuenta correcta."

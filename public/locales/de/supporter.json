@@ -429,6 +429,11 @@
       "not_guitar": "Diese Roadmap dreht sich ums Gitarrespielen — beschreib, was du spielen willst.",
       "title": "Bau eine Roadmap um dein Ziel",
       "folded_body": "Beschreib, was du spielen willst — der Coach legt die Phasen, Übungen und Songs fest.",
+      "preview": {
+        "goal": "Dein Ziel",
+        "phases": "Phasen",
+        "steps": "Übungen, Songs und Lektionen"
+      },
       "create": "Roadmap erstellen",
       "writing": "Deine Roadmap wird geschrieben",
       "running_body": "Das dauert ein paar Minuten und läuft bei uns — du kannst die Seite verlassen oder den Tab schließen und bekommst eine Benachrichtigung, wenn sie fertig ist. Bleib hier, und sie öffnet sich von selbst.",
@@ -611,6 +616,7 @@
       "start_failed": "Die Roadmap konnte nicht gestartet werden. Versuch es noch mal.",
       "starting": "Wird gestartet…",
       "start": "Diese Roadmap starten",
+      "view": "Roadmap ansehen",
       "done_refining": "Überarbeitung beenden",
       "refine": "Überarbeiten",
       "unknown": "Unbekannter Spieler",
@@ -626,6 +632,7 @@
       "following_count_one": "1 Spieler folgt",
       "following_none": "Du folgst, noch keine Sessions",
       "not_started": "Noch nicht gestartet",
+      "first_step": "Erster Schritt",
       "started_on": "gestartet am {{date}}",
       "created_on": "erstellt am {{date}}",
       "last_practised": "Zuletzt geübt am {{date}}",
@@ -646,7 +653,12 @@
       },
       "yours": "Deine Roadmaps",
       "others": "Von anderen Spielern",
-      "no_match": "Nichts passt zu diesem Filter."
+      "no_match": "Nichts passt zu diesem Filter.",
+      "page": {
+        "title": "Spieler-Roadmaps",
+        "subtitle": "Roadmaps, die der Coach um deine Ziele gebaut hat — und die, an denen andere Spieler arbeiten",
+        "eyebrow": "Meine Sachen"
+      }
     },
     "gear": {
       "propose_title": "Equipment vorschlagen",
