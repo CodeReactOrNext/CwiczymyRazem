@@ -48,6 +48,24 @@ interface UseNoteMatchingOptions {
   calibratedLatencyMs?: number | null;
   /** What the score rewards beyond hitting the notes — see pitchScoring.ts. */
   scoringFocus?: ScoringFocus;
+  /** Every tab note the moment it is settled — see NoteJudgement. */
+  onNoteJudged?: (judgement: NoteJudgement) => void;
+}
+
+/**
+ * One tab note settled by the matcher, delivered from inside the matching loop
+ * — not on the next flush to React — so a game mode can react to each note
+ * as it lands. Notes repeat their key on every pass of a looping tab.
+ */
+export interface NoteJudgement {
+  noteKey: string;
+  hit: boolean;
+  /** How the attack sat on the beat; null for a miss. */
+  grade: TimingGrade | null;
+  /** Dead on (±25 ms). Feedback only — the score treats it as a 3. */
+  perfect: boolean;
+  /** The streak after this note: 0 after a miss. */
+  combo: number;
 }
 
 /** A pitch-graded note that was hit and is still playing out — its points
@@ -77,8 +95,12 @@ export function useNoteMatching({
   isPlaying, startTime, audioContext, audioStartTime, effectiveBpm, rawBpm,
   activeTablature, isMicEnabled, currentExerciseIndex,
   speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset, calibratedLatencyMs,
-  scoringFocus = "timing",
+  scoringFocus = "timing", onNoteJudged,
 }: UseNoteMatchingOptions) {
+  // Read by the matching loop, which must not restart when the listener changes.
+  const onNoteJudgedRef = useRef(onNoteJudged);
+  useEffect(() => { onNoteJudgedRef.current = onNoteJudged; }, [onNoteJudged]);
+
   const {
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
@@ -612,11 +634,14 @@ export function useNoteMatching({
                 minScoredBpmRef.current = scoredBpm;
               }
 
+              const perfect = isPerfectTiming(attackDeltaMs);
               noteTimingsRef.current[noteKey] = {
                 grade: timingGrade,
+                perfect,
                 hint: timingHintFor(attackDeltaMs),
                 offsetBeats: attackDeltaMs === null ? null : attackDeltaMs / beatDurationMs,
               };
+              onNoteJudgedRef.current?.({ noteKey, hit: true, grade: timingGrade, perfect, combo: newCombo });
               timingCountsRef.current[timingGrade]++;
               if (attackDeltaMs !== null && timingOffsetsRef.current.length < MAX_TIMED_NOTES) {
                 timingOffsetsRef.current.push(attackDeltaMs);
@@ -636,6 +661,7 @@ export function useNoteMatching({
             // next hit scores at x1 — so the HUD drops to x1 right away too.
             gs.combo = 0;
             gs.multiplier = 1;
+            onNoteJudgedRef.current?.({ noteKey, hit: false, grade: null, perfect: false, combo: 0 });
           }
         });
       }

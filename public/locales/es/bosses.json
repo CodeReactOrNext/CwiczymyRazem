@@ -1,0 +1,224 @@
+{
+  "bosses": {
+    "fretweaver": {
+      "name": "La Tejedora de Trastes",
+      "title": "Reina de la red cromática"
+    }
+  },
+  "arena": {
+    "you": "Tú",
+    "record": "Récord: fase {{phase}}",
+    "your_hp": "PV",
+    "sword": "Espada",
+    "poisoned": "Veneno — carga a la mitad",
+    "streak": "Racha {{count}} · ×{{multiplier}}",
+    "phase": "Fase {{phase}}",
+    "phase_caption": "Fase {{phase}} · {{bpm}} BPM",
+    "slam_coming": "Golpe en camino — mantén una racha de {{streak}}",
+    "weak_spot": "Punto débil — tu espada carga ×{{multiplier}}",
+    "regenerating": "Se regenera — golpéala",
+    "blocked": "Bloqueado",
+    "slam": "Golpe",
+    "webbed": "Red — toca de memoria",
+    "caught_shield": "Escudo",
+    "caught_secondWind": "Segundo aliento",
+    "sword_ready": "Lista para golpear",
+    "poisoned_short": "Envenenada",
+    "enraged": "Furia"
+  },
+  "threats": {
+    "bites": "Mordiscos",
+    "slams": "Golpes",
+    "weak_spots": "Puntos débiles",
+    "venom": "Veneno",
+    "regen": "Regeneración",
+    "frenzy": "Frenesí",
+    "web": "Red"
+  },
+  "result": {
+    "title": "La red se cerró",
+    "body": "Tu partida terminó en la fase {{phase}}.",
+    "new_record": "Nuevo récord",
+    "phase": "Fase alcanzada",
+    "damage": "Daño infligido",
+    "best_streak": "Mejor racha",
+    "accuracy": "Precisión",
+    "retry": "Luchar de nuevo",
+    "finish": "Terminar",
+    "build": "Tus mejoras",
+    "chart_title": "PV perdidos en cada fase",
+    "hardest": "La más dura: fase {{phase}} (−{{hp}} PV)",
+    "phase_detail": "Fase {{phase}} · {{bpm}} BPM · {{rhythm}} · −{{hp}} PV",
+    "no_damage": "Ni un rasguño",
+    "ahead_one": "{{count}} fase más que tu récord",
+    "ahead_other": "{{count}} fases más que tu récord",
+    "behind_one": "A {{count}} fase de tu récord",
+    "behind_other": "A {{count}} fases de tu récord",
+    "level_with": "Igualas tu récord"
+  },
+  "lair": {
+    "pitch": "Un combate sin fin. En cada fase la araña muda a una forma más rápida con un ejercicio nuevo: a ver hasta dónde llegas.",
+    "best_phase": "Mejor fase",
+    "best_damage": "Más daño",
+    "runs": "Partidas",
+    "fight": "Luchar"
+  },
+  "rules": {
+    "title": "Cómo funciona el combate",
+    "sword": {
+      "title": "Carga la espada",
+      "body": "Cada acierto la carga: justo en el pulso 4, a tiempo 3, cerca 2, suelto 1. Un fallo rompe la carga."
+    },
+    "strike": {
+      "title": "Tajo",
+      "body": "Una espada llena golpea sola — más fuerte cuanto más larga tu racha, hasta ×2 con {{max}} seguidas."
+    },
+    "bite": {
+      "title": "Cada fallo es un mordisco",
+      "body": "Una nota fallada cuesta PV. Sin PV, se acaba la partida."
+    },
+    "slam": {
+      "title": "Bloquea el golpe",
+      "body": "Desde la fase {{slams}} la araña prepara golpes. Ten una racha de {{parry}} cuando caiga para bloquearlo — un bloqueo carga media espada."
+    },
+    "endless": {
+      "title": "Sin fin y al azar",
+      "body": "Deja a cero los PV de una fase y la araña muda: orden de dedos, recorrido, posición y ritmo al azar, cada vez más rápido. Cada fase superada te cura {{heal}} PV."
+    },
+    "draft": {
+      "title": "Mejoras",
+      "body": "Tras cada fase tomas una de tres mejoras al azar: armadura, una espada más afilada, un tempo más lento… Algunas se acumulan y las raras salen poco. Un barajado por partida y otro cada cinco fases."
+    },
+    "threats": {
+      "title": "Aprende",
+      "body": "Desde la fase {{weak}} muestra puntos débiles: tu espada carga ×{{weakCharge}} mientras están abiertos. Desde la fase {{affix}} gana poderes: veneno, regeneración, frenesí y redes sobre la tablatura, más a la vez cuanto más avances."
+    }
+  },
+  "draft": {
+    "eyebrow": "Empieza la fase {{phase}}",
+    "title": "Elige una mejora",
+    "reroll": "Barajar ({{count}})",
+    "owned": "Tienes: {{count}}",
+    "counters": "Contra: {{threat}}",
+    "pairs": "Combina con: {{list}}"
+  },
+  "rarity": {
+    "common": "Común",
+    "rare": "Rara",
+    "epic": "Épica"
+  },
+  "boons": {
+    "armor": {
+      "name": "Armadura",
+      "body": "Los mordiscos quitan un {{armorPercent}} % menos de PV. Se acumula."
+    },
+    "shield": {
+      "name": "Escudo",
+      "body": "Absorbe los próximos {{shieldCharges}} mordiscos."
+    },
+    "vitality": {
+      "name": "Vitalidad",
+      "body": "+{{vitalityHp}} PV máximos, curados al momento."
+    },
+    "bandage": {
+      "name": "Venda",
+      "body": "Cura {{bandageHp}} PV al momento."
+    },
+    "lifesteal": {
+      "name": "Robo de vida",
+      "body": "Cada tajo te cura {{lifestealHp}} PV. Se acumula."
+    },
+    "thorns": {
+      "name": "Espinas",
+      "body": "Cada mordisco le cuesta a la araña un {{thornsPercent}} % de los PV de la fase. Se acumula."
+    },
+    "secondWind": {
+      "name": "Segundo aliento",
+      "body": "{{secondWindMisses}} fallos por fase no cuentan: sin mordisco, la racha y la carga se mantienen."
+    },
+    "steadyHand": {
+      "name": "Pulso firme",
+      "body": "Bloquea los golpes con una racha de solo {{steadyHandStreak}}."
+    },
+    "antidote": {
+      "name": "Antídoto",
+      "body": "El veneno no te afecta."
+    },
+    "clearSight": {
+      "name": "Vista clara",
+      "body": "Las redes sobre la tablatura duran la mitad."
+    },
+    "blade": {
+      "name": "Filo",
+      "body": "Los tajos hacen un {{bladePercent}} % más. Se acumula."
+    },
+    "lightBlade": {
+      "name": "Espada ligera",
+      "body": "Tu espada se llena con un {{lightBladePercent}} % menos de puntos. Se acumula."
+    },
+    "precision": {
+      "name": "Precisión",
+      "body": "Las notas justas en el pulso cargan {{precisionPoints}} en vez de 4."
+    },
+    "momentum": {
+      "name": "Impulso",
+      "body": "Tu racha llega a ×2 con {{momentumStreak}} seguidas en vez de 48."
+    },
+    "exploit": {
+      "name": "Punto débil",
+      "body": "Los puntos débiles cargan tu espada ×{{exploitCharge}} y duran más."
+    },
+    "slowDown": {
+      "name": "Más despacio",
+      "body": "−{{slowDownBpm}} BPM en cada fase desde ahora."
+    },
+    "overdrive": {
+      "name": "Overdrive",
+      "body": "+{{overdriveBpm}} BPM en cada fase, pero los tajos hacen un {{overdrivePercent}} % más."
+    }
+  },
+  "briefing": {
+    "title": "Qué cambia",
+    "tempo": "Tempo",
+    "rhythm": "Ritmo",
+    "route": "Recorrido",
+    "fingers": "Dedos",
+    "neck": "Mástil",
+    "frets": "trastes {{low}}–{{high}}",
+    "gained": "Nuevo: {{list}}",
+    "lost": "Desaparece: {{list}}",
+    "faster": "Notas un {{percent}} % más rápidas",
+    "slower": "Notas un {{percent}} % más lentas",
+    "same_speed": "Notas a la misma velocidad",
+    "unchanged": "Sin cambios — {{list}}",
+    "first_bar": "Primer compás"
+  },
+  "subdivision": {
+    "quarters": "negras",
+    "eighths": "corcheas",
+    "triplets": "tresillos",
+    "sixteenths": "semicorcheas"
+  },
+  "route": {
+    "walk": "por las cuerdas",
+    "skip": "salto de cuerda",
+    "diagonal": "en diagonal"
+  },
+  "preview": {
+    "armor": "Mordisco {{from}} → {{to}} PV",
+    "shield": "Escudo {{from}} → {{to}}",
+    "vitality": "PV máx. {{from}} → {{to}}",
+    "bandage": "PV {{from}} → {{to}}",
+    "lifesteal": "Por tajo +{{from}} → +{{to}} PV",
+    "thorns": "Por mordisco {{from}} → {{to}} de daño",
+    "secondWind": "Fallos libres {{from}} → {{to}}",
+    "steadyHand": "Bloqueo con racha {{from}} → {{to}}",
+    "blade": "Tajo completo {{from}} → {{to}}",
+    "lightBlade": "Espada {{from}} → {{to}} puntos",
+    "precision": "Justo en el pulso {{from}} → {{to}} puntos",
+    "momentum": "×2 con racha {{from}} → {{to}}",
+    "exploit": "Punto débil {{from}} → {{to}}",
+    "slowDown": "Tempo {{from}} → {{to}} BPM",
+    "overdrive": "Tempo {{from}} → {{to}} BPM"
+  }
+}

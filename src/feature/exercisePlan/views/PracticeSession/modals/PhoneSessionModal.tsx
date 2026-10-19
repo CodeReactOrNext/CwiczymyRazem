@@ -79,6 +79,8 @@ interface PhoneSessionModalProps {
   handleRestart: () => void;
   /** See MobileExerciseContent — a song item's section map, mounted once. */
   songSectionMapSlot?: React.ReactNode;
+  /** Above the exercise, upright only — a boss fight's arena. */
+  heroSlot?: React.ReactNode;
 }
 
 /**
@@ -146,6 +148,7 @@ export function PhoneSessionModal({
   handleBackExerciseClick,
   handleRestart,
   songSectionMapSlot,
+  heroSlot,
 }: PhoneSessionModalProps) {
   const { t } = useTranslation("session");
   const isPortrait = orientation === "portrait";
@@ -342,6 +345,7 @@ export function PhoneSessionModal({
                 <div className="min-h-0 w-full flex-1 overflow-y-auto overscroll-contain">
                   <div className="flex min-h-full w-full flex-col gap-4">
                     <div className="flex flex-1 flex-col justify-center gap-4">
+                      {!isSideways && heroSlot}
                       <MobileExerciseContent
                         currentExercise={currentExercise}
                         activeTablature={activeTablature}
@@ -376,7 +380,7 @@ export function PhoneSessionModal({
 
                     {/* Upright there's height to spare under the exercise, so the score reads
                         straight under the tab it's for; sideways it lives in the drawer. */}
-                    {!isSideways && isMicEnabled && !currentExercise.customGoal && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
+                    {!isSideways && !heroSlot && isMicEnabled && !currentExercise.customGoal && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
                       <MobileMicGameHud />
                     )}
 

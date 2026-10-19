@@ -71,6 +71,7 @@ import {
   Search,
   Settings,
   Shield,
+  Skull,
   Signpost,
   SlidersHorizontal,
   Star,
@@ -268,6 +269,13 @@ const PRACTICE_SUB_NAV: SidebarSubLink[] = [
     href: "/scale-tree",
     icon: <ListTree size={16} />,
     tooltip: "scale_map_tooltip",
+  },
+  {
+    id: "practice-bosses",
+    name: "boss_fights",
+    href: "/bosses",
+    icon: <Skull size={16} />,
+    tooltip: "boss_fights_tooltip",
   },
 ];
 
@@ -505,6 +513,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname === "/ai-coach") return "practice";
     if (pathname === "/journey") return "practice";
     if (pathname.startsWith("/scale-tree")) return "practice";
+    if (pathname.startsWith("/bosses")) return "practice";
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";

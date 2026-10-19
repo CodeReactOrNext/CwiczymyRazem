@@ -369,6 +369,11 @@ export interface ExercisePlan {
   duel?: {
     id: string;
   };
+  /** Set when the session is a boss fight (see feature/bosses). Its exercise
+   *  is generated, so nothing public links to it by id. */
+  boss?: {
+    id: string;
+  };
 }
 
 /** Which high score a run competes against — one per scored exercise kind. */

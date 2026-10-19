@@ -16,6 +16,7 @@ import { useIntervalClickHunt } from "../hooks/useIntervalClickHunt";
 import type { LearnModeState } from "../hooks/useLearnModeMatcher";
 import type { NoteHuntState } from "../hooks/useNoteHunt";
 import { useNoteHunt } from "../hooks/useNoteHunt";
+import type { NoteJudgement } from "../hooks/useNoteMatching";
 import { useNoteMatching } from "../hooks/useNoteMatching";
 import type { SlotResult } from "../hooks/useStrummingMatcher";
 import { useStrummingMatcher } from "../hooks/useStrummingMatcher";
@@ -250,6 +251,8 @@ interface NoteMatchingProviderProps {
   // learn mode (see useLearnModeMatcher) — owned by PracticeSession, which also
   // switches the metronome off for it
   learn?: LearnModeState | null;
+  // every tab note the moment the matcher settles it (a game mode listening in)
+  onNoteJudged?: (judgement: NoteJudgement) => void;
 }
 
 export function NoteMatchingProvider({
@@ -288,6 +291,7 @@ export function NoteMatchingProvider({
   onExamFail,
   playbackLeakingRef,
   learn = null,
+  onNoteJudged,
 }: NoteMatchingProviderProps) {
   const {
     hitNotes,
@@ -326,6 +330,7 @@ export function NoteMatchingProvider({
     onReset,
     calibratedLatencyMs,
     scoringFocus,
+    onNoteJudged,
   });
 
   const {

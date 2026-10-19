@@ -108,8 +108,9 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           // What lets another player open this routine from the activity feed when it's one only
           // this player has (their own plan, an auto plan). A song wrapper has its song for that.
           // A duel leaves it out: the feed would name the exercise the opponent is on.
-          ...(!plan.song && !plan.duel && { exerciseIds: plan.exercises.map((exercise) => exercise.id) }),
-          ...(!plan.song && collectPracticed(plan.exercises, completedExercises)),
+          // A boss level's exercise is generated — there is no id to open it by.
+          ...(!plan.song && !plan.duel && !plan.boss && { exerciseIds: plan.exercises.map((exercise) => exercise.id) }),
+          ...(!plan.song && !plan.boss && collectPracticed(plan.exercises, completedExercises)),
           skillPointsGained: options?.skipSkillPoints
             ? {}
             : computeSkillPointsGained(plan.exercises, completedExercises),

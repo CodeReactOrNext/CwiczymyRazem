@@ -119,6 +119,8 @@ interface DesktopSessionViewProps {
   backingTrackStatus?:      BackingTrackStatus;
   onOpenBackingTrack?:      () => void;
   songSectionMapSlot?:      React.ReactNode;
+  /** Takes the place of the exercise's goals above the tab — a boss fight's arena. */
+  heroSlot?:                React.ReactNode;
   /** Cinema mode — the backing video fills the session behind the notation. */
   backingCinema?:           boolean;
   /** The backing-track alignment screen is open over the whole session. It plays
@@ -258,7 +260,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
               </div>
             ) : (
               <>
-                {!p.backingCinema && (
+                {/* A game mode's arena carries the identity; the title row would repeat it. */}
+                {!p.backingCinema && !p.heroSlot && (
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
                   <div className="min-w-0 flex-1">
                     <ExerciseHeroHeader
@@ -278,7 +281,10 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                 )}
 
                 <div className={cn("flex flex-col items-center justify-center text-center", p.currentExercise.isPlayalong ? "mb-6 mt-0" : "mb-12 mt-4")}>
-                  {!p.backingCinema && (
+                  {!p.backingCinema && p.heroSlot && (
+                    <div className="mb-8 w-full">{p.heroSlot}</div>
+                  )}
+                  {!p.backingCinema && !p.heroSlot && (
                     <ExerciseHeroHeader
                       variant="goals"
                       exercise={p.currentExercise}

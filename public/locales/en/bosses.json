@@ -1,0 +1,224 @@
+{
+  "bosses": {
+    "fretweaver": {
+      "name": "The Fretweaver",
+      "title": "Queen of the chromatic web"
+    }
+  },
+  "arena": {
+    "you": "You",
+    "record": "Record: phase {{phase}}",
+    "your_hp": "HP",
+    "sword": "Sword",
+    "poisoned": "Poisoned — charges at half speed",
+    "streak": "Streak {{count}} · ×{{multiplier}}",
+    "phase": "Phase {{phase}}",
+    "phase_caption": "Phase {{phase}} · {{bpm}} BPM",
+    "slam_coming": "Slam incoming — be on a streak of {{streak}}",
+    "weak_spot": "Weak spot — your sword charges ×{{multiplier}}",
+    "regenerating": "Regenerating — strike to stop it",
+    "blocked": "Blocked",
+    "slam": "Slam",
+    "webbed": "Webbed — play from memory",
+    "caught_shield": "Shield",
+    "caught_secondWind": "Second wind",
+    "sword_ready": "Ready to strike",
+    "poisoned_short": "Poisoned",
+    "enraged": "Enraged"
+  },
+  "threats": {
+    "bites": "Bites",
+    "slams": "Slams",
+    "weak_spots": "Weak spots",
+    "venom": "Venom",
+    "regen": "Regeneration",
+    "frenzy": "Frenzy",
+    "web": "Web"
+  },
+  "result": {
+    "title": "Caught in the web",
+    "body": "Your run ended in phase {{phase}}.",
+    "new_record": "New record",
+    "phase": "Phase reached",
+    "damage": "Damage dealt",
+    "best_streak": "Best streak",
+    "accuracy": "Accuracy",
+    "retry": "Fight again",
+    "finish": "Finish",
+    "build": "Your build",
+    "chart_title": "HP lost each phase",
+    "hardest": "Hardest: phase {{phase}} (−{{hp}} HP)",
+    "phase_detail": "Phase {{phase}} · {{bpm}} BPM · {{rhythm}} · −{{hp}} HP",
+    "no_damage": "Not a scratch",
+    "ahead_one": "{{count}} phase past your record",
+    "ahead_other": "{{count}} phases past your record",
+    "behind_one": "{{count}} phase short of your record",
+    "behind_other": "{{count}} phases short of your record",
+    "level_with": "Level with your record"
+  },
+  "lair": {
+    "pitch": "One endless fight. Every phase the spider molts into a faster form with a new drill — see how far you get.",
+    "best_phase": "Best phase",
+    "best_damage": "Most damage",
+    "runs": "Runs",
+    "fight": "Fight"
+  },
+  "rules": {
+    "title": "How the fight works",
+    "sword": {
+      "title": "Charge your sword",
+      "body": "Every hit charges it: dead on 4, on time 3, close 2, loose 1. A miss shatters the charge."
+    },
+    "strike": {
+      "title": "Strike",
+      "body": "A full sword strikes on its own — harder the longer your streak, up to ×2 at {{max}} in a row."
+    },
+    "bite": {
+      "title": "Every miss is a bite",
+      "body": "A missed note costs HP. Run out and the run is over."
+    },
+    "slam": {
+      "title": "Block the slam",
+      "body": "From phase {{slams}} the spider winds up slams. Be on a streak of {{parry}} when one lands to block it — a block half-charges your sword."
+    },
+    "endless": {
+      "title": "Endless and random",
+      "body": "Clear a phase's HP and the spider molts: a random finger order, route, position and rhythm, faster every time. Every phase cleared heals you {{heal}} HP."
+    },
+    "draft": {
+      "title": "Pick a boon",
+      "body": "After every phase you take one of three boons dealt at random — armor, a sharper blade, a slower tempo… Some stack, the rare ones come seldom. One reroll per run, another every five phases."
+    },
+    "threats": {
+      "title": "It learns",
+      "body": "From phase {{weak}} it shows weak spots — your sword charges ×{{weakCharge}} while one is open. From phase {{affix}} it gains powers: venom, regeneration, frenzy and webs spat over the tab, more of them the further you get."
+    }
+  },
+  "draft": {
+    "eyebrow": "Phase {{phase}} begins",
+    "title": "Pick a boon",
+    "reroll": "Reroll ({{count}})",
+    "owned": "You have {{count}}",
+    "counters": "Counters: {{threat}}",
+    "pairs": "Pairs with: {{list}}"
+  },
+  "rarity": {
+    "common": "Common",
+    "rare": "Rare",
+    "epic": "Epic"
+  },
+  "boons": {
+    "armor": {
+      "name": "Armor",
+      "body": "Bites take {{armorPercent}}% less HP. Stacks."
+    },
+    "shield": {
+      "name": "Shield",
+      "body": "Soaks up the next {{shieldCharges}} bites."
+    },
+    "vitality": {
+      "name": "Vitality",
+      "body": "+{{vitalityHp}} max HP, healed right away."
+    },
+    "bandage": {
+      "name": "Bandage",
+      "body": "Heal {{bandageHp}} HP now."
+    },
+    "lifesteal": {
+      "name": "Lifesteal",
+      "body": "Every strike heals you {{lifestealHp}} HP. Stacks."
+    },
+    "thorns": {
+      "name": "Thorns",
+      "body": "Every bite costs the spider {{thornsPercent}}% of the phase's HP. Stacks."
+    },
+    "secondWind": {
+      "name": "Second wind",
+      "body": "{{secondWindMisses}} misses each phase are forgiven: no bite, the streak and the charge stay."
+    },
+    "steadyHand": {
+      "name": "Steady hand",
+      "body": "Block slams with a streak of just {{steadyHandStreak}}."
+    },
+    "antidote": {
+      "name": "Antidote",
+      "body": "Venom can't touch you."
+    },
+    "clearSight": {
+      "name": "Clear sight",
+      "body": "Webs over the tab last half as long."
+    },
+    "blade": {
+      "name": "Sharp blade",
+      "body": "Strikes deal {{bladePercent}}% more. Stacks."
+    },
+    "lightBlade": {
+      "name": "Light blade",
+      "body": "Your sword fills with {{lightBladePercent}}% fewer points. Stacks."
+    },
+    "precision": {
+      "name": "Precision",
+      "body": "Dead-on notes charge {{precisionPoints}} instead of 4."
+    },
+    "momentum": {
+      "name": "Momentum",
+      "body": "Your streak reaches ×2 at {{momentumStreak}} in a row instead of 48."
+    },
+    "exploit": {
+      "name": "Exploit",
+      "body": "Weak spots charge your sword ×{{exploitCharge}} and stay open longer."
+    },
+    "slowDown": {
+      "name": "Slow down",
+      "body": "−{{slowDownBpm}} BPM on every phase from now on."
+    },
+    "overdrive": {
+      "name": "Overdrive",
+      "body": "+{{overdriveBpm}} BPM on every phase, but strikes deal {{overdrivePercent}}% more."
+    }
+  },
+  "briefing": {
+    "title": "What changes",
+    "tempo": "Tempo",
+    "rhythm": "Rhythm",
+    "route": "Route",
+    "fingers": "Fingers",
+    "neck": "Neck",
+    "frets": "frets {{low}}–{{high}}",
+    "gained": "New: {{list}}",
+    "lost": "Gone: {{list}}",
+    "faster": "Notes come {{percent}}% faster",
+    "slower": "Notes come {{percent}}% slower",
+    "same_speed": "Notes come at the same speed",
+    "unchanged": "Unchanged — {{list}}",
+    "first_bar": "First bar"
+  },
+  "subdivision": {
+    "quarters": "quarter notes",
+    "eighths": "eighths",
+    "triplets": "triplets",
+    "sixteenths": "sixteenths"
+  },
+  "route": {
+    "walk": "across the strings",
+    "skip": "string skipping",
+    "diagonal": "diagonal"
+  },
+  "preview": {
+    "armor": "Bite {{from}} → {{to}} HP",
+    "shield": "Shield {{from}} → {{to}}",
+    "vitality": "Max HP {{from}} → {{to}}",
+    "bandage": "HP {{from}} → {{to}}",
+    "lifesteal": "Per strike +{{from}} → +{{to}} HP",
+    "thorns": "Per bite {{from}} → {{to}} damage",
+    "secondWind": "Free misses {{from}} → {{to}}",
+    "steadyHand": "Block at streak {{from}} → {{to}}",
+    "blade": "Full strike {{from}} → {{to}}",
+    "lightBlade": "Sword {{from}} → {{to}} points",
+    "precision": "Dead on {{from}} → {{to}} points",
+    "momentum": "×2 at streak {{from}} → {{to}}",
+    "exploit": "Weak spot {{from}} → {{to}}",
+    "slowDown": "Tempo {{from}} → {{to}} BPM",
+    "overdrive": "Tempo {{from}} → {{to}} BPM"
+  }
+}
