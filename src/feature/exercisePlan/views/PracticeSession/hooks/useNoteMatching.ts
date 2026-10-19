@@ -9,7 +9,7 @@ import type { IntonationKind, LivePitch, ScoringFocus } from "../utils/pitchScor
 import { closerIntonation, continuationAttackFloorMs, gradeIntonation, hasOwnAttack, INTONATION_SETTLE_MS, intonationKindOf, isNearPitch, isSamePitchContinuation, liveBendAmount, medianCents, noteSettleMs } from "../utils/pitchScoring";
 import { tempoScoreFactor } from "../utils/tempoScoreFactor";
 import type { RunNote, TimingGrade } from "../utils/timingGrade";
-import { gradeTiming, TIMING_GRADE_POINTS, timingHintFor } from "../utils/timingGrade";
+import { gradeTiming, isPerfectTiming, TIMING_GRADE_POINTS, timingHintFor } from "../utils/timingGrade";
 import { MAX_TIMED_NOTES } from "../utils/timingPrecision";
 import type { ExpectedAttack } from "./noteEventGrader";
 import { assignAttacks } from "./noteEventGrader";
@@ -637,7 +637,6 @@ export function useNoteMatching({
               const perfect = isPerfectTiming(attackDeltaMs);
               noteTimingsRef.current[noteKey] = {
                 grade: timingGrade,
-                perfect,
                 hint: timingHintFor(attackDeltaMs),
                 offsetBeats: attackDeltaMs === null ? null : attackDeltaMs / beatDurationMs,
               };

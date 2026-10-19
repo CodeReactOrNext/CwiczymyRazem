@@ -85,6 +85,11 @@ export const timingWindowsFor = (noteMs: number): { onTimeMs: number; closeMs: n
  */
 export const PERFECT_TIMING_MS = 25;
 
+/** One attack dead on the beat (within PERFECT_TIMING_MS) — what a boss fight
+ *  rewards as a perfect hit. Unmeasured attacks never count. */
+export const isPerfectTiming = (deltaMs: number | null): boolean =>
+  deltaMs !== null && Math.abs(deltaMs) <= PERFECT_TIMING_MS;
+
 /**
  * The tab's labels — feedback only, they never touch the score (the grade
  * windows above do). Set by the owner apart from the grades: a "+" for any
