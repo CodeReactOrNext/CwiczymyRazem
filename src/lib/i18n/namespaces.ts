@@ -3,6 +3,7 @@ import achievements from "../../../public/locales/en/achievements.json";
 import ai_coach from "../../../public/locales/en/ai_coach.json";
 import arsenal from "../../../public/locales/en/arsenal.json";
 import backing_track from "../../../public/locales/en/backing_track.json";
+import bosses from "../../../public/locales/en/bosses.json";
 import calibration from "../../../public/locales/en/calibration.json";
 import challenges from "../../../public/locales/en/challenges.json";
 import chat from "../../../public/locales/en/chat.json";
@@ -61,6 +62,7 @@ export const TRANSLATION_NAMESPACES = [
   "ai_coach",
   "arsenal",
   "backing_track",
+  "bosses",
   "calibration",
   "challenges",
   "chat",
@@ -137,6 +139,7 @@ export const EN_CATALOG: LocaleCatalog = {
   ai_coach,
   arsenal,
   backing_track,
+  bosses,
   calibration,
   challenges,
   chat,

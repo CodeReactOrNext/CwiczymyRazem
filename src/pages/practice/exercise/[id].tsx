@@ -5,29 +5,23 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 import { journeyModules } from "feature/journey/data/journeyModules";
 import { accuracyToStars, firebaseCompleteJourneyStepWithStars } from "feature/journey/services/journey.service";
 import { firebaseAddExamPassedLog } from "feature/logs/services/addExamPassedLog.service";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { useRequireUserAuth } from "hooks/useRequireUserAuth";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "store/hooks";
 
 export default function PracticeExercisePage() {
   const router = useRouter();
   const { id, mode, bpm, stepId, moduleId } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
-  const userAuth = useAppSelector(selectUserAuth);
+  const userAuth = useRequireUserAuth();
 
   const isExamMode = mode === "exam";
   const examBpm = bpm ? parseInt(bpm as string, 10) : undefined;
 
   useEffect(() => {
-    if (!router.isReady) return;
-    if (!userAuth) {
-      router.push('/login');
-      return;
-    }
-    if (!id) return;
+    if (!router.isReady || !userAuth || !id) return;
 
     const exerciseId = (id as string).replace(/-/g, "_");
     const exercise = exercisesAgregat.find(ex => ex.id === exerciseId);

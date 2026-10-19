@@ -1,0 +1,224 @@
+{
+  "bosses": {
+    "fretweaver": {
+      "name": "Die Bundweberin",
+      "title": "Königin des chromatischen Netzes"
+    }
+  },
+  "arena": {
+    "you": "Du",
+    "record": "Rekord: Phase {{phase}}",
+    "your_hp": "HP",
+    "sword": "Schwert",
+    "poisoned": "Gift — lädt halb so schnell",
+    "streak": "Serie {{count}} · ×{{multiplier}}",
+    "phase": "Phase {{phase}}",
+    "phase_caption": "Phase {{phase}} · {{bpm}} BPM",
+    "slam_coming": "Schmetterschlag naht — halte eine Serie von {{streak}}",
+    "weak_spot": "Schwachstelle — dein Schwert lädt ×{{multiplier}}",
+    "regenerating": "Regeneriert — schlag zu",
+    "blocked": "Geblockt",
+    "slam": "Schmetterschlag",
+    "webbed": "Netz — spiel aus dem Gedächtnis",
+    "caught_shield": "Schild",
+    "caught_secondWind": "Zweiter Atem",
+    "sword_ready": "Bereit",
+    "poisoned_short": "Vergiftet",
+    "enraged": "Raserei"
+  },
+  "threats": {
+    "bites": "Bisse",
+    "slams": "Schmetterschläge",
+    "weak_spots": "Schwachstellen",
+    "venom": "Gift",
+    "regen": "Regeneration",
+    "frenzy": "Raserei",
+    "web": "Netz"
+  },
+  "result": {
+    "title": "Im Netz gefangen",
+    "body": "Dein Lauf endete in Phase {{phase}}.",
+    "new_record": "Neuer Rekord",
+    "phase": "Erreichte Phase",
+    "damage": "Verursachter Schaden",
+    "best_streak": "Beste Serie",
+    "accuracy": "Genauigkeit",
+    "retry": "Nochmal kämpfen",
+    "finish": "Beenden",
+    "build": "Dein Build",
+    "chart_title": "Verlorene HP pro Phase",
+    "hardest": "Am härtesten: Phase {{phase}} (−{{hp}} HP)",
+    "phase_detail": "Phase {{phase}} · {{bpm}} BPM · {{rhythm}} · −{{hp}} HP",
+    "no_damage": "Kein Kratzer",
+    "ahead_one": "{{count}} Phase über deinem Rekord",
+    "ahead_other": "{{count}} Phasen über deinem Rekord",
+    "behind_one": "{{count}} Phase unter deinem Rekord",
+    "behind_other": "{{count}} Phasen unter deinem Rekord",
+    "level_with": "Rekord eingestellt"
+  },
+  "lair": {
+    "pitch": "Ein endloser Kampf. In jeder Phase häutet sich die Spinne in eine schnellere Gestalt mit einer neuen Übung — wie weit kommst du?",
+    "best_phase": "Beste Phase",
+    "best_damage": "Meister Schaden",
+    "runs": "Läufe",
+    "fight": "Kämpfen"
+  },
+  "rules": {
+    "title": "So läuft der Kampf",
+    "sword": {
+      "title": "Lade dein Schwert",
+      "body": "Jeder Treffer lädt es: exakt 4, pünktlich 3, knapp 2, locker 1. Ein Fehler zerschlägt die Ladung."
+    },
+    "strike": {
+      "title": "Hieb",
+      "body": "Ein volles Schwert schlägt von selbst zu — umso härter, je länger deine Serie, bis ×2 bei {{max}} in Folge."
+    },
+    "bite": {
+      "title": "Jeder Fehler ist ein Biss",
+      "body": "Eine verpasste Note kostet HP. Sind sie weg, ist der Lauf vorbei."
+    },
+    "slam": {
+      "title": "Blocke den Schmetterschlag",
+      "body": "Ab Phase {{slams}} holt die Spinne aus. Hast du beim Aufprall eine Serie von {{parry}}, blockst du ihn — ein Block lädt dein Schwert zur Hälfte."
+    },
+    "endless": {
+      "title": "Endlos und zufällig",
+      "body": "Bring die HP einer Phase auf null und die Spinne häutet sich: zufällige Fingerfolge, Route, Lage und Rhythmus, jedes Mal schneller. Jede geschaffte Phase heilt dich um {{heal}} HP."
+    },
+    "draft": {
+      "title": "Verbesserungen",
+      "body": "Nach jeder Phase nimmst du eine von drei zufälligen Verbesserungen — Rüstung, schärfere Klinge, langsameres Tempo… Manche stapeln sich, seltene kommen selten. Einmal neu mischen pro Lauf, ein weiteres Mal alle fünf Phasen."
+    },
+    "threats": {
+      "title": "Sie lernt dazu",
+      "body": "Ab Phase {{weak}} zeigt sie Schwachstellen — dein Schwert lädt dann ×{{weakCharge}}. Ab Phase {{affix}} bekommt sie Kräfte: Gift, Regeneration, Raserei und Netze über der Tabulatur, je weiter, desto mehr auf einmal."
+    }
+  },
+  "draft": {
+    "eyebrow": "Phase {{phase}} beginnt",
+    "title": "Wähle eine Verbesserung",
+    "reroll": "Neu mischen ({{count}})",
+    "owned": "Du hast: {{count}}",
+    "counters": "Hilft gegen: {{threat}}",
+    "pairs": "Passt zu: {{list}}"
+  },
+  "rarity": {
+    "common": "Gewöhnlich",
+    "rare": "Selten",
+    "epic": "Episch"
+  },
+  "boons": {
+    "armor": {
+      "name": "Rüstung",
+      "body": "Bisse kosten {{armorPercent}} % weniger HP. Stapelbar."
+    },
+    "shield": {
+      "name": "Schild",
+      "body": "Fängt die nächsten {{shieldCharges}} Bisse ab."
+    },
+    "vitality": {
+      "name": "Vitalität",
+      "body": "+{{vitalityHp}} max. HP, sofort geheilt."
+    },
+    "bandage": {
+      "name": "Verband",
+      "body": "Heilt sofort {{bandageHp}} HP."
+    },
+    "lifesteal": {
+      "name": "Lebensraub",
+      "body": "Jeder Hieb heilt dich um {{lifestealHp}} HP. Stapelbar."
+    },
+    "thorns": {
+      "name": "Dornen",
+      "body": "Jeder Biss kostet die Spinne {{thornsPercent}} % der Phasen-HP. Stapelbar."
+    },
+    "secondWind": {
+      "name": "Zweiter Atem",
+      "body": "{{secondWindMisses}} Fehler pro Phase sind frei: kein Biss, Serie und Ladung bleiben."
+    },
+    "steadyHand": {
+      "name": "Ruhige Hand",
+      "body": "Blocke Schmetterschläge schon mit einer Serie von {{steadyHandStreak}}."
+    },
+    "antidote": {
+      "name": "Gegengift",
+      "body": "Gift kann dir nichts."
+    },
+    "clearSight": {
+      "name": "Klarer Blick",
+      "body": "Netze über der Tabulatur halten nur halb so lange."
+    },
+    "blade": {
+      "name": "Scharfe Klinge",
+      "body": "Hiebe machen {{bladePercent}} % mehr Schaden. Stapelbar."
+    },
+    "lightBlade": {
+      "name": "Leichte Klinge",
+      "body": "Dein Schwert braucht {{lightBladePercent}} % weniger Punkte. Stapelbar."
+    },
+    "precision": {
+      "name": "Präzision",
+      "body": "Exakte Noten laden {{precisionPoints}} statt 4."
+    },
+    "momentum": {
+      "name": "Schwung",
+      "body": "Deine Serie erreicht ×2 schon bei {{momentumStreak}} in Folge statt 48."
+    },
+    "exploit": {
+      "name": "Schwachstelle",
+      "body": "Schwachstellen laden dein Schwert ×{{exploitCharge}} und bleiben länger offen."
+    },
+    "slowDown": {
+      "name": "Langsamer",
+      "body": "−{{slowDownBpm}} BPM in jeder weiteren Phase."
+    },
+    "overdrive": {
+      "name": "Overdrive",
+      "body": "+{{overdriveBpm}} BPM in jeder Phase, aber Hiebe machen {{overdrivePercent}} % mehr Schaden."
+    }
+  },
+  "briefing": {
+    "title": "Was sich ändert",
+    "tempo": "Tempo",
+    "rhythm": "Rhythmus",
+    "route": "Route",
+    "fingers": "Finger",
+    "neck": "Griffbrett",
+    "frets": "Bünde {{low}}–{{high}}",
+    "gained": "Neu: {{list}}",
+    "lost": "Weg: {{list}}",
+    "faster": "Noten {{percent}} % schneller",
+    "slower": "Noten {{percent}} % langsamer",
+    "same_speed": "Noten im gleichen Tempo",
+    "unchanged": "Unverändert — {{list}}",
+    "first_bar": "Erster Takt"
+  },
+  "subdivision": {
+    "quarters": "Viertel",
+    "eighths": "Achtel",
+    "triplets": "Triolen",
+    "sixteenths": "Sechzehntel"
+  },
+  "route": {
+    "walk": "über die Saiten",
+    "skip": "Saitensprung",
+    "diagonal": "diagonal"
+  },
+  "preview": {
+    "armor": "Biss {{from}} → {{to}} HP",
+    "shield": "Schild {{from}} → {{to}}",
+    "vitality": "Max. HP {{from}} → {{to}}",
+    "bandage": "HP {{from}} → {{to}}",
+    "lifesteal": "Pro Hieb +{{from}} → +{{to}} HP",
+    "thorns": "Pro Biss {{from}} → {{to}} Schaden",
+    "secondWind": "Freie Fehler {{from}} → {{to}}",
+    "steadyHand": "Block ab Serie {{from}} → {{to}}",
+    "blade": "Voller Hieb {{from}} → {{to}}",
+    "lightBlade": "Schwert {{from}} → {{to}} Punkte",
+    "precision": "Exakt {{from}} → {{to}} Punkte",
+    "momentum": "×2 ab Serie {{from}} → {{to}}",
+    "exploit": "Schwachstelle {{from}} → {{to}}",
+    "slowDown": "Tempo {{from}} → {{to}} BPM",
+    "overdrive": "Tempo {{from}} → {{to}} BPM"
+  }
+}

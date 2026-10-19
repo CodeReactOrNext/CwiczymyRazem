@@ -4,6 +4,7 @@ import React, { memo, useEffect } from "react";
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 import { isOpenExercise } from "../../../utils/isOpenExercise";
 import { useSessionUI } from "../contexts/SessionUIContext";
+import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { strumSynthVolume } from "../helpers/strumSynthVolume";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
@@ -170,6 +171,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   obscured = false,
 }: ExerciseContentAreaProps) {
   const { backingVideoId, setBackingVideoId } = useSessionUI();
+  const { gameMode } = useTabOverlay();
 
   useEffect(() => {
     setBackingVideoId(null);
@@ -371,12 +373,14 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         </div>
       )}
 
-      <ExerciseInstructionsInline
-        exercise={activeExercise}
-        isPlaying={isPlaying}
-        rewardSkillId={rewardSkillId}
-        rewardAmount={rewardAmount}
-      />
+      {!gameMode && (
+        <ExerciseInstructionsInline
+          exercise={activeExercise}
+          isPlaying={isPlaying}
+          rewardSkillId={rewardSkillId}
+          rewardAmount={rewardAmount}
+        />
+      )}
     </div>
   );
 });

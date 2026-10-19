@@ -37,11 +37,13 @@ import { SessionDialogs } from "./components/SessionDialogs";
 import { SongSectionMapPanel } from "./components/SongSectionMapPanel";
 import { TimingCalibrationDialog } from "./components/TimingCalibrationDialog";
 import { TuningSettingsModal } from "./components/TuningSettingsModal";
+import { BossFightControlsProvider } from "./contexts/BossFightControlsContext";
 import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import { GuitarTuningProvider } from "./contexts/GuitarTuningContext";
 import type { NoteMatchingHandle, NoteMatchingSnapshot } from "./contexts/NoteMatchingContext";
 import { CLICK_EXAM_MISTAKE_LIMIT, NoteMatchingProvider } from "./contexts/NoteMatchingContext";
 import { SessionUIProvider } from "./contexts/SessionUIContext";
+import { TabOverlayProvider } from "./contexts/TabOverlayContext";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { withBackingTempo } from "./helpers/backingTempoOverlay";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
@@ -56,6 +58,7 @@ import {
 import { strumSynthVolume } from "./helpers/strumSynthVolume";
 import type { TempoRuler } from "./hooks/tempoBeatClock";
 import { createTempoRulerFromMeasures } from "./hooks/tempoBeatClock";
+import { useBossFightSession } from "./hooks/useBossFightSession";
 import { useCalibration } from "./hooks/useCalibration";
 import { useDesktopSessionIntegration } from "./hooks/useDesktopSessionIntegration";
 import { useEarTraining } from "./hooks/useEarTraining";
@@ -66,6 +69,7 @@ import { useGuitarTuning } from "./hooks/useGuitarTuning";
 import type { LearnModeState } from "./hooks/useLearnModeMatcher";
 import { useLearnModeMatcher } from "./hooks/useLearnModeMatcher";
 import { useNoteHuntRotation } from "./hooks/useNoteHuntRotation";
+import type { NoteJudgement } from "./hooks/useNoteMatching";
 import { usePlaybackLeakGuard } from "./hooks/usePlaybackLeakGuard";
 import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
@@ -113,6 +117,35 @@ export interface GoalRunConfig {
   summaryEyebrow?: string;
 }
 
+/**
+ * Boss mode: the exercise is one level of a boss fight. The tempo is locked as
+ * in an exam, the clock runs untimed, and the fight — fed every judged note —
+ * decides when the run is over.
+ */
+export interface BossFightConfig {
+  /** The tempo of the phase being fought. */
+  bpm: number;
+  /** Above the tab, in place of the exercise's goals. Display only: the
+   *  desktop and phone views both mount it. */
+  arena: ReactNode;
+  /** The same for the phone's smaller layout. */
+  compactArena?: ReactNode;
+  onNoteJudged: (judgement: NoteJudgement) => void;
+  /** Deals a fresh fight — BossFightSessionControls.restart calls it before it
+   *  restarts the run. A plain restart (R) keeps the fight going. */
+  onNewRun: () => void;
+  /** The fight is decided: the clock stops and the overlay takes over. */
+  isOver: boolean;
+  /** The fight holds the run — the boss changing phase. It resumes through
+   *  BossFightSessionControls.resume. */
+  isHolding: boolean;
+  /** Rendered once over the session; reads the session's controls through
+   *  useBossFightControls. */
+  overlay: ReactNode;
+  /** Laid over the tab itself (desktop and phone) — display only. */
+  tabOverlay?: ReactNode;
+}
+
 interface PracticeSessionProps {
   plan:                ExercisePlan;
   rawGpFile?:          File;
@@ -129,6 +162,7 @@ interface PracticeSessionProps {
   onExamComplete?:     (accuracy: number) => void;
   skipExitDialog?:     boolean;
   goalRun?:            GoalRunConfig;
+  bossFight?:          BossFightConfig;
 }
 
 const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
@@ -140,10 +174,14 @@ const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
 
 const PracticeSessionInner = ({
   plan, rawGpFile, onFinish, onClose, isFinishing, autoReport,
-  forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount,
-  examMode, examBpm, onExamComplete, skipExitDialog = false, goalRun,
+  forceFullDuration, freeMode: freeModeProp, skillRewardSkillId, skillRewardAmount,
+  examMode: examModeProp, examBpm, onExamComplete, skipExitDialog = false, goalRun, bossFight,
 }: PracticeSessionProps) => {
   const { t } = useTranslation("session");
+  // A boss level runs as an exam at the level's tempo (locked tempo, mic on,
+  // no learn mode), untimed — the fight, not the clock, ends it.
+  const examMode = examModeProp ?? (bossFight ? { requiredBpm: bossFight.bpm } : undefined);
+  const freeMode = freeModeProp || !!bossFight;
   const router = useRouter();
 
   const {
@@ -915,7 +953,7 @@ const PracticeSessionInner = ({
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleNoteMatchingReset,
   } = useSessionControls({
-    shortcutsDisabled: isAligningBacking,
+    shortcutsDisabled: isAligningBacking || !!bossFight?.isOver || !!bossFight?.isHolding,
     isPlaying, stopTimer, startTimer, resetTimer, metronome,
     currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
     handleNextExercise, restartFullSession,
@@ -925,6 +963,22 @@ const PracticeSessionInner = ({
     saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
     tabRestartKey, setTabRestartKey,
     learnMode: learnEnabled,
+  });
+
+  // ── Boss fight ────────────────────────────────────────────────────────────
+
+  const { controls: bossControls, tabOverlay: tabOverlayValue } = useBossFightSession({
+    isActive: !!bossFight,
+    tabOverlay: bossFight?.tabOverlay,
+    isOver: !!bossFight?.isOver,
+    isHolding: !!bossFight?.isHolding,
+    onNewRun: bossFight?.onNewRun,
+    stopTimer, stopMetronome: metronome.stopMetronome, handleRestart,
+    hasLoggedPractice,
+    // Practice time is all a fight reports — the score belongs to the fight.
+    reportPracticeTime: () => autoSubmitReport(exerciseRecordsRef.current, null, null),
+    onClose,
+    isFinishing: !!isFinishing || isSubmittingReport,
   });
 
   // ── Ear training: mic answer matching ─────────────────────────────────────
@@ -1054,10 +1108,12 @@ const PracticeSessionInner = ({
       onExamFail={handleExamMistakeFail}
       playbackLeakingRef={playbackLeakingRef}
       learn={learn}
+      onNoteJudged={bossFight?.onNoteJudged}
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>
     <SessionUIProvider>
+    <TabOverlayProvider value={tabOverlayValue}>
     <>
       {/* Intro splash that always plays on session mount, then parts open
           (door-reveal) to show the session beneath. */}
@@ -1170,6 +1226,7 @@ const PracticeSessionInner = ({
           onEarTrainingGuessed={handleEarTrainingGuessed}
           riddleProgress={riddleProgress} onPlayRiddle={handlePlayRiddle}
           songSectionMapSlot={isMobileView ? songSectionMapSlot : undefined}
+          heroSlot={bossFight ? (bossFight.compactArena ?? bossFight.arena) : undefined}
         />,
         document.body,
       )}
@@ -1206,6 +1263,7 @@ const PracticeSessionInner = ({
         ) : undefined}
         backingCinema={backingTrack.isCinema}
         songSectionMapSlot={isMobileView ? undefined : songSectionMapSlot}
+        heroSlot={bossFight?.arena}
         backingAligning={isAligningBacking}
         countInRemaining={(metronome as any).countInRemaining ?? 0}
         frequencyRef={audioRefs.frequencyRef} volumeRef={audioRefs.volumeRef}
@@ -1270,7 +1328,7 @@ const PracticeSessionInner = ({
           scale-tree exams and record runs, where the only way to finish is to
           play the thing out. Passes at 100% and at whatever tempo the run is
           locked to, so record runs save a record from here too. */}
-      {process.env.NODE_ENV !== "production" && isExamMode && !currentExercise.customGoal && isMounted && createPortal(
+      {process.env.NODE_ENV !== "production" && isExamMode && !bossFight && !currentExercise.customGoal && isMounted && createPortal(
         <button
           type="button"
           onClick={handleDevCompleteExam}
@@ -1281,9 +1339,14 @@ const PracticeSessionInner = ({
         document.body,
       )}
 
+      {bossFight && !reportResult && (
+        <BossFightControlsProvider value={bossControls}>{bossFight.overlay}</BossFightControlsProvider>
+      )}
+
       <TuningSettingsModal />
       <OutputStalledNotice />
     </>
+    </TabOverlayProvider>
     </SessionUIProvider>
     </BpmProgressProvider>
     </TimerProvider>

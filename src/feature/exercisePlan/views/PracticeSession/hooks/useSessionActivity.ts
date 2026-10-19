@@ -26,6 +26,17 @@ export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivity
           timestamp: Date.now(),
         })
       );
+    } else if (userAuth && plan.boss) {
+      // A boss level is generated: Live now names the fight, with no ids to
+      // open an exercise that exists nowhere else.
+      dispatch(
+        setActivity({
+          planTitle: plan.title,
+          exerciseTitle: currentExercise.title,
+          category: currentExercise.category,
+          timestamp: Date.now(),
+        })
+      );
     } else if (userAuth) {
       dispatch(
         setActivity({

@@ -1,0 +1,228 @@
+{
+  "bosses": {
+    "fretweaver": {
+      "name": "Tkaczka Progów",
+      "title": "Królowa chromatycznej sieci"
+    }
+  },
+  "arena": {
+    "you": "Ty",
+    "record": "Rekord: faza {{phase}}",
+    "your_hp": "HP",
+    "sword": "Miecz",
+    "poisoned": "Jad — ładuje się o połowę wolniej",
+    "streak": "Seria {{count}} · ×{{multiplier}}",
+    "phase": "Faza {{phase}}",
+    "phase_caption": "Faza {{phase}} · {{bpm}} BPM",
+    "slam_coming": "Nadchodzi uderzenie — miej serię {{streak}}",
+    "weak_spot": "Słaby punkt — miecz ładuje się ×{{multiplier}}",
+    "regenerating": "Regeneruje się — zadaj cios",
+    "blocked": "Zablokowane",
+    "slam": "Uderzenie",
+    "webbed": "Sieć — graj z pamięci",
+    "caught_shield": "Tarcza",
+    "caught_secondWind": "Drugi oddech",
+    "sword_ready": "Gotowy do ciosu",
+    "poisoned_short": "Zatruty",
+    "enraged": "Szał"
+  },
+  "threats": {
+    "bites": "Ukąszenia",
+    "slams": "Uderzenia",
+    "weak_spots": "Słabe punkty",
+    "venom": "Jad",
+    "regen": "Regeneracja",
+    "frenzy": "Szał",
+    "web": "Sieć"
+  },
+  "result": {
+    "title": "Sieć się zamknęła",
+    "body": "Twój bieg skończył się w fazie {{phase}}.",
+    "new_record": "Nowy rekord",
+    "phase": "Osiągnięta faza",
+    "damage": "Zadane obrażenia",
+    "best_streak": "Najdłuższa seria",
+    "accuracy": "Celność",
+    "retry": "Walcz jeszcze raz",
+    "finish": "Zakończ",
+    "build": "Twój zestaw",
+    "chart_title": "Stracone HP w każdej fazie",
+    "hardest": "Najtrudniej: faza {{phase}} (−{{hp}} HP)",
+    "phase_detail": "Faza {{phase}} · {{bpm}} BPM · {{rhythm}} · −{{hp}} HP",
+    "no_damage": "Bez draśnięcia",
+    "ahead_one": "{{count}} faza ponad rekord",
+    "ahead_few": "{{count}} fazy ponad rekord",
+    "ahead_many": "{{count}} faz ponad rekord",
+    "ahead_other": "{{count}} fazy ponad rekord",
+    "behind_one": "Do rekordu brakło {{count}} fazy",
+    "behind_few": "Do rekordu brakło {{count}} faz",
+    "behind_many": "Do rekordu brakło {{count}} faz",
+    "behind_other": "Do rekordu brakło {{count}} fazy",
+    "level_with": "Wyrównany rekord"
+  },
+  "lair": {
+    "pitch": "Jedna niekończąca się walka. W każdej fazie pająk linieje w szybszą formę z nowym ćwiczeniem — sprawdź, jak daleko zajdziesz.",
+    "best_phase": "Najlepsza faza",
+    "best_damage": "Najwięcej obrażeń",
+    "runs": "Biegi",
+    "fight": "Walcz"
+  },
+  "rules": {
+    "title": "Jak działa walka",
+    "sword": {
+      "title": "Naładuj miecz",
+      "body": "Każde trafienie go ładuje: idealnie 4, na czas 3, blisko 2, luźno 1. Pudło rozbija ładunek."
+    },
+    "strike": {
+      "title": "Cios",
+      "body": "Pełny miecz uderza sam — tym mocniej, im dłuższa seria, aż do ×2 przy {{max}} z rzędu."
+    },
+    "bite": {
+      "title": "Każde pudło to ukąszenie",
+      "body": "Nietrafiona nuta kosztuje HP. Skończy się HP — koniec biegu."
+    },
+    "slam": {
+      "title": "Zablokuj uderzenie",
+      "body": "Od fazy {{slams}} pająk bierze zamach. Miej serię {{parry}}, gdy uderza, a zablokujesz — blok ładuje miecz do połowy."
+    },
+    "endless": {
+      "title": "Bez końca i losowo",
+      "body": "Zbij HP fazy, a pająk linieje: losowa kolejność palców, trasa, pozycja i rytm, za każdym razem szybciej. Każda zaliczona faza leczy cię o {{heal}} HP."
+    },
+    "draft": {
+      "title": "Ulepszenia",
+      "body": "Po każdej fazie bierzesz jedno z trzech losowych ulepszeń — pancerz, ostrzejszy miecz, wolniejsze tempo… Część się kumuluje, rzadkie trafiają się rzadko. Jedno przetasowanie na bieg, kolejne co pięć faz."
+    },
+    "threats": {
+      "title": "Uczy się",
+      "body": "Od fazy {{weak}} odsłania słabe punkty — miecz ładuje się wtedy ×{{weakCharge}}. Od fazy {{affix}} zdobywa moce: jad, regenerację, szał i sieć plutą na tabulaturę — im dalej, tym więcej naraz."
+    }
+  },
+  "draft": {
+    "eyebrow": "Zaczyna się faza {{phase}}",
+    "title": "Wybierz ulepszenie",
+    "reroll": "Przetasuj ({{count}})",
+    "owned": "Masz: {{count}}",
+    "counters": "Pomaga na: {{threat}}",
+    "pairs": "Pasuje do: {{list}}"
+  },
+  "rarity": {
+    "common": "Zwykłe",
+    "rare": "Rzadkie",
+    "epic": "Epickie"
+  },
+  "boons": {
+    "armor": {
+      "name": "Pancerz",
+      "body": "Ukąszenia zabierają o {{armorPercent}}% mniej HP. Kumuluje się."
+    },
+    "shield": {
+      "name": "Tarcza",
+      "body": "Pochłania {{shieldCharges}} kolejne ukąszenia."
+    },
+    "vitality": {
+      "name": "Witalność",
+      "body": "+{{vitalityHp}} max HP i od razu tyle leczenia."
+    },
+    "bandage": {
+      "name": "Opatrunek",
+      "body": "Leczy {{bandageHp}} HP od razu."
+    },
+    "lifesteal": {
+      "name": "Wampiryzm",
+      "body": "Każdy cios leczy cię o {{lifestealHp}} HP. Kumuluje się."
+    },
+    "thorns": {
+      "name": "Ciernie",
+      "body": "Każde ukąszenie kosztuje pająka {{thornsPercent}}% HP fazy. Kumuluje się."
+    },
+    "secondWind": {
+      "name": "Drugi oddech",
+      "body": "{{secondWindMisses}} pudła w każdej fazie są darmowe: bez ukąszenia, seria i ładunek zostają."
+    },
+    "steadyHand": {
+      "name": "Pewna ręka",
+      "body": "Blokujesz uderzenia już przy serii {{steadyHandStreak}}."
+    },
+    "antidote": {
+      "name": "Antidotum",
+      "body": "Jad cię nie rusza."
+    },
+    "clearSight": {
+      "name": "Bystre oko",
+      "body": "Sieć na tabulaturze trwa o połowę krócej."
+    },
+    "blade": {
+      "name": "Ostrze",
+      "body": "Ciosy zadają o {{bladePercent}}% więcej. Kumuluje się."
+    },
+    "lightBlade": {
+      "name": "Lekki miecz",
+      "body": "Miecz potrzebuje o {{lightBladePercent}}% mniej punktów. Kumuluje się."
+    },
+    "precision": {
+      "name": "Precyzja",
+      "body": "Nuty idealnie w beat ładują {{precisionPoints}} zamiast 4."
+    },
+    "momentum": {
+      "name": "Rozpęd",
+      "body": "Mnożnik serii osiąga ×2 już przy {{momentumStreak}} z rzędu zamiast 48."
+    },
+    "exploit": {
+      "name": "Słaby punkt",
+      "body": "Słabe punkty ładują miecz ×{{exploitCharge}} i są dłużej otwarte."
+    },
+    "slowDown": {
+      "name": "Zwolnij",
+      "body": "−{{slowDownBpm}} BPM w każdej kolejnej fazie."
+    },
+    "overdrive": {
+      "name": "Overdrive",
+      "body": "+{{overdriveBpm}} BPM w każdej fazie, ale ciosy zadają o {{overdrivePercent}}% więcej."
+    }
+  },
+  "briefing": {
+    "title": "Co się zmienia",
+    "tempo": "Tempo",
+    "rhythm": "Rytm",
+    "route": "Trasa",
+    "fingers": "Palce",
+    "neck": "Gryf",
+    "frets": "progi {{low}}–{{high}}",
+    "gained": "Nowe: {{list}}",
+    "lost": "Znika: {{list}}",
+    "faster": "Nuty o {{percent}}% szybciej",
+    "slower": "Nuty o {{percent}}% wolniej",
+    "same_speed": "Nuty w tym samym tempie",
+    "unchanged": "Bez zmian — {{list}}",
+    "first_bar": "Pierwszy takt"
+  },
+  "subdivision": {
+    "quarters": "ćwierćnuty",
+    "eighths": "ósemki",
+    "triplets": "triole",
+    "sixteenths": "szesnastki"
+  },
+  "route": {
+    "walk": "po strunach",
+    "skip": "skok strun",
+    "diagonal": "po przekątnej"
+  },
+  "preview": {
+    "armor": "Ukąszenie {{from}} → {{to}} HP",
+    "shield": "Tarcza {{from}} → {{to}}",
+    "vitality": "Max HP {{from}} → {{to}}",
+    "bandage": "HP {{from}} → {{to}}",
+    "lifesteal": "Za cios +{{from}} → +{{to}} HP",
+    "thorns": "Za ukąszenie {{from}} → {{to}} obrażeń",
+    "secondWind": "Darmowe pudła {{from}} → {{to}}",
+    "steadyHand": "Blok przy serii {{from}} → {{to}}",
+    "blade": "Pełny cios {{from}} → {{to}}",
+    "lightBlade": "Miecz {{from}} → {{to}} pkt",
+    "precision": "Idealna nuta {{from}} → {{to}} pkt",
+    "momentum": "×2 przy serii {{from}} → {{to}}",
+    "exploit": "Słaby punkt {{from}} → {{to}}",
+    "slowDown": "Tempo {{from}} → {{to}} BPM",
+    "overdrive": "Tempo {{from}} → {{to}} BPM"
+  }
+}

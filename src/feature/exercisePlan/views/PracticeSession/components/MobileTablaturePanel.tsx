@@ -13,6 +13,7 @@ import React, {
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { useTabOverlay } from "../contexts/TabOverlayContext";
 import {
   NOTE_SPACING_MAX,
   NOTE_SPACING_MIN,
@@ -94,6 +95,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
 }: MobileTablaturePanelProps) {
   const { t } = useTranslation("session");
   const { hitNotes, missedNotes, noteTimings, livePitchRef } = useNoteMatchingContext();
+  const { overlay: tabOverlay } = useTabOverlay();
   const { tuning } = useGuitarTuningContext();
   const {
     settings,
@@ -174,6 +176,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
         ref={boardRef}
         className={cn("relative", fills && "min-h-0 flex-1")}
         style={fills ? undefined : { height }}>
+        {tabOverlay}
         <div className='absolute inset-x-0 top-0'>
           <TablatureViewer
             measures={measures}

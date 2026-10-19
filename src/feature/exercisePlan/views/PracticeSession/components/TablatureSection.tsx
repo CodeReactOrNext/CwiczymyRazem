@@ -14,6 +14,7 @@ import type { TablatureMeasure } from "../../../types/exercise.types";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
+import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { LearnModeBar } from "./LearnModeBar";
 import { MicHud } from "./MicHud";
@@ -184,6 +185,7 @@ export const TablatureSection = memo(function TablatureSection({
   obscured = false,
 }: TablatureSectionProps) {
   const { t } = useTranslation("session");
+  const { overlay: tabOverlay, gameMode } = useTabOverlay();
   const { hitNotes, missedNotes, noteTimings, livePitchRef, learn } = useNoteMatchingContext();
   const { openTimingCalibration } = useSessionUI();
   const { tuning } = useGuitarTuningContext();
@@ -456,7 +458,7 @@ export const TablatureSection = memo(function TablatureSection({
           <span>{t("timing.title")}</span>
         </button>
       )}
-      {isMicEnabled && <MicHud className='mr-1' />}
+      {isMicEnabled && !gameMode && <MicHud className='mr-1' />}
     </div>
   );
 
@@ -511,6 +513,7 @@ export const TablatureSection = memo(function TablatureSection({
           {minimapRow}
           <LearnModeBar />
           <div className='relative'>
+            {tabOverlay}
             <TablatureViewer
               measures={activeTablature}
               bpm={effectiveBpm}

@@ -7,12 +7,11 @@ import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSessio
 import type { GoalRunConfig } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { logger } from "feature/logger/Logger";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { useRequireUserAuth } from "hooks/useRequireUserAuth";
 import { useTranslation } from "hooks/useTranslation";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { useAppSelector } from "store/hooks";
 
 /**
  * Goal mode: the goal's exercise, played run after run, each run that reaches
@@ -23,7 +22,7 @@ import { useAppSelector } from "store/hooks";
 export default function GoalPracticePage() {
   const { t } = useTranslation("goals");
   const router = useRouter();
-  const userAuth = useAppSelector(selectUserAuth);
+  const userAuth = useRequireUserAuth();
   const goalId = typeof router.query.goalId === "string" ? router.query.goalId : null;
   const [exercise, setExercise] = useState<Exercise | null>(null);
   // Kept apart from the exercise: the goal moves on as milestones are cleared,
@@ -34,12 +33,7 @@ export default function GoalPracticePage() {
   const [isReached, setIsReached] = useState(false);
 
   useEffect(() => {
-    if (!router.isReady) return undefined;
-    if (!userAuth) {
-      router.push("/login");
-      return undefined;
-    }
-    if (!goalId) return undefined;
+    if (!router.isReady || !userAuth || !goalId) return undefined;
     let cancelled = false;
     getExerciseGoal(userAuth, goalId)
       .then(async (fetched) => {

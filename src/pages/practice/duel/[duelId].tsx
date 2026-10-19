@@ -7,11 +7,10 @@ import type {
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { logger } from "feature/logger/Logger";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { useRequireUserAuth } from "hooks/useRequireUserAuth";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { useAppSelector } from "store/hooks";
 
 /**
  * A duel run: the duel's exercise, played like any single exercise, with its
@@ -21,19 +20,14 @@ import { useAppSelector } from "store/hooks";
  */
 export default function DuelPracticePage() {
   const router = useRouter();
-  const userAuth = useAppSelector(selectUserAuth);
+  const userAuth = useRequireUserAuth();
   const duelId =
     typeof router.query.duelId === "string" ? router.query.duelId : null;
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
 
   useEffect(() => {
-    if (!router.isReady) return undefined;
-    if (!userAuth) {
-      router.push("/login");
-      return undefined;
-    }
-    if (!duelId) return undefined;
+    if (!router.isReady || !userAuth || !duelId) return undefined;
     let cancelled = false;
     fetchDuel(duelId)
       .then((duel) => {

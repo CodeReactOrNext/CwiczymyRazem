@@ -65,6 +65,8 @@ interface SessionModalProps {
   examMode?: boolean;
   /** See MobileExerciseContent — a song item's section map, mounted once. */
   songSectionMapSlot?: React.ReactNode;
+  /** Above the exercise, upright only — a boss fight's arena. */
+  heroSlot?: React.ReactNode;
 }
 
 const SessionModal = ({
@@ -90,6 +92,7 @@ const SessionModal = ({
   riddleProgress, onPlayRiddle,
   examMode,
   songSectionMapSlot,
+  heroSlot,
 }: SessionModalProps) => {
   const [tabResetKey, setTabResetKey] = useState(0);
   const [showFinishEarlyDialog, setShowFinishEarlyDialog] = useState(false);
@@ -188,6 +191,7 @@ const SessionModal = ({
         handleBackExerciseClick={handleBackExerciseClick}
         handleRestart={handleRestart}
         songSectionMapSlot={songSectionMapSlot}
+        heroSlot={heroSlot}
       />
       {finishEarlyDialog}
     </>
