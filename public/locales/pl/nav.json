@@ -49,6 +49,7 @@
   "my_plans": "Moje plany",
   "my_exercises": "Moje ćwiczenia",
   "rotation": "Rotacja",
+  "player_roadmaps": "Ścieżki graczy",
   "create_plan": "Utwórz plan",
   "create_exercise": "Utwórz ćwiczenie",
   "locked_until_level": "Zablokowane do poziomu {{level}}",
@@ -131,6 +132,9 @@
     },
     "my_exercises": {
       "label": "Moje ćwiczenia"
+    },
+    "my_roadmaps": {
+      "label": "Ścieżki graczy"
     },
     "profile_activity": {
       "label": "Aktywność"

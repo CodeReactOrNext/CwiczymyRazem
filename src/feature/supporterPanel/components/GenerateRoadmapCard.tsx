@@ -5,6 +5,7 @@ import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { GenerationStepper } from "feature/supporterPanel/components/GenerationStepper";
 import { BriefWizard } from "feature/supporterPanel/components/roadmapBrief/BriefWizard";
 import { PreflightChecking } from "feature/supporterPanel/components/roadmapBrief/PreflightChecking";
+import { RoadmapBuildPreview } from "feature/supporterPanel/components/RoadmapBuildPreview";
 import { useGenerateRoadmap } from "feature/supporterPanel/hooks/useGenerateRoadmap";
 import { preflightRoadmap } from "feature/supporterPanel/services/roadmapJob.service";
 import type { RoadmapGoalContext } from "feature/supporterPanel/types/roadmapJob.types";
@@ -305,35 +306,35 @@ export const GenerateRoadmapCard = ({
   };
 
   // A job in flight, or one that failed, always shows — folding it away would
-  // hide the only place that says what happened to the tokens.
+  // hide the only place that says what happened to the tokens. Folded, the
+  // preview beside the button plays what it starts: goal, phases, steps.
   if (!expanded && status === "idle") {
     return (
-      <section className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-5 sm:flex-row sm:items-center sm:justify-between md:px-6'>
-        <div className='flex items-start gap-3.5'>
-          <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300'>
-            <Sparkles size={18} />
-          </span>
-          <div>
-            <h2 className='text-base font-bold text-white'>
+      <section className='grid gap-8 rounded-lg bg-zinc-900/40 p-5 sm:p-6 md:grid-cols-2 md:items-center md:gap-12 lg:p-8'>
+        <div className='flex flex-col items-start gap-5'>
+          <div className='space-y-1.5'>
+            <h2 className='text-lg font-bold text-white'>
               {t("panel.generate.title")}
             </h2>
-            <p className='mt-0.5 text-sm text-zinc-400'>
+            <p className='max-w-md text-sm leading-relaxed text-zinc-400'>
               {t("panel.generate.folded_body")}
             </p>
           </div>
+
+          <button
+            type='button'
+            onClick={() => setExpanded(true)}
+            className='flex shrink-0 items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
+            <Sparkles size={15} />
+            {t("panel.generate.create")}
+            <span className='ml-0.5 flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 tabular-nums'>
+              <SupportToken size={14} />
+              {roadmapGenerationCost("public")}
+            </span>
+          </button>
         </div>
 
-        <button
-          type='button'
-          onClick={() => setExpanded(true)}
-          className='flex shrink-0 items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
-          <Sparkles size={15} />
-          {t("panel.generate.create")}
-          <span className='ml-0.5 flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 tabular-nums'>
-            <SupportToken size={14} />
-            {roadmapGenerationCost("public")}
-          </span>
-        </button>
+        <RoadmapBuildPreview />
       </section>
     );
   }

@@ -15,6 +15,7 @@ const { OutputQueueMonitor } = require("./outputQueueMonitor");
 const shared = require("./rtaudio");
 const { pickRequestedFrameSize } = require("./streamShape");
 const toneStore = require("./toneStore");
+const vstRack = require("./vst/vstRack");
 
 // Where this module runs: inside the dedicated audio process (electron/
 // audioProcess.js, spawned by audioEngineHost.js) — NOT the Electron main
@@ -526,6 +527,13 @@ function getMonoBuffer(n) {
   return monoBufCache;
 }
 
+// Right side of a stereo block (a hosted plugin is the only stereo source).
+let rightBufCache = null;
+function getRightBuffer(n) {
+  if (!rightBufCache || rightBufCache.length < n) rightBufCache = new Float32Array(n);
+  return rightBufCache;
+}
+
 // ── Per-stream accounting: output-queue monitor + diagnostics ────────────────
 // The monitor is what keeps a stall from turning into permanent latency (see
 // outputQueueMonitor.js — it replaced the old "accumulated DSP drift" watchdog,
@@ -569,7 +577,7 @@ const meterAcc = { inPeak: 0, outPeak: 0, sentAt: 0 };
 function onMeter(fn) {
   meterListener = fn;
 }
-function accumulateMeter(inF, mono, n) {
+function accumulateMeter(inF, mono, n, right) {
   let inPeak = meterAcc.inPeak;
   let outPeak = meterAcc.outPeak;
   for (let i = 0; i < n; i++) {
@@ -577,6 +585,10 @@ function accumulateMeter(inF, mono, n) {
     if (a > inPeak) inPeak = a;
     const b = Math.abs(mono[i]);
     if (b > outPeak) outPeak = b;
+    if (right) {
+      const c = Math.abs(right[i]);
+      if (c > outPeak) outPeak = c;
+    }
   }
   const now = Date.now();
   if (now - meterAcc.sentAt < METER_INTERVAL_MS) {
@@ -610,7 +622,13 @@ function evaluateOutputQueue() {
       console.warn(
         `[audio] Output queue ${drops} blocks behind real time (~${(drops * blockMs).toFixed(0)}ms; writes=${queueMonitor.writes} consumed=${queueMonitor.consumed} lastGap=${stats ? stats.lastGapMs.toFixed(2) : "?"}ms) — dropping them to restore latency (expect a brief click).`
       );
-      try { overloadListener?.({ driftMs: drops * blockMs, namEnabled: !!(ampChain && ampChain.params.namEnabled) }); } catch { /* ignore */ }
+      try {
+        overloadListener?.({
+          driftMs: drops * blockMs,
+          namEnabled: !!(ampChain && ampChain.params.namEnabled),
+          vstEnabled: !!(ampChain && ampChain.params.toneMode === "vst" && vstRack.isActive()),
+        });
+      } catch { /* ignore */ }
     }
   }
 }
@@ -668,14 +686,20 @@ function onInputBlock(inputBuffer) {
   const activeChain = ampChain;
   if (ampConsumer && activeChain) {
     const mono = getMonoBuffer(n);
-    activeChain.processBlock(inF, mono, n);
-    if (meterListener) accumulateMeter(inF, mono, n);
     if (outChannels === 1) {
+      activeChain.processBlock(inF, mono, n);
+      if (meterListener) accumulateMeter(inF, mono, n);
       out.set(mono.subarray(0, n));
     } else {
+      // Left on even outputs, right on odd ones: identical for every mono
+      // path, apart only when a hosted plugin produces real stereo.
+      const right = getRightBuffer(n);
+      activeChain.processBlockStereo(inF, mono, right, n);
+      if (meterListener) accumulateMeter(inF, mono, n, right);
       for (let i = 0; i < n; i++) {
-        const y = mono[i];
-        for (let ch = 0; ch < outChannels; ch++) out[i * outChannels + ch] = y;
+        const l = mono[i];
+        const r = right[i];
+        for (let ch = 0; ch < outChannels; ch++) out[i * outChannels + ch] = ch % 2 === 0 ? l : r;
       }
     }
   }
@@ -793,7 +817,10 @@ async function ensureOpenInner() {
 
   if (shapesEqual(openShape, desired) && shared.isStreamOpen()) {
     if (ampConsumer) {
-      if (!ampChain) ampChain = new AmpChain(openShape.sampleRate);
+      if (!ampChain) {
+        ampChain = new AmpChain(openShape.sampleRate);
+        ampChain.setInsert(vstRack);
+      }
       ampChain.setParams(resolveAmpPatch(ampConsumer.params || {}, ampChain));
     } else {
       ampChain = null;
@@ -822,12 +849,17 @@ async function ensureOpenInner() {
   // Built from the rate that actually opened, not the (possibly wrong) guess in
   // desired.sampleRate — AmpChain's filters/delay lines are tuned to it.
   ampChain = desired.duplex ? new AmpChain(actualSampleRate) : null;
+  if (ampChain) ampChain.setInsert(vstRack);
   if (ampChain && ampConsumer) {
     ampChain.setParams(resolveAmpPatch(ampConsumer.params || {}, ampChain));
     // Finish the (synchronous, tens-of-ms) NAM model build BEFORE the first
     // hardware callback can fire — on a running stream it was a guaranteed
-    // dropout + backlog on every "turn on" with a model selected.
-    await Promise.race([ampChain.whenReady(), sleep(MODEL_LOAD_WAIT_MS)]);
+    // dropout + backlog on every "turn on" with a model selected. Same for a
+    // hosted plugin switching sample rate (a reactivation + warm-up).
+    await Promise.race([
+      Promise.all([ampChain.whenReady(), vstRack.configure(actualSampleRate)]),
+      sleep(MODEL_LOAD_WAIT_MS),
+    ]);
   }
   rt.start();
 
@@ -900,6 +932,7 @@ async function attachAmp(opts = {}) {
     },
     params: opts.params || {},
   };
+  vstRack.applyParams(ampConsumer.params);
   recoveryGaveUp = false; // a fresh attach always deserves a real attempt
   try {
     await ensureOpen();
@@ -913,6 +946,9 @@ async function attachAmp(opts = {}) {
 
 function updateAmpParams(params) {
   if (ampConsumer) ampConsumer.params = { ...ampConsumer.params, ...(params || {}) };
+  // Even with the amp off: switching to the VST rack loads its plugins, so
+  // their windows can be opened (and the next "turn on" doesn't wait for them).
+  vstRack.applyParams(params);
   if (ampChain) ampChain.setParams(resolveAmpPatch(params || {}, ampChain));
   if (ampInfo && ampChain) ampInfo.params = ampChain.params;
   // Any backlog a too-heavy NAM model left in the output queue is shed by the

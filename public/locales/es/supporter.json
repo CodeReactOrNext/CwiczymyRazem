@@ -429,6 +429,11 @@
       "not_guitar": "Esta ruta trata de tocar la guitarra — describe lo que quieres tocar.",
       "title": "Crea una ruta en torno a tu objetivo",
       "folded_body": "Describe lo que quieres tocar — el coach organiza las fases, los ejercicios y las canciones.",
+      "preview": {
+        "goal": "Tu objetivo",
+        "phases": "Fases",
+        "steps": "Ejercicios, canciones y lecciones"
+      },
       "create": "Crear una ruta",
       "writing": "Escribiendo tu ruta",
       "running_body": "Tarda unos minutos y se hace en nuestro lado — puedes salir de la página o cerrar la pestaña y te llegará una notificación cuando esté lista. Si te quedas aquí, se abre sola.",
@@ -611,6 +616,7 @@
       "start_failed": "No se pudo empezar esta ruta. Inténtalo de nuevo.",
       "starting": "Empezando…",
       "start": "Empezar esta ruta",
+      "view": "Ver ruta",
       "done_refining": "Terminar ajustes",
       "refine": "Ajustar",
       "unknown": "Jugador desconocido",
@@ -626,6 +632,7 @@
       "following_count_one": "1 jugador la sigue",
       "following_none": "La sigues, sin sesiones todavía",
       "not_started": "Sin empezar",
+      "first_step": "Primer paso",
       "started_on": "empezada el {{date}}",
       "created_on": "creada el {{date}}",
       "last_practised": "Practicada por última vez el {{date}}",
@@ -646,7 +653,12 @@
       },
       "yours": "Tus rutas",
       "others": "De otros jugadores",
-      "no_match": "Nada coincide con este filtro."
+      "no_match": "Nada coincide con este filtro.",
+      "page": {
+        "title": "Rutas de jugadores",
+        "subtitle": "Rutas que el coach creó en torno a tus objetivos — y las que siguen otros jugadores",
+        "eyebrow": "Mis cosas"
+      }
     },
     "gear": {
       "propose_title": "Proponer un equipo",

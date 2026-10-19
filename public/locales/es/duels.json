@@ -23,7 +23,7 @@
     "matched": "Rival encontrado — tu duelo está abajo.",
     "queued": "Estás en la cola. Te avisaremos cuando alguien se una.",
     "error_limit": "Ya tienes {{max}} duelos abiertos.",
-    "error_locked": "Los duelos se abren en el nivel 4.",
+    "error_locked": "Los duelos se abren en el nivel 2.",
     "error": "No se pudo entrar ahora. Inténtalo de nuevo en un momento.",
     "ticket": "Buscando rival",
     "ticket_expires": "Caduca en {{time}}",
@@ -96,9 +96,8 @@
     "nobody_played": "Nadie tocó"
   },
   "feed": {
-    "title": "Todos los duelos",
+    "title": "Duelos de otros jugadores",
     "latest": "últimos {{count}}",
-    "empty": "Nadie ha resuelto un duelo todavía. Aquí aparece cada duelo terminado en la app.",
     "win": "{{winner}} vence a {{loser}}",
     "walkover": "{{winner}} vence a {{loser}} — por incomparecencia",
     "draw": "{{winner}} empata con {{loser}}",

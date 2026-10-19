@@ -94,7 +94,12 @@
     "heard": "{{hits}} of {{total}} clicks heard, steady within ±{{spread}} ms",
     "saved_before": "Saved before",
     "estimated_before": "Estimated before",
-    "use": "Use {{ms}} ms"
+    "use": "It's good · {{ms}} ms",
+    "map": {
+      "title": "Where each pluck landed",
+      "click": "Click",
+      "aria": "{{hits}} of {{total}} plucks heard, typically {{ms}} ms after the click"
+    }
   },
   "add_to_plan": "Add to Plan",
   "saving": "Saving…",

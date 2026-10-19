@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
 import { InputMeter } from "feature/toneStudio/components/InputMeter";
 import { Knob } from "feature/toneStudio/components/Knob";
+import { useVstHost } from "feature/toneStudio/hooks/useVstHost";
 import { chainBlockLabel } from "feature/toneStudio/utils/chain";
 import { CHAIN_BLOCKS, type ToneAccent } from "feature/toneStudio/utils/chain";
 import { AMP_HEAD_SRC } from "feature/toneStudio/utils/gearArt";
@@ -79,6 +80,11 @@ export const AmpSimButton = ({
   const { devices, api, selectedId, loading, refresh, select } =
     useNativeAudioDevices();
   const { presets, savePreset, updatePreset } = useTonePresets();
+  const vst = useVstHost();
+  const rackSlots =
+    vst.available && amp.params.toneMode === "vst"
+      ? (vst.rack?.slots ?? [])
+      : null;
   const [open, setOpen] = useState(false);
   const { t } = useTranslation("tone_studio");
   // Interface/latency are "set once" settings — folded away so the things
@@ -267,10 +273,10 @@ export const AmpSimButton = ({
         {!compact && (
           <span className='text-[10px] font-semibold tracking-wide'>
             {needsAttention
-                ? t("amp_button.amp_alert")
-                : amp.isOn
-                  ? t("amp_button.amp_on_caps")
-                  : t("amp_button.amp_caps")}
+              ? t("amp_button.amp_alert")
+              : amp.isOn
+                ? t("amp_button.amp_on_caps")
+                : t("amp_button.amp_caps")}
           </span>
         )}
       </RippleButton>
@@ -409,7 +415,9 @@ export const AmpSimButton = ({
                 <button
                   type='button'
                   onClick={handleRevert}
-                  title={t("amp_button.revert_hint", { name: activePreset.name })}
+                  title={t("amp_button.revert_hint", {
+                    name: activePreset.name,
+                  })}
                   className={cn(smallButton, secondaryButton)}>
                   <RotateCcw size={13} />
                   {t("amp_button.revert")}
@@ -427,7 +435,9 @@ export const AmpSimButton = ({
                   <button
                     type='button'
                     onClick={handleUpdatePreset}
-                    title={t("presets.overwrite_hint", { name: activePreset.name })}
+                    title={t("presets.overwrite_hint", {
+                      name: activePreset.name,
+                    })}
                     className={cn(smallButton, secondaryButton)}>
                     <Save size={13} />
                     {t("amp_button.update_preset")}
@@ -437,45 +447,79 @@ export const AmpSimButton = ({
             ))}
 
           {/* ── Chain: bypass a block without touching the preset ──────────── */}
-          <div className='flex flex-col gap-1.5'>
-            <span className='text-xs text-zinc-400'>
-              {t("amp_button.chain")}
-            </span>
-            <div className='flex flex-wrap gap-1.5'>
-              {CHAIN_BLOCKS.map((block) => {
-                const active = block.isActive(amp.params);
-                const label = chainBlockLabel(block, amp.params, t);
-                const chip = cn(
-                  "rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors",
-                  active
-                    ? CHIP_ON[block.accent]
-                    : "bg-zinc-800/60 text-zinc-500",
-                );
-                const toggle = block.toggle;
-                if (!toggle) {
-                  return (
-                    <span key={block.key} className={chip}>
-                      {label}
-                    </span>
-                  );
-                }
-                return (
+          {rackSlots ? (
+            <div className='flex flex-col gap-1.5'>
+              <span className='text-xs text-zinc-400'>
+                {t("amp_button.vst_rack")}
+              </span>
+              <div className='flex flex-wrap gap-1.5'>
+                {rackSlots.length === 0 && (
+                  <span className='text-[11px] text-zinc-500'>
+                    {t("amp_button.vst_rack_empty")}
+                  </span>
+                )}
+                {rackSlots.map((slot) => (
                   <button
-                    key={block.key}
+                    key={slot.id}
                     type='button'
-                    onClick={() => amp.setParams(toggle(amp.params))}
+                    onClick={() => vst.setBypass(slot.id, !slot.bypass)}
                     title={
-                      active
-                        ? t("rack.bypass", { name: label })
-                        : t("amp_button.enable", { name: label })
+                      slot.bypass
+                        ? t("amp_button.enable", { name: slot.name })
+                        : t("rack.bypass", { name: slot.name })
                     }
-                    className={cn(chip, !active && "hover:text-zinc-300")}>
-                    {label}
+                    className={cn(
+                      "max-w-[12rem] truncate rounded px-2.5 py-1 text-[11px] font-medium transition-colors",
+                      slot.bypass
+                        ? "bg-zinc-800/60 text-zinc-500 hover:text-zinc-300"
+                        : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/15",
+                    )}>
+                    {slot.name}
                   </button>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className='flex flex-col gap-1.5'>
+              <span className='text-xs text-zinc-400'>
+                {t("amp_button.chain")}
+              </span>
+              <div className='flex flex-wrap gap-1.5'>
+                {CHAIN_BLOCKS.map((block) => {
+                  const active = block.isActive(amp.params);
+                  const label = chainBlockLabel(block, amp.params, t);
+                  const chip = cn(
+                    "rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors",
+                    active
+                      ? CHIP_ON[block.accent]
+                      : "bg-zinc-800/60 text-zinc-500",
+                  );
+                  const toggle = block.toggle;
+                  if (!toggle) {
+                    return (
+                      <span key={block.key} className={chip}>
+                        {label}
+                      </span>
+                    );
+                  }
+                  return (
+                    <button
+                      key={block.key}
+                      type='button'
+                      onClick={() => amp.setParams(toggle(amp.params))}
+                      title={
+                        active
+                          ? t("rack.bypass", { name: label })
+                          : t("amp_button.enable", { name: label })
+                      }
+                      className={cn(chip, !active && "hover:text-zinc-300")}>
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* ── Interface + latency: set once, folded away afterwards ──────── */}
           <div className='flex flex-col gap-3 rounded-lg bg-zinc-800/30 p-3'>
@@ -546,7 +590,9 @@ export const AmpSimButton = ({
                           type='button'
                           onClick={() => amp.setBufferSize(choice.size)}
                           disabled={amp.isBusy}
-                          title={t("amp_button.samples", { count: choice.size })}
+                          title={t("amp_button.samples", {
+                            count: choice.size,
+                          })}
                           className={cn(
                             "flex flex-col items-center rounded-lg py-1.5 transition-colors disabled:opacity-50",
                             active
@@ -586,8 +632,10 @@ export const AmpSimButton = ({
                   {t("amp_button.overload", {
                     drift: Math.round(amp.overload.driftMs),
                   })}
-                  {amp.overload.namEnabled &&
-                    ` ${t("amp_button.overload_nam_hint")}`}
+                  {amp.overload.vstEnabled
+                    ? ` ${t("amp_button.overload_vst_hint")}`
+                    : amp.overload.namEnabled &&
+                      ` ${t("amp_button.overload_nam_hint")}`}
                 </p>
               )}
               {health === "glitchy" && !interfaceOpen && (

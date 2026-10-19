@@ -10,6 +10,7 @@ import {
   duelNeedsMic,
   duelScoreKind,
   getDuelExercise,
+  isDuelExercise,
 } from "./duelPool";
 
 const MIC_HUNT_MODES = new Set(["octaves", "region", "interval", "chord", "accumulate"]);
@@ -74,8 +75,12 @@ describe("duelScoreKind", () => {
 });
 
 describe("getDuelExercise", () => {
-  it("refuses an exercise outside the pool", () => {
-    expect(getDuelExercise("sweep_neoclassical")).toBeNull();
+  it("still resolves an exercise that has left the pool", () => {
+    expect(isDuelExercise("chord_degree_hunt_changes")).toBe(false);
+    expect(getDuelExercise("chord_degree_hunt_changes")?.title).toBe("Chords — Degree Hunt (Changes)");
+  });
+
+  it("returns null for an id the catalogue doesn't know", () => {
     expect(getDuelExercise("nope")).toBeNull();
   });
 });

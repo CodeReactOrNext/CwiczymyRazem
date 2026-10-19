@@ -12,7 +12,7 @@ import { getTabPreview } from "feature/landing/lib/tabPreview";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
-import { Check, EyeOff, Loader2, Play, UserRound } from "lucide-react";
+import { Check, Loader2, Play, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -29,6 +29,44 @@ const ReadyMark = () => {
         {t("ready.badge")}
       </span>
     </>
+  );
+};
+
+/**
+ * One side's line under the score: ticks, the count and "Ready" — or, before
+ * the first run, a single line saying so. The opponent's side is mirrored.
+ */
+const SideStatus = ({
+  attempts,
+  isReady,
+  emptyText,
+  isOpponent = false,
+}: {
+  attempts: number;
+  isReady: boolean;
+  emptyText: string;
+  isOpponent?: boolean;
+}) => {
+  const { t } = useTranslation("duels");
+  if (attempts === 0) {
+    return <p className='mt-2 truncate text-xs text-zinc-500'>{emptyText}</p>;
+  }
+  return (
+    <p
+      className={cn(
+        "mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs tabular-nums text-zinc-400",
+        isOpponent && "flex-row-reverse",
+      )}>
+      <span className={isOpponent ? "ml-0.5" : "mr-0.5"}>
+        <AttemptTicks
+          count={attempts}
+          align={isOpponent ? "end" : "start"}
+          tone={isOpponent ? "muted" : "light"}
+        />
+      </span>
+      <span>{t("active.attempts", { count: attempts })}</span>
+      {isReady && <ReadyMark />}
+    </p>
   );
 };
 
@@ -166,7 +204,8 @@ export const ActiveDuelCard = ({
             </div>
           </div>
 
-          <div className='mt-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 sm:gap-8'>
+          {/* One compact block, so the two sides read as a face-off rather than two ends of the card. */}
+          <div className='mt-6 grid max-w-lg grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-3 sm:gap-8'>
             {/* You */}
             <div className='min-w-0'>
               <div className='flex items-center gap-2.5'>
@@ -180,34 +219,36 @@ export const ActiveDuelCard = ({
                   {t("active.you")}
                 </span>
               </div>
-              <p
-                className={cn(
-                  "mt-3 font-teko text-5xl font-semibold tabular-nums leading-none",
-                  hasPlayed ? "text-zinc-50" : "text-zinc-700",
-                )}>
-                {hasPlayed ? duel.me.bestScore.toLocaleString(intlLocale) : "—"}
+              <p className='mt-3 flex flex-wrap items-baseline gap-x-2.5'>
+                <span
+                  className={cn(
+                    "font-teko text-5xl font-semibold tabular-nums leading-none",
+                    hasPlayed ? "text-zinc-50" : "text-zinc-700",
+                  )}>
+                  {hasPlayed
+                    ? duel.me.bestScore.toLocaleString(intlLocale)
+                    : "—"}
+                </span>
+                {hasPlayed && myRunDetails && (
+                  <span className='text-xs tabular-nums text-zinc-400'>
+                    {myRunDetails}
+                  </span>
+                )}
               </p>
-              <p className='mt-1.5 truncate text-xs tabular-nums text-zinc-400'>
-                {hasPlayed
-                  ? myRunDetails || t("active.best")
-                  : t("active.no_run")}
-              </p>
-              <div className='mt-3 flex min-h-2.5 items-center'>
-                <AttemptTicks count={duel.me.attempts} />
-              </div>
-              <p className='mt-1.5 flex flex-wrap items-center gap-x-1.5 text-xs tabular-nums text-zinc-500'>
-                {t("active.attempts", { count: duel.me.attempts })}
-                {isReady && <ReadyMark />}
-              </p>
+              <SideStatus
+                attempts={duel.me.attempts}
+                isReady={isReady}
+                emptyText={t("active.no_run")}
+              />
             </div>
 
             <span
-              className='font-teko text-4xl font-semibold leading-none text-zinc-700'
+              className='self-center font-teko text-4xl font-semibold leading-none text-zinc-700'
               aria-hidden='true'>
               vs
             </span>
 
-            {/* The opponent — attempts only */}
+            {/* The opponent — attempts only; "???" once there is a score to hide. */}
             <div className='min-w-0 text-right'>
               <div className='flex flex-row-reverse items-center gap-2.5'>
                 <span
@@ -219,36 +260,24 @@ export const ActiveDuelCard = ({
                   {t("active.anonymous")}
                 </span>
               </div>
-              <p
-                className='mt-3 font-teko text-5xl font-semibold leading-none text-zinc-700'
-                aria-hidden='true'>
-                ???
+              <p className='mt-3 font-teko text-5xl font-semibold leading-none text-zinc-700'>
+                <span aria-hidden='true'>
+                  {opponentAttempts > 0 ? "???" : "—"}
+                </span>
+                {opponentAttempts > 0 && (
+                  <span className='sr-only'>{t("active.hidden")}</span>
+                )}
               </p>
-              <p className='mt-1.5 flex items-center justify-end gap-1.5 truncate text-xs text-zinc-400'>
-                <EyeOff size={12} className='shrink-0 text-zinc-500' />
-                {t("active.hidden")}
-              </p>
-              <div className='mt-3 flex min-h-2.5 items-center justify-end'>
-                <AttemptTicks
-                  count={opponentAttempts}
-                  align='end'
-                  tone='muted'
-                />
-              </div>
-              <p
-                className={cn(
-                  "mt-1.5 flex flex-wrap items-center justify-end gap-x-1.5 text-xs tabular-nums",
-                  opponentAttempts > 0 ? "text-zinc-400" : "text-zinc-500",
-                )}>
-                {opponentAttempts > 0
-                  ? t("active.attempts", { count: opponentAttempts })
-                  : t("active.not_played")}
-                {isOpponentReady && <ReadyMark />}
-              </p>
+              <SideStatus
+                attempts={opponentAttempts}
+                isReady={isOpponentReady}
+                emptyText={t("active.not_played")}
+                isOpponent
+              />
             </div>
           </div>
 
-          <div className='mt-8'>
+          <div className='mt-6'>
             {isOver || (isReady && isOpponentReady) ? (
               <span className='inline-flex h-11 items-center rounded-lg bg-zinc-800/60 px-5 text-sm font-semibold text-zinc-400'>
                 {t("active.settling_short")}

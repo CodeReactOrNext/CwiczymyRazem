@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { gradeTiming, isPerfectTiming, TIMING_GRADE_POINTS, timingWindowsFor } from "./timingGrade";
+import { gradeTiming, TIMING_GRADE_POINTS, timingHintFor, timingWindowsFor } from "./timingGrade";
 
 /** One sixteenth at `bpm`, in ms. */
 const sixteenth = (bpm: number) => 60000 / bpm / 4;
@@ -8,16 +8,16 @@ const sixteenth = (bpm: number) => 60000 / bpm / 4;
 describe("timingWindowsFor", () => {
   it("caps the windows on long notes", () => {
     // A quarter at 60 BPM — a full second.
-    expect(timingWindowsFor(1000)).toEqual({ onTimeMs: 100, closeMs: 200 });
+    expect(timingWindowsFor(1000)).toEqual({ onTimeMs: 130, closeMs: 230 });
   });
 
   it("scales with the note in between", () => {
     // Sixteenths at 120 BPM — 125 ms.
-    expect(timingWindowsFor(sixteenth(120))).toEqual({ onTimeMs: 75, closeMs: 150 });
+    expect(timingWindowsFor(sixteenth(120))).toEqual({ onTimeMs: 105, closeMs: 180 });
   });
 
   it("never drops below the measurement error, however short the note", () => {
-    expect(timingWindowsFor(sixteenth(220))).toEqual({ onTimeMs: 70, closeMs: 140 });
+    expect(timingWindowsFor(sixteenth(220))).toEqual({ onTimeMs: 100, closeMs: 170 });
   });
 });
 
@@ -39,8 +39,8 @@ describe("gradeTiming", () => {
   });
 
   it("grades on the window edges inclusively", () => {
-    expect(gradeTiming(100, 1000)).toBe(3);
-    expect(gradeTiming(200, 1000)).toBe(2);
+    expect(gradeTiming(130, 1000)).toBe(3);
+    expect(gradeTiming(230, 1000)).toBe(2);
   });
 
   it("gives full marks when the attack could not be measured", () => {
@@ -48,20 +48,36 @@ describe("gradeTiming", () => {
   });
 });
 
-describe("isPerfectTiming", () => {
-  it("rewards an attack dead on the beat, with a human margin either side", () => {
-    expect(isPerfectTiming(0)).toBe(true);
-    expect(isPerfectTiming(-20)).toBe(true);
-    expect(isPerfectTiming(25)).toBe(true);
+describe("timingHintFor", () => {
+  it("gives a + to any attack within 80 ms, either side", () => {
+    expect(timingHintFor(0)).toBe("perfect");
+    expect(timingHintFor(-80)).toBe("perfect");
+    expect(timingHintFor(80)).toBe("perfect");
   });
 
-  it("keeps a merely good hit an ordinary 3", () => {
-    expect(isPerfectTiming(40)).toBe(false);
+  it("says nothing between the + and a plain slip, whatever the grade", () => {
+    expect(timingHintFor(81)).toBeNull();
+    expect(timingHintFor(-180)).toBeNull();
+    expect(gradeTiming(150, 500)).toBe(2);
+    expect(timingHintFor(150)).toBeNull();
+  });
+
+  it("calls early or late only past 180 ms", () => {
+    expect(timingHintFor(181)).toBe("late");
+    expect(timingHintFor(-181)).toBe("early");
+  });
+
+  it("never hands a + to a hit graded below 3", () => {
+    // The tightest "on time" window is wider than the +.
+    expect(gradeTiming(80, sixteenth(220))).toBe(3);
+  });
+
+  it("never labels an unmeasured attack", () => {
+    expect(timingHintFor(null)).toBeNull();
+  });
+
+  it("leaves the score alone — a + is still an ordinary 3", () => {
     expect(gradeTiming(40, 500)).toBe(3);
-  });
-
-  it("never calls an unmeasured attack perfect", () => {
-    expect(isPerfectTiming(null)).toBe(false);
   });
 });
 

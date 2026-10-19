@@ -5,6 +5,7 @@ import {
   createRecordingTempoMap,
   MAX_TEMPO_BPM,
   MIN_TEMPO_BPM,
+  shiftedBy,
   type TempoAnchor,
   withAnchorAt,
 } from "./tempoMap";
@@ -180,5 +181,21 @@ describe("withAnchorAt", () => {
     const anchors = [{ beat: 8, sec: 4 }];
     withAnchorAt(anchors, 8, 99);
     expect(anchors).toEqual([{ beat: 8, sec: 4 }]);
+  });
+});
+
+describe("shiftedBy", () => {
+  it("moves only the start when nothing is pinned", () => {
+    expect(shiftedBy({ offsetMs: 100, tempoAnchors: [] }, 40)).toEqual({ offsetMs: 140 });
+  });
+
+  it("moves every pinned bar with the start, so no tempo changes", () => {
+    const before = { offsetMs: 1000, tempoAnchors: [{ beat: 16, sec: 9 }, { beat: 32, sec: 17.2 }] };
+    const after = shiftedBy(before, -250);
+
+    expect(after).toEqual({ offsetMs: 750, tempoAnchors: [{ beat: 16, sec: 8.75 }, { beat: 32, sec: 16.95 }] });
+    const map = (a: typeof before) =>
+      createRecordingTempoMap({ anchors: a.tempoAnchors, offsetMs: a.offsetMs, sourceBpm: 120 });
+    expect(map(after as typeof before).bpmAtBeat(8)).toBeCloseTo(map(before).bpmAtBeat(8), 9);
   });
 });

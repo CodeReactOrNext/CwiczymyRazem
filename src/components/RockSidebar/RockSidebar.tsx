@@ -72,6 +72,7 @@ import {
   Settings,
   Shield,
   Skull,
+  Signpost,
   SlidersHorizontal,
   Star,
   Swords,
@@ -325,6 +326,12 @@ const LIBRARY_SUB_NAV: SidebarSubLink[] = [
     icon: <Music2 size={16} />,
   },
   {
+    id: "library-roadmaps",
+    name: "player_roadmaps",
+    href: "/my-roadmaps",
+    icon: <Signpost size={16} />,
+  },
+  {
     id: "library-create-plan",
     name: "create_plan",
     href: "/plans/create",
@@ -521,6 +528,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/tone-studio")) return "tone-studio";
     if (pathname.startsWith("/plans")) return "library";
     if (pathname.startsWith("/my-exercises")) return "library";
+    if (pathname.startsWith("/my-roadmaps")) return "library";
     if (pathname.startsWith("/tab-editor")) return "library";
     if (pathname.startsWith("/favorites")) return "library";
     if (pathname.startsWith("/rotation")) return "library";

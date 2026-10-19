@@ -1,4 +1,6 @@
 import { cn } from "assets/lib/utils";
+import { BackingTrackButton } from "feature/backingTrack/components/BackingTrackButton";
+import type { BackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
 import { useTranslation } from "hooks/useTranslation";
 import { Settings2, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
 import React, {
@@ -51,6 +53,10 @@ interface TablatureSectionProps {
   /** Cinema mode: the backing video plays behind the notation, so the board
    *  turns translucent instead of hiding it. */
   cinema?: boolean;
+  /** Song practice only: the backing track's state and the way into its
+   *  editor, shown as a button under Calibrate timing. */
+  backingTrackStatus?: BackingTrackStatus;
+  onOpenBackingTrack?: () => void;
   isAudioPlaying: boolean;
   onSeek?: (beatPosition: number) => void;
   onLoopRestart?: (loopStartBeat: number) => void;
@@ -159,6 +165,8 @@ export const TablatureSection = memo(function TablatureSection({
   baseTempo,
   showAlphaTabScore,
   cinema = false,
+  backingTrackStatus,
+  onOpenBackingTrack,
   isAudioPlaying,
   onSeek,
   onLoopRestart,
@@ -402,9 +410,12 @@ export const TablatureSection = memo(function TablatureSection({
     });
   }, [activeTablature, hitNotes, missedNotes, isMicEnabled]);
 
+  // Cinema keeps the picture clear of the backing track's own chrome.
+  const showBackingButton = !!backingTrackStatus && !!onOpenBackingTrack && !cinema;
+
   // Song navigator strip — shared between the score (notation) view and the
   // canvas tab view, since both drive the same seek/loop wiring off `activeTablature`.
-  const minimapRow = (showMinimap || isMicEnabled) && (
+  const minimapRow = (showMinimap || isMicEnabled || showBackingButton) && (
     <div
       className={cn(
         "flex items-center gap-6",
@@ -448,15 +459,23 @@ export const TablatureSection = memo(function TablatureSection({
           </button>
         )}
       </div>
-      {isMicEnabled && (
-        <button
-          type='button'
-          onClick={openTimingCalibration}
-          title={t("tab.calibrate_hint")}
-          className='flex shrink-0 items-center gap-1.5 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50 hover:bg-white/10 hover:text-zinc-100'>
-          <Timer className='h-3.5 w-3.5' />
-          <span>{t("timing.title")}</span>
-        </button>
+      {(isMicEnabled || showBackingButton) && (
+        // One column, so the sync tools read as a pair and share a width.
+        <div className='flex shrink-0 flex-col items-stretch gap-2'>
+          {isMicEnabled && (
+            <button
+              type='button'
+              onClick={openTimingCalibration}
+              title={t("tab.calibrate_hint")}
+              className='flex shrink-0 items-center gap-1.5 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50 hover:bg-white/10 hover:text-zinc-100'>
+              <Timer className='h-3.5 w-3.5' />
+              <span>{t("timing.title")}</span>
+            </button>
+          )}
+          {showBackingButton && backingTrackStatus && onOpenBackingTrack && (
+            <BackingTrackButton status={backingTrackStatus} onClick={onOpenBackingTrack} />
+          )}
+        </div>
       )}
       {isMicEnabled && !gameMode && <MicHud className='mr-1' />}
     </div>

@@ -19,7 +19,7 @@ import {
 } from "../utils/peakBuilder";
 import type { VideoClock } from "../utils/videoClock";
 import { createVideoClock } from "../utils/videoClock";
-import { PEAKS_PER_SECOND } from "./useWaveformPeaks";
+import { PEAKS_PER_SECOND } from "./useRecordingAnalysis";
 
 /** Enough resolution to see an attack; matches what a decoded file produces. */
 const BUCKETS_PER_SECOND = PEAKS_PER_SECOND;

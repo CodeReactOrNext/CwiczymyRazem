@@ -114,6 +114,50 @@ contextBridge.exposeInMainWorld("toneStudio", {
   importNamModel: () => ipcRenderer.invoke("tone:import-nam-model"),
 });
 
+// VST3 plugin rack for Tone Studio. Windows-only for now (see
+// electron/vst/vstAddon.js); each plugin's own controls live in its native
+// window, opened through here.
+contextBridge.exposeInMainWorld("vstHost", {
+  isAvailable: process.platform === "win32",
+
+  // ── Library: what's installed ──
+  /** { scannedAt, plugins: [{ id, name, vendor, subCategories, source, sourcePath? }],
+   *  failed: [{ name, error }], sources: { folders, files } }. Never scans by itself. */
+  listPlugins: () => ipcRenderer.invoke("vst:list-plugins"),
+  /** Scan the standard VST3 folders + the player's own; retries earlier failures. */
+  scan: () => ipcRenderer.invoke("vst:scan"),
+  /** Native picker for one .vst3; resolves the new library, or null if cancelled. */
+  addFile: () => ipcRenderer.invoke("vst:add-file"),
+  /** Native folder picker; resolves the new library (+ foundInFolder), or null. */
+  addFolder: () => ipcRenderer.invoke("vst:add-folder"),
+  /** Forget a file/folder the player added (and the plugins it brought). */
+  removeSource: (sourcePath) => ipcRenderer.invoke("vst:remove-source", sourcePath),
+
+  // ── Rack: what the guitar plays through. Each call resolves the new rack. ──
+  getRack: () => ipcRenderer.invoke("vst:rack-get"),
+  addToRack: (pluginId, index) => ipcRenderer.invoke("vst:rack-add", pluginId, index),
+  removeFromRack: (slotId) => ipcRenderer.invoke("vst:rack-remove", slotId),
+  moveInRack: (slotId, toIndex) => ipcRenderer.invoke("vst:rack-move", slotId, toIndex),
+  setBypass: (slotId, bypass) => ipcRenderer.invoke("vst:rack-bypass", slotId, bypass),
+  /** Loads the plugin if needed and shows its window (brings it forward if open). */
+  openEditor: (slotId) => ipcRenderer.invoke("vst:open-editor", slotId),
+  closeEditor: (slotId) => ipcRenderer.invoke("vst:close-editor", slotId),
+
+  /** Rack events: { type: "status", status } | { type: "warning"|"error",
+   *  slotId, message } | { type: "engine-exit" }. Returns an unsubscribe fn. */
+  onEvent: (cb) => {
+    const listener = (_event, payload) => cb(payload);
+    ipcRenderer.on("vst:event", listener);
+    return () => ipcRenderer.removeListener("vst:event", listener);
+  },
+  /** Scan progress: { done, total, current }. Returns an unsubscribe fn. */
+  onScanProgress: (cb) => {
+    const listener = (_event, payload) => cb(payload);
+    ipcRenderer.on("vst:scan-progress", listener);
+    return () => ipcRenderer.removeListener("vst:scan-progress", listener);
+  },
+});
+
 // Backing tracks: a local audio library plus the per-song sync settings that line
 // a recording up with the Guitar Pro tab (see feature/backingTrack on the
 // renderer side). YouTube backing tracks don't come through here — they work on

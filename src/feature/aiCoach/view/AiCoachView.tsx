@@ -1,8 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { cn } from "assets/lib/utils";
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
-import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import roadmaps from "data/roadmaps";
 import {
@@ -13,23 +11,20 @@ import {
 import { newlyCompletedSteps } from "feature/aiCoach/utils/completedSteps";
 import { withPhaseChecks } from "feature/aiCoach/utils/phaseCheck";
 import { extractStepProgress } from "feature/aiCoach/utils/roadmapProgress";
-import { PlayerRoadmapsLocked } from "feature/aiCoach/view/PlayerRoadmapsLocked";
 import { firebaseAddRoadmapStepLog } from "feature/logs/services/addRoadmapStepLog.service";
-import { UserRoadmapsTab } from "feature/supporterPanel/components/UserRoadmapsTab";
-import { useSupporterRoadmap } from "feature/supporterPanel/hooks/useSupporterRoadmap";
-import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowLeft,
-  Compass,
+  ArrowRight,
   Lightbulb,
   Loader2,
-  Lock,
   Map,
+  Signpost,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 import type {
@@ -46,11 +41,6 @@ const LEVEL_ORDER: Record<string, number> = {
   Intermediate: 2,
   Advanced: 3,
 };
-
-type CoachTab = "mastery" | "players";
-
-const isCoachTab = (value: unknown): value is CoachTab =>
-  value === "mastery" || value === "players";
 
 const progressQueryKey = (userId: string | null) =>
   ["userRoadmapProgress", userId] as const;
@@ -104,42 +94,19 @@ const AiCoachView = () => {
       : null;
   });
   const [suggestOpen, setSuggestOpen] = useState(false);
-  // A player roadmap open on its own takes the whole page, like a curated one.
-  // A notification link (?roadmap=) opens straight onto one.
-  const [linkedRoadmapId] = useState<string | null>(() =>
-    typeof router.query.roadmap === "string" ? router.query.roadmap : null,
-  );
-  const [playerDetailOpen, setPlayerDetailOpen] = useState(
-    () => linkedRoadmapId !== null && router.query.tab === "players",
-  );
 
-  const handlePlayerDetail = (open: boolean) => {
-    setPlayerDetailOpen(open);
-    // Drop the deep link on the way back, or a refresh reopens the roadmap.
-    if (!open && router.query.roadmap) {
-      const { roadmap: _dropped, ...query } = router.query;
-      void router.replace({ pathname: router.pathname, query }, undefined, {
-        shallow: true,
-      });
-    }
-  };
-  const [tab, setTab] = useState<CoachTab>(() =>
-    isCoachTab(router.query.tab) ? router.query.tab : "mastery",
-  );
-
-  const { isSupport, isLoading: isRosterLoading } = useSupportTeam();
-  const isSupporter = isSupport(userAuth);
-  // Only for the wallet on the generator card — the route 403s without the badge.
-  const { data: board } = useSupporterRoadmap(isSupporter && tab === "players");
-
-  const openTab = (next: CoachTab) => {
-    setTab(next);
-    void router.replace(
-      { pathname: router.pathname, query: { ...router.query, tab: next } },
-      undefined,
-      { shallow: true },
-    );
-  };
+  // Player Roadmaps used to be a tab here and live under My Stuff now; an old
+  // link to that tab — a "roadmap ready" notification among them — follows.
+  const movedTab = router.query.tab === "players";
+  const movedRoadmap =
+    typeof router.query.roadmap === "string" ? router.query.roadmap : null;
+  useEffect(() => {
+    if (!movedTab) return;
+    void router.replace({
+      pathname: "/my-roadmaps",
+      query: movedRoadmap ? { roadmap: movedRoadmap } : {},
+    });
+  }, [movedTab, movedRoadmap, router]);
 
   // Steps already put in the activity log during this visit.
   const loggedStepsRef = useRef(new Set<string>());
@@ -283,119 +250,88 @@ const AiCoachView = () => {
   // ─── List view ───
   return (
     <div className='flex w-full flex-col'>
-      {/* Same element either way, so the open roadmap survives the switch. */}
-      <div
-        className={cn(
-          !playerDetailOpen &&
-            "mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12",
-        )}>
+      <div className='mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12'>
         {/* A plain title, not a banner — the room goes to the roadmaps. */}
-        {!playerDetailOpen && (
-          <header className='space-y-3'>
-            <Breadcrumbs
-              items={[
-                { label: t("practice"), href: "/timer" },
-                { label: t("mastery_roadmaps") },
-              ]}
-            />
-            <div>
-              <h1 className='text-2xl font-bold leading-tight text-white md:text-3xl'>
-                {t("mastery_roadmaps")}
-              </h1>
-              <p className='mt-1 text-sm text-zinc-400'>{t("intro")}</p>
-            </div>
-          </header>
-        )}
-        {!playerDetailOpen && (
-          <div className={tabNavListClass}>
-            <button
-              type='button'
-              onClick={() => openTab("mastery")}
-              aria-pressed={tab === "mastery"}
-              className={tabNavItemClass(tab === "mastery")}>
-              <Map size={16} className='shrink-0' />
+        <header className='space-y-3'>
+          <Breadcrumbs
+            items={[
+              { label: t("practice"), href: "/timer" },
+              { label: t("mastery_roadmaps") },
+            ]}
+          />
+          <div>
+            <h1 className='text-2xl font-bold leading-tight text-white md:text-3xl'>
               {t("mastery_roadmaps")}
-            </button>
-            <button
-              type='button'
-              onClick={() => openTab("players")}
-              aria-pressed={tab === "players"}
-              className={tabNavItemClass(tab === "players")}>
-              <Compass size={16} className='shrink-0' />
-              {t("player_roadmaps")}
-              {!isRosterLoading && !isSupporter && (
-                <Lock size={13} className='shrink-0 text-amber-400/80' />
-              )}
-            </button>
+            </h1>
+            <p className='mt-1 text-sm text-zinc-400'>{t("intro")}</p>
+          </div>
+        </header>
+
+        {loadingProgress ? (
+          <div className='flex justify-center py-16'>
+            <Loader2 className='h-7 w-7 animate-spin text-cyan-500' />
+          </div>
+        ) : roadmaps.length === 0 ? (
+          <div className='flex flex-col items-center justify-center gap-3 py-20 text-zinc-500'>
+            <Map className='h-10 w-10 opacity-30' />
+            <span className='text-sm'>{t("empty")}</span>
+          </div>
+        ) : (
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+            {sortedRoadmaps.map((rm) => {
+              const merged = mergeWithProgress(
+                rm,
+                progressMap[rm.id] ?? null,
+                userId ?? "",
+              );
+              return (
+                <RoadmapCard
+                  key={rm.id}
+                  roadmap={merged}
+                  onOpen={() => setSelectedId(rm.id)}
+                />
+              );
+            })}
           </div>
         )}
 
-        {tab === "players" ? (
-          isRosterLoading ? (
-            // The roster answers "not a supporter" until it lands.
-            <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />
-          ) : isSupporter ? (
-            <UserRoadmapsTab
-              enabled={isSupporter}
-              wallet={board?.wallet}
-              variant='page'
-              onDetailChange={handlePlayerDetail}
-              initialRoadmapId={linkedRoadmapId}
-            />
-          ) : (
-            <PlayerRoadmapsLocked />
-          )
-        ) : (
-          <>
-            {loadingProgress ? (
-              <div className='flex justify-center py-16'>
-                <Loader2 className='h-7 w-7 animate-spin text-cyan-500' />
-              </div>
-            ) : roadmaps.length === 0 ? (
-              <div className='flex flex-col items-center justify-center gap-3 py-20 text-zinc-500'>
-                <Map className='h-10 w-10 opacity-30' />
-                <span className='text-sm'>{t("empty")}</span>
-              </div>
-            ) : (
-              <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-                {sortedRoadmaps.map((rm) => {
-                  const merged = mergeWithProgress(
-                    rm,
-                    progressMap[rm.id] ?? null,
-                    userId ?? "",
-                  );
-                  return (
-                    <RoadmapCard
-                      key={rm.id}
-                      roadmap={merged}
-                      onOpen={() => setSelectedId(rm.id)}
-                    />
-                  );
-                })}
-              </div>
-            )}
+        <div className='mt-2 flex flex-col gap-3'>
+          {/* ─── A roadmap of one's own ─── */}
+          <Link
+            href='/my-roadmaps'
+            className='flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70'>
+            <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800'>
+              <Signpost className='h-4 w-4 text-zinc-400' />
+            </div>
+            <div className='min-w-0 flex-1'>
+              <p className='text-sm font-semibold text-zinc-300'>
+                {t("player_roadmaps")}
+              </p>
+              <p className='text-xs text-zinc-500'>{t("players_link")}</p>
+            </div>
+            <ArrowRight className='h-4 w-4 shrink-0 text-zinc-500' />
+          </Link>
 
-            {/* ─── Suggest a roadmap ─── */}
-            <button
-              onClick={() => setSuggestOpen(true)}
-              className='mt-2 flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70'>
-              <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800'>
-                <Lightbulb className='h-4 w-4 text-zinc-400' />
-              </div>
-              <div>
-                <p className='text-sm font-semibold text-zinc-300'>
-                  {t("suggest.title")}
-                </p>
-                <p className='text-xs text-zinc-500'>{t("suggest.body")}</p>
-              </div>
-            </button>
+          {/* ─── Suggest a roadmap ─── */}
+          <button
+            onClick={() => setSuggestOpen(true)}
+            className='flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70'>
+            <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800'>
+              <Lightbulb className='h-4 w-4 text-zinc-400' />
+            </div>
+            <div>
+              <p className='text-sm font-semibold text-zinc-300'>
+                {t("suggest.title")}
+              </p>
+              <p className='text-xs text-zinc-500'>{t("suggest.body")}</p>
+            </div>
+          </button>
+        </div>
 
-            <FeedbackModal
-              isOpen={suggestOpen}
-              onClose={() => setSuggestOpen(false)}
-            />
-          </>
-        )}
+        <FeedbackModal
+          isOpen={suggestOpen}
+          onClose={() => setSuggestOpen(false)}
+        />
       </div>
     </div>
   );

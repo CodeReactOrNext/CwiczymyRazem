@@ -20,6 +20,14 @@ export interface UserRoadmapSummary {
   updatedAt: string;
   phaseCount: number;
   stepCount: number;
+  /** Steps in each phase, in map order — the shape the card draws. */
+  phaseSteps?: number[];
+  /** The owner's finished steps in each phase. */
+  phaseDone?: number[];
+  /** What a run starts on, for a card with no run of the viewer's to show. */
+  firstStep?: string | null;
+  /** The owner's next step: the one under way, or the first not finished. */
+  nextStep?: string | null;
   describedSteps: number;
   exerciseSteps: number;
   /** Steps linked to a song from the library. */
@@ -50,6 +58,10 @@ export interface RoadmapRunProgress {
   sessionsCompleted: number;
   startedAt: string | null;
   lastPractisedAt: string | null;
+  /** Finished steps in each phase, in map order. */
+  phaseDone?: number[];
+  /** The step under way, or the first not finished; null once all are done. */
+  nextStep?: string | null;
 }
 
 /**

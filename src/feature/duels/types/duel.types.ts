@@ -218,7 +218,7 @@ export interface DuelOverview {
   recent: DuelView[];
   ranking: DuelRankingEntry[];
   rankedPlayers: number;
-  /** The latest settled duels of every player, newest first. */
+  /** Other players' latest decided duels, newest first — the viewer's own and void ones left out. */
   feed: DuelFeedEntry[];
   /** Players waiting in the queue right now, the viewer's own tickets excluded. */
   waitingOthers: number;

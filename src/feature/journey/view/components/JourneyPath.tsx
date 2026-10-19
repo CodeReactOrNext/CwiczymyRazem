@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, ChevronLeft, Guitar, Star } from "lucide-react";
+import { Check, ChevronLeft, Star } from "lucide-react";
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import type { JourneyModuleWithStatus, JourneyStepWithStatus } from "../../types/journey.types";
@@ -226,16 +226,11 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
             </button>
           </div>
 
-          <div className="flex items-center gap-5">
-            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-cyan-500/10 ring-1 ring-cyan-500/30">
-              <Guitar size={30} className="text-cyan-400" />
-            </div>
-            <div>
-              <h1 className="font-display text-3xl font-black tracking-tight text-zinc-100 md:text-4xl">
-                {module.title}
-              </h1>
-              <p className="mt-1 max-w-xs text-sm text-zinc-400">{module.subtitle}</p>
-            </div>
+          <div>
+            <h1 className="font-display text-3xl font-black tracking-tight text-zinc-100 md:text-4xl">
+              {module.title}
+            </h1>
+            <p className="mt-1 max-w-xs text-sm text-zinc-400">{module.subtitle}</p>
           </div>
 
           <div className="mt-6 flex items-center gap-3">

@@ -48,7 +48,7 @@ While a note rings, a small tuner over it shows where the string is: the dot sit
 
 The chart under the summary shows every note of the run in order: how far each one landed from the beat, or from its pitch on bend drills, with the green band marking the top grade. A run that starts tight and drifts as your hand tires shows up there straight away.
 
-If every note leans the same way by about the same amount, that's usually audio delay rather than your hands. With the mic on, press **Calibrate timing** next to the score above the tab and play along to a few clicks. The app measures the delay of your speakers or interface and grades against it from then on.
+If every note leans the same way by about the same amount, that's usually audio delay rather than your hands. With the mic on, press **Calibrate timing** next to the score above the tab and play along to a few clicks. The app measures the delay of your speakers or interface and grades against it from then on. Afterwards a map shows where each pluck landed against its click, so you can keep the result with **It's good** or play it again.
 
 ## Setting it up
 

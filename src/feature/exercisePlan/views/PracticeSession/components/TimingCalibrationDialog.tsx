@@ -11,6 +11,7 @@ import type { CalibrationRunState } from "../hooks/useTimingCalibrationRun";
 import { useTimingCalibrationRun } from "../hooks/useTimingCalibrationRun";
 import type { CalibrationResult } from "../utils/timingCalibration";
 import { CALIBRATION_BPM, CALIBRATION_CLICKS, CALIBRATION_COUNT_IN, CALIBRATION_MIN_HITS } from "../utils/timingCalibration";
+import { TimingHitMap } from "./TimingHitMap";
 
 interface TimingCalibrationDialogProps {
   audioRefs: AudioRefs;
@@ -158,6 +159,22 @@ const ResultStep = ({
   onRetry: () => void;
 }) => {
   const { t } = useTranslation("session");
+  const { latencyMs } = result;
+  const hasHits = result.hits > 0;
+
+  // A refused run can still be kept: the map lets the player judge it, and
+  // their ear may trust a run our spread check doesn't.
+  const actions = (
+    <div className='mt-8 flex gap-2.5'>
+      <Button onClick={onRetry} className={result.ok ? SECONDARY : PRIMARY}>{t("timing.try_again")}</Button>
+      {latencyMs !== null && (
+        <Button onClick={() => onSave(latencyMs)} className={result.ok ? PRIMARY : SECONDARY}>
+          {t("timing.use", { ms: latencyMs })}
+        </Button>
+      )}
+    </div>
+  );
+
   if (!result.ok) {
     return (
       <>
@@ -179,9 +196,12 @@ const ResultStep = ({
               ? t("timing.fail.ahead_body")
               : t("timing.fail.spread_body", { spread: result.spreadMs })}
         </p>
-        <div className='mt-6 flex'>
-          <Button onClick={onRetry} className={PRIMARY}>{t("timing.try_again")}</Button>
-        </div>
+        {hasHits && (
+          <div className='mt-6'>
+            <TimingHitMap delays={result.delays} />
+          </div>
+        )}
+        {actions}
       </>
     );
   }
@@ -203,12 +223,11 @@ const ResultStep = ({
         </p>
       </div>
 
-      <div className='mt-8 flex gap-2.5'>
-        <Button onClick={onRetry} className={SECONDARY}>{t("timing.try_again")}</Button>
-        <Button onClick={() => onSave(result.latencyMs)} className={PRIMARY}>
-          {t("timing.use", { ms: result.latencyMs })}
-        </Button>
+      <div className='mt-8'>
+        <TimingHitMap delays={result.delays} />
       </div>
+
+      {actions}
     </>
   );
 };

@@ -13,6 +13,8 @@ const os = require("os");
 
 const { createRpcServer } = require("./workerRpc");
 const toneStore = require("./toneStore");
+const vstStore = require("./vst/vstStore");
+const vstRack = require("./vst/vstRack");
 
 const port = process.parentPort;
 let engine = null;
@@ -40,7 +42,12 @@ const handlers = {
   init({ userDataDir }) {
     if (!userDataDir) throw new Error("init: userDataDir is required");
     toneStore.setUserDataDir(userDataDir);
+    vstStore.setUserDataDir(userDataDir);
     raisePriority();
+    // VST host first: its UI thread must exist before any params can ask for
+    // the rack. Unsupported platform / missing binary just reports supported:false.
+    vstRack.init();
+    vstRack.onEvent((event) => rpc.emit("vst", event));
     engine = require("./nativeAudioEngine");
     engine.onOverload((info) => rpc.emit("overload", info));
     engine.onMeter((levels) => rpc.emit("meter", levels));
@@ -91,6 +98,29 @@ const handlers = {
     requireEngine().recoverAfterResume();
   },
 
+  // VST rack (electron/vst/vstRack.js). Every edit resolves with the new rack status.
+  rackGet() {
+    return vstRack.getStatus();
+  },
+  rackAdd(pluginId, index) {
+    return vstRack.add(pluginId, index);
+  },
+  rackRemove(slotId) {
+    return vstRack.remove(slotId);
+  },
+  rackMove(slotId, toIndex) {
+    return vstRack.move(slotId, toIndex);
+  },
+  rackSetBypass(slotId, bypass) {
+    return vstRack.setBypass(slotId, bypass);
+  },
+  rackOpenEditor(slotId) {
+    return vstRack.openEditor(slotId);
+  },
+  rackCloseEditor(slotId) {
+    return vstRack.closeEditor(slotId);
+  },
+
   /** Closes the stream cleanly (releases the ASIO driver) and exits once the
    *  reply has gone out. */
   async shutdown() {
@@ -98,6 +128,9 @@ const handlers = {
       try { await engine.detachCapture(); } catch { /* ignore */ }
       try { await engine.detachAmp(); } catch { /* ignore */ }
     }
+    // Saves every plugin's settings and unloads them cleanly (plugins write
+    // their own files on teardown too) before the process goes away.
+    try { await vstRack.shutdown(); } catch { /* ignore */ }
     setTimeout(() => process.exit(0), 20);
     return true;
   },

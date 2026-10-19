@@ -11,8 +11,8 @@ export type TimingGrade = 1 | 2 | 3;
 /** How one hit note was timed, as the tab draws it. */
 export interface NoteTiming {
   grade: TimingGrade;
-  /** Dead on the beat (see isPerfectTiming) — earns a "+" on the tab. */
-  perfect: boolean;
+  /** What the tab writes over the note (see timingHintFor); null for nothing. */
+  hint: TimingHint | null;
   /** How far the attack landed from the note's start, in beats (positive =
    *  late); null when the attack couldn't be measured. */
   offsetBeats: number | null;
@@ -55,9 +55,9 @@ export const TIMING_GRADE_POINTS: Record<TimingGrade, number> = { 3: 1, 2: 2 / 3
  * that it leans forgiving on purpose: a 3 is for "in the pocket", not for
  * metronome-tight, and only a slip a listener would clearly hear drops it.
  *
- * Both windows scale with the note's length and are capped: at 60 BPM a 100 ms
+ * Both windows scale with the note's length and are capped: at 60 BPM a 130 ms
  * slip is still in the pocket, in 16ths at 180 BPM (83 ms a note) the floor is
- * most of a note — the measurement error doesn't shrink with the note, and the
+ * more than a note — the measurement error doesn't shrink with the note, and the
  * owner wants beginners to land on 3 easily, so the floors hold.
  */
 const ON_TIME_SHARE = 0.6;
@@ -66,26 +66,44 @@ const ON_TIME_MAX_MS = 100;
 const CLOSE_SHARE = 1.2;
 const CLOSE_MIN_MS = 140;
 const CLOSE_MAX_MS = 200;
+/** Added flat to both windows at every note length — the owner loosened the
+ *  grades by this much on top of the scaled windows above. */
+const LOOSEN_MS = 30;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /** Timing windows (± ms around the due time) for a note `noteMs` long. */
 export const timingWindowsFor = (noteMs: number): { onTimeMs: number; closeMs: number } => ({
-  onTimeMs: clamp(noteMs * ON_TIME_SHARE, ON_TIME_MIN_MS, ON_TIME_MAX_MS),
-  closeMs: clamp(noteMs * CLOSE_SHARE, CLOSE_MIN_MS, CLOSE_MAX_MS),
+  onTimeMs: clamp(noteMs * ON_TIME_SHARE, ON_TIME_MIN_MS, ON_TIME_MAX_MS) + LOOSEN_MS,
+  closeMs: clamp(noteMs * CLOSE_SHARE, CLOSE_MIN_MS, CLOSE_MAX_MS) + LOOSEN_MS,
 });
 
 /**
- * Within this of the beat a hit counts as dead on. Tight enough to be an event
- * rather than the norm, loose enough to stay human — and well above the
- * detector's own error (±9 ms for 90% of attacks), so it rewards the hand, not
- * the measurement's luck. Feedback only: it scores like any other 3.
+ * A run whose typical attack (median |offset|) sits within this of the beat is
+ * dead on — the goal chart's tight zone. Well above the detector's own error
+ * (±9 ms for 90% of attacks), so it rewards the hand, not the measurement's luck.
  */
 export const PERFECT_TIMING_MS = 25;
 
-/** Whether a measured attack landed dead on the beat. Unmeasured never is. */
-export const isPerfectTiming = (deltaMs: number | null): boolean =>
-  deltaMs !== null && Math.abs(deltaMs) <= PERFECT_TIMING_MS;
+/**
+ * The tab's labels — feedback only, they never touch the score (the grade
+ * windows above do). Set by the owner apart from the grades: a "+" for any
+ * attack within PLUS_HINT_MS, "Early"/"Late" only past OFF_BEAT_HINT_MS, and
+ * nothing in between — even where that hit was graded a 2.
+ */
+export const PLUS_HINT_MS = 80;
+export const OFF_BEAT_HINT_MS = 180;
+
+export type TimingHint = "early" | "late" | "perfect";
+
+/** The tab's label for a measured attack (signed ms, + = late). Unmeasured gets none. */
+export const timingHintFor = (deltaMs: number | null): TimingHint | null => {
+  if (deltaMs === null) return null;
+  const offBy = Math.abs(deltaMs);
+  if (offBy <= PLUS_HINT_MS) return "perfect";
+  if (offBy > OFF_BEAT_HINT_MS) return deltaMs < 0 ? "early" : "late";
+  return null;
+};
 
 /**
  * Grades a hit by how far its attack landed from the note's due time (signed,

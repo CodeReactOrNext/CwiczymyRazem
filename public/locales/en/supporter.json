@@ -414,6 +414,11 @@
       "not_guitar": "This roadmap is about playing guitar — describe what you want to play.",
       "title": "Build a roadmap around your goal",
       "folded_body": "Describe what you want to play — the coach lays out the phases, exercises and songs.",
+      "preview": {
+        "goal": "Your goal",
+        "phases": "Phases",
+        "steps": "Exercises, songs and lessons"
+      },
       "create": "Create a roadmap",
       "writing": "Writing your roadmap",
       "running_body": "It takes a few minutes and runs on our side — you can leave this page or close the tab, and you will get a notification when it is ready. Stay here and it opens on its own.",
@@ -596,6 +601,7 @@
       "start_failed": "Could not start this roadmap. Try again.",
       "starting": "Starting…",
       "start": "Start this roadmap",
+      "view": "View roadmap",
       "done_refining": "Done refining",
       "refine": "Refine",
       "unknown": "Unknown player",
@@ -611,6 +617,7 @@
       "following_count_one": "1 player following",
       "following_none": "Following, no sessions yet",
       "not_started": "Not started yet",
+      "first_step": "First step",
       "started_on": "started {{date}}",
       "created_on": "created {{date}}",
       "last_practised": "Last practised {{date}}",
@@ -631,7 +638,12 @@
       },
       "yours": "Your roadmaps",
       "others": "From other players",
-      "no_match": "Nothing matches this filter."
+      "no_match": "Nothing matches this filter.",
+      "page": {
+        "title": "Player Roadmaps",
+        "subtitle": "Roadmaps the coach built around your goals — and the ones other players are working through",
+        "eyebrow": "My Stuff"
+      }
     },
     "gear": {
       "propose_title": "Propose a piece of gear",

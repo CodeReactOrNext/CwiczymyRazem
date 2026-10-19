@@ -1,7 +1,12 @@
 import type { UserRoadmapSummary } from "feature/supporterPanel/types/userRoadmaps.types";
 import { describe, expect, it } from "vitest";
 
-import { arrangeRoadmaps } from "./roadmapBoard";
+import {
+  arrangeOwnRoadmaps,
+  arrangeRoadmaps,
+  featuredRoadmap,
+  isViewersRoadmap,
+} from "./roadmapBoard";
 
 const row = (
   id: string,
@@ -79,5 +84,62 @@ describe("arrangeRoadmaps", () => {
     const copy = [...board];
     arrangeRoadmaps(board, { level: "all", sort: "newest" });
     expect(board).toEqual(copy);
+  });
+});
+
+describe("the viewer's own roadmaps", () => {
+  const mine = [
+    row("fresh", { userId: "me", createdAt: "2026-06-01" }),
+    row("older-fresh", { userId: "me", createdAt: "2026-03-01" }),
+    row("practised-long-ago", {
+      userId: "me",
+      stepCount: 4,
+      completedSteps: 1,
+      sessionsCompleted: 3,
+      lastPractisedAt: "2026-02-01",
+    }),
+    row("followed", {
+      userId: "someone",
+      stepCount: 4,
+      viewerProgress: {
+        completedSteps: 2,
+        sessionsCompleted: 5,
+        startedAt: "2026-04-01",
+        lastPractisedAt: "2026-05-01",
+      },
+    }),
+  ];
+
+  it("counts a roadmap they started as theirs, and nobody else's", () => {
+    expect(isViewersRoadmap(mine[0], "me")).toBe(true);
+    expect(isViewersRoadmap(mine[3], "me")).toBe(true);
+    expect(isViewersRoadmap(row("x", { userId: "someone" }), "me")).toBe(false);
+  });
+
+  it("puts what they practised first, last practised first, then the newest", () => {
+    expect(ids(arrangeOwnRoadmaps(mine, "me"))).toEqual([
+      "followed",
+      "practised-long-ago",
+      "fresh",
+      "older-fresh",
+    ]);
+  });
+
+  it("features the roadmap under way, and nothing on a list never started", () => {
+    expect(featuredRoadmap(arrangeOwnRoadmaps(mine, "me"), "me")?.id).toBe(
+      "followed",
+    );
+    expect(featuredRoadmap(mine.slice(0, 2), "me")).toBeNull();
+  });
+
+  it("never features a roadmap with every step done", () => {
+    const done = row("done", {
+      userId: "me",
+      stepCount: 2,
+      completedSteps: 2,
+      sessionsCompleted: 4,
+      lastPractisedAt: "2026-07-01",
+    });
+    expect(featuredRoadmap([done], "me")).toBeNull();
   });
 });

@@ -31,6 +31,12 @@
 // with the built-in cab sim or a loaded IR same as with the classic amp path.
 // Gate/overdrive stay before NAM and delay stays after, same as
 // pedals-into-amp-into-rack in a real rig.
+// `toneMode: "vst"` is the other world entirely: the player's own rack of VST3
+// plugins (electron/vst/vstRack.js) replaces this whole chain, gate to delay —
+// guitar straight into the rack, then only Master (2 × level, so the knob's
+// centre is unity) and the safety limiter. It is the one stereo path; see
+// processBlockStereo(). The rack is injected with setInsert() because it
+// outlives every AmpChain (one per stream open) and needs the native addon.
 // See dsp/nam.js and electron/nam/README.md for why NAM has to be fed whole
 // blocks (the WASM call overhead per sample is too high to call it the way
 // every other stage here is called, one sample at a time) — which is why the
@@ -176,8 +182,11 @@ class AmpChain {
       overdriveEnabled: false, overdriveDrive: 0.35, overdriveTone: 0.5, overdriveLevel: 0.5,
       delayEnabled: false, delayMs: 300, delayFeedback: 0.35, delayMix: 0.25,
       namEnabled: false, namModelId: null,
+      toneMode: "builtin",
       irId: null,
     };
+    // The VST rack for toneMode "vst": { isActive(), processBlock(left, n, right) } or null.
+    this.insert = null;
     this._applyFixed();
     this.setParams(this.params);
   }
@@ -224,6 +233,30 @@ class AmpChain {
     // traditional amp chain until it resolves.
     if ("irSamples" in p) this.convolver.setIR(irSamples);
     if ("namModelJson" in p) this.pendingModelLoad = this.nam.loadModel(namModelJson);
+  }
+
+  /** Hosts the VST rack (see the header comment); null removes it. */
+  setInsert(insert) {
+    this.insert = insert || null;
+  }
+
+  _vstActive() {
+    return this.params.toneMode === "vst" && !!this.insert && this.insert.isActive();
+  }
+
+  /** The VST rack path: guitar → rack (stereo) → Master → limiter. */
+  _processVst(inF, outL, outR, n) {
+    if (outL !== inF) outL.set(inF.subarray(0, n));
+    this.insert.processBlock(outL, n, outR);
+    const gain = this.params.level * 2;
+    for (let i = 0; i < n; i++) {
+      let l = outL[i] * gain;
+      let r = outR[i] * gain;
+      if (l > 1) l = 1; else if (l < -1) l = -1;
+      if (r > 1) r = 1; else if (r < -1) r = -1;
+      outL[i] = l;
+      outR[i] = r;
+    }
   }
 
   /** Resolves once the NAM WASM is up and any model load requested so far has
@@ -298,6 +331,12 @@ class AmpChain {
    *  with zero added latency (see dsp/nam.js processBlock). `out` may alias
    *  `inF`. Returns `out`. */
   processBlock(inF, out, n = inF.length) {
+    if (this._vstActive()) {
+      const right = this._blockBufferRight(n);
+      this._processVst(inF, out, right, n);
+      for (let i = 0; i < n; i++) out[i] = 0.5 * (out[i] + right[i]);
+      return out;
+    }
     const useNam = this.params.namEnabled && this.nam.isLoaded();
     if (!useNam) {
       for (let i = 0; i < n; i++) out[i] = this._post(this._classicAmp(this._pre(inF[i])));
@@ -308,6 +347,22 @@ class AmpChain {
     this.nam.processBlock(buf, n);
     for (let i = 0; i < n; i++) out[i] = this._post(buf[i]);
     return out;
+  }
+
+  /** Two-channel output into `outL`/`outR` for i < n. Only the VST rack has
+   *  two different sides; the built-in chain writes its mono signal to both. */
+  processBlockStereo(inF, outL, outR, n = inF.length) {
+    if (this._vstActive()) {
+      this._processVst(inF, outL, outR, n);
+      return;
+    }
+    this.processBlock(inF, outL, n);
+    outR.set(outL.subarray(0, n));
+  }
+
+  _blockBufferRight(n) {
+    if (!this._blockBufR || this._blockBufR.length < n) this._blockBufR = new Float32Array(n);
+    return this._blockBufR;
   }
 
   // Reused scratch for processBlock's NAM path — sized once per distinct block

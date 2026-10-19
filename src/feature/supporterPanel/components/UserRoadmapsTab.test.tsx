@@ -31,6 +31,9 @@ const summary: UserRoadmapSummary = {
   visibility: "public",
   followerCount: 2,
   viewerProgress: null,
+  phaseSteps: [2],
+  phaseDone: [1],
+  firstStep: "Alternate picking",
 };
 
 const detail: UserRoadmapDetail = {
@@ -86,6 +89,8 @@ const ownSummary: UserRoadmapSummary = {
   completedSteps: 0,
   sessionsCompleted: 0,
   lastPractisedAt: null,
+  phaseDone: [0],
+  nextStep: "String skipping",
 };
 
 const ownDetail: UserRoadmapDetail = {
@@ -226,5 +231,22 @@ describe("UserRoadmapsTab", () => {
 
     expect(screen.queryByText(/Somebody else.s roadmap/)).toBeNull();
     expect(screen.queryByText("Start this roadmap")).toBeNull();
+  });
+
+  it("offers somebody else's roadmap by its first step, not by their progress", () => {
+    render(<UserRoadmapsTab enabled />);
+
+    expect(screen.getByText("First step")).toBeDefined();
+    expect(screen.getByText("Alternate picking")).toBeDefined();
+    expect(screen.getByText("View roadmap")).toBeDefined();
+  });
+
+  it("keeps the viewer's own name off their own cards and starts them on their next step", () => {
+    render(<UserRoadmapsTab enabled />);
+
+    expect(screen.queryByText("You")).toBeNull();
+    expect(screen.getByText("Your first step")).toBeDefined();
+    expect(screen.getByText("String skipping")).toBeDefined();
+    expect(screen.getByText("Start learning")).toBeDefined();
   });
 });

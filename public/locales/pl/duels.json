@@ -25,7 +25,7 @@
     "matched": "Znaleziono rywala — twój duel jest poniżej.",
     "queued": "Jesteś w kolejce. Damy znać, gdy ktoś dołączy.",
     "error_limit": "Masz już otwarte {{max}} duele.",
-    "error_locked": "Duele odblokowują się na 4 levelu.",
+    "error_locked": "Duele odblokowują się na 2 levelu.",
     "error": "Nie udało się dołączyć. Spróbuj za chwilę.",
     "ticket": "Szukam rywala",
     "ticket_expires": "Wygasa za {{time}}",
@@ -102,9 +102,8 @@
     "nobody_played": "Nikt nie zagrał"
   },
   "feed": {
-    "title": "Wszystkie duele",
+    "title": "Duele innych graczy",
     "latest": "ostatnie {{count}}",
-    "empty": "Nikt jeszcze nie rozliczył duelu. Tu pojawia się każdy zakończony duel w aplikacji.",
     "win": "{{winner}} pokonuje {{loser}}",
     "walkover": "{{winner}} pokonuje {{loser}} — walkower",
     "draw": "{{winner}} remisuje z {{loser}}",

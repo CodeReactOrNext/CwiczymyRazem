@@ -1,4 +1,7 @@
-import type { TempoAnchor } from "../utils/tempoMap";
+import type { MutableRefObject } from "react";
+
+import type { ScoreClock } from "../utils/backingSync";
+import type { RecordingTempoMap, TempoAnchor } from "../utils/tempoMap";
 
 /** One audio file in the desktop backing-track library (electron/backingTrackStore.js). */
 export interface BackingTrackMeta {
@@ -64,8 +67,6 @@ export type BackingAlignment = Pick<
   "offsetMs" | "sourceBpm" | "tempoAnchors" | "volume" | "muted"
 >;
 
-export type BackingSource = "off" | "file" | "youtube";
-
 export const DEFAULT_STEM: Omit<BackingStem, "trackId"> = { volume: 1, muted: false, offsetMs: 0 };
 
 export const DEFAULT_ALIGNMENT: BackingAlignment = {
@@ -75,3 +76,30 @@ export const DEFAULT_ALIGNMENT: BackingAlignment = {
   volume: 0.8,
   muted: false,
 };
+
+/** The clock and the view every timeline lane in the editor reads. */
+export interface TimelineWindow {
+  startTime: number | null;
+  effectiveBpm: number;
+  /**
+   * The session clock, so every lane reads the bar the session is actually
+   * playing rather than the one an even beat count would suggest.
+   *
+   * A ref because it is rebuilt whenever a bar is pinned, and threading a fresh
+   * object into every canvas would tear down their frame loops mid-drag.
+   */
+  scoreClockRef: MutableRefObject<ScoreClock | null>;
+  /** Where the next Play begins, for when the transport is stopped — without it
+   *  a stopped lane drew its playhead at bar 1. */
+  getResumeBeat?: () => number;
+  sourceBpm: number;
+  /** Where the tab's beat 0 falls in the recording. */
+  offsetMs: number;
+  /** Where the tab's bars actually fall in the recording, pinned bars included. */
+  tempoMap: RecordingTempoMap;
+  beatsPerBar: number;
+  /** Seconds of recording across the lane — the zoom. */
+  windowSec: number;
+  /** Where to look while parked. Null follows the playhead. */
+  centreSecOverride: number | null;
+}

@@ -3,11 +3,11 @@ import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useMemo, useRef } from "react";
 
 import { useCanvasSize, useTimelineFrame } from "../hooks/useTimelineFrame";
+import type { TimelineWindow } from "../types/backingTrack.types";
 import type { TabNoteEvent, TabSourceMeasure } from "../utils/alignment";
 import { beatGridLines, tabNoteEvents } from "../utils/alignment";
 import { sessionBeats } from "../utils/backingSync";
 import { TIMELINE_COLORS } from "../utils/timelineColors";
-import type { TimelineWindow } from "./TimelineRuler";
 
 const STRING_COUNT = 6;
 
