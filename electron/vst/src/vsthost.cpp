@@ -15,6 +15,17 @@
 // and reports "not processed" while a load/reconfigure/state swap holds it, and
 // the JS side plays silence for that block instead of the raw DI signal.
 //
+// macOS is laid out differently, because AppKit only works on a process's main
+// thread (and JUCE plugins post to the main run loop, whatever thread loaded
+// them). In the audio process the main thread IS the JS thread that carries
+// every block, so a plugin window drawing there would crackle. So on macOS the
+// plugins live in the Electron main process instead, where the main thread runs
+// NSApplication: the "UI thread" is that main thread (tasks go through GCD's
+// main queue), and the chain runs on a real-time thread of the addon's own.
+// The audio process loads this same addon only as a client: process() copies
+// each block into shared memory, wakes that thread and waits for the result
+// (see `bridge` below; serveAudio() / connectAudio() set the two ends up).
+//
 // Every plugin lives in a named slot (the rack's slot id). Exports:
 //   init(onEvent)                          start the UI thread; onEvent(type, payload)
 //   getModulePaths() -> string[]           standard VST3 folders (no loading)
@@ -32,6 +43,11 @@
 //                                          when `right` is omitted). An empty
 //                                          chain passes the signal through.
 //   shutdown()
+// macOS only:
+//   serveAudio() -> string                 main process: start the chain thread +
+//                                          shared memory; returns its name
+//   connectAudio(name)                     audio process: process() now runs the
+//                                          chain of the process that served `name`
 
 #include <node_api.h>
 
@@ -49,11 +65,31 @@
 #include "pluginterfaces/vst/ivstprocesscontext.h"
 #include "pluginterfaces/vst/vstspeaker.h"
 
+#ifdef _WIN32
 #include <windows.h>
+#else
+// This file is compiled as Objective-C++ (ARC) on macOS — see build.sh.
+#import <Cocoa/Cocoa.h>
+#include <dispatch/dispatch.h>
+#include <fcntl.h>
+#include <mach/mach.h>
+#include <mach/mach_time.h>
+#include <mach/thread_policy.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <strings.h>
+#include <sys/mman.h>
+#include <time.h>
+#include <unistd.h>
+#endif
+#if defined(_M_X64) || defined(__x86_64__)
 #include <xmmintrin.h>
+#endif
 
 #include <algorithm>
 #include <atomic>
+#include <cerrno>
+#include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <deque>
@@ -64,6 +100,10 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+#ifdef __APPLE__
+@class RQEditorWindowDelegate;
+#endif
 
 using namespace Steinberg;
 using namespace Steinberg::Vst;
@@ -321,6 +361,7 @@ private:
 
 struct Instance;
 
+#ifdef _WIN32
 class PlugFrame : public U::ImplementsNonDestroyable<U::Directly<IPlugFrame>>
 {
 public:
@@ -343,6 +384,32 @@ public:
 		return kResultOk;
 	}
 };
+#else
+class PlugFrame : public U::ImplementsNonDestroyable<U::Directly<IPlugFrame>>
+{
+public:
+	__unsafe_unretained NSWindow* window = nil; // the Instance owns it
+	IPlugView* view = nullptr;
+	bool resizing = false;
+
+	/** Keeps the window's top-left corner where it is (AppKit's origin is the
+	 *  bottom-left, so a plain setContentSize would move the title bar). */
+	tresult PLUGIN_API resizeView (IPlugView* v, ViewRect* r) override
+	{
+		if (!window || !r || v != view)
+			return kInvalidArgument;
+		const NSRect old = window.frame;
+		NSRect next = [window frameRectForContentRect:NSMakeRect (0, 0, r->getWidth (), r->getHeight ())];
+		next.origin.x = old.origin.x;
+		next.origin.y = NSMaxY (old) - next.size.height;
+		resizing = true;
+		[window setFrame:next display:YES];
+		resizing = false;
+		view->onSize (r);
+		return kResultOk;
+	}
+};
+#endif
 
 struct Instance
 {
@@ -371,7 +438,48 @@ struct Instance
 	// Editor (UI thread only).
 	IPtr<IPlugView> view;
 	PlugFrame frame;
+#ifdef _WIN32
 	HWND hwnd = nullptr;
+#else
+	NSWindow* window = nil;
+	RQEditorWindowDelegate* windowDelegate = nil;
+#endif
+};
+
+bool editorIsOpen (const Instance& in)
+{
+#ifdef _WIN32
+	return in.hwnd != nullptr;
+#else
+	return in.window != nil;
+#endif
+}
+
+bool sameUid (const std::string& a, const std::string& b)
+{
+#ifdef _WIN32
+	return _stricmp (a.c_str (), b.c_str ()) == 0;
+#else
+	return strcasecmp (a.c_str (), b.c_str ()) == 0;
+#endif
+}
+
+/** Flush-to-zero + denormals-are-zero for the scope, as every DAW does. */
+struct DenormalGuard
+{
+#if defined(_M_X64) || defined(__x86_64__)
+	const unsigned int saved = _mm_getcsr ();
+	DenormalGuard () { _mm_setcsr (saved | 0x8040); }
+	~DenormalGuard () { _mm_setcsr (saved); }
+#elif defined(__aarch64__)
+	uint64_t saved = 0;
+	DenormalGuard ()
+	{
+		asm volatile ("mrs %0, fpcr" : "=r"(saved));
+		asm volatile ("msr fpcr, %0" ::"r"(saved | (1ull << 24))); // FZ
+	}
+	~DenormalGuard () { asm volatile ("msr fpcr, %0" ::"r"(saved)); }
+#endif
 };
 
 // Every loaded slot (UI thread writes, under gChainMutex) and the processing
@@ -464,23 +572,24 @@ bool processChunk (Instance& in, float* L, float* R, int32 count)
  *  128-frame budget, or after 1.5 s. */
 void warmUp (Instance& in)
 {
+	using Clock = std::chrono::steady_clock;
+	const auto msSince = [] (Clock::time_point t) {
+		return std::chrono::duration<double, std::milli> (Clock::now () - t).count ();
+	};
 	const int32 block = std::min (in.maxBlock, 128);
 	std::vector<float> l (block, 0.f), r (block, 0.f);
 	const double budgetMs = block * 1000.0 / in.sampleRate;
-	LARGE_INTEGER freq, t0, t1, start;
-	QueryPerformanceFrequency (&freq);
-	QueryPerformanceCounter (&start);
+	const auto start = Clock::now ();
 	int fastInARow = 0;
 	for (int i = 0; i < 400 && fastInARow < 8; ++i)
 	{
 		std::fill (l.begin (), l.end (), 0.f);
 		std::fill (r.begin (), r.end (), 0.f);
-		QueryPerformanceCounter (&t0);
+		const auto t0 = Clock::now ();
 		processChunk (in, l.data (), r.data (), block);
-		QueryPerformanceCounter (&t1);
-		const double ms = (t1.QuadPart - t0.QuadPart) * 1000.0 / freq.QuadPart;
+		const double ms = msSince (t0);
 		fastInARow = ms < budgetMs * 0.5 ? fastInARow + 1 : 0;
-		if ((t1.QuadPart - start.QuadPart) * 1000.0 / freq.QuadPart > 1500)
+		if (msSince (start) > 1500)
 			break;
 	}
 }
@@ -644,6 +753,9 @@ bool applyState (Instance& in, std::vector<char>& blob, std::string& err)
 // UI thread
 //------------------------------------------------------------------------
 
+HostApplication* gHostApp = nullptr;
+
+#ifdef _WIN32
 constexpr UINT WM_RQ_TASK = WM_APP + 1;
 const wchar_t* kMsgWindowClass = L"RiffQuestVstHostMsg";
 const wchar_t* kEditorWindowClass = L"RiffQuestVstEditor";
@@ -652,7 +764,8 @@ std::thread gUiThread;
 HWND gMsgWindow = nullptr;
 std::mutex gTaskMutex;
 std::deque<std::function<void ()>> gTasks;
-HostApplication* gHostApp = nullptr;
+
+bool uiRunning () { return gMsgWindow != nullptr; }
 
 void drainTasks ()
 {
@@ -829,6 +942,179 @@ bool openEditorOnUi (Instance& in, std::string& err)
 	return true;
 }
 
+#else // macOS: the "UI thread" is the main thread of the (Electron main) process
+
+std::atomic<bool> gUiRunning {false};
+
+bool uiRunning () { return gUiRunning.load (); }
+
+/** GCD's main queue: FIFO like the Win32 task queue, and drained by the main
+ *  run loop in every mode — also while a window is being dragged or a
+ *  plugin's own modal dialog is up. */
+void postToUi (std::function<void ()> task)
+{
+	auto* heap = new std::function<void ()> (std::move (task));
+	dispatch_async_f (dispatch_get_main_queue (), heap, [] (void* p) {
+		std::unique_ptr<std::function<void ()>> run (static_cast<std::function<void ()>*> (p));
+		(*run) ();
+	});
+}
+
+// ---- Editor windows ---------------------------------------------------
+
+void closeEditorOnUi (Instance& in, bool notify);
+
+} // namespace
+
+/** A plugin window's close button / resizing -> the slot it shows. */
+@interface RQEditorWindowDelegate : NSObject <NSWindowDelegate>
+@property (nonatomic, assign) Instance* instance;
+@end
+
+@implementation RQEditorWindowDelegate
+
+- (BOOL)windowShouldClose:(NSWindow*)sender
+{
+	// Close button / Cmd+W. Tear down on the next turn instead: releasing the
+	// window (and this delegate) inside its own callback would free them while
+	// AppKit is still in performClose: on them.
+	if (Instance* in = self.instance)
+	{
+		const std::string slot = in->slot;
+		postToUi ([slot] {
+			if (auto inst = findInstance (slot))
+				if (inst->window)
+					closeEditorOnUi (*inst, true);
+		});
+	}
+	return NO;
+}
+
+- (NSSize)windowWillResize:(NSWindow*)sender toSize:(NSSize)frameSize
+{
+	Instance* in = self.instance;
+	if (!in || !in->frame.view)
+		return frameSize;
+	const NSRect content = [sender contentRectForFrameRect:NSMakeRect (0, 0, frameSize.width, frameSize.height)];
+	ViewRect r {0, 0, (int32)content.size.width, (int32)content.size.height};
+	if (in->frame.view->checkSizeConstraint (&r) != kResultTrue)
+		return frameSize;
+	return [sender frameRectForContentRect:NSMakeRect (0, 0, r.getWidth (), r.getHeight ())].size;
+}
+
+- (void)windowDidResize:(NSNotification*)notification
+{
+	Instance* in = self.instance;
+	if (!in || !in->frame.view || in->frame.resizing || !in->window)
+		return;
+	const NSSize size = in->window.contentView.frame.size;
+	ViewRect r {0, 0, (int32)size.width, (int32)size.height};
+	in->frame.view->onSize (&r);
+}
+
+@end
+
+namespace {
+
+void closeEditorOnUi (Instance& in, bool notify)
+{
+	if (in.view)
+	{
+		in.view->setFrame (nullptr);
+		in.view->removed ();
+		in.view = nullptr;
+	}
+	in.frame.view = nullptr;
+	in.frame.window = nil;
+	if (in.window)
+	{
+		NSWindow* w = in.window;
+		in.window = nil;
+		w.delegate = nil;
+		[w orderOut:nil];
+		[w close];
+	}
+	in.windowDelegate.instance = nullptr;
+	in.windowDelegate = nil;
+	if (notify)
+		emitEvent ({"editor-closed", {{"slot", in.slot}}, {}});
+}
+
+/** The click that asked for the window landed in the renderer, so the app may
+ *  not be the active one (or the window sits behind the main one). */
+void bringToFront (NSWindow* window)
+{
+	[NSApp activateIgnoringOtherApps:YES];
+	if (window.miniaturized)
+		[window deminiaturize:nil];
+	[window makeKeyAndOrderFront:nil];
+}
+
+bool openEditorOnUi (Instance& in, std::string& err)
+{
+	if (in.window)
+	{
+		bringToFront (in.window);
+		return true;
+	}
+	if (!in.controller)
+	{
+		err = "plugin has no editor";
+		return false;
+	}
+	in.view = owned (in.controller->createView (ViewType::kEditor));
+	if (!in.view)
+	{
+		err = "plugin has no editor";
+		return false;
+	}
+	if (in.view->isPlatformTypeSupported (kPlatformTypeNSView) != kResultTrue)
+	{
+		in.view = nullptr;
+		err = "plugin editor does not support macOS";
+		return false;
+	}
+	ViewRect vr {};
+	in.view->getSize (&vr);
+	const bool resizable = in.view->canResize () == kResultTrue;
+	NSWindowStyleMask style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
+	if (resizable)
+		style |= NSWindowStyleMaskResizable;
+	const NSRect content = NSMakeRect (0, 0, std::max (vr.getWidth (), 200), std::max (vr.getHeight (), 100));
+	NSWindow* window = [[NSWindow alloc] initWithContentRect:content
+	                                               styleMask:style
+	                                                 backing:NSBackingStoreBuffered
+	                                                   defer:NO];
+	if (!window)
+	{
+		in.view = nullptr;
+		err = "could not create the editor window";
+		return false;
+	}
+	window.releasedWhenClosed = NO; // ARC owns it (in.window)
+	window.title = [NSString stringWithUTF8String:(in.name + " \xC2\xB7 riff.quest").c_str ()] ?: @"riff.quest";
+	[window center];
+	in.window = window;
+	in.windowDelegate = [RQEditorWindowDelegate new];
+	in.windowDelegate.instance = &in;
+	window.delegate = in.windowDelegate;
+	in.frame.window = window;
+	in.frame.view = in.view;
+	in.view->setFrame (&in.frame);
+	// No IPlugViewContentScaleSupport here: on macOS the view follows the
+	// backing scale on its own (the VST3 spec says not to call it).
+	if (in.view->attached ((__bridge void*)window.contentView, kPlatformTypeNSView) != kResultTrue)
+	{
+		closeEditorOnUi (in, false);
+		err = "plugin editor failed to attach";
+		return false;
+	}
+	bringToFront (window);
+	return true;
+}
+
+#endif
+
 // ---- Load / unload ----------------------------------------------------
 
 void handleRestart (std::weak_ptr<Instance> weak, int32 flags);
@@ -855,7 +1141,7 @@ std::shared_ptr<Instance> loadOnUi (const std::string& slot, const std::string& 
 	{
 		if (ci.category () != kVstAudioEffectClass)
 			continue;
-		if (!uid.empty () && _stricmp (ci.ID ().toString ().c_str (), uid.c_str ()) != 0)
+		if (!uid.empty () && !sameUid (ci.ID ().toString (), uid))
 			continue;
 		in->provider = owned (new PlugProvider (factory, ci, true));
 		if (!in->provider->initialize ())
@@ -913,7 +1199,23 @@ void destroyOnUi (std::shared_ptr<Instance> in)
 	in->component = nullptr;
 	in->controller = nullptr;
 	in->provider = nullptr; // terminates + disconnects component/controller
-	in->module = nullptr;   // FreeLibrary
+	in->module = nullptr;   // FreeLibrary / CFBundle release
+}
+
+/** UI thread: unloads every slot. */
+void destroyAll ()
+{
+	std::vector<std::shared_ptr<Instance>> all;
+	{
+		std::lock_guard<std::mutex> lock (gChainMutex);
+		for (auto& e : gInstances)
+			all.push_back (e.second);
+		gInstances.clear ();
+		gChainOrder.clear ();
+		gChain.clear ();
+	}
+	for (auto& in : all)
+		destroyOnUi (in);
 }
 
 /** Detaches a slot from the audio thread, returning its instance. */
@@ -950,6 +1252,7 @@ void handleRestart (std::weak_ptr<Instance> weak, int32 flags)
 	});
 }
 
+#ifdef _WIN32
 void uiThreadMain (HANDLE ready)
 {
 	OleInitialize (nullptr);
@@ -985,6 +1288,7 @@ void uiThreadMain (HANDLE ready)
 	gMsgWindow = nullptr;
 	OleUninitialize ();
 }
+#endif
 
 //------------------------------------------------------------------------
 // Promise plumbing
@@ -1004,7 +1308,7 @@ napi_value runOnUi (napi_env env, std::function<Result (std::string& err)> work,
 	napi_deferred deferred;
 	napi_value promise;
 	napi_create_promise (env, &deferred, &promise);
-	if (!gMsgWindow || !gTsfn)
+	if (!uiRunning () || !gTsfn)
 	{
 		napi_value msg, error;
 		napi_create_string_utf8 (env, "vsthost not initialised", NAPI_AUTO_LENGTH, &msg);
@@ -1058,7 +1362,7 @@ InfoData infoOf (const std::shared_ptr<Instance>& in)
 	d.maxBlock = in->maxBlock;
 	d.inChannels = in->mainIn;
 	d.outChannels = in->mainOut;
-	d.editorOpen = in->hwnd != nullptr;
+	d.editorOpen = editorIsOpen (*in);
 	return d;
 }
 
@@ -1123,10 +1427,18 @@ napi_value Init (napi_env env, napi_callback_info info)
 		PluginContextFactory::instance ().setPluginContext (gHostApp);
 	}
 
+#ifdef _WIN32
 	HANDLE ready = CreateEventW (nullptr, TRUE, FALSE, nullptr);
 	gUiThread = std::thread (uiThreadMain, ready);
 	WaitForSingleObject (ready, 5000);
 	CloseHandle (ready);
+#else
+	// Tasks go to the main queue, which only a main thread running a Cocoa run
+	// loop drains — i.e. the Electron main process, never the audio process.
+	if (![NSThread isMainThread])
+		return throwError (env, "init() must run on the main thread on macOS");
+	gUiRunning = true;
+#endif
 	napi_add_env_cleanup_hook (env, envCleanup, nullptr);
 	return makeUndefined (env);
 }
@@ -1349,7 +1661,7 @@ napi_value CloseEditor (napi_env env, napi_callback_info info)
 	    env,
 	    [slot] (std::string&) {
 		    auto in = findInstance (slot);
-		    const bool wasOpen = in && in->hwnd;
+		    const bool wasOpen = in && editorIsOpen (*in);
 		    if (wasOpen)
 			    closeEditorOnUi (*in, true);
 		    return wasOpen;
@@ -1367,6 +1679,288 @@ napi_value GetInfo (napi_env env, napi_callback_info info)
 	}
 	return infoToJs (env, infoOf (in));
 }
+
+/** The whole chain, in place: mono guitar in `left` (copied to `right` first —
+ *  the same on both sides going in), stereo out in left/right. Caller holds
+ *  gChainMutex. */
+bool runChain (float* left, float* right, size_t n)
+{
+	memcpy (right, left, n * sizeof (float));
+	DenormalGuard guard;
+	bool ok = true;
+	for (auto& inst : gChain)
+	{
+		Instance& in = *inst;
+		for (size_t pos = 0; pos < n; pos += (size_t)in.maxBlock)
+		{
+			const int32 count = (int32)std::min ((size_t)in.maxBlock, n - pos);
+			if (!processChunk (in, left + pos, right + pos, count))
+				ok = false;
+		}
+	}
+	return ok;
+}
+
+#ifdef __APPLE__
+//------------------------------------------------------------------------
+// macOS audio bridge: the audio process's process() -> the chain thread of
+// the main process, one block at a time.
+//
+// One shared buffer, owned by whoever's turn it is: the client may write it
+// only while response == request (the server is idle), bumps `request` and
+// posts the semaphore; the server runs the chain on it and sets
+// response = request. A client that gives up on a slow block (silence) leaves
+// the buffer to the server until it catches up — those blocks are silent
+// too, rather than racing it.
+//------------------------------------------------------------------------
+namespace bridge {
+
+constexpr uint32_t kMaxFrames = 4096;
+
+struct Shared
+{
+	std::atomic<uint32_t> request;
+	std::atomic<uint32_t> response;
+	std::atomic<uint32_t> ok;
+	uint32_t frames;
+	float left[kMaxFrames];
+	float right[kMaxFrames];
+};
+static_assert (std::atomic<uint32_t>::is_always_lock_free, "shared-memory atomics must be lock-free");
+
+/** Names live in one global namespace, 31 chars max. */
+std::string shmName (pid_t pid) { return "/rq.vst." + std::to_string (pid); }
+std::string semName (const std::string& shm) { return shm + ".go"; }
+
+Shared* mapShared (int fd)
+{
+	void* p = mmap (nullptr, sizeof (Shared), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	return p == MAP_FAILED ? nullptr : static_cast<Shared*> (p);
+}
+
+// ---- Server (main process) --------------------------------------------
+
+Shared* gServed = nullptr;
+sem_t* gServedWake = SEM_FAILED;
+std::string gServedName;
+std::thread gServeThread;
+std::atomic<bool> gServeStop {false};
+
+/** Mach real-time band, like a DAW's audio threads: not demoted behind the
+ *  browser's work, and kept on the performance cores. */
+void makeRealtime ()
+{
+	mach_timebase_info_data_t tb;
+	mach_timebase_info (&tb);
+	const auto abs = [&] (double ms) { return (uint32_t)(ms * 1e6 * tb.denom / tb.numer); };
+	thread_time_constraint_policy_data_t policy;
+	policy.period = 0;
+	policy.computation = abs (1.0);
+	policy.constraint = abs (3.0);
+	policy.preemptible = TRUE;
+	thread_policy_set (pthread_mach_thread_np (pthread_self ()), THREAD_TIME_CONSTRAINT_POLICY,
+	                   (thread_policy_t)&policy, THREAD_TIME_CONSTRAINT_POLICY_COUNT);
+}
+
+void serveMain ()
+{
+	pthread_setname_np ("riff.quest VST chain");
+	makeRealtime ();
+	Shared& s = *gServed;
+	for (;;)
+	{
+		if (sem_wait (gServedWake) != 0)
+		{
+			if (errno == EINTR)
+				continue;
+			return;
+		}
+		if (gServeStop)
+			return;
+		const uint32_t req = s.request.load (std::memory_order_acquire);
+		if (req == s.response.load (std::memory_order_relaxed))
+			continue;
+		const uint32_t n = std::min (s.frames, kMaxFrames);
+		bool ok = false;
+		{
+			std::unique_lock<std::mutex> lock (gChainMutex, std::try_to_lock);
+			if (lock.owns_lock ())
+				ok = runChain (s.left, s.right, n);
+		}
+		s.ok.store (ok ? 1 : 0, std::memory_order_relaxed);
+		s.response.store (req, std::memory_order_release);
+	}
+}
+
+void closeServed ()
+{
+	if (gServed)
+		munmap (gServed, sizeof (Shared));
+	gServed = nullptr;
+	if (gServedWake != SEM_FAILED)
+		sem_close (gServedWake);
+	gServedWake = SEM_FAILED;
+	if (!gServedName.empty ())
+	{
+		shm_unlink (gServedName.c_str ());
+		sem_unlink (semName (gServedName).c_str ());
+	}
+	gServedName.clear ();
+}
+
+/** Idempotent: a respawned audio process connects to the same one. */
+std::string serve (std::string& err)
+{
+	if (!gServedName.empty ())
+		return gServedName;
+	const std::string name = shmName (getpid ());
+	shm_unlink (name.c_str ()); // left over by a crashed run with a recycled pid
+	sem_unlink (semName (name).c_str ());
+	const int fd = shm_open (name.c_str (), O_CREAT | O_EXCL | O_RDWR, 0600);
+	if (fd < 0)
+	{
+		err = std::string ("shm_open: ") + strerror (errno);
+		return {};
+	}
+	gServedName = name;
+	if (ftruncate (fd, sizeof (Shared)) != 0 || !(gServed = mapShared (fd)))
+	{
+		err = std::string ("shared memory: ") + strerror (errno);
+		close (fd);
+		closeServed ();
+		return {};
+	}
+	close (fd);
+	gServedWake = sem_open (semName (name).c_str (), O_CREAT | O_EXCL, 0600, 0);
+	if (gServedWake == SEM_FAILED)
+	{
+		err = std::string ("sem_open: ") + strerror (errno);
+		closeServed ();
+		return {};
+	}
+	gServeStop = false;
+	gServeThread = std::thread (serveMain);
+	return gServedName;
+}
+
+void stopServing ()
+{
+	if (!gServeThread.joinable ())
+		return;
+	gServeStop = true;
+	sem_post (gServedWake);
+	gServeThread.join ();
+	closeServed ();
+}
+
+// ---- Client (audio process) -------------------------------------------
+
+Shared* gPeer = nullptr;
+sem_t* gPeerWake = SEM_FAILED;
+std::string gPeerName;
+
+bool connected () { return gPeer != nullptr; }
+
+void disconnect ()
+{
+	if (gPeer)
+		munmap (gPeer, sizeof (Shared));
+	gPeer = nullptr;
+	if (gPeerWake != SEM_FAILED)
+		sem_close (gPeerWake);
+	gPeerWake = SEM_FAILED;
+	gPeerName.clear ();
+}
+
+bool connect (const std::string& name, std::string& err)
+{
+	if (gPeer && name == gPeerName)
+		return true;
+	disconnect ();
+	const int fd = shm_open (name.c_str (), O_RDWR, 0600);
+	if (fd < 0)
+	{
+		err = std::string ("shm_open: ") + strerror (errno);
+		return false;
+	}
+	Shared* shared = mapShared (fd);
+	close (fd);
+	if (!shared)
+	{
+		err = std::string ("mmap: ") + strerror (errno);
+		return false;
+	}
+	sem_t* wake = sem_open (semName (name).c_str (), 0);
+	if (wake == SEM_FAILED)
+	{
+		err = std::string ("sem_open: ") + strerror (errno);
+		munmap (shared, sizeof (Shared));
+		return false;
+	}
+	gPeer = shared;
+	gPeerWake = wake;
+	gPeerName = name;
+	return true;
+}
+
+inline void cpuRelax ()
+{
+#if defined(__aarch64__)
+	__builtin_arm_yield ();
+#else
+	_mm_pause ();
+#endif
+}
+
+/** Spins briefly (the usual answer is a fraction of a block away), then naps.
+ *  Gives up only on a server that stopped answering altogether. */
+bool waitFor (Shared& s, uint32_t req)
+{
+	using Clock = std::chrono::steady_clock;
+	const auto start = Clock::now ();
+	const auto spinUntil = start + std::chrono::microseconds (300);
+	const auto giveUpAt = start + std::chrono::milliseconds (20);
+	for (;;)
+	{
+		if (s.response.load (std::memory_order_acquire) == req)
+			return true;
+		const auto now = Clock::now ();
+		if (now >= giveUpAt)
+			return false;
+		if (now < spinUntil)
+			cpuRelax ();
+		else
+		{
+			timespec nap {0, 20000};
+			nanosleep (&nap, nullptr);
+		}
+	}
+}
+
+/** Same contract as runChain(), across the process boundary. */
+bool process (float* left, float* right, size_t n)
+{
+	Shared& s = *gPeer;
+	for (size_t pos = 0; pos < n; pos += kMaxFrames)
+	{
+		const uint32_t count = (uint32_t)std::min<size_t> (kMaxFrames, n - pos);
+		const uint32_t prev = s.request.load (std::memory_order_relaxed);
+		if (s.response.load (std::memory_order_acquire) != prev)
+			return false; // still on a block we gave up on
+		memcpy (s.left, left + pos, count * sizeof (float));
+		s.frames = count;
+		s.request.store (prev + 1, std::memory_order_release);
+		sem_post (gPeerWake);
+		if (!waitFor (s, prev + 1) || !s.ok.load (std::memory_order_relaxed))
+			return false;
+		memcpy (left + pos, s.left, count * sizeof (float));
+		memcpy (right + pos, s.right, count * sizeof (float));
+	}
+	return true;
+}
+
+} // namespace bridge
+#endif
 
 /** process(left, n = left.length, right?) -> boolean. */
 napi_value Process (napi_env env, napi_callback_info info)
@@ -1399,10 +1993,6 @@ napi_value Process (napi_env env, napi_callback_info info)
 		}
 	}
 
-	std::unique_lock<std::mutex> lock (gChainMutex, std::try_to_lock);
-	if (!lock.owns_lock ())
-		return makeBool (env, false);
-
 	// Mono callers get a scratch right channel, folded back at the end.
 	static std::vector<float> scratch;
 	const bool fold = right == nullptr;
@@ -1412,50 +2002,74 @@ napi_value Process (napi_env env, napi_callback_info info)
 			scratch.resize (n);
 		right = scratch.data ();
 	}
-	memcpy (right, left, n * sizeof (float)); // the guitar is mono: same on both sides going in
 
-	const unsigned int csr = _mm_getcsr ();
-	_mm_setcsr (csr | 0x8040); // flush-to-zero + denormals-are-zero, as every DAW does
-
-	bool ok = true;
-	for (auto& inst : gChain)
+	bool ok = false;
+#ifdef __APPLE__
+	if (bridge::connected ())
+		ok = bridge::process (left, right, n);
+	else
+#endif
 	{
-		Instance& in = *inst;
-		for (size_t pos = 0; pos < n; pos += (size_t)in.maxBlock)
-		{
-			const int32 count = (int32)std::min ((size_t)in.maxBlock, n - pos);
-			if (!processChunk (in, left + pos, right + pos, count))
-				ok = false;
-		}
+		std::unique_lock<std::mutex> lock (gChainMutex, std::try_to_lock);
+		if (!lock.owns_lock ())
+			return makeBool (env, false);
+		ok = runChain (left, right, n);
 	}
-	_mm_setcsr (csr);
+	if (!ok)
+		return makeBool (env, false); // the JS side plays silence for this block
 
 	if (fold)
 		for (size_t i = 0; i < n; ++i)
 			left[i] = 0.5f * (left[i] + right[i]);
-	return makeBool (env, ok);
+	return makeBool (env, true);
 }
+
+#ifdef __APPLE__
+napi_value ServeAudio (napi_env env, napi_callback_info)
+{
+	std::string err;
+	const std::string name = bridge::serve (err);
+	if (name.empty ())
+		return throwError (env, "could not start the plugin audio thread: " + err);
+	return makeString (env, name);
+}
+
+napi_value ConnectAudio (napi_env env, napi_callback_info info)
+{
+	size_t argc = 1;
+	napi_value argv[1];
+	napi_get_cb_info (env, info, &argc, argv, nullptr, nullptr);
+	if (argc < 1)
+		return throwError (env, "connectAudio(name)");
+	std::string err;
+	if (!bridge::connect (getString (env, argv[0]), err))
+		return throwError (env, "could not reach the plugin host: " + err);
+	return makeUndefined (env);
+}
+#endif
 
 /** Unloads every plugin and ends the UI thread. Safe to call more than once. */
 void stopUiThread ()
 {
+#ifdef _WIN32
 	if (!gUiThread.joinable ())
 		return;
 	postToUi ([] {
-		std::vector<std::shared_ptr<Instance>> all;
-		{
-			std::lock_guard<std::mutex> lock (gChainMutex);
-			for (auto& e : gInstances)
-				all.push_back (e.second);
-			gInstances.clear ();
-			gChainOrder.clear ();
-			gChain.clear ();
-		}
-		for (auto& in : all)
-			destroyOnUi (in);
+		destroyAll ();
 		PostQuitMessage (0);
 	});
 	gUiThread.join ();
+#else
+	bridge::stopServing ();
+	if (!gUiRunning.exchange (false))
+		return;
+	if ([NSThread isMainThread])
+		destroyAll ();
+	else
+		dispatch_sync (dispatch_get_main_queue (), ^{
+		  destroyAll ();
+		});
+#endif
 }
 
 napi_value Shutdown (napi_env env, napi_callback_info)
@@ -1474,6 +2088,9 @@ napi_value Shutdown (napi_env env, napi_callback_info)
 void envCleanup (void*)
 {
 	stopUiThread ();
+#ifdef __APPLE__
+	bridge::disconnect ();
+#endif
 	gTsfn = nullptr; // Node tears the threadsafe function down itself here
 }
 
@@ -1494,6 +2111,10 @@ napi_value ModuleInit (napi_env env, napi_value exports)
 	    {"getInfo", nullptr, GetInfo, nullptr, nullptr, nullptr, napi_default, nullptr},
 	    {"process", nullptr, Process, nullptr, nullptr, nullptr, napi_default, nullptr},
 	    {"shutdown", nullptr, Shutdown, nullptr, nullptr, nullptr, napi_default, nullptr},
+#ifdef __APPLE__
+	    {"serveAudio", nullptr, ServeAudio, nullptr, nullptr, nullptr, napi_default, nullptr},
+	    {"connectAudio", nullptr, ConnectAudio, nullptr, nullptr, nullptr, napi_default, nullptr},
+#endif
 	};
 	napi_define_properties (env, exports, sizeof (props) / sizeof (props[0]), props);
 	return exports;

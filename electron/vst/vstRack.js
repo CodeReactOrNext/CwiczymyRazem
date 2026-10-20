@@ -2,7 +2,9 @@
 // ordered chain of plugins that replaces the whole built-in chain when the
 // amp's toneMode is "vst". AmpChain calls processBlock() from the audio
 // callback; every edit (add, remove, reorder, bypass) and every plugin
-// window goes through the addon's own UI thread, never the callback.
+// window goes through the addon's own UI thread, never the callback. (On
+// macOS the plugins themselves run in the main process and the addon here is
+// a stand-in for it — see ./vstRemote; the rack doesn't know the difference.)
 //
 // The rack is saved to disk as it changes (./vstStore) and comes back as it was
 // on the next launch. Plugins load lazily — the first time the rack is actually
@@ -350,6 +352,6 @@ function createRack({ loadAddon, store, newSlotId = () => crypto.randomBytes(8).
   };
 }
 
-const rack = createRack({ loadAddon: require("./vstAddon").load, store: require("./vstStore") });
+const rack = createRack({ loadAddon: require("./vstAddon").loadForRack, store: require("./vstStore") });
 
 module.exports = { ...rack, createRack };

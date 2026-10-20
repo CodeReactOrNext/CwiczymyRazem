@@ -21,6 +21,7 @@ files:
   - "!electron/vst/third_party/**"
   - "!electron/vst/build/**"
   - "!electron/vst/build.bat"
+  - "!electron/vst/build.sh"
   - "!electron/vst/README.md"
   - "!electron/vst/**/*.test.js"
   - public/favicon/**/*

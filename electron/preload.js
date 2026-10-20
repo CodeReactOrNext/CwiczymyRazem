@@ -114,11 +114,13 @@ contextBridge.exposeInMainWorld("toneStudio", {
   importNamModel: () => ipcRenderer.invoke("tone:import-nam-model"),
 });
 
-// VST3 plugin rack for Tone Studio. Windows-only for now (see
+// VST3 plugin rack for Tone Studio. Windows x64 and Apple Silicon Macs (see
 // electron/vst/vstAddon.js); each plugin's own controls live in its native
 // window, opened through here.
 contextBridge.exposeInMainWorld("vstHost", {
-  isAvailable: process.platform === "win32",
+  isAvailable:
+    (process.platform === "win32" && process.arch === "x64") ||
+    (process.platform === "darwin" && process.arch === "arm64"),
 
   // ── Library: what's installed ──
   /** { scannedAt, plugins: [{ id, name, vendor, subCategories, source, sourcePath? }],

@@ -1,20 +1,22 @@
 // Loads electron/vst/bin/<platform>-<arch>/vsthost.node, or explains why not.
-// Windows-only for now (VST3 hosting on macOS needs AU/VST3 bundle loading and
-// Cocoa editor windows — not built yet); every caller treats a null addon as
+// Windows x64 and Apple Silicon macOS; every caller treats a null addon as
 // "plugins unavailable" and the rest of the audio engine carries on.
 const path = require("path");
+
+const SUPPORTED = ["win32-x64", "darwin-arm64"];
 
 let cached = null;
 
 function load() {
   if (cached) return cached;
-  if (process.platform !== "win32" || process.arch !== "x64") {
-    cached = { addon: null, error: "VST plugins are only supported on Windows (x64) for now." };
+  const target = `${process.platform}-${process.arch}`;
+  if (!SUPPORTED.includes(target)) {
+    cached = { addon: null, error: "VST plugins are only supported on Windows (x64) and Apple Silicon Macs for now." };
     return cached;
   }
   // electron-builder unpacks *.node next to app.asar (asarUnpack) — require()
   // resolves the .asar path to the unpacked copy on its own.
-  const file = path.join(__dirname, "bin", `${process.platform}-${process.arch}`, "vsthost.node");
+  const file = path.join(__dirname, "bin", target, "vsthost.node");
   try {
     cached = { addon: require(file), error: null };
   } catch (err) {
@@ -23,4 +25,14 @@ function load() {
   return cached;
 }
 
-module.exports = { load };
+/** What ./vstRack drives. Windows: the addon itself — the rack and its plugins
+ *  share the audio process. macOS: a stand-in whose plugins live in the main
+ *  process (see ./vstRemote for why). */
+function loadForRack() {
+  const { addon, error } = load();
+  if (!addon || process.platform !== "darwin") return { addon, error };
+  if (!process.parentPort) return { addon: null, error: "VST plugins on macOS need the app's main process to host them." };
+  return { addon: require("./vstRemote").connectAudioProcess(addon), error: null };
+}
+
+module.exports = { load, loadForRack };

@@ -34,6 +34,12 @@ describe("friendlyError", () => {
     expect(friendlyError("timed out")).toMatch(/too long/);
     expect(friendlyError("crashed (exit code 255)")).toMatch(/crashed/);
   });
+  it("explains macOS bundle failures", () => {
+    expect(
+      friendlyError("The bundle “Amp” couldn’t be loaded because it doesn’t contain a version for the current architecture."),
+    ).toMatch(/Apple Silicon/);
+    expect(friendlyError("Calling 'bundleEntry' failed")).toMatch(/licence/);
+  });
 });
 
 describe("buildCatalog", () => {
@@ -192,9 +198,22 @@ describe("walkFolder / resolveBundle", () => {
     fs.mkdirSync(path.join(root, "Broken.vst3")); // bundle without a Windows binary
     fs.writeFileSync(path.join(root, "readme.txt"), "x");
 
-    const found = walkFolder(root).map((p) => path.relative(root, p)).sort();
+    const found = walkFolder(root, "win32").map((p) => path.relative(root, p)).sort();
     expect(found).toEqual([path.join("Amp.vst3", "Contents", "x86_64-win", "Amp.vst3"), path.join("Vendor", "Plain.vst3")]);
-    expect(resolveBundle(bundle)).toBe(path.join(bundle, "Contents", "x86_64-win", "Amp.vst3"));
-    expect(resolveBundle(path.join(root, "missing.vst3"))).toBeNull();
+    expect(resolveBundle(bundle, "win32")).toBe(path.join(bundle, "Contents", "x86_64-win", "Amp.vst3"));
+    expect(resolveBundle(path.join(root, "missing.vst3"), "win32")).toBeNull();
+  });
+
+  it("keeps macOS bundles as the bundle path (CFBundle loads the folder)", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "vst-walk-mac-"));
+    const bundle = path.join(root, "Vendor", "Amp.vst3");
+    fs.mkdirSync(path.join(bundle, "Contents", "MacOS"), { recursive: true });
+    fs.writeFileSync(path.join(bundle, "Contents", "MacOS", "Amp"), "x");
+    fs.mkdirSync(path.join(root, "Broken.vst3")); // no Contents/MacOS
+    fs.mkdirSync(path.join(root, "Win.vst3", "Contents", "x86_64-win"), { recursive: true });
+
+    expect(walkFolder(root, "darwin")).toEqual([bundle]);
+    expect(resolveBundle(bundle, "darwin")).toBe(bundle);
+    expect(resolveBundle(path.join(root, "Win.vst3"), "darwin")).toBeNull();
   });
 });

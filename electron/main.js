@@ -519,7 +519,9 @@ ipcMain.handle("vst:add-file", async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     title: "Add a VST3 plugin",
     filters: [{ name: "VST3 plugin", extensions: ["vst3"] }],
-    properties: ["openFile"],
+    // A macOS .vst3 is a bundle folder, which the picker only lets you choose
+    // as a folder (addFile rejects anything that isn't a .vst3).
+    properties: process.platform === "darwin" ? ["openFile", "openDirectory"] : ["openFile"],
   });
   if (result.canceled || !result.filePaths[0]) return null;
   return vstScanner.addFile(result.filePaths[0]);

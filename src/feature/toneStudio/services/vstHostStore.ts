@@ -18,7 +18,7 @@ import { create } from "zustand";
  */
 
 interface VstHostState {
-  /** True once the bridge has been seen (client, Windows desktop). */
+  /** True once the bridge has been seen (desktop app on Windows / Apple Silicon Mac). */
   available: boolean;
   library: VstLibrary | null;
   /** A scan or an add is reading plugin files right now. */

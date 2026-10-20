@@ -73,6 +73,9 @@ function spawn() {
   });
   child = proc;
   rpc = createRpcClient(proc, { onEvent: handleEvent });
+  // macOS: the engine's VST rack hosts its plugins here, in the main process
+  // (AppKit needs a main thread that isn't carrying audio) — see vst/vstRemote.js.
+  if (process.platform === "darwin") require("./vst/vstRemote").serveEngine(proc);
 
   proc.on("exit", (code) => {
     if (child !== proc) return; // an older instance we already replaced

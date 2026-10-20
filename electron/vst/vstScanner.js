@@ -28,7 +28,11 @@ function isEffect(cls) {
  *  spike) — say that instead of a raw Win32 error. */
 function friendlyError(raw) {
   const msg = String(raw || "");
-  if (/LoadLibrary/i.test(msg)) return "The plugin refused to load — usually a missing licence or activation.";
+  // macOS (CFBundle): an Intel-only plugin can't load into the arm64 app.
+  if (/current architecture|incompatible architecture/i.test(msg)) return "This plugin isn't built for Apple Silicon (no arm64 version).";
+  if (/LoadLibrary|couldn.t be loaded|bundleEntry|Could not create Bundle/i.test(msg)) {
+    return "The plugin refused to load — usually a missing licence or activation.";
+  }
   if (/timed out/i.test(msg)) return "The plugin took too long to load (maybe waiting on a hidden dialog).";
   if (/crashed|exited/i.test(msg)) return "The plugin crashed while loading.";
   return msg || "Could not read the plugin.";
@@ -36,7 +40,10 @@ function friendlyError(raw) {
 
 function fingerprintOf(modulePath) {
   try {
-    const st = fs.statSync(modulePath);
+    let st = fs.statSync(modulePath);
+    // A macOS bundle folder's own mtime doesn't follow an update — its binary's does.
+    const binary = path.join(modulePath, "Contents", "MacOS", path.basename(modulePath, ".vst3"));
+    if (st.isDirectory() && fs.existsSync(binary)) st = fs.statSync(binary);
     return `${st.size}:${Math.round(st.mtimeMs)}`;
   } catch {
     return null;
@@ -135,37 +142,43 @@ function publicView(catalog) {
 
 // ── The player's own files and folders ───────────────────────────────────────
 
-/** A .vst3 bundle is a folder; its loadable binary sits inside. */
-function resolveBundle(p) {
+/** A .vst3 bundle is a folder. Windows loads the binary inside it; macOS
+ *  loads the bundle itself (CFBundle), so it stays the path. */
+function resolveBundle(p, platform = process.platform) {
   try {
     if (!fs.statSync(p).isDirectory()) return p;
   } catch {
     return null;
   }
+  if (platform === "darwin") return fs.existsSync(path.join(p, "Contents", "MacOS")) ? p : null;
   const inner = path.join(p, "Contents", "x86_64-win", path.basename(p));
   return fs.existsSync(inner) ? inner : null;
 }
 
 /** Every .vst3 under `dir` (bundles resolved, not descended into). */
-function walkFolder(dir, depth = 0, out = []) {
-  if (depth > 5) return out;
-  let entries = [];
-  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return out; }
-  for (const e of entries) {
-    const full = path.join(dir, e.name);
-    if (e.name.toLowerCase().endsWith(".vst3")) {
-      const resolved = resolveBundle(full);
-      if (resolved) out.push(resolved);
-    } else if (e.isDirectory()) {
-      walkFolder(full, depth + 1, out);
+function walkFolder(dir, platform = process.platform) {
+  const out = [];
+  const walk = (at, depth) => {
+    if (depth > 5) return;
+    let entries = [];
+    try { entries = fs.readdirSync(at, { withFileTypes: true }); } catch { return; }
+    for (const e of entries) {
+      const full = path.join(at, e.name);
+      if (e.name.toLowerCase().endsWith(".vst3")) {
+        const resolved = resolveBundle(full, platform);
+        if (resolved) out.push(resolved);
+      } else if (e.isDirectory()) {
+        walk(full, depth + 1);
+      }
     }
-  }
+  };
+  walk(dir, 0);
   return out;
 }
 
 function sourcePaths(sources) {
   return [
-    ...sources.files.map(resolveBundle).filter(Boolean),
+    ...sources.files.map((f) => resolveBundle(f)).filter(Boolean),
     ...sources.folders.flatMap((d) => walkFolder(d)),
   ];
 }
