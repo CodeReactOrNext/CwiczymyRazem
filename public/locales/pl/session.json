@@ -335,6 +335,51 @@
     "mute": "Wycisz",
     "main_instrument": "Główny instrument"
   },
+  "auto_backing": {
+    "title": "Podkład",
+    "toggle": "Generowany podkład",
+    "description": "Perkusja, bas i miękki pad napisane pod to ćwiczenie: w jego tonacji i zgodnie z jego akordami.",
+    "drums_only": "Tylko perkusja: nuty przechodzą przez wszystkie progi, więc każdy akord by z nimi zgrzytał.",
+    "drone": "Bas i power chordy na podstawie, bo nuty nie rozstrzygają, czy to dur, czy moll.",
+    "headphones": "Przy włączonym mikrofonie załóż słuchawki. Inaczej mikrofon usłyszy zespół jako twoje granie.",
+    "groove": {
+      "rock": "Rock",
+      "pop": "Pop",
+      "ballad": "Ballada",
+      "shuffle": "Shuffle",
+      "metal": "Metal",
+      "doom": "Doom",
+      "thrash": "Thrash",
+      "halftime": "Half-time",
+      "compound": "Feeling 6/8",
+      "waltz": "Walc",
+      "boss": "Walka z bossem"
+    },
+    "key": {
+      "major": "{{tonic}}-dur",
+      "minor": "{{tonic}}-moll",
+      "dorian": "{{tonic}} dorycka",
+      "mixolydian": "{{tonic}} miksolidyjska",
+      "phrygian": "{{tonic}} frygijska",
+      "lydian": "{{tonic}} lidyjska",
+      "harmonicMinor": "{{tonic}}-moll harmoniczna",
+      "majorPentatonic": "{{tonic}} pentatonika durowa",
+      "minorPentatonic": "{{tonic}} pentatonika molowa",
+      "blues": "{{tonic}} bluesowa",
+      "root": "Podstawa {{tonic}}"
+    },
+    "track": {
+      "drums": "Perkusja",
+      "bass": "Bas",
+      "keys": "Pad",
+      "arp": "Arpeggio"
+    },
+    "headphones_toast": {
+      "title": "Podkład jest włączony",
+      "body": "Przy włączonym mikrofonie załóż słuchawki — inaczej mikrofon usłyszy zespół jako twoje granie. Zmienisz to w każdej chwili w menu Głośność.",
+      "off": "Wyłącz"
+    }
+  },
   "interval_click": {
     "now_above": "Teraz {{interval}} nad tym dźwiękiem podstawowym — w jego zasięgu",
     "click_any": "Kliknij dowolne {{note}}",

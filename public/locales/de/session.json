@@ -333,6 +333,51 @@
     "mute": "Stumm",
     "main_instrument": "Hauptinstrument"
   },
+  "auto_backing": {
+    "title": "Backing Track",
+    "toggle": "Generierter Backing Track",
+    "description": "Schlagzeug, Bass und ein weiches Pad für genau diese Übung, in ihrer Tonart und nach ihren Akkorden.",
+    "drums_only": "Nur Schlagzeug: Die Töne laufen über alle Bünde, jeder Akkord würde mit ihnen reiben.",
+    "drone": "Bass und Powerchords auf dem Grundton, weil die Töne weder Dur noch Moll festlegen.",
+    "headphones": "Mit aktivem Mikrofon Kopfhörer aufsetzen. Sonst hört das Mikrofon die Band als dein Spiel.",
+    "groove": {
+      "rock": "Rock",
+      "pop": "Pop",
+      "ballad": "Ballade",
+      "shuffle": "Shuffle",
+      "metal": "Metal",
+      "doom": "Doom",
+      "thrash": "Thrash",
+      "halftime": "Half-Time",
+      "compound": "6/8-Feel",
+      "waltz": "Walzer",
+      "boss": "Bosskampf"
+    },
+    "key": {
+      "major": "{{tonic}}-Dur",
+      "minor": "{{tonic}}-Moll",
+      "dorian": "{{tonic}} Dorisch",
+      "mixolydian": "{{tonic}} Mixolydisch",
+      "phrygian": "{{tonic}} Phrygisch",
+      "lydian": "{{tonic}} Lydisch",
+      "harmonicMinor": "{{tonic}} harmonisch Moll",
+      "majorPentatonic": "{{tonic}}-Dur-Pentatonik",
+      "minorPentatonic": "{{tonic}}-Moll-Pentatonik",
+      "blues": "{{tonic}} Blues",
+      "root": "Grundton {{tonic}}"
+    },
+    "track": {
+      "drums": "Schlagzeug",
+      "bass": "Bass",
+      "keys": "Pad",
+      "arp": "Arpeggio"
+    },
+    "headphones_toast": {
+      "title": "Der Backing Track ist an",
+      "body": "Mit aktivem Mikrofon Kopfhörer aufsetzen — sonst hört das Mikrofon die Band als dein Spiel. Ändern kannst du das jederzeit im Lautstärke-Menü.",
+      "off": "Ausschalten"
+    }
+  },
   "interval_click": {
     "now_above": "Jetzt die {{interval}} über diesem Grundton – in seiner Reichweite",
     "click_any": "Klick ein beliebiges {{note}}",

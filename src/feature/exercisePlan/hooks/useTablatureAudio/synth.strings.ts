@@ -13,13 +13,16 @@ export interface StringPlayers {
   vocals:      Soundfont.Player | null;
 }
 
+/** Every pitched track type — everything but the drums. */
+type PitchedTrackType = "guitar" | "bass" | "vocals" | "keys" | "arp";
+
 // ── Dead note: percussive thud, no pitch ──────────────────────────────────────
 
 export function playDeadNote(
   ctx: AudioContext,
   t: number,
-  trackGain: GainNode,
-  trackType: "guitar" | "bass" | "vocals",
+  trackGain: AudioNode,
+  trackType: PitchedTrackType,
 ): void {
   const dur = 0.035;
   const ns  = ctx.createBufferSource(); ns.buffer = getCachedNoiseBuffer(ctx, 35);
@@ -39,7 +42,7 @@ export function playHarmonicNote(
   ctx: AudioContext,
   freq: number,
   t: number,
-  trackGain: GainNode,
+  trackGain: AudioNode,
   duration: number,
   gainScale = 1,
 ): void {
@@ -72,9 +75,9 @@ export function playStringNote(
   ctx: AudioContext,
   note: TablatureNote,
   time: number,
-  trackGain: GainNode,
+  trackGain: AudioNode,
   duration: number,
-  trackType: "guitar" | "bass" | "vocals",
+  trackType: PitchedTrackType,
   trackId: string,
   activeNodes: Map<string, any>,
   players: StringPlayers,
@@ -90,7 +93,8 @@ export function playStringNote(
   let midiNote: number;
   let freq: number;
 
-  if (trackType === "vocals" && note.midiNote !== undefined) {
+  // Vocals and keys are written as pitches, not frets: there is no string to count from.
+  if ((trackType === "vocals" || trackType === "keys" || trackType === "arp") && note.midiNote !== undefined) {
     midiNote = note.midiNote;
     freq     = 440 * Math.pow(2, (midiNote - 69) / 12);
   } else {
@@ -133,6 +137,10 @@ export function playStringNote(
   let player: Soundfont.Player | null = null;
   if (trackType === "vocals") {
     player = players.vocals;
+  } else if (trackType === "keys" || trackType === "arp") {
+    // A generated backing's keys play on its AmbientBand; this is only the
+    // fallback for when there is no band, so it goes to the synth.
+    player = null;
   } else if (trackType === "bass") {
     player = players.bass;
   } else if (note.isPalmMute && players.mutedGuitar) {

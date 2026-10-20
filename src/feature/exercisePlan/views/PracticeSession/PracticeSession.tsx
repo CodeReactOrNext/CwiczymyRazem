@@ -1,5 +1,8 @@
 import "react-circular-progressbar/dist/styles.css";
 
+import { useAutoBacking } from "feature/autoBacking/hooks/useAutoBacking";
+import { useHeadphonesHint } from "feature/autoBacking/hooks/useHeadphonesHint";
+import { useAutoBackingStore } from "feature/autoBacking/store/autoBackingStore";
 import { BackingTrackBar } from "feature/backingTrack/components/BackingTrackBar";
 import { useBackingTrackSession } from "feature/backingTrack/hooks/useBackingTrackSession";
 import { barBeatsOf } from "feature/backingTrack/utils/alignment";
@@ -126,6 +129,10 @@ export interface GoalRunConfig {
 export interface BossFightConfig {
   /** The tempo of the phase being fought. */
   bpm: number;
+  /** The phase being fought, from 1 — the backing's score follows it. */
+  phase: number;
+  /** The boss is enraged (low on its phase's HP): the backing plays harder. */
+  enraged: boolean;
   /** Above the tab, in place of the exercise's goals. Display only: the
    *  desktop and phone views both mount it. */
   arena: ReactNode;
@@ -558,10 +565,21 @@ const PracticeSessionInner = ({
     tempoRulerRef.current = sessionTempoRuler.isConstant ? null : sessionTempoRuler;
   }, [sessionTempoRuler]);
 
+  // A generated band for tab exercises that bring no accompaniment of their own.
+  const autoBacking = useAutoBacking({
+    exercise: activeExercise,
+    measures: activeTablature,
+    tuningOffsets: guitarTuning.tuning.offsets,
+    repeatCount: tabRepeatCount,
+    blocked: !!effectiveRawGpFile || !!parsedGpTracks || !!riddleMeasures || (isExamMode && !!activeExercise.examBacking),
+    boss: bossFight ? { phase: bossFight.phase } : undefined,
+  });
+
   const dynamicBackingTracks = useMemo(() => {
     if (parsedGpTracks && parsedGpTracks.length > 1) return parsedGpTracks.filter((_, idx) => idx !== selectedGpTrackIdx);
-    return activeExercise.backingTracks;
-  }, [parsedGpTracks, selectedGpTrackIdx, activeExercise.backingTracks]);
+    if (activeExercise.backingTracks?.length) return activeExercise.backingTracks;
+    return autoBacking.tracks;
+  }, [parsedGpTracks, selectedGpTrackIdx, activeExercise.backingTracks, autoBacking.tracks]);
 
   const planHasTablature = useMemo(() => plan.exercises.some(ex => willHaveTablature(ex) || ex.riddleConfig?.mode === "sequenceRepeat"), [plan.exercises]);
   const planHasStrumming = useMemo(() => plan.exercises.some(ex => ex.strummingPatterns && ex.strummingPatterns.length > 0), [plan.exercises]);
@@ -585,6 +603,7 @@ const PracticeSessionInner = ({
     tabRestartKey,
     pendingSeekBeatRef: metronome.pendingSeekBeatRef,
     tuningOffsets: guitarTuning.tuning.offsets,
+    bandRage: !!bossFight?.enraged,
   });
 
   /**
@@ -844,6 +863,12 @@ const PracticeSessionInner = ({
   // the answer once the phrase has finished.
   const tabSoundLevel = strumSynthVolume(isAudioMuted, trackConfigs.main) * masterVolume;
   const hasTabSound = !!activeTablature?.length || !!effectiveRawGpFile || !!currentExercise.strummingPatterns?.length;
+  // The generated band plays the key's notes and a beat the mic would also
+  // take for the player's, so it needs guarding just like the tab's guitar.
+  const autoBackingLevel = autoBacking.tracks
+    ? Math.max(0, ...audioTracks.filter(track => track.generated && !track.isMuted).map(track => track.volume)) * masterVolume
+    : 0;
+  const setAutoBackingEnabled = useAutoBackingStore(state => state.setEnabled);
   const handlePlaybackLeak = useCallback(() => {
     noteMatchingHandle.current?.markPlaybackLeak?.();
     toast.warning(t("playback_leak.title", "Your mic can hear the guitar playback"), {
@@ -853,17 +878,23 @@ const PracticeSessionInner = ({
         "This run won't go on the leaderboards. Put on headphones or turn the guitar sound off, then start the run over.",
       ),
       duration: 12000,
-      action: { label: t("playback_leak.mute", "Turn guitar off"), onClick: () => setIsAudioMuted(true) },
+      action: {
+        label: t("playback_leak.mute", "Turn guitar off"),
+        onClick: () => { setIsAudioMuted(true); setAutoBackingEnabled(false); },
+      },
     });
-  }, [t, setIsAudioMuted]);
+  }, [t, setIsAudioMuted, setAutoBackingEnabled]);
   const playbackLeakingRef = usePlaybackLeakGuard({
     enabled: isMicEnabled && isListening && !isEarTrainingRiddle && (hasLeaderboard(activeExercise) || !!plan.duel),
-    isTabAudible: isAudioPlaying && hasTabSound && tabSoundLevel > 0,
-    tabLevel: tabSoundLevel,
+    isTabAudible: isAudioPlaying && ((hasTabSound && tabSoundLevel > 0) || autoBackingLevel > 0),
+    tabLevel: Math.max(tabSoundLevel, autoBackingLevel),
     audioContext: metronome.audioContext,
     inputTapRef: audioRefs.inputTapRef,
     onLeak: handlePlaybackLeak,
   });
+  // The backing is on by default — the first time it plays into a listening
+  // mic, the player hears once that it wants headphones.
+  useHeadphonesHint(isMicEnabled && isListening && isAudioPlaying && autoBackingLevel > 0);
 
   const { verdict: goalVerdict, rearm: rearmGoalVerdict } = useGoalRunVerdict({
     goalRun, showSuccessView, isMicEnabled, noteMatchingHandle,

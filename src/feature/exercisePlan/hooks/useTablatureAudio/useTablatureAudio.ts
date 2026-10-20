@@ -1,10 +1,12 @@
+import { AmbientBand, velocityOf } from "feature/autoBacking/synth/ambientBand";
 import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Soundfont from "soundfont-player";
 import { applySinkId } from "utils/applyAudioSinkId";
 
-import type { TablatureBeat, TablatureNote } from "../../types/exercise.types";
+import type { TablatureBeat, TablatureNote, TabTrackType } from "../../types/exercise.types";
 import { createTempoRulerFromMeasures } from "../../views/PracticeSession/hooks/tempoBeatClock";
+import { BASS_STRING_MIDI, MAIN_TRACK_BOOST } from "./audio.constants";
 import { playDrumNote } from "./synth.drums";
 import type { StringPlayers } from "./synth.strings";
 import { playStringNote } from "./synth.strings";
@@ -23,6 +25,7 @@ export const useTablatureAudio = ({
   disabled = false,
   repeatCount = 0,
   tuningOffsets,
+  rage = false,
 }: UseTablatureAudioProps) => {
   // ── Audio graph refs ──────────────────────────────────────────────────────
   const ownAudioContextRef   = useRef<AudioContext | null>(null);
@@ -30,6 +33,10 @@ export const useTablatureAudio = ({
   const masterGainRef        = useRef<GainNode | null>(null);
   const trackGainsRef        = useRef<Record<string, GainNode>>({});
   const trackPannersRef      = useRef<Record<string, StereoPannerNode>>({});
+  /** Where a track's notes go in: its gain, or a generated track's compressor. */
+  const trackInputsRef       = useRef<Record<string, AudioNode>>({});
+  /** A generated track's reverb/echo sends, taken after its fader. */
+  const trackSendsRef        = useRef<Record<string, AudioNode[]>>({});
   const timeoutRef           = useRef<number | null>(null);
 
   // ── Absolute-clock playback state ─────────────────────────────────────────
@@ -55,6 +62,9 @@ export const useTablatureAudio = ({
   const vocalsPlayerRef      = useRef<Soundfont.Player | null>(null);
   const [soundfontsReady, setSoundfontsReady] = useState(false);
 
+  // ── The generated backing's synthesised band ──────────────────────────────
+  const bandRef = useRef<AmbientBand | null>(null);
+
   const schedulerTickRef = useRef<(() => void) | null>(null);
   const isPlayingRef     = useRef(isPlaying);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
@@ -71,6 +81,14 @@ export const useTablatureAudio = ({
 
   const bpmRef = useRef(bpm);
   useEffect(() => { bpmRef.current = bpm; }, [bpm]);
+  // The band's echo follows the session tempo.
+  useEffect(() => { bandRef.current?.setTempo(bpm); }, [bpm, externalAudioContext]);
+  // Declared before the context effect, so a new band is handed the mood there.
+  const rageRef = useRef(rage);
+  useEffect(() => {
+    rageRef.current = rage;
+    bandRef.current?.setRage(rage);
+  }, [rage, externalAudioContext]);
 
   const trackDataRef = useRef<Record<string, {
     flattened:     TablatureBeat[];
@@ -145,6 +163,11 @@ export const useTablatureAudio = ({
       masterGainRef.current.connect(audioContextRef.current.destination);
       trackGainsRef.current   = {};
       trackPannersRef.current = {};
+      trackInputsRef.current  = {};
+      trackSendsRef.current   = {};
+      bandRef.current         = new AmbientBand(audioContextRef.current, masterGainRef.current);
+      bandRef.current.setTempo(bpmRef.current || 120);
+      bandRef.current.setRage(rageRef.current);
     }
     return () => {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
@@ -155,6 +178,7 @@ export const useTablatureAudio = ({
       // back to the plain-oscillator synth until the loader effect (which shares
       // this same dependency) supplies fresh players for the new context.
       guitarPlayerRef.current = mutedGuitarPlayerRef.current = bassPlayerRef.current = vocalsPlayerRef.current = null;
+      bandRef.current = null;
     };
   }, [externalAudioContext]);
 
@@ -200,8 +224,16 @@ export const useTablatureAudio = ({
       if (!currentIds.has(id)) {
         trackGainsRef.current[id]?.disconnect();
         trackPannersRef.current[id]?.disconnect();
+        const input = trackInputsRef.current[id];
+        if (input && input !== trackGainsRef.current[id]) {
+          input.disconnect();
+          bandRef.current?.removeInsert(input);
+        }
+        trackSendsRef.current[id]?.forEach(send => send.disconnect());
         delete trackGainsRef.current[id];
         delete trackPannersRef.current[id];
+        delete trackInputsRef.current[id];
+        delete trackSendsRef.current[id];
       }
     });
     activeTracks.forEach(track => {
@@ -211,14 +243,21 @@ export const useTablatureAudio = ({
         const gain   = ctx.createGain();
         const panner = ctx.createStereoPanner();
         panner.pan.value = track.pan ?? 0;
-        gain.connect(panner); panner.connect(masterGainRef.current!);
+        // A generated track plays through the band's own chain (ducker,
+        // chorus or saturator, compressor), sends to its hall and echo, and
+        // comes out through the band's limited bus.
+        const band = track.generated ? bandRef.current : null;
+        gain.connect(panner); panner.connect(band ? band.bus : masterGainRef.current!);
         trackGainsRef.current[track.id]  = gain;
         trackPannersRef.current[track.id] = panner;
+        trackInputsRef.current[track.id] = band ? band.insert(track.trackType, gain) : gain;
+        if (band) trackSendsRef.current[track.id] = band.attachSends(track.trackType, gain);
       } else {
         const panner = trackPannersRef.current[track.id];
         if (panner) panner.pan.value = track.pan ?? 0;
       }
-      const targetGain = track.isMuted ? 0 : track.volume;
+      // The player's own instrument sits a little above whatever backs it.
+      const targetGain = track.isMuted ? 0 : track.volume * (track.id === "main" ? MAIN_TRACK_BOOST : 1);
       trackGainsRef.current[track.id].gain.setTargetAtTime(targetGain, ctx.currentTime, 0.02);
     });
   }, [activeTracks, externalAudioContext]);
@@ -232,14 +271,39 @@ export const useTablatureAudio = ({
     time: number,
     trackId: string,
     duration: number,
-    trackType: "guitar" | "bass" | "drums" | "vocals" = "guitar",
+    trackType: TabTrackType = "guitar",
+    generated = false,
   ) => {
     const ctx       = audioContextRef.current;
-    const trackGain = trackGainsRef.current[trackId];
+    const trackGain = trackInputsRef.current[trackId] ?? trackGainsRef.current[trackId];
     // ctx.state === "closed" can happen for one scheduler tick right after the
     // context-owning effect tears down (e.g. switching audio sources) — skip
     // silently rather than throwing into a dead AudioContext.
     if (!ctx || ctx.state === "closed" || !trackGain || !isFinite(time)) return;
+
+    // The generated backing plays on its own synthesised band.
+    const band = generated ? bandRef.current : null;
+    if (band) {
+      const t = Math.max(ctx.currentTime + 0.001, time);
+      const seconds = Math.max(0.05, duration);
+      const bassOpen = BASS_STRING_MIDI[note.string - 1];
+      if (trackType === "drums") {
+        band.playDrum(trackId, note, t, trackGain);
+        return;
+      }
+      if (trackType === "bass" && bassOpen !== undefined) {
+        band.playBass(trackId, bassOpen + note.fret, velocityOf(note), t, seconds, trackGain);
+        return;
+      }
+      if (trackType === "arp" && note.midiNote !== undefined) {
+        band.playArp(note.midiNote, velocityOf(note), t, seconds, trackGain, note.string);
+        return;
+      }
+      if (trackType === "keys" && note.midiNote !== undefined) {
+        band.playPad(`${trackId}:${note.string}`, note.string - 1, note.midiNote, velocityOf(note), t, seconds, trackGain);
+        return;
+      }
+    }
 
     if (trackType === "drums") {
       playDrumNote(ctx, note, time, trackGain);
@@ -355,7 +419,7 @@ export const useTablatureAudio = ({
 
         if (!track.isMuted && !isLate) {
           beat.notes.forEach((n: TablatureNote) => {
-            playNote(n, t, track.id, beatDuration, track.trackType ?? "guitar");
+            playNote(n, t, track.id, beatDuration, track.trackType ?? "guitar", track.generated);
           });
         }
 
@@ -390,6 +454,7 @@ export const useTablatureAudio = ({
     } else {
       schedulerTickRef.current  = null;
       startAudioTimeRef.current = null;
+      bandRef.current?.stopAll();
       activeNodesRef.current.forEach(node => { try { node.stop(); } catch { /* already ended */ } });
       activeNodesRef.current.clear();
       trackStatesRef.current = {};

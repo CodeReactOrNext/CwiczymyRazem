@@ -333,6 +333,51 @@
     "mute": "Mute",
     "main_instrument": "Main Instrument"
   },
+  "auto_backing": {
+    "title": "Backing track",
+    "toggle": "Generated backing track",
+    "description": "Drums, bass and a soft pad written for this exercise, in its key and following its chords.",
+    "drums_only": "Drums only: the notes cover every fret, so any chord would clash with them.",
+    "drone": "Bass and power chords on the root, because the notes never say major or minor.",
+    "headphones": "With the mic on, wear headphones. Otherwise the mic hears the band as your playing.",
+    "groove": {
+      "rock": "Rock",
+      "pop": "Pop",
+      "ballad": "Ballad",
+      "shuffle": "Shuffle",
+      "metal": "Metal",
+      "doom": "Doom",
+      "thrash": "Thrash",
+      "halftime": "Half-time",
+      "compound": "6/8 feel",
+      "waltz": "Waltz",
+      "boss": "Boss battle"
+    },
+    "key": {
+      "major": "{{tonic}} major",
+      "minor": "{{tonic}} minor",
+      "dorian": "{{tonic}} Dorian",
+      "mixolydian": "{{tonic}} Mixolydian",
+      "phrygian": "{{tonic}} Phrygian",
+      "lydian": "{{tonic}} Lydian",
+      "harmonicMinor": "{{tonic}} harmonic minor",
+      "majorPentatonic": "{{tonic}} major pentatonic",
+      "minorPentatonic": "{{tonic}} minor pentatonic",
+      "blues": "{{tonic}} blues",
+      "root": "Root {{tonic}}"
+    },
+    "track": {
+      "drums": "Drums",
+      "bass": "Bass",
+      "keys": "Pad",
+      "arp": "Arpeggio"
+    },
+    "headphones_toast": {
+      "title": "The backing track is on",
+      "body": "With the mic on, wear headphones — otherwise the mic hears the band as your playing. You can change it any time in the Volume menu.",
+      "off": "Turn it off"
+    }
+  },
   "interval_click": {
     "now_above": "Now the {{interval}} above that root — within reach of it",
     "click_any": "Click any {{note}}",

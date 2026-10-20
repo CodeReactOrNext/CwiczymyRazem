@@ -5,7 +5,7 @@ export function playDrumNote(
   ctx: AudioContext,
   note: TablatureNote,
   time: number,
-  trackGain: GainNode,
+  trackGain: AudioNode,
 ): void {
   const t = Math.max(ctx.currentTime + 0.001, time);
   const accentScale = note.isAccented ? 1.35 : 1.0;

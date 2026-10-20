@@ -47,6 +47,8 @@ interface UseSessionAudioOptions {
   /** Per-string semitone offset from standard tuning, applied to the custom (non-GP) synth so the
    *  background guitar matches the player's chosen tuning. */
   tuningOffsets?:          readonly number[];
+  /** A boss fight's boss is enraged: the generated backing's band plays harder. */
+  bandRage?:               boolean;
 }
 
 export function useSessionAudio({
@@ -56,7 +58,7 @@ export function useSessionAudio({
   isMetronomeMuted, metronomeVolume, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
   stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce, autoStopAfterFirstLoop,
-  onAlphaTabAudioContextReady, tabRestartKey, pendingSeekBeatRef, tuningOffsets,
+  onAlphaTabAudioContextReady, tabRestartKey, pendingSeekBeatRef, tuningOffsets, bandRage = false,
 }: UseSessionAudioOptions) {
   // ── Track configs ──────────────────────────────────────────────────────────
 
@@ -103,7 +105,7 @@ export function useSessionAudio({
           id: track.id, name: track.name, measures: track.measures,
           volume:    trackConfigs[track.id]?.volume ?? 0.8,
           isMuted:   trackConfigs[track.id]?.isMuted ?? false,
-          trackType: track.trackType, pan: track.pan,
+          trackType: track.trackType, pan: track.pan, generated: track.generated,
         });
       });
     }
@@ -205,6 +207,7 @@ export function useSessionAudio({
     disabled:       !!effectiveRawGpFile || showAlphaTabScore,
     repeatCount:    tabRepeatCount,
     tuningOffsets,
+    rage:           bandRage,
   });
 
   return useMemo(() => ({

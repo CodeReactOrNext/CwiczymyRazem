@@ -1,4 +1,4 @@
-import type { BendPoint, TablatureMeasure } from "../../types/exercise.types";
+import type { BendPoint, TablatureMeasure, TabTrackType } from "../../types/exercise.types";
 
 export interface AudioTrackConfig {
   id:         string;
@@ -6,8 +6,10 @@ export interface AudioTrackConfig {
   measures:   TablatureMeasure[];
   volume:     number;
   isMuted:    boolean;
-  trackType?: "guitar" | "bass" | "drums" | "vocals";
+  trackType?: TabTrackType;
   pan?:       number; // -1.0 (left) to 1.0 (right)
+  /** See BackingTrack.generated. */
+  generated?: boolean;
 }
 
 export interface UseTablatureAudioProps {
@@ -27,6 +29,8 @@ export interface UseTablatureAudioProps {
   /** Per-string semitone offset from standard tuning (index 0 = string 1 … index 5 = string 6),
    *  applied to guitar-track notes so the background instrument matches the player's own tuning. */
   tuningOffsets?: readonly number[];
+  /** The generated backing's band plays harder — a boss in a rage. */
+  rage?:          boolean;
 }
 
 export interface StringSynthOptions {

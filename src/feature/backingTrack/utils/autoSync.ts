@@ -1,3 +1,5 @@
+import type { TabTrackType } from "feature/exercisePlan/types/exercise.types";
+
 import type { TabSourceMeasure } from "./alignment";
 import { tabNoteEvents } from "./alignment";
 import type { RecordingFeatures } from "./audioFeatures";
@@ -118,7 +120,7 @@ export interface SyncEvent {
 
 /** One Guitar Pro track, as the search reads it. */
 export interface SyncTrack {
-  trackType?: "guitar" | "bass" | "drums" | "vocals";
+  trackType?: TabTrackType;
   measures: TabSourceMeasure[];
 }
 
