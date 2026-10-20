@@ -150,12 +150,19 @@ export interface StrumPattern {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** The instrument a tab track sounds as. "keys" (the pad) and "arp" are only
+ *  written by the generated backing — Guitar Pro imports never produce them. */
+export type TabTrackType = 'guitar' | 'bass' | 'drums' | 'vocals' | 'keys' | 'arp';
+
 export interface BackingTrack {
   id: string;
   name: string;
   measures: TablatureMeasure[];
-  trackType?: 'guitar' | 'bass' | 'drums' | 'vocals';
+  trackType?: TabTrackType;
   pan?: number; // -1.0 (left) to 1.0 (right)
+  /** Written by the auto-backing generator rather than imported or authored —
+   *  played on the synthesised backing band (feature/autoBacking/synth). */
+  generated?: boolean;
 }
 
 /** The two ways a song from the library can be practised inside a routine. */

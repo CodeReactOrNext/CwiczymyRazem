@@ -41,3 +41,6 @@ function makeSoftClipCurve(samples = 512, drive = 2.0): Float32Array<ArrayBuffer
 
 export const SOFT_CLIP_CURVE       = makeSoftClipCurve(512, 2.0); // heavy drive (drums)
 export const SOFT_CLIP_CURVE_LIGHT = makeSoftClipCurve(512, 0.7); // gentle warmth (strings)
+
+/** The player's own instrument (the tab's "main" track) plays this much above its volume setting. */
+export const MAIN_TRACK_BOOST = 1.3;

@@ -38,6 +38,8 @@ export const useBossFight = ({ boss, record, onRunEnd }: UseBossFightOptions): B
   const newRun = useBossFightStore((s) => s.newRun);
   const outcome = useBossFightStore((s) => s.fight.outcome);
   const holding = useBossFightStore((s) => s.fight.holding);
+  const phase = useBossFightStore((s) => phaseNumber(s.fight));
+  const enraged = useBossFightStore((s) => s.fight.enraged);
   const dealt = useBossFightStore((s) => s.fight.plan.variation);
   // The phase's tempo with the run's boons on it (slow down, overdrive).
   const bpm = useBossFightStore((s) => phaseBpm(s.fight));
@@ -74,6 +76,8 @@ export const useBossFight = ({ boss, record, onRunEnd }: UseBossFightOptions): B
     variation,
     config: {
       bpm,
+      phase,
+      enraged,
       arena: <BossArena boss={boss} record={record} />,
       compactArena: <BossArena boss={boss} record={record} compact />,
       onNoteJudged: judge,

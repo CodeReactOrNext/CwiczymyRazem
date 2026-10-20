@@ -1,6 +1,8 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
+import { AutoBackingSection } from "feature/autoBacking/components/AutoBackingSection";
+import { useAutoBackingStore } from "feature/autoBacking/store/autoBackingStore";
 import { RippleButton } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { Volume1, Volume2, VolumeX } from "lucide-react";
@@ -51,6 +53,7 @@ export const VolumeButton = ({
   mobile = false,
 }: VolumeButtonProps) => {
   const { t } = useTranslation("session");
+  const autoBackingAvailable = useAutoBackingStore((state) => state.available);
   const showMetronome = !!metronome && !!setIsMetronomeMuted && metronome.volume !== undefined;
   const showMasterVolume = masterVolume !== undefined && !!onMasterVolumeChange;
   // Shown whenever there's at least the main (backing) track — a GP file with
@@ -183,8 +186,13 @@ export const VolumeButton = ({
           </div>
         )}
 
+        <AutoBackingSection
+          labelClassName={sectionLabel}
+          className={cn((showMetronome || showMasterVolume) && "mt-4")}
+        />
+
         {showTracks && (
-          <div className={cn("space-y-3", (showMetronome || showMasterVolume) && "mt-4")}>
+          <div className={cn("space-y-3", (showMetronome || showMasterVolume || autoBackingAvailable) && "mt-4")}>
             <span className={cn(sectionLabel, "flex items-center gap-1.5")}>
               <GiGuitar className='h-3 w-3' />
               {tracksLabel}

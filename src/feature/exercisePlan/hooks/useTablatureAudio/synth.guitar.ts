@@ -8,7 +8,7 @@ export function synthGuitar(
   ctx: AudioContext,
   freq: number,
   t: number,
-  trackGain: GainNode,
+  trackGain: AudioNode,
   duration: number,
   opts: StringSynthOptions = {},
 ): void {
@@ -104,7 +104,7 @@ export function synthBass(
   ctx: AudioContext,
   freq: number,
   t: number,
-  trackGain: GainNode,
+  trackGain: AudioNode,
   duration: number,
   opts: StringSynthOptions = {},
 ): void {

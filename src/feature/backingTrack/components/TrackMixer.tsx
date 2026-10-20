@@ -2,14 +2,14 @@ import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Volume2, VolumeX } from "lucide-react";
-import { GiDrumKit, GiGuitarBassHead, GiGuitarHead, GiMicrophone } from "react-icons/gi";
+import { GiDrumKit, GiGuitarBassHead, GiGuitarHead, GiMicrophone, GiMusicalNotes, GiPianoKeys } from "react-icons/gi";
 
 /** One instrument the Guitar Pro file plays, as the mixer needs it. */
 export interface MixerTrack {
   id: string;
   /** A Guitar Pro track does not have to be named, so the mixer names it. */
   name?: string;
-  trackType?: "guitar" | "bass" | "drums" | "vocals";
+  trackType?: "guitar" | "bass" | "drums" | "vocals" | "keys" | "arp";
   volume: number;
   isMuted: boolean;
 }
@@ -26,6 +26,8 @@ const ICONS = {
   bass: GiGuitarBassHead,
   drums: GiDrumKit,
   vocals: GiMicrophone,
+  keys: GiPianoKeys,
+  arp: GiMusicalNotes,
 } as const;
 
 /** Each instrument keeps the colour its lane and its notes already use. */
@@ -34,6 +36,8 @@ const ACCENTS = {
   bass: "text-emerald-400",
   drums: "text-purple-400",
   vocals: "text-amber-400",
+  keys: "text-orange-400",
+  arp: "text-amber-300",
 } as const;
 
 /**

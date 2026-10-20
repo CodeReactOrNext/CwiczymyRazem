@@ -333,6 +333,51 @@
     "mute": "Silenciar",
     "main_instrument": "Instrumento principal"
   },
+  "auto_backing": {
+    "title": "Pista de acompañamiento",
+    "toggle": "Acompañamiento generado",
+    "description": "Batería, bajo y un pad suave escritos para este ejercicio, en su tonalidad y siguiendo sus acordes.",
+    "drums_only": "Solo batería: las notas recorren todos los trastes, así que cualquier acorde chocaría con ellas.",
+    "drone": "Bajo y power chords sobre la raíz, porque las notas no dicen si es mayor o menor.",
+    "headphones": "Con el micrófono activo, usa auriculares. Si no, el micrófono oirá la banda como si tocaras tú.",
+    "groove": {
+      "rock": "Rock",
+      "pop": "Pop",
+      "ballad": "Balada",
+      "shuffle": "Shuffle",
+      "metal": "Metal",
+      "doom": "Doom",
+      "thrash": "Thrash",
+      "halftime": "Half-time",
+      "compound": "Aire de 6/8",
+      "waltz": "Vals",
+      "boss": "Batalla contra el jefe"
+    },
+    "key": {
+      "major": "{{tonic}} mayor",
+      "minor": "{{tonic}} menor",
+      "dorian": "{{tonic}} dórico",
+      "mixolydian": "{{tonic}} mixolidio",
+      "phrygian": "{{tonic}} frigio",
+      "lydian": "{{tonic}} lidio",
+      "harmonicMinor": "{{tonic}} menor armónica",
+      "majorPentatonic": "{{tonic}} pentatónica mayor",
+      "minorPentatonic": "{{tonic}} pentatónica menor",
+      "blues": "{{tonic}} blues",
+      "root": "Raíz {{tonic}}"
+    },
+    "track": {
+      "drums": "Batería",
+      "bass": "Bajo",
+      "keys": "Pad",
+      "arp": "Arpegio"
+    },
+    "headphones_toast": {
+      "title": "La pista de acompañamiento está activada",
+      "body": "Con el micrófono activo, usa auriculares: si no, el micrófono oirá la banda como si tocaras tú. Puedes cambiarlo cuando quieras en el menú de volumen.",
+      "off": "Desactivar"
+    }
+  },
   "interval_click": {
     "now_above": "Ahora la {{interval}} por encima de esa raíz, a su alcance",
     "click_any": "Haz clic en cualquier {{note}}",
