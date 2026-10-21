@@ -778,6 +778,40 @@ function drawPill(x: number, y: number, w: number, h: number, r: number) {
   pillPath(x, y, w, h, r);
 }
 
+// ── Chord box ─────────────────────────────────────────────────────────────────
+/** Notes a beat needs to be drawn as a chord box rather than note by note. */
+const CHORD_BOX_MIN_NOTES = 3;
+/** How far the box reaches above its top note and below its bottom one. */
+const CHORD_BOX_PAD = 3;
+
+/**
+ * The box a chord rings in: from its top string to its bottom one, from the
+ * strum to where the chord ends — one quiet shape in the board's ink instead
+ * of a coloured tail on every string, which stacked up into a wall of colour.
+ * Lit while the cursor is in it; the stretch the chord was held for fills with
+ * the hit colour, the way a single note's tail does.
+ */
+function drawChordBox(x: number, w: number, topY: number, bottomY: number, active: boolean, heldW: number, dim: number) {
+  if (!ctx) return;
+  const y = topY - BLOCK_H / 2 - CHORD_BOX_PAD;
+  const h = bottomY - topY + BLOCK_H + CHORD_BOX_PAD * 2;
+  const r = BLOCK_CORNER + CHORD_BOX_PAD;
+  ctx.fillStyle = inkColor;
+  ctx.globalAlpha = (active ? 0.13 : 0.07) * dim;
+  drawPill(x, y, w, h, r);
+  ctx.fill();
+  if (heldW > 0) {
+    ctx.save();
+    drawPill(x, y, w, h, r);
+    ctx.clip();
+    ctx.fillStyle = hitFill;
+    ctx.globalAlpha = 0.28;
+    ctx.fillRect(x, y, Math.min(w, heldW), h);
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
 // ── Hit glow sprites ──────────────────────────────────────────────────────────
 // The glow behind a freshly hit note is a canvas shadow, and a shadow is a blur.
 // Re-running that blur every frame for every note still glowing was the most
@@ -1448,6 +1482,29 @@ function render() {
       // Head centre of the beat's first palm-muted note — where its "P.M." goes.
       let palmMuteX: number | null = null;
 
+      // A chord is one strum, so it is drawn as one thing: its fret numbers
+      // stacked where it is struck, and a single box for as long as it rings
+      // (see drawChordBox) — its notes get heads and no tails, whatever the
+      // tail setting.
+      const isChordBox = beat.notes.length >= CHORD_BOX_MIN_NOTES;
+      if (isChordBox) {
+        let top = Infinity;
+        let bottom = -Infinity;
+        let held = 0;
+        let allMissed = true;
+        for (const note of beat.notes) {
+          top = Math.min(top, note.noteY);
+          bottom = Math.max(bottom, note.noteY);
+          const hit = reached && !!tileHit[note.noteKey];
+          // Last frame's fill — the heads below update it for this one.
+          if (hit) held = Math.max(held, isOutgoing ? blockW : (noteVisualFill.get(note.noteKey) ?? 0));
+          if (hit || !(reached && tileMissed[note.noteKey])) allMissed = false;
+        }
+        drawChordBox(blockX, blockW, top, bottom, isActive, held, allMissed ? 0.4 : 1);
+      }
+      // Heads sized for a tail: a chord's, or every note's with tails on.
+      const headsOnly = noteTails || isChordBox;
+
       for (const note of beat.notes) {
         const hitVal = reached ? tileHit[note.noteKey] : undefined;
         const isHit = !!hitVal;
@@ -1472,21 +1529,21 @@ function render() {
         const baseFs = 13 * fretFontScale;
         const fs = hasDynamics ? Math.max(9, Math.round(baseFs * (0.75 + 0.25 * dyn))) : Math.round(baseFs);
         const labelChars = note.fret.toString().length + (note.isGhost ? 2 : 0);
-        const headW = noteTails
+        const headW = headsOnly
           ? Math.min(blockW, Math.max(BLOCK_H, Math.ceil(labelChars * fs * 0.62 + 10)))
           : blockW;
         const tailH = Math.max(6, Math.round(BLOCK_H * 0.42));
         const tailY = note.noteY - tailH / 2;
         const tailX = blockX + headW / 2;
         const tailW = blockX + blockW - tailX;
-        const hasTail = noteTails && blockW - headW > 4;
+        const hasTail = noteTails && !isChordBox && blockW - headW > 4;
         const notePath = () => {
           ctx!.beginPath();
           pillPath(blockX, blockY, headW, BLOCK_H, BLOCK_CORNER);
           if (hasTail) pillPath(tailX, tailY, tailW, tailH, tailH / 2);
         };
         // Bar mode keeps the label in the left "head" of the long block.
-        const labelX = noteTails ? blockX + headW / 2 : blockX + Math.min(blockW / 2, BLOCK_H * 0.65);
+        const labelX = headsOnly ? blockX + headW / 2 : blockX + Math.min(blockW / 2, BLOCK_H * 0.65);
         if (note.isPalmMute && palmMuteX === null) palmMuteX = labelX;
 
         // ── Slide-in line ────────────────────────────────────────────────
@@ -1668,7 +1725,7 @@ function render() {
           ctx.shadowBlur = 0;
 
           // Solid bar keeps its original sheen: a lighter strip on the top half.
-          if (!noteTails && !isDead) {
+          if (!headsOnly && !isDead) {
             ctx.fillStyle = "rgba(255,255,255,0.14)";
             drawPill(blockX + 1, blockY + 1, blockW - 2, BLOCK_H / 2 - 1, BLOCK_CORNER);
             ctx.fill();
