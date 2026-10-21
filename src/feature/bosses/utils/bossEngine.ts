@@ -1,9 +1,20 @@
 import type { NoteJudgement } from "feature/exercisePlan/views/PracticeSession/hooks/useNoteMatching";
 
+import type { DrillKind } from "../types/boss.types";
 import type { BoonId, BoonStacks } from "./boons";
 import { BOON, boonBpmShift, dealDraft, stacksOf } from "./boons";
+import { subdivisionKey } from "./bossArt";
+import { generateChordPhase } from "./chordPhaseGenerator";
+import { changeKey, changesOf } from "./chordTab";
 import type { PhasePlan } from "./phaseGenerator";
-import { generatePhase } from "./phaseGenerator";
+import {
+  CHORD_MULTIPLIER_STREAK,
+  createRng,
+  generatePhase,
+  MAX_MULTIPLIER_STREAK,
+  phaseSeed,
+  pick,
+} from "./phaseGenerator";
 
 export const PLAYER_MAX_HP = 100;
 /** A streak this long when a slam lands blocks it (Steady hand: shorter). */
@@ -12,8 +23,9 @@ export const PARRY_STREAK = 4;
 export const SLAM_DAMAGE = 15;
 /** A block charges the sword by this share of a full charge. */
 export const COUNTER_CHARGE = 0.5;
-/** The streak at which a strike hits twice as hard; it scales up to there. */
-export const MAX_MULTIPLIER_STREAK = 48;
+export { CHORD_MULTIPLIER_STREAK, MAX_MULTIPLIER_STREAK };
+/** A quake that isn't blocked. */
+export const QUAKE_DAMAGE = SLAM_DAMAGE;
 /** HP the player gets back for every phase cleared. */
 export const PHASE_HEAL = 20;
 /** Under this share of the phase's HP the boss enrages… */
@@ -39,7 +51,8 @@ export interface PhaseRecord {
   /** 1-based. */
   phase: number;
   bpm: number;
-  notesPerBeat: number;
+  /** Translation key of the phase's rhythm ("subdivision.eighths"). */
+  rhythm: string;
   /** HP lost in the phase, to bites and slams. */
   damageTaken: number;
   /** HP left when it ended (before the break's heal). */
@@ -83,6 +96,20 @@ export interface BossFightState {
   lastBite: number;
   /** What caught the last bite, if anything did. */
   lastBiteCaught: "shield" | "secondWind" | null;
+  /**
+   * The colossus's fight only. The last strum judged (its index in the pass),
+   * what the alerts read the next one from…
+   */
+  lastUnit: number | null;
+  /** …the quake under way (its first strum), the strums of it judged so far
+   *  and how many of them were missed… */
+  quakeRun: number | null;
+  quakeJudged: readonly number[];
+  quakeMisses: number;
+  /** …misses over the run, by change ("G>C")… */
+  changeMisses: Record<string, number>;
+  /** …and the phase's weak spot: the change the player has missed most. */
+  weakChange: string | null;
   /** Notes until the next slam, and how many of them are the warning. */
   notesToSlam: number;
   slamWindup: number;
@@ -136,11 +163,19 @@ export interface BossFightState {
 export const streakMultiplier = (streak: number, cap = MAX_MULTIPLIER_STREAK) =>
   Math.round((1 + Math.min(streak, cap) / cap) * 10) / 10;
 
+/** The streak a phase's strikes reach ×2 at: notes for the spider, changes for the colossus. */
+export const multiplierStreakFor = (plan: Pick<PhasePlan, "kind">) =>
+  plan.kind === "chords" ? CHORD_MULTIPLIER_STREAK : MAX_MULTIPLIER_STREAK;
+
+/** The same with Momentum: half as long. */
+export const momentumStreakFor = (plan: Pick<PhasePlan, "kind">) =>
+  Math.round((multiplierStreakFor(plan) * BOON.momentumStreak) / MAX_MULTIPLIER_STREAK);
+
 /** The streak multiplier with the run's boons. */
-export const fightMultiplier = (state: Pick<BossFightState, "combo" | "boons">) =>
+export const fightMultiplier = (state: Pick<BossFightState, "combo" | "boons" | "plan">) =>
   streakMultiplier(
     state.combo,
-    stacksOf(state.boons, "momentum") ? BOON.momentumStreak : MAX_MULTIPLIER_STREAK,
+    stacksOf(state.boons, "momentum") ? momentumStreakFor(state.plan) : multiplierStreakFor(state.plan),
   );
 
 /** Sword points one hit is worth: its timing grade, 4 when dead on (6 with Precision). */
@@ -159,8 +194,53 @@ export const phaseBpm = (state: Pick<BossFightState, "plan" | "boons">) =>
 export const parryStreak = (state: Pick<BossFightState, "boons">) =>
   stacksOf(state.boons, "steadyHand") ? BOON.steadyHandStreak : PARRY_STREAK;
 
+/** Missed chords a quake still counts as blocked with: none, one with Steady hand. */
+export const quakeMissesAllowed = (state: Pick<BossFightState, "boons">) =>
+  stacksOf(state.boons, "steadyHand") ? BOON.steadyHandQuakeMisses : 0;
+
+/** Deals a phase of the boss's own kind. */
+export const dealPhase = (kind: DrillKind, runSeed: number, index: number): PhasePlan =>
+  kind === "chords" ? generateChordPhase(runSeed, index) : generatePhase(runSeed, index);
+
+/**
+ * The colossus's weak spot for a phase: of the changes its pass makes, the
+ * one the player has missed most this run — fix it and it pays double. Before
+ * any misses, or between equals, one is drawn from the run's seed.
+ */
+export const weakChangeFor = (
+  plan: PhasePlan,
+  changeMisses: Record<string, number>,
+  runSeed: number,
+): string | null => {
+  if (plan.kind !== "chords" || !plan.weakSpots) return null;
+  const changes = changesOf(plan.variation);
+  if (!changes.length) return null;
+  const worst = Math.max(...changes.map((key) => changeMisses[key] ?? 0));
+  const candidates = changes.filter((key) => (changeMisses[key] ?? 0) === worst);
+  return pick(createRng(phaseSeed(runSeed, plan.index) ^ 0x5bd1e995), candidates);
+};
+
+const CHORD_RHYTHM_KEYS = {
+  4: "subdivision.wholes",
+  2: "subdivision.halves",
+  1: "subdivision.quarters",
+} as const;
+
+/** The translation key of a chord drill's rhythm. */
+export const chordRhythmKey = (beatsPerChord: 1 | 2 | 4) => CHORD_RHYTHM_KEYS[beatsPerChord];
+
+/** The rhythm a phase is played in, as a translation key. */
+export const rhythmKeyOf = (plan: PhasePlan) =>
+  plan.kind === "chords"
+    ? chordRhythmKey(plan.variation.beatsPerChord)
+    : `subdivision.${subdivisionKey(plan.variation)}`;
+
 /** The phase's own counters, fresh: a full slam count, the first weak spot ahead. */
 const phaseStart = (plan: PhasePlan, boons: BoonStacks) => ({
+  lastUnit: null,
+  quakeRun: null,
+  quakeJudged: [],
+  quakeMisses: 0,
   notesToSlam: plan.rules.slamEvery,
   slamWindup: plan.rules.slamWindup,
   notesToWeakSpot: plan.rules.weakSpotEvery,
@@ -173,11 +253,13 @@ const phaseStart = (plan: PhasePlan, boons: BoonStacks) => ({
   forgivenLeft: stacksOf(boons, "secondWind") * BOON.secondWindMisses,
 });
 
-export const createFight = (runSeed: number): BossFightState => {
-  const plan = generatePhase(runSeed, 0);
+export const createFight = (runSeed: number, kind: DrillKind = "spider"): BossFightState => {
+  const plan = dealPhase(kind, runSeed, 0);
   return {
     runSeed,
     plan,
+    changeMisses: {},
+    weakChange: weakChangeFor(plan, {}, runSeed),
     previousPlan: null,
     previousBpm: 0,
     bossHp: plan.rules.bossHp,
@@ -224,7 +306,7 @@ export const createFight = (runSeed: number): BossFightState => {
 export const currentPhaseRecord = (state: BossFightState): PhaseRecord => ({
   phase: state.plan.index + 1,
   bpm: phaseBpm(state),
-  notesPerBeat: state.plan.variation.notesPerBeat,
+  rhythm: rhythmKeyOf(state.plan),
   damageTaken: state.phaseDamageTaken,
   hpEnd: state.playerHp,
   hits: state.hits - state.phaseStartHits,
@@ -240,7 +322,7 @@ export const runLog = (state: BossFightState): PhaseRecord[] =>
  * is dealt a draft of boons to pick from before it starts.
  */
 const breakIntoNextPhase = (state: BossFightState): BossFightState => {
-  const plan = generatePhase(state.runSeed, state.plan.index + 1);
+  const plan = dealPhase(state.plan.kind, state.runSeed, state.plan.index + 1);
   const playerHp = Math.min(state.playerMaxHp, state.playerHp + PHASE_HEAL);
   const start = phaseStart(plan, state.boons);
   const cleared = state.plan.index + 1;
@@ -261,6 +343,7 @@ const breakIntoNextPhase = (state: BossFightState): BossFightState => {
     phaseTick: state.phaseTick + 1,
     holding: true,
     enraged: false,
+    weakChange: weakChangeFor(plan, state.changeMisses, state.runSeed),
     draft: dealDraft(state.runSeed, plan.index + 1, state.boons),
     rerollsThisBreak: 0,
     rerollsLeft: state.rerollsLeft + (cleared % REROLL_EVERY === 0 ? 1 : 0),
@@ -366,20 +449,147 @@ export const isRegenerating = (
   state.notesSinceStrike > state.plan.rules.regenAfter;
 
 /**
+ * A slam lands — or, on the colossus, a quake: blocked, it half-charges the
+ * sword (which may strike); not, it takes its damage.
+ */
+const withSlam = (state: BossFightState, blocked: boolean, baseDamage: number): BossFightState => {
+  const damage = blocked ? 0 : rageDamage(state, baseDamage);
+  const next: BossFightState = {
+    ...state,
+    phaseDamageTaken: state.phaseDamageTaken + Math.min(damage, state.playerHp),
+    playerHp: Math.max(0, state.playerHp - damage),
+    playerHurtTick: state.playerHurtTick + (blocked ? 0 : 1),
+    slamTick: state.slamTick + 1,
+    lastSlam: { blocked, damage },
+  };
+  if (!blocked) return next;
+  next.blocks += 1;
+  next.charge += Math.round(next.chargeMax * COUNTER_CHARGE);
+  return withStrike(next);
+};
+
+// ── The colossus: strums, quakes and the weak change ────────────────────────
+
+/** Beats ahead a quake is called out. */
+export const QUAKE_WARNING_BEATS = 4;
+
+/** The strum after the last one judged — the one being played or about to be. */
+export const nextStrum = (state: Pick<BossFightState, "plan" | "lastUnit">) =>
+  state.plan.kind === "chords" && state.lastUnit !== null
+    ? (state.lastUnit + 1) % state.plan.variation.units.length
+    : null;
+
+/** Strum `unit` makes the phase's weak change. */
+export const isWeakChange = (state: Pick<BossFightState, "plan" | "weakChange">, unit: number) =>
+  state.plan.kind === "chords" &&
+  state.weakChange !== null &&
+  changeKey(state.plan.variation, unit) === state.weakChange;
+
+/** The quake strum `unit` belongs to, as its first strum and its length; null outside one. */
+export const quakeRunOf = (plan: PhasePlan, unit: number) => {
+  if (plan.kind !== "chords" || !plan.variation.units[unit]?.quake) return null;
+  const { units } = plan.variation;
+  const at = (i: number) => units[(i + units.length) % units.length];
+  let start = unit;
+  while (at(start - 1).quake && start - unit > -units.length) start -= 1;
+  let length = 0;
+  while (at(start + length).quake && length < units.length) length += 1;
+  return { start: (start + units.length) % units.length, length };
+};
+
+export interface QuakeWarning {
+  /** Coming within a bar, or under way. */
+  stage: "coming" | "on";
+  /** Beats until it starts, or strums left in it. */
+  left: number;
+  /** What `left` counts down from. */
+  total: number;
+}
+
+/** The quake about to hit or already shaking, read from the next strum. */
+export const quakeWarning = (
+  state: Pick<BossFightState, "plan" | "lastUnit" | "holding" | "outcome">,
+): QuakeWarning | null => {
+  const { plan } = state;
+  if (plan.kind !== "chords" || !plan.quakes || state.holding || state.outcome) return null;
+  const next = nextStrum(state);
+  if (next === null) return null;
+  const { units } = plan.variation;
+  const run = quakeRunOf(plan, next);
+  if (run) {
+    const done = (next - run.start + units.length) % units.length;
+    return { stage: "on", left: run.length - done, total: run.length };
+  }
+  let beats = 0;
+  for (let step = 0; step < units.length && beats <= QUAKE_WARNING_BEATS; step++) {
+    const unit = units[(next + step) % units.length];
+    if (unit.quake) return { stage: "coming", left: beats, total: QUAKE_WARNING_BEATS };
+    beats += unit.beats;
+  }
+  return null;
+};
+
+/** A strum later in the pass than `last` — late misses must not wind the alerts back. */
+const isAhead = (last: number | null, unit: number, units: number) =>
+  last === null || unit === last || (unit - last + units) % units < units / 2;
+
+/**
+ * The colossus's side of a judged strum: misses counted under its change, the
+ * alerts moved on, and a quake landing once every strum of it is judged —
+ * order doesn't matter, a miss comes in after the strum that follows it.
+ */
+const withStrum = (
+  state: BossFightState,
+  unit: number,
+  hit: boolean,
+): BossFightState => {
+  if (state.plan.kind !== "chords") return state;
+  const { units } = state.plan.variation;
+  let next: BossFightState = {
+    ...state,
+    lastUnit: isAhead(state.lastUnit, unit, units.length) ? unit : state.lastUnit,
+  };
+  if (!hit) {
+    const key = changeKey(state.plan.variation, unit);
+    if (key) next.changeMisses = { ...next.changeMisses, [key]: (next.changeMisses[key] ?? 0) + 1 };
+  }
+
+  const run = state.plan.quakes ? quakeRunOf(state.plan, unit) : null;
+  if (!run) return next;
+  // A strum this quake already had: the pass came round again.
+  const fresh = next.quakeRun !== run.start || next.quakeJudged.includes(unit);
+  const judged = fresh ? [unit] : [...next.quakeJudged, unit];
+  const misses = (fresh ? 0 : next.quakeMisses) + (hit ? 0 : 1);
+  next = { ...next, quakeRun: run.start, quakeJudged: judged, quakeMisses: misses };
+  if (judged.length < run.length) return next;
+  next = withSlam(next, misses <= quakeMissesAllowed(next), QUAKE_DAMAGE);
+  return { ...next, quakeRun: null, quakeJudged: [], quakeMisses: 0 };
+};
+
+/** A judged note — or, on the colossus, a judged strum and where it sits in the pass. */
+export type FightJudgement = Pick<NoteJudgement, "hit" | "grade" | "perfect"> & {
+  /** The strum's index in the colossus's pass. */
+  unit?: number;
+};
+
+/**
  * One judged note against the fight: a hit charges the sword (and a full one
  * strikes), a miss shatters the charge and draws a bite, and every note moves
  * the phase's clocks on — the next slam, the next weak spot, the web, the
- * venom, the boss's healing. The fight ends only when the player's HP runs
- * out; between two phases no note counts.
+ * venom, the boss's healing. On the colossus a "note" is a whole strum: its
+ * weak spot is a change, and its slams are the quakes written into the pass.
+ * The fight ends only when the player's HP runs out; between two phases no
+ * note counts.
  */
 export const applyJudgement = (
   state: BossFightState,
-  judgement: Pick<NoteJudgement, "hit" | "grade" | "perfect">,
+  judgement: FightJudgement,
 ): BossFightState => {
   if (state.outcome || state.holding) return state;
   const { rules, affixes } = state.plan;
+  const strum = state.plan.kind === "chords" ? (judgement.unit ?? null) : null;
   let next: BossFightState = { ...state };
-  const weakSpotOpen = isWeakSpotOpen(next);
+  const weakSpotOpen = strum !== null ? isWeakChange(next, strum) : isWeakSpotOpen(next);
 
   if (judgement.hit) {
     next.combo += 1;
@@ -404,7 +614,7 @@ export const applyJudgement = (
     next.bossHp = Math.min(next.bossMaxHp, next.bossHp + rules.regenPerNote);
   }
 
-  if (state.plan.weakSpots) {
+  if (state.plan.weakSpots && state.plan.kind === "spider") {
     if (next.weakSpotNotes > 0) {
       next.weakSpotNotes -= 1;
     } else if (--next.notesToWeakSpot <= 0) {
@@ -427,20 +637,14 @@ export const applyJudgement = (
   }
 
   if (state.plan.slams && --next.notesToSlam <= 0) {
-    const blocked = next.combo >= parryStreak(next);
-    const damage = blocked ? 0 : rageDamage(next, SLAM_DAMAGE);
-    next.phaseDamageTaken += Math.min(damage, next.playerHp);
-    next.playerHp = Math.max(0, next.playerHp - damage);
-    next.playerHurtTick += blocked ? 0 : 1;
-    next.slamTick += 1;
-    next.lastSlam = { blocked, damage };
+    next = withSlam(next, next.combo >= parryStreak(next), SLAM_DAMAGE);
     next.notesToSlam = Math.round(rules.slamEvery * (next.enraged ? RAGE_SLAM_PACE : 1));
-    if (blocked) {
-      next.blocks += 1;
-      next.charge += Math.round(next.chargeMax * COUNTER_CHARGE);
-      next = withStrike(next);
-      if (next.holding) return next;
-    }
+    if (next.holding) return next;
+  }
+
+  if (strum !== null) {
+    next = withStrum(next, strum, judgement.hit);
+    if (next.holding) return next;
   }
 
   next.enraged = next.bossHp / next.bossMaxHp < ENRAGE_BELOW;

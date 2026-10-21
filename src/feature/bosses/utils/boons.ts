@@ -1,3 +1,4 @@
+import type { ThreatId } from "./phaseChanges";
 import { AFFIX_FROM, createRng, SLAMS_FROM, WEAK_SPOTS_FROM } from "./phaseGenerator";
 
 /**
@@ -44,6 +45,8 @@ export const BOON = {
   thornsShare: 0.02,
   secondWindMisses: 2,
   steadyHandStreak: 2,
+  /** On the colossus: missed chords a quake is still blocked with. */
+  steadyHandQuakeMisses: 1,
   clearSightShare: 0.5,
   bladeBonus: 0.2,
   lightBladeCut: 0.2,
@@ -121,13 +124,17 @@ export const buildOf = (boons: BoonStacks): { id: BoonId; stacks: number }[] =>
     .map((b) => ({ id: b.id, stacks: stacksOf(boons, b.id) }))
     .sort((a, b) => b.stacks - a.stacks);
 
-/** The threat a boon answers — the draft says so when that threat is on. */
-export const BOON_COUNTERS: Partial<Record<BoonId, "slams" | "weak_spots" | "venom" | "web">> = {
-  steadyHand: "slams",
-  exploit: "weak_spots",
-  antidote: "venom",
-  clearSight: "web",
+/** The threats a boon answers — the draft says so when one of them is on. */
+export const BOON_COUNTERS: Partial<Record<BoonId, readonly ThreatId[]>> = {
+  steadyHand: ["slams", "quake"],
+  exploit: ["weak_spots"],
+  antidote: ["venom"],
+  clearSight: ["web"],
 };
+
+/** The threat in play that a boon answers, if any. */
+export const counteredThreat = (id: BoonId, threats: readonly ThreatId[]) =>
+  BOON_COUNTERS[id]?.find((threat) => threats.includes(threat)) ?? null;
 
 /** Boons that work well together — the draft points out pairs with the build. */
 export const BOON_SYNERGIES: Partial<Record<BoonId, readonly BoonId[]>> = {

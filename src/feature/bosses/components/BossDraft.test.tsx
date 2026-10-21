@@ -5,8 +5,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { FRETWEAVER } from "../data/fretweaver";
 import { useBossFightStore } from "../store/bossFightStore";
-import { fightWith } from "../utils/fightFixtures";
+import { fightWith,FIXTURE_SEED } from "../utils/fightFixtures";
 import type { PhasePlan } from "../utils/phaseGenerator";
+import { generatePhase } from "../utils/phaseGenerator";
 import { BossDraft } from "./BossDraft";
 
 const openDraft = (draft = ["armor", "blade", "bandage"] as const, rerollsLeft = 1) =>
@@ -80,15 +81,15 @@ describe("BossDraft", () => {
   });
 
   it("briefs what the next phase changes", () => {
-    const base = fightWith();
+    const base = generatePhase(FIXTURE_SEED, 0);
     const previousPlan: PhasePlan = {
-      ...base.plan,
+      ...base,
       slams: false,
       affixes: ["frenzy"],
       variation: { bpm: 96, notesPerBeat: 2, patterns: ["1234"], route: "walk", positions: [5] },
     };
     const plan: PhasePlan = {
-      ...base.plan,
+      ...base,
       slams: true,
       affixes: ["venom"],
       variation: { bpm: 104, notesPerBeat: 3, patterns: ["1324"], route: "skip", positions: [7] },

@@ -1,7 +1,15 @@
 import type { BoonId } from "./boons";
 import { BOON, stacksOf } from "./boons";
 import type { BossFightState } from "./bossEngine";
-import { chargeMaxFor, MAX_MULTIPLIER_STREAK, parryStreak, phaseBpm, WEAK_SPOT_CHARGE } from "./bossEngine";
+import {
+  chargeMaxFor,
+  momentumStreakFor,
+  multiplierStreakFor,
+  parryStreak,
+  phaseBpm,
+  quakeMissesAllowed,
+  WEAK_SPOT_CHARGE,
+} from "./bossEngine";
 
 export interface BoonPreview {
   from: number | string;
@@ -41,7 +49,10 @@ export const boonPreview = (fight: BossFightState, id: BoonId): BoonPreview | nu
     case "secondWind":
       return { from: fight.forgivenLeft, to: fight.forgivenLeft + BOON.secondWindMisses };
     case "steadyHand":
-      return { from: parryStreak(fight), to: BOON.steadyHandStreak };
+      // The colossus's quakes are blocked by missing no more than so many chords.
+      return fight.plan.kind === "chords"
+        ? { from: quakeMissesAllowed(fight), to: BOON.steadyHandQuakeMisses }
+        : { from: parryStreak(fight), to: BOON.steadyHandStreak };
     case "blade": {
       const overdrive = stacksOf(fight.boons, "overdrive");
       return {
@@ -54,7 +65,7 @@ export const boonPreview = (fight: BossFightState, id: BoonId): BoonPreview | nu
     case "precision":
       return { from: 4, to: BOON.precisionPoints };
     case "momentum":
-      return { from: MAX_MULTIPLIER_STREAK, to: BOON.momentumStreak };
+      return { from: multiplierStreakFor(fight.plan), to: momentumStreakFor(fight.plan) };
     case "exploit":
       return { from: `×${WEAK_SPOT_CHARGE}`, to: `×${BOON.exploitCharge}` };
     case "slowDown":

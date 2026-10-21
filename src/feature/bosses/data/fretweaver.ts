@@ -22,9 +22,5 @@ export const FRETWEAVER: BossDefinition = {
   id: "fretweaver",
   name: "The Fretweaver",
   title: "Queen of the chromatic web",
+  drill: "spider",
 };
-
-export const BOSSES: readonly BossDefinition[] = [FRETWEAVER];
-
-export const getBoss = (id: string): BossDefinition | undefined =>
-  BOSSES.find((boss) => boss.id === id);

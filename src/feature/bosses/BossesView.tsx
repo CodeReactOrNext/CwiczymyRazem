@@ -3,25 +3,32 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import Link from "next/link";
 import { useAppSelector } from "store/hooks";
 
-import { FretweaverArt } from "./components/FretweaverArt";
-import { BOSSES } from "./data/fretweaver";
+import { BossArt } from "./components/BossArt";
+import { BOSSES } from "./data/bosses";
 import { useBossRecord } from "./hooks/useBossProgress";
 import { useBossText } from "./hooks/useBossText";
 import type { BossDefinition } from "./types/boss.types";
-import { MAX_MULTIPLIER_STREAK, PARRY_STREAK, PHASE_HEAL, WEAK_SPOT_CHARGE } from "./utils/bossEngine";
+import {
+  CHORD_MULTIPLIER_STREAK,
+  MAX_MULTIPLIER_STREAK,
+  PARRY_STREAK,
+  PHASE_HEAL,
+  WEAK_SPOT_CHARGE,
+} from "./utils/bossEngine";
+import { QUAKES_FROM } from "./utils/chordPhaseGenerator";
 import { AFFIX_FROM, SLAMS_FROM, WEAK_SPOTS_FROM } from "./utils/phaseGenerator";
 
 const RULE_KEYS = ["sword", "strike", "bite", "slam", "endless", "draft", "threats"] as const;
 
-const RULE_VARS = {
-  max: MAX_MULTIPLIER_STREAK,
+const ruleVars = (boss: BossDefinition) => ({
+  max: boss.drill === "chords" ? CHORD_MULTIPLIER_STREAK : MAX_MULTIPLIER_STREAK,
   parry: PARRY_STREAK,
-  slams: SLAMS_FROM,
+  slams: boss.drill === "chords" ? QUAKES_FROM : SLAMS_FROM,
   heal: PHASE_HEAL,
   weak: WEAK_SPOTS_FROM,
   weakCharge: WEAK_SPOT_CHARGE,
   affix: AFFIX_FROM,
-};
+});
 
 const RecordStat = ({ value, label }: { value: string | number; label: string }) => (
   <div>
@@ -38,7 +45,8 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
   return (
     <section className='space-y-6'>
       <div className='grid items-center gap-8 rounded-lg bg-zinc-900/40 p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:p-8'>
-        <FretweaverArt
+        <BossArt
+          boss={boss}
           className='mx-auto aspect-[480/380] w-full max-w-md'
           pattern={[1, 3, 2, 4]}
           webTorn={0}
@@ -82,7 +90,7 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
                   {t(`rules.${key}.title`)}
                 </span>
                 <span className='block text-sm text-zinc-400'>
-                  {t(`rules.${key}.body`, RULE_VARS)}
+                  {t(`rules.${key}.body`, ruleVars(boss))}
                 </span>
               </span>
             </li>
@@ -93,7 +101,7 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
   );
 };
 
-/** Every boss, each with its lair — one so far. */
+/** Every boss, each with its lair. */
 export const BossesView = () => (
   <div className='space-y-10'>
     {BOSSES.map((boss) => (

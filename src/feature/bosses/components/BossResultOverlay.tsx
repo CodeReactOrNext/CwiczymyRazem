@@ -12,7 +12,7 @@ import { buildOf } from "../utils/boons";
 import { artPhaseFor, legPatternFor, moodFor } from "../utils/bossArt";
 import { fightAccuracy, phaseNumber, runLog } from "../utils/bossEngine";
 import { BoonIcon } from "./BoonIcon";
-import { FretweaverArt } from "./FretweaverArt";
+import { BossArt } from "./BossArt";
 import { RunChart } from "./RunChart";
 
 const Stat = ({ label, value }: { label: string; value: string | number }) => (
@@ -26,7 +26,7 @@ const Stat = ({ label, value }: { label: string; value: string | number }) => (
 const REVEAL_DELAY_MS = 900;
 
 /**
- * The end of a run: the spider gloating over its web, how far the player got,
+ * The end of a run: the boss gloating over the player, how far they got,
  * whether it beat their record, and the way on. Shown over the session, which
  * has already stopped the clock.
  */
@@ -79,11 +79,12 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
           <m.div
             variants={popIn}
             className='w-full max-w-lg space-y-6 rounded-lg bg-zinc-900 px-6 py-8 text-center sm:px-8'>
-            <FretweaverArt
+            <BossArt
+              boss={boss}
               className='mx-auto h-40 w-52'
               mood={moodFor(fight)}
-              phase={artPhaseFor(fight)}
-              pattern={legPatternFor(fight.plan.variation)}
+              form={artPhaseFor(fight)}
+              pattern={legPatternFor(fight.plan)}
               webTorn={1 - fight.bossHp / fight.bossMaxHp}
             />
 

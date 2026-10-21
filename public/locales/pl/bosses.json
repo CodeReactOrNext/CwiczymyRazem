@@ -3,6 +3,97 @@
     "fretweaver": {
       "name": "Tkaczka Progów",
       "title": "Królowa chromatycznej sieci"
+    },
+    "colossus": {
+      "name": "Kamienny Kolos",
+      "title": "Pogromca wolnych zmian",
+      "threats": {
+        "bites": "Pięści",
+        "weak_spots": "Słaba zmiana",
+        "venom": "Pył",
+        "regen": "Zrastanie",
+        "frenzy": "Wstrząsy wtórne",
+        "web": "Skamienienie"
+      },
+      "arena": {
+        "slam": "Wstrząs",
+        "webbed": "Skamienienie — graj progresję z pamięci",
+        "poisoned": "Pył w oczach — ładuje się o połowę wolniej",
+        "poisoned_short": "Pył",
+        "regenerating": "Zrasta się — zadaj cios"
+      },
+      "result": {
+        "title": "Kolos cię zmiażdżył"
+      },
+      "lair": {
+        "pitch": "Jedna niekończąca się walka na zmiany akordów. W każdej fazie kolos składa się na nowo wokół nowej progresji — akordy otwarte, power chordy, barré, septymowe — a zmiany przychodzą coraz szybciej. Sprawdź, jak daleko zajdziesz."
+      },
+      "rules": {
+        "sword": {
+          "body": "Każda czysta zmiana go ładuje: idealnie 4, na czas 3, blisko 2, luźno 1. Akord się liczy, gdy słychać wszystkie struny poza jedną. Pudło rozbija ładunek."
+        },
+        "strike": {
+          "body": "Pełny miecz uderza sam — tym mocniej, im dłuższa seria czystych zmian, aż do ×2 przy {{max}} z rzędu."
+        },
+        "bite": {
+          "title": "Każde pudło to cios pięścią",
+          "body": "Akord, na który nie zdążysz, kosztuje HP. Skończy się HP — koniec biegu."
+        },
+        "slam": {
+          "title": "Przetrwaj wstrząs",
+          "body": "Od fazy {{slams}} kolos wywołuje wstrząsy: przez dwa takty akordy zmieniają się dwa razy częściej. Zagraj każdy czysto, a zablokujesz — blok ładuje miecz do połowy."
+        },
+        "endless": {
+          "body": "Zbij HP fazy, a kolos składa się na nowo: nowa progresja, nowe akordy i szybsze tempo za każdym razem. Najpierw akordy otwarte, potem power chordy, barré i septymowe. Każda zaliczona faza leczy cię o {{heal}} HP."
+        },
+        "threats": {
+          "body": "Od fazy {{weak}} znajduje twoją słabą zmianę — tę, na której mylisz się najczęściej — a czysto zagrana ładuje miecz ×{{weakCharge}}. Od fazy {{affix}} zdobywa moce: pył, zrastanie, wstrząsy wtórne i skamienienie, które zamienia tabulaturę w kamień."
+        }
+      },
+      "boons": {
+        "armor": {
+          "body": "Ciosy pięścią zabierają o {{armorPercent}}% mniej HP. Kumuluje się."
+        },
+        "shield": {
+          "body": "Pochłania {{shieldCharges}} kolejne ciosy."
+        },
+        "thorns": {
+          "body": "Każdy cios pięścią kosztuje kolosa {{thornsPercent}}% HP fazy. Kumuluje się."
+        },
+        "secondWind": {
+          "body": "{{secondWindMisses}} pudła w każdej fazie są darmowe: bez ciosu, seria i ładunek zostają."
+        },
+        "steadyHand": {
+          "body": "Wstrząs jest zablokowany nawet z {{steadyHandQuakeMisses}} nietrafionym akordem."
+        },
+        "antidote": {
+          "name": "Maska",
+          "body": "Pył cię nie rusza."
+        },
+        "clearSight": {
+          "body": "Skamienienie trwa o połowę krócej."
+        },
+        "precision": {
+          "body": "Zmiany idealnie w beat ładują {{precisionPoints}} zamiast 4."
+        },
+        "momentum": {
+          "body": "Mnożnik serii osiąga ×2 już przy {{momentumStreak}} z rzędu zamiast {{maxStreak}}."
+        },
+        "exploit": {
+          "body": "Czysta słaba zmiana ładuje miecz ×{{exploitCharge}}."
+        }
+      },
+      "preview": {
+        "armor": "Cios {{from}} → {{to}} HP",
+        "thorns": "Za cios {{from}} → {{to}} obrażeń",
+        "steadyHand": "Dozwolone pudła we wstrząsie {{from}} → {{to}}",
+        "exploit": "Słaba zmiana {{from}} → {{to}}"
+      },
+      "briefing": {
+        "faster": "Zmiany o {{percent}}% szybciej",
+        "slower": "Zmiany o {{percent}}% wolniej",
+        "same_speed": "Zmiany w tym samym tempie"
+      }
     }
   },
   "arena": {
@@ -24,7 +115,12 @@
     "caught_secondWind": "Drugi oddech",
     "sword_ready": "Gotowy do ciosu",
     "poisoned_short": "Zatruty",
-    "enraged": "Szał"
+    "enraged": "Szał",
+    "quake_coming": "Wstrząs za takt — zmiany pójdą dwa razy częściej",
+    "quake_on": "Wstrząs — każdy akord czysto · zostało {{count}}",
+    "quake_on_steady": "Wstrząs — wolno 1 pudło · zostało {{count}}",
+    "weak_change": "Teraz słaba zmiana: {{change}} — miecz ×{{multiplier}}",
+    "weak_change_label": "Słaba zmiana:"
   },
   "threats": {
     "bites": "Ukąszenia",
@@ -33,7 +129,8 @@
     "venom": "Jad",
     "regen": "Regeneracja",
     "frenzy": "Szał",
-    "web": "Sieć"
+    "web": "Sieć",
+    "quake": "Wstrząsy"
   },
   "result": {
     "title": "Sieć się zamknęła",
@@ -195,13 +292,23 @@
     "slower": "Nuty o {{percent}}% wolniej",
     "same_speed": "Nuty w tym samym tempie",
     "unchanged": "Bez zmian — {{list}}",
-    "first_bar": "Pierwszy takt"
+    "first_bar": "Pierwszy takt",
+    "chords": "Akordy",
+    "progression": "Progresja",
+    "quakes": "Wstrząsy",
+    "quakes_per_pass_one": "{{count}} na przebieg",
+    "quakes_per_pass_few": "{{count}} na przebieg",
+    "quakes_per_pass_many": "{{count}} na przebieg",
+    "quakes_per_pass_other": "{{count}} na przebieg",
+    "shapes": "Chwyty"
   },
   "subdivision": {
     "quarters": "ćwierćnuty",
     "eighths": "ósemki",
     "triplets": "triole",
-    "sixteenths": "szesnastki"
+    "sixteenths": "szesnastki",
+    "halves": "półnuty",
+    "wholes": "całe nuty"
   },
   "route": {
     "walk": "po strunach",
@@ -224,5 +331,11 @@
     "exploit": "Słaby punkt {{from}} → {{to}}",
     "slowDown": "Tempo {{from}} → {{to}} BPM",
     "overdrive": "Tempo {{from}} → {{to}} BPM"
+  },
+  "chord_family": {
+    "open": "akordy otwarte",
+    "power": "power chordy",
+    "barre": "akordy barré",
+    "seventh": "akordy septymowe"
   }
 }

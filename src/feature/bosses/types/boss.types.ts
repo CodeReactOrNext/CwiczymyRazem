@@ -27,10 +27,40 @@ export interface SpiderVariation {
   positions: readonly number[];
 }
 
+/** The kinds of chord the colossus throws, in the order the fight brings them. */
+export type ChordFamily = "open" | "power" | "barre" | "seventh";
+
+/** One strum of the colossus's drill: the chord and how long it rings. */
+export interface ChordUnit {
+  chord: string;
+  /** In beats: 2 = a half note, 1 = a quarter, 0.5 = an eighth. */
+  beats: number;
+  /** Part of a quake — the bars where the chords change twice as often. */
+  quake: boolean;
+}
+
+/** One drill the colossus throws: a looped chord progression at a tempo. */
+export interface ChordVariation {
+  bpm: number;
+  family: ChordFamily;
+  /** The progression the pass cycles through, in order. */
+  progression: readonly string[];
+  /** Beats each chord rings outside a quake: 4 = a bar, 2 = half notes, 1 = quarters. */
+  beatsPerChord: 1 | 2 | 4;
+  /** The pass strum by strum, in whole 4/4 bars; the tab loops it. */
+  units: readonly ChordUnit[];
+}
+
+/** What a boss deals: the spider's finger drills or the colossus's chord changes. */
+export type DrillKind = "spider" | "chords";
+
+export type BossId = "fretweaver" | "colossus";
+
 export interface BossDefinition {
-  id: string;
+  id: BossId;
   name: string;
   title: string;
+  drill: DrillKind;
 }
 
 /** The player's best against one boss. */

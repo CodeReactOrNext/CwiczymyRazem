@@ -9,26 +9,32 @@ import { useAppSelector } from "store/hooks";
 
 import { useBossText } from "../hooks/useBossText";
 import { useBossFightStore } from "../store/bossFightStore";
-import type { BossDefinition, BossRecord } from "../types/boss.types";
+import type { BossDefinition, BossId, BossRecord } from "../types/boss.types";
 import { buildOf } from "../utils/boons";
-import { artPhaseFor, legPatternFor, moodFor, subdivisionKey } from "../utils/bossArt";
+import type { BossForm } from "../utils/bossArt";
+import { artPhaseFor, legPatternFor, moodFor } from "../utils/bossArt";
 import type { BossFightState } from "../utils/bossEngine";
 import {
   fightMultiplier,
   isRegenerating,
   isSlamComing,
+  isWeakChange,
   isWeakSpotOpen,
   isWebbed,
+  nextStrum,
   parryStreak,
   phaseBpm,
   phaseNumber,
+  quakeMissesAllowed,
+  quakeWarning,
+  rhythmKeyOf,
   weakSpotCharge,
 } from "../utils/bossEngine";
+import { changeLabel } from "../utils/chordTab";
 import type { ThreatId } from "../utils/phaseChanges";
 import { threatsOf } from "../utils/phaseChanges";
 import { BoonIcon } from "./BoonIcon";
-import type { SpiderPhase } from "./FretweaverArt";
-import { FretweaverArt } from "./FretweaverArt";
+import { BossArt } from "./BossArt";
 import { ThreatIcon } from "./ThreatIcon";
 
 /** Under this share of HP the player's bar warns. */
@@ -346,9 +352,27 @@ interface LiveAlert {
   tone: "danger" | "chance" | "info";
 }
 
-/** The one thing to watch right now, most urgent first: a slam, the web, a weak spot, healing. */
+/** The one thing to watch right now, most urgent first: a slam or quake, the web, a weak spot, healing. */
 const liveAlert = (fight: BossFightState, t: Translate): LiveAlert | null => {
   if (fight.outcome || fight.holding) return null;
+  const quake = quakeWarning(fight);
+  if (quake) {
+    return quake.stage === "on"
+      ? {
+          threat: "quake",
+          text: t(quakeMissesAllowed(fight) > 0 ? "arena.quake_on_steady" : "arena.quake_on", {
+            count: quake.left,
+          }),
+          progress: quake.left / quake.total,
+          tone: "danger",
+        }
+      : {
+          threat: "quake",
+          text: t("arena.quake_coming"),
+          progress: 1 - quake.left / quake.total,
+          tone: "danger",
+        };
+  }
   if (isSlamComing(fight)) {
     return {
       threat: "slams",
@@ -363,6 +387,18 @@ const liveAlert = (fight: BossFightState, t: Translate): LiveAlert | null => {
       text: t("arena.webbed"),
       progress: fight.webNotes / fight.plan.rules.webLength,
       tone: "danger",
+    };
+  }
+  const next = nextStrum(fight);
+  if (next !== null && fight.weakChange && isWeakChange(fight, next)) {
+    return {
+      threat: "weak_spots",
+      text: t("arena.weak_change", {
+        change: changeLabel(fight.weakChange),
+        multiplier: weakSpotCharge(fight),
+      }),
+      progress: 0,
+      tone: "chance",
     };
   }
   if (isWeakSpotOpen(fight)) {
@@ -391,7 +427,15 @@ const ALERT_BAR: Record<LiveAlert["tone"], string> = {
 };
 
 /** The live alert, large and over the stage — read in a glance from the tab. */
-const AlertPill = ({ alert, compact }: { alert: LiveAlert | null; compact: boolean }) => (
+const AlertPill = ({
+  alert,
+  boss,
+  compact,
+}: {
+  alert: LiveAlert | null;
+  boss: BossId;
+  compact: boolean;
+}) => (
   <AnimatePresence>
     {alert && (
       <m.div
@@ -410,7 +454,7 @@ const AlertPill = ({ alert, compact }: { alert: LiveAlert | null; compact: boole
             compact ? "text-sm" : "text-base",
             ALERT_TEXT[alert.tone],
           )}>
-          <ThreatIcon id={alert.threat} className={cn("shrink-0", compact ? "h-5 w-5" : "h-6 w-6")} />
+          <ThreatIcon id={alert.threat} boss={boss} className={cn("shrink-0", compact ? "h-5 w-5" : "h-6 w-6")} />
           <span className='truncate'>{alert.text}</span>
         </span>
         {alert.progress > 0 && (
@@ -432,11 +476,13 @@ const AlertPill = ({ alert, compact }: { alert: LiveAlert | null; compact: boole
 /** The phase's threats as icons; the one in play right now lights up. */
 const ThreatIcons = ({
   fight,
+  boss,
   live,
   t,
   align,
 }: {
   fight: BossFightState;
+  boss: BossId;
   live: ThreatId | null;
   t: Translate;
   align: "start" | "end";
@@ -448,6 +494,7 @@ const ThreatIcons = ({
         <li key={id} title={name} aria-label={name}>
           <ThreatIcon
             id={id}
+            boss={boss}
             className={cn(
               "transition-colors duration-fast",
               align === "end" ? "h-6 w-6" : "h-5 w-5",
@@ -462,24 +509,33 @@ const ThreatIcons = ({
 
 // ── Arena ───────────────────────────────────────────────────────────────────
 
-/** A leg for every eighth of the phase's HP gone; the molt grows them back. */
-const legsLostFor = (fight: Pick<BossFightState, "bossHp" | "bossMaxHp">) =>
+/** A leg — or a plate — for every eighth of the phase's HP gone; the molt puts them back. */
+const piecesLostFor = (fight: Pick<BossFightState, "bossHp" | "bossMaxHp">) =>
   Math.min(7, Math.floor((1 - fight.bossHp / fight.bossMaxHp) * 8));
 
 /**
- * The stage's light, in the colour of the spider's form — purple, gold, the
- * enraged orange — taken half-way to grey and kept low, one gradient falling
- * from the top: a lit stage, not a coloured box.
+ * The stage's light, in the colour of the boss's form — the spider's purple,
+ * gold and enraged orange, the colossus's cyan runes, amber and orange — taken
+ * half-way to grey and kept low, one gradient falling from the top: a lit
+ * stage, not a coloured box.
  */
-const STAGE_LIGHT: Record<SpiderPhase, string> = {
-  0: "120, 72, 159",
-  1: "165, 117, 63",
-  2: "174, 101, 67",
+const STAGE_LIGHT: Record<BossId, Record<BossForm, string>> = {
+  fretweaver: { 0: "120, 72, 159", 1: "165, 117, 63", 2: "174, 101, 67" },
+  colossus: { 0: "64, 115, 133", 1: "165, 117, 63", 2: "174, 101, 67" },
 };
 
-const stageStyle = (phase: SpiderPhase) => ({
-  backgroundImage: `linear-gradient(180deg, rgba(${STAGE_LIGHT[phase]}, 0.26) 0%, rgba(${STAGE_LIGHT[phase]}, 0.08) 55%, rgba(9, 9, 11, 0) 100%)`,
-});
+const stageStyle = (boss: BossId, form: BossForm) => {
+  const light = STAGE_LIGHT[boss][form];
+  return {
+    backgroundImage: `linear-gradient(180deg, rgba(${light}, 0.26) 0%, rgba(${light}, 0.08) 55%, rgba(9, 9, 11, 0) 100%)`,
+  };
+};
+
+/** The boss's HP bar: the spider purple, the colossus the grey of its stone. */
+const BOSS_BAR: Record<BossId, string> = {
+  fretweaver: "bg-gradient-to-l from-purple-700 to-purple-400",
+  colossus: "bg-gradient-to-l from-zinc-500 to-zinc-300",
+};
 
 interface BossArenaProps {
   boss: BossDefinition;
@@ -507,24 +563,27 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
   const alert = liveAlert(fight, t);
   const lowHp = fight.playerHp / fight.playerMaxHp < LOW_HP;
   const bpm = phaseBpm(fight);
-  const rhythm = t(`subdivision.${subdivisionKey(fight.plan.variation)}`);
+  const rhythm = t(rhythmKeyOf(fight.plan));
   const form = artPhaseFor(fight);
+  const quake = quakeWarning(fight);
 
   const spider = (
     <div className={cn("relative shrink-0", compact ? "h-32 w-40" : "h-64 w-80 xl:h-80 xl:w-[25rem]")}>
-      <FretweaverArt
+      <BossArt
+        boss={boss}
         className='h-full w-full'
         mood={moodFor(fight)}
         strikeTick={fight.strikeTick}
         biteTick={fight.biteTick}
         slamTick={fight.slamTick}
-        windup={alert?.threat === "slams"}
+        windup={alert?.threat === "slams" || quake?.stage === "coming"}
+        quaking={quake?.stage === "on"}
         exposed={alert?.threat === "weak_spots"}
-        phase={form}
+        form={form}
         molting={fight.holding && fight.draft !== null && !draftOpen}
-        pattern={legPatternFor(fight.plan.variation)}
+        pattern={legPatternFor(fight.plan)}
         webTorn={1 - fight.bossHp / fight.bossMaxHp}
-        legsLost={legsLostFor(fight)}
+        piecesLost={piecesLostFor(fight)}
         intro
       />
       <EventLayer events={events} zone='boss' compact={compact} />
@@ -593,13 +652,21 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
         max={fight.bossMaxHp}
         from={compact ? "left" : "right"}
         size={compact ? "md" : "lg"}
-        fillClass={
-          fight.enraged
-            ? "bg-gradient-to-l from-orange-600 to-orange-400"
-            : "bg-gradient-to-l from-purple-700 to-purple-400"
-        }
+        fillClass={fight.enraged ? "bg-gradient-to-l from-orange-600 to-orange-400" : BOSS_BAR[boss.id]}
       />
-      <ThreatIcons fight={fight} live={alert?.threat ?? null} t={t} align={compact ? "start" : "end"} />
+      <ThreatIcons
+        fight={fight}
+        boss={boss.id}
+        live={alert?.threat ?? null}
+        t={t}
+        align={compact ? "start" : "end"}
+      />
+      {fight.weakChange && (
+        <p className={cn("text-xs text-zinc-400", !compact && "text-right")}>
+          {t("arena.weak_change_label")}{" "}
+          <span className='font-medium tabular-nums text-emerald-400'>{changeLabel(fight.weakChange)}</span>
+        </p>
+      )}
     </div>
   );
 
@@ -617,7 +684,7 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
 
   if (compact) {
     return (
-      <div className='relative space-y-3 overflow-hidden rounded-lg bg-zinc-900/60 p-3 text-left' style={stageStyle(form)}>
+      <div className='relative space-y-3 overflow-hidden rounded-lg bg-zinc-900/60 p-3 text-left' style={stageStyle(boss.id, form)}>
         <div className='flex items-center gap-3'>
           {spider}
           <div className='min-w-0 flex-1 space-y-3'>
@@ -626,13 +693,13 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
           </div>
         </div>
         {playerSide}
-        <AlertPill alert={alert} compact />
+        <AlertPill alert={alert} boss={boss.id} compact />
       </div>
     );
   }
 
   return (
-    <div className='relative w-full overflow-hidden rounded-lg bg-zinc-900/60 text-left' style={stageStyle(form)}>
+    <div className='relative w-full overflow-hidden rounded-lg bg-zinc-900/60 text-left' style={stageStyle(boss.id, form)}>
       <div className='grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-10 px-10 pb-6 pt-5'>
         <div className='flex justify-end'>
           <div className='w-full max-w-md'>{playerSide}</div>
@@ -645,7 +712,7 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
           <div className='w-full max-w-md'>{bossSide}</div>
         </div>
       </div>
-      <AlertPill alert={alert} compact={false} />
+      <AlertPill alert={alert} boss={boss.id} compact={false} />
     </div>
   );
 };

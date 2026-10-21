@@ -1,8 +1,8 @@
-import { getBoss } from "feature/bosses/data/fretweaver";
+import { getBoss } from "feature/bosses/data/bosses";
 import { useBossFight } from "feature/bosses/hooks/useBossFight";
 import { useBossRecord } from "feature/bosses/hooks/useBossProgress";
 import type { BossDefinition } from "feature/bosses/types/boss.types";
-import { buildPhaseExercise } from "feature/bosses/utils/spiderTab";
+import { buildBossExercise } from "feature/bosses/utils/bossExercise";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -20,10 +20,10 @@ interface BossFightSessionProps {
 const BossFightSession = ({ boss, userId, onLeave }: BossFightSessionProps) => {
   const [isFinishing, setIsFinishing] = useState(false);
   const { record, saveRun } = useBossRecord(userId, boss.id);
-  const { config, variation } = useBossFight({ boss, record, onRunEnd: saveRun });
+  const { config, plan: phase, bpm } = useBossFight({ boss, record, onRunEnd: saveRun });
 
   const plan = useMemo<ExercisePlan>(() => {
-    const exercise = buildPhaseExercise(boss, variation);
+    const exercise = buildBossExercise(boss, phase, bpm);
     return {
       id: `boss-${boss.id}`,
       title: boss.name,
@@ -37,7 +37,11 @@ const BossFightSession = ({ boss, userId, onLeave }: BossFightSessionProps) => {
       image: null,
       boss: { id: boss.id },
     };
-  }, [boss, variation, userId]);
+  }, [boss, phase, bpm, userId]);
+
+  // The store still holds the last fight until the entry effect deals this
+  // boss's — don't hand the session another boss's tab in between.
+  if (phase.kind !== boss.drill) return <PracticeLoadingScreen isReady={false} />;
 
   return (
     <PracticeSession
