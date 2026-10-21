@@ -11,6 +11,8 @@ import { tempoScoreFactor } from "../utils/tempoScoreFactor";
 import type { RunNote, TimingGrade } from "../utils/timingGrade";
 import { gradeTiming, isPerfectTiming, TIMING_GRADE_POINTS, timingHintFor } from "../utils/timingGrade";
 import { MAX_TIMED_NOTES } from "../utils/timingPrecision";
+import type { AlphaTabPassClock, AlphaTabSource } from "./alphaTabPassClock";
+import { addAlphaTabPassStart, ALPHATAB_RESTART_GRACE_SEC, alphaTabPassBeats, createAlphaTabPassClock } from "./alphaTabPassClock";
 import type { ExpectedAttack } from "./noteEventGrader";
 import { assignAttacks } from "./noteEventGrader";
 import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
@@ -29,6 +31,11 @@ interface UseNoteMatchingOptions {
   audioContext?: AudioContext | null;
   /** AudioContext.currentTime of the first scheduled beat (same instant as startTime). */
   audioStartTime?: number | null;
+  /** AlphaTab plays the tab (null: the synth, locked to the metronome grid). It
+   *  restarts the tab itself once a pass has played out, late — so each pass is
+   *  judged from its own restart, reported through markAlphaTabPassStart, instead
+   *  of the grid. See alphaTabPassClock.ts. */
+  alphaTabSource?: AlphaTabSource | null;
   effectiveBpm: number;
   /** raw metronome BPM — × speedMultiplier gives the tempo a note scores at */
   rawBpm: number;
@@ -92,8 +99,8 @@ interface PendingIntonation {
 }
 
 export function useNoteMatching({
-  isPlaying, startTime, audioContext, audioStartTime, effectiveBpm, rawBpm,
-  activeTablature, isMicEnabled, currentExerciseIndex,
+  isPlaying, startTime, audioContext, audioStartTime, alphaTabSource = null,
+  effectiveBpm, rawBpm, activeTablature, isMicEnabled, currentExerciseIndex,
   speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset, calibratedLatencyMs,
   scoringFocus = "timing", onNoteJudged,
 }: UseNoteMatchingOptions) {
@@ -173,6 +180,21 @@ export function useNoteMatching({
    *  can never fill a whole run of notes. Keyed by onsetMs, which the processor
    *  derives per hop and is therefore unique per attack. */
   const consumedAttacksRef = useRef<Set<number>>(new Set());
+
+  // Read by the matching loop rather than restarting it: a restart lands while
+  // the last notes of the pass before are still being judged. Starts over when
+  // the other AlphaTab takes the sound (the notation view opened or closed): it
+  // picks up on the metronome grid, not from this one's restarts.
+  const alphaTabPassClockRef = useRef<AlphaTabPassClock | null>(null);
+  useEffect(() => {
+    alphaTabPassClockRef.current = isPlaying && audioStartTime != null ? createAlphaTabPassClock(audioStartTime) : null;
+  }, [isPlaying, audioStartTime, alphaTabSource]);
+
+  /** AlphaTab has just started the tab over — call it from its loop restart. */
+  const markAlphaTabPassStart = useCallback(() => {
+    const clock = alphaTabPassClockRef.current;
+    if (clock && audioContext) addAlphaTabPassStart(clock, audioContext.currentTime);
+  }, [audioContext]);
 
   // ── Derived ───────────────────────────────────────────────────────────────────
 
@@ -335,14 +357,21 @@ export function useNoteMatching({
 
       // Position on the clock the user hears (audio context), tempo-map-aware,
       // shifted back by the input latency so windows line up with the played note.
-      const rawElapsedSec = audioContext && audioStartTime != null
-        ? audioContext.currentTime - audioStartTime
-        : (now - startTime) / 1000;
-      const elapsedSec = rawElapsedSec - (calibratedLatencyMs ?? getLatencyMs()) / 1000;
-      const beatsTotal = beatClock
-        ? beatClock.toBeats(elapsedSec)
-        : elapsedSec * beatsPerSec;
-      const loopedBeatsElapsed = beatsTotal % totalExBeats;
+      const latencySec = (calibratedLatencyMs ?? getLatencyMs()) / 1000;
+      const toBeats = (elapsedSec: number) => beatClock ? beatClock.toBeats(elapsedSec) : elapsedSec * beatsPerSec;
+      const passClock = alphaTabSource && audioContext ? alphaTabPassClockRef.current : null;
+      let loopedBeatsElapsed: number;
+      if (passClock && audioContext) {
+        loopedBeatsElapsed = alphaTabPassBeats(
+          passClock, audioContext.currentTime - latencySec, toBeats, totalExBeats,
+          earlyWindowBeats / beatsPerSec, ALPHATAB_RESTART_GRACE_SEC * beatsPerSec,
+        );
+      } else {
+        const rawElapsedSec = audioContext && audioStartTime != null
+          ? audioContext.currentTime - audioStartTime
+          : (now - startTime) / 1000;
+        loopedBeatsElapsed = toBeats(rawElapsedSec - latencySec) % totalExBeats;
+      }
       const hasRecentOnset     = (now - lastOnsetTime) < onsetRecencyMs;
       const hasRecentTick      = (now - lastTickTime)  < onsetRecencyMs;
 
@@ -452,9 +481,12 @@ export function useNoteMatching({
         const { beat, beatStart, beatEnd, notes } = flatBeats[i];
         if (beatStart > loopedBeatsElapsed + earlyWindowBeats + 1) break;
 
+        // On the grid the pass after wraps straight on, so the last note's late
+        // window spills into it. An AlphaTab pass runs past its end instead and
+        // has already judged that note by the time the restart takes over.
         const isWithinWindow =
           (loopedBeatsElapsed >= beatStart - earlyWindowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
-          (loopedBeatsElapsed < earlyWindowBeats && beatEnd + windowBeats >= totalExBeats);
+          (!passClock && loopedBeatsElapsed < earlyWindowBeats && beatEnd + windowBeats >= totalExBeats);
         const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
 
         notes.forEach(({ note, noteKey }) => {
@@ -708,7 +740,7 @@ export function useNoteMatching({
       livePitchRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, startTime, audioContext, audioStartTime, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm, calibratedLatencyMs, scoringFocus, settleIntonation]);
+  }, [isPlaying, startTime, audioContext, audioStartTime, alphaTabSource, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm, calibratedLatencyMs, scoringFocus, settleIntonation]);
 
-  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, timingOffsetsRef, intonationCountsRef, intonationOffsetsRef, runLogRef, livePitchRef, settlePendingIntonation, resetGame };
+  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, timingOffsetsRef, intonationCountsRef, intonationOffsetsRef, runLogRef, livePitchRef, settlePendingIntonation, resetGame, markAlphaTabPassStart };
 }

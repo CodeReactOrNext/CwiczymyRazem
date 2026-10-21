@@ -35,10 +35,14 @@ interface UseAlphaTabApiOptions {
    *  practice session); short standalone previews turn it on so a 1-2 measure
    *  excerpt doesn't look stranded on the left. */
   justifyLastSystem?: boolean;
+  /** Called each time the looping playback starts the score over. */
+  onLoopRestart?: () => void;
 }
 
 interface UseAlphaTabApiReturn {
   apiRef: React.MutableRefObject<any>;
+  /** The score's length in ticks once the player has reported it, else 0. */
+  endTickRef: React.MutableRefObject<number>;
   scrollRef: React.MutableRefObject<HTMLDivElement | null>;
   containerRef: React.MutableRefObject<HTMLDivElement | null>;
   uiReady: boolean;
@@ -68,11 +72,16 @@ export function useAlphaTabApi({
   trackConfigs = {},
   backingTrackIds = [],
   justifyLastSystem = false,
+  onLoopRestart,
 }: UseAlphaTabApiOptions): UseAlphaTabApiReturn {
   const scrollRef    = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const apiRef       = useRef<any>(null);
   const scoreRef     = useRef<any>(null);
+  const endTickRef   = useRef(0);
+  // Read by the API's own listener, which must not be rebuilt when it changes.
+  const onLoopRestartRef = useRef(onLoopRestart);
+  useEffect(() => { onLoopRestartRef.current = onLoopRestart; }, [onLoopRestart]);
 
   const [uiReady,          setUiReady]          = useState(false);
   const [uiPlaying,        setUiPlaying]        = useState(false);
@@ -89,6 +98,7 @@ export function useAlphaTabApi({
     if (!AlphaTabApi) return;
 
     scoreRef.current = null;
+    endTickRef.current = 0;
     setUiReady(false);
     setUiPlaying(false);
     setTracks([]);
@@ -185,11 +195,15 @@ export function useAlphaTabApi({
     api.playerPositionChanged.on((args: any) => {
       if (args?.currentTime !== undefined) setCurrentMs(args.currentTime);
       if (args?.endTime > 0)              setTotalMs(args.endTime);
+      if (args?.endTick > 0)              endTickRef.current = args.endTick;
     });
 
+    // With isLooping on, AlphaSynth seeks back to the top the moment it reports
+    // this — after the buffered tail, not on the beat.
     api.playerFinished.on(() => {
       setUiPlaying(false);
       setCurrentMs(0);
+      onLoopRestartRef.current?.();
     });
 
     if (rawGpFile) {
@@ -204,6 +218,7 @@ export function useAlphaTabApi({
 
     return () => {
       unsubOutputDevice();
+      endTickRef.current = 0;
       try { api.stop();    } catch { /* ignore */ }
       try { api.destroy(); } catch { /* ignore */ }
       apiRef.current   = null;
@@ -250,6 +265,7 @@ export function useAlphaTabApi({
 
   return {
     apiRef,
+    endTickRef,
     scrollRef,
     containerRef,
     uiReady,

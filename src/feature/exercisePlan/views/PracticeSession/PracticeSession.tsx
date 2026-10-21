@@ -587,6 +587,7 @@ const PracticeSessionInner = ({
   // ── Audio subsystem ───────────────────────────────────────────────────────
 
   const [tabRestartKey, setTabRestartKey] = useState(0);
+  const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
 
   const { audioTracks, trackConfigs, setTrackConfigs, backingTrackIds, gpAudioActive, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
@@ -600,6 +601,7 @@ const PracticeSessionInner = ({
     metronomeAudioStartTime: metronome.audioStartTime,
     stopMetronome: metronome.stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce,
     onAlphaTabAudioContextReady: useCallback((ctx: AudioContext) => setAudioSystem(prev => ({ ...prev, context: ctx })), []),
+    onAlphaTabLoopRestart: () => noteMatchingHandle.current?.markAlphaTabPassStart?.(),
     tabRestartKey,
     pendingSeekBeatRef: metronome.pendingSeekBeatRef,
     tuningOffsets: guitarTuning.tuning.offsets,
@@ -832,7 +834,6 @@ const PracticeSessionInner = ({
     msPerBar: (60000 / effectiveBpm) * (huntBarSteps / stepsPerBeat(metronome.gridUnit)),
   };
   const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef, isExamMode, huntBarClock);
-  const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
   const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
   useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);
   // Set by the click-hunt mistake-limit fail path below — shows the same
@@ -1123,6 +1124,7 @@ const PracticeSessionInner = ({
     <NoteMatchingProvider
       handleRef={noteMatchingHandle} isPlaying={isPlaying} startTime={metronome.startTime}
       audioContext={metronome.audioContext} audioStartTime={metronome.audioStartTime}
+      alphaTabSource={showAlphaTabScore ? "notation" : effectiveRawGpFile ? "player" : null}
       effectiveBpm={effectiveBpm} rawBpm={metronome.bpm}
       activeTablature={isEarTrainingRiddle ? undefined : activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}

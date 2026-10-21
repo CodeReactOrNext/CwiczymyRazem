@@ -6,6 +6,7 @@ import { getUniformTuningShift } from "utils/audio/tunings";
 import { getChordTones } from "../../../chords/chordTones";
 import type { HuntPrompt, StrumPattern, TablatureMeasure } from "../../../types/exercise.types";
 import { useEarQuizRunStore } from "../helpers/earQuizRunStore";
+import type { AlphaTabSource } from "../hooks/alphaTabPassClock";
 import type { GameState } from "../hooks/noteMatchingFeedback";
 import type { ChordHuntState } from "../hooks/useChordHunt";
 import { useChordHunt } from "../hooks/useChordHunt";
@@ -95,6 +96,8 @@ interface NoteMatchingContextValue {
    *  session has no such mode (no tab, mobile, exams). While `enabled`, the hit
    *  marks above are the lesson's, not a scored run's. */
   learn: LearnModeState | null;
+  /** The notation view's AlphaTab has just started the tab over (see useNoteMatching). */
+  markAlphaTabPassStart: () => void;
 }
 
 // ── Imperative handle (what PracticeSession reads in event handlers) ──────────
@@ -136,6 +139,8 @@ export interface NoteMatchingHandle {
   snapshot: () => NoteMatchingSnapshot;
   /** The mic heard the tab's own playback — the run carries it to the end. */
   markPlaybackLeak?: () => void;
+  /** The hidden GP player has just started the tab over (see useNoteMatching). */
+  markAlphaTabPassStart?: () => void;
 }
 
 // ── Context ───────────────────────────────────────────────────────────────────
@@ -184,6 +189,7 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   registerFretClick: () => { /* no-op default */ },
   registerIntervalClick: () => { /* no-op default */ },
   learn: null,
+  markAlphaTabPassStart: () => { /* no-op default */ },
 });
 
 // ── Provider ──────────────────────────────────────────────────────────────────
@@ -198,6 +204,8 @@ interface NoteMatchingProviderProps {
    *  clock (what the user hears) instead of the drifting wall clock. */
   audioContext?: AudioContext | null;
   audioStartTime?: number | null;
+  /** Which AlphaTab plays the tab, if any — it restarts each pass itself, see useNoteMatching. */
+  alphaTabSource?: AlphaTabSource | null;
   effectiveBpm: number;
   rawBpm: number;
   activeTablature: TablatureMeasure[] | null | undefined;
@@ -262,6 +270,7 @@ export function NoteMatchingProvider({
   startTime,
   audioContext,
   audioStartTime,
+  alphaTabSource,
   effectiveBpm,
   rawBpm,
   activeTablature,
@@ -312,11 +321,13 @@ export function NoteMatchingProvider({
     livePitchRef,
     settlePendingIntonation,
     resetGame,
+    markAlphaTabPassStart,
   } = useNoteMatching({
     isPlaying,
     startTime,
     audioContext,
     audioStartTime,
+    alphaTabSource,
     effectiveBpm,
     rawBpm,
     activeTablature,
@@ -558,6 +569,7 @@ export function NoteMatchingProvider({
   // Populate the imperative handle on every render — safe, it's just a ref assignment
   handleRef.current = {
     resetGame: resetGameAndProgress,
+    markAlphaTabPassStart,
     markPlaybackLeak: () => {
       runPlaybackLeakRef.current = true;
     },
@@ -628,9 +640,10 @@ export function NoteMatchingProvider({
       markChordTone,
       registerFretClick,
       registerIntervalClick,
+      markAlphaTabPassStart,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, noteTimings, learn, isLearning, livePitchRef, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick],
+    [hitNotes, missedNotes, noteTimings, learn, isLearning, livePitchRef, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart],
   );
 
   return (

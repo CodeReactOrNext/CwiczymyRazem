@@ -60,4 +60,7 @@ export interface AlphaTabScoreViewerProps {
   notationSpacingOverride?: number;
   /** AlphaTab's own `display.justifyLastSystem` — see useAlphaTabApi. */
   justifyLastSystem?: boolean;
+  /** The looping playback has just started the score over — late, once the
+   *  previous pass's buffered tail has played out (see alphaTabPassClock.ts). */
+  onLoopRestart?: () => void;
 }

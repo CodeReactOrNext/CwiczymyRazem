@@ -40,6 +40,8 @@ interface UseSessionAudioOptions {
   /** Ear-training riddles: hand the floor back to the player after a single pass. */
   autoStopAfterFirstLoop?: boolean;
   onAlphaTabAudioContextReady: (ctx: AudioContext) => void;
+  /** The hidden GP player has just started the tab over — note matching re-anchors on it. */
+  onAlphaTabLoopRestart?:  () => void;
   /** Incremented on explicit restarts so AlphaTab resets to beat 0 instead of resuming. */
   tabRestartKey:           number;
   /** One-shot GP-audio seek target (in beats) owned by the metronome; keeps AlphaTab aligned with bar-click seeks. */
@@ -58,7 +60,7 @@ export function useSessionAudio({
   isMetronomeMuted, metronomeVolume, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
   stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce, autoStopAfterFirstLoop,
-  onAlphaTabAudioContextReady, tabRestartKey, pendingSeekBeatRef, tuningOffsets, bandRage = false,
+  onAlphaTabAudioContextReady, onAlphaTabLoopRestart, tabRestartKey, pendingSeekBeatRef, tuningOffsets, bandRage = false,
 }: UseSessionAudioOptions) {
   // ── Track configs ──────────────────────────────────────────────────────────
 
@@ -119,9 +121,13 @@ export function useSessionAudio({
 
   const metronomeAudioContextRef = useRef(metronomeAudioContext);
   metronomeAudioContextRef.current = metronomeAudioContext;
+  // A new function every render is fine — the player's listener reads it from here.
+  const onAlphaTabLoopRestartRef = useRef(onAlphaTabLoopRestart);
+  useEffect(() => { onAlphaTabLoopRestartRef.current = onAlphaTabLoopRestart; }, [onAlphaTabLoopRestart]);
 
   useEffect(() => { setGpAudioActive(!!effectiveRawGpFile && isAudioPlaying); }, [effectiveRawGpFile, isAudioPlaying]);
-  useEffect(() => { if (!isAudioPlaying) setAlphaTabLoopAnchor(null); },       [isAudioPlaying]);
+  // The notation view pauses this player too, and it resumes on the metronome grid.
+  useEffect(() => { if (!isAudioPlaying || showAlphaTabScore) setAlphaTabLoopAnchor(null); }, [isAudioPlaying, showAlphaTabScore]);
 
   const effectiveAudioStartTime = alphaTabLoopAnchor ?? metronomeAudioStartTime;
 
@@ -144,6 +150,7 @@ export function useSessionAudio({
     onLoopRestart:  useCallback(() => {
       const ctx = metronomeAudioContextRef.current;
       if (ctx) setAlphaTabLoopAnchor(ctx.currentTime);
+      onAlphaTabLoopRestartRef.current?.();
     }, []),
     onAudioContextReady: useCallback((ctx: AudioContext) => {
       onAlphaTabAudioContextReady(ctx);
