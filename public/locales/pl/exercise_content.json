@@ -2038,12 +2038,12 @@
       }
     },
     "ear_chord_quality_basics": {
-      "title": "Rodzaj akordu — wielka czwórka",
-      "description": "Usłysz akord i nazwij go: dur, moll, dominanta septymowa lub sus4. Cztery kolory, gryf niepotrzebny.",
+      "title": "Rodzaj akordu — cztery podstawowe",
+      "description": "Usłysz akord i nazwij go: durowy, molowy, dominanta septymowa albo sus4. Cztery barwy, gitara niepotrzebna.",
       "whyItMatters": "Niemal każdy utwór, którego się nauczysz, zbudowany jest z tych czterech brzmień. Gdy potrafisz nazwać akord w chwili, gdy zabrzmi, przestajesz zgadywać z rozpisek akordów i zaczynasz je słyszeć.",
       "instructions": {
-        "0": "Naciśnij Play — zabrzmi akord na losowym prymie.",
-        "1": "Wybierz rodzaj, który słyszysz. Prym zmienia się co rundę, więc jedynym, czego warto słuchać, jest kolor.",
+        "0": "Naciśnij Play — zabrzmi akord od losowego dźwięku.",
+        "1": "Wybierz rodzaj, który słyszysz. Dźwięk podstawowy zmienia się co rundę, więc słuchaj tylko barwy.",
         "2": "Utknąłeś? „Jedna nuta naraz” rozkłada akord na arpeggio."
       },
       "tips": {

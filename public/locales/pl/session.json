@@ -273,14 +273,90 @@
     "which_scale": "Jaka to skala?",
     "play_scale": "Odtwórz skalę",
     "play_slowly": "Odtwórz powoli",
-    "root": "Podstawa: {{root}}",
-    "root_held": "Podstawa brzmi pod spodem — porównuj z nią każdy dźwięk",
+    "root": "Dźwięk podstawowy: {{root}}",
+    "root_held": "Tonika brzmi cały czas pod spodem — odnoś do niej każdy kolejny dźwięk",
     "hear_again_slowly": "Posłuchaj jeszcze raz, powoli",
     "which_chord": "Jaki to rodzaj akordu?",
     "play_chord": "Odtwórz akord",
     "one_note": "Po jednym dźwięku",
-    "root_moves": "Podstawa zmienia się co rundę — słuchaj barwy, nie wysokości",
+    "root_moves": "Dźwięk podstawowy zmienia się co rundę — słuchaj barwy, nie wysokości",
     "formula": "Budowa: {{formula}}",
+    "chords": {
+      "major": {
+        "name": "Durowy",
+        "character": "Jasny i stabilny — zwykły, pogodny trójdźwięk."
+      },
+      "minor": {
+        "name": "Molowy",
+        "character": "Ciemniejszy od durowego, ale tak samo stabilny — robi to tercja mała."
+      },
+      "dom7": {
+        "name": "Dominanta septymowa",
+        "character": "Durowy z niepokojem — bluesowy i ciągnie, żeby się rozwiązać."
+      },
+      "maj7": {
+        "name": "Durowy z septymą wielką",
+        "character": "Rozmarzony i zawieszony w powietrzu — septyma leży półton pod dźwiękiem podstawowym."
+      },
+      "min7": {
+        "name": "Molowy z septymą małą",
+        "character": "Miękki i łagodny — molowy, tylko bez ostrych krawędzi."
+      },
+      "dim": {
+        "name": "Zmniejszony",
+        "character": "Napięty i chwiejny — obniżona kwinta nie daje mu odpocząć."
+      },
+      "sus4": {
+        "name": "Sus4",
+        "character": "Ani wesoły, ani smutny — nie ma tercji, więc brzmi jak zawieszony."
+      },
+      "sus2": {
+        "name": "Sus2",
+        "character": "Otwarty i przestrzenny — zamiast tercji jest sekunda."
+      }
+    },
+    "scales": {
+      "ionian": {
+        "name": "Jońska (durowa)",
+        "tell": "kwarta czysta i septyma wielka",
+        "character": "Zwykła skala durowa — nic nie odciąga od toniki."
+      },
+      "dorian": {
+        "name": "Dorycka",
+        "tell": "seksta wielka",
+        "character": "Molowa, ale seksta wielka ją rozjaśnia — funk, Santana, Moondance."
+      },
+      "phrygian": {
+        "name": "Frygijska",
+        "tell": "♭2 tuż nad toniką",
+        "character": "Najciemniejsza z molowych skal modalnych — mieszka w niej i flamenco, i metal."
+      },
+      "lydian": {
+        "name": "Lidyjska",
+        "tell": "kwarta zwiększona",
+        "character": "Durowa, ale uniesiona — zwiewna, filmowa, jakby bez ciężaru."
+      },
+      "mixolydian": {
+        "name": "Miksolidyjska",
+        "tell": "♭7",
+        "character": "Durowa z septymą małą — dur rocka i bluesa."
+      },
+      "aeolian": {
+        "name": "Eolska (moll naturalny)",
+        "tell": "♭6",
+        "character": "Zwykły moll naturalny — smutny, ale spokojny."
+      },
+      "locrian": {
+        "name": "Lokrycka",
+        "tell": "♭5 — nie ma stabilnego oparcia",
+        "character": "Nigdy nie ląduje: obniżona jest nawet kwinta."
+      },
+      "harmonicMinor": {
+        "name": "Molowa harmoniczna",
+        "tell": "duży skok między ♭6 a 7",
+        "character": "Moll z podwyższoną septymą — egzotyczny skok tuż pod oktawą."
+      }
+    },
     "modes": {
       "chordType": "Rodzaj akordu",
       "progression": "Progresje akordów",
