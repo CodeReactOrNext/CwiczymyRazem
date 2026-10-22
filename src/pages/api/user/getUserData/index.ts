@@ -1,9 +1,22 @@
+import type { DecodedIdToken } from "firebase-admin/auth";
 import { todayKey } from "lib/email/cooldown";
 import { markCooldown } from "lib/email/cooldownStore";
 import { sendWelcomeEmail } from "lib/email/send";
-import { claimPendingSupporter } from "lib/support/supporterGrant";
+import { claimPendingSupporter, hasPendingSupporter } from "lib/support/supporterGrant";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { firestore } from "utils/firebase/api/firebase.config";
+import { auth, firestore } from "utils/firebase/api/firebase.config";
+
+interface UserDataRequestBody {
+  idToken?: string;
+  displayName?: string | null;
+  photoURL?: string | null;
+  /** Legacy shape: the serialized Firebase `User` (see the handler). */
+  user?: {
+    displayName?: string | null;
+    photoURL?: string | null;
+    stsTokenManager?: { accessToken?: string };
+  };
+}
 
 const statisticsInitial = {
   time: { technique: 0, theory: 0, hearing: 0, creativity: 0, longestSession: 0 },
@@ -28,18 +41,42 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
-      if (!req.body.user) {
-        return res.status(401).json({ error: "Please include user object." });
+      const body = (req.body ?? {}) as UserDataRequestBody;
+      // Clients built before the token was sent post the whole serialized
+      // Firebase user, whose `stsTokenManager` carries the same ID token.
+      // Accepted so tabs left open across the deploy aren't signed out.
+      const idToken = body.idToken ?? body.user?.stsTokenManager?.accessToken;
+      if (!idToken) {
+        return res.status(401).json({ error: "Unauthorized" });
       }
-      const user = req.body.user;
-      const uid: string = user.uid;
 
-      if (!uid) {
-        return res.status(401).json({ error: "Invalid user object: missing uid." });
+      let decoded: DecodedIdToken;
+      try {
+        decoded = await auth.verifyIdToken(idToken);
+      } catch {
+        return res.status(401).json({ error: "Unauthorized" });
       }
+
+      // The uid and the address come from the verified token only. The name
+      // and photo are the client's to choose (a new email account picks its
+      // nick at sign-up, which no token carries) and only fill empty fields.
+      const uid = decoded.uid;
+      const user = {
+        email: decoded.email ?? null,
+        displayName: body.displayName ?? body.user?.displayName ?? decoded.name ?? null,
+        photoURL: body.photoURL ?? body.user?.photoURL ?? decoded.picture ?? null,
+      };
 
       const userDocRef = firestore.collection("users").doc(uid);
-      const userSnapshot = await userDocRef.get();
+      // The parked-donation lookup only needs the address, so it rides along
+      // with the profile read instead of adding a round trip after it.
+      const [userSnapshot, hasPendingDonation] = await Promise.all([
+        userDocRef.get(),
+        hasPendingSupporter(user.email).catch((error) => {
+          console.error("[supporter-claim] lookup failed for", uid, error);
+          return false;
+        }),
+      ]);
 
       if (!userSnapshot.exists) {
         await userDocRef.set({
@@ -63,8 +100,11 @@ export default async function handler(
         }
       }
 
-      const userSnapshotFresh = await userDocRef.get();
-      const userData = userSnapshotFresh.data();
+      // Re-read only a document this request just created; an existing one is
+      // already in hand, and every app boot waits on this route.
+      const userData = userSnapshot.exists
+        ? userSnapshot.data()
+        : (await userDocRef.get()).data();
 
       if (userData) {
         const backfill: Record<string, string> = {};
@@ -80,10 +120,10 @@ export default async function handler(
       // it was logged out) waits on the donor's email. Login is the one moment
       // the two sides are both known, so the badge is handed out here. The
       // grant itself re-checks the address against Firebase Auth — the email in
-      // the request body only decides whether there is anything to look up.
-      if (userData?.isSupport !== true) {
+      // the token only decides whether there is anything to look up.
+      if (hasPendingDonation && userData?.isSupport !== true) {
         try {
-          await claimPendingSupporter(uid, userData?.email ?? user.email);
+          await claimPendingSupporter(uid, user.email);
         } catch (error) {
           console.error("[supporter-claim] failed for", uid, error);
         }

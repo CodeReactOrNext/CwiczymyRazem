@@ -39,6 +39,7 @@ import useDailyQuestSync from "hooks/useDailyQuestSync";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { LocalizedChrome } from "lib/i18n/LocalizedRegion";
 import { transitions } from "lib/motion/motion";
+import { useQuerySnapshot } from "lib/querySnapshot/useQuerySnapshot";
 import dynamic from "next/dynamic";
 import type { AppPropsWithLayout } from "types/page";
 
@@ -49,27 +50,13 @@ const PostHogProvider = dynamic(
 
 const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {
     useAuthSync();
+    useQuerySnapshot();
     useDailyQuestSync();
-
-    if (typeof window !== "undefined" && !(window as any)._fetchAuthPatched) {
-      const originalFetch = window.fetch;
-      window.fetch = async (...args) => {
-        try {
-          return await originalFetch(...args);
-        } catch (error) {
-          const url = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
-          if (url.includes('/api/auth/session')) {
-             if (!url.includes('callbackUrl')) {
-                 import("next-auth/react").then(({ signOut }) => {
-                     signOut({ redirect: true, callbackUrl: "/" });
-                 });
-             }
-          }
-          throw error;
-        }
-      };
-      (window as any)._fetchAuthPatched = true;
-    }
+    // There used to be a window.fetch patch here that signed the player out
+    // whenever a request to /api/auth/session threw. fetch only throws when the
+    // request never got an answer — offline, a dropped connection — so it
+    // logged people out for losing wi-fi. An expired session comes back as an
+    // empty session and useSession turns "unauthenticated" on its own.
 
     return <>{children}</>;
 }

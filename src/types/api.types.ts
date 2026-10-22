@@ -242,6 +242,8 @@ export interface userSliceInitialState {
   currentActivity: CurrentActivityInterface | null;
   isLoggedOut: true | null;
   autoLogInFailed?: boolean;
+  /** The profile came from the last visit's saved copy and is not confirmed yet. */
+  isUserSnapshot?: boolean;
   currentUserStats: StatisticsDataInterface | null;
   previousUserStats: StatisticsDataInterface | null;
   raitingData: ReportDataInterface | null;

@@ -31,7 +31,7 @@ const SkeletonLogRow = () => (
   </div>
 );
 
-const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
+export const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
   <Card
     // Same box the loaded panel gets, so the feed doesn't jump when it arrives.
     className={`relative m-auto flex ${panelHeightClass({

@@ -1,4 +1,4 @@
-import { selectCurrentActivity, selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { selectConfirmedUserAuth, selectCurrentActivity, selectUserInfo } from "feature/user/store/userSlice";
 import { getDatabase, onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useEffect } from "react";
@@ -21,7 +21,7 @@ export const toPresenceActivity = (
 
 export const usePresence = () => {
   const userInfo = useAppSelector(selectUserInfo);
-  const userAuth = useAppSelector(selectUserAuth);
+  const userAuth = useAppSelector(selectConfirmedUserAuth);
   const currentActivity = useAppSelector(selectCurrentActivity);
   const { isElectron } = useElectronWindowControls();
 

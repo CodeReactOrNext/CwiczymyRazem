@@ -6,11 +6,21 @@ import type {
   UserDataInterface,
 } from "types/api.types";
 
-export const fetchUserData = async (user: User) =>
+/**
+ * The route takes the uid from the verified ID token. Only the token and the
+ * profile fields it needs go over the wire, not the serialized `User` (which
+ * would carry the refresh token too). `displayName` overrides the account's
+ * for a sign-up that has just picked its nick.
+ */
+export const fetchUserData = async (user: User, displayName?: string) =>
   axios
     .post<UserDataInterface>(
       "/api/user/getUserData",
-      { user },
+      {
+        idToken: await user.getIdToken(),
+        displayName: displayName ?? user.displayName,
+        photoURL: user.photoURL,
+      },
       // Without a timeout a stalled request (regional network / cold serverless
       // start) leaves autoLogIn pending forever, which keeps the dashboard on
       // its loading spinner. Reject instead so autoLogIn.rejected can recover.
@@ -18,7 +28,30 @@ export const fetchUserData = async (user: User) =>
     )
     .then((response) => response.data);
 
-export const fetchReport = ({ token, inputData }: updateReprotInterface) =>
+// Firebase saying the account itself is no longer good — not that it couldn't
+// be reached (`auth/network-request-failed` is the offline case).
+const REFUSING_AUTH_CODES = new Set([
+  "auth/user-token-expired",
+  "auth/user-disabled",
+  "auth/user-not-found",
+  "auth/invalid-user-token",
+]);
+
+/**
+ * True when a login failed because the player is not (or no longer) signed in,
+ * false when it failed for want of a connection — offline, a timeout, a 5xx.
+ * Only the first is a reason to sign anyone out.
+ */
+export const isAuthRefusal = (error: unknown): boolean => {
+  if (axios.isAxiosError(error)) {
+    const status = error.response?.status;
+    return status === 401 || status === 403;
+  }
+  const code = (error as { code?: unknown } | null)?.code;
+  return typeof code === "string" && REFUSING_AUTH_CODES.has(code);
+};
+
+export const fetchReport =({ token, inputData }: updateReprotInterface) =>
   axios
     .post<FetchedReportDataInterface>("/api/user/report", {
       token,

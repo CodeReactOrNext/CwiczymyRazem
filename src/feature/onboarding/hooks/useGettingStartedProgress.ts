@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useArsenalData } from "feature/arsenal/hooks/useArsenalData";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getLocalDateKey } from "utils/converter";
 
+import {
+  readChecklistMemory,
+  writeChecklistMemory,
+} from "../utils/checklistHiddenMemory";
 import { getGettingStartedProgress } from "../utils/gettingStartedProgress";
 import { useGettingStartedQuest } from "./useGettingStartedQuest";
 
@@ -60,5 +64,21 @@ export const useGettingStartedProgress = (
         practiceDayCount: practiceDays.size,
       });
 
-  return { ...questState, isLoading, progress, practiceDays };
+  // What the last visit concluded, for callers that would otherwise wait on
+  // `progress` to lay themselves out (see `checklistHiddenMemory`).
+  const [lastVisit] = useState(() => readChecklistMemory(userAuth));
+  const isHidden = progress ? !progress.isVisible : null;
+
+  useEffect(() => {
+    if (userAuth && isHidden !== null) writeChecklistMemory(userAuth, isHidden);
+  }, [userAuth, isHidden]);
+
+  return {
+    ...questState,
+    isLoading,
+    progress,
+    practiceDays,
+    wasHiddenLastVisit: lastVisit === "hidden",
+    wasVisibleLastVisit: lastVisit === "visible",
+  };
 };

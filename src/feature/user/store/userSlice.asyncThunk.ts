@@ -8,6 +8,7 @@ import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateEmailNotifi
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { getAdditionalUserInfo, GoogleAuthProvider } from "firebase/auth";
+import { clearQuerySnapshot } from "lib/querySnapshot/querySnapshot";
 import Router from "next/router";
 import { signIn, signOut } from "next-auth/react";
 import posthog from "posthog-js";
@@ -33,7 +34,7 @@ import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 
 import type { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 import type { SignUpCredentials } from "../view/SingupView/SingupView";
-import { fetchReport, fetchUserData } from "./services/userServices";
+import { fetchReport, fetchUserData, isAuthRefusal } from "./services/userServices";
 import {
   avatarErrorHandler,
   createAccountErrorHandler,
@@ -52,6 +53,7 @@ import {
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
+import { clearUserSnapshot } from "./userSnapshot";
 
 /**
  * A Google account signing in for the first time is a sign-up: it is counted
@@ -139,7 +141,17 @@ export const logInViaEmail = createAsyncThunk(
   }
 );
 
-export const autoLogIn = createAsyncThunk(
+/**
+ * Why autoLogIn failed: `refused` — the server or Firebase says this player is
+ * not signed in; `unavailable` — they couldn't be asked (offline, timeout, 5xx).
+ */
+export type AutoLogInFailure = "refused" | "unavailable";
+
+export const autoLogIn = createAsyncThunk<
+  UserDataInterface,
+  User,
+  { rejectValue: AutoLogInFailure }
+>(
   "user/autoLogin",
   async (user: User, { rejectWithValue }) => {
     try {
@@ -147,9 +159,13 @@ export const autoLogIn = createAsyncThunk(
       return userData as UserDataInterface;
     } catch (error) {
       console.error("autoLogIn failed:", error);
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Auto login failed"
-      );
+      if (!isAuthRefusal(error)) {
+        return rejectWithValue("unavailable");
+      }
+      // Gone before the rejection clears the store, or useAuthSync would
+      // restore it again on the very next render.
+      clearUserSnapshot();
+      return rejectWithValue("refused");
     }
   }
 );
@@ -163,8 +179,7 @@ export const createAccount = createAsyncThunk(
       }
       const { user } = await firebaseCreateAccountWithEmail(email, password);
       const token = await user.getIdToken();
-      const userWithDisplayName = { ...user, displayName: login };
-      const userData = await fetchUserData(userWithDisplayName);
+      const userData = await fetchUserData(user, login);
       await signIn("credentials", { idToken: token, redirect: false });
       posthog.identify(user.uid, { email: user.email ?? undefined, name: login });
       posthog.capture("user_signed_up", { method: "email", email: user.email, login });
@@ -264,6 +279,10 @@ export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   try {
     posthog.capture("user_logged_out");
     posthog.reset();
+    // Before the hard redirect below: useAuthSync would clear it on the way to
+    // "unauthenticated", but the page may be gone before that render.
+    clearUserSnapshot();
+    clearQuerySnapshot();
     await signOut({ redirect: false });
     await firebaseLogUserOut();
     logOutInfo();

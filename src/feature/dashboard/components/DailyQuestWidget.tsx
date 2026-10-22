@@ -1,11 +1,11 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
-import { selectDailyQuest } from "feature/user/store/userSlice";
+import { selectDailyQuest, selectIsUserSnapshot } from "feature/user/store/userSlice";
 import {
   claimQuestRewardAction,
   DAILY_QUEST_FAME_REWARD,
   DAILY_QUEST_POINTS_REWARD,
-  initializeDailyQuestAction,
+  ensureQuestForToday,
 } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import { CheckCircle2, ChevronRight, Gift, Swords } from "lucide-react";
@@ -72,10 +72,18 @@ export const DailyQuestWidget = () => {
   const { t } = useTranslation("dashboard");
   const dispatch = useAppDispatch();
   const dailyQuest = useAppSelector(selectDailyQuest);
+  // The saved copy shows the last quest it knew; drawing a new set on top of it
+  // would only be replaced (or merged) when the real profile lands.
+  const isUserSnapshot = useAppSelector(selectIsUserSnapshot);
 
+  // Only rolls the quest over when it is missing or from an earlier day.
+  // useAuthSync already drew and synced it at login, and useDailyQuestSync
+  // pulls other devices' progress on focus; re-initializing on every visit
+  // cost a Firestore transaction each time the dashboard opened.
   useEffect(() => {
-    dispatch(initializeDailyQuestAction());
-  }, [dispatch]);
+    if (isUserSnapshot) return;
+    dispatch(ensureQuestForToday());
+  }, [dispatch, isUserSnapshot]);
 
   if (!dailyQuest) return <DailyQuestSkeleton />;
 
