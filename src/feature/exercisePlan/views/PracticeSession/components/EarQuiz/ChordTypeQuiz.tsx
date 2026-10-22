@@ -59,6 +59,8 @@ export function ChordTypeQuiz({
   };
 
   const answerQuality = CHORD_QUALITIES[question.quality];
+  const qualityName = (id: ChordQualityId) =>
+    t(`quiz.chords.${id}.name`, CHORD_QUALITIES[id].name);
 
   return (
     <>
@@ -108,7 +110,7 @@ export function ChordTypeQuiz({
               onClick={() => handlePick(id)}
               disabled={isAnswered}
               state={state}
-              title={quality.name}
+              title={qualityName(id)}
               subtitle={isAnswered ? quality.formula : undefined}
             />
           );
@@ -118,8 +120,11 @@ export function ChordTypeQuiz({
       <QuizReveal show={isAnswered}>
         <QuizVerdict
           isCorrect={isCorrect}
-          answer={`${question.rootName}${answerQuality.suffix} — ${answerQuality.name}`}
-          explanation={answerQuality.character}
+          answer={`${question.rootName}${answerQuality.suffix} — ${qualityName(question.quality)}`}
+          explanation={t(
+            `quiz.chords.${question.quality}.character`,
+            answerQuality.character,
+          )}
           footnote={t("quiz.formula", { formula: answerQuality.formula })}
           onNext={onNext}
           extraAction={

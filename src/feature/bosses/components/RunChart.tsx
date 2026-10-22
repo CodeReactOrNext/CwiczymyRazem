@@ -1,8 +1,6 @@
 import type { Translate } from "lib/i18n/translate";
 import { useState } from "react";
 
-import type { NotesPerBeat } from "../types/boss.types";
-import { subdivisionKey } from "../utils/bossArt";
 import type { PhaseRecord } from "../utils/bossEngine";
 
 /** About the width the verdict gives it, so a column stays near its 24px cap on screen. */
@@ -33,10 +31,8 @@ export const RunChart = ({ log, t }: { log: PhaseRecord[]; t: Translate }) => {
   const hardest = most > 0 ? log.find((p) => p.damageTaken === most) : undefined;
   const slot = WIDTH / log.length;
   const barW = Math.min(MAX_BAR, Math.max(4, slot - 6));
-  const rhythm = (notesPerBeat: number) =>
-    t(`subdivision.${subdivisionKey({ notesPerBeat: notesPerBeat as NotesPerBeat })}`);
   const detail = (p: PhaseRecord) =>
-    t("result.phase_detail", { phase: p.phase, bpm: p.bpm, rhythm: rhythm(p.notesPerBeat), hp: p.damageTaken });
+    t("result.phase_detail", { phase: p.phase, bpm: p.bpm, rhythm: t(p.rhythm), hp: p.damageTaken });
   // Past ten phases, every other number on the axis.
   const labelEvery = log.length > 10 ? 2 : 1;
 

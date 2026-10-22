@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   AFFIX_FROM,
+  affixCountAt,
   createRng,
   generatePhase,
   SLAMS_FROM,
@@ -57,11 +58,14 @@ describe("generatePhase", () => {
     }
   });
 
-  it("gets faster and tougher as the phases climb", () => {
+  it("gets faster and tougher as the phases climb — slowly", () => {
     for (const seed of SEEDS) {
       const first = generatePhase(seed, 0);
+      const second = generatePhase(seed, 1);
       const tenth = generatePhase(seed, 9);
-      expect(notesPerSecond(tenth.variation)).toBeGreaterThan(notesPerSecond(first.variation) * 2);
+      // A step at a time: the second phase is barely quicker than the first.
+      expect(notesPerSecond(second.variation)).toBeLessThan(notesPerSecond(first.variation) * 1.15);
+      expect(notesPerSecond(tenth.variation)).toBeGreaterThan(notesPerSecond(first.variation) * 1.8);
       expect(tenth.rules.bossHp).toBeGreaterThan(first.rules.bossHp * 2);
     }
     PHASES.slice(1).forEach((index) =>
@@ -75,11 +79,20 @@ describe("generatePhase", () => {
       expect(at(1)).toMatchObject({ slams: false, weakSpots: false, affixes: [] });
       expect(at(SLAMS_FROM).slams).toBe(true);
       expect(at(WEAK_SPOTS_FROM).weakSpots).toBe(true);
+      expect(at(SLAMS_FROM - 1).slams).toBe(false);
       expect(at(AFFIX_FROM - 1).affixes).toHaveLength(0);
       expect(at(AFFIX_FROM).affixes).toHaveLength(1);
-      expect(at(7).affixes).toHaveLength(2);
-      expect(at(10).affixes).toHaveLength(3);
-      expect(new Set(at(10).affixes).size).toBe(3);
+      expect(at(9).affixes).toHaveLength(2);
+      expect(at(13).affixes).toHaveLength(3);
+      expect(new Set(at(13).affixes).size).toBe(3);
+    }
+  });
+
+  it("bites softly in the opening phases, in full from the sixth", () => {
+    for (const seed of SEEDS) {
+      const first = generatePhase(seed, 0).rules.biteDamage;
+      expect(first).toBeLessThanOrEqual(5);
+      expect(affixCountAt(1)).toBe(0);
     }
   });
 

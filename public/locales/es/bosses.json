@@ -3,6 +3,97 @@
     "fretweaver": {
       "name": "La Tejedora de Trastes",
       "title": "Reina de la red cromática"
+    },
+    "colossus": {
+      "name": "El Coloso de Piedra",
+      "title": "Destructor de cambios lentos",
+      "threats": {
+        "bites": "Puños",
+        "weak_spots": "Cambio débil",
+        "venom": "Polvo",
+        "regen": "Piedra que sana",
+        "frenzy": "Réplicas",
+        "web": "Petrificación"
+      },
+      "arena": {
+        "slam": "Terremoto",
+        "webbed": "Petrificada — toca la progresión de memoria",
+        "poisoned": "Polvo en los ojos — carga a la mitad",
+        "poisoned_short": "Polvo",
+        "regenerating": "Se recompone — golpéalo"
+      },
+      "result": {
+        "title": "El coloso te aplastó"
+      },
+      "lair": {
+        "pitch": "Un combate sin fin de cambios de acorde. En cada fase el coloso se recompone en torno a una progresión nueva — acordes abiertos, power chords, cejillas, séptimas — y los cambios llegan cada vez más rápido. A ver hasta dónde llegas."
+      },
+      "rules": {
+        "sword": {
+          "body": "Cada cambio limpio la carga: justo en el pulso 4, a tiempo 3, cerca 2, suelto 1. Un acorde cuenta en cuanto suenan todas las cuerdas menos una. Un fallo rompe la carga."
+        },
+        "strike": {
+          "body": "Una espada llena golpea sola — más fuerte cuanto más larga tu racha de cambios limpios, hasta ×2 con {{max}} seguidos."
+        },
+        "bite": {
+          "title": "Cada fallo es un puñetazo",
+          "body": "Un acorde al que no llegas a tiempo cuesta PV. Sin PV, se acaba la partida."
+        },
+        "slam": {
+          "title": "Aguanta el terremoto",
+          "body": "Desde la fase {{slams}} el coloso hace temblar la tierra: durante dos compases los acordes cambian el doble de seguido. Tócalos todos limpios para bloquearlo — un bloqueo carga media espada."
+        },
+        "endless": {
+          "body": "Deja a cero los PV de una fase y el coloso se recompone: progresión nueva, acordes nuevos y un tempo más rápido cada vez. Primero acordes abiertos, luego power chords, cejillas y séptimas. Cada fase superada te cura {{heal}} PV."
+        },
+        "threats": {
+          "body": "Desde la fase {{weak}} encuentra tu cambio débil — el que más fallas — y uno limpio ahí carga tu espada ×{{weakCharge}}. Desde la fase {{affix}} gana poderes: polvo, piedra que sana, réplicas y petrificación, que convierte la tablatura en piedra."
+        }
+      },
+      "boons": {
+        "armor": {
+          "body": "Los puñetazos quitan un {{armorPercent}} % menos de PV. Se acumula."
+        },
+        "shield": {
+          "body": "Absorbe los próximos {{shieldCharges}} puñetazos."
+        },
+        "thorns": {
+          "body": "Cada puñetazo le cuesta al coloso un {{thornsPercent}} % de los PV de la fase. Se acumula."
+        },
+        "secondWind": {
+          "body": "{{secondWindMisses}} fallos por fase no cuentan: sin puñetazo, la racha y la carga se mantienen."
+        },
+        "steadyHand": {
+          "body": "Un terremoto queda bloqueado aunque falles {{steadyHandQuakeMisses}} acorde."
+        },
+        "antidote": {
+          "name": "Mascarilla",
+          "body": "El polvo no te afecta."
+        },
+        "clearSight": {
+          "body": "La petrificación dura la mitad."
+        },
+        "precision": {
+          "body": "Los cambios justos en el pulso cargan {{precisionPoints}} en vez de 4."
+        },
+        "momentum": {
+          "body": "Tu racha llega a ×2 con {{momentumStreak}} seguidos en vez de {{maxStreak}}."
+        },
+        "exploit": {
+          "body": "Los cambios débiles limpios cargan tu espada ×{{exploitCharge}}."
+        }
+      },
+      "preview": {
+        "armor": "Puñetazo {{from}} → {{to}} PV",
+        "thorns": "Por puñetazo {{from}} → {{to}} de daño",
+        "steadyHand": "Fallos permitidos en el terremoto {{from}} → {{to}}",
+        "exploit": "Cambio débil {{from}} → {{to}}"
+      },
+      "briefing": {
+        "faster": "Cambios un {{percent}} % más rápidos",
+        "slower": "Cambios un {{percent}} % más lentos",
+        "same_speed": "Cambios a la misma velocidad"
+      }
     }
   },
   "arena": {
@@ -24,7 +115,12 @@
     "caught_secondWind": "Segundo aliento",
     "sword_ready": "Lista para golpear",
     "poisoned_short": "Envenenada",
-    "enraged": "Furia"
+    "enraged": "Furia",
+    "quake_coming": "Terremoto en un compás — los cambios irán al doble",
+    "quake_on": "Terremoto — cada acorde limpio · quedan {{count}}",
+    "quake_on_steady": "Terremoto — se permite 1 fallo · quedan {{count}}",
+    "weak_change": "Ahora el cambio débil: {{change}} — espada ×{{multiplier}}",
+    "weak_change_label": "Cambio débil:"
   },
   "threats": {
     "bites": "Mordiscos",
@@ -33,7 +129,8 @@
     "venom": "Veneno",
     "regen": "Regeneración",
     "frenzy": "Frenesí",
-    "web": "Red"
+    "web": "Red",
+    "quake": "Terremotos"
   },
   "result": {
     "title": "La red se cerró",
@@ -191,13 +288,21 @@
     "slower": "Notas un {{percent}} % más lentas",
     "same_speed": "Notas a la misma velocidad",
     "unchanged": "Sin cambios — {{list}}",
-    "first_bar": "Primer compás"
+    "first_bar": "Primer compás",
+    "chords": "Acordes",
+    "progression": "Progresión",
+    "quakes": "Terremotos",
+    "quakes_per_pass_one": "{{count}} por vuelta",
+    "quakes_per_pass_other": "{{count}} por vuelta",
+    "shapes": "Posiciones"
   },
   "subdivision": {
     "quarters": "negras",
     "eighths": "corcheas",
     "triplets": "tresillos",
-    "sixteenths": "semicorcheas"
+    "sixteenths": "semicorcheas",
+    "halves": "blancas",
+    "wholes": "redondas"
   },
   "route": {
     "walk": "por las cuerdas",
@@ -220,5 +325,11 @@
     "exploit": "Punto débil {{from}} → {{to}}",
     "slowDown": "Tempo {{from}} → {{to}} BPM",
     "overdrive": "Tempo {{from}} → {{to}} BPM"
+  },
+  "chord_family": {
+    "open": "acordes abiertos",
+    "power": "power chords",
+    "barre": "acordes con cejilla",
+    "seventh": "acordes de séptima"
   }
 }

@@ -98,8 +98,8 @@ describe("BossResultOverlay", () => {
       fight: {
         ...state.fight,
         phaseLog: [
-          { phase: 1, bpm: 96, notesPerBeat: 1, damageTaken: 10, hpEnd: 90, hits: 40, misses: 1 },
-          { phase: 2, bpm: 132, notesPerBeat: 1, damageTaken: 34, hpEnd: 76, hits: 60, misses: 4 },
+          { phase: 1, bpm: 96, rhythm: "subdivision.quarters", damageTaken: 10, hpEnd: 90, hits: 40, misses: 1 },
+          { phase: 2, bpm: 132, rhythm: "subdivision.quarters", damageTaken: 34, hpEnd: 76, hits: 60, misses: 4 },
         ],
       },
     }));

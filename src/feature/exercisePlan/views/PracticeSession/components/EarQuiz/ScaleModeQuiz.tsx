@@ -77,6 +77,8 @@ export function ScaleModeQuiz({
   };
 
   const answerScale = SCALE_MODES[question.scale];
+  const scaleName = (id: ScaleModeId) =>
+    t(`quiz.scales.${id}.name`, SCALE_MODES[id].name);
 
   return (
     <>
@@ -126,7 +128,7 @@ export function ScaleModeQuiz({
               onClick={() => handlePick(id)}
               disabled={isAnswered}
               state={state}
-              title={scale.name}
+              title={scaleName(id)}
               subtitle={isAnswered ? scale.formula : undefined}
             />
           );
@@ -136,9 +138,15 @@ export function ScaleModeQuiz({
       <QuizReveal show={isAnswered}>
         <QuizVerdict
           isCorrect={isCorrect}
-          answer={`${question.rootName} ${answerScale.name}`}
-          explanation={answerScale.character}
-          footnote={t("quiz.listen_for", { tell: answerScale.tell, formula: answerScale.formula })}
+          answer={`${question.rootName} ${scaleName(question.scale)}`}
+          explanation={t(
+            `quiz.scales.${question.scale}.character`,
+            answerScale.character,
+          )}
+          footnote={t("quiz.listen_for", {
+            tell: t(`quiz.scales.${question.scale}.tell`, answerScale.tell),
+            formula: answerScale.formula,
+          })}
           onNext={onNext}
           extraAction={
             <QuizSecondaryButton

@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import type { SpiderVariation } from "../types/boss.types";
 import { describePhaseChanges, fretSpan, threatsOf } from "./phaseChanges";
-import type { PhasePlan } from "./phaseGenerator";
+import type { SpiderPhasePlan } from "./phaseGenerator";
 import { generatePhase } from "./phaseGenerator";
 
-type PlanOverrides = Omit<Partial<PhasePlan>, "variation"> & {
+type PlanOverrides = Omit<Partial<SpiderPhasePlan>, "variation"> & {
   variation?: Partial<SpiderVariation>;
 };
 
-const plan = (overrides: PlanOverrides): PhasePlan => {
+const plan = (overrides: PlanOverrides): SpiderPhasePlan => {
   const base = generatePhase(1, 0);
   return {
     ...base,

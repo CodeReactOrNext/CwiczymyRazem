@@ -1,20 +1,24 @@
-import type { SpiderMood, SpiderPhase } from "../components/FretweaverArt";
+import type { SpiderMood } from "../components/FretweaverArt";
 import type { SpiderVariation } from "../types/boss.types";
 import type { BossFightState } from "./bossEngine";
+import type { PhasePlan } from "./phaseGenerator";
+
+/** A boss's three looks over a fight: its first form, a stronger one, the last. */
+export type BossForm = 0 | 1 | 2;
 
 /**
- * The form the art draws for a phase: purple for the first three, gold up to
- * the seventh, the orange queen after that. Each form wears a later level's
- * markings — bands, then the crown.
+ * The form the art draws for a phase: the first three phases, up to the
+ * seventh, and after that — the spider purple, gold, then its orange queen
+ * with a later level's markings; the colossus's runes cyan, amber, orange.
  */
-export const artPhaseFor = (fight: Pick<BossFightState, "plan">): SpiderPhase => {
+export const artPhaseFor = (fight: Pick<BossFightState, "plan">): BossForm => {
   const { index } = fight.plan;
   return index < 3 ? 0 : index < 7 ? 1 : 2;
 };
 
-/** The legs tap the first finger order the phase deals. */
-export const legPatternFor = (variation: SpiderVariation): number[] =>
-  variation.patterns[0].split("").map(Number);
+/** The legs tap the first finger order the phase deals; any boss but the spider taps 1234. */
+export const legPatternFor = (plan: PhasePlan): number[] =>
+  plan.kind === "spider" ? plan.variation.patterns[0].split("").map(Number) : [1, 2, 3, 4];
 
 export const moodFor = (fight: Pick<BossFightState, "outcome">): SpiderMood =>
   fight.outcome === "lost" ? "victorious" : "idle";
