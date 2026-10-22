@@ -279,6 +279,82 @@
     "one_note": "One note at a time",
     "root_moves": "The root moves every round — listen to the colour, not the pitch",
     "formula": "Formula: {{formula}}",
+    "chords": {
+      "major": {
+        "name": "Major",
+        "character": "Bright and settled — the plain, happy triad."
+      },
+      "minor": {
+        "name": "Minor",
+        "character": "Darker than major, but just as settled — the flat 3rd does it."
+      },
+      "dom7": {
+        "name": "Dominant 7",
+        "character": "Major with an itch — bluesy, and it wants to resolve."
+      },
+      "maj7": {
+        "name": "Major 7",
+        "character": "Dreamy and floating — the 7th sits a semitone under the root."
+      },
+      "min7": {
+        "name": "Minor 7",
+        "character": "Smooth and mellow — minor with the edge taken off."
+      },
+      "dim": {
+        "name": "Diminished",
+        "character": "Tense and unstable — the squashed 5th makes it ache."
+      },
+      "sus4": {
+        "name": "Sus4",
+        "character": "Neither happy nor sad — the 3rd is missing, so it hangs."
+      },
+      "sus2": {
+        "name": "Sus2",
+        "character": "Open and airy — a 2nd stands in for the 3rd."
+      }
+    },
+    "scales": {
+      "ionian": {
+        "name": "Ionian (major)",
+        "tell": "natural 4th and 7th",
+        "character": "The plain major scale — nothing pulls against the tonic."
+      },
+      "dorian": {
+        "name": "Dorian",
+        "tell": "natural 6th",
+        "character": "Minor, but the raised 6th lifts it — funk, Santana, Moondance."
+      },
+      "phrygian": {
+        "name": "Phrygian",
+        "tell": "♭2 right above the root",
+        "character": "Darkest of the minor modes — Spanish and metal both live here."
+      },
+      "lydian": {
+        "name": "Lydian",
+        "tell": "raised 4th",
+        "character": "Major with a lift — floating, cinematic, weightless."
+      },
+      "mixolydian": {
+        "name": "Mixolydian",
+        "tell": "♭7",
+        "character": "Major with a flat 7th — the rock and blues major."
+      },
+      "aeolian": {
+        "name": "Aeolian (natural minor)",
+        "tell": "♭6",
+        "character": "Plain natural minor — sad and settled."
+      },
+      "locrian": {
+        "name": "Locrian",
+        "tell": "♭5 — no stable home",
+        "character": "Never lands: the 5th itself is flattened."
+      },
+      "harmonicMinor": {
+        "name": "Harmonic minor",
+        "tell": "big jump between ♭6 and 7",
+        "character": "Minor with a raised 7th — the exotic leap near the top."
+      }
+    },
     "modes": {
       "chordType": "Chord quality",
       "progression": "Chord progressions",

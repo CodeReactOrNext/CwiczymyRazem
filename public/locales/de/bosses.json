@@ -3,6 +3,98 @@
     "fretweaver": {
       "name": "Die Bundweberin",
       "title": "Königin des chromatischen Netzes"
+    },
+    "colossus": {
+      "name": "Der Steinkoloss",
+      "title": "Brecher langsamer Wechsel",
+      "threats": {
+        "bites": "Fäuste",
+        "weak_spots": "Schwacher Wechsel",
+        "venom": "Staub",
+        "regen": "Steinheilung",
+        "frenzy": "Nachbeben",
+        "web": "Versteinerung"
+      },
+      "arena": {
+        "slam": "Beben",
+        "webbed": "Versteinert — spiel die Akkordfolge aus dem Gedächtnis",
+        "poisoned": "Staub in den Augen — lädt halb so schnell",
+        "poisoned_short": "Staub",
+        "regenerating": "Heilt sich — schlag zu"
+      },
+      "result": {
+        "title": "Zermalmt"
+      },
+      "lair": {
+        "pitch": "Ein endloser Kampf um Akkordwechsel. In jeder Phase setzt sich der Koloss um eine neue Akkordfolge neu zusammen — offene Akkorde, Powerchords, Barrégriffe, Septakkorde — und die Wechsel kommen immer schneller. Wie weit kommst du?"
+      },
+      "rules": {
+        "sword": {
+          "body": "Jeder saubere Wechsel lädt es: exakt 4, pünktlich 3, knapp 2, locker 1. Ein Akkord zählt, sobald alle Saiten bis auf eine zu hören sind. Ein Fehler zerschlägt die Ladung."
+        },
+        "strike": {
+          "body": "Ein volles Schwert schlägt von selbst zu — umso härter, je länger deine Serie sauberer Wechsel, bis ×2 bei {{max}} in Folge."
+        },
+        "bite": {
+          "title": "Jeder Fehler ist ein Faustschlag",
+          "body": "Ein Akkord, den du nicht rechtzeitig greifst, kostet HP. Sind sie weg, ist der Lauf vorbei."
+        },
+        "slam": {
+          "title": "Übersteh das Beben",
+          "body": "Ab Phase {{slams}} lässt der Koloss die Erde beben: zwei Takte lang wechseln die Akkorde doppelt so oft. Spiel jeden davon sauber, um es zu blocken — ein Block lädt dein Schwert zur Hälfte."
+        },
+        "endless": {
+          "body": "Bring die HP einer Phase auf null und der Koloss setzt sich neu zusammen: neue Akkordfolge, neue Akkorde, jedes Mal schneller. Erst offene Akkorde, dann Powerchords, Barrégriffe und Septakkorde. Jede geschaffte Phase heilt dich um {{heal}} HP."
+        },
+        "threats": {
+          "title": "Er lernt dazu",
+          "body": "Ab Phase {{weak}} findet er deinen schwachen Wechsel — den, bei dem du am häufigsten danebenliegst — und ein sauberer dort lädt dein Schwert ×{{weakCharge}}. Ab Phase {{affix}} bekommt er Kräfte: Staub, Steinheilung, Nachbeben und Versteinerung, die die Tabulatur zu Stein macht."
+        }
+      },
+      "boons": {
+        "armor": {
+          "body": "Faustschläge kosten {{armorPercent}} % weniger HP. Stapelbar."
+        },
+        "shield": {
+          "body": "Fängt die nächsten {{shieldCharges}} Faustschläge ab."
+        },
+        "thorns": {
+          "body": "Jeder Faustschlag kostet den Koloss {{thornsPercent}} % der Phasen-HP. Stapelbar."
+        },
+        "secondWind": {
+          "body": "{{secondWindMisses}} Fehler pro Phase sind frei: kein Faustschlag, Serie und Ladung bleiben."
+        },
+        "steadyHand": {
+          "body": "Ein Beben ist auch mit {{steadyHandQuakeMisses}} verpassten Akkord geblockt."
+        },
+        "antidote": {
+          "name": "Staubmaske",
+          "body": "Staub kann dir nichts."
+        },
+        "clearSight": {
+          "body": "Versteinerung hält nur halb so lange."
+        },
+        "precision": {
+          "body": "Exakte Wechsel laden {{precisionPoints}} statt 4."
+        },
+        "momentum": {
+          "body": "Deine Serie erreicht ×2 schon bei {{momentumStreak}} in Folge statt {{maxStreak}}."
+        },
+        "exploit": {
+          "body": "Saubere schwache Wechsel laden dein Schwert ×{{exploitCharge}}."
+        }
+      },
+      "preview": {
+        "armor": "Faustschlag {{from}} → {{to}} HP",
+        "thorns": "Pro Faustschlag {{from}} → {{to}} Schaden",
+        "steadyHand": "Erlaubte Fehler im Beben {{from}} → {{to}}",
+        "exploit": "Schwacher Wechsel {{from}} → {{to}}"
+      },
+      "briefing": {
+        "faster": "Wechsel {{percent}} % schneller",
+        "slower": "Wechsel {{percent}} % langsamer",
+        "same_speed": "Wechsel im gleichen Tempo"
+      }
     }
   },
   "arena": {
@@ -24,7 +116,12 @@
     "caught_secondWind": "Zweiter Atem",
     "sword_ready": "Bereit",
     "poisoned_short": "Vergiftet",
-    "enraged": "Raserei"
+    "enraged": "Raserei",
+    "quake_coming": "Beben in einem Takt — die Wechsel kommen doppelt so schnell",
+    "quake_on": "Beben — jeden Akkord sauber · noch {{count}}",
+    "quake_on_steady": "Beben — 1 Fehler erlaubt · noch {{count}}",
+    "weak_change": "Jetzt der schwache Wechsel: {{change}} — Schwert ×{{multiplier}}",
+    "weak_change_label": "Schwacher Wechsel:"
   },
   "threats": {
     "bites": "Bisse",
@@ -33,7 +130,8 @@
     "venom": "Gift",
     "regen": "Regeneration",
     "frenzy": "Raserei",
-    "web": "Netz"
+    "web": "Netz",
+    "quake": "Beben"
   },
   "result": {
     "title": "Im Netz gefangen",
@@ -191,13 +289,21 @@
     "slower": "Noten {{percent}} % langsamer",
     "same_speed": "Noten im gleichen Tempo",
     "unchanged": "Unverändert — {{list}}",
-    "first_bar": "Erster Takt"
+    "first_bar": "Erster Takt",
+    "chords": "Akkorde",
+    "progression": "Akkordfolge",
+    "quakes": "Beben",
+    "quakes_per_pass_one": "{{count}} pro Durchgang",
+    "quakes_per_pass_other": "{{count}} pro Durchgang",
+    "shapes": "Griffe"
   },
   "subdivision": {
     "quarters": "Viertel",
     "eighths": "Achtel",
     "triplets": "Triolen",
-    "sixteenths": "Sechzehntel"
+    "sixteenths": "Sechzehntel",
+    "halves": "Halbe",
+    "wholes": "Ganze"
   },
   "route": {
     "walk": "über die Saiten",
@@ -220,5 +326,11 @@
     "exploit": "Schwachstelle {{from}} → {{to}}",
     "slowDown": "Tempo {{from}} → {{to}} BPM",
     "overdrive": "Tempo {{from}} → {{to}} BPM"
+  },
+  "chord_family": {
+    "open": "offene Akkorde",
+    "power": "Powerchords",
+    "barre": "Barrégriffe",
+    "seventh": "Septakkorde"
   }
 }

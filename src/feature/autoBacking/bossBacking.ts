@@ -16,20 +16,25 @@ import type { AutoBackingResult, SongBar } from "./generateAutoBacking";
 import { AUTO_TRACK_IDS, songForm } from "./generateAutoBacking";
 import { groupHits, groupStarts, isSimpleMeter } from "./grooves";
 import type { ChordSpan } from "./harmonize";
-import type { BarInfo } from "./noteEvents";
+import { spansFromChordNames } from "./harmonize";
+import type { BarInfo, TabContent } from "./noteEvents";
 import { extractTabContent, pulseOf } from "./noteEvents";
 import type { Chord } from "./theory";
-import { chordSymbol, pcName } from "./theory";
+import { chordSymbol, hasThird, pcName, QUALITY_INTERVALS } from "./theory";
 
 /**
- * The boss-fight score: dark synth over a low E pedal. The spider's drills
- * are chromatic finger patterns — over a held pedal that's exactly what boss
- * music sounds like, all tension — so the harmony doesn't follow the notes,
- * it holds the ground under them: power chords in a dark progression that
- * changes with each phase, a sixteenth-note bass ostinato, a minor-second
- * "strings" motif, and a kit that hits harder the further the fight goes.
+ * The boss-fight score: dark synth, a sixteenth-note bass ostinato, a
+ * "strings" motif and a kit that hits harder the further the fight goes.
  * The boss enraging is played live by the band (AmbientBand.setRage), not
  * written here.
+ *
+ * The harmony depends on the drill. The spider's are chromatic finger
+ * patterns — over a held low E pedal that's exactly what boss music sounds
+ * like, all tension — so there it doesn't follow the notes: power chords in a
+ * dark progression that changes with each phase, and a minor-second motif.
+ * The colossus deals chord changes and names every chord in the tab, so there
+ * the band plays those chords, change for change, with the motif on their
+ * tones — a backing in another key would fight the player's own chords.
  */
 
 export interface BossMusicOptions {
@@ -200,6 +205,14 @@ export function bossBassBar(
 /** Root, minor second, root, fifth: the half step that tells you something is coming. */
 const STRINGS_MOTIF = [0, 1, 0, 7];
 
+/** Root, fifth, octave and the chord's own third: the motif over named chords. */
+const chordMotif = (chord: Chord) => {
+  const third = hasThird(chord.quality)
+    ? QUALITY_INTERVALS[chord.quality][1]
+    : 7;
+  return [0, 7, 12, third];
+};
+
 /** The strings' motif over each chord, from the E above middle C — high
  *  enough to cut through, the way an orchestra's violins carry a boss theme. */
 export function bossStringsBar(
@@ -207,11 +220,13 @@ export function bossStringsBar(
   segments: ReturnType<typeof segmentsForBar>,
   bpm: number,
   state: { step: number },
+  followChords = false,
 ): TrackEvent[] {
   const events: TrackEvent[] = [];
   const step = bpm <= 100 ? 0.25 : 0.5;
   for (const seg of segments) {
     const root = 64 + ((((seg.chord.root - 64) % 12) + 12) % 12);
+    const motif = followChords ? chordMotif(seg.chord) : STRINGS_MOTIF;
     for (const pos of every(step, seg.from, seg.to)) {
       const onBeat = Math.abs(pos - Math.round(pos)) < EPS;
       events.push({
@@ -221,7 +236,7 @@ export function bossStringsBar(
           {
             string: (state.step % 2) + 1,
             fret: 0,
-            midiNote: root + STRINGS_MOTIF[state.step % STRINGS_MOTIF.length],
+            midiNote: root + motif[state.step % motif.length],
             dynamics: onBeat ? 0.6 : 0.45,
           },
         ],
@@ -234,17 +249,50 @@ export function bossStringsBar(
 
 const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
 
-export function generateBossBacking(
-  measures: TablatureMeasure[],
-  bpm: number,
-  { phase }: BossMusicOptions,
-  options: { tuningOffsets?: readonly number[] },
-): AutoBackingResult | null {
-  const content = extractTabContent(measures, options.tuningOffsets);
-  if (content.totalLength <= 0 || content.bars.length === 0) return null;
+interface BossHarmony {
+  spans: ChordSpan[];
+  /** Tab bar played at each bar of the harmony loop. */
+  barMap: number[];
+  tonic: number;
+  /** The tab's own chords, or the boss's dark progression over the pedal. */
+  followsTab: boolean;
+}
 
+/**
+ * Semitones the whole guitar is tuned away from standard — E♭ standard is −1.
+ * A drop or open tuning moves only some strings, so the chord names still
+ * mean what they say there.
+ */
+const uniformShift = (tuningOffsets?: readonly number[]) =>
+  tuningOffsets?.length &&
+  tuningOffsets.every((offset) => offset === tuningOffsets[0])
+    ? tuningOffsets[0]
+    : 0;
+
+/** The chords the tab names, one loop of the tab, moved with a detuned guitar. */
+function tabHarmony(
+  content: TabContent,
+  tuningOffsets?: readonly number[],
+): BossHarmony | null {
+  const barMap = content.bars.map((_, i) => i);
+  const named = spansFromChordNames(content, barMap);
+  if (!named) return null;
+  const shift = uniformShift(tuningOffsets);
+  const spans = named.map((span) => ({
+    ...span,
+    chord: { ...span.chord, root: (span.chord.root + shift + 12) % 12 },
+  }));
+  return { spans, barMap, tonic: spans[0].chord.root, followsTab: true };
+}
+
+/** Power chords in the phase's progression over a low E pedal, a bar each. */
+function pedalHarmony(
+  content: TabContent,
+  phase: number,
+  tuningOffsets?: readonly number[],
+): BossHarmony {
   // The pedal follows the low string, so a detuned guitar keeps its ground.
-  const tonic = (BOSS_TONIC + (options.tuningOffsets?.[5] ?? 0) + 12) % 12;
+  const tonic = (BOSS_TONIC + (tuningOffsets?.[5] ?? 0) + 12) % 12;
   const progression =
     PROGRESSIONS[(Math.max(1, phase) - 1) % PROGRESSIONS.length];
 
@@ -267,6 +315,22 @@ export function generateBossBacking(
     else spans.push({ chord, start, length });
     start += length;
   });
+  return { spans, barMap, tonic, followsTab: false };
+}
+
+export function generateBossBacking(
+  measures: TablatureMeasure[],
+  bpm: number,
+  { phase }: BossMusicOptions,
+  options: { tuningOffsets?: readonly number[] },
+): AutoBackingResult | null {
+  const content = extractTabContent(measures, options.tuningOffsets);
+  if (content.totalLength <= 0 || content.bars.length === 0) return null;
+
+  const { spans, barMap, tonic, followsTab } =
+    tabHarmony(content, options.tuningOffsets) ??
+    pedalHarmony(content, phase, options.tuningOffsets);
+  const loopBars = barMap.length;
   const loopStarts: number[] = [];
   barMap.reduce((at, tabBar) => {
     loopStarts.push(at);
@@ -311,7 +375,10 @@ export function generateBossBacking(
     bass.push(buildMeasure(bossBassBar(bar, segments, bpm), bar));
     pad.push(buildMeasure(keysBar(bar, segments, "rock", padState), bar));
     strings.push(
-      buildMeasure(bossStringsBar(bar, segments, bpm, stringsState), bar),
+      buildMeasure(
+        bossStringsBar(bar, segments, bpm, stringsState, followsTab),
+        bar,
+      ),
     );
   });
 
@@ -353,8 +420,8 @@ export function generateBossBacking(
   return {
     tracks,
     summary: {
-      kind: "drone",
-      source: "progression",
+      kind: followsTab ? "tonal" : "drone",
+      source: followsTab ? "tab" : "progression",
       key: { tonic: pcName(tonic), scale: null },
       chords: spans.map((span) => chordSymbol(span.chord)),
       groove: "boss",

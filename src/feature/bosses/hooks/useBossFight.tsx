@@ -1,5 +1,5 @@
 import type { BossFightConfig } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { BossArena } from "../components/BossArena";
 import { BossDraft } from "../components/BossDraft";
@@ -8,10 +8,11 @@ import { BossPhaseIntro } from "../components/BossPhaseIntro";
 import { BossResultOverlay } from "../components/BossResultOverlay";
 import { BossWebOverlay } from "../components/BossWebOverlay";
 import { useBossFightStore } from "../store/bossFightStore";
-import type { BossDefinition, BossRecord, SpiderVariation } from "../types/boss.types";
+import type { BossDefinition, BossRecord } from "../types/boss.types";
 import { phaseBpm, phaseNumber } from "../utils/bossEngine";
 import type { RunResult } from "../utils/bossProgress";
 import { isNewRecord } from "../utils/bossProgress";
+import type { PhasePlan } from "../utils/phaseGenerator";
 
 interface UseBossFightOptions {
   boss: BossDefinition;
@@ -23,8 +24,10 @@ interface UseBossFightOptions {
 
 interface BossFight {
   config: BossFightConfig;
-  /** The drill of the phase being fought — the tab the session plays. */
-  variation: SpiderVariation;
+  /** The phase being fought — its drill is the tab the session plays… */
+  plan: PhasePlan;
+  /** …at this tempo, the run's boons on it. */
+  bpm: number;
 }
 
 /**
@@ -40,10 +43,9 @@ export const useBossFight = ({ boss, record, onRunEnd }: UseBossFightOptions): B
   const holding = useBossFightStore((s) => s.fight.holding);
   const phase = useBossFightStore((s) => phaseNumber(s.fight));
   const enraged = useBossFightStore((s) => s.fight.enraged);
-  const dealt = useBossFightStore((s) => s.fight.plan.variation);
+  const plan = useBossFightStore((s) => s.fight.plan);
   // The phase's tempo with the run's boons on it (slow down, overdrive).
   const bpm = useBossFightStore((s) => phaseBpm(s.fight));
-  const variation = useMemo(() => ({ ...dealt, bpm }), [dealt, bpm]);
 
   // Read when the run ends: the record it has to beat is the one from before it.
   const recordRef = useRef(record);
@@ -56,13 +58,13 @@ export const useBossFight = ({ boss, record, onRunEnd }: UseBossFightOptions): B
   // A fresh run on entry. Leaving in the middle of one still banks how far it
   // got — a player who walks away in phase 8 has reached phase 8.
   useEffect(() => {
-    useBossFightStore.getState().newRun();
+    useBossFightStore.getState().enterFight(boss.drill);
     return () => {
       const { fight } = useBossFightStore.getState();
       if (fight.outcome || fight.hits + fight.misses === 0) return;
       onRunEndRef.current({ phase: phaseNumber(fight), damage: fight.totalDamage });
     };
-  }, []);
+  }, [boss.drill]);
 
   useEffect(() => {
     if (outcome !== "lost") return;
@@ -73,7 +75,8 @@ export const useBossFight = ({ boss, record, onRunEnd }: UseBossFightOptions): B
   }, [outcome]);
 
   return {
-    variation,
+    plan,
+    bpm,
     config: {
       bpm,
       phase,

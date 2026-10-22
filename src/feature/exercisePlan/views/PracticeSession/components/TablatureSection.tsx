@@ -194,7 +194,7 @@ export const TablatureSection = memo(function TablatureSection({
 }: TablatureSectionProps) {
   const { t } = useTranslation("session");
   const { overlay: tabOverlay, gameMode } = useTabOverlay();
-  const { hitNotes, missedNotes, noteTimings, livePitchRef, learn } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, noteTimings, livePitchRef, learn, markAlphaTabPassStart } = useNoteMatchingContext();
   const { openTimingCalibration } = useSessionUI();
   const { tuning } = useGuitarTuningContext();
   const {
@@ -520,6 +520,7 @@ export const TablatureSection = memo(function TablatureSection({
             className='w-full'
             hitNotes={hitNotes}
             missedNotes={missedNotes}
+            onLoopRestart={markAlphaTabPassStart}
             heightPx={height}
             resizeHandle={
               <TablatureResizeHandle height={height} onChange={setHeight} />

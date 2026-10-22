@@ -11,9 +11,9 @@ import { useBossFightStore } from "../store/bossFightStore";
 import type { BossDefinition } from "../types/boss.types";
 import { boonPreview } from "../utils/boonPreview";
 import type { BoonRarity } from "../utils/boons";
-import { BOON, BOON_COUNTERS, boonDef, buildOf, stacksOf, synergiesWith } from "../utils/boons";
+import { BOON, boonDef, buildOf, counteredThreat, stacksOf, synergiesWith } from "../utils/boons";
 import type { BossFightState } from "../utils/bossEngine";
-import { phaseNumber } from "../utils/bossEngine";
+import { momentumStreakFor, multiplierStreakFor, phaseNumber } from "../utils/bossEngine";
 import { threatsOf } from "../utils/phaseChanges";
 import { BoonIcon, RARITY_TEXT } from "./BoonIcon";
 import { PhaseBriefing } from "./PhaseBriefing";
@@ -27,6 +27,13 @@ const BOON_VARS = {
   thornsPercent: Math.round(BOON.thornsShare * 100),
   overdrivePercent: Math.round((BOON.overdriveDamage - 1) * 100),
 };
+
+/** The same, with the streaks of the boss being fought — changes count slower than notes. */
+const boonVars = (fight: BossFightState) => ({
+  ...BOON_VARS,
+  momentumStreak: momentumStreakFor(fight.plan),
+  maxStreak: multiplierStreakFor(fight.plan),
+});
 
 /** A rare card glows faintly of its rarity — tinted, not outlined. */
 const RARITY_CARD: Record<BoonRarity, string> = {
@@ -149,8 +156,7 @@ export const BossDraft = ({ boss }: { boss: BossDefinition }) => {
                   const def = boonDef(id);
                   const owned = stacksOf(fight.boons, id);
                   const preview = boonPreview(fight, id);
-                  const counters = BOON_COUNTERS[id];
-                  const countersNow = counters && threatsOf(fight.plan).includes(counters);
+                  const countersNow = counteredThreat(id, threatsOf(fight.plan));
                   const pairs = synergiesWith(id, fight.boons);
                   return (
                     <m.li key={id} variants={fadeUp}>
@@ -181,13 +187,13 @@ export const BossDraft = ({ boss }: { boss: BossDefinition }) => {
                           </span>
                         )}
                         <span className='flex-1 text-sm leading-relaxed text-zinc-300'>
-                          {t(`boons.${id}.body`, BOON_VARS)}
+                          {t(`boons.${id}.body`, boonVars(fight))}
                         </span>
                         {(countersNow || pairs.length > 0) && (
                           <span className='space-y-1 text-xs font-medium'>
                             {countersNow && (
                               <span className='block text-emerald-400'>
-                                {t("draft.counters", { threat: t(`threats.${counters}`) })}
+                                {t("draft.counters", { threat: t(`threats.${countersNow}`) })}
                               </span>
                             )}
                             {pairs.length > 0 && (

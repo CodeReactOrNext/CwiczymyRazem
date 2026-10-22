@@ -3,6 +3,98 @@
     "fretweaver": {
       "name": "The Fretweaver",
       "title": "Queen of the chromatic web"
+    },
+    "colossus": {
+      "name": "The Stone Colossus",
+      "title": "Breaker of slow changes",
+      "threats": {
+        "bites": "Fists",
+        "weak_spots": "Weak change",
+        "venom": "Dust",
+        "regen": "Mending stone",
+        "frenzy": "Aftershocks",
+        "web": "Petrify"
+      },
+      "arena": {
+        "slam": "Quake",
+        "webbed": "Petrified — play the progression from memory",
+        "poisoned": "Dust in your eyes — charges at half speed",
+        "poisoned_short": "Dust",
+        "regenerating": "Mending — strike to stop it"
+      },
+      "result": {
+        "title": "Crushed"
+      },
+      "lair": {
+        "pitch": "One endless fight of chord changes. Every phase the colossus re-forms around a new progression — open chords, power chords, barre chords, sevenths — and the changes come quicker. See how far you get."
+      },
+      "rules": {
+        "sword": {
+          "body": "Every clean change charges it: dead on 4, on time 3, close 2, loose 1. A chord counts once every string but one is heard. A missed change shatters the charge."
+        },
+        "strike": {
+          "body": "A full sword strikes on its own — harder the longer your streak of clean changes, up to ×2 at {{max}} in a row."
+        },
+        "bite": {
+          "title": "Every missed change is a fist",
+          "body": "A chord you don't get to in time costs HP. Run out and the run is over."
+        },
+        "slam": {
+          "title": "Ride out the quake",
+          "body": "From phase {{slams}} the colossus quakes: for two bars the chords change twice as often. Play every one of them clean to block it — a block half-charges your sword."
+        },
+        "endless": {
+          "body": "Clear a phase's HP and the colossus re-forms: a new progression, new chords and a quicker tempo every time. Open chords first, then power chords, barre chords and sevenths. Every phase cleared heals you {{heal}} HP."
+        },
+        "threats": {
+          "title": "It learns",
+          "body": "From phase {{weak}} it finds your weak change — the one you miss most — and a clean one there charges your sword ×{{weakCharge}}. From phase {{affix}} it gains powers: dust, mending stone, aftershocks and petrify, which turns the tab to stone."
+        }
+      },
+      "boons": {
+        "armor": {
+          "body": "Fists take {{armorPercent}}% less HP. Stacks."
+        },
+        "shield": {
+          "body": "Soaks up the next {{shieldCharges}} fists."
+        },
+        "thorns": {
+          "body": "Every fist costs the colossus {{thornsPercent}}% of the phase's HP. Stacks."
+        },
+        "secondWind": {
+          "body": "{{secondWindMisses}} missed changes each phase are forgiven: no fist, the streak and the charge stay."
+        },
+        "steadyHand": {
+          "body": "A quake is still blocked with {{steadyHandQuakeMisses}} missed chord."
+        },
+        "antidote": {
+          "name": "Dust mask",
+          "body": "Dust can't touch you."
+        },
+        "clearSight": {
+          "body": "Petrify lasts half as long."
+        },
+        "precision": {
+          "body": "Dead-on changes charge {{precisionPoints}} instead of 4."
+        },
+        "momentum": {
+          "body": "Your streak reaches ×2 at {{momentumStreak}} in a row instead of {{maxStreak}}."
+        },
+        "exploit": {
+          "body": "Clean weak changes charge your sword ×{{exploitCharge}}."
+        }
+      },
+      "preview": {
+        "armor": "Fist {{from}} → {{to}} HP",
+        "thorns": "Per fist {{from}} → {{to}} damage",
+        "steadyHand": "Misses a quake allows {{from}} → {{to}}",
+        "exploit": "Weak change {{from}} → {{to}}"
+      },
+      "briefing": {
+        "faster": "Changes come {{percent}}% faster",
+        "slower": "Changes come {{percent}}% slower",
+        "same_speed": "Changes come at the same speed"
+      }
     }
   },
   "arena": {
@@ -24,7 +116,12 @@
     "caught_secondWind": "Second wind",
     "sword_ready": "Ready to strike",
     "poisoned_short": "Poisoned",
-    "enraged": "Enraged"
+    "enraged": "Enraged",
+    "quake_coming": "Quake in a bar — the changes come twice as fast",
+    "quake_on": "Quake — play every chord clean · {{count}} left",
+    "quake_on_steady": "Quake — one miss allowed · {{count}} left",
+    "weak_change": "Weak change now: {{change}} — sword ×{{multiplier}}",
+    "weak_change_label": "Weak change:"
   },
   "threats": {
     "bites": "Bites",
@@ -33,7 +130,8 @@
     "venom": "Venom",
     "regen": "Regeneration",
     "frenzy": "Frenzy",
-    "web": "Web"
+    "web": "Web",
+    "quake": "Quakes"
   },
   "result": {
     "title": "Caught in the web",
@@ -191,13 +289,21 @@
     "slower": "Notes come {{percent}}% slower",
     "same_speed": "Notes come at the same speed",
     "unchanged": "Unchanged — {{list}}",
-    "first_bar": "First bar"
+    "first_bar": "First bar",
+    "chords": "Chords",
+    "progression": "Progression",
+    "quakes": "Quakes",
+    "quakes_per_pass_one": "{{count}} per pass",
+    "quakes_per_pass_other": "{{count}} per pass",
+    "shapes": "Shapes"
   },
   "subdivision": {
     "quarters": "quarter notes",
     "eighths": "eighths",
     "triplets": "triplets",
-    "sixteenths": "sixteenths"
+    "sixteenths": "sixteenths",
+    "halves": "half notes",
+    "wholes": "whole notes"
   },
   "route": {
     "walk": "across the strings",
@@ -220,5 +326,11 @@
     "exploit": "Weak spot {{from}} → {{to}}",
     "slowDown": "Tempo {{from}} → {{to}} BPM",
     "overdrive": "Tempo {{from}} → {{to}} BPM"
+  },
+  "chord_family": {
+    "open": "open chords",
+    "power": "power chords",
+    "barre": "barre chords",
+    "seventh": "seventh chords"
   }
 }

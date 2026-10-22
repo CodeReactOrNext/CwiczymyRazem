@@ -276,7 +276,8 @@ function closeSpans(spans: ChordSpan[], total: number): ChordSpan[] {
   return merged;
 }
 
-function spansFromChordNames(
+/** The chords the tab names over its beats, laid out bar by bar along `barMap`. */
+export function spansFromChordNames(
   content: TabContent,
   barMap: readonly number[],
 ): ChordSpan[] | null {

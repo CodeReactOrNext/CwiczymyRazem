@@ -42,12 +42,14 @@ export const TimeSplitterModal = ({
   onArrangementChange,
 }: TimeSplitterModalProps) => {
   const { t } = useTranslation(["timer", "practice_hub"]);
-  // Share of the session spent on hearing — the slider's filled (left) side.
-  const [hearingPercent, setHearingPercent] = useState(50);
+  // Share of the session spent on technique. Dragging right means more
+  // technique — players have that in their hands, so it must not flip.
+  const [techniquePercent, setTechniquePercent] = useState(50);
   const [markAsLearned, setMarkAsLearned] = useState(false);
 
-  const hearingTime = Math.round(totalTime * (hearingPercent / 100));
-  const techniqueTime = totalTime - hearingTime;
+  const hearingPercent = 100 - techniquePercent;
+  const techniqueTime = Math.round(totalTime * (techniquePercent / 100));
+  const hearingTime = totalTime - techniqueTime;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
@@ -96,7 +98,7 @@ export const TimeSplitterModal = ({
                 </div>
                 <div className='text-right'>
                   <p className='text-xs text-zinc-400'>
-                    <span className='mr-1.5 tabular-nums text-zinc-500'>{100 - hearingPercent}%</span>
+                    <span className='mr-1.5 tabular-nums text-zinc-500'>{techniquePercent}%</span>
                     {t("time_splitter.technique")}
                   </p>
                   <p className='mt-1 text-2xl font-semibold tabular-nums text-amber-400'>
@@ -105,12 +107,12 @@ export const TimeSplitterModal = ({
                 </div>
               </div>
               <Slider
-                value={[hearingPercent]}
-                onValueChange={(val) => setHearingPercent(val[0])}
+                value={[techniquePercent]}
+                onValueChange={(val) => setTechniquePercent(val[0])}
                 max={100}
                 step={5}
                 aria-label={`${t("time_splitter.hearing")} / ${t("time_splitter.technique")}`}
-                className='mt-5 cursor-pointer py-2 [&_[data-slot=slider-range]]:bg-cyan-400 [&_[data-slot=slider-track]]:bg-amber-400/80 [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&_[role=slider]]:border-0 [&_[role=slider]]:bg-zinc-100 [&_[role=slider]]:shadow-none'
+                className='mt-5 cursor-pointer py-2 [&_[data-slot=slider-range]]:bg-amber-400 [&_[data-slot=slider-track]]:bg-cyan-400/80 [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&_[role=slider]]:border-0 [&_[role=slider]]:bg-zinc-100 [&_[role=slider]]:shadow-none'
               />
             </div>
           </section>

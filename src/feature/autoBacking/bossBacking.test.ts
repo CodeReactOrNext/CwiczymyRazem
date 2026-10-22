@@ -76,3 +76,102 @@ describe("generateBossBacking", () => {
     expect(halfDown.summary.key?.tonic).toBe("D#");
   });
 });
+
+/** The colossus's drill: one named strum per chord — G and C in half notes, then a quake in quarters. */
+const G: [number, number][] = [
+  [6, 3],
+  [5, 2],
+  [4, 0],
+  [3, 0],
+  [2, 0],
+  [1, 3],
+];
+const C: [number, number][] = [
+  [5, 3],
+  [4, 2],
+  [3, 0],
+  [2, 1],
+  [1, 0],
+];
+const strum = (name: string, cells: [number, number][], duration: number) => ({
+  duration,
+  chordName: name,
+  notes: cells.map(([string, fret]) => ({ string, fret })),
+});
+const changes: TablatureMeasure[] = [
+  { timeSignature: [4, 4], beats: [strum("G", G, 2), strum("C", C, 2)] },
+  {
+    timeSignature: [4, 4],
+    beats: [
+      strum("G", G, 1),
+      strum("C", C, 1),
+      strum("G", G, 1),
+      strum("C", C, 1),
+    ],
+  },
+];
+/** Where each chord of the drill starts, in beats from the top, and its root. */
+const CHANGES = [
+  { at: 0, root: 7 },
+  { at: 2, root: 0 },
+  { at: 4, root: 7 },
+  { at: 5, root: 0 },
+  { at: 6, root: 7 },
+  { at: 7, root: 0 },
+];
+/** The bass's open strings, G D A E — its notes are written as string and fret. */
+const BASS_OPEN = [43, 38, 33, 28];
+/** Every note of a track with the beat it starts on, over one loop of the drill. */
+const timeline = (measures: TablatureMeasure[]) => {
+  const out: { at: number; pc: number }[] = [];
+  let at = 0;
+  for (const measure of measures.slice(0, changes.length)) {
+    for (const beat of measure.beats) {
+      for (const note of beat.notes) {
+        const pitch = note.midiNote ?? BASS_OPEN[note.string - 1] + note.fret;
+        out.push({ at, pc: pitch % 12 });
+      }
+      at += beat.duration;
+    }
+  }
+  return out;
+};
+const chordAt = (at: number) =>
+  [...CHANGES].reverse().find((change) => change.at <= at + 1e-6)!;
+
+describe("generateBossBacking over named chords", () => {
+  it("plays the tab's own chords, change for change", () => {
+    const result = generateBossBacking(changes, 80, { phase: 3 }, {})!;
+    expect(result.summary.source).toBe("tab");
+    expect(result.summary.chords).toEqual(["G", "C", "G", "C", "G", "C"]);
+    const bass = timeline(result.tracks[1].measures);
+    for (const change of CHANGES) {
+      const first = bass.find((note) => Math.abs(note.at - change.at) < 1e-6);
+      expect(first?.pc, `bass at beat ${change.at}`).toBe(change.root);
+    }
+  });
+
+  it("keeps the strings on the chord's tones — no half step against it", () => {
+    const result = generateBossBacking(changes, 80, { phase: 3 }, {})!;
+    const tones: Record<number, number[]> = { 7: [7, 11, 2], 0: [0, 4, 7] };
+    for (const note of timeline(result.tracks[3].measures)) {
+      expect(tones[chordAt(note.at).root]).toContain(note.pc);
+    }
+  });
+
+  it("moves the chords with a guitar tuned down as a whole", () => {
+    const halfDown = generateBossBacking(
+      changes,
+      80,
+      { phase: 1 },
+      { tuningOffsets: [-1, -1, -1, -1, -1, -1] },
+    )!;
+    expect(halfDown.summary.chords.slice(0, 2)).toEqual(["F#", "B"]);
+  });
+
+  it("keeps the dark pedal for a drill with no chord names", () => {
+    expect(
+      generateBossBacking(drill, 90, { phase: 1 }, {})!.summary.source,
+    ).toBe("progression");
+  });
+});

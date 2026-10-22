@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { toAlphaTabClickVolume } from "feature/exercisePlan/components/Metronome/utils/alphaTabClickVolume";
+import { wrapResumeTick } from "feature/exercisePlan/hooks/useAlphaTabPlayer";
 import { useEffect, useRef } from "react";
 
 import { CountInOverlay } from "../CountInOverlay";
@@ -39,6 +40,7 @@ export const AlphaTabScoreViewer = ({
   notationDarkModeOverride,
   notationSpacingOverride,
   justifyLastSystem,
+  onLoopRestart,
 }: AlphaTabScoreViewerProps) => {
   const storeNotationDarkMode = useTablatureSettings((s) => s.notationDarkMode);
   const notationDarkMode = notationDarkModeOverride ?? storeNotationDarkMode;
@@ -61,6 +63,7 @@ export const AlphaTabScoreViewer = ({
 
   const {
     apiRef,
+    endTickRef,
     scrollRef,
     containerRef,
     uiReady,
@@ -84,6 +87,7 @@ export const AlphaTabScoreViewer = ({
     trackConfigs,
     backingTrackIds,
     justifyLastSystem,
+    onLoopRestart,
   });
 
   // Colour the actual fret numbers green on a hit / red on a miss.
@@ -117,10 +121,12 @@ export const AlphaTabScoreViewer = ({
       // Toggling the view mid-playback remounts this AlphaTab instance; without a
       // seek it would restart the audio at the top. startTime is the metronome's
       // back-dated master clock, so this continues from the session's position.
+      // It counts every loop played so far, so it's wrapped into one pass: a
+      // seek past the end left the looping synth silent for good.
       if (startTime) {
         const beats = ((Date.now() - startTime) / 1000) * (bpmRef.current / 60);
         if (beats > 0.1) {
-          try { api.tickPosition = Math.max(0, Math.round(beats * 960)); } catch { /* ignore */ }
+          try { api.tickPosition = wrapResumeTick(Math.round(beats * 960), endTickRef.current); } catch { /* ignore */ }
         }
       }
       try { api.play(); } catch { /* ignore */ }
