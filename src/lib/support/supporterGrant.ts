@@ -208,6 +208,17 @@ async function getVerifiedEmail(uid: string): Promise<string | null> {
 }
 
 /**
+ * Whether a donation is parked on this address. One document read, so a caller
+ * on the login path can run it alongside its own reads and skip
+ * `claimPendingSupporter` entirely in the common case of nothing waiting.
+ */
+export async function hasPendingSupporter(email?: string | null): Promise<boolean> {
+  const normalized = normalizeEmail(email);
+  if (!normalized) return false;
+  return (await pendingRef(normalized).get()).exists;
+}
+
+/**
  * Hands the badge to a freshly seen account whose email has a donation waiting.
  *
  * `claimedEmail` only decides whether there is anything to look up — the grant

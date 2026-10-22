@@ -22,7 +22,7 @@ import {
   countQuestCategories,
   isCategoryQuestType,
 } from "./dailyQuest.categories";
-import { getQuestDayKey, isPreMigrationQuestDay } from "./questDay";
+import { getQuestDayKey, isPreMigrationQuestDay, isQuestDrawnFor } from "./questDay";
 import { subtractReportedTime } from "./timerReporting";
 import {
   autoLogIn,
@@ -42,6 +42,7 @@ import {
   uploadUserAvatar,
   uploadUserSocialData,
 } from "./userSlice.asyncThunk";
+import type { UserSnapshot } from "./userSnapshot";
 
 
 const initialState: userSliceInitialState = {
@@ -85,6 +86,19 @@ const userSlice = createSlice({
       { payload }: PayloadAction<StatisticsDataInterface>
     ) => {
       state.currentUserStats = payload;
+    },
+    // The profile saved on the last visit (see `userSnapshot`), shown until
+    // autoLogIn brings the real one. Never over a profile already loaded.
+    restoreUserSnapshot: (state, { payload }: PayloadAction<UserSnapshot>) => {
+      if (state.userAuth) return;
+      state.userAuth = payload.userAuth;
+      state.userInfo = payload.userInfo;
+      // TEMP: Unlock master for all users. Remove this block to restore Stripe/role-based access.
+      if (state.userInfo) {
+        state.userInfo.role = "master";
+      }
+      state.currentUserStats = payload.currentUserStats;
+      state.isUserSnapshot = true;
     },
 
 
@@ -217,7 +231,7 @@ const userSlice = createSlice({
         return;
       }
 
-      if (storedQuest && hasTasks && storedQuest.date >= today) return;
+      if (isQuestDrawnFor(storedQuest, today)) return;
 
       // Shuffle and pick 3, skipping templates whose group is already
       // represented in the selection so the quest set never contains two
@@ -496,6 +510,7 @@ const userSlice = createSlice({
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.isLoggedOut = true;
+        state.isUserSnapshot = false;
         state.userAuth = null;
         state.userInfo = null;
         state.currentUserStats = null;
@@ -524,8 +539,13 @@ const userSlice = createSlice({
           state.userInfo.emailNotifications = payload;
         }
       })
-      .addCase(autoLogIn.rejected, (state) => {
+      .addCase(autoLogIn.rejected, (state, { payload }) => {
         state.isFetching = null;
+        // No connection is not a verdict: useAuthSync keeps retrying, the saved
+        // copy (if any) stays up, and pages keep their loading screen rather
+        // than bouncing to the login page. Only a refusal ends the session.
+        if (payload !== "refused") return;
+        state.isUserSnapshot = false;
         state.userAuth = null;
         state.userInfo = null;
         state.currentUserStats = null;
@@ -582,6 +602,7 @@ const userSlice = createSlice({
         (state, action) => {
           state.isFetching = null;
           state.autoLogInFailed = false;
+          state.isUserSnapshot = false;
           state.userInfo = action.payload.userInfo;
           // TEMP: Unlock master for all users. Remove this block to restore Stripe/role-based access.
           if (state.userInfo) {
@@ -612,6 +633,7 @@ export const {
   setFavoritePlan,
   setFavoriteExercise,
   setFavoriteSong,
+  restoreUserSnapshot,
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
@@ -634,5 +656,14 @@ export const selectDailyQuest = (state: RootState) =>
   state.user.currentUserStats?.dailyQuest;
 export const selectIsLoggedOut = (state: RootState) => state.user.isLoggedOut;
 export const selectAutoLogInFailed = (state: RootState) => state.user.autoLogInFailed;
+/** True while the store holds the saved copy, before autoLogIn confirms the player. */
+export const selectIsUserSnapshot = (state: RootState) => !!state.user.isUserSnapshot;
+/**
+ * `userAuth` once the player is confirmed, null while only the saved copy is up.
+ * For code that writes on the player's behalf: Firebase may not have restored its
+ * user yet, and a write built from the saved copy could carry stale data.
+ */
+export const selectConfirmedUserAuth = (state: RootState) =>
+  state.user.isUserSnapshot ? null : state.user.userAuth;
 
 export default userSlice.reducer;

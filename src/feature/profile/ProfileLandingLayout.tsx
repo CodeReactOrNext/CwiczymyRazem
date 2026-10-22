@@ -19,7 +19,7 @@ import { useUserSongs } from "feature/songs/hooks/useUserSongs";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, History } from "lucide-react";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { convertMsToHM } from "utils/converter";
@@ -47,19 +47,25 @@ const ProfileLandingLayout = ({
     isLoading: isSongsLoading,
     isError: isSongsError,
   } = useUserSongs(userAuth);
-  const [lastSession, setLastSession] = useState<LastSessionInfo | null>(null);
+  // Read on the first render, not in an effect: the dashboard only renders in
+  // the browser (AppLayout shows the shell on the server), and setting it a
+  // frame later grew the hero by the "Last session" row after it was painted.
+  const [lastSession] = useState<LastSessionInfo | null>(() => loadLastSession());
   const { item: equippedGuitar } = useEquippedGuitar(userAuth);
-  const { progress: gettingStarted, isLoading: isGettingStartedLoading } =
-    useGettingStartedProgress(
-      userAuth,
-      userStats?.sessionCount ?? 0,
-      reportList,
-    );
-  const showHero = !isGettingStartedLoading && !gettingStarted?.isVisible;
-
-  useEffect(() => {
-    setLastSession(loadLastSession());
-  }, []);
+  const {
+    progress: gettingStarted,
+    isLoading: isGettingStartedLoading,
+    wasHiddenLastVisit,
+  } = useGettingStartedProgress(
+    userAuth,
+    userStats?.sessionCount ?? 0,
+    reportList,
+  );
+  // Until the checklist's data is in, go by what the last visit found, so a
+  // player past onboarding gets the hero with the page instead of seconds later.
+  const showHero = isGettingStartedLoading
+    ? wasHiddenLastVisit
+    : !gettingStarted?.isVisible;
 
   const todayStr = new Date().toDateString();
   const lastReportDate = userStats?.lastReportDate

@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { YouTube } from "components/Blog/YouTube";
 import { HeroPattern } from "components/UI/HeroBanner";
@@ -47,6 +48,26 @@ const STEP_ICONS: Record<GettingStartedStepId, typeof Compass> = {
   second_day: CalendarCheck,
 };
 
+/** The card's frame — title row, then the four-node track — while it loads. */
+const GettingStartedSkeleton = () => (
+  <Card className='relative flex-col justify-between overflow-hidden p-4 sm:p-5'>
+    <div className='mb-3 flex h-7 items-center gap-2.5'>
+      <Compass size={16} className='text-zinc-700' />
+      <Skeleton className='h-3 w-32 rounded' />
+    </div>
+    <div className='flex items-start pt-1'>
+      {Array.from({ length: 4 }, (_, i) => (
+        <div
+          key={i}
+          className='flex min-w-0 flex-1 flex-col items-center gap-2 py-1 sm:gap-2.5 sm:px-1'>
+          <Skeleton className='h-9 w-9 rounded-full sm:h-10 sm:w-10' />
+          <Skeleton className='h-2.5 w-14 rounded sm:h-3 sm:w-20' />
+        </div>
+      ))}
+    </div>
+  </Card>
+);
+
 export const GettingStartedWidget = () => {
   const { t } = useTranslation("onboarding");
   const dispatch = useAppDispatch();
@@ -59,6 +80,7 @@ export const GettingStartedWidget = () => {
     markStep,
     claimReward,
     isClaiming,
+    wasVisibleLastVisit,
   } = useGettingStartedProgress(
     userAuth,
     userStats.sessionCount ?? 0,
@@ -66,7 +88,11 @@ export const GettingStartedWidget = () => {
   );
   const [openModal, setOpenModal] = useState<ModalId>(null);
 
-  if (isLoading || !progress) return null;
+  // A checklist that was up last time most likely still is: hold its place so
+  // it doesn't push the widgets down when its data lands.
+  if (isLoading || !progress) {
+    return wasVisibleLastVisit ? <GettingStartedSkeleton /> : null;
+  }
 
   const sessionCount = userStats.sessionCount ?? 0;
 

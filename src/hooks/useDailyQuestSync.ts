@@ -1,4 +1,4 @@
-import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { selectConfirmedUserAuth, selectCurrentUserStats } from "feature/user/store/userSlice";
 import { ensureQuestForToday, syncDailyQuestAction } from "feature/user/store/userSlice.questActions";
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -28,7 +28,7 @@ const MIN_SYNC_INTERVAL = 30_000;
  */
 const useDailyQuestSync = () => {
   const dispatch = useAppDispatch();
-  const userAuth = useAppSelector(selectUserAuth);
+  const userAuth = useAppSelector(selectConfirmedUserAuth);
   // The quest day is resolved in the zone stored on the profile, so the
   // midnight to wake up at is that zone's, not the device's (see `questDay`).
   const timeZone = useAppSelector(selectCurrentUserStats)?.timeZone;

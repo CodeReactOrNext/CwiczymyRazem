@@ -51,3 +51,13 @@ export const isPreMigrationQuestDay = (
   questToday: string,
   date: Date = new Date()
 ): boolean => storedDate > questToday && storedDate === getServerDateKey(date);
+
+/**
+ * Whether `quest` is a set already drawn for the player's day — the case where
+ * `generateDailyQuest` keeps what is there (at most re-stamping a pre-migration
+ * key, which always reads as later than `questToday`) instead of drawing anew.
+ */
+export const isQuestDrawnFor = (
+  quest: { date: string; tasks?: unknown[] } | null | undefined,
+  questToday: string
+): boolean => !!quest && (quest.tasks?.length ?? 0) > 0 && quest.date >= questToday;

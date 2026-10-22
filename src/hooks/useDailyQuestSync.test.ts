@@ -14,7 +14,7 @@ vi.mock("feature/user/store/userSlice.questActions", () => ({
 }));
 
 vi.mock("feature/user/store/userSlice", () => ({
-  selectUserAuth: () => "user1",
+  selectConfirmedUserAuth: () => "user1",
   selectCurrentUserStats: () => stats,
 }));
 

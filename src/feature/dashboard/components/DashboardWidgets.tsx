@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import type { DragEndEvent } from "@dnd-kit/core";
 import {
   closestCenter,
@@ -25,8 +24,8 @@ import {
   WIDGET_GROUP_LABELS,
   WIDGET_GROUP_ORDER,
 } from "feature/dashboard/data/widgetCatalog";
-import { useLocalizeWidget } from "feature/dashboard/hooks/useLocalizeWidget";
 import { useDashboardLayout } from "feature/dashboard/hooks/useDashboardLayout";
+import { useLocalizeWidget } from "feature/dashboard/hooks/useLocalizeWidget";
 import {
   addWidget,
   hiddenWidgets,
@@ -37,7 +36,10 @@ import {
   setWidgetSize,
 } from "feature/dashboard/utils/dashboardLayout";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
+import { LogsBoxSkeleton } from "feature/logsBox/view/LogsBoxView/LogsBoxView";
 import { GettingStartedWidget } from "feature/onboarding/components/GettingStartedWidget/GettingStartedWidget";
+import { MountOnVisible } from "feature/seoLanding/components/MountOnVisible";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, Plus, RotateCcw, Settings2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useResponsiveStore } from "store/useResponsiveStore";
@@ -225,7 +227,13 @@ export const DashboardWidgets = () => {
 
         <SupportBanner />
 
-        {feedSlot ?? <LogsBoxView />}
+        {/* Below the widgets and the banner, so usually off screen at load. The
+            feed brings a pile of listeners (logs, pinned donations, unread
+            counts), the changelog and the whole RTDB presence node — none of
+            it needs to compete with the widgets above it. */}
+        <MountOnVisible placeholder={<LogsBoxSkeleton />}>
+          {feedSlot ?? <LogsBoxView />}
+        </MountOnVisible>
       </div>
 
       <AddWidgetSheet

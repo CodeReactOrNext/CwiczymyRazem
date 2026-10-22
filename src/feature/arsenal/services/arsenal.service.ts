@@ -1,5 +1,5 @@
 import axios from "axios";
-import { auth } from "utils/firebase/client/firebase.utils";
+import { auth, firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 
 import type { HardwareKind, UpgradeRigResult } from "../data/rigHardware";
 import type {
@@ -25,8 +25,11 @@ import type {
 } from "../types/arsenal.types";
 
 async function getIdToken(): Promise<string> {
-  const token = await auth.currentUser!.getIdToken();
-  return token;
+  // The app can render from the saved profile before Firebase has restored its
+  // user (see `userSnapshot`); the inventory query fires on the dashboard then.
+  const user = auth.currentUser ?? (await firebaseGetCurrentUser());
+  if (!user) throw new Error("Not signed in");
+  return user.getIdToken();
 }
 
 export const openCase = async (

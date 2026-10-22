@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getQuestDayKey, isPreMigrationQuestDay } from "./questDay";
+import { getQuestDayKey, isPreMigrationQuestDay, isQuestDrawnFor } from "./questDay";
 
 /** 2026-09-04T01:05Z — the instant a Los Angeles player finished a 45-minute
  *  evening session, three hours before their own day was over. */
@@ -55,5 +55,20 @@ describe("isPreMigrationQuestDay", () => {
 
   it("says nothing about a quest that already carries today's key", () => {
     expect(isPreMigrationQuestDay("2026-09-03", "2026-09-03", LA_EVENING)).toBe(false);
+  });
+});
+
+describe("isQuestDrawnFor", () => {
+  const task = { id: "t" };
+
+  it("holds a set drawn for today, or stamped later than it", () => {
+    expect(isQuestDrawnFor({ date: "2026-10-22", tasks: [task] }, "2026-10-22")).toBe(true);
+    expect(isQuestDrawnFor({ date: "2026-10-23", tasks: [task] }, "2026-10-22")).toBe(true);
+  });
+
+  it("needs a new set for an earlier day, an empty set, or none", () => {
+    expect(isQuestDrawnFor({ date: "2026-10-21", tasks: [task] }, "2026-10-22")).toBe(false);
+    expect(isQuestDrawnFor({ date: "2026-10-22", tasks: [] }, "2026-10-22")).toBe(false);
+    expect(isQuestDrawnFor(null, "2026-10-22")).toBe(false);
   });
 });

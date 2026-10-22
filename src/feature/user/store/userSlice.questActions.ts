@@ -16,7 +16,7 @@ import { auth, db } from "utils/firebase/client/firebase.utils";
 import { getPointsToLvlUp, levelUpUser } from "utils/gameLogic";
 
 import { isSameQuest, mergeDailyQuests } from "./dailyQuest.merge";
-import { getQuestDayKey } from "./questDay";
+import { getQuestDayKey, isQuestDrawnFor } from "./questDay";
 import { claimQuestReward, completeQuestTask, generateDailyQuest, setDailyQuest } from "./userSlice";
 
 /** Fame Points awarded for completing the full daily quest set. */
@@ -191,6 +191,17 @@ export const syncDailyQuestAction = createAsyncThunk(
 export const initializeDailyQuestAction = createAsyncThunk(
   "user/initializeDailyQuest",
   async (_, { dispatch, getState }) => {
+    const stats = (getState() as RootState).user.currentUserStats;
+    // Usually today's set is already drawn — every login, every dashboard
+    // visit — and then nothing needs the exercise catalog, a large chunk to
+    // download just to throw away. The reducer still runs for the re-stamp it
+    // may owe a pre-migration key.
+    if (stats && isQuestDrawnFor(stats.dailyQuest, getQuestDayKey(stats.timeZone))) {
+      dispatch(generateDailyQuest());
+      dispatch(syncDailyQuestAction());
+      return;
+    }
+
     const { exercisesAgregat } = await import("../../exercisePlan/data/exercisesAgregat");
 
     const state = getState() as RootState;

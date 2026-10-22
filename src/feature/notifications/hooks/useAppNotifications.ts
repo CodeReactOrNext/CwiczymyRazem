@@ -8,7 +8,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";
 
 import type { AppNotification } from "../services/notification.service";
@@ -17,12 +17,15 @@ import {
   markNotificationAsRead,
 } from "../services/notification.service";
 
+// Sender avatars, so the same user isn't refetched on every snapshot. Module
+// level: the bell and the desktop toasts each run this hook, and per instance
+// both read the same sender documents.
+const avatarCache: Record<string, string | null> = {};
+
 export const useAppNotifications = (userId: string | null) => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  // Caches sender avatars so we don't refetch the same user on every snapshot.
-  const avatarCache = useRef<Record<string, string | null>>({});
 
   useEffect(() => {
     if (!userId) {
@@ -44,7 +47,7 @@ export const useAppNotifications = (userId: string | null) => {
               (n) =>
                 !n.senderAvatarUrl &&
                 n.senderId &&
-                !(n.senderId in avatarCache.current),
+                !(n.senderId in avatarCache),
             )
             .map((n) => n.senderId as string),
         ),
@@ -54,18 +57,18 @@ export const useAppNotifications = (userId: string | null) => {
         missing.map(async (uid) => {
           try {
             const snap = await getDoc(doc(db, "users", uid));
-            avatarCache.current[uid] = snap.exists()
+            avatarCache[uid] = snap.exists()
               ? (snap.data().avatar ?? null)
               : null;
           } catch {
-            avatarCache.current[uid] = null;
+            avatarCache[uid] = null;
           }
         }),
       );
 
       return list.map((n) =>
-        !n.senderAvatarUrl && n.senderId && avatarCache.current[n.senderId]
-          ? { ...n, senderAvatarUrl: avatarCache.current[n.senderId] }
+        !n.senderAvatarUrl && n.senderId && avatarCache[n.senderId]
+          ? { ...n, senderAvatarUrl: avatarCache[n.senderId] }
           : n,
       );
     };
@@ -82,6 +85,10 @@ export const useAppNotifications = (userId: string | null) => {
       orderBy("timestamp", "desc"),
       limit(20),
     );
+
+    // Kept so the effect cleanup can close it: it used to stay subscribed after
+    // logout and after every userId change.
+    let unsubscribeFallback: (() => void) | null = null;
 
     const unsubscribe = onSnapshot(
       q,
@@ -108,7 +115,7 @@ export const useAppNotifications = (userId: string | null) => {
             limit(20),
           );
 
-          onSnapshot(simpleQuery, (simpleSnapshot) => {
+          unsubscribeFallback = onSnapshot(simpleQuery, (simpleSnapshot) => {
             const fetched = simpleSnapshot.docs.map((doc) => ({
               id: doc.id,
               ...doc.data(),
@@ -129,7 +136,10 @@ export const useAppNotifications = (userId: string | null) => {
       },
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      unsubscribeFallback?.();
+    };
   }, [userId]);
 
   return {
