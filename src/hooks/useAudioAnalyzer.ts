@@ -5,6 +5,7 @@ import { spectrumFromAnalyser } from "utils/audio/chordTones";
 
 import type { DetectedNoteEvent, InputTap } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
+import { getDecimationFactor, GUITAR_INPUT_WORKLET_CODE } from "./guitarInputWorklet";
 
 interface AudioAnalyzerState {
   isListening: boolean;
@@ -57,31 +58,6 @@ function loadPersistedGain(): number {
   return DEFAULT_GAIN;
 }
 
-// Runs in AudioWorkletGlobalScope — accumulates 128-sample quanta into
-// 2048-sample buffers and posts them to the main thread for aubio processing.
-const WORKLET_CODE = `
-class GuitarInputProcessor extends AudioWorkletProcessor {
-  constructor() {
-    super();
-    this._buf = new Float32Array(2048);
-    this._pos = 0;
-  }
-  process(inputs) {
-    const ch = inputs[0]?.[0];
-    if (!ch) return true;
-    for (let i = 0; i < ch.length; i++) {
-      this._buf[this._pos++] = ch[i];
-      if (this._pos === 2048) {
-        this.port.postMessage(this._buf.slice());
-        this._pos = 0;
-      }
-    }
-    return true;
-  }
-}
-registerProcessor('guitar-input-processor', GuitarInputProcessor);
-`;
-
 export const useAudioAnalyzer = () => {
   const [state, setState] = useState<AudioAnalyzerState>({
     isListening: false,
@@ -125,19 +101,15 @@ export const useAudioAnalyzer = () => {
       streamRef.current = stream;
 
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      // Pin the analysis sample rate to 48 kHz. External interfaces (e.g. Arturia
-      // Minifuse) may run the device at 96/176.4/192 kHz; at those rates aubio's
-      // fixed 2048-sample yinfft window covers <2 periods of low guitar notes, so
-      // pitch detection silently returns 0 even though volume/onset still work.
-      // Browsers resample the device input to the requested rate. Fall back to the
-      // device default if the constructor rejects the option (rare/old engines).
-      let audioContext: AudioContext;
-      try {
-        audioContext = new AudioContextClass({ sampleRate: 48000 });
-      } catch {
-        audioContext = new AudioContextClass();
-      }
+      // The context runs at the device's own rate — never a requested one, which
+      // browsers don't reliably resample the mic into (see getDecimationFactor).
+      // Interfaces running at 96/176.4/192 kHz are brought down to ~48 kHz by the
+      // worklet instead, so aubio's 2048-sample window still holds enough
+      // periods of low E.
+      const audioContext = new AudioContextClass();
       audioContextRef.current = audioContext;
+      const decimation = getDecimationFactor(audioContext.sampleRate);
+      const analysisRate = audioContext.sampleRate / decimation;
 
       // After `await getUserMedia` the browser often considers the user gesture
       // consumed, so the freshly-created AudioContext starts in "suspended" state.
@@ -154,7 +126,9 @@ export const useAudioAnalyzer = () => {
       sourceRef.current = source;
 
       const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 8192;
+      // 8192 at 44.1/48 kHz (~170 ms); scaled up with the device rate so the
+      // chord grading keeps the same bin resolution at 96/192 kHz.
+      analyser.fftSize = Math.min(32768, 2 ** Math.round(Math.log2(8192 * decimation)));
       analyser.smoothingTimeConstant = 0.1; // fast decay → a fresh chord reads as itself
       source.connect(analyser);
       analyserNodeRef.current = analyser;
@@ -164,25 +138,27 @@ export const useAudioAnalyzer = () => {
       const Aubio = AubioModule.default || AubioModule;
       const aubio = await Aubio();
 
-      const detectors = createGuitarDetectors(aubio, audioContext.sampleRate);
+      const detectors = createGuitarDetectors(aubio, analysisRate);
       pitchDetectorRef.current = detectors.pitch;
       onsetDetectorRef.current = detectors.onset;
       tickDetectorRef.current = detectors.tick;
 
       // AudioWorklet: accumulates 128-sample quanta → 2048-sample buffers on main thread.
       // Avoids deprecated ScriptProcessorNode and runs audio collection off the main thread.
-      const blob = new Blob([WORKLET_CODE], { type: "application/javascript" });
+      const blob = new Blob([GUITAR_INPUT_WORKLET_CODE], { type: "application/javascript" });
       const workletUrl = URL.createObjectURL(blob);
       await audioContext.audioWorklet.addModule(workletUrl);
       URL.revokeObjectURL(workletUrl);
 
-      const workletNode = new AudioWorkletNode(audioContext, "guitar-input-processor");
+      const workletNode = new AudioWorkletNode(audioContext, "guitar-input-processor", {
+        processorOptions: { decimation },
+      });
       workletNodeRef.current = workletNode;
 
       const process = createGuitarBufferProcessor({
         detectors,
         getGain: () => inputGainRef.current,
-        sampleRate: audioContext.sampleRate,
+        sampleRate: analysisRate,
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
           lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, inputTapRef,
@@ -292,7 +268,8 @@ export const useAudioAnalyzer = () => {
   const getLatencyMs = useCallback(() => {
     const ctx = audioContextRef.current;
     if (!ctx) return 120;
-    const bufferLatency = (2048 / ctx.sampleRate) * 1000; // ~46ms at 44100Hz
+    const analysisRate = ctx.sampleRate / getDecimationFactor(ctx.sampleRate);
+    const bufferLatency = (2048 / analysisRate) * 1000; // ~46ms at 44100Hz
     const baseLatency = ((ctx as any).baseLatency || 0) * 1000;
     const outputLatency = ((ctx as any).outputLatency || 0) * 1000;
     return baseLatency + outputLatency + bufferLatency + 30;
