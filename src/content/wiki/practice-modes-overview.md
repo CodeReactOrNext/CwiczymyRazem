@@ -8,7 +8,7 @@ order: 1
 
 Open **Practice** and you get a wall of options. They all end in the same place, a logged session that feeds your points, streak and skills, but they differ in how much thinking you have to do first.
 
-<Screenshot src="/images/wiki/practice-hub.webp" alt="The Practice screen: a Practice Routines card listing All Routines, Playalongs, My Plans and Community, a Log card with Manual Log and Free Timer, then tiles for Songs, Auto Plan, Guitar Pro Files, Learning Path, Mastery Roadmaps, Scale Map, Skills, Exercises and Community Exercises" caption="Everything below lives on this one screen. The tiles that track progress show how far along you are right on the card." />
+<Screenshot src="/images/wiki/practice-hub.webp" alt="The Practice screen: one list of every way to practise — Practice Routines, Songs, Learning Path, Exercise Catalog, Skills, Duels, Boss Fights, Auto Plan, Scale Map, Mastery Roadmaps and Guitar Pro Files — with Log time (Free Timer, Manual Log) and My Stuff beside it" caption="Everything below lives on this one screen. The tiles that track progress show how far along you are right on the card." />
 
 ## Pick by how much direction you want
 

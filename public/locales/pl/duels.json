@@ -25,7 +25,6 @@
     "matched": "Znaleziono rywala — twój duel jest poniżej.",
     "queued": "Jesteś w kolejce. Damy znać, gdy ktoś dołączy.",
     "error_limit": "Masz już otwarte {{max}} duele.",
-    "error_locked": "Duele odblokowują się na 2 levelu.",
     "error": "Nie udało się dołączyć. Spróbuj za chwilę.",
     "ticket": "Szukam rywala",
     "ticket_expires": "Wygasa za {{time}}",

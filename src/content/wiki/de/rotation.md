@@ -10,13 +10,13 @@ Die Rotation ist deine eigene Liste von Dingen, die du nicht verlieren willst: e
 
 ## Zur Rotation hinzufügen
 
-<ClickPath steps="Bibliothek|Rotation|Hinzufügen" caption="Wechsle zwischen Songs, Übungen und Fähigkeiten und tippe dann auf alles, was du hinzufügen willst. Tippe erneut, um es herauszunehmen." />
+<ClickPath steps="Meine Sachen|Rotation|Hinzufügen" caption="Wechsle zwischen Songs, Übungen und Fähigkeiten und tippe dann auf alles, was du hinzufügen willst. Tippe erneut, um es herauszunehmen." />
 
 Songs kommen aus deiner eigenen Song-Bibliothek, die gemeisterten oben. Übungen kommen aus der gesamten Übungsbibliothek. Eine Fähigkeit spielt nicht von allein: Wenn sie an der Reihe ist, bekommst du eine der Übungen, die sie trainieren, die, die du am längsten nicht gespielt hast. Deine Rotation fasst bis zu 60 Dinge.
 
 ## Deine eigenen Posten
 
-<ClickPath steps="Bibliothek|Rotation|Hinzufügen|Eigenes" caption="Gib ihm einen Namen und füge eine Notiz oder einen Link hinzu, wenn du magst. Tippe auf ein Beispiel, um davon auszugehen." />
+<ClickPath steps="Meine Sachen|Rotation|Hinzufügen|Eigenes" caption="Gib ihm einen Namen und füge eine Notiz oder einen Link hinzu, wenn du magst. Tippe auf ein Beispiel, um davon auszugehen." />
 
 Alles, was nicht in der App ist, kann ebenfalls hinein: die nächste Lektion eines Online-Kurses, ein neuer Akkord pro Tag, ein Lick zum Heraushören. Der Link kann eine Kursseite, ein Video oder alles andere im Web sein und sitzt direkt neben dem Posten.
 
@@ -32,7 +32,7 @@ Alles, was du spielst, zählt, wo immer du es spielst: eine Session aus der Rota
 
 ## Aus deiner Rotation spielen
 
-<ClickPath steps="Bibliothek|Rotation|Die 3 ältesten spielen" caption="Startet eine kurze Session mit den drei Dingen, die du am längsten nicht gespielt hast." />
+<ClickPath steps="Meine Sachen|Rotation|Die 3 ältesten spielen" caption="Startet eine kurze Session mit den drei Dingen, die du am längsten nicht gespielt hast." />
 
 Oben auf der Seite werden die nächsten paar Posten als Kartenhand gezeigt, dazu wie viele auf eine Auffrischung warten. **Die 3 ältesten spielen** packt sie in eine Session. Songs bekommen dort je fünf Minuten, und Übungen behalten ihre übliche Länge. Die Abspiel-Schaltfläche in einer beliebigen Zeile startet eine Session nur mit diesem einen Posten.
 

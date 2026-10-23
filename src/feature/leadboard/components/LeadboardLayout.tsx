@@ -11,7 +11,6 @@ import type { LeaderboardNeighbors } from "feature/leadboard/services/getLeaderb
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { ArrowDown } from "lucide-react";
-import Link from "next/link";
 import { useRef, useState } from "react";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
@@ -112,89 +111,88 @@ export const LeadboardLayout = ({
     />
   );
 
+  // Same shape as the duel rating in the duels hero: one big Teko number, the
+  // context it needs on the line beside it, what to do next underneath.
   const rankContent = isRankLoading ? (
-    <Skeleton className="h-20 w-40" />
+    <div className='flex flex-col items-start gap-2 md:items-end'>
+      <Skeleton className='h-4 w-24 rounded' />
+      <Skeleton className='h-14 w-36 rounded-lg' />
+    </div>
   ) : userRank ? (
-    <div className="flex flex-col items-end gap-2">
-      <span className="text-xs text-zinc-400">{t("rank.your_position")}</span>
-      <div className="flex items-baseline gap-1">
-        <span className="text-5xl font-black text-cyan-300">#{userRank}</span>
+    <div className='flex flex-col items-start md:items-end md:text-right'>
+      <span className='text-xs font-semibold text-zinc-400'>
+        {t("rank.your_position")}
+      </span>
+      <div className='mt-1 flex items-baseline gap-3'>
+        <span className='font-teko text-7xl font-semibold tabular-nums leading-[0.8] text-zinc-50'>
+          #{userRank}
+        </span>
+        {totalUsers > 0 && (
+          <span className='text-sm tabular-nums text-zinc-400'>
+            {t("rank.out_of", { total: totalUsers.toLocaleString(intlLocale) })}
+          </span>
+        )}
       </div>
-      {totalUsers > 0 && (
-        <span className="text-sm text-zinc-500">{t("rank.out_of", { total: totalUsers.toLocaleString(intlLocale) })}</span>
-      )}
       {nextRival && (
-        <span className="text-sm text-zinc-300 md:text-right">
-          <span className="font-semibold tabular-nums text-cyan-300">
+        <p className='mt-3 text-sm text-zinc-300'>
+          <span className='font-semibold tabular-nums text-cyan-300'>
             {nextRival.gap.toLocaleString(intlLocale)}
           </span>{" "}
           {t("rank.to_pass", { unit: gapUnit(nextRival.gap), name: nextRival.displayName, place: nextRival.place })}
-        </span>
+        </p>
       )}
       {canShowAround && (
         <button
-          type="button"
+          type='button'
           onClick={jumpToMyRank}
-          className="mt-1 flex items-center gap-1.5 rounded-lg bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-300 transition-colors hover:bg-cyan-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60">
-          <ArrowDown className="h-3.5 w-3.5" />
+          className='mt-4 flex items-center gap-1.5 rounded-lg bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-300 transition-colors hover:bg-cyan-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
+          <ArrowDown className='h-3.5 w-3.5' />
           {t("rank.jump")}
         </button>
       )}
     </div>
   ) : null;
 
+  const hero = isSeasonalView
+    ? {
+        eyebrow: t("hero.seasonal_eyebrow"),
+        title: currentSeason?.name ?? t("hero.season"),
+        subtitle: currentSeason
+          ? `${formatDate(currentSeason.startDate)} – ${formatDate(currentSeason.endDate)}`
+          : t("hero.season_subtitle"),
+      }
+    : isGearView
+    ? {
+        eyebrow: t("hero.rig_eyebrow"),
+        title: t("gear_title"),
+        subtitle: t("gear_subtitle"),
+      }
+    : {
+        eyebrow: t("hero.all_time_eyebrow"),
+        title: t("hero.title"),
+        subtitle: t("hero.subtitle"),
+      };
+
   return (
     <div className='min-h-screen flex flex-col'>
-      {isSeasonalView ? (
-        <HeroBanner
-          title={currentSeason?.name ?? t("hero.season")}
-          subtitle={currentSeason ? `${formatDate(currentSeason.startDate)} – ${formatDate(currentSeason.endDate)}` : t("hero.season_subtitle")}
-          eyebrow={t("hero.seasonal_eyebrow")}
-          className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
-          backgroundContent={<HeroPattern />}
-          rightContent={
-            <div className='flex flex-col items-start md:items-end gap-4'>
-              {rankContent}
-              <SeasonRewards />
-            </div>
-          }
-        />
-      ) : isGearView ? (
-        <HeroBanner
-          title={t("gear_title")}
-          subtitle={t("gear_subtitle")}
-          eyebrow={t("hero.rig_eyebrow")}
-          className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
-          backgroundContent={<HeroPattern />}
-          rightContent={rankContent}
-        />
-      ) : (
-        <HeroBanner
-          title={t("hero.title")}
-          subtitle={t("hero.subtitle")}
-          eyebrow={t("hero.all_time_eyebrow")}
-          className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
-          backgroundContent={<HeroPattern />}
-          rightContent={rankContent}
-        />
-      )}
+      <HeroBanner
+        {...hero}
+        className='w-full !rounded-none !shadow-none'
+        backgroundContent={<HeroPattern />}
+        // The rewards belong to the season, so they sit under its name rather
+        // than queue up under the player's rank.
+        leftContent={isSeasonalView ? <SeasonRewards /> : undefined}
+        leftContentClassName=''
+        rightContent={rankContent}
+      />
 
       <div className='mt-8 mx-auto max-w-7xl px-4 w-full'>
-        {/* The rail is the row, not just the tabs: the "how points work" link
-            rides on it so the underline has one continuous line to sit against. */}
-        <div className='mb-8 flex items-center gap-2 border-b border-zinc-800'>
-          <PageTabs
-            tabs={LEADERBOARD_TABS}
-            activeHref={activeTabHref}
-            ariaLabel={t("hero.sections")}
-            className='border-b-0'
-          />
-          <Link
-            href='/scoring'
-            className='ml-auto shrink-0 rounded-lg px-3 py-2 text-xs text-zinc-500 transition-colors hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-            {t("hero.how_points")}
-          </Link>
-        </div>
+        <PageTabs
+          tabs={LEADERBOARD_TABS}
+          activeHref={activeTabHref}
+          ariaLabel={t("hero.sections")}
+          className='mb-8'
+        />
 
         {(isSeasonalView || canShowAround) && (
           <div className='mb-8 flex flex-wrap items-center gap-6'>

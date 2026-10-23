@@ -1,4 +1,5 @@
 {
+  "title": "Práctica",
   "continue": "Continuar",
   "loading": "Cargando...",
   "any_part": "Cualquier parte",
@@ -6,32 +7,37 @@
     "master": "Master",
     "premium": "Premium"
   },
+  "sections": {
+    "all": "Todas las formas de practicar",
+    "log_time": "Registrar tiempo",
+    "my_stuff": "Mis cosas",
+    "create_plan": "Crear plan",
+    "create_exercise": "Crear ejercicio"
+  },
   "modes": {
     "routine": {
       "title": "Rutinas de práctica",
-      "description": "Sigue una rutina diaria guiada",
-      "all": "Todas las rutinas",
-      "playalongs": "Playalongs",
-      "my_plans": "Mis planes",
-      "community": "Comunidad"
+      "description": "Rutinas listas, playalongs, tus planes y los de la comunidad"
     },
-    "log": {
-      "title": "Registro",
-      "description": "Registra una sesión a mano o con cronómetro",
-      "manual": "Registro manual",
-      "free_timer": "Temporizador libre"
+    "manual_log": {
+      "title": "Registro manual",
+      "description": "Hasta 7 días atrás"
+    },
+    "free_timer": {
+      "title": "Temporizador libre",
+      "description": "Cronómetro mientras tocas"
     },
     "songs": {
       "title": "Canciones",
-      "description": "Registra el tiempo de práctica de tu repertorio"
+      "description": "Practica tu repertorio: el tiempo cuenta para cada canción"
     },
     "auto": {
       "title": "Plan automático",
-      "description": "Sesión generada automáticamente"
+      "description": "Una sesión generada para el tiempo que tienes"
     },
     "gp": {
       "title": "Archivos Guitar Pro",
-      "description": "Practica las tablaturas de Guitar Pro que hayas importado"
+      "description": "Practica con tablaturas importadas, con reproducción"
     },
     "learning_path": {
       "title": "Ruta de aprendizaje",
@@ -39,28 +45,49 @@
     },
     "roadmaps": {
       "title": "Mastery Roadmaps",
-      "description": "Elige una habilidad o un estilo en el que centrarte"
+      "description": "Un plan personal para una habilidad o estilo de juego"
     },
     "scales": {
       "title": "Mapa de escalas",
-      "description": "Árbol interactivo de escalas en el mástil"
+      "description": "Formas de escalas, caja a caja al tempo objetivo"
+    },
+    "bosses": {
+      "title": "Jefes",
+      "description": "Derrota a un jefe nivel a nivel tocando la guitarra"
+    },
+    "duels": {
+      "title": "Duelos",
+      "description": "1 contra 1 con un desconocido en el mismo ejercicio"
     },
     "skills": {
       "title": "Habilidades",
       "description": "Mira tu progreso por técnica"
     },
     "exercises": {
-      "title": "Ejercicios",
+      "title": "Catálogo de ejercicios",
       "description": "Encuentra un ejercicio por habilidad, duración o modo"
     },
-    "community_exercises": {
-      "title": "Ejercicios de la comunidad",
-      "description": "Ejercicios compartidos por la comunidad"
+    "favorites": {
+      "title": "Favoritos"
+    },
+    "rotation": {
+      "title": "Rotación"
+    },
+    "my_plans": {
+      "title": "Mis planes"
+    },
+    "my_exercises": {
+      "title": "Mis ejercicios"
+    },
+    "player_roadmaps": {
+      "title": "Rutas de jugadores"
     }
   },
+  "tags": {
+    "most_used": "Lo más usado",
+    "new": "Nuevo"
+  },
   "progress": {
-    "steps": "pasos",
-    "of_total": "{{done}} de {{total}} {{unit}}",
     "all_modules": "Todos los módulos completados",
     "first_lesson": "Empieza por la primera lección",
     "next_roadmap": "Elige tu próxima roadmap",

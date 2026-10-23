@@ -1,4 +1,5 @@
 {
+  "title": "Ćwicz",
   "continue": "Kontynuuj",
   "loading": "Wczytywanie...",
   "any_part": "Dowolna część",
@@ -6,32 +7,37 @@
     "master": "Master",
     "premium": "Premium"
   },
+  "sections": {
+    "all": "Wszystkie sposoby ćwiczenia",
+    "log_time": "Zapisz czas",
+    "my_stuff": "Moje rzeczy",
+    "create_plan": "Utwórz plan",
+    "create_exercise": "Utwórz ćwiczenie"
+  },
   "modes": {
     "routine": {
       "title": "Rutyny ćwiczeń",
-      "description": "Codzienna rutyna z przewodnikiem",
-      "all": "Wszystkie rutyny",
-      "playalongs": "Playalongi",
-      "my_plans": "Moje plany",
-      "community": "Społeczność"
+      "description": "Gotowe rutyny, playalongi, Twoje plany i plany społeczności"
     },
-    "log": {
-      "title": "Zapis",
-      "description": "Zapisz sesję ręcznie albo stoperem",
-      "manual": "Ręczny wpis",
-      "free_timer": "Wolny stoper"
+    "manual_log": {
+      "title": "Ręczny wpis",
+      "description": "Do 7 dni wstecz"
+    },
+    "free_timer": {
+      "title": "Wolny stoper",
+      "description": "Stoper, gdy grasz"
     },
     "songs": {
       "title": "Utwory",
-      "description": "Mierz czas ćwiczenia swojego repertuaru"
+      "description": "Ćwicz swój repertuar — czas liczy się do nauki każdego utworu"
     },
     "auto": {
       "title": "Plan automatyczny",
-      "description": "Automatycznie wygenerowana sesja"
+      "description": "Sesja ułożona tak, by zmieściła się w Twoim czasie"
     },
     "gp": {
       "title": "Pliki Guitar Pro",
-      "description": "Ćwicz zaimportowane tabulatury Guitar Pro"
+      "description": "Ćwicz z zaimportowanych tabulatur, z odtwarzaniem"
     },
     "learning_path": {
       "title": "Ścieżka nauki",
@@ -39,28 +45,49 @@
     },
     "roadmaps": {
       "title": "Mastery Roadmaps",
-      "description": "Wybierz umiejętność lub styl gry, na którym się skupisz"
+      "description": "Osobisty plan dla jednej umiejętności lub stylu gry"
     },
     "scales": {
       "title": "Mapa skal",
-      "description": "Interaktywne drzewo skal na gryfie"
+      "description": "Kształty skal zaliczane pudełko po pudełku w docelowym tempie"
+    },
+    "bosses": {
+      "title": "Walki z bossami",
+      "description": "Pokonaj bossa poziom po poziomie, grając na gitarze"
+    },
+    "duels": {
+      "title": "Duele",
+      "description": "1 na 1 z nieznajomym na tym samym ćwiczeniu"
     },
     "skills": {
       "title": "Umiejętności",
       "description": "Zobacz postępy w poszczególnych technikach"
     },
     "exercises": {
-      "title": "Ćwiczenia",
+      "title": "Katalog ćwiczeń",
       "description": "Znajdź ćwiczenie po umiejętności, długości lub trybie"
     },
-    "community_exercises": {
-      "title": "Ćwiczenia społeczności",
-      "description": "Ćwiczenia udostępnione przez społeczność"
+    "favorites": {
+      "title": "Ulubione"
+    },
+    "rotation": {
+      "title": "Rotacja"
+    },
+    "my_plans": {
+      "title": "Moje plany"
+    },
+    "my_exercises": {
+      "title": "Moje ćwiczenia"
+    },
+    "player_roadmaps": {
+      "title": "Ścieżki graczy"
     }
   },
+  "tags": {
+    "most_used": "Najczęściej wybierane",
+    "new": "Nowość"
+  },
   "progress": {
-    "steps": "kroków",
-    "of_total": "{{done}} z {{total}} {{unit}}",
     "all_modules": "Wszystkie moduły ukończone",
     "first_lesson": "Zacznij od pierwszej lekcji",
     "next_roadmap": "Wybierz kolejną roadmapę",

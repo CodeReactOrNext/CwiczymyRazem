@@ -93,11 +93,9 @@ export const DuelQueueCard = ({
   const errorText =
     errorCode === "LIMIT"
       ? t("queue.error_limit", { max: DUEL_MAX_OPEN })
-      : errorCode === "LOCKED"
-        ? t("queue.error_locked")
-        : join.isError
-          ? t("queue.error")
-          : null;
+      : join.isError
+        ? t("queue.error")
+        : null;
 
   return (
     <Card className='p-5 sm:p-7'>

@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { MOBILE_BOTTOM_NAV_ATTR } from "components/RockSidebar/MobileMoreSheet";
+import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaimedMilestone";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { CassetteTape,Home, Menu, Timer, TrendingUp } from "lucide-react";
@@ -51,13 +52,16 @@ const BottomNavItem = ({
   icon: Icon,
   active,
   onNavigate,
+  showBadge = false,
 }: {
   label: string;
   href: string;
   icon: NavIcon;
   active: boolean;
   onNavigate?: () => void;
+  showBadge?: boolean;
 }) => {
+  const { t } = useTranslation("nav");
   const { createRipple, ripple } = useRipple("bg-cyan-400/30");
   return (
     <Link
@@ -71,10 +75,18 @@ const BottomNavItem = ({
     >
       <span className={pillClass(active)}>
         {ripple}
-        <Icon
-          size={20}
-          className={cn(iconClass(active), "transition-transform duration-base", active && "scale-110")}
-        />
+        <span className='relative'>
+          <Icon
+            size={20}
+            className={cn(iconClass(active), "transition-transform duration-base", active && "scale-110")}
+          />
+          {showBadge && (
+            <span
+              aria-label={t("unclaimed_reward")}
+              className='absolute -right-1 -top-0.5 h-2 w-2 animate-pulse rounded-full bg-amber-500'
+            />
+          )}
+        </span>
         <span className={labelClass(active)}>{label}</span>
       </span>
     </Link>
@@ -89,6 +101,8 @@ export const MobileBottomNav = ({
   const { t } = useTranslation("nav");
   const router = useRouter();
   const { createRipple, ripple } = useRipple("bg-cyan-400/30");
+  // Milestones sit behind the Progress tab, so their reward dot does too.
+  const hasUnclaimedMilestone = useHasUnclaimedMilestone();
 
   const isActive = (href: string) => {
     if (href.includes("?")) {
@@ -121,6 +135,7 @@ export const MobileBottomNav = ({
             icon={item.icon}
             active={!isMenuOpen && isActive(item.href)}
             onNavigate={onNavigate}
+            showBadge={item.href === "/profile/activity" && hasUnclaimedMilestone}
           />
         ))}
 

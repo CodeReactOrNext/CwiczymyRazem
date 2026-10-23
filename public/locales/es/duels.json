@@ -23,7 +23,6 @@
     "matched": "Rival encontrado — tu duelo está abajo.",
     "queued": "Estás en la cola. Te avisaremos cuando alguien se una.",
     "error_limit": "Ya tienes {{max}} duelos abiertos.",
-    "error_locked": "Los duelos se abren en el nivel 2.",
     "error": "No se pudo entrar ahora. Inténtalo de nuevo en un momento.",
     "ticket": "Buscando rival",
     "ticket_expires": "Caduca en {{time}}",

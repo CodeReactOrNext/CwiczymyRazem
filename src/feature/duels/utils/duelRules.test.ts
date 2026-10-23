@@ -10,7 +10,6 @@ import {
   canPlayerRun,
   DUEL_DURATION_MS,
   DUEL_MAX_OPEN,
-  DUEL_MIN_LVL,
   DUEL_MIN_RATING,
   DUEL_RECENT_LIMIT,
   DUEL_START_RATING,
@@ -473,11 +472,5 @@ describe("isEveryoneReady", () => {
 describe("DUEL_DURATION_MS", () => {
   it("gives the two of them 48 hours", () => {
     expect(DUEL_DURATION_MS).toBe(48 * 60 * 60 * 1000);
-  });
-});
-
-describe("DUEL_MIN_LVL", () => {
-  it("opens at level 2", () => {
-    expect(DUEL_MIN_LVL).toBe(2);
   });
 });

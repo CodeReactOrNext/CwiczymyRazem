@@ -1,4 +1,5 @@
 {
+  "title": "Practice",
   "continue": "Continue",
   "loading": "Loading...",
   "any_part": "Any part",
@@ -6,32 +7,37 @@
     "master": "Master",
     "premium": "Premium"
   },
+  "sections": {
+    "all": "All ways to practise",
+    "log_time": "Log time",
+    "my_stuff": "My Stuff",
+    "create_plan": "Create Plan",
+    "create_exercise": "Create Exercise"
+  },
   "modes": {
     "routine": {
       "title": "Practice Routines",
-      "description": "Follow daily guided routine",
-      "all": "All Routines",
-      "playalongs": "Playalongs",
-      "my_plans": "My Plans",
-      "community": "Community"
+      "description": "Ready-made routines, playalongs, your plans and the community's"
     },
-    "log": {
-      "title": "Log",
-      "description": "Track a session by hand or with a stopwatch",
-      "manual": "Manual Log",
-      "free_timer": "Free Timer"
+    "manual_log": {
+      "title": "Manual Log",
+      "description": "Up to 7 days back"
+    },
+    "free_timer": {
+      "title": "Free Timer",
+      "description": "Stopwatch while you play"
     },
     "songs": {
       "title": "Songs",
-      "description": "Track practice time for your repertoire"
+      "description": "Practise your repertoire — the time counts towards each song"
     },
     "auto": {
       "title": "Auto Plan",
-      "description": "Automatically generated session"
+      "description": "A session generated to fit the time you have"
     },
     "gp": {
       "title": "Guitar Pro Files",
-      "description": "Practice your imported Guitar Pro tabs"
+      "description": "Practise from tabs you import, with playback"
     },
     "learning_path": {
       "title": "Learning Path",
@@ -39,28 +45,49 @@
     },
     "roadmaps": {
       "title": "Mastery Roadmaps",
-      "description": "Choose a skill or playing style to focus on"
+      "description": "A personal plan for one skill or playing style"
     },
     "scales": {
       "title": "Scale Map",
-      "description": "Interactive scale fretboard tree"
+      "description": "Scale shapes cleared box by box at a target tempo"
+    },
+    "bosses": {
+      "title": "Boss Fights",
+      "description": "Beat a boss level by level, playing your guitar"
+    },
+    "duels": {
+      "title": "Duels",
+      "description": "1 vs 1 with a stranger on the same exercise"
     },
     "skills": {
       "title": "Skills",
       "description": "See your progress by technique"
     },
     "exercises": {
-      "title": "Exercises",
+      "title": "Exercise Catalog",
       "description": "Find an exercise by skill, length or practice mode"
     },
-    "community_exercises": {
-      "title": "Community Exercises",
-      "description": "Exercises shared by the community"
+    "favorites": {
+      "title": "Favorites"
+    },
+    "rotation": {
+      "title": "Rotation"
+    },
+    "my_plans": {
+      "title": "My Plans"
+    },
+    "my_exercises": {
+      "title": "My Exercises"
+    },
+    "player_roadmaps": {
+      "title": "Player Roadmaps"
     }
   },
+  "tags": {
+    "most_used": "Most used",
+    "new": "New"
+  },
   "progress": {
-    "steps": "steps",
-    "of_total": "{{done}} of {{total}} {{unit}}",
     "all_modules": "All modules completed",
     "first_lesson": "Start with the first lesson",
     "next_roadmap": "Choose your next roadmap",

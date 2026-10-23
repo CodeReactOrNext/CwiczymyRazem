@@ -24,7 +24,7 @@ import {
   ArrowRight,
   AtSign,
   Bell,
-  Clock,
+  CheckCheck,
   Dumbbell,
   Gem,
   Heart,
@@ -41,7 +41,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 const chatLabel = (verb: "mentioned" | "replied") =>
@@ -58,36 +58,41 @@ const chatLabel = (verb: "mentioned" | "replied") =>
     );
   };
 
+// The tint behind each type's icon, in the colour of what the notification is about (Fame amber,
+// social cyan, success emerald) rather than a solid fill with a white glyph.
+const toneClass = {
+  cyan: "bg-cyan-500/10 text-cyan-400",
+  amber: "bg-amber-500/10 text-amber-400",
+  emerald: "bg-emerald-500/10 text-emerald-400",
+  orange: "bg-orange-500/10 text-orange-400",
+  rose: "bg-rose-500/10 text-rose-400",
+  zinc: "bg-zinc-800 text-zinc-400",
+};
+
 const typeConfig = {
   chat_mention: {
-    icon: <AtSign className='h-3 w-3 text-white' />,
-    bg: "bg-cyan-500",
+    icon: <AtSign />,
+    tone: "cyan",
     label: chatLabel("mentioned"),
   },
   chat_reply: {
-    icon: <Reply className='h-3 w-3 text-white' />,
-    bg: "bg-cyan-500",
+    icon: <Reply />,
+    tone: "cyan",
     label: chatLabel("replied"),
   },
   like: {
-    icon: <Heart className='h-3 w-3 fill-current text-white' />,
-    bg: "bg-red-500",
+    icon: <Heart className='fill-current' />,
+    tone: "rose",
     label: (_n: any, t: Translate) => t("bell.like"),
   },
   comment: {
-    icon: <MessageSquare className='h-3 w-3 fill-current text-white' />,
-    bg: "bg-cyan-500",
+    icon: <MessageSquare className='fill-current' />,
+    tone: "cyan",
     label: (_n: any, t: Translate) => t("bell.comment"),
   },
   reaction: {
-    icon: (
-      <img
-        src='/images/coin.png'
-        alt='coin'
-        className='h-3 w-3 object-contain'
-      />
-    ),
-    bg: "bg-amber-500/20",
+    icon: <img src='/images/coin.png' alt='' className='object-contain' />,
+    tone: "amber",
     // Reactions recorded before the amount was stored have no number to show, so they just say
     // what happened instead of quoting one that was never actually awarded.
     label: (n: any, t: Translate) =>
@@ -105,8 +110,8 @@ const typeConfig = {
       ),
   },
   season_reward: {
-    icon: <Trophy className='h-3 w-3 fill-current text-white' />,
-    bg: "bg-amber-500",
+    icon: <Trophy className='fill-current' />,
+    tone: "amber",
     label: (n: any, t: Translate) =>
       t("bell.season_reward", {
         fame: n.fameAwarded,
@@ -114,19 +119,19 @@ const typeConfig = {
       }),
   },
   season_start: {
-    icon: <Zap className='h-3 w-3 fill-current text-white' />,
-    bg: "bg-green-500",
+    icon: <Zap className='fill-current' />,
+    tone: "emerald",
     label: (_n: any, t: Translate) => t("bell.season_start"),
   },
   marketplace_sold: {
-    icon: <Store className='h-3 w-3 text-white' />,
-    bg: "bg-amber-500",
+    icon: <Store />,
+    tone: "amber",
     label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
         <Interpolate
           text={t("bell.sold")}
           values={{
-            item: n.itemName ? <span className='font-semibold text-white'>{n.itemName}</span> : t("bell.item"),
+            item: n.itemName ? <span className='font-semibold text-zinc-100'>{n.itemName}</span> : t("bell.item"),
             fame: `+${n.fameAwarded}`,
           }}
         />
@@ -139,13 +144,13 @@ const typeConfig = {
     ),
   },
   playlist_saved: {
-    icon: <ListMusic className='h-3 w-3 text-white' />,
-    bg: "bg-emerald-500",
+    icon: <ListMusic />,
+    tone: "emerald",
     label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
         <Interpolate
           text={t("bell.playlist_saved")}
-          values={{ name: n.playlistName ? <span className='font-semibold text-white'>{n.playlistName}</span> : "" }}
+          values={{ name: n.playlistName ? <span className='font-semibold text-zinc-100'>{n.playlistName}</span> : "" }}
         />{" "}
         {t("bell.you_got", { fame: n.fameAwarded })}
         <img
@@ -157,13 +162,13 @@ const typeConfig = {
     ),
   },
   playlist_liked: {
-    icon: <Heart className='h-3 w-3 fill-current text-white' />,
-    bg: "bg-rose-500",
+    icon: <Heart className='fill-current' />,
+    tone: "rose",
     label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
         <Interpolate
           text={t("bell.playlist_liked")}
-          values={{ name: n.playlistName ? <span className='font-semibold text-white'>{n.playlistName}</span> : "" }}
+          values={{ name: n.playlistName ? <span className='font-semibold text-zinc-100'>{n.playlistName}</span> : "" }}
         />{" "}
         {t("bell.you_got", { fame: n.fameAwarded })}
         <img
@@ -175,13 +180,13 @@ const typeConfig = {
     ),
   },
   exercise_thanked: {
-    icon: <HeartHandshake className='h-3 w-3 text-white' />,
-    bg: "bg-amber-500",
+    icon: <HeartHandshake />,
+    tone: "amber",
     label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
         <Interpolate
           text={t("bell.exercise_thanked")}
-          values={{ name: n.exerciseTitle ? <span className='font-semibold text-white'>{n.exerciseTitle}</span> : t("bell.exercise_thanked_fallback") }}
+          values={{ name: n.exerciseTitle ? <span className='font-semibold text-zinc-100'>{n.exerciseTitle}</span> : t("bell.exercise_thanked_fallback") }}
         />{" "}
         {t("bell.you_got", { fame: n.fameAwarded })}
         <img
@@ -193,13 +198,13 @@ const typeConfig = {
     ),
   },
   exercise_completed: {
-    icon: <Dumbbell className='h-3 w-3 text-white' />,
-    bg: "bg-emerald-500",
+    icon: <Dumbbell />,
+    tone: "emerald",
     label: (n: any, t: Translate) => (
       <span className='inline-flex flex-wrap items-center gap-1'>
         <Interpolate
           text={t("bell.exercise_completed")}
-          values={{ name: n.exerciseTitle ? <span className='font-semibold text-white'>{n.exerciseTitle}</span> : "" }}
+          values={{ name: n.exerciseTitle ? <span className='font-semibold text-zinc-100'>{n.exerciseTitle}</span> : "" }}
         />{" "}
         {t("bell.you_got", { fame: n.fameAwarded })}
         <img
@@ -211,27 +216,27 @@ const typeConfig = {
     ),
   },
   daily_exercise_win: {
-    icon: <Trophy className='h-3 w-3 fill-current text-white' />,
-    bg: "bg-amber-500",
+    icon: <Trophy className='fill-current' />,
+    tone: "amber",
     label: (n: any, t: Translate) => (
       <span>
         <Interpolate
           text={t("bell.daily_win")}
-          values={{ prize: <span className='font-semibold text-white'>{n.prizeName ?? t("bell.your_prize")}</span> }}
+          values={{ prize: <span className='font-semibold text-zinc-100'>{n.prizeName ?? t("bell.your_prize")}</span> }}
         />
       </span>
     ),
   },
   daily_exercise_place: {
-    icon: <Medal className='h-3 w-3 text-white' />,
-    bg: "bg-cyan-500",
+    icon: <Medal />,
+    tone: "cyan",
     label: (n: any, t: Translate) => (
       <span>
         <Interpolate
           text={t(n.players ? "bell.daily_place_of" : "bell.daily_place")}
           values={{
-            place: <span className='font-semibold text-white'>{t("bell.ordinal", { place: n.place, suffix: placeSuffix(n.place) })}</span>,
-            players: <span className='font-semibold text-white'>{n.players}</span>,
+            place: <span className='font-semibold text-zinc-100'>{t("bell.ordinal", { place: n.place, suffix: placeSuffix(n.place) })}</span>,
+            players: <span className='font-semibold text-zinc-100'>{n.players}</span>,
           }}
         />
         {n.exerciseTitle && (
@@ -243,8 +248,8 @@ const typeConfig = {
     ),
   },
   duel_matched: {
-    icon: <Swords className='h-3 w-3 text-white' />,
-    bg: "bg-cyan-500",
+    icon: <Swords />,
+    tone: "cyan",
     label: (n: any, t: Translate) => (
       <span>
         {t("bell.duel_matched")}
@@ -257,8 +262,8 @@ const typeConfig = {
     ),
   },
   duel_reminder: {
-    icon: <Hourglass className='h-3 w-3 text-white' />,
-    bg: "bg-orange-500",
+    icon: <Hourglass />,
+    tone: "orange",
     label: (n: any, t: Translate) => (
       <span>
         {t("bell.duel_reminder")}
@@ -271,13 +276,13 @@ const typeConfig = {
     ),
   },
   duel_result: {
-    icon: <Swords className='h-3 w-3 text-white' />,
-    bg: "bg-zinc-600",
+    icon: <Swords />,
+    tone: "zinc",
     label: (n: any, t: Translate) => (
       <span>
         <Interpolate
           text={t(`bell.duel_${n.duelResult ?? "void"}`)}
-          values={{ name: <span className='font-semibold text-white'>{n.opponentName ?? "?"}</span> }}
+          values={{ name: <span className='font-semibold text-zinc-100'>{n.opponentName ?? "?"}</span> }}
         />
         {!!n.ratingDelta && (
           <span
@@ -293,21 +298,28 @@ const typeConfig = {
     ),
   },
   roadmap_ready: {
-    icon: <MapIcon className='h-3 w-3 text-white' />,
-    bg: "bg-cyan-500",
+    icon: <MapIcon />,
+    tone: "cyan",
     label: (n: any, t: Translate) => (
       <span>
         {t("bell.roadmap_ready")}
         {n.roadmapGoal ? (
           <>
             {": "}
-            <span className='font-semibold text-white'>{n.roadmapGoal}</span>
+            <span className='font-semibold text-zinc-100'>{n.roadmapGoal}</span>
           </>
         ) : null}
       </span>
     ),
   },
-};
+} satisfies Record<
+  string,
+  {
+    icon: ReactNode;
+    tone: keyof typeof toneClass;
+    label: (n: any, t: Translate) => ReactNode;
+  }
+>;
 
 export const NotificationsBell = () => {
   const { t } = useTranslation("notifications");
@@ -386,27 +398,26 @@ export const NotificationsBell = () => {
           )}
         </motion.button>
       </DropdownMenuTrigger>
+      {/* Portalled outside the app's theme wrapper, so it brings `dark-theme` along — without it
+          the initial-avatar fill (`bg-tertiary-400`) resolves to nothing and the letter vanishes.
+          The base menu's zoom scales from the centre, which on a panel this tall reads as the
+          whole thing swelling; it only fades and drops in from under the bell instead. */}
       <DropdownMenuContent
-        className='w-[380px] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/95 p-0 text-white shadow-2xl shadow-black/60 backdrop-blur-xl'
+        className='dark-theme w-[380px] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg border-white/10 bg-zinc-900 p-0 text-zinc-100 shadow-none data-[state=closed]:duration-base data-[state=open]:duration-base data-[state=closed]:zoom-out-100 data-[state=open]:zoom-in-100'
         align='start'
         sideOffset={10}
         collisionPadding={12}>
         {/* Header */}
-        <div className='flex items-center justify-between gap-3 border-b border-white/10 bg-white/[0.02] px-4 py-3.5'>
-          <div className='flex items-center gap-2.5'>
-            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-zinc-300'>
-              <Bell className='h-4 w-4' />
-            </div>
-            <div>
-              <h3 className='text-sm font-bold leading-none text-white'>
-                {t("bell.title")}
-              </h3>
-              {unreadCount > 0 && (
-                <p className='mt-1.5 text-[11px] font-medium text-zinc-500'>
-                  {unreadCount} unread
-                </p>
-              )}
-            </div>
+        <div className='flex items-center justify-between gap-3 px-4 pb-2 pt-4'>
+          <div className='flex items-center gap-2'>
+            <h3 className='text-sm font-semibold text-zinc-100'>
+              {t("bell.title")}
+            </h3>
+            {unreadCount > 0 && (
+              <span className='rounded bg-cyan-500/10 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-cyan-400'>
+                {unreadCount}
+              </span>
+            )}
           </div>
           {unreadCount > 0 && (
             <button
@@ -414,7 +425,8 @@ export const NotificationsBell = () => {
                 e.preventDefault();
                 markAllAsRead();
               }}
-              className='shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-cyan-400 transition-colors hover:bg-cyan-500/10 hover:text-cyan-300'>
+              className='flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+              <CheckCheck className='h-3.5 w-3.5' />
               {t("bell.mark_all_read")}
             </button>
           )}
@@ -423,11 +435,11 @@ export const NotificationsBell = () => {
         {/* List */}
         <div className='max-h-[60vh] overflow-y-auto [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5'>
           {isLoading ? (
-            <div className='flex flex-col gap-3 p-4'>
+            <div className='flex flex-col gap-1 p-2'>
               {[1, 2, 3].map((i) => (
-                <div key={i} className='flex animate-pulse items-start gap-3'>
+                <div key={i} className='flex animate-pulse items-start gap-3 p-3'>
                   <div className='h-10 w-10 shrink-0 rounded-full bg-zinc-800' />
-                  <div className='flex-1 space-y-2'>
+                  <div className='flex-1 space-y-2 pt-1'>
                     <div className='h-3 w-3/4 rounded bg-zinc-800' />
                     <div className='h-3 w-1/2 rounded bg-zinc-800' />
                   </div>
@@ -435,21 +447,21 @@ export const NotificationsBell = () => {
               ))}
             </div>
           ) : notifications.length === 0 ? (
-            <div className='flex flex-col items-center gap-4 py-16 text-center'>
-              <div className='rounded-full bg-zinc-800/60 p-4 text-zinc-600'>
-                <Bell className='h-7 w-7' />
+            <div className='flex flex-col items-center gap-4 px-6 pb-14 pt-10 text-center'>
+              <div className='rounded-full bg-zinc-800/60 p-4 text-zinc-500'>
+                <Bell className='h-6 w-6' />
               </div>
               <div>
-                <p className='text-sm font-medium text-zinc-400'>
+                <p className='text-sm font-medium text-zinc-200'>
                   {t("bell.empty_title")}
                 </p>
-                <p className='mt-1 text-xs text-zinc-600'>
+                <p className='mt-1 text-xs text-zinc-400'>
                   {t("bell.empty_body")}
                 </p>
               </div>
             </div>
           ) : (
-            <div>
+            <div className='flex flex-col gap-1 p-2'>
               {notifications.map((n) => {
                 const config =
                   typeConfig[n.type as keyof typeof typeConfig] ??
@@ -470,19 +482,19 @@ export const NotificationsBell = () => {
                   <button
                     key={n.id}
                     className={cn(
-                      "relative flex w-full items-start gap-3.5 border-b border-white/5 px-4 py-3.5 text-left transition-colors last:border-0",
+                      "flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                       n.isRead
-                        ? "hover:bg-white/[0.04]"
-                        : "bg-cyan-500/[0.06] before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-cyan-400 hover:bg-cyan-500/[0.1]",
+                        ? "hover:bg-zinc-800/40"
+                        : "bg-cyan-500/10 hover:bg-cyan-500/15",
                     )}
                     onClick={() => handleNotificationClick(n)}>
                     {/* Avatar or system icon + type badge */}
-                    <div className='relative mt-0.5 h-10 w-10 shrink-0'>
+                    <div className='relative h-10 w-10 shrink-0'>
                       {isSystemNotif ? (
                         <div
                           className={cn(
-                            "absolute inset-0 flex items-center justify-center rounded-full",
-                            config.bg,
+                            "absolute inset-0 flex items-center justify-center rounded-full [&>*]:h-4 [&>*]:w-4",
+                            toneClass[config.tone],
                           )}>
                           {config.icon}
                         </div>
@@ -496,12 +508,15 @@ export const NotificationsBell = () => {
                             />
                           </div>
                           {n.type !== "reaction" && (
-                            <div
-                              className={cn(
-                                "absolute -bottom-1 -right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full ring-2 ring-zinc-900/95",
-                                config.bg,
-                              )}>
-                              {config.icon}
+                            // A solid disc under the tint, so the badge reads the same over any photo.
+                            <div className='absolute -bottom-1 -right-1 z-10 h-5 w-5 rounded-full bg-zinc-900 ring-2 ring-zinc-900'>
+                              <div
+                                className={cn(
+                                  "flex h-full w-full items-center justify-center rounded-full [&>*]:h-3 [&>*]:w-3",
+                                  toneClass[config.tone],
+                                )}>
+                                {config.icon}
+                              </div>
                             </div>
                           )}
                         </>
@@ -510,10 +525,14 @@ export const NotificationsBell = () => {
 
                     {/* Content */}
                     <div className='min-w-0 flex-1'>
-                      <p className='text-sm leading-snug text-zinc-300'>
+                      <p
+                        className={cn(
+                          "text-sm leading-snug",
+                          n.isRead ? "text-zinc-400" : "text-zinc-200",
+                        )}>
                         {!isSystemNotif && n.senderName && (
                           <>
-                            <span className='font-semibold text-white'>
+                            <span className='font-semibold text-zinc-100'>
                               {n.senderName}
                             </span>{" "}
                           </>
@@ -591,22 +610,23 @@ export const NotificationsBell = () => {
                           <ArrowRight className='h-3 w-3' />
                         </p>
                       )}
-                      <div className='mt-1.5 flex items-center gap-1.5'>
-                        <Clock className='h-3 w-3 text-zinc-600' />
-                        <span className='text-xs text-zinc-600'>
-                          {n.timestamp?.toDate
-                            ? formatDistanceToNow(n.timestamp.toDate(), {
-                                addSuffix: true,
-                                locale: dateFnsLocale,
-                              })
-                            : t("bell.just_now")}
-                        </span>
-                      </div>
+                      <p
+                        className={cn(
+                          "mt-1.5 text-xs",
+                          n.isRead ? "text-zinc-500" : "font-medium text-cyan-400",
+                        )}>
+                        {n.timestamp?.toDate
+                          ? formatDistanceToNow(n.timestamp.toDate(), {
+                              addSuffix: true,
+                              locale: dateFnsLocale,
+                            })
+                          : t("bell.just_now")}
+                      </p>
                     </div>
 
                     {/* Unread indicator */}
                     {!n.isRead && (
-                      <div className='mt-2 h-2 w-2 shrink-0 rounded-full bg-cyan-400 shadow-[0_0_8px] shadow-cyan-400/50' />
+                      <div className='mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-cyan-400' />
                     )}
                   </button>
                 );

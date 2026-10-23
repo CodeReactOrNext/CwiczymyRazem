@@ -7,6 +7,7 @@ import {
   Heart,
   ListChecks,
   Medal,
+  Milestone,
   Repeat,
   ScrollText,
   Signpost,
@@ -26,6 +27,7 @@ export const PROGRESS_TABS: PageTab[] = [
   { label: "Activity", href: "/profile/activity", icon: Activity },
   { label: "Practice Log", href: "/practice-log", icon: ScrollText },
   { label: "Goals", href: "/goals", icon: Target },
+  { label: "Milestones", href: "/summary", icon: Milestone },
   { label: "Achievements", href: "/profile/achievements", icon: Medal },
 ];
 

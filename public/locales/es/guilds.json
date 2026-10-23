@@ -47,10 +47,8 @@
     "not_enough_tokens": "No te quedan suficientes tokens",
     "name_yours": "El nombre es tuyo para siempre",
     "found": "Fundar un gremio",
-    "search": "Busca gremios por nombre, etiqueta o descripción…",
     "empty_title": "Todavía no hay gremios",
     "empty_body": "Nadie ha reservado un nombre. El primero sigue libre.",
-    "no_match": "Ningún gremio coincide con «{{search}}»",
     "ranking": "Clasificación de gremios"
   },
   "members": {

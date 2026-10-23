@@ -22,7 +22,7 @@ Cała aplikacja to jedna pętla, powtarzana:
 
 Nie musisz niczego konfigurować. Weź gitarę, uruchom stoper, graj cokolwiek i tak miałeś zagrać.
 
-<ClickPath steps="Ćwiczenia|Wolny stoper" caption="Włącz go, gdy grasz, zatrzymaj, gdy skończysz. Już dziś ćwiczyłeś? Ćwiczenia → Ręczny wpis robi to samo bez stopera." />
+<ClickPath steps="Ćwicz|Wolny stoper" caption="Włącz go, gdy grasz, zatrzymaj, gdy skończysz. Już dziś ćwiczyłeś? Ćwicz → Ręczny wpis robi to samo bez stopera." />
 
 Gdy zatrzymasz stoper, dostajesz ten formularz z już wypełnionym czasem. Sprawdź podział, zaznacz wszystko, co prawdziwe, zapisz.
 
@@ -62,7 +62,7 @@ To myli prawie wszystkich w pierwszym tygodniu. **Punkty** to twój zapis: ustal
 
 ## Pytania, które ludzie zadają
 
-<FaqList items="Czy ma znaczenie, co ćwiczę?::Dla punktów nie. 15 minut to 15 minut w dowolnej kategorii. Dla umiejętności i zadań dziennych tak: kategoria, którą oznaczysz, decyduje, które umiejętności rosną|Ćwiczę z dala od komputera::Użyj Ćwiczenia → Ręczny wpis i wpisz czas. Możesz zapisać sesję do 7 dni po tym, jak się odbyła|Co jeśli opuszczę dzień?::Tracisz premię za serię i zaczynasz liczyć od nowa. Nic innego nie jest ruszane: punkty, poziom, utwory i sprzęt zostają|Czy muszę robić zadania i rzeczy ze sprzętem?::Nie. Tracker działa sam. Zadania, Arsenał i rankingi są na dni, gdy motywacja potrzebuje pomocy|Ile z tego jest darmowe?::Ćwiczenie, zapisywanie, utwory, serie, zadania i rankingi działają bez płacenia za cokolwiek" />
+<FaqList items="Czy ma znaczenie, co ćwiczę?::Dla punktów nie. 15 minut to 15 minut w dowolnej kategorii. Dla umiejętności i zadań dziennych tak: kategoria, którą oznaczysz, decyduje, które umiejętności rosną|Ćwiczę z dala od komputera::Użyj Ćwicz → Ręczny wpis i wpisz czas. Możesz zapisać sesję do 7 dni po tym, jak się odbyła|Co jeśli opuszczę dzień?::Tracisz premię za serię i zaczynasz liczyć od nowa. Nic innego nie jest ruszane: punkty, poziom, utwory i sprzęt zostają|Czy muszę robić zadania i rzeczy ze sprzętem?::Nie. Tracker działa sam. Zadania, Arsenał i rankingi są na dni, gdy motywacja potrzebuje pomocy|Ile z tego jest darmowe?::Ćwiczenie, zapisywanie, utwory, serie, zadania i rankingi działają bez płacenia za cokolwiek" />
 
 Więcej takich pytań, w tym ile aplikacja kosztuje, co trzeba podłączyć i jak zachowuje się seria, gdy życie staje na drodze, jest odpowiedzianych na [stronie z najczęściej zadawanymi pytaniami](/faq).
 

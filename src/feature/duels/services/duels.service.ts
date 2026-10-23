@@ -38,7 +38,7 @@ export const markDuelReady = (duelId: string) =>
 export const submitDuelRun = (run: DuelRunSubmission) =>
   post<DuelRunResult>("/api/duels/submit", { ...run });
 
-/** The API's error code ("LIMIT", "LOCKED"…), when there is one. */
+/** The API's error code ("LIMIT", "NOT_FOUND"…), when there is one. */
 export const duelErrorCode = (error: unknown): string | null =>
   axios.isAxiosError(error) && typeof error.response?.data?.error === "string"
     ? error.response.data.error

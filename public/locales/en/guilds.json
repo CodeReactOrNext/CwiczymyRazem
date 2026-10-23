@@ -47,10 +47,8 @@
     "not_enough_tokens": "Not enough tokens left",
     "name_yours": "The name is yours for good",
     "found": "Found a guild",
-    "search": "Search guilds by name, tag or description…",
     "empty_title": "No guilds yet",
     "empty_body": "Nobody has taken a name. The first one is still there.",
-    "no_match": "No guild matches “{{search}}”",
     "ranking": "Guild ranking"
   },
   "members": {

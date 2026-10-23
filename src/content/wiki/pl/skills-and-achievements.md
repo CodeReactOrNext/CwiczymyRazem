@@ -10,7 +10,7 @@ order: 2
 
 Aplikacja śledzi 23 pojedyncze umiejętności gitarowe (naprzemienne kostkowanie, legato, podciąganie, wibrato, akordy, skale, rytm, trening słuchu, improwizacja, transkrypcja i tak dalej), pogrupowane w te same cztery kategorie, których używa się wszędzie indziej: technika, teoria, słuch i kreatywność.
 
-<ClickPath steps="Ćwiczenia|Umiejętności" caption="Ekran Umiejętności to jedna wielka mapa: pień pośrodku, siedem kamieni milowych na nim i każde ćwiczenie z biblioteki jako pojedyncza kropka na gałęzi." />
+<ClickPath steps="Ćwicz|Umiejętności" caption="Ekran Umiejętności to jedna wielka mapa: pień pośrodku, siedem kamieni milowych na nim i każde ćwiczenie z biblioteki jako pojedyncza kropka na gałęzi." />
 
 Mapa biegnie z góry na dół, od Podstaw przez Technikę, Teorię i gryf, Rytm i groove, Ekspresję i styl oraz Kształcenie słuchu do Kreatywności, i kończy się na Mistrzostwie. Każdy kamień milowy rozgałęzia się w gałęzie nazwane od umiejętności (Kostkowanie naprzemienne, Legato, Polowania kliknięciem, Wzory bicia…), a każda gałąź to łańcuch kropek uporządkowanych od najłatwiejszych. Małe przerwy dzielą łańcuch na stopnie trudności, a słabe kreski pod każdym stopniem mówią, jak jest trudny: jedna dla początkujących, do czterech dla trudnych. Zielona kropka to ćwiczenie, które zagrałeś, ciemna kropka wciąż czeka, a kłódka oznacza ćwiczenie Pro. Dokładnie jedna kropka na całej mapie nosi pierścień: ćwiczenie, na którym jesteś. Okrąg kamienia milowego wypełnia się, gdy grasz jego ćwiczenia, i staje się w pełni zielony, gdy zrobisz każde z nich.
 
@@ -28,7 +28,7 @@ Luki są sednem. Gałąź z jedną wypełnioną kropką i ośmioma pustymi nie j
 Ta sama liczba jest nazwana „XP” na liście umiejętności i „Poziom” w podsumowaniu kategorii. To ta sama wartość pokazana na dwa sposoby i nic nie jest śledzone dwa razy.
 </BlogAlert>
 
-Używaj tego jak lustra, a nie celu: jeśli teoria ledwo ruszyła w ciągu miesiąca, to jest tu użyteczna informacja, a Ćwiczenia → Ćwiczenia pozwala wybrać ćwiczenie dokładnie na tę lukę.
+Używaj tego jak lustra, a nie celu: jeśli teoria ledwo ruszyła w ciągu miesiąca, to jest tu użyteczna informacja, a Ćwicz → Katalog ćwiczeń pozwala wybrać ćwiczenie dokładnie na tę lukę.
 
 ## Osiągnięcia
 

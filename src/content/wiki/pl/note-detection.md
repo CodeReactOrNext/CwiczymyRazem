@@ -8,7 +8,7 @@ order: 4
 
 Niektóre ćwiczenia nie tylko pokazują, co grać, ale to sprawdzają. Włącz **Wykrywanie**, a aplikacja słucha twojej gitary przez mikrofon lub interfejs audio, ustala, jaka nuta wybrzmiała, i porównuje ją z tym, co było na ekranie. To różnica między ćwiczeniem, które odhaczasz, a ćwiczeniem, które się z tobą spiera.
 
-<ClickPath steps="Ćwiczenia|dowolne ćwiczenie|Wykrywanie" caption="Przycisk leży obok elementów sterowania odtwarzaniem i robi się zielony, gdy aplikacja słucha." />
+<ClickPath steps="Ćwicz|dowolne ćwiczenie|Wykrywanie" caption="Przycisk leży obok elementów sterowania odtwarzaniem i robi się zielony, gdy aplikacja słucha." />
 
 <BlogAlert type="info">
 Nic z tego nie jest wymagane. Każde ćwiczenie można ćwiczyć z wyłączonym wykrywaniem, a twoje punkty pochodzą z czasu, który zapisujesz, a nie z tego, jak dokładnie grałeś. Wykrywanie zmienia ćwiczenie, nie nagrodę.

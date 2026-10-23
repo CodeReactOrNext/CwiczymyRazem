@@ -22,7 +22,7 @@ Ask for a roadmap that's about guitar. Requests that wander off the topic are tu
 
 Milestones are a ladder of weekly practice goals. Each rung costs a one-off amount of Fame to unlock and then pays Fame **every week you meet its goal**, so a rung you can hit reliably pays for itself and then keeps paying.
 
-<ClickPath steps="Milestones" caption="Unlock a level once, then claim it every week you meet the goal." />
+<ClickPath steps="Progress|Milestones" caption="Unlock a level once, then claim it every week you meet the goal." />
 
 <ProgressLadder items="Spark::Free to unlock · 20 Fame a week · one day of 15+ minutes|Groove::40 to unlock · 30 a week · three days of 20+ minutes|Hot Streak::80 to unlock · 45 a week · a 3-day streak of 15+ minutes|Momentum::130 to unlock · 60 a week · five days of 15+ minutes|Unstoppable::180 to unlock · 85 a week · a full 7-day streak of 15+ minutes|All-Rounder::230 to unlock · 120 a week · three days with all four categories at 15+ minutes|In the Zone::280 to unlock · 160 a week · a 3-day streak with all four categories|Shredder::300 to unlock · 220 a week · a 5-day streak with all four categories|Virtuoso::300 to unlock · 300 a week · a 7-day streak with all four categories at 15+ minutes every day" highlight="Virtuoso" caption="Every level you've unlocked and met can be claimed every week, and they stack." />
 

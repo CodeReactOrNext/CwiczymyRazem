@@ -539,7 +539,9 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
           // overflow-x-hidden: a vertical scroller scrolls sideways too unless told not to, and
           // the hover actions over a bubble (invisible until hovered, but laid out) reach past
           // a phone-width column — which gave the room a second, sideways scrollbar.
-          className='h-full overflow-y-auto overflow-x-hidden py-4 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:px-6 sm:py-6'>
+          // px-2 on a phone: the supporter's gold ring sits 4px outside the avatar, and with
+          // no padding the clip above shaved it, and the edge of the avatar, off both sides.
+          className='h-full overflow-y-auto overflow-x-hidden px-2 py-4 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700 sm:px-6 sm:py-6'>
           {!isLoading && messages.length === 0 ? (
             <EmptyRoom
               isGuild={isGuild}

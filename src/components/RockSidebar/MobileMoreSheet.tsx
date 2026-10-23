@@ -6,7 +6,7 @@ import {
 } from "assets/components/ui/drawer";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Lock, X } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
 
 export interface MoreSheetItem {
@@ -16,9 +16,6 @@ export interface MoreSheetItem {
   icon: React.ReactNode;
   isActive: boolean;
   external?: boolean;
-  /** Level the page opens at — set only while the account is below it. */
-  lockedLvl?: number;
-  showBadge?: boolean;
 }
 
 export interface MoreSheetGroup {
@@ -41,8 +38,6 @@ const MoreSheetRow = ({
   item: MoreSheetItem;
   onNavigate: () => void;
 }) => {
-  const { t } = useTranslation("nav");
-
   return (
     <Link
       href={item.href}
@@ -63,24 +58,7 @@ const MoreSheetRow = ({
         )}>
         {item.icon}
       </span>
-      <span className={cn("flex-1", item.lockedLvl && "text-zinc-400")}>
-        {item.name}
-      </span>
-      {item.lockedLvl ? (
-        <span
-          aria-label={t("locked_until_level", { level: item.lockedLvl })}
-          className='flex shrink-0 items-center gap-1 text-xs font-bold tabular-nums text-zinc-400'>
-          <Lock size={12} />
-          {item.lockedLvl}
-        </span>
-      ) : (
-        item.showBadge && (
-          <span
-            aria-label={t("unclaimed_reward")}
-            className='h-2 w-2 shrink-0 animate-pulse rounded-full bg-amber-500'
-          />
-        )
-      )}
+      <span className='flex-1'>{item.name}</span>
     </Link>
   );
 };

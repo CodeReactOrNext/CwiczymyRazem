@@ -1,5 +1,4 @@
 import { Button } from "assets/components/ui/button";
-import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
@@ -17,7 +16,7 @@ import {
   motifIcons,
 } from "feature/guilds/utils/guildCosmetics.utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Clock, Plus, Search, Shield, Users, X } from "lucide-react";
+import { Check, Clock, Plus, Shield, Users, X } from "lucide-react";
 import { useState } from "react";
 
 /** Who is in it, as faces — names on hover, the roster tab reads them. */
@@ -49,6 +48,9 @@ const MemberFaces = ({ guild }: { guild: Guild }) => {
  * One guild, as one line of a ranking: place, crest, name, who is in it, level,
  * and the way in. The banner still shows — faded in behind the right of the row
  * — so a guild's kit is not lost by folding the card down to a line.
+ *
+ * On a phone a single line leaves the name no room at all, so the level ring
+ * becomes a word in the meta line and the button moves to a row of its own.
  */
 const GuildRankRow = ({
   guild,
@@ -80,7 +82,7 @@ const GuildRankRow = ({
   return (
     <li
       className={cn(
-        "relative flex items-center gap-4 overflow-hidden rounded-lg p-4 transition-background sm:gap-6 sm:p-6",
+        "relative flex flex-wrap items-center gap-x-3 gap-y-3 overflow-hidden rounded-lg p-4 transition-background sm:flex-nowrap sm:gap-6 sm:p-6",
         isMine ? "bg-cyan-500/[0.08]" : "bg-zinc-900/40 hover:bg-zinc-900/60",
       )}>
       {/* The banner, faded in from the right and out under the text. */}
@@ -102,7 +104,7 @@ const GuildRankRow = ({
       <span
         aria-label={t("browser.rank", { rank })}
         className={cn(
-          "relative w-8 shrink-0 text-center text-3xl font-bold tabular-nums",
+          "relative w-6 shrink-0 text-center text-xl font-bold tabular-nums sm:w-8 sm:text-3xl",
           rank <= 3 ? "text-zinc-200" : "text-zinc-600",
         )}>
         {rank}
@@ -112,12 +114,12 @@ const GuildRankRow = ({
         logo={guild.logo}
         tag={guild.tag}
         accentHex={hex}
-        className='relative h-16 w-16 shrink-0 text-base sm:h-20 sm:w-20 sm:text-lg'
+        className='relative h-12 w-12 shrink-0 text-sm sm:h-20 sm:w-20 sm:text-lg'
       />
 
       <div className='relative min-w-0 flex-1'>
-        <p className='flex min-w-0 items-center gap-2'>
-          <span className='truncate text-lg font-bold text-white'>
+        <p className='flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1'>
+          <span className='max-w-full truncate text-base font-bold text-white sm:text-lg'>
             {guild.name}
           </span>
           {guild.logo && (
@@ -148,6 +150,9 @@ const GuildRankRow = ({
             <Users size={13} />
             {guild.memberCount}/{guild.memberLimit}
           </span>
+          <span className='tabular-nums sm:hidden'>
+            {t("browser.level", { level: guild.level })}
+          </span>
           <span className='truncate text-zinc-500'>
             {t("browser.by", { name: guild.founderName })}
           </span>
@@ -165,12 +170,12 @@ const GuildRankRow = ({
       </div>
 
       <div
-        className='relative shrink-0'
+        className='relative hidden shrink-0 sm:block'
         title={t("browser.level", { level: guild.level })}>
         <GuildLevelRing level={guild.level} size={56} />
       </div>
 
-      <div className='relative flex w-24 shrink-0 justify-end'>
+      <div className='relative flex w-full shrink-0 justify-end sm:w-24'>
         {isMine ? (
           <Button
             variant='ghost'
@@ -309,7 +314,6 @@ export const GuildBrowser = ({
 }) => {
   const { t } = useTranslation("guilds");
   const [isFounding, setIsFounding] = useState(false);
-  const [search, setSearch] = useState("");
   const { found, applyTo, withdraw, decide, leave } = useGuildMutations();
 
   if (isLoading || !data) {
@@ -333,19 +337,7 @@ export const GuildBrowser = ({
     leave.isPending;
   const tokensLeft = data.tokensLeft;
 
-  // Name, tag and the blurb all read as "which guild is this", so one box
-  // covers the three rather than making anyone guess what it matches on.
   const ranked = rankGuilds(data.guilds);
-  const ranks = new Map(ranked.map((guild, index) => [guild.id, index + 1]));
-  const needle = search.trim().toLowerCase();
-  const matches = needle
-    ? ranked.filter((guild) =>
-        [guild.name, guild.tag, guild.description]
-          .join(" ")
-          .toLowerCase()
-          .includes(needle),
-      )
-    : ranked;
 
   return (
     <div className='space-y-8'>
@@ -386,21 +378,6 @@ export const GuildBrowser = ({
         />
       )}
 
-      {data.guilds.length > 0 && (
-        <div className='relative'>
-          <Search
-            size={15}
-            className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500'
-          />
-          <Input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder={t("browser.search")}
-            className='h-11 bg-white/5 pl-10 font-medium'
-          />
-        </div>
-      )}
-
       {data.guilds.length === 0 ? (
         <div className='flex flex-col items-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
           <span className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-400'>
@@ -413,10 +390,6 @@ export const GuildBrowser = ({
             {t("browser.empty_body")}
           </p>
         </div>
-      ) : matches.length === 0 ? (
-        <p className='rounded-lg bg-zinc-900/40 px-6 py-14 text-center text-sm text-zinc-500'>
-          {t("browser.no_match", { search })}
-        </p>
       ) : (
         <section className='space-y-4'>
           <h2 className='flex items-center gap-2.5 text-lg font-bold text-white'>
@@ -426,11 +399,11 @@ export const GuildBrowser = ({
             </span>
           </h2>
           <ol className='space-y-3'>
-            {matches.map((guild) => (
+            {ranked.map((guild, index) => (
               <GuildRankRow
                 key={guild.id}
                 guild={guild}
-                rank={ranks.get(guild.id) ?? 0}
+                rank={index + 1}
                 isMine={guild.id === data.myGuildId}
                 blocked={!!data.myGuildId || !!data.myApplication}
                 application={

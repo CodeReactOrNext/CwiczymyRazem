@@ -10,7 +10,7 @@ Most of riff.quest lets you practise whatever you feel like. These two don't: th
 
 ## Learning Path
 
-<ClickPath steps="Practice|Learning Path" caption="Modules made of stages, stages made of steps, and an exam at the end of each stage." />
+<ClickPath steps="Learning Path" caption="Modules made of stages, stages made of steps, and an exam at the end of each stage." />
 
 Two modules are live today, **Fundamentals** and **Fretboard Mastery**, with rhythm, scales and improvisation marked as coming soon. Each step comes with instructions, a checklist and tips.
 

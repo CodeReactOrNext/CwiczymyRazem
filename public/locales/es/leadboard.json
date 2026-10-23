@@ -37,6 +37,11 @@
     "point": "punto",
     "points": "puntos"
   },
+  "rewards": {
+    "title": "Recompensas de temporada",
+    "place": "Puesto {{place}}: {{fame}} Fame",
+    "range": "Puestos {{from}}–{{to}}: {{max}}–{{min}} Fame"
+  },
   "hero": {
     "season": "Temporada",
     "season_subtitle": "Practica para subir en la clasificación.",
@@ -45,8 +50,7 @@
     "title": "Clasificación",
     "subtitle": "Mira cómo quedas frente a otros jugadores",
     "all_time_eyebrow": "Clasificación histórica",
-    "sections": "Secciones de la clasificación",
-    "how_points": "Cómo funcionan los puntos"
+    "sections": "Secciones de la clasificación"
   },
   "scope": {
     "top": "Mejores jugadores",

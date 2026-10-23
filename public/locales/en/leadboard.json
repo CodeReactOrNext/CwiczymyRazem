@@ -37,6 +37,11 @@
     "point": "point",
     "points": "points"
   },
+  "rewards": {
+    "title": "Season rewards",
+    "place": "Place {{place}}: {{fame}} Fame",
+    "range": "Places {{from}}–{{to}}: {{max}}–{{min}} Fame"
+  },
   "hero": {
     "season": "Season",
     "season_subtitle": "Practice to climb the leaderboard.",
@@ -45,8 +50,7 @@
     "title": "Leaderboard",
     "subtitle": "See how you rank against other players",
     "all_time_eyebrow": "All-time ranking",
-    "sections": "Leaderboard sections",
-    "how_points": "How points work"
+    "sections": "Leaderboard sections"
   },
   "scope": {
     "top": "Top players",

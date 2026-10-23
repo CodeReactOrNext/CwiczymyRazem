@@ -47,10 +47,8 @@
     "not_enough_tokens": "Za mało tokenów",
     "name_yours": "Nazwa będzie Twoja na stałe",
     "found": "Załóż gildię",
-    "search": "Szukaj gildii po nazwie, tagu lub opisie…",
     "empty_title": "Nie ma jeszcze gildii",
     "empty_body": "Nikt jeszcze nie zajął nazwy. Pierwsza wciąż czeka.",
-    "no_match": "Żadna gildia nie pasuje do „{{search}}”",
     "ranking": "Ranking gildii"
   },
   "members": {

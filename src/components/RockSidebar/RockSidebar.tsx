@@ -18,7 +18,7 @@ import Avatar from "components/UI/Avatar";
 import { DISCORD_INVITE_URL } from "constants/community";
 import { DESKTOP_APP_RELEASES_URL } from "constants/desktopApp";
 import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaimedMilestone";
-import { getLockedAtLvl } from "feature/levelGate/data/featureUnlocks";
+import { isFeatureUnlocked } from "feature/levelGate/data/featureUnlocks";
 import { CommunityIconButton } from "feature/logsBox/components/CommunityIconButton";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 import { userProfileQuery } from "feature/profile/hooks/userProfileQuery";
@@ -28,7 +28,6 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
   selectUserAvatar,
-  selectUserInfo,
   selectUserName,
 } from "feature/user/store/userSlice";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
@@ -40,55 +39,31 @@ import { useRipple } from "hooks/useRipple";
 import { useSupportPrompt } from "hooks/useSupportPrompt";
 import { useTranslation } from "hooks/useTranslation";
 import {
-  Activity,
   BookOpen,
-  Brain,
   CassetteTape,
   ChevronDown,
-  ClipboardList,
-  Clock,
-  Compass,
   Download,
-  Dumbbell,
-  FilePlus2,
   Flame,
   Heart,
   Home,
-  LayoutDashboard,
   Library,
-  ListChecks,
-  ListMusic,
-  ListTree,
-  Lock,
   LogOut,
   Mic2,
-  Milestone,
-  Music2,
-  NotebookPen,
-  PlusCircle,
-  Repeat,
   Route,
-  Search,
   Settings,
   Shield,
-  Skull,
-  Signpost,
   SlidersHorizontal,
-  Star,
   Swords,
-  Target,
   Timer,
   TrendingUp,
   Trophy,
   Users,
-  WandSparkles,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaDiscord } from "react-icons/fa6";
-import { SiGuitarpro } from "react-icons/si";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 
@@ -119,7 +94,6 @@ const SidebarNavLink = ({
   tooltip,
   muted = false,
   external = false,
-  lockedLvl,
 }: {
   href: string;
   name: string;
@@ -130,8 +104,6 @@ const SidebarNavLink = ({
   tooltip?: string;
   muted?: boolean;
   external?: boolean;
-  /** Level the page opens at — set only while the account is below it. */
-  lockedLvl?: number;
 }) => {
   const { t } = useTranslation("nav");
   const { createRipple, ripple } = useRipple();
@@ -156,18 +128,8 @@ const SidebarNavLink = ({
         className={`${NAV_ICON_SLOT} ${isActive ? "text-cyan-400" : "text-zinc-600"}`}>
         {icon}
       </span>
-      <span className={`flex-1 ${lockedLvl ? "text-zinc-600" : ""}`}>
-        {name}
-      </span>
-      {lockedLvl && (
-        <span
-          aria-label={t("locked_until_level", { level: lockedLvl })}
-          className='flex shrink-0 items-center gap-1 text-[11px] font-bold tabular-nums text-zinc-600'>
-          <Lock size={11} />
-          {lockedLvl}
-        </span>
-      )}
-      {!lockedLvl && (showBadge || isActive) && (
+      <span className='flex-1'>{name}</span>
+      {(showBadge || isActive) && (
         <span className={NAV_INDICATOR_SLOT}>
           {showBadge ? (
             <span
@@ -182,16 +144,14 @@ const SidebarNavLink = ({
     </Link>
   );
 
-  const hint = lockedLvl ? t("opens_at_level", { level: lockedLvl }) : tooltip;
-
-  if (!hint) return link;
+  if (!tooltip) return link;
 
   return (
     <TooltipProvider>
       <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>{link}</TooltipTrigger>
         <TooltipContent side='right' className='max-w-[200px]'>
-          <p>{hint}</p>
+          <p>{tooltip}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -204,152 +164,48 @@ interface SidebarSubLink {
   href: string;
   icon: React.ReactNode;
   tooltip?: string;
-  lockedLvl?: number;
-  showBadge?: boolean;
 }
 
-const PRACTICE_SUB_NAV: SidebarSubLink[] = [
+// Community is the one section without a tab bar of its own, so it is the only
+// one that still folds out here. Practice, Songs, Library and Progress land on
+// a page that already lists its sub-pages — repeating them here only made the
+// sidebar longer.
+const COMMUNITY_SUB_NAV: SidebarSubLink[] = [
   {
-    id: "practice-plans",
-    name: "practice_routines",
-    href: "/timer/plans",
-    icon: <ListChecks size={16} />,
+    id: "community-rankings",
+    name: "rankings",
+    href: "/seasons",
+    icon: <Trophy size={16} />,
   },
   {
-    id: "practice-auto",
-    name: "auto_plan",
-    href: "/timer/auto",
-    icon: <WandSparkles size={16} />,
+    id: "community-challenges",
+    name: "challenges",
+    href: "/challenges",
+    icon: <Flame size={16} />,
+    tooltip: "challenges_tooltip",
   },
   {
-    id: "practice-free-timer",
-    name: "free_timer",
-    href: "/timer/practice",
-    icon: <Clock size={16} />,
+    id: "community-duels",
+    name: "duels",
+    href: "/duels",
+    icon: <Swords size={16} />,
+    tooltip: "duels_tooltip",
   },
   {
-    id: "practice-report",
-    name: "manual_log",
-    href: "/report",
-    icon: <NotebookPen size={16} />,
+    id: "community-recordings",
+    name: "recordings",
+    href: "/recordings",
+    icon: <Mic2 size={16} />,
+    tooltip: "recordings_tooltip",
   },
   {
-    id: "practice-gp-tabs",
-    name: "guitar_pro_files",
-    href: "/gp-tabs",
-    icon: <SiGuitarpro size={16} />,
-  },
-  {
-    id: "practice-skills",
-    name: "skills",
-    href: "/profile/skills?tab=skill-tree",
-    icon: <Brain size={16} />,
-  },
-  {
-    id: "practice-exercises",
-    name: "exercises",
-    href: "/profile/skills?tab=browse",
-    icon: <Dumbbell size={16} />,
-  },
-  {
-    id: "practice-roadmaps",
-    name: "mastery_roadmaps",
-    href: "/ai-coach",
-    icon: <Compass size={16} />,
-  },
-  {
-    id: "practice-journey",
-    name: "learning_path",
-    href: "/journey",
-    icon: <Route size={16} />,
-  },
-  {
-    id: "practice-scale-map",
-    name: "scale_map",
-    href: "/scale-tree",
-    icon: <ListTree size={16} />,
-    tooltip: "scale_map_tooltip",
-  },
-  {
-    id: "practice-bosses",
-    name: "boss_fights",
-    href: "/bosses",
-    icon: <Skull size={16} />,
-    tooltip: "boss_fights_tooltip",
+    id: "community-guilds",
+    name: "guilds",
+    href: "/guilds",
+    icon: <Shield size={16} />,
+    tooltip: "guilds_tooltip",
   },
 ];
-
-const SONGS_SUB_NAV: SidebarSubLink[] = [
-  {
-    id: "songs-board",
-    name: "board",
-    href: "/songs?view=board",
-    icon: <LayoutDashboard size={16} />,
-  },
-  {
-    id: "songs-explore",
-    name: "explore",
-    href: "/songs?view=explore",
-    icon: <Search size={16} />,
-  },
-  {
-    id: "songs-playlists",
-    name: "playlists",
-    href: "/songs?view=playlists",
-    icon: <ListMusic size={16} />,
-  },
-];
-
-const LIBRARY_SUB_NAV: SidebarSubLink[] = [
-  {
-    id: "library-favorites",
-    name: "favorites",
-    href: "/favorites",
-    icon: <Star size={16} />,
-  },
-  {
-    id: "library-rotation",
-    name: "rotation",
-    href: "/rotation",
-    icon: <Repeat size={16} />,
-  },
-  {
-    id: "library-plans",
-    name: "my_plans",
-    href: "/plans",
-    icon: <ClipboardList size={16} />,
-  },
-  {
-    id: "library-exercises",
-    name: "my_exercises",
-    href: "/my-exercises",
-    icon: <Music2 size={16} />,
-  },
-  {
-    id: "library-roadmaps",
-    name: "player_roadmaps",
-    href: "/my-roadmaps",
-    icon: <Signpost size={16} />,
-  },
-  {
-    id: "library-create-plan",
-    name: "create_plan",
-    href: "/plans/create",
-    icon: <PlusCircle size={16} />,
-  },
-  {
-    id: "library-create-exercise",
-    name: "create_exercise",
-    href: "/tab-editor",
-    icon: <FilePlus2 size={16} />,
-  },
-];
-
-/** Views a page falls back to when its query param is absent (bare /songs renders Board). */
-const DEFAULT_QUERY_BY_PATH: Record<string, Record<string, string>> = {
-  "/songs": { view: "board" },
-  "/profile/skills": { tab: "skill-tree" },
-};
 
 const SidebarExpandableNavLink = ({
   href,
@@ -447,8 +303,6 @@ const SidebarExpandableNavLink = ({
                   isActive={isSubLinkActive(subLink.href)}
                   onClick={onLinkClick}
                   tooltip={subLink.tooltip && t(subLink.tooltip)}
-                  lockedLvl={subLink.lockedLvl}
-                  showBadge={subLink.showBadge}
                 />
               ))}
             </div>
@@ -483,7 +337,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
-  const userInfo = useAppSelector(selectUserInfo);
   const userAuth = useAppSelector(selectUserAuth);
   const hasUnclaimedMilestone = useHasUnclaimedMilestone();
   const queryClient = useQueryClient();
@@ -494,10 +347,10 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (userAuth) void queryClient.prefetchQuery(userProfileQuery(userAuth));
   };
 
-  // Undefined until the stats land, so a low-level lock never flashes on a
-  // sidebar that is still loading somebody's real level.
-  const lockedAtLvl = (feature: "summary" | "duels" | "guilds") =>
-    userStats ? getLockedAtLvl(feature, userStats.lvl) : undefined;
+  // A page that is still level-locked stays out of the nav instead of showing
+  // up with a padlock — a new account sees what it can open today. False until
+  // the stats land, so the entry never flashes in for a low-level account.
+  const showGuilds = !!userStats && isFeatureUnlocked("guilds", userStats.lvl);
 
   // The panel is a perk, so the entry only exists for people who funded it.
   const { isSupport } = useSupportTeam();
@@ -511,11 +364,12 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/gp-tabs")) return "practice";
     if (pathname.startsWith("/profile/skills")) return "practice";
     if (pathname === "/ai-coach") return "practice";
-    if (pathname === "/journey") return "practice";
     if (pathname.startsWith("/scale-tree")) return "practice";
     if (pathname.startsWith("/bosses")) return "practice";
+    if (pathname === "/journey") return "journey";
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
+    if (pathname.startsWith("/profile/achievements")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
     if (pathname.startsWith("/goals")) return "progress";
     if (pathname === "/summary") return "progress";
@@ -567,16 +421,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const toggleSection = (id: string) =>
     setExpandedOverride((prev) => ({ ...prev, [id]: !isSectionExpanded(id) }));
 
-  const isSubLinkActive = (href: string) => {
-    const [path, query] = href.split("?");
-    if (router.pathname !== path) return false;
-    if (!query) return true;
-    const params = new URLSearchParams(query);
-    return Array.from(params.entries()).every(
-      ([key, value]) =>
-        (router.query[key] ?? DEFAULT_QUERY_BY_PATH[path]?.[key]) === value,
-    );
-  };
+  const isSubLinkActive = (href: string) => router.pathname === href;
 
   const isLinkActive = (id: string | null, href: string) => {
     if (activeId) return activeId === id;
@@ -596,21 +441,20 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       name: t("practice"),
       href: "/timer",
       icon: <Timer size={18} />,
-      children: PRACTICE_SUB_NAV,
+    },
+    // Its own entry rather than one of the practice modes: it is the guided
+    // start, and the page new accounts open most after the dashboard.
+    {
+      id: "journey",
+      name: t("learning_path"),
+      href: "/journey",
+      icon: <Route size={18} />,
     },
     {
       id: "songs",
       name: t("songs"),
       href: "/songs",
       icon: <CassetteTape size={18} />,
-      children: SONGS_SUB_NAV,
-    },
-    {
-      id: "library",
-      name: t("my_stuff"),
-      href: "/favorites",
-      icon: <Library size={18} />,
-      children: LIBRARY_SUB_NAV,
     },
     {
       id: "progress",
@@ -618,73 +462,21 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       href: "/profile/activity",
       icon: <TrendingUp size={18} />,
       showBadge: hasUnclaimedMilestone,
-      children: [
-        {
-          id: "progress-activity",
-          name: t("activity"),
-          href: "/profile/activity",
-          icon: <Activity size={16} />,
-        },
-        {
-          id: "progress-goals",
-          name: t("goals"),
-          href: "/goals",
-          icon: <Target size={16} />,
-        },
-        {
-          id: "progress-milestones",
-          name: t("milestones"),
-          href: "/summary",
-          icon: <Milestone size={16} />,
-          tooltip: t("milestones_tooltip"),
-          lockedLvl: lockedAtLvl("summary"),
-          showBadge: hasUnclaimedMilestone,
-        },
-      ] as SidebarSubLink[],
+    },
+    {
+      id: "library",
+      name: t("my_stuff"),
+      href: "/favorites",
+      icon: <Library size={18} />,
     },
     {
       id: "community",
       name: t("community"),
       href: "/seasons",
       icon: <Users size={18} />,
-      children: [
-        {
-          id: "community-rankings",
-          name: t("rankings"),
-          href: "/seasons",
-          icon: <Trophy size={16} />,
-        },
-        {
-          id: "community-challenges",
-          name: t("challenges"),
-          href: "/challenges",
-          icon: <Flame size={16} />,
-          tooltip: t("challenges_tooltip"),
-        },
-        {
-          id: "community-duels",
-          name: t("duels"),
-          href: "/duels",
-          icon: <Swords size={16} />,
-          tooltip: t("duels_tooltip"),
-          lockedLvl: lockedAtLvl("duels"),
-        },
-        {
-          id: "community-recordings",
-          name: t("recordings"),
-          href: "/recordings",
-          icon: <Mic2 size={16} />,
-          tooltip: t("recordings_tooltip"),
-        },
-        {
-          id: "community-guilds",
-          name: t("guilds"),
-          href: "/guilds",
-          icon: <Shield size={16} />,
-          tooltip: t("guilds_tooltip"),
-          lockedLvl: lockedAtLvl("guilds"),
-        },
-      ] as SidebarSubLink[],
+      children: showGuilds
+        ? COMMUNITY_SUB_NAV
+        : COMMUNITY_SUB_NAV.filter((link) => link.href !== "/guilds"),
     },
     {
       id: "arsenal",
@@ -703,6 +495,9 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           },
         ]
       : []),
+  ];
+
+  const utilityNavigation = [
     // Shown to everyone: without the badge the page explains what supporting
     // buys and how to get it, and hiding the entry left that page unreachable
     // by the only people it was written for.
@@ -711,13 +506,9 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       name: isSupporter ? t("supporter") : t("support"),
       href: "/supporter",
       icon: <Heart size={18} />,
-      tooltip: isSupporter
-        ? t("supporter_tooltip")
-        : t("support_tooltip"),
+      muted: true,
+      tooltip: isSupporter ? t("supporter_tooltip") : t("support_tooltip"),
     },
-  ];
-
-  const utilityNavigation = [
     {
       id: "wiki",
       name: t("knowledge_base"),
@@ -753,7 +544,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       tooltip?: string;
       muted?: boolean;
       external?: boolean;
-      lockedLvl?: number;
       showBadge?: boolean;
       children?: SidebarSubLink[];
     }[],
@@ -768,7 +558,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         tooltip,
         muted,
         external,
-        lockedLvl,
         showBadge,
         children,
       }) => {
@@ -798,11 +587,10 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             icon={icon}
             isActive={isLinkActive(id, href)}
             onClick={onClick}
-            showBadge={id === "summary" && hasUnclaimedMilestone}
+            showBadge={showBadge}
             tooltip={tooltip}
             muted={muted}
             external={external}
-            lockedLvl={lockedLvl}
           />
         );
       },
@@ -870,54 +658,57 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     </nav>
   );
 
-  const toSheetItems = (subLinks: SidebarSubLink[]): MoreSheetItem[] =>
-    subLinks.map((subLink) => ({
-      id: subLink.id,
-      name: t(subLink.name),
-      href: subLink.href,
-      icon: subLink.icon,
-      isActive: isSubLinkActive(subLink.href),
-      lockedLvl: subLink.lockedLvl,
-      showBadge: subLink.showBadge,
-    }));
+  // The bottom bar already carries these four.
+  const BOTTOM_TAB_IDS = ["home", "practice", "songs", "progress"];
 
-  const sectionGroup = (id: string): MoreSheetGroup[] => {
-    const section = mainNavigation.find((item) => item.id === id);
-    return section?.children
-      ? [{ id, title: section.name, items: toSheetItems(section.children) }]
-      : [];
-  };
+  const toSheetItem = (item: {
+    id: string;
+    name: string;
+    href: string;
+    icon: React.ReactNode;
+    external?: boolean;
+  }): MoreSheetItem => ({
+    id: item.id,
+    name: item.name,
+    href: item.href,
+    icon: item.icon,
+    external: item.external,
+    isActive: isLinkActive(item.id, item.href),
+  });
 
-  // What the four tabs do not reach comes first; the tabs' own sub-pages
-  // follow, so no destination is phone-unreachable.
+  const communitySection = mainNavigation.find(
+    (item) => item.id === "community",
+  );
+
+  // Everything the four tabs do not reach, so no destination is
+  // phone-unreachable.
   const moreSheetGroups: MoreSheetGroup[] = [
-    ...sectionGroup("community"),
-    ...sectionGroup("library"),
     {
       id: "places",
       items: mainNavigation
-        .filter((item) => !item.children && item.id !== "home")
-        .map((item) => ({
-          id: item.id,
-          name: item.name,
-          href: item.href,
-          icon: item.icon,
-          isActive: isLinkActive(item.id, item.href),
-        })),
+        .filter((item) => !item.children && !BOTTOM_TAB_IDS.includes(item.id))
+        .map(toSheetItem),
     },
-    ...sectionGroup("practice"),
-    ...sectionGroup("songs"),
-    ...sectionGroup("progress"),
+    ...(communitySection?.children
+      ? [
+          {
+            id: "community",
+            title: communitySection.name,
+            items: communitySection.children.map(
+              (subLink): MoreSheetItem => ({
+                id: subLink.id,
+                name: t(subLink.name),
+                href: subLink.href,
+                icon: subLink.icon,
+                isActive: isSubLinkActive(subLink.href),
+              }),
+            ),
+          },
+        ]
+      : []),
     {
       id: "utility",
-      items: utilityNavigation.map((item) => ({
-        id: item.id,
-        name: item.name,
-        href: item.href,
-        icon: item.icon,
-        external: item.external,
-        isActive: isLinkActive(item.id, item.href),
-      })),
+      items: utilityNavigation.map(toSheetItem),
     },
   ];
 

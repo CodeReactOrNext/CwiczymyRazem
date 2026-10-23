@@ -8,7 +8,7 @@ order: 1
 
 Öffne **Üben**, und du bekommst eine Wand an Optionen. Alle enden am selben Ort, einer eingetragenen Session, die deine Punkte, Serie und Fähigkeiten speist, aber sie unterscheiden sich darin, wie viel du vorher nachdenken musst.
 
-<Screenshot src="/images/wiki/practice-hub.webp" alt="Der Üben-Bildschirm: eine Karte Übungsroutinen mit Alle Routinen, Playalongs, Meine Pläne und Community, eine Karte Eintragen mit Manueller Eintrag und Freier Timer, dann Kacheln für Songs, Auto-Plan, Guitar-Pro-Dateien, Lernpfad, Mastery Roadmaps, Scale Map, Fähigkeiten, Übungen und Community-Übungen" caption="Alles darunter lebt auf diesem einen Bildschirm. Die Kacheln, die Fortschritt verfolgen, zeigen direkt auf der Karte, wie weit du bist." />
+<Screenshot src="/images/wiki/practice-hub.webp" alt="Der Üben-Bildschirm: eine Liste aller Arten zu üben — Übungsroutinen, Songs, Lernpfad, Übungskatalog, Fähigkeiten, Duelle, Bosskämpfe, Auto-Plan, Scale Map, Mastery Roadmaps und Guitar-Pro-Dateien — daneben Zeit eintragen (Freier Timer, Manueller Eintrag) und Meine Sachen" caption="Alles darunter lebt auf diesem einen Bildschirm. Die Kacheln, die Fortschritt verfolgen, zeigen direkt auf der Karte, wie weit du bist." />
 
 ## Wähle danach, wie viel Orientierung du willst
 

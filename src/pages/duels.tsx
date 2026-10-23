@@ -1,6 +1,5 @@
 import MainContainer from "components/MainContainer";
 import { DuelsView } from "feature/duels/DuelsView";
-import { LevelGate } from "feature/levelGate/components/LevelGate";
 import AppLayout from "layouts/AppLayout";
 import Head from "next/head";
 import type { ReactElement } from "react";
@@ -13,9 +12,7 @@ const DuelsPage: NextPageWithLayout = () => (
       <title>Duels | RiffQuest</title>
       <meta name='robots' content='noindex, nofollow' />
     </Head>
-    <LevelGate feature='duels'>
-      <DuelsView />
-    </LevelGate>
+    <DuelsView />
   </MainContainer>
 );
 

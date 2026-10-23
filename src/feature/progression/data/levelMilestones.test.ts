@@ -67,8 +67,8 @@ describe("the ladder", () => {
 describe("getNextMilestone", () => {
   it("looks strictly upward", () => {
     expect(getNextMilestone(1)?.lvl).toBe(3);
-    // Level 4 pays nothing, but it opens Duels — that makes it a rung.
-    expect(getNextMilestone(3)?.lvl).toBe(4);
+    // Level 4 pays nothing and opens nothing, so the climb skips it.
+    expect(getNextMilestone(3)?.lvl).toBe(5);
     expect(getNextMilestone(4)?.lvl).toBe(5);
   });
 

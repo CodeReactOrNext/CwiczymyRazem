@@ -9,25 +9,20 @@ const MAX_SESSIONS = 3;
 // After two weeks "last session" stops being a meaningful shortcut.
 const MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
 
-export function saveLastSession(info: Omit<LastSessionInfo, "at">): void {
+/**
+ * The stored list as the raw string — a value that stays equal between reads,
+ * so a component can take it as a `useSyncExternalStore` snapshot.
+ */
+export function readLastSessionsRaw(): string | null {
   try {
-    const sessions = loadLastSessions();
-    const newSession = { ...info, at: Date.now() };
-    const updated = [newSession, ...sessions].slice(0, MAX_SESSIONS);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    return localStorage.getItem(STORAGE_KEY);
   } catch {
-    // Storage full/blocked — the shortcut just won't show, nothing to handle.
+    return null;
   }
 }
 
-export function loadLastSession(): LastSessionInfo | null {
-  const sessions = loadLastSessions();
-  return sessions[0] || null;
-}
-
-export function loadLastSessions(): LastSessionInfo[] {
+export function parseLastSessions(raw: string | null): LastSessionInfo[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown[];
     if (!Array.isArray(parsed)) return [];
@@ -44,4 +39,24 @@ export function loadLastSessions(): LastSessionInfo[] {
   } catch {
     return [];
   }
+}
+
+export function loadLastSessions(): LastSessionInfo[] {
+  return parseLastSessions(readLastSessionsRaw());
+}
+
+export function saveLastSession(info: Omit<LastSessionInfo, "at">): void {
+  try {
+    const sessions = loadLastSessions();
+    const newSession = { ...info, at: Date.now() };
+    const updated = [newSession, ...sessions].slice(0, MAX_SESSIONS);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  } catch {
+    // Storage full/blocked — the shortcut just won't show, nothing to handle.
+  }
+}
+
+export function loadLastSession(): LastSessionInfo | null {
+  const sessions = loadLastSessions();
+  return sessions[0] || null;
 }

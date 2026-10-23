@@ -18,7 +18,6 @@ import {
   canPlayerRun,
   DUEL_DURATION_MS,
   DUEL_FEED_SIZE,
-  DUEL_MIN_LVL,
   DUEL_RANKING_SIZE,
   DUEL_REMIND_BEFORE_MS,
   DUEL_START_RATING,
@@ -63,7 +62,6 @@ const QUEUE_SCAN = 50;
 const CRON_BATCH = 50;
 
 export type DuelErrorCode =
-  | "LOCKED"
   | "LIMIT"
   | "NOT_FOUND"
   | "FORBIDDEN"
@@ -86,7 +84,7 @@ export interface DuelIdentity {
 
 export const readDuelIdentity = async (
   userId: string,
-): Promise<DuelIdentity & { isAdmin: boolean }> => {
+): Promise<DuelIdentity> => {
   const snap: DocumentSnapshot = await firestore
     .collection("users")
     .doc(userId)
@@ -97,7 +95,6 @@ export const readDuelIdentity = async (
     displayName: user.displayName || "Anonymous",
     avatar: user.avatar || "",
     lvl: user.statistics?.lvl ?? 1,
-    isAdmin: user.role === "admin",
   };
 };
 
@@ -147,12 +144,10 @@ const notify = (tx: Transaction, payload: Record<string, unknown>) => {
  * get it — the loser of the race is retried and finds the next one.
  */
 export async function joinDuelQueue(
-  player: DuelIdentity & { isAdmin?: boolean },
+  player: DuelIdentity,
   now: number = Date.now(),
 ): Promise<DuelJoinResult> {
-  if (player.lvl < DUEL_MIN_LVL && !player.isAdmin)
-    throw new DuelError("LOCKED");
-  // Only these four fields are stored — never the admin flag.
+  // Copied field by field so nothing but these four ever reaches a stored duel.
   const identity: DuelIdentity = {
     userId: player.userId,
     displayName: player.displayName,

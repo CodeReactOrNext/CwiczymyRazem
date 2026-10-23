@@ -47,10 +47,8 @@
     "not_enough_tokens": "Nicht genug Tokens übrig",
     "name_yours": "Der Name gehört dir für immer",
     "found": "Gilde gründen",
-    "search": "Gilden nach Name, Tag oder Beschreibung suchen…",
     "empty_title": "Noch keine Gilden",
     "empty_body": "Noch niemand hat sich einen Namen gesichert. Der erste ist noch frei.",
-    "no_match": "Keine Gilde passt zu „{{search}}“",
     "ranking": "Gildenrangliste"
   },
   "members": {
