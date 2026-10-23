@@ -1,4 +1,5 @@
 {
+  "title": "Üben",
   "continue": "Weitermachen",
   "loading": "Wird geladen...",
   "any_part": "Beliebiger Teil",
@@ -6,32 +7,37 @@
     "master": "Master",
     "premium": "Premium"
   },
+  "sections": {
+    "all": "Alle Arten zu üben",
+    "log_time": "Zeit eintragen",
+    "my_stuff": "Meine Sachen",
+    "create_plan": "Plan erstellen",
+    "create_exercise": "Übung erstellen"
+  },
   "modes": {
     "routine": {
       "title": "Übungsroutinen",
-      "description": "Folge einer geführten Tagesroutine",
-      "all": "Alle Routinen",
-      "playalongs": "Playalongs",
-      "my_plans": "Meine Pläne",
-      "community": "Community"
+      "description": "Fertige Routinen, Playalongs, deine Pläne und die der Community"
     },
-    "log": {
-      "title": "Eintragen",
-      "description": "Erfasse eine Session per Hand oder mit Stoppuhr",
-      "manual": "Manueller Eintrag",
-      "free_timer": "Freier Timer"
+    "manual_log": {
+      "title": "Manueller Eintrag",
+      "description": "Bis zu 7 Tage zurück"
+    },
+    "free_timer": {
+      "title": "Freier Timer",
+      "description": "Stoppuhr, während du spielst"
     },
     "songs": {
       "title": "Songs",
-      "description": "Erfasse die Übungszeit für dein Repertoire"
+      "description": "Übe dein Repertoire — die Zeit zählt für jeden Song"
     },
     "auto": {
       "title": "Auto-Plan",
-      "description": "Automatisch erstellte Session"
+      "description": "Eine Session, die in deine verfügbare Zeit passt"
     },
     "gp": {
       "title": "Guitar-Pro-Dateien",
-      "description": "Übe deine importierten Guitar-Pro-Tabs"
+      "description": "Übe mit importierten Tabs, mit Wiedergabe"
     },
     "learning_path": {
       "title": "Lernpfad",
@@ -39,28 +45,49 @@
     },
     "roadmaps": {
       "title": "Mastery Roadmaps",
-      "description": "Wähle eine Fähigkeit oder einen Spielstil als Fokus"
+      "description": "Ein persönlicher Plan für eine Fähigkeit oder einen Spielstil"
     },
     "scales": {
       "title": "Scale Map",
-      "description": "Interaktiver Tonleiter-Baum auf dem Griffbrett"
+      "description": "Tonleiterformen, Box für Box im Zieltempo"
+    },
+    "bosses": {
+      "title": "Bosskämpfe",
+      "description": "Besiege einen Boss Level für Level mit deiner Gitarre"
+    },
+    "duels": {
+      "title": "Duelle",
+      "description": "1 gegen 1 mit einem Fremden auf derselben Übung"
     },
     "skills": {
       "title": "Fähigkeiten",
       "description": "Sieh deinen Fortschritt nach Technik"
     },
     "exercises": {
-      "title": "Übungen",
+      "title": "Übungskatalog",
       "description": "Finde eine Übung nach Fähigkeit, Länge oder Modus"
     },
-    "community_exercises": {
-      "title": "Community-Übungen",
-      "description": "Von der Community geteilte Übungen"
+    "favorites": {
+      "title": "Favoriten"
+    },
+    "rotation": {
+      "title": "Rotation"
+    },
+    "my_plans": {
+      "title": "Meine Pläne"
+    },
+    "my_exercises": {
+      "title": "Meine Übungen"
+    },
+    "player_roadmaps": {
+      "title": "Spieler-Roadmaps"
     }
   },
+  "tags": {
+    "most_used": "Am häufigsten genutzt",
+    "new": "Neu"
+  },
   "progress": {
-    "steps": "Schritte",
-    "of_total": "{{done}} von {{total}} {{unit}}",
     "all_modules": "Alle Module abgeschlossen",
     "first_lesson": "Beginne mit der ersten Lektion",
     "next_roadmap": "Wähle deine nächste Roadmap",

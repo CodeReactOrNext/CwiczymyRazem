@@ -11,12 +11,8 @@
  * the drop tables, and opening them early would let a new account skip the
  * case loop the rest of the Arsenal is built on. The level here is also the
  * one the API enforces — see `feature/arsenal/data/commission.ts`.
- *
- * Duels wait a few sessions so a ranked match is never somebody's first
- * contact with the mic scoring, and so a fresh account is not a free win for
- * whoever drew it. The API enforces the same level (DUEL_MIN_LVL).
  */
-export type LockedFeatureId = "summary" | "duels" | "guilds" | "commissions";
+export type LockedFeatureId = "summary" | "guilds" | "commissions";
 
 export interface FeatureUnlock {
   id: LockedFeatureId;
@@ -43,19 +39,6 @@ export const FEATURE_UNLOCKS: Record<LockedFeatureId, FeatureUnlock> = {
       "Weekly targets picked from how you actually practise",
       "Fame to claim every time you clear one",
       "A read on where the week went, category by category",
-    ],
-  },
-  duels: {
-    id: "duels",
-    name: "Duels",
-    href: "/duels",
-    requiredLvl: 2,
-    reason:
-      "A duel is ranked: you and a stranger get the same exercise and the app's scoring decides. A few sessions in you know how the scoring hears you — that is when a match against somebody else is a fair one.",
-    perks: [
-      "Anonymous 1-on-1 matches on technique, fretboard and ear drills",
-      "24 hours to set your best run, as many tries as you like",
-      "An ELO rating and a ranking to climb",
     ],
   },
   guilds: {

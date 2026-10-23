@@ -1,3 +1,4 @@
+import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import {
   firebaseClaimLevel,
@@ -12,6 +13,7 @@ import {
 } from "feature/aiSummary/utils/milestoneLogic";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
+import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
 import {
   addFame,
   deductFame,
@@ -1072,6 +1074,7 @@ function RulesAlert() {
 
 export const SummaryView = () => {
   const { t } = useTranslation("milestones");
+  const progressTabs = useProgressTabs();
   const intl = useIntlLocale() ?? "en-US";
   const userAuth  = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -1200,6 +1203,14 @@ export const SummaryView = () => {
         backgroundContent={<HeroPattern />}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
+
+      <div className="mt-6 px-4 md:px-6">
+        <PageTabs
+          tabs={progressTabs}
+          activeHref="/summary"
+          ariaLabel="Progress sections"
+        />
+      </div>
 
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 p-4 pb-14 md:gap-10 md:p-8 md:pb-20 lg:p-10 lg:pb-24">
         <RulesAlert />

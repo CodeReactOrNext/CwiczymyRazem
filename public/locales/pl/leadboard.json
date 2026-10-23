@@ -37,6 +37,11 @@
     "point": "punkt",
     "points": "punkty"
   },
+  "rewards": {
+    "title": "Nagrody sezonu",
+    "place": "Miejsce {{place}}: {{fame}} Fame",
+    "range": "Miejsca {{from}}–{{to}}: {{max}}–{{min}} Fame"
+  },
   "hero": {
     "season": "Sezon",
     "season_subtitle": "Ćwicz, żeby piąć się w rankingu.",
@@ -45,8 +50,7 @@
     "title": "Ranking",
     "subtitle": "Zobacz, jak wypadasz na tle innych graczy",
     "all_time_eyebrow": "Ranking wszech czasów",
-    "sections": "Sekcje rankingu",
-    "how_points": "Jak działają punkty"
+    "sections": "Sekcje rankingu"
   },
   "scope": {
     "top": "Najlepsi gracze",

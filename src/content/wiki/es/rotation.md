@@ -10,13 +10,13 @@ La Rotación es tu propia lista de cosas que no quieres perder: una canción que
 
 ## Añadir a tu rotación
 
-<ClickPath steps="Biblioteca|Rotación|Añadir" caption="Cambia entre Canciones, Ejercicios y Habilidades y luego toca cualquier cosa para añadirla. Tócala de nuevo para sacarla." />
+<ClickPath steps="Mis cosas|Rotación|Añadir" caption="Cambia entre Canciones, Ejercicios y Habilidades y luego toca cualquier cosa para añadirla. Tócala de nuevo para sacarla." />
 
 Las canciones salen de tu propia biblioteca de canciones, con las dominadas arriba. Los ejercicios salen de toda la biblioteca de ejercicios. Una habilidad no suena sola: cuando le toca el turno, recibes uno de los ejercicios que la entrenan, el que menos recientemente has tocado. Tu rotación admite hasta 60 elementos.
 
 ## Tus propios elementos
 
-<ClickPath steps="Biblioteca|Rotación|Añadir|Propios" caption="Ponle un nombre y añade una nota o un enlace si quieres. Toca un ejemplo para partir de él." />
+<ClickPath steps="Mis cosas|Rotación|Añadir|Propios" caption="Ponle un nombre y añade una nota o un enlace si quieres. Toca un ejemplo para partir de él." />
 
 También puede entrar cualquier cosa que no esté en la app: la siguiente lección de un curso online, un acorde nuevo al día, un lick para sacar de oído. El enlace puede ser la página de un curso, un vídeo o cualquier otra cosa de la web, y queda justo al lado del elemento.
 
@@ -32,7 +32,7 @@ Cuenta todo lo que toques, dondequiera que lo toques: una sesión de Rotación, 
 
 ## Tocar desde tu rotación
 
-<ClickPath steps="Biblioteca|Rotación|Tocar los 3 más olvidados" caption="Empieza una sesión corta con las tres cosas que llevas más tiempo sin tocar." />
+<ClickPath steps="Mis cosas|Rotación|Tocar los 3 más olvidados" caption="Empieza una sesión corta con las tres cosas que llevas más tiempo sin tocar." />
 
 La parte superior de la página muestra los siguientes elementos como una mano de cartas y cuántos esperan un repaso. **Tocar los 3 más olvidados** los mete en una sesión. Las canciones reciben allí cinco minutos cada una, y los ejercicios conservan su duración habitual. El botón de reproducir de cualquier fila empieza una sesión solo con ese elemento.
 

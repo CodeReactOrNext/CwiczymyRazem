@@ -8,7 +8,7 @@ order: 3
 
 **Rutyna** (aplikacja nazywa ją też planem ćwiczeń) to nic sprytniejszego niż uporządkowana lista ćwiczeń z nazwą, poziomem trudności i kategorią. Przechodzisz ją od góry do dołu, a na końcu zapisuje za ciebie sesję.
 
-<ClickPath steps="Ćwiczenia|Rutyny ćwiczeń" caption="Gotowe rutyny, granie z podkładem, twoje własne plany i plany udostępnione przez innych graczy." />
+<ClickPath steps="Ćwicz|Rutyny ćwiczeń" caption="Gotowe rutyny, granie z podkładem, twoje własne plany i plany udostępnione przez innych graczy." />
 
 ## Trzy sposoby na rutynę
 
@@ -22,7 +22,7 @@ Wybierasz długość od 15 minut do 2 godzin, opcjonalnie zawężasz do określo
 
 Etykieta trudności wygenerowanego planu jest wyliczana z ćwiczeń, które faktycznie zostały wybrane, więc „średni” plan naprawdę jest średnim miksem. Zanim zaczniesz, możesz zmienić kolejność ćwiczeń, usunąć te, na które nie masz ochoty, albo wylosować ponownie dowolne ćwiczenie na inne.
 
-<ClickPath steps="Ćwiczenia|Plan automatyczny" caption="Wybierz długość, naciśnij start, graj." />
+<ClickPath steps="Ćwicz|Plan automatyczny" caption="Wybierz długość, naciśnij start, graj." />
 
 ## Co jest w ćwiczeniu
 
@@ -32,7 +32,7 @@ Etykieta trudności wygenerowanego planu jest wyliczana z ćwiczeń, które fakt
 
 Rutyna może zawierać utwory z twojej biblioteki obok ćwiczeń, więc cała sesja — rozgrzewka, ćwiczenie techniczne, a potem utwór, którego się uczysz — mieszka w jednym planie.
 
-<ClickPath steps="Moje rzeczy|Utwórz plan|Utwory" caption="Twoja biblioteka, pogrupowana na W trakcie nauki, Chcę się nauczyć i Opanowane utwory. Wybierz utwór, zdecyduj, jak będziesz go ćwiczyć i jak długi ma być jego slot, a potem ułóż go jak każdy inny element." />
+<ClickPath steps="Moje rzeczy|Moje plany|Utwórz plan|Utwory" caption="Twoja biblioteka, pogrupowana na W trakcie nauki, Chcę się nauczyć i Opanowane utwory. Wybierz utwór, zdecyduj, jak będziesz go ćwiczyć i jak długi ma być jego slot, a potem ułóż go jak każdy inny element." />
 
 <Checklist items="Tabulatura Guitar Pro::Dostępna, gdy dołączysz plik do utworu — tabulatura pojawia się w rutynie z wykrywaniem nut i podkładem, tak jak na stronie ćwiczenia samego utworu|Mapa sekcji::Wideo utworu z oznaczonymi przez ciebie sekcjami, pętlami i opanowaniem, dokładnie jak w stoperze utworu. Nie przypiąłeś jeszcze wideo? Przypnij je i oznacz sekcje od razu w sesji — to ta sama mapa, zapisana w tym samym miejscu|Zmień zdanie później::Przycisk czasu przy utworze w planie ponownie otwiera wybór|Czas idzie na utwór::Każda minuta spędzona na tym elemencie liczy się jako czas z utworem, dokładnie tak jak w stoperze utworu — i tylko raz. Nie ma osobnego dziennika utworu do uzupełnienia potem|Posuwa utwór dalej::Ćwiczenie go w rutynie przenosi utwór, który tylko chciałeś poznać, do W trakcie nauki|Bez własnych punktów umiejętności::Element utworu zasila utwór, a nie umiejętność. Ćwiczenia wokół niego nadal to robią" />
 
@@ -40,7 +40,7 @@ Rutyna może zawierać utwory z twojej biblioteki obok ćwiczeń, więc cała se
 
 Każde ćwiczenie, które tworzysz, trafia do jednej puli; jeden przełącznik publiczne/prywatne decyduje, kto je widzi.
 
-<Checklist items="Moje ćwiczenia::Wszystko, co napisałeś, publiczne lub prywatne, w Moje rzeczy|Społeczność::Tylko publiczne, dostępne dla wszystkich i sortowane według oceny, w Ćwiczenia → Ćwiczenia" />
+<Checklist items="Moje ćwiczenia::Wszystko, co napisałeś, publiczne lub prywatne, w Moje rzeczy|Społeczność::Tylko publiczne, dostępne dla wszystkich i sortowane według oceny, w Ćwicz → Katalog ćwiczeń" />
 
 Ćwiczenia społeczności można oceniać od jednej do pięciu gwiazdek. Dzielenie się też trochę płaci: „dzięki” od innego gracza daje ci **+5 Fame**, a pierwszy raz, gdy ktoś inny niż ty ukończy twoje ćwiczenie, daje **+1 Fame**. Granie własnego ćwiczenia nie liczy się do jego liczby odtworzeń.
 

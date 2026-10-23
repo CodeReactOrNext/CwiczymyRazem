@@ -28,7 +28,7 @@ export const DailyResultBoard = ({
           <li
             key={row.place}
             className={cn(
-              "flex items-center gap-2.5 rounded-md px-2 py-1 text-xs",
+              "flex items-center gap-2.5 rounded px-2 py-1 text-xs",
               row.place === place ? "bg-cyan-500/10 font-semibold text-cyan-300" : "text-zinc-400",
             )}>
             <span className='w-5 shrink-0 text-right tabular-nums'>{row.place}</span>

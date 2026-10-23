@@ -10,7 +10,7 @@ Das meiste von riff.quest lässt dich üben, wonach dir ist. Diese zwei nicht: S
 
 ## Lernpfad
 
-<ClickPath steps="Üben|Lernpfad" caption="Module aus Stufen, Stufen aus Schritten und am Ende jeder Stufe eine Prüfung." />
+<ClickPath steps="Lernpfad" caption="Module aus Stufen, Stufen aus Schritten und am Ende jeder Stufe eine Prüfung." />
 
 Aktuell sind zwei Module live, **Fundamentals** und **Fretboard Mastery**, während Rhythmus, Tonleitern und Improvisation als demnächst markiert sind. Jeder Schritt kommt mit Anleitung, Checkliste und Tipps.
 

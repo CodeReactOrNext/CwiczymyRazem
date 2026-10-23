@@ -9,7 +9,6 @@ import type {
   DuelTicket,
   DuelView,
 } from "feature/duels/types/duel.types";
-import { FEATURE_UNLOCKS } from "feature/levelGate/data/featureUnlocks";
 
 const HOUR_MS = 60 * 60 * 1000;
 
@@ -40,9 +39,6 @@ export const DUEL_RECENT_LIMIT = 10;
 export const DUEL_RANKING_SIZE = 20;
 /** How many settled duels the public feed lists. */
 export const DUEL_FEED_SIZE = 20;
-
-/** The level duels open at — the same number the level gate and the API use. */
-export const DUEL_MIN_LVL = FEATURE_UNLOCKS.duels.requiredLvl;
 
 // ── ELO ──────────────────────────────────────────────────────────────────────
 

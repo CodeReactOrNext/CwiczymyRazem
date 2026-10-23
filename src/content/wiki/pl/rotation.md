@@ -10,13 +10,13 @@ Rotacja to twoja własna lista rzeczy, których nie chcesz stracić: utwór, kt�
 
 ## Dodawanie do rotacji
 
-<ClickPath steps="Biblioteka|Rotacja|Dodaj" caption="Przełączaj się między Utworami, Ćwiczeniami i Umiejętnościami, a potem stuknij cokolwiek, żeby dodać. Stuknij ponownie, żeby usunąć." />
+<ClickPath steps="Moje rzeczy|Rotacja|Dodaj" caption="Przełączaj się między Utworami, Ćwiczeniami i Umiejętnościami, a potem stuknij cokolwiek, żeby dodać. Stuknij ponownie, żeby usunąć." />
 
 Utwory pochodzą z twojej własnej biblioteki utworów, z tymi opanowanymi na górze. Ćwiczenia pochodzą z całej biblioteki ćwiczeń. Umiejętność nie gra sama: gdy przychodzi jej kolej, dostajesz jedno z ćwiczeń, które ją trenują, to, które grałeś najdawniej. Twoja rotacja mieści do 60 rzeczy.
 
 ## Własne pozycje
 
-<ClickPath steps="Biblioteka|Rotacja|Dodaj|Własne" caption="Nadaj nazwę i dodaj notatkę lub link, jeśli chcesz. Stuknij przykład, żeby od niego zacząć." />
+<ClickPath steps="Moje rzeczy|Rotacja|Dodaj|Własne" caption="Nadaj nazwę i dodaj notatkę lub link, jeśli chcesz. Stuknij przykład, żeby od niego zacząć." />
 
 Można dodać także wszystko, czego nie ma w aplikacji: następną lekcję kursu online, jeden nowy akord dziennie, lick do wyłapania ze słuchu. Link może prowadzić do strony kursu, wideo albo czegokolwiek innego w sieci i leży tuż obok pozycji.
 
@@ -32,7 +32,7 @@ Liczy się wszystko, co zagrasz, gdziekolwiek to zagrasz: sesja z Rotacji, rutyn
 
 ## Granie z rotacji
 
-<ClickPath steps="Biblioteka|Rotacja|Zagraj 3 najdawniej grane" caption="Rozpoczyna jedną krótką sesję z trzema rzeczami, których nie grałeś najdłużej." />
+<ClickPath steps="Moje rzeczy|Rotacja|Zagraj 3 najdawniej grane" caption="Rozpoczyna jedną krótką sesję z trzema rzeczami, których nie grałeś najdłużej." />
 
 Góra strony pokazuje kilka następnych pozycji jako rękę kart i to, ile czeka na odświeżenie. **Zagraj 3 najdawniej grane** wrzuca je do jednej sesji. Utwory dostają tam po pięć minut, a ćwiczenia zachowują swoją zwykłą długość. Przycisk odtwarzania w dowolnym wierszu rozpoczyna sesję tylko z tą jedną pozycją.
 

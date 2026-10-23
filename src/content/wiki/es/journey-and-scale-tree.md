@@ -10,7 +10,7 @@ La mayor parte de riff.quest te deja practicar lo que te apetezca. Estas dos no:
 
 ## Ruta de aprendizaje
 
-<ClickPath steps="Práctica|Ruta de aprendizaje" caption="Módulos hechos de etapas, etapas hechas de pasos y un examen al final de cada etapa." />
+<ClickPath steps="Ruta de aprendizaje" caption="Módulos hechos de etapas, etapas hechas de pasos y un examen al final de cada etapa." />
 
 Hoy hay dos módulos activos, **Fundamentals** y **Fretboard Mastery**, con ritmo, escalas e improvisación marcados como próximamente. Cada paso viene con instrucciones, una lista de comprobación y consejos.
 

@@ -23,7 +23,6 @@
     "matched": "Opponent found — your duel is below.",
     "queued": "You're in the queue. We'll let you know when someone joins.",
     "error_limit": "You already have {{max}} duels open.",
-    "error_locked": "Duels open at level 2.",
     "error": "Couldn't join right now. Try again in a moment.",
     "ticket": "Looking for an opponent",
     "ticket_expires": "Expires in {{time}}",

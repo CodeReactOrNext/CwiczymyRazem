@@ -21,15 +21,6 @@
         "2": "Podsumowanie, na co poszedł tydzień, kategoria po kategorii"
       }
     },
-    "duels": {
-      "name": "Duele",
-      "reason": "Duel jest rankingowy: ty i nieznajomy dostajecie to samo ćwiczenie, a rozstrzyga punktacja aplikacji. Po kilku sesjach wiesz już, jak punktacja cię słyszy — wtedy pojedynek z kimś innym jest uczciwy.",
-      "perks": {
-        "0": "Anonimowe pojedynki 1 na 1 na ćwiczeniach technicznych, gryfowych i słuchowych",
-        "1": "24 godziny na najlepszy wynik, ile chcesz podejść",
-        "2": "Ranking ELO, w którym możesz piąć się w górę"
-      }
-    },
     "guilds": {
       "name": "Gildie",
       "reason": "Gildia działa dzięki ludziom, którzy pojawiają się dla siebie nawzajem. Po kilku poziomach masz już własną rutynę — i wtedy dołączenie daje coś także reszcie gildii, nie tylko tobie.",

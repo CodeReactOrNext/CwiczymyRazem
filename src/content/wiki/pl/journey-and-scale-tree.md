@@ -10,7 +10,7 @@ Większość riff.quest pozwala ćwiczyć to, na co masz ochotę. Te dwie rzeczy
 
 ## Ścieżka nauki
 
-<ClickPath steps="Ćwiczenia|Ścieżka nauki" caption="Moduły złożone z etapów, etapy złożone z kroków i egzamin na końcu każdego etapu." />
+<ClickPath steps="Ścieżka nauki" caption="Moduły złożone z etapów, etapy złożone z kroków i egzamin na końcu każdego etapu." />
 
 Obecnie aktywne są dwa moduły, **Fundamentals** i **Fretboard Mastery**, a rytm, skale i improwizacja są oznaczone jako wkrótce. Każdy krok ma instrukcje, listę kontrolną i wskazówki.
 
@@ -22,7 +22,7 @@ Obecnie aktywne są dwa moduły, **Fundamentals** i **Fretboard Mastery**, a ryt
 
 ## Mapa skal
 
-<ClickPath steps="Ćwiczenia|Mapa skal" caption="Dziewięć rodzin skal, każda rozbita na kształty, które naprawdę grasz." />
+<ClickPath steps="Ćwicz|Mapa skal" caption="Dziewięć rodzin skal, każda rozbita na kształty, które naprawdę grasz." />
 
 Mapa obejmuje pentatonikę mollową i durową, molową naturalną, durową oraz pięć trybów. Pentatoniki używają nazw boksów, jakie usłyszałbyś od nauczyciela: boks 1 do 5, w kolejności, w jakiej byś je poznawał, z progiem, na którym leży każdy kształt, zapisanym pod spodem. Pozostałe skale nie mają nazw boksów, więc ich kształty nazywa się po progu, od którego się zaczynają.
 

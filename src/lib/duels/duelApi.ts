@@ -31,7 +31,6 @@ export async function authenticateDuelRequest(
 }
 
 const STATUS: Record<DuelErrorCode, number> = {
-  LOCKED: 403,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   LIMIT: 409,

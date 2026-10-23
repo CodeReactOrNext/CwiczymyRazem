@@ -1,9 +1,14 @@
+import { buttonVariants } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
+import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import { HeroPattern } from "components/UI/HeroBanner";
 import type { ModeProgressSummary } from "feature/practice/hooks/usePracticeModeProgress";
 import { usePracticeModeProgress } from "feature/practice/hooks/usePracticeModeProgress";
-import type { LastSessionInfo } from "feature/practice/utils/lastSession";
-import { loadLastSessions } from "feature/practice/utils/lastSession";
+import {
+  parseLastSessions,
+  readLastSessionsRaw,
+} from "feature/practice/utils/lastSession";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useRipple } from "hooks/useRipple";
@@ -12,229 +17,140 @@ import {
   ArrowRight,
   Brain,
   CassetteTape,
+  ClipboardCheck,
   ClipboardList,
-  Dumbbell,
+  Clock,
+  Heart,
   History,
   ListChecks,
   ListTree,
-  Lock,
+  Loader2,
+  Music2,
   NotebookPen,
+  Plus,
+  Repeat,
   Route,
-  Users,
+  Search,
+  Signpost,
+  Skull,
+  Swords,
   WandSparkles,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { SiGuitarpro } from "react-icons/si";
 import { useAppSelector } from "store/hooks";
 
-const colorMap = {
-  amber: {
-    iconBg: "bg-gradient-to-br from-amber-500/20 to-amber-500/5",
-    iconBorder:
-      "border border-white/5 border-t-amber-500/40 border-l-amber-500/20",
-    iconText: "text-amber-400",
-    cardBg: "bg-zinc-800/60",
-  },
-  rose: {
-    iconBg: "bg-gradient-to-br from-rose-500/20 to-rose-500/5",
-    iconBorder:
-      "border border-white/5 border-t-rose-500/40 border-l-rose-500/20",
-    iconText: "text-rose-400",
-    cardBg: "bg-zinc-800/60",
-  },
-  emerald: {
-    iconBg: "bg-gradient-to-br from-emerald-500/20 to-emerald-500/5",
-    iconBorder:
-      "border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20",
-    iconText: "text-emerald-400",
-    cardBg: "bg-zinc-800/60",
-  },
-  indigo: {
-    iconBg: "bg-gradient-to-br from-indigo-500/20 to-indigo-500/5",
-    iconBorder:
-      "border border-white/5 border-t-indigo-500/40 border-l-indigo-500/20",
-    iconText: "text-indigo-400",
-    cardBg: "bg-zinc-800/60",
-  },
-} as const;
-
-type ColorKey = keyof typeof colorMap;
-
-interface ModeLink {
-  label: string;
-  onClick: () => void;
-}
-
-interface ModeCardProps {
+interface ModeRowProps {
   Icon: React.ElementType;
   title: string;
   description: string;
-  ck: ColorKey;
   loading: boolean;
-  locked?: boolean;
+  /** The plan the mode needs — set only while the account does not have it. */
   lockLabel?: string;
-  hero?: boolean;
-  links?: ModeLink[];
+  /** A note like "New" or "Most used". */
+  tag?: string;
   progress?: ModeProgressSummary;
-  progressUnit?: string;
   onActivate: () => void;
 }
 
-const ModeCard = ({
+/**
+ * One way to practise as one row of the list. The right edge says where the
+ * player stands in it — a plan it needs, a tag, or their own progress — so the
+ * row tells you something before you open it.
+ *
+ * On a phone that edge only keeps the plan lock: tags and progress squeeze the
+ * description into three lines, and the lock is the one note that changes what
+ * a tap does.
+ */
+const ModeRow = ({
   Icon,
   title,
   description,
-  ck,
   loading,
-  locked,
   lockLabel,
-  hero,
-  links,
+  tag,
   progress,
-  progressUnit,
   onActivate,
-}: ModeCardProps) => {
+}: ModeRowProps) => {
   const { t } = useTranslation("practice_hub");
-  const c = colorMap[ck];
   const { createRipple, ripple } = useRipple("bg-white/15");
-  // A card with links is a group: the header is a label and only the list rows
-  // navigate — every destination gets exactly one click target.
-  const isGroup = !!links && links.length > 0;
 
   return (
-    <div
-      className={`group relative flex items-start gap-3 overflow-hidden rounded-xl transition-background duration-base ${
-        hero
-          ? `${c.cardBg} bg-gradient-to-br from-white/[0.03] to-transparent p-[18px] backdrop-blur-md`
-          : `${c.cardBg} bg-gradient-to-br from-white/[0.02] to-transparent p-3.5 backdrop-blur-sm`
-      } ${
-        isGroup
-          ? ""
-          : locked
-          ? "cursor-default opacity-60"
-          : `cursor-pointer ${
-              hero ? "hover:bg-white/[0.08]" : "hover:bg-white/[0.06]"
-            }`
-      }`}
-      onClick={
-        isGroup
-          ? undefined
-          : (e) => {
-              createRipple(e);
-              if (!loading) onActivate();
-            }
-      }
-      tabIndex={isGroup ? undefined : 0}
-      role={isGroup ? undefined : "button"}>
+    <button
+      type='button'
+      onClick={(e) => {
+        createRipple(e);
+        if (!loading) onActivate();
+      }}
+      className='relative flex min-h-[68px] w-full items-center gap-4 overflow-hidden rounded-lg px-3.5 py-2.5 text-left transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
       {ripple}
-      <div
-        className={`flex flex-shrink-0 items-center justify-center rounded-lg ${
-          c.iconBg
-        } ${c.iconBorder} ${hero ? "h-14 w-14" : "h-12 w-12"}`}>
+      <span className='flex h-6 w-6 shrink-0 items-center justify-center text-zinc-400'>
         {loading ? (
-          <div
-            className={`${
-              hero ? "h-8 w-8" : "h-7 w-7"
-            } animate-spin rounded-full border-[3px] border-white border-t-transparent`}
-          />
+          <Loader2 className='h-5 w-5 animate-spin' />
         ) : (
-          <Icon
-            className={`${hero ? "h-8 w-8" : "h-7 w-7"} ${
-              c.iconText
-            } transition-colors duration-base`}
-          />
+          <Icon className='h-5 w-5' />
         )}
-      </div>
-      <div className='min-w-0 flex-1'>
-        <div className='mb-0.5 flex items-center gap-2'>
-          <h3
-            className={
-              hero
-                ? "truncate text-[17px] font-black tracking-wide text-white"
-                : "truncate text-[14px] font-bold text-white transition-colors group-hover:text-white"
-            }>
-            {title}
-          </h3>
-          {locked && (
-            <div
-              className={`flex items-center gap-1 rounded-full bg-amber-500/10 ${
-                hero ? "px-2.5" : "px-2"
-              } py-0.5`}>
-              <Lock className='h-2.5 w-2.5 text-amber-500/80' />
-              <span className='text-[9px] font-black tracking-widest text-amber-500/80'>
-                {lockLabel}
-              </span>
-            </div>
-          )}
-        </div>
-        <p
-          className={
-            hero
-              ? "text-[13px] font-medium leading-relaxed text-zinc-500"
-              : "truncate text-[12px] text-zinc-500 transition-colors group-hover:text-zinc-400"
-          }>
-          {description}
-        </p>
-        {/* Reserved for every non-hero card (visible or not) so tiles share one height
-            across the whole grid — a card with no progress data would otherwise sit
-            shorter than its neighbours and make the rows look uneven. */}
-        {!hero && (
-          <div
-            className={`mt-2.5 space-y-1 ${
-              !locked && progress ? "" : "invisible"
-            }`}>
-            {/* The bar only measures the one path in progress; libraries get a count. */}
-            <div
-              className={`h-1.5 w-full overflow-hidden rounded-full bg-white/5 ${
-                progress?.total ? "" : "invisible"
-              }`}>
-              <div
-                className='h-full rounded-full bg-cyan-400 transition-all duration-slow'
-                style={{
-                  width:
-                    progress?.total && progress.done !== undefined
-                      ? `max(${Math.round((progress.done / progress.total) * 100)}%, 3px)`
-                      : 0,
-                }}
-              />
-            </div>
-            <p className='truncate text-[11px] font-semibold tabular-nums text-zinc-500'>
-              {progress?.labelKey
-                ? t(progress.labelKey, progress.labelVars)
-                : progress?.label}
-              {progress?.total
-                ? ` · ${t("progress.of_total", {
-                    done: progress.done ?? 0,
-                    total: progress.total,
-                    unit: progressUnit ?? "",
-                  })}`
-                : ""}
-            </p>
-          </div>
-        )}
-        {links && links.length > 0 && (
-          <div className='relative z-10 mt-4 flex flex-col gap-1.5'>
-            {links.map((link) => (
-              <button
-                key={link.label}
-                type='button'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  link.onClick();
-                }}
-                className='group/link relative flex min-h-[42px] items-center justify-between overflow-hidden rounded-lg bg-white/[0.05] px-3 py-2 text-left text-[13px] font-semibold text-zinc-100 transition-background duration-base hover:bg-white/[0.12] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:scale-[0.98]'>
-                <Ripple className='bg-white/20' />
-                <span>{link.label}</span>
-                <ArrowRight className='h-4 w-4 shrink-0 text-zinc-400 transition-all group-hover/link:translate-x-0.5 group-hover/link:text-white' />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+      </span>
+      <span className='flex min-w-0 flex-1 flex-col'>
+        <span className='text-[15px] font-semibold text-zinc-100'>{title}</span>
+        <span className='text-[13px] text-zinc-400'>{description}</span>
+      </span>
+      {lockLabel ? (
+        <Chip color='gray' className='shrink-0 rounded px-2 py-0.5 text-[11px]'>
+          {lockLabel}
+        </Chip>
+      ) : tag ? (
+        <Chip
+          color='gray'
+          className='hidden shrink-0 rounded px-2 py-0.5 text-[11px] sm:inline-flex'>
+          {tag}
+        </Chip>
+      ) : progress?.total ? (
+        // The bar only measures the one path in progress; libraries get a count.
+        <span className='hidden shrink-0 items-center gap-2.5 sm:flex'>
+          <span className='h-1.5 w-24 overflow-hidden rounded-full bg-zinc-800'>
+            <span
+              className='block h-full rounded-full bg-cyan-400 transition-all duration-slow'
+              style={{
+                width: `max(${Math.round(((progress.done ?? 0) / progress.total) * 100)}%, 3px)`,
+              }}
+            />
+          </span>
+          <span className='text-xs font-medium tabular-nums text-zinc-400'>
+            {progress.done ?? 0}/{progress.total}
+          </span>
+        </span>
+      ) : progress ? (
+        <span className='hidden max-w-[40%] shrink-0 truncate text-right text-xs font-medium text-zinc-400 sm:block'>
+          {progress.labelKey
+            ? t(progress.labelKey, progress.labelVars)
+            : progress.label}
+        </span>
+      ) : null}
+    </button>
   );
 };
+
+// Sessions are only saved by this tab's own navigation, so there is nothing to
+// listen for — the list is read once the page is on the client.
+const noStorageSubscription = () => () => {};
+// The server has no storage: no "continue" row until hydration is done.
+const getServerLastSessions = () => null;
+
+const createLinkClass = cn(
+  buttonVariants({ variant: "secondary", size: "sm" }),
+  "shadow-none"
+);
+
+const MY_STUFF = [
+  { id: "favorites", Icon: Heart, href: "/favorites" },
+  { id: "rotation", Icon: Repeat, href: "/rotation" },
+  { id: "my_plans", Icon: ClipboardCheck, href: "/plans" },
+  { id: "my_exercises", Icon: Music2, href: "/my-exercises" },
+  { id: "player_roadmaps", Icon: Signpost, href: "/my-roadmaps" },
+];
 
 export const PracticeModeSelector = () => {
   const { t } = useTranslation("practice_hub");
@@ -249,12 +165,17 @@ export const PracticeModeSelector = () => {
 
   const [loadingMode, setLoadingMode] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [lastSessions, setLastSessions] = useState<LastSessionInfo[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    setLastSessions(loadLastSessions());
-  }, []);
+  const lastSessionsRaw = useSyncExternalStore(
+    noStorageSubscription,
+    readLastSessionsRaw,
+    getServerLastSessions
+  );
+  const lastSessions = useMemo(
+    () => parseLastSessions(lastSessionsRaw),
+    [lastSessionsRaw]
+  );
 
   const nav = (href: string, id: string, locked?: boolean) => {
     if (locked) {
@@ -265,39 +186,49 @@ export const PracticeModeSelector = () => {
     router.push(href);
   };
 
-  const modeItem = (
+  const modeRow = (
     id: string,
     Icon: React.ElementType,
-    title: string,
-    description: string,
     href: string,
-    ck: ColorKey,
     options?: {
-      hero?: boolean;
-      locked?: boolean;
+      tag?: string;
       lockLabel?: string;
-      links?: { label: string; href: string }[];
       progress?: ModeProgressSummary;
-      progressUnit?: string;
     }
   ) => (
-    <ModeCard
+    <ModeRow
+      key={id}
       Icon={Icon}
-      title={title}
-      description={description}
-      ck={ck}
+      title={t(`modes.${id}.title`)}
+      description={t(`modes.${id}.description`)}
       loading={loadingMode === id}
-      hero={options?.hero}
-      locked={options?.locked}
       lockLabel={options?.lockLabel}
-      links={options?.links?.map((link) => ({
-        label: link.label,
-        onClick: () => nav(link.href, `${id}:${link.label}`, options?.locked),
-      }))}
+      tag={options?.tag}
       progress={options?.progress}
-      progressUnit={options?.progressUnit}
-      onActivate={() => nav(href, id, options?.locked)}
+      onActivate={() => nav(href, id, !!options?.lockLabel)}
     />
+  );
+
+  const logButton = (id: string, Icon: React.ElementType, href: string) => (
+    <button
+      type='button'
+      onClick={() => nav(href, id)}
+      className='relative flex min-h-[52px] w-full items-center gap-3 overflow-hidden rounded-lg bg-zinc-800/50 px-3.5 text-left transition-background hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
+      <Ripple className='bg-white/15' />
+      {loadingMode === id ? (
+        <Loader2 className='h-[18px] w-[18px] shrink-0 animate-spin text-zinc-400' />
+      ) : (
+        <Icon className='h-[18px] w-[18px] shrink-0 text-zinc-400' />
+      )}
+      <span className='flex min-w-0 flex-col'>
+        <span className='text-sm font-semibold text-zinc-100'>
+          {t(`modes.${id}.title`)}
+        </span>
+        <span className='text-xs text-zinc-400'>
+          {t(`modes.${id}.description`)}
+        </span>
+      </span>
+    </button>
   );
 
   return (
@@ -307,164 +238,115 @@ export const PracticeModeSelector = () => {
           className='opacity-[0.04]'
           maskImage='linear-gradient(to bottom, black 0%, black 20%, transparent 80%)'
         />
-        <div className='container relative z-10 mx-auto max-w-6xl px-4 py-12 font-sans sm:px-6'>
-          <div className='flex flex-col gap-6'>
-            {lastSessions.length > 0 && (
-              <div className='flex flex-col gap-2.5'>
-                <p className='flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-zinc-500'>
-                  <History className='h-3.5 w-3.5' />
-                  {t("continue")}
-                </p>
-                <div className='-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:px-0'>
-                  {lastSessions.map((session) => (
-                    <button
-                      key={session.at}
-                      type='button'
-                      onClick={() => nav(session.href, `resume-${session.at}`)}
-                      className='group relative flex shrink-0 items-center gap-2 overflow-hidden rounded-full bg-zinc-800/60 py-2 pl-3.5 pr-3 text-left transition-background duration-base hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-                      <Ripple className='bg-white/15' />
-                      {loadingMode === `resume-${session.at}` && (
-                        <div className='h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-[2px] border-white border-t-transparent' />
-                      )}
-                      <span className='max-w-[200px] truncate text-[13px] font-medium text-zinc-200 group-hover:text-white'>
-                        {session.title}
-                      </span>
-                      <ArrowRight className='h-3.5 w-3.5 shrink-0 text-zinc-500 transition-all group-hover:translate-x-0.5 group-hover:text-white' />
-                    </button>
-                  ))}
+        <div className='container relative z-10 mx-auto max-w-6xl space-y-8 px-4 py-12 font-sans sm:px-6'>
+          <h1 className='font-display text-3xl font-extrabold tracking-tight text-zinc-100'>
+            {t("title")}
+          </h1>
+
+          {lastSessions.length > 0 && (
+            <section className='space-y-3'>
+              <h2 className='flex items-center gap-2 text-base font-semibold text-zinc-200'>
+                <History className='h-4 w-4 text-zinc-400' />
+                {t("continue")}
+              </h2>
+              <div className='-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:px-0'>
+                {lastSessions.map((session) => (
+                  <button
+                    key={session.at}
+                    type='button'
+                    onClick={() => nav(session.href, `resume-${session.at}`)}
+                    className='group relative flex shrink-0 items-center gap-2 overflow-hidden rounded-full bg-zinc-800/60 py-2 pl-3.5 pr-3 text-left transition-background hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                    <Ripple className='bg-white/15' />
+                    {loadingMode === `resume-${session.at}` && (
+                      <Loader2 className='h-3.5 w-3.5 shrink-0 animate-spin text-zinc-200' />
+                    )}
+                    <span className='max-w-[200px] truncate text-sm font-medium text-zinc-200 group-hover:text-white'>
+                      {session.title}
+                    </span>
+                    <ArrowRight className='h-3.5 w-3.5 shrink-0 text-zinc-400 transition-colors group-hover:text-white' />
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <div className='flex flex-col items-start gap-8 lg:flex-row'>
+            <section className='w-full min-w-0 flex-1 space-y-3'>
+              <h2 className='text-base font-semibold text-zinc-200'>
+                {t("sections.all")}
+              </h2>
+              {/* Ordered by how often players open each one from this page —
+                  except Boss Fights and Duels, which sit high on purpose: they
+                  are new, and a spot at the bottom is how nobody finds them. */}
+              <div className='space-y-0.5 rounded-lg bg-zinc-900/60 p-2'>
+                {modeRow("routine", ListChecks, "/timer/plans", {
+                  tag: t("tags.most_used"),
+                })}
+                {modeRow("songs", CassetteTape, "/songs?view=board")}
+                {modeRow("learning_path", Route, "/journey", {
+                  progress: modeProgress.learningPath,
+                })}
+                {modeRow("exercises", Search, "/profile/skills?tab=browse")}
+                {modeRow("skills", Brain, "/profile/skills", {
+                  progress: modeProgress.skills,
+                })}
+                {modeRow("duels", Swords, "/duels", { tag: t("tags.new") })}
+                {modeRow("bosses", Skull, "/bosses", { tag: t("tags.new") })}
+                {modeRow("auto", WandSparkles, "/timer/auto", {
+                  lockLabel: isMaster ? undefined : t("lock.master"),
+                })}
+                {modeRow("scales", ListTree, "/scale-tree", {
+                  progress: modeProgress.scaleMap,
+                })}
+                {modeRow("roadmaps", ClipboardList, "/ai-coach", {
+                  progress: modeProgress.roadmaps,
+                })}
+                {modeRow("gp", SiGuitarpro, "/gp-tabs", {
+                  lockLabel: isPremium ? undefined : t("lock.premium"),
+                })}
+              </div>
+            </section>
+
+            <aside className='w-full shrink-0 space-y-8 lg:w-80'>
+              <section className='space-y-3'>
+                <h2 className='text-base font-semibold text-zinc-200'>
+                  {t("sections.log_time")}
+                </h2>
+                <div className='space-y-2 rounded-lg bg-zinc-900/60 p-3'>
+                  {logButton("free_timer", Clock, "/timer/practice")}
+                  {logButton("manual_log", NotebookPen, "/report")}
                 </div>
-              </div>
-            )}
+              </section>
 
-            <div>
-              <div className='grid grid-cols-1 items-start gap-4 md:grid-cols-2 lg:gap-6'>
-                {modeItem(
-                  "routine",
-                  ListChecks,
-                  t("modes.routine.title"),
-                  t("modes.routine.description"),
-                  "/timer/plans",
-                  "indigo",
-                  {
-                    hero: true,
-                    links: [
-                      { label: t("modes.routine.all"), href: "/timer/plans" },
-                      { label: t("modes.routine.playalongs"), href: "/timer/plans?tab=playalongs" },
-                      { label: t("modes.routine.my_plans"), href: "/timer/plans?tab=my_plans" },
-                      { label: t("modes.routine.community"), href: "/timer/plans?tab=community" },
-                    ],
-                  }
-                )}
-                {modeItem(
-                  "log",
-                  NotebookPen,
-                  t("modes.log.title"),
-                  t("modes.log.description"),
-                  "/report",
-                  "indigo",
-                  {
-                    hero: true,
-                    links: [
-                      { label: t("modes.log.manual"), href: "/report" },
-                      { label: t("modes.log.free_timer"), href: "/timer/practice" },
-                    ],
-                  }
-                )}
-              </div>
-            </div>
-
-            <div>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
-                {modeItem(
-                  "song",
-                  CassetteTape,
-                  t("modes.songs.title"),
-                  t("modes.songs.description"),
-                  "/songs?view=board",
-                  "amber"
-                )}
-                {modeItem(
-                  "smart",
-                  WandSparkles,
-                  t("modes.auto.title"),
-                  t("modes.auto.description"),
-                  "/timer/auto",
-                  "amber",
-                  { locked: !isMaster, lockLabel: t("lock.master") }
-                )}
-                {modeItem(
-                  "gp",
-                  SiGuitarpro,
-                  t("modes.gp.title"),
-                  t("modes.gp.description"),
-                  "/gp-tabs",
-                  "amber",
-                  { locked: !isPremium, lockLabel: t("lock.premium") }
-                )}
-              </div>
-            </div>
-
-            <div>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
-                {modeItem(
-                  "learning-path",
-                  Route,
-                  t("modes.learning_path.title"),
-                  t("modes.learning_path.description"),
-                  "/journey",
-                  "rose",
-                  { progress: modeProgress.learningPath, progressUnit: t("progress.steps") }
-                )}
-                {modeItem(
-                  "roadmaps",
-                  ClipboardList,
-                  t("modes.roadmaps.title"),
-                  t("modes.roadmaps.description"),
-                  "/ai-coach",
-                  "rose",
-                  { progress: modeProgress.roadmaps, progressUnit: t("progress.steps") }
-                )}
-                {modeItem(
-                  "scales",
-                  ListTree,
-                  t("modes.scales.title"),
-                  t("modes.scales.description"),
-                  "/scale-tree",
-                  "rose",
-                  { progress: modeProgress.scaleMap }
-                )}
-              </div>
-            </div>
-
-            <div>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6'>
-                {modeItem(
-                  "skills",
-                  Brain,
-                  t("modes.skills.title"),
-                  t("modes.skills.description"),
-                  "/profile/skills",
-                  "emerald",
-                  { progress: modeProgress.skills }
-                )}
-                {modeItem(
-                  "exercises",
-                  Dumbbell,
-                  t("modes.exercises.title"),
-                  t("modes.exercises.description"),
-                  "/profile/skills?tab=browse",
-                  "emerald"
-                )}
-                {modeItem(
-                  "community-exercises",
-                  Users,
-                  t("modes.community_exercises.title"),
-                  t("modes.community_exercises.description"),
-                  "/profile/skills?tab=community",
-                  "emerald"
-                )}
-              </div>
-            </div>
+              <section className='space-y-3'>
+                <h2 className='text-base font-semibold text-zinc-200'>
+                  {t("sections.my_stuff")}
+                </h2>
+                <div className='rounded-lg bg-zinc-900/60 p-2'>
+                  <nav aria-label={t("sections.my_stuff")} className='space-y-0.5'>
+                    {MY_STUFF.map(({ id, Icon, href }) => (
+                      <Link
+                        key={id}
+                        href={href}
+                        className='flex min-h-11 items-center gap-3 rounded-lg px-2.5 text-sm font-medium text-zinc-200 transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                        <Icon className='h-4 w-4 shrink-0 text-zinc-400' />
+                        {t(`modes.${id}.title`)}
+                      </Link>
+                    ))}
+                  </nav>
+                  <div className='flex flex-wrap gap-2 px-0.5 pb-0.5 pt-3'>
+                    <Link href='/plans/create' className={createLinkClass}>
+                      <Plus />
+                      {t("sections.create_plan")}
+                    </Link>
+                    <Link href='/tab-editor' className={createLinkClass}>
+                      <Plus />
+                      {t("sections.create_exercise")}
+                    </Link>
+                  </div>
+                </div>
+              </section>
+            </aside>
           </div>
         </div>
       </div>

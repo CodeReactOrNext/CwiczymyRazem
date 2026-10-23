@@ -12,7 +12,7 @@ Sesja, która nie została zapisana, z punktu widzenia aplikacji nigdy się nie 
 
 <StepList steps="Wolny stoper::Stoper, który uruchamiasz, gdy grasz, z osobnym zegarem na każdą kategorię. Zatrzymaj go, a formularz zapisu otworzy się już wypełniony twoim czasem|Ręczny wpis::Ten sam formularz, pusty, dla sesji, która odbyła się z dala od ekranu; możesz zapisać coś, co zdarzyło się nawet 7 dni temu" />
 
-<ClickPath steps="Ćwiczenia|Wolny stoper" caption="Albo Ćwiczenia → Ręczny wpis, jeśli opisujesz sesję po fakcie." />
+<ClickPath steps="Ćwicz|Wolny stoper" caption="Albo Ćwicz → Ręczny wpis, jeśli opisujesz sesję po fakcie." />
 
 ## O co prosi formularz
 

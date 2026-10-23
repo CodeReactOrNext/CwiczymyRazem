@@ -10,13 +10,13 @@ Rotation is your own list of things you don't want to lose: a song you finally n
 
 ## Adding to your rotation
 
-<ClickPath steps="Library|Rotation|Add" caption="Switch between Songs, Exercises and Skills, then tap anything to add it. Tap it again to take it out." />
+<ClickPath steps="My Stuff|Rotation|Add" caption="Switch between Songs, Exercises and Skills, then tap anything to add it. Tap it again to take it out." />
 
 Songs come from your own song library, with the ones you've mastered at the top. Exercises come from the whole exercise library. A skill doesn't play by itself: when its turn comes, you get one of the exercises that trains it, the one you've played least recently. Your rotation holds up to 60 things.
 
 ## Your own items
 
-<ClickPath steps="Library|Rotation|Add|Own" caption="Give it a name, and add a note or a link if you like. Tap an example to start from it." />
+<ClickPath steps="My Stuff|Rotation|Add|Own" caption="Give it a name, and add a note or a link if you like. Tap an example to start from it." />
 
 Anything that isn't in the app can go in too: the next lesson of an online course, one new chord a day, a lick to transcribe by ear. The link can be a course page, a video or anything else on the web, and it sits right next to the item.
 
@@ -32,7 +32,7 @@ Anything you play counts, wherever you play it: a session from Rotation, a routi
 
 ## Playing from your rotation
 
-<ClickPath steps="Library|Rotation|Play the 3 stalest" caption="Starts one short session with the three things you haven't played for the longest." />
+<ClickPath steps="My Stuff|Rotation|Play the 3 stalest" caption="Starts one short session with the three things you haven't played for the longest." />
 
 The top of the page shows the next few items as a hand of cards and how many are waiting for a refresh. **Play the 3 stalest** puts them into one session. Songs get five minutes each there, and exercises keep their usual length. The play button on any row starts a session with just that one item.
 

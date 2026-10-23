@@ -37,6 +37,11 @@
     "point": "Punkt",
     "points": "Punkte"
   },
+  "rewards": {
+    "title": "Saisonbelohnungen",
+    "place": "Platz {{place}}: {{fame}} Fame",
+    "range": "Plätze {{from}}–{{to}}: {{max}}–{{min}} Fame"
+  },
   "hero": {
     "season": "Saison",
     "season_subtitle": "Übe, um in der Rangliste aufzusteigen.",
@@ -45,8 +50,7 @@
     "title": "Rangliste",
     "subtitle": "Sieh, wie du im Vergleich zu anderen Spielern abschneidest",
     "all_time_eyebrow": "Ewige Rangliste",
-    "sections": "Ranglisten-Bereiche",
-    "how_points": "So funktionieren Punkte"
+    "sections": "Ranglisten-Bereiche"
   },
   "scope": {
     "top": "Top-Spieler",
