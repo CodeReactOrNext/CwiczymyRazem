@@ -18,7 +18,6 @@ import {
   trackSignupFormViewed,
 } from "lib/signupFunnel";
 import {
-  CheckCircle,
   ChevronRight,
   Eye,
   EyeOff,
@@ -27,7 +26,6 @@ import {
   Loader2,
   Lock,
   Mail,
-  Monitor,
   Music,
   User,
 } from "lucide-react";
@@ -38,13 +36,7 @@ import { useEffect,useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { TbGuitarPick } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { useResponsiveStore } from "store/useResponsiveStore";
 import { safeNextPath } from "utils/auth/safeNextPath";
-
-// Mobile gets the desktop-app notice on the success screen, which 3s is not
-// enough to read.
-const SUCCESS_REDIRECT_DELAY = 3000;
-const SUCCESS_REDIRECT_DELAY_MOBILE = 8000;
 
 export interface SignUpCredentials {
   login: string;
@@ -59,8 +51,6 @@ const SingupView = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const isMobile = useResponsiveStore((state) => state.isMobile);
 
   const isFetching = useAppSelector(selectIsFetching) === "createAccount";
   const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
@@ -84,7 +74,9 @@ const SingupView = () => {
     try {
       await dispatch(createAccount(credentials)).unwrap();
       trackSignupCompleted(destination);
-      setIsSuccess(true);
+      // Straight on: the onboarding is the welcome, and it tells phone
+      // players about the computer itself.
+      await router.push(destination);
     } catch  {
       // Error is handled by global toast in thunk
     }
@@ -111,67 +103,6 @@ const SingupView = () => {
     // Once per mount: re-firing on every destination change would inflate the step.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (isSuccess) {
-      const timer = setTimeout(
-        () => {
-          router.push(destination);
-        },
-        isMobile ? SUCCESS_REDIRECT_DELAY_MOBILE : SUCCESS_REDIRECT_DELAY
-      );
-      return () => clearTimeout(timer);
-    }
-  }, [isSuccess, isMobile, router, destination]);
-
-  if (isSuccess) {
-    return (
-      <div className='relative min-h-screen w-full overflow-hidden bg-zinc-950 text-foreground flex items-center justify-center p-6'>
-        <div className='absolute inset-0 overflow-hidden'>
-          <div className='absolute -left-[10%] -top-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-500/20 blur-[120px]' />
-          <div className='absolute -right-[10%] -bottom-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-800/20 blur-[120px]' />
-        </div>
-        
-        <div className="relative z-10 w-full max-w-md rounded-lg p-8 text-center border border-white/10 shadow-2xl">
-          <div className="flex justify-center mb-6">
-            <div className="h-20 w-20 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-              <CheckCircle className="h-10 w-10" />
-            </div>
-          </div>
-          
-          <h2 className="text-3xl font-bold text-white mb-2">Welcome to the Quest!</h2>
-          <p className="text-zinc-400 mb-8 leading-relaxed">
-            Your account has been created successfully. Are you ready to level up your guitar skills?
-          </p>
-
-          {isMobile && (
-            <div className='mb-8 flex items-start gap-3 rounded-lg bg-zinc-800/40 p-5 text-left'>
-              <Monitor className='mt-0.5 h-5 w-5 shrink-0 text-cyan-400' />
-              <div className='space-y-1.5'>
-                <p className='text-sm font-semibold text-zinc-200'>
-                  Best experienced on desktop
-                </p>
-                <p className='text-xs leading-relaxed text-zinc-400'>
-                  Riff Quest works on your phone, but note detection, tablature and
-                  full practice sessions are built for a bigger screen. For the best
-                  experience, open riff.quest on your computer — or grab the desktop
-                  app for low-latency audio input.
-                </p>
-              </div>
-            </div>
-          )}
-
-          <Button
-            onClick={() => router.push(destination)}
-            className="w-full h-12 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-base transition-all group"
-          >
-            {destination.startsWith("/onboarding") ? "Let's get started" : "Continue"}
-            <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className='relative min-h-screen w-full overflow-hidden bg-zinc-950 text-foreground flex items-center justify-center'>

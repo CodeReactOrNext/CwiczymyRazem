@@ -1,14 +1,26 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import SingupView from "./SingupView";
 
+const { router, dispatch } = vi.hoisted(() => ({
+  router: { query: {}, push: vi.fn() },
+  // createAccount resolves: the thunk's `.unwrap()` is all the view awaits.
+  dispatch: vi.fn(() => ({ unwrap: () => Promise.resolve() })),
+}));
+
 // The view only reads `isFetching` off the store and dispatches thunks, so the
 // whole Redux/Firebase chain is stubbed rather than booted.
 vi.mock("store/hooks", () => ({
-  useAppDispatch: () => vi.fn(),
+  useAppDispatch: () => dispatch,
   useAppSelector: () => null,
 }));
 
@@ -26,13 +38,7 @@ vi.mock("lib/signupFunnel", () => ({
   trackSignupFormViewed: vi.fn(),
 }));
 
-vi.mock("next/router", () => ({
-  useRouter: () => ({ query: {}, push: vi.fn() }),
-}));
-
-vi.mock("store/useResponsiveStore", () => ({
-  useResponsiveStore: () => false,
-}));
+vi.mock("next/router", () => ({ useRouter: () => router }));
 
 vi.mock("hooks/useTranslation", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -91,6 +97,25 @@ describe("SingupView", () => {
     const { container } = render(<SingupView />);
 
     expect(container.querySelector("#repeat_password")).toBeNull();
+  });
+
+  it("goes straight to the onboarding once the account exists", async () => {
+    const { container } = render(<SingupView />);
+    const fill = (id: string, value: string) =>
+      fireEvent.change(container.querySelector(`#${id}`) as HTMLElement, {
+        target: { value },
+      });
+
+    fill("email", "player@example.test");
+    fill("login", "riffer");
+    fill("password", "longenough1");
+    fireEvent.submit(container.querySelector("form") as HTMLFormElement);
+
+    await waitFor(() =>
+      expect(router.push).toHaveBeenCalledWith("/onboarding?from=signup"),
+    );
+    // No "Welcome to the Quest" stop on the way: the onboarding welcomes.
+    expect(screen.queryByText(/Welcome to the Quest/)).toBeNull();
   });
 
   it("repeats the landing page's promise above the form", () => {
