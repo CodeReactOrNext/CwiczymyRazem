@@ -1,3 +1,4 @@
+import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Music, Play, SearchIcon } from "lucide-react";
 import { useRef, useState } from "react";
@@ -22,6 +23,12 @@ const SEARCH_PHRASES = [
 
 type PickerState = "idle" | "loading" | "results";
 
+// The YouTube API returns titles HTML-escaped ("80&#39;s Rock"), and the
+// search cache stores them that way — decode them for display.
+function decodeEntities(text: string) {
+  return new DOMParser().parseFromString(text, "text/html").documentElement.textContent ?? text;
+}
+
 interface VideoResult {
   id: string;
   title: string;
@@ -32,9 +39,12 @@ interface VideoResult {
 interface BackingTrackPickerProps {
   exerciseTitle: string;
   searchQueries?: string[];
+  /** Phone layout — results as rows with a small thumbnail, so all of them fit
+   *  on a sideways screen instead of one full-width card at a time. */
+  compact?: boolean;
 }
 
-export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrackPickerProps) {
+export function BackingTrackPicker({ exerciseTitle, searchQueries, compact = false }: BackingTrackPickerProps) {
   const { t } = useTranslation("session");
   const { setBackingVideoId } = useSessionUI();
   const [state, setState] = useState<PickerState>("idle");
@@ -61,7 +71,11 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrac
       const q = encodeURIComponent(nextPhrase());
       const res = await fetch(`/api/songs/search-youtube?q=${q}`);
       const data = await res.json();
-      setVideos(data.videos ?? []);
+      setVideos((data.videos ?? []).map((video: VideoResult) => ({
+        ...video,
+        title: decodeEntities(video.title),
+        channel: decodeEntities(video.channel),
+      })));
       setState("results");
     } catch {
       setState("idle");
@@ -69,7 +83,10 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrac
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-8 gap-8 min-h-[260px]">
+    <div className={cn(
+      "w-full h-full flex flex-col items-center justify-center",
+      compact ? "p-5 gap-5" : "p-8 gap-8 min-h-[260px]",
+    )}>
       <div className="flex flex-col items-center gap-2 text-center">
         <Music size={28} className="text-amber-500/70" />
         <p className="text-zinc-300 font-semibold text-base">{t("backing.required")}</p>
@@ -93,7 +110,25 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries }: BackingTrac
         </div>
       )}
 
-      {state === "results" && (
+      {state === "results" && compact && (
+        <div className="w-full flex flex-col gap-2">
+          {videos.map((video) => (
+            <button
+              key={video.id}
+              onClick={() => setBackingVideoId(video.id)}
+              className="flex items-center gap-3 rounded-xl bg-white/5 p-2 text-left transition-colors hover:bg-white/10"
+            >
+              <img src={video.thumbnail} alt="" className="aspect-video w-24 shrink-0 rounded-lg object-cover" />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-zinc-200 line-clamp-2 leading-snug">{video.title}</p>
+                <p className="text-[10px] text-zinc-500 mt-1 truncate">{video.channel}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {state === "results" && !compact && (
         <div className="w-full max-w-2xl flex flex-col sm:flex-row gap-3">
           {videos.map((video) => (
             <button

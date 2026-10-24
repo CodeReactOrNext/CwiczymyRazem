@@ -226,7 +226,7 @@ export function MobileExerciseContent({
         <div className="w-full overflow-hidden rounded-2xl bg-zinc-900/40">
           {backingVideoId
             ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
-            : <BackingTrackPicker exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} />}
+            : <BackingTrackPicker exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} compact />}
         </div>
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
         <div className="w-full overflow-hidden rounded-2xl border border-white/5 shadow-lg">
