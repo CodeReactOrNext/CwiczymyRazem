@@ -44,7 +44,6 @@ describe("generateDailyQuest", () => {
   it("never selects two tasks from the same overlapping group", () => {
     for (let i = 0; i < 200; i++) {
       const state = buildState();
-      // @ts-expect-error minimal state for reducer testing
       const nextState = reducer(state, generateDailyQuest(undefined));
 
       const tasks = nextState.currentUserStats?.dailyQuest?.tasks ?? [];
@@ -58,7 +57,6 @@ describe("generateDailyQuest", () => {
 
   it("always selects exactly 3 unique tasks", () => {
     const state = buildState();
-    // @ts-expect-error minimal state for reducer testing
     const nextState = reducer(state, generateDailyQuest(undefined));
 
     const tasks = nextState.currentUserStats?.dailyQuest?.tasks ?? [];
@@ -68,9 +66,7 @@ describe("generateDailyQuest", () => {
 
   it("does not regenerate a quest that already exists for today", () => {
     const state = buildState();
-    // @ts-expect-error minimal state for reducer testing
     const firstState = reducer(state, generateDailyQuest(undefined));
-    // @ts-expect-error minimal state for reducer testing
     const secondState = reducer(firstState, generateDailyQuest(undefined));
 
     expect(secondState.currentUserStats?.dailyQuest).toEqual(

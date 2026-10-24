@@ -67,7 +67,7 @@ const buildStore = (dailyQuest: DailyQuest) =>
         },
         currentActivity: null,
       },
-    } as never,
+    } as { user: ReturnType<typeof userReducer> },
     middleware: (getDefault) => getDefault({ serializableCheck: false }),
   });
 

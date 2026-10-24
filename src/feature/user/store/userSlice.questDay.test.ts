@@ -66,7 +66,6 @@ describe("the daily quest day, in the player's own timezone", () => {
     const state = buildState(questOn(LA_DAY));
 
     const next = reducer(
-      // @ts-expect-error minimal state for reducer testing
       state,
       completeQuestTask({ type: "practice_total_time", amount: 45 }),
     );
@@ -80,7 +79,6 @@ describe("the daily quest day, in the player's own timezone", () => {
   it("leaves the set alone in the middle of that evening", () => {
     const state = buildState(questOn(LA_DAY, 10));
 
-    // @ts-expect-error minimal state for reducer testing
     const next = reducer(state, generateDailyQuest(undefined));
 
     expect(next.currentUserStats?.dailyQuest?.tasks).toHaveLength(1);
@@ -90,7 +88,6 @@ describe("the daily quest day, in the player's own timezone", () => {
   it("re-stamps a set stored under the old UTC key rather than redrawing it", () => {
     const state = buildState(questOn(UTC_DAY, 10));
 
-    // @ts-expect-error minimal state for reducer testing
     const next = reducer(state, generateDailyQuest(undefined));
 
     expect(next.currentUserStats?.dailyQuest?.date).toBe(LA_DAY);
@@ -100,7 +97,6 @@ describe("the daily quest day, in the player's own timezone", () => {
   it("draws a new set once the player's own day has turned over", () => {
     const state = buildState(questOn("2026-09-02", 10));
 
-    // @ts-expect-error minimal state for reducer testing
     const next = reducer(state, generateDailyQuest(undefined));
 
     expect(next.currentUserStats?.dailyQuest?.date).toBe(LA_DAY);
@@ -111,7 +107,6 @@ describe("the daily quest day, in the player's own timezone", () => {
     const state = buildState(questOn("2026-09-02"));
 
     const next = reducer(
-      // @ts-expect-error minimal state for reducer testing
       state,
       completeQuestTask({ type: "practice_total_time", amount: 45 }),
     );

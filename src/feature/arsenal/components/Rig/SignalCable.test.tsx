@@ -73,6 +73,7 @@ const verdictOf = (nodes: ChainNode[]): ChainVerdict => {
     okLinks: links.length,
     wrongLinks: 0,
     flawless: true,
+    complete: false,
     rate: 30,
     tier: "book",
     tip: null,
