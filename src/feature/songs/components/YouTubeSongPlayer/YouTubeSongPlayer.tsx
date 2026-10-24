@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import {
   Tooltip,
@@ -8,6 +7,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { extractVideoId } from "feature/songs/utils/youtube.utils";
+import { useTranslation } from "hooks/useTranslation";
 import { Link, Lock, LockKeyholeOpen, Pencil, Search } from "lucide-react";
 import {
   forwardRef,
@@ -32,6 +32,8 @@ export interface YouTubeSongPlayerRef {
   pause: () => void;
   togglePlay: () => void;
   getCurrentTime: () => number;
+  /** Swaps the video for the link form, as the "Change video" button does. */
+  editVideo: () => void;
 }
 
 interface YouTubeSongPlayerProps {
@@ -44,6 +46,13 @@ interface YouTubeSongPlayerProps {
   onLockToggle?: () => void;
   songTitle?: string;
   songArtist?: string;
+  /** Just the video — the parent draws its own speed and change-video controls. */
+  compact?: boolean;
+  /** Controlled playback speed, for a parent that draws the speed control itself. */
+  playbackRate?: number;
+  onPlayingChange?: (playing: boolean) => void;
+  /** Whether the video is up, rather than the link form. */
+  onVideoShownChange?: (shown: boolean) => void;
 }
 
 export const YouTubeSongPlayer = forwardRef<
@@ -61,6 +70,10 @@ export const YouTubeSongPlayer = forwardRef<
       onLockToggle,
       songTitle,
       songArtist,
+      compact,
+      playbackRate,
+      onPlayingChange,
+      onVideoShownChange,
     },
     ref,
   ) => {
@@ -70,7 +83,8 @@ export const YouTubeSongPlayer = forwardRef<
     const [urlInput, setUrlInput] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [inputError, setInputError] = useState(false);
-    const [speed, setSpeed] = useState(1);
+    const [internalSpeed, setSpeed] = useState(1);
+    const speed = playbackRate ?? internalSpeed;
     const [suggestions, setSuggestions] = useState<YouTubeSuggestion[]>([]);
 
     useEffect(() => {
@@ -100,7 +114,15 @@ export const YouTubeSongPlayer = forwardRef<
       getCurrentTime: () => {
         return playerRef.current?.getCurrentTime() ?? 0;
       },
+      editVideo: () => {
+        setUrlInput(youtubeUrl ?? "");
+        setIsEditing(true);
+      },
     }));
+
+    useEffect(() => {
+      playerRef.current?.setPlaybackRate?.(speed);
+    }, [speed]);
 
     const startTracking = () => {
       if (intervalRef.current) return;
@@ -138,6 +160,8 @@ export const YouTubeSongPlayer = forwardRef<
       } else {
         stopTracking();
       }
+      // Buffering mid-play still counts as playing, or the play button flickers.
+      if (event.data !== 3) onPlayingChange?.(event.data === 1);
     };
 
     const handleSaveUrl = () => {
@@ -154,6 +178,11 @@ export const YouTubeSongPlayer = forwardRef<
     };
 
     const videoId = youtubeUrl ? extractVideoId(youtubeUrl) : null;
+    const isVideoShown = !!videoId && !isEditing;
+
+    useEffect(() => {
+      onVideoShownChange?.(isVideoShown);
+    }, [isVideoShown, onVideoShownChange]);
 
     const opts: YouTubeProps["opts"] = {
       height: "100%",
@@ -163,10 +192,13 @@ export const YouTubeSongPlayer = forwardRef<
         modestbranding: 1,
         rel: 0,
         enablejsapi: 1,
+        // Without it iOS opens every play in its fullscreen player, hiding the
+        // sections and making the loop/seek controls useless.
+        playsinline: 1,
       },
     };
 
-    if (!videoId || isEditing) {
+    if (!isVideoShown) {
       return (
         <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5'>
           {/* Step 1 — paste link */}
@@ -288,17 +320,19 @@ export const YouTubeSongPlayer = forwardRef<
 
     return (
       <div className='space-y-2'>
-        <div className='flex justify-end'>
-          <button
-            onClick={() => {
-              setUrlInput(youtubeUrl ?? "");
-              setIsEditing(true);
-            }}
-            className='flex items-center gap-1.5 rounded-lg bg-zinc-800/40 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
-            <Pencil className='h-3.5 w-3.5' />
-            {t("youtube.change_link")}
-          </button>
-        </div>
+        {!compact && (
+          <div className='flex justify-end'>
+            <button
+              onClick={() => {
+                setUrlInput(youtubeUrl ?? "");
+                setIsEditing(true);
+              }}
+              className='flex items-center gap-1.5 rounded-lg bg-zinc-800/40 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+              <Pencil className='h-3.5 w-3.5' />
+              {t("youtube.change_link")}
+            </button>
+          </div>
+        )}
 
         <div className='aspect-video w-full overflow-hidden rounded-lg bg-zinc-900/40'>
           <YouTube
@@ -311,53 +345,61 @@ export const YouTubeSongPlayer = forwardRef<
           />
         </div>
 
-        <div className='flex items-center gap-1.5 pt-0.5'>
-          <span className='mr-1 text-xs font-medium text-zinc-500'>{t("youtube_player.speed")}</span>
-          {[0.5, 0.75, 1, 1.25, 1.5].map((rate) => (
-            <button
-              key={rate}
-              type='button'
-              onClick={() => handleSpeedChange(rate)}
-              className={cn(
-                "rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
-                speed === rate
-                  ? "bg-cyan-500/10 text-cyan-400"
-                  : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
-              )}>
-              {rate === 1 ? "1×" : `${rate}×`}
-            </button>
-          ))}
+        {!compact && (
+          <div className='flex flex-wrap items-center gap-1.5 pt-0.5'>
+            <span className='mr-1 text-xs font-medium text-zinc-500'>
+              {t("youtube_player.speed")}
+            </span>
+            {[0.5, 0.75, 1, 1.25, 1.5].map((rate) => (
+              <button
+                key={rate}
+                type='button'
+                onClick={() => handleSpeedChange(rate)}
+                className={cn(
+                  "rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
+                  speed === rate
+                    ? "bg-cyan-500/10 text-cyan-400"
+                    : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+                )}>
+                {rate === 1 ? "1×" : `${rate}×`}
+              </button>
+            ))}
 
-          <div className='ml-auto flex items-center gap-2'>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type='button'
-                    onClick={onLockToggle}
-                    className={cn(
-                      "flex h-8 items-center gap-2 rounded-lg px-3 transition-all",
-                      isLocked
-                        ? "bg-amber-500/10 text-amber-400"
-                        : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
-                    )}>
-                    {isLocked ? (
-                      <Lock className='h-3.5 w-3.5' />
-                    ) : (
-                      <LockKeyholeOpen className='h-3.5 w-3.5' />
-                    )}
-                    <span className='text-[10px] font-bold'>
-                      {isLocked ? "Locked" : "Lock"}
-                    </span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side='top'>
-                  <p>{isLocked ? t("youtube_player.unlock") : t("youtube_player.lock")}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className='ml-auto flex items-center gap-2'>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type='button'
+                      onClick={onLockToggle}
+                      className={cn(
+                        "flex h-8 items-center gap-2 rounded-lg px-3 transition-all",
+                        isLocked
+                          ? "bg-amber-500/10 text-amber-400"
+                          : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+                      )}>
+                      {isLocked ? (
+                        <Lock className='h-3.5 w-3.5' />
+                      ) : (
+                        <LockKeyholeOpen className='h-3.5 w-3.5' />
+                      )}
+                      <span className='text-[10px] font-bold'>
+                        {isLocked ? "Locked" : "Lock"}
+                      </span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side='top'>
+                    <p>
+                      {isLocked
+                        ? t("youtube_player.unlock")
+                        : t("youtube_player.lock")}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     );
   },

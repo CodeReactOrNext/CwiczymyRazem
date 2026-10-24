@@ -12,6 +12,7 @@ import type {
 } from "feature/songs/types/songSection.type";
 import { SECTION_COLORS } from "feature/songs/types/songSection.type";
 import { MIN_SECTIONS } from "feature/songs/utils/sectionMapValidation.utils";
+import { newSectionStart } from "feature/songs/utils/sectionTimes.utils";
 import { extractVideoId } from "feature/songs/utils/youtube.utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -232,15 +233,17 @@ export const useSongSectionMap = ({
     }
   };
 
-  const handleAddSection = (name?: string) => {
+  /** Adds a section at the playhead and returns its id. */
+  const handleAddSection = (name?: string): string => {
     const newSection: SongSection = {
       id: uuidv4(),
       name: name ?? `Section ${sections.length + 1}`,
-      startTime: Math.floor(currentTime),
+      startTime: newSectionStart(sections, currentTime, duration),
       color: nextSectionColor(sections),
       mastery: 0,
     };
     persistSections([...sections, newSection]);
+    return newSection.id;
   };
 
   useEffect(() => {

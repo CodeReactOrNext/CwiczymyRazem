@@ -50,6 +50,12 @@ body:has([data-desktop-session]) [data-mobile-bottom-nav] {
   display: none;
 }
 
+/* The song session on a phone has its own bottom bar (session time + Finish);
+   the tab bar under it only invited leaving mid-practice. */
+body:has([data-song-session]) [data-mobile-bottom-nav] {
+  display: none;
+}
+
 html,
 body {
   padding: 0;

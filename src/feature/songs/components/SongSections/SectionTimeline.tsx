@@ -11,6 +11,9 @@ interface SectionTimelineProps {
   onSeek: (time: number) => void;
   onSectionTimeChange: (id: string, startTime: number) => void;
   isLocked?: boolean;
+  /** Touch layout: tap to seek only — no drag grips, which a finger can't hit on a short section. */
+  seekOnly?: boolean;
+  className?: string;
 }
 
 export const SectionTimeline = ({
@@ -21,14 +24,13 @@ export const SectionTimeline = ({
   onSeek,
   onSectionTimeChange,
   isLocked,
+  seekOnly,
+  className,
 }: SectionTimelineProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef<{ id: string } | null>(null);
 
   const sorted = [...sections].sort((a, b) => a.startTime - b.startTime);
-
-  const toPercent = (t: number) =>
-    duration > 0 ? Math.min(100, (t / duration) * 100) : 0;
 
   const timeFromPointer = (clientX: number): number => {
     if (!trackRef.current) return 0;
@@ -63,7 +65,7 @@ export const SectionTimeline = ({
   return (
     <div
       ref={trackRef}
-      className="relative h-14 w-full cursor-pointer select-none"
+      className={cn("relative h-14 w-full cursor-pointer select-none", className)}
       onClick={handleTrackClick}
     >
       {/* base track */}
@@ -105,20 +107,22 @@ export const SectionTimeline = ({
                 }}
               >
                 {/* Grip handle */}
-                <div
-                  onPointerDown={(e) => handleSegmentPointerDown(e, section)}
-                  onPointerMove={(e) => handleSegmentPointerMove(e, section)}
-                  onPointerUp={handleSegmentPointerUp}
-                  className={cn(
-                    "absolute left-0 top-0 h-full w-4 bg-black/10 flex items-center justify-center transition-colors hover:bg-black/20",
-                    isLocked ? "cursor-default" : "cursor-grab active:cursor-grabbing"
-                  )}
-                >
-                  <GripVertical className="h-4 w-4 text-white/50" />
-                </div>
+                {!seekOnly && (
+                  <div
+                    onPointerDown={(e) => handleSegmentPointerDown(e, section)}
+                    onPointerMove={(e) => handleSegmentPointerMove(e, section)}
+                    onPointerUp={handleSegmentPointerUp}
+                    className={cn(
+                      "absolute left-0 top-0 h-full w-4 bg-black/10 flex items-center justify-center transition-colors hover:bg-black/20",
+                      isLocked ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+                    )}
+                  >
+                    <GripVertical className="h-4 w-4 text-white/50" />
+                  </div>
+                )}
 
                 {/* Text Label - Centered */}
-                <div className="flex-1 h-full flex items-center justify-center pl-4 pr-1 overflow-hidden">
+                <div className={cn("flex-1 h-full flex items-center justify-center pr-1 overflow-hidden", seekOnly ? "pl-1" : "pl-4")}>
                   <div className="px-2 py-0.5 bg-black/30 rounded-[4px] backdrop-blur-[1px] max-w-full">
                     <span
                       className={cn(

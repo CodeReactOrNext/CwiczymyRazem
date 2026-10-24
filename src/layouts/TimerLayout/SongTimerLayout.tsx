@@ -9,12 +9,12 @@ import { YouTubeSongPlayer } from "feature/songs/components/YouTubeSongPlayer";
 import { useSongSectionMap } from "feature/songs/hooks/useSongSectionMap";
 import type { Song } from "feature/songs/types/songs.type";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
+import { useIsCompactViewport } from "hooks/useMediaQuery";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowLeft,
   CheckCircle2,
-  FileText,
   Keyboard,
   Music,
   Pause,
@@ -23,6 +23,8 @@ import {
 import { useEffect, useState } from "react";
 
 import FreeTimerMetronome from "./components/FreeTimerMetronome";
+import { SongNotesCard } from "./components/SongNotesCard";
+import { SongTimerMobileLayout } from "./SongTimerMobileLayout";
 
 interface SongTimerLayoutProps {
   timer: useTimerInterface;
@@ -45,11 +47,10 @@ export const SongTimerLayout = ({
   const { timerEnabled, startTimer, stopTimer } = timer;
   const [time, setTime] = useState(() => timer.getTime());
 
-  useEffect(() => {
-    setTime(timer.getTime());
-    return timer.subscribe((t) => setTime(t));
-  }, [timer]);
+  useEffect(() => timer.subscribe(setTime), [timer]);
 
+  const isCompact = useIsCompactViewport();
+  const map = useSongSectionMap({ userId, songId });
   const {
     playerRef,
     youtubeUrl,
@@ -78,7 +79,7 @@ export const SongTimerLayout = ({
     handleTimeChange,
     handleMasteryChange,
     handleDelete,
-  } = useSongSectionMap({ userId, songId });
+  } = map;
 
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
@@ -92,6 +93,38 @@ export const SongTimerLayout = ({
   };
 
   const toggleTimer = () => (timerEnabled ? stopTimer() : startTimer());
+
+  const handleFinish = async () => {
+    try {
+      await saveNow();
+    } finally {
+      timerSubmitHandler();
+    }
+  };
+
+  const importModal = (
+    <CommunityMapImportModal
+      map={sectionMap}
+      open={isImportModalOpen}
+      onOpenChange={setIsImportModalOpen}
+      onImport={handleImportCommunityMap}
+    />
+  );
+
+  if (isCompact) {
+    return (
+      <>
+        <SongTimerMobileLayout
+          timer={timer}
+          song={song}
+          map={map}
+          onFinish={handleFinish}
+          onBack={onBack}
+        />
+        {importModal}
+      </>
+    );
+  }
 
   return (
     <MainContainer noBorder>
@@ -163,13 +196,7 @@ export const SongTimerLayout = ({
             <AmpSimButton h='h-10' />
 
             <Button
-              onClick={async () => {
-                try {
-                  await saveNow();
-                } finally {
-                  timerSubmitHandler();
-                }
-              }}
+              onClick={handleFinish}
               className='ml-1 gap-2 rounded-lg px-3 sm:ml-3 sm:px-4'>
               <span className='hidden sm:inline'>{t("finish")}</span>
               <CheckCircle2 className='h-4 w-4' />
@@ -177,7 +204,7 @@ export const SongTimerLayout = ({
           </div>
 
           {/* Player + metronome side by side on desktop, stacked on mobile */}
-          <div className='grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]'>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]'>
             <YouTubeSongPlayer
               ref={playerRef}
               youtubeUrl={youtubeUrl}
@@ -264,53 +291,15 @@ export const SongTimerLayout = ({
             </div>
           )}
 
-          {/* Notes Section */}
-          <div className='rounded-lg bg-zinc-900/40'>
-            <div className='flex items-center justify-between px-5 pt-4'>
-              <div className='flex items-center gap-2 text-zinc-400'>
-                <FileText className='h-4 w-4' />
-                <span className='text-xs font-bold text-zinc-500'>
-                  {t("song_timer.practice_notes")}
-                </span>
-              </div>
-              <div className='flex items-center gap-2'>
-                {isSaving && (
-                  <span className='animate-pulse text-[10px] text-zinc-500'>
-                    {t("saving")}
-                  </span>
-                )}
-                <span
-                  className={cn(
-                    "text-[10px] font-medium",
-                    notes.split(" ").length > 250
-                      ? "text-amber-400"
-                      : "text-zinc-500",
-                  )}>
-                  {t("song_timer.lines", { count: notes.split("\n").length })}
-                </span>
-              </div>
-            </div>
-            <textarea
-              value={notes}
-              onChange={(e) => {
-                const lines = e.target.value.split("\n");
-                if (lines.length <= 300) {
-                  setNotes(e.target.value);
-                }
-              }}
-              placeholder={t("song_timer.notes_placeholder")}
-              className='min-h-[160px] w-full resize-none bg-transparent px-5 pb-5 pt-3 text-sm leading-relaxed text-zinc-300 placeholder:text-zinc-600 focus:outline-none'
-            />
-          </div>
+          <SongNotesCard
+            notes={notes}
+            onNotesChange={setNotes}
+            isSaving={isSaving}
+          />
         </div>
       </div>
 
-      <CommunityMapImportModal
-        map={sectionMap}
-        open={isImportModalOpen}
-        onOpenChange={setIsImportModalOpen}
-        onImport={handleImportCommunityMap}
-      />
+      {importModal}
     </MainContainer>
   );
 };

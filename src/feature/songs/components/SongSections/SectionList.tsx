@@ -1,6 +1,6 @@
-import { useTranslation } from "hooks/useTranslation";
 import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
 import { SECTION_COLORS } from "feature/songs/types/songSection.type";
+import { useTranslation } from "hooks/useTranslation";
 import { Plus } from "lucide-react";
 
 import { SectionRow } from "./SectionRow";

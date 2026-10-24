@@ -1,11 +1,11 @@
-import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import type { MasteryLevel } from "feature/songs/types/songSection.type";
 import { MASTERY_LABELS } from "feature/songs/types/songSection.type";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-const MASTERY_STYLES: Record<MasteryLevel, string> = {
+export const MASTERY_STYLES: Record<MasteryLevel, string> = {
   0: "text-zinc-500 bg-transparent",
   1: "text-red-400 bg-red-500/10 hover:bg-red-500/15",
   2: "text-amber-400 bg-amber-500/10 hover:bg-amber-500/15",

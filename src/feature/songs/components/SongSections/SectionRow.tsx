@@ -1,12 +1,12 @@
-import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
+import { useTranslation } from "hooks/useTranslation";
 import { Play, Repeat2, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { MasteryBadge } from "./MasteryBadge";
 
-const PREDEFINED_NAMES = [
+export const PREDEFINED_NAMES = [
   "Intro", "Verse", "Pre-Chorus", "Chorus", "Bridge",
   "Outro", "Solo", "Guitar Solo", "Bass Solo", "Interlude",
   "Breakdown", "Hook", "Riff", "Verse 2", "Chorus 2",
