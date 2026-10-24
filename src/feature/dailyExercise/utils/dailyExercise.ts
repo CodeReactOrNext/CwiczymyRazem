@@ -191,6 +191,28 @@ export const dailyResultRows = <T extends { place: number }>(
   return own.place > last + 1 ? [...top, null, own] : [...top, own];
 };
 
+/** How many places the dashboard card shows, side by side. */
+export const DAILY_PODIUM_SIZE = 3;
+
+/**
+ * The places the dashboard card shows: the top three, except that a player
+ * below them takes the third slot with their own place — they see the leaders
+ * and how far behind they are. `null` is a place nobody has taken yet.
+ */
+export const dailyPodium = <T>(
+  top: readonly T[],
+  own: (T & { rank: number }) | null,
+): ({ entry: T; place: number } | null)[] => {
+  const places: ({ entry: T; place: number } | null)[] = top
+    .slice(0, DAILY_PODIUM_SIZE)
+    .map((entry, i) => ({ entry, place: i + 1 }));
+  if (own && own.rank > DAILY_PODIUM_SIZE) {
+    places[DAILY_PODIUM_SIZE - 1] = { entry: own, place: own.rank };
+  }
+  while (places.length < DAILY_PODIUM_SIZE) places.push(null);
+  return places;
+};
+
 /** The board's winner — its #1 by rankDailyBoard, or none on a board nobody else played. */
 export const pickDailyWinner = (
   topEntries: readonly DailyExerciseEntry[],

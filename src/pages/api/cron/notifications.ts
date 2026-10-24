@@ -3,6 +3,7 @@ import {
   SEASON_REWARD_PLACES,
 } from "constants/seasonRewards";
 import { DEFAULT_REMINDER_HOUR_UTC } from "constants/streakReminder";
+import { canSendEmail } from "lib/email/consent";
 import { isOnEmailCooldown, todayKey } from "lib/email/cooldown";
 import {
   batchMarkCooldown,
@@ -56,11 +57,10 @@ async function getSeasonParticipants(seasonId: string): Promise<RankedParticipan
     .map((p: RankedBase, idx: number) => ({
       ...p,
       email: (userDocs[idx].data()?.email as string) ?? "",
-      // Opt-in by default: only an explicit `false` disables season emails.
+      // Only for players who agreed to email and kept season emails on.
       // Kept on every participant (not filtered out here) so places and the
       // top-3 list shown in other users' emails stay accurate.
-      seasonUpdates:
-        userDocs[idx].data()?.emailNotifications?.seasonUpdates !== false,
+      seasonUpdates: canSendEmail(userDocs[idx].data(), "seasonUpdates"),
     }))
     .filter((p) => !!p.email);
 }
@@ -229,8 +229,8 @@ export default async function handler(
       const email: string | null = data.email ?? null;
       if (!email) return;
 
-      // Respect opt-out: only an explicit `false` disables streak emails.
-      if (data.emailNotifications?.streakReminders === false) return;
+      // Only for players who agreed to email and kept reminders on.
+      if (!canSendEmail(data, "streakReminders")) return;
 
       const target = evaluateStreakReminder(data.statistics, now);
       if (!target) return;
@@ -267,6 +267,7 @@ export default async function handler(
         run: () =>
           sendStreakReminderEmail({
             to: c.email,
+            uid: c.uid,
             userName: c.displayName,
             streakDays: c.streakDays,
             hoursLeft: c.hoursLeft,
@@ -333,6 +334,7 @@ export default async function handler(
           run: () =>
             sendSeasonResultsEmail({
               to: p.email,
+              uid: p.uid,
               userName: p.displayName,
               seasonName: prevSeasonName,
               userPlace: p.place,
@@ -377,6 +379,7 @@ export default async function handler(
           run: () =>
             sendSeasonStartEmail({
               to: p.email,
+              uid: p.uid,
               userName: p.displayName,
               seasonName: currentSeasonName,
               daysInSeason: daysInCurrentSeason,
@@ -426,6 +429,7 @@ export default async function handler(
           run: () =>
             sendSeasonEndingSoonEmail({
               to: p.email,
+              uid: p.uid,
               userName: p.displayName,
               seasonName,
               daysLeft: daysLeftInSeason,

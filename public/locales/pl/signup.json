@@ -13,5 +13,9 @@
   "submit_button": "Załóż konto",
   "google_button": "Kontynuuj z Google",
   "already_have_account": "Masz już konto?",
-  "login_link": "Zaloguj się"
+  "login_link": "Zaloguj się",
+  "email_consent_label": "Chcę dostawać przypomnienia o serii, informacje o sezonach i co jakiś czas nowości z Riff Quest. Mogę je wyłączyć w każdej chwili w Ustawieniach.",
+  "legal_notice": "Zakładając konto, akceptujesz {{terms}} i {{privacy}}.",
+  "terms_link": "Regulamin",
+  "privacy_link": "Politykę prywatności"
 }

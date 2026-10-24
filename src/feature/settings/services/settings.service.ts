@@ -9,10 +9,15 @@ import {
   arrayRemove,
   arrayUnion,
   doc,
+  serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import type { EmailNotificationPreferences } from "types/api.types";
+import { isAnyEmailEnabled } from "lib/email/consent";
+import type {
+  EmailConsent,
+  EmailNotificationPreferences,
+} from "types/api.types";
 import { db, firebaseUpdateUserDocument, storage } from "utils/firebase/client/firebase.utils";
 import { shuffleUid } from "utils/user/shuffleUid";
 
@@ -78,11 +83,41 @@ export const firebaseUpdateYouTubeLink = async (youtubeLink: string) => {
 export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
-}; export const firebaseUpdateEmailNotifications = async (
+};
+
+/**
+ * Saving the toggles in Settings is also an answer to "may we email you?" —
+ * any one left on is a yes — so the consent record is written with them.
+ * Returns that record as the client keeps it.
+ */
+export const firebaseUpdateEmailNotifications = async (
   preferences: EmailNotificationPreferences
-) => {
+): Promise<EmailConsent> => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
-  await updateDoc(userDocRef, { emailNotifications: preferences });
+  const emailConsent: EmailConsent = {
+    granted: isAnyEmailEnabled(preferences),
+    source: "settings",
+  };
+  await updateDoc(userDocRef, {
+    emailNotifications: preferences,
+    emailConsent: { ...emailConsent, updatedAt: serverTimestamp() },
+  });
+  return emailConsent;
+};
+
+/**
+ * The prompt's answer. The toggles are left alone, so an email turned off
+ * before the question existed stays off after a yes.
+ */
+export const firebaseAnswerEmailConsent = async (
+  granted: boolean
+): Promise<EmailConsent> => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  const emailConsent: EmailConsent = { granted, source: "prompt" };
+  await updateDoc(userDocRef, {
+    emailConsent: { ...emailConsent, updatedAt: serverTimestamp() },
+  });
+  return emailConsent;
 };
 
 export const firebaseToggleFavoritePlan = async (

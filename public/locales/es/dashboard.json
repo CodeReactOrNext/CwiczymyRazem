@@ -207,17 +207,15 @@
   },
   "daily_exercise": {
     "open_spot": "Puesto libre",
-    "no_scores": "Aún no hay puntuaciones. La primera partida se lleva el #1.",
+    "open_spot_hint": "Toca para ocuparlo",
     "title": "Ejercicio del día",
     "new_in": "Nuevo en {{time}}",
     "none_today": "Hoy no hay ejercicio.",
     "beat_score": "Supera tu puntuación",
     "play": "Tocar",
-    "your_best": "Tu mejor",
-    "rank_of": "#{{rank}} de {{players}}",
-    "todays_board": "Tablero de hoy",
     "board_error": "No se pudo cargar el tablero.",
     "prize": "Premio para el #1",
+    "wins": "El #1 gana",
     "mod": "Mod {{label}}"
   }
 }

@@ -61,17 +61,34 @@ export interface DailyQuest {
   isRewardClaimed: boolean;
 }
 
+/**
+ * Which of the optional emails the player keeps on. These only matter once they
+ * agreed to email at all (`EmailConsent`) — a missing key means "not turned off".
+ */
 export interface EmailNotificationPreferences {
   /** Daily streak / "come back and practice" reminder emails */
   streakReminders: boolean;
   /** Season start, ending-soon and results emails */
   seasonUpdates: boolean;
+  /** An occasional roundup of what's new at Riff Quest */
+  productUpdates: boolean;
 }
 
-export const DEFAULT_EMAIL_NOTIFICATIONS: EmailNotificationPreferences = {
-  streakReminders: true,
-  seasonUpdates: true,
-};
+/** Where the player answered: the sign-up checkbox, the one-time prompt, or Settings. */
+export type EmailConsentSource = "signup" | "prompt" | "settings";
+
+/**
+ * The player's answer to "may we email you?". No record means they were never
+ * asked — accounts older than the question, and Google sign-ups — and nothing
+ * optional is sent until they answer. Account emails (welcome, password reset,
+ * email change) do not depend on it.
+ */
+export interface EmailConsent {
+  granted: boolean;
+  source: EmailConsentSource;
+  /** Server time of the answer; not carried in the client copy. */
+  updatedAt?: Timestamp | null;
+}
 
 export interface UserDataInterface {
   userInfo: {
@@ -84,6 +101,7 @@ export interface UserDataInterface {
     selectedGuitarYear?: number;
     selectedGuitarCountry?: string;
     emailNotifications?: EmailNotificationPreferences;
+    emailConsent?: EmailConsent | null;
     favoritePlanIds?: string[];
     favoriteExerciseIds?: string[];
     favoriteSongIds?: string[];
@@ -234,6 +252,7 @@ export interface userSliceInitialState {
     supportAskDismissCount?: number;
     supportAskLastDismissedAt?: Timestamp | null;
     emailNotifications?: EmailNotificationPreferences;
+    emailConsent?: EmailConsent | null;
     favoritePlanIds?: string[];
     favoriteExerciseIds?: string[];
     favoriteSongIds?: string[];

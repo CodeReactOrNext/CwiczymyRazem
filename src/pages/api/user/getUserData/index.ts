@@ -1,4 +1,5 @@
 import type { DecodedIdToken } from "firebase-admin/auth";
+import { FieldValue } from "firebase-admin/firestore";
 import { todayKey } from "lib/email/cooldown";
 import { markCooldown } from "lib/email/cooldownStore";
 import { sendWelcomeEmail } from "lib/email/send";
@@ -10,6 +11,8 @@ interface UserDataRequestBody {
   idToken?: string;
   displayName?: string | null;
   photoURL?: string | null;
+  /** The sign-up form's email checkbox. Only stored while there is no answer yet. */
+  emailConsent?: boolean;
   /** Legacy shape: the serialized Firebase `User` (see the handler). */
   user?: {
     displayName?: string | null;
@@ -78,6 +81,17 @@ export default async function handler(
         }),
       ]);
 
+      // Asked on the email sign-up form only; a Google sign-up arrives without
+      // it and gets the in-app prompt instead.
+      const signupConsent =
+        typeof body.emailConsent === "boolean"
+          ? {
+              granted: body.emailConsent,
+              source: "signup",
+              updatedAt: FieldValue.serverTimestamp(),
+            }
+          : null;
+
       if (!userSnapshot.exists) {
         await userDocRef.set({
           displayName: user.displayName ?? null,
@@ -86,6 +100,7 @@ export default async function handler(
           email: user.email ?? null,
           statistics: statisticsInitial,
           rigLevel: 0,
+          ...(signupConsent && { emailConsent: signupConsent }),
         });
 
         if (user.email) {
@@ -107,10 +122,16 @@ export default async function handler(
         : (await userDocRef.get()).data();
 
       if (userData) {
-        const backfill: Record<string, string> = {};
+        const backfill: Record<string, unknown> = {};
         if (!userData.email && user.email) backfill.email = user.email;
         if (!userData.displayName && user.displayName)
           backfill.displayName = user.displayName;
+        // The sign-up request can lose the race to an auto-login that created
+        // the document first; the answer still belongs on it.
+        if (!userData.emailConsent && signupConsent) {
+          backfill.emailConsent = signupConsent;
+          userData.emailConsent = signupConsent;
+        }
         if (Object.keys(backfill).length > 0) {
           await userDocRef.update(backfill);
         }
@@ -151,12 +172,22 @@ export default async function handler(
           favoritePlanIds: userData?.favoritePlanIds ?? [],
           favoriteExerciseIds: userData?.favoriteExerciseIds ?? [],
           favoriteSongIds: userData?.favoriteSongIds ?? [],
+          // Only explicit opt-outs are stored; whether anything is sent at all
+          // is `emailConsent` (see lib/email/consent).
           emailNotifications: {
             streakReminders:
-              userData?.emailNotifications?.streakReminders ?? true,
+              userData?.emailNotifications?.streakReminders !== false,
             seasonUpdates:
-              userData?.emailNotifications?.seasonUpdates ?? true,
+              userData?.emailNotifications?.seasonUpdates !== false,
+            productUpdates:
+              userData?.emailNotifications?.productUpdates !== false,
           },
+          emailConsent: userData?.emailConsent
+            ? {
+                granted: userData.emailConsent.granted === true,
+                source: userData.emailConsent.source ?? null,
+              }
+            : null,
         },
         userAuth: uid,
         currentUserStats: {

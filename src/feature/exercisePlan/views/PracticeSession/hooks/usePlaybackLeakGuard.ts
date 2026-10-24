@@ -5,21 +5,23 @@ import {
   canHearPilot,
   createPilotTracker,
   createProbeSignal,
+  isProbeHeard,
+  LEAK_MIN_LEVEL,
   PILOT_HZ,
   PILOT_SNR_DB,
   pilotSnrDb,
-  PROBE_HEARD_CORRELATION,
   probeCaptureLength,
-  probeCorrelation,
+  probeMatch,
 } from "utils/audio/playbackLeak";
 
+/** What sent the probe that came back: the tab sound coming on (or a device
+ *  change), or the pilot heard mid-run. */
 export type PlaybackLeakSource = "probe" | "pilot";
 
-/** The probe's peak relative to the tab sound's own level. A pure sweep at
- *  1.5–5 kHz, where the ear is keenest, sounds far louder than a guitar note of
- *  the same peak; at 0.3 it was a shrill whistle on every start. At 0.08 it
- *  still reads 0.5+ through a quiet speaker in a noisy room, against the 0.3
- *  threshold. */
+/** The probe's peak relative to the tab sound's own level. Its drops sit at
+ *  1.4–3.5 kHz, where the ear is keenest, so they sound far louder than a guitar
+ *  note of the same peak — at 0.08 they are a soft patter under the tab, and
+ *  still read 0.5+ through a speaker in a noisy room. */
 const PROBE_LEVEL = 0.08;
 /** The pilot relative to the tab sound's level: far under it, and near-ultrasonic. */
 const PILOT_LEVEL = 0.02;
@@ -31,6 +33,9 @@ const PILOT_DELAY_MS = 400;
 const PILOT_FADE_S = 0.05;
 /** A device change settles — and fires more than once — before the probe goes again. */
 const DEVICE_CHANGE_SETTLE_MS = 600;
+/** The pilot sends the probe at most this often: a whine at its pitch that
+ *  never goes away must not keep dropping the probe on the player. */
+const PILOT_PROBE_GAP_MS = 20_000;
 
 interface UsePlaybackLeakGuardOptions {
   /** Worth listening for: the mic is open and the run can land on a board or in a duel. */
@@ -54,9 +59,10 @@ interface UsePlaybackLeakGuardOptions {
  *
  * Whenever the tab sound comes on it sends a short probe the same way and
  * listens for it, and keeps a quiet pilot tone under the sound for as long as it
- * plays (see utils/audio/playbackLeak.ts). A change of audio device sends the
- * probe again. Returns a ref that reads true while the playback is known to be
- * heard.
+ * plays (see utils/audio/playbackLeak.ts). A change of audio device, or the
+ * pilot showing up in the mic, sends the probe again. Only the probe decides,
+ * and only when it comes back loud enough for the tab to be scored. Returns a
+ * ref that reads true while the playback is known to be heard.
  */
 export function usePlaybackLeakGuard({
   enabled,
@@ -97,15 +103,17 @@ export function usePlaybackLeakGuard({
     // ── Probe ──
     let probeSource: AudioBufferSourceNode | null = null;
     let probeGeneration = 0;
+    let probeReason: PlaybackLeakSource = "probe";
     let capture: {
       samples: Float32Array;
       filled: number;
       sampleRate: number;
       generation: number;
+      reason: PlaybackLeakSource;
     } | null = null;
     let awaitingCapture = false;
 
-    const sendProbe = () => {
+    const sendProbe = (reason: PlaybackLeakSource) => {
       if (disposed) return;
       try {
         probeSource?.stop();
@@ -133,6 +141,7 @@ export function usePlaybackLeakGuard({
         return;
       }
       probeGeneration++;
+      probeReason = reason;
       capture = null;
       awaitingCapture = true;
     };
@@ -145,6 +154,7 @@ export function usePlaybackLeakGuard({
           filled: 0,
           sampleRate,
           generation: probeGeneration,
+          reason: probeReason,
         };
       }
       const take = Math.min(
@@ -160,11 +170,11 @@ export function usePlaybackLeakGuard({
       // Off the audio callback: the correlation is a few large FFTs.
       window.setTimeout(() => {
         if (disposed || done.generation !== probeGeneration) return;
-        if (
-          probeCorrelation(done.samples, done.sampleRate) >=
-          PROBE_HEARD_CORRELATION
-        )
-          report("probe");
+        const match = probeMatch(done.samples, done.sampleRate);
+        // The tab goes out 1/PROBE_LEVEL louder than the probe, so it reaches
+        // the mic that much louder too.
+        if (isProbeHeard(match) && match.level / PROBE_LEVEL >= LEAK_MIN_LEVEL)
+          report(done.reason);
       }, 0);
     };
 
@@ -195,9 +205,11 @@ export function usePlaybackLeakGuard({
     let pilotJudging = false;
     let baselineWindows = 0;
     let baselineHits = 0;
+    let pilotHeard = false;
+    let pilotProbedAt = -Infinity;
 
     const listenForPilot = (samples: Float32Array, sampleRate: number) => {
-      if (!pilotTrusted) return;
+      if (!pilotTrusted || leakingRef.current) return;
       const snr = pilotSnrDb(samples, sampleRate);
       if (!pilotJudging) {
         if (performance.now() - startedAt < PILOT_DELAY_MS) {
@@ -212,8 +224,18 @@ export function usePlaybackLeakGuard({
           return;
         }
       }
-      if (tracker.push(snr, (samples.length / sampleRate) * 1000))
-        report("pilot");
+      // Heard, it only asks the question again — once per stretch it stands,
+      // and never so often that the probe turns into a tick.
+      const heard = tracker.push(snr, (samples.length / sampleRate) * 1000);
+      if (
+        heard &&
+        !pilotHeard &&
+        performance.now() - pilotProbedAt >= PILOT_PROBE_GAP_MS
+      ) {
+        pilotProbedAt = performance.now();
+        sendProbe("pilot");
+      }
+      pilotHeard = heard;
     };
 
     const tap: InputTap = (samples, sampleRate) => {
@@ -222,7 +244,7 @@ export function usePlaybackLeakGuard({
     };
     const previousTap = inputTapRef.current;
     inputTapRef.current = tap;
-    sendProbe();
+    sendProbe("probe");
 
     // Headphones out, a Bluetooth speaker in: whatever was learnt is about the
     // device before, so start over and ask again once the switch has settled.
@@ -232,7 +254,8 @@ export function usePlaybackLeakGuard({
       settleTimer = window.setTimeout(() => {
         leakingRef.current = false;
         tracker.reset();
-        sendProbe();
+        pilotHeard = false;
+        sendProbe("probe");
       }, DEVICE_CHANGE_SETTLE_MS);
     };
     navigator.mediaDevices?.addEventListener?.("devicechange", onDeviceChange);

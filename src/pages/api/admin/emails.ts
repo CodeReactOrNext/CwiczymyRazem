@@ -1,4 +1,5 @@
 import { getSeasonFameReward } from "constants/seasonRewards";
+import { canSendEmail } from "lib/email/consent";
 import { isOnEmailCooldown, todayKey } from "lib/email/cooldown";
 import {
   fetchCooldown,
@@ -93,6 +94,8 @@ interface RankedParticipant {
   points: number;
   displayName: string;
   email: string;
+  /** Agreed to email and kept season emails on — the only ones mailed. */
+  seasonUpdates: boolean;
 }
 
 async function getSeasonParticipants(seasonId: string): Promise<RankedParticipant[]> {
@@ -122,6 +125,9 @@ async function getSeasonParticipants(seasonId: string): Promise<RankedParticipan
     .map((p: RankedBase, idx: number) => ({
       ...p,
       email: (userDocs[idx].data()?.email as string) ?? "",
+      // Kept on every participant (not filtered out here) so places and the
+      // top-3 list shown in other users' emails stay accurate.
+      seasonUpdates: canSendEmail(userDocs[idx].data(), "seasonUpdates"),
     }))
     .filter((p) => !!p.email);
 }
@@ -158,6 +164,8 @@ async function getStreakCandidates(diffTarget: 1 | 3): Promise<
     const data = doc.data();
     const email: string | undefined = data.email;
     if (!email) return;
+    // Same rule as the cron: only players who agreed and kept reminders on.
+    if (!canSendEmail(data, "streakReminders")) return;
 
     const target = evaluateStreakReminder(data.statistics, now);
     if (!target || target.daysSincePractice !== diffTarget) return;
@@ -198,17 +206,18 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
         extras: { streakDays: u.streakDays, hoursLeft: u.hoursLeft },
       })),
       cooldownExcluded: excluded,
-      description: `Users whose last practice was exactly ${diff} day${diff > 1 ? "s" : ""} ago.`,
+      description: `Users whose last practice was exactly ${diff} day${diff > 1 ? "s" : ""} ago. Only players who agreed to these emails.`,
     };
   }
 
   if (type === "season_start") {
     const participants = await getSeasonParticipants(prevSeasonId);
     const cooldowns = await fetchCooldownsMap(participants.map((p) => p.uid));
-    const eligible = participants.filter(
+    const consenting = participants.filter((p) => p.seasonUpdates);
+    const eligible = consenting.filter(
       (p) => !isOnEmailCooldown(cooldowns.get(p.uid) ?? null, type, now)
     );
-    const excluded = participants.length - eligible.length;
+    const excluded = consenting.length - eligible.length;
     return {
       type,
       recipients: eligible.map((p) => ({
@@ -221,17 +230,18 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
         seasonName: `Season ${currentSeasonId}`,
         daysInSeason: daysInCurrentSeason,
       },
-      description: `Participants of previous season (${prevSeasonId}). They will be invited to the new season ${currentSeasonId}.`,
+      description: `Participants of previous season (${prevSeasonId}). They will be invited to the new season ${currentSeasonId}. Only players who agreed to these emails.`,
     };
   }
 
   if (type === "season_ending_soon") {
     const participants = await getSeasonParticipants(currentSeasonId);
     const cooldowns = await fetchCooldownsMap(participants.map((p) => p.uid));
-    const eligible = participants.filter(
+    const consenting = participants.filter((p) => p.seasonUpdates);
+    const eligible = consenting.filter(
       (p) => !isOnEmailCooldown(cooldowns.get(p.uid) ?? null, type, now)
     );
-    const excluded = participants.length - eligible.length;
+    const excluded = consenting.length - eligible.length;
     return {
       type,
       recipients: eligible.map((p) => ({
@@ -244,7 +254,7 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
         seasonName: `Season ${currentSeasonId}`,
         daysLeft: daysLeftInSeason,
       },
-      description: `Current season (${currentSeasonId}) participants — ${daysLeftInSeason} day${daysLeftInSeason === 1 ? "" : "s"} left.`,
+      description: `Current season (${currentSeasonId}) participants — ${daysLeftInSeason} day${daysLeftInSeason === 1 ? "" : "s"} left. Only players who agreed to these emails.`,
     };
   }
 
@@ -255,10 +265,11 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
       displayName: p.displayName,
       points: p.points,
     }));
-    const eligible = participants.filter(
+    const consenting = participants.filter((p) => p.seasonUpdates);
+    const eligible = consenting.filter(
       (p) => !isOnEmailCooldown(cooldowns.get(p.uid) ?? null, type, now)
     );
-    const excluded = participants.length - eligible.length;
+    const excluded = consenting.length - eligible.length;
     return {
       type,
       recipients: eligible.map((p) => ({
@@ -276,7 +287,7 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
         seasonName: `Season ${prevSeasonId}`,
         top3,
       },
-      description: `Final results for previous season (${prevSeasonId}).`,
+      description: `Final results for previous season (${prevSeasonId}). Only players who agreed to these emails.`,
     };
   }
 
@@ -330,6 +341,7 @@ async function sendOne(
     const rawHoursLeft = recipient.extras?.hoursLeft;
     await sendStreakReminderEmail({
       to: recipient.email,
+      uid: recipient.uid,
       userName: recipient.displayName,
       streakDays,
       hoursLeft: typeof rawHoursLeft === "number" ? rawHoursLeft : null,
@@ -344,6 +356,7 @@ async function sendOne(
     }
     await sendSeasonStartEmail({
       to: recipient.email,
+      uid: recipient.uid,
       userName: recipient.displayName,
       seasonName: context.seasonName,
       daysInSeason: context.daysInSeason,
@@ -359,6 +372,7 @@ async function sendOne(
     }
     await sendSeasonEndingSoonEmail({
       to: recipient.email,
+      uid: recipient.uid,
       userName: recipient.displayName,
       seasonName: context.seasonName,
       daysLeft: context.daysLeft,
@@ -375,6 +389,7 @@ async function sendOne(
     const fameEarned = (recipient.extras?.fameEarned as number | null | undefined) ?? null;
     await sendSeasonResultsEmail({
       to: recipient.email,
+      uid: recipient.uid,
       userName: recipient.displayName,
       seasonName: context.seasonName,
       userPlace: place ?? null,

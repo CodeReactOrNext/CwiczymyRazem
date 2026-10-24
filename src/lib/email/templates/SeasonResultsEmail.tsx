@@ -12,6 +12,8 @@ import {
 } from "@react-email/components";
 import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
 
+import EmailFooter from "./EmailFooter";
+
 interface TopPlayer {
   displayName: string;
   points: number;
@@ -26,6 +28,8 @@ interface SeasonResultsEmailProps {
   top3: TopPlayer[];
   leaderboardUrl: string;
   logoUrl: string;
+  /** The email tab of Settings, linked from the footer. */
+  preferencesUrl: string;
 }
 
 const colors = {
@@ -192,14 +196,6 @@ const ctaButton = {
   display: "inline-block",
 };
 
-const footer = {
-  fontSize: "12px",
-  color: colors.textDim,
-  textAlign: "center" as const,
-  marginTop: "28px",
-  lineHeight: "18px",
-};
-
 const ordinal = (n: number) => {
   if (n === 1) return "1st";
   if (n === 2) return "2nd";
@@ -218,6 +214,7 @@ export default function SeasonResultsEmail({
   top3,
   leaderboardUrl,
   logoUrl,
+  preferencesUrl,
 }: SeasonResultsEmailProps) {
   const displayName = userName?.trim() || "Guitarist";
   const isRanked = userPlace !== null && userPlace <= SEASON_REWARD_PLACES;
@@ -313,11 +310,9 @@ export default function SeasonResultsEmail({
             </Section>
           </Section>
 
-          <Text style={footer}>
+          <EmailFooter preferencesUrl={preferencesUrl}>
             You received this because you participated in {seasonName}.
-            <br />
-            Riff Quest. Practice. Progress. Play.
-          </Text>
+          </EmailFooter>
         </Container>
       </Body>
     </Html>

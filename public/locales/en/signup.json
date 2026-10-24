@@ -14,5 +14,9 @@
   "submit_button": "Create account",
   "google_button": "Continue with Google",
   "already_have_account": "Already have an account?",
-  "login_link": "Log in"
+  "login_link": "Log in",
+  "email_consent_label": "Send me streak reminders, season updates and occasional news from Riff Quest. I can turn them off anytime in Settings.",
+  "legal_notice": "By creating an account you agree to our {{terms}} and {{privacy}}.",
+  "terms_link": "Terms of Service",
+  "privacy_link": "Privacy Policy"
 }

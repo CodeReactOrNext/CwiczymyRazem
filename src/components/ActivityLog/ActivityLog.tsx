@@ -38,7 +38,7 @@ const YearTabButton = ({
         createRipple(e);
         onSelect();
       }}
-      className={`relative min-h-11 min-w-11 overflow-hidden rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+      className={`relative h-8 overflow-hidden rounded px-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 sm:h-7 ${
         active
           ? "bg-white/20 text-white"
           : "text-white/60 hover:bg-white/15 hover:text-white"
@@ -133,7 +133,7 @@ export const ActivityLogView = ({
          <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
           <h3 className='text-xl font-semibold text-white mr-2'>Activity</h3>
 
-          <div className='flex gap-1 rounded-lg bg-white/10 p-1'>
+          <div className='flex gap-0.5 rounded-lg bg-white/10 p-0.5'>
             {yearButtons.map((yearValue) => (
               <YearTabButton
                 key={`year-btn-${yearValue}`}

@@ -51,7 +51,7 @@
   "email_label": "E-mail",
   "email_notifications": {
     "title": "Powiadomienia e-mail",
-    "description": "Wybierz, jakie e-maile chcesz dostawać od Riff Quest.",
+    "description": "Wybierz, jakie e-maile chcesz dostawać od Riff Quest. Wysyłamy tylko te, które włączysz.",
     "options": {
       "streakReminders": {
         "title": "Przypomnienia o serii",
@@ -60,11 +60,26 @@
       "seasonUpdates": {
         "title": "Informacje o sezonach",
         "description": "E-maile o starcie nowych sezonów, zbliżającym się końcu sezonu i twoich wynikach."
+      },
+      "productUpdates": {
+        "title": "Co nowego w Riff Quest",
+        "description": "Raz na jakiś czas krótkie podsumowanie tego, co nowego w aplikacji."
       }
     },
     "always_sent": "E-maile dotyczące konta i bezpieczeństwa (np. zmiana adresu) są wysyłane zawsze i nie da się ich wyłączyć.",
     "saving": "Zapisywanie...",
     "save": "Zapisz zmiany"
+  },
+  "email_consent": {
+    "title": "Czy możemy wysyłać Ci e-maile?",
+    "intro": "Hej! Chcemy Cię zapytać, czy możemy wysyłać Ci e-maile, bo wcześniej tego nie zrobiliśmy.",
+    "intro_new": "Hej! Jedno szybkie pytanie, zanim zaczniesz: czy możemy czasem wysłać Ci e-maila?",
+    "privacy": "Szanujemy Twoją prywatność, dlatego nie chcemy tego robić bez Twojej zgody.",
+    "list_label": "Ograniczymy się do:",
+    "change_later": "Te ustawienia zawsze możesz zmienić w {{settings}}.",
+    "settings_link": "Ustawieniach",
+    "accept": "Tak, chcę dostawać e-maile",
+    "decline": "Nie, dziękuję"
   },
   "tablature": {
     "title": "Tabulatura",

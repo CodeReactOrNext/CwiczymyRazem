@@ -4,13 +4,16 @@ import {
   canHearPilot,
   createPilotTracker,
   createProbeSignal,
+  isProbeHeard,
   PILOT_HOLD_MS,
   PILOT_HZ,
   PILOT_SNR_DB,
   pilotSnrDb,
+  PROBE_DROPS,
   PROBE_HEARD_CORRELATION,
+  PROBE_MS,
   probeCaptureLength,
-  probeCorrelation,
+  probeMatch,
 } from "./playbackLeak";
 
 const RATE = 48000;
@@ -162,12 +165,63 @@ const throughRoom = (
 
 const capture = (sampleRate = RATE) => probeCaptureLength(sampleRate);
 
-describe("probeCorrelation", () => {
-  it("hears the probe after a Bluetooth-sized delay, under noise and an echo", () => {
-    const recording = throughRoom(noise(capture(), 0.02), 320, 0.05);
-    expect(probeCorrelation(recording, RATE)).toBeGreaterThanOrEqual(
-      PROBE_HEARD_CORRELATION,
+/** Only some of the probe's drops, exactly as it plays them, the rest left silent. */
+const someDrops = (keep: number[]): Float32Array => {
+  const probe = createProbeSignal(RATE);
+  const out = new Float32Array(capture());
+  const at = Math.round(0.4 * RATE);
+  PROBE_DROPS.forEach(({ atMs }, i) => {
+    if (!keep.includes(i)) return;
+    const endMs = PROBE_DROPS[i + 1]?.atMs ?? PROBE_MS;
+    const end = Math.min(probe.length, Math.round((endMs / 1000) * RATE));
+    for (let n = Math.round((atMs / 1000) * RATE); n < end; n++)
+      out[at + n] = 0.3 * probe[n];
+  });
+  return out;
+};
+
+/** A linear sweep at a flat level — the kind of figure the probe used to be. */
+const chirp = (fromHz: number, toHz: number, ms: number): Float32Array => {
+  const out = new Float32Array(capture());
+  const seconds = ms / 1000;
+  const rate = (toHz - fromHz) / seconds;
+  for (let n = 0; n < seconds * RATE; n++) {
+    const t = n / RATE;
+    out[2000 + n] =
+      0.3 * Math.sin(2 * Math.PI * (fromHz * t + 0.5 * rate * t * t));
+  }
+  return out;
+};
+
+/** A string squeaking under a sliding hand: noise through a resonance that sweeps up and down. */
+const squeak = (seed: number): Float32Array => {
+  const excitation = noise(capture(), 0.02, seed);
+  const out = new Float32Array(excitation.length);
+  let y1 = 0;
+  let y2 = 0;
+  for (let n = 0; n < out.length; n++) {
+    const hz =
+      1500 + 2500 * (0.5 + 0.5 * Math.sin((2 * Math.PI * 2.3 * n) / RATE));
+    const pole = 0.995;
+    const y =
+      excitation[n] +
+      2 * pole * Math.cos((2 * Math.PI * hz) / RATE) * y1 -
+      pole * pole * y2;
+    y2 = y1;
+    y1 = y;
+    out[n] = y;
+  }
+  return out;
+};
+
+describe("probeMatch", () => {
+  it("hears the probe after a Bluetooth-sized delay, under noise and an echo, and how loud it came back", () => {
+    const match = probeMatch(
+      throughRoom(noise(capture(), 0.02), 320, 0.05),
+      RATE,
     );
+    expect(isProbeHeard(match)).toBe(true);
+    expect(match.level).toBeCloseTo(0.05, 2);
   });
 
   it("hears it under a strummed chord and the metronome", () => {
@@ -175,47 +229,64 @@ describe("probeCorrelation", () => {
     const click = clicks(capture());
     const roomNoise = noise(capture(), 0.01, 7);
     for (let i = 0; i < bed.length; i++) bed[i] += click[i] + roomNoise[i];
-    expect(
-      probeCorrelation(throughRoom(bed, 80, 0.08), RATE),
-    ).toBeGreaterThanOrEqual(PROBE_HEARD_CORRELATION);
+    expect(isProbeHeard(probeMatch(throughRoom(bed, 80, 0.08), RATE))).toBe(
+      true,
+    );
   });
 
   it("hears it at the interface's own rate", () => {
     const rate = 44100;
     const recording = throughRoom(noise(capture(rate), 0.02), 150, 0.05, rate);
-    expect(probeCorrelation(recording, rate)).toBeGreaterThanOrEqual(
-      PROBE_HEARD_CORRELATION,
-    );
+    expect(isProbeHeard(probeMatch(recording, rate))).toBe(true);
   });
 
   it("doesn't take noise or guitar for the probe", () => {
     const length = capture();
     for (const seed of [1, 2, 3]) {
-      expect(probeCorrelation(noise(length, 0.05, seed), RATE)).toBeLessThan(
-        PROBE_HEARD_CORRELATION / 2,
-      );
+      expect(
+        probeMatch(noise(length, 0.05, seed), RATE).correlation,
+      ).toBeLessThan(PROBE_HEARD_CORRELATION / 2);
     }
-    expect(probeCorrelation(strum(length), RATE)).toBeLessThan(
+    expect(probeMatch(strum(length), RATE).correlation).toBeLessThan(
       PROBE_HEARD_CORRELATION / 2,
     );
+  });
+
+  it.each([[[0]], [[1]], [[2]], [[0, 1]], [[1, 2]], [[0, 2]]])(
+    "doesn't take drops %j alone for the probe — the figure needs all three",
+    (keep) => {
+      expect(isProbeHeard(probeMatch(someDrops(keep), RATE))).toBe(false);
+    },
+  );
+
+  it("doesn't take a lone sweep or a squeaking string for the probe", () => {
+    expect(isProbeHeard(probeMatch(chirp(1500, 5000, 250), RATE))).toBe(false);
+    for (const seed of [1, 2, 3])
+      expect(isProbeHeard(probeMatch(squeak(seed), RATE))).toBe(false);
   });
 
   it.each(Object.keys(METRONOME))(
     "doesn't take the %s metronome for the probe, and still hears the probe over it",
     (sound) => {
       const length = capture();
-      expect(probeCorrelation(clicks(length, sound), RATE)).toBeLessThan(
+      expect(probeMatch(clicks(length, sound), RATE).correlation).toBeLessThan(
         PROBE_HEARD_CORRELATION / 2,
       );
-      // A probe at a twentieth of the click's level.
+      // A probe at a tenth of the click's level.
       expect(
-        probeCorrelation(throughRoom(clicks(length, sound), 300, 0.04), RATE),
-      ).toBeGreaterThanOrEqual(PROBE_HEARD_CORRELATION);
+        isProbeHeard(
+          probeMatch(throughRoom(clicks(length, sound), 300, 0.085), RATE),
+        ),
+      ).toBe(true);
     },
   );
 
   it("reads nothing in silence", () => {
-    expect(probeCorrelation(new Float32Array(capture()), RATE)).toBe(0);
+    expect(probeMatch(new Float32Array(capture()), RATE)).toEqual({
+      correlation: 0,
+      weakestDrop: 0,
+      level: 0,
+    });
   });
 });
 

@@ -86,28 +86,42 @@ const PrivacyPolicyPage: NextPageWithLayout = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-white mb-4">3. Data Sharing</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">3. Emails</h2>
               <p>
-                 We do not sell your personal data. We only share data with trusted third parties necessary for app operation (e.g., Firebase for authentication and database, Sentry for error tracking).
+                We send two kinds of email to the address on your account:
+              </p>
+              <ul className="list-disc pl-6 space-y-2">
+                <li><strong>Account emails:</strong> a welcome message when you sign up, password resets and email address changes. These are part of running your account and are always sent.</li>
+                <li><strong>Optional emails:</strong> streak reminders, season updates (a season starting, ending soon and your results) and an occasional roundup of what&apos;s new at Riff Quest. We only send these if you agree &mdash; on the sign-up form, when the app asks you, or in Settings.</li>
+              </ul>
+              <p className="mt-4">
+                You can withdraw your consent at any time: turn the emails off in Settings &rarr; Notifications, use the &ldquo;Manage email preferences&rdquo; link at the bottom of every email, or press &ldquo;Unsubscribe&rdquo; in your mail app. We keep a record of when and how you answered.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-white mb-4">4. Your Rights</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">4. Data Sharing</h2>
+              <p>
+                 We do not sell your personal data. We only share data with trusted third parties necessary for app operation (e.g., Firebase for authentication and database, Sentry for error tracking, Resend for delivering emails).
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-white mb-4">5. Your Rights</h2>
               <p>
                 You have full control over your data. You can export your data or delete your account at any time within the settings menu.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-white mb-4">5. Contact Us</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">6. Contact Us</h2>
               <p>
                 If you have any questions about this Privacy Policy, feel free to reach out on our <Link href="https://discord.gg/6yJmsZW2Ne" className="text-cyan-400 hover:underline">Discord server</Link>.
               </p>
             </section>
 
             <p className="pt-8 text-sm italic">
-              Last updated: January 27, 2026
+              Last updated: October 24, 2026
             </p>
           </div>
         </div>

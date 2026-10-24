@@ -11,6 +11,8 @@ import {
   Text,
 } from "@react-email/components";
 
+import EmailFooter from "./EmailFooter";
+
 export type StreakEmailVariant = "d1" | "d3";
 
 interface StreakReminderEmailProps {
@@ -18,6 +20,8 @@ interface StreakReminderEmailProps {
   streakDays: number;
   timerUrl: string;
   logoUrl: string;
+  /** The email tab of Settings, linked from the footer. */
+  preferencesUrl: string;
   variant: StreakEmailVariant;
   /** Hours before the streak dies, in the reader's own timezone. */
   hoursLeft?: number | null;
@@ -170,14 +174,6 @@ const ctaButton = (bgColor: string) => ({
   display: "inline-block",
 });
 
-const footer = {
-  fontSize: "12px",
-  color: colors.textDim,
-  textAlign: "center" as const,
-  marginTop: "28px",
-  lineHeight: "18px",
-};
-
 const d1Tips = [
   "Warm up with 5 minutes of chromatic exercises — your fingers will remember.",
   "Even one slow run through a chord progression counts as a session.",
@@ -199,6 +195,7 @@ export default function StreakReminderEmail({
   streakDays,
   timerUrl,
   logoUrl,
+  preferencesUrl,
   variant,
   hoursLeft = null,
 }: StreakReminderEmailProps) {
@@ -286,11 +283,9 @@ export default function StreakReminderEmail({
             )}
           </Section>
 
-          <Text style={footer}>
-            You received this because you have a Riff Quest account.
-            <br />
-            Riff Quest. Practice. Progress. Play.
-          </Text>
+          <EmailFooter preferencesUrl={preferencesUrl}>
+            You received this because you turned on streak reminders.
+          </EmailFooter>
         </Container>
       </Body>
     </Html>

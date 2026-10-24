@@ -51,7 +51,7 @@
   "email_label": "Correo electrónico",
   "email_notifications": {
     "title": "Notificaciones por correo",
-    "description": "Elige qué correos quieres recibir de Riff Quest.",
+    "description": "Elige qué correos quieres recibir de Riff Quest. Solo enviamos los que actives.",
     "options": {
       "streakReminders": {
         "title": "Recordatorios de racha",
@@ -60,11 +60,26 @@
       "seasonUpdates": {
         "title": "Novedades de temporada",
         "description": "Correos sobre el inicio de nuevas temporadas, temporadas a punto de acabar y tus resultados finales."
+      },
+      "productUpdates": {
+        "title": "Novedades de Riff Quest",
+        "description": "De vez en cuando, un breve resumen de las novedades de la app."
       }
     },
     "always_sent": "Los correos de cuenta y seguridad (como los cambios de correo) se envían siempre y no se pueden desactivar.",
     "saving": "Guardando...",
     "save": "Guardar cambios"
+  },
+  "email_consent": {
+    "title": "¿Podemos enviarte correos?",
+    "intro": "¡Hola! Queremos preguntarte si podemos enviarte correos. Deberíamos habértelo preguntado antes.",
+    "intro_new": "¡Hola! Una pregunta rápida antes de empezar: ¿podemos enviarte algún correo de vez en cuando?",
+    "privacy": "Respetamos tu privacidad, así que no te enviaremos nada sin tu permiso.",
+    "list_label": "Nos limitaremos a:",
+    "change_later": "Puedes cambiarlo cuando quieras en {{settings}}.",
+    "settings_link": "Ajustes",
+    "accept": "Sí, quiero recibirlos",
+    "decline": "No, gracias"
   },
   "tablature": {
     "title": "Tablatura",

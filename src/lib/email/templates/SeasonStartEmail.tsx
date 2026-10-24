@@ -12,12 +12,16 @@ import {
 } from "@react-email/components";
 import { placeSuffix, SEASON_FAME_REWARDS } from "constants/seasonRewards";
 
+import EmailFooter from "./EmailFooter";
+
 interface SeasonStartEmailProps {
   userName: string;
   seasonName: string;
   daysInSeason: number;
   leaderboardUrl: string;
   logoUrl: string;
+  /** The email tab of Settings, linked from the footer. */
+  preferencesUrl: string;
 }
 
 const colors = {
@@ -178,20 +182,13 @@ const ctaButton = {
   display: "inline-block",
 };
 
-const footer = {
-  fontSize: "12px",
-  color: colors.textDim,
-  textAlign: "center" as const,
-  marginTop: "28px",
-  lineHeight: "18px",
-};
-
 export default function SeasonStartEmail({
   userName,
   seasonName,
   daysInSeason,
   leaderboardUrl,
   logoUrl,
+  preferencesUrl,
 }: SeasonStartEmailProps) {
   const displayName = userName?.trim() || "Guitarist";
 
@@ -241,11 +238,9 @@ export default function SeasonStartEmail({
             </Section>
           </Section>
 
-          <Text style={footer}>
+          <EmailFooter preferencesUrl={preferencesUrl}>
             You received this because you participated in the previous season.
-            <br />
-            Riff Quest. Practice. Progress. Play.
-          </Text>
+          </EmailFooter>
         </Container>
       </Body>
     </Html>

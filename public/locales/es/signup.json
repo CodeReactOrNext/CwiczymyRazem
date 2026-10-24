@@ -13,5 +13,9 @@
   "submit_button": "Crear cuenta",
   "google_button": "Continuar con Google",
   "already_have_account": "¿Ya tienes una cuenta?",
-  "login_link": "Inicia sesión"
+  "login_link": "Inicia sesión",
+  "email_consent_label": "Quiero recibir recordatorios de racha, novedades de temporada y, de vez en cuando, noticias de Riff Quest. Puedo desactivarlos cuando quiera en Ajustes.",
+  "legal_notice": "Al crear una cuenta, aceptas nuestros {{terms}} y nuestra {{privacy}}.",
+  "terms_link": "Términos del servicio",
+  "privacy_link": "Política de privacidad"
 }

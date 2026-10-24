@@ -2,7 +2,11 @@
 import { cleanup, renderHook } from "@testing-library/react";
 import type { InputTap } from "hooks/guitarBufferProcessor";
 import type { MutableRefObject } from "react";
-import { PILOT_HZ, probeCaptureLength } from "utils/audio/playbackLeak";
+import {
+  PILOT_HOLD_MS,
+  PILOT_HZ,
+  probeCaptureLength,
+} from "utils/audio/playbackLeak";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { usePlaybackLeakGuard } from "./usePlaybackLeakGuard";
@@ -70,11 +74,12 @@ const hiss = (length: number, amplitude: number) => {
   });
 };
 
-/** What the mic hears while the probe comes back out of a speaker 200 ms later. */
-const speakerReturn = (probe: Float32Array) => {
-  const heard = hiss(probeCaptureLength(RATE), 0.01);
+/** What the mic hears while the probe comes back 200 ms later — out of a
+ *  speaker by default, or as the faint trace headphones leave in a laptop mic. */
+const speakerReturn = (probe: Float32Array, gain = 0.1, roomNoise = 0.01) => {
+  const heard = hiss(probeCaptureLength(RATE), roomNoise);
   const delay = Math.round(0.2 * RATE);
-  for (let n = 0; n < probe.length; n++) heard[delay + n] += 0.1 * probe[n];
+  for (let n = 0; n < probe.length; n++) heard[delay + n] += gain * probe[n];
   return heard;
 };
 
@@ -149,6 +154,15 @@ describe("usePlaybackLeakGuard — the probe", () => {
     expect(result.current.current).toBe(false);
   });
 
+  it("stays quiet when the probe only bleeds out of the headphones, too faint to score", async () => {
+    const { probes, inputTapRef, onLeak, result } = setup();
+    // Clear as a bell in a silent room, and 40 dB under anything that counts.
+    feed(inputTapRef, speakerReturn(probes[0], 0.0002, 0.00002));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(onLeak).not.toHaveBeenCalled();
+    expect(result.current.current).toBe(false);
+  });
+
   it("does nothing while the tab sound is off", () => {
     const { ctx } = fakeContext();
     const inputTapRef: MutableRefObject<InputTap | null> = { current: null };
@@ -167,21 +181,45 @@ describe("usePlaybackLeakGuard — the probe", () => {
 });
 
 describe("usePlaybackLeakGuard — the pilot", () => {
-  it("reports the speakers once the pilot has stood in the mic", () => {
-    const { inputTapRef, onLeak } = setup();
-    for (let i = 0; i < 5; i++) inputTapRef.current?.(hiss(WINDOW, 0.01), RATE); // before the pilot starts
+  /** Enough pilot windows to stand for PILOT_HOLD_MS, after a quiet room before it starts. */
+  const pilotStands = (
+    inputTapRef: MutableRefObject<InputTap | null>,
+    windows = Math.ceil((PILOT_HOLD_MS / 1000) * (RATE / WINDOW)) + 1,
+  ) => {
+    for (let i = 0; i < 5; i++) inputTapRef.current?.(hiss(WINDOW, 0.01), RATE);
     now = 500;
-    for (let i = 0; i < 12; i++)
+    for (let i = 0; i < windows; i++)
       inputTapRef.current?.(pilotWindow(0.003), RATE);
-    expect(onLeak).toHaveBeenCalledWith("pilot");
+  };
+
+  it("doesn't report on the pilot alone — it sends the probe to check", async () => {
+    const { probes, inputTapRef, onLeak } = setup();
+    pilotStands(inputTapRef);
+    expect(probes).toHaveLength(2);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(onLeak).not.toHaveBeenCalled();
+  });
+
+  it("reports the speakers once the probe the pilot sent comes back", async () => {
+    const { probes, inputTapRef, onLeak } = setup();
+    pilotStands(inputTapRef);
+    feed(inputTapRef, speakerReturn(probes[1]));
+    await vi.waitFor(() => expect(onLeak).toHaveBeenCalledWith("pilot"));
+  });
+
+  it("sends the probe once while the pilot stands, not on every window", () => {
+    const { probes, inputTapRef } = setup();
+    pilotStands(inputTapRef, 100);
+    expect(probes).toHaveLength(2);
   });
 
   it("ignores a tone the room already had at the pilot's pitch", () => {
-    const { inputTapRef, onLeak } = setup();
+    const { probes, inputTapRef, onLeak } = setup();
     for (let i = 0; i < 5; i++) inputTapRef.current?.(pilotWindow(0.003), RATE);
     now = 500;
-    for (let i = 0; i < 20; i++)
+    for (let i = 0; i < 40; i++)
       inputTapRef.current?.(pilotWindow(0.003), RATE);
+    expect(probes).toHaveLength(1);
     expect(onLeak).not.toHaveBeenCalled();
   });
 });

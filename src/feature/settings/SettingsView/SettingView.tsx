@@ -25,6 +25,7 @@ import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
 import type { UserInfo } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
 import { Bell, Guitar, Lock, Share2, User } from "lucide-react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "store/hooks";
 
@@ -36,11 +37,27 @@ const SETTINGS_TABS = [
   { value: "security", label: "Security", Icon: Lock },
 ] as const;
 
+type SettingsTab = (typeof SETTINGS_TABS)[number]["value"];
+
+const isSettingsTab = (value: unknown): value is SettingsTab =>
+  SETTINGS_TABS.some((tab) => tab.value === value);
+
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings", "toast"]);
   const [userProviderData, setUserProviderData] = useState<UserInfo>();
   const dispatch = useAppDispatch();
   const { ref: railRef, edges } = useRailEdges<HTMLDivElement>();
+  const router = useRouter();
+
+  // `?tab=` opens a tab directly — the emails' "Manage email preferences" link
+  // lands on the notifications one, also when Settings is already open.
+  const queryTab = isSettingsTab(router.query.tab) ? router.query.tab : null;
+  const [tab, setTab] = useState<SettingsTab>(queryTab ?? "profile");
+  const [lastQueryTab, setLastQueryTab] = useState(queryTab);
+  if (queryTab !== lastQueryTab) {
+    setLastQueryTab(queryTab);
+    if (queryTab) setTab(queryTab);
+  }
 
   const isViaGoogle = userProviderData?.providerId === "google.com";
 
@@ -52,7 +69,10 @@ const SettingsView = () => {
 
   return (
     <SettingsLayout>
-      <Tabs defaultValue="profile" className="w-full">
+      <Tabs
+        value={tab}
+        onValueChange={(value) => isSettingsTab(value) && setTab(value)}
+        className="w-full">
         {/* Same underline tab bar as the rest of the app, so the form gets the
             full width instead of sharing it with a column of category cards. */}
         <div className="space-y-6">

@@ -9,6 +9,11 @@ import StreakReminderEmail, {
   type StreakEmailVariant,
 } from "./templates/StreakReminderEmail";
 import WelcomeEmail from "./templates/WelcomeEmail";
+import { unsubscribeHeaders } from "./unsubscribe";
+
+// Every email links here from its footer: the Settings tab with the toggles.
+const preferencesUrlFor = (baseUrl: string) =>
+  `${baseUrl}/settings?tab=notifications`;
 
 interface SendWelcomeArgs {
   to: string;
@@ -29,6 +34,7 @@ export async function sendWelcomeEmail({ to, userName }: SendWelcomeArgs) {
       userName: userName ?? "",
       dashboardUrl: `${baseUrl}/dashboard`,
       logoUrl,
+      preferencesUrl: preferencesUrlFor(baseUrl),
     }),
   });
 
@@ -42,6 +48,8 @@ export async function sendWelcomeEmail({ to, userName }: SendWelcomeArgs) {
 
 interface SendStreakReminderArgs {
   to: string;
+  /** Signs the one-click unsubscribe link; without it only the footer link is offered. */
+  uid?: string;
   userName?: string | null;
   streakDays: number;
   /**
@@ -55,6 +63,7 @@ interface SendStreakReminderArgs {
 
 export async function sendStreakReminderEmail({
   to,
+  uid,
   userName,
   streakDays,
   hoursLeft = null,
@@ -74,12 +83,14 @@ export async function sendStreakReminderEmail({
     from: EMAIL_FROM,
     to,
     subject: subjects[variant],
+    headers: unsubscribeHeaders(uid, "streakReminders", baseUrl),
     react: StreakReminderEmail({
       userName: userName ?? "",
       streakDays,
       hoursLeft,
       timerUrl: `${baseUrl}/dashboard`,
       logoUrl,
+      preferencesUrl: preferencesUrlFor(baseUrl),
       variant,
     }),
   });
@@ -105,6 +116,8 @@ interface TopPlayer {
 
 interface SendSeasonStartArgs {
   to: string;
+  /** Signs the one-click unsubscribe link; without it only the footer link is offered. */
+  uid?: string;
   userName?: string | null;
   seasonName: string;
   daysInSeason: number;
@@ -112,6 +125,7 @@ interface SendSeasonStartArgs {
 
 export async function sendSeasonStartEmail({
   to,
+  uid,
   userName,
   seasonName,
   daysInSeason,
@@ -124,12 +138,14 @@ export async function sendSeasonStartEmail({
     from: EMAIL_FROM,
     to,
     subject: `${seasonName} has started — compete for the top ${SEASON_REWARD_PLACES}`,
+    headers: unsubscribeHeaders(uid, "seasonUpdates", baseUrl),
     react: SeasonStartEmail({
       userName: userName ?? "",
       seasonName,
       daysInSeason,
       leaderboardUrl: `${baseUrl}/leaderboard`,
       logoUrl,
+      preferencesUrl: preferencesUrlFor(baseUrl),
     }),
   });
 
@@ -143,6 +159,8 @@ export async function sendSeasonStartEmail({
 
 interface SendSeasonEndingSoonArgs {
   to: string;
+  /** Signs the one-click unsubscribe link; without it only the footer link is offered. */
+  uid?: string;
   userName?: string | null;
   seasonName: string;
   daysLeft: number;
@@ -156,6 +174,7 @@ function endingSoonSubject(seasonName: string, daysLeft: number): string {
 
 export async function sendSeasonEndingSoonEmail({
   to,
+  uid,
   userName,
   seasonName,
   daysLeft,
@@ -168,12 +187,14 @@ export async function sendSeasonEndingSoonEmail({
     from: EMAIL_FROM,
     to,
     subject: endingSoonSubject(seasonName, daysLeft),
+    headers: unsubscribeHeaders(uid, "seasonUpdates", baseUrl),
     react: SeasonEndingSoonEmail({
       userName: userName ?? "",
       seasonName,
       daysLeft,
       leaderboardUrl: `${baseUrl}/leaderboard`,
       logoUrl,
+      preferencesUrl: preferencesUrlFor(baseUrl),
     }),
   });
 
@@ -187,6 +208,8 @@ export async function sendSeasonEndingSoonEmail({
 
 interface SendSeasonResultsArgs {
   to: string;
+  /** Signs the one-click unsubscribe link; without it only the footer link is offered. */
+  uid?: string;
   userName?: string | null;
   seasonName: string;
   userPlace: number | null;
@@ -197,6 +220,7 @@ interface SendSeasonResultsArgs {
 
 export async function sendSeasonResultsEmail({
   to,
+  uid,
   userName,
   seasonName,
   userPlace,
@@ -217,6 +241,7 @@ export async function sendSeasonResultsEmail({
     from: EMAIL_FROM,
     to,
     subject,
+    headers: unsubscribeHeaders(uid, "seasonUpdates", baseUrl),
     react: SeasonResultsEmail({
       userName: userName ?? "",
       seasonName,
@@ -226,6 +251,7 @@ export async function sendSeasonResultsEmail({
       top3,
       leaderboardUrl: `${baseUrl}/leaderboard`,
       logoUrl,
+      preferencesUrl: preferencesUrlFor(baseUrl),
     }),
   });
 

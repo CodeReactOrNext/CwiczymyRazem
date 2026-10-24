@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { Checkbox } from "assets/components/ui/checkbox";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
@@ -11,6 +12,7 @@ import {
 import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
 import { Form, Formik } from "formik";
 import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
 import {
   trackSignupCompleted,
   trackSignupFormViewed,
@@ -48,6 +50,8 @@ export interface SignUpCredentials {
   login: string;
   email: string;
   password: string;
+  /** The optional-emails checkbox — unticked unless the player ticks it. */
+  emailConsent: boolean;
 }
 
 const SingupView = () => {
@@ -61,10 +65,11 @@ const SingupView = () => {
   const isFetching = useAppSelector(selectIsFetching) === "createAccount";
   const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
 
-  const formikInitialValues = {
+  const formikInitialValues: SignUpCredentials = {
     login: "",
     email: "",
     password: "",
+    emailConsent: false,
   };
 
   // Set by links that carried a destination — a song card in the public
@@ -270,7 +275,7 @@ const SingupView = () => {
               initialValues={formikInitialValues}
               validationSchema={signupSchema}
               onSubmit={onSubmit}>
-              {({ values, errors, touched, handleChange, handleBlur }) => {
+              {({ values, errors, touched, handleChange, handleBlur, setFieldValue }) => {
                 const strength = getPasswordStrength(values.password);
                 return (
                 <Form className='space-y-3 sm:space-y-4'>
@@ -393,6 +398,23 @@ const SingupView = () => {
                     )}
                   </div>
 
+                  {/* Optional emails — consent has to be a tick the player makes */}
+                  <div className='flex items-start gap-3 rounded-lg bg-black/40 p-3'>
+                    <Checkbox
+                      id='emailConsent'
+                      checked={values.emailConsent}
+                      onCheckedChange={(checked) =>
+                        setFieldValue("emailConsent", checked === true)
+                      }
+                      className='mt-0.5 border-zinc-600 data-[state=checked]:border-cyan-500 data-[state=checked]:bg-cyan-500 data-[state=checked]:text-zinc-950'
+                    />
+                    <Label
+                      htmlFor='emailConsent'
+                      className='cursor-pointer text-xs font-normal leading-relaxed text-zinc-400'>
+                      {t("signup:email_consent_label")}
+                    </Label>
+                  </div>
+
                   {/* Signup Button */}
                   <div className="pt-2">
                     <Button
@@ -413,6 +435,28 @@ const SingupView = () => {
                 </Form>
               )}}
             </Formik>
+
+            <p className='mt-4 text-center text-xs leading-relaxed text-zinc-400'>
+              <Interpolate
+                text={t("signup:legal_notice")}
+                values={{
+                  terms: (
+                    <Link
+                      href='/terms-of-service'
+                      className='text-zinc-300 underline underline-offset-2 transition-colors hover:text-white'>
+                      {t("signup:terms_link")}
+                    </Link>
+                  ),
+                  privacy: (
+                    <Link
+                      href='/privacy-policy'
+                      className='text-zinc-300 underline underline-offset-2 transition-colors hover:text-white'>
+                      {t("signup:privacy_link")}
+                    </Link>
+                  ),
+                }}
+              />
+            </p>
             </div>
             </div>
           </div>
