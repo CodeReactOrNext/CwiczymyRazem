@@ -22,6 +22,7 @@ import { isFeatureUnlocked } from "feature/levelGate/data/featureUnlocks";
 import { CommunityIconButton } from "feature/logsBox/components/CommunityIconButton";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 import { userProfileQuery } from "feature/profile/hooks/userProfileQuery";
+import { EmailConsentModal } from "feature/settings/components/EmailConsentModal";
 import { SupportModal } from "feature/support/components/SupportModal";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import {
@@ -34,6 +35,7 @@ import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAppVersion } from "hooks/useAppVersion";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
+import { useEmailConsentPrompt } from "hooks/useEmailConsentPrompt";
 import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useRipple } from "hooks/useRipple";
 import { useSupportPrompt } from "hooks/useSupportPrompt";
@@ -325,6 +327,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     markAsDismissed: markSupportAsDismissed,
     markAsDonate: markSupportAsDonate,
   } = useSupportPrompt();
+  const emailConsentPrompt = useEmailConsentPrompt();
   const { isElectron } = useElectronWindowControls();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -804,15 +807,22 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         footer={moreSheetFooter}
       />
 
+      <EmailConsentModal
+        isOpen={emailConsentPrompt.show}
+        isNewAccount={emailConsentPrompt.isNewAccount}
+        onAnswer={emailConsentPrompt.answer}
+        onClose={emailConsentPrompt.close}
+      />
+
       <FeedbackModal
         variant='prompt'
-        isOpen={showFeedbackPrompt}
+        isOpen={showFeedbackPrompt && !emailConsentPrompt.blocksOtherPrompts}
         onClose={markAsDismissed}
         onSent={markAsSent}
       />
 
       <SupportModal
-        isOpen={showSupportPrompt}
+        isOpen={showSupportPrompt && !emailConsentPrompt.blocksOtherPrompts}
         onClose={markSupportAsDismissed}
         onDonate={markSupportAsDonate}
       />

@@ -13,5 +13,9 @@
   "submit_button": "Konto erstellen",
   "google_button": "Weiter mit Google",
   "already_have_account": "Du hast schon ein Konto?",
-  "login_link": "Anmelden"
+  "login_link": "Anmelden",
+  "email_consent_label": "Schickt mir Serien-Erinnerungen, Saison-Updates und ab und zu Neuigkeiten von Riff Quest. Ich kann sie jederzeit in den Einstellungen abschalten.",
+  "legal_notice": "Mit der Erstellung eines Kontos stimmst du unseren {{terms}} und unserer {{privacy}} zu.",
+  "terms_link": "Nutzungsbedingungen",
+  "privacy_link": "Datenschutzerklärung"
 }

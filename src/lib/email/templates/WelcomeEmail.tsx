@@ -11,10 +11,14 @@ import {
   Text,
 } from "@react-email/components";
 
+import EmailFooter from "./EmailFooter";
+
 interface WelcomeEmailProps {
   userName: string;
   dashboardUrl: string;
   logoUrl: string;
+  /** The email tab of Settings, linked from the footer. */
+  preferencesUrl: string;
 }
 
 const colors = {
@@ -144,14 +148,6 @@ const tipText = {
   margin: 0,
 };
 
-const footer = {
-  fontSize: "12px",
-  color: colors.textDim,
-  textAlign: "center" as const,
-  marginTop: "28px",
-  lineHeight: "18px",
-};
-
 const features = [
   {
     title: "Daily Quests",
@@ -175,6 +171,7 @@ export default function WelcomeEmail({
   userName,
   dashboardUrl,
   logoUrl,
+  preferencesUrl,
 }: WelcomeEmailProps) {
   const displayName = userName?.trim() || "Guitarist";
 
@@ -224,11 +221,9 @@ export default function WelcomeEmail({
             </Section>
           </Section>
 
-          <Text style={footer}>
+          <EmailFooter preferencesUrl={preferencesUrl}>
             You received this email because you created a Riff Quest account.
-            <br />
-            Riff Quest. Practice. Progress. Play.
-          </Text>
+          </EmailFooter>
         </Container>
       </Body>
     </Html>

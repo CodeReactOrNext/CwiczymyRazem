@@ -122,6 +122,69 @@ describe("POST /api/user/getUserData", () => {
     );
   });
 
+  it("stores the sign-up checkbox on the new account", async () => {
+    verifyIdToken.mockResolvedValue({ uid: "uid-1", email: "a@b.c" });
+    docGet
+      .mockResolvedValueOnce({ exists: false, data: () => undefined })
+      .mockResolvedValueOnce(
+        existingDoc({ email: "a@b.c", emailConsent: { granted: true, source: "signup" } }),
+      );
+
+    const res = await call({ idToken: "token", displayName: "NewNick", emailConsent: true });
+
+    expect(docSet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        emailConsent: expect.objectContaining({ granted: true, source: "signup" }),
+      }),
+    );
+    expect(res.payload).toMatchObject({
+      userInfo: { emailConsent: { granted: true, source: "signup" } },
+    });
+  });
+
+  it("leaves a Google sign-up unanswered, so the in-app prompt asks", async () => {
+    verifyIdToken.mockResolvedValue({ uid: "uid-1", email: "a@b.c" });
+    docGet
+      .mockResolvedValueOnce({ exists: false, data: () => undefined })
+      .mockResolvedValueOnce(existingDoc({ email: "a@b.c" }));
+
+    const res = await call({ idToken: "token" });
+
+    expect(docSet).toHaveBeenCalledWith(
+      expect.not.objectContaining({ emailConsent: expect.anything() }),
+    );
+    expect(res.payload).toMatchObject({ userInfo: { emailConsent: null } });
+  });
+
+  it("adds the sign-up answer to a document an auto-login created first", async () => {
+    verifyIdToken.mockResolvedValue({ uid: "uid-1", email: "a@b.c" });
+    docGet.mockResolvedValue(existingDoc({ email: "a@b.c", displayName: "Nick" }));
+
+    await call({ idToken: "token", emailConsent: false });
+
+    expect(docUpdate).toHaveBeenCalledWith({
+      emailConsent: expect.objectContaining({ granted: false, source: "signup" }),
+    });
+  });
+
+  it("never overwrites an answer already given", async () => {
+    verifyIdToken.mockResolvedValue({ uid: "uid-1", email: "a@b.c" });
+    docGet.mockResolvedValue(
+      existingDoc({
+        email: "a@b.c",
+        displayName: "Nick",
+        emailConsent: { granted: false, source: "prompt" },
+      }),
+    );
+
+    const res = await call({ idToken: "token", emailConsent: true });
+
+    expect(docUpdate).not.toHaveBeenCalled();
+    expect(res.payload).toMatchObject({
+      userInfo: { emailConsent: { granted: false, source: "prompt" } },
+    });
+  });
+
   it("claims a parked donation only when one is waiting", async () => {
     verifyIdToken.mockResolvedValue({ uid: "uid-1", email: "a@b.c" });
     docGet.mockResolvedValue(existingDoc({ email: "a@b.c" }));

@@ -2,14 +2,14 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { DailyPrize } from "./DailyPrize";
+import { DailyPrizeName } from "./DailyPrize";
 
 afterEach(cleanup);
 
-describe("DailyPrize", () => {
+describe("DailyPrizeName", () => {
   it("names a mod and what it raises, nothing more", () => {
     render(
-      <DailyPrize
+      <DailyPrizeName
         prize={{
           kind: "mod",
           modKind: "guitar",
@@ -21,14 +21,13 @@ describe("DailyPrize", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "Prize for #1" })).toBeTruthy();
     expect(screen.getByText("Pro low action mod")).toBeTruthy();
     expect(screen.getByText("+4 Play Feeling")).toBeTruthy();
     expect(screen.queryByText(/Top roll|Fits/)).toBeNull();
   });
 
   it("names a part by its tier", () => {
-    render(<DailyPrize prize={{ kind: "part", partId: "pickup", label: "Pickup", tier: "Legendary" }} />);
+    render(<DailyPrizeName prize={{ kind: "part", partId: "pickup", label: "Pickup", tier: "Legendary" }} />);
 
     expect(screen.getByText("Legendary")).toBeTruthy();
     expect(screen.getByText(/Pickup/)).toBeTruthy();

@@ -25,6 +25,7 @@ import {
 import { getQuestDayKey, isPreMigrationQuestDay, isQuestDrawnFor } from "./questDay";
 import { subtractReportedTime } from "./timerReporting";
 import {
+  answerEmailConsent,
   autoLogIn,
   changeUserDisplayName,
   createAccount,
@@ -536,7 +537,13 @@ const userSlice = createSlice({
       .addCase(updateEmailNotifications.fulfilled, (state, { payload }) => {
         state.isFetching = null;
         if (state.userInfo) {
-          state.userInfo.emailNotifications = payload;
+          state.userInfo.emailNotifications = payload.preferences;
+          state.userInfo.emailConsent = payload.emailConsent;
+        }
+      })
+      .addCase(answerEmailConsent.fulfilled, (state, { payload }) => {
+        if (state.userInfo) {
+          state.userInfo.emailConsent = payload;
         }
       })
       .addCase(autoLogIn.rejected, (state, { payload }) => {

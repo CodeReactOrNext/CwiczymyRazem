@@ -207,17 +207,15 @@
   },
   "daily_exercise": {
     "open_spot": "Freier Platz",
-    "no_scores": "Noch keine Ergebnisse. Der erste Durchgang holt #1.",
+    "open_spot_hint": "Spiel, um ihn zu holen",
     "title": "Übung des Tages",
     "new_in": "Neu in {{time}}",
     "none_today": "Heute keine Übung.",
     "beat_score": "Schlag dein Ergebnis",
     "play": "Spielen",
-    "your_best": "Dein Bestes",
-    "rank_of": "#{{rank}} von {{players}}",
-    "todays_board": "Heutiges Board",
     "board_error": "Das Board konnte nicht geladen werden.",
     "prize": "Preis für #1",
+    "wins": "#1 gewinnt",
     "mod": "{{label}}-Mod"
   }
 }

@@ -5,13 +5,14 @@ import { cn } from "assets/lib/utils";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { updateEmailNotifications } from "feature/user/store/userSlice.asyncThunk";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Flame, Loader2, Mail, Trophy } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
-  DEFAULT_EMAIL_NOTIFICATIONS,
-  type EmailNotificationPreferences,
-} from "types/api.types";
+  effectiveEmailPreferences,
+  EMAIL_CATEGORIES,
+} from "lib/email/consent";
+import { Check, Flame, Loader2, Mail, Sparkles, Trophy } from "lucide-react";
+import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import type { EmailNotificationPreferences } from "types/api.types";
 
 type ToggleKey = keyof EmailNotificationPreferences;
 
@@ -38,6 +39,13 @@ const OPTIONS: {
     icon: Trophy,
     iconClass: "bg-cyan-500/10 text-cyan-500",
   },
+  {
+    key: "productUpdates",
+    title: "What's new at Riff Quest",
+    description: "Once in a while, a short roundup of what's new in the app.",
+    icon: Sparkles,
+    iconClass: "bg-zinc-800/60 text-zinc-400",
+  },
 ];
 
 const EmailNotificationSettings = () => {
@@ -46,17 +54,23 @@ const EmailNotificationSettings = () => {
   const userInfo = useAppSelector(selectUserInfo);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
-  const saved = userInfo?.emailNotifications ?? DEFAULT_EMAIL_NOTIFICATIONS;
+  // Off until the player agreed to email (on sign-up, in the prompt or here).
+  const saved = effectiveEmailPreferences(userInfo);
   const [prefs, setPrefs] = useState<EmailNotificationPreferences>(saved);
 
-  // Keep local state in sync once user data finishes loading.
-  useEffect(() => {
+  // Keep local state in sync once user data finishes loading (or the prompt is
+  // answered while this tab is open).
+  const savedKey = EMAIL_CATEGORIES.map((key) => saved[key]).join();
+  const [lastSavedKey, setLastSavedKey] = useState(savedKey);
+  if (savedKey !== lastSavedKey) {
+    setLastSavedKey(savedKey);
     setPrefs(saved);
-  }, [saved.streakReminders, saved.seasonUpdates]);
+  }
 
   const isChanged =
     prefs.streakReminders !== saved.streakReminders ||
-    prefs.seasonUpdates !== saved.seasonUpdates;
+    prefs.seasonUpdates !== saved.seasonUpdates ||
+    prefs.productUpdates !== saved.productUpdates;
 
   const handleSave = () => {
     dispatch(updateEmailNotifications(prefs));

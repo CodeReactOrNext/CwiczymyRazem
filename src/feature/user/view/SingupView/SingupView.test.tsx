@@ -38,6 +38,16 @@ vi.mock("hooks/useTranslation", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+// jsdom ships no ResizeObserver, which Radix's checkbox measures itself with.
+vi.stubGlobal(
+  "ResizeObserver",
+  class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  },
+);
+
 describe("SingupView", () => {
   afterEach(cleanup);
 
@@ -64,7 +74,17 @@ describe("SingupView", () => {
       "signup:email_label",
       "signup:username_label",
       "signup:password_label",
+      "signup:email_consent_label",
     ]);
+  });
+
+  it("leaves the email checkbox unticked — consent is the player's tick", () => {
+    render(<SingupView />);
+
+    const consent = screen.getByRole("checkbox", {
+      name: "signup:email_consent_label",
+    });
+    expect(consent.getAttribute("aria-checked")).toBe("false");
   });
 
   it("no longer asks anyone to retype their password", () => {

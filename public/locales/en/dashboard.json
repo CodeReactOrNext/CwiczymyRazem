@@ -207,17 +207,15 @@
   },
   "daily_exercise": {
     "open_spot": "Open spot",
-    "no_scores": "No scores yet. The first run takes #1.",
+    "open_spot_hint": "Play to take it",
     "title": "Exercise of the day",
     "new_in": "New in {{time}}",
     "none_today": "No exercise today.",
     "beat_score": "Beat your score",
     "play": "Play",
-    "your_best": "Your best",
-    "rank_of": "#{{rank}} of {{players}}",
-    "todays_board": "Today's board",
     "board_error": "The board could not be loaded.",
     "prize": "Prize for #1",
+    "wins": "#1 wins",
     "mod": "{{label}} mod"
   }
 }

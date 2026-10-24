@@ -12,12 +12,16 @@ import {
 } from "@react-email/components";
 import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
 
+import EmailFooter from "./EmailFooter";
+
 interface SeasonEndingSoonEmailProps {
   userName: string;
   seasonName: string;
   daysLeft: number;
   leaderboardUrl: string;
   logoUrl: string;
+  /** The email tab of Settings, linked from the footer. */
+  preferencesUrl: string;
 }
 
 const colors = {
@@ -131,14 +135,6 @@ const ctaButton = {
   display: "inline-block",
 };
 
-const footer = {
-  fontSize: "12px",
-  color: colors.textDim,
-  textAlign: "center" as const,
-  marginTop: "28px",
-  lineHeight: "18px",
-};
-
 interface Copy {
   preview: string;
   eyebrow: string;
@@ -193,6 +189,7 @@ export default function SeasonEndingSoonEmail({
   daysLeft,
   leaderboardUrl,
   logoUrl,
+  preferencesUrl,
 }: SeasonEndingSoonEmailProps) {
   const displayName = userName?.trim() || "Guitarist";
   const copy = buildCopy(daysLeft, displayName, seasonName);
@@ -227,11 +224,9 @@ export default function SeasonEndingSoonEmail({
             </Section>
           </Section>
 
-          <Text style={footer}>
+          <EmailFooter preferencesUrl={preferencesUrl}>
             You received this because you are participating in {seasonName}.
-            <br />
-            Riff Quest. Practice. Progress. Play.
-          </Text>
+          </EmailFooter>
         </Container>
       </Body>
     </Html>

@@ -4,7 +4,7 @@ import axios from "axios";
 // Challenges removed
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import { onboardingHref } from "feature/onboarding/analytics/onboardingAnalytics";
-import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateEmailNotifications, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
+import { firebaseAnswerEmailConsent, firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateEmailNotifications, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { getAdditionalUserInfo, GoogleAuthProvider } from "firebase/auth";
@@ -172,14 +172,14 @@ export const autoLogIn = createAsyncThunk<
 
 export const createAccount = createAsyncThunk(
   "user/createAccount",
-  async ({ login, email, password }: SignUpCredentials) => {
+  async ({ login, email, password, emailConsent }: SignUpCredentials) => {
     try {
       if (await firebaseCheckUsersNameIsNotUnique(login)) {
         throw new Error("nick-alredy-in-use");
       }
       const { user } = await firebaseCreateAccountWithEmail(email, password);
       const token = await user.getIdToken();
-      const userData = await fetchUserData(user, login);
+      const userData = await fetchUserData(user, login, emailConsent);
       await signIn("credentials", { idToken: token, redirect: false });
       posthog.identify(user.uid, { email: user.email ?? undefined, name: login });
       posthog.capture("user_signed_up", { method: "email", email: user.email, login });
@@ -257,9 +257,22 @@ export const updateEmailNotifications = createAsyncThunk(
   "user/updateEmailNotifications",
   async (preferences: EmailNotificationPreferences) => {
     try {
-      await firebaseUpdateEmailNotifications(preferences);
+      const emailConsent = await firebaseUpdateEmailNotifications(preferences);
       updateUserDataSuccess();
-      return preferences;
+      return { preferences, emailConsent };
+    } catch (error) {
+      udpateDataErrorHandler(error as SerializedError);
+      return Promise.reject();
+    }
+  }
+);
+
+/** The one-time "may we email you?" prompt. No toast: closing it is the feedback. */
+export const answerEmailConsent = createAsyncThunk(
+  "user/answerEmailConsent",
+  async (granted: boolean) => {
+    try {
+      return await firebaseAnswerEmailConsent(granted);
     } catch (error) {
       udpateDataErrorHandler(error as SerializedError);
       return Promise.reject();

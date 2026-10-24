@@ -207,17 +207,15 @@
   },
   "daily_exercise": {
     "open_spot": "Wolne miejsce",
-    "no_scores": "Brak wyników. Pierwsze podejście zajmuje #1.",
+    "open_spot_hint": "Zagraj, żeby je zająć",
     "title": "Ćwiczenie dnia",
     "new_in": "Nowe za {{time}}",
     "none_today": "Dziś brak ćwiczenia.",
     "beat_score": "Pobij swój wynik",
     "play": "Graj",
-    "your_best": "Twój najlepszy",
-    "rank_of": "#{{rank}} z {{players}}",
-    "todays_board": "Dzisiejsza tablica",
     "board_error": "Nie udało się wczytać tablicy.",
     "prize": "Nagroda za #1",
+    "wins": "#1 wygrywa",
     "mod": "Mod: {{label}}"
   }
 }

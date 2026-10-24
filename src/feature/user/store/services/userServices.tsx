@@ -10,9 +10,14 @@ import type {
  * The route takes the uid from the verified ID token. Only the token and the
  * profile fields it needs go over the wire, not the serialized `User` (which
  * would carry the refresh token too). `displayName` overrides the account's
- * for a sign-up that has just picked its nick.
+ * for a sign-up that has just picked its nick; `emailConsent` is that sign-up's
+ * answer to the email checkbox.
  */
-export const fetchUserData = async (user: User, displayName?: string) =>
+export const fetchUserData = async (
+  user: User,
+  displayName?: string,
+  emailConsent?: boolean,
+) =>
   axios
     .post<UserDataInterface>(
       "/api/user/getUserData",
@@ -20,6 +25,7 @@ export const fetchUserData = async (user: User, displayName?: string) =>
         idToken: await user.getIdToken(),
         displayName: displayName ?? user.displayName,
         photoURL: user.photoURL,
+        emailConsent,
       },
       // Without a timeout a stalled request (regional network / cold serverless
       // start) leaves autoLogIn pending forever, which keeps the dashboard on

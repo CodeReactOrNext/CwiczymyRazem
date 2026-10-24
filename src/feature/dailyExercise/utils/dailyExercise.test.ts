@@ -5,6 +5,7 @@ import type { DailyExerciseEntry } from "../types/dailyExercise.types";
 import {
   canSettleDailyBoard,
   DAILY_EXERCISE_POOL,
+  dailyPodium,
   dailyResultRows,
   findDailyDayKeyFor,
   getDailyDayKey,
@@ -182,5 +183,36 @@ describe("dailyResultRows", () => {
   it("shows a short board as it is", () => {
     expect(dailyResultRows(top.slice(0, 2), row(2))).toEqual(top.slice(0, 2));
     expect(dailyResultRows(top.slice(0, 2), null)).toEqual(top.slice(0, 2));
+  });
+});
+
+describe("dailyPodium", () => {
+  const e = (id: string) => ({ id });
+  const top = ["a", "b", "c", "d", "e"].map(e);
+
+  it("shows the top three", () => {
+    expect(dailyPodium(top, null)).toEqual([
+      { entry: e("a"), place: 1 },
+      { entry: e("b"), place: 2 },
+      { entry: e("c"), place: 3 },
+    ]);
+  });
+
+  it("gives the third slot to a player below the podium, at their own place", () => {
+    const own = { id: "me", rank: 7 };
+    expect(dailyPodium(top, own)).toEqual([
+      { entry: e("a"), place: 1 },
+      { entry: e("b"), place: 2 },
+      { entry: own, place: 7 },
+    ]);
+  });
+
+  it("leaves a player already on the podium where they are", () => {
+    expect(dailyPodium(top, { id: "b", rank: 2 }).map((p) => p?.place)).toEqual([1, 2, 3]);
+  });
+
+  it("keeps open places on a short board", () => {
+    expect(dailyPodium([e("a")], null)).toEqual([{ entry: e("a"), place: 1 }, null, null]);
+    expect(dailyPodium([], null)).toEqual([null, null, null]);
   });
 });
