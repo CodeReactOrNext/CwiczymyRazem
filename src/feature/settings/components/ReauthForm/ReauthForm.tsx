@@ -32,7 +32,7 @@ const ReauthForm = ({
               email: "",
               password: "",
               login: "",
-              repeat_password: "",
+              emailConsent: false,
             }}
             validationSchema={loginSchema}
             onSubmit={changeCredentialsHandler}>
