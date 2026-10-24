@@ -5,6 +5,7 @@ import {
   onboardingHref,
   parseOnboardingSource,
   trackOnboardingCompleted,
+  trackOnboardingDesktopHintContinued,
   trackOnboardingGoalChosen,
   trackOnboardingLevelChosen,
   trackOnboardingPlanChosen,
@@ -135,6 +136,25 @@ describe("onboardingAnalytics", () => {
       source: "google_signup",
     });
     expect(props).toHaveProperty("$set_once.onboarding_completed_at");
+  });
+
+  it("records a phone player tapping through the desktop step", () => {
+    trackOnboardingDesktopHintContinued({
+      level: "new",
+      goal: "journey",
+      timeOnStepMs: 2500,
+      source: "google_signup",
+    });
+
+    expect(lastCall()).toEqual([
+      "onboarding_desktop_hint_continued",
+      {
+        level: "new",
+        goal: "journey",
+        time_on_step_ms: 2500,
+        source: "google_signup",
+      },
+    ]);
   });
 
   it("records where a skip happened", () => {

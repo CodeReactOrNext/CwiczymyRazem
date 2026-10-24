@@ -1,7 +1,5 @@
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import type { LucideIcon } from "lucide-react";
-import { Compass, Dumbbell, Music, NotebookPen, Route } from "lucide-react";
 
 import type { OnboardingGoal, OnboardingLevel } from "../types";
 
@@ -41,7 +39,6 @@ export const LEVEL_OPTIONS: LevelOption[] = [
 
 export interface GoalOption {
   goal: OnboardingGoal;
-  icon: LucideIcon;
   label: string;
   description: string;
   /** Where the answer leads. `null` = the plan picker inside the onboarding. */
@@ -57,6 +54,12 @@ export interface GoalOption {
 const ALL_LEVELS: OnboardingLevel[] = ["new", "some", "experienced"];
 
 /**
+ * Where the songs answer lands. The onboarding first stops on its own step to
+ * say there are no tabs here — players picking it expected them.
+ */
+export const SONGS_HREF = "/songs?view=management";
+
+/**
  * The second question: what did the player come here for? Each answer only
  * shows up for the levels it fits — someone who has played for years is not
  * offered learning guitar from scratch, and a beginner has no routine to log.
@@ -64,7 +67,6 @@ const ALL_LEVELS: OnboardingLevel[] = ["new", "some", "experienced"];
 export const GOAL_OPTIONS: GoalOption[] = [
   {
     goal: "journey",
-    icon: Route,
     label: "Follow the Learning Path",
     description: "Learn guitar from scratch, one step at a time",
     href: "/journey",
@@ -74,7 +76,6 @@ export const GOAL_OPTIONS: GoalOption[] = [
   },
   {
     goal: "plans",
-    icon: Dumbbell,
     label: "Practice with exercise plans",
     description: "Ready-made routines with a timer that guides you",
     href: null,
@@ -84,17 +85,15 @@ export const GOAL_OPTIONS: GoalOption[] = [
   },
   {
     goal: "songs",
-    icon: Music,
     label: "Learn songs and track them",
     description: "Save songs you want to play and see your progress",
-    href: "/songs?view=management",
+    href: SONGS_HREF,
     levels: ALL_LEVELS,
     image: "/images/songs-library.webp",
     imagePosition: "object-left-top",
   },
   {
     goal: "roadmap",
-    icon: Compass,
     label: "Follow a roadmap to a goal",
     description: "A step-by-step path, like playing in the style of your hero",
     href: "/ai-coach",
@@ -104,7 +103,6 @@ export const GOAL_OPTIONS: GoalOption[] = [
   },
   {
     goal: "log",
-    icon: NotebookPen,
     label: "Log the practice I already do",
     description: "Track your time, streak and progress",
     href: "/report",

@@ -13,7 +13,8 @@ import type { OnboardingGoal, OnboardingLevel } from "../types";
  * what the player said they came for.
  */
 
-export type OnboardingStep = "level" | "goal" | "plan";
+/** `songs` explains what learning songs here looks like (no tabs) before the player commits to it. */
+export type OnboardingStep = "level" | "goal" | "plan" | "songs";
 
 /**
  * Wall-clock timing for time-on-step and total duration. Kept out of the
@@ -144,6 +145,24 @@ export const trackOnboardingCompleted = (props: {
     duration_ms: props.durationMs,
     source: props.source,
     $set_once: { onboarding_completed_at: new Date().toISOString() },
+  });
+};
+
+/**
+ * A phone player tapped through the "best on a computer" step. Its drop-off is
+ * `onboarding_completed` on mobile minus this event.
+ */
+export const trackOnboardingDesktopHintContinued = (props: {
+  level: OnboardingLevel;
+  goal: OnboardingGoal;
+  timeOnStepMs: number;
+  source: OnboardingSource;
+}) => {
+  posthog.capture("onboarding_desktop_hint_continued", {
+    level: props.level,
+    goal: props.goal,
+    time_on_step_ms: props.timeOnStepMs,
+    source: props.source,
   });
 };
 

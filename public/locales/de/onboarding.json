@@ -4,18 +4,32 @@
   "progress": "Einrichtungsfortschritt",
   "close": "Schließen",
   "level_step": {
-    "title": "Wie lange spielst du schon?",
-    "description": "Damit wir dir nur zeigen, was zu deinem Stand passt."
+    "title": "Wie lange spielst du schon?"
   },
   "goal_step": {
-    "title": "Was führt dich zu Riff Quest?",
-    "description": "Wähle, wo du anfangen willst. Alles andere bleibt einen Klick entfernt."
+    "title": "Was führt dich zu Riff Quest?"
   },
   "plan_step": {
     "title": "Wähle einen Plan für den Start",
-    "description": "Kurze Routinen, bei denen dich der Timer durch jede Übung führt. Nichts startet, bevor du Play drückst — mit Mikrofon für Live-Feedback oder ohne.",
     "open": "Plan öffnen",
     "browse_all": "Alle {{count}} Pläne ansehen"
+  },
+  "songs_step": {
+    "title": "So funktioniert das Lernen von Songs",
+    "description": "Wir liefern keine Tabs. Das bekommst du stattdessen.",
+    "no_tabs": "Ohne Tabs",
+    "features": {
+      "library": "Speichere die Songs, die du lernst, in deiner Bibliothek",
+      "time": "Wir erfassen, wie lange du jeden Song übst",
+      "sources": "Songteile aus YouTube markieren oder Guitar Pro hochladen"
+    },
+    "continue": "Verstanden, zu meinen Songs",
+    "other": "Etwas anderes wählen"
+  },
+  "desktop_hint": {
+    "title": "Am besten am Computer",
+    "description": "Auf dem Handy funktioniert alles, aber Riff Quest ist für den Computer gemacht. Komm am Computer zurück, dort ist es viel bequemer.",
+    "continue": "Verstanden, los geht's"
   },
   "levels": {
     "new": {
