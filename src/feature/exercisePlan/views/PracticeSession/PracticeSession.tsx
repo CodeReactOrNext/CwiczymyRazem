@@ -725,8 +725,17 @@ const PracticeSessionInner = ({
   // initAudio() flips it to true, immediately closing the stream that was just
   // opened. initAudio/closeAudio are stable (useCallback, see useAudioAnalyzer
   // / useNativeAudioAnalyzer) so omitting them changes nothing.
+  //
+  // The cleanup is only registered by the *enabled* run. The calibration wizard
+  // opens the stream itself while isMicEnabled is still false and flips it to
+  // true on completion — a cleanup left behind by the disabled run would fire
+  // right then and close the wizard's stream, while the guard above (isListening
+  // still true in this render) skips reopening it: mic "on", nothing detected
+  // until the player left the exercise and came back. Unmount is covered by the
+  // analyzer hooks' own cleanup.
   useEffect(() => {
-    if (isMicEnabled && !isListening) initAudio();
+    if (!isMicEnabled) return undefined;
+    if (!isListening) initAudio();
     return () => { closeAudio(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMicEnabled]);
