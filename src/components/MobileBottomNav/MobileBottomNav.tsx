@@ -123,7 +123,7 @@ export const MobileBottomNav = ({
       // The open sheet is a modal that switches pointer events off on <body>;
       // the bar opts back in so its tabs keep working underneath.
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-zinc-900/95 pb-safe pt-1.5 px-2 backdrop-blur-xl lg:hidden transform-gpu",
+        "fixed bottom-0 left-0 right-0 z-[100] h-[var(--mobile-nav-height)] border-t border-white/10 bg-zinc-900/95 pb-safe pt-1.5 px-2 backdrop-blur-xl lg:hidden transform-gpu",
         isMenuOpen && "pointer-events-auto"
       )}>
       <div className="mx-auto flex max-w-md items-stretch justify-around gap-0.5">

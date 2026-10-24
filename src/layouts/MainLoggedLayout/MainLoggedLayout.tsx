@@ -79,7 +79,7 @@ const MainLoggedLayout = ({
                   </m.div>
                 </div>
               ) : (
-                <div className={`z-20 mx-auto w-full px-0 pb-24 md:pt-8 md:pb-8 lg:px-8 ${wide ? "max-w-[1800px]" : "max-w-[1490px]"}`}>
+                <div className={`z-20 mx-auto w-full px-0 pb-[var(--mobile-nav-height)] md:pt-8 md:pb-8 lg:px-8 ${wide ? "max-w-[1800px]" : "max-w-[1490px]"}`}>
                     <m.div key={router.pathname} className='relative' {...pageEnter}>
                       {children}
                     </m.div>

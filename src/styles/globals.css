@@ -17,6 +17,14 @@
   }
 }
 
+/* The mobile bottom nav is exactly this tall, and the logged-in shell reserves
+   exactly this much below the content. A fixed reserve (pb-24) left a strip of
+   empty background above the nav whenever iOS Safari's bottom toolbar zeroes the
+   safe-area inset. */
+:root {
+  --mobile-nav-height: calc(67px + env(safe-area-inset-bottom, 0px));
+}
+
 html {
   /* Always reserve space for the vertical scrollbar so navigating between
      pages of different content height (e.g. library tabs) doesn't shift

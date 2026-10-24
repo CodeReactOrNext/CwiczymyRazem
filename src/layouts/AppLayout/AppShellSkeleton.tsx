@@ -65,9 +65,7 @@ export const AppShellSkeleton = () => {
         </div>
       </div>
 
-      <div className='fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-zinc-900/95 px-2 pb-safe pt-1.5 lg:hidden'>
-        <div className='h-14' />
-      </div>
+      <div className='fixed bottom-0 left-0 right-0 z-[100] h-[var(--mobile-nav-height)] border-t border-white/10 bg-zinc-900/95 lg:hidden' />
     </div>
   );
 };
