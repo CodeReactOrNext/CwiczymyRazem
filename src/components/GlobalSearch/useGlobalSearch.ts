@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { SEARCH_PAGES } from "components/GlobalSearch/searchPages";
+import { SHORTCUT_GROUP_LABELS } from "feature/dashboard/data/shortcutCatalog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 import { idToSlug } from "feature/exercises/lib/slugUtils";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import type { LucideIcon } from "lucide-react";
 import { useMemo } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -11,12 +15,14 @@ const MAX_RESULTS_PER_GROUP = 5;
 const MIN_QUERY_LENGTH = 2;
 
 export interface GlobalSearchResult {
-  type: "exercise" | "plan" | "song";
+  type: "page" | "exercise" | "plan" | "song";
   id: string;
   title: string;
   subtitle: string;
   href: string;
   coverUrl?: string;
+  /** Per-result icon, overriding the group's default (pages each have their own). */
+  icon?: LucideIcon;
 }
 
 const matches = (query: string, ...fields: (string | undefined)[]) =>
@@ -25,6 +31,7 @@ const matches = (query: string, ...fields: (string | undefined)[]) =>
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
 export const useGlobalSearch = (query: string, enabled: boolean) => {
+  const { t } = useTranslation(["dashboard", "nav", "practice_hub"]);
   const userId = useAppSelector(selectUserAuth);
   const normalizedQuery = query.trim().toLowerCase();
   const hasQuery = normalizedQuery.length >= MIN_QUERY_LENGTH;
@@ -42,6 +49,26 @@ export const useGlobalSearch = (query: string, enabled: boolean) => {
     enabled: enabled && !!userId,
     staleTime: 10 * 60 * 1000,
   });
+
+  // English names are matched too, so "settings" still finds the page for a
+  // player using another language.
+  const pageResults = useMemo<GlobalSearchResult[]>(() => {
+    if (!hasQuery) return [];
+    return SEARCH_PAGES.map((page) => ({
+      page,
+      title: page.titleKey ? t(page.titleKey, page.label) : page.label,
+    }))
+      .filter(({ page, title }) => matches(normalizedQuery, title, page.label, page.keywords))
+      .slice(0, MAX_RESULTS_PER_GROUP)
+      .map(({ page, title }) => ({
+        type: "page" as const,
+        id: page.id,
+        title,
+        subtitle: t(`dashboard:shortcuts.groups.${page.group}`, SHORTCUT_GROUP_LABELS[page.group]),
+        href: page.href,
+        icon: page.icon,
+      }));
+  }, [normalizedQuery, hasQuery, t]);
 
   const exerciseResults = useMemo<GlobalSearchResult[]>(() => {
     if (!hasQuery) return [];
@@ -89,11 +116,12 @@ export const useGlobalSearch = (query: string, enabled: boolean) => {
   }, [userSongs, normalizedQuery, hasQuery]);
 
   const results = useMemo(
-    () => [...exerciseResults, ...planResults, ...songResults],
-    [exerciseResults, planResults, songResults],
+    () => [...pageResults, ...exerciseResults, ...planResults, ...songResults],
+    [pageResults, exerciseResults, planResults, songResults],
   );
 
   return {
+    pageResults,
     exerciseResults,
     planResults,
     songResults,

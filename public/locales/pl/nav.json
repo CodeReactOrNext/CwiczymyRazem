@@ -44,10 +44,11 @@
   "search": {
     "button": "Szukaj...",
     "title": "Szukaj",
-    "description": "Przeszukaj swoje plany, ćwiczenia i utwory",
-    "placeholder": "Szukaj planów, ćwiczeń, utworów...",
-    "start_typing": "Zacznij pisać, aby przeszukać swoje plany, ćwiczenia i utwory.",
+    "description": "Przeszukaj strony, swoje plany, ćwiczenia i utwory",
+    "placeholder": "Szukaj stron, planów, ćwiczeń, utworów...",
+    "start_typing": "Zacznij pisać, aby przeszukać strony, swoje plany, ćwiczenia i utwory.",
     "no_results": "Brak wyników dla „{{query}}”.",
+    "group_pages": "Strony",
     "group_plans": "Plany",
     "group_exercises": "Ćwiczenia",
     "group_songs": "Utwory"

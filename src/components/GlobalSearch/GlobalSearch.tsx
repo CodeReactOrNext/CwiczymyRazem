@@ -11,6 +11,7 @@ import { useTranslation } from "hooks/useTranslation";
 import {
   ClipboardList,
   Dumbbell,
+  LayoutGrid,
   Loader2,
   Music,
   Search,
@@ -20,12 +21,14 @@ import type { KeyboardEvent } from "react";
 import { Fragment, useEffect, useRef, useState } from "react";
 
 const GROUP_LABEL_KEYS: Record<GlobalSearchResult["type"], string> = {
+  page: "search.group_pages",
   plan: "search.group_plans",
   exercise: "search.group_exercises",
   song: "search.group_songs",
 };
 
 const GROUP_ICONS: Record<GlobalSearchResult["type"], typeof Music> = {
+  page: LayoutGrid,
   plan: ClipboardList,
   exercise: Dumbbell,
   song: Music,
@@ -33,8 +36,9 @@ const GROUP_ICONS: Record<GlobalSearchResult["type"], typeof Music> = {
 
 // Matches the color coding already used for these categories elsewhere in the
 // app (e.g. the dashboard quick-links: indigo = plans, emerald = exercises,
-// amber = songs).
+// amber = songs). Pages are plain navigation, so they stay neutral.
 const GROUP_TILE_CLASSES: Record<GlobalSearchResult["type"], string> = {
+  page: "bg-zinc-800 text-zinc-300",
   plan: "bg-indigo-500/10 text-indigo-400",
   exercise: "bg-emerald-500/10 text-emerald-400",
   song: "bg-amber-500/10 text-amber-400",
@@ -171,7 +175,7 @@ export const GlobalSearch = () => {
               </p>
             )}
             {results.map((result, index) => {
-              const Icon = GROUP_ICONS[result.type];
+              const Icon = result.icon ?? GROUP_ICONS[result.type];
               const showGroupLabel =
                 index === 0 || results[index - 1].type !== result.type;
               return (

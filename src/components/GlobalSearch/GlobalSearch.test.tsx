@@ -44,7 +44,7 @@ describe("GlobalSearch", () => {
 
     fireEvent.click(screen.getByLabelText("Search"));
     const input = await screen.findByPlaceholderText(
-      "Search plans, exercises, songs...",
+      "Search pages, plans, exercises, songs...",
     );
 
     fireEvent.change(input, { target: { value: "shifting up the neck" } });
@@ -53,12 +53,41 @@ describe("GlobalSearch", () => {
     expect(await findByTitle("Spider — Shifting Up the Neck")).toBeTruthy();
   });
 
+  it("finds app pages by name and navigates to them", async () => {
+    renderGlobalSearch();
+
+    fireEvent.click(screen.getByLabelText("Search"));
+    const input = await screen.findByPlaceholderText(
+      "Search pages, plans, exercises, songs...",
+    );
+
+    fireEvent.change(input, { target: { value: "tone studio" } });
+
+    expect(await screen.findByText("Pages")).toBeTruthy();
+    fireEvent.click(await findByTitle("Tone Studio"));
+
+    expect(push).toHaveBeenCalledWith("/tone-studio");
+  });
+
+  it("finds pages the shortcuts card doesn't list, by keyword", async () => {
+    renderGlobalSearch();
+
+    fireEvent.click(screen.getByLabelText("Search"));
+    const input = await screen.findByPlaceholderText(
+      "Search pages, plans, exercises, songs...",
+    );
+
+    fireEvent.change(input, { target: { value: "boss" } });
+
+    expect(await findByTitle("Boss Fights")).toBeTruthy();
+  });
+
   it("shows nothing for a query shorter than 2 characters", async () => {
     renderGlobalSearch();
 
     fireEvent.click(screen.getByLabelText("Search"));
     const input = await screen.findByPlaceholderText(
-      "Search plans, exercises, songs...",
+      "Search pages, plans, exercises, songs...",
     );
 
     fireEvent.change(input, { target: { value: "s" } });
@@ -71,7 +100,7 @@ describe("GlobalSearch", () => {
 
     fireEvent.click(screen.getByLabelText("Search"));
     const input = await screen.findByPlaceholderText(
-      "Search plans, exercises, songs...",
+      "Search pages, plans, exercises, songs...",
     );
 
     fireEvent.change(input, { target: { value: "shifting up the neck" } });
@@ -80,6 +109,6 @@ describe("GlobalSearch", () => {
     fireEvent.keyDown(input, { key: "Enter" });
 
     expect(push).toHaveBeenCalledWith("/practice/exercise/spider-basic");
-    expect(screen.queryByPlaceholderText("Search plans, exercises, songs...")).toBeNull();
+    expect(screen.queryByPlaceholderText("Search pages, plans, exercises, songs...")).toBeNull();
   });
 });

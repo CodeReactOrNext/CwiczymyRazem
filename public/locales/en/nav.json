@@ -44,10 +44,11 @@
   "search": {
     "button": "Search...",
     "title": "Search",
-    "description": "Search your plans, exercises and songs",
-    "placeholder": "Search plans, exercises, songs...",
-    "start_typing": "Start typing to search your plans, exercises and songs.",
+    "description": "Search pages, plans, exercises and songs",
+    "placeholder": "Search pages, plans, exercises, songs...",
+    "start_typing": "Start typing to search pages, your plans, exercises and songs.",
     "no_results": "No results for “{{query}}”.",
+    "group_pages": "Pages",
     "group_plans": "Plans",
     "group_exercises": "Exercises",
     "group_songs": "Songs"
