@@ -5,6 +5,7 @@ import React from "react";
 import { isOpenExercise } from "../../../utils/isOpenExercise";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
+import { BackingTrackPicker, BackingVideoPlayer } from "./BackingTrackPicker";
 import { ChordHuntPanel } from "./ChordHuntPanel";
 import { ClickHuntPanel } from "./ClickHuntPanel";
 import { EarQuizPanel } from "./EarQuiz/EarQuizPanel";
@@ -86,7 +87,7 @@ export function MobileExerciseContent({
   turnTab = false,
 }: MobileExerciseContentProps) {
   const { t } = useTranslation("session");
-  const { openLeaderboard } = useSessionUI();
+  const { openLeaderboard, backingVideoId, setBackingVideoId } = useSessionUI();
 
   // Listening quizzes are the whole player slot — they carry no tab, video or
   // image to fall through to.
@@ -218,6 +219,14 @@ export function MobileExerciseContent({
               return <div className='flex h-full items-center justify-center text-xs text-zinc-500'>{t("video.invalid")}</div>;
             })()}
           </div>
+        </div>
+      ) : currentExercise.requiresBackingTrack ? (
+        // Improv over a backing track — without this branch these exercises
+        // (no tab, video or image of their own) left the phone screen empty.
+        <div className="w-full overflow-hidden rounded-2xl bg-zinc-900/40">
+          {backingVideoId
+            ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
+            : <BackingTrackPicker exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} />}
         </div>
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
         <div className="w-full overflow-hidden rounded-2xl border border-white/5 shadow-lg">

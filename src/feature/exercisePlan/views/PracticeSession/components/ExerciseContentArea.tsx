@@ -340,7 +340,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           onVideoEnd={onVideoEnd}
         />
       ) : currentExercise.requiresBackingTrack ? (
-        backingVideoId
+        // The phone view shares backingVideoId — a hidden copy here would autoplay it twice.
+        suppressVideo ? null : backingVideoId
           ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
           : <BackingTrackPicker exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} />
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
