@@ -442,8 +442,6 @@ function fretFont(px: number): string {
   return font;
 }
 const TECHNIQUE_FONT = "bold 9px Inter";
-/** Dynamics-lane bars: cyan-500, faded by how hard the note is played. */
-const DYNAMICS_COLOR = "#06b6d4";
 /** Tuplet number widths — the bracket arms stop short of the number. */
 const tupletLabelWidths = new Map<number, number>();
 
@@ -495,9 +493,8 @@ let palmMuteLabelW = 0;
 function drawPalmMuteLabel(x: number, room: number, live: boolean) {
   if (!ctx) return;
   const staffBottom = STAFF_TOP + 5 * STRING_SPACING;
-  // Below the dynamics bars when there are any; held inside the board when
-  // wide string spacing leaves little room under the staff.
-  const y = Math.min(BASE_H - 7, hasDynamics ? staffBottom + 47 : staffBottom + BLOCK_H / 2 + 11);
+  // Held inside the board when wide string spacing leaves little room under the staff.
+  const y = Math.min(BASE_H - 7, staffBottom + BLOCK_H / 2 + 11);
   ctx.font = "bold 11px Inter, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -2103,40 +2100,6 @@ function render() {
       ctx.stroke();
       // Number
       drawText(label, midX, bracketY);
-    }
-  }
-
-  // ── Dynamics lane ────────────────────────────────────────────────────────
-  if (hasDynamics) {
-    const DYN_BASE = STAFF_TOP + 5 * STRING_SPACING + 36;
-    const DYN_MAX_H = 24;
-    const BAR_W = 6;
-
-    ctx.strokeStyle = withAlpha(inkColor, 0.06);
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(Math.max(0, visL), DYN_BASE);
-    ctx.lineTo(Math.min(totalW, visR), DYN_BASE);
-    ctx.stroke();
-
-    const barOffset = BLOCK_PAD + BLOCK_H * 0.65;
-    let lo = 0, hi = renderBeats.length;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (renderBeats[mid].offsetX * dynBW + barOffset < visL) lo = mid + 1; else hi = mid;
-    }
-    for (let bi = lo; bi < renderBeats.length; bi++) {
-      const beat = renderBeats[bi];
-      const x = beat.offsetX * dynBW + barOffset;
-      if (x > visR) break;
-      for (const note of beat.notes) {
-        if (note.dynamics !== undefined && note.dynamics > 0) {
-          const barH = Math.max(2, note.dynamics * DYN_MAX_H);
-          const alpha = 0.2 + note.dynamics * 0.8;
-          ctx.fillStyle = withAlpha(DYNAMICS_COLOR, alpha);
-          ctx.fillRect(x - BAR_W / 2, DYN_BASE - barH, BAR_W, barH);
-        }
-      }
     }
   }
 

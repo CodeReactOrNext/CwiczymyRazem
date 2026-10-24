@@ -9,7 +9,7 @@ import { useTablatureRenderData } from "./useTablatureRenderData";
 // what was asked of it — enough to know what each frame still has to do: a fresh
 // hit's glow and a chord's name come from cached bitmaps instead of being blurred
 // and typeset every frame, and the parts of the board that look things up along
-// the song (rests, time signatures, tuplets, dynamics) find the same things a
+// the song (rests, time signatures, tuplets) find the same things a
 // scan of the whole song did.
 
 const FRAME_MS = 16;
@@ -259,7 +259,7 @@ describe("TablatureViewer.worker — looking things up along the song", () => {
     expect(restStates()).toEqual([true, false]);
   });
 
-  it("draws the time signature, tuplet and dynamics in view, and nothing from far away", async () => {
+  it("draws the time signature and tuplet in view, nothing from far away, and no dynamics bars", async () => {
     const { send, run, log } = await startWorker(longPiece);
     run(FRAME_MS);
     expect(log.texts).toContain("4");
@@ -273,6 +273,6 @@ describe("TablatureViewer.worker — looking things up along the song", () => {
     run(FRAME_MS);
     expect(log.texts).toEqual(expect.arrayContaining(["7", "8", "5"]));
     expect(log.texts).not.toContain("4");
-    expect(log.fills.filter(isDynamicsBar).length).toBeGreaterThan(0);
+    expect(log.fills.filter(isDynamicsBar)).toHaveLength(0);
   });
 });
