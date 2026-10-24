@@ -374,7 +374,11 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
 
   return (
     <>
-      <div className="flex flex-col h-[calc(100dvh-6rem)] md:h-[calc(100dvh-8rem)] overflow-hidden font-openSans">
+      {/* On phones the view ends exactly at the bottom nav (58px + safe area) and
+          -mb-24 cancels the layout's pb-24, so the shell doesn't scroll. A fixed
+          6rem offset left a strip of empty background above the nav whenever iOS
+          Safari's bottom toolbar zeroes the safe-area inset. */}
+      <div className="flex flex-col h-[calc(100dvh-58px-env(safe-area-inset-bottom,0px))] -mb-24 md:mb-0 md:h-[calc(100dvh-8rem)] overflow-hidden font-openSans">
         <DndContext
           sensors={activeSensors}
           collisionDetection={closestCenter}
