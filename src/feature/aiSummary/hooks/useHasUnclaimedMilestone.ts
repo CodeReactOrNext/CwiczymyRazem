@@ -9,8 +9,13 @@ import {
   practiceLevelsQueryKey,
   practiceLogsQueryKey,
 } from "feature/dashboard/hooks/useMilestoneProgress";
+import { isFeatureUnlocked } from "feature/levelGate/data/featureUnlocks";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import {
+  selectCurrentUserStats,
+  selectUserAuth,
+  selectUserInfo,
+} from "feature/user/store/userSlice";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef } from "react";
 import { useAppSelector } from "store/hooks";
@@ -31,11 +36,20 @@ const startOfToday = () => {
  *
  * Reads the same query keys as the milestone cards and the Milestones page, so
  * a claim made anywhere puts the dot out straight away instead of on the next
- * page. Both sources also sit behind memory caches (logs 2 days, practice levels
- * 5 min), which keeps the re-check on navigation essentially free.
+ * page. Off while Milestones are still locked: there is nothing to claim and
+ * nowhere to go yet. Both sources also sit behind memory caches (logs 2 days,
+ * practice levels 5 min), which keeps the re-check on navigation essentially
+ * free.
  */
 export function useHasUnclaimedMilestone(): boolean {
   const userAuth = useAppSelector(selectUserAuth);
+  const userStats = useAppSelector(selectCurrentUserStats);
+  const userInfo = useAppSelector(selectUserInfo);
+  // Same rule as the page's LevelGate, admins included.
+  const unlocked =
+    userInfo?.role === "admin" ||
+    (!!userStats && isFeatureUnlocked("summary", userStats.lvl));
+  const enabled = !!userAuth && unlocked;
   const { asPath } = useRouter();
   const queryClient = useQueryClient();
   const uid = userAuth ?? "";
@@ -45,13 +59,13 @@ export function useHasUnclaimedMilestone(): boolean {
   const { data: logs } = useQuery({
     queryKey: practiceLogsQueryKey(uid, year),
     queryFn: () => firebaseGetUserRaprotsLogs(uid, year),
-    enabled: !!userAuth,
+    enabled,
     staleTime: STALE_TIME,
   });
   const { data: levels } = useQuery({
     queryKey: practiceLevelsQueryKey(uid),
     queryFn: () => firebaseGetPracticeLevels(uid),
-    enabled: !!userAuth,
+    enabled,
     staleTime: STALE_TIME,
   });
 
@@ -59,15 +73,15 @@ export function useHasUnclaimedMilestone(): boolean {
   // refetch after a practice session. Re-check on navigation (cache-backed).
   const lastPath = useRef(asPath);
   useEffect(() => {
-    if (!userAuth || lastPath.current === asPath) return;
+    if (!enabled || lastPath.current === asPath) return;
     lastPath.current = asPath;
     void queryClient.invalidateQueries({ queryKey: practiceLogsQueryKey(uid, year) });
     void queryClient.invalidateQueries({ queryKey: practiceLevelsQueryKey(uid) });
-  }, [asPath, userAuth, uid, year, queryClient]);
+  }, [asPath, enabled, uid, year, queryClient]);
 
   const dayKey = today.getTime();
   return useMemo(() => {
-    if (!userAuth || !logs || !levels) return false;
+    if (!enabled || !logs || !levels) return false;
     const day = new Date(dayKey);
     const progress = computeProgressData(logs, day);
     const weekKey = isoWeekKey(day);
@@ -78,5 +92,5 @@ export function useHasUnclaimedMilestone(): boolean {
         owned.has(l.id) &&
         levels.claims[l.id]?.weekKey !== weekKey
     );
-  }, [userAuth, logs, levels, dayKey]);
+  }, [enabled, logs, levels, dayKey]);
 }
