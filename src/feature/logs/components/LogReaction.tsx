@@ -250,7 +250,10 @@ export const LogReaction = ({
                     </span>
                   ))}
               </span>
-              <span>{isReacted ? "Motivated" : "Motivate"}</span>
+              {/* The coin and the +N carry it on a phone; the word only crowds the name. */}
+              <span className='hidden sm:inline'>
+                {isReacted ? "Motivated" : "Motivate"}
+              </span>
               <span className='relative'>
                 <span
                   className={cn(

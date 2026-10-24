@@ -24,7 +24,10 @@ interface UserLinkProps {
   showName?: boolean;
   className?: string;
   nameClassName?: string;
+  /** On the Avatar itself, e.g. `AVATAR_SHRINK` for a 32px avatar on phones. */
   avatarClassName?: string;
+  /** e.g. `hidden sm:inline-flex` where a phone row has no room for the tag. */
+  guildBadgeClassName?: string;
 }
 
 /**
@@ -42,6 +45,7 @@ export const UserLink = ({
   className,
   nameClassName,
   avatarClassName,
+  guildBadgeClassName,
 }: UserLinkProps) => {
   const { getSupportMember } = useSupportTeam();
 
@@ -54,6 +58,7 @@ export const UserLink = ({
       size={size}
       name={userName}
       avatarURL={avatarUrl || undefined}
+      className={avatarClassName}
     />
   );
 
@@ -65,7 +70,9 @@ export const UserLink = ({
           className,
         )}
         href={`/user/${uid}`}>
-        <div className={cn("shrink-0", avatarClassName)}>
+        {/* flex, not block: the avatar is inline-block, and a line box would add a
+            descender's worth of height under it (an oval supporter ring). */}
+        <div className='flex shrink-0'>
           {supportMember ? (
             <SupportAvatarRing>{avatar}</SupportAvatarRing>
           ) : (
@@ -77,7 +84,11 @@ export const UserLink = ({
         )}
         {/* Not a link of its own: this whole row already is one, and an anchor
             inside an anchor is markup the browser silently rearranges. */}
-        <GuildTagBadge badge={guildBadge} linked={false} />
+        <GuildTagBadge
+          badge={guildBadge}
+          linked={false}
+          className={guildBadgeClassName}
+        />
       </Link>
     </UserTooltip>
   );

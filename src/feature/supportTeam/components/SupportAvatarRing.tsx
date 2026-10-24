@@ -60,7 +60,9 @@ export const SupportAvatarRing = ({
         className='pointer-events-none absolute rounded-full bg-zinc-950'
         style={{ inset: -gap }}
       />
-      <div className='relative'>{children}</div>
+      {/* flex keeps an inline-block avatar off the line box, whose descender
+          would make the wrapper taller than wide and the rings oval. */}
+      <div className='relative flex'>{children}</div>
     </div>
   );
 };

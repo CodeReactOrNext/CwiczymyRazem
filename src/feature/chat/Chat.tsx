@@ -50,6 +50,7 @@ import {
 import { useDateFnsLocale } from "lib/i18n/dateLocale";
 import { ArrowDown, Ellipsis, MessageCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TOUCH_TARGET } from "utils/touchTarget";
 
 /** Within this many pixels of the bottom still counts as "at the bottom". */
 const BOTTOM_SLACK_PX = 80;
@@ -148,7 +149,11 @@ const DayDivider = ({ date }: { date: Date }) => {
   );
 };
 
-/** The ⋯ that opens a message's menu — only where there is no hover to reveal the actions. */
+/**
+ * The ⋯ that opens a message's menu — only where there is no hover to reveal the
+ * actions. Long-press opens the same menu, so this is a quiet hint: narrow and
+ * dim beside the bubble, with the 44px tap area drawn by TOUCH_TARGET.
+ */
 const MoreButton = ({ onClick }: { onClick: () => void }) => {
   const { t } = useTranslation("chat");
   return (
@@ -156,9 +161,11 @@ const MoreButton = ({ onClick }: { onClick: () => void }) => {
       type='button'
       aria-label={t("menu.more")}
       onClick={onClick}
-      // -my-1 keeps a one-line bubble's row as tall as the bubble; the hit area stays 44px.
-      className='-my-1 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 active:bg-white/10 [@media(hover:none)]:flex'>
-      <Ellipsis className='h-5 w-5' />
+      className={cn(
+        TOUCH_TARGET,
+        "hidden h-6 w-5 shrink-0 items-center justify-center rounded text-zinc-600 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 active:text-zinc-300 [@media(hover:none)]:flex",
+      )}>
+      <Ellipsis className='h-4 w-4' />
     </button>
   );
 };

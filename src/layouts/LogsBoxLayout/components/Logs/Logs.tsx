@@ -37,6 +37,7 @@ import type {
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
+import { AVATAR_SHRINK } from "feature/chat/chatLayout";
 import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
 import { communityDocId } from "feature/communityExercises/utils/communityToExercise";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
@@ -518,6 +519,9 @@ interface LogsBoxLayoutProps {
   hasMoreLogs?: boolean;
   onLoadMoreLogs?: () => void;
 }
+
+/** 32px on a phone, so the name keeps the room; the full 40px from `sm`. */
+const FEED_AVATAR = cn(AVATAR_SHRINK, "sm:mr-2");
 
 const TimeStamp = ({ date }: { date: Date }) => (
   <p className='mb-2 w-full whitespace-nowrap py-1 text-[0.6rem] text-zinc-400 sm:mb-0 sm:w-auto sm:text-[0.55rem] lg:mr-4 lg:text-xs'>
@@ -1196,7 +1200,8 @@ const FirebaseLogsDonationItem = ({
               userName={userName ?? getDonationName(newest, t)}
               avatarUrl={avatarUrl ?? undefined}
               guildBadge={guildBadge}
-              avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
+              avatarClassName={FEED_AVATAR}
+              guildBadgeClassName='hidden sm:inline-flex'
             />
           </span>
           {reactionLogId && (
@@ -1413,7 +1418,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           <Interpolate
             text={message}
             values={{
@@ -1447,7 +1452,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           <Video className='mr-1.5 inline-block h-3 w-3 text-cyan-400' />
           {t("feed:added_recording")}{" "}
           {recLog.recordingId ? (
@@ -1483,7 +1488,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <span className='text-sm text-zinc-400'>
+        <span className='text-sm text-zinc-300'>
           <Interpolate
             text={t("feed:opened_case")}
             values={{
@@ -1519,7 +1524,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <span className='text-sm text-zinc-400'>{t("feed:listed")}</span>
+        <span className='text-sm text-zinc-300'>{t("feed:listed")}</span>
         <ItemPill
           itemType={marketLog.itemType}
           itemName={marketLog.itemName}
@@ -1553,7 +1558,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <span className='text-sm text-zinc-400'>
+        <span className='text-sm text-zinc-300'>
           <ShoppingCart className='mr-1.5 inline-block h-3.5 w-3.5 text-amber-400' />
           {t("feed:bought")}
         </span>
@@ -1567,7 +1572,7 @@ const GroupedLogLine = ({
           rolledGuitar={rolledGuitar}
           rolledEffect={rolledEffect}
         />
-        <span className='text-sm text-zinc-400'>
+        <span className='text-sm text-zinc-300'>
           {t("feed:from")}{" "}
           {purchaseLog.sellerId ? (
             <Link
@@ -1604,7 +1609,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           {t("feed:created_playlist", { kind: kindLabel })}{" "}
           <Link
             href={`/songs?view=playlists&playlistId=${playlistLog.playlistId}`}
@@ -1632,7 +1637,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           <GraduationCap className='mr-1.5 inline-block h-3.5 w-3.5 text-emerald-400' />
           <Interpolate
             text={t("feed:passed_exam")}
@@ -1656,7 +1661,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           <MapIcon className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
           <Interpolate
             text={t("feed:completed_roadmap_step")}
@@ -1686,7 +1691,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           <Target className='mr-1.5 inline-block h-3.5 w-3.5 text-emerald-400' />
           <Interpolate
             text={t("feed:reached_exercise_goal")}
@@ -1707,7 +1712,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           <Target className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
           <Interpolate
             text={t("feed:set_exercise_goal")}
@@ -1731,7 +1736,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           <Hand className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
           {phrase
             ? t("feed:joined_with", { phrase })
@@ -1746,7 +1751,7 @@ const GroupedLogLine = ({
 
     return (
       <GroupedLine>
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           <Interpolate
             text={t("feed:completed_daily_quests")}
             values={{
@@ -1839,7 +1844,7 @@ const GroupedLogLine = ({
     <GroupedLine>
       {/* One sentence around the points, so German can close it with
           "erhalten" right after them instead of after the time and the rest. */}
-      <span className='inline-flex items-center gap-1.5 text-sm text-zinc-400'>
+      <span className='inline-flex items-center gap-1.5 text-sm text-zinc-300'>
         <Interpolate
           text={t("common:logsBox.got_points")}
           values={{
@@ -1859,7 +1864,7 @@ const GroupedLogLine = ({
 
       {sessionTimeMs > 0 && (
         <span
-          className='inline-flex items-center gap-1.5 text-sm text-zinc-400'
+          className='inline-flex items-center gap-1.5 text-sm text-zinc-300'
           title={t("feed:session_time_hint")}>
           <Clock className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
           <span className='tabular-nums'>
@@ -1869,7 +1874,7 @@ const GroupedLogLine = ({
       )}
 
       {genericLog.newLevel?.isNewLevel && (
-        <span className='text-sm text-zinc-400'>
+        <span className='text-sm text-zinc-300'>
           {t("common:logsBox.lvl_up")}
           <span className='ml-1 text-main'>
             {t("feed:level_short", { level: genericLog.newLevel.level })}
@@ -1981,7 +1986,7 @@ const GroupedLogLine = ({
         ))}
 
       {practicedSongs.length > 0 && !hidesPrimarySong && (
-        <p className='text-sm text-zinc-400'>
+        <p className='text-sm text-zinc-300'>
           <Interpolate
             text={t("common:song_status.practiced", {
               count: practicedSongs.length,
@@ -2052,7 +2057,8 @@ const GroupedLogItem = ({
                 userName={userName}
                 avatarUrl={avatarUrl ?? undefined}
                 guildBadge={guildBadge}
-                avatarClassName='origin-left scale-75 sm:mr-2 sm:scale-100'
+                avatarClassName={FEED_AVATAR}
+                guildBadgeClassName='hidden sm:inline-flex'
               />
             </span>
             <span className='hidden shrink-0 items-center gap-1.5 text-[11px] text-zinc-400 sm:flex'>
