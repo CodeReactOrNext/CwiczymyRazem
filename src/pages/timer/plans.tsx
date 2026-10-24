@@ -2,13 +2,12 @@ import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import { getPublicExercisePlans } from "feature/exercisePlan/services/getPublicExercisePlans";
-import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
+import { usePublicExercisePlans, useUserExercisePlans } from "feature/exercisePlan/hooks/useExercisePlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect,useRef,useState } from "react";
@@ -16,12 +15,22 @@ import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
+// The session player (alphaTab, Tone, pitch detection…) is several MB of JS that
+// the plan list never needs. Imported statically it was part of this page's
+// first load and the list waited for all of it; now it is fetched on demand and
+// warmed up in the background once the list is on screen.
+const loadPracticeSession = () =>
+  import("feature/exercisePlan/views/PracticeSession/PracticeSession").then(
+    (m) => m.PracticeSession
+  );
+const PracticeSession = dynamic(loadPracticeSession, { ssr: false });
+
 const TimerPlans: NextPageWithLayout = () => {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
-  const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
-  const [communityPlans, setCommunityPlans] = useState<ExercisePlan[]>([]);
   const userAuth = useAppSelector(selectUserAuth);
+  const { data: customPlans } = useUserExercisePlans(userAuth);
+  const { data: communityPlans } = usePublicExercisePlans(!!userAuth);
   const [isFinishing, setIsFinishing] = useState(false);
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   // Tracks whether *this page* pushed the `planId` history entry (list -> session),
@@ -30,29 +39,31 @@ const TimerPlans: NextPageWithLayout = () => {
   const pushedPlanIdRef = useRef(false);
 
   useEffect(() => {
-    const loadPlans = async () => {
-      if (!userAuth) return;
-      try {
-        const [userPlans, publicPlans] = await Promise.all([
-          getUserExercisePlans(userAuth),
-          getPublicExercisePlans(),
-        ]);
-        setCustomPlans(userPlans);
-        setCommunityPlans(publicPlans);
-      } catch (error) {
-        console.error("Failed to load plans:", error);
-      }
-    };
+    loadPracticeSession();
+  }, []);
 
-    loadPlans();
-  }, [userAuth]);
+  const handlePlanSelect = async (planId: string) => {
+    const allPlans = [...defaultPlans, ...(customPlans ?? []), ...(communityPlans ?? [])];
+    const plan = allPlans.find((p) => p.id === planId);
+    if (plan) {
+      setLoadingPlanId(planId);
+      // Usually already warm from the preload on mount; on a cold click the card
+      // spinner covers the download instead of a blank screen.
+      await loadPracticeSession();
+      setSelectedPlan(plan);
+      setLoadingPlanId(null);
+    }
+  };
 
   useEffect(() => {
     if (router.isReady && router.query.planId) {
       const planId = router.query.planId as string;
+      // A background refetch of the plan lists must not swap the plan object
+      // under a running session.
+      if (selectedPlan?.id === planId) return;
       handlePlanSelect(planId);
     }
-  }, [router.isReady, router.query.planId, customPlans]);
+  }, [router.isReady, router.query.planId, customPlans, communityPlans]);
 
   const handleBack = () => {
     if (selectedPlan) {
@@ -75,18 +86,6 @@ const TimerPlans: NextPageWithLayout = () => {
       }
     } else {
       router.push("/timer");
-    }
-  };
-
-  const handlePlanSelect = (planId: string) => {
-    const allPlans = [...defaultPlans, ...customPlans, ...communityPlans];
-    const plan = allPlans.find((p) => p.id === planId);
-    if (plan) {
-      setLoadingPlanId(planId);
-      setTimeout(() => {
-        setSelectedPlan(plan);
-        setLoadingPlanId(null);
-      }, 500);
     }
   };
 

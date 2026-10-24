@@ -15,8 +15,7 @@ import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav"
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { PlanPreviewDialog } from "feature/exercisePlan/components/PlanPreviewDialog";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import { getPublicExercisePlans } from "feature/exercisePlan/services/getPublicExercisePlans";
-import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
+import { usePublicExercisePlans, useUserExercisePlans } from "feature/exercisePlan/hooks/useExercisePlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
@@ -79,6 +78,12 @@ const RippleTabsTrigger = ({
   );
 };
 
+const TabSpinner = () => (
+  <div className='flex h-[400px] items-center justify-center'>
+    <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-500' />
+  </div>
+);
+
 interface PlanSelectorProps {
   onBack?: () => void;
   onSelectPlan?: (planId: string) => void;
@@ -106,33 +111,10 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
     }
   }, [router.query.tab]);
 
-  const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
-  const [communityPlans, setCommunityPlans] = useState<ExercisePlan[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadPlans = async () => {
-      if (!userAuth) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const [userPlans, publicPlans] = await Promise.all([
-          getUserExercisePlans(userAuth),
-          getPublicExercisePlans(),
-        ]);
-        setCustomPlans(userPlans);
-        setCommunityPlans(publicPlans);
-      } catch (error) {
-        console.error("Failed to load plans:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPlans();
-  }, [userAuth]);
+  // Built-in routines are bundled, so only the "My plans" and "Community" tabs
+  // wait on Firestore — the rest of the page renders straight away.
+  const { data: customPlans = [], isLoading: isLoadingCustom } = useUserExercisePlans(userAuth);
+  const { data: communityPlans = [], isLoading: isLoadingCommunity } = usePublicExercisePlans(!!userAuth);
 
   const playalongPlans = defaultPlans.filter(p => p.exercises.some(e => e.isPlayalong));
   const routinePlans = defaultPlans.filter(p => !p.exercises.some(e => e.isPlayalong));
@@ -274,13 +256,6 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
         animate={{ opacity: 1 }}
         className='space-y-8 px-3 md:px-6 lg:px-8 py-6 md:py-8'
       >
-
-          {isLoading ? (
-            <div className='flex h-[400px] items-center justify-center'>
-              <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-500' />
-            </div>
-          ) : (
-            <>
               {onBack && (
                 <button
                   onClick={onBack}
@@ -307,7 +282,9 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
               </TabsContent>
 
               <TabsContent value="my_plans" className="mt-6 focus-visible:outline-none space-y-8">
-                {customPlans.length === 0 ? (
+                {isLoadingCustom ? (
+                  <TabSpinner />
+                ) : customPlans.length === 0 ? (
                   <div className='rounded-lg p-12 text-center bg-zinc-900/30'>
                     <p className='text-zinc-400 text-sm'>
                       {t("exercises:my_plans.no_custom_plans")}
@@ -340,7 +317,9 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
               </TabsContent>
 
               <TabsContent value="community" className="mt-6 focus-visible:outline-none space-y-8">
-                {communityPlans.length === 0 ? (
+                {isLoadingCommunity ? (
+                  <TabSpinner />
+                ) : communityPlans.length === 0 ? (
                   <div className='rounded-lg p-12 text-center bg-zinc-900/30'>
                     <p className='text-zinc-400 text-sm'>{t("practice_hub:no_community_plans")}</p>
                     <p className='text-zinc-500 text-xs mt-2'>{t("practice_hub:publish_hint")}</p>
@@ -366,8 +345,6 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                 )}
               </TabsContent>
             </Tabs>
-            </>
-          )}
         </motion.div>
       <PlanPreviewDialog
         plan={previewPlan}

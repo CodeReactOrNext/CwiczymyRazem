@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
+import { userPlansQueryKey } from "feature/exercisePlan/hooks/useExercisePlans";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 import { updateExercisePlan } from "feature/exercisePlan/services/updateExercisePlan";
 import type {
@@ -26,11 +27,6 @@ interface AddToPlanMenuProps {
   exercise: Exercise;
   userId: string;
 }
-
-const userPlansQueryKey = (userId: string) => [
-  "user-exercise-plans",
-  userId,
-];
 
 /** Appends the previewed exercise to one of the player's own plans. */
 export function AddToPlanMenu({ exercise, userId }: AddToPlanMenuProps) {
