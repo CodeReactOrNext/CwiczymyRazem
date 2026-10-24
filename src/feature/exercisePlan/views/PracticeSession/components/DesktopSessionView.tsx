@@ -243,7 +243,10 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   ) : undefined;
 
   return (
-    <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobile && "hidden")}>
+    <div
+      // Hides MobileBottomNav on tablets, see globals.css.
+      data-desktop-session={isMobile ? undefined : ""}
+      className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobile && "hidden")}>
       <BackgroundAmbiance category={p.category as any} isPlayalong={p.currentExercise.isPlayalong} visible={!p.reportResult} />
       <TooltipProvider>
         <div>

@@ -42,6 +42,14 @@ html:has(main[data-app-shell]) {
   scrollbar-gutter: auto;
 }
 
+/* The desktop practice session takes over the screen from 768px, but the
+   mobile bottom nav stays up until lg. The session is rendered inside the
+   page container (a z-20 flex item), so its own z-index can't lift it over
+   the nav — between 768 and 1023px the nav covered the Start button. */
+body:has([data-desktop-session]) [data-mobile-bottom-nav] {
+  display: none;
+}
+
 html,
 body {
   padding: 0;
