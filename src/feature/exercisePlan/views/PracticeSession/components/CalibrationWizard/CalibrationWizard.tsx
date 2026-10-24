@@ -132,6 +132,8 @@ export const CalibrationWizard = ({
                   currentOffset={currentOffset} audioRefs={audioRefs}
                   strings={strings}
                   onRetry={handleRetry} onAdvance={advanceString} onCancel={handleCancel}
+                  // Offsets aren't used any more, so finishing early only turns the mic on.
+                  onAlreadyTuned={handleConfirm}
                 />
               </motion.div>
             )}

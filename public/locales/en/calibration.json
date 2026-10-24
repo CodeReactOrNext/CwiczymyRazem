@@ -55,7 +55,8 @@
     "next_string": "Next String",
     "finish": "Finish Calibration",
     "skip_string": "Skip String",
-    "redo": "Redo this string"
+    "redo": "Redo this string",
+    "already_tuned": "My guitar is already tuned"
   },
   "source": {
     "title": "Guitar Calibration",
@@ -63,7 +64,11 @@
     "interface": "Audio Interface",
     "interface_desc": "USB or Thunderbolt audio interface",
     "mic": "Microphone",
-    "mic_desc": "Built-in laptop mic or external USB mic"
+    "mic_desc": "Built-in laptop mic or external USB mic",
+    "mobile_body": "Your phone's microphone will listen to your guitar.",
+    "mobile_headphones": "Plug in headphones if you can",
+    "mobile_headphones_body": "Without them the mic also hears the app's sounds from your speaker, and note detection gets less accurate.",
+    "continue": "Continue"
   },
   "summary": {
     "title": "All Done",
@@ -95,7 +100,6 @@
     "recalibrate": "Recalibrate"
   },
   "mic_mode": {
-    "alt": "Mic illustration",
     "required": "Microphone Required",
     "tracking": "Mic Tracking",
     "exam_body": "This module requires microphone setup. Enable your microphone so the system can evaluate your playing during the exam.",

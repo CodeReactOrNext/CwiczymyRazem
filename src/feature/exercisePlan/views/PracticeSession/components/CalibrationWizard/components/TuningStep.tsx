@@ -24,11 +24,13 @@ interface TuningStepProps {
   onRetry:       () => void;
   onAdvance:     () => void;
   onCancel:      () => void;
+  /** Ends the wizard with the mic on, skipping the strings that are left. */
+  onAlreadyTuned: () => void;
 }
 
 export const TuningStep = React.memo(function TuningStep({
   currentIndex, offsets, sampleCount, stringState, currentOffset,
-  audioRefs, strings, onRetry, onAdvance, onCancel,
+  audioRefs, strings, onRetry, onAdvance, onCancel, onAlreadyTuned,
 }: TuningStepProps) {
   const { t } = useTranslation("calibration");
   const str = strings[currentIndex];
@@ -175,6 +177,14 @@ export const TuningStep = React.memo(function TuningStep({
               {t("tuning.redo")}
             </Button>
           )}
+
+          <button
+            type="button"
+            onClick={onAlreadyTuned}
+            className="w-full py-1 text-center text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+          >
+            {t("tuning.already_tuned")}
+          </button>
         </div>
     </div>
   );

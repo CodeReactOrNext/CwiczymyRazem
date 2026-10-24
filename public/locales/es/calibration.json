@@ -55,7 +55,8 @@
     "next_string": "Siguiente cuerda",
     "finish": "Terminar calibración",
     "skip_string": "Saltar cuerda",
-    "redo": "Repetir esta cuerda"
+    "redo": "Repetir esta cuerda",
+    "already_tuned": "Mi guitarra ya está afinada"
   },
   "source": {
     "title": "Calibración de la guitarra",
@@ -63,7 +64,11 @@
     "interface": "Interfaz de audio",
     "interface_desc": "Interfaz de audio USB o Thunderbolt",
     "mic": "Micrófono",
-    "mic_desc": "Micrófono integrado del portátil o micrófono USB externo"
+    "mic_desc": "Micrófono integrado del portátil o micrófono USB externo",
+    "mobile_body": "El micrófono del móvil escuchará tu guitarra.",
+    "mobile_headphones": "Conecta auriculares si puedes",
+    "mobile_headphones_body": "Sin ellos, el micrófono también oye los sonidos de la app por el altavoz y la detección de notas es menos precisa.",
+    "continue": "Continuar"
   },
   "summary": {
     "title": "Listo",
@@ -95,7 +100,6 @@
     "recalibrate": "Recalibrar"
   },
   "mic_mode": {
-    "alt": "Ilustración de micrófono",
     "required": "Micrófono necesario",
     "tracking": "Seguimiento por micrófono",
     "exam_body": "Este módulo requiere configurar el micrófono. Actívalo para que el sistema pueda evaluar cómo tocas durante el examen.",

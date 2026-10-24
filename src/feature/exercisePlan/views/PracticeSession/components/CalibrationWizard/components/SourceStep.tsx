@@ -1,6 +1,8 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Mic, Plug,X } from "lucide-react";
+import { Headphones, Mic, Plug,X } from "lucide-react";
+import { useResponsiveStore } from "store/useResponsiveStore";
 
 export type InputSource = "interface" | "microphone";
 
@@ -9,8 +11,57 @@ interface SourceStepProps {
   onCancel: () => void;
 }
 
+/**
+ * On a phone the guitar can only reach the app through the mic, so there is
+ * nothing to choose — the step is just the one tip that matters there:
+ * headphones, so the mic doesn't hear the app's own sound.
+ */
+const MobileMicSource = ({ onSelect, onCancel }: SourceStepProps) => {
+  const { t } = useTranslation("calibration");
+  return (
+    <div className="flex flex-col px-6 py-6 text-white h-full">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-bold tracking-tight">{t("source.title")}</h2>
+        <button
+          onClick={onCancel}
+          className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors"
+        >
+          <X size={16} />
+        </button>
+      </div>
+
+      <div className="flex flex-col items-center gap-5 rounded-lg bg-zinc-900/40 px-5 py-8 text-center">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-400">
+          <Headphones className="h-7 w-7" />
+        </span>
+        <div className="space-y-2">
+          <p className="font-bold text-white">{t("source.mobile_headphones")}</p>
+          <p className="text-sm leading-relaxed text-zinc-400">
+            {t("source.mobile_headphones_body")}
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-5 text-center text-sm text-zinc-400">{t("source.mobile_body")}</p>
+
+      <Button onClick={() => onSelect("microphone")} className="mt-6 h-12 w-full font-bold">
+        {t("source.continue")}
+      </Button>
+
+      <button
+        onClick={onCancel}
+        className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors text-center py-3 mt-2"
+      >
+        {t("skip_calibration")}
+      </button>
+    </div>
+  );
+};
+
 export const SourceStep = ({ onSelect, onCancel }: SourceStepProps) => {
   const { t } = useTranslation("calibration");
+  const isMobile = useResponsiveStore((state) => state.isMobile);
+  if (isMobile) return <MobileMicSource onSelect={onSelect} onCancel={onCancel} />;
   return (
     <div className="flex flex-col px-6 py-6 text-white h-full">
       <div className="flex items-center justify-between mb-4">

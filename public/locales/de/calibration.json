@@ -55,7 +55,8 @@
     "next_string": "Nächste Saite",
     "finish": "Kalibrierung abschließen",
     "skip_string": "Saite überspringen",
-    "redo": "Diese Saite wiederholen"
+    "redo": "Diese Saite wiederholen",
+    "already_tuned": "Meine Gitarre ist schon gestimmt"
   },
   "source": {
     "title": "Gitarren-Kalibrierung",
@@ -63,7 +64,11 @@
     "interface": "Audio-Interface",
     "interface_desc": "USB- oder Thunderbolt-Audio-Interface",
     "mic": "Mikrofon",
-    "mic_desc": "Eingebautes Laptop-Mikro oder externes USB-Mikro"
+    "mic_desc": "Eingebautes Laptop-Mikro oder externes USB-Mikro",
+    "mobile_body": "Das Mikrofon deines Handys hört deiner Gitarre zu.",
+    "mobile_headphones": "Schließ wenn möglich Kopfhörer an",
+    "mobile_headphones_body": "Ohne sie hört das Mikro auch die Töne der App aus dem Lautsprecher, und die Notenerkennung wird ungenauer.",
+    "continue": "Weiter"
   },
   "summary": {
     "title": "Fertig",
@@ -95,7 +100,6 @@
     "recalibrate": "Neu kalibrieren"
   },
   "mic_mode": {
-    "alt": "Mikrofon-Illustration",
     "required": "Mikrofon erforderlich",
     "tracking": "Mikrofon-Tracking",
     "exam_body": "Dieses Modul erfordert ein eingerichtetes Mikrofon. Aktiviere dein Mikrofon, damit das System dein Spiel in der Prüfung bewerten kann.",

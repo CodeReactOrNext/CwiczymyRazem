@@ -55,7 +55,8 @@
     "next_string": "Następna struna",
     "finish": "Zakończ kalibrację",
     "skip_string": "Pomiń strunę",
-    "redo": "Powtórz tę strunę"
+    "redo": "Powtórz tę strunę",
+    "already_tuned": "Moja gitara jest już nastrojona"
   },
   "source": {
     "title": "Kalibracja gitary",
@@ -63,7 +64,11 @@
     "interface": "Interfejs audio",
     "interface_desc": "Interfejs audio USB lub Thunderbolt",
     "mic": "Mikrofon",
-    "mic_desc": "Wbudowany mikrofon laptopa lub zewnętrzny mikrofon USB"
+    "mic_desc": "Wbudowany mikrofon laptopa lub zewnętrzny mikrofon USB",
+    "mobile_body": "Mikrofon w telefonie będzie słuchał twojej gitary.",
+    "mobile_headphones": "Jeśli możesz, podłącz słuchawki",
+    "mobile_headphones_body": "Bez nich mikrofon słyszy też dźwięki aplikacji z głośnika i wykrywanie nut jest mniej dokładne.",
+    "continue": "Dalej"
   },
   "summary": {
     "title": "Gotowe",
@@ -95,7 +100,6 @@
     "recalibrate": "Skalibruj ponownie"
   },
   "mic_mode": {
-    "alt": "Ilustracja mikrofonu",
     "required": "Wymagany mikrofon",
     "tracking": "Śledzenie mikrofonem",
     "exam_body": "Ten moduł wymaga konfiguracji mikrofonu. Włącz mikrofon, żeby system mógł ocenić Twoją grę podczas egzaminu.",
