@@ -1,8 +1,10 @@
 import type { PageTab } from "components/PageTabs/PageTabs";
 import { PROGRESS_TABS } from "constants/navTabs";
 import { achievementsData } from "feature/achievements";
+import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaimedMilestone";
 import { isFeatureUnlocked } from "feature/levelGate/data/featureUnlocks";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { Lock } from "lucide-react";
 import { useMemo } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -14,23 +16,29 @@ import { useAppSelector } from "store/hooks";
  * question that makes a player open it at all, and it should be answerable
  * without opening it.
  *
- * Milestones stay off the rail until the account reaches their level, the same
- * way the sidebar leaves out pages that are still locked.
+ * Milestones are always on the rail, locked or not: the tab is where players
+ * learn the feature exists. Until their level it leads with a lock, and once
+ * a reward is waiting it carries the same dot as the Progress entry in the nav.
  */
 export const useProgressTabs = (): PageTab[] => {
   const stats = useAppSelector(selectCurrentUserStats);
   const owned = stats?.achievements?.length ?? 0;
-  const showMilestones = !!stats && isFeatureUnlocked("summary", stats.lvl);
+  const milestonesLocked = !!stats && !isFeatureUnlocked("summary", stats.lvl);
+  const hasUnclaimedMilestone = useHasUnclaimedMilestone();
 
   return useMemo(
     () =>
-      PROGRESS_TABS.filter(
-        (tab) => tab.href !== "/summary" || showMilestones
-      ).map((tab) =>
-        tab.href === "/profile/achievements"
-          ? { ...tab, badge: `${owned}/${achievementsData.length}` }
-          : tab
-      ),
-    [owned, showMilestones]
+      PROGRESS_TABS.map((tab) => {
+        if (tab.href === "/profile/achievements")
+          return { ...tab, badge: `${owned}/${achievementsData.length}` };
+        if (tab.href === "/summary")
+          return {
+            ...tab,
+            icon: milestonesLocked ? Lock : tab.icon,
+            dot: hasUnclaimedMilestone,
+          };
+        return tab;
+      }),
+    [owned, milestonesLocked, hasUnclaimedMilestone]
   );
 };

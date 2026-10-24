@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import {
@@ -11,6 +12,7 @@ import {
   LEVEL_COLORS, LEVELS, localDateStr, milestoneLockedAtLvl, MS_15,
   PRACTICE_CATEGORIES,
 } from "feature/aiSummary/utils/milestoneLogic";
+import { practiceLevelsQueryKey } from "feature/dashboard/hooks/useMilestoneProgress";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
 import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
@@ -1079,6 +1081,7 @@ export const SummaryView = () => {
   const userAuth  = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
   const dispatch  = useAppDispatch();
+  const queryClient = useQueryClient();
   const fame      = userStats?.fame ?? 0;
   const playerLvl = userStats?.lvl ?? 1;
 
@@ -1153,6 +1156,8 @@ export const SummaryView = () => {
       dispatch(deductFame(lvl.cost));
       setLevelsState(s => ({ ...s, ownedLevelIds: Array.from(new Set([...s.ownedLevelIds, levelId])) }));
       await firebasePurchaseLevel(userAuth, levelId, lvl.cost, prevOwned);
+      // The reward dot and the Home cards read the shared query, not this page's state.
+      void queryClient.invalidateQueries({ queryKey: practiceLevelsQueryKey(userAuth) });
       toast.success(t("page.toast_unlocked", { name: levelName(t, lvl) }));
     } catch (err) {
       dispatch(deductFame(-lvl.cost));
@@ -1177,6 +1182,7 @@ export const SummaryView = () => {
         claims: { ...s.claims, [levelId]: { weekKey: currentWeekKey, claimedAt: new Date().toISOString() } },
       }));
       await firebaseClaimLevel(userAuth, levelId, currentWeekKey, lvl.reward);
+      void queryClient.invalidateQueries({ queryKey: practiceLevelsQueryKey(userAuth) });
       toast.success(
         t("page.toast_claimed", { reward: lvl.reward, name: levelName(t, lvl) }),
       );

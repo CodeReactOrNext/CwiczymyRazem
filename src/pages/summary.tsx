@@ -1,7 +1,9 @@
+import { PageTabs } from "components/PageTabs/PageTabs";
 import { SummaryView } from "feature/aiSummary/view/SummaryView";
 import { LevelGate } from "feature/levelGate/components/LevelGate";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
+import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
 import { selectUserInfo } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout/AppLayout";
 import { BarChart3, Target, TrendingUp, Zap } from "lucide-react";
@@ -9,6 +11,20 @@ import type { ReactElement } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuthInitialProps } from "utils/auth/authInitialProps";
+
+/**
+ * The Progress rail for the screens that stand in for the page (locked, not on
+ * Master): the Milestones tab is always on it, so it must lead somewhere you can
+ * get back from.
+ */
+const MilestonesTabs = () => {
+  const tabs = useProgressTabs();
+  return (
+    <div className='px-4 pt-6 md:px-6'>
+      <PageTabs tabs={tabs} activeHref='/summary' ariaLabel='Progress sections' />
+    </div>
+  );
+};
 
 /** Milestones: your own weekly targets, behind the Master plan. */
 const SummaryPage: NextPageWithLayout = () => {
@@ -18,6 +34,7 @@ const SummaryPage: NextPageWithLayout = () => {
   const milestones =
     !isMaster && userInfo !== null ? (
       <div className='min-h-screen bg-zinc-950'>
+        <MilestonesTabs />
         <PremiumFeaturePreview
           eyebrow='Session'
           title='Summary'
@@ -62,7 +79,10 @@ const SummaryPage: NextPageWithLayout = () => {
   // Milestones are read out of your own practice history, so the page waits for
   // one behind the level gate.
   return (
-    <LevelGate feature='summary' className='min-h-screen bg-zinc-950'>
+    <LevelGate
+      feature='summary'
+      header={<MilestonesTabs />}
+      className='min-h-screen bg-zinc-950'>
       {milestones}
     </LevelGate>
   );
