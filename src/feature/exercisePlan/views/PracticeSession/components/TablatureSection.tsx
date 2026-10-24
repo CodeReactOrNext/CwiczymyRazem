@@ -29,6 +29,7 @@ import {
 } from "./tablatureSettings";
 import { TablatureSettingsDialog } from "./TablatureSettingsDialog";
 import { TablatureViewer } from "./TablatureViewer";
+import { useAutoTabZoom } from "./useAutoTabZoom";
 import {
   TablatureResizeHandle,
   useTablatureHeight,
@@ -38,13 +39,15 @@ import type { TuningGutterString } from "./useTablatureWorkerBridge";
 
 // The floating control and the "Note spacing" slider in settings drive one and
 // the same stored value, so the two can never disagree.
-const ZOOM_STEP = 0.25;
+const ZOOM_STEP = 0.05;
 
 const clampZoom = (z: number) =>
   Math.round(Math.min(NOTE_SPACING_MAX, Math.max(NOTE_SPACING_MIN, z)) * 100) /
   100;
 
 interface TablatureSectionProps {
+  /** The fitted note spacing and any later change to it are remembered under this. */
+  exerciseId?: string;
   activeTablature: TablatureMeasure[];
   rawGpFile?: File;
   /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
@@ -100,11 +103,13 @@ interface TablatureSectionProps {
 
 interface TablatureZoomControlProps {
   zoom: number;
+  /** Spacing fitted to the exercise — where the reset goes back to. */
+  resetTo: number;
   onChange: (next: number) => void;
 }
 
 /** Floating zoom control over the tablature — compress the score to see more at once, or enlarge it. */
-function TablatureZoomControl({ zoom, onChange }: TablatureZoomControlProps) {
+function TablatureZoomControl({ zoom, resetTo, onChange }: TablatureZoomControlProps) {
   const { t } = useTranslation("session");
   const atMin = zoom <= NOTE_SPACING_MIN + 1e-6;
   const atMax = zoom >= NOTE_SPACING_MAX - 1e-6;
@@ -124,7 +129,7 @@ function TablatureZoomControl({ zoom, onChange }: TablatureZoomControlProps) {
       </button>
       <button
         type='button'
-        onClick={() => onChange(1)}
+        onClick={() => onChange(resetTo)}
         title={t("tab.reset_zoom")}
         aria-label={t("tab.reset_zoom")}
         className='font-mono min-w-[3rem] rounded-md px-1.5 text-center text-[11px] font-semibold tabular-nums text-zinc-300 transition-colors hover:bg-white/10 hover:text-white'>
@@ -160,6 +165,7 @@ function TablatureSettingsButton({ onOpen }: { onOpen: () => void }) {
 }
 
 export const TablatureSection = memo(function TablatureSection({
+  exerciseId,
   activeTablature,
   rawGpFile,
   baseTempo,
@@ -261,6 +267,15 @@ export const TablatureSection = memo(function TablatureSection({
     (next: number) => setSetting("noteSpacing", clampZoom(next)),
     [setSetting],
   );
+  const boardRef = useRef<HTMLDivElement>(null);
+  const fitZoom = useAutoTabZoom({
+    storageKey: exerciseId,
+    measures: activeTablature,
+    bpm: effectiveBpm,
+    boardRef,
+    viewerHeight: height,
+    enabled: !showAlphaTabScore,
+  });
   const seekedBeatRef = useRef(0);
   const isRestartingRef = useRef(false);
   // Populated by TablatureViewer so minimap clicks can update the canvas cursor
@@ -487,9 +502,9 @@ export const TablatureSection = memo(function TablatureSection({
         "relative w-full rounded-lg",
         // Cinema pins the board to the bottom edge and drops its panel entirely,
         // so the picture owns the whole frame and only the notation sits on it.
-        // pb clears the session's bottom bar (fixed, ~90px tall).
+        // pb clears the session's bottom bar (fixed, ~65px tall).
         cinema
-          ? "fixed inset-x-0 bottom-0 z-20 mb-0 bg-transparent px-6 pb-[104px]"
+          ? "fixed inset-x-0 bottom-0 z-20 mb-0 bg-transparent px-6 pb-[80px]"
           : "mb-4 bg-[#0f0f12]",
       )}>
       {canShowAlphaTabScore && scoreEverShown && (
@@ -532,7 +547,7 @@ export const TablatureSection = memo(function TablatureSection({
         <div className='px-2 pt-0'>
           {minimapRow}
           <LearnModeBar />
-          <div className='relative'>
+          <div ref={boardRef} className='relative'>
             {tabOverlay}
             <TablatureViewer
               measures={activeTablature}
@@ -573,7 +588,11 @@ export const TablatureSection = memo(function TablatureSection({
             />
             <div className='absolute bottom-3 right-3 z-20 flex items-center gap-2'>
               <TablatureSettingsButton onOpen={() => setIsSettingsOpen(true)} />
-              <TablatureZoomControl zoom={zoom} onChange={handleZoomChange} />
+              <TablatureZoomControl
+                zoom={zoom}
+                resetTo={fitZoom}
+                onChange={handleZoomChange}
+              />
             </div>
             <TablatureResizeHandle height={height} onChange={setHeight} />
           </div>

@@ -172,6 +172,7 @@ export function MobileExerciseContent({
         <MetronomeGapTest compact isSessionRunning={isPlaying} onStartSession={startTimer} />
       ) : activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
         <MobileTablaturePanel
+          exerciseId={currentExercise.id}
           measures={activeTablature}
           bpm={effectiveBpm || metronome.bpm}
           isPlaying={metronome.isPlaying}

@@ -22,6 +22,7 @@ import {
 } from "./tablatureSettings";
 import { TablatureSettingsDialog } from "./TablatureSettingsDialog";
 import { TablatureViewer } from "./TablatureViewer";
+import { useAutoTabZoom } from "./useAutoTabZoom";
 import {
   TablatureResizeHandle,
   useTablatureHeight,
@@ -35,7 +36,7 @@ import type { TuningGutterString } from "./useTablatureWorkerBridge";
  * default would, and zooming from there behaves the same on both.
  */
 const MOBILE_FIT = 0.75;
-const ZOOM_STEP = 0.25;
+const ZOOM_STEP = 0.05;
 
 /**
  * Own height slot — a 600px desktop viewer would swallow a whole phone screen. Not the old
@@ -57,6 +58,8 @@ const clampZoom = (z: number) =>
   100;
 
 interface MobileTablaturePanelProps {
+  /** The fitted note spacing and any later change to it are remembered under this. */
+  exerciseId?: string;
   measures: TablatureMeasure[];
   bpm: number;
   isPlaying: boolean;
@@ -83,6 +86,7 @@ interface MobileTablaturePanelProps {
  * height the player drags still wins; double-tapping the handle hands it back to the screen.
  */
 export const MobileTablaturePanel = memo(function MobileTablaturePanel({
+  exerciseId,
   measures,
   bpm,
   isPlaying,
@@ -138,6 +142,15 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
     (next: number) => setSetting("noteSpacing", clampZoom(next)),
     [setSetting]
   );
+  // A phone fits differently from a desktop, so it keeps its own memory slot.
+  const fitZoom = useAutoTabZoom({
+    storageKey: exerciseId && `${exerciseId}:phone`,
+    measures,
+    bpm,
+    boardRef,
+    viewerHeight,
+    zoomScale: MOBILE_FIT,
+  });
 
   // Left-gutter tuning legend, same mapping as the desktop section: the notation
   // runs low→high, so index 0 is string 6.
@@ -236,7 +249,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
           </button>
           <button
             type='button'
-            onClick={() => handleZoomChange(1)}
+            onClick={() => handleZoomChange(fitZoom)}
             aria-label={t("tab.reset_zoom")}
             className='font-mono min-w-[3.25rem] rounded-lg px-1.5 py-2 text-center text-xs font-semibold tabular-nums text-zinc-300 transition-colors active:bg-white/10'>
             {Math.round(zoom * 100)}%

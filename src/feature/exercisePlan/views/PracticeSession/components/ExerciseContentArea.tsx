@@ -292,6 +292,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         <>
         {backingTrackSlot}
         <TablatureSection
+          exerciseId={currentExercise.id}
           cinema={cinema}
           backingTrackStatus={backingTrackStatus}
           onOpenBackingTrack={onOpenBackingTrack}
