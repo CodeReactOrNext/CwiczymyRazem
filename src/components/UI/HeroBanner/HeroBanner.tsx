@@ -47,9 +47,12 @@ export const HeroBanner = ({
   compact = false,
 }: HeroBannerProps) => {
   const { t } = useTranslation("ui");
+  // The fixed minimum height only exists to give the absolutely-positioned
+  // figures room; a text-only banner sizes to its content.
+  const hasFigures = Boolean(characterImage || secondaryImage);
   return (
     <div
-      className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible ${compact ? '' : 'min-h-[220px] md:min-h-[160px] lg:min-h-[180px]'} ${className}`}
+      className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible ${!compact && hasFigures ? 'min-h-[220px] md:min-h-[160px] lg:min-h-[180px]' : ''} ${className}`}
     >
       {/* Backgrounds Container (Clipped) */}
       <div className="absolute inset-0 rounded-none md:rounded-xl overflow-hidden pointer-events-none z-0">
@@ -127,7 +130,7 @@ export const HeroBanner = ({
               </p>
             )
           )}
-          <div className="inline-block !mb-4 md:!mb-6">
+          <div className={`inline-block ${leftContent ? "!mb-4 md:!mb-6" : ""}`}>
             <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
               {title}
             </h1>

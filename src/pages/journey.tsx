@@ -6,7 +6,7 @@ import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const JourneyPage: NextPageWithLayout = () => {
   return (
-    <div className="flex min-h-screen flex-col overflow-visible rounded-lg bg-zinc-950 lg:mt-16">
+    <div className="flex min-h-screen flex-col overflow-visible rounded-lg bg-zinc-950">
       <JourneyView />
     </div>
   );

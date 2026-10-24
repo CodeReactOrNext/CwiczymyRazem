@@ -99,7 +99,7 @@ const TimerPractice: NextPageWithLayout = () => {
           />
         }
         backgroundContent={<HeroPattern variant="timer" />}
-        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+        className="w-full !rounded-none !shadow-none"
       />
       {rotationItem && <RotationTimerBanner item={rotationItem} />}
       <TimerLayout

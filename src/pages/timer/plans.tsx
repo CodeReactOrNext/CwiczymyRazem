@@ -124,7 +124,7 @@ const TimerPlans: NextPageWithLayout = () => {
           />
         }
         backgroundContent={<HeroPattern />}
-        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+        className="w-full !rounded-none !shadow-none"
       />
       <PlanSelector onSelectPlan={handleSelectPlanFromList} loadingPlanId={loadingPlanId} />
     </div>

@@ -89,7 +89,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
         aria-hidden
       />
 
-      <div className="relative mx-auto max-w-3xl px-4 py-10 md:px-8">
+      <div className="relative mx-auto max-w-3xl px-4 pt-6 pb-10 md:px-8">
         <div className="mb-6">
           <h1 className="font-display text-2xl font-bold text-white">{t("modules.title")}</h1>
           <p className="mt-1 text-sm text-zinc-400">{t("modules.subtitle")}</p>
