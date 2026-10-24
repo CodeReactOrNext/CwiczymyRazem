@@ -63,7 +63,7 @@ export const MainTimerSection = ({
                 <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">{t("timer_section.session")}</span>
                 <div className="flex items-center gap-2 text-white">
                     <HistoryIcon size='1em' className="h-3.5 w-3.5 text-cyan-500/50" />
-                    <span className="font-mono text-lg font-black tracking-wide">{formattedTotalSession}</span>
+                    <span className="font-mono text-base font-black tracking-wide">{formattedTotalSession}</span>
                 </div>
              </div>
           </div>
@@ -73,7 +73,7 @@ export const MainTimerSection = ({
              <span className="text-[10px] text-zinc-500 font-bold capitalize tracking-wide leading-none">{t("timer_section.exercise")}</span>
              <div className="flex items-center gap-2">
                  <div className={cn(
-                   "font-mono text-3xl font-black leading-none tracking-tight transition-colors duration-base",
+                   "font-mono text-2xl font-black leading-none tracking-tight transition-colors duration-base",
                    isFinished ? "text-emerald-400" : isPlaying ? "text-cyan-400" : "text-white"
                  )}>
                      {formattedTimeLeft}
@@ -88,7 +88,7 @@ export const MainTimerSection = ({
                   isLastExercise={isLastExercise}
                   toggleTimer={toggleTimer}
                   handleNextExercise={handleNextExercise}
-                  size="md"
+                  size="sm"
                   variant="centered"
           
                   hidePlayButton={currentExercise.riddleConfig?.mode === 'sequenceRepeat'}

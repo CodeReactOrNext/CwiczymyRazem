@@ -93,7 +93,7 @@ const SessionBottomBarComponent = ({
   return (
     <>
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 border-t border-white/5">
-      <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
+      <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between gap-8">
 
         {/* Left: Exit */}
         <div className="flex-1 flex items-center justify-start gap-4">
@@ -169,7 +169,7 @@ const SessionBottomBarComponent = ({
                 className={cn(
                   "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior",
                   isLastExercise
-                    ? "h-12 px-6 bg-white text-black shadow-lg shadow-white/20 hover:bg-zinc-200 hover:text-black"
+                    ? "h-10 px-5 bg-white text-black shadow-lg shadow-white/20 hover:bg-zinc-200 hover:text-black"
                     : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
                   isLastExercise && finishDisabled && "opacity-50 cursor-not-allowed"
                 )}

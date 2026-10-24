@@ -80,7 +80,7 @@ const ExerciseControls = ({
           <Button
             onClick={toggleTimer}
             className={cn(
-              variant === "centered" ? (size === "lg" ? "h-14 px-8 w-auto" : "h-12 px-6 w-auto") : "w-full",
+              variant === "centered" ? (size === "lg" ? "h-14 px-8 w-auto" : size === "sm" ? "h-10 px-5 w-auto" : "h-12 px-6 w-auto") : "w-full",
               "rounded-lg font-black transition-background click-behavior   relative",
               isPlaying
                 ? "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20"
