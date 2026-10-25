@@ -548,7 +548,9 @@
     "description": "Elige cómo está afinada tu guitarra — la detección de tono y el audio de acompañamiento se ajustarán a esta afinación."
   },
   "header": {
-    "close_session": "Cerrar sesión de práctica"
+    "close_session": "Cerrar sesión de práctica",
+    "exercise_info": "Información del ejercicio",
+    "close_info": "Cerrar"
   },
   "speeds_mastered": {
     "hint": "Velocidades que dominas en este ejercicio",

@@ -6,7 +6,7 @@ import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMediaQuery } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Pause, PlayIcon, RotateCcw,SkipBack, SkipForward, X } from "lucide-react";
+import { Check, Info, Pause, PlayIcon, RotateCcw,SkipBack, SkipForward, X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -88,12 +88,12 @@ interface PhoneSessionModalProps {
  * fills the screen with the timer under it and every control sits on one strip down the right
  * edge, the details drawer sliding out of it over the exercise.
  *
- * Upright on a phone, a tab exercise lays that same sideways screen on its side, so it reads
+ * Upright on a phone, the exercise lays that same sideways screen on its side, so it reads
  * once the phone is turned: nudging the player round without forcing the page, which iOS can't
  * lock and a rotation-locked phone would never follow. The page then really rotating swaps the
  * turned box for the plain one with every element where it was — the exercise stays mounted
- * and the tab doesn't restart. Everything else held upright — other exercises, a small tablet
- * with the width to spare — gets the upright arrangement: strip along the bottom, drawer
+ * and a tab doesn't restart. Held upright, the exercises that can't be turned and a small
+ * tablet with the width to spare get the upright arrangement: strip along the bottom, drawer
  * rising from it.
  */
 export function PhoneSessionModal({
@@ -154,22 +154,23 @@ export function PhoneSessionModal({
   const isPortrait = orientation === "portrait";
   const isNarrow = useMediaQuery("(max-width: 599px)");
   const hasTablature = !!activeTablature && activeTablature.length > 0;
-  // Only a tab is worth turning the phone for — and only a tab is safe to turn: the quizzes'
-  // sliders read the pointer straight off the screen and would slide the wrong way. Ear
-  // training keeps its tab hidden until it's guessed, so it stays upright throughout rather
-  // than flipping mid-riddle.
-  const isTabExercise =
-    hasTablature &&
-    !currentExercise.earQuizConfig &&
-    currentExercise.id !== "metronome_gap_test" &&
-    currentExercise.riddleConfig?.mode !== "sequenceRepeat";
+  // Every exercise reads sideways on a phone, so every one is turned — except those that read
+  // the pointer straight off the screen and would slide the wrong way once turned: the detune
+  // quiz's slider and a song's section timeline.
+  const canTurn =
+    currentExercise.earQuizConfig?.mode !== "detune" &&
+    !songSectionMapSlot;
   /** The sideways screen, laid on its side on an upright phone. */
-  const isTurned = isPortrait && isNarrow && isTabExercise;
+  const isTurned = isPortrait && isNarrow && canTurn;
   /** The sideways arrangement — the phone really turned, or the screen turned for it. */
   const isSideways = !isPortrait || isTurned;
   // Sideways the drawer opens beside most of the tab. Upright it would cover the exercise, so
   // there it starts shut.
   const [isPanelExpanded, setIsPanelExpanded] = useState(!isPortrait);
+  // What the exercise is about — over the exercise, opened from its title. Held per exercise,
+  // so moving on to the next one closes it.
+  const [infoExerciseId, setInfoExerciseId] = useState<string | null>(null);
+  const isInfoOpen = infoExerciseId === currentExercise.id;
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
   const { formattedTimeLeft } = useTimerContext();
   const strumVolume = strumSynthVolume(isAudioMuted, audioTracks?.find(track => track.id === "main"));
@@ -339,6 +340,20 @@ export function PhoneSessionModal({
                 "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
                 isSideways ? "p-2" : "px-4 pb-2 pt-4",
               )}>
+                {/* Title — the screen has no room for the instructions, so they open from here */}
+                <button
+                  type="button"
+                  onClick={() => setInfoExerciseId(currentExercise.id)}
+                  aria-label={t("header.exercise_info")}
+                  className={cn(
+                    "flex max-w-full shrink-0 items-center gap-1.5 self-start text-left text-zinc-400 transition-colors hover:text-white",
+                    isSideways ? "px-1 pb-1.5" : "pb-3",
+                  )}
+                >
+                  <span className="truncate text-[11px] font-semibold">{currentExercise.title}</span>
+                  <Info className="h-3.5 w-3.5 shrink-0 text-cyan-400/80" />
+                </button>
+
                 {/* Scroll container + min-h-full column: the exercise owns the free height — a
                     tab grows into it, anything shorter is centred in it — while tall exercises
                     (chord hunt, ear training) scroll instead of being clipped under the timer. */}
@@ -403,6 +418,36 @@ export function PhoneSessionModal({
                 </div>
 
                 {drawer}
+
+                <AnimatePresence>
+                  {isInfoOpen && (
+                    <motion.div
+                      key="info"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute inset-0 z-30 overflow-y-auto overscroll-contain bg-zinc-950/95 backdrop-blur-xl"
+                    >
+                      <div className="mx-auto max-w-xl space-y-6 p-5">
+                        <div className="flex items-start gap-3">
+                          <div className="min-w-0 flex-1 space-y-2">
+                            <h3 className="text-sm font-bold text-white">{currentExercise.title}</h3>
+                            {currentExercise.description && (
+                              <p className="text-xs leading-relaxed text-zinc-400">{currentExercise.description}</p>
+                            )}
+                          </div>
+                          <Button variant='ghost' size='icon' onClick={() => setInfoExerciseId(null)}
+                            aria-label={t("header.close_info")}
+                            className='-mr-2 -mt-2 h-9 w-9 shrink-0 text-zinc-400 hover:text-white'>
+                            <X className='h-4 w-4' />
+                          </Button>
+                        </div>
+                        <MobileInstructionsCard exercise={currentExercise} plain />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Always-visible controls strip — down the right edge sideways, along the bottom

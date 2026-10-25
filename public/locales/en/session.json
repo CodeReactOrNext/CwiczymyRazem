@@ -624,7 +624,9 @@
     "description": "Choose how your guitar is tuned — pitch detection and backing audio will be matched to this tuning."
   },
   "header": {
-    "close_session": "Close session"
+    "close_session": "Close session",
+    "exercise_info": "Exercise info",
+    "close_info": "Close"
   },
   "speeds_mastered": {
     "hint": "Speeds you've mastered for this exercise",

@@ -548,7 +548,9 @@
     "description": "Wähle, wie deine Gitarre gestimmt ist — Tonerkennung und Begleitaudio werden an diese Stimmung angepasst."
   },
   "header": {
-    "close_session": "Session schließen"
+    "close_session": "Session schließen",
+    "exercise_info": "Infos zur Übung",
+    "close_info": "Schließen"
   },
   "speeds_mastered": {
     "hint": "Tempi, die du in dieser Übung gemeistert hast",
