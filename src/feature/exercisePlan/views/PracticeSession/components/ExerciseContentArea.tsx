@@ -227,7 +227,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
 
       {/* Improv Prompt */}
       {currentExercise.riddleConfig?.mode === "improvPrompt" && (
-        <div className="p-4">
+        <div className="px-6 pt-6">
           <ImprovPromptView config={currentExercise.riddleConfig} isRunning={isPlaying} />
         </div>
       )}

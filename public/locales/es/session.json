@@ -292,6 +292,7 @@
     "required": "Este ejercicio necesita una pista de acompañamiento",
     "find_hint": "Busca una en YouTube para tocar encima",
     "find": "Buscar pista en YouTube",
+    "find_short": "Buscar en YouTube",
     "searching": "Buscando en YouTube...",
     "search_again": "Buscar otra vez",
     "change": "Cambiar pista de acompañamiento"

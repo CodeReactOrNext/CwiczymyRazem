@@ -368,6 +368,7 @@
     "required": "This exercise requires a backing track",
     "find_hint": "Find one on YouTube to play along",
     "find": "Find Backing Track on YouTube",
+    "find_short": "Find on YouTube",
     "searching": "Searching YouTube...",
     "search_again": "Search again",
     "change": "Change backing track"
