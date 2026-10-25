@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { SongSection } from "feature/songs/types/songSection.type";
+import { fractionAlongX, useQuarterTurn } from "hooks/useQuarterTurn";
 import { GripVertical } from "lucide-react";
 import { useRef } from "react";
 
@@ -29,18 +30,18 @@ export const SectionTimeline = ({
 }: SectionTimelineProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef<{ id: string } | null>(null);
+  const quarterTurned = useQuarterTurn();
 
   const sorted = [...sections].sort((a, b) => a.startTime - b.startTime);
 
-  const timeFromPointer = (clientX: number): number => {
+  const timeFromPointer = (pointer: { clientX: number; clientY: number }): number => {
     if (!trackRef.current) return 0;
-    const rect = trackRef.current.getBoundingClientRect();
-    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) * duration;
+    return fractionAlongX(trackRef.current.getBoundingClientRect(), pointer, quarterTurned) * duration;
   };
 
   const handleTrackClick = (e: React.MouseEvent) => {
     if (draggingRef.current || isLocked) return;
-    onSeek(timeFromPointer(e.clientX));
+    onSeek(timeFromPointer(e));
   };
 
   const handleSegmentPointerDown = (e: React.PointerEvent, section: SongSection) => {
@@ -52,7 +53,7 @@ export const SectionTimeline = ({
 
   const handleSegmentPointerMove = (e: React.PointerEvent, section: SongSection) => {
     if (!draggingRef.current || draggingRef.current.id !== section.id) return;
-    onSectionTimeChange(section.id, Math.round(Math.max(0, timeFromPointer(e.clientX))));
+    onSectionTimeChange(section.id, Math.round(Math.max(0, timeFromPointer(e))));
   };
 
   const handleSegmentPointerUp = (e: React.PointerEvent) => {

@@ -167,7 +167,9 @@ export function MobileExerciseContent({
         />
       )}
       {currentExercise.riddleConfig?.mode === 'improvPrompt' && (
-        <ImprovPromptView config={currentExercise.riddleConfig} isRunning={isPlaying} />
+        <div className="w-full rounded-lg bg-zinc-900/60 p-5">
+          <ImprovPromptView config={currentExercise.riddleConfig} isRunning={isPlaying} />
+        </div>
       )}
       {currentExercise.id === "metronome_gap_test" ? (
         <MetronomeGapTest compact isSessionRunning={isPlaying} onStartSession={startTimer} />
@@ -223,7 +225,7 @@ export function MobileExerciseContent({
       ) : currentExercise.requiresBackingTrack ? (
         // Improv over a backing track — without this branch these exercises
         // (no tab, video or image of their own) left the phone screen empty.
-        <div className="w-full overflow-hidden rounded-2xl bg-zinc-900/40">
+        <div className="w-full overflow-hidden rounded-lg bg-zinc-900/60">
           {backingVideoId
             ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
             : <BackingTrackPicker exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} compact />}

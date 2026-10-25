@@ -370,6 +370,7 @@
     "required": "To ćwiczenie wymaga podkładu",
     "find_hint": "Znajdź go na YouTube, żeby grać do niego",
     "find": "Znajdź podkład na YouTube",
+    "find_short": "Szukaj na YouTube",
     "searching": "Szukanie na YouTube...",
     "search_again": "Szukaj ponownie",
     "change": "Zmień podkład"
@@ -626,7 +627,9 @@
     "description": "Wybierz strój gitary — wykrywanie wysokości i podkład zostaną do niego dopasowane."
   },
   "header": {
-    "close_session": "Zamknij sesję"
+    "close_session": "Zamknij sesję",
+    "exercise_info": "Informacje o ćwiczeniu",
+    "close_info": "Zamknij"
   },
   "speeds_mastered": {
     "hint": "Tempa opanowane w tym ćwiczeniu",

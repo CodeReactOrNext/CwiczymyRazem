@@ -1,6 +1,6 @@
-import { cn } from "assets/lib/utils";
+import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
-import { Music, Play, SearchIcon } from "lucide-react";
+import { Music, Play, RefreshCw, SearchIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { FaYoutube } from "react-icons/fa";
 
@@ -39,8 +39,8 @@ interface VideoResult {
 interface BackingTrackPickerProps {
   exerciseTitle: string;
   searchQueries?: string[];
-  /** Phone layout — results as rows with a small thumbnail, so all of them fit
-   *  on a sideways screen instead of one full-width card at a time. */
+  /** Phone layout — one row with the button, results as rows with a small
+   *  thumbnail, so all of them fit on a sideways screen. */
   compact?: boolean;
 }
 
@@ -82,85 +82,105 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries, compact = fal
     }
   }
 
+  const resultTitle = (video: VideoResult) => (
+    <div className="min-w-0">
+      <p className="line-clamp-2 text-xs font-semibold leading-snug text-zinc-200">{video.title}</p>
+      <p className="mt-1 truncate text-[11px] text-zinc-400">{video.channel}</p>
+    </div>
+  );
+
+  const searchAgain = (
+    <Button variant='ghost' size='sm' onClick={search} className='text-zinc-400 hover:text-zinc-100'>
+      <RefreshCw className="mr-1.5" />
+      {t("backing.search_again")}
+    </Button>
+  );
+
+  const searching = (
+    <span className="flex items-center gap-2 text-xs text-zinc-400 animate-pulse">
+      <SearchIcon className="h-3.5 w-3.5" />
+      {t("backing.searching")}
+    </span>
+  );
+
+  // Phone: one row — what's needed and the button — with the results listed under it.
+  if (compact) {
+    return (
+      <div className="flex w-full flex-col gap-4 p-5">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+          <Music className="h-5 w-5 shrink-0 text-zinc-400" />
+          <div className="min-w-0 flex-1 basis-40">
+            <p className="text-sm font-medium text-zinc-200">{t("backing.required")}</p>
+            <p className="mt-0.5 text-xs text-zinc-400">{t("backing.find_hint")}</p>
+          </div>
+          {state === "idle" && (
+            <Button variant='secondary' size='sm' onClick={search}>
+              <FaYoutube className="mr-1.5 text-red-500" />
+              {t("backing.find_short")}
+            </Button>
+          )}
+          {state === "loading" && searching}
+          {state === "results" && searchAgain}
+        </div>
+
+        {state === "results" && (
+          <div className="-mx-2 flex flex-col gap-1">
+            {videos.map((video) => (
+              <button
+                key={video.id}
+                onClick={() => setBackingVideoId(video.id)}
+                className="flex items-center gap-3 rounded-lg p-2 text-left outline-none transition-colors hover:bg-zinc-800/60 focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <img src={video.thumbnail} alt="" className="aspect-video w-24 shrink-0 rounded object-cover" />
+                {resultTitle(video)}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className={cn(
-      "w-full h-full flex flex-col items-center justify-center",
-      compact ? "p-5 gap-5" : "p-8 gap-8 min-h-[260px]",
-    )}>
-      <div className="flex flex-col items-center gap-2 text-center">
-        <Music size={28} className="text-amber-500/70" />
-        <p className="text-zinc-300 font-semibold text-base">{t("backing.required")}</p>
-        <p className="text-zinc-500 text-sm">{t("backing.find_hint")}</p>
+    <div className="flex w-full flex-col items-center gap-6 px-6 py-10 text-center">
+      <div className="flex flex-col items-center gap-1.5">
+        <Music className="mb-2 h-6 w-6 text-zinc-400" />
+        <p className="text-base font-semibold text-zinc-200">{t("backing.required")}</p>
+        <p className="text-sm text-zinc-400">{t("backing.find_hint")}</p>
       </div>
 
       {state === "idle" && (
-        <button
-          onClick={search}
-          className="flex items-center gap-2.5 px-6 py-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/20 hover:border-amber-500/40 text-amber-400 font-semibold text-sm transition-all"
-        >
-          <FaYoutube size={18} className="text-amber-500" />
+        <Button variant='secondary' onClick={search}>
+          <FaYoutube className="mr-1.5 text-red-500" />
           {t("backing.find")}
-        </button>
+        </Button>
       )}
 
-      {state === "loading" && (
-        <div className="flex items-center gap-2.5 text-zinc-500 text-sm font-medium animate-pulse">
-          <SearchIcon size={14} />
-          {t("backing.searching")}
-        </div>
-      )}
-
-      {state === "results" && compact && (
-        <div className="w-full flex flex-col gap-2">
-          {videos.map((video) => (
-            <button
-              key={video.id}
-              onClick={() => setBackingVideoId(video.id)}
-              className="flex items-center gap-3 rounded-xl bg-white/5 p-2 text-left transition-colors hover:bg-white/10"
-            >
-              <img src={video.thumbnail} alt="" className="aspect-video w-24 shrink-0 rounded-lg object-cover" />
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-zinc-200 line-clamp-2 leading-snug">{video.title}</p>
-                <p className="text-[10px] text-zinc-500 mt-1 truncate">{video.channel}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {state === "results" && !compact && (
-        <div className="w-full max-w-2xl flex flex-col sm:flex-row gap-3">
-          {videos.map((video) => (
-            <button
-              key={video.id}
-              onClick={() => setBackingVideoId(video.id)}
-              className="flex-1 group flex flex-col rounded-xl overflow-hidden bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all text-left"
-            >
-              <div className="relative">
-                <img
-                  src={video.thumbnail}
-                  alt=""
-                  className="w-full aspect-video object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="bg-amber-500 rounded-full p-3 shadow-lg">
-                    <Play size={14} className="text-white translate-x-0.5" />
-                  </div>
-                </div>
-              </div>
-              <div className="p-3">
-                <p className="text-xs font-semibold text-zinc-200 line-clamp-2 leading-snug">{video.title}</p>
-                <p className="text-[10px] text-zinc-500 mt-1 truncate">{video.channel}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
+      {state === "loading" && searching}
 
       {state === "results" && (
-        <button onClick={search} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors underline underline-offset-2">
-          {t("backing.search_again")}
-        </button>
+        <>
+          <div className="grid w-full max-w-3xl gap-4 text-left sm:grid-cols-3">
+            {videos.map((video) => (
+              <button
+                key={video.id}
+                onClick={() => setBackingVideoId(video.id)}
+                className="group flex flex-col gap-3 rounded-lg p-2 text-left outline-none transition-colors hover:bg-zinc-800/50 focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <div className="relative overflow-hidden rounded">
+                  <img src={video.thumbnail} alt="" className="aspect-video w-full object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="rounded-full bg-white p-2.5 text-black">
+                      <Play className="h-3.5 w-3.5 translate-x-px" />
+                    </div>
+                  </div>
+                </div>
+                {resultTitle(video)}
+              </button>
+            ))}
+          </div>
+          {searchAgain}
+        </>
       )}
     </div>
   );
@@ -174,25 +194,21 @@ interface BackingVideoPlayerProps {
 export function BackingVideoPlayer({ videoId, onChangeClick }: BackingVideoPlayerProps) {
   const { t } = useTranslation("session");
   return (
-    <div className="w-full relative group p-4 flex flex-col items-center gap-2">
-      <div className="aspect-video w-full max-w-sm rounded-lg overflow-hidden bg-zinc-900 shadow-2xl border-2 border-amber-500/30 relative ring-2 ring-amber-500/10 transition-all duration-base hover:border-amber-500/50 hover:ring-amber-500/20">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none z-10" />
+    <div className="flex w-full flex-col items-center gap-3 p-4">
+      <div className="aspect-video w-full max-w-sm overflow-hidden rounded-lg bg-zinc-950">
         {/* loop=1 + playlist=<id> makes a single video repeat, so a backing track
             shorter than the exercise keeps playing for the whole session. */}
         <iframe
           src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&loop=1&playlist=${videoId}`}
-          className="h-full w-full relative z-0"
+          className="h-full w-full"
           allow="autoplay; encrypted-media; fullscreen"
           allowFullScreen
         />
       </div>
-      <button
-        onClick={onChangeClick}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/20 hover:border-amber-500/40 text-amber-400 text-xs font-semibold transition-all"
-      >
-        <FaYoutube size={14} className="text-amber-500" />
+      <Button variant='ghost' size='sm' onClick={onChangeClick} className='text-zinc-400 hover:text-zinc-100'>
+        <FaYoutube className="mr-1.5" />
         {t("backing.change")}
-      </button>
+      </Button>
     </div>
   );
 }

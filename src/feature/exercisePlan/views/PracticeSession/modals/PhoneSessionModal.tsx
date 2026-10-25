@@ -5,8 +5,9 @@ import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/compone
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMediaQuery } from "hooks/useMediaQuery";
+import { QuarterTurnContext } from "hooks/useQuarterTurn";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Pause, PlayIcon, RotateCcw,SkipBack, SkipForward, X } from "lucide-react";
+import { Check, Info, Pause, PlayIcon, RotateCcw,SkipBack, SkipForward, X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -88,12 +89,12 @@ interface PhoneSessionModalProps {
  * fills the screen with the timer under it and every control sits on one strip down the right
  * edge, the details drawer sliding out of it over the exercise.
  *
- * Upright on a phone, a tab exercise lays that same sideways screen on its side, so it reads
+ * Upright on a phone, the exercise lays that same sideways screen on its side, so it reads
  * once the phone is turned: nudging the player round without forcing the page, which iOS can't
  * lock and a rotation-locked phone would never follow. The page then really rotating swaps the
  * turned box for the plain one with every element where it was — the exercise stays mounted
- * and the tab doesn't restart. Everything else held upright — other exercises, a small tablet
- * with the width to spare — gets the upright arrangement: strip along the bottom, drawer
+ * and a tab doesn't restart. Only a window that is wider than tall without being phone-short
+ * (a small window, not a phone) gets the upright arrangement: strip along the bottom, drawer
  * rising from it.
  */
 export function PhoneSessionModal({
@@ -152,24 +153,23 @@ export function PhoneSessionModal({
 }: PhoneSessionModalProps) {
   const { t } = useTranslation("session");
   const isPortrait = orientation === "portrait";
-  const isNarrow = useMediaQuery("(max-width: 599px)");
+  // Every phone held upright, the big ones too — not just under 600px, which left a large
+  // phone or a foldable with the exercise standing upright.
+  const isUprightScreen = useMediaQuery("(orientation: portrait)");
   const hasTablature = !!activeTablature && activeTablature.length > 0;
-  // Only a tab is worth turning the phone for — and only a tab is safe to turn: the quizzes'
-  // sliders read the pointer straight off the screen and would slide the wrong way. Ear
-  // training keeps its tab hidden until it's guessed, so it stays upright throughout rather
-  // than flipping mid-riddle.
-  const isTabExercise =
-    hasTablature &&
-    !currentExercise.earQuizConfig &&
-    currentExercise.id !== "metronome_gap_test" &&
-    currentExercise.riddleConfig?.mode !== "sequenceRepeat";
-  /** The sideways screen, laid on its side on an upright phone. */
-  const isTurned = isPortrait && isNarrow && isTabExercise;
+  /** The sideways screen, laid on its side on an upright phone — every exercise reads sideways.
+   *  What reads a drag off its own box (a tab, the detune slider, a song's section timeline)
+   *  learns of the turn through QuarterTurnContext. */
+  const isTurned = isPortrait && isUprightScreen;
   /** The sideways arrangement — the phone really turned, or the screen turned for it. */
   const isSideways = !isPortrait || isTurned;
   // Sideways the drawer opens beside most of the tab. Upright it would cover the exercise, so
   // there it starts shut.
   const [isPanelExpanded, setIsPanelExpanded] = useState(!isPortrait);
+  // What the exercise is about — over the exercise, opened from its title. Held per exercise,
+  // so moving on to the next one closes it.
+  const [infoExerciseId, setInfoExerciseId] = useState<string | null>(null);
+  const isInfoOpen = infoExerciseId === currentExercise.id;
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
   const { formattedTimeLeft } = useTimerContext();
   const strumVolume = strumSynthVolume(isAudioMuted, audioTracks?.find(track => track.id === "main"));
@@ -319,165 +319,211 @@ export function PhoneSessionModal({
           >
             {/* The screen's own box — turned onto its side on an upright phone. The same element
                 either way, so turning the phone never remounts what's inside it. */}
-            <div
-              className={cn(
-                "flex overflow-hidden",
-                isSideways ? "flex-row" : "flex-col",
-                !isTurned && "h-full",
-              )}
-              style={isTurned ? {
-                ...QUARTER_TURN_STYLE,
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: turnedSize.height,
-                height: turnedSize.width,
-              } : undefined}
-            >
-              {/* The exercise, the timer underneath it, and the drawer over both */}
-              <div className={cn(
-                "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
-                isSideways ? "p-2" : "px-4 pb-2 pt-4",
-              )}>
-                {/* Scroll container + min-h-full column: the exercise owns the free height — a
-                    tab grows into it, anything shorter is centred in it — while tall exercises
-                    (chord hunt, ear training) scroll instead of being clipped under the timer. */}
-                <div className="min-h-0 w-full flex-1 overflow-y-auto overscroll-contain">
-                  <div className="flex min-h-full w-full flex-col gap-4">
-                    <div className="flex flex-1 flex-col justify-center gap-4">
-                      {!isSideways && heroSlot}
-                      <MobileExerciseContent
-                        currentExercise={currentExercise}
-                        activeTablature={activeTablature}
-                        effectiveBpm={effectiveBpm}
-                        metronome={metronome}
-                        isRiddleRevealed={isRiddleRevealed}
-                        isRiddleGuessed={isRiddleGuessed}
-                        hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-                        isPlaying={isPlaying}
-                        isListening={isListening}
-                        isMicEnabled={isMicEnabled}
-                        frequencyRef={frequencyRef}
-                        tabResetKey={tabResetKey}
-                        setVideoDuration={setVideoDuration}
-                        setTimerTime={setTimerTime}
-                        startTimer={startTimer}
-                        stopTimer={stopTimer}
-                        onVideoEnd={handleNextExerciseClick}
-                        earTrainingScore={earTrainingScore}
-                        earTrainingHighScore={earTrainingHighScore}
-                        handleRevealRiddle={handleRevealRiddle}
-                        handleNextRiddle={handleNextRiddle}
-                        onEarTrainingGuessed={onEarTrainingGuessed}
-                        riddleProgress={riddleProgress}
-                        onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
-                        isExamMode={examMode}
-                        strumVolume={strumVolume}
-                        songSectionMapSlot={songSectionMapSlot}
-                        turnTab={isTurned}
-                      />
-                    </div>
-
-                    {/* Upright there's height to spare under the exercise, so the score reads
-                        straight under the tab it's for; sideways it lives in the drawer. */}
-                    {!isSideways && !heroSlot && isMicEnabled && !currentExercise.customGoal && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
-                      <MobileMicGameHud />
-                    )}
-
-                    {!isSideways && currentExercise.spotifyId && (
-                      <div className="animate-in fade-in slide-in-from-top-2 duration-base">
-                        <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Timer — always visible, even with the details drawer collapsed */}
-                <div className="flex shrink-0 items-center justify-center pt-1.5">
-                  <div className={cn(
-                    "font-mono text-2xl font-black leading-none tracking-tighter transition-colors",
-                    isPlaying ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" : "text-zinc-500"
-                  )}>
-                    {formattedTimeLeft}
-                  </div>
-                </div>
-
-                {drawer}
-              </div>
-
-              {/* Always-visible controls strip — down the right edge sideways, along the bottom
-                  upright */}
-              <div className={cn(
-                "relative z-20 shrink-0 bg-zinc-950/80 backdrop-blur-xl",
-                isSideways ? "w-16" : "pb-safe",
-              )}>
+            <QuarterTurnContext.Provider value={isTurned}>
+              <div
+                className={cn(
+                  "flex overflow-hidden",
+                  isSideways ? "flex-row" : "flex-col",
+                  !isTurned && "h-full",
+                )}
+                style={isTurned ? {
+                  ...QUARTER_TURN_STYLE,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: turnedSize.height,
+                  height: turnedSize.width,
+                } : undefined}
+              >
+                {/* The exercise, the timer underneath it, and the drawer over both */}
                 <div className={cn(
-                  "flex items-center gap-1.5 overscroll-contain scrollbar-hide",
-                  isSideways
-                    ? "h-full flex-col overflow-y-auto py-2"
-                    : "h-16 flex-row overflow-x-auto px-3",
+                  "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
+                  isSideways ? "p-2" : "px-4 pb-2 pt-4",
                 )}>
-                  <Button variant='ghost' size='icon' onClick={onClose}
-                    aria-label={t("header.close_session")}
-                    className='h-10 w-10 shrink-0 text-zinc-500 hover:text-white'>
-                    <X className='h-4 w-4' />
-                  </Button>
-
-                  <Button variant='ghost' size='icon'
-                    onClick={() => setIsPanelExpanded(prev => !prev)}
-                    aria-label={isPanelExpanded ? t("tools.close_panel") : t("tools.open_panel")}
-                    aria-expanded={isPanelExpanded}
-                    className='h-10 w-10 shrink-0 text-zinc-400 hover:text-white'
+                  {/* Title — the screen has no room for the instructions, so they open from here */}
+                  <button
+                    type="button"
+                    onClick={() => setInfoExerciseId(currentExercise.id)}
+                    aria-label={t("header.exercise_info")}
+                    className={cn(
+                      "flex max-w-full shrink-0 items-center gap-1.5 self-start text-left text-zinc-400 transition-colors hover:text-white",
+                      isSideways ? "px-1 pb-1.5" : "pb-3",
+                    )}
                   >
-                    <motion.span
-                      animate={{ rotate: toggleRotation }}
-                      transition={{ duration: 0.2 }}
-                      className="flex items-center justify-center"
+                    <span className="truncate text-[11px] font-semibold">{currentExercise.title}</span>
+                    <Info className="h-3.5 w-3.5 shrink-0 text-cyan-400/80" />
+                  </button>
+
+                  {/* Scroll container + min-h-full column: the exercise owns the free height — a
+                      tab grows into it, anything shorter is centred in it — while tall exercises
+                      (chord hunt, ear training) scroll instead of being clipped under the timer. */}
+                  <div className="min-h-0 w-full flex-1 overflow-y-auto overscroll-contain">
+                    <div className="flex min-h-full w-full flex-col gap-4">
+                      <div className="flex flex-1 flex-col justify-center gap-4">
+                        {!isSideways && heroSlot}
+                        <MobileExerciseContent
+                          currentExercise={currentExercise}
+                          activeTablature={activeTablature}
+                          effectiveBpm={effectiveBpm}
+                          metronome={metronome}
+                          isRiddleRevealed={isRiddleRevealed}
+                          isRiddleGuessed={isRiddleGuessed}
+                          hasPlayedRiddleOnce={hasPlayedRiddleOnce}
+                          isPlaying={isPlaying}
+                          isListening={isListening}
+                          isMicEnabled={isMicEnabled}
+                          frequencyRef={frequencyRef}
+                          tabResetKey={tabResetKey}
+                          setVideoDuration={setVideoDuration}
+                          setTimerTime={setTimerTime}
+                          startTimer={startTimer}
+                          stopTimer={stopTimer}
+                          onVideoEnd={handleNextExerciseClick}
+                          earTrainingScore={earTrainingScore}
+                          earTrainingHighScore={earTrainingHighScore}
+                          handleRevealRiddle={handleRevealRiddle}
+                          handleNextRiddle={handleNextRiddle}
+                          onEarTrainingGuessed={onEarTrainingGuessed}
+                          riddleProgress={riddleProgress}
+                          onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
+                          isExamMode={examMode}
+                          strumVolume={strumVolume}
+                          songSectionMapSlot={songSectionMapSlot}
+                          turnTab={isTurned}
+                        />
+                      </div>
+
+                      {/* Upright there's height to spare under the exercise, so the score reads
+                          straight under the tab it's for; sideways it lives in the drawer. */}
+                      {!isSideways && !heroSlot && isMicEnabled && !currentExercise.customGoal && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
+                        <MobileMicGameHud />
+                      )}
+
+                      {!isSideways && currentExercise.spotifyId && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-base">
+                          <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Timer — always visible, even with the details drawer collapsed */}
+                  <div className="flex shrink-0 items-center justify-center pt-1.5">
+                    <div className={cn(
+                      "font-mono text-2xl font-black leading-none tracking-tighter transition-colors",
+                      isPlaying ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" : "text-zinc-500"
+                    )}>
+                      {formattedTimeLeft}
+                    </div>
+                  </div>
+
+                  {drawer}
+
+                  <AnimatePresence>
+                    {isInfoOpen && (
+                      <motion.div
+                        key="info"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute inset-0 z-30 overflow-y-auto overscroll-contain bg-zinc-950/95 backdrop-blur-xl"
+                      >
+                        <div className="mx-auto max-w-xl space-y-6 p-5">
+                          <div className="flex items-start gap-3">
+                            <div className="min-w-0 flex-1 space-y-2">
+                              <h3 className="text-sm font-bold text-white">{currentExercise.title}</h3>
+                              {currentExercise.description && (
+                                <p className="text-xs leading-relaxed text-zinc-400">{currentExercise.description}</p>
+                              )}
+                            </div>
+                            <Button variant='ghost' size='icon' onClick={() => setInfoExerciseId(null)}
+                              aria-label={t("header.close_info")}
+                              className='-mr-2 -mt-2 h-9 w-9 shrink-0 text-zinc-400 hover:text-white'>
+                              <X className='h-4 w-4' />
+                            </Button>
+                          </div>
+                          <MobileInstructionsCard exercise={currentExercise} plain />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Always-visible controls strip — down the right edge sideways, along the bottom
+                    upright */}
+                <div className={cn(
+                  "relative z-20 shrink-0 bg-zinc-950/80 backdrop-blur-xl",
+                  isSideways ? "w-16" : "pb-safe",
+                )}>
+                  <div className={cn(
+                    "flex items-center gap-1.5 overscroll-contain scrollbar-hide",
+                    isSideways
+                      ? "h-full flex-col overflow-y-auto py-2"
+                      : "h-16 flex-row overflow-x-auto px-3",
+                  )}>
+                    <Button variant='ghost' size='icon' onClick={onClose}
+                      aria-label={t("header.close_session")}
+                      className='h-10 w-10 shrink-0 text-zinc-500 hover:text-white'>
+                      <X className='h-4 w-4' />
+                    </Button>
+
+                    <Button variant='ghost' size='icon'
+                      onClick={() => setIsPanelExpanded(prev => !prev)}
+                      aria-label={isPanelExpanded ? t("tools.close_panel") : t("tools.open_panel")}
+                      aria-expanded={isPanelExpanded}
+                      className='h-10 w-10 shrink-0 text-zinc-400 hover:text-white'
                     >
-                      <SkipForward size='1em' className='h-4 w-4' />
-                    </motion.span>
-                  </Button>
-
-                  <div className="flex-1" />
-
-                  {currentExerciseIndex > 0 && (
-                    <Button onClick={handleBackExerciseClick} variant="ghost" size="icon"
-                      className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white">
-                      <SkipBack size='1em' className="h-4 w-4" />
+                      <motion.span
+                        animate={{ rotate: toggleRotation }}
+                        transition={{ duration: 0.2 }}
+                        className="flex items-center justify-center"
+                      >
+                        <SkipForward size='1em' className='h-4 w-4' />
+                      </motion.span>
                     </Button>
-                  )}
-                  {hasTablature && (
-                    <Button onClick={handleRestart} variant="ghost" size="icon"
-                      className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-amber-400 hover:text-amber-300">
-                      <RotateCcw size='1em' className="h-4 w-4" />
-                    </Button>
-                  )}
 
-                  {/* The one main action — white, like every primary button in the app. */}
-                  <Button
-                    onClick={handleToggleTimer}
-                    size="icon"
-                    className="h-12 w-12 shrink-0 rounded-lg bg-white text-black transition-colors click-behavior hover:bg-zinc-200"
-                  >
-                    {isPlaying ? <Pause size='1em' className='h-4 w-4' /> : <PlayIcon size='1em' className='h-4 w-4' />}
-                  </Button>
+                    <div className="flex-1" />
 
-                  {!examMode && (
+                    {currentExerciseIndex > 0 && (
+                      <Button onClick={handleBackExerciseClick} variant="ghost" size="icon"
+                        className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white">
+                        <SkipBack size='1em' className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {hasTablature && (
+                      <Button onClick={handleRestart} variant="ghost" size="icon"
+                        className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-amber-400 hover:text-amber-300">
+                        <RotateCcw size='1em' className="h-4 w-4" />
+                      </Button>
+                    )}
+
+                    {/* The one main action — white, like every primary button in the app. */}
                     <Button
-                      onClick={isLastExercise ? onFinish : handleNextExerciseClick}
-                      disabled={isFinishing || isSubmittingReport }
-                      variant="ghost" size="icon"
-                      className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white"
+                      onClick={handleToggleTimer}
+                      size="icon"
+                      className="h-12 w-12 shrink-0 rounded-lg bg-white text-black transition-colors click-behavior hover:bg-zinc-200"
                     >
-                      {isFinishing || isSubmittingReport
-                        ? <div className="h-3 w-3 animate-spin rounded-lg border-2 border-zinc-500/20 border-t-zinc-500" />
-                        : isLastExercise ? <Check size='1em' className="h-4 w-4" /> : <SkipForward size='1em' className="h-4 w-4" />
-                      }
+                      {isPlaying ? <Pause size='1em' className='h-4 w-4' /> : <PlayIcon size='1em' className='h-4 w-4' />}
                     </Button>
-                  )}
+
+                    {!examMode && (
+                      <Button
+                        onClick={isLastExercise ? onFinish : handleNextExerciseClick}
+                        disabled={isFinishing || isSubmittingReport }
+                        variant="ghost" size="icon"
+                        className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white"
+                      >
+                        {isFinishing || isSubmittingReport
+                          ? <div className="h-3 w-3 animate-spin rounded-lg border-2 border-zinc-500/20 border-t-zinc-500" />
+                          : isLastExercise ? <Check size='1em' className="h-4 w-4" /> : <SkipForward size='1em' className="h-4 w-4" />
+                        }
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            </QuarterTurnContext.Provider>
 
           </motion.div>
         )}

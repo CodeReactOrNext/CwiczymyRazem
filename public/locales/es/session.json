@@ -292,6 +292,7 @@
     "required": "Este ejercicio necesita una pista de acompañamiento",
     "find_hint": "Busca una en YouTube para tocar encima",
     "find": "Buscar pista en YouTube",
+    "find_short": "Buscar en YouTube",
     "searching": "Buscando en YouTube...",
     "search_again": "Buscar otra vez",
     "change": "Cambiar pista de acompañamiento"
@@ -548,7 +549,9 @@
     "description": "Elige cómo está afinada tu guitarra — la detección de tono y el audio de acompañamiento se ajustarán a esta afinación."
   },
   "header": {
-    "close_session": "Cerrar sesión de práctica"
+    "close_session": "Cerrar sesión de práctica",
+    "exercise_info": "Información del ejercicio",
+    "close_info": "Cerrar"
   },
   "speeds_mastered": {
     "hint": "Velocidades que dominas en este ejercicio",

@@ -368,6 +368,7 @@
     "required": "This exercise requires a backing track",
     "find_hint": "Find one on YouTube to play along",
     "find": "Find Backing Track on YouTube",
+    "find_short": "Find on YouTube",
     "searching": "Searching YouTube...",
     "search_again": "Search again",
     "change": "Change backing track"
@@ -624,7 +625,9 @@
     "description": "Choose how your guitar is tuned — pitch detection and backing audio will be matched to this tuning."
   },
   "header": {
-    "close_session": "Close session"
+    "close_session": "Close session",
+    "exercise_info": "Exercise info",
+    "close_info": "Close"
   },
   "speeds_mastered": {
     "hint": "Speeds you've mastered for this exercise",

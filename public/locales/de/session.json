@@ -292,6 +292,7 @@
     "required": "Diese Übung braucht einen Backing Track",
     "find_hint": "Such dir auf YouTube einen zum Mitspielen",
     "find": "Backing Track auf YouTube suchen",
+    "find_short": "Auf YouTube suchen",
     "searching": "YouTube wird durchsucht...",
     "search_again": "Erneut suchen",
     "change": "Backing Track ändern"
@@ -548,7 +549,9 @@
     "description": "Wähle, wie deine Gitarre gestimmt ist — Tonerkennung und Begleitaudio werden an diese Stimmung angepasst."
   },
   "header": {
-    "close_session": "Session schließen"
+    "close_session": "Session schließen",
+    "exercise_info": "Infos zur Übung",
+    "close_info": "Schließen"
   },
   "speeds_mastered": {
     "hint": "Tempi, die du in dieser Übung gemeistert hast",
