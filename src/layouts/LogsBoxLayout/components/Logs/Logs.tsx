@@ -520,9 +520,6 @@ interface LogsBoxLayoutProps {
   onLoadMoreLogs?: () => void;
 }
 
-/** 32px on a phone, so the name keeps the room; the full 40px from `sm`. */
-const FEED_AVATAR = cn(AVATAR_SHRINK, "sm:mr-2");
-
 const TimeStamp = ({ date }: { date: Date }) => (
   <p className='mb-2 w-full whitespace-nowrap py-1 text-[0.6rem] text-zinc-400 sm:mb-0 sm:w-auto sm:text-[0.55rem] lg:mr-4 lg:text-xs'>
     {date.toLocaleDateString() +
@@ -1200,7 +1197,8 @@ const FirebaseLogsDonationItem = ({
               userName={userName ?? getDonationName(newest, t)}
               avatarUrl={avatarUrl ?? undefined}
               guildBadge={guildBadge}
-              avatarClassName={FEED_AVATAR}
+              avatarClassName={AVATAR_SHRINK}
+              nameClassName='sm:ml-2'
               guildBadgeClassName='hidden sm:inline-flex'
             />
           </span>
@@ -2057,7 +2055,8 @@ const GroupedLogItem = ({
                 userName={userName}
                 avatarUrl={avatarUrl ?? undefined}
                 guildBadge={guildBadge}
-                avatarClassName={FEED_AVATAR}
+                avatarClassName={AVATAR_SHRINK}
+                nameClassName='sm:ml-2'
                 guildBadgeClassName='hidden sm:inline-flex'
               />
             </span>

@@ -24,7 +24,10 @@ interface UserLinkProps {
   showName?: boolean;
   className?: string;
   nameClassName?: string;
-  /** On the Avatar itself, e.g. `AVATAR_SHRINK` for a 32px avatar on phones. */
+  /**
+   * On the Avatar itself, e.g. `AVATAR_SHRINK` for a 32px avatar on phones. No
+   * margins: inside the supporter ring they push the avatar off its centre.
+   */
   avatarClassName?: string;
   /** e.g. `hidden sm:inline-flex` where a phone row has no room for the tag. */
   guildBadgeClassName?: string;
