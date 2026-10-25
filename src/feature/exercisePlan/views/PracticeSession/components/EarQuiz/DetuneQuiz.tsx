@@ -8,9 +8,10 @@ import {
   isDetuneSolved,
   remainingDetuneCents,
 } from "feature/exercisePlan/logic/earQuiz/questions";
+import { fractionAlongX, useQuarterTurn } from "hooks/useQuarterTurn";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, Pause, Play } from "lucide-react";
-import { useState } from "react";
+import { type PointerEvent, useState } from "react";
 import { midiToFrequency } from "utils/audio/noteUtils";
 
 import { QuizReveal, QuizVerdict } from "./EarQuizChrome";
@@ -58,6 +59,27 @@ export function DetuneQuiz({
 
   const snapToPitch = () => setSliderCents(-question.offsetCents);
 
+  // On the turned phone screen the slider's track runs down the page, but Radix reads the
+  // pointer's x — so the drag is taken here instead, before it reaches the slider. The thumb
+  // still follows the value, and the keyboard still goes to Radix.
+  const quarterTurned = useQuarterTurn();
+  const slideTo = (e: PointerEvent<HTMLDivElement>) => {
+    const fraction = fractionAlongX(e.currentTarget.getBoundingClientRect(), e, true);
+    setSliderCents(Math.round(-SLIDER_RANGE_CENTS + fraction * SLIDER_RANGE_CENTS * 2));
+  };
+  const turnedDrag = quarterTurned && !isAnswered ? {
+    onPointerDownCapture: (e: PointerEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      slideTo(e);
+    },
+    onPointerMoveCapture: (e: PointerEvent<HTMLDivElement>) => {
+      if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+      e.stopPropagation();
+      slideTo(e);
+    },
+  } : {};
+
   const direction = remaining > 0 ? "sharp" : "flat";
   const verdictLine = solved
     ? t("quiz.detune_in_tune", {
@@ -98,16 +120,18 @@ export function DetuneQuiz({
       </div>
 
       <div className='space-y-4 px-1 sm:px-6'>
-        <Slider
-          value={[sliderCents]}
-          onValueChange={([value]) => !isAnswered && setSliderCents(value)}
-          min={-SLIDER_RANGE_CENTS}
-          max={SLIDER_RANGE_CENTS}
-          step={1}
-          disabled={isAnswered}
-          aria-label={t("quiz.second_pitch")}
-          className='py-3'
-        />
+        <div className='touch-none' {...turnedDrag}>
+          <Slider
+            value={[sliderCents]}
+            onValueChange={([value]) => !isAnswered && setSliderCents(value)}
+            min={-SLIDER_RANGE_CENTS}
+            max={SLIDER_RANGE_CENTS}
+            step={1}
+            disabled={isAnswered}
+            aria-label={t("quiz.second_pitch")}
+            className='py-3'
+          />
+        </div>
         <div className='flex items-center justify-between text-xs text-zinc-500'>
           <span>{t("quiz.flatter")}</span>
           <span
