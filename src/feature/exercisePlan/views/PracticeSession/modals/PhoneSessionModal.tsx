@@ -93,8 +93,9 @@ interface PhoneSessionModalProps {
  * once the phone is turned: nudging the player round without forcing the page, which iOS can't
  * lock and a rotation-locked phone would never follow. The page then really rotating swaps the
  * turned box for the plain one with every element where it was — the exercise stays mounted
- * and a tab doesn't restart. A small tablet held upright, with the width to spare, gets the
- * upright arrangement instead: strip along the bottom, drawer rising from it.
+ * and a tab doesn't restart. Only a window that is wider than tall without being phone-short
+ * (a small window, not a phone) gets the upright arrangement: strip along the bottom, drawer
+ * rising from it.
  */
 export function PhoneSessionModal({
   orientation,
@@ -152,12 +153,14 @@ export function PhoneSessionModal({
 }: PhoneSessionModalProps) {
   const { t } = useTranslation("session");
   const isPortrait = orientation === "portrait";
-  const isNarrow = useMediaQuery("(max-width: 599px)");
+  // Every phone held upright, the big ones too — not just under 600px, which left a large
+  // phone or a foldable with the exercise standing upright.
+  const isUprightScreen = useMediaQuery("(orientation: portrait)");
   const hasTablature = !!activeTablature && activeTablature.length > 0;
   /** The sideways screen, laid on its side on an upright phone — every exercise reads sideways.
    *  What reads a drag off its own box (a tab, the detune slider, a song's section timeline)
    *  learns of the turn through QuarterTurnContext. */
-  const isTurned = isPortrait && isNarrow;
+  const isTurned = isPortrait && isUprightScreen;
   /** The sideways arrangement — the phone really turned, or the screen turned for it. */
   const isSideways = !isPortrait || isTurned;
   // Sideways the drawer opens beside most of the tab. Upright it would cover the exercise, so
