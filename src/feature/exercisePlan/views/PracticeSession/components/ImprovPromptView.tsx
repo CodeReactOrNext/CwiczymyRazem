@@ -109,6 +109,10 @@ export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) =
 
   const progress = secondsLeft / config.promptIntervalSeconds;
   const count = config.simultaneousPrompts;
+  // Long rotations (a composition prompt holds for 40 minutes) read as a clock, not "2400s".
+  const timeLeft = secondsLeft >= 60
+    ? `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, "0")}`
+    : `${secondsLeft}s`;
 
   // Not a card of its own — it sits in the exercise's card (desktop) or is
   // given one by the phone view, so the prompt reads as plain, large text.
@@ -116,8 +120,8 @@ export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) =
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       <div className={cn(
         "grid gap-x-8 gap-y-5",
-        count > 1 && "sm:grid-cols-2",
-        count > 2 && "lg:grid-cols-3",
+        count > 1 && "sm:grid-cols-2 shortwide:grid-cols-2",
+        count > 2 && "lg:grid-cols-3 shortwide:grid-cols-3 shortwide:gap-y-4",
       )}>
         <AnimatePresence mode="wait">
           {activePrompts.map((prompt, i) => (
@@ -152,8 +156,8 @@ export const ImprovPromptView = ({ config, isRunning }: ImprovPromptViewProps) =
               transition={{ duration: 0.3, ease: "linear" }}
             />
           </div>
-          <span className="w-8 text-right font-mono text-xs tabular-nums text-zinc-400">
-            {secondsLeft}s
+          <span className="min-w-8 text-right font-mono text-xs tabular-nums text-zinc-400">
+            {timeLeft}
           </span>
         </div>
         {!isRunning && (

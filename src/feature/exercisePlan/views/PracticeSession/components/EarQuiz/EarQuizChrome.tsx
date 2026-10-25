@@ -12,7 +12,7 @@ import {
   Trophy,
   X,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
 import type { EarQuizStats } from "../../hooks/useEarQuizGame";
 
@@ -20,9 +20,12 @@ import type { EarQuizStats } from "../../hooks/useEarQuizGame";
 export function EarQuizHeader({
   label,
   stats,
+  hint,
 }: {
   label: string;
   stats: EarQuizStats;
+  /** Sideways the timer nudge rides in this row instead of taking one of its own. */
+  hint?: ReactNode;
 }) {
   const accuracy =
     stats.answered > 0
@@ -32,6 +35,7 @@ export function EarQuizHeader({
   return (
     <div className='flex flex-wrap items-center justify-between gap-x-6 gap-y-2'>
       <p className='text-sm font-medium text-zinc-400'>{label}</p>
+      {hint}
 
       <div className='flex items-center gap-5 text-xs tabular-nums text-zinc-400'>
         {accuracy !== null && (
@@ -185,8 +189,15 @@ export function QuizVerdict({
   extraAction,
 }: QuizVerdictProps) {
   const { t } = useTranslation("session");
+  // On a short screen (a phone held sideways) the verdict opens under the fold — bring it,
+  // and the way on to the next round, into view.
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
+  }, []);
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18 }}
@@ -241,7 +252,7 @@ export function QuizVerdict({
 export function EarQuizCard({ children }: { children: ReactNode }) {
   return (
     <div className='mx-auto w-full max-w-3xl'>
-      <div className='flex flex-col gap-6 rounded-lg bg-zinc-900/60 p-5 sm:p-6'>
+      <div className='flex flex-col gap-6 rounded-lg bg-zinc-900/60 p-5 sm:p-6 shortwide:gap-4 shortwide:p-4'>
         {children}
       </div>
     </div>
@@ -249,10 +260,10 @@ export function EarQuizCard({ children }: { children: ReactNode }) {
 }
 
 /** Nudge to start the session timer — the quiz itself stays fully usable. */
-export function StartTimerHint() {
+export function StartTimerHint({ className }: { className?: string }) {
   const { t } = useTranslation("session");
   return (
-    <p className='flex items-center justify-center gap-2 text-xs text-amber-400'>
+    <p className={cn('flex items-center justify-center gap-2 text-xs text-amber-400', className)}>
       <Play className='h-3 w-3' aria-hidden />
       {t("quiz.start_hint")}
     </p>

@@ -325,6 +325,9 @@ export function PhoneSessionModal({
                   "flex overflow-hidden",
                   isSideways ? "flex-row" : "flex-col",
                   !isTurned && "h-full",
+                  // Turned, the viewport is still the upright phone — this switches the
+                  // `shortwide:` (phone held sideways) layouts on inside it.
+                  isTurned && "sideways-screen",
                 )}
                 style={isTurned ? {
                   ...QUARTER_TURN_STYLE,

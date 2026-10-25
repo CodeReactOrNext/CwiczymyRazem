@@ -6,6 +6,21 @@ const ms = (n) => `${n}ms`;
 const bezier = (p) => `cubic-bezier(${p.join(", ")})`;
 /** @type {import('tailwindcss').Config} */
 
+/**
+ * `shortwide:` — short AND wide, a phone held sideways. Layouts that stack a tall prompt over a
+ * wide board can put them side by side here. Also on inside `.sideways-screen`: the phone's
+ * practice screen laid on its side on an upright phone, where the viewport is still the upright
+ * one and no media query can tell. Plugin variants are emitted before the screens, so both
+ * carry a second selector (`:root`, `.sideways-screen`) to keep winning over the width
+ * breakpoints, as the old height-based screen did by coming last.
+ */
+const shortwide = plugin(function ({ addVariant }) {
+  addVariant("shortwide", [
+    "@media (max-height: 600px) and (orientation: landscape) { :root & }",
+    ".sideways-screen &",
+  ]);
+});
+
 const rotateX = plugin(function ({ addUtilities }) {
   addUtilities({
     ".rotate-x-20": {
@@ -133,9 +148,7 @@ module.exports = {
       /** Short viewports — phones in landscape, where a dialog sized for
        *  a portrait screen would be clipped top and bottom. */
       short: { raw: "(max-height: 600px)" },
-      /** Short AND wide — a phone held sideways. Layouts that stack a tall
-       *  prompt over a wide board can put them side by side here. */
-      shortwide: { raw: "(max-height: 600px) and (orientation: landscape)" },
+      // `shortwide:` (a phone held sideways) is a variant, not a screen — see `shortwide` below.
     },
     extend: {
       // duration-fast/base/slow + the default curve and ease-out/ease-in-out all come
@@ -551,6 +564,7 @@ module.exports = {
     defaultClick,
     glassEffects,
     borderRadius,
+    shortwide,
     require("tailwindcss-animate"),
     require("@tailwindcss/typography"),
   ],

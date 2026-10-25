@@ -110,7 +110,9 @@ export function NoteHuntDetector({
   );
 
   const prompt = (
-    <div className="flex flex-col items-center gap-3">
+    // Sideways the tile stands beside its instructions instead of over them, so the board
+    // below keeps the height for all six strings.
+    <div className="flex flex-col items-center gap-3 shortwide:flex-row shortwide:gap-4">
       {isPrompt ? (
         <>
           {/* Chord (or root) and the degree asked for, side by side at the same
@@ -125,8 +127,19 @@ export function NoteHuntDetector({
             complete={complete}
             foundCount={foundUnits}
           />
+        </>
+      ) : (
+        <HuntTargetCard
+          value={targetNote}
+          complete={complete}
+          foundCount={foundUnits}
+          animationKey={targetNote}
+        />
+      )}
 
-          <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-3 shortwide:items-start shortwide:gap-1.5">
+        {isPrompt ? (
+          <div className="flex flex-col items-center gap-2 shortwide:items-start">
             {customGoalPrompt!.steps && <HuntSteps {...customGoalPrompt!.steps} />}
             {/* The chord drills ask for a degree of the chord on the card, not an
                 interval above a note, so they set their own line here. Gone once
@@ -138,22 +151,13 @@ export function NoteHuntDetector({
               </p>
             )}
           </div>
-        </>
-      ) : (
-        <>
-          <HuntTargetCard
-            value={targetNote}
-            complete={complete}
-            foundCount={foundUnits}
-            animationKey={targetNote}
-          />
-
-          <div className="flex flex-col items-center gap-2">
+        ) : (
+          <div className="flex flex-col items-center gap-2 shortwide:items-start">
             {/* Says the quiet part loudly: the note alone isn't the task — the
                 string is half of it. Replaces the prose description, which said
                 the same thing. */}
             {soleString ? (
-              <p className="text-center text-sm font-bold text-zinc-200">
+              <p className="text-center text-sm font-bold text-zinc-200 shortwide:text-left">
                 Play it on the <span className="text-cyan-400">{STRING_NAMES[soleString]}</span> string
                 <span className="ml-1 font-semibold text-zinc-500">({STRING_ORDINALS[soleString]})</span>
               </p>
@@ -163,52 +167,52 @@ export function NoteHuntDetector({
               )
             )}
           </div>
-        </>
-      )}
+        )}
 
-      {/* Detection status */}
-      {!isMicEnabled ? (
-        isPrompt ? (
-          // The prompt drills have nothing to tick off by hand: without the mic
-          // the only way out of a round is Reveal answer, which is the giving-up
-          // path. So the requirement is stated outright rather than offered as a
-          // hint the way the octave hunts can afford to.
-          <div className="flex max-w-xs flex-col items-center gap-1 rounded-lg bg-amber-500/10 px-4 py-3 text-center">
-            <span className="flex items-center gap-2 text-sm font-bold text-amber-300">
-              <Mic size='1em' className="h-3.5 w-3.5" aria-hidden /> {t("note_hunt.needs_pitch")}
-            </span>
-            <span className="text-xs font-semibold text-amber-200/70">
-              {t("note_hunt.turn_on")}
-            </span>
-          </div>
+        {/* Detection status */}
+        {!isMicEnabled ? (
+          isPrompt ? (
+            // The prompt drills have nothing to tick off by hand: without the mic
+            // the only way out of a round is Reveal answer, which is the giving-up
+            // path. So the requirement is stated outright rather than offered as a
+            // hint the way the octave hunts can afford to.
+            <div className="flex max-w-xs flex-col items-center gap-1 rounded-lg bg-amber-500/10 px-4 py-3 text-center">
+              <span className="flex items-center gap-2 text-sm font-bold text-amber-300">
+                <Mic size='1em' className="h-3.5 w-3.5" aria-hidden /> {t("note_hunt.needs_pitch")}
+              </span>
+              <span className="text-xs font-semibold text-amber-200/70">
+                {t("note_hunt.turn_on")}
+              </span>
+            </div>
+          ) : (
+            <p className="text-center text-xs text-zinc-400 shortwide:max-w-[18rem] shortwide:text-left">
+              {t("note_hunt.enable_mic")}
+            </p>
+          )
+        ) : !isListening ? (
+          <p className="text-sm font-semibold text-zinc-200">{t("note_hunt.starting_mic")}</p>
         ) : (
-          <p className="text-center text-xs text-zinc-400">
-            {t("note_hunt.enable_mic")}
-          </p>
-        )
-      ) : !isListening ? (
-        <p className="text-sm font-semibold text-zinc-200">{t("note_hunt.starting_mic")}</p>
-      ) : (
-        <DetectionWave volumeRef={volumeRef} active={isListening} isMatch={isMatch} />
-      )}
+          <DetectionWave volumeRef={volumeRef} active={isListening} isMatch={isMatch} />
+        )}
 
-      {/* The right note in an octave the goal doesn't cover — i.e. found on the
-          wrong string. The waveform goes green either way (it hears the note),
-          so without this the score just silently refuses to move. */}
-      {isMicEnabled && wrongOctave && (
-        <p className="text-center text-xs font-bold text-amber-400">
-          {t("note_hunt.wrong_octave", { note: `${targetNote}${toSuperscript(detectedOctave!)}` })}{" "}
-          {soleString
-            ? t("note_hunt.string_gives", {
-                string: t(`note_hunt.strings.${soleString}`, STRING_NAMES[soleString]),
-                note: `${targetNote}${toSuperscript(octaves[0])}`,
-              })
-            : t("note_hunt.stay_inside", {
-                from: noteHuntRegion?.startFret,
-                to: noteHuntRegion?.endFret,
-              })}
-        </p>
-      )}
+        {/* The right note in an octave the goal doesn't cover — i.e. found on the
+            wrong string. The waveform goes green either way (it hears the note),
+            so without this the score just silently refuses to move. */}
+        {isMicEnabled && wrongOctave && (
+          <p className="text-center text-xs font-bold text-amber-400">
+            {t("note_hunt.wrong_octave", { note: `${targetNote}${toSuperscript(detectedOctave!)}` })}{" "}
+            {soleString
+              ? t("note_hunt.string_gives", {
+                  string: t(`note_hunt.strings.${soleString}`, STRING_NAMES[soleString]),
+                  note: `${targetNote}${toSuperscript(octaves[0])}`,
+                })
+              : t("note_hunt.stay_inside", {
+                  from: noteHuntRegion?.startFret,
+                  to: noteHuntRegion?.endFret,
+                })}
+          </p>
+        )}
+      </div>
     </div>
   );
 

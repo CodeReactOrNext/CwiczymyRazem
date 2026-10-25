@@ -65,14 +65,14 @@ interface StepTileProps {
 
 function StepTile({ step, caption, value, state, progress, burst }: StepTileProps) {
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2 shortwide:gap-1">
       <div className="relative">
         {burst && <HuntSuccessBurst foundCount={burst.foundCount} complete={burst.complete} />}
         <motion.div
           animate={state === "done" ? { scale: [1, 1.12, 1] } : { scale: 1 }}
           transition={{ duration: 0.4 }}
           className={cn(
-            "flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-lg transition-colors duration-slow sm:h-20 sm:w-20",
+            "flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-lg transition-colors duration-slow sm:h-20 sm:w-20 shortwide:h-14 shortwide:w-14",
             STEP_TILE_STYLES[state],
           )}>
           <AnimatePresence mode="popLayout">
@@ -82,7 +82,7 @@ function StepTile({ step, caption, value, state, progress, burst }: StepTileProp
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.85 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="font-display text-3xl font-black tracking-tight sm:text-4xl">
+              className="font-display text-3xl font-black tracking-tight sm:text-4xl shortwide:text-2xl">
               {value}
             </motion.span>
           </AnimatePresence>
@@ -289,7 +289,7 @@ export function IntervalClickPanel({
         />
       }
       prompt={
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 shortwide:flex-row shortwide:gap-4">
           {/* The prompt: root, the interval between them, and the answer slot. */}
           <div className="flex items-start justify-center gap-3 sm:gap-5">
             <StepTile
@@ -301,7 +301,7 @@ export function IntervalClickPanel({
               burst={onInterval ? undefined : { foundCount: rootFound, complete: false }}
             />
 
-            <div className="flex flex-col items-center gap-1 pt-5 sm:pt-6">
+            <div className="flex flex-col items-center gap-1 pt-5 sm:pt-6 shortwide:pt-3">
               {interval && (
                 <span className="rounded bg-cyan-500/10 px-2 py-0.5 text-xs font-extrabold text-cyan-400">
                   {interval.degree}
@@ -326,7 +326,7 @@ export function IntervalClickPanel({
             />
           </div>
 
-          <p className={cn("text-center text-sm font-bold", complete ? "text-emerald-400" : "text-zinc-200")}>
+          <p className={cn("text-center text-sm font-bold shortwide:max-w-[12rem] shortwide:text-left shortwide:text-xs", complete ? "text-emerald-400" : "text-zinc-200")}>
             {stepPrompt}
           </p>
         </div>

@@ -119,43 +119,46 @@ export function DetuneQuiz({
         </p>
       </div>
 
-      <div className='space-y-4 px-1 sm:px-6'>
-        <div className='touch-none' {...turnedDrag}>
-          <Slider
-            value={[sliderCents]}
-            onValueChange={([value]) => !isAnswered && setSliderCents(value)}
-            min={-SLIDER_RANGE_CENTS}
-            max={SLIDER_RANGE_CENTS}
-            step={1}
-            disabled={isAnswered}
-            aria-label={t("quiz.second_pitch")}
-            className='py-3'
-          />
+      {/* The answer side — one block, so it sits beside the question when sideways */}
+      <div className='flex flex-col gap-6 shortwide:gap-4'>
+        <div className='space-y-4 px-1 sm:px-6'>
+          <div className='touch-none' {...turnedDrag}>
+            <Slider
+              value={[sliderCents]}
+              onValueChange={([value]) => !isAnswered && setSliderCents(value)}
+              min={-SLIDER_RANGE_CENTS}
+              max={SLIDER_RANGE_CENTS}
+              step={1}
+              disabled={isAnswered}
+              aria-label={t("quiz.second_pitch")}
+              className='py-3'
+            />
+          </div>
+          <div className='flex items-center justify-between text-xs text-zinc-500'>
+            <span>{t("quiz.flatter")}</span>
+            <span
+              className={cn(
+                isAnswered && (solved ? "text-emerald-400" : "text-red-400"),
+              )}>
+              {isAnswered
+                ? `${remaining > 0 ? "+" : ""}${Math.round(remaining)} cents`
+                : "no numbers — trust your ears"}
+            </span>
+            <span>{t("quiz.sharper")}</span>
+          </div>
         </div>
-        <div className='flex items-center justify-between text-xs text-zinc-500'>
-          <span>{t("quiz.flatter")}</span>
-          <span
-            className={cn(
-              isAnswered && (solved ? "text-emerald-400" : "text-red-400"),
-            )}>
-            {isAnswered
-              ? `${remaining > 0 ? "+" : ""}${Math.round(remaining)} cents`
-              : "no numbers — trust your ears"}
-          </span>
-          <span>{t("quiz.sharper")}</span>
-        </div>
-      </div>
 
-      {!isAnswered && (
-        <div className='flex justify-center'>
-          <Button
-            onClick={submit}
-            className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
-            <Check className='h-4 w-4' />
-            That&apos;s in tune
-          </Button>
-        </div>
-      )}
+        {!isAnswered && (
+          <div className='flex justify-center'>
+            <Button
+              onClick={submit}
+              className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
+              <Check className='h-4 w-4' />
+              That&apos;s in tune
+            </Button>
+          </div>
+        )}
+      </div>
 
       <QuizReveal show={isAnswered}>
         <QuizVerdict

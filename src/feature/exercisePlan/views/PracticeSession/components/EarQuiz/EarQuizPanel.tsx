@@ -47,21 +47,30 @@ export function EarQuizPanel({
 
   return (
     <EarQuizCard>
-      <EarQuizHeader label={t(`quiz.modes.${config.mode}`, MODE_LABEL[config.mode])} stats={stats} />
-      {isSessionRunning === false && <StartTimerHint />}
+      <EarQuizHeader
+        label={t(`quiz.modes.${config.mode}`, MODE_LABEL[config.mode])}
+        stats={stats}
+        hint={isSessionRunning === false && <StartTimerHint className='hidden shortwide:flex' />}
+      />
+      {isSessionRunning === false && <StartTimerHint className='shortwide:hidden' />}
 
-      {question.kind === "chordType" && (
-        <ChordTypeQuiz key={round} question={question} {...shared} />
-      )}
-      {question.kind === "progression" && (
-        <ProgressionQuiz key={round} question={question} {...shared} />
-      )}
-      {question.kind === "detune" && (
-        <DetuneQuiz key={round} question={question} {...shared} />
-      )}
-      {question.kind === "scaleMode" && (
-        <ScaleModeQuiz key={round} question={question} {...shared} />
-      )}
+      {/* Sideways the stack runs past the screen: the question and its listen buttons move
+          into a left column, the answers beside them, the verdict across both underneath.
+          Every quiz body is laid out as those three parts in that order. */}
+      <div className='flex flex-col gap-6 shortwide:grid shortwide:grid-cols-2 shortwide:items-center shortwide:gap-x-6 shortwide:gap-y-4 shortwide:[&>*:nth-child(n+3)]:col-span-2'>
+        {question.kind === "chordType" && (
+          <ChordTypeQuiz key={round} question={question} {...shared} />
+        )}
+        {question.kind === "progression" && (
+          <ProgressionQuiz key={round} question={question} {...shared} />
+        )}
+        {question.kind === "detune" && (
+          <DetuneQuiz key={round} question={question} {...shared} />
+        )}
+        {question.kind === "scaleMode" && (
+          <ScaleModeQuiz key={round} question={question} {...shared} />
+        )}
+      </div>
     </EarQuizCard>
   );
 }

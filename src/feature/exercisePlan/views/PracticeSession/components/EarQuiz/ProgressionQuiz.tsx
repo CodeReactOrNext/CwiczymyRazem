@@ -132,83 +132,86 @@ export function ProgressionQuiz({
         </p>
       </div>
 
-      {/* Slots the tiles drop into */}
-      <div className='flex flex-wrap items-center justify-center gap-3'>
-        {slots.map((slot, index) => {
-          const verdict = verdicts?.[index];
-          return (
-            <button
-              key={index}
-              type='button'
-              onClick={() => clearSlot(index)}
-              disabled={isAnswered || slot === null}
-              aria-label={
-                slot
-                  ? t("quiz.slot_filled", { n: index + 1, chord: slot })
-                  : t("quiz.slot_empty", { n: index + 1 })
-              }
-              className={cn(
-                "flex h-16 w-20 flex-col items-center justify-center gap-0.5 rounded-lg text-lg font-semibold transition-colors",
-                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none",
-                slot === null && "bg-zinc-800/20 text-zinc-600",
-                slot !== null &&
-                  verdict === undefined &&
-                  "bg-zinc-800/60 text-zinc-100 hover:bg-zinc-800",
-                verdict === true && "bg-emerald-500/10 text-emerald-400",
-                verdict === false && "bg-red-500/10 text-red-400",
-              )}>
-              <span>{slot ?? index + 1}</span>
-              {isAnswered && (
-                <span className='text-[11px] font-normal opacity-70'>
-                  {question.chords[index]?.name}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Degree tiles */}
-      <div className='flex flex-wrap items-center justify-center gap-2.5'>
-        {question.tiles.map((degree) => (
-          <button
-            key={degree}
-            type='button'
-            onClick={() => placeDegree(degree)}
-            disabled={isAnswered || isComplete}
-            className={cn(
-              "flex h-12 min-w-[72px] flex-col items-center justify-center rounded-lg bg-zinc-800/40 px-3 transition-colors",
-              "text-base font-semibold text-zinc-100 hover:bg-zinc-800",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-              "disabled:pointer-events-none disabled:opacity-40",
-            )}>
-            {degree}
-            <span className='text-[10px] font-normal text-zinc-500'>
-              {QUALITY_LABEL[DEGREES[degree].quality]}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {!isAnswered && (
+      {/* The answer side — one block, so it sits beside the question when sideways */}
+      <div className='flex flex-col gap-6 shortwide:gap-4'>
+        {/* Slots the tiles drop into */}
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <Button
-            onClick={submit}
-            disabled={!isComplete}
-            className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
-            <Check className='h-4 w-4' />
-            {t("quiz.check")}
-          </Button>
-          <Button
-            variant='ghost'
-            onClick={clearAll}
-            disabled={slots.every((slot) => slot === null)}
-            className='h-10 gap-2 text-zinc-400 hover:text-zinc-100'>
-            <Undo2 className='h-4 w-4' />
-            {t("quiz.clear")}
-          </Button>
+          {slots.map((slot, index) => {
+            const verdict = verdicts?.[index];
+            return (
+              <button
+                key={index}
+                type='button'
+                onClick={() => clearSlot(index)}
+                disabled={isAnswered || slot === null}
+                aria-label={
+                  slot
+                    ? t("quiz.slot_filled", { n: index + 1, chord: slot })
+                    : t("quiz.slot_empty", { n: index + 1 })
+                }
+                className={cn(
+                  "flex h-16 w-20 flex-col items-center justify-center gap-0.5 rounded-lg text-lg font-semibold transition-colors",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none",
+                  slot === null && "bg-zinc-800/20 text-zinc-600",
+                  slot !== null &&
+                    verdict === undefined &&
+                    "bg-zinc-800/60 text-zinc-100 hover:bg-zinc-800",
+                  verdict === true && "bg-emerald-500/10 text-emerald-400",
+                  verdict === false && "bg-red-500/10 text-red-400",
+                )}>
+                <span>{slot ?? index + 1}</span>
+                {isAnswered && (
+                  <span className='text-[11px] font-normal opacity-70'>
+                    {question.chords[index]?.name}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
-      )}
+
+        {/* Degree tiles */}
+        <div className='flex flex-wrap items-center justify-center gap-2.5'>
+          {question.tiles.map((degree) => (
+            <button
+              key={degree}
+              type='button'
+              onClick={() => placeDegree(degree)}
+              disabled={isAnswered || isComplete}
+              className={cn(
+                "flex h-12 min-w-[72px] flex-col items-center justify-center rounded-lg bg-zinc-800/40 px-3 transition-colors",
+                "text-base font-semibold text-zinc-100 hover:bg-zinc-800",
+                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                "disabled:pointer-events-none disabled:opacity-40",
+              )}>
+              {degree}
+              <span className='text-[10px] font-normal text-zinc-500'>
+                {QUALITY_LABEL[DEGREES[degree].quality]}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {!isAnswered && (
+          <div className='flex flex-wrap items-center justify-center gap-3'>
+            <Button
+              onClick={submit}
+              disabled={!isComplete}
+              className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
+              <Check className='h-4 w-4' />
+              {t("quiz.check")}
+            </Button>
+            <Button
+              variant='ghost'
+              onClick={clearAll}
+              disabled={slots.every((slot) => slot === null)}
+              className='h-10 gap-2 text-zinc-400 hover:text-zinc-100'>
+              <Undo2 className='h-4 w-4' />
+              {t("quiz.clear")}
+            </Button>
+          </div>
+        )}
+      </div>
 
       <QuizReveal show={isAnswered}>
         <QuizVerdict
