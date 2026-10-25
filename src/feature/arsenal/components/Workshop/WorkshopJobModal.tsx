@@ -93,7 +93,8 @@ export const WorkshopJobModal = ({
 }: WorkshopJobModalProps) => {
   const build = useWorkshopBuild();
   const repair = useWorkshopRepair();
-  const mod = useWorkshopMod();
+  // A fit plays the fit scene; the result below is the receipt it leaves.
+  const mod = useWorkshopMod({ scene: true });
   const [result, setResult] = useState<WorkshopResult | null>(null);
   const labels = useArsenalLabels();
   const { t } = labels;
@@ -115,25 +116,31 @@ export const WorkshopJobModal = ({
     onChangeJob(next);
   };
 
+  // A build or a restoration that played its scene has said everything the
+  // result card would: the dialog closes under the scene rather than waiting
+  // behind it with a second "Done" to press. Without a scene — nothing mounted
+  // to play one — the card is still the only answer, so it stays.
   const runBuild = () =>
     build.mutate(
       { itemId: entry.id, kind: entry.kind },
       {
-        onSuccess: (data) =>
-          setResult({
-            kind: entry.kind,
-            rarity: buildQuote.requirement.promotesTo ?? entry.rarity,
-            rarityBefore: buildQuote.requirement.promotesTo
-              ? entry.rarity
-              : undefined,
-            rarityAfter: buildQuote.requirement.promotesTo ?? undefined,
-            levelBefore: entry.level,
-            levelAfter: entry.level + data.levelGain,
-            conditionBefore: entry.condition,
-            conditionAfter: entry.condition,
-            spent: data.spent,
-            item: data.item,
-          }),
+        onSuccess: (data, _vars, scene) =>
+          scene?.sceneId != null
+            ? close()
+            : setResult({
+                kind: entry.kind,
+                rarity: buildQuote.requirement.promotesTo ?? entry.rarity,
+                rarityBefore: buildQuote.requirement.promotesTo
+                  ? entry.rarity
+                  : undefined,
+                rarityAfter: buildQuote.requirement.promotesTo ?? undefined,
+                levelBefore: entry.level,
+                levelAfter: entry.level + data.levelGain,
+                conditionBefore: entry.condition,
+                conditionAfter: entry.condition,
+                spent: data.spent,
+                item: data.item,
+              }),
       },
     );
 
@@ -141,17 +148,19 @@ export const WorkshopJobModal = ({
     repair.mutate(
       { itemId: entry.id, kind: entry.kind },
       {
-        onSuccess: (data) =>
-          setResult({
-            kind: entry.kind,
-            rarity: entry.rarity,
-            levelBefore: entry.level,
-            levelAfter: entry.level + data.levelGain,
-            conditionBefore: entry.condition,
-            conditionAfter: data.condition,
-            spent: data.spent,
-            item: data.item,
-          }),
+        onSuccess: (data, _vars, scene) =>
+          scene?.sceneId != null
+            ? close()
+            : setResult({
+                kind: entry.kind,
+                rarity: entry.rarity,
+                levelBefore: entry.level,
+                levelAfter: entry.level + data.levelGain,
+                conditionBefore: entry.condition,
+                conditionAfter: data.condition,
+                spent: data.spent,
+                item: data.item,
+              }),
       },
     );
 

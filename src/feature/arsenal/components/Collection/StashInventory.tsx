@@ -243,7 +243,9 @@ export const StashInventory = ({
   const { mutate: sellMod, isPending: isSellingMod } = useSellSalvagedMod();
   const { mutate: sellPart, isPending: isSellingPart } = useSellPart();
   const { mutate: fusePartsStack, isPending: isFusingPart } = useFuseParts();
-  const { mutate: fitMod, isPending: isFitting } = useWorkshopMod();
+  const { mutate: fitMod, isPending: isFitting } = useWorkshopMod({
+    scene: true,
+  });
   // One duplicate at a time plays the merge scene; the sweep over every
   // duplicate at once just reports what it did, with a toast.
   const mergeScene = useMergeScene();

@@ -353,9 +353,10 @@ export const EffectCard = ({
         </CardActionRow>
       )}
 
-      {/* Sell */}
+      {/* Sell — keys, like the guitar card's lower row: a pedal has no Equip,
+          so the actions that send it away are the whole band. */}
       {!readOnly && !footer && !(isOnPedalboard && onRemoveFromBoard) && (
-        <CardActionRow>
+        <CardActionRow keys>
           {onListClick && (
             <CardAction
               tone='market'

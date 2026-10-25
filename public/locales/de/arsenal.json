@@ -1343,5 +1343,39 @@
     "level": "Item-Level",
     "continue": "Weiter",
     "sr": "{{name}} verschmolzen. Item-Level von {{before}} auf {{after}}."
+  },
+  "scene": {
+    "more": "+{{count}} weitere",
+    "teardown": {
+      "working_one": "{{name}} wird zerlegt",
+      "working_many": "{{count}} Ausrüstungsteile werden zerlegt",
+      "done": "Zerlegt",
+      "parts": "Geborgene Teile"
+    },
+    "rework": {
+      "working": "{{count}}× {{part}} werden umgearbeitet",
+      "done": "Umgearbeitet",
+      "from": "aus {{count}}× {{part}}"
+    },
+    "fit": {
+      "working": "{{mod}} wird in {{name}} eingebaut",
+      "done": "Eingebaut"
+    },
+    "delivery": {
+      "working_commission": "Die Werkbank baut deine {{name}}",
+      "working_trader": "Der Händler packt deine {{name}} ein",
+      "done_commission": "Geliefert",
+      "done_trader": "Gekauft",
+      "new_dex": "Neu in deinem Dex",
+      "sr": "{{name}} wurde in dein Lager geliefert."
+    },
+    "build": {
+      "working": "Die Werkbank arbeitet an deiner {{name}}",
+      "promoted": "Aufgewertet zu {{rarity}}"
+    },
+    "restore": {
+      "working": "{{name}} wird restauriert",
+      "done": "Restauriert auf {{grade}}"
+    }
   }
 }

@@ -361,42 +361,45 @@ export const GuitarCard = ({
 
       {/* Equip / Sell */}
       {!readOnly && !footer && (
-        <CardActionRow>
-          <TooltipProvider>
-            {/* Locked, the key says so rather than offering an Equip that will
-                bounce. It keeps its full opacity — the row's disabled style
-                drops to 30%, which on an 11px label is a key the player cannot
-                read at all, and "unreadable" is not the same message as "off". */}
-            {lockedLvl != null ? (
-              <Tooltip delayDuration={150}>
-                <TooltipTrigger asChild>
-                  {/* Wrapper span keeps the tooltip working while the button is disabled. */}
-                  <span className='flex flex-1'>
-                    <CardAction
-                      tone='neutral'
-                      icon={Lock}
-                      disabled
-                      className='text-zinc-500 disabled:opacity-100'>
-                      {t("card.locked")}
-                    </CardAction>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent
-                  side='top'
-                  className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-xs text-white'>
-                  {rarityLockReason(rarity, lockedLvl, t, labels.rarity(rarity))}
-                </TooltipContent>
-              </Tooltip>
-            ) : (
-              <CardAction
-                tone={isEquipped ? "active" : "neutral"}
-                icon={isEquipped ? Check : undefined}
-                onClick={() => onEquipClick?.()}
-                disabled={isEquipping}>
-                {t("card.equip")}
-              </CardAction>
-            )}
-
+        <TooltipProvider>
+          <CardActionRow
+            primary={
+              // Locked, the key says so rather than offering an Equip that will
+              // bounce. It keeps its full opacity — the row's disabled style
+              // drops to 30%, which on a small label is a key the player cannot
+              // read at all, and "unreadable" is not the same message as "off".
+              lockedLvl != null ? (
+                <Tooltip delayDuration={150}>
+                  <TooltipTrigger asChild>
+                    {/* Wrapper span keeps the tooltip working while the button is disabled. */}
+                    <span className='flex flex-1'>
+                      <CardAction
+                        tone='neutral'
+                        icon={Lock}
+                        disabled
+                        className='text-zinc-500 disabled:opacity-100'>
+                        {t("card.locked")}
+                      </CardAction>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side='top'
+                    className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-xs text-white'>
+                    {rarityLockReason(rarity, lockedLvl, t, labels.rarity(rarity))}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                // White while it is an offer; amber once it is the state the
+                // guitar is in, the way every "already done" key is.
+                <CardAction
+                  tone={isEquipped ? "active" : "primary"}
+                  icon={isEquipped ? Check : undefined}
+                  onClick={() => onEquipClick?.()}
+                  disabled={isEquipping}>
+                  {t("card.equip")}
+                </CardAction>
+              )
+            }>
             {onListClick && (
               <Tooltip delayDuration={150}>
                 <TooltipTrigger asChild>
@@ -541,8 +544,8 @@ export const GuitarCard = ({
                 {sellTooltip}
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
-        </CardActionRow>
+          </CardActionRow>
+        </TooltipProvider>
       )}
     </div>
   );

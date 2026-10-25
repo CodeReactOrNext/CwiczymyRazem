@@ -78,8 +78,10 @@ import { CaseShop } from "./components/CaseShop/CaseShop";
 import { CollectionTab } from "./components/Collection/CollectionTab";
 import { CommissionsView } from "./components/Commissions/CommissionsView";
 import { DexView } from "./components/Dex/DexView";
+import { FameWallet } from "./components/FameWallet";
 import { MarketplaceView } from "./components/Marketplace/MarketplaceView";
 import { RigView } from "./components/Rig/RigView";
+import { ArsenalSceneHost } from "./components/Scene/ArsenalSceneHost";
 import {
   arsenalTabListClass,
   arsenalTabTriggerClass,
@@ -184,11 +186,7 @@ const ArsenalTabs = () => {
           // Rig tab itself (`RigStatsPanel`): they are changed by moving gear,
           // so they read as stats of that screen rather than of the banner.
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-1.5">
-              <img src="/images/coin.png" alt="coin" className="h-4 w-4 object-contain" />
-              <span className="text-sm font-black text-amber-400">{fame.toLocaleString()}</span>
-              <span className="text-[11px] text-zinc-400">{t("common.fame")}</span>
-            </div>
+            <FameWallet fame={userStats?.fame} />
             {/*
               Shown even at zero, unlike most counters. A currency nobody knows
               exists is a currency nobody goes and earns: hiding the empty state
@@ -378,6 +376,8 @@ const ArsenalTabs = () => {
         }
         isOpeningAgain={isOpeningPack}
       />
+
+      <ArsenalSceneHost />
     </MainContainer>
   );
 };

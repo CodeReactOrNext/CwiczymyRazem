@@ -1369,5 +1369,39 @@
     "level": "Poziom przedmiotu",
     "continue": "Dalej",
     "sr": "Scalono: {{name}}. Poziom przedmiotu z {{before}} na {{after}}."
+  },
+  "scene": {
+    "more": "+{{count}} więcej",
+    "teardown": {
+      "working_one": "Rozbieranie: {{name}}",
+      "working_many": "Rozbieranie sprzętu: {{count}} szt.",
+      "done": "Rozebrane",
+      "parts": "Odzyskane części"
+    },
+    "rework": {
+      "working": "Przeróbka: {{count}}× {{part}}",
+      "done": "Przerobione",
+      "from": "z {{count}}× {{part}}"
+    },
+    "fit": {
+      "working": "Montaż: {{mod}} → {{name}}",
+      "done": "Zamontowane"
+    },
+    "delivery": {
+      "working_commission": "Warsztat buduje: {{name}}",
+      "working_trader": "Handlarz pakuje: {{name}}",
+      "done_commission": "Dostarczone",
+      "done_trader": "Kupione",
+      "new_dex": "Nowość w Twoim Dexie",
+      "sr": "{{name}} trafia do Twojego schowka."
+    },
+    "build": {
+      "working": "Warsztat pracuje nad: {{name}}",
+      "promoted": "Awans na: {{rarity}}"
+    },
+    "restore": {
+      "working": "Odnawianie: {{name}}",
+      "done": "Odnowione do: {{grade}}"
+    }
   }
 }

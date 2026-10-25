@@ -19,6 +19,7 @@ import { DexMarks } from "../DexMarks";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { ScrapYieldStrip } from "../Parts/ScrapYieldStrip";
+import { PurchaseStamp, useTakenHere } from "./purchaseMotion";
 
 /**
  * What the offered instance would break down into. The offer *is* the roll, so
@@ -70,6 +71,7 @@ export const ItemOfferCard = ({
 }: ItemOfferCardProps) => {
   const { t } = useTranslation("arsenal");
   const canAfford = currentFame >= offer.unitPrice;
+  const takenHere = useTakenHere(available);
   const scrapParts = getOfferScrapYield(offer);
 
   const footer = (
@@ -87,10 +89,12 @@ export const ItemOfferCard = ({
           onClick={onBuy}
         />
       ) : (
-        <div className='flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-800 text-xs font-semibold text-zinc-400'>
+        <PurchaseStamp
+          slam={takenHere}
+          className='flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-800 text-xs font-semibold text-zinc-400'>
           <Check size={13} strokeWidth={3} />
           {t("trader.bought_today")}
-        </div>
+        </PurchaseStamp>
       )}
     </div>
   );

@@ -20,6 +20,7 @@ import {
   PickerSpacer,
   TakenForToday,
 } from "./offerRow";
+import { PurchaseSweep, useTakenHere } from "./purchaseMotion";
 
 interface PartOfferRowProps {
   offer: TraderPartOffer;
@@ -99,9 +100,11 @@ export const PartOfferRow = ({
   const fameBound = maxQty >= 1 && maxQty < remaining;
   const fillTo = fameBound ? maxQty : remaining;
   const tierColor = PART_TIER_COLORS[offer.tier];
+  const takenHere = useTakenHere(!soldOut);
 
   return (
     <div className={offerRowClass(soldOut)}>
+      <PurchaseSweep trigger={owned} color={tierColor} />
       {/* The same lit hollow the stash sockets use, so a part on the counter
           reads as the very object it will become in the pile. */}
       <OfferRowIdentity
@@ -116,7 +119,12 @@ export const PartOfferRow = ({
         }
       />
 
-      <OfferRowStats owned={owned} remaining={remaining} stock={offer.stock} />
+      <OfferRowStats
+        owned={owned}
+        accent={tierColor}
+        remaining={remaining}
+        stock={offer.stock}
+      />
 
       <OfferRowPrice
         unitPrice={offer.unitPrice}
@@ -126,7 +134,7 @@ export const PartOfferRow = ({
 
       <OfferRowActions>
         {soldOut ? (
-          <TakenForToday />
+          <TakenForToday slam={takenHere} />
         ) : (
           <>
             {remaining > 1 ? (

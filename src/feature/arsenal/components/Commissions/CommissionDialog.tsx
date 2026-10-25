@@ -198,7 +198,18 @@ export const CommissionDialog = ({
             </button>
             <button
               onClick={() =>
-                commission.mutate({ kind: target.kind, definitionId: def.id })
+                commission.mutate(
+                  { kind: target.kind, definitionId: def.id },
+                  {
+                    // The delivery scene turned the card over already; the
+                    // dialog's own delivered view would only show it again.
+                    onSuccess: (_data, _vars, scene) => {
+                      if (scene?.sceneId == null) return;
+                      commission.reset();
+                      onClose();
+                    },
+                  },
+                )
               }
               disabled={!quote.canAfford || commission.isPending}
               className={cn(

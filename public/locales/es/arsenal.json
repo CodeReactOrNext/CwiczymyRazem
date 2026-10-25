@@ -1343,5 +1343,39 @@
     "level": "Nivel del objeto",
     "continue": "Continuar",
     "sr": "{{name}} fusionado. Nivel del objeto de {{before}} a {{after}}."
+  },
+  "scene": {
+    "more": "+{{count}} más",
+    "teardown": {
+      "working_one": "Desmontando {{name}}",
+      "working_many": "Desmontando {{count}} piezas de equipo",
+      "done": "Desguazado",
+      "parts": "Piezas recuperadas"
+    },
+    "rework": {
+      "working": "Reelaborando {{count}}× {{part}}",
+      "done": "Reelaborado",
+      "from": "a partir de {{count}}× {{part}}"
+    },
+    "fit": {
+      "working": "Montando {{mod}} en {{name}}",
+      "done": "Montado"
+    },
+    "delivery": {
+      "working_commission": "El taller está construyendo tu {{name}}",
+      "working_trader": "El comerciante está empaquetando tu {{name}}",
+      "done_commission": "Entregado",
+      "done_trader": "Comprado",
+      "new_dex": "Nuevo en tu Dex",
+      "sr": "{{name}} entregado a tu almacén."
+    },
+    "build": {
+      "working": "El taller está trabajando en tu {{name}}",
+      "promoted": "Ascendido a {{rarity}}"
+    },
+    "restore": {
+      "working": "Restaurando tu {{name}}",
+      "done": "Restaurado a {{grade}}"
+    }
   }
 }

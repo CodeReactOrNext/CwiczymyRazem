@@ -6,6 +6,7 @@ import { BuyButton } from "../BuyButton";
 import { MOD_ACCENT, TierPlate } from "../TierPlate";
 import { ModArt } from "../Workshop/ModArt";
 import { RollMeter } from "./offerBits";
+import { PurchaseStamp, PurchaseSweep, useTakenHere } from "./purchaseMotion";
 
 interface ModOfferCardProps {
   offer: TraderModOffer;
@@ -42,6 +43,7 @@ export const ModOfferCard = ({
   const { t } = labels;
   const canAfford = currentFame >= offer.unitPrice;
   const isTopRoll = offer.points >= offer.maxPoints;
+  const takenHere = useTakenHere(available);
 
   return (
     <div
@@ -50,6 +52,8 @@ export const ModOfferCard = ({
         available ? "hover:bg-zinc-800/60" : "opacity-60",
         className,
       )}>
+      <PurchaseSweep trigger={takenHere ? 1 : 0} color={MOD_ACCENT} />
+
       {/* The mods' own purple, as light off the plate rather than a frame. */}
       <div
         className='pointer-events-none absolute inset-0'
@@ -102,7 +106,9 @@ export const ModOfferCard = ({
             className='w-full sm:w-40'
           />
         ) : (
-          <span className='text-xs text-zinc-500'>Taken for today</span>
+          <PurchaseStamp slam={takenHere} className='text-xs text-zinc-500'>
+            {t("trader.taken_for_today")}
+          </PurchaseStamp>
         )}
       </div>
     </div>

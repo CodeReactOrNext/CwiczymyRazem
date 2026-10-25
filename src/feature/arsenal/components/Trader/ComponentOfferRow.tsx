@@ -19,6 +19,7 @@ import {
   PickerSpacer,
   TakenForToday,
 } from "./offerRow";
+import { PurchaseSweep, useTakenHere } from "./purchaseMotion";
 
 interface ComponentOfferRowProps {
   offer: TraderComponentOffer;
@@ -49,13 +50,16 @@ export const ComponentOfferRow = ({
 }: ComponentOfferRowProps) => {
   const labels = useArsenalLabels();
   const { t } = labels;
+  const takenHere = useTakenHere(available);
   const def = getComponent(offer.roll.defId);
   if (!def) return null;
+  const rarityColor = getRarityColor(def.rarity);
 
   const [, maxLevel] = levelRange(def);
 
   return (
     <div className={offerRowClass(!available)}>
+      <PurchaseSweep trigger={owned} color={rarityColor} />
       <OfferRowIdentity
         plate={
           <PartPlate className='h-11 w-11'>
@@ -65,7 +69,7 @@ export const ComponentOfferRow = ({
         name={def.name}
         detail={
           <>
-            <span style={{ color: getRarityColor(def.rarity) }}>
+            <span style={{ color: rarityColor }}>
               {labels.rarity(def.rarity)}
             </span>
             <span className='text-zinc-400'>
@@ -79,6 +83,7 @@ export const ComponentOfferRow = ({
 
       <OfferRowStats
         owned={owned}
+        accent={rarityColor}
         remaining={available ? 1 : 0}
         stock={offer.stock}
       />
@@ -100,7 +105,7 @@ export const ComponentOfferRow = ({
             />
           </>
         ) : (
-          <TakenForToday />
+          <TakenForToday slam={takenHere} />
         )}
       </OfferRowActions>
     </div>

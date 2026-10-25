@@ -4,6 +4,12 @@ import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
+import {
+  afterScene,
+  beginScene,
+  endScene,
+  resolveScene,
+} from "../components/Scene/sceneStore";
 import { getPartLabel } from "../data/partDefinitions";
 import { fuseParts } from "../services/arsenal.service";
 import type { PartId, PartTier } from "../types/arsenal.types";
@@ -28,9 +34,21 @@ export const useFuseParts = () => {
   return useMutation({
     mutationFn: ({ partId, tier, crafts }: FusePartsInput) =>
       fuseParts(partId, tier, crafts),
-    onSuccess: (data) => {
-      // Negative: the fee left the player's balance.
-      dispatch(addFame(-data.fameSpent));
+    onMutate: ({ partId, tier, crafts }) => ({
+      sceneId: beginScene({ type: "rework", partId, tier, crafts }),
+    }),
+    onSuccess: (data, _input, scene) => {
+      // Negative: the fee left the player's balance. Both wait for the scene
+      // to go, so the tab re-renders off its frames and the wallet's count
+      // plays where it can be seen.
+      afterScene(scene?.sceneId, () => {
+        dispatch(addFame(-data.fameSpent));
+        queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
+      });
+      if (scene?.sceneId != null) {
+        resolveScene(scene.sceneId, data);
+        return;
+      }
       toast.success(
         t("toasts.reworked", {
           qty: data.produced.qty,
@@ -43,9 +61,9 @@ export const useFuseParts = () => {
           }),
         }),
       );
-      queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
     },
-    onError: (error: any) => {
+    onError: (error: any, _input, scene) => {
+      endScene(scene?.sceneId);
       const message = error?.response?.data?.error || t("toasts.err.rework");
       toast.error(message);
     },

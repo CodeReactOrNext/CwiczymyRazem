@@ -129,10 +129,13 @@ describe("CommissionsView", () => {
     expect((order as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(order);
 
-    expect(mutate).toHaveBeenCalledWith({
-      kind: "guitar",
-      definitionId: first.target.def.id,
-    });
+    expect(mutate).toHaveBeenCalledWith(
+      {
+        kind: "guitar",
+        definitionId: first.target.def.id,
+      },
+      expect.anything(),
+    );
   });
 
   it("says so once there is nothing left to build", () => {

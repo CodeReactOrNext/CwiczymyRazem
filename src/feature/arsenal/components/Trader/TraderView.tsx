@@ -8,12 +8,17 @@ import { useArsenalData } from "../../hooks/useArsenalData";
 import { useBuyTraderOffer } from "../../hooks/useBuyTraderOffer";
 import { getRemainingStock, useTraderShop } from "../../hooks/useTraderShop";
 import type {
+  EffectInventoryItem,
+  InventoryItem,
+} from "../../types/arsenal.types";
+import type {
   TraderComponentOffer,
   TraderItemOffer,
   TraderModOffer,
   TraderPartOffer,
 } from "../../types/trader.types";
 import { buildDexLookup } from "../../utils/dex";
+import { subjectOfItem } from "../Scene/sceneSubject";
 import { ComponentOfferRow } from "./ComponentOfferRow";
 import { ItemOfferCard } from "./ItemOfferCard";
 import { ModOfferCard } from "./ModOfferCard";
@@ -42,10 +47,24 @@ export const TraderView = () => {
   const { mutate: buy, isPending } = useBuyTraderOffer();
   const [pendingOfferId, setPendingOfferId] = useState<string | null>(null);
 
-  const handleBuy = (offerId: string, qty: number) => {
+  // An instrument off the counter arrives through the delivery scene, which
+  // needs to know what to draw while the purchase is out.
+  const handleBuy = (offerId: string, qty: number, item?: TraderItemOffer) => {
     setPendingOfferId(offerId);
     buy(
-      { offerId, qty, window: shop.window },
+      {
+        offerId,
+        qty,
+        window: shop.window,
+        subject: item
+          ? (subjectOfItem(item.kind, {
+              ...item.roll,
+              id: item.id,
+              acquiredAt: 0,
+              isNew: false,
+            } as InventoryItem | EffectInventoryItem) ?? undefined)
+          : undefined,
+      },
       { onSettled: () => setPendingOfferId(null) },
     );
   };
@@ -187,7 +206,7 @@ export const TraderView = () => {
                     : offer.roll.effectId,
                 )}
                 currentFame={fame}
-                onBuy={() => handleBuy(offer.id, 1)}
+                onBuy={() => handleBuy(offer.id, 1, offer)}
                 isBuying={isPending && pendingOfferId === offer.id}
               />
             ))}

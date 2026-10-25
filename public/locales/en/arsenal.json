@@ -1342,5 +1342,39 @@
     "level": "Item Level",
     "continue": "Continue",
     "sr": "{{name}} merged. Item Level {{before}} to {{after}}."
+  },
+  "scene": {
+    "more": "+{{count}} more",
+    "teardown": {
+      "working_one": "Taking the {{name}} apart",
+      "working_many": "Taking {{count}} pieces of gear apart",
+      "done": "Scrapped",
+      "parts": "Parts recovered"
+    },
+    "rework": {
+      "working": "Reworking {{count}}× {{part}}",
+      "done": "Reworked",
+      "from": "from {{count}}× {{part}}"
+    },
+    "fit": {
+      "working": "Fitting {{mod}} to the {{name}}",
+      "done": "Fitted"
+    },
+    "delivery": {
+      "working_commission": "The bench is building your {{name}}",
+      "working_trader": "The trader is packing your {{name}}",
+      "done_commission": "Delivered",
+      "done_trader": "Bought",
+      "new_dex": "New in your Dex",
+      "sr": "{{name}} delivered to your stash."
+    },
+    "build": {
+      "working": "The bench is working on your {{name}}",
+      "promoted": "Promoted to {{rarity}}"
+    },
+    "restore": {
+      "working": "Restoring your {{name}}",
+      "done": "Restored to {{grade}}"
+    }
   }
 }

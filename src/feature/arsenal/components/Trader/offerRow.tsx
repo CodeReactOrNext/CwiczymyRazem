@@ -2,6 +2,8 @@ import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import type { ReactNode } from "react";
 
+import { GainCount, PurchaseStamp } from "./purchaseMotion";
+
 /**
  * The price list's columns — shared by the header and every row, so the
  * figures line up down the page the way a counter's price board does.
@@ -10,10 +12,13 @@ import type { ReactNode } from "react";
 export const PART_ROW_COLS =
   "xl:grid-cols-[minmax(0,1fr)_5.5rem_5.5rem_7.5rem_auto]";
 
-/** The row itself — one shared surface, dimmed once the slot is taken. */
+/**
+ * The row itself — one shared surface, dimmed once the slot is taken. Relative
+ * and clipped so a purchase can sweep its colour across it.
+ */
 export const offerRowClass = (soldOut: boolean) =>
   cn(
-    "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 rounded-lg bg-zinc-800/30 px-4 py-3 transition-colors xl:gap-x-6",
+    "relative grid grid-cols-[minmax(0,1fr)_auto] items-center overflow-hidden gap-x-4 gap-y-3 rounded-lg bg-zinc-800/30 px-4 py-3 transition-colors xl:gap-x-6",
     PART_ROW_COLS,
     soldOut ? "opacity-50" : "hover:bg-zinc-800/50",
   );
@@ -43,6 +48,8 @@ export const OfferRowIdentity = ({
 
 interface OfferRowStatsProps {
   owned: number;
+  /** The colour a purchase floats off the holding in. */
+  accent?: string;
   remaining: number;
   stock: number;
 }
@@ -54,6 +61,7 @@ interface OfferRowStatsProps {
  */
 export const OfferRowStats = ({
   owned,
+  accent,
   remaining,
   stock,
 }: OfferRowStatsProps) => {
@@ -62,9 +70,11 @@ export const OfferRowStats = ({
   return (
   <div className='order-3 col-span-2 flex gap-4 text-xs tabular-nums text-zinc-400 sm:col-span-1 xl:contents'>
     <span className='xl:text-sm'>
-      <span className='font-semibold text-zinc-200'>
-        {owned.toLocaleString()}
-      </span>
+      <GainCount
+        value={owned}
+        color={accent}
+        className='font-semibold text-zinc-200'
+      />
       <span className='xl:hidden'> {t("trader.in_stash")}</span>
     </span>
     <span className='xl:text-sm'>
@@ -123,14 +133,19 @@ export const OfferRowActions = ({ children }: { children: ReactNode }) => (
   </div>
 );
 
-/** Same width as picker + All + Buy, so the line sits where the controls were. */
-export const TakenForToday = () => {
+/**
+ * Same width as picker + All + Buy, so the line sits where the controls were.
+ * Stamped on when the slot was emptied here rather than on load.
+ */
+export const TakenForToday = ({ slam = false }: { slam?: boolean }) => {
   const { t } = useTranslation("arsenal");
 
   return (
-  <span className='text-xs text-zinc-500 sm:w-[20.5rem] sm:text-center'>
+  <PurchaseStamp
+    slam={slam}
+    className='text-xs text-zinc-500 sm:w-[20.5rem] sm:text-center'>
     {t("trader.taken_for_today")}
-  </span>
+  </PurchaseStamp>
   );
 };
 

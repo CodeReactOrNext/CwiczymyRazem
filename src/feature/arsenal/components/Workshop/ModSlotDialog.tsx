@@ -323,7 +323,8 @@ export const ModSlotDialog = ({
   fame,
   onClose,
 }: ModSlotDialogProps) => {
-  const mod = useWorkshopMod();
+  // Installing into an empty socket plays the fit scene; re-rolls stay here.
+  const mod = useWorkshopMod({ scene: true });
   const labels = useArsenalLabels();
   const { t } = labels;
   const [query, setQuery] = useState("");
