@@ -172,7 +172,8 @@
     "open_tone_studio": "Open Tone Studio",
     "overload_vst_hint": "A safer latency setting gives the plugin more time per block.",
     "vst_rack": "VST rack",
-    "vst_rack_empty": "No plugins yet — build the rack in Tone Studio."
+    "vst_rack_empty": "No plugins yet — build the rack in Tone Studio.",
+    "open_window": "Open the {{name}} window"
   },
   "mode": {
     "choose_title": "How do you want to shape your sound?",

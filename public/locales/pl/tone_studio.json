@@ -174,7 +174,8 @@
     "open_tone_studio": "Otwórz Tone Studio",
     "overload_vst_hint": "Bezpieczniejsze ustawienie opóźnienia da pluginowi więcej czasu na blok.",
     "vst_rack": "Rack VST",
-    "vst_rack_empty": "Brak pluginów — zbuduj rack w Tone Studio."
+    "vst_rack_empty": "Brak pluginów — zbuduj rack w Tone Studio.",
+    "open_window": "Otwórz okno: {{name}}"
   },
   "mode": {
     "choose_title": "Jak chcesz kształtować brzmienie?",

@@ -10,6 +10,7 @@ import { getBackingTrackStatus } from "feature/backingTrack/utils/backingTrackSt
 import { useLocalizedPlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
+import { useSessionTunerStore } from "feature/tuner/store/sessionTunerStore";
 import { selectUserAuth,selectUserInfo} from "feature/user/store/userSlice";
 import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
 import { useTranslation } from "hooks/useTranslation";
@@ -760,6 +761,22 @@ const PracticeSessionInner = ({
     return () => { closeAudio(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMicEnabled]);
+
+  // Lend the open input to the desktop title bar's tuner (see sessionTunerStore).
+  // No cleanup on change: a null in between would close a tuner that is reading
+  // it, so the source only clears when the input closes or the session unmounts.
+  const setTunerSource = useSessionTunerStore((s) => s.setSource);
+  const isInputOpen = isMicEnabled || isListening;
+  useEffect(() => {
+    setTunerSource(isInputOpen ? {
+      frequencyRef: audioRefs.frequencyRef,
+      volumeRef: audioRefs.volumeRef,
+      isListening,
+      tuning: guitarTuning.tuning,
+      isTuningLocked: guitarTuning.isLocked,
+    } : null);
+  }, [isInputOpen, isListening, audioRefs.frequencyRef, audioRefs.volumeRef, guitarTuning.tuning, guitarTuning.isLocked, setTunerSource]);
+  useEffect(() => () => setTunerSource(null), [setTunerSource]);
 
   // Restore this exercise's persisted pitch-detection preference (exam mode
   // manages mic enablement itself via the mic_prompt flow above).

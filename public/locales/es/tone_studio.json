@@ -172,7 +172,8 @@
     "open_tone_studio": "Abrir Tone Studio",
     "overload_vst_hint": "Un ajuste de latencia más seguro le da al plugin más tiempo por bloque.",
     "vst_rack": "Rack VST",
-    "vst_rack_empty": "Aún no hay plugins: monta el rack en Tone Studio."
+    "vst_rack_empty": "Aún no hay plugins: monta el rack en Tone Studio.",
+    "open_window": "Abrir la ventana de {{name}}"
   },
   "mode": {
     "choose_title": "¿Cómo quieres dar forma a tu sonido?",

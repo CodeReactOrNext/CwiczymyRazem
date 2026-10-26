@@ -172,7 +172,8 @@
     "open_tone_studio": "Tone Studio öffnen",
     "overload_vst_hint": "Eine sicherere Latenzeinstellung gibt dem Plugin mehr Zeit pro Block.",
     "vst_rack": "VST-Rack",
-    "vst_rack_empty": "Noch keine Plugins — bau das Rack im Tone Studio."
+    "vst_rack_empty": "Noch keine Plugins — bau das Rack im Tone Studio.",
+    "open_window": "Fenster von {{name}} öffnen"
   },
   "mode": {
     "choose_title": "Wie willst du deinen Sound formen?",

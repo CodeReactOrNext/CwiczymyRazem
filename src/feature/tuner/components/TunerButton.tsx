@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
+import { useSessionTunerStore } from "../store/sessionTunerStore";
 import { TunerDialog } from "./TunerDialog";
 import { TuningForkIcon } from "./TuningForkIcon";
 
@@ -20,53 +21,83 @@ interface TunerButtonProps {
  * practice session has, on the native (ASIO/WASAPI) input. Renders nothing on
  * the web build — there the tuner lives on /tools/tuner and inside sessions.
  *
- * The native engine has one capture slot, so while a practice session is
- * running Pitch Detect this button refuses to open rather than steal the
- * stream (its close() would tear the session's capture down). The session's
- * own Tuner button covers that case.
+ * The native engine has one capture slot, so while a practice session has its
+ * input open the tuner reads the session's pitch instead of opening its own
+ * stream (its close() would tear the session's capture down).
  */
 export const TunerButton = ({ h = "h-7" }: TunerButtonProps) => {
   const { t } = useTranslation("desktop");
   const audio = useGuitarAudioInput();
   const { tuning } = useGuitarTuning({ isGpFile: false, isExamMode: false });
-  const [open, setOpen] = useState(false);
+  const sessionSource = useSessionTunerStore((s) => s.source);
+  // "own" opens the tuner's own capture, "session" borrows the practice
+  // session's input.
+  const [mode, setMode] = useState<"own" | "session" | null>(null);
 
   const { init, close, isNative } = audio;
 
   // Whatever happens to the page, an open tuner never leaves the stream
   // running behind it.
   useEffect(() => {
-    if (!open) return undefined;
+    if (mode !== "own") return undefined;
     init();
     return () => close();
-  }, [open, init, close]);
+  }, [mode, init, close]);
+
+  // The session's input going away closes the borrowed tuner for good, so it
+  // doesn't pop back up when the next session opens one.
+  useEffect(() => {
+    if (mode !== "session") return undefined;
+    return useSessionTunerStore.subscribe((s) => {
+      if (!s.source) setMode(null);
+    });
+  }, [mode]);
 
   const handleOpen = useCallback(async () => {
-    const status = await window.nativeAudio?.getStatus().catch(() => null);
-    if (status?.isOpen) {
-      toast.info(
-        t("tuner.in_use"),
-      );
+    if (useSessionTunerStore.getState().source) {
+      setMode("session");
       return;
     }
-    setOpen(true);
-  }, []);
+    const status = await window.nativeAudio?.getStatus().catch(() => null);
+    if (status?.isOpen) {
+      toast.info(t("tuner.in_use"));
+      return;
+    }
+    setMode("own");
+  }, [t]);
 
   if (!isNative) return null;
 
-  const micHint = audio.error ?? t("tuner.opening");
+  const borrowed = mode === "session" ? sessionSource : null;
+  const isOpen = mode === "own" || !!borrowed;
+  const dialogProps = borrowed
+    ? {
+        frequencyRef: borrowed.frequencyRef,
+        volumeRef: borrowed.volumeRef,
+        isMicEnabled: borrowed.isListening,
+        micHint: t("tuner.opening"),
+        tuning: borrowed.tuning,
+        isTuningLocked: borrowed.isTuningLocked,
+      }
+    : {
+        frequencyRef: audio.audioRefs.frequencyRef,
+        volumeRef: audio.audioRefs.volumeRef,
+        isMicEnabled: audio.isListening,
+        micHint: audio.error ?? t("tuner.opening"),
+        tuning,
+      };
 
   return (
     <>
       {/* The title bar's pill — the nav buttons' shape and ink, tinted
           violet (the tuner's colour everywhere else) while it's open. */}
       <RippleButton
-        onClick={open ? () => setOpen(false) : handleOpen}
+        onClick={isOpen ? () => setMode(null) : handleOpen}
         title={t("tuner.title")}
         className={cn(
           "flex items-center gap-1.5 rounded-full pl-2.5 pr-3 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-400/50",
           h,
-          open
+          isOpen
             ? "bg-violet-500/10 text-violet-300 hover:bg-violet-500/15"
             : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100",
         )}>
@@ -74,17 +105,10 @@ export const TunerButton = ({ h = "h-7" }: TunerButtonProps) => {
         <span>{t("tuner.title")}</span>
       </RippleButton>
 
-      {open &&
+      {isOpen &&
         typeof document !== "undefined" &&
         createPortal(
-          <TunerDialog
-            frequencyRef={audio.audioRefs.frequencyRef}
-            volumeRef={audio.audioRefs.volumeRef}
-            isMicEnabled={audio.isListening}
-            micHint={micHint}
-            tuning={tuning}
-            onClose={() => setOpen(false)}
-          />,
+          <TunerDialog {...dialogProps} onClose={() => setMode(null)} />,
           document.body,
         )}
     </>
